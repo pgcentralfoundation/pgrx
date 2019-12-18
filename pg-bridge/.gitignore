@@ -1,0 +1,3 @@
+src/pg_sys/pg10.rs
+src/pg_sys/pg11.rs
+src/pg_sys/pg12.rs

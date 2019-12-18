@@ -1,0 +1,25 @@
+[package]
+name = "pg-bridge"
+version = "0.1.0"
+authors = ["Eric B. Ridge <eebbrr@gmail.com>"]
+edition = "2018"
+build = "build.rs"
+
+[dependencies]
+pg-guard-attr = { path = "../pg-guard-attr/" }
+pg-guard = { path = "../pg-guard" }
+
+[build-dependencies]
+pg-guard-rewriter = { path = "../pg-guard-rewriter" }
+bindgen = "0.52.0"
+clang = "0.23.0"
+syn = { version = "1.0.5", features = ["extra-traits", "full", "fold", "parsing"] }
+quote = "1.0.2"
+proc-macro2 = "1.0.6"
+rayon = "1.2.1"
+
+[features]
+default = []
+pg10 = []
+pg11 = []
+pg12 = []

@@ -1,0 +1,17 @@
+[workspace]
+members = [
+    "zdb-helper",
+    "pg-bridge",
+    "pg-guard-attr",
+    "pg-guard-rewriter",
+    "pg-guard"
+]
+
+[profile.dev]
+panic = "unwind"
+
+[profile.release]
+panic = "unwind"
+opt-level = 3
+lto = true
+codegen-units = 1
