@@ -2,3 +2,4 @@
 /target
 *.iml
 **/*.rs.bk
+Cargo.lock
