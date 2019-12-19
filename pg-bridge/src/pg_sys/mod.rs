@@ -23,13 +23,13 @@ mod pg12_bindings;
 //
 
 #[cfg(feature = "pg10")]
-pub use pg10::*;
+pub use v10::*;
 
 #[cfg(feature = "pg11")]
-pub use pg11::*;
+pub use v11::*;
 
 #[cfg(feature = "pg12")]
-pub use pg12::*;
+pub use v12::*;
 
 // version modules
 // These exist to allow us to add additional items to the various version namespaces
@@ -37,24 +37,24 @@ pub use pg12::*;
 
 /// item declarations we want to add to all versions
 mod all_versions {
-    // comes from whatever feature version is selected
-    use super::Oid;
-
     /// this comes from `postgres_ext.h`
-    pub const InvalidOid: Oid = 0;
+    pub const InvalidOid: super::Oid = 0;
 }
 
-pub mod pg10 {
+#[cfg(feature = "pg10")]
+pub mod v10 {
     pub use super::all_versions::*;
     pub use super::pg10_bindings::*;
 }
 
-pub mod pg11 {
+#[cfg(feature = "pg11")]
+pub mod v11 {
     pub use super::all_versions::*;
     pub use super::pg11_bindings::*;
 }
 
-pub mod pg12 {
+#[cfg(feature = "pg12")]
+pub mod v12 {
     pub use super::all_versions::*;
     pub use super::pg12_bindings::*;
 }
