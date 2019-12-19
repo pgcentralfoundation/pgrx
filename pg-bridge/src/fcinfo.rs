@@ -1,4 +1,4 @@
-use crate::{pg_sys, text_to_rust_str};
+use crate::{pg_sys, rust_str_to_text_p, text_to_rust_str};
 use std::borrow::Cow;
 
 union Float4Union {
@@ -127,7 +127,6 @@ pub fn pg_getarg_text_pp(
     }
 }
 
-/// Copies the specified `varlena/text` argument into a Rust string
 #[inline]
 pub fn pg_getarg_text_pp_as_str(fcinfo: &pg_sys::FunctionCallInfo, num: usize) -> Option<Cow<str>> {
     match pg_getarg_text_pp(fcinfo, num) {
@@ -212,4 +211,22 @@ pub fn datum_get_float8(d: pg_sys::Datum) -> f64 {
 #[inline]
 pub fn datum_get_text_p(d: pg_sys::Datum) -> *const pg_sys::text {
     d as *const pg_sys::text
+}
+
+#[inline]
+pub fn pg_return_text_p(s: &str) -> pg_sys::Datum {
+    rust_str_to_text_p(s) as pg_sys::Datum
+}
+
+#[inline]
+pub fn pg_return_null(fcinfo: &pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+    unsafe {
+        (*(*fcinfo)).isnull = true;
+    }
+    0 as pg_sys::Datum
+}
+
+#[inline]
+pub fn pg_return_void() -> pg_sys::Datum {
+    0 as pg_sys::Datum
 }
