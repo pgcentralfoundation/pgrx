@@ -1,5 +1,4 @@
 pub mod fcinfo;
-pub mod memcxt;
 pub mod pg_sys;
 pub mod stringinfo;
 pub mod varlena;
