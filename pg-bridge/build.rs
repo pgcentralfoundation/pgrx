@@ -1,3 +1,5 @@
+extern crate build_deps;
+
 use bindgen::callbacks::MacroParsingBehavior;
 use pg_guard_rewriter::{PgGuardRewriter, RewriteMode};
 use quote::quote;
@@ -57,6 +59,9 @@ fn make_git_repo_path(out_dir: String, branch_name: &str) -> PathBuf {
 }
 
 fn main() -> Result<(), std::io::Error> {
+    build_deps::rerun_if_changed_paths("include/*").unwrap();
+    build_deps::rerun_if_changed_paths("include").unwrap();
+
     let pg_git_repo_url = "git://git.postgresql.org/git/postgresql.git";
 
     &vec![
@@ -69,28 +74,39 @@ fn main() -> Result<(), std::io::Error> {
         let out_dir = std::env::var("OUT_DIR").unwrap();
         let version = v.0;
         let branch_name = v.1;
+        let pg_git_path = make_git_repo_path(out_dir, branch_name);
+
         let mut output_rs = PathBuf::new();
         output_rs.push(format!("src/pg_sys/{}.rs", version));
-        let pg_git_path = make_git_repo_path(out_dir, branch_name);
+
+        let mut include_h = PathBuf::new();
+        include_h.push(format!("include/{}.h", version));
 
         let need_generate = git_clone_postgres(&pg_git_path, pg_git_repo_url, branch_name)
             .expect(&format!("Unable to git clone {}", pg_git_repo_url));
 
-        if !need_generate && output_rs.is_file() {
-            eprintln!("{} already exists:  skipping", output_rs.to_str().unwrap());
+        if need_generate || !output_rs.is_file() {
+            eprintln!("[{}] cleaning and building", branch_name);
+
+            git_clean(&pg_git_path, &branch_name)
+                .expect(&format!("Unable to switch to branch {}", branch_name));
+
+            configure_and_make(&pg_git_path, &branch_name).expect(&format!(
+                "Unable to make clean and configure postgres branch {}",
+                branch_name
+            ));
+        } else if std::fs::metadata(&include_h)
+            .unwrap()
+            .modified()
+            .unwrap()
+            .lt(&std::fs::metadata(&output_rs).unwrap().modified().unwrap())
+        {
+            eprintln!("{} is up-to-date:  skipping", output_rs.to_str().unwrap());
             return;
         }
 
-        git_clean(&pg_git_path, &branch_name)
-            .expect(&format!("Unable to switch to branch {}", branch_name));
-
-        configure_and_make(&pg_git_path, &branch_name).expect(&format!(
-            "Unable to make clean and configure postgres branch {}",
-            branch_name
-        ));
-
         let bindings = bindgen::Builder::default()
-            .header(format!("include/{}.h", version))
+            .header(include_h.to_str().unwrap())
             .clang_arg(&format!("-I{}/src/include", pg_git_path.to_str().unwrap()))
             .parse_callbacks(Box::new(IgnoredMacros::default()))
             .rustfmt_bindings(true)
@@ -121,12 +137,9 @@ fn git_clone_postgres(
 
         if gitdir.exists() && gitdir.is_file() {
             // we already have git cloned
-            // do a fetch instead
+            // do a pull instead
             let output = run_command(
-                Command::new("git")
-                    .arg("fetch")
-                    .arg("--all")
-                    .current_dir(path),
+                Command::new("git").arg("pull").current_dir(path),
                 branch_name,
             )?;
 
