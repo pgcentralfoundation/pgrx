@@ -129,10 +129,7 @@ pub fn pg_getarg_text_pp(
 
 /// Copies the specified `varlena/text` argument into a Rust string
 #[inline]
-pub fn pg_getarg_text_pp_as_str<'a>(
-    fcinfo: &'a pg_sys::FunctionCallInfo,
-    num: usize,
-) -> Option<Cow<'a, str>> {
+pub fn pg_getarg_text_pp_as_str(fcinfo: &pg_sys::FunctionCallInfo, num: usize) -> Option<Cow<str>> {
     match pg_getarg_text_pp(fcinfo, num) {
         Some(t) => Some(text_to_rust_str(t)),
         None => None,
