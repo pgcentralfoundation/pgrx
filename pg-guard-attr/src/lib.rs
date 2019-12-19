@@ -14,7 +14,13 @@ pub fn pg_guard(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let rewriter = PgGuardRewriter::new(RewriteMode::RewriteFunctionWithWrapper);
 
     match ast {
+        // this is for processing the members of extern "C" { } blocks
+        // functions inside the block get wrapped as public, top-level unsafe functions that are not "extern"
         Item::ForeignMod(block) => TokenStream::from(rewriter.extern_block(block)),
+
+        // process top-level functions
+        // these functions get wrapped as public extern "C" functions with #[no_mangle] so they
+        // can also be called from C code
         Item::Fn(func) => TokenStream::from(rewriter.item_fn(func)),
         _ => {
             panic!("#[pg_guard] can only be applied to extern \"C\" blocks and top-level functions")
