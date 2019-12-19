@@ -1,4 +1,5 @@
-use crate::pg_sys;
+use crate::{pg_sys, text_to_rust_str};
+use std::borrow::Cow;
 
 union Float4Union {
     value: i32,
@@ -11,21 +12,21 @@ union Float8Union {
 }
 
 #[inline]
-pub fn pg_arg_is_null(fcinfo: &pg_sys::FunctionCallInfoData, num: usize) -> bool {
-    fcinfo.argnull[num]
+pub fn pg_arg_is_null(fcinfo: &pg_sys::FunctionCallInfo, num: usize) -> bool {
+    unsafe { (*(*fcinfo)).argnull[num] }
 }
 
 #[inline]
-pub fn pg_getarg_datum(fcinfo: &pg_sys::FunctionCallInfoData, num: usize) -> Option<pg_sys::Datum> {
+pub fn pg_getarg_datum(fcinfo: &pg_sys::FunctionCallInfo, num: usize) -> Option<pg_sys::Datum> {
     if pg_arg_is_null(fcinfo, num) {
         None
     } else {
-        Some(fcinfo.arg[num])
+        Some(unsafe { (*(*fcinfo)).arg[num] })
     }
 }
 
 #[inline]
-pub fn pg_getarg_i32(fcinfo: &pg_sys::FunctionCallInfoData, num: usize) -> Option<i32> {
+pub fn pg_getarg_i32(fcinfo: &pg_sys::FunctionCallInfo, num: usize) -> Option<i32> {
     match pg_getarg_datum(fcinfo, num) {
         Some(d) => Some(datum_get_i32(d)),
         None => None,
@@ -33,7 +34,7 @@ pub fn pg_getarg_i32(fcinfo: &pg_sys::FunctionCallInfoData, num: usize) -> Optio
 }
 
 #[inline]
-pub fn pg_getarg_u32(fcinfo: &pg_sys::FunctionCallInfoData, num: usize) -> Option<u32> {
+pub fn pg_getarg_u32(fcinfo: &pg_sys::FunctionCallInfo, num: usize) -> Option<u32> {
     match pg_getarg_datum(fcinfo, num) {
         Some(d) => Some(datum_get_u32(d)),
         None => None,
@@ -41,7 +42,7 @@ pub fn pg_getarg_u32(fcinfo: &pg_sys::FunctionCallInfoData, num: usize) -> Optio
 }
 
 #[inline]
-pub fn pg_getarg_i64(fcinfo: &pg_sys::FunctionCallInfoData, num: usize) -> Option<i64> {
+pub fn pg_getarg_i64(fcinfo: &pg_sys::FunctionCallInfo, num: usize) -> Option<i64> {
     match pg_getarg_datum(fcinfo, num) {
         Some(d) => Some(datum_get_i64(d)),
         None => None,
@@ -49,7 +50,7 @@ pub fn pg_getarg_i64(fcinfo: &pg_sys::FunctionCallInfoData, num: usize) -> Optio
 }
 
 #[inline]
-pub fn pg_getarg_u16(fcinfo: &pg_sys::FunctionCallInfoData, num: usize) -> Option<u16> {
+pub fn pg_getarg_u16(fcinfo: &pg_sys::FunctionCallInfo, num: usize) -> Option<u16> {
     match pg_getarg_datum(fcinfo, num) {
         Some(d) => Some(datum_get_u16(d)),
         None => None,
@@ -57,7 +58,7 @@ pub fn pg_getarg_u16(fcinfo: &pg_sys::FunctionCallInfoData, num: usize) -> Optio
 }
 
 #[inline]
-pub fn pg_getarg_char(fcinfo: &pg_sys::FunctionCallInfoData, num: usize) -> Option<char> {
+pub fn pg_getarg_char(fcinfo: &pg_sys::FunctionCallInfo, num: usize) -> Option<char> {
     match pg_getarg_datum(fcinfo, num) {
         Some(d) => Some(datum_get_char(d)),
         None => None,
@@ -65,7 +66,7 @@ pub fn pg_getarg_char(fcinfo: &pg_sys::FunctionCallInfoData, num: usize) -> Opti
 }
 
 #[inline]
-pub fn pg_getarg_bool(fcinfo: &pg_sys::FunctionCallInfoData, num: usize) -> Option<bool> {
+pub fn pg_getarg_bool(fcinfo: &pg_sys::FunctionCallInfo, num: usize) -> Option<bool> {
     match pg_getarg_datum(fcinfo, num) {
         Some(d) => Some(datum_get_bool(d)),
         None => None,
@@ -73,7 +74,7 @@ pub fn pg_getarg_bool(fcinfo: &pg_sys::FunctionCallInfoData, num: usize) -> Opti
 }
 
 #[inline]
-pub fn pg_getarg_oid(fcinfo: &pg_sys::FunctionCallInfoData, num: usize) -> Option<pg_sys::Oid> {
+pub fn pg_getarg_oid(fcinfo: &pg_sys::FunctionCallInfo, num: usize) -> Option<pg_sys::Oid> {
     match pg_getarg_datum(fcinfo, num) {
         Some(d) => Some(datum_get_oid(d)),
         None => None,
@@ -82,7 +83,7 @@ pub fn pg_getarg_oid(fcinfo: &pg_sys::FunctionCallInfoData, num: usize) -> Optio
 
 #[inline]
 pub fn pg_getarg_cstring(
-    fcinfo: &pg_sys::FunctionCallInfoData,
+    fcinfo: &pg_sys::FunctionCallInfo,
     num: usize,
 ) -> Option<std::ffi::CString> {
     match pg_getarg_datum(fcinfo, num) {
@@ -92,7 +93,7 @@ pub fn pg_getarg_cstring(
 }
 
 #[inline]
-pub fn pg_getarg_name(fcinfo: &pg_sys::FunctionCallInfoData, num: usize) -> Option<pg_sys::Name> {
+pub fn pg_getarg_name(fcinfo: &pg_sys::FunctionCallInfo, num: usize) -> Option<pg_sys::Name> {
     match pg_getarg_datum(fcinfo, num) {
         Some(d) => Some(datum_get_name(d)),
         None => None,
@@ -100,7 +101,7 @@ pub fn pg_getarg_name(fcinfo: &pg_sys::FunctionCallInfoData, num: usize) -> Opti
 }
 
 #[inline]
-pub fn pg_getarg_float4(fcinfo: &pg_sys::FunctionCallInfoData, num: usize) -> Option<f32> {
+pub fn pg_getarg_float4(fcinfo: &pg_sys::FunctionCallInfo, num: usize) -> Option<f32> {
     match pg_getarg_datum(fcinfo, num) {
         Some(d) => Some(datum_get_float4(d)),
         None => None,
@@ -108,7 +109,7 @@ pub fn pg_getarg_float4(fcinfo: &pg_sys::FunctionCallInfoData, num: usize) -> Op
 }
 
 #[inline]
-pub fn pg_getarg_float8(fcinfo: &pg_sys::FunctionCallInfoData, num: usize) -> Option<f64> {
+pub fn pg_getarg_float8(fcinfo: &pg_sys::FunctionCallInfo, num: usize) -> Option<f64> {
     match pg_getarg_datum(fcinfo, num) {
         Some(d) => Some(datum_get_float8(d)),
         None => None,
@@ -116,8 +117,8 @@ pub fn pg_getarg_float8(fcinfo: &pg_sys::FunctionCallInfoData, num: usize) -> Op
 }
 
 #[inline]
-pub fn pg_getarg_text_p(
-    fcinfo: &pg_sys::FunctionCallInfoData,
+pub fn pg_getarg_text_pp(
+    fcinfo: &pg_sys::FunctionCallInfo,
     num: usize,
 ) -> Option<*const pg_sys::text> {
     match pg_getarg_datum(fcinfo, num) {
@@ -126,14 +127,14 @@ pub fn pg_getarg_text_p(
     }
 }
 
-pub fn pg_getarg_text_p_as_cstring(
-    fcinfo: &pg_sys::FunctionCallInfoData,
+/// Copies the specified `varlena/text` argument into a Rust string
+#[inline]
+pub fn pg_getarg_text_pp_as_str<'a>(
+    fcinfo: &'a pg_sys::FunctionCallInfo,
     num: usize,
-) -> Option<std::ffi::CString> {
-    match pg_getarg_text_p(fcinfo, num) {
-        Some(t) => Some(unsafe {
-            std::ffi::CString::from(std::ffi::CStr::from_ptr(pg_sys::text_to_cstring(t)))
-        }),
+) -> Option<Cow<'a, str>> {
+    match pg_getarg_text_pp(fcinfo, num) {
+        Some(t) => Some(text_to_rust_str(t)),
         None => None,
     }
 }
