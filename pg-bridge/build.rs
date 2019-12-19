@@ -63,6 +63,7 @@ fn main() -> Result<(), std::io::Error> {
     build_deps::rerun_if_changed_paths("include").unwrap();
 
     let pg_git_repo_url = "git://git.postgresql.org/git/postgresql.git";
+    let build_rs = PathBuf::from("build.rs");
 
     &vec![
         ("pg10", "REL_10_STABLE"),
@@ -76,16 +77,13 @@ fn main() -> Result<(), std::io::Error> {
         let branch_name = v.1;
         let pg_git_path = make_git_repo_path(out_dir, branch_name);
 
-        let mut output_rs = PathBuf::new();
-        output_rs.push(format!("src/pg_sys/{}.rs", version));
-
-        let mut include_h = PathBuf::new();
-        include_h.push(format!("include/{}.h", version));
+        let output_rs = PathBuf::from(format!("src/pg_sys/{}.rs", version));
+        let include_h = PathBuf::from(format!("include/{}.h", version));
 
         let need_generate = git_clone_postgres(&pg_git_path, pg_git_repo_url, branch_name)
             .expect(&format!("Unable to git clone {}", pg_git_repo_url));
 
-        if need_generate || !output_rs.is_file() {
+        if need_generate {
             eprintln!("[{}] cleaning and building", branch_name);
 
             git_clean(&pg_git_path, &branch_name)
@@ -95,16 +93,36 @@ fn main() -> Result<(), std::io::Error> {
                 "Unable to make clean and configure postgres branch {}",
                 branch_name
             ));
-        } else if std::fs::metadata(&include_h)
-            .unwrap()
-            .modified()
-            .unwrap()
-            .lt(&std::fs::metadata(&output_rs).unwrap().modified().unwrap())
+        } else if output_rs.is_file()
+            && std::fs::metadata(&build_rs)
+                .unwrap()
+                .modified()
+                .unwrap()
+                .gt(&std::fs::metadata(&output_rs).unwrap().modified().unwrap())
+        {
+            eprintln!(
+                "[{}] build.rs is newer, removing and re-generating {}",
+                branch_name,
+                output_rs.to_str().unwrap()
+            );
+            std::fs::remove_file(&output_rs)
+                .expect(&format!("couldn't delete {}", output_rs.to_str().unwrap()));
+        } else if output_rs.is_file()
+            && std::fs::metadata(&include_h)
+                .unwrap()
+                .modified()
+                .unwrap()
+                .lt(&std::fs::metadata(&output_rs).unwrap().modified().unwrap())
         {
             eprintln!("{} is up-to-date:  skipping", output_rs.to_str().unwrap());
             return;
         }
 
+        eprintln!(
+            "[{}] Running bindgen on {}",
+            branch_name,
+            output_rs.to_str().unwrap()
+        );
         let bindings = bindgen::Builder::default()
             .header(include_h.to_str().unwrap())
             .clang_arg(&format!("-I{}/src/include", pg_git_path.to_str().unwrap()))
