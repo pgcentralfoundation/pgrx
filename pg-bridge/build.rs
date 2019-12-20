@@ -128,7 +128,7 @@ fn main() -> Result<(), std::io::Error> {
             .clang_arg(&format!("-I{}/src/include", pg_git_path.to_str().unwrap()))
             .parse_callbacks(Box::new(IgnoredMacros::default()))
             .rustfmt_bindings(true)
-            .derive_debug(false)
+            .derive_debug(true)
             .layout_tests(false)
             .generate()
             .expect(&format!("Unable to generate bindings for {}", version));
