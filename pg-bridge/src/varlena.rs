@@ -51,6 +51,7 @@ pub fn varsize(ptr: *const pg_sys::varlena) -> u32 {
 /// #define VARATT_IS_4B(PTR) \
 /// ((((varattrib_1b *) (PTR))->va_header & 0x01) == 0x00)
 /// ```
+#[inline]
 pub fn varatt_is_4b(ptr: *const pg_sys::varlena) -> bool {
     unsafe {
         let va1b = ptr as *const pg_sys::varattrib_1b;
@@ -62,6 +63,7 @@ pub fn varatt_is_4b(ptr: *const pg_sys::varlena) -> bool {
 /// #define VARATT_IS_4B_U(PTR) \
 /// ((((varattrib_1b *) (PTR))->va_header & 0x03) == 0x00)
 /// ```
+#[inline]
 pub fn varatt_is_4b_u(ptr: *const pg_sys::varlena) -> bool {
     unsafe {
         let va1b = ptr as *const pg_sys::varattrib_1b;
@@ -73,6 +75,7 @@ pub fn varatt_is_4b_u(ptr: *const pg_sys::varlena) -> bool {
 /// #define VARATT_IS_4B_C(PTR) \
 /// ((((varattrib_1b *) (PTR))->va_header & 0x03) == 0x02)
 /// ```
+#[inline]
 pub fn varatt_is_b8_c(ptr: *const pg_sys::varlena) -> bool {
     unsafe {
         let va1b = ptr as *const pg_sys::varattrib_1b;
@@ -84,6 +87,7 @@ pub fn varatt_is_b8_c(ptr: *const pg_sys::varlena) -> bool {
 /// #define VARATT_IS_1B(PTR) \
 /// ((((varattrib_1b *) (PTR))->va_header & 0x01) == 0x01)
 /// ```
+#[inline]
 pub fn varatt_is_b8(ptr: *const pg_sys::varlena) -> bool {
     unsafe {
         let va1b = ptr as *const pg_sys::varattrib_1b;
@@ -95,6 +99,7 @@ pub fn varatt_is_b8(ptr: *const pg_sys::varlena) -> bool {
 /// #define VARATT_IS_1B_E(PTR) \
 /// ((((varattrib_1b *) (PTR))->va_header) == 0x01)
 /// ```
+#[inline]
 pub fn varatt_is_b8_e(ptr: *const pg_sys::varlena) -> bool {
     unsafe {
         let va1b = ptr as *const pg_sys::varattrib_1b;
@@ -106,6 +111,7 @@ pub fn varatt_is_b8_e(ptr: *const pg_sys::varlena) -> bool {
 /// #define VARATT_NOT_PAD_BYTE(PTR) \
 /// (*((uint8 *) (PTR)) != 0)
 /// ```
+#[inline]
 pub fn varatt_not_pad_byte(ptr: *const pg_sys::varlena) -> bool {
     !ptr.is_null()
 }
