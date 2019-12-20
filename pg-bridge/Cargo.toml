@@ -8,6 +8,7 @@ build = "build.rs"
 [dependencies]
 pg-guard-attr = { path = "../pg-guard-attr/" }
 pg-guard = { path = "../pg-guard" }
+memoffset = "0.5.3"
 
 [build-dependencies]
 pg-guard-rewriter = { path = "../pg-guard-rewriter" }

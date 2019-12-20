@@ -37,12 +37,25 @@ pub use v12::*;
 
 /// item declarations we want to add to all versions
 mod all_versions {
+    use memoffset::*;
+
     /// this comes from `postgres_ext.h`
     pub const InvalidOid: super::Oid = 0;
     pub const InvalidOffsetNumber: super::OffsetNumber = 0;
     pub const FirstOffsetNumber: super::OffsetNumber = 1;
     pub const MaxOffsetNumber: super::OffsetNumber =
         (super::BLCKSZ as usize / std::mem::size_of::<super::ItemIdData>()) as super::OffsetNumber;
+    pub const VARHDRSZ: usize = std::mem::size_of::<super::int32>();
+
+    #[inline]
+    pub fn VARHDRSZ_EXTERNAL() -> usize {
+        offset_of!(super::varattrib_1b_e, va_data)
+    }
+
+    #[inline]
+    pub fn VARHDRSZ_SHORT() -> usize {
+        offset_of!(super::varattrib_1b, va_data)
+    }
 }
 
 #[cfg(feature = "pg10")]
