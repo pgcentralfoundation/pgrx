@@ -39,6 +39,10 @@ pub use v12::*;
 mod all_versions {
     /// this comes from `postgres_ext.h`
     pub const InvalidOid: super::Oid = 0;
+    pub const InvalidOffsetNumber: super::OffsetNumber = 0;
+    pub const FirstOffsetNumber: super::OffsetNumber = 1;
+    pub const MaxOffsetNumber: super::OffsetNumber =
+        (super::BLCKSZ as usize / std::mem::size_of::<super::ItemIdData>()) as super::OffsetNumber;
 }
 
 #[cfg(feature = "pg10")]

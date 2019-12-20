@@ -3,6 +3,7 @@
 #include "access/amapi.h"
 #include "access/genam.h"
 #include "access/htup.h"
+#include "access/htup_details.h"
 #include "access/skey.h"
 #include "catalog/index.h"
 #include "executor/executor.h"

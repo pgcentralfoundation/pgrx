@@ -1,4 +1,6 @@
 pub mod fcinfo;
+pub mod htup;
+pub mod itemptr;
 pub mod memcxt;
 pub mod nodes;
 pub mod pg_sys;
@@ -6,6 +8,8 @@ pub mod stringinfo;
 pub mod varlena;
 
 pub use fcinfo::*;
+pub use htup::*;
+pub use itemptr::*;
 pub use memcxt::*;
 pub use nodes::*;
 pub use pg_guard::{
