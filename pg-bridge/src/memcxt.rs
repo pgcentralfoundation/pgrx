@@ -7,6 +7,7 @@
 //! simple accessibility to working with MemoryContexts in a compiler-checked manner
 //!
 use crate::pg_sys;
+use pg_guard::PostgresStruct;
 use std::fmt::Debug;
 use std::ops::{Deref, DerefMut};
 
@@ -16,7 +17,7 @@ use std::ops::{Deref, DerefMut};
 ///
 /// The memory will be freed when its parent MemoryContext is deleted.
 #[inline]
-pub fn palloc_struct<T: Sized + Debug>() -> *mut T {
+pub fn palloc_struct<T>() -> *mut T {
     (unsafe { pg_sys::palloc(std::mem::size_of::<T>()) }) as *mut T
 }
 
@@ -28,7 +29,7 @@ pub fn palloc_struct<T: Sized + Debug>() -> *mut T {
 ///
 /// Also zeros out the allocation block
 #[inline]
-pub fn palloc0_struct<T: Sized + Debug>() -> *mut T {
+pub fn palloc0_struct<T>() -> *mut T {
     (unsafe { pg_sys::palloc0(std::mem::size_of::<T>()) }) as *mut T
 }
 
@@ -38,9 +39,7 @@ pub fn palloc0_struct<T: Sized + Debug>() -> *mut T {
 ///
 /// The memory will be freed when the specified MemoryContext is deleted.
 #[inline]
-pub fn palloc_struct_in_memory_context<T: Sized + Debug>(
-    memory_context: pg_sys::MemoryContext,
-) -> *mut T {
+pub fn palloc_struct_in_memory_context<T>(memory_context: pg_sys::MemoryContext) -> *mut T {
     assert!(!memory_context.is_null());
     (unsafe { pg_sys::MemoryContextAlloc(memory_context, std::mem::size_of::<T>()) }) as *mut T
 }
@@ -53,9 +52,7 @@ pub fn palloc_struct_in_memory_context<T: Sized + Debug>(
 ///
 /// Also zeros out the allocation block
 #[inline]
-pub fn palloc0_struct_in_memory_context<T: Sized + Debug>(
-    memory_context: pg_sys::MemoryContext,
-) -> *mut T {
+pub fn palloc0_struct_in_memory_context<T>(memory_context: pg_sys::MemoryContext) -> *mut T {
     assert!(!memory_context.is_null());
     (unsafe { pg_sys::MemoryContextAllocZero(memory_context, std::mem::size_of::<T>()) }) as *mut T
 }
@@ -458,7 +455,7 @@ enum WhoAllocated {
 #[derive(Debug)]
 pub struct PgBox<T>
 where
-    T: Sized + Debug,
+    T: Sized + Debug + PostgresStruct,
 {
     ptr: Option<*mut T>,
     owner: WhoAllocated,
@@ -466,7 +463,7 @@ where
 
 impl<T> PgBox<T>
 where
-    T: Sized + Debug,
+    T: Sized + Debug + PostgresStruct,
 {
     /// Allocate enough memory for the type'd struct, within Postgres' `CurrentMemoryContext`  The
     /// allocated memory is uninitialized.
@@ -600,7 +597,7 @@ where
 
 impl<T> Deref for PgBox<T>
 where
-    T: Sized + Debug,
+    T: Sized + Debug + PostgresStruct,
 {
     type Target = T;
 
@@ -614,7 +611,7 @@ where
 
 impl<T> DerefMut for PgBox<T>
 where
-    T: Sized + Debug,
+    T: Sized + Debug + PostgresStruct,
 {
     fn deref_mut(&mut self) -> &mut T {
         match self.ptr {
@@ -626,7 +623,7 @@ where
 
 impl<T> From<*mut T> for PgBox<T>
 where
-    T: Sized + Debug,
+    T: Sized + Debug + PostgresStruct,
 {
     fn from(ptr: *mut T) -> Self {
         PgBox::from_pg(ptr)
@@ -635,7 +632,7 @@ where
 
 impl<T> Drop for PgBox<T>
 where
-    T: Sized + Debug,
+    T: Sized + Debug + PostgresStruct,
 {
     fn drop(&mut self) {
         if self.ptr.is_some() {
@@ -655,7 +652,7 @@ where
 
 impl<T> std::fmt::Display for PgBox<T>
 where
-    T: Sized + Debug,
+    T: Sized + Debug + PostgresStruct,
 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self.ptr {

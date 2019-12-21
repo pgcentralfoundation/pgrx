@@ -2,7 +2,10 @@ use quote::quote;
 use std::ops::Deref;
 use std::str::FromStr;
 use syn::export::{ToTokens, TokenStream2};
-use syn::{FnArg, ForeignItem, ForeignItemFn, ItemFn, ItemForeignMod, Pat, Signature, Visibility};
+use syn::{
+    FnArg, ForeignItem, ForeignItemFn, ItemFn, ItemForeignMod, ItemStruct, Pat, Signature,
+    Visibility,
+};
 
 pub enum RewriteMode {
     ApplyPgGuardMacro,
@@ -14,6 +17,16 @@ pub struct PgGuardRewriter(RewriteMode);
 impl PgGuardRewriter {
     pub fn new(mode: RewriteMode) -> Self {
         PgGuardRewriter(mode)
+    }
+
+    pub fn item_struct(&self, item_struct: ItemStruct) -> proc_macro2::TokenStream {
+        let mut stream = TokenStream2::new();
+        stream.extend(quote! {
+            #[derive(PostgresStruct)]
+            #item_struct
+        });
+
+        stream
     }
 
     pub fn extern_block(&self, block: ItemForeignMod) -> proc_macro2::TokenStream {

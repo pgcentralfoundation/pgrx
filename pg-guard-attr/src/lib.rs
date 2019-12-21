@@ -56,3 +56,24 @@ fn rewrite_item_fn(func: ItemFn) -> proc_macro2::TokenStream {
     // TODO:  should we even do that?  I think macros in favor of
     // TODO:  mimicking PG_GETARG_XXX() makes more sense
 }
+
+#[proc_macro_derive(PostgresStruct)]
+pub fn derive_postgres_struct(input: TokenStream) -> TokenStream {
+    fn impl_postgres_struct(ast: &syn::DeriveInput) -> TokenStream {
+        let name = &ast.ident;
+        let name_str = format!("{}", name);
+
+        if name_str.starts_with("_") {
+            // skip types that start with an underscore
+            (quote! {}).into()
+        } else {
+            (quote! {
+                impl PostgresStruct for #name { }
+            })
+            .into()
+        }
+    }
+
+    let ast = syn::parse(input).unwrap();
+    impl_postgres_struct(&ast)
+}

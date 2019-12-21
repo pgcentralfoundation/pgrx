@@ -267,11 +267,16 @@ fn apply_pg_guard(input: String) -> Result<String, std::io::Error> {
     let mut stream = TokenStream2::new();
     let file = syn::parse_file(input.as_str()).unwrap();
 
+    stream.extend(quote! {use pg_guard::PostgresStruct;});
     for item in file.items.into_iter() {
         match item {
             Item::ForeignMod(block) => {
                 let block = rewriter.extern_block(block);
                 stream.extend(quote! { #block });
+            }
+            Item::Struct(item_struct) => {
+                let item_struct = rewriter.item_struct(item_struct);
+                stream.extend(quote! { #item_struct });
             }
             _ => {
                 stream.extend(quote! { #item });

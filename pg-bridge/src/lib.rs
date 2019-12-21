@@ -1,3 +1,6 @@
+#[macro_use]
+extern crate pg_guard_attr;
+
 pub mod fcinfo;
 pub mod htup;
 pub mod itemptr;
