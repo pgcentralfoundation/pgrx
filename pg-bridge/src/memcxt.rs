@@ -424,7 +424,7 @@ enum WhoAllocated {
 /// ```
 ///
 /// Alternatively, perhaps you want to work with a pointer Postgres gave you as if it were a Rust type,
-/// but it can't be freed on Drop since Postgres you don't own it (Postgres does):
+/// but it can't be freed on Drop since you don't own it -- Postgres does:
 ///
 /// ```rust
 /// use pg_bridge::{pg_sys, PgBox};
