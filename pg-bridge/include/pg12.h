@@ -7,6 +7,7 @@
 #include "access/skey.h"
 #include "catalog/index.h"
 #include "executor/executor.h"
+#include "executor/spi.h"
 #include "nodes/execnodes.h"
 #include "nodes/nodes.h"
 #include "nodes/tidbitmap.h"
