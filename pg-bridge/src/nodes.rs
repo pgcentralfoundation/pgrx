@@ -1,4 +1,3 @@
-use crate::memcxt::palloc0_struct;
 use crate::{pg_sys, PgBox};
 use pg_guard::PostgresStruct;
 use std::fmt::Debug;
@@ -34,7 +33,7 @@ where
     // TODO:  and make this a gigantic match arm where we hardcode the struct name
     // TODO:  not sure that's a better idea, but it would be one less thing the caller
     // TODO:  would need to specify, reducing compilation problems
-    let node = palloc0_struct::<T>() as *mut pg_sys::Node;
+    let mut node = pg_sys::palloc0(std::mem::size_of::<T>()) as *mut pg_sys::Node;
     (*node).type_ = tag;
     PgBox::from_raw(node as *mut T)
 }

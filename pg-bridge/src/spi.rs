@@ -1,7 +1,6 @@
-use crate::pg_sys;
 use crate::pg_sys::{SPI_execute, SPI_execute_with_args, SPI_finish};
+use crate::{pg_sys, PgMemoryContexts};
 use num_traits::FromPrimitive;
-use pg_guard::*;
 
 #[derive(Debug, Primitive)]
 pub enum SpiOk {
@@ -50,15 +49,22 @@ pub struct Spi();
 pub struct SpiClient {
     #[allow(dead_code)]
     spi: Spi,
+    outer_memory_context: PgMemoryContexts,
 }
 
 impl Spi {
     pub fn connect<R, F: FnOnce(SpiClient) -> std::result::Result<R, SpiError>>(
         f: F,
     ) -> std::result::Result<R, SpiError> {
+        let outer_memory_context =
+            PgMemoryContexts::For(PgMemoryContexts::CurrentMemoryContext.value());
+
         Spi::check_status(unsafe { pg_sys::SPI_connect() })?;
 
-        f(SpiClient { spi: Spi() })
+        f(SpiClient {
+            spi: Spi(),
+            outer_memory_context: outer_memory_context,
+        })
     }
 
     pub fn check_status(status_code: i32) -> std::result::Result<SpiOk, SpiError> {
@@ -87,6 +93,10 @@ impl SpiClient {
         args: Option<Vec<(pg_sys::Oid, pg_sys::Datum)>>,
     ) -> std::result::Result<(SpiOk, u64), SpiError> {
         SpiClient::execute(query, true, limit, args)
+    }
+
+    pub fn get_outer_memory_context(&mut self) -> &mut PgMemoryContexts {
+        &mut self.outer_memory_context
     }
 
     /// perform any query (including utility statements) that modify the database in some way

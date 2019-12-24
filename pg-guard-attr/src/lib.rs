@@ -16,12 +16,12 @@ pub fn pg_guard(_attr: TokenStream, item: TokenStream) -> TokenStream {
     match ast {
         // this is for processing the members of extern "C" { } blocks
         // functions inside the block get wrapped as public, top-level unsafe functions that are not "extern"
-        Item::ForeignMod(block) => TokenStream::from(rewriter.extern_block(block)),
+        Item::ForeignMod(block) => rewriter.extern_block(block).into(),
 
         // process top-level functions
         // these functions get wrapped as public extern "C" functions with #[no_mangle] so they
         // can also be called from C code
-        Item::Fn(func) => TokenStream::from(rewriter.item_fn(func)),
+        Item::Fn(func) => rewriter.item_fn(func).into(),
         _ => {
             panic!("#[pg_guard] can only be applied to extern \"C\" blocks and top-level functions")
         }
@@ -33,7 +33,7 @@ pub fn pg_extern(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(item as syn::Item);
 
     match ast {
-        Item::Fn(func) => TokenStream::from(rewrite_item_fn(func)),
+        Item::Fn(func) => rewrite_item_fn(func).into(),
         _ => panic!("#[pg_extern] can only be applied to top-level functions"),
     }
 }

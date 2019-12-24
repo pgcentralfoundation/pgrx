@@ -59,14 +59,14 @@ impl PgGuardRewriter {
         sig.abi = Some(syn::parse_str("extern \"C\"").unwrap());
         let sig = sig.into_token_stream();
 
-        proc_macro2::TokenStream::from(quote! {
+        quote! {
             #[no_mangle]
             pub #sig {
                 #orig_func
 
                 pg_guard::guard( || unsafe { # func_name( # arg_list) })
             }
-        })
+        }
     }
 
     pub fn foreign_item(&self, item: ForeignItem) -> proc_macro2::TokenStream {

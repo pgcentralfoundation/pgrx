@@ -17,8 +17,11 @@ use std::ops::{Deref, DerefMut};
 ///
 /// The memory will be freed when its parent MemoryContext is deleted.
 #[inline]
-pub fn palloc_struct<T>() -> *mut T {
-    (unsafe { pg_sys::palloc(std::mem::size_of::<T>()) }) as *mut T
+pub fn palloc_struct<T>() -> PgBox<T>
+where
+    T: Sized + Debug + PostgresStruct,
+{
+    PgBox::from_raw((unsafe { pg_sys::palloc(std::mem::size_of::<T>()) }) as *mut T)
 }
 
 /// Return a Postgres-allocated pointer to a struct allocated in Postgres' [pg_sys::CurrentMemoryContext].  
@@ -29,8 +32,11 @@ pub fn palloc_struct<T>() -> *mut T {
 ///
 /// Also zeros out the allocation block
 #[inline]
-pub fn palloc0_struct<T>() -> *mut T {
-    (unsafe { pg_sys::palloc0(std::mem::size_of::<T>()) }) as *mut T
+pub fn palloc0_struct<T>() -> PgBox<T>
+where
+    T: Sized + Debug + PostgresStruct,
+{
+    PgBox::from_raw((unsafe { pg_sys::palloc0(std::mem::size_of::<T>()) }) as *mut T)
 }
 
 /// Return a Postgres-allocated pointer to a struct allocated in the specified Postgres MemoryContext.  
@@ -39,9 +45,14 @@ pub fn palloc0_struct<T>() -> *mut T {
 ///
 /// The memory will be freed when the specified MemoryContext is deleted.
 #[inline]
-pub fn palloc_struct_in_memory_context<T>(memory_context: pg_sys::MemoryContext) -> *mut T {
+pub fn palloc_struct_in_memory_context<T>(memory_context: pg_sys::MemoryContext) -> PgBox<T>
+where
+    T: Sized + Debug + PostgresStruct,
+{
     assert!(!memory_context.is_null());
-    (unsafe { pg_sys::MemoryContextAlloc(memory_context, std::mem::size_of::<T>()) }) as *mut T
+    PgBox::from_raw(
+        (unsafe { pg_sys::MemoryContextAlloc(memory_context, std::mem::size_of::<T>()) }) as *mut T,
+    )
 }
 
 /// Return a Postgres-allocated pointer to a struct allocated in the specified Postgres MemoryContext.  
@@ -52,9 +63,15 @@ pub fn palloc_struct_in_memory_context<T>(memory_context: pg_sys::MemoryContext)
 ///
 /// Also zeros out the allocation block
 #[inline]
-pub fn palloc0_struct_in_memory_context<T>(memory_context: pg_sys::MemoryContext) -> *mut T {
+pub fn palloc0_struct_in_memory_context<T>(memory_context: pg_sys::MemoryContext) -> PgBox<T>
+where
+    T: Sized + Debug + PostgresStruct,
+{
     assert!(!memory_context.is_null());
-    (unsafe { pg_sys::MemoryContextAllocZero(memory_context, std::mem::size_of::<T>()) }) as *mut T
+    PgBox::from_raw(
+        (unsafe { pg_sys::MemoryContextAllocZero(memory_context, std::mem::size_of::<T>()) })
+            as *mut T,
+    )
 }
 
 /// A shorter type name for a `*const std::os::raw::c_void`
@@ -201,6 +218,9 @@ pub enum PgMemoryContexts {
 }
 
 impl PgMemoryContexts {
+    /// Retrieve the underlying Postgres `*mut MemoryContextData`
+    ///
+    /// This works for every type except the `::Transient` type.
     pub fn value(&self) -> pg_sys::MemoryContext {
         match self {
             PgMemoryContexts::CurrentMemoryContext => unsafe { pg_sys::CurrentMemoryContext },
@@ -277,6 +297,44 @@ impl PgMemoryContexts {
                 result
             }
             _ => PgMemoryContexts::exec_in_context(self.value(), f),
+        }
+    }
+
+    /// Copies the bytes behind the specified `src` struct into
+    /// this memory context.  Returns a `PgBox<T>`'d wrapper around
+    /// the memory location to where `src` was copied
+    pub fn copy_struct_into<T>(&mut self, src: T) -> PgBox<T>
+    where
+        T: Sized + Debug + PostgresStruct,
+    {
+        let len = std::mem::size_of::<T>();
+        unsafe {
+            let dest = pg_sys::MemoryContextAlloc(self.value(), len) as *mut T;
+            // TODO:  Postgres complains with:
+            //        WARNING:  detected write past chunk end in ExprContext <mem address>
+            //        but I can't figure out why?
+            //        std::ptr::copy_nonoverlapping::<T>(&src as *const T, dest, len);
+            pg_sys::memcpy(
+                dest as *mut std::os::raw::c_void,
+                &src as *const T as void_ptr,
+                len as u64,
+            );
+            PgBox::from_raw(dest)
+        }
+    }
+
+    /// Copies `len` bytes, starting at `src` into this memory context and
+    /// returns a raw `*mut std::os::raw:c_void` pointer to the newly allocation
+    /// location
+    pub fn copy_ptr_into(&mut self, src: void_ptr, len: usize) -> void_ptr {
+        if src.is_null() {
+            panic!("attempt to copy a null pointer");
+        }
+        unsafe {
+            let dest = pg_sys::MemoryContextAlloc(self.value(), len);
+            //            std::ptr::copy_nonoverlapping(src, dest, len);
+            pg_sys::memcpy(dest, src, len as u64);
+            dest
         }
     }
 
@@ -479,7 +537,7 @@ where
     /// ```
     pub fn alloc() -> PgBox<T> {
         PgBox::<T> {
-            ptr: Some(palloc_struct::<T>()),
+            ptr: Some(unsafe { pg_sys::palloc(std::mem::size_of::<T>()) as *mut T }),
             owner: WhoAllocated::Rust,
         }
     }
@@ -498,7 +556,7 @@ where
     /// ```
     pub fn alloc0() -> PgBox<T> {
         PgBox::<T> {
-            ptr: Some(palloc0_struct::<T>()),
+            ptr: Some(unsafe { pg_sys::palloc0(std::mem::size_of::<T>()) as *mut T }),
             owner: WhoAllocated::Rust,
         }
     }
@@ -517,7 +575,9 @@ where
     /// ```
     pub fn alloc_in_context(memory_context: PgMemoryContexts) -> PgBox<T> {
         PgBox::<T> {
-            ptr: Some(palloc_struct_in_memory_context(memory_context.value())),
+            ptr: Some(unsafe {
+                pg_sys::MemoryContextAlloc(memory_context.value(), std::mem::size_of::<T>())
+            } as *mut T),
             owner: WhoAllocated::Rust,
         }
     }
@@ -536,7 +596,9 @@ where
     /// ```
     pub fn alloc0_in_context(memory_context: PgMemoryContexts) -> PgBox<T> {
         PgBox::<T> {
-            ptr: Some(palloc0_struct_in_memory_context(memory_context.value())),
+            ptr: Some(unsafe {
+                pg_sys::MemoryContextAllocZero(memory_context.value(), std::mem::size_of::<T>())
+            } as *mut T),
             owner: WhoAllocated::Rust,
         }
     }
@@ -656,7 +718,7 @@ where
 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self.ptr {
-            Some(_) => write!(f, "PgBox {{ {:?} }}", self.deref()), // std::fmt::Display::fmt(self.deref(), f),
+            Some(_) => write!(f, "PgBox {{ owner={:?}, {:?} }}", self.owner, self.deref()),
             None => std::fmt::Display::fmt("NULL", f),
         }
     }
