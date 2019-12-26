@@ -1,4 +1,4 @@
-use crate::{pg_sys, vardata_any, varsize_any_exhdr, PgBox};
+use crate::{pg_sys, varsize_any_exhdr, PgBox};
 use pg_guard::PostgresStruct;
 use std::convert::{Infallible, TryInto};
 use std::fmt::Debug;
@@ -18,6 +18,11 @@ where
     }
 
     #[inline]
+    pub fn null() -> Self {
+        PgDatum(None, PhantomData)
+    }
+
+    #[inline]
     pub fn is_null(&self) -> bool {
         self.0.is_none()
     }
@@ -30,6 +35,13 @@ impl<T> Into<pg_sys::Datum> for PgDatum<T> {
             Some(datum) => datum,
             None => 0 as pg_sys::Datum,
         }
+    }
+}
+
+impl From<pg_sys::Datum> for PgDatum<pg_sys::Datum> {
+    #[inline]
+    fn from(datum: pg_sys::Datum) -> Self {
+        PgDatum::new(datum, false)
     }
 }
 
@@ -187,16 +199,15 @@ impl<'a> TryInto<&'a str> for PgDatum<&'a pg_sys::varlena> {
     #[inline]
     fn try_into(self) -> Result<&'a str, Self::Error> {
         match self.0 {
-            Some(datum) => unsafe {
+            Some(datum) => {
                 let t = datum as *const pg_sys::varlena;
                 let len = varsize_any_exhdr(t);
-                let data = vardata_any(t);
+                let data = unsafe { pg_sys::text_to_cstring(t) };
 
-                Ok(std::str::from_utf8_unchecked(std::slice::from_raw_parts(
-                    data as *mut u8,
-                    len,
-                )))
-            },
+                Ok(unsafe {
+                    std::str::from_utf8_unchecked(std::slice::from_raw_parts(data as *mut u8, len))
+                })
+            }
             None => Err("Datum is NULL"),
         }
     }
@@ -212,6 +223,20 @@ impl<'a> TryInto<&'a std::ffi::CStr> for PgDatum<&'a std::ffi::CStr> {
                 let s = datum as *const std::os::raw::c_char;
                 Ok(unsafe { std::ffi::CStr::from_ptr(s) })
             }
+            None => Err("Datum is NULL"),
+        }
+    }
+}
+
+impl<'a> TryInto<&'a std::ffi::CStr> for PgDatum<&'a pg_sys::varlena> {
+    type Error = (&'static str);
+
+    #[inline]
+    fn try_into(self) -> Result<&'a std::ffi::CStr, Self::Error> {
+        match self.0 {
+            Some(datum) => Ok(unsafe {
+                std::ffi::CStr::from_ptr(pg_sys::text_to_cstring(datum as *const pg_sys::varlena))
+            }),
             None => Err("Datum is NULL"),
         }
     }
