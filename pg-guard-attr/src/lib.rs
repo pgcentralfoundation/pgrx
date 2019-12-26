@@ -22,7 +22,7 @@ pub fn pg_guard(_attr: TokenStream, item: TokenStream) -> TokenStream {
         // process top-level functions
         // these functions get wrapped as public extern "C" functions with #[no_mangle] so they
         // can also be called from C code
-        Item::Fn(func) => rewriter.item_fn(&func).into(),
+        Item::Fn(mut func) => rewriter.item_fn(&mut func).into(),
         _ => {
             panic!("#[pg_guard] can only be applied to extern \"C\" blocks and top-level functions")
         }
@@ -39,14 +39,17 @@ pub fn pg_extern(_attr: TokenStream, item: TokenStream) -> TokenStream {
     }
 }
 
-fn rewrite_item_fn(func: ItemFn) -> proc_macro2::TokenStream {
+fn rewrite_item_fn(mut func: ItemFn) -> proc_macro2::TokenStream {
     let finfo_name = syn::Ident::new(&format!("pg_finfo_{}", func.sig.ident), Span::call_site());
 
     // use the PgGuardRewriter to go ahead and wrap the function here, rather than applying
     // a #[pg_guard] macro to the original function.  This is necessary so that compiler
     // errors/warnings indicate the proper line numbers
     let rewriter = PgGuardRewriter::new(RewriteMode::RewriteFunctionWithWrapper);
-    let func_span = rewriter.item_fn(&func);
+
+    // make the function 'extern "C"' because this is for the #[pg_extern[ macro
+    func.sig.abi = Some(syn::parse_str("extern \"C\"").unwrap());
+    let func_span = rewriter.item_fn(&mut func);
 
     quote_spanned! {func.span()=>
         #[no_mangle]
@@ -55,6 +58,7 @@ fn rewrite_item_fn(func: ItemFn) -> proc_macro2::TokenStream {
             &V1_API
         }
 
+        #[no_mangle]
         #func_span
     }
 

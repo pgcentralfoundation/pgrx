@@ -6,7 +6,7 @@ use syn::export::TokenStream2;
 use syn::spanned::Spanned;
 use syn::{
     FnArg, ForeignItem, ForeignItemFn, ItemFn, ItemForeignMod, ItemStruct, Pat, ReturnType,
-    Signature,
+    Signature, Visibility,
 };
 
 pub enum RewriteMode {
@@ -51,16 +51,24 @@ impl PgGuardRewriter {
         stream
     }
 
-    pub fn item_fn(&self, func: &ItemFn) -> proc_macro2::TokenStream {
-        let mut sig = func.sig.clone();
-        sig.abi = Some(syn::parse_str("extern \"C\"").unwrap());
+    pub fn item_fn(&self, func: &mut ItemFn) -> proc_macro2::TokenStream {
+        // remember the original visibility and signature classifications as we want
+        // to use those for the outer function
+        let sig = func.sig.clone();
+        let vis = func.vis.clone();
+
+        // but for the inner function (the one we're wrapping) we don't need any kind of
+        // abi classification
+        func.sig.abi = None;
+
+        // nor do we need a visibility beyond "private"
+        func.vis = Visibility::Inherited;
 
         let arg_list = PgGuardRewriter::build_arg_list(&sig);
         let func_name = PgGuardRewriter::build_func_name(&sig);
 
         quote_spanned! {func.span()=>
-            #[no_mangle]
-            pub #sig {
+            #vis #sig {
                 #func
 
                 pg_guard::guard( || #func_name(#arg_list) )
