@@ -184,6 +184,7 @@ impl<'a> TryInto<&'a pg_sys::varlena> for PgDatum<&'a pg_sys::varlena> {
 impl<'a> TryInto<&'a str> for PgDatum<&'a pg_sys::varlena> {
     type Error = (&'static str);
 
+    #[inline]
     fn try_into(self) -> Result<&'a str, Self::Error> {
         match self.0 {
             Some(datum) => unsafe {
@@ -204,6 +205,7 @@ impl<'a> TryInto<&'a str> for PgDatum<&'a pg_sys::varlena> {
 impl<'a> TryInto<&'a std::ffi::CStr> for PgDatum<&'a std::ffi::CStr> {
     type Error = (&'static str);
 
+    #[inline]
     fn try_into(self) -> Result<&'a std::ffi::CStr, Self::Error> {
         match self.0 {
             Some(datum) => {
@@ -369,6 +371,7 @@ where
 {
     type Error = Infallible;
 
+    #[inline]
     fn try_into(self) -> Result<PgBox<T>, Self::Error> {
         Ok(PgBox::from_pg(
             if self.0.is_some() { self.0.unwrap() } else { 0 } as *mut T,
