@@ -1,5 +1,4 @@
 use crate::pg_sys;
-use std::borrow::Cow;
 
 /// ```c
 /// #define VARSIZE_EXTERNAL(PTR)				(VARHDRSZ_EXTERNAL + VARTAG_SIZE(VARTAG_EXTERNAL(PTR)))
@@ -256,17 +255,20 @@ pub fn vardata_any(ptr: *const pg_sys::varlena) -> *const std::os::raw::c_char {
     }
 }
 
+/// Convert a Postgres `varlena *` (or `text *`) into a Rust `&str`.
+///
+/// ## Safety
+///
+/// This function is unsafe because it blindly assumes the provided varlena pointer is non-null.
+///
+/// Note also that this function is zero-copy and the underlying Rust &str is backed by Postgres-allocated
+/// memory.  As such, the return value will become invalid the moment Postgres frees the varlena
 #[inline]
-pub fn text_to_rust_str<'a>(t: *const pg_sys::text) -> Cow<'a, str> {
-    unsafe {
-        let len = varsize_any_exhdr(t);
-        let data = vardata_any(t);
+pub unsafe fn text_to_rust_str_unchecked<'a>(t: *const pg_sys::varlena) -> &'a str {
+    let len = varsize_any_exhdr(t);
+    let data = vardata_any(t);
 
-        Cow::Borrowed(std::str::from_utf8_unchecked(std::slice::from_raw_parts(
-            data as *mut u8,
-            len,
-        )))
-    }
+    std::str::from_utf8_unchecked(std::slice::from_raw_parts(data as *mut u8, len))
 }
 
 #[inline]

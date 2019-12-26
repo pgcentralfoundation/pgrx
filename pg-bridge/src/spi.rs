@@ -1,5 +1,5 @@
 use crate::pg_sys::{SPI_execute, SPI_execute_with_args, SPI_finish};
-use crate::{pg_sys, PgMemoryContexts};
+use crate::{pg_sys, PgDatum, PgMemoryContexts};
 use num_traits::FromPrimitive;
 
 #[derive(Debug, Primitive)]
@@ -52,6 +52,15 @@ pub struct SpiClient {
     outer_memory_context: PgMemoryContexts,
 }
 
+#[derive(Debug)]
+pub struct SpiTupleTable {
+    status_code: SpiOk,
+    table: *mut pg_sys::SPITupleTable,
+    size: usize,
+    tupdesc: Option<pg_sys::TupleDesc>,
+    current: usize,
+}
+
 impl Spi {
     pub fn connect<R, F: FnOnce(SpiClient) -> std::result::Result<R, SpiError>>(
         f: F,
@@ -84,19 +93,28 @@ impl Spi {
     }
 }
 
+impl Drop for Spi {
+    fn drop(&mut self) {
+        match Spi::check_status(unsafe { SPI_finish() }) {
+            Ok(_) => { /* we're good */ }
+            Err(e) => panic!("problem calling SPI_finish: code={:?}", e),
+        }
+    }
+}
+
 impl SpiClient {
+    pub fn get_outer_memory_context(&mut self) -> &mut PgMemoryContexts {
+        &mut self.outer_memory_context
+    }
+
     /// perform a read-only SELECT statement
     pub fn select(
         &self,
         query: &str,
         limit: Option<i64>,
         args: Option<Vec<(pg_sys::Oid, pg_sys::Datum)>>,
-    ) -> std::result::Result<(SpiOk, u64), SpiError> {
+    ) -> std::result::Result<SpiTupleTable, SpiError> {
         SpiClient::execute(query, true, limit, args)
-    }
-
-    pub fn get_outer_memory_context(&mut self) -> &mut PgMemoryContexts {
-        &mut self.outer_memory_context
     }
 
     /// perform any query (including utility statements) that modify the database in some way
@@ -105,7 +123,7 @@ impl SpiClient {
         query: &str,
         limit: Option<i64>,
         args: Option<Vec<(pg_sys::Oid, pg_sys::Datum)>>,
-    ) -> std::result::Result<(SpiOk, u64), SpiError> {
+    ) -> std::result::Result<SpiTupleTable, SpiError> {
         SpiClient::execute(query, false, limit, args)
     }
 
@@ -114,7 +132,9 @@ impl SpiClient {
         read_only: bool,
         limit: Option<i64>,
         args: Option<Vec<(u32, usize)>>,
-    ) -> Result<(SpiOk, u64), SpiError> {
+    ) -> Result<SpiTupleTable, SpiError> {
+        unsafe { pg_sys::SPI_tuptable = 0 as *mut pg_sys::SPITupleTable };
+
         let src = std::ffi::CString::new(query).unwrap();
         let status_code = match args {
             Some(args) => {
@@ -157,17 +177,85 @@ impl SpiClient {
         };
         let status = Spi::check_status(status_code);
         match status {
-            Ok(status) => Ok((status, unsafe { pg_sys::SPI_processed })),
+            Ok(status) => Ok(SpiTupleTable {
+                status_code: status,
+                table: unsafe { pg_sys::SPI_tuptable },
+                size: unsafe { pg_sys::SPI_processed as usize },
+                tupdesc: if unsafe { pg_sys::SPI_tuptable }.is_null() {
+                    None
+                } else {
+                    Some(unsafe { (*pg_sys::SPI_tuptable).tupdesc })
+                },
+                current: 0,
+            }),
             Err(e) => Err(e),
         }
     }
 }
 
-impl Drop for Spi {
-    fn drop(&mut self) {
-        match Spi::check_status(unsafe { SPI_finish() }) {
-            Ok(_) => { /* we're good */ }
-            Err(e) => panic!("problem calling SPI_finish: code={:?}", e),
+impl SpiTupleTable {
+    fn make_vec(&self) -> Option<Vec<PgDatum<pg_sys::Datum>>> {
+        match self.tupdesc {
+            Some(tupdesc) => {
+                let natts = unsafe { (*tupdesc).natts };
+                let mut row = Vec::with_capacity(natts as usize);
+                let heap_tuple = unsafe {
+                    std::slice::from_raw_parts((*self.table).vals, self.size)[self.current]
+                };
+
+                for i in 1..=natts {
+                    let mut is_null = false;
+                    let datum =
+                        unsafe { pg_sys::SPI_getbinval(heap_tuple, tupdesc, i, &mut is_null) };
+                    row.push(PgDatum::new(datum, is_null));
+                }
+
+                Some(row)
+            }
+
+            None => None,
+        }
+    }
+}
+
+impl Iterator for SpiTupleTable {
+    type Item = (Vec<PgDatum<pg_sys::Datum>>);
+
+    #[inline]
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.current >= self.size {
+            // reset the iterator back to the start
+            self.current = 0;
+
+            // and indicate that we're done
+            None
+        } else {
+            let rc = self.nth(self.current);
+            self.current += 1;
+            rc
+        }
+    }
+
+    #[inline]
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        (0, Some(self.size))
+    }
+
+    #[inline]
+    fn count(self) -> usize
+    where
+        Self: Sized,
+    {
+        self.size
+    }
+
+    #[allow(unused_mut)]
+    #[inline]
+    fn nth(&mut self, mut n: usize) -> Option<Self::Item> {
+        if n >= self.size {
+            None
+        } else {
+            self.make_vec()
         }
     }
 }
