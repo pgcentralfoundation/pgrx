@@ -61,6 +61,8 @@ fn make_git_repo_path(out_dir: String, branch_name: &str) -> PathBuf {
 fn main() -> Result<(), std::io::Error> {
     build_deps::rerun_if_changed_paths("include/*").unwrap();
     build_deps::rerun_if_changed_paths("include").unwrap();
+    build_deps::rerun_if_changed_paths("../pg-guard-attr/src/lib.rs").unwrap();
+    build_deps::rerun_if_changed_paths("../pg-guard-rewriter/src/lib.rs").unwrap();
 
     let pg_git_repo_url = "git://git.postgresql.org/git/postgresql.git";
     let build_rs = PathBuf::from("build.rs");
@@ -80,10 +82,11 @@ fn main() -> Result<(), std::io::Error> {
         let output_rs = PathBuf::from(format!("src/pg_sys/{}_bindings.rs", version));
         let include_h = PathBuf::from(format!("include/{}.h", version));
 
-        let need_generate = git_clone_postgres(&pg_git_path, pg_git_repo_url, branch_name)
-            .expect(&format!("Unable to git clone {}", pg_git_repo_url));
+        let need_configure_and_make =
+            git_clone_postgres(&pg_git_path, pg_git_repo_url, branch_name)
+                .expect(&format!("Unable to git clone {}", pg_git_repo_url));
 
-        if need_generate {
+        if need_configure_and_make {
             eprintln!("[{}] cleaning and building", branch_name);
 
             git_clean(&pg_git_path, &branch_name)

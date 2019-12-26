@@ -1,10 +1,12 @@
-use quote::quote;
+use proc_macro2::Ident;
+use quote::{quote, quote_spanned};
 use std::ops::Deref;
 use std::str::FromStr;
-use syn::export::{ToTokens, TokenStream2};
+use syn::export::TokenStream2;
+use syn::spanned::Spanned;
 use syn::{
-    FnArg, ForeignItem, ForeignItemFn, ItemFn, ItemForeignMod, ItemStruct, Pat, Signature,
-    Visibility,
+    FnArg, ForeignItem, ForeignItemFn, ItemFn, ItemForeignMod, ItemStruct, Pat, ReturnType,
+    Signature,
 };
 
 pub enum RewriteMode {
@@ -49,22 +51,19 @@ impl PgGuardRewriter {
         stream
     }
 
-    pub fn item_fn(&self, func: ItemFn) -> proc_macro2::TokenStream {
-        let mut orig_func: ItemFn = func.clone();
-        let mut sig = func.sig;
+    pub fn item_fn(&self, func: &ItemFn) -> proc_macro2::TokenStream {
+        let mut sig = func.sig.clone();
+        sig.abi = Some(syn::parse_str("extern \"C\"").unwrap());
+
         let arg_list = PgGuardRewriter::build_arg_list(&sig);
         let func_name = PgGuardRewriter::build_func_name(&sig);
 
-        orig_func.vis = Visibility::Inherited;
-        sig.abi = Some(syn::parse_str("extern \"C\"").unwrap());
-        let sig = sig.into_token_stream();
-
-        quote! {
+        quote_spanned! {func.span()=>
             #[no_mangle]
             pub #sig {
-                #orig_func
+                #func
 
-                pg_guard::guard( || unsafe { # func_name( # arg_list) })
+                pg_guard::guard( || #func_name(#arg_list) )
             }
         }
     }
@@ -88,21 +87,19 @@ impl PgGuardRewriter {
         let arg_list_with_types = PgGuardRewriter::rename_arg_list_with_types(&func.sig);
         let return_type = PgGuardRewriter::get_return_type(&func.sig);
 
-        let body = quote! {
-                pub unsafe fn #func_name ( #arg_list_with_types ) #return_type {
-                    extern "C" {
-                        pub fn #func_name( #arg_list_with_types ) #return_type ;
-                    }
-
-                    pg_guard::guard(|| unsafe { #func_name( #arg_list) })
+        quote! {
+            pub unsafe fn #func_name ( #arg_list_with_types ) #return_type {
+                extern "C" {
+                    pub fn #func_name( #arg_list_with_types ) #return_type ;
                 }
-        };
 
-        body
+                pg_guard::guard(|| unsafe { #func_name( #arg_list) })
+            }
+        }
     }
 
-    pub fn build_func_name(sig: &Signature) -> proc_macro2::TokenStream {
-        sig.ident.to_token_stream()
+    pub fn build_func_name(sig: &Signature) -> &Ident {
+        &sig.ident
     }
 
     pub fn build_arg_list(sig: &Signature) -> proc_macro2::TokenStream {
@@ -112,8 +109,7 @@ impl PgGuardRewriter {
             match arg {
                 FnArg::Typed(ty) => {
                     if let Pat::Ident(ident) = ty.pat.deref() {
-                        let name = ident.ident.to_token_stream();
-                        arg_list.extend(quote! { #name, });
+                        arg_list.extend(quote! { #ident, });
                     }
                 }
                 FnArg::Receiver(_) => panic!(
@@ -132,12 +128,8 @@ impl PgGuardRewriter {
             match arg {
                 FnArg::Typed(ty) => {
                     if let Pat::Ident(ident) = ty.pat.deref() {
-                        let name = ident.ident.to_token_stream();
-
-                        // prefix argument name with an underscore
-                        let name =
-                            proc_macro2::TokenStream::from_str(&format!("arg_{}", name)).unwrap();
-
+                        // prefix argument name with "arg_""
+                        let name = Ident::new(&format!("arg_{}", ident.ident), ident.ident.span());
                         arg_list.extend(quote! { #name, });
                     }
                 }
@@ -157,11 +149,10 @@ impl PgGuardRewriter {
             match arg {
                 FnArg::Typed(ty) => {
                     if let Pat::Ident(_) = ty.pat.deref() {
-                        // prefix argument name with an underscore
+                        // prefix argument name with a "arg_"
                         let arg =
-                            proc_macro2::TokenStream::from_str(&format!("arg_{}", quote! { #ty}))
+                            proc_macro2::TokenStream::from_str(&format!("arg_{}", quote! {#ty}))
                                 .unwrap();
-
                         arg_list.extend(quote! { #arg, });
                     }
                 }
@@ -174,8 +165,7 @@ impl PgGuardRewriter {
         arg_list
     }
 
-    pub fn get_return_type(sig: &Signature) -> proc_macro2::TokenStream {
-        let rc = &sig.output;
-        quote! { #rc }
+    pub fn get_return_type(sig: &Signature) -> &ReturnType {
+        &sig.output
     }
 }
