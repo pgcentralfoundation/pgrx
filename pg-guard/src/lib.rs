@@ -31,6 +31,25 @@ struct JumpContext {
     jump_value: c_int,
 }
 
+#[derive(Debug, Clone, Copy)]
+pub struct PgBridgePanic {
+    pub message: &'static str,
+    pub filename: &'static str,
+    pub lineno: u32,
+    pub colno: u32,
+}
+
+impl PgBridgePanic {
+    pub fn new(message: &'static str, filename: &'static str, lineno: u32, colno: u32) -> Self {
+        PgBridgePanic {
+            message,
+            filename,
+            lineno,
+            colno,
+        }
+    }
+}
+
 thread_local! { static PANIC_LOCATION: Cell<Option<String>> = Cell::new(None) }
 
 fn take_panic_location() -> String {
@@ -169,6 +188,11 @@ fn downcast_err(e: Box<dyn Any + Send>) -> Result<String, JumpContext> {
         Ok(s.to_string())
     } else if let Some(s) = e.downcast_ref::<String>() {
         Ok(s.to_string())
+    } else if let Some(s) = e.downcast_ref::<PgBridgePanic>() {
+        Ok(format!(
+            "{}: {}:{}:{}",
+            s.message, s.filename, s.lineno, s.colno
+        ))
     } else {
         // not a type we understand, so use a generic string
         Ok("Box<Any>".to_string())

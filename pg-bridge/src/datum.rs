@@ -344,17 +344,12 @@ impl<'a> TryFrom<PgDatum<pg_sys::Datum>> for &'a str {
 
     #[inline]
     fn try_from(value: PgDatum<pg_sys::Datum>) -> Result<Self, Self::Error> {
-        println!("HERE IN TRYFROM DATUM FOR STR");
         match value.as_pg_datum() {
             Some(datum) => {
-                println!("   returning datum as varlena to string");
                 let t = datum as *const pg_sys::varlena;
                 Ok(unsafe { text_to_rust_str_unchecked(t) })
             }
-            None => {
-                println!("   datum is null");
-                Err("Datum is NULL")
-            }
+            None => Err("Datum is NULL"),
         }
     }
 }
@@ -369,6 +364,21 @@ impl<'a> TryFrom<PgDatum<&'a str>> for &'a str {
                 let t = datum as *const pg_sys::varlena;
                 Ok(unsafe { text_to_rust_str_unchecked(t) })
             }
+            None => Err("Datum is NULL"),
+        }
+    }
+}
+
+impl<'a> TryFrom<PgDatum<&'a pg_sys::varlena>> for &'a pg_sys::varlena {
+    type Error = (&'static str);
+
+    #[inline]
+    fn try_from(value: PgDatum<&'a pg_sys::varlena>) -> Result<Self, Self::Error> {
+        match value.as_pg_datum() {
+            Some(datum) => unsafe {
+                let t = datum as *const pg_sys::varlena;
+                Ok(t.as_ref().unwrap())
+            },
             None => Err("Datum is NULL"),
         }
     }

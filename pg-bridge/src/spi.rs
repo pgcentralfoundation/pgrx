@@ -62,9 +62,11 @@ pub struct SpiTupleTable {
 }
 
 impl Spi {
-    pub fn connect<R, F: FnOnce(SpiClient) -> std::result::Result<R, SpiError>>(f: F) -> PgDatum<R>
+    pub fn connect<R, F: FnOnce(SpiClient) -> std::result::Result<PgDatum<R>, SpiError>>(
+        f: F,
+    ) -> PgDatum<R>
     where
-        R: DatumCompatible<R> + SpiSend,
+        R: DatumCompatible<R>,
     {
         let mut outer_memory_context =
             PgMemoryContexts::For(PgMemoryContexts::CurrentMemoryContext.value());
@@ -197,52 +199,46 @@ impl SpiClient {
 }
 
 impl SpiTupleTable {
-    pub fn get_one<A, Apg>(self) -> A
+    pub fn get_one<A>(self) -> A
     where
-        A: DatumCompatible<A> + SpiSend + TryFrom<PgDatum<Apg>>,
-        Apg: DatumCompatible<Apg> + SpiSend,
-        <A as std::convert::TryFrom<PgDatum<Apg>>>::Error: std::fmt::Debug,
+        A: DatumCompatible<A> + SpiSend + TryFrom<PgDatum<A>>,
+        <A as std::convert::TryFrom<PgDatum<A>>>::Error: std::fmt::Debug,
     {
-        let a = self.get_x::<Apg>(1).try_into().unwrap();
+        let a = self.get_datum(1).try_into().unwrap();
         a
     }
 
-    pub fn get_two<A, Apg, B, Bpg>(self) -> (A, B)
+    pub fn get_two<A, B>(self) -> (A, B)
     where
-        A: DatumCompatible<A> + SpiSend + TryFrom<PgDatum<Apg>>,
-        Apg: DatumCompatible<Apg> + SpiSend,
-        <A as std::convert::TryFrom<PgDatum<Apg>>>::Error: std::fmt::Debug,
+        A: DatumCompatible<A> + SpiSend + TryFrom<PgDatum<A>>,
+        <A as std::convert::TryFrom<PgDatum<A>>>::Error: std::fmt::Debug,
 
-        B: DatumCompatible<B> + SpiSend + TryFrom<PgDatum<Bpg>>,
-        Bpg: DatumCompatible<Bpg> + SpiSend,
-        <B as std::convert::TryFrom<PgDatum<Bpg>>>::Error: std::fmt::Debug,
+        B: DatumCompatible<B> + SpiSend + TryFrom<PgDatum<B>>,
+        <B as std::convert::TryFrom<PgDatum<B>>>::Error: std::fmt::Debug,
     {
-        let a = self.get_x::<Apg>(1).try_into().unwrap();
-        let b = self.get_x::<Bpg>(2).try_into().unwrap();
+        let a = self.get_datum::<A>(1).try_into().unwrap();
+        let b = self.get_datum::<B>(2).try_into().unwrap();
         (a, b)
     }
 
-    pub fn get_three<A, Apg, B, Bpg, C, Cpg>(self) -> (A, B, C)
+    pub fn get_three<A, B, C>(self) -> (A, B, C)
     where
-        A: DatumCompatible<A> + SpiSend + TryFrom<PgDatum<Apg>>,
-        Apg: DatumCompatible<Apg> + SpiSend,
-        <A as std::convert::TryFrom<PgDatum<Apg>>>::Error: std::fmt::Debug,
+        A: DatumCompatible<A> + SpiSend + TryFrom<PgDatum<A>>,
+        <A as std::convert::TryFrom<PgDatum<A>>>::Error: std::fmt::Debug,
 
-        B: DatumCompatible<B> + SpiSend + TryFrom<PgDatum<Bpg>>,
-        Bpg: DatumCompatible<Bpg> + SpiSend,
-        <B as std::convert::TryFrom<PgDatum<Bpg>>>::Error: std::fmt::Debug,
+        B: DatumCompatible<B> + SpiSend + TryFrom<PgDatum<B>>,
+        <B as std::convert::TryFrom<PgDatum<B>>>::Error: std::fmt::Debug,
 
-        C: DatumCompatible<C> + SpiSend + TryFrom<PgDatum<Cpg>>,
-        Cpg: DatumCompatible<Cpg> + SpiSend,
-        <C as std::convert::TryFrom<PgDatum<Cpg>>>::Error: std::fmt::Debug,
+        C: DatumCompatible<C> + SpiSend + TryFrom<PgDatum<C>>,
+        <C as std::convert::TryFrom<PgDatum<C>>>::Error: std::fmt::Debug,
     {
-        let a = self.get_x::<Apg>(1).try_into().unwrap();
-        let b = self.get_x::<Bpg>(2).try_into().unwrap();
-        let c = self.get_x::<Cpg>(3).try_into().unwrap();
+        let a = self.get_datum::<A>(1).try_into().unwrap();
+        let b = self.get_datum::<B>(2).try_into().unwrap();
+        let c = self.get_datum::<C>(3).try_into().unwrap();
         (a, b, c)
     }
 
-    fn get_x<T>(&self, x: i32) -> PgDatum<T>
+    pub fn get_datum<T>(&self, ordinal: i32) -> PgDatum<T>
     where
         T: DatumCompatible<T> + SpiSend,
     {
@@ -250,13 +246,13 @@ impl SpiTupleTable {
             Some(tupdesc) => unsafe {
                 let natts = (*tupdesc).natts;
 
-                if x < 1 || x > natts {
-                    panic!("invalid column ordinal {}", x)
+                if ordinal < 1 || ordinal > natts {
+                    panic!("invalid column ordinal {}", ordinal)
                 } else {
                     let heap_tuple =
                         std::slice::from_raw_parts((*self.table).vals, self.size)[self.current];
                     let mut is_null = false;
-                    let datum = pg_sys::SPI_getbinval(heap_tuple, tupdesc, x, &mut is_null);
+                    let datum = pg_sys::SPI_getbinval(heap_tuple, tupdesc, ordinal, &mut is_null);
 
                     PgDatum::new(datum, is_null)
                 }
