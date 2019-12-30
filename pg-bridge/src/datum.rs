@@ -15,21 +15,30 @@ impl<T> PgDatum<T>
 where
     T: DatumCompatible<T>,
 {
+    /// Wrap an outside `pg_sys::Datum` value, along with noting if it's NULL or not
     #[inline]
     pub fn new(datum: pg_sys::Datum, is_null: bool) -> Self {
         PgDatum(if is_null { None } else { Some(datum) }, PhantomData)
     }
 
+    /// Instantiate a typed NULL Datum
     #[inline]
     pub fn null() -> Self {
         PgDatum(None, PhantomData)
     }
 
+    /// Is this datum NULL?
     #[inline]
     pub fn is_null(&self) -> bool {
         self.0.is_none()
     }
 
+    /// Copy the backing bytes of the Datum to a different `MemoryContext`
+    ///
+    /// The implementation relies on the `DatumCompatible<T>` trait implementations
+    /// to do the right thing for the type the Datum represents.
+    ///
+    /// Copying bytes isn't strictly necessary for pass-by-value Datum types
     #[inline]
     pub fn copy_into(&self, memory_context: &mut PgMemoryContexts) -> PgDatum<T> {
         match self.0 {
@@ -41,9 +50,21 @@ where
         }
     }
 
+    /// - `Some(datum)` means a valid Datum value
+    /// - `None` means a NULL Datum value (which is distinct from `Some(0)`
     #[inline]
     pub fn as_pg_datum(&self) -> Option<pg_sys::Datum> {
         self.0
+    }
+
+    /// Return the underlying [pg_sys::Datum], even if it represents a NULL.  In that
+    /// case the return value is simply `0`
+    #[inline]
+    pub fn as_raw_pg_datum(&self) -> pg_sys::Datum {
+        match self.0 {
+            Some(datum) => datum,
+            None => 0,
+        }
     }
 }
 
@@ -64,6 +85,87 @@ impl From<pg_sys::Datum> for PgDatum<pg_sys::Datum> {
     #[inline]
     fn from(datum: pg_sys::Datum) -> Self {
         PgDatum::new(datum, false)
+    }
+}
+
+impl<'a> From<&'a str> for PgDatum<pg_sys::Datum> {
+    #[inline]
+    fn from(val: &'a str) -> Self {
+        PgDatum::new(rust_str_to_text_p(val) as pg_sys::Datum, false)
+    }
+}
+
+impl From<i8> for PgDatum<pg_sys::Datum> {
+    #[inline]
+    fn from(val: i8) -> Self {
+        PgDatum::new(val as pg_sys::Datum, false)
+    }
+}
+impl From<i16> for PgDatum<pg_sys::Datum> {
+    #[inline]
+    fn from(val: i16) -> Self {
+        PgDatum::new(val as pg_sys::Datum, false)
+    }
+}
+impl From<i32> for PgDatum<pg_sys::Datum> {
+    #[inline]
+    fn from(val: i32) -> Self {
+        PgDatum::new(val as pg_sys::Datum, false)
+    }
+}
+impl From<i64> for PgDatum<pg_sys::Datum> {
+    #[inline]
+    fn from(val: i64) -> Self {
+        PgDatum::new(val as pg_sys::Datum, false)
+    }
+}
+impl From<u8> for PgDatum<pg_sys::Datum> {
+    #[inline]
+    fn from(val: u8) -> Self {
+        PgDatum::new(val as pg_sys::Datum, false)
+    }
+}
+impl From<u16> for PgDatum<pg_sys::Datum> {
+    #[inline]
+    fn from(val: u16) -> Self {
+        PgDatum::new(val as pg_sys::Datum, false)
+    }
+}
+impl From<u32> for PgDatum<pg_sys::Datum> {
+    #[inline]
+    fn from(val: u32) -> Self {
+        PgDatum::new(val as pg_sys::Datum, false)
+    }
+}
+impl From<u64> for PgDatum<pg_sys::Datum> {
+    #[inline]
+    fn from(val: u64) -> Self {
+        PgDatum::new(val as pg_sys::Datum, false)
+    }
+}
+
+impl From<f32> for PgDatum<pg_sys::Datum> {
+    #[inline]
+    fn from(val: f32) -> Self {
+        PgDatum::new(f32::to_bits(val) as pg_sys::Datum, false)
+    }
+}
+impl From<f64> for PgDatum<pg_sys::Datum> {
+    #[inline]
+    fn from(val: f64) -> Self {
+        PgDatum::new(f64::to_bits(val) as pg_sys::Datum, false)
+    }
+}
+impl From<bool> for PgDatum<pg_sys::Datum> {
+    #[inline]
+    fn from(val: bool) -> Self {
+        PgDatum::new(val as u8 as pg_sys::Datum, false)
+    }
+}
+impl From<char> for PgDatum<pg_sys::Datum> {
+    #[inline]
+    fn from(val: char) -> Self {
+        PgDatum::new(val as pg_sys::Datum, false)
     }
 }
 

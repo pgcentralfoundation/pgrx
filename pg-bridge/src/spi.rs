@@ -1,4 +1,4 @@
-use crate::{pg_sys, DatumCompatible, PgDatum, PgMemoryContexts};
+use crate::{pg_sys, DatumCompatible, PgDatum, PgMemoryContexts, PgOid};
 use num_traits::FromPrimitive;
 use std::convert::TryFrom;
 use std::convert::TryInto;
@@ -120,7 +120,7 @@ impl SpiClient {
         &self,
         query: &str,
         limit: Option<i64>,
-        args: Option<Vec<(pg_sys::Oid, pg_sys::Datum)>>,
+        args: Option<Vec<(PgOid, PgDatum<pg_sys::Datum>)>>,
     ) -> SpiTupleTable {
         SpiClient::execute(query, true, limit, args)
     }
@@ -130,7 +130,7 @@ impl SpiClient {
         &mut self,
         query: &str,
         limit: Option<i64>,
-        args: Option<Vec<(pg_sys::Oid, pg_sys::Datum)>>,
+        args: Option<Vec<(PgOid, PgDatum<pg_sys::Datum>)>>,
     ) -> SpiTupleTable {
         SpiClient::execute(query, false, limit, args)
     }
@@ -139,7 +139,7 @@ impl SpiClient {
         query: &str,
         read_only: bool,
         limit: Option<i64>,
-        args: Option<Vec<(u32, usize)>>,
+        args: Option<Vec<(PgOid, PgDatum<pg_sys::Datum>)>>,
     ) -> SpiTupleTable {
         unsafe { pg_sys::SPI_tuptable = 0 as *mut pg_sys::SPITupleTable };
 
@@ -152,11 +152,9 @@ impl SpiClient {
                 let mut nulls = vec![];
 
                 for (argtype, value) in args {
-                    let ptr = value as *mut std::os::raw::c_void;
-
-                    nulls.push(ptr.is_null() as std::os::raw::c_char);
-                    argtypes.push(argtype);
-                    values.push(value);
+                    argtypes.push(argtype.value());
+                    values.push(value.as_raw_pg_datum());
+                    nulls.push(value.is_null() as std::os::raw::c_char);
                 }
 
                 unsafe {

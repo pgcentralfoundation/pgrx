@@ -6,6 +6,7 @@
 #include "access/htup_details.h"
 #include "access/skey.h"
 #include "catalog/index.h"
+#include "catalog/pg_type.h"
 #include "executor/executor.h"
 #include "executor/spi.h"
 #include "nodes/execnodes.h"
