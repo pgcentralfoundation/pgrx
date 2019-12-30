@@ -5,7 +5,7 @@ use proc_macro::TokenStream;
 use proc_macro2::Span;
 use quote::{quote, quote_spanned};
 use syn::spanned::Spanned;
-use syn::{parse_macro_input, Item, ItemFn};
+use syn::{parse_macro_input, Data, Item, ItemFn, Type};
 
 #[proc_macro_attribute]
 pub fn pg_guard(_attr: TokenStream, item: TokenStream) -> TokenStream {
@@ -67,23 +67,57 @@ fn rewrite_item_fn(mut func: ItemFn) -> proc_macro2::TokenStream {
     // TODO:  mimicking PG_GETARG_XXX() makes more sense
 }
 
-#[proc_macro_derive(PostgresStruct)]
-pub fn derive_postgres_struct(input: TokenStream) -> TokenStream {
-    fn impl_postgres_struct(ast: &syn::DeriveInput) -> TokenStream {
-        let name = &ast.ident;
-        let name_str = format!("{}", name);
+#[proc_macro_derive(DatumCompatible)]
+pub fn derive_datum_compatible(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    impl_datum_compatible(&ast)
+}
 
-        if name_str.starts_with("_") {
-            // skip types that start with an underscore
-            (quote! {}).into()
-        } else {
-            (quote! {
-                impl PostgresStruct for #name { }
-            })
-            .into()
+fn impl_datum_compatible(ast: &syn::DeriveInput) -> TokenStream {
+    let name = &ast.ident;
+    let name_str = format!("{}", name);
+
+    if name_str.starts_with("_") {
+        // skip types that start with an underscore
+        TokenStream::new()
+    } else {
+        match &ast.data {
+            Data::Struct(ds) => {
+                if !struct_contains_type(ds) {
+                    (quote! {
+                        impl DatumCompatible<#name> for #name {
+                            fn copy_into(&self, memory_context: &mut crate::PgMemoryContexts) -> crate::PgDatum<#name> {
+                                memory_context.copy_struct_into(self)
+                            }
+
+                        }
+                    })
+                    .into()
+                } else {
+                    TokenStream::new()
+                }
+            }
+            Data::Enum(_) => TokenStream::new(),
+            Data::Union(_) => TokenStream::new(),
+        }
+    }
+}
+
+fn struct_contains_type(ds: &syn::DataStruct) -> bool {
+    for field in ds.fields.iter() {
+        let ty = &field.ty;
+        match ty {
+            Type::Path(path) => {
+                for segment in path.path.segments.iter() {
+                    if segment.ident.eq("__IncompleteArrayField") {
+                        return true;
+                    }
+                }
+            }
+
+            _ => {}
         }
     }
 
-    let ast = syn::parse(input).unwrap();
-    impl_postgres_struct(&ast)
+    false
 }

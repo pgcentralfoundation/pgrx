@@ -6,6 +6,7 @@ extern crate enum_primitive_derive;
 extern crate num_traits;
 
 pub mod datum;
+pub mod datum_compatible;
 pub mod fcinfo;
 pub mod htup;
 pub mod itemptr;
@@ -17,6 +18,7 @@ pub mod stringinfo;
 pub mod varlena;
 
 pub use datum::*;
+pub use datum_compatible::*;
 pub use fcinfo::*;
 pub use htup::*;
 pub use itemptr::*;

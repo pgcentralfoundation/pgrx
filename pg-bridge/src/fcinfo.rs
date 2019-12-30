@@ -1,7 +1,10 @@
-use crate::{pg_sys, rust_str_to_text_p, PgDatum};
+use crate::{pg_sys, rust_str_to_text_p, DatumCompatible, PgDatum};
 
 #[inline]
-pub fn pg_getarg<T>(fcinfo: &pg_sys::FunctionCallInfo, num: usize) -> PgDatum<T> {
+pub fn pg_getarg<T>(fcinfo: &pg_sys::FunctionCallInfo, num: usize) -> PgDatum<T>
+where
+    T: DatumCompatible<T>,
+{
     PgDatum::<T>::new(
         (unsafe { *(*fcinfo) }).arg[num],
         (unsafe { *(*fcinfo) }).argnull[num] as bool,

@@ -1,6 +1,10 @@
-use crate::pg_sys::{SPI_execute, SPI_execute_with_args, SPI_finish};
-use crate::{pg_sys, PgDatum, PgMemoryContexts};
+use crate::{pg_sys, DatumCompatible, PgDatum, PgMemoryContexts};
 use num_traits::FromPrimitive;
+use std::convert::TryFrom;
+use std::convert::TryInto;
+use std::fmt::Debug;
+
+pub trait SpiSend {}
 
 #[derive(Debug, Primitive)]
 pub enum SpiOk {
@@ -46,11 +50,7 @@ pub enum SpiError {
 
 pub struct Spi();
 
-pub struct SpiClient {
-    #[allow(dead_code)]
-    spi: Spi,
-    outer_memory_context: PgMemoryContexts,
-}
+pub struct SpiClient();
 
 #[derive(Debug)]
 pub struct SpiTupleTable {
@@ -62,58 +62,64 @@ pub struct SpiTupleTable {
 }
 
 impl Spi {
-    pub fn connect<R, F: FnOnce(SpiClient) -> std::result::Result<R, SpiError>>(
-        f: F,
-    ) -> std::result::Result<R, SpiError> {
-        let outer_memory_context =
+    pub fn connect<R, F: FnOnce(SpiClient) -> std::result::Result<R, SpiError>>(f: F) -> PgDatum<R>
+    where
+        R: DatumCompatible<R> + SpiSend,
+    {
+        let mut outer_memory_context =
             PgMemoryContexts::For(PgMemoryContexts::CurrentMemoryContext.value());
 
-        Spi::check_status(unsafe { pg_sys::SPI_connect() })?;
+        // connect to SPI
+        Spi::check_status(unsafe { pg_sys::SPI_connect() });
 
-        f(SpiClient {
-            spi: Spi(),
-            outer_memory_context: outer_memory_context,
-        })
+        // run the provided closure within the memory context that SPI_connect()
+        // just put us un.  We'll disconnect from SPI when the closure is finished.
+        // If there's a panic or elog(ERROR), we don't care about also disconnecting from
+        // SPI b/c Postgres will do that for us automatically
+        match f(SpiClient()) {
+            // copy the result to the outer memory context we saved above
+            Ok(result) => {
+                let result = result.copy_into(&mut outer_memory_context);
+
+                // disconnect from SPI
+                Spi::check_status(unsafe { pg_sys::SPI_finish() });
+                result
+            }
+
+            // closure returned an error
+            Err(e) => {
+                // disconnect from SPI
+                Spi::check_status(unsafe { pg_sys::SPI_finish() });
+                panic!(e)
+            }
+        }
     }
 
-    pub fn check_status(status_code: i32) -> std::result::Result<SpiOk, SpiError> {
+    pub fn check_status(status_code: i32) -> SpiOk {
         if status_code > 0 {
             let status_enum = SpiOk::from_i32(status_code);
             match status_enum {
-                Some(status) => Ok(status),
+                Some(ok) => ok,
                 None => panic!("unrecognized SPI status code {}", status_code),
             }
         } else {
             let status_enum = SpiError::from_i32(-status_code);
             match status_enum {
-                Some(status) => Err(status),
+                Some(e) => panic!(e),
                 None => panic!("unrecognized SPI status code {}", status_code),
             }
         }
     }
 }
 
-impl Drop for Spi {
-    fn drop(&mut self) {
-        match Spi::check_status(unsafe { SPI_finish() }) {
-            Ok(_) => { /* we're good */ }
-            Err(e) => panic!("problem calling SPI_finish: code={:?}", e),
-        }
-    }
-}
-
 impl SpiClient {
-    pub fn get_outer_memory_context(&mut self) -> &mut PgMemoryContexts {
-        &mut self.outer_memory_context
-    }
-
     /// perform a read-only SELECT statement
     pub fn select(
         &self,
         query: &str,
         limit: Option<i64>,
         args: Option<Vec<(pg_sys::Oid, pg_sys::Datum)>>,
-    ) -> std::result::Result<SpiTupleTable, SpiError> {
+    ) -> SpiTupleTable {
         SpiClient::execute(query, true, limit, args)
     }
 
@@ -123,7 +129,7 @@ impl SpiClient {
         query: &str,
         limit: Option<i64>,
         args: Option<Vec<(pg_sys::Oid, pg_sys::Datum)>>,
-    ) -> std::result::Result<SpiTupleTable, SpiError> {
+    ) -> SpiTupleTable {
         SpiClient::execute(query, false, limit, args)
     }
 
@@ -132,7 +138,7 @@ impl SpiClient {
         read_only: bool,
         limit: Option<i64>,
         args: Option<Vec<(u32, usize)>>,
-    ) -> Result<SpiTupleTable, SpiError> {
+    ) -> SpiTupleTable {
         unsafe { pg_sys::SPI_tuptable = 0 as *mut pg_sys::SPITupleTable };
 
         let src = std::ffi::CString::new(query).unwrap();
@@ -152,7 +158,7 @@ impl SpiClient {
                 }
 
                 unsafe {
-                    SPI_execute_with_args(
+                    pg_sys::SPI_execute_with_args(
                         src.as_ptr(),
                         nargs as i32,
                         argtypes.as_mut_ptr(),
@@ -166,7 +172,7 @@ impl SpiClient {
             None => {
                 let rc;
                 unsafe {
-                    rc = SPI_execute(
+                    rc = pg_sys::SPI_execute(
                         src.as_ptr(),
                         read_only,
                         if limit.is_some() { limit.unwrap() } else { 0 },
@@ -175,25 +181,89 @@ impl SpiClient {
                 rc
             }
         };
-        let status = Spi::check_status(status_code);
-        match status {
-            Ok(status) => Ok(SpiTupleTable {
-                status_code: status,
-                table: unsafe { pg_sys::SPI_tuptable },
-                size: unsafe { pg_sys::SPI_processed as usize },
-                tupdesc: if unsafe { pg_sys::SPI_tuptable }.is_null() {
-                    None
-                } else {
-                    Some(unsafe { (*pg_sys::SPI_tuptable).tupdesc })
-                },
-                current: 0,
-            }),
-            Err(e) => Err(e),
+
+        SpiTupleTable {
+            status_code: Spi::check_status(status_code),
+            table: unsafe { pg_sys::SPI_tuptable },
+            size: unsafe { pg_sys::SPI_processed as usize },
+            tupdesc: if unsafe { pg_sys::SPI_tuptable }.is_null() {
+                None
+            } else {
+                Some(unsafe { (*pg_sys::SPI_tuptable).tupdesc })
+            },
+            current: 0,
         }
     }
 }
 
 impl SpiTupleTable {
+    pub fn get_one<A, Apg>(self) -> A
+    where
+        A: DatumCompatible<A> + SpiSend + TryFrom<PgDatum<Apg>>,
+        Apg: DatumCompatible<Apg> + SpiSend,
+        <A as std::convert::TryFrom<PgDatum<Apg>>>::Error: std::fmt::Debug,
+    {
+        let a = self.get_x::<Apg>(1).try_into().unwrap();
+        a
+    }
+
+    pub fn get_two<A, Apg, B, Bpg>(self) -> (A, B)
+    where
+        A: DatumCompatible<A> + SpiSend + TryFrom<PgDatum<Apg>>,
+        Apg: DatumCompatible<Apg> + SpiSend,
+        <A as std::convert::TryFrom<PgDatum<Apg>>>::Error: std::fmt::Debug,
+
+        B: DatumCompatible<B> + SpiSend + TryFrom<PgDatum<Bpg>>,
+        Bpg: DatumCompatible<Bpg> + SpiSend,
+        <B as std::convert::TryFrom<PgDatum<Bpg>>>::Error: std::fmt::Debug,
+    {
+        let a = self.get_x::<Apg>(1).try_into().unwrap();
+        let b = self.get_x::<Bpg>(2).try_into().unwrap();
+        (a, b)
+    }
+
+    pub fn get_three<A, Apg, B, Bpg, C, Cpg>(self) -> (A, B, C)
+    where
+        A: DatumCompatible<A> + SpiSend + TryFrom<PgDatum<Apg>>,
+        Apg: DatumCompatible<Apg> + SpiSend,
+        <A as std::convert::TryFrom<PgDatum<Apg>>>::Error: std::fmt::Debug,
+
+        B: DatumCompatible<B> + SpiSend + TryFrom<PgDatum<Bpg>>,
+        Bpg: DatumCompatible<Bpg> + SpiSend,
+        <B as std::convert::TryFrom<PgDatum<Bpg>>>::Error: std::fmt::Debug,
+
+        C: DatumCompatible<C> + SpiSend + TryFrom<PgDatum<Cpg>>,
+        Cpg: DatumCompatible<Cpg> + SpiSend,
+        <C as std::convert::TryFrom<PgDatum<Cpg>>>::Error: std::fmt::Debug,
+    {
+        let a = self.get_x::<Apg>(1).try_into().unwrap();
+        let b = self.get_x::<Bpg>(2).try_into().unwrap();
+        let c = self.get_x::<Cpg>(3).try_into().unwrap();
+        (a, b, c)
+    }
+
+    fn get_x<T>(&self, x: i32) -> PgDatum<T>
+    where
+        T: DatumCompatible<T> + SpiSend,
+    {
+        match self.tupdesc {
+            Some(tupdesc) => unsafe {
+                let natts = (*tupdesc).natts;
+
+                if x < 1 || x > natts {
+                    panic!("invalid column ordinal {}", x)
+                } else {
+                    let heap_tuple =
+                        std::slice::from_raw_parts((*self.table).vals, self.size)[self.current];
+                    let mut is_null = false;
+                    let datum = pg_sys::SPI_getbinval(heap_tuple, tupdesc, x, &mut is_null);
+
+                    PgDatum::new(datum, is_null)
+                }
+            },
+            None => panic!("TupDesc is NULL"),
+        }
+    }
     fn make_vec(&self) -> Option<Vec<PgDatum<pg_sys::Datum>>> {
         match self.tupdesc {
             Some(tupdesc) => {
@@ -259,3 +329,22 @@ impl Iterator for SpiTupleTable {
         }
     }
 }
+
+impl<'a> SpiSend for &'a str {}
+impl<'a> SpiSend for &'a pg_sys::varlena {}
+
+impl SpiSend for i8 {}
+impl SpiSend for i16 {}
+impl SpiSend for i32 {}
+impl SpiSend for i64 {}
+
+impl SpiSend for u8 {}
+impl SpiSend for u16 {}
+impl SpiSend for u32 {}
+impl SpiSend for u64 {}
+
+impl SpiSend for f32 {}
+impl SpiSend for f64 {}
+
+impl SpiSend for bool {}
+impl SpiSend for char {}

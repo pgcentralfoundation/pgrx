@@ -6,8 +6,7 @@
 //! An enum-based interface (`PgMemoryContexts`) around Postgres' various `MemoryContext`s provides
 //! simple accessibility to working with MemoryContexts in a compiler-checked manner
 //!
-use crate::pg_sys;
-use pg_guard::PostgresStruct;
+use crate::{pg_sys, DatumCompatible, PgDatum};
 use std::fmt::Debug;
 use std::ops::{Deref, DerefMut};
 
@@ -19,7 +18,7 @@ use std::ops::{Deref, DerefMut};
 #[inline]
 pub fn palloc_struct<T>() -> PgBox<T>
 where
-    T: Sized + Debug + PostgresStruct,
+    T: Debug + DatumCompatible<T>,
 {
     PgBox::from_raw((unsafe { pg_sys::palloc(std::mem::size_of::<T>()) }) as *mut T)
 }
@@ -34,7 +33,7 @@ where
 #[inline]
 pub fn palloc0_struct<T>() -> PgBox<T>
 where
-    T: Sized + Debug + PostgresStruct,
+    T: Debug + DatumCompatible<T>,
 {
     PgBox::from_raw((unsafe { pg_sys::palloc0(std::mem::size_of::<T>()) }) as *mut T)
 }
@@ -47,7 +46,7 @@ where
 #[inline]
 pub fn palloc_struct_in_memory_context<T>(memory_context: pg_sys::MemoryContext) -> PgBox<T>
 where
-    T: Sized + Debug + PostgresStruct,
+    T: Debug + DatumCompatible<T>,
 {
     assert!(!memory_context.is_null());
     PgBox::from_raw(
@@ -65,7 +64,7 @@ where
 #[inline]
 pub fn palloc0_struct_in_memory_context<T>(memory_context: pg_sys::MemoryContext) -> PgBox<T>
 where
-    T: Sized + Debug + PostgresStruct,
+    T: Debug + DatumCompatible<T>,
 {
     assert!(!memory_context.is_null());
     PgBox::from_raw(
@@ -303,9 +302,9 @@ impl PgMemoryContexts {
     /// Copies the bytes behind the specified `src` struct into
     /// this memory context.  Returns a `PgBox<T>`'d wrapper around
     /// the memory location to where `src` was copied
-    pub fn copy_struct_into<T>(&mut self, src: T) -> PgBox<T>
+    pub fn copy_struct_into<T>(&mut self, src: &T) -> PgDatum<T>
     where
-        T: Sized + Debug + PostgresStruct,
+        T: DatumCompatible<T>,
     {
         let len = std::mem::size_of::<T>();
         unsafe {
@@ -316,10 +315,10 @@ impl PgMemoryContexts {
             //        std::ptr::copy_nonoverlapping::<T>(&src as *const T, dest, len);
             pg_sys::memcpy(
                 dest as *mut std::os::raw::c_void,
-                &src as *const T as void_ptr,
+                src as *const T as void_ptr,
                 len as u64,
             );
-            PgBox::from_raw(dest)
+            PgDatum::new(dest as pg_sys::Datum, false)
         }
     }
 
@@ -336,6 +335,10 @@ impl PgMemoryContexts {
             pg_sys::memcpy(dest, src, len as u64);
             dest
         }
+    }
+
+    pub fn alloc0(&mut self, len: usize) -> void_ptr {
+        unsafe { pg_sys::MemoryContextAllocZero(self.value(), len) }
     }
 
     /// helper function
@@ -513,7 +516,7 @@ enum WhoAllocated {
 #[derive(Debug)]
 pub struct PgBox<T>
 where
-    T: Sized + Debug + PostgresStruct,
+    T: DatumCompatible<T>,
 {
     ptr: Option<*mut T>,
     owner: WhoAllocated,
@@ -521,7 +524,7 @@ where
 
 impl<T> PgBox<T>
 where
-    T: Sized + Debug + PostgresStruct,
+    T: DatumCompatible<T>,
 {
     /// Allocate enough memory for the type'd struct, within Postgres' `CurrentMemoryContext`  The
     /// allocated memory is uninitialized.
@@ -603,6 +606,24 @@ where
         }
     }
 
+    /// Box nothing
+    pub fn null() -> PgBox<T> {
+        return PgBox::<T> {
+            ptr: None,
+            owner: WhoAllocated::Rust,
+        };
+    }
+
+    /// Box a struct by copying it into Postgres' `CurrentMemoryContext`
+    ///
+    /// When this `PgBox<T>` is dropped, the boxed memory is freed, unless it has
+    /// been turned [into_pg]
+    pub fn new_from_struct(data: T) -> PgBox<T> {
+        let datum = PgMemoryContexts::CurrentMemoryContext.copy_struct_into(&data);
+        let datum: pg_sys::Datum = datum.into();
+        PgBox::from_raw(datum as *mut T)
+    }
+
     /// Box a pointer that came from Postgres.
     ///
     /// When this `PgBox<T>` is dropped, the boxed memory is **not** freed.  Since Postgres
@@ -643,23 +664,11 @@ where
             None => 0 as *mut T,
         }
     }
-
-    /// Unwraps the boxed pointer as its underlying type
-    pub fn into_inner(self) -> T {
-        let ptr = self.ptr;
-        match ptr {
-            Some(ptr) => {
-                std::mem::forget(self);
-                unsafe { ptr.read() }
-            }
-            None => panic!("attempt to dereference a null pointer during PgBox::into_inner()"),
-        }
-    }
 }
 
 impl<T> Deref for PgBox<T>
 where
-    T: Sized + Debug + PostgresStruct,
+    T: DatumCompatible<T>,
 {
     type Target = T;
 
@@ -673,7 +682,7 @@ where
 
 impl<T> DerefMut for PgBox<T>
 where
-    T: Sized + Debug + PostgresStruct,
+    T: DatumCompatible<T>,
 {
     fn deref_mut(&mut self) -> &mut T {
         match self.ptr {
@@ -685,7 +694,7 @@ where
 
 impl<T> From<*mut T> for PgBox<T>
 where
-    T: Sized + Debug + PostgresStruct,
+    T: DatumCompatible<T>,
 {
     fn from(ptr: *mut T) -> Self {
         PgBox::from_pg(ptr)
@@ -694,7 +703,7 @@ where
 
 impl<T> Drop for PgBox<T>
 where
-    T: Sized + Debug + PostgresStruct,
+    T: DatumCompatible<T>,
 {
     fn drop(&mut self) {
         if self.ptr.is_some() {
@@ -714,7 +723,7 @@ where
 
 impl<T> std::fmt::Display for PgBox<T>
 where
-    T: Sized + Debug + PostgresStruct,
+    T: Debug + DatumCompatible<T>,
 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self.ptr {

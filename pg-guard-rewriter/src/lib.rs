@@ -24,7 +24,7 @@ impl PgGuardRewriter {
     pub fn item_struct(&self, item_struct: ItemStruct) -> proc_macro2::TokenStream {
         let mut stream = TokenStream2::new();
         stream.extend(quote! {
-            #[derive(PostgresStruct)]
+            #[derive(DatumCompatible)]
             #item_struct
         });
 

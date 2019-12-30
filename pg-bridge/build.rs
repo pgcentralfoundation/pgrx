@@ -63,6 +63,7 @@ fn main() -> Result<(), std::io::Error> {
     build_deps::rerun_if_changed_paths("include").unwrap();
     build_deps::rerun_if_changed_paths("../pg-guard-attr/src/lib.rs").unwrap();
     build_deps::rerun_if_changed_paths("../pg-guard-rewriter/src/lib.rs").unwrap();
+    build_deps::rerun_if_changed_paths("src/pg_sys/*.rs").unwrap();
 
     let pg_git_repo_url = "git://git.postgresql.org/git/postgresql.git";
     let build_rs = PathBuf::from("build.rs");
@@ -270,7 +271,7 @@ fn apply_pg_guard(input: String) -> Result<String, std::io::Error> {
     let mut stream = TokenStream2::new();
     let file = syn::parse_file(input.as_str()).unwrap();
 
-    stream.extend(quote! {use pg_guard::PostgresStruct;});
+    stream.extend(quote! {use crate::DatumCompatible;});
     for item in file.items.into_iter() {
         match item {
             Item::ForeignMod(block) => {

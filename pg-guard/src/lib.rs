@@ -174,8 +174,3 @@ fn downcast_err(e: Box<dyn Any + Send>) -> Result<String, JumpContext> {
         Ok("Box<Any>".to_string())
     }
 }
-
-/// Marker trait for structs that are part of Postgres' source code.
-///
-/// Can be implemented directly or as `#[derive(PostgresStruct)]`
-pub trait PostgresStruct {}

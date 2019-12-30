@@ -1,5 +1,4 @@
-use crate::{pg_sys, PgBox};
-use pg_guard::PostgresStruct;
+use crate::{pg_sys, DatumCompatible, PgBox};
 use std::fmt::Debug;
 
 /// #define IsA(nodeptr,_type_)		(nodeTag(nodeptr) == T_##_type_)
@@ -27,7 +26,7 @@ pub fn is_a(nodeptr: *mut pg_sys::Node, tag: pg_sys::NodeTag) -> bool {
 #[inline]
 pub unsafe fn make_node<T>(tag: pg_sys::NodeTag) -> PgBox<T>
 where
-    T: Sized + Debug + PostgresStruct,
+    T: Sized + Debug + DatumCompatible<T>,
 {
     // TODO:  we can convert pg_sys::NodeTag to a rust enum using bindgen
     // TODO:  and make this a gigantic match arm where we hardcode the struct name

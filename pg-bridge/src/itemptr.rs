@@ -1,4 +1,4 @@
-use crate::pg_sys;
+use crate::{pg_sys, DatumCompatible, PgBox};
 
 #[inline]
 pub fn item_pointer_get_block_number(ctid: *const pg_sys::ItemPointerData) -> pg_sys::BlockNumber {
@@ -32,4 +32,16 @@ pub fn item_pointer_get_offset_number_no_check(
 #[inline]
 pub fn item_pointer_is_valid(ctid: *const pg_sys::ItemPointerData) -> bool {
     (unsafe { *ctid }).ip_posid != pg_sys::InvalidOffsetNumber
+}
+
+#[inline]
+pub fn new_item_pointer(
+    blockno: pg_sys::BlockNumber,
+    offno: pg_sys::OffsetNumber,
+) -> PgBox<pg_sys::ItemPointerData> {
+    let mut tid = pg_sys::ItemPointerData::alloc();
+    tid.ip_blkid.bi_hi = (blockno >> 16) as u16;
+    tid.ip_blkid.bi_lo = (blockno & 0xffff) as u16;
+    tid.ip_posid = offno;
+    tid
 }

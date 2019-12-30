@@ -1,17 +1,16 @@
-use crate::{pg_sys, text_to_rust_str_unchecked, PgBox};
-use pg_guard::PostgresStruct;
-use std::convert::{Infallible, TryInto};
+use crate::{pg_sys, text_to_rust_str_unchecked, DatumCompatible, PgBox, PgMemoryContexts};
+use std::convert::TryFrom;
 use std::fmt::Debug;
 use std::marker::PhantomData;
 
 #[derive(Debug)]
 pub struct PgDatum<T>(Option<pg_sys::Datum>, PhantomData<T>)
 where
-    T: Sized;
+    T: DatumCompatible<T>;
 
 impl<T> PgDatum<T>
 where
-    T: Sized,
+    T: DatumCompatible<T>,
 {
     #[inline]
     pub fn new(datum: pg_sys::Datum, is_null: bool) -> Self {
@@ -27,13 +26,32 @@ where
     pub fn is_null(&self) -> bool {
         self.0.is_none()
     }
+
+    #[inline]
+    pub fn copy_into(&self, memory_context: &mut PgMemoryContexts) -> PgDatum<T> {
+        match self.0 {
+            Some(t) => {
+                let t = t as *const T;
+                unsafe { (*t).copy_into(memory_context) }
+            }
+            None => PgDatum::null(),
+        }
+    }
+
+    #[inline]
+    pub fn as_pg_datum(&self) -> Option<pg_sys::Datum> {
+        self.0
+    }
 }
 
-impl<T> Into<pg_sys::Datum> for PgDatum<T> {
+impl<T> Into<pg_sys::Datum> for PgDatum<T>
+where
+    T: DatumCompatible<T>,
+{
     #[inline]
     fn into(self) -> pg_sys::Datum {
         match self.0 {
-            Some(datum) => datum,
+            Some(datum) => datum as pg_sys::Datum,
             None => 0 as pg_sys::Datum,
         }
     }
@@ -48,7 +66,7 @@ impl From<pg_sys::Datum> for PgDatum<pg_sys::Datum> {
 
 impl<T> From<*mut T> for PgDatum<T>
 where
-    T: Sized + PostgresStruct,
+    T: DatumCompatible<T>,
 {
     #[inline]
     fn from(val: *mut T) -> Self {
@@ -58,35 +76,11 @@ where
 
 impl<T> From<PgBox<T>> for PgDatum<T>
 where
-    T: Sized + PostgresStruct + Debug,
+    T: DatumCompatible<T> + Debug,
 {
     #[inline]
     fn from(val: PgBox<T>) -> Self {
         PgDatum::<T>::from(val.into_pg())
-    }
-}
-
-//
-// From trait implementations for built-in Postgres types
-//
-
-impl<'a> From<&'a pg_sys::varlena> for PgDatum<&'a pg_sys::varlena> {
-    #[inline]
-    fn from(val: &'a pg_sys::varlena) -> Self {
-        PgDatum(
-            Some(val as *const pg_sys::varlena as pg_sys::Datum),
-            PhantomData,
-        )
-    }
-}
-
-impl<'a> From<&'a std::ffi::CString> for PgDatum<&'a std::ffi::CStr> {
-    #[inline]
-    fn from(val: &'a std::ffi::CString) -> Self {
-        PgDatum(
-            Some(val as *const std::ffi::CString as pg_sys::Datum),
-            PhantomData,
-        )
     }
 }
 
@@ -182,230 +176,160 @@ impl From<f64> for PgDatum<f64> {
 // TryInto trait implementations for Postgres types
 //
 
-impl<'a> TryInto<&'a pg_sys::varlena> for PgDatum<&'a pg_sys::varlena> {
-    type Error = (&'static str);
-
-    #[inline]
-    fn try_into(self) -> Result<&'a pg_sys::varlena, Self::Error> {
-        match self.0 {
-            Some(datum) => Ok(unsafe { &*(datum as *const pg_sys::varlena) }),
-            None => Err("Datum is NULL"),
-        }
-    }
-}
-
-impl<'a> TryInto<&'a str> for PgDatum<&'a pg_sys::varlena> {
-    type Error = (&'static str);
-
-    #[inline]
-    fn try_into(self) -> Result<&'a str, Self::Error> {
-        match self.0 {
-            Some(datum) => {
-                let t = datum as *const pg_sys::varlena;
-                Ok(unsafe { text_to_rust_str_unchecked(t) })
-            }
-            None => Err("Datum is NULL"),
-        }
-    }
-}
-
-impl<'a> TryInto<&'a std::ffi::CStr> for PgDatum<&'a std::ffi::CStr> {
-    type Error = (&'static str);
-
-    #[inline]
-    fn try_into(self) -> Result<&'a std::ffi::CStr, Self::Error> {
-        match self.0 {
-            Some(datum) => {
-                let s = datum as *const std::os::raw::c_char;
-                Ok(unsafe { std::ffi::CStr::from_ptr(s) })
-            }
-            None => Err("Datum is NULL"),
-        }
-    }
-}
-
-impl<'a> TryInto<&'a std::ffi::CStr> for PgDatum<&'a pg_sys::varlena> {
-    type Error = (&'static str);
-
-    #[inline]
-    fn try_into(self) -> Result<&'a std::ffi::CStr, Self::Error> {
-        match self.0 {
-            Some(datum) => Ok(unsafe {
-                std::ffi::CStr::from_ptr(pg_sys::text_to_cstring(datum as *const pg_sys::varlena))
-            }),
-            None => Err("Datum is NULL"),
-        }
-    }
-}
-
 //
 // TryInto trait implementations for primitive types
 //
 
-impl TryInto<bool> for PgDatum<bool> {
+impl TryFrom<PgDatum<i8>> for i8 {
     type Error = (&'static str);
 
     #[inline]
-    fn try_into(self) -> Result<bool, Self::Error> {
-        match self.0 {
-            Some(datum) => Ok(datum != 0),
-            None => Err("Datum is NULL"),
-        }
-    }
-}
-
-impl TryInto<char> for PgDatum<char> {
-    type Error = (&'static str);
-
-    #[inline]
-    fn try_into(self) -> Result<char, Self::Error> {
-        match self.0 {
-            Some(datum) => Ok(datum as u8 as char),
-            None => Err("Datum is NULL"),
-        }
-    }
-}
-
-impl TryInto<i8> for PgDatum<i8> {
-    type Error = (&'static str);
-
-    #[inline]
-    fn try_into(self) -> Result<i8, Self::Error> {
-        match self.0 {
+    fn try_from(value: PgDatum<i8>) -> Result<Self, Self::Error> {
+        match value.as_pg_datum() {
             Some(datum) => Ok(datum as i8),
             None => Err("Datum is NULL"),
         }
     }
 }
 
-impl TryInto<i16> for PgDatum<i16> {
+impl TryFrom<PgDatum<i16>> for i16 {
     type Error = (&'static str);
 
     #[inline]
-    fn try_into(self) -> Result<i16, Self::Error> {
-        match self.0 {
+    fn try_from(value: PgDatum<i16>) -> Result<Self, Self::Error> {
+        match value.as_pg_datum() {
             Some(datum) => Ok(datum as i16),
             None => Err("Datum is NULL"),
         }
     }
 }
 
-impl TryInto<i32> for PgDatum<i32> {
+impl TryFrom<PgDatum<i32>> for i32 {
     type Error = (&'static str);
 
     #[inline]
-    fn try_into(self) -> Result<i32, Self::Error> {
-        match self.0 {
+    fn try_from(value: PgDatum<i32>) -> Result<Self, Self::Error> {
+        match value.as_pg_datum() {
             Some(datum) => Ok(datum as i32),
             None => Err("Datum is NULL"),
         }
     }
 }
 
-impl TryInto<i64> for PgDatum<i64> {
+impl TryFrom<PgDatum<i64>> for i64 {
     type Error = (&'static str);
 
     #[inline]
-    fn try_into(self) -> Result<i64, Self::Error> {
-        match self.0 {
+    fn try_from(value: PgDatum<i64>) -> Result<Self, Self::Error> {
+        match value.as_pg_datum() {
             Some(datum) => Ok(datum as i64),
             None => Err("Datum is NULL"),
         }
     }
 }
 
-impl TryInto<u8> for PgDatum<u8> {
+impl TryFrom<PgDatum<u8>> for u8 {
     type Error = (&'static str);
 
     #[inline]
-    fn try_into(self) -> Result<u8, Self::Error> {
-        match self.0 {
+    fn try_from(value: PgDatum<u8>) -> Result<Self, Self::Error> {
+        match value.as_pg_datum() {
             Some(datum) => Ok(datum as u8),
             None => Err("Datum is NULL"),
         }
     }
 }
 
-impl TryInto<u16> for PgDatum<u16> {
+impl TryFrom<PgDatum<u16>> for u16 {
     type Error = (&'static str);
 
     #[inline]
-    fn try_into(self) -> Result<u16, Self::Error> {
-        match self.0 {
+    fn try_from(value: PgDatum<u16>) -> Result<Self, Self::Error> {
+        match value.as_pg_datum() {
             Some(datum) => Ok(datum as u16),
             None => Err("Datum is NULL"),
         }
     }
 }
 
-impl TryInto<u32> for PgDatum<u32> {
+impl TryFrom<PgDatum<u32>> for u32 {
     type Error = (&'static str);
 
     #[inline]
-    fn try_into(self) -> Result<u32, Self::Error> {
-        match self.0 {
+    fn try_from(value: PgDatum<u32>) -> Result<Self, Self::Error> {
+        match value.as_pg_datum() {
             Some(datum) => Ok(datum as u32),
             None => Err("Datum is NULL"),
         }
     }
 }
 
-impl TryInto<u64> for PgDatum<u64> {
+impl TryFrom<PgDatum<u64>> for u64 {
     type Error = (&'static str);
 
     #[inline]
-    fn try_into(self) -> Result<u64, Self::Error> {
-        match self.0 {
+    fn try_from(value: PgDatum<u64>) -> Result<Self, Self::Error> {
+        match value.as_pg_datum() {
             Some(datum) => Ok(datum as u64),
             None => Err("Datum is NULL"),
         }
     }
 }
 
-impl TryInto<f32> for PgDatum<f32> {
+impl TryFrom<PgDatum<f32>> for f32 {
     type Error = (&'static str);
 
     #[inline]
-    fn try_into(self) -> Result<f32, Self::Error> {
-        match self.0 {
+    fn try_from(value: PgDatum<f32>) -> Result<Self, Self::Error> {
+        match value.as_pg_datum() {
             Some(datum) => Ok(f32::from_bits(datum as u32)),
             None => Err("Datum is NULL"),
         }
     }
 }
 
-impl TryInto<f64> for PgDatum<f64> {
+impl TryFrom<PgDatum<f64>> for f64 {
     type Error = (&'static str);
 
     #[inline]
-    fn try_into(self) -> Result<f64, Self::Error> {
-        match self.0 {
+    fn try_from(value: PgDatum<f64>) -> Result<Self, Self::Error> {
+        match value.as_pg_datum() {
             Some(datum) => Ok(f64::from_bits(datum as u64)),
             None => Err("Datum is NULL"),
         }
     }
 }
 
-impl<T> TryInto<PgBox<T>> for PgDatum<PgBox<T>>
-where
-    T: Sized + PostgresStruct + Debug,
-{
-    type Error = Infallible;
-
-    #[inline]
-    fn try_into(self) -> Result<PgBox<T>, Self::Error> {
-        Ok(PgBox::from_pg(
-            if self.0.is_some() { self.0.unwrap() } else { 0 } as *mut T,
-        ))
-    }
-}
-
-impl<'a> TryInto<&'a str> for PgDatum<pg_sys::Datum> {
+impl TryFrom<PgDatum<bool>> for bool {
     type Error = (&'static str);
 
     #[inline]
-    fn try_into(self) -> Result<&'a str, Self::Error> {
-        match self.0 {
+    fn try_from(value: PgDatum<bool>) -> Result<Self, Self::Error> {
+        match value.as_pg_datum() {
+            Some(datum) => Ok(datum != 0),
+            None => Err("Datum is NULL"),
+        }
+    }
+}
+
+impl TryFrom<PgDatum<char>> for char {
+    type Error = (&'static str);
+
+    #[inline]
+    fn try_from(value: PgDatum<char>) -> Result<Self, Self::Error> {
+        match value.as_pg_datum() {
+            Some(datum) => Ok(datum as u8 as char),
+            None => Err("Datum is NULL"),
+        }
+    }
+}
+
+impl<'a> TryFrom<PgDatum<&'a pg_sys::varlena>> for &'a str {
+    type Error = (&'static str);
+
+    #[inline]
+    fn try_from(value: PgDatum<&'a pg_sys::varlena>) -> Result<Self, Self::Error> {
+        match value.as_pg_datum() {
             Some(datum) => {
                 let t = datum as *const pg_sys::varlena;
                 Ok(unsafe { text_to_rust_str_unchecked(t) })
@@ -415,304 +339,36 @@ impl<'a> TryInto<&'a str> for PgDatum<pg_sys::Datum> {
     }
 }
 
-impl TryInto<bool> for PgDatum<pg_sys::Datum> {
+impl<'a> TryFrom<PgDatum<pg_sys::Datum>> for &'a str {
     type Error = (&'static str);
 
     #[inline]
-    fn try_into(self) -> Result<bool, Self::Error> {
-        match self.0 {
-            Some(datum) => Ok(datum != 0),
-            None => Err("Datum is NULL"),
+    fn try_from(value: PgDatum<pg_sys::Datum>) -> Result<Self, Self::Error> {
+        println!("HERE IN TRYFROM DATUM FOR STR");
+        match value.as_pg_datum() {
+            Some(datum) => {
+                println!("   returning datum as varlena to string");
+                let t = datum as *const pg_sys::varlena;
+                Ok(unsafe { text_to_rust_str_unchecked(t) })
+            }
+            None => {
+                println!("   datum is null");
+                Err("Datum is NULL")
+            }
         }
     }
 }
 
-impl TryInto<char> for PgDatum<pg_sys::Datum> {
+impl<'a> TryFrom<PgDatum<&'a str>> for &'a str {
     type Error = (&'static str);
 
     #[inline]
-    fn try_into(self) -> Result<char, Self::Error> {
-        match self.0 {
-            Some(datum) => Ok(datum as u8 as char),
-            None => Err("Datum is NULL"),
-        }
-    }
-}
-
-impl TryInto<i8> for PgDatum<pg_sys::Datum> {
-    type Error = (&'static str);
-
-    #[inline]
-    fn try_into(self) -> Result<i8, Self::Error> {
-        match self.0 {
-            Some(datum) => Ok(datum as i8),
-            None => Err("Datum is NULL"),
-        }
-    }
-}
-
-impl TryInto<i16> for PgDatum<pg_sys::Datum> {
-    type Error = (&'static str);
-
-    #[inline]
-    fn try_into(self) -> Result<i16, Self::Error> {
-        match self.0 {
-            Some(datum) => Ok(datum as i16),
-            None => Err("Datum is NULL"),
-        }
-    }
-}
-
-impl TryInto<i32> for PgDatum<pg_sys::Datum> {
-    type Error = (&'static str);
-
-    #[inline]
-    fn try_into(self) -> Result<i32, Self::Error> {
-        match self.0 {
-            Some(datum) => Ok(datum as i32),
-            None => Err("Datum is NULL"),
-        }
-    }
-}
-
-impl TryInto<i64> for PgDatum<pg_sys::Datum> {
-    type Error = (&'static str);
-
-    #[inline]
-    fn try_into(self) -> Result<i64, Self::Error> {
-        match self.0 {
-            Some(datum) => Ok(datum as i64),
-            None => Err("Datum is NULL"),
-        }
-    }
-}
-
-impl TryInto<u8> for PgDatum<pg_sys::Datum> {
-    type Error = (&'static str);
-
-    #[inline]
-    fn try_into(self) -> Result<u8, Self::Error> {
-        match self.0 {
-            Some(datum) => Ok(datum as u8),
-            None => Err("Datum is NULL"),
-        }
-    }
-}
-
-impl TryInto<u16> for PgDatum<pg_sys::Datum> {
-    type Error = (&'static str);
-
-    #[inline]
-    fn try_into(self) -> Result<u16, Self::Error> {
-        match self.0 {
-            Some(datum) => Ok(datum as u16),
-            None => Err("Datum is NULL"),
-        }
-    }
-}
-
-impl TryInto<u32> for PgDatum<pg_sys::Datum> {
-    type Error = (&'static str);
-
-    #[inline]
-    fn try_into(self) -> Result<u32, Self::Error> {
-        match self.0 {
-            Some(datum) => Ok(datum as u32),
-            None => Err("Datum is NULL"),
-        }
-    }
-}
-
-impl TryInto<u64> for PgDatum<pg_sys::Datum> {
-    type Error = (&'static str);
-
-    #[inline]
-    fn try_into(self) -> Result<u64, Self::Error> {
-        match self.0 {
-            Some(datum) => Ok(datum as u64),
-            None => Err("Datum is NULL"),
-        }
-    }
-}
-
-impl TryInto<f32> for PgDatum<pg_sys::Datum> {
-    type Error = (&'static str);
-
-    #[inline]
-    fn try_into(self) -> Result<f32, Self::Error> {
-        match self.0 {
-            Some(datum) => Ok(f32::from_bits(datum as u32)),
-            None => Err("Datum is NULL"),
-        }
-    }
-}
-
-impl TryInto<f64> for PgDatum<pg_sys::Datum> {
-    type Error = (&'static str);
-
-    #[inline]
-    fn try_into(self) -> Result<f64, Self::Error> {
-        match self.0 {
-            Some(datum) => Ok(f64::from_bits(datum as u64)),
-            None => Err("Datum is NULL"),
-        }
-    }
-}
-
-impl<'a> TryInto<&'a str> for &PgDatum<pg_sys::Datum> {
-    type Error = (&'static str);
-
-    #[inline]
-    fn try_into(self) -> Result<&'a str, Self::Error> {
-        match self.0 {
+    fn try_from(value: PgDatum<&'a str>) -> Result<Self, Self::Error> {
+        match value.as_pg_datum() {
             Some(datum) => {
                 let t = datum as *const pg_sys::varlena;
                 Ok(unsafe { text_to_rust_str_unchecked(t) })
             }
-            None => Err("Datum is NULL"),
-        }
-    }
-}
-
-impl TryInto<bool> for &PgDatum<pg_sys::Datum> {
-    type Error = (&'static str);
-
-    #[inline]
-    fn try_into(self) -> Result<bool, Self::Error> {
-        match self.0 {
-            Some(datum) => Ok(datum != 0),
-            None => Err("Datum is NULL"),
-        }
-    }
-}
-
-impl TryInto<char> for &PgDatum<pg_sys::Datum> {
-    type Error = (&'static str);
-
-    #[inline]
-    fn try_into(self) -> Result<char, Self::Error> {
-        match self.0 {
-            Some(datum) => Ok(datum as u8 as char),
-            None => Err("Datum is NULL"),
-        }
-    }
-}
-
-impl TryInto<i8> for &PgDatum<pg_sys::Datum> {
-    type Error = (&'static str);
-
-    #[inline]
-    fn try_into(self) -> Result<i8, Self::Error> {
-        match self.0 {
-            Some(datum) => Ok(datum as i8),
-            None => Err("Datum is NULL"),
-        }
-    }
-}
-
-impl TryInto<i16> for &PgDatum<pg_sys::Datum> {
-    type Error = (&'static str);
-
-    #[inline]
-    fn try_into(self) -> Result<i16, Self::Error> {
-        match self.0 {
-            Some(datum) => Ok(datum as i16),
-            None => Err("Datum is NULL"),
-        }
-    }
-}
-
-impl TryInto<i32> for &PgDatum<pg_sys::Datum> {
-    type Error = (&'static str);
-
-    #[inline]
-    fn try_into(self) -> Result<i32, Self::Error> {
-        match self.0 {
-            Some(datum) => Ok(datum as i32),
-            None => Err("Datum is NULL"),
-        }
-    }
-}
-
-impl TryInto<i64> for &PgDatum<pg_sys::Datum> {
-    type Error = (&'static str);
-
-    #[inline]
-    fn try_into(self) -> Result<i64, Self::Error> {
-        match self.0 {
-            Some(datum) => Ok(datum as i64),
-            None => Err("Datum is NULL"),
-        }
-    }
-}
-
-impl TryInto<u8> for &PgDatum<pg_sys::Datum> {
-    type Error = (&'static str);
-
-    #[inline]
-    fn try_into(self) -> Result<u8, Self::Error> {
-        match self.0 {
-            Some(datum) => Ok(datum as u8),
-            None => Err("Datum is NULL"),
-        }
-    }
-}
-
-impl TryInto<u16> for &PgDatum<pg_sys::Datum> {
-    type Error = (&'static str);
-
-    #[inline]
-    fn try_into(self) -> Result<u16, Self::Error> {
-        match self.0 {
-            Some(datum) => Ok(datum as u16),
-            None => Err("Datum is NULL"),
-        }
-    }
-}
-
-impl TryInto<u32> for &PgDatum<pg_sys::Datum> {
-    type Error = (&'static str);
-
-    #[inline]
-    fn try_into(self) -> Result<u32, Self::Error> {
-        match self.0 {
-            Some(datum) => Ok(datum as u32),
-            None => Err("Datum is NULL"),
-        }
-    }
-}
-
-impl TryInto<u64> for &PgDatum<pg_sys::Datum> {
-    type Error = (&'static str);
-
-    #[inline]
-    fn try_into(self) -> Result<u64, Self::Error> {
-        match self.0 {
-            Some(datum) => Ok(datum as u64),
-            None => Err("Datum is NULL"),
-        }
-    }
-}
-
-impl TryInto<f32> for &PgDatum<pg_sys::Datum> {
-    type Error = (&'static str);
-
-    #[inline]
-    fn try_into(self) -> Result<f32, Self::Error> {
-        match self.0 {
-            Some(datum) => Ok(f32::from_bits(datum as u32)),
-            None => Err("Datum is NULL"),
-        }
-    }
-}
-
-impl TryInto<f64> for &PgDatum<pg_sys::Datum> {
-    type Error = (&'static str);
-
-    #[inline]
-    fn try_into(self) -> Result<f64, Self::Error> {
-        match self.0 {
-            Some(datum) => Ok(f64::from_bits(datum as u64)),
             None => Err("Datum is NULL"),
         }
     }

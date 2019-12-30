@@ -255,6 +255,11 @@ pub fn vardata_any(ptr: *const pg_sys::varlena) -> *const std::os::raw::c_char {
     }
 }
 
+#[inline]
+pub unsafe fn varlena_size(t: *const pg_sys::varlena) -> usize {
+    std::mem::size_of_val(&(*t).vl_len_) + varsize_any_exhdr(t)
+}
+
 /// Convert a Postgres `varlena *` (or `text *`) into a Rust `&str`.
 ///
 /// ## Safety
