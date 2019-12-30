@@ -167,18 +167,14 @@ impl SpiClient {
                         values.as_mut_ptr(),
                         nulls.as_mut_ptr(),
                         read_only,
-                        if limit.is_some() { limit.unwrap() } else { 0 },
+                        limit.unwrap_or(0),
                     )
                 }
             }
             None => {
                 let rc;
                 unsafe {
-                    rc = pg_sys::SPI_execute(
-                        src.as_ptr(),
-                        read_only,
-                        if limit.is_some() { limit.unwrap() } else { 0 },
-                    );
+                    rc = pg_sys::SPI_execute(src.as_ptr(), read_only, limit.unwrap_or(0));
                 }
                 rc
             }

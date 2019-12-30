@@ -280,5 +280,6 @@ pub unsafe fn text_to_rust_str_unchecked<'a>(t: *const pg_sys::varlena) -> &'a s
 pub fn rust_str_to_text_p(s: &str) -> *const pg_sys::text {
     let len = s.len();
     let ptr = s.as_ptr();
+
     unsafe { pg_sys::cstring_to_text_with_len(ptr as *const std::os::raw::c_char, len as i32) }
 }
