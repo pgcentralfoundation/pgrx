@@ -1,4 +1,7 @@
-use crate::{pg_sys, text_to_rust_str_unchecked, DatumCompatible, PgBox, PgMemoryContexts};
+use crate::{
+    pg_sys, rust_str_to_text_p, text_to_rust_str_unchecked, DatumCompatible, PgBox,
+    PgMemoryContexts,
+};
 use std::convert::TryFrom;
 use std::fmt::Debug;
 use std::marker::PhantomData;
@@ -32,7 +35,7 @@ where
         match self.0 {
             Some(t) => {
                 let t = t as *const T;
-                unsafe { (*t).copy_into(memory_context) }
+                unsafe { t.as_ref() }.unwrap().copy_into(memory_context)
             }
             None => PgDatum::null(),
         }
@@ -172,9 +175,13 @@ impl From<f64> for PgDatum<f64> {
     }
 }
 
-//
-// TryInto trait implementations for Postgres types
-//
+/// Rust [&str]'s are represented as Postgres-allocated `varlena` inside a PgDatum
+impl<'a> From<&'a str> for PgDatum<&'a str> {
+    #[inline]
+    fn from(val: &str) -> Self {
+        PgDatum(Some(rust_str_to_text_p(val) as pg_sys::Datum), PhantomData)
+    }
+}
 
 //
 // TryInto trait implementations for primitive types
@@ -323,6 +330,10 @@ impl TryFrom<PgDatum<char>> for char {
         }
     }
 }
+
+//
+// TryInto trait implementations for Postgres types
+//
 
 impl<'a> TryFrom<PgDatum<&'a pg_sys::varlena>> for &'a str {
     type Error = (&'static str);

@@ -1,4 +1,4 @@
-use crate::{pg_sys, rust_str_to_text_p, PgBox, PgDatum, PgMemoryContexts};
+use crate::{pg_sys, PgBox, PgDatum, PgMemoryContexts};
 
 /// Trait for structs that are part of Postgres' source code.
 ///
@@ -101,20 +101,23 @@ impl DatumCompatible<char> for char {
 
 impl<'a> DatumCompatible<&'a str> for &'a str {
     fn copy_into(&self, memory_context: &mut PgMemoryContexts) -> PgDatum<&'a str> {
-        memory_context.switch_to(|| {
-            let copy = rust_str_to_text_p(self);
-            PgDatum::new(copy as pg_sys::Datum, false)
-        })
+        let ptr = self as *const _ as *const pg_sys::varlena;
+        let size = unsafe { crate::varlena_size(ptr) };
+
+        PgDatum::new(
+            memory_context.copy_ptr_into(ptr as crate::void_ptr, size) as pg_sys::Datum,
+            false,
+        )
     }
 }
 
 impl<'a> DatumCompatible<&'a pg_sys::varlena> for &'a pg_sys::varlena {
     fn copy_into(&self, memory_context: &mut PgMemoryContexts) -> PgDatum<&'a pg_sys::varlena> {
-        let foo = self as *const _ as *const pg_sys::varlena;
-        let size = unsafe { crate::varlena_size(foo) };
+        let ptr = self as *const _ as *const pg_sys::varlena;
+        let size = unsafe { crate::varlena_size(ptr) };
 
         PgDatum::new(
-            memory_context.copy_ptr_into(foo as crate::void_ptr, size) as pg_sys::Datum,
+            memory_context.copy_ptr_into(ptr as crate::void_ptr, size) as pg_sys::Datum,
             false,
         )
     }
