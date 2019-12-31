@@ -6,13 +6,13 @@ pub enum PgOid {
     CommonBuiltIn(CommonBuiltInOids),
 
     #[cfg(feature = "pg10")]
-    BuiltInPg10(Pg11BuiltInOids),
+    BuiltInPg10(Pg10BuiltInOids),
 
     #[cfg(feature = "pg11")]
     BuiltInPg11(Pg11BuiltInOids),
 
     #[cfg(feature = "pg12")]
-    BuiltInPg12(Pg21BuiltInOids),
+    BuiltInPg12(Pg12BuiltInOids),
 }
 
 impl PgOid {

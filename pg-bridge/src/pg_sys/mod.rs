@@ -92,5 +92,5 @@ pub mod v12 {
 
     pub type FunctionCallInfo = *mut super::pg12_specific::FunctionCallInfoBaseData;
     pub type TupleDesc = *mut super::pg12_specific::TupleDescData;
-    pub use super::pg12_specific::AllocSetContextCreateExtended;
+    pub use super::pg12_specific::AllocSetContextCreateInternal as AllocSetContextCreateExtended;
 }
