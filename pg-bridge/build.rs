@@ -89,7 +89,7 @@ fn main() -> Result<(), std::io::Error> {
         let output_rs = PathBuf::from(format!("src/pg_sys/{}_bindings.rs", version));
         let include_h = PathBuf::from(format!("include/{}.h", version));
         let config_status =
-            PathBuf::from(format!("{}/target/{}/config.status", out_dir, branch_name));
+            PathBuf::from(format!("{}/config.status", pg_git_path.to_str().unwrap()));
 
         let need_configure_and_make =
             git_clone_postgres(&pg_git_path, pg_git_repo_url, branch_name)
