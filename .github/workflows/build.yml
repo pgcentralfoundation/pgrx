@@ -15,8 +15,10 @@ jobs:
 
     strategy:
       matrix:
-          os: [ubuntu-latest, macos-latest]
-          version: [10, 11, 12]
+          os: ubuntu-latest
+          version: 10
+#          os: [ubuntu-latest, macos-latest]
+#          version: [10, 11, 12]
 
     steps:
     - uses: actions/checkout@v1
@@ -33,4 +35,4 @@ jobs:
         path: pg-rs-bridge/target/REL_${{ matrix.version }}_STABLE
         key: ${{ runner.os }}-postgres-${{ matrix.version }}
     - name: cargo build -vv
-      run: cd pg-bridge && cargo build --no-default-features --features pg${{ matrix.version }}
+      run: cd pg-bridge && cargo build --no-default-features --features pg${{ matrix.version }} && find ./ -type d
