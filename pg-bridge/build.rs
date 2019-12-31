@@ -8,6 +8,8 @@ use std::collections::HashSet;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Output};
 use std::str::FromStr;
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::Arc;
 use syn::export::{ToTokens, TokenStream2};
 use syn::Item;
 
@@ -71,6 +73,7 @@ fn main() -> Result<(), std::io::Error> {
     let pg_git_repo_url = "git://git.postgresql.org/git/postgresql.git";
     let build_rs = PathBuf::from("build.rs");
 
+    let regen_flag = Arc::new(AtomicBool::new(false));
     &vec![
         ("pg10", "REL_10_STABLE"),
         ("pg11", "REL_11_STABLE"),
@@ -143,20 +146,29 @@ fn main() -> Result<(), std::io::Error> {
         let bindings = apply_pg_guard(bindings.to_string()).unwrap();
         std::fs::write(output_rs.clone(), bindings)
             .expect(&format!("Unable to save bindings for {}", version));
+
+        rust_fmt(output_rs.as_path(), &branch_name)
+            .expect(&format!("Unable to run rustfmt for {}", version));
+        regen_flag.store(true, Ordering::SeqCst);
     });
 
-    cwd.pop();
-    run_command(
-        Command::new("cargo")
-            .arg("run")
-            .arg("--release")
-            .arg("--bin")
-            .arg("bindings-diff")
-            .current_dir(cwd),
-        "all branches",
-    )
-    .expect("bindings-diff failed");
-
+    if regen_flag.load(Ordering::SeqCst) {
+        eprintln!("Regenerating common.rs and XX_specific.rs files...");
+        cwd.pop();
+        let rc = run_command(
+            Command::new("cargo")
+                .arg("run")
+                .arg("--release")
+                .arg("--bin")
+                .arg("bindings-diff")
+                .current_dir(cwd),
+            "all branches",
+        )
+        .expect("bindings-diff failed");
+        if rc.status.code().expect("expected a status code") != 0 {
+            panic!("bindings-diff failed")
+        }
+    }
     Ok(())
 }
 
@@ -301,4 +313,13 @@ fn apply_pg_guard(input: String) -> Result<String, std::io::Error> {
     }
 
     Ok(format!("{}", stream.into_token_stream()))
+}
+
+fn rust_fmt(path: &Path, branch_name: &str) -> Result<(), std::io::Error> {
+    run_command(
+        Command::new("rustfmt").arg(path).current_dir("."),
+        branch_name,
+    )?;
+
+    Ok(())
 }
