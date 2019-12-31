@@ -11,7 +11,6 @@ pg-guard = { path = "../pg-guard" }
 memoffset = "0.5.3"
 enum-primitive-derive = "0.1.2"
 num-traits = "0.2.10"
-cfg-if = "0.1.10"
 
 [build-dependencies]
 pg-guard-rewriter = { path = "../pg-guard-rewriter" }
