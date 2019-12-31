@@ -3,5 +3,6 @@ members = [
     "pg-bridge",
     "pg-guard-attr",
     "pg-guard-rewriter",
-    "pg-guard"
+    "pg-guard",
+    "bindings-diff"
 ]

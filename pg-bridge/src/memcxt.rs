@@ -276,7 +276,7 @@ impl PgMemoryContexts {
                 initial_block_size,
                 max_block_size,
             } => {
-                let context: *mut pg_sys::MemoryContextData = unsafe {
+                let context: pg_sys::MemoryContext = unsafe {
                     let name = std::ffi::CString::new(*name).unwrap();
                     pg_sys::AllocSetContextCreateExtended(
                         *parent,

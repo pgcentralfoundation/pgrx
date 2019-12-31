@@ -1,3 +1,6 @@
+#include <stdbool.h>
+#define USE_STDBOOL 1
+
 #include "postgres.h"
 #include "miscadmin.h"
 #include "access/amapi.h"
