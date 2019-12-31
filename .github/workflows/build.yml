@@ -30,7 +30,7 @@ jobs:
     - name: postgres git/configure/make cache
       uses: actions/cache@v1
       with:
-        path: target/REL_${{ matrix.version }}_STABLE
+        path: pg-bridge/target/REL_${{ matrix.version }}_STABLE
         key: ${{ runner.os }}-postgres-${{ matrix.version }}-${{ hashFiles('**/build.rs') }}
         restore-keys: |
           ${{ runner.os }}-postgres-${{ matrix.version }}-${{ hashFiles('**/build.rs') }}
