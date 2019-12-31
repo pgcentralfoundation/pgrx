@@ -19,9 +19,9 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-          override: true
+      with:
+        profile: minimal
+        toolchain: stable
+        override: true
     - name: cargo build -vv
       run: cargo build -vv
