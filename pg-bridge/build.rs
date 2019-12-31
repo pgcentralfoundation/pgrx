@@ -253,6 +253,7 @@ fn configure_and_make(path: &Path, branch_name: &str) -> Result<(), std::io::Err
     )?;
 
     let num_jobs = u32::from_str(std::env::var("NUM_JOBS").unwrap().as_str()).unwrap();
+    let num_jobs = std::cmp::max(1, num_jobs);
     run_command(
         Command::new("make")
             .arg("-j")
