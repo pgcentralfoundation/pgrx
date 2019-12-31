@@ -77,8 +77,8 @@ fn impl_datum_compatible(ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
     let name_str = format!("{}", name);
 
-    if name_str.starts_with("_") {
-        // skip types that start with an underscore
+    if name_str.starts_with('_') {
+        // skip types that start with an underscore b/c they're likely not general Postgres structs
         TokenStream::new()
     } else {
         match &ast.data {
@@ -106,16 +106,12 @@ fn impl_datum_compatible(ast: &syn::DeriveInput) -> TokenStream {
 fn struct_contains_type(ds: &syn::DataStruct) -> bool {
     for field in ds.fields.iter() {
         let ty = &field.ty;
-        match ty {
-            Type::Path(path) => {
-                for segment in path.path.segments.iter() {
-                    if segment.ident.eq("__IncompleteArrayField") {
-                        return true;
-                    }
+        if let Type::Path(path) = ty {
+            for segment in path.path.segments.iter() {
+                if segment.ident.eq("__IncompleteArrayField") {
+                    return true;
                 }
             }
-
-            _ => {}
         }
     }
 
