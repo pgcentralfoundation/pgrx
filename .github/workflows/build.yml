@@ -12,12 +12,12 @@ jobs:
   build:
 
     name: build pg-rs-bridge
-    runs-on: ${{ matrix.os }}
-    
+    runs-on: [${{ matrix.os }}]
+
     strategy:
       matrix:
           os: [ubuntu-latest, macos-latest]
-      steps:
-      - uses: actions/checkout@v1
-      - name: cargo build -vv
-        run: cargo build -vv
+    steps:
+    - uses: actions/checkout@v1
+    - name: cargo build -vv
+      run: cargo build -vv
