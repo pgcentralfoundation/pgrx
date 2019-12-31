@@ -31,8 +31,8 @@ jobs:
       uses: actions/cache@v1
       with:
         path: target/REL_${{ matrix.version }}_STABLE
-        key: ${{ runner.os }}-postgres-${{ matrix.version }}-${{ hashFiles('**/config.status') }}
+        key: ${{ runner.os }}-postgres-${{ matrix.version }}-${{ hashFiles('**/build.rs') }}
         restore-keys: |
-          ${{ runner.os }}-postgres-${{ matrix.version }}-${{ hashFiles('**/config.status') }}
+          ${{ runner.os }}-postgres-${{ matrix.version }}-${{ hashFiles('**/build.rs') }}
     - name: cargo build -vv
       run: cd pg-bridge && cargo build -vv --no-default-features --features pg${{ matrix.version }}
