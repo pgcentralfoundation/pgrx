@@ -290,7 +290,7 @@ impl<'a> From<&'a str> for PgDatum<&'a str> {
 //
 
 impl TryFrom<PgDatum<i8>> for i8 {
-    type Error = (&'static str);
+    type Error = &'static str;
 
     #[inline]
     fn try_from(value: PgDatum<i8>) -> Result<Self, Self::Error> {
@@ -302,7 +302,7 @@ impl TryFrom<PgDatum<i8>> for i8 {
 }
 
 impl TryFrom<PgDatum<i16>> for i16 {
-    type Error = (&'static str);
+    type Error = &'static str;
 
     #[inline]
     fn try_from(value: PgDatum<i16>) -> Result<Self, Self::Error> {
@@ -314,7 +314,7 @@ impl TryFrom<PgDatum<i16>> for i16 {
 }
 
 impl TryFrom<PgDatum<i32>> for i32 {
-    type Error = (&'static str);
+    type Error = &'static str;
 
     #[inline]
     fn try_from(value: PgDatum<i32>) -> Result<Self, Self::Error> {
@@ -326,7 +326,7 @@ impl TryFrom<PgDatum<i32>> for i32 {
 }
 
 impl TryFrom<PgDatum<i64>> for i64 {
-    type Error = (&'static str);
+    type Error = &'static str;
 
     #[inline]
     fn try_from(value: PgDatum<i64>) -> Result<Self, Self::Error> {
@@ -338,7 +338,7 @@ impl TryFrom<PgDatum<i64>> for i64 {
 }
 
 impl TryFrom<PgDatum<u8>> for u8 {
-    type Error = (&'static str);
+    type Error = &'static str;
 
     #[inline]
     fn try_from(value: PgDatum<u8>) -> Result<Self, Self::Error> {
@@ -350,7 +350,7 @@ impl TryFrom<PgDatum<u8>> for u8 {
 }
 
 impl TryFrom<PgDatum<u16>> for u16 {
-    type Error = (&'static str);
+    type Error = &'static str;
 
     #[inline]
     fn try_from(value: PgDatum<u16>) -> Result<Self, Self::Error> {
@@ -362,7 +362,7 @@ impl TryFrom<PgDatum<u16>> for u16 {
 }
 
 impl TryFrom<PgDatum<u32>> for u32 {
-    type Error = (&'static str);
+    type Error = &'static str;
 
     #[inline]
     fn try_from(value: PgDatum<u32>) -> Result<Self, Self::Error> {
@@ -374,7 +374,7 @@ impl TryFrom<PgDatum<u32>> for u32 {
 }
 
 impl TryFrom<PgDatum<u64>> for u64 {
-    type Error = (&'static str);
+    type Error = &'static str;
 
     #[inline]
     fn try_from(value: PgDatum<u64>) -> Result<Self, Self::Error> {
@@ -386,7 +386,7 @@ impl TryFrom<PgDatum<u64>> for u64 {
 }
 
 impl TryFrom<PgDatum<f32>> for f32 {
-    type Error = (&'static str);
+    type Error = &'static str;
 
     #[inline]
     fn try_from(value: PgDatum<f32>) -> Result<Self, Self::Error> {
@@ -398,7 +398,7 @@ impl TryFrom<PgDatum<f32>> for f32 {
 }
 
 impl TryFrom<PgDatum<f64>> for f64 {
-    type Error = (&'static str);
+    type Error = &'static str;
 
     #[inline]
     fn try_from(value: PgDatum<f64>) -> Result<Self, Self::Error> {
@@ -410,7 +410,7 @@ impl TryFrom<PgDatum<f64>> for f64 {
 }
 
 impl TryFrom<PgDatum<bool>> for bool {
-    type Error = (&'static str);
+    type Error = &'static str;
 
     #[inline]
     fn try_from(value: PgDatum<bool>) -> Result<Self, Self::Error> {
@@ -422,7 +422,7 @@ impl TryFrom<PgDatum<bool>> for bool {
 }
 
 impl TryFrom<PgDatum<char>> for char {
-    type Error = (&'static str);
+    type Error = &'static str;
 
     #[inline]
     fn try_from(value: PgDatum<char>) -> Result<Self, Self::Error> {
@@ -438,7 +438,7 @@ impl TryFrom<PgDatum<char>> for char {
 //
 
 impl<'a> TryFrom<PgDatum<&'a pg_sys::varlena>> for &'a str {
-    type Error = (&'static str);
+    type Error = &'static str;
 
     #[inline]
     fn try_from(value: PgDatum<&'a pg_sys::varlena>) -> Result<Self, Self::Error> {
@@ -453,7 +453,7 @@ impl<'a> TryFrom<PgDatum<&'a pg_sys::varlena>> for &'a str {
 }
 
 impl<'a> TryFrom<PgDatum<pg_sys::Datum>> for &'a str {
-    type Error = (&'static str);
+    type Error = &'static str;
 
     #[inline]
     fn try_from(value: PgDatum<pg_sys::Datum>) -> Result<Self, Self::Error> {
@@ -468,7 +468,7 @@ impl<'a> TryFrom<PgDatum<pg_sys::Datum>> for &'a str {
 }
 
 impl<'a> TryFrom<PgDatum<&'a str>> for &'a str {
-    type Error = (&'static str);
+    type Error = &'static str;
 
     #[inline]
     fn try_from(value: PgDatum<&'a str>) -> Result<Self, Self::Error> {
@@ -483,7 +483,7 @@ impl<'a> TryFrom<PgDatum<&'a str>> for &'a str {
 }
 
 impl<'a> TryFrom<PgDatum<&'a pg_sys::varlena>> for &'a pg_sys::varlena {
-    type Error = (&'static str);
+    type Error = &'static str;
 
     #[inline]
     fn try_from(value: PgDatum<&'a pg_sys::varlena>) -> Result<Self, Self::Error> {
@@ -498,7 +498,7 @@ impl<'a> TryFrom<PgDatum<&'a pg_sys::varlena>> for &'a pg_sys::varlena {
 }
 
 impl TryFrom<&PgDatum<pg_sys::Datum>> for i8 {
-    type Error = (&'static str);
+    type Error = &'static str;
 
     #[inline]
     fn try_from(value: &PgDatum<pg_sys::Datum>) -> Result<Self, Self::Error> {
@@ -510,7 +510,7 @@ impl TryFrom<&PgDatum<pg_sys::Datum>> for i8 {
 }
 
 impl TryFrom<&PgDatum<pg_sys::Datum>> for i16 {
-    type Error = (&'static str);
+    type Error = &'static str;
 
     #[inline]
     fn try_from(value: &PgDatum<pg_sys::Datum>) -> Result<Self, Self::Error> {
@@ -522,7 +522,7 @@ impl TryFrom<&PgDatum<pg_sys::Datum>> for i16 {
 }
 
 impl TryFrom<&PgDatum<pg_sys::Datum>> for i32 {
-    type Error = (&'static str);
+    type Error = &'static str;
 
     #[inline]
     fn try_from(value: &PgDatum<pg_sys::Datum>) -> Result<Self, Self::Error> {
@@ -534,7 +534,7 @@ impl TryFrom<&PgDatum<pg_sys::Datum>> for i32 {
 }
 
 impl TryFrom<&PgDatum<pg_sys::Datum>> for i64 {
-    type Error = (&'static str);
+    type Error = &'static str;
 
     #[inline]
     fn try_from(value: &PgDatum<pg_sys::Datum>) -> Result<Self, Self::Error> {
@@ -546,7 +546,7 @@ impl TryFrom<&PgDatum<pg_sys::Datum>> for i64 {
 }
 
 impl TryFrom<&PgDatum<pg_sys::Datum>> for u8 {
-    type Error = (&'static str);
+    type Error = &'static str;
 
     #[inline]
     fn try_from(value: &PgDatum<pg_sys::Datum>) -> Result<Self, Self::Error> {
@@ -558,7 +558,7 @@ impl TryFrom<&PgDatum<pg_sys::Datum>> for u8 {
 }
 
 impl TryFrom<&PgDatum<pg_sys::Datum>> for u16 {
-    type Error = (&'static str);
+    type Error = &'static str;
 
     #[inline]
     fn try_from(value: &PgDatum<pg_sys::Datum>) -> Result<Self, Self::Error> {
@@ -570,7 +570,7 @@ impl TryFrom<&PgDatum<pg_sys::Datum>> for u16 {
 }
 
 impl TryFrom<&PgDatum<pg_sys::Datum>> for u32 {
-    type Error = (&'static str);
+    type Error = &'static str;
 
     #[inline]
     fn try_from(value: &PgDatum<pg_sys::Datum>) -> Result<Self, Self::Error> {
@@ -582,7 +582,7 @@ impl TryFrom<&PgDatum<pg_sys::Datum>> for u32 {
 }
 
 impl TryFrom<&PgDatum<pg_sys::Datum>> for u64 {
-    type Error = (&'static str);
+    type Error = &'static str;
 
     #[inline]
     fn try_from(value: &PgDatum<pg_sys::Datum>) -> Result<Self, Self::Error> {
@@ -594,7 +594,7 @@ impl TryFrom<&PgDatum<pg_sys::Datum>> for u64 {
 }
 
 impl TryFrom<&PgDatum<pg_sys::Datum>> for f32 {
-    type Error = (&'static str);
+    type Error = &'static str;
 
     #[inline]
     fn try_from(value: &PgDatum<pg_sys::Datum>) -> Result<Self, Self::Error> {
@@ -606,7 +606,7 @@ impl TryFrom<&PgDatum<pg_sys::Datum>> for f32 {
 }
 
 impl TryFrom<&PgDatum<pg_sys::Datum>> for f64 {
-    type Error = (&'static str);
+    type Error = &'static str;
 
     #[inline]
     fn try_from(value: &PgDatum<pg_sys::Datum>) -> Result<Self, Self::Error> {
@@ -618,7 +618,7 @@ impl TryFrom<&PgDatum<pg_sys::Datum>> for f64 {
 }
 
 impl TryFrom<&PgDatum<pg_sys::Datum>> for bool {
-    type Error = (&'static str);
+    type Error = &'static str;
 
     #[inline]
     fn try_from(value: &PgDatum<pg_sys::Datum>) -> Result<Self, Self::Error> {
@@ -630,7 +630,7 @@ impl TryFrom<&PgDatum<pg_sys::Datum>> for bool {
 }
 
 impl TryFrom<&PgDatum<pg_sys::Datum>> for char {
-    type Error = (&'static str);
+    type Error = &'static str;
 
     #[inline]
     fn try_from(value: &PgDatum<pg_sys::Datum>) -> Result<Self, Self::Error> {
@@ -646,7 +646,7 @@ impl TryFrom<&PgDatum<pg_sys::Datum>> for char {
 //
 
 impl<'a> TryFrom<&PgDatum<pg_sys::Datum>> for &'a str {
-    type Error = (&'static str);
+    type Error = &'static str;
 
     #[inline]
     fn try_from(value: &PgDatum<pg_sys::Datum>) -> Result<Self, Self::Error> {
@@ -661,7 +661,7 @@ impl<'a> TryFrom<&PgDatum<pg_sys::Datum>> for &'a str {
 }
 
 impl<'a> TryFrom<&PgDatum<pg_sys::Datum>> for &'a pg_sys::varlena {
-    type Error = (&'static str);
+    type Error = &'static str;
 
     #[inline]
     fn try_from(value: &PgDatum<pg_sys::Datum>) -> Result<Self, Self::Error> {
