@@ -280,7 +280,7 @@ impl SpiTupleTable {
 }
 
 impl Iterator for SpiTupleTable {
-    type Item = (Vec<PgDatum<pg_sys::Datum>>);
+    type Item = Vec<PgDatum<pg_sys::Datum>>;
 
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
