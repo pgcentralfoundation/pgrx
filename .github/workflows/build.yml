@@ -11,7 +11,7 @@ on:
 jobs:
   build:
 
-    name: build pg-rs-bridge
+    name: build-pg-rs-bridge
     runs-on: [${{ matrix.os }}]
 
     strategy:
