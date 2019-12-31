@@ -2,6 +2,7 @@ use crate::{pg_sys, DatumCompatible, PgBox};
 use std::fmt::Debug;
 
 /// #define IsA(nodeptr,_type_)		(nodeTag(nodeptr) == T_##_type_)
+#[allow(clippy::not_unsafe_ptr_arg_deref)] // ok b/c we check that nodeptr isn't null
 #[inline]
 pub fn is_a(nodeptr: *mut pg_sys::Node, tag: pg_sys::NodeTag) -> bool {
     !nodeptr.is_null() && (unsafe { *nodeptr }).type_ == tag

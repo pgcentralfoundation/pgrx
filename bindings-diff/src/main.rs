@@ -153,7 +153,7 @@ fn build_common_set(
 }
 
 #[inline]
-fn all_contain(maps: &Vec<&mut BTreeMap<String, SortableItem>>, key: &String) -> bool {
+fn all_contain(maps: &[&mut BTreeMap<String, SortableItem>], key: &str) -> bool {
     for map in maps.iter() {
         if !map.contains_key(key) {
             return false;
@@ -182,6 +182,9 @@ fn read_source_file(filename: &str) -> BTreeMap<String, SortableItem> {
 
 fn write_source_file(filename: &str, items: BTreeMap<String, SortableItem>) {
     let mut stream = TokenStream2::new();
+    stream.extend(quote! {
+        #![allow(clippy::all)]
+    });
     stream.extend(quote! {use crate::DatumCompatible;});
     stream.extend(quote! {use crate::pg_sys::common::*;});
     for (_, item) in items {
@@ -190,21 +193,24 @@ fn write_source_file(filename: &str, items: BTreeMap<String, SortableItem>) {
             item => stream.extend(quote! {#item}),
         }
     }
-    std::fs::write(filename.clone(), stream.to_string())
-        .expect(&format!("Unable to save bindings for {}", filename));
+    std::fs::write(filename, stream.to_string())
+        .unwrap_or_else(|_| panic!("Unable to save bindings for {}", filename));
     rustfmt(filename);
 }
 
 fn write_common_file(filename: &str, items: BTreeSet<SortableItem>) {
     let mut stream = TokenStream2::new();
+    stream.extend(quote! {
+        #![allow(clippy::all)]
+    });
     stream.extend(quote! {use crate::DatumCompatible;});
     stream.extend(quote! {
-            #[cfg(feature = "pg10")]
-            use crate::pg_sys::pg10_specific::*;
-            #[cfg(feature = "pg11")]
-            use crate::pg_sys::pg11_specific::*;
-            #[cfg(feature = "pg12")]
-            use crate::pg_sys::pg12_specific::*;
+        #[cfg(feature = "pg10")]
+        use crate::pg_sys::pg10_specific::*;
+        #[cfg(feature = "pg11")]
+        use crate::pg_sys::pg11_specific::*;
+        #[cfg(feature = "pg12")]
+        use crate::pg_sys::pg12_specific::*;
     });
     for item in items.iter() {
         match &item.item {
@@ -212,8 +218,8 @@ fn write_common_file(filename: &str, items: BTreeSet<SortableItem>) {
             item => stream.extend(quote! {#item}),
         }
     }
-    std::fs::write(filename.clone(), stream.to_string())
-        .expect(&format!("Unable to save bindings for {}", filename));
+    std::fs::write(filename, stream.to_string())
+        .unwrap_or_else(|_| panic!("Unable to save bindings for {}", filename));
     rustfmt(filename);
 }
 

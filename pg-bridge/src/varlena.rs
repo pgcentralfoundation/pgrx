@@ -36,16 +36,12 @@ pub fn vartag_is_expanded(tag: pg_sys::vartag_external) -> bool {
 pub fn vartag_size(tag: pg_sys::vartag_external) -> usize {
     if tag == pg_sys::vartag_external_VARTAG_INDIRECT {
         std::mem::size_of::<pg_sys::varatt_indirect>()
+    } else if vartag_is_expanded(tag) {
+        std::mem::size_of::<pg_sys::varatt_expanded>()
+    } else if tag == pg_sys::vartag_external_VARTAG_ONDISK {
+        std::mem::size_of::<pg_sys::varatt_external>()
     } else {
-        if vartag_is_expanded(tag) {
-            std::mem::size_of::<pg_sys::varatt_expanded>()
-        } else {
-            if tag == pg_sys::vartag_external_VARTAG_ONDISK {
-                std::mem::size_of::<pg_sys::varatt_external>()
-            } else {
-                panic!("unrecognized TOAST vartag")
-            }
-        }
+        panic!("unrecognized TOAST vartag")
     }
 }
 
@@ -53,11 +49,13 @@ pub fn vartag_size(tag: pg_sys::vartag_external) -> usize {
 /// #define VARSIZE_4B(PTR) \
 /// ((((varattrib_4b *) (PTR))->va_4byte.va_header >> 2) & 0x3FFFFFFF)
 /// ```
+
+#[allow(clippy::cast_ptr_alignment)]
 #[inline]
 pub fn varsize_4b(ptr: *const pg_sys::varlena) -> usize {
     unsafe {
         let va4b = ptr as *const pg_sys::varattrib_4b__bindgen_ty_1; // 4byte
-        (((*va4b).va_header >> 2) & 0x3FFFFFFF) as usize
+        (((*va4b).va_header >> 2) & 0x3FFF_FFFF) as usize
     }
 }
 
@@ -106,6 +104,8 @@ pub fn varatt_is_4b(ptr: *const pg_sys::varlena) -> bool {
 /// #define VARATT_IS_4B_U(PTR) \
 /// ((((varattrib_1b *) (PTR))->va_header & 0x03) == 0x00)
 /// ```
+
+#[allow(clippy::verbose_bit_mask)]
 #[inline]
 pub fn varatt_is_4b_u(ptr: *const pg_sys::varlena) -> bool {
     unsafe {
@@ -175,12 +175,10 @@ pub fn varatt_not_pad_byte(ptr: *const pg_sys::varlena) -> bool {
 pub fn varsize_any_exhdr(ptr: *const pg_sys::varlena) -> usize {
     if varatt_is_1b_e(ptr) {
         varsize_external(ptr) - pg_sys::VARHDRSZ_EXTERNAL()
+    } else if varatt_is_1b(ptr) {
+        varsize_1b(ptr) - pg_sys::VARHDRSZ_SHORT()
     } else {
-        if varatt_is_1b(ptr) {
-            varsize_1b(ptr) - pg_sys::VARHDRSZ_SHORT()
-        } else {
-            varsize_4b(ptr) - pg_sys::VARHDRSZ
-        }
+        varsize_4b(ptr) - pg_sys::VARHDRSZ
     }
 }
 
@@ -201,6 +199,7 @@ pub fn vardata_1b(ptr: *const pg_sys::varlena) -> *const std::os::raw::c_char {
 /// ```c
 /// #define VARDATA_4B(PTR)		(((varattrib_4b *) (PTR))->va_4byte.va_data)
 /// ```
+#[allow(clippy::cast_ptr_alignment)]
 #[inline]
 pub fn vardata_4b(ptr: *const pg_sys::varlena) -> *const std::os::raw::c_char {
     unsafe {
@@ -215,6 +214,7 @@ pub fn vardata_4b(ptr: *const pg_sys::varlena) -> *const std::os::raw::c_char {
 /// ```c
 /// #define VARDATA_4B_C(PTR)	(((varattrib_4b *) (PTR))->va_compressed.va_data)
 /// ```
+#[allow(clippy::cast_ptr_alignment)]
 #[inline]
 pub fn vardata_4b_c(ptr: *const pg_sys::varlena) -> *const std::os::raw::c_char {
     unsafe {
@@ -229,6 +229,7 @@ pub fn vardata_4b_c(ptr: *const pg_sys::varlena) -> *const std::os::raw::c_char 
 /// ```c
 /// #define VARDATA_1B_E(PTR)	(((varattrib_1b_e *) (PTR))->va_data)
 /// ```
+#[allow(clippy::cast_ptr_alignment)]
 #[inline]
 pub fn vardata_1b_e(ptr: *const pg_sys::varlena) -> *const std::os::raw::c_char {
     unsafe {
@@ -255,6 +256,9 @@ pub fn vardata_any(ptr: *const pg_sys::varlena) -> *const std::os::raw::c_char {
     }
 }
 
+/// ## Safety
+///
+/// This function is unsafe because it blindly dereferences the varlena pointer argument
 #[inline]
 pub unsafe fn varlena_size(t: *const pg_sys::varlena) -> usize {
     std::mem::size_of_val(&(*t).vl_len_) + varsize_any_exhdr(t)

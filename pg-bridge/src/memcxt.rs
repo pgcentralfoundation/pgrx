@@ -233,13 +233,9 @@ impl PgMemoryContexts {
             PgMemoryContexts::CurTransactionContext => unsafe { pg_sys::CurTransactionContext },
             PgMemoryContexts::For(mc) => *mc,
             PgMemoryContexts::Of(ptr) => PgMemoryContexts::get_context_for_pointer(*ptr),
-            PgMemoryContexts::Transient {
-                parent: _,
-                name: _,
-                min_context_size: _,
-                initial_block_size: _,
-                max_block_size: _,
-            } => panic!("cannot use value() to retrieve a Transient PgMemoryContext"),
+            PgMemoryContexts::Transient { .. } => {
+                panic!("cannot use value() to retrieve a Transient PgMemoryContext")
+            }
         }
     }
 
@@ -608,10 +604,10 @@ where
 
     /// Box nothing
     pub fn null() -> PgBox<T> {
-        return PgBox::<T> {
+        PgBox::<T> {
             ptr: None,
             owner: WhoAllocated::Rust,
-        };
+        }
     }
 
     /// Box a struct by copying it into Postgres' `CurrentMemoryContext`
@@ -648,7 +644,7 @@ where
         let ptr = self.ptr;
         match ptr {
             Some(ptr) => ptr,
-            None => 0 as *mut T,
+            None => std::ptr::null_mut(),
         }
     }
 
@@ -661,7 +657,7 @@ where
 
         match ptr {
             Some(ptr) => ptr,
-            None => 0 as *mut T,
+            None => std::ptr::null_mut(),
         }
     }
 }

@@ -141,7 +141,9 @@ impl SpiClient {
         limit: Option<i64>,
         args: Option<Vec<(PgOid, PgDatum<pg_sys::Datum>)>>,
     ) -> SpiTupleTable {
-        unsafe { pg_sys::SPI_tuptable = 0 as *mut pg_sys::SPITupleTable };
+        unsafe {
+            pg_sys::SPI_tuptable = std::ptr::null_mut();
+        }
 
         let src = std::ffi::CString::new(query).unwrap();
         let status_code = match args {
@@ -198,8 +200,7 @@ impl SpiTupleTable {
         A: DatumCompatible<A> + SpiSend + TryFrom<PgDatum<A>>,
         <A as std::convert::TryFrom<PgDatum<A>>>::Error: std::fmt::Debug,
     {
-        let a = self.get_datum(1).try_into().unwrap();
-        a
+        self.get_datum(1).try_into().unwrap()
     }
 
     pub fn get_two<A, B>(self) -> (A, B)
