@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
           os: [ubuntu-latest, macos-latest]
-          version: [pg10, pg11, pg12]
+          version: [10, 11, 12]
 
     steps:
     - uses: actions/checkout@v1
@@ -27,5 +27,12 @@ jobs:
         override: true
     - name: install postgres build dependencies
       run: if [ "${{ matrix.os}}" == "ubuntu-latest" ] ; then sudo apt install bison flex; fi
+    - name: postgres git/configure/make cache
+      uses: actions/cache@v1
+      with:
+        path: target/REL_${{ matrix.version }}_STABLE
+        key: ${{ runner.os }}-postgres-${{ matrix.version }}-${{ hashFiles('**/config.status') }}
+        restore-keys: |
+          ${{ runner.os }}-postgres-${{ matrix.version }}-${{ hashFiles('**/config.status') }}
     - name: cargo build -vv
-      run: cd pg-bridge && cargo build -vv --no-default-features --features ${{ matrix.version }}
+      run: cd pg-bridge && cargo build -vv --no-default-features --features pg${{ matrix.version }}

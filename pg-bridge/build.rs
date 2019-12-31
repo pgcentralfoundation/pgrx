@@ -239,7 +239,7 @@ fn git_clean(path: &Path, branch_name: &str) -> Result<(), std::io::Error> {
 }
 
 fn configure_and_make(path: &Path, branch_name: &str) -> Result<(), std::io::Error> {
-    run_command(
+    let rc = run_command(
         Command::new("sh")
             .arg("-c")
             .arg("./configure")
@@ -252,12 +252,16 @@ fn configure_and_make(path: &Path, branch_name: &str) -> Result<(), std::io::Err
         branch_name,
     )?;
 
+    if rc.status.code().unwrap() != 0 {
+        panic!("configure failed for {}", branch_name)
+    }
+
     let num_jobs = u32::from_str(std::env::var("NUM_JOBS").unwrap().as_str()).unwrap();
-    let num_jobs = std::cmp::max(1, num_jobs);
+    let num_jobs = std::cmp::max(1, num_jobs / 3);
     run_command(
         Command::new("make")
             .arg("-j")
-            .arg(format!("{}", num_jobs / 3))
+            .arg(format!("{}", num_jobs))
             .env_remove("TARGET")
             .env_remove("PROFILE")
             .env_remove("OUT_DIR")
@@ -266,6 +270,10 @@ fn configure_and_make(path: &Path, branch_name: &str) -> Result<(), std::io::Err
             .current_dir(path),
         branch_name,
     )?;
+
+    if rc.status.code().unwrap() != 0 {
+        panic!("make failed for {}", branch_name)
+    }
 
     Ok(())
 }
