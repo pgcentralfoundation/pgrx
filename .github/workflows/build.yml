@@ -10,12 +10,14 @@ on:
 
 jobs:
   build:
-
+    name: Build PG RS Bridge
     runs-on: ${{ matrix.os }}
 
     strategy:
       matrix:
           os: [ubuntu-latest, macos-latest]
+          version: [pg10, pg11, pg12]
+
     steps:
     - uses: actions/checkout@v1
     - uses: actions-rs/toolchain@v1
@@ -23,5 +25,7 @@ jobs:
         profile: minimal
         toolchain: stable
         override: true
+    - name: install postgres build dependencies
+      run: if [ "${{ matrix.os}}" == "ubuntu-latest" ] ; then sudo apt install bison flex fi
     - name: cargo build -vv
-      run: cargo build -vv
+      run: cargo build -vv --no-default-features --features ${{ matrix.version }}
