@@ -8,11 +8,15 @@
 #include "access/htup.h"
 #include "access/htup_details.h"
 #include "access/skey.h"
+
+#define ScanKey struct ScanKeyData *
+#include "nodes/execnodes.h"
+#undef ScanKey
+
 #include "catalog/index.h"
 #include "catalog/pg_type.h"
 #include "executor/executor.h"
 #include "executor/spi.h"
-#include "nodes/execnodes.h"
 #include "nodes/nodes.h"
 #include "nodes/tidbitmap.h"
 #include "optimizer/planner.h"
