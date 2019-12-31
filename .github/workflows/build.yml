@@ -28,4 +28,4 @@ jobs:
     - name: install postgres build dependencies
       run: if [ "${{ matrix.os}}" == "ubuntu-latest" ] ; then sudo apt install bison flex; fi
     - name: cargo build -vv
-      run: cargo build -vv --no-default-features --features ${{ matrix.version }}
+      run: cd pg-bridge && cargo build -vv --no-default-features --features ${{ matrix.version }}
