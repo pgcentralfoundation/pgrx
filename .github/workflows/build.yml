@@ -33,4 +33,4 @@ jobs:
         path: pg-bridge/target/REL_${{ matrix.version }}_STABLE
         key: ${{ runner.os }}-postgres-${{ matrix.version }}
     - name: cargo build -vv
-      run: cd pg-bridge && cargo build -vv --no-default-features --features pg${{ matrix.version }}
+      run: cd pg-bridge && cargo build --no-default-features --features pg${{ matrix.version }}

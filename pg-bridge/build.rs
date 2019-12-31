@@ -62,10 +62,8 @@ fn make_git_repo_path(out_dir: &str, branch_name: &str) -> PathBuf {
 
 fn main() -> Result<(), std::io::Error> {
     build_deps::rerun_if_changed_paths("include/*").unwrap();
-    build_deps::rerun_if_changed_paths("include").unwrap();
     build_deps::rerun_if_changed_paths("../pg-guard-attr/src/lib.rs").unwrap();
     build_deps::rerun_if_changed_paths("../pg-guard-rewriter/src/lib.rs").unwrap();
-    build_deps::rerun_if_changed_paths("src/pg_sys/*.rs").unwrap();
     build_deps::rerun_if_changed_paths("../bindings-diff/*").unwrap();
     build_deps::rerun_if_changed_paths("../bindings-diff/src/*").unwrap();
 
@@ -91,12 +89,18 @@ fn main() -> Result<(), std::io::Error> {
         let config_status =
             PathBuf::from(format!("{}/config.status", pg_git_path.to_str().unwrap()));
 
+        let common_rs = PathBuf::from(format!("src/pg_sys/common.rs"));
+        let version_specific_rs = PathBuf::from(format!("src/pg_sys/{}_specific.rs", version));
+        if !common_rs.is_file() || !version_specific_rs.is_file() {
+            regen_flag.store(true, Ordering::SeqCst);
+        }
+
         let need_configure_and_make =
             git_clone_postgres(&pg_git_path, pg_git_repo_url, branch_name)
                 .expect(&format!("Unable to git clone {}", pg_git_repo_url));
 
         if need_configure_and_make || !config_status.is_file() {
-            eprintln!("[{}] cleaning and building", branch_name);
+            println!("cargo:warning=[{}] cleaning and building", branch_name);
 
             git_clean(&pg_git_path, &branch_name)
                 .expect(&format!("Unable to switch to branch {}", branch_name));
@@ -112,8 +116,8 @@ fn main() -> Result<(), std::io::Error> {
                 .unwrap()
                 .gt(&std::fs::metadata(&output_rs).unwrap().modified().unwrap())
         {
-            eprintln!(
-                "[{}] build.rs is newer, removing and re-generating {}",
+            println!(
+                "cargo:warning=[{}] build.rs is newer, removing and re-generating {}",
                 branch_name,
                 output_rs.to_str().unwrap()
             );
@@ -126,12 +130,15 @@ fn main() -> Result<(), std::io::Error> {
                 .unwrap()
                 .lt(&std::fs::metadata(&output_rs).unwrap().modified().unwrap())
         {
-            eprintln!("{} is up-to-date:  skipping", output_rs.to_str().unwrap());
+            println!(
+                "cargo:warning={} is up-to-date:  skipping",
+                output_rs.to_str().unwrap()
+            );
             return;
         }
 
-        eprintln!(
-            "[{}] Running bindgen on {}",
+        println!(
+            "cargo:warning=[{}] Running bindgen on {}",
             branch_name,
             output_rs.to_str().unwrap()
         );
@@ -155,7 +162,9 @@ fn main() -> Result<(), std::io::Error> {
     });
 
     if regen_flag.load(Ordering::SeqCst) {
-        eprintln!("Regenerating common.rs and XX_specific.rs files...");
+        println!(
+            "cargo:warning=[all branches]: Regenerating common.rs and XX_specific.rs files..."
+        );
         cwd.pop();
         let rc = run_command(
             Command::new("cargo")
@@ -281,6 +290,7 @@ fn configure_and_make(path: &Path, branch_name: &str) -> Result<(), std::io::Err
 fn run_command(command: &mut Command, branch_name: &str) -> Result<Output, std::io::Error> {
     let mut dbg = String::new();
 
+    println!("cargo:warning=[{}]: {:?}", branch_name, command);
     dbg.push_str(&format!(
         "[{}]: -------- {:?} -------- \n",
         branch_name, command
@@ -291,7 +301,11 @@ fn run_command(command: &mut Command, branch_name: &str) -> Result<Output, std::
 
     if !output.stdout.is_empty() {
         for line in String::from_utf8(output.stdout).unwrap().lines() {
-            dbg.push_str(&format!("[{}] [stdout]: {}\n", branch_name, line));
+            if line.starts_with("cargo:") {
+                dbg.push_str(&format!("{}\n", line));
+            } else {
+                dbg.push_str(&format!("[{}] [stdout]: {}\n", branch_name, line));
+            }
         }
     }
 
