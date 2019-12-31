@@ -45,7 +45,7 @@ impl bindgen::callbacks::ParseCallbacks for IgnoredMacros {
     }
 }
 
-fn make_git_repo_path(out_dir: String, branch_name: &str) -> PathBuf {
+fn make_git_repo_path(out_dir: &str, branch_name: &str) -> PathBuf {
     let mut pg_git_path = PathBuf::from(out_dir);
     // backup 4 directories
     pg_git_path.pop();
@@ -84,16 +84,18 @@ fn main() -> Result<(), std::io::Error> {
         let out_dir = std::env::var("OUT_DIR").unwrap();
         let version = v.0;
         let branch_name = v.1;
-        let pg_git_path = make_git_repo_path(out_dir, branch_name);
+        let pg_git_path = make_git_repo_path(&out_dir, branch_name);
 
         let output_rs = PathBuf::from(format!("src/pg_sys/{}_bindings.rs", version));
         let include_h = PathBuf::from(format!("include/{}.h", version));
+        let config_status =
+            PathBuf::from(format!("{}/target/{}/config.status", out_dir, branch_name));
 
         let need_configure_and_make =
             git_clone_postgres(&pg_git_path, pg_git_repo_url, branch_name)
                 .expect(&format!("Unable to git clone {}", pg_git_repo_url));
 
-        if need_configure_and_make {
+        if need_configure_and_make || !config_status.is_file() {
             eprintln!("[{}] cleaning and building", branch_name);
 
             git_clean(&pg_git_path, &branch_name)
@@ -241,7 +243,11 @@ fn configure_and_make(path: &Path, branch_name: &str) -> Result<(), std::io::Err
         Command::new("sh")
             .arg("-c")
             .arg("./configure")
-            .env_clear()
+            .env_remove("TARGET")
+            .env_remove("PROFILE")
+            .env_remove("OUT_DIR")
+            .env_remove("HOST")
+            .env_remove("NUM_JOBS")
             .current_dir(path),
         branch_name,
     )?;
@@ -251,7 +257,11 @@ fn configure_and_make(path: &Path, branch_name: &str) -> Result<(), std::io::Err
         Command::new("make")
             .arg("-j")
             .arg(format!("{}", num_jobs / 3))
-            .env_clear()
+            .env_remove("TARGET")
+            .env_remove("PROFILE")
+            .env_remove("OUT_DIR")
+            .env_remove("HOST")
+            .env_remove("NUM_JOBS")
             .current_dir(path),
         branch_name,
     )?;
