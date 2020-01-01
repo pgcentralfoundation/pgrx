@@ -56,5 +56,5 @@ jobs:
         key: ${{ runner.os }}-postgres-REL_12_STABLE-v1
 
     # build our code
-    - name: cargo build
+    - name: cargo check
       run: cd pg-bridge && cargo check --no-default-features --features pg${{ matrix.version }}
