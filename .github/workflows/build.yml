@@ -32,9 +32,9 @@ jobs:
     - name: postgres git/configure/make cache
       uses: actions/cache@v1
       with:
-        path: ${{ GITHUB_WORKSPACE }}/target/REL_${{ matrix.version }}_STABLE-test
+        path: target/REL_${{ matrix.version }}_STABLE-test
         key: ${{ runner.os }}-postgres-${{ matrix.version }}
     - name: cargo build -vv
 #      run: cd pg-bridge && cargo build --no-default-features --features pg${{ matrix.version }} && find ./ -type d
-      run: echo ~ && mkdir -p target/REL_10_STABLE && pwd && find ./ -type d
+      run: echo $GITHUB_WORKSPACE && echo ~ && mkdir -p target/REL_10_STABLE && pwd && find ./ -type d
 #      run: cd pg-bridge && cargo build --no-default-features --features pg${{ matrix.version }} && find ./ -type d
