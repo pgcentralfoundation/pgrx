@@ -56,7 +56,6 @@ fn make_git_repo_path(out_dir: &str, branch_name: &str) -> PathBuf {
     // and a new dir named "pg_git_repo"
     pg_git_path.push(branch_name);
 
-    // return the path we built
     pg_git_path
 }
 
@@ -66,6 +65,18 @@ fn make_include_path(git_repo_path: &PathBuf) -> PathBuf {
     include_path
 }
 
+fn make_shim_path(manifest_dir: &str) -> PathBuf {
+    let mut shim_dir = PathBuf::from(manifest_dir);
+
+    // backup a directory
+    shim_dir.pop();
+
+    // and a new dir named "pg-shim"
+    shim_dir.push("pg-shim");
+
+    shim_dir
+}
+
 fn main() -> Result<(), std::io::Error> {
     build_deps::rerun_if_changed_paths("include/*").unwrap();
     build_deps::rerun_if_changed_paths("../pg-guard-attr/src/lib.rs").unwrap();
@@ -73,11 +84,14 @@ fn main() -> Result<(), std::io::Error> {
     build_deps::rerun_if_changed_paths("../bindings-diff/*").unwrap();
     build_deps::rerun_if_changed_paths("../bindings-diff/src/*").unwrap();
 
+    let manifest_dir = std::env::var("CARGO_MANIFEST_DIR").unwrap();
+    let out_dir = std::env::var("OUT_DIR").unwrap();
     let cwd = PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").unwrap());
     let pg_git_repo_url = "git://git.postgresql.org/git/postgresql.git";
     let build_rs = PathBuf::from("build.rs");
-
+    let shim_dir = make_shim_path(&manifest_dir);
     let regen_flag = Arc::new(AtomicBool::new(false));
+
     &vec![
         ("pg10", "REL_10_STABLE", "8810"),
         ("pg11", "REL_11_STABLE", "8811"),
@@ -85,7 +99,6 @@ fn main() -> Result<(), std::io::Error> {
     ]
     .par_iter()
     .for_each(|v| {
-        let out_dir = std::env::var("OUT_DIR").unwrap();
         let version = v.0;
         let branch_name = v.1;
         let port_no = u16::from_str(v.2).unwrap();
@@ -171,11 +184,58 @@ fn main() -> Result<(), std::io::Error> {
     if regen_flag.load(Ordering::SeqCst) {
         generate_common_rs(cwd);
     }
+
+    // add shim_dir to rustc's library search path
+    println!("cargo:rustc-link-search={}", shim_dir.display());
+
+    // then build the shim for the version feature currently being built
+    // and tell rustc to link to the library that was built
+    if std::env::var("CARGO_FEATURE_PG10").is_ok() {
+        build_shim_for_version(&shim_dir, &out_dir, 10)?;
+        println!("cargo:rustc-link-lib=static=pg-shim-10");
+    } else if std::env::var("CARGO_FEATURE_PG11").is_ok() {
+        build_shim_for_version(&shim_dir, &out_dir, 11)?;
+        println!("cargo:rustc-link-lib=static=pg-shim-11");
+    } else if std::env::var("CARGO_FEATURE_PG12").is_ok() {
+        build_shim_for_version(&shim_dir, &out_dir, 12)?;
+        println!("cargo:rustc-link-lib=static=pg-shim-12");
+    }
+
+    Ok(())
+}
+
+fn build_shim_for_version(
+    shim_dir: &PathBuf,
+    out_dir: &str,
+    version_no: i32,
+) -> Result<(), std::io::Error> {
+    // put the install directory fir this version of Postgres at the head of the path
+    // so that `pg_config` gets found and we can make the shim static library
+    let path_env = std::env::var("PATH").unwrap();
+    let path_env = format!(
+        "{}:{}",
+        format!("{}/target/REL_{}_STABLE/install/bin", out_dir, version_no),
+        path_env
+    );
+
+    eprintln!("shim_dir={}", shim_dir.display());
+    let rc = run_command(
+        Command::new("make")
+            .env("PG_TARGET_VERSION", format!("{}", version_no))
+            .env("PATH", path_env)
+            .current_dir(shim_dir),
+        &format!("shim for PG v{}", version_no),
+    )?;
+
+    if rc.status.code().unwrap() != 0 {
+        panic!("failed to make pg-shim for v{}", version_no);
+    }
+
     Ok(())
 }
 
 fn generate_common_rs(mut cwd: PathBuf) -> () {
-    println!("cargo:warning=[all branches]: Regenerating common.rs and XX_specific.rs files...");
+    println!("cargo:warning=[all branches] Regenerating common.rs and XX_specific.rs files...");
     cwd.pop();
     let rc = run_command(
         Command::new("cargo")
@@ -260,6 +320,7 @@ fn configure_and_make(path: &Path, branch_name: &str, port_no: u16) -> Result<()
     // configure
     let rc = run_command(
         Command::new(format!("{}/configure", path.display()))
+            .arg("--without-readline") // don't need readline to build PG extensions -- one less system dep to install
             .arg(format!("--prefix={}/install", path.display()))
             .arg(format!("--with-pgport={}", port_no))
             .current_dir(path),
@@ -314,9 +375,9 @@ fn run_command(mut command: &mut Command, branch_name: &str) -> Result<Output, s
         .env_remove("HOST")
         .env_remove("NUM_JOBS");
 
-    println!("cargo:warning=[{}]: {:?}", branch_name, command);
+    println!("cargo:warning=[{}] {:?}", branch_name, command);
     dbg.push_str(&format!(
-        "[{}]: -------- {:?} -------- \n",
+        "[{}] -------- {:?} -------- \n",
         branch_name, command
     ));
 
@@ -328,14 +389,14 @@ fn run_command(mut command: &mut Command, branch_name: &str) -> Result<Output, s
             if line.starts_with("cargo:") {
                 dbg.push_str(&format!("{}\n", line));
             } else {
-                dbg.push_str(&format!("[{}] [stdout]: {}\n", branch_name, line));
+                dbg.push_str(&format!("[{}] [stdout] {}\n", branch_name, line));
             }
         }
     }
 
     if !output.stderr.is_empty() {
         for line in String::from_utf8(output.stderr).unwrap().lines() {
-            dbg.push_str(&format!("[{}] [stderr]: {}\n", branch_name, line));
+            dbg.push_str(&format!("[{}] [stderr] {}\n", branch_name, line));
         }
     }
     dbg.push_str(&format!(

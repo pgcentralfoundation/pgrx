@@ -369,12 +369,10 @@ impl PgMemoryContexts {
     /// repalloc() to find the context to call.
     ///
     fn get_context_for_pointer(ptr: void_ptr) -> pg_sys::MemoryContext {
-        // exported from ZomboDB since I failed to convert the macro within a reasonable amount of time
-        // TODO:  fix this
         extern "C" {
-            pub fn zdb_GetMemoryChunkContext(pointer: void_ptr) -> pg_sys::MemoryContext;
+            pub fn pg_rs_bridge_GetMemoryContextChunk(pointer: void_ptr) -> pg_sys::MemoryContext;
         }
-        unsafe { zdb_GetMemoryChunkContext(ptr) }
+        unsafe { pg_rs_bridge_GetMemoryContextChunk(ptr) }
 
         //
         // the below causes PG to crash b/c it mis-calculates where the MemoryContext address is
