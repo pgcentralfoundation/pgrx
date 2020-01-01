@@ -48,5 +48,5 @@ jobs:
         key: ${{ runner.os }}-postgres-REL_12_STABLE-v1
 
     # build our code
-    - name: cargo build -vv
-      run: cd pg-bridge && cargo build --no-default-features --features pg${{ matrix.version }} && pwd && find ${GITHUB_WORKSPACE} -type d
+    - name: cargo build
+      run: cd pg-bridge && cargo build --no-default-features --features pg${{ matrix.version }}
