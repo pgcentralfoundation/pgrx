@@ -15,24 +15,24 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-latest, macos-latest]
         version: [10]
 #          os: [ubuntu-latest, macos-latest]
 #          version: [10, 11, 12]
 
     steps:
     - uses: actions/checkout@v1
-    - uses: actions-rs/toolchain@v1
-      with:
-        profile: minimal
-        toolchain: stable
-        override: true
-    - name: install postgres build dependencies
-      run: if [ "${{ matrix.os}}" == "ubuntu-latest" ] ; then sudo apt install libreadline6-dev bison flex; fi
+#    - uses: actions-rs/toolchain@v1
+#      with:
+#        profile: minimal
+#        toolchain: stable
+#        override: true
+#    - name: install postgres build dependencies
+#      run: if [ "${{ matrix.os}}" == "ubuntu-latest" ] ; then sudo apt install libreadline6-dev bison flex; fi
     - name: postgres git/configure/make cache
       uses: actions/cache@v1
       with:
-        path: ~/pg-rs-bridge/pg-rs-bridge/target/REL_${{ matrix.version }}_STABLE
+        path: $GITHUB_WORKSPACE/target/REL_${{ matrix.version }}_STABLE-test
         key: ${{ runner.os }}-postgres-${{ matrix.version }}
     - name: cargo build -vv
 #      run: cd pg-bridge && cargo build --no-default-features --features pg${{ matrix.version }} && find ./ -type d
