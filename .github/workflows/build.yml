@@ -31,6 +31,6 @@ jobs:
       uses: actions/cache@v1
       with:
         path: target/REL_${{ matrix.version }}_STABLE
-        key: ${{ runner.os }}-postgres-${{ matrix.version }}
+        key: ${{ runner.os }}-postgres-${{ matrix.version }}-v1
     - name: cargo build -vv
       run: cd pg-bridge && cargo build --no-default-features --features pg${{ matrix.version }} && pwd && find ${GITHUB_WORKSPACE} -type d
