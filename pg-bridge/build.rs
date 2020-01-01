@@ -60,6 +60,12 @@ fn make_git_repo_path(out_dir: &str, branch_name: &str) -> PathBuf {
     pg_git_path
 }
 
+fn make_include_path(git_repo_path: &PathBuf) -> PathBuf {
+    let mut include_path = git_repo_path.clone();
+    include_path.push("install/include/postgresql/server");
+    include_path
+}
+
 fn main() -> Result<(), std::io::Error> {
     build_deps::rerun_if_changed_paths("include/*").unwrap();
     build_deps::rerun_if_changed_paths("../pg-guard-attr/src/lib.rs").unwrap();
@@ -67,30 +73,30 @@ fn main() -> Result<(), std::io::Error> {
     build_deps::rerun_if_changed_paths("../bindings-diff/*").unwrap();
     build_deps::rerun_if_changed_paths("../bindings-diff/src/*").unwrap();
 
-    let mut cwd = PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").unwrap());
+    let cwd = PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").unwrap());
     let pg_git_repo_url = "git://git.postgresql.org/git/postgresql.git";
     let build_rs = PathBuf::from("build.rs");
 
     let regen_flag = Arc::new(AtomicBool::new(false));
     &vec![
-        ("pg10", "REL_10_STABLE"),
-        ("pg11", "REL_11_STABLE"),
-        ("pg12", "REL_12_STABLE"),
+        ("pg10", "REL_10_STABLE", "8810"),
+        ("pg11", "REL_11_STABLE", "8811"),
+        ("pg12", "REL_12_STABLE", "8812"),
     ]
     .par_iter()
     .for_each(|v| {
         let out_dir = std::env::var("OUT_DIR").unwrap();
         let version = v.0;
         let branch_name = v.1;
+        let port_no = u16::from_str(v.2).unwrap();
         let pg_git_path = make_git_repo_path(&out_dir, branch_name);
-
+        let include_path = make_include_path(&pg_git_path);
         let output_rs = PathBuf::from(format!("src/pg_sys/{}_bindings.rs", version));
         let include_h = PathBuf::from(format!("include/{}.h", version));
-        let config_status =
-            PathBuf::from(format!("{}/config.status", pg_git_path.to_str().unwrap()));
-
+        let config_status = PathBuf::from(format!("{}/config.status", pg_git_path.display()));
         let common_rs = PathBuf::from(format!("src/pg_sys/common.rs"));
         let version_specific_rs = PathBuf::from(format!("src/pg_sys/{}_specific.rs", version));
+
         if !common_rs.is_file() || !version_specific_rs.is_file() {
             regen_flag.store(true, Ordering::SeqCst);
         }
@@ -105,7 +111,7 @@ fn main() -> Result<(), std::io::Error> {
             git_clean(&pg_git_path, &branch_name)
                 .expect(&format!("Unable to switch to branch {}", branch_name));
 
-            configure_and_make(&pg_git_path, &branch_name).expect(&format!(
+            configure_and_make(&pg_git_path, &branch_name, port_no).expect(&format!(
                 "Unable to make clean and configure postgres branch {}",
                 branch_name
             ));
@@ -119,10 +125,10 @@ fn main() -> Result<(), std::io::Error> {
             println!(
                 "cargo:warning=[{}] build.rs is newer, removing and re-generating {}",
                 branch_name,
-                output_rs.to_str().unwrap()
+                output_rs.display()
             );
             std::fs::remove_file(&output_rs)
-                .expect(&format!("couldn't delete {}", output_rs.to_str().unwrap()));
+                .expect(&format!("couldn't delete {}", output_rs.display()));
         } else if output_rs.is_file()
             && std::fs::metadata(&include_h)
                 .unwrap()
@@ -132,19 +138,20 @@ fn main() -> Result<(), std::io::Error> {
         {
             println!(
                 "cargo:warning={} is up-to-date:  skipping",
-                output_rs.to_str().unwrap()
+                output_rs.display()
             );
             return;
         }
 
         println!(
-            "cargo:warning=[{}] Running bindgen on {}",
+            "cargo:warning=[{}] Running bindgen on {} with {}",
             branch_name,
-            output_rs.to_str().unwrap()
+            output_rs.display(),
+            include_path.display()
         );
         let bindings = bindgen::Builder::default()
             .header(include_h.to_str().unwrap())
-            .clang_arg(&format!("-I{}/src/include", pg_git_path.to_str().unwrap()))
+            .clang_arg(&format!("-I{}", include_path.display()))
             .parse_callbacks(Box::new(IgnoredMacros::default()))
             .rustfmt_bindings(true)
             .derive_debug(true)
@@ -162,25 +169,27 @@ fn main() -> Result<(), std::io::Error> {
     });
 
     if regen_flag.load(Ordering::SeqCst) {
-        println!(
-            "cargo:warning=[all branches]: Regenerating common.rs and XX_specific.rs files..."
-        );
-        cwd.pop();
-        let rc = run_command(
-            Command::new("cargo")
-                .arg("run")
-                .arg("--release")
-                .arg("--bin")
-                .arg("bindings-diff")
-                .current_dir(cwd),
-            "all branches",
-        )
-        .expect("bindings-diff failed");
-        if rc.status.code().expect("expected a status code") != 0 {
-            panic!("bindings-diff failed")
-        }
+        generate_common_rs(cwd);
     }
     Ok(())
+}
+
+fn generate_common_rs(mut cwd: PathBuf) -> () {
+    println!("cargo:warning=[all branches]: Regenerating common.rs and XX_specific.rs files...");
+    cwd.pop();
+    let rc = run_command(
+        Command::new("cargo")
+            .arg("run")
+            .arg("--release")
+            .arg("--bin")
+            .arg("bindings-diff")
+            .current_dir(cwd),
+        "all branches",
+    )
+    .expect("bindings-diff failed");
+    if rc.status.code().expect("expected a status code") != 0 {
+        panic!("bindings-diff failed")
+    }
 }
 
 fn git_clone_postgres(
@@ -247,16 +256,12 @@ fn git_clean(path: &Path, branch_name: &str) -> Result<(), std::io::Error> {
     Ok(())
 }
 
-fn configure_and_make(path: &Path, branch_name: &str) -> Result<(), std::io::Error> {
+fn configure_and_make(path: &Path, branch_name: &str, port_no: u16) -> Result<(), std::io::Error> {
+    // configure
     let rc = run_command(
-        Command::new("sh")
-            .arg("-c")
-            .arg("./configure")
-            .env_remove("TARGET")
-            .env_remove("PROFILE")
-            .env_remove("OUT_DIR")
-            .env_remove("HOST")
-            .env_remove("NUM_JOBS")
+        Command::new(format!("{}/configure", path.display()))
+            .arg(format!("--prefix={}/install", path.display()))
+            .arg(format!("--with-pgport={}", port_no))
             .current_dir(path),
         branch_name,
     )?;
@@ -267,28 +272,47 @@ fn configure_and_make(path: &Path, branch_name: &str) -> Result<(), std::io::Err
 
     let num_jobs = u32::from_str(std::env::var("NUM_JOBS").unwrap().as_str()).unwrap();
     let num_jobs = std::cmp::max(1, num_jobs / 3);
-    run_command(
+
+    // make install
+    let rc = run_command(
         Command::new("make")
             .arg("-j")
             .arg(format!("{}", num_jobs))
-            .env_remove("TARGET")
-            .env_remove("PROFILE")
-            .env_remove("OUT_DIR")
-            .env_remove("HOST")
-            .env_remove("NUM_JOBS")
+            .arg("install")
             .current_dir(path),
         branch_name,
     )?;
 
     if rc.status.code().unwrap() != 0 {
-        panic!("make failed for {}", branch_name)
+        panic!("make install failed for {}", branch_name)
+    }
+
+    // make clean
+    let rc = run_command(
+        Command::new("make")
+            .arg("-j")
+            .arg(format!("{}", num_jobs))
+            .arg("clean")
+            .current_dir(path),
+        branch_name,
+    )?;
+
+    if rc.status.code().unwrap() != 0 {
+        panic!("make clean failed for {}", branch_name)
     }
 
     Ok(())
 }
 
-fn run_command(command: &mut Command, branch_name: &str) -> Result<Output, std::io::Error> {
+fn run_command(mut command: &mut Command, branch_name: &str) -> Result<Output, std::io::Error> {
     let mut dbg = String::new();
+
+    command = command
+        .env_remove("TARGET")
+        .env_remove("PROFILE")
+        .env_remove("OUT_DIR")
+        .env_remove("HOST")
+        .env_remove("NUM_JOBS");
 
     println!("cargo:warning=[{}]: {:?}", branch_name, command);
     dbg.push_str(&format!(
