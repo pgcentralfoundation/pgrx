@@ -16,9 +16,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
-        version: [10]
-#          os: [ubuntu-latest, macos-latest]
-#          version: [10, 11, 12]
+        version: [10, 11, 12]
 
     steps:
     - uses: actions/checkout@v1
@@ -36,5 +34,3 @@ jobs:
         key: ${{ runner.os }}-postgres-${{ matrix.version }}
     - name: cargo build -vv
       run: cd pg-bridge && cargo build --no-default-features --features pg${{ matrix.version }} && pwd && find ${GITHUB_WORKSPACE} -type d
-#      run: echo $GITHUB_WORKSPACE && echo ~ && mkdir -p target/REL_10_STABLE && pwd && find ./ -type d
-#      run: cd pg-bridge && cargo build --no-default-features --features pg${{ matrix.version }} && find ./ -type d
