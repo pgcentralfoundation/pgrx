@@ -28,9 +28,14 @@ jobs:
     - name: install postgres build dependencies
       run: if [ "${{ matrix.os}}" == "ubuntu-latest" ] ; then sudo apt install libreadline6-dev bison flex; fi
 
-    # create caches for each of PG 10, 11, 12
+    # create caches for each of ~/.cargo, PG 10, 11, 12
     # we hardcode these rather than using ${{ matrix.feature }} because no matter what feature we're building for
     # build.rs needs all of these
+    - name: cargo cache
+      uses: actions/cache@v1
+      with:
+        path: ~/.cargo
+        key: ${{ runner.os }}-cargo-v1
     - name: postgres 10 git/configure/make cache
       uses: actions/cache@v1
       with:
