@@ -27,10 +27,26 @@ jobs:
         override: true
     - name: install postgres build dependencies
       run: if [ "${{ matrix.os}}" == "ubuntu-latest" ] ; then sudo apt install libreadline6-dev bison flex; fi
-    - name: postgres git/configure/make cache
+
+    # create caches for each of PG 10, 11, 12
+    # we hardcode these rather than using ${{ matrix.feature }} because no matter what feature we're building for
+    # build.rs needs all of these
+    - name: postgres 10 git/configure/make cache
       uses: actions/cache@v1
       with:
-        path: target/REL_${{ matrix.version }}_STABLE
-        key: ${{ runner.os }}-postgres-${{ matrix.version }}-v1
+        path: target/REL_10_STABLE
+        key: ${{ runner.os }}-postgres-REL_10_STABLE-v1
+    - name: postgres 11 git/configure/make cache
+      uses: actions/cache@v1
+      with:
+        path: target/REL_11_STABLE
+        key: ${{ runner.os }}-postgres-REL_11_STABLE-v1
+    - name: postgres 12 git/configure/make cache
+      uses: actions/cache@v1
+      with:
+        path: target/REL_12_STABLE
+        key: ${{ runner.os }}-postgres-REL_12_STABLE-v1
+
+    # build our code
     - name: cargo build -vv
       run: cd pg-bridge && cargo build --no-default-features --features pg${{ matrix.version }} && pwd && find ${GITHUB_WORKSPACE} -type d
