@@ -83,6 +83,7 @@ fn main() -> Result<(), std::io::Error> {
     build_deps::rerun_if_changed_paths("../pg-guard-rewriter/src/lib.rs").unwrap();
     build_deps::rerun_if_changed_paths("../bindings-diff/*").unwrap();
     build_deps::rerun_if_changed_paths("../bindings-diff/src/*").unwrap();
+    build_deps::rerun_if_changed_paths("../pg-shim/pg-shim.c").unwrap();
 
     let manifest_dir = std::env::var("CARGO_MANIFEST_DIR").unwrap();
     let out_dir = std::env::var("OUT_DIR").unwrap();

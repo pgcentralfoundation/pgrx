@@ -1,7 +1,5 @@
 #![allow(non_snake_case)]
 
-pub mod log;
-
 use libc::sigset_t;
 use std::any::Any;
 use std::cell::Cell;
@@ -160,7 +158,10 @@ where
                     // the error is a String, which means it was originally a Rust panic!(), so
                     // translate it into an elog(ERROR), including the code location that caused
                     // the panic!()
-                    Ok(message) => error!("caught Rust panic at {}: {}", location, message),
+                    Ok(message) => {
+                        elog_error(&format!("caught Rust panic at {}: {}", location, message));
+                        unreachable!("elog_error() failed at depth==0 with message: {}", message);
+                    }
 
                     // the error is a JumpContext, so we need to longjmp back into Postgres
                     Err(jump_context) => unsafe {
@@ -207,4 +208,24 @@ fn downcast_err(e: Box<dyn Any + Send>) -> Result<String, JumpContext> {
         // not a type we understand, so use a generic string
         Ok("Box<Any>".to_string())
     }
+}
+
+pub(crate) fn elog_error(message: &str) {
+    use std::ffi::CString;
+    use std::os::raw::c_char;
+
+    unsafe {
+        extern "C" {
+            fn pg_rs_bridge_elog_error(message: *const c_char);
+        }
+
+        match CString::new(message) {
+            Ok(s) => crate::guard(|| pg_rs_bridge_elog_error(s.as_ptr())),
+            Err(_) => crate::guard(|| {
+                pg_rs_bridge_elog_error(b"log message was null\0".as_ptr() as *const c_char)
+            }),
+        }
+    }
+
+    unreachable!("elog_error() didn't work with message: {}", message);
 }

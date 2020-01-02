@@ -10,6 +10,7 @@ pub mod datum_compatible;
 pub mod fcinfo;
 pub mod htup;
 pub mod itemptr;
+pub mod log;
 pub mod memcxt;
 pub mod nodes;
 pub mod oids;
@@ -23,13 +24,11 @@ pub use datum_compatible::*;
 pub use fcinfo::*;
 pub use htup::*;
 pub use itemptr::*;
+pub use log::*;
 pub use memcxt::*;
 pub use nodes::*;
 pub use oids::*;
-pub use pg_guard::{
-    check_for_interrupts, debug1, debug2, debug3, debug4, debug5, error, info, log, notice,
-    pg_extern, warning, FATAL, PANIC,
-};
+pub use pg_guard::*;
 pub use spi::*;
 pub use varlena::*;
 
