@@ -191,13 +191,13 @@ fn main() -> Result<(), std::io::Error> {
     // then build the shim for the version feature currently being built
     // and tell rustc to link to the library that was built
     if std::env::var("CARGO_FEATURE_PG10").is_ok() {
-        build_shim_for_version(&shim_dir, &out_dir, 10)?;
+        build_shim_for_version(&shim_dir, &git_repo_path, 10)?;
         println!("cargo:rustc-link-lib=static=pg-shim-10");
     } else if std::env::var("CARGO_FEATURE_PG11").is_ok() {
-        build_shim_for_version(&shim_dir, &out_dir, 11)?;
+        build_shim_for_version(&shim_dir, &git_repo_path, 11)?;
         println!("cargo:rustc-link-lib=static=pg-shim-11");
     } else if std::env::var("CARGO_FEATURE_PG12").is_ok() {
-        build_shim_for_version(&shim_dir, &out_dir, 12)?;
+        build_shim_for_version(&shim_dir, &git_repo_path, 12)?;
         println!("cargo:rustc-link-lib=static=pg-shim-12");
     }
 
@@ -206,7 +206,7 @@ fn main() -> Result<(), std::io::Error> {
 
 fn build_shim_for_version(
     shim_dir: &PathBuf,
-    out_dir: &str,
+    git_repo_path: &str,
     version_no: i32,
 ) -> Result<(), std::io::Error> {
     // put the install directory fir this version of Postgres at the head of the path
@@ -214,7 +214,7 @@ fn build_shim_for_version(
     let path_env = std::env::var("PATH").unwrap();
     let path_env = format!(
         "{}:{}",
-        format!("{}/target/REL_{}_STABLE/install/bin", out_dir, version_no),
+        format!("{}/install/bin", git_repo_path, version_no),
         path_env
     );
 
