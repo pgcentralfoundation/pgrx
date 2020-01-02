@@ -14,9 +14,19 @@ use std::thread::LocalKey;
 pub use pg_guard_attr::{pg_extern, pg_guard};
 
 extern "C" {
-    fn sigsetjmp(env: *mut sigjmp_buf, savesigs: c_int) -> c_int;
     fn siglongjmp(env: *mut sigjmp_buf, val: c_int) -> c_void;
     static mut PG_exception_stack: *mut sigjmp_buf;
+}
+
+#[cfg(target_os = "linux")]
+extern "C" {
+    #[link_name = "__sigsetjmp"]
+    fn sigsetjmp(env: *mut sigjmp_buf, savemask: c_int) -> c_int;
+}
+
+#[cfg(target_os = "macos")]
+extern "C" {
+    fn sigsetjmp(env: *mut sigjmp_buf, savemask: c_int) -> c_int;
 }
 
 #[repr(C)]
