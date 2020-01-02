@@ -9,7 +9,7 @@ use std::path::{Path, PathBuf};
 use std::process::{Command, Output};
 use std::str::FromStr;
 use std::sync::atomic::{AtomicBool, Ordering};
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 use syn::export::{ToTokens, TokenStream2};
 use syn::Item;
 
@@ -92,6 +92,7 @@ fn main() -> Result<(), std::io::Error> {
     let shim_dir = make_shim_path(&manifest_dir);
     let regen_flag = Arc::new(AtomicBool::new(false));
 
+    let shim_mutex = Mutex::new(());
     &vec![
         ("pg10", "REL_10_STABLE", "8810"),
         ("pg11", "REL_11_STABLE", "8811"),
@@ -179,6 +180,27 @@ fn main() -> Result<(), std::io::Error> {
         rust_fmt(output_rs.as_path(), &branch_name)
             .expect(&format!("Unable to run rustfmt for {}", version));
         regen_flag.store(true, Ordering::SeqCst);
+
+        // build the shim under a lock b/c this can't be built concurrently
+        {
+            let _ = shim_mutex.lock().expect("couldn't obtain shim_mutex");
+
+            // then build the shim for the version feature currently being built
+            // and tell rustc to link to the library that was built
+            if std::env::var("CARGO_FEATURE_PG10").is_ok() {
+                build_shim_for_version(&shim_dir, &pg_git_path, 10)
+                    .expect("shim build for pg10 failed");
+                println!("cargo:rustc-link-lib=static=pg-shim-10");
+            } else if std::env::var("CARGO_FEATURE_PG11").is_ok() {
+                build_shim_for_version(&shim_dir, &pg_git_path, 11)
+                    .expect("shim build for pg11 failed");
+                println!("cargo:rustc-link-lib=static=pg-shim-11");
+            } else if std::env::var("CARGO_FEATURE_PG12").is_ok() {
+                build_shim_for_version(&shim_dir, &pg_git_path, 12)
+                    .expect("shim build for pg12 failed");
+                println!("cargo:rustc-link-lib=static=pg-shim-12");
+            }
+        }
     });
 
     if regen_flag.load(Ordering::SeqCst) {
@@ -188,25 +210,12 @@ fn main() -> Result<(), std::io::Error> {
     // add shim_dir to rustc's library search path
     println!("cargo:rustc-link-search={}", shim_dir.display());
 
-    // then build the shim for the version feature currently being built
-    // and tell rustc to link to the library that was built
-    if std::env::var("CARGO_FEATURE_PG10").is_ok() {
-        build_shim_for_version(&shim_dir, &git_repo_path, 10)?;
-        println!("cargo:rustc-link-lib=static=pg-shim-10");
-    } else if std::env::var("CARGO_FEATURE_PG11").is_ok() {
-        build_shim_for_version(&shim_dir, &git_repo_path, 11)?;
-        println!("cargo:rustc-link-lib=static=pg-shim-11");
-    } else if std::env::var("CARGO_FEATURE_PG12").is_ok() {
-        build_shim_for_version(&shim_dir, &git_repo_path, 12)?;
-        println!("cargo:rustc-link-lib=static=pg-shim-12");
-    }
-
     Ok(())
 }
 
 fn build_shim_for_version(
     shim_dir: &PathBuf,
-    git_repo_path: &str,
+    git_repo_path: &PathBuf,
     version_no: i32,
 ) -> Result<(), std::io::Error> {
     // put the install directory fir this version of Postgres at the head of the path
@@ -214,7 +223,7 @@ fn build_shim_for_version(
     let path_env = std::env::var("PATH").unwrap();
     let path_env = format!(
         "{}:{}",
-        format!("{}/install/bin", git_repo_path, version_no),
+        format!("{}/install/bin", git_repo_path.display()),
         path_env
     );
 
