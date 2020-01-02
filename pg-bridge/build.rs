@@ -112,8 +112,6 @@ fn main() -> Result<(), std::io::Error> {
         let common_rs = PathBuf::from(format!("src/pg_sys/common.rs"));
         let version_specific_rs = PathBuf::from(format!("src/pg_sys/{}_specific.rs", version));
 
-        build_shim(&shim_dir, &shim_mutex, &pg_git_path, version);
-
         if !common_rs.is_file() || !version_specific_rs.is_file() {
             regen_flag.store(true, Ordering::SeqCst);
         }
@@ -154,6 +152,7 @@ fn main() -> Result<(), std::io::Error> {
                 .lt(&std::fs::metadata(&output_rs).unwrap().modified().unwrap())
         {
             eprintln!("{} is up-to-date:  skipping", output_rs.display());
+            build_shim(&shim_dir, &shim_mutex, &pg_git_path, version);
             return;
         }
 
@@ -180,6 +179,8 @@ fn main() -> Result<(), std::io::Error> {
         rust_fmt(output_rs.as_path(), &branch_name)
             .expect(&format!("Unable to run rustfmt for {}", version));
         regen_flag.store(true, Ordering::SeqCst);
+
+        build_shim(&shim_dir, &shim_mutex, &pg_git_path, version);
     });
 
     if regen_flag.load(Ordering::SeqCst) {
@@ -195,9 +196,6 @@ fn build_shim(
     pg_git_path: &PathBuf,
     version: &str,
 ) -> () {
-    // add shim_dir to rustc's library search path
-    println!("cargo:rustc-link-search={}", shim_dir.display());
-
     // build the shim under a lock b/c this can't be built concurrently
     let _ = shim_mutex.lock().expect("couldn't obtain shim_mutex");
 
@@ -205,12 +203,15 @@ fn build_shim(
     // and tell rustc to link to the library that was built
     if version.eq("pg10") && std::env::var("CARGO_FEATURE_PG10").is_ok() {
         build_shim_for_version(&shim_dir, &pg_git_path, 10).expect("shim build for pg10 failed");
+        println!("cargo:rustc-link-search={}", shim_dir.display());
         println!("cargo:rustc-link-lib=static=pg-shim-10");
     } else if version.eq("pg11") && std::env::var("CARGO_FEATURE_PG11").is_ok() {
         build_shim_for_version(&shim_dir, &pg_git_path, 11).expect("shim build for pg11 failed");
+        println!("cargo:rustc-link-search={}", shim_dir.display());
         println!("cargo:rustc-link-lib=static=pg-shim-11");
     } else if version.eq("pg12") && std::env::var("CARGO_FEATURE_PG12").is_ok() {
         build_shim_for_version(&shim_dir, &pg_git_path, 12).expect("shim build for pg12 failed");
+        println!("cargo:rustc-link-search={}", shim_dir.display());
         println!("cargo:rustc-link-lib=static=pg-shim-12");
     }
 }
@@ -378,9 +379,6 @@ fn configure_and_make(path: &Path, branch_name: &str, port_no: u16) -> Result<()
 }
 
 fn run_command(mut command: &mut Command, branch_name: &str) -> Result<Output, std::io::Error> {
-    for var in std::env::vars() {
-        eprintln!("[{}] VAR:  {:?}", branch_name, var);
-    }
     let mut dbg = String::new();
 
     command = command
