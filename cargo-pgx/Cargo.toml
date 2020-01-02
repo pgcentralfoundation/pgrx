@@ -1,0 +1,10 @@
+[package]
+name = "cargo-pgx"
+version = "0.1.0"
+authors = ["Eric B. Ridge <eebbrr@gmail.com>"]
+edition = "2018"
+description = "Cargo Postgres extension manager"
+
+[dependencies]
+clap = {version = "2.33.0", features = ["yaml"]}
+cargo = "0.41.0"
