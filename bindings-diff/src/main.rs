@@ -105,8 +105,8 @@ fn main() -> Result<(), std::io::Error> {
     let mut versions = vec![&mut v10, &mut v11, &mut v12];
     let common = build_common_set(&mut versions);
 
-    println!(
-        "cargo:warning=[all branches]: common={}, v10={}, v11={}, v12={}",
+    eprintln!(
+        "[all branches]: common={}, v10={}, v11={}, v12={}",
         common.len(),
         v10.len(),
         v11.len(),

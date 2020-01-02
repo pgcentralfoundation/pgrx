@@ -122,7 +122,7 @@ fn main() -> Result<(), std::io::Error> {
                 .expect(&format!("Unable to git clone {}", pg_git_repo_url));
 
         if need_configure_and_make || !config_status.is_file() {
-            println!("cargo:warning=[{}] cleaning and building", branch_name);
+            eprintln!("[{}] cleaning and building", branch_name);
 
             git_clean(&pg_git_path, &branch_name)
                 .expect(&format!("Unable to switch to branch {}", branch_name));
@@ -138,8 +138,8 @@ fn main() -> Result<(), std::io::Error> {
                 .unwrap()
                 .gt(&std::fs::metadata(&output_rs).unwrap().modified().unwrap())
         {
-            println!(
-                "cargo:warning=[{}] build.rs is newer, removing and re-generating {}",
+            eprintln!(
+                "[{}] build.rs is newer, removing and re-generating {}",
                 branch_name,
                 output_rs.display()
             );
@@ -152,15 +152,12 @@ fn main() -> Result<(), std::io::Error> {
                 .unwrap()
                 .lt(&std::fs::metadata(&output_rs).unwrap().modified().unwrap())
         {
-            println!(
-                "cargo:warning={} is up-to-date:  skipping",
-                output_rs.display()
-            );
+            eprintln!("{} is up-to-date:  skipping", output_rs.display());
             return;
         }
 
-        println!(
-            "cargo:warning=[{}] Running bindgen on {} with {}",
+        eprintln!(
+            "[{}] Running bindgen on {} with {}",
             branch_name,
             output_rs.display(),
             include_path.display()
@@ -249,7 +246,7 @@ fn build_shim_for_version(
 }
 
 fn generate_common_rs(mut cwd: PathBuf) -> () {
-    println!("cargo:warning=[all branches] Regenerating common.rs and XX_specific.rs files...");
+    eprintln!("[all branches] Regenerating common.rs and XX_specific.rs files...");
     cwd.pop();
     let rc = run_command(
         Command::new("cargo")
@@ -398,7 +395,7 @@ fn run_command(mut command: &mut Command, branch_name: &str) -> Result<Output, s
         .env_remove("HOST")
         .env_remove("NUM_JOBS");
 
-    println!("cargo:warning=[{}] {:?}", branch_name, command);
+    eprintln!("[{}] {:?}", branch_name, command);
     dbg.push_str(&format!(
         "[{}] -------- {:?} -------- \n",
         branch_name, command
