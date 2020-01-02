@@ -4,5 +4,6 @@ members = [
     "pg-guard-attr",
     "pg-guard-rewriter",
     "pg-guard",
-    "bindings-diff"
+    "bindings-diff",
+    "cargo-pgx"
 ]
