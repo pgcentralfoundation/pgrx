@@ -13,7 +13,9 @@ pub fn elog(level: u32, message: &str) {
             Err(_) => crate::guard(|| {
                 pg_rs_bridge_elog(
                     level as i32,
-                    b"log message was null\0" as *const c_char,
+                    std::ffi::CStr::from_bytes_with_nul(b"log message was null\0")
+                        .unwrap()
+                        .as_ptr(),
                 )
             }),
         }
