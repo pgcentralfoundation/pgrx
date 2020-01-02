@@ -183,6 +183,9 @@ fn main() -> Result<(), std::io::Error> {
 
         // build the shim under a lock b/c this can't be built concurrently
         {
+            // add shim_dir to rustc's library search path
+            println!("cargo:rustc-link-search={}", shim_dir.display());
+
             let _ = shim_mutex.lock().expect("couldn't obtain shim_mutex");
 
             // then build the shim for the version feature currently being built
@@ -206,9 +209,6 @@ fn main() -> Result<(), std::io::Error> {
     if regen_flag.load(Ordering::SeqCst) {
         generate_common_rs(cwd);
     }
-
-    // add shim_dir to rustc's library search path
-    println!("cargo:rustc-link-search={}", shim_dir.display());
 
     Ok(())
 }
