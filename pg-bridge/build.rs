@@ -218,6 +218,7 @@ fn build_shim_for_version(
         path_env
     );
 
+    eprintln!("PATH={}", path_env);
     eprintln!("shim_dir={}", shim_dir.display());
     let rc = run_command(
         Command::new("make")
@@ -366,9 +367,18 @@ fn configure_and_make(path: &Path, branch_name: &str, port_no: u16) -> Result<()
 }
 
 fn run_command(mut command: &mut Command, branch_name: &str) -> Result<Output, std::io::Error> {
+    for var in std::env::vars() {
+        eprintln!("[{}] VAR:  {:?}", branch_name, var);
+    }
     let mut dbg = String::new();
 
     command = command
+        .env_remove("DEBUG")
+        .env_remove("MAKEFLAGS")
+        .env_remove("MAKELEVEL")
+        .env_remove("MFLAGS")
+        .env_remove("DYLD_FALLBACK_LIBRARY_PATH")
+        .env_remove("OPT_LEVEL")
         .env_remove("TARGET")
         .env_remove("PROFILE")
         .env_remove("OUT_DIR")
