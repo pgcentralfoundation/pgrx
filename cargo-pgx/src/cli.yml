@@ -14,3 +14,8 @@ subcommands:
                     help: the name of the extension
           - install:
               about: install the extension from the current directory
+              args:
+                - target:
+                    value_name: DEBUG_OR_RELEASE
+                    takes_value: true
+                    help: '"debug" or "release" (default is "debug")'
