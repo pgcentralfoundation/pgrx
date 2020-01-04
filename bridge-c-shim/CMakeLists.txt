@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.5)
-project(pg-shim)
+project(bridge-c-shim)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 set(SOURCE_FILES
-        pg-shim.c)
+        bridge-c-shim.c)
 
 include_directories(src/c /usr/local/src/pg11/src/include /usr/local/src/pg11/src/backend)
 

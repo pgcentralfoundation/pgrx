@@ -71,8 +71,8 @@ fn make_shim_path(manifest_dir: &str) -> PathBuf {
     // backup a directory
     shim_dir.pop();
 
-    // and a new dir named "pg-shim"
-    shim_dir.push("pg-shim");
+    // and a new dir named "bridge-c-shim"
+    shim_dir.push("bridge-c-shim");
 
     shim_dir
 }
@@ -83,7 +83,7 @@ fn main() -> Result<(), std::io::Error> {
     build_deps::rerun_if_changed_paths("../pg-guard-rewriter/src/lib.rs").unwrap();
     build_deps::rerun_if_changed_paths("../bindings-diff/*").unwrap();
     build_deps::rerun_if_changed_paths("../bindings-diff/src/*").unwrap();
-    build_deps::rerun_if_changed_paths("../pg-shim/pg-shim.c").unwrap();
+    build_deps::rerun_if_changed_paths("../bridge-c-shim/bridge-c-shim.c").unwrap();
 
     let manifest_dir = std::env::var("CARGO_MANIFEST_DIR").unwrap();
     let out_dir = std::env::var("OUT_DIR").unwrap();
@@ -204,15 +204,15 @@ fn build_shim(
     if version.eq("pg10") && std::env::var("CARGO_FEATURE_PG10").is_ok() {
         build_shim_for_version(&shim_dir, &pg_git_path, 10).expect("shim build for pg10 failed");
         println!("cargo:rustc-link-search={}", shim_dir.display());
-        println!("cargo:rustc-link-lib=static=pg-shim-10");
+        println!("cargo:rustc-link-lib=static=bridge-c-shim-10");
     } else if version.eq("pg11") && std::env::var("CARGO_FEATURE_PG11").is_ok() {
         build_shim_for_version(&shim_dir, &pg_git_path, 11).expect("shim build for pg11 failed");
         println!("cargo:rustc-link-search={}", shim_dir.display());
-        println!("cargo:rustc-link-lib=static=pg-shim-11");
+        println!("cargo:rustc-link-lib=static=bridge-c-shim-11");
     } else if version.eq("pg12") && std::env::var("CARGO_FEATURE_PG12").is_ok() {
         build_shim_for_version(&shim_dir, &pg_git_path, 12).expect("shim build for pg12 failed");
         println!("cargo:rustc-link-search={}", shim_dir.display());
-        println!("cargo:rustc-link-lib=static=pg-shim-12");
+        println!("cargo:rustc-link-lib=static=bridge-c-shim-12");
     }
 }
 
@@ -241,7 +241,7 @@ fn build_shim_for_version(
     )?;
 
     if rc.status.code().unwrap() != 0 {
-        panic!("failed to make pg-shim for v{}", version_no);
+        panic!("failed to make bridge-c-shim for v{}", version_no);
     }
 
     Ok(())

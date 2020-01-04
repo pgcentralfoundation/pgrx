@@ -135,6 +135,38 @@ pub fn pg_return_null(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
 //
 
 #[inline]
+pub fn pg_getarg_pointer<T>(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> Option<*mut T> {
+    match pg_getarg_datum(fcinfo, num) {
+        Some(datum) => Some(datum as *mut T),
+        None => None,
+    }
+}
+
+#[inline]
+pub fn pg_getarg_boxed<T>(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> Option<crate::PgBox<T>>
+where
+    T: DatumCompatible<T>,
+{
+    match pg_getarg_pointer(fcinfo, num) {
+        Some(ptr) => Some(crate::PgBox::from_pg(ptr)),
+        None => None,
+    }
+}
+
+/// this is intended for Postgres functions that take an actual `cstring` argument, not for getting
+/// a varlena argument type as a CStr.
+#[inline]
+pub fn pg_getarg_cstr<'a>(
+    fcinfo: pg_sys::FunctionCallInfo,
+    num: usize,
+) -> Option<&'a std::ffi::CStr> {
+    match pg_getarg_pointer(fcinfo, num) {
+        Some(ptr) => Some(unsafe { std::ffi::CStr::from_ptr(ptr) }),
+        None => None,
+    }
+}
+
+#[inline]
 pub fn pg_return_text_p(s: &str) -> pg_sys::Datum {
     rust_str_to_text_p(s) as pg_sys::Datum
 }

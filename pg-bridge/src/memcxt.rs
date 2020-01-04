@@ -637,6 +637,11 @@ where
         }
     }
 
+    /// Are we boxing a NULL?
+    pub fn is_null(&self) -> bool {
+        self.ptr.is_none()
+    }
+
     /// Return the boxed pointer, so that it can be passed back into a Postgres function
     pub fn to_pg(&self) -> *mut T {
         let ptr = self.ptr;
@@ -644,6 +649,11 @@ where
             Some(ptr) => ptr,
             None => std::ptr::null_mut(),
         }
+    }
+
+    /// Return the boxed pointer as a pg_sys::Datum, so that it can be passed back into a Postgres function
+    pub fn as_datum(&self) -> pg_sys::Datum {
+        self.to_pg() as pg_sys::Datum
     }
 
     /// Useful for returning the boxed pointer back to Postgres (as a return value, for example).
@@ -657,6 +667,11 @@ where
             Some(ptr) => ptr,
             None => std::ptr::null_mut(),
         }
+    }
+
+    /// Consumed this object and return the boxed pointer as a pg_sys::Datum
+    pub fn into_datum(self) -> pg_sys::Datum {
+        self.into_pg() as pg_sys::Datum
     }
 }
 
@@ -686,6 +701,15 @@ where
     }
 }
 
+impl<T> Into<pg_sys::Datum> for PgBox<T>
+where
+    T: DatumCompatible<T>,
+{
+    fn into(self) -> usize {
+        self.into_datum()
+    }
+}
+
 impl<T> From<*mut T> for PgBox<T>
 where
     T: DatumCompatible<T>,
@@ -700,6 +724,7 @@ where
     T: DatumCompatible<T>,
 {
     fn drop(&mut self) {
+        println!("dropping box");
         if self.ptr.is_some() {
             match self.owner {
                 WhoAllocated::Postgres => { /* do nothing, we'll let Postgres free the pointer */ }

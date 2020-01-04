@@ -2,7 +2,7 @@
 
 use crate::pg_sys;
 use std::ffi::CStr;
-use std::os::raw::{c_char, c_void};
+use std::os::raw::c_char;
 
 #[derive(Debug)]
 pub struct StringInfo {
@@ -120,6 +120,15 @@ impl StringInfo {
     pub fn enlarge(&mut self, needed: i32) {
         unsafe { pg_sys::enlargeStringInfo(self.sid, needed) }
     }
+
+    pub fn into_char_ptr(self) -> *const std::os::raw::c_char {
+        let ptr = unsafe { self.sid.as_ref() }.unwrap().data as *const std::os::raw::c_char;
+        unsafe {
+            pg_sys::pfree(self.sid as *mut std::os::raw::c_void);
+        }
+        std::mem::forget(self);
+        ptr
+    }
 }
 
 impl Default for StringInfo {
@@ -166,9 +175,9 @@ impl Drop for StringInfo {
             unsafe {
                 if !self.sid.is_null() {
                     if !(*self.sid).data.is_null() {
-                        pg_sys::pfree((*self.sid).data as *mut c_void);
+                        pg_sys::pfree((*self.sid).data as *mut std::os::raw::c_void);
                     }
-                    pg_sys::pfree(self.sid as *mut c_void);
+                    pg_sys::pfree(self.sid as *mut std::os::raw::c_void);
                 }
             }
         }
