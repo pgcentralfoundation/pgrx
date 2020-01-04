@@ -281,6 +281,9 @@ pub unsafe fn text_to_rust_str_unchecked<'a>(t: *const pg_sys::varlena) -> &'a s
     std::str::from_utf8_unchecked(std::slice::from_raw_parts(data as *mut u8, len))
 }
 
+/// Convert a Rust `&str` into a Postgres `text *`.
+///
+/// This allocates the returned Postgres `text *` in `CurrentMemoryContext`.
 #[inline]
 pub fn rust_str_to_text_p(s: &str) -> *const pg_sys::text {
     let len = s.len();

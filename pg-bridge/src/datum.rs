@@ -313,7 +313,7 @@ impl<'a> From<&'a str> for PgDatum<&'a str> {
 }
 
 /// Rust [String]s are represented as Postgres-allocated `varlena` inside a PgDatum, allocated
-///// within `CurrentMemoryContext`
+/// within `CurrentMemoryContext`
 impl From<String> for PgDatum<String> {
     #[inline]
     fn from(val: String) -> Self {
