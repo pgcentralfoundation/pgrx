@@ -67,7 +67,7 @@ crate-type = [\"cdylib\"]
 
 [dependencies]
 pg-bridge = {{ path = \"../pg-rs-bridge/pg-bridge/\", features = [\"pg11\"], default-features = false }}
-pg-guard-attr = {{ path = \"../pg-rs-bridge/pg-guard-attr\" }}
+pg-bridge-macros = {{ path = \"../pg-rs-bridge/pg-bridge-macros\" }}
 
 [profile.dev]
 panic = \"unwind\"
@@ -130,7 +130,7 @@ fn create_lib_rs(path: &PathBuf, name: &str) -> Result<(), std::io::Error> {
     file.write_all(
         &format!(
             "use pg_bridge::*;
-use pg_guard_attr::*;
+use pg_bridge_macros::*;
 
 pg_module_magic!();
 
