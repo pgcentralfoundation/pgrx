@@ -1,7 +1,7 @@
 [workspace]
 members = [
     "pg-bridge",
-    "pg-guard-attr",
+    "pg-bridge-macros",
     "bindings-diff",
     "cargo-pgx"
 ]

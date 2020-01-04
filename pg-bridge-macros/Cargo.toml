@@ -1,5 +1,5 @@
 [package]
-name = "pg-guard-attr"
+name = "pg-bridge-macros"
 version = "0.1.0"
 authors = ["Eric B. Ridge <eebbrr@gmail.com>"]
 edition = "2018"

@@ -1,12 +1,12 @@
 #[macro_use]
-extern crate pg_guard_attr;
+extern crate pg_bridge_macros;
 
 #[macro_use]
 extern crate enum_primitive_derive;
 extern crate num_traits;
 
 // expose the #[derive(DatumCompatible)] trait
-pub use pg_guard_attr::DatumCompatible;
+pub use pg_bridge_macros::DatumCompatible;
 
 // we need this publicly too
 pub use std::convert::TryInto;

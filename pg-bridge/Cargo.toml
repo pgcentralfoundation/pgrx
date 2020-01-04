@@ -6,7 +6,7 @@ edition = "2018"
 build = "build.rs"
 
 [dependencies]
-pg-guard-attr = { path = "../pg-guard-attr/" }
+pg-bridge-macros = { path = "../pg-bridge-macros/" }
 memoffset = "0.5.3"
 enum-primitive-derive = "0.1.2"
 num-traits = "0.2.10"

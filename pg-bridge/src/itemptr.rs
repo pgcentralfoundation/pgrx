@@ -26,7 +26,7 @@ pub unsafe fn item_pointer_get_offset_number(
 
 /// ## Safety
 ///
-/// This function s unsafe becuase it does not check that the specified ItemPointerData pointer
+/// This function is unsafe because it does not check that the specified ItemPointerData pointer
 /// might be null
 #[inline]
 pub unsafe fn item_pointer_get_block_number_no_check(
@@ -38,7 +38,7 @@ pub unsafe fn item_pointer_get_block_number_no_check(
 
 /// ## Safety
 ///
-/// This function s unsafe becuase it does not check that the specified ItemPointerData pointer
+/// This function is unsafe because it does not check that the specified ItemPointerData pointer
 /// might be null
 #[inline]
 pub unsafe fn item_pointer_get_offset_number_no_check(
