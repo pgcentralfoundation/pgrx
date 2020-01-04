@@ -54,6 +54,8 @@ impl PgGuardRewriter {
         let rewritten_args = self.rewrite_args(func.clone());
         let rewritten_return_type = self.rewrite_return_type(func.clone());
 
+        eprintln!("rewritten_args = {}", rewritten_args);
+        eprintln!("rewritten_return_type = {}", rewritten_return_type);
         quote_spanned! {func_span=>
             #[allow(unused_variables)]
             #vis fn #func_name(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
@@ -299,7 +301,7 @@ impl FunctionSignatureRewriter {
                                 quote_spanned! {ident.span()=>
                                     let #name: #type_ =
                                         pg_bridge::pg_getarg::<#type_>(fcinfo, #i).try_into()
-                                            .expect(&format!("argument '{}'", stringify! { #name }))
+                                            .expect(&format!("argument '{}'", stringify! { #name }));
                                 }
                             };
 
