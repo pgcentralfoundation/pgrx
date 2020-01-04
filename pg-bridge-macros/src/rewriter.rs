@@ -257,26 +257,47 @@ impl FunctionSignatureRewriter {
 
         let mut stream = proc_macro2::TokenStream::new();
         let mut i = 0usize;
+        let mut have_option = false;
         for arg in &self.func.sig.inputs {
             match arg {
                 FnArg::Receiver(_) => panic!("Functions that take self are not supported"),
-                FnArg::Typed(ty) => match ty.pat.deref() {
-                    Pat::Ident(ident) => {
-                        let name = &ident.ident;
-                        let type_ = &ty.ty;
+                FnArg::Typed(ty) => {
+                    match ty.pat.deref() {
+                        Pat::Ident(ident) => {
+                            let name = &ident.ident;
+                            let type_ = &ty.ty;
+                            let is_option = type_matches(type_, "Option");
 
-                        let ts = quote_spanned! {ident.span()=>
-                            let #name: #type_ =
-                                pg_bridge::pg_getarg::<#type_>(fcinfo, #i).try_into()
-                                    .expect(&format!("argument '{}'", stringify! { #name }));
-                        };
+                            let ts = if is_option {
+                                have_option = true;
 
-                        stream.extend(ts);
+                                let option_type = extract_option_type(type_);
+                                quote_spanned! {ident.span()=>
+                                    let #name = if pg_arg_is_null(fcinfo, #i) {
+                                        None
+                                    } else {
+                                        Some(pg_bridge::pg_getarg::#option_type(fcinfo, #i).try_into()
+                                            .expect(&format!("argument '{}'", stringify! { #name })))
+                                    };
+                                }
+                            } else {
+                                if have_option {
+                                    panic!("If one argument is Option<T>, all arguments must be Option<T>")
+                                }
+                                quote_spanned! {ident.span()=>
+                                    let #name: #type_ =
+                                        pg_bridge::pg_getarg::<#type_>(fcinfo, #i).try_into()
+                                            .expect(&format!("argument '{}'", stringify! { #name }))
+                                }
+                            };
 
-                        i += 1;
+                            stream.extend(ts);
+
+                            i += 1;
+                        }
+                        _ => panic!("Unrecognized function arg type"),
                     }
-                    _ => panic!("Unrecognized function arg type"),
-                },
+                }
             }
         }
 
@@ -298,5 +319,21 @@ fn type_matches(ty: &Box<Type>, pattern: &str) -> bool {
             path.starts_with(pattern)
         }
         _ => false,
+    }
+}
+
+fn extract_option_type(ty: &Box<Type>) -> proc_macro2::TokenStream {
+    match ty.deref() {
+        Type::Path(path) => {
+            let mut stream = proc_macro2::TokenStream::new();
+            for segment in &path.path.segments {
+                let arguments = &segment.arguments;
+
+                stream.extend(quote! { #arguments });
+            }
+
+            stream
+        }
+        _ => panic!("No type found inside Option"),
     }
 }
