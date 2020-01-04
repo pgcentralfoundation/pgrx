@@ -747,7 +747,6 @@ where
     T: DatumCompatible<T>,
 {
     fn drop(&mut self) {
-        println!("dropping box");
         if self.ptr.is_some() {
             match self.owner {
                 WhoAllocated::Postgres => { /* do nothing, we'll let Postgres free the pointer */ }
