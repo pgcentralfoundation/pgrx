@@ -234,9 +234,21 @@ impl FunctionSignatureRewriter {
                 });
             }
             ReturnType::Type(_, type_) => {
-                stream.extend(quote! {
-                    pg_bridge::PgDatum::<#type_>::from(result).into()
-                });
+                if type_matches(type_, "Option") {
+                    let option_type = extract_option_type(type_);
+                    stream.extend(quote! {
+                        match result {
+                            Some(result) => {
+                                pg_bridge::PgDatum::#option_type::from(result).into()
+                            },
+                            None => pg_bridge::pg_return_null(fcinfo)
+                        }
+                    });
+                } else {
+                    stream.extend(quote! {
+                        pg_bridge::PgDatum::<#type_>::from(result).into()
+                    });
+                }
             }
         }
 
