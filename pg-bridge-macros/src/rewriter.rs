@@ -54,8 +54,6 @@ impl PgGuardRewriter {
         let rewritten_args = self.rewrite_args(func.clone());
         let rewritten_return_type = self.rewrite_return_type(func.clone());
 
-        eprintln!("rewritten_args = {}", rewritten_args);
-        eprintln!("rewritten_return_type = {}", rewritten_return_type);
         quote_spanned! {func_span=>
             #[allow(unused_variables)]
             #vis fn #func_name(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
@@ -293,6 +291,13 @@ impl FunctionSignatureRewriter {
                                         Some(pg_bridge::pg_getarg::#option_type(fcinfo, #i).try_into()
                                             .expect(&format!("argument '{}'", stringify! { #name })))
                                     };
+                                }
+                            } else if type_matches(type_, "pg_sys :: FunctionCallInfo") {
+                                if i != 0 {
+                                    panic!("When using `pg_sys::FunctionCallInfo` as an argument it must be the first argument")
+                                }
+                                quote_spanned! {ident.span()=>
+                                    let #name = #name;
                                 }
                             } else {
                                 if have_option {
