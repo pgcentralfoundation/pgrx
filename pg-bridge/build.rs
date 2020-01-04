@@ -1,7 +1,6 @@
 extern crate build_deps;
 
 use bindgen::callbacks::MacroParsingBehavior;
-use pg_guard_rewriter::{PgGuardRewriter, RewriteMode};
 use quote::quote;
 use rayon::prelude::*;
 use std::collections::HashSet;
@@ -11,7 +10,7 @@ use std::str::FromStr;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 use syn::export::{ToTokens, TokenStream2};
-use syn::Item;
+use syn::{Item, ItemStruct};
 
 #[derive(Debug)]
 struct IgnoredMacros(HashSet<String>);
@@ -428,19 +427,20 @@ fn run_command(mut command: &mut Command, branch_name: &str) -> Result<Output, s
 }
 
 fn apply_pg_guard(input: String) -> Result<String, std::io::Error> {
-    let rewriter = PgGuardRewriter::new(RewriteMode::ApplyPgGuardMacro);
-    let mut stream = TokenStream2::new();
     let file = syn::parse_file(input.as_str()).unwrap();
 
+    let mut stream = TokenStream2::new();
     stream.extend(quote! {use crate::DatumCompatible;});
     for item in file.items.into_iter() {
         match item {
             Item::ForeignMod(block) => {
-                let block = rewriter.extern_block(block);
-                stream.extend(quote! { #block });
+                stream.extend(quote! {
+                    #[pg_guard]
+                    #block
+                });
             }
             Item::Struct(item_struct) => {
-                let item_struct = rewriter.item_struct(item_struct);
+                let item_struct = rewrite_item_struct(item_struct);
                 stream.extend(quote! { #item_struct });
             }
             _ => {
@@ -450,6 +450,16 @@ fn apply_pg_guard(input: String) -> Result<String, std::io::Error> {
     }
 
     Ok(format!("{}", stream.into_token_stream()))
+}
+
+pub fn rewrite_item_struct(item_struct: ItemStruct) -> proc_macro2::TokenStream {
+    let mut stream = TokenStream2::new();
+    stream.extend(quote! {
+        #[derive(DatumCompatible)]
+        #item_struct
+    });
+
+    stream
 }
 
 fn rust_fmt(path: &Path, branch_name: &str) -> Result<(), std::io::Error> {

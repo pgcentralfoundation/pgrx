@@ -1,9 +1,11 @@
 extern crate proc_macro;
 
-use pg_guard_rewriter::{PgGuardRewriter, RewriteMode};
+mod rewriter;
+
 use proc_macro::TokenStream;
 use proc_macro2::Span;
 use quote::{quote, quote_spanned};
+use rewriter::*;
 use syn::spanned::Spanned;
 use syn::{parse_macro_input, Data, Item, ItemFn, Type};
 
@@ -12,7 +14,7 @@ pub fn pg_guard(_attr: TokenStream, item: TokenStream) -> TokenStream {
     // get a usable token stream
     let ast = parse_macro_input!(item as syn::Item);
 
-    let rewriter = PgGuardRewriter::new(RewriteMode::RewriteFunctionWithWrapper);
+    let rewriter = PgGuardRewriter::new();
 
     match ast {
         // this is for processing the members of extern "C" { } blocks
@@ -45,7 +47,7 @@ fn rewrite_item_fn(mut func: ItemFn) -> proc_macro2::TokenStream {
     // use the PgGuardRewriter to go ahead and wrap the function here, rather than applying
     // a #[pg_guard] macro to the original function.  This is necessary so that compiler
     // errors/warnings indicate the proper line numbers
-    let rewriter = PgGuardRewriter::new(RewriteMode::RewriteFunctionWithWrapper);
+    let rewriter = PgGuardRewriter::new();
 
     // make the function 'extern "C"' because this is for the #[pg_extern[ macro
     func.sig.abi = Some(syn::parse_str("extern \"C\"").unwrap());

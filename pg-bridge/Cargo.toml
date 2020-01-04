@@ -13,7 +13,6 @@ enum-primitive-derive = "0.1.2"
 num-traits = "0.2.10"
 
 [build-dependencies]
-pg-guard-rewriter = { path = "../pg-guard-rewriter" }
 bindgen = "0.52.0"
 clang = "0.23.0"
 syn = { version = "1.0.5", features = ["extra-traits", "full", "fold", "parsing"] }

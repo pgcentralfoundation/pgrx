@@ -7,47 +7,22 @@ use std::str::FromStr;
 use syn::export::TokenStream2;
 use syn::spanned::Spanned;
 use syn::{
-    FnArg, ForeignItem, ForeignItemFn, ItemFn, ItemForeignMod, ItemStruct, Pat, ReturnType,
-    Signature, Type, Visibility,
+    FnArg, ForeignItem, ForeignItemFn, ItemFn, ItemForeignMod, Pat, ReturnType, Signature, Type,
+    Visibility,
 };
 
-pub enum RewriteMode {
-    ApplyPgGuardMacro,
-    RewriteFunctionWithWrapper,
-}
-
-pub struct PgGuardRewriter(RewriteMode);
+pub struct PgGuardRewriter();
 
 impl PgGuardRewriter {
-    pub fn new(mode: RewriteMode) -> Self {
-        PgGuardRewriter(mode)
-    }
-
-    pub fn item_struct(&self, item_struct: ItemStruct) -> proc_macro2::TokenStream {
-        let mut stream = TokenStream2::new();
-        stream.extend(quote! {
-            #[derive(DatumCompatible)]
-            #item_struct
-        });
-
-        stream
+    pub fn new() -> Self {
+        PgGuardRewriter()
     }
 
     pub fn extern_block(&self, block: ItemForeignMod) -> proc_macro2::TokenStream {
         let mut stream = TokenStream2::new();
 
-        match self.0 {
-            RewriteMode::ApplyPgGuardMacro => {
-                stream.extend(quote! {
-                    #[pg_guard::pg_guard]
-                    #block
-                });
-            }
-            RewriteMode::RewriteFunctionWithWrapper => {
-                for item in block.items.into_iter() {
-                    stream.extend(self.foreign_item(item));
-                }
-            }
+        for item in block.items.into_iter() {
+            stream.extend(self.foreign_item(item));
         }
 
         stream
