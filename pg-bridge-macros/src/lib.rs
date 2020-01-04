@@ -37,12 +37,12 @@ pub fn pg_extern(attr: TokenStream, item: TokenStream) -> TokenStream {
     let attr_string = attr.to_string();
     let attrs: Vec<_> = attr_string.split(',').collect();
 
-    let mut is_strict = false;
+    let mut is_raw = false;
     let mut no_guard = false;
 
     for attr in attrs {
         match attr.trim() {
-            "strict" => is_strict = true,
+            "raw" => is_raw = true,
             "no_guard" => no_guard = true,
             "" => { /* noop */ }
             unknown => panic!("unrecognized #[pg_extern] attribute: '{}'", unknown),
@@ -50,12 +50,12 @@ pub fn pg_extern(attr: TokenStream, item: TokenStream) -> TokenStream {
     }
 
     match ast {
-        Item::Fn(func) => rewrite_item_fn(func, is_strict, no_guard).into(),
+        Item::Fn(func) => rewrite_item_fn(func, is_raw, no_guard).into(),
         _ => panic!("#[pg_extern] can only be applied to top-level functions"),
     }
 }
 
-fn rewrite_item_fn(mut func: ItemFn, is_strict: bool, no_guard: bool) -> proc_macro2::TokenStream {
+fn rewrite_item_fn(mut func: ItemFn, is_raw: bool, no_guard: bool) -> proc_macro2::TokenStream {
     let finfo_name = syn::Ident::new(&format!("pg_finfo_{}", func.sig.ident), Span::call_site());
 
     // use the PgGuardRewriter to go ahead and wrap the function here, rather than applying
@@ -66,7 +66,7 @@ fn rewrite_item_fn(mut func: ItemFn, is_strict: bool, no_guard: bool) -> proc_ma
     // make the function 'extern "C"' because this is for the #[pg_extern[ macro
     func.sig.abi = Some(syn::parse_str("extern \"C\"").unwrap());
     let func_span = func.span().clone();
-    let rewritten_func = rewriter.item_fn(func, true, is_strict, no_guard);
+    let rewritten_func = rewriter.item_fn(func, true, is_raw, no_guard);
 
     quote_spanned! {func_span=>
         #[no_mangle]

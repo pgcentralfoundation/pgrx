@@ -32,11 +32,11 @@ impl PgGuardRewriter {
         &self,
         func: ItemFn,
         rewrite_args: bool,
-        is_strict: bool,
+        is_raw: bool,
         no_guard: bool,
     ) -> proc_macro2::TokenStream {
         if rewrite_args {
-            self.item_fn_with_rewrite(func, is_strict, no_guard)
+            self.item_fn_with_rewrite(func, is_raw, no_guard)
         } else {
             self.item_fn_without_rewrite(func)
         }
@@ -45,7 +45,7 @@ impl PgGuardRewriter {
     fn item_fn_with_rewrite(
         &self,
         mut func: ItemFn,
-        is_strict: bool,
+        is_raw: bool,
         no_guard: bool,
     ) -> proc_macro2::TokenStream {
         // remember the original visibility and signature classifications as we want
@@ -62,7 +62,7 @@ impl PgGuardRewriter {
         let arg_list = PgGuardRewriter::build_arg_list(&func.sig);
         let func_name = PgGuardRewriter::build_func_name(&func.sig);
         let func_span = func.span().clone();
-        let rewritten_args = self.rewrite_args(func.clone(), is_strict);
+        let rewritten_args = self.rewrite_args(func.clone(), is_raw);
         let rewritten_return_type = self.rewrite_return_type(func.clone());
 
         if no_guard {
@@ -225,9 +225,9 @@ impl PgGuardRewriter {
         sig.output.clone()
     }
 
-    pub fn rewrite_args(&self, func: ItemFn, is_strict: bool) -> proc_macro2::TokenStream {
+    pub fn rewrite_args(&self, func: ItemFn, is_raw: bool) -> proc_macro2::TokenStream {
         let fsr = FunctionSignatureRewriter::new(func);
-        let args = fsr.args(is_strict);
+        let args = fsr.args(is_raw);
 
         quote! {
             #args
@@ -283,7 +283,7 @@ impl FunctionSignatureRewriter {
         stream
     }
 
-    fn args(&self, is_strict: bool) -> proc_macro2::TokenStream {
+    fn args(&self, is_raw: bool) -> proc_macro2::TokenStream {
         if self.func.sig.inputs.len() == 1 && self.return_type_is_datum() {
             match self.func.sig.inputs.first().unwrap() {
                 FnArg::Typed(ty) => {
@@ -327,7 +327,7 @@ impl FunctionSignatureRewriter {
                             quote_spanned! {ident.span()=>
                                 let #name = #name;
                             }
-                        } else if is_strict {
+                        } else if is_raw {
                             quote_spanned! {ident.span()=>
                                 let #name = pg_bridge::pg_getarg_datum_raw(fcinfo, #i) as #type_;
                             }
