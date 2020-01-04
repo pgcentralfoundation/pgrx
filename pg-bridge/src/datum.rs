@@ -2,7 +2,8 @@ use crate::{
     pg_sys, rust_str_to_text_p, text_to_rust_str_unchecked, DatumCompatible, PgBox,
     PgMemoryContexts,
 };
-use std::convert::TryFrom;
+use std::convert::{Infallible, TryFrom};
+use std::ffi::CStr;
 use std::fmt::Debug;
 use std::marker::PhantomData;
 
@@ -85,6 +86,23 @@ impl From<pg_sys::Datum> for PgDatum<pg_sys::Datum> {
     #[inline]
     fn from(datum: pg_sys::Datum) -> Self {
         PgDatum::new(datum, false)
+    }
+}
+
+impl<T> From<PgBox<T>> for PgDatum<PgBox<T>>
+where
+    T: crate::datum_compatible::DatumCompatible<T>,
+{
+    #[inline]
+    fn from(val: PgBox<T>) -> Self {
+        let is_null = val.is_null();
+        PgDatum::new(val.into_datum(), is_null)
+    }
+}
+
+impl<'a> From<&'a std::ffi::CStr> for PgDatum<&'a std::ffi::CStr> {
+    fn from(val: &'a CStr) -> Self {
+        PgDatum::new(val.as_ptr() as pg_sys::Datum, false)
     }
 }
 
@@ -436,6 +454,38 @@ impl TryFrom<PgDatum<char>> for char {
 //
 // TryFrom trait implementations for pointer types
 //
+
+/// this is intended for Postgres functions that take an actual `cstring` argument, not for getting
+/// a varlena argument type as a CStr.
+impl<'a> TryFrom<PgDatum<&'a std::ffi::CStr>> for &'a std::ffi::CStr {
+    type Error = &'static str;
+
+    #[inline]
+    fn try_from(value: PgDatum<&'a CStr>) -> Result<Self, Self::Error> {
+        match value.as_pg_datum() {
+            Some(datum) => {
+                let t = datum as *const std::os::raw::c_char;
+                Ok(unsafe { std::ffi::CStr::from_ptr(t) })
+            }
+            None => Err("Datum is NULL"),
+        }
+    }
+}
+
+impl<T> TryFrom<PgDatum<PgBox<T>>> for PgBox<T>
+where
+    T: DatumCompatible<T>,
+{
+    type Error = Infallible;
+
+    #[inline]
+    fn try_from(value: PgDatum<PgBox<T>>) -> Result<Self, Self::Error> {
+        match value.as_pg_datum() {
+            Some(datum) => Ok(PgBox::<T>::from_pg(datum as *mut T)),
+            None => Ok(PgBox::null()),
+        }
+    }
+}
 
 impl<'a> TryFrom<PgDatum<&'a pg_sys::varlena>> for &'a str {
     type Error = &'static str;

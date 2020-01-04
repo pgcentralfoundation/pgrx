@@ -16,6 +16,12 @@ impl Into<pg_sys::StringInfo> for StringInfo {
     }
 }
 
+impl<'a> Into<&'a std::ffi::CStr> for StringInfo {
+    fn into(self) -> &'a std::ffi::CStr {
+        unsafe { std::ffi::CStr::from_ptr(self.into_char_ptr()) }
+    }
+}
+
 pub trait IntoPostgres {
     fn into_postgres(self) -> pg_sys::StringInfo;
 }

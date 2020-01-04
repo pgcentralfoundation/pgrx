@@ -1,4 +1,5 @@
-use crate::{pg_sys, PgBox, PgDatum, PgMemoryContexts};
+use crate::{pg_sys, void_ptr, PgBox, PgDatum, PgMemoryContexts};
+use std::ffi::CStr;
 
 /// Trait for structs that are part of Postgres' source code.
 ///
@@ -23,6 +24,26 @@ impl DatumCompatible<()> for () {
         PgDatum::null()
     }
 }
+
+impl<T> DatumCompatible<PgBox<T>> for PgBox<T>
+where
+    T: DatumCompatible<T>,
+{
+    fn copy_into(&self, memory_context: &mut PgMemoryContexts) -> PgDatum<PgBox<T>> {
+        let copy = memory_context.copy_ptr_into(self.to_pg() as void_ptr, std::mem::size_of::<T>());
+        PgDatum::new(copy as pg_sys::Datum, false)
+    }
+}
+
+impl<'a> DatumCompatible<&'a std::ffi::CStr> for &'a std::ffi::CStr {
+    fn copy_into(&self, memory_context: &mut PgMemoryContexts) -> PgDatum<&'a CStr> {
+        PgDatum::new(
+            memory_context.switch_to(|| unsafe { pg_sys::pstrdup(self.as_ptr()) }) as pg_sys::Datum,
+            false,
+        )
+    }
+}
+
 impl DatumCompatible<pg_sys::Datum> for pg_sys::Datum {
     fn copy_into(&self, _memory_context: &mut PgMemoryContexts) -> PgDatum<pg_sys::Datum> {
         PgDatum::new(*self, false)
