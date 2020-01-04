@@ -83,7 +83,7 @@ fn impl_datum_compatible(ast: &syn::DeriveInput) -> TokenStream {
     } else {
         match &ast.data {
             Data::Struct(ds) => {
-                if !struct_contains_type(ds) {
+                if !type_blacklisted_for_datum_compatible(ds) {
                     (quote! {
                         impl DatumCompatible<#name> for #name {
                             fn copy_into(&self, memory_context: &mut pg_bridge::PgMemoryContexts) -> pg_bridge::PgDatum<#name> {
@@ -103,7 +103,7 @@ fn impl_datum_compatible(ast: &syn::DeriveInput) -> TokenStream {
     }
 }
 
-fn struct_contains_type(ds: &syn::DataStruct) -> bool {
+fn type_blacklisted_for_datum_compatible(ds: &syn::DataStruct) -> bool {
     for field in ds.fields.iter() {
         let ty = &field.ty;
         if let Type::Path(path) = ty {
