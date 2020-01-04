@@ -269,54 +269,50 @@ impl FunctionSignatureRewriter {
 
         let mut stream = proc_macro2::TokenStream::new();
         let mut i = 0usize;
-        let mut have_option = false;
+        let mut have_fcinfo = false;
         for arg in &self.func.sig.inputs {
             match arg {
                 FnArg::Receiver(_) => panic!("Functions that take self are not supported"),
-                FnArg::Typed(ty) => {
-                    match ty.pat.deref() {
-                        Pat::Ident(ident) => {
-                            let name = &ident.ident;
-                            let type_ = &ty.ty;
-                            let is_option = type_matches(type_, "Option");
+                FnArg::Typed(ty) => match ty.pat.deref() {
+                    Pat::Ident(ident) => {
+                        let name = &ident.ident;
+                        let type_ = &ty.ty;
+                        let is_option = type_matches(type_, "Option");
 
-                            let ts = if is_option {
-                                have_option = true;
-
-                                let option_type = extract_option_type(type_);
-                                quote_spanned! {ident.span()=>
-                                    let #name = if pg_arg_is_null(fcinfo, #i) {
-                                        None
-                                    } else {
-                                        Some(pg_bridge::pg_getarg::#option_type(fcinfo, #i).try_into()
-                                            .expect(&format!("argument '{}'", stringify! { #name })))
-                                    };
-                                }
-                            } else if type_matches(type_, "pg_sys :: FunctionCallInfo") {
-                                if i != 0 {
-                                    panic!("When using `pg_sys::FunctionCallInfo` as an argument it must be the first argument")
-                                }
-                                quote_spanned! {ident.span()=>
-                                    let #name = #name;
-                                }
-                            } else {
-                                if have_option {
-                                    panic!("If one argument is Option<T>, all arguments must be Option<T>")
-                                }
-                                quote_spanned! {ident.span()=>
-                                    let #name: #type_ =
-                                        pg_bridge::pg_getarg::<#type_>(fcinfo, #i).try_into()
-                                            .expect(&format!("argument '{}'", stringify! { #name }));
-                                }
-                            };
-
-                            stream.extend(ts);
-
-                            i += 1;
+                        if have_fcinfo {
+                            panic!("When using `pg_sys::FunctionCallInfo` as an argument it must be the last argument")
                         }
-                        _ => panic!("Unrecognized function arg type"),
+
+                        let ts = if is_option {
+                            let option_type = extract_option_type(type_);
+
+                            quote_spanned! {ident.span()=>
+                                let #name = if pg_arg_is_null(fcinfo, #i) {
+                                    None
+                                } else {
+                                    Some(pg_bridge::pg_getarg::#option_type(fcinfo, #i).try_into()
+                                        .expect(&format!("argument '{}'", stringify! { #name })))
+                                };
+                            }
+                        } else if type_matches(type_, "pg_sys :: FunctionCallInfo") {
+                            have_fcinfo = true;
+                            quote_spanned! {ident.span()=>
+                                let #name = #name;
+                            }
+                        } else {
+                            quote_spanned! {ident.span()=>
+                                let #name: #type_ =
+                                    pg_bridge::pg_getarg::<#type_>(fcinfo, #i).try_into()
+                                        .expect(&format!("argument '{}'", stringify! { #name }));
+                            }
+                        };
+
+                        stream.extend(ts);
+
+                        i += 1;
                     }
-                }
+                    _ => panic!("Unrecognized function arg type"),
+                },
             }
         }
 
