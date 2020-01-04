@@ -34,6 +34,12 @@ pub fn pg_getarg_datum(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> Option<p
 
 #[cfg(feature = "pg10")]
 #[inline]
+pub fn pg_getarg_datum_raw(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> pg_sys::Datum {
+    unsafe { fcinfo.as_ref() }.unwrap().arg[num]
+}
+
+#[cfg(feature = "pg10")]
+#[inline]
 pub fn pg_return_null(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
     unsafe { fcinfo.as_mut() }.unwrap().isnull = true;
     0 as pg_sys::Datum
@@ -73,6 +79,12 @@ pub fn pg_getarg_datum(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> Option<p
 
 #[cfg(feature = "pg11")]
 #[inline]
+pub fn pg_getarg_datum_raw(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> pg_sys::Datum {
+    unsafe { fcinfo.as_ref() }.unwrap().arg[num]
+}
+
+#[cfg(feature = "pg11")]
+#[inline]
 pub fn pg_return_null(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
     unsafe { fcinfo.as_mut() }.unwrap().isnull = true;
     0 as pg_sys::Datum
@@ -106,6 +118,12 @@ pub fn pg_getarg_datum(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> Option<p
     } else {
         Some(get_nullable_datum(fcinfo, num).value)
     }
+}
+
+#[cfg(feature = "pg12")]
+#[inline]
+pub fn pg_getarg_datum_raw(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> pg_sys::Datum {
+    get_nullable_datum(fcinfo, num).value
 }
 
 #[cfg(feature = "pg12")]

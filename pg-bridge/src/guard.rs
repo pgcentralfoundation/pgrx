@@ -73,18 +73,22 @@ pub fn register_pg_guard_panic_handler() {
     }))
 }
 
+#[inline]
 fn inc_depth(depth: &'static LocalKey<Cell<usize>>) {
     depth.with(|depth| depth.replace(depth.get() + 1));
 }
 
+#[inline]
 fn dec_depth(depth: &'static LocalKey<Cell<usize>>) {
     depth.with(|depth| depth.replace(depth.get() - 1));
 }
 
+#[inline]
 fn get_depth(depth: &'static LocalKey<Cell<usize>>) -> usize {
     depth.with(|depth| depth.get())
 }
 
+#[inline]
 pub fn guard<R, F: FnOnce() -> R>(f: F) -> R
 where
     F: std::panic::UnwindSafe,

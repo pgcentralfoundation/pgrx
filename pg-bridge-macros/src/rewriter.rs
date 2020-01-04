@@ -28,15 +28,26 @@ impl PgGuardRewriter {
         stream
     }
 
-    pub fn item_fn(&self, func: ItemFn, rewrite_args: bool) -> proc_macro2::TokenStream {
+    pub fn item_fn(
+        &self,
+        func: ItemFn,
+        rewrite_args: bool,
+        is_strict: bool,
+        no_guard: bool,
+    ) -> proc_macro2::TokenStream {
         if rewrite_args {
-            self.item_fn_with_rewrite(func)
+            self.item_fn_with_rewrite(func, is_strict, no_guard)
         } else {
             self.item_fn_without_rewrite(func)
         }
     }
 
-    fn item_fn_with_rewrite(&self, mut func: ItemFn) -> proc_macro2::TokenStream {
+    fn item_fn_with_rewrite(
+        &self,
+        mut func: ItemFn,
+        is_strict: bool,
+        no_guard: bool,
+    ) -> proc_macro2::TokenStream {
         // remember the original visibility and signature classifications as we want
         // to use those for the outer function
         let vis = func.vis.clone();
@@ -51,21 +62,38 @@ impl PgGuardRewriter {
         let arg_list = PgGuardRewriter::build_arg_list(&func.sig);
         let func_name = PgGuardRewriter::build_func_name(&func.sig);
         let func_span = func.span().clone();
-        let rewritten_args = self.rewrite_args(func.clone());
+        let rewritten_args = self.rewrite_args(func.clone(), is_strict);
         let rewritten_return_type = self.rewrite_return_type(func.clone());
 
-        quote_spanned! {func_span=>
-            #[allow(unused_variables)]
-            #vis fn #func_name(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-                #func
+        if no_guard {
+            quote_spanned! {func_span=>
+                #[allow(unused_variables)]
+                #vis fn #func_name(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+                    #func
 
-                let result = pg_bridge::guard( || {
-                    #rewritten_args
+                    let result = {
+                        #rewritten_args
 
-                    #func_name(#arg_list)
-                } );
+                        #func_name(#arg_list)
+                    };
 
-                #rewritten_return_type
+                    #rewritten_return_type
+                }
+            }
+        } else {
+            quote_spanned! {func_span=>
+                #[allow(unused_variables)]
+                #vis fn #func_name(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+                    #func
+
+                    let result = pg_bridge::guard( || {
+                        #rewritten_args
+
+                        #func_name(#arg_list)
+                    } );
+
+                    #rewritten_return_type
+                }
             }
         }
     }
@@ -197,9 +225,9 @@ impl PgGuardRewriter {
         sig.output.clone()
     }
 
-    pub fn rewrite_args(&self, func: ItemFn) -> proc_macro2::TokenStream {
+    pub fn rewrite_args(&self, func: ItemFn, is_strict: bool) -> proc_macro2::TokenStream {
         let fsr = FunctionSignatureRewriter::new(func);
-        let args = fsr.args();
+        let args = fsr.args(is_strict);
 
         quote! {
             #args
@@ -255,7 +283,7 @@ impl FunctionSignatureRewriter {
         stream
     }
 
-    fn args(&self) -> proc_macro2::TokenStream {
+    fn args(&self, is_strict: bool) -> proc_macro2::TokenStream {
         if self.func.sig.inputs.len() == 1 && self.return_type_is_datum() {
             match self.func.sig.inputs.first().unwrap() {
                 FnArg::Typed(ty) => {
@@ -298,6 +326,10 @@ impl FunctionSignatureRewriter {
                             have_fcinfo = true;
                             quote_spanned! {ident.span()=>
                                 let #name = #name;
+                            }
+                        } else if is_strict {
+                            quote_spanned! {ident.span()=>
+                                let #name = pg_bridge::pg_getarg_datum_raw(fcinfo, #i) as #type_;
                             }
                         } else {
                             quote_spanned! {ident.span()=>
