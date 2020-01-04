@@ -55,10 +55,11 @@ impl PgGuardRewriter {
         let rewritten_return_type = self.rewrite_return_type(func.clone());
 
         quote_spanned! {func_span=>
+            #[allow(unused_variables)]
             #vis fn #func_name(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
                 #func
 
-                let result = pg_guard::guard( || {
+                let result = pg_bridge::guard( || {
                     #rewritten_args
 
                     #func_name(#arg_list)
@@ -90,7 +91,7 @@ impl PgGuardRewriter {
             #vis #sig {
                 #func
 
-                pg_guard::guard( || #func_name(#arg_list) )
+                pg_bridge::guard( || #func_name(#arg_list) )
             }
         }
     }
@@ -120,7 +121,7 @@ impl PgGuardRewriter {
                     pub fn #func_name( #arg_list_with_types ) #return_type ;
                 }
 
-                pg_guard::guard(|| unsafe { #func_name( #arg_list) })
+                pg_bridge::guard(|| unsafe { #func_name( #arg_list) })
             }
         }
     }
@@ -259,26 +260,23 @@ impl FunctionSignatureRewriter {
         for arg in &self.func.sig.inputs {
             match arg {
                 FnArg::Receiver(_) => panic!("Functions that take self are not supported"),
-                FnArg::Typed(ty) => {
-                    match ty.pat.deref() {
-                        Pat::Ident(ident) => {
-                            let name = &ident.ident;
-                            let type_ = &ty.ty;
+                FnArg::Typed(ty) => match ty.pat.deref() {
+                    Pat::Ident(ident) => {
+                        let name = &ident.ident;
+                        let type_ = &ty.ty;
 
-                            let ts = quote_spanned! {ident.span()=>
-                                let #name: #type_ =
-                                    pg_bridge::pg_getarg::<#type_>(fcinfo, #i).try_into()
-                                        .expect(&format!("argument '{}'", stringify! { #name }));
-                            };
-                            //                            };
+                        let ts = quote_spanned! {ident.span()=>
+                            let #name: #type_ =
+                                pg_bridge::pg_getarg::<#type_>(fcinfo, #i).try_into()
+                                    .expect(&format!("argument '{}'", stringify! { #name }));
+                        };
 
-                            stream.extend(ts);
+                        stream.extend(ts);
 
-                            i += 1;
-                        }
-                        _ => panic!("Unrecognized function arg type"),
+                        i += 1;
                     }
-                }
+                    _ => panic!("Unrecognized function arg type"),
+                },
             }
         }
 

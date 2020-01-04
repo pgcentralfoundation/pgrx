@@ -14,6 +14,7 @@ pub use std::convert::TryInto;
 pub mod datum;
 pub mod datum_compatible;
 pub mod fcinfo;
+pub mod guard;
 pub mod htup;
 pub mod itemptr;
 pub mod log;
@@ -28,13 +29,13 @@ pub mod varlena;
 pub use datum::*;
 pub use datum_compatible::*;
 pub use fcinfo::*;
+pub use guard::*;
 pub use htup::*;
 pub use itemptr::*;
 pub use log::*;
 pub use memcxt::*;
 pub use nodes::*;
 pub use oids::*;
-pub use pg_guard::*;
 pub use spi::*;
 pub use varlena::*;
 
@@ -66,7 +67,7 @@ macro_rules! pg_module_magic {
 
             // go ahead and register our panic handler since Postgres
             // calls this function first
-            pg_guard::register_pg_guard_panic_handler();
+            pg_bridge::register_pg_guard_panic_handler();
 
             // return the magic
             &my_magic
@@ -80,5 +81,5 @@ macro_rules! pg_module_magic {
 #[allow(unused)]
 #[no_mangle]
 pub extern "C" fn initialize() {
-    pg_guard::register_pg_guard_panic_handler();
+    register_pg_guard_panic_handler();
 }

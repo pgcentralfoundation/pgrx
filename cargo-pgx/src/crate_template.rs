@@ -35,8 +35,7 @@ fn create_control_file(path: &PathBuf, name: &str) -> Result<(), std::io::Error>
 
     file.write_all(
         &format!(
-            "
-comment = '{name}:  Created by pg-rs-bridge'
+            "comment = '{name}:  Created by pg-rs-bridge'
 default_version = '1.0'
 module_pathname = '$libdir/{name}'
 relocatable = true
@@ -58,8 +57,7 @@ fn create_cargo_toml(path: &PathBuf, name: &str) -> Result<(), std::io::Error> {
 
     file.write_all(
         &format!(
-            "
-[package]
+            "[package]
 name = \"{name}\"
 version = \"0.1.0\"
 edition = \"2018\"
@@ -70,7 +68,6 @@ crate-type = [\"cdylib\"]
 [dependencies]
 pg-bridge = {{ path = \"../pg-rs-bridge/pg-bridge/\", features = [\"pg11\"], default-features = false }}
 pg-guard-attr = {{ path = \"../pg-rs-bridge/pg-guard-attr\" }}
-pg-guard = {{ path = \"../pg-rs-bridge/pg-guard\" }}
 
 [profile.dev]
 panic = \"unwind\"
@@ -98,8 +95,7 @@ fn create_dotcargo_config(path: &PathBuf, _name: &str) -> Result<(), std::io::Er
 
     file.write_all(
         &format!(
-            "
-[build]
+            "[build]
 # Postgres symbols won't ve available until runtime
 rustflags = [\"-C\", \"link-args=-Wl,-undefined,dynamic_lookup\"]
 "
@@ -133,16 +129,14 @@ fn create_lib_rs(path: &PathBuf, name: &str) -> Result<(), std::io::Error> {
 
     file.write_all(
         &format!(
-            "
-extern crate pg_guard;
-
-use pg_bridge::*;
+            "use pg_bridge::*;
+use pg_guard_attr::*;
 
 pg_module_magic!();
 
 #[pg_extern]
-fn hello_{name}(_fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {{
-    pg_return_text_p(\"Hello, {name}\")
+fn hello_{name}() -> &'static str {{
+    \"Hello, {name}\"
 }}
 ",
             name = name

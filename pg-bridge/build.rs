@@ -79,7 +79,7 @@ fn make_shim_path(manifest_dir: &str) -> PathBuf {
 fn main() -> Result<(), std::io::Error> {
     build_deps::rerun_if_changed_paths("include/*").unwrap();
     build_deps::rerun_if_changed_paths("../pg-guard-attr/src/lib.rs").unwrap();
-    build_deps::rerun_if_changed_paths("../pg-guard-rewriter/src/lib.rs").unwrap();
+    build_deps::rerun_if_changed_paths("../pg-guard-attr/src/rewriter.rs").unwrap();
     build_deps::rerun_if_changed_paths("../bindings-diff/*").unwrap();
     build_deps::rerun_if_changed_paths("../bindings-diff/src/*").unwrap();
     build_deps::rerun_if_changed_paths("../bridge-c-shim/bridge-c-shim.c").unwrap();

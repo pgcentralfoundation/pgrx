@@ -2,7 +2,6 @@
 members = [
     "pg-bridge",
     "pg-guard-attr",
-    "pg-guard",
     "bindings-diff",
     "cargo-pgx"
 ]
