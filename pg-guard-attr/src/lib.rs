@@ -86,7 +86,7 @@ fn impl_datum_compatible(ast: &syn::DeriveInput) -> TokenStream {
                 if !struct_contains_type(ds) {
                     (quote! {
                         impl DatumCompatible<#name> for #name {
-                            fn copy_into(&self, memory_context: &mut crate::PgMemoryContexts) -> crate::PgDatum<#name> {
+                            fn copy_into(&self, memory_context: &mut pg_bridge::PgMemoryContexts) -> pg_bridge::PgDatum<#name> {
                                 memory_context.copy_struct_into(self)
                             }
 

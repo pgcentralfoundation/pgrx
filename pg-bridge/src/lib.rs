@@ -5,6 +5,9 @@ extern crate pg_guard_attr;
 extern crate enum_primitive_derive;
 extern crate num_traits;
 
+// expose the #[derive(DatumCompatible)] trait
+pub use pg_guard_attr::DatumCompatible;
+
 pub mod datum;
 pub mod datum_compatible;
 pub mod fcinfo;

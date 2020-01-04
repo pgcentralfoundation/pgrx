@@ -184,9 +184,11 @@ fn write_source_file(filename: &str, items: BTreeMap<String, SortableItem>) {
     let mut stream = TokenStream2::new();
     stream.extend(quote! {
         #![allow(clippy::all)]
+
+        use crate as pg_bridge;
+        use crate::pg_sys::common::*;
+        use crate::DatumCompatible;
     });
-    stream.extend(quote! {use crate::DatumCompatible;});
-    stream.extend(quote! {use crate::pg_sys::common::*;});
     for (_, item) in items {
         match &item.item {
             Item::Use(_) => {}
@@ -202,9 +204,10 @@ fn write_common_file(filename: &str, items: BTreeSet<SortableItem>) {
     let mut stream = TokenStream2::new();
     stream.extend(quote! {
         #![allow(clippy::all)]
-    });
-    stream.extend(quote! {use crate::DatumCompatible;});
-    stream.extend(quote! {
+
+        use crate as pg_bridge;
+        use crate::datum_compatible::DatumCompatible;
+
         #[cfg(feature = "pg10")]
         use crate::pg_sys::pg10_specific::*;
         #[cfg(feature = "pg11")]
