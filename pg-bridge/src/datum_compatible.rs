@@ -132,6 +132,15 @@ impl<'a> DatumCompatible<&'a str> for &'a str {
     }
 }
 
+impl DatumCompatible<String> for String {
+    fn copy_into(&self, memory_context: &mut PgMemoryContexts) -> PgDatum<String> {
+        match self.as_str().copy_into(memory_context).as_pg_datum() {
+            Some(datum) => PgDatum::<String>::new(datum, false),
+            None => PgDatum::null(),
+        }
+    }
+}
+
 impl<'a> DatumCompatible<&'a pg_sys::varlena> for &'a pg_sys::varlena {
     fn copy_into(&self, memory_context: &mut PgMemoryContexts) -> PgDatum<&'a pg_sys::varlena> {
         let ptr = self as *const _ as *const pg_sys::varlena;

@@ -67,6 +67,14 @@ where
             None => 0,
         }
     }
+
+    #[inline]
+    pub fn into_datum(self) -> pg_sys::Datum {
+        match self.0 {
+            Some(datum) => datum,
+            None => 0,
+        }
+    }
 }
 
 impl<T> Into<pg_sys::Datum> for PgDatum<T>
@@ -295,11 +303,24 @@ impl From<f64> for PgDatum<f64> {
     }
 }
 
-/// Rust [&str]'s are represented as Postgres-allocated `varlena` inside a PgDatum
+/// Rust [&str]s are represented as Postgres-allocated `varlena` inside a PgDatum, allocated
+/// within `CurrentMemoryContext`
 impl<'a> From<&'a str> for PgDatum<&'a str> {
     #[inline]
     fn from(val: &str) -> Self {
         PgDatum(Some(rust_str_to_text_p(val) as pg_sys::Datum), PhantomData)
+    }
+}
+
+/// Rust [String]s are represented as Postgres-allocated `varlena` inside a PgDatum, allocated
+///// within `CurrentMemoryContext`
+impl From<String> for PgDatum<String> {
+    #[inline]
+    fn from(val: String) -> Self {
+        PgDatum(
+            Some(rust_str_to_text_p(val.as_str()) as pg_sys::Datum),
+            PhantomData,
+        )
     }
 }
 
