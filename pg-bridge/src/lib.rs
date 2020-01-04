@@ -8,6 +8,9 @@ extern crate num_traits;
 // expose the #[derive(DatumCompatible)] trait
 pub use pg_guard_attr::DatumCompatible;
 
+// we need this publicly too
+pub use std::convert::TryInto;
+
 pub mod datum;
 pub mod datum_compatible;
 pub mod fcinfo;
