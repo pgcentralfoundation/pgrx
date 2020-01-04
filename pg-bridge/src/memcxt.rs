@@ -7,7 +7,7 @@
 //! simple accessibility to working with MemoryContexts in a compiler-checked manner
 //!
 use crate::{pg_sys, DatumCompatible, PgDatum};
-use std::fmt::Debug;
+use std::fmt::{Debug, Error, Formatter};
 use std::ops::{Deref, DerefMut};
 
 /// Return a Postgres-allocated pointer to a struct allocated in Postgres' [pg_sys::CurrentMemoryContext].  
@@ -507,13 +507,36 @@ enum WhoAllocated {
 ///  - Interactions with Poastgres' error!() macro
 ///  - Boxing a null pointer -- it works ::from_pg(), ::into_pg(), and ::to_pg(), but will panic!() on all other uses
 ///
-#[derive(Debug)]
 pub struct PgBox<T>
 where
     T: DatumCompatible<T>,
 {
     ptr: Option<*mut T>,
     owner: WhoAllocated,
+}
+
+impl<T> Debug for PgBox<T>
+where
+    T: DatumCompatible<T> + Debug,
+{
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
+        match self.ptr {
+            Some(ptr) => f.write_str(&format!(
+                "PgBox<{}> (ptr={:?}, owner={:?})",
+                std::any::type_name::<T>(),
+                unsafe {
+                    ptr.as_ref()
+                        .expect("impl Debug for PgBox expected self.ptr to be non-NULL")
+                },
+                self.owner
+            )),
+            None => f.write_str(&format!(
+                "PgBox<{}> (ptr=NULL, owner={:?})",
+                std::any::type_name::<T>(),
+                self.owner
+            )),
+        }
+    }
 }
 
 impl<T> PgBox<T>
