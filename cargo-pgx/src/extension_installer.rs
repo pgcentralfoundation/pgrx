@@ -29,8 +29,8 @@ pub(crate) fn install_extension(target: Option<&str>) -> Result<(), std::io::Err
         return Err(std::io::Error::from_raw_os_error(status.code().unwrap()));
     }
 
-    let pkgdir = get_pkglibdir()?;
-    let extdir = get_extensiondir()?;
+    let pkgdir = get_pkglibdir();
+    let extdir = get_extensiondir();
     let (control_file, extname) = find_control_file()?;
     let (libpath, libfile) = find_library_file(&extname, is_release)?;
 
@@ -108,24 +108,22 @@ fn find_control_file() -> Result<(String, String), std::io::Error> {
     panic!("couldn't find control file");
 }
 
-fn get_pkglibdir() -> Result<String, std::io::Error> {
-    Ok(String::from_utf8(
-        Command::new("pg_config")
-            .arg("--pkglibdir")
-            .output()?
-            .stdout,
-    )
-    .unwrap()
-    .trim()
-    .to_string())
+fn get_pkglibdir() -> String {
+    run_pg_config("--pkglibdir")
 }
 
-fn get_extensiondir() -> Result<String, std::io::Error> {
-    let mut dir = String::from_utf8(Command::new("pg_config").arg("--sharedir").output()?.stdout)
-        .unwrap()
-        .trim()
-        .to_string();
+fn get_extensiondir() -> String {
+    let mut dir = run_pg_config("--sharedir");
 
     dir.push_str("/extension");
-    Ok(dir)
+    dir
+}
+
+fn run_pg_config(arg: &str) -> String {
+    let output = Command::new("pg_config")
+        .arg(arg)
+        .output()
+        .expect("couldn't run 'pg_config'");
+
+    String::from_utf8(output.stdout).unwrap().trim().to_string()
 }
