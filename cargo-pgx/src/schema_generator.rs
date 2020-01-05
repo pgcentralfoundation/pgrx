@@ -49,14 +49,7 @@ pub(crate) fn generate_schema() -> Result<(), std::io::Error> {
 
 fn process_schema_load_order(created: &mut Vec<String>, deleted: &mut Vec<String>) {
     let filename = PathBuf::from_str("./sql/load-order.txt").unwrap();
-    let mut load_order = Vec::new();
-
-    if let Ok(file) = std::fs::File::open(&filename) {
-        let reader = std::io::BufReader::new(file);
-        for (_, line) in reader.lines().enumerate() {
-            load_order.push(line.unwrap());
-        }
-    }
+    let mut load_order = read_load_order(&filename);
 
     // remove everything from load_order that we deleted
     for v in deleted {
@@ -82,6 +75,21 @@ fn process_schema_load_order(created: &mut Vec<String>, deleted: &mut Vec<String
         file.write(&['\n' as u8])
             .expect(&format!("failed to write to {}", filename.display()));
     });
+}
+
+pub(crate) fn read_load_order(filename: &PathBuf) -> Vec<String> {
+    let mut load_order = Vec::new();
+
+    match std::fs::File::open(&filename) {
+        Ok(file) => {
+            let reader = std::io::BufReader::new(file);
+            for (_, line) in reader.lines().enumerate() {
+                load_order.push(line.unwrap());
+            }
+        }
+        Err(e) => panic!(e),
+    }
+    load_order
 }
 
 fn write_sql_file(f: &DirEntry, statements: Vec<String>) -> (bool, PathBuf) {

@@ -1,5 +1,8 @@
+use std::io::{BufRead, Write};
+use std::path::PathBuf;
 use std::process::{Command, Stdio};
 use std::result::Result;
+use std::str::FromStr;
 
 pub(crate) fn install_extension(target: Option<&str>) -> Result<(), std::io::Error> {
     let is_release = target.unwrap_or("").eq("release");
@@ -43,21 +46,51 @@ pub(crate) fn install_extension(target: Option<&str>) -> Result<(), std::io::Err
         format!("{}/{}.so", pkgdir, extname),
     )?;
 
-    copy_sql_files(&extdir)?;
+    copy_sql_files(&extdir, &extname)?;
 
     Ok(())
 }
 
-fn copy_sql_files(extdir: &str) -> Result<(), std::io::Error> {
+fn copy_sql_files(extdir: &str, extname: &str) -> Result<(), std::io::Error> {
+    let load_order = crate::schema_generator::read_load_order(
+        &PathBuf::from_str("./sql/load-order.txt").unwrap(),
+    );
+    let target_filename =
+        PathBuf::from_str(&format!("{}/{}--{}.sql", extdir, extname, get_version())).unwrap();
+    let mut sql = std::fs::File::create(&target_filename).unwrap();
+
+    // write each sql file from load-order.txt to the version.sql file
+    for file in load_order {
+        let file = PathBuf::from_str(&format!("sql/{}", file)).unwrap();
+        let contents = std::fs::read_to_string(&file).unwrap();
+
+        println!(
+            "writing {} to {}",
+            file.display(),
+            target_filename.display()
+        );
+        sql.write_all("--\n".as_bytes())
+            .expect("couldn't write version SQL file");
+        sql.write_all(format!("-- {}\n", file.display()).as_bytes())
+            .expect("couldn't write version SQL file");
+        sql.write_all("--\n".as_bytes())
+            .expect("couldn't write version SQL file");
+        sql.write_all(contents.as_bytes())
+            .expect("couldn't write version SQL file");
+        sql.write_all("\n\n\n".as_bytes())
+            .expect("couldn't write version SQL file");
+    }
+
+    // now copy all the version upgrade files too
     for f in std::fs::read_dir("sql/")? {
         if f.is_ok() {
             let f = f.unwrap();
             let filename = f.file_name().into_string().unwrap();
 
-            if filename.ends_with(".sql") {
+            if filename.starts_with(&format!("{}--", extname)) && filename.ends_with(".sql") {
                 let dest = format!("{}/{}", extdir, filename);
 
-                println!("copying SQL ({}) to: {}", filename, dest);
+                println!("copying SQL: {} to: {}", filename, dest);
                 std::fs::copy(f.path(), dest)?;
             }
         }
@@ -106,6 +139,25 @@ fn find_control_file() -> Result<(String, String), std::io::Error> {
     }
 
     panic!("couldn't find control file");
+}
+
+fn get_version() -> String {
+    let control_file = std::fs::File::open(find_control_file().unwrap().0).unwrap();
+    let reader = std::io::BufReader::new(control_file);
+
+    for line in reader.lines() {
+        let line = line.unwrap();
+        if line.starts_with("default_version") {
+            let mut parts: Vec<&str> = line.split("=").collect();
+            let mut version = parts.pop().unwrap().trim().to_string();
+
+            version = version.trim_matches('\'').trim().to_string();
+
+            return version;
+        }
+    }
+
+    panic!("couldn't determine version number");
 }
 
 fn get_pkglibdir() -> String {
