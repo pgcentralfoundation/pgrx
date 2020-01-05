@@ -22,7 +22,7 @@ pub(crate) fn generate_schema() -> Result<(), std::io::Error> {
         let result = std::panic::catch_unwind(|| make_create_function_statements(f));
 
         match result {
-            Ok(statements) => write_sql_file(&path, f, statements),
+            Ok(statements) => write_sql_file(f, statements),
             Err(e) => eprintln!("ERROR:  {}", downcast_err(e)),
         }
     });
@@ -30,24 +30,29 @@ pub(crate) fn generate_schema() -> Result<(), std::io::Error> {
     Ok(())
 }
 
-fn write_sql_file(path: &PathBuf, f: &DirEntry, statements: Vec<String>) {
-    let sql_filename = make_sql_filename(f);
-    let mut file =
-        std::fs::File::create(&sql_filename).expect(&format!("failed to open {}", path.display()));
+fn write_sql_file(f: &DirEntry, statements: Vec<String>) {
+    let filename = make_sql_filename(f);
 
     if statements.is_empty() {
-        std::fs::remove_file(&sql_filename).expect(&format!("unable to delete {}", sql_filename));
+        // delete existing sql file if it exists
+        if filename.exists() {
+            std::fs::remove_file(&filename)
+                .expect(&format!("unable to delete {}", filename.display()));
+        }
     } else {
+        // write the statements out to the sql file
+        let mut file = std::fs::File::create(&filename)
+            .expect(&format!("failed to open {}", filename.display()));
         for statement in statements {
             file.write_all(statement.as_bytes())
-                .expect(&format!("failed to write to {}", path.display()));
+                .expect(&format!("failed to write to {}", filename.display()));
             file.write(&['\n' as u8])
-                .expect(&format!("failed to write to {}", path.display()));
+                .expect(&format!("failed to write to {}", filename.display()));
         }
     }
 }
 
-fn make_sql_filename(f: &DirEntry) -> String {
+fn make_sql_filename(f: &DirEntry) -> PathBuf {
     let mut sql_filename = f.path().display().to_string();
 
     sql_filename = sql_filename.trim_start_matches("./src/").to_string();
@@ -56,7 +61,7 @@ fn make_sql_filename(f: &DirEntry) -> String {
     sql_filename.insert_str(0, "./sql/");
     sql_filename.push_str(".generated.sql");
 
-    sql_filename
+    PathBuf::from_str(&sql_filename).unwrap()
 }
 
 fn find_rs_files(path: &PathBuf, mut files: Vec<DirEntry>) -> Vec<DirEntry> {
