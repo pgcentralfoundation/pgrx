@@ -44,6 +44,13 @@ pub fn pg_extern(attr: TokenStream, item: TokenStream) -> TokenStream {
         match attr.trim() {
             "raw" => is_raw = true,
             "no_guard" => no_guard = true,
+            "strict" => { /* noop */ }
+            "stable" => { /* noop */ }
+            "volatile" => { /* noop */ }
+            "immutable" => { /* noop */ }
+            "parallel_safe" => { /* noop */ }
+            "parallel_unsafe" => { /* noop */ }
+            "parallel_restricted" => { /* noop */ }
             "" => { /* noop */ }
             unknown => panic!("unrecognized #[pg_extern] attribute: '{}'", unknown),
         }

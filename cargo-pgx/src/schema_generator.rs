@@ -2,6 +2,7 @@ use proc_macro2::Ident;
 use quote::quote;
 use rayon::prelude::*;
 use std::any::Any;
+use std::collections::HashSet;
 use std::fs::DirEntry;
 use std::io::{BufRead, Write};
 use std::ops::Deref;
@@ -11,7 +12,7 @@ use std::str::FromStr;
 use std::sync::Mutex;
 use syn::export::ToTokens;
 use syn::spanned::Spanned;
-use syn::{FnArg, Item, Pat, ReturnType, Type};
+use syn::{Attribute, FnArg, Item, Pat, ReturnType, Type};
 
 pub(crate) fn generate_schema() -> Result<(), std::io::Error> {
     let path = PathBuf::from_str("./src").unwrap();
@@ -155,6 +156,49 @@ fn find_rs_files(path: &PathBuf, mut files: Vec<DirEntry>) -> Vec<DirEntry> {
     files
 }
 
+#[derive(Debug, Hash, Ord, PartialOrd, Eq, PartialEq)]
+enum ExternArgs {
+    Immutable,
+    Strict,
+    Stable,
+    Volatile,
+    Raw,
+    ParallelSafe,
+    ParallelUnsafe,
+    ParallelRestricted,
+}
+
+fn parse_extern_args(att: &Attribute) -> HashSet<ExternArgs> {
+    let mut args = HashSet::<ExternArgs>::new();
+    let line = att.into_token_stream().to_string();
+    let mut line = line.as_str();
+
+    if line.contains('(') {
+        line = line.trim_start_matches("# [ pg_extern").trim();
+        line = line.trim_start_matches("(").trim();
+        line = line.trim_end_matches(") ]").trim();
+        line = line.trim_end_matches("]").trim();
+        let atts: Vec<_> = line.split(',').collect();
+
+        for att in atts {
+            let att = att.trim();
+
+            match att {
+                "immutable" => args.insert(ExternArgs::Immutable),
+                "strict" => args.insert(ExternArgs::Strict),
+                "stable" => args.insert(ExternArgs::Stable),
+                "volatile" => args.insert(ExternArgs::Volatile),
+                "raw" => args.insert(ExternArgs::Raw),
+                "parallel_safe" => args.insert(ExternArgs::ParallelSafe),
+                "parallel_unsafe" => args.insert(ExternArgs::ParallelUnsafe),
+                "parallel_restricted" => args.insert(ExternArgs::ParallelRestricted),
+                _ => false,
+            };
+        }
+    }
+    args
+}
+
 fn make_create_function_statements(rs_file: &DirEntry) -> Vec<String> {
     let mut sql = Vec::new();
     let file = std::fs::read_to_string(rs_file.path()).unwrap();
@@ -175,9 +219,9 @@ fn make_create_function_statements(rs_file: &DirEntry) -> Vec<String> {
             }
         } else if let Item::Fn(func) = item {
             for att in &func.attrs {
-                if let "# [ pg_extern ]" = &format!("{}", quote! {#att}) as &str {
-                    // TODO:  pick out: strict, immutable, volatile, parallel safe
-
+                let att_desc = att.clone().into_token_stream().to_string();
+                if att_desc.starts_with("# [ pg_extern") {
+                    let mut extern_args = parse_extern_args(att);
                     let mut def = String::new();
 
                     def.push_str(&format!(
@@ -185,32 +229,34 @@ fn make_create_function_statements(rs_file: &DirEntry) -> Vec<String> {
                         name = quote_ident(&func.sig.ident)
                     ));
 
+                    // function arguments
                     def.push('(');
                     let mut had_none = false;
                     let mut i = 0;
+                    let mut had_option = false;
                     for arg in &func.sig.inputs {
                         match arg {
                             FnArg::Receiver(_) => {
                                 panic!("functions that take 'self' are not supported")
                             }
-                            FnArg::Typed(ty) => {
-                                let type_name = translate_type(rs_file, &ty.ty);
-
-                                match type_name {
-                                    Some(type_name) => {
-                                        if i > 0 {
-                                            def.push_str(", ");
-                                        }
-
-                                        def.push_str(&arg_name(arg));
-                                        def.push(' ');
-                                        def.push_str(&type_name);
-
-                                        i += 1;
+                            FnArg::Typed(ty) => match translate_type(rs_file, &ty.ty) {
+                                Some((type_name, is_option)) => {
+                                    if i > 0 {
+                                        def.push_str(", ");
                                     }
-                                    None => had_none = true,
+
+                                    def.push_str(&arg_name(arg));
+                                    def.push(' ');
+                                    def.push_str(&type_name);
+
+                                    if is_option {
+                                        had_option = true;
+                                    }
+
+                                    i += 1;
                                 }
-                            }
+                                None => had_none = true,
+                            },
                         }
                     }
 
@@ -228,12 +274,37 @@ fn make_create_function_statements(rs_file: &DirEntry) -> Vec<String> {
 
                     def.push(')');
 
+                    if !had_option {
+                        // there were no Option<T> arguments, so the function can be declared STRICT
+                        extern_args.insert(ExternArgs::Strict);
+                    }
+
+                    // append RETURNS clause
                     match match &func.sig.output {
-                        ReturnType::Default => Some("void".to_string()),
+                        ReturnType::Default => Some(("void".to_string(), false)),
                         ReturnType::Type(_, ty) => translate_type(rs_file, ty),
                     } {
-                        Some(return_type) => def.push_str(&format!(" RETURNS {}", return_type)),
+                        Some((return_type, is_option)) => {
+                            if is_option {
+                                panic!("#{pg_extern] functions cannot return Optino<T>");
+                            }
+                            def.push_str(&format!(" RETURNS {}", return_type))
+                        }
                         None => panic!("could not determine return type"),
+                    }
+
+                    // modifiers
+                    for extern_arg in extern_args {
+                        match extern_arg {
+                            ExternArgs::Immutable => def.push_str(" IMMUTABLE"),
+                            ExternArgs::Strict => def.push_str(" STRICT"),
+                            ExternArgs::Stable => def.push_str(" STABLE"),
+                            ExternArgs::Volatile => def.push_str(" VOLATILE"),
+                            ExternArgs::Raw => { /* no op */ }
+                            ExternArgs::ParallelSafe => def.push_str(" PARALLEL SAFE"),
+                            ExternArgs::ParallelUnsafe => def.push_str(" PARALLEL UNSAFE"),
+                            ExternArgs::ParallelRestricted => def.push_str(" PARALLEL RESTRICTED"),
+                        }
                     }
 
                     def.push_str(" LANGUAGE c AS 'MODULE_PATHNAME';");
@@ -264,7 +335,7 @@ fn arg_name(arg: &FnArg) -> String {
     panic!("functions that take 'self' are not supported")
 }
 
-fn translate_type(filename: &DirEntry, ty: &Box<Type>) -> Option<String> {
+fn translate_type(filename: &DirEntry, ty: &Box<Type>) -> Option<(String, bool)> {
     let rust_type;
     let span;
     if let Type::Path(path) = ty.deref() {
@@ -286,24 +357,25 @@ fn translate_type_string(
     filename: &DirEntry,
     span: &proc_macro2::Span,
     ty: &Box<Type>,
-) -> Option<String> {
+) -> Option<(String, bool)> {
     match rust_type.as_str() {
-        "i16" => Some("smallint".to_string()),
-        "i32" => Some("int".to_string()),
-        "i64" => Some("bigint".to_string()),
-        "bool" => Some("bool".to_string()),
-        "f32" => Some("real".to_string()),
-        "f64" => Some("double precision".to_string()),
-        "& str" | "String" => Some("text".to_string()),
-        "& std :: ffi :: CStr" => Some("cstring".to_string()),
-        "pg_sys :: ItemPointerData" => Some("tid".to_string()),
+        "i16" => Some(("smallint".to_string(), false)),
+        "i32" => Some(("int".to_string(), false)),
+        "i64" => Some(("bigint".to_string(), false)),
+        "bool" => Some(("bool".to_string(), false)),
+        "f32" => Some(("real".to_string(), false)),
+        "f64" => Some(("double precision".to_string(), false)),
+        "& str" | "String" => Some(("text".to_string(), false)),
+        "& std :: ffi :: CStr" => Some(("cstring".to_string(), false)),
+        "pg_sys :: ItemPointerData" => Some(("tid".to_string(), false)),
         "pg_sys :: FunctionCallInfo" => None,
-        "pg_sys :: IndexAmRoutine" => Some("index_am_handler".to_string()),
+        "pg_sys :: IndexAmRoutine" => Some(("index_am_handler".to_string(), false)),
         _boxed if rust_type.starts_with("PgBox <") => {
             translate_type_string(extract_type(ty), filename, span, ty)
         }
         _option if rust_type.starts_with("Option <") => {
-            translate_type_string(extract_type(ty), filename, span, ty)
+            let rc = translate_type_string(extract_type(ty), filename, span, ty);
+            Some((rc.unwrap().0, true))
         }
         mut unknown => {
             eprintln!(
@@ -315,7 +387,7 @@ fn translate_type_string(
             );
 
             unknown = unknown.trim_start_matches("pg_sys :: ");
-            Some(unknown.to_string())
+            Some((unknown.to_string(), false))
         }
     }
 }
