@@ -9,7 +9,14 @@ pub(crate) fn create_crate_template(path: PathBuf, name: &str) -> Result<(), std
     create_dotcargo_config(&path, name)?;
     create_lib_rs(&path, name)?;
     create_git_ignore(&path, name)?;
-    git_init(&path)
+
+    let cwd = std::env::current_dir().unwrap();
+    std::env::set_current_dir(&path)?;
+    crate::generate_schema()?;
+    std::env::set_current_dir(cwd)?;
+
+    git_init(&path)?;
+    git_add(&path)
 }
 
 fn create_directory_structure(path: &PathBuf) -> Result<(), std::io::Error> {
@@ -87,6 +94,22 @@ fn create_git_ignore(path: &PathBuf, _name: &str) -> Result<(), std::io::Error> 
 fn git_init(path: &PathBuf) -> Result<(), std::io::Error> {
     let output = Command::new("git")
         .arg("init")
+        .arg(".")
+        .current_dir(path)
+        .output()?;
+
+    if !output.status.success() {
+        Err(std::io::Error::from_raw_os_error(
+            output.status.code().unwrap(),
+        ))
+    } else {
+        Ok(())
+    }
+}
+
+fn git_add(path: &PathBuf) -> Result<(), std::io::Error> {
+    let output = Command::new("git")
+        .arg("add")
         .arg(".")
         .current_dir(path)
         .output()?;

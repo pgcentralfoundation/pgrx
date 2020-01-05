@@ -3,11 +3,12 @@ use quote::quote;
 use rayon::prelude::*;
 use std::any::Any;
 use std::fs::DirEntry;
-use std::io::Write;
+use std::io::{BufRead, Write};
 use std::ops::Deref;
 use std::path::PathBuf;
 use std::result::Result;
 use std::str::FromStr;
+use std::sync::Mutex;
 use syn::export::ToTokens;
 use syn::spanned::Spanned;
 use syn::{FnArg, Item, Pat, ReturnType, Type};
@@ -17,20 +18,73 @@ pub(crate) fn generate_schema() -> Result<(), std::io::Error> {
     let files = find_rs_files(&path, Vec::new());
 
     std::panic::set_hook(Box::new(|_| {}));
-
+    let mut created = Mutex::new(Vec::new());
+    let mut deleted = Mutex::new(Vec::new());
     files.par_iter().for_each(|f: &DirEntry| {
         let result = std::panic::catch_unwind(|| make_create_function_statements(f));
 
         match result {
-            Ok(statements) => write_sql_file(f, statements),
+            Ok(statements) => {
+                let (did_write, filename) = write_sql_file(f, statements);
+
+                // strip the leading ./sql/ from the filenames we generated
+                let mut filename = filename.display().to_string();
+                filename = filename.trim_start_matches("./sql/").to_string();
+
+                if did_write {
+                    created.lock().unwrap().push(filename);
+                } else {
+                    deleted.lock().unwrap().push(filename);
+                }
+            }
             Err(e) => eprintln!("ERROR:  {}", downcast_err(e)),
         }
     });
+    let _ = std::panic::take_hook();
+
+    process_schema_load_order(created.get_mut().unwrap(), deleted.get_mut().unwrap());
 
     Ok(())
 }
 
-fn write_sql_file(f: &DirEntry, statements: Vec<String>) {
+fn process_schema_load_order(created: &mut Vec<String>, deleted: &mut Vec<String>) {
+    let filename = PathBuf::from_str("./sql/load-order.txt").unwrap();
+    let mut load_order = Vec::new();
+
+    if let Ok(file) = std::fs::File::open(&filename) {
+        let reader = std::io::BufReader::new(file);
+        for (_, line) in reader.lines().enumerate() {
+            load_order.push(line.unwrap());
+        }
+    }
+
+    // remove everything from load_order that we deleted
+    for v in deleted {
+        if let Some(idx) = load_order.iter().position(|r| r.eq(v)) {
+            load_order.remove(idx);
+        }
+    }
+
+    // created keeps only those items that aren't already in load_order
+    created.retain(|v| !load_order.contains(v));
+
+    // and finally we append whatever is left in created to load_order as they're new files
+    load_order.append(created);
+
+    // rewrite the load_order file
+    let mut file = std::fs::File::create(&filename)
+        .expect(&format!("couldn't open {} for writing", filename.display()));
+    load_order.iter().for_each(|v| {
+        let v = v.trim_start_matches("./sql/");
+
+        file.write_all(v.as_bytes())
+            .expect(&format!("failed to write to {}", filename.display()));
+        file.write(&['\n' as u8])
+            .expect(&format!("failed to write to {}", filename.display()));
+    });
+}
+
+fn write_sql_file(f: &DirEntry, statements: Vec<String>) -> (bool, PathBuf) {
     let filename = make_sql_filename(f);
 
     if statements.is_empty() {
@@ -39,6 +93,8 @@ fn write_sql_file(f: &DirEntry, statements: Vec<String>) {
             std::fs::remove_file(&filename)
                 .expect(&format!("unable to delete {}", filename.display()));
         }
+
+        (false, filename)
     } else {
         // write the statements out to the sql file
         let mut file = std::fs::File::create(&filename)
@@ -49,19 +105,25 @@ fn write_sql_file(f: &DirEntry, statements: Vec<String>) {
             file.write(&['\n' as u8])
                 .expect(&format!("failed to write to {}", filename.display()));
         }
+
+        (true, filename)
     }
 }
 
 fn make_sql_filename(f: &DirEntry) -> PathBuf {
-    let mut sql_filename = f.path().display().to_string();
+    PathBuf::from_str(make_sql_filename_from_string(f.path().display().to_string()).as_str())
+        .unwrap()
+}
 
+fn make_sql_filename_from_string(mut sql_filename: String) -> String {
     sql_filename = sql_filename.trim_start_matches("./src/").to_string();
+    sql_filename = sql_filename.trim_start_matches("./sql/").to_string();
     sql_filename = sql_filename.trim_end_matches(".rs").to_string();
     sql_filename = sql_filename.replace("/", "_");
     sql_filename.insert_str(0, "./sql/");
     sql_filename.push_str(".generated.sql");
 
-    PathBuf::from_str(&sql_filename).unwrap()
+    sql_filename
 }
 
 fn find_rs_files(path: &PathBuf, mut files: Vec<DirEntry>) -> Vec<DirEntry> {
