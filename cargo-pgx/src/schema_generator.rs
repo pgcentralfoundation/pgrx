@@ -50,8 +50,8 @@ fn write_sql_file(path: &PathBuf, f: &DirEntry, statements: Vec<String>) {
 fn make_sql_filename(f: &DirEntry) -> String {
     let sql_filename = f.path().display().to_string();
     let mut sql_filename = sql_filename;
-    sql_filename = sql_filename.trim_start_matches("./src/").to_string();
 
+    sql_filename = sql_filename.trim_start_matches("./src/").to_string();
     sql_filename = sql_filename.trim_end_matches(".rs").to_string();
     sql_filename = sql_filename.replace("/", "_");
     sql_filename.insert_str(0, "./sql/");
