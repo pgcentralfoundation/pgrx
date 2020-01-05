@@ -46,6 +46,7 @@ pub(crate) fn install_extension(target: Option<&str>) -> Result<(), std::io::Err
         format!("{}/{}.so", pkgdir, extname),
     )?;
 
+    crate::generate_schema()?;
     copy_sql_files(&extdir, &extname)?;
 
     Ok(())

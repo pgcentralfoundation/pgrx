@@ -80,15 +80,13 @@ fn process_schema_load_order(created: &mut Vec<String>, deleted: &mut Vec<String
 pub(crate) fn read_load_order(filename: &PathBuf) -> Vec<String> {
     let mut load_order = Vec::new();
 
-    match std::fs::File::open(&filename) {
-        Ok(file) => {
-            let reader = std::io::BufReader::new(file);
-            for (_, line) in reader.lines().enumerate() {
-                load_order.push(line.unwrap());
-            }
+    if let Ok(file) = std::fs::File::open(&filename) {
+        let reader = std::io::BufReader::new(file);
+        for (_, line) in reader.lines().enumerate() {
+            load_order.push(line.unwrap());
         }
-        Err(e) => panic!(e),
     }
+
     load_order
 }
 
