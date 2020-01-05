@@ -248,9 +248,9 @@ impl PgMemoryContexts {
     ///
     /// ## Examples
     ///
-    /// ```rust
-    /// use pg_bridge::{PgMemoryContexts, pg_sys, PgBox};
-    ///
+    /// ```rust,no_run
+    /// use pg_bridge::*;
+    /// use pg_bridge_macros::*;
     /// #[pg_guard]
     /// pub fn do_something() -> pg_sys::ItemPointer {
     ///     PgMemoryContexts::TopTransactionContext.switch_to(|| {
@@ -443,8 +443,9 @@ enum WhoAllocated {
 ///
 /// This example allocates a simple Postgres structure, modifies it, and returns it back to Postgres:
 ///
-/// ```rust
-/// use pg_bridge::{pg_sys, PgBox};
+/// ```rust,no_run
+/// use pg_bridge::*;
+/// use pg_bridge_macros::*;
 /// #[pg_guard]
 /// pub fn do_something() -> pg_sys::ItemPointer {
 ///     // postgres-allocate an ItemPointerData structure
@@ -461,8 +462,9 @@ enum WhoAllocated {
 /// A similar example, but instead the `PgBox<T>`'s backing memory gets freed when the box is
 /// dropped:
 ///
-/// ```rust
-/// use pg_bridge::{pg_sys, PgBox};
+/// ```rust,no_run
+/// use pg_bridge::*;
+/// use pg_bridge_macros::*;
 /// #[pg_guard]
 /// pub fn do_something()  {
 ///     // postgres-allocate an ItemPointerData structure
@@ -478,8 +480,9 @@ enum WhoAllocated {
 /// Alternatively, perhaps you want to work with a pointer Postgres gave you as if it were a Rust type,
 /// but it can't be freed on Drop since you don't own it -- Postgres does:
 ///
-/// ```rust
-/// use pg_bridge::{pg_sys, PgBox};
+/// ```rust,no_run
+/// use pg_bridge::*;
+/// use pg_bridge_macros::*;
 /// #[pg_guard]
 /// pub fn do_something()  {
 ///     // open a relation and project it as a pg_sys::Relation
@@ -551,7 +554,7 @@ where
     /// when its owning MemoryContext is deleted by Postgres (likely transaction end).
     ///
     /// ## Examples
-    /// ```rust
+    /// ```rust,no_run
     /// use pg_bridge::{PgBox, pg_sys};
     /// let ctid = PgBox::<pg_sys::ItemPointerData>::alloc();
     /// ```
@@ -570,7 +573,7 @@ where
     /// when its owning MemoryContext is deleted by Postgres (likely transaction end).
     ///
     /// ## Examples
-    /// ```rust
+    /// ```rust,no_run
     /// use pg_bridge::{PgBox, pg_sys};
     /// let ctid = PgBox::<pg_sys::ItemPointerData>::alloc0();
     /// ```
@@ -589,7 +592,7 @@ where
     /// when its owning MemoryContext is deleted by Postgres (likely transaction end).
     ///
     /// ## Examples
-    /// ```rust
+    /// ```rust,no_run
     /// use pg_bridge::{PgBox, pg_sys, PgMemoryContexts};
     /// let ctid = PgBox::<pg_sys::ItemPointerData>::alloc_in_context(PgMemoryContexts::TopTransactionContext);
     /// ```
@@ -610,7 +613,7 @@ where
     /// when its owning MemoryContext is deleted by Postgres (likely transaction end).
     ///
     /// ## Examples
-    /// ```rust
+    /// ```rust,no_run
     /// use pg_bridge::{PgBox, pg_sys, PgMemoryContexts};
     /// let ctid = PgBox::<pg_sys::ItemPointerData>::alloc0_in_context(PgMemoryContexts::TopTransactionContext);
     /// ```
