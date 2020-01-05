@@ -34,6 +34,7 @@ fn write_sql_file(path: &PathBuf, f: &DirEntry, statements: Vec<String>) {
     let sql_filename = make_sql_filename(f);
     let mut file =
         std::fs::File::create(&sql_filename).expect(&format!("failed to open {}", path.display()));
+
     if statements.is_empty() {
         std::fs::remove_file(&sql_filename).expect(&format!("unable to delete {}", sql_filename));
     } else {
