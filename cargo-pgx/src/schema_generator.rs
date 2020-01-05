@@ -7,6 +7,7 @@ use std::ops::Deref;
 use std::path::PathBuf;
 use std::result::Result;
 use std::str::FromStr;
+use syn::export::ToTokens;
 use syn::spanned::Spanned;
 use syn::{FnArg, Item, Pat, ReturnType, Type};
 
@@ -22,6 +23,9 @@ pub(crate) fn generate_schema() -> Result<(), std::io::Error> {
         match result {
             Ok(statements) => {
                 // TODO:  write statements to disk
+                for statement in statements {
+                    println!("{}", statement);
+                }
             }
             Err(e) => {
                 eprintln!("ERROR:  {}", downcast_err(e));
@@ -61,7 +65,19 @@ fn make_create_function_statements(rs_file: &DirEntry) -> Vec<String> {
     let ast = syn::parse_file(file.as_str()).unwrap();
 
     for item in ast.items {
-        if let Item::Fn(func) = item {
+        if let Item::Macro(makro) = item {
+            let name = makro
+                .mac
+                .path
+                .get_ident()
+                .unwrap()
+                .into_token_stream()
+                .to_string();
+
+            if "extension_sql".eq(&name) {
+                sql.push(makro.mac.tokens.to_string());
+            }
+        } else if let Item::Fn(func) = item {
             for att in &func.attrs {
                 if let "# [ pg_extern ]" = &format!("{}", quote! {#att}) as &str {
                     // TODO:  pick out: strict, immutable, volatile, parallel safe
@@ -125,8 +141,6 @@ fn make_create_function_statements(rs_file: &DirEntry) -> Vec<String> {
                     }
 
                     def.push_str(" LANGUAGE c AS 'MODULE_PATHNAME';");
-
-                    println!("{}", def);
                     sql.push(def);
                 }
             }
