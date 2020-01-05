@@ -3,10 +3,12 @@ extern crate clap;
 
 mod crate_template;
 mod extension_installer;
+mod schema_generator;
 
 use clap::App;
 use crate_template::*;
 use extension_installer::*;
+use schema_generator::*;
 use std::path::PathBuf;
 use std::str::FromStr;
 
@@ -27,6 +29,8 @@ fn main() -> std::result::Result<(), std::io::Error> {
         } else if let Some(install) = extension.subcommand_matches("install") {
             let target = install.value_of("target");
             install_extension(target)?;
+        } else if let Some(_schema) = extension.subcommand_matches("schema") {
+            generate_schema()?;
         } else {
             eprintln!("{}", extension.usage());
         }

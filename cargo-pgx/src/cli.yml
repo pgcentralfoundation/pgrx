@@ -19,3 +19,5 @@ subcommands:
                     value_name: DEBUG_OR_RELEASE
                     takes_value: true
                     help: '"debug" or "release" (default is "debug")'
+          - schema:
+              about: generate a schema

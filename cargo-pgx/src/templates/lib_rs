@@ -1,0 +1,9 @@
+use pg_bridge::*;
+use pg_bridge_macros::*;
+
+pg_module_magic!();
+
+#[pg_extern]
+fn hello_{name}() -> &'static str {{
+    "Hello, {name}"
+}}

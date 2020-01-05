@@ -1,0 +1,5 @@
+comment = '{name}:  Created by pg-rs-bridge'
+default_version = '1.0'
+module_pathname = '$libdir/{name}'
+relocatable = true
+superuser = false
