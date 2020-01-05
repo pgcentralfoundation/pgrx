@@ -3,6 +3,7 @@ use quote::quote;
 use rayon::prelude::*;
 use std::any::Any;
 use std::fs::DirEntry;
+use std::io::Write;
 use std::ops::Deref;
 use std::path::PathBuf;
 use std::result::Result;
@@ -17,23 +18,45 @@ pub(crate) fn generate_schema() -> Result<(), std::io::Error> {
 
     std::panic::set_hook(Box::new(|_| {}));
 
-    files.par_iter().for_each(|f| {
+    files.par_iter().for_each(|f: &DirEntry| {
         let result = std::panic::catch_unwind(|| make_create_function_statements(f));
 
         match result {
-            Ok(statements) => {
-                // TODO:  write statements to disk
-                for statement in statements {
-                    println!("{}", statement);
-                }
-            }
-            Err(e) => {
-                eprintln!("ERROR:  {}", downcast_err(e));
-            }
+            Ok(statements) => write_sql_file(&path, f, statements),
+            Err(e) => eprintln!("ERROR:  {}", downcast_err(e)),
         }
     });
 
     Ok(())
+}
+
+fn write_sql_file(path: &PathBuf, f: &DirEntry, statements: Vec<String>) {
+    let sql_filename = make_sql_filename(f);
+    let mut file =
+        std::fs::File::create(&sql_filename).expect(&format!("failed to open {}", path.display()));
+    if statements.is_empty() {
+        std::fs::remove_file(&sql_filename).expect(&format!("unable to delete {}", sql_filename));
+    } else {
+        for statement in statements {
+            file.write_all(statement.as_bytes())
+                .expect(&format!("failed to write to {}", path.display()));
+            file.write(&['\n' as u8])
+                .expect(&format!("failed to write to {}", path.display()));
+        }
+    }
+}
+
+fn make_sql_filename(f: &DirEntry) -> String {
+    let sql_filename = f.path().display().to_string();
+    let mut sql_filename = sql_filename;
+    sql_filename = sql_filename.trim_start_matches("./src/").to_string();
+
+    sql_filename = sql_filename.trim_end_matches(".rs").to_string();
+    sql_filename = sql_filename.replace("/", "_");
+    sql_filename.insert_str(0, "./sql/");
+    sql_filename.push_str(".generated.sql");
+
+    sql_filename
 }
 
 fn find_rs_files(path: &PathBuf, mut files: Vec<DirEntry>) -> Vec<DirEntry> {
@@ -121,11 +144,11 @@ fn make_create_function_statements(rs_file: &DirEntry) -> Vec<String> {
                     if had_none && i == 0 {
                         let span = &func.span();
                         eprintln!(
-                            "WARNING:  Could not generate function for {} at {}:{}:{} -- it contains only pg_sys::FunctionCallData as its only argument",
-                            quote_ident(&func.sig.ident),
+                            "{}:{}:{}: Could not generate function for {} at  -- it contains only pg_sys::FunctionCallData as its only argument",
                             rs_file.path().display(),
                             span.start().line,
-                            span.start().column
+                            span.start().column,
+                            quote_ident(&func.sig.ident),
                         );
                         continue;
                     }
@@ -211,11 +234,11 @@ fn translate_type_string(
         }
         mut unknown => {
             eprintln!(
-                "WARNING:  Unsupported rust type: {} at {}:{}:{}",
-                unknown,
+                "{}:{}:{}: Unrecognized type: {}",
                 filename.path().display(),
                 span.start().line,
-                span.start().column
+                span.start().column,
+                unknown,
             );
 
             unknown = unknown.trim_start_matches("pg_sys :: ");
