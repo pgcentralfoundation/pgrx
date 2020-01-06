@@ -103,6 +103,7 @@ pub use pg_10_11::*;
 
 #[cfg(feature = "pg12")]
 pub use pg_12::*;
+use std::convert::TryInto;
 
 #[inline]
 pub fn pg_getarg_pointer<T>(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> Option<*mut T> {
@@ -128,4 +129,57 @@ pub fn pg_getarg_cstr<'a>(
 #[inline]
 pub fn pg_return_void() -> pg_sys::Datum {
     0 as pg_sys::Datum
+}
+
+/// As `#[pg_extern]` functions are wrapped with a different signature, this
+/// allows you to directly call them.
+///
+/// This mimics the functionality of Postgres' `DirectFunctionCall` macros.  Unlike those macros,
+/// the directly called function is allowed to return a NULL datum.
+///
+/// You'll just need to account for that when using `.try_into()` to convert the datum into a rust
+/// type.
+///
+/// ## Examples
+/// ```rust,no_run
+/// use pg_bridge::*;
+/// use pg_bridge_macros::*;
+///
+/// #[pg_extern]
+/// fn add_two_numbers(a: i32, b: i32) -> i32 {
+///    a + b
+/// }
+///
+/// fn some_func() {
+///     let result = direct_function_call(add_two_numbers, vec!(PgDatum::from(2), PgDatum::from(3)));
+///     let sum:i32 = result.try_into().unwrap();   // don't care to check for NULL datum here
+///     assert_eq!(sum, 5);
+/// }
+/// ```
+pub fn direct_function_call<F: FnOnce(pg_sys::FunctionCallInfo) -> pg_sys::Datum>(
+    func: F,
+    args: Vec<crate::PgDatum<pg_sys::Datum>>,
+) -> crate::PgDatum<pg_sys::Datum> {
+    let mut null_array = [false; 100usize];
+    let mut arg_array = [0 as pg_sys::Datum; 100usize];
+    let nargs = args.len();
+
+    for (i, datum) in args.into_iter().enumerate() {
+        null_array[i] = datum.is_null();
+        arg_array[i] = datum.into_datum();
+    }
+
+    let mut fcid = pg_sys::pg11_specific::FunctionCallInfoData {
+        flinfo: std::ptr::null_mut(),
+        context: std::ptr::null_mut(),
+        resultinfo: std::ptr::null_mut(),
+        fncollation: crate::pg_sys::InvalidOid,
+        isnull: false,
+        nargs: nargs as i16,
+        arg: arg_array,
+        argnull: null_array,
+    };
+
+    let result = func(&mut fcid);
+    crate::PgDatum::new(result, fcid.isnull).try_into().unwrap()
 }
