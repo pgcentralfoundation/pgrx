@@ -5,20 +5,14 @@ use std::process::{Command, Stdio};
 use std::result::Result;
 use std::str::FromStr;
 
-static mut TARGET_DIR: String = String::new();
-
 pub(crate) fn install_extension(target: Option<&str>) -> Result<(), std::io::Error> {
     let is_release = target.unwrap_or("") == "release";
 
-    let pkgdir = get_pkglibdir();
-    let extdir = get_extensiondir();
     let (control_file, extname) = find_control_file()?;
-    unsafe {
-        TARGET_DIR = format!("/tmp/cargo-pgx-build-artifacts/{}", extname);
-    }
+    let target_dir = format!("/tmp/cargo-pgx-build-artifacts/{}", extname);
 
     if &std::env::var("PGX_NO_BUILD").unwrap_or_default() != "true" {
-        build_extension(is_release)?;
+        build_extension(&target_dir, is_release)?;
     } else {
         eprintln!(
             "Skipping build due to $PGX_NO_BUILD=true in {}",
@@ -26,7 +20,9 @@ pub(crate) fn install_extension(target: Option<&str>) -> Result<(), std::io::Err
         );
     }
 
-    let (libpath, libfile) = find_library_file(&extname, is_release)?;
+    let pkgdir = get_pkglibdir();
+    let extdir = get_extensiondir();
+    let (libpath, libfile) = find_library_file(&target_dir, &extname, is_release)?;
 
     if let Err(e) = std::fs::copy(control_file.clone(), format!("{}/{}", extdir, control_file)) {
         panic!(
@@ -48,14 +44,14 @@ pub(crate) fn install_extension(target: Option<&str>) -> Result<(), std::io::Err
     Ok(())
 }
 
-fn build_extension(is_release: bool) -> Result<(), std::io::Error> {
+fn build_extension(target_dir: &str, is_release: bool) -> Result<(), std::io::Error> {
     let mut command = Command::new("cargo");
     command.arg("build");
     if is_release {
         command.arg("--release");
     }
     command.arg("--target-dir");
-    command.arg(unsafe { TARGET_DIR.clone() });
+    command.arg(target_dir);
 
     let mut process = command
         .env_remove("BASE_TARGET_DIR")
@@ -113,11 +109,15 @@ fn copy_sql_files(extdir: &str, extname: &str) -> Result<(), std::io::Error> {
     Ok(())
 }
 
-fn find_library_file(extname: &str, is_release: bool) -> Result<(String, String), std::io::Error> {
+fn find_library_file(
+    target_dir: &str,
+    extname: &str,
+    is_release: bool,
+) -> Result<(String, String), std::io::Error> {
     let path = PathBuf::from(if is_release {
-        format!("{}/release", unsafe { TARGET_DIR.clone() })
+        format!("{}/release", target_dir)
     } else {
-        format!("{}/debug", unsafe { TARGET_DIR.clone() })
+        format!("{}/debug", target_dir)
     });
 
     for f in std::fs::read_dir(&path)? {
