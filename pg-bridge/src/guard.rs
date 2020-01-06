@@ -57,7 +57,7 @@ fn take_panic_location() -> String {
     })
 }
 
-pub fn register_pg_guard_panic_handler() {
+pub(crate) fn register_pg_guard_panic_handler() {
     std::panic::set_hook(Box::new(|info| {
         PANIC_LOCATION.with(|p| {
             let newval = Some(match p.take() {
