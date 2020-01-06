@@ -5,31 +5,15 @@ use std::result::Result;
 use std::str::FromStr;
 
 pub(crate) fn install_extension(target: Option<&str>) -> Result<(), std::io::Error> {
-    let is_release = target.unwrap_or("").eq("release");
+    let is_release = target.unwrap_or("") == "release";
 
-    let mut command = Command::new("cargo");
-    command.arg("build");
-
-    if target.is_some() {
-        match target.unwrap() {
-            "release" => {
-                command.arg("--release");
-            }
-            "debug" => {
-                // noop
-            }
-            _ => panic!("unsupported installation build target, expect 'debug' or 'release'"),
-        }
-    }
-
-    let mut process = command
-        .stdout(Stdio::inherit())
-        .stderr(Stdio::inherit())
-        .spawn()?;
-
-    let status = process.wait()?;
-    if !status.success() {
-        return Err(std::io::Error::from_raw_os_error(status.code().unwrap()));
+    if &std::env::var("PGX_NO_BUILD").unwrap_or_default() != "true" {
+        build_extension(is_release)?;
+    } else {
+        eprintln!(
+            "Skipping build due to $PGX_NO_BUILD=true in {}",
+            std::env::current_dir().unwrap().display()
+        );
     }
 
     let pkgdir = get_pkglibdir();
@@ -49,6 +33,27 @@ pub(crate) fn install_extension(target: Option<&str>) -> Result<(), std::io::Err
     crate::generate_schema()?;
     copy_sql_files(&extdir, &extname)?;
 
+    Ok(())
+}
+
+fn build_extension(is_release: bool) -> Result<(), std::io::Error> {
+    let mut command = Command::new("cargo");
+    command.arg("build");
+    if is_release {
+        command.arg("--release");
+    }
+
+    let mut process = command
+        .env_remove("CARGO_MANIFEST_DIR")
+        .stdout(Stdio::inherit())
+        .stderr(Stdio::inherit())
+        .spawn()?;
+    let status = process.wait()?;
+    if !status.success() {
+        return Err(std::io::Error::from_raw_os_error(status.code().unwrap()));
+    }
+
+    println!();
     Ok(())
 }
 
@@ -101,12 +106,24 @@ fn copy_sql_files(extdir: &str, extname: &str) -> Result<(), std::io::Error> {
 }
 
 fn find_library_file(extname: &str, is_release: bool) -> Result<(String, String), std::io::Error> {
+    let manifest_dir = std::env::var("CARGO_MANIFEST_DIR").unwrap_or(".".to_string());
     let path = if is_release {
-        "target/release"
+        format!("{}/target/release", manifest_dir)
     } else {
-        "target/debug"
+        format!("{}/target/debug", manifest_dir)
     };
-    for f in std::fs::read_dir(path)? {
+
+    let path = PathBuf::from_str(&path).unwrap();
+
+    if !path.is_dir() {
+        eprintln!(
+            "build directory {}: Not found.  Try setting CARGO_MANIFEST_DIR",
+            path.display()
+        );
+        std::process::exit(1);
+    }
+
+    for f in std::fs::read_dir(&path)? {
         if f.is_ok() {
             let f = f.unwrap();
             let filename = f.file_name().into_string().unwrap();
@@ -117,7 +134,7 @@ fn find_library_file(extname: &str, is_release: bool) -> Result<(String, String)
                     || filename.ends_with(".dylib")
                     || filename.ends_with(".dll"))
             {
-                return Ok((path.to_string(), filename));
+                return Ok((path.display().to_string(), filename));
             }
         }
     }
@@ -173,10 +190,14 @@ fn get_extensiondir() -> String {
 }
 
 fn run_pg_config(arg: &str) -> String {
-    let output = Command::new("pg_config")
-        .arg(arg)
-        .output()
-        .expect("couldn't run 'pg_config'");
+    let pg_config = std::env::var("PG_CONFIG").unwrap_or("pg_config".to_string());
+    let output = Command::new(pg_config).arg(arg).output();
 
-    String::from_utf8(output.stdout).unwrap().trim().to_string()
+    match output {
+        Ok(output) => String::from_utf8(output.stdout).unwrap().trim().to_string(),
+
+        Err(e) => {
+            panic!("Problem running pg_config: {}", e);
+        }
+    }
 }

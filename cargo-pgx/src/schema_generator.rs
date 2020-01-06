@@ -1,7 +1,6 @@
 use proc_macro2::Ident;
 use quote::quote;
 use rayon::prelude::*;
-use std::any::Any;
 use std::collections::HashSet;
 use std::fs::DirEntry;
 use std::io::{BufRead, Write};
@@ -18,30 +17,22 @@ pub(crate) fn generate_schema() -> Result<(), std::io::Error> {
     let path = PathBuf::from_str("./src").unwrap();
     let files = find_rs_files(&path, Vec::new());
 
-    std::panic::set_hook(Box::new(|_| {}));
     let mut created = Mutex::new(Vec::new());
     let mut deleted = Mutex::new(Vec::new());
     files.par_iter().for_each(|f: &DirEntry| {
-        let result = std::panic::catch_unwind(|| make_create_function_statements(f));
+        let statemets = make_create_function_statements(f);
+        let (did_write, filename) = write_sql_file(f, statemets);
 
-        match result {
-            Ok(statements) => {
-                let (did_write, filename) = write_sql_file(f, statements);
+        // strip the leading ./sql/ from the filenames we generated
+        let mut filename = filename.display().to_string();
+        filename = filename.trim_start_matches("./sql/").to_string();
 
-                // strip the leading ./sql/ from the filenames we generated
-                let mut filename = filename.display().to_string();
-                filename = filename.trim_start_matches("./sql/").to_string();
-
-                if did_write {
-                    created.lock().unwrap().push(filename);
-                } else {
-                    deleted.lock().unwrap().push(filename);
-                }
-            }
-            Err(e) => eprintln!("ERROR:  {}", downcast_err(e)),
+        if did_write {
+            created.lock().unwrap().push(filename);
+        } else {
+            deleted.lock().unwrap().push(filename);
         }
     });
-    let _ = std::panic::take_hook();
 
     process_schema_load_order(created.get_mut().unwrap(), deleted.get_mut().unwrap());
 
@@ -286,7 +277,7 @@ fn make_create_function_statements(rs_file: &DirEntry) -> Vec<String> {
                     } {
                         Some((return_type, is_option)) => {
                             if is_option {
-                                panic!("#{pg_extern] functions cannot return Optino<T>");
+                                panic!("#{pg_extern] functions cannot return Option<T>");
                             }
                             def.push_str(&format!(" RETURNS {}", return_type))
                         }
@@ -416,16 +407,5 @@ fn extract_type(ty: &Box<Type>) -> String {
             panic!("No type found inside Option");
         }
         _ => panic!("No type found inside Option"),
-    }
-}
-
-fn downcast_err(e: Box<dyn Any + Send>) -> String {
-    if let Some(s) = e.downcast_ref::<&str>() {
-        s.to_string()
-    } else if let Some(s) = e.downcast_ref::<String>() {
-        s.to_string()
-    } else {
-        // not a type we understand, so use a generic string
-        "Box<Any>".to_string()
     }
 }
