@@ -44,7 +44,7 @@ fn build_extension(is_release: bool) -> Result<(), std::io::Error> {
     }
 
     let mut process = command
-        .env_remove("CARGO_MANIFEST_DIR")
+        .env_remove("BASE_TARGET_DIR")
         .stdout(Stdio::inherit())
         .stderr(Stdio::inherit())
         .spawn()?;
@@ -106,7 +106,7 @@ fn copy_sql_files(extdir: &str, extname: &str) -> Result<(), std::io::Error> {
 }
 
 fn find_library_file(extname: &str, is_release: bool) -> Result<(String, String), std::io::Error> {
-    let manifest_dir = std::env::var("CARGO_MANIFEST_DIR").unwrap_or(".".to_string());
+    let manifest_dir = std::env::var("BASE_TARGET_DIR").unwrap_or(".".to_string());
     let path = if is_release {
         format!("{}/target/release", manifest_dir)
     } else {
@@ -117,7 +117,7 @@ fn find_library_file(extname: &str, is_release: bool) -> Result<(String, String)
 
     if !path.is_dir() {
         eprintln!(
-            "build directory {}: Not found.  Try setting CARGO_MANIFEST_DIR",
+            "Not found: {}\n   Try setting BASE_TARGET_DIR",
             path.display()
         );
         std::process::exit(1);

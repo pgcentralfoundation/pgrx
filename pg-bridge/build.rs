@@ -86,7 +86,7 @@ fn main() -> Result<(), std::io::Error> {
 
     let manifest_dir = std::env::var("CARGO_MANIFEST_DIR").unwrap();
     let out_dir = std::env::var("OUT_DIR").unwrap();
-    let cwd = PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").unwrap());
+    let cwd = PathBuf::from(&manifest_dir);
     let pg_git_repo_url = "git://git.postgresql.org/git/postgresql.git";
     let build_rs = PathBuf::from("build.rs");
     let shim_dir = make_shim_path(&manifest_dir);
