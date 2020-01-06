@@ -154,7 +154,7 @@ fn start_pg() {
     // add a shutdown hook so we can terminate it when the test framework exits
     add_shutdown_hook(move || unsafe {
         libc::printf(
-            std::ffi::CString::new("terminating Postgres\n".bold().blue().to_string())
+            std::ffi::CString::new("Stopping Postgres\n\n".bold().blue().to_string())
                 .unwrap()
                 .as_ptr(),
         );
