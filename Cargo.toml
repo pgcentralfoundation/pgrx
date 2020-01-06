@@ -2,6 +2,6 @@
 members = [
     "pg-bridge",
     "pg-bridge-macros",
-    "bindings-diff",
-    "cargo-pgx"
+
+    "cargo-pgx",
 ]
