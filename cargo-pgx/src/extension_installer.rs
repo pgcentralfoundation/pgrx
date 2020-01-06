@@ -1,11 +1,21 @@
+use colored::*;
 use std::io::{BufRead, Write};
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
 use std::result::Result;
 use std::str::FromStr;
 
+static mut TARGET_DIR: String = String::new();
+
 pub(crate) fn install_extension(target: Option<&str>) -> Result<(), std::io::Error> {
     let is_release = target.unwrap_or("") == "release";
+
+    let pkgdir = get_pkglibdir();
+    let extdir = get_extensiondir();
+    let (control_file, extname) = find_control_file()?;
+    unsafe {
+        TARGET_DIR = format!("/tmp/cargo-pgx-build-artifacts/{}", extname);
+    }
 
     if &std::env::var("PGX_NO_BUILD").unwrap_or_default() != "true" {
         build_extension(is_release)?;
@@ -16,9 +26,6 @@ pub(crate) fn install_extension(target: Option<&str>) -> Result<(), std::io::Err
         );
     }
 
-    let pkgdir = get_pkglibdir();
-    let extdir = get_extensiondir();
-    let (control_file, extname) = find_control_file()?;
     let (libpath, libfile) = find_library_file(&extname, is_release)?;
 
     println!("copying control file ({}) to: {}", control_file, extdir);
@@ -42,6 +49,8 @@ fn build_extension(is_release: bool) -> Result<(), std::io::Error> {
     if is_release {
         command.arg("--release");
     }
+    command.arg("--target-dir");
+    command.arg(unsafe { TARGET_DIR.clone() });
 
     let mut process = command
         .env_remove("BASE_TARGET_DIR")
@@ -106,22 +115,11 @@ fn copy_sql_files(extdir: &str, extname: &str) -> Result<(), std::io::Error> {
 }
 
 fn find_library_file(extname: &str, is_release: bool) -> Result<(String, String), std::io::Error> {
-    let manifest_dir = std::env::var("BASE_TARGET_DIR").unwrap_or(".".to_string());
-    let path = if is_release {
-        format!("{}/target/release", manifest_dir)
+    let path = PathBuf::from(if is_release {
+        format!("{}/release", unsafe { TARGET_DIR.clone() })
     } else {
-        format!("{}/target/debug", manifest_dir)
-    };
-
-    let path = PathBuf::from_str(&path).unwrap();
-
-    if !path.is_dir() {
-        eprintln!(
-            "Not found: {}\n   Try setting BASE_TARGET_DIR",
-            path.display()
-        );
-        std::process::exit(1);
-    }
+        format!("{}/debug", unsafe { TARGET_DIR.clone() })
+    });
 
     for f in std::fs::read_dir(&path)? {
         if f.is_ok() {
@@ -197,7 +195,8 @@ fn run_pg_config(arg: &str) -> String {
         Ok(output) => String::from_utf8(output.stdout).unwrap().trim().to_string(),
 
         Err(e) => {
-            panic!("Problem running pg_config: {}", e);
+            eprintln!("{}: Problem running pg_config: {}", "error".bold().red(), e);
+            std::process::exit(1);
         }
     }
 }

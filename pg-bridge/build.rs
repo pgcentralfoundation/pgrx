@@ -80,8 +80,6 @@ fn main() -> Result<(), std::io::Error> {
     build_deps::rerun_if_changed_paths("include/*").unwrap();
     build_deps::rerun_if_changed_paths("../pg-bridge-macros/src/lib.rs").unwrap();
     build_deps::rerun_if_changed_paths("../pg-bridge-macros/src/rewriter.rs").unwrap();
-    build_deps::rerun_if_changed_paths("../bindings-diff/*").unwrap();
-    build_deps::rerun_if_changed_paths("../bindings-diff/src/*").unwrap();
     build_deps::rerun_if_changed_paths("../bridge-c-shim/bridge-c-shim.c").unwrap();
 
     let manifest_dir = std::env::var("CARGO_MANIFEST_DIR").unwrap();
