@@ -745,3 +745,166 @@ impl<'a> TryFrom<&PgDatum<pg_sys::Datum>> for &'a pg_sys::varlena {
         }
     }
 }
+
+impl TryFrom<PgDatum<pg_sys::Datum>> for i8 {
+    type Error = &'static str;
+
+    #[inline]
+    fn try_from(value: PgDatum<pg_sys::Datum>) -> Result<Self, Self::Error> {
+        match value.as_pg_datum() {
+            Some(datum) => Ok(datum as i8),
+            None => Err("Datum is NULL"),
+        }
+    }
+}
+
+impl TryFrom<PgDatum<pg_sys::Datum>> for i16 {
+    type Error = &'static str;
+
+    #[inline]
+    fn try_from(value: PgDatum<pg_sys::Datum>) -> Result<Self, Self::Error> {
+        match value.as_pg_datum() {
+            Some(datum) => Ok(datum as i16),
+            None => Err("Datum is NULL"),
+        }
+    }
+}
+
+impl TryFrom<PgDatum<pg_sys::Datum>> for i32 {
+    type Error = &'static str;
+
+    #[inline]
+    fn try_from(value: PgDatum<pg_sys::Datum>) -> Result<Self, Self::Error> {
+        match value.as_pg_datum() {
+            Some(datum) => Ok(datum as i32),
+            None => Err("Datum is NULL"),
+        }
+    }
+}
+
+impl TryFrom<PgDatum<pg_sys::Datum>> for i64 {
+    type Error = &'static str;
+
+    #[inline]
+    fn try_from(value: PgDatum<pg_sys::Datum>) -> Result<Self, Self::Error> {
+        match value.as_pg_datum() {
+            Some(datum) => Ok(datum as i64),
+            None => Err("Datum is NULL"),
+        }
+    }
+}
+
+impl TryFrom<PgDatum<pg_sys::Datum>> for u8 {
+    type Error = &'static str;
+
+    #[inline]
+    fn try_from(value: PgDatum<pg_sys::Datum>) -> Result<Self, Self::Error> {
+        match value.as_pg_datum() {
+            Some(datum) => Ok(datum as u8),
+            None => Err("Datum is NULL"),
+        }
+    }
+}
+
+impl TryFrom<PgDatum<pg_sys::Datum>> for u16 {
+    type Error = &'static str;
+
+    #[inline]
+    fn try_from(value: PgDatum<pg_sys::Datum>) -> Result<Self, Self::Error> {
+        match value.as_pg_datum() {
+            Some(datum) => Ok(datum as u16),
+            None => Err("Datum is NULL"),
+        }
+    }
+}
+
+impl TryFrom<PgDatum<pg_sys::Datum>> for u32 {
+    type Error = &'static str;
+
+    #[inline]
+    fn try_from(value: PgDatum<pg_sys::Datum>) -> Result<Self, Self::Error> {
+        match value.as_pg_datum() {
+            Some(datum) => Ok(datum as u32),
+            None => Err("Datum is NULL"),
+        }
+    }
+}
+
+impl TryFrom<PgDatum<pg_sys::Datum>> for u64 {
+    type Error = &'static str;
+
+    #[inline]
+    fn try_from(value: PgDatum<pg_sys::Datum>) -> Result<Self, Self::Error> {
+        match value.as_pg_datum() {
+            Some(datum) => Ok(datum as u64),
+            None => Err("Datum is NULL"),
+        }
+    }
+}
+
+impl TryFrom<PgDatum<pg_sys::Datum>> for f32 {
+    type Error = &'static str;
+
+    #[inline]
+    fn try_from(value: PgDatum<pg_sys::Datum>) -> Result<Self, Self::Error> {
+        match value.as_pg_datum() {
+            Some(datum) => Ok(f32::from_bits(datum as u32)),
+            None => Err("Datum is NULL"),
+        }
+    }
+}
+
+impl TryFrom<PgDatum<pg_sys::Datum>> for f64 {
+    type Error = &'static str;
+
+    #[inline]
+    fn try_from(value: PgDatum<pg_sys::Datum>) -> Result<Self, Self::Error> {
+        match value.as_pg_datum() {
+            Some(datum) => Ok(f64::from_bits(datum as u64)),
+            None => Err("Datum is NULL"),
+        }
+    }
+}
+
+impl TryFrom<PgDatum<pg_sys::Datum>> for bool {
+    type Error = &'static str;
+
+    #[inline]
+    fn try_from(value: PgDatum<pg_sys::Datum>) -> Result<Self, Self::Error> {
+        match value.as_pg_datum() {
+            Some(datum) => Ok(datum != 0),
+            None => Err("Datum is NULL"),
+        }
+    }
+}
+
+impl TryFrom<PgDatum<pg_sys::Datum>> for char {
+    type Error = &'static str;
+
+    #[inline]
+    fn try_from(value: PgDatum<pg_sys::Datum>) -> Result<Self, Self::Error> {
+        match value.as_pg_datum() {
+            Some(datum) => Ok(datum as u8 as char),
+            None => Err("Datum is NULL"),
+        }
+    }
+}
+
+//
+// TryFrom trait implementations for pointer types
+//
+
+impl<'a> TryFrom<PgDatum<pg_sys::Datum>> for &'a pg_sys::varlena {
+    type Error = &'static str;
+
+    #[inline]
+    fn try_from(value: PgDatum<pg_sys::Datum>) -> Result<Self, Self::Error> {
+        match value.as_pg_datum() {
+            Some(datum) => unsafe {
+                let t = datum as *const pg_sys::varlena;
+                Ok(t.as_ref().unwrap())
+            },
+            None => Err("Datum is NULL"),
+        }
+    }
+}
