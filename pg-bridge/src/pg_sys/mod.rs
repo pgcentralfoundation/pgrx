@@ -46,6 +46,7 @@ pub use v12::*;
 /// item declarations we want to add to all versions
 mod all_versions {
     use memoffset::*;
+    use std::str::FromStr;
 
     /// this comes from `postgres_ext.h`
     pub const InvalidOid: super::Oid = 0;
@@ -69,6 +70,11 @@ mod all_versions {
     pub fn get_pg_major_version_string() -> &'static str {
         let mver = std::ffi::CStr::from_bytes_with_nul(super::PG_MAJORVERSION).unwrap();
         mver.to_str().unwrap()
+    }
+
+    #[inline]
+    pub fn get_pg_major_version_num() -> u16 {
+        u16::from_str(super::get_pg_major_version_string()).unwrap()
     }
 }
 
