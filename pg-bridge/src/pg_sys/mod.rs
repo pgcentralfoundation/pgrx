@@ -64,6 +64,12 @@ mod all_versions {
     pub fn VARHDRSZ_SHORT() -> usize {
         offset_of!(super::varattrib_1b, va_data)
     }
+
+    #[inline]
+    pub fn get_pg_major_version_string() -> &'static str {
+        let mver = std::ffi::CStr::from_bytes_with_nul(super::PG_MAJORVERSION).unwrap();
+        mver.to_str().unwrap()
+    }
 }
 
 #[cfg(feature = "pg10")]
