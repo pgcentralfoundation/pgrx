@@ -28,14 +28,19 @@ pub(crate) fn install_extension(target: Option<&str>) -> Result<(), std::io::Err
 
     let (libpath, libfile) = find_library_file(&extname, is_release)?;
 
-    println!("copying control file ({}) to: {}", control_file, extdir);
-    std::fs::copy(control_file.clone(), format!("{}/{}", extdir, control_file))?;
+    if let Err(e) = std::fs::copy(control_file.clone(), format!("{}/{}", extdir, control_file)) {
+        panic!(
+            "failed copying control file ({}) to {}:  {}",
+            control_file, extdir, e
+        );
+    }
 
-    println!("copying library ({}) to: {}", libfile, pkgdir);
-    std::fs::copy(
+    if let Err(e) = std::fs::copy(
         format!("{}/{}", libpath, libfile),
         format!("{}/{}.so", pkgdir, extname),
-    )?;
+    ) {
+        panic!("failed copying library ({}) to {}:  {}", libfile, pkgdir, e);
+    }
 
     crate::generate_schema()?;
     copy_sql_files(&extdir, &extname)?;
@@ -61,8 +66,6 @@ fn build_extension(is_release: bool) -> Result<(), std::io::Error> {
     if !status.success() {
         return Err(std::io::Error::from_raw_os_error(status.code().unwrap()));
     }
-
-    println!();
     Ok(())
 }
 
@@ -79,11 +82,6 @@ fn copy_sql_files(extdir: &str, extname: &str) -> Result<(), std::io::Error> {
         let file = PathBuf::from_str(&format!("sql/{}", file)).unwrap();
         let contents = std::fs::read_to_string(&file).unwrap();
 
-        println!(
-            "writing {} to {}",
-            file.display(),
-            target_filename.display()
-        );
         sql.write_all("--\n".as_bytes())
             .expect("couldn't write version SQL file");
         sql.write_all(format!("-- {}\n", file.display()).as_bytes())
@@ -105,8 +103,9 @@ fn copy_sql_files(extdir: &str, extname: &str) -> Result<(), std::io::Error> {
             if filename.starts_with(&format!("{}--", extname)) && filename.ends_with(".sql") {
                 let dest = format!("{}/{}", extdir, filename);
 
-                println!("copying SQL: {} to: {}", filename, dest);
-                std::fs::copy(f.path(), dest)?;
+                if let Err(e) = std::fs::copy(f.path(), &dest) {
+                    panic!("failed copying SQL {} to {}:  {}", filename, dest, e)
+                }
             }
         }
     }
