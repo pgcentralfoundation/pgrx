@@ -18,7 +18,6 @@ lazy_static! {
     static ref TEST_MUTEX: Mutex<SetupState> = Mutex::new(SetupState { installed: false });
     static ref SHUTDOWN_HOOKS: Mutex<Vec<Box<dyn Fn() + Send>>> = Mutex::new(Vec::new());
 }
-const TEST_DB_NAME: &str = "pg_bridge_tests";
 
 fn register_shutdown_hook() {
     extern "C" fn run_shutdown_hooks() {
@@ -36,23 +35,49 @@ where
     SHUTDOWN_HOOKS.lock().unwrap().push(Box::new(func));
 }
 
+#[macro_export]
+macro_rules! testmsg {
+    ($($arg:tt)*) => (
+        std::thread::spawn(|| {
+            println!(
+                "{}",
+                format!($($arg)*).cyan()
+            )
+        }).join().unwrap();
+    )
+}
+
 pub fn run_test<F: FnOnce(pg_sys::FunctionCallInfo) -> pg_sys::Datum>(_test_func: F) {
     match TEST_MUTEX.lock() {
         Ok(mut state) => {
             if !state.installed {
                 register_shutdown_hook();
+
                 install_extension();
                 initdb();
+
                 start_pg();
                 dropdb();
                 createdb();
+                create_extension();
+
                 state.installed = true;
             }
         }
         Err(_) => panic!("failed due to poison error"),
     }
 
-    println!("Calling: {}", std::any::type_name::<F>());
+    testmsg!("Calling {}", std::any::type_name::<F>());
+}
+
+pub fn client() -> postgres::Client {
+    postgres::Config::new()
+        .host(&get_pg_host())
+        .port(get_pg_port())
+        .user(&get_pg_user())
+        .dbname(&get_pg_dbname())
+        .connect(postgres::NoTls)
+        .unwrap()
 }
 
 fn install_extension() {
@@ -100,7 +125,7 @@ fn start_pg() {
         .arg("-h")
         .arg(get_pg_host())
         .arg("-p")
-        .arg(get_pg_port())
+        .arg(get_pg_port().to_string())
         .arg("-i")
         .stdout(Stdio::inherit())
         .stderr(Stdio::piped())
@@ -167,8 +192,8 @@ fn dropdb() {
         .arg("-h")
         .arg(get_pg_host())
         .arg("-p")
-        .arg(get_pg_port())
-        .arg(TEST_DB_NAME)
+        .arg(get_pg_port().to_string())
+        .arg(get_pg_dbname())
         .env("PATH", get_pgbin_envpath())
         .output()
         .unwrap();
@@ -178,7 +203,7 @@ fn dropdb() {
         let stderr = String::from_utf8_lossy(output.stderr.as_slice());
         if !stderr.contains(&format!(
             "ERROR:  database \"{}\" does not exist",
-            TEST_DB_NAME
+            get_pg_dbname()
         )) {
             // got some error we didn't expect
             eprintln!("{}", String::from_utf8_lossy(output.stdout.as_slice()));
@@ -193,8 +218,8 @@ fn createdb() {
         .arg("-h")
         .arg(get_pg_host())
         .arg("-p")
-        .arg(get_pg_port())
-        .arg(TEST_DB_NAME)
+        .arg(get_pg_port().to_string())
+        .arg(get_pg_dbname())
         .stdout(Stdio::inherit())
         .stderr(Stdio::inherit())
         .env("PATH", get_pgbin_envpath())
@@ -206,10 +231,20 @@ fn createdb() {
     }
 }
 
-fn get_pg_path() -> String {
-    let package_name = std::env::var("CARGO_PKG_NAME")
+fn create_extension() {
+    client()
+        .simple_query(&format!("CREATE EXTENSION {};", get_extension_name()))
+        .unwrap();
+}
+
+fn get_extension_name() -> String {
+    std::env::var("CARGO_PKG_NAME")
         .unwrap_or_else(|_| panic!("CARGO_PKG_NAME is not an envvar"))
-        .replace("-", "_");
+        .replace("-", "_")
+}
+
+fn get_pg_path() -> String {
+    let package_name = get_extension_name();
 
     format!(
         "/tmp/cargo-pgx-build-artifacts/{}/REL_{}_STABLE/install/",
@@ -230,6 +265,14 @@ fn get_pg_host() -> String {
     "localhost".to_string()
 }
 
-fn get_pg_port() -> String {
-    format!("88{}", pg_sys::get_pg_major_version_string())
+fn get_pg_port() -> u16 {
+    8800 + pg_sys::get_pg_major_version_num()
+}
+
+fn get_pg_dbname() -> String {
+    "pg_bridge_tests".to_string()
+}
+
+fn get_pg_user() -> String {
+    std::env::var("USER").unwrap_or_else(|_| panic!("USER is not an envvar"))
 }
