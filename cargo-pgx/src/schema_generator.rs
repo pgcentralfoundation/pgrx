@@ -195,8 +195,19 @@ fn make_create_function_statements(rs_file: &DirEntry) -> Vec<String> {
     let file = std::fs::read_to_string(rs_file.path()).unwrap();
     let ast = syn::parse_file(file.as_str()).unwrap();
 
-    for item in ast.items {
-        if let Item::Macro(makro) = item {
+    walk_items(rs_file, &mut sql, ast.items);
+
+    sql
+}
+
+fn walk_items(rs_file: &DirEntry, sql: &mut Vec<String>, items: Vec<Item>) {
+    for item in items {
+        if let Item::Mod(modd) = item {
+            match modd.content {
+                Some((_, items)) => walk_items(rs_file, sql, items),
+                None => {}
+            }
+        } else if let Item::Macro(makro) = item {
             let name = makro
                 .mac
                 .path
@@ -254,12 +265,12 @@ fn make_create_function_statements(rs_file: &DirEntry) -> Vec<String> {
                     if had_none && i == 0 {
                         let span = &func.span();
                         eprintln!(
-                            "{}:{}:{}: Could not generate function for {} at  -- it contains only pg_sys::FunctionCallData as its only argument",
-                            rs_file.path().display(),
-                            span.start().line,
-                            span.start().column,
-                            quote_ident(&func.sig.ident),
-                        );
+                        "{}:{}:{}: Could not generate function for {} at  -- it contains only pg_sys::FunctionCallData as its only argument",
+                        rs_file.path().display(),
+                        span.start().line,
+                        span.start().column,
+                        quote_ident(&func.sig.ident),
+                    );
                         continue;
                     }
 
@@ -304,8 +315,6 @@ fn make_create_function_statements(rs_file: &DirEntry) -> Vec<String> {
             }
         }
     }
-
-    sql
 }
 
 fn quote_ident(ident: &Ident) -> String {
