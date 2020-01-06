@@ -2,6 +2,7 @@
 members = [
     "pg-bridge",
     "pg-bridge-macros",
+    "pg-bridge-tests",
 
     "cargo-pgx",
 ]

@@ -1,0 +1,8 @@
+##
+## This is necessary on the top-level so that we can build the pg-bridge-tests/ package, as a library, as
+## part of the top-level Cargo.toml workspace manifest
+##
+
+[build]
+# Postgres symbols won't ve available until runtime
+rustflags = ["-C", "link-args=-Wl,-undefined,dynamic_lookup"]
