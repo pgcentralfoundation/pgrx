@@ -67,7 +67,7 @@ macro_rules! pg_module_magic {
 
             // go ahead and register our panic handler since Postgres
             // calls this function first
-            pg_bridge::register_pg_guard_panic_handler();
+            pg_bridge::initialize();
 
             // return the magic
             &my_magic
