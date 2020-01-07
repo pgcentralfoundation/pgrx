@@ -291,10 +291,7 @@ fn walk_items(rs_file: &DirEntry, sql: &mut Vec<String>, items: Vec<Item>) {
                         ReturnType::Default => Some(("void".to_string(), false)),
                         ReturnType::Type(_, ty) => translate_type(rs_file, ty),
                     } {
-                        Some((return_type, is_option)) => {
-                            if is_option {
-                                panic!("#{pg_extern] functions cannot return Option<T>");
-                            }
+                        Some((return_type, _is_option)) => {
                             def.push_str(&format!(" RETURNS {}", return_type))
                         }
                         None => panic!("could not determine return type"),
@@ -367,10 +364,12 @@ fn translate_type_string(
     ty: &Box<Type>,
 ) -> Option<(String, bool)> {
     match rust_type.as_str() {
+        "i8" => Some(("smallint".to_string(), false)), // convert i8 types into smallints as Postgres doesn't have a 1byte-sized type
         "i16" => Some(("smallint".to_string(), false)),
         "i32" => Some(("int".to_string(), false)),
         "i64" => Some(("bigint".to_string(), false)),
         "bool" => Some(("bool".to_string(), false)),
+        "char" => Some(("char".to_string(), false)),
         "f32" => Some(("real".to_string(), false)),
         "f64" => Some(("double precision".to_string(), false)),
         "& str" | "String" => Some(("text".to_string(), false)),
