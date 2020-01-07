@@ -1,1 +1,2 @@
 tests.generated.sql
+fcinfo_tests.generated.sql
