@@ -9,10 +9,8 @@ pub(crate) fn install_extension(target: Option<&str>) -> Result<(), std::io::Err
     let is_release = target.unwrap_or("") == "release";
 
     let (control_file, extname) = find_control_file()?;
-    let target_dir = format!("/tmp/cargo-pgx-build-artifacts/{}", extname);
-
     if &std::env::var("PGX_NO_BUILD").unwrap_or_default() != "true" {
-        build_extension(&target_dir, is_release)?;
+        build_extension(is_release)?;
     } else {
         eprintln!(
             "Skipping build due to $PGX_NO_BUILD=true in {}",
@@ -20,9 +18,18 @@ pub(crate) fn install_extension(target: Option<&str>) -> Result<(), std::io::Err
         );
     }
 
+    let mut target_dir = PathBuf::from(format!("{}", std::env::var("CARGO_MANIFEST_DIR").unwrap()));
+
+    // TODO:  HACK:  FIX THIS
+    if target_dir.ends_with("pg-bridge-tests") {
+        target_dir.pop();
+    }
+    target_dir.push("target");
+
     let pkgdir = get_pkglibdir();
     let extdir = get_extensiondir();
-    let (libpath, libfile) = find_library_file(&target_dir, &extname, is_release)?;
+    let (libpath, libfile) =
+        find_library_file(&target_dir.display().to_string(), &extname, is_release)?;
 
     if let Err(e) = std::fs::copy(control_file.clone(), format!("{}/{}", extdir, control_file)) {
         panic!(
@@ -44,15 +51,13 @@ pub(crate) fn install_extension(target: Option<&str>) -> Result<(), std::io::Err
     Ok(())
 }
 
-fn build_extension(target_dir: &str, is_release: bool) -> Result<(), std::io::Error> {
+fn build_extension(is_release: bool) -> Result<(), std::io::Error> {
     let features = std::env::var("PGX_BUILD_FLAGS").unwrap_or_default();
     let mut command = Command::new("cargo");
     command.arg("build");
     if is_release {
         command.arg("--release");
     }
-    command.arg("--target-dir");
-    command.arg(target_dir);
 
     for arg in features.split_ascii_whitespace() {
         command.arg(arg);
