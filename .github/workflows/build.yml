@@ -37,32 +37,32 @@ jobs:
       uses: actions/cache@v1
       with:
         path: ~/.cargo
-        key: ${{ runner.os }}-cargo-v2
+        key: ${{ runner.os }}-cargo-v3
     - name: cargo build cache
       uses: actions/cache@v1
       with:
         path: target/debug
-        key: ${{ runner.os }}-cargo-debug-build-v2
+        key: ${{ runner.os }}-cargo-debug-build-v3
     - name: postgres 10 git/configure/make cache
       uses: actions/cache@v1
       with:
         path: target/REL_10_STABLE
-        key: ${{ runner.os }}-postgres-REL_10_STABLE-v2
+        key: ${{ runner.os }}-postgres-REL_10_STABLE-v3
     - name: postgres 11 git/configure/make cache
       uses: actions/cache@v1
       with:
         path: target/REL_11_STABLE
-        key: ${{ runner.os }}-postgres-REL_11_STABLE-v2
+        key: ${{ runner.os }}-postgres-REL_11_STABLE-v3
     - name: postgres 12 git/configure/make cache
       uses: actions/cache@v1
       with:
         path: target/REL_12_STABLE
-        key: ${{ runner.os }}-postgres-REL_12_STABLE-v2
+        key: ${{ runner.os }}-postgres-REL_12_STABLE-v3
 
     # build our code
     - name: install cargo pgx
       run: cd cargo-pgx && cargo install --path . --force
-    - name: cargo check
+    - name: cargo build
       run: cargo build --features pg${{ matrix.version }}
     - name: cargo test
       run: cargo test --features pg${{ matrix.version }} --all

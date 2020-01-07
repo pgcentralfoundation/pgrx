@@ -6,9 +6,16 @@ edition = "2018"
 [lib]
 crate-type = ["cdylib"]
 
+[features]
+default = ["pg-bridge/pg11", "pg-bridge-tests/pg11"]
+pg10 = ["pg-bridge/pg10", "pg-bridge-tests/pg10"]
+pg11 = ["pg-bridge/pg11", "pg-bridge-tests/pg11"]
+pg12 = ["pg-bridge/pg12", "pg-bridge-tests/pg12"]
+
 [dependencies]
-pg-bridge = {{ path = "../pg-rs-bridge/pg-bridge/", features = ["pg11"], default-features = false }}
+pg-bridge = {{ path = "../pg-rs-bridge/pg-bridge/", default-features = false }}
 pg-bridge-macros = {{ path = "../pg-rs-bridge/pg-bridge-macros" }}
+pg-bridge-tests = {{ path = "../pg-rs-bridge/pg-bridge-tests", default-features = false }}
 
 [profile.dev]
 panic = "unwind"

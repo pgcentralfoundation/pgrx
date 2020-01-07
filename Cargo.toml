@@ -12,11 +12,12 @@ members = [
 ]
 
 [features]
-default = []
-pg10 = ["pg-bridge/pg10"]
-pg11 = ["pg-bridge/pg11"]
-pg12 = ["pg-bridge/pg12"]
+default = ["pg-bridge/pg11", "pg-bridge-tests/pg11"]
+pg10 = ["pg-bridge/pg10", "pg-bridge-tests/pg10"]
+pg11 = ["pg-bridge/pg11", "pg-bridge-tests/pg11"]
+pg12 = ["pg-bridge/pg12", "pg-bridge-tests/pg12"]
 
 [dependencies]
 pg-bridge = { path = "pg-bridge", default-features = false }
 pg-bridge-macros = { path = "pg-bridge-macros" }
+pg-bridge-tests = { path = "pg-bridge-tests", default-features = false }

@@ -109,7 +109,7 @@ fn install_extension() {
         .env(
             "PGX_BUILD_FLAGS",
             format!(
-                "--features pg{}",
+                "--features pg{} --no-default-features",
                 pg_sys::get_pg_major_version_string().to_string()
             ),
         )

@@ -7,3 +7,18 @@ pg_module_magic!();
 fn hello_{name}() -> &'static str {{
     "Hello, {name}"
 }}
+
+mod tests {{
+    use pg_bridge::*;
+    use pg_bridge_macros::*;
+
+    #[test]
+    #[ignore]
+    fn make_idea_happy() {{ }}
+
+    #[pg_test]
+    fn test_hello_{name}() {{
+        assert_eq!("Hello, {name}", crate::hello_{name}());
+    }}
+
+}}
