@@ -37,32 +37,30 @@ jobs:
       uses: actions/cache@v1
       with:
         path: ~/.cargo
-        key: ${{ runner.os }}-cargo-v3
+        key: ${{ runner.os }}-cargo-v4
     - name: cargo build cache
       uses: actions/cache@v1
       with:
         path: target/debug
-        key: ${{ runner.os }}-cargo-debug-build-v3
+        key: ${{ runner.os }}-cargo-debug-build-v4
     - name: postgres 10 git/configure/make cache
       uses: actions/cache@v1
       with:
-        path: target/REL_10_STABLE
-        key: ${{ runner.os }}-postgres-REL_10_STABLE-v3
+        path: /tmp/pg-rs-bridge-build/REL_10_STABLE
+        key: ${{ runner.os }}-postgres-REL_10_STABLE-v4
     - name: postgres 11 git/configure/make cache
       uses: actions/cache@v1
       with:
-        path: target/REL_11_STABLE
-        key: ${{ runner.os }}-postgres-REL_11_STABLE-v3
+        path: /tmp/pg-rs-bridge-build/REL_11_STABLE
+        key: ${{ runner.os }}-postgres-REL_11_STABLE-v4
     - name: postgres 12 git/configure/make cache
       uses: actions/cache@v1
       with:
-        path: target/REL_12_STABLE
-        key: ${{ runner.os }}-postgres-REL_12_STABLE-v3
+        path: /tmp/pg-rs-bridge-build/REL_12_STABLE
+        key: ${{ runner.os }}-postgres-REL_12_STABLE-v4
 
-    # build our code
+    # test our code
     - name: install cargo pgx
       run: cd cargo-pgx && cargo install --path . --force
-    - name: cargo build
-      run: cargo build --features pg${{ matrix.version }}
     - name: cargo test
-      run: cargo test --features pg${{ matrix.version }} --all
+      run: cargo test --all --features pg${{ matrix.version }} --no-default-features

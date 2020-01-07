@@ -44,18 +44,8 @@ impl bindgen::callbacks::ParseCallbacks for IgnoredMacros {
     }
 }
 
-fn make_git_repo_path(out_dir: &str, branch_name: &str) -> PathBuf {
-    let mut pg_git_path = PathBuf::from(out_dir);
-    // backup 4 directories
-    pg_git_path.pop();
-    pg_git_path.pop();
-    pg_git_path.pop();
-    pg_git_path.pop();
-
-    // and a new dir named "pg_git_repo"
-    pg_git_path.push(branch_name);
-
-    pg_git_path
+fn make_git_repo_path(branch_name: &str) -> PathBuf {
+    PathBuf::from(format!("/tmp/pg-rs-bridge-build/{}", branch_name))
 }
 
 fn make_include_path(git_repo_path: &PathBuf) -> PathBuf {
@@ -83,7 +73,6 @@ fn main() -> Result<(), std::io::Error> {
     build_deps::rerun_if_changed_paths("../bridge-c-shim/bridge-c-shim.c").unwrap();
 
     let manifest_dir = std::env::var("CARGO_MANIFEST_DIR").unwrap();
-    let out_dir = std::env::var("OUT_DIR").unwrap();
     let cwd = PathBuf::from(&manifest_dir);
     let pg_git_repo_url = "git://git.postgresql.org/git/postgresql.git";
     let build_rs = PathBuf::from("build.rs");
@@ -101,7 +90,7 @@ fn main() -> Result<(), std::io::Error> {
         let version = v.0;
         let branch_name = v.1;
         let port_no = u16::from_str(v.2).unwrap();
-        let pg_git_path = make_git_repo_path(&out_dir, branch_name);
+        let pg_git_path = make_git_repo_path(branch_name);
         let include_path = make_include_path(&pg_git_path);
         let output_rs = PathBuf::from(format!("src/pg_sys/{}_bindings.rs", version));
         let include_h = PathBuf::from(format!("include/{}.h", version));

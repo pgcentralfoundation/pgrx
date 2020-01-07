@@ -272,11 +272,8 @@ fn get_extension_name() -> String {
 }
 
 fn get_pg_path() -> String {
-    let package_name = get_extension_name();
-
     format!(
-        "/tmp/cargo-pgx-build-artifacts/{}/REL_{}_STABLE/install/",
-        package_name,
+        "/tmp/pg-rs-bridge-build/REL_{}_STABLE/install/",
         pg_sys::get_pg_major_version_string(),
     )
 }

@@ -12,7 +12,7 @@ members = [
 ]
 
 [features]
-default = ["pg-bridge/pg11", "pg-bridge-tests/pg11"]
+default = ["pg11"]
 pg10 = ["pg-bridge/pg10", "pg-bridge-tests/pg10"]
 pg11 = ["pg-bridge/pg11", "pg-bridge-tests/pg11"]
 pg12 = ["pg-bridge/pg12", "pg-bridge-tests/pg12"]
