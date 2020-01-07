@@ -103,6 +103,7 @@ fn install_extension() {
         .stderr(Stdio::inherit())
         .env("PATH", get_pgbin_envpath())
         .env("PGX_TEST_MODE", "1")
+        .env("PGX_MANIFEST_DIR", std::env::var("PWD").unwrap())
         .env(
             "PGX_BUILD_FLAGS",
             format!(

@@ -18,14 +18,7 @@ pub(crate) fn install_extension(target: Option<&str>) -> Result<(), std::io::Err
         );
     }
 
-    let mut target_dir = PathBuf::from(format!("{}", std::env::var("CARGO_MANIFEST_DIR").unwrap()));
-
-    // TODO:  HACK:  FIX THIS
-    if target_dir.ends_with("pg-bridge-tests") {
-        target_dir.pop();
-    }
-    target_dir.push("target");
-
+    let target_dir = get_target_dir();
     let pkgdir = get_pkglibdir();
     let extdir = get_extensiondir();
     let (libpath, libfile) =
@@ -64,7 +57,6 @@ fn build_extension(is_release: bool) -> Result<(), std::io::Error> {
     }
 
     let mut process = command
-        .env_remove("BASE_TARGET_DIR")
         .stdout(Stdio::inherit())
         .stderr(Stdio::inherit())
         .spawn()?;
@@ -183,6 +175,16 @@ fn get_version() -> String {
     }
 
     panic!("couldn't determine version number");
+}
+
+fn get_target_dir() -> PathBuf {
+    let mut target_dir = PathBuf::from(format!(
+        "{}",
+        std::env::var("PGX_MANIFEST_DIR")
+            .unwrap_or_else(|_| panic!("PGX_MANIFEST_DIR not an envvar"))
+    ));
+    target_dir.push("target");
+    target_dir
 }
 
 fn get_pkglibdir() -> String {
