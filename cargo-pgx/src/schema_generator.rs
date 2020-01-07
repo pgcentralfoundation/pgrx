@@ -157,6 +157,7 @@ enum ExternArgs {
     ParallelSafe,
     ParallelUnsafe,
     ParallelRestricted,
+    Error(String),
 }
 
 fn parse_extern_args(att: &Attribute) -> HashSet<ExternArgs> {
@@ -184,6 +185,29 @@ fn parse_extern_args(att: &Attribute) -> HashSet<ExternArgs> {
                 "parallel_safe" => args.insert(ExternArgs::ParallelSafe),
                 "parallel_unsafe" => args.insert(ExternArgs::ParallelUnsafe),
                 "parallel_restricted" => args.insert(ExternArgs::ParallelRestricted),
+                error if att.starts_with("error") => {
+                    // error = "message"
+                    let re = regex::Regex::new(r#"("[^"\\]*(?:\\.[^"\\]*)*")"#).unwrap();
+
+                    let message = match re.captures(error) {
+                        Some(captures) => match captures.get(0) {
+                            Some(mtch) => {
+                                let message = mtch.as_str();
+                                let message = message.trim_start_matches('"');
+                                let message = message.trim_end_matches('"');
+                                unescape::unescape(message)
+                                    .expect("improperly escaped error message")
+                            }
+                            None => {
+                                panic!("No matches found in: {}", error);
+                            }
+                        },
+                        None => panic!("/{}/ is an invalid error= attribute", error),
+                    };
+
+                    args.insert(ExternArgs::Error(message))
+                }
+
                 _ => false,
             };
         }
@@ -304,10 +328,11 @@ fn walk_items(rs_file: &DirEntry, sql: &mut Vec<String>, items: Vec<Item>) {
                             ExternArgs::Strict => def.push_str(" STRICT"),
                             ExternArgs::Stable => def.push_str(" STABLE"),
                             ExternArgs::Volatile => def.push_str(" VOLATILE"),
-                            ExternArgs::Raw => { /* no op */ }
+                            ExternArgs::Raw => { /* noop */ }
                             ExternArgs::ParallelSafe => def.push_str(" PARALLEL SAFE"),
                             ExternArgs::ParallelUnsafe => def.push_str(" PARALLEL UNSAFE"),
                             ExternArgs::ParallelRestricted => def.push_str(" PARALLEL RESTRICTED"),
+                            ExternArgs::Error(_) => { /* noop */ }
                         }
                     }
 

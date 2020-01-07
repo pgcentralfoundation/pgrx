@@ -6,9 +6,12 @@ edition = "2018"
 description = "Cargo Postgres extension manager"
 
 [dependencies]
+pg-bridge-macros = { path = "../pg-bridge-macros" }
 clap = {version = "2.33.0", features = ["yaml"]}
 syn = { version = "1.0.5", features = ["extra-traits", "full", "fold", "parsing"] }
 quote = "1.0.2"
 proc-macro2 = { version = "1.0.6", features = ["span-locations"] }
 rayon = "1.3.0"
 colored = "1.9.1"
+regex = "1.3.1"
+unescape = "0.1.0"
