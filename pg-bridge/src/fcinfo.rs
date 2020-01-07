@@ -187,7 +187,7 @@ fn make_function_call_info(
     arg_array: [usize; 100],
     null_array: [bool; 100],
 ) -> pg_sys::FunctionCallInfo {
-    pg_sys::pg10_specific::FunctionCallInfoData {
+    crate::PgBox::new_from_struct(pg_sys::pg10_specific::FunctionCallInfoData {
         flinfo: std::ptr::null_mut(),
         context: std::ptr::null_mut(),
         resultinfo: std::ptr::null_mut(),
@@ -196,7 +196,8 @@ fn make_function_call_info(
         nargs: nargs as i16,
         arg: arg_array,
         argnull: null_array,
-    }
+    })
+    .to_pg()
 }
 
 #[cfg(feature = "pg11")]
