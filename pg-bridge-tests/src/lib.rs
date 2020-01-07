@@ -9,7 +9,7 @@ use postgres::error::DbError;
 use std::io::{BufRead, BufReader};
 use std::path::PathBuf;
 
-mod tests;
+mod fcinfo_tests;
 
 struct SetupState {
     pub installed: bool,
@@ -66,7 +66,7 @@ pub fn run_test<F: FnOnce(pg_sys::FunctionCallInfo) -> pg_sys::Datum>(_test_func
                 state.installed = true;
             }
         }
-        Err(_) => panic!("failed due to poison error"),
+        Err(e) => panic!("failed due to poison error: {:?}", e),
     }
 
     let funcname = std::any::type_name::<F>();

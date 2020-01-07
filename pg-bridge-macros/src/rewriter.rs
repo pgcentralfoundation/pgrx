@@ -4,7 +4,7 @@ use proc_macro2::Ident;
 use quote::{quote, quote_spanned};
 use std::ops::Deref;
 use std::str::FromStr;
-use syn::export::TokenStream2;
+use syn::export::{Span, TokenStream2};
 use syn::spanned::Spanned;
 use syn::{
     FnArg, ForeignItem, ForeignItemFn, ItemFn, ItemForeignMod, Pat, ReturnType, Signature, Type,
@@ -87,6 +87,14 @@ impl PgGuardRewriter {
                 func_span,
             );
 
+            let returns_void = rewritten_return_type
+                .to_string()
+                .contains("pg_return_void()");
+            let result_var_name = if returns_void {
+                Ident::new("_", Span::call_site())
+            } else {
+                Ident::new("result", Span::call_site())
+            };
             quote_spanned! {func_span=>
                 #func
 
@@ -94,7 +102,7 @@ impl PgGuardRewriter {
                 #[allow(unused_variables)]
                 #vis fn #func_name_wrapper(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
 
-                    let result = pg_bridge::guard( || {
+                    let #result_var_name = pg_bridge::guard( || {
                         #rewritten_args
 
                         #func_name(#arg_list)
@@ -327,7 +335,7 @@ impl FunctionSignatureRewriter {
                                     None
                                 } else {
                                     Some(pg_bridge::pg_getarg::#option_type(fcinfo, #i).try_into()
-                                        .expect(&format!("argument '{}'", stringify! { #name })))
+                                        .unwrap_or_else(|_| panic!("argument '{}'", stringify! { #name })))
                                 };
                             }
                         } else if type_matches(type_, "pg_sys :: FunctionCallInfo") {
@@ -343,7 +351,7 @@ impl FunctionSignatureRewriter {
                             quote_spanned! {ident.span()=>
                                 let #name: #type_ =
                                     pg_bridge::pg_getarg::<#type_>(fcinfo, #i).try_into()
-                                        .expect(&format!("argument '{}'", stringify! { #name }));
+                                        .unwrap_or_else(|_| panic!("argument '{}'", stringify! { #name }));
                             }
                         };
 
