@@ -174,7 +174,20 @@ pub fn direct_function_call<F: FnOnce(pg_sys::FunctionCallInfo) -> pg_sys::Datum
         arg_array[i] = datum.into_datum();
     }
 
-    let mut fcid = pg_sys::pg11_specific::FunctionCallInfoData {
+    let fcid = make_function_call_info(nargs, arg_array, null_array);
+    let result = func(fcid);
+    crate::PgDatum::new(result, unsafe { fcid.as_ref() }.unwrap().isnull)
+        .try_into()
+        .unwrap()
+}
+
+#[cfg(feature = "pg10")]
+fn make_function_call_info(
+    nargs: usize,
+    arg_array: [usize; 100],
+    null_array: [bool; 100],
+) -> pg_sys::FunctionCallInfo {
+    pg_sys::pg10_specific::FunctionCallInfoData {
         flinfo: std::ptr::null_mut(),
         context: std::ptr::null_mut(),
         resultinfo: std::ptr::null_mut(),
@@ -183,8 +196,51 @@ pub fn direct_function_call<F: FnOnce(pg_sys::FunctionCallInfo) -> pg_sys::Datum
         nargs: nargs as i16,
         arg: arg_array,
         argnull: null_array,
+    }
+}
+
+#[cfg(feature = "pg11")]
+fn make_function_call_info(
+    nargs: usize,
+    arg_array: [usize; 100],
+    null_array: [bool; 100],
+) -> pg_sys::FunctionCallInfo {
+    crate::PgBox::new_from_struct(pg_sys::pg11_specific::FunctionCallInfoData {
+        flinfo: std::ptr::null_mut(),
+        context: std::ptr::null_mut(),
+        resultinfo: std::ptr::null_mut(),
+        fncollation: crate::pg_sys::InvalidOid,
+        isnull: false,
+        nargs: nargs as i16,
+        arg: arg_array,
+        argnull: null_array,
+    })
+    .to_pg()
+}
+
+#[cfg(feature = "pg12")]
+fn make_function_call_info(
+    nargs: usize,
+    arg_array: [usize; 100],
+    null_array: [bool; 100],
+) -> pg_sys::FunctionCallInfo {
+    let fcid: *mut pg_sys::pg12_specific::FunctionCallInfoBaseData = unsafe {
+        pg_sys::palloc0(
+            std::mem::size_of::<pg_sys::pg12_specific::FunctionCallInfoBaseData>()
+                + nargs * std::mem::size_of::<pg_sys::pg12_specific::NullableDatum>(),
+        ) as *mut pg_sys::pg12_specific::FunctionCallInfoBaseData
     };
 
-    let result = func(&mut fcid);
-    crate::PgDatum::new(result, fcid.isnull).try_into().unwrap()
+    let fcid = unsafe { fcid.as_mut() }.unwrap();
+    fcid.nargs = nargs as i16;
+
+    let slice = unsafe { fcid.args.as_mut_slice(nargs) };
+    for i in 0..nargs {
+        slice[i] = pg_sys::pg12_specific::NullableDatum {
+            value: arg_array[i],
+            isnull: null_array[i],
+        }
+    }
+
+    fcid
 }
