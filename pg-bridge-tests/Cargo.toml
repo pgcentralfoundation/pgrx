@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2018"
 
 [lib]
-crate-type = ["cdylib"]
+crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 pg-bridge = { path = "../pg-bridge", features = ["pg11"], default-features = false }

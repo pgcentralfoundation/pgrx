@@ -5,6 +5,7 @@ use std::sync::Mutex;
 
 use colored::*;
 use pg_bridge::*;
+use postgres::error::DbError;
 use std::io::{BufRead, BufReader};
 use std::path::PathBuf;
 
@@ -35,6 +36,7 @@ where
     SHUTDOWN_HOOKS.lock().unwrap().push(Box::new(func));
 }
 
+pub use colored;
 #[macro_export]
 macro_rules! testmsg {
     ($($arg:tt)*) => (
@@ -71,10 +73,19 @@ pub fn run_test<F: FnOnce(pg_sys::FunctionCallInfo) -> pg_sys::Datum>(_test_func
     let funcname = &funcname[funcname.rfind(':').unwrap() + 1..];
     let funcname = funcname.trim_end_matches("_wrapper");
 
-    testmsg!("Calling: {}", funcname);
-    let result = client()
-        .simple_query(&format!("SELECT {}();", funcname))
-        .unwrap();
+    if let Err(e) = client().simple_query(&format!("SELECT {}();", funcname)) {
+        let cause = e.into_source();
+        match cause {
+            Some(e) => {
+                if let Some(dberror) = e.downcast_ref::<DbError>() {
+                    panic!("{}", dberror.message());
+                } else {
+                    panic!(e)
+                }
+            }
+            None => {}
+        }
+    }
 }
 
 pub fn client() -> postgres::Client {

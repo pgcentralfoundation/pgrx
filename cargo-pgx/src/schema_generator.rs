@@ -386,13 +386,15 @@ fn translate_type_string(
             Some((rc.unwrap().0, true))
         }
         mut unknown => {
-            eprintln!(
-                "{}:{}:{}: Unrecognized type: {}",
-                filename.path().display(),
-                span.start().line,
-                span.start().column,
-                unknown,
-            );
+            if std::env::var("DEBUG").is_ok() {
+                eprintln!(
+                    "{}:{}:{}: Unrecognized type: {}",
+                    filename.path().display(),
+                    span.start().line,
+                    span.start().column,
+                    unknown,
+                );
+            }
 
             unknown = unknown.trim_start_matches("pg_sys :: ");
             Some((unknown.to_string(), false))

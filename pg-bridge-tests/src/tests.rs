@@ -17,6 +17,11 @@ mod tests {
 
     #[pg_test]
     fn test_add_two_numbers() {
-        assert_eq!(super::add_two_numbers(2, 3), 5);
+        assert_eq!(super::add_two_numbers(2, 3), 4);
+    }
+
+    #[test]
+    fn test_it() {
+        assert_eq!(5, 4);
     }
 }

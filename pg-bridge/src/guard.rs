@@ -153,7 +153,7 @@ where
                     // translate it into an elog(ERROR), including the code location that caused
                     // the panic!()
                     Ok(message) => {
-                        elog_error(&format!("caught Rust panic at {}: {}", location, message));
+                        elog_error(&format!("{}, {}", message, location));
                         unreachable!("elog_error() failed at depth==0 with message: {}", message);
                     }
 
