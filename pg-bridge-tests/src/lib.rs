@@ -148,7 +148,7 @@ fn initdb() {
 fn modify_postgresql_conf(pgdata: PathBuf) {
     let mut postgresql_conf = std::fs::OpenOptions::new()
         .append(true)
-        .open(format!("{}/ostgresql.conf", pgdata.display()))
+        .open(format!("{}/postgresql.conf", pgdata.display()))
         .expect("couldn't open postgresql.conf");
     postgresql_conf
         .write_all("log_line_prefix='[%m] [%p]: '\n".as_bytes())
