@@ -134,11 +134,16 @@ pub fn pg_return_void() -> pg_sys::Datum {
 /// As `#[pg_extern]` functions are wrapped with a different signature, this
 /// allows you to directly call them.
 ///
-/// This mimics the functionality of Postgres' `DirectFunctionCall` macros.  Unlike those macros,
-/// the directly called function is allowed to return a NULL datum.
+/// This mimics the functionality of Postgres' `DirectFunctionCall` macros, allowing you to call
+/// Rust-defined functions.  Unlike Postgres' macros, the directly called function is allowed to
+/// return a NULL datum.
 ///
 /// You'll just need to account for that when using `.try_into()` to convert the datum into a rust
 /// type.
+///
+/// ## Note
+///
+/// You must suffix the function name with `_wrapper`, as shown in the example below.
 ///
 /// ## Examples
 /// ```rust,no_run
@@ -151,7 +156,7 @@ pub fn pg_return_void() -> pg_sys::Datum {
 /// }
 ///
 /// fn some_func() {
-///     let result = direct_function_call(add_two_numbers, vec!(PgDatum::from(2), PgDatum::from(3)));
+///     let result = direct_function_call(add_two_numbers_wrapper, vec!(PgDatum::from(2), PgDatum::from(3)));
 ///     let sum:i32 = result.try_into().unwrap();   // don't care to check for NULL datum here
 ///     assert_eq!(sum, 5);
 /// }

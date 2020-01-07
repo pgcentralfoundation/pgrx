@@ -38,7 +38,7 @@ where
 #[macro_export]
 macro_rules! testmsg {
     ($($arg:tt)*) => (
-        std::thread::spawn(|| {
+        std::thread::spawn(move || {
             println!(
                 "{}",
                 format!($($arg)*).cyan()
@@ -67,7 +67,14 @@ pub fn run_test<F: FnOnce(pg_sys::FunctionCallInfo) -> pg_sys::Datum>(_test_func
         Err(_) => panic!("failed due to poison error"),
     }
 
-    testmsg!("Calling {}", std::any::type_name::<F>());
+    let funcname = std::any::type_name::<F>();
+    let funcname = &funcname[funcname.rfind(':').unwrap() + 1..];
+    let funcname = funcname.trim_end_matches("_wrapper");
+
+    testmsg!("Calling: {}", funcname);
+    let result = client()
+        .simple_query(&format!("SELECT {}();", funcname))
+        .unwrap();
 }
 
 pub fn client() -> postgres::Client {
@@ -87,6 +94,7 @@ fn install_extension() {
         .stdout(Stdio::inherit())
         .stderr(Stdio::inherit())
         .env("PATH", get_pgbin_envpath())
+        .env("PGX_TEST_MODE", "1")
         .spawn()
         .unwrap();
 

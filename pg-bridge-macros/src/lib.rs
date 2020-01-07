@@ -3,7 +3,7 @@ extern crate proc_macro;
 mod rewriter;
 
 use proc_macro::TokenStream;
-use proc_macro2::Span;
+use proc_macro2::{Ident, Span};
 use quote::{quote, quote_spanned};
 use rewriter::*;
 use syn::spanned::Spanned;
@@ -29,6 +29,39 @@ pub fn pg_guard(_attr: TokenStream, item: TokenStream) -> TokenStream {
             panic!("#[pg_guard] can only be applied to extern \"C\" blocks and top-level functions")
         }
     }
+}
+
+#[proc_macro_attribute]
+pub fn pg_test(attr: TokenStream, item: TokenStream) -> TokenStream {
+    let mut stream = proc_macro2::TokenStream::new();
+
+    stream.extend(proc_macro2::TokenStream::from(pg_extern(
+        attr.clone(),
+        item.clone(),
+    )));
+
+    let ast = parse_macro_input!(item as syn::Item);
+    match ast {
+        Item::Fn(func) => {
+            let func_name = Ident::new(
+                &format!("{}_wrapper", func.sig.ident.to_string()),
+                func.span(),
+            );
+            let test_func_name =
+                Ident::new(&format!("{}_test", func.sig.ident.to_string()), func.span());
+
+            stream.extend(quote! {
+                #[test]
+                fn #test_func_name() {
+                    pg_bridge_tests::run_test(#func_name)
+                }
+            });
+        }
+
+        _ => panic!("#[pg_test] can only be applied to top-level functions"),
+    }
+
+    stream.into()
 }
 
 #[proc_macro_attribute]
@@ -63,7 +96,10 @@ pub fn pg_extern(attr: TokenStream, item: TokenStream) -> TokenStream {
 }
 
 fn rewrite_item_fn(mut func: ItemFn, is_raw: bool, no_guard: bool) -> proc_macro2::TokenStream {
-    let finfo_name = syn::Ident::new(&format!("pg_finfo_{}", func.sig.ident), Span::call_site());
+    let finfo_name = syn::Ident::new(
+        &format!("pg_finfo_{}_wrapper", func.sig.ident),
+        Span::call_site(),
+    );
 
     // use the PgGuardRewriter to go ahead and wrap the function here, rather than applying
     // a #[pg_guard] macro to the original function.  This is necessary so that compiler
@@ -82,7 +118,6 @@ fn rewrite_item_fn(mut func: ItemFn, is_raw: bool, no_guard: bool) -> proc_macro
             &V1_API
         }
 
-        #[no_mangle]
         #rewritten_func
     }
 

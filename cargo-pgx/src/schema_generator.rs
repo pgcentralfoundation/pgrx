@@ -166,6 +166,7 @@ fn parse_extern_args(att: &Attribute) -> HashSet<ExternArgs> {
 
     if line.contains('(') {
         line = line.trim_start_matches("# [ pg_extern").trim();
+        line = line.trim_start_matches("# [ pg_test").trim();
         line = line.trim_start_matches("(").trim();
         line = line.trim_end_matches(") ]").trim();
         line = line.trim_end_matches("]").trim();
@@ -222,9 +223,13 @@ fn walk_items(rs_file: &DirEntry, sql: &mut Vec<String>, items: Vec<Item>) {
         } else if let Item::Fn(func) = item {
             for att in &func.attrs {
                 let att_desc = att.clone().into_token_stream().to_string();
-                if att_desc.starts_with("# [ pg_extern") {
+                let is_test_mode = std::env::var("PGX_TEST_MODE").is_ok();
+                if att_desc.starts_with("# [ pg_extern")
+                    || (att_desc.starts_with("# [ pg_test") && is_test_mode)
+                {
                     let mut extern_args = parse_extern_args(att);
                     let mut def = String::new();
+                    let exported_func_name = format!("{}_wrapper", func.sig.ident.to_string());
 
                     def.push_str(&format!(
                         "CREATE OR REPLACE FUNCTION {name}",
@@ -309,7 +314,10 @@ fn walk_items(rs_file: &DirEntry, sql: &mut Vec<String>, items: Vec<Item>) {
                         }
                     }
 
-                    def.push_str(" LANGUAGE c AS 'MODULE_PATHNAME';");
+                    def.push_str(&format!(
+                        " LANGUAGE c AS 'MODULE_PATHNAME', '{}';",
+                        exported_func_name
+                    ));
                     sql.push(def);
                 }
             }

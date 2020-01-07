@@ -60,13 +60,14 @@ impl PgGuardRewriter {
         func.vis = Visibility::Inherited;
 
         let arg_list = PgGuardRewriter::build_arg_list(&func.sig);
-        let func_name = PgGuardRewriter::build_func_name(&func.sig);
+        let func_name = &func.sig.ident;
         let func_span = func.span().clone();
         let rewritten_args = self.rewrite_args(func.clone(), is_raw);
         let rewritten_return_type = self.rewrite_return_type(func.clone());
 
         if no_guard {
             quote_spanned! {func_span=>
+                #[no_mangle]
                 #[allow(unused_variables)]
                 #vis fn #func_name(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
                     #func
@@ -81,10 +82,17 @@ impl PgGuardRewriter {
                 }
             }
         } else {
+            let func_name_wrapper = Ident::new(
+                &format!("{}_wrapper", &func.sig.ident.to_string()),
+                func_span,
+            );
+
             quote_spanned! {func_span=>
+                #func
+
+                #[no_mangle]
                 #[allow(unused_variables)]
-                #vis fn #func_name(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-                    #func
+                #vis fn #func_name_wrapper(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
 
                     let result = pg_bridge::guard( || {
                         #rewritten_args
