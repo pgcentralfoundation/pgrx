@@ -76,6 +76,12 @@ mod all_versions {
     pub fn get_pg_major_version_num() -> u16 {
         u16::from_str(super::get_pg_major_version_string()).unwrap()
     }
+
+    #[inline]
+    pub fn get_pg_version_string() -> &'static str {
+        let ver = std::ffi::CStr::from_bytes_with_nul(super::PG_VERSION_STR).unwrap();
+        ver.to_str().unwrap()
+    }
 }
 
 // for when no features are enabled -- at least we'll get the common stuff exported

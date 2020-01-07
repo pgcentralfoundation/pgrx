@@ -6,10 +6,12 @@ use std::sync::Mutex;
 use colored::*;
 use pg_bridge::*;
 use postgres::error::DbError;
-use std::io::{BufRead, BufReader};
+use std::io::{BufRead, BufReader, Write};
 use std::path::PathBuf;
 
 mod fcinfo_tests;
+
+pub use colored;
 
 struct SetupState {
     pub installed: bool,
@@ -36,7 +38,6 @@ where
     SHUTDOWN_HOOKS.lock().unwrap().push(Box::new(func));
 }
 
-pub use colored;
 #[macro_export]
 macro_rules! testmsg {
     ($($arg:tt)*) => (
@@ -140,10 +141,23 @@ fn initdb() {
     if !status.success() {
         panic!("initdb failed");
     }
+
+    modify_postgresql_conf(pgdata);
+}
+
+fn modify_postgresql_conf(pgdata: PathBuf) {
+    let mut postgresql_conf = std::fs::OpenOptions::new()
+        .append(true)
+        .open(format!("{}/ostgresql.conf", pgdata.display()))
+        .expect("couldn't open postgresql.conf");
+    postgresql_conf
+        .write_all("log_line_prefix='[%m] [%p]: '\n".as_bytes())
+        .expect("couldn't append log_line_prefix");
 }
 
 fn start_pg() {
-    let mut child = Command::new("postmaster")
+    let mut command = Command::new("postmaster");
+    command
         .arg("-D")
         .arg(get_pgdata_path().to_str().unwrap())
         .arg("-h")
@@ -153,15 +167,24 @@ fn start_pg() {
         .arg("-i")
         .stdout(Stdio::inherit())
         .stderr(Stdio::piped())
-        .env("PATH", get_pgbin_envpath())
-        .spawn()
-        .expect("postmaster didn't spawn");
+        .env("PATH", get_pgbin_envpath());
+
+    let cmd_string = format!("{:?}", command);
+
+    let mut child = command.spawn().expect("postmaster didn't spawn");
 
     // monitor the processes stderr in the background
     // and send notify the main thread when it's ready to start
     let (sender, receiver) = std::sync::mpsc::channel();
     std::thread::spawn(move || {
         let pid = child.id();
+
+        eprintln!(
+            "{}, pid={}",
+            cmd_string.bold().blue(),
+            pid.to_string().yellow()
+        );
+        eprintln!("{}", pg_sys::get_pg_version_string().bold().purple());
 
         // wait for the database to say its ready to start up
         let reader = BufReader::new(
@@ -175,12 +198,20 @@ fn start_pg() {
                 Ok(line) => {
                     if line.contains("database system is ready to accept connections") {
                         // Postgres says it's ready to go
-                        eprintln!("{}", line.bold().blue());
                         sender.send(pid).unwrap();
-                        break;
-                    } else if !line.contains("LOG: ") {
-                        // detected some unexpected output
+                    }
+
+                    // colorize Postgres' log output
+                    if line.contains("INFO: ") {
+                        eprintln!("{}", line.cyan());
+                    } else if line.contains("WARN: ") {
+                        eprintln!("{}", line.bold().yellow());
+                    } else if line.contains("ERROR: ") {
                         eprintln!("{}", line.bold().red());
+                    } else if line.contains("statement: ") || line.contains("duration: ") {
+                        eprintln!("{}", line.bold().blue());
+                    } else if line.contains("LOG: ") {
+                        eprintln!("{}", line.dimmed().white());
                     } else {
                         eprintln!("{}", line.bold().purple());
                     }
@@ -189,6 +220,7 @@ fn start_pg() {
             }
         }
 
+        // wait for Postgres to really finish
         match child.try_wait() {
             Ok(status) => {
                 if let Some(_status) = status {
@@ -258,6 +290,20 @@ fn createdb() {
 fn create_extension() {
     client()
         .simple_query(&format!("CREATE EXTENSION {};", get_extension_name()))
+        .unwrap();
+
+    client()
+        .simple_query(&format!(
+            "ALTER DATABASE {} SET log_duration TO false;",
+            get_pg_dbname()
+        ))
+        .unwrap();
+
+    client()
+        .simple_query(&format!(
+            "ALTER DATABASE {} SET log_statement TO 'all';",
+            get_pg_dbname()
+        ))
         .unwrap();
 }
 

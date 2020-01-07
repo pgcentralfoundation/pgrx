@@ -47,17 +47,17 @@ jobs:
       uses: actions/cache@v1
       with:
         path: /tmp/pg-rs-bridge-build/REL_10_STABLE
-        key: ${{ runner.os }}-postgres-REL_10_STABLE-v4
+        key: ${{ runner.os }}-postgres-REL_10_STABLE-v5
     - name: postgres 11 git/configure/make cache
       uses: actions/cache@v1
       with:
         path: /tmp/pg-rs-bridge-build/REL_11_STABLE
-        key: ${{ runner.os }}-postgres-REL_11_STABLE-v4
+        key: ${{ runner.os }}-postgres-REL_11_STABLE-v5
     - name: postgres 12 git/configure/make cache
       uses: actions/cache@v1
       with:
         path: /tmp/pg-rs-bridge-build/REL_12_STABLE
-        key: ${{ runner.os }}-postgres-REL_12_STABLE-v4
+        key: ${{ runner.os }}-postgres-REL_12_STABLE-v5
 
     # test our code
     - name: install cargo pgx
