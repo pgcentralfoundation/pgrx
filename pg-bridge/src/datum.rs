@@ -121,6 +121,13 @@ impl<'a> From<&'a str> for PgDatum<pg_sys::Datum> {
     }
 }
 
+impl From<&String> for PgDatum<pg_sys::Datum> {
+    #[inline]
+    fn from(val: &String) -> Self {
+        PgDatum::new(rust_str_to_text_p(val.as_str()) as pg_sys::Datum, false)
+    }
+}
+
 impl From<i8> for PgDatum<pg_sys::Datum> {
     #[inline]
     fn from(val: i8) -> Self {
@@ -532,6 +539,36 @@ impl<'a> TryFrom<PgDatum<pg_sys::Datum>> for &'a str {
             Some(datum) => {
                 let t = datum as *const pg_sys::varlena;
                 Ok(unsafe { text_to_rust_str_unchecked(t) })
+            }
+            None => Err("Datum is NULL"),
+        }
+    }
+}
+
+impl TryFrom<PgDatum<pg_sys::Datum>> for String {
+    type Error = &'static str;
+
+    #[inline]
+    fn try_from(value: PgDatum<pg_sys::Datum>) -> Result<Self, Self::Error> {
+        match value.as_pg_datum() {
+            Some(datum) => {
+                let t = datum as *const pg_sys::varlena;
+                Ok(unsafe { text_to_rust_str_unchecked(t) }.to_string())
+            }
+            None => Err("Datum is NULL"),
+        }
+    }
+}
+
+impl TryFrom<PgDatum<String>> for String {
+    type Error = &'static str;
+
+    #[inline]
+    fn try_from(value: PgDatum<String>) -> Result<Self, Self::Error> {
+        match value.as_pg_datum() {
+            Some(datum) => {
+                let t = datum as *const pg_sys::varlena;
+                Ok(unsafe { text_to_rust_str_unchecked(t) }.to_string())
             }
             None => Err("Datum is NULL"),
         }
