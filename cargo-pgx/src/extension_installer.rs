@@ -45,6 +45,7 @@ pub(crate) fn install_extension(target: Option<&str>) -> Result<(), std::io::Err
 }
 
 fn build_extension(target_dir: &str, is_release: bool) -> Result<(), std::io::Error> {
+    let features = std::env::var("PGX_BUILD_FLAGS").unwrap_or_default();
     let mut command = Command::new("cargo");
     command.arg("build");
     if is_release {
@@ -52,6 +53,10 @@ fn build_extension(target_dir: &str, is_release: bool) -> Result<(), std::io::Er
     }
     command.arg("--target-dir");
     command.arg(target_dir);
+
+    for arg in features.split_ascii_whitespace() {
+        command.arg(arg);
+    }
 
     let mut process = command
         .env_remove("BASE_TARGET_DIR")

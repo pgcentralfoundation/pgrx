@@ -1,8 +1,22 @@
+[package]
+name = "pg-rs-bridge"
+version = "0.1.0"
+
 [workspace]
 members = [
+    ".",
     "pg-bridge",
     "pg-bridge-macros",
     "pg-bridge-tests",
-
     "cargo-pgx",
 ]
+
+[features]
+default = []
+pg10 = ["pg-bridge/pg10"]
+pg11 = ["pg-bridge/pg11"]
+pg12 = ["pg-bridge/pg12"]
+
+[dependencies]
+pg-bridge = { path = "pg-bridge", default-features = false }
+pg-bridge-macros = { path = "pg-bridge-macros" }

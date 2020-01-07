@@ -106,6 +106,13 @@ fn install_extension() {
         .stderr(Stdio::inherit())
         .env("PATH", get_pgbin_envpath())
         .env("PGX_TEST_MODE", "1")
+        .env(
+            "PGX_BUILD_FLAGS",
+            format!(
+                "--features pg{}",
+                pg_sys::get_pg_major_version_string().to_string()
+            ),
+        )
         .spawn()
         .unwrap();
 
@@ -176,6 +183,8 @@ fn start_pg() {
                     } else if !line.contains("LOG: ") {
                         // detected some unexpected output
                         eprintln!("{}", line.bold().red());
+                    } else {
+                        eprintln!("{}", line.bold().purple());
                     }
                 }
                 Err(e) => panic!(e),

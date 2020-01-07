@@ -63,6 +63,6 @@ jobs:
     - name: install cargo pgx
       run: cd cargo-pgx && cargo install --path . --force
     - name: cargo check
-      run: cd pg-bridge && cargo check --no-default-features --features pg${{ matrix.version }}
+      run: cargo build --features pg${{ matrix.version }}
     - name: cargo test
-      run: cargo test
+      run: cargo test --features pg${{ matrix.version }} --all

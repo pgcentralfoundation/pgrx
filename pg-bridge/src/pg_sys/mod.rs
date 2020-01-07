@@ -78,6 +78,16 @@ mod all_versions {
     }
 }
 
+// for when no features are enabled -- at least we'll get the common stuff exported
+#[cfg(not(any(feature = "pg10", feature = "pg11", feature = "pg12")))]
+pub use all_versions::*;
+#[cfg(not(any(feature = "pg10", feature = "pg11", feature = "pg12")))]
+pub use common::*;
+
+//
+// for specific versions
+//
+
 #[cfg(feature = "pg10")]
 pub mod v10 {
     pub use super::all_versions::*;
