@@ -190,7 +190,7 @@ fn downcast_err(e: Box<dyn Any + Send>) -> Result<String, JumpContext> {
     if let Some(cxt) = e.downcast_ref::<JumpContext>() {
         Err(cxt.clone())
     } else if let Some(s) = e.downcast_ref::<&str>() {
-        Ok(s.to_string())
+        Ok((*s).to_string())
     } else if let Some(s) = e.downcast_ref::<String>() {
         Ok(s.to_string())
     } else if let Some(s) = e.downcast_ref::<PgBridgePanic>() {

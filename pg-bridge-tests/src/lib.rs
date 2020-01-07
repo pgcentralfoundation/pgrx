@@ -75,15 +75,12 @@ pub fn run_test<F: FnOnce(pg_sys::FunctionCallInfo) -> pg_sys::Datum>(_test_func
 
     if let Err(e) = client().simple_query(&format!("SELECT {}();", funcname)) {
         let cause = e.into_source();
-        match cause {
-            Some(e) => {
-                if let Some(dberror) = e.downcast_ref::<DbError>() {
-                    panic!("{}", dberror.message());
-                } else {
-                    panic!(e)
-                }
+        if let Some(e) = cause {
+            if let Some(dberror) = e.downcast_ref::<DbError>() {
+                panic!("{}", dberror.message());
+            } else {
+                panic!(e)
             }
-            None => {}
         }
     }
 }
@@ -206,11 +203,9 @@ fn start_pg() {
 
     // add a shutdown hook so we can terminate it when the test framework exits
     add_shutdown_hook(move || unsafe {
-        libc::printf(
-            std::ffi::CString::new("Stopping Postgres\n\n".bold().blue().to_string())
-                .unwrap()
-                .as_ptr(),
-        );
+        let message_string =
+            std::ffi::CString::new("Stopping Postgres\n\n".bold().blue().to_string()).unwrap();
+        libc::printf(message_string.as_ptr());
         libc::kill(pgpid as libc::pid_t, libc::SIGTERM);
     });
 }

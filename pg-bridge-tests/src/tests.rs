@@ -144,7 +144,7 @@ mod tests {
 
     #[pg_test]
     fn test_takes_f32() {
-        let input = 42.424242424242;
+        let input = 42.424_242_424_242f32;
         let result = direct_function_call(super::takes_f32_wrapper, vec![PgDatum::from(input)]);
         let result: f32 = result.try_into().unwrap();
         assert_eq!(result, input);
@@ -152,7 +152,7 @@ mod tests {
 
     #[pg_test]
     fn test_takes_f64() {
-        let input = 42.424242424242;
+        let input = 42.424_242_424_242f64;
         let result = direct_function_call(super::takes_f64_wrapper, vec![PgDatum::from(input)]);
         let result: f64 = result.try_into().unwrap();
         assert_eq!(result, input);
