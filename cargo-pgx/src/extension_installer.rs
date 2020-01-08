@@ -181,7 +181,7 @@ fn get_target_dir() -> PathBuf {
     let mut target_dir = PathBuf::from(format!(
         "{}",
         std::env::var("PGX_MANIFEST_DIR")
-            .unwrap_or_else(|_| panic!("PGX_MANIFEST_DIR not an envvar"))
+            .unwrap_or(".".to_string())
     ));
     target_dir.push("target");
     target_dir
