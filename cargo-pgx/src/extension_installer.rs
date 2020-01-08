@@ -1,9 +1,10 @@
 use colored::*;
-use std::io::{BufRead, Write};
+use std::io::{Write};
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
 use std::result::Result;
 use std::str::FromStr;
+use crate::property_inspector::{get_property, find_control_file};
 
 pub(crate) fn install_extension(target: Option<&str>) -> Result<(), std::io::Error> {
     let is_release = target.unwrap_or("") == "release";
@@ -140,41 +141,11 @@ fn find_library_file(
 
     panic!("couldn't find library file");
 }
-
-fn find_control_file() -> Result<(String, String), std::io::Error> {
-    for f in std::fs::read_dir(".")? {
-        if f.is_ok() {
-            let f = f?;
-            if f.file_name().to_string_lossy().ends_with(".control") {
-                let filename = f.file_name().into_string().unwrap();
-                let mut extname: Vec<&str> = filename.split('.').collect();
-                extname.pop();
-                let extname = extname.pop().unwrap();
-                return Ok((filename.clone(), extname.to_string()));
-            }
-        }
-    }
-
-    panic!("couldn't find control file");
-}
-
 fn get_version() -> String {
-    let control_file = std::fs::File::open(find_control_file().unwrap().0).unwrap();
-    let reader = std::io::BufReader::new(control_file);
-
-    for line in reader.lines() {
-        let line = line.unwrap();
-        if line.starts_with("default_version") {
-            let mut parts: Vec<&str> = line.split("=").collect();
-            let mut version = parts.pop().unwrap().trim().to_string();
-
-            version = version.trim_matches('\'').trim().to_string();
-
-            return version;
-        }
+    match get_property("default_version") {
+        Some(v) => v,
+        None => panic!("couldn't determine version number")
     }
-
-    panic!("couldn't determine version number");
 }
 
 fn get_target_dir() -> PathBuf {

@@ -5,14 +5,16 @@ mod crate_template;
 mod extension_installer;
 mod schema_generator;
 mod test_runner;
+mod property_inspector;
 
 use clap::App;
 use crate_template::*;
 use extension_installer::*;
 use schema_generator::*;
+use test_runner::*;
+use property_inspector::*;
 use std::path::PathBuf;
 use std::str::FromStr;
-use crate::test_runner::test_extension;
 
 fn main() -> std::result::Result<(), std::io::Error> {
     let yaml = load_yaml!("cli.yml");
@@ -37,9 +39,13 @@ fn main() -> std::result::Result<(), std::io::Error> {
             let version = test.value_of("pg_version").unwrap_or("all");
             match version {
                 "pg10" | "pg11" | "pg12" | "all" => test_extension(version)?,
-                _=> panic!("Unrecognized version: {}", version),
+                _ => panic!("Unrecognized version: {}", version),
             }
-
+        } else if let Some(get) = extension.subcommand_matches("get") {
+            let name = get.value_of("name").expect("no property name specified");
+            if let Some(value) = get_property(name) {
+                println!("{}", value);
+            }
         } else {
             eprintln!("{}", extension.usage());
         }

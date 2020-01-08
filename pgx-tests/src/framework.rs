@@ -70,7 +70,8 @@ pub fn run_test<F: FnOnce(pg_sys::FunctionCallInfo) -> pg_sys::Datum>(
     .unwrap_or_else(||panic!("couldn't extract function name from {}", std::any::type_name::<F>()));
     let (mut client, session_id) = client();
 
-    let result = client.simple_query(&format!("SELECT {}();", funcname));
+    let schema = get_extension_schema();
+    let result = client.simple_query(&format!("SELECT {}.{}();", schema, funcname));
 
     if let Err(e) = result {
         let cause = e.into_source();
@@ -456,4 +457,22 @@ fn get_pg_dbname() -> String {
 
 fn get_pg_user() -> String {
     std::env::var("USER").unwrap_or_else(|_| panic!("USER is not an envvar"))
+}
+
+fn get_extension_schema() -> String {
+    let output = Command::new("cargo")
+        .arg("pgx")
+        .arg("get")
+        .arg("schema")
+        .output();
+
+    match output {
+        Ok(output) => {
+            match String::from_utf8(output.stdout).unwrap().trim() {
+                "" => "public".to_string(),
+                value => value.to_string()
+            }
+        },
+        Err(e) => panic!("failed to get extension schema property: {:?}", e),
+    }
 }

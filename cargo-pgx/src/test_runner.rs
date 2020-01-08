@@ -1,6 +1,6 @@
 use std::process::{Command, Stdio};
 
-pub(crate) fn test_extension(version: &str) -> Result<(), std::io::Error>{
+pub fn test_extension(version: &str) -> Result<(), std::io::Error>{
     let versions = if version == "all" {
         vec!["pg10", "pg11", "pg12"]
     } else {
