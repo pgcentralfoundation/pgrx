@@ -21,3 +21,10 @@ subcommands:
                     help: '"debug" or "release" (default is "debug")'
           - schema:
               about: generate a schema
+          - test:
+              about: run the test suite for this crate
+              args:
+                - pg_version:
+                    value_name: PG_VERSION
+                    takes_value: true
+                    help: Do you want to test for Postgres 'pg10', 'pg11', pg12', or 'all'?
