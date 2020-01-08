@@ -54,4 +54,26 @@ mod tests {
     fn test_error() {
         error!("error message");
     }
+
+    #[pg_test]
+    fn test_check_for_interrupts() {
+        check_for_interrupts!();
+    }
+
+    #[pg_test(error = "ereport error")]
+    fn test_ereport() {
+        ereport(
+            PgLogLevel::ERROR,
+            PgSqlErrorCode::ERRCODE_INTERNAL_ERROR,
+            "ereport error",
+            file!(),
+            line!(),
+            column!(),
+        )
+    }
+
+    #[pg_test(error = "panic message")]
+    fn test_panic() {
+        panic!("panic message")
+    }
 }

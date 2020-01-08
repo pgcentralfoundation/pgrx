@@ -140,22 +140,19 @@ fn install_extension() {
 fn initdb() {
     let pgdata = get_pgdata_path();
 
-    if pgdata.is_dir() {
-        // we've already run initdb
-        return;
-    }
+    if !pgdata.is_dir() {
+        let status = Command::new("initdb")
+            .arg("-D")
+            .arg(pgdata.to_str().unwrap())
+            .stdout(Stdio::inherit())
+            .stderr(Stdio::inherit())
+            .env("PATH", get_pgbin_envpath())
+            .status()
+            .unwrap();
 
-    let status = Command::new("initdb")
-        .arg("-D")
-        .arg(pgdata.to_str().unwrap())
-        .stdout(Stdio::inherit())
-        .stderr(Stdio::inherit())
-        .env("PATH", get_pgbin_envpath())
-        .status()
-        .unwrap();
-
-    if !status.success() {
-        panic!("initdb failed");
+        if !status.success() {
+            panic!("initdb failed");
+        }
     }
 
     modify_postgresql_conf(pgdata);
@@ -167,7 +164,7 @@ fn modify_postgresql_conf(pgdata: PathBuf) {
         .open(format!("{}/postgresql.conf", pgdata.display()))
         .expect("couldn't open postgresql.conf");
     postgresql_conf
-        .write_all("log_line_prefix='[%m] [%p]: '\n".as_bytes())
+        .write_all("log_line_prefix='[%m] [%p] [%c]: '\n".as_bytes())
         .expect("couldn't append log_line_prefix");
 }
 

@@ -1,5 +1,6 @@
 #![allow(non_snake_case)]
 
+use crate::{PgLogLevel, PgSqlErrorCode};
 use std::any::Any;
 use std::cell::Cell;
 use std::mem::MaybeUninit;
@@ -48,27 +49,44 @@ impl PgBridgePanic {
     }
 }
 
-thread_local! { static PANIC_LOCATION: Cell<Option<String>> = Cell::new(None) }
+struct PanicLocation {
+    file: String,
+    line: u32,
+    col: u32,
+}
 
-fn take_panic_location() -> String {
+thread_local! { static PANIC_LOCATION: Cell<Option<PanicLocation>> = Cell::new(None) }
+
+fn take_panic_location() -> PanicLocation {
     PANIC_LOCATION.with(|p| match p.take() {
-        Some(s) => s,
-        None => "<unknown>".to_string(),
+        Some(location) => location,
+
+        // this case shouldn't happen
+        None => PanicLocation {
+            file: "<unknown>".to_string(),
+            line: 0,
+            col: 0,
+        },
     })
 }
 
 pub(crate) fn register_pg_guard_panic_handler() {
     std::panic::set_hook(Box::new(|info| {
         PANIC_LOCATION.with(|p| {
-            let newval = Some(match p.take() {
-                Some(s) => s,
-                None => match info.location() {
-                    Some(location) => format!("{}", location),
-                    None => "<unknown>".to_string(),
-                },
-            });
+            let existing = p.take();
 
-            p.replace(newval)
+            p.replace(if existing.is_none() {
+                match info.location() {
+                    Some(location) => Some(PanicLocation {
+                        file: location.file().to_string(),
+                        line: location.line(),
+                        col: location.column(),
+                    }),
+                    None => None,
+                }
+            } else {
+                existing
+            })
         });
     }))
 }
@@ -153,8 +171,15 @@ where
                     // translate it into an elog(ERROR), including the code location that caused
                     // the panic!()
                     Ok(message) => {
-                        elog_error(&format!("{}, {}", message, location));
-                        unreachable!("elog_error() failed at depth==0 with message: {}", message);
+                        crate::log::ereport(
+                            PgLogLevel::ERROR,
+                            PgSqlErrorCode::ERRCODE_INTERNAL_ERROR,
+                            &message,
+                            &location.file,
+                            location.line,
+                            location.col,
+                        );
+                        unreachable!("ereport() failed at depth==0 with message: {}", message);
                     }
 
                     // the error is a JumpContext, so we need to longjmp back into Postgres
@@ -172,9 +197,7 @@ where
     }
 }
 
-///
 /// rethrow whatever the `e` error is as a Rust `panic!()`
-///
 fn rethrow_panic(e: Box<dyn Any + Send>) -> ! {
     match downcast_err(e) {
         Ok(message) => panic!(message),
@@ -182,10 +205,8 @@ fn rethrow_panic(e: Box<dyn Any + Send>) -> ! {
     }
 }
 
-///
 /// convert types of `e` that we understand/expect into either a
 /// `Ok(String)` or a `Err<JumpContext>`
-///
 fn downcast_err(e: Box<dyn Any + Send>) -> Result<String, JumpContext> {
     if let Some(cxt) = e.downcast_ref::<JumpContext>() {
         Err(cxt.clone())
@@ -202,24 +223,4 @@ fn downcast_err(e: Box<dyn Any + Send>) -> Result<String, JumpContext> {
         // not a type we understand, so use a generic string
         Ok("Box<Any>".to_string())
     }
-}
-
-pub(crate) fn elog_error(message: &str) {
-    use std::ffi::CString;
-    use std::os::raw::c_char;
-
-    unsafe {
-        extern "C" {
-            fn pg_rs_bridge_elog_error(message: *const c_char);
-        }
-
-        match CString::new(message) {
-            Ok(s) => crate::guard(|| pg_rs_bridge_elog_error(s.as_ptr())),
-            Err(_) => crate::guard(|| {
-                pg_rs_bridge_elog_error(b"log message was null\0".as_ptr() as *const c_char)
-            }),
-        }
-    }
-
-    unreachable!("elog_error() didn't work with message: {}", message);
 }
