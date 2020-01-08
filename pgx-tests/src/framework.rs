@@ -67,10 +67,7 @@ pub fn run_test<F: FnOnce(pg_sys::FunctionCallInfo) -> pg_sys::Datum>(
         "funcname",
         std::any::type_name::<F>(),
     )
-    .expect(&format!(
-        "couldn't extract function name from {}",
-        std::any::type_name::<F>()
-    ));
+    .unwrap_or_else(||panic!("couldn't extract function name from {}", std::any::type_name::<F>()));
     let (mut client, session_id) = client();
 
     let result = client.simple_query(&format!("SELECT {}();", funcname));
@@ -150,11 +147,10 @@ fn format_loglines(session_id: &str, loglines: &LogLines) -> String {
 }
 
 fn get_named_capture(regex: &regex::Regex, name: &'static str, against: &str) -> Option<String> {
-    let captures = regex.captures_iter(against);
-    for cap in captures {
-        return Some(cap[name].to_string());
+    match regex.captures(against) {
+        Some(cap) => Some(cap[name].to_string()),
+        None => None
     }
-    None
 }
 
 #[inline]
@@ -183,12 +179,10 @@ pub fn client() -> (postgres::Client, String) {
     fn determine_session_id(client: &mut Client) -> String {
         let result = client.query("SELECT to_hex(trunc(EXTRACT(EPOCH FROM backend_start))::integer) || '.' || to_hex(pid) AS sid FROM pg_stat_activity WHERE pid = pg_backend_pid();", &[]).expect("failed to determine session id");
 
-        for row in result {
-            let session_id: &str = row.get("sid");
-            return session_id.to_string();
+        match result.get(0) {
+            Some(row) => row.get::<&str, &str>("sid").to_string(),
+            None => panic!("No session id returned from query")
         }
-
-        panic!("No session id returned from query");
     }
 
     let mut client = postgres::Config::new()
@@ -351,7 +345,7 @@ fn monitor_pg(mut command: Command, cmd_string: String, loglines: LogLines) -> (
                     //                    }
                     //
                     let mut loglines = loglines.lock().unwrap();
-                    let session_lines = loglines.entry(session_id).or_insert(Vec::new());
+                    let session_lines = loglines.entry(session_id).or_insert_with(Vec::new);
                     session_lines.push(line);
                 }
                 Err(e) => panic!(e),
