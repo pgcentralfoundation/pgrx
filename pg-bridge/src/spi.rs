@@ -200,7 +200,10 @@ impl SpiTupleTable {
         A: DatumCompatible<A> + SpiSend + TryFrom<PgDatum<A>>,
         <A as std::convert::TryFrom<PgDatum<A>>>::Error: std::fmt::Debug,
     {
-        self.get_datum(1).try_into().unwrap()
+        self.get_datum(1)
+            .expect("no value for column #1")
+            .try_into()
+            .unwrap()
     }
 
     pub fn get_two<A, B>(self) -> (A, B)
@@ -211,8 +214,16 @@ impl SpiTupleTable {
         B: DatumCompatible<B> + SpiSend + TryFrom<PgDatum<B>>,
         <B as std::convert::TryFrom<PgDatum<B>>>::Error: std::fmt::Debug,
     {
-        let a = self.get_datum::<A>(1).try_into().unwrap();
-        let b = self.get_datum::<B>(2).try_into().unwrap();
+        let a = self
+            .get_datum::<A>(1)
+            .expect("no value for column #1")
+            .try_into()
+            .unwrap();
+        let b = self
+            .get_datum::<B>(2)
+            .expect("no value for column #2")
+            .try_into()
+            .unwrap();
         (a, b)
     }
 
@@ -227,13 +238,25 @@ impl SpiTupleTable {
         C: DatumCompatible<C> + SpiSend + TryFrom<PgDatum<C>>,
         <C as std::convert::TryFrom<PgDatum<C>>>::Error: std::fmt::Debug,
     {
-        let a = self.get_datum::<A>(1).try_into().unwrap();
-        let b = self.get_datum::<B>(2).try_into().unwrap();
-        let c = self.get_datum::<C>(3).try_into().unwrap();
+        let a = self
+            .get_datum::<A>(1)
+            .expect("no value for column #1")
+            .try_into()
+            .unwrap();
+        let b = self
+            .get_datum::<B>(2)
+            .expect("no value for column #2")
+            .try_into()
+            .unwrap();
+        let c = self
+            .get_datum::<C>(3)
+            .expect("no value for column #3")
+            .try_into()
+            .unwrap();
         (a, b, c)
     }
 
-    pub fn get_datum<T>(&self, ordinal: i32) -> PgDatum<T>
+    pub fn get_datum<T>(&self, ordinal: i32) -> Option<PgDatum<T>>
     where
         T: DatumCompatible<T> + SpiSend,
     {
@@ -242,19 +265,20 @@ impl SpiTupleTable {
                 let natts = (*tupdesc).natts;
 
                 if ordinal < 1 || ordinal > natts {
-                    panic!("invalid column ordinal {}", ordinal)
+                    None
                 } else {
                     let heap_tuple =
                         std::slice::from_raw_parts((*self.table).vals, self.size)[self.current];
                     let mut is_null = false;
                     let datum = pg_sys::SPI_getbinval(heap_tuple, tupdesc, ordinal, &mut is_null);
 
-                    PgDatum::new(datum, is_null)
+                    Some(PgDatum::new(datum, is_null))
                 }
             },
             None => panic!("TupDesc is NULL"),
         }
     }
+
     fn make_vec(&self) -> Option<Vec<PgDatum<pg_sys::Datum>>> {
         match self.tupdesc {
             Some(tupdesc) => {
@@ -323,6 +347,8 @@ impl Iterator for SpiTupleTable {
 
 impl<'a> SpiSend for &'a str {}
 impl<'a> SpiSend for &'a pg_sys::varlena {}
+
+impl SpiSend for String {}
 
 impl SpiSend for i8 {}
 impl SpiSend for i16 {}

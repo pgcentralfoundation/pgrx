@@ -82,7 +82,6 @@ mod tests {
     use pg_bridge::*;
 
     #[test]
-    #[ignore]
     fn make_idea_happy() {
         assert_eq!(5, 5);
     }

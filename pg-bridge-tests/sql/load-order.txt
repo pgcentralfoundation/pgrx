@@ -1,2 +1,3 @@
 fcinfo_tests.generated.sql
 log_tests.generated.sql
+spi_tests.generated.sql

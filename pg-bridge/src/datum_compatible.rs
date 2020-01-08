@@ -134,10 +134,13 @@ impl<'a> DatumCompatible<&'a str> for &'a str {
 
 impl DatumCompatible<String> for String {
     fn copy_into(&self, memory_context: &mut PgMemoryContexts) -> PgDatum<String> {
-        match self.as_str().copy_into(memory_context).as_pg_datum() {
-            Some(datum) => PgDatum::<String>::new(datum, false),
-            None => PgDatum::null(),
-        }
+        let ptr = self as *const _ as *const pg_sys::varlena;
+        let size = unsafe { crate::varlena_size(ptr) };
+
+        PgDatum::new(
+            memory_context.copy_ptr_into(ptr as crate::void_ptr, size) as pg_sys::Datum,
+            false,
+        )
     }
 }
 
