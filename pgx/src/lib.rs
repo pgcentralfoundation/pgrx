@@ -1,12 +1,12 @@
 #[macro_use]
-extern crate pg_bridge_macros;
+extern crate pgx_macros;
 
 #[macro_use]
 extern crate enum_primitive_derive;
 extern crate num_traits;
 
 // expose the #[derive(DatumCompatible)] trait
-pub use pg_bridge_macros::*;
+pub use pgx_macros::*;
 
 // we need this publicly too
 pub use std::convert::TryInto;
@@ -67,7 +67,7 @@ macro_rules! pg_module_magic {
 
             // go ahead and register our panic handler since Postgres
             // calls this function first
-            pg_bridge::initialize();
+            pgx::initialize();
 
             // return the magic
             &my_magic

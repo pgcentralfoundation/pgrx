@@ -147,7 +147,7 @@ pub fn pg_return_void() -> pg_sys::Datum {
 ///
 /// ## Examples
 /// ```rust,no_run
-/// use pg_bridge::*;
+/// use pgx::*;
 ///
 /// #[pg_extern]
 /// fn add_two_numbers(a: i32, b: i32) -> i32 {

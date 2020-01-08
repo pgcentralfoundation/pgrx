@@ -1,5 +1,5 @@
 [package]
-name = "pg-bridge-tests"
+name = "pgx-tests"
 version = "0.1.0"
 edition = "2018"
 
@@ -8,13 +8,13 @@ crate-type = ["cdylib", "rlib"]
 
 [features]
 default = []
-pg10 = ["pg-bridge/pg10"]
-pg11 = ["pg-bridge/pg11"]
-pg12 = ["pg-bridge/pg12"]
+pg10 = ["pgx/pg10"]
+pg11 = ["pgx/pg11"]
+pg12 = ["pgx/pg12"]
 
 [dependencies]
-pg-bridge = { path = "../pg-bridge", default-features = false }
-pg-bridge-macros = { path = "../pg-bridge-macros" }
+pgx = { path = "../pgx", default-features = false }
+pgx-macros = { path = "../pgx-macros" }
 lazy_static = "1.4.0"
 shutdown_hooks = "0.1.0"
 colored = "1.9.1"

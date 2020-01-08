@@ -45,7 +45,7 @@ impl bindgen::callbacks::ParseCallbacks for IgnoredMacros {
 }
 
 fn make_git_repo_path(branch_name: &str) -> PathBuf {
-    PathBuf::from(format!("/tmp/pg-rs-bridge-build/{}", branch_name))
+    PathBuf::from(format!("/tmp/pgx-build/{}", branch_name))
 }
 
 fn make_include_path(git_repo_path: &PathBuf) -> PathBuf {
@@ -60,17 +60,17 @@ fn make_shim_path(manifest_dir: &str) -> PathBuf {
     // backup a directory
     shim_dir.pop();
 
-    // and a new dir named "bridge-c-shim"
-    shim_dir.push("bridge-c-shim");
+    // and a new dir named "pgx-cshim"
+    shim_dir.push("pgx-cshim");
 
     shim_dir
 }
 
 fn main() -> Result<(), std::io::Error> {
     build_deps::rerun_if_changed_paths("include/*").unwrap();
-    build_deps::rerun_if_changed_paths("../pg-bridge-macros/src/lib.rs").unwrap();
-    build_deps::rerun_if_changed_paths("../pg-bridge-macros/src/rewriter.rs").unwrap();
-    build_deps::rerun_if_changed_paths("../bridge-c-shim/bridge-c-shim.c").unwrap();
+    build_deps::rerun_if_changed_paths("../pgx-macros/src/lib.rs").unwrap();
+    build_deps::rerun_if_changed_paths("../pgx-macros/src/rewriter.rs").unwrap();
+    build_deps::rerun_if_changed_paths("../pgx-cshim/pgx-cshim.c").unwrap();
 
     let manifest_dir = std::env::var("CARGO_MANIFEST_DIR").unwrap();
     let cwd = PathBuf::from(&manifest_dir);
@@ -190,15 +190,15 @@ fn build_shim(
     if version.eq("pg10") && std::env::var("CARGO_FEATURE_PG10").is_ok() {
         build_shim_for_version(&shim_dir, &pg_git_path, 10).expect("shim build for pg10 failed");
         println!("cargo:rustc-link-search={}", shim_dir.display());
-        println!("cargo:rustc-link-lib=static=bridge-c-shim-10");
+        println!("cargo:rustc-link-lib=static=pgx-cshim-10");
     } else if version.eq("pg11") && std::env::var("CARGO_FEATURE_PG11").is_ok() {
         build_shim_for_version(&shim_dir, &pg_git_path, 11).expect("shim build for pg11 failed");
         println!("cargo:rustc-link-search={}", shim_dir.display());
-        println!("cargo:rustc-link-lib=static=bridge-c-shim-11");
+        println!("cargo:rustc-link-lib=static=pgx-cshim-11");
     } else if version.eq("pg12") && std::env::var("CARGO_FEATURE_PG12").is_ok() {
         build_shim_for_version(&shim_dir, &pg_git_path, 12).expect("shim build for pg12 failed");
         println!("cargo:rustc-link-search={}", shim_dir.display());
-        println!("cargo:rustc-link-lib=static=bridge-c-shim-12");
+        println!("cargo:rustc-link-lib=static=pgx-cshim-12");
     }
 }
 
@@ -227,7 +227,7 @@ fn build_shim_for_version(
     )?;
 
     if rc.status.code().unwrap() != 0 {
-        panic!("failed to make bridge-c-shim for v{}", version_no);
+        panic!("failed to make pgx-cshim for v{}", version_no);
     }
 
     Ok(())
@@ -555,9 +555,9 @@ pub(crate) mod bindings_diff {
     }
 
     pub(crate) fn main() -> Result<(), std::io::Error> {
-        let mut v10 = read_source_file("pg-bridge/src/pg_sys/pg10_bindings.rs");
-        let mut v11 = read_source_file("pg-bridge/src/pg_sys/pg11_bindings.rs");
-        let mut v12 = read_source_file("pg-bridge/src/pg_sys/pg12_bindings.rs");
+        let mut v10 = read_source_file("pgx/src/pg_sys/pg10_bindings.rs");
+        let mut v11 = read_source_file("pgx/src/pg_sys/pg11_bindings.rs");
+        let mut v12 = read_source_file("pgx/src/pg_sys/pg12_bindings.rs");
 
         let mut versions = vec![&mut v10, &mut v11, &mut v12];
         let common = build_common_set(&mut versions);
@@ -570,10 +570,10 @@ pub(crate) mod bindings_diff {
             v12.len(),
         );
 
-        write_common_file("pg-bridge/src/pg_sys/common.rs", common);
-        write_source_file("pg-bridge/src/pg_sys/pg10_specific.rs", v10);
-        write_source_file("pg-bridge/src/pg_sys/pg11_specific.rs", v11);
-        write_source_file("pg-bridge/src/pg_sys/pg12_specific.rs", v12);
+        write_common_file("pgx/src/pg_sys/common.rs", common);
+        write_source_file("pgx/src/pg_sys/pg10_specific.rs", v10);
+        write_source_file("pgx/src/pg_sys/pg11_specific.rs", v11);
+        write_source_file("pgx/src/pg_sys/pg12_specific.rs", v12);
 
         Ok(())
     }
@@ -642,7 +642,7 @@ pub(crate) mod bindings_diff {
         stream.extend(quote! {
             #![allow(clippy::all)]
 
-            use crate as pg_bridge;
+            use crate as pgx;
             use crate::pg_sys::common::*;
             use crate::DatumCompatible;
         });
@@ -662,7 +662,7 @@ pub(crate) mod bindings_diff {
         stream.extend(quote! {
             #![allow(clippy::all)]
 
-            use crate as pg_bridge;
+            use crate as pgx;
             use crate::datum_compatible::DatumCompatible;
 
             #[cfg(feature = "pg10")]

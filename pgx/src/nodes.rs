@@ -15,7 +15,7 @@ pub fn is_a(nodeptr: *mut pg_sys::Node, tag: pg_sys::NodeTag) -> bool {
 /// ## Examples
 ///
 /// ```rust,no_run
-/// use pg_bridge::{pg_sys, make_node};
+/// use pgx::{pg_sys, make_node};
 /// let expr_context = unsafe { make_node::<pg_sys::CreateRoleStmt>(pg_sys::NodeTag_T_ExprContext) };
 /// ```
 ///

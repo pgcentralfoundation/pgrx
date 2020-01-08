@@ -1,6 +1,6 @@
 name: "Cargo Postgres extension manager"
 version: "0.1.0"
-about: Creates and installs pg-rs-bridge based Postgres extensions
+about: Creates and installs pgx based Postgres extensions
 subcommands:
   - pgx:
         subcommands:

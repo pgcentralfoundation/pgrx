@@ -1,4 +1,4 @@
-comment = '{name}:  Created by pg-rs-bridge'
+comment = '{name}:  Created by pgx'
 default_version = '1.0'
 module_pathname = '$libdir/{name}'
 relocatable = true

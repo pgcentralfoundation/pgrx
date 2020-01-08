@@ -66,7 +66,7 @@ pub fn pg_test(attr: TokenStream, item: TokenStream) -> TokenStream {
             stream.extend(quote! {
                 #[test]
                 fn #test_func_name() {
-                    pg_bridge_tests::run_test(#func_name, #expected_error)
+                    pgx_tests::run_test(#func_name, #expected_error)
                 }
             });
         }
@@ -140,7 +140,7 @@ fn impl_datum_compatible(ast: &syn::DeriveInput) -> TokenStream {
                 if !type_blacklisted_for_datum_compatible(ds) {
                     (quote! {
                         impl DatumCompatible<#name> for #name {
-                            fn copy_into(&self, memory_context: &mut pg_bridge::PgMemoryContexts) -> pg_bridge::PgDatum<#name> {
+                            fn copy_into(&self, memory_context: &mut pgx::PgMemoryContexts) -> pgx::PgDatum<#name> {
                                 memory_context.copy_struct_into(self)
                             }
 

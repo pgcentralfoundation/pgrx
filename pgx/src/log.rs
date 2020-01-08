@@ -445,13 +445,13 @@ pub fn elog(level: PgLogLevel, message: &str) {
 
     unsafe {
         extern "C" {
-            fn pg_rs_bridge_elog(level: i32, message: *const c_char);
+            fn pgx_elog(level: i32, message: *const c_char);
         }
 
         match CString::new(message) {
-            Ok(s) => crate::guard(|| pg_rs_bridge_elog(level as i32, s.as_ptr())),
+            Ok(s) => crate::guard(|| pgx_elog(level as i32, s.as_ptr())),
             Err(_) => crate::guard(|| {
-                pg_rs_bridge_elog(
+                pgx_elog(
                     level as i32,
                     std::ffi::CStr::from_bytes_with_nul(b"log message was null\0")
                         .unwrap()
@@ -478,7 +478,7 @@ pub fn ereport(
     use std::os::raw::c_char;
 
     extern "C" {
-        fn pg_rs_bridge_ereport(
+        fn pgx_ereport(
             level: i32,
             code: i32,
             message: *const c_char,
@@ -506,7 +506,7 @@ pub fn ereport(
 
     unsafe {
         crate::guard(|| {
-            pg_rs_bridge_ereport(
+            pgx_ereport(
                 level as i32,
                 code as i32,
                 message.as_ptr(),

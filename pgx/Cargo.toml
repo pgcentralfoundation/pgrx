@@ -1,12 +1,12 @@
 [package]
-name = "pg-bridge"
+name = "pgx"
 version = "0.1.0"
 authors = ["Eric B. Ridge <eebbrr@gmail.com>"]
 edition = "2018"
 build = "build.rs"
 
 [dependencies]
-pg-bridge-macros = { path = "../pg-bridge-macros/" }
+pgx-macros = { path = "../pgx-macros/" }
 memoffset = "0.5.3"
 enum-primitive-derive = "0.1.2"
 num-traits = "0.2.10"

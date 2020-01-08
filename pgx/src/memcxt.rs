@@ -249,7 +249,7 @@ impl PgMemoryContexts {
     /// ## Examples
     ///
     /// ```rust,no_run
-    /// use pg_bridge::*;
+    /// use pgx::*;
     ///
     /// #[pg_guard]
     /// pub fn do_something() -> pg_sys::ItemPointer {
@@ -370,9 +370,9 @@ impl PgMemoryContexts {
     ///
     fn get_context_for_pointer(ptr: void_ptr) -> pg_sys::MemoryContext {
         extern "C" {
-            pub fn pg_rs_bridge_GetMemoryContextChunk(pointer: void_ptr) -> pg_sys::MemoryContext;
+            pub fn pgx_GetMemoryContextChunk(pointer: void_ptr) -> pg_sys::MemoryContext;
         }
-        unsafe { pg_rs_bridge_GetMemoryContextChunk(ptr) }
+        unsafe { pgx_GetMemoryContextChunk(ptr) }
 
         //
         // the below causes PG to crash b/c it mis-calculates where the MemoryContext address is
@@ -444,7 +444,7 @@ enum WhoAllocated {
 /// This example allocates a simple Postgres structure, modifies it, and returns it back to Postgres:
 ///
 /// ```rust,no_run
-/// use pg_bridge::*;
+/// use pgx::*;
 ///
 /// #[pg_guard]
 /// pub fn do_something() -> pg_sys::ItemPointer {
@@ -463,7 +463,7 @@ enum WhoAllocated {
 /// dropped:
 ///
 /// ```rust,no_run
-/// use pg_bridge::*;
+/// use pgx::*;
 ///
 /// #[pg_guard]
 /// pub fn do_something()  {
@@ -481,7 +481,7 @@ enum WhoAllocated {
 /// but it can't be freed on Drop since you don't own it -- Postgres does:
 ///
 /// ```rust,no_run
-/// use pg_bridge::*;
+/// use pgx::*;
 ///
 /// #[pg_guard]
 /// pub fn do_something()  {
@@ -555,7 +555,7 @@ where
     ///
     /// ## Examples
     /// ```rust,no_run
-    /// use pg_bridge::{PgBox, pg_sys};
+    /// use pgx::{PgBox, pg_sys};
     /// let ctid = PgBox::<pg_sys::ItemPointerData>::alloc();
     /// ```
     pub fn alloc() -> PgBox<T> {
@@ -574,7 +574,7 @@ where
     ///
     /// ## Examples
     /// ```rust,no_run
-    /// use pg_bridge::{PgBox, pg_sys};
+    /// use pgx::{PgBox, pg_sys};
     /// let ctid = PgBox::<pg_sys::ItemPointerData>::alloc0();
     /// ```
     pub fn alloc0() -> PgBox<T> {
@@ -593,7 +593,7 @@ where
     ///
     /// ## Examples
     /// ```rust,no_run
-    /// use pg_bridge::{PgBox, pg_sys, PgMemoryContexts};
+    /// use pgx::{PgBox, pg_sys, PgMemoryContexts};
     /// let ctid = PgBox::<pg_sys::ItemPointerData>::alloc_in_context(PgMemoryContexts::TopTransactionContext);
     /// ```
     pub fn alloc_in_context(memory_context: PgMemoryContexts) -> PgBox<T> {
@@ -614,7 +614,7 @@ where
     ///
     /// ## Examples
     /// ```rust,no_run
-    /// use pg_bridge::{PgBox, pg_sys, PgMemoryContexts};
+    /// use pgx::{PgBox, pg_sys, PgMemoryContexts};
     /// let ctid = PgBox::<pg_sys::ItemPointerData>::alloc0_in_context(PgMemoryContexts::TopTransactionContext);
     /// ```
     pub fn alloc0_in_context(memory_context: PgMemoryContexts) -> PgBox<T> {

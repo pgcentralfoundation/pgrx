@@ -8,14 +8,14 @@ crate-type = ["cdylib"]
 
 [features]
 default = ["pg11"]
-pg10 = ["pg-bridge/pg10", "pg-bridge-tests/pg10"]
-pg11 = ["pg-bridge/pg11", "pg-bridge-tests/pg11"]
-pg12 = ["pg-bridge/pg12", "pg-bridge-tests/pg12"]
+pg10 = ["pgx/pg10", "pgx-tests/pg10"]
+pg11 = ["pgx/pg11", "pgx-tests/pg11"]
+pg12 = ["pgx/pg12", "pgx-tests/pg12"]
 
 [dependencies]
-pg-bridge = {{ path = "../pg-rs-bridge/pg-bridge/", default-features = false }}
-pg-bridge-macros = {{ path = "../pg-rs-bridge/pg-bridge-macros" }}
-pg-bridge-tests = {{ path = "../pg-rs-bridge/pg-bridge-tests", default-features = false }}
+pgx = {{ path = "../pgx/pgx/", default-features = false }}
+pgx-macros = {{ path = "../pgx/pgx-macros" }}
+pgx-tests = {{ path = "../pgx/pgx-tests", default-features = false }}
 
 [profile.dev]
 panic = "unwind"

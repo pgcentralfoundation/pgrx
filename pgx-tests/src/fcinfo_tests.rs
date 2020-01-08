@@ -1,4 +1,4 @@
-use pg_bridge::*;
+use pgx::*;
 
 pg_module_magic!();
 
@@ -77,9 +77,9 @@ fn returns_none() -> Option<i32> {
 
 mod tests {
     #[allow(unused_imports)]
-    use crate as pg_bridge_tests;
+    use crate as pgx_tests;
 
-    use pg_bridge::*;
+    use pgx::*;
 
     #[test]
     fn make_idea_happy() {

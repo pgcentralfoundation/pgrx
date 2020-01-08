@@ -1,5 +1,5 @@
 [package]
-name = "pg-bridge-macros"
+name = "pgx-macros"
 version = "0.1.0"
 authors = ["Eric B. Ridge <eebbrr@gmail.com>"]
 edition = "2018"

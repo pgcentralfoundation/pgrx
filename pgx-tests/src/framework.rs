@@ -4,7 +4,7 @@ use lazy_static::*;
 use std::sync::{Arc, Mutex};
 
 use colored::*;
-use pg_bridge::*;
+use pgx::*;
 use postgres::error::DbError;
 use postgres::Client;
 use std::collections::HashMap;
@@ -435,7 +435,7 @@ fn get_extension_name() -> String {
 
 fn get_pg_path() -> String {
     format!(
-        "/tmp/pg-rs-bridge-build/REL_{}_STABLE/install/",
+        "/tmp/pgx-build/REL_{}_STABLE/install/",
         pg_sys::get_pg_major_version_string(),
     )
 }
@@ -457,7 +457,7 @@ fn get_pg_port() -> u16 {
 }
 
 fn get_pg_dbname() -> String {
-    "pg_bridge_tests".to_string()
+    "pgx_tests".to_string()
 }
 
 fn get_pg_user() -> String {

@@ -31,16 +31,16 @@ struct JumpContext {
 }
 
 #[derive(Debug, Clone, Copy)]
-pub struct PgBridgePanic {
+pub struct PgxPanic {
     pub message: &'static str,
     pub filename: &'static str,
     pub lineno: u32,
     pub colno: u32,
 }
 
-impl PgBridgePanic {
+impl PgxPanic {
     pub fn new(message: &'static str, filename: &'static str, lineno: u32, colno: u32) -> Self {
-        PgBridgePanic {
+        PgxPanic {
             message,
             filename,
             lineno,
@@ -214,7 +214,7 @@ fn downcast_err(e: Box<dyn Any + Send>) -> Result<String, JumpContext> {
         Ok((*s).to_string())
     } else if let Some(s) = e.downcast_ref::<String>() {
         Ok(s.to_string())
-    } else if let Some(s) = e.downcast_ref::<PgBridgePanic>() {
+    } else if let Some(s) = e.downcast_ref::<PgxPanic>() {
         Ok(format!(
             "{}: {}:{}:{}",
             s.message, s.filename, s.lineno, s.colno

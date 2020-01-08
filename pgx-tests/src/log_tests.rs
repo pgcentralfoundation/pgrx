@@ -1,8 +1,8 @@
 mod tests {
     #[allow(unused_imports)]
-    use crate as pg_bridge_tests;
+    use crate as pgx_tests;
 
-    use pg_bridge::*;
+    use pgx::*;
 
     #[pg_test]
     fn test_info() {

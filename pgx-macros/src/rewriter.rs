@@ -102,7 +102,7 @@ impl PgGuardRewriter {
                 #[allow(unused_variables)]
                 #vis fn #func_name_wrapper(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
 
-                    let #result_var_name = pg_bridge::guard( || {
+                    let #result_var_name = pgx::guard( || {
                         #rewritten_args
 
                         #func_name(#arg_list)
@@ -135,7 +135,7 @@ impl PgGuardRewriter {
             #vis #sig {
                 #func
 
-                pg_bridge::guard( || #func_name(#arg_list) )
+                pgx::guard( || #func_name(#arg_list) )
             }
         }
     }
@@ -165,7 +165,7 @@ impl PgGuardRewriter {
                     pub fn #func_name( #arg_list_with_types ) #return_type ;
                 }
 
-                pg_bridge::guard(|| unsafe { #func_name( #arg_list) })
+                pgx::guard(|| unsafe { #func_name( #arg_list) })
             }
         }
     }
@@ -274,7 +274,7 @@ impl FunctionSignatureRewriter {
         match &self.func.sig.output {
             ReturnType::Default => {
                 stream.extend(quote! {
-                    pg_bridge::pg_return_void()
+                    pgx::pg_return_void()
                 });
             }
             ReturnType::Type(_, type_) => {
@@ -283,14 +283,14 @@ impl FunctionSignatureRewriter {
                     stream.extend(quote! {
                         match result {
                             Some(result) => {
-                                pg_bridge::PgDatum::#option_type::from(result).into()
+                                pgx::PgDatum::#option_type::from(result).into()
                             },
-                            None => pg_bridge::pg_return_null(fcinfo)
+                            None => pgx::pg_return_null(fcinfo)
                         }
                     });
                 } else {
                     stream.extend(quote! {
-                        pg_bridge::PgDatum::<#type_>::from(result).into()
+                        pgx::PgDatum::<#type_>::from(result).into()
                     });
                 }
             }
@@ -334,7 +334,7 @@ impl FunctionSignatureRewriter {
                                 let #name = if pg_arg_is_null(fcinfo, #i) {
                                     None
                                 } else {
-                                    Some(pg_bridge::pg_getarg::#option_type(fcinfo, #i).try_into()
+                                    Some(pgx::pg_getarg::#option_type(fcinfo, #i).try_into()
                                         .unwrap_or_else(|_| panic!("argument '{}'", stringify! { #name })))
                                 };
                             }
@@ -345,12 +345,12 @@ impl FunctionSignatureRewriter {
                             }
                         } else if is_raw {
                             quote_spanned! {ident.span()=>
-                                let #name = pg_bridge::pg_getarg_datum_raw(fcinfo, #i) as #type_;
+                                let #name = pgx::pg_getarg_datum_raw(fcinfo, #i) as #type_;
                             }
                         } else {
                             quote_spanned! {ident.span()=>
                                 let #name: #type_ =
-                                    pg_bridge::pg_getarg::<#type_>(fcinfo, #i).try_into()
+                                    pgx::pg_getarg::<#type_>(fcinfo, #i).try_into()
                                         .unwrap_or_else(|_| panic!("argument '{}'", stringify! { #name }));
                             }
                         };
