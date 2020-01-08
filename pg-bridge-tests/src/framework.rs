@@ -71,12 +71,8 @@ pub fn run_test<F: FnOnce(pg_sys::FunctionCallInfo) -> pg_sys::Datum>(
         "couldn't extract function name from {}",
         std::any::type_name::<F>()
     ));
-    let mut client = client();
+    let (mut client, session_id) = client();
 
-    let session_id = determine_session_id(&mut client);
-    client
-        .simple_query("SET log_statement TO 'all';")
-        .expect("FAILED: SET log_statement TO 'all'");
     let result = client.simple_query(&format!("SELECT {}();", funcname));
 
     if let Err(e) = result {
@@ -91,22 +87,39 @@ pub fn run_test<F: FnOnce(pg_sys::FunctionCallInfo) -> pg_sys::Datum>(
                     assert_eq!(received_error_message, expected_error_message)
                 } else {
                     // we weren't expecting an error
-                    // so wait 1/4 of a second for Postgres to get log messages for this test written
-                    // to stdout
-                    std::thread::sleep(std::time::Duration::from_millis(250));
+                    //
+                    // wait a second for Postgres to get log messages written to stdoerr
+                    std::thread::sleep(std::time::Duration::from_millis(1000));
 
-                    let detail = match dberror.detail() {
-                        Some(detail) => detail,
-                        None => "",
-                    };
+                    let mut pg_location = String::new();
+                    pg_location.push_str("Postgres location: ");
+                    if dberror.file().is_some() {
+                        pg_location.push_str(&dberror.file().unwrap());
+
+                        if dberror.line().is_some() {
+                            pg_location.push(':');
+                            pg_location.push_str(&dberror.line().unwrap().to_string());
+                        }
+                    } else {
+                        pg_location.push_str("<unknown>");
+                    }
+
+                    let mut rust_location = String::new();
+                    rust_location.push_str("Rust location: ");
+                    if dberror.where_().is_some() {
+                        rust_location.push_str(&dberror.where_().unwrap());
+                    } else {
+                        rust_location.push_str("<unknown>");
+                    }
 
                     // then we can panic with those messages plus those that belong to the system
                     panic!(
-                        "\n\n{}\n{}\n{}\n{}\n\n",
-                        received_error_message,
+                        "\n{}...\n{}\n{}\n{}\n{}\n\n",
                         format_loglines(&system_session_id, &loglines),
                         format_loglines(&session_id, &loglines),
-                        detail
+                        received_error_message.bold().red(),
+                        pg_location.dimmed().white(),
+                        rust_location.yellow()
                     );
                 }
             } else {
@@ -134,17 +147,6 @@ fn format_loglines(session_id: &str, loglines: &LogLines) -> String {
     }
 
     result
-}
-
-fn determine_session_id(client: &mut Client) -> String {
-    let result = client.query("SELECT to_hex(trunc(EXTRACT(EPOCH FROM backend_start))::integer) || '.' || to_hex(pid) AS sid FROM pg_stat_activity WHERE pid = pg_backend_pid();", &[]).expect("failed to determine session id");
-
-    for row in result {
-        let session_id: &str = row.get("sid");
-        return session_id.to_string();
-    }
-
-    panic!("No session id returned from query");
 }
 
 fn get_named_capture(regex: &regex::Regex, name: &'static str, against: &str) -> Option<String> {
@@ -177,14 +179,36 @@ fn initialize_test_framework() -> (LogLines, String) {
     (state.loglines.clone(), state.system_session_id.clone())
 }
 
-pub fn client() -> postgres::Client {
-    postgres::Config::new()
+pub fn client() -> (postgres::Client, String) {
+    fn determine_session_id(client: &mut Client) -> String {
+        let result = client.query("SELECT to_hex(trunc(EXTRACT(EPOCH FROM backend_start))::integer) || '.' || to_hex(pid) AS sid FROM pg_stat_activity WHERE pid = pg_backend_pid();", &[]).expect("failed to determine session id");
+
+        for row in result {
+            let session_id: &str = row.get("sid");
+            return session_id.to_string();
+        }
+
+        panic!("No session id returned from query");
+    }
+
+    let mut client = postgres::Config::new()
         .host(&get_pg_host())
         .port(get_pg_port())
         .user(&get_pg_user())
         .dbname(&get_pg_dbname())
         .connect(postgres::NoTls)
-        .unwrap()
+        .unwrap();
+
+    let session_id = determine_session_id(&mut client);
+    client
+        .simple_query("SET log_min_messages TO 'INFO';")
+        .expect("FAILED: SET log_min_messages TO 'INFO'");
+
+    client
+        .simple_query("SET log_statement TO 'all';")
+        .expect("FAILED: SET log_statement TO 'all'");
+
+    (client, session_id)
 }
 
 fn install_extension() {
@@ -396,7 +420,9 @@ fn createdb() {
 }
 
 fn create_extension() {
-    client()
+    let (mut client, _) = client();
+
+    client
         .simple_query(&format!("CREATE EXTENSION {};", get_extension_name()))
         .unwrap();
 }

@@ -21,7 +21,7 @@ void pg_rs_bridge_elog_error(char *message) {
 void pg_rs_bridge_ereport(int level, int code, char *message, char *file, int lineno, int colno) {
     ereport(level,
             (errcode(code),
-                    errmsg("%s", message), errdetail("%s:%d:%d", file, lineno, colno)));
+                    errmsg("%s", message), errcontext_msg("%s:%d:%d", file, lineno, colno)));
 }
 
 
