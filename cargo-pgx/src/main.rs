@@ -19,7 +19,7 @@ fn main() -> std::result::Result<(), std::io::Error> {
     let matches = app.get_matches();
 
     if let Some(extension) = matches.subcommand_matches("pgx") {
-        if let Some(create) = extension.subcommand_matches("create") {
+        if let Some(create) = extension.subcommand_matches("new") {
             let name = create
                 .value_of("name")
                 .expect("<NAME> argument to create is required");

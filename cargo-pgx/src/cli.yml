@@ -4,8 +4,8 @@ about: Creates and installs pgx based Postgres extensions
 subcommands:
   - pgx:
         subcommands:
-          - create:
-              about: create a new extension
+          - new:
+              about: create a new extension crate
               args:
                 - name:
                     value_name: NAME
@@ -13,7 +13,7 @@ subcommands:
                     required: true
                     help: the name of the extension
           - install:
-              about: install the extension from the current directory
+              about: install the extension from the current crate
               args:
                 - target:
                     value_name: DEBUG_OR_RELEASE
