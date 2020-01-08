@@ -205,16 +205,20 @@ fn parse_extern_attributes(attr: &TokenStream) -> HashSet<ExternArgs> {
             "parallel_unsafe" => args.insert(ExternArgs::ParallelUnsafe),
             "parallel_restricted" => args.insert(ExternArgs::ParallelRestricted),
             error if att.starts_with("error") => {
-                // error = "message"
                 let re = regex::Regex::new(r#"("[^"\\]*(?:\\.[^"\\]*)*")"#).unwrap();
 
                 let message = match re.captures(error) {
                     Some(captures) => match captures.get(0) {
                         Some(mtch) => {
-                            let message = mtch.as_str();
-                            let message = message.trim_start_matches('"');
-                            let message = message.trim_end_matches('"');
-                            unescape::unescape(message).expect("improperly escaped error message")
+                            let message = mtch.as_str().clone();
+                            let message = unescape::unescape(message)
+                                .expect("improperly escaped error message");
+
+                            // trim leading/trailing quotes
+                            let message = String::from(&message[1..]);
+                            let message = String::from(&message[..message.len() - 1]);
+
+                            message
                         }
                         None => {
                             panic!("No matches found in: {}", error);
@@ -223,7 +227,7 @@ fn parse_extern_attributes(attr: &TokenStream) -> HashSet<ExternArgs> {
                     None => panic!("/{}/ is an invalid error= attribute", error),
                 };
 
-                args.insert(ExternArgs::Error(message))
+                args.insert(ExternArgs::Error(message.to_string()))
             }
 
             _ => false,
