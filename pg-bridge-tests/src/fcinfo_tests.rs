@@ -1,5 +1,4 @@
 use pg_bridge::*;
-use pg_bridge_macros::*;
 
 pg_module_magic!();
 
@@ -81,7 +80,6 @@ mod tests {
     use crate as pg_bridge_tests;
 
     use pg_bridge::*;
-    use pg_bridge_macros::*;
 
     #[test]
     #[ignore]

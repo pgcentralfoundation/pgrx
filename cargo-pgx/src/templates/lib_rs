@@ -1,5 +1,4 @@
 use pg_bridge::*;
-use pg_bridge_macros::*;
 
 pg_module_magic!();
 
@@ -10,7 +9,6 @@ fn hello_{name}() -> &'static str {{
 
 mod tests {{
     use pg_bridge::*;
-    use pg_bridge_macros::*;
 
     #[test]
     #[ignore]

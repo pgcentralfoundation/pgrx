@@ -3,7 +3,6 @@ mod tests {
     use crate as pg_bridge_tests;
 
     use pg_bridge::*;
-    use pg_bridge_macros::*;
 
     #[pg_test]
     fn test_info() {

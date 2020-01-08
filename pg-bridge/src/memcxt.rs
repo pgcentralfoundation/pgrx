@@ -250,7 +250,7 @@ impl PgMemoryContexts {
     ///
     /// ```rust,no_run
     /// use pg_bridge::*;
-    /// use pg_bridge_macros::*;
+    ///
     /// #[pg_guard]
     /// pub fn do_something() -> pg_sys::ItemPointer {
     ///     PgMemoryContexts::TopTransactionContext.switch_to(|| {
@@ -445,7 +445,7 @@ enum WhoAllocated {
 ///
 /// ```rust,no_run
 /// use pg_bridge::*;
-/// use pg_bridge_macros::*;
+///
 /// #[pg_guard]
 /// pub fn do_something() -> pg_sys::ItemPointer {
 ///     // postgres-allocate an ItemPointerData structure
@@ -464,7 +464,7 @@ enum WhoAllocated {
 ///
 /// ```rust,no_run
 /// use pg_bridge::*;
-/// use pg_bridge_macros::*;
+///
 /// #[pg_guard]
 /// pub fn do_something()  {
 ///     // postgres-allocate an ItemPointerData structure
@@ -482,7 +482,7 @@ enum WhoAllocated {
 ///
 /// ```rust,no_run
 /// use pg_bridge::*;
-/// use pg_bridge_macros::*;
+///
 /// #[pg_guard]
 /// pub fn do_something()  {
 ///     // open a relation and project it as a pg_sys::Relation

@@ -6,7 +6,7 @@ extern crate enum_primitive_derive;
 extern crate num_traits;
 
 // expose the #[derive(DatumCompatible)] trait
-pub use pg_bridge_macros::DatumCompatible;
+pub use pg_bridge_macros::*;
 
 // we need this publicly too
 pub use std::convert::TryInto;
