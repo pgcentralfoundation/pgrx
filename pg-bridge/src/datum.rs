@@ -226,6 +226,13 @@ where
 // From trait implementations for primitive types
 //
 
+impl From<()> for PgDatum<()> {
+    #[inline]
+    fn from(_: ()) -> Self {
+        PgDatum::null()
+    }
+}
+
 impl From<bool> for PgDatum<bool> {
     #[inline]
     fn from(val: bool) -> Self {
