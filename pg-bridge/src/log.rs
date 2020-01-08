@@ -584,7 +584,8 @@ macro_rules! warning {
 #[macro_export]
 macro_rules! error {
     ($($arg:tt)*) => (
-        { $crate::log::elog(PgLogLevel::ERROR, format!($($arg)*).as_str()); unreachable!("elog failed"); }
+//        { $crate::log::elog(PgLogLevel::ERROR, format!($($arg)*).as_str()); unreachable!("elog failed"); }
+        { $crate::log::ereport(PgLogLevel::ERROR, PgSqlErrorCode::ERRCODE_INTERNAL_ERROR, format!($($arg)*).as_str(), file!(), line!(), column!()); unreachable!("elog failed"); }
     )
 }
 

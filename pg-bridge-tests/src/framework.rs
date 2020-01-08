@@ -1,20 +1,30 @@
 use std::process::{Command, Stdio};
 
 use lazy_static::*;
-use std::sync::Mutex;
+use std::sync::{Arc, Mutex};
 
 use colored::*;
 use pg_bridge::*;
 use postgres::error::DbError;
+use postgres::Client;
+use std::collections::HashMap;
 use std::io::{BufRead, BufReader, Write};
 use std::path::PathBuf;
 
+type LogLines = Arc<Mutex<HashMap<String, Vec<String>>>>;
+
 struct SetupState {
-    pub installed: bool,
+    installed: bool,
+    loglines: LogLines,
+    system_session_id: String,
 }
 
 lazy_static! {
-    static ref TEST_MUTEX: Mutex<SetupState> = Mutex::new(SetupState { installed: false });
+    static ref TEST_MUTEX: Mutex<SetupState> = Mutex::new(SetupState {
+        installed: false,
+        loglines: Arc::new(Mutex::new(HashMap::new())),
+        system_session_id: "NONE".to_string(),
+    });
     static ref SHUTDOWN_HOOKS: Mutex<Vec<Box<dyn Fn() + Send>>> = Mutex::new(Vec::new());
 }
 
@@ -50,13 +60,26 @@ pub fn run_test<F: FnOnce(pg_sys::FunctionCallInfo) -> pg_sys::Datum>(
     _test_func: F,
     expected_error: Option<&str>,
 ) {
-    initialize_test_framework();
+    let (loglines, system_session_id) = initialize_test_framework();
 
-    let funcname = std::any::type_name::<F>();
-    let funcname = &funcname[funcname.rfind(':').unwrap() + 1..];
-    let funcname = funcname.trim_end_matches("_wrapper");
+    let funcname = get_named_capture(
+        &regex::Regex::new(".*::(?P<funcname>.*?)_wrapper").unwrap(),
+        "funcname",
+        std::any::type_name::<F>(),
+    )
+    .expect(&format!(
+        "couldn't extract function name from {}",
+        std::any::type_name::<F>()
+    ));
+    let mut client = client();
 
-    if let Err(e) = client().simple_query(&format!("SELECT {}();", funcname)) {
+    let session_id = determine_session_id(&mut client);
+    client
+        .simple_query("SET log_statement TO 'all';")
+        .expect("FAILED: SET log_statement TO 'all'");
+    let result = client.simple_query(&format!("SELECT {}();", funcname));
+
+    if let Err(e) = result {
         let cause = e.into_source();
         if let Some(e) = cause {
             if let Some(dberror) = e.downcast_ref::<DbError>() {
@@ -68,7 +91,23 @@ pub fn run_test<F: FnOnce(pg_sys::FunctionCallInfo) -> pg_sys::Datum>(
                     assert_eq!(received_error_message, expected_error_message)
                 } else {
                     // we weren't expecting an error
-                    panic!("{}", received_error_message);
+                    // so wait 1/4 of a second for Postgres to get log messages for this test written
+                    // to stdout
+                    std::thread::sleep(std::time::Duration::from_millis(250));
+
+                    let detail = match dberror.detail() {
+                        Some(detail) => detail,
+                        None => "",
+                    };
+
+                    // then we can panic with those messages plus those that belong to the system
+                    panic!(
+                        "\n\n{}\n{}\n{}\n{}\n\n",
+                        received_error_message,
+                        format_loglines(&system_session_id, &loglines),
+                        format_loglines(&session_id, &loglines),
+                        detail
+                    );
                 }
             } else {
                 panic!(e)
@@ -80,26 +119,62 @@ pub fn run_test<F: FnOnce(pg_sys::FunctionCallInfo) -> pg_sys::Datum>(
     }
 }
 
-#[inline]
-fn initialize_test_framework() {
-    match TEST_MUTEX.lock() {
-        Ok(mut state) => {
-            if !state.installed {
-                register_shutdown_hook();
+fn format_loglines(session_id: &str, loglines: &LogLines) -> String {
+    let mut result = String::new();
 
-                install_extension();
-                initdb();
-
-                start_pg();
-                dropdb();
-                createdb();
-                create_extension();
-
-                state.installed = true;
-            }
-        }
-        Err(e) => panic!("failed due to poison error: {:?}", e),
+    for line in loglines
+        .lock()
+        .unwrap()
+        .entry(session_id.to_string())
+        .or_default()
+        .iter()
+    {
+        result.push_str(line);
+        result.push('\n');
     }
+
+    result
+}
+
+fn determine_session_id(client: &mut Client) -> String {
+    let result = client.query("SELECT to_hex(trunc(EXTRACT(EPOCH FROM backend_start))::integer) || '.' || to_hex(pid) AS sid FROM pg_stat_activity WHERE pid = pg_backend_pid();", &[]).expect("failed to determine session id");
+
+    for row in result {
+        let session_id: &str = row.get("sid");
+        return session_id.to_string();
+    }
+
+    panic!("No session id returned from query");
+}
+
+fn get_named_capture(regex: &regex::Regex, name: &'static str, against: &str) -> Option<String> {
+    let captures = regex.captures_iter(against);
+    for cap in captures {
+        return Some(cap[name].to_string());
+    }
+    None
+}
+
+#[inline]
+fn initialize_test_framework() -> (LogLines, String) {
+    let mut state = TEST_MUTEX.lock().expect("lock was poisoned");
+
+    if !state.installed {
+        register_shutdown_hook();
+
+        install_extension();
+        initdb();
+
+        let system_session_id = start_pg(state.loglines.clone());
+        dropdb();
+        createdb();
+        create_extension();
+
+        state.installed = true;
+        state.system_session_id = system_session_id;
+    }
+
+    (state.loglines.clone(), state.system_session_id.clone())
 }
 
 pub fn client() -> postgres::Client {
@@ -168,7 +243,7 @@ fn modify_postgresql_conf(pgdata: PathBuf) {
         .expect("couldn't append log_line_prefix");
 }
 
-fn start_pg() {
+fn start_pg(loglines: LogLines) -> String {
     let mut command = Command::new("postmaster");
     command
         .arg("-D")
@@ -186,7 +261,7 @@ fn start_pg() {
 
     // start Postgres and monitor its stderr in the background
     // also notify the main thread when it's ready to accept connections
-    let pgpid = monitor_pg(command, cmd_string);
+    let (pgpid, session_id) = monitor_pg(command, cmd_string, loglines);
 
     // add a shutdown hook so we can terminate it when the test framework exits
     add_shutdown_hook(move || unsafe {
@@ -195,10 +270,13 @@ fn start_pg() {
         libc::printf(message_string.as_ptr());
         libc::kill(pgpid as libc::pid_t, libc::SIGTERM);
     });
+
+    session_id
 }
 
-fn monitor_pg(mut command: Command, cmd_string: String) -> u32 {
+fn monitor_pg(mut command: Command, cmd_string: String, loglines: LogLines) -> (u32, String) {
     let (sender, receiver) = std::sync::mpsc::channel();
+
     std::thread::spawn(move || {
         let mut child = command.spawn().expect("postmaster didn't spawn");
 
@@ -218,28 +296,39 @@ fn monitor_pg(mut command: Command, cmd_string: String) -> u32 {
                 .take()
                 .expect("couldn't take postmaster stdout"),
         );
+
+        let regex = regex::Regex::new(r#"\[.*?\] \[.*?\] \[(?P<session_id>.*?)\]"#).unwrap();
         for line in reader.lines() {
             match line {
                 Ok(line) => {
+                    let session_id = match get_named_capture(&regex, "session_id", &line) {
+                        Some(sid) => sid,
+                        None => "NONE".to_string(),
+                    };
+
                     if line.contains("database system is ready to accept connections") {
                         // Postgres says it's ready to go
-                        sender.send(pid).unwrap();
+                        sender.send((pid, session_id.clone())).unwrap();
                     }
 
-                    // colorize Postgres' log output
-                    if line.contains("INFO: ") {
-                        eprintln!("{}", line.cyan());
-                    } else if line.contains("WARNING: ") {
-                        eprintln!("{}", line.bold().yellow());
-                    } else if line.contains("ERROR: ") {
-                        eprintln!("{}", line.bold().red());
-                    } else if line.contains("statement: ") || line.contains("duration: ") {
-                        eprintln!("{}", line.bold().blue());
-                    } else if line.contains("LOG: ") {
-                        eprintln!("{}", line.dimmed().white());
-                    } else {
-                        eprintln!("{}", line.bold().purple());
-                    }
+                    //                    // colorize Postgres' log output
+                    //                    if line.contains("INFO: ") {
+                    //                        eprintln!("{}", line.cyan());
+                    //                    } else if line.contains("WARNING: ") {
+                    //                        eprintln!("{}", line.bold().yellow());
+                    //                    } else if line.contains("ERROR: ") {
+                    //                        eprintln!("{}", line.bold().red());
+                    //                    } else if line.contains("statement: ") || line.contains("duration: ") {
+                    //                        eprintln!("{}", line.bold().blue());
+                    //                    } else if line.contains("LOG: ") {
+                    //                        eprintln!("{}", line.dimmed().white());
+                    //                    } else {
+                    //                        eprintln!("{}", line.bold().purple());
+                    //                    }
+                    //
+                    let mut loglines = loglines.lock().unwrap();
+                    let session_lines = loglines.entry(session_id).or_insert(Vec::new());
+                    session_lines.push(line);
                 }
                 Err(e) => panic!(e),
             }
@@ -257,8 +346,8 @@ fn monitor_pg(mut command: Command, cmd_string: String) -> u32 {
     });
 
     // wait for Postgres to indicate it's ready to accept connection
-    let pgpid = receiver.recv().unwrap();
-    pgpid
+    // and return its pid when it is
+    receiver.recv().unwrap()
 }
 
 fn dropdb() {
@@ -309,20 +398,6 @@ fn createdb() {
 fn create_extension() {
     client()
         .simple_query(&format!("CREATE EXTENSION {};", get_extension_name()))
-        .unwrap();
-
-    client()
-        .simple_query(&format!(
-            "ALTER DATABASE {} SET log_duration TO false;",
-            get_pg_dbname()
-        ))
-        .unwrap();
-
-    client()
-        .simple_query(&format!(
-            "ALTER DATABASE {} SET log_statement TO 'all';",
-            get_pg_dbname()
-        ))
         .unwrap();
 }
 
