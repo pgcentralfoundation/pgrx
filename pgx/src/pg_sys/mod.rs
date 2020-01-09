@@ -101,8 +101,12 @@ mod internal {
 
         pub use crate::pg_sys::pg10_specific::AllocSetContextCreate as AllocSetContextCreateExtended;
         pub use crate::pg_sys::pg10_specific::IndexAmRoutine;
+        pub use crate::pg_sys::pg10_specific::IndexInfo;
+        pub use crate::pg_sys::pg10_specific::IndexPath;
+        pub use crate::pg_sys::pg10_specific::IndexVacuumInfo;
         pub use crate::pg_sys::pg10_specific::InterruptPending;
         pub use crate::pg_sys::pg10_specific::NodeTag_T_IndexAmRoutine;
+        pub use crate::pg_sys::pg10_specific::PlannerInfo;
         pub use crate::pg_sys::pg10_specific::PG_MAJORVERSION;
         pub use crate::pg_sys::pg10_specific::PG_VERSION;
         pub use crate::pg_sys::pg10_specific::PG_VERSION_NUM;
@@ -118,8 +122,12 @@ mod internal {
 
         pub use crate::pg_sys::pg11_specific::AllocSetContextCreateExtended;
         pub use crate::pg_sys::pg11_specific::IndexAmRoutine;
+        pub use crate::pg_sys::pg11_specific::IndexInfo;
+        pub use crate::pg_sys::pg11_specific::IndexPath;
+        pub use crate::pg_sys::pg11_specific::IndexVacuumInfo;
         pub use crate::pg_sys::pg11_specific::InterruptPending;
         pub use crate::pg_sys::pg11_specific::NodeTag_T_IndexAmRoutine;
+        pub use crate::pg_sys::pg11_specific::PlannerInfo;
         pub use crate::pg_sys::pg11_specific::PG_MAJORVERSION;
         pub use crate::pg_sys::pg11_specific::PG_VERSION;
         pub use crate::pg_sys::pg11_specific::PG_VERSION_NUM;
@@ -135,8 +143,12 @@ mod internal {
 
         pub use crate::pg_sys::pg12_specific::AllocSetContextCreateInternal as AllocSetContextCreateExtended;
         pub use crate::pg_sys::pg12_specific::IndexAmRoutine;
+        pub use crate::pg_sys::pg12_specific::IndexInfo;
+        pub use crate::pg_sys::pg12_specific::IndexPath;
+        pub use crate::pg_sys::pg12_specific::IndexVacuumInfo;
         pub use crate::pg_sys::pg12_specific::InterruptPending;
         pub use crate::pg_sys::pg12_specific::NodeTag_T_IndexAmRoutine;
+        pub use crate::pg_sys::pg12_specific::PlannerInfo;
         pub use crate::pg_sys::pg12_specific::PG_MAJORVERSION;
         pub use crate::pg_sys::pg12_specific::PG_VERSION;
         pub use crate::pg_sys::pg12_specific::PG_VERSION_NUM;
