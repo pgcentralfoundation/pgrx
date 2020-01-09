@@ -64,52 +64,50 @@ impl PgGuardRewriter {
         let func_span = func.span().clone();
         let rewritten_args = self.rewrite_args(func.clone(), is_raw);
         let rewritten_return_type = self.rewrite_return_type(func.clone());
+        let func_name_wrapper = Ident::new(
+            &format!("{}_wrapper", &func.sig.ident.to_string()),
+            func_span,
+        );
 
-        if no_guard {
-            quote_spanned! {func_span=>
-                #[no_mangle]
-                #[allow(unused_variables)]
-                #vis fn #func_name(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-                    #func
+        let returns_void = rewritten_return_type
+            .to_string()
+            .contains("pg_return_void()");
+        let result_var_name = if returns_void {
+            Ident::new("_", Span::call_site())
+        } else {
+            Ident::new("result", Span::call_site())
+        };
 
+        let func_call = if no_guard {
+            quote! {
                     let result = {
                         #rewritten_args
 
                         #func_name(#arg_list)
                     };
-
-                    #rewritten_return_type
-                }
             }
         } else {
-            let func_name_wrapper = Ident::new(
-                &format!("{}_wrapper", &func.sig.ident.to_string()),
-                func_span,
-            );
-
-            let returns_void = rewritten_return_type
-                .to_string()
-                .contains("pg_return_void()");
-            let result_var_name = if returns_void {
-                Ident::new("_", Span::call_site())
-            } else {
-                Ident::new("result", Span::call_site())
-            };
-            quote_spanned! {func_span=>
-                #func
-
-                #[no_mangle]
-                #[allow(unused_variables)]
-                #vis fn #func_name_wrapper(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-
+            quote! {
                     let #result_var_name = pgx::guard( || {
                         #rewritten_args
 
                         #func_name(#arg_list)
                     } );
+            }
+        };
 
-                    #rewritten_return_type
-                }
+        quote_spanned! {func_span=>
+
+            #[inline]
+            #func
+
+            #[no_mangle]
+            #[allow(unused_variables)]
+            #vis fn #func_name_wrapper(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+
+                #func_call
+
+                #rewritten_return_type
             }
         }
     }
