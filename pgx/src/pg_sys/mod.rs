@@ -31,8 +31,6 @@ pub mod pg12_specific;
 //
 
 pub use all_versions::*;
-
-pub use internal::IndexAmRoutine;
 pub use internal::*;
 
 // version modules
