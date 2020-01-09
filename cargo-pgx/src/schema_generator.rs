@@ -251,10 +251,17 @@ fn walk_items(rs_file: &DirEntry, sql: &mut Vec<String>, items: Vec<Item>) {
                 if !string.starts_with("r#\"") || !string.ends_with("\"#") {
                     panic!("extension_sql!{} value isn't ia raw string");
                 }
+
+                // remove the raw string quotes
                 let string = string.trim_start_matches("r#\"");
                 let string = string.trim_end_matches("\"#");
 
-                sql.push(string.trim().to_string());
+                // trim off leading/trailing new lines, but preserve other whitespace
+                let string = string.trim_start_matches('\n');
+                let string = string.trim_end_matches('\n');
+
+                // and remember this sql block
+                sql.push(string.to_string());
             }
         } else if let Item::Fn(func) = item {
             for att in &func.attrs {
