@@ -7,15 +7,12 @@ edition = "2018"
 crate-type = ["cdylib"]
 
 [features]
-default = ["pg11"]
-pg10 = ["pgx/pg10", "pgx-tests/pg10"]
-pg11 = ["pgx/pg11", "pgx-tests/pg11"]
-pg12 = ["pgx/pg12", "pgx-tests/pg12"]
+default = ["pgx/pg11"]
 
 [dependencies]
 pgx = {{ path = "../pgx/pgx/", default-features = false }}
 pgx-macros = {{ path = "../pgx/pgx-macros" }}
-pgx-tests = {{ path = "../pgx/pgx-tests", default-features = false }}
+pgx-tests = {{ path = "../pgx/pgx-tests" }}
 
 [profile.dev]
 panic = "unwind"

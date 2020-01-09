@@ -1,9 +1,14 @@
 use std::process::{Command, Stdio};
 
-pub fn test_extension(version: &str) -> Result<(), std::io::Error>{
+pub fn test_extension(version: &str) -> Result<(), std::io::Error> {
     let versions = if version == "all" {
-        vec!["pg10", "pg11", "pg12"]
+        vec![
+            "pgx/pg10".to_string(),
+            "pgx/pg11".to_string(),
+            "pgx/pg12".to_string(),
+        ]
     } else {
+        let version = format!("pgx/{}", version);
         vec![version]
     };
 
@@ -22,7 +27,7 @@ pub fn test_extension(version: &str) -> Result<(), std::io::Error>{
         if !result.is_ok() {
             return Err(result.err().unwrap());
         }
-    };
+    }
 
     Ok(())
 }

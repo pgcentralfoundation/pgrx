@@ -6,12 +6,6 @@ edition = "2018"
 [lib]
 crate-type = ["cdylib", "rlib"]
 
-[features]
-default = ["pg11"]
-pg10 = ["pgx/pg10"]
-pg11 = ["pgx/pg11"]
-pg12 = ["pgx/pg12"]
-
 [dependencies]
 pgx = { path = "../pgx", default-features = false }
 pgx-macros = { path = "../pgx-macros" }
