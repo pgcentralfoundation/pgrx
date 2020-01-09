@@ -34,7 +34,7 @@ pub use htup::*;
 pub use itemptr::*;
 pub use log::*;
 pub use memcxt::*;
-pub use nodes::*;
+pub use nodes::{is_a, PgNode, PgNodeFactory}; // be specific since we have multiple versions of these things behind feature gates
 pub use oids::*;
 pub use spi::*;
 pub use varlena::*;

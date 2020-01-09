@@ -518,652 +518,660 @@ pub struct PgNodeFactory();
 #[allow(non_snake_case)]
 impl PgNodeFactory {
     pub fn makeIndexInfo() -> PgBox<pg_sys::pg12_specific::IndexInfo> {
-        PgBox::<pg_sys::pg12_specific::IndexInfo>::alloc0()
+        PgBox::<pg_sys::pg12_specific::IndexInfo>::alloc_node(PgNode::IndexInfo)
     }
     pub fn makeExprContext() -> PgBox<pg_sys::ExprContext> {
-        PgBox::<pg_sys::ExprContext>::alloc0()
+        PgBox::<pg_sys::ExprContext>::alloc_node(PgNode::ExprContext)
     }
     pub fn makeProjectionInfo() -> PgBox<pg_sys::ProjectionInfo> {
-        PgBox::<pg_sys::ProjectionInfo>::alloc0()
+        PgBox::<pg_sys::ProjectionInfo>::alloc_node(PgNode::ProjectionInfo)
     }
     pub fn makeJunkFilter() -> PgBox<pg_sys::JunkFilter> {
-        PgBox::<pg_sys::JunkFilter>::alloc0()
+        PgBox::<pg_sys::JunkFilter>::alloc_node(PgNode::JunkFilter)
     }
     pub fn makeOnConflictSetState() -> PgBox<pg_sys::pg12_specific::OnConflictSetState> {
-        PgBox::<pg_sys::pg12_specific::OnConflictSetState>::alloc0()
+        PgBox::<pg_sys::pg12_specific::OnConflictSetState>::alloc_node(PgNode::OnConflictSetState)
     }
     pub fn makeResultRelInfo() -> PgBox<pg_sys::pg12_specific::ResultRelInfo> {
-        PgBox::<pg_sys::pg12_specific::ResultRelInfo>::alloc0()
+        PgBox::<pg_sys::pg12_specific::ResultRelInfo>::alloc_node(PgNode::ResultRelInfo)
     }
     pub fn makeEState() -> PgBox<pg_sys::pg12_specific::EState> {
-        PgBox::<pg_sys::pg12_specific::EState>::alloc0()
+        PgBox::<pg_sys::pg12_specific::EState>::alloc_node(PgNode::EState)
     }
     pub fn makeTupleTableSlot() -> PgBox<pg_sys::pg12_specific::TupleTableSlot> {
-        PgBox::<pg_sys::pg12_specific::TupleTableSlot>::alloc0()
+        PgBox::<pg_sys::pg12_specific::TupleTableSlot>::alloc_node(PgNode::TupleTableSlot)
     }
 
     pub fn makePlan() -> PgBox<pg_sys::Plan> {
-        PgBox::<pg_sys::Plan>::alloc0()
+        PgBox::<pg_sys::Plan>::alloc_node(PgNode::Plan)
     }
     pub fn makeResult() -> PgBox<pg_sys::Result> {
-        PgBox::<pg_sys::Result>::alloc0()
+        PgBox::<pg_sys::Result>::alloc_node(PgNode::Result)
     }
     pub fn makeProjectSet() -> PgBox<pg_sys::ProjectSet> {
-        PgBox::<pg_sys::ProjectSet>::alloc0()
+        PgBox::<pg_sys::ProjectSet>::alloc_node(PgNode::ProjectSet)
     }
     pub fn makeModifyTable() -> PgBox<pg_sys::pg12_specific::ModifyTable> {
-        PgBox::<pg_sys::pg12_specific::ModifyTable>::alloc0()
+        PgBox::<pg_sys::pg12_specific::ModifyTable>::alloc_node(PgNode::ModifyTable)
     }
     pub fn makeAppend() -> PgBox<pg_sys::pg12_specific::Append> {
-        PgBox::<pg_sys::pg12_specific::Append>::alloc0()
+        PgBox::<pg_sys::pg12_specific::Append>::alloc_node(PgNode::Append)
     }
     pub fn makeMergeAppend() -> PgBox<pg_sys::pg12_specific::MergeAppend> {
-        PgBox::<pg_sys::pg12_specific::MergeAppend>::alloc0()
+        PgBox::<pg_sys::pg12_specific::MergeAppend>::alloc_node(PgNode::MergeAppend)
     }
     pub fn makeRecursiveUnion() -> PgBox<pg_sys::pg12_specific::RecursiveUnion> {
-        PgBox::<pg_sys::pg12_specific::RecursiveUnion>::alloc0()
+        PgBox::<pg_sys::pg12_specific::RecursiveUnion>::alloc_node(PgNode::RecursiveUnion)
     }
     pub fn makeBitmapAnd() -> PgBox<pg_sys::BitmapAnd> {
-        PgBox::<pg_sys::BitmapAnd>::alloc0()
+        PgBox::<pg_sys::BitmapAnd>::alloc_node(PgNode::BitmapAnd)
     }
     pub fn makeBitmapOr() -> PgBox<pg_sys::BitmapOr> {
-        PgBox::<pg_sys::BitmapOr>::alloc0()
+        PgBox::<pg_sys::BitmapOr>::alloc_node(PgNode::BitmapOr)
     }
     pub fn makeScan() -> PgBox<pg_sys::Scan> {
-        PgBox::<pg_sys::Scan>::alloc0()
+        PgBox::<pg_sys::Scan>::alloc_node(PgNode::Scan)
     }
     pub fn makeSeqScan() -> PgBox<pg_sys::SeqScan> {
-        PgBox::<pg_sys::SeqScan>::alloc0()
+        PgBox::<pg_sys::SeqScan>::alloc_node(PgNode::SeqScan)
     }
     pub fn makeSampleScan() -> PgBox<pg_sys::SampleScan> {
-        PgBox::<pg_sys::SampleScan>::alloc0()
+        PgBox::<pg_sys::SampleScan>::alloc_node(PgNode::SampleScan)
     }
     pub fn makeIndexScan() -> PgBox<pg_sys::IndexScan> {
-        PgBox::<pg_sys::IndexScan>::alloc0()
+        PgBox::<pg_sys::IndexScan>::alloc_node(PgNode::IndexScan)
     }
     pub fn makeIndexOnlyScan() -> PgBox<pg_sys::IndexOnlyScan> {
-        PgBox::<pg_sys::IndexOnlyScan>::alloc0()
+        PgBox::<pg_sys::IndexOnlyScan>::alloc_node(PgNode::IndexOnlyScan)
     }
     pub fn makeBitmapIndexScan() -> PgBox<pg_sys::BitmapIndexScan> {
-        PgBox::<pg_sys::BitmapIndexScan>::alloc0()
+        PgBox::<pg_sys::BitmapIndexScan>::alloc_node(PgNode::BitmapIndexScan)
     }
     pub fn makeBitmapHeapScan() -> PgBox<pg_sys::BitmapHeapScan> {
-        PgBox::<pg_sys::BitmapHeapScan>::alloc0()
+        PgBox::<pg_sys::BitmapHeapScan>::alloc_node(PgNode::BitmapHeapScan)
     }
     pub fn makeTidScan() -> PgBox<pg_sys::TidScan> {
-        PgBox::<pg_sys::TidScan>::alloc0()
+        PgBox::<pg_sys::TidScan>::alloc_node(PgNode::TidScan)
     }
     pub fn makeSubqueryScan() -> PgBox<pg_sys::SubqueryScan> {
-        PgBox::<pg_sys::SubqueryScan>::alloc0()
+        PgBox::<pg_sys::SubqueryScan>::alloc_node(PgNode::SubqueryScan)
     }
     pub fn makeFunctionScan() -> PgBox<pg_sys::FunctionScan> {
-        PgBox::<pg_sys::FunctionScan>::alloc0()
+        PgBox::<pg_sys::FunctionScan>::alloc_node(PgNode::FunctionScan)
     }
     pub fn makeValuesScan() -> PgBox<pg_sys::ValuesScan> {
-        PgBox::<pg_sys::ValuesScan>::alloc0()
+        PgBox::<pg_sys::ValuesScan>::alloc_node(PgNode::ValuesScan)
     }
     pub fn makeTableFuncScan() -> PgBox<pg_sys::TableFuncScan> {
-        PgBox::<pg_sys::TableFuncScan>::alloc0()
+        PgBox::<pg_sys::TableFuncScan>::alloc_node(PgNode::TableFuncScan)
     }
     pub fn makeCteScan() -> PgBox<pg_sys::CteScan> {
-        PgBox::<pg_sys::CteScan>::alloc0()
+        PgBox::<pg_sys::CteScan>::alloc_node(PgNode::CteScan)
     }
     pub fn makeNamedTuplestoreScan() -> PgBox<pg_sys::NamedTuplestoreScan> {
-        PgBox::<pg_sys::NamedTuplestoreScan>::alloc0()
+        PgBox::<pg_sys::NamedTuplestoreScan>::alloc_node(PgNode::NamedTuplestoreScan)
     }
     pub fn makeWorkTableScan() -> PgBox<pg_sys::WorkTableScan> {
-        PgBox::<pg_sys::WorkTableScan>::alloc0()
+        PgBox::<pg_sys::WorkTableScan>::alloc_node(PgNode::WorkTableScan)
     }
     pub fn makeForeignScan() -> PgBox<pg_sys::ForeignScan> {
-        PgBox::<pg_sys::ForeignScan>::alloc0()
+        PgBox::<pg_sys::ForeignScan>::alloc_node(PgNode::ForeignScan)
     }
     pub fn makeCustomScan() -> PgBox<pg_sys::CustomScan> {
-        PgBox::<pg_sys::CustomScan>::alloc0()
+        PgBox::<pg_sys::CustomScan>::alloc_node(PgNode::CustomScan)
     }
     pub fn makeJoin() -> PgBox<pg_sys::Join> {
-        PgBox::<pg_sys::Join>::alloc0()
+        PgBox::<pg_sys::Join>::alloc_node(PgNode::Join)
     }
     pub fn makeNestLoop() -> PgBox<pg_sys::NestLoop> {
-        PgBox::<pg_sys::NestLoop>::alloc0()
+        PgBox::<pg_sys::NestLoop>::alloc_node(PgNode::NestLoop)
     }
     pub fn makeMergeJoin() -> PgBox<pg_sys::MergeJoin> {
-        PgBox::<pg_sys::MergeJoin>::alloc0()
+        PgBox::<pg_sys::MergeJoin>::alloc_node(PgNode::MergeJoin)
     }
     pub fn makeHashJoin() -> PgBox<pg_sys::pg12_specific::HashJoin> {
-        PgBox::<pg_sys::pg12_specific::HashJoin>::alloc0()
+        PgBox::<pg_sys::pg12_specific::HashJoin>::alloc_node(PgNode::HashJoin)
     }
     pub fn makeMaterial() -> PgBox<pg_sys::Material> {
-        PgBox::<pg_sys::Material>::alloc0()
+        PgBox::<pg_sys::Material>::alloc_node(PgNode::Material)
     }
     pub fn makeSort() -> PgBox<pg_sys::Sort> {
-        PgBox::<pg_sys::Sort>::alloc0()
+        PgBox::<pg_sys::Sort>::alloc_node(PgNode::Sort)
     }
     pub fn makeGroup() -> PgBox<pg_sys::pg12_specific::Group> {
-        PgBox::<pg_sys::pg12_specific::Group>::alloc0()
+        PgBox::<pg_sys::pg12_specific::Group>::alloc_node(PgNode::Group)
     }
     pub fn makeAgg() -> PgBox<pg_sys::pg12_specific::Agg> {
-        PgBox::<pg_sys::pg12_specific::Agg>::alloc0()
+        PgBox::<pg_sys::pg12_specific::Agg>::alloc_node(PgNode::Agg)
     }
     pub fn makeWindowAgg() -> PgBox<pg_sys::pg12_specific::WindowAgg> {
-        PgBox::<pg_sys::pg12_specific::WindowAgg>::alloc0()
+        PgBox::<pg_sys::pg12_specific::WindowAgg>::alloc_node(PgNode::WindowAgg)
     }
     pub fn makeUnique() -> PgBox<pg_sys::pg12_specific::Unique> {
-        PgBox::<pg_sys::pg12_specific::Unique>::alloc0()
+        PgBox::<pg_sys::pg12_specific::Unique>::alloc_node(PgNode::Unique)
     }
     pub fn makeGather() -> PgBox<pg_sys::pg12_specific::Gather> {
-        PgBox::<pg_sys::pg12_specific::Gather>::alloc0()
+        PgBox::<pg_sys::pg12_specific::Gather>::alloc_node(PgNode::Gather)
     }
     pub fn makeGatherMerge() -> PgBox<pg_sys::pg12_specific::GatherMerge> {
-        PgBox::<pg_sys::pg12_specific::GatherMerge>::alloc0()
+        PgBox::<pg_sys::pg12_specific::GatherMerge>::alloc_node(PgNode::GatherMerge)
     }
     pub fn makeHash() -> PgBox<pg_sys::pg12_specific::Hash> {
-        PgBox::<pg_sys::pg12_specific::Hash>::alloc0()
+        PgBox::<pg_sys::pg12_specific::Hash>::alloc_node(PgNode::Hash)
     }
     pub fn makeSetOp() -> PgBox<pg_sys::pg12_specific::SetOp> {
-        PgBox::<pg_sys::pg12_specific::SetOp>::alloc0()
+        PgBox::<pg_sys::pg12_specific::SetOp>::alloc_node(PgNode::SetOp)
     }
     pub fn makeLockRows() -> PgBox<pg_sys::LockRows> {
-        PgBox::<pg_sys::LockRows>::alloc0()
+        PgBox::<pg_sys::LockRows>::alloc_node(PgNode::LockRows)
     }
     pub fn makeLimit() -> PgBox<pg_sys::Limit> {
-        PgBox::<pg_sys::Limit>::alloc0()
+        PgBox::<pg_sys::Limit>::alloc_node(PgNode::Limit)
     }
 
     pub fn makeNestLoopParam() -> PgBox<pg_sys::NestLoopParam> {
-        PgBox::<pg_sys::NestLoopParam>::alloc0()
+        PgBox::<pg_sys::NestLoopParam>::alloc_node(PgNode::NestLoopParam)
     }
     pub fn makePlanRowMark() -> PgBox<pg_sys::PlanRowMark> {
-        PgBox::<pg_sys::PlanRowMark>::alloc0()
+        PgBox::<pg_sys::PlanRowMark>::alloc_node(PgNode::PlanRowMark)
     }
     pub fn makePartitionPruneInfo() -> PgBox<pg_sys::pg12_specific::PartitionPruneInfo> {
-        PgBox::<pg_sys::pg12_specific::PartitionPruneInfo>::alloc0()
+        PgBox::<pg_sys::pg12_specific::PartitionPruneInfo>::alloc_node(PgNode::PartitionPruneInfo)
     }
     pub fn makePartitionedRelPruneInfo() -> PgBox<pg_sys::pg12_specific::PartitionedRelPruneInfo> {
-        PgBox::<pg_sys::pg12_specific::PartitionedRelPruneInfo>::alloc0()
+        PgBox::<pg_sys::pg12_specific::PartitionedRelPruneInfo>::alloc_node(
+            PgNode::PartitionedRelPruneInfo,
+        )
     }
     pub fn makePartitionPruneStepOp() -> PgBox<pg_sys::pg12_specific::PartitionPruneStepOp> {
-        PgBox::<pg_sys::pg12_specific::PartitionPruneStepOp>::alloc0()
+        PgBox::<pg_sys::pg12_specific::PartitionPruneStepOp>::alloc_node(
+            PgNode::PartitionPruneStepOp,
+        )
     }
     pub fn makePartitionPruneStepCombine() -> PgBox<pg_sys::pg12_specific::PartitionPruneStepCombine>
     {
-        PgBox::<pg_sys::pg12_specific::PartitionPruneStepCombine>::alloc0()
+        PgBox::<pg_sys::pg12_specific::PartitionPruneStepCombine>::alloc_node(
+            PgNode::PartitionPruneStepCombine,
+        )
     }
     pub fn makePlanInvalItem() -> PgBox<pg_sys::PlanInvalItem> {
-        PgBox::<pg_sys::PlanInvalItem>::alloc0()
+        PgBox::<pg_sys::PlanInvalItem>::alloc_node(PgNode::PlanInvalItem)
     }
 
     pub fn makePlanState() -> PgBox<pg_sys::pg12_specific::PlanState> {
-        PgBox::<pg_sys::pg12_specific::PlanState>::alloc0()
+        PgBox::<pg_sys::pg12_specific::PlanState>::alloc_node(PgNode::PlanState)
     }
     pub fn makeResultState() -> PgBox<pg_sys::ResultState> {
-        PgBox::<pg_sys::ResultState>::alloc0()
+        PgBox::<pg_sys::ResultState>::alloc_node(PgNode::ResultState)
     }
     pub fn makeProjectSetState() -> PgBox<pg_sys::pg12_specific::ProjectSetState> {
-        PgBox::<pg_sys::pg12_specific::ProjectSetState>::alloc0()
+        PgBox::<pg_sys::pg12_specific::ProjectSetState>::alloc_node(PgNode::ProjectSetState)
     }
     pub fn makeModifyTableState() -> PgBox<pg_sys::pg12_specific::ModifyTableState> {
-        PgBox::<pg_sys::pg12_specific::ModifyTableState>::alloc0()
+        PgBox::<pg_sys::pg12_specific::ModifyTableState>::alloc_node(PgNode::ModifyTableState)
     }
     pub fn makeAppendState() -> PgBox<pg_sys::pg12_specific::AppendState> {
-        PgBox::<pg_sys::pg12_specific::AppendState>::alloc0()
+        PgBox::<pg_sys::pg12_specific::AppendState>::alloc_node(PgNode::AppendState)
     }
     pub fn makeMergeAppendState() -> PgBox<pg_sys::pg12_specific::MergeAppendState> {
-        PgBox::<pg_sys::pg12_specific::MergeAppendState>::alloc0()
+        PgBox::<pg_sys::pg12_specific::MergeAppendState>::alloc_node(PgNode::MergeAppendState)
     }
     pub fn makeRecursiveUnionState() -> PgBox<pg_sys::pg12_specific::RecursiveUnionState> {
-        PgBox::<pg_sys::pg12_specific::RecursiveUnionState>::alloc0()
+        PgBox::<pg_sys::pg12_specific::RecursiveUnionState>::alloc_node(PgNode::RecursiveUnionState)
     }
     pub fn makeBitmapAndState() -> PgBox<pg_sys::BitmapAndState> {
-        PgBox::<pg_sys::BitmapAndState>::alloc0()
+        PgBox::<pg_sys::BitmapAndState>::alloc_node(PgNode::BitmapAndState)
     }
     pub fn makeBitmapOrState() -> PgBox<pg_sys::BitmapOrState> {
-        PgBox::<pg_sys::BitmapOrState>::alloc0()
+        PgBox::<pg_sys::BitmapOrState>::alloc_node(PgNode::BitmapOrState)
     }
     pub fn makeScanState() -> PgBox<pg_sys::pg12_specific::ScanState> {
-        PgBox::<pg_sys::pg12_specific::ScanState>::alloc0()
+        PgBox::<pg_sys::pg12_specific::ScanState>::alloc_node(PgNode::ScanState)
     }
     pub fn makeSeqScanState() -> PgBox<pg_sys::SeqScanState> {
-        PgBox::<pg_sys::SeqScanState>::alloc0()
+        PgBox::<pg_sys::SeqScanState>::alloc_node(PgNode::SeqScanState)
     }
     pub fn makeSampleScanState() -> PgBox<pg_sys::pg12_specific::SampleScanState> {
-        PgBox::<pg_sys::pg12_specific::SampleScanState>::alloc0()
+        PgBox::<pg_sys::pg12_specific::SampleScanState>::alloc_node(PgNode::SampleScanState)
     }
     pub fn makeIndexScanState() -> PgBox<pg_sys::pg12_specific::IndexScanState> {
-        PgBox::<pg_sys::pg12_specific::IndexScanState>::alloc0()
+        PgBox::<pg_sys::pg12_specific::IndexScanState>::alloc_node(PgNode::IndexScanState)
     }
     pub fn makeIndexOnlyScanState() -> PgBox<pg_sys::pg12_specific::IndexOnlyScanState> {
-        PgBox::<pg_sys::pg12_specific::IndexOnlyScanState>::alloc0()
+        PgBox::<pg_sys::pg12_specific::IndexOnlyScanState>::alloc_node(PgNode::IndexOnlyScanState)
     }
     pub fn makeBitmapIndexScanState() -> PgBox<pg_sys::pg12_specific::BitmapIndexScanState> {
-        PgBox::<pg_sys::pg12_specific::BitmapIndexScanState>::alloc0()
+        PgBox::<pg_sys::pg12_specific::BitmapIndexScanState>::alloc_node(
+            PgNode::BitmapIndexScanState,
+        )
     }
     pub fn makeBitmapHeapScanState() -> PgBox<pg_sys::pg12_specific::BitmapHeapScanState> {
-        PgBox::<pg_sys::pg12_specific::BitmapHeapScanState>::alloc0()
+        PgBox::<pg_sys::pg12_specific::BitmapHeapScanState>::alloc_node(PgNode::BitmapHeapScanState)
     }
     pub fn makeTidScanState() -> PgBox<pg_sys::TidScanState> {
-        PgBox::<pg_sys::TidScanState>::alloc0()
+        PgBox::<pg_sys::TidScanState>::alloc_node(PgNode::TidScanState)
     }
     pub fn makeSubqueryScanState() -> PgBox<pg_sys::SubqueryScanState> {
-        PgBox::<pg_sys::SubqueryScanState>::alloc0()
+        PgBox::<pg_sys::SubqueryScanState>::alloc_node(PgNode::SubqueryScanState)
     }
     pub fn makeFunctionScanState() -> PgBox<pg_sys::FunctionScanState> {
-        PgBox::<pg_sys::FunctionScanState>::alloc0()
+        PgBox::<pg_sys::FunctionScanState>::alloc_node(PgNode::FunctionScanState)
     }
     pub fn makeTableFuncScanState() -> PgBox<pg_sys::TableFuncScanState> {
-        PgBox::<pg_sys::TableFuncScanState>::alloc0()
+        PgBox::<pg_sys::TableFuncScanState>::alloc_node(PgNode::TableFuncScanState)
     }
     pub fn makeValuesScanState() -> PgBox<pg_sys::ValuesScanState> {
-        PgBox::<pg_sys::ValuesScanState>::alloc0()
+        PgBox::<pg_sys::ValuesScanState>::alloc_node(PgNode::ValuesScanState)
     }
     pub fn makeCteScanState() -> PgBox<pg_sys::CteScanState> {
-        PgBox::<pg_sys::CteScanState>::alloc0()
+        PgBox::<pg_sys::CteScanState>::alloc_node(PgNode::CteScanState)
     }
     pub fn makeNamedTuplestoreScanState() -> PgBox<pg_sys::NamedTuplestoreScanState> {
-        PgBox::<pg_sys::NamedTuplestoreScanState>::alloc0()
+        PgBox::<pg_sys::NamedTuplestoreScanState>::alloc_node(PgNode::NamedTuplestoreScanState)
     }
     pub fn makeWorkTableScanState() -> PgBox<pg_sys::WorkTableScanState> {
-        PgBox::<pg_sys::WorkTableScanState>::alloc0()
+        PgBox::<pg_sys::WorkTableScanState>::alloc_node(PgNode::WorkTableScanState)
     }
     pub fn makeForeignScanState() -> PgBox<pg_sys::ForeignScanState> {
-        PgBox::<pg_sys::ForeignScanState>::alloc0()
+        PgBox::<pg_sys::ForeignScanState>::alloc_node(PgNode::ForeignScanState)
     }
     pub fn makeCustomScanState() -> PgBox<pg_sys::CustomScanState> {
-        PgBox::<pg_sys::CustomScanState>::alloc0()
+        PgBox::<pg_sys::CustomScanState>::alloc_node(PgNode::CustomScanState)
     }
     pub fn makeJoinState() -> PgBox<pg_sys::JoinState> {
-        PgBox::<pg_sys::JoinState>::alloc0()
+        PgBox::<pg_sys::JoinState>::alloc_node(PgNode::JoinState)
     }
     pub fn makeNestLoopState() -> PgBox<pg_sys::NestLoopState> {
-        PgBox::<pg_sys::NestLoopState>::alloc0()
+        PgBox::<pg_sys::NestLoopState>::alloc_node(PgNode::NestLoopState)
     }
     pub fn makeMergeJoinState() -> PgBox<pg_sys::MergeJoinState> {
-        PgBox::<pg_sys::MergeJoinState>::alloc0()
+        PgBox::<pg_sys::MergeJoinState>::alloc_node(PgNode::MergeJoinState)
     }
     pub fn makeHashJoinState() -> PgBox<pg_sys::pg12_specific::HashJoinState> {
-        PgBox::<pg_sys::pg12_specific::HashJoinState>::alloc0()
+        PgBox::<pg_sys::pg12_specific::HashJoinState>::alloc_node(PgNode::HashJoinState)
     }
     pub fn makeMaterialState() -> PgBox<pg_sys::MaterialState> {
-        PgBox::<pg_sys::MaterialState>::alloc0()
+        PgBox::<pg_sys::MaterialState>::alloc_node(PgNode::MaterialState)
     }
     pub fn makeSortState() -> PgBox<pg_sys::pg12_specific::SortState> {
-        PgBox::<pg_sys::pg12_specific::SortState>::alloc0()
+        PgBox::<pg_sys::pg12_specific::SortState>::alloc_node(PgNode::SortState)
     }
     pub fn makeGroupState() -> PgBox<pg_sys::pg12_specific::GroupState> {
-        PgBox::<pg_sys::pg12_specific::GroupState>::alloc0()
+        PgBox::<pg_sys::pg12_specific::GroupState>::alloc_node(PgNode::GroupState)
     }
     pub fn makeAggState() -> PgBox<pg_sys::pg12_specific::AggState> {
-        PgBox::<pg_sys::pg12_specific::AggState>::alloc0()
+        PgBox::<pg_sys::pg12_specific::AggState>::alloc_node(PgNode::AggState)
     }
     pub fn makeWindowAggState() -> PgBox<pg_sys::pg12_specific::WindowAggState> {
-        PgBox::<pg_sys::pg12_specific::WindowAggState>::alloc0()
+        PgBox::<pg_sys::pg12_specific::WindowAggState>::alloc_node(PgNode::WindowAggState)
     }
     pub fn makeUniqueState() -> PgBox<pg_sys::pg12_specific::UniqueState> {
-        PgBox::<pg_sys::pg12_specific::UniqueState>::alloc0()
+        PgBox::<pg_sys::pg12_specific::UniqueState>::alloc_node(PgNode::UniqueState)
     }
     pub fn makeGatherState() -> PgBox<pg_sys::pg12_specific::GatherState> {
-        PgBox::<pg_sys::pg12_specific::GatherState>::alloc0()
+        PgBox::<pg_sys::pg12_specific::GatherState>::alloc_node(PgNode::GatherState)
     }
     pub fn makeGatherMergeState() -> PgBox<pg_sys::pg12_specific::GatherMergeState> {
-        PgBox::<pg_sys::pg12_specific::GatherMergeState>::alloc0()
+        PgBox::<pg_sys::pg12_specific::GatherMergeState>::alloc_node(PgNode::GatherMergeState)
     }
     pub fn makeHashState() -> PgBox<pg_sys::pg12_specific::HashState> {
-        PgBox::<pg_sys::pg12_specific::HashState>::alloc0()
+        PgBox::<pg_sys::pg12_specific::HashState>::alloc_node(PgNode::HashState)
     }
     pub fn makeSetOpState() -> PgBox<pg_sys::pg12_specific::SetOpState> {
-        PgBox::<pg_sys::pg12_specific::SetOpState>::alloc0()
+        PgBox::<pg_sys::pg12_specific::SetOpState>::alloc_node(PgNode::SetOpState)
     }
     pub fn makeLockRowsState() -> PgBox<pg_sys::pg12_specific::LockRowsState> {
-        PgBox::<pg_sys::pg12_specific::LockRowsState>::alloc0()
+        PgBox::<pg_sys::pg12_specific::LockRowsState>::alloc_node(PgNode::LockRowsState)
     }
     pub fn makeLimitState() -> PgBox<pg_sys::LimitState> {
-        PgBox::<pg_sys::LimitState>::alloc0()
+        PgBox::<pg_sys::LimitState>::alloc_node(PgNode::LimitState)
     }
 
     pub fn makeAlias() -> PgBox<pg_sys::Alias> {
-        PgBox::<pg_sys::Alias>::alloc0()
+        PgBox::<pg_sys::Alias>::alloc_node(PgNode::Alias)
     }
     pub fn makeRangeVar() -> PgBox<pg_sys::RangeVar> {
-        PgBox::<pg_sys::RangeVar>::alloc0()
+        PgBox::<pg_sys::RangeVar>::alloc_node(PgNode::RangeVar)
     }
     pub fn makeTableFunc() -> PgBox<pg_sys::TableFunc> {
-        PgBox::<pg_sys::TableFunc>::alloc0()
+        PgBox::<pg_sys::TableFunc>::alloc_node(PgNode::TableFunc)
     }
     pub fn makeExpr() -> PgBox<pg_sys::Expr> {
-        PgBox::<pg_sys::Expr>::alloc0()
+        PgBox::<pg_sys::Expr>::alloc_node(PgNode::Expr)
     }
     pub fn makeVar() -> PgBox<pg_sys::Var> {
-        PgBox::<pg_sys::Var>::alloc0()
+        PgBox::<pg_sys::Var>::alloc_node(PgNode::Var)
     }
     pub fn makeConst() -> PgBox<pg_sys::Const> {
-        PgBox::<pg_sys::Const>::alloc0()
+        PgBox::<pg_sys::Const>::alloc_node(PgNode::Const)
     }
     pub fn makeParam() -> PgBox<pg_sys::Param> {
-        PgBox::<pg_sys::Param>::alloc0()
+        PgBox::<pg_sys::Param>::alloc_node(PgNode::Param)
     }
     pub fn makeAggref() -> PgBox<pg_sys::Aggref> {
-        PgBox::<pg_sys::Aggref>::alloc0()
+        PgBox::<pg_sys::Aggref>::alloc_node(PgNode::Aggref)
     }
     pub fn makeGroupingFunc() -> PgBox<pg_sys::GroupingFunc> {
-        PgBox::<pg_sys::GroupingFunc>::alloc0()
+        PgBox::<pg_sys::GroupingFunc>::alloc_node(PgNode::GroupingFunc)
     }
     pub fn makeWindowFunc() -> PgBox<pg_sys::WindowFunc> {
-        PgBox::<pg_sys::WindowFunc>::alloc0()
+        PgBox::<pg_sys::WindowFunc>::alloc_node(PgNode::WindowFunc)
     }
     pub fn makeSubscriptingRef() -> PgBox<pg_sys::pg12_specific::SubscriptingRef> {
-        PgBox::<pg_sys::pg12_specific::SubscriptingRef>::alloc0()
+        PgBox::<pg_sys::pg12_specific::SubscriptingRef>::alloc_node(PgNode::SubscriptingRef)
     }
     pub fn makeFuncExpr() -> PgBox<pg_sys::FuncExpr> {
-        PgBox::<pg_sys::FuncExpr>::alloc0()
+        PgBox::<pg_sys::FuncExpr>::alloc_node(PgNode::FuncExpr)
     }
     pub fn makeNamedArgExpr() -> PgBox<pg_sys::NamedArgExpr> {
-        PgBox::<pg_sys::NamedArgExpr>::alloc0()
+        PgBox::<pg_sys::NamedArgExpr>::alloc_node(PgNode::NamedArgExpr)
     }
     pub fn makeOpExpr() -> PgBox<pg_sys::OpExpr> {
-        PgBox::<pg_sys::OpExpr>::alloc0()
+        PgBox::<pg_sys::OpExpr>::alloc_node(PgNode::OpExpr)
     }
     pub fn makeDistinctExpr() -> PgBox<pg_sys::DistinctExpr> {
-        PgBox::<pg_sys::DistinctExpr>::alloc0()
+        PgBox::<pg_sys::DistinctExpr>::alloc_node(PgNode::DistinctExpr)
     }
     pub fn makeNullIfExpr() -> PgBox<pg_sys::NullIfExpr> {
-        PgBox::<pg_sys::NullIfExpr>::alloc0()
+        PgBox::<pg_sys::NullIfExpr>::alloc_node(PgNode::NullIfExpr)
     }
     pub fn makeScalarArrayOpExpr() -> PgBox<pg_sys::ScalarArrayOpExpr> {
-        PgBox::<pg_sys::ScalarArrayOpExpr>::alloc0()
+        PgBox::<pg_sys::ScalarArrayOpExpr>::alloc_node(PgNode::ScalarArrayOpExpr)
     }
     pub fn makeBoolExpr() -> PgBox<pg_sys::BoolExpr> {
-        PgBox::<pg_sys::BoolExpr>::alloc0()
+        PgBox::<pg_sys::BoolExpr>::alloc_node(PgNode::BoolExpr)
     }
     pub fn makeSubLink() -> PgBox<pg_sys::SubLink> {
-        PgBox::<pg_sys::SubLink>::alloc0()
+        PgBox::<pg_sys::SubLink>::alloc_node(PgNode::SubLink)
     }
     pub fn makeSubPlan() -> PgBox<pg_sys::SubPlan> {
-        PgBox::<pg_sys::SubPlan>::alloc0()
+        PgBox::<pg_sys::SubPlan>::alloc_node(PgNode::SubPlan)
     }
     pub fn makeAlternativeSubPlan() -> PgBox<pg_sys::AlternativeSubPlan> {
-        PgBox::<pg_sys::AlternativeSubPlan>::alloc0()
+        PgBox::<pg_sys::AlternativeSubPlan>::alloc_node(PgNode::AlternativeSubPlan)
     }
     pub fn makeFieldSelect() -> PgBox<pg_sys::FieldSelect> {
-        PgBox::<pg_sys::FieldSelect>::alloc0()
+        PgBox::<pg_sys::FieldSelect>::alloc_node(PgNode::FieldSelect)
     }
     pub fn makeFieldStore() -> PgBox<pg_sys::FieldStore> {
-        PgBox::<pg_sys::FieldStore>::alloc0()
+        PgBox::<pg_sys::FieldStore>::alloc_node(PgNode::FieldStore)
     }
     pub fn makeRelabelType() -> PgBox<pg_sys::RelabelType> {
-        PgBox::<pg_sys::RelabelType>::alloc0()
+        PgBox::<pg_sys::RelabelType>::alloc_node(PgNode::RelabelType)
     }
     pub fn makeCoerceViaIO() -> PgBox<pg_sys::CoerceViaIO> {
-        PgBox::<pg_sys::CoerceViaIO>::alloc0()
+        PgBox::<pg_sys::CoerceViaIO>::alloc_node(PgNode::CoerceViaIO)
     }
     pub fn makeArrayCoerceExpr() -> PgBox<pg_sys::pg12_specific::ArrayCoerceExpr> {
-        PgBox::<pg_sys::pg12_specific::ArrayCoerceExpr>::alloc0()
+        PgBox::<pg_sys::pg12_specific::ArrayCoerceExpr>::alloc_node(PgNode::ArrayCoerceExpr)
     }
     pub fn makeConvertRowtypeExpr() -> PgBox<pg_sys::ConvertRowtypeExpr> {
-        PgBox::<pg_sys::ConvertRowtypeExpr>::alloc0()
+        PgBox::<pg_sys::ConvertRowtypeExpr>::alloc_node(PgNode::ConvertRowtypeExpr)
     }
     pub fn makeCollateExpr() -> PgBox<pg_sys::CollateExpr> {
-        PgBox::<pg_sys::CollateExpr>::alloc0()
+        PgBox::<pg_sys::CollateExpr>::alloc_node(PgNode::CollateExpr)
     }
     pub fn makeCaseExpr() -> PgBox<pg_sys::CaseExpr> {
-        PgBox::<pg_sys::CaseExpr>::alloc0()
+        PgBox::<pg_sys::CaseExpr>::alloc_node(PgNode::CaseExpr)
     }
     pub fn makeCaseWhen() -> PgBox<pg_sys::CaseWhen> {
-        PgBox::<pg_sys::CaseWhen>::alloc0()
+        PgBox::<pg_sys::CaseWhen>::alloc_node(PgNode::CaseWhen)
     }
     pub fn makeCaseTestExpr() -> PgBox<pg_sys::CaseTestExpr> {
-        PgBox::<pg_sys::CaseTestExpr>::alloc0()
+        PgBox::<pg_sys::CaseTestExpr>::alloc_node(PgNode::CaseTestExpr)
     }
     pub fn makeArrayExpr() -> PgBox<pg_sys::ArrayExpr> {
-        PgBox::<pg_sys::ArrayExpr>::alloc0()
+        PgBox::<pg_sys::ArrayExpr>::alloc_node(PgNode::ArrayExpr)
     }
     pub fn makeRowExpr() -> PgBox<pg_sys::RowExpr> {
-        PgBox::<pg_sys::RowExpr>::alloc0()
+        PgBox::<pg_sys::RowExpr>::alloc_node(PgNode::RowExpr)
     }
     pub fn makeRowCompareExpr() -> PgBox<pg_sys::RowCompareExpr> {
-        PgBox::<pg_sys::RowCompareExpr>::alloc0()
+        PgBox::<pg_sys::RowCompareExpr>::alloc_node(PgNode::RowCompareExpr)
     }
     pub fn makeCoalesceExpr() -> PgBox<pg_sys::CoalesceExpr> {
-        PgBox::<pg_sys::CoalesceExpr>::alloc0()
+        PgBox::<pg_sys::CoalesceExpr>::alloc_node(PgNode::CoalesceExpr)
     }
     pub fn makeMinMaxExpr() -> PgBox<pg_sys::MinMaxExpr> {
-        PgBox::<pg_sys::MinMaxExpr>::alloc0()
+        PgBox::<pg_sys::MinMaxExpr>::alloc_node(PgNode::MinMaxExpr)
     }
     pub fn makeSQLValueFunction() -> PgBox<pg_sys::SQLValueFunction> {
-        PgBox::<pg_sys::SQLValueFunction>::alloc0()
+        PgBox::<pg_sys::SQLValueFunction>::alloc_node(PgNode::SQLValueFunction)
     }
     pub fn makeXmlExpr() -> PgBox<pg_sys::XmlExpr> {
-        PgBox::<pg_sys::XmlExpr>::alloc0()
+        PgBox::<pg_sys::XmlExpr>::alloc_node(PgNode::XmlExpr)
     }
     pub fn makeNullTest() -> PgBox<pg_sys::NullTest> {
-        PgBox::<pg_sys::NullTest>::alloc0()
+        PgBox::<pg_sys::NullTest>::alloc_node(PgNode::NullTest)
     }
     pub fn makeBooleanTest() -> PgBox<pg_sys::BooleanTest> {
-        PgBox::<pg_sys::BooleanTest>::alloc0()
+        PgBox::<pg_sys::BooleanTest>::alloc_node(PgNode::BooleanTest)
     }
     pub fn makeCoerceToDomain() -> PgBox<pg_sys::CoerceToDomain> {
-        PgBox::<pg_sys::CoerceToDomain>::alloc0()
+        PgBox::<pg_sys::CoerceToDomain>::alloc_node(PgNode::CoerceToDomain)
     }
     pub fn makeCoerceToDomainValue() -> PgBox<pg_sys::CoerceToDomainValue> {
-        PgBox::<pg_sys::CoerceToDomainValue>::alloc0()
+        PgBox::<pg_sys::CoerceToDomainValue>::alloc_node(PgNode::CoerceToDomainValue)
     }
     pub fn makeSetToDefault() -> PgBox<pg_sys::SetToDefault> {
-        PgBox::<pg_sys::SetToDefault>::alloc0()
+        PgBox::<pg_sys::SetToDefault>::alloc_node(PgNode::SetToDefault)
     }
     pub fn makeCurrentOfExpr() -> PgBox<pg_sys::CurrentOfExpr> {
-        PgBox::<pg_sys::CurrentOfExpr>::alloc0()
+        PgBox::<pg_sys::CurrentOfExpr>::alloc_node(PgNode::CurrentOfExpr)
     }
     pub fn makeNextValueExpr() -> PgBox<pg_sys::NextValueExpr> {
-        PgBox::<pg_sys::NextValueExpr>::alloc0()
+        PgBox::<pg_sys::NextValueExpr>::alloc_node(PgNode::NextValueExpr)
     }
     pub fn makeInferenceElem() -> PgBox<pg_sys::InferenceElem> {
-        PgBox::<pg_sys::InferenceElem>::alloc0()
+        PgBox::<pg_sys::InferenceElem>::alloc_node(PgNode::InferenceElem)
     }
     pub fn makeTargetEntry() -> PgBox<pg_sys::TargetEntry> {
-        PgBox::<pg_sys::TargetEntry>::alloc0()
+        PgBox::<pg_sys::TargetEntry>::alloc_node(PgNode::TargetEntry)
     }
     pub fn makeRangeTblRef() -> PgBox<pg_sys::RangeTblRef> {
-        PgBox::<pg_sys::RangeTblRef>::alloc0()
+        PgBox::<pg_sys::RangeTblRef>::alloc_node(PgNode::RangeTblRef)
     }
     pub fn makeJoinExpr() -> PgBox<pg_sys::JoinExpr> {
-        PgBox::<pg_sys::JoinExpr>::alloc0()
+        PgBox::<pg_sys::JoinExpr>::alloc_node(PgNode::JoinExpr)
     }
     pub fn makeFromExpr() -> PgBox<pg_sys::FromExpr> {
-        PgBox::<pg_sys::FromExpr>::alloc0()
+        PgBox::<pg_sys::FromExpr>::alloc_node(PgNode::FromExpr)
     }
     pub fn makeOnConflictExpr() -> PgBox<pg_sys::OnConflictExpr> {
-        PgBox::<pg_sys::OnConflictExpr>::alloc0()
+        PgBox::<pg_sys::OnConflictExpr>::alloc_node(PgNode::OnConflictExpr)
     }
     pub fn makeIntoClause() -> PgBox<pg_sys::pg12_specific::IntoClause> {
-        PgBox::<pg_sys::pg12_specific::IntoClause>::alloc0()
+        PgBox::<pg_sys::pg12_specific::IntoClause>::alloc_node(PgNode::IntoClause)
     }
 
     pub fn makeExprState() -> PgBox<pg_sys::pg12_specific::ExprState> {
-        PgBox::<pg_sys::pg12_specific::ExprState>::alloc0()
+        PgBox::<pg_sys::pg12_specific::ExprState>::alloc_node(PgNode::ExprState)
     }
     pub fn makeAggrefExprState() -> PgBox<pg_sys::AggrefExprState> {
-        PgBox::<pg_sys::AggrefExprState>::alloc0()
+        PgBox::<pg_sys::AggrefExprState>::alloc_node(PgNode::AggrefExprState)
     }
     pub fn makeWindowFuncExprState() -> PgBox<pg_sys::WindowFuncExprState> {
-        PgBox::<pg_sys::WindowFuncExprState>::alloc0()
+        PgBox::<pg_sys::WindowFuncExprState>::alloc_node(PgNode::WindowFuncExprState)
     }
     pub fn makeSetExprState() -> PgBox<pg_sys::pg12_specific::SetExprState> {
-        PgBox::<pg_sys::pg12_specific::SetExprState>::alloc0()
+        PgBox::<pg_sys::pg12_specific::SetExprState>::alloc_node(PgNode::SetExprState)
     }
     pub fn makeSubPlanState() -> PgBox<pg_sys::pg12_specific::SubPlanState> {
-        PgBox::<pg_sys::pg12_specific::SubPlanState>::alloc0()
+        PgBox::<pg_sys::pg12_specific::SubPlanState>::alloc_node(PgNode::SubPlanState)
     }
     pub fn makeAlternativeSubPlanState() -> PgBox<pg_sys::AlternativeSubPlanState> {
-        PgBox::<pg_sys::AlternativeSubPlanState>::alloc0()
+        PgBox::<pg_sys::AlternativeSubPlanState>::alloc_node(PgNode::AlternativeSubPlanState)
     }
     pub fn makeDomainConstraintState() -> PgBox<pg_sys::DomainConstraintState> {
-        PgBox::<pg_sys::DomainConstraintState>::alloc0()
+        PgBox::<pg_sys::DomainConstraintState>::alloc_node(PgNode::DomainConstraintState)
     }
 
     pub fn makePlannerInfo() -> PgBox<pg_sys::pg12_specific::PlannerInfo> {
-        PgBox::<pg_sys::pg12_specific::PlannerInfo>::alloc0()
+        PgBox::<pg_sys::pg12_specific::PlannerInfo>::alloc_node(PgNode::PlannerInfo)
     }
     pub fn makePlannerGlobal() -> PgBox<pg_sys::pg12_specific::PlannerGlobal> {
-        PgBox::<pg_sys::pg12_specific::PlannerGlobal>::alloc0()
+        PgBox::<pg_sys::pg12_specific::PlannerGlobal>::alloc_node(PgNode::PlannerGlobal)
     }
     pub fn makeRelOptInfo() -> PgBox<pg_sys::pg12_specific::RelOptInfo> {
-        PgBox::<pg_sys::pg12_specific::RelOptInfo>::alloc0()
+        PgBox::<pg_sys::pg12_specific::RelOptInfo>::alloc_node(PgNode::RelOptInfo)
     }
     pub fn makeIndexOptInfo() -> PgBox<pg_sys::pg12_specific::IndexOptInfo> {
-        PgBox::<pg_sys::pg12_specific::IndexOptInfo>::alloc0()
+        PgBox::<pg_sys::pg12_specific::IndexOptInfo>::alloc_node(PgNode::IndexOptInfo)
     }
     pub fn makeForeignKeyOptInfo() -> PgBox<pg_sys::ForeignKeyOptInfo> {
-        PgBox::<pg_sys::ForeignKeyOptInfo>::alloc0()
+        PgBox::<pg_sys::ForeignKeyOptInfo>::alloc_node(PgNode::ForeignKeyOptInfo)
     }
     pub fn makeParamPathInfo() -> PgBox<pg_sys::ParamPathInfo> {
-        PgBox::<pg_sys::ParamPathInfo>::alloc0()
+        PgBox::<pg_sys::ParamPathInfo>::alloc_node(PgNode::ParamPathInfo)
     }
     pub fn makePath() -> PgBox<pg_sys::Path> {
-        PgBox::<pg_sys::Path>::alloc0()
+        PgBox::<pg_sys::Path>::alloc_node(PgNode::Path)
     }
     pub fn makeIndexPath() -> PgBox<pg_sys::pg12_specific::IndexPath> {
-        PgBox::<pg_sys::pg12_specific::IndexPath>::alloc0()
+        PgBox::<pg_sys::pg12_specific::IndexPath>::alloc_node(PgNode::IndexPath)
     }
     pub fn makeBitmapHeapPath() -> PgBox<pg_sys::BitmapHeapPath> {
-        PgBox::<pg_sys::BitmapHeapPath>::alloc0()
+        PgBox::<pg_sys::BitmapHeapPath>::alloc_node(PgNode::BitmapHeapPath)
     }
     pub fn makeBitmapAndPath() -> PgBox<pg_sys::BitmapAndPath> {
-        PgBox::<pg_sys::BitmapAndPath>::alloc0()
+        PgBox::<pg_sys::BitmapAndPath>::alloc_node(PgNode::BitmapAndPath)
     }
     pub fn makeBitmapOrPath() -> PgBox<pg_sys::BitmapOrPath> {
-        PgBox::<pg_sys::BitmapOrPath>::alloc0()
+        PgBox::<pg_sys::BitmapOrPath>::alloc_node(PgNode::BitmapOrPath)
     }
     pub fn makeTidPath() -> PgBox<pg_sys::TidPath> {
-        PgBox::<pg_sys::TidPath>::alloc0()
+        PgBox::<pg_sys::TidPath>::alloc_node(PgNode::TidPath)
     }
     pub fn makeSubqueryScanPath() -> PgBox<pg_sys::SubqueryScanPath> {
-        PgBox::<pg_sys::SubqueryScanPath>::alloc0()
+        PgBox::<pg_sys::SubqueryScanPath>::alloc_node(PgNode::SubqueryScanPath)
     }
     pub fn makeForeignPath() -> PgBox<pg_sys::ForeignPath> {
-        PgBox::<pg_sys::ForeignPath>::alloc0()
+        PgBox::<pg_sys::ForeignPath>::alloc_node(PgNode::ForeignPath)
     }
     pub fn makeCustomPath() -> PgBox<pg_sys::CustomPath> {
-        PgBox::<pg_sys::CustomPath>::alloc0()
+        PgBox::<pg_sys::CustomPath>::alloc_node(PgNode::CustomPath)
     }
     pub fn makeNestPath() -> PgBox<pg_sys::NestPath> {
-        PgBox::<pg_sys::NestPath>::alloc0()
+        PgBox::<pg_sys::NestPath>::alloc_node(PgNode::NestPath)
     }
     pub fn makeMergePath() -> PgBox<pg_sys::MergePath> {
-        PgBox::<pg_sys::MergePath>::alloc0()
+        PgBox::<pg_sys::MergePath>::alloc_node(PgNode::MergePath)
     }
     pub fn makeHashPath() -> PgBox<pg_sys::pg12_specific::HashPath> {
-        PgBox::<pg_sys::pg12_specific::HashPath>::alloc0()
+        PgBox::<pg_sys::pg12_specific::HashPath>::alloc_node(PgNode::HashPath)
     }
     pub fn makeAppendPath() -> PgBox<pg_sys::pg12_specific::AppendPath> {
-        PgBox::<pg_sys::pg12_specific::AppendPath>::alloc0()
+        PgBox::<pg_sys::pg12_specific::AppendPath>::alloc_node(PgNode::AppendPath)
     }
     pub fn makeMergeAppendPath() -> PgBox<pg_sys::MergeAppendPath> {
-        PgBox::<pg_sys::MergeAppendPath>::alloc0()
+        PgBox::<pg_sys::MergeAppendPath>::alloc_node(PgNode::MergeAppendPath)
     }
     pub fn makeGroupResultPath() -> PgBox<pg_sys::pg12_specific::GroupResultPath> {
-        PgBox::<pg_sys::pg12_specific::GroupResultPath>::alloc0()
+        PgBox::<pg_sys::pg12_specific::GroupResultPath>::alloc_node(PgNode::GroupResultPath)
     }
     pub fn makeMaterialPath() -> PgBox<pg_sys::MaterialPath> {
-        PgBox::<pg_sys::MaterialPath>::alloc0()
+        PgBox::<pg_sys::MaterialPath>::alloc_node(PgNode::MaterialPath)
     }
     pub fn makeUniquePath() -> PgBox<pg_sys::UniquePath> {
-        PgBox::<pg_sys::UniquePath>::alloc0()
+        PgBox::<pg_sys::UniquePath>::alloc_node(PgNode::UniquePath)
     }
     pub fn makeGatherPath() -> PgBox<pg_sys::GatherPath> {
-        PgBox::<pg_sys::GatherPath>::alloc0()
+        PgBox::<pg_sys::GatherPath>::alloc_node(PgNode::GatherPath)
     }
     pub fn makeGatherMergePath() -> PgBox<pg_sys::GatherMergePath> {
-        PgBox::<pg_sys::GatherMergePath>::alloc0()
+        PgBox::<pg_sys::GatherMergePath>::alloc_node(PgNode::GatherMergePath)
     }
     pub fn makeProjectionPath() -> PgBox<pg_sys::ProjectionPath> {
-        PgBox::<pg_sys::ProjectionPath>::alloc0()
+        PgBox::<pg_sys::ProjectionPath>::alloc_node(PgNode::ProjectionPath)
     }
     pub fn makeProjectSetPath() -> PgBox<pg_sys::ProjectSetPath> {
-        PgBox::<pg_sys::ProjectSetPath>::alloc0()
+        PgBox::<pg_sys::ProjectSetPath>::alloc_node(PgNode::ProjectSetPath)
     }
     pub fn makeSortPath() -> PgBox<pg_sys::SortPath> {
-        PgBox::<pg_sys::SortPath>::alloc0()
+        PgBox::<pg_sys::SortPath>::alloc_node(PgNode::SortPath)
     }
     pub fn makeGroupPath() -> PgBox<pg_sys::GroupPath> {
-        PgBox::<pg_sys::GroupPath>::alloc0()
+        PgBox::<pg_sys::GroupPath>::alloc_node(PgNode::GroupPath)
     }
     pub fn makeUpperUniquePath() -> PgBox<pg_sys::UpperUniquePath> {
-        PgBox::<pg_sys::UpperUniquePath>::alloc0()
+        PgBox::<pg_sys::UpperUniquePath>::alloc_node(PgNode::UpperUniquePath)
     }
     pub fn makeAggPath() -> PgBox<pg_sys::AggPath> {
-        PgBox::<pg_sys::AggPath>::alloc0()
+        PgBox::<pg_sys::AggPath>::alloc_node(PgNode::AggPath)
     }
     pub fn makeGroupingSetsPath() -> PgBox<pg_sys::GroupingSetsPath> {
-        PgBox::<pg_sys::GroupingSetsPath>::alloc0()
+        PgBox::<pg_sys::GroupingSetsPath>::alloc_node(PgNode::GroupingSetsPath)
     }
     pub fn makeMinMaxAggPath() -> PgBox<pg_sys::MinMaxAggPath> {
-        PgBox::<pg_sys::MinMaxAggPath>::alloc0()
+        PgBox::<pg_sys::MinMaxAggPath>::alloc_node(PgNode::MinMaxAggPath)
     }
     pub fn makeWindowAggPath() -> PgBox<pg_sys::pg12_specific::WindowAggPath> {
-        PgBox::<pg_sys::pg12_specific::WindowAggPath>::alloc0()
+        PgBox::<pg_sys::pg12_specific::WindowAggPath>::alloc_node(PgNode::WindowAggPath)
     }
     pub fn makeSetOpPath() -> PgBox<pg_sys::SetOpPath> {
-        PgBox::<pg_sys::SetOpPath>::alloc0()
+        PgBox::<pg_sys::SetOpPath>::alloc_node(PgNode::SetOpPath)
     }
     pub fn makeRecursiveUnionPath() -> PgBox<pg_sys::RecursiveUnionPath> {
-        PgBox::<pg_sys::RecursiveUnionPath>::alloc0()
+        PgBox::<pg_sys::RecursiveUnionPath>::alloc_node(PgNode::RecursiveUnionPath)
     }
     pub fn makeLockRowsPath() -> PgBox<pg_sys::LockRowsPath> {
-        PgBox::<pg_sys::LockRowsPath>::alloc0()
+        PgBox::<pg_sys::LockRowsPath>::alloc_node(PgNode::LockRowsPath)
     }
     pub fn makeModifyTablePath() -> PgBox<pg_sys::pg12_specific::ModifyTablePath> {
-        PgBox::<pg_sys::pg12_specific::ModifyTablePath>::alloc0()
+        PgBox::<pg_sys::pg12_specific::ModifyTablePath>::alloc_node(PgNode::ModifyTablePath)
     }
     pub fn makeLimitPath() -> PgBox<pg_sys::LimitPath> {
-        PgBox::<pg_sys::LimitPath>::alloc0()
+        PgBox::<pg_sys::LimitPath>::alloc_node(PgNode::LimitPath)
     }
 
     pub fn makeEquivalenceClass() -> PgBox<pg_sys::EquivalenceClass> {
-        PgBox::<pg_sys::EquivalenceClass>::alloc0()
+        PgBox::<pg_sys::EquivalenceClass>::alloc_node(PgNode::EquivalenceClass)
     }
     pub fn makeEquivalenceMember() -> PgBox<pg_sys::EquivalenceMember> {
-        PgBox::<pg_sys::EquivalenceMember>::alloc0()
+        PgBox::<pg_sys::EquivalenceMember>::alloc_node(PgNode::EquivalenceMember)
     }
     pub fn makePathKey() -> PgBox<pg_sys::PathKey> {
-        PgBox::<pg_sys::PathKey>::alloc0()
+        PgBox::<pg_sys::PathKey>::alloc_node(PgNode::PathKey)
     }
     pub fn makePathTarget() -> PgBox<pg_sys::PathTarget> {
-        PgBox::<pg_sys::PathTarget>::alloc0()
+        PgBox::<pg_sys::PathTarget>::alloc_node(PgNode::PathTarget)
     }
     pub fn makeRestrictInfo() -> PgBox<pg_sys::pg12_specific::RestrictInfo> {
-        PgBox::<pg_sys::pg12_specific::RestrictInfo>::alloc0()
+        PgBox::<pg_sys::pg12_specific::RestrictInfo>::alloc_node(PgNode::RestrictInfo)
     }
     pub fn makeIndexClause() -> PgBox<pg_sys::pg12_specific::IndexClause> {
-        PgBox::<pg_sys::pg12_specific::IndexClause>::alloc0()
+        PgBox::<pg_sys::pg12_specific::IndexClause>::alloc_node(PgNode::IndexClause)
     }
     pub fn makePlaceHolderVar() -> PgBox<pg_sys::PlaceHolderVar> {
-        PgBox::<pg_sys::PlaceHolderVar>::alloc0()
+        PgBox::<pg_sys::PlaceHolderVar>::alloc_node(PgNode::PlaceHolderVar)
     }
     pub fn makeSpecialJoinInfo() -> PgBox<pg_sys::SpecialJoinInfo> {
-        PgBox::<pg_sys::SpecialJoinInfo>::alloc0()
+        PgBox::<pg_sys::SpecialJoinInfo>::alloc_node(PgNode::SpecialJoinInfo)
     }
     pub fn makeAppendRelInfo() -> PgBox<pg_sys::AppendRelInfo> {
-        PgBox::<pg_sys::AppendRelInfo>::alloc0()
+        PgBox::<pg_sys::AppendRelInfo>::alloc_node(PgNode::AppendRelInfo)
     }
     pub fn makePlaceHolderInfo() -> PgBox<pg_sys::PlaceHolderInfo> {
-        PgBox::<pg_sys::PlaceHolderInfo>::alloc0()
+        PgBox::<pg_sys::PlaceHolderInfo>::alloc_node(PgNode::PlaceHolderInfo)
     }
     pub fn makeMinMaxAggInfo() -> PgBox<pg_sys::MinMaxAggInfo> {
-        PgBox::<pg_sys::MinMaxAggInfo>::alloc0()
+        PgBox::<pg_sys::MinMaxAggInfo>::alloc_node(PgNode::MinMaxAggInfo)
     }
     pub fn makePlannerParamItem() -> PgBox<pg_sys::PlannerParamItem> {
-        PgBox::<pg_sys::PlannerParamItem>::alloc0()
+        PgBox::<pg_sys::PlannerParamItem>::alloc_node(PgNode::PlannerParamItem)
     }
     pub fn makeRollupData() -> PgBox<pg_sys::RollupData> {
-        PgBox::<pg_sys::RollupData>::alloc0()
+        PgBox::<pg_sys::RollupData>::alloc_node(PgNode::RollupData)
     }
     pub fn makeGroupingSetData() -> PgBox<pg_sys::GroupingSetData> {
-        PgBox::<pg_sys::GroupingSetData>::alloc0()
+        PgBox::<pg_sys::GroupingSetData>::alloc_node(PgNode::GroupingSetData)
     }
     pub fn makeStatisticExtInfo() -> PgBox<pg_sys::StatisticExtInfo> {
-        PgBox::<pg_sys::StatisticExtInfo>::alloc0()
+        PgBox::<pg_sys::StatisticExtInfo>::alloc_node(PgNode::StatisticExtInfo)
     }
 
     pub fn makeValue() -> PgBox<pg_sys::Value> {
-        PgBox::<pg_sys::Value>::alloc0()
+        PgBox::<pg_sys::Value>::alloc_node(PgNode::Value)
     }
     pub fn makeInteger(i: i32) -> PgBox<pg_sys::Value> {
         let mut value = PgNodeFactory::makeValue();
