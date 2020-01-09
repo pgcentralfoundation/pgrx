@@ -31,13 +31,13 @@ pub mod pg12_specific;
 //
 
 #[cfg(feature = "pg10")]
-pub use v10::*;
+pub use pg10::*;
 
 #[cfg(feature = "pg11")]
-pub use v11::*;
+pub use pg11::*;
 
 #[cfg(feature = "pg12")]
-pub use v12::*;
+pub use pg12::*;
 
 // version modules
 // These exist to allow us to add additional items to the various version namespaces
@@ -84,16 +84,12 @@ mod all_versions {
     }
 }
 
-// for when no features are enabled -- at least we'll get the common stuff exported
-#[cfg(not(any(feature = "pg10", feature = "pg11", feature = "pg12")))]
-pub use all_versions::*;
-
 //
 // for specific versions
 //
 
 #[cfg(feature = "pg10")]
-pub mod v10 {
+pub mod pg10 {
     pub use super::all_versions::*;
     pub use super::common::*;
 
@@ -110,7 +106,7 @@ pub mod v10 {
 }
 
 #[cfg(feature = "pg11")]
-pub mod v11 {
+pub mod pg11 {
     pub use super::all_versions::*;
     pub use super::common::*;
 
@@ -127,7 +123,7 @@ pub mod v11 {
 }
 
 #[cfg(feature = "pg12")]
-pub mod v12 {
+pub mod pg12 {
     pub use super::all_versions::*;
     pub use super::common::*;
 
