@@ -6,7 +6,7 @@
 //! An enum-based interface (`PgMemoryContexts`) around Postgres' various `MemoryContext`s provides
 //! simple accessibility to working with MemoryContexts in a compiler-checked manner
 //!
-use crate::{pg_sys, DatumCompatible, PgDatum};
+use crate::{pg_sys, DatumCompatible, PgDatum, PgNode};
 use std::fmt::{Debug, Error, Formatter};
 use std::ops::{Deref, DerefMut};
 
@@ -292,6 +292,24 @@ impl PgMemoryContexts {
                 result
             }
             _ => PgMemoryContexts::exec_in_context(self.value(), f),
+        }
+    }
+
+    /// Duplicate a Rust `&str` into a Postgres-allocated "char *"
+    ///
+    /// ## Examples
+    ///
+    /// ```rust,no_run
+    /// use pgx::PgMemoryContexts;
+    /// let copy = PgMemoryContexts::CurrentMemoryContext.pstrdup("make a copy of this");
+    /// ```
+    pub fn pstrdup(&self, s: &str) -> *mut std::os::raw::c_char {
+        let len = s.len() + 1; // +1 for the \0 we'll have
+        let cstring = std::ffi::CString::new(s).unwrap();
+        let copy = unsafe { pg_sys::palloc(len) };
+        unsafe {
+            pg_sys::memcpy(copy, cstring.as_ptr() as void_ptr, len as u64)
+                as *mut std::os::raw::c_char
         }
     }
 
@@ -634,6 +652,24 @@ where
         }
     }
 
+    /// Allocate a struct that can be cast to Postgres' `Node`
+    ///
+    /// This function automatically fills the struct with zeros and sets
+    /// the `type_` field to the specified [PgNode]
+    ///
+    /// ## Safety
+    ///
+    /// This function is unsafe as it can be used against types which aren't
+    /// properly cast-able to a Postgres `Node`
+    pub fn alloc_node(tag: PgNode) -> PgBox<T> {
+        let boxed = PgBox::<T>::alloc0();
+        let node = boxed.to_pg() as *mut pg_sys::Node;
+
+        unsafe { node.as_mut() }.unwrap().type_ = tag as u32;
+
+        boxed
+    }
+
     /// Box a struct by copying it into Postgres' `CurrentMemoryContext`
     ///
     /// When this `PgBox<T>` is dropped, the boxed memory is freed, unless it has
@@ -674,6 +710,22 @@ where
         match ptr {
             Some(ptr) => ptr,
             None => std::ptr::null_mut(),
+        }
+    }
+
+    pub fn as_ref<'a>(&self) -> Option<&'a T> {
+        let ptr = self.ptr;
+        match ptr {
+            Some(ptr) => unsafe { ptr.as_ref() },
+            None => None,
+        }
+    }
+
+    pub fn as_mut<'a>(&self) -> Option<&'a mut T> {
+        let ptr = self.ptr;
+        match ptr {
+            Some(ptr) => unsafe { ptr.as_mut() },
+            None => None,
         }
     }
 

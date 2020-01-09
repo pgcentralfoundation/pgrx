@@ -1,6 +1,7 @@
 mod fcinfo_tests;
 mod framework;
 mod log_tests;
+mod node_tests;
 mod spi_tests;
 
 pub use colored;

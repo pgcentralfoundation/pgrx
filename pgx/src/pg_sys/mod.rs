@@ -87,8 +87,6 @@ mod all_versions {
 // for when no features are enabled -- at least we'll get the common stuff exported
 #[cfg(not(any(feature = "pg10", feature = "pg11", feature = "pg12")))]
 pub use all_versions::*;
-#[cfg(not(any(feature = "pg10", feature = "pg11", feature = "pg12")))]
-pub use common::*;
 
 //
 // for specific versions
@@ -102,7 +100,9 @@ pub mod v10 {
     pub type FunctionCallInfo = *mut super::pg10_specific::FunctionCallInfoData;
     pub type TupleDesc = *mut super::pg10_specific::tupleDesc;
     pub use super::pg10_specific::AllocSetContextCreate as AllocSetContextCreateExtended;
+    pub use super::pg10_specific::IndexAmRoutine;
     pub use super::pg10_specific::InterruptPending;
+    pub use super::pg10_specific::NodeTag_T_IndexAmRoutine;
     pub use super::pg10_specific::PG_MAJORVERSION;
     pub use super::pg10_specific::PG_VERSION;
     pub use super::pg10_specific::PG_VERSION_NUM;
@@ -117,7 +117,9 @@ pub mod v11 {
     pub type FunctionCallInfo = *mut super::pg11_specific::FunctionCallInfoData;
     pub type TupleDesc = *mut super::pg11_specific::tupleDesc;
     pub use super::pg11_specific::AllocSetContextCreateExtended;
+    pub use super::pg11_specific::IndexAmRoutine;
     pub use super::pg11_specific::InterruptPending;
+    pub use super::pg11_specific::NodeTag_T_IndexAmRoutine;
     pub use super::pg11_specific::PG_MAJORVERSION;
     pub use super::pg11_specific::PG_VERSION;
     pub use super::pg11_specific::PG_VERSION_NUM;
@@ -132,7 +134,9 @@ pub mod v12 {
     pub type FunctionCallInfo = *mut super::pg12_specific::FunctionCallInfoBaseData;
     pub type TupleDesc = *mut super::pg12_specific::TupleDescData;
     pub use super::pg12_specific::AllocSetContextCreateInternal as AllocSetContextCreateExtended;
+    pub use super::pg12_specific::IndexAmRoutine;
     pub use super::pg12_specific::InterruptPending;
+    pub use super::pg12_specific::NodeTag_T_IndexAmRoutine;
     pub use super::pg12_specific::PG_MAJORVERSION;
     pub use super::pg12_specific::PG_VERSION;
     pub use super::pg12_specific::PG_VERSION_NUM;
