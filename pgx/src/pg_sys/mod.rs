@@ -30,14 +30,10 @@ pub mod pg12_specific;
 // only expose one of these behind "pg_sys" at a time
 //
 
-#[cfg(feature = "pg10")]
-pub use pg10::*;
+pub use all_versions::*;
 
-#[cfg(feature = "pg11")]
-pub use pg11::*;
-
-#[cfg(feature = "pg12")]
-pub use pg12::*;
+pub use internal::IndexAmRoutine;
+pub use internal::*;
 
 // version modules
 // These exist to allow us to add additional items to the various version namespaces
@@ -84,57 +80,68 @@ mod all_versions {
     }
 }
 
-//
-// for specific versions
-//
+mod internal {
+    #[cfg(feature = "pg10")]
+    pub use pg10::*;
 
-#[cfg(feature = "pg10")]
-pub mod pg10 {
-    pub use super::all_versions::*;
-    pub use super::common::*;
+    #[cfg(feature = "pg11")]
+    pub use pg11::*;
 
-    pub type FunctionCallInfo = *mut super::pg10_specific::FunctionCallInfoData;
-    pub type TupleDesc = *mut super::pg10_specific::tupleDesc;
-    pub use super::pg10_specific::AllocSetContextCreate as AllocSetContextCreateExtended;
-    pub use super::pg10_specific::IndexAmRoutine;
-    pub use super::pg10_specific::InterruptPending;
-    pub use super::pg10_specific::NodeTag_T_IndexAmRoutine;
-    pub use super::pg10_specific::PG_MAJORVERSION;
-    pub use super::pg10_specific::PG_VERSION;
-    pub use super::pg10_specific::PG_VERSION_NUM;
-    pub use super::pg10_specific::PG_VERSION_STR;
-}
+    #[cfg(feature = "pg12")]
+    pub use pg12::*;
 
-#[cfg(feature = "pg11")]
-pub mod pg11 {
-    pub use super::all_versions::*;
-    pub use super::common::*;
+    //
+    // for specific versions
+    //
 
-    pub type FunctionCallInfo = *mut super::pg11_specific::FunctionCallInfoData;
-    pub type TupleDesc = *mut super::pg11_specific::tupleDesc;
-    pub use super::pg11_specific::AllocSetContextCreateExtended;
-    pub use super::pg11_specific::IndexAmRoutine;
-    pub use super::pg11_specific::InterruptPending;
-    pub use super::pg11_specific::NodeTag_T_IndexAmRoutine;
-    pub use super::pg11_specific::PG_MAJORVERSION;
-    pub use super::pg11_specific::PG_VERSION;
-    pub use super::pg11_specific::PG_VERSION_NUM;
-    pub use super::pg11_specific::PG_VERSION_STR;
-}
+    #[cfg(feature = "pg10")]
+    mod pg10 {
+        pub use crate::pg_sys::common::*;
 
-#[cfg(feature = "pg12")]
-pub mod pg12 {
-    pub use super::all_versions::*;
-    pub use super::common::*;
+        pub type FunctionCallInfo = *mut crate::pg_sys::pg10_specific::FunctionCallInfoData;
+        pub type TupleDesc = *mut crate::pg_sys::pg10_specific::tupleDesc;
 
-    pub type FunctionCallInfo = *mut super::pg12_specific::FunctionCallInfoBaseData;
-    pub type TupleDesc = *mut super::pg12_specific::TupleDescData;
-    pub use super::pg12_specific::AllocSetContextCreateInternal as AllocSetContextCreateExtended;
-    pub use super::pg12_specific::IndexAmRoutine;
-    pub use super::pg12_specific::InterruptPending;
-    pub use super::pg12_specific::NodeTag_T_IndexAmRoutine;
-    pub use super::pg12_specific::PG_MAJORVERSION;
-    pub use super::pg12_specific::PG_VERSION;
-    pub use super::pg12_specific::PG_VERSION_NUM;
-    pub use super::pg12_specific::PG_VERSION_STR;
+        pub use crate::pg_sys::pg10_specific::AllocSetContextCreate as AllocSetContextCreateExtended;
+        pub use crate::pg_sys::pg10_specific::IndexAmRoutine;
+        pub use crate::pg_sys::pg10_specific::InterruptPending;
+        pub use crate::pg_sys::pg10_specific::NodeTag_T_IndexAmRoutine;
+        pub use crate::pg_sys::pg10_specific::PG_MAJORVERSION;
+        pub use crate::pg_sys::pg10_specific::PG_VERSION;
+        pub use crate::pg_sys::pg10_specific::PG_VERSION_NUM;
+        pub use crate::pg_sys::pg10_specific::PG_VERSION_STR;
+    }
+
+    #[cfg(feature = "pg11")]
+    mod pg11 {
+        pub use crate::pg_sys::common::*;
+
+        pub type FunctionCallInfo = *mut crate::pg_sys::pg11_specific::FunctionCallInfoData;
+        pub type TupleDesc = *mut crate::pg_sys::pg11_specific::tupleDesc;
+
+        pub use crate::pg_sys::pg11_specific::AllocSetContextCreateExtended;
+        pub use crate::pg_sys::pg11_specific::IndexAmRoutine;
+        pub use crate::pg_sys::pg11_specific::InterruptPending;
+        pub use crate::pg_sys::pg11_specific::NodeTag_T_IndexAmRoutine;
+        pub use crate::pg_sys::pg11_specific::PG_MAJORVERSION;
+        pub use crate::pg_sys::pg11_specific::PG_VERSION;
+        pub use crate::pg_sys::pg11_specific::PG_VERSION_NUM;
+        pub use crate::pg_sys::pg11_specific::PG_VERSION_STR;
+    }
+
+    #[cfg(feature = "pg12")]
+    mod pg12 {
+        pub use crate::pg_sys::common::*;
+
+        pub type FunctionCallInfo = *mut crate::pg_sys::pg12_specific::FunctionCallInfoBaseData;
+        pub type TupleDesc = *mut crate::pg_sys::pg12_specific::TupleDescData;
+
+        pub use crate::pg_sys::pg12_specific::AllocSetContextCreateInternal as AllocSetContextCreateExtended;
+        pub use crate::pg_sys::pg12_specific::IndexAmRoutine;
+        pub use crate::pg_sys::pg12_specific::InterruptPending;
+        pub use crate::pg_sys::pg12_specific::NodeTag_T_IndexAmRoutine;
+        pub use crate::pg_sys::pg12_specific::PG_MAJORVERSION;
+        pub use crate::pg_sys::pg12_specific::PG_VERSION;
+        pub use crate::pg_sys::pg12_specific::PG_VERSION_NUM;
+        pub use crate::pg_sys::pg12_specific::PG_VERSION_STR;
+    }
 }
