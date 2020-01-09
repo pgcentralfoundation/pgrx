@@ -245,7 +245,16 @@ fn walk_items(rs_file: &DirEntry, sql: &mut Vec<String>, items: Vec<Item>) {
                 .to_string();
 
             if "extension_sql".eq(&name) {
-                sql.push(makro.mac.tokens.to_string());
+                let string = makro.mac.tokens.to_string();
+                let string = string.trim();
+
+                if !string.starts_with("r#\"") || !string.ends_with("\"#") {
+                    panic!("extension_sql!{} value isn't ia raw string");
+                }
+                let string = string.trim_start_matches("r#\"");
+                let string = string.trim_end_matches("\"#");
+
+                sql.push(string.trim().to_string());
             }
         } else if let Item::Fn(func) = item {
             for att in &func.attrs {

@@ -235,3 +235,9 @@ fn parse_extern_attributes(attr: &TokenStream) -> HashSet<ExternArgs> {
     }
     args
 }
+
+#[proc_macro]
+pub fn extension_sql(_: TokenStream) -> TokenStream {
+    // we don't want to output anything here
+    TokenStream::new()
+}

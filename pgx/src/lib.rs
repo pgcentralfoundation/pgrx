@@ -75,13 +75,6 @@ macro_rules! pg_module_magic {
     };
 }
 
-#[macro_export]
-macro_rules! extension_sql {
-    ($($body:tt)*) => {
-        const _: &str = stringify!($($body)*);
-    };
-}
-
 /// Top-level initialization function
 ///
 /// C-based Postgres extensions should call this in their _PG_init() function
