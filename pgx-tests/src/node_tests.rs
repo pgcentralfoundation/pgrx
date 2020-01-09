@@ -6,6 +6,7 @@ mod tests {
 
     #[pg_test]
     fn test_alloc_node_by_type() {
-        //        let node = PgNode::IndexAmRoutine.new();
+        let node = PgNodeFactory::makeIndexAmRoutine();
+        assert_eq!(PgNode::IndexAmRoutine as u32, *&(node).type_)
     }
 }
