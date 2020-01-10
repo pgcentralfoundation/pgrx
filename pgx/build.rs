@@ -152,6 +152,8 @@ fn main() -> Result<(), std::io::Error> {
             .header(include_h.to_str().unwrap())
             .clang_arg(&format!("-I{}", include_path.display()))
             .parse_callbacks(Box::new(IgnoredMacros::default()))
+            // pgx converts the VARSIZE_ANY macro, so we don't want to also have this function, which is in heaptuple.c
+            .blacklist_function("varsize_any")
             .rustfmt_bindings(true)
             .derive_debug(true)
             .layout_tests(false)
