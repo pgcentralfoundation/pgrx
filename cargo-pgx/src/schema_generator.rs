@@ -277,6 +277,7 @@ fn walk_items(rs_file: &DirEntry, sql: &mut Vec<String>, items: Vec<Item>) {
         } else if let Item::Fn(func) = item {
             let attributes = collect_attributes(rs_file, &func, &func.attrs);
             let is_test_mode = std::env::var("PGX_TEST_MODE").is_ok();
+            let mut function_sql = Vec::new();
 
             for attribute in attributes {
                 match attribute {
@@ -286,8 +287,8 @@ fn walk_items(rs_file: &DirEntry, sql: &mut Vec<String>, items: Vec<Item>) {
                     CategorizedAttribute::PgTest((span, _)) if is_test_mode => {
                         match make_create_function_statement(&func, None, rs_file) {
                             Some(statement) => {
-                                sql.push(location_comment(rs_file, span));
-                                sql.push(statement)
+                                function_sql.push(location_comment(rs_file, span));
+                                function_sql.push(statement)
                             }
                             None => {}
                         }
@@ -295,23 +296,25 @@ fn walk_items(rs_file: &DirEntry, sql: &mut Vec<String>, items: Vec<Item>) {
 
                     // for #[pg_extern] attributes, we only want to programatically generate
                     // a CREATE FUNCTION statement if we don't already have some
-                    CategorizedAttribute::PgExtern((span, args)) if sql.is_empty() => {
+                    CategorizedAttribute::PgExtern((span, args)) if function_sql.is_empty() => {
                         match make_create_function_statement(&func, Some(args), rs_file) {
                             Some(statement) => {
-                                sql.push(location_comment(rs_file, span));
-                                sql.push(statement)
+                                function_sql.push(location_comment(rs_file, span));
+                                function_sql.push(statement)
                             }
                             None => {} // TODO:  Emit a warning?
                         }
                     }
 
                     // it's user-provided SQL from doc comment blocks
-                    CategorizedAttribute::Sql(mut sql_lines) => sql.append(&mut sql_lines),
+                    CategorizedAttribute::Sql(mut sql_lines) => function_sql.append(&mut sql_lines),
 
                     // we don't care about other attributes
                     _ => {}
                 }
             }
+
+            sql.append(&mut function_sql);
         }
     }
 }
