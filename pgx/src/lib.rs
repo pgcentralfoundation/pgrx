@@ -12,7 +12,6 @@ pub use pgx_macros::*;
 pub use std::convert::TryInto;
 
 pub mod datum;
-pub mod datum_compatible;
 pub mod fcinfo;
 pub mod guard;
 pub mod htup;
@@ -22,12 +21,12 @@ pub mod memcxt;
 pub mod nodes;
 pub mod oids;
 pub mod pg_sys;
+pub mod pgbox;
 pub mod spi;
 pub mod stringinfo;
 pub mod varlena;
 
 pub use datum::*;
-pub use datum_compatible::*;
 pub use fcinfo::*;
 pub use guard::*;
 pub use htup::*;
@@ -36,6 +35,7 @@ pub use log::*;
 pub use memcxt::*;
 pub use nodes::{is_a, PgNode, PgNodeFactory}; // be specific since we have multiple versions of these things behind feature gates
 pub use oids::*;
+pub use pgbox::*;
 pub use spi::*;
 pub use varlena::*;
 

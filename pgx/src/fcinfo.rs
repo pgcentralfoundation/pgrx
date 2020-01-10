@@ -1,18 +1,14 @@
-use crate::pg_sys;
+use crate::{pg_sys, FromDatum, PgBox};
 
 #[cfg(any(feature = "pg10", feature = "pg11"))]
 mod pg_10_11 {
-    use crate::{pg_sys, DatumCompatible, PgDatum};
+    use crate::{pg_sys, FromDatum};
 
     #[inline]
-    pub fn pg_getarg<T>(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> PgDatum<T>
-    where
-        T: DatumCompatible<T>,
-    {
-        PgDatum::<T>::new(
-            unsafe { fcinfo.as_ref() }.unwrap().arg[num],
-            unsafe { fcinfo.as_ref() }.unwrap().argnull[num] as bool,
-        )
+    pub fn pg_getarg<T: FromDatum<T>>(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> Option<T> {
+        let datum = unsafe { fcinfo.as_ref() }.unwrap().arg[num];
+        let isnull = pg_arg_is_null(fcinfo, num);
+        T::from_datum(datum, isnull)
     }
 
     #[inline]
@@ -43,13 +39,10 @@ mod pg_10_11 {
 
 #[cfg(feature = "pg12")]
 mod pg_12 {
-    use crate::{pg_sys, DatumCompatible, PgDatum};
+    use crate::{pg_sys, PgDatum};
 
     #[inline]
-    pub fn pg_getarg<T>(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> PgDatum<T>
-    where
-        T: DatumCompatible<T>,
-    {
+    pub fn pg_getarg<T>(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> PgDatum<T> {
         let datum = get_nullable_datum(fcinfo, num);
         PgDatum::<T>::new(datum.value, datum.isnull)
     }
@@ -103,7 +96,7 @@ pub use pg_10_11::*;
 
 #[cfg(feature = "pg12")]
 pub use pg_12::*;
-use std::convert::TryInto;
+use std::ops::DerefMut;
 
 #[inline]
 pub fn pg_getarg_pointer<T>(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> Option<*mut T> {
@@ -155,29 +148,38 @@ pub fn pg_return_void() -> pg_sys::Datum {
 /// }
 ///
 /// fn some_func() {
-///     let result = direct_function_call(add_two_numbers_wrapper, vec!(PgDatum::from(2), PgDatum::from(3)));
-///     let sum:i32 = result.try_into().unwrap();   // don't care to check for NULL datum here
+///     let result = direct_function_call::<i32>(add_two_numbers_wrapper, vec!(2.into_datum(), 3.into_datum()));
+///     let sum = result.expect("function returned null");
 ///     assert_eq!(sum, 5);
 /// }
 /// ```
-pub fn direct_function_call<F: FnOnce(pg_sys::FunctionCallInfo) -> pg_sys::Datum>(
-    func: F,
-    args: Vec<crate::PgDatum<pg_sys::Datum>>,
-) -> crate::PgDatum<pg_sys::Datum> {
+pub fn direct_function_call<R: FromDatum<R>>(
+    func: fn(pg_sys::FunctionCallInfo) -> pg_sys::Datum,
+    args: Vec<Option<pg_sys::Datum>>,
+) -> Option<R> {
     let mut null_array = [false; 100usize];
     let mut arg_array = [0 as pg_sys::Datum; 100usize];
     let nargs = args.len();
 
     for (i, datum) in args.into_iter().enumerate() {
-        null_array[i] = datum.is_null();
-        arg_array[i] = datum.into_datum();
+        match datum {
+            Some(datum) => {
+                null_array[i] = false;
+                arg_array[i] = datum;
+            }
+
+            None => {
+                null_array[i] = true;
+                arg_array[i] = 0;
+            }
+        }
     }
 
-    let fcid = make_function_call_info(nargs, arg_array, null_array);
-    let result = func(fcid);
-    crate::PgDatum::new(result, unsafe { fcid.as_ref() }.unwrap().isnull)
-        .try_into()
-        .unwrap()
+    let mut fcid = make_function_call_info(nargs, arg_array, null_array);
+    let datum = func(fcid.deref_mut());
+    let is_null = fcid.as_ref().unwrap().isnull;
+
+    R::from_datum(datum, is_null)
 }
 
 #[cfg(feature = "pg10")]
@@ -185,18 +187,15 @@ fn make_function_call_info(
     nargs: usize,
     arg_array: [usize; 100],
     null_array: [bool; 100],
-) -> pg_sys::FunctionCallInfo {
-    crate::PgBox::new_from_struct(pg_sys::pg10_specific::FunctionCallInfoData {
-        flinfo: std::ptr::null_mut(),
-        context: std::ptr::null_mut(),
-        resultinfo: std::ptr::null_mut(),
-        fncollation: crate::pg_sys::InvalidOid,
-        isnull: false,
-        nargs: nargs as i16,
-        arg: arg_array,
-        argnull: null_array,
-    })
-    .to_pg()
+) -> PgBox<pg_sys::pg10_specific::FunctionCallInfoData> {
+    let mut fcinfo_boxed = PgBox::<pg_sys::pg10_specific::FunctionCallInfoData>::alloc0();
+    let fcinfo = fcinfo_boxed.deref_mut();
+
+    fcinfo.nargs = nargs as i16;
+    fcinfo.arg = arg_array;
+    fcinfo.argnull = null_array;
+
+    fcinfo_boxed
 }
 
 #[cfg(feature = "pg11")]
@@ -204,18 +203,15 @@ fn make_function_call_info(
     nargs: usize,
     arg_array: [usize; 100],
     null_array: [bool; 100],
-) -> pg_sys::FunctionCallInfo {
-    crate::PgBox::new_from_struct(pg_sys::pg11_specific::FunctionCallInfoData {
-        flinfo: std::ptr::null_mut(),
-        context: std::ptr::null_mut(),
-        resultinfo: std::ptr::null_mut(),
-        fncollation: crate::pg_sys::InvalidOid,
-        isnull: false,
-        nargs: nargs as i16,
-        arg: arg_array,
-        argnull: null_array,
-    })
-    .to_pg()
+) -> PgBox<pg_sys::pg11_specific::FunctionCallInfoData> {
+    let mut fcinfo_boxed = PgBox::<pg_sys::pg11_specific::FunctionCallInfoData>::alloc0();
+    let fcinfo = fcinfo_boxed.deref_mut();
+
+    fcinfo.nargs = nargs as i16;
+    fcinfo.arg = arg_array;
+    fcinfo.argnull = null_array;
+
+    fcinfo_boxed
 }
 
 #[cfg(feature = "pg12")]

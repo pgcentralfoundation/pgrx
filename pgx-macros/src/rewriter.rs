@@ -277,18 +277,17 @@ impl FunctionSignatureRewriter {
             }
             ReturnType::Type(_, type_) => {
                 if type_matches(type_, "Option") {
-                    let option_type = extract_option_type(type_);
                     stream.extend(quote! {
                         match result {
                             Some(result) => {
-                                pgx::PgDatum::#option_type::from(result).into()
+                                result.into_datum().unwrap_or_else(|| panic!("returned Option<T> was NULL"))
                             },
                             None => pgx::pg_return_null(fcinfo)
                         }
                     });
                 } else {
                     stream.extend(quote! {
-                        pgx::PgDatum::<#type_>::from(result).into()
+                        result.into_datum().unwrap_or_else(|| panic!("returned Datum was NULL"))
                     });
                 }
             }
@@ -327,14 +326,8 @@ impl FunctionSignatureRewriter {
 
                         let ts = if is_option {
                             let option_type = extract_option_type(type_);
-
                             quote_spanned! {ident.span()=>
-                                let #name = if pg_arg_is_null(fcinfo, #i) {
-                                    None
-                                } else {
-                                    Some(pgx::pg_getarg::#option_type(fcinfo, #i).try_into()
-                                        .unwrap_or_else(|_| panic!("argument '{}'", stringify! { #name })))
-                                };
+                                let #name = pgx::pg_getarg::<#option_type>(fcinfo, #i);
                             }
                         } else if type_matches(type_, "pg_sys :: FunctionCallInfo") {
                             have_fcinfo = true;
@@ -347,9 +340,7 @@ impl FunctionSignatureRewriter {
                             }
                         } else {
                             quote_spanned! {ident.span()=>
-                                let #name: #type_ =
-                                    pgx::pg_getarg::<#type_>(fcinfo, #i).try_into()
-                                        .unwrap_or_else(|_| panic!("argument '{}'", stringify! { #name }));
+                                let #name = pgx::pg_getarg::<#type_>(fcinfo, #i).unwrap_or_else(|| panic!("{} is null", stringify!{#name}));
                             }
                         };
 
@@ -393,7 +384,11 @@ fn extract_option_type(ty: &Box<Type>) -> proc_macro2::TokenStream {
                 stream.extend(quote! { #arguments });
             }
 
-            stream
+            let string = stream.to_string();
+            let string = string.trim().trim_start_matches('<');
+            let string = string.trim().trim_end_matches('>');
+
+            proc_macro2::TokenStream::from_str(string.trim()).unwrap()
         }
         _ => panic!("No type found inside Option"),
     }

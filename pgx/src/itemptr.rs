@@ -1,4 +1,4 @@
-use crate::{pg_sys, DatumCompatible, PgBox};
+use crate::{pg_sys, PgBox};
 
 /// ## Safety
 ///
@@ -62,7 +62,7 @@ pub fn new_item_pointer(
     blockno: pg_sys::BlockNumber,
     offno: pg_sys::OffsetNumber,
 ) -> PgBox<pg_sys::ItemPointerData> {
-    let mut tid = pg_sys::ItemPointerData::alloc();
+    let mut tid = PgBox::<pg_sys::ItemPointerData>::alloc();
     tid.ip_blkid.bi_hi = (blockno >> 16) as u16;
     tid.ip_blkid.bi_lo = (blockno & 0xffff) as u16;
     tid.ip_posid = offno;

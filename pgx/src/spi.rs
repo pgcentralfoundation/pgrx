@@ -1,10 +1,6 @@
-use crate::{pg_sys, DatumCompatible, PgDatum, PgMemoryContexts, PgOid};
+use crate::{pg_sys, FromDatum, IntoDatum, PgMemoryContexts, PgOid};
 use num_traits::FromPrimitive;
-use std::convert::TryFrom;
-use std::convert::TryInto;
 use std::fmt::Debug;
-
-pub trait SpiSend {}
 
 #[derive(Debug, Primitive)]
 pub enum SpiOk {
@@ -62,13 +58,23 @@ pub struct SpiTupleTable {
 }
 
 impl Spi {
-    pub fn connect<R, F: FnOnce(SpiClient) -> std::result::Result<PgDatum<R>, SpiError>>(
+    /// execute SPI commands via the provided `SpiClient`
+    pub fn execute<F: FnOnce(SpiClient)>(f: F) {
+        Spi::connect(|client| {
+            f(client);
+            Ok(Some(()))
+        });
+    }
+
+    /// execute SPI commands via the provided `SpiClient` and return a value from SPI which is
+    /// automatically copied into the `CurrentMemoryContext` at the time of this function call
+    pub fn connect<
+        R: FromDatum<R> + IntoDatum<R>,
+        F: FnOnce(SpiClient) -> std::result::Result<Option<R>, SpiError>,
+    >(
         f: F,
-    ) -> PgDatum<R>
-    where
-        R: DatumCompatible<R>,
-    {
-        let mut outer_memory_context =
+    ) -> Option<R> {
+        let outer_memory_context =
             PgMemoryContexts::For(PgMemoryContexts::CurrentMemoryContext.value());
 
         // connect to SPI
@@ -81,11 +87,25 @@ impl Spi {
         match f(SpiClient()) {
             // copy the result to the outer memory context we saved above
             Ok(result) => {
-                let result = result.copy_into(&mut outer_memory_context);
-
+                // TODO:  Depending on the datum type, we need to copy it into the outser_memory_context
                 // disconnect from SPI
                 Spi::check_status(unsafe { pg_sys::SPI_finish() });
-                result
+
+                match result {
+                    Some(result) => {
+                        let as_datum = result.into_datum();
+                        if as_datum.is_none() {
+                            // SPI function returned Some(()), which means we just want to return None
+                            None
+                        } else {
+                            // transfer the returned datum to the outer memory context
+                            outer_memory_context.switch_to(|| {
+                                R::from_datum(as_datum.expect("SPI result datum was NULL"), false)
+                            })
+                        }
+                    }
+                    None => None,
+                }
             }
 
             // closure returned an error
@@ -120,7 +140,7 @@ impl SpiClient {
         &self,
         query: &str,
         limit: Option<i64>,
-        args: Option<Vec<(PgOid, PgDatum<pg_sys::Datum>)>>,
+        args: Option<Vec<(PgOid, Option<pg_sys::Datum>)>>,
     ) -> SpiTupleTable {
         SpiClient::execute(query, true, limit, args)
     }
@@ -130,7 +150,7 @@ impl SpiClient {
         &mut self,
         query: &str,
         limit: Option<i64>,
-        args: Option<Vec<(PgOid, PgDatum<pg_sys::Datum>)>>,
+        args: Option<Vec<(PgOid, Option<pg_sys::Datum>)>>,
     ) -> SpiTupleTable {
         SpiClient::execute(query, false, limit, args)
     }
@@ -139,7 +159,7 @@ impl SpiClient {
         query: &str,
         read_only: bool,
         limit: Option<i64>,
-        args: Option<Vec<(PgOid, PgDatum<pg_sys::Datum>)>>,
+        args: Option<Vec<(PgOid, Option<pg_sys::Datum>)>>,
     ) -> SpiTupleTable {
         unsafe {
             pg_sys::SPI_tuptable = std::ptr::null_mut();
@@ -150,13 +170,23 @@ impl SpiClient {
             Some(args) => {
                 let nargs = args.len();
                 let mut argtypes = vec![];
-                let mut values = vec![];
+                let mut datums = vec![];
                 let mut nulls = vec![];
 
-                for (argtype, value) in args {
+                for (argtype, datum) in args {
                     argtypes.push(argtype.value());
-                    values.push(value.as_raw_pg_datum());
-                    nulls.push(value.is_null() as std::os::raw::c_char);
+
+                    match datum {
+                        Some(datum) => {
+                            datums.push(datum);
+                            nulls.push(0 as std::os::raw::c_char);
+                        }
+
+                        None => {
+                            datums.push(0);
+                            nulls.push(1 as std::os::raw::c_char);
+                        }
+                    }
                 }
 
                 unsafe {
@@ -164,7 +194,7 @@ impl SpiClient {
                         src.as_ptr(),
                         nargs as i32,
                         argtypes.as_mut_ptr(),
-                        values.as_mut_ptr(),
+                        datums.as_mut_ptr(),
                         nulls.as_mut_ptr(),
                         read_only,
                         limit.unwrap_or(0),
@@ -195,71 +225,26 @@ impl SpiClient {
 }
 
 impl SpiTupleTable {
-    pub fn get_one<A>(self) -> A
-    where
-        A: DatumCompatible<A> + SpiSend + TryFrom<PgDatum<A>>,
-        <A as std::convert::TryFrom<PgDatum<A>>>::Error: std::fmt::Debug,
-    {
+    pub fn get_one<A: FromDatum<A>>(self) -> Option<A> {
         self.get_datum(1)
-            .expect("no value for column #1")
-            .try_into()
-            .unwrap()
     }
 
-    pub fn get_two<A, B>(self) -> (A, B)
-    where
-        A: DatumCompatible<A> + SpiSend + TryFrom<PgDatum<A>>,
-        <A as std::convert::TryFrom<PgDatum<A>>>::Error: std::fmt::Debug,
-
-        B: DatumCompatible<B> + SpiSend + TryFrom<PgDatum<B>>,
-        <B as std::convert::TryFrom<PgDatum<B>>>::Error: std::fmt::Debug,
-    {
-        let a = self
-            .get_datum::<A>(1)
-            .expect("no value for column #1")
-            .try_into()
-            .unwrap();
-        let b = self
-            .get_datum::<B>(2)
-            .expect("no value for column #2")
-            .try_into()
-            .unwrap();
+    pub fn get_two<A: FromDatum<A>, B: FromDatum<B>>(self) -> (Option<A>, Option<B>) {
+        let a = self.get_datum::<A>(1);
+        let b = self.get_datum::<B>(2);
         (a, b)
     }
 
-    pub fn get_three<A, B, C>(self) -> (A, B, C)
-    where
-        A: DatumCompatible<A> + SpiSend + TryFrom<PgDatum<A>>,
-        <A as std::convert::TryFrom<PgDatum<A>>>::Error: std::fmt::Debug,
-
-        B: DatumCompatible<B> + SpiSend + TryFrom<PgDatum<B>>,
-        <B as std::convert::TryFrom<PgDatum<B>>>::Error: std::fmt::Debug,
-
-        C: DatumCompatible<C> + SpiSend + TryFrom<PgDatum<C>>,
-        <C as std::convert::TryFrom<PgDatum<C>>>::Error: std::fmt::Debug,
-    {
-        let a = self
-            .get_datum::<A>(1)
-            .expect("no value for column #1")
-            .try_into()
-            .unwrap();
-        let b = self
-            .get_datum::<B>(2)
-            .expect("no value for column #2")
-            .try_into()
-            .unwrap();
-        let c = self
-            .get_datum::<C>(3)
-            .expect("no value for column #3")
-            .try_into()
-            .unwrap();
+    pub fn get_three<A: FromDatum<A>, B: FromDatum<B>, C: FromDatum<C>>(
+        self,
+    ) -> (Option<A>, Option<B>, Option<C>) {
+        let a = self.get_datum::<A>(1);
+        let b = self.get_datum::<B>(2);
+        let c = self.get_datum::<C>(3);
         (a, b, c)
     }
 
-    pub fn get_datum<T>(&self, ordinal: i32) -> Option<PgDatum<T>>
-    where
-        T: DatumCompatible<T> + SpiSend,
-    {
+    pub fn get_datum<T: FromDatum<T>>(&self, ordinal: i32) -> Option<T> {
         match self.tupdesc {
             Some(tupdesc) => unsafe {
                 let natts = (*tupdesc).natts;
@@ -272,14 +257,14 @@ impl SpiTupleTable {
                     let mut is_null = false;
                     let datum = pg_sys::SPI_getbinval(heap_tuple, tupdesc, ordinal, &mut is_null);
 
-                    Some(PgDatum::new(datum, is_null))
+                    T::from_datum(datum, is_null)
                 }
             },
             None => panic!("TupDesc is NULL"),
         }
     }
 
-    fn make_vec(&self) -> Option<Vec<PgDatum<pg_sys::Datum>>> {
+    fn make_vec(&self) -> Option<Vec<Option<pg_sys::Datum>>> {
         match self.tupdesc {
             Some(tupdesc) => {
                 let natts = unsafe { (*tupdesc).natts };
@@ -292,7 +277,8 @@ impl SpiTupleTable {
                     let mut is_null = false;
                     let datum =
                         unsafe { pg_sys::SPI_getbinval(heap_tuple, tupdesc, i, &mut is_null) };
-                    row.push(PgDatum::new(datum, is_null));
+
+                    row.push(if is_null { None } else { Some(datum) });
                 }
 
                 Some(row)
@@ -304,7 +290,7 @@ impl SpiTupleTable {
 }
 
 impl Iterator for SpiTupleTable {
-    type Item = Vec<PgDatum<pg_sys::Datum>>;
+    type Item = Vec<Option<pg_sys::Datum>>;
 
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
@@ -344,24 +330,3 @@ impl Iterator for SpiTupleTable {
         }
     }
 }
-
-impl<'a> SpiSend for &'a str {}
-impl<'a> SpiSend for &'a pg_sys::varlena {}
-
-impl SpiSend for String {}
-
-impl SpiSend for i8 {}
-impl SpiSend for i16 {}
-impl SpiSend for i32 {}
-impl SpiSend for i64 {}
-
-impl SpiSend for u8 {}
-impl SpiSend for u16 {}
-impl SpiSend for u32 {}
-impl SpiSend for u64 {}
-
-impl SpiSend for f32 {}
-impl SpiSend for f64 {}
-
-impl SpiSend for bool {}
-impl SpiSend for char {}

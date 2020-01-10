@@ -8,7 +8,7 @@ use quote::{quote, quote_spanned};
 use rewriter::*;
 use std::collections::HashSet;
 use syn::spanned::Spanned;
-use syn::{parse_macro_input, Data, Item, ItemFn, Type};
+use syn::{parse_macro_input, Item, ItemFn};
 
 #[proc_macro_attribute]
 pub fn pg_guard(_attr: TokenStream, item: TokenStream) -> TokenStream {
@@ -119,57 +119,6 @@ fn rewrite_item_fn(mut func: ItemFn, is_raw: bool, no_guard: bool) -> proc_macro
     // TODO:  how to automatically convert function arguments?
     // TODO:  should we even do that?  I think macros in favor of
     // TODO:  mimicking PG_GETARG_XXX() makes more sense
-}
-
-#[proc_macro_derive(DatumCompatible)]
-pub fn derive_datum_compatible(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
-    impl_datum_compatible(&ast)
-}
-
-fn impl_datum_compatible(ast: &syn::DeriveInput) -> TokenStream {
-    let name = &ast.ident;
-    let name_str = format!("{}", name);
-
-    if name_str.starts_with('_') {
-        // skip types that start with an underscore b/c they're likely not general Postgres structs
-        TokenStream::new()
-    } else {
-        match &ast.data {
-            Data::Struct(ds) => {
-                if !type_blacklisted_for_datum_compatible(ds) {
-                    (quote! {
-                        impl DatumCompatible<#name> for #name {
-                            fn copy_into(&self, memory_context: &mut pgx::PgMemoryContexts) -> pgx::PgDatum<#name> {
-                                memory_context.copy_struct_into(self)
-                            }
-
-                        }
-                    })
-                    .into()
-                } else {
-                    TokenStream::new()
-                }
-            }
-            Data::Enum(_) => TokenStream::new(),
-            Data::Union(_) => TokenStream::new(),
-        }
-    }
-}
-
-fn type_blacklisted_for_datum_compatible(ds: &syn::DataStruct) -> bool {
-    for field in ds.fields.iter() {
-        let ty = &field.ty;
-        if let Type::Path(path) = ty {
-            for segment in path.path.segments.iter() {
-                if segment.ident.eq("__IncompleteArrayField") {
-                    return true;
-                }
-            }
-        }
-    }
-
-    false
 }
 
 #[derive(Debug, Hash, Ord, PartialOrd, Eq, PartialEq)]

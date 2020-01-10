@@ -6,41 +6,30 @@ mod tests {
 
     #[pg_test(error = "syntax error at or near \"THIS\"")]
     fn test_spi_failure() {
-        Spi::connect(|client| {
+        Spi::execute(|client| {
             client.select("THIS IS NOT A VALID QUERY", None, None);
-
-            Ok(().into())
         });
     }
 
     #[pg_test]
     fn test_spi_can_recurse() {
-        Spi::connect(|_| {
-            Spi::connect(|_| {
-                Spi::connect(|_| {
-                    Spi::connect(|_| {
-                        Spi::connect(|_| Ok(().into()));
-                        Ok(().into())
+        Spi::execute(|_| {
+            Spi::execute(|_| {
+                Spi::execute(|_| {
+                    Spi::execute(|_| {
+                        Spi::execute(|_| {});
                     });
-                    Ok(().into())
                 });
-                Ok(().into())
             });
-            Ok(().into())
         });
     }
 
     #[pg_test]
     fn test_spi_returns_primitive() {
-        let rc = Spi::connect(|client| {
-            Ok(client
-                .select("SELECT 42", None, None)
-                .get_datum::<i32>(1)
-                .unwrap())
-        });
+        let rc =
+            Spi::connect(|client| Ok(client.select("SELECT 42", None, None).get_datum::<i32>(1)));
 
-        let rc: i32 = rc.try_into().unwrap();
-        assert_eq!(42, rc)
+        assert_eq!(42, rc.expect("SPI failed to return proper value"))
     }
 
     #[pg_test]
@@ -48,12 +37,13 @@ mod tests {
         let rc = Spi::connect(|client| {
             Ok(client
                 .select("SELECT 'this is a test'", None, None)
-                .get_datum::<&str>(1)
-                .unwrap())
+                .get_datum::<&str>(1))
         });
 
-        let rc: &str = rc.try_into().unwrap();
-        assert_eq!("this is a test", rc)
+        assert_eq!(
+            "this is a test",
+            rc.expect("SPI failed to return proper value")
+        )
     }
 
     #[pg_test]
@@ -61,80 +51,72 @@ mod tests {
         let rc = Spi::connect(|client| {
             Ok(client
                 .select("SELECT 'this is a test'", None, None)
-                .get_datum::<String>(1)
-                .unwrap())
+                .get_datum::<String>(1))
         });
 
-        let rc: String = rc.try_into().unwrap();
-        assert_eq!("this is a test", rc)
+        assert_eq!(
+            "this is a test",
+            rc.expect("SPI failed to return proper value")
+        )
     }
 
     #[pg_test]
     fn test_spi_get_one() {
-        Spi::connect(|client| {
-            let val = client.select("SELECT 42", None, None).get_one::<i64>();
-
-            assert_eq!(42, val);
-
-            Ok(().into())
+        Spi::execute(|client| {
+            let i = client
+                .select("SELECT 42::bigint", None, None)
+                .get_one::<i64>();
+            assert_eq!(42, i.unwrap());
         });
     }
 
     #[pg_test]
     fn test_spi_get_two() {
-        Spi::connect(|client| {
+        Spi::execute(|client| {
             let (i, s) = client
                 .select("SELECT 42, 'test'", None, None)
                 .get_two::<i64, &str>();
 
-            assert_eq!(42, i);
-            assert_eq!("test", s);
-
-            Ok(().into())
+            assert_eq!(42, i.unwrap());
+            assert_eq!("test", s.unwrap());
         });
     }
 
     #[pg_test]
     fn test_spi_get_three() {
-        Spi::connect(|client| {
+        Spi::execute(|client| {
             let (i, s, b) = client
                 .select("SELECT 42, 'test', true", None, None)
                 .get_three::<i64, &str, bool>();
 
-            assert_eq!(42, i);
-            assert_eq!("test", s);
-            assert_eq!(true, b);
-
-            Ok(().into())
+            assert_eq!(42, i.unwrap());
+            assert_eq!("test", s.unwrap());
+            assert_eq!(true, b.unwrap());
         });
     }
 
-    #[pg_test(error = "no value for column #2")]
+    #[pg_test]
     fn test_spi_get_two_with_failure() {
-        Spi::connect(|client| {
+        Spi::execute(|client| {
             let (i, s) = client
                 .select("SELECT 42", None, None)
                 .get_two::<i64, &str>();
 
-            assert_eq!(42, i);
-            assert_eq!("test", s);
-
-            Ok(().into())
+            assert_eq!(42, i.unwrap());
+            assert!(s.is_none());
         });
     }
 
-    #[pg_test(error = "no value for column #3")]
+    #[pg_test]
     fn test_spi_get_three_failure() {
-        Spi::connect(|client| {
+        Spi::execute(|client| {
             let (i, s, b) = client
                 .select("SELECT 42, 'test'", None, None)
                 .get_three::<i64, &str, bool>();
 
-            assert_eq!(42, i);
-            assert_eq!("test", s);
-            assert_eq!(true, b);
-
-            Ok(().into())
+            assert_eq!(42, i.unwrap());
+            assert_eq!("test", s.unwrap());
+            assert!(b.is_none());
         });
     }
 }
