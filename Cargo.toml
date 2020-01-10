@@ -21,3 +21,4 @@ pg12 = ["pgx/pg12"]
 pgx = { path = "pgx", default-features = false }
 pgx-macros = { path = "pgx-macros" }
 pgx-tests = { path = "pgx-tests", default-features = false }
+cargo-pgx = { path = "cargo-pgx" }
