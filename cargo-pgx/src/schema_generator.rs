@@ -34,7 +34,7 @@ enum CategorizedAttribute {
     RustTest(Span),
     PgExtern((Span, HashSet<ExternArgs>)),
     Sql(Vec<String>),
-    Other(Vec<String>),
+    Other(Vec<(Span, String)>),
 }
 
 pub(crate) fn generate_schema() -> Result<(), std::io::Error> {
@@ -553,6 +553,7 @@ fn collect_attributes(
             let mut sql_statements = Vec::new();
 
             // run forward saving each line as an sql statement until we find ```
+            sql_statements.push(location_comment(rs_file, a.span()));
             i = i + 1;
             while i < attrs.len() {
                 let a = attrs.get(i).unwrap();
@@ -574,11 +575,10 @@ fn collect_attributes(
                         .replace("@FUNCTION_NAME@", &format!("{}_wrapper", func.sig.ident));
 
                     // and remember it, along with its original source location
-                    sql_statements.push(location_comment(rs_file, a.span()));
                     sql_statements.push(as_string);
                 } else {
                     // it's not a doc line, so add it to other_attributes and get out
-                    other_attributes.push(as_string);
+                    other_attributes.push((span, as_string));
                     break;
                 }
 
@@ -589,8 +589,7 @@ fn collect_attributes(
                 categorized_attributes.push(CategorizedAttribute::Sql(sql_statements));
             }
         } else {
-            other_attributes.push(location_comment(rs_file, span));
-            other_attributes.push(as_string);
+            other_attributes.push((span, as_string));
         }
 
         i = i + 1;
