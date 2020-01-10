@@ -1,6 +1,7 @@
-use proc_macro2::Ident;
+use proc_macro2::{Ident, Span};
 use quote::quote;
 use rayon::prelude::*;
+use std::borrow::BorrowMut;
 use std::collections::HashSet;
 use std::fs::DirEntry;
 use std::io::{BufRead, Write};
@@ -11,7 +12,30 @@ use std::str::FromStr;
 use std::sync::Mutex;
 use syn::export::ToTokens;
 use syn::spanned::Spanned;
-use syn::{Attribute, FnArg, Item, Pat, ReturnType, Type};
+use syn::{Attribute, FnArg, Item, ItemFn, Pat, ReturnType, Type};
+
+#[derive(Debug, Hash, Ord, PartialOrd, Eq, PartialEq)]
+enum ExternArgs {
+    Immutable,
+    Strict,
+    Stable,
+    Volatile,
+    Raw,
+    ParallelSafe,
+    ParallelUnsafe,
+    ParallelRestricted,
+    Error(String),
+}
+
+#[derive(Debug)]
+enum CategorizedAttribute {
+    PgGuard(Span),
+    PgTest((Span, HashSet<ExternArgs>)),
+    RustTest(Span),
+    PgExtern((Span, HashSet<ExternArgs>)),
+    Sql(Vec<String>),
+    Other(Vec<String>),
+}
 
 pub(crate) fn generate_schema() -> Result<(), std::io::Error> {
     let path = PathBuf::from_str("./src").unwrap();
@@ -147,19 +171,6 @@ fn find_rs_files(path: &PathBuf, mut files: Vec<DirEntry>) -> Vec<DirEntry> {
     files
 }
 
-#[derive(Debug, Hash, Ord, PartialOrd, Eq, PartialEq)]
-enum ExternArgs {
-    Immutable,
-    Strict,
-    Stable,
-    Volatile,
-    Raw,
-    ParallelSafe,
-    ParallelUnsafe,
-    ParallelRestricted,
-    Error(String),
-}
-
 fn parse_extern_args(att: &Attribute) -> HashSet<ExternArgs> {
     let mut args = HashSet::<ExternArgs>::new();
     let line = att.into_token_stream().to_string();
@@ -264,112 +275,150 @@ fn walk_items(rs_file: &DirEntry, sql: &mut Vec<String>, items: Vec<Item>) {
                 sql.push(string.to_string());
             }
         } else if let Item::Fn(func) = item {
-            for att in &func.attrs {
-                let att_desc = att.clone().into_token_stream().to_string();
-                let is_test_mode = std::env::var("PGX_TEST_MODE").is_ok();
-                if att_desc.starts_with("# [ pg_extern")
-                    || (att_desc.starts_with("# [ pg_test") && is_test_mode)
-                {
-                    let mut extern_args = parse_extern_args(att);
-                    let mut def = String::new();
-                    let exported_func_name = format!("{}_wrapper", func.sig.ident.to_string());
+            let attributes = collect_attributes(rs_file, &func, &func.attrs);
+            let is_test_mode = std::env::var("PGX_TEST_MODE").is_ok();
 
-                    def.push_str(&format!(
-                        "CREATE OR REPLACE FUNCTION {name}",
-                        name = quote_ident(&func.sig.ident)
-                    ));
-
-                    // function arguments
-                    def.push('(');
-                    let mut had_none = false;
-                    let mut i = 0;
-                    let mut had_option = false;
-                    for arg in &func.sig.inputs {
-                        match arg {
-                            FnArg::Receiver(_) => {
-                                panic!("functions that take 'self' are not supported")
+            for attribute in attributes {
+                match attribute {
+                    // only generate CREATE FUNCTION statements for #[pg_test] functions
+                    // if we're in test mode, which is controlled by the PGX_TEST_MODE
+                    // environment variable
+                    CategorizedAttribute::PgTest((span, _)) if is_test_mode => {
+                        match make_create_function_statement(&func, None, rs_file) {
+                            Some(statement) => {
+                                sql.push(location_comment(rs_file, span));
+                                sql.push(statement)
                             }
-                            FnArg::Typed(ty) => match translate_type(rs_file, &ty.ty) {
-                                Some((type_name, is_option)) => {
-                                    if i > 0 {
-                                        def.push_str(", ");
-                                    }
-
-                                    def.push_str(&arg_name(arg));
-                                    def.push(' ');
-                                    def.push_str(&type_name);
-
-                                    if is_option {
-                                        had_option = true;
-                                    }
-
-                                    i += 1;
-                                }
-                                None => had_none = true,
-                            },
+                            None => {}
                         }
                     }
 
-                    if had_none && i == 0 {
-                        let span = &func.span();
-                        eprintln!(
-                        "{}:{}:{}: Could not generate function for {} at  -- it contains only pg_sys::FunctionCallData as its only argument",
-                        rs_file.path().display(),
-                        span.start().line,
-                        span.start().column,
-                        quote_ident(&func.sig.ident),
-                    );
-                        continue;
-                    }
-
-                    def.push(')');
-
-                    if !had_option {
-                        // there were no Option<T> arguments, so the function can be declared STRICT
-                        extern_args.insert(ExternArgs::Strict);
-                    }
-
-                    // append RETURNS clause
-                    match match &func.sig.output {
-                        ReturnType::Default => Some(("void".to_string(), false)),
-                        ReturnType::Type(_, ty) => translate_type(rs_file, ty),
-                    } {
-                        Some((return_type, _is_option)) => {
-                            def.push_str(&format!(" RETURNS {}", return_type))
-                        }
-                        None => panic!("could not determine return type"),
-                    }
-
-                    // modifiers
-                    for extern_arg in extern_args {
-                        match extern_arg {
-                            ExternArgs::Immutable => def.push_str(" IMMUTABLE"),
-                            ExternArgs::Strict => def.push_str(" STRICT"),
-                            ExternArgs::Stable => def.push_str(" STABLE"),
-                            ExternArgs::Volatile => def.push_str(" VOLATILE"),
-                            ExternArgs::Raw => { /* noop */ }
-                            ExternArgs::ParallelSafe => def.push_str(" PARALLEL SAFE"),
-                            ExternArgs::ParallelUnsafe => def.push_str(" PARALLEL UNSAFE"),
-                            ExternArgs::ParallelRestricted => def.push_str(" PARALLEL RESTRICTED"),
-                            ExternArgs::Error(_) => { /* noop */ }
+                    // for #[pg_extern] attributes, we only want to programatically generate
+                    // a CREATE FUNCTION statement if we don't already have some
+                    CategorizedAttribute::PgExtern((span, args)) if sql.is_empty() => {
+                        match make_create_function_statement(&func, Some(args), rs_file) {
+                            Some(statement) => {
+                                sql.push(location_comment(rs_file, span));
+                                sql.push(statement)
+                            }
+                            None => {} // TODO:  Emit a warning?
                         }
                     }
 
-                    def.push_str(&format!(
-                        " LANGUAGE c AS 'MODULE_PATHNAME', '{}';",
-                        exported_func_name
-                    ));
-                    sql.push(def);
+                    // it's user-provided SQL from doc comment blocks
+                    CategorizedAttribute::Sql(mut sql_lines) => sql.append(&mut sql_lines),
+
+                    // we don't care about other attributes
+                    _ => {}
                 }
             }
         }
     }
 }
 
+fn make_create_function_statement(
+    func: &ItemFn,
+    mut extern_args: Option<HashSet<ExternArgs>>,
+    rs_file: &DirEntry,
+) -> Option<String> {
+    let exported_func_name = format!("{}_wrapper", func.sig.ident.to_string());
+    let mut statement = String::new();
+
+    statement.push_str(&format!(
+        "CREATE OR REPLACE FUNCTION {name}",
+        name = quote_ident(&func.sig.ident)
+    ));
+
+    // function arguments
+    statement.push('(');
+    let mut had_none = false;
+    let mut i = 0;
+    let mut had_option = false;
+    for arg in &func.sig.inputs {
+        match arg {
+            FnArg::Receiver(_) => panic!("functions that take 'self' are not supported"),
+            FnArg::Typed(ty) => match translate_type(rs_file, &ty.ty) {
+                Some((type_name, is_option)) => {
+                    if i > 0 {
+                        statement.push_str(", ");
+                    }
+
+                    statement.push_str(&arg_name(arg));
+                    statement.push(' ');
+                    statement.push_str(&type_name);
+
+                    if is_option {
+                        had_option = true;
+                    }
+
+                    i += 1;
+                }
+                None => had_none = true,
+            },
+        }
+    }
+
+    if had_none && i == 0 {
+        let span = &func.span();
+        eprintln!(
+            "{}:{}:{}: Could not generate function for {} at  -- it contains only pg_sys::FunctionCallData as its only argument",
+            rs_file.path().display(),
+            span.start().line,
+            span.start().column,
+            quote_ident(&func.sig.ident),
+        );
+        return None;
+    }
+
+    statement.push(')');
+
+    if !had_option {
+        // there were no Option<T> arguments, so the function can be declared STRICT
+        if let Some(extern_args) = extern_args.borrow_mut() {
+            extern_args.insert(ExternArgs::Strict);
+        }
+    }
+
+    // append RETURNS clause
+    match match &func.sig.output {
+        ReturnType::Default => Some(("void".to_string(), false)),
+        ReturnType::Type(_, ty) => translate_type(rs_file, ty),
+    } {
+        Some((return_type, _is_option)) => statement.push_str(&format!(" RETURNS {}", return_type)),
+        None => panic!("could not determine return type"),
+    }
+
+    // modifiers
+    if let Some(extern_args) = extern_args {
+        for extern_arg in extern_args {
+            match extern_arg {
+                ExternArgs::Immutable => statement.push_str(" IMMUTABLE"),
+                ExternArgs::Strict => statement.push_str(" STRICT"),
+                ExternArgs::Stable => statement.push_str(" STABLE"),
+                ExternArgs::Volatile => statement.push_str(" VOLATILE"),
+                ExternArgs::Raw => { /* noop */ }
+                ExternArgs::ParallelSafe => statement.push_str(" PARALLEL SAFE"),
+                ExternArgs::ParallelUnsafe => statement.push_str(" PARALLEL UNSAFE"),
+                ExternArgs::ParallelRestricted => statement.push_str(" PARALLEL RESTRICTED"),
+                ExternArgs::Error(_) => { /* noop */ }
+            }
+        }
+    }
+
+    statement.push_str(&format!(
+        " LANGUAGE c AS 'MODULE_PATHNAME', '{}';",
+        exported_func_name
+    ));
+
+    Some(statement)
+}
+
 fn quote_ident(ident: &Ident) -> String {
-    let mut name = format!("{}", quote! {#ident});
-    name = name.replace("\"", "\"\"");
-    format!("\"{}\"", name)
+    quote_ident_string(ident.to_token_stream().to_string())
+}
+
+fn quote_ident_string(ident: String) -> String {
+    ident.replace("\"", "\"\"")
 }
 
 fn arg_name(arg: &FnArg) -> String {
@@ -470,4 +519,95 @@ fn extract_type(ty: &Box<Type>) -> String {
         }
         _ => panic!("No type found inside Option"),
     }
+}
+
+fn collect_attributes(
+    rs_file: &DirEntry,
+    func: &ItemFn,
+    attrs: &Vec<Attribute>,
+) -> Vec<CategorizedAttribute> {
+    let mut categorized_attributes = Vec::new();
+    let mut other_attributes = Vec::new();
+
+    //    let itr = attrs.iter();
+    let mut i = 0;
+    while i < attrs.len() {
+        let a = attrs.get(i).unwrap();
+        let span = a.span();
+        let as_string = a.to_token_stream().to_string();
+
+        if as_string == "# [ pg_guard ]" {
+            categorized_attributes.push(CategorizedAttribute::PgGuard(span));
+        } else if as_string.starts_with("# [ pg_extern") {
+            categorized_attributes.push(CategorizedAttribute::PgExtern((
+                span,
+                parse_extern_args(&a),
+            )));
+        } else if as_string.starts_with("# [ pg_test") {
+            categorized_attributes
+                .push(CategorizedAttribute::PgTest((span, parse_extern_args(&a))));
+        } else if as_string == "# [ test ]" {
+            categorized_attributes.push(CategorizedAttribute::RustTest(span));
+        } else if as_string == "# [ doc = \" ```sql\" ]" {
+            // we start an SQL doc block
+            let mut sql_statements = Vec::new();
+
+            // run forward saving each line as an sql statement until we find ```
+            i = i + 1;
+            while i < attrs.len() {
+                let a = attrs.get(i).unwrap();
+                let as_string = a.to_token_stream().to_string();
+
+                if as_string == "# [ doc = \" ```\" ]" {
+                    // we found the end to this ```sql block of documentation
+                    break;
+                } else if as_string.starts_with("# [ doc = \"") {
+                    // it's a doc line within the sql block
+                    let as_string = as_string.trim_start_matches("# [ doc = \"");
+                    let as_string = as_string.trim_end_matches("\" ]");
+                    let as_string = as_string.trim();
+                    let as_string = unescape::unescape(as_string)
+                        .expect(&format!("Improperly escaped:\n{}", as_string));
+
+                    // do variable substitution in the sql statement
+                    let as_string = as_string
+                        .replace("@FUNCTION_NAME@", &format!("{}_wrapper", func.sig.ident));
+
+                    // and remember it, along with its original source location
+                    sql_statements.push(location_comment(rs_file, a.span()));
+                    sql_statements.push(as_string);
+                } else {
+                    // it's not a doc line, so add it to other_attributes and get out
+                    other_attributes.push(as_string);
+                    break;
+                }
+
+                i = i + 1;
+            }
+
+            if !sql_statements.is_empty() {
+                categorized_attributes.push(CategorizedAttribute::Sql(sql_statements));
+            }
+        } else {
+            other_attributes.push(location_comment(rs_file, span));
+            other_attributes.push(as_string);
+        }
+
+        i = i + 1;
+    }
+
+    if !other_attributes.is_empty() {
+        categorized_attributes.push(CategorizedAttribute::Other(other_attributes));
+    }
+
+    categorized_attributes
+}
+
+fn location_comment(rs_file: &DirEntry, span: Span) -> String {
+    format!(
+        "-- {}:{}:{}",
+        rs_file.path().display(),
+        span.start().line,
+        span.start().column,
+    )
 }
