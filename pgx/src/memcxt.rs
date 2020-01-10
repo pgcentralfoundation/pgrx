@@ -6,7 +6,10 @@
 //! An enum-based interface (`PgMemoryContexts`) around Postgres' various `MemoryContext`s provides
 //! simple accessibility to working with MemoryContexts in a compiler-checked manner
 //!
-use crate::{pg_sys, DatumCompatible, PgDatum, PgNode};
+use crate::{
+    pg_sys, rust_str_to_text_p, text_to_rust_str_unchecked, DatumCompatible, PgDatum, PgNode,
+};
+use serde::{Deserialize, Serialize};
 use std::fmt::{Debug, Error, Formatter};
 use std::ops::{Deref, DerefMut};
 
@@ -351,7 +354,15 @@ impl PgMemoryContexts {
         }
     }
 
-    pub fn alloc0(&mut self, len: usize) -> void_ptr {
+    /// Allocate memory in this context, which will be free'd whenever Postgres deletes this MeoryContext
+    pub fn palloc(&mut self, len: usize) -> *mut std::os::raw::c_void {
+        unsafe { pg_sys::MemoryContextAlloc(self.value(), len) }
+    }
+
+    /// Allocate memory in this context, which will be free'd whenever Postgres deletes this MeoryContext
+    ///
+    /// The allocated memory is zero'd
+    pub fn palloc0(&mut self, len: usize) -> *mut std::os::raw::c_void {
         unsafe { pg_sys::MemoryContextAllocZero(self.value(), len) }
     }
 
@@ -557,6 +568,29 @@ where
                 self.owner
             )),
         }
+    }
+}
+
+impl<T> PgBox<T>
+where
+    T: DatumCompatible<T>,
+{
+    pub fn serialize(data: T) -> serde_json::Result<PgBox<T>>
+    where
+        T: Serialize,
+    {
+        let varlena = rust_str_to_text_p(serde_json::to_string(&data)?.as_str());
+        Ok(PgBox::<T>::from(varlena as *mut T))
+    }
+
+    pub fn deserialize(self) -> serde_json::Result<T>
+    where
+        T: Deserialize<'static>,
+    {
+        let varlena = self.into_pg() as *mut pg_sys::varlena;
+        let string = unsafe { text_to_rust_str_unchecked(varlena) };
+
+        serde_json::from_str(string)
     }
 }
 

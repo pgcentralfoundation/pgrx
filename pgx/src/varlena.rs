@@ -1,5 +1,13 @@
 use crate::pg_sys;
 
+pub fn set_varsize(ptr: *mut pg_sys::varlena, len: i32) {
+    extern "C" {
+        fn pgx_SET_VARSIZE(ptr: *mut pg_sys::varlena, len: i32);
+    }
+
+    unsafe { pgx_SET_VARSIZE(ptr, len) }
+}
+
 /// ```c
 /// #define VARSIZE_EXTERNAL(PTR)				(VARHDRSZ_EXTERNAL + VARTAG_SIZE(VARTAG_EXTERNAL(PTR)))
 /// ```
@@ -160,6 +168,23 @@ pub fn varatt_not_pad_byte(ptr: *const pg_sys::varlena) -> bool {
 }
 
 /// ```c
+/// #define VARSIZE_ANY(PTR) \
+///	(VARATT_IS_1B_E(PTR) ? VARSIZE_EXTERNAL(PTR) : \
+///	 (VARATT_IS_1B(PTR) ? VARSIZE_1B(PTR) : \
+///	  VARSIZE_4B(PTR)))
+/// ```
+#[inline]
+pub fn varsize_any(ptr: *const pg_sys::varlena) -> usize {
+    if varatt_is_1b_e(ptr) {
+        varsize_external(ptr)
+    } else if varatt_is_1b(ptr) {
+        varsize_1b(ptr)
+    } else {
+        varsize_4b(ptr)
+    }
+}
+
+/// ```c
 /// /* Size of a varlena data, excluding header */
 /// #define VARSIZE_ANY_EXHDR(PTR) \
 ///	       (VARATT_IS_1B_E(PTR) ? \
@@ -274,7 +299,8 @@ pub unsafe fn varlena_size(t: *const pg_sys::varlena) -> usize {
 /// memory.  As such, the return value will become invalid the moment Postgres frees the varlena
 #[inline]
 pub unsafe fn text_to_rust_str_unchecked<'a>(t: *const pg_sys::varlena) -> &'a str {
-    let unpacked = pg_sys::pg_detoast_datum_packed(t as *mut pg_sys::varlena);
+    let unpacked =
+        pg_sys::pg_detoast_datum_packed(pg_sys::pg_detoast_datum(t as *mut pg_sys::varlena));
     let len = varsize_any_exhdr(unpacked);
     let data = vardata_any(unpacked);
 
@@ -285,7 +311,7 @@ pub unsafe fn text_to_rust_str_unchecked<'a>(t: *const pg_sys::varlena) -> &'a s
 ///
 /// This allocates the returned Postgres `text *` in `CurrentMemoryContext`.
 #[inline]
-pub fn rust_str_to_text_p(s: &str) -> *const pg_sys::text {
+pub fn rust_str_to_text_p(s: &str) -> *const pg_sys::varlena {
     let len = s.len();
     let ptr = s.as_ptr();
 
