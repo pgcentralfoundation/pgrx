@@ -214,7 +214,7 @@ where
 
 impl<T> From<PgBox<T>> for PgDatum<T>
 where
-    T: DatumCompatible<T> + Debug,
+    T: DatumCompatible<T>,
 {
     #[inline]
     fn from(val: PgBox<T>) -> Self {

@@ -39,7 +39,8 @@ mod tests {
                 .unwrap())
         });
 
-        assert_eq!(42, rc.try_into().unwrap())
+        let rc: i32 = rc.try_into().unwrap();
+        assert_eq!(42, rc)
     }
 
     #[pg_test]
