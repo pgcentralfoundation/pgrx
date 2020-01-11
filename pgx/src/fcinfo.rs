@@ -39,12 +39,12 @@ mod pg_10_11 {
 
 #[cfg(feature = "pg12")]
 mod pg_12 {
-    use crate::{pg_sys, PgDatum};
+    use crate::{pg_sys, FromDatum};
 
     #[inline]
-    pub fn pg_getarg<T>(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> PgDatum<T> {
+    pub fn pg_getarg<T: FromDatum<T>>(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> Option<T> {
         let datum = get_nullable_datum(fcinfo, num);
-        PgDatum::<T>::new(datum.value, datum.isnull)
+        T::from_datum(datum.value, datum.isnull)
     }
 
     #[inline]
@@ -219,7 +219,7 @@ fn make_function_call_info(
     nargs: usize,
     arg_array: [usize; 100],
     null_array: [bool; 100],
-) -> pg_sys::FunctionCallInfo {
+) -> PgBox<pg_sys::pg12_specific::FunctionCallInfoBaseData> {
     let fcid: *mut pg_sys::pg12_specific::FunctionCallInfoBaseData = unsafe {
         pg_sys::palloc0(
             std::mem::size_of::<pg_sys::pg12_specific::FunctionCallInfoBaseData>()
@@ -227,10 +227,12 @@ fn make_function_call_info(
         ) as *mut pg_sys::pg12_specific::FunctionCallInfoBaseData
     };
 
-    let fcid = unsafe { fcid.as_mut() }.unwrap();
-    fcid.nargs = nargs as i16;
+    let mut fcinfo_boxed = PgBox::<pg_sys::pg12_specific::FunctionCallInfoBaseData>::from_pg(fcid);
+    let fcinfo = fcinfo_boxed.deref_mut();
 
-    let slice = unsafe { fcid.args.as_mut_slice(nargs) };
+    fcinfo.nargs = nargs as i16;
+
+    let slice = unsafe { fcinfo.args.as_mut_slice(nargs) };
     for i in 0..nargs {
         slice[i] = pg_sys::pg12_specific::NullableDatum {
             value: arg_array[i],
@@ -238,5 +240,5 @@ fn make_function_call_info(
         }
     }
 
-    fcid
+    fcinfo_boxed
 }
