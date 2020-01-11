@@ -1,5 +1,6 @@
 #![allow(non_snake_case)]
 
+use crate::pg_sys::{error_context_stack, PG_exception_stack};
 use crate::{PgLogLevel, PgSqlErrorCode};
 use std::any::Any;
 use std::cell::Cell;
@@ -11,7 +12,6 @@ use std::thread::LocalKey;
 
 extern "C" {
     fn siglongjmp(env: *mut crate::pg_sys::sigjmp_buf, val: c_int) -> c_void;
-    static mut PG_exception_stack: *mut crate::pg_sys::sigjmp_buf;
 }
 
 #[cfg(target_os = "linux")]
@@ -116,6 +116,7 @@ where
     let result = unsafe {
         // remember where Postgres would like to jump to
         let prev_exception_stack = PG_exception_stack;
+        let prev_error_context_stack = error_context_stack;
 
         //
         // setup the longjmp context and run our wrapped function inside
@@ -149,6 +150,7 @@ where
         // restore Postgres' understanding of where it should longjmp
         dec_depth(&DEPTH);
         PG_exception_stack = prev_exception_stack;
+        error_context_stack = prev_error_context_stack;
 
         // return our result -- it could be Ok(), or it could be an Err()
         result
