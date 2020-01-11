@@ -3,7 +3,6 @@ mod tests {
     use crate as pgx_tests;
 
     use pgx::*;
-    use pgx_tests::*;
 
     #[pg_test]
     fn test_json() {
