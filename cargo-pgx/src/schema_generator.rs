@@ -34,6 +34,7 @@ enum CategorizedAttribute {
     RustTest(Span),
     PgExtern((Span, HashSet<ExternArgs>)),
     Sql(Vec<String>),
+    FunctionArgsSql(String),
     Other(Vec<(Span, String)>),
 }
 
@@ -278,6 +279,7 @@ fn walk_items(rs_file: &DirEntry, sql: &mut Vec<String>, items: Vec<Item>) {
             let attributes = collect_attributes(rs_file, &func, &func.attrs);
             let is_test_mode = std::env::var("PGX_TEST_MODE").is_ok();
             let mut function_sql = Vec::new();
+            let sql_func_arg = extract_funcargs_attribute(&attributes);
 
             for attribute in attributes {
                 match attribute {
@@ -285,7 +287,7 @@ fn walk_items(rs_file: &DirEntry, sql: &mut Vec<String>, items: Vec<Item>) {
                     // if we're in test mode, which is controlled by the PGX_TEST_MODE
                     // environment variable
                     CategorizedAttribute::PgTest((span, _)) if is_test_mode => {
-                        match make_create_function_statement(&func, None, rs_file) {
+                        match make_create_function_statement(&func, None, rs_file, None) {
                             Some(statement) => {
                                 function_sql.push(location_comment(rs_file, span));
                                 function_sql.push(statement)
@@ -297,7 +299,12 @@ fn walk_items(rs_file: &DirEntry, sql: &mut Vec<String>, items: Vec<Item>) {
                     // for #[pg_extern] attributes, we only want to programatically generate
                     // a CREATE FUNCTION statement if we don't already have some
                     CategorizedAttribute::PgExtern((span, args)) if function_sql.is_empty() => {
-                        match make_create_function_statement(&func, Some(args), rs_file) {
+                        match make_create_function_statement(
+                            &func,
+                            Some(args),
+                            rs_file,
+                            sql_func_arg.clone(),
+                        ) {
                             Some(statement) => {
                                 function_sql.push(location_comment(rs_file, span));
                                 function_sql.push(statement)
@@ -323,59 +330,59 @@ fn make_create_function_statement(
     func: &ItemFn,
     mut extern_args: Option<HashSet<ExternArgs>>,
     rs_file: &DirEntry,
+    sql_func_arg: Option<String>,
 ) -> Option<String> {
     let exported_func_name = format!("{}_wrapper", func.sig.ident.to_string());
     let mut statement = String::new();
+    let has_option_arg = func_args_have_option(func, rs_file);
 
     statement.push_str(&format!(
         "CREATE OR REPLACE FUNCTION {name}",
         name = quote_ident(&func.sig.ident)
     ));
 
-    // function arguments
-    statement.push('(');
-    let mut had_none = false;
-    let mut i = 0;
-    let mut had_option = false;
-    for arg in &func.sig.inputs {
-        match arg {
-            FnArg::Receiver(_) => panic!("functions that take 'self' are not supported"),
-            FnArg::Typed(ty) => match translate_type(rs_file, &ty.ty) {
-                Some((type_name, is_option)) => {
-                    if i > 0 {
-                        statement.push_str(", ");
+    if sql_func_arg.is_some() {
+        statement.push_str(sql_func_arg.unwrap().as_str());
+    } else {
+        // function arguments
+        statement.push('(');
+        let mut had_none = false;
+        let mut i = 0;
+        for arg in &func.sig.inputs {
+            match arg {
+                FnArg::Receiver(_) => panic!("functions that take 'self' are not supported"),
+                FnArg::Typed(ty) => match translate_type(rs_file, &ty.ty) {
+                    Some((type_name, _)) => {
+                        if i > 0 {
+                            statement.push_str(", ");
+                        }
+
+                        statement.push_str(&arg_name(arg));
+                        statement.push(' ');
+                        statement.push_str(&type_name);
+
+                        i += 1;
                     }
-
-                    statement.push_str(&arg_name(arg));
-                    statement.push(' ');
-                    statement.push_str(&type_name);
-
-                    if is_option {
-                        had_option = true;
-                    }
-
-                    i += 1;
-                }
-                None => had_none = true,
-            },
+                    None => had_none = true,
+                },
+            }
         }
+
+        if had_none && i == 0 {
+            let span = &func.span();
+            eprintln!(
+                "{}:{}:{}: Could not generate function for {} at  -- it contains only pg_sys::FunctionCallData as its only argument",
+                rs_file.path().display(),
+                span.start().line,
+                span.start().column,
+                quote_ident(&func.sig.ident),
+            );
+            return None;
+        }
+        statement.push(')');
     }
 
-    if had_none && i == 0 {
-        let span = &func.span();
-        eprintln!(
-            "{}:{}:{}: Could not generate function for {} at  -- it contains only pg_sys::FunctionCallData as its only argument",
-            rs_file.path().display(),
-            span.start().line,
-            span.start().column,
-            quote_ident(&func.sig.ident),
-        );
-        return None;
-    }
-
-    statement.push(')');
-
-    if !had_option {
+    if !has_option_arg {
         // there were no Option<T> arguments, so the function can be declared STRICT
         if let Some(extern_args) = extern_args.borrow_mut() {
             extern_args.insert(ExternArgs::Strict);
@@ -414,6 +421,20 @@ fn make_create_function_statement(
     ));
 
     Some(statement)
+}
+
+fn func_args_have_option(func: &ItemFn, rs_file: &DirEntry) -> bool {
+    for arg in &func.sig.inputs {
+        if let FnArg::Typed(ty) = arg {
+            if let Some((_, is_option)) = translate_type(rs_file, &ty.ty) {
+                if is_option {
+                    return true;
+                }
+            }
+        }
+    }
+
+    false
 }
 
 fn quote_ident(ident: &Ident) -> String {
@@ -470,6 +491,7 @@ fn translate_type_string(
         "f64" => Some(("double precision".to_string(), false)),
         "& str" | "String" => Some(("text".to_string(), false)),
         "& std :: ffi :: CStr" => Some(("cstring".to_string(), false)),
+        "TypedDatum" => Some(("anyelement".to_string(), false)),
         "pg_sys :: ItemPointerData" => Some(("tid".to_string(), false)),
         "pg_sys :: FunctionCallInfo" => None,
         "pg_sys :: IndexAmRoutine" => Some(("index_am_handler".to_string(), false)),
@@ -524,6 +546,16 @@ fn extract_type(ty: &Box<Type>) -> String {
     }
 }
 
+fn extract_funcargs_attribute(attrs: &Vec<CategorizedAttribute>) -> Option<String> {
+    for a in attrs {
+        if let CategorizedAttribute::FunctionArgsSql(sql) = a {
+            return Some(sql.clone());
+        }
+    }
+
+    None
+}
+
 fn collect_attributes(
     rs_file: &DirEntry,
     func: &ItemFn,
@@ -551,46 +583,46 @@ fn collect_attributes(
                 .push(CategorizedAttribute::PgTest((span, parse_extern_args(&a))));
         } else if as_string == "# [ test ]" {
             categorized_attributes.push(CategorizedAttribute::RustTest(span));
-        } else if as_string == "# [ doc = \" ```sql\" ]" {
-            // we start an SQL doc block
-            let mut sql_statements = Vec::new();
+        } else if as_string == "# [ doc = \" ```funcargs\" ]" {
+            let (new_i, mut sql_statements) = collect_doc(
+                rs_file,
+                &func,
+                attrs,
+                &mut other_attributes,
+                i,
+                a,
+                span,
+                false,
+            );
 
-            // run forward saving each line as an sql statement until we find ```
-            sql_statements.push(location_comment(rs_file, a.span()));
-            i = i + 1;
-            while i < attrs.len() {
-                let a = attrs.get(i).unwrap();
-                let as_string = a.to_token_stream().to_string();
-
-                if as_string == "# [ doc = \" ```\" ]" {
-                    // we found the end to this ```sql block of documentation
-                    break;
-                } else if as_string.starts_with("# [ doc = \"") {
-                    // it's a doc line within the sql block
-                    let as_string = as_string.trim_start_matches("# [ doc = \"");
-                    let as_string = as_string.trim_end_matches("\" ]");
-                    let as_string = as_string.trim();
-                    let as_string = unescape::unescape(as_string)
-                        .expect(&format!("Improperly escaped:\n{}", as_string));
-
-                    // do variable substitution in the sql statement
-                    let as_string = as_string
-                        .replace("@FUNCTION_NAME@", &format!("{}_wrapper", func.sig.ident));
-
-                    // and remember it, along with its original source location
-                    sql_statements.push(as_string);
-                } else {
-                    // it's not a doc line, so add it to other_attributes and get out
-                    other_attributes.push((span, as_string));
-                    break;
-                }
-
-                i = i + 1;
+            if sql_statements.len() == 1 {
+                categorized_attributes.push(CategorizedAttribute::FunctionArgsSql(
+                    sql_statements.pop().unwrap(),
+                ));
+            } else if sql_statements.len() == 0 {
+                panic!("Found no lines for ```funcargs");
+            } else {
+                panic!("Found more than 1 line for ```funcargs");
             }
+
+            i = new_i;
+        } else if as_string == "# [ doc = \" ```sql\" ]" {
+            let (new_i, sql_statements) = collect_doc(
+                rs_file,
+                &func,
+                attrs,
+                &mut other_attributes,
+                i,
+                a,
+                span,
+                true,
+            );
 
             if !sql_statements.is_empty() {
                 categorized_attributes.push(CategorizedAttribute::Sql(sql_statements));
             }
+
+            i = new_i;
         } else {
             other_attributes.push((span, as_string));
         }
@@ -603,6 +635,57 @@ fn collect_attributes(
     }
 
     categorized_attributes
+}
+
+fn collect_doc(
+    rs_file: &DirEntry,
+    func: &&ItemFn,
+    attrs: &Vec<Attribute>,
+    other_attributes: &mut Vec<(Span, String)>,
+    mut i: usize,
+    a: &Attribute,
+    span: Span,
+    track_location: bool,
+) -> (usize, Vec<String>) {
+    let mut sql_statements = Vec::new();
+
+    // run forward saving each line as an sql statement until we find ```
+
+    if track_location {
+        sql_statements.push(location_comment(rs_file, a.span()));
+    }
+
+    i = i + 1;
+    while i < attrs.len() {
+        let a = attrs.get(i).unwrap();
+        let as_string = a.to_token_stream().to_string();
+
+        if as_string == "# [ doc = \" ```\" ]" {
+            // we found the end to this ```sql block of documentation
+            break;
+        } else if as_string.starts_with("# [ doc = \"") {
+            // it's a doc line within the sql block
+            let as_string = as_string.trim_start_matches("# [ doc = \"");
+            let as_string = as_string.trim_end_matches("\" ]");
+            let as_string = as_string.trim();
+            let as_string = unescape::unescape(as_string)
+                .expect(&format!("Improperly escaped:\n{}", as_string));
+
+            // do variable substitution in the sql statement
+            let as_string =
+                as_string.replace("@FUNCTION_NAME@", &format!("{}_wrapper", func.sig.ident));
+
+            // and remember it, along with its original source location
+            sql_statements.push(as_string);
+        } else {
+            // it's not a doc line, so add it to other_attributes and get out
+            other_attributes.push((span, as_string));
+            break;
+        }
+
+        i = i + 1;
+    }
+    (i, sql_statements)
 }
 
 fn location_comment(rs_file: &DirEntry, span: Span) -> String {

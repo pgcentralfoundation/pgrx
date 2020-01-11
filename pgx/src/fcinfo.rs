@@ -8,7 +8,7 @@ mod pg_10_11 {
     pub fn pg_getarg<T: FromDatum<T>>(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> Option<T> {
         let datum = unsafe { fcinfo.as_ref() }.unwrap().arg[num];
         let isnull = pg_arg_is_null(fcinfo, num);
-        T::from_datum(datum, isnull)
+        T::from_datum(datum, isnull, crate::get_getarg_type(fcinfo, num))
     }
 
     #[inline]
@@ -44,7 +44,11 @@ mod pg_12 {
     #[inline]
     pub fn pg_getarg<T: FromDatum<T>>(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> Option<T> {
         let datum = get_nullable_datum(fcinfo, num);
-        T::from_datum(datum.value, datum.isnull)
+        T::from_datum(
+            datum.value,
+            datum.isnull,
+            crate::get_getarg_type(fcinfo, num),
+        )
     }
 
     #[inline]
@@ -106,6 +110,13 @@ pub fn pg_getarg_pointer<T>(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> Opt
     }
 }
 
+#[inline]
+pub fn get_getarg_type(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> pg_sys::Oid {
+    unsafe {
+        pg_sys::get_fn_expr_argtype(fcinfo.as_ref().unwrap().flinfo, num as std::os::raw::c_int)
+    }
+}
+
 /// this is intended for Postgres functions that take an actual `cstring` argument, not for getting
 /// a varlena argument type as a CStr.
 #[inline]
@@ -159,7 +170,7 @@ pub fn direct_function_call<R: FromDatum<R>>(
 ) -> Option<R> {
     let datum = direct_function_call_as_datum(func, args);
     match datum {
-        Some(datum) => R::from_datum(datum, false),
+        Some(datum) => R::from_datum(datum, false, pg_sys::InvalidOid),
         None => None,
     }
 }

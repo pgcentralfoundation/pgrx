@@ -114,7 +114,13 @@ impl Spi {
                         } else {
                             // transfer the returned datum to the outer memory context
                             outer_memory_context.switch_to(|| {
-                                R::from_datum(as_datum.expect("SPI result datum was NULL"), false)
+                                // TODO:  can we get the type oid from somewhere?
+                                //        - do we even need it?
+                                R::from_datum(
+                                    as_datum.expect("SPI result datum was NULL"),
+                                    false,
+                                    pg_sys::InvalidOid,
+                                )
                             })
                         }
                     }
@@ -265,7 +271,7 @@ impl SpiTupleTable {
                     let mut is_null = false;
                     let datum = pg_sys::SPI_getbinval(heap_tuple, tupdesc, ordinal, &mut is_null);
 
-                    T::from_datum(datum, is_null)
+                    T::from_datum(datum, is_null, pg_sys::SPI_gettypeid(tupdesc, ordinal))
                 }
             },
             None => panic!("TupDesc is NULL"),
