@@ -15,7 +15,7 @@ pub struct JsonB(pub Value);
 // for converting a pg_sys::Datum and a corresponding "is_null" bool into a typed Option
 //
 
-pub trait FromDatum<T>: Sized {
+pub trait FromDatum<T> {
     fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<T>;
 }
 
@@ -105,6 +105,19 @@ impl FromDatum<f64> for f64 {
 
 /// for text, varchar
 impl<'a> FromDatum<&'a str> for &'a str {
+    #[inline]
+    fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<&'a str> {
+        if is_null {
+            None
+        } else if datum == 0 {
+            panic!("a varlena Datum was flagged as non-null but the datum is zero");
+        } else {
+            let varlena = unsafe { pg_sys::pg_detoast_datum(datum as *mut pg_sys::varlena) };
+            Some(unsafe { text_to_rust_str_unchecked(varlena) })
+        }
+    }
+}
+impl<'a> FromDatum<&'a str> for str {
     #[inline]
     fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<&'a str> {
         if is_null {
@@ -216,7 +229,7 @@ impl<T> FromDatum<PgBox<T>> for PgBox<T> {
 // cast of the primitive type to pg_sys::Datum
 //
 //
-pub trait IntoDatum<T>: Sized {
+pub trait IntoDatum<T> {
     fn into_datum(self) -> Option<pg_sys::Datum>;
 }
 
