@@ -103,6 +103,7 @@ mod internal {
         pub use crate::pg_sys::pg10_specific::IndexAmRoutine;
         pub use crate::pg_sys::pg10_specific::IndexInfo;
         pub use crate::pg_sys::pg10_specific::IndexPath;
+        pub use crate::pg_sys::pg10_specific::IndexScanDescData;
         pub use crate::pg_sys::pg10_specific::IndexVacuumInfo;
         pub use crate::pg_sys::pg10_specific::InterruptPending;
         pub use crate::pg_sys::pg10_specific::NodeTag_T_IndexAmRoutine;
@@ -124,6 +125,7 @@ mod internal {
         pub use crate::pg_sys::pg11_specific::IndexAmRoutine;
         pub use crate::pg_sys::pg11_specific::IndexInfo;
         pub use crate::pg_sys::pg11_specific::IndexPath;
+        pub use crate::pg_sys::pg11_specific::IndexScanDescData;
         pub use crate::pg_sys::pg11_specific::IndexVacuumInfo;
         pub use crate::pg_sys::pg11_specific::InterruptPending;
         pub use crate::pg_sys::pg11_specific::NodeTag_T_IndexAmRoutine;
@@ -145,6 +147,7 @@ mod internal {
         pub use crate::pg_sys::pg12_specific::IndexAmRoutine;
         pub use crate::pg_sys::pg12_specific::IndexInfo;
         pub use crate::pg_sys::pg12_specific::IndexPath;
+        pub use crate::pg_sys::pg12_specific::IndexScanDescData;
         pub use crate::pg_sys::pg12_specific::IndexVacuumInfo;
         pub use crate::pg_sys::pg12_specific::InterruptPending;
         pub use crate::pg_sys::pg12_specific::NodeTag_T_IndexAmRoutine;

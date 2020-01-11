@@ -5,6 +5,7 @@
 #include "access/htup.h"
 #include "access/htup_details.h"
 #include "access/relation.h"
+#include "access/relscan.h"
 #include "access/skey.h"
 #include "catalog/index.h"
 #include "catalog/pg_type.h"

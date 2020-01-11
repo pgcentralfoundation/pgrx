@@ -42,6 +42,14 @@ impl IntoDatum<i32> for i32 {
     }
 }
 
+/// for oid
+impl IntoDatum<u32> for u32 {
+    #[inline]
+    fn into_datum(self) -> Option<pg_sys::Datum> {
+        Some(self as pg_sys::Datum)
+    }
+}
+
 /// for bigint
 impl IntoDatum<i64> for i64 {
     #[inline]

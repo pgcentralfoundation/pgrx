@@ -61,6 +61,18 @@ impl FromDatum<i32> for i32 {
     }
 }
 
+/// for oid
+impl FromDatum<u32> for u32 {
+    #[inline]
+    fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<u32> {
+        if is_null {
+            None
+        } else {
+            Some(datum as u32)
+        }
+    }
+}
+
 /// for bigint
 impl FromDatum<i64> for i64 {
     #[inline]

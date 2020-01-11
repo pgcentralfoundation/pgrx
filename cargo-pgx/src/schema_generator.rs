@@ -492,9 +492,11 @@ fn translate_type_string(
         "& str" | "String" => Some(("text".to_string(), false)),
         "& std :: ffi :: CStr" => Some(("cstring".to_string(), false)),
         "TypedDatum" => Some(("anyelement".to_string(), false)),
+        "pg_sys :: Oid" => Some(("oid".to_string(), false)),
         "pg_sys :: ItemPointerData" => Some(("tid".to_string(), false)),
         "pg_sys :: FunctionCallInfo" => None,
         "pg_sys :: IndexAmRoutine" => Some(("index_am_handler".to_string(), false)),
+        _internal if rust_type.starts_with("Internal <") => Some(("internal".to_string(), false)),
         _boxed if rust_type.starts_with("PgBox <") => {
             translate_type_string(extract_type(ty), filename, span, ty)
         }
