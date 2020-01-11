@@ -1,5 +1,15 @@
-use crate::{pg_sys, rust_str_to_text_p, text_to_rust_str_unchecked, PgBox};
+use crate::{
+    direct_function_call, direct_function_call_as_datum, pg_sys, rust_str_to_text_p,
+    text_to_rust_str_unchecked, PgBox,
+};
+use serde_json::Value;
 use std::ffi::CStr;
+
+#[derive(Debug)]
+pub struct Json(pub Value);
+
+#[derive(Debug)]
+pub struct JsonB(pub Value);
 
 //
 // for converting a pg_sys::Datum and a corresponding "is_null" bool into a typed Option
@@ -125,7 +135,7 @@ impl FromDatum<String> for String {
 /// for cstring
 impl<'a> FromDatum<&'a std::ffi::CStr> for &'a std::ffi::CStr {
     #[inline]
-    fn from_datum(datum: usize, is_null: bool) -> Option<&'a CStr> {
+    fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<&'a CStr> {
         if is_null {
             None
         } else if datum == 0 {
@@ -139,15 +149,53 @@ impl<'a> FromDatum<&'a std::ffi::CStr> for &'a std::ffi::CStr {
 /// for NULL -- always converts to a `None`, even if the is_null argument is false
 impl FromDatum<()> for () {
     #[inline]
-    fn from_datum(_datum: usize, _is_null: bool) -> Option<()> {
+    fn from_datum(_datum: pg_sys::Datum, _is_null: bool) -> Option<()> {
         None
+    }
+}
+
+/// for json
+impl FromDatum<Json> for Json {
+    #[inline]
+    fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Json> {
+        if is_null {
+            None
+        } else if datum == 0 {
+            panic!("a json Datum was flagged as non-null but the datum is zero");
+        } else {
+            let string = unsafe {
+                text_to_rust_str_unchecked(pg_sys::pg_detoast_datum(datum as *mut pg_sys::varlena))
+            };
+
+            let value = serde_json::from_str(string).expect("failed to parse Json value");
+            Some(Json(value))
+        }
+    }
+}
+
+/// for jsonb
+impl FromDatum<JsonB> for JsonB {
+    fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<JsonB> {
+        if is_null {
+            None
+        } else if datum == 0 {
+            panic!("a jsonb Datum was flagged as non-null but the datum is zero")
+        } else {
+            let cstr =
+                direct_function_call::<&std::ffi::CStr>(pg_sys::jsonb_out, vec![Some(datum)])
+                    .expect("failed to convert jsonb to a cstring");
+
+            let value =
+                serde_json::from_str(cstr.to_str().unwrap()).expect("failed to parse JsonB value");
+            Some(JsonB(value))
+        }
     }
 }
 
 /// for user types
 impl<T> FromDatum<PgBox<T>> for PgBox<T> {
     #[inline]
-    fn from_datum(datum: usize, is_null: bool) -> Option<PgBox<T>> {
+    fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<PgBox<T>> {
         if is_null {
             None
         } else if datum == 0 {
@@ -252,6 +300,27 @@ impl IntoDatum<()> for () {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
         None
+    }
+}
+
+/// for json
+impl IntoDatum<Json> for Json {
+    fn into_datum(self) -> Option<pg_sys::Datum> {
+        let string = serde_json::to_string(&self.0).expect("failed to serialize Json value");
+        Some(rust_str_to_text_p(string.as_str()) as pg_sys::Datum)
+    }
+}
+
+/// for jsonb
+impl IntoDatum<JsonB> for JsonB {
+    fn into_datum(self) -> Option<pg_sys::Datum> {
+        let string = serde_json::to_string(&self.0).expect("failed to serialize JsonB value");
+        let cstring = std::ffi::CString::new(string).unwrap();
+
+        direct_function_call_as_datum(
+            pg_sys::jsonb_in,
+            vec![Some(cstring.as_ptr() as pg_sys::Datum)],
+        )
     }
 }
 

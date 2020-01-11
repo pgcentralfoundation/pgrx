@@ -154,7 +154,7 @@ pub fn pg_return_void() -> pg_sys::Datum {
 /// }
 /// ```
 pub fn direct_function_call<R: FromDatum<R>>(
-    func: fn(pg_sys::FunctionCallInfo) -> pg_sys::Datum,
+    func: unsafe fn(pg_sys::FunctionCallInfo) -> pg_sys::Datum,
     args: Vec<Option<pg_sys::Datum>>,
 ) -> Option<R> {
     let mut null_array = [false; 100usize];
@@ -176,10 +176,45 @@ pub fn direct_function_call<R: FromDatum<R>>(
     }
 
     let mut fcid = make_function_call_info(nargs, arg_array, null_array);
-    let datum = func(fcid.deref_mut());
+    let datum = unsafe { func(fcid.deref_mut()) };
     let is_null = fcid.as_ref().unwrap().isnull;
 
     R::from_datum(datum, is_null)
+}
+
+/// Same as [direct_function_call] but instead returns the direct `Option<pg_sys::Datum>` instead
+/// of converting it to a value
+pub fn direct_function_call_as_datum(
+    func: unsafe fn(pg_sys::FunctionCallInfo) -> pg_sys::Datum,
+    args: Vec<Option<pg_sys::Datum>>,
+) -> Option<pg_sys::Datum> {
+    let mut null_array = [false; 100usize];
+    let mut arg_array = [0 as pg_sys::Datum; 100usize];
+    let nargs = args.len();
+
+    for (i, datum) in args.into_iter().enumerate() {
+        match datum {
+            Some(datum) => {
+                null_array[i] = false;
+                arg_array[i] = datum;
+            }
+
+            None => {
+                null_array[i] = true;
+                arg_array[i] = 0;
+            }
+        }
+    }
+
+    let mut fcid = make_function_call_info(nargs, arg_array, null_array);
+    let datum = unsafe { func(fcid.deref_mut()) };
+    let is_null = fcid.as_ref().unwrap().isnull;
+
+    if is_null {
+        None
+    } else {
+        Some(datum)
+    }
 }
 
 #[cfg(feature = "pg10")]
