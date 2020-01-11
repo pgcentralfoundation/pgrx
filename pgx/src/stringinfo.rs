@@ -18,7 +18,15 @@ impl Into<pg_sys::StringInfo> for StringInfo {
 
 impl<'a> Into<&'a std::ffi::CStr> for StringInfo {
     fn into(self) -> &'a std::ffi::CStr {
-        unsafe { std::ffi::CStr::from_ptr(self.into_char_ptr()) }
+        let len = self.len();
+        let ptr = self.into_char_ptr();
+
+        unsafe {
+            std::ffi::CStr::from_bytes_with_nul_unchecked(std::slice::from_raw_parts(
+                ptr as *const u8,
+                len as usize,
+            ))
+        }
     }
 }
 
