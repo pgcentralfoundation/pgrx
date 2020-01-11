@@ -310,12 +310,8 @@ impl<T> Drop for PgBox<T> {
     fn drop(&mut self) {
         if self.ptr.is_some() {
             match self.owner {
-                WhoAllocated::Postgres => {
-                    /* do nothing, we'll let Postgres free the pointer */
-                    eprintln!("Not dropping PgBox<{}>", std::any::type_name::<T>());
-                }
+                WhoAllocated::Postgres => { /* do nothing, we'll let Postgres free the pointer */ }
                 WhoAllocated::Rust => {
-                    eprintln!("Doing drop of PgBox<{}>", std::any::type_name::<T>());
                     // we own it here in rust, so we need to free it too
                     let ptr = self.ptr.unwrap();
                     unsafe {
