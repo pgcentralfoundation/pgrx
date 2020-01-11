@@ -6,7 +6,7 @@
 //! An enum-based interface (`PgMemoryContexts`) around Postgres' various `MemoryContext`s provides
 //! simple accessibility to working with MemoryContexts in a compiler-checked manner
 //!
-use crate::pg_sys;
+use crate::{guard, pg_sys};
 use std::fmt::Debug;
 
 /// A shorter type name for a `*const std::os::raw::c_void`
@@ -199,7 +199,7 @@ impl PgMemoryContexts {
     ///     })
     /// }
     /// ```
-    pub fn switch_to<R, F: FnOnce() -> R>(&self, f: F) -> R {
+    pub fn switch_to<R, F: FnOnce() -> R + std::panic::UnwindSafe>(&self, f: F) -> R {
         match self {
             PgMemoryContexts::Transient {
                 parent,
@@ -276,7 +276,10 @@ impl PgMemoryContexts {
     }
 
     /// helper function
-    fn exec_in_context<R, F: FnOnce() -> R>(context: pg_sys::MemoryContext, f: F) -> R {
+    fn exec_in_context<R, F: FnOnce() -> R + std::panic::UnwindSafe>(
+        context: pg_sys::MemoryContext,
+        f: F,
+    ) -> R {
         let prev_context;
 
         // mimic what palloc.h does for switching memory contexts
@@ -285,7 +288,7 @@ impl PgMemoryContexts {
             pg_sys::CurrentMemoryContext = context;
         }
 
-        let result = f();
+        let result = guard::guard(|| f());
 
         // restore our understanding of the current memory context
         unsafe {

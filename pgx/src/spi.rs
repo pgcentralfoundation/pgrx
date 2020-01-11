@@ -58,8 +58,23 @@ pub struct SpiTupleTable {
 }
 
 impl Spi {
+    pub fn get_one<A: FromDatum<A> + IntoDatum<A>>(query: &str) -> Option<A> {
+        Spi::connect(|client| Ok(client.select(query, Some(1), None).get_one()))
+    }
+
+    /// just run an arbitrary SQL statement.
+    ///
+    /// ## Safety
+    ///
+    /// The statement runs in read/write mode
+    pub fn run(query: &str) {
+        Spi::execute(|mut client| {
+            client.update(query, None, None);
+        })
+    }
+
     /// execute SPI commands via the provided `SpiClient`
-    pub fn execute<F: FnOnce(SpiClient)>(f: F) {
+    pub fn execute<F: FnOnce(SpiClient) + std::panic::UnwindSafe>(f: F) {
         Spi::connect(|client| {
             f(client);
             Ok(Some(()))
@@ -70,7 +85,7 @@ impl Spi {
     /// automatically copied into the `CurrentMemoryContext` at the time of this function call
     pub fn connect<
         R: FromDatum<R> + IntoDatum<R>,
-        F: FnOnce(SpiClient) -> std::result::Result<Option<R>, SpiError>,
+        F: FnOnce(SpiClient) -> std::result::Result<Option<R>, SpiError> + std::panic::UnwindSafe,
     >(
         f: F,
     ) -> Option<R> {
@@ -87,7 +102,6 @@ impl Spi {
         match f(SpiClient()) {
             // copy the result to the outer memory context we saved above
             Ok(result) => {
-                // TODO:  Depending on the datum type, we need to copy it into the outser_memory_context
                 // disconnect from SPI
                 Spi::check_status(unsafe { pg_sys::SPI_finish() });
 
@@ -201,13 +215,7 @@ impl SpiClient {
                     )
                 }
             }
-            None => {
-                let rc;
-                unsafe {
-                    rc = pg_sys::SPI_execute(src.as_ptr(), read_only, limit.unwrap_or(0));
-                }
-                rc
-            }
+            None => unsafe { pg_sys::SPI_execute(src.as_ptr(), read_only, limit.unwrap_or(0)) },
         };
 
         SpiTupleTable {

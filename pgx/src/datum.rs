@@ -1,4 +1,5 @@
-use crate::{pg_sys, rust_str_to_text_p, text_to_rust_str_unchecked};
+use crate::{pg_sys, rust_str_to_text_p, text_to_rust_str_unchecked, PgBox};
+use std::ffi::CStr;
 
 //
 // for converting a pg_sys::Datum and a corresponding "is_null" bool into a typed Option
@@ -121,11 +122,42 @@ impl FromDatum<String> for String {
     }
 }
 
+/// for cstring
+impl<'a> FromDatum<&'a std::ffi::CStr> for &'a std::ffi::CStr {
+    #[inline]
+    fn from_datum(datum: usize, is_null: bool) -> Option<&'a CStr> {
+        if is_null {
+            None
+        } else if datum == 0 {
+            panic!("a cstring Datum was flagged as non-null but the datum is zero");
+        } else {
+            Some(unsafe { std::ffi::CStr::from_ptr(datum as *const std::os::raw::c_char) })
+        }
+    }
+}
+
 /// for NULL -- always converts to a `None`, even if the is_null argument is false
 impl FromDatum<()> for () {
     #[inline]
     fn from_datum(_datum: usize, _is_null: bool) -> Option<()> {
         None
+    }
+}
+
+/// for user types
+impl<T> FromDatum<PgBox<T>> for PgBox<T> {
+    #[inline]
+    fn from_datum(datum: usize, is_null: bool) -> Option<PgBox<T>> {
+        if is_null {
+            None
+        } else if datum == 0 {
+            panic!(
+                "user type {} Datum was flagged as non-null but the datum is zero",
+                std::any::type_name::<T>()
+            );
+        } else {
+            Some(PgBox::<T>::from_pg(datum as *mut T))
+        }
     }
 }
 
@@ -199,7 +231,19 @@ impl<'a> IntoDatum<&'a str> for &'a str {
 impl IntoDatum<String> for String {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        self.as_str().into_datum()
+        Some(rust_str_to_text_p(&self) as pg_sys::Datum)
+    }
+}
+
+/// for cstring
+///
+/// ## Safety
+///
+/// The `&CStr` better be allocated by Postgres
+impl<'a> IntoDatum<&'a std::ffi::CStr> for &'a std::ffi::CStr {
+    #[inline]
+    fn into_datum(self) -> Option<pg_sys::Datum> {
+        Some(self.as_ptr() as pg_sys::Datum)
     }
 }
 
@@ -208,5 +252,16 @@ impl IntoDatum<()> for () {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
         None
+    }
+}
+
+/// for user types
+impl<T> IntoDatum<PgBox<T>> for PgBox<T> {
+    fn into_datum(self) -> Option<pg_sys::Datum> {
+        if self.is_null() {
+            None
+        } else {
+            Some(self.convert_to_datum())
+        }
     }
 }

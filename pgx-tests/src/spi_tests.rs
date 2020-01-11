@@ -119,4 +119,14 @@ mod tests {
             assert!(b.is_none());
         });
     }
+
+    #[pg_extern]
+    fn do_panic() {
+        panic!("did a panic");
+    }
+
+    #[pg_test(error = "did a panic")]
+    fn test_panic_via_spi() {
+        Spi::run("SELECT do_panic();");
+    }
 }

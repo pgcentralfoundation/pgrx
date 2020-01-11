@@ -76,9 +76,25 @@ pub fn run_test<F: FnOnce(pg_sys::FunctionCallInfo) -> pg_sys::Datum>(
     let (mut client, session_id) = client();
 
     let schema = get_extension_schema();
-    let result = client.simple_query(&format!("SELECT {}.{}();", schema, funcname));
+    let result = match client.transaction() {
+        // run the test function in a transaction
+        Ok(mut tx) => {
+            let result = tx.simple_query(&format!("SELECT {}.{}();", schema, funcname));
+
+            if result.is_ok() {
+                // and abort the transaction when complete
+                tx.rollback().expect("test rollback didn't work");
+            }
+
+            result
+        }
+
+        Err(e) => panic!(e),
+    };
 
     if let Err(e) = result {
+        let error_as_string = format!("{}", e);
+
         let cause = e.into_source();
         if let Some(e) = cause {
             if let Some(dberror) = e.downcast_ref::<DbError>() {
@@ -128,6 +144,8 @@ pub fn run_test<F: FnOnce(pg_sys::FunctionCallInfo) -> pg_sys::Datum>(
             } else {
                 panic!(e)
             }
+        } else {
+            panic!(format!("{}", error_as_string.bold().red()))
         }
     } else if let Some(expected_error_message) = expected_error {
         // we expected an ERROR, but didn't get one
@@ -203,6 +221,10 @@ pub fn client() -> (postgres::Client, String) {
     client
         .simple_query("SET log_min_messages TO 'INFO';")
         .expect("FAILED: SET log_min_messages TO 'INFO'");
+
+    client
+        .simple_query("SET log_min_duration_statement TO 1000;")
+        .expect("FAILED: SET log_min_duration_statement TO 1000");
 
     client
         .simple_query("SET log_statement TO 'all';")
@@ -335,9 +357,9 @@ fn monitor_pg(mut command: Command, cmd_string: String, loglines: LogLines) -> (
                         sender.send((pid, session_id.clone())).unwrap();
                     }
 
-                    //                    // colorize Postgres' log output
-                    //                    if line.contains("INFO: ") {
-                    //                        eprintln!("{}", line.cyan());
+                    if line.contains("INFO: ") {
+                        eprintln!("{}", line.cyan());
+                    }
                     //                    } else if line.contains("WARNING: ") {
                     //                        eprintln!("{}", line.bold().yellow());
                     //                    } else if line.contains("ERROR: ") {

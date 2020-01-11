@@ -118,26 +118,6 @@ impl<T: Debug> Debug for PgBox<T> {
     }
 }
 
-//impl<T> PgBox<T> {
-//    pub fn serialize(data: T) -> serde_json::Result<PgBox<T>>
-//        where
-//            T: Serialize,
-//    {
-//        let varlena = rust_str_to_text_p(serde_json::to_string(&data)?.as_str());
-//        Ok(PgBox::<T>::from(varlena as *mut T))
-//    }
-//
-//    pub fn deserialize(self) -> serde_json::Result<T>
-//        where
-//            T: Deserialize<'static>,
-//    {
-//        let varlena = self.into_pg() as *mut pg_sys::varlena;
-//        let string = unsafe { text_to_rust_str_unchecked(varlena) };
-//
-//        serde_json::from_str(string)
-//    }
-//}
-
 impl<T> PgBox<T> {
     /// Allocate enough memory for the type'd struct, within Postgres' `CurrentMemoryContext`  The
     /// allocated memory is uninitialized.
@@ -286,9 +266,10 @@ impl<T> PgBox<T> {
         }
     }
 
-    /// Return the boxed pointer as a pg_sys::Datum, so that it can be passed back into a Postgres function
-    pub fn as_datum(&self) -> pg_sys::Datum {
-        self.to_pg() as pg_sys::Datum
+    /// Consume this instance and return the boxed pointer as a pg_sys::Datum, so that it can be
+    /// passed back into a Postgres function
+    pub fn convert_to_datum(self) -> pg_sys::Datum {
+        self.into_pg() as pg_sys::Datum
     }
 
     /// Useful for returning the boxed pointer back to Postgres (as a return value, for example).
@@ -302,11 +283,6 @@ impl<T> PgBox<T> {
             Some(ptr) => ptr,
             None => std::ptr::null_mut(),
         }
-    }
-
-    /// Consumed this object and return the boxed pointer as a pg_sys::Datum
-    pub fn into_datum(self) -> pg_sys::Datum {
-        self.into_pg() as pg_sys::Datum
     }
 }
 
@@ -334,8 +310,12 @@ impl<T> Drop for PgBox<T> {
     fn drop(&mut self) {
         if self.ptr.is_some() {
             match self.owner {
-                WhoAllocated::Postgres => { /* do nothing, we'll let Postgres free the pointer */ }
+                WhoAllocated::Postgres => {
+                    /* do nothing, we'll let Postgres free the pointer */
+                    eprintln!("Not dropping PgBox<{}>", std::any::type_name::<T>());
+                }
                 WhoAllocated::Rust => {
+                    eprintln!("Doing drop of PgBox<{}>", std::any::type_name::<T>());
                     // we own it here in rust, so we need to free it too
                     let ptr = self.ptr.unwrap();
                     unsafe {
