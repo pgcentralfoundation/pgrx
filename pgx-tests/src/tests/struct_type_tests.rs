@@ -47,7 +47,7 @@ mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
 
-    use crate::struct_type_tests::Complex;
+    use crate::tests::struct_type_tests::Complex;
     use pgx::*;
 
     #[pg_test]

@@ -47,12 +47,7 @@ where
 #[macro_export]
 macro_rules! testmsg {
     ($($arg:tt)*) => (
-        std::thread::spawn(move || {
-            println!(
-                "{}",
-                format!($($arg)*).cyan()
-            )
-        }).join().unwrap();
+        eprintln!("{}", format!("TMSG: {}:{}:{}:  {}", file!(), line!(), column!(), format!($($arg)*)));
     )
 }
 
@@ -357,9 +352,12 @@ fn monitor_pg(mut command: Command, cmd_string: String, loglines: LogLines) -> (
                         sender.send((pid, session_id.clone())).unwrap();
                     }
 
-                    if line.contains("INFO: ") {
+                    if line.contains("TMSG: ") {
                         eprintln!("{}", line.cyan());
                     }
+
+                    //                    if line.contains("INFO: ") {
+                    //                        eprintln!("{}", line.cyan());
                     //                    } else if line.contains("WARNING: ") {
                     //                        eprintln!("{}", line.bold().yellow());
                     //                    } else if line.contains("ERROR: ") {
@@ -371,7 +369,7 @@ fn monitor_pg(mut command: Command, cmd_string: String, loglines: LogLines) -> (
                     //                    } else {
                     //                        eprintln!("{}", line.bold().purple());
                     //                    }
-                    //
+
                     let mut loglines = loglines.lock().unwrap();
                     let session_lines = loglines.entry(session_id).or_insert_with(Vec::new);
                     session_lines.push(line);
