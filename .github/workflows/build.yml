@@ -21,12 +21,18 @@ jobs:
     steps:
     - uses: actions/checkout@v1
 
+    # which host are we running on?
+    - name: hostname
+      run: hostname
+
     # Ubuntu system dependencies required to build Postgres from sources
     - name: install postgres build dependencies
       run: sudo apt install -y bison flex zlib1g zlib1g-dev
 
-    # test our code
+    # install our cargo subcomment
     - name: install cargo pgx
-      run: hostname && cd cargo-pgx && cargo install --path . --force
+      run: cd cargo-pgx && cargo install --path . --force
+
+    # test our code
     - name: cargo test
       run: RUST_BACKTRACE=1 cargo test --target-dir /tmp/pgx-build-v${{ matrix.version }}/rust --all --features pg${{ matrix.version }} --no-default-features
