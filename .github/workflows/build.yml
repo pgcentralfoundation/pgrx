@@ -23,7 +23,7 @@ jobs:
 
     # Ubuntu system dependencies required to build Postgres from sources
     - name: install postgres build dependencies
-      run: rustup component add rustfmt && sudo apt install -y bison flex zlib1g zlib1g-dev
+      run: sudo apt install -y bison flex zlib1g zlib1g-dev
 
     # test our code
     - name: install cargo pgx
