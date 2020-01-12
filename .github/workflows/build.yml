@@ -28,7 +28,7 @@ jobs:
 
     # Ubuntu system dependencies required to build Postgres from sources
     - name: install postgres build dependencies
-      run: rustup component add rustfmt && sudo apt install -y bison flex
+      run: rustup component add rustfmt && sudo apt install -y bison flex zlib1g zlib1g-dev
 
     # create caches for each of ~/.cargo, PG 10, 11, 12
     # we hardcode these rather than using ${{ matrix.feature }} because no matter what feature we're building for
