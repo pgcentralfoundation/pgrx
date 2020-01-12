@@ -26,4 +26,4 @@ jobs:
     - name: install cargo pgx
       run: cd cargo-pgx && cargo install --path . --force
     - name: cargo test
-      run: RUST_BACKTRACE=1 cargo test --all --features pg${{ matrix.version }} --no-default-features
+      run: RUST_BACKTRACE=1 cargo test --target-dir /tmp/pgx-build/rust --all --features pg${{ matrix.version }} --no-default-features
