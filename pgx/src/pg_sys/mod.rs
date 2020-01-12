@@ -48,6 +48,7 @@ mod all_versions {
     pub const FirstOffsetNumber: super::OffsetNumber = 1;
     pub const MaxOffsetNumber: super::OffsetNumber =
         (super::BLCKSZ as usize / std::mem::size_of::<super::ItemIdData>()) as super::OffsetNumber;
+    pub const InvalidBlockNumber: u32 = 0xFFFFFFFF as crate::pg_sys::BlockNumber;
     pub const VARHDRSZ: usize = std::mem::size_of::<super::int32>();
 
     #[inline]
@@ -112,6 +113,23 @@ mod internal {
         pub use crate::pg_sys::pg10_specific::PG_VERSION;
         pub use crate::pg_sys::pg10_specific::PG_VERSION_NUM;
         pub use crate::pg_sys::pg10_specific::PG_VERSION_STR;
+
+        pub unsafe fn IndexBuildHeapScan<T>(
+            heap_relation: crate::pg_sys::Relation,
+            index_relation: crate::pg_sys::Relation,
+            index_info: *mut IndexInfo,
+            build_callback: crate::pg_sys::IndexBuildCallback,
+            build_callback_state: *mut T,
+        ) {
+            crate::pg_sys::pg10_specific::IndexBuildHeapScan(
+                heap_relation,
+                index_relation,
+                index_info,
+                true,
+                build_callback,
+                build_callback_state as *mut std::os::raw::c_void,
+            );
+        }
     }
 
     #[cfg(feature = "pg11")]
@@ -134,6 +152,24 @@ mod internal {
         pub use crate::pg_sys::pg11_specific::PG_VERSION;
         pub use crate::pg_sys::pg11_specific::PG_VERSION_NUM;
         pub use crate::pg_sys::pg11_specific::PG_VERSION_STR;
+
+        pub unsafe fn IndexBuildHeapScan<T>(
+            heap_relation: crate::pg_sys::Relation,
+            index_relation: crate::pg_sys::Relation,
+            index_info: *mut IndexInfo,
+            build_callback: crate::pg_sys::IndexBuildCallback,
+            build_callback_state: *mut T,
+        ) {
+            crate::pg_sys::pg11_specific::IndexBuildHeapScan(
+                heap_relation,
+                index_relation,
+                index_info,
+                true,
+                build_callback,
+                build_callback_state as *mut std::os::raw::c_void,
+                std::ptr::null_mut(),
+            );
+        }
     }
 
     #[cfg(feature = "pg12")]
@@ -156,5 +192,30 @@ mod internal {
         pub use crate::pg_sys::pg12_specific::PG_VERSION;
         pub use crate::pg_sys::pg12_specific::PG_VERSION_NUM;
         pub use crate::pg_sys::pg12_specific::PG_VERSION_STR;
+
+        pub unsafe fn IndexBuildHeapScan<T>(
+            heap_relation: crate::pg_sys::Relation,
+            index_relation: crate::pg_sys::Relation,
+            index_info: *mut IndexInfo,
+            build_callback: crate::pg_sys::IndexBuildCallback,
+            build_callback_state: *mut T,
+        ) {
+            let heap_relation_ref = heap_relation.as_ref().unwrap();
+            let table_am = heap_relation_ref.rd_tableam.as_ref().unwrap();
+
+            table_am.index_build_range_scan.unwrap()(
+                heap_relation,
+                index_relation,
+                index_info,
+                true,
+                false,
+                true,
+                0,
+                crate::pg_sys::InvalidBlockNumber,
+                build_callback,
+                build_callback_state as *mut std::os::raw::c_void,
+                std::ptr::null_mut(),
+            );
+        }
     }
 }

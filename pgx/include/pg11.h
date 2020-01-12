@@ -24,6 +24,7 @@
 #include "nodes/tidbitmap.h"
 #include "nodes/value.h"
 #include "optimizer/planner.h"
+#include "storage/block.h"
 #include "storage/itemptr.h"
 #include "utils/builtins.h"
 #include "utils/jsonb.h"
