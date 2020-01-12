@@ -448,7 +448,9 @@ pub(crate) mod bindings_diff {
     use std::fs::File;
     use std::hash::{Hash, Hasher};
     use std::io::Read;
+    use std::path::PathBuf;
     use std::process::{Command, Output};
+    use std::str::FromStr;
     use syn::export::TokenStream2;
     use syn::ForeignItem;
     use syn::{ImplItem, Item};
@@ -561,6 +563,14 @@ pub(crate) mod bindings_diff {
         write_source_file("pgx/src/pg_sys/pg10_specific.rs", v10);
         write_source_file("pgx/src/pg_sys/pg11_specific.rs", v11);
         write_source_file("pgx/src/pg_sys/pg12_specific.rs", v12);
+
+        // delete the bindings files when we're done with them
+        std::fs::remove_file(PathBuf::from_str("pgx/src/pg_sys/pg10_bindings.rs").unwrap())
+            .expect("couldn't delete v10 bindings");
+        std::fs::remove_file(PathBuf::from_str("pgx/src/pg_sys/pg11_bindings.rs").unwrap())
+            .expect("couldn't delete v11 bindings");
+        std::fs::remove_file(PathBuf::from_str("pgx/src/pg_sys/pg12_bindings.rs").unwrap())
+            .expect("couldn't delete v12 bindings");
 
         Ok(())
     }
