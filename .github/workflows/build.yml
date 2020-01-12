@@ -16,7 +16,6 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
         version: [10, 11, 12]
 
     steps:
@@ -29,7 +28,7 @@ jobs:
 
     # Ubuntu system dependencies required to build Postgres from sources
     - name: install postgres build dependencies
-      run: rustup component add rustfmt && if [ "${{ matrix.os}}" == "ubuntu-latest" ] ; then sudo apt install bison flex; fi
+      run: rustup component add rustfmt && sudo apt install -y bison flex
 
     # create caches for each of ~/.cargo, PG 10, 11, 12
     # we hardcode these rather than using ${{ matrix.feature }} because no matter what feature we're building for
@@ -38,27 +37,27 @@ jobs:
       uses: actions/cache@v1
       with:
         path: ~/.cargo
-        key: ${{ runner.os }}-cargo-v7
+        key: ${{ runner.os }}-cargo-v8
     - name: cargo build cache
       uses: actions/cache@v1
       with:
         path: target/debug
-        key: ${{ runner.os }}-cargo-debug-build-v7
+        key: ${{ runner.os }}-cargo-debug-build-v8
     - name: postgres 10 git/configure/make cache
       uses: actions/cache@v1
       with:
         path: /tmp/pgx-build/REL_10_STABLE
-        key: ${{ runner.os }}-postgres-REL_10_STABLE-v7
+        key: ${{ runner.os }}-postgres-REL_10_STABLE-v8
     - name: postgres 11 git/configure/make cache
       uses: actions/cache@v1
       with:
         path: /tmp/pgx-build/REL_11_STABLE
-        key: ${{ runner.os }}-postgres-REL_11_STABLE-v7
+        key: ${{ runner.os }}-postgres-REL_11_STABLE-v8
     - name: postgres 12 git/configure/make cache
       uses: actions/cache@v1
       with:
         path: /tmp/pgx-build/REL_12_STABLE
-        key: ${{ runner.os }}-postgres-REL_12_STABLE-v7
+        key: ${{ runner.os }}-postgres-REL_12_STABLE-v8
 
     # test our code
     - name: install cargo pgx
