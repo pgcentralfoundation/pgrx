@@ -26,7 +26,7 @@ jobs:
       run: sudo apt install -y bison flex zlib1g zlib1g-dev
 
     # test our code
-    - name: install cargo pgx on ${{ runner.name }}
-      run: cd cargo-pgx && cargo install --path . --force
+    - name: install cargo pgx
+      run: hostname && cd cargo-pgx && cargo install --path . --force
     - name: cargo test
       run: RUST_BACKTRACE=1 cargo test --target-dir /tmp/pgx-build/rust --all --features pg${{ matrix.version }} --no-default-features
