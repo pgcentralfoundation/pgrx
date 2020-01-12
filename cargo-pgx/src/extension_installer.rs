@@ -1,10 +1,10 @@
+use crate::property_inspector::{find_control_file, get_property};
 use colored::*;
-use std::io::{Write};
+use std::io::Write;
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
 use std::result::Result;
 use std::str::FromStr;
-use crate::property_inspector::{get_property, find_control_file};
 
 pub(crate) fn install_extension(target: Option<&str>) -> Result<(), std::io::Error> {
     let is_release = target.unwrap_or("") == "release";
@@ -144,18 +144,12 @@ fn find_library_file(
 fn get_version() -> String {
     match get_property("default_version") {
         Some(v) => v,
-        None => panic!("couldn't determine version number")
+        None => panic!("couldn't determine version number"),
     }
 }
 
 fn get_target_dir() -> PathBuf {
-    let mut target_dir = PathBuf::from(format!(
-        "{}",
-        std::env::var("PGX_MANIFEST_DIR")
-            .unwrap_or(".".to_string())
-    ));
-    target_dir.push("target");
-    target_dir
+    PathBuf::from(std::env::var("CARGO_TARGET_DIR").unwrap_or("target".to_string()))
 }
 
 fn get_pkglibdir() -> String {
