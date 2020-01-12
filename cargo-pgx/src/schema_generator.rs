@@ -491,7 +491,7 @@ fn translate_type_string(
         "f64" => Some(("double precision".to_string(), false)),
         "& str" | "String" => Some(("text".to_string(), false)),
         "& std :: ffi :: CStr" => Some(("cstring".to_string(), false)),
-        "TypedDatum" => Some(("anyelement".to_string(), false)),
+        "AnyElement" => Some(("anyelement".to_string(), false)),
         "pg_sys :: Oid" => Some(("oid".to_string(), false)),
         "pg_sys :: ItemPointerData" => Some(("tid".to_string(), false)),
         "pg_sys :: FunctionCallInfo" => None,
