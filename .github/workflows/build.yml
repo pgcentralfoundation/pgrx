@@ -1,4 +1,4 @@
-name: build
+name: test
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
         - master
 
 jobs:
-  build:
+  test:
 
     #runs-on: ${{ matrix.os }}
     runs-on: self-hosted
