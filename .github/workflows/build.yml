@@ -35,4 +35,4 @@ jobs:
 
     # test our code
     - name: cargo test
-      run: RUST_BACKTRACE=1 CARGO_INCREMENTAL=1 cargo test --target-dir /tmp/pgx-build-v${{ matrix.version }}/rust --all --features pg${{ matrix.version }} --no-default-features
+      run: RUST_BACKTRACE=1 CARGO_INCREMENTAL=1 CARGO_TARGET_DIR=/tmp/pgx-build-v${{ matrix.version }}/rust cargo test --target-dir /tmp/pgx-build-v${{ matrix.version }}/rust --all --features pg${{ matrix.version }} --no-default-features
