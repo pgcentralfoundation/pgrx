@@ -17,6 +17,8 @@ pub fn test_extension(version: &str) -> Result<(), std::io::Error> {
             .stdout(Stdio::inherit())
             .stderr(Stdio::inherit())
             .arg("test")
+            .arg("--target-dir")
+            .arg(std::env::var("CARGO_TARGET_DIR").unwrap_or("target".to_string()))
             .arg("--all")
             .arg("--features")
             .arg(version)
