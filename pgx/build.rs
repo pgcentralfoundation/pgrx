@@ -106,7 +106,7 @@ fn main() -> Result<(), std::io::Error> {
             git_clone_postgres(&pg_git_path, pg_git_repo_url, branch_name)
                 .expect(&format!("Unable to git clone {}", pg_git_repo_url));
 
-        if need_configure_and_make || !config_status.is_file() || !common_rs.is_file() {
+        if need_configure_and_make || !config_status.is_file() {
             eprintln!("[{}] cleaning and building", branch_name);
 
             git_clean(&pg_git_path, &branch_name)
