@@ -203,11 +203,6 @@ impl<T> PgBox<T> {
     ///
     /// This function automatically fills the struct with zeros and sets
     /// the `type_` field to the specified [PgNode]
-    ///
-    /// ## Safety
-    ///
-    /// This function is unsafe as it can be used against types which aren't
-    /// properly cast-able to a Postgres `Node`
     pub fn alloc_node(tag: PgNode) -> PgBox<T> {
         let boxed = PgBox::<T>::alloc0();
         let node = boxed.to_pg() as *mut pg_sys::Node;
@@ -313,7 +308,7 @@ impl<T> Drop for PgBox<T> {
                 WhoAllocated::Postgres => { /* do nothing, we'll let Postgres free the pointer */ }
                 WhoAllocated::Rust => {
                     // we own it here in rust, so we need to free it too
-                    let ptr = self.ptr.unwrap();
+                    let ptr = self.ptr.expect("ptr was None when it shouldn't have been");
                     unsafe {
                         pg_sys::pfree(ptr as *mut std::ffi::c_void);
                     }

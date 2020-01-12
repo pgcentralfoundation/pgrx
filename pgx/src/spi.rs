@@ -185,7 +185,7 @@ impl SpiClient {
             pg_sys::SPI_tuptable = std::ptr::null_mut();
         }
 
-        let src = std::ffi::CString::new(query).unwrap();
+        let src = std::ffi::CString::new(query).expect("query contained a null byte");
         let status_code = match args {
             Some(args) => {
                 let nargs = args.len();

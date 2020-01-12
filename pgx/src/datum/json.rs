@@ -41,8 +41,11 @@ impl FromDatum<JsonB> for JsonB {
                 direct_function_call::<&std::ffi::CStr>(pg_sys::jsonb_out, vec![Some(datum)])
                     .expect("failed to convert jsonb to a cstring");
 
-            let value =
-                serde_json::from_str(cstr.to_str().unwrap()).expect("failed to parse JsonB value");
+            let value = serde_json::from_str(
+                cstr.to_str()
+                    .expect("text version of json is not valid UTF8"),
+            )
+            .expect("failed to parse JsonB value");
             Some(JsonB(value))
         }
     }
@@ -60,7 +63,8 @@ impl IntoDatum<Json> for Json {
 impl IntoDatum<JsonB> for JsonB {
     fn into_datum(self) -> Option<pg_sys::Datum> {
         let string = serde_json::to_string(&self.0).expect("failed to serialize JsonB value");
-        let cstring = std::ffi::CString::new(string).unwrap();
+        let cstring =
+            std::ffi::CString::new(string).expect("string version of jsonb is not valid UTF8");
 
         direct_function_call_as_datum(
             pg_sys::jsonb_in,
