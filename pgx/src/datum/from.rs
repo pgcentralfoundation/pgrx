@@ -13,6 +13,18 @@ pub trait FromDatum<T> {
     fn from_datum(datum: pg_sys::Datum, is_null: bool, typoid: pg_sys::Oid) -> Option<T>;
 }
 
+/// for pg_sys::Datum
+impl FromDatum<pg_sys::Datum> for pg_sys::Datum {
+    #[inline]
+    fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<pg_sys::Datum> {
+        if is_null {
+            None
+        } else {
+            Some(datum)
+        }
+    }
+}
+
 /// for bool
 impl FromDatum<bool> for bool {
     #[inline]

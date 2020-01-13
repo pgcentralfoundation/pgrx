@@ -13,7 +13,24 @@ pub struct Array<'a, T: FromDatum<T>> {
 }
 
 impl<'a, T: FromDatum<T>> Array<'a, T> {
-    fn new(
+    /// Create an [`Array`] over an array of [pg_sys::Datum] values and a corresponding array
+    /// of "is_null" indicators
+    ///
+    /// [`T`] can be [pg_sys::Datum] if the elements are not all of the same type
+    pub fn over(elements: *mut pg_sys::Datum, nulls: *mut bool, nelems: usize) -> Array<'a, T> {
+        Array::<T> {
+            array_type: std::ptr::null_mut(),
+            elements,
+            nulls,
+            typoid: pg_sys::InvalidOid,
+            nelems,
+            elem_slice: unsafe { std::slice::from_raw_parts(elements, nelems) },
+            null_slice: unsafe { std::slice::from_raw_parts(nulls, nelems) },
+            _marker: PhantomData,
+        }
+    }
+
+    fn from_pg(
         array_type: *mut pg_sys::ArrayType,
         elements: *mut pg_sys::Datum,
         nulls: *mut bool,
@@ -33,6 +50,10 @@ impl<'a, T: FromDatum<T>> Array<'a, T> {
     }
 
     pub fn into_array_type(self) -> *const pg_sys::ArrayType {
+        if self.array_type.is_null() {
+            panic!("attempt to dereference a null Array");
+        }
+
         let ptr = self.array_type;
         std::mem::forget(self);
         ptr
@@ -142,6 +163,11 @@ impl<'a, T: FromDatum<T>> Iterator for ArrayIntoIterator<'a, T> {
 
 impl<'a, T: FromDatum<T>> Drop for Array<'a, T> {
     fn drop(&mut self) {
+        if self.array_type.is_null() {
+            // don't pfree anything if the values aren't backed by a pg_sys::ArrayType
+            return;
+        }
+
         if !self.elements.is_null() {
             unsafe {
                 pg_sys::pfree(self.elements as *mut std::os::raw::c_void);
@@ -154,10 +180,8 @@ impl<'a, T: FromDatum<T>> Drop for Array<'a, T> {
             }
         }
 
-        if !self.array_type.is_null() {
-            unsafe {
-                pg_sys::pfree(self.array_type as *mut std::os::raw::c_void);
-            }
+        unsafe {
+            pg_sys::pfree(self.array_type as *mut std::os::raw::c_void);
         }
     }
 }
@@ -202,7 +226,13 @@ impl<'a, T: FromDatum<T>> FromDatum<Array<'a, T>> for Array<'a, T> {
                     &mut nelems,
                 );
 
-                Some(Array::new(array, elements, nulls, typoid, nelems as usize))
+                Some(Array::from_pg(
+                    array,
+                    elements,
+                    nulls,
+                    typoid,
+                    nelems as usize,
+                ))
             }
         }
     }
