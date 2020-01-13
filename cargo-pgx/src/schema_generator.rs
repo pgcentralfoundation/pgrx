@@ -66,10 +66,16 @@ fn process_schema_load_order(mut created: Vec<String>) {
     let filename = PathBuf::from_str("./sql/load-order.txt").unwrap();
     let mut load_order = read_load_order(&filename);
 
-    // remove everything from load_order that is a generated file that isn't in the set of files we just created
-    load_order.retain(|v| !v.ends_with(".generated.sql") && !created.contains(v));
+    // keep in load oder only those files that a) aren't generated or b) are generated that we just created
+    // ie, remove those that are flagged as generated but aren't valid anymore
+    load_order.retain(|v| {
+        !v.ends_with(".generated.sql") || (v.ends_with(".generated.sql") && created.contains(v))
+    });
 
-    // append created to load_order as they're new files
+    // remove everything from created that is already in load order
+    created.retain(|v| !load_order.contains(v));
+
+    // append whatever is left in created to load_order as they're new files
     created.sort();
     load_order.append(&mut created);
 
