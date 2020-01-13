@@ -34,7 +34,8 @@ enum CategorizedAttribute {
     RustTest(Span),
     PgExtern((Span, HashSet<ExternArgs>)),
     Sql(Vec<String>),
-    FunctionArgsSql(String),
+    SqlFunctionName(String),
+    SqlFunctionArgs(String),
     Other(Vec<(Span, String)>),
 }
 
@@ -276,10 +277,10 @@ fn walk_items(rs_file: &DirEntry, sql: &mut Vec<String>, items: Vec<Item>) {
                 sql.push(string.to_string());
             }
         } else if let Item::Fn(func) = item {
-            let attributes = collect_attributes(rs_file, &func, &func.attrs);
+            let attributes = collect_attributes(rs_file, &func);
             let is_test_mode = std::env::var("PGX_TEST_MODE").is_ok();
             let mut function_sql = Vec::new();
-            let sql_func_arg = extract_funcargs_attribute(&attributes);
+            let sql_func_args = extract_funcargs_attribute(&attributes);
 
             for attribute in attributes {
                 match attribute {
@@ -303,7 +304,7 @@ fn walk_items(rs_file: &DirEntry, sql: &mut Vec<String>, items: Vec<Item>) {
                             &func,
                             Some(args),
                             rs_file,
-                            sql_func_arg.clone(),
+                            sql_func_args.clone(),
                         ) {
                             Some(statement) => {
                                 function_sql.push(location_comment(rs_file, span));
@@ -335,11 +336,11 @@ fn make_create_function_statement(
     let exported_func_name = format!("{}_wrapper", func.sig.ident.to_string());
     let mut statement = String::new();
     let has_option_arg = func_args_have_option(func, rs_file);
+    let attributes = collect_attributes(rs_file, func);
+    let sql_func_name =
+        extract_funcname_attribute(&attributes).unwrap_or(quote_ident(&func.sig.ident));
 
-    statement.push_str(&format!(
-        "CREATE OR REPLACE FUNCTION {name}",
-        name = quote_ident(&func.sig.ident)
-    ));
+    statement.push_str(&format!("CREATE OR REPLACE FUNCTION {}", sql_func_name));
 
     if sql_func_arg.is_some() {
         statement.push_str(sql_func_arg.unwrap().as_str());
@@ -442,7 +443,13 @@ fn quote_ident(ident: &Ident) -> String {
 }
 
 fn quote_ident_string(ident: String) -> String {
-    ident.replace("\"", "\"\"")
+    let mut quoted = String::new();
+
+    quoted.push('"');
+    quoted.push_str(ident.replace("\"", "\"\"").as_str());
+    quoted.push('"');
+
+    quoted
 }
 
 fn arg_name(arg: &FnArg) -> String {
@@ -483,7 +490,7 @@ fn translate_type_string(
     match rust_type.as_str() {
         "i8" => Some(("smallint".to_string(), false)), // convert i8 types into smallints as Postgres doesn't have a 1byte-sized type
         "i16" => Some(("smallint".to_string(), false)),
-        "i32" => Some(("int".to_string(), false)),
+        "i32" => Some(("integer".to_string(), false)),
         "i64" => Some(("bigint".to_string(), false)),
         "bool" => Some(("bool".to_string(), false)),
         "char" => Some(("char".to_string(), false)),
@@ -496,6 +503,12 @@ fn translate_type_string(
         "pg_sys :: ItemPointerData" => Some(("tid".to_string(), false)),
         "pg_sys :: FunctionCallInfo" => None,
         "pg_sys :: IndexAmRoutine" => Some(("index_am_handler".to_string(), false)),
+        _array if rust_type.starts_with("Array <") => {
+            let rc = translate_type_string(extract_type(ty), filename, span, ty);
+            let mut type_string = rc.unwrap().0;
+            type_string.push_str("[]");
+            Some((type_string, false))
+        }
         _internal if rust_type.starts_with("Internal <") => Some(("internal".to_string(), false)),
         _boxed if rust_type.starts_with("PgBox <") => {
             translate_type_string(extract_type(ty), filename, span, ty)
@@ -550,7 +563,7 @@ fn extract_type(ty: &Box<Type>) -> String {
 
 fn extract_funcargs_attribute(attrs: &Vec<CategorizedAttribute>) -> Option<String> {
     for a in attrs {
-        if let CategorizedAttribute::FunctionArgsSql(sql) = a {
+        if let CategorizedAttribute::SqlFunctionArgs(sql) = a {
             return Some(sql.clone());
         }
     }
@@ -558,11 +571,18 @@ fn extract_funcargs_attribute(attrs: &Vec<CategorizedAttribute>) -> Option<Strin
     None
 }
 
-fn collect_attributes(
-    rs_file: &DirEntry,
-    func: &ItemFn,
-    attrs: &Vec<Attribute>,
-) -> Vec<CategorizedAttribute> {
+fn extract_funcname_attribute(attrs: &Vec<CategorizedAttribute>) -> Option<String> {
+    for a in attrs {
+        if let CategorizedAttribute::SqlFunctionName(sql) = a {
+            return Some(quote_ident_string(sql.clone()));
+        }
+    }
+
+    None
+}
+
+fn collect_attributes(rs_file: &DirEntry, func: &ItemFn) -> Vec<CategorizedAttribute> {
+    let attrs = &func.attrs;
     let mut categorized_attributes = Vec::new();
     let mut other_attributes = Vec::new();
 
@@ -585,6 +605,29 @@ fn collect_attributes(
                 .push(CategorizedAttribute::PgTest((span, parse_extern_args(&a))));
         } else if as_string == "# [ test ]" {
             categorized_attributes.push(CategorizedAttribute::RustTest(span));
+        } else if as_string == "# [ doc = \" ```funcname\" ]" {
+            let (new_i, mut sql_statements) = collect_doc(
+                rs_file,
+                &func,
+                attrs,
+                &mut other_attributes,
+                i,
+                a,
+                span,
+                false,
+            );
+
+            if sql_statements.len() == 1 {
+                categorized_attributes.push(CategorizedAttribute::SqlFunctionName(
+                    sql_statements.pop().unwrap(),
+                ));
+            } else if sql_statements.len() == 0 {
+                panic!("Found no lines for ```funcname");
+            } else {
+                panic!("Found more than 1 line for ```funcname");
+            }
+
+            i = new_i;
         } else if as_string == "# [ doc = \" ```funcargs\" ]" {
             let (new_i, mut sql_statements) = collect_doc(
                 rs_file,
@@ -598,7 +641,7 @@ fn collect_attributes(
             );
 
             if sql_statements.len() == 1 {
-                categorized_attributes.push(CategorizedAttribute::FunctionArgsSql(
+                categorized_attributes.push(CategorizedAttribute::SqlFunctionArgs(
                     sql_statements.pop().unwrap(),
                 ));
             } else if sql_statements.len() == 0 {

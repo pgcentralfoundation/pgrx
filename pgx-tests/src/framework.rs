@@ -238,7 +238,8 @@ fn install_extension() {
         .env("PGX_TEST_MODE", "1")
         .env(
             "CARGO_TARGET_DIR",
-            std::env::var("CARGO_TARGET_DIR").unwrap_or(std::env::var("PWD").unwrap()),
+            std::env::var("CARGO_TARGET_DIR")
+                .unwrap_or(format!("{}/target", std::env::var("PWD").unwrap())),
         )
         .env(
             "PGX_BUILD_FLAGS",

@@ -28,6 +28,7 @@
 #include "storage/itemptr.h"
 #include "utils/builtins.h"
 #include "utils/jsonb.h"
+#include "utils/lsyscache.h"
 #include "utils/memutils.h"
 #include "utils/palloc.h"
 #include "utils/rel.h"

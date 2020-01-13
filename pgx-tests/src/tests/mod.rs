@@ -1,3 +1,4 @@
+mod array_tests;
 mod fcinfo_tests;
 mod json_tests;
 mod log_tests;
