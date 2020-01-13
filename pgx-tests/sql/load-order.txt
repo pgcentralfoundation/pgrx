@@ -1,7 +1,4 @@
-tests_node_tests.generated.sql
-tests_log_tests.generated.sql
-tests_struct_type_tests.generated.sql
-tests_spi_tests.generated.sql
-tests_fcinfo_tests.generated.sql
-tests_json_tests.generated.sql
 tests_array_tests.generated.sql
+tests_fcinfo_tests.generated.sql
+tests_spi_tests.generated.sql
+tests_struct_type_tests.generated.sql

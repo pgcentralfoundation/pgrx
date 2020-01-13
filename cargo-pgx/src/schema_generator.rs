@@ -1,6 +1,5 @@
 use proc_macro2::{Ident, Span};
 use quote::quote;
-use rayon::prelude::*;
 use std::borrow::BorrowMut;
 use std::collections::HashSet;
 use std::fs::DirEntry;
@@ -9,7 +8,6 @@ use std::ops::Deref;
 use std::path::PathBuf;
 use std::result::Result;
 use std::str::FromStr;
-use std::sync::Mutex;
 use syn::export::ToTokens;
 use syn::spanned::Spanned;
 use syn::{Attribute, FnArg, Item, ItemFn, Pat, ReturnType, Type};
@@ -43,9 +41,10 @@ pub(crate) fn generate_schema() -> Result<(), std::io::Error> {
     let path = PathBuf::from_str("./src").unwrap();
     let files = find_rs_files(&path, Vec::new());
 
-    let mut created = Mutex::new(Vec::new());
-    let mut deleted = Mutex::new(Vec::new());
-    files.par_iter().for_each(|f: &DirEntry| {
+    delete_generated_sql();
+
+    let mut created = Vec::new();
+    files.iter().for_each(|f: &DirEntry| {
         let statemets = make_create_function_statements(f);
         let (did_write, filename) = write_sql_file(f, statemets);
 
@@ -54,33 +53,25 @@ pub(crate) fn generate_schema() -> Result<(), std::io::Error> {
         filename = filename.trim_start_matches("./sql/").to_string();
 
         if did_write {
-            created.lock().unwrap().push(filename);
-        } else {
-            deleted.lock().unwrap().push(filename);
+            created.push(filename);
         }
     });
 
-    process_schema_load_order(created.get_mut().unwrap(), deleted.get_mut().unwrap());
+    process_schema_load_order(created);
 
     Ok(())
 }
 
-fn process_schema_load_order(created: &mut Vec<String>, deleted: &mut Vec<String>) {
+fn process_schema_load_order(mut created: Vec<String>) {
     let filename = PathBuf::from_str("./sql/load-order.txt").unwrap();
     let mut load_order = read_load_order(&filename);
 
-    // remove everything from load_order that we deleted
-    for v in deleted {
-        if let Some(idx) = load_order.iter().position(|r| r.eq(v)) {
-            load_order.remove(idx);
-        }
-    }
+    // remove everything from load_order that is a generated file that isn't in the set of files we just created
+    load_order.retain(|v| !v.ends_with(".generated.sql") && !created.contains(v));
 
-    // created keeps only those items that aren't already in load_order
-    created.retain(|v| !load_order.contains(v));
-
-    // and finally we append whatever is left in created to load_order as they're new files
-    load_order.append(created);
+    // append created to load_order as they're new files
+    created.sort();
+    load_order.append(&mut created);
 
     // rewrite the load_order file
     let mut file = std::fs::File::create(&filename)
@@ -171,6 +162,20 @@ fn find_rs_files(path: &PathBuf, mut files: Vec<DirEntry>) -> Vec<DirEntry> {
     }
 
     files
+}
+
+fn delete_generated_sql() {
+    let path = PathBuf::from_str("./sql").unwrap();
+    for f in std::fs::read_dir(&path).unwrap() {
+        if f.is_ok() {
+            let f = f.unwrap();
+            let filename = f.file_name().into_string().unwrap();
+
+            if f.metadata().unwrap().is_file() && filename.ends_with(".generated.sql") {
+                std::fs::remove_file(f.path()).expect(&format!("couldn't delete {}", filename));
+            }
+        }
+    }
 }
 
 fn parse_extern_args(att: &Attribute) -> HashSet<ExternArgs> {
