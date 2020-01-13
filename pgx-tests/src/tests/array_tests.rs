@@ -51,6 +51,11 @@ fn count_nulls(values: Array<i32>) -> i32 {
         .count() as i32
 }
 
+#[pg_extern]
+fn optional_array_arg(values: Option<Array<f32>>) -> f32 {
+    values.unwrap().iter().map(|v| v.unwrap_or(0f32)).sum()
+}
+
 mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
@@ -111,5 +116,12 @@ mod tests {
         let cnt = Spi::get_one::<i32>("SELECT count_nulls(ARRAY[NULL, 1, 2, NULL]::integer[])");
         assert!(cnt.is_some());
         assert_eq!(cnt.unwrap(), 2);
+    }
+
+    #[pg_test]
+    fn test_optional_array() {
+        let sum = Spi::get_one::<f32>("SELECT optional_array_arg(ARRAY[1,2,3]::real[])");
+        assert!(sum.is_some());
+        assert_eq!(sum.unwrap(), 6f32);
     }
 }

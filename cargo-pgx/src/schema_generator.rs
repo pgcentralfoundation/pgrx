@@ -478,14 +478,14 @@ fn translate_type(filename: &DirEntry, ty: &Box<Type>) -> Option<(String, bool)>
         panic!("Unsupported type: {}", quote! {#ty});
     }
 
-    translate_type_string(rust_type, filename, &span, ty)
+    translate_type_string(rust_type, filename, &span, 0)
 }
 
 fn translate_type_string(
     rust_type: String,
     filename: &DirEntry,
     span: &proc_macro2::Span,
-    ty: &Box<Type>,
+    depth: i32,
 ) -> Option<(String, bool)> {
     match rust_type.as_str() {
         "i8" => Some(("smallint".to_string(), false)), // convert i8 types into smallints as Postgres doesn't have a 1byte-sized type
@@ -504,18 +504,19 @@ fn translate_type_string(
         "pg_sys :: FunctionCallInfo" => None,
         "pg_sys :: IndexAmRoutine" => Some(("index_am_handler".to_string(), false)),
         _array if rust_type.starts_with("Array <") => {
-            let rc = translate_type_string(extract_type(ty), filename, span, ty);
+            let rc = translate_type_string(extract_type(&rust_type), filename, span, depth + 1);
             let mut type_string = rc.unwrap().0;
             type_string.push_str("[]");
             Some((type_string, false))
         }
         _internal if rust_type.starts_with("Internal <") => Some(("internal".to_string(), false)),
         _boxed if rust_type.starts_with("PgBox <") => {
-            translate_type_string(extract_type(ty), filename, span, ty)
+            translate_type_string(extract_type(&rust_type), filename, span, depth + 1)
         }
         _option if rust_type.starts_with("Option <") => {
-            let rc = translate_type_string(extract_type(ty), filename, span, ty);
-            Some((rc.unwrap().0, true))
+            let rc = translate_type_string(extract_type(&rust_type), filename, span, depth + 1);
+            let type_string = rc.unwrap().0;
+            Some((type_string, true))
         }
         mut unknown => {
             if std::env::var("DEBUG").is_ok() {
@@ -534,31 +535,10 @@ fn translate_type_string(
     }
 }
 
-fn extract_type(ty: &Box<Type>) -> String {
-    match ty.deref() {
-        Type::Path(path) => {
-            for segment in &path.path.segments {
-                let arguments = &segment.arguments;
-                let mut type_name = &format!("{}", quote! {#arguments}) as &str;
-
-                type_name = type_name.trim();
-                type_name = type_name.trim_start_matches('<');
-                type_name = type_name.trim_end_matches('>');
-
-                while type_name.contains('<') {
-                    // trim off type
-                    type_name = type_name.trim();
-                    type_name = &type_name[type_name.find(' ').unwrap()..];
-                    type_name = type_name.trim_start_matches('<');
-                    type_name = type_name.trim_end_matches('>');
-                }
-
-                return type_name.trim().to_string();
-            }
-            panic!("No type found inside Option");
-        }
-        _ => panic!("No type found inside Option"),
-    }
+fn extract_type(type_name: &str) -> String {
+    let re = regex::Regex::new(r#"\w+ < (.*) >.*"#).unwrap();
+    let capture = re.captures(type_name).unwrap().get(1);
+    return capture.unwrap().as_str().to_string();
 }
 
 fn extract_funcargs_attribute(attrs: &Vec<CategorizedAttribute>) -> Option<String> {
