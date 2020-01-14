@@ -87,11 +87,7 @@ impl<'a, T: FromDatum<T>> Array<'a, T> {
         if i >= self.nelems {
             None
         } else {
-            Some(T::from_datum(
-                self.elem_slice[i],
-                self.null_slice[i],
-                self.typoid,
-            ))
+            Some(unsafe { T::from_datum(self.elem_slice[i], self.null_slice[i], self.typoid) })
         }
     }
 }
@@ -187,53 +183,51 @@ impl<'a, T: FromDatum<T>> Drop for Array<'a, T> {
 }
 
 impl<'a, T: FromDatum<T>> FromDatum<Array<'a, T>> for Array<'a, T> {
-    fn from_datum(datum: usize, is_null: bool, typoid: u32) -> Option<Array<'a, T>> {
+    unsafe fn from_datum(datum: usize, is_null: bool, typoid: u32) -> Option<Array<'a, T>> {
         if is_null {
             None
         } else if datum == 0 {
             panic!("&[32] array was flagged not null but datum is zero");
         } else {
-            unsafe {
-                let array = pg_sys::pg_detoast_datum(datum as *mut pg_sys::varlena)
-                    as *mut pg_sys::ArrayType;
-                let array_ref = array.as_ref().expect("ArrayType * was NULL");
+            let array =
+                pg_sys::pg_detoast_datum(datum as *mut pg_sys::varlena) as *mut pg_sys::ArrayType;
+            let array_ref = array.as_ref().expect("ArrayType * was NULL");
 
-                // outvals for get_typlenbyvalalign()
-                let mut typlen = 0;
-                let mut typbyval = false;
-                let mut typalign = 0;
+            // outvals for get_typlenbyvalalign()
+            let mut typlen = 0;
+            let mut typbyval = false;
+            let mut typalign = 0;
 
-                // outvals for deconstruct_array()
-                let mut elements = 0 as *mut pg_sys::Datum;
-                let mut nulls = 0 as *mut bool;
-                let mut nelems = 0;
+            // outvals for deconstruct_array()
+            let mut elements = 0 as *mut pg_sys::Datum;
+            let mut nulls = 0 as *mut bool;
+            let mut nelems = 0;
 
-                pg_sys::get_typlenbyvalalign(
-                    array_ref.elemtype,
-                    &mut typlen,
-                    &mut typbyval,
-                    &mut typalign,
-                );
+            pg_sys::get_typlenbyvalalign(
+                array_ref.elemtype,
+                &mut typlen,
+                &mut typbyval,
+                &mut typalign,
+            );
 
-                pg_sys::deconstruct_array(
-                    array,
-                    array_ref.elemtype,
-                    typlen as i32,
-                    typbyval,
-                    typalign,
-                    &mut elements,
-                    &mut nulls,
-                    &mut nelems,
-                );
+            pg_sys::deconstruct_array(
+                array,
+                array_ref.elemtype,
+                typlen as i32,
+                typbyval,
+                typalign,
+                &mut elements,
+                &mut nulls,
+                &mut nelems,
+            );
 
-                Some(Array::from_pg(
-                    array,
-                    elements,
-                    nulls,
-                    typoid,
-                    nelems as usize,
-                ))
-            }
+            Some(Array::from_pg(
+                array,
+                elements,
+                nulls,
+                typoid,
+                nelems as usize,
+            ))
         }
     }
 }

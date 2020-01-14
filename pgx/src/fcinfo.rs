@@ -8,7 +8,7 @@ mod pg_10_11 {
     pub fn pg_getarg<T: FromDatum<T>>(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> Option<T> {
         let datum = unsafe { fcinfo.as_ref() }.unwrap().arg[num];
         let isnull = pg_arg_is_null(fcinfo, num);
-        T::from_datum(datum, isnull, crate::get_getarg_type(fcinfo, num))
+        unsafe { T::from_datum(datum, isnull, crate::get_getarg_type(fcinfo, num)) }
     }
 
     #[inline]
@@ -159,12 +159,12 @@ pub fn pg_return_void() -> pg_sys::Datum {
 /// }
 ///
 /// fn some_func() {
-///     let result = direct_function_call::<i32>(add_two_numbers_wrapper, vec!(2.into_datum(), 3.into_datum()));
+///     let result = unsafe { direct_function_call::<i32>(add_two_numbers_wrapper, vec!(2.into_datum(), 3.into_datum())) };
 ///     let sum = result.expect("function returned null");
 ///     assert_eq!(sum, 5);
 /// }
 /// ```
-pub fn direct_function_call<R: FromDatum<R>>(
+pub unsafe fn direct_function_call<R: FromDatum<R>>(
     func: unsafe fn(pg_sys::FunctionCallInfo) -> pg_sys::Datum,
     args: Vec<Option<pg_sys::Datum>>,
 ) -> Option<R> {

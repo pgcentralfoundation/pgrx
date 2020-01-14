@@ -116,11 +116,13 @@ impl Spi {
                             outer_memory_context.switch_to(|| {
                                 // TODO:  can we get the type oid from somewhere?
                                 //        - do we even need it?
-                                R::from_datum(
-                                    as_datum.expect("SPI result datum was NULL"),
-                                    false,
-                                    pg_sys::InvalidOid,
-                                )
+                                unsafe {
+                                    R::from_datum(
+                                        as_datum.expect("SPI result datum was NULL"),
+                                        false,
+                                        pg_sys::InvalidOid,
+                                    )
+                                }
                             })
                         }
                     }

@@ -13,15 +13,14 @@ pub struct JsonB(pub Value);
 /// for json
 impl FromDatum<Json> for Json {
     #[inline]
-    fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<Json> {
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<Json> {
         if is_null {
             None
         } else if datum == 0 {
             panic!("a json Datum was flagged as non-null but the datum is zero");
         } else {
-            let string = unsafe {
-                text_to_rust_str_unchecked(pg_sys::pg_detoast_datum(datum as *mut pg_sys::varlena))
-            };
+            let string =
+                text_to_rust_str_unchecked(pg_sys::pg_detoast_datum(datum as *mut pg_sys::varlena));
 
             let value = serde_json::from_str(string).expect("failed to parse Json value");
             Some(Json(value))
@@ -31,7 +30,7 @@ impl FromDatum<Json> for Json {
 
 /// for jsonb
 impl FromDatum<JsonB> for JsonB {
-    fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<JsonB> {
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<JsonB> {
         if is_null {
             None
         } else if datum == 0 {

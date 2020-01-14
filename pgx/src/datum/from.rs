@@ -10,13 +10,28 @@ use std::ffi::CStr;
 /// If implementing this, also implement `IntoDatum<T>` for the reverse
 /// conversion.
 pub trait FromDatum<T> {
-    fn from_datum(datum: pg_sys::Datum, is_null: bool, typoid: pg_sys::Oid) -> Option<T>;
+    /// ## Safety
+    ///
+    /// This method is inherently unsafe as the `datum` argument can represent an arbitrary
+    /// memory address in the case of pass-by-reference Datums.  Referencing that memory address
+    /// can cause Postgres to crash if it's invalid.
+    ///
+    /// If the `(datum, is_null)` tuple comes from Postgres, it's generally okay to consider this
+    /// a safe call (ie, wrap it in `unsafe {}`) and move on with life.
+    ///
+    /// If, however, you're providing an arbitrary datum value, it needs to be considered unsafe
+    /// and that unsafeness should be propagated through your API.
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, typoid: pg_sys::Oid) -> Option<T>;
 }
 
 /// for pg_sys::Datum
 impl FromDatum<pg_sys::Datum> for pg_sys::Datum {
     #[inline]
-    fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<pg_sys::Datum> {
+    unsafe fn from_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _: pg_sys::Oid,
+    ) -> Option<pg_sys::Datum> {
         if is_null {
             None
         } else {
@@ -28,7 +43,7 @@ impl FromDatum<pg_sys::Datum> for pg_sys::Datum {
 /// for bool
 impl FromDatum<bool> for bool {
     #[inline]
-    fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<bool> {
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<bool> {
         if is_null {
             None
         } else {
@@ -40,7 +55,7 @@ impl FromDatum<bool> for bool {
 /// for char
 impl FromDatum<i8> for i8 {
     #[inline]
-    fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<i8> {
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<i8> {
         if is_null {
             None
         } else {
@@ -52,7 +67,7 @@ impl FromDatum<i8> for i8 {
 /// for smallint
 impl FromDatum<i16> for i16 {
     #[inline]
-    fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<i16> {
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<i16> {
         if is_null {
             None
         } else {
@@ -64,7 +79,7 @@ impl FromDatum<i16> for i16 {
 /// for integer
 impl FromDatum<i32> for i32 {
     #[inline]
-    fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<i32> {
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<i32> {
         if is_null {
             None
         } else {
@@ -76,7 +91,7 @@ impl FromDatum<i32> for i32 {
 /// for oid
 impl FromDatum<u32> for u32 {
     #[inline]
-    fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<u32> {
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<u32> {
         if is_null {
             None
         } else {
@@ -88,7 +103,7 @@ impl FromDatum<u32> for u32 {
 /// for bigint
 impl FromDatum<i64> for i64 {
     #[inline]
-    fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<i64> {
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<i64> {
         if is_null {
             None
         } else {
@@ -100,7 +115,7 @@ impl FromDatum<i64> for i64 {
 /// for real
 impl FromDatum<f32> for f32 {
     #[inline]
-    fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<f32> {
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<f32> {
         if is_null {
             None
         } else {
@@ -112,7 +127,7 @@ impl FromDatum<f32> for f32 {
 /// for double precision
 impl FromDatum<f64> for f64 {
     #[inline]
-    fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<f64> {
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<f64> {
         if is_null {
             None
         } else {
@@ -124,41 +139,41 @@ impl FromDatum<f64> for f64 {
 /// for text, varchar
 impl<'a> FromDatum<&'a str> for &'a str {
     #[inline]
-    fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<&'a str> {
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<&'a str> {
         if is_null {
             None
         } else if datum == 0 {
             panic!("a varlena Datum was flagged as non-null but the datum is zero");
         } else {
-            let varlena = unsafe { pg_sys::pg_detoast_datum(datum as *mut pg_sys::varlena) };
-            Some(unsafe { text_to_rust_str_unchecked(varlena) })
+            let varlena = pg_sys::pg_detoast_datum(datum as *mut pg_sys::varlena);
+            Some(text_to_rust_str_unchecked(varlena))
         }
     }
 }
 impl<'a> FromDatum<&'a str> for str {
     #[inline]
-    fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<&'a str> {
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<&'a str> {
         if is_null {
             None
         } else if datum == 0 {
             panic!("a varlena Datum was flagged as non-null but the datum is zero");
         } else {
-            let varlena = unsafe { pg_sys::pg_detoast_datum(datum as *mut pg_sys::varlena) };
-            Some(unsafe { text_to_rust_str_unchecked(varlena) })
+            let varlena = pg_sys::pg_detoast_datum(datum as *mut pg_sys::varlena);
+            Some(text_to_rust_str_unchecked(varlena))
         }
     }
 }
 
 impl FromDatum<String> for String {
     #[inline]
-    fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<String> {
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<String> {
         if is_null {
             None
         } else if datum == 0 {
             panic!("a varlena Datum was flagged as non-null but the datum is zero");
         } else {
-            let varlena = unsafe { pg_sys::pg_detoast_datum(datum as *mut pg_sys::varlena) };
-            Some(unsafe { text_to_rust_str_unchecked(varlena) }.to_string())
+            let varlena = pg_sys::pg_detoast_datum(datum as *mut pg_sys::varlena);
+            Some(text_to_rust_str_unchecked(varlena).to_string())
         }
     }
 }
@@ -166,13 +181,15 @@ impl FromDatum<String> for String {
 /// for cstring
 impl<'a> FromDatum<&'a std::ffi::CStr> for &'a std::ffi::CStr {
     #[inline]
-    fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<&'a CStr> {
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<&'a CStr> {
         if is_null {
             None
         } else if datum == 0 {
             panic!("a cstring Datum was flagged as non-null but the datum is zero");
         } else {
-            Some(unsafe { std::ffi::CStr::from_ptr(datum as *const std::os::raw::c_char) })
+            Some(std::ffi::CStr::from_ptr(
+                datum as *const std::os::raw::c_char,
+            ))
         }
     }
 }
@@ -180,7 +197,7 @@ impl<'a> FromDatum<&'a std::ffi::CStr> for &'a std::ffi::CStr {
 /// for NULL -- always converts to a `None`, even if the is_null argument is false
 impl FromDatum<()> for () {
     #[inline]
-    fn from_datum(_datum: pg_sys::Datum, _is_null: bool, _: pg_sys::Oid) -> Option<()> {
+    unsafe fn from_datum(_datum: pg_sys::Datum, _is_null: bool, _: pg_sys::Oid) -> Option<()> {
         None
     }
 }
@@ -188,7 +205,7 @@ impl FromDatum<()> for () {
 /// for user types
 impl<T> FromDatum<PgBox<T>> for PgBox<T> {
     #[inline]
-    fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<PgBox<T>> {
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<PgBox<T>> {
         if is_null {
             None
         } else if datum == 0 {

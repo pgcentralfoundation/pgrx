@@ -24,6 +24,7 @@ pub mod pg_sys;
 pub mod pgbox;
 pub mod spi;
 pub mod stringinfo;
+pub mod tupdesc;
 pub mod varlena;
 
 pub use datum::*;
@@ -37,6 +38,7 @@ pub use nodes::{is_a, PgNode, PgNodeFactory}; // be specific since we have multi
 pub use oids::*;
 pub use pgbox::*;
 pub use spi::*;
+pub use tupdesc::*;
 pub use varlena::*;
 
 /// A macro for marking a library compatible with the Postgres extension framework.

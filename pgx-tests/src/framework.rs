@@ -51,30 +51,16 @@ macro_rules! testmsg {
     )
 }
 
-pub fn run_test<F: FnOnce(pg_sys::FunctionCallInfo) -> pg_sys::Datum>(
-    _test_func: F,
-    expected_error: Option<&str>,
-) {
+pub fn run_test(sql_funcname: &str, expected_error: Option<&str>) {
     let (loglines, system_session_id) = initialize_test_framework();
 
-    let funcname = get_named_capture(
-        &regex::Regex::new(".*::(?P<funcname>.*?)_wrapper").unwrap(),
-        "funcname",
-        std::any::type_name::<F>(),
-    )
-    .unwrap_or_else(|| {
-        panic!(
-            "couldn't extract function name from {}",
-            std::any::type_name::<F>()
-        )
-    });
     let (mut client, session_id) = client();
 
     let schema = get_extension_schema();
     let result = match client.transaction() {
         // run the test function in a transaction
         Ok(mut tx) => {
-            let result = tx.simple_query(&format!("SELECT {}.{}();", schema, funcname));
+            let result = tx.simple_query(&format!("SELECT {}.{}();", schema, sql_funcname));
 
             if result.is_ok() {
                 // and abort the transaction when complete

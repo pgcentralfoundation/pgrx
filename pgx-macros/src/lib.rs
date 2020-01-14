@@ -56,17 +56,14 @@ pub fn pg_test(attr: TokenStream, item: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(item as syn::Item);
     match ast {
         Item::Fn(func) => {
-            let func_name = Ident::new(
-                &format!("{}_wrapper", func.sig.ident.to_string()),
-                func.span(),
-            );
+            let sql_funcname = format!("{}_wrapper", func.sig.ident.to_string());
             let test_func_name =
                 Ident::new(&format!("{}_test", func.sig.ident.to_string()), func.span());
 
             stream.extend(quote! {
                 #[test]
                 fn #test_func_name() {
-                    pgx_tests::run_test(#func_name, #expected_error)
+                    pgx_tests::run_test(#sql_funcname, #expected_error)
                 }
             });
         }

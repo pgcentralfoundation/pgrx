@@ -103,7 +103,7 @@ impl PgGuardRewriter {
 
             #[no_mangle]
             #[allow(unused_variables)]
-            #vis fn #func_name_wrapper(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+            #vis unsafe fn #func_name_wrapper(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
 
                 #func_call
 
