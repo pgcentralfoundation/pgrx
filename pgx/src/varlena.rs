@@ -1,18 +1,48 @@
 use crate::pg_sys;
+use crate::stringinfo::StringInfo;
 
-pub fn set_varsize(ptr: *mut pg_sys::varlena, len: i32) {
+/// Encode a Rust type instance that is `serde::Serialize` into a Postgres varlena pointer
+pub fn to_varlena<T: serde::Serialize>(data: &T) -> serde_cbor::Result<*const pg_sys::varlena> {
+    let mut serialized = StringInfo::new();
+
+    serialized.push_bytes(&[0u8; pg_sys::VARHDRSZ]); // reserve space fo the header
+    serde_cbor::to_writer(&mut serialized, data)?;
+
+    let size = serialized.len() as usize;
+    let varlena = serialized.into_char_ptr();
+    unsafe {
+        set_varsize(varlena as *mut pg_sys::varlena, size as i32);
+    }
+
+    Ok(varlena as *const pg_sys::varlena)
+}
+
+/// Decode a Postgres varlena pointer into a Rust type instance
+pub unsafe fn from_varlena<T: serde::de::DeserializeOwned>(
+    varlena: *const pg_sys::varlena,
+) -> serde_cbor::Result<T> {
+    let varlena = pg_sys::pg_detoast_datum(varlena as *mut pg_sys::varlena);
+    let size = varsize_any(varlena);
+    let slice = std::slice::from_raw_parts(varlena as *const u8, size);
+    let (_, mut data) = slice.split_at(pg_sys::VARHDRSZ);
+    let object = serde_cbor::from_reader(&mut data)?;
+
+    Ok(object)
+}
+
+pub unsafe fn set_varsize(ptr: *mut pg_sys::varlena, len: i32) {
     extern "C" {
         fn pgx_SET_VARSIZE(ptr: *mut pg_sys::varlena, len: i32);
     }
 
-    unsafe { pgx_SET_VARSIZE(ptr, len) }
+    pgx_SET_VARSIZE(ptr, len)
 }
 
 /// ```c
 /// #define VARSIZE_EXTERNAL(PTR)				(VARHDRSZ_EXTERNAL + VARTAG_SIZE(VARTAG_EXTERNAL(PTR)))
 /// ```
 #[inline]
-pub fn varsize_external(ptr: *const pg_sys::varlena) -> usize {
+pub unsafe fn varsize_external(ptr: *const pg_sys::varlena) -> usize {
     pg_sys::VARHDRSZ_EXTERNAL() + vartag_size(vartag_external(ptr) as pg_sys::vartag_external)
 }
 
@@ -20,7 +50,7 @@ pub fn varsize_external(ptr: *const pg_sys::varlena) -> usize {
 /// #define VARTAG_EXTERNAL(PTR)				VARTAG_1B_E(PTR)
 /// ```
 #[inline]
-pub fn vartag_external(ptr: *const pg_sys::varlena) -> u8 {
+pub unsafe fn vartag_external(ptr: *const pg_sys::varlena) -> u8 {
     vartag_1b_e(ptr)
 }
 
@@ -29,7 +59,7 @@ pub fn vartag_external(ptr: *const pg_sys::varlena) -> u8 {
 ///	(((tag) & ~1) == VARTAG_EXPANDED_RO)
 /// ```
 #[inline]
-pub fn vartag_is_expanded(tag: pg_sys::vartag_external) -> bool {
+pub unsafe fn vartag_is_expanded(tag: pg_sys::vartag_external) -> bool {
     (tag & !1) == pg_sys::vartag_external_VARTAG_EXPANDED_RO
 }
 
@@ -41,7 +71,7 @@ pub fn vartag_is_expanded(tag: pg_sys::vartag_external) -> bool {
 ///	 TrapMacro(true, "unrecognized TOAST vartag"))
 /// ```
 #[inline]
-pub fn vartag_size(tag: pg_sys::vartag_external) -> usize {
+pub unsafe fn vartag_size(tag: pg_sys::vartag_external) -> usize {
     if tag == pg_sys::vartag_external_VARTAG_INDIRECT {
         std::mem::size_of::<pg_sys::varatt_indirect>()
     } else if vartag_is_expanded(tag) {
@@ -60,11 +90,9 @@ pub fn vartag_size(tag: pg_sys::vartag_external) -> usize {
 
 #[allow(clippy::cast_ptr_alignment)]
 #[inline]
-pub fn varsize_4b(ptr: *const pg_sys::varlena) -> usize {
-    unsafe {
-        let va4b = ptr as *const pg_sys::varattrib_4b__bindgen_ty_1; // 4byte
-        (((*va4b).va_header >> 2) & 0x3FFF_FFFF) as usize
-    }
+pub unsafe fn varsize_4b(ptr: *const pg_sys::varlena) -> usize {
+    let va4b = ptr as *const pg_sys::varattrib_4b__bindgen_ty_1; // 4byte
+    (((*va4b).va_header >> 2) & 0x3FFF_FFFF) as usize
 }
 
 /// ```c
@@ -72,11 +100,9 @@ pub fn varsize_4b(ptr: *const pg_sys::varlena) -> usize {
 /// ((((varattrib_1b *) (PTR))->va_header >> 1) & 0x7F)
 /// ```
 #[inline]
-pub fn varsize_1b(ptr: *const pg_sys::varlena) -> usize {
-    unsafe {
-        let va1b = ptr as *const pg_sys::varattrib_1b;
-        (((*va1b).va_header >> 1) & 0x7F) as usize
-    }
+pub unsafe fn varsize_1b(ptr: *const pg_sys::varlena) -> usize {
+    let va1b = ptr as *const pg_sys::varattrib_1b;
+    (((*va1b).va_header >> 1) & 0x7F) as usize
 }
 
 /// ```c
@@ -84,15 +110,13 @@ pub fn varsize_1b(ptr: *const pg_sys::varlena) -> usize {
 /// (((varattrib_1b_e *) (PTR))->va_tag)
 /// ```
 #[inline]
-pub fn vartag_1b_e(ptr: *const pg_sys::varlena) -> u8 {
-    unsafe {
-        let va1be = ptr as *const pg_sys::varattrib_1b_e;
-        (*va1be).va_tag
-    }
+pub unsafe fn vartag_1b_e(ptr: *const pg_sys::varlena) -> u8 {
+    let va1be = ptr as *const pg_sys::varattrib_1b_e;
+    (*va1be).va_tag
 }
 
 #[inline]
-pub fn varsize(ptr: *const pg_sys::varlena) -> usize {
+pub unsafe fn varsize(ptr: *const pg_sys::varlena) -> usize {
     varsize_4b(ptr)
 }
 
@@ -101,11 +125,9 @@ pub fn varsize(ptr: *const pg_sys::varlena) -> usize {
 /// ((((varattrib_1b *) (PTR))->va_header & 0x01) == 0x00)
 /// ```
 #[inline]
-pub fn varatt_is_4b(ptr: *const pg_sys::varlena) -> bool {
-    unsafe {
-        let va1b = ptr as *const pg_sys::varattrib_1b;
-        (*va1b).va_header & 0x01 == 0x00
-    }
+pub unsafe fn varatt_is_4b(ptr: *const pg_sys::varlena) -> bool {
+    let va1b = ptr as *const pg_sys::varattrib_1b;
+    (*va1b).va_header & 0x01 == 0x00
 }
 
 /// ```c
@@ -115,11 +137,9 @@ pub fn varatt_is_4b(ptr: *const pg_sys::varlena) -> bool {
 
 #[allow(clippy::verbose_bit_mask)]
 #[inline]
-pub fn varatt_is_4b_u(ptr: *const pg_sys::varlena) -> bool {
-    unsafe {
-        let va1b = ptr as *const pg_sys::varattrib_1b;
-        (*va1b).va_header & 0x03 == 0x00
-    }
+pub unsafe fn varatt_is_4b_u(ptr: *const pg_sys::varlena) -> bool {
+    let va1b = ptr as *const pg_sys::varattrib_1b;
+    (*va1b).va_header & 0x03 == 0x00
 }
 
 /// ```c
@@ -127,11 +147,9 @@ pub fn varatt_is_4b_u(ptr: *const pg_sys::varlena) -> bool {
 /// ((((varattrib_1b *) (PTR))->va_header & 0x03) == 0x02)
 /// ```
 #[inline]
-pub fn varatt_is_b8_c(ptr: *const pg_sys::varlena) -> bool {
-    unsafe {
-        let va1b = ptr as *const pg_sys::varattrib_1b;
-        (*va1b).va_header & 0x03 == 0x02
-    }
+pub unsafe fn varatt_is_b8_c(ptr: *const pg_sys::varlena) -> bool {
+    let va1b = ptr as *const pg_sys::varattrib_1b;
+    (*va1b).va_header & 0x03 == 0x02
 }
 
 /// ```c
@@ -139,11 +157,9 @@ pub fn varatt_is_b8_c(ptr: *const pg_sys::varlena) -> bool {
 /// ((((varattrib_1b *) (PTR))->va_header & 0x01) == 0x01)
 /// ```
 #[inline]
-pub fn varatt_is_1b(ptr: *const pg_sys::varlena) -> bool {
-    unsafe {
-        let va1b = ptr as *const pg_sys::varattrib_1b;
-        (*va1b).va_header & 0x01 == 0x01
-    }
+pub unsafe fn varatt_is_1b(ptr: *const pg_sys::varlena) -> bool {
+    let va1b = ptr as *const pg_sys::varattrib_1b;
+    (*va1b).va_header & 0x01 == 0x01
 }
 
 /// ```c
@@ -151,11 +167,9 @@ pub fn varatt_is_1b(ptr: *const pg_sys::varlena) -> bool {
 /// ((((varattrib_1b *) (PTR))->va_header) == 0x01)
 /// ```
 #[inline]
-pub fn varatt_is_1b_e(ptr: *const pg_sys::varlena) -> bool {
-    unsafe {
-        let va1b = ptr as *const pg_sys::varattrib_1b;
-        (*va1b).va_header == 0x01
-    }
+pub unsafe fn varatt_is_1b_e(ptr: *const pg_sys::varlena) -> bool {
+    let va1b = ptr as *const pg_sys::varattrib_1b;
+    (*va1b).va_header == 0x01
 }
 
 /// ```c
@@ -163,7 +177,7 @@ pub fn varatt_is_1b_e(ptr: *const pg_sys::varlena) -> bool {
 /// (*((uint8 *) (PTR)) != 0)
 /// ```
 #[inline]
-pub fn varatt_not_pad_byte(ptr: *const pg_sys::varlena) -> bool {
+pub unsafe fn varatt_not_pad_byte(ptr: *const pg_sys::varlena) -> bool {
     !ptr.is_null()
 }
 
@@ -174,7 +188,7 @@ pub fn varatt_not_pad_byte(ptr: *const pg_sys::varlena) -> bool {
 ///	  VARSIZE_4B(PTR)))
 /// ```
 #[inline]
-pub fn varsize_any(ptr: *const pg_sys::varlena) -> usize {
+pub unsafe fn varsize_any(ptr: *const pg_sys::varlena) -> usize {
     if varatt_is_1b_e(ptr) {
         varsize_external(ptr)
     } else if varatt_is_1b(ptr) {
@@ -197,7 +211,7 @@ pub fn varsize_any(ptr: *const pg_sys::varlena) -> usize {
 ///         )
 /// ```
 #[inline]
-pub fn varsize_any_exhdr(ptr: *const pg_sys::varlena) -> usize {
+pub unsafe fn varsize_any_exhdr(ptr: *const pg_sys::varlena) -> usize {
     if varatt_is_1b_e(ptr) {
         varsize_external(ptr) - pg_sys::VARHDRSZ_EXTERNAL()
     } else if varatt_is_1b(ptr) {
@@ -211,14 +225,12 @@ pub fn varsize_any_exhdr(ptr: *const pg_sys::varlena) -> usize {
 /// #define VARDATA_1B(PTR)		(((varattrib_1b *) (PTR))->va_data)
 /// ```
 #[inline]
-pub fn vardata_1b(ptr: *const pg_sys::varlena) -> *const std::os::raw::c_char {
-    unsafe {
-        let va1b = ptr as *const pg_sys::varattrib_1b;
-        (*va1b)
-            .va_data
-            .as_slice(varsize_1b(ptr as *const pg_sys::varlena) as usize)
-            .as_ptr() as *const std::os::raw::c_char
-    }
+pub unsafe fn vardata_1b(ptr: *const pg_sys::varlena) -> *const std::os::raw::c_char {
+    let va1b = ptr as *const pg_sys::varattrib_1b;
+    (*va1b)
+        .va_data
+        .as_slice(varsize_1b(ptr as *const pg_sys::varlena) as usize)
+        .as_ptr() as *const std::os::raw::c_char
 }
 
 /// ```c
@@ -226,14 +238,12 @@ pub fn vardata_1b(ptr: *const pg_sys::varlena) -> *const std::os::raw::c_char {
 /// ```
 #[allow(clippy::cast_ptr_alignment)]
 #[inline]
-pub fn vardata_4b(ptr: *const pg_sys::varlena) -> *const std::os::raw::c_char {
-    unsafe {
-        let va1b = ptr as *const pg_sys::varattrib_4b__bindgen_ty_1; // 4byte
-        (*va1b)
-            .va_data
-            .as_slice(varsize_1b(ptr as *const pg_sys::varlena) as usize)
-            .as_ptr() as *const std::os::raw::c_char
-    }
+pub unsafe fn vardata_4b(ptr: *const pg_sys::varlena) -> *const std::os::raw::c_char {
+    let va1b = ptr as *const pg_sys::varattrib_4b__bindgen_ty_1; // 4byte
+    (*va1b)
+        .va_data
+        .as_slice(varsize_1b(ptr as *const pg_sys::varlena) as usize)
+        .as_ptr() as *const std::os::raw::c_char
 }
 
 /// ```c
@@ -241,14 +251,12 @@ pub fn vardata_4b(ptr: *const pg_sys::varlena) -> *const std::os::raw::c_char {
 /// ```
 #[allow(clippy::cast_ptr_alignment)]
 #[inline]
-pub fn vardata_4b_c(ptr: *const pg_sys::varlena) -> *const std::os::raw::c_char {
-    unsafe {
-        let va1b = ptr as *const pg_sys::varattrib_4b__bindgen_ty_2; // compressed
-        (*va1b)
-            .va_data
-            .as_slice(varsize_1b(ptr as *const pg_sys::varlena) as usize)
-            .as_ptr() as *const std::os::raw::c_char
-    }
+pub unsafe fn vardata_4b_c(ptr: *const pg_sys::varlena) -> *const std::os::raw::c_char {
+    let va1b = ptr as *const pg_sys::varattrib_4b__bindgen_ty_2; // compressed
+    (*va1b)
+        .va_data
+        .as_slice(varsize_1b(ptr as *const pg_sys::varlena) as usize)
+        .as_ptr() as *const std::os::raw::c_char
 }
 
 /// ```c
@@ -256,14 +264,12 @@ pub fn vardata_4b_c(ptr: *const pg_sys::varlena) -> *const std::os::raw::c_char 
 /// ```
 #[allow(clippy::cast_ptr_alignment)]
 #[inline]
-pub fn vardata_1b_e(ptr: *const pg_sys::varlena) -> *const std::os::raw::c_char {
-    unsafe {
-        let va1b = ptr as *const pg_sys::varattrib_1b_e;
-        (*va1b)
-            .va_data
-            .as_slice(varsize_1b(ptr as *const pg_sys::varlena) as usize)
-            .as_ptr() as *const std::os::raw::c_char
-    }
+pub unsafe fn vardata_1b_e(ptr: *const pg_sys::varlena) -> *const std::os::raw::c_char {
+    let va1b = ptr as *const pg_sys::varattrib_1b_e;
+    (*va1b)
+        .va_data
+        .as_slice(varsize_1b(ptr as *const pg_sys::varlena) as usize)
+        .as_ptr() as *const std::os::raw::c_char
 }
 
 /// ```c
@@ -273,7 +279,7 @@ pub fn vardata_1b_e(ptr: *const pg_sys::varlena) -> *const std::os::raw::c_char 
 ///	    (VARATT_IS_1B(PTR) ? VARDATA_1B(PTR) : VARDATA_4B(PTR))
 /// ```
 #[inline]
-pub fn vardata_any(ptr: *const pg_sys::varlena) -> *const std::os::raw::c_char {
+pub unsafe fn vardata_any(ptr: *const pg_sys::varlena) -> *const std::os::raw::c_char {
     if varatt_is_1b(ptr) {
         vardata_1b(ptr)
     } else {

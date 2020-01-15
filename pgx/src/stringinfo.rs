@@ -2,7 +2,7 @@
 
 use crate::pg_sys;
 use std::ffi::CStr;
-use std::os::raw::c_char;
+use std::io::Error;
 
 #[derive(Debug)]
 pub struct StringInfo {
@@ -27,6 +27,17 @@ impl<'a> Into<&'a std::ffi::CStr> for StringInfo {
                 len as usize,
             ))
         }
+    }
+}
+
+impl std::io::Write for StringInfo {
+    fn write(&mut self, buf: &[u8]) -> Result<usize, Error> {
+        self.push_bytes(buf);
+        Ok(buf.len())
+    }
+
+    fn flush(&mut self) -> Result<(), Error> {
+        Ok(())
     }
 }
 
@@ -108,12 +119,16 @@ impl StringInfo {
     }
 
     pub fn push(&mut self, ch: char) {
-        unsafe { pg_sys::appendStringInfoChar(self.sid, ch as c_char) }
+        unsafe { pg_sys::appendStringInfoChar(self.sid, ch as std::os::raw::c_char) }
     }
 
     pub fn push_str(&mut self, s: &str) {
         unsafe {
-            pg_sys::appendBinaryStringInfo(self.sid, s.as_ptr() as *const c_char, s.len() as i32)
+            pg_sys::appendBinaryStringInfo(
+                self.sid,
+                s.as_ptr() as *const std::os::raw::c_char,
+                s.len() as i32,
+            )
         }
     }
 
@@ -121,7 +136,7 @@ impl StringInfo {
         unsafe {
             pg_sys::appendBinaryStringInfo(
                 self.sid,
-                bytes.as_ptr() as *const c_char,
+                bytes.as_ptr() as *const std::os::raw::c_char,
                 bytes.len() as i32,
             )
         }
