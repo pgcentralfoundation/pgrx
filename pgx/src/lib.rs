@@ -22,6 +22,7 @@ pub mod nodes;
 pub mod oids;
 pub mod pg_sys;
 pub mod pgbox;
+pub mod postgres_type;
 pub mod spi;
 pub mod stringinfo;
 pub mod tupdesc;
@@ -37,7 +38,9 @@ pub use memcxt::*;
 pub use nodes::{is_a, PgNode, PgNodeFactory}; // be specific since we have multiple versions of these things behind feature gates
 pub use oids::*;
 pub use pgbox::*;
+pub use postgres_type::*;
 pub use spi::*;
+pub use stringinfo::*;
 pub use tupdesc::*;
 pub use varlena::*;
 

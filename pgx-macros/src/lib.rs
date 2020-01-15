@@ -7,8 +7,9 @@ use proc_macro2::{Ident, Span};
 use quote::{quote, quote_spanned};
 use rewriter::*;
 use std::collections::HashSet;
+use syn::export::ToTokens;
 use syn::spanned::Spanned;
-use syn::{parse_macro_input, Item, ItemFn};
+use syn::{parse_macro_input, Attribute, DeriveInput, Item, ItemFn};
 
 #[proc_macro_attribute]
 pub fn pg_guard(_attr: TokenStream, item: TokenStream) -> TokenStream {
@@ -112,10 +113,108 @@ fn rewrite_item_fn(mut func: ItemFn, is_raw: bool, no_guard: bool) -> proc_macro
 
         #rewritten_func
     }
+}
 
-    // TODO:  how to automatically convert function arguments?
-    // TODO:  should we even do that?  I think macros in favor of
-    // TODO:  mimicking PG_GETARG_XXX() makes more sense
+#[proc_macro_derive(PostgresType, attributes(inoutfuncs, schema))]
+pub fn postgres_type(input: TokenStream) -> TokenStream {
+    let ast = parse_macro_input!(input as syn::DeriveInput);
+
+    impl_postgres_type(&ast).into()
+}
+
+fn impl_postgres_type(ast: &DeriveInput) -> proc_macro2::TokenStream {
+    let name = &ast.ident;
+    let funcname_in = Ident::new(&format!("{}_in", name).to_lowercase(), name.span());
+    let funcname_out = Ident::new(&format!("{}_out", name).to_lowercase(), name.span());
+    let mut args = parse_postgres_type_args(&ast.attrs);
+    let mut stream = proc_macro2::TokenStream::new();
+
+    if args.is_empty() {
+        // assume the user wants us to implement the InOutFuncs
+        args.insert(PostgresTypeAttribute::Default);
+    }
+
+    if args.contains(&PostgresTypeAttribute::Default) {
+        stream.extend(quote! {
+            impl InOutFuncs for #name {}
+        });
+    }
+
+    stream.extend(quote! {
+
+        impl pgx::FromDatum<#name> for #name {
+            #[inline]
+            unsafe fn from_datum(datum: pgx::pg_sys::Datum, is_null: bool, typoid: pgx::pg_sys::Oid) -> Option<#name> {
+                if is_null {
+                    None
+                } else if datum == 0 {
+                    panic!("{} datum flagged non-null but its datum is zero", stringify!(#name));
+                } else {
+                    Some(pgx::from_varlena(datum as *const pgx::pg_sys::varlena)
+                        .expect(&format!("failed to deserialize a {}", stringify!(#name))))
+                }
+            }
+        }
+
+        impl pgx::IntoDatum<#name> for #name {
+            #[inline]
+            fn into_datum(self) -> Option<pgx::pg_sys::Datum> {
+                Some(pgx::to_varlena(&self).expect(&format!("failed to serialize a {}", stringify!(#name))) as pgx::pg_sys::Datum)
+            }
+        }
+
+        #[pg_extern(immutable)]
+        fn #funcname_in(input: &std::ffi::CStr) -> #name {
+            #name::input(input.to_str().unwrap()).expect(&format!("failed to convert input to a {}", stringify!(#name)))
+        }
+
+        #[pg_extern(immutable)]
+        fn #funcname_out(input: #name) -> &'static std::ffi::CStr {
+            let mut buffer = StringInfo::new();
+            input.output(&mut buffer);
+            buffer.into()
+        }
+    });
+
+    stream
+}
+
+#[derive(Debug, Hash, Ord, PartialOrd, Eq, PartialEq)]
+enum PostgresTypeAttribute {
+    Custom,
+    Default,
+    Schema(String),
+}
+
+fn parse_postgres_type_args(attributes: &Vec<Attribute>) -> HashSet<PostgresTypeAttribute> {
+    let mut categorized_attributes = HashSet::new();
+
+    for a in attributes {
+        match a.path.to_token_stream().to_string().as_str() {
+            "inoutfuncs" => match a.tokens.to_string().as_str() {
+                "= \"Custom\"" => categorized_attributes.insert(PostgresTypeAttribute::Custom),
+
+                "= \"Default\"" => categorized_attributes.insert(PostgresTypeAttribute::Default),
+
+                _ => panic!("unrecognized PostgresType property: {}", a.tokens),
+            },
+
+            "schema" => categorized_attributes.insert(PostgresTypeAttribute::Schema(
+                a.tokens
+                    .to_string()
+                    .trim_start_matches('=')
+                    .trim()
+                    .to_string(),
+            )),
+
+            _ => panic!(
+                "unrecognized PostgresType attribute: {}",
+                a.path.to_token_stream().to_string()
+            ),
+        };
+    }
+
+    categorized_attributes
 }
 
 #[derive(Debug, Hash, Ord, PartialOrd, Eq, PartialEq)]

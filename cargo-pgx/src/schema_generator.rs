@@ -253,11 +253,52 @@ fn make_create_function_statements(rs_file: &DirEntry) -> Vec<String> {
 }
 
 fn walk_items(rs_file: &DirEntry, sql: &mut Vec<String>, items: Vec<Item>) {
+    let mut postgres_types = Vec::new();
     for item in items {
         if let Item::Mod(modd) = item {
             match modd.content {
                 Some((_, items)) => walk_items(rs_file, sql, items),
                 None => {}
+            }
+        } else if let Item::Struct(strct) = item {
+            let mut schema = String::new();
+            let mut found_postgres_type = false;
+            for a in strct.attrs {
+                let string = a.to_token_stream().to_string();
+
+                if string.contains("PostgresType") {
+                    found_postgres_type = true;
+                } else if string.starts_with("# [ schema = \"") {
+                    let re = regex::Regex::new(r#".*"(.*?)".*"#).unwrap();
+                    schema = re
+                        .captures(string.as_str())
+                        .unwrap()
+                        .get(1)
+                        .unwrap()
+                        .as_str()
+                        .to_string();
+                }
+            }
+
+            if found_postgres_type {
+                let name = strct.ident.to_string().to_lowercase();
+                if !schema.is_empty() {
+                    schema = format!("{}.", schema);
+                }
+                sql.push(format!("CREATE TYPE {}{};", schema, name));
+
+                postgres_types.push(format!("CREATE OR REPLACE FUNCTION {name}_in(cstring) RETURNS {name} IMMUTABLE STRICT LANGUAGE C AS 'MODULE_PATHNAME', '{name}_in_wrapper';", name = name));
+                postgres_types.push(format!("CREATE OR REPLACE FUNCTION {name}_out({name}) RETURNS cstring IMMUTABLE STRICT LANGUAGE C AS 'MODULE_PATHNAME', '{name}_out_wrapper';", name = name));
+                postgres_types.push(format!(
+                    "CREATE TYPE {schema}{name} (
+                        INTERNALLENGTH = variable,
+                        INPUT = {name}_in,
+                        OUTPUT = {name}_out,
+                        STORAGE = extended
+                    );",
+                    schema = schema,
+                    name = name,
+                ));
             }
         } else if let Item::Macro(makro) = item {
             let name = makro
@@ -336,6 +377,8 @@ fn walk_items(rs_file: &DirEntry, sql: &mut Vec<String>, items: Vec<Item>) {
             sql.append(&mut function_sql);
         }
     }
+
+    sql.append(&mut postgres_types);
 }
 
 fn make_create_function_statement(

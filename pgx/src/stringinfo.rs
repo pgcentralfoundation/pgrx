@@ -16,15 +16,15 @@ impl Into<pg_sys::StringInfo> for StringInfo {
     }
 }
 
-impl<'a> Into<&'a std::ffi::CStr> for StringInfo {
-    fn into(self) -> &'a std::ffi::CStr {
+impl Into<&'static std::ffi::CStr> for StringInfo {
+    fn into(self) -> &'static std::ffi::CStr {
         let len = self.len();
         let ptr = self.into_char_ptr();
 
         unsafe {
             std::ffi::CStr::from_bytes_with_nul_unchecked(std::slice::from_raw_parts(
                 ptr as *const u8,
-                len as usize,
+                (len + 1) as usize, // +1 to get the trailing null byte
             ))
         }
     }
