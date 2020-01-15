@@ -44,11 +44,13 @@ mod pg_12 {
     #[inline]
     pub fn pg_getarg<T: FromDatum<T>>(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> Option<T> {
         let datum = get_nullable_datum(fcinfo, num);
-        T::from_datum(
-            datum.value,
-            datum.isnull,
-            crate::get_getarg_type(fcinfo, num),
-        )
+        unsafe {
+            T::from_datum(
+                datum.value,
+                datum.isnull,
+                crate::get_getarg_type(fcinfo, num),
+            )
+        }
     }
 
     #[inline]
