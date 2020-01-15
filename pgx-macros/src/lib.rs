@@ -56,9 +56,9 @@ pub fn pg_test(attr: TokenStream, item: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(item as syn::Item);
     match ast {
         Item::Fn(func) => {
-            let sql_funcname = format!("{}_wrapper", func.sig.ident.to_string());
+            let sql_funcname = func.sig.ident.to_string();
             let test_func_name =
-                Ident::new(&format!("{}_test", func.sig.ident.to_string()), func.span());
+                Ident::new(&format!("pg_{}", func.sig.ident.to_string()), func.span());
 
             stream.extend(quote! {
                 #[test]
