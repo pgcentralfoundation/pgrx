@@ -13,6 +13,10 @@ use std::fmt::Debug;
 #[allow(non_camel_case_types)]
 pub type void_ptr = *const std::os::raw::c_void;
 
+/// A shorter type name for a `*mut std::os::raw::c_void`
+#[allow(non_camel_case_types)]
+pub type void_mut_ptr = *mut std::os::raw::c_void;
+
 /// An Enumeration of Postgres top-level MemoryContexts.  Each have their own use and "lifetimes"
 /// as defined by Postgres' memory management model.
 ///
@@ -266,6 +270,14 @@ impl PgMemoryContexts {
     /// Allocate memory in this context, which will be free'd whenever Postgres deletes this MeoryContext
     pub fn palloc(&mut self, len: usize) -> *mut std::os::raw::c_void {
         unsafe { pg_sys::MemoryContextAlloc(self.value(), len) }
+    }
+
+    pub fn palloc_struct<T>(&mut self) -> *mut T {
+        self.palloc(std::mem::size_of::<T>()) as *mut T
+    }
+
+    pub fn palloc0_struct<T>(&mut self) -> *mut T {
+        self.palloc0(std::mem::size_of::<T>()) as *mut T
     }
 
     /// Allocate a slice in this context, which will be free'd whenever Postgres deletes this MeoryContext

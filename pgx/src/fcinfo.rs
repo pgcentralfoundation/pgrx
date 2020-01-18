@@ -203,9 +203,8 @@ pub fn direct_function_call_as_datum(
 
     let mut fcid = make_function_call_info(nargs, arg_array, null_array);
     let datum = unsafe { func(fcid.deref_mut()) };
-    let is_null = fcid.as_ref().unwrap().isnull;
 
-    if is_null {
+    if fcid.isnull {
         None
     } else {
         Some(datum)

@@ -1,13 +1,7 @@
 use crate::nodes::PgNode;
-use crate::{pg_sys, PgMemoryContexts};
+use crate::{pg_sys, void_mut_ptr, PgMemoryContexts};
 use std::fmt::{Debug, Error, Formatter};
 use std::ops::{Deref, DerefMut};
-
-#[derive(Debug)]
-enum WhoAllocated {
-    Postgres,
-    Rust,
-}
 
 /// Similar to Rust's `Box<T>` type, `PgBox<T>` represents heap-allocated memory.
 ///
@@ -94,7 +88,7 @@ enum WhoAllocated {
 ///
 pub struct PgBox<T> {
     ptr: Option<*mut T>,
-    owner: WhoAllocated,
+    allocated_by_pg: bool,
 }
 
 impl<T: Debug> Debug for PgBox<T> {
@@ -107,12 +101,12 @@ impl<T: Debug> Debug for PgBox<T> {
                     ptr.as_ref()
                         .expect("impl Debug for PgBox expected self.ptr to be non-NULL")
                 },
-                self.owner
+                self.owner_string()
             )),
             None => f.write_str(&format!(
                 "PgBox<{}> (ptr=NULL, owner={:?})",
                 std::any::type_name::<T>(),
-                self.owner
+                self.owner_string()
             )),
         }
     }
@@ -134,7 +128,7 @@ impl<T> PgBox<T> {
     pub fn alloc() -> PgBox<T> {
         PgBox::<T> {
             ptr: Some(unsafe { pg_sys::palloc(std::mem::size_of::<T>()) as *mut T }),
-            owner: WhoAllocated::Rust,
+            allocated_by_pg: false,
         }
     }
 
@@ -153,7 +147,7 @@ impl<T> PgBox<T> {
     pub fn alloc0() -> PgBox<T> {
         PgBox::<T> {
             ptr: Some(unsafe { pg_sys::palloc0(std::mem::size_of::<T>()) as *mut T }),
-            owner: WhoAllocated::Rust,
+            allocated_by_pg: false,
         }
     }
 
@@ -174,7 +168,7 @@ impl<T> PgBox<T> {
             ptr: Some(unsafe {
                 pg_sys::MemoryContextAlloc(memory_context.value(), std::mem::size_of::<T>())
             } as *mut T),
-            owner: WhoAllocated::Rust,
+            allocated_by_pg: false,
         }
     }
 
@@ -195,7 +189,7 @@ impl<T> PgBox<T> {
             ptr: Some(unsafe {
                 pg_sys::MemoryContextAllocZero(memory_context.value(), std::mem::size_of::<T>())
             } as *mut T),
-            owner: WhoAllocated::Rust,
+            allocated_by_pg: false,
         }
     }
 
@@ -216,7 +210,7 @@ impl<T> PgBox<T> {
     pub fn null() -> PgBox<T> {
         PgBox::<T> {
             ptr: None,
-            owner: WhoAllocated::Rust,
+            allocated_by_pg: false,
         }
     }
 
@@ -227,7 +221,7 @@ impl<T> PgBox<T> {
     pub fn from_pg(ptr: *mut T) -> PgBox<T> {
         PgBox::<T> {
             ptr: if ptr.is_null() { None } else { Some(ptr) },
-            owner: WhoAllocated::Postgres,
+            allocated_by_pg: true,
         }
     }
 
@@ -245,22 +239,6 @@ impl<T> PgBox<T> {
         }
     }
 
-    pub fn as_ref<'a>(&self) -> Option<&'a T> {
-        let ptr = self.ptr;
-        match ptr {
-            Some(ptr) => unsafe { ptr.as_ref() },
-            None => None,
-        }
-    }
-
-    pub fn as_mut<'a>(&self) -> Option<&'a mut T> {
-        let ptr = self.ptr;
-        match ptr {
-            Some(ptr) => unsafe { ptr.as_mut() },
-            None => None,
-        }
-    }
-
     /// Consume this instance and return the boxed pointer as a pg_sys::Datum, so that it can be
     /// passed back into a Postgres function
     pub fn convert_to_datum(self) -> pg_sys::Datum {
@@ -270,13 +248,19 @@ impl<T> PgBox<T> {
     /// Useful for returning the boxed pointer back to Postgres (as a return value, for example).
     ///
     /// Rust forgets the Box and the boxed pointer is **not** free'd by Rust
-    pub fn into_pg(self) -> *mut T {
-        let ptr = self.ptr;
-        std::mem::forget(self);
-
-        match ptr {
+    pub fn into_pg(mut self) -> *mut T {
+        self.allocated_by_pg = true;
+        match self.ptr {
             Some(ptr) => ptr,
             None => std::ptr::null_mut(),
+        }
+    }
+
+    fn owner_string(&self) -> &str {
+        if self.allocated_by_pg {
+            "Postgres"
+        } else {
+            "Rust"
         }
     }
 }
@@ -303,16 +287,10 @@ impl<T> DerefMut for PgBox<T> {
 
 impl<T> Drop for PgBox<T> {
     fn drop(&mut self) {
-        if self.ptr.is_some() {
-            match self.owner {
-                WhoAllocated::Postgres => { /* do nothing, we'll let Postgres free the pointer */ }
-                WhoAllocated::Rust => {
-                    // we own it here in rust, so we need to free it too
-                    let ptr = self.ptr.expect("ptr was None when it shouldn't have been");
-                    unsafe {
-                        pg_sys::pfree(ptr as *mut std::ffi::c_void);
-                    }
-                }
+        if !self.allocated_by_pg && !self.ptr.is_none() {
+            let ptr = self.ptr.expect("PgBox ptr was null during Drop");
+            unsafe {
+                pg_sys::pfree(ptr as void_mut_ptr);
             }
         }
     }
@@ -321,7 +299,12 @@ impl<T> Drop for PgBox<T> {
 impl<T: Debug> std::fmt::Display for PgBox<T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self.ptr {
-            Some(_) => write!(f, "PgBox {{ owner={:?}, {:?} }}", self.owner, self.deref()),
+            Some(_) => write!(
+                f,
+                "PgBox {{ owner={:?}, {:?} }}",
+                self.owner_string(),
+                self.deref()
+            ),
             None => std::fmt::Display::fmt("NULL", f),
         }
     }
