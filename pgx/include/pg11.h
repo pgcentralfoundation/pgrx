@@ -12,6 +12,7 @@
 #undef ScanKey
 
 #include "catalog/index.h"
+#include "catalog/namespace.h"
 #include "catalog/pg_type.h"
 #include "commands/event_trigger.h"
 #include "executor/executor.h"
@@ -20,10 +21,15 @@
 #include "nodes/extensible.h"
 #include "nodes/makefuncs.h"
 #include "nodes/nodes.h"
+#include "nodes/relation.h"
 #include "nodes/replnodes.h"
 #include "nodes/tidbitmap.h"
 #include "nodes/value.h"
+#include "optimizer/clauses.h"
+#include "optimizer/paths.h"
+#include "optimizer/pathnode.h"
 #include "optimizer/planner.h"
+#include "optimizer/restrictinfo.h"
 #include "storage/block.h"
 #include "storage/itemptr.h"
 #include "utils/builtins.h"
