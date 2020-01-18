@@ -87,7 +87,7 @@ fn main() -> Result<(), std::io::Error> {
     ]
     .par_iter()
     .for_each(|v| {
-        let mut regen = false;
+        let mut regen = true;
         let version = v.0;
         let branch_name = v.1;
         let port_no = u16::from_str(v.2).unwrap();
@@ -103,7 +103,7 @@ fn main() -> Result<(), std::io::Error> {
                 .expect(&format!("Unable to git clone {}", pg_git_repo_url));
 
         if !common_rs.is_file() || !version_specific_rs.is_file() {
-            regen_flag.store(true, Ordering::SeqCst);
+            regen = true;
         }
 
         if need_configure_and_make || !config_status.is_file() {
@@ -116,8 +116,6 @@ fn main() -> Result<(), std::io::Error> {
                 "Unable to make clean and configure postgres branch {}",
                 branch_name
             ));
-
-            regen = true;
         } else if output_rs.is_file()
             && std::fs::metadata(&build_rs)
                 .unwrap()
@@ -132,8 +130,6 @@ fn main() -> Result<(), std::io::Error> {
             );
             std::fs::remove_file(&output_rs)
                 .expect(&format!("couldn't delete {}", output_rs.display()));
-
-            regen = true;
         } else if output_rs.is_file()
             && std::fs::metadata(&include_h)
                 .unwrap()
