@@ -25,6 +25,23 @@ pub fn is_a(nodeptr: *mut pg_sys::Node, tag: pg_sys::NodeTag) -> bool {
     !nodeptr.is_null() && (unsafe { *nodeptr }).type_ == tag
 }
 
+pub fn node_to_string<'a>(nodeptr: *mut pg_sys::Node) -> Option<&'a str> {
+    if nodeptr.is_null() {
+        None
+    } else {
+        let string = unsafe { pg_sys::nodeToString(nodeptr as crate::void_ptr) };
+        if string.is_null() {
+            None
+        } else {
+            Some(
+                unsafe { std::ffi::CStr::from_ptr(string) }
+                    .to_str()
+                    .expect("unable to convert Node into a &str"),
+            )
+        }
+    }
+}
+
 impl PgNode {
     pub fn is<T>(self, boxed: PgBox<T>) -> bool {
         let node = boxed.to_pg() as *mut pg_sys::Node;
