@@ -142,6 +142,8 @@ mod internal {
         pub use crate::pg_sys::common::*;
         pub use crate::pg_sys::pg10_specific::*;
 
+        pub use crate::pg_sys::pg10_specific::AllocSetContextCreate as AllocSetContextCreateExtended;
+
         pub unsafe fn IndexBuildHeapScan<T>(
             heap_relation: crate::pg_sys::Relation,
             index_relation: crate::pg_sys::Relation,
@@ -188,6 +190,8 @@ mod internal {
     mod pg12 {
         pub use crate::pg_sys::common::*;
         pub use crate::pg_sys::pg12_specific::*;
+
+        pub use crate::pg_sys::pg12_specific::AllocSetContextCreateInternal as AllocSetContextCreateExtended;
 
         pub unsafe fn IndexBuildHeapScan<T>(
             heap_relation: crate::pg_sys::Relation,
