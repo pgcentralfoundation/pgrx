@@ -329,6 +329,7 @@ fn monitor_pg(mut command: Command, cmd_string: String, loglines: LogLines) -> (
         );
 
         let regex = regex::Regex::new(r#"\[.*?\] \[.*?\] \[(?P<session_id>.*?)\]"#).unwrap();
+        let mut is_started_yet = false;
         for line in reader.lines() {
             match line {
                 Ok(line) => {
@@ -340,9 +341,10 @@ fn monitor_pg(mut command: Command, cmd_string: String, loglines: LogLines) -> (
                     if line.contains("database system is ready to accept connections") {
                         // Postgres says it's ready to go
                         sender.send((pid, session_id.clone())).unwrap();
+                        is_started_yet = true;
                     }
 
-                    if line.contains("TMSG: ") {
+                    if !is_started_yet || line.contains("TMSG: ") {
                         eprintln!("{}", line.cyan());
                     }
 
@@ -381,7 +383,7 @@ fn monitor_pg(mut command: Command, cmd_string: String, loglines: LogLines) -> (
 
     // wait for Postgres to indicate it's ready to accept connection
     // and return its pid when it is
-    receiver.recv().unwrap()
+    receiver.recv().expect("Postgres failed to start")
 }
 
 fn dropdb() {
