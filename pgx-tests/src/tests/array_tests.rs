@@ -1,4 +1,5 @@
 use pgx::*;
+use serde_json::*;
 
 /// ```funcname
 /// sum_array
@@ -56,11 +57,34 @@ fn optional_array_arg(values: Option<Array<f32>>) -> f32 {
     values.unwrap().iter().map(|v| v.unwrap_or(0f32)).sum()
 }
 
+#[pg_extern]
+fn iterate_array_with_deny_null(values: Array<i32>) {
+    for _ in values.iter_deny_null() {
+        // noop
+    }
+}
+
+#[pg_extern]
+fn serde_serialize_array(values: Array<&str>) -> Json {
+    Json(json! { { "values": values } })
+}
+
+#[pg_extern]
+fn serde_serialize_array_i32(values: Array<i32>) -> Json {
+    Json(json! { { "values": values } })
+}
+
+#[pg_extern]
+fn serde_serialize_array_i32_deny_null(values: Array<i32>) -> Json {
+    Json(json! { { "values": values.iter_deny_null() } })
+}
+
 mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
 
     use pgx::*;
+    use serde_json::json;
 
     #[pg_test]
     fn test_sum_array_i32() {
@@ -123,5 +147,32 @@ mod tests {
         let sum = Spi::get_one::<f32>("SELECT optional_array_arg(ARRAY[1,2,3]::real[])");
         assert!(sum.is_some());
         assert_eq!(sum.unwrap(), 6f32);
+    }
+
+    #[pg_test(error = "array contains NULL")]
+    fn test_array_deny_nulls() {
+        Spi::run("SELECT iterate_array_with_deny_null(ARRAY[1,2,3, NULL]::int[])");
+    }
+
+    #[pg_test]
+    fn test_serde_serialize_array() {
+        let json = Spi::get_one::<Json>(
+            "SELECT serde_serialize_array(ARRAY['one', null, 'two', 'three'])",
+        )
+        .expect("returned json was null");
+        assert_eq!(json.0, json! {{"values": ["one", null, "two", "three"]}});
+    }
+
+    #[pg_test]
+    fn test_serde_serialize_array_i32() {
+        let json = Spi::get_one::<Json>("SELECT serde_serialize_array_i32(ARRAY[1,2,3,null, 4])")
+            .expect("returned json was null");
+        assert_eq!(json.0, json! {{"values": [1,2,3,null,4]}});
+    }
+
+    #[pg_test(error = "array contains NULL")]
+    fn test_serde_serialize_array_i32_deny_null() {
+        Spi::get_one::<Json>("SELECT serde_serialize_array_i32_deny_null(ARRAY[1,2,3,null, 4])")
+            .expect("returned json was null");
     }
 }

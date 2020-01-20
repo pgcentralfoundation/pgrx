@@ -1,4 +1,5 @@
 use crate::{pg_sys, FromDatum};
+use serde::Serializer;
 use std::marker::PhantomData;
 
 pub struct Array<'a, T: FromDatum<T>> {
@@ -10,6 +11,24 @@ pub struct Array<'a, T: FromDatum<T>> {
     elem_slice: &'a [pg_sys::Datum],
     null_slice: &'a [bool],
     _marker: PhantomData<T>,
+}
+
+impl<'a, T: FromDatum<T> + serde::Serialize> serde::Serialize for Array<'a, T> {
+    fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error>
+    where
+        S: Serializer,
+    {
+        serializer.collect_seq(self.iter())
+    }
+}
+
+impl<'a, T: FromDatum<T> + serde::Serialize> serde::Serialize for ArrayTypedIterator<'a, T> {
+    fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error>
+    where
+        S: Serializer,
+    {
+        serializer.collect_seq(self.array.iter())
+    }
 }
 
 impl<'a, T: FromDatum<T>> Array<'a, T> {
@@ -51,7 +70,7 @@ impl<'a, T: FromDatum<T>> Array<'a, T> {
 
     pub fn into_array_type(self) -> *const pg_sys::ArrayType {
         if self.array_type.is_null() {
-            panic!("attempt to dereference a null Array");
+            panic!("attempt to dereference a NULL array");
         }
 
         let ptr = self.array_type;
@@ -70,8 +89,25 @@ impl<'a, T: FromDatum<T>> Array<'a, T> {
         }
     }
 
+    /// Return an Iterator of Option<T> over the contained Datums.
     pub fn iter(&self) -> ArrayIterator<'_, T> {
         ArrayIterator {
+            array: self,
+            curr: 0,
+        }
+    }
+
+    /// Return an Iterator of the contained Datums (converted to Rust types).
+    ///
+    /// This function will panic when called if the array contains any SQL NULL values.
+    pub fn iter_deny_null(&self) -> ArrayTypedIterator<'_, T> {
+        if self.array_type.is_null() {
+            panic!("array is NULL");
+        } else if unsafe { pg_sys::array_contains_nulls(self.array_type) } {
+            panic!("array contains NULL");
+        }
+
+        ArrayTypedIterator {
             array: self,
             curr: 0,
         }
@@ -88,6 +124,29 @@ impl<'a, T: FromDatum<T>> Array<'a, T> {
             None
         } else {
             Some(unsafe { T::from_datum(self.elem_slice[i], self.null_slice[i], self.typoid) })
+        }
+    }
+}
+
+pub struct ArrayTypedIterator<'a, T: 'a + FromDatum<T>> {
+    array: &'a Array<'a, T>,
+    curr: usize,
+}
+
+impl<'a, T: FromDatum<T>> Iterator for ArrayTypedIterator<'a, T> {
+    type Item = T;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.curr >= self.array.nelems {
+            None
+        } else {
+            let element = self
+                .array
+                .get(self.curr)
+                .expect("array index out of bounds")
+                .expect("array element was unexpectedly NULL during iteration");
+            self.curr += 1;
+            Some(element)
         }
     }
 }
