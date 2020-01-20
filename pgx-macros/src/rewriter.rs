@@ -59,7 +59,7 @@ impl PgGuardRewriter {
         // nor do we need a visibility beyond "private"
         func.vis = Visibility::Inherited;
 
-        let arg_list = PgGuardRewriter::build_arg_list(&func.sig);
+        let arg_list = PgGuardRewriter::build_arg_list(&func.sig, true);
         let func_name = &func.sig.ident;
         let func_span = func.span().clone();
         let rewritten_args = self.rewrite_args(func.clone(), is_raw);
@@ -125,7 +125,7 @@ impl PgGuardRewriter {
         // nor do we need a visibility beyond "private"
         func.vis = Visibility::Inherited;
 
-        let arg_list = PgGuardRewriter::build_arg_list(&sig);
+        let arg_list = PgGuardRewriter::build_arg_list(&sig, false);
         let func_name = PgGuardRewriter::build_func_name(&sig);
 
         quote_spanned! {func.span()=>
@@ -172,14 +172,19 @@ impl PgGuardRewriter {
         sig.ident.clone()
     }
 
-    pub fn build_arg_list(sig: &Signature) -> proc_macro2::TokenStream {
+    pub fn build_arg_list(sig: &Signature, suffix_arg_name: bool) -> proc_macro2::TokenStream {
         let mut arg_list = proc_macro2::TokenStream::new();
 
         for arg in &sig.inputs {
             match arg {
                 FnArg::Typed(ty) => {
                     if let Pat::Ident(ident) = ty.pat.deref() {
-                        arg_list.extend(quote! { #ident, });
+                        if suffix_arg_name {
+                            let ident = Ident::new(&format!("{}_", ident.ident), ident.span());
+                            arg_list.extend(quote! { #ident, });
+                        } else {
+                            arg_list.extend(quote! { #ident, });
+                        }
                     }
                 }
                 FnArg::Receiver(_) => panic!(
@@ -316,7 +321,7 @@ impl FunctionSignatureRewriter {
                 FnArg::Receiver(_) => panic!("Functions that take self are not supported"),
                 FnArg::Typed(ty) => match ty.pat.deref() {
                     Pat::Ident(ident) => {
-                        let name = &ident.ident;
+                        let name = Ident::new(&format!("{}_", ident.ident), ident.span());
                         let type_ = &ty.ty;
                         let is_option = type_matches(type_, "Option");
 
@@ -340,7 +345,7 @@ impl FunctionSignatureRewriter {
                             }
                         } else {
                             quote_spanned! {ident.span()=>
-                                let #name = pgx::pg_getarg::<#type_>(fcinfo, #i).unwrap_or_else(|| panic!("{} is null", stringify!{#name}));
+                                let #name = pgx::pg_getarg::<#type_>(fcinfo, #i).unwrap_or_else(|| panic!("{} is null", stringify!{#ident}));
                             }
                         };
 

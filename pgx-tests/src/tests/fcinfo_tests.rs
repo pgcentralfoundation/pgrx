@@ -65,10 +65,16 @@ fn returns_none() -> Option<i32> {
     None
 }
 
+#[pg_extern]
+fn same_name(same_name: &str) -> &str {
+    same_name
+}
+
 mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
 
+    use crate::tests::fcinfo_tests::same_name;
     use pgx::*;
 
     #[test]
@@ -180,5 +186,12 @@ mod tests {
     unsafe fn test_returns_none() {
         let result = direct_function_call::<i32>(super::returns_none_wrapper, vec![]);
         assert!(result.is_none())
+    }
+
+    /// ensures that we can have a `#[pg_extern]` function with an argument that
+    /// shares its name
+    #[pg_test]
+    fn test_same_name() {
+        assert_eq!("test", same_name("test"));
     }
 }
