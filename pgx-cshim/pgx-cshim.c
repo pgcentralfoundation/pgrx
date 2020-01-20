@@ -1,4 +1,5 @@
 #include "postgres.h"
+#include "access/htup.h"
 #include "access/htup_details.h"
 #include "utils/memutils.h"
 #include "catalog/pg_type.h"
@@ -10,6 +11,8 @@ PGDLLEXPORT void pgx_elog_error(char *message);
 PGDLLEXPORT void pgx_ereport(int level, int code, char *message, char *file, int lineno, int colno);
 PGDLLEXPORT void pgx_SET_VARSIZE(struct varlena *ptr, int size);
 PGDLLEXPORT Datum pgx_heap_getattr(HeapTupleData *tuple, int attnum, TupleDesc tupdesc, bool *isnull);
+PGDLLEXPORT TransactionId pgx_HeapTupleHeaderGetXmin(HeapTupleHeader htup_header);
+PGDLLEXPORT TransactionId pgx_HeapTupleHeaderGetRawCommandId(HeapTupleHeader htup_header);
 
 MemoryContext pgx_GetMemoryContextChunk(void *ptr) {
     return GetMemoryChunkContext(ptr);
@@ -35,4 +38,12 @@ void pgx_SET_VARSIZE(struct varlena *ptr, int size) {
 
 Datum pgx_heap_getattr(HeapTupleData *tuple, int attnum, TupleDesc tupdesc, bool *isnull) {
     return heap_getattr(tuple, attnum, tupdesc, isnull);
+}
+
+TransactionId pgx_HeapTupleHeaderGetXmin(HeapTupleHeader htup_header) {
+    return HeapTupleHeaderGetXmin(htup_header);
+}
+
+CommandId pgx_HeapTupleHeaderGetRawCommandId(HeapTupleHeader htup_header) {
+    return HeapTupleHeaderGetRawCommandId(htup_header);
 }

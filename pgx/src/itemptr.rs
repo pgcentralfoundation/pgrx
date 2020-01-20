@@ -36,6 +36,13 @@ pub unsafe fn item_pointer_get_block_number_no_check(
     (((block_id.bi_hi as u32) << 16) | (block_id.bi_lo as u32)) as pg_sys::BlockNumber
 }
 
+pub fn item_pointer_to_u64(ctid: pg_sys::ItemPointerData) -> u64 {
+    let blockno = unsafe { item_pointer_get_block_number_no_check(&ctid) } as u64;
+    let offno = unsafe { item_pointer_get_offset_number_no_check(&ctid) } as u64;
+
+    (blockno << 32) | offno
+}
+
 /// ## Safety
 ///
 /// This function is unsafe because it does not check that the specified ItemPointerData pointer

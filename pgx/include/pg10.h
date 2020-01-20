@@ -9,6 +9,7 @@
 #include "access/htup_details.h"
 #include "access/relscan.h"
 #include "access/skey.h"
+#include "access/xact.h"
 
 #define ScanKey struct ScanKeyData *
 #include "nodes/execnodes.h"

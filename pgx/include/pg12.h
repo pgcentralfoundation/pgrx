@@ -8,6 +8,7 @@
 #include "access/relscan.h"
 #include "access/skey.h"
 #include "access/tableam.h"
+#include "access/xact.h"
 #include "catalog/index.h"
 #include "catalog/namespace.h"
 #include "catalog/pg_type.h"

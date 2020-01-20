@@ -50,6 +50,11 @@ mod all_versions {
         (super::BLCKSZ as usize / std::mem::size_of::<super::ItemIdData>()) as super::OffsetNumber;
     pub const InvalidBlockNumber: u32 = 0xFFFFFFFF as crate::pg_sys::BlockNumber;
     pub const VARHDRSZ: usize = std::mem::size_of::<super::int32>();
+    pub const InvalidTransactionId: super::TransactionId = 0 as super::TransactionId;
+    pub const BootstrapTransactionId: super::TransactionId = 1 as super::TransactionId;
+    pub const FrozenTransactionId: super::TransactionId = 2 as super::TransactionId;
+    pub const FirstNormalTransactionId: super::TransactionId = 3 as super::TransactionId;
+    pub const MaxTransactionId: super::TransactionId = 0xFFFFFFFF as super::TransactionId;
 
     #[inline]
     pub fn VARHDRSZ_EXTERNAL() -> usize {
@@ -77,6 +82,45 @@ mod all_versions {
         let ver = std::ffi::CStr::from_bytes_with_nul(super::PG_VERSION_STR).unwrap();
         ver.to_str().unwrap()
     }
+
+    #[inline]
+    pub fn TransactionIdIsNormal(xid: super::TransactionId) -> bool {
+        xid >= FirstNormalTransactionId
+    }
+
+    #[inline]
+    pub fn HeapTupleHeaderGetXmin(
+        htup_header: super::HeapTupleHeader,
+    ) -> Option<super::TransactionId> {
+        extern "C" {
+            pub fn pgx_HeapTupleHeaderGetXmin(
+                htup_header: super::HeapTupleHeader,
+            ) -> super::TransactionId;
+        }
+
+        if htup_header.is_null() {
+            None
+        } else {
+            Some(unsafe { pgx_HeapTupleHeaderGetXmin(htup_header) })
+        }
+    }
+
+    #[inline]
+    pub fn HeapTupleHeaderGetRawCommandId(
+        htup_header: super::HeapTupleHeader,
+    ) -> Option<super::CommandId> {
+        extern "C" {
+            pub fn pgx_HeapTupleHeaderGetRawCommandId(
+                htup_header: super::HeapTupleHeader,
+            ) -> super::CommandId;
+        }
+
+        if htup_header.is_null() {
+            None
+        } else {
+            Some(unsafe { pgx_HeapTupleHeaderGetRawCommandId(htup_header) })
+        }
+    }
 }
 
 mod internal {
@@ -96,34 +140,7 @@ mod internal {
     #[cfg(feature = "pg10")]
     mod pg10 {
         pub use crate::pg_sys::common::*;
-
-        pub type FunctionCallInfo = *mut crate::pg_sys::pg10_specific::FunctionCallInfoData;
-        pub type TupleDesc = *mut crate::pg_sys::pg10_specific::tupleDesc;
-
-        pub use crate::pg_sys::pg10_specific::AllocSetContextCreate as AllocSetContextCreateExtended;
-        pub use crate::pg_sys::pg10_specific::CustomPathMethods;
-        pub use crate::pg_sys::pg10_specific::EState;
-        pub use crate::pg_sys::pg10_specific::ExplainState;
-        pub use crate::pg_sys::pg10_specific::IndexAmRoutine;
-        pub use crate::pg_sys::pg10_specific::IndexInfo;
-        pub use crate::pg_sys::pg10_specific::IndexPath;
-        pub use crate::pg_sys::pg10_specific::IndexScanDescData;
-        pub use crate::pg_sys::pg10_specific::IndexVacuumInfo;
-        pub use crate::pg_sys::pg10_specific::InterruptPending;
-        pub use crate::pg_sys::pg10_specific::NodeTag_T_CustomPath;
-        pub use crate::pg_sys::pg10_specific::NodeTag_T_CustomScan;
-        pub use crate::pg_sys::pg10_specific::NodeTag_T_CustomScanState;
-        pub use crate::pg_sys::pg10_specific::NodeTag_T_IndexAmRoutine;
-        pub use crate::pg_sys::pg10_specific::ParallelContext;
-        pub use crate::pg_sys::pg10_specific::PlannerInfo;
-        pub use crate::pg_sys::pg10_specific::RangeTblEntry;
-        pub use crate::pg_sys::pg10_specific::RelOptInfo;
-        pub use crate::pg_sys::pg10_specific::RestrictInfo;
-        pub use crate::pg_sys::pg10_specific::TupleTableSlot;
-        pub use crate::pg_sys::pg10_specific::PG_MAJORVERSION;
-        pub use crate::pg_sys::pg10_specific::PG_VERSION;
-        pub use crate::pg_sys::pg10_specific::PG_VERSION_NUM;
-        pub use crate::pg_sys::pg10_specific::PG_VERSION_STR;
+        pub use crate::pg_sys::pg10_specific::*;
 
         pub unsafe fn IndexBuildHeapScan<T>(
             heap_relation: crate::pg_sys::Relation,
@@ -146,34 +163,7 @@ mod internal {
     #[cfg(feature = "pg11")]
     mod pg11 {
         pub use crate::pg_sys::common::*;
-
-        pub type FunctionCallInfo = *mut crate::pg_sys::pg11_specific::FunctionCallInfoData;
-        pub type TupleDesc = *mut crate::pg_sys::pg11_specific::tupleDesc;
-
-        pub use crate::pg_sys::pg11_specific::AllocSetContextCreateExtended;
-        pub use crate::pg_sys::pg11_specific::CustomPathMethods;
-        pub use crate::pg_sys::pg11_specific::EState;
-        pub use crate::pg_sys::pg11_specific::ExplainState;
-        pub use crate::pg_sys::pg11_specific::IndexAmRoutine;
-        pub use crate::pg_sys::pg11_specific::IndexInfo;
-        pub use crate::pg_sys::pg11_specific::IndexPath;
-        pub use crate::pg_sys::pg11_specific::IndexScanDescData;
-        pub use crate::pg_sys::pg11_specific::IndexVacuumInfo;
-        pub use crate::pg_sys::pg11_specific::InterruptPending;
-        pub use crate::pg_sys::pg11_specific::NodeTag_T_CustomPath;
-        pub use crate::pg_sys::pg11_specific::NodeTag_T_CustomScan;
-        pub use crate::pg_sys::pg11_specific::NodeTag_T_CustomScanState;
-        pub use crate::pg_sys::pg11_specific::NodeTag_T_IndexAmRoutine;
-        pub use crate::pg_sys::pg11_specific::ParallelContext;
-        pub use crate::pg_sys::pg11_specific::PlannerInfo;
-        pub use crate::pg_sys::pg11_specific::RangeTblEntry;
-        pub use crate::pg_sys::pg11_specific::RelOptInfo;
-        pub use crate::pg_sys::pg11_specific::RestrictInfo;
-        pub use crate::pg_sys::pg11_specific::TupleTableSlot;
-        pub use crate::pg_sys::pg11_specific::PG_MAJORVERSION;
-        pub use crate::pg_sys::pg11_specific::PG_VERSION;
-        pub use crate::pg_sys::pg11_specific::PG_VERSION_NUM;
-        pub use crate::pg_sys::pg11_specific::PG_VERSION_STR;
+        pub use crate::pg_sys::pg11_specific::*;
 
         pub unsafe fn IndexBuildHeapScan<T>(
             heap_relation: crate::pg_sys::Relation,
@@ -197,34 +187,7 @@ mod internal {
     #[cfg(feature = "pg12")]
     mod pg12 {
         pub use crate::pg_sys::common::*;
-
-        pub type FunctionCallInfo = *mut crate::pg_sys::pg12_specific::FunctionCallInfoBaseData;
-        pub type TupleDesc = *mut crate::pg_sys::pg12_specific::TupleDescData;
-
-        pub use crate::pg_sys::pg12_specific::AllocSetContextCreateInternal as AllocSetContextCreateExtended;
-        pub use crate::pg_sys::pg12_specific::CustomPathMethods;
-        pub use crate::pg_sys::pg12_specific::EState;
-        pub use crate::pg_sys::pg12_specific::ExplainState;
-        pub use crate::pg_sys::pg12_specific::IndexAmRoutine;
-        pub use crate::pg_sys::pg12_specific::IndexInfo;
-        pub use crate::pg_sys::pg12_specific::IndexPath;
-        pub use crate::pg_sys::pg12_specific::IndexScanDescData;
-        pub use crate::pg_sys::pg12_specific::IndexVacuumInfo;
-        pub use crate::pg_sys::pg12_specific::InterruptPending;
-        pub use crate::pg_sys::pg12_specific::NodeTag_T_CustomPath;
-        pub use crate::pg_sys::pg12_specific::NodeTag_T_CustomScan;
-        pub use crate::pg_sys::pg12_specific::NodeTag_T_CustomScanState;
-        pub use crate::pg_sys::pg12_specific::NodeTag_T_IndexAmRoutine;
-        pub use crate::pg_sys::pg12_specific::ParallelContext;
-        pub use crate::pg_sys::pg12_specific::PlannerInfo;
-        pub use crate::pg_sys::pg12_specific::RangeTblEntry;
-        pub use crate::pg_sys::pg12_specific::RelOptInfo;
-        pub use crate::pg_sys::pg12_specific::RestrictInfo;
-        pub use crate::pg_sys::pg12_specific::TupleTableSlot;
-        pub use crate::pg_sys::pg12_specific::PG_MAJORVERSION;
-        pub use crate::pg_sys::pg12_specific::PG_VERSION;
-        pub use crate::pg_sys::pg12_specific::PG_VERSION_NUM;
-        pub use crate::pg_sys::pg12_specific::PG_VERSION_STR;
+        pub use crate::pg_sys::pg12_specific::*;
 
         pub unsafe fn IndexBuildHeapScan<T>(
             heap_relation: crate::pg_sys::Relation,

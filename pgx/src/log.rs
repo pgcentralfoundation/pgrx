@@ -605,6 +605,18 @@ macro_rules! PANIC {
     )
 }
 
+#[cfg(any(feature = "pg10", feature = "pg11"))]
+#[inline]
+pub fn interrupt_pending() -> bool {
+    unsafe { crate::pg_sys::InterruptPending }
+}
+
+#[cfg(feature = "pg12")]
+#[inline]
+pub fn interrupt_pending() -> bool {
+    (unsafe { crate::pg_sys::InterruptPending } != 0)
+}
+
 #[macro_export]
 macro_rules! check_for_interrupts {
     () => {
