@@ -1,9 +1,10 @@
-use pgx::*;
+mod test {
+    use pgx::*;
 
-#[pg_extern]
-fn func_with_variadic_args(a: variadic!(Array<i32>)) -> i32 {
-    let datum = a.get(0).unwrap();
-    datum.unwrap()
+    #[pg_extern]
+    fn func_with_variadic_args(_field: &str, values: variadic!(Array<&str>)) -> String {
+        values.get(0).unwrap().unwrap().to_string()
+    }
 }
 
 mod tests {
@@ -14,8 +15,9 @@ mod tests {
 
     #[pg_test]
     fn test_func_with_variadic_args() {
-        let result = Spi::get_one::<i32>("SELECT func_with_variadic_args(1, 2, 3, 4, 5);")
-            .expect("didn't get SPI result");
-        assert_eq!(result, 1);
+        let result =
+            Spi::get_one::<&str>("SELECT test.func_with_variadic_args('test', 'a', 'b', 'c');")
+                .expect("didn't get SPI result");
+        assert_eq!(result, "a");
     }
 }
