@@ -56,9 +56,6 @@ impl PgGuardRewriter {
         // abi classification
         func.sig.abi = None;
 
-        // nor do we need a visibility beyond "private"
-        func.vis = Visibility::Inherited;
-
         let arg_list = PgGuardRewriter::build_arg_list(&func.sig, true);
         let func_name = &func.sig.ident;
         let func_span = func.span().clone();

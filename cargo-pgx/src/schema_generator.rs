@@ -1,3 +1,4 @@
+use crate::property_inspector::get_property;
 use proc_macro2::{Ident, Span};
 use quote::quote;
 use std::borrow::BorrowMut;
@@ -40,12 +41,13 @@ enum CategorizedAttribute {
 pub(crate) fn generate_schema() -> Result<(), std::io::Error> {
     let path = PathBuf::from_str("./src").unwrap();
     let files = find_rs_files(&path, Vec::new());
+    let default_schema = get_property("schema").unwrap_or("public".to_string());
 
     delete_generated_sql();
 
     let mut created = Vec::new();
     files.iter().for_each(|f: &DirEntry| {
-        let statemets = make_create_function_statements(f);
+        let statemets = generate_sql(f, default_schema.clone());
         let (did_write, filename) = write_sql_file(f, statemets);
 
         // strip the leading ./sql/ from the filenames we generated
@@ -242,61 +244,72 @@ fn parse_extern_args(att: &Attribute) -> HashSet<ExternArgs> {
     args
 }
 
-fn make_create_function_statements(rs_file: &DirEntry) -> Vec<String> {
+fn generate_sql(rs_file: &DirEntry, default_schema: String) -> Vec<String> {
     let mut sql = Vec::new();
     let file = std::fs::read_to_string(rs_file.path()).unwrap();
     let ast = syn::parse_file(file.as_str()).unwrap();
 
-    walk_items(rs_file, &mut sql, ast.items);
+    let mut schema_stack = Vec::new();
+
+    schema_stack.push(default_schema.clone());
+    walk_items(
+        rs_file,
+        &mut sql,
+        ast.items,
+        &mut schema_stack,
+        &default_schema,
+    );
 
     sql
 }
 
-fn walk_items(rs_file: &DirEntry, sql: &mut Vec<String>, items: Vec<Item>) {
+fn walk_items(
+    rs_file: &DirEntry,
+    sql: &mut Vec<String>,
+    items: Vec<Item>,
+    schema_stack: &mut Vec<String>,
+    default_schema: &str,
+) {
+    let statement_cnt = sql.len();
     let mut postgres_types = Vec::new();
+    let current_schema = schema_stack
+        .last()
+        .expect("couldn't determine the current schema")
+        .clone();
     for item in items {
-        if let Item::Mod(modd) = item {
-            match modd.content {
-                Some((_, items)) => walk_items(rs_file, sql, items),
+        if let Item::Mod(module) = item {
+            match module.content {
+                Some((_, items)) => {
+                    schema_stack.push(module.ident.to_string());
+                    walk_items(rs_file, sql, items, schema_stack, default_schema);
+                    schema_stack.pop();
+                }
                 None => {}
             }
         } else if let Item::Struct(strct) = item {
-            let mut schema = String::new();
             let mut found_postgres_type = false;
             for a in strct.attrs {
                 let string = a.to_token_stream().to_string();
 
                 if string.contains("PostgresType") {
                     found_postgres_type = true;
-                } else if string.starts_with("# [ schema = \"") {
-                    let re = regex::Regex::new(r#".*"(.*?)".*"#).unwrap();
-                    schema = re
-                        .captures(string.as_str())
-                        .unwrap()
-                        .get(1)
-                        .unwrap()
-                        .as_str()
-                        .to_string();
                 }
             }
 
             if found_postgres_type {
                 let name = strct.ident.to_string().to_lowercase();
-                if !schema.is_empty() {
-                    schema = format!("{}.", schema);
-                }
-                sql.push(format!("CREATE TYPE {}{};", schema, name));
+                sql.push(format!("CREATE TYPE {}.{};", current_schema, name));
 
-                postgres_types.push(format!("CREATE OR REPLACE FUNCTION {name}_in(cstring) RETURNS {name} IMMUTABLE STRICT LANGUAGE C AS 'MODULE_PATHNAME', '{name}_in_wrapper';", name = name));
-                postgres_types.push(format!("CREATE OR REPLACE FUNCTION {name}_out({name}) RETURNS cstring IMMUTABLE STRICT LANGUAGE C AS 'MODULE_PATHNAME', '{name}_out_wrapper';", name = name));
+                postgres_types.push(format!("CREATE OR REPLACE FUNCTION {schema}.{name}_in(cstring) RETURNS {schema}.{name} IMMUTABLE STRICT LANGUAGE C AS 'MODULE_PATHNAME', '{name}_in_wrapper';", name = name, schema = current_schema));
+                postgres_types.push(format!("CREATE OR REPLACE FUNCTION {schema}.{name}_out({schema}.{name}) RETURNS cstring IMMUTABLE STRICT LANGUAGE C AS 'MODULE_PATHNAME', '{name}_out_wrapper';", name = name, schema = current_schema));
                 postgres_types.push(format!(
-                    "CREATE TYPE {schema}{name} (
+                    "CREATE TYPE {schema}.{name} (
                         INTERNALLENGTH = variable,
-                        INPUT = {name}_in,
-                        OUTPUT = {name}_out,
+                        INPUT = {schema}.{name}_in,
+                        OUTPUT = {schema}.{name}_out,
                         STORAGE = extended
                     );",
-                    schema = schema,
+                    schema = current_schema,
                     name = name,
                 ));
             }
@@ -329,7 +342,7 @@ fn walk_items(rs_file: &DirEntry, sql: &mut Vec<String>, items: Vec<Item>) {
                 sql.push(string.to_string());
             }
         } else if let Item::Fn(func) = item {
-            let attributes = collect_attributes(rs_file, &func);
+            let attributes = collect_attributes(rs_file, &func.sig.ident, &func.attrs);
             let is_test_mode = std::env::var("PGX_TEST_MODE").is_ok();
             let mut function_sql = Vec::new();
             let sql_func_args = extract_funcargs_attribute(&attributes);
@@ -340,7 +353,13 @@ fn walk_items(rs_file: &DirEntry, sql: &mut Vec<String>, items: Vec<Item>) {
                     // if we're in test mode, which is controlled by the PGX_TEST_MODE
                     // environment variable
                     CategorizedAttribute::PgTest((span, _)) if is_test_mode => {
-                        match make_create_function_statement(&func, None, rs_file, None) {
+                        match make_create_function_statement(
+                            &func,
+                            None,
+                            rs_file,
+                            None,
+                            &current_schema,
+                        ) {
                             Some(statement) => {
                                 function_sql.push(location_comment(rs_file, span));
                                 function_sql.push(statement)
@@ -357,6 +376,7 @@ fn walk_items(rs_file: &DirEntry, sql: &mut Vec<String>, items: Vec<Item>) {
                             Some(args),
                             rs_file,
                             sql_func_args.clone(),
+                            &current_schema,
                         ) {
                             Some(statement) => {
                                 function_sql.push(location_comment(rs_file, span));
@@ -379,6 +399,23 @@ fn walk_items(rs_file: &DirEntry, sql: &mut Vec<String>, items: Vec<Item>) {
     }
 
     sql.append(&mut postgres_types);
+
+    if sql.len() != statement_cnt {
+        // we added some statements, so inject a CREATE SCHEMA statement ahead of the statements
+        // we just generated
+        if current_schema != default_schema {
+            // pg_catalog is a reserved schema name that we can't even try to create
+            if current_schema != "pg_catalog" {
+                sql.insert(
+                    statement_cnt,
+                    format!(
+                        "CREATE SCHEMA IF NOT EXISTS {};",
+                        quote_ident_string(current_schema)
+                    ),
+                );
+            }
+        }
+    }
 }
 
 fn make_create_function_statement(
@@ -386,15 +423,20 @@ fn make_create_function_statement(
     mut extern_args: Option<HashSet<ExternArgs>>,
     rs_file: &DirEntry,
     sql_func_arg: Option<String>,
+    schema: &str,
 ) -> Option<String> {
     let exported_func_name = format!("{}_wrapper", func.sig.ident.to_string());
     let mut statement = String::new();
     let has_option_arg = func_args_have_option(func, rs_file);
-    let attributes = collect_attributes(rs_file, func);
+    let attributes = collect_attributes(rs_file, &func.sig.ident, &func.attrs);
     let sql_func_name =
         extract_funcname_attribute(&attributes).unwrap_or(quote_ident(&func.sig.ident));
 
-    statement.push_str(&format!("CREATE OR REPLACE FUNCTION {}", sql_func_name));
+    statement.push_str(&format!(
+        "CREATE OR REPLACE FUNCTION {schema}.{name}",
+        schema = schema,
+        name = sql_func_name
+    ));
 
     if sql_func_arg.is_some() {
         statement.push_str(sql_func_arg.unwrap().as_str());
@@ -664,8 +706,11 @@ fn extract_funcname_attribute(attrs: &Vec<CategorizedAttribute>) -> Option<Strin
     None
 }
 
-fn collect_attributes(rs_file: &DirEntry, func: &ItemFn) -> Vec<CategorizedAttribute> {
-    let attrs = &func.attrs;
+fn collect_attributes(
+    rs_file: &DirEntry,
+    ident: &Ident,
+    attrs: &Vec<Attribute>,
+) -> Vec<CategorizedAttribute> {
     let mut categorized_attributes = Vec::new();
     let mut other_attributes = Vec::new();
 
@@ -691,7 +736,7 @@ fn collect_attributes(rs_file: &DirEntry, func: &ItemFn) -> Vec<CategorizedAttri
         } else if as_string == "# [ doc = \" ```funcname\" ]" {
             let (new_i, mut sql_statements) = collect_doc(
                 rs_file,
-                &func,
+                ident,
                 attrs,
                 &mut other_attributes,
                 i,
@@ -714,7 +759,7 @@ fn collect_attributes(rs_file: &DirEntry, func: &ItemFn) -> Vec<CategorizedAttri
         } else if as_string == "# [ doc = \" ```funcargs\" ]" {
             let (new_i, mut sql_statements) = collect_doc(
                 rs_file,
-                &func,
+                ident,
                 attrs,
                 &mut other_attributes,
                 i,
@@ -737,7 +782,7 @@ fn collect_attributes(rs_file: &DirEntry, func: &ItemFn) -> Vec<CategorizedAttri
         } else if as_string == "# [ doc = \" ```sql\" ]" {
             let (new_i, sql_statements) = collect_doc(
                 rs_file,
-                &func,
+                ident,
                 attrs,
                 &mut other_attributes,
                 i,
@@ -767,7 +812,7 @@ fn collect_attributes(rs_file: &DirEntry, func: &ItemFn) -> Vec<CategorizedAttri
 
 fn collect_doc(
     rs_file: &DirEntry,
-    func: &&ItemFn,
+    ident: &Ident,
     attrs: &Vec<Attribute>,
     other_attributes: &mut Vec<(Span, String)>,
     mut i: usize,
@@ -800,8 +845,7 @@ fn collect_doc(
                 .expect(&format!("Improperly escaped:\n{}", as_string));
 
             // do variable substitution in the sql statement
-            let as_string =
-                as_string.replace("@FUNCTION_NAME@", &format!("{}_wrapper", func.sig.ident));
+            let as_string = as_string.replace("@FUNCTION_NAME@", &format!("{}_wrapper", ident));
 
             // and remember it, along with its original source location
             sql_statements.push(as_string);

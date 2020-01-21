@@ -56,7 +56,7 @@ pub fn run_test(sql_funcname: &str, expected_error: Option<&str>) {
 
     let (mut client, session_id) = client();
 
-    let schema = get_extension_schema();
+    let schema = "tests"; // get_extension_schema();
     let result = match client.transaction() {
         // run the test function in a transaction
         Ok(mut tx) => {
@@ -474,20 +474,4 @@ fn get_pg_dbname() -> String {
 
 fn get_pg_user() -> String {
     std::env::var("USER").unwrap_or_else(|_| panic!("USER is not an envvar"))
-}
-
-fn get_extension_schema() -> String {
-    let output = Command::new("cargo")
-        .arg("pgx")
-        .arg("get")
-        .arg("schema")
-        .output();
-
-    match output {
-        Ok(output) => match String::from_utf8(output.stdout).unwrap().trim() {
-            "" => "public".to_string(),
-            value => value.to_string(),
-        },
-        Err(e) => panic!("failed to get extension schema property: {:?}", e),
-    }
 }

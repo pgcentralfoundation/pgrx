@@ -127,6 +127,6 @@ mod tests {
 
     #[pg_test(error = "did a panic")]
     fn test_panic_via_spi() {
-        Spi::run("SELECT do_panic();");
+        Spi::run("SELECT tests.do_panic();");
     }
 }

@@ -164,12 +164,12 @@ fn impl_postgres_type(ast: &DeriveInput) -> proc_macro2::TokenStream {
         }
 
         #[pg_extern(immutable)]
-        fn #funcname_in(input: &std::ffi::CStr) -> #name {
+        pub fn #funcname_in(input: &std::ffi::CStr) -> #name {
             #name::input(input.to_str().unwrap()).expect(&format!("failed to convert input to a {}", stringify!(#name)))
         }
 
         #[pg_extern(immutable)]
-        fn #funcname_out(input: #name) -> &'static std::ffi::CStr {
+        pub fn #funcname_out(input: #name) -> &'static std::ffi::CStr {
             let mut buffer = StringInfo::new();
             input.output(&mut buffer);
             buffer.into()
