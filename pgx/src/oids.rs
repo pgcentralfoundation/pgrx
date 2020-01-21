@@ -1,6 +1,7 @@
 #![allow(non_camel_case_types)]
 use crate::pg_sys;
 
+#[derive(Clone)]
 pub enum PgOid {
     Custom(pg_sys::Oid),
     CommonBuiltIn(CommonBuiltInOids),
@@ -34,6 +35,7 @@ impl PgOid {
 }
 
 #[cfg(feature = "pg10")]
+#[derive(Clone)]
 pub enum Pg10BuiltInOids {
     ABSTIMEOID = pg_sys::pg10_specific::ABSTIMEOID as isize,
     RELTIMEOID = pg_sys::pg10_specific::RELTIMEOID as isize,
@@ -41,6 +43,7 @@ pub enum Pg10BuiltInOids {
 }
 
 #[cfg(feature = "pg11")]
+#[derive(Clone)]
 pub enum Pg11BuiltInOids {
     XMLARRAYOID = pg_sys::pg11_specific::XMLARRAYOID as isize,
     TSVECTORARRAYOID = pg_sys::pg11_specific::TSVECTORARRAYOID as isize,
@@ -118,6 +121,7 @@ pub enum Pg11BuiltInOids {
 }
 
 #[cfg(feature = "pg12")]
+#[derive(Clone)]
 pub enum Pg12BuiltInOids {
     XMLARRAYOID = pg_sys::pg12_specific::XMLARRAYOID as isize,
     TSVECTORARRAYOID = pg_sys::pg12_specific::TSVECTORARRAYOID as isize,
@@ -187,6 +191,7 @@ pub enum Pg12BuiltInOids {
     PG_LSNARRAYOID = pg_sys::pg12_specific::PG_LSNARRAYOID as isize,
 }
 
+#[derive(Clone)]
 pub enum CommonBuiltInOids {
     BOOLOID = pg_sys::BOOLOID as isize,
     BYTEAOID = pg_sys::BYTEAOID as isize,
