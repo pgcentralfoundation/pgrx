@@ -407,7 +407,7 @@ fn make_create_function_statement(
             match arg {
                 FnArg::Receiver(_) => panic!("functions that take 'self' are not supported"),
                 FnArg::Typed(ty) => match translate_type(rs_file, &ty.ty) {
-                    Some((type_name, _)) => {
+                    Some((type_name, _, default_value)) => {
                         if i > 0 {
                             statement.push_str(", ");
                         }
@@ -415,6 +415,15 @@ fn make_create_function_statement(
                         statement.push_str(&arg_name(arg));
                         statement.push(' ');
                         statement.push_str(&type_name);
+
+                        if default_value.is_some() {
+                            let default_value = default_value.unwrap();
+                            let mut default_value = default_value.as_str();
+                            default_value = default_value.trim_start_matches('"');
+                            default_value = default_value.trim_end_matches('"');
+
+                            statement.push_str(&format!(" DEFAULT {}", default_value));
+                        }
 
                         i += 1;
                     }
@@ -446,10 +455,12 @@ fn make_create_function_statement(
 
     // append RETURNS clause
     match match &func.sig.output {
-        ReturnType::Default => Some(("void".to_string(), false)),
+        ReturnType::Default => Some(("void".to_string(), false, None)),
         ReturnType::Type(_, ty) => translate_type(rs_file, ty),
     } {
-        Some((return_type, _is_option)) => statement.push_str(&format!(" RETURNS {}", return_type)),
+        Some((return_type, _is_option, _)) => {
+            statement.push_str(&format!(" RETURNS {}", return_type))
+        }
         None => panic!("could not determine return type"),
     }
 
@@ -481,7 +492,7 @@ fn make_create_function_statement(
 fn func_args_have_option(func: &ItemFn, rs_file: &DirEntry) -> bool {
     for arg in &func.sig.inputs {
         if let FnArg::Typed(ty) = arg {
-            if let Some((_, is_option)) = translate_type(rs_file, &ty.ty) {
+            if let Some((_, is_option, _)) = translate_type(rs_file, &ty.ty) {
                 if is_option {
                     return true;
                 }
@@ -518,21 +529,40 @@ fn arg_name(arg: &FnArg) -> String {
     panic!("functions that take 'self' are not supported")
 }
 
-fn translate_type(filename: &DirEntry, ty: &Box<Type>) -> Option<(String, bool)> {
+fn translate_type(filename: &DirEntry, ty: &Box<Type>) -> Option<(String, bool, Option<String>)> {
     let rust_type;
+    let mut default_value = None;
     let span;
-    if let Type::Path(path) = ty.deref() {
-        rust_type = format!("{}", quote! {#path});
-        span = path.span().clone();
-    } else if let Type::Reference(tref) = ty.deref() {
-        let elem = &tref.elem;
-        rust_type = format!("{}", quote! {&#elem});
-        span = tref.span().clone();
-    } else {
-        panic!("Unsupported type: {}", quote! {#ty});
+
+    match ty.deref() {
+        Type::Path(path) => {
+            rust_type = format!("{}", quote! {#path});
+            span = path.span().clone();
+        }
+        Type::Reference(tref) => {
+            let elem = &tref.elem;
+            rust_type = format!("{}", quote! {&#elem});
+            span = tref.span().clone();
+        }
+        Type::Macro(makro) => {
+            let regexp =
+                regex::Regex::new(r#"default ! \( (?P<type>.*?) , (?P<value>.*?) \)"#).unwrap();
+
+            default_value = Some(
+                get_named_capture(&regexp, "value", &format!("{}", quote!(#ty)))
+                    .expect("no default value"),
+            );
+
+            rust_type = get_named_capture(&regexp, "type", &format!("{}", quote!(#ty)))
+                .expect("no type name in default ");
+            span = makro.span().clone();
+        }
+        other => {
+            panic!("Unsupported type: {:?}", other);
+        }
     }
 
-    translate_type_string(rust_type, filename, &span, 0)
+    translate_type_string(rust_type, filename, &span, 0, default_value)
 }
 
 fn translate_type_string(
@@ -540,37 +570,56 @@ fn translate_type_string(
     filename: &DirEntry,
     span: &proc_macro2::Span,
     depth: i32,
-) -> Option<(String, bool)> {
+    default_value: Option<String>,
+) -> Option<(String, bool, Option<String>)> {
     match rust_type.as_str() {
-        "i8" => Some(("smallint".to_string(), false)), // convert i8 types into smallints as Postgres doesn't have a 1byte-sized type
-        "i16" => Some(("smallint".to_string(), false)),
-        "i32" => Some(("integer".to_string(), false)),
-        "i64" => Some(("bigint".to_string(), false)),
-        "bool" => Some(("bool".to_string(), false)),
-        "char" => Some(("char".to_string(), false)),
-        "f32" => Some(("real".to_string(), false)),
-        "f64" => Some(("double precision".to_string(), false)),
-        "& str" | "String" => Some(("text".to_string(), false)),
-        "& std :: ffi :: CStr" => Some(("cstring".to_string(), false)),
-        "AnyElement" => Some(("anyelement".to_string(), false)),
-        "pg_sys :: Oid" => Some(("oid".to_string(), false)),
-        "pg_sys :: ItemPointerData" => Some(("tid".to_string(), false)),
+        "i8" => Some(("smallint".to_string(), false, default_value)), // convert i8 types into smallints as Postgres doesn't have a 1byte-sized type
+        "i16" => Some(("smallint".to_string(), false, default_value)),
+        "i32" => Some(("integer".to_string(), false, default_value)),
+        "i64" => Some(("bigint".to_string(), false, default_value)),
+        "bool" => Some(("bool".to_string(), false, default_value)),
+        "char" => Some(("char".to_string(), false, default_value)),
+        "f32" => Some(("real".to_string(), false, default_value)),
+        "f64" => Some(("double precision".to_string(), false, default_value)),
+        "& str" | "String" => Some(("text".to_string(), false, default_value)),
+        "& std :: ffi :: CStr" => Some(("cstring".to_string(), false, default_value)),
+        "AnyElement" => Some(("anyelement".to_string(), false, default_value)),
+        "pg_sys :: Oid" => Some(("oid".to_string(), false, default_value)),
+        "pg_sys :: ItemPointerData" => Some(("tid".to_string(), false, default_value)),
         "pg_sys :: FunctionCallInfo" => None,
-        "pg_sys :: IndexAmRoutine" => Some(("index_am_handler".to_string(), false)),
+        "pg_sys :: IndexAmRoutine" => Some(("index_am_handler".to_string(), false, default_value)),
         _array if rust_type.starts_with("Array <") => {
-            let rc = translate_type_string(extract_type(&rust_type), filename, span, depth + 1);
+            let rc = translate_type_string(
+                extract_type(&rust_type),
+                filename,
+                span,
+                depth + 1,
+                default_value.clone(),
+            );
             let mut type_string = rc.unwrap().0;
             type_string.push_str("[]");
-            Some((type_string, false))
+            Some((type_string, false, default_value))
         }
-        _internal if rust_type.starts_with("Internal <") => Some(("internal".to_string(), false)),
-        _boxed if rust_type.starts_with("PgBox <") => {
-            translate_type_string(extract_type(&rust_type), filename, span, depth + 1)
+        _internal if rust_type.starts_with("Internal <") => {
+            Some(("internal".to_string(), false, default_value))
         }
+        _boxed if rust_type.starts_with("PgBox <") => translate_type_string(
+            extract_type(&rust_type),
+            filename,
+            span,
+            depth + 1,
+            default_value,
+        ),
         _option if rust_type.starts_with("Option <") => {
-            let rc = translate_type_string(extract_type(&rust_type), filename, span, depth + 1);
+            let rc = translate_type_string(
+                extract_type(&rust_type),
+                filename,
+                span,
+                depth + 1,
+                default_value.clone(),
+            );
             let type_string = rc.unwrap().0;
-            Some((type_string, true))
+            Some((type_string, true, default_value))
         }
         mut unknown => {
             if std::env::var("DEBUG").is_ok() {
@@ -584,7 +633,7 @@ fn translate_type_string(
             }
 
             unknown = unknown.trim_start_matches("pg_sys :: ");
-            Some((unknown.to_string(), false))
+            Some((unknown.to_string(), false, default_value))
         }
     }
 }
@@ -774,4 +823,11 @@ fn location_comment(rs_file: &DirEntry, span: Span) -> String {
         span.start().line,
         span.start().column,
     )
+}
+
+fn get_named_capture(regex: &regex::Regex, name: &'static str, against: &str) -> Option<String> {
+    match regex.captures(against) {
+        Some(cap) => Some(cap[name].to_string()),
+        None => None,
+    }
 }

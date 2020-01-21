@@ -1,5 +1,34 @@
 use crate::{pg_sys, FromDatum, PgBox};
 
+/// A macro for specifying default argument values so they get propery translated to SQL in
+/// `CREATE FUNCTION` statements
+///
+/// ## Examples
+///
+/// This example will create a SQL function like so:
+///
+/// ```sql
+/// CREATE OR REPLACE FUNCTION fun_with_default_arg_value(a integer, b integer DEFAULT 99) RETURNS integer ...;
+/// ```
+///
+/// ```rust
+/// use crate::pgx::*;
+///
+/// #[pg_extern]
+/// fn fun_with_default_arg_value(a: i32, b: default!(i32, 99)) -> i32 {
+///    a + b
+/// }
+/// ```
+///
+/// This allows users of this function, from within Postgres, to elide the `b` argument, and
+/// Postgres will automatically use `99`.
+#[macro_export]
+macro_rules! default {
+    ($ty:tt, $val:tt) => {
+        $ty
+    };
+}
+
 #[cfg(any(feature = "pg10", feature = "pg11"))]
 mod pg_10_11 {
     use crate::{pg_sys, FromDatum};
