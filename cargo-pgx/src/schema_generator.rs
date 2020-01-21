@@ -715,9 +715,9 @@ fn translate_type_string(
 }
 
 fn extract_type(type_name: &str) -> String {
-    let re = regex::Regex::new(r#"\w+ < (.*) >.*"#).unwrap();
-    let capture = re.captures(type_name).unwrap().get(1);
-    return capture.unwrap().as_str().to_string();
+    let re = regex::Regex::new(r#"\w+ <(.*)>.*"#).unwrap();
+    let capture = re.captures(type_name).expect(&format!("no type capture against: {}", type_name)).get(1);
+    capture.unwrap().as_str().to_string().trim().to_string()
 }
 
 fn extract_funcargs_attribute(attrs: &Vec<CategorizedAttribute>) -> Option<String> {
