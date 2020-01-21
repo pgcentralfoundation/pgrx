@@ -24,7 +24,14 @@ use crate::{pg_sys, FromDatum, PgBox};
 /// Postgres will automatically use `99`.
 #[macro_export]
 macro_rules! default {
-    ($ty:tt, $val:tt) => {
+    ($ty:ty, $val:tt) => {
+        $ty
+    };
+}
+
+#[macro_export]
+macro_rules! variadic {
+    ($ty:ty) => {
         $ty
     };
 }

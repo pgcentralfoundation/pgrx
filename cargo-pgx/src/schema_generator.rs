@@ -449,13 +449,16 @@ fn make_create_function_statement(
             match arg {
                 FnArg::Receiver(_) => panic!("functions that take 'self' are not supported"),
                 FnArg::Typed(ty) => match translate_type(rs_file, &ty.ty) {
-                    Some((type_name, _, default_value)) => {
+                    Some((type_name, _, default_value, variadic)) => {
                         if i > 0 {
                             statement.push_str(", ");
                         }
 
                         statement.push_str(&arg_name(arg));
                         statement.push(' ');
+                        if variadic {
+                            statement.push_str("VARIADIC ");
+                        }
                         statement.push_str(&type_name);
 
                         if default_value.is_some() {
@@ -497,10 +500,10 @@ fn make_create_function_statement(
 
     // append RETURNS clause
     match match &func.sig.output {
-        ReturnType::Default => Some(("void".to_string(), false, None)),
+        ReturnType::Default => Some(("void".to_string(), false, None, false)),
         ReturnType::Type(_, ty) => translate_type(rs_file, ty),
     } {
-        Some((return_type, _is_option, _)) => {
+        Some((return_type, _is_option, _, _)) => {
             statement.push_str(&format!(" RETURNS {}", return_type))
         }
         None => panic!("could not determine return type"),
@@ -534,7 +537,7 @@ fn make_create_function_statement(
 fn func_args_have_option(func: &ItemFn, rs_file: &DirEntry) -> bool {
     for arg in &func.sig.inputs {
         if let FnArg::Typed(ty) = arg {
-            if let Some((_, is_option, _)) = translate_type(rs_file, &ty.ty) {
+            if let Some((_, is_option, _, _)) = translate_type(rs_file, &ty.ty) {
                 if is_option {
                     return true;
                 }
@@ -571,9 +574,13 @@ fn arg_name(arg: &FnArg) -> String {
     panic!("functions that take 'self' are not supported")
 }
 
-fn translate_type(filename: &DirEntry, ty: &Box<Type>) -> Option<(String, bool, Option<String>)> {
+fn translate_type(
+    filename: &DirEntry,
+    ty: &Box<Type>,
+) -> Option<(String, bool, Option<String>, bool)> {
     let rust_type;
     let mut default_value = None;
+    let mut variadic = false;
     let span;
 
     match ty.deref() {
@@ -587,24 +594,37 @@ fn translate_type(filename: &DirEntry, ty: &Box<Type>) -> Option<(String, bool, 
             span = tref.span().clone();
         }
         Type::Macro(makro) => {
-            let regexp =
-                regex::Regex::new(r#"default ! \( (?P<type>.*?) , (?P<value>.*?) \)"#).unwrap();
+            let as_string = format!("{}", quote!(#ty));
 
-            default_value = Some(
-                get_named_capture(&regexp, "value", &format!("{}", quote!(#ty)))
-                    .expect("no default value"),
-            );
+            if as_string.starts_with("default !") {
+                let regexp =
+                    regex::Regex::new(r#"default ! \( (?P<type>.*?) , (?P<value>.*?) \)"#).unwrap();
 
-            rust_type = get_named_capture(&regexp, "type", &format!("{}", quote!(#ty)))
-                .expect("no type name in default ");
-            span = makro.span().clone();
+                default_value = Some(
+                    get_named_capture(&regexp, "value", &format!("{}", quote!(#ty)))
+                        .expect("no default value"),
+                );
+
+                rust_type = get_named_capture(&regexp, "type", &format!("{}", quote!(#ty)))
+                    .expect("no type name in default ");
+                span = makro.span().clone();
+            } else if as_string.starts_with("variadic !") {
+                let regexp = regex::Regex::new(r#"variadic ! \( (?P<type>.*?) \)"#).unwrap();
+
+                rust_type = get_named_capture(&regexp, "type", &format!("{}", quote!(#ty)))
+                    .expect("no type name in default ");
+                span = makro.span().clone();
+                variadic = true;
+            } else {
+                panic!("unrecognized macro in argument list: {}", as_string);
+            }
         }
         other => {
             panic!("Unsupported type: {:?}", other);
         }
     }
 
-    translate_type_string(rust_type, filename, &span, 0, default_value)
+    translate_type_string(rust_type, filename, &span, 0, default_value, variadic)
 }
 
 fn translate_type_string(
@@ -613,23 +633,34 @@ fn translate_type_string(
     span: &proc_macro2::Span,
     depth: i32,
     default_value: Option<String>,
-) -> Option<(String, bool, Option<String>)> {
+    variadic: bool,
+) -> Option<(String, bool, Option<String>, bool)> {
     match rust_type.as_str() {
-        "i8" => Some(("smallint".to_string(), false, default_value)), // convert i8 types into smallints as Postgres doesn't have a 1byte-sized type
-        "i16" => Some(("smallint".to_string(), false, default_value)),
-        "i32" => Some(("integer".to_string(), false, default_value)),
-        "i64" => Some(("bigint".to_string(), false, default_value)),
-        "bool" => Some(("bool".to_string(), false, default_value)),
-        "char" => Some(("char".to_string(), false, default_value)),
-        "f32" => Some(("real".to_string(), false, default_value)),
-        "f64" => Some(("double precision".to_string(), false, default_value)),
-        "& str" | "String" => Some(("text".to_string(), false, default_value)),
-        "& std :: ffi :: CStr" => Some(("cstring".to_string(), false, default_value)),
-        "AnyElement" => Some(("anyelement".to_string(), false, default_value)),
-        "pg_sys :: Oid" => Some(("oid".to_string(), false, default_value)),
-        "pg_sys :: ItemPointerData" => Some(("tid".to_string(), false, default_value)),
+        "i8" => Some(("smallint".to_string(), false, default_value, variadic)), // convert i8 types into smallints as Postgres doesn't have a 1byte-sized type
+        "i16" => Some(("smallint".to_string(), false, default_value, variadic)),
+        "i32" => Some(("integer".to_string(), false, default_value, variadic)),
+        "i64" => Some(("bigint".to_string(), false, default_value, variadic)),
+        "bool" => Some(("bool".to_string(), false, default_value, variadic)),
+        "char" => Some(("char".to_string(), false, default_value, variadic)),
+        "f32" => Some(("real".to_string(), false, default_value, variadic)),
+        "f64" => Some((
+            "double precision".to_string(),
+            false,
+            default_value,
+            variadic,
+        )),
+        "& str" | "String" => Some(("text".to_string(), false, default_value, variadic)),
+        "& std :: ffi :: CStr" => Some(("cstring".to_string(), false, default_value, variadic)),
+        "AnyElement" => Some(("anyelement".to_string(), false, default_value, variadic)),
+        "pg_sys :: Oid" => Some(("oid".to_string(), false, default_value, variadic)),
+        "pg_sys :: ItemPointerData" => Some(("tid".to_string(), false, default_value, variadic)),
         "pg_sys :: FunctionCallInfo" => None,
-        "pg_sys :: IndexAmRoutine" => Some(("index_am_handler".to_string(), false, default_value)),
+        "pg_sys :: IndexAmRoutine" => Some((
+            "index_am_handler".to_string(),
+            false,
+            default_value,
+            variadic,
+        )),
         _array if rust_type.starts_with("Array <") => {
             let rc = translate_type_string(
                 extract_type(&rust_type),
@@ -637,13 +668,14 @@ fn translate_type_string(
                 span,
                 depth + 1,
                 default_value.clone(),
+                variadic,
             );
             let mut type_string = rc.unwrap().0;
             type_string.push_str("[]");
-            Some((type_string, false, default_value))
+            Some((type_string, false, default_value, variadic))
         }
         _internal if rust_type.starts_with("Internal <") => {
-            Some(("internal".to_string(), false, default_value))
+            Some(("internal".to_string(), false, default_value, variadic))
         }
         _boxed if rust_type.starts_with("PgBox <") => translate_type_string(
             extract_type(&rust_type),
@@ -651,6 +683,7 @@ fn translate_type_string(
             span,
             depth + 1,
             default_value,
+            variadic,
         ),
         _option if rust_type.starts_with("Option <") => {
             let rc = translate_type_string(
@@ -659,9 +692,10 @@ fn translate_type_string(
                 span,
                 depth + 1,
                 default_value.clone(),
+                variadic,
             );
             let type_string = rc.unwrap().0;
-            Some((type_string, true, default_value))
+            Some((type_string, true, default_value, variadic))
         }
         mut unknown => {
             if std::env::var("DEBUG").is_ok() {
@@ -675,7 +709,7 @@ fn translate_type_string(
             }
 
             unknown = unknown.trim_start_matches("pg_sys :: ");
-            Some((unknown.to_string(), false, default_value))
+            Some((unknown.to_string(), false, default_value, variadic))
         }
     }
 }
