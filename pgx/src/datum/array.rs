@@ -2,6 +2,8 @@ use crate::{pg_sys, FromDatum};
 use serde::Serializer;
 use std::marker::PhantomData;
 
+pub type VariadicArray<'a, T> = Array<'a, T>;
+
 pub struct Array<'a, T: FromDatum<T>> {
     array_type: *mut pg_sys::ArrayType,
     elements: *mut pg_sys::Datum,

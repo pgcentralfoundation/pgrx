@@ -5,6 +5,11 @@ mod test {
     fn func_with_variadic_args(_field: &str, values: variadic!(Array<&str>)) -> String {
         values.get(0).unwrap().unwrap().to_string()
     }
+
+    #[pg_extern]
+    fn func_with_variadic_array_args(_field: &str, values: VariadicArray<&str>) -> String {
+        values.get(0).unwrap().unwrap().to_string()
+    }
 }
 
 mod tests {
@@ -18,6 +23,15 @@ mod tests {
         let result =
             Spi::get_one::<&str>("SELECT test.func_with_variadic_args('test', 'a', 'b', 'c');")
                 .expect("didn't get SPI result");
+        assert_eq!(result, "a");
+    }
+
+    #[pg_test]
+    fn test_func_with_variadic_array_args() {
+        let result = Spi::get_one::<&str>(
+            "SELECT test.func_with_variadic_array_args('test', 'a', 'b', 'c');",
+        )
+        .expect("didn't get SPI result");
         assert_eq!(result, "a");
     }
 }

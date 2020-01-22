@@ -674,6 +674,19 @@ fn translate_type_string(
             type_string.push_str("[]");
             Some((type_string, false, default_value, variadic))
         }
+        _array if rust_type.starts_with("VariadicArray <") => {
+            let rc = translate_type_string(
+                extract_type(&rust_type),
+                filename,
+                span,
+                depth + 1,
+                default_value.clone(),
+                true,
+            );
+            let mut type_string = rc.unwrap().0;
+            type_string.push_str("[]");
+            Some((type_string, false, default_value, true))
+        }
         _internal if rust_type.starts_with("Internal <") => {
             Some(("internal".to_string(), false, default_value, variadic))
         }
@@ -716,7 +729,10 @@ fn translate_type_string(
 
 fn extract_type(type_name: &str) -> String {
     let re = regex::Regex::new(r#"\w+ <(.*)>.*"#).unwrap();
-    let capture = re.captures(type_name).expect(&format!("no type capture against: {}", type_name)).get(1);
+    let capture = re
+        .captures(type_name)
+        .expect(&format!("no type capture against: {}", type_name))
+        .get(1);
     capture.unwrap().as_str().to_string().trim().to_string()
 }
 
