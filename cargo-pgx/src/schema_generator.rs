@@ -652,6 +652,7 @@ fn translate_type_string(
         "& str" | "String" => Some(("text".to_string(), false, default_value, variadic)),
         "& std :: ffi :: CStr" => Some(("cstring".to_string(), false, default_value, variadic)),
         "AnyElement" => Some(("anyelement".to_string(), false, default_value, variadic)),
+        "AnyArray" => Some(("anyarray".to_string(), false, default_value, variadic)),
         "pg_sys :: Oid" => Some(("oid".to_string(), false, default_value, variadic)),
         "pg_sys :: ItemPointerData" => Some(("tid".to_string(), false, default_value, variadic)),
         "pg_sys :: FunctionCallInfo" => None,

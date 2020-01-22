@@ -1,3 +1,4 @@
+mod anyarray_tests;
 mod array_tests;
 mod default_arg_value_tests;
 mod fcinfo_tests;
