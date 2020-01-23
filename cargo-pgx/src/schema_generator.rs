@@ -314,13 +314,10 @@ fn walk_items(
                 ));
             }
         } else if let Item::Macro(makro) = item {
-            let name = makro
-                .mac
-                .path
-                .get_ident()
-                .unwrap()
-                .into_token_stream()
-                .to_string();
+            let name = match makro.mac.path.get_ident() {
+                Some(ident) => ident.to_token_stream().to_string(),
+                None => "".to_string(),
+            };
 
             if "extension_sql".eq(&name) {
                 let string = makro.mac.tokens.to_string();
