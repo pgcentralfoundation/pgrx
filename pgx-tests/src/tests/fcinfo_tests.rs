@@ -1,7 +1,5 @@
 use pgx::*;
 
-pg_module_magic!();
-
 #[pg_extern]
 fn add_two_numbers(a: i32, b: i32) -> i32 {
     a + b

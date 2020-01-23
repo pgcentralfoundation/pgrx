@@ -53,7 +53,8 @@ pub use varlena::*;
 /// This macro was initially inspired from the `pg_module` macro in https://github.com/thehydroimpulse/postgres-extension.rs
 ///
 /// Shameless;y cribbed from https://github.com/bluejekyll/pg-extend-rs
-#[macro_export]
+///
+/// There's no need for users of this crate to use this macro.  It is installed automatically
 macro_rules! pg_module_magic {
     () => {
         #[no_mangle]
@@ -61,10 +62,11 @@ macro_rules! pg_module_magic {
         #[allow(unused)]
         #[link_name = "Pg_magic_func"]
         pub extern "C" fn Pg_magic_func() -> &'static pg_sys::Pg_magic_struct {
+            use crate as pgx;
             use std::mem::size_of;
             use std::os::raw::c_int;
 
-            const my_magic: pg_sys::Pg_magic_struct = pg_sys::Pg_magic_struct {
+            const MY_MAGIC: pg_sys::Pg_magic_struct = pg_sys::Pg_magic_struct {
                 len: size_of::<pg_sys::Pg_magic_struct>() as c_int,
                 version: pg_sys::PG_VERSION_NUM as std::os::raw::c_int / 100,
                 funcmaxargs: pg_sys::FUNC_MAX_ARGS as c_int,
@@ -79,10 +81,13 @@ macro_rules! pg_module_magic {
             pgx::initialize();
 
             // return the magic
-            &my_magic
+            &MY_MAGIC
         }
     };
 }
+
+// install the module magic for everyone that uses pgx
+pg_module_magic!();
 
 /// Top-level initialization function
 ///
