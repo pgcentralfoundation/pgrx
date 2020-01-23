@@ -228,12 +228,13 @@ fn install_extension() {
                 .unwrap_or(format!("{}/target", std::env::var("PWD").unwrap())),
         )
         .env(
-            "PGX_BUILD_FLAGS",
+            "PGX_BUILD_FEATURES",
             format!(
-                "--features pgx/pg{} --no-default-features",
+                "pgx/pg{} pg_test",
                 pg_sys::get_pg_major_version_string().to_string()
             ),
         )
+        .env("PGX_BUILD_FLAGS", "--no-default-features")
         .spawn()
         .unwrap();
 

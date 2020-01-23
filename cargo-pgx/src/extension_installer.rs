@@ -46,14 +46,20 @@ pub(crate) fn install_extension(target: Option<&str>) -> Result<(), std::io::Err
 }
 
 fn build_extension(is_release: bool) -> Result<(), std::io::Error> {
-    let features = std::env::var("PGX_BUILD_FLAGS").unwrap_or_default();
+    let features = std::env::var("PGX_BUILD_FEATURES").unwrap_or_default();
+    let flags = std::env::var("PGX_BUILD_FLAGS").unwrap_or_default();
     let mut command = Command::new("cargo");
     command.arg("build");
     if is_release {
         command.arg("--release");
     }
 
-    for arg in features.split_ascii_whitespace() {
+    if !features.trim().is_empty() {
+        command.arg("--features");
+        command.arg(features);
+    }
+
+    for arg in flags.split_ascii_whitespace() {
         command.arg(arg);
     }
 

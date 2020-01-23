@@ -5,6 +5,7 @@ fn default_argument(a: default!(i32, 99)) -> i32 {
     a
 }
 
+#[cfg(any(test, feature = "pg_test"))]
 mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;

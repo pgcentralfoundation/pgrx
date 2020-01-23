@@ -6,6 +6,7 @@ fn anyarray_arg(array: AnyArray) -> Json {
         .expect("conversion to json returned null")
 }
 
+#[cfg(any(test, feature = "pg_test"))]
 mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;

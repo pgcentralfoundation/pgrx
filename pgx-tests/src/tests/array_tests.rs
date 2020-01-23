@@ -79,6 +79,7 @@ fn serde_serialize_array_i32_deny_null(values: Array<i32>) -> Json {
     Json(json! { { "values": values.iter_deny_null() } })
 }
 
+#[cfg(any(test, feature = "pg_test"))]
 mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;

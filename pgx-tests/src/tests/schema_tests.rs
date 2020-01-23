@@ -5,6 +5,7 @@ mod test_schema {
     fn func_in_diff_schema() {}
 }
 
+#[cfg(any(test, feature = "pg_test"))]
 mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
