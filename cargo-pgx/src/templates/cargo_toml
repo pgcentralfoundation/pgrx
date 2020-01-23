@@ -23,5 +23,5 @@ panic = "unwind"
 [profile.release]
 panic = "unwind"
 opt-level = 3
-lto = true
+lto = "fat"
 codegen-units = 1
