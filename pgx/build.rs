@@ -68,9 +68,8 @@ fn make_shim_path(manifest_dir: &str) -> PathBuf {
 
 fn main() -> Result<(), std::io::Error> {
     build_deps::rerun_if_changed_paths("include/*").unwrap();
-    build_deps::rerun_if_changed_paths("../pgx-macros/src/lib.rs").unwrap();
-    build_deps::rerun_if_changed_paths("../pgx-macros/src/rewriter.rs").unwrap();
-    build_deps::rerun_if_changed_paths("../pgx-cshim/pgx-cshim.c").unwrap();
+    build_deps::rerun_if_changed_paths("../pgx-macros/src/*").unwrap();
+    build_deps::rerun_if_changed_paths("../pgx-cshim/*").unwrap();
 
     let manifest_dir = std::env::var("CARGO_MANIFEST_DIR").unwrap();
     let cwd = PathBuf::from(&manifest_dir);
@@ -139,6 +138,8 @@ fn main() -> Result<(), std::io::Error> {
         {
             eprintln!("{} is up-to-date:  skipping", output_rs.display());
             build_shim(&shim_dir, &shim_mutex, &pg_git_path, version);
+            regen = false;
+        } else {
             regen = false;
         }
 
