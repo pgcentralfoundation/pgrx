@@ -10,5 +10,6 @@ mod schema_tests;
 mod spi_tests;
 mod struct_type_tests;
 mod variadic_tests;
+mod xid64_tests;
 
 pgx::pg_module_magic!();

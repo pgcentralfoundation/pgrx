@@ -30,6 +30,7 @@ pub mod spi;
 pub mod stringinfo;
 pub mod tupdesc;
 pub mod varlena;
+pub mod xid;
 
 pub use datum::*;
 pub use enum_helper::*;
@@ -49,6 +50,7 @@ pub use spi::*;
 pub use stringinfo::*;
 pub use tupdesc::*;
 pub use varlena::*;
+pub use xid::*;
 
 /// A macro for marking a library compatible with the Postgres extension framework.
 ///
