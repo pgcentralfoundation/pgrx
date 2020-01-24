@@ -68,6 +68,10 @@ fn make_shim_path(manifest_dir: &str) -> PathBuf {
 
 fn main() -> Result<(), std::io::Error> {
     build_deps::rerun_if_changed_paths("include/*").unwrap();
+    build_deps::rerun_if_changed_paths("src/pg_sys/common.rs").unwrap();
+    build_deps::rerun_if_changed_paths("src/pg_sys/pg10_specific.rs").unwrap();
+    build_deps::rerun_if_changed_paths("src/pg_sys/pg11_specific.rs").unwrap();
+    build_deps::rerun_if_changed_paths("src/pg_sys/pg12_specific.rs").unwrap();
     build_deps::rerun_if_changed_paths("../pgx-macros/src/*").unwrap();
     build_deps::rerun_if_changed_paths("../pgx-cshim/*").unwrap();
 
