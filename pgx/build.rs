@@ -190,7 +190,7 @@ fn build_shim(
     version: &str,
 ) -> () {
     // build the shim under a lock b/c this can't be built concurrently
-    let _ = shim_mutex.lock().expect("couldn't obtain shim_mutex");
+    let lock = shim_mutex.lock().expect("couldn't obtain shim_mutex");
 
     // then build the shim for the version feature currently being built
     if version.eq("pg10") {
