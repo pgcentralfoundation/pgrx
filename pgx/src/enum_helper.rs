@@ -8,9 +8,12 @@ pub fn lookup_enum_by_oid(enumval: pg_sys::Oid) -> (String, pg_sys::Oid, f32) {
     }
 
     let tup = unsafe {
-        pg_sys::SearchSysCache1(
+        pg_sys::SearchSysCache(
             pg_sys::SysCacheIdentifier_ENUMOID as i32,
             enumval as pg_sys::Datum,
+            0,
+            0,
+            0,
         )
     };
     if tup.is_null() {
