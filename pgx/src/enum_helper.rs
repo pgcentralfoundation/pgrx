@@ -66,12 +66,14 @@ pub fn lookup_enum_by_label(typname: &str, label: &str) -> pg_sys::Datum {
     }
 
     let tup = unsafe {
-        pg_sys::SearchSysCache2(
+        pg_sys::SearchSysCache(
             pg_sys::SysCacheIdentifier_ENUMTYPOIDNAME as i32,
             enumtypoid as pg_sys::Datum,
             std::ffi::CString::new(label)
                 .expect("failed to convert enum typname to a CString")
                 .as_ptr() as pg_sys::Datum,
+            0,
+            0,
         )
     };
 
