@@ -90,7 +90,7 @@ fn main() -> Result<(), std::io::Error> {
     ]
     .par_iter()
     .for_each(|v| {
-        let mut regen = true;
+        let mut regen = false;
         let version = v.0;
         let branch_name = v.1;
         let port_no = u16::from_str(v.2).unwrap();
@@ -104,10 +104,6 @@ fn main() -> Result<(), std::io::Error> {
         let need_configure_and_make =
             git_clone_postgres(&pg_git_path, pg_git_repo_url, branch_name)
                 .expect(&format!("Unable to git clone {}", pg_git_repo_url));
-
-        if !common_rs.is_file() || !version_specific_rs.is_file() {
-            regen = true;
-        }
 
         if need_configure_and_make || !config_status.is_file() {
             eprintln!("[{}] cleaning and building", branch_name);
@@ -143,8 +139,10 @@ fn main() -> Result<(), std::io::Error> {
             eprintln!("{} is up-to-date:  skipping", output_rs.display());
             build_shim(&shim_dir, &shim_mutex, &pg_git_path, version);
             regen = false;
-        } else {
-            regen = false;
+        }
+
+        if !common_rs.is_file() || !version_specific_rs.is_file() {
+            regen = true;
         }
 
         build_shim(&shim_dir, &shim_mutex, &pg_git_path, version);
