@@ -121,6 +121,11 @@ impl<'a, T: FromDatum<T>> Array<'a, T> {
     }
 
     #[inline]
+    pub fn is_empty(&self) -> bool {
+        self.nelems == 0
+    }
+
+    #[inline]
     pub fn get(&self, i: usize) -> Option<Option<T>> {
         if i >= self.nelems {
             None

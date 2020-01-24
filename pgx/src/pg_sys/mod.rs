@@ -48,13 +48,13 @@ mod all_versions {
     pub const FirstOffsetNumber: super::OffsetNumber = 1;
     pub const MaxOffsetNumber: super::OffsetNumber =
         (super::BLCKSZ as usize / std::mem::size_of::<super::ItemIdData>()) as super::OffsetNumber;
-    pub const InvalidBlockNumber: u32 = 0xFFFFFFFF as crate::pg_sys::BlockNumber;
+    pub const InvalidBlockNumber: u32 = 0xFFFF_FFFF as crate::pg_sys::BlockNumber;
     pub const VARHDRSZ: usize = std::mem::size_of::<super::int32>();
     pub const InvalidTransactionId: super::TransactionId = 0 as super::TransactionId;
     pub const BootstrapTransactionId: super::TransactionId = 1 as super::TransactionId;
     pub const FrozenTransactionId: super::TransactionId = 2 as super::TransactionId;
     pub const FirstNormalTransactionId: super::TransactionId = 3 as super::TransactionId;
-    pub const MaxTransactionId: super::TransactionId = 0xFFFFFFFF as super::TransactionId;
+    pub const MaxTransactionId: super::TransactionId = 0xFFFF_FFFF as super::TransactionId;
 
     #[inline]
     pub fn VARHDRSZ_EXTERNAL() -> usize {

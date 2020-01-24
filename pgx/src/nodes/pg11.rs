@@ -1151,29 +1151,29 @@ impl PgNodeFactory {
     pub fn makeInteger(i: i32) -> PgBox<pg_sys::Value> {
         let mut value = PgNodeFactory::makeValue();
 
-        (&mut value).type_ = PgNode::Integer as u32;
-        (&mut value.val).ival = i;
+        value.type_ = PgNode::Integer as u32;
+        value.val.ival = i;
         value
     }
     pub fn makeFloat(memory_context: PgMemoryContexts, f: f64) -> PgBox<pg_sys::Value> {
         let mut value = PgNodeFactory::makeValue();
 
-        (&mut value).type_ = PgNode::Float as u32;
-        (&mut value.val).str = memory_context.pstrdup(f.to_string().as_str());
+        value.type_ = PgNode::Float as u32;
+        value.val.str = memory_context.pstrdup(f.to_string().as_str());
         value
     }
     pub fn makeString(memory_context: PgMemoryContexts, s: &str) -> PgBox<pg_sys::Value> {
         let mut value = PgNodeFactory::makeValue();
 
-        (&mut value).type_ = PgNode::String as u32;
-        (&mut value.val).str = memory_context.pstrdup(s);
+        value.type_ = PgNode::String as u32;
+        value.val.str = memory_context.pstrdup(s);
         value
     }
     pub fn makeBitString(memory_context: PgMemoryContexts, bs: &str) -> PgBox<pg_sys::Value> {
         let mut value = PgNodeFactory::makeValue();
 
-        (&mut value).type_ = PgNode::BitString as u32;
-        (&mut value.val).str = memory_context.pstrdup(bs);
+        value.type_ = PgNode::BitString as u32;
+        value.val.str = memory_context.pstrdup(bs);
         value
     }
     pub fn makeNull() -> PgBox<pg_sys::Const> {
