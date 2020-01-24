@@ -8,9 +8,9 @@ use std::str::FromStr;
 
 pub(crate) fn install_extension(target: Option<&str>) -> Result<(), std::io::Error> {
     let is_release = target.unwrap_or("") == "release";
-    let target_dir = get_target_dir(is_release);
-
     let (control_file, extname) = find_control_file()?;
+    let target_dir = get_target_dir(is_release, &extname);
+
     if &std::env::var("PGX_NO_BUILD").unwrap_or_default() != "true" {
         build_extension(is_release, target_dir.to_str().unwrap())?;
     } else {
@@ -155,8 +155,8 @@ fn get_version() -> String {
     }
 }
 
-fn get_target_dir(is_release: bool) -> PathBuf {
-    let package_name = std::env::var("CARGO_PKG_NAME").unwrap();
+fn get_target_dir(is_release: bool, extname: &str) -> PathBuf {
+    let package_name = std::env::var("CARGO_PKG_NAME").unwrap_or(extname.to_string());
 
     PathBuf::from(std::env::var("CARGO_TARGET_DIR").unwrap_or(format!(
         "/tmp/pgx-installer/{}-{}",

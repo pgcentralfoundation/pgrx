@@ -193,7 +193,6 @@ fn build_shim(
     let _ = shim_mutex.lock().expect("couldn't obtain shim_mutex");
 
     // then build the shim for the version feature currently being built
-    // and tell rustc to link to the library that was built
     if version.eq("pg10") {
         build_shim_for_version(&shim_dir, &pg_git_path, 10).expect("shim build for pg10 failed");
     } else if version.eq("pg11") {
@@ -204,6 +203,7 @@ fn build_shim(
         panic!("can't determine which c-shim to build");
     }
 
+    // and tell rustc to link to the library that was built for the feature we're currently building
     if std::env::var("CARGO_FEATURE_PG10").is_ok() {
         println!("cargo:rustc-link-search={}", shim_dir.display());
         println!("cargo:rustc-link-lib=static=pgx-cshim-10");
@@ -234,6 +234,8 @@ fn build_shim_for_version(
     eprintln!("shim_dir={}", shim_dir.display());
     let rc = run_command(
         Command::new("make")
+            .arg("clean")
+            .arg("all")
             .env("PG_TARGET_VERSION", format!("{}", version_no))
             .env("PATH", path_env)
             .current_dir(shim_dir),
