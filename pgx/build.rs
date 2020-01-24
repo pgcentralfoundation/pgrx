@@ -73,7 +73,8 @@ fn main() -> Result<(), std::io::Error> {
     build_deps::rerun_if_changed_paths("src/pg_sys/pg11_specific.rs").unwrap();
     build_deps::rerun_if_changed_paths("src/pg_sys/pg12_specific.rs").unwrap();
     build_deps::rerun_if_changed_paths("../pgx-macros/src/*").unwrap();
-    build_deps::rerun_if_changed_paths("../pgx-cshim/*").unwrap();
+    build_deps::rerun_if_changed_paths("../pgx-cshim/pgx-cshim.c").unwrap();
+    build_deps::rerun_if_changed_paths("../pgx-cshim/Makefile").unwrap();
 
     let manifest_dir = std::env::var("CARGO_MANIFEST_DIR").unwrap();
     let cwd = PathBuf::from(&manifest_dir);
