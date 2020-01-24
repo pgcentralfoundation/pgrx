@@ -9,7 +9,7 @@ use rewriter::*;
 use std::collections::HashSet;
 use syn::export::ToTokens;
 use syn::spanned::Spanned;
-use syn::{parse_macro_input, Attribute, DeriveInput, Item, ItemFn};
+use syn::{parse_macro_input, Attribute, Data, DeriveInput, Item, ItemFn};
 
 #[proc_macro_attribute]
 pub fn pg_guard(_attr: TokenStream, item: TokenStream) -> TokenStream {
@@ -115,19 +115,83 @@ fn rewrite_item_fn(mut func: ItemFn, is_raw: bool, no_guard: bool) -> proc_macro
     }
 }
 
-#[proc_macro_derive(PostgresType, attributes(inoutfuncs, schema))]
+#[proc_macro_derive(PostgresEnum)]
+pub fn postgres_enum(input: TokenStream) -> TokenStream {
+    let ast = parse_macro_input!(input as syn::DeriveInput);
+
+    impl_postgres_enum(ast).into()
+}
+
+fn impl_postgres_enum(ast: DeriveInput) -> proc_macro2::TokenStream {
+    let mut stream = proc_macro2::TokenStream::new();
+    let enum_ident = ast.ident;
+    let enum_name = enum_ident.to_string();
+
+    // validate that we're only operating on a struct
+    let enum_data = match ast.data {
+        Data::Enum(e) => e,
+        _ => panic!("#[derive(PostgresEnum)] can only be applied to enums"),
+    };
+
+    let mut from_datum = proc_macro2::TokenStream::new();
+    let mut into_datum = proc_macro2::TokenStream::new();
+
+    for d in enum_data.variants {
+        let label_ident = &d.ident;
+        let label_string = label_ident.to_token_stream().to_string();
+
+        from_datum.extend(quote! { #label_string => Some(#enum_ident::#label_ident), });
+        into_datum.extend(quote! { #enum_ident::#label_ident => Some(pgx::lookup_enum_by_label(#enum_name, #label_string)), });
+    }
+
+    stream.extend(quote! {
+        impl pgx::FromDatum<#enum_ident> for #enum_ident {
+            #[inline]
+            unsafe fn from_datum(datum: pgx::pg_sys::Datum, is_null: bool, typeoid: pgx::pg_sys::Oid) -> Option<#enum_ident> {
+                if is_null {
+                    None
+                } else {
+                    let (name, _, _) = pgx::lookup_enum_by_oid(datum as pgx::pg_sys::Oid);
+                    match name.as_str() {
+                        #from_datum
+                        _ => panic!("invalid enum value: {}", name)
+                    }
+                }
+            }
+        }
+
+        impl pgx::IntoDatum<#enum_ident> for #enum_ident {
+            #[inline]
+            fn into_datum(self) -> Option<pgx::pg_sys::Datum> {
+                match self {
+                    #into_datum
+                }
+            }
+        }
+    });
+
+    stream
+}
+
+#[proc_macro_derive(PostgresType, attributes(inoutfuncs))]
 pub fn postgres_type(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
 
-    impl_postgres_type(&ast).into()
+    impl_postgres_type(ast).into()
 }
 
-fn impl_postgres_type(ast: &DeriveInput) -> proc_macro2::TokenStream {
+fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
     let name = &ast.ident;
     let funcname_in = Ident::new(&format!("{}_in", name).to_lowercase(), name.span());
     let funcname_out = Ident::new(&format!("{}_out", name).to_lowercase(), name.span());
     let mut args = parse_postgres_type_args(&ast.attrs);
     let mut stream = proc_macro2::TokenStream::new();
+
+    // validate that we're only operating on a struct
+    match ast.data {
+        Data::Struct(_) => { /* this is okay */ }
+        _ => panic!("#[derive(PostgresType)] can only be applied to structs"),
+    }
 
     if args.is_empty() {
         // assume the user wants us to implement the InOutFuncs
@@ -183,7 +247,6 @@ fn impl_postgres_type(ast: &DeriveInput) -> proc_macro2::TokenStream {
 enum PostgresTypeAttribute {
     Custom,
     Default,
-    Schema(String),
 }
 
 fn parse_postgres_type_args(attributes: &Vec<Attribute>) -> HashSet<PostgresTypeAttribute> {
@@ -198,15 +261,6 @@ fn parse_postgres_type_args(attributes: &Vec<Attribute>) -> HashSet<PostgresType
 
                 _ => panic!("unrecognized PostgresType property: {}", a.tokens),
             },
-
-            "schema" => categorized_attributes.insert(PostgresTypeAttribute::Schema(
-                a.tokens
-                    .to_string()
-                    .trim_start_matches('=')
-                    .trim()
-                    .to_string(),
-            )),
-
             _ => panic!(
                 "unrecognized PostgresType attribute: {}",
                 a.path.to_token_stream().to_string()

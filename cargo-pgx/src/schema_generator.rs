@@ -313,6 +313,31 @@ fn walk_items(
                     name = name,
                 ));
             }
+        } else if let Item::Enum(enm) = item {
+            let mut found_postgres_enum = false;
+            for a in enm.attrs {
+                let string = a.to_token_stream().to_string();
+
+                if string.contains("PostgresEnum") {
+                    found_postgres_enum = true;
+                }
+            }
+
+            if found_postgres_enum {
+                let name = enm.ident.to_string().to_lowercase();
+                sql.push(format!("CREATE TYPE {}.{} AS ENUM (", current_schema, name));
+
+                for (idx, d) in enm.variants.iter().enumerate() {
+                    let mut line = String::new();
+                    line.push_str(&format!("'{}'", d.ident.to_string()));
+                    if idx < enm.variants.len() - 1 {
+                        line.push(',');
+                    }
+
+                    sql.push(line);
+                }
+                sql.push(");".to_string());
+            }
         } else if let Item::Macro(makro) = item {
             let name = match makro.mac.path.get_ident() {
                 Some(ident) => ident.to_token_stream().to_string(),

@@ -12,6 +12,7 @@ pub use pgx_macros::*;
 pub use std::convert::TryInto;
 
 pub mod datum;
+pub mod enum_helper;
 pub mod fcinfo;
 pub mod guard;
 pub mod htup;
@@ -31,6 +32,7 @@ pub mod tupdesc;
 pub mod varlena;
 
 pub use datum::*;
+pub use enum_helper::*;
 pub use fcinfo::*;
 pub use guard::*;
 pub use htup::*;

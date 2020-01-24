@@ -12,7 +12,9 @@ PGDLLEXPORT void pgx_ereport(int level, int code, char *message, char *file, int
 PGDLLEXPORT void pgx_SET_VARSIZE(struct varlena *ptr, int size);
 PGDLLEXPORT Datum pgx_heap_getattr(HeapTupleData *tuple, int attnum, TupleDesc tupdesc, bool *isnull);
 PGDLLEXPORT TransactionId pgx_HeapTupleHeaderGetXmin(HeapTupleHeader htup_header);
-PGDLLEXPORT TransactionId pgx_HeapTupleHeaderGetRawCommandId(HeapTupleHeader htup_header);
+PGDLLEXPORT CommandId pgx_HeapTupleHeaderGetRawCommandId(HeapTupleHeader htup_header);
+PGDLLEXPORT Oid pgx_HeapTupleHeaderGetOid(HeapTupleHeader htup_header);
+PGDLLEXPORT char *pgx_GETSTRUCT(HeapTuple tuple);
 
 MemoryContext pgx_GetMemoryContextChunk(void *ptr) {
     return GetMemoryChunkContext(ptr);
@@ -46,4 +48,12 @@ TransactionId pgx_HeapTupleHeaderGetXmin(HeapTupleHeader htup_header) {
 
 CommandId pgx_HeapTupleHeaderGetRawCommandId(HeapTupleHeader htup_header) {
     return HeapTupleHeaderGetRawCommandId(htup_header);
+}
+
+Oid pgx_HeapTupleHeaderGetOid(HeapTupleHeader htup_header) {
+    return HeapTupleHeaderGetOid(htup_header);
+}
+
+char *pgx_GETSTRUCT(HeapTuple tuple) {
+    return GETSTRUCT(tuple);
 }
