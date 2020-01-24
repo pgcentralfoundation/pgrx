@@ -235,7 +235,7 @@ fn build_shim_for_version(
     let rc = run_command(
         Command::new("make")
             .arg("clean")
-            .arg("all")
+            .arg(&format!("libpgx-cshim-{}.a", version_no))
             .env("PG_TARGET_VERSION", format!("{}", version_no))
             .env("PATH", path_env)
             .current_dir(shim_dir),
