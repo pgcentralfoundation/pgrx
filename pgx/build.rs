@@ -137,7 +137,6 @@ fn main() -> Result<(), std::io::Error> {
                 .lt(&std::fs::metadata(&output_rs).unwrap().modified().unwrap())
         {
             eprintln!("{} is up-to-date:  skipping", output_rs.display());
-            build_shim(&shim_dir, &shim_mutex, &pg_git_path, version);
             regen = false;
         }
 
@@ -195,18 +194,20 @@ fn build_shim(
 
     // then build the shim for the version feature currently being built
     // and tell rustc to link to the library that was built
-    if version.eq("pg10") && std::env::var("CARGO_FEATURE_PG10").is_ok() {
+    if version.eq("pg10") {
         build_shim_for_version(&shim_dir, &pg_git_path, 10).expect("shim build for pg10 failed");
         println!("cargo:rustc-link-search={}", shim_dir.display());
         println!("cargo:rustc-link-lib=static=pgx-cshim-10");
-    } else if version.eq("pg11") && std::env::var("CARGO_FEATURE_PG11").is_ok() {
+    } else if version.eq("pg11") {
         build_shim_for_version(&shim_dir, &pg_git_path, 11).expect("shim build for pg11 failed");
         println!("cargo:rustc-link-search={}", shim_dir.display());
         println!("cargo:rustc-link-lib=static=pgx-cshim-11");
-    } else if version.eq("pg12") && std::env::var("CARGO_FEATURE_PG12").is_ok() {
+    } else if version.eq("pg12") {
         build_shim_for_version(&shim_dir, &pg_git_path, 12).expect("shim build for pg12 failed");
         println!("cargo:rustc-link-search={}", shim_dir.display());
         println!("cargo:rustc-link-lib=static=pgx-cshim-12");
+    } else {
+        panic!("can't determine which c-shim to build");
     }
 }
 

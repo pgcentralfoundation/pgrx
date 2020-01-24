@@ -2,11 +2,11 @@ use crate::{
     direct_function_call, ereport, pg_sys, rust_str_to_text_p, PgLogLevel, PgSqlErrorCode,
 };
 
-pub fn lookup_enum_by_oid(enumval: pg_sys::Oid) -> (String, pg_sys::Oid, f32) {
-    extern "C" {
-        fn pgx_GETSTRUCT(tuple: pg_sys::HeapTuple) -> *mut std::os::raw::c_char;
-    }
+extern "C" {
+    fn pgx_GETSTRUCT(tuple: pg_sys::HeapTuple) -> *mut std::os::raw::c_char;
+}
 
+pub fn lookup_enum_by_oid(enumval: pg_sys::Oid) -> (String, pg_sys::Oid, f32) {
     let tup = unsafe {
         pg_sys::SearchSysCache(
             pg_sys::SysCacheIdentifier_ENUMOID as i32,
@@ -48,10 +48,6 @@ pub fn lookup_enum_by_oid(enumval: pg_sys::Oid) -> (String, pg_sys::Oid, f32) {
 }
 
 pub fn lookup_enum_by_label(typname: &str, label: &str) -> pg_sys::Datum {
-    extern "C" {
-        fn pgx_HeapTupleHeaderGetOid(htup_header: pg_sys::HeapTupleHeader) -> pg_sys::Oid;
-    }
-
     let typname_as_text = rust_str_to_text_p(typname);
     let enumtypoid = unsafe {
         direct_function_call::<pg_sys::Oid>(
@@ -84,11 +80,27 @@ pub fn lookup_enum_by_label(typname: &str, label: &str) -> pg_sys::Datum {
         );
     }
 
-    let oid = unsafe { pgx_HeapTupleHeaderGetOid(tup.as_ref().unwrap().t_data) };
+    let oid = extract_enum_oid(tup);
 
     unsafe {
         pg_sys::ReleaseSysCache(tup);
     }
 
     oid as pg_sys::Datum
+}
+
+#[cfg(any(feature = "pg10", feature = "pg11"))]
+fn extract_enum_oid(tup: *mut pg_sys::HeapTupleData) -> pg_sys::Oid {
+    extern "C" {
+        fn pgx_HeapTupleHeaderGetOid(htup_header: pg_sys::HeapTupleHeader) -> pg_sys::Oid;
+    }
+
+    unsafe { pgx_HeapTupleHeaderGetOid(tup.as_ref().unwrap().t_data) }
+}
+
+#[cfg(feature = "pg12")]
+fn extract_enum_oid(tup: *mut pg_sys::HeapTupleData) -> pg_sys::Oid {
+    let en = unsafe { pgx_GETSTRUCT(tup) } as pg_sys::Form_pg_enum;
+    let en = unsafe { en.as_ref() }.unwrap();
+    en.oid
 }
