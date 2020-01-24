@@ -31,7 +31,7 @@ jobs:
 
     # install sccache
     - name: install sccache
-      run: cargo install sccache
+      run: cargo install sccache --force
 
     # install our cargo subcomment
     - name: install cargo pgx
