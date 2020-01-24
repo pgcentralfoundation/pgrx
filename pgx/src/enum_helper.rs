@@ -53,7 +53,7 @@ pub fn lookup_enum_by_label(typname: &str, label: &str) -> pg_sys::Datum {
     let enumtypoid = unsafe {
         direct_function_call::<pg_sys::Oid>(
             pg_sys::to_regtype,
-            vec![Some(typname_as_text.to_pg() as pg_sys::Datum)],
+            vec![Some(typname_as_text.as_ptr() as pg_sys::Datum)],
         )
     }
     .expect("could not convert enum type to oid") as pg_sys::Oid;

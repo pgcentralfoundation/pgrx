@@ -44,7 +44,7 @@ pub fn node_to_string<'a>(nodeptr: *mut pg_sys::Node) -> Option<&'a str> {
 
 impl PgNode {
     pub fn is<T>(self, boxed: PgBox<T>) -> bool {
-        let node = boxed.to_pg() as *mut pg_sys::Node;
+        let node = boxed.as_ptr() as *mut pg_sys::Node;
         let me = self as u32;
         !node.is_null() && unsafe { node.as_ref() }.unwrap().type_ == me
     }

@@ -70,7 +70,7 @@ use std::ops::{Deref, DerefMut};
 ///     // ...
 ///
 ///     // pass the relation back to Postgres
-///     unsafe { pg_sys::relation_close(relation.to_pg(), lockmode); }
+///     unsafe { pg_sys::relation_close(relation.as_ptr(), lockmode); }
 ///
 ///     // While the `PgBox` instance gets dropped, the backing Postgres-allocated pointer is
 ///     // **not** freed since it came "::from_pg()".  We don't own the underlying memory so
@@ -199,7 +199,7 @@ impl<T> PgBox<T> {
     /// the `type_` field to the specified [PgNode]
     pub fn alloc_node(tag: PgNode) -> PgBox<T> {
         let boxed = PgBox::<T>::alloc0();
-        let node = boxed.to_pg() as *mut pg_sys::Node;
+        let node = boxed.as_ptr() as *mut pg_sys::Node;
 
         unsafe { node.as_mut() }.unwrap().type_ = tag as u32;
 
@@ -244,7 +244,7 @@ impl<T> PgBox<T> {
     }
 
     /// Return the boxed pointer, so that it can be passed back into a Postgres function
-    pub fn to_pg(&self) -> *mut T {
+    pub fn as_ptr(&self) -> *mut T {
         let ptr = self.ptr;
         match ptr {
             Some(ptr) => ptr,
@@ -252,15 +252,9 @@ impl<T> PgBox<T> {
         }
     }
 
-    /// Consume this instance and return the boxed pointer as a pg_sys::Datum, so that it can be
-    /// passed back into a Postgres function
-    pub fn convert_to_datum(self) -> pg_sys::Datum {
-        self.into_pg() as pg_sys::Datum
-    }
-
     /// Useful for returning the boxed pointer back to Postgres (as a return value, for example).
     ///
-    /// Rust forgets the Box and the boxed pointer is **not** free'd by Rust
+    /// The boxed pointer is **not** free'd by Rust
     pub fn into_pg(mut self) -> *mut T {
         self.allocated_by_pg = true;
         match self.ptr {
