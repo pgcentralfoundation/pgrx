@@ -64,6 +64,7 @@ fn build_extension(is_release: bool) -> Result<(), std::io::Error> {
     }
 
     let mut process = command
+        .env("CARGO_TARGET_DIR", "/tmp/pgx-installer")
         .stdout(Stdio::inherit())
         .stderr(Stdio::inherit())
         .spawn()?;
