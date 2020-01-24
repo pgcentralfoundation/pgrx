@@ -78,14 +78,14 @@ impl IntoDatum<f64> for f64 {
 impl<'a> IntoDatum<&'a str> for &'a str {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        Some(rust_str_to_text_p(&self) as pg_sys::Datum)
+        Some(rust_str_to_text_p(&self).convert_to_datum())
     }
 }
 
 impl IntoDatum<String> for String {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        Some(rust_str_to_text_p(&self) as pg_sys::Datum)
+        Some(rust_str_to_text_p(&self).convert_to_datum())
     }
 }
 

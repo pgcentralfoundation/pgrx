@@ -1,6 +1,5 @@
 use crate::{
-    direct_function_call, ereport, pg_sys, rust_str_to_text_p, void_mut_ptr, PgLogLevel,
-    PgSqlErrorCode,
+    direct_function_call, ereport, pg_sys, rust_str_to_text_p, PgLogLevel, PgSqlErrorCode,
 };
 
 pub fn lookup_enum_by_oid(enumval: pg_sys::Oid) -> (String, pg_sys::Oid, f32) {
@@ -54,13 +53,10 @@ pub fn lookup_enum_by_label(typname: &str, label: &str) -> pg_sys::Datum {
     let enumtypoid = unsafe {
         direct_function_call::<pg_sys::Oid>(
             pg_sys::to_regtype,
-            vec![Some(typname_as_text as pg_sys::Datum)],
+            vec![Some(typname_as_text.to_pg() as pg_sys::Datum)],
         )
     }
     .expect("could not convert enum type to oid") as pg_sys::Oid;
-    unsafe {
-        pg_sys::pfree(typname_as_text as void_mut_ptr);
-    }
 
     if enumtypoid == pg_sys::InvalidOid {
         panic!("could not locate type oid for type: {}", typname);

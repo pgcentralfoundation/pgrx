@@ -1,4 +1,4 @@
-use crate::pg_sys;
+use crate::{pg_sys, PgBox};
 
 pub unsafe fn set_varsize(ptr: *mut pg_sys::varlena, len: i32) {
     extern "C" {
@@ -286,9 +286,12 @@ pub unsafe fn text_to_rust_str_unchecked<'a>(t: *const pg_sys::varlena) -> &'a s
 ///
 /// This allocates the returned Postgres `text *` in `CurrentMemoryContext`.
 #[inline]
-pub fn rust_str_to_text_p(s: &str) -> *const pg_sys::varlena {
+pub fn rust_str_to_text_p(s: &str) -> PgBox<pg_sys::varlena> {
     let len = s.len();
     let ptr = s.as_ptr();
 
-    unsafe { pg_sys::cstring_to_text_with_len(ptr as *const std::os::raw::c_char, len as i32) }
+    let textp =
+        unsafe { pg_sys::cstring_to_text_with_len(ptr as *const std::os::raw::c_char, len as i32) };
+
+    PgBox::from_pg(textp)
 }

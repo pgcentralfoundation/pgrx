@@ -54,7 +54,7 @@ impl FromDatum<JsonB> for JsonB {
 impl IntoDatum<Json> for Json {
     fn into_datum(self) -> Option<pg_sys::Datum> {
         let string = serde_json::to_string(&self.0).expect("failed to serialize Json value");
-        Some(rust_str_to_text_p(string.as_str()) as pg_sys::Datum)
+        Some(rust_str_to_text_p(string.as_str()).convert_to_datum())
     }
 }
 

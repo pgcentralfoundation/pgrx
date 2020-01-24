@@ -225,6 +225,19 @@ impl<T> PgBox<T> {
         }
     }
 
+    /// Box a pointer that was allocated within Rust
+    ///
+    /// When this `PgBox<T>` is dropped, the boxed memory is freed.  Since Rust
+    /// allocated it, Rust is responsible for freeing it.
+    ///
+    /// If you need to give the boxed pointer to Postgres, call `.into_pg()`
+    pub fn from_rust(ptr: *mut T) -> PgBox<T> {
+        PgBox::<T> {
+            ptr: if ptr.is_null() { None } else { Some(ptr) },
+            allocated_by_pg: false,
+        }
+    }
+
     /// Are we boxing a NULL?
     pub fn is_null(&self) -> bool {
         self.ptr.is_none()
