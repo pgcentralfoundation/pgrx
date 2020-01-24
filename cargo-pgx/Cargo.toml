@@ -6,7 +6,6 @@ edition = "2018"
 description = "Cargo Postgres extension manager"
 
 [dependencies]
-pgx-macros = { path = "../pgx-macros" }
 clap = {version = "2.33.0", features = ["yaml"]}
 syn = { version = "1.0.5", features = ["extra-traits", "full", "fold", "parsing"] }
 quote = "1.0.2"
