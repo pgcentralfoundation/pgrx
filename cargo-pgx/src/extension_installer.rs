@@ -8,10 +8,11 @@ use std::str::FromStr;
 
 pub(crate) fn install_extension(target: Option<&str>) -> Result<(), std::io::Error> {
     let is_release = target.unwrap_or("") == "release";
+    let target_dir = get_target_dir(is_release);
 
     let (control_file, extname) = find_control_file()?;
     if &std::env::var("PGX_NO_BUILD").unwrap_or_default() != "true" {
-        build_extension(is_release)?;
+        build_extension(is_release, target_dir.to_str().unwrap())?;
     } else {
         eprintln!(
             "Skipping build due to $PGX_NO_BUILD=true in {}",
@@ -19,7 +20,6 @@ pub(crate) fn install_extension(target: Option<&str>) -> Result<(), std::io::Err
         );
     }
 
-    let target_dir = get_target_dir();
     let pkgdir = get_pkglibdir();
     let extdir = get_extensiondir();
     let (libpath, libfile) =
@@ -45,7 +45,7 @@ pub(crate) fn install_extension(target: Option<&str>) -> Result<(), std::io::Err
     Ok(())
 }
 
-fn build_extension(is_release: bool) -> Result<(), std::io::Error> {
+fn build_extension(is_release: bool, target_dir: &str) -> Result<(), std::io::Error> {
     let features = std::env::var("PGX_BUILD_FEATURES").unwrap_or_default();
     let flags = std::env::var("PGX_BUILD_FLAGS").unwrap_or_default();
     let mut command = Command::new("cargo");
@@ -64,13 +64,7 @@ fn build_extension(is_release: bool) -> Result<(), std::io::Error> {
     }
 
     let mut process = command
-        .env(
-            "CARGO_TARGET_DIR",
-            format!(
-                "/tmp/pgx-installer/{}",
-                std::env::var("CARGO_PKG_NAME").unwrap()
-            ),
-        )
+        .env("CARGO_TARGET_DIR", target_dir.to_string())
         .stdout(Stdio::inherit())
         .stderr(Stdio::inherit())
         .spawn()?;
@@ -152,7 +146,7 @@ fn find_library_file(
         }
     }
 
-    panic!("couldn't find library file");
+    panic!("couldn't find library file in: {}", target_dir);
 }
 fn get_version() -> String {
     match get_property("default_version") {
@@ -161,8 +155,14 @@ fn get_version() -> String {
     }
 }
 
-fn get_target_dir() -> PathBuf {
-    PathBuf::from(std::env::var("CARGO_TARGET_DIR").unwrap_or("target".to_string()))
+fn get_target_dir(is_release: bool) -> PathBuf {
+    let package_name = std::env::var("CARGO_PKG_NAME").unwrap();
+
+    PathBuf::from(std::env::var("CARGO_TARGET_DIR").unwrap_or(format!(
+        "/tmp/pgx-installer/{}-{}",
+        package_name,
+        if is_release { "release" } else { "debug" }
+    )))
 }
 
 fn get_pkglibdir() -> String {
