@@ -107,9 +107,9 @@ fn get_depth(depth: &'static LocalKey<Cell<usize>>) -> usize {
 }
 
 #[inline]
-pub fn guard<R, F: FnOnce() -> R>(f: F) -> R
+pub fn guard<R, F: Fn() -> R>(f: F) -> R
 where
-    F: std::panic::UnwindSafe,
+    F: std::panic::UnwindSafe + std::panic::RefUnwindSafe,
 {
     thread_local! { static DEPTH: Cell<usize> = Cell::new(0) }
 

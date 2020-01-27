@@ -1,5 +1,5 @@
 #[allow(dead_code)]
-
+#[derive(Clone, Copy)]
 pub enum PgLogLevel {
     /// Debugging messages, in categories of decreasing detail
     DEBUG5 = crate::pg_sys::DEBUG5 as isize,
@@ -47,6 +47,7 @@ pub enum PgLogLevel {
 
 /// This list of SQL Error Codes is taken directly from Postgres 12's generated "utils/errcodes.h"
 #[allow(non_camel_case_types)]
+#[derive(Clone, Copy)]
 pub enum PgSqlErrorCode {
     /// Class 00 - Successful Completion
     ERRCODE_SUCCESSFUL_COMPLETION = MAKE_SQLSTATE('0', '0', '0', '0', '0') as isize,

@@ -11,6 +11,7 @@ pub use pgx_macros::*;
 // we need this publicly too
 pub use std::convert::TryInto;
 
+pub mod callbacks;
 pub mod datum;
 pub mod enum_helper;
 pub mod fcinfo;
@@ -32,6 +33,7 @@ pub mod tupdesc;
 pub mod varlena;
 pub mod xid;
 
+pub use callbacks::*;
 pub use datum::*;
 pub use enum_helper::*;
 pub use fcinfo::*;

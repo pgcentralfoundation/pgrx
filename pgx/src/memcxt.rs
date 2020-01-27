@@ -203,7 +203,10 @@ impl PgMemoryContexts {
     ///     })
     /// }
     /// ```
-    pub fn switch_to<R, F: FnOnce() -> R + std::panic::UnwindSafe>(&self, f: F) -> R {
+    pub fn switch_to<R, F: Fn() -> R + std::panic::UnwindSafe + std::panic::RefUnwindSafe>(
+        &self,
+        f: F,
+    ) -> R {
         match self {
             PgMemoryContexts::Transient {
                 parent,
@@ -294,7 +297,7 @@ impl PgMemoryContexts {
     }
 
     /// helper function
-    fn exec_in_context<R, F: FnOnce() -> R + std::panic::UnwindSafe>(
+    fn exec_in_context<R, F: Fn() -> R + std::panic::UnwindSafe + std::panic::RefUnwindSafe>(
         context: pg_sys::MemoryContext,
         f: F,
     ) -> R {
@@ -306,7 +309,7 @@ impl PgMemoryContexts {
             pg_sys::CurrentMemoryContext = context;
         }
 
-        let result = guard::guard(|| f());
+        let result = guard::guard(f);
 
         // restore our understanding of the current memory context
         unsafe {
