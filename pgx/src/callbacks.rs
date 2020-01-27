@@ -71,7 +71,8 @@ impl XactCallbackReceipt {
     /// ## Examples
     ///
     /// ```rust,no_run
-    /// use pgx::{register_xact_callback, PgXactCallbackEvent};
+    /// use pgx::*;
+    ///
     /// let receipt = register_xact_callback(PgXactCallbackEvent::Commit, || info!("called after commit"));
     ///
     /// let no_longer_necessary = true;
@@ -106,7 +107,8 @@ type CallbackMap = HashMap<PgXactCallbackEvent, Vec<Rc<RefCell<Option<XactCallba
 /// Register a number of events for pre-commit and commit:
 ///
 /// ```rust,no_run
-/// use pgx::{register_xact_callback, PgXactCallbackEvent};
+/// use pgx::*;
+///
 /// register_xact_callback(PgXactCallbackEvent::PreCommit, || info!("pre-commit #1"));
 /// register_xact_callback(PgXactCallbackEvent::PreCommit, || info!("pre-commit #2"));
 /// register_xact_callback(PgXactCallbackEvent::PreCommit, || info!("pre-commit #3"));
@@ -116,7 +118,7 @@ type CallbackMap = HashMap<PgXactCallbackEvent, Vec<Rc<RefCell<Option<XactCallba
 /// Register an event, do some work, and then decide the callback isn't actually necessary anymore:
 ///
 /// ```rust,no_run
-/// use pgx::{register_xact_callback, PgXactCallbackEvent};
+/// use pgx::*;
 ///
 /// // ... do some initialization work ...
 ///
@@ -128,7 +130,6 @@ type CallbackMap = HashMap<PgXactCallbackEvent, Vec<Rc<RefCell<Option<XactCallba
 /// receipt.unregister_callback();
 /// ```
 ///
-///
 /// ## Safety
 ///
 /// Any kind of Rust `panic!()` or Postgres `ereport(ERROR)` while executing a `PgXactCallbackEvent::Commit`
@@ -137,8 +138,8 @@ type CallbackMap = HashMap<PgXactCallbackEvent, Vec<Rc<RefCell<Option<XactCallba
 ///
 /// As the Postgres internal documentation says:  
 ///
-///     At transaction end, the callback occurs post-commit or post-abort, so the callback
-///     functions can only do noncritical cleanup.
+/// At transaction end, the callback occurs post-commit or post-abort, so the callback
+/// functions can only do noncritical cleanup.
 pub fn register_xact_callback<F>(which_event: PgXactCallbackEvent, f: F) -> XactCallbackReceipt
 where
     F: Fn() + std::panic::UnwindSafe + std::panic::RefUnwindSafe + 'static,
@@ -263,8 +264,9 @@ impl SubXactCallbackReceipt {
     /// ## Examples
     ///
     /// ```rust,no_run
-    /// use pgx::{register_subxact_callback};
-    /// let receipt = register_subxact_callback(PgSubXactCallbackEvent::Commit, |my_subid, parent_subid| info!("called after commit: {} {}", my_subid, parent_subid));
+    /// use pgx::*;
+    ///
+    /// let receipt = register_subxact_callback(PgSubXactCallbackEvent::CommitSub, |my_subid, parent_subid| info!("called after commit-sub: {} {}", my_subid, parent_subid));
     ///
     /// let no_longer_necessary = true;
     ///
