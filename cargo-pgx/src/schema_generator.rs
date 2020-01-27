@@ -618,27 +618,14 @@ fn translate_type(
         Type::Macro(makro) => {
             let as_string = format!("{}", quote!(#ty));
 
-            if as_string.starts_with("default !") {
-                let regexp =
-                    regex::Regex::new(r#"default ! \( (?P<type>.*?) , (?P<value>.*?) \)"#).unwrap();
-
-                default_value = Some(
-                    get_named_capture(&regexp, "value", &format!("{}", quote!(#ty)))
-                        .expect("no default value"),
-                );
-
-                rust_type = get_named_capture(&regexp, "type", &format!("{}", quote!(#ty)))
-                    .expect("no type name in default ");
-                span = makro.span().clone();
-            } else if as_string.starts_with("variadic !") {
-                let regexp = regex::Regex::new(r#"variadic ! \( (?P<type>.*?) \)"#).unwrap();
-
-                rust_type = get_named_capture(&regexp, "type", &format!("{}", quote!(#ty)))
-                    .expect("no type name in default ");
-                span = makro.span().clone();
-                variadic = true;
-            } else {
-                panic!("unrecognized macro in argument list: {}", as_string);
+            match deconstruct_macro(&as_string) {
+                Some((rt, dv, v)) => {
+                    rust_type = rt;
+                    default_value = dv;
+                    variadic = v;
+                    span = makro.span().clone();
+                }
+                None => panic!("unrecognized macro in argument list: {}", as_string),
             }
         }
         other => {
@@ -649,13 +636,35 @@ fn translate_type(
     translate_type_string(rust_type, filename, &span, 0, default_value, variadic)
 }
 
+fn deconstruct_macro(as_string: &str) -> Option<(String, Option<String>, bool)> {
+    if as_string.starts_with("default !") {
+        let regexp =
+            regex::Regex::new(r#"default ! \( (?P<type>.*?) , (?P<value>.*?) \)"#).unwrap();
+
+        let default_value =
+            Some(get_named_capture(&regexp, "value", as_string).expect("no default value"));
+
+        let rust_type =
+            get_named_capture(&regexp, "type", as_string).expect("no type name in default ");
+        Some((rust_type, default_value, false))
+    } else if as_string.starts_with("variadic !") {
+        let regexp = regex::Regex::new(r#"variadic ! \( (?P<type>.*?) \)"#).unwrap();
+
+        let rust_type =
+            get_named_capture(&regexp, "type", as_string).expect("no type name in default ");
+        Some((rust_type, None, true))
+    } else {
+        None
+    }
+}
+
 fn translate_type_string(
     rust_type: String,
     filename: &DirEntry,
     span: &proc_macro2::Span,
     depth: i32,
-    default_value: Option<String>,
-    variadic: bool,
+    mut default_value: Option<String>,
+    mut variadic: bool,
 ) -> Option<(String, bool, Option<String>, bool)> {
     match rust_type.as_str() {
         "i8" => Some(("smallint".to_string(), false, default_value, variadic)), // convert i8 types into smallints as Postgres doesn't have a 1byte-sized type
@@ -722,14 +731,22 @@ fn translate_type_string(
             variadic,
         ),
         _option if rust_type.starts_with("Option <") => {
+            let mut extraced_type = extract_type(&rust_type);
+            if let Some((rt, dv, v)) = deconstruct_macro(&extraced_type) {
+                extraced_type = rt;
+                default_value = dv;
+                variadic = v;
+            }
+
             let rc = translate_type_string(
-                extract_type(&rust_type),
+                extraced_type,
                 filename,
                 span,
                 depth + 1,
                 default_value.clone(),
                 variadic,
             );
+            //            eprintln!("rc={:?}", rc);
             let type_string = rc.unwrap().0;
             Some((type_string, true, default_value, variadic))
         }
