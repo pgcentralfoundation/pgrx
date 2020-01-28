@@ -522,63 +522,63 @@ pub fn ereport(
 #[macro_export]
 macro_rules! debug5 {
     ($($arg:tt)*) => (
-        $crate::log::elog(PgLogLevel::DEBUG5, format!($($arg)*).as_str());
+        $crate::log::elog($crate::log::PgLogLevel::DEBUG5, format!($($arg)*).as_str());
     )
 }
 
 #[macro_export]
 macro_rules! debug4 {
     ($($arg:tt)*) => (
-        $crate::log::elog(PgLogLevel::DEBUG4, format!($($arg)*).as_str());
+        $crate::log::elog($crate::log::PgLogLevel::DEBUG4, format!($($arg)*).as_str());
     )
 }
 
 #[macro_export]
 macro_rules! debug3 {
     ($($arg:tt)*) => (
-        $crate::log::elog(PgLogLevel::DEBUG3, format!($($arg)*).as_str());
+        $crate::log::elog($crate::log::PgLogLevel::DEBUG3, format!($($arg)*).as_str());
     )
 }
 
 #[macro_export]
 macro_rules! debug2 {
     ($($arg:tt)*) => (
-        $crate::log::elog(PgLogLevel::DEBUG2, format!($($arg)*).as_str());
+        $crate::log::elog($crate::log::PgLogLevel::DEBUG2, format!($($arg)*).as_str());
     )
 }
 
 #[macro_export]
 macro_rules! debug1 {
     ($($arg:tt)*) => (
-        $crate::log::elog(PgLogLevel::DEBUG1, format!($($arg)*).as_str());
+        $crate::log::elog($crate::log::PgLogLevel::DEBUG1, format!($($arg)*).as_str());
     )
 }
 
 #[macro_export]
 macro_rules! log {
     ($($arg:tt)*) => (
-        $crate::log::elog(PgLogLevel::LOG, format!($($arg)*).as_str());
+        $crate::log::elog($crate::log::PgLogLevel::LOG, format!($($arg)*).as_str());
     )
 }
 
 #[macro_export]
 macro_rules! info {
     ($($arg:tt)*) => (
-        $crate::log::elog(PgLogLevel::INFO, format!($($arg)*).as_str());
+        $crate::log::elog($crate::log::PgLogLevel::INFO, format!($($arg)*).as_str());
     )
 }
 
 #[macro_export]
 macro_rules! notice {
     ($($arg:tt)*) => (
-        $crate::log::elog(PgLogLevel::NOTICE, format!($($arg)*).as_str());
+        $crate::log::elog($crate::log::PgLogLevel::NOTICE, format!($($arg)*).as_str());
     )
 }
 
 #[macro_export]
 macro_rules! warning {
     ($($arg:tt)*) => (
-        $crate::log::elog(PgLogLevel::WARNING, format!($($arg)*).as_str());
+        $crate::log::elog($crate::log::PgLogLevel::WARNING, format!($($arg)*).as_str());
     )
 }
 
@@ -586,7 +586,7 @@ macro_rules! warning {
 macro_rules! error {
     ($($arg:tt)*) => (
 //        { $crate::log::elog(PgLogLevel::ERROR, format!($($arg)*).as_str()); unreachable!("elog failed"); }
-        { $crate::log::ereport(PgLogLevel::ERROR, PgSqlErrorCode::ERRCODE_INTERNAL_ERROR, format!($($arg)*).as_str(), file!(), line!(), column!()); unreachable!("elog failed"); }
+        { $crate::log::ereport($crate::log::PgLogLevel::ERROR, $crate::log::PgSqlErrorCode::ERRCODE_INTERNAL_ERROR, format!($($arg)*).as_str(), file!(), line!(), column!()); unreachable!("elog failed"); }
     )
 }
 
@@ -594,7 +594,7 @@ macro_rules! error {
 #[macro_export]
 macro_rules! FATAL {
     ($($arg:tt)*) => (
-        { $crate::log::elog(PgLogLevel::FATAL, format!($($arg)*).as_str()); unreachable!("elog failed"); }
+        { $crate::log::elog($crate::log::PgLogLevel::FATAL, format!($($arg)*).as_str()); unreachable!("elog failed"); }
     )
 }
 
@@ -602,7 +602,7 @@ macro_rules! FATAL {
 #[macro_export]
 macro_rules! PANIC {
     ($($arg:tt)*) => (
-        { $crate::log::elog(PgLogLevel::PANIC, format!($($arg)*).as_str()); unreachable!("elog failed"); }
+        { $crate::log::elog($crate::log::PgLogLevel::PANIC, format!($($arg)*).as_str()); unreachable!("elog failed"); }
     )
 }
 
