@@ -1,4 +1,5 @@
 use crate::{pg_sys, FromDatum, IntoDatum, PgMemoryContexts, PgOid};
+use enum_primitive_derive::*;
 use num_traits::FromPrimitive;
 use std::fmt::Debug;
 

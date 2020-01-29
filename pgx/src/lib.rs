@@ -1,7 +1,5 @@
 extern crate pgx_macros;
 
-#[macro_use]
-extern crate enum_primitive_derive;
 extern crate num_traits;
 
 // expose the #[derive(DatumCompatible)] trait
