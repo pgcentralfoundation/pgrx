@@ -4,6 +4,9 @@ version = "0.1.0"
 authors = ["Eric B. Ridge <eebbrr@gmail.com>"]
 edition = "2018"
 
+[lib]
+crate-type = ["rlib"]
+
 [features]
 default = []
 pg10 = ["pgx-pg-sys/pg10"]
