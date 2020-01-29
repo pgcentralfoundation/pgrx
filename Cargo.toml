@@ -8,17 +8,19 @@ members = [
     "pgx",
     "pgx-macros",
     "pgx-tests",
+    "pgx-pg-sys",
     "cargo-pgx",
 ]
 
 [features]
 default = ["pg11"]
-pg10 = ["pgx/pg10"]
-pg11 = ["pgx/pg11"]
-pg12 = ["pgx/pg12"]
+pg10 = ["pgx/pg10", "pgx-pg-sys/pg10"]
+pg11 = ["pgx/pg11", "pgx-pg-sys/pg11"]
+pg12 = ["pgx/pg12", "pgx-pg-sys/pg12"]
 
 [dependencies]
 pgx = { path = "pgx", default-features = false }
 pgx-macros = { path = "pgx-macros" }
 pgx-tests = { path = "pgx-tests", default-features = false }
+pgx-pg-sys = { path = "pgx-pg-sys", default-features = false }
 cargo-pgx = { path = "cargo-pgx" }

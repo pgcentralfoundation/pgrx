@@ -7,8 +7,7 @@ use std::collections::HashSet;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Output};
 use std::str::FromStr;
-use std::sync::atomic::{AtomicBool, Ordering};
-use std::sync::{Arc, Mutex};
+use std::sync::Mutex;
 use syn::export::{ToTokens, TokenStream2};
 use syn::Item;
 
@@ -68,20 +67,26 @@ fn make_shim_path(manifest_dir: &str) -> PathBuf {
 
 fn main() -> Result<(), std::io::Error> {
     build_deps::rerun_if_changed_paths("include/*").unwrap();
-    build_deps::rerun_if_changed_paths("src/pg_sys/common.rs").unwrap();
-    build_deps::rerun_if_changed_paths("src/pg_sys/pg10_specific.rs").unwrap();
-    build_deps::rerun_if_changed_paths("src/pg_sys/pg11_specific.rs").unwrap();
-    build_deps::rerun_if_changed_paths("src/pg_sys/pg12_specific.rs").unwrap();
     build_deps::rerun_if_changed_paths("../pgx-macros/src/*").unwrap();
     build_deps::rerun_if_changed_paths("../pgx-cshim/pgx-cshim.c").unwrap();
     build_deps::rerun_if_changed_paths("../pgx-cshim/Makefile").unwrap();
+    build_deps::rerun_if_changed_paths(
+        "/tmp/pgx-build/REL_10_STABLE/.git/refs/heads/REL_10_STABLE",
+    )
+    .unwrap();
+    build_deps::rerun_if_changed_paths(
+        "/tmp/pgx-build/REL_11_STABLE/.git/refs/heads/REL_11_STABLE",
+    )
+    .unwrap();
+    build_deps::rerun_if_changed_paths(
+        "/tmp/pgx-build/REL_12_STABLE/.git/refs/heads/REL_12_STABLE",
+    )
+    .unwrap();
 
     let manifest_dir = std::env::var("CARGO_MANIFEST_DIR").unwrap();
     let cwd = PathBuf::from(&manifest_dir);
     let pg_git_repo_url = "git://git.postgresql.org/git/postgresql.git";
-    let build_rs = PathBuf::from("build.rs");
     let shim_dir = make_shim_path(&manifest_dir);
-    let regen_flag = Arc::new(AtomicBool::new(false));
 
     let shim_mutex = Mutex::new(());
     &vec![
@@ -91,17 +96,14 @@ fn main() -> Result<(), std::io::Error> {
     ]
     .par_iter()
     .for_each(|v| {
-        let mut regen = false;
         let version = v.0;
         let branch_name = v.1;
         let port_no = u16::from_str(v.2).unwrap();
         let pg_git_path = make_git_repo_path(branch_name);
         let include_path = make_include_path(&pg_git_path);
-        let output_rs = PathBuf::from(format!("src/pg_sys/{}_bindings.rs", version));
+        let bindings_rs = PathBuf::from(format!("src/{}_bindings.rs", version));
         let include_h = PathBuf::from(format!("include/{}.h", version));
         let config_status = PathBuf::from(format!("{}/config.status", pg_git_path.display()));
-        let common_rs = PathBuf::from(format!("src/pg_sys/common.rs"));
-        let version_specific_rs = PathBuf::from(format!("src/pg_sys/{}_specific.rs", version));
         let need_configure_and_make =
             git_clone_postgres(&pg_git_path, pg_git_repo_url, branch_name)
                 .expect(&format!("Unable to git clone {}", pg_git_repo_url));
@@ -116,77 +118,43 @@ fn main() -> Result<(), std::io::Error> {
                 "Unable to make clean and configure postgres branch {}",
                 branch_name
             ));
-        } else if output_rs.is_file()
-            && std::fs::metadata(&build_rs)
-                .unwrap()
-                .modified()
-                .unwrap()
-                .gt(&std::fs::metadata(&output_rs).unwrap().modified().unwrap())
-        {
-            eprintln!(
-                "[{}] build.rs is newer, removing and re-generating {}",
-                branch_name,
-                output_rs.display()
-            );
-            std::fs::remove_file(&output_rs)
-                .expect(&format!("couldn't delete {}", output_rs.display()));
-        } else if output_rs.is_file()
-            && std::fs::metadata(&include_h)
-                .unwrap()
-                .modified()
-                .unwrap()
-                .lt(&std::fs::metadata(&output_rs).unwrap().modified().unwrap())
-        {
-            eprintln!("{} is up-to-date:  skipping", output_rs.display());
-            regen = false;
-        }
-
-        if !common_rs.is_file() || !version_specific_rs.is_file() {
-            regen = true;
         }
 
         build_shim(&shim_dir, &shim_mutex, &pg_git_path, version);
 
-        if regen {
-            eprintln!(
-                "[{}] Running bindgen on {} with {}",
-                branch_name,
-                output_rs.display(),
-                include_path.display()
-            );
-            let bindings = bindgen::Builder::default()
-                .header(include_h.to_str().unwrap())
-                .clang_arg(&format!("-I{}", include_path.display()))
-                .parse_callbacks(Box::new(IgnoredMacros::default()))
-                // pgx converts the VARSIZE_ANY macro, so we don't want to also have this function, which is in heaptuple.c
-                .blacklist_function("varsize_any")
-                .rustfmt_bindings(true)
-                .derive_debug(true)
-                .derive_copy(true) // necessary to void __BindgenUnionField usages -- I don't understand why?
-                .derive_default(false)
-                .derive_eq(false)
-                .derive_partialeq(false)
-                .derive_hash(false)
-                .derive_ord(false)
-                .derive_partialord(false)
-                .layout_tests(false)
-                .generate()
-                .expect(&format!("Unable to generate bindings for {}", version));
+        eprintln!(
+            "[{}] Running bindgen on {} with {}",
+            branch_name,
+            bindings_rs.display(),
+            include_path.display()
+        );
+        let bindings = bindgen::Builder::default()
+            .header(include_h.to_str().unwrap())
+            .clang_arg(&format!("-I{}", include_path.display()))
+            .parse_callbacks(Box::new(IgnoredMacros::default()))
+            .blacklist_function("varsize_any") // pgx converts the VARSIZE_ANY macro, so we don't want to also have this function, which is in heaptuple.c
+            .rustfmt_bindings(true)
+            .derive_debug(true)
+            .derive_copy(true) // necessary to avoid __BindgenUnionField usages -- I don't understand why?
+            .derive_default(false)
+            .derive_eq(false)
+            .derive_partialeq(false)
+            .derive_hash(false)
+            .derive_ord(false)
+            .derive_partialord(false)
+            .layout_tests(false)
+            .generate()
+            .expect(&format!("Unable to generate bindings for {}", version));
 
-            let bindings = apply_pg_guard(bindings.to_string()).unwrap();
-            std::fs::write(output_rs.clone(), bindings)
-                .expect(&format!("Unable to save bindings for {}", version));
-
-            rust_fmt(output_rs.as_path(), &branch_name)
-                .expect(&format!("Unable to run rustfmt for {}", version));
-
-            regen_flag.store(true, Ordering::SeqCst);
-        }
+        let bindings = apply_pg_guard(bindings.to_string()).unwrap();
+        std::fs::write(bindings_rs.clone(), bindings).expect(&format!(
+            "Unable to save bindings for {} to {}",
+            version,
+            bindings_rs.display()
+        ));
     });
 
-    if regen_flag.load(Ordering::SeqCst) {
-        generate_common_rs(cwd);
-    }
+    generate_common_rs(cwd);
 
     Ok(())
 }
@@ -454,16 +422,17 @@ fn apply_pg_guard(input: String) -> Result<String, std::io::Error> {
     Ok(format!("{}", stream.into_token_stream()))
 }
 
-fn rust_fmt(path: &Path, branch_name: &str) -> Result<(), std::io::Error> {
+fn rust_fmt(path: &str) -> Result<(), std::io::Error> {
     run_command(
         Command::new("rustfmt").arg(path).current_dir("."),
-        branch_name,
+        "[bindings_diff]",
     )?;
 
     Ok(())
 }
 
 pub(crate) mod bindings_diff {
+    use crate::rust_fmt;
     use quote::quote;
     use std::cmp::Ordering;
     use std::collections::BTreeMap;
@@ -471,7 +440,6 @@ pub(crate) mod bindings_diff {
     use std::hash::{Hash, Hasher};
     use std::io::Read;
     use std::path::PathBuf;
-    use std::process::{Command, Output};
     use std::str::FromStr;
     use syn::export::TokenStream2;
     use syn::ForeignItem;
@@ -566,9 +534,9 @@ pub(crate) mod bindings_diff {
     }
 
     pub(crate) fn main() -> Result<(), std::io::Error> {
-        let mut v10 = read_source_file("pgx/src/pg_sys/pg10_bindings.rs");
-        let mut v11 = read_source_file("pgx/src/pg_sys/pg11_bindings.rs");
-        let mut v12 = read_source_file("pgx/src/pg_sys/pg12_bindings.rs");
+        let mut v10 = read_source_file("pgx-pg-sys/src/pg10_bindings.rs");
+        let mut v11 = read_source_file("pgx-pg-sys/src/pg11_bindings.rs");
+        let mut v12 = read_source_file("pgx-pg-sys/src/pg12_bindings.rs");
 
         let mut versions = vec![&mut v10, &mut v11, &mut v12];
         let common = build_common_set(&mut versions);
@@ -581,17 +549,17 @@ pub(crate) mod bindings_diff {
             v12.len(),
         );
 
-        write_common_file("pgx/src/pg_sys/common.rs", common);
-        write_source_file("pgx/src/pg_sys/pg10_specific.rs", v10);
-        write_source_file("pgx/src/pg_sys/pg11_specific.rs", v11);
-        write_source_file("pgx/src/pg_sys/pg12_specific.rs", v12);
+        write_common_file("pgx-pg-sys/src/common.rs", common);
+        write_source_file("pgx-pg-sys/src/pg10_specific.rs", v10);
+        write_source_file("pgx-pg-sys/src/pg11_specific.rs", v11);
+        write_source_file("pgx-pg-sys/src/pg12_specific.rs", v12);
 
         // delete the bindings files when we're done with them
-        std::fs::remove_file(PathBuf::from_str("pgx/src/pg_sys/pg10_bindings.rs").unwrap())
+        std::fs::remove_file(PathBuf::from_str("pgx-pg-sys/src/pg10_bindings.rs").unwrap())
             .expect("couldn't delete v10 bindings");
-        std::fs::remove_file(PathBuf::from_str("pgx/src/pg_sys/pg11_bindings.rs").unwrap())
+        std::fs::remove_file(PathBuf::from_str("pgx-pg-sys/src/pg11_bindings.rs").unwrap())
             .expect("couldn't delete v11 bindings");
-        std::fs::remove_file(PathBuf::from_str("pgx/src/pg_sys/pg12_bindings.rs").unwrap())
+        std::fs::remove_file(PathBuf::from_str("pgx-pg-sys/src/pg12_bindings.rs").unwrap())
             .expect("couldn't delete v12 bindings");
 
         Ok(())
@@ -652,8 +620,9 @@ pub(crate) mod bindings_diff {
         stream.extend(quote! {
             #![allow(clippy::all)]
 
-            use crate as pgx;
-            use crate::pg_sys::common::*;
+            use crate as pg_sys;
+            use pgx_macros::*;
+            use crate::common::*;
         });
         for (_, item) in items {
             match &item.item {
@@ -663,7 +632,7 @@ pub(crate) mod bindings_diff {
         }
         std::fs::write(filename, stream.to_string())
             .unwrap_or_else(|_| panic!("Unable to save bindings for {}", filename));
-        rustfmt(filename);
+        rust_fmt(filename).expect(&format!("unable to run rustfmt for {}", filename));
     }
 
     fn write_common_file(filename: &str, items: BTreeMap<String, SortableItem>) {
@@ -671,14 +640,15 @@ pub(crate) mod bindings_diff {
         stream.extend(quote! {
             #![allow(clippy::all)]
 
-            use crate as pgx;
+            use crate as pg_sys;
+            use pgx_macros::*;
 
             #[cfg(feature = "pg10")]
-            use crate::pg_sys::pg10_specific::*;
+            use crate::pg10_specific::*;
             #[cfg(feature = "pg11")]
-            use crate::pg_sys::pg11_specific::*;
+            use crate::pg11_specific::*;
             #[cfg(feature = "pg12")]
-            use crate::pg_sys::pg12_specific::*;
+            use crate::pg12_specific::*;
         });
         for (_, item) in items.iter() {
             match &item.item {
@@ -688,45 +658,6 @@ pub(crate) mod bindings_diff {
         }
         std::fs::write(filename, stream.to_string())
             .unwrap_or_else(|_| panic!("Unable to save bindings for {}", filename));
-        rustfmt(filename);
-    }
-
-    fn rustfmt(filename: &str) {
-        run_command(
-            Command::new("rustfmt").arg(filename).current_dir("."),
-            "common",
-        )
-        .unwrap();
-    }
-
-    fn run_command(command: &mut Command, branch_name: &str) -> Result<Output, std::io::Error> {
-        let mut dbg = String::new();
-
-        dbg.push_str(&format!(
-            "[{}]: -------- {:?} -------- \n",
-            branch_name, command
-        ));
-
-        let output = command.output()?;
-        let rc = output.clone();
-
-        if !output.stdout.is_empty() {
-            for line in String::from_utf8(output.stdout).unwrap().lines() {
-                dbg.push_str(&format!("[{}] [stdout]: {}\n", branch_name, line));
-            }
-        }
-
-        if !output.stderr.is_empty() {
-            for line in String::from_utf8(output.stderr).unwrap().lines() {
-                dbg.push_str(&format!("[{}] [stderr]: {}\n", branch_name, line));
-            }
-        }
-        dbg.push_str(&format!(
-            "[{}] /----------------------------------------\n",
-            branch_name
-        ));
-
-        eprintln!("{}", dbg);
-        Ok(rc)
+        rust_fmt(filename).expect(&format!("unable to run rustfmt for {}", filename));
     }
 }

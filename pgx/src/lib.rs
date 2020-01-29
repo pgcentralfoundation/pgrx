@@ -1,4 +1,3 @@
-#[macro_use]
 extern crate pgx_macros;
 
 #[macro_use]
@@ -15,7 +14,6 @@ pub mod callbacks;
 pub mod datum;
 pub mod enum_helper;
 pub mod fcinfo;
-pub mod guard;
 pub mod htup;
 pub mod inoutfuncs;
 pub mod itemptr;
@@ -25,7 +23,6 @@ pub mod memcxt;
 pub mod namespace;
 pub mod nodes;
 pub mod oids;
-pub mod pg_sys;
 pub mod pgbox;
 pub mod spi;
 pub mod stringinfo;
@@ -38,7 +35,6 @@ pub use callbacks::*;
 pub use datum::*;
 pub use enum_helper::*;
 pub use fcinfo::*;
-pub use guard::*;
 pub use htup::*;
 pub use inoutfuncs::*;
 pub use itemptr::*;
@@ -55,6 +51,10 @@ pub use tupdesc::*;
 pub use utils::*;
 pub use varlena::*;
 pub use xid::*;
+
+pub use pgx_pg_sys as pg_sys; // the module only, not its contents
+pub use pgx_pg_sys::guard;
+pub use pgx_pg_sys::guard::*;
 
 /// A macro for marking a library compatible with the Postgres extension framework.
 ///

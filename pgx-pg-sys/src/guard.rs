@@ -1,7 +1,6 @@
 #![allow(non_snake_case)]
 
-use crate::pg_sys::{error_context_stack, PG_exception_stack};
-use crate::{PgLogLevel, PgSqlErrorCode};
+use crate::common::{error_context_stack, sigjmp_buf, PG_exception_stack};
 use std::any::Any;
 use std::cell::Cell;
 use std::mem::MaybeUninit;
@@ -11,18 +10,27 @@ use std::sync::atomic::{compiler_fence, Ordering};
 use std::thread::LocalKey;
 
 extern "C" {
-    fn siglongjmp(env: *mut crate::pg_sys::sigjmp_buf, val: c_int) -> c_void;
+    fn siglongjmp(env: *mut sigjmp_buf, val: c_int) -> c_void;
+    fn pgx_ereport(
+        level: i32,
+        code: i32,
+        message: *const std::os::raw::c_char,
+        file: *const std::os::raw::c_char,
+        lineno: i32,
+        colno: i32,
+    );
+
 }
 
 #[cfg(target_os = "linux")]
 extern "C" {
     #[link_name = "__sigsetjmp"]
-    fn sigsetjmp(env: *mut crate::pg_sys::sigjmp_buf, savemask: c_int) -> c_int;
+    fn sigsetjmp(env: *mut sigjmp_buf, savemask: c_int) -> c_int;
 }
 
 #[cfg(target_os = "macos")]
 extern "C" {
-    fn sigsetjmp(env: *mut crate::pg_sys::sigjmp_buf, savemask: c_int) -> c_int;
+    fn sigsetjmp(env: *mut sigjmp_buf, savemask: c_int) -> c_int;
 }
 
 #[derive(Clone)]
@@ -70,7 +78,7 @@ fn take_panic_location() -> PanicLocation {
     })
 }
 
-pub(crate) fn register_pg_guard_panic_handler() {
+pub fn register_pg_guard_panic_handler() {
     std::panic::set_hook(Box::new(|info| {
         PANIC_LOCATION.with(|p| {
             let existing = p.take();
@@ -173,14 +181,19 @@ where
                     // translate it into an elog(ERROR), including the code location that caused
                     // the panic!()
                     Ok(message) => {
-                        crate::log::ereport(
-                            PgLogLevel::ERROR,
-                            PgSqlErrorCode::ERRCODE_INTERNAL_ERROR,
-                            &message,
-                            &location.file,
-                            location.line,
-                            location.col,
-                        );
+                        let c_message = std::ffi::CString::new(message.clone()).unwrap();
+                        let c_file = std::ffi::CString::new(location.file).unwrap();
+
+                        unsafe {
+                            pgx_ereport(
+                                crate::ERROR as i32,
+                                2600, // ERRCODE_INTERNAL_ERROR
+                                c_message.as_ptr(),
+                                c_file.as_ptr(),
+                                location.line as i32,
+                                location.col as i32,
+                            );
+                        }
                         unreachable!("ereport() failed at depth==0 with message: {}", message);
                     }
 

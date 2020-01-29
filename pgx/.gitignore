@@ -1,7 +1,0 @@
-src/pg_sys/pg10_bindings.rs
-src/pg_sys/pg11_bindings.rs
-src/pg_sys/pg12_bindings.rs
-src/pg_sys/common.rs
-src/pg_sys/pg10_specific.rs
-src/pg_sys/pg11_specific.rs
-src/pg_sys/pg12_specific.rs

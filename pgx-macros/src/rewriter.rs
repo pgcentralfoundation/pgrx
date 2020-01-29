@@ -85,7 +85,7 @@ impl PgGuardRewriter {
             }
         } else {
             quote! {
-                    let #result_var_name = pgx::guard( || {
+                    let #result_var_name = pg_sys::guard::guard( || {
                         #rewritten_args
 
                         #func_name(#arg_list)
@@ -130,7 +130,7 @@ impl PgGuardRewriter {
             #vis #sig {
                 #func
 
-                pgx::guard( || #func_name(#arg_list) )
+                pg_sys::guard::guard( || #func_name(#arg_list) )
             }
         }
     }
@@ -160,7 +160,7 @@ impl PgGuardRewriter {
                     pub fn #func_name( #arg_list_with_types ) #return_type ;
                 }
 
-                pgx::guard(|| unsafe { #func_name( #arg_list) })
+                pg_sys::guard::guard(|| unsafe { #func_name( #arg_list) })
             }
         }
     }

@@ -3,11 +3,16 @@ name = "pgx"
 version = "0.1.0"
 authors = ["Eric B. Ridge <eebbrr@gmail.com>"]
 edition = "2018"
-build = "build.rs"
+
+[features]
+default = []
+pg10 = ["pgx-pg-sys/pg10"]
+pg11 = ["pgx-pg-sys/pg11"]
+pg12 = ["pgx-pg-sys/pg12"]
 
 [dependencies]
 pgx-macros = { path = "../pgx-macros/" }
-memoffset = "0.5.3"
+pgx-pg-sys = { path = "../pgx-pg-sys", default-featurs = false}
 enum-primitive-derive = "0.1.2"
 lazy_static = "1.4.0"
 num-traits = "0.2.10"
@@ -15,17 +20,3 @@ serde = { version = "1.0.104", features = ["derive"] }
 serde_json = "1.0.44"
 serde_cbor = "0.11.1"
 
-[build-dependencies]
-bindgen = "0.52.0"
-clang = "0.23.0"
-syn = { version = "1.0.5", features = ["extra-traits", "full", "fold", "parsing"] }
-quote = "1.0.2"
-proc-macro2 = "1.0.6"
-rayon = "1.2.1"
-build-deps = "0.1.4"
-
-[features]
-default = []
-pg10 = []
-pg11 = []
-pg12 = []
