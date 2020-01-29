@@ -30,6 +30,7 @@ pub mod pgbox;
 pub mod spi;
 pub mod stringinfo;
 pub mod tupdesc;
+pub mod utils;
 pub mod varlena;
 pub mod xid;
 
@@ -51,6 +52,7 @@ pub use pgbox::*;
 pub use spi::*;
 pub use stringinfo::*;
 pub use tupdesc::*;
+pub use utils::*;
 pub use varlena::*;
 pub use xid::*;
 
