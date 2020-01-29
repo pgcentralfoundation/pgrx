@@ -15,13 +15,9 @@
 
 mod common;
 
-#[cfg(feature = "pg10")]
+// always make the version specific modules public, regardless of how we're feature gated
 pub mod pg10_specific;
-
-#[cfg(feature = "pg11")]
 pub mod pg11_specific;
-
-#[cfg(feature = "pg12")]
 pub mod pg12_specific;
 
 //
@@ -142,12 +138,13 @@ mod internal {
         pub use crate::pg_sys::common::*;
         pub use crate::pg_sys::pg10_specific::*;
 
+        pub use crate::pg_sys::pg10_specific::tupleDesc as TupleDescData;
         pub use crate::pg_sys::pg10_specific::AllocSetContextCreate as AllocSetContextCreateExtended;
 
         pub unsafe fn IndexBuildHeapScan<T>(
             heap_relation: crate::pg_sys::Relation,
             index_relation: crate::pg_sys::Relation,
-            index_info: *mut IndexInfo,
+            index_info: *mut crate::pg_sys::pg10_specific::IndexInfo,
             build_callback: crate::pg_sys::IndexBuildCallback,
             build_callback_state: *mut T,
         ) {
@@ -167,10 +164,12 @@ mod internal {
         pub use crate::pg_sys::common::*;
         pub use crate::pg_sys::pg11_specific::*;
 
+        pub use crate::pg_sys::pg11_specific::tupleDesc as TupleDescData;
+
         pub unsafe fn IndexBuildHeapScan<T>(
             heap_relation: crate::pg_sys::Relation,
             index_relation: crate::pg_sys::Relation,
-            index_info: *mut IndexInfo,
+            index_info: *mut crate::pg_sys::pg11_specific::IndexInfo,
             build_callback: crate::pg_sys::IndexBuildCallback,
             build_callback_state: *mut T,
         ) {
@@ -196,7 +195,7 @@ mod internal {
         pub unsafe fn IndexBuildHeapScan<T>(
             heap_relation: crate::pg_sys::Relation,
             index_relation: crate::pg_sys::Relation,
-            index_info: *mut IndexInfo,
+            index_info: *mut crate::pg_sys::pg12_specific::IndexInfo,
             build_callback: crate::pg_sys::IndexBuildCallback,
             build_callback_state: *mut T,
         ) {
