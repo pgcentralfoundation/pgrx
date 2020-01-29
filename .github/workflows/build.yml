@@ -39,4 +39,4 @@ jobs:
 
     # test our code
     - name: cargo test
-      run: touch pgx/build.rs && RUSTC_WRAPPER=sccache RUST_BACKTRACE=1 CARGO_TARGET_DIR=/tmp/pgx-build-v${{ matrix.version }} cargo test --target-dir /tmp/pgx-build-v${{ matrix.version }} --all --features pg${{ matrix.version }} --no-default-features
+      run: touch pgx-pg-sys/build.rs && RUSTC_WRAPPER=sccache RUST_BACKTRACE=1 CARGO_TARGET_DIR=/tmp/pgx-build-v${{ matrix.version }} cargo test --target-dir /tmp/pgx-build-v${{ matrix.version }} --all --features pg${{ matrix.version }} --no-default-features
