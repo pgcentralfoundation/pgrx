@@ -18,13 +18,13 @@ extern "C" {
 /// [attno] is 1-based
 #[inline]
 pub unsafe fn heap_getattr<T: FromDatum<T>>(
-    tuple: *const pg_sys::HeapTupleData,
+    tuple: &PgBox<pg_sys::HeapTupleData>,
     attno: u32,
-    tupdesc: pg_sys::TupleDesc,
+    tupdesc: &PgBox<pg_sys::TupleDescData>,
 ) -> Option<T> {
     let mut is_null = false;
-    let datum = pgx_heap_getattr(tuple, attno as u32, tupdesc, &mut is_null);
-    let typoid = tupdesc_get_typoid(tupdesc, attno);
+    let datum = pgx_heap_getattr(tuple.as_ptr(), attno as u32, tupdesc.as_ptr(), &mut is_null);
+    let typoid = tupdesc_get_typoid(tupdesc, attno as usize);
 
     if is_null {
         None
@@ -35,23 +35,24 @@ pub unsafe fn heap_getattr<T: FromDatum<T>>(
 
 #[derive(Debug, Clone)]
 pub struct DatumWithTypeInfo {
-    datum: pg_sys::Datum,
-    is_null: bool,
-    typoid: pg_sys::Oid,
-    typlen: i16,
-    typbyval: bool,
+    pub datum: pg_sys::Datum,
+    pub is_null: bool,
+    pub typoid: pg_sys::Oid,
+    pub typlen: i16,
+    pub typbyval: bool,
 }
 
 /// [attno] is 1-based
 #[inline]
 pub fn heap_getattr_datum_ex(
-    tuple: *const pg_sys::HeapTupleData,
+    tuple: &PgBox<pg_sys::HeapTupleData>,
     attno: u32,
-    tupdesc: pg_sys::TupleDesc,
+    tupdesc: &PgBox<pg_sys::TupleDescData>,
 ) -> DatumWithTypeInfo {
     let mut is_null = false;
-    let datum = unsafe { pgx_heap_getattr(tuple, attno as u32, tupdesc, &mut is_null) };
-    let typoid = unsafe { tupdesc_get_typoid(tupdesc, attno) };
+    let datum =
+        unsafe { pgx_heap_getattr(tuple.as_ptr(), attno as u32, tupdesc.as_ptr(), &mut is_null) };
+    let typoid = tupdesc_get_typoid(tupdesc, attno as usize);
 
     let mut typlen = 0;
     let mut typbyval = false;

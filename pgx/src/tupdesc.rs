@@ -1,57 +1,55 @@
+use crate::{pg_sys, PgBox};
+
 #[cfg(feature = "pg10")]
 pub use v10::*;
-#[cfg(feature = "pg11")]
-pub use v11::*;
-#[cfg(feature = "pg12")]
-pub use v12::*;
+#[cfg(any(feature = "pg11", feature = "pg12"))]
+pub use v11_v12::*;
+
+/// [attno] is 1-based
+#[inline]
+pub fn tupdesc_get_typoid(tupdesc: &PgBox<pg_sys::TupleDescData>, attno: usize) -> pg_sys::Oid {
+    tupdesc_get_attr(tupdesc, attno - 1).atttypid
+}
+
+/// [attno] is 1-based
+#[inline]
+pub fn tupdesc_get_typmod(tupdesc: &PgBox<pg_sys::TupleDescData>, attno: usize) -> i32 {
+    tupdesc_get_attr(tupdesc, attno - 1).atttypmod
+}
 
 #[cfg(feature = "pg10")]
 mod v10 {
-    use crate::pg_sys;
+    use crate::{pg_sys, PgBox};
+    use std::borrow::Borrow;
 
-    /// [attno] is 1-based
+    /// [attno] is 0-based
     #[inline]
-    pub unsafe fn tupdesc_get_typoid(
-        tupdesc: *const pg_sys::pg10_specific::tupleDesc,
-        attno: u32,
-    ) -> pg_sys::Oid {
-        let tupdesc_ref = tupdesc.as_ref().unwrap();
-        let atts = std::slice::from_raw_parts(tupdesc_ref.attrs, tupdesc_ref.natts as usize);
-
-        atts[(attno - 1) as usize].as_ref().unwrap().atttypid
+    pub fn tupdesc_get_attr(
+        tupdesc: &PgBox<pg_sys::TupleDescData>,
+        attno: usize,
+    ) -> &pg_sys::FormData_pg_attribute {
+        let atts = unsafe { std::slice::from_raw_parts(tupdesc.attrs, tupdesc.natts as usize) };
+        unsafe {
+            atts[attno]
+                .as_ref()
+                .expect("found null FormData_pg_attribute")
+        }
     }
 }
 
-#[cfg(feature = "pg11")]
-mod v11 {
-    use crate::pg_sys;
+#[cfg(any(feature = "pg11", feature = "pg12"))]
+mod v11_v12 {
+    use crate::{pg_sys, PgBox};
+    use std::borrow::Borrow;
 
-    /// [attno] is 1-based
+    /// [attno] is 0-based
     #[inline]
-    pub unsafe fn tupdesc_get_typoid(
-        tupdesc: *const pg_sys::pg11_specific::tupleDesc,
-        attno: u32,
-    ) -> pg_sys::Oid {
-        let tupdesc_ref = tupdesc.as_ref().unwrap();
-        let atts = tupdesc_ref.attrs.as_slice(tupdesc_ref.natts as usize);
+    pub fn tupdesc_get_attr(
+        tupdesc: &PgBox<pg_sys::TupleDescData>,
+        attno: usize,
+    ) -> &pg_sys::FormData_pg_attribute {
+        let atts = unsafe { tupdesc.attrs.as_slice(tupdesc.natts as usize) };
 
-        atts[(attno - 1) as usize].atttypid
-    }
-}
-
-#[cfg(feature = "pg12")]
-mod v12 {
-    use crate::pg_sys;
-
-    /// [attno] is 1-based
-    #[inline]
-    pub unsafe fn tupdesc_get_typoid(
-        tupdesc: *const pg_sys::pg12_specific::TupleDescData,
-        attno: u32,
-    ) -> pg_sys::Oid {
-        let tupdesc_ref = tupdesc.as_ref().unwrap();
-        let atts = tupdesc_ref.attrs.as_slice(tupdesc_ref.natts as usize);
-
-        atts[(attno - 1) as usize].atttypid
+        atts[attno].borrow()
     }
 }
