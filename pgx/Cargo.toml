@@ -15,7 +15,7 @@ pg12 = ["pgx-pg-sys/pg12"]
 
 [dependencies]
 pgx-macros = { path = "../pgx-macros/" }
-pgx-pg-sys = { path = "../pgx-pg-sys", default-featurs = false}
+pgx-pg-sys = { path = "../pgx-pg-sys" }
 enum-primitive-derive = "0.1.2"
 lazy_static = "1.4.0"
 num-traits = "0.2.10"
