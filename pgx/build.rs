@@ -162,6 +162,13 @@ fn main() -> Result<(), std::io::Error> {
                 .blacklist_function("varsize_any")
                 .rustfmt_bindings(true)
                 .derive_debug(true)
+                .derive_copy(true) // necessary to void __BindgenUnionField usages -- I don't understand why?
+                .derive_default(false)
+                .derive_eq(false)
+                .derive_partialeq(false)
+                .derive_hash(false)
+                .derive_ord(false)
+                .derive_partialord(false)
                 .layout_tests(false)
                 .generate()
                 .expect(&format!("Unable to generate bindings for {}", version));
@@ -459,7 +466,7 @@ fn rust_fmt(path: &Path, branch_name: &str) -> Result<(), std::io::Error> {
 pub(crate) mod bindings_diff {
     use quote::quote;
     use std::cmp::Ordering;
-    use std::collections::{BTreeMap, BTreeSet};
+    use std::collections::BTreeMap;
     use std::fs::File;
     use std::hash::{Hash, Hasher};
     use std::io::Read;
@@ -592,29 +599,20 @@ pub(crate) mod bindings_diff {
 
     fn build_common_set(
         versions: &mut Vec<&mut BTreeMap<String, SortableItem>>,
-    ) -> BTreeSet<SortableItem> {
-        let mut common = BTreeSet::new();
+    ) -> BTreeMap<String, SortableItem> {
+        let mut common = BTreeMap::new();
 
         for map in versions.iter() {
             for (key, value) in map.iter() {
-                if common.contains(value)
-                    || key.contains("pub struct __BindgenUnionField")
-                    || key.contains("pub struct __IncompleteArrayField")
-                {
-                    continue;
-                }
-
-                if all_contain(&versions, &key) {
-                    common.insert(value.clone());
+                if !common.contains_key(key) && all_contain(&versions, &key) {
+                    common.insert(key.clone(), value.clone());
                 }
             }
         }
 
         for map in versions.iter_mut() {
-            for item in &common {
-                let item = &item.item;
-                let key = format!("{}", quote! {#item});
-                map.remove(&key);
+            for (key, _) in common.iter() {
+                map.remove(key);
             }
         }
 
@@ -643,7 +641,7 @@ pub(crate) mod bindings_diff {
         for item in source.items.into_iter() {
             let mut stream = TokenStream2::new();
             stream.extend(quote! {#item});
-            item_map.insert(format!("{}", stream), SortableItem::new(item));
+            item_map.insert(stream.to_string(), SortableItem::new(item));
         }
 
         item_map
@@ -668,7 +666,7 @@ pub(crate) mod bindings_diff {
         rustfmt(filename);
     }
 
-    fn write_common_file(filename: &str, items: BTreeSet<SortableItem>) {
+    fn write_common_file(filename: &str, items: BTreeMap<String, SortableItem>) {
         let mut stream = TokenStream2::new();
         stream.extend(quote! {
             #![allow(clippy::all)]
@@ -682,7 +680,7 @@ pub(crate) mod bindings_diff {
             #[cfg(feature = "pg12")]
             use crate::pg_sys::pg12_specific::*;
         });
-        for item in items.iter() {
+        for (_, item) in items.iter() {
             match &item.item {
                 Item::Use(_) => {}
                 item => stream.extend(quote! {#item}),
