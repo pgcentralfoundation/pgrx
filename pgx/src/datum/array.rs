@@ -242,9 +242,9 @@ impl<'a, T: FromDatum<T>> Drop for Array<'a, T> {
             }
         }
 
-        unsafe {
-            pg_sys::pfree(self.array_type as *mut std::os::raw::c_void);
-        }
+        // NB:  we don't pfree(self.array_type) because we don't know if it's actually
+        // safe to do that.  It'll be freed whenever Postgres deletes/resets its parent
+        // MemoryContext
     }
 }
 
