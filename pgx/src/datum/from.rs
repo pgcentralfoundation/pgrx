@@ -1,6 +1,8 @@
 //! for converting a pg_sys::Datum and a corresponding "is_null" bool into a typed Option
 
-use crate::{pg_sys, text_to_rust_str_unchecked, PgBox};
+use crate::{
+    pg_sys, text_to_rust_str_unchecked, vardata_any, varsize_any_exhdr, void_mut_ptr, PgBox,
+};
 use std::ffi::CStr;
 
 /// Convert a `(pg_sys::Datum, is_null:bool)` tuple into a Rust type
@@ -164,6 +166,9 @@ impl<'a> FromDatum<&'a str> for str {
     }
 }
 
+/// for text, varchar, or any `pg_sys::varlena`-based type
+///
+/// This returns a **copy**, allocated and managed by Rust, of the underlying `varlena` Datum
 impl FromDatum<String> for String {
     #[inline]
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<String> {
@@ -172,8 +177,20 @@ impl FromDatum<String> for String {
         } else if datum == 0 {
             panic!("a varlena Datum was flagged as non-null but the datum is zero");
         } else {
-            let varlena = pg_sys::pg_detoast_datum(datum as *mut pg_sys::varlena);
-            Some(text_to_rust_str_unchecked(varlena).to_string())
+            let varlena = datum as *mut pg_sys::varlena;
+            let detoasted = pg_sys::pg_detoast_datum(varlena);
+            let len = varsize_any_exhdr(detoasted);
+            let data = vardata_any(detoasted);
+
+            let result =
+                std::str::from_utf8_unchecked(std::slice::from_raw_parts(data as *mut u8, len))
+                    .to_owned();
+
+            if detoasted != varlena {
+                pg_sys::pfree(detoasted as void_mut_ptr);
+            }
+
+            Some(result)
         }
     }
 }

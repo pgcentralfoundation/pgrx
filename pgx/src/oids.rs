@@ -178,6 +178,7 @@ pub enum PgOid {
 }
 
 impl PgOid {
+    #[inline]
     pub fn from(oid: pg_sys::Oid) -> PgOid {
         match oid {
             pg_sys::InvalidOid => PgOid::InvalidOid,
@@ -419,11 +420,12 @@ impl PgOid {
         }
     }
 
-    pub fn value(self) -> pg_sys::Oid {
+    #[inline]
+    pub fn value(&self) -> pg_sys::Oid {
         match self {
             PgOid::InvalidOid => pg_sys::InvalidOid,
-            PgOid::Custom(custom) => custom as pg_sys::Oid,
-            PgOid::BuiltIn(builtin) => builtin as pg_sys::Oid,
+            PgOid::Custom(custom) => custom.clone() as pg_sys::Oid,
+            PgOid::BuiltIn(builtin) => builtin.clone() as pg_sys::Oid,
         }
     }
 }

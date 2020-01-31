@@ -1,10 +1,11 @@
-use crate::{pg_sys, FromDatum};
+use crate::{pg_sys, void_mut_ptr, FromDatum};
 use serde::Serializer;
 use std::marker::PhantomData;
 
 pub type VariadicArray<'a, T> = Array<'a, T>;
 
 pub struct Array<'a, T: FromDatum<T>> {
+    ptr: *mut pg_sys::varlena,
     array_type: *mut pg_sys::ArrayType,
     elements: *mut pg_sys::Datum,
     nulls: *mut bool,
@@ -40,6 +41,7 @@ impl<'a, T: FromDatum<T>> Array<'a, T> {
     /// [`T`] can be [pg_sys::Datum] if the elements are not all of the same type
     pub fn over(elements: *mut pg_sys::Datum, nulls: *mut bool, nelems: usize) -> Array<'a, T> {
         Array::<T> {
+            ptr: std::ptr::null_mut(),
             array_type: std::ptr::null_mut(),
             elements,
             nulls,
@@ -52,6 +54,7 @@ impl<'a, T: FromDatum<T>> Array<'a, T> {
     }
 
     fn from_pg(
+        ptr: *mut pg_sys::varlena,
         array_type: *mut pg_sys::ArrayType,
         elements: *mut pg_sys::Datum,
         nulls: *mut bool,
@@ -59,6 +62,7 @@ impl<'a, T: FromDatum<T>> Array<'a, T> {
         nelems: usize,
     ) -> Self {
         Array::<T> {
+            ptr,
             array_type,
             elements,
             nulls,
@@ -143,6 +147,7 @@ pub struct ArrayTypedIterator<'a, T: 'a + FromDatum<T>> {
 impl<'a, T: FromDatum<T>> Iterator for ArrayTypedIterator<'a, T> {
     type Item = T;
 
+    #[inline]
     fn next(&mut self) -> Option<Self::Item> {
         if self.curr >= self.array.nelems {
             None
@@ -166,6 +171,7 @@ pub struct ArrayIterator<'a, T: 'a + FromDatum<T>> {
 impl<'a, T: FromDatum<T>> Iterator for ArrayIterator<'a, T> {
     type Item = Option<T>;
 
+    #[inline]
     fn next(&mut self) -> Option<Self::Item> {
         if self.curr >= self.array.nelems {
             None
@@ -197,6 +203,7 @@ impl<'a, T: FromDatum<T>> IntoIterator for Array<'a, T> {
 impl<'a, T: FromDatum<T>> Iterator for ArrayIntoIterator<'a, T> {
     type Item = Option<T>;
 
+    #[inline]
     fn next(&mut self) -> Option<Self::Item> {
         if self.curr >= self.array.nelems {
             None
@@ -225,36 +232,39 @@ impl<'a, T: FromDatum<T>> Iterator for ArrayIntoIterator<'a, T> {
 
 impl<'a, T: FromDatum<T>> Drop for Array<'a, T> {
     fn drop(&mut self) {
-        if self.array_type.is_null() {
-            // don't pfree anything if the values aren't backed by a pg_sys::ArrayType
-            return;
-        }
-
         if !self.elements.is_null() {
             unsafe {
-                pg_sys::pfree(self.elements as *mut std::os::raw::c_void);
+                pg_sys::pfree(self.elements as void_mut_ptr);
             }
         }
 
         if !self.nulls.is_null() {
             unsafe {
-                pg_sys::pfree(self.nulls as *mut std::os::raw::c_void);
+                pg_sys::pfree(self.nulls as void_mut_ptr);
             }
         }
 
-        // NB:  we don't pfree(self.array_type) because we don't know if it's actually
+        if !self.array_type.is_null() && self.array_type as *mut pg_sys::varlena != self.ptr {
+            unsafe {
+                pg_sys::pfree(self.array_type as void_mut_ptr);
+            }
+        }
+
+        // NB:  we don't pfree(self.ptr) because we don't know if it's actually
         // safe to do that.  It'll be freed whenever Postgres deletes/resets its parent
         // MemoryContext
     }
 }
 
 impl<'a, T: FromDatum<T>> FromDatum<Array<'a, T>> for Array<'a, T> {
+    #[inline]
     unsafe fn from_datum(datum: usize, is_null: bool, typoid: u32) -> Option<Array<'a, T>> {
         if is_null {
             None
         } else if datum == 0 {
-            panic!("&[32] array was flagged not null but datum is zero");
+            panic!("array was flagged not null but datum is zero");
         } else {
+            let ptr = datum as *mut pg_sys::varlena;
             let array =
                 pg_sys::pg_detoast_datum(datum as *mut pg_sys::varlena) as *mut pg_sys::ArrayType;
             let array_ref = array.as_ref().expect("ArrayType * was NULL");
@@ -264,17 +274,17 @@ impl<'a, T: FromDatum<T>> FromDatum<Array<'a, T>> for Array<'a, T> {
             let mut typbyval = false;
             let mut typalign = 0;
 
-            // outvals for deconstruct_array()
-            let mut elements = 0 as *mut pg_sys::Datum;
-            let mut nulls = 0 as *mut bool;
-            let mut nelems = 0;
-
             pg_sys::get_typlenbyvalalign(
                 array_ref.elemtype,
                 &mut typlen,
                 &mut typbyval,
                 &mut typalign,
             );
+
+            // outvals for deconstruct_array()
+            let mut elements = std::ptr::null_mut();
+            let mut nulls = std::ptr::null_mut();
+            let mut nelems = 0;
 
             pg_sys::deconstruct_array(
                 array,
@@ -288,12 +298,36 @@ impl<'a, T: FromDatum<T>> FromDatum<Array<'a, T>> for Array<'a, T> {
             );
 
             Some(Array::from_pg(
+                ptr,
                 array,
                 elements,
                 nulls,
                 typoid,
                 nelems as usize,
             ))
+        }
+    }
+}
+
+impl<T: FromDatum<T>> FromDatum<Vec<Option<T>>> for Vec<Option<T>> {
+    #[inline]
+    unsafe fn from_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        typoid: u32,
+    ) -> Option<Vec<Option<T>>> {
+        if is_null {
+            None
+        } else if datum == 0 {
+            panic!("array was flagged not null but datum is zero");
+        } else {
+            let array = Array::<T>::from_datum(datum, is_null, typoid).unwrap();
+            let mut v = Vec::with_capacity(array.len());
+
+            for element in array.iter() {
+                v.push(element)
+            }
+            Some(v)
         }
     }
 }

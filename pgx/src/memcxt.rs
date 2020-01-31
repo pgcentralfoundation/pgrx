@@ -150,9 +150,9 @@ pub enum PgMemoryContexts {
     Transient {
         parent: pg_sys::MemoryContext,
         name: &'static str,
-        min_context_size: usize,
-        initial_block_size: usize,
-        max_block_size: usize,
+        min_context_size: u32,
+        initial_block_size: u32,
+        max_block_size: u32,
     },
 }
 
@@ -220,9 +220,9 @@ impl PgMemoryContexts {
                     pg_sys::AllocSetContextCreateExtended(
                         *parent,
                         name.into_raw(),
-                        *min_context_size,
-                        *initial_block_size,
-                        *max_block_size,
+                        *min_context_size as usize,
+                        *initial_block_size as usize,
+                        *max_block_size as usize,
                     )
                 };
 

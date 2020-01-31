@@ -1,8 +1,54 @@
 use crate::*;
 
+/// Given a `pg_sys::Datum` representing a composite row type, return a boxed `HeapTupleData`,
+/// which can be used by the various `heap_getattr` methods
+///
+/// ## Safety
+///
+/// This function is safe, but if the provided `HeapTupleHeader` is null, it will `panic!()`
 #[inline]
-pub unsafe fn heap_tuple_header_get_datum_length(htup_header: pg_sys::HeapTupleHeader) -> usize {
-    crate::varlena::varsize(htup_header as *const pg_sys::varlena)
+pub fn composite_row_type_make_tuple(row: pg_sys::Datum) -> PgBox<pg_sys::HeapTupleData> {
+    let htup_header =
+        unsafe { pg_sys::pg_detoast_datum(row as *mut pg_sys::varlena) } as pg_sys::HeapTupleHeader;
+    let mut tuple = PgBox::<pg_sys::HeapTupleData>::alloc0();
+
+    tuple.t_len = heap_tuple_header_get_datum_length(htup_header) as u32;
+    tuple.t_data = htup_header;
+
+    tuple
+}
+
+pub fn deconstruct_row_type(
+    tupdesc: &PgBox<pg_sys::TupleDescData>,
+    row: pg_sys::Datum,
+) -> Array<pg_sys::Datum> {
+    extern "C" {
+        fn pgx_deconstruct_row_type(
+            tupdesc: pg_sys::TupleDesc,
+            row: pg_sys::Datum,
+            columns: *mut *mut pg_sys::Datum,
+            nulls: *mut *mut bool,
+        );
+    }
+    let mut columns = 0 as *mut pg_sys::Datum;
+    let mut nulls = 0 as *mut bool;
+    unsafe {
+        pgx_deconstruct_row_type(tupdesc.as_ptr(), row, &mut columns, &mut nulls);
+    }
+
+    Array::over(columns, nulls, tupdesc.natts as usize)
+}
+
+/// ## Safety
+///
+/// This function is safe, but if the provided `HeapTupleHeader` is null, it will `panic!()`
+#[inline]
+pub fn heap_tuple_header_get_datum_length(htup_header: pg_sys::HeapTupleHeader) -> usize {
+    if htup_header.is_null() {
+        panic!("Attempt to dereference a null HeapTupleHeader");
+    }
+
+    unsafe { crate::varlena::varsize(htup_header as *const pg_sys::varlena) }
 }
 
 extern "C" {
@@ -17,19 +63,20 @@ extern "C" {
 
 /// [attno] is 1-based
 #[inline]
-pub unsafe fn heap_getattr<T: FromDatum<T>>(
+pub fn heap_getattr<T: FromDatum<T>>(
     tuple: &PgBox<pg_sys::HeapTupleData>,
-    attno: u32,
+    attno: usize,
     tupdesc: &PgBox<pg_sys::TupleDescData>,
 ) -> Option<T> {
     let mut is_null = false;
-    let datum = pgx_heap_getattr(tuple.as_ptr(), attno as u32, tupdesc.as_ptr(), &mut is_null);
-    let typoid = tupdesc_get_typoid(tupdesc, attno as usize);
+    let datum =
+        unsafe { pgx_heap_getattr(tuple.as_ptr(), attno as u32, tupdesc.as_ptr(), &mut is_null) };
+    let typoid = tupdesc_get_typoid(tupdesc, attno);
 
     if is_null {
         None
     } else {
-        T::from_datum(datum, false, typoid)
+        unsafe { T::from_datum(datum, false, typoid) }
     }
 }
 
@@ -37,29 +84,36 @@ pub unsafe fn heap_getattr<T: FromDatum<T>>(
 pub struct DatumWithTypeInfo {
     pub datum: pg_sys::Datum,
     pub is_null: bool,
-    pub typoid: pg_sys::Oid,
+    pub typoid: PgOid,
     pub typlen: i16,
     pub typbyval: bool,
+}
+
+impl DatumWithTypeInfo {
+    #[inline]
+    pub fn into_value<T: FromDatum<T>>(self) -> T {
+        unsafe { T::from_datum(self.datum, self.is_null, self.typoid.value()).unwrap() }
+    }
 }
 
 /// [attno] is 1-based
 #[inline]
 pub fn heap_getattr_datum_ex(
     tuple: &PgBox<pg_sys::HeapTupleData>,
-    attno: u32,
+    attno: usize,
     tupdesc: &PgBox<pg_sys::TupleDescData>,
 ) -> DatumWithTypeInfo {
     let mut is_null = false;
     let datum =
         unsafe { pgx_heap_getattr(tuple.as_ptr(), attno as u32, tupdesc.as_ptr(), &mut is_null) };
-    let typoid = tupdesc_get_typoid(tupdesc, attno as usize);
+    let typoid = PgOid::from(tupdesc_get_typoid(tupdesc, attno));
 
     let mut typlen = 0;
     let mut typbyval = false;
     let mut typalign = 0 as std::os::raw::c_char; // unused
 
     unsafe {
-        pg_sys::get_typlenbyvalalign(typoid, &mut typlen, &mut typbyval, &mut typalign);
+        pg_sys::get_typlenbyvalalign(typoid.value(), &mut typlen, &mut typbyval, &mut typalign);
     }
 
     DatumWithTypeInfo {
