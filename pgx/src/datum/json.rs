@@ -1,6 +1,6 @@
 use crate::{
-    direct_function_call, direct_function_call_as_datum, pg_sys, rust_str_to_text_p, void_mut_ptr,
-    DetoastedVarlenA, FromDatum, IntoDatum,
+    direct_function_call, direct_function_call_as_datum, pg_sys, rust_str_to_text_p, vardata_any,
+    varsize_any_exhdr, void_mut_ptr, DetoastedVarlenA, FromDatum, IntoDatum,
 };
 use serde::{Serialize, Serializer};
 use serde_json::Value;
@@ -10,6 +10,9 @@ pub struct Json(pub Value);
 
 #[derive(Debug)]
 pub struct JsonB(pub Value);
+
+#[derive(Debug)]
+pub struct JsonString(pub String);
 
 /// for json
 impl FromDatum<Json> for Json {
@@ -54,6 +57,39 @@ impl FromDatum<JsonB> for JsonB {
     }
 }
 
+/// for `json` types to be represented as a wholly-owned Rust String copy
+///
+/// This returns a **copy**, allocated and managed by Rust, of the underlying `varlena` Datum
+impl FromDatum<JsonString> for JsonString {
+    #[inline]
+    unsafe fn from_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _: pg_sys::Oid,
+    ) -> Option<JsonString> {
+        if is_null {
+            None
+        } else if datum == 0 {
+            panic!("a varlena Datum was flagged as non-null but the datum is zero");
+        } else {
+            let varlena = datum as *mut pg_sys::varlena;
+            let detoasted = pg_sys::pg_detoast_datum(varlena);
+            let len = varsize_any_exhdr(detoasted);
+            let data = vardata_any(detoasted);
+
+            let result =
+                std::str::from_utf8_unchecked(std::slice::from_raw_parts(data as *mut u8, len))
+                    .to_owned();
+
+            if detoasted != varlena {
+                pg_sys::pfree(detoasted as void_mut_ptr);
+            }
+
+            Some(JsonString(result))
+        }
+    }
+}
+
 /// for json
 impl IntoDatum<Json> for Json {
     fn into_datum(self) -> Option<pg_sys::Datum> {
@@ -76,6 +112,13 @@ impl IntoDatum<JsonB> for JsonB {
     }
 }
 
+/// for jsonstring
+impl IntoDatum<JsonString> for JsonString {
+    fn into_datum(self) -> Option<pg_sys::Datum> {
+        rust_str_to_text_p(self.0.as_str()).into_datum()
+    }
+}
+
 impl Serialize for Json {
     fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error>
     where
@@ -91,5 +134,16 @@ impl Serialize for JsonB {
         S: Serializer,
     {
         self.0.serialize(serializer)
+    }
+}
+
+impl Serialize for JsonString {
+    fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error>
+    where
+        S: Serializer,
+    {
+        serde_json::to_value(self.0.as_str())
+            .expect("JsonString is not valid JSON")
+            .serialize(serializer)
     }
 }
