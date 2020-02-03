@@ -144,6 +144,72 @@ mod internal {
         pub use crate::pg10_specific::tupleDesc as TupleDescData;
         pub use crate::pg10_specific::AllocSetContextCreate as AllocSetContextCreateExtended;
 
+        pub unsafe fn add_string_reloption(
+            kinds: bits32,
+            name: *const ::std::os::raw::c_char,
+            desc: *const ::std::os::raw::c_char,
+            default_val: *const ::std::os::raw::c_char,
+            validator: ::std::option::Option<
+                unsafe extern "C" fn(value: *const ::std::os::raw::c_char),
+            >,
+        ) {
+            use std::cell::Cell;
+            thread_local! {
+                static VALIDATOR_HACK: Cell<::std::option::Option<unsafe extern "C" fn(value: *const ::std::os::raw::c_char)>> = Cell::new(None);
+            }
+
+            VALIDATOR_HACK.with(|v| {
+                v.set(validator);
+            });
+            unsafe extern "C" fn validator_wrapper(value: *mut ::std::os::raw::c_char) {
+                VALIDATOR_HACK.with(|v| {
+                    let validator = v.take();
+                    if let Some(validator) = validator {
+                        (validator)(value as *const std::os::raw::c_char)
+                    }
+                });
+            }
+            crate::pg10_specific::add_string_reloption(
+                kinds,
+                name as *mut std::os::raw::c_char,
+                desc as *mut std::os::raw::c_char,
+                default_val as *mut std::os::raw::c_char,
+                Some(validator_wrapper),
+            );
+        }
+
+        pub unsafe fn add_int_reloption(
+            kinds: bits32,
+            name: *const ::std::os::raw::c_char,
+            desc: *const ::std::os::raw::c_char,
+            default_val: ::std::os::raw::c_int,
+            min_val: ::std::os::raw::c_int,
+            max_val: ::std::os::raw::c_int,
+        ) {
+            crate::pg10_specific::add_int_reloption(
+                kinds,
+                name as *mut std::os::raw::c_char,
+                desc as *mut std::os::raw::c_char,
+                default_val,
+                min_val,
+                max_val,
+            );
+        }
+
+        pub unsafe fn add_bool_reloption(
+            kinds: bits32,
+            name: *const ::std::os::raw::c_char,
+            desc: *const ::std::os::raw::c_char,
+            default_val: bool,
+        ) {
+            crate::pg10_specific::add_bool_reloption(
+                kinds,
+                name as *mut std::os::raw::c_char,
+                desc as *mut std::os::raw::c_char,
+                default_val,
+            );
+        }
+
         pub unsafe fn IndexBuildHeapScan<T>(
             heap_relation: crate::Relation,
             index_relation: crate::Relation,
