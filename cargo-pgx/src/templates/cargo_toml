@@ -7,7 +7,10 @@ edition = "2018"
 crate-type = ["cdylib"]
 
 [features]
-default = ["pgx/pg11"]
+default = ["pg11"]
+pg10 = ["pgx/pg10"]
+pg11 = ["pgx/pg11"]
+pg12 = ["pgx/pg12"]
 pg_test = []
 
 [dependencies]

@@ -230,7 +230,7 @@ fn install_extension() {
         .env(
             "PGX_BUILD_FEATURES",
             format!(
-                "pgx/pg{} pg_test",
+                "pg{} pg_test",
                 pg_sys::get_pg_major_version_string().to_string()
             ),
         )
