@@ -7,6 +7,7 @@
 #include "access/genam.h"
 #include "access/htup.h"
 #include "access/htup_details.h"
+#include "access/reloptions.h"
 #include "access/relscan.h"
 #include "access/skey.h"
 #include "access/xact.h"
