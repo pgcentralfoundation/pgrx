@@ -20,7 +20,6 @@ pub fn tupdesc_get_typmod(tupdesc: &PgBox<pg_sys::TupleDescData>, attno: usize) 
 #[cfg(feature = "pg10")]
 mod v10 {
     use crate::{pg_sys, PgBox};
-    use std::borrow::Borrow;
 
     /// [attno] is 0-based
     #[inline]
