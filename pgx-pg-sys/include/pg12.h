@@ -14,6 +14,7 @@
 #include "catalog/namespace.h"
 #include "catalog/pg_enum.h"
 #include "catalog/pg_type.h"
+#include "commands/dbcommands.h"
 #include "commands/event_trigger.h"
 #include "executor/executor.h"
 #include "executor/spi.h"

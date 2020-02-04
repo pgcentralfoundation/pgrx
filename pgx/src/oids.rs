@@ -170,6 +170,12 @@ pub enum PgBuiltInOids {
     PG_LSNARRAYOID = pg_sys::pg11_specific::PG_LSNARRAYOID as isize,
 }
 
+impl PgBuiltInOids {
+    pub fn value(&self) -> pg_sys::Oid {
+        self.clone() as isize as pg_sys::Oid
+    }
+}
+
 #[derive(Clone, Eq, PartialEq, Hash, Ord, PartialOrd, Debug)]
 pub enum PgOid {
     InvalidOid,
@@ -424,8 +430,8 @@ impl PgOid {
     pub fn value(&self) -> pg_sys::Oid {
         match self {
             PgOid::InvalidOid => pg_sys::InvalidOid,
-            PgOid::Custom(custom) => custom.clone() as pg_sys::Oid,
-            PgOid::BuiltIn(builtin) => builtin.clone() as pg_sys::Oid,
+            PgOid::Custom(custom) => custom.clone(),
+            PgOid::BuiltIn(builtin) => builtin.value().clone(),
         }
     }
 }

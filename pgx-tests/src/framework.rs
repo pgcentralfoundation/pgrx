@@ -44,13 +44,6 @@ where
     SHUTDOWN_HOOKS.lock().unwrap().push(Box::new(func));
 }
 
-#[macro_export]
-macro_rules! testmsg {
-    ($($arg:tt)*) => (
-        eprintln!("{}", format!("TMSG: {}:{}:{}:  {}", file!(), line!(), column!(), format!($($arg)*)));
-    )
-}
-
 pub fn run_test(sql_funcname: &str, expected_error: Option<&str>) {
     let (loglines, system_session_id) = initialize_test_framework();
 

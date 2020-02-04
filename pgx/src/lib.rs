@@ -22,6 +22,7 @@ pub mod namespace;
 pub mod nodes;
 pub mod oids;
 pub mod pgbox;
+pub mod rel;
 pub mod spi;
 pub mod stringinfo;
 pub mod tupdesc;
@@ -43,6 +44,7 @@ pub use namespace::*;
 pub use nodes::{is_a, PgNode, PgNodeFactory}; // be specific since we have multiple versions of these things behind feature gates
 pub use oids::*;
 pub use pgbox::*;
+pub use rel::*;
 pub use spi::*;
 pub use stringinfo::*;
 pub use tupdesc::*;

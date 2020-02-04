@@ -606,6 +606,13 @@ macro_rules! PANIC {
     )
 }
 
+#[macro_export]
+macro_rules! testmsg {
+    ($($arg:tt)*) => (
+        eprintln!("{}", format!("TMSG: {}:{}:{}:  {}", file!(), line!(), column!(), format!($($arg)*)));
+    )
+}
+
 #[cfg(any(feature = "pg10", feature = "pg11"))]
 #[inline]
 pub fn interrupt_pending() -> bool {

@@ -3,7 +3,7 @@
 //! Primitive types can never be null, so we do a direct
 //! cast of the primitive type to pg_sys::Datum
 
-use crate::{pg_sys, rust_str_to_text_p, PgBox};
+use crate::{pg_sys, rust_str_to_text_p, PgBox, PgOid};
 
 /// Convert a Rust type into a `pg_sys::Datum`.
 ///
@@ -71,6 +71,16 @@ impl IntoDatum<f64> for f64 {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
         Some(self.to_bits() as pg_sys::Datum)
+    }
+}
+
+impl IntoDatum<PgOid> for PgOid {
+    #[inline]
+    fn into_datum(self) -> Option<pg_sys::Datum> {
+        match self {
+            PgOid::InvalidOid => None,
+            oid => Some(oid.value() as pg_sys::Datum),
+        }
     }
 }
 

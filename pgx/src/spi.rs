@@ -63,6 +63,13 @@ impl Spi {
         Spi::connect(|client| Ok(client.select(query, Some(1), None).get_one()))
     }
 
+    pub fn get_one_with_args<A: FromDatum<A> + IntoDatum<A>>(
+        query: &str,
+        args: Vec<(PgOid, Option<pg_sys::Datum>)>,
+    ) -> Option<A> {
+        Spi::connect(|client| Ok(client.select(query, Some(1), Some(args)).get_one()))
+    }
+
     /// just run an arbitrary SQL statement.
     ///
     /// ## Safety
