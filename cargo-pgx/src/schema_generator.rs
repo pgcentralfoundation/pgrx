@@ -639,7 +639,7 @@ fn translate_type(
 fn deconstruct_macro(as_string: &str) -> Option<(String, Option<String>, bool)> {
     if as_string.starts_with("default !") {
         let regexp =
-            regex::Regex::new(r#"default ! \( (?P<type>.*?) , (?P<value>.*?) \)"#).unwrap();
+            regex::Regex::new(r#"default ! \( (?P<type>.*?)\s*, (?P<value>.*?) \)"#).unwrap();
 
         let default_value =
             Some(get_named_capture(&regexp, "value", as_string).expect("no default value"));

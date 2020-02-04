@@ -65,6 +65,11 @@ fn iterate_array_with_deny_null(values: Array<i32>) {
 }
 
 #[pg_extern]
+fn optional_array_with_default(values: Option<default!(Array<i32>, NULL)>) -> i32 {
+    values.unwrap().iter().map(|v| v.unwrap_or(0)).sum()
+}
+
+#[pg_extern]
 fn serde_serialize_array(values: Array<&str>) -> Json {
     Json(json! { { "values": values } })
 }
@@ -162,6 +167,13 @@ mod tests {
         )
         .expect("returned json was null");
         assert_eq!(json.0, json! {{"values": ["one", null, "two", "three"]}});
+    }
+
+    #[pg_test]
+    fn test_optional_array_with_default() {
+        let sum = Spi::get_one::<i32>("SELECT optional_array_with_default(ARRAY[1,2,3])")
+            .expect("failed to get SPI result");
+        assert_eq!(sum, 6);
     }
 
     #[pg_test]
