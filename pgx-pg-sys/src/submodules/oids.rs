@@ -1,5 +1,5 @@
 #![allow(non_camel_case_types)]
-use crate::pg_sys;
+use crate as pg_sys;
 
 #[derive(Clone, Eq, PartialEq, Hash, Ord, PartialOrd, Debug)]
 pub enum PgBuiltInOids {

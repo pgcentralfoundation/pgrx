@@ -20,13 +20,11 @@ pub mod log;
 pub mod memcxt;
 pub mod namespace;
 pub mod nodes;
-pub mod oids;
 pub mod pgbox;
 pub mod rel;
 pub mod spi;
 pub mod stringinfo;
 pub mod tupdesc;
-pub mod utils;
 pub mod varlena;
 pub mod xid;
 
@@ -42,19 +40,17 @@ pub use log::*;
 pub use memcxt::*;
 pub use namespace::*;
 pub use nodes::{is_a, PgNode, PgNodeFactory}; // be specific since we have multiple versions of these things behind feature gates
-pub use oids::*;
 pub use pgbox::*;
 pub use rel::*;
 pub use spi::*;
 pub use stringinfo::*;
 pub use tupdesc::*;
-pub use utils::*;
 pub use varlena::*;
 pub use xid::*;
 
 pub use pgx_pg_sys as pg_sys; // the module only, not its contents
-pub use pgx_pg_sys::guard;
-pub use pgx_pg_sys::guard::*;
+pub use pgx_pg_sys::submodules;
+pub use pgx_pg_sys::submodules::*;
 
 /// A macro for marking a library compatible with the Postgres extension framework.
 ///

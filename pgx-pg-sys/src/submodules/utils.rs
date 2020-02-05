@@ -1,4 +1,4 @@
-use crate::pg_sys;
+use crate as pg_sys;
 
 #[inline]
 pub fn name_data_to_str<'a>(name_data: &pg_sys::NameData) -> &'a str {
