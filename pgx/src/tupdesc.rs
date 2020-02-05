@@ -28,7 +28,7 @@ mod v10 {
         attno: usize,
     ) -> &pg_sys::FormData_pg_attribute {
         let atts = unsafe { std::slice::from_raw_parts(tupdesc.attrs, tupdesc.natts as usize) };
-        atts[attno]
+        unsafe { atts[attno].as_ref().unwrap() }
     }
 }
 
