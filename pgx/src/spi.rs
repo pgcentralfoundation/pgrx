@@ -269,22 +269,27 @@ impl SpiTupleTable {
     }
 
     pub fn get_datum<T: FromDatum<T>>(&self, ordinal: i32) -> Option<T> {
-        match self.tupdesc {
-            Some(tupdesc) => unsafe {
-                let natts = (*tupdesc).natts;
+        if self.current as u64 >= unsafe { pg_sys::SPI_processed } {
+            None
+        } else {
+            match self.tupdesc {
+                Some(tupdesc) => unsafe {
+                    let natts = (*tupdesc).natts;
 
-                if ordinal < 1 || ordinal > natts {
-                    None
-                } else {
-                    let heap_tuple =
-                        std::slice::from_raw_parts((*self.table).vals, self.size)[self.current];
-                    let mut is_null = false;
-                    let datum = pg_sys::SPI_getbinval(heap_tuple, tupdesc, ordinal, &mut is_null);
+                    if ordinal < 1 || ordinal > natts {
+                        None
+                    } else {
+                        let heap_tuple =
+                            std::slice::from_raw_parts((*self.table).vals, self.size)[self.current];
+                        let mut is_null = false;
+                        let datum =
+                            pg_sys::SPI_getbinval(heap_tuple, tupdesc, ordinal, &mut is_null);
 
-                    T::from_datum(datum, is_null, pg_sys::SPI_gettypeid(tupdesc, ordinal))
-                }
-            },
-            None => panic!("TupDesc is NULL"),
+                        T::from_datum(datum, is_null, pg_sys::SPI_gettypeid(tupdesc, ordinal))
+                    }
+                },
+                None => panic!("TupDesc is NULL"),
+            }
         }
     }
 

@@ -13,7 +13,7 @@ mod tests {
     }
 
     #[pg_test]
-    fn test_spi_can_recurse() {
+    fn test_spi_can_nest() {
         Spi::execute(|_| {
             Spi::execute(|_| {
                 Spi::execute(|_| {
@@ -119,6 +119,11 @@ mod tests {
             assert_eq!("test", s.unwrap());
             assert!(b.is_none());
         });
+    }
+
+    #[pg_test]
+    fn test_spi_select_zero_rows() {
+        assert!(Spi::get_one::<i32>("SELECT 1 LIMIT 0").is_none());
     }
 
     #[pg_extern]
