@@ -7,8 +7,4 @@ tests_schema_tests.generated.sql
 tests_variadic_tests.generated.sql
 tests_anyarray_tests.generated.sql
 tests_enum_type_tests.generated.sql
-tests_json_tests.generated.sql
-tests_log_tests.generated.sql
-tests_node_tests.generated.sql
-tests_xid64_tests.generated.sql
-tests_xact_callback_tests.generated.sql
+tests_datetime_tests.generated.sql

@@ -684,6 +684,31 @@ fn translate_type_string(
         "& std :: ffi :: CStr" => Some(("cstring".to_string(), false, default_value, variadic)),
         "AnyElement" => Some(("anyelement".to_string(), false, default_value, variadic)),
         "AnyArray" => Some(("anyarray".to_string(), false, default_value, variadic)),
+        "time :: Time" | "Time" => Some(("time".to_string(), false, default_value, variadic)),
+        "pgx :: TimeWithTimeZone" | "TimeWithTimeZone" => Some((
+            "time with time zone".to_string(),
+            false,
+            default_value,
+            variadic,
+        )),
+        "time :: Date" | "Date" => Some(("date".to_string(), false, default_value, variadic)),
+        "time :: PrimitiveDateTime" | "PrimitiveDateTime" | "pgx :: Timestamp" | "Timestamp" => {
+            Some((
+                "timestamp without time zone".to_string(),
+                false,
+                default_value,
+                variadic,
+            ))
+        }
+        "time :: OffsetDateTime"
+        | "OffsetDateTime"
+        | "pgx :: TimestampWithTimeZone"
+        | "TimestampWithTimeZone" => Some((
+            "timestamp with time zone".to_string(),
+            false,
+            default_value,
+            variadic,
+        )),
         "pg_sys :: Oid" => Some(("oid".to_string(), false, default_value, variadic)),
         "pg_sys :: ItemPointerData" => Some(("tid".to_string(), false, default_value, variadic)),
         "pg_sys :: FunctionCallInfo" => None,

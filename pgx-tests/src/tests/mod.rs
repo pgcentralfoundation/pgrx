@@ -1,5 +1,6 @@
 mod anyarray_tests;
 mod array_tests;
+mod datetime_tests;
 mod default_arg_value_tests;
 mod enum_type_tests;
 mod fcinfo_tests;

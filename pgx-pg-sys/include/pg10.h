@@ -41,6 +41,7 @@
 #include "storage/block.h"
 #include "storage/itemptr.h"
 #include "utils/builtins.h"
+#include "utils/date.h"
 #include "utils/json.h"
 #include "utils/jsonb.h"
 #include "utils/syscache.h"
