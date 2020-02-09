@@ -1,4 +1,5 @@
 use crate::{direct_function_call_as_datum, pg_sys, FromDatum, IntoDatum, PgBox};
+use serde::Serializer;
 use std::ops::Deref;
 use time::UtcOffset;
 
@@ -99,6 +100,15 @@ impl Deref for TimeWithTimeZone {
 
     fn deref(&self) -> &Self::Target {
         &self.0
+    }
+}
+
+impl serde::Serialize for TimeWithTimeZone {
+    fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error>
+    where
+        S: Serializer,
+    {
+        self.0.serialize(serializer)
     }
 }
 
