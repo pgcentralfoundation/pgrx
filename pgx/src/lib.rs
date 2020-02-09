@@ -2,11 +2,8 @@ extern crate pgx_macros;
 
 extern crate num_traits;
 
-// expose the #[derive(DatumCompatible)] trait
+// expose our various derive macros
 pub use pgx_macros::*;
-
-// we need this publicly too
-pub use std::convert::TryInto;
 
 pub mod callbacks;
 pub mod datum;
