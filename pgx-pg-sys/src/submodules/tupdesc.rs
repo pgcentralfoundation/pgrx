@@ -5,7 +5,7 @@ impl crate::FormData_pg_attribute {
         name_data_to_str(&self.attname)
     }
 
-    pub fn oid(&self) -> PgOid {
+    pub fn type_oid(&self) -> PgOid {
         PgOid::from(self.atttypid)
     }
 
