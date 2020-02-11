@@ -247,13 +247,8 @@ impl PgMemoryContexts {
     /// let copy = PgMemoryContexts::CurrentMemoryContext.pstrdup("make a copy of this");
     /// ```
     pub fn pstrdup(&self, s: &str) -> *mut std::os::raw::c_char {
-        let len = s.len() + 1; // +1 for the \0 we'll have
         let cstring = std::ffi::CString::new(s).unwrap();
-        let copy = unsafe { pg_sys::palloc(len) };
-        unsafe {
-            pg_sys::memcpy(copy, cstring.as_ptr() as void_ptr, len as u64)
-                as *mut std::os::raw::c_char
-        }
+        unsafe { pg_sys::MemoryContextStrdup(self.value(), cstring.as_ptr()) }
     }
 
     /// Copies `len` bytes, starting at `src` into this memory context and
@@ -284,9 +279,15 @@ impl PgMemoryContexts {
     }
 
     /// Allocate a slice in this context, which will be free'd whenever Postgres deletes this MeoryContext
-    pub fn palloc_slice<'a>(&mut self, len: usize) -> &'a mut [u8] {
-        let buffer = self.palloc(len);
-        unsafe { std::slice::from_raw_parts_mut(buffer as *mut u8, len) }
+    pub fn palloc_slice<'a, T>(&mut self, len: usize) -> &'a mut [T] {
+        let buffer = self.palloc(std::mem::size_of::<T>() * len) as *mut T;
+        unsafe { std::slice::from_raw_parts_mut(buffer, len) }
+    }
+
+    /// Allocate a slice in this context, where the memory is zero'd, which will be free'd whenever Postgres deletes this MeoryContext
+    pub fn palloc0_slice<'a, T>(&mut self, len: usize) -> &'a mut [T] {
+        let buffer = self.palloc0(std::mem::size_of::<T>() * len) as *mut T;
+        unsafe { std::slice::from_raw_parts_mut(buffer, len) }
     }
 
     /// Allocate memory in this context, which will be free'd whenever Postgres deletes this MeoryContext
