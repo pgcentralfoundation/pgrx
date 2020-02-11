@@ -270,6 +270,11 @@ impl<T> PgBox<T> {
             "Rust"
         }
     }
+
+    /// Execute a closure with a mutable, `PgBox`'d form of the specified `ptr`
+    pub fn with<F: FnOnce(&mut PgBox<T>)>(ptr: *mut T, func: F) {
+        func(&mut PgBox::from_pg(ptr))
+    }
 }
 
 impl<T> Deref for PgBox<T> {
