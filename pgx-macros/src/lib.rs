@@ -127,7 +127,7 @@ fn impl_postgres_enum(ast: DeriveInput) -> proc_macro2::TokenStream {
     let enum_ident = ast.ident;
     let enum_name = enum_ident.to_string();
 
-    // validate that we're only operating on a struct
+    // validate that we're only operating on an enum
     let enum_data = match ast.data {
         Data::Enum(e) => e,
         _ => panic!("#[derive(PostgresEnum)] can only be applied to enums"),
@@ -237,6 +237,87 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
             let mut buffer = StringInfo::new();
             input.output(&mut buffer);
             buffer.into()
+        }
+    });
+
+    stream
+}
+
+#[proc_macro_derive(PostgresGucEnum, attributes(hidden))]
+pub fn postgres_guc_enum(input: TokenStream) -> TokenStream {
+    let ast = parse_macro_input!(input as syn::DeriveInput);
+
+    impl_guc_enum(ast).into()
+}
+
+fn impl_guc_enum(ast: DeriveInput) -> proc_macro2::TokenStream {
+    let mut stream = proc_macro2::TokenStream::new();
+
+    // validate that we're only operating on an enum
+    let enum_data = match ast.data {
+        Data::Enum(e) => e,
+        _ => panic!("#[derive(PostgresGucEnum)] can only be applied to enums"),
+    };
+    let enum_name = ast.ident;
+    let enum_len = enum_data.variants.len();
+
+    let mut from_match_arms = proc_macro2::TokenStream::new();
+    for (idx, e) in enum_data.variants.iter().enumerate() {
+        let label = &e.ident;
+        let idx = idx as i32;
+        from_match_arms.extend(quote! { #idx => #enum_name::#label, })
+    }
+    from_match_arms.extend(quote! { _ => panic!("Unrecognized ordinal ")});
+
+    let mut ordinal_match_arms = proc_macro2::TokenStream::new();
+    for (idx, e) in enum_data.variants.iter().enumerate() {
+        let label = &e.ident;
+        let idx = idx as i32;
+        ordinal_match_arms.extend(quote! { #enum_name::#label => #idx, });
+    }
+
+    let mut build_array_body = proc_macro2::TokenStream::new();
+    for (idx, e) in enum_data.variants.iter().enumerate() {
+        let label = e.ident.to_string();
+        let mut hidden = false;
+
+        for att in e.attrs.iter() {
+            if att.to_token_stream().to_string() == "# [hidden]" {
+                hidden = true;
+                break;
+            }
+        }
+
+        build_array_body.extend(quote! {
+            pgx::PgBox::with(&mut slice[#idx], |v| {
+                v.name = pgx::PgMemoryContexts::TopMemoryContext.pstrdup(#label);
+                v.val = #idx as i32;
+                v.hidden = #hidden;
+            });
+        });
+    }
+
+    stream.extend(quote! {
+        impl pgx::GucEnum<#enum_name> for #enum_name {
+            fn from_ordinal(ordinal: i32) -> #enum_name {
+                match ordinal {
+                    #from_match_arms
+                }
+            }
+
+            fn to_ordinal(&self) -> i32 {
+                match *self {
+                    #ordinal_match_arms
+                }
+            }
+
+            unsafe fn config_matrix(&self) -> *const pgx::pg_sys::config_enum_entry {
+                let slice = pgx::PgMemoryContexts::TopMemoryContext.palloc0_slice::<pg_sys::config_enum_entry>(#enum_len + 1usize);
+
+                #build_array_body
+
+                slice.as_ptr()
+            }
         }
     });
 
