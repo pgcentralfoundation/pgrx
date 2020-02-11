@@ -83,7 +83,6 @@ void pgx_deconstruct_row_type(TupleDesc tupdesc, Datum row, Datum **columns, boo
 
     for (int i=0; i<natts; i++) {
         Form_pg_attribute att = TupleDescAttr(tupdesc, i);
-        bool is_null;
 
         if (att->attisdropped) {
             cols[i] = 0;
