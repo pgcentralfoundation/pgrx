@@ -61,10 +61,24 @@ pub fn pg_test(attr: TokenStream, item: TokenStream) -> TokenStream {
             let test_func_name =
                 Ident::new(&format!("pg_{}", func.sig.ident.to_string()), func.span());
 
+            let attributes = func.attrs;
+            let mut att_stream = proc_macro2::TokenStream::new();
+
+            for a in attributes.iter() {
+                let as_str = a.tokens.to_token_stream().to_string();
+                att_stream.extend(quote! {
+                    options.push(#as_str);
+                });
+            }
+
             stream.extend(quote! {
                 #[test]
                 fn #test_func_name() {
-                    pgx_tests::run_test(#sql_funcname, #expected_error)
+                    let mut options = Vec::new();
+                    #att_stream
+
+                    crate::pg_test_setup(options);
+                    pgx_tests::run_test(#sql_funcname, #expected_error, crate::pg_test_postgresql_conf_options())
                 }
             });
         }
@@ -73,6 +87,11 @@ pub fn pg_test(attr: TokenStream, item: TokenStream) -> TokenStream {
     }
 
     stream.into()
+}
+
+#[proc_macro_attribute]
+pub fn initialize(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    item
 }
 
 #[proc_macro_attribute]

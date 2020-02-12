@@ -37,15 +37,19 @@ fn register_shutdown_hook() {
     shutdown_hooks::add_shutdown_hook(run_shutdown_hooks);
 }
 
-fn add_shutdown_hook<F: Fn()>(func: F)
+pub fn add_shutdown_hook<F: Fn()>(func: F)
 where
     F: Send + 'static,
 {
     SHUTDOWN_HOOKS.lock().unwrap().push(Box::new(func));
 }
 
-pub fn run_test(sql_funcname: &str, expected_error: Option<&str>) {
-    let (loglines, system_session_id) = initialize_test_framework();
+pub fn run_test(
+    sql_funcname: &str,
+    expected_error: Option<&str>,
+    postgresql_conf: Vec<&'static str>,
+) {
+    let (loglines, system_session_id) = initialize_test_framework(postgresql_conf);
 
     let (mut client, session_id) = client();
 
@@ -152,14 +156,14 @@ fn get_named_capture(regex: &regex::Regex, name: &'static str, against: &str) ->
 }
 
 #[inline]
-fn initialize_test_framework() -> (LogLines, String) {
+fn initialize_test_framework(postgresql_conf: Vec<&'static str>) -> (LogLines, String) {
     let mut state = TEST_MUTEX.lock().expect("lock was poisoned");
 
     if !state.installed {
         register_shutdown_hook();
 
         install_extension();
-        initdb();
+        initdb(postgresql_conf);
 
         let system_session_id = start_pg(state.loglines.clone());
         dropdb();
@@ -237,7 +241,7 @@ fn install_extension() {
     }
 }
 
-fn initdb() {
+fn initdb(postgresql_conf: Vec<&'static str>) {
     let pgdata = get_pgdata_path();
 
     if !pgdata.is_dir() {
@@ -255,17 +259,24 @@ fn initdb() {
         }
     }
 
-    modify_postgresql_conf(pgdata);
+    modify_postgresql_conf(pgdata, postgresql_conf);
 }
 
-fn modify_postgresql_conf(pgdata: PathBuf) {
-    let mut postgresql_conf = std::fs::OpenOptions::new()
-        .append(true)
-        .open(format!("{}/postgresql.conf", pgdata.display()))
-        .expect("couldn't open postgresql.conf");
-    postgresql_conf
+fn modify_postgresql_conf(pgdata: PathBuf, postgresql_conf: Vec<&'static str>) {
+    let mut postgresql_conf_file = std::fs::OpenOptions::new()
+        .write(true)
+        .truncate(true)
+        .open(format!("{}/postgresql.auto.conf", pgdata.display()))
+        .expect("couldn't open postgresql.auto.conf");
+    postgresql_conf_file
         .write_all("log_line_prefix='[%m] [%p] [%c]: '\n".as_bytes())
         .expect("couldn't append log_line_prefix");
+
+    for setting in postgresql_conf {
+        postgresql_conf_file
+            .write_all(format!("{}\n", setting).as_bytes())
+            .expect("couldn't append custom setting to postgresql.conf");
+    }
 }
 
 fn start_pg(loglines: LogLines) -> String {
@@ -319,7 +330,7 @@ fn monitor_pg(mut command: Command, cmd_string: String, loglines: LogLines) -> (
             child
                 .stderr
                 .take()
-                .expect("couldn't take postmaster stdout"),
+                .expect("couldn't take postmaster stderr"),
         );
 
         let regex = regex::Regex::new(r#"\[.*?\] \[.*?\] \[(?P<session_id>.*?)\]"#).unwrap();
