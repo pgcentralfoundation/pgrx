@@ -2,12 +2,13 @@ extern crate proc_macro;
 
 mod rewriter;
 
+use pgx_utils::*;
 use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span};
 use quote::{quote, quote_spanned};
 use rewriter::*;
 use std::collections::HashSet;
-use syn::export::ToTokens;
+use syn::export::{ToTokens, TokenStream2};
 use syn::spanned::Spanned;
 use syn::{parse_macro_input, Attribute, Data, DeriveInput, Item, ItemFn};
 
@@ -36,7 +37,7 @@ pub fn pg_guard(_attr: TokenStream, item: TokenStream) -> TokenStream {
 #[proc_macro_attribute]
 pub fn pg_test(attr: TokenStream, item: TokenStream) -> TokenStream {
     let mut stream = proc_macro2::TokenStream::new();
-    let args = parse_extern_attributes(&attr);
+    let args = parse_extern_attributes(TokenStream2::from(attr.clone()));
 
     let mut expected_error = None;
     args.into_iter().for_each(|v| match v {
@@ -45,7 +46,7 @@ pub fn pg_test(attr: TokenStream, item: TokenStream) -> TokenStream {
     });
 
     stream.extend(proc_macro2::TokenStream::from(pg_extern(
-        attr.clone(),
+        attr,
         item.clone(),
     )));
 
@@ -96,7 +97,7 @@ pub fn initialize(_attr: TokenStream, item: TokenStream) -> TokenStream {
 
 #[proc_macro_attribute]
 pub fn pg_extern(attr: TokenStream, item: TokenStream) -> TokenStream {
-    let args = parse_extern_attributes(&attr);
+    let args = parse_extern_attributes(TokenStream2::from(attr));
     let is_raw = args.contains(&ExternArgs::Raw);
     let no_guard = args.contains(&ExternArgs::NoGuard);
 
@@ -369,70 +370,6 @@ fn parse_postgres_type_args(attributes: &Vec<Attribute>) -> HashSet<PostgresType
     }
 
     categorized_attributes
-}
-
-#[derive(Debug, Hash, Ord, PartialOrd, Eq, PartialEq)]
-enum ExternArgs {
-    Immutable,
-    Strict,
-    Stable,
-    Volatile,
-    Raw,
-    NoGuard,
-    ParallelSafe,
-    ParallelUnsafe,
-    ParallelRestricted,
-    Error(String),
-}
-
-fn parse_extern_attributes(attr: &TokenStream) -> HashSet<ExternArgs> {
-    let attr_string = attr.to_string();
-    let attrs: Vec<&str> = attr_string.split(',').collect();
-
-    let mut args = HashSet::<ExternArgs>::new();
-    for att in attrs {
-        let att = att.trim();
-
-        match att {
-            "immutable" => args.insert(ExternArgs::Immutable),
-            "strict" => args.insert(ExternArgs::Strict),
-            "stable" => args.insert(ExternArgs::Stable),
-            "volatile" => args.insert(ExternArgs::Volatile),
-            "raw" => args.insert(ExternArgs::Raw),
-            "no_guard" => args.insert(ExternArgs::NoGuard),
-            "parallel_safe" => args.insert(ExternArgs::ParallelSafe),
-            "parallel_unsafe" => args.insert(ExternArgs::ParallelUnsafe),
-            "parallel_restricted" => args.insert(ExternArgs::ParallelRestricted),
-            error if att.starts_with("error") => {
-                let re = regex::Regex::new(r#"("[^"\\]*(?:\\.[^"\\]*)*")"#).unwrap();
-
-                let message = match re.captures(error) {
-                    Some(captures) => match captures.get(0) {
-                        Some(mtch) => {
-                            let message = mtch.as_str().clone();
-                            let message = unescape::unescape(message)
-                                .expect("improperly escaped error message");
-
-                            // trim leading/trailing quotes
-                            let message = String::from(&message[1..]);
-                            let message = String::from(&message[..message.len() - 1]);
-
-                            message
-                        }
-                        None => {
-                            panic!("No matches found in: {}", error);
-                        }
-                    },
-                    None => panic!("/{}/ is an invalid error= attribute", error),
-                };
-
-                args.insert(ExternArgs::Error(message.to_string()))
-            }
-
-            _ => false,
-        };
-    }
-    args
 }
 
 #[proc_macro]

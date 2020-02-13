@@ -9,6 +9,7 @@ members = [
     "pgx-macros",
     "pgx-tests",
     "pgx-pg-sys",
+    "pgx-utils",
     "cargo-pgx",
 ]
 

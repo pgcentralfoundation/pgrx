@@ -1,4 +1,5 @@
 use crate::property_inspector::get_property;
+use pgx_utils::ExternArgs;
 use proc_macro2::{Ident, Span};
 use quote::quote;
 use std::borrow::BorrowMut;
@@ -12,19 +13,6 @@ use std::str::FromStr;
 use syn::export::ToTokens;
 use syn::spanned::Spanned;
 use syn::{Attribute, FnArg, Item, ItemFn, Pat, ReturnType, Type};
-
-#[derive(Debug, Hash, Ord, PartialOrd, Eq, PartialEq)]
-enum ExternArgs {
-    Immutable,
-    Strict,
-    Stable,
-    Volatile,
-    Raw,
-    ParallelSafe,
-    ParallelUnsafe,
-    ParallelRestricted,
-    Error(String),
-}
 
 #[derive(Debug)]
 enum CategorizedAttribute {
@@ -187,61 +175,7 @@ fn delete_generated_sql() {
 }
 
 fn parse_extern_args(att: &Attribute) -> HashSet<ExternArgs> {
-    let mut args = HashSet::<ExternArgs>::new();
-    let line = att.into_token_stream().to_string();
-    let mut line = line.as_str();
-
-    if line.contains('(') {
-        line = line.trim_start_matches("# [ pg_extern").trim();
-        line = line.trim_start_matches("# [ pg_test").trim();
-        line = line.trim_start_matches("(").trim();
-        line = line.trim_end_matches(") ]").trim();
-        line = line.trim_end_matches("]").trim();
-        let atts: Vec<_> = line.split(',').collect();
-
-        for att in atts {
-            let att = att.trim();
-
-            match att {
-                "immutable" => args.insert(ExternArgs::Immutable),
-                "strict" => args.insert(ExternArgs::Strict),
-                "stable" => args.insert(ExternArgs::Stable),
-                "volatile" => args.insert(ExternArgs::Volatile),
-                "raw" => args.insert(ExternArgs::Raw),
-                "parallel_safe" => args.insert(ExternArgs::ParallelSafe),
-                "parallel_unsafe" => args.insert(ExternArgs::ParallelUnsafe),
-                "parallel_restricted" => args.insert(ExternArgs::ParallelRestricted),
-                error if att.starts_with("error") => {
-                    let re = regex::Regex::new(r#"("[^"\\]*(?:\\.[^"\\]*)*")"#).unwrap();
-
-                    let message = match re.captures(error) {
-                        Some(captures) => match captures.get(0) {
-                            Some(mtch) => {
-                                let message = mtch.as_str().clone();
-                                let message = unescape::unescape(message)
-                                    .expect("improperly escaped error message");
-
-                                // trim leading/trailing quotes
-                                let message = String::from(&message[1..]);
-                                let message = String::from(&message[..message.len() - 1]);
-
-                                message
-                            }
-                            None => {
-                                panic!("No matches found in: {}", error);
-                            }
-                        },
-                        None => panic!("/{}/ is an invalid error= attribute", error),
-                    };
-
-                    args.insert(ExternArgs::Error(message.to_string()))
-                }
-
-                _ => false,
-            };
-        }
-    }
-    args
+    pgx_utils::parse_extern_attributes(att.tokens.clone())
 }
 
 fn generate_sql(rs_file: &DirEntry, default_schema: String) -> Vec<String> {
@@ -544,6 +478,7 @@ fn make_create_function_statement(
                 ExternArgs::ParallelUnsafe => statement.push_str(" PARALLEL UNSAFE"),
                 ExternArgs::ParallelRestricted => statement.push_str(" PARALLEL RESTRICTED"),
                 ExternArgs::Error(_) => { /* noop */ }
+                ExternArgs::NoGuard => {}
             }
         }
     }
