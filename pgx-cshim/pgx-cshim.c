@@ -51,6 +51,12 @@ CommandId pgx_HeapTupleHeaderGetRawCommandId(HeapTupleHeader htup_header) {
     return HeapTupleHeaderGetRawCommandId(htup_header);
 }
 
+PGDLLEXPORT bool pgx_HeapTupleHeaderIsHeapOnly();
+bool pgx_HeapTupleHeaderIsHeapOnly(HeapTupleHeader htup_header) {
+    return HeapTupleHeaderIsHeapOnly(htup_header);
+}
+
+
 #if IS_PG_10 || IS_PG_11
 PGDLLEXPORT Oid pgx_HeapTupleHeaderGetOid(HeapTupleHeader htup_header);
 Oid pgx_HeapTupleHeaderGetOid(HeapTupleHeader htup_header) {

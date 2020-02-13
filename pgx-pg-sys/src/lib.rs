@@ -114,6 +114,19 @@ mod all_versions {
             Some(unsafe { pgx_HeapTupleHeaderGetRawCommandId(htup_header) })
         }
     }
+
+    #[inline]
+    pub fn HeapTupleHeaderIsHeapOnly(htup_header: super::HeapTupleHeader) -> bool {
+        extern "C" {
+            pub fn pgx_HeapTupleHeaderIsHeapOnly(htup_header: super::HeapTupleHeader) -> bool;
+        }
+
+        if htup_header.is_null() {
+            panic!("provided HeapTupleHeader is null");
+        } else {
+            unsafe { pgx_HeapTupleHeaderIsHeapOnly(htup_header) }
+        }
+    }
 }
 
 mod internal {
