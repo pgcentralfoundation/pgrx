@@ -5,11 +5,9 @@ use crate::{pg_sys, PgBox};
 /// This function s unsafe becuase it does not check that the specified ItemPointerData pointer
 /// might be null
 #[inline]
-pub unsafe fn item_pointer_get_block_number(
-    ctid: *const pg_sys::ItemPointerData,
-) -> pg_sys::BlockNumber {
+pub fn item_pointer_get_block_number(ctid: *const pg_sys::ItemPointerData) -> pg_sys::BlockNumber {
     assert!(item_pointer_is_valid(ctid));
-    item_pointer_get_block_number_no_check(ctid)
+    unsafe { item_pointer_get_block_number_no_check(ctid) }
 }
 
 /// ## Safety
@@ -17,11 +15,11 @@ pub unsafe fn item_pointer_get_block_number(
 /// This function s unsafe becuase it does not check that the specified ItemPointerData pointer
 /// might be null
 #[inline]
-pub unsafe fn item_pointer_get_offset_number(
+pub fn item_pointer_get_offset_number(
     ctid: *const pg_sys::ItemPointerData,
 ) -> pg_sys::OffsetNumber {
     assert!(item_pointer_is_valid(ctid));
-    item_pointer_get_offset_number_no_check(ctid)
+    unsafe { item_pointer_get_offset_number_no_check(ctid) }
 }
 
 /// ## Safety
