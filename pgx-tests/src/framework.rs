@@ -57,7 +57,7 @@ pub fn run_test(
     let result = match client.transaction() {
         // run the test function in a transaction
         Ok(mut tx) => {
-            let result = tx.simple_query(&format!("SELECT {}.{}();", schema, sql_funcname));
+            let result = tx.simple_query(&format!("SELECT \"{}\".\"{}\"();", schema, sql_funcname));
 
             if result.is_ok() {
                 // and abort the transaction when complete
