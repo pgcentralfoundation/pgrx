@@ -34,13 +34,6 @@ pub unsafe fn item_pointer_get_block_number_no_check(
     (((block_id.bi_hi as u32) << 16) | (block_id.bi_lo as u32)) as pg_sys::BlockNumber
 }
 
-pub fn item_pointer_to_u64(ctid: pg_sys::ItemPointerData) -> u64 {
-    let blockno = unsafe { item_pointer_get_block_number_no_check(&ctid) } as u64;
-    let offno = unsafe { item_pointer_get_offset_number_no_check(&ctid) } as u64;
-
-    (blockno << 32) | offno
-}
-
 /// ## Safety
 ///
 /// This function is unsafe because it does not check that the specified ItemPointerData pointer
@@ -50,6 +43,35 @@ pub unsafe fn item_pointer_get_offset_number_no_check(
     ctid: *const pg_sys::ItemPointerData,
 ) -> pg_sys::OffsetNumber {
     (*ctid).ip_posid
+}
+
+#[inline]
+pub fn item_pointer_set_all(
+    tid: &mut pg_sys::ItemPointerData,
+    blockno: pg_sys::BlockNumber,
+    offno: pg_sys::OffsetNumber,
+) {
+    use std::convert::TryInto;
+    tid.ip_posid = offno;
+    tid.ip_blkid.bi_hi = (blockno >> 16).try_into().unwrap();
+    tid.ip_blkid.bi_lo = (blockno & 0xffff).try_into().unwrap();
+}
+
+/// Convert an `ItemPointerData` struct into a `u64`
+#[inline]
+pub fn item_pointer_to_u64(ctid: pg_sys::ItemPointerData) -> u64 {
+    let blockno = unsafe { item_pointer_get_block_number_no_check(&ctid) } as u64;
+    let offno = unsafe { item_pointer_get_offset_number_no_check(&ctid) } as u64;
+
+    (blockno << 32) | offno
+}
+
+/// Deconstruct a `u64` into an otherwise uninitialized `ItemPointerData` struct
+#[inline]
+pub fn u64_to_item_pointer(value: u64, tid: &mut pg_sys::ItemPointerData) {
+    let blockno = (value >> 32) as pg_sys::BlockNumber;
+    let offno = value as pg_sys::OffsetNumber;
+    item_pointer_set_all(tid, blockno, offno);
 }
 
 #[allow(clippy::not_unsafe_ptr_arg_deref)] // this is okay b/c we guard against ctid being null
