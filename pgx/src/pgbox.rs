@@ -218,6 +218,7 @@ impl<T> PgBox<T> {
     ///
     /// When this `PgBox<T>` is dropped, the boxed memory is **not** freed.  Since Postgres
     /// allocated it, Postgres is responsible for freeing it.
+    #[inline]
     pub fn from_pg(ptr: *mut T) -> PgBox<T> {
         PgBox::<T> {
             ptr: if ptr.is_null() { None } else { Some(ptr) },
@@ -255,6 +256,7 @@ impl<T> PgBox<T> {
     /// Useful for returning the boxed pointer back to Postgres (as a return value, for example).
     ///
     /// The boxed pointer is **not** free'd by Rust
+    #[inline]
     pub fn into_pg(mut self) -> *mut T {
         self.allocated_by_pg = true;
         match self.ptr {
