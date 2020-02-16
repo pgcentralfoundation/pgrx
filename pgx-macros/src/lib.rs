@@ -78,8 +78,8 @@ pub fn pg_test(attr: TokenStream, item: TokenStream) -> TokenStream {
                     let mut options = Vec::new();
                     #att_stream
 
-                    crate::pg_test_setup(options);
-                    pgx_tests::run_test(#sql_funcname, #expected_error, crate::pg_test_postgresql_conf_options())
+                    crate::pg_test::setup(options);
+                    pgx_tests::run_test(#sql_funcname, #expected_error, crate::pg_test::postgresql_conf_options())
                 }
             });
         }
