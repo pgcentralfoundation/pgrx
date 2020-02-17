@@ -8,6 +8,7 @@ mod guc_tests;
 mod json_tests;
 mod log_tests;
 mod node_tests;
+mod pg_extern_args_tests;
 mod schema_tests;
 mod spi_tests;
 mod struct_type_tests;

@@ -21,7 +21,11 @@ pub fn parse_extern_attributes(attr: TokenStream2) -> HashSet<ExternArgs> {
     let mut itr = attr.into_iter();
     while let Some(t) = itr.next() {
         match t {
-            TokenTree::Group(_) => {}
+            TokenTree::Group(g) => {
+                for arg in parse_extern_attributes(g.stream()).into_iter() {
+                    args.insert(arg);
+                }
+            }
             TokenTree::Ident(i) => {
                 let name = i.to_string();
                 match name.as_str() {
