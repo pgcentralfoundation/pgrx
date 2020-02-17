@@ -1,4 +1,4 @@
-use crate::{pg_sys, FromDatum, IntoDatum, PgMemoryContexts, PgOid};
+use crate::{pg_sys, FromDatum, IntoDatum, Json, PgMemoryContexts, PgOid};
 use enum_primitive_derive::*;
 use num_traits::FromPrimitive;
 use std::fmt::Debug;
@@ -79,6 +79,19 @@ impl Spi {
         Spi::execute(|mut client| {
             client.update(query, None, None);
         })
+    }
+
+    /// explain a query, returning its result in json form
+    pub fn explain(query: &str) -> Json {
+        Spi::connect(|mut client| {
+            let table = client.update(&format!("EXPLAIN (format json) {}", query), None, None);
+            Ok(Some(
+                table
+                    .get_one::<Json>()
+                    .expect("failed to get json EXPLAIN result"),
+            ))
+        })
+        .unwrap()
     }
 
     /// execute SPI commands via the provided `SpiClient`
@@ -165,14 +178,25 @@ impl Spi {
 }
 
 impl SpiClient {
-    /// perform a read-only SELECT statement
+    /// perform a SELECT statement
     pub fn select(
         &self,
         query: &str,
         limit: Option<i64>,
         args: Option<Vec<(PgOid, Option<pg_sys::Datum>)>>,
     ) -> SpiTupleTable {
-        SpiClient::execute(query, true, limit, args)
+        // Postgres docs say:
+        //
+        //    It is generally unwise to mix read-only and read-write commands within a single function
+        //    using SPI; that could result in very confusing behavior, since the read-only queries
+        //    would not see the results of any database updates done by the read-write queries.
+        //
+        // As such, we don't actually set read-only to true here
+
+        // TODO:  can we detect if the command counter (or something?) has incremented and if yes
+        //        then we set read_only=false, else we can set it to true?
+        //        Is this even a good idea?
+        SpiClient::execute(query, false, limit, args)
     }
 
     /// perform any query (including utility statements) that modify the database in some way
