@@ -1,6 +1,8 @@
 #[cfg(any(test, feature = "pg_test"))]
 mod tests {
+    #[allow(unused_imports)]
     use crate as pgx_tests;
+
     use pgx::*;
 
     #[pg_test]
