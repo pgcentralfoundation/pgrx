@@ -273,18 +273,18 @@ impl SpiClient {
 }
 
 impl SpiTupleTable {
-    pub fn get_one<A: FromDatum<A>>(self) -> Option<A> {
+    pub fn get_one<A: FromDatum<A>>(&self) -> Option<A> {
         self.get_datum(1)
     }
 
-    pub fn get_two<A: FromDatum<A>, B: FromDatum<B>>(self) -> (Option<A>, Option<B>) {
+    pub fn get_two<A: FromDatum<A>, B: FromDatum<B>>(&self) -> (Option<A>, Option<B>) {
         let a = self.get_datum::<A>(1);
         let b = self.get_datum::<B>(2);
         (a, b)
     }
 
     pub fn get_three<A: FromDatum<A>, B: FromDatum<B>, C: FromDatum<C>>(
-        self,
+        &self,
     ) -> (Option<A>, Option<B>, Option<C>) {
         let a = self.get_datum::<A>(1);
         let b = self.get_datum::<B>(2);
