@@ -157,7 +157,11 @@ fn get_named_capture(regex: &regex::Regex, name: &'static str, against: &str) ->
 
 #[inline]
 fn initialize_test_framework(postgresql_conf: Vec<&'static str>) -> (LogLines, String) {
-    let mut state = TEST_MUTEX.lock().expect("lock was poisoned");
+    let mut state = TEST_MUTEX.lock().unwrap_or_else(|_| {
+        // if we can't get the lock, that means it was poisoned,
+        // so we just abruptly exit, which cuts down on test failure spam
+        std::process::exit(1);
+    });
 
     if !state.installed {
         register_shutdown_hook();
