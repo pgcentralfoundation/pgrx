@@ -1,26 +1,67 @@
 use crate::{direct_function_call_as_datum, pg_sys, FromDatum, IntoDatum, PgBox};
-use serde::Serializer;
-use std::ops::Deref;
-use time::UtcOffset;
+use std::ops::{Deref, DerefMut};
+use time::{ComponentRangeError, UtcOffset};
 
-pub type Date = time::Date;
+pub struct Date(time::Date);
 impl FromDatum<Date> for Date {
     #[inline]
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _typoid: u32) -> Option<Date> {
         if is_null {
             None
         } else {
-            Some(time::Date::from_julian_day(
+            Some(Date(time::Date::from_julian_day(
                 (datum as i32 + pg_sys::POSTGRES_EPOCH_JDATE as i32) as i64,
-            ))
+            )))
+        }
+    }
+}
+impl IntoDatum<time::Date> for Date {
+    #[inline]
+    fn into_datum(self) -> Option<pg_sys::Datum> {
+        Some((self.julian_day() as i32 - pg_sys::POSTGRES_EPOCH_JDATE as i32) as pg_sys::Datum)
+    }
+}
+
+impl Date {
+    pub fn new(date: time::Date) -> Self {
+        Date(date)
+    }
+
+    pub fn from_ymd(
+        year: i32,
+        month: u8,
+        day: u8,
+    ) -> std::result::Result<Date, ComponentRangeError> {
+        match time::Date::try_from_ymd(year, month, day) {
+            Ok(date) => Ok(Date(date)),
+            Err(e) => Err(e),
         }
     }
 }
 
-impl IntoDatum<time::Date> for time::Date {
-    #[inline]
-    fn into_datum(self) -> Option<pg_sys::Datum> {
-        Some((self.julian_day() as i32 - pg_sys::POSTGRES_EPOCH_JDATE as i32) as pg_sys::Datum)
+impl Deref for Date {
+    type Target = time::Date;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl DerefMut for Date {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
+}
+
+impl serde::Serialize for Date {
+    fn serialize<S>(
+        &self,
+        serializer: S,
+    ) -> std::result::Result<<S as serde::Serializer>::Ok, <S as serde::Serializer>::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(&self.format("%Y-%m-%d"))
     }
 }
 
@@ -31,7 +72,6 @@ const MINS_PER_HOUR: i64 = 60;
 const SEC_PER_MIN: i64 = 60;
 
 pub type Time = time::Time;
-
 impl FromDatum<Time> for Time {
     #[inline]
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _typoid: u32) -> Option<Time> {
@@ -77,7 +117,6 @@ impl IntoDatum<time::Time> for time::Time {
 }
 
 pub struct TimeWithTimeZone(time::Time);
-
 impl FromDatum<TimeWithTimeZone> for TimeWithTimeZone {
     #[inline]
     unsafe fn from_datum(datum: usize, is_null: bool, typoid: u32) -> Option<TimeWithTimeZone> {
@@ -94,24 +133,6 @@ impl FromDatum<TimeWithTimeZone> for TimeWithTimeZone {
         }
     }
 }
-
-impl Deref for TimeWithTimeZone {
-    type Target = time::Time;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl serde::Serialize for TimeWithTimeZone {
-    fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error>
-    where
-        S: Serializer,
-    {
-        self.0.serialize(serializer)
-    }
-}
-
 impl IntoDatum<TimeWithTimeZone> for TimeWithTimeZone {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
@@ -126,8 +147,15 @@ impl IntoDatum<TimeWithTimeZone> for TimeWithTimeZone {
     }
 }
 
-pub type Timestamp = time::PrimitiveDateTime;
+impl Deref for TimeWithTimeZone {
+    type Target = time::Time;
 
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+pub type Timestamp = time::PrimitiveDateTime;
 impl FromDatum<Timestamp> for Timestamp {
     #[inline]
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, typoid: u32) -> Option<Timestamp> {
@@ -144,7 +172,6 @@ impl FromDatum<Timestamp> for Timestamp {
         }
     }
 }
-
 impl IntoDatum<Timestamp> for Timestamp {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
@@ -170,7 +197,6 @@ impl IntoDatum<Timestamp> for Timestamp {
 }
 
 pub type TimestampWithTimeZone = time::OffsetDateTime;
-
 impl FromDatum<TimestampWithTimeZone> for TimestampWithTimeZone {
     #[inline]
     unsafe fn from_datum(
@@ -220,7 +246,6 @@ impl FromDatum<TimestampWithTimeZone> for TimestampWithTimeZone {
         }
     }
 }
-
 impl IntoDatum<TimestampWithTimeZone> for TimestampWithTimeZone {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {

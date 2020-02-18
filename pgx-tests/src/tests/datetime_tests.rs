@@ -25,6 +25,20 @@ fn accept_timestamp_with_time_zone(t: TimestampWithTimeZone) -> TimestampWithTim
     t
 }
 
+#[cfg(test)]
+mod serialization_tests {
+    use pgx::Date;
+    use serde_json::*;
+
+    #[test]
+    fn test_date_serialization() {
+        let date = Date::new(time::date!(2020 - 09 - 09));
+        let json = json!({ "date": date });
+
+        assert_eq!(json!({"date":"2020-09-09"}), json);
+    }
+}
+
 #[cfg(any(test, feature = "pg_test"))]
 mod tests {
     #[allow(unused_imports)]
