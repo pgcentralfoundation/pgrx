@@ -419,9 +419,16 @@ fn make_create_function_statement(
 
                         if default_value.is_some() {
                             let default_value = default_value.unwrap();
-                            let mut default_value = default_value.as_str();
-                            default_value = default_value.trim_start_matches('"');
-                            default_value = default_value.trim_end_matches('"');
+                            let mut default_value = default_value;
+                            default_value = default_value.trim_start_matches('"').to_string();
+                            default_value = default_value.trim_end_matches('"').to_string();
+                            default_value = default_value.trim().to_string();
+                            default_value = default_value.trim_start_matches('\'').to_string();
+                            default_value = default_value.trim_end_matches('\'').to_string();
+
+                            if !default_value.eq_ignore_ascii_case("NULL") {
+                                default_value = format!("'{}'", default_value);
+                            }
 
                             statement.push_str(&format!(" DEFAULT {}", default_value));
                         }
