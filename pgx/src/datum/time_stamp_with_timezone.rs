@@ -3,6 +3,7 @@ use crate::{direct_function_call_as_datum, pg_sys, FromDatum, IntoDatum};
 use std::ops::{Deref, DerefMut};
 use time::UtcOffset;
 
+#[derive(Debug)]
 pub struct TimestampWithTimeZone(time::OffsetDateTime);
 impl FromDatum<TimestampWithTimeZone> for TimestampWithTimeZone {
     #[inline]
@@ -81,8 +82,9 @@ impl IntoDatum<TimestampWithTimeZone> for TimestampWithTimeZone {
 }
 
 impl TimestampWithTimeZone {
-    pub fn new(time: time::OffsetDateTime) -> Self {
-        TimestampWithTimeZone(time)
+    /// This shifts the provided `time` back to UTC
+    pub fn new(time: time::PrimitiveDateTime, at_tz_offset: time::UtcOffset) -> Self {
+        TimestampWithTimeZone(time.using_offset(UtcOffset::seconds(-at_tz_offset.as_seconds())))
     }
 }
 
@@ -107,6 +109,10 @@ impl serde::Serialize for TimestampWithTimeZone {
     where
         S: serde::Serializer,
     {
-        serializer.serialize_str(&self.format("%Y-%m-%dT%T+00:00"))
+        if self.millisecond() > 0 {
+            serializer.serialize_str(&self.format(&format!("%Y-%m-%dT%T.{}Z", self.millisecond())))
+        } else {
+            serializer.serialize_str(&self.format("%Y-%m-%dT%TZ"))
+        }
     }
 }

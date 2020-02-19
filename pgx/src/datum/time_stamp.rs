@@ -3,6 +3,7 @@ use crate::{direct_function_call_as_datum, pg_sys, FromDatum, IntoDatum, Timesta
 use std::ops::{Deref, DerefMut};
 use time::PrimitiveDateTime;
 
+#[derive(Debug)]
 pub struct Timestamp(time::PrimitiveDateTime);
 impl FromDatum<Timestamp> for Timestamp {
     #[inline]
@@ -70,6 +71,6 @@ impl serde::Serialize for Timestamp {
     where
         S: serde::Serializer,
     {
-        serializer.serialize_str(&self.format("%Y-%m-%dT%T+00:00"))
+        serializer.serialize_str(&self.format("%Y-%m-%dT%T"))
     }
 }

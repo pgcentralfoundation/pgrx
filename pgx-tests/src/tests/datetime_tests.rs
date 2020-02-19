@@ -1,4 +1,5 @@
 use pgx::*;
+use time::UtcOffset;
 
 #[pg_extern]
 fn accept_date(d: Date) -> Date {
@@ -25,17 +26,79 @@ fn accept_timestamp_with_time_zone(t: TimestampWithTimeZone) -> TimestampWithTim
     t
 }
 
+#[pg_extern]
+fn return_3pm_mountain_time() -> TimestampWithTimeZone {
+    let three_pm = TimestampWithTimeZone::new(
+        time::PrimitiveDateTime::new(time::date!(2020 - 02 - 19), time::time!(15:00:00)),
+        UtcOffset::hours(-7),
+    );
+
+    assert_eq!(7, three_pm.offset().as_hours());
+
+    three_pm
+}
+
 #[cfg(test)]
 mod serialization_tests {
-    use pgx::Date;
+    use pgx::*;
     use serde_json::*;
+    use time::{PrimitiveDateTime, UtcOffset};
 
     #[test]
     fn test_date_serialization() {
-        let date = Date::new(time::date!(2020 - 09 - 09));
-        let json = json!({ "date": date });
+        let date = Date::new(time::date!(2020 - 04 - 07));
+        let json = json!({ "date test": date });
 
-        assert_eq!(json!({"date":"2020-09-09"}), json);
+        assert_eq!(json!({"date test":"2020-04-07"}), json);
+    }
+
+    #[test]
+    fn test_time_serialization() {
+        let time = Time::new(time::time!(0:00));
+        let json = json!({ "time test": time });
+
+        assert_eq!(json!({"time test":"0:00:00"}), json);
+    }
+    #[test]
+    fn test_time_with_timezone_serialization() {
+        let time_with_timezone =
+            TimeWithTimeZone::new(time::time!(12: 23: 34), time::UtcOffset::hours(2));
+        let json = json!({ "time W/ Zone test": time_with_timezone });
+
+        // we automatically converted to UTC upon construction in ::new()
+        assert_eq!(10, time_with_timezone.hour());
+
+        // b/c we always want our times output in UTC
+        assert_eq!(json!({"time W/ Zone test":"10:23:34Z"}), json);
+    }
+
+    #[test]
+    fn test_timestamp_serialization() {
+        let time_stamp = Timestamp::new(PrimitiveDateTime::new(
+            time::date!(2020 - 1 - 01),
+            time::time!(12:34:54),
+        ));
+        let json = json!({ "time stamp test": time_stamp });
+
+        assert_eq!(json!({"time stamp test":"2020-01-01T12:34:54"}), json);
+    }
+    #[test]
+    fn test_timestamp_with_timezone_serialization() {
+        let time_stamp_with_timezone = TimestampWithTimeZone::new(
+            PrimitiveDateTime::new(time::date!(2022 - 2 - 02), time::time!(16:57:11)),
+            UtcOffset::parse("+0200", "%z").unwrap(),
+        );
+
+        let json = json!({ "time stamp with timezone test": time_stamp_with_timezone });
+
+        // b/c we shift back to UTC during construction in ::new()
+        assert_eq!(14, time_stamp_with_timezone.hour());
+
+        // but we serialize timestamps at UTC
+        assert_eq!(
+            json!({"time stamp with timezone test":"2022-02-02T14:57:11Z"}),
+            json
+        );
     }
 }
 
@@ -140,5 +203,13 @@ mod tests {
         let result = Spi::get_one::<bool>("SELECT accept_timestamp_with_time_zone('1990-01-23 03:45:00-07') = '1990-01-23 03:45:00-07'::timestamp with time zone;")
             .expect("failed to get SPI result");
         assert!(result)
+    }
+
+    #[pg_test]
+    fn test_return_3pm_mountain_time() {
+        let result = Spi::get_one::<TimestampWithTimeZone>("SELECT return_3pm_mountain_time();")
+            .expect("failed to get SPI result");
+
+        assert_eq!(22, result.hour());
     }
 }

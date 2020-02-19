@@ -1,8 +1,8 @@
 use crate::datum::time::Time;
 use crate::{pg_sys, FromDatum, IntoDatum, PgBox};
 use std::ops::{Deref, DerefMut};
-use time::ComponentRangeError;
 
+#[derive(Debug)]
 pub struct TimeWithTimeZone(Time);
 impl FromDatum<TimeWithTimeZone> for TimeWithTimeZone {
     #[inline]
@@ -14,7 +14,7 @@ impl FromDatum<TimeWithTimeZone> for TimeWithTimeZone {
 
             let mut time = Time::from_datum(timetz.time as pg_sys::Datum, false, typoid)
                 .expect("failed to convert TimeWithTimeZone");
-            time.0 += time::Duration::seconds(timetz.zone as i64);
+            time.0 -= time::Duration::seconds(timetz.zone as i64);
 
             Some(TimeWithTimeZone(time))
         }
@@ -36,23 +36,10 @@ impl IntoDatum<TimeWithTimeZone> for TimeWithTimeZone {
 }
 
 impl TimeWithTimeZone {
-    pub fn new(time: time::Time) -> Self {
+    /// This shifts the provided `time` back to UTC using the specified `utc_offset`
+    pub fn new(mut time: time::Time, at_tz_offset: time::UtcOffset) -> Self {
+        time -= time::Duration::seconds(at_tz_offset.as_seconds() as i64);
         TimeWithTimeZone(Time(time))
-    }
-
-    pub fn from_hmso(
-        hour: u8,
-        minute: u8,
-        second: u8,
-        offset: time::Duration,
-    ) -> std::result::Result<Time, ComponentRangeError> {
-        match time::Time::try_from_hms(hour, minute, second) {
-            Ok(mut time) => {
-                time = time - offset;
-                Ok(Time(time)) //not sure this is right, it is a mystery
-            }
-            Err(e) => Err(e),
-        }
     }
 }
 
@@ -77,6 +64,10 @@ impl serde::Serialize for TimeWithTimeZone {
     where
         S: serde::Serializer,
     {
-        serializer.serialize_str(&self.format("%h-%m-%s-%z"))
+        if self.millisecond() > 0 {
+            serializer.serialize_str(&self.format(&format!("%T.{}Z", self.millisecond())))
+        } else {
+            serializer.serialize_str(&self.format("%TZ"))
+        }
     }
 }

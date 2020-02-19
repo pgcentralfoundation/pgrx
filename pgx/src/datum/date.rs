@@ -1,7 +1,7 @@
 use crate::{pg_sys, FromDatum, IntoDatum};
 use std::ops::{Deref, DerefMut};
-use time::ComponentRangeError;
 
+#[derive(Debug)]
 pub struct Date(time::Date);
 impl FromDatum<Date> for Date {
     #[inline]
@@ -25,17 +25,6 @@ impl IntoDatum<time::Date> for Date {
 impl Date {
     pub fn new(date: time::Date) -> Self {
         Date(date)
-    }
-
-    pub fn from_ymd(
-        year: i32,
-        month: u8,
-        day: u8,
-    ) -> std::result::Result<Date, ComponentRangeError> {
-        match time::Date::try_from_ymd(year, month, day) {
-            Ok(date) => Ok(Date(date)),
-            Err(e) => Err(e),
-        }
     }
 }
 

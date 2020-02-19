@@ -1,6 +1,5 @@
 use crate::{pg_sys, FromDatum, IntoDatum};
 use std::ops::{Deref, DerefMut};
-use time::ComponentRangeError;
 
 pub(crate) const USECS_PER_HOUR: i64 = 3600000000;
 pub(crate) const USECS_PER_MINUTE: i64 = 60000000;
@@ -8,6 +7,7 @@ pub(crate) const USECS_PER_SEC: i64 = 1000000;
 pub(crate) const MINS_PER_HOUR: i64 = 60;
 pub(crate) const SEC_PER_MIN: i64 = 60;
 
+#[derive(Debug)]
 pub struct Time(pub(crate) time::Time);
 impl FromDatum<Time> for Time {
     #[inline]
@@ -57,17 +57,6 @@ impl Time {
     pub fn new(time: time::Time) -> Self {
         Time(time)
     }
-
-    pub fn from_hms(
-        hour: u8,
-        minute: u8,
-        second: u8,
-    ) -> std::result::Result<Time, ComponentRangeError> {
-        match time::Time::try_from_hms(hour, minute, second) {
-            Ok(time) => Ok(Time(time)),
-            Err(e) => Err(e),
-        }
-    }
 }
 
 impl Deref for Time {
@@ -92,6 +81,6 @@ impl serde::Serialize for Time {
     where
         S: serde::Serializer,
     {
-        serializer.serialize_str(&self.format("%h-%m-%s"))
+        serializer.serialize_str(&self.format("%T"))
     }
 }
