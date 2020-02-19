@@ -1,0 +1,66 @@
+use crate::{pg_sys, FromDatum, IntoDatum};
+use std::ops::{Deref, DerefMut};
+use time::ComponentRangeError;
+
+pub struct Date(time::Date);
+impl FromDatum<Date> for Date {
+    #[inline]
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _typoid: u32) -> Option<Date> {
+        if is_null {
+            None
+        } else {
+            Some(Date(time::Date::from_julian_day(
+                (datum as i32 + pg_sys::POSTGRES_EPOCH_JDATE as i32) as i64,
+            )))
+        }
+    }
+}
+impl IntoDatum<time::Date> for Date {
+    #[inline]
+    fn into_datum(self) -> Option<pg_sys::Datum> {
+        Some((self.julian_day() as i32 - pg_sys::POSTGRES_EPOCH_JDATE as i32) as pg_sys::Datum)
+    }
+}
+
+impl Date {
+    pub fn new(date: time::Date) -> Self {
+        Date(date)
+    }
+
+    pub fn from_ymd(
+        year: i32,
+        month: u8,
+        day: u8,
+    ) -> std::result::Result<Date, ComponentRangeError> {
+        match time::Date::try_from_ymd(year, month, day) {
+            Ok(date) => Ok(Date(date)),
+            Err(e) => Err(e),
+        }
+    }
+}
+
+impl Deref for Date {
+    type Target = time::Date;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl DerefMut for Date {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
+}
+
+impl serde::Serialize for Date {
+    fn serialize<S>(
+        &self,
+        serializer: S,
+    ) -> std::result::Result<<S as serde::Serializer>::Ok, <S as serde::Serializer>::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(&self.format("%Y-%m-%d"))
+    }
+}
