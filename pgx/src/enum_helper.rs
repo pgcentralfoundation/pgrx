@@ -39,7 +39,6 @@ pub fn lookup_enum_by_oid(enumval: pg_sys::Oid) -> (String, pg_sys::Oid, f32) {
         en.enumsortorder as f32,
     );
 
-    eprintln!("result={}", result.0);
     unsafe {
         pg_sys::ReleaseSysCache(tup);
     }

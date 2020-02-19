@@ -212,4 +212,21 @@ mod tests {
 
         assert_eq!(22, result.hour());
     }
+
+    fn test_is_timestamp_with_time_zone_utc() {
+        let ts = Spi::get_one::<TimestampWithTimeZone>(
+            "SELECT '2020-02-18 14:08 -07'::timestamp with time zone",
+        )
+        .expect("failed to get SPI result");
+
+        assert_eq!(ts.hour(), 21);
+    }
+
+    #[pg_test]
+    fn test_is_timestamp_utc() {
+        let ts = Spi::get_one::<Timestamp>("SELECT '2020-02-18 14:08'::timestamp")
+            .expect("failed to get SPI result");
+
+        assert_eq!(ts.hour(), 14);
+    }
 }
