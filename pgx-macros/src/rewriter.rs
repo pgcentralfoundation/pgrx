@@ -334,7 +334,7 @@ impl FunctionSignatureRewriter {
                         } else if type_matches(type_, "pg_sys :: FunctionCallInfo") {
                             have_fcinfo = true;
                             quote_spanned! {ident.span()=>
-                                let #name = #name;
+                                let #name = fcinfo;
                             }
                         } else if is_raw {
                             quote_spanned! {ident.span()=>
