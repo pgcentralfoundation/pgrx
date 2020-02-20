@@ -81,6 +81,10 @@ impl serde::Serialize for Time {
     where
         S: serde::Serializer,
     {
-        serializer.serialize_str(&self.format("%T"))
+        if self.millisecond() > 0 {
+            serializer.serialize_str(&self.format(&format!("%T.{}Z", self.millisecond())))
+        } else {
+            serializer.serialize_str(&self.format("%TZ"))
+        }
     }
 }
