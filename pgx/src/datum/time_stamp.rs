@@ -71,6 +71,10 @@ impl serde::Serialize for Timestamp {
     where
         S: serde::Serializer,
     {
-        serializer.serialize_str(&self.format("%Y-%m-%dT%T"))
+        if self.millisecond() > 0 {
+            serializer.serialize_str(&self.format(&format!("%Y-%m-%dT%T.{}Z", self.millisecond())))
+        } else {
+            serializer.serialize_str(&self.format("%Y-%m-%dT%TZ"))
+        }
     }
 }
