@@ -116,31 +116,44 @@ fn get_depth(depth: &'static LocalKey<Cell<usize>>) -> usize {
 
 thread_local! { static DEPTH: Cell<usize> = Cell::new(0) }
 
+/// A `std::result::Result`-type value returned from `pg_try()` that allows for performing cleanup
+/// work after a closure raised an error and before it is possibly rethrown
 #[must_use = "this `PgTryResult` may be be holding a Postgres ERROR.  It must be consumed or rethrown"]
 pub struct PgTryResult<T>(std::thread::Result<T>);
 
 impl<T> PgTryResult<T> {
+    /// Retrieve the returned value or panic if the try block raised an error
     #[inline]
     pub fn unwrap(self) -> T {
-        match self.0 {
-            Ok(result) => result,
-            Err(e) => {
-                catch_guard(e, || {});
-                unreachable!("failed to rethrow ERROR during pg_try().unwrap()")
-            }
-        }
+        self.unwrap_or_rethrow(|| {})
     }
 
+    /// ## Safety
+    ///
+    /// This function is unsafe because you might be ignoring a caught Postgres ERROR (or Rust panic)
+    /// and you better know what you're doing when you do that.  
+    ///
+    /// Doing so can potentially leave Postgres in an undefined state and ultimately cause it
+    /// to crash.
     #[inline]
-    pub fn unwrap_or(self, value: T) -> T {
+    pub unsafe fn unwrap_or(self, value: T) -> T {
         match self.0 {
             Ok(result) => result,
             Err(_) => value,
         }
     }
 
+    /// Perform some operation cleanup operation after the try block, even if an error was thrown.
+    ///
+    /// ## Safety
+    ///
+    /// This function does not rethrow a caught ERROR.  You better know what you're doing when you
+    /// call this function.
+    ///
+    /// Ignoring a caught error can leave Postgres in an undefined state and ultimately cause it
+    /// to crash.
     #[inline]
-    pub fn unwrap_or_else<F>(self, cleanup: F) -> T
+    pub unsafe fn unwrap_or_else<F>(self, cleanup: F) -> T
     where
         F: FnOnce() -> T + std::panic::UnwindSafe + std::panic::RefUnwindSafe,
     {
@@ -150,6 +163,9 @@ impl<T> PgTryResult<T> {
         }
     }
 
+    /// Perform some cleanup after the try block completes, even if it caught an error.
+    ///
+    /// In the event an error was caught, it is rethrown.
     #[inline]
     pub fn unwrap_or_rethrow<F>(self, cleanup: F) -> T
     where
@@ -165,8 +181,34 @@ impl<T> PgTryResult<T> {
     }
 }
 
+/// Guard a closure such that Rust Panics are properly converted into Postgres ERRORs
+///
+/// Generally, this function won't need to be used directly, as it's also the implementation
+/// behind the `#[pg_guard]` and `#[pg_extern]` macros.  Which means the function you'd like to guard
+/// is likely already guarded.
+///
+/// This function is re-entrant and will properly "bubble-up" panics or errors to the top-level
+/// before they're converted into Postgres ERRORs
 #[inline]
-pub fn try_guard<Try, R>(try_func: Try) -> PgTryResult<R>
+pub fn guard<Func, R>(f: Func) -> R
+where
+    Func: FnOnce() -> R + std::panic::UnwindSafe + std::panic::RefUnwindSafe,
+{
+    pg_try(f).unwrap()
+}
+
+/// Similar to `guard`, but allows the caller to unwrap the result in various ways, possibly
+/// performing cleanup work before the caught error is rethrown
+#[inline]
+pub fn pg_try<Try, R>(try_func: Try) -> PgTryResult<R>
+where
+    Try: FnOnce() -> R + std::panic::UnwindSafe + std::panic::RefUnwindSafe,
+{
+    try_guard(try_func)
+}
+
+#[inline]
+fn try_guard<Try, R>(try_func: Try) -> PgTryResult<R>
 where
     Try: FnOnce() -> R + std::panic::UnwindSafe + std::panic::RefUnwindSafe,
 {
@@ -215,18 +257,16 @@ where
 }
 
 #[inline]
-pub fn catch_guard<Catch>(error: Box<dyn Any + std::marker::Send>, catch_func: Catch)
+fn catch_guard<Catch>(error: Box<dyn Any + std::marker::Send>, catch_func: Catch)
 where
     Catch: FnOnce() + std::panic::UnwindSafe + std::panic::RefUnwindSafe,
 {
-    // the result is an Err(), which means we caught a panic!() up above in catch_rewind()
-    // if we're at nesting depth zero then we'll report it to Postgres, otherwise we'll
-    // simply rethrow it
-
     // call our catch function to do any cleanup work that might be necessary
     // before we end up rethrowing the error
     catch_func();
 
+    // if we're at nesting depth zero then we'll report the specified error to Postgres, otherwise
+    // we'll rethrow it
     if get_depth(&DEPTH) == 0 {
         let location = take_panic_location();
 
@@ -263,14 +303,6 @@ where
         // we're at least one level deep in nesting so rethrow the panic!()
         rethrow_panic(error)
     }
-}
-
-#[inline]
-pub fn guard<R, F: Fn() -> R>(f: F) -> R
-where
-    F: std::panic::UnwindSafe + std::panic::RefUnwindSafe,
-{
-    try_guard(f).unwrap()
 }
 
 /// rethrow whatever the `e` error is as a Rust `panic!()`

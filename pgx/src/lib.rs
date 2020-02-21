@@ -8,7 +8,6 @@ pub use pgx_macros::*;
 pub mod callbacks;
 pub mod datum;
 pub mod enum_helper;
-pub mod exception;
 pub mod fcinfo;
 pub mod guc;
 pub mod hooks;
@@ -31,7 +30,6 @@ pub mod xid;
 pub use callbacks::*;
 pub use datum::*;
 pub use enum_helper::*;
-pub use exception::*;
 pub use fcinfo::*;
 pub use guc::*;
 pub use hooks::*;
@@ -52,7 +50,6 @@ pub use varlena::*;
 pub use xid::*;
 
 pub use pgx_pg_sys as pg_sys; // the module only, not its contents
-pub use pgx_pg_sys::submodules;
 pub use pgx_pg_sys::submodules::*;
 
 /// A macro for marking a library compatible with the Postgres extension framework.
