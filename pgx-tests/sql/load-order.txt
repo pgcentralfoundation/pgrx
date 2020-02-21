@@ -15,3 +15,4 @@ tests_log_tests.generated.sql
 tests_node_tests.generated.sql
 tests_xact_callback_tests.generated.sql
 tests_xid64_tests.generated.sql
+tests_hooks_tests.generated.sql
