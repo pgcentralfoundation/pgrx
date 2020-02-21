@@ -426,7 +426,9 @@ fn make_create_function_statement(
                             default_value = default_value.trim_start_matches('\'').to_string();
                             default_value = default_value.trim_end_matches('\'').to_string();
 
-                            if !default_value.eq_ignore_ascii_case("NULL") {
+                            if !default_value.eq_ignore_ascii_case("NULL")
+                                && !default_value.starts_with("ARRAY")
+                            {
                                 default_value = format!("'{}'", default_value);
                             }
 
