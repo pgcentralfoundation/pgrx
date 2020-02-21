@@ -57,7 +57,7 @@ mod serialization_tests {
         let time = Time::new(time::time!(0:00));
         let json = json!({ "time test": time });
 
-        assert_eq!(json!({"time test":"0:00:00"}), json);
+        assert_eq!(json!({"time test":"0:00:00Z"}), json);
     }
     #[test]
     fn test_time_with_timezone_serialization() {
@@ -80,7 +80,7 @@ mod serialization_tests {
         ));
         let json = json!({ "time stamp test": time_stamp });
 
-        assert_eq!(json!({"time stamp test":"2020-01-01T12:34:54"}), json);
+        assert_eq!(json!({"time stamp test":"2020-01-01T12:34:54Z"}), json);
     }
     #[test]
     fn test_timestamp_with_timezone_serialization() {
