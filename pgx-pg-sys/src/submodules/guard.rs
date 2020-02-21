@@ -114,14 +114,14 @@ fn get_depth(depth: &'static LocalKey<Cell<usize>>) -> usize {
     depth.with(|depth| depth.get())
 }
 
-#[inline]
-pub fn guard<R, F: Fn() -> R>(f: F) -> R
-where
-    F: std::panic::UnwindSafe + std::panic::RefUnwindSafe,
-{
-    thread_local! { static DEPTH: Cell<usize> = Cell::new(0) }
+thread_local! { static DEPTH: Cell<usize> = Cell::new(0) }
 
-    let result = unsafe {
+#[inline]
+pub fn try_guard<Try, R>(try_func: Try) -> std::thread::Result<R>
+where
+    Try: Fn() -> R + std::panic::UnwindSafe + std::panic::RefUnwindSafe,
+{
+    unsafe {
         // remember where Postgres would like to jump to
         let prev_exception_stack = PG_exception_stack;
         let prev_error_context_stack = error_context_stack;
@@ -152,7 +152,7 @@ where
 
             // run our wrapped function and return its result
             inc_depth(&DEPTH);
-            f()
+            try_func()
         });
 
         // restore Postgres' understanding of where it should longjmp
@@ -162,16 +162,28 @@ where
 
         // return our result -- it could be Ok(), or it could be an Err()
         result
-    };
+    }
+}
 
+#[inline]
+pub fn catch_guard<Catch, R>(result: std::thread::Result<R>, catch_func: Catch) -> Option<R>
+where
+    Catch: Fn() -> std::result::Result<(), ()> + std::panic::UnwindSafe + std::panic::RefUnwindSafe,
+{
     match result {
         // the result is Ok(), so just return it
-        Ok(result) => result,
+        Ok(result) => Some(result),
 
         // the result is an Err(), which means we caught a panic!() up above in catch_rewind()
         // if we're at nesting depth zero then we'll report it to Postgres, otherwise we'll
         // simply rethrow it
         Err(e) => {
+            // call our catch function to do any cleanup work that might be necessary
+            // before we end up rethrowing the error
+            if catch_func().is_ok() {
+                return None;
+            }
+
             if get_depth(&DEPTH) == 0 {
                 let location = take_panic_location();
 
@@ -210,6 +222,15 @@ where
             }
         }
     }
+}
+
+#[inline]
+pub fn guard<R, F: Fn() -> R>(f: F) -> R
+where
+    F: std::panic::UnwindSafe + std::panic::RefUnwindSafe,
+{
+    // .unwrap() is always okay here as we'll never return an ok value from the catch closure
+    catch_guard(try_guard(f), || Err(())).unwrap()
 }
 
 /// rethrow whatever the `e` error is as a Rust `panic!()`
