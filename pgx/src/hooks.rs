@@ -45,6 +45,16 @@ pub trait PgHooks {
     ) -> bool {
         true
     }
+
+    /// Hook for plugins to get control of the planner
+    fn planner(
+        &mut self,
+        _parse: &PgBox<pg_sys::Query>,
+        _cursor_options: i32,
+        _bound_params: &PgBox<pg_sys::ParamListInfoData>,
+    ) -> Option<*mut pg_sys::PlannedStmt> {
+        None
+    }
 }
 
 static mut REGISTRATIONS: Vec<
@@ -56,6 +66,7 @@ static mut EXECUTOR_RUN_HOOK: pg_sys::ExecutorRun_hook_type = None;
 static mut EXECUTOR_FINISH_HOOK: pg_sys::ExecutorFinish_hook_type = None;
 static mut EXECUTOR_END_HOOK: pg_sys::ExecutorEnd_hook_type = None;
 static mut EXECUTOR_CHECK_PERMS_HOOK: pg_sys::ExecutorCheckPerms_hook_type = None;
+static mut PLANNER_HOOK: pg_sys::planner_hook_type = None;
 
 /// Register a `PgHook` instance to respond to the various hook points
 pub fn register_hook(
@@ -100,6 +111,10 @@ pub unsafe fn init() {
         .replace(pgx_executor_end)
         .or(Some(pgx_standard_executor_end_wrapper));
     EXECUTOR_CHECK_PERMS_HOOK = pg_sys::ExecutorCheckPerms_hook.replace(pgx_executor_check_perms);
+
+    PLANNER_HOOK = pg_sys::planner_hook
+        .replace(pgx_planner)
+        .or(Some(pgx_standard_planner_wrapper));
 }
 
 #[pg_guard]
@@ -168,14 +183,37 @@ unsafe extern "C" fn pgx_executor_check_perms(
     range_table: *mut pg_sys::List,
     ereport_on_violation: bool,
 ) -> bool {
-    let range_table = PgList::from_pg(range_table);
+    let range_table_boxed = PgList::from_pg(range_table);
     for hook in REGISTRATIONS.iter_mut() {
-        if !hook.executor_check_perms(&range_table, ereport_on_violation) {
+        if !hook.executor_check_perms(&range_table_boxed, ereport_on_violation) {
+            // first hook to fail perms check wins
             return false;
         }
     }
 
-    true
+    match EXECUTOR_CHECK_PERMS_HOOK {
+        Some(hook) => hook(range_table, ereport_on_violation),
+        None => true,
+    }
+}
+
+#[pg_guard]
+unsafe extern "C" fn pgx_planner(
+    parse: *mut pg_sys::Query,
+    cursor_options: i32,
+    bound_params: pg_sys::ParamListInfo,
+) -> *mut pg_sys::PlannedStmt {
+    let parse_boxed = PgBox::from_pg(parse);
+    let bound_params_boxed = PgBox::from_pg(bound_params);
+
+    for hook in REGISTRATIONS.iter_mut() {
+        if let Some(result) = hook.planner(&parse_boxed, cursor_options, &bound_params_boxed) {
+            // the first planner hook we have that returns a value wins
+            return result;
+        }
+    }
+
+    (PLANNER_HOOK.as_ref().unwrap())(parse, cursor_options, bound_params)
 }
 
 unsafe extern "C" fn pgx_standard_executor_start_wrapper(
@@ -200,4 +238,12 @@ unsafe extern "C" fn pgx_standard_executor_finish_wrapper(query_desc: *mut pg_sy
 
 unsafe extern "C" fn pgx_standard_executor_end_wrapper(query_desc: *mut pg_sys::QueryDesc) {
     pg_sys::standard_ExecutorEnd(query_desc);
+}
+
+unsafe extern "C" fn pgx_standard_planner_wrapper(
+    parse: *mut pg_sys::Query,
+    cursor_options: i32,
+    bound_params: pg_sys::ParamListInfo,
+) -> *mut pg_sys::PlannedStmt {
+    pg_sys::standard_planner(parse, cursor_options, bound_params)
 }

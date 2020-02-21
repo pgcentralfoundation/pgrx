@@ -72,12 +72,22 @@ mod tests {
                 self.events += 1;
                 true
             }
+
+            fn planner(
+                &mut self,
+                _parse: &PgBox<pg_sys::Query>,
+                _cursor_options: i32,
+                _bound_params: &PgBox<pg_sys::ParamListInfoData>,
+            ) -> Option<*mut pg_sys::PlannedStmt> {
+                self.events += 1;
+                None
+            }
         }
 
         static mut HOOK: TestHook = TestHook { events: 0 };
         pgx::hooks::register_hook(&mut HOOK);
         Spi::run("SELECT 1");
-        assert_eq!(9, HOOK.events);
+        assert_eq!(10, HOOK.events);
 
         // TODO:  it'd be nice to also test that .commit() and .abort() also get called
         //    but I don't see how to do that since we're running *inside* a transaction here
