@@ -110,6 +110,13 @@ mod tests {
     use pgx::*;
 
     #[pg_test]
+    fn test_is_timezone_utc() {
+        let timezone = Spi::get_one::<&str>("select current_setting('timezone');")
+            .expect("failed to get SPI result");
+        assert_eq!("UTC", timezone);
+    }
+
+    #[pg_test]
     fn test_accept_date_now() {
         let result = Spi::get_one::<bool>("SELECT accept_date(now()::date) = now()::date;")
             .expect("failed to get SPI result");
@@ -150,7 +157,7 @@ mod tests {
     #[pg_test]
     fn test_accept_time_with_time_zone_now() {
         let result = Spi::get_one::<bool>(
-            "SELECT accept_time_with_time_zone(now()::time with time zone) = now()::time with time zone;",
+            "SELECT accept_time_with_time_zone(now()::time with time zone at time zone 'America/Denver') = now()::time with time zone at time zone 'utc';",
         )
         .expect("failed to get SPI result");
         assert!(result)

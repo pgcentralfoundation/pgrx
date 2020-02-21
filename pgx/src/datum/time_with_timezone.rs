@@ -14,7 +14,7 @@ impl FromDatum<TimeWithTimeZone> for TimeWithTimeZone {
 
             let mut time = Time::from_datum(timetz.time as pg_sys::Datum, false, typoid)
                 .expect("failed to convert TimeWithTimeZone");
-            time.0 -= time::Duration::seconds(timetz.zone as i64);
+            time.0 += time::Duration::seconds(timetz.zone as i64);
 
             Some(TimeWithTimeZone(time))
         }
