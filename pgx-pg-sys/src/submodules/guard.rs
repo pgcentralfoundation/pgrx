@@ -143,7 +143,7 @@ impl<T> PgTryResult<T> {
         }
     }
 
-    /// Perform some operation cleanup operation after the try block, even if an error was thrown.
+    /// Perform some operation cleanup operation after the try block if an error was thrown.
     ///
     /// ## Safety
     ///
@@ -163,7 +163,7 @@ impl<T> PgTryResult<T> {
         }
     }
 
-    /// Perform some cleanup after the try block completes, even if it caught an error.
+    /// Perform some operation cleanup operation after the try block if an error was thrown.
     ///
     /// In the event an error was caught, it is rethrown.
     #[inline]
