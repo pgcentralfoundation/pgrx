@@ -1,134 +1,153 @@
-use crate::{pg_guard, pg_sys, void_mut_ptr, PgBox, PgList};
+use crate::{pg_guard, pg_sys, PgBox, PgList};
+use std::ops::Deref;
+
+pub struct HookResult<T> {
+    inner: T,
+}
+
+impl<T> HookResult<T> {
+    pub fn new(value: T) -> Self {
+        HookResult { inner: value }
+    }
+}
+
+impl<T> Deref for HookResult<T> {
+    type Target = T;
+
+    fn deref(&self) -> &Self::Target {
+        &self.inner
+    }
+}
 
 pub trait PgHooks {
-    /// Called when a transaction commits
-    fn commit(&mut self) {}
-
-    /// Called when a transacton aborts
-    fn abort(&mut self) {}
-
     /// Hook for plugins to get control in ExecutorStart()
-    fn executor_before_start(&mut self, _query_desc: &PgBox<pg_sys::QueryDesc>, _eflags: i32) {}
-    fn executor_after_start(&mut self, _query_desc: &PgBox<pg_sys::QueryDesc>, _eflags: i32) {}
+    fn executor_start(
+        &mut self,
+        query_desc: PgBox<pg_sys::QueryDesc>,
+        eflags: i32,
+        prev_hook: fn(query_desc: PgBox<pg_sys::QueryDesc>, eflags: i32) -> HookResult<()>,
+    ) -> HookResult<()> {
+        prev_hook(query_desc, eflags)
+    }
 
     /// Hook for plugins to get control in ExecutorRun()
-    fn executor_before_run(
+    fn executor_run(
         &mut self,
-        _query_desc: &PgBox<pg_sys::QueryDesc>,
-        _direction: pg_sys::ScanDirection,
-        _count: u64,
-        _execute_once: bool,
-    ) {
-    }
-    fn executor_after_run(
-        &mut self,
-        _query_desc: &PgBox<pg_sys::QueryDesc>,
-        _direction: pg_sys::ScanDirection,
-        _count: u64,
-        _execute_once: bool,
-    ) {
+        query_desc: PgBox<pg_sys::QueryDesc>,
+        direction: pg_sys::ScanDirection,
+        count: u64,
+        execute_once: bool,
+        prev_hook: fn(
+            query_desc: PgBox<pg_sys::QueryDesc>,
+            direction: pg_sys::ScanDirection,
+            count: u64,
+            execute_once: bool,
+        ) -> HookResult<()>,
+    ) -> HookResult<()> {
+        prev_hook(query_desc, direction, count, execute_once)
     }
 
     /// Hook for plugins to get control in ExecutorFinish()
-    fn executor_before_finish(&mut self, _query_desc: &PgBox<pg_sys::QueryDesc>) {}
-    fn executor_after_finish(&mut self, _query_desc: &PgBox<pg_sys::QueryDesc>) {}
+    fn executor_finish(
+        &mut self,
+        query_desc: PgBox<pg_sys::QueryDesc>,
+        prev_hook: fn(query_desc: PgBox<pg_sys::QueryDesc>) -> HookResult<()>,
+    ) -> HookResult<()> {
+        prev_hook(query_desc)
+    }
 
     /// Hook for plugins to get control in ExecutorEnd()
-    fn executor_before_end(&mut self, _query_desc: &PgBox<pg_sys::QueryDesc>) {}
-    fn executor_after_end(&mut self, _query_desc: &PgBox<pg_sys::QueryDesc>) {}
+    fn executor_end(
+        &mut self,
+        query_desc: PgBox<pg_sys::QueryDesc>,
+        prev_hook: fn(query_desc: PgBox<pg_sys::QueryDesc>) -> HookResult<()>,
+    ) -> HookResult<()> {
+        prev_hook(query_desc)
+    }
 
     /// Hook for plugins to get control in ExecCheckRTPerms()
     fn executor_check_perms(
         &mut self,
-        _range_table: &PgList<*mut pg_sys::RangeTblEntry>,
-        _ereport_on_violation: bool,
-    ) -> bool {
-        true
+        range_table: PgList<*mut pg_sys::RangeTblEntry>,
+        ereport_on_violation: bool,
+        prev_hook: fn(
+            range_table: PgList<*mut pg_sys::RangeTblEntry>,
+            ereport_on_violation: bool,
+        ) -> HookResult<bool>,
+    ) -> HookResult<bool> {
+        prev_hook(range_table, ereport_on_violation)
     }
 
     /// Hook for plugins to get control of the planner
     fn planner(
         &mut self,
-        _parse: &PgBox<pg_sys::Query>,
-        _cursor_options: i32,
-        _bound_params: &PgBox<pg_sys::ParamListInfoData>,
-    ) -> Option<*mut pg_sys::PlannedStmt> {
-        None
+        parse: PgBox<pg_sys::Query>,
+        cursor_options: i32,
+        bound_params: PgBox<pg_sys::ParamListInfoData>,
+        prev_hook: fn(
+            parse: PgBox<pg_sys::Query>,
+            cursor_options: i32,
+            bound_params: PgBox<pg_sys::ParamListInfoData>,
+        ) -> HookResult<*mut pg_sys::PlannedStmt>,
+    ) -> HookResult<*mut pg_sys::PlannedStmt> {
+        prev_hook(parse, cursor_options, bound_params)
     }
 }
 
-static mut REGISTRATIONS: Vec<
-    Box<&'static mut (dyn PgHooks + std::panic::UnwindSafe + std::panic::RefUnwindSafe)>,
-> = Vec::new();
+struct Hooks {
+    current_hook: Box<&'static mut (dyn PgHooks)>,
+    prev_executor_start_hook: pg_sys::ExecutorStart_hook_type,
+    prev_executor_run_hook: pg_sys::ExecutorRun_hook_type,
+    prev_executor_finish_hook: pg_sys::ExecutorFinish_hook_type,
+    prev_executor_end_hook: pg_sys::ExecutorEnd_hook_type,
+    prev_executor_check_perms_hook: pg_sys::ExecutorCheckPerms_hook_type,
+    prev_planner_hook: pg_sys::planner_hook_type,
+}
 
-static mut EXECUTOR_START_HOOK: pg_sys::ExecutorStart_hook_type = None;
-static mut EXECUTOR_RUN_HOOK: pg_sys::ExecutorRun_hook_type = None;
-static mut EXECUTOR_FINISH_HOOK: pg_sys::ExecutorFinish_hook_type = None;
-static mut EXECUTOR_END_HOOK: pg_sys::ExecutorEnd_hook_type = None;
-static mut EXECUTOR_CHECK_PERMS_HOOK: pg_sys::ExecutorCheckPerms_hook_type = None;
-static mut PLANNER_HOOK: pg_sys::planner_hook_type = None;
+static mut HOOKS: Option<Hooks> = None;
 
 /// Register a `PgHook` instance to respond to the various hook points
-pub fn register_hook(
-    hook: &'static mut (dyn PgHooks + std::panic::UnwindSafe + std::panic::RefUnwindSafe),
-) {
-    unsafe extern "C" fn xact_callback(event: pg_sys::XactEvent, _: void_mut_ptr) {
-        match event {
-            pg_sys::XactEvent_XACT_EVENT_ABORT => {
-                for hook in REGISTRATIONS.iter_mut() {
-                    hook.abort();
-                }
-            }
-            pg_sys::XactEvent_XACT_EVENT_PRE_COMMIT => {
-                for hook in REGISTRATIONS.iter_mut() {
-                    hook.commit();
-                }
-            }
-            _ => { /* noop */ }
-        }
+pub unsafe fn register_hook(hook: &'static mut (dyn PgHooks)) {
+    if HOOKS.is_some() {
+        panic!("PgHook instance already registered");
     }
-
-    unsafe {
-        if REGISTRATIONS.is_empty() {
-            pg_sys::RegisterXactCallback(Some(xact_callback), std::ptr::null_mut());
-        }
-        REGISTRATIONS.push(Box::new(hook));
-    }
-}
-
-/// Initialize the system for hooking Postgres' various function hook types
-pub unsafe fn init() {
-    EXECUTOR_START_HOOK = pg_sys::ExecutorStart_hook
-        .replace(pgx_executor_start)
-        .or(Some(pgx_standard_executor_start_wrapper));
-    EXECUTOR_RUN_HOOK = pg_sys::ExecutorRun_hook
-        .replace(pgx_executor_run)
-        .or(Some(pgx_standard_executor_run_wrapper));
-    EXECUTOR_FINISH_HOOK = pg_sys::ExecutorFinish_hook
-        .replace(pgx_executor_finish)
-        .or(Some(pgx_standard_executor_finish_wrapper));
-    EXECUTOR_END_HOOK = pg_sys::ExecutorEnd_hook
-        .replace(pgx_executor_end)
-        .or(Some(pgx_standard_executor_end_wrapper));
-    EXECUTOR_CHECK_PERMS_HOOK = pg_sys::ExecutorCheckPerms_hook.replace(pgx_executor_check_perms);
-
-    PLANNER_HOOK = pg_sys::planner_hook
-        .replace(pgx_planner)
-        .or(Some(pgx_standard_planner_wrapper));
+    HOOKS = Some(Hooks {
+        current_hook: Box::new(hook),
+        prev_executor_start_hook: pg_sys::ExecutorStart_hook
+            .replace(pgx_executor_start)
+            .or(Some(pgx_standard_executor_start_wrapper)),
+        prev_executor_run_hook: pg_sys::ExecutorRun_hook
+            .replace(pgx_executor_run)
+            .or(Some(pgx_standard_executor_run_wrapper)),
+        prev_executor_finish_hook: pg_sys::ExecutorFinish_hook
+            .replace(pgx_executor_finish)
+            .or(Some(pgx_standard_executor_finish_wrapper)),
+        prev_executor_end_hook: pg_sys::ExecutorEnd_hook
+            .replace(pgx_executor_end)
+            .or(Some(pgx_standard_executor_end_wrapper)),
+        prev_executor_check_perms_hook: pg_sys::ExecutorCheckPerms_hook
+            .replace(pgx_executor_check_perms)
+            .or(Some(pgx_standard_executor_check_perms_wrapper)),
+        prev_planner_hook: pg_sys::planner_hook
+            .replace(pgx_planner)
+            .or(Some(pgx_standard_planner_wrapper)),
+    })
 }
 
 #[pg_guard]
 unsafe extern "C" fn pgx_executor_start(query_desc: *mut pg_sys::QueryDesc, eflags: i32) {
-    let query_desc_boxed = PgBox::from_pg(query_desc);
-    for hook in REGISTRATIONS.iter_mut() {
-        hook.executor_before_start(&query_desc_boxed, eflags);
+    fn prev(query_desc: PgBox<pg_sys::QueryDesc>, eflags: i32) -> HookResult<()> {
+        HookResult::new(unsafe {
+            (HOOKS
+                .as_mut()
+                .unwrap()
+                .prev_executor_start_hook
+                .as_ref()
+                .unwrap())(query_desc.into_pg(), eflags)
+        })
     }
-
-    (EXECUTOR_START_HOOK.as_ref().unwrap())(query_desc, eflags);
-
-    for hook in REGISTRATIONS.iter_mut() {
-        hook.executor_after_start(&query_desc_boxed, eflags);
-    }
+    let hook = &mut HOOKS.as_mut().unwrap().current_hook;
+    hook.executor_start(PgBox::from_pg(query_desc), eflags, prev);
 }
 
 #[pg_guard]
@@ -138,44 +157,61 @@ unsafe extern "C" fn pgx_executor_run(
     count: u64,
     execute_once: bool,
 ) {
-    let query_desc_boxed = PgBox::from_pg(query_desc);
-    for hook in REGISTRATIONS.iter_mut() {
-        hook.executor_before_run(&query_desc_boxed, direction, count, execute_once);
+    fn prev(
+        query_desc: PgBox<pg_sys::QueryDesc>,
+        direction: pg_sys::ScanDirection,
+        count: u64,
+        execute_once: bool,
+    ) -> HookResult<()> {
+        HookResult::new(unsafe {
+            (HOOKS
+                .as_mut()
+                .unwrap()
+                .prev_executor_run_hook
+                .as_ref()
+                .unwrap())(query_desc.into_pg(), direction, count, execute_once)
+        })
     }
-
-    (EXECUTOR_RUN_HOOK.as_ref().unwrap())(query_desc, direction, count, execute_once);
-
-    for hook in REGISTRATIONS.iter_mut() {
-        hook.executor_after_run(&query_desc_boxed, direction, count, execute_once);
-    }
+    let hook = &mut HOOKS.as_mut().unwrap().current_hook;
+    hook.executor_run(
+        PgBox::from_pg(query_desc),
+        direction,
+        count,
+        execute_once,
+        prev,
+    );
 }
 
 #[pg_guard]
 unsafe extern "C" fn pgx_executor_finish(query_desc: *mut pg_sys::QueryDesc) {
-    let query_desc_boxed = PgBox::from_pg(query_desc);
-    for hook in REGISTRATIONS.iter_mut() {
-        hook.executor_before_finish(&query_desc_boxed);
+    fn prev(query_desc: PgBox<pg_sys::QueryDesc>) -> HookResult<()> {
+        HookResult::new(unsafe {
+            (HOOKS
+                .as_mut()
+                .unwrap()
+                .prev_executor_finish_hook
+                .as_ref()
+                .unwrap())(query_desc.into_pg())
+        })
     }
-
-    (EXECUTOR_FINISH_HOOK.as_ref().unwrap())(query_desc);
-
-    for hook in REGISTRATIONS.iter_mut() {
-        hook.executor_after_finish(&query_desc_boxed);
-    }
+    let hook = &mut HOOKS.as_mut().unwrap().current_hook;
+    hook.executor_finish(PgBox::from_pg(query_desc), prev);
 }
 
 #[pg_guard]
 unsafe extern "C" fn pgx_executor_end(query_desc: *mut pg_sys::QueryDesc) {
-    let query_desc_boxed = PgBox::from_pg(query_desc);
-    for hook in REGISTRATIONS.iter_mut() {
-        hook.executor_before_end(&query_desc_boxed);
+    fn prev(query_desc: PgBox<pg_sys::QueryDesc>) -> HookResult<()> {
+        HookResult::new(unsafe {
+            (HOOKS
+                .as_mut()
+                .unwrap()
+                .prev_executor_end_hook
+                .as_ref()
+                .unwrap())(query_desc.into_pg())
+        })
     }
-
-    (EXECUTOR_END_HOOK.as_ref().unwrap())(query_desc);
-
-    for hook in REGISTRATIONS.iter_mut() {
-        hook.executor_after_end(&query_desc_boxed);
-    }
+    let hook = &mut HOOKS.as_mut().unwrap().current_hook;
+    hook.executor_end(PgBox::from_pg(query_desc), prev);
 }
 
 #[pg_guard]
@@ -183,18 +219,22 @@ unsafe extern "C" fn pgx_executor_check_perms(
     range_table: *mut pg_sys::List,
     ereport_on_violation: bool,
 ) -> bool {
-    let range_table_boxed = PgList::from_pg(range_table);
-    for hook in REGISTRATIONS.iter_mut() {
-        if !hook.executor_check_perms(&range_table_boxed, ereport_on_violation) {
-            // first hook to fail perms check wins
-            return false;
-        }
+    fn prev(
+        range_table: PgList<*mut pg_sys::RangeTblEntry>,
+        ereport_on_violation: bool,
+    ) -> HookResult<bool> {
+        HookResult::new(unsafe {
+            (HOOKS
+                .as_mut()
+                .unwrap()
+                .prev_executor_check_perms_hook
+                .as_ref()
+                .unwrap())(range_table.into_pg(), ereport_on_violation)
+        })
     }
-
-    match EXECUTOR_CHECK_PERMS_HOOK {
-        Some(hook) => hook(range_table, ereport_on_violation),
-        None => true,
-    }
+    let hook = &mut HOOKS.as_mut().unwrap().current_hook;
+    hook.executor_check_perms(PgList::from_pg(range_table), ereport_on_violation, prev)
+        .inner
 }
 
 #[pg_guard]
@@ -203,17 +243,27 @@ unsafe extern "C" fn pgx_planner(
     cursor_options: i32,
     bound_params: pg_sys::ParamListInfo,
 ) -> *mut pg_sys::PlannedStmt {
-    let parse_boxed = PgBox::from_pg(parse);
-    let bound_params_boxed = PgBox::from_pg(bound_params);
-
-    for hook in REGISTRATIONS.iter_mut() {
-        if let Some(result) = hook.planner(&parse_boxed, cursor_options, &bound_params_boxed) {
-            // the first planner hook we have that returns a value wins
-            return result;
-        }
+    fn prev(
+        parse: PgBox<pg_sys::Query>,
+        cursor_options: i32,
+        bound_params: PgBox<pg_sys::ParamListInfoData>,
+    ) -> HookResult<*mut pg_sys::PlannedStmt> {
+        HookResult::new(unsafe {
+            (HOOKS.as_mut().unwrap().prev_planner_hook.as_ref().unwrap())(
+                parse.into_pg(),
+                cursor_options,
+                bound_params.into_pg(),
+            )
+        })
     }
-
-    (PLANNER_HOOK.as_ref().unwrap())(parse, cursor_options, bound_params)
+    let hook = &mut HOOKS.as_mut().unwrap().current_hook;
+    hook.planner(
+        PgBox::from_pg(parse),
+        cursor_options,
+        PgBox::from_pg(bound_params),
+        prev,
+    )
+    .inner
 }
 
 unsafe extern "C" fn pgx_standard_executor_start_wrapper(
@@ -238,6 +288,13 @@ unsafe extern "C" fn pgx_standard_executor_finish_wrapper(query_desc: *mut pg_sy
 
 unsafe extern "C" fn pgx_standard_executor_end_wrapper(query_desc: *mut pg_sys::QueryDesc) {
     pg_sys::standard_ExecutorEnd(query_desc);
+}
+
+unsafe extern "C" fn pgx_standard_executor_check_perms_wrapper(
+    _range_table: *mut pg_sys::List,
+    _ereport_on_violation: bool,
+) -> bool {
+    true
 }
 
 unsafe extern "C" fn pgx_standard_planner_wrapper(
