@@ -155,7 +155,7 @@ impl<T> PgTryResult<T> {
     #[inline]
     pub unsafe fn unwrap_or_else<F>(self, cleanup: F) -> T
     where
-        F: FnOnce() -> T + std::panic::UnwindSafe + std::panic::RefUnwindSafe,
+        F: FnOnce() -> T,
     {
         match self.0 {
             Ok(result) => result,
@@ -169,12 +169,33 @@ impl<T> PgTryResult<T> {
     #[inline]
     pub fn unwrap_or_rethrow<F>(self, cleanup: F) -> T
     where
-        F: FnOnce() + std::panic::UnwindSafe + std::panic::RefUnwindSafe,
+        F: FnOnce(),
     {
         match self.0 {
             Ok(result) => result,
             Err(e) => {
                 catch_guard(e, cleanup);
+                unreachable!("failed to rethrow ERROR during pg_try().or_else_rethrow()")
+            }
+        }
+    }
+
+    /// Perform some operation after the try block completes, regardless of if an error was thrown.
+    ///
+    /// In the event an error was caught, it is rethrown.  Otherwise, the return value from the try
+    /// block is returned
+    #[inline]
+    pub fn finally_or_rethrow<F>(self, finally_block: F) -> T
+    where
+        F: FnOnce(),
+    {
+        match self.0 {
+            Ok(result) => {
+                finally_block();
+                result
+            }
+            Err(e) => {
+                catch_guard(e, finally_block);
                 unreachable!("failed to rethrow ERROR during pg_try().or_else_rethrow()")
             }
         }
@@ -259,7 +280,7 @@ where
 #[inline]
 fn catch_guard<Catch>(error: Box<dyn Any + std::marker::Send>, catch_func: Catch)
 where
-    Catch: FnOnce() + std::panic::UnwindSafe + std::panic::RefUnwindSafe,
+    Catch: FnOnce(),
 {
     // call our catch function to do any cleanup work that might be necessary
     // before we end up rethrowing the error
