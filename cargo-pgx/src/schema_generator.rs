@@ -624,6 +624,7 @@ fn translate_type_string(
             default_value,
             variadic,
         )),
+        "PgRelation" => Some(("regclass".to_string(), false, default_value, variadic)),
         "& str" | "String" => Some(("text".to_string(), false, default_value, variadic)),
         "& std :: ffi :: CStr" => Some(("cstring".to_string(), false, default_value, variadic)),
         "AnyElement" => Some(("anyelement".to_string(), false, default_value, variadic)),
