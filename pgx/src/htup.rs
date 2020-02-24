@@ -18,10 +18,7 @@ pub fn composite_row_type_make_tuple(row: pg_sys::Datum) -> PgBox<pg_sys::HeapTu
     tuple
 }
 
-pub fn deconstruct_row_type(
-    tupdesc: &PgBox<pg_sys::TupleDescData>,
-    row: pg_sys::Datum,
-) -> Array<pg_sys::Datum> {
+pub fn deconstruct_row_type(tupdesc: &PgTupleDesc, row: pg_sys::Datum) -> Array<pg_sys::Datum> {
     extern "C" {
         fn pgx_deconstruct_row_type(
             tupdesc: pg_sys::TupleDesc,
@@ -36,7 +33,7 @@ pub fn deconstruct_row_type(
         pgx_deconstruct_row_type(tupdesc.as_ptr(), row, &mut columns, &mut nulls);
     }
 
-    Array::over(columns, nulls, tupdesc.natts as usize)
+    Array::over(columns, nulls, tupdesc.len())
 }
 
 /// ## Safety

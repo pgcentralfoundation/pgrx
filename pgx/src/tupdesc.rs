@@ -1,9 +1,60 @@
 use crate::{pg_sys, PgBox};
 
+use std::ops::Deref;
 #[cfg(feature = "pg10")]
 pub use v10::*;
 #[cfg(any(feature = "pg11", feature = "pg12"))]
 pub use v11_v12::*;
+
+pub struct PgTupleDesc(PgBox<pg_sys::TupleDescData>);
+
+impl PgTupleDesc {
+    #[inline]
+    pub fn from_pg(ptr: *mut pg_sys::TupleDescData) -> PgTupleDesc {
+        PgTupleDesc(PgBox::from_pg(ptr))
+    }
+
+    #[inline]
+    pub fn len(&self) -> usize {
+        self.0.natts as usize
+    }
+
+    #[inline]
+    pub fn get(&self, i: usize) -> Option<&pg_sys::FormData_pg_attribute> {
+        if i >= self.len() {
+            None
+        } else {
+            Some(tupdesc_get_attr(&self.0, i))
+        }
+    }
+
+    #[inline]
+    pub fn iter(&self) -> TupleDescIterator {
+        TupleDescIterator {
+            tupdesc: self,
+            curr: 0,
+        }
+    }
+}
+
+impl Deref for PgTupleDesc {
+    type Target = PgBox<pg_sys::TupleDescData>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl Drop for PgTupleDesc {
+    fn drop(&mut self) {
+        if self.0.tdrefcount >= 0 {
+            crate::info!("releasing tupdesc on drop");
+            unsafe {
+                pg_sys::DecrTupleDescRefCount(self.0.as_ptr());
+            }
+        }
+    }
+}
 
 /// [attno] is 1-based
 #[inline]
@@ -48,32 +99,8 @@ mod v11_v12 {
     }
 }
 
-impl PgBox<pg_sys::TupleDescData> {
-    #[inline]
-    pub fn len(&self) -> usize {
-        self.natts as usize
-    }
-
-    #[inline]
-    pub fn get(&self, i: usize) -> Option<&pg_sys::FormData_pg_attribute> {
-        if i >= self.len() {
-            None
-        } else {
-            Some(tupdesc_get_attr(self, i))
-        }
-    }
-
-    #[inline]
-    pub fn iter(&self) -> TupleDescIterator {
-        TupleDescIterator {
-            pgbox: self,
-            curr: 0,
-        }
-    }
-}
-
 pub struct TupleDescIterator<'a> {
-    pgbox: &'a PgBox<pg_sys::TupleDescData>,
+    tupdesc: &'a PgTupleDesc,
     curr: usize,
 }
 
@@ -81,24 +108,24 @@ impl<'a> Iterator for TupleDescIterator<'a> {
     type Item = &'a pg_sys::FormData_pg_attribute;
 
     fn next(&mut self) -> Option<Self::Item> {
-        let result = self.pgbox.get(self.curr);
+        let result = self.tupdesc.get(self.curr);
         self.curr += 1;
         result
     }
 }
 
 pub struct TupleDescDataIntoIterator {
-    pgbox: PgBox<pg_sys::TupleDescData>,
+    tupdesc: PgTupleDesc,
     curr: usize,
 }
 
-impl IntoIterator for PgBox<pg_sys::TupleDescData> {
+impl IntoIterator for PgTupleDesc {
     type Item = pg_sys::FormData_pg_attribute;
     type IntoIter = TupleDescDataIntoIterator;
 
     fn into_iter(self) -> Self::IntoIter {
         TupleDescDataIntoIterator {
-            pgbox: self,
+            tupdesc: self,
             curr: 0,
         }
     }
@@ -109,7 +136,7 @@ impl Iterator for TupleDescDataIntoIterator {
 
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
-        let result = match self.pgbox.get(self.curr) {
+        let result = match self.tupdesc.get(self.curr) {
             Some(result) => *result,
             None => {
                 return None;
