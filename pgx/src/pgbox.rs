@@ -87,13 +87,17 @@ use std::ops::{Deref, DerefMut};
 ///  - Boxing a null pointer -- it works ::from_pg(), ::into_pg(), and ::to_pg(), but will panic!() on all other uses
 ///
 pub struct PgBox<T> {
+    inner: Inner<T>,
+}
+
+struct Inner<T> {
     ptr: Option<*mut T>,
     allocated_by_pg: bool,
 }
 
 impl<T: Debug> Debug for PgBox<T> {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
-        match self.ptr {
+        match self.inner.ptr {
             Some(ptr) => f.write_str(&format!(
                 "PgBox<{}> (ptr={:?}, owner={:?})",
                 std::any::type_name::<T>(),
@@ -127,8 +131,10 @@ impl<T> PgBox<T> {
     /// ```
     pub fn alloc() -> PgBox<T> {
         PgBox::<T> {
-            ptr: Some(unsafe { pg_sys::palloc(std::mem::size_of::<T>()) as *mut T }),
-            allocated_by_pg: false,
+            inner: Inner::<T> {
+                ptr: Some(unsafe { pg_sys::palloc(std::mem::size_of::<T>()) as *mut T }),
+                allocated_by_pg: false,
+            },
         }
     }
 
@@ -146,8 +152,10 @@ impl<T> PgBox<T> {
     /// ```
     pub fn alloc0() -> PgBox<T> {
         PgBox::<T> {
-            ptr: Some(unsafe { pg_sys::palloc0(std::mem::size_of::<T>()) as *mut T }),
-            allocated_by_pg: false,
+            inner: Inner::<T> {
+                ptr: Some(unsafe { pg_sys::palloc0(std::mem::size_of::<T>()) as *mut T }),
+                allocated_by_pg: false,
+            },
         }
     }
 
@@ -165,10 +173,12 @@ impl<T> PgBox<T> {
     /// ```
     pub fn alloc_in_context(memory_context: PgMemoryContexts) -> PgBox<T> {
         PgBox::<T> {
-            ptr: Some(unsafe {
-                pg_sys::MemoryContextAlloc(memory_context.value(), std::mem::size_of::<T>())
-            } as *mut T),
-            allocated_by_pg: false,
+            inner: Inner::<T> {
+                ptr: Some(unsafe {
+                    pg_sys::MemoryContextAlloc(memory_context.value(), std::mem::size_of::<T>())
+                } as *mut T),
+                allocated_by_pg: false,
+            },
         }
     }
 
@@ -186,10 +196,12 @@ impl<T> PgBox<T> {
     /// ```
     pub fn alloc0_in_context(memory_context: PgMemoryContexts) -> PgBox<T> {
         PgBox::<T> {
-            ptr: Some(unsafe {
-                pg_sys::MemoryContextAllocZero(memory_context.value(), std::mem::size_of::<T>())
-            } as *mut T),
-            allocated_by_pg: false,
+            inner: Inner::<T> {
+                ptr: Some(unsafe {
+                    pg_sys::MemoryContextAllocZero(memory_context.value(), std::mem::size_of::<T>())
+                } as *mut T),
+                allocated_by_pg: false,
+            },
         }
     }
 
@@ -209,8 +221,10 @@ impl<T> PgBox<T> {
     /// Box nothing
     pub fn null() -> PgBox<T> {
         PgBox::<T> {
-            ptr: None,
-            allocated_by_pg: false,
+            inner: Inner::<T> {
+                ptr: None,
+                allocated_by_pg: false,
+            },
         }
     }
 
@@ -221,8 +235,10 @@ impl<T> PgBox<T> {
     #[inline]
     pub fn from_pg(ptr: *mut T) -> PgBox<T> {
         PgBox::<T> {
-            ptr: if ptr.is_null() { None } else { Some(ptr) },
-            allocated_by_pg: true,
+            inner: Inner::<T> {
+                ptr: if ptr.is_null() { None } else { Some(ptr) },
+                allocated_by_pg: true,
+            },
         }
     }
 
@@ -234,19 +250,21 @@ impl<T> PgBox<T> {
     /// If you need to give the boxed pointer to Postgres, call `.into_pg()`
     pub fn from_rust(ptr: *mut T) -> PgBox<T> {
         PgBox::<T> {
-            ptr: if ptr.is_null() { None } else { Some(ptr) },
-            allocated_by_pg: false,
+            inner: Inner {
+                ptr: if ptr.is_null() { None } else { Some(ptr) },
+                allocated_by_pg: false,
+            },
         }
     }
 
     /// Are we boxing a NULL?
     pub fn is_null(&self) -> bool {
-        self.ptr.is_none()
+        self.inner.ptr.is_none()
     }
 
     /// Return the boxed pointer, so that it can be passed back into a Postgres function
     pub fn as_ptr(&self) -> *mut T {
-        let ptr = self.ptr;
+        let ptr = self.inner.ptr;
         match ptr {
             Some(ptr) => ptr,
             None => std::ptr::null_mut(),
@@ -258,15 +276,15 @@ impl<T> PgBox<T> {
     /// The boxed pointer is **not** free'd by Rust
     #[inline]
     pub fn into_pg(mut self) -> *mut T {
-        self.allocated_by_pg = true;
-        match self.ptr {
+        self.inner.allocated_by_pg = true;
+        match self.inner.ptr {
             Some(ptr) => ptr,
             None => std::ptr::null_mut(),
         }
     }
 
     fn owner_string(&self) -> &str {
-        if self.allocated_by_pg {
+        if self.inner.allocated_by_pg {
             "Postgres"
         } else {
             "Rust"
@@ -283,7 +301,7 @@ impl<T> Deref for PgBox<T> {
     type Target = T;
 
     fn deref(&self) -> &Self::Target {
-        match self.ptr {
+        match self.inner.ptr {
             Some(ptr) => unsafe { &*ptr },
             None => panic!("Attempt to dereference null pointer during Deref of PgBox"),
         }
@@ -292,14 +310,14 @@ impl<T> Deref for PgBox<T> {
 
 impl<T> DerefMut for PgBox<T> {
     fn deref_mut(&mut self) -> &mut T {
-        match self.ptr {
+        match self.inner.ptr {
             Some(ptr) => unsafe { &mut *ptr },
             None => panic!("Attempt to dereference null pointer during DerefMut of PgBox"),
         }
     }
 }
 
-impl<T> Drop for PgBox<T> {
+impl<T> Drop for Inner<T> {
     fn drop(&mut self) {
         if !self.allocated_by_pg && !self.ptr.is_none() {
             let ptr = self.ptr.expect("PgBox ptr was null during Drop");
@@ -312,7 +330,7 @@ impl<T> Drop for PgBox<T> {
 
 impl<T: Debug> std::fmt::Display for PgBox<T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self.ptr {
+        match self.inner.ptr {
             Some(_) => write!(
                 f,
                 "PgBox {{ owner={:?}, {:?} }}",
