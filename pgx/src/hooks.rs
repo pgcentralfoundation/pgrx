@@ -1,4 +1,4 @@
-use crate::{pg_guard, pg_sys, PgBox, PgList};
+use crate::{pg_guard, pg_sys, void_mut_ptr, PgBox, PgList};
 use std::ops::Deref;
 
 pub struct HookResult<T> {
@@ -92,6 +92,12 @@ pub trait PgHooks {
     ) -> HookResult<*mut pg_sys::PlannedStmt> {
         prev_hook(parse, cursor_options, bound_params)
     }
+
+    /// Called when the transaction aborts
+    fn abort(&mut self) {}
+
+    /// Called when the transaction commits
+    fn commit(&mut self) {}
 }
 
 struct Hooks {
@@ -131,7 +137,21 @@ pub unsafe fn register_hook(hook: &'static mut (dyn PgHooks)) {
         prev_planner_hook: pg_sys::planner_hook
             .replace(pgx_planner)
             .or(Some(pgx_standard_planner_wrapper)),
-    })
+    });
+
+    unsafe extern "C" fn xact_callback(event: pg_sys::XactEvent, _: void_mut_ptr) {
+        match event {
+            pg_sys::XactEvent_XACT_EVENT_ABORT => {
+                HOOKS.as_mut().unwrap().current_hook.abort();
+            }
+            pg_sys::XactEvent_XACT_EVENT_PRE_COMMIT => {
+                HOOKS.as_mut().unwrap().current_hook.commit();
+            }
+            _ => { /* noop */ }
+        }
+    }
+
+    pg_sys::RegisterXactCallback(Some(xact_callback), std::ptr::null_mut());
 }
 
 #[pg_guard]
