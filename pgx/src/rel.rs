@@ -81,7 +81,7 @@ impl FromDatum<PgRelation> for PgRelation {
     }
 }
 
-impl IntoDatum for PgRelation {
+impl IntoDatum<PgRelation> for PgRelation {
     fn into_datum(self) -> Option<pg_sys::Datum> {
         Some(self.oid() as pg_sys::Datum)
     }
