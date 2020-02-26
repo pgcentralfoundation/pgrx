@@ -17,3 +17,4 @@ tests_xact_callback_tests.generated.sql
 tests_xid64_tests.generated.sql
 tests_hooks_tests.generated.sql
 tests_pg_try_tests.generated.sql
+tests_srf_tests.generated.sql

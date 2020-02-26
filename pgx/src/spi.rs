@@ -55,19 +55,19 @@ pub struct SpiTupleTable {
     table: *mut pg_sys::SPITupleTable,
     size: usize,
     tupdesc: Option<pg_sys::TupleDesc>,
-    current: usize,
+    current: isize,
 }
 
 impl Spi {
     pub fn get_one<A: FromDatum<A> + IntoDatum<A>>(query: &str) -> Option<A> {
-        Spi::connect(|client| Ok(client.select(query, Some(1), None).get_one()))
+        Spi::connect(|client| Ok(client.select(query, Some(1), None).first().get_one()))
     }
 
     pub fn get_one_with_args<A: FromDatum<A> + IntoDatum<A>>(
         query: &str,
         args: Vec<(PgOid, Option<pg_sys::Datum>)>,
     ) -> Option<A> {
-        Spi::connect(|client| Ok(client.select(query, Some(1), Some(args)).get_one()))
+        Spi::connect(|client| Ok(client.select(query, Some(1), Some(args)).first().get_one()))
     }
 
     /// just run an arbitrary SQL statement.
@@ -267,12 +267,21 @@ impl SpiClient {
             } else {
                 Some(unsafe { (*pg_sys::SPI_tuptable).tupdesc })
             },
-            current: 0,
+            current: -1,
         }
     }
 }
 
 impl SpiTupleTable {
+    /// `SpiTupleTable`s are positioned before the start, for iteration purposes.
+    ///
+    /// This method moves the position to the first row.  If there are no rows, this
+    /// method will silently return.
+    pub fn first(mut self) -> Self {
+        self.current = 0;
+        self
+    }
+
     pub fn get_one<A: FromDatum<A>>(&self) -> Option<A> {
         self.get_datum(1)
     }
@@ -293,6 +302,9 @@ impl SpiTupleTable {
     }
 
     pub fn get_datum<T: FromDatum<T>>(&self, ordinal: i32) -> Option<T> {
+        if self.current < 0 {
+            panic!("SpiTupleTable positioned before start")
+        }
         if self.current as u64 >= unsafe { pg_sys::SPI_processed } {
             None
         } else {
@@ -303,8 +315,8 @@ impl SpiTupleTable {
                     if ordinal < 1 || ordinal > natts {
                         None
                     } else {
-                        let heap_tuple =
-                            std::slice::from_raw_parts((*self.table).vals, self.size)[self.current];
+                        let heap_tuple = std::slice::from_raw_parts((*self.table).vals, self.size)
+                            [self.current as usize];
                         let mut is_null = false;
                         let datum =
                             pg_sys::SPI_getbinval(heap_tuple, tupdesc, ordinal, &mut is_null);
@@ -323,7 +335,7 @@ impl SpiTupleTable {
                 let natts = unsafe { (*tupdesc).natts };
                 let mut row = Vec::with_capacity(natts as usize);
                 let heap_tuple = unsafe {
-                    std::slice::from_raw_parts((*self.table).vals, self.size)[self.current]
+                    std::slice::from_raw_parts((*self.table).vals, self.size)[self.current as usize]
                 };
 
                 for i in 1..=natts {
@@ -347,15 +359,16 @@ impl Iterator for SpiTupleTable {
 
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
-        if self.current >= self.size {
+        if self.current >= self.size as isize {
             // reset the iterator back to the start
-            self.current = 0;
+            self.current = -1;
 
             // and indicate that we're done
             None
         } else {
-            let rc = self.nth(self.current);
             self.current += 1;
+            assert!(self.current >= 0);
+            let rc = self.nth(self.current as usize);
             rc
         }
     }

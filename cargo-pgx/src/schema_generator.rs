@@ -1,5 +1,5 @@
 use crate::property_inspector::get_property;
-use pgx_utils::ExternArgs;
+use pgx_utils::{categorize_type, CategorizedType, ExternArgs};
 use proc_macro2::{Ident, Span};
 use quote::quote;
 use std::borrow::BorrowMut;
@@ -545,9 +545,10 @@ fn translate_type(
     ty: &Box<Type>,
 ) -> Option<(String, bool, Option<String>, bool)> {
     let rust_type;
+    let span;
+    let mut subtype = None;
     let mut default_value = None;
     let mut variadic = false;
-    let span;
 
     match ty.deref() {
         Type::Path(path) => {
@@ -572,12 +573,33 @@ fn translate_type(
                 None => panic!("unrecognized macro in argument list: {}", as_string),
             }
         }
+        Type::ImplTrait(tr) => match categorize_type(ty) {
+            CategorizedType::Default => panic!("{:?} isn't an 'impl Trait' type", tr),
+            CategorizedType::Iterator(iter) => {
+                rust_type = "Iterator".to_string();
+                span = tr.span();
+
+                if iter.len() == 1 {
+                    subtype = iter.get(0).cloned()
+                } else {
+                    panic!("composite tuples are not supported yet")
+                }
+            }
+        },
         other => {
             panic!("Unsupported type: {:?}", other);
         }
     }
 
-    translate_type_string(rust_type, filename, &span, 0, default_value, variadic)
+    translate_type_string(
+        rust_type,
+        filename,
+        &span,
+        0,
+        default_value,
+        variadic,
+        subtype,
+    )
 }
 
 fn deconstruct_macro(as_string: &str) -> Option<(String, Option<String>, bool)> {
@@ -609,6 +631,7 @@ fn translate_type_string(
     depth: i32,
     mut default_value: Option<String>,
     mut variadic: bool,
+    subtype: Option<String>,
 ) -> Option<(String, bool, Option<String>, bool)> {
     match rust_type.as_str() {
         "i8" => Some(("smallint".to_string(), false, default_value, variadic)), // convert i8 types into smallints as Postgres doesn't have a 1byte-sized type
@@ -663,7 +686,25 @@ fn translate_type_string(
             default_value,
             variadic,
         )),
-        _array if rust_type.starts_with("Array <") => {
+        "Iterator" => {
+            let translated = translate_type_string(
+                subtype.unwrap(),
+                filename,
+                span,
+                depth + 1,
+                default_value.clone(),
+                variadic,
+                None,
+            )
+            .unwrap();
+            Some((
+                format!("SETOF {}", translated.0),
+                false,
+                default_value,
+                variadic,
+            ))
+        }
+        _array if rust_type.starts_with("Array <") | rust_type.starts_with("Vec <") => {
             let rc = translate_type_string(
                 extract_type(&rust_type),
                 filename,
@@ -671,6 +712,7 @@ fn translate_type_string(
                 depth + 1,
                 default_value.clone(),
                 variadic,
+                subtype,
             );
             let mut type_string = rc.unwrap().0;
             type_string.push_str("[]");
@@ -684,6 +726,7 @@ fn translate_type_string(
                 depth + 1,
                 default_value.clone(),
                 true,
+                subtype,
             );
             let mut type_string = rc.unwrap().0;
             type_string.push_str("[]");
@@ -699,6 +742,7 @@ fn translate_type_string(
             depth + 1,
             default_value,
             variadic,
+            subtype,
         ),
         _option if rust_type.starts_with("Option <") => {
             let mut extraced_type = extract_type(&rust_type);
@@ -715,6 +759,7 @@ fn translate_type_string(
                 depth + 1,
                 default_value.clone(),
                 variadic,
+                subtype,
             );
             //            eprintln!("rc={:?}", rc);
             let type_string = rc.unwrap().0;

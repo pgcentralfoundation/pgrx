@@ -1,6 +1,9 @@
 use proc_macro2::TokenTree;
+use quote::quote;
 use std::collections::HashSet;
+use std::ops::Deref;
 use syn::export::TokenStream2;
+use syn::{GenericArgument, ItemFn, PathArguments, ReturnType, Type, TypeParamBound};
 
 #[derive(Debug, Hash, Ord, PartialOrd, Eq, PartialEq)]
 pub enum ExternArgs {
@@ -14,6 +17,12 @@ pub enum ExternArgs {
     ParallelUnsafe,
     ParallelRestricted,
     Error(String),
+}
+
+#[derive(Debug)]
+pub enum CategorizedType {
+    Iterator(Vec<String>),
+    Default,
 }
 
 pub fn parse_extern_attributes(attr: TokenStream2) -> HashSet<ExternArgs> {
@@ -56,6 +65,84 @@ pub fn parse_extern_attributes(attr: TokenStream2) -> HashSet<ExternArgs> {
         }
     }
     args
+}
+
+pub fn categorize_return_type(func: &ItemFn) -> CategorizedType {
+    let rt = &func.sig.output;
+
+    match rt {
+        ReturnType::Default => CategorizedType::Default,
+        ReturnType::Type(_, ty) => categorize_type(ty),
+    }
+}
+
+pub fn categorize_type(ty: &Box<Type>) -> CategorizedType {
+    match ty.deref() {
+        Type::ImplTrait(ty) => {
+            for bound in &ty.bounds {
+                match bound {
+                    TypeParamBound::Trait(trait_bound) => {
+                        let segments = &trait_bound.path.segments;
+
+                        let mut ident = String::new();
+                        for segment in segments {
+                            if !ident.is_empty() {
+                                ident.push_str("::")
+                            }
+                            ident.push_str(segment.ident.to_string().as_str());
+                        }
+
+                        match ident.as_str() {
+                            "Iterator" | "std::iter::Iterator" => {
+                                let segment = segments.last().unwrap();
+                                match &segment.arguments {
+                                    PathArguments::None => {
+                                        panic!("Iterator must have at least one generic type")
+                                    }
+                                    PathArguments::Parenthesized(_) => {
+                                        panic!("Unsupported arguments to Iterator")
+                                    }
+                                    PathArguments::AngleBracketed(a) => {
+                                        let args = &a.args;
+                                        if args.len() > 1 {
+                                            panic!("Only one generic type is supported when returning an Iterator")
+                                        }
+
+                                        match args.first().unwrap() {
+                                            GenericArgument::Binding(b) => {
+                                                let mut types = Vec::new();
+                                                let ty = &b.ty;
+                                                match ty {
+                                                    Type::Tuple(tuple) => {
+                                                        for e in &tuple.elems {
+                                                            types.push(quote!{#e}.to_string());
+                                                        }
+                                                    },
+                                                    _ => {
+                                                        types.push(quote! {#ty}.to_string())
+                                                    }
+                                                }
+
+                                                return CategorizedType::Iterator(types);
+                                            }
+                                            _ => panic!("Only binding type arguments are supported when returning an Iterator")
+                                        }
+                                    }
+                                }
+                            }
+                            _ => panic!("Unsupported trait return type"),
+                        }
+                    }
+                    TypeParamBound::Lifetime(_) => {
+                        panic!("Functions can't return traits with lifetime bounds")
+                    }
+                }
+            }
+
+            panic!("Unsupported trait return type");
+        }
+        _ => CategorizedType::Default,
+    }
 }
 
 #[cfg(test)]

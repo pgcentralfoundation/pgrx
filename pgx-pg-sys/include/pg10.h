@@ -2,6 +2,7 @@
 #define USE_STDBOOL 1
 
 #include "postgres.h"
+#include "funcapi.h"
 #include "miscadmin.h"
 #include "access/amapi.h"
 #include "access/genam.h"

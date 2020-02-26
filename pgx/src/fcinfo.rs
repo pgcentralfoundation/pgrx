@@ -307,3 +307,49 @@ fn make_function_call_info(
 
     fcinfo_boxed
 }
+
+#[inline]
+pub fn srf_is_first_call(fcinfo: pg_sys::FunctionCallInfo) -> bool {
+    let fcinfo = PgBox::from_pg(fcinfo);
+    let flinfo = PgBox::from_pg(fcinfo.flinfo);
+
+    flinfo.fn_extra.is_null()
+}
+
+#[inline]
+pub fn srf_first_call_init(fcinfo: pg_sys::FunctionCallInfo) -> PgBox<pg_sys::FuncCallContext> {
+    let funcctx = unsafe { pg_sys::init_MultiFuncCall(fcinfo) };
+    PgBox::from_pg(funcctx)
+}
+
+#[inline]
+pub fn srf_per_call_setup(fcinfo: pg_sys::FunctionCallInfo) -> PgBox<pg_sys::FuncCallContext> {
+    let funcctx = unsafe { pg_sys::per_MultiFuncCall(fcinfo) };
+    PgBox::from_pg(funcctx)
+}
+
+#[inline]
+pub fn srf_return_next(
+    fcinfo: pg_sys::FunctionCallInfo,
+    funcctx: &mut PgBox<pg_sys::FuncCallContext>,
+) {
+    funcctx.call_cntr += 1;
+
+    let fcinfo = PgBox::from_pg(fcinfo);
+    let mut rsi = PgBox::from_pg(fcinfo.resultinfo as *mut pg_sys::ReturnSetInfo);
+    rsi.isDone = pg_sys::ExprDoneCond_ExprMultipleResult;
+}
+
+#[inline]
+pub fn srf_return_done(
+    fcinfo: pg_sys::FunctionCallInfo,
+    funcctx: &mut PgBox<pg_sys::FuncCallContext>,
+) {
+    unsafe {
+        pg_sys::end_MultiFuncCall(fcinfo, funcctx.as_ptr());
+    }
+
+    let fcinfo = PgBox::from_pg(fcinfo);
+    let mut rsi = PgBox::from_pg(fcinfo.resultinfo as *mut pg_sys::ReturnSetInfo);
+    rsi.isDone = pg_sys::ExprDoneCond_ExprEndResult;
+}
