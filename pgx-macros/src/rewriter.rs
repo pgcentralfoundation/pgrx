@@ -112,7 +112,8 @@ impl PgGuardRewriter {
                 }
             }
             CategorizedType::Iterator(types) if types.len() == 1 => {
-                let generic_type = Ident::new(&types.first().unwrap(), func_span);
+                let generic_type =
+                    proc_macro2::TokenStream::from_str(types.first().unwrap()).unwrap();
 
                 quote_spanned! {func_span=>
                     #[inline]
