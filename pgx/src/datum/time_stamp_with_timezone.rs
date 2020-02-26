@@ -51,7 +51,9 @@ impl FromDatum<TimestampWithTimeZone> for TimestampWithTimeZone {
             .expect("failed to create time from TimestampWithTimeZonez");
 
             Some(TimestampWithTimeZone(
-                time::PrimitiveDateTime::new(date, time).using_offset(UtcOffset::seconds(tz)),
+                time::PrimitiveDateTime::new(date, time)
+                    .assume_utc()
+                    .to_offset(UtcOffset::seconds(tz)),
             ))
         }
     }
@@ -84,7 +86,10 @@ impl IntoDatum<TimestampWithTimeZone> for TimestampWithTimeZone {
 impl TimestampWithTimeZone {
     /// This shifts the provided `time` back to UTC
     pub fn new(time: time::PrimitiveDateTime, at_tz_offset: time::UtcOffset) -> Self {
-        TimestampWithTimeZone(time.using_offset(UtcOffset::seconds(-at_tz_offset.as_seconds())))
+        TimestampWithTimeZone(
+            time.assume_utc()
+                .to_offset(UtcOffset::seconds(-at_tz_offset.as_seconds())),
+        )
     }
 }
 
