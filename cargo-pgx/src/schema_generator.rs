@@ -629,6 +629,7 @@ fn translate_type_string(
     subtypes: Option<Vec<String>>,
 ) -> Option<(String, bool, Option<String>, bool)> {
     match rust_type.as_str() {
+        "()" => Some(("bool".to_string(), false, default_value, variadic)),
         "i8" => Some(("smallint".to_string(), false, default_value, variadic)), // convert i8 types into smallints as Postgres doesn't have a 1byte-sized type
         "i16" => Some(("smallint".to_string(), false, default_value, variadic)),
         "i32" => Some(("integer".to_string(), false, default_value, variadic)),
