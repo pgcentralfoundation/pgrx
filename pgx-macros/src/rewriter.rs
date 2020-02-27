@@ -94,77 +94,196 @@ impl PgGuardRewriter {
             }
         };
 
+        let prolog = quote! {
+            #[inline]
+            #func
+
+            #[no_mangle]
+            #[allow(unused_variables)]
+        };
         match categorize_return_type(&func) {
-            CategorizedType::Default => {
-                quote_spanned! {func_span=>
+            CategorizedType::Default => PgGuardRewriter::impl_standard_udf(
+                func_span,
+                prolog,
+                vis,
+                func_name_wrapper,
+                func_call,
+                rewritten_return_type,
+            ),
 
-                    #[inline]
-                    #func
-
-                    #[no_mangle]
-                    #[allow(unused_variables)]
-                    #vis unsafe fn #func_name_wrapper(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
-
-                        #func_call
-
-                        #rewritten_return_type
-                    }
-                }
-            }
             CategorizedType::Iterator(types) if types.len() == 1 => {
-                let generic_type =
-                    proc_macro2::TokenStream::from_str(types.first().unwrap()).unwrap();
+                PgGuardRewriter::impl_setof_srf(
+                    types,
+                    func_span,
+                    prolog,
+                    vis,
+                    func_name_wrapper,
+                    func_call,
+                )
+            }
+            CategorizedType::Iterator(types) => PgGuardRewriter::impl_table_srf(
+                types,
+                func_span,
+                prolog,
+                vis,
+                func_name_wrapper,
+                func_call,
+            ),
+        }
+    }
 
-                quote_spanned! {func_span=>
-                    #[inline]
-                    #func
+    fn impl_standard_udf(
+        func_span: Span,
+        prolog: proc_macro2::TokenStream,
+        vis: Visibility,
+        func_name_wrapper: Ident,
+        func_call: proc_macro2::TokenStream,
+        rewritten_return_type: proc_macro2::TokenStream,
+    ) -> proc_macro2::TokenStream {
+        quote_spanned! {func_span=>
+            #prolog
+            #vis unsafe fn #func_name_wrapper(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
 
-                    #[no_mangle]
-                    #[allow(unused_variables)]
-                    #vis fn #func_name_wrapper(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+                #func_call
 
-                        struct IteratorHolder<T> {
-                            iter: *mut dyn Iterator<Item=T>,
-                        }
+                #rewritten_return_type
+            }
+        }
+    }
 
-                        let mut funcctx: pgx::PgBox<pg_sys::FuncCallContext>;
-                        let mut iterator_holder: pgx::PgBox<IteratorHolder<#generic_type>>;
+    fn impl_setof_srf(
+        types: Vec<String>,
+        func_span: Span,
+        prolog: proc_macro2::TokenStream,
+        vis: Visibility,
+        func_name_wrapper: Ident,
+        func_call: proc_macro2::TokenStream,
+    ) -> proc_macro2::TokenStream {
+        let generic_type = proc_macro2::TokenStream::from_str(types.first().unwrap()).unwrap();
 
-                        if srf_is_first_call(fcinfo) {
-                            funcctx = pgx::srf_first_call_init(fcinfo);
-                            funcctx.user_fctx = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).palloc_struct::<IteratorHolder<#generic_type>>() as void_mut_ptr;
+        quote_spanned! {func_span=>
+            #prolog
+            #vis fn #func_name_wrapper(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
 
-                            iterator_holder = pgx::PgBox::from_pg(funcctx.user_fctx as *mut IteratorHolder<#generic_type>);
+                struct IteratorHolder<T> {
+                    iter: *mut dyn Iterator<Item=T>,
+                }
 
-                            #func_call
-                            iterator_holder.iter = Box::leak(Box::new(result));
-                        }
+                let mut funcctx: pgx::PgBox<pg_sys::FuncCallContext>;
+                let mut iterator_holder: pgx::PgBox<IteratorHolder<#generic_type>>;
 
-                        funcctx = pgx::srf_per_call_setup(fcinfo);
-                        iterator_holder = pgx::PgBox::from_pg(funcctx.user_fctx as *mut IteratorHolder<#generic_type>);
+                if srf_is_first_call(fcinfo) {
+                    funcctx = pgx::srf_first_call_init(fcinfo);
+                    funcctx.user_fctx = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).palloc_struct::<IteratorHolder<#generic_type>>() as void_mut_ptr;
 
-                        let mut iter = unsafe { Box::from_raw(iterator_holder.iter) };
-                        match iter.next() {
-                            Some(result) => {
-                                // we need to leak the boxed iterator so that it's not freed by rust and we can
-                                // continue to use it
-                                Box::leak(iter);
-                                let datum = result.into_datum();
-                                pgx::srf_return_next(fcinfo, &mut funcctx);
-                                return datum.unwrap();
-                            },
-                            None => {
-                                // explicitly drop the boxed iterator since we're done with it
-                                drop(iter);
-                                pgx::srf_return_done(fcinfo, &mut funcctx);
-                                pgx::pg_return_null(fcinfo)
-                            },
-                        }
-                    }
+                    iterator_holder = pgx::PgBox::from_pg(funcctx.user_fctx as *mut IteratorHolder<#generic_type>);
+
+                    #func_call
+                    iterator_holder.iter = Box::leak(Box::new(result));
+                }
+
+                funcctx = pgx::srf_per_call_setup(fcinfo);
+                iterator_holder = pgx::PgBox::from_pg(funcctx.user_fctx as *mut IteratorHolder<#generic_type>);
+
+                let mut iter = unsafe { Box::from_raw(iterator_holder.iter) };
+                match iter.next() {
+                    Some(result) => {
+                        // we need to leak the boxed iterator so that it's not freed by rust and we can
+                        // continue to use it
+                        Box::leak(iter);
+                        let datum = result.into_datum();
+                        pgx::srf_return_next(fcinfo, &mut funcctx);
+                        return datum.unwrap();
+                    },
+                    None => {
+                        // explicitly drop the boxed iterator since we're done with it
+                        drop(iter);
+                        pgx::srf_return_done(fcinfo, &mut funcctx);
+                        pgx::pg_return_null(fcinfo)
+                    },
                 }
             }
-            CategorizedType::Iterator(_types) => {
-                panic!("Composite/Tuple iterator return types are not yet supported")
+        }
+    }
+
+    fn impl_table_srf(
+        types: Vec<String>,
+        func_span: Span,
+        prolog: proc_macro2::TokenStream,
+        vis: Visibility,
+        func_name_wrapper: Ident,
+        func_call: proc_macro2::TokenStream,
+    ) -> proc_macro2::TokenStream {
+        let numtypes = types.len();
+        let i = (0..numtypes).map(syn::Index::from);
+        let create_heap_tuple = quote! {
+            let mut datums: [usize; #numtypes] = [0; #numtypes];
+            let mut nulls: [bool; #numtypes] = [false; #numtypes];
+
+            // TODO:  how to detect that 'result.i' is an Option, and if it's none
+            //        set nulls[i] to true?
+            #( datums[#i] = result.#i.into_datum().unwrap() as usize; )*
+
+            let heap_tuple = unsafe { pgx::pg_sys::heap_form_tuple(funcctx.tuple_desc, datums.as_mut_ptr(), nulls.as_mut_ptr()) };
+        };
+
+        let composite_type = format!("({})", types.join(","));
+        let generic_type = proc_macro2::TokenStream::from_str(&composite_type).unwrap();
+        quote_spanned! {func_span=>
+            #prolog
+            #vis fn #func_name_wrapper(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+
+                struct IteratorHolder<T> {
+                    iter: *mut dyn Iterator<Item=T>,
+                }
+
+                let mut funcctx: pgx::PgBox<pg_sys::FuncCallContext>;
+                let mut iterator_holder: pgx::PgBox<IteratorHolder<#generic_type>>;
+
+                if srf_is_first_call(fcinfo) {
+                    funcctx = pgx::srf_first_call_init(fcinfo);
+                    funcctx.user_fctx = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).palloc_struct::<IteratorHolder<#generic_type>>() as void_mut_ptr;
+                    funcctx.tuple_desc = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).switch_to(|| {
+                        let mut tupdesc: *mut pgx::pg_sys::TupleDescData = std::ptr::null_mut();
+
+                        unsafe {
+                            /* Build a tuple descriptor for our result type */
+                            if pgx::pg_sys::get_call_result_type(fcinfo, std::ptr::null_mut(), &mut tupdesc) != pgx::pg_sys::TypeFuncClass_TYPEFUNC_COMPOSITE {
+                                pgx::error!("return type must be a row type");
+                            }
+
+                            pgx::pg_sys::BlessTupleDesc(tupdesc)
+                        }
+                    });
+                    iterator_holder = pgx::PgBox::from_pg(funcctx.user_fctx as *mut IteratorHolder<#generic_type>);
+
+                    #func_call
+                    iterator_holder.iter = Box::leak(Box::new(result));
+                }
+
+                funcctx = pgx::srf_per_call_setup(fcinfo);
+                iterator_holder = pgx::PgBox::from_pg(funcctx.user_fctx as *mut IteratorHolder<#generic_type>);
+
+                let mut iter = unsafe { Box::from_raw(iterator_holder.iter) };
+                match iter.next() {
+                    Some(result) => {
+                        // we need to leak the boxed iterator so that it's not freed by rust and we can
+                        // continue to use it
+                        Box::leak(iter);
+
+                        #create_heap_tuple
+
+                        let datum = pgx::heap_tuple_get_datum(heap_tuple);
+                        pgx::srf_return_next(fcinfo, &mut funcctx);
+                        return datum as pgx::pg_sys::Datum;
+                    },
+                    None => {
+                        // explicitly drop the boxed iterator since we're done with it
+                        drop(iter);
+                        pgx::srf_return_done(fcinfo, &mut funcctx);
+                        pgx::pg_return_null(fcinfo)
+                    },
+                }
             }
         }
     }

@@ -575,15 +575,10 @@ fn translate_type(
         }
         Type::ImplTrait(tr) => match categorize_type(ty) {
             CategorizedType::Default => panic!("{:?} isn't an 'impl Trait' type", tr),
-            CategorizedType::Iterator(iter) => {
+            CategorizedType::Iterator(types) => {
                 rust_type = "Iterator".to_string();
                 span = tr.span();
-
-                if iter.len() == 1 {
-                    subtype = iter.get(0).cloned()
-                } else {
-                    panic!("composite tuples are not supported yet")
-                }
+                subtype = Some(types);
             }
         },
         other => {
@@ -631,7 +626,7 @@ fn translate_type_string(
     depth: i32,
     mut default_value: Option<String>,
     mut variadic: bool,
-    subtype: Option<String>,
+    subtypes: Option<Vec<String>>,
 ) -> Option<(String, bool, Option<String>, bool)> {
     match rust_type.as_str() {
         "i8" => Some(("smallint".to_string(), false, default_value, variadic)), // convert i8 types into smallints as Postgres doesn't have a 1byte-sized type
@@ -688,9 +683,9 @@ fn translate_type_string(
             default_value,
             variadic,
         )),
-        "Iterator" => {
+        "Iterator" if subtypes.is_some() && subtypes.as_ref().unwrap().len() == 1 => {
             let translated = translate_type_string(
-                subtype.unwrap(),
+                subtypes.unwrap().pop().unwrap(),
                 filename,
                 span,
                 depth + 1,
@@ -706,6 +701,35 @@ fn translate_type_string(
                 variadic,
             ))
         }
+        "Iterator" => {
+            let mut composite_def = String::new();
+            for (idx, ty) in subtypes.unwrap().into_iter().enumerate() {
+                let translated = translate_type_string(
+                    ty,
+                    filename,
+                    span,
+                    depth + 1,
+                    default_value.clone(),
+                    variadic,
+                    None,
+                )
+                .unwrap();
+
+                if !composite_def.is_empty() {
+                    composite_def.push_str(", ");
+                }
+                composite_def.push(('a' as usize + idx) as u8 as char);
+                composite_def.push(' ');
+                composite_def.push_str(&translated.0);
+            }
+
+            Some((
+                format!("TABLE ({})", composite_def),
+                false,
+                default_value,
+                variadic,
+            ))
+        }
         _array if rust_type.starts_with("Array <") | rust_type.starts_with("Vec <") => {
             let rc = translate_type_string(
                 extract_type(&rust_type),
@@ -714,7 +738,7 @@ fn translate_type_string(
                 depth + 1,
                 default_value.clone(),
                 variadic,
-                subtype,
+                subtypes,
             );
             let mut type_string = rc.unwrap().0;
             type_string.push_str("[]");
@@ -728,7 +752,7 @@ fn translate_type_string(
                 depth + 1,
                 default_value.clone(),
                 true,
-                subtype,
+                subtypes,
             );
             let mut type_string = rc.unwrap().0;
             type_string.push_str("[]");
@@ -744,7 +768,7 @@ fn translate_type_string(
             depth + 1,
             default_value,
             variadic,
-            subtype,
+            subtypes,
         ),
         _option if rust_type.starts_with("Option <") => {
             let mut extraced_type = extract_type(&rust_type);
@@ -761,7 +785,7 @@ fn translate_type_string(
                 depth + 1,
                 default_value.clone(),
                 variadic,
-                subtype,
+                subtypes,
             );
             //            eprintln!("rc={:?}", rc);
             let type_string = rc.unwrap().0;

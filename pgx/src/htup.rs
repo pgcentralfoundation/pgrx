@@ -48,6 +48,11 @@ pub fn heap_tuple_header_get_datum_length(htup_header: pg_sys::HeapTupleHeader) 
     unsafe { crate::varlena::varsize(htup_header as *const pg_sys::varlena) }
 }
 
+#[inline]
+pub fn heap_tuple_get_datum(heap_tuple: pg_sys::HeapTuple) -> pg_sys::Datum {
+    unsafe { pg_sys::HeapTupleHeaderGetDatum((*heap_tuple).t_data) }
+}
+
 extern "C" {
     fn pgx_heap_getattr(
         tuple: *const pg_sys::HeapTupleData,
