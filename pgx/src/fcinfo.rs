@@ -30,6 +30,13 @@ macro_rules! default {
 }
 
 #[macro_export]
+macro_rules! name {
+    ($name:tt, $ty:ty) => {
+        $ty
+    };
+}
+
+#[macro_export]
 macro_rules! variadic {
     ($ty:ty) => {
         $ty

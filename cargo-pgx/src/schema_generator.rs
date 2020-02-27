@@ -1,6 +1,6 @@
 use crate::property_inspector::get_property;
 use pgx_utils::{categorize_type, CategorizedType, ExternArgs};
-use proc_macro2::{Ident, Span};
+use proc_macro2::{Ident, Span, TokenTree};
 use quote::quote;
 use std::borrow::BorrowMut;
 use std::collections::HashSet;
@@ -317,7 +317,7 @@ fn walk_items(
                             &current_schema,
                         ) {
                             Some(statement) => {
-                                function_sql.push(location_comment(rs_file, span));
+                                function_sql.push(location_comment(rs_file, &span));
                                 function_sql.push(statement)
                             }
                             None => {}
@@ -335,7 +335,7 @@ fn walk_items(
                             &current_schema,
                         ) {
                             Some(statement) => {
-                                function_sql.push(location_comment(rs_file, span));
+                                function_sql.push(location_comment(rs_file, &span));
                                 function_sql.push(statement)
                             }
                             None => {} // TODO:  Emit a warning?
@@ -629,7 +629,7 @@ fn translate_type_string(
     subtypes: Option<Vec<String>>,
 ) -> Option<(String, bool, Option<String>, bool)> {
     match rust_type.as_str() {
-        "()" => Some(("bool".to_string(), false, default_value, variadic)),
+        "( )" => Some(("bool".to_string(), false, default_value, variadic)),
         "i8" => Some(("smallint".to_string(), false, default_value, variadic)), // convert i8 types into smallints as Postgres doesn't have a 1byte-sized type
         "i16" => Some(("smallint".to_string(), false, default_value, variadic)),
         "i32" => Some(("integer".to_string(), false, default_value, variadic)),
@@ -644,7 +644,7 @@ fn translate_type_string(
             variadic,
         )),
         "PgRelation" => Some(("regclass".to_string(), false, default_value, variadic)),
-        "& str" | "& 'static str" | "String" => {
+        "& str" | "& 'static str" | "&'static str" | "String" => {
             Some(("text".to_string(), false, default_value, variadic))
         }
         "& std :: ffi :: CStr" => Some(("cstring".to_string(), false, default_value, variadic)),
@@ -704,7 +704,50 @@ fn translate_type_string(
         }
         "Iterator" => {
             let mut composite_def = String::new();
-            for (idx, ty) in subtypes.unwrap().into_iter().enumerate() {
+            for ty in subtypes.unwrap().into_iter() {
+                let parsed_type_with_name = proc_macro2::TokenStream::from_str(&ty).unwrap();
+                let mut iter = parsed_type_with_name.into_iter();
+                let (name, ty) = if let Some(tree) = iter.next() {
+                    match tree {
+                        TokenTree::Ident(_ident) => {
+                            let _bang = iter.next();
+                            let open_paren = iter.next();
+                            match open_paren.unwrap() {
+                                TokenTree::Group(group) => {
+                                    let mut iter = group.stream().into_iter();
+
+                                    let name = iter.next();
+                                    let _comma = iter.next();
+                                    let mut ty = proc_macro2::TokenStream::new();
+                                    while let Some(tree) = iter.next() {
+                                        match tree {
+                                            TokenTree::Punct(punc) => {
+                                                if punc.as_char() != ')' {
+                                                    ty.extend(quote! {#punc})
+                                                }
+                                            }
+                                            other => ty.extend(quote! {#other}),
+                                        }
+                                    }
+
+                                    (
+                                        format!("{}", name.unwrap().to_string()),
+                                        format!("{}", ty.to_string()),
+                                    )
+                                }
+                                _ => panic!("malformed name!() macro"),
+                            }
+                        }
+                        _ => panic!(
+                            "No name!() macro specified for tuple member of type: {} at {}",
+                            ty,
+                            location_comment(filename, span)
+                        ),
+                    }
+                } else {
+                    panic!("malformed name!() macro")
+                };
+
                 let translated = translate_type_string(
                     ty,
                     filename,
@@ -719,7 +762,14 @@ fn translate_type_string(
                 if !composite_def.is_empty() {
                     composite_def.push_str(", ");
                 }
-                composite_def.push(('a' as usize + idx) as u8 as char);
+                if !name.starts_with('"') {
+                    composite_def.push('"');
+                }
+                composite_def.push_str(&name);
+                if !name.ends_with('"') {
+                    composite_def.push('"');
+                }
+
                 composite_def.push(' ');
                 composite_def.push_str(&translated.0);
             }
@@ -957,7 +1007,7 @@ fn collect_doc(
     // run forward saving each line as an sql statement until we find ```
 
     if track_location {
-        sql_statements.push(location_comment(rs_file, a.span()));
+        sql_statements.push(location_comment(rs_file, &a.span()));
     }
 
     i = i + 1;
@@ -992,7 +1042,7 @@ fn collect_doc(
     (i, sql_statements)
 }
 
-fn location_comment(rs_file: &DirEntry, span: Span) -> String {
+fn location_comment(rs_file: &DirEntry, span: &Span) -> String {
     format!(
         "-- {}:{}:{}",
         rs_file.path().display(),
