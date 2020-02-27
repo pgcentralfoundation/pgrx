@@ -6,7 +6,7 @@
 //! An enum-based interface (`PgMemoryContexts`) around Postgres' various `MemoryContext`s provides
 //! simple accessibility to working with MemoryContexts in a compiler-checked manner
 //!
-use crate::{guard, pg_sys};
+use crate::{guard, pg_sys, PgBox};
 use std::fmt::Debug;
 
 /// A shorter type name for a `*const std::os::raw::c_void`
@@ -295,6 +295,23 @@ impl PgMemoryContexts {
     /// The allocated memory is zero'd
     pub fn palloc0(&mut self, len: usize) -> *mut std::os::raw::c_void {
         unsafe { pg_sys::MemoryContextAllocZero(self.value(), len) }
+    }
+
+    pub fn leak_and_drop_on_delete<T>(&mut self, v: T) -> *mut T {
+        unsafe extern "C" fn drop_on_delete(ptr: void_mut_ptr) {
+            let boxed = Box::from_raw(ptr);
+            drop(boxed);
+        }
+
+        let leaked_ptr = Box::leak(Box::new(v));
+        let mut memcxt_callback =
+            PgBox::from_pg(self.palloc_struct::<pg_sys::MemoryContextCallback>());
+        memcxt_callback.func = Some(drop_on_delete);
+        memcxt_callback.arg = leaked_ptr as *mut T as void_mut_ptr;
+        unsafe {
+            pg_sys::MemoryContextRegisterResetCallback(self.value(), memcxt_callback.into_pg());
+        }
+        leaked_ptr
     }
 
     /// helper function

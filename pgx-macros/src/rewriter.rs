@@ -179,7 +179,7 @@ impl PgGuardRewriter {
                     iterator_holder = pgx::PgBox::from_pg(funcctx.user_fctx as *mut IteratorHolder<#generic_type>);
 
                     #func_call
-                    iterator_holder.iter = Box::leak(Box::new(result));
+                    iterator_holder.iter = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).leak_and_drop_on_delete(result);
                 }
 
                 funcctx = pgx::srf_per_call_setup(fcinfo);
@@ -191,16 +191,18 @@ impl PgGuardRewriter {
                         // we need to leak the boxed iterator so that it's not freed by rust and we can
                         // continue to use it
                         Box::leak(iter);
-                        pgx::srf_return_next(fcinfo, &mut funcctx);
 
+                        pgx::srf_return_next(fcinfo, &mut funcctx);
                         match result.into_datum() {
                             Some(datum) => return datum,
                             None => return pgx::pg_return_null(fcinfo),
                         }
                     },
                     None => {
-                        // explicitly drop the boxed iterator since we're done with it
-                        drop(iter);
+                        // leak the iterator here too, even tho we're done, b/c our MemoryContextCallback
+                        // function is going to properly drop it for us
+                        Box::leak(iter);
+
                         pgx::srf_return_done(fcinfo, &mut funcctx);
                         pgx::pg_return_null(fcinfo)
                     },
@@ -267,7 +269,7 @@ impl PgGuardRewriter {
                     iterator_holder = pgx::PgBox::from_pg(funcctx.user_fctx as *mut IteratorHolder<#generic_type>);
 
                     #func_call
-                    iterator_holder.iter = Box::leak(Box::new(result));
+                    iterator_holder.iter = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).leak_and_drop_on_delete(result);
                 }
 
                 funcctx = pgx::srf_per_call_setup(fcinfo);
@@ -287,8 +289,10 @@ impl PgGuardRewriter {
                         return datum as pgx::pg_sys::Datum;
                     },
                     None => {
-                        // explicitly drop the boxed iterator since we're done with it
-                        drop(iter);
+                        // leak the iterator here too, even tho we're done, b/c our MemoryContextCallback
+                        // function is going to properly drop it for us
+                        Box::leak(iter);
+
                         pgx::srf_return_done(fcinfo, &mut funcctx);
                         pgx::pg_return_null(fcinfo)
                     },
