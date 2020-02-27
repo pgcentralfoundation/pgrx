@@ -191,9 +191,12 @@ impl PgGuardRewriter {
                         // we need to leak the boxed iterator so that it's not freed by rust and we can
                         // continue to use it
                         Box::leak(iter);
-                        let datum = result.into_datum();
                         pgx::srf_return_next(fcinfo, &mut funcctx);
-                        return datum.unwrap();
+
+                        match result.into_datum() {
+                            Some(datum) => return datum,
+                            None => return pgx::pg_return_null(fcinfo),
+                        }
                     },
                     None => {
                         // explicitly drop the boxed iterator since we're done with it
@@ -222,7 +225,13 @@ impl PgGuardRewriter {
 
             // TODO:  how to detect that 'result.i' is an Option, and if it's none
             //        set nulls[i] to true?
-            #( datums[#i] = result.#i.into_datum().unwrap() as usize; )*
+            #(
+                let datum = result.#i.into_datum();
+                match datum {
+                    Some(datum) => { datums[#i] = datum as usize; },
+                    None => { nulls[#i] = true; }
+                }
+            )*
 
             let heap_tuple = unsafe { pgx::pg_sys::heap_form_tuple(funcctx.tuple_desc, datums.as_mut_ptr(), nulls.as_mut_ptr()) };
         };

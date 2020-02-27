@@ -18,6 +18,19 @@ pub trait IntoDatum<T> {
     fn into_datum(self) -> Option<pg_sys::Datum>;
 }
 
+/// for supporting NULL as the None value of an Option<T>
+impl<T> IntoDatum<Option<T>> for Option<T>
+where
+    T: IntoDatum<T>,
+{
+    fn into_datum(self) -> Option<pg_sys::Datum> {
+        match self {
+            Some(t) => t.into_datum(),
+            None => None,
+        }
+    }
+}
+
 /// for bool
 impl IntoDatum<bool> for bool {
     #[inline]
