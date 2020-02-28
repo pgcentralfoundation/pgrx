@@ -178,7 +178,7 @@ impl PgGuardRewriter {
 
                     iterator_holder = pgx::PgBox::from_pg(funcctx.user_fctx as *mut IteratorHolder<#generic_type>);
 
-                    #func_call
+                    let result = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).switch_to(|| { #func_call result });
                     iterator_holder.iter = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).leak_and_drop_on_delete(result);
                 }
 
@@ -268,7 +268,7 @@ impl PgGuardRewriter {
                     });
                     iterator_holder = pgx::PgBox::from_pg(funcctx.user_fctx as *mut IteratorHolder<#generic_type>);
 
-                    #func_call
+                    let result = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).switch_to(|| { #func_call result });
                     iterator_holder.iter = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).leak_and_drop_on_delete(result);
                 }
 
