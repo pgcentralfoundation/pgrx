@@ -1,3 +1,4 @@
+//! Utility functions for working with `pg_sys::HeapTuple` and `pg_sys::HeapTupleHeader` structs
 use crate::*;
 
 /// Given a `pg_sys::Datum` representing a composite row type, return a boxed `HeapTupleData`,
@@ -51,6 +52,7 @@ pub fn heap_tuple_header_get_datum_length(htup_header: pg_sys::HeapTupleHeader) 
     unsafe { crate::varlena::varsize(htup_header as *const pg_sys::varlena) }
 }
 
+/// convert a HeapTupleHeader to a Datum.
 #[inline]
 pub fn heap_tuple_get_datum(heap_tuple: pg_sys::HeapTuple) -> pg_sys::Datum {
     unsafe { pg_sys::HeapTupleHeaderGetDatum((*heap_tuple).t_data) }
@@ -66,7 +68,18 @@ extern "C" {
 
 }
 
-/// [attno] is 1-based
+/// Extract an attribute of a heap tuple and return it as a Datum.
+/// This works for either system or user attributes.  The given `attnum`
+/// is properly range-checked.
+///
+/// If the field in question has a NULL value, we return `None`.
+/// Otherwise, a `Some(T)`
+///
+/// 'tup' is the pointer to the heap tuple.  'attnum' is the attribute
+/// number of the column (field) caller wants.  'tupleDesc' is a
+/// pointer to the structure describing the row and all its fields.
+///
+/// `attno` is 1-based
 #[inline]
 pub fn heap_getattr<T: FromDatum<T>>(
     tuple: &PgBox<pg_sys::HeapTupleData>,
@@ -101,7 +114,8 @@ impl DatumWithTypeInfo {
     }
 }
 
-/// [attno] is 1-based
+/// Similar to `heap_getattr()`, but returns extended information about the requested attribute
+/// `attno` is 1-based
 #[inline]
 pub fn heap_getattr_datum_ex(
     tuple: &PgBox<pg_sys::HeapTupleData>,

@@ -5,7 +5,7 @@ use crate::{
 };
 use std::ffi::CStr;
 
-/// Convert a `(pg_sys::Datum, is_null:bool)` tuple into a Rust type
+/// Convert a `(pg_sys::Datum, is_null:bool, type_oid:pg_sys::Oid)` tuple into a Rust type
 ///
 /// Default implementations are provided for the common Rust types.
 ///

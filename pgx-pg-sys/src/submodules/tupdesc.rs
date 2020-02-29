@@ -1,5 +1,7 @@
+//! Provides helper implementations for various `TupleDesc`-related structs
 use crate::{name_data_to_str, PgOid};
 
+/// Helper implementation for `FormData_pg_attribute`
 impl crate::FormData_pg_attribute {
     pub fn name(&self) -> &str {
         name_data_to_str(&self.attname)

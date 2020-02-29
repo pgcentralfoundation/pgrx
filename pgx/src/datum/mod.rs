@@ -1,3 +1,5 @@
+//! Handing for easily converting Postgres Datum types into their corresponding Rust types
+//! and converting Rust types into their corresponding Postgres types
 mod anyarray;
 mod anyelement;
 mod array;

@@ -3,6 +3,37 @@ use crate::{pg_sys, void_mut_ptr, PgBox, PgRelation};
 
 use std::ops::Deref;
 
+/// This struct is passed around within the backend to describe the structure
+/// of tuples.  For tuples coming from on-disk relations, the information is
+/// collected from the pg_attribute, pg_attrdef, and pg_constraint catalogs.
+/// Transient row types (such as the result of a join query) have anonymous
+/// TupleDesc structs that generally omit any constraint info; therefore the
+/// structure is designed to let the constraints be omitted efficiently.
+///
+/// Note that only user attributes, not system attributes, are mentioned in
+/// TupleDesc; with the exception that tdhasoid indicates if OID is present.
+///
+/// If the tupdesc is known to correspond to a named rowtype (such as a table's
+/// rowtype) then tdtypeid identifies that type and tdtypmod is -1.  Otherwise
+/// tdtypeid is RECORDOID, and tdtypmod can be either -1 for a fully anonymous
+/// row type, or a value >= 0 to allow the rowtype to be looked up in the
+/// typcache.c type cache.
+///
+/// Note that tdtypeid is never the OID of a domain over composite, even if
+/// we are dealing with values that are known (at some higher level) to be of
+/// a domain-over-composite type.  This is because tdtypeid/tdtypmod need to
+/// match up with the type labeling of composite Datums, and those are never
+/// explicitly marked as being of a domain type, either.
+///
+/// Tuple descriptors that live in caches (relcache or typcache, at present)
+/// are reference-counted: they can be deleted when their reference count goes
+/// to zero.  Tuple descriptors created by the executor need no reference
+/// counting, however: they are simply created in the appropriate memory
+/// context and go away when the context is freed.  We set the tdrefcount
+/// field of such a descriptor to -1, while reference-counted descriptors
+/// always have tdrefcount >= 0.
+///
+/// PGX's safe wrapper takes care of properly freeing or decrementing reference counts
 pub struct PgTupleDesc<'a> {
     tupdesc: PgBox<pg_sys::TupleDescData>,
     parent: Option<&'a PgRelation>,
