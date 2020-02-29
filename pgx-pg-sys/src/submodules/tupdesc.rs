@@ -9,6 +9,10 @@ impl crate::FormData_pg_attribute {
         PgOid::from(self.atttypid)
     }
 
+    pub fn type_mod(&self) -> i32 {
+        self.atttypmod
+    }
+
     pub fn num(&self) -> i16 {
         self.attnum
     }

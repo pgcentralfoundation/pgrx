@@ -18,7 +18,10 @@ pub fn composite_row_type_make_tuple(row: pg_sys::Datum) -> PgBox<pg_sys::HeapTu
     tuple
 }
 
-pub fn deconstruct_row_type(tupdesc: &PgTupleDesc, row: pg_sys::Datum) -> Array<pg_sys::Datum> {
+pub fn deconstruct_row_type<'a>(
+    tupdesc: &'a PgTupleDesc,
+    row: pg_sys::Datum,
+) -> Array<'a, pg_sys::Datum> {
     extern "C" {
         fn pgx_deconstruct_row_type(
             tupdesc: pg_sys::TupleDesc,
@@ -68,17 +71,17 @@ extern "C" {
 pub fn heap_getattr<T: FromDatum<T>>(
     tuple: &PgBox<pg_sys::HeapTupleData>,
     attno: usize,
-    tupdesc: &PgBox<pg_sys::TupleDescData>,
+    tupdesc: &PgTupleDesc,
 ) -> Option<T> {
     let mut is_null = false;
     let datum =
         unsafe { pgx_heap_getattr(tuple.as_ptr(), attno as u32, tupdesc.as_ptr(), &mut is_null) };
-    let typoid = tupdesc_get_typoid(tupdesc, attno);
+    let typoid = tupdesc.get(attno - 1).expect("no attribute").type_oid();
 
     if is_null {
         None
     } else {
-        unsafe { T::from_datum(datum, false, typoid) }
+        unsafe { T::from_datum(datum, false, typoid.value()) }
     }
 }
 
@@ -103,12 +106,12 @@ impl DatumWithTypeInfo {
 pub fn heap_getattr_datum_ex(
     tuple: &PgBox<pg_sys::HeapTupleData>,
     attno: usize,
-    tupdesc: &PgBox<pg_sys::TupleDescData>,
+    tupdesc: &PgTupleDesc,
 ) -> DatumWithTypeInfo {
     let mut is_null = false;
     let datum =
         unsafe { pgx_heap_getattr(tuple.as_ptr(), attno as u32, tupdesc.as_ptr(), &mut is_null) };
-    let typoid = PgOid::from(tupdesc_get_typoid(tupdesc, attno));
+    let typoid = tupdesc.get(attno - 1).expect("no attribute").type_oid();
 
     let mut typlen = 0;
     let mut typbyval = false;
