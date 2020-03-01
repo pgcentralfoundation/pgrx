@@ -1,7 +1,7 @@
 #![allow(non_camel_case_types)]
 use crate as pg_sys;
 
-#[derive(Clone, Eq, PartialEq, Hash, Ord, PartialOrd, Debug)]
+#[derive(Copy, Clone, Eq, PartialEq, Hash, Ord, PartialOrd, Debug)]
 pub enum PgBuiltInOids {
     BOOLOID = pg_sys::BOOLOID as isize,
     BYTEAOID = pg_sys::BYTEAOID as isize,
@@ -176,7 +176,7 @@ impl PgBuiltInOids {
     }
 }
 
-#[derive(Clone, Eq, PartialEq, Hash, Ord, PartialOrd, Debug)]
+#[derive(Copy, Clone, Eq, PartialEq, Hash, Ord, PartialOrd, Debug)]
 pub enum PgOid {
     InvalidOid,
     Custom(pg_sys::Oid),

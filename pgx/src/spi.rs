@@ -106,7 +106,7 @@ impl Spi {
     /// automatically copied into the `CurrentMemoryContext` at the time of this function call
     pub fn connect<
         R: FromDatum<R> + IntoDatum<R>,
-        F: FnOnce(SpiClient) -> std::result::Result<Option<R>, SpiError> + std::panic::UnwindSafe,
+        F: FnOnce(SpiClient) -> std::result::Result<Option<R>, SpiError>,
     >(
         f: F,
     ) -> Option<R> {
