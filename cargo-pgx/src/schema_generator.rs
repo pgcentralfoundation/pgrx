@@ -684,9 +684,15 @@ fn translate_type_string(
             default_value,
             variadic,
         )),
-        "Iterator" if subtypes.is_some() && subtypes.as_ref().unwrap().len() == 1 => {
+        "Iterator"
+            if subtypes.is_some()
+                && subtypes.as_ref().expect("no iterator subtypes").len() == 1 =>
+        {
             let translated = translate_type_string(
-                subtypes.unwrap().pop().unwrap(),
+                subtypes
+                    .expect("no subtypes")
+                    .pop()
+                    .expect("failed to pop first subtype"),
                 filename,
                 span,
                 depth + 1,
@@ -704,12 +710,16 @@ fn translate_type_string(
         }
         "Iterator" => {
             let mut composite_def = String::new();
-            for ty in subtypes.unwrap().into_iter() {
-                let parsed_type_with_name = proc_macro2::TokenStream::from_str(&ty).unwrap();
+            for ty in subtypes
+                .expect("no iterator subtypes where len != 1")
+                .into_iter()
+            {
+                let parsed_type_with_name =
+                    proc_macro2::TokenStream::from_str(&ty).expect("failed to parse type name");
                 let mut iter = parsed_type_with_name.into_iter();
                 let (name, ty) = if let Some(tree) = iter.next() {
                     match tree {
-                        TokenTree::Ident(_ident) => {
+                        TokenTree::Ident(_ident) if ty.starts_with("name !") => {
                             let _bang = iter.next();
                             let open_paren = iter.next();
                             match open_paren.unwrap() {
