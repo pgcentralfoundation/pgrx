@@ -142,7 +142,7 @@ impl PgGuardRewriter {
     ) -> proc_macro2::TokenStream {
         quote_spanned! {func_span=>
             #prolog
-            #vis unsafe extern "C" fn #func_name_wrapper(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+            #vis unsafe fn #func_name_wrapper(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
 
                 #func_call
 
