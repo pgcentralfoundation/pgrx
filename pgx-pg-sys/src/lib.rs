@@ -160,28 +160,30 @@ mod internal {
                 unsafe extern "C" fn(value: *const ::std::os::raw::c_char),
             >,
         ) {
-            use std::cell::Cell;
-            thread_local! {
-                static VALIDATOR_HACK: Cell<::std::option::Option<unsafe extern "C" fn(value: *const ::std::os::raw::c_char)>> = Cell::new(None);
-            }
+            // PG10 defines the validator function as taking a "*mut c_char"
+            // whereas PG11/12 want a "*const c_char".
+            //
+            // For ease of use by users of this crate, we cast the provided
+            // 'validator' function to what PG10 wants, using transmute
+            //
+            // If there's a better way to do this, I'ld love to know!
+            let func_as_mut_arg = match validator {
+                Some(func) => {
+                    let func_ptr = std::mem::transmute::<
+                        unsafe extern "C" fn(*const ::std::os::raw::c_char),
+                        unsafe extern "C" fn(*mut ::std::os::raw::c_char),
+                    >(func);
+                    Some(func_ptr)
+                }
+                None => None,
+            };
 
-            VALIDATOR_HACK.with(|v| {
-                v.set(validator);
-            });
-            unsafe extern "C" fn validator_wrapper(value: *mut ::std::os::raw::c_char) {
-                VALIDATOR_HACK.with(|v| {
-                    let validator = v.take();
-                    if let Some(validator) = validator {
-                        (validator)(value as *const std::os::raw::c_char)
-                    }
-                });
-            }
             crate::pg10_specific::add_string_reloption(
                 kinds,
                 name as *mut std::os::raw::c_char,
                 desc as *mut std::os::raw::c_char,
                 default_val as *mut std::os::raw::c_char,
-                Some(validator_wrapper),
+                func_as_mut_arg,
             );
         }
 
