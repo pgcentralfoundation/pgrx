@@ -99,6 +99,13 @@ impl PgRelation {
         rd_rel.relnamespace
     }
 
+    /// What is the name of the namespace in which this relation is located?
+    pub fn namespace(&self) -> &str {
+        unsafe { std::ffi::CStr::from_ptr(pg_sys::get_namespace_name(self.namespace_oid())) }
+            .to_str()
+            .expect("unable to convert namespace name to UTF8")
+    }
+
     /// If this `PgRelation` represents an index, return the `PgRelation` for the heap
     /// relation to which it is attached
     pub fn heap_relation(&self) -> Option<PgRelation> {

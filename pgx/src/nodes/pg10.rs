@@ -782,8 +782,20 @@ impl PgNodeFactory {
     pub fn makeAlias() -> PgBox<pg_sys::Alias> {
         PgBox::<pg_sys::Alias>::alloc_node(PgNode::Alias)
     }
-    pub fn makeRangeVar() -> PgBox<pg_sys::RangeVar> {
-        PgBox::<pg_sys::RangeVar>::alloc_node(PgNode::RangeVar)
+    pub fn makeRangeVar(
+        memory_context: PgMemoryContexts,
+        schemaname: &str,
+        relname: &str,
+        location: i32,
+    ) -> PgBox<pg_sys::RangeVar> {
+        let range_var = unsafe {
+            pg_sys::makeRangeVar(
+                memory_context.pstrdup(schemaname),
+                memory_context.pstrdup(relname),
+                location,
+            )
+        };
+        PgBox::from_pg(range_var)
     }
     pub fn makeTableFunc() -> PgBox<pg_sys::TableFunc> {
         PgBox::<pg_sys::TableFunc>::alloc_node(PgNode::TableFunc)

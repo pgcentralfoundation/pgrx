@@ -24,7 +24,7 @@ impl<T> PgList<T> {
         }
     }
 
-    pub fn to_pg(&self) -> *mut pg_sys::List {
+    pub fn as_ptr(&self) -> *mut pg_sys::List {
         self.list
     }
 

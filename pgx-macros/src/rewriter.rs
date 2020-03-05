@@ -142,7 +142,7 @@ impl PgGuardRewriter {
     ) -> proc_macro2::TokenStream {
         quote_spanned! {func_span=>
             #prolog
-            #vis unsafe fn #func_name_wrapper(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+            #vis unsafe extern "C" fn #func_name_wrapper(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
 
                 #func_call
 
@@ -368,7 +368,7 @@ impl PgGuardRewriter {
             match arg {
                 FnArg::Typed(ty) => {
                     if let Pat::Ident(ident) = ty.pat.deref() {
-                        if suffix_arg_name {
+                        if suffix_arg_name && ident.ident.to_string() != "fcinfo" {
                             let ident = Ident::new(&format!("{}_", ident.ident), ident.span());
                             arg_list.extend(quote! { #ident, });
                         } else {
@@ -478,6 +478,10 @@ impl FunctionSignatureRewriter {
                             },
                             None => pgx::pg_return_null(fcinfo)
                         }
+                    });
+                } else if type_matches(type_, "pg_sys :: Datum") {
+                    stream.extend(quote! {
+                        result
                     });
                 } else {
                     stream.extend(quote! {
