@@ -145,7 +145,7 @@ pub unsafe fn register_hook(hook: &'static mut (dyn PgHooks)) {
                 HOOKS.as_mut().unwrap().current_hook.abort();
             }
             pg_sys::XactEvent_XACT_EVENT_PRE_COMMIT => {
-                HOOKS.as_mut().unwrap().current_hook.commit();
+                crate::guard(|| HOOKS.as_mut().unwrap().current_hook.commit());
             }
             _ => { /* noop */ }
         }
