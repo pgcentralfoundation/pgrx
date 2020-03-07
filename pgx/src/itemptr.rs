@@ -46,6 +46,18 @@ pub unsafe fn item_pointer_get_offset_number_no_check(
 }
 
 #[inline]
+pub fn item_pointer_get_both(
+    ctid: &pg_sys::ItemPointerData,
+) -> (pg_sys::BlockNumber, pg_sys::OffsetNumber) {
+    unsafe {
+        (
+            item_pointer_get_block_number_no_check(ctid as *const pg_sys::ItemPointerData),
+            item_pointer_get_offset_number_no_check(ctid as *const pg_sys::ItemPointerData),
+        )
+    }
+}
+
+#[inline]
 pub fn item_pointer_set_all(
     tid: &mut pg_sys::ItemPointerData,
     blockno: pg_sys::BlockNumber,
