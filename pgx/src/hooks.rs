@@ -142,7 +142,7 @@ pub unsafe fn register_hook(hook: &'static mut (dyn PgHooks)) {
     unsafe extern "C" fn xact_callback(event: pg_sys::XactEvent, _: void_mut_ptr) {
         match event {
             pg_sys::XactEvent_XACT_EVENT_ABORT => {
-                HOOKS.as_mut().unwrap().current_hook.abort();
+                crate::guard(|| HOOKS.as_mut().unwrap().current_hook.abort());
             }
             pg_sys::XactEvent_XACT_EVENT_PRE_COMMIT => {
                 crate::guard(|| HOOKS.as_mut().unwrap().current_hook.commit());
@@ -286,6 +286,7 @@ unsafe extern "C" fn pgx_planner(
     .inner
 }
 
+#[pg_guard]
 unsafe extern "C" fn pgx_standard_executor_start_wrapper(
     query_desc: *mut pg_sys::QueryDesc,
     eflags: i32,
@@ -293,6 +294,7 @@ unsafe extern "C" fn pgx_standard_executor_start_wrapper(
     pg_sys::standard_ExecutorStart(query_desc, eflags);
 }
 
+#[pg_guard]
 unsafe extern "C" fn pgx_standard_executor_run_wrapper(
     query_desc: *mut pg_sys::QueryDesc,
     direction: pg_sys::ScanDirection,
@@ -302,14 +304,17 @@ unsafe extern "C" fn pgx_standard_executor_run_wrapper(
     pg_sys::standard_ExecutorRun(query_desc, direction, count, execute_once);
 }
 
+#[pg_guard]
 unsafe extern "C" fn pgx_standard_executor_finish_wrapper(query_desc: *mut pg_sys::QueryDesc) {
     pg_sys::standard_ExecutorFinish(query_desc);
 }
 
+#[pg_guard]
 unsafe extern "C" fn pgx_standard_executor_end_wrapper(query_desc: *mut pg_sys::QueryDesc) {
     pg_sys::standard_ExecutorEnd(query_desc);
 }
 
+#[pg_guard]
 unsafe extern "C" fn pgx_standard_executor_check_perms_wrapper(
     _range_table: *mut pg_sys::List,
     _ereport_on_violation: bool,
@@ -317,6 +322,7 @@ unsafe extern "C" fn pgx_standard_executor_check_perms_wrapper(
     true
 }
 
+#[pg_guard]
 unsafe extern "C" fn pgx_standard_planner_wrapper(
     parse: *mut pg_sys::Query,
     cursor_options: i32,
