@@ -1,5 +1,7 @@
 //! Provides a safe wrapper around Postgres' `pg_sys::RelationData` struct
-use crate::{name_data_to_str, pg_sys, FromDatum, IntoDatum, PgBox, PgTupleDesc};
+use crate::{
+    direct_function_call, name_data_to_str, pg_sys, FromDatum, IntoDatum, PgBox, PgTupleDesc,
+};
 use std::ops::Deref;
 
 pub struct PgRelation {
@@ -17,7 +19,7 @@ impl PgRelation {
     /// ## Safety
     ///
     /// This method is unsafe as we cannot ensure that this relation will later be closed by Postgres
-    pub unsafe fn from_pg(ptr: pg_sys::Relation) -> PgRelation {
+    pub unsafe fn from_pg(ptr: pg_sys::Relation) -> Self {
         PgRelation {
             boxed: PgBox::from_pg(ptr),
             need_close: false,
@@ -38,7 +40,7 @@ impl PgRelation {
     /// nasty race conditions.
     ///
     /// As such, this function is unsafe as we cannot guarantee that this requirement is true.
-    pub unsafe fn open(oid: pg_sys::Oid) -> PgRelation {
+    pub unsafe fn open(oid: pg_sys::Oid) -> Self {
         let rel = pg_sys::RelationIdGetRelation(oid);
         if rel.is_null() {
             // relation was recently deleted
@@ -66,13 +68,36 @@ impl PgRelation {
     ///
     /// The opened relation is automatically closed via `pg_sys::relation_close()`
     /// when this instance is dropped
-    pub fn with_lock(oid: pg_sys::Oid, lockmode: pg_sys::LOCKMODE) -> PgRelation {
+    pub fn with_lock(oid: pg_sys::Oid, lockmode: pg_sys::LOCKMODE) -> Self {
         unsafe {
             PgRelation {
                 boxed: PgBox::from_pg(pg_sys::relation_open(oid, lockmode)),
                 need_close: true,
                 lockmode: Some(lockmode),
             }
+        }
+    }
+
+    /// Given a relation name, use `pg_sys::to_regclass` to look up its oid, and then
+    /// `pg_sys::RelationIdGetRelation()` to open the relation.
+    ///
+    /// If the specified relation name is not found, we return an `Err(&str)`.
+    ///
+    /// If the specified relation was recently deleted, this function will panic.
+    ///
+    /// Additionally, the relation is closed via `pg_sys::RelationClose()` when this instance is
+    /// dropped.
+    ///
+    /// ## Safety
+    ///
+    /// The caller should already have at least AccessShareLock on the relation ID, else there are
+    /// nasty race conditions.
+    ///
+    /// As such, this function is unsafe as we cannot guarantee that this requirement is true.
+    pub unsafe fn open_with_name(relname: &str) -> std::result::Result<Self, &'static str> {
+        match direct_function_call::<pg_sys::Oid>(pg_sys::to_regclass, vec![relname.into_datum()]) {
+            Some(oid) => Ok(PgRelation::open(oid)),
+            None => Err("no such relation"),
         }
     }
 
