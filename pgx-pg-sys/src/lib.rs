@@ -44,6 +44,7 @@ mod all_versions {
     pub const InvalidBlockNumber: u32 = 0xFFFF_FFFF as crate::BlockNumber;
     pub const VARHDRSZ: usize = std::mem::size_of::<super::int32>();
     pub const InvalidTransactionId: super::TransactionId = 0 as super::TransactionId;
+    pub const InvalidCommandId: super::CommandId = 0 as super::CommandId;
     pub const BootstrapTransactionId: super::TransactionId = 1 as super::TransactionId;
     pub const FrozenTransactionId: super::TransactionId = 2 as super::TransactionId;
     pub const FirstNormalTransactionId: super::TransactionId = 3 as super::TransactionId;

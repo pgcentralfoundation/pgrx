@@ -58,6 +58,13 @@ macro_rules! name {
     };
 }
 
+#[macro_export]
+macro_rules! variadic {
+    ($ty:ty) => {
+        $ty
+    };
+}
+
 #[cfg(any(feature = "pg10", feature = "pg11"))]
 mod pg_10_11 {
     use crate::{pg_sys, FromDatum};

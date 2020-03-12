@@ -44,6 +44,7 @@
 #include "optimizer/restrictinfo.h"
 #include "parser/parse_type.h"
 #include "storage/block.h"
+#include "storage/procarray.h"
 #include "storage/itemptr.h"
 #include "utils/builtins.h"
 #include "utils/date.h"
@@ -56,4 +57,5 @@
 #include "utils/palloc.h"
 #include "utils/rel.h"
 #include "utils/relcache.h"
+#include "utils/snapmgr.h"
 #include "utils/typcache.h"

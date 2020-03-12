@@ -8,27 +8,27 @@ pub fn called_as_trigger(fcinfo: pg_sys::FunctionCallInfo) -> bool {
 
 #[inline]
 pub fn trigger_fired_by_insert(event: u32) -> bool {
-    (((event) & pg_sys::TRIGGER_EVENT_OPMASK) == pg_sys::TRIGGER_EVENT_INSERT)
+    event & pg_sys::TRIGGER_EVENT_OPMASK == pg_sys::TRIGGER_EVENT_INSERT
 }
 
 #[inline]
 pub fn trigger_fired_by_delete(event: u32) -> bool {
-    (((event) & pg_sys::TRIGGER_EVENT_OPMASK) == pg_sys::TRIGGER_EVENT_DELETE)
+    event & pg_sys::TRIGGER_EVENT_OPMASK == pg_sys::TRIGGER_EVENT_DELETE
 }
 
 #[inline]
 pub fn trigger_fired_by_update(event: u32) -> bool {
-    (((event) & pg_sys::TRIGGER_EVENT_OPMASK) == pg_sys::TRIGGER_EVENT_UPDATE)
+    event & pg_sys::TRIGGER_EVENT_OPMASK == pg_sys::TRIGGER_EVENT_UPDATE
 }
 
 #[inline]
 pub fn trigger_fired_by_truncate(event: u32) -> bool {
-    (((event) & pg_sys::TRIGGER_EVENT_OPMASK) == pg_sys::TRIGGER_EVENT_TRUNCATE)
+    event & pg_sys::TRIGGER_EVENT_OPMASK == pg_sys::TRIGGER_EVENT_TRUNCATE
 }
 
 #[inline]
 pub fn trigger_fired_for_row(event: u32) -> bool {
-    ((event) & pg_sys::TRIGGER_EVENT_ROW) != 0
+    event & pg_sys::TRIGGER_EVENT_ROW != 0
 }
 
 #[inline]
@@ -38,15 +38,15 @@ pub fn trigger_fired_for_statement(event: u32) -> bool {
 
 #[inline]
 pub fn trigger_fired_before(event: u32) -> bool {
-    (((event) & pg_sys::TRIGGER_EVENT_TIMINGMASK) == pg_sys::TRIGGER_EVENT_BEFORE)
+    event & pg_sys::TRIGGER_EVENT_TIMINGMASK == pg_sys::TRIGGER_EVENT_BEFORE
 }
 
 #[inline]
 pub fn trigger_fired_after(event: u32) -> bool {
-    (((event) & pg_sys::TRIGGER_EVENT_TIMINGMASK) == pg_sys::TRIGGER_EVENT_AFTER)
+    event & pg_sys::TRIGGER_EVENT_TIMINGMASK == pg_sys::TRIGGER_EVENT_AFTER
 }
 
 #[inline]
 pub fn trigger_fired_instead(event: u32) -> bool {
-    (((event) & pg_sys::TRIGGER_EVENT_TIMINGMASK) == pg_sys::TRIGGER_EVENT_INSTEAD)
+    event & pg_sys::TRIGGER_EVENT_TIMINGMASK == pg_sys::TRIGGER_EVENT_INSTEAD
 }
