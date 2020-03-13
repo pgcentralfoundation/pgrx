@@ -161,9 +161,9 @@ impl PgRelation {
 }
 
 impl Clone for PgRelation {
-    /// Same as calling `PgRelation::open()` on the underlying relation id
+    /// Same as calling `PgRelation::with_lock(AccessShareLock)` on the underlying relation id
     fn clone(&self) -> Self {
-        unsafe { PgRelation::open(self.rd_id) }
+        PgRelation::with_lock(self.rd_id, pg_sys::AccessShareLock as pg_sys::LOCKMODE)
     }
 }
 
@@ -172,7 +172,10 @@ impl FromDatum<PgRelation> for PgRelation {
         if is_null {
             None
         } else {
-            Some(PgRelation::open(datum as pg_sys::Oid))
+            Some(PgRelation::with_lock(
+                datum as pg_sys::Oid,
+                pg_sys::AccessShareLock as pg_sys::LOCKMODE,
+            ))
         }
     }
 }
