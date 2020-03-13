@@ -1,5 +1,7 @@
 use crate::{direct_function_call_as_datum, pg_sys, IntoDatum};
+use serde::{Deserialize, Serialize};
 
+#[derive(Serialize, Deserialize)]
 pub struct Numeric(String);
 
 impl Into<Numeric> for i8 {
