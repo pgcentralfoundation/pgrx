@@ -1,8 +1,84 @@
-use crate::{direct_function_call_as_datum, pg_sys, IntoDatum};
-use serde::{Deserialize, Serialize};
+use crate::{direct_function_call_as_datum, pg_sys, void_mut_ptr, IntoDatum};
+use pgx_pg_sys::pg_try;
+use serde::de::{Error, Visitor};
+use serde::{de, Deserialize, Deserializer, Serialize};
+use serde_json::Number;
+use std::fmt;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize)]
 pub struct Numeric(String);
+
+impl<'de> Deserialize<'de> for Numeric {
+    fn deserialize<D>(deserializer: D) -> Result<Self, <D as Deserializer<'de>>::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        struct NumericVisitor;
+
+        impl<'de> Visitor<'de> for NumericVisitor {
+            type Value = Numeric;
+
+            fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+                formatter.write_str("a JSON number or a \"quoted JSON number\"")
+            }
+
+            #[inline]
+            fn visit_i64<E>(self, value: i64) -> Result<Numeric, E> {
+                Ok(value.into())
+            }
+
+            #[inline]
+            fn visit_u64<E>(self, value: u64) -> Result<Numeric, E> {
+                Ok(value.into())
+            }
+
+            #[inline]
+            fn visit_f64<E>(self, value: f64) -> Result<Numeric, E>
+            where
+                E: de::Error,
+            {
+                let result =
+                    Number::from_f64(value).ok_or_else(|| de::Error::custom("not a JSON number"));
+                match result {
+                    Ok(num) => Ok(num.as_f64().unwrap().into()),
+                    Err(e) => Err(e),
+                }
+            }
+
+            #[inline]
+            fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
+            where
+                E: Error,
+            {
+                self.visit_string(v.to_owned())
+            }
+
+            #[inline]
+            fn visit_string<E>(self, v: String) -> Result<Self::Value, E>
+            where
+                E: Error,
+            {
+                // try to convert the provided String value into a Postgres Numeric Datum
+                // if it doesn't raise an ERROR, then we're good
+                unsafe {
+                    pg_try(|| {
+                        // this might throw, but that's okay
+                        let datum = Numeric(v.clone()).into_datum().unwrap();
+
+                        // and don't leak the NumericData datum Postgres created
+                        pg_sys::pfree(datum as void_mut_ptr);
+
+                        // we have it as a valid String
+                        Ok(Numeric(v.clone()))
+                    })
+                    .unwrap_or(Err(Error::custom(format!("invalid Numeric value: {}", v))))
+                }
+            }
+        }
+
+        deserializer.deserialize_any(NumericVisitor)
+    }
+}
 
 impl Into<Numeric> for i8 {
     fn into(self) -> Numeric {
