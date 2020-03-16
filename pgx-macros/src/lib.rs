@@ -40,9 +40,10 @@ pub fn pg_test(attr: TokenStream, item: TokenStream) -> TokenStream {
     let args = parse_extern_attributes(TokenStream2::from(attr.clone()));
 
     let mut expected_error = None;
-    args.into_iter().for_each(|v| match v {
-        ExternArgs::Error(message) => expected_error = Some(message),
-        _ => {}
+    args.into_iter().for_each(|v| {
+        if let ExternArgs::Error(message) = v {
+            expected_error = Some(message)
+        }
     });
 
     stream.extend(proc_macro2::TokenStream::from(pg_extern(
@@ -121,7 +122,7 @@ fn rewrite_item_fn(mut func: ItemFn, is_raw: bool, no_guard: bool) -> proc_macro
 
     // make the function 'extern "C"' because this is for the #[pg_extern[ macro
     func.sig.abi = Some(syn::parse_str("extern \"C\"").unwrap());
-    let func_span = func.span().clone();
+    let func_span = func.span();
     let rewritten_func = rewriter.item_fn(func, true, is_raw, no_guard);
 
     quote_spanned! {func_span=>
@@ -350,7 +351,7 @@ enum PostgresTypeAttribute {
     Default,
 }
 
-fn parse_postgres_type_args(attributes: &Vec<Attribute>) -> HashSet<PostgresTypeAttribute> {
+fn parse_postgres_type_args(attributes: &[Attribute]) -> HashSet<PostgresTypeAttribute> {
     let mut categorized_attributes = HashSet::new();
 
     for a in attributes {

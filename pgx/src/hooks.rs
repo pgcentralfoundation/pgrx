@@ -157,14 +157,15 @@ pub unsafe fn register_hook(hook: &'static mut (dyn PgHooks)) {
 #[pg_guard]
 unsafe extern "C" fn pgx_executor_start(query_desc: *mut pg_sys::QueryDesc, eflags: i32) {
     fn prev(query_desc: PgBox<pg_sys::QueryDesc>, eflags: i32) -> HookResult<()> {
-        HookResult::new(unsafe {
+        unsafe {
             (HOOKS
                 .as_mut()
                 .unwrap()
                 .prev_executor_start_hook
                 .as_ref()
                 .unwrap())(query_desc.into_pg(), eflags)
-        })
+        }
+        HookResult::new(())
     }
     let hook = &mut HOOKS.as_mut().unwrap().current_hook;
     hook.executor_start(PgBox::from_pg(query_desc), eflags, prev);
@@ -183,14 +184,15 @@ unsafe extern "C" fn pgx_executor_run(
         count: u64,
         execute_once: bool,
     ) -> HookResult<()> {
-        HookResult::new(unsafe {
+        unsafe {
             (HOOKS
                 .as_mut()
                 .unwrap()
                 .prev_executor_run_hook
                 .as_ref()
                 .unwrap())(query_desc.into_pg(), direction, count, execute_once)
-        })
+        }
+        HookResult::new(())
     }
     let hook = &mut HOOKS.as_mut().unwrap().current_hook;
     hook.executor_run(
@@ -205,14 +207,15 @@ unsafe extern "C" fn pgx_executor_run(
 #[pg_guard]
 unsafe extern "C" fn pgx_executor_finish(query_desc: *mut pg_sys::QueryDesc) {
     fn prev(query_desc: PgBox<pg_sys::QueryDesc>) -> HookResult<()> {
-        HookResult::new(unsafe {
+        unsafe {
             (HOOKS
                 .as_mut()
                 .unwrap()
                 .prev_executor_finish_hook
                 .as_ref()
                 .unwrap())(query_desc.into_pg())
-        })
+        }
+        HookResult::new(())
     }
     let hook = &mut HOOKS.as_mut().unwrap().current_hook;
     hook.executor_finish(PgBox::from_pg(query_desc), prev);
@@ -221,14 +224,15 @@ unsafe extern "C" fn pgx_executor_finish(query_desc: *mut pg_sys::QueryDesc) {
 #[pg_guard]
 unsafe extern "C" fn pgx_executor_end(query_desc: *mut pg_sys::QueryDesc) {
     fn prev(query_desc: PgBox<pg_sys::QueryDesc>) -> HookResult<()> {
-        HookResult::new(unsafe {
+        unsafe {
             (HOOKS
                 .as_mut()
                 .unwrap()
                 .prev_executor_end_hook
                 .as_ref()
                 .unwrap())(query_desc.into_pg())
-        })
+        }
+        HookResult::new(())
     }
     let hook = &mut HOOKS.as_mut().unwrap().current_hook;
     hook.executor_end(PgBox::from_pg(query_desc), prev);

@@ -39,5 +39,5 @@ fn convert_xid_common(xid: pg_sys::TransactionId, last_xid: u32, epoch: u32) -> 
         epoch += 1;
     }
 
-    return (epoch << 32) | xid as u64;
+    (epoch << 32) | xid as u64
 }

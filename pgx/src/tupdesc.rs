@@ -136,6 +136,11 @@ impl<'a> PgTupleDesc<'a> {
         self.tupdesc.natts as usize
     }
 
+    /// Do we have attributes?
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
+
     /// Get a numbered attribute.  Attribute numbers are zero-based
     pub fn get(&self, i: usize) -> Option<&pg_sys::FormData_pg_attribute> {
         if i >= self.len() {

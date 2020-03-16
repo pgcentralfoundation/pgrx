@@ -621,7 +621,7 @@ pub fn interrupt_pending() -> bool {
 #[cfg(feature = "pg12")]
 #[inline]
 pub fn interrupt_pending() -> bool {
-    (unsafe { crate::pg_sys::InterruptPending } != 0)
+    unsafe { crate::pg_sys::InterruptPending != 0 }
 }
 
 #[macro_export]

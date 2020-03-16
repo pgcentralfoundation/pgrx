@@ -1,9 +1,9 @@
 use crate::{pg_sys, FromDatum, IntoDatum};
 use std::ops::{Deref, DerefMut};
 
-pub(crate) const USECS_PER_HOUR: i64 = 3600000000;
-pub(crate) const USECS_PER_MINUTE: i64 = 60000000;
-pub(crate) const USECS_PER_SEC: i64 = 1000000;
+pub(crate) const USECS_PER_HOUR: i64 = 3_600_000_000;
+pub(crate) const USECS_PER_MINUTE: i64 = 60_000_000;
+pub(crate) const USECS_PER_SEC: i64 = 1_000_000;
 pub(crate) const MINS_PER_HOUR: i64 = 60;
 pub(crate) const SEC_PER_MIN: i64 = 60;
 

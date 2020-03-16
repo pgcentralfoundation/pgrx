@@ -220,6 +220,10 @@ mod internal {
             );
         }
 
+        /// # Safety
+        ///
+        /// This function wraps Postgres' internal `IndexBuildHeapScan` method, and therfore, is
+        /// inherently unsafe
         pub unsafe fn IndexBuildHeapScan<T>(
             heap_relation: crate::Relation,
             index_relation: crate::Relation,
@@ -245,6 +249,10 @@ mod internal {
 
         pub use crate::pg11_specific::tupleDesc as TupleDescData;
 
+        /// # Safety
+        ///
+        /// This function wraps Postgres' internal `IndexBuildHeapScan` method, and therfore, is
+        /// inherently unsafe
         pub unsafe fn IndexBuildHeapScan<T>(
             heap_relation: crate::Relation,
             index_relation: crate::Relation,
@@ -271,6 +279,10 @@ mod internal {
 
         pub use crate::pg12_specific::AllocSetContextCreateInternal as AllocSetContextCreateExtended;
 
+        /// # Safety
+        ///
+        /// This function wraps Postgres' internal `IndexBuildHeapScan` method, and therfore, is
+        /// inherently unsafe
         pub unsafe fn IndexBuildHeapScan<T>(
             heap_relation: crate::Relation,
             index_relation: crate::Relation,

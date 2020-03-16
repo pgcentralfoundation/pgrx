@@ -9,7 +9,7 @@ pub unsafe fn set_varsize(ptr: *mut pg_sys::varlena, len: i32) {
 }
 
 /// ```c
-/// #define VARSIZE_EXTERNAL(PTR)				(VARHDRSZ_EXTERNAL + VARTAG_SIZE(VARTAG_EXTERNAL(PTR)))
+/// #define VARSIZE_EXTERNAL(PTR)                        (VARHDRSZ_EXTERNAL + VARTAG_SIZE(VARTAG_EXTERNAL(PTR)))
 /// ```
 #[inline]
 pub unsafe fn varsize_external(ptr: *const pg_sys::varlena) -> usize {
@@ -17,7 +17,7 @@ pub unsafe fn varsize_external(ptr: *const pg_sys::varlena) -> usize {
 }
 
 /// ```c
-/// #define VARTAG_EXTERNAL(PTR)				VARTAG_1B_E(PTR)
+/// #define VARTAG_EXTERNAL(PTR)                        VARTAG_1B_E(PTR)
 /// ```
 #[inline]
 pub unsafe fn vartag_external(ptr: *const pg_sys::varlena) -> u8 {
@@ -26,7 +26,7 @@ pub unsafe fn vartag_external(ptr: *const pg_sys::varlena) -> u8 {
 
 /// ```c
 /// #define VARTAG_IS_EXPANDED(tag) \
-///	(((tag) & ~1) == VARTAG_EXPANDED_RO)
+///      (((tag) & ~1) == VARTAG_EXPANDED_RO)
 /// ```
 #[inline]
 pub unsafe fn vartag_is_expanded(tag: pg_sys::vartag_external) -> bool {
@@ -35,10 +35,10 @@ pub unsafe fn vartag_is_expanded(tag: pg_sys::vartag_external) -> bool {
 
 /// ```c
 /// #define VARTAG_SIZE(tag) \
-///	((tag) == VARTAG_INDIRECT ? sizeof(varatt_indirect) : \
-///	 VARTAG_IS_EXPANDED(tag) ? sizeof(varatt_expanded) : \
-///	 (tag) == VARTAG_ONDISK ? sizeof(varatt_external) : \
-///	 TrapMacro(true, "unrecognized TOAST vartag"))
+///      ((tag) == VARTAG_INDIRECT ? sizeof(varatt_indirect) : \
+///       VARTAG_IS_EXPANDED(tag) ? sizeof(varatt_expanded) : \
+///       (tag) == VARTAG_ONDISK ? sizeof(varatt_external) : \
+///       TrapMacro(true, "unrecognized TOAST vartag"))
 /// ```
 #[inline]
 pub unsafe fn vartag_size(tag: pg_sys::vartag_external) -> usize {
@@ -153,9 +153,9 @@ pub unsafe fn varatt_not_pad_byte(ptr: *const pg_sys::varlena) -> bool {
 
 /// ```c
 /// #define VARSIZE_ANY(PTR) \
-///	(VARATT_IS_1B_E(PTR) ? VARSIZE_EXTERNAL(PTR) : \
-///	 (VARATT_IS_1B(PTR) ? VARSIZE_1B(PTR) : \
-///	  VARSIZE_4B(PTR)))
+///      (VARATT_IS_1B_E(PTR) ? VARSIZE_EXTERNAL(PTR) : \
+///       (VARATT_IS_1B(PTR) ? VARSIZE_1B(PTR) : \
+///        VARSIZE_4B(PTR)))
 /// ```
 #[inline]
 pub unsafe fn varsize_any(ptr: *const pg_sys::varlena) -> usize {
@@ -171,12 +171,12 @@ pub unsafe fn varsize_any(ptr: *const pg_sys::varlena) -> usize {
 /// ```c
 /// /* Size of a varlena data, excluding header */
 /// #define VARSIZE_ANY_EXHDR(PTR) \
-///	       (VARATT_IS_1B_E(PTR) ? \
+///             (VARATT_IS_1B_E(PTR) ? \
 ///              VARSIZE_EXTERNAL(PTR)-VARHDRSZ_EXTERNAL : \
-///	             ( \
+///                   ( \
 ///                  VARATT_IS_1B(PTR) ? \
 ///                        VARSIZE_1B(PTR)-VARHDRSZ_SHORT : \
-///	                       VARSIZE_4B(PTR)-VARHDRSZ \
+///                             VARSIZE_4B(PTR)-VARHDRSZ \
 ///               ) \
 ///         )
 /// ```
@@ -192,7 +192,7 @@ pub unsafe fn varsize_any_exhdr(ptr: *const pg_sys::varlena) -> usize {
 }
 
 /// ```c
-/// #define VARDATA_1B(PTR)		(((varattrib_1b *) (PTR))->va_data)
+/// #define VARDATA_1B(PTR)            (((varattrib_1b *) (PTR))->va_data)
 /// ```
 #[inline]
 pub unsafe fn vardata_1b(ptr: *const pg_sys::varlena) -> *const std::os::raw::c_char {
@@ -204,7 +204,7 @@ pub unsafe fn vardata_1b(ptr: *const pg_sys::varlena) -> *const std::os::raw::c_
 }
 
 /// ```c
-/// #define VARDATA_4B(PTR)		(((varattrib_4b *) (PTR))->va_4byte.va_data)
+/// #define VARDATA_4B(PTR)            (((varattrib_4b *) (PTR))->va_4byte.va_data)
 /// ```
 #[allow(clippy::cast_ptr_alignment)]
 #[inline]
@@ -217,7 +217,7 @@ pub unsafe fn vardata_4b(ptr: *const pg_sys::varlena) -> *const std::os::raw::c_
 }
 
 /// ```c
-/// #define VARDATA_4B_C(PTR)	(((varattrib_4b *) (PTR))->va_compressed.va_data)
+/// #define VARDATA_4B_C(PTR)      (((varattrib_4b *) (PTR))->va_compressed.va_data)
 /// ```
 #[allow(clippy::cast_ptr_alignment)]
 #[inline]
@@ -230,7 +230,7 @@ pub unsafe fn vardata_4b_c(ptr: *const pg_sys::varlena) -> *const std::os::raw::
 }
 
 /// ```c
-/// #define VARDATA_1B_E(PTR)	(((varattrib_1b_e *) (PTR))->va_data)
+/// #define VARDATA_1B_E(PTR)      (((varattrib_1b_e *) (PTR))->va_data)
 /// ```
 #[allow(clippy::cast_ptr_alignment)]
 #[inline]
@@ -246,7 +246,7 @@ pub unsafe fn vardata_1b_e(ptr: *const pg_sys::varlena) -> *const std::os::raw::
 /// /* caution: this will not work on an external or compressed-in-line Datum */
 /// /* caution: this will return a possibly unaligned pointer */
 /// #define VARDATA_ANY(PTR) \
-///	    (VARATT_IS_1B(PTR) ? VARDATA_1B(PTR) : VARDATA_4B(PTR))
+///          (VARATT_IS_1B(PTR) ? VARDATA_1B(PTR) : VARDATA_4B(PTR))
 /// ```
 #[inline]
 pub unsafe fn vardata_any(ptr: *const pg_sys::varlena) -> *const std::os::raw::c_char {

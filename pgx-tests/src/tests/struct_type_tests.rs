@@ -21,8 +21,8 @@ fn complex_in(input: &std::ffi::CStr) -> PgBox<Complex> {
     let y = get_named_capture(&re, "y", input_as_str).unwrap();
     let mut complex = PgBox::<Complex>::alloc();
 
-    (&mut complex).x = str::parse::<f64>(&x).expect(&format!("{} isn't a f64", x));
-    (&mut complex).y = str::parse::<f64>(&y).expect(&format!("{} isn't a f64", y));
+    complex.x = str::parse::<f64>(&x).unwrap_or_else(|_| panic!("{} isn't a f64", x));
+    complex.y = str::parse::<f64>(&y).unwrap_or_else(|_| panic!("{} isn't a f64", y));
 
     complex
 }

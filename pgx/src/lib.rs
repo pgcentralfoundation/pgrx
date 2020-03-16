@@ -1,3 +1,5 @@
+#![allow(clippy::missing_safety_doc)]
+#![allow(clippy::cast_ptr_alignment)]
 extern crate pgx_macros;
 
 extern crate num_traits;

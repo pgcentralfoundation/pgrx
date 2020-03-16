@@ -31,13 +31,13 @@ pub fn deconstruct_row_type<'a>(
             nulls: *mut *mut bool,
         );
     }
-    let mut columns = 0 as *mut pg_sys::Datum;
-    let mut nulls = 0 as *mut bool;
+    let mut columns = std::ptr::null_mut();
+    let mut nulls = std::ptr::null_mut();
     unsafe {
         pgx_deconstruct_row_type(tupdesc.as_ptr(), row, &mut columns, &mut nulls);
-    }
 
-    Array::over(columns, nulls, tupdesc.len())
+        Array::over(columns, nulls, tupdesc.len())
+    }
 }
 
 /// ## Safety

@@ -30,7 +30,7 @@ impl FromDatum<TimestampWithTimeZone> for TimestampWithTimeZone {
             };
             let mut tz = 0i32;
             let mut fsec = 0 as pg_sys::fsec_t;
-            let mut tzn = 0 as *const std::os::raw::c_char;
+            let mut tzn = std::ptr::null::<std::os::raw::c_char>();
             pg_sys::timestamp2tm(
                 datum as i64,
                 &mut tz,

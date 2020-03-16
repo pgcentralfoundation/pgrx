@@ -63,7 +63,7 @@ fn create_dotcargo_config(path: &PathBuf, _name: &str) -> Result<(), std::io::Er
     filename.push("config");
     let mut file = std::fs::File::create(filename)?;
 
-    file.write_all(&format!(include_str!("templates/cargo_config")).as_bytes())?;
+    file.write_all(include_bytes!("templates/cargo_config"))?;
 
     Ok(())
 }
@@ -86,7 +86,7 @@ fn create_git_ignore(path: &PathBuf, _name: &str) -> Result<(), std::io::Error> 
     filename.push(".gitignore");
     let mut file = std::fs::File::create(filename)?;
 
-    file.write_all(&format!(include_str!("templates/gitignore")).as_bytes())?;
+    file.write_all(include_bytes!("templates/gitignore"))?;
 
     Ok(())
 }

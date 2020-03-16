@@ -339,8 +339,8 @@ impl PgMemoryContexts {
 
     ///
     /// GetMemoryChunkContext
-    ///		Given a currently-allocated chunk, determine the context
-    ///		it belongs to.
+    ///    Given a currently-allocated chunk, determine the context
+    ///         it belongs to.
     ///
     /// All chunks allocated by any memory context manager are required to be
     /// preceded by the corresponding MemoryContext stored, without padding, in the
@@ -361,11 +361,11 @@ impl PgMemoryContexts {
         // bottom of the function
         //
 
-        //        // #define MAXALIGN(LEN)			TYPEALIGN(MAXIMUM_ALIGNOF, (LEN))
+        //        // #define MAXALIGN(LEN)                  TYPEALIGN(MAXIMUM_ALIGNOF, (LEN))
         //        #[inline]
         //        fn max_align(len: void_ptr) -> void_ptr {
         //            // #define TYPEALIGN(ALIGNVAL,LEN)  \
-        //            //	(((uintptr_t) (LEN) + ((ALIGNVAL) - 1)) & ~((uintptr_t) ((ALIGNVAL) - 1)))
+        //            //      (((uintptr_t) (LEN) + ((ALIGNVAL) - 1)) & ~((uintptr_t) ((ALIGNVAL) - 1)))
         //            #[inline]
         //            fn type_align(
         //                alignval: u32,

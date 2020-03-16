@@ -5,9 +5,11 @@ use crate::{pg_sys, PgBox};
 /// This function s unsafe becuase it does not check that the specified ItemPointerData pointer
 /// might be null
 #[inline]
-pub fn item_pointer_get_block_number(ctid: *const pg_sys::ItemPointerData) -> pg_sys::BlockNumber {
+pub unsafe fn item_pointer_get_block_number(
+    ctid: *const pg_sys::ItemPointerData,
+) -> pg_sys::BlockNumber {
     assert!(item_pointer_is_valid(ctid));
-    unsafe { item_pointer_get_block_number_no_check(ctid) }
+    item_pointer_get_block_number_no_check(*ctid)
 }
 
 /// ## Safety
@@ -15,11 +17,11 @@ pub fn item_pointer_get_block_number(ctid: *const pg_sys::ItemPointerData) -> pg
 /// This function s unsafe becuase it does not check that the specified ItemPointerData pointer
 /// might be null
 #[inline]
-pub fn item_pointer_get_offset_number(
+pub unsafe fn item_pointer_get_offset_number(
     ctid: *const pg_sys::ItemPointerData,
 ) -> pg_sys::OffsetNumber {
     assert!(item_pointer_is_valid(ctid));
-    unsafe { item_pointer_get_offset_number_no_check(ctid) }
+    item_pointer_get_offset_number_no_check(*ctid)
 }
 
 /// ## Safety
@@ -28,9 +30,9 @@ pub fn item_pointer_get_offset_number(
 /// might be null
 #[inline]
 pub unsafe fn item_pointer_get_block_number_no_check(
-    ctid: *const pg_sys::ItemPointerData,
+    ctid: pg_sys::ItemPointerData,
 ) -> pg_sys::BlockNumber {
-    let block_id = (*ctid).ip_blkid;
+    let block_id = ctid.ip_blkid;
     (((block_id.bi_hi as u32) << 16) | (block_id.bi_lo as u32)) as pg_sys::BlockNumber
 }
 
@@ -40,19 +42,19 @@ pub unsafe fn item_pointer_get_block_number_no_check(
 /// might be null
 #[inline]
 pub unsafe fn item_pointer_get_offset_number_no_check(
-    ctid: *const pg_sys::ItemPointerData,
+    ctid: pg_sys::ItemPointerData,
 ) -> pg_sys::OffsetNumber {
-    (*ctid).ip_posid
+    ctid.ip_posid
 }
 
 #[inline]
 pub fn item_pointer_get_both(
-    ctid: &pg_sys::ItemPointerData,
+    ctid: pg_sys::ItemPointerData,
 ) -> (pg_sys::BlockNumber, pg_sys::OffsetNumber) {
     unsafe {
         (
-            item_pointer_get_block_number_no_check(ctid as *const pg_sys::ItemPointerData),
-            item_pointer_get_offset_number_no_check(ctid as *const pg_sys::ItemPointerData),
+            item_pointer_get_block_number_no_check(ctid),
+            item_pointer_get_offset_number_no_check(ctid),
         )
     }
 }
@@ -72,8 +74,9 @@ pub fn item_pointer_set_all(
 /// Convert an `ItemPointerData` struct into a `u64`
 #[inline]
 pub fn item_pointer_to_u64(ctid: pg_sys::ItemPointerData) -> u64 {
-    let blockno = unsafe { item_pointer_get_block_number_no_check(&ctid) } as u64;
-    let offno = unsafe { item_pointer_get_offset_number_no_check(&ctid) } as u64;
+    let (blockno, offno) = item_pointer_get_both(ctid);
+    let blockno = blockno as u64;
+    let offno = offno as u64;
 
     (blockno << 32) | offno
 }

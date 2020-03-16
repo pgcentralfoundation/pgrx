@@ -33,8 +33,7 @@ pub fn lookup_enum_by_oid(enumval: pg_sys::Oid) -> (String, pg_sys::Oid, f32) {
         unsafe { std::ffi::CStr::from_ptr(en.enumlabel.data.as_ptr() as *const i8) }
             .to_str()
             .unwrap()
-            .to_string()
-            .to_owned(),
+            .to_string(),
         en.enumtypid,
         en.enumsortorder as f32,
     );
@@ -61,12 +60,12 @@ pub fn lookup_enum_by_label(typname: &str, label: &str) -> pg_sys::Datum {
     }
 
     let tup = unsafe {
+        let label =
+            std::ffi::CString::new(label).expect("failed to convert enum typname to a CString");
         pg_sys::SearchSysCache(
             pg_sys::SysCacheIdentifier_ENUMTYPOIDNAME as i32,
             enumtypoid as pg_sys::Datum,
-            std::ffi::CString::new(label)
-                .expect("failed to convert enum typname to a CString")
-                .as_ptr() as pg_sys::Datum,
+            label.as_ptr() as pg_sys::Datum,
             0,
             0,
         )

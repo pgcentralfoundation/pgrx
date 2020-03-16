@@ -5,6 +5,12 @@ pub struct PgQualifiedNameBuilder {
     list: PgList<pg_sys::Value>,
 }
 
+impl Default for PgQualifiedNameBuilder {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl PgQualifiedNameBuilder {
     pub fn new() -> PgQualifiedNameBuilder {
         PgQualifiedNameBuilder {
@@ -12,7 +18,7 @@ impl PgQualifiedNameBuilder {
         }
     }
 
-    pub fn add(mut self, value: &str) -> PgQualifiedNameBuilder {
+    pub fn push(mut self, value: &str) -> PgQualifiedNameBuilder {
         self.list
             .push(unsafe { pg_sys::makeString(std::ffi::CString::new(value).unwrap().into_raw()) });
         self

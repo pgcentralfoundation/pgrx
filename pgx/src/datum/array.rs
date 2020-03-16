@@ -39,7 +39,16 @@ impl<'a, T: FromDatum<T>> Array<'a, T> {
     /// of "is_null" indicators
     ///
     /// [`T`] can be [pg_sys::Datum] if the elements are not all of the same type
-    pub fn over(elements: *mut pg_sys::Datum, nulls: *mut bool, nelems: usize) -> Array<'a, T> {
+    ///
+    /// # Safety
+    ///
+    /// This function is unsafe as it can't validate the provided pointer are valid or that
+    ///
+    pub unsafe fn over(
+        elements: *mut pg_sys::Datum,
+        nulls: *mut bool,
+        nelems: usize,
+    ) -> Array<'a, T> {
         Array::<T> {
             ptr: std::ptr::null_mut(),
             array_type: std::ptr::null_mut(),
@@ -47,8 +56,8 @@ impl<'a, T: FromDatum<T>> Array<'a, T> {
             nulls,
             typoid: pg_sys::InvalidOid,
             nelems,
-            elem_slice: unsafe { std::slice::from_raw_parts(elements, nelems) },
-            null_slice: unsafe { std::slice::from_raw_parts(nulls, nelems) },
+            elem_slice: std::slice::from_raw_parts(elements, nelems),
+            null_slice: std::slice::from_raw_parts(nulls, nelems),
             _marker: PhantomData,
         }
     }
@@ -129,6 +138,7 @@ impl<'a, T: FromDatum<T>> Array<'a, T> {
         self.nelems == 0
     }
 
+    #[allow(clippy::option_option)]
     #[inline]
     pub fn get(&self, i: usize) -> Option<Option<T>> {
         if i >= self.nelems {

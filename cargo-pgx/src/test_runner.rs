@@ -13,7 +13,7 @@ pub fn test_extension(version: &str) -> Result<(), std::io::Error> {
             .stderr(Stdio::inherit())
             .arg("test")
             .arg("--target-dir")
-            .arg(std::env::var("CARGO_TARGET_DIR").unwrap_or("target".to_string()))
+            .arg(std::env::var("CARGO_TARGET_DIR").unwrap_or_else(|_| "target".to_string()))
             .arg("--all")
             .arg("--features")
             .arg(version)
@@ -21,7 +21,7 @@ pub fn test_extension(version: &str) -> Result<(), std::io::Error> {
             .env("RUST_BACKTRACE", "1")
             .status();
 
-        if !result.is_ok() {
+        if result.is_err() {
             return Err(result.err().unwrap());
         }
     }

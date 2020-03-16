@@ -59,7 +59,7 @@ impl PgGuardRewriter {
 
         let arg_list = PgGuardRewriter::build_arg_list(&func.sig, true);
         let func_name = &func.sig.ident;
-        let func_span = func.span().clone();
+        let func_span = func.span();
         let rewritten_args = self.rewrite_args(func.clone(), is_raw);
         let rewritten_return_type = self.rewrite_return_type(func.clone());
         let func_name_wrapper = Ident::new(
@@ -142,6 +142,8 @@ impl PgGuardRewriter {
     ) -> proc_macro2::TokenStream {
         quote_spanned! {func_span=>
             #prolog
+            #[allow(clippy::missing_safety_doc)]
+            #[allow(clippy::redundant_closure)]
             #vis unsafe fn #func_name_wrapper(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
 
                 #func_call
@@ -194,8 +196,8 @@ impl PgGuardRewriter {
 
                         pgx::srf_return_next(fcinfo, &mut funcctx);
                         match result.into_datum() {
-                            Some(datum) => return datum,
-                            None => return pgx::pg_return_null(fcinfo),
+                            Some(datum) => datum,
+                            None => pgx::pg_return_null(fcinfo),
                         }
                     },
                     None => {
@@ -286,7 +288,7 @@ impl PgGuardRewriter {
 
                         let datum = pgx::heap_tuple_get_datum(heap_tuple);
                         pgx::srf_return_next(fcinfo, &mut funcctx);
-                        return datum as pgx::pg_sys::Datum;
+                        datum as pgx::pg_sys::Datum
                     },
                     None => {
                         // leak the iterator here too, even tho we're done, b/c our MemoryContextCallback
@@ -347,6 +349,8 @@ impl PgGuardRewriter {
         let return_type = PgGuardRewriter::get_return_type(&func.sig);
 
         quote! {
+            #[allow(clippy::missing_safety_doc)]
+            #[allow(clippy::redundant_closure)]
             pub unsafe fn #func_name ( #arg_list_with_types ) #return_type {
                 extern "C" {
                     pub fn #func_name( #arg_list_with_types ) #return_type ;
@@ -361,6 +365,7 @@ impl PgGuardRewriter {
         sig.ident.clone()
     }
 
+    #[allow(clippy::cmp_owned)]
     pub fn build_arg_list(sig: &Signature, suffix_arg_name: bool) -> proc_macro2::TokenStream {
         let mut arg_list = proc_macro2::TokenStream::new();
 
@@ -496,13 +501,10 @@ impl FunctionSignatureRewriter {
 
     fn args(&self, is_raw: bool) -> proc_macro2::TokenStream {
         if self.func.sig.inputs.len() == 1 && self.return_type_is_datum() {
-            match self.func.sig.inputs.first().unwrap() {
-                FnArg::Typed(ty) => {
-                    if type_matches(&ty.ty, "pg_sys :: FunctionCallInfo") {
-                        return proc_macro2::TokenStream::new();
-                    }
+            if let FnArg::Typed(ty) = self.func.sig.inputs.first().unwrap() {
+                if type_matches(&ty.ty, "pg_sys :: FunctionCallInfo") {
+                    return proc_macro2::TokenStream::new();
                 }
-                _ => {}
             }
         }
 
@@ -562,8 +564,8 @@ impl FunctionSignatureRewriter {
     }
 }
 
-fn type_matches(ty: &Box<Type>, pattern: &str) -> bool {
-    match ty.deref() {
+fn type_matches(ty: &Type, pattern: &str) -> bool {
+    match ty {
         Type::Path(path) => {
             let path = format!("{}", quote! {#path});
             path.starts_with(pattern)
@@ -572,8 +574,8 @@ fn type_matches(ty: &Box<Type>, pattern: &str) -> bool {
     }
 }
 
-fn extract_option_type(ty: &Box<Type>) -> proc_macro2::TokenStream {
-    match ty.deref() {
+fn extract_option_type(ty: &Type) -> proc_macro2::TokenStream {
+    match ty {
         Type::Path(path) => {
             let mut stream = proc_macro2::TokenStream::new();
             for segment in &path.path.segments {

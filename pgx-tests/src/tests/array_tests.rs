@@ -45,11 +45,7 @@ fn count_true_sliced(values: Array<bool>) -> i32 {
 
 #[pg_extern]
 fn count_nulls(values: Array<i32>) -> i32 {
-    values
-        .iter()
-        .map(|v| if v.is_none() { true } else { false })
-        .filter(|v| *v)
-        .count() as i32
+    values.iter().map(|v| v.is_none()).filter(|v| *v).count() as i32
 }
 
 #[pg_extern]

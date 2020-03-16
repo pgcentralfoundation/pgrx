@@ -368,8 +368,7 @@ impl Iterator for SpiTupleTable {
         } else {
             self.current += 1;
             assert!(self.current >= 0);
-            let rc = self.nth(self.current as usize);
-            rc
+            self.nth(self.current as usize)
         }
     }
 

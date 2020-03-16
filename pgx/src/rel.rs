@@ -102,7 +102,7 @@ impl PgRelation {
     }
 
     /// RelationGetRelationName
-    ///		Returns the rel's name.
+    ///            Returns the rel's name.
     ///
     /// Note that the name is only unique within the containing namespace.
     pub fn name(&self) -> &str {
@@ -111,14 +111,14 @@ impl PgRelation {
     }
 
     /// RelationGetRelid
-    ///	    Returns the OID of the relation
+    ///          Returns the OID of the relation
     pub fn oid(&self) -> pg_sys::Oid {
         let rel = &self.boxed;
         rel.rd_id
     }
 
     /// RelationGetNamespace
-    ///		Returns the rel's namespace OID.
+    ///            Returns the rel's namespace OID.
     pub fn namespace_oid(&self) -> pg_sys::Oid {
         let rd_rel: PgBox<pg_sys::FormData_pg_class> = PgBox::from_pg(self.boxed.rd_rel);
         rd_rel.relnamespace

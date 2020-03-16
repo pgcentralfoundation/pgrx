@@ -1,7 +1,6 @@
 use proc_macro2::TokenTree;
 use quote::quote;
 use std::collections::HashSet;
-use std::ops::Deref;
 use syn::export::TokenStream2;
 use syn::{GenericArgument, ItemFn, PathArguments, ReturnType, Type, TypeParamBound};
 
@@ -76,8 +75,8 @@ pub fn categorize_return_type(func: &ItemFn) -> CategorizedType {
     }
 }
 
-pub fn categorize_type(ty: &Box<Type>) -> CategorizedType {
-    match ty.deref() {
+pub fn categorize_type(ty: &Type) -> CategorizedType {
+    match ty {
         Type::ImplTrait(ty) => {
             for bound in &ty.bounds {
                 match bound {

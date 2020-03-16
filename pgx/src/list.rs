@@ -6,11 +6,16 @@ pub struct PgList<T> {
     allocated_by_pg: bool,
     _marker: PhantomData<T>,
 }
+impl<T> Default for PgList<T> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 impl<T> PgList<T> {
     pub fn new() -> Self {
         PgList {
-            list: 0 as *mut pg_sys::List, // an empty List is NIL
+            list: std::ptr::null_mut(), // an empty List is NIL
             allocated_by_pg: false,
             _marker: PhantomData,
         }
@@ -40,6 +45,11 @@ impl<T> PgList<T> {
         } else {
             unsafe { self.list.as_ref() }.unwrap().length as usize
         }
+    }
+
+    #[inline]
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
     }
 
     #[inline]

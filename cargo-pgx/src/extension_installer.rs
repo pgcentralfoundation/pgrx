@@ -88,22 +88,21 @@ fn copy_sql_files(extdir: &str, extname: &str) -> Result<(), std::io::Error> {
         let file = PathBuf::from_str(&format!("sql/{}", file)).unwrap();
         let contents = std::fs::read_to_string(&file).unwrap();
 
-        sql.write_all("--\n".as_bytes())
+        sql.write_all(b"--\n")
             .expect("couldn't write version SQL file");
         sql.write_all(format!("-- {}\n", file.display()).as_bytes())
             .expect("couldn't write version SQL file");
-        sql.write_all("--\n".as_bytes())
+        sql.write_all(b"--\n")
             .expect("couldn't write version SQL file");
         sql.write_all(contents.as_bytes())
             .expect("couldn't write version SQL file");
-        sql.write_all("\n\n\n".as_bytes())
+        sql.write_all(b"\n\n\n")
             .expect("couldn't write version SQL file");
     }
 
     // now copy all the version upgrade files too
     for f in std::fs::read_dir("sql/")? {
-        if f.is_ok() {
-            let f = f.unwrap();
+        if let Ok(f) = f {
             let filename = f.file_name().into_string().unwrap();
 
             if filename.starts_with(&format!("{}--", extname)) && filename.ends_with(".sql") {
@@ -131,8 +130,7 @@ fn find_library_file(
     });
 
     for f in std::fs::read_dir(&path)? {
-        if f.is_ok() {
-            let f = f.unwrap();
+        if let Ok(f) = f {
             let filename = f.file_name().into_string().unwrap();
 
             if filename.contains(extname)
@@ -156,7 +154,7 @@ fn get_version() -> String {
 }
 
 fn get_target_dir(is_release: bool, extname: &str) -> PathBuf {
-    let package_name = std::env::var("CARGO_PKG_NAME").unwrap_or(extname.to_string());
+    let package_name = std::env::var("CARGO_PKG_NAME").unwrap_or_else(|_| extname.to_string());
 
     PathBuf::from(std::env::var("CARGO_TARGET_DIR").unwrap_or(format!(
         "/tmp/pgx-installer/{}-{}",
@@ -177,7 +175,7 @@ fn get_extensiondir() -> String {
 }
 
 fn run_pg_config(arg: &str) -> String {
-    let pg_config = std::env::var("PG_CONFIG").unwrap_or("pg_config".to_string());
+    let pg_config = std::env::var("PG_CONFIG").unwrap_or_else(|_| "pg_config".to_string());
     let output = Command::new(pg_config).arg(arg).output();
 
     match output {

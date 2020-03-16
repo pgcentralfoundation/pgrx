@@ -18,7 +18,7 @@ pub use pg12::*;
 
 use crate::{pg_sys, PgBox};
 
-/// #define IsA(nodeptr,_type_)		(nodeTag(nodeptr) == T_##_type_)
+/// #define IsA(nodeptr,_type_)            (nodeTag(nodeptr) == T_##_type_)
 #[allow(clippy::not_unsafe_ptr_arg_deref)] // ok b/c we check that nodeptr isn't null
 #[inline]
 pub fn is_a(nodeptr: *mut pg_sys::Node, tag: pg_sys::NodeTag) -> bool {

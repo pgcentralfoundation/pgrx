@@ -319,7 +319,7 @@ impl<T> DerefMut for PgBox<T> {
 
 impl<T> Drop for Inner<T> {
     fn drop(&mut self) {
-        if !self.allocated_by_pg && !self.ptr.is_none() {
+        if !self.allocated_by_pg && self.ptr.is_some() {
             let ptr = self.ptr.expect("PgBox ptr was null during Drop");
             unsafe {
                 pg_sys::pfree(ptr as void_mut_ptr);

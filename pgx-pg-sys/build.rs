@@ -89,7 +89,7 @@ fn main() -> Result<(), std::io::Error> {
     let shim_dir = make_shim_path(&manifest_dir);
 
     let shim_mutex = Mutex::new(());
-    &vec![
+    vec![
         ("pg10", "REL_10_STABLE", "8810"),
         ("pg11", "REL_11_STABLE", "8811"),
         ("pg12", "REL_12_STABLE", "8812"),
@@ -106,18 +106,20 @@ fn main() -> Result<(), std::io::Error> {
         let config_status = PathBuf::from(format!("{}/config.status", pg_git_path.display()));
         let need_configure_and_make =
             git_clone_postgres(&pg_git_path, pg_git_repo_url, branch_name)
-                .expect(&format!("Unable to git clone {}", pg_git_repo_url));
+                .unwrap_or_else(|e| panic!("Unable to git clone {}: {:?}", pg_git_repo_url, e));
 
         if need_configure_and_make || !config_status.is_file() {
             eprintln!("[{}] cleaning and building", branch_name);
 
             git_clean(&pg_git_path, &branch_name)
-                .expect(&format!("Unable to switch to branch {}", branch_name));
+                .unwrap_or_else(|e| panic!("Unable to switch to branch {}: {:?}", branch_name, e));
 
-            configure_and_make(&pg_git_path, &branch_name, port_no).expect(&format!(
-                "Unable to make clean and configure postgres branch {}",
-                branch_name
-            ));
+            configure_and_make(&pg_git_path, &branch_name, port_no).unwrap_or_else(|e| {
+                panic!(
+                    "Unable to make clean and configure postgres branch {}: {:?}",
+                    branch_name, e
+                )
+            });
         }
 
         build_shim(&shim_dir, &shim_mutex, &pg_git_path, version);
@@ -144,14 +146,17 @@ fn main() -> Result<(), std::io::Error> {
             .derive_partialord(false)
             .layout_tests(false)
             .generate()
-            .expect(&format!("Unable to generate bindings for {}", version));
+            .unwrap_or_else(|e| panic!("Unable to generate bindings for {}: {:?}", version, e));
 
         let bindings = apply_pg_guard(bindings.to_string()).unwrap();
-        std::fs::write(bindings_rs.clone(), bindings).expect(&format!(
-            "Unable to save bindings for {} to {}",
-            version,
-            bindings_rs.display()
-        ));
+        std::fs::write(bindings_rs.clone(), bindings).unwrap_or_else(|e| {
+            panic!(
+                "Unable to save bindings for {} to {}: {:?}",
+                version,
+                bindings_rs.display(),
+                e
+            )
+        });
     });
 
     generate_common_rs(cwd);
@@ -159,12 +164,7 @@ fn main() -> Result<(), std::io::Error> {
     Ok(())
 }
 
-fn build_shim(
-    shim_dir: &PathBuf,
-    shim_mutex: &Mutex<()>,
-    pg_git_path: &PathBuf,
-    version: &str,
-) -> () {
+fn build_shim(shim_dir: &PathBuf, shim_mutex: &Mutex<()>, pg_git_path: &PathBuf, version: &str) {
     // build the shim under a lock b/c this can't be built concurrently
     let _lock = shim_mutex.lock().expect("couldn't obtain shim_mutex");
 
@@ -225,7 +225,7 @@ fn build_shim_for_version(
     Ok(())
 }
 
-fn generate_common_rs(mut working_dir: PathBuf) -> () {
+fn generate_common_rs(mut working_dir: PathBuf) {
     eprintln!("[all branches] Regenerating common.rs and XX_specific.rs files...");
     let cwd = std::env::current_dir().unwrap();
 
@@ -234,7 +234,7 @@ fn generate_common_rs(mut working_dir: PathBuf) -> () {
     let result = bindings_diff::main();
     std::env::set_current_dir(cwd).unwrap();
 
-    if !result.is_ok() {
+    if result.is_err() {
         panic!(result.err().unwrap());
     }
 }
@@ -245,7 +245,7 @@ fn git_clone_postgres(
     branch_name: &str,
 ) -> Result<bool, std::io::Error> {
     if path.exists() {
-        let mut gitdir = path.clone().to_path_buf();
+        let mut gitdir = path.to_path_buf();
         gitdir.push(Path::new(".git/config"));
 
         if gitdir.exists() && gitdir.is_file() {
@@ -631,8 +631,9 @@ pub(crate) mod bindings_diff {
             }
         }
         std::fs::write(filename, stream.to_string())
-            .unwrap_or_else(|_| panic!("Unable to save bindings for {}", filename));
-        rust_fmt(filename).expect(&format!("unable to run rustfmt for {}", filename));
+            .unwrap_or_else(|e| panic!("Unable to save bindings for {}: {:?}", filename, e));
+        rust_fmt(filename)
+            .unwrap_or_else(|e| panic!("unable to run rustfmt for {}: {:?}", filename, e));
     }
 
     fn write_common_file(filename: &str, items: BTreeMap<String, SortableItem>) {
@@ -657,7 +658,8 @@ pub(crate) mod bindings_diff {
             }
         }
         std::fs::write(filename, stream.to_string())
-            .unwrap_or_else(|_| panic!("Unable to save bindings for {}", filename));
-        rust_fmt(filename).expect(&format!("unable to run rustfmt for {}", filename));
+            .unwrap_or_else(|e| panic!("Unable to save bindings for {}: {:?}", filename, e));
+        rust_fmt(filename)
+            .unwrap_or_else(|e| panic!("unable to run rustfmt for {}: {:?}", filename, e));
     }
 }

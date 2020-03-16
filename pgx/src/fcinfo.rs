@@ -216,6 +216,10 @@ pub fn pg_return_void() -> pg_sys::Datum {
 ///
 /// You must suffix the function name with `_wrapper`, as shown in the example below.
 ///
+/// ## Safety
+///
+/// This function is unsafe as the underlying function being called is likely unsafe
+///
 /// ## Examples
 /// ```rust,no_run
 /// use pgx::*;
