@@ -81,6 +81,10 @@ impl IntoDatum<TimestampWithTimeZone> for TimestampWithTimeZone {
             ],
         )
     }
+
+    fn type_oid() -> u32 {
+        pg_sys::TIMESTAMPTZOID
+    }
 }
 
 impl TimestampWithTimeZone {

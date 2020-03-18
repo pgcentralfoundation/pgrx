@@ -51,6 +51,10 @@ impl IntoDatum<Time> for Time {
 
         Some(datum as pg_sys::Datum)
     }
+
+    fn type_oid() -> u32 {
+        pg_sys::TIMEOID
+    }
 }
 
 impl Time {

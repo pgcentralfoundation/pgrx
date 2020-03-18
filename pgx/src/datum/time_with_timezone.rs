@@ -33,6 +33,10 @@ impl IntoDatum<TimeWithTimeZone> for TimeWithTimeZone {
 
         Some(timetz.into_pg() as pg_sys::Datum)
     }
+
+    fn type_oid() -> u32 {
+        pg_sys::TIMETZOID
+    }
 }
 
 impl TimeWithTimeZone {

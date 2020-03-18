@@ -184,6 +184,10 @@ impl IntoDatum<PgRelation> for PgRelation {
     fn into_datum(self) -> Option<pg_sys::Datum> {
         Some(self.oid() as pg_sys::Datum)
     }
+
+    fn type_oid() -> u32 {
+        pg_sys::REGCLASSOID
+    }
 }
 
 impl Deref for PgRelation {

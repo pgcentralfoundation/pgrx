@@ -41,4 +41,8 @@ impl IntoDatum<AnyArray> for AnyArray {
     fn into_datum(self) -> Option<pg_sys::Datum> {
         Some(self.datum)
     }
+
+    fn type_oid() -> u32 {
+        pg_sys::ANYARRAYOID
+    }
 }

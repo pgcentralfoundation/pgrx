@@ -147,4 +147,8 @@ impl IntoDatum<Numeric> for Numeric {
         let cstr = cstring.as_c_str();
         direct_function_call_as_datum(pg_sys::numeric_in, vec![cstr.into_datum()])
     }
+
+    fn type_oid() -> u32 {
+        pg_sys::NUMERICOID
+    }
 }

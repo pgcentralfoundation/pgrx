@@ -20,6 +20,10 @@ impl IntoDatum<time::Date> for Date {
     fn into_datum(self) -> Option<pg_sys::Datum> {
         Some((self.julian_day() as i32 - pg_sys::POSTGRES_EPOCH_JDATE as i32) as pg_sys::Datum)
     }
+
+    fn type_oid() -> u32 {
+        pg_sys::DATEOID
+    }
 }
 
 impl Date {

@@ -80,6 +80,11 @@ fn serde_serialize_array_i32_deny_null(values: Array<i32>) -> Json {
     Json(json! { { "values": values.iter_deny_null() } })
 }
 
+#[pg_extern]
+fn return_text_array() -> Vec<&'static str> {
+    vec!["a", "b", "c", "d"]
+}
+
 #[cfg(any(test, feature = "pg_test"))]
 mod tests {
     #[allow(unused_imports)]
@@ -183,5 +188,12 @@ mod tests {
     fn test_serde_serialize_array_i32_deny_null() {
         Spi::get_one::<Json>("SELECT serde_serialize_array_i32_deny_null(ARRAY[1,2,3,null, 4])")
             .expect("returned json was null");
+    }
+
+    #[pg_test]
+    fn test_return_text_array() {
+        let rc = Spi::get_one::<bool>("SELECT ARRAY['a', 'b', 'c', 'd'] = return_text_array();")
+            .expect("failed to get SPI result");
+        assert!(rc)
     }
 }

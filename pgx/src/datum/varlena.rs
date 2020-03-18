@@ -78,12 +78,20 @@ impl<'a> IntoDatum<OwnedVarlenA<'a>> for OwnedVarlenA<'a> {
     fn into_datum(self) -> Option<pg_sys::Datum> {
         Some(self.detoasted.ptr as pg_sys::Datum)
     }
+
+    fn type_oid() -> u32 {
+        pg_sys::TEXTOID
+    }
 }
 
 impl<'a> IntoDatum<DetoastedVarlenA<'a>> for DetoastedVarlenA<'a> {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
         Some(self.ptr as pg_sys::Datum)
+    }
+
+    fn type_oid() -> u32 {
+        pg_sys::TEXTOID
     }
 }
 

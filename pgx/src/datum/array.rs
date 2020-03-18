@@ -1,4 +1,4 @@
-use crate::{pg_sys, void_mut_ptr, FromDatum};
+use crate::{pg_sys, void_mut_ptr, FromDatum, IntoDatum, PgMemoryContexts};
 use serde::Serializer;
 use std::marker::PhantomData;
 
@@ -339,5 +339,36 @@ impl<T: FromDatum<T>> FromDatum<Vec<Option<T>>> for Vec<Option<T>> {
             }
             Some(v)
         }
+    }
+}
+
+impl<T> IntoDatum<Vec<T>> for Vec<T>
+where
+    T: IntoDatum<T>,
+{
+    fn into_datum(self) -> Option<pg_sys::Datum> {
+        let mut state = std::ptr::null_mut();
+        for s in self {
+            let datum = s.into_datum();
+            let isnull = datum.is_none();
+
+            unsafe {
+                state = pg_sys::accumArrayResult(
+                    state,
+                    datum.unwrap_or(0usize),
+                    isnull,
+                    T::type_oid(),
+                    PgMemoryContexts::CurrentMemoryContext.value(),
+                );
+            }
+        }
+
+        Some(unsafe {
+            pg_sys::makeArrayResult(state, PgMemoryContexts::CurrentMemoryContext.value())
+        })
+    }
+
+    fn type_oid() -> u32 {
+        unsafe { pg_sys::get_array_type(T::type_oid()) }
     }
 }

@@ -43,6 +43,10 @@ impl IntoDatum<Timestamp> for Timestamp {
             ],
         )
     }
+
+    fn type_oid() -> u32 {
+        pg_sys::TIMESTAMPOID
+    }
 }
 impl Timestamp {
     pub fn new(timestamp: time::PrimitiveDateTime) -> Self {

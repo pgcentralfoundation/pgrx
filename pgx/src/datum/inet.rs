@@ -97,6 +97,10 @@ impl IntoDatum<Inet> for Inet {
         let cstr = std::ffi::CString::new(self.0).expect("failed to convert inet into CString");
         direct_function_call_as_datum(pg_sys::inet_in, vec![cstr.as_c_str().into_datum()])
     }
+
+    fn type_oid() -> u32 {
+        pg_sys::INETOID
+    }
 }
 
 impl Into<Inet> for String {

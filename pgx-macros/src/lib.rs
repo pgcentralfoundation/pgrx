@@ -188,6 +188,14 @@ fn impl_postgres_enum(ast: DeriveInput) -> proc_macro2::TokenStream {
                     #into_datum
                 }
             }
+
+            fn type_oid() -> pg_sys::Oid {
+                unsafe {
+                    pgx::direct_function_call::<pgx::pg_sys::Oid>(pgx::pg_sys::regtypein, vec![#enum_name.into_datum()])
+                        .expect("failed to lookup typeoid")
+                }
+            }
+
         }
     });
 
@@ -203,6 +211,7 @@ pub fn postgres_type(input: TokenStream) -> TokenStream {
 
 fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
     let name = &ast.ident;
+    let name_string = format!("{}", name);
     let funcname_in = Ident::new(&format!("{}_in", name).to_lowercase(), name.span());
     let funcname_out = Ident::new(&format!("{}_out", name).to_lowercase(), name.span());
     let mut args = parse_postgres_type_args(&ast.attrs);
@@ -245,6 +254,13 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
             #[inline]
             fn into_datum(self) -> Option<pgx::pg_sys::Datum> {
                 Some(pgx::to_varlena(&self).expect(&format!("failed to serialize a {}", stringify!(#name))) as pgx::pg_sys::Datum)
+            }
+
+            fn type_oid() -> pg_sys::Oid {
+                unsafe {
+                    pgx::direct_function_call::<pgx::pg_sys::Oid>(pgx::pg_sys::regtypein, vec![#name_string.into_datum()])
+                        .expect("failed to lookup typeoid")
+                }
             }
         }
 

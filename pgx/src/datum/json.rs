@@ -1,6 +1,6 @@
 use crate::{
-    direct_function_call, direct_function_call_as_datum, pg_sys, rust_str_to_text_p, vardata_any,
-    varsize_any_exhdr, void_mut_ptr, DetoastedVarlenA, FromDatum, IntoDatum,
+    direct_function_call, direct_function_call_as_datum, pg_sys, vardata_any, varsize_any_exhdr,
+    void_mut_ptr, DetoastedVarlenA, FromDatum, IntoDatum,
 };
 use serde::{Serialize, Serializer};
 use serde_json::Value;
@@ -94,7 +94,11 @@ impl FromDatum<JsonString> for JsonString {
 impl IntoDatum<Json> for Json {
     fn into_datum(self) -> Option<pg_sys::Datum> {
         let string = serde_json::to_string(&self.0).expect("failed to serialize Json value");
-        rust_str_to_text_p(string.as_str()).into_datum()
+        string.into_datum()
+    }
+
+    fn type_oid() -> u32 {
+        pg_sys::JSONOID
     }
 }
 
@@ -110,12 +114,20 @@ impl IntoDatum<JsonB> for JsonB {
             vec![Some(cstring.as_ptr() as pg_sys::Datum)],
         )
     }
+
+    fn type_oid() -> u32 {
+        pg_sys::JSONBOID
+    }
 }
 
 /// for jsonstring
 impl IntoDatum<JsonString> for JsonString {
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        rust_str_to_text_p(self.0.as_str()).into_datum()
+        self.0.as_str().into_datum()
+    }
+
+    fn type_oid() -> u32 {
+        pg_sys::JSONOID
     }
 }
 
