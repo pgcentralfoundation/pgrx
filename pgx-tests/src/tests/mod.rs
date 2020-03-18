@@ -6,6 +6,7 @@ mod enum_type_tests;
 mod fcinfo_tests;
 mod guc_tests;
 mod hooks_tests;
+mod inet_tests;
 mod json_tests;
 mod log_tests;
 mod node_tests;

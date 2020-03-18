@@ -631,6 +631,7 @@ fn translate_type_string(
         )),
         "PgRelation" => Some(("regclass".to_string(), false, default_value, variadic)),
         "Numeric" => Some(("numeric".to_string(), false, default_value, variadic)),
+        "Inet" => Some(("inet".to_string(), false, default_value, variadic)),
         "& str" | "& 'static str" | "&'static str" | "String" => {
             Some(("text".to_string(), false, default_value, variadic))
         }

@@ -19,3 +19,4 @@ tests_hooks_tests.generated.sql
 tests_pg_try_tests.generated.sql
 tests_srf_tests.generated.sql
 tests_numeric_tests.generated.sql
+tests_inet_tests.generated.sql
