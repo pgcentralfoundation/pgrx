@@ -136,9 +136,9 @@ fn main() -> Result<(), std::io::Error> {
             .parse_callbacks(Box::new(IgnoredMacros::default()))
             .blacklist_function("varsize_any") // pgx converts the VARSIZE_ANY macro, so we don't want to also have this function, which is in heaptuple.c
             .rustfmt_bindings(true)
-            .derive_debug(false)
+            .derive_debug(true)
             .derive_copy(true) // necessary to avoid __BindgenUnionField usages -- I don't understand why?
-            .derive_default(false)
+            .derive_default(true)
             .derive_eq(false)
             .derive_partialeq(false)
             .derive_hash(false)

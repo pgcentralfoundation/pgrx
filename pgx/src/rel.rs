@@ -158,6 +158,18 @@ impl PgRelation {
     pub fn tuple_desc(&self) -> PgTupleDesc {
         PgTupleDesc::from_relation(&self)
     }
+
+    pub fn reltuples(&self) -> Option<f32> {
+        let reltuples = unsafe { self.boxed.rd_rel.as_ref() }
+            .expect("rd_rel is NULL")
+            .reltuples;
+
+        if reltuples == 0f32 {
+            None
+        } else {
+            Some(reltuples)
+        }
+    }
 }
 
 impl Clone for PgRelation {

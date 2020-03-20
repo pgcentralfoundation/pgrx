@@ -1,13 +1,21 @@
 #include "postgres.h"
-#include "access/htup.h"
-#include "access/htup_details.h"
-#include "utils/memutils.h"
-#include "catalog/pg_type.h"
-#include "utils/builtins.h"
 
 #define IS_PG_10 (PG_VERSION_NUM >= 100000 && PG_VERSION_NUM < 110000)
 #define IS_PG_11 (PG_VERSION_NUM >= 110000 && PG_VERSION_NUM < 120000)
 #define IS_PG_12 (PG_VERSION_NUM >= 120000 && PG_VERSION_NUM < 130000)
+
+#include "access/htup.h"
+#include "access/htup_details.h"
+#include "catalog/pg_type.h"
+#if IS_PG_10 || IS_PG_11
+#include "nodes/relation.h"
+#else
+#include "nodes/pathnodes.h"
+#endif
+#include "parser/parsetree.h"
+#include "utils/memutils.h"
+#include "utils/builtins.h"
+
 
 PGDLLEXPORT MemoryContext pgx_GetMemoryContextChunk(void *ptr);
 MemoryContext pgx_GetMemoryContextChunk(void *ptr) {
@@ -56,6 +64,10 @@ bool pgx_HeapTupleHeaderIsHeapOnly(HeapTupleHeader htup_header) {
     return HeapTupleHeaderIsHeapOnly(htup_header);
 }
 
+PGDLLEXPORT RangeTblEntry *pgx_planner_rt_fetch(Index index, PlannerInfo *plannerInfo);
+RangeTblEntry *pgx_planner_rt_fetch(Index index, PlannerInfo *root) {
+    planner_rt_fetch(index, root);
+}
 
 #if IS_PG_10 || IS_PG_11
 PGDLLEXPORT Oid pgx_HeapTupleHeaderGetOid(HeapTupleHeader htup_header);

@@ -52,5 +52,6 @@
 #include "utils/palloc.h"
 #include "utils/rel.h"
 #include "utils/relcache.h"
+#include "utils/selfuncs.h"
 #include "utils/snapmgr.h"
 #include "utils/typcache.h"

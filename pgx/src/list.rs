@@ -1,4 +1,4 @@
-use crate::{pg_sys, void_mut_ptr};
+use crate::{is_a, pg_sys, void_mut_ptr};
 use serde::export::PhantomData;
 
 pub struct PgList<T> {
@@ -89,11 +89,40 @@ impl<T> PgList<T> {
     }
 
     #[inline]
-    pub fn get(&self, i: usize) -> Option<*mut T> {
+    pub fn get_ptr(&self, i: usize) -> Option<*mut T> {
+        if !is_a(self.list as *mut pg_sys::Node, pg_sys::NodeTag_T_List) {
+            panic!("PgList does not contain pointers")
+        }
         if self.list.is_null() || i >= self.len() {
             None
         } else {
             Some(unsafe { pg_sys::list_nth(self.list, i as i32) } as *mut T)
+        }
+    }
+
+    #[inline]
+    pub fn get_int(&self, i: usize) -> Option<i32> {
+        if !is_a(self.list as *mut pg_sys::Node, pg_sys::NodeTag_T_IntList) {
+            panic!("PgList does not contain pointers")
+        }
+
+        if self.list.is_null() || i >= self.len() {
+            None
+        } else {
+            Some(unsafe { pg_sys::list_nth_int(self.list, i as i32) })
+        }
+    }
+
+    #[inline]
+    pub fn get_oid(&self, i: usize) -> Option<pg_sys::Oid> {
+        if !is_a(self.list as *mut pg_sys::Node, pg_sys::NodeTag_T_OidList) {
+            panic!("PgList does not contain pointers")
+        }
+
+        if self.list.is_null() || i >= self.len() {
+            None
+        } else {
+            Some(unsafe { pg_sys::list_nth_oid(self.list, i as i32) })
         }
     }
 

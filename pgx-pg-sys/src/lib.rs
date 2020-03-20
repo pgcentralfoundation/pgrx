@@ -82,6 +82,29 @@ mod all_versions {
         xid >= FirstNormalTransactionId
     }
 
+    /// ```c
+    ///     #define type_is_array(typid)  (get_element_type(typid) != InvalidOid)
+    /// ```
+    #[inline]
+    pub unsafe fn type_is_array(typoid: super::Oid) -> bool {
+        super::get_element_type(typoid) != InvalidOid
+    }
+
+    #[inline]
+    pub unsafe fn planner_rt_fetch(
+        index: super::Index,
+        root: *mut super::PlannerInfo,
+    ) -> *mut super::RangeTblEntry {
+        extern "C" {
+            pub fn pgx_planner_rt_fetch(
+                index: super::Index,
+                root: *mut super::PlannerInfo,
+            ) -> *mut super::RangeTblEntry;
+        }
+
+        pgx_planner_rt_fetch(index, root)
+    }
+
     #[inline]
     pub fn HeapTupleHeaderGetXmin(
         htup_header: super::HeapTupleHeader,
