@@ -37,6 +37,7 @@
 #include "nodes/replnodes.h"
 #include "nodes/tidbitmap.h"
 #include "nodes/value.h"
+#include "optimizer/cost.h"
 #include "optimizer/clauses.h"
 #include "optimizer/paths.h"
 #include "optimizer/pathnode.h"
