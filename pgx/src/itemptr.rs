@@ -89,6 +89,13 @@ pub fn u64_to_item_pointer(value: u64, tid: &mut pg_sys::ItemPointerData) {
     item_pointer_set_all(tid, blockno, offno);
 }
 
+#[inline]
+pub fn u64_to_item_pointer_parts(value: u64) -> (pg_sys::BlockNumber, pg_sys::OffsetNumber) {
+    let blockno = (value >> 32) as pg_sys::BlockNumber;
+    let offno = value as pg_sys::OffsetNumber;
+    (blockno, offno)
+}
+
 #[allow(clippy::not_unsafe_ptr_arg_deref)] // this is okay b/c we guard against ctid being null
 #[inline]
 pub fn item_pointer_is_valid(ctid: *const pg_sys::ItemPointerData) -> bool {

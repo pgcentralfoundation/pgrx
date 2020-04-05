@@ -32,6 +32,9 @@ pub use internal::*;
 
 /// item declarations we want to add to all versions
 mod all_versions {
+    use crate as pg_sys;
+    use pgx_macros::*;
+
     use memoffset::*;
     use std::str::FromStr;
 
@@ -105,6 +108,18 @@ mod all_versions {
         pgx_planner_rt_fetch(index, root)
     }
 
+    /// ```c
+    /// #define rt_fetch(rangetable_index, rangetable) \
+    ///     ((RangeTblEntry *) list_nth(rangetable, (rangetable_index)-1))
+    /// ```
+    #[inline]
+    pub fn rt_fetch(
+        index: super::Index,
+        range_table: *mut super::List,
+    ) -> *mut super::RangeTblEntry {
+        unsafe { super::list_nth(range_table, index as i32 - 1) as *mut super::RangeTblEntry }
+    }
+
     #[inline]
     pub fn HeapTupleHeaderGetXmin(
         htup_header: super::HeapTupleHeader,
@@ -150,6 +165,29 @@ mod all_versions {
         } else {
             unsafe { pgx_HeapTupleHeaderIsHeapOnly(htup_header) }
         }
+    }
+
+    #[pg_guard]
+    extern "C" {
+        pub fn query_tree_walker(
+            query: *mut super::Query,
+            walker: ::std::option::Option<
+                unsafe extern "C" fn(*mut super::Node, *mut ::std::os::raw::c_void) -> bool,
+            >,
+            context: *mut ::std::os::raw::c_void,
+            flags: ::std::os::raw::c_int,
+        ) -> bool;
+    }
+
+    #[pg_guard]
+    extern "C" {
+        pub fn expression_tree_walker(
+            node: *mut super::Node,
+            walker: ::std::option::Option<
+                unsafe extern "C" fn(*mut super::Node, *mut ::std::os::raw::c_void) -> bool,
+            >,
+            context: *mut ::std::os::raw::c_void,
+        ) -> bool;
     }
 }
 

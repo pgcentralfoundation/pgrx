@@ -135,6 +135,8 @@ fn main() -> Result<(), std::io::Error> {
             .clang_arg(&format!("-I{}", include_path.display()))
             .parse_callbacks(Box::new(IgnoredMacros::default()))
             .blacklist_function("varsize_any") // pgx converts the VARSIZE_ANY macro, so we don't want to also have this function, which is in heaptuple.c
+            .blacklist_function("query_tree_walker")
+            .blacklist_function("expression_tree_walker")
             .rustfmt_bindings(true)
             .derive_debug(true)
             .derive_copy(true) // necessary to avoid __BindgenUnionField usages -- I don't understand why?
