@@ -35,6 +35,7 @@
 #include "nodes/value.h"
 #include "optimizer/cost.h"
 #include "optimizer/clauses.h"
+#include "optimizer/optimizer.h"
 #include "optimizer/paths.h"
 #include "optimizer/pathnode.h"
 #include "optimizer/planner.h"

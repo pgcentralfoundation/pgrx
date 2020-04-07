@@ -340,6 +340,8 @@ mod internal {
 
         pub use crate::pg12_specific::AllocSetContextCreateInternal as AllocSetContextCreateExtended;
 
+        pub const QTW_EXAMINE_RTES: u32 = crate::pg12_specific::QTW_EXAMINE_RTES_BEFORE;
+
         /// # Safety
         ///
         /// This function wraps Postgres' internal `IndexBuildHeapScan` method, and therfore, is
