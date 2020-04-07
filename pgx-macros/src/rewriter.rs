@@ -119,8 +119,22 @@ impl PgGuardRewriter {
                     vis,
                     func_name_wrapper,
                     func_call,
+                    false,
                 )
             }
+
+            CategorizedType::OptionalIterator(types) if types.len() == 1 => {
+                PgGuardRewriter::impl_setof_srf(
+                    types,
+                    func_span,
+                    prolog,
+                    vis,
+                    func_name_wrapper,
+                    func_call,
+                    true,
+                )
+            }
+
             CategorizedType::Iterator(types) => PgGuardRewriter::impl_table_srf(
                 types,
                 func_span,
@@ -128,6 +142,17 @@ impl PgGuardRewriter {
                 vis,
                 func_name_wrapper,
                 func_call,
+                false,
+            ),
+
+            CategorizedType::OptionalIterator(types) => PgGuardRewriter::impl_table_srf(
+                types,
+                func_span,
+                prolog,
+                vis,
+                func_name_wrapper,
+                func_call,
+                true,
             ),
         }
     }
@@ -160,8 +185,25 @@ impl PgGuardRewriter {
         vis: Visibility,
         func_name_wrapper: Ident,
         func_call: proc_macro2::TokenStream,
+        optional: bool,
     ) -> proc_macro2::TokenStream {
         let generic_type = proc_macro2::TokenStream::from_str(types.first().unwrap()).unwrap();
+
+        let result_handler = if optional {
+            quote! {
+                let result = match pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).switch_to(|| { #func_call result }) {
+                    Some(result) => result,
+                    None => {
+                        pgx::srf_return_done(fcinfo, &mut funcctx);
+                        return pgx::pg_return_null(fcinfo)
+                    }
+                };
+            }
+        } else {
+            quote! {
+                let result = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).switch_to(|| { #func_call result });
+            }
+        };
 
         quote_spanned! {func_span=>
             #prolog
@@ -180,7 +222,8 @@ impl PgGuardRewriter {
 
                     iterator_holder = pgx::PgBox::from_pg(funcctx.user_fctx as *mut IteratorHolder<#generic_type>);
 
-                    let result = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).switch_to(|| { #func_call result });
+                    #result_handler
+
                     iterator_holder.iter = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).leak_and_drop_on_delete(result);
                 }
 
@@ -220,6 +263,7 @@ impl PgGuardRewriter {
         vis: Visibility,
         func_name_wrapper: Ident,
         func_call: proc_macro2::TokenStream,
+        optional: bool,
     ) -> proc_macro2::TokenStream {
         let numtypes = types.len();
         let i = (0..numtypes).map(syn::Index::from);
@@ -242,6 +286,23 @@ impl PgGuardRewriter {
 
         let composite_type = format!("({})", types.join(","));
         let generic_type = proc_macro2::TokenStream::from_str(&composite_type).unwrap();
+
+        let result_handler = if optional {
+            quote! {
+                let result = match pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).switch_to(|| { #func_call result }) {
+                    Some(result) => result,
+                    None => {
+                        pgx::srf_return_done(fcinfo, &mut funcctx);
+                        return pgx::pg_return_null(fcinfo)
+                    }
+                };
+            }
+        } else {
+            quote! {
+                let result = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).switch_to(|| { #func_call result });
+            }
+        };
+
         quote_spanned! {func_span=>
             #prolog
             #vis fn #func_name_wrapper(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
@@ -270,7 +331,8 @@ impl PgGuardRewriter {
                     });
                     iterator_holder = pgx::PgBox::from_pg(funcctx.user_fctx as *mut IteratorHolder<#generic_type>);
 
-                    let result = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).switch_to(|| { #func_call result });
+                    #result_handler
+
                     iterator_holder.iter = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).leak_and_drop_on_delete(result);
                 }
 

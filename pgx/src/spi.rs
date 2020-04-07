@@ -282,6 +282,15 @@ impl SpiTupleTable {
         self
     }
 
+    /// How many rows were processed?
+    pub fn len(&self) -> usize {
+        self.size
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
+
     pub fn get_one<A: FromDatum<A>>(&self) -> Option<A> {
         self.get_datum(1)
     }

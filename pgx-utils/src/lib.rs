@@ -21,6 +21,7 @@ pub enum ExternArgs {
 #[derive(Debug)]
 pub enum CategorizedType {
     Iterator(Vec<String>),
+    OptionalIterator(Vec<String>),
     Default,
 }
 
@@ -77,6 +78,36 @@ pub fn categorize_return_type(func: &ItemFn) -> CategorizedType {
 
 pub fn categorize_type(ty: &Type) -> CategorizedType {
     match ty {
+        Type::Path(ty) => {
+            let segments = &ty.path.segments;
+            for segment in segments {
+                if segment.ident.to_string() == "Option" {
+                    match &segment.arguments {
+                        PathArguments::AngleBracketed(a) => match a.args.first().unwrap() {
+                            GenericArgument::Type(ty) => {
+                                let result = categorize_type(ty);
+
+                                return match result {
+                                    CategorizedType::Iterator(i) => {
+                                        CategorizedType::OptionalIterator(i)
+                                    }
+
+                                    _ => result,
+                                };
+                            }
+                            _ => {
+                                break;
+                            }
+                        },
+                        _ => {
+                            break;
+                        }
+                    }
+                }
+            }
+            CategorizedType::Default
+        }
+
         Type::ImplTrait(ty) => {
             for bound in &ty.bounds {
                 match bound {
@@ -114,7 +145,7 @@ pub fn categorize_type(ty: &Type) -> CategorizedType {
                                                 match ty {
                                                     Type::Tuple(tuple) => {
                                                         for e in &tuple.elems {
-                                                            types.push(quote!{#e}.to_string());
+                                                            types.push(quote! {#e}.to_string());
                                                         }
                                                     },
                                                     _ => {

@@ -537,10 +537,18 @@ fn translate_type(filename: &DirEntry, ty: &Type) -> Option<(String, bool, Optio
     let mut variadic = false;
 
     match ty.deref() {
-        Type::Path(path) => {
-            rust_type = format!("{}", quote! {#path});
-            span = path.span();
-        }
+        Type::Path(path) => match categorize_type(ty) {
+            CategorizedType::OptionalIterator(types) => {
+                rust_type = "Iterator".to_string();
+                span = path.span();
+                subtype = Some(types);
+            }
+            CategorizedType::Default => {
+                rust_type = format!("{}", quote! {#path});
+                span = path.span();
+            }
+            _ => panic!("found unexpected path type: {:?}", ty),
+        },
         Type::Reference(tref) => {
             let elem = &tref.elem;
             rust_type = format!("{}", quote! {&#elem});
@@ -562,6 +570,11 @@ fn translate_type(filename: &DirEntry, ty: &Type) -> Option<(String, bool, Optio
         Type::ImplTrait(tr) => match categorize_type(ty) {
             CategorizedType::Default => panic!("{:?} isn't an 'impl Trait' type", tr),
             CategorizedType::Iterator(types) => {
+                rust_type = "Iterator".to_string();
+                span = tr.span();
+                subtype = Some(types);
+            }
+            CategorizedType::OptionalIterator(types) => {
                 rust_type = "Iterator".to_string();
                 span = tr.span();
                 subtype = Some(types);

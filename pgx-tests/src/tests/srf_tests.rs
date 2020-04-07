@@ -18,6 +18,46 @@ fn example_composite_set(
         .map(|(idx, value)| ((idx + 1) as i32, value))
 }
 
+#[pg_extern]
+fn return_some_iterator(
+) -> Option<impl std::iter::Iterator<Item = (name!(idx, i32), name!(some_value, &'static str))>> {
+    Some(
+        vec!["a", "b", "c"]
+            .into_iter()
+            .enumerate()
+            .map(|(idx, value)| ((idx + 1) as i32, value)),
+    )
+}
+
+#[pg_extern]
+fn return_none_iterator(
+) -> Option<impl std::iter::Iterator<Item = (name!(idx, i32), name!(some_value, &'static str))>> {
+    if true {
+        None
+    } else {
+        Some(
+            vec!["a", "b", "c"]
+                .into_iter()
+                .enumerate()
+                .map(|(idx, value)| ((idx + 1) as i32, value)),
+        )
+    }
+}
+
+#[pg_extern]
+fn return_some_setof_iterator() -> Option<impl std::iter::Iterator<Item = i32>> {
+    Some(vec![1, 2, 3].into_iter())
+}
+
+#[pg_extern]
+fn return_none_setof_iterator() -> Option<impl std::iter::Iterator<Item = i32>> {
+    if true {
+        None
+    } else {
+        Some(vec![1, 2, 3].into_iter())
+    }
+}
+
 #[cfg(any(test, feature = "pg_test"))]
 mod tests {
     #[allow(unused_imports)]
@@ -70,5 +110,49 @@ mod tests {
         });
 
         assert_eq!(cnt.unwrap(), 3)
+    }
+
+    #[pg_test]
+    fn test_return_some_iterator() {
+        let cnt = Spi::connect(|client| {
+            let table = client.select("SELECT * from return_some_iterator();", None, None);
+
+            Ok(Some(table.len() as i64))
+        });
+
+        assert_eq!(cnt, Some(3))
+    }
+
+    #[pg_test]
+    fn test_return_none_iterator() {
+        let cnt = Spi::connect(|client| {
+            let table = client.select("SELECT * from return_none_iterator();", None, None);
+
+            Ok(Some(table.len() as i64))
+        });
+
+        assert_eq!(cnt, Some(0))
+    }
+
+    #[pg_test]
+    fn test_return_some_setof_iterator() {
+        let cnt = Spi::connect(|client| {
+            let table = client.select("SELECT * from return_some_setof_iterator();", None, None);
+
+            Ok(Some(table.len() as i64))
+        });
+
+        assert_eq!(cnt, Some(3))
+    }
+
+    #[pg_test]
+    fn test_return_none_setof_iterator() {
+        let cnt = Spi::connect(|client| {
+            let table = client.select("SELECT * from return_none_setof_iterator();", None, None);
+
+            Ok(Some(table.len() as i64))
+        });
+
+        assert_eq!(cnt, Some(0))
     }
 }
