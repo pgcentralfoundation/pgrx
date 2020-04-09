@@ -27,6 +27,21 @@ impl PgRelation {
         }
     }
 
+    /// Wrap a Postgres-provided `pg_sys::Relation`.
+    ///
+    /// The provided `Relation` will be closed via `pg_sys::RelationClose` when this instance is dropped
+    ///
+    /// ## Safety
+    ///
+    /// This method is unsafe as we cannot ensure that this relation will later be closed by Postgres
+    pub unsafe fn from_pg_owned(ptr: pg_sys::Relation) -> Self {
+        PgRelation {
+            boxed: PgBox::from_pg(ptr),
+            need_close: true,
+            lockmode: None,
+        }
+    }
+
     /// Given a relation oid, use `pg_sys::RelationIdGetRelation()` to open the relation
     ///
     /// If the specified relation oid was recently deleted, this function will panic.
