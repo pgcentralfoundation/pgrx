@@ -19,7 +19,7 @@ rayon = "1.2.1"
 build-deps = "0.1.4"
 
 [features]
-default = []
+default = ["pg12"]
 pg10 = []
 pg11 = []
 pg12 = []

@@ -8,14 +8,14 @@ edition = "2018"
 crate-type = ["rlib"]
 
 [features]
-default = []
+default = ["pg12"]
 pg10 = ["pgx-pg-sys/pg10"]
 pg11 = ["pgx-pg-sys/pg11"]
 pg12 = ["pgx-pg-sys/pg12"]
 
 [dependencies]
-pgx-macros = { path = "../pgx-macros/" }
-pgx-pg-sys = { path = "../pgx-pg-sys" }
+pgx-macros = { path = "../pgx-macros/", defaut-features = false }
+pgx-pg-sys = { path = "../pgx-pg-sys", defaut-features = false }
 time = "0.2.7"
 enum-primitive-derive = "0.1.2"
 lazy_static = "1.4.0"
