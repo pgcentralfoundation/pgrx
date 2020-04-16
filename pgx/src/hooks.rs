@@ -78,6 +78,37 @@ pub trait PgHooks {
         prev_hook(range_table, ereport_on_violation)
     }
 
+    /// Hook for plugins to get control in `ProcessUtility()`
+    fn process_utility_hook(
+        &mut self,
+        pstmt: PgBox<pg_sys::PlannedStmt>,
+        query_string: &std::ffi::CStr,
+        context: pg_sys::ProcessUtilityContext,
+        params: PgBox<pg_sys::ParamListInfoData>,
+        query_env: PgBox<pg_sys::QueryEnvironment>,
+        dest: PgBox<pg_sys::DestReceiver>,
+        completion_tag: *mut ::std::os::raw::c_char,
+        prev_hook: fn(
+            pstmt: PgBox<pg_sys::PlannedStmt>,
+            query_string: &std::ffi::CStr,
+            context: pg_sys::ProcessUtilityContext,
+            params: PgBox<pg_sys::ParamListInfoData>,
+            query_env: PgBox<pg_sys::QueryEnvironment>,
+            dest: PgBox<pg_sys::DestReceiver>,
+            completion_tag: *mut ::std::os::raw::c_char,
+        ) -> HookResult<()>,
+    ) -> HookResult<()> {
+        prev_hook(
+            pstmt,
+            query_string,
+            context,
+            params,
+            query_env,
+            dest,
+            completion_tag,
+        )
+    }
+
     /// Hook for plugins to get control of the planner
     fn planner(
         &mut self,
@@ -107,6 +138,7 @@ struct Hooks {
     prev_executor_finish_hook: pg_sys::ExecutorFinish_hook_type,
     prev_executor_end_hook: pg_sys::ExecutorEnd_hook_type,
     prev_executor_check_perms_hook: pg_sys::ExecutorCheckPerms_hook_type,
+    prev_process_utility_hook: pg_sys::ProcessUtility_hook_type,
     prev_planner_hook: pg_sys::planner_hook_type,
 }
 
@@ -134,6 +166,9 @@ pub unsafe fn register_hook(hook: &'static mut (dyn PgHooks)) {
         prev_executor_check_perms_hook: pg_sys::ExecutorCheckPerms_hook
             .replace(pgx_executor_check_perms)
             .or(Some(pgx_standard_executor_check_perms_wrapper)),
+        prev_process_utility_hook: pg_sys::ProcessUtility_hook
+            .replace(pgx_process_utility)
+            .or(Some(pgx_standard_process_utility_wrapper)),
         prev_planner_hook: pg_sys::planner_hook
             .replace(pgx_planner)
             .or(Some(pgx_standard_planner_wrapper)),
@@ -262,6 +297,57 @@ unsafe extern "C" fn pgx_executor_check_perms(
 }
 
 #[pg_guard]
+unsafe extern "C" fn pgx_process_utility(
+    pstmt: *mut pg_sys::PlannedStmt,
+    query_string: *const ::std::os::raw::c_char,
+    context: pg_sys::ProcessUtilityContext,
+    params: pg_sys::ParamListInfo,
+    query_env: *mut pg_sys::QueryEnvironment,
+    dest: *mut pg_sys::DestReceiver,
+    completion_tag: *mut ::std::os::raw::c_char,
+) {
+    fn prev(
+        pstmt: PgBox<pg_sys::PlannedStmt>,
+        query_string: &std::ffi::CStr,
+        context: pg_sys::ProcessUtilityContext,
+        params: PgBox<pg_sys::ParamListInfoData>,
+        query_env: PgBox<pg_sys::QueryEnvironment>,
+        dest: PgBox<pg_sys::DestReceiver>,
+        completion_tag: *mut ::std::os::raw::c_char,
+    ) -> HookResult<()> {
+        HookResult::new(unsafe {
+            (HOOKS
+                .as_mut()
+                .unwrap()
+                .prev_process_utility_hook
+                .as_ref()
+                .unwrap())(
+                pstmt.into_pg(),
+                query_string.as_ptr(),
+                context,
+                params.into_pg(),
+                query_env.into_pg(),
+                dest.into_pg(),
+                completion_tag,
+            )
+        })
+    }
+
+    let hook = &mut HOOKS.as_mut().unwrap().current_hook;
+    hook.process_utility_hook(
+        PgBox::from_pg(pstmt),
+        std::ffi::CStr::from_ptr(query_string),
+        context,
+        PgBox::from_pg(params),
+        PgBox::from_pg(query_env),
+        PgBox::from_pg(dest),
+        completion_tag,
+        prev,
+    )
+    .inner
+}
+
+#[pg_guard]
 unsafe extern "C" fn pgx_planner(
     parse: *mut pg_sys::Query,
     cursor_options: i32,
@@ -324,6 +410,27 @@ unsafe extern "C" fn pgx_standard_executor_check_perms_wrapper(
     _ereport_on_violation: bool,
 ) -> bool {
     true
+}
+
+#[pg_guard]
+unsafe extern "C" fn pgx_standard_process_utility_wrapper(
+    pstmt: *mut pg_sys::PlannedStmt,
+    query_string: *const ::std::os::raw::c_char,
+    context: pg_sys::ProcessUtilityContext,
+    params: pg_sys::ParamListInfo,
+    query_env: *mut pg_sys::QueryEnvironment,
+    dest: *mut pg_sys::DestReceiver,
+    completion_tag: *mut ::std::os::raw::c_char,
+) {
+    pg_sys::standard_ProcessUtility(
+        pstmt,
+        query_string,
+        context,
+        params,
+        query_env,
+        dest,
+        completion_tag,
+    )
 }
 
 #[pg_guard]

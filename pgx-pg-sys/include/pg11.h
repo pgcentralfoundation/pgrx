@@ -46,6 +46,7 @@
 #include "storage/block.h"
 #include "storage/procarray.h"
 #include "storage/itemptr.h"
+#include "tcop/utility.h"
 #include "utils/builtins.h"
 #include "utils/date.h"
 #include "utils/guc.h"
