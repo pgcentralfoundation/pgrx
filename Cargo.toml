@@ -5,23 +5,23 @@ version = "0.1.0"
 [workspace]
 members = [
     ".",
+    "cargo-pgx",
     "pgx",
     "pgx-macros",
-    "pgx-tests",
     "pgx-pg-sys",
+    "pgx-tests",
     "pgx-utils",
-    "cargo-pgx",
 ]
 
 [features]
-default = []
-pg10 = ["pgx/pg10", "pgx-pg-sys/pg10"]
-pg11 = ["pgx/pg11", "pgx-pg-sys/pg11"]
-pg12 = ["pgx/pg12", "pgx-pg-sys/pg12"]
+default = [ ]
+pg10 = [ "pgx/pg10", "pgx-pg-sys/pg10" ]
+pg11 = [ "pgx/pg11", "pgx-pg-sys/pg11" ]
+pg12 = [ "pgx/pg12", "pgx-pg-sys/pg12" ]
 
 [dependencies]
+cargo-pgx = { path = "cargo-pgx" }
 pgx = { path = "pgx", default-features = false }
 pgx-macros = { path = "pgx-macros" }
-pgx-tests = { path = "pgx-tests", default-features = false }
 pgx-pg-sys = { path = "pgx-pg-sys", default-features = false }
-cargo-pgx = { path = "cargo-pgx" }
+pgx-tests = { path = "pgx-tests", default-features = false }

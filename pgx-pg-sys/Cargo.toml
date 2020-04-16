@@ -1,25 +1,27 @@
 [package]
 name = "pgx-pg-sys"
 version = "0.1.0"
-authors = ["Eric B. Ridge <eebbrr@gmail.com>"]
+authors = [ "Eric B. Ridge <eebbrr@gmail.com>" ]
 edition = "2018"
 build = "build.rs"
 
 [dependencies]
-pgx-macros = { path = "../pgx-macros/" }
 memoffset = "0.5.3"
+
+pgx-macros = { path = "../pgx-macros/" }
 
 [build-dependencies]
 bindgen = "0.52.0"
-clang = "0.23.0"
-syn = { version = "1.0.5", features = ["extra-traits", "full", "fold", "parsing"] }
-quote = "1.0.2"
-proc-macro2 = "1.0.6"
-rayon = "1.2.1"
 build-deps = "0.1.4"
 
+clang = "0.23.0"
+proc-macro2 = "1.0.6"
+quote = "1.0.2"
+rayon = "1.2.1"
+syn = { version = "1.0.5", features = [ "extra-traits", "full", "fold", "parsing" ] }
+
 [features]
-default = []
-pg10 = []
-pg11 = []
-pg12 = []
+default = [ ]
+pg10 = [ ]
+pg11 = [ ]
+pg12 = [ ]
