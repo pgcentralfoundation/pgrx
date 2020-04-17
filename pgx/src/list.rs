@@ -90,7 +90,7 @@ impl<T> PgList<T> {
 
     #[inline]
     pub fn get_ptr(&self, i: usize) -> Option<*mut T> {
-        if !is_a(self.list as *mut pg_sys::Node, pg_sys::NodeTag_T_List) {
+        if !self.is_empty() && !is_a(self.list as *mut pg_sys::Node, pg_sys::NodeTag_T_List) {
             panic!("PgList does not contain pointers")
         }
         if self.list.is_null() || i >= self.len() {
@@ -102,8 +102,8 @@ impl<T> PgList<T> {
 
     #[inline]
     pub fn get_int(&self, i: usize) -> Option<i32> {
-        if !is_a(self.list as *mut pg_sys::Node, pg_sys::NodeTag_T_IntList) {
-            panic!("PgList does not contain pointers")
+        if !self.is_empty() && !is_a(self.list as *mut pg_sys::Node, pg_sys::NodeTag_T_IntList) {
+            panic!("PgList does not contain ints")
         }
 
         if self.list.is_null() || i >= self.len() {
@@ -115,14 +115,38 @@ impl<T> PgList<T> {
 
     #[inline]
     pub fn get_oid(&self, i: usize) -> Option<pg_sys::Oid> {
-        if !is_a(self.list as *mut pg_sys::Node, pg_sys::NodeTag_T_OidList) {
-            panic!("PgList does not contain pointers")
+        if !self.is_empty() && !is_a(self.list as *mut pg_sys::Node, pg_sys::NodeTag_T_OidList) {
+            panic!("PgList does not contain oids")
         }
 
         if self.list.is_null() || i >= self.len() {
             None
         } else {
             Some(unsafe { pg_sys::list_nth_oid(self.list, i as i32) })
+        }
+    }
+
+    #[inline]
+    pub fn iter_ptr(&self) -> impl Iterator<Item = *mut T> + '_ {
+        PgListIteratorPtr {
+            list: &self,
+            pos: 0,
+        }
+    }
+
+    #[inline]
+    pub fn iter_oid(&self) -> impl Iterator<Item = pg_sys::Oid> + '_ {
+        PgListIteratorOid {
+            list: &self,
+            pos: 0,
+        }
+    }
+
+    #[inline]
+    pub fn iter_int(&self) -> impl Iterator<Item = i32> + '_ {
+        PgListIteratorInt {
+            list: &self,
+            pos: 0,
         }
     }
 
@@ -140,6 +164,51 @@ impl<T> PgList<T> {
         }
 
         tail
+    }
+}
+
+struct PgListIteratorPtr<'a, T> {
+    list: &'a PgList<T>,
+    pos: usize,
+}
+
+struct PgListIteratorOid<'a, T> {
+    list: &'a PgList<T>,
+    pos: usize,
+}
+
+struct PgListIteratorInt<'a, T> {
+    list: &'a PgList<T>,
+    pos: usize,
+}
+
+impl<'a, T> Iterator for PgListIteratorPtr<'a, T> {
+    type Item = *mut T;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let result = self.list.get_ptr(self.pos);
+        self.pos += 1;
+        result
+    }
+}
+
+impl<'a, T> Iterator for PgListIteratorOid<'a, T> {
+    type Item = pg_sys::Oid;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let result = self.list.get_oid(self.pos);
+        self.pos += 1;
+        result
+    }
+}
+
+impl<'a, T> Iterator for PgListIteratorInt<'a, T> {
+    type Item = i32;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let result = self.list.get_int(self.pos);
+        self.pos += 1;
+        result
     }
 }
 
