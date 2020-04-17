@@ -1,6 +1,7 @@
 //! Provides a safe wrapper around Postgres' `pg_sys::RelationData` struct
 use crate::{
-    direct_function_call, name_data_to_str, pg_sys, FromDatum, IntoDatum, PgBox, PgTupleDesc,
+    direct_function_call, name_data_to_str, pg_sys, FromDatum, IntoDatum, PgBox, PgList,
+    PgTupleDesc,
 };
 use std::ops::Deref;
 
@@ -30,11 +31,7 @@ impl PgRelation {
     /// Wrap a Postgres-provided `pg_sys::Relation`.
     ///
     /// The provided `Relation` will be closed via `pg_sys::RelationClose` when this instance is dropped
-    ///
-    /// ## Safety
-    ///
-    /// This method is unsafe as we cannot ensure that this relation will later be closed by Postgres
-    pub unsafe fn from_pg_owned(ptr: pg_sys::Relation) -> Self {
+    pub fn from_pg_owned(ptr: pg_sys::Relation) -> Self {
         PgRelation {
             boxed: PgBox::from_pg(ptr),
             need_close: true,
@@ -157,6 +154,11 @@ impl PgRelation {
         }
     }
 
+    /// Retun a `PgList` of index relation oids attached to this Relation.
+    pub fn indicies(&self) -> PgList<pg_sys::Oid> {
+        PgList::<pg_sys::Oid>::from_pg(unsafe { pg_sys::RelationGetIndexList(self.boxed.as_ptr()) })
+    }
+
     /// Returned a wrapped `PgTupleDesc`
     ///
     /// The returned `PgTupleDesc` is tied to the lifetime of this `PgRelation` instance.
@@ -174,6 +176,7 @@ impl PgRelation {
         PgTupleDesc::from_relation(&self)
     }
 
+    /// Number of tuples in this relation (not always up-to-date)
     pub fn reltuples(&self) -> Option<f32> {
         let reltuples = unsafe { self.boxed.rd_rel.as_ref() }
             .expect("rd_rel is NULL")
@@ -184,6 +187,12 @@ impl PgRelation {
         } else {
             Some(reltuples)
         }
+    }
+
+    /// ensures that the returned `PgRelation` is closed by Rust when it is dropped
+    pub fn to_owned(mut self) -> Self {
+        self.need_close = true;
+        self
     }
 }
 
@@ -227,10 +236,14 @@ impl Deref for PgRelation {
 
 impl Drop for PgRelation {
     fn drop(&mut self) {
-        if self.need_close {
-            match self.lockmode {
-                None => unsafe { pg_sys::RelationClose(self.boxed.as_ptr()) },
-                Some(lockmode) => unsafe { pg_sys::relation_close(self.boxed.as_ptr(), lockmode) },
+        if !self.boxed.is_null() {
+            if self.need_close {
+                match self.lockmode {
+                    None => unsafe { pg_sys::RelationClose(self.boxed.as_ptr()) },
+                    Some(lockmode) => unsafe {
+                        pg_sys::relation_close(self.boxed.as_ptr(), lockmode)
+                    },
+                }
             }
         }
     }
