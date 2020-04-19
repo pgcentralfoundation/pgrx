@@ -58,7 +58,7 @@ impl FromDatum<TimestampWithTimeZone> for TimestampWithTimeZone {
         }
     }
 }
-impl IntoDatum<TimestampWithTimeZone> for TimestampWithTimeZone {
+impl IntoDatum for TimestampWithTimeZone {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
         let year = self.year();

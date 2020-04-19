@@ -92,7 +92,7 @@ impl FromDatum<Inet> for Inet {
     }
 }
 
-impl IntoDatum<Inet> for Inet {
+impl IntoDatum for Inet {
     fn into_datum(self) -> Option<pg_sys::Datum> {
         let cstr = std::ffi::CString::new(self.0).expect("failed to convert inet into CString");
         direct_function_call_as_datum(pg_sys::inet_in, vec![cstr.as_c_str().into_datum()])

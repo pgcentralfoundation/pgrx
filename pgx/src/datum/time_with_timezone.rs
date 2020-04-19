@@ -21,7 +21,7 @@ impl FromDatum<TimeWithTimeZone> for TimeWithTimeZone {
     }
 }
 
-impl IntoDatum<TimeWithTimeZone> for TimeWithTimeZone {
+impl IntoDatum for TimeWithTimeZone {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
         let mut timetz = PgBox::<pg_sys::TimeTzADT>::alloc();

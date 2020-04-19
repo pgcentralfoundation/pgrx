@@ -36,7 +36,7 @@ impl FromDatum<AnyArray> for AnyArray {
     }
 }
 
-impl IntoDatum<AnyArray> for AnyArray {
+impl IntoDatum for AnyArray {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
         Some(self.datum)

@@ -21,7 +21,7 @@ impl FromDatum<Timestamp> for Timestamp {
         }
     }
 }
-impl IntoDatum<Timestamp> for Timestamp {
+impl IntoDatum for Timestamp {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
         let year = self.year();

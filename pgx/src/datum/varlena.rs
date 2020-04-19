@@ -73,7 +73,7 @@ impl<'a> FromDatum<OwnedVarlenA<'a>> for OwnedVarlenA<'a> {
     }
 }
 
-impl<'a> IntoDatum<OwnedVarlenA<'a>> for OwnedVarlenA<'a> {
+impl<'a> IntoDatum for OwnedVarlenA<'a> {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
         Some(self.detoasted.ptr as pg_sys::Datum)
@@ -84,7 +84,7 @@ impl<'a> IntoDatum<OwnedVarlenA<'a>> for OwnedVarlenA<'a> {
     }
 }
 
-impl<'a> IntoDatum<DetoastedVarlenA<'a>> for DetoastedVarlenA<'a> {
+impl<'a> IntoDatum for DetoastedVarlenA<'a> {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
         Some(self.ptr as pg_sys::Datum)

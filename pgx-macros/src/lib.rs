@@ -181,7 +181,7 @@ fn impl_postgres_enum(ast: DeriveInput) -> proc_macro2::TokenStream {
             }
         }
 
-        impl pgx::IntoDatum<#enum_ident> for #enum_ident {
+        impl pgx::IntoDatum for #enum_ident {
             #[inline]
             fn into_datum(self) -> Option<pgx::pg_sys::Datum> {
                 match self {
@@ -250,7 +250,7 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
             }
         }
 
-        impl pgx::IntoDatum<#name> for #name {
+        impl pgx::IntoDatum for #name {
             #[inline]
             fn into_datum(self) -> Option<pgx::pg_sys::Datum> {
                 Some(pgx::to_varlena(&self).expect(&format!("failed to serialize a {}", stringify!(#name))) as pgx::pg_sys::Datum)

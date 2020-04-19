@@ -342,9 +342,9 @@ impl<T: FromDatum<T>> FromDatum<Vec<Option<T>>> for Vec<Option<T>> {
     }
 }
 
-impl<T> IntoDatum<Vec<T>> for Vec<T>
+impl<T> IntoDatum for Vec<T>
 where
-    T: IntoDatum<T>,
+    T: IntoDatum,
 {
     fn into_datum(self) -> Option<pg_sys::Datum> {
         let mut state = std::ptr::null_mut();

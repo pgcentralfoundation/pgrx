@@ -41,7 +41,7 @@ impl FromDatum<Time> for Time {
     }
 }
 
-impl IntoDatum<Time> for Time {
+impl IntoDatum for Time {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
         let datum = ((((self.hour() as i64 * MINS_PER_HOUR + self.minute() as i64) * SEC_PER_MIN)

@@ -9,7 +9,7 @@ use std::ffi::CStr;
 ///
 /// Default implementations are provided for the common Rust types.
 ///
-/// If implementing this, also implement `IntoDatum<T>` for the reverse
+/// If implementing this, also implement `IntoDatum` for the reverse
 /// conversion.
 pub trait FromDatum<T> {
     /// ## Safety

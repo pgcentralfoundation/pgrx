@@ -91,7 +91,7 @@ impl FromDatum<JsonString> for JsonString {
 }
 
 /// for json
-impl IntoDatum<Json> for Json {
+impl IntoDatum for Json {
     fn into_datum(self) -> Option<pg_sys::Datum> {
         let string = serde_json::to_string(&self.0).expect("failed to serialize Json value");
         string.into_datum()
@@ -103,7 +103,7 @@ impl IntoDatum<Json> for Json {
 }
 
 /// for jsonb
-impl IntoDatum<JsonB> for JsonB {
+impl IntoDatum for JsonB {
     fn into_datum(self) -> Option<pg_sys::Datum> {
         let string = serde_json::to_string(&self.0).expect("failed to serialize JsonB value");
         let cstring =
@@ -121,7 +121,7 @@ impl IntoDatum<JsonB> for JsonB {
 }
 
 /// for jsonstring
-impl IntoDatum<JsonString> for JsonString {
+impl IntoDatum for JsonString {
     fn into_datum(self) -> Option<pg_sys::Datum> {
         self.0.as_str().into_datum()
     }

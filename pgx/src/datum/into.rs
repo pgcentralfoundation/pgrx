@@ -14,7 +14,7 @@ use crate::{direct_function_call, pg_sys, rust_str_to_text_p, PgBox, PgOid};
 ///
 /// Note that any conversions that need to allocate memory (ie, for a `varlena *` representation
 /// of a Rust type, that memory **must** be allocated within a [PgMemoryContext]
-pub trait IntoDatum<T> {
+pub trait IntoDatum {
     fn into_datum(self) -> Option<pg_sys::Datum>;
     fn type_oid() -> pg_sys::Oid;
     fn array_type_oid() -> pg_sys::Oid {
@@ -23,9 +23,9 @@ pub trait IntoDatum<T> {
 }
 
 /// for supporting NULL as the None value of an Option<T>
-impl<T> IntoDatum<Option<T>> for Option<T>
+impl<T> IntoDatum for Option<T>
 where
-    T: IntoDatum<T>,
+    T: IntoDatum,
 {
     fn into_datum(self) -> Option<pg_sys::Datum> {
         match self {
@@ -40,7 +40,7 @@ where
 }
 
 /// for bool
-impl IntoDatum<bool> for bool {
+impl IntoDatum for bool {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
         Some((if self { 1 } else { 0 }) as pg_sys::Datum)
@@ -52,7 +52,7 @@ impl IntoDatum<bool> for bool {
 }
 
 /// for smallint
-impl IntoDatum<i16> for i16 {
+impl IntoDatum for i16 {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
         Some(self as pg_sys::Datum)
@@ -64,7 +64,7 @@ impl IntoDatum<i16> for i16 {
 }
 
 /// for integer
-impl IntoDatum<i32> for i32 {
+impl IntoDatum for i32 {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
         Some(self as pg_sys::Datum)
@@ -76,7 +76,7 @@ impl IntoDatum<i32> for i32 {
 }
 
 /// for oid
-impl IntoDatum<u32> for u32 {
+impl IntoDatum for u32 {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
         Some(self as pg_sys::Datum)
@@ -88,7 +88,7 @@ impl IntoDatum<u32> for u32 {
 }
 
 /// for bigint
-impl IntoDatum<i64> for i64 {
+impl IntoDatum for i64 {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
         Some(self as pg_sys::Datum)
@@ -100,7 +100,7 @@ impl IntoDatum<i64> for i64 {
 }
 
 /// for real
-impl IntoDatum<f32> for f32 {
+impl IntoDatum for f32 {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
         Some(self.to_bits() as pg_sys::Datum)
@@ -112,7 +112,7 @@ impl IntoDatum<f32> for f32 {
 }
 
 /// for double precision
-impl IntoDatum<f64> for f64 {
+impl IntoDatum for f64 {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
         Some(self.to_bits() as pg_sys::Datum)
@@ -123,7 +123,7 @@ impl IntoDatum<f64> for f64 {
     }
 }
 
-impl IntoDatum<PgOid> for PgOid {
+impl IntoDatum for PgOid {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
         match self {
@@ -138,7 +138,7 @@ impl IntoDatum<PgOid> for PgOid {
 }
 
 /// for text, varchar
-impl<'a> IntoDatum<&'a str> for &'a str {
+impl<'a> IntoDatum for &'a str {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
         let varlena = rust_str_to_text_p(&self);
@@ -154,7 +154,7 @@ impl<'a> IntoDatum<&'a str> for &'a str {
     }
 }
 
-impl IntoDatum<String> for String {
+impl IntoDatum for String {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
         self.as_str().into_datum()
@@ -170,7 +170,7 @@ impl IntoDatum<String> for String {
 /// ## Safety
 ///
 /// The `&CStr` better be allocated by Postgres
-impl<'a> IntoDatum<&'a std::ffi::CStr> for &'a std::ffi::CStr {
+impl<'a> IntoDatum for &'a std::ffi::CStr {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
         Some(self.as_ptr() as pg_sys::Datum)
@@ -182,7 +182,7 @@ impl<'a> IntoDatum<&'a std::ffi::CStr> for &'a std::ffi::CStr {
 }
 
 /// for NULL -- always converts to `None`
-impl IntoDatum<()> for () {
+impl IntoDatum for () {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
         None
@@ -194,7 +194,7 @@ impl IntoDatum<()> for () {
 }
 
 /// for user types
-impl<T> IntoDatum<PgBox<T>> for PgBox<T> {
+impl<T> IntoDatum for PgBox<T> {
     fn into_datum(self) -> Option<pg_sys::Datum> {
         if self.is_null() {
             None

@@ -59,11 +59,11 @@ pub struct SpiTupleTable {
 }
 
 impl Spi {
-    pub fn get_one<A: FromDatum<A> + IntoDatum<A>>(query: &str) -> Option<A> {
+    pub fn get_one<A: FromDatum<A> + IntoDatum>(query: &str) -> Option<A> {
         Spi::connect(|client| Ok(client.select(query, Some(1), None).first().get_one()))
     }
 
-    pub fn get_one_with_args<A: FromDatum<A> + IntoDatum<A>>(
+    pub fn get_one_with_args<A: FromDatum<A> + IntoDatum>(
         query: &str,
         args: Vec<(PgOid, Option<pg_sys::Datum>)>,
     ) -> Option<A> {
@@ -105,7 +105,7 @@ impl Spi {
     /// execute SPI commands via the provided `SpiClient` and return a value from SPI which is
     /// automatically copied into the `CurrentMemoryContext` at the time of this function call
     pub fn connect<
-        R: FromDatum<R> + IntoDatum<R>,
+        R: FromDatum<R> + IntoDatum,
         F: FnOnce(SpiClient) -> std::result::Result<Option<R>, SpiError>,
     >(
         f: F,

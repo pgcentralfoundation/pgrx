@@ -140,7 +140,7 @@ impl Into<Numeric> for f64 {
     }
 }
 
-impl IntoDatum<Numeric> for Numeric {
+impl IntoDatum for Numeric {
     fn into_datum(self) -> Option<pg_sys::Datum> {
         let cstring =
             std::ffi::CString::new(self.0).expect("failed to convert numeric string into CString");

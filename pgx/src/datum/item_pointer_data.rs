@@ -22,7 +22,7 @@ impl FromDatum<pg_sys::ItemPointerData> for pg_sys::ItemPointerData {
     }
 }
 
-impl IntoDatum<pg_sys::ItemPointerData> for pg_sys::ItemPointerData {
+impl IntoDatum for pg_sys::ItemPointerData {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
         let tid = self;
