@@ -26,6 +26,7 @@
 #include "catalog/dependency.h"
 #include "catalog/objectaddress.h"
 #include "catalog/pg_trigger.h"
+#include "commands/tablecmds.h"
 #include "commands/trigger.h"
 #include "executor/executor.h"
 #include "executor/spi.h"

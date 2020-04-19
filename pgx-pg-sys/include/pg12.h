@@ -17,6 +17,7 @@
 #include "catalog/pg_type.h"
 #include "commands/dbcommands.h"
 #include "commands/event_trigger.h"
+#include "commands/tablecmds.h"
 #include "catalog/dependency.h"
 #include "catalog/objectaddress.h"
 #include "catalog/pg_trigger.h"
