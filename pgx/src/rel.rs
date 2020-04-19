@@ -154,9 +154,20 @@ impl PgRelation {
         }
     }
 
-    /// Retun a `PgList` of index relation oids attached to this Relation.
-    pub fn indicies(&self) -> PgList<pg_sys::Oid> {
-        PgList::<pg_sys::Oid>::from_pg(unsafe { pg_sys::RelationGetIndexList(self.boxed.as_ptr()) })
+    /// Return an iterator of indices, as `PgRelation`s, attached to this relation
+    pub fn indicies(
+        &self,
+        lockmode: pg_sys::LOCKMODE,
+    ) -> impl std::iter::Iterator<Item = PgRelation> {
+        let list = PgList::<pg_sys::Oid>::from_pg(unsafe {
+            pg_sys::RelationGetIndexList(self.boxed.as_ptr())
+        });
+
+        list.iter_oid()
+            .filter(|oid| *oid != pg_sys::InvalidOid)
+            .map(|oid| PgRelation::with_lock(oid, lockmode))
+            .collect::<Vec<PgRelation>>()
+            .into_iter()
     }
 
     /// Returned a wrapped `PgTupleDesc`
@@ -187,6 +198,60 @@ impl PgRelation {
         } else {
             Some(reltuples)
         }
+    }
+
+    pub fn is_table(&self) -> bool {
+        let rd_rel: &pg_sys::FormData_pg_class =
+            unsafe { self.boxed.rd_rel.as_ref().expect("rd_rel is NULL") };
+        rd_rel.relkind == pg_sys::RELKIND_RELATION as i8
+    }
+
+    pub fn is_matview(&self) -> bool {
+        let rd_rel: &pg_sys::FormData_pg_class =
+            unsafe { self.boxed.rd_rel.as_ref().expect("rd_rel is NULL") };
+        rd_rel.relkind == pg_sys::RELKIND_MATVIEW as i8
+    }
+
+    pub fn is_index(&self) -> bool {
+        let rd_rel: &pg_sys::FormData_pg_class =
+            unsafe { self.boxed.rd_rel.as_ref().expect("rd_rel is NULL") };
+        rd_rel.relkind == pg_sys::RELKIND_INDEX as i8
+    }
+
+    pub fn is_view(&self) -> bool {
+        let rd_rel: &pg_sys::FormData_pg_class =
+            unsafe { self.boxed.rd_rel.as_ref().expect("rd_rel is NULL") };
+        rd_rel.relkind == pg_sys::RELKIND_VIEW as i8
+    }
+
+    pub fn is_sequence(&self) -> bool {
+        let rd_rel: &pg_sys::FormData_pg_class =
+            unsafe { self.boxed.rd_rel.as_ref().expect("rd_rel is NULL") };
+        rd_rel.relkind == pg_sys::RELKIND_SEQUENCE as i8
+    }
+
+    pub fn is_composite_type(&self) -> bool {
+        let rd_rel: &pg_sys::FormData_pg_class =
+            unsafe { self.boxed.rd_rel.as_ref().expect("rd_rel is NULL") };
+        rd_rel.relkind == pg_sys::RELKIND_COMPOSITE_TYPE as i8
+    }
+
+    pub fn is_foreign_table(&self) -> bool {
+        let rd_rel: &pg_sys::FormData_pg_class =
+            unsafe { self.boxed.rd_rel.as_ref().expect("rd_rel is NULL") };
+        rd_rel.relkind == pg_sys::RELKIND_FOREIGN_TABLE as i8
+    }
+
+    pub fn is_partitioned_table(&self) -> bool {
+        let rd_rel: &pg_sys::FormData_pg_class =
+            unsafe { self.boxed.rd_rel.as_ref().expect("rd_rel is NULL") };
+        rd_rel.relkind == pg_sys::RELKIND_PARTITIONED_TABLE as i8
+    }
+
+    pub fn is_toast_value(&self) -> bool {
+        let rd_rel: &pg_sys::FormData_pg_class =
+            unsafe { self.boxed.rd_rel.as_ref().expect("rd_rel is NULL") };
+        rd_rel.relkind == pg_sys::RELKIND_TOASTVALUE as i8
     }
 
     /// ensures that the returned `PgRelation` is closed by Rust when it is dropped
