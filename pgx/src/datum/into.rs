@@ -9,7 +9,7 @@ use crate::{direct_function_call, pg_sys, rust_str_to_text_p, PgBox, PgOid};
 ///
 /// Default implementations are provided for the common Rust types.
 ///
-/// If implementing this, also implement `FromDatum<T>` for the reverse
+/// If implementing this, also implement `FromDatum` for the reverse
 /// conversion.
 ///
 /// Note that any conversions that need to allocate memory (ie, for a `varlena *` representation

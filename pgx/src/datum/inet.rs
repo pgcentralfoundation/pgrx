@@ -74,7 +74,7 @@ impl<'de> Deserialize<'de> for Inet {
     }
 }
 
-impl FromDatum<Inet> for Inet {
+impl FromDatum for Inet {
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _typoid: u32) -> Option<Inet> {
         if is_null {
             None

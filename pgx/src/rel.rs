@@ -268,7 +268,7 @@ impl Clone for PgRelation {
     }
 }
 
-impl FromDatum<PgRelation> for PgRelation {
+impl FromDatum for PgRelation {
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _typoid: u32) -> Option<PgRelation> {
         if is_null {
             None

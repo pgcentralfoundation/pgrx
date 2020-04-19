@@ -5,7 +5,7 @@ use time::PrimitiveDateTime;
 
 #[derive(Debug)]
 pub struct Timestamp(time::PrimitiveDateTime);
-impl FromDatum<Timestamp> for Timestamp {
+impl FromDatum for Timestamp {
     #[inline]
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, typoid: u32) -> Option<Timestamp> {
         let ts: Option<TimestampWithTimeZone> =

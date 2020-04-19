@@ -4,7 +4,7 @@ use std::marker::PhantomData;
 
 pub type VariadicArray<'a, T> = Array<'a, T>;
 
-pub struct Array<'a, T: FromDatum<T>> {
+pub struct Array<'a, T: FromDatum> {
     ptr: *mut pg_sys::varlena,
     array_type: *mut pg_sys::ArrayType,
     elements: *mut pg_sys::Datum,
@@ -16,7 +16,7 @@ pub struct Array<'a, T: FromDatum<T>> {
     _marker: PhantomData<T>,
 }
 
-impl<'a, T: FromDatum<T> + serde::Serialize> serde::Serialize for Array<'a, T> {
+impl<'a, T: FromDatum + serde::Serialize> serde::Serialize for Array<'a, T> {
     fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error>
     where
         S: Serializer,
@@ -25,7 +25,7 @@ impl<'a, T: FromDatum<T> + serde::Serialize> serde::Serialize for Array<'a, T> {
     }
 }
 
-impl<'a, T: FromDatum<T> + serde::Serialize> serde::Serialize for ArrayTypedIterator<'a, T> {
+impl<'a, T: FromDatum + serde::Serialize> serde::Serialize for ArrayTypedIterator<'a, T> {
     fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error>
     where
         S: Serializer,
@@ -34,7 +34,7 @@ impl<'a, T: FromDatum<T> + serde::Serialize> serde::Serialize for ArrayTypedIter
     }
 }
 
-impl<'a, T: FromDatum<T>> Array<'a, T> {
+impl<'a, T: FromDatum> Array<'a, T> {
     /// Create an [`Array`] over an array of [pg_sys::Datum] values and a corresponding array
     /// of "is_null" indicators
     ///
@@ -149,12 +149,12 @@ impl<'a, T: FromDatum<T>> Array<'a, T> {
     }
 }
 
-pub struct ArrayTypedIterator<'a, T: 'a + FromDatum<T>> {
+pub struct ArrayTypedIterator<'a, T: 'a + FromDatum> {
     array: &'a Array<'a, T>,
     curr: usize,
 }
 
-impl<'a, T: FromDatum<T>> Iterator for ArrayTypedIterator<'a, T> {
+impl<'a, T: FromDatum> Iterator for ArrayTypedIterator<'a, T> {
     type Item = T;
 
     #[inline]
@@ -173,12 +173,12 @@ impl<'a, T: FromDatum<T>> Iterator for ArrayTypedIterator<'a, T> {
     }
 }
 
-pub struct ArrayIterator<'a, T: 'a + FromDatum<T>> {
+pub struct ArrayIterator<'a, T: 'a + FromDatum> {
     array: &'a Array<'a, T>,
     curr: usize,
 }
 
-impl<'a, T: FromDatum<T>> Iterator for ArrayIterator<'a, T> {
+impl<'a, T: FromDatum> Iterator for ArrayIterator<'a, T> {
     type Item = Option<T>;
 
     #[inline]
@@ -193,12 +193,12 @@ impl<'a, T: FromDatum<T>> Iterator for ArrayIterator<'a, T> {
     }
 }
 
-pub struct ArrayIntoIterator<'a, T: FromDatum<T>> {
+pub struct ArrayIntoIterator<'a, T: FromDatum> {
     array: Array<'a, T>,
     curr: usize,
 }
 
-impl<'a, T: FromDatum<T>> IntoIterator for Array<'a, T> {
+impl<'a, T: FromDatum> IntoIterator for Array<'a, T> {
     type Item = Option<T>;
     type IntoIter = ArrayIntoIterator<'a, T>;
 
@@ -210,7 +210,7 @@ impl<'a, T: FromDatum<T>> IntoIterator for Array<'a, T> {
     }
 }
 
-impl<'a, T: FromDatum<T>> Iterator for ArrayIntoIterator<'a, T> {
+impl<'a, T: FromDatum> Iterator for ArrayIntoIterator<'a, T> {
     type Item = Option<T>;
 
     #[inline]
@@ -240,7 +240,7 @@ impl<'a, T: FromDatum<T>> Iterator for ArrayIntoIterator<'a, T> {
     }
 }
 
-impl<'a, T: FromDatum<T>> Drop for Array<'a, T> {
+impl<'a, T: FromDatum> Drop for Array<'a, T> {
     fn drop(&mut self) {
         if !self.elements.is_null() {
             unsafe {
@@ -266,7 +266,7 @@ impl<'a, T: FromDatum<T>> Drop for Array<'a, T> {
     }
 }
 
-impl<'a, T: FromDatum<T>> FromDatum<Array<'a, T>> for Array<'a, T> {
+impl<'a, T: FromDatum> FromDatum for Array<'a, T> {
     #[inline]
     unsafe fn from_datum(datum: usize, is_null: bool, typoid: u32) -> Option<Array<'a, T>> {
         if is_null {
@@ -319,7 +319,7 @@ impl<'a, T: FromDatum<T>> FromDatum<Array<'a, T>> for Array<'a, T> {
     }
 }
 
-impl<T: FromDatum<T>> FromDatum<Vec<Option<T>>> for Vec<Option<T>> {
+impl<T: FromDatum> FromDatum for Vec<Option<T>> {
     #[inline]
     unsafe fn from_datum(
         datum: pg_sys::Datum,

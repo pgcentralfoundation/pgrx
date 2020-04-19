@@ -81,7 +81,7 @@ extern "C" {
 ///
 /// `attno` is 1-based
 #[inline]
-pub fn heap_getattr<T: FromDatum<T>>(
+pub fn heap_getattr<T: FromDatum>(
     tuple: &PgBox<pg_sys::HeapTupleData>,
     attno: usize,
     tupdesc: &PgTupleDesc,
@@ -109,7 +109,7 @@ pub struct DatumWithTypeInfo {
 
 impl DatumWithTypeInfo {
     #[inline]
-    pub fn into_value<T: FromDatum<T>>(self) -> T {
+    pub fn into_value<T: FromDatum>(self) -> T {
         unsafe { T::from_datum(self.datum, self.is_null, self.typoid.value()).unwrap() }
     }
 }

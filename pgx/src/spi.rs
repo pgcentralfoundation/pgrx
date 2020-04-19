@@ -59,11 +59,11 @@ pub struct SpiTupleTable {
 }
 
 impl Spi {
-    pub fn get_one<A: FromDatum<A> + IntoDatum>(query: &str) -> Option<A> {
+    pub fn get_one<A: FromDatum + IntoDatum>(query: &str) -> Option<A> {
         Spi::connect(|client| Ok(client.select(query, Some(1), None).first().get_one()))
     }
 
-    pub fn get_one_with_args<A: FromDatum<A> + IntoDatum>(
+    pub fn get_one_with_args<A: FromDatum + IntoDatum>(
         query: &str,
         args: Vec<(PgOid, Option<pg_sys::Datum>)>,
     ) -> Option<A> {
@@ -105,7 +105,7 @@ impl Spi {
     /// execute SPI commands via the provided `SpiClient` and return a value from SPI which is
     /// automatically copied into the `CurrentMemoryContext` at the time of this function call
     pub fn connect<
-        R: FromDatum<R> + IntoDatum,
+        R: FromDatum + IntoDatum,
         F: FnOnce(SpiClient) -> std::result::Result<Option<R>, SpiError>,
     >(
         f: F,
@@ -291,17 +291,17 @@ impl SpiTupleTable {
         self.len() == 0
     }
 
-    pub fn get_one<A: FromDatum<A>>(&self) -> Option<A> {
+    pub fn get_one<A: FromDatum>(&self) -> Option<A> {
         self.get_datum(1)
     }
 
-    pub fn get_two<A: FromDatum<A>, B: FromDatum<B>>(&self) -> (Option<A>, Option<B>) {
+    pub fn get_two<A: FromDatum, B: FromDatum>(&self) -> (Option<A>, Option<B>) {
         let a = self.get_datum::<A>(1);
         let b = self.get_datum::<B>(2);
         (a, b)
     }
 
-    pub fn get_three<A: FromDatum<A>, B: FromDatum<B>, C: FromDatum<C>>(
+    pub fn get_three<A: FromDatum, B: FromDatum, C: FromDatum>(
         &self,
     ) -> (Option<A>, Option<B>, Option<C>) {
         let a = self.get_datum::<A>(1);
@@ -310,7 +310,7 @@ impl SpiTupleTable {
         (a, b, c)
     }
 
-    pub fn get_datum<T: FromDatum<T>>(&self, ordinal: i32) -> Option<T> {
+    pub fn get_datum<T: FromDatum>(&self, ordinal: i32) -> Option<T> {
         if self.current < 0 {
             panic!("SpiTupleTable positioned before start")
         }

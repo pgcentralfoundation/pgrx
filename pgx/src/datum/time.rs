@@ -9,7 +9,7 @@ pub(crate) const SEC_PER_MIN: i64 = 60;
 
 #[derive(Debug)]
 pub struct Time(pub(crate) time::Time);
-impl FromDatum<Time> for Time {
+impl FromDatum for Time {
     #[inline]
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _typoid: u32) -> Option<Time> {
         if is_null {

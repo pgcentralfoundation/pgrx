@@ -16,12 +16,12 @@ impl AnyArray {
     }
 
     #[inline]
-    pub fn into<T: FromDatum<T>>(&self) -> Option<T> {
+    pub fn into<T: FromDatum>(&self) -> Option<T> {
         unsafe { T::from_datum(self.datum(), false, self.oid()) }
     }
 }
 
-impl FromDatum<AnyArray> for AnyArray {
+impl FromDatum for AnyArray {
     #[inline]
     unsafe fn from_datum(
         datum: pg_sys::Datum,

@@ -70,7 +70,7 @@ mod pg_10_11 {
     use crate::{pg_sys, FromDatum};
 
     #[inline]
-    pub fn pg_getarg<T: FromDatum<T>>(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> Option<T> {
+    pub fn pg_getarg<T: FromDatum>(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> Option<T> {
         let datum = unsafe { fcinfo.as_ref() }.unwrap().arg[num];
         let isnull = pg_arg_is_null(fcinfo, num);
         unsafe { T::from_datum(datum, isnull, crate::get_getarg_type(fcinfo, num)) }
@@ -107,7 +107,7 @@ mod pg_12 {
     use crate::{pg_sys, FromDatum};
 
     #[inline]
-    pub fn pg_getarg<T: FromDatum<T>>(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> Option<T> {
+    pub fn pg_getarg<T: FromDatum>(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> Option<T> {
         let datum = get_nullable_datum(fcinfo, num);
         unsafe {
             T::from_datum(
@@ -249,7 +249,7 @@ pub fn pg_func_extra<ReturnType, DefaultValue: FnOnce() -> ReturnType>(
 ///     assert_eq!(sum, 5);
 /// }
 /// ```
-pub unsafe fn direct_function_call<R: FromDatum<R>>(
+pub unsafe fn direct_function_call<R: FromDatum>(
     func: unsafe fn(pg_sys::FunctionCallInfo) -> pg_sys::Datum,
     args: Vec<Option<pg_sys::Datum>>,
 ) -> Option<R> {

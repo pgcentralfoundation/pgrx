@@ -26,7 +26,7 @@ impl<'a> OwnedVarlenA<'a> {
     }
 }
 
-impl<'a> FromDatum<DetoastedVarlenA<'a>> for DetoastedVarlenA<'a> {
+impl<'a> FromDatum for DetoastedVarlenA<'a> {
     #[inline]
     unsafe fn from_datum(datum: usize, is_null: bool, _: u32) -> Option<DetoastedVarlenA<'a>> {
         if is_null {
@@ -54,7 +54,7 @@ impl<'a> FromDatum<DetoastedVarlenA<'a>> for DetoastedVarlenA<'a> {
     }
 }
 
-impl<'a> FromDatum<OwnedVarlenA<'a>> for OwnedVarlenA<'a> {
+impl<'a> FromDatum for OwnedVarlenA<'a> {
     #[inline]
     unsafe fn from_datum(datum: usize, is_null: bool, typoid: u32) -> Option<OwnedVarlenA<'a>> {
         if is_null {

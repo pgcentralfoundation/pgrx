@@ -2,7 +2,7 @@ use crate::{
     item_pointer_get_both, item_pointer_set_all, pg_sys, FromDatum, IntoDatum, PgMemoryContexts,
 };
 
-impl FromDatum<pg_sys::ItemPointerData> for pg_sys::ItemPointerData {
+impl FromDatum for pg_sys::ItemPointerData {
     #[inline]
     unsafe fn from_datum(
         datum: pg_sys::Datum,

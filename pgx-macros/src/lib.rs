@@ -166,7 +166,7 @@ fn impl_postgres_enum(ast: DeriveInput) -> proc_macro2::TokenStream {
     }
 
     stream.extend(quote! {
-        impl pgx::FromDatum<#enum_ident> for #enum_ident {
+        impl pgx::FromDatum for #enum_ident {
             #[inline]
             unsafe fn from_datum(datum: pgx::pg_sys::Datum, is_null: bool, typeoid: pgx::pg_sys::Oid) -> Option<#enum_ident> {
                 if is_null {
@@ -236,7 +236,7 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
 
     stream.extend(quote! {
 
-        impl pgx::FromDatum<#name> for #name {
+        impl pgx::FromDatum for #name {
             #[inline]
             unsafe fn from_datum(datum: pgx::pg_sys::Datum, is_null: bool, typoid: pgx::pg_sys::Oid) -> Option<#name> {
                 if is_null {

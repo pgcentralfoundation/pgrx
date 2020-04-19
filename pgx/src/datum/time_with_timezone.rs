@@ -4,7 +4,7 @@ use std::ops::{Deref, DerefMut};
 
 #[derive(Debug)]
 pub struct TimeWithTimeZone(Time);
-impl FromDatum<TimeWithTimeZone> for TimeWithTimeZone {
+impl FromDatum for TimeWithTimeZone {
     #[inline]
     unsafe fn from_datum(datum: usize, is_null: bool, typoid: u32) -> Option<TimeWithTimeZone> {
         if is_null {

@@ -5,7 +5,7 @@ use time::UtcOffset;
 
 #[derive(Debug)]
 pub struct TimestampWithTimeZone(time::OffsetDateTime);
-impl FromDatum<TimestampWithTimeZone> for TimestampWithTimeZone {
+impl FromDatum for TimestampWithTimeZone {
     #[inline]
     unsafe fn from_datum(
         datum: pg_sys::Datum,

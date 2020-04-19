@@ -2,7 +2,7 @@ use crate::{pg_sys, FromDatum, PgBox};
 
 pub struct Internal<T>(pub PgBox<T>);
 
-impl<T> FromDatum<Internal<T>> for Internal<T> {
+impl<T> FromDatum for Internal<T> {
     #[inline]
     unsafe fn from_datum(
         datum: pg_sys::Datum,

@@ -15,7 +15,7 @@ pub struct JsonB(pub Value);
 pub struct JsonString(pub String);
 
 /// for json
-impl FromDatum<Json> for Json {
+impl FromDatum for Json {
     #[inline]
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, typoid: pg_sys::Oid) -> Option<Json> {
         if is_null {
@@ -31,7 +31,7 @@ impl FromDatum<Json> for Json {
 }
 
 /// for jsonb
-impl FromDatum<JsonB> for JsonB {
+impl FromDatum for JsonB {
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<JsonB> {
         if is_null {
             None
@@ -60,7 +60,7 @@ impl FromDatum<JsonB> for JsonB {
 /// for `json` types to be represented as a wholly-owned Rust String copy
 ///
 /// This returns a **copy**, allocated and managed by Rust, of the underlying `varlena` Datum
-impl FromDatum<JsonString> for JsonString {
+impl FromDatum for JsonString {
     #[inline]
     unsafe fn from_datum(
         datum: pg_sys::Datum,
