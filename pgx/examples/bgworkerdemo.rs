@@ -27,11 +27,7 @@ pub extern "C" fn my_bgw_init() {
         BackgroundWorker::get_name()
     );
 
-    while BackgroundWorker::wait_latch(
-        Duration::from_secs(10),
-        WLflags::WL_LATCH_SET | WLflags::WL_TIMEOUT | WLflags::WL_POSTMASTER_DEATH,
-    ) && !BackgroundWorker::sigterm_received()
-    {
+    while BackgroundWorker::wait_latch(Some(Duration::from_secs(10))) {
         if BackgroundWorker::sighup_received() {
             //Do sighuppy stuff
         }

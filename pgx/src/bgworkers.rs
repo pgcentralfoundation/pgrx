@@ -67,9 +67,15 @@ impl BackgroundWorker {
         GOT_SIGTERM.swap(false, Ordering::SeqCst)
     }
 
-    pub fn wait_latch(timeout: Duration, wakeup_flags: WLflags) -> bool {
-        wait_latch(timeout.as_millis().try_into().unwrap(), wakeup_flags);
-        true
+    pub fn wait_latch(timeout: Option<Duration>) -> bool {
+        match timeout {
+            Some(t) => wait_latch(
+                t.as_millis().try_into().unwrap(),
+                WLflags::WL_LATCH_SET | WLflags::WL_TIMEOUT | WLflags::WL_POSTMASTER_DEATH,
+            ),
+            None => wait_latch(0, WLflags::WL_LATCH_SET | WLflags::WL_POSTMASTER_DEATH),
+        };
+        !BackgroundWorker::sigterm_received()
     }
 
     pub fn worker_continue() -> bool {
@@ -100,7 +106,9 @@ impl BackgroundWorker {
         }
     }
 
-    pub fn transaction<F: FnOnce() + std::panic::UnwindSafe + std::panic::RefUnwindSafe>(transaction_body: F) {
+    pub fn transaction<F: FnOnce() + std::panic::UnwindSafe + std::panic::RefUnwindSafe>(
+        transaction_body: F,
+    ) {
         unsafe {
             pg_sys::SetCurrentStatementStartTimestamp();
             pg_sys::StartTransactionCommand();
