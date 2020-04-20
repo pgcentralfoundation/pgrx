@@ -628,6 +628,7 @@ pub fn interrupt_pending() -> bool {
 macro_rules! check_for_interrupts {
     () => {
         #[cfg(any(feature = "pg10", feature = "pg11"))]
+        #[allow(unused_unsafe)]
         unsafe {
             if $crate::pg_sys::InterruptPending {
                 $crate::pg_sys::ProcessInterrupts();
@@ -635,6 +636,7 @@ macro_rules! check_for_interrupts {
         }
 
         #[cfg(feature = "pg12")]
+        #[allow(unused_unsafe)]
         unsafe {
             if $crate::pg_sys::InterruptPending != 0 {
                 $crate::pg_sys::ProcessInterrupts();
