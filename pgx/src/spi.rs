@@ -89,7 +89,9 @@ impl Spi {
     /// explain a query, returning its result in json form
     pub fn explain(query: &str) -> Json {
         Spi::connect(|mut client| {
-            let table = client.update(&format!("EXPLAIN (format json) {}", query), None, None);
+            let table = client
+                .update(&format!("EXPLAIN (format json) {}", query), None, None)
+                .first();
             Ok(Some(
                 table
                     .get_one::<Json>()
