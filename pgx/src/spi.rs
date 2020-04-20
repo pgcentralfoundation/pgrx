@@ -1,6 +1,7 @@
 use crate::{pg_sys, FromDatum, IntoDatum, Json, PgMemoryContexts, PgOid};
 use enum_primitive_derive::*;
 use num_traits::FromPrimitive;
+use std::convert::TryInto;
 use std::fmt::Debug;
 
 #[derive(Debug, Primitive)]
@@ -56,6 +57,11 @@ pub struct SpiTupleTable {
     size: usize,
     tupdesc: Option<pg_sys::TupleDesc>,
     current: isize,
+}
+
+pub struct SpiHeapTupleData {
+    data: *mut pg_sys::HeapTupleData,
+    tupdesc: pg_sys::TupleDesc,
 }
 
 impl Spi {
@@ -310,6 +316,27 @@ impl SpiTupleTable {
         (a, b, c)
     }
 
+    pub fn get_heap_tuple(&self) -> Option<SpiHeapTupleData> {
+        if self.current < 0 {
+            panic!("SpiTupleTable positioned before start")
+        }
+        if self.current as u64 >= unsafe { pg_sys::SPI_processed } {
+            None
+        } else {
+            match self.tupdesc {
+                Some(tupdesc) => unsafe {
+                    let heap_tuple = std::slice::from_raw_parts((*self.table).vals, self.size)
+                        [self.current as usize];
+                    Some(SpiHeapTupleData {
+                        data: heap_tuple,
+                        tupdesc: tupdesc,
+                    })
+                },
+                None => panic!("TupDesc is NULL"),
+            }
+        }
+    }
+
     pub fn get_datum<T: FromDatum>(&self, ordinal: i32) -> Option<T> {
         if self.current < 0 {
             panic!("SpiTupleTable positioned before start")
@@ -363,24 +390,37 @@ impl SpiTupleTable {
     }
 }
 
+impl SpiHeapTupleData {
+    pub fn get_datum<T: FromDatum>(&self, ordinal: i32) -> Option<T> {
+        unsafe {
+            let natts = (*self.tupdesc).natts;
+
+            if ordinal < 1 || ordinal > natts {
+                None
+            } else {
+                let mut is_null = false;
+                let datum = pg_sys::SPI_getbinval(self.data, self.tupdesc, ordinal, &mut is_null);
+
+                T::from_datum(datum, is_null, pg_sys::SPI_gettypeid(self.tupdesc, ordinal))
+            }
+        }
+    }
+}
+
 impl Iterator for SpiTupleTable {
-    type Item = Vec<Option<pg_sys::Datum>>;
+    type Item = SpiHeapTupleData;
 
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
         if self.current >= self.size as isize {
-            // reset the iterator back to the start
             self.current = -1;
-
-            // and indicate that we're done
             None
         } else {
             self.current += 1;
             assert!(self.current >= 0);
-            self.nth(self.current as usize)
+            self.get_heap_tuple()
         }
     }
-
     #[inline]
     fn size_hint(&self) -> (usize, Option<usize>) {
         (0, Some(self.size))
@@ -394,13 +434,6 @@ impl Iterator for SpiTupleTable {
         self.size
     }
 
-    #[allow(unused_mut)]
-    #[inline]
-    fn nth(&mut self, mut n: usize) -> Option<Self::Item> {
-        if n >= self.size {
-            None
-        } else {
-            self.make_vec()
-        }
-    }
+    // Removed this function as it comes with an iterator
+    //fn nth(&mut self, mut n: usize) -> Option<Self::Item> {
 }
