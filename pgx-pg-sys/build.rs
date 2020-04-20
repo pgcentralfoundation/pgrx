@@ -4,6 +4,7 @@ use bindgen::callbacks::MacroParsingBehavior;
 use quote::quote;
 use rayon::prelude::*;
 use std::collections::HashSet;
+use std::env;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Output};
 use std::str::FromStr;
@@ -13,6 +14,11 @@ use syn::Item;
 
 #[derive(Debug)]
 struct IgnoredMacros(HashSet<String>);
+
+enum Source {
+    Git,
+    Packaged,
+}
 
 impl IgnoredMacros {
     fn default() -> Self {
@@ -47,9 +53,12 @@ fn make_git_repo_path(branch_name: &str) -> PathBuf {
     PathBuf::from(format!("/tmp/pgx-build/{}", branch_name))
 }
 
-fn make_include_path(git_repo_path: &PathBuf) -> PathBuf {
-    let mut include_path = git_repo_path.clone();
-    include_path.push("install/include/postgresql/server");
+fn make_include_path(pg_path: &PathBuf, source: Source) -> PathBuf {
+    let mut include_path = pg_path.clone();
+    match source {
+        Source::Git => include_path.push("install/include/postgresql/server"),
+        Source::Packaged => include_path.push("include/server"),
+    };
     include_path
 }
 
@@ -97,36 +106,45 @@ fn main() -> Result<(), std::io::Error> {
     .par_iter()
     .for_each(|v| {
         let version = v.0;
-        let branch_name = v.1;
-        let port_no = u16::from_str(v.2).unwrap();
-        let pg_git_path = make_git_repo_path(branch_name);
-        let include_path = make_include_path(&pg_git_path);
+        let (pg_path, include_path) = match env::var(format!("{}_INCLUDE_PATH", v.0.to_uppercase()))
+        {
+            Err(_) => {
+                let branch_name = v.1;
+                let port_no = u16::from_str(v.2).unwrap();
+                let pg_git_path = make_git_repo_path(branch_name);
+                let config_status =
+                    PathBuf::from(format!("{}/config.status", pg_git_path.display()));
+                let need_configure_and_make =
+                    git_clone_postgres(&pg_git_path, pg_git_repo_url, branch_name)
+                        .expect(&format!("Unable to git clone {}", pg_git_repo_url));
+
+                if need_configure_and_make || !config_status.is_file() {
+                    eprintln!("[{}] cleaning and building", branch_name);
+
+                    git_clean(&pg_git_path, &branch_name)
+                        .expect(&format!("Unable to switch to branch {}", branch_name));
+
+                    configure_and_make(&pg_git_path, &branch_name, port_no).expect(&format!(
+                        "Unable to make clean and configure postgres branch {}",
+                        branch_name
+                    ));
+                }
+                let include_path = make_include_path(&pg_git_path, Source::Git);
+                (pg_git_path, include_path)
+            }
+            Ok(path) => {
+                let pg_path = PathBuf::from(path);
+                let include_path = make_include_path(&pg_path, Source::Packaged);
+                (pg_path, include_path)
+            }
+        };
         let bindings_rs = PathBuf::from(format!("src/{}_bindings.rs", version));
         let include_h = PathBuf::from(format!("include/{}.h", version));
-        let config_status = PathBuf::from(format!("{}/config.status", pg_git_path.display()));
-        let need_configure_and_make =
-            git_clone_postgres(&pg_git_path, pg_git_repo_url, branch_name)
-                .unwrap_or_else(|e| panic!("Unable to git clone {}: {:?}", pg_git_repo_url, e));
-
-        if need_configure_and_make || !config_status.is_file() {
-            eprintln!("[{}] cleaning and building", branch_name);
-
-            git_clean(&pg_git_path, &branch_name)
-                .unwrap_or_else(|e| panic!("Unable to switch to branch {}: {:?}", branch_name, e));
-
-            configure_and_make(&pg_git_path, &branch_name, port_no).unwrap_or_else(|e| {
-                panic!(
-                    "Unable to make clean and configure postgres branch {}: {:?}",
-                    branch_name, e
-                )
-            });
-        }
-
-        build_shim(&shim_dir, &shim_mutex, &pg_git_path, version);
+        build_shim(&shim_dir, &shim_mutex, &pg_path, version);
 
         eprintln!(
             "[{}] Running bindgen on {} with {}",
-            branch_name,
+            version,
             bindings_rs.display(),
             include_path.display()
         );
@@ -229,6 +247,7 @@ fn build_shim_for_version(
 
 fn generate_common_rs(mut working_dir: PathBuf) {
     eprintln!("[all branches] Regenerating common.rs and XX_specific.rs files...");
+    eprintln!("{:?}", working_dir);
     let cwd = std::env::current_dir().unwrap();
 
     working_dir.pop();
@@ -542,13 +561,17 @@ pub(crate) mod bindings_diff {
 
         let mut versions = vec![&mut v10, &mut v11, &mut v12];
         let common = build_common_set(&mut versions);
-
         eprintln!(
             "[all branches]: common={}, v10={}, v11={}, v12={}",
             common.len(),
             v10.len(),
             v11.len(),
             v12.len(),
+        );
+        eprintln!(
+            "[all branches]: common={}, v10=, v11={}, v12=",
+            common.len(),
+            v11.len(),
         );
 
         write_common_file("pgx-pg-sys/src/common.rs", common);
