@@ -1,5 +1,4 @@
 use crate::pg_sys;
-use std::borrow::Cow;
 use std::convert::TryInto;
 use std::ffi::CStr;
 use std::ffi::CString;
@@ -48,13 +47,14 @@ pub enum BgWorkerStartTime {
 pub struct BackgroundWorker {}
 
 impl BackgroundWorker {
-    pub fn get_name() -> Cow<'static, str> {
+    pub fn get_name() -> &'static str {
         unsafe {
             CStr::from_ptr(std::mem::transmute::<&[i8; 96], *const i8>(
                 &(*pg_sys::MyBgworkerEntry).bgw_name,
             ))
         }
-        .to_string_lossy()
+        .to_str()
+        .expect("should not have non UTF8")
     }
 
     pub fn sighup_received() -> bool {
@@ -67,7 +67,7 @@ impl BackgroundWorker {
         GOT_SIGTERM.swap(false, Ordering::SeqCst)
     }
 
-    pub fn wait_latch(timeout: Duration, wakeup_flags: WLflags) -> bool{
+    pub fn wait_latch(timeout: Duration, wakeup_flags: WLflags) -> bool {
         wait_latch(timeout.as_millis().try_into().unwrap(), wakeup_flags);
         true
     }
@@ -100,13 +100,13 @@ impl BackgroundWorker {
         }
     }
 
-    pub fn transaction<F: FnOnce()>(transaction_body: F) {
+    pub fn transaction<F: FnOnce() + std::panic::UnwindSafe + std::panic::RefUnwindSafe>(transaction_body: F) {
         unsafe {
             pg_sys::SetCurrentStatementStartTimestamp();
             pg_sys::StartTransactionCommand();
             pg_sys::PushActiveSnapshot(pg_sys::GetTransactionSnapshot());
         }
-        transaction_body();
+        pg_sys::guard(|| transaction_body());
         unsafe {
             pg_sys::PopActiveSnapshot();
             pg_sys::CommitTransactionCommand();
