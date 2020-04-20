@@ -1,7 +1,6 @@
 use crate::{pg_sys, FromDatum, IntoDatum, Json, PgMemoryContexts, PgOid};
 use enum_primitive_derive::*;
 use num_traits::FromPrimitive;
-use std::convert::TryInto;
 use std::fmt::Debug;
 
 #[derive(Debug, Primitive)]
@@ -362,30 +361,6 @@ impl SpiTupleTable {
                 },
                 None => panic!("TupDesc is NULL"),
             }
-        }
-    }
-
-    fn make_vec(&self) -> Option<Vec<Option<pg_sys::Datum>>> {
-        match self.tupdesc {
-            Some(tupdesc) => {
-                let natts = unsafe { (*tupdesc).natts };
-                let mut row = Vec::with_capacity(natts as usize);
-                let heap_tuple = unsafe {
-                    std::slice::from_raw_parts((*self.table).vals, self.size)[self.current as usize]
-                };
-
-                for i in 1..=natts {
-                    let mut is_null = false;
-                    let datum =
-                        unsafe { pg_sys::SPI_getbinval(heap_tuple, tupdesc, i, &mut is_null) };
-
-                    row.push(if is_null { None } else { Some(datum) });
-                }
-
-                Some(row)
-            }
-
-            None => None,
         }
     }
 }
