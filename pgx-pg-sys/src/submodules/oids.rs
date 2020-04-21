@@ -174,6 +174,10 @@ impl PgBuiltInOids {
     pub fn value(self) -> pg_sys::Oid {
         self as isize as pg_sys::Oid
     }
+
+    pub fn oid(self) -> PgOid {
+        PgOid::from(self.value())
+    }
 }
 
 #[derive(Copy, Clone, Eq, PartialEq, Hash, Ord, PartialOrd, Debug)]
