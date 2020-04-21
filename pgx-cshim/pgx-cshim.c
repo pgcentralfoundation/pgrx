@@ -66,7 +66,7 @@ bool pgx_HeapTupleHeaderIsHeapOnly(HeapTupleHeader htup_header) {
 
 PGDLLEXPORT RangeTblEntry *pgx_planner_rt_fetch(Index index, PlannerInfo *plannerInfo);
 RangeTblEntry *pgx_planner_rt_fetch(Index index, PlannerInfo *root) {
-    planner_rt_fetch(index, root);
+    return planner_rt_fetch(index, root);
 }
 
 #if IS_PG_10 || IS_PG_11
