@@ -46,6 +46,7 @@ pub extern "C" fn my_bgw_init() {
             });
         });
     }
+
     log!(
         "Goodbye from inside the {} BGWorker! ",
         BackgroundWorker::get_name()

@@ -236,9 +236,12 @@ impl BackgroundWorkerBuilder {
                 Some(d) => d.as_secs() as i32,
             },
             bgw_library_name: RpgffiChar96::from(&self.bgw_library_name[..]).0,
+            bgw_function_name: RpgffiChar96::from(&self.bgw_function_name[..]).0,
+            /*
             bgw_function_name: RpgffiChar96::from(
-                &format!("pg_bgw_{}_wrapper", &self.bgw_function_name)[..],
+                &format!("{}_wrapper", &self.bgw_function_name)[..],
             )
+            */
             .0,
             bgw_main_arg: self.bgw_main_arg,
             bgw_extra: RpgffiChar128::from(&self.bgw_extra[..]).0,
@@ -247,7 +250,9 @@ impl BackgroundWorkerBuilder {
 
         unsafe {
             pg_sys::RegisterBackgroundWorker(&mut bgw);
-            if self.bgw_flags.contains(BGWflags::BGWORKER_SHMEM_ACCESS) {
+            if self.bgw_flags.contains(BGWflags::BGWORKER_SHMEM_ACCESS)
+                && self.shared_memory_startup_fn.is_some()
+            {
                 PREV_SHMEM_STARTUP_HOOK = pg_sys::shmem_startup_hook;
                 pg_sys::shmem_startup_hook = self.shared_memory_startup_fn;
             }
