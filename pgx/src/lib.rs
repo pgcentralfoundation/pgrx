@@ -60,7 +60,7 @@ pub use pgx_pg_sys::submodules::*;
 ///
 /// This macro was initially inspired from the `pg_module` macro in https://github.com/thehydroimpulse/postgres-extension.rs
 ///
-/// Shameless;y cribbed from https://github.com/bluejekyll/pg-extend-rs
+/// Shamelessly cribbed from https://github.com/bluejekyll/pg-extend-rs
 #[macro_export]
 macro_rules! pg_module_magic {
     () => {
