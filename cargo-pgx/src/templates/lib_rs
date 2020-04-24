@@ -11,9 +11,6 @@ fn hello_{name}() -> &'static str {{
 mod tests {{
     use pgx::*;
 
-    #[test]
-    fn make_idea_happy() {{ }}
-
     #[pg_test]
     fn test_hello_{name}() {{
         assert_eq!("Hello, {name}", crate::hello_{name}());
