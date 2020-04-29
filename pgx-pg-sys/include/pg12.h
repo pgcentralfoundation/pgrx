@@ -53,6 +53,7 @@
 #include "tcop/utility.h"
 #include "utils/builtins.h"
 #include "utils/date.h"
+#include "utils/geo_decls.h"
 #include "utils/guc.h"
 #include "utils/json.h"
 #include "utils/jsonb.h"

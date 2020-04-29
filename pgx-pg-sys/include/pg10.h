@@ -57,6 +57,9 @@
 #include "tcop/utility.h"
 #include "utils/builtins.h"
 #include "utils/date.h"
+#define double float8
+#include "utils/geo_decls.h"
+#undef double
 #include "utils/guc.h"
 #include "utils/json.h"
 #include "utils/jsonb.h"

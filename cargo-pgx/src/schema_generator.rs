@@ -676,6 +676,8 @@ fn translate_type_string(
             default_value,
             variadic,
         )),
+        "pg_sys :: BOX" | "BOX" => Some(("box".to_string(), false, default_value, variadic)),
+        "pg_sys :: Point" | "Point" => Some(("point".to_string(), false, default_value, variadic)),
         "pg_sys :: Oid" => Some(("oid".to_string(), false, default_value, variadic)),
         "pg_sys :: ItemPointerData" => Some(("tid".to_string(), false, default_value, variadic)),
         "pg_sys :: FunctionCallInfo" => None,
