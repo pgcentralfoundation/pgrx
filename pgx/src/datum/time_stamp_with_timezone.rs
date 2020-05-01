@@ -119,9 +119,11 @@ impl serde::Serialize for TimestampWithTimeZone {
         S: serde::Serializer,
     {
         if self.millisecond() > 0 {
-            serializer.serialize_str(&self.format(&format!("%Y-%m-%dT%T.{}Z", self.millisecond())))
+            serializer.serialize_str(
+                &self.format(&format!("%Y-%m-%dT%H:%M:%S.{}-00", self.millisecond())),
+            )
         } else {
-            serializer.serialize_str(&self.format("%Y-%m-%dT%TZ"))
+            serializer.serialize_str(&self.format("%Y-%m-%dT%H:%M:%S-00"))
         }
     }
 }
