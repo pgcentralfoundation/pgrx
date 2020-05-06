@@ -2,7 +2,7 @@ use crate::{pg_guard, pg_sys, void_mut_ptr, PgBox, PgList};
 use std::ops::Deref;
 
 pub struct HookResult<T> {
-    inner: T,
+    pub inner: T,
 }
 
 impl<T> HookResult<T> {
