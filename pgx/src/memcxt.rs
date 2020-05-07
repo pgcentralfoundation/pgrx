@@ -298,15 +298,15 @@ impl PgMemoryContexts {
     }
 
     pub fn leak_and_drop_on_delete<T>(&mut self, v: T) -> *mut T {
-        unsafe extern "C" fn drop_on_delete(ptr: void_mut_ptr) {
-            let boxed = Box::from_raw(ptr);
+        unsafe extern "C" fn drop_on_delete<T>(ptr: void_mut_ptr) {
+            let boxed = Box::from_raw(ptr as *mut T);
             drop(boxed);
         }
 
         let leaked_ptr = Box::leak(Box::new(v));
         let mut memcxt_callback =
             PgBox::from_pg(self.palloc_struct::<pg_sys::MemoryContextCallback>());
-        memcxt_callback.func = Some(drop_on_delete);
+        memcxt_callback.func = Some(drop_on_delete::<T>);
         memcxt_callback.arg = leaked_ptr as *mut T as void_mut_ptr;
         unsafe {
             pg_sys::MemoryContextRegisterResetCallback(self.value(), memcxt_callback.into_pg());
