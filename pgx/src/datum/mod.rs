@@ -16,6 +16,7 @@ mod time;
 mod time_stamp;
 mod time_stamp_with_timezone;
 mod time_with_timezone;
+mod tuples;
 mod varlena;
 
 pub use self::time::*;
@@ -34,4 +35,5 @@ pub use numeric::*;
 pub use time_stamp::*;
 pub use time_stamp_with_timezone::*;
 pub use time_with_timezone::*;
+pub use tuples::*;
 pub use varlena::*;

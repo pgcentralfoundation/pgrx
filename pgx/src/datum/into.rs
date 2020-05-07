@@ -211,3 +211,13 @@ impl<T> IntoDatum for PgBox<T> {
         }
     }
 }
+
+impl IntoDatum for pg_sys::Datum {
+    fn into_datum(self) -> Option<pg_sys::Datum> {
+        Some(self)
+    }
+
+    fn type_oid() -> pg_sys::Oid {
+        pg_sys::INT8OID
+    }
+}

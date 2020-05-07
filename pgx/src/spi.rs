@@ -65,7 +65,40 @@ pub struct SpiHeapTupleData {
 
 impl Spi {
     pub fn get_one<A: FromDatum + IntoDatum>(query: &str) -> Option<A> {
-        Spi::connect(|client| Ok(client.select(query, Some(1), None).first().get_one()))
+        Spi::connect(|client| {
+            let result = client.select(query, Some(1), None).first().get_one();
+            Ok(result)
+        })
+    }
+
+    pub fn get_two<A: FromDatum + IntoDatum, B: FromDatum + IntoDatum>(
+        query: &str,
+    ) -> (Option<A>, Option<B>) {
+        Spi::connect(|client| {
+            let (a, b) = client
+                .select(query, Some(1), None)
+                .first()
+                .get_two::<A, B>();
+            Ok(Some((a, b)))
+        })
+        .unwrap()
+    }
+
+    pub fn get_three<
+        A: FromDatum + IntoDatum,
+        B: FromDatum + IntoDatum,
+        C: FromDatum + IntoDatum,
+    >(
+        query: &str,
+    ) -> (Option<A>, Option<B>, Option<C>) {
+        Spi::connect(|client| {
+            let (a, b, c) = client
+                .select(query, Some(1), None)
+                .first()
+                .get_three::<A, B, C>();
+            Ok(Some((a, b, c)))
+        })
+        .unwrap()
     }
 
     pub fn get_one_with_args<A: FromDatum + IntoDatum>(
@@ -73,6 +106,38 @@ impl Spi {
         args: Vec<(PgOid, Option<pg_sys::Datum>)>,
     ) -> Option<A> {
         Spi::connect(|client| Ok(client.select(query, Some(1), Some(args)).first().get_one()))
+    }
+
+    pub fn get_two_with_args<A: FromDatum + IntoDatum, B: FromDatum + IntoDatum>(
+        query: &str,
+        args: Vec<(PgOid, Option<pg_sys::Datum>)>,
+    ) -> (Option<A>, Option<B>) {
+        Spi::connect(|client| {
+            let (a, b) = client
+                .select(query, Some(1), Some(args))
+                .first()
+                .get_two::<A, B>();
+            Ok(Some((a, b)))
+        })
+        .unwrap()
+    }
+
+    pub fn get_three_with_args<
+        A: FromDatum + IntoDatum,
+        B: FromDatum + IntoDatum,
+        C: FromDatum + IntoDatum,
+    >(
+        query: &str,
+        args: Vec<(PgOid, Option<pg_sys::Datum>)>,
+    ) -> (Option<A>, Option<B>, Option<C>) {
+        Spi::connect(|client| {
+            let (a, b, c) = client
+                .select(query, Some(1), Some(args))
+                .first()
+                .get_three::<A, B, C>();
+            Ok(Some((a, b, c)))
+        })
+        .unwrap()
     }
 
     /// just run an arbitrary SQL statement.
