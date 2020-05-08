@@ -191,7 +191,7 @@ impl PgGuardRewriter {
 
         let result_handler = if optional {
             quote! {
-                let result = match pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).switch_to(|| { #func_call result }) {
+                let result = match pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).switch_to(|_| { #func_call result }) {
                     Some(result) => result,
                     None => {
                         pgx::srf_return_done(fcinfo, &mut funcctx);
@@ -201,7 +201,7 @@ impl PgGuardRewriter {
             }
         } else {
             quote! {
-                let result = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).switch_to(|| { #func_call result });
+                let result = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).switch_to(|_| { #func_call result });
             }
         };
 
@@ -289,7 +289,7 @@ impl PgGuardRewriter {
 
         let result_handler = if optional {
             quote! {
-                let result = match pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).switch_to(|| { #func_call result }) {
+                let result = match pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).switch_to(|_| { #func_call result }) {
                     Some(result) => result,
                     None => {
                         pgx::srf_return_done(fcinfo, &mut funcctx);
@@ -299,7 +299,7 @@ impl PgGuardRewriter {
             }
         } else {
             quote! {
-                let result = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).switch_to(|| { #func_call result });
+                let result = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).switch_to(|_| { #func_call result });
             }
         };
 
@@ -317,7 +317,7 @@ impl PgGuardRewriter {
                 if srf_is_first_call(fcinfo) {
                     funcctx = pgx::srf_first_call_init(fcinfo);
                     funcctx.user_fctx = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).palloc_struct::<IteratorHolder<#generic_type>>() as void_mut_ptr;
-                    funcctx.tuple_desc = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).switch_to(|| {
+                    funcctx.tuple_desc = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).switch_to(|_| {
                         let mut tupdesc: *mut pgx::pg_sys::TupleDescData = std::ptr::null_mut();
 
                         unsafe {

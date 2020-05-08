@@ -182,7 +182,7 @@ impl Spi {
     >(
         f: F,
     ) -> Option<R> {
-        let outer_memory_context =
+        let mut outer_memory_context =
             PgMemoryContexts::For(PgMemoryContexts::CurrentMemoryContext.value());
 
         // connect to SPI
@@ -206,7 +206,7 @@ impl Spi {
                             None
                         } else {
                             // transfer the returned datum to the outer memory context
-                            outer_memory_context.switch_to(|| {
+                            outer_memory_context.switch_to(|_| {
                                 // TODO:  can we get the type oid from somewhere?
                                 //        - do we even need it?
                                 unsafe {

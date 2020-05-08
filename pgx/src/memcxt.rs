@@ -193,7 +193,7 @@ impl PgMemoryContexts {
     ///
     /// #[pg_guard]
     /// pub fn do_something() -> pg_sys::ItemPointer {
-    ///     PgMemoryContexts::TopTransactionContext.switch_to(|| {
+    ///     PgMemoryContexts::TopTransactionContext.switch_to(|context| {
     ///         // allocate a new ItemPointerData, but inside the TopTransactionContext
     ///         let tid = PgBox::<pg_sys::ItemPointerData>::alloc();
     ///         
@@ -203,8 +203,11 @@ impl PgMemoryContexts {
     ///     })
     /// }
     /// ```
-    pub fn switch_to<R, F: Fn() -> R + std::panic::UnwindSafe + std::panic::RefUnwindSafe>(
-        &self,
+    pub fn switch_to<
+        R,
+        F: Fn(&mut PgMemoryContexts) -> R + std::panic::UnwindSafe + std::panic::RefUnwindSafe,
+    >(
+        &mut self,
         f: F,
     ) -> R {
         match self {
@@ -315,7 +318,10 @@ impl PgMemoryContexts {
     }
 
     /// helper function
-    fn exec_in_context<R, F: Fn() -> R + std::panic::UnwindSafe + std::panic::RefUnwindSafe>(
+    fn exec_in_context<
+        R,
+        F: Fn(&mut PgMemoryContexts) -> R + std::panic::UnwindSafe + std::panic::RefUnwindSafe,
+    >(
         context: pg_sys::MemoryContext,
         f: F,
     ) -> R {
@@ -327,7 +333,7 @@ impl PgMemoryContexts {
             pg_sys::CurrentMemoryContext = context;
         }
 
-        let result = guard::guard(f);
+        let result = guard::guard(|| f(&mut PgMemoryContexts::For(context)));
 
         // restore our understanding of the current memory context
         unsafe {
