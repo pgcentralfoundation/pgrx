@@ -252,7 +252,7 @@ where
             // set a jump point so that should the wrapped function execute an
             // elog(ERROR), it'll longjmp back here, instead of somewhere inside Postgres
             compiler_fence(Ordering::SeqCst);
-            let jump_value = sigsetjmp(jmp_buff.as_mut_ptr(), 0);
+            let jump_value = sigsetjmp(jmp_buff.as_mut_ptr(), 1);
 
             if jump_value != 0 {
                 // caught an elog(ERROR), so convert it into a panic!()
