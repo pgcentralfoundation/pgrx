@@ -153,25 +153,25 @@ pub unsafe fn register_hook(hook: &'static mut (dyn PgHooks)) {
         current_hook: Box::new(hook),
         prev_executor_start_hook: pg_sys::ExecutorStart_hook
             .replace(pgx_executor_start)
-            .or(Some(pgx_standard_executor_start_wrapper)),
+            .or(Some(pg_sys::standard_ExecutorStart)),
         prev_executor_run_hook: pg_sys::ExecutorRun_hook
             .replace(pgx_executor_run)
-            .or(Some(pgx_standard_executor_run_wrapper)),
+            .or(Some(pg_sys::standard_ExecutorRun)),
         prev_executor_finish_hook: pg_sys::ExecutorFinish_hook
             .replace(pgx_executor_finish)
-            .or(Some(pgx_standard_executor_finish_wrapper)),
+            .or(Some(pg_sys::standard_ExecutorFinish)),
         prev_executor_end_hook: pg_sys::ExecutorEnd_hook
             .replace(pgx_executor_end)
-            .or(Some(pgx_standard_executor_end_wrapper)),
+            .or(Some(pg_sys::standard_ExecutorEnd)),
         prev_executor_check_perms_hook: pg_sys::ExecutorCheckPerms_hook
             .replace(pgx_executor_check_perms)
             .or(Some(pgx_standard_executor_check_perms_wrapper)),
         prev_process_utility_hook: pg_sys::ProcessUtility_hook
             .replace(pgx_process_utility)
-            .or(Some(pgx_standard_process_utility_wrapper)),
+            .or(Some(pg_sys::standard_ProcessUtility)),
         prev_planner_hook: pg_sys::planner_hook
             .replace(pgx_planner)
-            .or(Some(pgx_standard_planner_wrapper)),
+            .or(Some(pg_sys::standard_planner)),
     });
 
     unsafe extern "C" fn xact_callback(event: pg_sys::XactEvent, _: void_mut_ptr) {
@@ -376,68 +376,9 @@ unsafe extern "C" fn pgx_planner(
     .inner
 }
 
-#[pg_guard]
-unsafe extern "C" fn pgx_standard_executor_start_wrapper(
-    query_desc: *mut pg_sys::QueryDesc,
-    eflags: i32,
-) {
-    pg_sys::standard_ExecutorStart(query_desc, eflags);
-}
-
-#[pg_guard]
-unsafe extern "C" fn pgx_standard_executor_run_wrapper(
-    query_desc: *mut pg_sys::QueryDesc,
-    direction: pg_sys::ScanDirection,
-    count: u64,
-    execute_once: bool,
-) {
-    pg_sys::standard_ExecutorRun(query_desc, direction, count, execute_once);
-}
-
-#[pg_guard]
-unsafe extern "C" fn pgx_standard_executor_finish_wrapper(query_desc: *mut pg_sys::QueryDesc) {
-    pg_sys::standard_ExecutorFinish(query_desc);
-}
-
-#[pg_guard]
-unsafe extern "C" fn pgx_standard_executor_end_wrapper(query_desc: *mut pg_sys::QueryDesc) {
-    pg_sys::standard_ExecutorEnd(query_desc);
-}
-
-#[pg_guard]
 unsafe extern "C" fn pgx_standard_executor_check_perms_wrapper(
     _range_table: *mut pg_sys::List,
     _ereport_on_violation: bool,
 ) -> bool {
     true
-}
-
-#[pg_guard]
-unsafe extern "C" fn pgx_standard_process_utility_wrapper(
-    pstmt: *mut pg_sys::PlannedStmt,
-    query_string: *const ::std::os::raw::c_char,
-    context: pg_sys::ProcessUtilityContext,
-    params: pg_sys::ParamListInfo,
-    query_env: *mut pg_sys::QueryEnvironment,
-    dest: *mut pg_sys::DestReceiver,
-    completion_tag: *mut ::std::os::raw::c_char,
-) {
-    pg_sys::standard_ProcessUtility(
-        pstmt,
-        query_string,
-        context,
-        params,
-        query_env,
-        dest,
-        completion_tag,
-    )
-}
-
-#[pg_guard]
-unsafe extern "C" fn pgx_standard_planner_wrapper(
-    parse: *mut pg_sys::Query,
-    cursor_options: i32,
-    bound_params: pg_sys::ParamListInfo,
-) -> *mut pg_sys::PlannedStmt {
-    pg_sys::standard_planner(parse, cursor_options, bound_params)
 }
