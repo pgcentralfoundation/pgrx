@@ -2,7 +2,6 @@
 
 use std::any::Any;
 use std::cell::Cell;
-use std::os::raw::c_int;
 use std::panic::catch_unwind;
 
 extern "C" {
