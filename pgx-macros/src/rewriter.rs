@@ -171,6 +171,7 @@ impl PgGuardRewriter {
             #[inline(never)]
             #[allow(clippy::missing_safety_doc)]
             #[allow(clippy::redundant_closure)]
+            #[pg_guard]
             #vis unsafe fn #func_name_wrapper(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
 
                 #func_call
@@ -209,6 +210,7 @@ impl PgGuardRewriter {
 
         quote_spanned! {func_span=>
             #prolog
+            #[pg_guard]
             #vis fn #func_name_wrapper(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
 
                 struct IteratorHolder<T> {
@@ -307,6 +309,7 @@ impl PgGuardRewriter {
 
         quote_spanned! {func_span=>
             #prolog
+            #[pg_guard]
             #vis fn #func_name_wrapper(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
 
                 struct IteratorHolder<T> {
