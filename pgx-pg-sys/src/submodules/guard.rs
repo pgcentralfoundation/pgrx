@@ -1,16 +1,12 @@
 #![allow(non_snake_case)]
 
-use crate::common::{error_context_stack, sigjmp_buf, PG_exception_stack};
 use std::any::Any;
 use std::cell::Cell;
-use std::mem::MaybeUninit;
-use std::os::raw::{c_int, c_void};
+use std::os::raw::c_int;
 use std::panic::catch_unwind;
-use std::sync::atomic::{compiler_fence, Ordering};
-use std::thread::LocalKey;
 
 extern "C" {
-    fn siglongjmp(env: *mut sigjmp_buf, val: c_int) -> c_void;
+    fn pg_re_throw();
     fn pgx_ereport(
         level: i32,
         code: i32,
@@ -22,21 +18,8 @@ extern "C" {
 
 }
 
-#[cfg(target_os = "linux")]
-extern "C" {
-    #[link_name = "__sigsetjmp"]
-    fn sigsetjmp(env: *mut sigjmp_buf, savemask: c_int) -> c_int;
-}
-
-#[cfg(target_os = "macos")]
-extern "C" {
-    fn sigsetjmp(env: *mut sigjmp_buf, savemask: c_int) -> c_int;
-}
-
-#[derive(Clone)]
-struct JumpContext {
-    jump_value: c_int,
-}
+#[derive(Clone, Debug)]
+pub struct JumpContext {}
 
 #[derive(Debug, Clone, Copy)]
 pub struct PgxPanic {
@@ -99,23 +82,6 @@ pub fn register_pg_guard_panic_handler() {
     }))
 }
 
-#[inline]
-fn inc_depth(depth: &'static LocalKey<Cell<usize>>) {
-    depth.with(|depth| depth.replace(depth.get() + 1));
-}
-
-#[inline]
-fn dec_depth(depth: &'static LocalKey<Cell<usize>>) {
-    depth.with(|depth| depth.replace(depth.get() - 1));
-}
-
-#[inline]
-fn get_depth(depth: &'static LocalKey<Cell<usize>>) -> usize {
-    depth.with(|depth| depth.get())
-}
-
-thread_local! { static DEPTH: Cell<usize> = Cell::new(0) }
-
 /// A `std::result::Result`-type value returned from `pg_try()` that allows for performing cleanup
 /// work after a closure raised an error and before it is possibly rethrown
 #[must_use = "this `PgTryResult` may be be holding a Postgres ERROR.  It must be consumed or rethrown"]
@@ -123,7 +89,6 @@ pub struct PgTryResult<T>(std::thread::Result<T>);
 
 impl<T> PgTryResult<T> {
     /// Retrieve the returned value or panic if the try block raised an error
-    #[inline]
     pub fn unwrap(self) -> T {
         self.unwrap_or_rethrow(|| {})
     }
@@ -135,7 +100,6 @@ impl<T> PgTryResult<T> {
     ///
     /// Doing so can potentially leave Postgres in an undefined state and ultimately cause it
     /// to crash.
-    #[inline]
     pub unsafe fn unwrap_or(self, value: T) -> T {
         match self.0 {
             Ok(result) => result,
@@ -152,7 +116,6 @@ impl<T> PgTryResult<T> {
     ///
     /// Ignoring a caught error can leave Postgres in an undefined state and ultimately cause it
     /// to crash.
-    #[inline]
     pub unsafe fn unwrap_or_else<F>(self, cleanup: F) -> T
     where
         F: FnOnce() -> T,
@@ -166,7 +129,6 @@ impl<T> PgTryResult<T> {
     /// Perform some operation cleanup operation after the try block if an error was thrown.
     ///
     /// In the event an error was caught, it is rethrown.
-    #[inline]
     pub fn unwrap_or_rethrow<F>(self, cleanup: F) -> T
     where
         F: FnOnce(),
@@ -175,7 +137,7 @@ impl<T> PgTryResult<T> {
             Ok(result) => result,
             Err(e) => {
                 catch_guard(e, cleanup);
-                unreachable!("failed to rethrow ERROR during pg_try().or_else_rethrow()")
+                unreachable!("failed to rethrow ERROR during pg_try().unwrap_or_rethrow()")
             }
         }
     }
@@ -184,7 +146,6 @@ impl<T> PgTryResult<T> {
     ///
     /// In the event an error was caught, it is rethrown.  Otherwise, the return value from the try
     /// block is returned
-    #[inline]
     pub fn finally_or_rethrow<F>(self, finally_block: F) -> T
     where
         F: FnOnce(),
@@ -196,7 +157,7 @@ impl<T> PgTryResult<T> {
             }
             Err(e) => {
                 catch_guard(e, finally_block);
-                unreachable!("failed to rethrow ERROR during pg_try().or_else_rethrow()")
+                unreachable!("failed to rethrow ERROR during pg_try().finally_or_rethrow()")
             }
         }
     }
@@ -210,7 +171,6 @@ impl<T> PgTryResult<T> {
 ///
 /// This function is re-entrant and will properly "bubble-up" panics or errors to the top-level
 /// before they're converted into Postgres ERRORs
-#[inline]
 pub fn guard<Func, R>(f: Func) -> R
 where
     Func: FnOnce() -> R + std::panic::UnwindSafe + std::panic::RefUnwindSafe,
@@ -220,7 +180,6 @@ where
 
 /// Similar to `guard`, but allows the caller to unwrap the result in various ways, possibly
 /// performing cleanup work before the caught error is rethrown
-#[inline]
 pub fn pg_try<Try, R>(try_func: Try) -> PgTryResult<R>
 where
     Try: FnOnce() -> R + std::panic::UnwindSafe + std::panic::RefUnwindSafe,
@@ -228,56 +187,19 @@ where
     try_guard(try_func)
 }
 
-#[inline]
 fn try_guard<Try, R>(try_func: Try) -> PgTryResult<R>
 where
     Try: FnOnce() -> R + std::panic::UnwindSafe + std::panic::RefUnwindSafe,
 {
-    unsafe {
-        // remember where Postgres would like to jump to
-        let prev_exception_stack = PG_exception_stack;
-        let prev_error_context_stack = error_context_stack;
+    // run try_func() in a catch_unwind, as we never want a Rust panic! to leak
+    // from this function.  It's imperative that we nevery try to panic! across
+    // FFI (extern "C") function boundaries
+    let result = catch_unwind(try_func);
 
-        //
-        // setup the longjmp context and run our wrapped function inside
-        // a catch_unwind() block
-        //
-        // we do this so that we can catch any panic!() that might occur
-        // in the wrapped function, including those we generate in response
-        // to an elog(ERROR) via longjmp
-        //
-        let result = catch_unwind(|| {
-            let mut jmp_buff = MaybeUninit::uninit();
-
-            // set a jump point so that should the wrapped function execute an
-            // elog(ERROR), it'll longjmp back here, instead of somewhere inside Postgres
-            compiler_fence(Ordering::SeqCst);
-            let jump_value = sigsetjmp(jmp_buff.as_mut_ptr(), 1);
-
-            if jump_value != 0 {
-                // caught an elog(ERROR), so convert it into a panic!()
-                panic!(JumpContext { jump_value });
-            }
-
-            // lie to Postgres about where it should jump when it does an elog(ERROR)
-            PG_exception_stack = jmp_buff.as_mut_ptr();
-
-            // run our wrapped function and return its result
-            inc_depth(&DEPTH);
-            try_func()
-        });
-
-        // restore Postgres' understanding of where it should longjmp
-        dec_depth(&DEPTH);
-        PG_exception_stack = prev_exception_stack;
-        error_context_stack = prev_error_context_stack;
-
-        // return our result -- it could be Ok(), or it could be an Err()
-        PgTryResult(result)
-    }
+    // return our result -- it could be Ok(), or it could be an Err()
+    PgTryResult(result)
 }
 
-#[inline]
 fn catch_guard<Catch>(error: Box<dyn Any + std::marker::Send>, catch_func: Catch)
 where
     Catch: FnOnce(),
@@ -286,51 +208,34 @@ where
     // before we end up rethrowing the error
     catch_func();
 
-    // if we're at nesting depth zero then we'll report the specified error to Postgres, otherwise
-    // we'll rethrow it
-    if get_depth(&DEPTH) == 0 {
-        let location = take_panic_location();
+    // determine how to rethrow the error
+    match downcast_err(error) {
+        // the error is a String, which means it was originally a Rust panic!(), so
+        // translate it into an elog(ERROR), including the code location that caused
+        // the panic!()
+        Ok(message) => {
+            let location = take_panic_location();
+            let c_message = std::ffi::CString::new(message.clone()).unwrap();
+            let c_file = std::ffi::CString::new(location.file).unwrap();
 
-        // we're not wrapping a function
-        match downcast_err(error) {
-            // the error is a String, which means it was originally a Rust panic!(), so
-            // translate it into an elog(ERROR), including the code location that caused
-            // the panic!()
-            Ok(message) => {
-                let c_message = std::ffi::CString::new(message.clone()).unwrap();
-                let c_file = std::ffi::CString::new(location.file).unwrap();
-
-                unsafe {
-                    pgx_ereport(
-                        crate::ERROR as i32,
-                        2600, // ERRCODE_INTERNAL_ERROR
-                        c_message.as_ptr(),
-                        c_file.as_ptr(),
-                        location.line as i32,
-                        location.col as i32,
-                    );
-                }
-                unreachable!("ereport() failed at depth==0 with message: {}", message);
+            unsafe {
+                pgx_ereport(
+                    crate::ERROR as i32,
+                    2600, // ERRCODE_INTERNAL_ERROR
+                    c_message.as_ptr(),
+                    c_file.as_ptr(),
+                    location.line as i32,
+                    location.col as i32,
+                );
             }
-
-            // the error is a JumpContext, so we need to longjmp back into Postgres
-            Err(jump_context) => unsafe {
-                compiler_fence(Ordering::SeqCst);
-                siglongjmp(PG_exception_stack, jump_context.jump_value);
-                unreachable!("siglongjmp failed");
-            },
+            unreachable!("ereport() failed at depth==0 with message: {}", message);
         }
-    } else {
-        // we're at least one level deep in nesting so rethrow the panic!()
-        rethrow_panic(error)
-    }
-}
 
-/// rethrow whatever the `e` error is as a Rust `panic!()`
-fn rethrow_panic(e: Box<dyn Any + Send>) -> ! {
-    match downcast_err(e) {
-        Ok(message) => panic!(message),
-        Err(jump_context) => panic!(jump_context),
+        // the error is a JumpContext, so we need to longjmp back into Postgres
+        Err(_) => unsafe {
+            pg_re_throw();
+            unreachable!("siglongjmp failed");
+        },
     }
 }
 

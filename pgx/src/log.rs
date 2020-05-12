@@ -584,9 +584,12 @@ macro_rules! warning {
 
 #[macro_export]
 macro_rules! error {
-    ($($arg:tt)*) => (
-        { $crate::log::ereport($crate::log::PgLogLevel::ERROR, $crate::log::PgSqlErrorCode::ERRCODE_INTERNAL_ERROR, format!($($arg)*).as_str(), file!(), line!(), column!()); unreachable!("elog failed"); }
-    )
+    () => ({ panic!("explicit ERROR") });
+    ($msg:expr) => ({ panic!($msg) });
+    ($msg:expr,) => ({ panic!($msg) });
+    ($fmt:expr, $($arg:tt)+) => ({
+        panic!($fmt, $($arg)+)
+    });
 }
 
 #[allow(non_snake_case)]

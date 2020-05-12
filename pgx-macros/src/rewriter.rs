@@ -95,7 +95,7 @@ impl PgGuardRewriter {
         };
 
         let prolog = quote! {
-            #[inline]
+            #[inline(never)]
             #func
 
             #[no_mangle]
@@ -167,6 +167,8 @@ impl PgGuardRewriter {
     ) -> proc_macro2::TokenStream {
         quote_spanned! {func_span=>
             #prolog
+
+            #[inline(never)]
             #[allow(clippy::missing_safety_doc)]
             #[allow(clippy::redundant_closure)]
             #vis unsafe fn #func_name_wrapper(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
@@ -416,14 +418,32 @@ impl PgGuardRewriter {
         let return_type = PgGuardRewriter::get_return_type(&func.sig);
 
         quote! {
+            #[inline(never)]
             #[allow(clippy::missing_safety_doc)]
             #[allow(clippy::redundant_closure)]
-            pub unsafe extern "C" fn #func_name ( #arg_list_with_types ) #return_type {
+            pub unsafe fn #func_name ( #arg_list_with_types ) #return_type {
                 extern "C" {
                     pub fn #func_name( #arg_list_with_types ) #return_type ;
                 }
 
-                pg_sys::guard::guard(|| unsafe { #func_name( #arg_list) })
+                let prev_exception_stack = pg_sys::PG_exception_stack;
+                let prev_error_context_stack = pg_sys::error_context_stack;
+                let mut jmp_buff = std::mem::MaybeUninit::uninit();
+                let jump_value = pg_sys::sigsetjmp(jmp_buff.as_mut_ptr(), 0);
+
+                let result = if jump_value == 0 {
+                    pg_sys::PG_exception_stack = jmp_buff.as_mut_ptr();
+                    #func_name(#arg_list)
+                } else {
+                    pg_sys::PG_exception_stack = prev_exception_stack;
+                    pg_sys::error_context_stack = prev_error_context_stack;
+                    panic!(pg_sys::JumpContext { });
+                };
+
+                pg_sys::PG_exception_stack = prev_exception_stack;
+                pg_sys::error_context_stack = prev_error_context_stack;
+
+                result
             }
         }
     }
