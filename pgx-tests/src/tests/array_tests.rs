@@ -85,6 +85,11 @@ fn return_text_array() -> Vec<&'static str> {
     vec!["a", "b", "c", "d"]
 }
 
+#[pg_extern]
+fn return_zero_length_vec() -> Vec<i32> {
+    Vec::new()
+}
+
 #[cfg(any(test, feature = "pg_test"))]
 mod tests {
     #[allow(unused_imports)]
@@ -193,6 +198,13 @@ mod tests {
     #[pg_test]
     fn test_return_text_array() {
         let rc = Spi::get_one::<bool>("SELECT ARRAY['a', 'b', 'c', 'd'] = return_text_array();")
+            .expect("failed to get SPI result");
+        assert!(rc)
+    }
+
+    #[pg_test]
+    fn test_return_zero_length_vec() {
+        let rc = Spi::get_one::<bool>("SELECT ARRAY[]::integer[] = return_zero_length_vec();")
             .expect("failed to get SPI result");
         assert!(rc)
     }
