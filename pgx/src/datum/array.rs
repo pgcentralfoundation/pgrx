@@ -347,7 +347,13 @@ where
     T: IntoDatum,
 {
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        let mut state = std::ptr::null_mut();
+        let mut state = unsafe {
+            pg_sys::initArrayResult(
+                T::type_oid(),
+                PgMemoryContexts::CurrentMemoryContext.value(),
+                false,
+            )
+        };
         for s in self {
             let datum = s.into_datum();
             let isnull = datum.is_none();
@@ -363,9 +369,14 @@ where
             }
         }
 
-        Some(unsafe {
-            pg_sys::makeArrayResult(state, PgMemoryContexts::CurrentMemoryContext.value())
-        })
+        if state.is_null() {
+            // shoudln't happen
+            None
+        } else {
+            Some(unsafe {
+                pg_sys::makeArrayResult(state, PgMemoryContexts::CurrentMemoryContext.value())
+            })
+        }
     }
 
     fn type_oid() -> u32 {
