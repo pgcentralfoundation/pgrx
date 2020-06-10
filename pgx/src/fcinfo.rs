@@ -31,6 +31,12 @@ macro_rules! default {
     ($ty:ty, $val:tt) => {
         $ty
     };
+    ($ty:ty, $val:path) => {
+        $ty
+    };
+    ($ty:ty, $val:expr) => {
+        $ty
+    };
 }
 
 /// A macro for providing SQL names for the returned fields for functions that return a Rust tuple,

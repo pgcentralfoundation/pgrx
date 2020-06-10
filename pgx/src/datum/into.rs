@@ -165,6 +165,17 @@ impl IntoDatum for String {
     }
 }
 
+impl IntoDatum for &String {
+    #[inline]
+    fn into_datum(self) -> Option<pg_sys::Datum> {
+        self.as_str().into_datum()
+    }
+
+    fn type_oid() -> u32 {
+        pg_sys::TEXTOID
+    }
+}
+
 /// for cstring
 ///
 /// ## Safety

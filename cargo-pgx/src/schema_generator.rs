@@ -415,8 +415,10 @@ fn make_create_function_statement(
                             default_value = default_value.trim_start_matches('\'').to_string();
                             default_value = default_value.trim_end_matches('\'').to_string();
 
+                            // quote default values, except those that match certain patterns
                             if !default_value.eq_ignore_ascii_case("NULL")
-                                && !default_value.starts_with("ARRAY")
+                                && !default_value.to_uppercase().starts_with("ARRAY")
+                                && !default_value.contains("(")
                             {
                                 default_value = format!("'{}'", default_value);
                             }
@@ -599,7 +601,7 @@ fn translate_type(filename: &DirEntry, ty: &Type) -> Option<(String, bool, Optio
 fn deconstruct_macro(as_string: &str) -> Option<(String, Option<String>, bool)> {
     if as_string.starts_with("default !") {
         let regexp =
-            regex::Regex::new(r#"default ! \( (?P<type>.*?)\s*, (?P<value>.*?) \)"#).unwrap();
+            regex::Regex::new(r#"default ! \( (?P<type>.*?)\s*, (?P<value>.*) \)"#).unwrap();
 
         let default_value =
             Some(get_named_capture(&regexp, "value", as_string).expect("no default value"));
@@ -645,7 +647,7 @@ fn translate_type_string(
         "PgRelation" => Some(("regclass".to_string(), false, default_value, variadic)),
         "Numeric" => Some(("numeric".to_string(), false, default_value, variadic)),
         "Inet" => Some(("inet".to_string(), false, default_value, variadic)),
-        "& str" | "& 'static str" | "&'static str" | "String" => {
+        "& str" | "& 'static str" | "&'static str" | "String" | "& 'static String" | "& String" => {
             Some(("text".to_string(), false, default_value, variadic))
         }
         "& std :: ffi :: CStr" => Some(("cstring".to_string(), false, default_value, variadic)),
