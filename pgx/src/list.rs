@@ -127,6 +127,30 @@ impl<T> PgList<T> {
     }
 
     #[inline]
+    pub fn replace_ptr(&mut self, i: usize, with: *mut T) {
+        unsafe {
+            let cell = pg_sys::list_nth_cell(self.list, i as i32);
+            cell.as_mut().expect("cell is null").data.ptr_value = with as void_mut_ptr;
+        }
+    }
+
+    #[inline]
+    pub fn replace_int(&mut self, i: usize, with: i32) {
+        unsafe {
+            let cell = pg_sys::list_nth_cell(self.list, i as i32);
+            cell.as_mut().expect("cell is null").data.int_value = with;
+        }
+    }
+
+    #[inline]
+    pub fn replace_oid(&mut self, i: usize, with: pg_sys::Oid) {
+        unsafe {
+            let cell = pg_sys::list_nth_cell(self.list, i as i32);
+            cell.as_mut().expect("cell is null").data.oid_value = with;
+        }
+    }
+
+    #[inline]
     pub fn iter_ptr(&self) -> impl Iterator<Item = *mut T> + '_ {
         PgListIteratorPtr {
             list: &self,
