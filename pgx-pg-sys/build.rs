@@ -269,7 +269,7 @@ fn compile_postgres(
     match rc.status.code().unwrap() {
         0 => Ok(false), // we did NOT compile Postgres
         2 => Ok(true),  // we did compile Postgres
-        _ => panic!("failed to download Postgres v{}", version_number),
+        _ => panic!("failed to compile Postgres v{}", version_number),
     }
 }
 

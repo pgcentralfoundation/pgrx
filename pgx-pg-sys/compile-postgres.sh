@@ -30,7 +30,7 @@ cd "${PGDIR}" || exit 1
 
 # configure postgres if not already
 if [ ! -f "config.status" ]; then
-  ./configure --prefix="${INSTALLDIR}" --with-pgport=${PORT} || exit 1
+  ./configure --prefix="${INSTALLDIR}" ---without-readline --without-zlib -with-pgport=${PORT} || exit 1
 fi
 
 # compile postgres and install it locally
