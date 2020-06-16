@@ -4,9 +4,10 @@ use bindgen::callbacks::MacroParsingBehavior;
 use quote::quote;
 use rayon::prelude::*;
 use std::collections::HashSet;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::process::{Command, Output};
 use std::str::FromStr;
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Mutex;
 use syn::export::{ToTokens, TokenStream2};
 use syn::Item;
@@ -43,146 +44,126 @@ impl bindgen::callbacks::ParseCallbacks for IgnoredMacros {
     }
 }
 
-fn make_git_repo_path(branch_name: &str) -> PathBuf {
-    PathBuf::from(format!("/tmp/pgx-build/{}", branch_name))
-}
-
-fn make_include_path(git_repo_path: &PathBuf) -> PathBuf {
-    let mut include_path = git_repo_path.clone();
-    include_path.push("install/include/postgresql/server");
-    include_path
-}
-
-fn make_shim_path(manifest_dir: &str) -> PathBuf {
-    let mut shim_dir = PathBuf::from(manifest_dir);
-
-    // backup a directory
-    shim_dir.pop();
-
-    // and a new dir named "pgx-cshim"
-    shim_dir.push("pgx-cshim");
-
-    shim_dir
-}
-
 fn main() -> Result<(), std::io::Error> {
-    build_deps::rerun_if_changed_paths("include/*").unwrap();
-    build_deps::rerun_if_changed_paths("../pgx-macros/src/*").unwrap();
-    build_deps::rerun_if_changed_paths("../pgx-cshim/pgx-cshim.c").unwrap();
-    build_deps::rerun_if_changed_paths("../pgx-cshim/Makefile").unwrap();
-    build_deps::rerun_if_changed_paths(
-        "/tmp/pgx-build/REL_10_STABLE/.git/refs/heads/REL_10_STABLE",
-    )
-    .unwrap();
-    build_deps::rerun_if_changed_paths(
-        "/tmp/pgx-build/REL_11_STABLE/.git/refs/heads/REL_11_STABLE",
-    )
-    .unwrap();
-    build_deps::rerun_if_changed_paths(
-        "/tmp/pgx-build/REL_12_STABLE/.git/refs/heads/REL_12_STABLE",
-    )
-    .unwrap();
+    // dump our environment
+    for (k, v) in std::env::vars() {
+        eprintln!("{}={}", k, v);
+    }
 
-    let manifest_dir = std::env::var("CARGO_MANIFEST_DIR").unwrap();
-    let cwd = PathBuf::from(&manifest_dir);
-    let pg_git_repo_url = "git://git.postgresql.org/git/postgresql.git";
-    let shim_dir = make_shim_path(&manifest_dir);
+    build_deps::rerun_if_changed_paths("download-postgres.sh").unwrap();
+    build_deps::rerun_if_changed_paths("compile-postgres.sh").unwrap();
+    build_deps::rerun_if_changed_paths("include/*").unwrap();
+    build_deps::rerun_if_changed_paths("cshim/pgx-cshim.c").unwrap();
+    build_deps::rerun_if_changed_paths("cshim/Makefile").unwrap();
+
+    let manifest_dir = PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").unwrap());
+    let target_dir = PathBuf::from(std::env::var("CARGO_TARGET_DIR").unwrap_or_else(|_| {
+        let mut out_dir = PathBuf::from(std::env::var("OUT_DIR").unwrap());
+        out_dir.pop();
+        out_dir.pop();
+        out_dir.pop();
+        out_dir.pop();
+        out_dir.display().to_string()
+    }));
+    let shim_dir = PathBuf::from(format!("{}/cshim", manifest_dir.display()));
+
+    eprintln!("manifest_dir={}", manifest_dir.display());
+    eprintln!("target_dir={}", target_dir.display());
+    eprintln!("shim_dir={}", shim_dir.display());
 
     let shim_mutex = Mutex::new(());
-    vec![
-        ("pg10", "REL_10_STABLE", "8810"),
-        ("pg11", "REL_11_STABLE", "8811"),
-        ("pg12", "REL_12_STABLE", "8812"),
-    ]
-    .par_iter()
-    .for_each(|v| {
-        let version = v.0;
-        let branch_name = v.1;
-        let port_no = u16::from_str(v.2).unwrap();
-        let pg_git_path = make_git_repo_path(branch_name);
-        let include_path = make_include_path(&pg_git_path);
-        let bindings_rs = PathBuf::from(format!("src/{}_bindings.rs", version));
-        let include_h = PathBuf::from(format!("include/{}.h", version));
-        let config_status = PathBuf::from(format!("{}/config.status", pg_git_path.display()));
-        let need_configure_and_make =
-            git_clone_postgres(&pg_git_path, pg_git_repo_url, branch_name)
-                .unwrap_or_else(|e| panic!("Unable to git clone {}: {:?}", pg_git_repo_url, e));
+    let need_common_rs = AtomicBool::new(false);
 
-        if need_configure_and_make || !config_status.is_file() {
-            eprintln!("[{}] cleaning and building", branch_name);
+    vec![("10.13", "8810"), ("11.8", "8811"), ("12.3", "8812")]
+        .par_iter()
+        .for_each(|v| {
+            let version: &str = v.0;
+            let major_version =
+                u16::from_str(version.split_terminator('.').next().unwrap()).unwrap();
+            let port_no = u16::from_str(v.1).unwrap();
+            let include_path = PathBuf::from(format!(
+                "{}/postgresql-{}/pgx-install/include/server",
+                target_dir.display(),
+                version
+            ));
+            let bindings_rs = PathBuf::from(format!("src/pg{}_bindings.rs", major_version));
+            let specific_rs = PathBuf::from(format!("src/pg{}_specific.rs", major_version));
+            let include_h = PathBuf::from(format!("include/pg{}.h", major_version));
 
-            git_clean(&pg_git_path, &branch_name)
-                .unwrap_or_else(|e| panic!("Unable to switch to branch {}: {:?}", branch_name, e));
+            eprintln!("include_path={}", include_path.display());
+            eprintln!("bindings_rs={}", bindings_rs.display());
+            eprintln!("include_h={}", include_h.display());
+            download_postgres(&manifest_dir, version, &target_dir)
+                .expect(&format!("failed to download Postgres v{}", version));
+            let did_compile = compile_postgres(&manifest_dir, version, &target_dir, port_no)
+                .expect(&format!("failed to compile Postgres v{}", version));
+            build_shim(&shim_dir, &shim_mutex, &target_dir, major_version, version);
 
-            configure_and_make(&pg_git_path, &branch_name, port_no).unwrap_or_else(|e| {
-                panic!(
-                    "Unable to make clean and configure postgres branch {}: {:?}",
-                    branch_name, e
-                )
-            });
-        }
+            if did_compile || !specific_rs.exists() {
+                need_common_rs.store(true, Ordering::SeqCst);
+                eprintln!(
+                    "[{}] Running bindgen on {} with {}",
+                    version,
+                    bindings_rs.display(),
+                    include_path.display()
+                );
+                let bindings = bindgen::Builder::default()
+                    .header(include_h.to_str().unwrap())
+                    .clang_arg(&format!("-I{}", include_path.display()))
+                    .parse_callbacks(Box::new(IgnoredMacros::default()))
+                    .blacklist_function("varsize_any") // pgx converts the VARSIZE_ANY macro, so we don't want to also have this function, which is in heaptuple.c
+                    .blacklist_function("query_tree_walker")
+                    .blacklist_function("expression_tree_walker")
+                    .blacklist_function("sigsetjmp")
+                    .blacklist_function("siglongjmp")
+                    .blacklist_function("pg_re_throw")
+                    .rustfmt_bindings(true)
+                    .derive_debug(true)
+                    .derive_copy(true) // necessary to avoid __BindgenUnionField usages -- I don't understand why?
+                    .derive_default(true)
+                    .derive_eq(false)
+                    .derive_partialeq(false)
+                    .derive_hash(false)
+                    .derive_ord(false)
+                    .derive_partialord(false)
+                    .layout_tests(false)
+                    .generate()
+                    .unwrap_or_else(|e| {
+                        panic!("Unable to generate bindings for {}: {:?}", version, e)
+                    });
 
-        build_shim(&shim_dir, &shim_mutex, &pg_git_path, version);
-
-        eprintln!(
-            "[{}] Running bindgen on {} with {}",
-            branch_name,
-            bindings_rs.display(),
-            include_path.display()
-        );
-        let bindings = bindgen::Builder::default()
-            .header(include_h.to_str().unwrap())
-            .clang_arg(&format!("-I{}", include_path.display()))
-            .parse_callbacks(Box::new(IgnoredMacros::default()))
-            .blacklist_function("varsize_any") // pgx converts the VARSIZE_ANY macro, so we don't want to also have this function, which is in heaptuple.c
-            .blacklist_function("query_tree_walker")
-            .blacklist_function("expression_tree_walker")
-            .blacklist_function("sigsetjmp")
-            .blacklist_function("siglongjmp")
-            .blacklist_function("pg_re_throw")
-            .rustfmt_bindings(true)
-            .derive_debug(true)
-            .derive_copy(true) // necessary to avoid __BindgenUnionField usages -- I don't understand why?
-            .derive_default(true)
-            .derive_eq(false)
-            .derive_partialeq(false)
-            .derive_hash(false)
-            .derive_ord(false)
-            .derive_partialord(false)
-            .layout_tests(false)
-            .generate()
-            .unwrap_or_else(|e| panic!("Unable to generate bindings for {}: {:?}", version, e));
-
-        let bindings = apply_pg_guard(bindings.to_string()).unwrap();
-        std::fs::write(bindings_rs.clone(), bindings).unwrap_or_else(|e| {
-            panic!(
-                "Unable to save bindings for {} to {}: {:?}",
-                version,
-                bindings_rs.display(),
-                e
-            )
+                let bindings = apply_pg_guard(bindings.to_string()).unwrap();
+                std::fs::write(bindings_rs.clone(), bindings).unwrap_or_else(|e| {
+                    panic!(
+                        "Unable to save bindings for {} to {}: {:?}",
+                        version,
+                        bindings_rs.display(),
+                        e
+                    )
+                });
+            }
         });
-    });
 
-    generate_common_rs(cwd);
+    if need_common_rs.load(Ordering::SeqCst) {
+        generate_common_rs(manifest_dir);
+    }
 
     Ok(())
 }
 
-fn build_shim(shim_dir: &PathBuf, shim_mutex: &Mutex<()>, pg_git_path: &PathBuf, version: &str) {
+fn build_shim(
+    shim_dir: &PathBuf,
+    shim_mutex: &Mutex<()>,
+    target_dir: &PathBuf,
+    major_version: u16,
+    version: &str,
+) {
     // build the shim under a lock b/c this can't be built concurrently
     let _lock = shim_mutex.lock().expect("couldn't obtain shim_mutex");
 
     // then build the shim for the version feature currently being built
-    if version.eq("pg10") {
-        build_shim_for_version(&shim_dir, &pg_git_path, 10).expect("shim build for pg10 failed");
-    } else if version.eq("pg11") {
-        build_shim_for_version(&shim_dir, &pg_git_path, 11).expect("shim build for pg11 failed");
-    } else if version.eq("pg12") {
-        build_shim_for_version(&shim_dir, &pg_git_path, 12).expect("shim build for pg12 failed");
-    } else {
-        panic!("can't determine which c-shim to build");
-    }
+    build_shim_for_version(&shim_dir, &target_dir, major_version, version)
+        .expect("shim build failed");
 
     // and tell rustc to link to the library that was built for the feature we're currently building
     if std::env::var("CARGO_FEATURE_PG10").is_ok() {
@@ -199,15 +180,20 @@ fn build_shim(shim_dir: &PathBuf, shim_mutex: &Mutex<()>, pg_git_path: &PathBuf,
 
 fn build_shim_for_version(
     shim_dir: &PathBuf,
-    git_repo_path: &PathBuf,
-    version_no: i32,
+    target_dir: &PathBuf,
+    major_version: u16,
+    version: &str,
 ) -> Result<(), std::io::Error> {
-    // put the install directory fir this version of Postgres at the head of the path
+    // put the install directory for this version of Postgres at the head of the path
     // so that `pg_config` gets found and we can make the shim static library
     let path_env = std::env::var("PATH").unwrap();
     let path_env = format!(
         "{}:{}",
-        format!("{}/install/bin", git_repo_path.display()),
+        format!(
+            "{}/postgresql-{}/pgx-install/bin",
+            target_dir.display(),
+            version
+        ),
         path_env
     );
 
@@ -216,15 +202,15 @@ fn build_shim_for_version(
     let rc = run_command(
         Command::new("make")
             .arg("clean")
-            .arg(&format!("libpgx-cshim-{}.a", version_no))
-            .env("PG_TARGET_VERSION", format!("{}", version_no))
+            .arg(&format!("libpgx-cshim-{}.a", major_version))
+            .env("PG_TARGET_VERSION", format!("{}", major_version))
             .env("PATH", path_env)
             .current_dir(shim_dir),
-        &format!("shim for PG v{}", version_no),
+        &format!("shim for PG v{}", major_version),
     )?;
 
     if rc.status.code().unwrap() != 0 {
-        panic!("failed to make pgx-cshim for v{}", version_no);
+        panic!("failed to make pgx-cshim for v{}", major_version);
     }
 
     Ok(())
@@ -244,120 +230,50 @@ fn generate_common_rs(mut working_dir: PathBuf) {
     }
 }
 
-fn git_clone_postgres(
-    path: &Path,
-    repo_url: &str,
-    branch_name: &str,
+fn download_postgres(
+    manifest_dir: &PathBuf,
+    version_number: &str,
+    target_dir: &PathBuf,
+) -> Result<(), std::io::Error> {
+    let rc = run_command(
+        Command::new("./download-postgres.sh")
+            .arg(version_number)
+            .arg(target_dir.display().to_string())
+            .current_dir(manifest_dir.display().to_string()),
+        version_number,
+    )?;
+
+    if rc.status.code().unwrap() != 0 {
+        panic!("failed to download Postgres v{}", version_number);
+    }
+    Ok(())
+}
+
+fn compile_postgres(
+    manifest_dir: &PathBuf,
+    version_number: &str,
+    target_dir: &PathBuf,
+    port_number: u16,
 ) -> Result<bool, std::io::Error> {
-    if path.exists() {
-        let mut gitdir = path.to_path_buf();
-        gitdir.push(Path::new(".git/config"));
-
-        if gitdir.exists() && gitdir.is_file() {
-            // we already have git cloned
-            // do a pull instead
-            let output = run_command(
-                Command::new("git").arg("pull").current_dir(path),
-                branch_name,
-            )?;
-
-            // a status code of zero and more than 1 line on stdout means we fetched new stuff
-            return Ok(output.status.code().unwrap() == 0
-                && String::from_utf8(output.stdout).unwrap().lines().count() > 1);
-        }
-    }
-
-    let output = run_command(
-        Command::new("git").arg("clone").arg(repo_url).arg(path),
-        branch_name,
+    let num_cpus = 1.max(num_cpus::get() / 3);
+    let rc = run_command(
+        Command::new("./compile-postgres.sh")
+            .arg(version_number)
+            .arg(target_dir.display().to_string())
+            .arg(port_number.to_string())
+            .env("NUM_CPUS", num_cpus.to_string())
+            .current_dir(manifest_dir.display().to_string()),
+        version_number,
     )?;
 
-    // if the output status is zero, that means we cloned the repo
-    if output.status.code().unwrap() != 0 {
-        return Ok(false);
+    match rc.status.code().unwrap() {
+        0 => Ok(false), // we did NOT compile Postgres
+        2 => Ok(true),  // we did compile Postgres
+        _ => panic!("failed to download Postgres v{}", version_number),
     }
-
-    let output = run_command(
-        Command::new("git")
-            .arg("checkout")
-            .arg(branch_name)
-            .current_dir(path),
-        branch_name,
-    )?;
-
-    // if the output status is zero, that means we switched to the right branch
-    Ok(output.status.code().unwrap() == 0)
 }
 
-fn git_clean(path: &Path, branch_name: &str) -> Result<(), std::io::Error> {
-    run_command(
-        Command::new("git")
-            .arg("clean")
-            .arg("-f")
-            .arg("-d")
-            .arg("-x")
-            .current_dir(path),
-        branch_name,
-    )?;
-
-    run_command(
-        Command::new("git").arg("pull").current_dir(path),
-        branch_name,
-    )?;
-
-    Ok(())
-}
-
-fn configure_and_make(path: &Path, branch_name: &str, port_no: u16) -> Result<(), std::io::Error> {
-    // configure
-    let rc = run_command(
-        Command::new(format!("{}/configure", path.display()))
-            .arg("--without-readline") // don't need readline to build PG extensions -- one less system dep to install
-            .arg(format!("--prefix={}/install", path.display()))
-            .arg(format!("--with-pgport={}", port_no))
-            .current_dir(path),
-        branch_name,
-    )?;
-
-    if rc.status.code().unwrap() != 0 {
-        panic!("configure failed for {}", branch_name)
-    }
-
-    let num_jobs = u32::from_str(std::env::var("NUM_JOBS").unwrap().as_str()).unwrap();
-    let num_jobs = std::cmp::max(1, num_jobs / 3);
-
-    // make install
-    let rc = run_command(
-        Command::new("make")
-            .arg("-j")
-            .arg(format!("{}", num_jobs))
-            .arg("install")
-            .current_dir(path),
-        branch_name,
-    )?;
-
-    if rc.status.code().unwrap() != 0 {
-        panic!("make install failed for {}", branch_name)
-    }
-
-    // make clean
-    let rc = run_command(
-        Command::new("make")
-            .arg("-j")
-            .arg(format!("{}", num_jobs))
-            .arg("clean")
-            .current_dir(path),
-        branch_name,
-    )?;
-
-    if rc.status.code().unwrap() != 0 {
-        panic!("make clean failed for {}", branch_name)
-    }
-
-    Ok(())
-}
-
-fn run_command(mut command: &mut Command, branch_name: &str) -> Result<Output, std::io::Error> {
+fn run_command(mut command: &mut Command, version: &str) -> Result<Output, std::io::Error> {
     let mut dbg = String::new();
 
     command = command
@@ -373,11 +289,8 @@ fn run_command(mut command: &mut Command, branch_name: &str) -> Result<Output, s
         .env_remove("HOST")
         .env_remove("NUM_JOBS");
 
-    eprintln!("[{}] {:?}", branch_name, command);
-    dbg.push_str(&format!(
-        "[{}] -------- {:?} -------- \n",
-        branch_name, command
-    ));
+    eprintln!("[{}] {:?}", version, command);
+    dbg.push_str(&format!("[{}] -------- {:?} -------- \n", version, command));
 
     let output = command.output()?;
     let rc = output.clone();
@@ -387,19 +300,19 @@ fn run_command(mut command: &mut Command, branch_name: &str) -> Result<Output, s
             if line.starts_with("cargo:") {
                 dbg.push_str(&format!("{}\n", line));
             } else {
-                dbg.push_str(&format!("[{}] [stdout] {}\n", branch_name, line));
+                dbg.push_str(&format!("[{}] [stdout] {}\n", version, line));
             }
         }
     }
 
     if !output.stderr.is_empty() {
         for line in String::from_utf8(output.stderr).unwrap().lines() {
-            dbg.push_str(&format!("[{}] [stderr] {}\n", branch_name, line));
+            dbg.push_str(&format!("[{}] [stderr] {}\n", version, line));
         }
     }
     dbg.push_str(&format!(
         "[{}] /----------------------------------------\n",
-        branch_name
+        version
     ));
 
     eprintln!("{}", dbg);

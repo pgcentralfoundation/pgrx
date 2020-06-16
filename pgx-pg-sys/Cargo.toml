@@ -7,13 +7,12 @@ build = "build.rs"
 
 [dependencies]
 memoffset = "0.5.3"
-
 pgx-macros = { path = "../pgx-macros/" }
 
 [build-dependencies]
 bindgen = "0.52.0"
 build-deps = "0.1.4"
-
+num_cpus = "1.13.0"
 clang = "0.23.0"
 proc-macro2 = "1.0.6"
 quote = "1.0.2"

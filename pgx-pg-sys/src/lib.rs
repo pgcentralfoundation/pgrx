@@ -81,6 +81,12 @@ mod all_versions {
     }
 
     #[inline]
+    pub fn get_pg_major_minor_version_string() -> &'static str {
+        let mver = std::ffi::CStr::from_bytes_with_nul(super::PG_VERSION).unwrap();
+        mver.to_str().unwrap()
+    }
+
+    #[inline]
     pub fn TransactionIdIsNormal(xid: super::TransactionId) -> bool {
         xid >= FirstNormalTransactionId
     }

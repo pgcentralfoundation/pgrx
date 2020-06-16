@@ -9,7 +9,7 @@ use std::str::FromStr;
 pub(crate) fn install_extension(target: Option<&str>) -> Result<(), std::io::Error> {
     let is_release = target.unwrap_or("") == "release";
     let (control_file, extname) = find_control_file()?;
-    let target_dir = get_target_dir(is_release, &extname);
+    let target_dir = get_target_dir();
 
     if &std::env::var("PGX_NO_BUILD").unwrap_or_default() != "true" {
         build_extension(is_release, target_dir.to_str().unwrap())?;
@@ -25,17 +25,19 @@ pub(crate) fn install_extension(target: Option<&str>) -> Result<(), std::io::Err
     let (libpath, libfile) =
         find_library_file(&target_dir.display().to_string(), &extname, is_release)?;
 
-    if let Err(e) = std::fs::copy(control_file.clone(), format!("{}/{}", extdir, control_file)) {
+    let src = control_file.clone();
+    let dest = format!("{}/{}", extdir, control_file);
+    if let Err(e) = std::fs::copy(src, dest) {
         panic!(
             "failed copying control file ({}) to {}:  {}",
             control_file, extdir, e
         );
     }
 
-    if let Err(e) = std::fs::copy(
-        format!("{}/{}", libpath, libfile),
-        format!("{}/{}.so", pkgdir, extname),
-    ) {
+    let src = format!("{}/{}", libpath, libfile);
+    let dest = format!("{}/{}.so", pkgdir, extname);
+    println!("Copying {} to {}", src, dest);
+    if let Err(e) = std::fs::copy(src, dest) {
         panic!("failed copying library ({}) to {}:  {}", libfile, pkgdir, e);
     }
 
@@ -153,14 +155,12 @@ fn get_version() -> String {
     }
 }
 
-fn get_target_dir(is_release: bool, extname: &str) -> PathBuf {
-    let package_name = std::env::var("CARGO_PKG_NAME").unwrap_or_else(|_| extname.to_string());
-
-    PathBuf::from(std::env::var("CARGO_TARGET_DIR").unwrap_or(format!(
-        "/tmp/pgx-installer/{}-{}",
-        package_name,
-        if is_release { "release" } else { "debug" }
-    )))
+fn get_target_dir() -> PathBuf {
+    PathBuf::from(std::env::var("CARGO_TARGET_DIR").unwrap_or_else(|_| {
+        let mut out_dir = PathBuf::from(std::env::current_dir().unwrap());
+        out_dir.push("target");
+        out_dir.display().to_string()
+    }))
 }
 
 fn get_pkglibdir() -> String {

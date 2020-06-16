@@ -455,9 +455,13 @@ fn get_extension_name() -> String {
 }
 
 fn get_pg_path() -> String {
+    let target_dir = std::env::var("CARGO_TARGET_DIR")
+        .unwrap_or(format!("{}/target", std::env::var("PWD").unwrap()));
+
     format!(
-        "/tmp/pgx-build/REL_{}_STABLE/install/",
-        pg_sys::get_pg_major_version_string(),
+        "{}/postgresql-{}/pgx-install/",
+        target_dir,
+        pg_sys::get_pg_major_minor_version_string(),
     )
 }
 
