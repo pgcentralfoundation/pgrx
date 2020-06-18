@@ -1,7 +1,6 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-
 use crate::property_inspector::{find_control_file, get_property};
 use colored::*;
 use std::io::Write;
@@ -10,8 +9,7 @@ use std::process::{Command, Stdio};
 use std::result::Result;
 use std::str::FromStr;
 
-pub(crate) fn install_extension(target: Option<&str>) -> Result<(), std::io::Error> {
-    let is_release = target.unwrap_or("") == "release";
+pub(crate) fn install_extension(is_release: bool) -> Result<(), std::io::Error> {
     let (control_file, extname) = find_control_file()?;
     let target_dir = get_target_dir();
 

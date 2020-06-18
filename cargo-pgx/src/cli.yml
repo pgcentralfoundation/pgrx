@@ -19,10 +19,10 @@ subcommands:
           - install:
               about: install the extension from the current crate
               args:
-                - target:
-                    value_name: DEBUG_OR_RELEASE
-                    takes_value: true
-                    help: '"debug" or "release" (default is "debug")'
+                - release:
+                    short: r
+                    long: release
+                    help: compile for release mode (default is debug)
           - schema:
               about: generate a schema
           - test:

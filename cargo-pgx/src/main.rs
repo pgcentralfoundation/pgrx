@@ -1,24 +1,23 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-
 #[macro_use]
 extern crate clap;
 
 mod crate_template;
 mod extension_installer;
+mod property_inspector;
 mod schema_generator;
 mod test_runner;
-mod property_inspector;
 
 use clap::App;
 use crate_template::*;
 use extension_installer::*;
-use schema_generator::*;
-use test_runner::*;
 use property_inspector::*;
+use schema_generator::*;
 use std::path::PathBuf;
 use std::str::FromStr;
+use test_runner::*;
 
 fn main() -> std::result::Result<(), std::io::Error> {
     let yaml = load_yaml!("cli.yml");
@@ -35,7 +34,7 @@ fn main() -> std::result::Result<(), std::io::Error> {
             let path = PathBuf::from_str(&format!("{}/", name)).unwrap();
             create_crate_template(path, name)?;
         } else if let Some(install) = extension.subcommand_matches("install") {
-            let target = install.value_of("target");
+            let target = install.is_present("release");
             install_extension(target)?;
         } else if let Some(_schema) = extension.subcommand_matches("schema") {
             generate_schema()?;
