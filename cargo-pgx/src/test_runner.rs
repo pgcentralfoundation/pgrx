@@ -1,3 +1,7 @@
+// Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
+// governed by the MIT license that can be found in the LICENSE file.
+
+
 use std::process::{Command, Stdio};
 
 pub fn test_extension(version: &str) -> Result<(), std::io::Error> {

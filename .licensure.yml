@@ -1,0 +1,11 @@
+author: ZomboDB, LLC
+ident: MIT
+email: zombodb@gmail.com
+excludes:
+  - Cargo.toml
+  - ".*\\.h"
+  - "\\.cargo/config"
+  - "cargo-pgx/src/templates/*"
+  - ".github/workflows/*"
+  - ".*\\.control"
+  - ".*\\.md"

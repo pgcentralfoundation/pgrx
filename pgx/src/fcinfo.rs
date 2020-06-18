@@ -1,3 +1,7 @@
+// Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
+// governed by the MIT license that can be found in the LICENSE file.
+
+
 //! Helper macros and functions for creating Postgres UDFs.
 //!
 //! Other than the exported macros, typically these functions are not necessary to call directly
