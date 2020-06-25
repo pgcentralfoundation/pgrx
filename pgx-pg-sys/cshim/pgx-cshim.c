@@ -91,6 +91,7 @@ void pgx_deconstruct_row_type(TupleDesc tupdesc, Datum row, Datum **columns, boo
     HeapTupleHeader td;
     HeapTupleData   tmptup;
     HeapTupleData   *tuple;
+    int             natts;
 
     td = DatumGetHeapTupleHeader(row);
 
@@ -98,8 +99,7 @@ void pgx_deconstruct_row_type(TupleDesc tupdesc, Datum row, Datum **columns, boo
     tmptup.t_len  = HeapTupleHeaderGetDatumLength(td);
     tmptup.t_data = td;
     tuple = &tmptup;
-
-    int natts = tupdesc->natts;
+    natts = tupdesc->natts;
 
     Datum *cols = palloc(natts * sizeof(Datum));
     bool *ns = palloc(natts * sizeof(bool));
