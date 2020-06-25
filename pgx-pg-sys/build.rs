@@ -1,7 +1,6 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-
 extern crate build_deps;
 
 use bindgen::callbacks::MacroParsingBehavior;
@@ -98,9 +97,9 @@ fn main() -> Result<(), std::io::Error> {
             eprintln!("bindings_rs={}", bindings_rs.display());
             eprintln!("include_h={}", include_h.display());
             download_postgres(&manifest_dir, version, &target_dir)
-                .expect(&format!("failed to download Postgres v{}", version));
+                .unwrap_or_else(|_| panic!("failed to download Postgres v{}", version));
             let did_compile = compile_postgres(&manifest_dir, version, &target_dir, port_no)
-                .expect(&format!("failed to compile Postgres v{}", version));
+                .unwrap_or_else(|_| panic!("failed to compile Postgres v{}", version));
             build_shim(&shim_dir, &shim_mutex, &target_dir, major_version, version);
 
             if did_compile || !specific_rs.exists() {

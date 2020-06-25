@@ -90,7 +90,12 @@ fn copy_sql_files(extdir: &str, extname: &str) -> Result<(), std::io::Error> {
     // write each sql file from load-order.txt to the version.sql file
     for file in load_order {
         let file = PathBuf::from_str(&format!("sql/{}", file)).unwrap();
-        let contents = std::fs::read_to_string(&file).unwrap();
+        let pwd = std::env::current_dir().expect("no current directory");
+        let contents = std::fs::read_to_string(&file).expect(&format!(
+            "could not open {}/{}",
+            pwd.display(),
+            file.display()
+        ));
 
         sql.write_all(b"--\n")
             .expect("couldn't write version SQL file");

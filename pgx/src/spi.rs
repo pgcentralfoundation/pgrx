@@ -1,7 +1,6 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-
 use crate::{pg_sys, FromDatum, IntoDatum, Json, PgMemoryContexts, PgOid};
 use enum_primitive_derive::*;
 use num_traits::FromPrimitive;
@@ -399,7 +398,7 @@ impl SpiTupleTable {
                         [self.current as usize];
                     Some(SpiHeapTupleData {
                         data: heap_tuple,
-                        tupdesc: tupdesc,
+                        tupdesc,
                     })
                 },
                 None => panic!("TupDesc is NULL"),
