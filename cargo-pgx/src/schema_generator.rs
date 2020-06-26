@@ -1,7 +1,6 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-
 use crate::property_inspector::get_property;
 use pgx_utils::{categorize_type, CategorizedType, ExternArgs};
 use proc_macro2::{Ident, Span, TokenTree};
@@ -235,17 +234,16 @@ fn walk_items(
                 let name = strct.ident.to_string().to_lowercase();
                 sql.push(format!("CREATE TYPE {}.{};", current_schema, name));
 
-                postgres_types.push(format!("CREATE OR REPLACE FUNCTION {schema}.{name}_in(cstring) RETURNS {schema}.{name} IMMUTABLE STRICT LANGUAGE C AS 'MODULE_PATHNAME', '{name}_in_wrapper';", name = name, schema = current_schema));
-                postgres_types.push(format!("CREATE OR REPLACE FUNCTION {schema}.{name}_out({schema}.{name}) RETURNS cstring IMMUTABLE STRICT LANGUAGE C AS 'MODULE_PATHNAME', '{name}_out_wrapper';", name = name, schema = current_schema));
+                postgres_types.push(format!("CREATE OR REPLACE FUNCTION {qualified_name}_in(cstring) RETURNS {qualified_name} IMMUTABLE STRICT LANGUAGE C AS 'MODULE_PATHNAME', '{name}_in_wrapper';", qualified_name = qualify_name(&current_schema, &name), name = name));
+                postgres_types.push(format!("CREATE OR REPLACE FUNCTION {qualified_name}_out({qualified_name}) RETURNS cstring IMMUTABLE STRICT LANGUAGE C AS 'MODULE_PATHNAME', '{name}_out_wrapper';", qualified_name = qualify_name(&current_schema, &name), name = name));
                 postgres_types.push(format!(
-                    "CREATE TYPE {schema}.{name} (
+                    "CREATE TYPE {qualified_name} (
                         INTERNALLENGTH = variable,
-                        INPUT = {schema}.{name}_in,
-                        OUTPUT = {schema}.{name}_out,
+                        INPUT = {qualified_name}_in,
+                        OUTPUT = {qualified_name}_out,
                         STORAGE = extended
                     );",
-                    schema = current_schema,
-                    name = name,
+                    qualified_name = qualify_name(&current_schema, &name)
                 ));
             }
         } else if let Item::Enum(enm) = item {
@@ -260,7 +258,10 @@ fn walk_items(
 
             if found_postgres_enum {
                 let name = enm.ident.to_string().to_lowercase();
-                sql.push(format!("CREATE TYPE {}.{} AS ENUM (", current_schema, name));
+                sql.push(format!(
+                    "CREATE TYPE {qualified_name} AS ENUM (",
+                    qualified_name = qualify_name(&current_schema, &name)
+                ));
 
                 for (idx, d) in enm.variants.iter().enumerate() {
                     let mut line = String::new();
@@ -369,6 +370,14 @@ fn walk_items(
     }
 }
 
+fn qualify_name(schema: &str, name: &str) -> String {
+    if "public" == schema {
+        name.to_owned()
+    } else {
+        format!("{}.{}", schema, name)
+    }
+}
+
 fn make_create_function_statement(
     func: &ItemFn,
     mut extern_args: Option<HashSet<ExternArgs>>,
@@ -384,9 +393,8 @@ fn make_create_function_statement(
         extract_funcname_attribute(&attributes).unwrap_or_else(|| quote_ident(&func.sig.ident));
 
     statement.push_str(&format!(
-        "CREATE OR REPLACE FUNCTION {schema}.{name}",
-        schema = schema,
-        name = sql_func_name
+        "CREATE OR REPLACE FUNCTION {}",
+        qualify_name(schema, &sql_func_name)
     ));
 
     if let Some(sql_func_arg) = sql_func_arg {
