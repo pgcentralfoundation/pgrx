@@ -1,15 +1,15 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-
+/// Similar to Rust's `Box<T>` type, `PgBox<T>` also represents heap-allocated memory.
 use crate::nodes::PgNode;
 use crate::{pg_sys, void_mut_ptr, PgMemoryContexts};
 use std::fmt::{Debug, Error, Formatter};
 use std::ops::{Deref, DerefMut};
 
-/// Similar to Rust's `Box<T>` type, `PgBox<T>` represents heap-allocated memory.
+/// Similar to Rust's `Box<T>` type, `PgBox<T>` also represents heap-allocated memory.
 ///
-/// However, it represents a heap-allocated pointer that was allocated by Postgres's memory
+/// However, it represents a heap-allocated pointer that was allocated by **Postgres's** memory
 /// allocation functions (`palloc`, etc).  Think of `PgBox<T>` as a wrapper around an otherwise
 /// opaque Postgres type that is projected as a concrete Rust type.
 ///

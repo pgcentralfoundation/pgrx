@@ -1,7 +1,6 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-
 extern crate proc_macro;
 
 mod rewriter;
@@ -16,6 +15,8 @@ use syn::export::{ToTokens, TokenStream2};
 use syn::spanned::Spanned;
 use syn::{parse_macro_input, Attribute, Data, DeriveInput, Item, ItemFn};
 
+/// Declare a function as `#[pg_guard]` to indcate that it is called from a Postgres `extern "C"`
+/// function so that Rust `panic!()`s (and Postgres `elog(ERROR)`s) will be properly handled by `pgx`
 #[proc_macro_attribute]
 pub fn pg_guard(_attr: TokenStream, item: TokenStream) -> TokenStream {
     // get a usable token stream
@@ -38,6 +39,8 @@ pub fn pg_guard(_attr: TokenStream, item: TokenStream) -> TokenStream {
     }
 }
 
+/// `#[pg_test]` functions are test functions (akin to `#[test]`), but they run in-process inside
+/// Postgres during `cargo pgx test`.
 #[proc_macro_attribute]
 pub fn pg_test(attr: TokenStream, item: TokenStream) -> TokenStream {
     let mut stream = proc_macro2::TokenStream::new();
@@ -95,11 +98,14 @@ pub fn pg_test(attr: TokenStream, item: TokenStream) -> TokenStream {
     stream.into()
 }
 
+/// Associated macro for `#[pg_test]` to provide context back to your test framework to indicate
+/// that the test system is being initialized
 #[proc_macro_attribute]
 pub fn initialize(_attr: TokenStream, item: TokenStream) -> TokenStream {
     item
 }
 
+/// Declare a function as `#[pg_extern]` to indicate that it can be used by Postgres as a UDF
 #[proc_macro_attribute]
 pub fn pg_extern(attr: TokenStream, item: TokenStream) -> TokenStream {
     let args = parse_extern_attributes(TokenStream2::from(attr));

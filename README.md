@@ -71,7 +71,7 @@ $ psql test
 ## Digging Deeper
 
  - [cargo-pgx sub-command](cargo-pgx/)
- - [various examples](pgx-examples/)
+ - [various examples](examples/)
 
 
  

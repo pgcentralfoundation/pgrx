@@ -1,10 +1,12 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
+//! A helper struct for creating a Postgres `List` of `String`s to qualify an object name
 
 use crate::list::PgList;
 use crate::pg_sys;
 
+/// A helper struct for creating a Postgres `List` of `String`s to qualify an object name
 pub struct PgQualifiedNameBuilder {
     list: PgList<pg_sys::Value>,
 }

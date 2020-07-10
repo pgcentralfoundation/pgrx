@@ -11,6 +11,10 @@ members = [
     "pgx-pg-sys",
     "pgx-tests",
     "pgx-utils",
+    "examples/arrays",
+    "examples/errors",
+    "examples/srf",
+    "examples/strings",
 ]
 
 [features]

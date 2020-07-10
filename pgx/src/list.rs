@@ -1,6 +1,10 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
+//! A safe wrapper around Postgres' internal `List` structure.
+//!
+//! It functions similarly to a Rust `Vec`, including Iterator support, but provides separate
+//! understandings of Lists of Oids, Integers, and Pointers.
 
 use crate::{is_a, pg_sys, void_mut_ptr};
 use serde::export::PhantomData;

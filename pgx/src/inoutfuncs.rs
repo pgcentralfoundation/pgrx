@@ -1,6 +1,11 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
+//! Helper trait for the `#[derive(PostgresType)]` proc macro for overriding custom Postgres type
+//! input/output functions.
+//!
+//! The default implementations use `serde_json` to serialize a custom type to human-readable strings,
+//! and `serde_cbor` to serialize internally as a `varlena *` for storage on disk.
 
 use crate::*;
 

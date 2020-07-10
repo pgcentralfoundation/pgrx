@@ -1,7 +1,22 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-
+//! `pgx` is a framework for creating Postgres extensions in 100% Rust
+//!
+//! ## Example
+//!
+//! ```rust,no_run
+//! use pgx::*;
+//!
+//! pg_module_magic!();
+//!
+//! // Convert the input string to lowercase and return
+//! #[pg_extern]
+//! fn my_to_lowercase(input: &'static str) -> String {
+//!     input.to_lowercase()
+//! }
+//!
+//! ```
 #![allow(clippy::missing_safety_doc)]
 #![allow(clippy::cast_ptr_alignment)]
 extern crate pgx_macros;
@@ -97,11 +112,9 @@ macro_rules! pg_module_magic {
     };
 }
 
-/// Top-level initialization function
-///
-/// C-based Postgres extensions should call this in their _PG_init() function
+/// Top-level initialization function.  This is called automatically by the `pg_module_magic!()`
+/// macro and need not be called directly
 #[allow(unused)]
-#[no_mangle]
-pub extern "C" fn initialize() {
+pub fn initialize() {
     register_pg_guard_panic_handler();
 }

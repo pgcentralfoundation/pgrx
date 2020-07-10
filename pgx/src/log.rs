@@ -1,7 +1,9 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
+//! Access to Postgres' logging system
 
+/// Postgres' various logging levels
 #[allow(dead_code)]
 #[derive(Clone, Copy)]
 pub enum PgLogLevel {
@@ -523,6 +525,7 @@ pub fn ereport(
     }
 }
 
+/// Log to Postgres' `debug5` log level
 #[macro_export]
 macro_rules! debug5 {
     ($($arg:tt)*) => (
@@ -530,6 +533,7 @@ macro_rules! debug5 {
     )
 }
 
+/// Log to Postgres' `debug4` log level
 #[macro_export]
 macro_rules! debug4 {
     ($($arg:tt)*) => (
@@ -537,6 +541,7 @@ macro_rules! debug4 {
     )
 }
 
+/// Log to Postgres' `debug3` log level
 #[macro_export]
 macro_rules! debug3 {
     ($($arg:tt)*) => (
@@ -544,6 +549,7 @@ macro_rules! debug3 {
     )
 }
 
+/// Log to Postgres' `debug2` log level
 #[macro_export]
 macro_rules! debug2 {
     ($($arg:tt)*) => (
@@ -551,6 +557,7 @@ macro_rules! debug2 {
     )
 }
 
+/// Log to Postgres' `debug1` log level
 #[macro_export]
 macro_rules! debug1 {
     ($($arg:tt)*) => (
@@ -558,6 +565,7 @@ macro_rules! debug1 {
     )
 }
 
+/// Log to Postgres' `log` log level
 #[macro_export]
 macro_rules! log {
     ($($arg:tt)*) => (
@@ -565,6 +573,7 @@ macro_rules! log {
     )
 }
 
+/// Log to Postgres' `info` log level
 #[macro_export]
 macro_rules! info {
     ($($arg:tt)*) => (
@@ -572,6 +581,7 @@ macro_rules! info {
     )
 }
 
+/// Log to Postgres' `notice` log level
 #[macro_export]
 macro_rules! notice {
     ($($arg:tt)*) => (
@@ -579,6 +589,7 @@ macro_rules! notice {
     )
 }
 
+/// Log to Postgres' `warning` log level
 #[macro_export]
 macro_rules! warning {
     ($($arg:tt)*) => (
@@ -586,6 +597,7 @@ macro_rules! warning {
     )
 }
 
+/// Log to Postgres' `error` log level.  This will abort the current Postgres transaction.
 #[macro_export]
 macro_rules! error {
     () => ({ panic!("explicit ERROR") });
@@ -596,6 +608,7 @@ macro_rules! error {
     });
 }
 
+/// Log to Postgres' `fatal` log level.  This will abort the current Postgres backend connection processs
 #[allow(non_snake_case)]
 #[macro_export]
 macro_rules! FATAL {
@@ -604,6 +617,7 @@ macro_rules! FATAL {
     )
 }
 
+/// Log to Postgres' `panic` log level.  This will cause the entire Postgres cluster to crash
 #[allow(non_snake_case)]
 #[macro_export]
 macro_rules! PANIC {
@@ -612,6 +626,8 @@ macro_rules! PANIC {
     )
 }
 
+/// Emit a test output message for highlighting during `cargo pgx test`
+#[cfg(test)]
 #[macro_export]
 macro_rules! testmsg {
     ($($arg:tt)*) => (
@@ -619,18 +635,22 @@ macro_rules! testmsg {
     )
 }
 
+/// Is an interrupt pending?
 #[cfg(any(feature = "pg10", feature = "pg11"))]
 #[inline]
 pub fn interrupt_pending() -> bool {
     unsafe { crate::pg_sys::InterruptPending }
 }
 
+/// Is an interrupt pending?
 #[cfg(feature = "pg12")]
 #[inline]
 pub fn interrupt_pending() -> bool {
     unsafe { crate::pg_sys::InterruptPending != 0 }
 }
 
+/// If an interrupt is pending (perhaps a user-initiated "cancel query" message to this backend),
+/// this will safely abort the current transaction
 #[macro_export]
 macro_rules! check_for_interrupts {
     () => {
