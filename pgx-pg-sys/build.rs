@@ -231,11 +231,10 @@ fn build_shim_for_version(
     Ok(())
 }
 
-fn generate_common_rs(mut working_dir: PathBuf) {
+fn generate_common_rs(working_dir: PathBuf) {
     eprintln!("[all branches] Regenerating common.rs and XX_specific.rs files...");
     let cwd = std::env::current_dir().unwrap();
 
-    working_dir.pop();
     std::env::set_current_dir(&working_dir).unwrap();
     let result = bindings_diff::main();
     std::env::set_current_dir(cwd).unwrap();
@@ -467,9 +466,9 @@ pub(crate) mod bindings_diff {
     }
 
     pub(crate) fn main() -> Result<(), std::io::Error> {
-        let mut v10 = read_source_file("pgx-pg-sys/src/pg10_bindings.rs");
-        let mut v11 = read_source_file("pgx-pg-sys/src/pg11_bindings.rs");
-        let mut v12 = read_source_file("pgx-pg-sys/src/pg12_bindings.rs");
+        let mut v10 = read_source_file("src/pg10_bindings.rs");
+        let mut v11 = read_source_file("src/pg11_bindings.rs");
+        let mut v12 = read_source_file("src/pg12_bindings.rs");
 
         let mut versions = vec![&mut v10, &mut v11, &mut v12];
         let common = build_common_set(&mut versions);
@@ -482,17 +481,17 @@ pub(crate) mod bindings_diff {
             v12.len(),
         );
 
-        write_common_file("pgx-pg-sys/src/common.rs", common);
-        write_source_file("pgx-pg-sys/src/pg10_specific.rs", v10);
-        write_source_file("pgx-pg-sys/src/pg11_specific.rs", v11);
-        write_source_file("pgx-pg-sys/src/pg12_specific.rs", v12);
+        write_common_file("src/common.rs", common);
+        write_source_file("src/pg10_specific.rs", v10);
+        write_source_file("src/pg11_specific.rs", v11);
+        write_source_file("src/pg12_specific.rs", v12);
 
         // delete the bindings files when we're done with them
-        std::fs::remove_file(PathBuf::from_str("pgx-pg-sys/src/pg10_bindings.rs").unwrap())
+        std::fs::remove_file(PathBuf::from_str("src/pg10_bindings.rs").unwrap())
             .expect("couldn't delete v10 bindings");
-        std::fs::remove_file(PathBuf::from_str("pgx-pg-sys/src/pg11_bindings.rs").unwrap())
+        std::fs::remove_file(PathBuf::from_str("src/pg11_bindings.rs").unwrap())
             .expect("couldn't delete v11 bindings");
-        std::fs::remove_file(PathBuf::from_str("pgx-pg-sys/src/pg12_bindings.rs").unwrap())
+        std::fs::remove_file(PathBuf::from_str("src/pg12_bindings.rs").unwrap())
             .expect("couldn't delete v12 bindings");
 
         Ok(())
