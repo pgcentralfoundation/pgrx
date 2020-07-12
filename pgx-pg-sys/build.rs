@@ -89,9 +89,21 @@ fn main() -> Result<(), std::io::Error> {
                 target_dir.display(),
                 version
             ));
-            let bindings_rs = PathBuf::from(format!("src/pg{}_bindings.rs", major_version));
-            let specific_rs = PathBuf::from(format!("src/pg{}_specific.rs", major_version));
-            let include_h = PathBuf::from(format!("include/pg{}.h", major_version));
+            let bindings_rs = PathBuf::from(format!(
+                "{}/src/pg{}_bindings.rs",
+                manifest_dir.display(),
+                major_version
+            ));
+            let specific_rs = PathBuf::from(format!(
+                "{}/src/pg{}_specific.rs",
+                manifest_dir.display(),
+                major_version
+            ));
+            let include_h = PathBuf::from(format!(
+                "{}/include/pg{}.h",
+                manifest_dir.display(),
+                major_version
+            ));
 
             eprintln!("include_path={}", include_path.display());
             eprintln!("bindings_rs={}", bindings_rs.display());

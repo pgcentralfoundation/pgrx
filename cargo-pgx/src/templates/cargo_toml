@@ -1,6 +1,6 @@
 [package]
 name = "{name}"
-version = "0.0.1"
+version = "0.0.2"
 edition = "2018"
 
 [lib]
@@ -14,11 +14,11 @@ pg12 = ["pgx/pg12"]
 pg_test = []
 
 [dependencies]
-pgx = "0.0.1"
-pgx-macros = "0.0.1"
+pgx = "0.0.2"
+pgx-macros = "0.0.2"
 
 [dev-dependencies]
-pgx-tests = "0.0.1"
+pgx-tests = "0.0.2"
 
 [profile.dev]
 panic = "unwind"

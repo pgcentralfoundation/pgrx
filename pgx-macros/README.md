@@ -1,6 +1,6 @@
 # pgx-macros
 
-Procedural macros for [`pgx`](https://crates.io/pgx/).
+Procedural macros for [`pgx`](https://crates.io/crates/pgx/).
 
 Provides:
 
