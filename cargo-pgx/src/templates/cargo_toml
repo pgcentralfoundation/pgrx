@@ -1,6 +1,6 @@
 [package]
 name = "{name}"
-version = "0.1.0"
+version = "0.0.1"
 edition = "2018"
 
 [lib]
@@ -14,7 +14,7 @@ pg12 = ["pgx/pg12"]
 pg_test = []
 
 [dependencies]
-pgx = {{ path = "../pgx/pgx/", default-features = false }}
+pgx = "0.0.1"
 pgx-macros = {{ path = "../pgx/pgx-macros" }}
 
 [dev-dependencies]
