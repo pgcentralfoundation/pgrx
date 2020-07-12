@@ -13,7 +13,7 @@ of Postgres.
 Installing via crates.io is really easy:
 
 ```shell script
-$ cargo install pgx
+$ cargo install cargo-pgx
 ```
 
 ## Usage

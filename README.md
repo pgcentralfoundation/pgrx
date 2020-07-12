@@ -37,7 +37,7 @@ First you'll want to install the `pgx` cargo sub-command from crates.io.  You'll
 your development and testing workflow.
 
 ```shell script
-$ cargo install pgx
+$ cargo install cargo-pgx
 ```
 
 It has a number of sub-commands.  For example, to create a new extension project, simply run:
