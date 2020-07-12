@@ -74,4 +74,11 @@ $ psql test
  - [various examples](pgx-examples/)
 
 
- 
+## Contributing
+
+We are most definitely open to contributions of any kind.  Bug Reports, Feature Requests, Documentation,
+and even [sponsorships](https://github.com/sponsors/eeeebbbbrrrr).
+
+Providing wrappers for Postgres' internals is not a straightforward task, and completely wrapping it is going
+to take quite a bit of time.  `pgx` is generally ready for use now, and it will continue to be developed as
+time goes on.  Your feedback about what you'd like to be able to do with `pgx` is greatly appreciated.
