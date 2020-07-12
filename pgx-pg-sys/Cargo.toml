@@ -12,7 +12,7 @@ readme = "README.md"
 
 [dependencies]
 memoffset = "0.5.3"
-pgx-macros = { path = "../pgx-macros/" }
+pgx-macros = { path = "../pgx-macros/", version="0.0.1" }
 
 [build-dependencies]
 bindgen = "0.52.0"
