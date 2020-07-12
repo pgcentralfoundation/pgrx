@@ -11,12 +11,12 @@ on:
 jobs:
   test:
 
-    #runs-on: ${{ matrix.os }}
-    runs-on: self-hosted
+    runs-on: ${{ matrix.os }}
 
     strategy:
       matrix:
         version: [10, 11, 12]
+        os: ["ubuntu-latest", "macos-latest"]
 
     steps:
     - uses: actions/checkout@v1
