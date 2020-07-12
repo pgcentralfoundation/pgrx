@@ -1,9 +1,14 @@
 [package]
 name = "cargo-pgx"
-version = "0.1.0"
-authors = [ "Eric B. Ridge <eebbrr@gmail.com>" ]
+version = "0.0.1"
+authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
 edition = "2018"
-description = "Cargo Postgres extension manager"
+license = "MIT"
+description = "cargo subcommand for 'pgx' to make Postgres extension development easy"
+homepage = "https://github.com/zombodb/pgx/cargo-pgx"
+repository = "https://github.com/zombodb/pgx/cargo-pgx"
+documentation = "https://docs.rs/pgx-tests"
+readme = "README.md"
 
 [dependencies]
 clap = { version = "2.33.0", features = [ "yaml" ] }

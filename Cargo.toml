@@ -1,6 +1,12 @@
 [package]
 name = "pgx-parent"
-version = "0.1.0"
+version = "0.0.1"
+authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
+edition = "2018"
+license = "MIT"
+description = "Top-level repo for 'pgx' (not on crates.io)"
+homepage = "https://github.com/zombodb/pgx/"
+repository = "https://github.com/zombodb/pgx/"
 
 [workspace]
 members = [

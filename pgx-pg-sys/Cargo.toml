@@ -1,9 +1,14 @@
 [package]
 name = "pgx-pg-sys"
-version = "0.1.0"
-authors = [ "Eric B. Ridge <eebbrr@gmail.com>" ]
+version = "0.0.1"
+authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
 edition = "2018"
-build = "build.rs"
+license = "MIT"
+description = "Generated Rust bindings for Postgres internals, for use with 'pgx'"
+homepage = "https://github.com/zombodb/pgx/pg-pg-sys"
+repository = "https://github.com/zombodb/pgx/pg-pg-sys"
+documentation = "https://docs.rs/pgx-pg-sys"
+readme = "README.md"
 
 [dependencies]
 memoffset = "0.5.3"
