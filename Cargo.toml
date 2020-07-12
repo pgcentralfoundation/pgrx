@@ -18,6 +18,12 @@ members = [
     "pgx-tests",
     "pgx-utils",
 ]
+exclude = [
+    "pgx-examples/arrays",
+    "pgx-examples/errors",
+    "pgx-examples/srf",
+    "pgx-examples/strings",
+]
 
 [features]
 default = [ ]

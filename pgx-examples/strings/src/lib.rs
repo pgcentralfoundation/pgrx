@@ -36,3 +36,31 @@ fn split_set(
 ) -> impl std::iter::Iterator<Item = &'static str> {
     input.split_terminator(pattern).into_iter()
 }
+
+#[cfg(any(test, feature = "pg_test"))]
+mod tests {
+    use pgx::*;
+
+    #[pg_test]
+    fn test_it() {
+        // do testing here.
+        //
+        // #[pg_test] functions run *inside* Postgres and have access to all Postgres internals
+        //
+        // Normal #[test] functions do not
+        //
+        // In either case, they all run in parallel
+    }
+}
+
+#[cfg(test)]
+pub mod pg_test {
+    pub fn setup(_options: Vec<&str>) {
+        // perform one-off initialization when the pg_test framework starts
+    }
+
+    pub fn postgresql_conf_options() -> Vec<&'static str> {
+        // return any postgresql.conf settings that are required for your tests
+        vec![]
+    }
+}

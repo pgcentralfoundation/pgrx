@@ -65,8 +65,14 @@ mod tests {
     use pgx::*;
 
     #[pg_test]
-    fn test_hello_arrays() {
-        assert_eq!("Hello, arrays", crate::hello_arrays());
+    fn test_it() {
+        // do testing here.
+        //
+        // #[pg_test] functions run *inside* Postgres and have access to all Postgres internals
+        //
+        // Normal #[test] functions do not
+        //
+        // In either case, they all run in parallel
     }
 }
 

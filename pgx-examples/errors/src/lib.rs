@@ -61,8 +61,14 @@ mod tests {
     use pgx::*;
 
     #[pg_test]
-    fn test_hello_errors() {
-        assert_eq!("Hello, errors", crate::hello_errors());
+    fn test_it() {
+        // do testing here.
+        //
+        // #[pg_test] functions run *inside* Postgres and have access to all Postgres internals
+        //
+        // Normal #[test] functions do not
+        //
+        // In either case, they all run in parallel
     }
 }
 
