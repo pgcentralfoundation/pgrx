@@ -35,4 +35,4 @@ jobs:
 
     # test our code
     - name: cargo test
-      run: touch pgx-pg-sys/build.rs && RUST_BACKTRACE=1 cargo test --target-dir /tmp/pgx-build-v${{ matrix.version }} --all --features pg${{ matrix.version }} --no-default-features
+      run: RUST_BACKTRACE=1 cargo test --all --features pg${{ matrix.version }} --no-default-features
