@@ -15,10 +15,10 @@ pg_test = []
 
 [dependencies]
 pgx = "0.0.1"
-pgx-macros = {{ path = "../pgx/pgx-macros" }}
+pgx-macros = "0.0.1"
 
 [dev-dependencies]
-pgx-tests = {{ path = "../pgx/pgx-tests" }}
+pgx-tests = "0.0.1"
 
 [profile.dev]
 panic = "unwind"
