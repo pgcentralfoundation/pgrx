@@ -1,4 +1,4 @@
-[![Actions Status](https://github.com/zombodb/pgx/workflows/test/badge.svg)](https://github.com/zombodb/pgx/actions)
+[![Actions Status](https://github.com/zombodb/pgx/workflows/cargo%20test%20--all/badge.svg)](https://github.com/zombodb/pgx/actions)
 [![crates.io badge](https://img.shields.io/crates/v/pgx.svg)](https://crates.io/crates/pgx)
 [![docs.rs badge](https://docs.rs/pgx/badge.svg)](https://docs.rs/pgx)
 

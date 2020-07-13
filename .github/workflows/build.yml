@@ -1,4 +1,4 @@
-name: test
+name: cargo test --all
 
 on:
   push:
@@ -29,10 +29,24 @@ jobs:
     - name: install postgres build dependencies
       run: sudo apt install -y bison flex zlib1g zlib1g-dev pkg-config libssl-dev
 
+    # Install Postgres too
+    - name: install Postgres
+      run: sudo apt install -y postgresql-${{ matrix.version }}
+
     # install our cargo subcomment
     - name: install cargo pgx
       run: cd cargo-pgx && cargo install --path . --force
 
     # test our code
     - name: cargo test
-      run: RUST_BACKTRACE=1 cargo test --all --features pg${{ matrix.version }} --no-default-features
+      run: RUST_BACKTRACE=1 CARGO_TARGET_DIR=~/cargo-target-dir cargo test --all --features pg${{ matrix.version }} --no-default-features
+
+    # make sure the examples build too, using 'pgx'
+    - name: build arrays example
+      run: CARGO_TARGET_DIR=~/cargo-target-dir cd pgx-examples/arrays && cargo pgx install
+    - name: build errors example
+      run: CARGO_TARGET_DIR=~/cargo-target-dir cd pgx-examples/errors && cargo pgx install
+    - name: build srf example
+      run: CARGO_TARGET_DIR=~/cargo-target-dir cd pgx-examples/srf && cargo pgx install
+    - name: build strings example
+      run: CARGO_TARGET_DIR=~/cargo-target-dir cd pgx-examples/strings && cargo pgx install
