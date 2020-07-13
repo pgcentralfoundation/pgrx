@@ -22,32 +22,27 @@ jobs:
     steps:
     - uses: actions/checkout@v1
 
-    # which host are we running on?
-    - name: hostname
-      run: hostname
-
-    # Ubuntu system dependencies required to build Postgres from sources
-    - name: install postgres build dependencies
-      run: sudo apt install -y bison flex zlib1g zlib1g-dev pkg-config libssl-dev
-
-    # Install Postgres too
-    - name: install Postgres
-      run: sudo apt install -y postgresql-${{ matrix.version }}
-
-    # install our cargo subcomment
-    - name: install cargo pgx
-      run: cd cargo-pgx && cargo install --path . --force
-
-    # test our code
-    - name: cargo test
-      run: RUST_BACKTRACE=1 CARGO_TARGET_DIR=~/cargo-target-dir cargo test --all --features pg${{ matrix.version }} --no-default-features
-
-    # make sure the examples build too, using 'pgx'
-    - name: build arrays example
-      run: CARGO_TARGET_DIR=~/cargo-target-dir cd pgx-examples/arrays && cargo pgx test pg${{ matrix.version }}
-    - name: build errors example
-      run: CARGO_TARGET_DIR=~/cargo-target-dir cd pgx-examples/errors && cargo pgx test pg${{ matrix.version }}
-    - name: build srf example
-      run: CARGO_TARGET_DIR=~/cargo-target-dir cd pgx-examples/srf && cargo pgx test pg${{ matrix.version }}
-    - name: build strings example
-      run: CARGO_TARGET_DIR=~/cargo-target-dir cd pgx-examples/strings && cargo pgx test pg${{ matrix.version }}
+    - name: cargo version
+      run: cargo --version
+#
+#    # Ubuntu system dependencies required to build Postgres from sources
+#    - name: install postgres build dependencies
+#      run: sudo apt install -y bison flex zlib1g zlib1g-dev pkg-config libssl-dev
+#
+#    # install our cargo subcomment
+#    - name: install cargo pgx
+#      run: cd cargo-pgx && cargo install --path . --force
+#
+#    # test our code
+#    - name: cargo test
+#      run: RUST_BACKTRACE=1 CARGO_TARGET_DIR=~/cargo-target-dir cargo test --all --features pg${{ matrix.version }} --no-default-features
+#
+#    # make sure the examples build too, using 'pgx'
+#    - name: build arrays example
+#      run: CARGO_TARGET_DIR=~/cargo-target-dir cd pgx-examples/arrays && cargo pgx test pg${{ matrix.version }}
+#    - name: build errors example
+#      run: CARGO_TARGET_DIR=~/cargo-target-dir cd pgx-examples/errors && cargo pgx test pg${{ matrix.version }}
+#    - name: build srf example
+#      run: CARGO_TARGET_DIR=~/cargo-target-dir cd pgx-examples/srf && cargo pgx test pg${{ matrix.version }}
+#    - name: build strings example
+#      run: CARGO_TARGET_DIR=~/cargo-target-dir cd pgx-examples/strings && cargo pgx test pg${{ matrix.version }}
