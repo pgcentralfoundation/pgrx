@@ -24,6 +24,7 @@ jobs:
 
     - name: cargo version
       run: cargo --version
+      
 #
 #    # Ubuntu system dependencies required to build Postgres from sources
 #    - name: install postgres build dependencies
