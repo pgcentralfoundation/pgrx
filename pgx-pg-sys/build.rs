@@ -132,6 +132,7 @@ fn main() -> Result<(), std::io::Error> {
                     .blacklist_function("sigsetjmp")
                     .blacklist_function("siglongjmp")
                     .blacklist_function("pg_re_throw")
+                    .size_t_is_usize(true)
                     .rustfmt_bindings(true)
                     .derive_debug(true)
                     .derive_copy(true) // necessary to avoid __BindgenUnionField usages -- I don't understand why?
