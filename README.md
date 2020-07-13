@@ -1,10 +1,14 @@
 [![Actions Status](https://github.com/zombodb/pgx/workflows/cargo%20test%20--all/badge.svg)](https://github.com/zombodb/pgx/actions)
 [![crates.io badge](https://img.shields.io/crates/v/pgx.svg)](https://crates.io/crates/pgx)
 [![docs.rs badge](https://docs.rs/pgx/badge.svg)](https://docs.rs/pgx)
-
 [![Twitter Follow](https://img.shields.io/twitter/follow/zombodb.svg?style=social)](https://twitter.com/zombodb)
+---
+
+[![Logo](logo.png)](https://twitter.com/zombodb)
 
 # pgx
+
+###### Build Postgres Extensions with Rust!
 
 `pgx` is a framework for developing PostgreSQL extensions in Rust and wants to make that process as idiomatic and safe
 as possible.  Currently, `pgx` supports Postgres v10, v11, and v12.
