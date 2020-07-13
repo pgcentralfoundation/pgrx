@@ -44,10 +44,10 @@ jobs:
 
     # make sure the examples build too, using 'pgx'
     - name: build arrays example
-      run: CARGO_TARGET_DIR=~/cargo-target-dir cd pgx-examples/arrays && sudo cargo pgx install
+      run: CARGO_TARGET_DIR=~/cargo-target-dir cd pgx-examples/arrays && cargo pgx test pg${{ matrix.version }}
     - name: build errors example
-      run: CARGO_TARGET_DIR=~/cargo-target-dir cd pgx-examples/errors && sudo cargo pgx install
+      run: CARGO_TARGET_DIR=~/cargo-target-dir cd pgx-examples/errors && cargo pgx test pg${{ matrix.version }}
     - name: build srf example
-      run: CARGO_TARGET_DIR=~/cargo-target-dir cd pgx-examples/srf && sudo cargo pgx install
+      run: CARGO_TARGET_DIR=~/cargo-target-dir cd pgx-examples/srf && cargo pgx test pg${{ matrix.version }}
     - name: build strings example
-      run: CARGO_TARGET_DIR=~/cargo-target-dir cd pgx-examples/strings && sudo cargo pgx install
+      run: CARGO_TARGET_DIR=~/cargo-target-dir cd pgx-examples/strings && cargo pgx test pg${{ matrix.version }}
