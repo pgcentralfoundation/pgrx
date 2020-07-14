@@ -40,30 +40,30 @@ jobs:
     # make sure the examples build too
     - name: build arrays example
       run: |
-        PGX_PG10_CONFIG=~/cargo-target-dir/postgresql-{{ matrix.version }}/pgx-install/bin/pg_config
-        PGX_PG11_CONFIG=~/cargo-target-dir/postgresql-{{ matrix.version }}/pgx-install/bin/pg_config
-        PGX_PG12_CONFIG=~/cargo-target-dir/postgresql-{{ matrix.version }}/pgx-install/bin/pg_config
+        PGX_PG10_CONFIG=~/cargo-target-dir/postgresql-10/pgx-install/bin/pg_config
+        PGX_PG11_CONFIG=~/cargo-target-dir/postgresql-11/pgx-install/bin/pg_config
+        PGX_PG12_CONFIG=~/cargo-target-dir/postgresql-12/pgx-install/bin/pg_config
         CARGO_TARGET_DIR=~/cargo-target-dir
         cd pgx-examples/arrays && cargo test --all --features pg${{ matrix.version }} --no-default-features
     - name: build errors example
       run: |
-        PGX_PG10_CONFIG=~/cargo-target-dir/postgresql-{{ matrix.version }}/pgx-install/bin/pg_config
-        PGX_PG11_CONFIG=~/cargo-target-dir/postgresql-{{ matrix.version }}/pgx-install/bin/pg_config
-        PGX_PG12_CONFIG=~/cargo-target-dir/postgresql-{{ matrix.version }}/pgx-install/bin/pg_config
+        PGX_PG10_CONFIG=~/cargo-target-dir/postgresql-10/pgx-install/bin/pg_config
+        PGX_PG11_CONFIG=~/cargo-target-dir/postgresql-11/pgx-install/bin/pg_config
+        PGX_PG12_CONFIG=~/cargo-target-dir/postgresql-12/pgx-install/bin/pg_config
         CARGO_TARGET_DIR=~/cargo-target-dir
         cd pgx-examples/errors && cargo test --all --features pg${{ matrix.version }} --no-default-features
     - name: build srf example
       run: |
-        PGX_PG10_CONFIG=~/cargo-target-dir/postgresql-{{ matrix.version }}/pgx-install/bin/pg_config
-        PGX_PG11_CONFIG=~/cargo-target-dir/postgresql-{{ matrix.version }}/pgx-install/bin/pg_config
-        PGX_PG12_CONFIG=~/cargo-target-dir/postgresql-{{ matrix.version }}/pgx-install/bin/pg_config
+        PGX_PG10_CONFIG=~/cargo-target-dir/postgresql-10/pgx-install/bin/pg_config
+        PGX_PG11_CONFIG=~/cargo-target-dir/postgresql-11/pgx-install/bin/pg_config
+        PGX_PG12_CONFIG=~/cargo-target-dir/postgresql-12/pgx-install/bin/pg_config
         CARGO_TARGET_DIR=~/cargo-target-dir
         cd pgx-examples/srf && cargo test --all --features pg${{ matrix.version }} --no-default-features
     - name: build strings example
       run: |
-        PGX_PG10_CONFIG=~/cargo-target-dir/postgresql-{{ matrix.version }}/pgx-install/bin/pg_config
-        PGX_PG11_CONFIG=~/cargo-target-dir/postgresql-{{ matrix.version }}/pgx-install/bin/pg_config
-        PGX_PG12_CONFIG=~/cargo-target-dir/postgresql-{{ matrix.version }}/pgx-install/bin/pg_config
+        PGX_PG10_CONFIG=~/cargo-target-dir/postgresql-10/pgx-install/bin/pg_config
+        PGX_PG11_CONFIG=~/cargo-target-dir/postgresql-11/pgx-install/bin/pg_config
+        PGX_PG12_CONFIG=~/cargo-target-dir/postgresql-12/pgx-install/bin/pg_config
         CARGO_TARGET_DIR=~/cargo-target-dir
         cd pgx-examples/strings && cargo test --all --features pg${{ matrix.version }} --no-default-features
 
