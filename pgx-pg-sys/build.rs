@@ -4,7 +4,7 @@
 extern crate build_deps;
 
 use bindgen::callbacks::MacroParsingBehavior;
-use pgx_utils::run_pg_config;
+use pgx_utils::{run_pg_config, BASE_POSTGRES_PORT_NO};
 use quote::quote;
 use rayon::prelude::*;
 use std::collections::HashSet;
@@ -61,13 +61,15 @@ fn main() -> Result<(), std::io::Error> {
     build_deps::rerun_if_changed_paths("cshim/Makefile").unwrap();
 
     let manifest_dir = PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").unwrap());
-    let target_dir = PathBuf::from(std::env::var("CARGO_TARGET_DIR").unwrap_or_else(|_| {
-        let mut out_dir = PathBuf::from(std::env::var("OUT_DIR").unwrap());
-        out_dir.pop();
-        out_dir.pop();
-        out_dir.pop();
-        out_dir.pop();
-        out_dir.display().to_string()
+    let target_dir = PathBuf::from(std::env::var("PG_DOWNLOAD_TARGET_DIR").unwrap_or_else(|_| {
+        std::env::var("CARGO_TARGET_DIR").unwrap_or_else(|_| {
+            let mut out_dir = PathBuf::from(std::env::var("OUT_DIR").unwrap());
+            out_dir.pop();
+            out_dir.pop();
+            out_dir.pop();
+            out_dir.pop();
+            out_dir.display().to_string()
+        })
     }));
     let shim_dir = PathBuf::from(format!("{}/cshim", manifest_dir.display()));
 
@@ -81,25 +83,22 @@ fn main() -> Result<(), std::io::Error> {
     let pg_versions = vec![
         (
             "10.13",                                                    // the version we'll download
-            8810, // the port we'll run that on for testing
             std::env::var("PGX_PG10_CONFIG").map_or(None, |v| Some(v)), // or use whatver this specific pg_config binrary tells us
         ),
         (
             "11.8",
-            8811,
             std::env::var("PGX_PG11_CONFIG").map_or(None, |v| Some(v)),
         ),
         (
             "12.3",
-            8812,
             std::env::var("PGX_PG12_CONFIG").map_or(None, |v| Some(v)),
         ),
     ];
     pg_versions.par_iter().for_each(|v| {
         let version: &str = v.0;
         let major_version = u16::from_str(version.split_terminator('.').next().unwrap()).unwrap();
-        let port_no = v.1;
-        let pg_config: Option<String> = v.2.clone();
+        let port_no = BASE_POSTGRES_PORT_NO + major_version;
+        let pg_config: Option<String> = v.1.clone();
         let bindings_rs = PathBuf::from(format!(
             "{}/src/pg{}_bindings.rs",
             manifest_dir.display(),

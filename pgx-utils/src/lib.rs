@@ -9,17 +9,24 @@ use std::process::Command;
 use syn::export::TokenStream2;
 use syn::{GenericArgument, ItemFn, PathArguments, ReturnType, Type, TypeParamBound};
 
+pub static BASE_POSTGRES_PORT_NO: u16 = 28800;
+
 pub fn run_pg_config(pg_config: &Option<String>, arg: &str) -> String {
     let pg_config = pg_config
         .clone()
         .unwrap_or_else(|| std::env::var("PG_CONFIG").unwrap_or_else(|_| "pg_config".to_string()));
-    let output = Command::new(pg_config).arg(arg).output();
+    let output = Command::new(&pg_config).arg(arg).output();
 
     match output {
         Ok(output) => String::from_utf8(output.stdout).unwrap().trim().to_string(),
 
         Err(e) => {
-            eprintln!("{}: Problem running pg_config: {}", "error".bold().red(), e);
+            eprintln!(
+                "{}: Problem running {}: {}",
+                "error".bold().red(),
+                pg_config,
+                e
+            );
             std::process::exit(1);
         }
     }

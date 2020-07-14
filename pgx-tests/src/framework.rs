@@ -8,7 +8,7 @@ use std::sync::{Arc, Mutex};
 
 use colored::*;
 use pgx::*;
-use pgx_utils::run_pg_config;
+use pgx_utils::{run_pg_config, BASE_POSTGRES_PORT_NO};
 use postgres::error::DbError;
 use postgres::Client;
 use std::collections::HashMap;
@@ -456,13 +456,18 @@ fn get_extension_name() -> String {
 }
 
 fn get_target_dir() -> String {
-    std::env::var("CARGO_TARGET_DIR").unwrap_or(format!("{}/target", std::env::var("PWD").unwrap()))
+    std::env::var("CARGO_TARGET_DIR")
+        .unwrap_or_else(|_| format!("{}/target", std::env::var("PWD").unwrap()))
+}
+
+fn get_pg_download_dir() -> String {
+    std::env::var("PG_DOWNLOAD_TARGET_DIR").unwrap_or_else(|_| get_target_dir())
 }
 
 fn get_pg_path() -> String {
     format!(
         "{}/postgresql-{}/pgx-install/",
-        get_target_dir(),
+        get_pg_download_dir(),
         pg_sys::get_pg_major_minor_version_string(),
     )
 }
@@ -514,7 +519,7 @@ fn get_pg_host() -> String {
 }
 
 fn get_pg_port() -> u16 {
-    8800 + pg_sys::get_pg_major_version_num()
+    BASE_POSTGRES_PORT_NO + pg_sys::get_pg_major_version_num()
 }
 
 fn get_pg_dbname() -> String {

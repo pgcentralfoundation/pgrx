@@ -21,7 +21,7 @@ pg12 = [ "pgx/pg12" ]
 pg_test = [ ]
 
 [dependencies]
-colored = "1.9.3"
+colored = "2.0.0"
 lazy_static = "1.4.0"
 libc = "0.2.72"
 pgx = { path = "../pgx", default-features = false, version="0.0.4" }
