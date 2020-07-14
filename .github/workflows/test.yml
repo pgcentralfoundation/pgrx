@@ -66,4 +66,5 @@ jobs:
         PGX_PG12_CONFIG=~/cargo-target-dir/postgresql-12/pgx-install/bin/pg_config
         CARGO_TARGET_DIR=~/cargo-target-dir
         cd pgx-examples/strings && cargo test --all --features pg${{ matrix.version }} --no-default-features
-
+    - name: dir listing
+      run: find ~/ -type f | grep -v ".git"
