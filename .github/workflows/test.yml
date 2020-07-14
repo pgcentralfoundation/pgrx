@@ -39,11 +39,31 @@ jobs:
 
     # make sure the examples build too
     - name: build arrays example
-      run: CARGO_TARGET_DIR=~/cargo-target-dir cd pgx-examples/arrays && cargo test --all --features pg${{ matrix.version }} --no-default-features
+      run: |
+        PGX_PG10_CONFIG=~/cargo-target-dir/postgresql-{{ matrix.version }}/pgx-install/bin/pg_config
+        PGX_PG11_CONFIG=~/cargo-target-dir/postgresql-{{ matrix.version }}/pgx-install/bin/pg_config
+        PGX_PG12_CONFIG=~/cargo-target-dir/postgresql-{{ matrix.version }}/pgx-install/bin/pg_config
+        CARGO_TARGET_DIR=~/cargo-target-dir
+        cd pgx-examples/arrays && cargo test --all --features pg${{ matrix.version }} --no-default-features
     - name: build errors example
-      run: CARGO_TARGET_DIR=~/cargo-target-dir cd pgx-examples/errors && cargo test --all --features pg${{ matrix.version }} --no-default-features
+      run: |
+        PGX_PG10_CONFIG=~/cargo-target-dir/postgresql-{{ matrix.version }}/pgx-install/bin/pg_config
+        PGX_PG11_CONFIG=~/cargo-target-dir/postgresql-{{ matrix.version }}/pgx-install/bin/pg_config
+        PGX_PG12_CONFIG=~/cargo-target-dir/postgresql-{{ matrix.version }}/pgx-install/bin/pg_config
+        CARGO_TARGET_DIR=~/cargo-target-dir
+        cd pgx-examples/errors && cargo test --all --features pg${{ matrix.version }} --no-default-features
     - name: build srf example
-      run: CARGO_TARGET_DIR=~/cargo-target-dir cd pgx-examples/srf && cargo test --all --features pg${{ matrix.version }} --no-default-features
+      run: |
+        PGX_PG10_CONFIG=~/cargo-target-dir/postgresql-{{ matrix.version }}/pgx-install/bin/pg_config
+        PGX_PG11_CONFIG=~/cargo-target-dir/postgresql-{{ matrix.version }}/pgx-install/bin/pg_config
+        PGX_PG12_CONFIG=~/cargo-target-dir/postgresql-{{ matrix.version }}/pgx-install/bin/pg_config
+        CARGO_TARGET_DIR=~/cargo-target-dir
+        cd pgx-examples/srf && cargo test --all --features pg${{ matrix.version }} --no-default-features
     - name: build strings example
-      run: CARGO_TARGET_DIR=~/cargo-target-dir cd pgx-examples/strings && cargo pgx test pg${{ matrix.version }}
+      run: |
+        PGX_PG10_CONFIG=~/cargo-target-dir/postgresql-{{ matrix.version }}/pgx-install/bin/pg_config
+        PGX_PG11_CONFIG=~/cargo-target-dir/postgresql-{{ matrix.version }}/pgx-install/bin/pg_config
+        PGX_PG12_CONFIG=~/cargo-target-dir/postgresql-{{ matrix.version }}/pgx-install/bin/pg_config
+        CARGO_TARGET_DIR=~/cargo-target-dir
+        cd pgx-examples/strings && cargo test --all --features pg${{ matrix.version }} --no-default-features
 
