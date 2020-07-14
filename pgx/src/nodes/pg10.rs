@@ -1142,21 +1142,21 @@ impl PgNodeFactory {
         let mut value = PgNodeFactory::makeValue();
 
         value.type_ = PgNode::Float as u32;
-        value.val.str_ = memory_context.pstrdup(f.to_string().as_str());
+        value.val.str = memory_context.pstrdup(f.to_string().as_str());
         value
     }
     pub fn makeString(memory_context: PgMemoryContexts, s: &str) -> PgBox<pg_sys::Value> {
         let mut value = PgNodeFactory::makeValue();
 
         value.type_ = PgNode::String as u32;
-        value.val.str_ = memory_context.pstrdup(s);
+        value.val.str = memory_context.pstrdup(s);
         value
     }
     pub fn makeBitString(memory_context: PgMemoryContexts, bs: &str) -> PgBox<pg_sys::Value> {
         let mut value = PgNodeFactory::makeValue();
 
         value.type_ = PgNode::BitString as u32;
-        value.val.str_ = memory_context.pstrdup(bs);
+        value.val.str = memory_context.pstrdup(bs);
         value
     }
     pub fn makeNull() -> PgBox<pg_sys::Const> {
