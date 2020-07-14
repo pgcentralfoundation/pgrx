@@ -14,7 +14,7 @@ pg12 = ["pgx/pg12"]
 pg_test = []
 
 [dependencies]
-pgx = "0.0.3"
+pgx = "0.0.4"
 pgx-macros = "0.0.3"
 
 [dev-dependencies]
