@@ -11,6 +11,15 @@ use syn::{GenericArgument, ItemFn, PathArguments, ReturnType, Type, TypeParamBou
 
 pub static BASE_POSTGRES_PORT_NO: u16 = 28800;
 
+pub fn get_target_dir() -> String {
+    std::env::var("CARGO_TARGET_DIR")
+        .unwrap_or_else(|_| format!("{}/target", std::env::var("PWD").unwrap()))
+}
+
+pub fn get_pg_download_dir() -> String {
+    std::env::var("PG_DOWNLOAD_TARGET_DIR").unwrap_or_else(|_| get_target_dir())
+}
+
 pub fn run_pg_config(pg_config: &Option<String>, arg: &str) -> String {
     let pg_config = pg_config
         .clone()

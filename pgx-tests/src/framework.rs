@@ -8,7 +8,7 @@ use std::sync::{Arc, Mutex};
 
 use colored::*;
 use pgx::*;
-use pgx_utils::{run_pg_config, BASE_POSTGRES_PORT_NO};
+use pgx_utils::{get_pg_download_dir, get_target_dir, run_pg_config, BASE_POSTGRES_PORT_NO};
 use postgres::error::DbError;
 use postgres::Client;
 use std::collections::HashMap;
@@ -453,15 +453,6 @@ fn get_extension_name() -> String {
     std::env::var("CARGO_PKG_NAME")
         .unwrap_or_else(|_| panic!("CARGO_PKG_NAME is not an envvar"))
         .replace("-", "_")
-}
-
-fn get_target_dir() -> String {
-    std::env::var("CARGO_TARGET_DIR")
-        .unwrap_or_else(|_| format!("{}/target", std::env::var("PWD").unwrap()))
-}
-
-fn get_pg_download_dir() -> String {
-    std::env::var("PG_DOWNLOAD_TARGET_DIR").unwrap_or_else(|_| get_target_dir())
 }
 
 fn get_pg_path() -> String {

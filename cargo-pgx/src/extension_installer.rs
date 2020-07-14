@@ -3,7 +3,7 @@
 
 use crate::property_inspector::{find_control_file, get_property};
 use colored::Colorize;
-use pgx_utils::run_pg_config;
+use pgx_utils::{get_pg_download_dir, run_pg_config};
 use std::io::Write;
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
@@ -96,6 +96,7 @@ fn build_extension(is_release: bool, target_dir: &str) -> Result<(), std::io::Er
 
     let mut process = command
         .env("CARGO_TARGET_DIR", target_dir.to_string())
+        .env("PG_DOWNLOAD_TARGET_DIR", get_pg_download_dir())
         .stdout(Stdio::inherit())
         .stderr(Stdio::inherit())
         .spawn()?;
