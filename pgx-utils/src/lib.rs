@@ -1,12 +1,29 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-
+use colored::Colorize;
 use proc_macro2::TokenTree;
 use quote::quote;
 use std::collections::HashSet;
+use std::process::Command;
 use syn::export::TokenStream2;
 use syn::{GenericArgument, ItemFn, PathArguments, ReturnType, Type, TypeParamBound};
+
+pub fn run_pg_config(pg_config: &Option<String>, arg: &str) -> String {
+    let pg_config = pg_config
+        .clone()
+        .unwrap_or_else(|| std::env::var("PG_CONFIG").unwrap_or_else(|_| "pg_config".to_string()));
+    let output = Command::new(pg_config).arg(arg).output();
+
+    match output {
+        Ok(output) => String::from_utf8(output.stdout).unwrap().trim().to_string(),
+
+        Err(e) => {
+            eprintln!("{}: Problem running pg_config: {}", "error".bold().red(), e);
+            std::process::exit(1);
+        }
+    }
+}
 
 #[derive(Debug, Hash, Ord, PartialOrd, Eq, PartialEq)]
 pub enum ExternArgs {

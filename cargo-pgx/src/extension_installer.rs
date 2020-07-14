@@ -2,7 +2,7 @@
 // governed by the MIT license that can be found in the LICENSE file.
 
 use crate::property_inspector::{find_control_file, get_property};
-use colored::*;
+use pgx_utils::run_pg_config;
 use std::io::Write;
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
@@ -171,26 +171,12 @@ fn get_target_dir() -> PathBuf {
 }
 
 fn get_pkglibdir() -> String {
-    run_pg_config("--pkglibdir")
+    run_pg_config(&None, "--pkglibdir")
 }
 
 fn get_extensiondir() -> String {
-    let mut dir = run_pg_config("--sharedir");
+    let mut dir = run_pg_config(&None, "--sharedir");
 
     dir.push_str("/extension");
     dir
-}
-
-fn run_pg_config(arg: &str) -> String {
-    let pg_config = std::env::var("PG_CONFIG").unwrap_or_else(|_| "pg_config".to_string());
-    let output = Command::new(pg_config).arg(arg).output();
-
-    match output {
-        Ok(output) => String::from_utf8(output.stdout).unwrap().trim().to_string(),
-
-        Err(e) => {
-            eprintln!("{}: Problem running pg_config: {}", "error".bold().red(), e);
-            std::process::exit(1);
-        }
-    }
 }
