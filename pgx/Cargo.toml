@@ -23,7 +23,7 @@ pg12 = [ "pgx-pg-sys/pg12" ]
 enum-primitive-derive = "0.2.1"
 lazy_static = "1.4.0"
 num-traits = "0.2.12"
-pgx-macros = { path = "../pgx-macros/", version="0.0.3" }
+pgx-macros = { path = "../pgx-macros/", version="0.0.4" }
 pgx-pg-sys = { path = "../pgx-pg-sys", version="0.0.4" }
 serde = { version = "1.0.114", features = [ "derive" ] }
 serde_cbor = "0.11.1"
