@@ -1,6 +1,6 @@
 [package]
 name = "{name}"
-version = "0.0.4"
+version = "0.0.0"
 edition = "2018"
 
 [lib]
