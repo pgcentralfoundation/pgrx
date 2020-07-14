@@ -77,88 +77,90 @@ fn main() -> Result<(), std::io::Error> {
     let shim_mutex = Mutex::new(());
     let need_common_rs = AtomicBool::new(false);
 
-    vec![("10.13", "8810"), ("11.8", "8811"), ("12.3", "8812")]
-        .par_iter()
-        .for_each(|v| {
-            let version: &str = v.0;
-            let major_version =
-                u16::from_str(version.split_terminator('.').next().unwrap()).unwrap();
-            let port_no = u16::from_str(v.1).unwrap();
-            let include_path = PathBuf::from(format!(
-                "{}/postgresql-{}/pgx-install/include/server",
-                target_dir.display(),
-                version
-            ));
-            let bindings_rs = PathBuf::from(format!(
-                "{}/src/pg{}_bindings.rs",
-                manifest_dir.display(),
-                major_version
-            ));
-            let specific_rs = PathBuf::from(format!(
-                "{}/src/pg{}_specific.rs",
-                manifest_dir.display(),
-                major_version
-            ));
-            let include_h = PathBuf::from(format!(
-                "{}/include/pg{}.h",
-                manifest_dir.display(),
-                major_version
-            ));
+    let pg_versions = vec![("10.13", 8810), ("11.8", 8811), ("12.3", 8812)];
+    pg_versions.par_iter().for_each(|v| {
+        let version: &str = v.0;
+        let major_version = u16::from_str(version.split_terminator('.').next().unwrap()).unwrap();
+        let port_no = v.1;
+        let include_path = PathBuf::from(format!(
+            "{}/postgresql-{}/pgx-install/include/server",
+            target_dir.display(),
+            version
+        ));
+        let bindings_rs = PathBuf::from(format!(
+            "{}/src/pg{}_bindings.rs",
+            manifest_dir.display(),
+            major_version
+        ));
+        let specific_rs = PathBuf::from(format!(
+            "{}/src/pg{}_specific.rs",
+            manifest_dir.display(),
+            major_version
+        ));
+        let include_h = PathBuf::from(format!(
+            "{}/include/pg{}.h",
+            manifest_dir.display(),
+            major_version
+        ));
 
-            eprintln!("include_path={}", include_path.display());
-            eprintln!("bindings_rs={}", bindings_rs.display());
-            eprintln!("include_h={}", include_h.display());
-            download_postgres(&manifest_dir, version, &target_dir)
-                .unwrap_or_else(|_| panic!("failed to download Postgres v{}", version));
-            let did_compile = compile_postgres(&manifest_dir, version, &target_dir, port_no)
-                .unwrap_or_else(|_| panic!("failed to compile Postgres v{}", version));
-            build_shim(&shim_dir, &shim_mutex, &target_dir, major_version, version);
+        eprintln!("include_path={}", include_path.display());
+        eprintln!("bindings_rs={}", bindings_rs.display());
+        eprintln!("include_h={}", include_h.display());
+        download_postgres(&manifest_dir, version, &target_dir)
+            .unwrap_or_else(|_| panic!("failed to download Postgres v{}", version));
+        let did_compile = compile_postgres(
+            &manifest_dir,
+            version,
+            &target_dir,
+            port_no,
+            pg_versions.len(),
+        )
+        .unwrap_or_else(|_| panic!("failed to compile Postgres v{}", version));
+        build_shim(&shim_dir, &shim_mutex, &target_dir, major_version, version);
 
-            if did_compile || !specific_rs.exists() {
-                need_common_rs.store(true, Ordering::SeqCst);
-                eprintln!(
-                    "[{}] Running bindgen on {} with {}",
+        if did_compile || !specific_rs.exists() {
+            need_common_rs.store(true, Ordering::SeqCst);
+            eprintln!(
+                "[{}] Running bindgen on {} with {}",
+                version,
+                bindings_rs.display(),
+                include_path.display()
+            );
+            let bindings = bindgen::Builder::default()
+                .header(include_h.to_str().unwrap())
+                .clang_arg(&format!("-I{}", include_path.display()))
+                .parse_callbacks(Box::new(IgnoredMacros::default()))
+                .blacklist_function("varsize_any") // pgx converts the VARSIZE_ANY macro, so we don't want to also have this function, which is in heaptuple.c
+                .blacklist_function("query_tree_walker")
+                .blacklist_function("expression_tree_walker")
+                .blacklist_function("sigsetjmp")
+                .blacklist_function("siglongjmp")
+                .blacklist_function("pg_re_throw")
+                .size_t_is_usize(true)
+                .rustfmt_bindings(true)
+                .derive_debug(true)
+                .derive_copy(true) // necessary to avoid __BindgenUnionField usages -- I don't understand why?
+                .derive_default(true)
+                .derive_eq(false)
+                .derive_partialeq(false)
+                .derive_hash(false)
+                .derive_ord(false)
+                .derive_partialord(false)
+                .layout_tests(false)
+                .generate()
+                .unwrap_or_else(|e| panic!("Unable to generate bindings for {}: {:?}", version, e));
+
+            let bindings = apply_pg_guard(bindings.to_string()).unwrap();
+            std::fs::write(bindings_rs.clone(), bindings).unwrap_or_else(|e| {
+                panic!(
+                    "Unable to save bindings for {} to {}: {:?}",
                     version,
                     bindings_rs.display(),
-                    include_path.display()
-                );
-                let bindings = bindgen::Builder::default()
-                    .header(include_h.to_str().unwrap())
-                    .clang_arg(&format!("-I{}", include_path.display()))
-                    .parse_callbacks(Box::new(IgnoredMacros::default()))
-                    .blacklist_function("varsize_any") // pgx converts the VARSIZE_ANY macro, so we don't want to also have this function, which is in heaptuple.c
-                    .blacklist_function("query_tree_walker")
-                    .blacklist_function("expression_tree_walker")
-                    .blacklist_function("sigsetjmp")
-                    .blacklist_function("siglongjmp")
-                    .blacklist_function("pg_re_throw")
-                    .size_t_is_usize(true)
-                    .rustfmt_bindings(true)
-                    .derive_debug(true)
-                    .derive_copy(true) // necessary to avoid __BindgenUnionField usages -- I don't understand why?
-                    .derive_default(true)
-                    .derive_eq(false)
-                    .derive_partialeq(false)
-                    .derive_hash(false)
-                    .derive_ord(false)
-                    .derive_partialord(false)
-                    .layout_tests(false)
-                    .generate()
-                    .unwrap_or_else(|e| {
-                        panic!("Unable to generate bindings for {}: {:?}", version, e)
-                    });
-
-                let bindings = apply_pg_guard(bindings.to_string()).unwrap();
-                std::fs::write(bindings_rs.clone(), bindings).unwrap_or_else(|e| {
-                    panic!(
-                        "Unable to save bindings for {} to {}: {:?}",
-                        version,
-                        bindings_rs.display(),
-                        e
-                    )
-                });
-            }
-        });
+                    e
+                )
+            });
+        }
+    });
 
     if need_common_rs.load(Ordering::SeqCst) {
         generate_common_rs(manifest_dir);
@@ -269,8 +271,9 @@ fn compile_postgres(
     version_number: &str,
     target_dir: &PathBuf,
     port_number: u16,
+    num_versions: usize,
 ) -> Result<bool, std::io::Error> {
-    let num_cpus = 1.max(num_cpus::get() / 3);
+    let num_cpus = 1.max(num_cpus::get() / num_versions);
     let rc = run_command(
         Command::new("./compile-postgres.sh")
             .arg(version_number)
