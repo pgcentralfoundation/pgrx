@@ -1,0 +1,74 @@
+name: cargo test --all
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  test:
+
+    runs-on: ${{ matrix.os }}
+    if: "!contains(github.event.head_commit.message, 'nogha')"
+
+    strategy:
+      matrix:
+        version: [10, 11, 12]
+        os: ["ubuntu-latest"]
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: cargo version
+      run: cargo --version
+
+    # Ubuntu system dependencies required to build Postgres from sources
+    - name: install postgres build dependencies
+      run: sudo apt install -y bison flex zlib1g zlib1g-dev pkg-config libssl-dev
+
+    # install our cargo subcomment
+    - name: install cargo pgx
+      run: cd cargo-pgx && cargo install --path . --force
+
+    # test our code
+    - name: cargo test
+      run: RUST_BACKTRACE=1 CARGO_TARGET_DIR=~/cargo-target-dir cargo test --all --features pg${{ matrix.version }} --no-default-features
+
+    # make sure the examples build too
+    - name: build arrays example
+      run: |
+        cd pgx-examples/arrays &&
+        PGX_PG10_CONFIG=~/cargo-target-dir/postgresql-10/pgx-install/bin/pg_config
+        PGX_PG11_CONFIG=~/cargo-target-dir/postgresql-11/pgx-install/bin/pg_config
+        PGX_PG12_CONFIG=~/cargo-target-dir/postgresql-12/pgx-install/bin/pg_config
+        CARGO_TARGET_DIR=~/cargo-target-dir
+        cargo pgx test pg${{ matrix.version }}
+    - name: build errors example
+      run: |
+        cd pgx-examples/errors &&
+        PGX_PG10_CONFIG=~/cargo-target-dir/postgresql-10/pgx-install/bin/pg_config
+        PGX_PG11_CONFIG=~/cargo-target-dir/postgresql-11/pgx-install/bin/pg_config
+        PGX_PG12_CONFIG=~/cargo-target-dir/postgresql-12/pgx-install/bin/pg_config
+        CARGO_TARGET_DIR=~/cargo-target-dir
+        cargo pgx test pg${{ matrix.version }}
+    - name: build srf example
+      run: |
+        cd pgx-examples/srf &&
+        PGX_PG10_CONFIG=~/cargo-target-dir/postgresql-10/pgx-install/bin/pg_config
+        PGX_PG11_CONFIG=~/cargo-target-dir/postgresql-11/pgx-install/bin/pg_config
+        PGX_PG12_CONFIG=~/cargo-target-dir/postgresql-12/pgx-install/bin/pg_config
+        CARGO_TARGET_DIR=~/cargo-target-dir
+        cargo pgx test pg${{ matrix.version }}
+    - name: build strings example
+      run: |
+        cd pgx-examples/strings &&
+        PGX_PG10_CONFIG=~/cargo-target-dir/postgresql-10/pgx-install/bin/pg_config
+        PGX_PG11_CONFIG=~/cargo-target-dir/postgresql-11/pgx-install/bin/pg_config
+        PGX_PG12_CONFIG=~/cargo-target-dir/postgresql-12/pgx-install/bin/pg_config
+        CARGO_TARGET_DIR=~/cargo-target-dir
+        cargo pgx test pg${{ matrix.version }}
+    - name: dir listing
+      run: find ~/ -type f | grep -v ".git"

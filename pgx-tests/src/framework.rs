@@ -1,7 +1,6 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-
 use std::process::{Command, Stdio};
 
 use lazy_static::*;
@@ -9,6 +8,7 @@ use std::sync::{Arc, Mutex};
 
 use colored::*;
 use pgx::*;
+use pgx_utils::{get_pg_download_dir, get_target_dir, run_pg_config, BASE_POSTGRES_PORT_NO};
 use postgres::error::DbError;
 use postgres::Client;
 use std::collections::HashMap;
@@ -220,6 +220,7 @@ pub fn client() -> (postgres::Client, String) {
 }
 
 fn install_extension() {
+    eprintln!("installing extension");
     let mut command = Command::new("cargo-pgx")
         .arg("pgx")
         .arg("install")
@@ -227,11 +228,7 @@ fn install_extension() {
         .stderr(Stdio::inherit())
         .env("PATH", get_pgbin_envpath())
         .env("PGX_TEST_MODE", "1")
-        .env(
-            "CARGO_TARGET_DIR",
-            std::env::var("CARGO_TARGET_DIR")
-                .unwrap_or(format!("{}/target", std::env::var("PWD").unwrap())),
-        )
+        .env("CARGO_TARGET_DIR", get_target_dir())
         .env(
             "PGX_BUILD_FEATURES",
             format!(
@@ -459,22 +456,53 @@ fn get_extension_name() -> String {
 }
 
 fn get_pg_path() -> String {
-    let target_dir = std::env::var("CARGO_TARGET_DIR")
-        .unwrap_or(format!("{}/target", std::env::var("PWD").unwrap()));
-
     format!(
         "{}/postgresql-{}/pgx-install/",
-        target_dir,
+        get_pg_download_dir(),
         pg_sys::get_pg_major_minor_version_string(),
     )
 }
 
 fn get_pgbin_envpath() -> String {
-    format!("{}/bin:{}", get_pg_path(), std::env::var("PATH").unwrap())
+    let pgbin_path = match std::env::var(&format!(
+        "PGX_PG{}_CONFIG",
+        pg_sys::get_pg_major_version_string()
+    ))
+    .map_or(None, |v| Some(v))
+    {
+        // ask the PGX_PGxx_CONFIG tool where its bindir is
+        Some(pg_config) => run_pg_config(&Some(pg_config), "--bindir"),
+
+        // build it based on where we installed Postgres ourselves
+        None => format!("{}/bin:", get_pg_path()),
+    };
+
+    // get our pgbin directory at the head of the system path
+    format!("{}:{}", pgbin_path, std::env::var("PATH").unwrap())
 }
 
 fn get_pgdata_path() -> PathBuf {
-    PathBuf::from(format!("{}/data", get_pg_path()))
+    let pgdata = match std::env::var(&format!(
+        "PGX_PG{}_CONFIG",
+        pg_sys::get_pg_major_version_string()
+    ))
+    .map_or(None, |v| Some(v))
+    {
+        // put it in our CARGO_TARGET_DIR
+        // we want to keep it far away from anywhere "pg_config" might say
+        // since this is a system-installed Postgres version
+        Some(_pg_config) => PathBuf::from(format!(
+            "{}/pg_data-{}",
+            get_target_dir(),
+            pg_sys::get_pg_major_version_string()
+        )),
+
+        // build it based on where we installed Postgres ourselves
+        None => PathBuf::from(format!("{}/data", get_pg_path())),
+    };
+
+    eprintln!("pgdata={}", pgdata.display());
+    pgdata
 }
 
 fn get_pg_host() -> String {
@@ -482,7 +510,7 @@ fn get_pg_host() -> String {
 }
 
 fn get_pg_port() -> u16 {
-    8800 + pg_sys::get_pg_major_version_num()
+    BASE_POSTGRES_PORT_NO + pg_sys::get_pg_major_version_num()
 }
 
 fn get_pg_dbname() -> String {

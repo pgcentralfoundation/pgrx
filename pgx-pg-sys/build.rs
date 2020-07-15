@@ -4,6 +4,7 @@
 extern crate build_deps;
 
 use bindgen::callbacks::MacroParsingBehavior;
+use pgx_utils::{run_pg_config, BASE_POSTGRES_PORT_NO};
 use quote::quote;
 use rayon::prelude::*;
 use std::collections::HashSet;
@@ -60,13 +61,15 @@ fn main() -> Result<(), std::io::Error> {
     build_deps::rerun_if_changed_paths("cshim/Makefile").unwrap();
 
     let manifest_dir = PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").unwrap());
-    let target_dir = PathBuf::from(std::env::var("CARGO_TARGET_DIR").unwrap_or_else(|_| {
-        let mut out_dir = PathBuf::from(std::env::var("OUT_DIR").unwrap());
-        out_dir.pop();
-        out_dir.pop();
-        out_dir.pop();
-        out_dir.pop();
-        out_dir.display().to_string()
+    let target_dir = PathBuf::from(std::env::var("PG_DOWNLOAD_TARGET_DIR").unwrap_or_else(|_| {
+        std::env::var("CARGO_TARGET_DIR").unwrap_or_else(|_| {
+            let mut out_dir = PathBuf::from(std::env::var("OUT_DIR").unwrap());
+            out_dir.pop();
+            out_dir.pop();
+            out_dir.pop();
+            out_dir.pop();
+            out_dir.display().to_string()
+        })
     }));
     let shim_dir = PathBuf::from(format!("{}/cshim", manifest_dir.display()));
 
@@ -77,16 +80,25 @@ fn main() -> Result<(), std::io::Error> {
     let shim_mutex = Mutex::new(());
     let need_common_rs = AtomicBool::new(false);
 
-    let pg_versions = vec![("10.13", 8810), ("11.8", 8811), ("12.3", 8812)];
+    let pg_versions = vec![
+        (
+            "10.13",                                                    // the version we'll download
+            std::env::var("PGX_PG10_CONFIG").map_or(None, |v| Some(v)), // or use whatver this specific pg_config binrary tells us
+        ),
+        (
+            "11.8",
+            std::env::var("PGX_PG11_CONFIG").map_or(None, |v| Some(v)),
+        ),
+        (
+            "12.3",
+            std::env::var("PGX_PG12_CONFIG").map_or(None, |v| Some(v)),
+        ),
+    ];
     pg_versions.par_iter().for_each(|v| {
         let version: &str = v.0;
         let major_version = u16::from_str(version.split_terminator('.').next().unwrap()).unwrap();
-        let port_no = v.1;
-        let include_path = PathBuf::from(format!(
-            "{}/postgresql-{}/pgx-install/include/server",
-            target_dir.display(),
-            version
-        ));
+        let port_no = BASE_POSTGRES_PORT_NO + major_version;
+        let pg_config: Option<String> = v.1.clone();
         let bindings_rs = PathBuf::from(format!(
             "{}/src/pg{}_bindings.rs",
             manifest_dir.display(),
@@ -103,32 +115,65 @@ fn main() -> Result<(), std::io::Error> {
             major_version
         ));
 
-        eprintln!("include_path={}", include_path.display());
         eprintln!("bindings_rs={}", bindings_rs.display());
         eprintln!("include_h={}", include_h.display());
-        download_postgres(&manifest_dir, version, &target_dir)
-            .unwrap_or_else(|_| panic!("failed to download Postgres v{}", version));
-        let did_compile = compile_postgres(
-            &manifest_dir,
-            version,
-            &target_dir,
-            port_no,
-            pg_versions.len(),
-        )
-        .unwrap_or_else(|_| panic!("failed to compile Postgres v{}", version));
-        build_shim(&shim_dir, &shim_mutex, &target_dir, major_version, version);
 
+        let did_compile;
+        let includedir_server;
+
+        if pg_config.is_none() {
+            eprintln!("downloading and compiling Postgres v{}", version);
+
+            // use the path we're going to create when we download and install postgres
+            includedir_server = PathBuf::from(format!(
+                "{}/postgresql-{}/pgx-install/include/server",
+                target_dir.display(),
+                version
+            ));
+
+            download_postgres(&manifest_dir, version, &target_dir)
+                .unwrap_or_else(|_| panic!("failed to download Postgres v{}", version));
+            did_compile = compile_postgres(
+                &manifest_dir,
+                version,
+                &target_dir,
+                port_no,
+                pg_versions.len(),
+            )
+            .unwrap_or_else(|_| panic!("failed to compile Postgres v{}", version));
+        } else {
+            eprintln!(
+                "not downloading or compiling Postgres v{} -- using {} instead",
+                version,
+                pg_config.as_ref().unwrap()
+            );
+
+            // use whatever pg_config tells us to use for the server's include file path
+            includedir_server = PathBuf::from(run_pg_config(&pg_config, "--includedir-server"));
+            did_compile = false;
+        }
+
+        build_shim(
+            &shim_dir,
+            &shim_mutex,
+            &target_dir,
+            major_version,
+            version,
+            &pg_config,
+        );
+
+        eprintln!("include_path={}", includedir_server.display());
         if did_compile || !specific_rs.exists() {
             need_common_rs.store(true, Ordering::SeqCst);
             eprintln!(
                 "[{}] Running bindgen on {} with {}",
                 version,
                 bindings_rs.display(),
-                include_path.display()
+                includedir_server.display()
             );
             let bindings = bindgen::Builder::default()
                 .header(include_h.to_str().unwrap())
-                .clang_arg(&format!("-I{}", include_path.display()))
+                .clang_arg(&format!("-I{}", includedir_server.display()))
                 .parse_callbacks(Box::new(IgnoredMacros::default()))
                 .blacklist_function("varsize_any") // pgx converts the VARSIZE_ANY macro, so we don't want to also have this function, which is in heaptuple.c
                 .blacklist_function("query_tree_walker")
@@ -175,12 +220,13 @@ fn build_shim(
     target_dir: &PathBuf,
     major_version: u16,
     version: &str,
+    pg_config: &Option<String>,
 ) {
     // build the shim under a lock b/c this can't be built concurrently
     let _lock = shim_mutex.lock().expect("couldn't obtain shim_mutex");
 
     // then build the shim for the version feature currently being built
-    build_shim_for_version(&shim_dir, &target_dir, major_version, version)
+    build_shim_for_version(&shim_dir, &target_dir, major_version, version, pg_config)
         .expect("shim build failed");
 
     // and tell rustc to link to the library that was built for the feature we're currently building
@@ -201,19 +247,27 @@ fn build_shim_for_version(
     target_dir: &PathBuf,
     major_version: u16,
     version: &str,
+    pg_config: &Option<String>,
 ) -> Result<(), std::io::Error> {
-    // put the install directory for this version of Postgres at the head of the path
-    // so that `pg_config` gets found and we can make the shim static library
-    let path_env = std::env::var("PATH").unwrap();
-    let path_env = format!(
-        "{}:{}",
-        format!(
+    // put the "bin" directory that contains pg_config at the head of our path
+    let pg_config_bin_path = match pg_config.as_ref() {
+        // if we have a pg_config argument, that value is its parent directory
+        Some(pg_config) => {
+            let mut parent_dir = PathBuf::from(pg_config);
+            parent_dir.pop();
+            parent_dir
+        }
+
+        // otherwise, it's hardcoded inside our target_dir
+        None => PathBuf::from(format!(
             "{}/postgresql-{}/pgx-install/bin",
             target_dir.display(),
             version
-        ),
-        path_env
-    );
+        )),
+    };
+
+    let path_env = std::env::var("PATH").unwrap();
+    let path_env = format!("{}:{}", pg_config_bin_path.display(), path_env);
 
     eprintln!("PATH={}", path_env);
     eprintln!("shim_dir={}", shim_dir.display());

@@ -11,6 +11,7 @@ documentation = "https://docs.rs/pgx-utils"
 readme = "README.md"
 
 [dependencies]
+colored = "2.0.0"
 proc-macro2 = "1.0.18"
 quote = "1.0.7"
 syn = { version = "1.0.34", features = [ "extra-traits", "full", "fold", "parsing" ] }

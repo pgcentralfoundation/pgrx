@@ -4,7 +4,7 @@ pg_module_magic!();
 
 #[pg_extern]
 fn return_static() -> &'static str {
-    "This is a static string"
+    "This is a static string xxx"
 }
 
 #[pg_extern]
