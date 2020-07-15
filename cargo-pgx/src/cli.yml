@@ -8,6 +8,27 @@ about: Creates and installs pgx based Postgres extensions
 subcommands:
   - pgx:
         subcommands:
+          - init:
+              about: initize pgx development environment for the first time
+              args:
+                - pg10:
+                    long: pg10
+                    value_name: PG10_PG_CONFIG
+                    takes_value: true
+                    required: false
+                    help: if installed locally, the path to PG10's 'pg_config' tool
+                - pg11:
+                    long: pg11
+                    value_name: PG11_PG_CONFIG
+                    takes_value: true
+                    required: false
+                    help: if installed locally, the path to PG11's 'pg_config' tool
+                - pg12:
+                    long: pg12
+                    value_name: PG12_PG_CONFIG
+                    takes_value: true
+                    required: false
+                    help: if installed locally, the path to PG12's 'pg_config' tool
           - new:
               about: create a new extension crate
               args:

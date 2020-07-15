@@ -1,7 +1,9 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-use crate::property_inspector::{find_control_file, get_property};
+use crate::commands::get::{find_control_file, get_property};
+use crate::commands::schema::read_load_order;
+use crate::exit_with_error;
 use colored::Colorize;
 use pgx_utils::{get_pg_download_dir, run_pg_config};
 use std::io::Write;
@@ -10,33 +12,22 @@ use std::process::{Command, Stdio};
 use std::result::Result;
 use std::str::FromStr;
 
-macro_rules! exit {
-    () => ({ exit!("explicit panic") });
-    ($msg:expr) => ({ exit!("{}", $msg) });
-    ($msg:expr,) => ({ exit!($msg) });
-    ($fmt:expr, $($arg:tt)+) => ({
-        eprint!("{} ", "     [error]".bold().red());
-        eprintln!($fmt, $($arg)+);
-        std::process::exit(1);
-    });
-}
-
 pub(crate) fn install_extension(is_release: bool) -> Result<(), std::io::Error> {
     let (control_file, extname) = find_control_file()?;
     let target_dir = get_target_dir();
 
     if &std::env::var("PGX_NO_BUILD").unwrap_or_default() != "true" {
-        eprintln!("building extension");
+        println!("building extension");
         build_extension(is_release, target_dir.to_str().unwrap())?;
     } else {
-        eprintln!(
+        println!(
             "Skipping build due to $PGX_NO_BUILD=true in {}",
             std::env::current_dir().unwrap().display()
         );
     }
 
-    eprintln!();
-    eprintln!("installing extension");
+    println!();
+    println!("installing extension");
     let pkgdir = get_pkglibdir();
     let extdir = get_extensiondir();
     let (libpath, libfile) =
@@ -45,7 +36,7 @@ pub(crate) fn install_extension(is_release: bool) -> Result<(), std::io::Error> 
     let src = control_file.clone();
     let dest = format!("{}/{}", extdir, control_file);
     if let Err(e) = std::fs::copy(&src, &dest) {
-        exit!(
+        exit_with_error!(
             "failed copying control file ({}) to {}:  {}",
             control_file,
             extdir,
@@ -61,7 +52,7 @@ pub(crate) fn install_extension(is_release: bool) -> Result<(), std::io::Error> 
     let src = format!("{}/{}", libpath, libfile);
     let dest = format!("{}/{}.so", pkgdir, extname);
     if let Err(e) = std::fs::copy(&src, &dest) {
-        exit!("failed copying library ({}) to {}:  {}", libfile, pkgdir, e);
+        exit_with_error!("failed copying library ({}) to {}:  {}", libfile, pkgdir, e);
     }
     println!(
         "{} shared library to: {}",
@@ -108,9 +99,7 @@ fn build_extension(is_release: bool, target_dir: &str) -> Result<(), std::io::Er
 }
 
 fn copy_sql_files(extdir: &str, extname: &str) -> Result<(), std::io::Error> {
-    let load_order = crate::schema_generator::read_load_order(
-        &PathBuf::from_str("./sql/load-order.txt").unwrap(),
-    );
+    let load_order = read_load_order(&PathBuf::from_str("./sql/load-order.txt").unwrap());
     let target_filename =
         PathBuf::from_str(&format!("{}/{}--{}.sql", extdir, extname, get_version())).unwrap();
     let mut sql = std::fs::File::create(&target_filename).unwrap();
@@ -151,7 +140,7 @@ fn copy_sql_files(extdir: &str, extname: &str) -> Result<(), std::io::Error> {
                 let dest = format!("{}/{}", extdir, filename);
 
                 if let Err(e) = std::fs::copy(f.path(), &dest) {
-                    exit!("failed copying SQL {} to {}:  {}", filename, dest, e)
+                    exit_with_error!("failed copying SQL {} to {}:  {}", filename, dest, e)
                 }
             }
         }
@@ -172,7 +161,7 @@ fn find_library_file(
     });
 
     if !path.exists() {
-        exit!("target directory does not exist: {}", path.display());
+        exit_with_error!("target directory does not exist: {}", path.display());
     }
 
     for f in std::fs::read_dir(&path)? {
@@ -190,12 +179,12 @@ fn find_library_file(
         }
     }
 
-    exit!("couldn't find library file in: {}", target_dir);
+    exit_with_error!("couldn't find library file in: {}", target_dir);
 }
 fn get_version() -> String {
     match get_property("default_version") {
         Some(v) => v,
-        None => exit!("couldn't determine version number"),
+        None => exit_with_error!("couldn't determine version number"),
     }
 }
 

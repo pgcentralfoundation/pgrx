@@ -1,7 +1,6 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-
 use std::io::Write;
 use std::path::PathBuf;
 use std::process::Command;
@@ -44,7 +43,7 @@ fn create_control_file(path: &PathBuf, name: &str) -> Result<(), std::io::Error>
     filename.push(format!("{}.control", name));
     let mut file = std::fs::File::create(filename)?;
 
-    file.write_all(&format!(include_str!("templates/control"), name = name).as_bytes())?;
+    file.write_all(&format!(include_str!("../templates/control"), name = name).as_bytes())?;
 
     Ok(())
 }
@@ -55,7 +54,7 @@ fn create_cargo_toml(path: &PathBuf, name: &str) -> Result<(), std::io::Error> {
     filename.push("Cargo.toml");
     let mut file = std::fs::File::create(filename)?;
 
-    file.write_all(&format!(include_str!("templates/cargo_toml"), name = name).as_bytes())?;
+    file.write_all(&format!(include_str!("../templates/cargo_toml"), name = name).as_bytes())?;
 
     Ok(())
 }
@@ -67,7 +66,7 @@ fn create_dotcargo_config(path: &PathBuf, _name: &str) -> Result<(), std::io::Er
     filename.push("config");
     let mut file = std::fs::File::create(filename)?;
 
-    file.write_all(include_bytes!("templates/cargo_config"))?;
+    file.write_all(include_bytes!("../templates/cargo_config"))?;
 
     Ok(())
 }
@@ -79,7 +78,7 @@ fn create_lib_rs(path: &PathBuf, name: &str) -> Result<(), std::io::Error> {
     filename.push("lib.rs");
     let mut file = std::fs::File::create(filename)?;
 
-    file.write_all(&format!(include_str!("templates/lib_rs"), name = name).as_bytes())?;
+    file.write_all(&format!(include_str!("../templates/lib_rs"), name = name).as_bytes())?;
 
     Ok(())
 }
@@ -90,7 +89,7 @@ fn create_git_ignore(path: &PathBuf, _name: &str) -> Result<(), std::io::Error> 
     filename.push(".gitignore");
     let mut file = std::fs::File::create(filename)?;
 
-    file.write_all(include_bytes!("templates/gitignore"))?;
+    file.write_all(include_bytes!("../templates/gitignore"))?;
 
     Ok(())
 }
