@@ -87,8 +87,8 @@ pub(crate) fn init_pgx(
     let output_configs = mutex.as_mut().unwrap();
 
     output_configs.sort_by(|(_, a), (_, b)| a.major.cmp(&b.major));
-    for (pg_config, _) in output_configs.iter() {
-        validate_pg_config(&pg_config);
+    for (pg_config, version) in output_configs.iter() {
+        validate_pg_config(pg_config, version);
     }
 
     write_config(output_configs)
@@ -258,12 +258,12 @@ fn make_install_postgres(version: &PgVersion, pgdir: &PathBuf) -> PathBuf {
     pg_config
 }
 
-fn validate_pg_config(pg_config: &PathBuf) {
+fn validate_pg_config(pg_config: &PathBuf, version: &PgVersion) {
     println!("{} {}", "  Validating".bold().green(), pg_config.display());
     let mut command = std::process::Command::new(pg_config);
 
     command
-        .arg("--version")
+        .arg("--includedir-server")
         .stdout(std::process::Stdio::piped())
         .stderr(std::process::Stdio::piped())
         .stdin(std::process::Stdio::null());
@@ -277,12 +277,23 @@ fn validate_pg_config(pg_config: &PathBuf) {
     );
 
     if !output.status.success() {
-        exit_with_error!(format!(
-            "{}\n{}{}",
+        exit_with_error!(
+            "{}: {}\n{}{}",
+            version,
             command_str,
             String::from_utf8(output.stdout).unwrap(),
             String::from_utf8(output.stderr).unwrap()
-        ))
+        )
+    }
+
+    let includedir = PathBuf::from_str(&String::from_utf8(output.stdout).unwrap().trim()).unwrap();
+    if !includedir.exists() {
+        exit_with_error!(
+            "{}:  {} --includedir-server\n     `{}` does not exist",
+            version,
+            pg_config.display(),
+            includedir.display().to_string().bold().yellow()
+        );
     }
 }
 
