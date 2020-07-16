@@ -13,42 +13,9 @@ use crate::commands::new::create_crate_template;
 use crate::commands::schema::generate_schema;
 use crate::commands::test::test_extension;
 use clap::App;
+use pgx_utils::{exit, exit_with_error};
 use std::path::PathBuf;
 use std::str::FromStr;
-
-#[macro_export]
-macro_rules! exit_with_error {
-    () => ({ exit_with_error!("explicit panic") });
-    ($msg:expr) => ({ exit_with_error!("{}", $msg) });
-    ($msg:expr,) => ({ exit_with_error!($msg) });
-    ($fmt:expr, $($arg:tt)+) => ({
-        use colored::Colorize;
-        eprint!("{} ", "     [error]".bold().red());
-        eprintln!($fmt, $($arg)+);
-        std::process::exit(1);
-    });
-}
-
-#[macro_export]
-macro_rules! exit {
-    () => ({ exit!("explicit panic") });
-    ($msg:expr) => ({ exit!("{}", $msg) });
-    ($msg:expr,) => ({ exit!($msg) });
-    ($fmt:expr, $($arg:tt)+) => ({
-        eprintln!($fmt, $($arg)+);
-        std::process::exit(1);
-    });
-}
-
-#[macro_export]
-macro_rules! handle_result {
-    ($message:expr, $expr:expr) => {{
-        match $expr {
-            Ok(result) => result,
-            Err(e) => crate::exit_with_error!("{}: {}", $message, e),
-        }
-    }};
-}
 
 fn main() -> std::result::Result<(), std::io::Error> {
     let yaml = load_yaml!("cli.yml");

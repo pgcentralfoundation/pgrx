@@ -4,14 +4,14 @@
 extern crate build_deps;
 
 use bindgen::callbacks::MacroParsingBehavior;
-use pgx_utils::{run_pg_config, BASE_POSTGRES_PORT_NO};
+use pgx_utils::{exit_with_error, get_pgx_config_path, handle_result, prefix_path, run_pg_config};
 use quote::quote;
 use rayon::prelude::*;
+use serde_derive::Deserialize;
 use std::collections::HashSet;
 use std::path::PathBuf;
 use std::process::{Command, Output};
 use std::str::FromStr;
-use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Mutex;
 use syn::export::{ToTokens, TokenStream2};
 use syn::Item;
@@ -48,186 +48,150 @@ impl bindgen::callbacks::ParseCallbacks for IgnoredMacros {
     }
 }
 
+#[derive(Debug, Deserialize)]
+struct PgConfigPaths {
+    pg10: String,
+    pg11: String,
+    pg12: String,
+}
+
+#[derive(Debug, Deserialize)]
+struct Configs {
+    configs: PgConfigPaths,
+}
+
+fn load_pgx_config() -> Configs {
+    let path = get_pgx_config_path();
+
+    if !path.exists() {
+        // TODO:  do this automatically if an environment variable is set?
+        //        I think we want/need that ability
+        exit_with_error!(
+            "{} not found.  Have you run `{}` yet?",
+            path.display(),
+            "cargo pgx init".bold().yellow()
+        )
+    }
+
+    handle_result!(
+        "config.toml invalid",
+        toml::from_str::<Configs>(handle_result!(
+            "Unable to read config.toml",
+            &std::fs::read_to_string(path)
+        ))
+    )
+}
+
 fn main() -> Result<(), std::io::Error> {
+    let configs = load_pgx_config().configs;
+
     // dump our environment
     for (k, v) in std::env::vars() {
         eprintln!("{}={}", k, v);
     }
 
-    build_deps::rerun_if_changed_paths("download-postgres.sh").unwrap();
-    build_deps::rerun_if_changed_paths("compile-postgres.sh").unwrap();
+    build_deps::rerun_if_changed_paths(&get_pgx_config_path().display().to_string()).unwrap();
     build_deps::rerun_if_changed_paths("include/*").unwrap();
     build_deps::rerun_if_changed_paths("cshim/pgx-cshim.c").unwrap();
     build_deps::rerun_if_changed_paths("cshim/Makefile").unwrap();
 
     let manifest_dir = PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").unwrap());
-    let target_dir = PathBuf::from(std::env::var("PG_DOWNLOAD_TARGET_DIR").unwrap_or_else(|_| {
-        std::env::var("CARGO_TARGET_DIR").unwrap_or_else(|_| {
-            let mut out_dir = PathBuf::from(std::env::var("OUT_DIR").unwrap());
-            out_dir.pop();
-            out_dir.pop();
-            out_dir.pop();
-            out_dir.pop();
-            out_dir.display().to_string()
-        })
-    }));
     let shim_dir = PathBuf::from(format!("{}/cshim", manifest_dir.display()));
 
     eprintln!("manifest_dir={}", manifest_dir.display());
-    eprintln!("target_dir={}", target_dir.display());
     eprintln!("shim_dir={}", shim_dir.display());
 
-    let shim_mutex = Mutex::new(());
-    let need_common_rs = AtomicBool::new(false);
-
-    let pg_versions = vec![
-        (
-            "10.13",                                                    // the version we'll download
-            std::env::var("PGX_PG10_CONFIG").map_or(None, |v| Some(v)), // or use whatver this specific pg_config binrary tells us
-        ),
-        (
-            "11.8",
-            std::env::var("PGX_PG11_CONFIG").map_or(None, |v| Some(v)),
-        ),
-        (
-            "12.3",
-            std::env::var("PGX_PG12_CONFIG").map_or(None, |v| Some(v)),
-        ),
+    let pg_configs = vec![
+        (PathBuf::from_str(&configs.pg10).unwrap(), 10),
+        (PathBuf::from_str(&configs.pg11).unwrap(), 11),
+        (PathBuf::from_str(&configs.pg12).unwrap(), 12),
     ];
-    pg_versions.par_iter().for_each(|v| {
-        let version: &str = v.0;
-        let major_version = u16::from_str(version.split_terminator('.').next().unwrap()).unwrap();
-        let port_no = BASE_POSTGRES_PORT_NO + major_version;
-        let pg_config: Option<String> = v.1.clone();
-        let bindings_rs = PathBuf::from(format!(
-            "{}/src/pg{}_bindings.rs",
-            manifest_dir.display(),
-            major_version
-        ));
-        let specific_rs = PathBuf::from(format!(
-            "{}/src/pg{}_specific.rs",
-            manifest_dir.display(),
-            major_version
-        ));
-        let include_h = PathBuf::from(format!(
-            "{}/include/pg{}.h",
-            manifest_dir.display(),
-            major_version
-        ));
+    let shim_mutex = Mutex::new(());
 
-        eprintln!("bindings_rs={}", bindings_rs.display());
-        eprintln!("include_h={}", include_h.display());
-
-        let did_compile;
-        let includedir_server;
-
-        if pg_config.is_none() {
-            eprintln!("downloading and compiling Postgres v{}", version);
-
-            // use the path we're going to create when we download and install postgres
-            includedir_server = PathBuf::from(format!(
-                "{}/postgresql-{}/pgx-install/include/server",
-                target_dir.display(),
-                version
+    pg_configs
+        .into_par_iter()
+        .for_each(|(pg_config, major_version)| {
+            let include_h = PathBuf::from(format!(
+                "{}/include/pg{}.h",
+                manifest_dir.display(),
+                major_version
+            ));
+            let bindings_rs = PathBuf::from(format!(
+                "{}/src/pg{}_bindings.rs",
+                manifest_dir.display(),
+                major_version
             ));
 
-            download_postgres(&manifest_dir, version, &target_dir)
-                .unwrap_or_else(|_| panic!("failed to download Postgres v{}", version));
-            did_compile = compile_postgres(
-                &manifest_dir,
-                version,
-                &target_dir,
-                port_no,
-                pg_versions.len(),
-            )
-            .unwrap_or_else(|_| panic!("failed to compile Postgres v{}", version));
-        } else {
-            eprintln!(
-                "not downloading or compiling Postgres v{} -- using {} instead",
-                version,
-                pg_config.as_ref().unwrap()
-            );
+            run_bindgen(&pg_config, major_version, &include_h, &bindings_rs);
+            build_shim(&shim_dir, &shim_mutex, major_version, &pg_config);
+        });
 
-            // use whatever pg_config tells us to use for the server's include file path
-            includedir_server = PathBuf::from(run_pg_config(&pg_config, "--includedir-server"));
-            did_compile = false;
-        }
-
-        build_shim(
-            &shim_dir,
-            &shim_mutex,
-            &target_dir,
-            major_version,
-            version,
-            &pg_config,
-        );
-
-        eprintln!("include_path={}", includedir_server.display());
-        if did_compile || !specific_rs.exists() {
-            need_common_rs.store(true, Ordering::SeqCst);
-            eprintln!(
-                "[{}] Running bindgen on {} with {}",
-                version,
-                bindings_rs.display(),
-                includedir_server.display()
-            );
-            let bindings = bindgen::Builder::default()
-                .header(include_h.to_str().unwrap())
-                .clang_arg(&format!("-I{}", includedir_server.display()))
-                .parse_callbacks(Box::new(IgnoredMacros::default()))
-                .blacklist_function("varsize_any") // pgx converts the VARSIZE_ANY macro, so we don't want to also have this function, which is in heaptuple.c
-                .blacklist_function("query_tree_walker")
-                .blacklist_function("expression_tree_walker")
-                .blacklist_function("sigsetjmp")
-                .blacklist_function("siglongjmp")
-                .blacklist_function("pg_re_throw")
-                .size_t_is_usize(true)
-                .rustfmt_bindings(true)
-                .derive_debug(true)
-                .derive_copy(true) // necessary to avoid __BindgenUnionField usages -- I don't understand why?
-                .derive_default(true)
-                .derive_eq(false)
-                .derive_partialeq(false)
-                .derive_hash(false)
-                .derive_ord(false)
-                .derive_partialord(false)
-                .layout_tests(false)
-                .generate()
-                .unwrap_or_else(|e| panic!("Unable to generate bindings for {}: {:?}", version, e));
-
-            let bindings = apply_pg_guard(bindings.to_string()).unwrap();
-            std::fs::write(bindings_rs.clone(), bindings).unwrap_or_else(|e| {
-                panic!(
-                    "Unable to save bindings for {} to {}: {:?}",
-                    version,
-                    bindings_rs.display(),
-                    e
-                )
-            });
-        }
-    });
-
-    if need_common_rs.load(Ordering::SeqCst) {
-        generate_common_rs(manifest_dir);
-    }
+    generate_common_rs(manifest_dir);
 
     Ok(())
 }
 
-fn build_shim(
-    shim_dir: &PathBuf,
-    shim_mutex: &Mutex<()>,
-    target_dir: &PathBuf,
+fn run_bindgen(
+    pg_config: &PathBuf,
     major_version: u16,
-    version: &str,
-    pg_config: &Option<String>,
+    include_h: &PathBuf,
+    bindings_rs: &PathBuf,
 ) {
+    eprintln!(
+        "Generating bindings for pg{} to {}",
+        major_version,
+        bindings_rs.display()
+    );
+    let includedir_server = run_pg_config(
+        &Some(pg_config.display().to_string()),
+        "--includedir-server",
+    );
+    let bindings = bindgen::Builder::default()
+        .header(include_h.display().to_string())
+        .clang_arg(&format!("-I{}", includedir_server))
+        .parse_callbacks(Box::new(IgnoredMacros::default()))
+        .blacklist_function("varsize_any") // pgx converts the VARSIZE_ANY macro, so we don't want to also have this function, which is in heaptuple.c
+        .blacklist_function("query_tree_walker")
+        .blacklist_function("expression_tree_walker")
+        .blacklist_function("sigsetjmp")
+        .blacklist_function("siglongjmp")
+        .blacklist_function("pg_re_throw")
+        .size_t_is_usize(true)
+        .rustfmt_bindings(true)
+        .derive_debug(true)
+        .derive_copy(true) // necessary to avoid __BindgenUnionField usages -- I don't understand why?
+        .derive_default(true)
+        .derive_eq(false)
+        .derive_partialeq(false)
+        .derive_hash(false)
+        .derive_ord(false)
+        .derive_partialord(false)
+        .layout_tests(false)
+        .generate()
+        .unwrap_or_else(|e| {
+            panic!(
+                "Unable to generate bindings for pg{}: {:?}",
+                major_version, e
+            )
+        });
+
+    let bindings = apply_pg_guard(bindings.to_string()).unwrap();
+    std::fs::write(&bindings_rs, bindings).unwrap_or_else(|e| {
+        panic!(
+            "Unable to save bindings for pg{} to {}: {:?}",
+            major_version,
+            bindings_rs.display(),
+            e
+        )
+    });
+}
+
+fn build_shim(shim_dir: &PathBuf, shim_mutex: &Mutex<()>, major_version: u16, pg_config: &PathBuf) {
     // build the shim under a lock b/c this can't be built concurrently
     let _lock = shim_mutex.lock().expect("couldn't obtain shim_mutex");
 
     // then build the shim for the version feature currently being built
-    build_shim_for_version(&shim_dir, &target_dir, major_version, version, pg_config)
-        .expect("shim build failed");
+    build_shim_for_version(&shim_dir, major_version, pg_config).expect("shim build failed");
 
     // and tell rustc to link to the library that was built for the feature we're currently building
     if std::env::var("CARGO_FEATURE_PG10").is_ok() {
@@ -244,32 +208,12 @@ fn build_shim(
 
 fn build_shim_for_version(
     shim_dir: &PathBuf,
-    target_dir: &PathBuf,
     major_version: u16,
-    version: &str,
-    pg_config: &Option<String>,
+    pg_config: &PathBuf,
 ) -> Result<(), std::io::Error> {
-    // put the "bin" directory that contains pg_config at the head of our path
-    let pg_config_bin_path = match pg_config.as_ref() {
-        // if we have a pg_config argument, that value is its parent directory
-        Some(pg_config) => {
-            let mut parent_dir = PathBuf::from(pg_config);
-            parent_dir.pop();
-            parent_dir
-        }
+    let path_env = prefix_path(pg_config.parent().unwrap());
 
-        // otherwise, it's hardcoded inside our target_dir
-        None => PathBuf::from(format!(
-            "{}/postgresql-{}/pgx-install/bin",
-            target_dir.display(),
-            version
-        )),
-    };
-
-    let path_env = std::env::var("PATH").unwrap();
-    let path_env = format!("{}:{}", pg_config_bin_path.display(), path_env);
-
-    eprintln!("PATH={}", path_env);
+    eprintln!("PATH for build_shim={}", path_env);
     eprintln!("shim_dir={}", shim_dir.display());
     let rc = run_command(
         Command::new("make")
@@ -298,50 +242,6 @@ fn generate_common_rs(working_dir: PathBuf) {
 
     if result.is_err() {
         panic!(result.err().unwrap());
-    }
-}
-
-fn download_postgres(
-    manifest_dir: &PathBuf,
-    version_number: &str,
-    target_dir: &PathBuf,
-) -> Result<(), std::io::Error> {
-    let rc = run_command(
-        Command::new("./download-postgres.sh")
-            .arg(version_number)
-            .arg(target_dir.display().to_string())
-            .current_dir(manifest_dir.display().to_string()),
-        version_number,
-    )?;
-
-    if rc.status.code().unwrap() != 0 {
-        panic!("failed to download Postgres v{}", version_number);
-    }
-    Ok(())
-}
-
-fn compile_postgres(
-    manifest_dir: &PathBuf,
-    version_number: &str,
-    target_dir: &PathBuf,
-    port_number: u16,
-    num_versions: usize,
-) -> Result<bool, std::io::Error> {
-    let num_cpus = 1.max(num_cpus::get() / num_versions);
-    let rc = run_command(
-        Command::new("./compile-postgres.sh")
-            .arg(version_number)
-            .arg(target_dir.display().to_string())
-            .arg(port_number.to_string())
-            .env("NUM_CPUS", num_cpus.to_string())
-            .current_dir(manifest_dir.display().to_string()),
-        version_number,
-    )?;
-
-    match rc.status.code().unwrap() {
-        0 => Ok(false), // we did NOT compile Postgres
-        2 => Ok(true),  // we did compile Postgres
-        _ => panic!("failed to compile Postgres v{}", version_number),
     }
 }
 
@@ -423,7 +323,7 @@ fn rust_fmt(path: &str) -> Result<(), std::io::Error> {
 
 pub(crate) mod bindings_diff {
     use crate::rust_fmt;
-    use quote::quote;
+    use quote::{quote, ToTokens};
     use std::cmp::Ordering;
     use std::collections::BTreeMap;
     use std::fs::File;
@@ -432,70 +332,22 @@ pub(crate) mod bindings_diff {
     use std::path::PathBuf;
     use std::str::FromStr;
     use syn::export::TokenStream2;
-    use syn::ForeignItem;
-    use syn::{ImplItem, Item};
+    use syn::Item;
 
     #[derive(Eq, Clone)]
     struct SortableItem {
         item: Item,
+        ident: String,
     }
 
     impl SortableItem {
         fn new(item: Item) -> Self {
-            SortableItem { item }
+            let ident = item.to_token_stream().to_string();
+            SortableItem { item, ident }
         }
 
-        fn ident(&self) -> String {
-            match &self.item {
-                Item::Const(v) => format!("Const: {}", v.ident.to_string()),
-                Item::Enum(v) => format!("Enum: {}", v.ident.to_string()),
-                Item::ExternCrate(v) => format!("ExternCrate: {}", v.ident.to_string()),
-                Item::Fn(v) => format!("Fn: {}", v.sig.ident.to_string()),
-                Item::ForeignMod(v) => format!(
-                    "ForeignMod: {}",
-                    if v.items.is_empty() {
-                        format!("{}", quote! {#v})
-                    } else {
-                        match v.items.first().unwrap() {
-                            ForeignItem::Fn(v) => format!("Fn: {}", v.sig.ident.to_string()),
-                            ForeignItem::Static(v) => format!("Static: {}", v.ident.to_string()),
-                            ForeignItem::Type(v) => format!("Type: {}", v.ident.to_string()),
-                            ForeignItem::Macro(v) => format!("Macro: {}", quote! {#v}),
-                            ForeignItem::Verbatim(v) => format!("Verbatim: {}", quote! {#v}),
-                            ForeignItem::__Nonexhaustive => panic!("ForeignItem __Nonexhausstive"),
-                        }
-                    }
-                ),
-                Item::Impl(v) => format!(
-                    "Impl: {}",
-                    if v.items.is_empty() {
-                        format!("{}", quote! {#v})
-                    } else {
-                        match v.items.first().unwrap() {
-                            ImplItem::Const(v) => format!("Const: {}", v.ident.to_string()),
-                            ImplItem::Method(v) => format!("Method: {}", v.sig.ident.to_string()),
-                            ImplItem::Type(v) => format!("Type: {}", v.ident.to_string()),
-                            ImplItem::Macro(v) => format!("Macro: {}", format!("{}", quote! {#v})),
-                            ImplItem::Verbatim(v) => {
-                                format!("Verbatim: {}", format!("{}", quote! {#v}))
-                            }
-                            ImplItem::__Nonexhaustive => panic!("ImplItem __Nonexhausstive"),
-                        }
-                    }
-                ),
-                Item::Macro(v) => format!("Macro: {}", quote! {#v}),
-                Item::Macro2(v) => format!("Macro2: {}", v.ident.to_string()),
-                Item::Mod(v) => format!("Mod: {}", v.ident.to_string()),
-                Item::Static(v) => format!("Static: {}", v.ident.to_string()),
-                Item::Struct(v) => format!("Struct: {}", v.ident.to_string()),
-                Item::Trait(v) => format!("Trait: {}", v.ident.to_string()),
-                Item::TraitAlias(v) => format!("TraitAlias: {}", v.ident.to_string()),
-                Item::Type(v) => format!("Type: {}", v.ident.to_string()),
-                Item::Union(v) => format!("Union: {}", v.ident.to_string()),
-                Item::Use(v) => format!("Use: {}", format!("{}", quote! {#v})),
-                Item::Verbatim(v) => format!("Verbatim: {}", format!("{}", quote! {#v})),
-                Item::__Nonexhaustive => panic!("Item __Nonexhaustive"),
-            }
+        fn ident(&self) -> &str {
+            &self.ident
         }
     }
 
@@ -578,7 +430,7 @@ pub(crate) mod bindings_diff {
     }
 
     #[inline]
-    fn all_contain(maps: &[&mut BTreeMap<String, SortableItem>], key: &str) -> bool {
+    fn all_contain(maps: &[&mut BTreeMap<String, SortableItem>], key: &String) -> bool {
         for map in maps.iter() {
             if !map.contains_key(key) {
                 return false;

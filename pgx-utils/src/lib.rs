@@ -5,11 +5,68 @@ use colored::Colorize;
 use proc_macro2::TokenTree;
 use quote::quote;
 use std::collections::HashSet;
+use std::path::PathBuf;
 use std::process::Command;
 use syn::export::TokenStream2;
 use syn::{GenericArgument, ItemFn, PathArguments, ReturnType, Type, TypeParamBound};
 
 pub static BASE_POSTGRES_PORT_NO: u16 = 28800;
+
+#[macro_export]
+macro_rules! exit_with_error {
+    () => ({ exit_with_error!("explicit panic") });
+    ($msg:expr) => ({ exit_with_error!("{}", $msg) });
+    ($msg:expr,) => ({ exit_with_error!($msg) });
+    ($fmt:expr, $($arg:tt)+) => ({
+        use colored::Colorize;
+        eprint!("{} ", "     [error]".bold().red());
+        eprintln!($fmt, $($arg)+);
+        std::process::exit(1);
+    });
+}
+
+#[macro_export]
+macro_rules! exit {
+    () => ({ exit!("explicit panic") });
+    ($msg:expr) => ({ exit!("{}", $msg) });
+    ($msg:expr,) => ({ exit!($msg) });
+    ($fmt:expr, $($arg:tt)+) => ({
+        eprintln!($fmt, $($arg)+);
+        std::process::exit(1);
+    });
+}
+
+#[macro_export]
+macro_rules! handle_result {
+    ($message:expr, $expr:expr) => {{
+        match $expr {
+            Ok(result) => result,
+            Err(e) => crate::exit_with_error!("{}: {}", $message, e),
+        }
+    }};
+}
+
+pub fn get_pgx_dir() -> PathBuf {
+    let mut dir = match dirs::home_dir() {
+        Some(dir) => dir,
+        None => exit_with_error!("You don't seem to have a home directory"),
+    };
+    dir.push(".pgx");
+    if !dir.exists() {
+        handle_result!(
+            format!("creating {}", dir.display()),
+            std::fs::create_dir_all(&dir)
+        );
+    }
+
+    dir
+}
+
+pub fn get_pgx_config_path() -> PathBuf {
+    let mut path = get_pgx_dir();
+    path.push("config.toml");
+    path
+}
 
 pub fn get_target_dir() -> String {
     std::env::var("CARGO_TARGET_DIR")
@@ -39,6 +96,17 @@ pub fn run_pg_config(pg_config: &Option<String>, arg: &str) -> String {
             std::process::exit(1);
         }
     }
+}
+
+pub fn prefix_path<P: Into<PathBuf>>(dir: P) -> String {
+    let mut path = std::env::split_paths(&std::env::var_os("PATH").expect("failed to get $PATH"))
+        .collect::<Vec<_>>();
+
+    path.insert(0, dir.into());
+    std::env::join_paths(path)
+        .expect("failed to join paths")
+        .into_string()
+        .expect("failed to construct path")
 }
 
 #[derive(Debug, Hash, Ord, PartialOrd, Eq, PartialEq)]

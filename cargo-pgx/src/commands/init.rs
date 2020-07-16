@@ -1,7 +1,8 @@
-use crate::exit_with_error;
-use crate::handle_result;
 use colored::Colorize;
-use pgx_utils::BASE_POSTGRES_PORT_NO;
+use pgx_utils::{
+    exit_with_error, get_pgx_config_path, get_pgx_dir, handle_result, prefix_path,
+    BASE_POSTGRES_PORT_NO,
+};
 use rayon::prelude::*;
 use rttp_client::HttpClient;
 use std::fmt::Display;
@@ -298,54 +299,21 @@ fn validate_pg_config(pg_config: &PathBuf, version: &PgVersion) {
 }
 
 fn write_config(pg_configs: &Vec<(PathBuf, &PgVersion)>) -> Result<(), std::io::Error> {
-    let config_path = get_pgx_config();
+    let config_path = get_pgx_config_path();
     let mut file = handle_result!(
         format!("Unable to create {}", config_path.display()),
         File::create(&config_path)
     );
     file.write_all(b"[configs]\n")?;
     for (pg_config, version) in pg_configs {
-        file.write_all(format!("{}={}\n", version.label(), pg_config.display()).as_bytes())?;
+        file.write_all(format!("{}=\"{}\"\n", version.label(), pg_config.display()).as_bytes())?;
     }
 
     Ok(())
-}
-
-fn get_pgx_dir() -> PathBuf {
-    let mut dir = match dirs::home_dir() {
-        Some(dir) => dir,
-        None => exit_with_error!("You don't seem to have a home directory"),
-    };
-    dir.push(".pgx");
-    if !dir.exists() {
-        handle_result!(
-            format!("creating {}", dir.display()),
-            std::fs::create_dir_all(&dir)
-        );
-    }
-
-    dir
-}
-
-fn get_pgx_config() -> PathBuf {
-    let mut path = get_pgx_dir();
-    path.push("config.toml");
-    path
 }
 
 fn get_pg_installdir(pgdir: &PathBuf) -> PathBuf {
     let mut dir = PathBuf::from(pgdir);
     dir.push("pgx-install");
     dir
-}
-
-fn prefix_path(dir: &PathBuf) -> String {
-    let mut path = std::env::split_paths(&std::env::var_os("PATH").expect("failed to get $PATH"))
-        .collect::<Vec<_>>();
-
-    path.insert(0, dir.clone());
-    std::env::join_paths(path)
-        .expect("failed to join paths")
-        .into_string()
-        .expect("failed to construct path")
 }
