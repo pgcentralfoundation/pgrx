@@ -3,4 +3,7 @@ pub(crate) mod init;
 pub(crate) mod install;
 pub(crate) mod new;
 pub(crate) mod schema;
+pub(crate) mod start;
+pub(crate) mod status;
+pub(crate) mod stop;
 pub(crate) mod test;

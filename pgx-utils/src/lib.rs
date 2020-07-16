@@ -3,6 +3,7 @@
 
 use proc_macro2::TokenTree;
 use quote::quote;
+use serde_derive::Deserialize;
 use std::collections::HashSet;
 use std::path::PathBuf;
 use std::process::Command;
@@ -45,7 +46,54 @@ macro_rules! handle_result {
     }};
 }
 
-pub fn get_pgx_dir() -> PathBuf {
+#[derive(Debug, Deserialize)]
+pub struct PgConfigPaths {
+    pub pg10: String,
+    pub pg11: String,
+    pub pg12: String,
+}
+
+#[derive(Debug, Deserialize)]
+struct Configs {
+    configs: PgConfigPaths,
+}
+
+pub fn load_pgx_config() -> PgConfigPaths {
+    let path = get_pgx_config_path();
+
+    if !path.exists() {
+        // TODO:  do this automatically if an environment variable is set?
+        //        I think we want/need that ability
+        exit_with_error!(
+            "{} not found.  Have you run `{}` yet?",
+            path.display(),
+            "cargo pgx init".bold().yellow()
+        )
+    }
+
+    handle_result!(
+        "config.toml invalid",
+        toml::from_str::<Configs>(handle_result!(
+            "Unable to read config.toml",
+            &std::fs::read_to_string(path)
+        ))
+    )
+    .configs
+}
+
+pub fn get_pgdata_dir(major_version: u16) -> PathBuf {
+    let mut path = get_pgx_home();
+    path.push(format!("data-{}", major_version));
+    path
+}
+
+pub fn get_pglog_file(major_version: u16) -> PathBuf {
+    let mut path = get_pgx_home();
+    path.push(format!("{}.log", major_version));
+    path
+}
+
+pub fn get_pgx_home() -> PathBuf {
     let mut dir = match dirs::home_dir() {
         Some(dir) => dir,
         None => exit_with_error!("You don't seem to have a home directory"),
@@ -62,7 +110,7 @@ pub fn get_pgx_dir() -> PathBuf {
 }
 
 pub fn get_pgx_config_path() -> PathBuf {
-    let mut path = get_pgx_dir();
+    let mut path = get_pgx_home();
     path.push("config.toml");
     path
 }
@@ -76,6 +124,16 @@ pub fn get_target_dir() -> PathBuf {
         },
         |v| v.into(),
     )
+}
+
+pub fn get_pg_config(major_version: u16) -> Option<String> {
+    let paths = load_pgx_config();
+    match major_version {
+        10 => Some(paths.pg10),
+        11 => Some(paths.pg11),
+        12 => Some(paths.pg12),
+        _ => None,
+    }
 }
 
 pub fn get_pg_download_dir() -> PathBuf {

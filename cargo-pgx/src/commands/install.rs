@@ -11,7 +11,10 @@ use std::process::{Command, Stdio};
 use std::result::Result;
 use std::str::FromStr;
 
-pub(crate) fn install_extension(is_release: bool) -> Result<(), std::io::Error> {
+pub(crate) fn install_extension(
+    pg_config: &Option<String>,
+    is_release: bool,
+) -> Result<(), std::io::Error> {
     let (control_file, extname) = find_control_file();
 
     println!("building extension");
@@ -19,8 +22,8 @@ pub(crate) fn install_extension(is_release: bool) -> Result<(), std::io::Error> 
 
     println!();
     println!("installing extension");
-    let pkgdir = get_pkglibdir();
-    let extdir = get_extensiondir();
+    let pkgdir = get_pkglibdir(pg_config);
+    let extdir = get_extensiondir(pg_config);
     let (libpath, libfile) = find_library_file(&extname, is_release);
 
     let src = control_file.clone();
@@ -177,12 +180,12 @@ fn get_version() -> String {
     }
 }
 
-fn get_pkglibdir() -> String {
-    run_pg_config(&None, "--pkglibdir")
+fn get_pkglibdir(pg_config: &Option<String>) -> String {
+    run_pg_config(pg_config, "--pkglibdir")
 }
 
-fn get_extensiondir() -> String {
-    let mut dir = run_pg_config(&None, "--sharedir");
+fn get_extensiondir(pg_config: &Option<String>) -> String {
+    let mut dir = run_pg_config(pg_config, "--sharedir");
 
     dir.push_str("/extension");
     dir

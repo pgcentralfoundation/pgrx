@@ -29,6 +29,30 @@ subcommands:
                     takes_value: true
                     required: false
                     help: if installed locally, the path to PG12's 'pg_config' tool
+          - start:
+              about: start a pgx-managed Postgres instance
+              args:
+                - pg_version:
+                    value_name: PG_VERSION
+                    takes_value: true
+                    required: true
+                    help: the Postgres version to start
+          - stop:
+              about: stop a pgx-managed Postgres instance
+              args:
+                - pg_version:
+                    value_name: PG_VERSION
+                    takes_value: true
+                    required: true
+                    help: the Postgres version to stop
+          - status:
+              about: is a pgx-managed Postgres instance running?
+              args:
+                - pg_version:
+                    value_name: PG_VERSION
+                    takes_value: true
+                    required: true
+                    help: the Postgres version
           - new:
               about: create a new extension crate
               args:

@@ -1,6 +1,6 @@
 use colored::Colorize;
 use pgx_utils::{
-    exit_with_error, get_pgx_config_path, get_pgx_dir, handle_result, prefix_path,
+    exit_with_error, get_pgx_config_path, get_pgx_home, handle_result, prefix_path,
     BASE_POSTGRES_PORT_NO,
 };
 use rayon::prelude::*;
@@ -61,7 +61,7 @@ pub(crate) fn init_pgx(
     pg11_config: Option<&str>,
     pg12_config: Option<&str>,
 ) -> std::result::Result<(), std::io::Error> {
-    let dir = get_pgx_dir();
+    let dir = get_pgx_home();
 
     let input_configs = vec![
         (pg10_config, &PG10_VERSION),

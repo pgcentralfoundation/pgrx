@@ -4,14 +4,12 @@
 extern crate build_deps;
 
 use bindgen::callbacks::MacroParsingBehavior;
-use pgx_utils::{exit_with_error, get_pgx_config_path, handle_result, prefix_path, run_pg_config};
+use pgx_utils::{get_pg_config, get_pgx_config_path, prefix_path, run_pg_config};
 use quote::quote;
 use rayon::prelude::*;
-use serde_derive::Deserialize;
 use std::collections::HashSet;
 use std::path::PathBuf;
 use std::process::{Command, Output};
-use std::str::FromStr;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Mutex;
 use syn::export::{ToTokens, TokenStream2};
@@ -49,43 +47,7 @@ impl bindgen::callbacks::ParseCallbacks for IgnoredMacros {
     }
 }
 
-#[derive(Debug, Deserialize)]
-struct PgConfigPaths {
-    pg10: String,
-    pg11: String,
-    pg12: String,
-}
-
-#[derive(Debug, Deserialize)]
-struct Configs {
-    configs: PgConfigPaths,
-}
-
-fn load_pgx_config() -> Configs {
-    let path = get_pgx_config_path();
-
-    if !path.exists() {
-        // TODO:  do this automatically if an environment variable is set?
-        //        I think we want/need that ability
-        exit_with_error!(
-            "{} not found.  Have you run `{}` yet?",
-            path.display(),
-            "cargo pgx init".bold().yellow()
-        )
-    }
-
-    handle_result!(
-        "config.toml invalid",
-        toml::from_str::<Configs>(handle_result!(
-            "Unable to read config.toml",
-            &std::fs::read_to_string(path)
-        ))
-    )
-}
-
 fn main() -> Result<(), std::io::Error> {
-    let configs = load_pgx_config().configs;
-
     // dump our environment
     for (k, v) in std::env::vars() {
         eprintln!("{}={}", k, v);
@@ -102,51 +64,46 @@ fn main() -> Result<(), std::io::Error> {
     eprintln!("manifest_dir={}", manifest_dir.display());
     eprintln!("shim_dir={}", shim_dir.display());
 
-    let pg_configs = vec![
-        (PathBuf::from_str(&configs.pg10).unwrap(), 10),
-        (PathBuf::from_str(&configs.pg11).unwrap(), 11),
-        (PathBuf::from_str(&configs.pg12).unwrap(), 12),
-    ];
+    let major_versions = vec![10, 11, 12];
     let shim_mutex = Mutex::new(());
     let need_common_rs = AtomicBool::new(false);
 
-    pg_configs
-        .into_par_iter()
-        .for_each(|(pg_config, major_version)| {
-            let include_h = PathBuf::from(format!(
-                "{}/include/pg{}.h",
-                manifest_dir.display(),
-                major_version
-            ));
-            let bindings_rs = PathBuf::from(format!(
-                "{}/src/pg{}_bindings.rs",
-                manifest_dir.display(),
-                major_version
-            ));
-            let specific_rs = PathBuf::from(format!(
-                "{}/src/pg{}_specific.rs",
-                manifest_dir.display(),
-                major_version
-            ));
-            let libpgx_cshim = PathBuf::from(format!(
-                "{}/cshim/libpgx-cshim-{}.a",
-                manifest_dir.display(),
-                major_version
-            ));
+    major_versions.into_par_iter().for_each(|major_version| {
+        let pg_config = get_pg_config(major_version);
+        let include_h = PathBuf::from(format!(
+            "{}/include/pg{}.h",
+            manifest_dir.display(),
+            major_version
+        ));
+        let bindings_rs = PathBuf::from(format!(
+            "{}/src/pg{}_bindings.rs",
+            manifest_dir.display(),
+            major_version
+        ));
+        let specific_rs = PathBuf::from(format!(
+            "{}/src/pg{}_specific.rs",
+            manifest_dir.display(),
+            major_version
+        ));
+        let libpgx_cshim = PathBuf::from(format!(
+            "{}/cshim/libpgx-cshim-{}.a",
+            manifest_dir.display(),
+            major_version
+        ));
 
-            eprintln!("bindings_rs={}", bindings_rs.display());
-            eprintln!("specific_rs={}", specific_rs.display());
-            eprintln!("libpgx_cshim={}", libpgx_cshim.display());
+        eprintln!("bindings_rs={}", bindings_rs.display());
+        eprintln!("specific_rs={}", specific_rs.display());
+        eprintln!("libpgx_cshim={}", libpgx_cshim.display());
 
-            if !specific_rs.exists() {
-                run_bindgen(&pg_config, major_version, &include_h, &bindings_rs);
-                need_common_rs.store(true, Ordering::SeqCst);
-            }
+        if !specific_rs.exists() {
+            run_bindgen(&pg_config, major_version, &include_h, &bindings_rs);
+            need_common_rs.store(true, Ordering::SeqCst);
+        }
 
-            if !libpgx_cshim.exists() {
-                build_shim(&shim_dir, &shim_mutex, major_version, &pg_config);
-            }
-        });
+        if !libpgx_cshim.exists() {
+            build_shim(&shim_dir, &shim_mutex, major_version, &pg_config);
+        }
+    });
 
     if need_common_rs.load(Ordering::SeqCst) {
         generate_common_rs(manifest_dir);
@@ -156,7 +113,7 @@ fn main() -> Result<(), std::io::Error> {
 }
 
 fn run_bindgen(
-    pg_config: &PathBuf,
+    pg_config: &Option<String>,
     major_version: u16,
     include_h: &PathBuf,
     bindings_rs: &PathBuf,
@@ -166,10 +123,7 @@ fn run_bindgen(
         major_version,
         bindings_rs.display()
     );
-    let includedir_server = run_pg_config(
-        &Some(pg_config.display().to_string()),
-        "--includedir-server",
-    );
+    let includedir_server = run_pg_config(pg_config, "--includedir-server");
     let bindings = bindgen::Builder::default()
         .header(include_h.display().to_string())
         .clang_arg(&format!("-I{}", includedir_server))
@@ -210,7 +164,12 @@ fn run_bindgen(
     });
 }
 
-fn build_shim(shim_dir: &PathBuf, shim_mutex: &Mutex<()>, major_version: u16, pg_config: &PathBuf) {
+fn build_shim(
+    shim_dir: &PathBuf,
+    shim_mutex: &Mutex<()>,
+    major_version: u16,
+    pg_config: &Option<String>,
+) {
     // build the shim under a lock b/c this can't be built concurrently
     let _lock = shim_mutex.lock().expect("couldn't obtain shim_mutex");
 
@@ -233,8 +192,9 @@ fn build_shim(shim_dir: &PathBuf, shim_mutex: &Mutex<()>, major_version: u16, pg
 fn build_shim_for_version(
     shim_dir: &PathBuf,
     major_version: u16,
-    pg_config: &PathBuf,
+    pg_config: &Option<String>,
 ) -> Result<(), std::io::Error> {
+    let pg_config: PathBuf = pg_config.as_ref().unwrap().into();
     let path_env = prefix_path(pg_config.parent().unwrap());
 
     eprintln!("PATH for build_shim={}", path_env);
