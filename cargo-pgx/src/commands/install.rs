@@ -3,9 +3,8 @@
 
 use crate::commands::get::{find_control_file, get_property};
 use crate::commands::schema::read_load_order;
-use crate::exit_with_error;
 use colored::Colorize;
-use pgx_utils::{get_pg_download_dir, run_pg_config};
+use pgx_utils::{exit_with_error, get_target_dir, handle_result, run_pg_config};
 use std::io::Write;
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
@@ -13,49 +12,37 @@ use std::result::Result;
 use std::str::FromStr;
 
 pub(crate) fn install_extension(is_release: bool) -> Result<(), std::io::Error> {
-    let (control_file, extname) = find_control_file()?;
-    let target_dir = get_target_dir();
+    let (control_file, extname) = find_control_file();
 
-    if &std::env::var("PGX_NO_BUILD").unwrap_or_default() != "true" {
-        println!("building extension");
-        build_extension(is_release, target_dir.to_str().unwrap())?;
-    } else {
-        println!(
-            "Skipping build due to $PGX_NO_BUILD=true in {}",
-            std::env::current_dir().unwrap().display()
-        );
-    }
+    println!("building extension");
+    build_extension(is_release);
 
     println!();
     println!("installing extension");
     let pkgdir = get_pkglibdir();
     let extdir = get_extensiondir();
-    let (libpath, libfile) =
-        find_library_file(&target_dir.display().to_string(), &extname, is_release)?;
+    let (libpath, libfile) = find_library_file(&extname, is_release);
 
     let src = control_file.clone();
     let dest = format!("{}/{}", extdir, control_file);
-    if let Err(e) = std::fs::copy(&src, &dest) {
-        exit_with_error!(
-            "failed copying control file ({}) to {}:  {}",
-            control_file,
-            extdir,
-            e
-        );
-    }
-    println!(
-        "{} control file to:   {}",
-        "     Copying".bold().green(),
-        dest
+    handle_result!(
+        format!(
+            "failed copying control file `{}` to `{}`",
+            control_file, extdir
+        ),
+        std::fs::copy(&src, &dest)
     );
+
+    println!("{} control file to {}", "     Copying".bold().green(), dest);
 
     let src = format!("{}/{}", libpath, libfile);
     let dest = format!("{}/{}.so", pkgdir, extname);
-    if let Err(e) = std::fs::copy(&src, &dest) {
-        exit_with_error!("failed copying library ({}) to {}:  {}", libfile, pkgdir, e);
-    }
+    handle_result!(
+        format!("failed copying `{}` to `{}`", libfile, pkgdir),
+        std::fs::copy(&src, &dest)
+    );
     println!(
-        "{} shared library to: {}",
+        "{} shared library to {}",
         "     Copying".bold().green(),
         dest
     );
@@ -67,7 +54,8 @@ pub(crate) fn install_extension(is_release: bool) -> Result<(), std::io::Error> 
     Ok(())
 }
 
-fn build_extension(is_release: bool, target_dir: &str) -> Result<(), std::io::Error> {
+fn build_extension(is_release: bool) {
+    let target_dir = get_target_dir();
     let features = std::env::var("PGX_BUILD_FEATURES").unwrap_or_default();
     let flags = std::env::var("PGX_BUILD_FLAGS").unwrap_or_default();
     let mut command = Command::new("cargo");
@@ -81,21 +69,25 @@ fn build_extension(is_release: bool, target_dir: &str) -> Result<(), std::io::Er
         command.arg(features);
     }
 
+    command.arg("--target-dir");
+    command.arg(target_dir.display().to_string());
+
     for arg in flags.split_ascii_whitespace() {
         command.arg(arg);
     }
 
-    let mut process = command
-        .env("CARGO_TARGET_DIR", target_dir.to_string())
-        .env("PG_DOWNLOAD_TARGET_DIR", get_pg_download_dir())
+    let command = command
+        .env("CARGO_TARGET_DIR", target_dir.display().to_string())
         .stdout(Stdio::inherit())
-        .stderr(Stdio::inherit())
-        .spawn()?;
-    let status = process.wait()?;
+        .stderr(Stdio::inherit());
+    let command_str = format!("{:?}", command);
+    let status = handle_result!(
+        format!("failed to spawn cargo: {}", command_str),
+        command.status()
+    );
     if !status.success() {
-        return Err(std::io::Error::from_raw_os_error(status.code().unwrap()));
+        exit_with_error!("failed to build extension");
     }
-    Ok(())
 }
 
 fn copy_sql_files(extdir: &str, extname: &str) -> Result<(), std::io::Error> {
@@ -149,22 +141,18 @@ fn copy_sql_files(extdir: &str, extname: &str) -> Result<(), std::io::Error> {
     Ok(())
 }
 
-fn find_library_file(
-    target_dir: &str,
-    extname: &str,
-    is_release: bool,
-) -> Result<(String, String), std::io::Error> {
-    let path = PathBuf::from(if is_release {
-        format!("{}/release", target_dir)
-    } else {
-        format!("{}/debug", target_dir)
-    });
+fn find_library_file(extname: &str, is_release: bool) -> (String, String) {
+    let mut target_dir = get_target_dir();
+    target_dir.push(if is_release { "release" } else { "debug" });
 
-    if !path.exists() {
-        exit_with_error!("target directory does not exist: {}", path.display());
+    if !target_dir.exists() {
+        exit_with_error!("target directory does not exist: {}", target_dir.display());
     }
 
-    for f in std::fs::read_dir(&path)? {
+    for f in handle_result!(
+        format!("Unable to read {}", target_dir.display()),
+        std::fs::read_dir(&target_dir)
+    ) {
         if let Ok(f) = f {
             let filename = f.file_name().into_string().unwrap();
 
@@ -174,28 +162,19 @@ fn find_library_file(
                     || filename.ends_with(".dylib")
                     || filename.ends_with(".dll"))
             {
-                return Ok((path.display().to_string(), filename));
+                return (target_dir.display().to_string(), filename);
             }
         }
     }
 
-    exit_with_error!("couldn't find library file in: {}", target_dir);
+    exit_with_error!("couldn't find library file in: {}", target_dir.display())
 }
+
 fn get_version() -> String {
     match get_property("default_version") {
         Some(v) => v,
         None => exit_with_error!("couldn't determine version number"),
     }
-}
-
-fn get_target_dir() -> PathBuf {
-    let target_dir = std::env::var("CARGO_TARGET_DIR").unwrap_or_else(|_| {
-        let mut out_dir = PathBuf::from(std::env::current_dir().unwrap());
-        out_dir.push("target");
-        out_dir.display().to_string()
-    });
-
-    PathBuf::from(&format!("{}/pgx-install", target_dir))
 }
 
 fn get_pkglibdir() -> String {

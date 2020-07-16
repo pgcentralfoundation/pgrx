@@ -1,7 +1,6 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-use colored::Colorize;
 use proc_macro2::TokenTree;
 use quote::quote;
 use std::collections::HashSet;
@@ -68,34 +67,31 @@ pub fn get_pgx_config_path() -> PathBuf {
     path
 }
 
-pub fn get_target_dir() -> String {
-    std::env::var("CARGO_TARGET_DIR")
-        .unwrap_or_else(|_| format!("{}/target", std::env::var("PWD").unwrap()))
+pub fn get_target_dir() -> PathBuf {
+    std::env::var("CARGO_TARGET_DIR").map_or_else(
+        |_| {
+            let mut cwd = std::env::current_dir().unwrap();
+            cwd.push("target");
+            cwd
+        },
+        |v| v.into(),
+    )
 }
 
-pub fn get_pg_download_dir() -> String {
-    std::env::var("PG_DOWNLOAD_TARGET_DIR").unwrap_or_else(|_| get_target_dir())
+pub fn get_pg_download_dir() -> PathBuf {
+    std::env::var("PG_DOWNLOAD_TARGET_DIR").map_or_else(|_| get_target_dir(), |v| v.into())
 }
 
 pub fn run_pg_config(pg_config: &Option<String>, arg: &str) -> String {
     let pg_config = pg_config
         .clone()
         .unwrap_or_else(|| std::env::var("PG_CONFIG").unwrap_or_else(|_| "pg_config".to_string()));
-    let output = Command::new(&pg_config).arg(arg).output();
+    let output = handle_result!(
+        format!("{}", pg_config),
+        Command::new(&pg_config).arg(arg).output()
+    );
 
-    match output {
-        Ok(output) => String::from_utf8(output.stdout).unwrap().trim().to_string(),
-
-        Err(e) => {
-            eprintln!(
-                "{}: Problem running {}: {}",
-                "error".bold().red(),
-                pg_config,
-                e
-            );
-            std::process::exit(1);
-        }
-    }
+    String::from_utf8(output.stdout).unwrap().trim().to_string()
 }
 
 pub fn prefix_path<P: Into<PathBuf>>(dir: P) -> String {

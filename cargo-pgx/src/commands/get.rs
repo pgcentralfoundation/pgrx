@@ -1,12 +1,12 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-
-use std::io::{BufRead, BufReader};
+use pgx_utils::{exit_with_error, handle_result};
 use std::fs::File;
+use std::io::{BufRead, BufReader};
 
 pub fn get_property(name: &str) -> Option<String> {
-    let control_file = File::open(find_control_file().unwrap().0).unwrap();
+    let control_file = File::open(find_control_file().0).unwrap();
     let reader = BufReader::new(control_file);
 
     for line in reader.lines() {
@@ -29,19 +29,23 @@ pub fn get_property(name: &str) -> Option<String> {
     None
 }
 
-pub(crate) fn find_control_file() -> Result<(String, String), std::io::Error> {
-    for f in std::fs::read_dir(".")? {
+pub(crate) fn find_control_file() -> (String, String) {
+    for f in handle_result!(
+        "cannot open current directory for reading",
+        std::fs::read_dir(".")
+    ) {
         if f.is_ok() {
-            let f = f?;
-            if f.file_name().to_string_lossy().ends_with(".control") {
-                let filename = f.file_name().into_string().unwrap();
-                let mut extname: Vec<&str> = filename.split('.').collect();
-                extname.pop();
-                let extname = extname.pop().unwrap();
-                return Ok((filename.clone(), extname.to_string()));
+            if let Ok(f) = f {
+                if f.file_name().to_string_lossy().ends_with(".control") {
+                    let filename = f.file_name().into_string().unwrap();
+                    let mut extname: Vec<&str> = filename.split('.').collect();
+                    extname.pop();
+                    let extname = extname.pop().unwrap();
+                    return (filename.clone(), extname.to_string());
+                }
             }
         }
     }
 
-    panic!("couldn't find control file");
+    exit_with_error!("couldn't find control file")
 }
