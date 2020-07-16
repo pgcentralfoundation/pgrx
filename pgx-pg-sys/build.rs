@@ -323,57 +323,12 @@ fn rust_fmt(path: &str) -> Result<(), std::io::Error> {
 
 pub(crate) mod bindings_diff {
     use crate::rust_fmt;
+    use elapsed::measure_time;
     use quote::{quote, ToTokens};
-    use std::cmp::Ordering;
-    use std::collections::BTreeMap;
-    use std::fs::File;
-    use std::hash::{Hash, Hasher};
-    use std::io::Read;
+    use std::collections::HashSet;
+    use std::io::{Read, Write};
     use std::path::PathBuf;
     use std::str::FromStr;
-    use syn::export::TokenStream2;
-    use syn::Item;
-
-    #[derive(Eq, Clone)]
-    struct SortableItem {
-        item: Item,
-        ident: String,
-    }
-
-    impl SortableItem {
-        fn new(item: Item) -> Self {
-            let ident = item.to_token_stream().to_string();
-            SortableItem { item, ident }
-        }
-
-        fn ident(&self) -> &str {
-            &self.ident
-        }
-    }
-
-    impl Ord for SortableItem {
-        fn cmp(&self, other: &Self) -> Ordering {
-            self.ident().cmp(&other.ident())
-        }
-    }
-
-    impl PartialOrd for SortableItem {
-        fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-            self.ident().partial_cmp(&other.ident())
-        }
-    }
-
-    impl PartialEq for SortableItem {
-        fn eq(&self, other: &Self) -> bool {
-            self.item.eq(&other.item)
-        }
-    }
-
-    impl Hash for SortableItem {
-        fn hash<H: Hasher>(&self, state: &mut H) {
-            self.item.hash(state)
-        }
-    }
 
     pub(crate) fn main() -> Result<(), std::io::Error> {
         let mut v10 = read_source_file("src/pg10_bindings.rs");
@@ -407,21 +362,19 @@ pub(crate) mod bindings_diff {
         Ok(())
     }
 
-    fn build_common_set(
-        versions: &mut Vec<&mut BTreeMap<String, SortableItem>>,
-    ) -> BTreeMap<String, SortableItem> {
-        let mut common = BTreeMap::new();
+    fn build_common_set(versions: &mut Vec<&mut HashSet<String>>) -> HashSet<String> {
+        let mut common = HashSet::new();
 
         for map in versions.iter() {
-            for (key, value) in map.iter() {
-                if !common.contains_key(key) && all_contain(&versions, &key) {
-                    common.insert(key.clone(), value.clone());
+            for key in map.iter() {
+                if !common.contains(key) && all_contain(&versions, &key) {
+                    common.insert(key.clone());
                 }
             }
         }
 
         for map in versions.iter_mut() {
-            for (key, _) in common.iter() {
+            for key in common.iter() {
                 map.remove(key);
             }
         }
@@ -430,9 +383,9 @@ pub(crate) mod bindings_diff {
     }
 
     #[inline]
-    fn all_contain(maps: &[&mut BTreeMap<String, SortableItem>], key: &String) -> bool {
+    fn all_contain(maps: &[&mut HashSet<String>], key: &String) -> bool {
         for map in maps.iter() {
-            if !map.contains_key(key) {
+            if !map.contains(key) {
                 return false;
             }
         }
@@ -440,67 +393,69 @@ pub(crate) mod bindings_diff {
         true
     }
 
-    fn read_source_file(filename: &str) -> BTreeMap<String, SortableItem> {
-        let mut file = File::open(filename).unwrap();
+    fn read_source_file(filename: &str) -> HashSet<String> {
+        let mut file = std::fs::File::open(filename).unwrap();
         let mut input = String::new();
 
         file.read_to_string(&mut input).unwrap();
         let source = syn::parse_file(input.as_str()).unwrap();
 
-        let mut item_map = BTreeMap::new();
+        let mut item_map = HashSet::new();
         for item in source.items.into_iter() {
-            let mut stream = TokenStream2::new();
-            stream.extend(quote! {#item});
-            item_map.insert(stream.to_string(), SortableItem::new(item));
+            item_map.insert(item.to_token_stream().to_string());
         }
 
         item_map
     }
 
-    fn write_source_file(filename: &str, items: BTreeMap<String, SortableItem>) {
-        let mut stream = TokenStream2::new();
-        stream.extend(quote! {
-            #![allow(clippy::all)]
+    fn write_source_file(filename: &str, items: HashSet<String>) {
+        let mut file =
+            std::fs::File::create(filename).expect(&format!("failed to create {}", filename));
+        file.write_all(
+            quote! {
+                #![allow(clippy::all)]
 
-            use crate as pg_sys;
-            use pgx_macros::*;
-            use crate::common::*;
-        });
-        for (_, item) in items {
-            match &item.item {
-                Item::Use(_) => {}
-                item => stream.extend(quote! {#item}),
+                use crate as pg_sys;
+                use pgx_macros::*;
+                use crate::common::*;
             }
+            .to_string()
+            .as_bytes(),
+        )
+        .expect(&format!("failed to write to {}", filename));
+        for item in items {
+            file.write_all(item.as_bytes())
+                .expect(&format!("failed to write to {}", filename));
         }
-        std::fs::write(filename, stream.to_string())
-            .unwrap_or_else(|e| panic!("Unable to save bindings for {}: {:?}", filename, e));
         rust_fmt(filename)
             .unwrap_or_else(|e| panic!("unable to run rustfmt for {}: {:?}", filename, e));
     }
 
-    fn write_common_file(filename: &str, items: BTreeMap<String, SortableItem>) {
-        let mut stream = TokenStream2::new();
-        stream.extend(quote! {
-            #![allow(clippy::all)]
+    fn write_common_file(filename: &str, items: HashSet<String>) {
+        let mut file = std::fs::File::create(filename).expect("failed to create common.rs");
+        file.write_all(
+            quote! {
+                #![allow(clippy::all)]
 
-            use crate as pg_sys;
-            use pgx_macros::*;
+                use crate as pg_sys;
+                use pgx_macros::*;
 
-            #[cfg(feature = "pg10")]
-            use crate::pg10_specific::*;
-            #[cfg(feature = "pg11")]
-            use crate::pg11_specific::*;
-            #[cfg(feature = "pg12")]
-            use crate::pg12_specific::*;
-        });
-        for (_, item) in items.iter() {
-            match &item.item {
-                Item::Use(_) => {}
-                item => stream.extend(quote! {#item}),
+                #[cfg(feature = "pg10")]
+                use crate::pg10_specific::*;
+                #[cfg(feature = "pg11")]
+                use crate::pg11_specific::*;
+                #[cfg(feature = "pg12")]
+                use crate::pg12_specific::*;
             }
+            .to_string()
+            .as_bytes(),
+        )
+        .expect("failed to write to common.rs");
+
+        for item in items.iter() {
+            file.write_all(item.as_bytes())
+                .expect("failed to write to common.rs");
         }
-        std::fs::write(filename, stream.to_string())
-            .unwrap_or_else(|e| panic!("Unable to save bindings for {}: {:?}", filename, e));
         rust_fmt(filename)
             .unwrap_or_else(|e| panic!("unable to run rustfmt for {}: {:?}", filename, e));
     }
