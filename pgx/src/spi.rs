@@ -187,7 +187,7 @@ impl Spi {
     >(
         f: F,
     ) -> Option<R> {
-        let mut outer_memory_context =
+        let outer_memory_context =
             PgMemoryContexts::For(PgMemoryContexts::CurrentMemoryContext.value());
 
         // connect to SPI
@@ -200,32 +200,33 @@ impl Spi {
         match f(SpiClient()) {
             // copy the result to the outer memory context we saved above
             Ok(result) => {
-                // disconnect from SPI
-                Spi::check_status(unsafe { pg_sys::SPI_finish() });
-
-                match result {
+                // we need to copy the resulting Datum into the outer memory context
+                // *before* we disconnect from SPI, otherwise we're copying free'd memory
+                // see https://github.com/zombodb/pgx/issues/17
+                let copied_datum = match result {
                     Some(result) => {
                         let as_datum = result.into_datum();
                         if as_datum.is_none() {
                             // SPI function returned Some(()), which means we just want to return None
                             None
                         } else {
-                            // transfer the returned datum to the outer memory context
-                            outer_memory_context.switch_to(|_| {
-                                // TODO:  can we get the type oid from somewhere?
-                                //        - do we even need it?
-                                unsafe {
-                                    R::from_datum(
-                                        as_datum.expect("SPI result datum was NULL"),
-                                        false,
-                                        pg_sys::InvalidOid,
-                                    )
-                                }
-                            })
+                            unsafe {
+                                R::from_datum_in_memory_context(
+                                    outer_memory_context,
+                                    as_datum.expect("SPI result datum was NULL"),
+                                    false,
+                                    pg_sys::InvalidOid,
+                                )
+                            }
                         }
                     }
                     None => None,
-                }
+                };
+
+                // disconnect from SPI
+                Spi::check_status(unsafe { pg_sys::SPI_finish() });
+
+                copied_datum
             }
 
             // closure returned an error

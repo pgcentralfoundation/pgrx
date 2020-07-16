@@ -1,7 +1,6 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-
 //!
 //! Provides interfacing into Postgres' `MemoryContext` system.
 //!
@@ -259,16 +258,15 @@ impl PgMemoryContexts {
     }
 
     /// Copies `len` bytes, starting at `src` into this memory context and
-    /// returns a raw `*mut std::os::raw:c_void` pointer to the newly allocation
-    /// location
-    pub fn copy_ptr_into(&mut self, src: void_ptr, len: usize) -> void_ptr {
+    /// returns a raw `*mut T` pointer to the newly allocated location
+    pub fn copy_ptr_into<T>(&mut self, src: *mut T, len: usize) -> *mut T {
         if src.is_null() {
             panic!("attempt to copy a null pointer");
         }
         unsafe {
             let dest = pg_sys::MemoryContextAlloc(self.value(), len);
-            pg_sys::memcpy(dest, src, len as u64);
-            dest
+            pg_sys::memcpy(dest, src as void_mut_ptr, len as u64);
+            dest as *mut T
         }
     }
 
