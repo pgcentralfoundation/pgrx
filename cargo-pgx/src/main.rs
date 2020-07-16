@@ -17,7 +17,7 @@ use crate::commands::stop::stop_postgres;
 use crate::commands::test::test_extension;
 use clap::App;
 use colored::Colorize;
-use pgx_utils::{exit, exit_with_error};
+use pgx_utils::{exit, exit_with_error, get_pg_config};
 use std::path::PathBuf;
 use std::str::FromStr;
 
@@ -57,31 +57,49 @@ fn main() -> std::result::Result<(), std::io::Error> {
                 stop_postgres(make_pg_major_version(pgver))
             }
             ("status", Some(start)) => {
-                let pgver = start
-                    .value_of("pg_version")
-                    .expect("<PG_VERSION> argument is required");
-                let major_version = make_pg_major_version(pgver);
-                if status_postgres(major_version) {
-                    println!(
-                        "Postgres v{} is {}",
-                        major_version,
-                        "running".bold().green()
-                    )
+                let pgver = start.value_of("pg_version").unwrap_or("all");
+
+                let versions = if pgver == "all" {
+                    vec![10, 11, 12]
                 } else {
-                    println!("Postgres v{} is {}", major_version, "stopped".bold().red())
+                    vec![make_pg_major_version(pgver)]
+                };
+
+                for major_version in versions {
+                    if status_postgres(major_version) {
+                        println!(
+                            "Postgres v{} is {}",
+                            major_version,
+                            "running".bold().green()
+                        )
+                    } else {
+                        println!("Postgres v{} is {}", major_version, "stopped".bold().red())
+                    }
                 }
                 Ok(())
             }
             ("install", Some(install)) => {
                 let target = install.is_present("release");
-                install_extension(&Some("pg_config".to_string()), target)
+                let pg_config = match std::env::var("PGX_TEST_MODE_VERSION") {
+                    Ok(pgver) => {
+                        get_pg_config(u16::from_str(&pgver).expect("not a valid version number"))
+                    }
+                    Err(_) => Some("pg_config".to_string()),
+                };
+                install_extension(&pg_config, target)
             }
             ("test", Some(test)) => {
-                let version = test.value_of("pg_version").unwrap_or("all");
-                match version {
-                    "pg10" | "pg11" | "pg12" | "all" => test_extension(version),
-                    _ => panic!("Unrecognized version: {}", version),
+                let pgver = test.value_of("pg_version").unwrap_or("all");
+                let versions = if pgver == "all" {
+                    vec![10, 11, 12]
+                } else {
+                    vec![make_pg_major_version(pgver)]
+                };
+
+                for major_version in versions {
+                    test_extension(major_version);
                 }
+                Ok(())
             }
             ("schema", Some(_schema)) => generate_schema(),
             ("get", Some(get)) => {

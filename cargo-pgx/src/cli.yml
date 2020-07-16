@@ -51,7 +51,6 @@ subcommands:
                 - pg_version:
                     value_name: PG_VERSION
                     takes_value: true
-                    required: true
                     help: the Postgres version
           - new:
               about: create a new extension crate

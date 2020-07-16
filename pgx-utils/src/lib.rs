@@ -11,6 +11,7 @@ use syn::export::TokenStream2;
 use syn::{GenericArgument, ItemFn, PathArguments, ReturnType, Type, TypeParamBound};
 
 pub static BASE_POSTGRES_PORT_NO: u16 = 28800;
+pub static BASE_POSTGRES_TESTING_PORT_NO: u16 = 32200;
 
 #[macro_export]
 macro_rules! exit_with_error {
@@ -79,6 +80,34 @@ pub fn load_pgx_config() -> PgConfigPaths {
         ))
     )
     .configs
+}
+
+pub fn get_pgbin_dir(major_version: u16) -> PathBuf {
+    run_pg_config(&get_pg_config(major_version), "--bindir").into()
+}
+
+pub fn get_postmaster_path(major_version: u16) -> PathBuf {
+    let mut path = get_pgbin_dir(major_version);
+    path.push("postmaster");
+    path
+}
+
+pub fn get_initdb_path(major_version: u16) -> PathBuf {
+    let mut path = get_pgbin_dir(major_version);
+    path.push("initdb");
+    path
+}
+
+pub fn get_createdb_path(major_version: u16) -> PathBuf {
+    let mut path = get_pgbin_dir(major_version);
+    path.push("createdb");
+    path
+}
+
+pub fn get_dropdb_path(major_version: u16) -> PathBuf {
+    let mut path = get_pgbin_dir(major_version);
+    path.push("dropdb");
+    path
 }
 
 pub fn get_pgdata_dir(major_version: u16) -> PathBuf {
@@ -161,6 +190,17 @@ pub fn prefix_path<P: Into<PathBuf>>(dir: P) -> String {
         .expect("failed to join paths")
         .into_string()
         .expect("failed to construct path")
+}
+
+pub fn get_named_capture(
+    regex: &regex::Regex,
+    name: &'static str,
+    against: &str,
+) -> Option<String> {
+    match regex.captures(against) {
+        Some(cap) => Some(cap[name].to_string()),
+        None => None,
+    }
 }
 
 #[derive(Debug, Hash, Ord, PartialOrd, Eq, PartialEq)]

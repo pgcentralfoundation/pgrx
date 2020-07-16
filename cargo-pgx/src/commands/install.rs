@@ -17,7 +17,6 @@ pub(crate) fn install_extension(
 ) -> Result<(), std::io::Error> {
     let (control_file, extname) = find_control_file();
 
-    println!("building extension");
     build_extension(is_release);
 
     println!();
@@ -84,6 +83,7 @@ fn build_extension(is_release: bool) {
         .stdout(Stdio::inherit())
         .stderr(Stdio::inherit());
     let command_str = format!("{:?}", command);
+    println!("building extension: {}", command_str);
     let status = handle_result!(
         format!("failed to spawn cargo: {}", command_str),
         command.status()

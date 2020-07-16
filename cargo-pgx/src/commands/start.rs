@@ -1,6 +1,6 @@
 use colored::Colorize;
 use pgx_utils::{
-    exit_with_error, get_pg_config, get_pgdata_dir, get_pglog_file, handle_result, run_pg_config,
+    exit_with_error, get_pgbin_dir, get_pgdata_dir, get_pglog_file, handle_result,
     BASE_POSTGRES_PORT_NO,
 };
 use std::path::PathBuf;
@@ -9,8 +9,7 @@ use std::process::Stdio;
 pub(crate) fn start_postgres(major_version: u16) -> Result<(), std::io::Error> {
     let datadir = get_pgdata_dir(major_version);
     let logfile = get_pglog_file(major_version);
-    let pg_config = get_pg_config(major_version);
-    let bindir: PathBuf = run_pg_config(&pg_config, "--bindir").into();
+    let bindir = get_pgbin_dir(major_version);
     let port = BASE_POSTGRES_PORT_NO + major_version;
 
     if !datadir.exists() {

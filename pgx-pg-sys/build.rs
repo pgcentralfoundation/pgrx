@@ -85,24 +85,16 @@ fn main() -> Result<(), std::io::Error> {
             manifest_dir.display(),
             major_version
         ));
-        let libpgx_cshim = PathBuf::from(format!(
-            "{}/cshim/libpgx-cshim-{}.a",
-            manifest_dir.display(),
-            major_version
-        ));
 
         eprintln!("bindings_rs={}", bindings_rs.display());
         eprintln!("specific_rs={}", specific_rs.display());
-        eprintln!("libpgx_cshim={}", libpgx_cshim.display());
 
         if !specific_rs.exists() {
             run_bindgen(&pg_config, major_version, &include_h, &bindings_rs);
             need_common_rs.store(true, Ordering::SeqCst);
         }
 
-        if !libpgx_cshim.exists() {
-            build_shim(&shim_dir, &shim_mutex, major_version, &pg_config);
-        }
+        build_shim(&shim_dir, &shim_mutex, major_version, &pg_config);
     });
 
     if need_common_rs.load(Ordering::SeqCst) {
@@ -170,13 +162,19 @@ fn build_shim(
     major_version: u16,
     pg_config: &Option<String>,
 ) {
-    // build the shim under a lock b/c this can't be built concurrently
-    let _lock = shim_mutex.lock().expect("couldn't obtain shim_mutex");
+    let libpgx_cshim: PathBuf =
+        format!("{}/libpgx-cshim-{}.a", shim_dir.display(), major_version).into();
 
-    // then build the shim for the version feature currently being built
-    build_shim_for_version(&shim_dir, major_version, pg_config).expect("shim build failed");
+    eprintln!("libpgx_cshim={}", libpgx_cshim.display());
+    if !libpgx_cshim.exists() {
+        // build the shim under a lock b/c this can't be built concurrently
+        let _lock = shim_mutex.lock().expect("couldn't obtain shim_mutex");
 
-    // and tell rustc to link to the library that was built for the feature we're currently building
+        // then build the shim for the version feature currently being built
+        build_shim_for_version(&shim_dir, major_version, pg_config).expect("shim build failed");
+    }
+
+    // no matter what, tell rustc to link to the library that was built for the feature we're currently building
     if std::env::var("CARGO_FEATURE_PG10").is_ok() {
         println!("cargo:rustc-link-search={}", shim_dir.display());
         println!("cargo:rustc-link-lib=static=pgx-cshim-10");

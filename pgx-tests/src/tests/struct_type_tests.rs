@@ -1,9 +1,9 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-
 use pgx::stringinfo::StringInfo;
 use pgx::*;
+use pgx_utils::get_named_capture;
 
 #[derive(Debug)]
 #[repr(C)]
@@ -108,12 +108,5 @@ mod tests {
         let complex = complex.unwrap();
         assert_eq!(&complex.x, &1.0);
         assert_eq!(&complex.y, &2.01);
-    }
-}
-
-fn get_named_capture(regex: &regex::Regex, name: &'static str, against: &str) -> Option<String> {
-    match regex.captures(against) {
-        Some(cap) => Some(cap[name].to_string()),
-        None => None,
     }
 }

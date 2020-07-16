@@ -1,12 +1,10 @@
 use colored::Colorize;
-use pgx_utils::{exit_with_error, get_pg_config, get_pgdata_dir, handle_result, run_pg_config};
-use std::path::PathBuf;
+use pgx_utils::{exit_with_error, get_pgbin_dir, get_pgdata_dir, handle_result};
 use std::process::Stdio;
 
 pub(crate) fn stop_postgres(major_version: u16) -> Result<(), std::io::Error> {
     let datadir = get_pgdata_dir(major_version);
-    let pg_config = get_pg_config(major_version);
-    let bindir: PathBuf = run_pg_config(&pg_config, "--bindir").into();
+    let bindir = get_pgbin_dir(major_version);
 
     println!(
         "  {} Postgres v{}",
