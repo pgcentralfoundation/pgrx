@@ -13,6 +13,21 @@ use std::str::FromStr;
 use std::sync::{Arc, Mutex};
 use syn::export::Formatter;
 
+static PROCESS_ENV_DENYLIST: &'static [&'static str] = &[
+    "DEBUG",
+    "MAKEFLAGS",
+    "MAKELEVEL",
+    "MFLAGS",
+    "DYLD_FALLBACK_LIBRARY_PATH",
+    "OPT_LEVEL",
+    "TARGET",
+    "PROFILE",
+    "OUT_DIR",
+    "HOST",
+    "NUM_JOBS",
+    "LIBRARY_PATH", // see https://github.com/zombodb/pgx/issues/16
+];
+
 #[derive(Debug)]
 struct PgVersion {
     major: u16,
@@ -170,6 +185,10 @@ fn configure_postgres(version: &PgVersion, pgdir: &PathBuf) {
         .stdin(std::process::Stdio::null())
         .env("PATH", prefix_path(pgdir))
         .current_dir(pgdir.display().to_string());
+    for var in PROCESS_ENV_DENYLIST {
+        command.env_remove(var);
+    }
+
     let command_str = format!("{:?}", command);
 
     let child = handle_result!(format!("Failed: {:?}", command_str), command.spawn());
@@ -201,6 +220,11 @@ fn make_postgres(version: &PgVersion, pgdir: &PathBuf) {
         .stderr(std::process::Stdio::piped())
         .stdin(std::process::Stdio::null())
         .current_dir(pgdir.display().to_string());
+
+    for var in PROCESS_ENV_DENYLIST {
+        command.env_remove(var);
+    }
+
     let command_str = format!("{:?}", command);
 
     let child = handle_result!(format!("Failed: {:?}", command_str), command.spawn());
@@ -235,6 +259,10 @@ fn make_install_postgres(version: &PgVersion, pgdir: &PathBuf) -> PathBuf {
         .stderr(std::process::Stdio::piped())
         .stdin(std::process::Stdio::null())
         .current_dir(pgdir.display().to_string());
+    for var in PROCESS_ENV_DENYLIST {
+        command.env_remove(var);
+    }
+
     let command_str = format!("{:?}", command);
 
     let child = handle_result!(format!("Failed: {:?}", command_str), command.spawn());
