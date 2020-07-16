@@ -12,6 +12,7 @@ use std::collections::HashSet;
 use std::path::PathBuf;
 use std::process::{Command, Output};
 use std::str::FromStr;
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Mutex;
 use syn::export::{ToTokens, TokenStream2};
 use syn::Item;
@@ -107,6 +108,7 @@ fn main() -> Result<(), std::io::Error> {
         (PathBuf::from_str(&configs.pg12).unwrap(), 12),
     ];
     let shim_mutex = Mutex::new(());
+    let need_common_rs = AtomicBool::new(false);
 
     pg_configs
         .into_par_iter()
@@ -121,12 +123,34 @@ fn main() -> Result<(), std::io::Error> {
                 manifest_dir.display(),
                 major_version
             ));
+            let specific_rs = PathBuf::from(format!(
+                "{}/src/pg{}_specific.rs",
+                manifest_dir.display(),
+                major_version
+            ));
+            let libpgx_cshim = PathBuf::from(format!(
+                "{}/cshim/libpgx-cshim-{}.a",
+                manifest_dir.display(),
+                major_version
+            ));
 
-            run_bindgen(&pg_config, major_version, &include_h, &bindings_rs);
-            build_shim(&shim_dir, &shim_mutex, major_version, &pg_config);
+            eprintln!("bindings_rs={}", bindings_rs.display());
+            eprintln!("specific_rs={}", specific_rs.display());
+            eprintln!("libpgx_cshim={}", libpgx_cshim.display());
+
+            if !specific_rs.exists() {
+                run_bindgen(&pg_config, major_version, &include_h, &bindings_rs);
+                need_common_rs.store(true, Ordering::SeqCst);
+            }
+
+            if !libpgx_cshim.exists() {
+                build_shim(&shim_dir, &shim_mutex, major_version, &pg_config);
+            }
         });
 
-    generate_common_rs(manifest_dir);
+    if need_common_rs.load(Ordering::SeqCst) {
+        generate_common_rs(manifest_dir);
+    }
 
     Ok(())
 }
@@ -323,7 +347,6 @@ fn rust_fmt(path: &str) -> Result<(), std::io::Error> {
 
 pub(crate) mod bindings_diff {
     use crate::rust_fmt;
-    use elapsed::measure_time;
     use quote::{quote, ToTokens};
     use std::collections::HashSet;
     use std::io::{Read, Write};
