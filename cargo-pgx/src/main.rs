@@ -81,9 +81,12 @@ fn main() -> std::result::Result<(), std::io::Error> {
             ("install", Some(install)) => {
                 let target = install.is_present("release");
                 let pg_config = match std::env::var("PGX_TEST_MODE_VERSION") {
-                    Ok(pgver) => {
-                        get_pg_config(u16::from_str(&pgver).expect("not a valid version number"))
-                    }
+                    // for test mode, we want the pg_config specified in PGX_TEST_MODE_VERSION
+                    Ok(pgver) => get_pg_config(u16::from_str(&pgver).expect(
+                        "PGX_TEST_MODE_VERSION does not contain a valid postgres version number",
+                    )),
+
+                    // otherwise, the user just ran "cargo pgx install", and we use whatever "pg_config" is on the path
                     Err(_) => Some("pg_config".to_string()),
                 };
                 install_extension(&pg_config, target)
