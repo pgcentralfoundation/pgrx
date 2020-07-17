@@ -9,7 +9,7 @@ use std::sync::{Arc, Mutex};
 use colored::*;
 use pgx::*;
 use pgx_utils::{
-    get_createdb_path, get_dropdb_path, get_initdb_path, get_named_capture, get_postmaster_path,
+    createdb, get_dropdb_path, get_initdb_path, get_named_capture, get_postmaster_path,
     get_target_dir, BASE_POSTGRES_TESTING_PORT_NO,
 };
 use postgres::error::DbError;
@@ -170,7 +170,13 @@ fn initialize_test_framework(postgresql_conf: Vec<&'static str>) -> (LogLines, S
 
         let system_session_id = start_pg(state.loglines.clone());
         dropdb();
-        createdb();
+        createdb(
+            pg_sys::get_pg_major_version_num(),
+            &get_pg_host(),
+            get_pg_port(),
+            get_pg_dbname(),
+            false,
+        );
         create_extension();
 
         state.installed = true;
@@ -233,7 +239,6 @@ fn install_extension() {
                 pg_sys::get_pg_major_version_string().to_string()
             ),
         )
-        .env("PGX_BUILD_FLAGS", "--no-default-features")
         .spawn()
         .unwrap();
 
@@ -413,23 +418,6 @@ fn dropdb() {
             eprintln!("{}", stderr);
             panic!("failed to drop test database");
         }
-    }
-}
-
-fn createdb() {
-    let status = Command::new(get_createdb_path(pg_sys::get_pg_major_version_num()))
-        .arg("-h")
-        .arg(get_pg_host())
-        .arg("-p")
-        .arg(get_pg_port().to_string())
-        .arg(get_pg_dbname())
-        .stdout(Stdio::inherit())
-        .stderr(Stdio::inherit())
-        .status()
-        .unwrap();
-
-    if !status.success() {
-        panic!("failed to create testing database");
     }
 }
 

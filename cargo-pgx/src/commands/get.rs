@@ -6,7 +6,13 @@ use std::fs::File;
 use std::io::{BufRead, BufReader};
 
 pub fn get_property(name: &str) -> Option<String> {
-    let control_file = File::open(find_control_file().0).unwrap();
+    let (control_file, extname) = find_control_file();
+
+    if name == "extname" {
+        return Some(extname);
+    }
+
+    let control_file = File::open(control_file).unwrap();
     let reader = BufReader::new(control_file);
 
     for line in reader.lines() {

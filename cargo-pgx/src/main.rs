@@ -10,6 +10,7 @@ use crate::commands::get::get_property;
 use crate::commands::init::init_pgx;
 use crate::commands::install::install_extension;
 use crate::commands::new::create_crate_template;
+use crate::commands::run::run_psql;
 use crate::commands::schema::generate_schema;
 use crate::commands::start::start_postgres;
 use crate::commands::status::status_postgres;
@@ -45,28 +46,25 @@ fn main() -> std::result::Result<(), std::io::Error> {
                 create_crate_template(path, extname)
             }
             ("start", Some(start)) => {
-                let pgver = start
-                    .value_of("pg_version")
-                    .expect("<PG_VERSION> argument is required");
-                start_postgres(make_pg_major_version(pgver))
-            }
-            ("stop", Some(start)) => {
-                let pgver = start
-                    .value_of("pg_version")
-                    .expect("<PG_VERSION> argument is required");
-                stop_postgres(make_pg_major_version(pgver))
-            }
-            ("status", Some(start)) => {
                 let pgver = start.value_of("pg_version").unwrap_or("all");
+                for major_version in make_pg_major_version(pgver) {
+                    start_postgres(*major_version);
+                }
 
-                let versions = if pgver == "all" {
-                    vec![10, 11, 12]
-                } else {
-                    vec![make_pg_major_version(pgver)]
-                };
+                Ok(())
+            }
+            ("stop", Some(stop)) => {
+                let pgver = stop.value_of("pg_version").unwrap_or("all");
+                for major_version in make_pg_major_version(pgver) {
+                    stop_postgres(*major_version);
+                }
 
-                for major_version in versions {
-                    if status_postgres(major_version) {
+                Ok(())
+            }
+            ("status", Some(status)) => {
+                let pgver = status.value_of("pg_version").unwrap_or("all");
+                for major_version in make_pg_major_version(pgver) {
+                    if status_postgres(*major_version) {
                         println!(
                             "Postgres v{} is {}",
                             major_version,
@@ -89,18 +87,24 @@ fn main() -> std::result::Result<(), std::io::Error> {
                     // otherwise, the user just ran "cargo pgx install", and we use whatever "pg_config" is on the path
                     Err(_) => Some("pg_config".to_string()),
                 };
-                install_extension(&pg_config, target)
+                install_extension(&pg_config, target);
+                Ok(())
+            }
+            ("run", Some(run)) => {
+                let pgver = run
+                    .value_of("pg_version")
+                    .expect("<PG_VERSION> is required");
+                let dbname = run.value_of("dbname").map_or_else(
+                    || get_property("extname").expect("could not determine extension name"),
+                    |v| v.to_string(),
+                );
+                run_psql(make_pg_major_version(pgver)[0], &dbname);
+                Ok(())
             }
             ("test", Some(test)) => {
                 let pgver = test.value_of("pg_version").unwrap_or("all");
-                let versions = if pgver == "all" {
-                    vec![10, 11, 12]
-                } else {
-                    vec![make_pg_major_version(pgver)]
-                };
-
-                for major_version in versions {
-                    test_extension(major_version);
+                for major_version in make_pg_major_version(pgver) {
+                    test_extension(*major_version);
                 }
                 Ok(())
             }
@@ -133,11 +137,12 @@ fn validate_extension_name(extname: &str) {
     }
 }
 
-fn make_pg_major_version(version_string: &str) -> u16 {
+fn make_pg_major_version(version_string: &str) -> &'static [u16] {
     match version_string {
-        "pg10" => 10,
-        "pg11" => 11,
-        "pg12" => 12,
+        "all" => &[10, 11, 12],
+        "pg10" => &[10],
+        "pg11" => &[11],
+        "pg12" => &[12],
         _ => exit_with_error!("unrecognized Postgres version: {}", version_string),
     }
 }

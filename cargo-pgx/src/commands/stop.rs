@@ -1,13 +1,18 @@
+use crate::commands::status::status_postgres;
 use colored::Colorize;
 use pgx_utils::{exit_with_error, get_pgbin_dir, get_pgdata_dir, handle_result};
 use std::process::Stdio;
 
-pub(crate) fn stop_postgres(major_version: u16) -> Result<(), std::io::Error> {
+pub(crate) fn stop_postgres(major_version: u16) {
     let datadir = get_pgdata_dir(major_version);
     let bindir = get_pgbin_dir(major_version);
 
+    if !status_postgres(major_version) {
+        return;
+    }
+
     println!(
-        "  {} Postgres v{}",
+        "{} Postgres v{}",
         "    Stopping".bold().green(),
         major_version
     );
@@ -34,6 +39,4 @@ pub(crate) fn stop_postgres(major_version: u16) -> Result<(), std::io::Error> {
             String::from_utf8(output.stderr).unwrap()
         )
     }
-
-    Ok(())
 }

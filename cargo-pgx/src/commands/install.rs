@@ -8,16 +8,13 @@ use pgx_utils::{exit_with_error, get_target_dir, handle_result, run_pg_config};
 use std::io::Write;
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
-use std::result::Result;
 use std::str::FromStr;
 
-pub(crate) fn install_extension(
-    pg_config: &Option<String>,
-    is_release: bool,
-) -> Result<(), std::io::Error> {
+pub(crate) fn install_extension(pg_config: &Option<String>, is_release: bool) {
     let (control_file, extname) = find_control_file();
+    let major_version = get_pg_config_major_version(pg_config);
 
-    build_extension(is_release);
+    build_extension(major_version, is_release);
 
     println!();
     println!("installing extension");
@@ -49,16 +46,15 @@ pub(crate) fn install_extension(
         dest
     );
 
-    crate::generate_schema()?;
-    copy_sql_files(&extdir, &extname)?;
+    handle_result!("failed to generate SQL schema", crate::generate_schema());
+    copy_sql_files(&extdir, &extname);
 
     println!("{} installing {}", "    Finished".bold().green(), extname);
-    Ok(())
 }
 
-fn build_extension(is_release: bool) {
+fn build_extension(major_version: u16, is_release: bool) {
     let target_dir = get_target_dir();
-    let features = std::env::var("PGX_BUILD_FEATURES").unwrap_or_default();
+    let features = std::env::var("PGX_BUILD_FEATURES").unwrap_or(format!("pg{}", major_version));
     let flags = std::env::var("PGX_BUILD_FLAGS").unwrap_or_default();
     let mut command = Command::new("cargo");
     command.arg("build");
@@ -68,7 +64,8 @@ fn build_extension(is_release: bool) {
 
     if !features.trim().is_empty() {
         command.arg("--features");
-        command.arg(features);
+        command.arg(&features);
+        command.arg("--no-default-features");
     }
 
     command.arg("--target-dir");
@@ -83,7 +80,10 @@ fn build_extension(is_release: bool) {
         .stdout(Stdio::inherit())
         .stderr(Stdio::inherit());
     let command_str = format!("{:?}", command);
-    println!("building extension: {}", command_str);
+    println!(
+        "building extension with features `{}`\n{}",
+        features, command_str
+    );
     let status = handle_result!(
         format!("failed to spawn cargo: {}", command_str),
         command.status()
@@ -93,7 +93,7 @@ fn build_extension(is_release: bool) {
     }
 }
 
-fn copy_sql_files(extdir: &str, extname: &str) -> Result<(), std::io::Error> {
+fn copy_sql_files(extdir: &str, extname: &str) {
     let load_order = read_load_order(&PathBuf::from_str("./sql/load-order.txt").unwrap());
     let target_filename =
         PathBuf::from_str(&format!("{}/{}--{}.sql", extdir, extname, get_version())).unwrap();
@@ -127,7 +127,7 @@ fn copy_sql_files(extdir: &str, extname: &str) -> Result<(), std::io::Error> {
     }
 
     // now copy all the version upgrade files too
-    for f in std::fs::read_dir("sql/")? {
+    for f in handle_result!("failed to read ./sql/ directory", std::fs::read_dir("sql/")) {
         if let Ok(f) = f {
             let filename = f.file_name().into_string().unwrap();
 
@@ -140,8 +140,6 @@ fn copy_sql_files(extdir: &str, extname: &str) -> Result<(), std::io::Error> {
             }
         }
     }
-
-    Ok(())
 }
 
 fn find_library_file(extname: &str, is_release: bool) -> (String, String) {
@@ -189,4 +187,12 @@ fn get_extensiondir(pg_config: &Option<String>) -> String {
 
     dir.push_str("/extension");
     dir
+}
+
+fn get_pg_config_major_version(pg_config: &Option<String>) -> u16 {
+    let version_string = run_pg_config(&pg_config, "--version");
+    let version_parts = version_string.split_whitespace().collect::<Vec<&str>>();
+    let version = version_parts.get(1);
+    let version = f64::from_str(&version.unwrap()).expect("not a valid version number");
+    version.floor() as u16
 }

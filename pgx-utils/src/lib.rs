@@ -1,12 +1,14 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
+use colored::Colorize;
 use proc_macro2::TokenTree;
 use quote::quote;
 use serde_derive::Deserialize;
 use std::collections::HashSet;
 use std::path::PathBuf;
-use std::process::Command;
+use std::process::{Command, Stdio};
+use std::str::FromStr;
 use syn::export::TokenStream2;
 use syn::{GenericArgument, ItemFn, PathArguments, ReturnType, Type, TypeParamBound};
 
@@ -169,6 +171,12 @@ pub fn get_pg_download_dir() -> PathBuf {
     std::env::var("PG_DOWNLOAD_TARGET_DIR").map_or_else(|_| get_target_dir(), |v| v.into())
 }
 
+pub fn get_psql_path(major_version: u16) -> PathBuf {
+    let mut bindir = get_pgbin_dir(major_version);
+    bindir.push("psql");
+    bindir
+}
+
 pub fn run_pg_config(pg_config: &Option<String>, arg: &str) -> String {
     let pg_config = pg_config
         .clone()
@@ -190,6 +198,84 @@ pub fn prefix_path<P: Into<PathBuf>>(dir: P) -> String {
         .expect("failed to join paths")
         .into_string()
         .expect("failed to construct path")
+}
+
+pub fn createdb(
+    major_version: u16,
+    host: &str,
+    port: u16,
+    dbname: &str,
+    if_not_exists: bool,
+) -> bool {
+    if if_not_exists && does_db_exist(major_version, host, port, dbname) {
+        return false;
+    }
+
+    println!("{} {}", "    Creating database".bold().green(), dbname);
+    let mut command = Command::new(get_createdb_path(major_version));
+    command
+        .arg("-h")
+        .arg(host)
+        .arg("-p")
+        .arg(port.to_string())
+        .arg(dbname)
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped());
+    let command_str = format!("{:?}", command);
+
+    let output = handle_result!(
+        format!("Failed to create database {}", dbname),
+        command.output()
+    );
+
+    if !output.status.success() {
+        exit_with_error!(
+            "problem running createdb: {}\n\n{}{}",
+            command_str,
+            String::from_utf8(output.stdout).unwrap(),
+            String::from_utf8(output.stderr).unwrap()
+        )
+    }
+
+    true
+}
+
+fn does_db_exist(major_version: u16, host: &str, port: u16, dbname: &str) -> bool {
+    let mut command = Command::new(get_psql_path(major_version));
+    command
+        .arg("-XqAt")
+        .arg("-h")
+        .arg(host)
+        .arg("-p")
+        .arg(port.to_string())
+        .arg("template1")
+        .arg("-c")
+        .arg(&format!(
+            "select count(*) from pg_database where datname = '{}';",
+            dbname.replace("'", "''")
+        ))
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped());
+    let command_str = format!("{:?}", command);
+
+    let output = handle_result!(
+        format!("Failed to create database {}", dbname),
+        command.output()
+    );
+
+    if !output.status.success() {
+        exit_with_error!(
+            "problem checking if database '{}' exists: {}\n\n{}{}",
+            dbname,
+            command_str,
+            String::from_utf8(output.stdout).unwrap(),
+            String::from_utf8(output.stderr).unwrap()
+        )
+    } else {
+        let count = i32::from_str(&String::from_utf8(output.stdout).unwrap().trim())
+            .expect("result is not a number");
+        count > 0
+    }
 }
 
 pub fn get_named_capture(

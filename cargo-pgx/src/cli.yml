@@ -36,7 +36,7 @@ subcommands:
                     value_name: PG_VERSION
                     takes_value: true
                     required: true
-                    help: the Postgres version to start
+                    help: the Postgres version to start ('pg10', 'pg11', pg12', or 'all')
           - stop:
               about: stop a pgx-managed Postgres instance
               args:
@@ -44,7 +44,7 @@ subcommands:
                     value_name: PG_VERSION
                     takes_value: true
                     required: true
-                    help: the Postgres version to stop
+                    help: the Postgres version to stop ('pg10', 'pg11', pg12', or 'all')
           - status:
               about: is a pgx-managed Postgres instance running?
               args:
@@ -69,6 +69,18 @@ subcommands:
                     help: compile for release mode (default is debug)
           - schema:
               about: generate a schema
+          - run:
+              about: compile/install extension to a pgx-managed Postgres instance and start psql
+              args:
+                - pg_version:
+                    value_name: PG_VERSION
+                    takes_value: true
+                    required: true
+                    help: Do you want to run against Postgres 'pg10', 'pg11', pg12'?
+                - dbname:
+                    value_name: DBNAME
+                    takes_value: true
+                    help: The database to connect to (and create if the first time).  Defaults to a database with the same name as the current extension name
           - test:
               about: run the test suite for this crate
               args:

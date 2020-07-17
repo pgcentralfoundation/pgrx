@@ -1,3 +1,4 @@
+use crate::commands::status::status_postgres;
 use colored::Colorize;
 use pgx_utils::{
     exit_with_error, get_pgbin_dir, get_pgdata_dir, get_pglog_file, handle_result,
@@ -6,7 +7,7 @@ use pgx_utils::{
 use std::path::PathBuf;
 use std::process::Stdio;
 
-pub(crate) fn start_postgres(major_version: u16) -> Result<(), std::io::Error> {
+pub(crate) fn start_postgres(major_version: u16) {
     let datadir = get_pgdata_dir(major_version);
     let logfile = get_pglog_file(major_version);
     let bindir = get_pgbin_dir(major_version);
@@ -16,8 +17,12 @@ pub(crate) fn start_postgres(major_version: u16) -> Result<(), std::io::Error> {
         initdb(&bindir, &datadir);
     }
 
+    if status_postgres(major_version) {
+        return;
+    }
+
     println!(
-        "  {} Postgres v{} on port {}",
+        "{} Postgres v{} on port {}",
         "    Starting".bold().green(),
         major_version,
         port.to_string().bold().cyan()
@@ -47,8 +52,6 @@ pub(crate) fn start_postgres(major_version: u16) -> Result<(), std::io::Error> {
             String::from_utf8(output.stderr).unwrap()
         )
     }
-
-    Ok(())
 }
 
 fn initdb(bindir: &PathBuf, datadir: &PathBuf) {
