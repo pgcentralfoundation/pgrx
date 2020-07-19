@@ -4,20 +4,24 @@
 #[macro_use]
 extern crate clap;
 
-mod crate_template;
-mod extension_installer;
-mod property_inspector;
-mod schema_generator;
-mod test_runner;
+mod commands;
 
+use crate::commands::get::get_property;
+use crate::commands::init::init_pgx;
+use crate::commands::install::install_extension;
+use crate::commands::new::create_crate_template;
+use crate::commands::package::package_extension;
+use crate::commands::run::run_psql;
+use crate::commands::schema::generate_schema;
+use crate::commands::start::start_postgres;
+use crate::commands::status::status_postgres;
+use crate::commands::stop::stop_postgres;
+use crate::commands::test::test_extension;
 use clap::App;
-use crate_template::*;
-use extension_installer::*;
-use property_inspector::*;
-use schema_generator::*;
+use colored::Colorize;
+use pgx_utils::{exit, exit_with_error, get_pg_config};
 use std::path::PathBuf;
 use std::str::FromStr;
-use test_runner::*;
 
 fn main() -> std::result::Result<(), std::io::Error> {
     let yaml = load_yaml!("cli.yml");
@@ -26,35 +30,128 @@ fn main() -> std::result::Result<(), std::io::Error> {
     let matches = app.get_matches();
 
     if let Some(extension) = matches.subcommand_matches("pgx") {
-        if let Some(create) = extension.subcommand_matches("new") {
-            let name = create
-                .value_of("name")
-                .expect("<NAME> argument to create is required");
-            // TODO:  validate name to make sure it's all ascii [a-z0-9_]
-            let path = PathBuf::from_str(&format!("{}/", name)).unwrap();
-            create_crate_template(path, name)?;
-        } else if let Some(install) = extension.subcommand_matches("install") {
-            let target = install.is_present("release");
-            install_extension(target)?;
-        } else if let Some(_schema) = extension.subcommand_matches("schema") {
-            generate_schema()?;
-        } else if let Some(test) = extension.subcommand_matches("test") {
-            let version = test.value_of("pg_version").unwrap_or("all");
-            match version {
-                "pg10" | "pg11" | "pg12" | "all" => test_extension(version)?,
-                _ => panic!("Unrecognized version: {}", version),
+        let result = match extension.subcommand() {
+            ("init", Some(init)) => {
+                let pg10_path = init.value_of("pg10");
+                let pg11_path = init.value_of("pg11");
+                let pg12_path = init.value_of("pg12");
+
+                init_pgx(pg10_path, pg11_path, pg12_path)
             }
-        } else if let Some(get) = extension.subcommand_matches("get") {
-            let name = get.value_of("name").expect("no property name specified");
-            if let Some(value) = get_property(name) {
-                println!("{}", value);
+            ("new", Some(new)) => {
+                let extname = new
+                    .value_of("name")
+                    .expect("<NAME> argument to create is required");
+                validate_extension_name(extname);
+                let path = PathBuf::from_str(&format!("{}/", extname)).unwrap();
+                create_crate_template(path, extname)
             }
-        } else {
-            eprintln!("{}", extension.usage());
+            ("start", Some(start)) => {
+                let pgver = start.value_of("pg_version").unwrap_or("all");
+                for major_version in make_pg_major_version(pgver) {
+                    start_postgres(*major_version);
+                }
+
+                Ok(())
+            }
+            ("stop", Some(stop)) => {
+                let pgver = stop.value_of("pg_version").unwrap_or("all");
+                for major_version in make_pg_major_version(pgver) {
+                    stop_postgres(*major_version);
+                }
+
+                Ok(())
+            }
+            ("status", Some(status)) => {
+                let pgver = status.value_of("pg_version").unwrap_or("all");
+                for major_version in make_pg_major_version(pgver) {
+                    if status_postgres(*major_version) {
+                        println!(
+                            "Postgres v{} is {}",
+                            major_version,
+                            "running".bold().green()
+                        )
+                    } else {
+                        println!("Postgres v{} is {}", major_version, "stopped".bold().red())
+                    }
+                }
+                Ok(())
+            }
+            ("install", Some(install)) => {
+                let is_release = install.is_present("release");
+                let pg_config = match std::env::var("PGX_TEST_MODE_VERSION") {
+                    // for test mode, we want the pg_config specified in PGX_TEST_MODE_VERSION
+                    Ok(pgver) => get_pg_config(u16::from_str(&pgver).expect(
+                        "PGX_TEST_MODE_VERSION does not contain a valid postgres version number",
+                    )),
+
+                    // otherwise, the user just ran "cargo pgx install", and we use whatever "pg_config" is on the path
+                    Err(_) => Some("pg_config".to_string()),
+                };
+
+                install_extension(&pg_config, is_release, None);
+                Ok(())
+            }
+            ("package", Some(package)) => {
+                let is_debug = package.is_present("debug");
+                let pg_config = Some("pg_config".to_string()); // use whatever "pg_config" is on the path
+
+                package_extension(&pg_config, is_debug);
+                Ok(())
+            }
+            ("run", Some(run)) => {
+                let pgver = run
+                    .value_of("pg_version")
+                    .expect("<PG_VERSION> is required");
+                let dbname = run.value_of("dbname").map_or_else(
+                    || get_property("extname").expect("could not determine extension name"),
+                    |v| v.to_string(),
+                );
+                run_psql(make_pg_major_version(pgver)[0], &dbname);
+                Ok(())
+            }
+            ("test", Some(test)) => {
+                let pgver = test.value_of("pg_version").unwrap_or("all");
+                for major_version in make_pg_major_version(pgver) {
+                    test_extension(*major_version);
+                }
+                Ok(())
+            }
+            ("schema", Some(_schema)) => generate_schema(),
+            ("get", Some(get)) => {
+                let name = get.value_of("name").expect("no property name specified");
+                if let Some(value) = get_property(name) {
+                    println!("{}", value);
+                }
+                Ok(())
+            }
+            _ => exit!(extension.usage()),
+        };
+
+        if let Err(e) = result {
+            exit!("{}", e)
         }
     } else {
-        eprintln!("{}", matches.usage());
+        exit!(matches.usage())
     }
 
     Ok(())
+}
+
+fn validate_extension_name(extname: &str) {
+    for c in extname.chars() {
+        if !c.is_alphanumeric() && c != '_' && !c.is_lowercase() {
+            exit_with_error!("Extension name must be in the set of [a-z0-9_]")
+        }
+    }
+}
+
+fn make_pg_major_version(version_string: &str) -> &'static [u16] {
+    match version_string {
+        "all" => &[10, 11, 12],
+        "pg10" => &[10],
+        "pg11" => &[11],
+        "pg12" => &[12],
+        _ => exit_with_error!("unrecognized Postgres version: {}", version_string),
+    }
 }

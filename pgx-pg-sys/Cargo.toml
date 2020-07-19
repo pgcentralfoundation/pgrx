@@ -1,6 +1,6 @@
 [package]
 name = "pgx-pg-sys"
-version = "0.0.4"
+version = "0.0.7"
 authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
 edition = "2018"
 license = "MIT"
@@ -12,13 +12,14 @@ readme = "README.md"
 
 [dependencies]
 memoffset = "0.5.5"
-pgx-macros = { path = "../pgx-macros/", version="0.0.4" }
+pgx-macros = { path = "../pgx-macros/", version= "^0.0.7"}
 
 [build-dependencies]
 bindgen = "=0.54.0"
 build-deps = "0.1.4"
+colored = "2.0.0"
 num_cpus = "1.13.0"
-pgx-utils = { path = "../pgx-utils/", version="0.0.4" }
+pgx-utils = { path = "../pgx-utils/", version= "^0.0.7"}
 proc-macro2 = "1.0.18"
 quote = "1.0.7"
 rayon = "1.3.1"

@@ -4,39 +4,94 @@
 [![Twitter Follow](https://img.shields.io/twitter/follow/zombodb.svg?style=flat)](https://twitter.com/zombodb)
 ---
 
-[![Logo](logo.png)](https://twitter.com/zombodb)
+![Logo](logo.png)
 
 # pgx
 
 ###### Build Postgres Extensions with Rust!
 
-`pgx` is a framework for developing PostgreSQL extensions in Rust and wants to make that process as idiomatic and safe
-as possible.  Currently, `pgx` supports Postgres v10, v11, and v12.
+`pgx` is a framework for developing PostgreSQL extensions in Rust and strives to be as idiomatic and safe as possible.  
+
+`pgx` supports Postgres v10, v11, and v12.
 
 ## Key Features
 
- - A cargo sub-command (`pgx`) for creating, compiling/installing, and testing extensions
- - Postgres `Datum`<-->Rust type conversion via `pgx::IntoDatum` and `pgx::FromDatum`
- - Safe handling of `NULL` Datums -- Datums are simply `Option<T>`
- - Translation of Rust `panic!()`s into Postgres `ERROR`s, which abort the current transaction instead of the Postgres cluster
- - `#[derive(PostgresType)]` macro for automatically generating Postgres types based on Rust structs
- - `#[derive(PostgresEnum)]` macro for automatically generating Postgres enums based on Rust enums
- - `extension_sql!()` macro for providing custom extension schema DDL
- - `#[pg_extern]` proc-macro for automatically creating UDFs
- - Automatic extension schema generation
- - Transparent support for generating Set Returning Functions (SRFs) by returning a `std::iter::Iterator<Item = T>`
- - `#[pg_test]` proc-macro for unit tests that run **in-proccess** in Postgres
- - `PgMemoryContexts` wrapper around Postgres' "MemoryContext" system
- - Executor/planner/transaction/subtransaction hook support
+#### A Managed Development Environment
+ - A cargo sub-command (`carg-pgx`) for managing the `pgx` development environment
+    - Quickly create a new extension template crate via `cargo pgx new`
+    - Install, configure, compile, and privately install all required Postgres versions via `cargo pgx init`
+    - Run your extension and interactively test with `psql` via `cargo pgx run`
+    - Unit-test your extension across multiple Postgres versions via `cargo pgx test`
+    - Create installation packages for your extension via `cargo pgx package`
+
+#### Target Multiple Postgres Versions
+ - Support Postgres 10, 11, and 12, from the same codebase
+    - Postgres Rust bindings are organized into `common.rs` and `pgXX_specific.rs` modules
+ - Use Rust feature gating to use version-specific APIs
+ - Seamlessly test against all versions
+
+#### Automatic Schema Generation
+ - Generates DDL for common SQL objects such as
+    - Functions
+    - Types
+    - Enums
+ - Hand-written SQL is supported through the `extension_sql!` macro or through on-disk `.sql` files
+ - Control the order in which SQL is executed during `CREATE EXTENSION ...;`
+ 
+#### Safety First
+ - Translates Rust `panic!`s into Postgres `ERROR`s that abort the transaction, not the process
+ - Memory Management follows Rust's drop semantics, even in the face of `panic!` and `elog(ERROR)`
+ - `#[pg_guard]` procedural macro to ensure the above
+ - Postgres `Datum` is simply `Option<T> where T: FromDatum` -- `NULL` Datums are safely represented as `Option::None`
+ - `#[pg_test]` proc-macro for unit testing **in-process** within Postgres
+
+#### First-class UDF support
+ - Annotate functions with `#[pg_extern]` to expose them to Postgres
+ - Return `impl std::iter::Iterator<Item = T> where T: IntoDatum` for automatic set-returning-functions (both `RETURNS SETOF` and `RETURNS TABLE (...)` variants
+ - DDL automatically generated
+
+#### Most Postgres Datatypes Transparently Converted to Rust
+ - `text`/`varchar` --> `String`/`&str`
+ - `integer` --> `i32`
+ - `bigint` --> `i64`
+ - `bool` --> `bool`
+ - `json`/`jsonb` --> `pgx::Json`/`pgx::Jsonb` newtypes over `serde_json::Value`
+ - arrays --> `pgx::Array<T>`/`Vec<Option<T>>` 
+ - `date`/`time`/`timestamp` -> `pgx::Date/Time/Timestamp`
+ - `time with time zone`/`timestamp with time zone` -> `pgx::Time/TimestampWithTimeZone`
+ - `IntoDatum` and `FromDatum` traits for implementing more support
+ - many more!
+
+#### Easy Custom Types
+ - `#[derive(PostgresType)]` to use a Rust struct as a Postgres type, represented as a CBOR-encoded object in-memory/on-disk, and JSON as human-readable
+ 	- can provide custom implementations for custom in-memory/on-disk/human-readable representations
+ - `#[derive(PostgresEnum)]` to use a Rust enum as a Postgres enum
+ - DDL automatically generated
+
+#### Server Prgramming Interface (SPI)
+ - Safe access into SPI
+ - Transparently return owned Datums from an SPI context
+
+#### Advanced Features
+ - Safe access to Postgres' `MemoryContext` system via `pgx::PgMemoryContexts`
+ - Executor/planner/transaction/subtransaction hooks
+ - Safely use Postgres-provided pointers with `pgx::PgBox<T>` (akin to `alloc::boxed::Box<T>`)
  - `#[pg_guard]` proc-macro for guarding `extern "C"` Rust functions that need to be passed into Postgres
- - Basic SPI support
+ - Access Postgres' logging system through `eprintln!`-like macros
  - Direct `unsafe` access to large parts of Postgres internals via the `pgx::pg_sys` module
- - Separation of Postgres symbols (types, functions, etc) by what's common across all supported versions, and then
- version-specific modules
  - lots more!
 
+## System Requirements
+
+ - `cargo install rustfmt`
+ - `git`
+ - A C-compiler toolchain capable of building PostgreSQL, plus
+    - `libreadline-dev` package (might be different for your OS)
+    - `zlib1g-dev` package (might be different for your OS)
+    
 ## Getting Started
 
+### Install `cargo pgx`
 First you'll want to install the `pgx` cargo sub-command from crates.io.  You'll use it almost exclusively during
 your development and testing workflow.
 
@@ -44,26 +99,39 @@ your development and testing workflow.
 $ cargo install cargo-pgx
 ```
 
-It has a number of sub-commands.  For example, to create a new extension project, simply run:
+### Initialize it
+
+Next, `pgx` needs to be initialized.  You only need to do this once.
+
+```shell script
+$ cargo pgx init
+```
+
+The `init` command downloads Postgres versions 10, 11, 12, and compiles them to `~/.pgx/`.  These installations
+are needed by `pgx` not only for auto-generating Rust bindings from each version's header files, but also for `pgx`'s 
+test framework.
+
+
+### Create a new extension
 
 ```shell script
 $ cargo pgx new my_extension
 ``` 
 
-Then `cd my_extension` and run:
+### Run your extension
 
 ```shell script
-$ cargo pgx install
+$ cd my_extension
+$ cargo pgx run pg12  # or pg10 or pg11
 ```
 
-The first time, this will take awhile.  Behind the scenes, `pgx` is downloading, configuring, compiling and installing
-(within `target/`) Postgres v10, v11, and v12.  All of this happens in the `target/` directory and the artifacts
-will remain until a `cargo clean`.  This is necessary in order to generate the proper Rust bindings for Postgres internals.
+`cargo pgx run` compiles the extension to a shared library, copies it to the specified Postgres installation (in `~/.pgx/`),
+starts that Postgres instance and connects you, via `psql`, to a database named for the extension.
+ 
+The first time, compilation takes a few minutes as `pgx` needs to generate almost 200k lines of Rust "bindings" from
+Postgres' header files.
 
-Note that `cargo pgx install` will compile your extension and then install it to your locally installed Postgres instance
-as identified by `pg_config`, so make sure that `pg_config` is in your `$PATH`.
-
-From here, you can create a Postgres database and create your extension in it:
+Once compiled you'll be placed in a `psql` shell, for, in this case, Postgres 12.
 
 ```shell script
 $ createdb test
@@ -76,6 +144,33 @@ $ psql test
 
  - [cargo-pgx sub-command](cargo-pgx/)
  - [various examples](pgx-examples/)
+
+
+## Caveats & Known Issues
+
+There's probably more than are listed here, but a primary things of note are:
+
+ - Threading is not really supported.  Postgres is strictly single-threaded.  As such, if you do venture into using threads, those threads **MUST NOT** call *any* internal Postgres function, or otherwise use any Postgres-provided pointer.  There's also a potential problem with Postgres' use of `sigprocmask`.  This was being discussed on the -hackers list, even with a patch provided, but the conversation seems to have stalled (https://www.postgresql.org/message-id/flat/5EF20168.2040508%40anastigmatix.net#4533edb74194d30adfa04a6a2ce635ba).
+
+ - `async` interactions are unknown right now.
+
+ - `pgx` uses lots of `unsafe` Rust.  That's generally the nature of the beast when doing FFI wrappers, so be aware.
+
+ - Not all of Postgres' internals are included or even wrapped.  This isn't due to it not being possible, it's simply due to it being an incredibly large task.  If you identify internal Postgres APIs you need, open an issue and we'll get them exposed, at least through the `pgx::pg_sys` module.
+
+ - Windows is not supported.  It could be, but will require a bit of work with `cargo-pgx` and figuring out how to compile `pgx`'s "cshim" static library. 
+
+## TODO
+
+There's a few things on our immediate TODO list
+
+ - Cleanup and merge PR #5 for Background Worker support.  It looks like the only remaining work is another
+procmaro, maybe `#[pg_bgworker_main]` to automate some of the boilerplate and make sure it's safe
+ - Better trigger function support.  `pgx` does support creating trigger functions in Rust (need examples!)
+but it doesn't automatically generate any of the DDL for them.  This too likely needs a procmaro like `#[pg_trigger]`
+ - Automatic extension schema upgrade scripts, based on diffs from a previous git tag and HEAD.  Likely, this
+will be build into the `cargo-pgx` subcommand and make use of https://github.com/zombodb/postgres-parser.
+ - More examples -- especially around memory management and the various derive macros `#[derive(PostgresType/Enum)]`
 
 
 ## Contributing

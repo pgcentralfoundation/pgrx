@@ -1,11 +1,11 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-
 //! for converting a pg_sys::Datum and a corresponding "is_null" bool into a typed Option
 
 use crate::{
     pg_sys, text_to_rust_str_unchecked, vardata_any, varsize_any_exhdr, void_mut_ptr, PgBox,
+    PgMemoryContexts,
 };
 use std::ffi::CStr;
 
@@ -30,6 +30,31 @@ pub trait FromDatum {
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, typoid: pg_sys::Oid) -> Option<Self>
     where
         Self: Sized;
+
+    /// Default implementation switched to the specified memory context and then simply calls
+    /// `From::from_datum(...)` from within that context.
+    ///
+    /// For certain Datums (such as `&str`), this is likely not enough and this function
+    /// should be overridden in the type's trait implementation.
+    ///
+    /// The intent here is that the returned Rust type, which might be backed by a pass-by-reference
+    /// Datum, be copied into the specified memory context, and then the Rust type constructed from
+    /// that pointer instead.
+    ///
+    /// ## Safety
+    ///
+    /// Same caveats as `From::from_datum(...)`
+    unsafe fn from_datum_in_memory_context(
+        mut memory_context: PgMemoryContexts,
+        datum: pg_sys::Datum,
+        is_null: bool,
+        typoid: pg_sys::Oid,
+    ) -> Option<Self>
+    where
+        Self: Sized,
+    {
+        memory_context.switch_to(|_| FromDatum::from_datum(datum, is_null, typoid))
+    }
 }
 
 /// for pg_sys::Datum
@@ -157,6 +182,35 @@ impl<'a> FromDatum for &'a str {
             Some(text_to_rust_str_unchecked(varlena))
         }
     }
+
+    unsafe fn from_datum_in_memory_context(
+        mut memory_context: PgMemoryContexts,
+        datum: usize,
+        is_null: bool,
+        _typoid: u32,
+    ) -> Option<Self>
+    where
+        Self: Sized,
+    {
+        if is_null {
+            None
+        } else if datum == 0 {
+            panic!("a varlena Datum was flagged as non-null but the datum is zero");
+        } else {
+            let varlena = pg_sys::pg_detoast_datum(datum as *mut pg_sys::varlena);
+            memory_context.switch_to(|_| {
+                // this gets the varlena Datum copied into this memory context
+                let cstr = pg_sys::text_to_cstring(varlena as *mut pg_sys::text);
+
+                // and now we return it as a &str
+                let cstr = std::ffi::CStr::from_ptr(cstr);
+                Some(
+                    cstr.to_str()
+                        .expect("failed to convert varlena datum into &str"),
+                )
+            })
+        }
+    }
 }
 
 /// for text, varchar, or any `pg_sys::varlena`-based type
@@ -226,5 +280,29 @@ impl<T> FromDatum for PgBox<T> {
         } else {
             Some(PgBox::<T>::from_pg(datum as *mut T))
         }
+    }
+
+    unsafe fn from_datum_in_memory_context(
+        mut memory_context: PgMemoryContexts,
+        datum: usize,
+        is_null: bool,
+        _typoid: u32,
+    ) -> Option<Self>
+    where
+        Self: Sized,
+    {
+        memory_context.switch_to(|context| {
+            if is_null {
+                None
+            } else if datum == 0 {
+                panic!(
+                    "user type {} Datum was flagged as non-null but the datum is zero",
+                    std::any::type_name::<T>()
+                );
+            } else {
+                let copied = context.copy_ptr_into(datum as *mut T, std::mem::size_of::<T>());
+                Some(PgBox::<T>::from_pg(copied))
+            }
+        })
     }
 }

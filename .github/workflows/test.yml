@@ -27,48 +27,26 @@ jobs:
 
     # Ubuntu system dependencies required to build Postgres from sources
     - name: install postgres build dependencies
-      run: sudo apt install -y bison flex zlib1g zlib1g-dev pkg-config libssl-dev
+      run: sudo apt install -y bison flex zlib1g zlib1g-dev pkg-config libssl-dev libreadline-dev
 
     # install our cargo subcomment
     - name: install cargo pgx
       run: cd cargo-pgx && cargo install --path . --force
 
+    # initialize pgx
+    - name: cargo pgx init
+      run: cargo pgx init
+
     # test our code
     - name: cargo test
-      run: RUST_BACKTRACE=1 CARGO_TARGET_DIR=~/cargo-target-dir cargo test --all --features pg${{ matrix.version }} --no-default-features
+      run: RUST_BACKTRACE=1 cargo test --all --features pg${{ matrix.version }} --no-default-features
 
     # make sure the examples build too
-    - name: build arrays example
-      run: |
-        cd pgx-examples/arrays &&
-        PGX_PG10_CONFIG=~/cargo-target-dir/postgresql-10/pgx-install/bin/pg_config
-        PGX_PG11_CONFIG=~/cargo-target-dir/postgresql-11/pgx-install/bin/pg_config
-        PGX_PG12_CONFIG=~/cargo-target-dir/postgresql-12/pgx-install/bin/pg_config
-        CARGO_TARGET_DIR=~/cargo-target-dir
-        cargo pgx test pg${{ matrix.version }}
-    - name: build errors example
-      run: |
-        cd pgx-examples/errors &&
-        PGX_PG10_CONFIG=~/cargo-target-dir/postgresql-10/pgx-install/bin/pg_config
-        PGX_PG11_CONFIG=~/cargo-target-dir/postgresql-11/pgx-install/bin/pg_config
-        PGX_PG12_CONFIG=~/cargo-target-dir/postgresql-12/pgx-install/bin/pg_config
-        CARGO_TARGET_DIR=~/cargo-target-dir
-        cargo pgx test pg${{ matrix.version }}
-    - name: build srf example
-      run: |
-        cd pgx-examples/srf &&
-        PGX_PG10_CONFIG=~/cargo-target-dir/postgresql-10/pgx-install/bin/pg_config
-        PGX_PG11_CONFIG=~/cargo-target-dir/postgresql-11/pgx-install/bin/pg_config
-        PGX_PG12_CONFIG=~/cargo-target-dir/postgresql-12/pgx-install/bin/pg_config
-        CARGO_TARGET_DIR=~/cargo-target-dir
-        cargo pgx test pg${{ matrix.version }}
-    - name: build strings example
-      run: |
-        cd pgx-examples/strings &&
-        PGX_PG10_CONFIG=~/cargo-target-dir/postgresql-10/pgx-install/bin/pg_config
-        PGX_PG11_CONFIG=~/cargo-target-dir/postgresql-11/pgx-install/bin/pg_config
-        PGX_PG12_CONFIG=~/cargo-target-dir/postgresql-12/pgx-install/bin/pg_config
-        CARGO_TARGET_DIR=~/cargo-target-dir
-        cargo pgx test pg${{ matrix.version }}
-    - name: dir listing
-      run: find ~/ -type f | grep -v ".git"
+    - name: arrays example
+      run: cd pgx-examples/arrays && cargo pgx test pg${{ matrix.version }}
+    - name: errors example
+      run: cd pgx-examples/errors && cargo pgx test pg${{ matrix.version }}
+    - name: srf example
+      run: cd pgx-examples/srf && cargo pgx test pg${{ matrix.version }}
+    - name: strings example
+      run: cd pgx-examples/strings && cargo pgx test pg${{ matrix.version }}

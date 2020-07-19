@@ -2,12 +2,56 @@
 # governed by the MIT license that can be found in the LICENSE file.
 
 
-name: "Cargo Postgres extension manager"
-version: "0.1.0"
+name: "pgx's development environment tool"
+version: "0.0.7"
 about: Creates and installs pgx based Postgres extensions
 subcommands:
   - pgx:
         subcommands:
+          - init:
+              about: initize pgx development environment for the first time
+              args:
+                - pg10:
+                    long: pg10
+                    value_name: PG10_PG_CONFIG
+                    takes_value: true
+                    required: false
+                    help: if installed locally, the path to PG10's 'pg_config' tool
+                - pg11:
+                    long: pg11
+                    value_name: PG11_PG_CONFIG
+                    takes_value: true
+                    required: false
+                    help: if installed locally, the path to PG11's 'pg_config' tool
+                - pg12:
+                    long: pg12
+                    value_name: PG12_PG_CONFIG
+                    takes_value: true
+                    required: false
+                    help: if installed locally, the path to PG12's 'pg_config' tool
+          - start:
+              about: start a pgx-managed Postgres instance
+              args:
+                - pg_version:
+                    value_name: PG_VERSION
+                    takes_value: true
+                    required: true
+                    help: the Postgres version to start ('pg10', 'pg11', pg12', or 'all')
+          - stop:
+              about: stop a pgx-managed Postgres instance
+              args:
+                - pg_version:
+                    value_name: PG_VERSION
+                    takes_value: true
+                    required: true
+                    help: the Postgres version to stop ('pg10', 'pg11', pg12', or 'all')
+          - status:
+              about: is a pgx-managed Postgres instance running?
+              args:
+                - pg_version:
+                    value_name: PG_VERSION
+                    takes_value: true
+                    help: the Postgres version
           - new:
               about: create a new extension crate
               args:
@@ -17,21 +61,40 @@ subcommands:
                     required: true
                     help: the name of the extension
           - install:
-              about: install the extension from the current crate
+              about: install the extension from the current crate to the Postgres specified by whatever "pg_config" is currently on your $PATH
               args:
                 - release:
                     short: r
                     long: release
                     help: compile for release mode (default is debug)
+          - package:
+              about: create an installation package directory (in ./target/[debug|release]/extname-pgXX/) for the Postgres installation specified by whatever "pg_cofig" is currently on your $PATH
+              args:
+                - debug:
+                    short: d
+                    long: debug
+                    help: compile for debug mode (default is release)
           - schema:
-              about: generate a schema
+              about: generate extension schema files (typically not necessary)
+          - run:
+              about: compile/install extension to a pgx-managed Postgres instance and start psql
+              args:
+                - pg_version:
+                    value_name: PG_VERSION
+                    takes_value: true
+                    required: true
+                    help: Do you want to run against Postgres 'pg10', 'pg11', pg12'?
+                - dbname:
+                    value_name: DBNAME
+                    takes_value: true
+                    help: The database to connect to (and create if the first time).  Defaults to a database with the same name as the current extension name
           - test:
               about: run the test suite for this crate
               args:
                 - pg_version:
                     value_name: PG_VERSION
                     takes_value: true
-                    help: Do you want to test for Postgres 'pg10', 'pg11', pg12', or 'all'?
+                    help: Do you want to test for Postgres 'pg10', 'pg11', pg12', or 'all' (default)?
           - get:
               about: get a property from the extension control file
               args:

@@ -1,8 +1,8 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-use crate::property_inspector::get_property;
-use pgx_utils::{categorize_type, CategorizedType, ExternArgs};
+use crate::commands::get::get_property;
+use pgx_utils::{categorize_type, get_named_capture, CategorizedType, ExternArgs};
 use proc_macro2::{Ident, Span, TokenTree};
 use quote::quote;
 use std::borrow::BorrowMut;
@@ -301,7 +301,7 @@ fn walk_items(
             }
         } else if let Item::Fn(func) = item {
             let attributes = collect_attributes(rs_file, &func.sig.ident, &func.attrs);
-            let is_test_mode = std::env::var("PGX_TEST_MODE").is_ok();
+            let is_test_mode = std::env::var("PGX_TEST_MODE_VERSION").is_ok();
             let mut function_sql = Vec::new();
             let sql_func_args = extract_funcargs_attribute(&attributes);
 
@@ -1074,11 +1074,4 @@ fn location_comment(rs_file: &DirEntry, span: &Span) -> String {
         span.start().line,
         span.start().column,
     )
-}
-
-fn get_named_capture(regex: &regex::Regex, name: &'static str, against: &str) -> Option<String> {
-    match regex.captures(against) {
-        Some(cap) => Some(cap[name].to_string()),
-        None => None,
-    }
 }
