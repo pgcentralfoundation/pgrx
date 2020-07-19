@@ -85,13 +85,21 @@ fn main() -> Result<(), std::io::Error> {
             manifest_dir.display(),
             major_version
         ));
+        let common_rs = PathBuf::from(format!("{}/src/common.rs", manifest_dir.display(),));
 
+        eprintln!("common_rs={}", common_rs.display());
         eprintln!("bindings_rs={}", bindings_rs.display());
         eprintln!("specific_rs={}", specific_rs.display());
 
-        if !specific_rs.exists() {
+        if !common_rs.exists()  // no common.rs
+            || !specific_rs.exists() // no version-specific.rs
+            || include_h.metadata().unwrap().modified().unwrap() // include headers are newer than version-specific.rs
+                > specific_rs.metadata().unwrap().modified().unwrap()
+        {
             run_bindgen(&pg_config, major_version, &include_h, &bindings_rs);
             need_common_rs.store(true, Ordering::SeqCst);
+        } else {
+            eprintln!("{} is up-to-date", specific_rs.display())
         }
 
         build_shim(&shim_dir, &shim_mutex, major_version, &pg_config);
@@ -127,7 +135,7 @@ fn run_bindgen(
         .blacklist_function("siglongjmp")
         .blacklist_function("pg_re_throw")
         .size_t_is_usize(true)
-        .rustfmt_bindings(true)
+        .rustfmt_bindings(false)
         .derive_debug(true)
         .derive_copy(true) // necessary to avoid __BindgenUnionField usages -- I don't understand why?
         .derive_default(true)
