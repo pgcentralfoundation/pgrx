@@ -160,6 +160,18 @@ There's probably more than are listed here, but a primary things of note are:
 
  - Windows is not supported.  It could be, but will require a bit of work with `cargo-pgx` and figuring out how to compile `pgx`'s "cshim" static library. 
 
+## TODO
+
+There's a few things on our immediate TODO list
+
+ - Cleanup and merge PR #5 for Background Worker support.  It looks like the only remaining work is another
+procmaro, maybe `#[pg_bgworker_main]` to automate some of the boilerplate and make sure it's safe
+ - Better trigger function support.  `pgx` does support creating trigger functions in Rust (need examples!)
+but it doesn't automatically generate any of the DDL for them.  This too likely needs a procmaro like `#[pg_trigger]`
+ - Automatic extension schema upgrade scripts, based on diffs from a previous git tag and HEAD.  Likely, this
+will be build into the `cargo-pgx` subcommand and make use of https://github.com/zombodb/postgres-parser.
+
+
 ## Contributing
 
 We are most definitely open to contributions of any kind.  Bug Reports, Feature Requests, Documentation,
