@@ -67,6 +67,13 @@ subcommands:
                     short: r
                     long: release
                     help: compile for release mode (default is debug)
+          - package:
+              about: create an installation package directory (in ./target/[debug|release]/extname-pgXX-package/) for the Postgres installation specified by whatever "pg_cofig" is currently on your $PATH
+              args:
+                - debug:
+                    short: d
+                    long: debug
+                    help: compile for debug mode (default is release)
           - schema:
               about: generate extension schema files (typically not necessary)
           - run:

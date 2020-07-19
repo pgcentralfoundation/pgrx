@@ -9,7 +9,7 @@ pub(crate) fn run_psql(major_version: u16, dbname: &str) {
     let pg_config = get_pg_config(major_version);
 
     // install the extension
-    install_extension(&pg_config, false);
+    install_extension(&pg_config, false, None);
 
     // restart postgres
     stop_postgres(major_version);

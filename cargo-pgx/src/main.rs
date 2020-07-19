@@ -10,6 +10,7 @@ use crate::commands::get::get_property;
 use crate::commands::init::init_pgx;
 use crate::commands::install::install_extension;
 use crate::commands::new::create_crate_template;
+use crate::commands::package::package_extension;
 use crate::commands::run::run_psql;
 use crate::commands::schema::generate_schema;
 use crate::commands::start::start_postgres;
@@ -77,7 +78,7 @@ fn main() -> std::result::Result<(), std::io::Error> {
                 Ok(())
             }
             ("install", Some(install)) => {
-                let target = install.is_present("release");
+                let is_release = install.is_present("release");
                 let pg_config = match std::env::var("PGX_TEST_MODE_VERSION") {
                     // for test mode, we want the pg_config specified in PGX_TEST_MODE_VERSION
                     Ok(pgver) => get_pg_config(u16::from_str(&pgver).expect(
@@ -87,7 +88,15 @@ fn main() -> std::result::Result<(), std::io::Error> {
                     // otherwise, the user just ran "cargo pgx install", and we use whatever "pg_config" is on the path
                     Err(_) => Some("pg_config".to_string()),
                 };
-                install_extension(&pg_config, target);
+
+                install_extension(&pg_config, is_release, None);
+                Ok(())
+            }
+            ("package", Some(package)) => {
+                let is_debug = package.is_present("debug");
+                let pg_config = Some("pg_config".to_string()); // use whatever "pg_config" is on the path
+
+                package_extension(&pg_config, is_debug);
                 Ok(())
             }
             ("run", Some(run)) => {

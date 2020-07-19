@@ -4,52 +4,77 @@
 use crate::commands::get::{find_control_file, get_property};
 use crate::commands::schema::read_load_order;
 use colored::Colorize;
-use pgx_utils::{exit_with_error, get_target_dir, handle_result, run_pg_config};
+use pgx_utils::{
+    exit_with_error, get_pg_config_major_version, get_target_dir, handle_result, run_pg_config,
+};
 use std::io::Write;
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
 use std::str::FromStr;
 
-pub(crate) fn install_extension(pg_config: &Option<String>, is_release: bool) {
+pub(crate) fn install_extension(
+    pg_config: &Option<String>,
+    is_release: bool,
+    base_directory: Option<PathBuf>,
+) {
     let (control_file, extname) = find_control_file();
     let major_version = get_pg_config_major_version(pg_config);
 
+    let base_directory = base_directory.unwrap_or("/".into());
+    eprintln!("base_directory={}", base_directory.display());
     build_extension(major_version, is_release);
 
     println!();
     println!("installing extension");
-    let pkgdir = get_pkglibdir(pg_config);
-    let extdir = get_extensiondir(pg_config);
-    let (libpath, libfile) = find_library_file(&extname, is_release);
+    let pkgdir = make_relative(get_pkglibdir(pg_config));
+    let extdir = make_relative(get_extensiondir(pg_config));
+    let shlibpath = find_library_file(&extname, is_release);
 
-    let src = control_file.clone();
-    let dest = format!("{}/{}", extdir, control_file);
-    handle_result!(
-        format!(
-            "failed copying control file `{}` to `{}`",
-            control_file, extdir
-        ),
-        std::fs::copy(&src, &dest)
-    );
+    {
+        let mut dest = base_directory.clone();
+        dest.push(&extdir);
+        dest.push(&control_file);
+        copy_file(control_file, dest, "control file");
+    }
 
-    println!("{} control file to {}", "     Copying".bold().green(), dest);
+    {
+        let mut dest = base_directory.clone();
+        dest.push(&pkgdir);
+        dest.push(format!("{}.so", extname));
+        copy_file(shlibpath, dest, "shared library");
+    }
 
-    let src = format!("{}/{}", libpath, libfile);
-    let dest = format!("{}/{}.so", pkgdir, extname);
-    handle_result!(
-        format!("failed copying `{}` to `{}`", libfile, pkgdir),
-        std::fs::copy(&src, &dest)
-    );
-    println!(
-        "{} shared library to {}",
-        "     Copying".bold().green(),
-        dest
-    );
+    {
+        handle_result!("failed to generate SQL schema", crate::generate_schema());
+    }
 
-    handle_result!("failed to generate SQL schema", crate::generate_schema());
-    copy_sql_files(&extdir, &extname);
+    copy_sql_files(&extdir, &extname, &base_directory);
 
     println!("{} installing {}", "    Finished".bold().green(), extname);
+}
+
+fn copy_file(src: PathBuf, dest: PathBuf, msg: &str) {
+    if !dest.parent().unwrap().exists() {
+        handle_result!(
+            format!(
+                "failed to create destination directory {}",
+                dest.parent().unwrap().display()
+            ),
+            std::fs::create_dir_all(dest.parent().unwrap())
+        );
+    }
+
+    println!(
+        "{} {} to `{}`",
+        "     Copying".bold().green(),
+        msg,
+        dest.display()
+    );
+
+    handle_result!(
+        format!("failed copying `{}` to `{}`", src.display(), dest.display()),
+        std::fs::copy(&src, &dest)
+    );
 }
 
 fn build_extension(major_version: u16, is_release: bool) {
@@ -93,13 +118,14 @@ fn build_extension(major_version: u16, is_release: bool) {
     }
 }
 
-fn copy_sql_files(extdir: &str, extname: &str) {
+fn copy_sql_files(extdir: &PathBuf, extname: &str, base_directory: &PathBuf) {
     let load_order = read_load_order(&PathBuf::from_str("./sql/load-order.txt").unwrap());
-    let target_filename =
-        PathBuf::from_str(&format!("{}/{}--{}.sql", extdir, extname, get_version())).unwrap();
+    let mut target_filename = base_directory.clone();
+    target_filename.push(extdir);
+    target_filename.push(format!("{}--{}.sql", extname, get_version()));
     let mut sql = std::fs::File::create(&target_filename).unwrap();
     println!(
-        "{} {}",
+        "{} extension schema to `{}`",
         "     Writing".bold().green(),
         target_filename.display()
     );
@@ -127,22 +153,22 @@ fn copy_sql_files(extdir: &str, extname: &str) {
     }
 
     // now copy all the version upgrade files too
-    for f in handle_result!("failed to read ./sql/ directory", std::fs::read_dir("sql/")) {
-        if let Ok(f) = f {
-            let filename = f.file_name().into_string().unwrap();
+    for sql in handle_result!("failed to read ./sql/ directory", std::fs::read_dir("sql/")) {
+        if let Ok(sql) = sql {
+            let filename = sql.file_name().into_string().unwrap();
 
             if filename.starts_with(&format!("{}--", extname)) && filename.ends_with(".sql") {
-                let dest = format!("{}/{}", extdir, filename);
+                let mut dest = PathBuf::new();
+                dest.push(&extdir);
+                dest.push(filename);
 
-                if let Err(e) = std::fs::copy(f.path(), &dest) {
-                    exit_with_error!("failed copying SQL {} to {}:  {}", filename, dest, e)
-                }
+                copy_file(sql.path(), dest, "extension schema file");
             }
         }
     }
 }
 
-fn find_library_file(extname: &str, is_release: bool) -> (String, String) {
+fn find_library_file(extname: &str, is_release: bool) -> PathBuf {
     let mut target_dir = get_target_dir();
     target_dir.push(if is_release { "release" } else { "debug" });
 
@@ -163,7 +189,7 @@ fn find_library_file(extname: &str, is_release: bool) -> (String, String) {
                     || filename.ends_with(".dylib")
                     || filename.ends_with(".dll"))
             {
-                return (target_dir.display().to_string(), filename);
+                return f.path();
             }
         }
     }
@@ -178,21 +204,26 @@ fn get_version() -> String {
     }
 }
 
-fn get_pkglibdir(pg_config: &Option<String>) -> String {
-    run_pg_config(pg_config, "--pkglibdir")
+fn get_pkglibdir(pg_config: &Option<String>) -> PathBuf {
+    run_pg_config(pg_config, "--pkglibdir").into()
 }
 
-fn get_extensiondir(pg_config: &Option<String>) -> String {
-    let mut dir = run_pg_config(pg_config, "--sharedir");
+fn get_extensiondir(pg_config: &Option<String>) -> PathBuf {
+    let mut dir: PathBuf = run_pg_config(pg_config, "--sharedir").into();
 
-    dir.push_str("/extension");
+    dir.push("extension");
     dir
 }
 
-fn get_pg_config_major_version(pg_config: &Option<String>) -> u16 {
-    let version_string = run_pg_config(&pg_config, "--version");
-    let version_parts = version_string.split_whitespace().collect::<Vec<&str>>();
-    let version = version_parts.get(1);
-    let version = f64::from_str(&version.unwrap()).expect("not a valid version number");
-    version.floor() as u16
+fn make_relative(path: PathBuf) -> PathBuf {
+    if path.is_relative() {
+        return path;
+    }
+    let mut relative = PathBuf::new();
+    let mut components = path.components();
+    components.next(); // skip the root
+    while let Some(part) = components.next() {
+        relative.push(part)
+    }
+    relative
 }

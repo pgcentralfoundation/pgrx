@@ -172,6 +172,14 @@ pub fn get_pg_config(major_version: u16) -> Option<String> {
     }
 }
 
+pub fn get_pg_config_major_version(pg_config: &Option<String>) -> u16 {
+    let version_string = run_pg_config(&pg_config, "--version");
+    let version_parts = version_string.split_whitespace().collect::<Vec<&str>>();
+    let version = version_parts.get(1);
+    let version = f64::from_str(&version.unwrap()).expect("not a valid version number");
+    version.floor() as u16
+}
+
 pub fn get_pg_download_dir() -> PathBuf {
     std::env::var("PG_DOWNLOAD_TARGET_DIR").map_or_else(|_| get_target_dir(), |v| v.into())
 }

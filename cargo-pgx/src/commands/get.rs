@@ -4,6 +4,7 @@
 use pgx_utils::{exit_with_error, handle_result};
 use std::fs::File;
 use std::io::{BufRead, BufReader};
+use std::path::PathBuf;
 
 pub fn get_property(name: &str) -> Option<String> {
     let (control_file, extname) = find_control_file();
@@ -35,7 +36,7 @@ pub fn get_property(name: &str) -> Option<String> {
     None
 }
 
-pub(crate) fn find_control_file() -> (String, String) {
+pub(crate) fn find_control_file() -> (PathBuf, String) {
     for f in handle_result!(
         "cannot open current directory for reading",
         std::fs::read_dir(".")
@@ -47,7 +48,7 @@ pub(crate) fn find_control_file() -> (String, String) {
                     let mut extname: Vec<&str> = filename.split('.').collect();
                     extname.pop();
                     let extname = extname.pop().unwrap();
-                    return (filename.clone(), extname.to_string());
+                    return (filename.clone().into(), extname.to_string());
                 }
             }
         }

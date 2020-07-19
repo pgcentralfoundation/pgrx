@@ -30,22 +30,14 @@ FLAGS:
     -V, --version    Prints version information
 
 SUBCOMMANDS:
-cargo-pgx-pgx 
-
-USAGE:
-    cargo-pgx pgx [SUBCOMMAND]
-
-FLAGS:
-    -h, --help       Prints help information
-    -V, --version    Prints version information
-
-SUBCOMMANDS:
     get        get a property from the extension control file
     help       Prints this message or the help of the given subcommand(s)
     init       initize pgx development environment for the first time
     install    install the extension from the current crate to the Postgres specified by whatever "pg_config" is
                currently on your $PATH
     new        create a new extension crate
+    package    create an installation package directory (in ./target/[debug|release]/extname-pgXX-package/) for the
+               Postgres installation specified by whatever "pg_cofig" is currently on your $PATH
     run        compile/install extension to a pgx-managed Postgres instance and start psql
     schema     generate extension schema files (typically not necessary)
     start      start a pgx-managed Postgres instance
@@ -79,7 +71,7 @@ You'll also want to make sure you have the "postgresql-server-dev" package insta
 
 Once complete, `cargo pgx init` also creates a configuration file (`~/.pgx/config.toml`) that describes where to find each version's `pg_config` tool.
 
-```
+```shell script
 $ cargo pgx init --help
 cargo-pgx-pgx-init 
 initize pgx development environment for the first time
@@ -105,7 +97,7 @@ OPTIONS:
 
 It also initializes the crate directory as a `git` repository.
 
-```
+```shell script
 $ cargo pgx new --help
 cargo-pgx-pgx-new 
 create a new extension crate
@@ -151,8 +143,8 @@ When you exit `psql`, the Postgres instance `pgx` started stays running.
 
 For Postgres installations which are already on your computer, `cargo pgx run` will need write permissions to the directories described by `pg_config --pkglibdir` and `pg_config --sharedir`.  It's up to you to decide how to make that happen.  While a single Postgres installation can be started multiple times on different ports and different data directories, it does not support multiple "extension library directories".
 
-```
-cargo pgx run --help
+```shell script
+$ cargo pgx run --help
 cargo-pgx-pgx-run
 compile/install extension to a pgx-managed Postgres instance and start psql
 
@@ -181,8 +173,8 @@ The output is standard "cargo test" output along with some Postgres log output. 
 
 Normal Rust `#[test]` functions behave normally, while `#[pg_test]` functions are run **inside** the Postgres instance and have full access to all of Postgres internals.  All tests are run in parallel, regardless of their type.
 
-```
-cargo pgx test --help
+```shell script
+$ cargo pgx test --help
 cargo-pgx-pgx-test 
 run the test suite for this crate
 
