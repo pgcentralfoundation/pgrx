@@ -28,6 +28,8 @@
 #include "commands/trigger.h"
 #include "executor/executor.h"
 #include "executor/spi.h"
+#include "foreign/fdwapi.h"
+#include "foreign/foreign.h"
 #include "nodes/execnodes.h"
 #include "nodes/extensible.h"
 #include "nodes/makefuncs.h"
