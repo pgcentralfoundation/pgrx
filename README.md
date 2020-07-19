@@ -16,6 +16,7 @@ as possible.  Currently, `pgx` supports Postgres v10, v11, and v12.
 ## Key Features
 
  - A cargo sub-command (`pgx`) for creating, compiling/installing, and testing extensions
+ - Self manages each Postgres version installation for you (or you can bring your own)
  - Postgres `Datum`<-->Rust type conversion via `pgx::IntoDatum` and `pgx::FromDatum`
  - Safe handling of `NULL` Datums -- Datums are simply `Option<T>`
  - Translation of Rust `panic!()`s into Postgres `ERROR`s, which abort the current transaction instead of the Postgres cluster
@@ -37,6 +38,8 @@ as possible.  Currently, `pgx` supports Postgres v10, v11, and v12.
 
 ## Getting Started
 
+
+### Install `cargo pgx`
 First you'll want to install the `pgx` cargo sub-command from crates.io.  You'll use it almost exclusively during
 your development and testing workflow.
 
@@ -44,26 +47,39 @@ your development and testing workflow.
 $ cargo install cargo-pgx
 ```
 
-It has a number of sub-commands.  For example, to create a new extension project, simply run:
+### Initialize it
+
+Next, `pgx` needs to be initialized.  You only need to do this once.
+
+```shell script
+$ cargo pgx init
+```
+
+The `init` command downloads Postgres versions 10, 11, 12, and compiles them to `~/.pgx/`.  These installations
+are needed by `pgx` not only for auto-generating Rust bindings from each version's header files, but also for `pgx`'s 
+test framework.
+
+
+### Create a new extension
 
 ```shell script
 $ cargo pgx new my_extension
 ``` 
 
-Then `cd my_extension` and run:
+### Run your extension
 
 ```shell script
-$ cargo pgx install
+$ cd my_extension
+$ cargo pgx run pg12  # or pg10 or pg11
 ```
 
-The first time, this will take awhile.  Behind the scenes, `pgx` is downloading, configuring, compiling and installing
-(within `target/`) Postgres v10, v11, and v12.  All of this happens in the `target/` directory and the artifacts
-will remain until a `cargo clean`.  This is necessary in order to generate the proper Rust bindings for Postgres internals.
+`cargo pgx run` compiles the extension to a shard library, copies it to the specified Postgres installation (in `~/.pgx/`),
+starts that Postgres instance and connects you, via `psql` to a database named for the extension.
+ 
+The first time, compilation takes a few minutes as `pgx` needs to generate almost 200k lines of Rust "bindings" from
+Postgres' header files.
 
-Note that `cargo pgx install` will compile your extension and then install it to your locally installed Postgres instance
-as identified by `pg_config`, so make sure that `pg_config` is in your `$PATH`.
-
-From here, you can create a Postgres database and create your extension in it:
+Once compiled you'll be placed in a `psql` shell, for, in this case, Postgres 12.
 
 ```shell script
 $ createdb test

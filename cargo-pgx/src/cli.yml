@@ -3,7 +3,7 @@
 
 
 name: "Cargo Postgres extension manager"
-version: "0.1.0"
+version: "0.0.6"
 about: Creates and installs pgx based Postgres extensions
 subcommands:
   - pgx:
@@ -61,14 +61,14 @@ subcommands:
                     required: true
                     help: the name of the extension
           - install:
-              about: install the extension from the current crate
+              about: install the extension from the current crate to the Postgres specified by whatever "pg_config" is currently on your $PATH
               args:
                 - release:
                     short: r
                     long: release
                     help: compile for release mode (default is debug)
           - schema:
-              about: generate a schema
+              about: generate extension schema files (typically not necessary)
           - run:
               about: compile/install extension to a pgx-managed Postgres instance and start psql
               args:
@@ -87,7 +87,7 @@ subcommands:
                 - pg_version:
                     value_name: PG_VERSION
                     takes_value: true
-                    help: Do you want to test for Postgres 'pg10', 'pg11', pg12', or 'all'?
+                    help: Do you want to test for Postgres 'pg10', 'pg11', pg12', or 'all' (default)?
           - get:
               about: get a property from the extension control file
               args:
