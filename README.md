@@ -4,7 +4,7 @@
 [![Twitter Follow](https://img.shields.io/twitter/follow/zombodb.svg?style=flat)](https://twitter.com/zombodb)
 ---
 
-[![Logo](logo.png)](https://twitter.com/zombodb)
+![Logo](logo.png)
 
 # pgx
 
