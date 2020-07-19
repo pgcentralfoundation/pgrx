@@ -56,7 +56,7 @@
  - `bigint` --> `i64`
  - `bool` --> `bool`
  - `json`/`jsonb` --> `pgx::Json`/`pgx::Jsonb` newtypes over `serde_json::Value`
- - arrays --> `pgx::Array<T>`/`Vec<Option<T>` 
+ - arrays --> `pgx::Array<T>`/`Vec<Option<T>>` 
  - `date`/`time`/`timestamp` -> `pgx::Date/Time/Timestamp`
  - `time with time zone`/`timestamp with time zone` -> `pgx::Time/TimestampWithTimeZone`
  - `IntoDatum` and `FromDatum` traits for implementing more support
