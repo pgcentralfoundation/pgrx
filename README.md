@@ -15,8 +15,7 @@ as possible.  Currently, `pgx` supports Postgres v10, v11, and v12.
 
 ## Key Features
 
- - A cargo sub-command (`pgx`) for creating, compiling/installing, and testing extensions
- - Self manages each Postgres version installation for you (or you can bring your own)
+ - A cargo sub-command (`carg-pgx`) for managing the `pgx` development environment
  - Postgres `Datum`<-->Rust type conversion via `pgx::IntoDatum` and `pgx::FromDatum`
  - Safe handling of `NULL` Datums -- Datums are simply `Option<T>`
  - Translation of Rust `panic!()`s into Postgres `ERROR`s, which abort the current transaction instead of the Postgres cluster
