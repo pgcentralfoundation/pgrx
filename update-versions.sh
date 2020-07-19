@@ -12,11 +12,11 @@ set -x
 HEAD=$(git rev-parse HEAD)
 VERSION=$1
 
-cargo release --workspace --skip-publish --skip-push --skip-tag --no-dev-version ${VERSION}
-git reset --soft ${HEAD}
-git reset HEAD
-sed -i'' -e "s/^pgx = .*$/pgx = \"${VERSION}\"/" ./cargo-pgx/src/templates/cargo_toml
-sed -i'' -e "s/^pgx-macros = .*$/pgx-macros = \"${VERSION}\"/" ./cargo-pgx/src/templates/cargo_toml
-sed -i'' -e "s/^pgx-tests = .*$/pgx-tests = \"${VERSION}\"/" ./cargo-pgx/src/templates/cargo_toml
+cargo release --workspace --skip-publish --skip-push --skip-tag --no-dev-version ${VERSION} || exit 1
+git reset --soft ${HEAD} || exit 1 
+git reset HEAD || exit 1
+sed -i '' -e "s/^pgx = .*$/pgx = \"${VERSION}\"/" ./cargo-pgx/src/templates/cargo_toml || exit 1
+sed -i '' -e "s/^pgx-macros = .*$/pgx-macros = \"${VERSION}\"/" ./cargo-pgx/src/templates/cargo_toml || exit 1
+sed -i '' -e "s/^pgx-tests = .*$/pgx-tests = \"${VERSION}\"/" ./cargo-pgx/src/templates/cargo_toml || exit 1
 
 
