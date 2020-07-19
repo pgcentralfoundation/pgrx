@@ -170,6 +170,7 @@ procmaro, maybe `#[pg_bgworker_main]` to automate some of the boilerplate and ma
 but it doesn't automatically generate any of the DDL for them.  This too likely needs a procmaro like `#[pg_trigger]`
  - Automatic extension schema upgrade scripts, based on diffs from a previous git tag and HEAD.  Likely, this
 will be build into the `cargo-pgx` subcommand and make use of https://github.com/zombodb/postgres-parser.
+ - More examples -- especially around memory management and the various derive macros `#[derive(PostgresType/Enum)]`
 
 
 ## Contributing
