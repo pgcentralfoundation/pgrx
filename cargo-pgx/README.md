@@ -36,7 +36,7 @@ SUBCOMMANDS:
     install    install the extension from the current crate to the Postgres specified by whatever "pg_config" is
                currently on your $PATH
     new        create a new extension crate
-    package    create an installation package directory (in ./target/[debug|release]/extname-pgXX-package/) for the
+    package    create an installation package directory (in ./target/[debug|release]/extname-pgXX/) for the
                Postgres installation specified by whatever "pg_cofig" is currently on your $PATH
     run        compile/install extension to a pgx-managed Postgres instance and start psql
     schema     generate extension schema files (typically not necessary)
@@ -161,6 +161,32 @@ ARGS:
                     name as the current extension name
 ```
 
+## Installing Your Extension Locally
+
+![install](install.png)
+
+If for some reason `cargo pgx run <PG_VERSION>` isn't your style, you can use `cargo pgx install` to install your extension
+to the Postgres installation described by the `pg_config` tool currently on your `$PATH`.
+
+You'll need write permissions to the directories described by `pg_config --pkglibdir` and `pg_config --sharedir`.
+
+By default, `cargo pgx install` builds your extension in debug mode.  Specifying `--release` changes that. 
+
+```shell script
+$ cargo pgx install --help
+  cargo-pgx-pgx-install 
+  install the extension from the current crate to the Postgres specified by whatever "pg_config" is currently on your
+  $PATH
+  
+  USAGE:
+      cargo-pgx pgx install [FLAGS]
+  
+  FLAGS:
+      -h, --help       Prints help information
+      -r, --release    compile for release mode (default is debug)
+      -V, --version    Prints version information
+```
+
 ## Testing Your Extension
 
 ![test](test.png)
@@ -187,4 +213,38 @@ FLAGS:
 
 ARGS:
     <PG_VERSION>    Do you want to test for Postgres 'pg10', 'pg11', pg12', or 'all' (default)?
+```
+
+## Building an Installation Package
+
+![package](package.png)
+
+`cargo pgx package [--debug]` builds your extension, in `--release` mode, to a directory structure in 
+`./target/[debug | release]/extension_name-PGVER` using the Postgres installation path information from the `pg_config` 
+tool on your `$PATH`.
+
+The intent is that you'd then change into that directory and build a tarball or a .deb or .rpm package.
+
+The directory structure `cargo pgx package` creates starts at the root of the filesystem, as a package-manager installed
+version of Postgres is likely to split `pg_config --pkglibdir` and `pg_config --sharedir` into different base paths.
+
+(In the example screenshot above, `cargo pgx package` was used to build a directory structure using my manually installed
+version of Postgres 12.)
+
+This command could be useful from Dockerfiles, for example, to automate building installation packages for various Linux
+distobutions or MacOS Postgres installations.
+
+```shell script
+$ cargo pgx package --help
+ cargo-pgx-pgx-package 
+ create an installation package directory (in ./target/[debug|release]/extname-pgXX/) for the Postgres installation
+ specified by whatever "pg_cofig" is currently on your $PATH
+ 
+ USAGE:
+     cargo-pgx pgx package [FLAGS]
+ 
+ FLAGS:
+     -d, --debug      compile for debug mode (default is release)
+     -h, --help       Prints help information
+     -V, --version    Prints version information
 ```
