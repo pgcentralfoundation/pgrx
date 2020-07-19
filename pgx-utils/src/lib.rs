@@ -125,19 +125,24 @@ pub fn get_pglog_file(major_version: u16) -> PathBuf {
 }
 
 pub fn get_pgx_home() -> PathBuf {
-    let mut dir = match dirs::home_dir() {
-        Some(dir) => dir,
-        None => exit_with_error!("You don't seem to have a home directory"),
-    };
-    dir.push(".pgx");
-    if !dir.exists() {
-        handle_result!(
-            format!("creating {}", dir.display()),
-            std::fs::create_dir_all(&dir)
-        );
-    }
+    std::env::var("PGX_HOME").map_or_else(
+        |_| {
+            let mut dir = match dirs::home_dir() {
+                Some(dir) => dir,
+                None => exit_with_error!("You don't seem to have a home directory"),
+            };
+            dir.push(".pgx");
+            if !dir.exists() {
+                handle_result!(
+                    format!("creating {}", dir.display()),
+                    std::fs::create_dir_all(&dir)
+                );
+            }
 
-    dir
+            dir
+        },
+        |v| v.into(),
+    )
 }
 
 pub fn get_pgx_config_path() -> PathBuf {
