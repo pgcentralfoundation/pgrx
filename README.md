@@ -73,7 +73,7 @@ $ cd my_extension
 $ cargo pgx run pg12  # or pg10 or pg11
 ```
 
-`cargo pgx run` compiles the extension to a shard library, copies it to the specified Postgres installation (in `~/.pgx/`),
+`cargo pgx run` compiles the extension to a shared library, copies it to the specified Postgres installation (in `~/.pgx/`),
 starts that Postgres instance and connects you, via `psql` to a database named for the extension.
  
 The first time, compilation takes a few minutes as `pgx` needs to generate almost 200k lines of Rust "bindings" from
