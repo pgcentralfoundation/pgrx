@@ -48,8 +48,8 @@ SUBCOMMANDS:
 
 ## Environment Variables
 
-`PGX_HOME` - If set, overrides `pgx`'s default directory of `~/.pgx/`
-`PGX_BUILD_FLAGS` - If set during `cargo pgx run/test/install`, these additional flags are passed to `cargo build` while building the extension
+ - `PGX_HOME` - If set, overrides `pgx`'s default directory of `~/.pgx/`
+ - `PGX_BUILD_FLAGS` - If set during `cargo pgx run/test/install`, these additional flags are passed to `cargo build` while building the extension
 
 ## First Time Initialization
 
