@@ -3,7 +3,7 @@
 
 
 name: "Cargo Postgres extension manager"
-version: "0.0.6"
+version: "0.0.7"
 about: Creates and installs pgx based Postgres extensions
 subcommands:
   - pgx:
