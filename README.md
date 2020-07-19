@@ -35,7 +35,7 @@
     - Functions
     - Types
     - Enums
- - Hand-written SQL is supposed through the `extension_sql!` macro or through on-disk `.sql` files
+ - Hand-written SQL is supported through the `extension_sql!` macro or through on-disk `.sql` files
  - Control the order in which SQL is executed during `CREATE EXTENSION ...;`
  
 #### Safety First
@@ -85,7 +85,7 @@
 
  - `cargo install rustfmt`
  - `git`
- - A C-compiler toolchain capable of building Postgresql, plus
+ - A C-compiler toolchain capable of building PostgreSQL, plus
     - `libreadline-dev` package (might be different for your OS)
     - `zlib1g-dev` package (might be different for your OS)
     
@@ -154,7 +154,7 @@ There's probably more than are listed here, but a primary things of note are:
 
  - `async` interactions are unknown right now.
 
- - `pgx` uses lots of `unsafe` Rust.  That's generally the nature of the beast when doing FFI wrappers, but be aware.
+ - `pgx` uses lots of `unsafe` Rust.  That's generally the nature of the beast when doing FFI wrappers, so be aware.
 
  - Not all of Postgres' internals are included or even wrapped.  This isn't due to it not being possible, it's simply due to it being an incredibly large task.  If you identify internal Postgres APIs you need, open an issue and we'll get them exposed, at least through the `pgx::pg_sys` module.
 
