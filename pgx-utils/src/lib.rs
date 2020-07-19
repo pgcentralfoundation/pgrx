@@ -211,7 +211,7 @@ pub fn createdb(
         return false;
     }
 
-    println!("{} {}", "    Creating database".bold().green(), dbname);
+    println!("{} database {}", "    Creating".bold().green(), dbname);
     let mut command = Command::new(get_createdb_path(major_version));
     command
         .arg("-h")
