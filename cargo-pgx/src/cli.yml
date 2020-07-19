@@ -2,7 +2,7 @@
 # governed by the MIT license that can be found in the LICENSE file.
 
 
-name: "Cargo Postgres extension manager"
+name: "pgx's development environment tool"
 version: "0.0.7"
 about: Creates and installs pgx based Postgres extensions
 subcommands:
