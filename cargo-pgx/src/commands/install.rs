@@ -17,11 +17,10 @@ pub(crate) fn install_extension(
     is_release: bool,
     base_directory: Option<PathBuf>,
 ) {
+    let base_directory = base_directory.unwrap_or("/".into());
     let (control_file, extname) = find_control_file();
     let major_version = get_pg_config_major_version(pg_config);
 
-    let base_directory = base_directory.unwrap_or("/".into());
-    eprintln!("base_directory={}", base_directory.display());
     build_extension(major_version, is_release);
 
     println!();
@@ -68,7 +67,7 @@ fn copy_file(src: PathBuf, dest: PathBuf, msg: &str) {
         "{} {} to `{}`",
         "     Copying".bold().green(),
         msg,
-        dest.display()
+        format_display_path(&dest)
     );
 
     handle_result!(
@@ -123,11 +122,12 @@ fn copy_sql_files(extdir: &PathBuf, extname: &str, base_directory: &PathBuf) {
     let mut target_filename = base_directory.clone();
     target_filename.push(extdir);
     target_filename.push(format!("{}--{}.sql", extname, get_version()));
+
     let mut sql = std::fs::File::create(&target_filename).unwrap();
     println!(
         "{} extension schema to `{}`",
         "     Writing".bold().green(),
-        target_filename.display()
+        format_display_path(&target_filename)
     );
 
     // write each sql file from load-order.txt to the version.sql file
@@ -194,13 +194,13 @@ fn find_library_file(extname: &str, is_release: bool) -> PathBuf {
         }
     }
 
-    exit_with_error!("couldn't find library file in: {}", target_dir.display())
+    exit_with_error!("library file not found in: `{}`", target_dir.display())
 }
 
 fn get_version() -> String {
     match get_property("default_version") {
         Some(v) => v,
-        None => exit_with_error!("couldn't determine version number"),
+        None => exit_with_error!("cannot determine extension version number.  Is the `default_version` property declared in the control file?"),
     }
 }
 
@@ -226,4 +226,11 @@ fn make_relative(path: PathBuf) -> PathBuf {
         relative.push(part)
     }
     relative
+}
+
+fn format_display_path(path: &PathBuf) -> String {
+    path.strip_prefix(get_target_dir().parent().unwrap())
+        .unwrap_or(&path)
+        .display()
+        .to_string()
 }

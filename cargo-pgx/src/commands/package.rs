@@ -30,6 +30,6 @@ fn build_base_path(pg_config: &Option<String>, is_debug: bool) -> PathBuf {
     let pgver = get_pg_config_major_version(pg_config);
     let extname = get_property("extname").expect("could not determine extension name");
     target_dir.push(if is_debug { "debug" } else { "release" });
-    target_dir.push(format!("{}-pg{}-package", extname, pgver));
+    target_dir.push(format!("{}-pg{}", extname, pgver));
     target_dir
 }

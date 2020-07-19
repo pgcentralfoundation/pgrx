@@ -54,5 +54,5 @@ pub(crate) fn find_control_file() -> (PathBuf, String) {
         }
     }
 
-    exit_with_error!("couldn't find control file")
+    exit_with_error!("control file not found in current directory")
 }
