@@ -221,6 +221,8 @@ pub fn postgres_type(input: TokenStream) -> TokenStream {
 
 fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
     let name = &ast.ident;
+    let generics = &ast.generics;
+    let has_lifetimes = generics.lifetimes().next();
     let name_string = format!("{}", name);
     let funcname_in = Ident::new(&format!("{}_in", name).to_lowercase(), name.span());
     let funcname_out = Ident::new(&format!("{}_out", name).to_lowercase(), name.span());
@@ -238,32 +240,51 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
         args.insert(PostgresTypeAttribute::Default);
     }
 
+    let (from_varlena, to_varlena, lifetime) = match has_lifetimes {
+        Some(lifetime) => (
+            quote! {from_varlena_borrowed},
+            quote! {to_varlena_borrowed},
+            lifetime.to_token_stream(),
+        ),
+        None => (
+            quote! {from_varlena_owned},
+            quote! {to_varlena_owned},
+            quote! {'static},
+        ),
+    };
+
     if args.contains(&PostgresTypeAttribute::Default) {
+        let inout_generics = if has_lifetimes.is_some() {
+            generics.to_token_stream()
+        } else {
+            quote! {<'_>}
+        };
+
         stream.extend(quote! {
-            impl InOutFuncs for #name {}
+            impl #generics InOutFuncs #inout_generics for #name #generics {}
         });
     }
 
     stream.extend(quote! {
 
-        impl pgx::FromDatum for #name {
+        impl #generics pgx::FromDatum for #name #generics {
             #[inline]
-            unsafe fn from_datum(datum: pgx::pg_sys::Datum, is_null: bool, typoid: pgx::pg_sys::Oid) -> Option<#name> {
+            unsafe fn from_datum(datum: pgx::pg_sys::Datum, is_null: bool, typoid: pgx::pg_sys::Oid) -> Option<#name #generics> {
                 if is_null {
                     None
                 } else if datum == 0 {
                     panic!("{} datum flagged non-null but its datum is zero", stringify!(#name));
                 } else {
-                    Some(pgx::from_varlena(datum as *const pgx::pg_sys::varlena)
+                    Some(pgx::#from_varlena(datum as *const pgx::pg_sys::varlena)
                         .expect(&format!("failed to deserialize a {}", stringify!(#name))))
                 }
             }
         }
 
-        impl pgx::IntoDatum for #name {
+        impl #generics pgx::IntoDatum for #name #generics {
             #[inline]
             fn into_datum(self) -> Option<pgx::pg_sys::Datum> {
-                Some(pgx::to_varlena(&self).expect(&format!("failed to serialize a {}", stringify!(#name))) as pgx::pg_sys::Datum)
+                Some(pgx::#to_varlena(&self).expect(&format!("failed to serialize a {}", stringify!(#name))) as pgx::pg_sys::Datum)
             }
 
             fn type_oid() -> pg_sys::Oid {
@@ -275,12 +296,12 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
         }
 
         #[pg_extern(immutable)]
-        pub fn #funcname_in(input: &std::ffi::CStr) -> #name {
+        pub fn #funcname_in #generics(input: &#lifetime std::ffi::CStr) -> #name #generics {
             #name::input(input.to_str().unwrap()).expect(&format!("failed to convert input to a {}", stringify!(#name)))
         }
 
         #[pg_extern(immutable)]
-        pub fn #funcname_out(input: #name) -> &'static std::ffi::CStr {
+        pub fn #funcname_out #generics(input: #name #generics) -> &#lifetime std::ffi::CStr {
             let mut buffer = StringInfo::new();
             input.output(&mut buffer);
             buffer.into()

@@ -878,6 +878,10 @@ fn translate_type_string(
             }
 
             unknown = unknown.trim_start_matches("pg_sys :: ");
+            let unknown = match unknown.find('<') {
+                Some(idx) => unknown[0..idx].trim(),
+                None => unknown,
+            };
             Some((unknown.to_string(), false, default_value, variadic))
         }
     }

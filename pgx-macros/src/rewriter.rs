@@ -1,7 +1,6 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-
 extern crate proc_macro;
 
 use pgx_utils::{categorize_return_type, CategorizedType};
@@ -10,10 +9,12 @@ use quote::{quote, quote_spanned};
 use std::ops::Deref;
 use std::str::FromStr;
 use syn::export::{Span, TokenStream2};
+use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
 use syn::{
-    FnArg, ForeignItem, ForeignItemFn, ItemFn, ItemForeignMod, Pat, ReturnType, Signature, Type,
-    Visibility,
+    AngleBracketedGenericArguments, FnArg, ForeignItem, ForeignItemFn, GenericArgument, ItemFn,
+    ItemForeignMod, Pat, Path, PathArguments, PathSegment, ReturnType, Signature, Type, TypePath,
+    TypeReference, Visibility,
 };
 
 pub struct PgGuardRewriter();
@@ -633,6 +634,64 @@ impl FunctionSignatureRewriter {
                                 let #name = pgx::pg_getarg_datum_raw(fcinfo, #i) as #type_;
                             }
                         } else {
+                            let type_ = match type_.deref() {
+                                // remove lifetime and mutability specifiers
+                                Type::Reference(r) => Box::new(Type::Reference(TypeReference {
+                                    and_token: r.and_token,
+                                    lifetime: None,
+                                    mutability: None,
+                                    elem: r.elem.clone(),
+                                })),
+
+                                Type::Path(p) => {
+                                    let mut punctuated = Punctuated::new();
+
+                                    for segment in &p.path.segments {
+                                        let arguments = match &segment.arguments {
+                                            PathArguments::AngleBracketed(ab) => {
+                                                let mut new_args = Punctuated::new();
+
+                                                for punc in ab.args.iter().cloned() {
+                                                    match punc {
+                                                        GenericArgument::Lifetime(_) => {}
+
+                                                        other => new_args.push(other),
+                                                    }
+                                                }
+
+                                                PathArguments::AngleBracketed(
+                                                    AngleBracketedGenericArguments {
+                                                        colon2_token: None,
+                                                        lt_token: syn::token::Lt(p.span()),
+                                                        args: new_args,
+                                                        gt_token: syn::token::Gt(p.span()),
+                                                    },
+                                                )
+                                            }
+                                            _ => segment.arguments.clone(),
+                                        };
+
+                                        let new_segment = PathSegment {
+                                            ident: segment.ident.clone(),
+                                            arguments,
+                                        };
+
+                                        punctuated.push(new_segment);
+                                    }
+
+                                    Box::new(Type::Path(TypePath {
+                                        qself: p.qself.clone(),
+                                        path: Path {
+                                            leading_colon: None,
+                                            segments: punctuated,
+                                        },
+                                    }))
+                                }
+
+                                // use the type as-is
+                                _ => type_.clone(),
+                            };
+
                             quote_spanned! {ident.span()=>
                                 let #name = pgx::pg_getarg::<#type_>(fcinfo, #i).unwrap_or_else(|| panic!("{} is null", stringify!{#ident}));
                             }
