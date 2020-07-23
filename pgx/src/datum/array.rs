@@ -1,7 +1,6 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-
 use crate::{pg_sys, void_mut_ptr, FromDatum, IntoDatum, PgMemoryContexts};
 use serde::Serializer;
 use std::marker::PhantomData;
@@ -279,8 +278,8 @@ impl<'a, T: FromDatum> FromDatum for Array<'a, T> {
             panic!("array was flagged not null but datum is zero");
         } else {
             let ptr = datum as *mut pg_sys::varlena;
-            let array =
-                pg_sys::pg_detoast_datum(datum as *mut pg_sys::varlena) as *mut pg_sys::ArrayType;
+            let array = pg_sys::pg_detoast_datum_packed(datum as *mut pg_sys::varlena)
+                as *mut pg_sys::ArrayType;
             let array_ref = array.as_ref().expect("ArrayType * was NULL");
 
             // outvals for get_typlenbyvalalign()

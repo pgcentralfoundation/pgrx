@@ -178,7 +178,7 @@ impl<'a> FromDatum for &'a str {
         } else if datum == 0 {
             panic!("a varlena Datum was flagged as non-null but the datum is zero");
         } else {
-            let varlena = pg_sys::pg_detoast_datum(datum as *mut pg_sys::varlena);
+            let varlena = pg_sys::pg_detoast_datum_packed(datum as *mut pg_sys::varlena);
             Some(text_to_rust_str_unchecked(varlena))
         }
     }
@@ -197,17 +197,15 @@ impl<'a> FromDatum for &'a str {
         } else if datum == 0 {
             panic!("a varlena Datum was flagged as non-null but the datum is zero");
         } else {
-            let varlena = pg_sys::pg_detoast_datum(datum as *mut pg_sys::varlena);
             memory_context.switch_to(|_| {
                 // this gets the varlena Datum copied into this memory context
-                let cstr = pg_sys::text_to_cstring(varlena as *mut pg_sys::text);
+                let detoasted = pg_sys::pg_detoast_datum_copy(datum as *mut pg_sys::varlena);
+
+                // and we need to unpack it (if necessary), which will decompress it too
+                let varlena = pg_sys::pg_detoast_datum_packed(detoasted);
 
                 // and now we return it as a &str
-                let cstr = std::ffi::CStr::from_ptr(cstr);
-                Some(
-                    cstr.to_str()
-                        .expect("failed to convert varlena datum into &str"),
-                )
+                Some(text_to_rust_str_unchecked(varlena))
             })
         }
     }
@@ -225,7 +223,7 @@ impl FromDatum for String {
             panic!("a varlena Datum was flagged as non-null but the datum is zero");
         } else {
             let varlena = datum as *mut pg_sys::varlena;
-            let detoasted = pg_sys::pg_detoast_datum(varlena);
+            let detoasted = pg_sys::pg_detoast_datum_packed(varlena);
             let len = varsize_any_exhdr(detoasted);
             let data = vardata_any(detoasted);
 

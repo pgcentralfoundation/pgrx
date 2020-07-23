@@ -279,10 +279,9 @@ pub unsafe fn varlena_size(t: *const pg_sys::varlena) -> usize {
 /// Note also that this function is zero-copy and the underlying Rust &str is backed by Postgres-allocated
 /// memory.  As such, the return value will become invalid the moment Postgres frees the varlena
 #[inline]
-pub unsafe fn text_to_rust_str_unchecked<'a>(t: *const pg_sys::varlena) -> &'a str {
-    let unpacked = pg_sys::pg_detoast_datum_packed(t as *mut pg_sys::varlena);
-    let len = varsize_any_exhdr(unpacked);
-    let data = vardata_any(unpacked);
+pub unsafe fn text_to_rust_str_unchecked<'a>(varlena: *const pg_sys::varlena) -> &'a str {
+    let len = varsize_any_exhdr(varlena);
+    let data = vardata_any(varlena);
 
     std::str::from_utf8_unchecked(std::slice::from_raw_parts(data as *mut u8, len))
 }

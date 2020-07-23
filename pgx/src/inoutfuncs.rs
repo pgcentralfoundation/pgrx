@@ -29,9 +29,9 @@ pub trait InOutFuncs<'de>: serde::de::Deserialize<'de> + serde::ser::Serialize {
 pub unsafe fn from_varlena_owned<T: serde::de::DeserializeOwned>(
     varlena: *const pg_sys::varlena,
 ) -> serde_cbor::Result<T> {
-    let varlena = pg_sys::pg_detoast_datum(varlena as *mut pg_sys::varlena);
-    let size = varsize_any(varlena);
-    let slice = std::slice::from_raw_parts(varlena as *const u8, size);
+    let varlena = pg_sys::pg_detoast_datum_packed(varlena as *mut pg_sys::varlena);
+    let len = varsize_any_exhdr(varlena);
+    let slice = std::slice::from_raw_parts(varlena as *const u8, len);
     let (_, mut data) = slice.split_at(pg_sys::VARHDRSZ);
     serde_cbor::from_reader(&mut data)
 }
@@ -40,9 +40,9 @@ pub unsafe fn from_varlena_owned<T: serde::de::DeserializeOwned>(
 pub unsafe fn from_varlena_borrowed<'de, T: serde::de::Deserialize<'de>>(
     varlena: *const pg_sys::varlena,
 ) -> serde_json::Result<T> {
-    let varlena = pg_sys::pg_detoast_datum(varlena as *mut pg_sys::varlena);
-    let size = varsize_any(varlena);
-    let slice = std::slice::from_raw_parts(varlena as *const u8, size);
+    let varlena = pg_sys::pg_detoast_datum_packed(varlena as *mut pg_sys::varlena);
+    let len = varsize_any(varlena);
+    let slice = std::slice::from_raw_parts(varlena as *const u8, len);
     let (_, data) = slice.split_at(pg_sys::VARHDRSZ);
     serde_json::from_slice(data)
 }

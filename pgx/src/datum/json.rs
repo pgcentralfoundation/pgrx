@@ -1,7 +1,6 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-
 use crate::{
     direct_function_call, direct_function_call_as_datum, pg_sys, vardata_any, varsize_any_exhdr,
     void_mut_ptr, DetoastedVarlenA, FromDatum, IntoDatum,
@@ -77,7 +76,7 @@ impl FromDatum for JsonString {
             panic!("a varlena Datum was flagged as non-null but the datum is zero");
         } else {
             let varlena = datum as *mut pg_sys::varlena;
-            let detoasted = pg_sys::pg_detoast_datum(varlena);
+            let detoasted = pg_sys::pg_detoast_datum_packed(varlena);
             let len = varsize_any_exhdr(detoasted);
             let data = vardata_any(detoasted);
 

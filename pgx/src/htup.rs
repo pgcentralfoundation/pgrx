@@ -1,7 +1,6 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-
 //! Utility functions for working with `pg_sys::HeapTuple` and `pg_sys::HeapTupleHeader` structs
 use crate::*;
 
@@ -13,8 +12,8 @@ use crate::*;
 /// This function is safe, but if the provided `HeapTupleHeader` is null, it will `panic!()`
 #[inline]
 pub fn composite_row_type_make_tuple(row: pg_sys::Datum) -> PgBox<pg_sys::HeapTupleData> {
-    let htup_header =
-        unsafe { pg_sys::pg_detoast_datum(row as *mut pg_sys::varlena) } as pg_sys::HeapTupleHeader;
+    let htup_header = unsafe { pg_sys::pg_detoast_datum_packed(row as *mut pg_sys::varlena) }
+        as pg_sys::HeapTupleHeader;
     let mut tuple = PgBox::<pg_sys::HeapTupleData>::alloc0();
 
     tuple.t_len = heap_tuple_header_get_datum_length(htup_header) as u32;
