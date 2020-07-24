@@ -659,8 +659,13 @@ fn translate_type_string(
         "PgRelation" => Some(("regclass".to_string(), false, default_value, variadic)),
         "Numeric" => Some(("numeric".to_string(), false, default_value, variadic)),
         "Inet" => Some(("inet".to_string(), false, default_value, variadic)),
+        "Json" => Some(("json".to_string(), false, default_value, variadic)),
+        "Jsonb" => Some(("jsonb".to_string(), false, default_value, variadic)),
         "& str" | "& 'static str" | "&'static str" | "String" | "& 'static String" | "& String" => {
             Some(("text".to_string(), false, default_value, variadic))
+        }
+        "& [ u8 ]" | "& 'static [ u8 ]" | "&'static [ u8 ]" | "Vec < u8 >" => {
+            Some(("bytea".to_string(), false, default_value, variadic))
         }
         "& std :: ffi :: CStr" => Some(("cstring".to_string(), false, default_value, variadic)),
         "AnyElement" => Some(("anyelement".to_string(), false, default_value, variadic)),

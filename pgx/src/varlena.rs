@@ -286,16 +286,42 @@ pub unsafe fn text_to_rust_str_unchecked<'a>(varlena: *const pg_sys::varlena) ->
     std::str::from_utf8_unchecked(std::slice::from_raw_parts(data as *mut u8, len))
 }
 
+/// Convert a Postgres `varlena *` (or `byte *`) into a Rust `&[u8]`.
+///
+/// ## Safety
+///
+/// This function is unsafe because it blindly assumes the provided varlena pointer is non-null.
+///
+/// Note also that this function is zero-copy and the underlying Rust `&[u8]` slice is backed by Postgres-allocated
+/// memory.  As such, the return value will become invalid the moment Postgres frees the varlena
+#[inline]
+pub unsafe fn varlena_to_byte_slice<'a>(varlena: *const pg_sys::varlena) -> &'a [u8] {
+    let len = varsize_any_exhdr(varlena);
+    let data = vardata_any(varlena);
+
+    std::slice::from_raw_parts(data as *const u8, len)
+}
+
 /// Convert a Rust `&str` into a Postgres `text *`.
 ///
 /// This allocates the returned Postgres `text *` in `CurrentMemoryContext`.
 #[inline]
 pub fn rust_str_to_text_p(s: &str) -> PgBox<pg_sys::varlena> {
-    let len = s.len();
-    let ptr = s.as_ptr();
+    let bytea = rust_byte_slice_to_bytea(s.as_bytes());
 
-    let textp =
-        unsafe { pg_sys::cstring_to_text_with_len(ptr as *const std::os::raw::c_char, len as i32) };
+    // a pg_sys::bytea is a type alias for pg_sys::varlena so this cast is fine
+    PgBox::from_pg(bytea.as_ptr() as *mut pg_sys::varlena)
+}
 
-    PgBox::from_pg(textp)
+/// Convert a Rust `&[u8]]` into a Postgres `bytea *` (which is really a varchar)
+///
+/// This allocates the returned Postgres `bytea *` in `CurrentMemoryContext`.
+#[inline]
+pub fn rust_byte_slice_to_bytea(slice: &[u8]) -> PgBox<pg_sys::bytea> {
+    let len = slice.len();
+    let ptr = slice.as_ptr();
+
+    PgBox::from_pg(unsafe {
+        pg_sys::cstring_to_text_with_len(ptr as *const std::os::raw::c_char, len as i32)
+    })
 }
