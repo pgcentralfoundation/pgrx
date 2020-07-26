@@ -1,7 +1,6 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-
 use pgx::*;
 
 #[pg_extern]
@@ -65,6 +64,16 @@ fn returns_some() -> Option<i32> {
 #[pg_extern]
 fn returns_none() -> Option<i32> {
     None
+}
+
+#[pg_extern]
+fn takes_void(_void: ()) {
+    // noop
+}
+
+#[pg_extern]
+fn returns_void() -> () {
+    // noop
 }
 
 #[pg_extern]
@@ -189,6 +198,18 @@ mod tests {
     unsafe fn test_returns_none() {
         let result = direct_function_call::<i32>(super::returns_none_wrapper, vec![]);
         assert!(result.is_none())
+    }
+
+    #[pg_test]
+    fn test_takes_void() {
+        let result = Spi::get_one::<()>("SELECT takes_void(NULL::void);");
+        assert_eq!(result, None)
+    }
+
+    #[pg_test]
+    fn test_returns_void() {
+        let result = Spi::get_one::<()>("SELECT returns_void();");
+        assert_eq!(result, None)
     }
 
     /// ensures that we can have a `#[pg_extern]` function with an argument that
