@@ -39,6 +39,16 @@ fn takes_f64(i: f64) -> f64 {
 }
 
 #[pg_extern]
+fn takes_i8(i: i8) -> i8 {
+    i
+}
+
+#[pg_extern]
+fn takes_char(i: char) -> char {
+    i
+}
+
+#[pg_extern]
 fn takes_option(i: Option<i32>) -> i32 {
     match i {
         Some(i) => i,
@@ -151,6 +161,18 @@ mod tests {
             direct_function_call::<f64>(super::takes_f64_wrapper, vec![input.into_datum()]);
         let result = result.expect("result is NULL");
         assert!(result.eq(&input));
+    }
+
+    #[pg_test]
+    unsafe fn test_takes_i8() {
+        let result = Spi::get_one::<i8>("SELECT takes_i8('a');").expect("SPI result was NULL");
+        assert_eq!(result, 'a' as i8);
+    }
+
+    #[pg_test]
+    unsafe fn test_takes_char() {
+        let result = Spi::get_one::<char>("SELECT takes_char('🚨');").expect("SPI result was NULL");
+        assert_eq!(result, '🚨');
     }
 
     #[pg_test]

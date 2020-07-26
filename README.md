@@ -56,7 +56,8 @@ Postgres Type | Rust Type (as `Option<T>`)
 --------------|-----------
 `bytea` | `Vec<u8>` or `&[u8]` (zero-copy)
 `text` | `String` or `&str` (zero-copy)
-`varchar` | `String` or `&str` (zero-copy)
+`varchar` | `String` or `&str` (zero-copy) or `char`
+`"char"` | `i8`
 `smallint` | `i16`
 `integer` | `i32`
 `bigint` | `i64`
@@ -79,6 +80,7 @@ Postgres Type | Rust Type (as `Option<T>`)
 `cstring` | `&std::ffi::CStr`
 `inet` | `pgx::Inet(String)` -- TODO: needs better support
 `numeric` | `pgx::Numeric(String)` -- TODO: needs better support
+`void` | `()`
 `ARRAY[]::<type>` | `Vec<Option<T>>` or `pgx::Array<T>` (zero-copy)
 `NULL` | `Option::None`
 `internal` | `pgx::PgBox<T>` where `T` is any Rust/Postgres struct
