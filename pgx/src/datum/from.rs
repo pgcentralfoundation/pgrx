@@ -249,7 +249,7 @@ impl<'a> FromDatum for &'a [u8] {
         if is_null {
             None
         } else if datum == 0 {
-            panic!("a bytea Datum as flagged as non-null but the datum is zero");
+            panic!("a bytea Datum was flagged as non-null but the datum is zero");
         } else {
             let varlena = pg_sys::pg_detoast_datum_packed(datum as *mut pg_sys::varlena);
             Some(varlena_to_byte_slice(varlena))
@@ -277,7 +277,7 @@ impl<'a> FromDatum for &'a [u8] {
                 // and we need to unpack it (if necessary), which will decompress it too
                 let varlena = pg_sys::pg_detoast_datum_packed(detoasted);
 
-                // and now we return it as a &str
+                // and now we return it as a &[u8]
                 Some(varlena_to_byte_slice(varlena))
             })
         }
