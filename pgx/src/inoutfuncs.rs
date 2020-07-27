@@ -30,21 +30,21 @@ pub unsafe fn from_varlena_owned<T: serde::de::DeserializeOwned>(
     varlena: *const pg_sys::varlena,
 ) -> serde_cbor::Result<T> {
     let varlena = pg_sys::pg_detoast_datum_packed(varlena as *mut pg_sys::varlena);
-    let len = varsize_any(varlena);
-    let slice = std::slice::from_raw_parts(varlena as *const u8, len);
-    let (_, mut data) = slice.split_at(pg_sys::VARHDRSZ);
-    serde_cbor::from_reader(&mut data)
+    let len = varsize_any_exhdr(varlena);
+    let data = vardata_any(varlena);
+    let slice = std::slice::from_raw_parts(data as *const u8, len);
+    serde_cbor::from_slice(slice)
 }
 
 /// Decode a borrowed Postgres varlena pointer from JSON into a Rust type instance
 pub unsafe fn from_varlena_borrowed<'de, T: serde::de::Deserialize<'de>>(
     varlena: *const pg_sys::varlena,
 ) -> serde_json::Result<T> {
-    let varlena = pg_sys::pg_detoast_datum(varlena as *mut pg_sys::varlena);
-    let size = varsize_any(varlena);
-    let slice = std::slice::from_raw_parts(varlena as *const u8, size);
-    let (_, data) = slice.split_at(pg_sys::VARHDRSZ);
-    serde_json::from_slice(data)
+    let varlena = pg_sys::pg_detoast_datum_packed(varlena as *mut pg_sys::varlena);
+    let len = varsize_any_exhdr(varlena);
+    let data = vardata_any(varlena);
+    let slice = std::slice::from_raw_parts(data as *const u8, len);
+    serde_json::from_slice(slice)
 }
 
 /// Encode a Rust type containing only owned values that is `serde::Serialize` into a Postgres
