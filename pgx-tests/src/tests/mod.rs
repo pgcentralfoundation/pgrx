@@ -1,11 +1,11 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-
 mod anyarray_tests;
 mod array_tests;
 mod datetime_tests;
 mod default_arg_value_tests;
+mod derive_pgtype_lifetimes;
 mod enum_type_tests;
 mod fcinfo_tests;
 mod guc_tests;

@@ -9,12 +9,10 @@ use quote::{quote, quote_spanned};
 use std::ops::Deref;
 use std::str::FromStr;
 use syn::export::{Span, TokenStream2};
-use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
 use syn::{
-    AngleBracketedGenericArguments, FnArg, ForeignItem, ForeignItemFn, GenericArgument, ItemFn,
-    ItemForeignMod, Pat, Path, PathArguments, PathSegment, ReturnType, Signature, Type, TypePath,
-    TypeReference, Visibility,
+    FnArg, ForeignItem, ForeignItemFn, Generics, ItemFn, ItemForeignMod, Pat, ReturnType,
+    Signature, Type, Visibility,
 };
 
 pub struct PgGuardRewriter();
@@ -67,6 +65,7 @@ impl PgGuardRewriter {
         let func_span = func.span();
         let rewritten_args = self.rewrite_args(func.clone(), is_raw);
         let rewritten_return_type = self.rewrite_return_type(func.clone());
+        let generics = &func.sig.generics;
         let func_name_wrapper = Ident::new(
             &format!("{}_wrapper", &func.sig.ident.to_string()),
             func_span,
@@ -112,6 +111,7 @@ impl PgGuardRewriter {
                 prolog,
                 vis,
                 func_name_wrapper,
+                generics,
                 func_call,
                 rewritten_return_type,
             ),
@@ -123,6 +123,7 @@ impl PgGuardRewriter {
                     prolog,
                     vis,
                     func_name_wrapper,
+                    generics,
                     func_call,
                     false,
                 )
@@ -135,6 +136,7 @@ impl PgGuardRewriter {
                     prolog,
                     vis,
                     func_name_wrapper,
+                    generics,
                     func_call,
                     true,
                 )
@@ -146,6 +148,7 @@ impl PgGuardRewriter {
                 prolog,
                 vis,
                 func_name_wrapper,
+                generics,
                 func_call,
                 false,
             ),
@@ -156,6 +159,7 @@ impl PgGuardRewriter {
                 prolog,
                 vis,
                 func_name_wrapper,
+                generics,
                 func_call,
                 true,
             ),
@@ -167,6 +171,7 @@ impl PgGuardRewriter {
         prolog: proc_macro2::TokenStream,
         vis: Visibility,
         func_name_wrapper: Ident,
+        generics: &Generics,
         func_call: proc_macro2::TokenStream,
         rewritten_return_type: proc_macro2::TokenStream,
     ) -> proc_macro2::TokenStream {
@@ -177,7 +182,7 @@ impl PgGuardRewriter {
             #[allow(clippy::missing_safety_doc)]
             #[allow(clippy::redundant_closure)]
             #[pg_guard]
-            #vis unsafe fn #func_name_wrapper(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+            #vis unsafe fn #func_name_wrapper #generics(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
 
                 #func_call
 
@@ -192,6 +197,7 @@ impl PgGuardRewriter {
         prolog: proc_macro2::TokenStream,
         vis: Visibility,
         func_name_wrapper: Ident,
+        generics: &Generics,
         func_call: proc_macro2::TokenStream,
         optional: bool,
     ) -> proc_macro2::TokenStream {
@@ -216,7 +222,7 @@ impl PgGuardRewriter {
         quote_spanned! {func_span=>
             #prolog
             #[pg_guard]
-            #vis fn #func_name_wrapper(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+            #vis fn #func_name_wrapper #generics(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
 
                 struct IteratorHolder<T> {
                     iter: *mut dyn Iterator<Item=T>,
@@ -271,6 +277,7 @@ impl PgGuardRewriter {
         prolog: proc_macro2::TokenStream,
         vis: Visibility,
         func_name_wrapper: Ident,
+        generics: &Generics,
         func_call: proc_macro2::TokenStream,
         optional: bool,
     ) -> proc_macro2::TokenStream {
@@ -315,7 +322,7 @@ impl PgGuardRewriter {
         quote_spanned! {func_span=>
             #prolog
             #[pg_guard]
-            #vis fn #func_name_wrapper(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+            #vis fn #func_name_wrapper #generics(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
 
                 struct IteratorHolder<T> {
                     iter: *mut dyn Iterator<Item=T>,
@@ -634,64 +641,6 @@ impl FunctionSignatureRewriter {
                                 let #name = pgx::pg_getarg_datum_raw(fcinfo, #i) as #type_;
                             }
                         } else {
-                            let type_ = match type_.deref() {
-                                // remove lifetime and mutability specifiers
-                                Type::Reference(r) => Box::new(Type::Reference(TypeReference {
-                                    and_token: r.and_token,
-                                    lifetime: None,
-                                    mutability: None,
-                                    elem: r.elem.clone(),
-                                })),
-
-                                Type::Path(p) => {
-                                    let mut punctuated = Punctuated::new();
-
-                                    for segment in &p.path.segments {
-                                        let arguments = match &segment.arguments {
-                                            PathArguments::AngleBracketed(ab) => {
-                                                let mut new_args = Punctuated::new();
-
-                                                for punc in ab.args.iter().cloned() {
-                                                    match punc {
-                                                        GenericArgument::Lifetime(_) => {}
-
-                                                        other => new_args.push(other),
-                                                    }
-                                                }
-
-                                                PathArguments::AngleBracketed(
-                                                    AngleBracketedGenericArguments {
-                                                        colon2_token: None,
-                                                        lt_token: syn::token::Lt(p.span()),
-                                                        args: new_args,
-                                                        gt_token: syn::token::Gt(p.span()),
-                                                    },
-                                                )
-                                            }
-                                            _ => segment.arguments.clone(),
-                                        };
-
-                                        let new_segment = PathSegment {
-                                            ident: segment.ident.clone(),
-                                            arguments,
-                                        };
-
-                                        punctuated.push(new_segment);
-                                    }
-
-                                    Box::new(Type::Path(TypePath {
-                                        qself: p.qself.clone(),
-                                        path: Path {
-                                            leading_colon: None,
-                                            segments: punctuated,
-                                        },
-                                    }))
-                                }
-
-                                // use the type as-is
-                                _ => type_.clone(),
-                            };
-
                             quote_spanned! {ident.span()=>
                                 let #name = pgx::pg_getarg::<#type_>(fcinfo, #i).unwrap_or_else(|| panic!("{} is null", stringify!{#ident}));
                             }
