@@ -3,10 +3,7 @@
 
 //! for converting a pg_sys::Datum and a corresponding "is_null" bool into a typed Option
 
-use crate::{
-    pg_sys, text_to_rust_str_unchecked, vardata_any, varsize_any_exhdr, void_mut_ptr, PgBox,
-    PgMemoryContexts,
-};
+use crate::{pg_sys, text_to_rust_str_unchecked, varlena_to_byte_slice, PgBox, PgMemoryContexts};
 use std::ffi::CStr;
 
 /// Convert a `(pg_sys::Datum, is_null:bool, type_oid:pg_sys::Oid)` tuple into a Rust type
@@ -178,7 +175,7 @@ impl<'a> FromDatum for &'a str {
         } else if datum == 0 {
             panic!("a varlena Datum was flagged as non-null but the datum is zero");
         } else {
-            let varlena = pg_sys::pg_detoast_datum(datum as *mut pg_sys::varlena);
+            let varlena = pg_sys::pg_detoast_datum_packed(datum as *mut pg_sys::varlena);
             Some(text_to_rust_str_unchecked(varlena))
         }
     }
@@ -197,17 +194,15 @@ impl<'a> FromDatum for &'a str {
         } else if datum == 0 {
             panic!("a varlena Datum was flagged as non-null but the datum is zero");
         } else {
-            let varlena = pg_sys::pg_detoast_datum(datum as *mut pg_sys::varlena);
             memory_context.switch_to(|_| {
                 // this gets the varlena Datum copied into this memory context
-                let cstr = pg_sys::text_to_cstring(varlena as *mut pg_sys::text);
+                let detoasted = pg_sys::pg_detoast_datum_copy(datum as *mut pg_sys::varlena);
+
+                // and we need to unpack it (if necessary), which will decompress it too
+                let varlena = pg_sys::pg_detoast_datum_packed(detoasted);
 
                 // and now we return it as a &str
-                let cstr = std::ffi::CStr::from_ptr(cstr);
-                Some(
-                    cstr.to_str()
-                        .expect("failed to convert varlena datum into &str"),
-                )
+                Some(text_to_rust_str_unchecked(varlena))
             })
         }
     }
@@ -218,26 +213,15 @@ impl<'a> FromDatum for &'a str {
 /// This returns a **copy**, allocated and managed by Rust, of the underlying `varlena` Datum
 impl FromDatum for String {
     #[inline]
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<String> {
-        if is_null {
-            None
-        } else if datum == 0 {
-            panic!("a varlena Datum was flagged as non-null but the datum is zero");
-        } else {
-            let varlena = datum as *mut pg_sys::varlena;
-            let detoasted = pg_sys::pg_detoast_datum(varlena);
-            let len = varsize_any_exhdr(detoasted);
-            let data = vardata_any(detoasted);
-
-            let result =
-                std::str::from_utf8_unchecked(std::slice::from_raw_parts(data as *mut u8, len))
-                    .to_owned();
-
-            if detoasted != varlena {
-                pg_sys::pfree(detoasted as void_mut_ptr);
-            }
-
-            Some(result)
+    unsafe fn from_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        typoid: pg_sys::Oid,
+    ) -> Option<String> {
+        let refstr: Option<&str> = FromDatum::from_datum(datum, is_null, typoid);
+        match refstr {
+            Some(refstr) => Some(refstr.to_owned()),
+            None => None,
         }
     }
 }
@@ -254,6 +238,69 @@ impl<'a> FromDatum for &'a std::ffi::CStr {
             Some(std::ffi::CStr::from_ptr(
                 datum as *const std::os::raw::c_char,
             ))
+        }
+    }
+}
+
+/// for bytea
+impl<'a> FromDatum for &'a [u8] {
+    #[inline]
+    unsafe fn from_datum(datum: usize, is_null: bool, _typoid: u32) -> Option<&'a [u8]> {
+        if is_null {
+            None
+        } else if datum == 0 {
+            panic!("a bytea Datum was flagged as non-null but the datum is zero");
+        } else {
+            let varlena = pg_sys::pg_detoast_datum_packed(datum as *mut pg_sys::varlena);
+            Some(varlena_to_byte_slice(varlena))
+        }
+    }
+
+    unsafe fn from_datum_in_memory_context(
+        mut memory_context: PgMemoryContexts,
+        datum: usize,
+        is_null: bool,
+        _typoid: u32,
+    ) -> Option<Self>
+    where
+        Self: Sized,
+    {
+        if is_null {
+            None
+        } else if datum == 0 {
+            panic!("a bytea Datum was flagged as non-null but the datum is zero");
+        } else {
+            memory_context.switch_to(|_| {
+                // this gets the varlena Datum copied into this memory context
+                let detoasted = pg_sys::pg_detoast_datum_copy(datum as *mut pg_sys::varlena);
+
+                // and we need to unpack it (if necessary), which will decompress it too
+                let varlena = pg_sys::pg_detoast_datum_packed(detoasted);
+
+                // and now we return it as a &[u8]
+                Some(varlena_to_byte_slice(varlena))
+            })
+        }
+    }
+}
+
+impl FromDatum for Vec<u8> {
+    #[inline]
+    unsafe fn from_datum(datum: usize, is_null: bool, typoid: u32) -> Option<Vec<u8>> {
+        if is_null {
+            None
+        } else if datum == 0 {
+            panic!("a bytea Datum as flagged as non-null but the datum is zero");
+        } else {
+            // Vec<u8> conversion is initially the same as for &[u8]
+            let bytes: Option<&[u8]> = FromDatum::from_datum(datum, is_null, typoid);
+
+            match bytes {
+                // but then we need to convert it into an owned Vec where the backing
+                // data is allocated by Rust
+                Some(bytes) => Some(bytes.into_iter().map(|b| *b).collect::<Vec<u8>>()),
+                None => None,
+            }
         }
     }
 }

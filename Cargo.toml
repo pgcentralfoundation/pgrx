@@ -20,6 +20,7 @@ members = [
 ]
 exclude = [
     "pgx-examples/arrays",
+    "pgx-examples/bytea",
     "pgx-examples/custom_types",
     "pgx-examples/errors",
     "pgx-examples/srf",

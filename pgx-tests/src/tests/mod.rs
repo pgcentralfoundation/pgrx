@@ -3,6 +3,7 @@
 
 mod anyarray_tests;
 mod array_tests;
+mod bytea_tests;
 mod datetime_tests;
 mod default_arg_value_tests;
 mod derive_pgtype_lifetimes;

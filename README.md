@@ -51,16 +51,41 @@
  - DDL automatically generated
 
 #### Most Postgres Datatypes Transparently Converted to Rust
- - `text`/`varchar` --> `String`/`&str`
- - `integer` --> `i32`
- - `bigint` --> `i64`
- - `bool` --> `bool`
- - `json`/`jsonb` --> `pgx::Json`/`pgx::Jsonb` newtypes over `serde_json::Value`
- - arrays --> `pgx::Array<T>`/`Vec<Option<T>>` 
- - `date`/`time`/`timestamp` -> `pgx::Date/Time/Timestamp`
- - `time with time zone`/`timestamp with time zone` -> `pgx::Time/TimestampWithTimeZone`
- - `IntoDatum` and `FromDatum` traits for implementing more support
- - many more!
+
+Postgres Type | Rust Type (as `Option<T>`)
+--------------|-----------
+`bytea` | `Vec<u8>` or `&[u8]` (zero-copy)
+`text` | `String` or `&str` (zero-copy)
+`varchar` | `String` or `&str` (zero-copy)
+`smallint` | `i16`
+`integer` | `i32`
+`bigint` | `i64`
+`oid` | `u32`
+`real` | `f32`
+`double precision` | `f64`
+`bool` | `bool`
+`json` | `pgx::Json(serde_json::Value)`
+`jsonb` | `pgx::Json(serde_json::Value)`
+`date` | `pgx::Date`
+`time` | `pgx::Time`
+`timestamp` | `pgx::Timestamp`
+`time with time zone` | `pgx::TimeWithTimeZone`
+`timestamp with time zone` | `pgx::TimestampWithTimeZone`
+`anyarray` | `pgx::AnyArray`
+`anyelement` | `pgx::AnyElement`
+`box` | `pgx::pg_sys::BOX`
+`point` | `pgx::pgx_sys::Point`
+`tid` | `pgx::pg_sys::ItemPointerData`
+`cstring` | `&std::ffi::CStr`
+`inet` | `pgx::Inet(String)` -- TODO: needs better support
+`numeric` | `pgx::Numeric(String)` -- TODO: needs better support
+`ARRAY[]::<type>` | `Vec<Option<T>>` or `pgx::Array<T>` (zero-copy)
+`NULL` | `Option::None`
+`internal` | `pgx::PgBox<T>` where `T` is any Rust/Postgres struct
+
+There are also `IntoDatum` and `FromDatum` traits for implementing additional type conversions, 
+along with `#[derive(PostgresType)]` and `#[derive(PostgresEnum)]` for automatic conversion of 
+custom types.
 
 #### Easy Custom Types
  - `#[derive(PostgresType)]` to use a Rust struct as a Postgres type, represented as a CBOR-encoded object in-memory/on-disk, and JSON as human-readable
