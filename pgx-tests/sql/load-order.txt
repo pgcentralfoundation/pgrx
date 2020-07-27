@@ -13,6 +13,7 @@ tests_srf_tests.generated.sql
 tests_numeric_tests.generated.sql
 tests_inet_tests.generated.sql
 tests_bytea_tests.generated.sql
+tests_derive_pgtype_lifetimes.generated.sql
 tests_guc_tests.generated.sql
 tests_hooks_tests.generated.sql
 tests_json_tests.generated.sql
