@@ -56,6 +56,17 @@ impl IntoDatum for bool {
     }
 }
 
+/// for "char"
+impl IntoDatum for i8 {
+    fn into_datum(self) -> Option<pg_sys::Datum> {
+        Some(self as pg_sys::Datum)
+    }
+
+    fn type_oid() -> u32 {
+        pg_sys::CHAROID
+    }
+}
+
 /// for smallint
 impl IntoDatum for i16 {
     #[inline]
@@ -178,6 +189,17 @@ impl IntoDatum for &String {
 
     fn type_oid() -> u32 {
         pg_sys::TEXTOID
+    }
+}
+
+impl IntoDatum for char {
+    #[inline]
+    fn into_datum(self) -> Option<pg_sys::Datum> {
+        self.to_string().into_datum()
+    }
+
+    fn type_oid() -> u32 {
+        pg_sys::VARCHAROID
     }
 }
 

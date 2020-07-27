@@ -590,6 +590,10 @@ impl FunctionSignatureRewriter {
                     stream.extend(quote! {
                         result
                     });
+                } else if type_matches(type_, "()") {
+                    stream.extend(quote! {
+                       pgx::pg_return_void()
+                    });
                 } else {
                     stream.extend(quote! {
                         result.into_datum().unwrap_or_else(|| panic!("returned Datum was NULL"))
@@ -667,13 +671,8 @@ impl FunctionSignatureRewriter {
 }
 
 fn type_matches(ty: &Type, pattern: &str) -> bool {
-    match ty {
-        Type::Path(path) => {
-            let path = format!("{}", quote! {#path});
-            path.starts_with(pattern)
-        }
-        _ => false,
-    }
+    let type_string = format!("{}", quote! {#ty});
+    type_string.starts_with(pattern)
 }
 
 fn extract_option_type(ty: &Type) -> proc_macro2::TokenStream {

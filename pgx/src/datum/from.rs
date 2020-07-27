@@ -82,7 +82,7 @@ impl FromDatum for bool {
     }
 }
 
-/// for char
+/// for `"char"`
 impl FromDatum for i8 {
     #[inline]
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<i8> {
@@ -221,6 +221,17 @@ impl FromDatum for String {
         let refstr: Option<&str> = FromDatum::from_datum(datum, is_null, typoid);
         match refstr {
             Some(refstr) => Some(refstr.to_owned()),
+            None => None,
+        }
+    }
+}
+
+impl FromDatum for char {
+    #[inline]
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, typoid: pg_sys::Oid) -> Option<char> {
+        let refstr: Option<&str> = FromDatum::from_datum(datum, is_null, typoid);
+        match refstr {
+            Some(refstr) => refstr.chars().next(),
             None => None,
         }
     }
