@@ -53,11 +53,6 @@ fn main() -> Result<(), std::io::Error> {
         eprintln!("{}={}", k, v);
     }
 
-    build_deps::rerun_if_changed_paths(&get_pgx_config_path().display().to_string()).unwrap();
-    build_deps::rerun_if_changed_paths("include/*").unwrap();
-    build_deps::rerun_if_changed_paths("cshim/pgx-cshim.c").unwrap();
-    build_deps::rerun_if_changed_paths("cshim/Makefile").unwrap();
-
     let manifest_dir = PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").unwrap());
     let shim_dir = PathBuf::from(format!("{}/cshim", manifest_dir.display()));
     let common_rs = PathBuf::from(format!("{}/src/common.rs", manifest_dir.display(),));
@@ -100,6 +95,11 @@ fn main() -> Result<(), std::io::Error> {
         std::fs::copy(common_rs_for_docs_rc, &common_rs)?;
         return Ok(());
     }
+
+    build_deps::rerun_if_changed_paths(&get_pgx_config_path().display().to_string()).unwrap();
+    build_deps::rerun_if_changed_paths("include/*").unwrap();
+    build_deps::rerun_if_changed_paths("cshim/pgx-cshim.c").unwrap();
+    build_deps::rerun_if_changed_paths("cshim/Makefile").unwrap();
 
     let shim_mutex = Mutex::new(());
     let need_common_rs = AtomicBool::new(false);
