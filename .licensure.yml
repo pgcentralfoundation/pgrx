@@ -9,4 +9,6 @@ excludes:
   - ".github/workflows/*"
   - ".*\\.control"
   - ".*\\.md"
+  - ".*\\.yml"
+  - ".*\\.sh"
   - load-order.txt

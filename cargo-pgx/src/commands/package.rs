@@ -1,3 +1,7 @@
+// Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
+// governed by the MIT license that can be found in the LICENSE file.
+
+
 use crate::commands::get::get_property;
 use crate::commands::install::install_extension;
 use pgx_utils::{get_pg_config_major_version, get_target_dir, handle_result};

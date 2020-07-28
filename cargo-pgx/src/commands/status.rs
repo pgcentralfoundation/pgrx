@@ -1,3 +1,7 @@
+// Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
+// governed by the MIT license that can be found in the LICENSE file.
+
+
 use pgx_utils::{exit_with_error, get_pgbin_dir, get_pgdata_dir, handle_result};
 use std::process::Stdio;
 
