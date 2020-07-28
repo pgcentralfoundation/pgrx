@@ -33,6 +33,14 @@ jobs:
     - name: install cargo pgx
       run: cd cargo-pgx && cargo install --path . --force --debug
 
+    # install cargo tree
+    - name: install cargo tree
+      run: cargo install cargo-tree --debug
+
+    # run cargo tree
+    - name: cargo tree
+      run: cargo tree
+
     # initialize pgx
     - name: cargo pgx init
       run: cargo pgx init
