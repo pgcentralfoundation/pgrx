@@ -33,6 +33,10 @@ pg10 = [ "pgx/pg10", "pgx-pg-sys/pg10" ]
 pg11 = [ "pgx/pg11", "pgx-pg-sys/pg11" ]
 pg12 = [ "pgx/pg12", "pgx-pg-sys/pg12" ]
 
+[package.metadata.docs.rs]
+features = ["pg12"]
+no-default-features = true
+
 [dependencies]
 cargo-pgx = { path = "cargo-pgx" }
 pgx = { path = "pgx", default-features = false }

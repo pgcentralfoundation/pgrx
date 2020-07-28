@@ -20,6 +20,10 @@ pg11 = [ "pgx/pg11" ]
 pg12 = [ "pgx/pg12" ]
 pg_test = [ ]
 
+[package.metadata.docs.rs]
+features = ["pg12"]
+no-default-features = true
+
 [dependencies]
 colored = "2.0.0"
 lazy_static = "1.4.0"

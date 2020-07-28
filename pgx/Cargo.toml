@@ -19,6 +19,10 @@ pg10 = [ "pgx-pg-sys/pg10" ]
 pg11 = [ "pgx-pg-sys/pg11" ]
 pg12 = [ "pgx-pg-sys/pg12" ]
 
+[package.metadata.docs.rs]
+features = ["pg12"]
+no-default-features = true
+
 [dependencies]
 enum-primitive-derive = "0.2.1"
 lazy_static = "1.4.0"

@@ -60,11 +60,47 @@ fn main() -> Result<(), std::io::Error> {
 
     let manifest_dir = PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").unwrap());
     let shim_dir = PathBuf::from(format!("{}/cshim", manifest_dir.display()));
+    let common_rs = PathBuf::from(format!("{}/src/common.rs", manifest_dir.display(),));
 
     eprintln!("manifest_dir={}", manifest_dir.display());
     eprintln!("shim_dir={}", shim_dir.display());
+    eprintln!("common_rs={}", common_rs.display());
 
     let major_versions = vec![10, 11, 12];
+
+    if std::env::var("DOCS_RS").unwrap_or("false".into()) == "1" {
+        for major_version in &major_versions {
+            let src = PathBuf::from(format!(
+                "{}/docsrs-hacks/pg{}_specific.rs",
+                manifest_dir.display(),
+                major_version
+            ));
+            let dest = PathBuf::from(format!(
+                "{}/src/pg{}_specific.rs",
+                manifest_dir.display(),
+                major_version
+            ));
+
+            eprintln!(
+                "[docs.rs build] copying {} to {}",
+                src.display(),
+                dest.display()
+            );
+            std::fs::copy(src, dest)?;
+        }
+
+        let common_rs_for_docs_rc =
+            PathBuf::from(format!("{}/docsrs-hacks/common.rs", manifest_dir.display(),));
+
+        eprintln!(
+            "[docs.rs build] copying {} to {}",
+            common_rs_for_docs_rc.display(),
+            common_rs.display()
+        );
+        std::fs::copy(common_rs_for_docs_rc, &common_rs)?;
+        return Ok(());
+    }
+
     let shim_mutex = Mutex::new(());
     let need_common_rs = AtomicBool::new(false);
 
@@ -85,9 +121,7 @@ fn main() -> Result<(), std::io::Error> {
             manifest_dir.display(),
             major_version
         ));
-        let common_rs = PathBuf::from(format!("{}/src/common.rs", manifest_dir.display(),));
 
-        eprintln!("common_rs={}", common_rs.display());
         eprintln!("bindings_rs={}", bindings_rs.display());
         eprintln!("specific_rs={}", specific_rs.display());
 
