@@ -31,7 +31,7 @@ jobs:
 
     # install our cargo subcomment
     - name: install cargo pgx
-      run: cd cargo-pgx && cargo install --path . --force
+      run: cd cargo-pgx && cargo install --path . --force --debug
 
     # initialize pgx
     - name: cargo pgx init
