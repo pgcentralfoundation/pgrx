@@ -1,0 +1,6 @@
+comment = 'spi:  Created by pgx'
+default_version = '1.0'
+module_pathname = '$libdir/spi'
+relocatable = false
+superuser = false
+schema = 'spi'

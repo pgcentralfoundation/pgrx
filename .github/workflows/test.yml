@@ -58,6 +58,8 @@ jobs:
       run: cd pgx-examples/custom_types && cargo pgx test pg${{ matrix.version }}
     - name: errors example
       run: cd pgx-examples/errors && cargo pgx test pg${{ matrix.version }}
+    - name: spi example
+      run: cd pgx-examples/spi && cargo pgx test pg${{ matrix.version }}
     - name: srf example
       run: cd pgx-examples/srf && cargo pgx test pg${{ matrix.version }}
     - name: strings example
