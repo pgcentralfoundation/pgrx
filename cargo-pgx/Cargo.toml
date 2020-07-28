@@ -7,7 +7,7 @@ license = "MIT"
 description = "cargo subcommand for 'pgx' to make Postgres extension development easy"
 homepage = "https://github.com/zombodb/pgx/cargo-pgx"
 repository = "https://github.com/zombodb/pgx/cargo-pgx"
-documentation = "https://docs.rs/pgx-tests"
+documentation = "https://docs.rs/cargo-pgx"
 readme = "README.md"
 
 [dependencies]
