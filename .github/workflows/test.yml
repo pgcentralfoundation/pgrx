@@ -52,6 +52,8 @@ jobs:
     # make sure the examples build too
     - name: arrays example
       run: cd pgx-examples/arrays && cargo pgx test pg${{ matrix.version }}
+    - name: bad_ideas example
+      run: cd pgx-examples/bad_ideas && cargo pgx test pg${{ matrix.version }}
     - name: bytea example
       run: cd pgx-examples/bytea && cargo pgx test pg${{ matrix.version }}
     - name: custom_types example

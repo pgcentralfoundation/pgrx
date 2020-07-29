@@ -1,0 +1,5 @@
+comment = 'bad_ideas:  Created by pgx'
+default_version = '1.0'
+module_pathname = '$libdir/bad_ideas'
+relocatable = true
+superuser = false
