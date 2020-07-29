@@ -471,11 +471,15 @@ pub fn categorize_type(ty: &Type) -> CategorizedType {
             panic!("Unsupported trait return type");
         }
         Type::Tuple(tuple) => {
-            let mut types = Vec::new();
-            for ty in &tuple.elems {
-                types.push(quote! {#ty}.to_string())
+            if tuple.elems.len() == 0 {
+                CategorizedType::Default
+            } else {
+                let mut types = Vec::new();
+                for ty in &tuple.elems {
+                    types.push(quote! {#ty}.to_string())
+                }
+                CategorizedType::Tuple(types)
             }
-            CategorizedType::Tuple(types)
         }
         _ => CategorizedType::Default,
     }
