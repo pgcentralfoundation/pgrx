@@ -1,7 +1,6 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-
 use pgx::*;
 
 pg_module_magic!();
@@ -26,6 +25,11 @@ fn random_values(
 fn vector_of_static_values() -> impl std::iter::Iterator<Item = &'static str> {
     let values = vec!["Brandy", "Sally", "Anchovy"];
     values.into_iter()
+}
+
+#[pg_extern]
+fn return_tuple() -> (name!(id, i32), name!(name, &'static str), name!(age, f64)) {
+    (1, "Brandy", 4.5)
 }
 
 #[cfg(any(test, feature = "pg_test"))]

@@ -320,6 +320,7 @@ pub enum ExternArgs {
 pub enum CategorizedType {
     Iterator(Vec<String>),
     OptionalIterator(Vec<String>),
+    Tuple(Vec<String>),
     Default,
 }
 
@@ -468,6 +469,13 @@ pub fn categorize_type(ty: &Type) -> CategorizedType {
             }
 
             panic!("Unsupported trait return type");
+        }
+        Type::Tuple(tuple) => {
+            let mut types = Vec::new();
+            for ty in &tuple.elems {
+                types.push(quote! {#ty}.to_string())
+            }
+            CategorizedType::Tuple(types)
         }
         _ => CategorizedType::Default,
     }

@@ -581,25 +581,25 @@ fn translate_type(filename: &DirEntry, ty: &Type) -> Option<(String, bool, Optio
                 None => panic!("unrecognized macro in argument list: {}", as_string),
             }
         }
-        Type::ImplTrait(tr) => match categorize_type(ty) {
-            CategorizedType::Default => panic!("{:?} isn't an 'impl Trait' type", tr),
-            CategorizedType::Iterator(types) => {
-                rust_type = "Iterator".to_string();
-                span = tr.span();
-                subtype = Some(types);
-            }
-            CategorizedType::OptionalIterator(types) => {
-                rust_type = "Iterator".to_string();
-                span = tr.span();
-                subtype = Some(types);
-            }
-        },
 
         // for the "unit" type:  ()
         Type::Tuple(tuple) if tuple.elems.is_empty() => {
             rust_type = format!("{}", quote!(#tuple));
             span = tuple.span();
         }
+
+        Type::ImplTrait(_) | Type::Tuple(_) => match categorize_type(ty) {
+            CategorizedType::Default => {
+                panic!("{:?} isn't an 'impl Trait' type or a Rust Tuple", ty)
+            }
+            CategorizedType::Iterator(types)
+            | CategorizedType::OptionalIterator(types)
+            | CategorizedType::Tuple(types) => {
+                rust_type = "Iterator".to_string();
+                span = ty.span();
+                subtype = Some(types);
+            }
+        },
 
         other => {
             panic!("Unsupported type: {:?}", other);
