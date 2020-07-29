@@ -190,8 +190,27 @@ impl Spi {
         let outer_memory_context =
             PgMemoryContexts::For(PgMemoryContexts::CurrentMemoryContext.value());
 
+        /// a struct to manage our SPI connection lifetime
+        struct SpiConnection;
+        impl SpiConnection {
+            /// Connect to Postgres' SPI system
+            fn connect() -> Self {
+                // connect to SPI
+                Spi::check_status(unsafe { pg_sys::SPI_connect() });
+                SpiConnection
+            }
+        }
+
+        impl Drop for SpiConnection {
+            /// when SpiConnection is dropped, we make sure to disconnect from SPI
+            fn drop(&mut self) {
+                // disconnect from SPI
+                Spi::check_status(unsafe { pg_sys::SPI_finish() });
+            }
+        }
+
         // connect to SPI
-        Spi::check_status(unsafe { pg_sys::SPI_connect() });
+        let _connection = SpiConnection::connect();
 
         // run the provided closure within the memory context that SPI_connect()
         // just put us un.  We'll disconnect from SPI when the closure is finished.
@@ -223,18 +242,11 @@ impl Spi {
                     None => None,
                 };
 
-                // disconnect from SPI
-                Spi::check_status(unsafe { pg_sys::SPI_finish() });
-
                 copied_datum
             }
 
             // closure returned an error
-            Err(e) => {
-                // disconnect from SPI
-                Spi::check_status(unsafe { pg_sys::SPI_finish() });
-                panic!(e)
-            }
+            Err(e) => panic!(e),
         }
     }
 
