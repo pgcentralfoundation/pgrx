@@ -1,9 +1,9 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-
 #![allow(non_snake_case)]
 
+use crate::FlushErrorState;
 use std::any::Any;
 use std::cell::Cell;
 use std::panic::catch_unwind;
@@ -106,7 +106,10 @@ impl<T> PgTryResult<T> {
     pub unsafe fn unwrap_or(self, value: T) -> T {
         match self.0 {
             Ok(result) => result,
-            Err(_) => value,
+            Err(_) => {
+                FlushErrorState();
+                value
+            }
         }
     }
 
@@ -125,7 +128,10 @@ impl<T> PgTryResult<T> {
     {
         match self.0 {
             Ok(result) => result,
-            Err(_) => cleanup(),
+            Err(_) => {
+                FlushErrorState();
+                cleanup()
+            }
         }
     }
 
