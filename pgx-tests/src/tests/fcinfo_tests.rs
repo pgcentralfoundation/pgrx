@@ -87,6 +87,11 @@ fn returns_void() -> () {
 }
 
 #[pg_extern]
+fn returns_tuple() -> (name!(id, i32), name!(title, String)) {
+    (42, "pgx".into())
+}
+
+#[pg_extern]
 fn same_name(same_name: &str) -> &str {
     same_name
 }
@@ -232,6 +237,12 @@ mod tests {
     fn test_returns_void() {
         let result = Spi::get_one::<()>("SELECT returns_void();");
         assert_eq!(result, None)
+    }
+
+    #[pg_test]
+    fn test_returns_tuple() {
+        let result = Spi::get_two::<i32, String>("SELECT * FROM returns_tuple();");
+        assert_eq!((Some(42), Some("pgx".into())), result)
     }
 
     /// ensures that we can have a `#[pg_extern]` function with an argument that
