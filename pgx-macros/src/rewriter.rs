@@ -38,11 +38,11 @@ impl PgGuardRewriter {
         rewrite_args: bool,
         is_raw: bool,
         no_guard: bool,
-    ) -> proc_macro2::TokenStream {
+    ) -> (proc_macro2::TokenStream, bool) {
         if rewrite_args {
             self.item_fn_with_rewrite(func, is_raw, no_guard)
         } else {
-            self.item_fn_without_rewrite(func)
+            (self.item_fn_without_rewrite(func), true)
         }
     }
 
@@ -51,7 +51,7 @@ impl PgGuardRewriter {
         mut func: ItemFn,
         is_raw: bool,
         no_guard: bool,
-    ) -> proc_macro2::TokenStream {
+    ) -> (proc_macro2::TokenStream, bool) {
         // remember the original visibility and signature classifications as we want
         // to use those for the outer function
         let vis = func.vis.clone();
@@ -106,17 +106,22 @@ impl PgGuardRewriter {
             #[allow(unused_variables)]
         };
         match categorize_return_type(&func) {
-            CategorizedType::Default => PgGuardRewriter::impl_standard_udf(
-                func_span,
-                prolog,
-                vis,
-                func_name_wrapper,
-                generics,
-                func_call,
-                rewritten_return_type,
+            CategorizedType::Default => (
+                PgGuardRewriter::impl_standard_udf(
+                    func_span,
+                    prolog,
+                    vis,
+                    func_name_wrapper,
+                    generics,
+                    func_call,
+                    rewritten_return_type,
+                ),
+                true,
             ),
 
-            CategorizedType::Iterator(types) if types.len() == 1 => {
+            CategorizedType::Tuple(_types) => (PgGuardRewriter::impl_tuple_udf(func), false),
+
+            CategorizedType::Iterator(types) if types.len() == 1 => (
                 PgGuardRewriter::impl_setof_srf(
                     types,
                     func_span,
@@ -126,10 +131,11 @@ impl PgGuardRewriter {
                     generics,
                     func_call,
                     false,
-                )
-            }
+                ),
+                true,
+            ),
 
-            CategorizedType::OptionalIterator(types) if types.len() == 1 => {
+            CategorizedType::OptionalIterator(types) if types.len() == 1 => (
                 PgGuardRewriter::impl_setof_srf(
                     types,
                     func_span,
@@ -139,28 +145,35 @@ impl PgGuardRewriter {
                     generics,
                     func_call,
                     true,
-                )
-            }
-
-            CategorizedType::Iterator(types) => PgGuardRewriter::impl_table_srf(
-                types,
-                func_span,
-                prolog,
-                vis,
-                func_name_wrapper,
-                generics,
-                func_call,
-                false,
+                ),
+                true,
             ),
 
-            CategorizedType::OptionalIterator(types) => PgGuardRewriter::impl_table_srf(
-                types,
-                func_span,
-                prolog,
-                vis,
-                func_name_wrapper,
-                generics,
-                func_call,
+            CategorizedType::Iterator(types) => (
+                PgGuardRewriter::impl_table_srf(
+                    types,
+                    func_span,
+                    prolog,
+                    vis,
+                    func_name_wrapper,
+                    generics,
+                    func_call,
+                    false,
+                ),
+                true,
+            ),
+
+            CategorizedType::OptionalIterator(types) => (
+                PgGuardRewriter::impl_table_srf(
+                    types,
+                    func_span,
+                    prolog,
+                    vis,
+                    func_name_wrapper,
+                    generics,
+                    func_call,
+                    true,
+                ),
                 true,
             ),
         }
@@ -187,6 +200,24 @@ impl PgGuardRewriter {
                 #func_call
 
                 #rewritten_return_type
+            }
+        }
+    }
+
+    fn impl_tuple_udf(mut func: ItemFn) -> proc_macro2::TokenStream {
+        let func_span = func.span();
+        let return_type = func.sig.output;
+        let return_type = format!("{}", quote! {#return_type});
+        let return_type = TokenStream2::from_str(return_type.trim_start_matches("->")).unwrap();
+        let return_type = quote! {impl std::iter::Iterator<Item = #return_type>};
+
+        func.sig.output = ReturnType::Default;
+        let sig = func.sig;
+        let body = func.block;
+        quote_spanned! {func_span=>
+            #[pg_extern]
+            #sig -> #return_type {
+                Some(#body).into_iter()
             }
         }
     }
