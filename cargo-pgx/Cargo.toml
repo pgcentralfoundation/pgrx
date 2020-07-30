@@ -13,6 +13,7 @@ readme = "README.md"
 [dependencies]
 clap = { version = "2.33.1", features = [ "yaml" ] }
 colored = "2.0.0"
+env_proxy = "0.4.1"
 num_cpus = "1.13.0"
 pgx-utils = { path = "../pgx-utils", version = "^0.0.8"}
 proc-macro2 = { version = "1.0.19", features = [ "span-locations" ] }

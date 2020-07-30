@@ -8,7 +8,7 @@ use pgx_utils::{
     BASE_POSTGRES_PORT_NO,
 };
 use rayon::prelude::*;
-use rttp_client::HttpClient;
+use rttp_client::{ HttpClient, types::Proxy };
 use std::fmt::Display;
 use std::fs::File;
 use std::io::Write;
@@ -121,8 +121,12 @@ fn download_postgres(version: &PgVersion, pgxdir: &PathBuf) -> PathBuf {
         version,
         version.url
     );
-
-    let result = handle_result!("", HttpClient::new().get().url(version.url).emit());
+    let mut http_client = HttpClient::new();
+    http_client.get().url(version.url);
+    if let Some((host, port)) = env_proxy::for_url_str(version.url).host_port() {
+        http_client.proxy(Proxy::https(host, port as u32));
+    }
+    let result = handle_result!("", http_client.emit());
     let pgdir = untar(result.body().binary(), pgxdir, version);
     configure_postgres(version, &pgdir);
     make_postgres(version, &pgdir);
