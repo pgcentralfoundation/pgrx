@@ -41,6 +41,7 @@ pub mod itemptr;
 pub mod list;
 #[macro_use]
 pub mod log;
+pub mod bgworkers;
 pub mod memcxt;
 pub mod namespace;
 pub mod nodes;
@@ -52,7 +53,6 @@ pub mod trigger_support;
 pub mod tupdesc;
 pub mod varlena;
 pub mod xid;
-pub mod bgworkers;
 
 pub use callbacks::*;
 pub use datum::*;
