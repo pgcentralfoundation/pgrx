@@ -1,3 +1,7 @@
+// Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
+// governed by the MIT license that can be found in the LICENSE file.
+
+
 use crate::datum::time::USECS_PER_SEC;
 use crate::{direct_function_call_as_datum, pg_sys, FromDatum, IntoDatum};
 use std::ops::{Deref, DerefMut};
@@ -119,9 +123,11 @@ impl serde::Serialize for TimestampWithTimeZone {
         S: serde::Serializer,
     {
         if self.millisecond() > 0 {
-            serializer.serialize_str(&self.format(&format!("%Y-%m-%dT%T.{}Z", self.millisecond())))
+            serializer.serialize_str(
+                &self.format(&format!("%Y-%m-%dT%H:%M:%S.{}-00", self.millisecond())),
+            )
         } else {
-            serializer.serialize_str(&self.format("%Y-%m-%dT%TZ"))
+            serializer.serialize_str(&self.format("%Y-%m-%dT%H:%M:%S-00"))
         }
     }
 }

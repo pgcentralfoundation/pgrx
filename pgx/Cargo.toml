@@ -1,8 +1,14 @@
 [package]
 name = "pgx"
-version = "0.1.0"
-authors = [ "Eric B. Ridge <eebbrr@gmail.com>" ]
+version = "0.0.8"
+authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
 edition = "2018"
+license = "MIT"
+description = "pgx:  A Rust framework for creating Postgres extensions"
+homepage = "https://github.com/zombodb/pgx"
+repository = "https://github.com/zombodb/pgx"
+documentation = "https://docs.rs/pgx"
+readme = "../README.md"
 
 [lib]
 crate-type = [ "rlib" ]
@@ -13,18 +19,19 @@ pg10 = [ "pgx-pg-sys/pg10" ]
 pg11 = [ "pgx-pg-sys/pg11" ]
 pg12 = [ "pgx-pg-sys/pg12" ]
 
+[package.metadata.docs.rs]
+features = ["pg12"]
+no-default-features = true
+
 [dependencies]
-enum-primitive-derive = "0.1.2"
+enum-primitive-derive = "0.2.1"
 lazy_static = "1.4.0"
-num-traits = "0.2.10"
-pgx-macros = { path = "../pgx-macros/" }
-pgx-pg-sys = { path = "../pgx-pg-sys" }
-serde = { version = "1.0.104", features = [ "derive" ] }
+num-traits = "0.2.12"
+pgx-macros = { path = "../pgx-macros/", version= "^0.0.8"}
+pgx-pg-sys = { path = "../pgx-pg-sys", version= "^0.0.8"}
+serde = { version = "1.0.114", features = [ "derive" ] }
 serde_cbor = "0.11.1"
-serde_json = "1.0.46"
-time = "0.2.7"
+serde_json = "1.0.57"
+time = "0.2.16"
 bitflags = "1.2.1"
 
-[[example]]
-name = "bgworkerdemo"
-crate-type = ["cdylib"]

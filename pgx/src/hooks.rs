@@ -1,8 +1,13 @@
+// Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
+// governed by the MIT license that can be found in the LICENSE file.
+
+//! A trait and registration system for hooking Postgres internal operations such as its planner and executor
+
 use crate::{pg_guard, pg_sys, void_mut_ptr, PgBox, PgList};
 use std::ops::Deref;
 
 pub struct HookResult<T> {
-    inner: T,
+    pub inner: T,
 }
 
 impl<T> HookResult<T> {
@@ -381,7 +386,7 @@ unsafe extern "C" fn pgx_standard_executor_start_wrapper(
     query_desc: *mut pg_sys::QueryDesc,
     eflags: i32,
 ) {
-    pg_sys::standard_ExecutorStart(query_desc, eflags);
+    pg_sys::standard_ExecutorStart(query_desc, eflags)
 }
 
 #[pg_guard]
@@ -391,17 +396,17 @@ unsafe extern "C" fn pgx_standard_executor_run_wrapper(
     count: u64,
     execute_once: bool,
 ) {
-    pg_sys::standard_ExecutorRun(query_desc, direction, count, execute_once);
+    pg_sys::standard_ExecutorRun(query_desc, direction, count, execute_once)
 }
 
 #[pg_guard]
 unsafe extern "C" fn pgx_standard_executor_finish_wrapper(query_desc: *mut pg_sys::QueryDesc) {
-    pg_sys::standard_ExecutorFinish(query_desc);
+    pg_sys::standard_ExecutorFinish(query_desc)
 }
 
 #[pg_guard]
 unsafe extern "C" fn pgx_standard_executor_end_wrapper(query_desc: *mut pg_sys::QueryDesc) {
-    pg_sys::standard_ExecutorEnd(query_desc);
+    pg_sys::standard_ExecutorEnd(query_desc)
 }
 
 #[pg_guard]

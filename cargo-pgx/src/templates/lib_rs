@@ -11,9 +11,6 @@ fn hello_{name}() -> &'static str {{
 mod tests {{
     use pgx::*;
 
-    #[test]
-    fn make_idea_happy() {{ }}
-
     #[pg_test]
     fn test_hello_{name}() {{
         assert_eq!("Hello, {name}", crate::hello_{name}());
@@ -24,7 +21,7 @@ mod tests {{
 #[cfg(test)]
 pub mod pg_test {{
     pub fn setup(_options: Vec<&str>) {{
-        // perform one-off initialization when the pg_test framework stats
+        // perform one-off initialization when the pg_test framework starts
     }}
 
     pub fn postgresql_conf_options() -> Vec<&'static str> {{

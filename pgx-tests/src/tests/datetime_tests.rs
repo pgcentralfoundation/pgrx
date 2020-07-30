@@ -1,3 +1,7 @@
+// Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
+// governed by the MIT license that can be found in the LICENSE file.
+
+
 use pgx::*;
 use time::UtcOffset;
 
@@ -57,7 +61,7 @@ mod serialization_tests {
         let time = Time::new(time::time!(0:00));
         let json = json!({ "time test": time });
 
-        assert_eq!(json!({"time test":"0:00:00Z"}), json);
+        assert_eq!(json!({"time test":"00:00:00"}), json);
     }
     #[test]
     fn test_time_with_timezone_serialization() {
@@ -69,7 +73,7 @@ mod serialization_tests {
         assert_eq!(10, time_with_timezone.hour());
 
         // b/c we always want our times output in UTC
-        assert_eq!(json!({"time W/ Zone test":"10:23:34Z"}), json);
+        assert_eq!(json!({"time W/ Zone test":"10:23:34-00"}), json);
     }
 
     #[test]
@@ -80,7 +84,7 @@ mod serialization_tests {
         ));
         let json = json!({ "time stamp test": time_stamp });
 
-        assert_eq!(json!({"time stamp test":"2020-01-01T12:34:54Z"}), json);
+        assert_eq!(json!({"time stamp test":"2020-01-01T12:34:54-00"}), json);
     }
     #[test]
     fn test_timestamp_with_timezone_serialization() {
@@ -96,7 +100,7 @@ mod serialization_tests {
 
         // but we serialize timestamps at UTC
         assert_eq!(
-            json!({"time stamp with timezone test":"2022-02-02T14:57:11Z"}),
+            json!({"time stamp with timezone test":"2022-02-02T14:57:11-00"}),
             json
         );
     }

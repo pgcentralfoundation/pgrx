@@ -1,3 +1,8 @@
+// Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
+// governed by the MIT license that can be found in the LICENSE file.
+
+//! Helper functions and such for Postgres' various query tree `Node`s
+
 #[cfg(feature = "pg10")]
 mod pg10;
 
@@ -22,7 +27,7 @@ use crate::{pg_sys, PgBox};
 #[allow(clippy::not_unsafe_ptr_arg_deref)] // ok b/c we check that nodeptr isn't null
 #[inline]
 pub fn is_a(nodeptr: *mut pg_sys::Node, tag: pg_sys::NodeTag) -> bool {
-    !nodeptr.is_null() && (unsafe { *nodeptr }).type_ == tag
+    !nodeptr.is_null() && unsafe { nodeptr.as_ref().unwrap().type_ == tag }
 }
 
 pub fn node_to_string<'a>(nodeptr: *mut pg_sys::Node) -> Option<&'a str> {

@@ -1,3 +1,8 @@
+// Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
+// governed by the MIT license that can be found in the LICENSE file.
+
+//! Provides safe wrappers around Postgres' "Transaction" and "Sub Transaction" hook system
+
 use crate::pg_sys;
 use std::cell::RefCell;
 use std::collections::HashMap;
@@ -88,7 +93,7 @@ impl XactCallbackReceipt {
 
 /// An internal wrapper for a callback closure
 struct XactCallbackWrapper(
-    Box<dyn Fn() + std::panic::UnwindSafe + std::panic::RefUnwindSafe + 'static>,
+    Box<dyn FnOnce() + std::panic::UnwindSafe + std::panic::RefUnwindSafe + 'static>,
 );
 
 /// Shorthand for the type representing the map of callbacks
@@ -142,7 +147,7 @@ type CallbackMap = HashMap<PgXactCallbackEvent, Vec<Rc<RefCell<Option<XactCallba
 /// functions can only do noncritical cleanup.
 pub fn register_xact_callback<F>(which_event: PgXactCallbackEvent, f: F) -> XactCallbackReceipt
 where
-    F: Fn() + std::panic::UnwindSafe + std::panic::RefUnwindSafe + 'static,
+    F: FnOnce() + std::panic::UnwindSafe + std::panic::RefUnwindSafe + 'static,
 {
     // our map of xact callbacks.  It starts as None and gets initialized below in maybe_initialize()
     static mut XACT_HOOKS: Option<CallbackMap> = None;

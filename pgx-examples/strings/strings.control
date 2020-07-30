@@ -1,0 +1,6 @@
+comment = 'strings:  Created by pgx'
+default_version = '1.0'
+module_pathname = '$libdir/strings'
+relocatable = false
+superuser = false
+schema = strings

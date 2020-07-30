@@ -1,3 +1,6 @@
+// Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
+// governed by the MIT license that can be found in the LICENSE file.
+
 //
 // we allow improper_ctypes just to eliminate these warnings:
 //      = note: `#[warn(improper_ctypes)]` on by default
@@ -81,6 +84,12 @@ mod all_versions {
     }
 
     #[inline]
+    pub fn get_pg_major_minor_version_string() -> &'static str {
+        let mver = std::ffi::CStr::from_bytes_with_nul(super::PG_VERSION).unwrap();
+        mver.to_str().unwrap()
+    }
+
+    #[inline]
     pub fn TransactionIdIsNormal(xid: super::TransactionId) -> bool {
         xid >= FirstNormalTransactionId
     }
@@ -113,11 +122,11 @@ mod all_versions {
     ///     ((RangeTblEntry *) list_nth(rangetable, (rangetable_index)-1))
     /// ```
     #[inline]
-    pub fn rt_fetch(
+    pub unsafe fn rt_fetch(
         index: super::Index,
         range_table: *mut super::List,
     ) -> *mut super::RangeTblEntry {
-        unsafe { super::list_nth(range_table, index as i32 - 1) as *mut super::RangeTblEntry }
+        super::list_nth(range_table, index as i32 - 1) as *mut super::RangeTblEntry
     }
 
     #[inline]

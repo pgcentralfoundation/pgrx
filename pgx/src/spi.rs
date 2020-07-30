@@ -1,3 +1,8 @@
+// Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
+// governed by the MIT license that can be found in the LICENSE file.
+
+//! Safe access to Postgres' *Server Programming Interface* (SPI).
+
 use crate::{pg_sys, FromDatum, IntoDatum, Json, PgMemoryContexts, PgOid};
 use enum_primitive_derive::*;
 use num_traits::FromPrimitive;
@@ -65,7 +70,40 @@ pub struct SpiHeapTupleData {
 
 impl Spi {
     pub fn get_one<A: FromDatum + IntoDatum>(query: &str) -> Option<A> {
-        Spi::connect(|client| Ok(client.select(query, Some(1), None).first().get_one()))
+        Spi::connect(|client| {
+            let result = client.select(query, Some(1), None).first().get_one();
+            Ok(result)
+        })
+    }
+
+    pub fn get_two<A: FromDatum + IntoDatum, B: FromDatum + IntoDatum>(
+        query: &str,
+    ) -> (Option<A>, Option<B>) {
+        Spi::connect(|client| {
+            let (a, b) = client
+                .select(query, Some(1), None)
+                .first()
+                .get_two::<A, B>();
+            Ok(Some((a, b)))
+        })
+        .unwrap()
+    }
+
+    pub fn get_three<
+        A: FromDatum + IntoDatum,
+        B: FromDatum + IntoDatum,
+        C: FromDatum + IntoDatum,
+    >(
+        query: &str,
+    ) -> (Option<A>, Option<B>, Option<C>) {
+        Spi::connect(|client| {
+            let (a, b, c) = client
+                .select(query, Some(1), None)
+                .first()
+                .get_three::<A, B, C>();
+            Ok(Some((a, b, c)))
+        })
+        .unwrap()
     }
 
     pub fn get_one_with_args<A: FromDatum + IntoDatum>(
@@ -73,6 +111,38 @@ impl Spi {
         args: Vec<(PgOid, Option<pg_sys::Datum>)>,
     ) -> Option<A> {
         Spi::connect(|client| Ok(client.select(query, Some(1), Some(args)).first().get_one()))
+    }
+
+    pub fn get_two_with_args<A: FromDatum + IntoDatum, B: FromDatum + IntoDatum>(
+        query: &str,
+        args: Vec<(PgOid, Option<pg_sys::Datum>)>,
+    ) -> (Option<A>, Option<B>) {
+        Spi::connect(|client| {
+            let (a, b) = client
+                .select(query, Some(1), Some(args))
+                .first()
+                .get_two::<A, B>();
+            Ok(Some((a, b)))
+        })
+        .unwrap()
+    }
+
+    pub fn get_three_with_args<
+        A: FromDatum + IntoDatum,
+        B: FromDatum + IntoDatum,
+        C: FromDatum + IntoDatum,
+    >(
+        query: &str,
+        args: Vec<(PgOid, Option<pg_sys::Datum>)>,
+    ) -> (Option<A>, Option<B>, Option<C>) {
+        Spi::connect(|client| {
+            let (a, b, c) = client
+                .select(query, Some(1), Some(args))
+                .first()
+                .get_three::<A, B, C>();
+            Ok(Some((a, b, c)))
+        })
+        .unwrap()
     }
 
     /// just run an arbitrary SQL statement.
@@ -120,8 +190,27 @@ impl Spi {
         let outer_memory_context =
             PgMemoryContexts::For(PgMemoryContexts::CurrentMemoryContext.value());
 
+        /// a struct to manage our SPI connection lifetime
+        struct SpiConnection;
+        impl SpiConnection {
+            /// Connect to Postgres' SPI system
+            fn connect() -> Self {
+                // connect to SPI
+                Spi::check_status(unsafe { pg_sys::SPI_connect() });
+                SpiConnection
+            }
+        }
+
+        impl Drop for SpiConnection {
+            /// when SpiConnection is dropped, we make sure to disconnect from SPI
+            fn drop(&mut self) {
+                // disconnect from SPI
+                Spi::check_status(unsafe { pg_sys::SPI_finish() });
+            }
+        }
+
         // connect to SPI
-        Spi::check_status(unsafe { pg_sys::SPI_connect() });
+        let _connection = SpiConnection::connect();
 
         // run the provided closure within the memory context that SPI_connect()
         // just put us un.  We'll disconnect from SPI when the closure is finished.
@@ -130,40 +219,34 @@ impl Spi {
         match f(SpiClient()) {
             // copy the result to the outer memory context we saved above
             Ok(result) => {
-                // disconnect from SPI
-                Spi::check_status(unsafe { pg_sys::SPI_finish() });
-
-                match result {
+                // we need to copy the resulting Datum into the outer memory context
+                // *before* we disconnect from SPI, otherwise we're copying free'd memory
+                // see https://github.com/zombodb/pgx/issues/17
+                let copied_datum = match result {
                     Some(result) => {
                         let as_datum = result.into_datum();
                         if as_datum.is_none() {
                             // SPI function returned Some(()), which means we just want to return None
                             None
                         } else {
-                            // transfer the returned datum to the outer memory context
-                            outer_memory_context.switch_to(|| {
-                                // TODO:  can we get the type oid from somewhere?
-                                //        - do we even need it?
-                                unsafe {
-                                    R::from_datum(
-                                        as_datum.expect("SPI result datum was NULL"),
-                                        false,
-                                        pg_sys::InvalidOid,
-                                    )
-                                }
-                            })
+                            unsafe {
+                                R::from_datum_in_memory_context(
+                                    outer_memory_context,
+                                    as_datum.expect("SPI result datum was NULL"),
+                                    false,
+                                    pg_sys::InvalidOid,
+                                )
+                            }
                         }
                     }
                     None => None,
-                }
+                };
+
+                copied_datum
             }
 
             // closure returned an error
-            Err(e) => {
-                // disconnect from SPI
-                Spi::check_status(unsafe { pg_sys::SPI_finish() });
-                panic!(e)
-            }
+            Err(e) => panic!(e),
         }
     }
 
@@ -330,7 +413,7 @@ impl SpiTupleTable {
                         [self.current as usize];
                     Some(SpiHeapTupleData {
                         data: heap_tuple,
-                        tupdesc: tupdesc,
+                        tupdesc,
                     })
                 },
                 None => panic!("TupDesc is NULL"),

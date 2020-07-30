@@ -1,0 +1,3 @@
+complex.generated.sql
+hstore_clone.generated.sql
+generic_enum.generated.sql

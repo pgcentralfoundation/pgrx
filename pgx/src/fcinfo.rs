@@ -1,3 +1,7 @@
+// Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
+// governed by the MIT license that can be found in the LICENSE file.
+
+
 //! Helper macros and functions for creating Postgres UDFs.
 //!
 //! Other than the exported macros, typically these functions are not necessary to call directly
@@ -29,6 +33,12 @@ use crate::{pg_sys, void_mut_ptr, FromDatum, PgBox, PgMemoryContexts};
 #[macro_export]
 macro_rules! default {
     ($ty:ty, $val:tt) => {
+        $ty
+    };
+    ($ty:ty, $val:path) => {
+        $ty
+    };
+    ($ty:ty, $val:expr) => {
         $ty
     };
 }

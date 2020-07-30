@@ -1,3 +1,7 @@
+// Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
+// governed by the MIT license that can be found in the LICENSE file.
+
+
 use crate::{pg_sys, FromDatum, IntoDatum};
 use std::ops::{Deref, DerefMut};
 
@@ -86,9 +90,9 @@ impl serde::Serialize for Time {
         S: serde::Serializer,
     {
         if self.millisecond() > 0 {
-            serializer.serialize_str(&self.format(&format!("%T.{}Z", self.millisecond())))
+            serializer.serialize_str(&self.format(&format!("%H:%M:%S.{}", self.millisecond())))
         } else {
-            serializer.serialize_str(&self.format("%TZ"))
+            serializer.serialize_str(&self.format("%H:%M:%S"))
         }
     }
 }

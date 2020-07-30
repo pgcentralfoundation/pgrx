@@ -1,3 +1,7 @@
+// Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
+// governed by the MIT license that can be found in the LICENSE file.
+
+
 #![allow(non_camel_case_types)]
 use crate as pg_sys;
 
@@ -173,6 +177,10 @@ pub enum PgBuiltInOids {
 impl PgBuiltInOids {
     pub fn value(self) -> pg_sys::Oid {
         self as isize as pg_sys::Oid
+    }
+
+    pub fn oid(self) -> PgOid {
+        PgOid::from(self.value())
     }
 }
 

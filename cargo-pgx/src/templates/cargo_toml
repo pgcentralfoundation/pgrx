@@ -1,24 +1,24 @@
 [package]
 name = "{name}"
-version = "0.1.0"
+version = "0.0.0"
 edition = "2018"
 
 [lib]
 crate-type = ["cdylib"]
 
 [features]
-default = ["pg11"]
+default = ["pg12"]
 pg10 = ["pgx/pg10"]
 pg11 = ["pgx/pg11"]
 pg12 = ["pgx/pg12"]
 pg_test = []
 
 [dependencies]
-pgx = {{ path = "../pgx/pgx/", default-features = false }}
-pgx-macros = {{ path = "../pgx/pgx-macros" }}
+pgx = "0.0.8"
+pgx-macros = "0.0.8"
 
 [dev-dependencies]
-pgx-tests = {{ path = "../pgx/pgx-tests" }}
+pgx-tests = "0.0.8"
 
 [profile.dev]
 panic = "unwind"

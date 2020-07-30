@@ -1,9 +1,14 @@
+// Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
+// governed by the MIT license that can be found in the LICENSE file.
+
 //! for converting primitive types into Datums
 //!
 //! Primitive types can never be null, so we do a direct
 //! cast of the primitive type to pg_sys::Datum
 
-use crate::{direct_function_call, pg_sys, rust_str_to_text_p, PgBox, PgOid};
+use crate::{
+    direct_function_call, pg_sys, rust_byte_slice_to_bytea, rust_str_to_text_p, PgBox, PgOid,
+};
 
 /// Convert a Rust type into a `pg_sys::Datum`.
 ///
@@ -48,6 +53,17 @@ impl IntoDatum for bool {
 
     fn type_oid() -> u32 {
         pg_sys::BOOLOID
+    }
+}
+
+/// for "char"
+impl IntoDatum for i8 {
+    fn into_datum(self) -> Option<pg_sys::Datum> {
+        Some(self as pg_sys::Datum)
+    }
+
+    fn type_oid() -> u32 {
+        pg_sys::CHAROID
     }
 }
 
@@ -165,6 +181,28 @@ impl IntoDatum for String {
     }
 }
 
+impl IntoDatum for &String {
+    #[inline]
+    fn into_datum(self) -> Option<pg_sys::Datum> {
+        self.as_str().into_datum()
+    }
+
+    fn type_oid() -> u32 {
+        pg_sys::TEXTOID
+    }
+}
+
+impl IntoDatum for char {
+    #[inline]
+    fn into_datum(self) -> Option<pg_sys::Datum> {
+        self.to_string().into_datum()
+    }
+
+    fn type_oid() -> u32 {
+        pg_sys::VARCHAROID
+    }
+}
+
 /// for cstring
 ///
 /// ## Safety
@@ -178,6 +216,36 @@ impl<'a> IntoDatum for &'a std::ffi::CStr {
 
     fn type_oid() -> u32 {
         pg_sys::CSTRINGOID
+    }
+}
+
+/// for bytea
+impl<'a> IntoDatum for &'a [u8] {
+    #[inline]
+    fn into_datum(self) -> Option<pg_sys::Datum> {
+        let varlena = rust_byte_slice_to_bytea(&self);
+        if varlena.is_null() {
+            None
+        } else {
+            Some(varlena.into_pg() as pg_sys::Datum)
+        }
+    }
+
+    #[inline]
+    fn type_oid() -> u32 {
+        pg_sys::BYTEAOID
+    }
+}
+
+impl IntoDatum for Vec<u8> {
+    #[inline]
+    fn into_datum(self) -> Option<pg_sys::Datum> {
+        (&self[..]).into_datum()
+    }
+
+    #[inline]
+    fn type_oid() -> u32 {
+        pg_sys::BYTEAOID
     }
 }
 
@@ -209,5 +277,15 @@ impl<T> IntoDatum for PgBox<T> {
             direct_function_call::<pg_sys::Oid>(pg_sys::regtypein, vec![type_name.into_datum()])
                 .expect("unable to lookup type oid")
         }
+    }
+}
+
+impl IntoDatum for pg_sys::Datum {
+    fn into_datum(self) -> Option<pg_sys::Datum> {
+        Some(self)
+    }
+
+    fn type_oid() -> pg_sys::Oid {
+        pg_sys::INT8OID
     }
 }

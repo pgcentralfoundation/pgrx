@@ -1,3 +1,6 @@
+// Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
+// governed by the MIT license that can be found in the LICENSE file.
+
 extern crate proc_macro;
 
 use pgx_utils::{categorize_return_type, CategorizedType};
@@ -8,8 +11,8 @@ use std::str::FromStr;
 use syn::export::{Span, TokenStream2};
 use syn::spanned::Spanned;
 use syn::{
-    FnArg, ForeignItem, ForeignItemFn, ItemFn, ItemForeignMod, Pat, ReturnType, Signature, Type,
-    Visibility,
+    FnArg, ForeignItem, ForeignItemFn, Generics, ItemFn, ItemForeignMod, Pat, ReturnType,
+    Signature, Type, Visibility,
 };
 
 pub struct PgGuardRewriter();
@@ -35,11 +38,11 @@ impl PgGuardRewriter {
         rewrite_args: bool,
         is_raw: bool,
         no_guard: bool,
-    ) -> proc_macro2::TokenStream {
+    ) -> (proc_macro2::TokenStream, bool) {
         if rewrite_args {
             self.item_fn_with_rewrite(func, is_raw, no_guard)
         } else {
-            self.item_fn_without_rewrite(func)
+            (self.item_fn_without_rewrite(func), true)
         }
     }
 
@@ -48,7 +51,7 @@ impl PgGuardRewriter {
         mut func: ItemFn,
         is_raw: bool,
         no_guard: bool,
-    ) -> proc_macro2::TokenStream {
+    ) -> (proc_macro2::TokenStream, bool) {
         // remember the original visibility and signature classifications as we want
         // to use those for the outer function
         let vis = func.vis.clone();
@@ -62,6 +65,7 @@ impl PgGuardRewriter {
         let func_span = func.span();
         let rewritten_args = self.rewrite_args(func.clone(), is_raw);
         let rewritten_return_type = self.rewrite_return_type(func.clone());
+        let generics = &func.sig.generics;
         let func_name_wrapper = Ident::new(
             &format!("{}_wrapper", &func.sig.ident.to_string()),
             func_span,
@@ -95,63 +99,81 @@ impl PgGuardRewriter {
         };
 
         let prolog = quote! {
-            #[inline]
+            #[inline(never)]
             #func
 
             #[no_mangle]
             #[allow(unused_variables)]
         };
         match categorize_return_type(&func) {
-            CategorizedType::Default => PgGuardRewriter::impl_standard_udf(
-                func_span,
-                prolog,
-                vis,
-                func_name_wrapper,
-                func_call,
-                rewritten_return_type,
+            CategorizedType::Default => (
+                PgGuardRewriter::impl_standard_udf(
+                    func_span,
+                    prolog,
+                    vis,
+                    func_name_wrapper,
+                    generics,
+                    func_call,
+                    rewritten_return_type,
+                ),
+                true,
             ),
 
-            CategorizedType::Iterator(types) if types.len() == 1 => {
+            CategorizedType::Tuple(_types) => (PgGuardRewriter::impl_tuple_udf(func), false),
+
+            CategorizedType::Iterator(types) if types.len() == 1 => (
                 PgGuardRewriter::impl_setof_srf(
                     types,
                     func_span,
                     prolog,
                     vis,
                     func_name_wrapper,
+                    generics,
                     func_call,
                     false,
-                )
-            }
+                ),
+                true,
+            ),
 
-            CategorizedType::OptionalIterator(types) if types.len() == 1 => {
+            CategorizedType::OptionalIterator(types) if types.len() == 1 => (
                 PgGuardRewriter::impl_setof_srf(
                     types,
                     func_span,
                     prolog,
                     vis,
                     func_name_wrapper,
+                    generics,
                     func_call,
                     true,
-                )
-            }
-
-            CategorizedType::Iterator(types) => PgGuardRewriter::impl_table_srf(
-                types,
-                func_span,
-                prolog,
-                vis,
-                func_name_wrapper,
-                func_call,
-                false,
+                ),
+                true,
             ),
 
-            CategorizedType::OptionalIterator(types) => PgGuardRewriter::impl_table_srf(
-                types,
-                func_span,
-                prolog,
-                vis,
-                func_name_wrapper,
-                func_call,
+            CategorizedType::Iterator(types) => (
+                PgGuardRewriter::impl_table_srf(
+                    types,
+                    func_span,
+                    prolog,
+                    vis,
+                    func_name_wrapper,
+                    generics,
+                    func_call,
+                    false,
+                ),
+                true,
+            ),
+
+            CategorizedType::OptionalIterator(types) => (
+                PgGuardRewriter::impl_table_srf(
+                    types,
+                    func_span,
+                    prolog,
+                    vis,
+                    func_name_wrapper,
+                    generics,
+                    func_call,
+                    true,
+                ),
                 true,
             ),
         }
@@ -162,18 +184,40 @@ impl PgGuardRewriter {
         prolog: proc_macro2::TokenStream,
         vis: Visibility,
         func_name_wrapper: Ident,
+        generics: &Generics,
         func_call: proc_macro2::TokenStream,
         rewritten_return_type: proc_macro2::TokenStream,
     ) -> proc_macro2::TokenStream {
         quote_spanned! {func_span=>
             #prolog
+
+            #[inline(never)]
             #[allow(clippy::missing_safety_doc)]
             #[allow(clippy::redundant_closure)]
-            #vis unsafe fn #func_name_wrapper(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+            #[pg_guard]
+            #vis unsafe fn #func_name_wrapper #generics(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
 
                 #func_call
 
                 #rewritten_return_type
+            }
+        }
+    }
+
+    fn impl_tuple_udf(mut func: ItemFn) -> proc_macro2::TokenStream {
+        let func_span = func.span();
+        let return_type = func.sig.output;
+        let return_type = format!("{}", quote! {#return_type});
+        let return_type = TokenStream2::from_str(return_type.trim_start_matches("->")).unwrap();
+        let return_type = quote! {impl std::iter::Iterator<Item = #return_type>};
+
+        func.sig.output = ReturnType::Default;
+        let sig = func.sig;
+        let body = func.block;
+        quote_spanned! {func_span=>
+            #[pg_extern]
+            #sig -> #return_type {
+                Some(#body).into_iter()
             }
         }
     }
@@ -184,6 +228,7 @@ impl PgGuardRewriter {
         prolog: proc_macro2::TokenStream,
         vis: Visibility,
         func_name_wrapper: Ident,
+        generics: &Generics,
         func_call: proc_macro2::TokenStream,
         optional: bool,
     ) -> proc_macro2::TokenStream {
@@ -191,7 +236,7 @@ impl PgGuardRewriter {
 
         let result_handler = if optional {
             quote! {
-                let result = match pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).switch_to(|| { #func_call result }) {
+                let result = match pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).switch_to(|_| { #func_call result }) {
                     Some(result) => result,
                     None => {
                         pgx::srf_return_done(fcinfo, &mut funcctx);
@@ -201,13 +246,14 @@ impl PgGuardRewriter {
             }
         } else {
             quote! {
-                let result = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).switch_to(|| { #func_call result });
+                let result = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).switch_to(|_| { #func_call result });
             }
         };
 
         quote_spanned! {func_span=>
             #prolog
-            #vis fn #func_name_wrapper(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+            #[pg_guard]
+            #vis fn #func_name_wrapper #generics(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
 
                 struct IteratorHolder<T> {
                     iter: *mut dyn Iterator<Item=T>,
@@ -262,6 +308,7 @@ impl PgGuardRewriter {
         prolog: proc_macro2::TokenStream,
         vis: Visibility,
         func_name_wrapper: Ident,
+        generics: &Generics,
         func_call: proc_macro2::TokenStream,
         optional: bool,
     ) -> proc_macro2::TokenStream {
@@ -289,7 +336,7 @@ impl PgGuardRewriter {
 
         let result_handler = if optional {
             quote! {
-                let result = match pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).switch_to(|| { #func_call result }) {
+                let result = match pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).switch_to(|_| { #func_call result }) {
                     Some(result) => result,
                     None => {
                         pgx::srf_return_done(fcinfo, &mut funcctx);
@@ -299,13 +346,14 @@ impl PgGuardRewriter {
             }
         } else {
             quote! {
-                let result = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).switch_to(|| { #func_call result });
+                let result = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).switch_to(|_| { #func_call result });
             }
         };
 
         quote_spanned! {func_span=>
             #prolog
-            #vis fn #func_name_wrapper(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+            #[pg_guard]
+            #vis fn #func_name_wrapper #generics(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
 
                 struct IteratorHolder<T> {
                     iter: *mut dyn Iterator<Item=T>,
@@ -317,7 +365,7 @@ impl PgGuardRewriter {
                 if srf_is_first_call(fcinfo) {
                     funcctx = pgx::srf_first_call_init(fcinfo);
                     funcctx.user_fctx = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).palloc_struct::<IteratorHolder<#generic_type>>() as void_mut_ptr;
-                    funcctx.tuple_desc = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).switch_to(|| {
+                    funcctx.tuple_desc = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).switch_to(|_| {
                         let mut tupdesc: *mut pgx::pg_sys::TupleDescData = std::ptr::null_mut();
 
                         unsafe {
@@ -378,8 +426,13 @@ impl PgGuardRewriter {
         // nor do we need a visibility beyond "private"
         func.vis = Visibility::Inherited;
 
+        func.sig.ident = Ident::new(
+            &format!("{}_inner", func.sig.ident.to_string()),
+            func.sig.ident.span(),
+        );
+
         let arg_list = PgGuardRewriter::build_arg_list(&sig, false);
-        let func_name = PgGuardRewriter::build_func_name(&sig);
+        let func_name = PgGuardRewriter::build_func_name(&func.sig);
 
         quote_spanned! {func.span()=>
             #[no_mangle]
@@ -411,6 +464,7 @@ impl PgGuardRewriter {
         let return_type = PgGuardRewriter::get_return_type(&func.sig);
 
         quote! {
+            #[inline(never)]
             #[allow(clippy::missing_safety_doc)]
             #[allow(clippy::redundant_closure)]
             pub unsafe fn #func_name ( #arg_list_with_types ) #return_type {
@@ -418,7 +472,24 @@ impl PgGuardRewriter {
                     pub fn #func_name( #arg_list_with_types ) #return_type ;
                 }
 
-                pg_sys::guard::guard(|| unsafe { #func_name( #arg_list) })
+                let prev_exception_stack = pg_sys::PG_exception_stack;
+                let prev_error_context_stack = pg_sys::error_context_stack;
+                let mut jmp_buff = std::mem::MaybeUninit::uninit();
+                let jump_value = pg_sys::sigsetjmp(jmp_buff.as_mut_ptr(), 0);
+
+                let result = if jump_value == 0 {
+                    pg_sys::PG_exception_stack = jmp_buff.as_mut_ptr();
+                    #func_name(#arg_list)
+                } else {
+                    pg_sys::PG_exception_stack = prev_exception_stack;
+                    pg_sys::error_context_stack = prev_error_context_stack;
+                    panic!(pg_sys::JumpContext { });
+                };
+
+                pg_sys::PG_exception_stack = prev_exception_stack;
+                pg_sys::error_context_stack = prev_error_context_stack;
+
+                result
             }
         }
     }
@@ -550,6 +621,10 @@ impl FunctionSignatureRewriter {
                     stream.extend(quote! {
                         result
                     });
+                } else if type_matches(type_, "()") {
+                    stream.extend(quote! {
+                       pgx::pg_return_void()
+                    });
                 } else {
                     stream.extend(quote! {
                         result.into_datum().unwrap_or_else(|| panic!("returned Datum was NULL"))
@@ -627,13 +702,8 @@ impl FunctionSignatureRewriter {
 }
 
 fn type_matches(ty: &Type, pattern: &str) -> bool {
-    match ty {
-        Type::Path(path) => {
-            let path = format!("{}", quote! {#path});
-            path.starts_with(pattern)
-        }
-        _ => false,
-    }
+    let type_string = format!("{}", quote! {#ty});
+    type_string.starts_with(pattern)
 }
 
 fn extract_option_type(ty: &Type) -> proc_macro2::TokenStream {

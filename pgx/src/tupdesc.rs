@@ -1,3 +1,7 @@
+// Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
+// governed by the MIT license that can be found in the LICENSE file.
+
+
 //! Provides a safe wrapper around Postgres' `pg_sys::TupleDescData` struct
 use crate::{pg_sys, void_mut_ptr, PgBox, PgRelation};
 

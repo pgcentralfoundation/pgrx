@@ -1,3 +1,6 @@
+// Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
+// governed by the MIT license that can be found in the LICENSE file.
+
 //!
 //! Provides interfacing into Postgres' `MemoryContext` system.
 //!
@@ -193,7 +196,7 @@ impl PgMemoryContexts {
     ///
     /// #[pg_guard]
     /// pub fn do_something() -> pg_sys::ItemPointer {
-    ///     PgMemoryContexts::TopTransactionContext.switch_to(|| {
+    ///     PgMemoryContexts::TopTransactionContext.switch_to(|context| {
     ///         // allocate a new ItemPointerData, but inside the TopTransactionContext
     ///         let tid = PgBox::<pg_sys::ItemPointerData>::alloc();
     ///         
@@ -203,8 +206,11 @@ impl PgMemoryContexts {
     ///     })
     /// }
     /// ```
-    pub fn switch_to<R, F: Fn() -> R + std::panic::UnwindSafe + std::panic::RefUnwindSafe>(
-        &self,
+    pub fn switch_to<
+        R,
+        F: Fn(&mut PgMemoryContexts) -> R + std::panic::UnwindSafe + std::panic::RefUnwindSafe,
+    >(
+        &mut self,
         f: F,
     ) -> R {
         match self {
@@ -252,16 +258,15 @@ impl PgMemoryContexts {
     }
 
     /// Copies `len` bytes, starting at `src` into this memory context and
-    /// returns a raw `*mut std::os::raw:c_void` pointer to the newly allocation
-    /// location
-    pub fn copy_ptr_into(&mut self, src: void_ptr, len: usize) -> void_ptr {
+    /// returns a raw `*mut T` pointer to the newly allocated location
+    pub fn copy_ptr_into<T>(&mut self, src: *mut T, len: usize) -> *mut T {
         if src.is_null() {
             panic!("attempt to copy a null pointer");
         }
         unsafe {
             let dest = pg_sys::MemoryContextAlloc(self.value(), len);
-            pg_sys::memcpy(dest, src, len as u64);
-            dest
+            pg_sys::memcpy(dest, src as void_mut_ptr, len as u64);
+            dest as *mut T
         }
     }
 
@@ -298,15 +303,15 @@ impl PgMemoryContexts {
     }
 
     pub fn leak_and_drop_on_delete<T>(&mut self, v: T) -> *mut T {
-        unsafe extern "C" fn drop_on_delete(ptr: void_mut_ptr) {
-            let boxed = Box::from_raw(ptr);
+        unsafe extern "C" fn drop_on_delete<T>(ptr: void_mut_ptr) {
+            let boxed = Box::from_raw(ptr as *mut T);
             drop(boxed);
         }
 
         let leaked_ptr = Box::leak(Box::new(v));
         let mut memcxt_callback =
             PgBox::from_pg(self.palloc_struct::<pg_sys::MemoryContextCallback>());
-        memcxt_callback.func = Some(drop_on_delete);
+        memcxt_callback.func = Some(drop_on_delete::<T>);
         memcxt_callback.arg = leaked_ptr as *mut T as void_mut_ptr;
         unsafe {
             pg_sys::MemoryContextRegisterResetCallback(self.value(), memcxt_callback.into_pg());
@@ -315,7 +320,10 @@ impl PgMemoryContexts {
     }
 
     /// helper function
-    fn exec_in_context<R, F: Fn() -> R + std::panic::UnwindSafe + std::panic::RefUnwindSafe>(
+    fn exec_in_context<
+        R,
+        F: Fn(&mut PgMemoryContexts) -> R + std::panic::UnwindSafe + std::panic::RefUnwindSafe,
+    >(
         context: pg_sys::MemoryContext,
         f: F,
     ) -> R {
@@ -327,7 +335,7 @@ impl PgMemoryContexts {
             pg_sys::CurrentMemoryContext = context;
         }
 
-        let result = guard::guard(f);
+        let result = guard::guard(|| f(&mut PgMemoryContexts::For(context)));
 
         // restore our understanding of the current memory context
         unsafe {

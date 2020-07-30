@@ -1,6 +1,12 @@
 [package]
 name = "pgx-parent"
-version = "0.1.0"
+version = "0.0.8"
+authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
+edition = "2018"
+license = "MIT"
+description = "Top-level repo for 'pgx' (not on crates.io)"
+homepage = "https://github.com/zombodb/pgx/"
+repository = "https://github.com/zombodb/pgx/"
 
 [workspace]
 members = [
@@ -12,12 +18,26 @@ members = [
     "pgx-tests",
     "pgx-utils",
 ]
+exclude = [
+    "pgx-examples/arrays",
+    "pgx-examples/bad_ideas",
+    "pgx-examples/bytea",
+    "pgx-examples/custom_types",
+    "pgx-examples/errors",
+    "pgx-examples/spi",
+    "pgx-examples/srf",
+    "pgx-examples/strings",
+]
 
 [features]
 default = [ ]
 pg10 = [ "pgx/pg10", "pgx-pg-sys/pg10" ]
 pg11 = [ "pgx/pg11", "pgx-pg-sys/pg11" ]
 pg12 = [ "pgx/pg12", "pgx-pg-sys/pg12" ]
+
+[package.metadata.docs.rs]
+features = ["pg12"]
+no-default-features = true
 
 [dependencies]
 cargo-pgx = { path = "cargo-pgx" }

@@ -1,3 +1,11 @@
+// Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
+// governed by the MIT license that can be found in the LICENSE file.
+
+//! A safe wrapper around Postgres' internal `List` structure.
+//!
+//! It functions similarly to a Rust `Vec`, including Iterator support, but provides separate
+//! understandings of Lists of Oids, Integers, and Pointers.
+
 use crate::{is_a, pg_sys, void_mut_ptr};
 use serde::export::PhantomData;
 
@@ -123,6 +131,30 @@ impl<T> PgList<T> {
             None
         } else {
             Some(unsafe { pg_sys::list_nth_oid(self.list, i as i32) })
+        }
+    }
+
+    #[inline]
+    pub fn replace_ptr(&mut self, i: usize, with: *mut T) {
+        unsafe {
+            let cell = pg_sys::list_nth_cell(self.list, i as i32);
+            cell.as_mut().expect("cell is null").data.ptr_value = with as void_mut_ptr;
+        }
+    }
+
+    #[inline]
+    pub fn replace_int(&mut self, i: usize, with: i32) {
+        unsafe {
+            let cell = pg_sys::list_nth_cell(self.list, i as i32);
+            cell.as_mut().expect("cell is null").data.int_value = with;
+        }
+    }
+
+    #[inline]
+    pub fn replace_oid(&mut self, i: usize, with: pg_sys::Oid) {
+        unsafe {
+            let cell = pg_sys::list_nth_cell(self.list, i as i32);
+            cell.as_mut().expect("cell is null").data.oid_value = with;
         }
     }
 

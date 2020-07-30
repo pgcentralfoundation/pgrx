@@ -1,3 +1,6 @@
+// Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
+// governed by the MIT license that can be found in the LICENSE file.
+
 use std::process::{Command, Stdio};
 
 use lazy_static::*;
@@ -5,6 +8,10 @@ use std::sync::{Arc, Mutex};
 
 use colored::*;
 use pgx::*;
+use pgx_utils::{
+    createdb, get_dropdb_path, get_initdb_path, get_named_capture, get_postmaster_path,
+    get_target_dir, BASE_POSTGRES_TESTING_PORT_NO,
+};
 use postgres::error::DbError;
 use postgres::Client;
 use std::collections::HashMap;
@@ -148,14 +155,6 @@ fn format_loglines(session_id: &str, loglines: &LogLines) -> String {
     result
 }
 
-fn get_named_capture(regex: &regex::Regex, name: &'static str, against: &str) -> Option<String> {
-    match regex.captures(against) {
-        Some(cap) => Some(cap[name].to_string()),
-        None => None,
-    }
-}
-
-#[inline]
 fn initialize_test_framework(postgresql_conf: Vec<&'static str>) -> (LogLines, String) {
     let mut state = TEST_MUTEX.lock().unwrap_or_else(|_| {
         // if we can't get the lock, that means it was poisoned,
@@ -171,7 +170,13 @@ fn initialize_test_framework(postgresql_conf: Vec<&'static str>) -> (LogLines, S
 
         let system_session_id = start_pg(state.loglines.clone());
         dropdb();
-        createdb();
+        createdb(
+            pg_sys::get_pg_major_version_num(),
+            &get_pg_host(),
+            get_pg_port(),
+            get_pg_dbname(),
+            false,
+        );
         create_extension();
 
         state.installed = true;
@@ -216,18 +221,17 @@ pub fn client() -> (postgres::Client, String) {
 }
 
 fn install_extension() {
+    eprintln!("installing extension");
     let mut command = Command::new("cargo-pgx")
         .arg("pgx")
         .arg("install")
         .stdout(Stdio::inherit())
         .stderr(Stdio::inherit())
-        .env("PATH", get_pgbin_envpath())
-        .env("PGX_TEST_MODE", "1")
         .env(
-            "CARGO_TARGET_DIR",
-            std::env::var("CARGO_TARGET_DIR")
-                .unwrap_or(format!("{}/target", std::env::var("PWD").unwrap())),
+            "PGX_TEST_MODE_VERSION",
+            pg_sys::get_pg_major_version_string().to_string(),
         )
+        .env("CARGO_TARGET_DIR", get_target_dir())
         .env(
             "PGX_BUILD_FEATURES",
             format!(
@@ -235,7 +239,6 @@ fn install_extension() {
                 pg_sys::get_pg_major_version_string().to_string()
             ),
         )
-        .env("PGX_BUILD_FLAGS", "--no-default-features")
         .spawn()
         .unwrap();
 
@@ -249,12 +252,11 @@ fn initdb(postgresql_conf: Vec<&'static str>) {
     let pgdata = get_pgdata_path();
 
     if !pgdata.is_dir() {
-        let status = Command::new("initdb")
+        let status = Command::new(get_initdb_path(pg_sys::get_pg_major_version_num()))
             .arg("-D")
             .arg(pgdata.to_str().unwrap())
             .stdout(Stdio::inherit())
             .stderr(Stdio::inherit())
-            .env("PATH", get_pgbin_envpath())
             .status()
             .unwrap();
 
@@ -284,7 +286,7 @@ fn modify_postgresql_conf(pgdata: PathBuf, postgresql_conf: Vec<&'static str>) {
 }
 
 fn start_pg(loglines: LogLines) -> String {
-    let mut command = Command::new("postmaster");
+    let mut command = Command::new(get_postmaster_path(pg_sys::get_pg_major_version_num()));
     command
         .arg("-D")
         .arg(get_pgdata_path().to_str().unwrap())
@@ -292,16 +294,14 @@ fn start_pg(loglines: LogLines) -> String {
         .arg(get_pg_host())
         .arg("-p")
         .arg(get_pg_port().to_string())
-        .arg("-i")
         .stdout(Stdio::inherit())
-        .stderr(Stdio::piped())
-        .env("PATH", get_pgbin_envpath());
+        .stderr(Stdio::piped());
 
-    let cmd_string = format!("{:?}", command);
+    let command_str = format!("{:?}", command);
 
     // start Postgres and monitor its stderr in the background
     // also notify the main thread when it's ready to accept connections
-    let (pgpid, session_id) = monitor_pg(command, cmd_string, loglines);
+    let (pgpid, session_id) = monitor_pg(command, command_str, loglines);
 
     // add a shutdown hook so we can terminate it when the test framework exits
     add_shutdown_hook(move || unsafe {
@@ -396,14 +396,13 @@ fn monitor_pg(mut command: Command, cmd_string: String, loglines: LogLines) -> (
 }
 
 fn dropdb() {
-    let output = Command::new("dropdb")
+    let output = Command::new(get_dropdb_path(pg_sys::get_pg_major_version_num()))
         .arg("--if-exists")
         .arg("-h")
         .arg(get_pg_host())
         .arg("-p")
         .arg(get_pg_port().to_string())
         .arg(get_pg_dbname())
-        .env("PATH", get_pgbin_envpath())
         .output()
         .unwrap();
 
@@ -422,24 +421,6 @@ fn dropdb() {
     }
 }
 
-fn createdb() {
-    let status = Command::new("createdb")
-        .arg("-h")
-        .arg(get_pg_host())
-        .arg("-p")
-        .arg(get_pg_port().to_string())
-        .arg(get_pg_dbname())
-        .stdout(Stdio::inherit())
-        .stderr(Stdio::inherit())
-        .env("PATH", get_pgbin_envpath())
-        .status()
-        .unwrap();
-
-    if !status.success() {
-        panic!("failed to create testing database");
-    }
-}
-
 fn create_extension() {
     let (mut client, _) = client();
 
@@ -454,19 +435,13 @@ fn get_extension_name() -> String {
         .replace("-", "_")
 }
 
-fn get_pg_path() -> String {
-    format!(
-        "/tmp/pgx-build/REL_{}_STABLE/install/",
-        pg_sys::get_pg_major_version_string(),
-    )
-}
-
-fn get_pgbin_envpath() -> String {
-    format!("{}/bin:{}", get_pg_path(), std::env::var("PATH").unwrap())
-}
-
 fn get_pgdata_path() -> PathBuf {
-    PathBuf::from(format!("{}/data", get_pg_path()))
+    let mut target_dir = get_target_dir();
+    target_dir.push(&format!(
+        "pgx-test-data-{}",
+        pg_sys::get_pg_major_version_num()
+    ));
+    target_dir
 }
 
 fn get_pg_host() -> String {
@@ -474,11 +449,11 @@ fn get_pg_host() -> String {
 }
 
 fn get_pg_port() -> u16 {
-    8800 + pg_sys::get_pg_major_version_num()
+    BASE_POSTGRES_TESTING_PORT_NO + pg_sys::get_pg_major_version_num()
 }
 
-fn get_pg_dbname() -> String {
-    "pgx_tests".to_string()
+fn get_pg_dbname() -> &'static str {
+    "pgx_tests"
 }
 
 fn get_pg_user() -> String {

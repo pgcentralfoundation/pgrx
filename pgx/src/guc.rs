@@ -1,3 +1,7 @@
+// Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
+// governed by the MIT license that can be found in the LICENSE file.
+
+
 //! Provides a safe interface into Postgres' Configuration System (GUC)
 use crate::{pg_sys, PgMemoryContexts};
 use std::cell::Cell;

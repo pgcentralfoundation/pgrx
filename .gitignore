@@ -4,3 +4,7 @@
 *.iml
 **/*.rs.bk
 Cargo.lock
+*.o
+*.so
+*.a
+cmake*/

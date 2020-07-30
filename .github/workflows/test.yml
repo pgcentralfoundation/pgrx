@@ -1,0 +1,68 @@
+name: cargo test --all
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  test:
+
+    runs-on: ${{ matrix.os }}
+    if: "!contains(github.event.head_commit.message, 'nogha')"
+
+    strategy:
+      matrix:
+        version: [10, 11, 12]
+        os: ["ubuntu-latest"]
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: cargo version
+      run: cargo --version
+
+    # Ubuntu system dependencies required to build Postgres from sources
+    - name: install postgres build dependencies
+      run: sudo apt install -y bison flex zlib1g zlib1g-dev pkg-config libssl-dev libreadline-dev
+
+    # install our cargo subcomment
+    - name: install cargo pgx
+      run: cd cargo-pgx && cargo install --path . --force --debug
+
+    # install cargo tree
+    - name: install cargo tree
+      run: cargo install cargo-tree --debug
+
+    # run cargo tree
+    - name: cargo tree
+      run: cargo tree
+
+    # initialize pgx
+    - name: cargo pgx init
+      run: cargo pgx init
+
+    # test our code
+    - name: cargo test
+      run: RUST_BACKTRACE=1 cargo test --all --features pg${{ matrix.version }} --no-default-features
+
+    # make sure the examples build too
+    - name: arrays example
+      run: cd pgx-examples/arrays && cargo pgx test pg${{ matrix.version }}
+    - name: bad_ideas example
+      run: cd pgx-examples/bad_ideas && cargo pgx test pg${{ matrix.version }}
+    - name: bytea example
+      run: cd pgx-examples/bytea && cargo pgx test pg${{ matrix.version }}
+    - name: custom_types example
+      run: cd pgx-examples/custom_types && cargo pgx test pg${{ matrix.version }}
+    - name: errors example
+      run: cd pgx-examples/errors && cargo pgx test pg${{ matrix.version }}
+    - name: spi example
+      run: cd pgx-examples/spi && cargo pgx test pg${{ matrix.version }}
+    - name: srf example
+      run: cd pgx-examples/srf && cargo pgx test pg${{ matrix.version }}
+    - name: strings example
+      run: cd pgx-examples/strings && cargo pgx test pg${{ matrix.version }}
