@@ -48,8 +48,13 @@ pub struct BackgroundWorker {}
 
 impl BackgroundWorker {
     pub fn get_name() -> &'static str {
+        #[cfg(feature = "pg10")]
+        const LEN: usize = 64;
+        #[cfg(any(feature = "pg11", feature = "pg12"))]
+        const LEN: usize = 96;
+
         unsafe {
-            CStr::from_ptr(std::mem::transmute::<&[i8; 96], *const i8>(
+            CStr::from_ptr(std::mem::transmute::<&[i8; LEN], *const i8>(
                 &(*pg_sys::MyBgworkerEntry).bgw_name,
             ))
         }
@@ -90,6 +95,10 @@ impl BackgroundWorker {
         let user: *const i8 = user.as_ref().map_or(std::ptr::null(), |i| i.as_ptr());
 
         unsafe {
+            #[cfg(feature = "pg10")]
+            pg_sys::BackgroundWorkerInitializeConnection(db as *mut i8, user as *mut i8);
+
+            #[cfg(any(feature = "pg11", feature = "pg12"))]
             pg_sys::BackgroundWorkerInitializeConnection(db, user, 0);
         };
     }
@@ -226,23 +235,34 @@ impl BackgroundWorkerBuilder {
     }
 
     pub fn load(self: Self) {
+        #[cfg(feature = "pg10")]
         let mut bgw = pg_sys::BackgroundWorker {
-            bgw_name: RpgffiChar96::from(&self.bgw_name[..]).0,
-            bgw_type: RpgffiChar96::from(&self.bgw_type[..]).0,
+            bgw_name: RpgffiChar::from(&self.bgw_name[..]).0,
             bgw_flags: self.bgw_flags.bits(),
             bgw_start_time: self.bgw_start_time as u32,
             bgw_restart_time: match self.bgw_restart_time {
                 None => -1,
                 Some(d) => d.as_secs() as i32,
             },
-            bgw_library_name: RpgffiChar96::from(&self.bgw_library_name[..]).0,
-            bgw_function_name: RpgffiChar96::from(&self.bgw_function_name[..]).0,
-            /*
-            bgw_function_name: RpgffiChar96::from(
-                &format!("{}_wrapper", &self.bgw_function_name)[..],
-            )
-            */
-            .0,
+            bgw_library_name: RpgffiChar::from(&self.bgw_library_name[..]).0,
+            bgw_function_name: RpgffiChar::from(&self.bgw_function_name[..]).0,
+            bgw_main_arg: self.bgw_main_arg,
+            bgw_extra: RpgffiChar128::from(&self.bgw_extra[..]).0,
+            bgw_notify_pid: self.bgw_notify_pid,
+        };
+
+        #[cfg(any(feature = "pg11", feature = "pg12"))]
+        let mut bgw = pg_sys::BackgroundWorker {
+            bgw_name: RpgffiChar::from(&self.bgw_name[..]).0,
+            bgw_type: RpgffiChar::from(&self.bgw_type[..]).0,
+            bgw_flags: self.bgw_flags.bits(),
+            bgw_start_time: self.bgw_start_time as u32,
+            bgw_restart_time: match self.bgw_restart_time {
+                None => -1,
+                Some(d) => d.as_secs() as i32,
+            },
+            bgw_library_name: RpgffiChar::from(&self.bgw_library_name[..]).0,
+            bgw_function_name: RpgffiChar::from(&self.bgw_function_name[..]).0,
             bgw_main_arg: self.bgw_main_arg,
             bgw_extra: RpgffiChar128::from(&self.bgw_extra[..]).0,
             bgw_notify_pid: self.bgw_notify_pid,
@@ -272,6 +292,24 @@ fn wait_latch(timeout: i64, wakeup_flags: WLflags) -> i32 {
         check_for_interrupts!();
 
         latch
+    }
+}
+
+#[cfg(feature = "pg10")]
+type RpgffiChar = RpgffiChar64;
+
+#[cfg(any(feature = "pg11", feature = "pg12'"))]
+type RpgffiChar = RpgffiChar96;
+
+pub struct RpgffiChar64([i8; 64]);
+
+impl<'a> From<&'a str> for RpgffiChar64 {
+    fn from(string: &str) -> Self {
+        let mut r = [0; 64];
+        for (dest, src) in r.iter_mut().zip(string.as_bytes()) {
+            *dest = *src as i8;
+        }
+        RpgffiChar64(r)
     }
 }
 
