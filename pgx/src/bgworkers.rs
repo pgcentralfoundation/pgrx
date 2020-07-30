@@ -298,7 +298,7 @@ fn wait_latch(timeout: i64, wakeup_flags: WLflags) -> i32 {
 #[cfg(feature = "pg10")]
 type RpgffiChar = RpgffiChar64;
 
-#[cfg(any(feature = "pg11", feature = "pg12'"))]
+#[cfg(any(feature = "pg11", feature = "pg12"))]
 type RpgffiChar = RpgffiChar96;
 
 pub struct RpgffiChar64([i8; 64]);
