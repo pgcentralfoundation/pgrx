@@ -106,3 +106,6 @@ jobs:
       run: cd pgx-examples/strings && cargo pgx test pg${{ matrix.version }}
       env:
         RUSTC_WRAPPER: sccache
+
+    - name: sccache stats
+      run: sccache -s
