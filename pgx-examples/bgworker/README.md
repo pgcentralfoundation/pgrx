@@ -5,7 +5,7 @@ In order to use this bgworker with pgx, you'll need to edit the proper `postgres
 `~/.pgx/data-PGVER/postgresql.conf` and add this line to the end:
 
 ```
-session_preload_libraries = 'bgwoker.so'
+session_preload_libraries = 'bgworker.so'
 ```
 
 Background workers **must** be initialized in the extension's `_PG_init()` function, and can **only**
