@@ -2,7 +2,9 @@
 // governed by the MIT license that can be found in the LICENSE file.
 
 use crate::commands::get::get_property;
-use pgx_utils::{categorize_type, get_named_capture, CategorizedType, ExternArgs};
+use pgx_utils::{
+    categorize_type, exit_with_error, get_named_capture, handle_result, CategorizedType, ExternArgs,
+};
 use proc_macro2::{Ident, Span, TokenTree};
 use quote::quote;
 use std::borrow::BorrowMut;
@@ -86,26 +88,34 @@ fn process_schema_load_order(mut created: Vec<String>) {
     load_order.append(&mut created);
 
     // rewrite the load_order file
-    let mut file = std::fs::File::create(&filename)
-        .unwrap_or_else(|e| panic!("couldn't open {} for writing: {:?}", filename.display(), e));
+    let mut file = handle_result!(
+        format!("failed to create {}", filename.display()),
+        std::fs::File::create(&filename)
+    );
     load_order.iter().for_each(|v| {
         let v = v.trim_start_matches("./sql/");
 
-        file.write_all(v.as_bytes())
-            .unwrap_or_else(|e| panic!("failed to write to {}: {:?}", filename.display(), e));
-        file.write_all(&[b'\n'])
-            .unwrap_or_else(|e| panic!("failed to write to {}: {:?}", filename.display(), e));
+        handle_result!(
+            format!("failed to write to {}", filename.display()),
+            file.write_all(v.as_bytes())
+        );
+        handle_result!(
+            format!("failed to write to {}", filename.display()),
+            file.write_all(&[b'\n'])
+        );
     });
 }
 
 pub(crate) fn read_load_order(filename: &PathBuf) -> Vec<String> {
     let mut load_order = Vec::new();
 
-    if let Ok(file) = std::fs::File::open(&filename) {
-        let reader = std::io::BufReader::new(file);
-        for (_, line) in reader.lines().enumerate() {
-            load_order.push(line.unwrap());
-        }
+    let file = handle_result!(
+        format!("failed to open {}", filename.display()),
+        std::fs::File::open(&filename)
+    );
+    let reader = std::io::BufReader::new(file);
+    for (_, line) in reader.lines().enumerate() {
+        load_order.push(line.unwrap());
     }
 
     load_order
@@ -117,20 +127,28 @@ fn write_sql_file(f: &DirEntry, statements: Vec<String>) -> (bool, PathBuf) {
     if statements.is_empty() {
         // delete existing sql file if it exists
         if filename.exists() {
-            std::fs::remove_file(&filename)
-                .unwrap_or_else(|e| panic!("unable to delete {}: {:?}", filename.display(), e));
+            handle_result!(
+                format!("failed to delete {}", filename.display()),
+                std::fs::remove_file(&filename)
+            );
         }
 
         (false, filename)
     } else {
         // write the statements out to the sql file
-        let mut file = std::fs::File::create(&filename)
-            .unwrap_or_else(|e| panic!("failed to open {}: {:?}", filename.display(), e));
+        let mut file = handle_result!(
+            format!("failed to create {}", filename.display()),
+            std::fs::File::create(&filename)
+        );
         for statement in statements {
-            file.write_all(statement.as_bytes())
-                .unwrap_or_else(|e| panic!("failed to write to {}: {:?}", filename.display(), e));
-            file.write_all(&[b'\n'])
-                .unwrap_or_else(|e| panic!("failed to write to {}: {:?}", filename.display(), e));
+            handle_result!(
+                format!("failed to write to {}", filename.display()),
+                file.write_all(statement.as_bytes())
+            );
+            handle_result!(
+                format!("failed to write to {}", filename.display()),
+                file.write_all(&[b'\n'])
+            );
         }
 
         (true, filename)
@@ -182,8 +200,10 @@ fn delete_generated_sql() {
             let filename = f.file_name().into_string().unwrap();
 
             if f.metadata().unwrap().is_file() && filename.ends_with(".generated.sql") {
-                std::fs::remove_file(f.path())
-                    .unwrap_or_else(|e| panic!("couldn't delete {}: {:?}", filename, e));
+                handle_result!(
+                    format!("failed to delete {}", filename),
+                    std::fs::remove_file(f.path())
+                );
             }
         }
     }
@@ -299,7 +319,7 @@ fn walk_items(
                 let string = string.trim();
 
                 if !string.starts_with("r#\"") || !string.ends_with("\"#") {
-                    panic!("extension_sql!{{}} value isn't ia raw string");
+                    exit_with_error!("extension_sql!{{}} value isn't ia raw string");
                 }
 
                 // remove the raw string quotes
@@ -367,7 +387,7 @@ fn walk_items(
                             )
                         {
                             if type_names.len() > 2 {
-                                panic!(
+                                exit_with_error!(
                                     "#[pg_operator] only supports functions with 1 or 2 arguments"
                                 )
                             }
@@ -385,7 +405,9 @@ fn walk_items(
                             }
 
                             if name.is_none() {
-                                panic!("#[pg_operator] requires the #[opname( <opname> )] macro")
+                                exit_with_error!(
+                                    "#[pg_operator] requires the #[opname( <opname> )] macro"
+                                )
                             }
 
                             let mut sql = String::new();
@@ -504,7 +526,9 @@ fn make_create_function_statement(
         let mut i = 0;
         for arg in &func.sig.inputs {
             match arg {
-                FnArg::Receiver(_) => panic!("functions that take 'self' are not supported"),
+                FnArg::Receiver(_) => {
+                    exit_with_error!("functions that take 'self' are not supported")
+                }
                 FnArg::Typed(ty) => match translate_type(rs_file, &ty.ty) {
                     Some((type_name, _, default_value, variadic)) => {
                         sql_argument_type_names.push(type_name.to_string());
@@ -574,7 +598,10 @@ fn make_create_function_statement(
         Some((return_type, _is_option, _, _)) => {
             statement.push_str(&format!(" RETURNS {}", return_type))
         }
-        None => panic!("could not determine return type"),
+        None => exit_with_error!(
+            "could not determine return type for function: {}",
+            func.sig.ident
+        ),
     }
 
     // modifiers
@@ -641,10 +668,10 @@ fn arg_name(arg: &FnArg) -> String {
             return quote_ident(&ident.ident);
         }
 
-        panic!("Can't figure out argument name");
+        exit_with_error!("Can't figure out argument name");
     }
 
-    panic!("functions that take 'self' are not supported")
+    exit_with_error!("functions that take 'self' are not supported")
 }
 
 fn translate_type(filename: &DirEntry, ty: &Type) -> Option<(String, bool, Option<String>, bool)> {
@@ -665,7 +692,7 @@ fn translate_type(filename: &DirEntry, ty: &Type) -> Option<(String, bool, Optio
                 rust_type = format!("{}", quote! {#path});
                 span = path.span();
             }
-            _ => panic!("found unexpected path type: {:?}", ty),
+            _ => exit_with_error!("found unexpected path type: {:?}", ty),
         },
         Type::Reference(tref) => {
             let elem = &tref.elem;
@@ -682,7 +709,7 @@ fn translate_type(filename: &DirEntry, ty: &Type) -> Option<(String, bool, Optio
                     variadic = v;
                     span = makro.span();
                 }
-                None => panic!("unrecognized macro in argument list: {}", as_string),
+                None => exit_with_error!("unrecognized macro in argument list: {}", as_string),
             }
         }
 
@@ -694,7 +721,7 @@ fn translate_type(filename: &DirEntry, ty: &Type) -> Option<(String, bool, Optio
 
         Type::ImplTrait(_) | Type::Tuple(_) => match categorize_type(ty) {
             CategorizedType::Default => {
-                panic!("{:?} isn't an 'impl Trait' type or a Rust Tuple", ty)
+                exit_with_error!("{:?} isn't an 'impl Trait' type or a Rust Tuple", ty)
             }
             CategorizedType::Iterator(types)
             | CategorizedType::OptionalIterator(types)
@@ -705,9 +732,7 @@ fn translate_type(filename: &DirEntry, ty: &Type) -> Option<(String, bool, Optio
             }
         },
 
-        other => {
-            panic!("Unsupported type: {:?}", other);
-        }
+        other => exit_with_error!("Unsupported type: {:?}", other),
     }
 
     translate_type_string(
@@ -875,17 +900,17 @@ fn translate_type_string(
 
                                     (name.unwrap().to_string(), ty.to_string())
                                 }
-                                _ => panic!("malformed name!() macro"),
+                                _ => exit_with_error!("malformed name!() macro"),
                             }
                         }
-                        _ => panic!(
+                        _ => exit_with_error!(
                             "No name!() macro specified for tuple member of type: {} at {}",
                             ty,
                             location_comment(filename, span)
                         ),
                     }
                 } else {
-                    panic!("malformed name!() macro")
+                    exit_with_error!("malformed name!() macro")
                 };
 
                 let translated = translate_type_string(
@@ -1007,7 +1032,7 @@ fn extract_type(type_name: &str) -> String {
     let re = regex::Regex::new(r#"\w+ <(.*)>.*"#).unwrap();
     let capture = re
         .captures(type_name)
-        .unwrap_or_else(|| panic!("no type capture against: {}", type_name))
+        .unwrap_or_else(|| exit_with_error!("no type capture against: {}", type_name))
         .get(1);
     capture.unwrap().as_str().to_string().trim().to_string()
 }
@@ -1117,9 +1142,9 @@ fn collect_attributes(
                     sql_statements.pop().unwrap(),
                 ));
             } else if sql_statements.is_empty() {
-                panic!("Found no lines for ```funcname");
+                exit_with_error!("Found no lines for ```funcname");
             } else {
-                panic!("Found more than 1 line for ```funcname");
+                exit_with_error!("Found more than 1 line for ```funcname");
             }
 
             i = new_i;
@@ -1140,9 +1165,9 @@ fn collect_attributes(
                     sql_statements.pop().unwrap(),
                 ));
             } else if sql_statements.is_empty() {
-                panic!("Found no lines for ```funcargs");
+                exit_with_error!("Found no lines for ```funcargs");
             } else {
-                panic!("Found more than 1 line for ```funcargs");
+                exit_with_error!("Found more than 1 line for ```funcargs");
             }
 
             i = new_i;
@@ -1225,7 +1250,7 @@ fn collect_doc(
             let as_string = as_string.trim_end_matches("\" ]");
             let as_string = as_string.trim();
             let as_string = unescape::unescape(as_string)
-                .unwrap_or_else(|| panic!("Improperly escaped:\n{}", as_string));
+                .unwrap_or_else(|| exit_with_error!("Improperly escaped:\n{}", as_string));
 
             // do variable substitution in the sql statement
             let as_string = as_string.replace("@FUNCTION_NAME@", &format!("{}_wrapper", ident));
