@@ -5,12 +5,16 @@ use std::io::Write;
 use std::path::PathBuf;
 use std::process::Command;
 
-pub(crate) fn create_crate_template(path: PathBuf, name: &str) -> Result<(), std::io::Error> {
+pub(crate) fn create_crate_template(
+    path: PathBuf,
+    name: &str,
+    is_bgworker: bool,
+) -> Result<(), std::io::Error> {
     create_directory_structure(&path)?;
     create_control_file(&path, name)?;
     create_cargo_toml(&path, name)?;
     create_dotcargo_config(&path, name)?;
-    create_lib_rs(&path, name)?;
+    create_lib_rs(&path, name, is_bgworker)?;
     create_git_ignore(&path, name)?;
 
     let cwd = std::env::current_dir().unwrap();
@@ -71,14 +75,20 @@ fn create_dotcargo_config(path: &PathBuf, _name: &str) -> Result<(), std::io::Er
     Ok(())
 }
 
-fn create_lib_rs(path: &PathBuf, name: &str) -> Result<(), std::io::Error> {
+fn create_lib_rs(path: &PathBuf, name: &str, is_bgworker: bool) -> Result<(), std::io::Error> {
     let mut filename = path.clone();
 
     filename.push("src");
     filename.push("lib.rs");
     let mut file = std::fs::File::create(filename)?;
 
-    file.write_all(&format!(include_str!("../templates/lib_rs"), name = name).as_bytes())?;
+    if is_bgworker {
+        file.write_all(
+            &format!(include_str!("../templates/bgworker_lib_rs"), name = name).as_bytes(),
+        )?;
+    } else {
+        file.write_all(&format!(include_str!("../templates/lib_rs"), name = name).as_bytes())?;
+    }
 
     Ok(())
 }

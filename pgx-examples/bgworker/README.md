@@ -9,4 +9,4 @@ session_preload_libraries = 'bgworker.so'
 ```
 
 Background workers **must** be initialized in the extension's `_PG_init()` function, and can **only**
-actually be started if loaded through the `session_preload_libraries` configuration setting.
+be started if loaded through the `session_preload_libraries` configuration setting.

@@ -60,6 +60,10 @@ subcommands:
                     takes_value: true
                     required: true
                     help: the name of the extension
+                - bgworker:
+                    short: bgw
+                    long: bgworker
+                    help: create a background worker template
           - install:
               about: install the extension from the current crate to the Postgres specified by whatever "pg_config" is currently on your $PATH
               args:
