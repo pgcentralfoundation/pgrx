@@ -23,6 +23,9 @@ extern crate pgx_macros;
 
 extern crate num_traits;
 
+#[macro_use]
+extern crate bitflags;
+
 // expose our various derive macros
 pub use pgx_macros::*;
 
@@ -36,7 +39,9 @@ pub mod htup;
 pub mod inoutfuncs;
 pub mod itemptr;
 pub mod list;
+#[macro_use]
 pub mod log;
+pub mod bgworkers;
 pub mod memcxt;
 pub mod namespace;
 pub mod nodes;

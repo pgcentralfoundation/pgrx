@@ -94,7 +94,9 @@ OPTIONS:
 
  ![new](new.png)
 
-`cargo pgx new <extname>` is an easy way to get started creating a new extension.  It's simlar to `cargo new <name>`, but does the additional things necessary to support building a Rust Postgres extension.
+`cargo pgx new <extname>` is an easy way to get started creating a new extension.  It's similar to `cargo new <name>`, but does the additional things necessary to support building a Rust Postgres extension.
+
+If you'd like to create a "background worker" instead, specify the `--bgworker` argument.
 
 It also initializes the crate directory as a `git` repository.
 
@@ -104,11 +106,12 @@ cargo-pgx-pgx-new
 create a new extension crate
 
 USAGE:
-    cargo-pgx pgx new <NAME>
+    cargo-pgx pgx new [FLAGS] <NAME>
 
 FLAGS:
-    -h, --help       Prints help information
-    -V, --version    Prints version information
+    -b, --bgworker    create a background worker template
+    -h, --help        Prints help information
+    -V, --version     Prints version information
 
 ARGS:
     <NAME>    the name of the extension
