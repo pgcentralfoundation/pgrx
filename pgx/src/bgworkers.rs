@@ -383,7 +383,7 @@ impl BackgroundWorkerBuilder {
             bgw_flags: self.bgw_flags.bits(),
             bgw_start_time: self.bgw_start_time as u32,
             bgw_restart_time: match self.bgw_restart_time {
-                None => -1,
+                None => pg_sys::BGW_NEVER_RESTART,
                 Some(d) => d.as_secs() as i32,
             },
             bgw_library_name: RpgffiChar::from(&self.bgw_library_name[..]).0,
