@@ -61,6 +61,28 @@ pub fn heap_tuple_get_datum(heap_tuple: pg_sys::HeapTuple) -> pg_sys::Datum {
     unsafe { pg_sys::HeapTupleHeaderGetDatum((*heap_tuple).t_data) }
 }
 
+/// ```c
+/// #define HeapTupleHeaderGetTypeId(tup) \
+/// ( \
+/// (tup)->t_choice.t_datum.datum_typeid \
+/// )
+/// ```
+#[inline]
+pub unsafe fn heap_tuple_header_get_type_id(htup_header: pg_sys::HeapTupleHeader) -> pg_sys::Oid {
+    htup_header.as_ref().unwrap().t_choice.t_datum.datum_typeid
+}
+
+/// ```c
+/// #define HeapTupleHeaderGetTypMod(tup) \
+/// ( \
+/// (tup)->t_choice.t_datum.datum_typmod \
+/// )
+/// ```
+#[inline]
+pub unsafe fn heap_tuple_header_get_typmod(htup_header: pg_sys::HeapTupleHeader) -> i32 {
+    htup_header.as_ref().unwrap().t_choice.t_datum.datum_typmod
+}
+
 extern "C" {
     fn pgx_heap_getattr(
         tuple: *const pg_sys::HeapTupleData,

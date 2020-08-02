@@ -92,6 +92,11 @@ jobs:
       env:
         RUSTC_WRAPPER: sccache
 
+    - name: operators example
+      run: cd pgx-examples/operators && cargo pgx test pg${{ matrix.version }}
+      env:
+        RUSTC_WRAPPER: sccache
+
     - name: spi example
       run: cd pgx-examples/spi && cargo pgx test pg${{ matrix.version }}
       env:

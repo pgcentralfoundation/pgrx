@@ -105,6 +105,55 @@ pub fn initialize(_attr: TokenStream, item: TokenStream) -> TokenStream {
     item
 }
 
+/// Declare a function as `#[pg_operator]` to indicate that it represents a Postgres operator
+/// `cargo pgx schema` will automatically generate the underlying SQL
+#[proc_macro_attribute]
+pub fn pg_operator(attr: TokenStream, item: TokenStream) -> TokenStream {
+    pg_extern(attr, item)
+}
+
+/// Used with `#[pg_operator]`.  1 value which is the operator name itself
+#[proc_macro_attribute]
+pub fn opname(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    item
+}
+
+/// Used with `#[pg_operator]`.  1 value which is the function name
+#[proc_macro_attribute]
+pub fn commutator(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    item
+}
+
+/// Used with `#[pg_operator]`.  1 value which is the function name
+#[proc_macro_attribute]
+pub fn negator(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    item
+}
+
+/// Used with `#[pg_operator]`.  1 value which is the function name
+#[proc_macro_attribute]
+pub fn restrict(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    item
+}
+
+/// Used with `#[pg_operator]`.  1 value which is the function name
+#[proc_macro_attribute]
+pub fn join(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    item
+}
+
+/// Used with `#[pg_operator]`.  no values
+#[proc_macro_attribute]
+pub fn hashes(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    item
+}
+
+/// Used with `#[pg_operator]`.  no values
+#[proc_macro_attribute]
+pub fn merges(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    item
+}
+
 /// Declare a function as `#[pg_extern]` to indicate that it can be used by Postgres as a UDF
 #[proc_macro_attribute]
 pub fn pg_extern(attr: TokenStream, item: TokenStream) -> TokenStream {

@@ -50,6 +50,7 @@ SUBCOMMANDS:
 
  - `PGX_HOME` - If set, overrides `pgx`'s default directory of `~/.pgx/`
  - `PGX_BUILD_FLAGS` - If set during `cargo pgx run/test/install`, these additional flags are passed to `cargo build` while building the extension
+ - `HTTPS_PROXY` - If set during `cargo pgx init`, it will download the Postgres sources using these proxy settings. For more details refer to the [env_proxy crate documentation](https://docs.rs/env_proxy/*/env_proxy/fn.for_url.html).
 
 ## First Time Initialization
 
@@ -152,10 +153,11 @@ cargo-pgx-pgx-run
 compile/install extension to a pgx-managed Postgres instance and start psql
 
 USAGE:
-    cargo-pgx pgx run <PG_VERSION> [DBNAME]
+    cargo-pgx pgx run [FLAGS] <PG_VERSION> [DBNAME]
 
 FLAGS:
     -h, --help       Prints help information
+    -r, --release    compile for release mode (default is debug)
     -V, --version    Prints version information
 
 ARGS:

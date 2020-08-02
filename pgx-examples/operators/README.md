@@ -1,0 +1,1 @@
+A quick example of making operator functions

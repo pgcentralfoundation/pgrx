@@ -1,9 +1,8 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-
 //! Provides a safe wrapper around Postgres' `pg_sys::TupleDescData` struct
-use crate::{pg_sys, void_mut_ptr, PgBox, PgRelation};
+use crate::{pg_sys, void_mut_ptr, FromDatum, PgBox, PgRelation};
 
 use std::ops::Deref;
 
@@ -41,6 +40,7 @@ use std::ops::Deref;
 pub struct PgTupleDesc<'a> {
     tupdesc: PgBox<pg_sys::TupleDescData>,
     parent: Option<&'a PgRelation>,
+    data: Option<PgBox<pg_sys::HeapTupleData>>,
     need_release: bool,
     need_pfree: bool,
 }
@@ -60,6 +60,7 @@ impl<'a> PgTupleDesc<'a> {
         PgTupleDesc {
             tupdesc: PgBox::from_pg(ptr),
             parent: None,
+            data: None,
             need_release: true,
             need_pfree: false,
         }
@@ -73,6 +74,7 @@ impl<'a> PgTupleDesc<'a> {
         PgTupleDesc {
             tupdesc: PgBox::from_pg(unsafe { pg_sys::CreateTupleDescCopyConstr(ptr) }),
             parent: None,
+            data: None,
             need_release: false,
             need_pfree: true,
         }
@@ -105,17 +107,47 @@ impl<'a> PgTupleDesc<'a> {
         PgTupleDesc {
             tupdesc: PgBox::from_pg(ptr),
             parent: None,
+            data: None,
             need_release: false,
             need_pfree: true,
         }
     }
 
     /// wrap the `pg_sys::TupleDesc` contained by the specified `PgRelation`
-    pub(crate) fn from_relation(parent: &PgRelation) -> PgTupleDesc {
+    pub fn from_relation(parent: &PgRelation) -> PgTupleDesc {
         PgTupleDesc {
             tupdesc: PgBox::from_pg(parent.rd_att),
             parent: Some(parent),
+            data: None,
             need_release: false,
+            need_pfree: false,
+        }
+    }
+
+    /// create a `PgTupleDesc` from a composite `pg_sys::Datum`, also tracking the backing
+    /// `HeapTupleData` so its attribute values can get retrieved via the `get_attr()` function.
+    ///
+    /// ## Safety
+    ///
+    /// This function is unsafe as it cannot guarantee that the provided `pg_sys::Datum` actually
+    /// points to a composite type
+    pub unsafe fn from_composite(composite: pg_sys::Datum) -> Self {
+        let htup_header =
+            pg_sys::pg_detoast_datum(composite as *mut pg_sys::varlena) as pg_sys::HeapTupleHeader;
+        let tup_type = crate::heap_tuple_header_get_type_id(htup_header);
+        let tup_typmod = crate::heap_tuple_header_get_typmod(htup_header);
+        let tupdesc = pg_sys::lookup_rowtype_tupdesc(tup_type, tup_typmod);
+
+        let mut data = PgBox::<pg_sys::HeapTupleData>::alloc();
+
+        data.t_len = crate::heap_tuple_header_get_datum_length(htup_header) as u32;
+        data.t_data = htup_header;
+
+        PgTupleDesc {
+            tupdesc: PgBox::from_pg(tupdesc),
+            parent: None,
+            data: Some(data),
+            need_release: true,
             need_pfree: false,
         }
     }
@@ -152,6 +184,21 @@ impl<'a> PgTupleDesc<'a> {
         } else {
             Some(tupdesc_get_attr(&self.tupdesc, i))
         }
+    }
+
+    /// Get a typed attribute Datum from the backing composite data.
+    ///
+    /// This is only possible for `PgTupleDesc` created with `from_composite()`.
+    ///
+    /// The `attno` argument is zero-based
+    pub fn get_attr<T: FromDatum>(&self, attno: usize) -> Option<T> {
+        crate::heap_getattr(
+            self.data
+                .as_ref()
+                .expect("no composite data associated with this PgTupleDesc"),
+            attno + 1, // +1 b/c heap_getattr is 1-based but we're not
+            &self,
+        )
     }
 
     /// Iterate over our attributes

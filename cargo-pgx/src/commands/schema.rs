@@ -2,7 +2,9 @@
 // governed by the MIT license that can be found in the LICENSE file.
 
 use crate::commands::get::get_property;
-use pgx_utils::{categorize_type, get_named_capture, CategorizedType, ExternArgs};
+use pgx_utils::{
+    categorize_type, exit_with_error, get_named_capture, handle_result, CategorizedType, ExternArgs,
+};
 use proc_macro2::{Ident, Span, TokenTree};
 use quote::quote;
 use std::borrow::BorrowMut;
@@ -14,8 +16,20 @@ use std::path::PathBuf;
 use std::result::Result;
 use std::str::FromStr;
 use syn::export::ToTokens;
+use syn::export::TokenStream2;
 use syn::spanned::Spanned;
 use syn::{Attribute, FnArg, Item, ItemFn, Pat, ReturnType, Type};
+
+#[derive(Debug)]
+enum OperatorOptions {
+    Name(String),
+    Commutator(String),
+    Negator(String),
+    Restrict(String),
+    Join(String),
+    Hashes,
+    Merges,
+}
 
 #[derive(Debug)]
 enum CategorizedAttribute {
@@ -23,6 +37,7 @@ enum CategorizedAttribute {
     PgTest((Span, HashSet<ExternArgs>)),
     RustTest(Span),
     PgExtern((Span, HashSet<ExternArgs>)),
+    PgOperator(Span, HashSet<ExternArgs>, Vec<OperatorOptions>),
     Sql(Vec<String>),
     SqlFunctionName(String),
     SqlFunctionArgs(String),
@@ -73,26 +88,34 @@ fn process_schema_load_order(mut created: Vec<String>) {
     load_order.append(&mut created);
 
     // rewrite the load_order file
-    let mut file = std::fs::File::create(&filename)
-        .unwrap_or_else(|e| panic!("couldn't open {} for writing: {:?}", filename.display(), e));
+    let mut file = handle_result!(
+        format!("failed to create {}", filename.display()),
+        std::fs::File::create(&filename)
+    );
     load_order.iter().for_each(|v| {
         let v = v.trim_start_matches("./sql/");
 
-        file.write_all(v.as_bytes())
-            .unwrap_or_else(|e| panic!("failed to write to {}: {:?}", filename.display(), e));
-        file.write_all(&[b'\n'])
-            .unwrap_or_else(|e| panic!("failed to write to {}: {:?}", filename.display(), e));
+        handle_result!(
+            format!("failed to write to {}", filename.display()),
+            file.write_all(v.as_bytes())
+        );
+        handle_result!(
+            format!("failed to write to {}", filename.display()),
+            file.write_all(&[b'\n'])
+        );
     });
 }
 
 pub(crate) fn read_load_order(filename: &PathBuf) -> Vec<String> {
     let mut load_order = Vec::new();
 
-    if let Ok(file) = std::fs::File::open(&filename) {
-        let reader = std::io::BufReader::new(file);
-        for (_, line) in reader.lines().enumerate() {
-            load_order.push(line.unwrap());
-        }
+    let file = handle_result!(
+        format!("failed to open {}", filename.display()),
+        std::fs::File::open(&filename)
+    );
+    let reader = std::io::BufReader::new(file);
+    for (_, line) in reader.lines().enumerate() {
+        load_order.push(line.unwrap());
     }
 
     load_order
@@ -104,20 +127,28 @@ fn write_sql_file(f: &DirEntry, statements: Vec<String>) -> (bool, PathBuf) {
     if statements.is_empty() {
         // delete existing sql file if it exists
         if filename.exists() {
-            std::fs::remove_file(&filename)
-                .unwrap_or_else(|e| panic!("unable to delete {}: {:?}", filename.display(), e));
+            handle_result!(
+                format!("failed to delete {}", filename.display()),
+                std::fs::remove_file(&filename)
+            );
         }
 
         (false, filename)
     } else {
         // write the statements out to the sql file
-        let mut file = std::fs::File::create(&filename)
-            .unwrap_or_else(|e| panic!("failed to open {}: {:?}", filename.display(), e));
+        let mut file = handle_result!(
+            format!("failed to create {}", filename.display()),
+            std::fs::File::create(&filename)
+        );
         for statement in statements {
-            file.write_all(statement.as_bytes())
-                .unwrap_or_else(|e| panic!("failed to write to {}: {:?}", filename.display(), e));
-            file.write_all(&[b'\n'])
-                .unwrap_or_else(|e| panic!("failed to write to {}: {:?}", filename.display(), e));
+            handle_result!(
+                format!("failed to write to {}", filename.display()),
+                file.write_all(statement.as_bytes())
+            );
+            handle_result!(
+                format!("failed to write to {}", filename.display()),
+                file.write_all(&[b'\n'])
+            );
         }
 
         (true, filename)
@@ -169,8 +200,10 @@ fn delete_generated_sql() {
             let filename = f.file_name().into_string().unwrap();
 
             if f.metadata().unwrap().is_file() && filename.ends_with(".generated.sql") {
-                std::fs::remove_file(f.path())
-                    .unwrap_or_else(|e| panic!("couldn't delete {}: {:?}", filename, e));
+                handle_result!(
+                    format!("failed to delete {}", filename),
+                    std::fs::remove_file(f.path())
+                );
             }
         }
     }
@@ -209,6 +242,7 @@ fn walk_items(
 ) {
     let statement_cnt = sql.len();
     let mut postgres_types = Vec::new();
+    let mut operator_sql = Vec::new();
     let current_schema = schema_stack
         .last()
         .expect("couldn't determine the current schema")
@@ -280,12 +314,12 @@ fn walk_items(
                 None => "".to_string(),
             };
 
-            if "extension_sql".eq(&name) {
+            if name.ends_with("extension_sql") {
                 let string = makro.mac.tokens.to_string();
                 let string = string.trim();
 
                 if !string.starts_with("r#\"") || !string.ends_with("\"#") {
-                    panic!("extension_sql!{{}} value isn't ia raw string");
+                    exit_with_error!("extension_sql!{{}} value isn't ia raw string");
                 }
 
                 // remove the raw string quotes
@@ -311,7 +345,7 @@ fn walk_items(
                     // if we're in test mode, which is controlled by the PGX_TEST_MODE
                     // environment variable
                     CategorizedAttribute::PgTest((span, _)) if is_test_mode => {
-                        if let Some(statement) = make_create_function_statement(
+                        if let (Some(statement), _, _) = make_create_function_statement(
                             &func,
                             None,
                             rs_file,
@@ -326,7 +360,7 @@ fn walk_items(
                     // for #[pg_extern] attributes, we only want to programatically generate
                     // a CREATE FUNCTION statement if we don't already have some
                     CategorizedAttribute::PgExtern((span, args)) if function_sql.is_empty() => {
-                        if let Some(statement) = make_create_function_statement(
+                        if let (Some(statement), _, _) = make_create_function_statement(
                             &func,
                             Some(args),
                             rs_file,
@@ -334,7 +368,91 @@ fn walk_items(
                             &current_schema,
                         ) {
                             function_sql.push(location_comment(rs_file, &span));
-                            function_sql.push(statement)
+                            function_sql.push(statement);
+                        }
+                    }
+
+                    // for #[pg_operator] we do the same as above for #[pg_extern], but we also
+                    // generate the CREATE OPERATOR sql too
+                    CategorizedAttribute::PgOperator(span, args, options)
+                        if function_sql.is_empty() =>
+                    {
+                        if let (Some(statement), Some(func_name), Some(type_names)) =
+                            make_create_function_statement(
+                                &func,
+                                Some(args),
+                                rs_file,
+                                sql_func_args.clone(),
+                                &current_schema,
+                            )
+                        {
+                            if type_names.len() > 2 {
+                                exit_with_error!(
+                                    "#[pg_operator] only supports functions with 1 or 2 arguments"
+                                )
+                            }
+
+                            function_sql.push(location_comment(rs_file, &span));
+                            function_sql.push(statement);
+
+                            let mut name = None;
+
+                            for option in &options {
+                                match option {
+                                    OperatorOptions::Name(n) => name = Some(n),
+                                    _ => {}
+                                }
+                            }
+
+                            if name.is_none() {
+                                exit_with_error!(
+                                    "#[pg_operator] requires the #[opname( <opname> )] macro"
+                                )
+                            }
+
+                            let mut sql = String::new();
+                            sql.push_str("CREATE OPERATOR ");
+                            sql.push_str(&qualify_name(&current_schema, &name.unwrap()));
+                            sql.push_str(" (");
+                            sql.push_str("\n   FUNCTION=");
+                            sql.push_str(&qualify_name(&current_schema, &func_name));
+                            if type_names.len() == 1 {
+                                sql.push_str(",\n   RIGHTARG=");
+                                sql.push_str(type_names.get(0).unwrap());
+                            } else if type_names.len() == 2 {
+                                sql.push_str(",\n   LEFTARG=");
+                                sql.push_str(type_names.get(0).unwrap());
+                                sql.push_str(",\n   RIGHTARG=");
+                                sql.push_str(type_names.get(1).unwrap());
+                            }
+
+                            for option in options {
+                                match option {
+                                    OperatorOptions::Commutator(c) => {
+                                        sql.push_str(",\n   COMMUTATOR=");
+                                        sql.push_str(&c);
+                                    }
+                                    OperatorOptions::Negator(n) => {
+                                        sql.push_str(",\n   NEGATOR=");
+                                        sql.push_str(&n);
+                                    }
+                                    OperatorOptions::Restrict(r) => {
+                                        sql.push_str(",\n   RESTRICT=");
+                                        sql.push_str(&r);
+                                    }
+                                    OperatorOptions::Join(j) => {
+                                        sql.push_str(",\n   JOIN=");
+                                        sql.push_str(&j);
+                                    }
+                                    OperatorOptions::Hashes => sql.push_str(",\n   HASHES"),
+                                    OperatorOptions::Merges => sql.push_str(",\n   MERGES"),
+                                    _ => {}
+                                }
+                            }
+
+                            sql.push_str("\n);");
+
+                            operator_sql.push(sql);
                         }
                     }
 
@@ -351,6 +469,7 @@ fn walk_items(
     }
 
     sql.append(&mut postgres_types);
+    sql.append(&mut operator_sql);
 
     if sql.len() != statement_cnt {
         // we added some statements, so inject a CREATE SCHEMA statement ahead of the statements
@@ -384,13 +503,14 @@ fn make_create_function_statement(
     rs_file: &DirEntry,
     sql_func_arg: Option<String>,
     schema: &str,
-) -> Option<String> {
+) -> (Option<String>, Option<String>, Option<Vec<String>>) {
     let exported_func_name = format!("{}_wrapper", func.sig.ident.to_string());
     let mut statement = String::new();
     let has_option_arg = func_args_have_option(func, rs_file);
     let attributes = collect_attributes(rs_file, &func.sig.ident, &func.attrs);
     let sql_func_name =
         extract_funcname_attribute(&attributes).unwrap_or_else(|| quote_ident(&func.sig.ident));
+    let mut sql_argument_type_names = Vec::new();
 
     statement.push_str(&format!(
         "CREATE OR REPLACE FUNCTION {}",
@@ -406,9 +526,13 @@ fn make_create_function_statement(
         let mut i = 0;
         for arg in &func.sig.inputs {
             match arg {
-                FnArg::Receiver(_) => panic!("functions that take 'self' are not supported"),
+                FnArg::Receiver(_) => {
+                    exit_with_error!("functions that take 'self' are not supported")
+                }
                 FnArg::Typed(ty) => match translate_type(rs_file, &ty.ty) {
                     Some((type_name, _, default_value, variadic)) => {
+                        sql_argument_type_names.push(type_name.to_string());
+
                         if i > 0 {
                             statement.push_str(", ");
                         }
@@ -454,7 +578,7 @@ fn make_create_function_statement(
                 span.start().column,
                 quote_ident(&func.sig.ident),
             );
-            return None;
+            return (None, None, None);
         }
         statement.push(')');
     }
@@ -474,7 +598,10 @@ fn make_create_function_statement(
         Some((return_type, _is_option, _, _)) => {
             statement.push_str(&format!(" RETURNS {}", return_type))
         }
-        None => panic!("could not determine return type"),
+        None => exit_with_error!(
+            "could not determine return type for function: {}",
+            func.sig.ident
+        ),
     }
 
     // modifiers
@@ -500,7 +627,11 @@ fn make_create_function_statement(
         exported_func_name
     ));
 
-    Some(statement)
+    (
+        Some(statement),
+        Some(sql_func_name),
+        Some(sql_argument_type_names),
+    )
 }
 
 fn func_args_have_option(func: &ItemFn, rs_file: &DirEntry) -> bool {
@@ -537,10 +668,10 @@ fn arg_name(arg: &FnArg) -> String {
             return quote_ident(&ident.ident);
         }
 
-        panic!("Can't figure out argument name");
+        exit_with_error!("Can't figure out argument name");
     }
 
-    panic!("functions that take 'self' are not supported")
+    exit_with_error!("functions that take 'self' are not supported")
 }
 
 fn translate_type(filename: &DirEntry, ty: &Type) -> Option<(String, bool, Option<String>, bool)> {
@@ -561,7 +692,7 @@ fn translate_type(filename: &DirEntry, ty: &Type) -> Option<(String, bool, Optio
                 rust_type = format!("{}", quote! {#path});
                 span = path.span();
             }
-            _ => panic!("found unexpected path type: {:?}", ty),
+            _ => exit_with_error!("found unexpected path type: {:?}", ty),
         },
         Type::Reference(tref) => {
             let elem = &tref.elem;
@@ -578,7 +709,7 @@ fn translate_type(filename: &DirEntry, ty: &Type) -> Option<(String, bool, Optio
                     variadic = v;
                     span = makro.span();
                 }
-                None => panic!("unrecognized macro in argument list: {}", as_string),
+                None => exit_with_error!("unrecognized macro in argument list: {}", as_string),
             }
         }
 
@@ -590,7 +721,7 @@ fn translate_type(filename: &DirEntry, ty: &Type) -> Option<(String, bool, Optio
 
         Type::ImplTrait(_) | Type::Tuple(_) => match categorize_type(ty) {
             CategorizedType::Default => {
-                panic!("{:?} isn't an 'impl Trait' type or a Rust Tuple", ty)
+                exit_with_error!("{:?} isn't an 'impl Trait' type or a Rust Tuple", ty)
             }
             CategorizedType::Iterator(types)
             | CategorizedType::OptionalIterator(types)
@@ -601,9 +732,7 @@ fn translate_type(filename: &DirEntry, ty: &Type) -> Option<(String, bool, Optio
             }
         },
 
-        other => {
-            panic!("Unsupported type: {:?}", other);
-        }
+        other => exit_with_error!("Unsupported type: {:?}", other),
     }
 
     translate_type_string(
@@ -771,17 +900,17 @@ fn translate_type_string(
 
                                     (name.unwrap().to_string(), ty.to_string())
                                 }
-                                _ => panic!("malformed name!() macro"),
+                                _ => exit_with_error!("malformed name!() macro"),
                             }
                         }
-                        _ => panic!(
+                        _ => exit_with_error!(
                             "No name!() macro specified for tuple member of type: {} at {}",
                             ty,
                             location_comment(filename, span)
                         ),
                     }
                 } else {
-                    panic!("malformed name!() macro")
+                    exit_with_error!("malformed name!() macro")
                 };
 
                 let translated = translate_type_string(
@@ -903,7 +1032,7 @@ fn extract_type(type_name: &str) -> String {
     let re = regex::Regex::new(r#"\w+ <(.*)>.*"#).unwrap();
     let capture = re
         .captures(type_name)
-        .unwrap_or_else(|| panic!("no type capture against: {}", type_name))
+        .unwrap_or_else(|| exit_with_error!("no type capture against: {}", type_name))
         .get(1);
     capture.unwrap().as_str().to_string().trim().to_string()
 }
@@ -935,6 +1064,7 @@ fn collect_attributes(
 ) -> Vec<CategorizedAttribute> {
     let mut categorized_attributes = Vec::new();
     let mut other_attributes = Vec::new();
+    let mut operator = None;
 
     //    let itr = attrs.iter();
     let mut i = 0;
@@ -950,6 +1080,46 @@ fn collect_attributes(
                 span,
                 parse_extern_args(&a),
             )));
+        } else if as_string.starts_with("# [ pg_operator") {
+            operator = Some(CategorizedAttribute::PgOperator(
+                span,
+                parse_extern_args(&a),
+                Vec::new(),
+            ));
+        } else if as_string.starts_with("# [ opname") {
+            if let Some(CategorizedAttribute::PgOperator(_, _, options)) = operator.as_mut() {
+                options.push(OperatorOptions::Name(extract_single_arg(a.tokens.clone())));
+            }
+        } else if as_string.starts_with("# [ commutator") {
+            if let Some(CategorizedAttribute::PgOperator(_, _, options)) = operator.as_mut() {
+                options.push(OperatorOptions::Commutator(extract_single_arg(
+                    a.tokens.clone(),
+                )));
+            }
+        } else if as_string.starts_with("# [ negator") {
+            if let Some(CategorizedAttribute::PgOperator(_, _, options)) = operator.as_mut() {
+                options.push(OperatorOptions::Negator(extract_single_arg(
+                    a.tokens.clone(),
+                )));
+            }
+        } else if as_string.starts_with("# [ restrict") {
+            if let Some(CategorizedAttribute::PgOperator(_, _, options)) = operator.as_mut() {
+                options.push(OperatorOptions::Restrict(extract_single_arg(
+                    a.tokens.clone(),
+                )));
+            }
+        } else if as_string.starts_with("# [ join") {
+            if let Some(CategorizedAttribute::PgOperator(_, _, options)) = operator.as_mut() {
+                options.push(OperatorOptions::Join(extract_single_arg(a.tokens.clone())));
+            }
+        } else if as_string.eq("# [ hashes ]") {
+            if let Some(CategorizedAttribute::PgOperator(_, _, options)) = operator.as_mut() {
+                options.push(OperatorOptions::Hashes);
+            }
+        } else if as_string.eq("# [ merges ]") {
+            if let Some(CategorizedAttribute::PgOperator(_, _, options)) = operator.as_mut() {
+                options.push(OperatorOptions::Merges);
+            }
         } else if as_string.starts_with("# [ pg_test") {
             categorized_attributes
                 .push(CategorizedAttribute::PgTest((span, parse_extern_args(&a))));
@@ -972,9 +1142,9 @@ fn collect_attributes(
                     sql_statements.pop().unwrap(),
                 ));
             } else if sql_statements.is_empty() {
-                panic!("Found no lines for ```funcname");
+                exit_with_error!("Found no lines for ```funcname");
             } else {
-                panic!("Found more than 1 line for ```funcname");
+                exit_with_error!("Found more than 1 line for ```funcname");
             }
 
             i = new_i;
@@ -995,9 +1165,9 @@ fn collect_attributes(
                     sql_statements.pop().unwrap(),
                 ));
             } else if sql_statements.is_empty() {
-                panic!("Found no lines for ```funcargs");
+                exit_with_error!("Found no lines for ```funcargs");
             } else {
-                panic!("Found more than 1 line for ```funcargs");
+                exit_with_error!("Found more than 1 line for ```funcargs");
             }
 
             i = new_i;
@@ -1025,11 +1195,26 @@ fn collect_attributes(
         i += 1;
     }
 
+    if let Some(operator) = operator {
+        categorized_attributes.push(operator);
+    }
+
     if !other_attributes.is_empty() {
         categorized_attributes.push(CategorizedAttribute::Other(other_attributes));
     }
 
     categorized_attributes
+}
+
+fn extract_single_arg(attr: TokenStream2) -> String {
+    let mut itr = attr.into_iter();
+    let mut arg = String::new();
+    while let Some(t) = itr.next() {
+        match t {
+            token => arg.push_str(&token.to_string()),
+        }
+    }
+    arg.trim_start_matches('(').trim_end_matches(')').into()
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -1065,7 +1250,7 @@ fn collect_doc(
             let as_string = as_string.trim_end_matches("\" ]");
             let as_string = as_string.trim();
             let as_string = unescape::unescape(as_string)
-                .unwrap_or_else(|| panic!("Improperly escaped:\n{}", as_string));
+                .unwrap_or_else(|| exit_with_error!("Improperly escaped:\n{}", as_string));
 
             // do variable substitution in the sql statement
             let as_string = as_string.replace("@FUNCTION_NAME@", &format!("{}_wrapper", ident));
