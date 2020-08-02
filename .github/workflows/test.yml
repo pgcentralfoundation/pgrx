@@ -29,27 +29,17 @@ jobs:
     - name: install postgres build dependencies
       run: sudo apt install -y bison flex zlib1g zlib1g-dev pkg-config libssl-dev libreadline-dev
 
-      # install sccache
-    - name: install sccache
-      run: if [ ! -f ~/.cargo/bin/sccache ]; then cargo install sccache --force; fi
-
     # install our cargo subcomment
     - name: install cargo pgx
       run: cd cargo-pgx && cargo install --path . --force --debug
-      env:
-        RUSTC_WRAPPER: sccache
 
     # install cargo tree
     - name: install cargo tree
       run: cargo install cargo-tree --debug
-      env:
-        RUSTC_WRAPPER: sccache
 
     # run cargo tree
     - name: cargo tree
       run: cargo tree
-      env:
-        RUSTC_WRAPPER: sccache
 
     # initialize pgx
     - name: cargo pgx init
@@ -59,58 +49,55 @@ jobs:
     - name: cargo test
       run: RUST_BACKTRACE=1 cargo test --all --features pg${{ matrix.version }} --no-default-features
       env:
-        RUSTC_WRAPPER: sccache
+        CARGO_TARGET_DIR: ~/target/
 
     # make sure the examples build too
     - name: arrays example
       run: cd pgx-examples/arrays && cargo pgx test pg${{ matrix.version }}
       env:
-        RUSTC_WRAPPER: sccache
+        CARGO_TARGET_DIR: ~/target/
 
     - name: bad_ideas example
       run: cd pgx-examples/bad_ideas && cargo pgx test pg${{ matrix.version }}
       env:
-        RUSTC_WRAPPER: sccache
+        CARGO_TARGET_DIR: ~/target/
 
     - name: bgworker example
       run: cd pgx-examples/bgworker && cargo pgx test pg${{ matrix.version }}
       env:
-        RUSTC_WRAPPER: sccache
+        CARGO_TARGET_DIR: ~/target/
 
     - name: bytea example
       run: cd pgx-examples/bytea && cargo pgx test pg${{ matrix.version }}
       env:
-        RUSTC_WRAPPER: sccache
+        CARGO_TARGET_DIR: ~/target/
 
     - name: custom_types example
       run: cd pgx-examples/custom_types && cargo pgx test pg${{ matrix.version }}
       env:
-        RUSTC_WRAPPER: sccache
+        CARGO_TARGET_DIR: ~/target/
 
     - name: errors example
       run: cd pgx-examples/errors && cargo pgx test pg${{ matrix.version }}
       env:
-        RUSTC_WRAPPER: sccache
+        CARGO_TARGET_DIR: ~/target/
 
     - name: operators example
       run: cd pgx-examples/operators && cargo pgx test pg${{ matrix.version }}
       env:
-        RUSTC_WRAPPER: sccache
+        CARGO_TARGET_DIR: ~/target/
 
     - name: spi example
       run: cd pgx-examples/spi && cargo pgx test pg${{ matrix.version }}
       env:
-        RUSTC_WRAPPER: sccache
+        CARGO_TARGET_DIR: ~/target/
 
     - name: srf example
       run: cd pgx-examples/srf && cargo pgx test pg${{ matrix.version }}
       env:
-        RUSTC_WRAPPER: sccache
+        CARGO_TARGET_DIR: ~/target/
 
     - name: strings example
       run: cd pgx-examples/strings && cargo pgx test pg${{ matrix.version }}
       env:
-        RUSTC_WRAPPER: sccache
-
-    - name: sccache stats
-      run: sccache -s
+        CARGO_TARGET_DIR: ~/target/
