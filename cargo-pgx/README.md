@@ -150,10 +150,11 @@ cargo-pgx-pgx-run
 compile/install extension to a pgx-managed Postgres instance and start psql
 
 USAGE:
-    cargo-pgx pgx run <PG_VERSION> [DBNAME]
+    cargo-pgx pgx run [FLAGS] <PG_VERSION> [DBNAME]
 
 FLAGS:
     -h, --help       Prints help information
+    -r, --release    compile for release mode (default is debug)
     -V, --version    Prints version information
 
 ARGS:

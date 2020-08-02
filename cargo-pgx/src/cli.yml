@@ -88,6 +88,10 @@ subcommands:
                     value_name: DBNAME
                     takes_value: true
                     help: The database to connect to (and create if the first time).  Defaults to a database with the same name as the current extension name
+                - release:
+                    short: r
+                    long: release
+                    help: compile for release mode (default is debug)
           - test:
               about: run the test suite for this crate
               args:

@@ -7,11 +7,11 @@ use crate::commands::stop::stop_postgres;
 use colored::Colorize;
 use pgx_utils::{createdb, get_pg_config, get_psql_path, BASE_POSTGRES_PORT_NO};
 
-pub(crate) fn run_psql(major_version: u16, dbname: &str) {
+pub(crate) fn run_psql(major_version: u16, dbname: &str, is_release: bool) {
     let pg_config = get_pg_config(major_version);
 
     // install the extension
-    install_extension(&pg_config, false, None);
+    install_extension(&pg_config, is_release, None);
 
     // restart postgres
     stop_postgres(major_version);
