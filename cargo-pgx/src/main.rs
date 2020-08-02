@@ -107,7 +107,8 @@ fn main() -> std::result::Result<(), std::io::Error> {
                     || get_property("extname").expect("could not determine extension name"),
                     |v| v.to_string(),
                 );
-                run_psql(make_pg_major_version(pgver)[0], &dbname);
+                let is_release = run.is_present("release");
+                run_psql(make_pg_major_version(pgver)[0], &dbname, is_release);
                 Ok(())
             }
             ("test", Some(test)) => {

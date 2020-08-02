@@ -1,8 +1,9 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-
-use crate::{direct_function_call_as_datum, pg_sys, void_mut_ptr, IntoDatum};
+use crate::{
+    direct_function_call, direct_function_call_as_datum, pg_sys, void_mut_ptr, FromDatum, IntoDatum,
+};
 use pgx_pg_sys::pg_try;
 use serde::de::{Error, Visitor};
 use serde::{de, Deserialize, Deserializer, Serialize};
@@ -10,7 +11,7 @@ use serde_json::Number;
 use std::fmt;
 
 #[derive(Serialize)]
-pub struct Numeric(String);
+pub struct Numeric(pub String);
 
 impl<'de> Deserialize<'de> for Numeric {
     fn deserialize<D>(deserializer: D) -> Result<Self, <D as Deserializer<'de>>::Error>
@@ -141,6 +142,22 @@ impl Into<Numeric> for f32 {
 impl Into<Numeric> for f64 {
     fn into(self) -> Numeric {
         Numeric(format!("{}", self))
+    }
+}
+
+impl FromDatum for Numeric {
+    unsafe fn from_datum(datum: usize, is_null: bool, _typoid: u32) -> Option<Self>
+    where
+        Self: Sized,
+    {
+        if is_null {
+            None
+        } else {
+            let cstr =
+                direct_function_call::<&std::ffi::CStr>(pg_sys::numeric_out, vec![Some(datum)])
+                    .expect("numeric_out returned null");
+            Some(Numeric(cstr.to_str().unwrap().into()))
+        }
     }
 }
 
