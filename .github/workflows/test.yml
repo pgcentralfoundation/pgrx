@@ -29,8 +29,9 @@ jobs:
         path: |
           ~/.cargo/registry
           ~/.cargo/git
+          ~/.cargo/cargo-pgx
           target
-        key: ${{ matrix.os }}-cargo }}
+        key: ${{ matrix.os }}-cargo-v2
 
     - name: cache cargo pgx init
       id: cargo-pgx-init-cache
@@ -44,6 +45,7 @@ jobs:
 
     # Ubuntu system dependencies required to build Postgres from sources
     - name: install postgres build dependencies
+      if: steps.cargo-pgx-init-cache.outputs.cache-hit != 'true'
       run: sudo apt install -y bison flex zlib1g zlib1g-dev pkg-config libssl-dev libreadline-dev
 
     # install cargo-pgx
@@ -57,4 +59,4 @@ jobs:
 
     # test our code
     - name: cargo test
-      run: RUST_BACKTRACE=1 cargo test --all --features pg${{ matrix.version }} --no-default-features
+      run: RUST_BACKTRACE=1 CARGO_TARGET_DIR=~/.cargo/cargo-pgx cargo test --all --features "pg${{ matrix.version }} pg_test" --no-default-features

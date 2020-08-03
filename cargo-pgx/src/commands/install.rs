@@ -77,7 +77,6 @@ fn copy_file(src: PathBuf, dest: PathBuf, msg: &str) {
 }
 
 fn build_extension(major_version: u16, is_release: bool) {
-    let target_dir = get_target_dir();
     let features = std::env::var("PGX_BUILD_FEATURES").unwrap_or(format!("pg{}", major_version));
     let flags = std::env::var("PGX_BUILD_FLAGS").unwrap_or_default();
     let mut command = Command::new("cargo");
@@ -92,17 +91,11 @@ fn build_extension(major_version: u16, is_release: bool) {
         command.arg("--no-default-features");
     }
 
-    command.arg("--target-dir");
-    command.arg(target_dir.display().to_string());
-
     for arg in flags.split_ascii_whitespace() {
         command.arg(arg);
     }
 
-    let command = command
-        .env("CARGO_TARGET_DIR", target_dir.display().to_string())
-        .stdout(Stdio::inherit())
-        .stderr(Stdio::inherit());
+    let command = command.stdout(Stdio::inherit()).stderr(Stdio::inherit());
     let command_str = format!("{:?}", command);
     println!(
         "building extension with features `{}`\n{}",

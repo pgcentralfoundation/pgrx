@@ -34,6 +34,7 @@ default = [ ]
 pg10 = [ "pgx/pg10", "pgx-pg-sys/pg10" ]
 pg11 = [ "pgx/pg11", "pgx-pg-sys/pg11" ]
 pg12 = [ "pgx/pg12", "pgx-pg-sys/pg12" ]
+pg_test = [ ]
 
 [package.metadata.docs.rs]
 features = ["pg12"]
