@@ -1,11 +1,10 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-
 use crate::commands::status::status_postgres;
 use colored::Colorize;
 use pgx_utils::{
-    exit_with_error, get_pgbin_dir, get_pgdata_dir, get_pglog_file, handle_result,
+    exit_with_error, get_pgbin_dir, get_pgdata_dir, get_pglog_file, get_pgx_home, handle_result,
     BASE_POSTGRES_PORT_NO,
 };
 use std::path::PathBuf;
@@ -37,7 +36,11 @@ pub(crate) fn start_postgres(major_version: u16) {
         .stderr(Stdio::piped())
         .arg("start")
         .arg("--options")
-        .arg(format!("-o -i -p {}", port))
+        .arg(format!(
+            "-o -i -p {} -c unix_socket_directories={}",
+            port,
+            get_pgx_home().display()
+        ))
         .arg("-D")
         .arg(datadir.display().to_string())
         .arg("-l")
