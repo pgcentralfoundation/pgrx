@@ -22,6 +22,15 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: cache cargo artifacts
+      id: cargo-artifacts-cache
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          target
+        key: ${{ matrix.os }}-cargo }}
+
     - name: cache cargo pgx init
       id: cargo-pgx-init-cache
       uses: actions/cache@v2
@@ -36,18 +45,14 @@ jobs:
     - name: install postgres build dependencies
       run: sudo apt install -y bison flex zlib1g zlib1g-dev pkg-config libssl-dev libreadline-dev
 
-    # install cargo tree
-    - name: install cargo tree
-      run: cargo install cargo-tree --debug
-
-    # run cargo tree
-    - name: cargo tree
-      run: cargo tree
+    # install cargo-pgx
+    - name: install cargo-pgx
+      run: cargo install --path cargo-pgx/ --debug
 
     # initialize pgx
     - name: cargo pgx init
       if: steps.cargo-pgx-init-cache.outputs.cache-hit != 'true'
-      run: cargo install --path cargo-pgx/ --debug && cargo pgx init
+      run: cargo pgx init
 
     # test our code
     - name: cargo test
