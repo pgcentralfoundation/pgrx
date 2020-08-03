@@ -24,6 +24,7 @@ jobs:
 
     - name: cache cargo artifacts
       id: cargo-artifacts-cache
+      uses: actions/cache@v2
       with:
         path: |
           ~/.cargo/registry
