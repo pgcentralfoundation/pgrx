@@ -22,6 +22,15 @@ jobs:
     steps:
     - uses: actions/checkout@v1
 
+    - uses: actions/checkout@v2
+
+    - name: cache cargo pgx init
+      id: cargo-pgx-init-cache
+      uses: actions/cache@v2
+      with:
+        path: ~/.pgx/
+        key: ${{ matrix.os }}-pgx-init-${{ hashFiles('**/.h') }}
+
     - name: cargo version
       run: cargo --version
 
@@ -31,6 +40,7 @@ jobs:
 
     # install our cargo subcomment
     - name: install cargo pgx
+      if: steps.cargo-pgx-init-cache.outputs.cache-hit != 'true'
       run: cd cargo-pgx && cargo install --path . --force --debug
 
     # install cargo tree
@@ -48,56 +58,5 @@ jobs:
     # test our code
     - name: cargo test
       run: RUST_BACKTRACE=1 cargo test --all --features pg${{ matrix.version }} --no-default-features
-      env:
-        CARGO_TARGET_DIR: ~/target/
-
-    # make sure the examples build too
-    - name: arrays example
-      run: cd pgx-examples/arrays && cargo pgx test pg${{ matrix.version }}
-      env:
-        CARGO_TARGET_DIR: ~/target/
-
-    - name: bad_ideas example
-      run: cd pgx-examples/bad_ideas && cargo pgx test pg${{ matrix.version }}
-      env:
-        CARGO_TARGET_DIR: ~/target/
-
-    - name: bgworker example
-      run: cd pgx-examples/bgworker && cargo pgx test pg${{ matrix.version }}
-      env:
-        CARGO_TARGET_DIR: ~/target/
-
-    - name: bytea example
-      run: cd pgx-examples/bytea && cargo pgx test pg${{ matrix.version }}
-      env:
-        CARGO_TARGET_DIR: ~/target/
-
-    - name: custom_types example
-      run: cd pgx-examples/custom_types && cargo pgx test pg${{ matrix.version }}
-      env:
-        CARGO_TARGET_DIR: ~/target/
-
-    - name: errors example
-      run: cd pgx-examples/errors && cargo pgx test pg${{ matrix.version }}
-      env:
-        CARGO_TARGET_DIR: ~/target/
-
-    - name: operators example
-      run: cd pgx-examples/operators && cargo pgx test pg${{ matrix.version }}
-      env:
-        CARGO_TARGET_DIR: ~/target/
-
-    - name: spi example
-      run: cd pgx-examples/spi && cargo pgx test pg${{ matrix.version }}
-      env:
-        CARGO_TARGET_DIR: ~/target/
-
-    - name: srf example
-      run: cd pgx-examples/srf && cargo pgx test pg${{ matrix.version }}
-      env:
-        CARGO_TARGET_DIR: ~/target/
-
-    - name: strings example
-      run: cd pgx-examples/strings && cargo pgx test pg${{ matrix.version }}
       env:
         CARGO_TARGET_DIR: ~/target/
