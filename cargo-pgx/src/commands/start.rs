@@ -39,7 +39,7 @@ pub(crate) fn start_postgres(major_version: u16) {
         .arg(format!(
             "-o -i -p {} -c unix_socket_directories={}",
             port,
-            get_pgx_home().display().to_string()
+            get_pgx_home().display()
         ))
         .arg("-D")
         .arg(datadir.display().to_string())
