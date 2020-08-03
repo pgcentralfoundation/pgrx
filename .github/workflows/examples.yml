@@ -1,0 +1,89 @@
+name: test examples
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  test:
+
+    runs-on: ${{ matrix.os }}
+    if: "!contains(github.event.head_commit.message, 'nogha')"
+
+    strategy:
+      matrix:
+        version: [10, 11, 12]
+        os: ["ubuntu-latest"]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: cache cargo artifacts
+      id: cargo-artifacts-cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          ~/.cargo/cargo-pgx
+          target
+        key: ${{ matrix.os }}-cargo-v2
+
+    - name: cache cargo pgx init
+      id: cargo-pgx-init-cache
+      uses: actions/cache@v2
+      with:
+        path: ~/.pgx/
+        key: ${{ matrix.os }}-pgx-init-${{ hashFiles('~/work/pgx/pgx/**/*.h') }}
+
+    - name: cargo version
+      run: cargo --version
+
+    # Ubuntu system dependencies required to build Postgres from sources
+    - name: install postgres build dependencies
+      if: steps.cargo-pgx-init-cache.outputs.cache-hit != 'true'
+      run: sudo apt install -y bison flex zlib1g zlib1g-dev pkg-config libssl-dev libreadline-dev
+
+    # install cargo-pgx
+    - name: install cargo-pgx
+      run: cargo install --path cargo-pgx/ --debug
+
+    # initialize pgx
+    - name: cargo pgx init
+      if: steps.cargo-pgx-init-cache.outputs.cache-hit != 'true'
+      run: cargo pgx init
+
+    # make sure the examples build too
+    - name: arrays example
+      run: cd pgx-examples/arrays && CARGO_TARGET_DIR=~/.cargo/cargo-pgx cargo pgx test pg${{ matrix.version }}
+
+    - name: bad_ideas example
+      run: cd pgx-examples/bad_ideas && CARGO_TARGET_DIR=~/.cargo/cargo-pgx cargo pgx test pg${{ matrix.version }}
+
+    - name: bgworker example
+      run: cd pgx-examples/bgworker && CARGO_TARGET_DIR=~/.cargo/cargo-pgx cargo pgx test pg${{ matrix.version }}
+
+    - name: bytea example
+      run: cd pgx-examples/bytea && CARGO_TARGET_DIR=~/.cargo/cargo-pgx cargo pgx test pg${{ matrix.version }}
+
+    - name: custom_types example
+      run: cd pgx-examples/custom_types && CARGO_TARGET_DIR=~/.cargo/cargo-pgx cargo pgx test pg${{ matrix.version }}
+
+    - name: errors example
+      run: cd pgx-examples/errors && CARGO_TARGET_DIR=~/.cargo/cargo-pgx cargo pgx test pg${{ matrix.version }}
+
+    - name: operators example
+      run: cd pgx-examples/operators && CARGO_TARGET_DIR=~/.cargo/cargo-pgx cargo pgx test pg${{ matrix.version }}
+
+    - name: spi example
+      run: cd pgx-examples/spi && CARGO_TARGET_DIR=~/.cargo/cargo-pgx cargo pgx test pg${{ matrix.version }}
+
+    - name: srf example
+      run: cd pgx-examples/srf && CARGO_TARGET_DIR=~/.cargo/cargo-pgx cargo pgx test pg${{ matrix.version }}
+
+    - name: strings example
+      run: cd pgx-examples/strings && CARGO_TARGET_DIR=~/.cargo/cargo-pgx cargo pgx test pg${{ matrix.version }}
