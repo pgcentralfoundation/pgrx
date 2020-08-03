@@ -44,7 +44,7 @@ pub extern "C" fn background_worker_main(arg: pg_sys::Datum) {
     log!(
         "Hello from inside the {} BGWorker!  Argument value={}",
         BackgroundWorker::get_name(),
-        arg
+        arg.unwrap();
     );
 
     // wake up every 10s or if we received a SIGTERM

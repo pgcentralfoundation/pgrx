@@ -1,13 +1,13 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-use pgx_utils::{get_target_dir, handle_result};
+use pgx_utils::{exit_with_error, get_target_dir, handle_result};
 use std::process::{Command, Stdio};
 
 pub fn test_extension(major_version: u16) {
     let target_dir = get_target_dir();
 
-    handle_result!(
+    let status = handle_result!(
         "failed to run cargo test",
         Command::new("cargo")
             .stdout(Stdio::inherit())
@@ -20,4 +20,8 @@ pub fn test_extension(major_version: u16) {
             .env("CARGO_TARGET_DIR", target_dir.display().to_string())
             .status()
     );
+
+    if !status.success() {
+        exit_with_error!("cargo pgx test failed with status = {:?}", status.code())
+    }
 }
