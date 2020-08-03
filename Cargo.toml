@@ -1,6 +1,6 @@
 [package]
 name = "pgx-parent"
-version = "0.0.8"
+version = "0.0.9"
 authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
 edition = "2018"
 license = "MIT"
