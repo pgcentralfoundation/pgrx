@@ -27,7 +27,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: ~/.pgx/
-        key: ${{ matrix.os }}-pgx-init-${{ hashFiles('**/*/.h') }}
+        key: ${{ matrix.os }}-pgx-init-${{ hashFiles('~/work/pgx/pgx/**/*.h') }}
 
     - name: cargo version
       run: cargo --version
