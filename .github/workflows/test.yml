@@ -20,8 +20,6 @@ jobs:
         os: ["ubuntu-latest"]
 
     steps:
-    - uses: actions/checkout@v1
-
     - uses: actions/checkout@v2
 
     - name: cache cargo pgx init
@@ -29,7 +27,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: ~/.pgx/
-        key: ${{ matrix.os }}-pgx-init-${{ hashFiles('**/.h') }}
+        key: ${{ matrix.os }}-pgx-init-${{ hashFiles('**/*/.h') }}
 
     - name: cargo version
       run: cargo --version
@@ -37,11 +35,6 @@ jobs:
     # Ubuntu system dependencies required to build Postgres from sources
     - name: install postgres build dependencies
       run: sudo apt install -y bison flex zlib1g zlib1g-dev pkg-config libssl-dev libreadline-dev
-
-    # install our cargo subcomment
-    - name: install cargo pgx
-      if: steps.cargo-pgx-init-cache.outputs.cache-hit != 'true'
-      run: cd cargo-pgx && cargo install --path . --force --debug
 
     # install cargo tree
     - name: install cargo tree
@@ -53,10 +46,9 @@ jobs:
 
     # initialize pgx
     - name: cargo pgx init
-      run: cargo pgx init
+      if: steps.cargo-pgx-init-cache.outputs.cache-hit != 'true'
+      run: cargo install --path cargo-pgx/ --debug && cargo pgx init
 
     # test our code
     - name: cargo test
       run: RUST_BACKTRACE=1 cargo test --all --features pg${{ matrix.version }} --no-default-features
-      env:
-        CARGO_TARGET_DIR: ~/target/
