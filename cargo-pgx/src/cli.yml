@@ -3,7 +3,7 @@
 
 
 name: "pgx's development environment tool"
-version: "0.0.10"
+version: "0.0.11"
 about: Creates and installs pgx based Postgres extensions
 subcommands:
   - pgx:
