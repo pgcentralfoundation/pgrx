@@ -398,8 +398,8 @@ pub(crate) mod bindings_diff {
     }
 
     fn read_source_file(filename: &str) -> BTreeSet<String> {
-        let mut file =
-            std::fs::File::open(filename).unwrap_or_else(|| panic!("Failed to read: {}", filename));
+        let mut file = std::fs::File::open(filename)
+            .unwrap_or_else(|_| panic!("Failed to read: {}", filename));
         let mut input = String::new();
 
         file.read_to_string(&mut input).unwrap();
