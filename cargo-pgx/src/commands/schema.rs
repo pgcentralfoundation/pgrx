@@ -109,13 +109,11 @@ fn process_schema_load_order(mut created: Vec<String>) {
 pub(crate) fn read_load_order(filename: &PathBuf) -> Vec<String> {
     let mut load_order = Vec::new();
 
-    let file = handle_result!(
-        format!("failed to open {}", filename.display()),
-        std::fs::File::open(&filename)
-    );
-    let reader = std::io::BufReader::new(file);
-    for (_, line) in reader.lines().enumerate() {
-        load_order.push(line.unwrap());
+    if let Ok(file) = std::fs::File::open(&filename) {
+        let reader = std::io::BufReader::new(file);
+        for (_, line) in reader.lines().enumerate() {
+            load_order.push(line.unwrap());
+        }
     }
 
     load_order
