@@ -329,9 +329,9 @@ pub(crate) mod bindings_diff {
     use std::str::FromStr;
 
     pub(crate) fn main(out_dir: &PathBuf) -> Result<(), std::io::Error> {
-        let mut v10 = read_source_file(&format!("{}/pg10_bindings.rs", out_dir.display()));
-        let mut v11 = read_source_file(&format!("{}/pg11_bindings.rs", out_dir.display()));
-        let mut v12 = read_source_file(&format!("{}/pg12_bindings.rs", out_dir.display()));
+        let mut v10 = read_source_file(&format!("{}pg10_bindings.rs", out_dir.display()));
+        let mut v11 = read_source_file(&format!("{}pg11_bindings.rs", out_dir.display()));
+        let mut v12 = read_source_file(&format!("{}pg12_bindings.rs", out_dir.display()));
 
         let mut versions = vec![&mut v10, &mut v11, &mut v12];
         let common = build_common_set(&mut versions);
@@ -344,22 +344,22 @@ pub(crate) mod bindings_diff {
             v12.len(),
         );
 
-        write_common_file(&format!("{}/common.rs", out_dir.display()), &common);
-        write_source_file(&format!("{}/pg10_specific.rs", out_dir.display()), &v10);
-        write_source_file(&format!("{}/pg11_specific.rs", out_dir.display()), &v11);
-        write_source_file(&format!("{}/pg12_specific.rs", out_dir.display()), &v12);
+        write_common_file(&format!("{}common.rs", out_dir.display()), &common);
+        write_source_file(&format!("{}pg10_specific.rs", out_dir.display()), &v10);
+        write_source_file(&format!("{}pg11_specific.rs", out_dir.display()), &v11);
+        write_source_file(&format!("{}pg12_specific.rs", out_dir.display()), &v12);
 
         // delete the bindings files when we're done with them
         std::fs::remove_file(
-            PathBuf::from_str(&format!("{}/pg10_bindings.rs", out_dir.display())).unwrap(),
+            PathBuf::from_str(&format!("{}pg10_bindings.rs", out_dir.display())).unwrap(),
         )
         .expect("couldn't delete v10 bindings");
         std::fs::remove_file(
-            PathBuf::from_str(&format!("{}/pg11_bindings.rs", out_dir.display())).unwrap(),
+            PathBuf::from_str(&format!("{}pg11_bindings.rs", out_dir.display())).unwrap(),
         )
         .expect("couldn't delete v11 bindings");
         std::fs::remove_file(
-            PathBuf::from_str(&format!("{}/pg12_bindings.rs", out_dir.display())).unwrap(),
+            PathBuf::from_str(&format!("{}pg12_bindings.rs", out_dir.display())).unwrap(),
         )
         .expect("couldn't delete v12 bindings");
 
