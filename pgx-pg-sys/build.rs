@@ -54,8 +54,12 @@ fn main() -> Result<(), std::io::Error> {
     }
 
     let manifest_dir = PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").unwrap());
+    let out_dir = PathBuf::from(format!(
+        "{}/generated-bindings/",
+        std::env::var("CARGO_MANIFEST_DIR").unwrap()
+    ));
     let shim_dir = PathBuf::from(format!("{}/cshim", manifest_dir.display()));
-    let common_rs = PathBuf::from(format!("{}/src/common.rs", manifest_dir.display(),));
+    let common_rs = PathBuf::from(format!("{}/common.rs", out_dir.display(),));
 
     eprintln!("manifest_dir={}", manifest_dir.display());
     eprintln!("shim_dir={}", shim_dir.display());
@@ -64,35 +68,6 @@ fn main() -> Result<(), std::io::Error> {
     let major_versions = vec![10, 11, 12];
 
     if std::env::var("DOCS_RS").unwrap_or("false".into()) == "1" {
-        for major_version in &major_versions {
-            let src = PathBuf::from(format!(
-                "{}/docsrs-hacks/pg{}_specific.rs",
-                manifest_dir.display(),
-                major_version
-            ));
-            let dest = PathBuf::from(format!(
-                "{}/src/pg{}_specific.rs",
-                manifest_dir.display(),
-                major_version
-            ));
-
-            eprintln!(
-                "[docs.rs build] copying {} to {}",
-                src.display(),
-                dest.display()
-            );
-            std::fs::copy(src, dest)?;
-        }
-
-        let common_rs_for_docs_rc =
-            PathBuf::from(format!("{}/docsrs-hacks/common.rs", manifest_dir.display(),));
-
-        eprintln!(
-            "[docs.rs build] copying {} to {}",
-            common_rs_for_docs_rc.display(),
-            common_rs.display()
-        );
-        std::fs::copy(common_rs_for_docs_rc, &common_rs)?;
         return Ok(());
     }
 
@@ -112,13 +87,13 @@ fn main() -> Result<(), std::io::Error> {
             major_version
         ));
         let bindings_rs = PathBuf::from(format!(
-            "{}/src/pg{}_bindings.rs",
-            manifest_dir.display(),
+            "{}/pg{}_bindings.rs",
+            out_dir.display(),
             major_version
         ));
         let specific_rs = PathBuf::from(format!(
-            "{}/src/pg{}_specific.rs",
-            manifest_dir.display(),
+            "{}/pg{}_specific.rs",
+            out_dir.display(),
             major_version
         ));
 
@@ -140,7 +115,7 @@ fn main() -> Result<(), std::io::Error> {
     });
 
     if need_common_rs.load(Ordering::SeqCst) {
-        generate_common_rs(manifest_dir);
+        generate_common_rs(manifest_dir, &out_dir);
     }
 
     Ok(())
@@ -256,12 +231,12 @@ fn build_shim_for_version(
     Ok(())
 }
 
-fn generate_common_rs(working_dir: PathBuf) {
+fn generate_common_rs(working_dir: PathBuf, out_dir: &PathBuf) {
     eprintln!("[all branches] Regenerating common.rs and XX_specific.rs files...");
     let cwd = std::env::current_dir().unwrap();
 
     std::env::set_current_dir(&working_dir).unwrap();
-    let result = bindings_diff::main();
+    let result = bindings_diff::main(out_dir);
     std::env::set_current_dir(cwd).unwrap();
 
     if result.is_err() {
@@ -348,15 +323,15 @@ fn rust_fmt(path: &str) -> Result<(), std::io::Error> {
 pub(crate) mod bindings_diff {
     use crate::rust_fmt;
     use quote::{quote, ToTokens};
-    use std::collections::HashSet;
+    use std::collections::BTreeSet;
     use std::io::{Read, Write};
     use std::path::PathBuf;
     use std::str::FromStr;
 
-    pub(crate) fn main() -> Result<(), std::io::Error> {
-        let mut v10 = read_source_file("src/pg10_bindings.rs");
-        let mut v11 = read_source_file("src/pg11_bindings.rs");
-        let mut v12 = read_source_file("src/pg12_bindings.rs");
+    pub(crate) fn main(out_dir: &PathBuf) -> Result<(), std::io::Error> {
+        let mut v10 = read_source_file(&format!("{}/pg10_bindings.rs", out_dir.display()));
+        let mut v11 = read_source_file(&format!("{}/pg11_bindings.rs", out_dir.display()));
+        let mut v12 = read_source_file(&format!("{}/pg12_bindings.rs", out_dir.display()));
 
         let mut versions = vec![&mut v10, &mut v11, &mut v12];
         let common = build_common_set(&mut versions);
@@ -369,24 +344,30 @@ pub(crate) mod bindings_diff {
             v12.len(),
         );
 
-        write_common_file("src/common.rs", common);
-        write_source_file("src/pg10_specific.rs", v10);
-        write_source_file("src/pg11_specific.rs", v11);
-        write_source_file("src/pg12_specific.rs", v12);
+        write_common_file(&format!("{}/common.rs", out_dir.display()), &common);
+        write_source_file(&format!("{}/pg10_specific.rs", out_dir.display()), &v10);
+        write_source_file(&format!("{}/pg11_specific.rs", out_dir.display()), &v11);
+        write_source_file(&format!("{}/pg12_specific.rs", out_dir.display()), &v12);
 
         // delete the bindings files when we're done with them
-        std::fs::remove_file(PathBuf::from_str("src/pg10_bindings.rs").unwrap())
-            .expect("couldn't delete v10 bindings");
-        std::fs::remove_file(PathBuf::from_str("src/pg11_bindings.rs").unwrap())
-            .expect("couldn't delete v11 bindings");
-        std::fs::remove_file(PathBuf::from_str("src/pg12_bindings.rs").unwrap())
-            .expect("couldn't delete v12 bindings");
+        std::fs::remove_file(
+            PathBuf::from_str(&format!("{}/pg10_bindings.rs", out_dir.display())).unwrap(),
+        )
+        .expect("couldn't delete v10 bindings");
+        std::fs::remove_file(
+            PathBuf::from_str(&format!("{}/pg11_bindings.rs", out_dir.display())).unwrap(),
+        )
+        .expect("couldn't delete v11 bindings");
+        std::fs::remove_file(
+            PathBuf::from_str(&format!("{}/pg12_bindings.rs", out_dir.display())).unwrap(),
+        )
+        .expect("couldn't delete v12 bindings");
 
         Ok(())
     }
 
-    fn build_common_set(versions: &mut Vec<&mut HashSet<String>>) -> HashSet<String> {
-        let mut common = HashSet::new();
+    fn build_common_set(versions: &mut Vec<&mut BTreeSet<String>>) -> BTreeSet<String> {
+        let mut common = BTreeSet::new();
 
         for map in versions.iter() {
             for key in map.iter() {
@@ -406,7 +387,7 @@ pub(crate) mod bindings_diff {
     }
 
     #[inline]
-    fn all_contain(maps: &[&mut HashSet<String>], key: &String) -> bool {
+    fn all_contain(maps: &[&mut BTreeSet<String>], key: &String) -> bool {
         for map in maps.iter() {
             if !map.contains(key) {
                 return false;
@@ -416,14 +397,14 @@ pub(crate) mod bindings_diff {
         true
     }
 
-    fn read_source_file(filename: &str) -> HashSet<String> {
+    fn read_source_file(filename: &str) -> BTreeSet<String> {
         let mut file = std::fs::File::open(filename).unwrap();
         let mut input = String::new();
 
         file.read_to_string(&mut input).unwrap();
         let source = syn::parse_file(input.as_str()).unwrap();
 
-        let mut item_map = HashSet::new();
+        let mut item_map = BTreeSet::new();
         for item in source.items.into_iter() {
             item_map.insert(item.to_token_stream().to_string());
         }
@@ -431,13 +412,11 @@ pub(crate) mod bindings_diff {
         item_map
     }
 
-    fn write_source_file(filename: &str, items: HashSet<String>) {
+    fn write_source_file(filename: &str, items: &BTreeSet<String>) {
         let mut file =
             std::fs::File::create(filename).expect(&format!("failed to create {}", filename));
         file.write_all(
             quote! {
-                #![allow(clippy::all)]
-
                 use crate as pg_sys;
                 use pgx_macros::*;
                 use crate::common::*;
@@ -454,12 +433,10 @@ pub(crate) mod bindings_diff {
             .unwrap_or_else(|e| panic!("unable to run rustfmt for {}: {:?}", filename, e));
     }
 
-    fn write_common_file(filename: &str, items: HashSet<String>) {
+    fn write_common_file(filename: &str, items: &BTreeSet<String>) {
         let mut file = std::fs::File::create(filename).expect("failed to create common.rs");
         file.write_all(
             quote! {
-                #![allow(clippy::all)]
-
                 use crate as pg_sys;
                 use pgx_macros::*;
 
