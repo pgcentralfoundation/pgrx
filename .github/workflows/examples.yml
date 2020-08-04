@@ -58,6 +58,9 @@ jobs:
       run: cargo pgx init
 
     # make sure the examples build too
+    - name: create new sample extension
+      run: cd /tmp/ && cargo pgx new sample
+
     - name: arrays example
       run: cd pgx-examples/arrays && CARGO_TARGET_DIR=~/.cargo/cargo-pgx cargo pgx test pg${{ matrix.version }}
 
