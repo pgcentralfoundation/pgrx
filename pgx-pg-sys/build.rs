@@ -10,7 +10,6 @@ use rayon::prelude::*;
 use std::collections::HashSet;
 use std::path::PathBuf;
 use std::process::{Command, Output};
-use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Mutex;
 use syn::export::{ToTokens, TokenStream2};
 use syn::Item;
@@ -77,7 +76,6 @@ fn main() -> Result<(), std::io::Error> {
     build_deps::rerun_if_changed_paths("cshim/Makefile").unwrap();
 
     let shim_mutex = Mutex::new(());
-    let need_common_rs = AtomicBool::new(false);
 
     major_versions.into_par_iter().for_each(|major_version| {
         let pg_config = get_pg_config(major_version);
@@ -100,23 +98,12 @@ fn main() -> Result<(), std::io::Error> {
         eprintln!("bindings_rs={}", bindings_rs.display());
         eprintln!("specific_rs={}", specific_rs.display());
 
-        if !common_rs.exists()  // no common.rs
-            || !specific_rs.exists() // no version-specific.rs
-            || include_h.metadata().unwrap().modified().unwrap() // include headers are newer than version-specific.rs
-                > specific_rs.metadata().unwrap().modified().unwrap()
-        {
-            run_bindgen(&pg_config, major_version, &include_h, &bindings_rs);
-            need_common_rs.store(true, Ordering::SeqCst);
-        } else {
-            eprintln!("{} is up-to-date", specific_rs.display())
-        }
+        run_bindgen(&pg_config, major_version, &include_h, &bindings_rs);
 
         build_shim(&shim_dir, &shim_mutex, major_version, &pg_config);
     });
 
-    if need_common_rs.load(Ordering::SeqCst) {
-        generate_common_rs(manifest_dir, &out_dir);
-    }
+    generate_common_rs(manifest_dir, &out_dir);
 
     Ok(())
 }
