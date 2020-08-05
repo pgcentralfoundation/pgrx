@@ -27,4 +27,5 @@ mod variadic_tests;
 mod xact_callback_tests;
 mod xid64_tests;
 
+#[cfg(not(features = "pg_test"))]
 pgx::pg_module_magic!();
