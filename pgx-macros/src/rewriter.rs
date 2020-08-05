@@ -99,10 +99,8 @@ impl PgGuardRewriter {
         };
 
         let prolog = quote! {
-            #[inline(never)]
             #func
 
-            #[no_mangle]
             #[allow(unused_variables)]
         };
         match categorize_return_type(&func) {
@@ -191,7 +189,6 @@ impl PgGuardRewriter {
         quote_spanned! {func_span=>
             #prolog
 
-            #[inline(never)]
             #[allow(clippy::missing_safety_doc)]
             #[allow(clippy::redundant_closure)]
             #[pg_guard]
@@ -464,7 +461,6 @@ impl PgGuardRewriter {
         let return_type = PgGuardRewriter::get_return_type(&func.sig);
 
         quote! {
-            #[inline(never)]
             #[allow(clippy::missing_safety_doc)]
             #[allow(clippy::redundant_closure)]
             pub unsafe fn #func_name ( #arg_list_with_types ) #return_type {
