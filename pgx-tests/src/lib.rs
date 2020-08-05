@@ -2,7 +2,7 @@
 // governed by the MIT license that can be found in the LICENSE file.
 
 mod framework;
-#[cfg(features = "pg_test")]
+#[cfg(any(test, feature = "pg_test"))]
 mod tests;
 
 pub use framework::*;
