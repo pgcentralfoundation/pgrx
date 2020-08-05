@@ -3,7 +3,7 @@
 
 use crate::{
     direct_function_call, direct_function_call_as_datum, pg_sys, vardata_any, varsize_any_exhdr,
-    void_mut_ptr, DetoastedVarlenA, FromDatum, IntoDatum,
+    void_mut_ptr, FromDatum, IntoDatum,
 };
 use serde::{Serialize, Serializer};
 use serde_json::Value;
@@ -20,14 +20,17 @@ pub struct JsonString(pub String);
 /// for json
 impl FromDatum for Json {
     #[inline]
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, typoid: pg_sys::Oid) -> Option<Json> {
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<Json> {
         if is_null {
             None
         } else if datum == 0 {
             panic!("a json Datum was flagged as non-null but the datum is zero");
         } else {
-            let string = DetoastedVarlenA::from_datum(datum, is_null, typoid).unwrap();
-            let value = serde_json::from_str(&string).expect("failed to parse Json value");
+            let varlena = pg_sys::pg_detoast_datum(datum as *mut pg_sys::varlena);
+            let len = varsize_any_exhdr(varlena);
+            let data = vardata_any(varlena);
+            let slice = std::slice::from_raw_parts(data as *const u8, len);
+            let value = serde_json::from_slice(slice).expect("failed to parse Json value");
             Some(Json(value))
         }
     }
