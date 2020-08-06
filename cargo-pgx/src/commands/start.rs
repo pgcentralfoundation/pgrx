@@ -7,6 +7,7 @@ use pgx_utils::{
     exit_with_error, get_pgbin_dir, get_pgdata_dir, get_pglog_file, get_pgx_home, handle_result,
     BASE_POSTGRES_PORT_NO,
 };
+use std::os::unix::process::CommandExt;
 use std::path::PathBuf;
 use std::process::Stdio;
 
@@ -31,20 +32,29 @@ pub(crate) fn start_postgres(major_version: u16) {
         port.to_string().bold().cyan()
     );
     let mut command = std::process::Command::new(format!("{}/pg_ctl", bindir.display()));
-    command
-        .stdout(Stdio::piped())
-        .stderr(Stdio::piped())
-        .arg("start")
-        .arg("--options")
-        .arg(format!(
-            "-o -i -p {} -c unix_socket_directories={}",
-            port,
-            get_pgx_home().display()
-        ))
-        .arg("-D")
-        .arg(datadir.display().to_string())
-        .arg("-l")
-        .arg(logfile.display().to_string());
+    // This is unsafe to stop ctrl-c being passed through from psql when using cargo pgx run
+    // without the pre_exec call this would terminate PostgreSQL. This is a workaround until
+    // a better option can be found
+    unsafe {
+        command
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .arg("start")
+            .arg("--options")
+            .arg(format!(
+                "-o -i -p {} -c unix_socket_directories={}",
+                port,
+                get_pgx_home().display()
+            ))
+            .arg("-D")
+            .arg(datadir.display().to_string())
+            .arg("-l")
+            .arg(logfile.display().to_string())
+            .pre_exec(|| {
+                fork::setsid().expect("setsid call failed for pg_ctl");
+                Ok(())
+            });
+    }
     let command_str = format!("{:?}", command);
 
     let output = handle_result!(
