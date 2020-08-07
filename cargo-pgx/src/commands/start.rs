@@ -32,9 +32,11 @@ pub(crate) fn start_postgres(major_version: u16) {
         port.to_string().bold().cyan()
     );
     let mut command = std::process::Command::new(format!("{}/pg_ctl", bindir.display()));
-    // This is unsafe to stop ctrl-c being passed through from psql when using cargo pgx run
-    // without the pre_exec call this would terminate PostgreSQL. This is a workaround until
-    // a better option can be found
+    // Unsafe block is for the pre_exec setsid call below
+    //
+    // This is to work around a bug in PG10 + PG11 which don't call setsid in pg_ctl
+    // This means that when cargo pgx run dumps a user into psql, pushing ctrl-c will abort
+    // the postgres server started by pgx
     unsafe {
         command
             .stdout(Stdio::piped())
