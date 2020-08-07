@@ -7,6 +7,7 @@ use pgx_utils::{
     exit_with_error, get_pgbin_dir, get_pgdata_dir, get_pglog_file, get_pgx_home, handle_result,
     BASE_POSTGRES_PORT_NO,
 };
+use std::os::unix::process::CommandExt;
 use std::path::PathBuf;
 use std::process::Stdio;
 
@@ -31,20 +32,31 @@ pub(crate) fn start_postgres(major_version: u16) {
         port.to_string().bold().cyan()
     );
     let mut command = std::process::Command::new(format!("{}/pg_ctl", bindir.display()));
-    command
-        .stdout(Stdio::piped())
-        .stderr(Stdio::piped())
-        .arg("start")
-        .arg("--options")
-        .arg(format!(
-            "-o -i -p {} -c unix_socket_directories={}",
-            port,
-            get_pgx_home().display()
-        ))
-        .arg("-D")
-        .arg(datadir.display().to_string())
-        .arg("-l")
-        .arg(logfile.display().to_string());
+    // Unsafe block is for the pre_exec setsid call below
+    //
+    // This is to work around a bug in PG10 + PG11 which don't call setsid in pg_ctl
+    // This means that when cargo pgx run dumps a user into psql, pushing ctrl-c will abort
+    // the postgres server started by pgx
+    unsafe {
+        command
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .arg("start")
+            .arg("--options")
+            .arg(format!(
+                "-o -i -p {} -c unix_socket_directories={}",
+                port,
+                get_pgx_home().display()
+            ))
+            .arg("-D")
+            .arg(datadir.display().to_string())
+            .arg("-l")
+            .arg(logfile.display().to_string())
+            .pre_exec(|| {
+                fork::setsid().expect("setsid call failed for pg_ctl");
+                Ok(())
+            });
+    }
     let command_str = format!("{:?}", command);
 
     let output = handle_result!(
