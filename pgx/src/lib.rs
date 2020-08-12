@@ -47,6 +47,7 @@ pub mod namespace;
 pub mod nodes;
 pub mod pgbox;
 pub mod rel;
+pub mod shmem;
 pub mod spi;
 pub mod stringinfo;
 pub mod trigger_support;
