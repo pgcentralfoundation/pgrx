@@ -1,29 +1,40 @@
-use core::ops::{Deref, DerefMut};
 use crate::pg_sys;
+use core::ops::{Deref, DerefMut};
 use std::cell::UnsafeCell;
 
 /// A Rust locking mechanism which uses a PostgreSQL LWLock to lock the data
-/// 
+///
 /// This type of lock allows a number of readers or at most one writer at any
 /// point in time. The write portion of this lock typically allows modification
 /// of the underlying data (exclusive access) and the read portion of this lock
 /// typically allows for read-only access (shared access).
 ///
-/// The lock is valid across processes as the LWLock is managed by Postgres. Data 
-/// mutability once a lock is obtained is handled by Rust giving out & or &mut 
+/// The lock is valid across processes as the LWLock is managed by Postgres. Data
+/// mutability once a lock is obtained is handled by Rust giving out & or &mut
 /// pointers.
 ///
-/// When a lock is given out it is wrapped in a PgLwLockShareGuard or 
+/// When a lock is given out it is wrapped in a PgLwLockShareGuard or
 /// PgLwLockExclusiveGuard, which releases the lock on drop
 ///
 /// # Poisoning
+/// This lock can not be poisoned from Rust. Panic and Abort are handled by
+/// PostgreSQL cleanly.
 
 pub struct PgLwLock<T> {
     inner: UnsafeCell<Option<PgLwLockInner<T>>>,
 }
 
 impl<T> PgLwLock<T> {
-    pub const fn new() -> Self {
+    /// Create a new lock for T by attaching a LWLock, which is looked up by name
+    pub fn new(lock: String, value: T) -> Self {
+        PgLwLock {
+            inner: UnsafeCell::new(Some(PgLwLockInner::<T>::new(lock, value))),
+        }
+    }
+
+    /// Create an empty lock wich can be created as a global with None as a
+    /// sentiel value
+    pub const fn empty() -> Self {
         PgLwLock {
             inner: UnsafeCell::new(None),
         }
@@ -39,16 +50,14 @@ impl<T> PgLwLock<T> {
         unsafe { (*self.inner.get()).as_mut().unwrap().exclusive() }
     }
 
-    // To use a lock it has to be attached to an allocated Postgres LWLock, which
-    // we look up by name. The lock must have been created in _PG_init
-    pub fn attach(&self, lock: String, value: T) -> Result<(), T> {
+    /// Attach an empty PgLwLock lock to a LWLock, and wrap T
+    pub fn attach(&self, lock: String, value: T) {
         let slot = unsafe { &*self.inner.get() };
         if slot.is_some() {
-            return Err(value);
+            panic!("Lock is not in an empty state");
         }
         let slot = unsafe { &mut *self.inner.get() };
         *slot = Some(PgLwLockInner::<T>::new(lock, value));
-        Ok(())
     }
 }
 
@@ -80,7 +89,7 @@ impl<'a, T> PgLwLockInner<T> {
         }
     }
 
-    fn exclusive(&mut self) -> PgLwLockExclusiveGuard<T> {
+    fn exclusive(&self) -> PgLwLockExclusiveGuard<T> {
         unsafe {
             pg_sys::LWLockAcquire(self.lock_ptr, pg_sys::LWLockMode_LW_EXCLUSIVE);
         }
