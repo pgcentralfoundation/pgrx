@@ -54,7 +54,7 @@ impl<T> PgLwLock<T> {
     pub fn exclusive(&self) -> PgLwLockExclusiveGuard<T> {
         unsafe {
             (*self.inner.get())
-                .as_mut()
+                .as_ref()
                 .expect("Lock is in an empty state")
                 .exclusive()
         }
