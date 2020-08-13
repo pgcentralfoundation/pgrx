@@ -42,12 +42,22 @@ impl<T> PgLwLock<T> {
 
     /// Obtain a shared lock (which comes with &T access)
     pub fn share(&self) -> PgLwLockShareGuard<T> {
-        unsafe { (*self.inner.get()).as_ref().unwrap().share() }
+        unsafe {
+            (*self.inner.get())
+                .as_ref()
+                .expect("Lock is in an empty state")
+                .share()
+        }
     }
 
     /// Obtain an exclusive lock (which comes with &mut T access)
     pub fn exclusive(&self) -> PgLwLockExclusiveGuard<T> {
-        unsafe { (*self.inner.get()).as_mut().unwrap().exclusive() }
+        unsafe {
+            (*self.inner.get())
+                .as_mut()
+                .expect("Lock is in an empty state")
+                .exclusive()
+        }
     }
 
     /// Attach an empty PgLwLock lock to a LWLock, and wrap T
@@ -80,8 +90,7 @@ impl<'a, T> PgLwLockInner<T> {
     fn share(&self) -> PgLwLockShareGuard<T> {
         unsafe {
             pg_sys::LWLockAcquire(self.lock_ptr, pg_sys::LWLockMode_LW_SHARED);
-        }
-        unsafe {
+
             PgLwLockShareGuard {
                 data: &*self.data.get(),
                 lock: self.lock_ptr,
@@ -92,8 +101,7 @@ impl<'a, T> PgLwLockInner<T> {
     fn exclusive(&self) -> PgLwLockExclusiveGuard<T> {
         unsafe {
             pg_sys::LWLockAcquire(self.lock_ptr, pg_sys::LWLockMode_LW_EXCLUSIVE);
-        }
-        unsafe {
+
             PgLwLockExclusiveGuard {
                 data: &mut *self.data.get(),
                 lock: self.lock_ptr,
