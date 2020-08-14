@@ -31,7 +31,7 @@ pub trait InOutFuncs {
     /// It is expected that malformed input will raise an `error!()` or `panic!()`
     fn input(input: &std::ffi::CStr) -> Self
     where
-        Self: Copy + Sized;
+        Self: Sized;
 
     /// Convert `Self` into text by writing to the supplied `StringInfo` buffer
     fn output(&self, buffer: &mut StringInfo);
