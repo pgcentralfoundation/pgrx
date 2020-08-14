@@ -42,7 +42,7 @@ impl PgGuardRewriter {
         if rewrite_args {
             self.item_fn_with_rewrite(func, is_raw, no_guard)
         } else {
-            (self.item_fn_without_rewrite(func), true)
+            (self.item_fn_without_rewrite(func, no_guard), true)
         }
     }
 
@@ -80,22 +80,12 @@ impl PgGuardRewriter {
             Ident::new("result", Span::call_site())
         };
 
-        let func_call = if no_guard {
-            quote! {
-                    let result = {
-                        #rewritten_args
+        let func_call = quote! {
+            let #result_var_name = {
+                #rewritten_args
 
-                        #func_name(#arg_list)
-                    };
-            }
-        } else {
-            quote! {
-                    let #result_var_name = pg_sys::guard::guard( || {
-                        #rewritten_args
-
-                        #func_name(#arg_list)
-                    } );
-            }
+                #func_name(#arg_list)
+            };
         };
 
         let prolog = quote! {
@@ -113,6 +103,7 @@ impl PgGuardRewriter {
                     generics,
                     func_call,
                     rewritten_return_type,
+                    no_guard,
                 ),
                 true,
             ),
@@ -185,13 +176,19 @@ impl PgGuardRewriter {
         generics: &Generics,
         func_call: proc_macro2::TokenStream,
         rewritten_return_type: proc_macro2::TokenStream,
+        no_guard: bool,
     ) -> proc_macro2::TokenStream {
+        let guard = if no_guard {
+            quote! {#[no_mangle]}
+        } else {
+            quote! {#[pg_guard]}
+        };
         quote_spanned! {func_span=>
             #prolog
 
             #[allow(clippy::missing_safety_doc)]
             #[allow(clippy::redundant_closure)]
-            #[pg_guard]
+            #guard
             #vis unsafe fn #func_name_wrapper #generics(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
 
                 #func_call
@@ -410,7 +407,11 @@ impl PgGuardRewriter {
         }
     }
 
-    fn item_fn_without_rewrite(&self, mut func: ItemFn) -> proc_macro2::TokenStream {
+    fn item_fn_without_rewrite(
+        &self,
+        mut func: ItemFn,
+        no_guard: bool,
+    ) -> proc_macro2::TokenStream {
         // remember the original visibility and signature classifications as we want
         // to use those for the outer function
         let sig = func.sig.clone();
@@ -431,12 +432,17 @@ impl PgGuardRewriter {
         let arg_list = PgGuardRewriter::build_arg_list(&sig, false);
         let func_name = PgGuardRewriter::build_func_name(&func.sig);
 
+        let func_call = if no_guard {
+            quote! { #func_name(#arg_list) }
+        } else {
+            quote! { pg_sys::guard::guard( || #func_name(#arg_list) ) }
+        };
+
         quote_spanned! {func.span()=>
             #[no_mangle]
             #vis #sig {
                 #func
-
-                pg_sys::guard::guard( || #func_name(#arg_list) )
+                #func_call
             }
         }
     }

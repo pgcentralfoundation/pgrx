@@ -86,6 +86,14 @@ pub unsafe extern "C" fn _PG_init() {
     pg_sys::RegisterXactCallback(Some(random_abort_callback), std::ptr::null_mut());
 }
 
+/// with `no_guard` we're telling pgx that we're positive this function
+/// won't ever perform a Rust panic!
+#[pg_extern(no_guard)]
+fn crash_postgres() {
+    // so when it does, it'll crash Postgres
+    panic!("oh no!")
+}
+
 #[pg_extern]
 fn drop_struct() {
     struct Foo;

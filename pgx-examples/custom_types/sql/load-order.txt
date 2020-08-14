@@ -1,3 +1,4 @@
 complex.generated.sql
 hstore_clone.generated.sql
 generic_enum.generated.sql
+fixed_size.generated.sql

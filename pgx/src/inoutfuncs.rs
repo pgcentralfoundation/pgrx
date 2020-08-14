@@ -9,78 +9,48 @@
 
 use crate::*;
 
-pub trait InOutFuncs<'de>: serde::de::Deserialize<'de> + serde::ser::Serialize {
-    fn input(input: &'de str) -> std::result::Result<Self, String> {
-        match serde_json::from_str(input) {
-            Ok(obj) => Ok(obj),
-            Err(e) => Err(format!("{}", e)),
-        }
+/// `#[derive(Copy, Clone, PostgresType)]` types need to implement this trait to provide the text
+/// input/output functions for that type
+pub trait PgVarlenaInOutFuncs {
+    /// Given a string representation of `Self`, parse it into a `PgVarlena<Self>`.
+    ///
+    /// It is expected that malformed input will raise an `error!()` or `panic!()`
+    fn input(input: &std::ffi::CStr) -> PgVarlena<Self>
+    where
+        Self: Copy + Sized;
+
+    /// Convert `Self` into text by writing to the supplied `StringInfo` buffer
+    fn output(&self, buffer: &mut StringInfo);
+}
+
+/// `#[derive(Serialize, Deserialize, PostgresType)]` types may implement this trait if they prefer
+/// a textual representation that isn't JSON
+pub trait InOutFuncs {
+    /// Given a string representation of `Self`, parse it into `Self`.
+    ///
+    /// It is expected that malformed input will raise an `error!()` or `panic!()`
+    fn input(input: &std::ffi::CStr) -> Self
+    where
+        Self: Copy + Sized;
+
+    /// Convert `Self` into text by writing to the supplied `StringInfo` buffer
+    fn output(&self, buffer: &mut StringInfo);
+}
+
+/// Automatically implemented for `#[derive(Serialize, Deserialize, PostgresType)]` types that do
+/// **not** also have the `#[inoutfuncs]` attribute macro
+pub trait JsonInOutFuncs<'de>: serde::de::Deserialize<'de> + serde::ser::Serialize {
+    /// Uses `serde_json` to deserialize the input, which is assumed to be JSON
+    fn input(input: &'de std::ffi::CStr) -> Self {
+        serde_json::from_str(input.to_str().expect("text input is not valid UTF8"))
+            .expect("failed to deserialize json")
     }
 
+    /// Users `serde_json` to serialize `Self` into JSON
     fn output(&self, buffer: &mut StringInfo)
     where
         Self: serde::ser::Serialize,
     {
-        serde_json::to_writer(buffer, self).expect("failed to serialize a {} to json")
+        serde_json::to_writer(buffer, self).expect("failed to serialize to json")
     }
-}
-
-/// Decode am owned Postgres varlena pointer from CBOR into a Rust type instance
-pub unsafe fn from_varlena_owned<T: serde::de::DeserializeOwned>(
-    varlena: *const pg_sys::varlena,
-) -> serde_cbor::Result<T> {
-    let varlena = pg_sys::pg_detoast_datum_packed(varlena as *mut pg_sys::varlena);
-    let len = varsize_any_exhdr(varlena);
-    let data = vardata_any(varlena);
-    let slice = std::slice::from_raw_parts(data as *const u8, len);
-    serde_cbor::from_slice(slice)
-}
-
-/// Decode a borrowed Postgres varlena pointer from JSON into a Rust type instance
-pub unsafe fn from_varlena_borrowed<'de, T: serde::de::Deserialize<'de>>(
-    varlena: *const pg_sys::varlena,
-) -> serde_json::Result<T> {
-    let varlena = pg_sys::pg_detoast_datum_packed(varlena as *mut pg_sys::varlena);
-    let len = varsize_any_exhdr(varlena);
-    let data = vardata_any(varlena);
-    let slice = std::slice::from_raw_parts(data as *const u8, len);
-    serde_json::from_slice(slice)
-}
-
-/// Encode a Rust type containing only owned values that is `serde::Serialize` into a Postgres
-/// varlena pointer as CBOR
-pub fn to_varlena_owned<T: serde::Serialize>(
-    data: &T,
-) -> serde_cbor::Result<*const pg_sys::varlena> {
-    let mut serialized = StringInfo::new();
-
-    serialized.push_bytes(&[0u8; pg_sys::VARHDRSZ]); // reserve space fo the header
-    serde_cbor::to_writer(&mut serialized, data)?;
-
-    let size = serialized.len() as usize;
-    let varlena = serialized.into_char_ptr();
-    unsafe {
-        set_varsize(varlena as *mut pg_sys::varlena, size as i32);
-    }
-
-    Ok(varlena as *const pg_sys::varlena)
-}
-
-/// Encode a Rust type containing at least one borrowed value that is `serde::Serialize` into a Postgres
-/// varlena pointer as JSON
-pub fn to_varlena_borrowed<T: serde::Serialize>(
-    data: &T,
-) -> serde_json::Result<*const pg_sys::varlena> {
-    let mut serialized = StringInfo::new();
-
-    serialized.push_bytes(&[0u8; pg_sys::VARHDRSZ]); // reserve space fo the header
-    serde_json::to_writer(&mut serialized, data)?;
-
-    let size = serialized.len() as usize;
-    let varlena = serialized.into_char_ptr();
-    unsafe {
-        set_varsize(varlena as *mut pg_sys::varlena, size as i32);
-    }
-
-    Ok(varlena as *const pg_sys::varlena)
 }
