@@ -265,7 +265,7 @@ fn impl_postgres_enum(ast: DeriveInput) -> proc_macro2::TokenStream {
     stream
 }
 
-#[proc_macro_derive(PostgresType, attributes(inoutfuncs))]
+#[proc_macro_derive(PostgresType, attributes(inoutfuncs, pgvarlena_inoutfuncs))]
 pub fn postgres_type(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
 
@@ -327,9 +327,23 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
             }
 
         });
-    } else if args.contains(&PostgresTypeAttribute::Custom) {
-        // otherwise if it's custom, then it's assumed the user has implemented InOutFuncs and
-        // our _in/_out functions use a PgVarlena
+    } else if args.contains(&PostgresTypeAttribute::InOutFuncs) {
+        // otherwise if it's InOutFuncs our _in/_out functions use an owned type instance
+        stream.extend(quote! {
+            #[pg_extern(immutable,parallel_safe)]
+            pub fn #funcname_in #generics(input: &#lifetime std::ffi::CStr) -> #name #generics {
+                #name::input(input)
+            }
+
+            #[pg_extern(immutable,parallel_safe)]
+            pub fn #funcname_out #generics(input: #name #generics) -> &#lifetime std::ffi::CStr {
+                let mut buffer = StringInfo::new();
+                input.output(&mut buffer);
+                buffer.into()
+            }
+        });
+    } else if args.contains(&PostgresTypeAttribute::PgVarlenaInOutFuncs) {
+        // otherwise if it's PgVarlenaInOutFuncs our _in/_out functions use a PgVarlena
         stream.extend(quote! {
             #[pg_extern(immutable,parallel_safe)]
             pub fn #funcname_in #generics(input: &#lifetime std::ffi::CStr) -> pgx::PgVarlena<#name #generics> {
@@ -431,7 +445,8 @@ fn impl_guc_enum(ast: DeriveInput) -> proc_macro2::TokenStream {
 
 #[derive(Debug, Hash, Ord, PartialOrd, Eq, PartialEq)]
 enum PostgresTypeAttribute {
-    Custom,
+    InOutFuncs,
+    PgVarlenaInOutFuncs,
     Default,
 }
 
@@ -440,7 +455,10 @@ fn parse_postgres_type_args(attributes: &[Attribute]) -> HashSet<PostgresTypeAtt
 
     for a in attributes {
         match a.path.to_token_stream().to_string().as_str() {
-            "inoutfuncs" => categorized_attributes.insert(PostgresTypeAttribute::Custom),
+            "inoutfuncs" => categorized_attributes.insert(PostgresTypeAttribute::InOutFuncs),
+            "pgvarlena_inoutfuncs" => {
+                categorized_attributes.insert(PostgresTypeAttribute::PgVarlenaInOutFuncs)
+            }
             _ => panic!(
                 "unrecognized PostgresType attribute: {}",
                 a.path.to_token_stream().to_string()

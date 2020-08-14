@@ -54,7 +54,7 @@ into something that looks like your type.
 
 ```rust
 #[derive(Copy, Clone, PostgresType)]
-#[inoutfuncs]   // This is required for non-serde types
+#[pgvarlena_inoutfuncs]   // This is required for non-serde types
 struct MyType {
    a: f32,
    b: f32,
@@ -91,8 +91,8 @@ fn do_a_thing(mut input: PgVarlena<MyType>) -> PgVarlena<MyType> {
 
 ## Notes
 
-- For serde-compatible types, you can specify the `#[inoutfuncs]` annotation if you'd prefer to
-implement the type's textual representation (maybe JSON isn't what you want).  
+- For serde-compatible types, you can use the `#[inoutfuncs]` annotation (instead of `#[pgvarlena_inoutfuncs]`) if you'd 
+prefer to implement the type's textual representation (maybe JSON isn't what you want).  
 
     Instead of implementing the trait `PgVarlenaInOutFuncs` (as shown above), you instead implement 
     the trait `InOutFuncs`.  Its `input()` function has a slightly different signature since you'll be 

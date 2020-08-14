@@ -3,7 +3,7 @@ use std::ffi::CStr;
 use std::str::FromStr;
 
 #[derive(Copy, Clone, PostgresType)]
-#[inoutfuncs]
+#[pgvarlena_inoutfuncs]
 pub struct FixedF32Array {
     array: [f32; 91],
 }

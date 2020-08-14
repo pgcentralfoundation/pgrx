@@ -45,7 +45,7 @@ impl Clone for PallocdVarlena {
 /// pg_module_magic!();
 ///
 /// #[derive(Copy, Clone, PostgresType)]
-/// #[inoutfuncs]
+/// #[pgvarlena_inoutfuncs]
 /// struct MyType {
 ///    a: f32,
 ///    b: f32,
