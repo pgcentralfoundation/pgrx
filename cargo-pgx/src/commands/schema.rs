@@ -412,7 +412,7 @@ fn walk_items(
                             sql.push_str("CREATE OPERATOR ");
                             sql.push_str(&qualify_name(&current_schema, &name.unwrap()));
                             sql.push_str(" (");
-                            sql.push_str("\n   FUNCTION=");
+                            sql.push_str("\n   PROCEDURE=");
                             sql.push_str(&qualify_name(&current_schema, &func_name));
                             if type_names.len() == 1 {
                                 sql.push_str(",\n   RIGHTARG=");
