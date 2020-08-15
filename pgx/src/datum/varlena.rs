@@ -280,6 +280,30 @@ where
             Some(PgVarlena::<T>::from_datum(datum))
         }
     }
+
+    unsafe fn from_datum_in_memory_context(
+        mut memory_context: PgMemoryContexts,
+        datum: usize,
+        is_null: bool,
+        _typoid: u32,
+    ) -> Option<Self> {
+        if is_null {
+            None
+        } else if datum == 0 {
+            panic!("a varlena Datum was flagged as non-null but the datum is zero");
+        } else {
+            memory_context.switch_to(|_| {
+                // this gets the varlena Datum copied into this memory context
+                let detoasted = pg_sys::pg_detoast_datum_copy(datum as *mut pg_sys::varlena);
+
+                // and we need to unpack it (if necessary), which will decompress it too
+                let varlena = pg_sys::pg_detoast_datum_packed(detoasted);
+
+                // and now we return it as a &str
+                Some(PgVarlena::<T>::from_datum(varlena as pg_sys::Datum))
+            })
+        }
+    }
 }
 
 impl<T> IntoDatum for T
