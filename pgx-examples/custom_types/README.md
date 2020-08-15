@@ -46,7 +46,7 @@ blob within a Postgres `varlena` with either a short 1-byte or a full 4-byte hea
 size of the Rust struct.
 
 These types must implement the text input/output functions themselves, which requires
-an additional annotation on the type (`#[inoutfuncs]`).
+an additional annotation on the type (`#[pgvarlena_inoutfuncs]`).
 
 When using this type in function arguments and return values, it is required that you use
 `PgVarlena<T>`.  This formulation ensures that the datum value from Postgres is properly mapped
