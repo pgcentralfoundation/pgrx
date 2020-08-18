@@ -1,159 +1,161 @@
+//#[macro_use]
+//extern crate static_assertions;
+use crate::lwlock::*;
 use crate::pg_sys;
-use core::ops::{Deref, DerefMut};
-use std::cell::UnsafeCell;
+//use impls::impls;
+use uuid::Uuid;
 
-/// A Rust locking mechanism which uses a PostgreSQL LWLock to lock the data
-///
-/// This type of lock allows a number of readers or at most one writer at any
-/// point in time. The write portion of this lock typically allows modification
-/// of the underlying data (exclusive access) and the read portion of this lock
-/// typically allows for read-only access (shared access).
-///
-/// The lock is valid across processes as the LWLock is managed by Postgres. Data
-/// mutability once a lock is obtained is handled by Rust giving out & or &mut
-/// pointers.
-///
-/// When a lock is given out it is wrapped in a PgLwLockShareGuard or
-/// PgLwLockExclusiveGuard, which releases the lock on drop
-///
-/// # Poisoning
-/// This lock can not be poisoned from Rust. Panic and Abort are handled by
-/// PostgreSQL cleanly.
+pub unsafe trait PGXSharedMemory {}
 
-pub struct PgLwLock<T> {
-    inner: UnsafeCell<Option<PgLwLockInner<T>>>,
+#[macro_export]
+macro_rules! pgx_sharedmem_locked {
+    ($item_name:ident, $item_type:ty) => {
+        //This doesn't give a nice error message -> would use if it did
+        //const_assert!(impls!($item_type: PGXSharedMemory));
+
+        thread_local! {
+            static $item_name: PgLwLock<&'static mut $item_type> = PgLwLock::empty(stringify!($item_name));
+        }
+    };
 }
 
-impl<T> PgLwLock<T> {
-    /// Create a new lock for T by attaching a LWLock, which is looked up by name
-    pub fn new(lock: String, value: T) -> Self {
-        PgLwLock {
-            inner: UnsafeCell::new(Some(PgLwLockInner::<T>::new(lock, value))),
-        }
-    }
+/// This macro is used to create a global which will be used to access shared memory components
+#[macro_export]
+macro_rules! pgx_sharedmem_atomic {
+    ($item_name:ident, $item_type:ty = $value:expr) => {
+        static $item_name: $item_type = <$item_type>::new($value);
+    };
+}
 
-    /// Create an empty lock wich can be created as a global with None as a
-    /// sentiel value
-    pub const fn empty() -> Self {
-        PgLwLock {
-            inner: UnsafeCell::new(None),
-        }
-    }
+/// This struct contains methods to drive creation of types in shared memory
+pub struct PgSharedMem {}
 
-    /// Obtain a shared lock (which comes with &T access)
-    pub fn share(&self) -> PgLwLockShareGuard<T> {
+impl PgSharedMem {
+    /// Must be run from PG_init, use for types which are guarded by a LWLock
+    pub fn pg_init_locked<T: Default + PGXSharedMemory>(
+        pgstatic: &'static std::thread::LocalKey<PgLwLock<&'static mut T>>,
+    ) {
         unsafe {
-            (*self.inner.get())
-                .as_ref()
-                .expect("Lock is in an empty state")
-                .share()
+            pgstatic.with(|lock| {
+                let lock = std::ffi::CString::new(lock.get_name()).expect("CString::new failed");
+                pg_sys::RequestAddinShmemSpace(std::mem::size_of::<T>());
+                pg_sys::RequestNamedLWLockTranche(lock.as_ptr(), 1);
+            });
         }
     }
-
-    /// Obtain an exclusive lock (which comes with &mut T access)
-    pub fn exclusive(&self) -> PgLwLockExclusiveGuard<T> {
+    /// Must be run from PG_init for atomics
+    pub fn pg_init_atomic<T: atomic_traits::Atomic + Default>(_pgstatic: &'static T) {
         unsafe {
-            (*self.inner.get())
-                .as_ref()
-                .expect("Lock is in an empty state")
-                .exclusive()
+            pg_sys::RequestAddinShmemSpace(std::mem::size_of::<T>());
         }
     }
 
-    /// Attach an empty PgLwLock lock to a LWLock, and wrap T
-    pub fn attach(&self, lock: String, value: T) {
-        let slot = unsafe { &*self.inner.get() };
-        if slot.is_some() {
-            panic!("Lock is not in an empty state");
-        }
-        let slot = unsafe { &mut *self.inner.get() };
-        *slot = Some(PgLwLockInner::<T>::new(lock, value));
+    /// Must be run from the shared memory init hook, use for types which are guarded by a LWLock
+    pub fn shmem_init_locked<T: Default + PGXSharedMemory>(
+        pgstatic: &'static std::thread::LocalKey<PgLwLock<&'static mut T>>,
+    ) {
+        let mut found = false;
+        pgstatic.with(|lock| unsafe {
+            let shm_name = std::ffi::CString::new(lock.get_name()).expect("CString::new failed");
+            let addin_shmem_init_lock: *mut pg_sys::LWLock =
+                &mut (*pg_sys::MainLWLockArray.add(21)).lock;
+            pg_sys::LWLockAcquire(addin_shmem_init_lock, pg_sys::LWLockMode_LW_EXCLUSIVE);
+
+            let fv_shmem =
+                pg_sys::ShmemInitStruct(shm_name.into_raw(), std::mem::size_of::<T>(), &mut found)
+                    as *mut T;
+
+            *fv_shmem = std::mem::zeroed();
+            let fv = <T>::default();
+
+            std::ptr::copy(&fv, fv_shmem, 1);
+
+            lock.attach(&mut *fv_shmem);
+            pg_sys::LWLockRelease(addin_shmem_init_lock);
+        });
     }
-}
 
-pub struct PgLwLockInner<T> {
-    lock_ptr: *mut pg_sys::LWLock,
-    data: UnsafeCell<T>,
-}
-
-impl<'a, T> PgLwLockInner<T> {
-    fn new(lock_name: String, data: T) -> Self {
+    /// Must be run from the shared memory init hook, use for atomics
+    pub fn shmem_init_atomic<T: atomic_traits::Atomic + Default>(pgstatic: &'static T) {
         unsafe {
-            let lock = std::ffi::CString::new(lock_name).expect("CString::new failed");
-            PgLwLockInner {
-                lock_ptr: &mut (*pg_sys::GetNamedLWLockTranche(lock.as_ptr())).lock,
-                data: UnsafeCell::new(data),
-            }
-        }
-    }
+            let mut found = false;
+            let shm_name =
+                std::ffi::CString::new(Uuid::new_v4().to_string()).expect("CString::new failed");
+            let addin_shmem_init_lock: *mut pg_sys::LWLock =
+                &mut (*pg_sys::MainLWLockArray.add(21)).lock;
+            pg_sys::LWLockAcquire(addin_shmem_init_lock, pg_sys::LWLockMode_LW_EXCLUSIVE);
 
-    fn share(&self) -> PgLwLockShareGuard<T> {
-        unsafe {
-            pg_sys::LWLockAcquire(self.lock_ptr, pg_sys::LWLockMode_LW_SHARED);
+            let fv_shmem =
+                pg_sys::ShmemInitStruct(shm_name.into_raw(), std::mem::size_of::<T>(), &mut found)
+                    as *mut T;
 
-            PgLwLockShareGuard {
-                data: &*self.data.get(),
-                lock: self.lock_ptr,
-            }
-        }
-    }
+            std::ptr::copy(pgstatic, fv_shmem, 1);
 
-    fn exclusive(&self) -> PgLwLockExclusiveGuard<T> {
-        unsafe {
-            pg_sys::LWLockAcquire(self.lock_ptr, pg_sys::LWLockMode_LW_EXCLUSIVE);
-
-            PgLwLockExclusiveGuard {
-                data: &mut *self.data.get(),
-                lock: self.lock_ptr,
-            }
+            pg_sys::LWLockRelease(addin_shmem_init_lock);
         }
     }
 }
 
-pub struct PgLwLockShareGuard<'a, T> {
-    data: &'a T,
-    lock: *mut pg_sys::LWLock,
+//unsafe impl PGXSharedMemory for dyn num_traits::Num {}
+unsafe impl PGXSharedMemory for bool {}
+unsafe impl PGXSharedMemory for char {}
+unsafe impl PGXSharedMemory for str {}
+unsafe impl PGXSharedMemory for () {}
+unsafe impl PGXSharedMemory for i8 {}
+unsafe impl PGXSharedMemory for i16 {}
+unsafe impl PGXSharedMemory for i32 {}
+unsafe impl PGXSharedMemory for i64 {}
+unsafe impl PGXSharedMemory for i128 {}
+unsafe impl PGXSharedMemory for u8 {}
+unsafe impl PGXSharedMemory for u16 {}
+unsafe impl PGXSharedMemory for u32 {}
+unsafe impl PGXSharedMemory for u64 {}
+unsafe impl PGXSharedMemory for u128 {}
+unsafe impl PGXSharedMemory for usize {}
+unsafe impl PGXSharedMemory for isize {}
+unsafe impl PGXSharedMemory for f32 {}
+unsafe impl PGXSharedMemory for f64 {}
+unsafe impl<T> PGXSharedMemory for [T] where T: PGXSharedMemory + Default {}
+unsafe impl<A, B> PGXSharedMemory for (A, B)
+where
+    A: PGXSharedMemory + Default,
+    B: PGXSharedMemory + Default,
+{
 }
-
-impl<T> Drop for PgLwLockShareGuard<'_, T> {
-    fn drop(&mut self) {
-        unsafe {
-            pg_sys::LWLockRelease(self.lock);
-        }
-    }
+unsafe impl<A, B, C> PGXSharedMemory for (A, B, C)
+where
+    A: PGXSharedMemory + Default,
+    B: PGXSharedMemory + Default,
+    C: PGXSharedMemory + Default,
+{
 }
-
-impl<T> Deref for PgLwLockShareGuard<'_, T> {
-    type Target = T;
-
-    fn deref(&self) -> &T {
-        &self.data
-    }
+unsafe impl<A, B, C, D> PGXSharedMemory for (A, B, C, D)
+where
+    A: PGXSharedMemory + Default,
+    B: PGXSharedMemory + Default,
+    C: PGXSharedMemory + Default,
+    D: PGXSharedMemory + Default,
+{
 }
-
-pub struct PgLwLockExclusiveGuard<'a, T> {
-    data: &'a mut T,
-    lock: *mut pg_sys::LWLock,
+unsafe impl<A, B, C, D, E> PGXSharedMemory for (A, B, C, D, E)
+where
+    A: PGXSharedMemory + Default,
+    B: PGXSharedMemory + Default,
+    C: PGXSharedMemory + Default,
+    D: PGXSharedMemory + Default,
+    E: PGXSharedMemory + Default,
+{
 }
-
-impl<T> Deref for PgLwLockExclusiveGuard<'_, T> {
-    type Target = T;
-
-    fn deref(&self) -> &T {
-        &self.data
-    }
+unsafe impl<N: Default + PGXSharedMemory, T: heapless::ArrayLength<N>> PGXSharedMemory
+    for heapless::Vec<N, T>
+{
 }
-
-impl<T> DerefMut for PgLwLockExclusiveGuard<'_, T> {
-    fn deref_mut(&mut self) -> &mut T {
-        &mut self.data
-    }
-}
-
-impl<T> Drop for PgLwLockExclusiveGuard<'_, T> {
-    fn drop(&mut self) {
-        unsafe {
-            pg_sys::LWLockRelease(self.lock);
-        }
-    }
+unsafe impl<
+        K: Eq + hash32::Hash,
+        V: Default,
+        N: heapless::ArrayLength<heapless::Bucket<K, V>>
+            + heapless::ArrayLength<Option<heapless::Pos>>,
+        S,
+    > PGXSharedMemory for heapless::IndexMap<K, V, N, S>
+{
 }

@@ -42,6 +42,7 @@ pub mod list;
 #[macro_use]
 pub mod log;
 pub mod bgworkers;
+pub mod lwlock;
 pub mod memcxt;
 pub mod namespace;
 pub mod nodes;
