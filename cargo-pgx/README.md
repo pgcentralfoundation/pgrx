@@ -246,7 +246,7 @@ distobutions or MacOS Postgres installations.
 $ cargo pgx package --help
  cargo-pgx-pgx-package 
  create an installation package directory (in ./target/[debug|release]/extname-pgXX/) for the Postgres installation
- specified by whatever "pg_cofig" is currently on your $PATH
+ specified by whatever "pg_config" is currently on your $PATH
  
  USAGE:
      cargo-pgx pgx package [FLAGS]
