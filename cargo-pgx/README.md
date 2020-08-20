@@ -37,7 +37,7 @@ SUBCOMMANDS:
                currently on your $PATH
     new        create a new extension crate
     package    create an installation package directory (in ./target/[debug|release]/extname-pgXX/) for the
-               Postgres installation specified by whatever "pg_cofig" is currently on your $PATH
+               Postgres installation specified by whatever "pg_config" is currently on your $PATH
     run        compile/install extension to a pgx-managed Postgres instance and start psql
     schema     generate extension schema files (typically not necessary)
     start      start a pgx-managed Postgres instance
