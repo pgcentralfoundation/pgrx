@@ -8,23 +8,54 @@ use uuid::Uuid;
 pub unsafe trait PGXSharedMemory {}
 
 #[macro_export]
-macro_rules! pgx_sharedmem_locked {
-    ($item_name:ident, $item_type:ty) => {
-        //This doesn't give a nice error message -> would use if it did
-        //const_assert!(impls!($item_type: PGXSharedMemory));
+macro_rules! pg_shmem_init {
+    ($thing:expr) => {
+        $thing.pg_init();
 
-        thread_local! {
-            static $item_name: PgLwLock<&'static mut $item_type> = PgLwLock::empty(stringify!($item_name));
+        unsafe {
+            static mut PREV_SHMEM_STARTUP_HOOK: Option<unsafe extern "C" fn()> = None;
+            PREV_SHMEM_STARTUP_HOOK = pg_sys::shmem_startup_hook;
+            pg_sys::shmem_startup_hook = Some(shmem_hook);
+
+            extern "C" fn shmem_hook() {
+                unsafe {
+                    if let Some(i) = PREV_SHMEM_STARTUP_HOOK {
+                        i();
+                    }
+                }
+                $thing.shmem_init();
+            }
         }
     };
 }
 
-/// This macro is used to create a global which will be used to access shared memory components
-#[macro_export]
-macro_rules! pgx_sharedmem_atomic {
-    ($item_name:ident, $item_type:ty = $value:expr) => {
-        static $item_name: $item_type = <$item_type>::new($value);
-    };
+pub trait PgSharedMemoryInitialization {
+    fn pg_init(&'static self);
+    fn shmem_init(&'static self);
+}
+
+impl<T> PgSharedMemoryInitialization for std::thread::LocalKey<PgLwLock<T>>
+where
+    T: Default + PGXSharedMemory + 'static,
+{
+    fn pg_init(&'static self) {
+        self.with(|v| PgSharedMem::pg_init_locked(v))
+    }
+
+    fn shmem_init(&'static self) {
+        self.with(|v| PgSharedMem::shmem_init_locked(v))
+    }
+}
+
+// TODO:  implement these
+impl PgSharedMemoryInitialization for std::sync::atomic::AtomicBool {
+    fn pg_init(&self) {
+        PgSharedMem::pg_init_atomic(self)
+    }
+
+    fn shmem_init(&'static self) {
+        PgSharedMem::shmem_init_atomic(self)
+    }
 }
 
 /// This struct contains methods to drive creation of types in shared memory
