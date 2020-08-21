@@ -27,20 +27,20 @@ pub struct PgLwLock<T> {
 }
 
 impl<T> PgLwLock<T> {
-    /// Create a new lock for T by attaching a LWLock, which is looked up by name
-    pub fn new(name: &'static str, value: *mut T) -> Self {
-        PgLwLock {
-            inner: UnsafeCell::new(Some(PgLwLockInner::<T>::new(name, value))),
-            name,
-        }
-    }
-
-    /// Create an empty lock wich can be created as a global with None as a
-    /// sentiel value
-    pub fn empty() -> Self {
+    /// Create an empty lock which can be created as a global with None as a
+    /// sentinel value
+    pub fn new() -> Self {
         PgLwLock {
             inner: UnsafeCell::new(None),
             name: Box::leak(Uuid::new_v4().to_string().into_boxed_str()),
+        }
+    }
+
+    /// Create a new lock for T by attaching a LWLock, which is looked up by name
+    pub fn from_named(name: &'static str, value: *mut T) -> Self {
+        PgLwLock {
+            inner: UnsafeCell::new(Some(PgLwLockInner::<T>::new(name, value))),
+            name,
         }
     }
 

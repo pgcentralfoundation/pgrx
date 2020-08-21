@@ -24,19 +24,13 @@ impl Default for Pgtest {
 unsafe impl PGXSharedMemory for Pgtest {}
 
 thread_local! {
-    static VEC: PgLwLock<heapless::Vec<Pgtest, U400>> = PgLwLock::empty();
+    static VEC: PgLwLock<heapless::Vec<Pgtest, U400>> = PgLwLock::new();
+    static HASH: PgLwLock<heapless::FnvIndexMap<i32, i32, U4>> = PgLwLock::new();
+    static STRUCT: PgLwLock<Pgtest> = PgLwLock::new();
+    static PRIMITIVE: PgLwLock<i32> = PgLwLock::new();
+    static ATOMIC: PgAtomic<std::sync::atomic::AtomicBool, bool> = PgAtomic::new(true);
+    static ATOMIC_INT32: PgAtomic<std::sync::atomic::AtomicI32, i32> = PgAtomic::new(42);
 }
-
-thread_local! {
-    static HASH: PgLwLock<heapless::FnvIndexMap<i32, i32, U4>> = PgLwLock::empty();
-}
-thread_local! {
-    static STRUCT: PgLwLock<Pgtest> = PgLwLock::empty();
-}
-thread_local! {
-    static PRIMITIVE: PgLwLock<i32> = PgLwLock::empty();
-}
-static ATOMIC: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(true);
 
 #[allow(non_snake_case)]
 #[pg_guard]
@@ -46,6 +40,7 @@ pub extern "C" fn _PG_init() {
     pg_shmem_init!(STRUCT);
     pg_shmem_init!(PRIMITIVE);
     pg_shmem_init!(ATOMIC);
+    pg_shmem_init!(ATOMIC_INT32);
 }
 
 #[pg_extern]
@@ -105,20 +100,31 @@ fn struct_set(value1: i32, value2: i32) {
 }
 
 #[pg_extern]
-fn primative_get() -> i32 {
+fn primitive_get() -> i32 {
     PRIMITIVE.with(|s| s.share().clone())
 }
 
 #[pg_extern]
-fn primative_set(value: i32) {
+fn primitive_set(value: i32) {
     PRIMITIVE.with(|s| *s.exclusive() = value);
 }
+
 #[pg_extern]
 fn atomic_get() -> bool {
-    ATOMIC.load(Ordering::Relaxed).clone()
+    ATOMIC.with(|s| s.load(Ordering::Relaxed))
 }
 
 #[pg_extern]
 fn atomic_set(value: bool) {
-    ATOMIC.store(value, Ordering::Relaxed);
+    ATOMIC.with(|s| s.store(value, Ordering::Relaxed))
+}
+
+#[pg_extern]
+fn atomic_i32_get() -> i32 {
+    ATOMIC_INT32.with(|s| s.load(Ordering::Relaxed))
+}
+
+#[pg_extern]
+fn atomic_i32_set(value: i32) -> i32 {
+    ATOMIC_INT32.with(|s| s.swap(value, Ordering::Relaxed))
 }
