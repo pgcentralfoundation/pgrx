@@ -27,7 +27,7 @@ pub struct PgLwLock<T> {
 
 impl<T> PgLwLock<T> {
     /// Create a new lock for T by attaching a LWLock, which is looked up by name
-    pub fn new(name: &'static str, value: T) -> Self {
+    pub fn new(name: &'static str, value: *mut T) -> Self {
         PgLwLock {
             inner: UnsafeCell::new(Some(PgLwLockInner::<T>::new(name, value))),
             name,
@@ -69,7 +69,7 @@ impl<T> PgLwLock<T> {
     }
 
     /// Attach an empty PgLwLock lock to a LWLock, and wrap T
-    pub fn attach(&self, value: T) {
+    pub fn attach(&self, value: *mut T) {
         let slot = unsafe { &*self.inner.get() };
         if slot.is_some() {
             panic!("Lock is not in an empty state");
@@ -81,16 +81,16 @@ impl<T> PgLwLock<T> {
 
 pub struct PgLwLockInner<T> {
     lock_ptr: *mut pg_sys::LWLock,
-    data: UnsafeCell<T>,
+    data: *mut T,
 }
 
 impl<'a, T> PgLwLockInner<T> {
-    fn new(name: &'static str, data: T) -> Self {
+    fn new(name: &'static str, data: *mut T) -> Self {
         unsafe {
             let lock = std::ffi::CString::new(name).expect("CString::new failed");
             PgLwLockInner {
                 lock_ptr: &mut (*pg_sys::GetNamedLWLockTranche(lock.as_ptr())).lock,
-                data: UnsafeCell::new(data),
+                data,
             }
         }
     }
@@ -100,7 +100,7 @@ impl<'a, T> PgLwLockInner<T> {
             pg_sys::LWLockAcquire(self.lock_ptr, pg_sys::LWLockMode_LW_SHARED);
 
             PgLwLockShareGuard {
-                data: &*self.data.get(),
+                data: self.data.as_ref().unwrap(),
                 lock: self.lock_ptr,
             }
         }
@@ -111,7 +111,7 @@ impl<'a, T> PgLwLockInner<T> {
             pg_sys::LWLockAcquire(self.lock_ptr, pg_sys::LWLockMode_LW_EXCLUSIVE);
 
             PgLwLockExclusiveGuard {
-                data: &mut *self.data.get(),
+                data: self.data.as_mut().unwrap(),
                 lock: self.lock_ptr,
             }
         }

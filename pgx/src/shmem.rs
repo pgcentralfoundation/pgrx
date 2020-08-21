@@ -32,15 +32,11 @@ pub struct PgSharedMem {}
 
 impl PgSharedMem {
     /// Must be run from PG_init, use for types which are guarded by a LWLock
-    pub fn pg_init_locked<T: Default + PGXSharedMemory>(
-        pgstatic: &'static std::thread::LocalKey<PgLwLock<&'static mut T>>,
-    ) {
+    pub fn pg_init_locked<T: Default + PGXSharedMemory>(lock: &PgLwLock<T>) {
         unsafe {
-            pgstatic.with(|lock| {
-                let lock = std::ffi::CString::new(lock.get_name()).expect("CString::new failed");
-                pg_sys::RequestAddinShmemSpace(std::mem::size_of::<T>());
-                pg_sys::RequestNamedLWLockTranche(lock.as_ptr(), 1);
-            });
+            let lock = std::ffi::CString::new(lock.get_name()).expect("CString::new failed");
+            pg_sys::RequestAddinShmemSpace(std::mem::size_of::<T>());
+            pg_sys::RequestNamedLWLockTranche(lock.as_ptr(), 1);
         }
     }
 
@@ -59,18 +55,16 @@ impl PgSharedMem {
     }
 
     /// Must be run from PG_init for atomics
-    pub fn pg_init_atomic<T: atomic_traits::Atomic + Default>(_pgstatic: &'static T) {
+    pub fn pg_init_atomic<T: atomic_traits::Atomic + Default>(_pgstatic: &T) {
         unsafe {
             pg_sys::RequestAddinShmemSpace(std::mem::size_of::<T>());
         }
     }
 
     /// Must be run from the shared memory init hook, use for types which are guarded by a LWLock
-    pub fn shmem_init_locked<T: Default + PGXSharedMemory>(
-        pgstatic: &'static std::thread::LocalKey<PgLwLock<&'static mut T>>,
-    ) {
+    pub fn shmem_init_locked<T: Default + PGXSharedMemory>(lock: &PgLwLock<T>) {
         let mut found = false;
-        pgstatic.with(|lock| unsafe {
+        unsafe {
             let shm_name = std::ffi::CString::new(lock.get_name()).expect("CString::new failed");
             let addin_shmem_init_lock: *mut pg_sys::LWLock =
                 &mut (*pg_sys::MainLWLockArray.add(21)).lock;
@@ -85,19 +79,19 @@ impl PgSharedMem {
 
             std::ptr::copy(&fv, fv_shmem, 1);
 
-            lock.attach(&mut *fv_shmem);
+            lock.attach(fv_shmem);
             pg_sys::LWLockRelease(addin_shmem_init_lock);
-        });
+        }
     }
 
     /// Test version
     pub fn shmem_init_locked_sized<T: PGXSharedMemory>(
-        pgstatic: &'static std::thread::LocalKey<PgLwLock<&'static mut T>>,
+        lock: &'static PgLwLock<T>,
         size: usize,
         data: T,
     ) {
         let mut found = false;
-        pgstatic.with(|lock| unsafe {
+        unsafe {
             let shm_name = std::ffi::CString::new(lock.get_name()).expect("CString::new failed");
             let addin_shmem_init_lock: *mut pg_sys::LWLock =
                 &mut (*pg_sys::MainLWLockArray.add(21)).lock;
@@ -113,13 +107,13 @@ impl PgSharedMem {
 
             std::ptr::copy(&data, fv_shmem, 1);
 
-            lock.attach(&mut *fv_shmem);
+            lock.attach(fv_shmem);
             pg_sys::LWLockRelease(addin_shmem_init_lock);
-        });
+        };
     }
 
     /// Must be run from the shared memory init hook, use for atomics
-    pub fn shmem_init_atomic<T: atomic_traits::Atomic + Default>(pgstatic: &'static T) {
+    pub fn shmem_init_atomic<T: atomic_traits::Atomic + Default>(pgstatic: &T) {
         unsafe {
             let mut found = false;
             let shm_name =
