@@ -1,6 +1,7 @@
 use crate::pg_sys;
 use core::ops::{Deref, DerefMut};
 use std::cell::UnsafeCell;
+use uuid::Uuid;
 
 /// A Rust locking mechanism which uses a PostgreSQL LWLock to lock the data
 ///
@@ -36,10 +37,10 @@ impl<T> PgLwLock<T> {
 
     /// Create an empty lock wich can be created as a global with None as a
     /// sentiel value
-    pub fn empty(name: &'static str) -> Self {
+    pub fn empty() -> Self {
         PgLwLock {
             inner: UnsafeCell::new(None),
-            name,
+            name: Box::leak(Uuid::new_v4().to_string().into_boxed_str()),
         }
     }
 

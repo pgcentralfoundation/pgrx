@@ -24,17 +24,17 @@ impl Default for Pgtest {
 unsafe impl PGXSharedMemory for Pgtest {}
 
 thread_local! {
-    static VEC: PgLwLock<heapless::Vec<Pgtest, U400>> = PgLwLock::empty("vec");
+    static VEC: PgLwLock<heapless::Vec<Pgtest, U400>> = PgLwLock::empty();
 }
 
 thread_local! {
-    static HASH: PgLwLock<heapless::FnvIndexMap<i32, i32, U4>> = PgLwLock::empty("hash");
+    static HASH: PgLwLock<heapless::FnvIndexMap<i32, i32, U4>> = PgLwLock::empty();
 }
 thread_local! {
-    static STRUCT: PgLwLock<Pgtest> = PgLwLock::empty("struct");
+    static STRUCT: PgLwLock<Pgtest> = PgLwLock::empty();
 }
 thread_local! {
-    static PRIMITIVE: PgLwLock<i32> = PgLwLock::empty("primitive");
+    static PRIMITIVE: PgLwLock<i32> = PgLwLock::empty();
 }
 static ATOMIC: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(true);
 
