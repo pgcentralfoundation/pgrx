@@ -174,14 +174,12 @@ impl BackgroundWorker {
     }
 }
 
-#[allow(non_snake_case)]
 unsafe extern "C" fn worker_spi_sighup(_signal_args: i32) {
     GOT_SIGHUP.store(true, Ordering::SeqCst);
     pg_sys::ProcessConfigFile(pg_sys::GucContext_PGC_SIGHUP);
     pg_sys::SetLatch(pg_sys::MyLatch);
 }
 
-#[allow(non_snake_case)]
 unsafe extern "C" fn worker_spi_sigterm(_signal_args: i32) {
     GOT_SIGTERM.store(true, Ordering::SeqCst);
     pg_sys::SetLatch(pg_sys::MyLatch);
@@ -200,7 +198,6 @@ unsafe extern "C" fn worker_spi_sigterm(_signal_args: i32) {
 ///
 /// pg_module_magic!();
 ///
-/// #[allow(non_snake_case)]
 /// #[pg_guard]
 /// pub extern "C" fn _PG_init() {
 ///     BackgroundWorkerBuilder::new("My Example BGWorker")

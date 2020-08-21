@@ -19,7 +19,6 @@ use std::time::Duration;
 
 pg_module_magic!();
 
-#[allow(non_snake_case)]
 #[pg_guard]
 pub extern "C" fn _PG_init() {
     BackgroundWorkerBuilder::new("Background Worker Example")

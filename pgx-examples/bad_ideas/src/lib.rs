@@ -69,7 +69,6 @@ fn random_abort() {
     });
 }
 
-#[allow(non_snake_case)]
 #[pg_guard]
 pub unsafe extern "C" fn _PG_init() {
     #[pg_guard]
