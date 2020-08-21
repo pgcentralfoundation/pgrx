@@ -174,12 +174,14 @@ impl BackgroundWorker {
     }
 }
 
+#[pg_guard]
 unsafe extern "C" fn worker_spi_sighup(_signal_args: i32) {
     GOT_SIGHUP.store(true, Ordering::SeqCst);
     pg_sys::ProcessConfigFile(pg_sys::GucContext_PGC_SIGHUP);
     pg_sys::SetLatch(pg_sys::MyLatch);
 }
 
+#[pg_guard]
 unsafe extern "C" fn worker_spi_sigterm(_signal_args: i32) {
     GOT_SIGTERM.store(true, Ordering::SeqCst);
     pg_sys::SetLatch(pg_sys::MyLatch);
