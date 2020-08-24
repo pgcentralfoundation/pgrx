@@ -1,5 +1,5 @@
 use crate::lwlock::*;
-use crate::{pg_sys, PgAtomic};
+use crate::{pg_sys, PgAtomic, PgAtomicFancy};
 use std::ops::BitAnd;
 use uuid::Uuid;
 
@@ -65,6 +65,19 @@ where
     }
 }
 
+impl<T> PgSharedMemoryInitialization for PgAtomicFancy<T>
+where
+    T: atomic_traits::Atomic + Default,
+{
+    fn pg_init(&'static self) {
+        PgSharedMem::pg_init_atomic_fancy(self);
+    }
+
+    fn shmem_init(&'static self) {
+        PgSharedMem::shmem_init_atomic_fancy(self);
+    }
+}
+
 /// This struct contains methods to drive creation of types in shared memory
 pub struct PgSharedMem {}
 
@@ -96,6 +109,13 @@ impl PgSharedMem {
     fn pg_init_atomic<T: atomic_traits::Atomic<Type = V> + Default, V: BitAnd + Copy>(
         _atomic: &PgAtomic<T, V>,
     ) {
+        unsafe {
+            pg_sys::RequestAddinShmemSpace(std::mem::size_of::<T>());
+        }
+    }
+
+    /// Must be run from PG_init for atomics
+    fn pg_init_atomic_fancy<T: atomic_traits::Atomic + Default>(_atomic: &PgAtomicFancy<T>) {
         unsafe {
             pg_sys::RequestAddinShmemSpace(std::mem::size_of::<T>());
         }
@@ -173,6 +193,26 @@ impl PgSharedMem {
                 pg_sys::ShmemInitStruct(shm_name, std::mem::size_of::<T>(), &mut found) as *mut T;
 
             let atomic = T::new(value);
+            std::ptr::copy(&atomic, fv_shmem, 1);
+            pg_sys::LWLockRelease(addin_shmem_init_lock);
+        }
+    }
+    fn shmem_init_atomic_fancy<T: atomic_traits::Atomic + Default>(atomic: &PgAtomicFancy<T>) {
+        unsafe {
+            let shm_name =
+                std::ffi::CString::new(Uuid::new_v4().to_string()).expect("CString::new() failed");
+
+            let addin_shmem_init_lock: *mut pg_sys::LWLock =
+                &mut (*pg_sys::MainLWLockArray.add(21)).lock;
+
+            let mut found = false;
+            pg_sys::LWLockAcquire(addin_shmem_init_lock, pg_sys::LWLockMode_LW_EXCLUSIVE);
+            let fv_shmem =
+                pg_sys::ShmemInitStruct(shm_name.into_raw(), std::mem::size_of::<T>(), &mut found)
+                    as *mut T;
+
+            atomic.attach(fv_shmem);
+            let atomic = T::default();
             std::ptr::copy(&atomic, fv_shmem, 1);
             pg_sys::LWLockRelease(addin_shmem_init_lock);
         }

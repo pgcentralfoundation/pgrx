@@ -1,7 +1,45 @@
 use crate::pg_sys;
 use std::cell::UnsafeCell;
+
+use once_cell::sync::OnceCell;
 use std::marker::PhantomData;
 use std::ops::{BitAnd, Deref};
+
+pub struct PgAtomicFancy<T> {
+    inner: OnceCell<*mut T>,
+}
+
+impl<T> PgAtomicFancy<T> {
+    pub const fn new() -> Self {
+        Self {
+            inner: OnceCell::new(),
+        }
+    }
+}
+
+impl<T> PgAtomicFancy<T>
+where
+    T: atomic_traits::Atomic + Default,
+{
+    pub fn attach(&self, value: *mut T) {
+        self.inner
+            .set(value)
+            .expect("This PgAtomic is not empty, can't re-attach");
+    }
+
+    pub fn get(&self) -> &T {
+        unsafe {
+            self.inner
+                .get()
+                .expect("This PgAtomic as not been initialized")
+                .as_ref()
+                .unwrap()
+        }
+    }
+}
+
+unsafe impl<T> Send for PgAtomicFancy<T> where T: atomic_traits::Atomic + Default {}
+unsafe impl<T> Sync for PgAtomicFancy<T> where T: atomic_traits::Atomic + Default {}
 
 pub struct PgAtomic<T, V>
 where
