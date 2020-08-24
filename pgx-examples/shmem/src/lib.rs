@@ -29,7 +29,6 @@ static HASH: PgLwLock<heapless::FnvIndexMap<i32, i32, U4>> = PgLwLock::new();
 //static PRIMITIVE: PgLwLock<i32> = PgLwLock::new();
 //static ATOMIC_FANCY: PgAtomicFancy<std::sync::atomic::AtomicBool> = PgAtomicFancy::new();
 
-#[allow(non_snake_case)]
 #[pg_guard]
 pub extern "C" fn _PG_init() {
     pg_shmem_init!(VEC);
