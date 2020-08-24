@@ -13,6 +13,14 @@ pub unsafe fn set_varsize(ptr: *mut pg_sys::varlena, len: i32) {
     pgx_SET_VARSIZE(ptr, len)
 }
 
+pub unsafe fn set_varsize_short(ptr: *mut pg_sys::varlena, len: i32) {
+    extern "C" {
+        fn pgx_SET_VARSIZE_SHORT(ptr: *mut pg_sys::varlena, len: i32);
+    }
+
+    pgx_SET_VARSIZE_SHORT(ptr, len)
+}
+
 /// ```c
 /// #define VARSIZE_EXTERNAL(PTR)                        (VARHDRSZ_EXTERNAL + VARTAG_SIZE(VARTAG_EXTERNAL(PTR)))
 /// ```

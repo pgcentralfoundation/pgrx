@@ -1,7 +1,6 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-
 //! Provides a safe wrapper around Postgres' `pg_sys::RelationData` struct
 use crate::{
     direct_function_call, name_data_to_str, pg_sys, FromDatum, IntoDatum, PgBox, PgList,
@@ -114,6 +113,30 @@ impl PgRelation {
         match direct_function_call::<pg_sys::Oid>(pg_sys::to_regclass, vec![relname.into_datum()]) {
             Some(oid) => Ok(PgRelation::open(oid)),
             None => Err("no such relation"),
+        }
+    }
+
+    /// Given a relation name, use `pg_sys::to_regclass` to look up its oid, and then
+    /// open it with an AccessShareLock
+    ///
+    /// If the specified relation name is not found, we return an `Err(&str)`.
+    ///
+    /// If the specified relation was recently deleted, this function will panic.
+    ///
+    /// Additionally, the relation is closed via `pg_sys::RelationClose()` when this instance is
+    /// dropped.
+    pub fn open_with_name_and_share_lock(relname: &str) -> std::result::Result<Self, &'static str> {
+        unsafe {
+            match direct_function_call::<pg_sys::Oid>(
+                pg_sys::to_regclass,
+                vec![relname.into_datum()],
+            ) {
+                Some(oid) => Ok(PgRelation::with_lock(
+                    oid,
+                    pg_sys::AccessShareLock as pg_sys::LOCKMODE,
+                )),
+                None => Err("no such relation"),
+            }
         }
     }
 

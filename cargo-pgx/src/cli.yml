@@ -3,7 +3,7 @@
 
 
 name: "pgx's development environment tool"
-version: "0.0.12"
+version: "0.0.13"
 about: Creates and installs pgx based Postgres extensions
 subcommands:
   - pgx:
@@ -72,7 +72,7 @@ subcommands:
                     long: release
                     help: compile for release mode (default is debug)
           - package:
-              about: create an installation package directory (in ./target/[debug|release]/extname-pgXX/) for the Postgres installation specified by whatever "pg_cofig" is currently on your $PATH
+              about: create an installation package directory (in ./target/[debug|release]/extname-pgXX/) for the Postgres installation specified by whatever "pg_config" is currently on your $PATH
               args:
                 - debug:
                     short: d
