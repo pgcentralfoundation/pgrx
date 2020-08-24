@@ -30,7 +30,10 @@ thread_local! {
     static PRIMITIVE: PgLwLock<i32> = PgLwLock::new();
     static ATOMIC: PgAtomic<std::sync::atomic::AtomicBool, bool> = PgAtomic::new(true);
     static ATOMIC_INT32: PgAtomic<std::sync::atomic::AtomicI32, i32> = PgAtomic::new(42);
+
 }
+
+static ATOMIC_FANCY: PgAtomicFancy<std::sync::atomic::AtomicBool> = PgAtomicFancy::new();
 
 #[allow(non_snake_case)]
 #[pg_guard]
@@ -41,6 +44,7 @@ pub extern "C" fn _PG_init() {
     pg_shmem_init!(PRIMITIVE);
     pg_shmem_init!(ATOMIC);
     pg_shmem_init!(ATOMIC_INT32);
+    pg_shmem_init!(ATOMIC_FANCY);
 }
 
 #[pg_extern]
@@ -127,4 +131,14 @@ fn atomic_i32_get() -> i32 {
 #[pg_extern]
 fn atomic_i32_set(value: i32) -> i32 {
     ATOMIC_INT32.with(|s| s.swap(value, Ordering::Relaxed))
+}
+
+#[pg_extern]
+fn atomic_fancy_get() -> bool {
+    ATOMIC_FANCY.get().load(Ordering::Relaxed)
+}
+
+#[pg_extern]
+fn atomic_fancy_set(value: bool) -> bool {
+    ATOMIC_FANCY.get().swap(value, Ordering::Relaxed)
 }
