@@ -1,6 +1,8 @@
 use crate::pg_sys;
 use core::ops::{Deref, DerefMut};
+use once_cell::sync::OnceCell;
 use std::cell::UnsafeCell;
+use std::fmt;
 use uuid::Uuid;
 
 /// A Rust locking mechanism which uses a PostgreSQL LWLock to lock the data
@@ -22,48 +24,50 @@ use uuid::Uuid;
 /// PostgreSQL cleanly.
 
 pub struct PgLwLock<T> {
-    inner: UnsafeCell<Option<PgLwLockInner<T>>>,
-    name: &'static str,
+    inner: OnceCell<PgLwLockInner<T>>,
+    name: OnceCell<&'static str>,
 }
+
+unsafe impl<T> Send for PgLwLock<T> {}
+unsafe impl<T> Sync for PgLwLock<T> {}
 
 impl<T> PgLwLock<T> {
     /// Create an empty lock which can be created as a global with None as a
     /// sentinel value
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         PgLwLock {
-            inner: UnsafeCell::new(None),
-            name: Box::leak(Uuid::new_v4().to_string().into_boxed_str()),
+            inner: OnceCell::new(),
+            name: OnceCell::new(),
         }
     }
 
     /// Create a new lock for T by attaching a LWLock, which is looked up by name
-    pub fn from_named(name: &'static str, value: *mut T) -> Self {
-        PgLwLock {
-            inner: UnsafeCell::new(Some(PgLwLockInner::<T>::new(name, value))),
-            name,
-        }
+    pub fn from_named(input_name: &'static str, value: *mut T) -> Self {
+        let inner = OnceCell::new();
+        let name = OnceCell::new();
+        inner.set(PgLwLockInner::<T>::new(input_name, value)).unwrap();
+        name.set(input_name).unwrap();
+        PgLwLock { inner, name }
     }
 
     /// Get the name of the PgLwLock
     pub fn get_name(&self) -> &'static str {
-        self.name
+        match self.name.get() {
+            Some(s) => s,
+            None => Box::leak(Uuid::new_v4().to_string().into_boxed_str()),
+        }
     }
 
     /// Obtain a shared lock (which comes with &T access)
     pub fn share(&self) -> PgLwLockShareGuard<T> {
-        unsafe {
-            (*self.inner.get())
-                .as_ref()
-                .expect("Lock is in an empty state")
-                .share()
-        }
+        unsafe { self.inner.get().expect("Lock is in an empty state").share() }
     }
 
     /// Obtain an exclusive lock (which comes with &mut T access)
     pub fn exclusive(&self) -> PgLwLockExclusiveGuard<T> {
         unsafe {
-            (*self.inner.get())
-                .as_ref()
+            self.inner
+                .get()
                 .expect("Lock is in an empty state")
                 .exclusive()
         }
@@ -71,18 +75,21 @@ impl<T> PgLwLock<T> {
 
     /// Attach an empty PgLwLock lock to a LWLock, and wrap T
     pub fn attach(&self, value: *mut T) {
-        let slot = unsafe { &*self.inner.get() };
-        if slot.is_some() {
-            panic!("Lock is not in an empty state");
-        }
-        let slot = unsafe { &mut *self.inner.get() };
-        *slot = Some(PgLwLockInner::<T>::new(self.name, value));
+        self.inner
+            .set(PgLwLockInner::<T>::new(self.get_name(), value))
+            .expect("Lock is not in an empty state");
     }
 }
 
 pub struct PgLwLockInner<T> {
     lock_ptr: *mut pg_sys::LWLock,
     data: *mut T,
+}
+
+impl<T> fmt::Debug for PgLwLockInner<T> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("PgLwLockInner").finish()
+    }
 }
 
 impl<'a, T> PgLwLockInner<T> {

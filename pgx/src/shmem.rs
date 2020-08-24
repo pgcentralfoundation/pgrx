@@ -38,30 +38,30 @@ pub trait PgSharedMemoryInitialization {
     fn shmem_init(&'static self);
 }
 
-impl<T> PgSharedMemoryInitialization for std::thread::LocalKey<PgLwLock<T>>
+impl<T> PgSharedMemoryInitialization for PgLwLock<T>
 where
     T: Default + PGXSharedMemory + 'static,
 {
     fn pg_init(&'static self) {
-        self.with(|v| PgSharedMem::pg_init_locked(v))
+        PgSharedMem::pg_init_locked(self);
     }
 
     fn shmem_init(&'static self) {
-        self.with(|v| PgSharedMem::shmem_init_locked(v))
+        PgSharedMem::shmem_init_locked(self);
     }
 }
 
-impl<T, V> PgSharedMemoryInitialization for std::thread::LocalKey<PgAtomic<T, V>>
+impl<T, V> PgSharedMemoryInitialization for PgAtomic<T, V>
 where
     T: atomic_traits::Atomic<Type = V> + Default,
     V: BitAnd + Copy,
 {
     fn pg_init(&'static self) {
-        self.with(|v| PgSharedMem::pg_init_atomic(v))
+        PgSharedMem::pg_init_atomic(self)
     }
 
     fn shmem_init(&'static self) {
-        self.with(|v| PgSharedMem::shmem_init_atomic(v))
+        PgSharedMem::shmem_init_atomic(self)
     }
 }
 
@@ -93,15 +93,13 @@ impl PgSharedMem {
 
     // Test version
     pub fn pg_init_locked_sized<T: PGXSharedMemory>(
-        pgstatic: &'static std::thread::LocalKey<PgLwLock<&'static mut T>>,
+        pgstatic: &'static PgLwLock<&'static mut T>,
         size: usize,
     ) {
         unsafe {
-            pgstatic.with(|lock| {
-                let lock = std::ffi::CString::new(lock.get_name()).expect("CString::new failed");
-                pg_sys::RequestAddinShmemSpace(std::mem::size_of::<T>() + size);
-                pg_sys::RequestNamedLWLockTranche(lock.as_ptr(), 1);
-            });
+            let lock = std::ffi::CString::new(pgstatic.get_name()).expect("CString::new failed");
+            pg_sys::RequestAddinShmemSpace(std::mem::size_of::<T>() + size);
+            pg_sys::RequestNamedLWLockTranche(lock.as_ptr(), 1);
         }
     }
 
