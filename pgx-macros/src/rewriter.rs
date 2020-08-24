@@ -414,8 +414,18 @@ impl PgGuardRewriter {
     ) -> proc_macro2::TokenStream {
         // remember the original visibility and signature classifications as we want
         // to use those for the outer function
+        let input_func_name = func.sig.ident.to_string();
         let sig = func.sig.clone();
         let vis = func.vis.clone();
+        let is_extern_c = if let Some(abi) = func.sig.abi.as_ref() {
+            if let Some(name) = abi.name.as_ref() {
+                name.value() == "C"
+            } else {
+                false
+            }
+        } else {
+            false
+        };
 
         // but for the inner function (the one we're wrapping) we don't need any kind of
         // abi classification
@@ -438,10 +448,17 @@ impl PgGuardRewriter {
             quote! { pg_sys::guard::guard( || #func_name(#arg_list) ) }
         };
 
-        let prolog = if func_name.to_string().eq("_PG_init") {
-            quote! {#[allow(non_snake_case)]}
-        } else {
+        let prolog = if input_func_name.to_string().eq("_PG_init") {
+            quote! {
+                #[allow(non_snake_case)]
+                #[no_mangle]
+            }
+        } else if is_extern_c {
             quote! {}
+        } else {
+            quote! {
+                #[no_mangle]
+            }
         };
 
         quote_spanned! {func.span()=>
