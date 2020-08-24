@@ -7,6 +7,7 @@ use crate::FlushErrorState;
 use std::any::Any;
 use std::cell::Cell;
 use std::panic::catch_unwind;
+use std::sync::{Arc, Mutex};
 
 extern "C" {
     fn pg_re_throw();
@@ -65,23 +66,39 @@ fn take_panic_location() -> PanicLocation {
 }
 
 pub fn register_pg_guard_panic_handler() {
-    std::panic::set_hook(Box::new(|info| {
-        PANIC_LOCATION.with(|p| {
-            let existing = p.take();
+    // it's expected that this function will only ever be called by `pg_module_magic!()` in the
+    // main thread
+    thread_local! { static IS_MAIN_THREAD: Arc<Mutex<Option<()>>> = Arc::new(Mutex::new(None)); }
+    IS_MAIN_THREAD.with(|v| v.lock().as_mut().unwrap().replace(()));
 
-            p.replace(if existing.is_none() {
-                match info.location() {
-                    Some(location) => Some(PanicLocation {
-                        file: location.file().to_string(),
-                        line: location.line(),
-                        col: location.column(),
-                    }),
-                    None => None,
-                }
-            } else {
-                existing
-            })
-        });
+    std::panic::set_hook(Box::new(|info| {
+        if IS_MAIN_THREAD.with(|v| v.lock().as_ref().unwrap().is_none()) {
+            // if a thread that isn't the main thread panic'd, we make a best effort to push
+            // a message to stderr, which hopefully Postgres is logging somewhere
+            eprintln!(
+                "thread={:?}, id={:?}, {}",
+                std::thread::current().name(),
+                std::thread::current().id(),
+                info
+            );
+        } else {
+            PANIC_LOCATION.with(|p| {
+                let existing = p.take();
+
+                p.replace(if existing.is_none() {
+                    match info.location() {
+                        Some(location) => Some(PanicLocation {
+                            file: location.file().to_string(),
+                            line: location.line(),
+                            col: location.column(),
+                        }),
+                        None => None,
+                    }
+                } else {
+                    existing
+                })
+            });
+        }
     }))
 }
 
