@@ -1,7 +1,6 @@
 use crate::pg_sys;
 use core::ops::{Deref, DerefMut};
 use once_cell::sync::OnceCell;
-use std::cell::UnsafeCell;
 use std::fmt;
 use uuid::Uuid;
 
@@ -45,7 +44,9 @@ impl<T> PgLwLock<T> {
     pub fn from_named(input_name: &'static str, value: *mut T) -> Self {
         let inner = OnceCell::new();
         let name = OnceCell::new();
-        inner.set(PgLwLockInner::<T>::new(input_name, value)).unwrap();
+        inner
+            .set(PgLwLockInner::<T>::new(input_name, value))
+            .unwrap();
         name.set(input_name).unwrap();
         PgLwLock { inner, name }
     }
@@ -53,31 +54,36 @@ impl<T> PgLwLock<T> {
     /// Get the name of the PgLwLock
     pub fn get_name(&self) -> &'static str {
         match self.name.get() {
-            Some(s) => s,
-            None => Box::leak(Uuid::new_v4().to_string().into_boxed_str()),
+            None => {
+                let name = Box::leak(Uuid::new_v4().to_string().into_boxed_str());
+                self.name.set(name).unwrap();
+                name
+            }
+            Some(name) => name,
         }
     }
 
     /// Obtain a shared lock (which comes with &T access)
     pub fn share(&self) -> PgLwLockShareGuard<T> {
-        unsafe { self.inner.get().expect("Lock is in an empty state").share() }
+        self.inner
+            .get()
+            .expect("Can't give out share, lock is in an empty state")
+            .share()
     }
 
     /// Obtain an exclusive lock (which comes with &mut T access)
     pub fn exclusive(&self) -> PgLwLockExclusiveGuard<T> {
-        unsafe {
-            self.inner
-                .get()
-                .expect("Lock is in an empty state")
-                .exclusive()
-        }
+        self.inner
+            .get()
+            .expect("Can't give out exclusive, lock is in an empty state")
+            .exclusive()
     }
 
     /// Attach an empty PgLwLock lock to a LWLock, and wrap T
     pub fn attach(&self, value: *mut T) {
         self.inner
             .set(PgLwLockInner::<T>::new(self.get_name(), value))
-            .expect("Lock is not in an empty state");
+            .expect("Can't attach, lock is not in an empty state");
     }
 }
 

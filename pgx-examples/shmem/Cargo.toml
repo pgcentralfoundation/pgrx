@@ -20,9 +20,7 @@ pg_test = []
 heapless = { git = "https://github.com/japaric/heapless" }
 pgx = { path = "../../../pgx/pgx/", default-features = false }
 pgx-macros = { path = "../../../pgx/pgx-macros" }
-rand = "0.7.3"
 serde = { version = "1.0.114", features = [ "derive" ] }
-thread_local = "1.0.1"
 
 [dev-dependencies]
 pgx-tests = { path = "../../../pgx/pgx-tests" }

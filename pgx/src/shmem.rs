@@ -1,6 +1,5 @@
 use crate::lwlock::*;
-use crate::{pg_sys, PgAtomic, PgAtomicFancy};
-use std::ops::BitAnd;
+use crate::{pg_sys, PgAtomic};
 use uuid::Uuid;
 
 pub unsafe trait PGXSharedMemory {}
@@ -27,7 +26,6 @@ macro_rules! pg_shmem_init {
         }
     };
 }
-
 /// A trait that types can implement to provide their own Postgres Shared Memory initialization process
 pub trait PgSharedMemoryInitialization {
     /// Automatically called when the an extension is loaded.  If using the `pg_shmem_init!()` macro
@@ -52,30 +50,16 @@ where
     }
 }
 
-impl<T, V> PgSharedMemoryInitialization for PgAtomic<T, V>
-where
-    T: atomic_traits::Atomic<Type = V> + Default,
-    V: BitAnd + Copy,
-{
-    fn pg_init(&'static self) {
-        PgSharedMem::pg_init_atomic(self)
-    }
-
-    fn shmem_init(&'static self) {
-        PgSharedMem::shmem_init_atomic(self)
-    }
-}
-
-impl<T> PgSharedMemoryInitialization for PgAtomicFancy<T>
+impl<T> PgSharedMemoryInitialization for PgAtomic<T>
 where
     T: atomic_traits::Atomic + Default,
 {
     fn pg_init(&'static self) {
-        PgSharedMem::pg_init_atomic_fancy(self);
+        PgSharedMem::pg_init_atomic(self);
     }
 
     fn shmem_init(&'static self) {
-        PgSharedMem::shmem_init_atomic_fancy(self);
+        PgSharedMem::shmem_init_atomic(self);
     }
 }
 
@@ -84,7 +68,7 @@ pub struct PgSharedMem {}
 
 impl PgSharedMem {
     /// Must be run from PG_init, use for types which are guarded by a LWLock
-    fn pg_init_locked<T: Default + PGXSharedMemory>(lock: &PgLwLock<T>) {
+    pub fn pg_init_locked<T: Default + PGXSharedMemory>(lock: &PgLwLock<T>) {
         unsafe {
             let lock = std::ffi::CString::new(lock.get_name()).expect("CString::new failed");
             pg_sys::RequestAddinShmemSpace(std::mem::size_of::<T>());
@@ -92,36 +76,15 @@ impl PgSharedMem {
         }
     }
 
-    // Test version
-    pub fn pg_init_locked_sized<T: PGXSharedMemory>(
-        pgstatic: &'static PgLwLock<&'static mut T>,
-        size: usize,
-    ) {
-        unsafe {
-            let lock = std::ffi::CString::new(pgstatic.get_name()).expect("CString::new failed");
-            pg_sys::RequestAddinShmemSpace(std::mem::size_of::<T>() + size);
-            pg_sys::RequestNamedLWLockTranche(lock.as_ptr(), 1);
-        }
-    }
-
     /// Must be run from PG_init for atomics
-    fn pg_init_atomic<T: atomic_traits::Atomic<Type = V> + Default, V: BitAnd + Copy>(
-        _atomic: &PgAtomic<T, V>,
-    ) {
-        unsafe {
-            pg_sys::RequestAddinShmemSpace(std::mem::size_of::<T>());
-        }
-    }
-
-    /// Must be run from PG_init for atomics
-    fn pg_init_atomic_fancy<T: atomic_traits::Atomic + Default>(_atomic: &PgAtomicFancy<T>) {
+    pub fn pg_init_atomic<T: atomic_traits::Atomic + Default>(_atomic: &PgAtomic<T>) {
         unsafe {
             pg_sys::RequestAddinShmemSpace(std::mem::size_of::<T>());
         }
     }
 
     /// Must be run from the shared memory init hook, use for types which are guarded by a LWLock
-    fn shmem_init_locked<T: Default + PGXSharedMemory>(lock: &PgLwLock<T>) {
+    pub fn shmem_init_locked<T: Default + PGXSharedMemory>(lock: &PgLwLock<T>) {
         let mut found = false;
         unsafe {
             let shm_name = std::ffi::CString::new(lock.get_name()).expect("CString::new failed");
@@ -133,70 +96,14 @@ impl PgSharedMem {
                 pg_sys::ShmemInitStruct(shm_name.into_raw(), std::mem::size_of::<T>(), &mut found)
                     as *mut T;
 
-            *fv_shmem = std::mem::zeroed();
-            let fv = <T>::default();
-
-            std::ptr::copy(&fv, fv_shmem, 1);
+            std::ptr::write(fv_shmem, <T>::default());
 
             lock.attach(fv_shmem);
             pg_sys::LWLockRelease(addin_shmem_init_lock);
         }
     }
 
-    /// Test version
-    pub fn shmem_init_locked_sized<T: PGXSharedMemory>(
-        lock: &'static PgLwLock<T>,
-        size: usize,
-        data: T,
-    ) {
-        let mut found = false;
-        unsafe {
-            let shm_name = std::ffi::CString::new(lock.get_name()).expect("CString::new failed");
-            let addin_shmem_init_lock: *mut pg_sys::LWLock =
-                &mut (*pg_sys::MainLWLockArray.add(21)).lock;
-            pg_sys::LWLockAcquire(addin_shmem_init_lock, pg_sys::LWLockMode_LW_EXCLUSIVE);
-
-            let fv_shmem = pg_sys::ShmemInitStruct(
-                shm_name.into_raw(),
-                std::mem::size_of::<T>() + size,
-                &mut found,
-            ) as *mut T;
-
-            *fv_shmem = std::mem::zeroed();
-
-            std::ptr::copy(&data, fv_shmem, 1);
-
-            lock.attach(fv_shmem);
-            pg_sys::LWLockRelease(addin_shmem_init_lock);
-        };
-    }
-
-    /// Must be run from the shared memory init hook, use for atomics
-    fn shmem_init_atomic<T: atomic_traits::Atomic<Type = V> + Default, V: BitAnd + Copy>(
-        atomic: &PgAtomic<T, V>,
-    ) {
-        unsafe {
-            let shm_name =
-                std::ffi::CString::new(Uuid::new_v4().to_string()).expect("CString::new() failed");
-            let value = *atomic.default.as_ref().unwrap();
-            *atomic.name.get() = Some(shm_name.as_ptr());
-            std::mem::forget(shm_name);
-
-            let shm_name = atomic.name.get().as_ref().unwrap().unwrap();
-            let addin_shmem_init_lock: *mut pg_sys::LWLock =
-                &mut (*pg_sys::MainLWLockArray.add(21)).lock;
-
-            let mut found = false;
-            pg_sys::LWLockAcquire(addin_shmem_init_lock, pg_sys::LWLockMode_LW_EXCLUSIVE);
-            let fv_shmem =
-                pg_sys::ShmemInitStruct(shm_name, std::mem::size_of::<T>(), &mut found) as *mut T;
-
-            let atomic = T::new(value);
-            std::ptr::copy(&atomic, fv_shmem, 1);
-            pg_sys::LWLockRelease(addin_shmem_init_lock);
-        }
-    }
-    fn shmem_init_atomic_fancy<T: atomic_traits::Atomic + Default>(atomic: &PgAtomicFancy<T>) {
+    pub fn shmem_init_atomic<T: atomic_traits::Atomic + Default>(atomic: &PgAtomic<T>) {
         unsafe {
             let shm_name =
                 std::ffi::CString::new(Uuid::new_v4().to_string()).expect("CString::new() failed");

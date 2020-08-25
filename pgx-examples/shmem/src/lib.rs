@@ -25,19 +25,18 @@ unsafe impl PGXSharedMemory for Pgtest {}
 
 static VEC: PgLwLock<heapless::Vec<Pgtest, U400>> = PgLwLock::new();
 static HASH: PgLwLock<heapless::FnvIndexMap<i32, i32, U4>> = PgLwLock::new();
-//static STRUCT: PgLwLock<Pgtest> = PgLwLock::new();
-//static PRIMITIVE: PgLwLock<i32> = PgLwLock::new();
-//static ATOMIC_FANCY: PgAtomicFancy<std::sync::atomic::AtomicBool> = PgAtomicFancy::new();
+static STRUCT: PgLwLock<Pgtest> = PgLwLock::new();
+static PRIMITIVE: PgLwLock<i32> = PgLwLock::new();
+static ATOMIC: PgAtomic<std::sync::atomic::AtomicBool> = PgAtomic::new();
 
 #[pg_guard]
 pub extern "C" fn _PG_init() {
     pg_shmem_init!(VEC);
-    // pg_shmem_init!(HASH);
-    //   pg_shmem_init!(STRUCT);
-    //   pg_shmem_init!(PRIMITIVE);
-    //   pg_shmem_init!(ATOMIC_FANCY);
+    pg_shmem_init!(HASH);
+    pg_shmem_init!(STRUCT);
+    pg_shmem_init!(PRIMITIVE);
+    pg_shmem_init!(ATOMIC);
 }
-/*
 
 #[pg_extern]
 fn vec_select() -> impl Iterator<Item = Pgtest> {
@@ -104,12 +103,11 @@ fn primitive_set(value: i32) {
 }
 
 #[pg_extern]
-fn atomic_fancy_get() -> bool {
-    ATOMIC_FANCY.get().load(Ordering::Relaxed)
+fn atomic_get() -> bool {
+    ATOMIC.get().load(Ordering::Relaxed)
 }
 
 #[pg_extern]
-fn atomic_fancy_set(value: bool) -> bool {
-    ATOMIC_FANCY.get().swap(value, Ordering::Relaxed)
+fn atomic_set(value: bool) -> bool {
+    ATOMIC.get().swap(value, Ordering::Relaxed)
 }
-*/
