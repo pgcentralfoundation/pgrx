@@ -25,7 +25,6 @@ no-default-features = true
 
 [dependencies]
 enum-primitive-derive = "0.2.1"
-#lazy_static = "1.4.0"
 num-traits = "0.2.12"
 pgx-macros = { path = "../pgx-macros/", version= "^0.0.13"}
 pgx-pg-sys = { path = "../pgx-pg-sys", version= "^0.0.13"}
