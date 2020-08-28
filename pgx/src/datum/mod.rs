@@ -20,6 +20,7 @@ mod time_stamp;
 mod time_stamp_with_timezone;
 mod time_with_timezone;
 mod tuples;
+mod varlena;
 
 pub use self::time::*;
 pub use anyarray::*;
@@ -38,3 +39,8 @@ pub use time_stamp::*;
 pub use time_stamp_with_timezone::*;
 pub use time_with_timezone::*;
 pub use tuples::*;
+pub use varlena::*;
+
+/// A tagging trait to indicate a user type is also meant to be used by Postgres
+/// Implemented automatically by `#[derive(PostgresType)]`
+pub trait PostgresType {}

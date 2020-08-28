@@ -171,6 +171,7 @@ $ psql test
 
  - [cargo-pgx sub-command](cargo-pgx/)
  - [various examples](pgx-examples/)
+ - [Custom Types](pgx-examples/custom_types/)
 
 
 ## Caveats & Known Issues

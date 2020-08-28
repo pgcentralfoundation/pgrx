@@ -49,6 +49,11 @@ void pgx_SET_VARSIZE(struct varlena *ptr, int size) {
     SET_VARSIZE(ptr, size);
 }
 
+PGDLLEXPORT void pgx_SET_VARSIZE_SHORT(struct varlena *ptr, int size);
+void pgx_SET_VARSIZE_SHORT(struct varlena *ptr, int size) {
+    SET_VARSIZE_SHORT(ptr, size);
+}
+
 PGDLLEXPORT Datum pgx_heap_getattr(HeapTupleData *tuple, int attnum, TupleDesc tupdesc, bool *isnull);
 Datum pgx_heap_getattr(HeapTupleData *tuple, int attnum, TupleDesc tupdesc, bool *isnull) {
     return heap_getattr(tuple, attnum, tupdesc, isnull);

@@ -412,7 +412,7 @@ fn walk_items(
                             sql.push_str("CREATE OPERATOR ");
                             sql.push_str(&qualify_name(&current_schema, &name.unwrap()));
                             sql.push_str(" (");
-                            sql.push_str("\n   FUNCTION=");
+                            sql.push_str("\n   PROCEDURE=");
                             sql.push_str(&qualify_name(&current_schema, &func_name));
                             if type_names.len() == 1 {
                                 sql.push_str(",\n   RIGHTARG=");
@@ -1001,7 +1001,29 @@ fn translate_type_string(
                 variadic,
                 subtypes,
             );
-            //            eprintln!("rc={:?}", rc);
+            let type_string = rc.unwrap().0;
+            Some((type_string, true, default_value, variadic))
+        }
+        _pgvarlena
+            if rust_type.starts_with("PgVarlena <")
+                || rust_type.starts_with("pgx :: PgVarlena <") =>
+        {
+            let mut extraced_type = extract_type(&rust_type);
+            if let Some((rt, dv, v)) = deconstruct_macro(&extraced_type) {
+                extraced_type = rt;
+                default_value = dv;
+                variadic = v;
+            }
+
+            let rc = translate_type_string(
+                extraced_type,
+                filename,
+                span,
+                depth + 1,
+                default_value.clone(),
+                variadic,
+                subtypes,
+            );
             let type_string = rc.unwrap().0;
             Some((type_string, true, default_value, variadic))
         }
@@ -1016,12 +1038,13 @@ fn translate_type_string(
                 );
             }
 
+            unknown = unknown.trim_start_matches("&");
             unknown = unknown.trim_start_matches("pg_sys :: ");
             let unknown = match unknown.find('<') {
                 Some(idx) => unknown[0..idx].trim(),
                 None => unknown,
             };
-            Some((unknown.to_string(), false, default_value, variadic))
+            Some((unknown.trim().to_string(), false, default_value, variadic))
         }
     }
 }
