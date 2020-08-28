@@ -33,6 +33,7 @@
 #include "executor/spi.h"
 #include "foreign/fdwapi.h"
 #include "foreign/foreign.h"
+#include "libpq/auth.h"
 #include "nodes/execnodes.h"
 #include "nodes/extensible.h"
 #include "nodes/makefuncs.h"
