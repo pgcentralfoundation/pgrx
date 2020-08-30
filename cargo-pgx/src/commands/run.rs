@@ -6,8 +6,8 @@ use crate::commands::start::start_postgres;
 use crate::commands::stop::stop_postgres;
 use colored::Colorize;
 use pgx_utils::{createdb, get_pg_config, get_psql_path, BASE_POSTGRES_PORT_NO};
-use std::process::Command;
 use std::os::unix::process::CommandExt;
+use std::process::Command;
 
 pub(crate) fn run_psql(major_version: u16, dbname: &str, is_release: bool) {
     let pg_config = get_pg_config(major_version);
@@ -43,6 +43,10 @@ pub(crate) fn run_psql(major_version: u16, dbname: &str, is_release: bool) {
 fn exec_psql(major_version: u16, dbname: &str) {
     let mut command = Command::new(get_psql_path(major_version));
     command
+        .env_remove("PGDATABASE")
+        .env_remove("PGHOST")
+        .env_remove("PGPORT")
+        .env_remove("PGUSER")
         .arg("-h")
         .arg("localhost")
         .arg("-p")

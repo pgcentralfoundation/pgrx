@@ -397,6 +397,10 @@ fn monitor_pg(mut command: Command, cmd_string: String, loglines: LogLines) -> (
 
 fn dropdb() {
     let output = Command::new(get_dropdb_path(pg_sys::get_pg_major_version_num()))
+        .env_remove("PGDATABASE")
+        .env_remove("PGHOST")
+        .env_remove("PGPORT")
+        .env_remove("PGUSER")
         .arg("--if-exists")
         .arg("-h")
         .arg(get_pg_host())

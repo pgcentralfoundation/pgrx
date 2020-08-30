@@ -227,6 +227,10 @@ pub fn createdb(
     println!("{} database {}", "    Creating".bold().green(), dbname);
     let mut command = Command::new(get_createdb_path(major_version));
     command
+        .env_remove("PGDATABASE")
+        .env_remove("PGHOST")
+        .env_remove("PGPORT")
+        .env_remove("PGUSER")
         .arg("-h")
         .arg(host)
         .arg("-p")
