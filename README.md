@@ -14,6 +14,8 @@
 
 `pgx` supports Postgres v10, v11, and v12.
 
+Feel free to join our [Discord Server](https://discord.gg/hPb93Y9).
+
 ## Key Features
 
 #### A Managed Development Environment
