@@ -2,6 +2,8 @@
 [![crates.io badge](https://img.shields.io/crates/v/pgx.svg)](https://crates.io/crates/pgx)
 [![docs.rs badge](https://docs.rs/pgx/badge.svg)](https://docs.rs/pgx)
 [![Twitter Follow](https://img.shields.io/twitter/follow/zombodb.svg?style=flat)](https://twitter.com/zombodb)
+[![Discord Chat](https://img.shields.io/discord/561648697805504526.svg)](https://discord.gg/hPb93Y9)  
+
 ---
 
 ![Logo](logo.png)
