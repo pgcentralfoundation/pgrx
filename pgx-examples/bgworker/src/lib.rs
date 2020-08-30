@@ -7,11 +7,11 @@ use std::time::Duration;
     `~/.pgx/data-PGVER/postgresql.conf` and add this line to the end:
 
     ```
-    session_preload_libraries = 'bgworker.so'
+    shared_preload_libraries = 'bgworker.so'
     ```
 
     Background workers **must** be initialized in the extension's `_PG_init()` function, and can **only**
-    be started if loaded through the `session_preload_libraries` configuration setting.
+    be started if loaded through the `shared_preload_libraries` configuration setting.
 
     Executing `cargo pgx run <PGVER>` will, when it restarts the specified Postgres instance, also start
     this background worker
