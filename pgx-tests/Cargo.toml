@@ -27,7 +27,7 @@ no-default-features = true
 [dependencies]
 colored = "2.0.0"
 lazy_static = "1.4.0"
-libc = "0.2.74"
+libc = "0.2.76"
 pgx = { path = "../pgx", default-features = false, version= "^0.0.13"}
 pgx-macros = { path = "../pgx-macros", version= "^0.0.13"}
 pgx-utils = { path = "../pgx-utils", version= "^0.0.13"}

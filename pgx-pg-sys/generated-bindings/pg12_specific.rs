@@ -1016,6 +1016,26 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
+    pub fn RE_compile_and_cache(
+        text_re: *mut text,
+        cflags: ::std::os::raw::c_int,
+        collation: Oid,
+    ) -> *mut regex_t;
+}
+#[pg_guard]
+extern "C" {
+    pub fn RE_compile_and_execute(
+        text_re: *mut text,
+        dat: *mut ::std::os::raw::c_char,
+        dat_len: ::std::os::raw::c_int,
+        cflags: ::std::os::raw::c_int,
+        collation: Oid,
+        nmatch: ::std::os::raw::c_int,
+        pmatch: *mut regmatch_t,
+    ) -> bool;
+}
+#[pg_guard]
+extern "C" {
     pub fn RI_FKey_fk_upd_check_required(
         trigger: *mut Trigger,
         fk_rel: Relation,
@@ -1514,7 +1534,7 @@ extern "C" {
 #[pg_guard]
 extern "C" {
     pub fn appendBinaryStringInfoNT(
-        str: StringInfo,
+        str_: StringInfo,
         data: *const ::std::os::raw::c_char,
         datalen: ::std::os::raw::c_int,
     );
@@ -2909,7 +2929,7 @@ extern "C" {
 #[pg_guard]
 extern "C" {
     pub fn pg_snprintf(
-        str: *mut ::std::os::raw::c_char,
+        str_: *mut ::std::os::raw::c_char,
         count: usize,
         fmt: *const ::std::os::raw::c_char,
         ...
@@ -2918,7 +2938,7 @@ extern "C" {
 #[pg_guard]
 extern "C" {
     pub fn pg_sprintf(
-        str: *mut ::std::os::raw::c_char,
+        str_: *mut ::std::os::raw::c_char,
         fmt: *const ::std::os::raw::c_char,
         ...
     ) -> ::std::os::raw::c_int;
@@ -2950,7 +2970,7 @@ extern "C" {
 #[pg_guard]
 extern "C" {
     pub fn pg_strfromd(
-        str: *mut ::std::os::raw::c_char,
+        str_: *mut ::std::os::raw::c_char,
         count: usize,
         precision: ::std::os::raw::c_int,
         value: f64,
@@ -2986,7 +3006,7 @@ extern "C" {
 #[pg_guard]
 extern "C" {
     pub fn pg_vsnprintf(
-        str: *mut ::std::os::raw::c_char,
+        str_: *mut ::std::os::raw::c_char,
         count: usize,
         fmt: *const ::std::os::raw::c_char,
         args: *mut __va_list_tag,
@@ -2995,7 +3015,7 @@ extern "C" {
 #[pg_guard]
 extern "C" {
     pub fn pg_vsprintf(
-        str: *mut ::std::os::raw::c_char,
+        str_: *mut ::std::os::raw::c_char,
         fmt: *const ::std::os::raw::c_char,
         args: *mut __va_list_tag,
     ) -> ::std::os::raw::c_int;
@@ -3029,6 +3049,17 @@ extern "C" {
         cursorOptions: ::std::os::raw::c_int,
         boundParams: *mut ParamListInfoData,
     ) -> *mut PlannedStmt;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pq_gettcpusertimeout(port: *mut Port) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pq_settcpusertimeout(
+        timeout: ::std::os::raw::c_int,
+        port: *mut Port,
+    ) -> ::std::os::raw::c_int;
 }
 #[pg_guard]
 extern "C" {
@@ -3188,7 +3219,7 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
-    pub fn stringToNode(str: *const ::std::os::raw::c_char) -> *mut ::std::os::raw::c_void;
+    pub fn stringToNode(str_: *const ::std::os::raw::c_char) -> *mut ::std::os::raw::c_void;
 }
 #[pg_guard]
 extern "C" {
@@ -3935,6 +3966,48 @@ pub struct FormData_pg_type {
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
+pub struct HbaLine {
+    pub linenumber: ::std::os::raw::c_int,
+    pub rawline: *mut ::std::os::raw::c_char,
+    pub conntype: ConnType,
+    pub databases: *mut List,
+    pub roles: *mut List,
+    pub addr: sockaddr_storage,
+    pub mask: sockaddr_storage,
+    pub ip_cmp_method: IPCompareMethod,
+    pub hostname: *mut ::std::os::raw::c_char,
+    pub auth_method: UserAuth,
+    pub usermap: *mut ::std::os::raw::c_char,
+    pub pamservice: *mut ::std::os::raw::c_char,
+    pub pam_use_hostname: bool,
+    pub ldaptls: bool,
+    pub ldapscheme: *mut ::std::os::raw::c_char,
+    pub ldapserver: *mut ::std::os::raw::c_char,
+    pub ldapport: ::std::os::raw::c_int,
+    pub ldapbinddn: *mut ::std::os::raw::c_char,
+    pub ldapbindpasswd: *mut ::std::os::raw::c_char,
+    pub ldapsearchattribute: *mut ::std::os::raw::c_char,
+    pub ldapsearchfilter: *mut ::std::os::raw::c_char,
+    pub ldapbasedn: *mut ::std::os::raw::c_char,
+    pub ldapscope: ::std::os::raw::c_int,
+    pub ldapprefix: *mut ::std::os::raw::c_char,
+    pub ldapsuffix: *mut ::std::os::raw::c_char,
+    pub clientcert: ClientCertMode,
+    pub krb_realm: *mut ::std::os::raw::c_char,
+    pub include_realm: bool,
+    pub compat_realm: bool,
+    pub upn_username: bool,
+    pub radiusservers: *mut List,
+    pub radiusservers_s: *mut ::std::os::raw::c_char,
+    pub radiussecrets: *mut List,
+    pub radiussecrets_s: *mut ::std::os::raw::c_char,
+    pub radiusidentifiers: *mut List,
+    pub radiusidentifiers_s: *mut ::std::os::raw::c_char,
+    pub radiusports: *mut List,
+    pub radiusports_s: *mut ::std::os::raw::c_char,
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
 pub struct PGPROC {
     pub links: SHM_QUEUE,
     pub procgloballist: *mut *mut PGPROC,
@@ -4024,6 +4097,39 @@ pub struct PgBackendStatus {
     pub st_progress_command: ProgressCommandType,
     pub st_progress_command_target: Oid,
     pub st_progress_param: [int64; 20usize],
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct Port {
+    pub sock: pgsocket,
+    pub noblock: bool,
+    pub proto: ProtocolVersion,
+    pub laddr: SockAddr,
+    pub raddr: SockAddr,
+    pub remote_host: *mut ::std::os::raw::c_char,
+    pub remote_hostname: *mut ::std::os::raw::c_char,
+    pub remote_hostname_resolv: ::std::os::raw::c_int,
+    pub remote_hostname_errcode: ::std::os::raw::c_int,
+    pub remote_port: *mut ::std::os::raw::c_char,
+    pub canAcceptConnections: CAC_state,
+    pub database_name: *mut ::std::os::raw::c_char,
+    pub user_name: *mut ::std::os::raw::c_char,
+    pub cmdline_options: *mut ::std::os::raw::c_char,
+    pub guc_options: *mut List,
+    pub application_name: *mut ::std::os::raw::c_char,
+    pub hba: *mut HbaLine,
+    pub default_keepalives_idle: ::std::os::raw::c_int,
+    pub default_keepalives_interval: ::std::os::raw::c_int,
+    pub default_keepalives_count: ::std::os::raw::c_int,
+    pub default_tcp_user_timeout: ::std::os::raw::c_int,
+    pub keepalives_idle: ::std::os::raw::c_int,
+    pub keepalives_interval: ::std::os::raw::c_int,
+    pub keepalives_count: ::std::os::raw::c_int,
+    pub tcp_user_timeout: ::std::os::raw::c_int,
+    pub gss: *mut ::std::os::raw::c_void,
+    pub ssl_in_use: bool,
+    pub peer_cn: *mut ::std::os::raw::c_char,
+    pub peer_cert_valid: bool,
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
@@ -4121,7 +4227,7 @@ pub union PgStat_Msg {
 #[derive(Copy, Clone)]
 pub union Value_ValUnion {
     pub ival: ::std::os::raw::c_int,
-    pub str: *mut ::std::os::raw::c_char,
+    pub str_: *mut ::std::os::raw::c_char,
     _bindgen_union_align: u64,
 }
 #[repr(C)]
@@ -4640,7 +4746,7 @@ pub struct EState {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct ExplainState {
-    pub str: StringInfo,
+    pub str_: StringInfo,
     pub verbose: bool,
     pub analyze: bool,
     pub costs: bool,
@@ -7537,8 +7643,13 @@ pub const CLOG_ZEROPAGE: u32 = 0;
 pub const CTEMaterialize_CTEMaterializeAlways: CTEMaterialize = 1;
 pub const CTEMaterialize_CTEMaterializeDefault: CTEMaterialize = 0;
 pub const CTEMaterialize_CTEMaterializeNever: CTEMaterialize = 2;
+pub const ClientCertMode_clientCertCA: ClientCertMode = 1;
+pub const ClientCertMode_clientCertFull: ClientCertMode = 2;
+pub const ClientCertMode_clientCertOff: ClientCertMode = 0;
 pub const ClusterOption_CLUOPT_RECHECK: ClusterOption = 1;
 pub const ClusterOption_CLUOPT_VERBOSE: ClusterOption = 2;
+pub const ConnType_ctHostGSS: ConnType = 4;
+pub const ConnType_ctHostNoGSS: ConnType = 5;
 pub const ConstrType_CONSTR_ATTR_DEFERRABLE: ConstrType = 10;
 pub const ConstrType_CONSTR_ATTR_DEFERRED: ConstrType = 12;
 pub const ConstrType_CONSTR_ATTR_IMMEDIATE: ConstrType = 13;
@@ -7699,6 +7810,7 @@ pub const LOCK_MANAGER_LWLOCK_OFFSET: u32 = 173;
 pub const LSEGARRAYOID: u32 = 1018;
 pub const MACADDR8ARRAYOID: u32 = 775;
 pub const MACADDRARRAYOID: u32 = 1040;
+pub const MAX_CONVERSION_GROWTH: u32 = 4;
 pub const MONEYARRAYOID: u32 = 791;
 pub const MaxCommandIdAttributeNumber: i32 = -5;
 pub const MaxLockMode: u32 = 8;
@@ -8420,8 +8532,9 @@ pub const tuplehash_status_tuplehash_SH_IN_USE: tuplehash_status = 1;
 pub type BeginForeignInsert_function = ::std::option::Option<
     unsafe extern "C" fn(mtstate: *mut ModifyTableState, rinfo: *mut ResultRelInfo),
 >;
-pub type CTEMaterialize = u32;
-pub type ClusterOption = u32;
+pub type CTEMaterialize = ::std::os::raw::c_uint;
+pub type ClientCertMode = ::std::os::raw::c_uint;
+pub type ClusterOption = ::std::os::raw::c_uint;
 pub type EndForeignInsert_function =
     ::std::option::Option<unsafe extern "C" fn(estate: *mut EState, rinfo: *mut ResultRelInfo)>;
 pub type ExplainOneQuery_hook_type = ::std::option::Option<
@@ -8435,7 +8548,7 @@ pub type ExplainOneQuery_hook_type = ::std::option::Option<
         queryEnv: *mut QueryEnvironment,
     ),
 >;
-pub type ForceParallelMode = u32;
+pub type ForceParallelMode = ::std::os::raw::c_uint;
 pub type FunctionCallInfo = *mut FunctionCallInfoBaseData;
 pub type GetForeignUpperPaths_function = ::std::option::Option<
     unsafe extern "C" fn(
@@ -8446,7 +8559,7 @@ pub type GetForeignUpperPaths_function = ::std::option::Option<
         extra: *mut ::std::os::raw::c_void,
     ),
 >;
-pub type InheritanceKind = u32;
+pub type InheritanceKind = ::std::os::raw::c_uint;
 pub type MemoryStatsPrintFunc = ::std::option::Option<
     unsafe extern "C" fn(
         context: MemoryContext,
@@ -8474,12 +8587,12 @@ pub type ParamFetchHook = ::std::option::Option<
     ) -> *mut ParamExternData,
 >;
 pub type PartitionDirectory = *mut PartitionDirectoryData;
-pub type PartitionPruneCombineOp = u32;
+pub type PartitionPruneCombineOp = ::std::os::raw::c_uint;
 pub type PartitionScheme = *mut PartitionSchemeData;
-pub type PartitionwiseAggregateType = u32;
-pub type PlanCacheMode = u32;
-pub type RVROption = u32;
-pub type RecoveryTargetTimeLineGoal = u32;
+pub type PartitionwiseAggregateType = ::std::os::raw::c_uint;
+pub type PlanCacheMode = ::std::os::raw::c_uint;
+pub type RVROption = ::std::os::raw::c_uint;
+pub type RecoveryTargetTimeLineGoal = ::std::os::raw::c_uint;
 pub type RefetchForeignRow_function = ::std::option::Option<
     unsafe extern "C" fn(
         estate: *mut EState,
@@ -8496,15 +8609,15 @@ pub type ReparameterizeForeignPathByChild_function = ::std::option::Option<
         child_rel: *mut RelOptInfo,
     ) -> *mut List,
 >;
-pub type ScanOptions = u32;
-pub type SnapshotType = u32;
+pub type ScanOptions = ::std::os::raw::c_uint;
+pub type SnapshotType = ::std::os::raw::c_uint;
 pub type SortCoordinate = *mut SortCoordinateData;
-pub type TM_Result = u32;
+pub type TM_Result = ::std::os::raw::c_uint;
 pub type TableScanDesc = *mut TableScanDescData;
-pub type TempNamespaceStatus = u32;
+pub type TempNamespaceStatus = ::std::os::raw::c_uint;
 pub type TupleDesc = *mut TupleDescData;
-pub type TuplesortMethod = u32;
-pub type TuplesortSpaceType = u32;
+pub type TuplesortMethod = ::std::os::raw::c_uint;
+pub type TuplesortSpaceType = ::std::os::raw::c_uint;
 pub type XidStatus = ::std::os::raw::c_int;
 pub type ambuildphasename_function =
     ::std::option::Option<unsafe extern "C" fn(phasenum: int64) -> *mut ::std::os::raw::c_char>;

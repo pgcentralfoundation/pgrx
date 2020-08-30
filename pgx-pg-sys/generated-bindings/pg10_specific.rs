@@ -2074,7 +2074,7 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
-    pub fn stringToNode(str: *mut ::std::os::raw::c_char) -> *mut ::std::os::raw::c_void;
+    pub fn stringToNode(str_: *mut ::std::os::raw::c_char) -> *mut ::std::os::raw::c_void;
 }
 #[pg_guard]
 extern "C" {
@@ -2488,6 +2488,46 @@ pub struct FunctionCallInfoData {
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
+pub struct HbaLine {
+    pub linenumber: ::std::os::raw::c_int,
+    pub rawline: *mut ::std::os::raw::c_char,
+    pub conntype: ConnType,
+    pub databases: *mut List,
+    pub roles: *mut List,
+    pub addr: sockaddr_storage,
+    pub mask: sockaddr_storage,
+    pub ip_cmp_method: IPCompareMethod,
+    pub hostname: *mut ::std::os::raw::c_char,
+    pub auth_method: UserAuth,
+    pub usermap: *mut ::std::os::raw::c_char,
+    pub pamservice: *mut ::std::os::raw::c_char,
+    pub pam_use_hostname: bool,
+    pub ldaptls: bool,
+    pub ldapserver: *mut ::std::os::raw::c_char,
+    pub ldapport: ::std::os::raw::c_int,
+    pub ldapbinddn: *mut ::std::os::raw::c_char,
+    pub ldapbindpasswd: *mut ::std::os::raw::c_char,
+    pub ldapsearchattribute: *mut ::std::os::raw::c_char,
+    pub ldapbasedn: *mut ::std::os::raw::c_char,
+    pub ldapscope: ::std::os::raw::c_int,
+    pub ldapprefix: *mut ::std::os::raw::c_char,
+    pub ldapsuffix: *mut ::std::os::raw::c_char,
+    pub clientcert: bool,
+    pub krb_realm: *mut ::std::os::raw::c_char,
+    pub include_realm: bool,
+    pub compat_realm: bool,
+    pub upn_username: bool,
+    pub radiusservers: *mut List,
+    pub radiusservers_s: *mut ::std::os::raw::c_char,
+    pub radiussecrets: *mut List,
+    pub radiussecrets_s: *mut ::std::os::raw::c_char,
+    pub radiusidentifiers: *mut List,
+    pub radiusidentifiers_s: *mut ::std::os::raw::c_char,
+    pub radiusports: *mut List,
+    pub radiusports_s: *mut ::std::os::raw::c_char,
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
 pub struct HeapScanDescData {
     pub rs_rd: Relation,
     pub rs_snapshot: Snapshot,
@@ -2589,6 +2629,37 @@ pub struct PgBackendStatus {
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
+pub struct Port {
+    pub sock: pgsocket,
+    pub noblock: bool,
+    pub proto: ProtocolVersion,
+    pub laddr: SockAddr,
+    pub raddr: SockAddr,
+    pub remote_host: *mut ::std::os::raw::c_char,
+    pub remote_hostname: *mut ::std::os::raw::c_char,
+    pub remote_hostname_resolv: ::std::os::raw::c_int,
+    pub remote_hostname_errcode: ::std::os::raw::c_int,
+    pub remote_port: *mut ::std::os::raw::c_char,
+    pub canAcceptConnections: CAC_state,
+    pub database_name: *mut ::std::os::raw::c_char,
+    pub user_name: *mut ::std::os::raw::c_char,
+    pub cmdline_options: *mut ::std::os::raw::c_char,
+    pub guc_options: *mut List,
+    pub hba: *mut HbaLine,
+    pub SessionStartTime: TimestampTz,
+    pub default_keepalives_idle: ::std::os::raw::c_int,
+    pub default_keepalives_interval: ::std::os::raw::c_int,
+    pub default_keepalives_count: ::std::os::raw::c_int,
+    pub keepalives_idle: ::std::os::raw::c_int,
+    pub keepalives_interval: ::std::os::raw::c_int,
+    pub keepalives_count: ::std::os::raw::c_int,
+    pub gss: *mut ::std::os::raw::c_void,
+    pub ssl_in_use: bool,
+    pub peer_cn: *mut ::std::os::raw::c_char,
+    pub peer_cert_valid: bool,
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
 pub struct SetExprState {
     pub type_: NodeTag,
     pub expr: *mut Expr,
@@ -2661,7 +2732,7 @@ pub union PgStat_Msg {
 #[derive(Copy, Clone)]
 pub union Value_ValUnion {
     pub ival: ::std::os::raw::c_long,
-    pub str: *mut ::std::os::raw::c_char,
+    pub str_: *mut ::std::os::raw::c_char,
     _bindgen_union_align: u64,
 }
 #[repr(C)]
@@ -3088,7 +3159,7 @@ pub struct EState {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct ExplainState {
-    pub str: StringInfo,
+    pub str_: StringInfo,
     pub verbose: bool,
     pub analyze: bool,
     pub costs: bool,
@@ -5745,7 +5816,7 @@ pub const dsm_op_DSM_OP_DESTROY: dsm_op = 4;
 pub const dsm_op_DSM_OP_RESIZE: dsm_op = 3;
 pub const tuplehash_status_tuplehash_EMPTY: tuplehash_status = 0;
 pub const tuplehash_status_tuplehash_IN_USE: tuplehash_status = 1;
-pub type AclObjectKind = u32;
+pub type AclObjectKind = ::std::os::raw::c_uint;
 pub type AttrDefault = attrDefault;
 pub type BoolPtr = *mut bool;
 pub type BulkInsertState = *mut BulkInsertStateData;
@@ -5771,16 +5842,16 @@ pub type GetForeignUpperPaths_function = ::std::option::Option<
         output_rel: *mut RelOptInfo,
     ),
 >;
-pub type GrantObjectType = u32;
-pub type HTSU_Result = u32;
+pub type GrantObjectType = ::std::os::raw::c_uint;
+pub type HTSU_Result = ::std::os::raw::c_uint;
 pub type HeapScanDesc = *mut HeapScanDescData;
 pub type ParallelHeapScanDesc = *mut ParallelHeapScanDescData;
 pub type ParamFetchHook = ::std::option::Option<
     unsafe extern "C" fn(params: ParamListInfo, paramid: ::std::os::raw::c_int),
 >;
 pub type PartitionDispatch = *mut PartitionDispatchData;
-pub type Pattern_Prefix_Status = u32;
-pub type Pattern_Type = u32;
+pub type Pattern_Prefix_Status = ::std::os::raw::c_uint;
+pub type Pattern_Type = ::std::os::raw::c_uint;
 pub type RefetchForeignRow_function = ::std::option::Option<
     unsafe extern "C" fn(
         estate: *mut EState,
@@ -5794,7 +5865,7 @@ pub type SnapshotSatisfiesFunc = ::std::option::Option<
 >;
 pub type TupleConstr = tupleConstr;
 pub type TupleDesc = *mut tupleDesc;
-pub type VacuumOption = u32;
+pub type VacuumOption = ::std::os::raw::c_uint;
 pub type bitmapword = uint32;
 pub type create_upper_paths_hook_type = ::std::option::Option<
     unsafe extern "C" fn(
