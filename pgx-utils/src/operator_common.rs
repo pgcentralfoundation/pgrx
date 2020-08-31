@@ -129,3 +129,17 @@ pub fn cmp(type_name: &Ident) -> proc_macro2::TokenStream {
         }
     }
 }
+
+pub fn hash(type_name: &Ident) -> proc_macro2::TokenStream {
+    let pg_name = Ident::new(
+        &format!("{}_hash", type_name).to_lowercase(),
+        type_name.span(),
+    );
+    quote! {
+        #[allow(non_snake_case)]
+        #[pg_extern(immutable, parallel_safe)]
+        fn #pg_name(value: #type_name) -> i32 {
+            pgx::misc::pgx_seahash(&value) as i32
+        }
+    }
+}

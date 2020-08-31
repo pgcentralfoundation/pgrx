@@ -21,3 +21,11 @@ pub(crate) fn impl_postgres_ord(ast: DeriveInput) -> proc_macro2::TokenStream {
 
     stream
 }
+
+pub(crate) fn impl_postgres_hash(ast: DeriveInput) -> proc_macro2::TokenStream {
+    let mut stream = proc_macro2::TokenStream::new();
+
+    stream.extend(hash(&ast.ident));
+
+    stream
+}

@@ -50,6 +50,7 @@ enum DeriveMacros {
     PostgresType,
     PostgresEq,
     PostgresOrd,
+    PostgresHash,
 }
 
 pub(crate) fn generate_schema() -> Result<(), std::io::Error> {
@@ -275,6 +276,9 @@ fn walk_items(
                 if string.contains("PostgresOrd") {
                     derives.insert(DeriveMacros::PostgresOrd);
                 }
+                if string.contains("PostgresHash") {
+                    derives.insert(DeriveMacros::PostgresHash);
+                }
             }
 
             if derives.contains(&DeriveMacros::PostgresType) {
@@ -347,6 +351,28 @@ fn walk_items(
                     schema_stack,
                     default_schema,
                 );
+            }
+
+            if derives.contains(&DeriveMacros::PostgresHash) {
+                walk_items(
+                    rs_file,
+                    &mut operator_sql,
+                    vec![parse_item(hash(&strct.ident))],
+                    schema_stack,
+                    default_schema,
+                );
+
+                let type_name = &strct.ident.to_string().to_lowercase();
+                operator_sql.push(format!(
+                    "CREATE OPERATOR FAMILY {}_hash_ops USING hash;",
+                    type_name
+                ));
+                operator_sql.push(format!(
+                    "CREATE OPERATOR CLASS {type_name}_hash_ops DEFAULT FOR TYPE {type_name} USING hash FAMILY {type_name}_hash_ops AS 
+                        OPERATOR    1   =  ({type_name}, {type_name}),
+                        FUNCTION    1   {type_name}_hash({type_name});",
+                    type_name = type_name
+                ));
             }
 
             if derives.contains(&DeriveMacros::PostgresEq)
