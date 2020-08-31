@@ -39,7 +39,7 @@ pub extern "C" fn background_worker_main(arg: pg_sys::Datum) {{
     BackgroundWorker::attach_signal_handlers(SignalWakeFlags::SIGHUP | SignalWakeFlags::SIGTERM);
 
     // we want to be able to use SPI against the specified table (postgres), as the user postgres
-    BackgroundWorker::connect_worker_to_spi(Some("postgres"), Some("postgres"));
+    BackgroundWorker::connect_worker_to_spi(Some("postgres"), None);
 
     log!(
         "Background Worker '{{}}' is starting.  Argument={{}}",
