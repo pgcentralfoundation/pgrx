@@ -4231,35 +4231,6 @@ pub union Value_ValUnion {
     _bindgen_union_align: u64,
 }
 #[repr(C)]
-#[derive(Debug)]
-pub struct FunctionCallInfoBaseData {
-    pub flinfo: *mut FmgrInfo,
-    pub context: fmNodePtr,
-    pub resultinfo: fmNodePtr,
-    pub fncollation: Oid,
-    pub isnull: bool,
-    pub nargs: ::std::os::raw::c_short,
-    pub args: __IncompleteArrayField<NullableDatum>,
-}
-#[repr(C)]
-#[derive(Debug)]
-pub struct ParamListInfoData {
-    pub paramFetch: ParamFetchHook,
-    pub paramFetchArg: *mut ::std::os::raw::c_void,
-    pub paramCompile: ParamCompileHook,
-    pub paramCompileArg: *mut ::std::os::raw::c_void,
-    pub parserSetup: ParserSetupHook,
-    pub parserSetupArg: *mut ::std::os::raw::c_void,
-    pub numParams: ::std::os::raw::c_int,
-    pub params: __IncompleteArrayField<ParamExternData>,
-}
-#[repr(C)]
-#[derive(Debug)]
-pub struct SharedSortInfo {
-    pub num_workers: ::std::os::raw::c_int,
-    pub sinstrument: __IncompleteArrayField<TuplesortInstrumentation>,
-}
-#[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct Agg {
     pub plan: Plan,
@@ -6902,31 +6873,6 @@ pub struct WindowClause {
     pub copiedOrder: bool,
 }
 #[repr(C)]
-#[derive(Debug, Default)]
-pub struct FormData_pg_index {
-    pub indexrelid: Oid,
-    pub indrelid: Oid,
-    pub indnatts: int16,
-    pub indnkeyatts: int16,
-    pub indisunique: bool,
-    pub indisprimary: bool,
-    pub indisexclusion: bool,
-    pub indimmediate: bool,
-    pub indisclustered: bool,
-    pub indisvalid: bool,
-    pub indcheckxmin: bool,
-    pub indisready: bool,
-    pub indislive: bool,
-    pub indisreplident: bool,
-    pub indkey: int2vector,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct SharedHashInfo {
-    pub num_workers: ::std::os::raw::c_int,
-    pub hinstrument: __IncompleteArrayField<HashInstrumentation>,
-}
-#[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct AggClauseCosts {
     pub numAggs: ::std::os::raw::c_int,
@@ -7185,6 +7131,60 @@ pub struct xl_clog_truncate {
     pub pageno: ::std::os::raw::c_int,
     pub oldestXact: TransactionId,
     pub oldestXactDb: Oid,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct FormData_pg_index {
+    pub indexrelid: Oid,
+    pub indrelid: Oid,
+    pub indnatts: int16,
+    pub indnkeyatts: int16,
+    pub indisunique: bool,
+    pub indisprimary: bool,
+    pub indisexclusion: bool,
+    pub indimmediate: bool,
+    pub indisclustered: bool,
+    pub indisvalid: bool,
+    pub indcheckxmin: bool,
+    pub indisready: bool,
+    pub indislive: bool,
+    pub indisreplident: bool,
+    pub indkey: int2vector,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct SharedHashInfo {
+    pub num_workers: ::std::os::raw::c_int,
+    pub hinstrument: __IncompleteArrayField<HashInstrumentation>,
+}
+#[repr(C)]
+#[derive(Debug)]
+pub struct FunctionCallInfoBaseData {
+    pub flinfo: *mut FmgrInfo,
+    pub context: fmNodePtr,
+    pub resultinfo: fmNodePtr,
+    pub fncollation: Oid,
+    pub isnull: bool,
+    pub nargs: ::std::os::raw::c_short,
+    pub args: __IncompleteArrayField<NullableDatum>,
+}
+#[repr(C)]
+#[derive(Debug)]
+pub struct ParamListInfoData {
+    pub paramFetch: ParamFetchHook,
+    pub paramFetchArg: *mut ::std::os::raw::c_void,
+    pub paramCompile: ParamCompileHook,
+    pub paramCompileArg: *mut ::std::os::raw::c_void,
+    pub parserSetup: ParserSetupHook,
+    pub parserSetupArg: *mut ::std::os::raw::c_void,
+    pub numParams: ::std::os::raw::c_int,
+    pub params: __IncompleteArrayField<ParamExternData>,
+}
+#[repr(C)]
+#[derive(Debug)]
+pub struct SharedSortInfo {
+    pub num_workers: ::std::os::raw::c_int,
+    pub sinstrument: __IncompleteArrayField<TuplesortInstrumentation>,
 }
 #[repr(C)]
 pub struct FormData_pg_trigger {
@@ -8281,7 +8281,7 @@ pub const PG_MAJORVERSION: &'static [u8; 3usize] = b"12\0";
 pub const PG_STRERROR_R_BUFLEN: u32 = 256;
 pub const PG_VERSION: &'static [u8; 5usize] = b"12.3\0";
 pub const PG_VERSION_NUM: u32 = 120003;
-pub const PG_VERSION_STR : & 'static [ u8 ; 114usize ] = b"PostgreSQL 12.3 on x86_64-apple-darwin19.0.0, compiled by Apple clang version 11.0.0 (clang-1100.0.33.12), 64-bit\0" ;
+pub const PG_VERSION_STR : & 'static [u8 ; 114usize] = b"PostgreSQL 12.3 on x86_64-apple-darwin19.0.0, compiled by Apple clang version 11.0.0 (clang-1100.0.33.12), 64-bit\0" ;
 pub const POINTARRAYOID: u32 = 1017;
 pub const POLYGONARRAYOID: u32 = 1027;
 pub const PREDICATELOCK_MANAGER_LWLOCK_OFFSET: u32 = 189;
@@ -8379,7 +8379,6 @@ pub const ScanOptions_SO_TYPE_BITMAPSCAN: ScanOptions = 2;
 pub const ScanOptions_SO_TYPE_SAMPLESCAN: ScanOptions = 4;
 pub const ScanOptions_SO_TYPE_SEQSCAN: ScanOptions = 1;
 pub const ScanOptions_SO_TYPE_TIDSCAN: ScanOptions = 256;
-pub const SelfItemPointerAttributeNumber: i32 = -1;
 pub const SnapshotType_SNAPSHOT_ANY: SnapshotType = 2;
 pub const SnapshotType_SNAPSHOT_DIRTY: SnapshotType = 4;
 pub const SnapshotType_SNAPSHOT_HISTORIC_MVCC: SnapshotType = 5;

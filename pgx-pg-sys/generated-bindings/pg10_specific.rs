@@ -2736,17 +2736,6 @@ pub union Value_ValUnion {
     _bindgen_union_align: u64,
 }
 #[repr(C)]
-#[derive(Debug)]
-pub struct ParamListInfoData {
-    pub paramFetch: ParamFetchHook,
-    pub paramFetchArg: *mut ::std::os::raw::c_void,
-    pub parserSetup: ParserSetupHook,
-    pub parserSetupArg: *mut ::std::os::raw::c_void,
-    pub numParams: ::std::os::raw::c_int,
-    pub paramMask: *mut Bitmapset,
-    pub params: __IncompleteArrayField<ParamExternData>,
-}
-#[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct Agg {
     pub plan: Plan,
@@ -4722,35 +4711,6 @@ pub struct xl_xact_parsed_commit {
     pub origin_timestamp: TimestampTz,
 }
 #[repr(C)]
-#[derive(Debug, Default)]
-pub struct FormData_pg_index {
-    pub indexrelid: Oid,
-    pub indrelid: Oid,
-    pub indnatts: int16,
-    pub indisunique: bool,
-    pub indisprimary: bool,
-    pub indisexclusion: bool,
-    pub indimmediate: bool,
-    pub indisclustered: bool,
-    pub indisvalid: bool,
-    pub indcheckxmin: bool,
-    pub indisready: bool,
-    pub indislive: bool,
-    pub indisreplident: bool,
-    pub indkey: int2vector,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct ParallelHeapScanDescData {
-    pub phs_relid: Oid,
-    pub phs_syncscan: bool,
-    pub phs_nblocks: BlockNumber,
-    pub phs_mutex: slock_t,
-    pub phs_startblock: BlockNumber,
-    pub phs_cblock: BlockNumber,
-    pub phs_snapshot_data: __IncompleteArrayField<::std::os::raw::c_char>,
-}
-#[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct AggClauseCosts {
     pub numAggs: ::std::os::raw::c_int,
@@ -4885,6 +4845,46 @@ pub struct VariableCacheData {
     pub newestCommitTsXid: TransactionId,
     pub latestCompletedXid: TransactionId,
     pub oldestClogXid: TransactionId,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct FormData_pg_index {
+    pub indexrelid: Oid,
+    pub indrelid: Oid,
+    pub indnatts: int16,
+    pub indisunique: bool,
+    pub indisprimary: bool,
+    pub indisexclusion: bool,
+    pub indimmediate: bool,
+    pub indisclustered: bool,
+    pub indisvalid: bool,
+    pub indcheckxmin: bool,
+    pub indisready: bool,
+    pub indislive: bool,
+    pub indisreplident: bool,
+    pub indkey: int2vector,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct ParallelHeapScanDescData {
+    pub phs_relid: Oid,
+    pub phs_syncscan: bool,
+    pub phs_nblocks: BlockNumber,
+    pub phs_mutex: slock_t,
+    pub phs_startblock: BlockNumber,
+    pub phs_cblock: BlockNumber,
+    pub phs_snapshot_data: __IncompleteArrayField<::std::os::raw::c_char>,
+}
+#[repr(C)]
+#[derive(Debug)]
+pub struct ParamListInfoData {
+    pub paramFetch: ParamFetchHook,
+    pub paramFetchArg: *mut ::std::os::raw::c_void,
+    pub parserSetup: ParserSetupHook,
+    pub parserSetupArg: *mut ::std::os::raw::c_void,
+    pub numParams: ::std::os::raw::c_int,
+    pub paramMask: *mut Bitmapset,
+    pub params: __IncompleteArrayField<ParamExternData>,
 }
 #[repr(C)]
 pub struct FormData_pg_trigger {
@@ -5229,6 +5229,7 @@ pub const FRAMEOPTION_START_VALUE: u32 = 5120;
 pub const FRAMEOPTION_START_VALUE_FOLLOWING: u32 = 4096;
 pub const FRAMEOPTION_START_VALUE_PRECEDING: u32 = 1024;
 pub const FirstBootstrapObjectId: u32 = 10000;
+pub const FirstLowInvalidHeapAttributeNumber: i32 = -8;
 pub const FuncDetailCode_FUNCDETAIL_AGGREGATE: FuncDetailCode = 3;
 pub const FuncDetailCode_FUNCDETAIL_COERCION: FuncDetailCode = 5;
 pub const FuncDetailCode_FUNCDETAIL_WINDOWFUNC: FuncDetailCode = 4;
@@ -5272,6 +5273,10 @@ pub const IndexAttrBitmapKind_INDEX_ATTR_BITMAP_IDENTITY_KEY: IndexAttrBitmapKin
 pub const IndexAttrBitmapKind_INDEX_ATTR_BITMAP_KEY: IndexAttrBitmapKind = 1;
 pub const IndexAttrBitmapKind_INDEX_ATTR_BITMAP_PRIMARY_KEY: IndexAttrBitmapKind = 2;
 pub const LOCK_MANAGER_LWLOCK_OFFSET: u32 = 174;
+pub const MaxCommandIdAttributeNumber: i32 = -6;
+pub const MaxTransactionIdAttributeNumber: i32 = -5;
+pub const MinCommandIdAttributeNumber: i32 = -4;
+pub const MinTransactionIdAttributeNumber: i32 = -3;
 pub const NUM_FIXED_LWLOCKS: u32 = 206;
 pub const NUM_INDIVIDUAL_LWLOCKS: u32 = 46;
 pub const Natts_pg_attribute: u32 = 22;
@@ -5678,6 +5683,7 @@ pub const NodeTag_T_WorkTableScan: NodeTag = 31;
 pub const NodeTag_T_WorkTableScanState: NodeTag = 76;
 pub const NodeTag_T_XmlExpr: NodeTag = 132;
 pub const NodeTag_T_XmlSerialize: NodeTag = 373;
+pub const ObjectIdAttributeNumber: i32 = -2;
 pub const ObjectType_OBJECT_PUBLICATION: ObjectType = 28;
 pub const ObjectType_OBJECT_PUBLICATION_REL: ObjectType = 29;
 pub const ObjectType_OBJECT_ROLE: ObjectType = 30;
@@ -5706,7 +5712,7 @@ pub const PG_BACKEND_VERSIONSTR: &'static [u8; 29usize] = b"postgres (PostgreSQL
 pub const PG_MAJORVERSION: &'static [u8; 3usize] = b"10\0";
 pub const PG_VERSION: &'static [u8; 6usize] = b"10.13\0";
 pub const PG_VERSION_NUM: u32 = 100013;
-pub const PG_VERSION_STR : & 'static [ u8 ; 115usize ] = b"PostgreSQL 10.13 on x86_64-apple-darwin19.0.0, compiled by Apple clang version 11.0.0 (clang-1100.0.33.12), 64-bit\0" ;
+pub const PG_VERSION_STR : & 'static [u8 ; 115usize] = b"PostgreSQL 10.13 on x86_64-apple-darwin19.0.0, compiled by Apple clang version 11.0.0 (clang-1100.0.33.12), 64-bit\0" ;
 pub const PREDICATELOCK_MANAGER_LWLOCK_OFFSET: u32 = 190;
 pub const ParseExprKind_EXPR_KIND_ALTER_COL_TRANSFORM: ParseExprKind = 31;
 pub const ParseExprKind_EXPR_KIND_CHECK_CONSTRAINT: ParseExprKind = 25;
@@ -5776,6 +5782,7 @@ pub const TableLikeOption_CREATE_TABLE_LIKE_IDENTITY: TableLikeOption = 4;
 pub const TableLikeOption_CREATE_TABLE_LIKE_INDEXES: TableLikeOption = 8;
 pub const TableLikeOption_CREATE_TABLE_LIKE_STATISTICS: TableLikeOption = 64;
 pub const TableLikeOption_CREATE_TABLE_LIKE_STORAGE: TableLikeOption = 16;
+pub const TableOidAttributeNumber: i32 = -7;
 pub const TypeFuncClass_TYPEFUNC_OTHER: TypeFuncClass = 3;
 pub const TypeFuncClass_TYPEFUNC_RECORD: TypeFuncClass = 2;
 pub const UpperRelationKind_UPPERREL_DISTINCT: UpperRelationKind = 3;
