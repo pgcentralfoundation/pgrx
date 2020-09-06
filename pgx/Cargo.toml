@@ -32,6 +32,6 @@ pgx-pg-sys = { path = "../pgx-pg-sys", version= "^0.0.13"}
 serde = { version = "1.0.115", features = [ "derive" ] }
 serde_cbor = "0.11.1"
 serde_json = "1.0.57"
-time = "0.2.16"
+time = "0.2.17"
 bitflags = "1.2.1"
 
