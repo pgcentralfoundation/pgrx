@@ -746,8 +746,7 @@ fn translate_type(filename: &DirEntry, ty: &Type) -> Option<(String, bool, Optio
 
 fn deconstruct_macro(as_string: &str) -> Option<(String, Option<String>, bool)> {
     if as_string.starts_with("default !") {
-        let regexp =
-            regex::Regex::new(r#"default ! \( (?P<type>.*?)\s*, (?P<value>.*) \)"#).unwrap();
+        let regexp = regex::Regex::new(r#"default ! \((?P<type>.*?)\s*, (?P<value>.*)\)"#).unwrap();
 
         let default_value =
             Some(get_named_capture(&regexp, "value", as_string).expect("no default value"));
@@ -756,7 +755,7 @@ fn deconstruct_macro(as_string: &str) -> Option<(String, Option<String>, bool)> 
             get_named_capture(&regexp, "type", as_string).expect("no type name in default ");
         Some((rust_type, default_value, false))
     } else if as_string.starts_with("variadic !") {
-        let regexp = regex::Regex::new(r#"variadic ! \( (?P<type>.*?) \)"#).unwrap();
+        let regexp = regex::Regex::new(r#"variadic ! \((?P<type>.*?)\)"#).unwrap();
 
         let rust_type =
             get_named_capture(&regexp, "type", as_string).expect("no type name in default ");
@@ -776,7 +775,7 @@ fn translate_type_string(
     subtypes: Option<Vec<String>>,
 ) -> Option<(String, bool, Option<String>, bool)> {
     match rust_type.as_str() {
-        "( )" => Some(("void".to_string(), false, default_value, variadic)),
+        "()" => Some(("void".to_string(), false, default_value, variadic)),
         "i8" => Some(("\"char\"".to_string(), false, default_value, variadic)),
         "i16" => Some(("smallint".to_string(), false, default_value, variadic)),
         "i32" => Some(("integer".to_string(), false, default_value, variadic)),
@@ -798,7 +797,7 @@ fn translate_type_string(
         "& str" | "& 'static str" | "&'static str" | "String" | "& 'static String" | "& String" => {
             Some(("text".to_string(), false, default_value, variadic))
         }
-        "& [ u8 ]" | "& 'static [ u8 ]" | "&'static [ u8 ]" | "Vec < u8 >" => {
+        "& [u8]" | "&[u8]" | "& 'static [u8]" | "&'static [u8]" | "Vec < u8 >" => {
             Some(("bytea".to_string(), false, default_value, variadic))
         }
         "& std :: ffi :: CStr" => Some(("cstring".to_string(), false, default_value, variadic)),
@@ -1093,60 +1092,59 @@ fn collect_attributes(
         let a = attrs.get(i).unwrap();
         let span = a.span();
         let as_string = a.to_token_stream().to_string();
-
-        if as_string == "# [ pg_guard ]" {
+        if as_string == "# [pg_guard]" {
             categorized_attributes.push(CategorizedAttribute::PgGuard(span));
-        } else if as_string.starts_with("# [ pg_extern") {
+        } else if as_string.starts_with("# [pg_extern") {
             categorized_attributes.push(CategorizedAttribute::PgExtern((
                 span,
                 parse_extern_args(&a),
             )));
-        } else if as_string.starts_with("# [ pg_operator") {
+        } else if as_string.starts_with("# [pg_operator") {
             operator = Some(CategorizedAttribute::PgOperator(
                 span,
                 parse_extern_args(&a),
                 Vec::new(),
             ));
-        } else if as_string.starts_with("# [ opname") {
+        } else if as_string.starts_with("# [opname") {
             if let Some(CategorizedAttribute::PgOperator(_, _, options)) = operator.as_mut() {
                 options.push(OperatorOptions::Name(extract_single_arg(a.tokens.clone())));
             }
-        } else if as_string.starts_with("# [ commutator") {
+        } else if as_string.starts_with("# [commutator") {
             if let Some(CategorizedAttribute::PgOperator(_, _, options)) = operator.as_mut() {
                 options.push(OperatorOptions::Commutator(extract_single_arg(
                     a.tokens.clone(),
                 )));
             }
-        } else if as_string.starts_with("# [ negator") {
+        } else if as_string.starts_with("# [negator") {
             if let Some(CategorizedAttribute::PgOperator(_, _, options)) = operator.as_mut() {
                 options.push(OperatorOptions::Negator(extract_single_arg(
                     a.tokens.clone(),
                 )));
             }
-        } else if as_string.starts_with("# [ restrict") {
+        } else if as_string.starts_with("# [restrict") {
             if let Some(CategorizedAttribute::PgOperator(_, _, options)) = operator.as_mut() {
                 options.push(OperatorOptions::Restrict(extract_single_arg(
                     a.tokens.clone(),
                 )));
             }
-        } else if as_string.starts_with("# [ join") {
+        } else if as_string.starts_with("# [join") {
             if let Some(CategorizedAttribute::PgOperator(_, _, options)) = operator.as_mut() {
                 options.push(OperatorOptions::Join(extract_single_arg(a.tokens.clone())));
             }
-        } else if as_string.eq("# [ hashes ]") {
+        } else if as_string.eq("# [hashes]") {
             if let Some(CategorizedAttribute::PgOperator(_, _, options)) = operator.as_mut() {
                 options.push(OperatorOptions::Hashes);
             }
-        } else if as_string.eq("# [ merges ]") {
+        } else if as_string.eq("# [merges]") {
             if let Some(CategorizedAttribute::PgOperator(_, _, options)) = operator.as_mut() {
                 options.push(OperatorOptions::Merges);
             }
-        } else if as_string.starts_with("# [ pg_test") {
+        } else if as_string.starts_with("# [pg_test") {
             categorized_attributes
                 .push(CategorizedAttribute::PgTest((span, parse_extern_args(&a))));
-        } else if as_string == "# [ test ]" {
+        } else if as_string == "# [test]" {
             categorized_attributes.push(CategorizedAttribute::RustTest(span));
-        } else if as_string == "# [ doc = \" ```funcname\" ]" {
+        } else if as_string == "# [doc = \" ```funcname\"]" {
             let (new_i, mut sql_statements) = collect_doc(
                 rs_file,
                 ident,
@@ -1169,7 +1167,7 @@ fn collect_attributes(
             }
 
             i = new_i;
-        } else if as_string == "# [ doc = \" ```funcargs\" ]" {
+        } else if as_string == "# [doc = \" ```funcargs\"]" {
             let (new_i, mut sql_statements) = collect_doc(
                 rs_file,
                 ident,
@@ -1192,7 +1190,7 @@ fn collect_attributes(
             }
 
             i = new_i;
-        } else if as_string == "# [ doc = \" ```sql\" ]" {
+        } else if as_string == "# [doc = \" ```sql\"]" {
             let (new_i, sql_statements) = collect_doc(
                 rs_file,
                 ident,
@@ -1262,13 +1260,13 @@ fn collect_doc(
         let a = attrs.get(i).unwrap();
         let as_string = a.to_token_stream().to_string();
 
-        if as_string == "# [ doc = \" ```\" ]" {
+        if as_string == "# [doc = \" ```\"]" {
             // we found the end to this ```sql block of documentation
             break;
-        } else if as_string.starts_with("# [ doc = \"") {
+        } else if as_string.starts_with("# [doc = \"") {
             // it's a doc line within the sql block
-            let as_string = as_string.trim_start_matches("# [ doc = \"");
-            let as_string = as_string.trim_end_matches("\" ]");
+            let as_string = as_string.trim_start_matches("# [doc = \"");
+            let as_string = as_string.trim_end_matches("\"]");
             let as_string = as_string.trim();
             let as_string = unescape::unescape(as_string)
                 .unwrap_or_else(|| exit_with_error!("Improperly escaped:\n{}", as_string));
