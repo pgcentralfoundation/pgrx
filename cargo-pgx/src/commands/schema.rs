@@ -188,6 +188,12 @@ fn find_rs_files(path: &PathBuf, mut files: Vec<DirEntry>) -> Vec<DirEntry> {
         }
     }
 
+    files.sort_by(|a, b| {
+        a.file_name()
+            .to_str()
+            .unwrap()
+            .cmp(b.file_name().to_str().unwrap())
+    });
     files
 }
 
