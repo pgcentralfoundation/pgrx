@@ -2,16 +2,15 @@
 
 `pgx` makes defining custom operators for your custom types very simple.  You can either
 manually use the `#[pg_operator]` macro on a function for likely non-standard operators, or you
-can use or more of the the derive macros `#[derive(PostgresEq, PostgresOrd, PostgresHash)]`
-if your type is otherwise capable of implementing the equivalent Rust traits, and `pgx`
-will generate all the standard equality/comparision macros for you.
+can use one or more of the the derive macros `#[derive(PostgresEq, PostgresOrd, PostgresHash)]`
+if your type is otherwise capable of implementing the equivalent Rust traits.  In that case, `pgx`
+will generate all the standard equality/comparison SQL (and Rust) functions for you.
 
 ### Manual Operator Defines
 
-The `#[pg_operator]` macro can be used to manually declare a function as a Postgres operator.
+The `#[pg_operator]` macro is used to manually declare a function as a Postgres operator.
 
-Operator functions take one or two arguments and return non-void value.  
-The argument types and return types do not necessarily need to be identical.  
+Operator functions take one or two arguments and return non-void value.  The argument types and return types do not necessarily need to be identical.  
 
 If, for example, you have a type, such as:
 
@@ -41,12 +40,12 @@ And now, it'll be usable via SQL as:
 (1 row)
 ```
 
-(note that `#[derive(PostgresType, Serialize, Deserialize)]` uses JSON as the textual representation of a type by default)
+> note that `#[derive(PostgresType, Serialize, Deserialize)]` uses JSON as the textual representation of a type
 
 You'll notice that we used `#[pg_operator(immutable, parallel_safe)]`.  If those properties are true for your function,
 you should specify them.  The defaults are `volatile, parallel_unsafe`.
 
-The '#[opername(||)]' macro specifies the actual SQL operator name.
+The `#[opername(||)]` macro specifies the actual SQL operator name.
 
 The complete set of attributes that can be used with `#[pg_operator]`, which correspond
 to Postgres' [CREATE OPERATOR](https://www.postgresql.org/docs/12/sql-createoperator.html) 
@@ -67,7 +66,7 @@ statement are:
 ### Automatically Deriving Operators and Families
 
 `pgx` also provides three derive macros for automatically implementing the standard Postgres
-equality comparison, and hash operators and functions, along with their `OPERATOR CLASS` and `OPERATOR FAMILY`
+equality, comparison, and hash operators/functions, along with their `OPERATOR CLASS` and `OPERATOR FAMILY`
 definitions.  Using these derive macros will generate the necessary SQL to ensure your
 type can be used in `btree` and `hash` indexes.
 
@@ -77,7 +76,7 @@ This derive macro requires that your type also implement Rust's `Eq` and `Partia
 either through `#[derive]` or manually.
 
 `pgx` will then generate `#[pg_operator(immutable, parallel_safe))]`-tagged functions for the
-equals (`=`) and not equals (`<>`) functions, properly setting their `#[negator]` attributes.
+equals (`=`) and not equals (`<>`) operators, properly setting their `#[negator]` attributes.
 
 #### `#[derive(PostgresOrd)]`
 
@@ -86,11 +85,11 @@ either through `#[derive]` or manually.
 
 `pgx` will then generate `#[pg_operator(immutable, parallel_safe)]`-tagged functions for the
 following operators:
-    - `<`
-    - `>`
-    - `<=`
-    - `>=`
-    - a "compare" function named `<typename>_cmp()`
+ - `<`
+ - `>`
+ - `<=`
+ - `>=`
+ - a "compare" function named `<typename>_cmp()`
 
 For the generated operators, their `#[negator]` and `#[commutator]` attributes are properly set.
 
