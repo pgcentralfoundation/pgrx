@@ -47,9 +47,11 @@ impl bindgen::callbacks::ParseCallbacks for IgnoredMacros {
 }
 
 fn main() -> Result<(), std::io::Error> {
-    // dump our environment
-    for (k, v) in std::env::vars() {
-        eprintln!("{}={}", k, v);
+    // dump the environment for debugging if asked
+    if std::env::var("PGX_BUILD_VERBOSE").unwrap_or("false".to_string()) == "true" {
+        for (k, v) in std::env::vars() {
+            eprintln!("{}={}", k, v);
+        }
     }
 
     let manifest_dir = PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").unwrap());
