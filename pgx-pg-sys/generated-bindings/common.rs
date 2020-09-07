@@ -28966,6 +28966,48 @@ extern "C" {
 extern "C" {
     pub static sys_signame: [*const ::std::os::raw::c_char; 32usize];
 }
+#[repr(C, packed(2))]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct ItemPointerData {
+    pub ip_blkid: BlockIdData,
+    pub ip_posid: OffsetNumber,
+}
+#[repr(C, packed(4))]
+#[derive(Copy, Clone)]
+pub struct __msfilterreq {
+    pub msfr_ifindex: u32,
+    pub msfr_fmode: u32,
+    pub msfr_nsrcs: u32,
+    pub __msfr_align: u32,
+    pub msfr_group: sockaddr_storage,
+    pub msfr_srcs: *mut sockaddr_storage,
+}
+#[repr(C, packed(4))]
+#[derive(Copy, Clone)]
+pub struct group_req {
+    pub gr_interface: u32,
+    pub gr_group: sockaddr_storage,
+}
+#[repr(C, packed(4))]
+#[derive(Copy, Clone)]
+pub struct group_source_req {
+    pub gsr_interface: u32,
+    pub gsr_group: sockaddr_storage,
+    pub gsr_source: sockaddr_storage,
+}
+#[repr(C, packed(4))]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct log2phys {
+    pub l2p_flags: ::std::os::raw::c_uint,
+    pub l2p_contigbytes: off_t,
+    pub l2p_devoffset: off_t,
+}
+#[repr(C)]
+#[derive(Copy, Clone, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub struct __BindgenBitfieldUnit<Storage, Align> {
+    storage: Storage,
+    align: [Align; 0],
+}
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct A_Const {
@@ -29852,42 +29894,6 @@ pub union wait {
     pub w_T: wait__bindgen_ty_1,
     pub w_S: wait__bindgen_ty_2,
     _bindgen_union_align: u32,
-}
-#[repr(C)]
-#[derive(Copy, Clone, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd)]
-pub struct __BindgenBitfieldUnit<Storage, Align> {
-    storage: Storage,
-    align: [Align; 0],
-}
-#[repr(C)]
-#[derive(Debug)]
-pub struct DynamicZoneAbbrev {
-    pub tz: *mut pg_tz,
-    pub zone: __IncompleteArrayField<::std::os::raw::c_char>,
-}
-#[repr(C)]
-#[derive(Debug)]
-pub struct ParallelBitmapHeapState {
-    pub tbmiterator: dsa_pointer,
-    pub prefetch_iterator: dsa_pointer,
-    pub mutex: slock_t,
-    pub prefetch_pages: ::std::os::raw::c_int,
-    pub prefetch_target: ::std::os::raw::c_int,
-    pub state: SharedBitmapState,
-    pub cv: ConditionVariable,
-    pub phs_snapshot_data: __IncompleteArrayField<::std::os::raw::c_char>,
-}
-#[repr(C)]
-#[derive(Debug)]
-pub struct _FuncCandidateList {
-    pub next: *mut _FuncCandidateList,
-    pub pathpos: ::std::os::raw::c_int,
-    pub oid: Oid,
-    pub nargs: ::std::os::raw::c_int,
-    pub nvargs: ::std::os::raw::c_int,
-    pub ndargs: ::std::os::raw::c_int,
-    pub argnumbers: *mut ::std::os::raw::c_int,
-    pub args: __IncompleteArrayField<Oid>,
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -34384,183 +34390,6 @@ pub struct varatt_indirect {
     pub pointer: *mut varlena,
 }
 #[repr(C)]
-#[derive(Debug, Default)]
-pub struct Bitmapset {
-    pub nwords: ::std::os::raw::c_int,
-    pub words: __IncompleteArrayField<bitmapword>,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct Jsonb {
-    pub vl_len_: int32,
-    pub root: JsonbContainer,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct JsonbContainer {
-    pub header: uint32,
-    pub children: __IncompleteArrayField<JEntry>,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct MinimalTupleData {
-    pub t_len: uint32,
-    pub mt_padding: [::std::os::raw::c_char; 6usize],
-    pub t_infomask2: uint16,
-    pub t_infomask: uint16,
-    pub t_hoff: uint8,
-    pub t_bits: __IncompleteArrayField<bits8>,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct PATH {
-    pub vl_len_: int32,
-    pub npts: int32,
-    pub closed: int32,
-    pub dummy: int32,
-    pub p: __IncompleteArrayField<Point>,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct POLYGON {
-    pub vl_len_: int32,
-    pub npts: int32,
-    pub boundbox: BOX,
-    pub p: __IncompleteArrayField<Point>,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct PageHeaderData {
-    pub pd_lsn: PageXLogRecPtr,
-    pub pd_checksum: uint16,
-    pub pd_flags: uint16,
-    pub pd_lower: LocationIndex,
-    pub pd_upper: LocationIndex,
-    pub pd_special: LocationIndex,
-    pub pd_pagesize_version: uint16,
-    pub pd_prune_xid: TransactionId,
-    pub pd_linp: __IncompleteArrayField<ItemIdData>,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct ParallelIndexScanDescData {
-    pub ps_relid: Oid,
-    pub ps_indexid: Oid,
-    pub ps_offset: Size,
-    pub ps_snapshot_data: __IncompleteArrayField<::std::os::raw::c_char>,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct TBMIterateResult {
-    pub blockno: BlockNumber,
-    pub ntuples: ::std::os::raw::c_int,
-    pub recheck: bool,
-    pub offsets: __IncompleteArrayField<OffsetNumber>,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct TimeZoneAbbrevTable {
-    pub tblsize: Size,
-    pub numabbrevs: ::std::os::raw::c_int,
-    pub abbrevs: __IncompleteArrayField<datetkn>,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct WorkerInstrumentation {
-    pub num_workers: ::std::os::raw::c_int,
-    pub instrument: __IncompleteArrayField<Instrumentation>,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct int2vector {
-    pub vl_len_: int32,
-    pub ndim: ::std::os::raw::c_int,
-    pub dataoffset: int32,
-    pub elemtype: Oid,
-    pub dim1: ::std::os::raw::c_int,
-    pub lbound1: ::std::os::raw::c_int,
-    pub values: __IncompleteArrayField<int16>,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct oidvector {
-    pub vl_len_: int32,
-    pub ndim: ::std::os::raw::c_int,
-    pub dataoffset: int32,
-    pub elemtype: Oid,
-    pub dim1: ::std::os::raw::c_int,
-    pub lbound1: ::std::os::raw::c_int,
-    pub values: __IncompleteArrayField<Oid>,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct varattrib_1b {
-    pub va_header: uint8,
-    pub va_data: __IncompleteArrayField<::std::os::raw::c_char>,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct varattrib_1b_e {
-    pub va_header: uint8,
-    pub va_tag: uint8,
-    pub va_data: __IncompleteArrayField<::std::os::raw::c_char>,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct varattrib_4b__bindgen_ty_1 {
-    pub va_header: uint32,
-    pub va_data: __IncompleteArrayField<::std::os::raw::c_char>,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct varattrib_4b__bindgen_ty_2 {
-    pub va_header: uint32,
-    pub va_rawsize: uint32,
-    pub va_data: __IncompleteArrayField<::std::os::raw::c_char>,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct varlena {
-    pub vl_len_: [::std::os::raw::c_char; 4usize],
-    pub vl_dat: __IncompleteArrayField<::std::os::raw::c_char>,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct xl_running_xacts {
-    pub xcnt: ::std::os::raw::c_int,
-    pub subxcnt: ::std::os::raw::c_int,
-    pub subxid_overflow: bool,
-    pub nextXid: TransactionId,
-    pub oldestRunningXid: TransactionId,
-    pub latestCompletedXid: TransactionId,
-    pub xids: __IncompleteArrayField<TransactionId>,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct xl_standby_locks {
-    pub nlocks: ::std::os::raw::c_int,
-    pub locks: __IncompleteArrayField<xl_standby_lock>,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct xl_xact_assignment {
-    pub xtop: TransactionId,
-    pub nsubxacts: ::std::os::raw::c_int,
-    pub xsub: __IncompleteArrayField<TransactionId>,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct xl_xact_relfilenodes {
-    pub nrels: ::std::os::raw::c_int,
-    pub xnodes: __IncompleteArrayField<RelFileNode>,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct xl_xact_subxacts {
-    pub nsubxacts: ::std::os::raw::c_int,
-    pub subxacts: __IncompleteArrayField<TransactionId>,
-}
-#[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct AclItem {
     pub ai_grantee: Oid,
@@ -35835,6 +35664,213 @@ pub struct xl_xact_xinfo {
     pub xinfo: uint32,
 }
 #[repr(C)]
+#[derive(Debug, Default)]
+pub struct Bitmapset {
+    pub nwords: ::std::os::raw::c_int,
+    pub words: __IncompleteArrayField<bitmapword>,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct Jsonb {
+    pub vl_len_: int32,
+    pub root: JsonbContainer,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct JsonbContainer {
+    pub header: uint32,
+    pub children: __IncompleteArrayField<JEntry>,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct MinimalTupleData {
+    pub t_len: uint32,
+    pub mt_padding: [::std::os::raw::c_char; 6usize],
+    pub t_infomask2: uint16,
+    pub t_infomask: uint16,
+    pub t_hoff: uint8,
+    pub t_bits: __IncompleteArrayField<bits8>,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct PATH {
+    pub vl_len_: int32,
+    pub npts: int32,
+    pub closed: int32,
+    pub dummy: int32,
+    pub p: __IncompleteArrayField<Point>,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct POLYGON {
+    pub vl_len_: int32,
+    pub npts: int32,
+    pub boundbox: BOX,
+    pub p: __IncompleteArrayField<Point>,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct PageHeaderData {
+    pub pd_lsn: PageXLogRecPtr,
+    pub pd_checksum: uint16,
+    pub pd_flags: uint16,
+    pub pd_lower: LocationIndex,
+    pub pd_upper: LocationIndex,
+    pub pd_special: LocationIndex,
+    pub pd_pagesize_version: uint16,
+    pub pd_prune_xid: TransactionId,
+    pub pd_linp: __IncompleteArrayField<ItemIdData>,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct ParallelIndexScanDescData {
+    pub ps_relid: Oid,
+    pub ps_indexid: Oid,
+    pub ps_offset: Size,
+    pub ps_snapshot_data: __IncompleteArrayField<::std::os::raw::c_char>,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct TBMIterateResult {
+    pub blockno: BlockNumber,
+    pub ntuples: ::std::os::raw::c_int,
+    pub recheck: bool,
+    pub offsets: __IncompleteArrayField<OffsetNumber>,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct TimeZoneAbbrevTable {
+    pub tblsize: Size,
+    pub numabbrevs: ::std::os::raw::c_int,
+    pub abbrevs: __IncompleteArrayField<datetkn>,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct WorkerInstrumentation {
+    pub num_workers: ::std::os::raw::c_int,
+    pub instrument: __IncompleteArrayField<Instrumentation>,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct int2vector {
+    pub vl_len_: int32,
+    pub ndim: ::std::os::raw::c_int,
+    pub dataoffset: int32,
+    pub elemtype: Oid,
+    pub dim1: ::std::os::raw::c_int,
+    pub lbound1: ::std::os::raw::c_int,
+    pub values: __IncompleteArrayField<int16>,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct oidvector {
+    pub vl_len_: int32,
+    pub ndim: ::std::os::raw::c_int,
+    pub dataoffset: int32,
+    pub elemtype: Oid,
+    pub dim1: ::std::os::raw::c_int,
+    pub lbound1: ::std::os::raw::c_int,
+    pub values: __IncompleteArrayField<Oid>,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct varattrib_1b {
+    pub va_header: uint8,
+    pub va_data: __IncompleteArrayField<::std::os::raw::c_char>,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct varattrib_1b_e {
+    pub va_header: uint8,
+    pub va_tag: uint8,
+    pub va_data: __IncompleteArrayField<::std::os::raw::c_char>,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct varattrib_4b__bindgen_ty_1 {
+    pub va_header: uint32,
+    pub va_data: __IncompleteArrayField<::std::os::raw::c_char>,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct varattrib_4b__bindgen_ty_2 {
+    pub va_header: uint32,
+    pub va_rawsize: uint32,
+    pub va_data: __IncompleteArrayField<::std::os::raw::c_char>,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct varlena {
+    pub vl_len_: [::std::os::raw::c_char; 4usize],
+    pub vl_dat: __IncompleteArrayField<::std::os::raw::c_char>,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct xl_running_xacts {
+    pub xcnt: ::std::os::raw::c_int,
+    pub subxcnt: ::std::os::raw::c_int,
+    pub subxid_overflow: bool,
+    pub nextXid: TransactionId,
+    pub oldestRunningXid: TransactionId,
+    pub latestCompletedXid: TransactionId,
+    pub xids: __IncompleteArrayField<TransactionId>,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct xl_standby_locks {
+    pub nlocks: ::std::os::raw::c_int,
+    pub locks: __IncompleteArrayField<xl_standby_lock>,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct xl_xact_assignment {
+    pub xtop: TransactionId,
+    pub nsubxacts: ::std::os::raw::c_int,
+    pub xsub: __IncompleteArrayField<TransactionId>,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct xl_xact_relfilenodes {
+    pub nrels: ::std::os::raw::c_int,
+    pub xnodes: __IncompleteArrayField<RelFileNode>,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct xl_xact_subxacts {
+    pub nsubxacts: ::std::os::raw::c_int,
+    pub subxacts: __IncompleteArrayField<TransactionId>,
+}
+#[repr(C)]
+#[derive(Debug)]
+pub struct DynamicZoneAbbrev {
+    pub tz: *mut pg_tz,
+    pub zone: __IncompleteArrayField<::std::os::raw::c_char>,
+}
+#[repr(C)]
+#[derive(Debug)]
+pub struct ParallelBitmapHeapState {
+    pub tbmiterator: dsa_pointer,
+    pub prefetch_iterator: dsa_pointer,
+    pub mutex: slock_t,
+    pub prefetch_pages: ::std::os::raw::c_int,
+    pub prefetch_target: ::std::os::raw::c_int,
+    pub state: SharedBitmapState,
+    pub cv: ConditionVariable,
+    pub phs_snapshot_data: __IncompleteArrayField<::std::os::raw::c_char>,
+}
+#[repr(C)]
+#[derive(Debug)]
+pub struct _FuncCandidateList {
+    pub next: *mut _FuncCandidateList,
+    pub pathpos: ::std::os::raw::c_int,
+    pub oid: Oid,
+    pub nargs: ::std::os::raw::c_int,
+    pub nvargs: ::std::os::raw::c_int,
+    pub ndargs: ::std::os::raw::c_int,
+    pub argnumbers: *mut ::std::os::raw::c_int,
+    pub args: __IncompleteArrayField<Oid>,
+}
+#[repr(C)]
 #[derive(Default)]
 pub struct __IncompleteArrayField<T>(::std::marker::PhantomData<T>, [T; 0]);
 #[repr(C)]
@@ -35896,42 +35932,6 @@ pub struct xl_invalidations {
 pub struct xl_xact_invals {
     pub nmsgs: ::std::os::raw::c_int,
     pub msgs: __IncompleteArrayField<SharedInvalidationMessage>,
-}
-#[repr(C, packed(2))]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct ItemPointerData {
-    pub ip_blkid: BlockIdData,
-    pub ip_posid: OffsetNumber,
-}
-#[repr(C, packed(4))]
-#[derive(Copy, Clone)]
-pub struct __msfilterreq {
-    pub msfr_ifindex: u32,
-    pub msfr_fmode: u32,
-    pub msfr_nsrcs: u32,
-    pub __msfr_align: u32,
-    pub msfr_group: sockaddr_storage,
-    pub msfr_srcs: *mut sockaddr_storage,
-}
-#[repr(C, packed(4))]
-#[derive(Copy, Clone)]
-pub struct group_req {
-    pub gr_interface: u32,
-    pub gr_group: sockaddr_storage,
-}
-#[repr(C, packed(4))]
-#[derive(Copy, Clone)]
-pub struct group_source_req {
-    pub gsr_interface: u32,
-    pub gsr_group: sockaddr_storage,
-    pub gsr_source: sockaddr_storage,
-}
-#[repr(C, packed(4))]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct log2phys {
-    pub l2p_flags: ::std::os::raw::c_uint,
-    pub l2p_contigbytes: off_t,
-    pub l2p_devoffset: off_t,
 }
 impl<Storage, Align> __BindgenBitfieldUnit<Storage, Align>
 where
@@ -43061,6 +43061,7 @@ pub const S_IXUSR: u32 = 64;
 pub const ScanDirection_BackwardScanDirection: ScanDirection = -1;
 pub const ScanDirection_ForwardScanDirection: ScanDirection = 1;
 pub const ScanDirection_NoMovementScanDirection: ScanDirection = 0;
+pub const SelfItemPointerAttributeNumber: i32 = -1;
 pub const SessionBackupState_SESSION_BACKUP_EXCLUSIVE: SessionBackupState = 1;
 pub const SessionBackupState_SESSION_BACKUP_NONE: SessionBackupState = 0;
 pub const SessionBackupState_SESSION_BACKUP_NON_EXCLUSIVE: SessionBackupState = 2;

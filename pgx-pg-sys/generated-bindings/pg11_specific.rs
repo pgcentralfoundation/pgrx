@@ -3827,24 +3827,6 @@ pub union Value_ValUnion {
     _bindgen_union_align: u64,
 }
 #[repr(C)]
-#[derive(Debug)]
-pub struct ParamListInfoData {
-    pub paramFetch: ParamFetchHook,
-    pub paramFetchArg: *mut ::std::os::raw::c_void,
-    pub paramCompile: ParamCompileHook,
-    pub paramCompileArg: *mut ::std::os::raw::c_void,
-    pub parserSetup: ParserSetupHook,
-    pub parserSetupArg: *mut ::std::os::raw::c_void,
-    pub numParams: ::std::os::raw::c_int,
-    pub params: __IncompleteArrayField<ParamExternData>,
-}
-#[repr(C)]
-#[derive(Debug)]
-pub struct SharedSortInfo {
-    pub num_workers: ::std::os::raw::c_int,
-    pub sinstrument: __IncompleteArrayField<TuplesortInstrumentation>,
-}
-#[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct Agg {
     pub plan: Plan,
@@ -6020,43 +6002,6 @@ pub struct tupleConstr {
     pub has_not_null: bool,
 }
 #[repr(C)]
-#[derive(Debug, Default)]
-pub struct FormData_pg_index {
-    pub indexrelid: Oid,
-    pub indrelid: Oid,
-    pub indnatts: int16,
-    pub indnkeyatts: int16,
-    pub indisunique: bool,
-    pub indisprimary: bool,
-    pub indisexclusion: bool,
-    pub indimmediate: bool,
-    pub indisclustered: bool,
-    pub indisvalid: bool,
-    pub indcheckxmin: bool,
-    pub indisready: bool,
-    pub indislive: bool,
-    pub indisreplident: bool,
-    pub indkey: int2vector,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct ParallelHeapScanDescData {
-    pub phs_relid: Oid,
-    pub phs_syncscan: bool,
-    pub phs_nblocks: BlockNumber,
-    pub phs_mutex: slock_t,
-    pub phs_startblock: BlockNumber,
-    pub phs_nallocated: pg_atomic_uint64,
-    pub phs_snapshot_any: bool,
-    pub phs_snapshot_data: __IncompleteArrayField<::std::os::raw::c_char>,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct SharedHashInfo {
-    pub num_workers: ::std::os::raw::c_int,
-    pub hinstrument: __IncompleteArrayField<HashInstrumentation>,
-}
-#[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct AggClauseCosts {
     pub numAggs: ::std::os::raw::c_int,
@@ -6247,6 +6192,61 @@ pub struct xl_clog_truncate {
     pub pageno: ::std::os::raw::c_int,
     pub oldestXact: TransactionId,
     pub oldestXactDb: Oid,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct FormData_pg_index {
+    pub indexrelid: Oid,
+    pub indrelid: Oid,
+    pub indnatts: int16,
+    pub indnkeyatts: int16,
+    pub indisunique: bool,
+    pub indisprimary: bool,
+    pub indisexclusion: bool,
+    pub indimmediate: bool,
+    pub indisclustered: bool,
+    pub indisvalid: bool,
+    pub indcheckxmin: bool,
+    pub indisready: bool,
+    pub indislive: bool,
+    pub indisreplident: bool,
+    pub indkey: int2vector,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct ParallelHeapScanDescData {
+    pub phs_relid: Oid,
+    pub phs_syncscan: bool,
+    pub phs_nblocks: BlockNumber,
+    pub phs_mutex: slock_t,
+    pub phs_startblock: BlockNumber,
+    pub phs_nallocated: pg_atomic_uint64,
+    pub phs_snapshot_any: bool,
+    pub phs_snapshot_data: __IncompleteArrayField<::std::os::raw::c_char>,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct SharedHashInfo {
+    pub num_workers: ::std::os::raw::c_int,
+    pub hinstrument: __IncompleteArrayField<HashInstrumentation>,
+}
+#[repr(C)]
+#[derive(Debug)]
+pub struct ParamListInfoData {
+    pub paramFetch: ParamFetchHook,
+    pub paramFetchArg: *mut ::std::os::raw::c_void,
+    pub paramCompile: ParamCompileHook,
+    pub paramCompileArg: *mut ::std::os::raw::c_void,
+    pub parserSetup: ParserSetupHook,
+    pub parserSetupArg: *mut ::std::os::raw::c_void,
+    pub numParams: ::std::os::raw::c_int,
+    pub params: __IncompleteArrayField<ParamExternData>,
+}
+#[repr(C)]
+#[derive(Debug)]
+pub struct SharedSortInfo {
+    pub num_workers: ::std::os::raw::c_int,
+    pub sinstrument: __IncompleteArrayField<TuplesortInstrumentation>,
 }
 #[repr(C)]
 pub struct FormData_pg_trigger {
@@ -6699,6 +6699,7 @@ pub const FRAMEOPTION_START_OFFSET_PRECEDING: u32 = 2048;
 pub const FRAMEOPTION_START_UNBOUNDED_FOLLOWING: u32 = 128;
 pub const FRAMEOPTION_START_UNBOUNDED_PRECEDING: u32 = 32;
 pub const FirstBootstrapObjectId: u32 = 10000;
+pub const FirstLowInvalidHeapAttributeNumber: i32 = -8;
 pub const FuncDetailCode_FUNCDETAIL_AGGREGATE: FuncDetailCode = 4;
 pub const FuncDetailCode_FUNCDETAIL_COERCION: FuncDetailCode = 6;
 pub const FuncDetailCode_FUNCDETAIL_PROCEDURE: FuncDetailCode = 3;
@@ -6773,6 +6774,10 @@ pub const MACADDR8ARRAYOID: u32 = 775;
 pub const MACADDRARRAYOID: u32 = 1040;
 pub const MAX_CONVERSION_GROWTH: u32 = 4;
 pub const MONEYARRAYOID: u32 = 791;
+pub const MaxCommandIdAttributeNumber: i32 = -6;
+pub const MaxTransactionIdAttributeNumber: i32 = -5;
+pub const MinCommandIdAttributeNumber: i32 = -4;
+pub const MinTransactionIdAttributeNumber: i32 = -3;
 pub const MovedPartitionsOffsetNumber: u32 = 65533;
 pub const NAMEARRAYOID: u32 = 1003;
 pub const NUMERICARRAYOID: u32 = 1231;
@@ -7194,6 +7199,7 @@ pub const NodeTag_T_XmlExpr: NodeTag = 137;
 pub const NodeTag_T_XmlSerialize: NodeTag = 379;
 pub const OIDCHARS: u32 = 10;
 pub const OIDVECTORARRAYOID: u32 = 1013;
+pub const ObjectIdAttributeNumber: i32 = -2;
 pub const ObjectType_OBJECT_PROCEDURE: ObjectType = 28;
 pub const ObjectType_OBJECT_PUBLICATION: ObjectType = 29;
 pub const ObjectType_OBJECT_PUBLICATION_REL: ObjectType = 30;
@@ -7227,7 +7233,7 @@ pub const PG_LSNARRAYOID: u32 = 3221;
 pub const PG_MAJORVERSION: &'static [u8; 3usize] = b"11\0";
 pub const PG_VERSION: &'static [u8; 5usize] = b"11.8\0";
 pub const PG_VERSION_NUM: u32 = 110008;
-pub const PG_VERSION_STR : & 'static [ u8 ; 114usize ] = b"PostgreSQL 11.8 on x86_64-apple-darwin19.0.0, compiled by Apple clang version 11.0.0 (clang-1100.0.33.12), 64-bit\0" ;
+pub const PG_VERSION_STR : & 'static [u8 ; 114usize] = b"PostgreSQL 11.8 on x86_64-apple-darwin19.0.0, compiled by Apple clang version 11.0.0 (clang-1100.0.33.12), 64-bit\0" ;
 pub const POINTARRAYOID: u32 = 1017;
 pub const POLYGONARRAYOID: u32 = 1027;
 pub const PREDICATELOCK_MANAGER_LWLOCK_OFFSET: u32 = 190;
@@ -7352,6 +7358,7 @@ pub const TableLikeOption_CREATE_TABLE_LIKE_IDENTITY: TableLikeOption = 8;
 pub const TableLikeOption_CREATE_TABLE_LIKE_INDEXES: TableLikeOption = 16;
 pub const TableLikeOption_CREATE_TABLE_LIKE_STATISTICS: TableLikeOption = 32;
 pub const TableLikeOption_CREATE_TABLE_LIKE_STORAGE: TableLikeOption = 64;
+pub const TableOidAttributeNumber: i32 = -7;
 pub const TempNamespaceStatus_TEMP_NAMESPACE_IDLE: TempNamespaceStatus = 1;
 pub const TempNamespaceStatus_TEMP_NAMESPACE_IN_USE: TempNamespaceStatus = 2;
 pub const TempNamespaceStatus_TEMP_NAMESPACE_NOT_TEMP: TempNamespaceStatus = 0;
