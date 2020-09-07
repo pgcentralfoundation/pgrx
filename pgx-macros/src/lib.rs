@@ -457,14 +457,17 @@ fn parse_postgres_type_args(attributes: &[Attribute]) -> HashSet<PostgresTypeAtt
 
     for a in attributes {
         match a.path.to_token_stream().to_string().as_str() {
-            "inoutfuncs" => categorized_attributes.insert(PostgresTypeAttribute::InOutFuncs),
-            "pgvarlena_inoutfuncs" => {
-                categorized_attributes.insert(PostgresTypeAttribute::PgVarlenaInOutFuncs)
+            "inoutfuncs" => {
+                categorized_attributes.insert(PostgresTypeAttribute::InOutFuncs);
             }
-            _ => panic!(
-                "unrecognized PostgresType attribute: {}",
-                a.path.to_token_stream().to_string()
-            ),
+
+            "pgvarlena_inoutfuncs" => {
+                categorized_attributes.insert(PostgresTypeAttribute::PgVarlenaInOutFuncs);
+            }
+
+            _ => {
+                // we can just ignore attributes we don't understand
+            }
         };
     }
 
