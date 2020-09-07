@@ -239,12 +239,13 @@ fn generate_sql(rs_file: &DirEntry, default_schema: String) -> Vec<String> {
 #[allow(clippy::cognitive_complexity)]
 fn walk_items(
     rs_file: &DirEntry,
-    sql: &mut Vec<String>,
+    all_sql: &mut Vec<String>,
     items: Vec<Item>,
     schema_stack: &mut Vec<String>,
     default_schema: &str,
 ) {
-    let statement_cnt = sql.len();
+    let mut sql = Vec::new();
+    let mut postgres_enums = Vec::new();
     let mut postgres_types = Vec::new();
     let mut operator_sql = Vec::new();
     let current_schema = schema_stack
@@ -255,7 +256,7 @@ fn walk_items(
         if let Item::Mod(module) = item {
             if let Some((_, items)) = module.content {
                 schema_stack.push(module.ident.to_string());
-                walk_items(rs_file, sql, items, schema_stack, default_schema);
+                walk_items(rs_file, &mut sql, items, schema_stack, default_schema);
                 schema_stack.pop();
             }
         } else if let Item::Struct(strct) = item {
@@ -270,8 +271,7 @@ fn walk_items(
 
             if found_postgres_type {
                 let name = strct.ident.to_string().to_lowercase();
-                sql.push(format!("CREATE TYPE {}.{};", current_schema, name));
-
+                postgres_types.push(format!("CREATE TYPE {}.{};", current_schema, name));
                 postgres_types.push(format!("CREATE OR REPLACE FUNCTION {qualified_name}_in(cstring) RETURNS {qualified_name} IMMUTABLE STRICT LANGUAGE C AS 'MODULE_PATHNAME', '{name}_in_wrapper';", qualified_name = qualify_name(&current_schema, &name), name = name));
                 postgres_types.push(format!("CREATE OR REPLACE FUNCTION {qualified_name}_out({qualified_name}) RETURNS cstring IMMUTABLE STRICT LANGUAGE C AS 'MODULE_PATHNAME', '{name}_out_wrapper';", qualified_name = qualify_name(&current_schema, &name), name = name));
                 postgres_types.push(format!(
@@ -296,7 +296,7 @@ fn walk_items(
 
             if found_postgres_enum {
                 let name = enm.ident.to_string().to_lowercase();
-                sql.push(format!(
+                postgres_enums.push(format!(
                     "CREATE TYPE {qualified_name} AS ENUM (",
                     qualified_name = qualify_name(&current_schema, &name)
                 ));
@@ -308,9 +308,9 @@ fn walk_items(
                         line.push(',');
                     }
 
-                    sql.push(line);
+                    postgres_enums.push(line);
                 }
-                sql.push(");".to_string());
+                postgres_enums.push(");".to_string());
             }
         } else if let Item::Macro(makro) = item {
             let name = match makro.mac.path.get_ident() {
@@ -472,25 +472,25 @@ fn walk_items(
         }
     }
 
-    sql.append(&mut postgres_types);
-    sql.append(&mut operator_sql);
-
-    if sql.len() != statement_cnt {
-        // we added some statements, so inject a CREATE SCHEMA statement ahead of the statements
-        // we just generated
-        if current_schema != default_schema {
-            // pg_catalog is a reserved schema name that we can't even try to create
-            if current_schema != "pg_catalog" {
-                sql.insert(
-                    statement_cnt,
-                    format!(
-                        "CREATE SCHEMA IF NOT EXISTS {};",
-                        quote_ident_string(current_schema)
-                    ),
-                );
-            }
+    if !sql.is_empty() && current_schema != default_schema {
+        // pg_catalog is a reserved schema name that we can't even try to create
+        if current_schema != "pg_catalog" {
+            all_sql.push(format!(
+                "CREATE SCHEMA IF NOT EXISTS {};",
+                quote_ident_string(current_schema)
+            ));
         }
     }
+
+    // types (with their in/out functions) go first
+    all_sql.append(&mut postgres_enums);
+    all_sql.append(&mut postgres_types);
+
+    // then general sql (mostly just functions)
+    all_sql.append(&mut sql);
+
+    // and finally then operators
+    all_sql.append(&mut operator_sql);
 }
 
 fn qualify_name(schema: &str, name: &str) -> String {
