@@ -486,11 +486,11 @@ fn walk_items(
     all_sql.append(&mut postgres_enums);
     all_sql.append(&mut postgres_types);
 
-    // then operators
-    all_sql.append(&mut operator_sql);
-
-    // finally all other sql we might have created
+    // then general sql (mostly just functions)
     all_sql.append(&mut sql);
+
+    // and finally then operators
+    all_sql.append(&mut operator_sql);
 }
 
 fn qualify_name(schema: &str, name: &str) -> String {
