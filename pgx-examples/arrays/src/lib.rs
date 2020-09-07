@@ -3,6 +3,7 @@
 
 
 use pgx::*;
+use serde::*;
 
 pg_module_magic!();
 
@@ -62,6 +63,14 @@ fn strip_nulls(input: Vec<Option<i32>>) -> Vec<i32> {
         .filter(|i| i.is_some())
         .map(|i| i.unwrap())
         .collect()
+}
+
+#[derive(PostgresType, Serialize, Deserialize)]
+pub struct SomeStruct {}
+
+#[pg_extern]
+fn return_vec_of_customtype() -> Vec<SomeStruct> {
+    vec![SomeStruct {}]
 }
 
 #[cfg(any(test, feature = "pg_test"))]
