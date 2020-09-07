@@ -10,7 +10,7 @@ will generate all the standard equality/comparison SQL (and Rust) functions for 
 
 The `#[pg_operator]` macro is used to manually declare a function as a Postgres operator.
 
-Operator functions take one or two arguments and return non-void value.  The argument types and return types do not necessarily need to be identical.  
+Operator functions take one or two arguments and return a non-void value.  The argument types and return types do not necessarily need to be identical.  
 
 If, for example, you have a type, such as:
 
@@ -23,7 +23,7 @@ We can create a "concatenate" operator like so:
 
 ```rust
 #[pg_operator(immutable, parallel_safe)]
-#[opername(||)]
+#[opname(||)]
 fn mytype_concact(mut left: MyType, right: MyType) -> MyType {
     left.0.push_str(&right.0);
     left
@@ -45,7 +45,7 @@ And now, it'll be usable via SQL as:
 You'll notice that we used `#[pg_operator(immutable, parallel_safe)]`.  If those properties are true for your function,
 you should specify them.  The defaults are `volatile, parallel_unsafe`.
 
-The `#[opername(||)]` macro specifies the actual SQL operator name.
+The `#[opname(||)]` macro specifies the actual SQL operator name.
 
 The complete set of attributes that can be used with `#[pg_operator]`, which correspond
 to Postgres' [CREATE OPERATOR](https://www.postgresql.org/docs/12/sql-createoperator.html) 
