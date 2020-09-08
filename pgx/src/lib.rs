@@ -52,6 +52,7 @@ pub mod stringinfo;
 pub mod trigger_support;
 pub mod tupdesc;
 pub mod varlena;
+pub mod wrappers;
 pub mod xid;
 
 pub use callbacks::*;
@@ -75,6 +76,7 @@ pub use stringinfo::*;
 pub use trigger_support::*;
 pub use tupdesc::*;
 pub use varlena::*;
+pub use wrappers::*;
 pub use xid::*;
 
 pub use pgx_pg_sys as pg_sys; // the module only, not its contents

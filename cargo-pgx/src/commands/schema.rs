@@ -271,7 +271,10 @@ fn walk_items(
 
             if found_postgres_type {
                 let name = strct.ident.to_string().to_lowercase();
-                postgres_types.push(format!("CREATE TYPE {}.{};", current_schema, name));
+                postgres_types.push(format!(
+                    "CREATE TYPE {};",
+                    qualify_name(&current_schema, &name)
+                ));
                 postgres_types.push(format!("CREATE OR REPLACE FUNCTION {qualified_name}_in(cstring) RETURNS {qualified_name} IMMUTABLE STRICT LANGUAGE C AS 'MODULE_PATHNAME', '{name}_in_wrapper';", qualified_name = qualify_name(&current_schema, &name), name = name));
                 postgres_types.push(format!("CREATE OR REPLACE FUNCTION {qualified_name}_out({qualified_name}) RETURNS cstring IMMUTABLE STRICT LANGUAGE C AS 'MODULE_PATHNAME', '{name}_out_wrapper';", qualified_name = qualify_name(&current_schema, &name), name = name));
                 postgres_types.push(format!(
@@ -355,6 +358,7 @@ fn walk_items(
                             rs_file,
                             None,
                             &current_schema,
+                            schema_stack,
                         ) {
                             function_sql.push(location_comment(rs_file, &span));
                             function_sql.push(statement);
@@ -370,6 +374,7 @@ fn walk_items(
                             rs_file,
                             sql_func_args.clone(),
                             &current_schema,
+                            schema_stack,
                         ) {
                             function_sql.push(location_comment(rs_file, &span));
                             function_sql.push(statement);
@@ -388,6 +393,7 @@ fn walk_items(
                                 rs_file,
                                 sql_func_args.clone(),
                                 &current_schema,
+                                schema_stack,
                             )
                         {
                             if type_names.len() > 2 {
@@ -472,13 +478,19 @@ fn walk_items(
         }
     }
 
-    if !sql.is_empty() && current_schema != default_schema {
-        // pg_catalog is a reserved schema name that we can't even try to create
-        if current_schema != "pg_catalog" {
-            all_sql.push(format!(
-                "CREATE SCHEMA IF NOT EXISTS {};",
-                quote_ident_string(current_schema)
-            ));
+    if !sql.is_empty() {
+        if current_schema != default_schema {
+            // pg_catalog is a reserved schema name that we can't even try to create
+            if current_schema != "pg_catalog" {
+                all_sql.push(format!(
+                    "CREATE SCHEMA IF NOT EXISTS {};",
+                    quote_ident_string(current_schema.clone())
+                ));
+            }
+        }
+
+        if current_schema != "public" {
+            all_sql.push(format!("SET LOCAL search_path TO {};", current_schema));
         }
     }
 
@@ -507,6 +519,7 @@ fn make_create_function_statement(
     rs_file: &DirEntry,
     sql_func_arg: Option<String>,
     schema: &str,
+    schema_stack: &Vec<String>,
 ) -> (Option<String>, Option<String>, Option<Vec<String>>) {
     let exported_func_name = format!("{}_wrapper", func.sig.ident.to_string());
     let mut statement = String::new();
@@ -625,6 +638,19 @@ fn make_create_function_statement(
             }
         }
     }
+
+    let mut search_path = if get_property("relocatable") == Some("false".into()) {
+        String::from("@extschema@")
+    } else {
+        String::new()
+    };
+    for s in schema_stack.iter().rev().filter(|v| *v != "public") {
+        if !s.is_empty() {
+            search_path.push(',');
+        }
+        search_path.push_str(s);
+    }
+    statement.push_str(&format!(" SET search_path TO {}", search_path));
 
     statement.push_str(&format!(
         " LANGUAGE c AS 'MODULE_PATHNAME', '{}';",
