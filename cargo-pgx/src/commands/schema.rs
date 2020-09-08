@@ -650,7 +650,10 @@ fn make_create_function_statement(
         }
         search_path.push_str(s);
     }
-    statement.push_str(&format!(" SET search_path TO {}", search_path));
+
+    if !search_path.is_empty() {
+        statement.push_str(&format!(" SET search_path TO {}", search_path));
+    }
 
     statement.push_str(&format!(
         " LANGUAGE c AS 'MODULE_PATHNAME', '{}';",
