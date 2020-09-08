@@ -222,7 +222,7 @@ pub fn client() -> (postgres::Client, String) {
 
 fn install_extension() {
     eprintln!("installing extension");
-    let mut command = Command::new("cargo-pgx")
+    let mut command = Command::new("cargo")
         .arg("pgx")
         .arg("install")
         .stdout(Stdio::inherit())
