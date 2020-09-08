@@ -64,7 +64,7 @@ fn strip_nulls(input: Vec<Option<i32>>) -> Vec<i32> {
         .collect()
 }
 
-#[derive(PostgresType, Serialize, Deserialize, Debug, PartialEq)]
+#[derive(PostgresType, Serialize, Deserialize)]
 pub struct SomeStruct {}
 
 #[pg_extern]
