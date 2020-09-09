@@ -488,10 +488,6 @@ fn walk_items(
                 ));
             }
         }
-
-        if current_schema != "public" {
-            all_sql.push(format!("SET LOCAL search_path TO {};", current_schema));
-        }
     }
 
     // types (with their in/out functions) go first
@@ -645,7 +641,7 @@ fn make_create_function_statement(
         String::new()
     };
     for s in schema_stack.iter().rev().filter(|v| *v != "public") {
-        if !s.is_empty() {
+        if !search_path.is_empty() {
             search_path.push(',');
         }
         search_path.push_str(s);
