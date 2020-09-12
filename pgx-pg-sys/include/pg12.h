@@ -49,6 +49,7 @@
 #include "optimizer/restrictinfo.h"
 #include "parser/parse_func.h"
 #include "parser/parse_type.h"
+#include "parser/parser.h"
 #include "postmaster/bgworker.h"
 #include "storage/block.h"
 #include "storage/lwlock.h"
