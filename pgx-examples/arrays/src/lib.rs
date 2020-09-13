@@ -1,7 +1,6 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-
 use pgx::*;
 use serde::*;
 
@@ -65,7 +64,7 @@ fn strip_nulls(input: Vec<Option<i32>>) -> Vec<i32> {
         .collect()
 }
 
-#[derive(PostgresType, Serialize, Deserialize)]
+#[derive(PostgresType, Serialize, Deserialize, Debug, Eq, PartialEq)]
 pub struct SomeStruct {}
 
 #[pg_extern]
@@ -73,24 +72,9 @@ fn return_vec_of_customtype() -> Vec<SomeStruct> {
     vec![SomeStruct {}]
 }
 
-#[cfg(any(test, feature = "pg_test"))]
-mod tests {
-    use pgx::*;
-
-    #[pg_test]
-    fn test_it() {
-        // do testing here.
-        //
-        // #[pg_test] functions run *inside* Postgres and have access to all Postgres internals
-        //
-        // Normal #[test] functions do not
-        //
-        // In either case, they all run in parallel
-    }
-}
-
 #[cfg(test)]
 pub mod pg_test {
+
     pub fn setup(_options: Vec<&str>) {
         // perform one-off initialization when the pg_test framework starts
     }
@@ -98,5 +82,18 @@ pub mod pg_test {
     pub fn postgresql_conf_options() -> Vec<&'static str> {
         // return any postgresql.conf settings that are required for your tests
         vec![]
+    }
+}
+
+#[cfg(any(test, feature = "pg_test"))]
+pub mod tests {
+    use crate::SomeStruct;
+    use pgx::*;
+    #[pg_test]
+    fn test_vec_of_customtype() {
+        let customvec =
+            Spi::get_one::<Vec<SomeStruct>>("SELECT arrays.return_vec_of_customtype();")
+                .expect("SQL select failed");
+        assert_eq!(customvec, vec![SomeStruct {}]);
     }
 }

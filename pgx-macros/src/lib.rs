@@ -253,10 +253,7 @@ fn impl_postgres_enum(ast: DeriveInput) -> proc_macro2::TokenStream {
             }
 
             fn type_oid() -> pg_sys::Oid {
-                unsafe {
-                    pgx::direct_function_call::<pgx::pg_sys::Oid>(pgx::pg_sys::regtypein, vec![#enum_name.into_datum()])
-                        .expect("failed to lookup typeoid")
-                }
+                pgx::regtypein(#enum_name)
             }
 
         }
