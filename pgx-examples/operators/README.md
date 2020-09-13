@@ -33,10 +33,10 @@ fn mytype_concact(mut left: MyType, right: MyType) -> MyType {
 And now, it'll be usable via SQL as:
 
 ```sql
-# SELECT '["hello "]' || '["world"]';
+# SELECT '"hello "' || '"world"';
  ?column? 
 ----------
- ["hello world"]
+ "hello world"
 (1 row)
 ```
 
