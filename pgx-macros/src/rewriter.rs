@@ -463,7 +463,6 @@ impl PgGuardRewriter {
 
         quote_spanned! {func.span()=>
             #prolog
-            #[no_mangle]
             #vis #sig {
                 #[allow(non_snake_case)]
                 #func
