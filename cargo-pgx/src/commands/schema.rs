@@ -635,16 +635,22 @@ fn make_create_function_statement(
         }
     }
 
-    let mut search_path = if get_property("relocatable") == Some("false".into()) {
-        String::from("@extschema@")
-    } else {
-        String::new()
-    };
-    for s in schema_stack.iter().rev().filter(|v| *v != "public") {
-        if !search_path.is_empty() {
-            search_path.push(',');
+    let mut search_path = String::new();
+    for s in schema_stack.iter().rev().filter(|v| *v != "public").chain(
+        vec![if get_property("relocatable") == Some("false".into()) {
+            String::from("@extschema@")
+        } else {
+            // this shouldn't happen as we catch it long before we get here
+            exit_with_error!("pgx extensions are not relocatable")
+        }]
+        .iter(),
+    ) {
+        if !s.is_empty() {
+            if !search_path.is_empty() {
+                search_path.push(',');
+            }
+            search_path.push_str(s);
         }
-        search_path.push_str(s);
     }
 
     if !search_path.is_empty() {
