@@ -19,7 +19,7 @@
 
         // More than one feature will also cause problems and for now
         // we support few enough postgres versions that the cobinatorics
-        // do not make this check to bad. It might have to be ditched
+        // do not make this check too bad. It might have to be ditched
         // when/if more versions are supported though.
         all(feature = "pg10", feature = "pg11", feature = "pg12"),
         all(feature = "pg10", feature = "pg11"),
