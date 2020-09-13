@@ -1,5 +1,5 @@
 comment = 'custom_types:  Created by pgx'
 default_version = '1.0'
 module_pathname = '$libdir/custom_types'
-relocatable = true
+relocatable = false
 superuser = false

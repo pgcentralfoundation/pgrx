@@ -222,7 +222,7 @@ pub fn client() -> (postgres::Client, String) {
 
 fn install_extension() {
     eprintln!("installing extension");
-    let mut command = Command::new("cargo-pgx")
+    let mut command = Command::new("cargo")
         .arg("pgx")
         .arg("install")
         .stdout(Stdio::inherit())
@@ -323,7 +323,7 @@ fn monitor_pg(mut command: Command, cmd_string: String, loglines: LogLines) -> (
         let pid = child.id();
 
         eprintln!(
-            "{}, pid={}",
+            "{}\npid={}",
             cmd_string.bold().blue(),
             pid.to_string().yellow()
         );

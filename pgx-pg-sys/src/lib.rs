@@ -12,6 +12,23 @@
 #![allow(improper_ctypes)]
 #![allow(clippy::unneeded_field_pattern)]
 
+#[cfg(
+    any(
+        // no features at all will cause problems
+        not(any(feature = "pg10", feature = "pg11", feature = "pg12")),
+
+        // More than one feature will also cause problems and for now
+        // we support few enough postgres versions that the cobinatorics
+        // do not make this check too bad. It might have to be ditched
+        // when/if more versions are supported though.
+        all(feature = "pg10", feature = "pg11", feature = "pg12"),
+        all(feature = "pg10", feature = "pg11"),
+        all(feature = "pg10", feature = "pg12"),
+        all(feature = "pg11", feature = "pg10"),
+        all(feature = "pg11", feature = "pg12")
+  ))]
+std::compile_error!("exactly one one feature must be provided (pg10, pg11, or pg12)");
+
 pub mod submodules;
 pub use submodules::guard;
 pub use submodules::*;
