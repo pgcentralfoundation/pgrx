@@ -448,7 +448,7 @@ impl PgGuardRewriter {
             quote! { pg_sys::guard::guard( || #func_name(#arg_list) ) }
         };
 
-        let prolog = if input_func_name.to_string().eq("_PG_init") {
+        let prolog = if input_func_name == "_PG_init" || input_func_name == "_PG_fini" {
             quote! {
                 #[allow(non_snake_case)]
                 #[no_mangle]
