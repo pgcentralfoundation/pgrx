@@ -171,17 +171,6 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
-    #[link_name = "\u{1}_select$1050"]
-    pub fn select(
-        arg1: ::std::os::raw::c_int,
-        arg2: *mut fd_set,
-        arg3: *mut fd_set,
-        arg4: *mut fd_set,
-        arg5: *mut timeval,
-    ) -> ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
     #[link_name = "\u{1}_telldir$INODE64"]
     pub fn telldir(arg1: *mut DIR) -> ::std::os::raw::c_long;
 }
@@ -572,13 +561,6 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
-    pub fn BIG5toCNS(
-        big5: ::std::os::raw::c_ushort,
-        lc: *mut ::std::os::raw::c_uchar,
-    ) -> ::std::os::raw::c_ushort;
-}
-#[pg_guard]
-extern "C" {
     pub fn BackendPidGetProc(pid: ::std::os::raw::c_int) -> *mut PGPROC;
 }
 #[pg_guard]
@@ -679,13 +661,6 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
-    pub fn CNStoBIG5(
-        cns: ::std::os::raw::c_ushort,
-        lc: ::std::os::raw::c_uchar,
-    ) -> ::std::os::raw::c_ushort;
-}
-#[pg_guard]
-extern "C" {
     pub fn CachedPlanGetTargetList(
         plansource: *mut CachedPlanSource,
         queryEnv: *mut QueryEnvironment,
@@ -782,10 +757,6 @@ extern "C" {
 #[pg_guard]
 extern "C" {
     pub fn CheckXLogRemoved(segno: XLogSegNo, tli: TimeLineID);
-}
-#[pg_guard]
-extern "C" {
-    pub fn ClientAuthentication(port: *mut Port);
 }
 #[pg_guard]
 extern "C" {
@@ -2652,14 +2623,6 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
-    pub fn GetDatabaseEncoding() -> ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
-    pub fn GetDatabaseEncodingName() -> *const ::std::os::raw::c_char;
-}
-#[pg_guard]
-extern "C" {
     pub fn GetDatabasePath(dbNode: Oid, spcNode: Oid) -> *mut ::std::os::raw::c_char;
 }
 #[pg_guard]
@@ -2801,10 +2764,6 @@ extern "C" {
 #[pg_guard]
 extern "C" {
     pub fn GetMemoryChunkSpace(pointer: *mut ::std::os::raw::c_void) -> Size;
-}
-#[pg_guard]
-extern "C" {
-    pub fn GetMessageEncoding() -> ::std::os::raw::c_int;
 }
 #[pg_guard]
 extern "C" {
@@ -3243,10 +3202,6 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
-    pub fn InitializeClientEncoding();
-}
-#[pg_guard]
-extern "C" {
     pub fn InitializeGUCOptions();
 }
 #[pg_guard]
@@ -3487,19 +3442,6 @@ extern "C" {
 #[pg_guard]
 extern "C" {
     pub fn LocalExecuteInvalidationMessage(msg: *mut SharedInvalidationMessage);
-}
-#[pg_guard]
-extern "C" {
-    pub fn LocalToUtf(
-        iso: *const ::std::os::raw::c_uchar,
-        len: ::std::os::raw::c_int,
-        utf: *mut ::std::os::raw::c_uchar,
-        map: *const pg_mb_radix_tree,
-        cmap: *const pg_local_to_utf_combined,
-        cmapsize: ::std::os::raw::c_int,
-        conv_func: utf_local_conversion_func,
-        encoding: ::std::os::raw::c_int,
-    );
 }
 #[pg_guard]
 extern "C" {
@@ -4292,10 +4234,6 @@ extern "C" {
 #[pg_guard]
 extern "C" {
     pub fn PreCommit_on_commit_actions();
-}
-#[pg_guard]
-extern "C" {
-    pub fn PrepareClientEncoding(encoding: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
 }
 #[pg_guard]
 extern "C" {
@@ -5581,10 +5519,6 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
-    pub fn SetClientEncoding(encoding: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
     pub fn SetConfigOption(
         name: *const ::std::os::raw::c_char,
         value: *const ::std::os::raw::c_char,
@@ -5606,10 +5540,6 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
-    pub fn SetDatabaseEncoding(encoding: ::std::os::raw::c_int);
-}
-#[pg_guard]
-extern "C" {
     pub fn SetDatabasePath(path: *const ::std::os::raw::c_char);
 }
 #[pg_guard]
@@ -5619,10 +5549,6 @@ extern "C" {
 #[pg_guard]
 extern "C" {
     pub fn SetLatch(latch: *mut Latch);
-}
-#[pg_guard]
-extern "C" {
-    pub fn SetMessageEncoding(encoding: ::std::os::raw::c_int);
 }
 #[pg_guard]
 extern "C" {
@@ -6110,19 +6036,6 @@ extern "C" {
 #[pg_guard]
 extern "C" {
     pub fn UpdateFullPageWrites();
-}
-#[pg_guard]
-extern "C" {
-    pub fn UtfToLocal(
-        utf: *const ::std::os::raw::c_uchar,
-        len: ::std::os::raw::c_int,
-        iso: *mut ::std::os::raw::c_uchar,
-        map: *const pg_mb_radix_tree,
-        cmap: *const pg_utf_to_local_combined,
-        cmapsize: ::std::os::raw::c_int,
-        conv_func: utf_local_conversion_func,
-        encoding: ::std::os::raw::c_int,
-    );
 }
 #[pg_guard]
 extern "C" {
@@ -6789,10 +6702,6 @@ extern "C" {
 #[pg_guard]
 extern "C" {
     pub fn add_size(s1: Size, s2: Size) -> Size;
-}
-#[pg_guard]
-extern "C" {
-    pub fn adjtime(arg1: *const timeval, arg2: *mut timeval) -> ::std::os::raw::c_int;
 }
 #[pg_guard]
 extern "C" {
@@ -8922,16 +8831,6 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
-    pub fn check_encoding_conversion_args(
-        src_encoding: ::std::os::raw::c_int,
-        dest_encoding: ::std::os::raw::c_int,
-        len: ::std::os::raw::c_int,
-        expected_src_encoding: ::std::os::raw::c_int,
-        expected_dest_encoding: ::std::os::raw::c_int,
-    );
-}
-#[pg_guard]
-extern "C" {
     pub fn check_encoding_locale_matches(
         encoding: ::std::os::raw::c_int,
         collate: *const ::std::os::raw::c_char,
@@ -9027,15 +8926,6 @@ extern "C" {
         extra: *mut *mut ::std::os::raw::c_void,
         source: GucSource,
     ) -> bool;
-}
-#[pg_guard]
-extern "C" {
-    pub fn check_usermap(
-        usermap_name: *const ::std::os::raw::c_char,
-        pg_role: *const ::std::os::raw::c_char,
-        auth_user: *const ::std::os::raw::c_char,
-        case_sensitive: bool,
-    ) -> ::std::os::raw::c_int;
 }
 #[pg_guard]
 extern "C" {
@@ -12595,10 +12485,6 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
-    pub fn futimes(arg1: ::std::os::raw::c_int, arg2: *const timeval) -> ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
     pub fn fwrite(
         __ptr: *const ::std::os::raw::c_void,
         __size: ::std::os::raw::c_ulong,
@@ -12980,12 +12866,6 @@ extern "C" {
 #[pg_guard]
 extern "C" {
     pub fn get_element_type(typid: Oid) -> Oid;
-}
-#[pg_guard]
-extern "C" {
-    pub fn get_encoding_name_for_icu(
-        encoding: ::std::os::raw::c_int,
-    ) -> *const ::std::os::raw::c_char;
 }
 #[pg_guard]
 extern "C" {
@@ -13747,10 +13627,6 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
-    pub fn getitimer(arg1: ::std::os::raw::c_int, arg2: *mut itimerval) -> ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
     pub fn getline(
         __linep: *mut *mut ::std::os::raw::c_char,
         __linecapp: *mut usize,
@@ -13945,13 +13821,6 @@ extern "C" {
         arg1: *mut *mut ::std::os::raw::c_char,
         arg2: *const *mut ::std::os::raw::c_char,
         arg3: *mut *mut ::std::os::raw::c_char,
-    ) -> ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
-    pub fn gettimeofday(
-        arg1: *mut timeval,
-        arg2: *mut ::std::os::raw::c_void,
     ) -> ::std::os::raw::c_int;
 }
 #[pg_guard]
@@ -14733,10 +14602,6 @@ extern "C" {
         rel1: *mut RelOptInfo,
         rel2: *mut RelOptInfo,
     ) -> bool;
-}
-#[pg_guard]
-extern "C" {
-    pub fn hba_getauthmethod(port: *mut hbaPort);
 }
 #[pg_guard]
 extern "C" {
@@ -16604,10 +16469,6 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
-    pub fn is_encoding_supported_by_icu(encoding: ::std::os::raw::c_int) -> bool;
-}
-#[pg_guard]
-extern "C" {
     pub fn is_member_of_role(member: Oid, role: Oid) -> bool;
 }
 #[pg_guard]
@@ -17149,27 +17010,6 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
-    pub fn latin2mic(
-        l: *const ::std::os::raw::c_uchar,
-        p: *mut ::std::os::raw::c_uchar,
-        len: ::std::os::raw::c_int,
-        lc: ::std::os::raw::c_int,
-        encoding: ::std::os::raw::c_int,
-    );
-}
-#[pg_guard]
-extern "C" {
-    pub fn latin2mic_with_table(
-        l: *const ::std::os::raw::c_uchar,
-        p: *mut ::std::os::raw::c_uchar,
-        len: ::std::os::raw::c_int,
-        lc: ::std::os::raw::c_int,
-        encoding: ::std::os::raw::c_int,
-        tab: *const ::std::os::raw::c_uchar,
-    );
-}
-#[pg_guard]
-extern "C" {
     pub fn lcong48(arg1: *mut ::std::os::raw::c_ushort);
 }
 #[pg_guard]
@@ -17496,25 +17336,6 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
-    pub fn load_hba() -> bool;
-}
-#[pg_guard]
-extern "C" {
-    pub fn load_ident() -> bool;
-}
-#[pg_guard]
-extern "C" {
-    pub fn local2local(
-        l: *const ::std::os::raw::c_uchar,
-        p: *mut ::std::os::raw::c_uchar,
-        len: ::std::os::raw::c_int,
-        src_encoding: ::std::os::raw::c_int,
-        dest_encoding: ::std::os::raw::c_int,
-        tab: *const ::std::os::raw::c_uchar,
-    );
-}
-#[pg_guard]
-extern "C" {
     pub fn localeconv() -> *mut lconv;
 }
 #[pg_guard]
@@ -17799,13 +17620,6 @@ extern "C" {
 #[pg_guard]
 extern "C" {
     pub fn ltrim1(fcinfo: FunctionCallInfo) -> Datum;
-}
-#[pg_guard]
-extern "C" {
-    pub fn lutimes(
-        arg1: *const ::std::os::raw::c_char,
-        arg2: *const timeval,
-    ) -> ::std::os::raw::c_int;
 }
 #[pg_guard]
 extern "C" {
@@ -18547,27 +18361,6 @@ extern "C" {
         __width: usize,
         __compar: *mut ::std::os::raw::c_void,
     ) -> ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
-    pub fn mic2latin(
-        mic: *const ::std::os::raw::c_uchar,
-        p: *mut ::std::os::raw::c_uchar,
-        len: ::std::os::raw::c_int,
-        lc: ::std::os::raw::c_int,
-        encoding: ::std::os::raw::c_int,
-    );
-}
-#[pg_guard]
-extern "C" {
-    pub fn mic2latin_with_table(
-        mic: *const ::std::os::raw::c_uchar,
-        p: *mut ::std::os::raw::c_uchar,
-        len: ::std::os::raw::c_int,
-        lc: ::std::os::raw::c_int,
-        encoding: ::std::os::raw::c_int,
-        tab: *const ::std::os::raw::c_uchar,
-    );
 }
 #[pg_guard]
 extern "C" {
@@ -19864,22 +19657,6 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
-    pub fn pg_any_to_server(
-        s: *const ::std::os::raw::c_char,
-        len: ::std::os::raw::c_int,
-        encoding: ::std::os::raw::c_int,
-    ) -> *mut ::std::os::raw::c_char;
-}
-#[pg_guard]
-extern "C" {
-    pub fn pg_ascii2mic(
-        l: *const ::std::os::raw::c_uchar,
-        p: *mut ::std::os::raw::c_uchar,
-        len: ::std::os::raw::c_int,
-    );
-}
-#[pg_guard]
-extern "C" {
     pub fn pg_ascii_tolower(ch: ::std::os::raw::c_uchar) -> ::std::os::raw::c_uchar;
 }
 #[pg_guard]
@@ -19952,25 +19729,6 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
-    pub fn pg_char_and_wchar_strcmp(
-        s1: *const ::std::os::raw::c_char,
-        s2: *const pg_wchar,
-    ) -> ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
-    pub fn pg_char_and_wchar_strncmp(
-        s1: *const ::std::os::raw::c_char,
-        s2: *const pg_wchar,
-        n: usize,
-    ) -> ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
-    pub fn pg_char_to_encoding(name: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
     pub fn pg_check_dir(dir: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
 }
 #[pg_guard]
@@ -19989,13 +19747,6 @@ extern "C" {
 #[pg_guard]
 extern "C" {
     pub fn pg_client_encoding(fcinfo: FunctionCallInfo) -> Datum;
-}
-#[pg_guard]
-extern "C" {
-    pub fn pg_client_to_server(
-        s: *const ::std::os::raw::c_char,
-        len: ::std::os::raw::c_int,
-    ) -> *mut ::std::os::raw::c_char;
 }
 #[pg_guard]
 extern "C" {
@@ -20128,14 +19879,6 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
-    pub fn pg_database_encoding_character_incrementer() -> mbcharacter_incrementer;
-}
-#[pg_guard]
-extern "C" {
-    pub fn pg_database_encoding_max_length() -> ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
     pub fn pg_database_ownercheck(db_oid: Oid, roleid: Oid) -> bool;
 }
 #[pg_guard]
@@ -20200,81 +19943,11 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
-    pub fn pg_do_encoding_conversion(
-        src: *mut ::std::os::raw::c_uchar,
-        len: ::std::os::raw::c_int,
-        src_encoding: ::std::os::raw::c_int,
-        dest_encoding: ::std::os::raw::c_int,
-    ) -> *mut ::std::os::raw::c_uchar;
-}
-#[pg_guard]
-extern "C" {
     pub fn pg_drop_replication_slot(fcinfo: FunctionCallInfo) -> Datum;
 }
 #[pg_guard]
 extern "C" {
-    pub fn pg_dsplen(mbstr: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
-    pub fn pg_encoding_dsplen(
-        encoding: ::std::os::raw::c_int,
-        mbstr: *const ::std::os::raw::c_char,
-    ) -> ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
-    pub fn pg_encoding_max_length(encoding: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
     pub fn pg_encoding_max_length_sql(fcinfo: FunctionCallInfo) -> Datum;
-}
-#[pg_guard]
-extern "C" {
-    pub fn pg_encoding_mb2wchar_with_len(
-        encoding: ::std::os::raw::c_int,
-        from: *const ::std::os::raw::c_char,
-        to: *mut pg_wchar,
-        len: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
-    pub fn pg_encoding_mbcliplen(
-        encoding: ::std::os::raw::c_int,
-        mbstr: *const ::std::os::raw::c_char,
-        len: ::std::os::raw::c_int,
-        limit: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
-    pub fn pg_encoding_mblen(
-        encoding: ::std::os::raw::c_int,
-        mbstr: *const ::std::os::raw::c_char,
-    ) -> ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
-    pub fn pg_encoding_to_char(encoding: ::std::os::raw::c_int) -> *const ::std::os::raw::c_char;
-}
-#[pg_guard]
-extern "C" {
-    pub fn pg_encoding_verifymb(
-        encoding: ::std::os::raw::c_int,
-        mbstr: *const ::std::os::raw::c_char,
-        len: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
-    pub fn pg_encoding_wchar2mb_with_len(
-        encoding: ::std::os::raw::c_int,
-        from: *const pg_wchar,
-        to: *mut ::std::os::raw::c_char,
-        len: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
 }
 #[pg_guard]
 extern "C" {
@@ -20377,14 +20050,6 @@ extern "C" {
 #[pg_guard]
 extern "C" {
     pub fn pg_function_is_visible(fcinfo: FunctionCallInfo) -> Datum;
-}
-#[pg_guard]
-extern "C" {
-    pub fn pg_get_client_encoding() -> ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
-    pub fn pg_get_client_encoding_name() -> *const ::std::os::raw::c_char;
 }
 #[pg_guard]
 extern "C" {
@@ -20617,10 +20282,6 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
-    pub fn pg_isblank(c: ::std::os::raw::c_char) -> bool;
-}
-#[pg_guard]
-extern "C" {
     pub fn pg_isolation_test_session_is_blocked(fcinfo: FunctionCallInfo) -> Datum;
 }
 #[pg_guard]
@@ -20820,72 +20481,10 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
-    pub fn pg_mb2wchar(
-        from: *const ::std::os::raw::c_char,
-        to: *mut pg_wchar,
-    ) -> ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
-    pub fn pg_mb2wchar_with_len(
-        from: *const ::std::os::raw::c_char,
-        to: *mut pg_wchar,
-        len: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
-    pub fn pg_mbcharcliplen(
-        mbstr: *const ::std::os::raw::c_char,
-        len: ::std::os::raw::c_int,
-        imit: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
-    pub fn pg_mbcliplen(
-        mbstr: *const ::std::os::raw::c_char,
-        len: ::std::os::raw::c_int,
-        limit: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
-    pub fn pg_mblen(mbstr: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
-    pub fn pg_mbstrlen(mbstr: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
-    pub fn pg_mbstrlen_with_len(
-        mbstr: *const ::std::os::raw::c_char,
-        len: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
-    pub fn pg_mic2ascii(
-        mic: *const ::std::os::raw::c_uchar,
-        p: *mut ::std::os::raw::c_uchar,
-        len: ::std::os::raw::c_int,
-    );
-}
-#[pg_guard]
-extern "C" {
-    pub fn pg_mic_mblen(mbstr: *const ::std::os::raw::c_uchar) -> ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
     pub fn pg_mkdir_p(
         path: *mut ::std::os::raw::c_char,
         omode: ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
-    pub fn pg_mule_mblen(mbstr: *const ::std::os::raw::c_uchar) -> ::std::os::raw::c_int;
 }
 #[pg_guard]
 extern "C" {
@@ -21091,50 +20690,6 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
-    pub fn pg_regcomp(
-        arg1: *mut regex_t,
-        arg2: *const pg_wchar,
-        arg3: usize,
-        arg4: ::std::os::raw::c_int,
-        arg5: Oid,
-    ) -> ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
-    pub fn pg_regerror(
-        arg1: ::std::os::raw::c_int,
-        arg2: *const regex_t,
-        arg3: *mut ::std::os::raw::c_char,
-        arg4: usize,
-    ) -> usize;
-}
-#[pg_guard]
-extern "C" {
-    pub fn pg_regexec(
-        arg1: *mut regex_t,
-        arg2: *const pg_wchar,
-        arg3: usize,
-        arg4: usize,
-        arg5: *mut rm_detail_t,
-        arg6: usize,
-        arg7: *mut regmatch_t,
-        arg8: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
-    pub fn pg_regfree(arg1: *mut regex_t);
-}
-#[pg_guard]
-extern "C" {
-    pub fn pg_regprefix(
-        arg1: *mut regex_t,
-        arg2: *mut *mut pg_wchar,
-        arg3: *mut usize,
-    ) -> ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
     pub fn pg_relation_filenode(fcinfo: FunctionCallInfo) -> Datum;
 }
 #[pg_guard]
@@ -21216,21 +20771,6 @@ extern "C" {
 #[pg_guard]
 extern "C" {
     pub fn pg_sequence_parameters(fcinfo: FunctionCallInfo) -> Datum;
-}
-#[pg_guard]
-extern "C" {
-    pub fn pg_server_to_any(
-        s: *const ::std::os::raw::c_char,
-        len: ::std::os::raw::c_int,
-        encoding: ::std::os::raw::c_int,
-    ) -> *mut ::std::os::raw::c_char;
-}
-#[pg_guard]
-extern "C" {
-    pub fn pg_server_to_client(
-        s: *const ::std::os::raw::c_char,
-        len: ::std::os::raw::c_int,
-    ) -> *mut ::std::os::raw::c_char;
 }
 #[pg_guard]
 extern "C" {
@@ -21883,55 +21423,6 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
-    pub fn pg_utf8_islegal(
-        source: *const ::std::os::raw::c_uchar,
-        length: ::std::os::raw::c_int,
-    ) -> bool;
-}
-#[pg_guard]
-extern "C" {
-    pub fn pg_utf_mblen(arg1: *const ::std::os::raw::c_uchar) -> ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
-    pub fn pg_valid_client_encoding(name: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
-    pub fn pg_valid_server_encoding(name: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
-    pub fn pg_valid_server_encoding_id(encoding: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
-    pub fn pg_verify_mbstr(
-        encoding: ::std::os::raw::c_int,
-        mbstr: *const ::std::os::raw::c_char,
-        len: ::std::os::raw::c_int,
-        noError: bool,
-    ) -> bool;
-}
-#[pg_guard]
-extern "C" {
-    pub fn pg_verify_mbstr_len(
-        encoding: ::std::os::raw::c_int,
-        mbstr: *const ::std::os::raw::c_char,
-        len: ::std::os::raw::c_int,
-        noError: bool,
-    ) -> ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
-    pub fn pg_verifymbstr(
-        mbstr: *const ::std::os::raw::c_char,
-        len: ::std::os::raw::c_int,
-        noError: bool,
-    ) -> bool;
-}
-#[pg_guard]
-extern "C" {
     pub fn pg_wal_lsn_diff(fcinfo: FunctionCallInfo) -> Datum;
 }
 #[pg_guard]
@@ -21949,33 +21440,6 @@ extern "C" {
 #[pg_guard]
 extern "C" {
     pub fn pg_walfile_name_offset(fcinfo: FunctionCallInfo) -> Datum;
-}
-#[pg_guard]
-extern "C" {
-    pub fn pg_wchar2mb(
-        from: *const pg_wchar,
-        to: *mut ::std::os::raw::c_char,
-    ) -> ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
-    pub fn pg_wchar2mb_with_len(
-        from: *const pg_wchar,
-        to: *mut ::std::os::raw::c_char,
-        len: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
-    pub fn pg_wchar_strlen(wstr: *const pg_wchar) -> usize;
-}
-#[pg_guard]
-extern "C" {
-    pub fn pg_wchar_strncmp(
-        s1: *const pg_wchar,
-        s2: *const pg_wchar,
-        n: usize,
-    ) -> ::std::os::raw::c_int;
 }
 #[pg_guard]
 extern "C" {
@@ -22504,39 +21968,6 @@ extern "C" {
         buffer: *mut ::std::os::raw::c_char,
         buflen: usize,
         result: *mut *mut passwd,
-    ) -> ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
-    pub fn pq_getkeepalivescount(port: *mut Port) -> ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
-    pub fn pq_getkeepalivesidle(port: *mut Port) -> ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
-    pub fn pq_getkeepalivesinterval(port: *mut Port) -> ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
-    pub fn pq_setkeepalivescount(
-        count: ::std::os::raw::c_int,
-        port: *mut Port,
-    ) -> ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
-    pub fn pq_setkeepalivesidle(
-        idle: ::std::os::raw::c_int,
-        port: *mut Port,
-    ) -> ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
-    pub fn pq_setkeepalivesinterval(
-        interval: ::std::os::raw::c_int,
-        port: *mut Port,
     ) -> ::std::os::raw::c_int;
 }
 #[pg_guard]
@@ -23714,23 +23145,6 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
-    pub fn report_invalid_encoding(
-        encoding: ::std::os::raw::c_int,
-        mbstr: *const ::std::os::raw::c_char,
-        len: ::std::os::raw::c_int,
-    );
-}
-#[pg_guard]
-extern "C" {
-    pub fn report_untranslatable_char(
-        src_encoding: ::std::os::raw::c_int,
-        dest_encoding: ::std::os::raw::c_int,
-        mbstr: *const ::std::os::raw::c_char,
-        len: ::std::os::raw::c_int,
-    );
-}
-#[pg_guard]
-extern "C" {
     pub fn resetStringInfo(str_: StringInfo);
 }
 #[pg_guard]
@@ -24194,14 +23608,6 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
-    pub fn setitimer(
-        arg1: ::std::os::raw::c_int,
-        arg2: *const itimerval,
-        arg3: *mut itimerval,
-    ) -> ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
     pub fn setjmp(arg1: *mut ::std::os::raw::c_int) -> ::std::os::raw::c_int;
 }
 #[pg_guard]
@@ -24292,10 +23698,6 @@ extern "C" {
 #[pg_guard]
 extern "C" {
     pub fn setstate(arg1: *const ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
-}
-#[pg_guard]
-extern "C" {
-    pub fn settimeofday(arg1: *const timeval, arg2: *const timezone) -> ::std::os::raw::c_int;
 }
 #[pg_guard]
 extern "C" {
@@ -27150,13 +26552,6 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
-    pub fn unicode_to_utf8(
-        c: pg_wchar,
-        utf8string: *mut ::std::os::raw::c_uchar,
-    ) -> *mut ::std::os::raw::c_uchar;
-}
-#[pg_guard]
-extern "C" {
     pub fn unique_key_recheck(fcinfo: FunctionCallInfo) -> Datum;
 }
 #[pg_guard]
@@ -27225,17 +26620,6 @@ extern "C" {
 #[pg_guard]
 extern "C" {
     pub fn user_from_uid(arg1: uid_t, arg2: ::std::os::raw::c_int) -> *mut ::std::os::raw::c_char;
-}
-#[pg_guard]
-extern "C" {
-    pub fn utf8_to_unicode(c: *const ::std::os::raw::c_uchar) -> pg_wchar;
-}
-#[pg_guard]
-extern "C" {
-    pub fn utimes(
-        arg1: *const ::std::os::raw::c_char,
-        arg2: *const timeval,
-    ) -> ::std::os::raw::c_int;
 }
 #[pg_guard]
 extern "C" {
@@ -27838,10 +27222,6 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
-    pub static mut ClientAuthentication_hook: ClientAuthentication_hook_type;
-}
-#[pg_guard]
-extern "C" {
     pub static mut ConfigFileName: *mut ::std::os::raw::c_char;
 }
 #[pg_guard]
@@ -27963,10 +27343,6 @@ extern "C" {
 #[pg_guard]
 extern "C" {
     pub static mut FirstSnapshotSet: bool;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut FrontendProtocol: ProtocolVersion;
 }
 #[pg_guard]
 extern "C" {
@@ -28733,30 +28109,6 @@ extern "C" {
             len: usize,
         ) -> pg_crc32c,
     >;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut pg_enc2gettext_tbl: [pg_enc2gettext; 0usize];
-}
-#[pg_guard]
-extern "C" {
-    pub static mut pg_enc2name_tbl: [pg_enc2name; 0usize];
-}
-#[pg_guard]
-extern "C" {
-    pub static mut pg_krb_caseins_users: bool;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut pg_krb_realm: *mut ::std::os::raw::c_char;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut pg_krb_server_keyfile: *mut ::std::os::raw::c_char;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut pg_wchar_table: [pg_wchar_tbl; 0usize];
 }
 #[pg_guard]
 extern "C" {
@@ -31754,15 +31106,6 @@ pub struct HeapTupleData {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct IdentLine {
-    pub linenumber: ::std::os::raw::c_int,
-    pub usermap: *mut ::std::os::raw::c_char,
-    pub ident_user: *mut ::std::os::raw::c_char,
-    pub pg_role: *mut ::std::os::raw::c_char,
-    pub re: regex_t,
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
 pub struct IdentifySystemCmd {
     pub type_: NodeTag,
 }
@@ -32719,6 +32062,11 @@ pub struct PlannerParamItem {
     pub type_: NodeTag,
     pub item: *mut Node,
     pub paramId: ::std::os::raw::c_int,
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct Port {
+    _unused: [u8; 0],
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -34135,48 +33483,6 @@ pub struct passwd {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct pg_enc2gettext {
-    pub encoding: pg_enc,
-    pub name: *const ::std::os::raw::c_char,
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct pg_enc2name {
-    pub name: *const ::std::os::raw::c_char,
-    pub encoding: pg_enc,
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct pg_mb_radix_tree {
-    pub chars16: *const uint16,
-    pub chars32: *const uint32,
-    pub b1root: uint32,
-    pub b1_lower: uint8,
-    pub b1_upper: uint8,
-    pub b2root: uint32,
-    pub b2_1_lower: uint8,
-    pub b2_1_upper: uint8,
-    pub b2_2_lower: uint8,
-    pub b2_2_upper: uint8,
-    pub b3root: uint32,
-    pub b3_1_lower: uint8,
-    pub b3_1_upper: uint8,
-    pub b3_2_lower: uint8,
-    pub b3_2_upper: uint8,
-    pub b3_3_lower: uint8,
-    pub b3_3_upper: uint8,
-    pub b4root: uint32,
-    pub b4_1_lower: uint8,
-    pub b4_1_upper: uint8,
-    pub b4_2_lower: uint8,
-    pub b4_2_upper: uint8,
-    pub b4_3_lower: uint8,
-    pub b4_3_upper: uint8,
-    pub b4_4_lower: uint8,
-    pub b4_4_upper: uint8,
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
 pub struct pg_tm {
     pub tm_sec: ::std::os::raw::c_int,
     pub tm_min: ::std::os::raw::c_int,
@@ -34206,18 +33512,6 @@ pub struct protoent {
     pub p_name: *mut ::std::os::raw::c_char,
     pub p_aliases: *mut *mut ::std::os::raw::c_char,
     pub p_proto: ::std::os::raw::c_int,
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct regex_t {
-    pub re_magic: ::std::os::raw::c_int,
-    pub re_nsub: usize,
-    pub re_info: ::std::os::raw::c_long,
-    pub re_csize: ::std::os::raw::c_int,
-    pub re_endp: *mut ::std::os::raw::c_char,
-    pub re_collation: Oid,
-    pub re_guts: *mut ::std::os::raw::c_char,
-    pub re_fns: *mut ::std::os::raw::c_char,
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -35132,15 +34426,6 @@ pub struct binaryheap {
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
-pub struct clockinfo {
-    pub hz: ::std::os::raw::c_int,
-    pub tick: ::std::os::raw::c_int,
-    pub tickadj: ::std::os::raw::c_int,
-    pub stathz: ::std::os::raw::c_int,
-    pub profhz: ::std::os::raw::c_int,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
 pub struct cmsghdr {
     pub cmsg_len: socklen_t,
     pub cmsg_level: ::std::os::raw::c_int,
@@ -35244,12 +34529,6 @@ pub struct ip_mreqn {
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
-pub struct itimerval {
-    pub it_interval: timeval,
-    pub it_value: timeval,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
 pub struct ldiv_t {
     pub quot: ::std::os::raw::c_long,
     pub rem: ::std::os::raw::c_long,
@@ -35283,30 +34562,6 @@ pub struct pg_atomic_uint64 {
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
-pub struct pg_local_to_utf_combined {
-    pub code: uint32,
-    pub utf1: uint32,
-    pub utf2: uint32,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct pg_utf_to_local_combined {
-    pub utf1: uint32,
-    pub utf2: uint32,
-    pub code: uint32,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct pg_wchar_tbl {
-    pub mb2wchar_with_len: mb2wchar_with_len_converter,
-    pub wchar2mb_with_len: wchar2mb_with_len_converter,
-    pub mblen: mblen_converter,
-    pub dsplen: mbdisplaylen_converter,
-    pub mbverify: mbverifier,
-    pub maxmblen: ::std::os::raw::c_int,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
 pub struct proc_rlimit_control_wakeupmon {
     pub wm_flags: u32,
     pub wm_rate: i32,
@@ -35337,20 +34592,9 @@ pub struct radvisory {
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
-pub struct regmatch_t {
-    pub rm_so: regoff_t,
-    pub rm_eo: regoff_t,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
 pub struct rlimit {
     pub rlim_cur: rlim_t,
     pub rlim_max: rlim_t,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct rm_detail_t {
-    pub rm_extend: regmatch_t,
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
@@ -35546,47 +34790,6 @@ pub struct sockproto {
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
-pub struct tcp_connection_info {
-    pub tcpi_state: u_int8_t,
-    pub tcpi_snd_wscale: u_int8_t,
-    pub tcpi_rcv_wscale: u_int8_t,
-    pub __pad1: u_int8_t,
-    pub tcpi_options: u_int32_t,
-    pub tcpi_flags: u_int32_t,
-    pub tcpi_rto: u_int32_t,
-    pub tcpi_maxseg: u_int32_t,
-    pub tcpi_snd_ssthresh: u_int32_t,
-    pub tcpi_snd_cwnd: u_int32_t,
-    pub tcpi_snd_wnd: u_int32_t,
-    pub tcpi_snd_sbbytes: u_int32_t,
-    pub tcpi_rcv_wnd: u_int32_t,
-    pub tcpi_rttcur: u_int32_t,
-    pub tcpi_srtt: u_int32_t,
-    pub tcpi_rttvar: u_int32_t,
-    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 4usize], u32>,
-    pub tcpi_txpackets: u_int64_t,
-    pub tcpi_txbytes: u_int64_t,
-    pub tcpi_txretransmitbytes: u_int64_t,
-    pub tcpi_rxpackets: u_int64_t,
-    pub tcpi_rxbytes: u_int64_t,
-    pub tcpi_rxoutoforderbytes: u_int64_t,
-    pub tcpi_txretransmitpackets: u_int64_t,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct tcphdr {
-    pub th_sport: ::std::os::raw::c_ushort,
-    pub th_dport: ::std::os::raw::c_ushort,
-    pub th_seq: tcp_seq,
-    pub th_ack: tcp_seq,
-    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 1usize], u8>,
-    pub th_flags: ::std::os::raw::c_uchar,
-    pub th_win: ::std::os::raw::c_ushort,
-    pub th_sum: ::std::os::raw::c_ushort,
-    pub th_urp: ::std::os::raw::c_ushort,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
 pub struct timespec {
     pub tv_sec: __darwin_time_t,
     pub tv_nsec: ::std::os::raw::c_long,
@@ -35596,18 +34799,6 @@ pub struct timespec {
 pub struct timeval {
     pub tv_sec: __darwin_time_t,
     pub tv_usec: __darwin_suseconds_t,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct timeval64 {
-    pub tv_sec: __int64_t,
-    pub tv_usec: __int64_t,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct timezone {
-    pub tz_minuteswest: ::std::os::raw::c_int,
-    pub tz_dsttime: ::std::os::raw::c_int,
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
@@ -37286,11 +36477,6 @@ impl Default for HashState {
         unsafe { ::std::mem::zeroed() }
     }
 }
-impl Default for HbaLine {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
 impl Default for HeapTupleData {
     fn default() -> Self {
         unsafe { ::std::mem::zeroed() }
@@ -37312,11 +36498,6 @@ impl Default for HeapTupleHeaderData {
     }
 }
 impl Default for HeapTupleHeaderData__bindgen_ty_1 {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-impl Default for IdentLine {
     fn default() -> Self {
         unsafe { ::std::mem::zeroed() }
     }
@@ -38092,11 +37273,6 @@ impl Default for PlannerInfo {
     }
 }
 impl Default for PlannerParamItem {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-impl Default for Port {
     fn default() -> Self {
         unsafe { ::std::mem::zeroed() }
     }
@@ -39166,32 +38342,12 @@ impl Default for passwd {
         unsafe { ::std::mem::zeroed() }
     }
 }
-impl Default for pg_enc2gettext {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-impl Default for pg_enc2name {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-impl Default for pg_mb_radix_tree {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
 impl Default for pg_tm {
     fn default() -> Self {
         unsafe { ::std::mem::zeroed() }
     }
 }
 impl Default for protoent {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-impl Default for regex_t {
     fn default() -> Self {
         unsafe { ::std::mem::zeroed() }
     }
@@ -39793,323 +38949,6 @@ impl __darwin_fp_status {
         __bindgen_bitfield_unit
     }
 }
-impl tcp_connection_info {
-    #[inline]
-    pub fn tcpi_tfo_cookie_req(&self) -> u_int32_t {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(0usize, 1u8) as u32) }
-    }
-    #[inline]
-    pub fn set_tcpi_tfo_cookie_req(&mut self, val: u_int32_t) {
-        unsafe {
-            let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(0usize, 1u8, val as u64)
-        }
-    }
-    #[inline]
-    pub fn tcpi_tfo_cookie_rcv(&self) -> u_int32_t {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(1usize, 1u8) as u32) }
-    }
-    #[inline]
-    pub fn set_tcpi_tfo_cookie_rcv(&mut self, val: u_int32_t) {
-        unsafe {
-            let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(1usize, 1u8, val as u64)
-        }
-    }
-    #[inline]
-    pub fn tcpi_tfo_syn_loss(&self) -> u_int32_t {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(2usize, 1u8) as u32) }
-    }
-    #[inline]
-    pub fn set_tcpi_tfo_syn_loss(&mut self, val: u_int32_t) {
-        unsafe {
-            let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(2usize, 1u8, val as u64)
-        }
-    }
-    #[inline]
-    pub fn tcpi_tfo_syn_data_sent(&self) -> u_int32_t {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(3usize, 1u8) as u32) }
-    }
-    #[inline]
-    pub fn set_tcpi_tfo_syn_data_sent(&mut self, val: u_int32_t) {
-        unsafe {
-            let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(3usize, 1u8, val as u64)
-        }
-    }
-    #[inline]
-    pub fn tcpi_tfo_syn_data_acked(&self) -> u_int32_t {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(4usize, 1u8) as u32) }
-    }
-    #[inline]
-    pub fn set_tcpi_tfo_syn_data_acked(&mut self, val: u_int32_t) {
-        unsafe {
-            let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(4usize, 1u8, val as u64)
-        }
-    }
-    #[inline]
-    pub fn tcpi_tfo_syn_data_rcv(&self) -> u_int32_t {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(5usize, 1u8) as u32) }
-    }
-    #[inline]
-    pub fn set_tcpi_tfo_syn_data_rcv(&mut self, val: u_int32_t) {
-        unsafe {
-            let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(5usize, 1u8, val as u64)
-        }
-    }
-    #[inline]
-    pub fn tcpi_tfo_cookie_req_rcv(&self) -> u_int32_t {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(6usize, 1u8) as u32) }
-    }
-    #[inline]
-    pub fn set_tcpi_tfo_cookie_req_rcv(&mut self, val: u_int32_t) {
-        unsafe {
-            let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(6usize, 1u8, val as u64)
-        }
-    }
-    #[inline]
-    pub fn tcpi_tfo_cookie_sent(&self) -> u_int32_t {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(7usize, 1u8) as u32) }
-    }
-    #[inline]
-    pub fn set_tcpi_tfo_cookie_sent(&mut self, val: u_int32_t) {
-        unsafe {
-            let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(7usize, 1u8, val as u64)
-        }
-    }
-    #[inline]
-    pub fn tcpi_tfo_cookie_invalid(&self) -> u_int32_t {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(8usize, 1u8) as u32) }
-    }
-    #[inline]
-    pub fn set_tcpi_tfo_cookie_invalid(&mut self, val: u_int32_t) {
-        unsafe {
-            let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(8usize, 1u8, val as u64)
-        }
-    }
-    #[inline]
-    pub fn tcpi_tfo_cookie_wrong(&self) -> u_int32_t {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(9usize, 1u8) as u32) }
-    }
-    #[inline]
-    pub fn set_tcpi_tfo_cookie_wrong(&mut self, val: u_int32_t) {
-        unsafe {
-            let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(9usize, 1u8, val as u64)
-        }
-    }
-    #[inline]
-    pub fn tcpi_tfo_no_cookie_rcv(&self) -> u_int32_t {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(10usize, 1u8) as u32) }
-    }
-    #[inline]
-    pub fn set_tcpi_tfo_no_cookie_rcv(&mut self, val: u_int32_t) {
-        unsafe {
-            let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(10usize, 1u8, val as u64)
-        }
-    }
-    #[inline]
-    pub fn tcpi_tfo_heuristics_disable(&self) -> u_int32_t {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(11usize, 1u8) as u32) }
-    }
-    #[inline]
-    pub fn set_tcpi_tfo_heuristics_disable(&mut self, val: u_int32_t) {
-        unsafe {
-            let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(11usize, 1u8, val as u64)
-        }
-    }
-    #[inline]
-    pub fn tcpi_tfo_send_blackhole(&self) -> u_int32_t {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(12usize, 1u8) as u32) }
-    }
-    #[inline]
-    pub fn set_tcpi_tfo_send_blackhole(&mut self, val: u_int32_t) {
-        unsafe {
-            let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(12usize, 1u8, val as u64)
-        }
-    }
-    #[inline]
-    pub fn tcpi_tfo_recv_blackhole(&self) -> u_int32_t {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(13usize, 1u8) as u32) }
-    }
-    #[inline]
-    pub fn set_tcpi_tfo_recv_blackhole(&mut self, val: u_int32_t) {
-        unsafe {
-            let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(13usize, 1u8, val as u64)
-        }
-    }
-    #[inline]
-    pub fn tcpi_tfo_onebyte_proxy(&self) -> u_int32_t {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(14usize, 1u8) as u32) }
-    }
-    #[inline]
-    pub fn set_tcpi_tfo_onebyte_proxy(&mut self, val: u_int32_t) {
-        unsafe {
-            let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(14usize, 1u8, val as u64)
-        }
-    }
-    #[inline]
-    pub fn __pad2(&self) -> u_int32_t {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(15usize, 17u8) as u32) }
-    }
-    #[inline]
-    pub fn set___pad2(&mut self, val: u_int32_t) {
-        unsafe {
-            let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(15usize, 17u8, val as u64)
-        }
-    }
-    #[inline]
-    pub fn new_bitfield_1(
-        tcpi_tfo_cookie_req: u_int32_t,
-        tcpi_tfo_cookie_rcv: u_int32_t,
-        tcpi_tfo_syn_loss: u_int32_t,
-        tcpi_tfo_syn_data_sent: u_int32_t,
-        tcpi_tfo_syn_data_acked: u_int32_t,
-        tcpi_tfo_syn_data_rcv: u_int32_t,
-        tcpi_tfo_cookie_req_rcv: u_int32_t,
-        tcpi_tfo_cookie_sent: u_int32_t,
-        tcpi_tfo_cookie_invalid: u_int32_t,
-        tcpi_tfo_cookie_wrong: u_int32_t,
-        tcpi_tfo_no_cookie_rcv: u_int32_t,
-        tcpi_tfo_heuristics_disable: u_int32_t,
-        tcpi_tfo_send_blackhole: u_int32_t,
-        tcpi_tfo_recv_blackhole: u_int32_t,
-        tcpi_tfo_onebyte_proxy: u_int32_t,
-        __pad2: u_int32_t,
-    ) -> __BindgenBitfieldUnit<[u8; 4usize], u32> {
-        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize], u32> =
-            Default::default();
-        __bindgen_bitfield_unit.set(0usize, 1u8, {
-            let tcpi_tfo_cookie_req: u32 = unsafe { ::std::mem::transmute(tcpi_tfo_cookie_req) };
-            tcpi_tfo_cookie_req as u64
-        });
-        __bindgen_bitfield_unit.set(1usize, 1u8, {
-            let tcpi_tfo_cookie_rcv: u32 = unsafe { ::std::mem::transmute(tcpi_tfo_cookie_rcv) };
-            tcpi_tfo_cookie_rcv as u64
-        });
-        __bindgen_bitfield_unit.set(2usize, 1u8, {
-            let tcpi_tfo_syn_loss: u32 = unsafe { ::std::mem::transmute(tcpi_tfo_syn_loss) };
-            tcpi_tfo_syn_loss as u64
-        });
-        __bindgen_bitfield_unit.set(3usize, 1u8, {
-            let tcpi_tfo_syn_data_sent: u32 =
-                unsafe { ::std::mem::transmute(tcpi_tfo_syn_data_sent) };
-            tcpi_tfo_syn_data_sent as u64
-        });
-        __bindgen_bitfield_unit.set(4usize, 1u8, {
-            let tcpi_tfo_syn_data_acked: u32 =
-                unsafe { ::std::mem::transmute(tcpi_tfo_syn_data_acked) };
-            tcpi_tfo_syn_data_acked as u64
-        });
-        __bindgen_bitfield_unit.set(5usize, 1u8, {
-            let tcpi_tfo_syn_data_rcv: u32 =
-                unsafe { ::std::mem::transmute(tcpi_tfo_syn_data_rcv) };
-            tcpi_tfo_syn_data_rcv as u64
-        });
-        __bindgen_bitfield_unit.set(6usize, 1u8, {
-            let tcpi_tfo_cookie_req_rcv: u32 =
-                unsafe { ::std::mem::transmute(tcpi_tfo_cookie_req_rcv) };
-            tcpi_tfo_cookie_req_rcv as u64
-        });
-        __bindgen_bitfield_unit.set(7usize, 1u8, {
-            let tcpi_tfo_cookie_sent: u32 = unsafe { ::std::mem::transmute(tcpi_tfo_cookie_sent) };
-            tcpi_tfo_cookie_sent as u64
-        });
-        __bindgen_bitfield_unit.set(8usize, 1u8, {
-            let tcpi_tfo_cookie_invalid: u32 =
-                unsafe { ::std::mem::transmute(tcpi_tfo_cookie_invalid) };
-            tcpi_tfo_cookie_invalid as u64
-        });
-        __bindgen_bitfield_unit.set(9usize, 1u8, {
-            let tcpi_tfo_cookie_wrong: u32 =
-                unsafe { ::std::mem::transmute(tcpi_tfo_cookie_wrong) };
-            tcpi_tfo_cookie_wrong as u64
-        });
-        __bindgen_bitfield_unit.set(10usize, 1u8, {
-            let tcpi_tfo_no_cookie_rcv: u32 =
-                unsafe { ::std::mem::transmute(tcpi_tfo_no_cookie_rcv) };
-            tcpi_tfo_no_cookie_rcv as u64
-        });
-        __bindgen_bitfield_unit.set(11usize, 1u8, {
-            let tcpi_tfo_heuristics_disable: u32 =
-                unsafe { ::std::mem::transmute(tcpi_tfo_heuristics_disable) };
-            tcpi_tfo_heuristics_disable as u64
-        });
-        __bindgen_bitfield_unit.set(12usize, 1u8, {
-            let tcpi_tfo_send_blackhole: u32 =
-                unsafe { ::std::mem::transmute(tcpi_tfo_send_blackhole) };
-            tcpi_tfo_send_blackhole as u64
-        });
-        __bindgen_bitfield_unit.set(13usize, 1u8, {
-            let tcpi_tfo_recv_blackhole: u32 =
-                unsafe { ::std::mem::transmute(tcpi_tfo_recv_blackhole) };
-            tcpi_tfo_recv_blackhole as u64
-        });
-        __bindgen_bitfield_unit.set(14usize, 1u8, {
-            let tcpi_tfo_onebyte_proxy: u32 =
-                unsafe { ::std::mem::transmute(tcpi_tfo_onebyte_proxy) };
-            tcpi_tfo_onebyte_proxy as u64
-        });
-        __bindgen_bitfield_unit.set(15usize, 17u8, {
-            let __pad2: u32 = unsafe { ::std::mem::transmute(__pad2) };
-            __pad2 as u64
-        });
-        __bindgen_bitfield_unit
-    }
-}
-impl tcphdr {
-    #[inline]
-    pub fn th_x2(&self) -> ::std::os::raw::c_uint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(0usize, 4u8) as u32) }
-    }
-    #[inline]
-    pub fn set_th_x2(&mut self, val: ::std::os::raw::c_uint) {
-        unsafe {
-            let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(0usize, 4u8, val as u64)
-        }
-    }
-    #[inline]
-    pub fn th_off(&self) -> ::std::os::raw::c_uint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(4usize, 4u8) as u32) }
-    }
-    #[inline]
-    pub fn set_th_off(&mut self, val: ::std::os::raw::c_uint) {
-        unsafe {
-            let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(4usize, 4u8, val as u64)
-        }
-    }
-    #[inline]
-    pub fn new_bitfield_1(
-        th_x2: ::std::os::raw::c_uint,
-        th_off: ::std::os::raw::c_uint,
-    ) -> __BindgenBitfieldUnit<[u8; 1usize], u8> {
-        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> =
-            Default::default();
-        __bindgen_bitfield_unit.set(0usize, 4u8, {
-            let th_x2: u32 = unsafe { ::std::mem::transmute(th_x2) };
-            th_x2 as u64
-        });
-        __bindgen_bitfield_unit.set(4usize, 4u8, {
-            let th_off: u32 = unsafe { ::std::mem::transmute(th_off) };
-            th_off as u64
-        });
-        __bindgen_bitfield_unit
-    }
-}
 impl wait__bindgen_ty_1 {
     #[inline]
     pub fn w_Termsig(&self) -> ::std::os::raw::c_uint {
@@ -40558,12 +39397,6 @@ pub const BoolTestType_IS_TRUE: BoolTestType = 0;
 pub const BoolTestType_IS_UNKNOWN: BoolTestType = 4;
 pub const CACHEDPLANSOURCE_MAGIC: u32 = 195726186;
 pub const CACHEDPLAN_MAGIC: u32 = 953717834;
-pub const CAC_state_CAC_OK: CAC_state = 0;
-pub const CAC_state_CAC_RECOVERY: CAC_state = 3;
-pub const CAC_state_CAC_SHUTDOWN: CAC_state = 2;
-pub const CAC_state_CAC_STARTUP: CAC_state = 1;
-pub const CAC_state_CAC_TOOMANY: CAC_state = 4;
-pub const CAC_state_CAC_WAITBACKUP: CAC_state = 5;
 pub const CASHOID: u32 = 790;
 pub const CENTURY: u32 = 26;
 pub const CHARCLASS_NAME_MAX: u32 = 14;
@@ -40645,10 +39478,6 @@ pub const CommandDest_DestSQLFunction: CommandDest = 9;
 pub const CommandDest_DestTransientRel: CommandDest = 10;
 pub const CommandDest_DestTupleQueue: CommandDest = 11;
 pub const CommandDest_DestTuplestore: CommandDest = 6;
-pub const ConnType_ctHost: ConnType = 1;
-pub const ConnType_ctHostNoSSL: ConnType = 3;
-pub const ConnType_ctHostSSL: ConnType = 2;
-pub const ConnType_ctLocal: ConnType = 0;
 pub const ConstrType_CONSTR_DEFAULT: ConstrType = 2;
 pub const ConstrType_CONSTR_IDENTITY: ConstrType = 3;
 pub const ConstrType_CONSTR_NOTNULL: ConstrType = 1;
@@ -40727,13 +39556,6 @@ pub const DSM_IMPL_MMAP: u32 = 4;
 pub const DSM_IMPL_POSIX: u32 = 1;
 pub const DSM_IMPL_SYSV: u32 = 2;
 pub const DSM_IMPL_WINDOWS: u32 = 3;
-pub const DST_AUST: u32 = 2;
-pub const DST_CAN: u32 = 6;
-pub const DST_EET: u32 = 5;
-pub const DST_MET: u32 = 4;
-pub const DST_NONE: u32 = 0;
-pub const DST_USA: u32 = 1;
-pub const DST_WET: u32 = 3;
 pub const DTERR_BAD_FORMAT: i32 = -1;
 pub const DTERR_FIELD_OVERFLOW: i32 = -2;
 pub const DTERR_INTERVAL_OVERFLOW: i32 = -4;
@@ -41479,10 +40301,6 @@ pub const IPCTL_RTMINEXPIRE: u32 = 6;
 pub const IPCTL_SENDREDIRECTS: u32 = 2;
 pub const IPCTL_SOURCEROUTE: u32 = 8;
 pub const IPCTL_STATS: u32 = 12;
-pub const IPCompareMethod_ipCmpAll: IPCompareMethod = 3;
-pub const IPCompareMethod_ipCmpMask: IPCompareMethod = 0;
-pub const IPCompareMethod_ipCmpSameHost: IPCompareMethod = 1;
-pub const IPCompareMethod_ipCmpSameNet: IPCompareMethod = 2;
 pub const IPPORT_HIFIRSTAUTO: u32 = 49152;
 pub const IPPORT_HILASTAUTO: u32 = 65535;
 pub const IPPORT_RESERVEDSTART: u32 = 600;
@@ -41745,9 +40563,6 @@ pub const IP_TTL: u32 = 4;
 pub const IP_UNBLOCK_SOURCE: u32 = 73;
 pub const ISODATE: u32 = 22;
 pub const ISOTIME: u32 = 23;
-pub const ITIMER_PROF: u32 = 2;
-pub const ITIMER_REAL: u32 = 0;
-pub const ITIMER_VIRTUAL: u32 = 1;
 pub const ImportForeignSchemaType_FDW_IMPORT_SCHEMA_ALL: ImportForeignSchemaType = 0;
 pub const ImportForeignSchemaType_FDW_IMPORT_SCHEMA_EXCEPT: ImportForeignSchemaType = 2;
 pub const ImportForeignSchemaType_FDW_IMPORT_SCHEMA_LIMIT_TO: ImportForeignSchemaType = 1;
@@ -41895,63 +40710,13 @@ pub const KEV_INET_SIFNETMASK: u32 = 6;
 pub const KEV_INET_SUBCLASS: u32 = 1;
 pub const LANGUAGE_HANDLEROID: u32 = 2280;
 pub const LATE: &'static [u8; 9usize] = b"infinity\0";
-pub const LCPRV1_A: u32 = 154;
-pub const LCPRV1_B: u32 = 155;
-pub const LCPRV2_A: u32 = 156;
-pub const LCPRV2_B: u32 = 157;
 pub const LC_ALL: u32 = 0;
-pub const LC_ARABIC_1_COLUMN: u32 = 165;
-pub const LC_ARABIC_2_COLUMN: u32 = 168;
-pub const LC_ARABIC_DIGIT: u32 = 164;
-pub const LC_ASCII_RIGHT_TO_LEFT: u32 = 166;
-pub const LC_BIG5_1: u32 = 152;
-pub const LC_BIG5_2: u32 = 153;
-pub const LC_CNS11643_1: u32 = 149;
-pub const LC_CNS11643_2: u32 = 150;
-pub const LC_CNS11643_3: u32 = 246;
-pub const LC_CNS11643_4: u32 = 247;
-pub const LC_CNS11643_5: u32 = 248;
-pub const LC_CNS11643_6: u32 = 249;
-pub const LC_CNS11643_7: u32 = 250;
 pub const LC_COLLATE: u32 = 1;
 pub const LC_CTYPE: u32 = 2;
-pub const LC_ETHIOPIC: u32 = 245;
-pub const LC_GB2312_80: u32 = 145;
-pub const LC_INDIAN_1_COLUMN: u32 = 240;
-pub const LC_INDIAN_2_COLUMN: u32 = 251;
-pub const LC_IPA: u32 = 161;
-pub const LC_ISO8859_1: u32 = 129;
-pub const LC_ISO8859_15: u32 = 142;
-pub const LC_ISO8859_2: u32 = 130;
-pub const LC_ISO8859_3: u32 = 131;
-pub const LC_ISO8859_4: u32 = 132;
-pub const LC_ISO8859_5: u32 = 140;
-pub const LC_ISO8859_6: u32 = 135;
-pub const LC_ISO8859_7: u32 = 134;
-pub const LC_ISO8859_8: u32 = 136;
-pub const LC_ISO8859_9: u32 = 141;
-pub const LC_JISX0201K: u32 = 137;
-pub const LC_JISX0201R: u32 = 138;
-pub const LC_JISX0208: u32 = 146;
-pub const LC_JISX0208_1978: u32 = 144;
-pub const LC_JISX0212: u32 = 148;
-pub const LC_JISX0213_1: u32 = 151;
-pub const LC_KOI8_R: u32 = 139;
-pub const LC_KS5601: u32 = 147;
-pub const LC_LAO: u32 = 167;
 pub const LC_MESSAGES: u32 = 6;
 pub const LC_MONETARY: u32 = 3;
 pub const LC_NUMERIC: u32 = 4;
-pub const LC_SISHENG: u32 = 160;
-pub const LC_TIBETAN: u32 = 252;
-pub const LC_TIBETAN_1_COLUMN: u32 = 241;
 pub const LC_TIME: u32 = 5;
-pub const LC_TIS620: u32 = 133;
-pub const LC_UNICODE_SUBSET: u32 = 244;
-pub const LC_UNICODE_SUBSET_2: u32 = 242;
-pub const LC_UNICODE_SUBSET_3: u32 = 243;
-pub const LC_VISCII_LOWER: u32 = 162;
-pub const LC_VISCII_UPPER: u32 = 163;
 pub const LINEOID: u32 = 628;
 pub const LINE_MAX: u32 = 2048;
 pub const LINK_MAX: u32 = 32767;
@@ -42044,10 +40809,7 @@ pub const MAX_INPUT: u32 = 1024;
 pub const MAX_INTERVAL_PRECISION: u32 = 6;
 pub const MAX_KILOBYTES: u32 = 2147483647;
 pub const MAX_LOCKMODES: u32 = 10;
-pub const MAX_MULTIBYTE_CHAR_LEN: u32 = 4;
-pub const MAX_SACK_BLKS: u32 = 6;
 pub const MAX_STARTUP_PACKET_LENGTH: u32 = 10000;
-pub const MAX_TCPOPTLEN: u32 = 40;
 pub const MAX_TIMESTAMP_PRECISION: u32 = 6;
 pub const MAX_TIME_PRECISION: u32 = 6;
 pub const MAX_TZDISP_HOUR: u32 = 15;
@@ -42327,7 +41089,6 @@ pub const PERFORM_DELETION_INTERNAL: u32 = 1;
 pub const PERFORM_DELETION_QUIETLY: u32 = 4;
 pub const PERFORM_DELETION_SKIP_EXTENSIONS: u32 = 16;
 pub const PERFORM_DELETION_SKIP_ORIGINAL: u32 = 8;
-pub const PERSIST_TIMEOUT: u32 = 64;
 pub const PF_APPLETALK: u32 = 16;
 pub const PF_CCITT: u32 = 10;
 pub const PF_CHAOS: u32 = 5;
@@ -42569,69 +41330,6 @@ pub const REGPROCOID: u32 = 24;
 pub const REGROLEOID: u32 = 4096;
 pub const REGTYPEARRAYOID: u32 = 2211;
 pub const REGTYPEOID: u32 = 2206;
-pub const REG_ADVANCED: u32 = 3;
-pub const REG_ADVF: u32 = 2;
-pub const REG_ASSERT: u32 = 15;
-pub const REG_ATOI: u32 = 101;
-pub const REG_BADBR: u32 = 10;
-pub const REG_BADOPT: u32 = 18;
-pub const REG_BADPAT: u32 = 2;
-pub const REG_BADRPT: u32 = 13;
-pub const REG_BASIC: u32 = 0;
-pub const REG_BOSONLY: u32 = 1024;
-pub const REG_CANCEL: u32 = 21;
-pub const REG_DUMP: u32 = 2048;
-pub const REG_EBRACE: u32 = 9;
-pub const REG_EBRACK: u32 = 7;
-pub const REG_ECOLLATE: u32 = 3;
-pub const REG_ECOLORS: u32 = 20;
-pub const REG_ECTYPE: u32 = 4;
-pub const REG_EESCAPE: u32 = 5;
-pub const REG_EPAREN: u32 = 8;
-pub const REG_ERANGE: u32 = 11;
-pub const REG_ESPACE: u32 = 12;
-pub const REG_ESUBREG: u32 = 6;
-pub const REG_ETOOBIG: u32 = 19;
-pub const REG_EXACT: i32 = -2;
-pub const REG_EXPANDED: u32 = 32;
-pub const REG_EXPECT: u32 = 512;
-pub const REG_EXTENDED: u32 = 1;
-pub const REG_FAKE: u32 = 4096;
-pub const REG_FTRACE: u32 = 8;
-pub const REG_ICASE: u32 = 8;
-pub const REG_INVARG: u32 = 16;
-pub const REG_ITOA: u32 = 102;
-pub const REG_MIXED: u32 = 17;
-pub const REG_MTRACE: u32 = 16;
-pub const REG_NEWLINE: u32 = 192;
-pub const REG_NLANCH: u32 = 128;
-pub const REG_NLSTOP: u32 = 64;
-pub const REG_NOMATCH: u32 = 1;
-pub const REG_NOSPEC: u32 = 4;
-pub const REG_NOSUB: u32 = 16;
-pub const REG_NOTBOL: u32 = 1;
-pub const REG_NOTEOL: u32 = 2;
-pub const REG_OKAY: u32 = 0;
-pub const REG_PEND: u32 = 256;
-pub const REG_PREFIX: i32 = -1;
-pub const REG_PROGRESS: u32 = 8192;
-pub const REG_QUOTE: u32 = 4;
-pub const REG_SMALL: u32 = 32;
-pub const REG_STARTEND: u32 = 4;
-pub const REG_UBACKREF: u32 = 1;
-pub const REG_UBBS: u32 = 64;
-pub const REG_UBOUNDS: u32 = 4;
-pub const REG_UBRACES: u32 = 8;
-pub const REG_UBSALNUM: u32 = 16;
-pub const REG_UEMPTYMATCH: u32 = 2048;
-pub const REG_UIMPOSSIBLE: u32 = 4096;
-pub const REG_ULOCALE: u32 = 1024;
-pub const REG_ULOOKAROUND: u32 = 2;
-pub const REG_UNONPOSIX: u32 = 128;
-pub const REG_UPBOTCH: u32 = 32;
-pub const REG_USHORTEST: u32 = 8192;
-pub const REG_UUNPORT: u32 = 512;
-pub const REG_UUNSPEC: u32 = 256;
 pub const REINDEXOPT_VERBOSE: u32 = 1;
 pub const REINDEX_REL_CHECK_CONSTRAINTS: u32 = 4;
 pub const REINDEX_REL_FORCE_INDEXES_PERMANENT: u32 = 16;
@@ -43006,8 +41704,6 @@ pub const SQLValueFunctionOp_SVFOP_LOCALTIMESTAMP_N: SQLValueFunctionOp = 8;
 pub const SQLValueFunctionOp_SVFOP_LOCALTIME_N: SQLValueFunctionOp = 6;
 pub const SQLValueFunctionOp_SVFOP_SESSION_USER: SQLValueFunctionOp = 12;
 pub const SQLValueFunctionOp_SVFOP_USER: SQLValueFunctionOp = 11;
-pub const SS2: u32 = 142;
-pub const SS3: u32 = 143;
 pub const SSIZE_MAX: u64 = 9223372036854775807;
 pub const SS_DISABLE: u32 = 4;
 pub const SS_ONSTACK: u32 = 1;
@@ -43190,70 +41886,8 @@ pub const SysCacheIdentifier_RULERELNAME: SysCacheIdentifier = 53;
 pub const SysCacheIdentifier_SEQRELID: SysCacheIdentifier = 54;
 pub const TABLESPACE_MAP: &'static [u8; 15usize] = b"tablespace_map\0";
 pub const TABLESPACE_MAP_OLD: &'static [u8; 19usize] = b"tablespace_map.old\0";
-pub const TCP6_MSS: u32 = 1024;
-pub const TCPCI_FLAG_LOSSRECOVERY: u32 = 1;
-pub const TCPCI_FLAG_REORDERING_DETECTED: u32 = 2;
-pub const TCPCI_OPT_ECN: u32 = 8;
-pub const TCPCI_OPT_SACK: u32 = 2;
-pub const TCPCI_OPT_TIMESTAMPS: u32 = 1;
-pub const TCPCI_OPT_WSCALE: u32 = 4;
-pub const TCPOLEN_CC: u32 = 6;
-pub const TCPOLEN_CC_APPA: u32 = 8;
-pub const TCPOLEN_FASTOPEN_REQ: u32 = 2;
-pub const TCPOLEN_MAXSEG: u32 = 4;
-pub const TCPOLEN_SACK: u32 = 8;
-pub const TCPOLEN_SACK_PERMITTED: u32 = 2;
-pub const TCPOLEN_SIGNATURE: u32 = 18;
-pub const TCPOLEN_TIMESTAMP: u32 = 10;
-pub const TCPOLEN_TSTAMP_APPA: u32 = 12;
-pub const TCPOLEN_WINDOW: u32 = 3;
-pub const TCPOPT_CC: u32 = 11;
-pub const TCPOPT_CCECHO: u32 = 13;
-pub const TCPOPT_CCNEW: u32 = 12;
-pub const TCPOPT_EOL: u32 = 0;
-pub const TCPOPT_FASTOPEN: u32 = 34;
-pub const TCPOPT_MAXSEG: u32 = 2;
-pub const TCPOPT_NOP: u32 = 1;
-pub const TCPOPT_SACK: u32 = 5;
-pub const TCPOPT_SACK_HDR: u32 = 16844032;
-pub const TCPOPT_SACK_PERMITTED: u32 = 4;
-pub const TCPOPT_SIGNATURE: u32 = 19;
-pub const TCPOPT_TIMESTAMP: u32 = 8;
-pub const TCPOPT_TSTAMP_HDR: u32 = 16844810;
-pub const TCPOPT_WINDOW: u32 = 3;
-pub const TCP_CONNECTIONTIMEOUT: u32 = 32;
-pub const TCP_CONNECTION_INFO: u32 = 262;
-pub const TCP_ENABLE_ECN: u32 = 260;
-pub const TCP_FASTOPEN: u32 = 261;
-pub const TCP_KEEPALIVE: u32 = 16;
-pub const TCP_KEEPCNT: u32 = 258;
-pub const TCP_KEEPINTVL: u32 = 257;
-pub const TCP_MAXHLEN: u32 = 60;
-pub const TCP_MAXSEG: u32 = 2;
-pub const TCP_MAXWIN: u32 = 65535;
-pub const TCP_MAX_SACK: u32 = 4;
-pub const TCP_MAX_WINSHIFT: u32 = 14;
-pub const TCP_MINMSS: u32 = 216;
-pub const TCP_MSS: u32 = 512;
-pub const TCP_NODELAY: u32 = 1;
-pub const TCP_NOOPT: u32 = 8;
-pub const TCP_NOPUSH: u32 = 4;
-pub const TCP_NOTSENT_LOWAT: u32 = 513;
-pub const TCP_RXT_CONNDROPTIME: u32 = 128;
-pub const TCP_RXT_FINDROP: u32 = 256;
-pub const TCP_SENDMOREACKS: u32 = 259;
 pub const TEXTARRAYOID: u32 = 1009;
 pub const TEXTOID: u32 = 25;
-pub const TH_ACCEPT: u32 = 23;
-pub const TH_ACK: u32 = 16;
-pub const TH_CWR: u32 = 128;
-pub const TH_ECE: u32 = 64;
-pub const TH_FIN: u32 = 1;
-pub const TH_FLAGS: u32 = 247;
-pub const TH_PUSH: u32 = 8;
-pub const TH_RST: u32 = 4;
-pub const TH_SYN: u32 = 2;
-pub const TH_URG: u32 = 32;
 pub const TIDOID: u32 = 27;
 pub const TIMEOID: u32 = 1083;
 pub const TIMESTAMPOID: u32 = 1114;
@@ -43301,7 +41935,6 @@ pub const TSM_HANDLEROID: u32 = 3310;
 pub const TSQUERYOID: u32 = 3615;
 pub const TSVECTOROID: u32 = 3614;
 pub const TS_PREC_INV: f64 = 1000000.0;
-pub const TTCP_CLIENT_SND_WND: u32 = 4096;
 pub const TYPCATEGORY_ARRAY: u8 = 65u8;
 pub const TYPCATEGORY_BITSTRING: u8 = 86u8;
 pub const TYPCATEGORY_BOOLEAN: u8 = 66u8;
@@ -43404,21 +42037,6 @@ pub const UniquePathMethod_UNIQUE_PATH_HASH: UniquePathMethod = 1;
 pub const UniquePathMethod_UNIQUE_PATH_NOOP: UniquePathMethod = 0;
 pub const UniquePathMethod_UNIQUE_PATH_SORT: UniquePathMethod = 2;
 pub const UpperRelationKind_UPPERREL_SETOP: UpperRelationKind = 0;
-pub const UserAuth_uaBSD: UserAuth = 10;
-pub const UserAuth_uaCert: UserAuth = 12;
-pub const UserAuth_uaGSS: UserAuth = 7;
-pub const UserAuth_uaIdent: UserAuth = 3;
-pub const UserAuth_uaImplicitReject: UserAuth = 1;
-pub const UserAuth_uaLDAP: UserAuth = 11;
-pub const UserAuth_uaMD5: UserAuth = 5;
-pub const UserAuth_uaPAM: UserAuth = 9;
-pub const UserAuth_uaPassword: UserAuth = 4;
-pub const UserAuth_uaPeer: UserAuth = 14;
-pub const UserAuth_uaRADIUS: UserAuth = 13;
-pub const UserAuth_uaReject: UserAuth = 0;
-pub const UserAuth_uaSCRAM: UserAuth = 6;
-pub const UserAuth_uaSSPI: UserAuth = 8;
-pub const UserAuth_uaTrust: UserAuth = 2;
 pub const VALID_XFN_CHARS: &'static [u8; 40usize] = b"0123456789ABCDEF.history.backup.partial\0";
 pub const VARATT_SHORT_MAX: u32 = 127;
 pub const VARBITOID: u32 = 1562;
@@ -43945,49 +42563,6 @@ pub const jbvType_jbvNull: jbvType = 0;
 pub const jbvType_jbvNumeric: jbvType = 2;
 pub const jbvType_jbvObject: jbvType = 17;
 pub const jbvType_jbvString: jbvType = 1;
-pub const pg_enc_PG_BIG5: pg_enc = 36;
-pub const pg_enc_PG_EUC_CN: pg_enc = 2;
-pub const pg_enc_PG_EUC_JIS_2004: pg_enc = 5;
-pub const pg_enc_PG_EUC_JP: pg_enc = 1;
-pub const pg_enc_PG_EUC_KR: pg_enc = 3;
-pub const pg_enc_PG_EUC_TW: pg_enc = 4;
-pub const pg_enc_PG_GB18030: pg_enc = 39;
-pub const pg_enc_PG_GBK: pg_enc = 37;
-pub const pg_enc_PG_ISO_8859_5: pg_enc = 25;
-pub const pg_enc_PG_ISO_8859_6: pg_enc = 26;
-pub const pg_enc_PG_ISO_8859_7: pg_enc = 27;
-pub const pg_enc_PG_ISO_8859_8: pg_enc = 28;
-pub const pg_enc_PG_JOHAB: pg_enc = 40;
-pub const pg_enc_PG_KOI8R: pg_enc = 22;
-pub const pg_enc_PG_KOI8U: pg_enc = 34;
-pub const pg_enc_PG_LATIN1: pg_enc = 8;
-pub const pg_enc_PG_LATIN10: pg_enc = 17;
-pub const pg_enc_PG_LATIN2: pg_enc = 9;
-pub const pg_enc_PG_LATIN3: pg_enc = 10;
-pub const pg_enc_PG_LATIN4: pg_enc = 11;
-pub const pg_enc_PG_LATIN5: pg_enc = 12;
-pub const pg_enc_PG_LATIN6: pg_enc = 13;
-pub const pg_enc_PG_LATIN7: pg_enc = 14;
-pub const pg_enc_PG_LATIN8: pg_enc = 15;
-pub const pg_enc_PG_LATIN9: pg_enc = 16;
-pub const pg_enc_PG_MULE_INTERNAL: pg_enc = 7;
-pub const pg_enc_PG_SHIFT_JIS_2004: pg_enc = 41;
-pub const pg_enc_PG_SJIS: pg_enc = 35;
-pub const pg_enc_PG_SQL_ASCII: pg_enc = 0;
-pub const pg_enc_PG_UHC: pg_enc = 38;
-pub const pg_enc_PG_UTF8: pg_enc = 6;
-pub const pg_enc_PG_WIN1250: pg_enc = 29;
-pub const pg_enc_PG_WIN1251: pg_enc = 23;
-pub const pg_enc_PG_WIN1252: pg_enc = 24;
-pub const pg_enc_PG_WIN1253: pg_enc = 30;
-pub const pg_enc_PG_WIN1254: pg_enc = 31;
-pub const pg_enc_PG_WIN1255: pg_enc = 32;
-pub const pg_enc_PG_WIN1256: pg_enc = 18;
-pub const pg_enc_PG_WIN1257: pg_enc = 33;
-pub const pg_enc_PG_WIN1258: pg_enc = 19;
-pub const pg_enc_PG_WIN866: pg_enc = 20;
-pub const pg_enc_PG_WIN874: pg_enc = 21;
-pub const pg_enc__PG_LAST_ENCODING_: pg_enc = 42;
 pub const pseudo_AF_HDRCMPLT: u32 = 35;
 pub const pseudo_AF_KEY: u32 = 29;
 pub const pseudo_AF_PIP: u32 = 25;
@@ -44093,9 +42668,6 @@ pub type BpChar = varlena;
 pub type Buffer = ::std::os::raw::c_int;
 pub type BufferAccessStrategy = *mut BufferAccessStrategyData;
 pub type BuiltinTrancheIds = ::std::os::raw::c_uint;
-pub type CAC_state = ::std::os::raw::c_uint;
-pub type ClientAuthentication_hook_type =
-    ::std::option::Option<unsafe extern "C" fn(arg1: *mut Port, arg2: ::std::os::raw::c_int)>;
 pub type CmdType = ::std::os::raw::c_uint;
 pub type CoerceParamHook = ::std::option::Option<
     unsafe extern "C" fn(
@@ -44111,7 +42683,6 @@ pub type CoercionForm = ::std::os::raw::c_uint;
 pub type CollectedCommandType = ::std::os::raw::c_uint;
 pub type CommandDest = ::std::os::raw::c_uint;
 pub type CommandId = uint32;
-pub type ConnType = ::std::os::raw::c_uint;
 pub type ConstrType = ::std::os::raw::c_uint;
 pub type ConstraintExclusionType = ::std::os::raw::c_uint;
 pub type Cost = f64;
@@ -44346,7 +42917,6 @@ pub type HeapTuple = *mut HeapTupleData;
 pub type HeapTupleHeader = *mut HeapTupleHeaderData;
 pub type HotStandbyState = ::std::os::raw::c_uint;
 pub type IOFuncSelector = ::std::os::raw::c_uint;
-pub type IPCompareMethod = ::std::os::raw::c_uint;
 pub type ImportForeignSchemaType = ::std::os::raw::c_uint;
 pub type ImportForeignSchema_function = ::std::option::Option<
     unsafe extern "C" fn(stmt: *mut ImportForeignSchemaStmt, serverOid: Oid) -> *mut List,
@@ -44625,7 +43195,6 @@ pub type Type = HeapTuple;
 pub type TypeFuncClass = ::std::os::raw::c_uint;
 pub type UniquePathMethod = ::std::os::raw::c_uint;
 pub type UpperRelationKind = ::std::os::raw::c_uint;
-pub type UserAuth = ::std::os::raw::c_uint;
 pub type VarChar = varlena;
 pub type VariableCache = *mut VariableCacheData;
 pub type VariableSetKind = ::std::os::raw::c_uint;
@@ -44886,7 +43455,6 @@ pub type get_relation_stats_hook_type = ::std::option::Option<
     ) -> bool,
 >;
 pub type gid_t = __darwin_gid_t;
-pub type hbaPort = Port;
 pub type id_t = __darwin_id_t;
 pub type idtype_t = ::std::os::raw::c_uint;
 pub type in6_addr_t = in6_addr;
@@ -44920,28 +43488,6 @@ pub type join_search_hook_type = ::std::option::Option<
 >;
 pub type key_t = __int32_t;
 pub type max_align_t = u128;
-pub type mb2wchar_with_len_converter = ::std::option::Option<
-    unsafe extern "C" fn(
-        from: *const ::std::os::raw::c_uchar,
-        to: *mut pg_wchar,
-        len: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int,
->;
-pub type mbcharacter_incrementer = ::std::option::Option<
-    unsafe extern "C" fn(mbstr: *mut ::std::os::raw::c_uchar, len: ::std::os::raw::c_int) -> bool,
->;
-pub type mbdisplaylen_converter = ::std::option::Option<
-    unsafe extern "C" fn(mbstr: *const ::std::os::raw::c_uchar) -> ::std::os::raw::c_int,
->;
-pub type mblen_converter = ::std::option::Option<
-    unsafe extern "C" fn(mbstr: *const ::std::os::raw::c_uchar) -> ::std::os::raw::c_int,
->;
-pub type mbverifier = ::std::option::Option<
-    unsafe extern "C" fn(
-        mbstr: *const ::std::os::raw::c_uchar,
-        len: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int,
->;
 pub type mcontext_t = *mut __darwin_mcontext64;
 pub type mode_t = __darwin_mode_t;
 pub type needs_fmgr_hook_type = ::std::option::Option<unsafe extern "C" fn(fn_oid: Oid) -> bool>;
@@ -44959,13 +43505,11 @@ pub type pairingheap_comparator = ::std::option::Option<
 pub type parallel_worker_main_type =
     ::std::option::Option<unsafe extern "C" fn(seg: *mut dsm_segment, toc: *mut shm_toc)>;
 pub type pg_crc32c = uint32;
-pub type pg_enc = ::std::os::raw::c_uint;
 pub type pg_int64 = ::std::os::raw::c_long;
 pub type pg_on_exit_callback =
     ::std::option::Option<unsafe extern "C" fn(code: ::std::os::raw::c_int, arg: Datum)>;
 pub type pg_stack_base_t = *mut ::std::os::raw::c_char;
 pub type pg_time_t = int64;
-pub type pg_wchar = ::std::os::raw::c_uint;
 pub type pgsocket = ::std::os::raw::c_int;
 pub type pid_t = __darwin_pid_t;
 pub type planner_hook_type = ::std::option::Option<
@@ -44996,7 +43540,6 @@ pub type qsort_arg_comparator = ::std::option::Option<
 >;
 pub type quad_t = i64;
 pub type register_t = i64;
-pub type regoff_t = ::std::os::raw::c_long;
 pub type regproc = Oid;
 pub type relopt_kind = ::std::os::raw::c_uint;
 pub type relopt_type = ::std::os::raw::c_uint;
@@ -45041,8 +43584,6 @@ pub type stack_t = __darwin_sigaltstack;
 pub type suseconds_t = __darwin_suseconds_t;
 pub type swblk_t = i32;
 pub type syscall_arg_t = u_int64_t;
-pub type tcp_cc = __uint32_t;
-pub type tcp_seq = __uint32_t;
 pub type text = varlena;
 pub type time_t = __darwin_time_t;
 pub type tuplehash_status = ::std::os::raw::c_uint;
@@ -45081,18 +43622,9 @@ pub type user_ssize_t = i64;
 pub type user_time_t = i64;
 pub type user_ulong_t = u_int64_t;
 pub type ushort = ::std::os::raw::c_ushort;
-pub type utf_local_conversion_func =
-    ::std::option::Option<unsafe extern "C" fn(code: uint32) -> uint32>;
 pub type uuid_string_t = __darwin_uuid_string_t;
 pub type uuid_t = __darwin_uuid_t;
 pub type va_list = __darwin_va_list;
 pub type vartag_external = ::std::os::raw::c_uint;
-pub type wchar2mb_with_len_converter = ::std::option::Option<
-    unsafe extern "C" fn(
-        from: *const pg_wchar,
-        to: *mut ::std::os::raw::c_uchar,
-        len: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int,
->;
 pub type wchar_t = __darwin_wchar_t;
 pub type wint_t = __darwin_wint_t;

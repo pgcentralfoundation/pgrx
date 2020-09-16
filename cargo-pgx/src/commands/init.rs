@@ -1,14 +1,14 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-
+use crate::commands::stop::stop_postgres;
 use colored::Colorize;
 use pgx_utils::{
     exit_with_error, get_pgx_config_path, get_pgx_home, handle_result, prefix_path,
     BASE_POSTGRES_PORT_NO,
 };
 use rayon::prelude::*;
-use rttp_client::{ HttpClient, types::Proxy };
+use rttp_client::{types::Proxy, HttpClient};
 use std::fmt::Display;
 use std::fs::File;
 use std::io::Write;
@@ -61,18 +61,18 @@ impl Display for PgVersion {
 
 const PG10_VERSION: PgVersion = PgVersion::new(
     10,
-    13,
-    "https://ftp.postgresql.org/pub/source/v10.13/postgresql-10.13.tar.bz2",
+    14,
+    "https://ftp.postgresql.org/pub/source/v10.14/postgresql-10.14.tar.bz2",
 );
 const PG11_VERSION: PgVersion = PgVersion::new(
     11,
-    8,
-    "https://ftp.postgresql.org/pub/source/v11.8/postgresql-11.8.tar.bz2",
+    9,
+    "https://ftp.postgresql.org/pub/source/v11.9/postgresql-11.9.tar.bz2",
 );
 const PG12_VERSION: PgVersion = PgVersion::new(
     12,
-    3,
-    "https://ftp.postgresql.org/pub/source/v12.3/postgresql-12.3.tar.bz2",
+    4,
+    "https://ftp.postgresql.org/pub/source/v12.4/postgresql-12.4.tar.bz2",
 );
 
 pub(crate) fn init_pgx(
@@ -92,6 +92,7 @@ pub(crate) fn init_pgx(
     input_configs
         .into_par_iter()
         .for_each(|(pg_config, version)| {
+            stop_postgres(version.major, false);
             let pg_config = pg_config.map_or_else(
                 || download_postgres(version, &dir),
                 |v| PathBuf::from_str(v).unwrap(),

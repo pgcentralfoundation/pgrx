@@ -21,7 +21,7 @@ pub(crate) fn start_postgres(major_version: u16) {
         initdb(&bindir, &datadir);
     }
 
-    if status_postgres(major_version) {
+    if status_postgres(major_version, true) {
         return;
     }
 
