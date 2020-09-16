@@ -1202,6 +1202,10 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
+    pub fn do_pg_abort_backup();
+}
+#[pg_guard]
+extern "C" {
     pub fn do_pg_start_backup(
         backupidstr: *const ::std::os::raw::c_char,
         fast: bool,
@@ -5176,7 +5180,6 @@ pub const GrantObjectType_ACL_OBJECT_SEQUENCE: GrantObjectType = 2;
 pub const GrantObjectType_ACL_OBJECT_TABLESPACE: GrantObjectType = 11;
 pub const GrantObjectType_ACL_OBJECT_TYPE: GrantObjectType = 12;
 pub const HAVE_DECL_SNPRINTF: u32 = 1;
-pub const HAVE_DECL_SYS_SIGLIST: u32 = 1;
 pub const HAVE_DECL_VSNPRINTF: u32 = 1;
 pub const HAVE_SNPRINTF: u32 = 1;
 pub const HAVE_STRERROR: u32 = 1;
@@ -5634,14 +5637,14 @@ pub const ObjectType_OBJECT_TYPE: ObjectType = 45;
 pub const ObjectType_OBJECT_USER_MAPPING: ObjectType = 46;
 pub const ObjectType_OBJECT_VIEW: ObjectType = 47;
 pub const PACKAGE_BUGREPORT: &'static [u8; 26usize] = b"pgsql-bugs@postgresql.org\0";
-pub const PACKAGE_STRING: &'static [u8; 17usize] = b"PostgreSQL 10.13\0";
-pub const PACKAGE_VERSION: &'static [u8; 6usize] = b"10.13\0";
+pub const PACKAGE_STRING: &'static [u8; 17usize] = b"PostgreSQL 10.14\0";
+pub const PACKAGE_VERSION: &'static [u8; 6usize] = b"10.14\0";
 pub const PGSTAT_NUM_PROGRESS_PARAM: u32 = 10;
-pub const PG_BACKEND_VERSIONSTR: &'static [u8; 29usize] = b"postgres (PostgreSQL) 10.13\n\0";
+pub const PG_BACKEND_VERSIONSTR: &'static [u8; 29usize] = b"postgres (PostgreSQL) 10.14\n\0";
 pub const PG_MAJORVERSION: &'static [u8; 3usize] = b"10\0";
-pub const PG_VERSION: &'static [u8; 6usize] = b"10.13\0";
-pub const PG_VERSION_NUM: u32 = 100013;
-pub const PG_VERSION_STR : & 'static [u8 ; 115usize] = b"PostgreSQL 10.13 on x86_64-apple-darwin19.0.0, compiled by Apple clang version 11.0.0 (clang-1100.0.33.12), 64-bit\0" ;
+pub const PG_VERSION: &'static [u8; 6usize] = b"10.14\0";
+pub const PG_VERSION_NUM: u32 = 100014;
+pub const PG_VERSION_STR : & 'static [u8 ; 115usize] = b"PostgreSQL 10.14 on x86_64-apple-darwin19.0.0, compiled by Apple clang version 11.0.0 (clang-1100.0.33.12), 64-bit\0" ;
 pub const PREDICATELOCK_MANAGER_LWLOCK_OFFSET: u32 = 190;
 pub const ParseExprKind_EXPR_KIND_ALTER_COL_TRANSFORM: ParseExprKind = 31;
 pub const ParseExprKind_EXPR_KIND_CHECK_CONSTRAINT: ParseExprKind = 25;

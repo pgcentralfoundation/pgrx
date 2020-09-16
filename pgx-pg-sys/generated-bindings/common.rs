@@ -10520,10 +10520,6 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
-    pub fn do_pg_abort_backup();
-}
-#[pg_guard]
-extern "C" {
     pub fn do_pg_stop_backup(
         labelfile: *mut ::std::os::raw::c_char,
         waitforarchive: bool,
@@ -12068,6 +12064,14 @@ extern "C" {
 #[pg_guard]
 extern "C" {
     pub fn float8up(fcinfo: FunctionCallInfo) -> Datum;
+}
+#[pg_guard]
+extern "C" {
+    pub fn float_time_overflows(
+        hour: ::std::os::raw::c_int,
+        min: ::std::os::raw::c_int,
+        sec: f64,
+    ) -> bool;
 }
 #[pg_guard]
 extern "C" {
@@ -21230,6 +21234,10 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
+    pub fn pg_strsignal(signum: ::std::os::raw::c_int) -> *const ::std::os::raw::c_char;
+}
+#[pg_guard]
+extern "C" {
     pub fn pg_strtouint64(
         str_: *const ::std::os::raw::c_char,
         endptr: *mut *mut ::std::os::raw::c_char,
@@ -25186,6 +25194,15 @@ extern "C" {
 #[pg_guard]
 extern "C" {
     pub fn time_out(fcinfo: FunctionCallInfo) -> Datum;
+}
+#[pg_guard]
+extern "C" {
+    pub fn time_overflows(
+        hour: ::std::os::raw::c_int,
+        min: ::std::os::raw::c_int,
+        sec: ::std::os::raw::c_int,
+        fsec: fsec_t,
+    ) -> bool;
 }
 #[pg_guard]
 extern "C" {
@@ -40084,6 +40101,7 @@ pub const HAVE_STRINGS_H: u32 = 1;
 pub const HAVE_STRING_H: u32 = 1;
 pub const HAVE_STRLCAT: u32 = 1;
 pub const HAVE_STRLCPY: u32 = 1;
+pub const HAVE_STRSIGNAL: u32 = 1;
 pub const HAVE_STRTOLL: u32 = 1;
 pub const HAVE_STRTOULL: u32 = 1;
 pub const HAVE_STRUCT_ADDRINFO: u32 = 1;

@@ -222,7 +222,10 @@ pub fn client() -> (postgres::Client, String) {
 
 fn install_extension() {
     eprintln!("installing extension");
-    let mut command = Command::new("cargo")
+    let is_release = std::env::var("PGX_BUILD_PROFILE").unwrap_or("debug".into()) == "release";
+
+    let mut command = Command::new("cargo");
+    command
         .arg("pgx")
         .arg("install")
         .stdout(Stdio::inherit())
@@ -238,11 +241,14 @@ fn install_extension() {
                 "pg{} pg_test",
                 pg_sys::get_pg_major_version_string().to_string()
             ),
-        )
-        .spawn()
-        .unwrap();
+        );
 
-    let status = command.wait().unwrap();
+    if is_release {
+        command.arg("--release");
+    }
+
+    let mut child = command.spawn().unwrap();
+    let status = child.wait().unwrap();
     if !status.success() {
         panic!("failed to install extension");
     }

@@ -103,6 +103,10 @@ subcommands:
                     value_name: PG_VERSION
                     takes_value: true
                     help: Do you want to test for Postgres 'pg10', 'pg11', pg12', or 'all' (default)?
+                - release:
+                    short: r
+                    long: release
+                    help: compile for release mode (default is debug)
           - get:
               about: get a property from the extension control file
               args:

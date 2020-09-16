@@ -139,9 +139,9 @@ Once started, you can connect to them using `psql` (if you have it on your $PATH
 
 The very first time you execute `cargo pgx run pgXX`, it needs to compile not only your extension, but pgx itself, along with all its dependencies.  Depending on your computer, this could take a bit of time (`pgx` is nearly 200k lines of Rust when counting the generated bindings for Postgres).  Afterwards, however (as seen in the above screenshot), it's fairly fast.
 
-`cargo pgx run` compiles your extension, installs it to the specified Postgres installation as described by its `pg_config` tool, starts that Postgres instance using the same process as `cargo pgx start pgXX`, and drops you into a `psql` shell connected to a database, by default, namded after your extension.  From there, it's up to you to create your extension and use it.
+`cargo pgx run` compiles your extension, installs it to the specified Postgres installation as described by its `pg_config` tool, starts that Postgres instance using the same process as `cargo pgx start pgXX`, and drops you into a `psql` shell connected to a database, by default, named after your extension.  From there, it's up to you to create your extension and use it.
 
-This is also the stage where `pgx` automatically generates the SQL schema for your extension.  It places individual `modname.generated.sql` files into `./sql/`, and the combines those together by the order defined in `./sql/load-order.txt`.
+This is also the stage where `pgx` automatically generates the SQL schema for your extension.  It places individual `modname.generated.sql` files into `./sql/`, and then combines those together by the order defined in `./sql/load-order.txt`.
 
 When you exit `psql`, the Postgres instance continues to run in the background.
 
@@ -213,10 +213,11 @@ cargo-pgx-pgx-test
 run the test suite for this crate
 
 USAGE:
-    cargo-pgx pgx test [PG_VERSION]
+    cargo-pgx pgx test [FLAGS] [PG_VERSION]
 
 FLAGS:
     -h, --help       Prints help information
+    -r, --release    compile for release mode (default is debug)
     -V, --version    Prints version information
 
 ARGS:

@@ -114,8 +114,9 @@ fn main() -> std::result::Result<(), std::io::Error> {
             }
             ("test", Some(test)) => {
                 let pgver = test.value_of("pg_version").unwrap_or("all");
+                let is_release = test.is_present("release");
                 for major_version in make_pg_major_version(pgver) {
-                    test_extension(*major_version);
+                    test_extension(*major_version, is_release);
                 }
                 Ok(())
             }

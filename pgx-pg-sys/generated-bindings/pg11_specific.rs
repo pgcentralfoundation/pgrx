@@ -1766,6 +1766,10 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
+    pub fn do_pg_abort_backup(code: ::std::os::raw::c_int, arg: Datum);
+}
+#[pg_guard]
+extern "C" {
     pub fn do_pg_start_backup(
         backupidstr: *const ::std::os::raw::c_char,
         fast: bool,
@@ -2768,6 +2772,10 @@ extern "C" {
         p_restrictinfo: *mut *mut RestrictInfo,
         below_outer_join: bool,
     ) -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn register_persistent_abort_backup_handler();
 }
 #[pg_guard]
 extern "C" {
@@ -6639,7 +6647,6 @@ pub const GTSVECTORARRAYOID: u32 = 3644;
 pub const GUC_UNIT_BYTE: u32 = 32768;
 pub const HAVE_DECL_SNPRINTF: u32 = 1;
 pub const HAVE_DECL_STRNLEN: u32 = 1;
-pub const HAVE_DECL_SYS_SIGLIST: u32 = 1;
 pub const HAVE_DECL_VSNPRINTF: u32 = 1;
 pub const HAVE_SNPRINTF: u32 = 1;
 pub const HAVE_STDBOOL_H: u32 = 1;
@@ -7149,17 +7156,17 @@ pub const ObjectType_OBJECT_TYPE: ObjectType = 47;
 pub const ObjectType_OBJECT_USER_MAPPING: ObjectType = 48;
 pub const ObjectType_OBJECT_VIEW: ObjectType = 49;
 pub const PACKAGE_BUGREPORT: &'static [u8; 26usize] = b"pgsql-bugs@postgresql.org\0";
-pub const PACKAGE_STRING: &'static [u8; 16usize] = b"PostgreSQL 11.8\0";
-pub const PACKAGE_VERSION: &'static [u8; 5usize] = b"11.8\0";
+pub const PACKAGE_STRING: &'static [u8; 16usize] = b"PostgreSQL 11.9\0";
+pub const PACKAGE_VERSION: &'static [u8; 5usize] = b"11.9\0";
 pub const PARTITION_STRATEGY_HASH: u8 = 104u8;
 pub const PATHARRAYOID: u32 = 1019;
 pub const PGSTAT_NUM_PROGRESS_PARAM: u32 = 10;
-pub const PG_BACKEND_VERSIONSTR: &'static [u8; 28usize] = b"postgres (PostgreSQL) 11.8\n\0";
+pub const PG_BACKEND_VERSIONSTR: &'static [u8; 28usize] = b"postgres (PostgreSQL) 11.9\n\0";
 pub const PG_LSNARRAYOID: u32 = 3221;
 pub const PG_MAJORVERSION: &'static [u8; 3usize] = b"11\0";
-pub const PG_VERSION: &'static [u8; 5usize] = b"11.8\0";
-pub const PG_VERSION_NUM: u32 = 110008;
-pub const PG_VERSION_STR : & 'static [u8 ; 114usize] = b"PostgreSQL 11.8 on x86_64-apple-darwin19.0.0, compiled by Apple clang version 11.0.0 (clang-1100.0.33.12), 64-bit\0" ;
+pub const PG_VERSION: &'static [u8; 5usize] = b"11.9\0";
+pub const PG_VERSION_NUM: u32 = 110009;
+pub const PG_VERSION_STR : & 'static [u8 ; 114usize] = b"PostgreSQL 11.9 on x86_64-apple-darwin19.0.0, compiled by Apple clang version 11.0.0 (clang-1100.0.33.12), 64-bit\0" ;
 pub const POINTARRAYOID: u32 = 1017;
 pub const POLYGONARRAYOID: u32 = 1027;
 pub const PREDICATELOCK_MANAGER_LWLOCK_OFFSET: u32 = 190;

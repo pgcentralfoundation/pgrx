@@ -1931,6 +1931,10 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
+    pub fn do_pg_abort_backup(code: ::std::os::raw::c_int, arg: Datum);
+}
+#[pg_guard]
+extern "C" {
     pub fn do_pg_start_backup(
         backupidstr: *const ::std::os::raw::c_char,
         fast: bool,
@@ -2333,6 +2337,19 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
+    pub fn histogram_selectivity_ext(
+        vardata: *mut VariableStatData,
+        opproc: *mut FmgrInfo,
+        collation: Oid,
+        constval: Datum,
+        varonleft: bool,
+        min_hist_size: ::std::os::raw::c_int,
+        n_skip: ::std::os::raw::c_int,
+        hist_size: *mut ::std::os::raw::c_int,
+    ) -> f64;
+}
+#[pg_guard]
+extern "C" {
     pub fn in_range_date_interval(fcinfo: FunctionCallInfo) -> Datum;
 }
 #[pg_guard]
@@ -2528,6 +2545,19 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
+    pub fn ineq_histogram_selectivity_ext(
+        root: *mut PlannerInfo,
+        vardata: *mut VariableStatData,
+        opproc: *mut FmgrInfo,
+        isgt: bool,
+        iseq: bool,
+        collation: Oid,
+        constval: Datum,
+        consttype: Oid,
+    ) -> f64;
+}
+#[pg_guard]
+extern "C" {
     pub fn initial_cost_hashjoin(
         root: *mut PlannerInfo,
         workspace: *mut JoinCostWorkspace,
@@ -2712,6 +2742,17 @@ extern "C" {
 #[pg_guard]
 extern "C" {
     pub fn mark_dummy_rel(rel: *mut RelOptInfo);
+}
+#[pg_guard]
+extern "C" {
+    pub fn mcv_selectivity_ext(
+        vardata: *mut VariableStatData,
+        opproc: *mut FmgrInfo,
+        collation: Oid,
+        constval: Datum,
+        varonleft: bool,
+        sumcommonp: *mut f64,
+    ) -> f64;
 }
 #[pg_guard]
 extern "C" {
@@ -2958,10 +2999,6 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
-    pub fn pg_strsignal(signum: ::std::os::raw::c_int) -> *const ::std::os::raw::c_char;
-}
-#[pg_guard]
-extern "C" {
     pub fn pg_strtoint16(s: *const ::std::os::raw::c_char) -> int16;
 }
 #[pg_guard]
@@ -3091,6 +3128,10 @@ extern "C" {
         context: *mut ::std::os::raw::c_void,
         flags: ::std::os::raw::c_int,
     ) -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn register_persistent_abort_backup_handler();
 }
 #[pg_guard]
 extern "C" {
@@ -3546,6 +3587,18 @@ extern "C" {
     pub fn var_eq_const(
         vardata: *mut VariableStatData,
         oproid: Oid,
+        constval: Datum,
+        constisnull: bool,
+        varonleft: bool,
+        negate: bool,
+    ) -> f64;
+}
+#[pg_guard]
+extern "C" {
+    pub fn var_eq_const_ext(
+        vardata: *mut VariableStatData,
+        oproid: Oid,
+        collation: Oid,
         constval: Datum,
         constisnull: bool,
         varonleft: bool,
@@ -7648,7 +7701,6 @@ pub const HAVE_PWRITE: u32 = 1;
 pub const HAVE_SPECIALJOININFO_TYPEDEF: u32 = 1;
 pub const HAVE_STDBOOL_H: u32 = 1;
 pub const HAVE_STRNLEN: u32 = 1;
-pub const HAVE_STRSIGNAL: u32 = 1;
 pub const HAVE_STRTOF: u32 = 1;
 pub const HAVE_X86_64_POPCNTQ: u32 = 1;
 pub const HAVE__BOOL: u32 = 1;
@@ -8156,20 +8208,20 @@ pub const ObjectType_OBJECT_TYPE: ObjectType = 47;
 pub const ObjectType_OBJECT_USER_MAPPING: ObjectType = 48;
 pub const ObjectType_OBJECT_VIEW: ObjectType = 49;
 pub const PACKAGE_BUGREPORT: &'static [u8; 32usize] = b"pgsql-bugs@lists.postgresql.org\0";
-pub const PACKAGE_STRING: &'static [u8; 16usize] = b"PostgreSQL 12.3\0";
-pub const PACKAGE_VERSION: &'static [u8; 5usize] = b"12.3\0";
+pub const PACKAGE_STRING: &'static [u8; 16usize] = b"PostgreSQL 12.4\0";
+pub const PACKAGE_VERSION: &'static [u8; 5usize] = b"12.4\0";
 pub const PARTITION_STRATEGY_HASH: u8 = 104u8;
 pub const PATHARRAYOID: u32 = 1019;
 pub const PERFORM_DELETION_CONCURRENT_LOCK: u32 = 32;
 pub const PGMCVLISTOID: u32 = 5017;
 pub const PGSTAT_NUM_PROGRESS_PARAM: u32 = 20;
-pub const PG_BACKEND_VERSIONSTR: &'static [u8; 28usize] = b"postgres (PostgreSQL) 12.3\n\0";
+pub const PG_BACKEND_VERSIONSTR: &'static [u8; 28usize] = b"postgres (PostgreSQL) 12.4\n\0";
 pub const PG_LSNARRAYOID: u32 = 3221;
 pub const PG_MAJORVERSION: &'static [u8; 3usize] = b"12\0";
 pub const PG_STRERROR_R_BUFLEN: u32 = 256;
-pub const PG_VERSION: &'static [u8; 5usize] = b"12.3\0";
-pub const PG_VERSION_NUM: u32 = 120003;
-pub const PG_VERSION_STR : & 'static [u8 ; 114usize] = b"PostgreSQL 12.3 on x86_64-apple-darwin19.0.0, compiled by Apple clang version 11.0.0 (clang-1100.0.33.12), 64-bit\0" ;
+pub const PG_VERSION: &'static [u8; 5usize] = b"12.4\0";
+pub const PG_VERSION_NUM: u32 = 120004;
+pub const PG_VERSION_STR : & 'static [u8 ; 114usize] = b"PostgreSQL 12.4 on x86_64-apple-darwin19.0.0, compiled by Apple clang version 11.0.0 (clang-1100.0.33.12), 64-bit\0" ;
 pub const POINTARRAYOID: u32 = 1017;
 pub const POLYGONARRAYOID: u32 = 1027;
 pub const PREDICATELOCK_MANAGER_LWLOCK_OFFSET: u32 = 189;

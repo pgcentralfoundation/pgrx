@@ -13,11 +13,11 @@ readme = "README.md"
 [dependencies]
 colored = "2.0.0"
 dirs = "3.0.1"
-proc-macro2 = "1.0.20"
+proc-macro2 = "1.0.21"
 quote = "1.0.7"
 regex = "1.3.9"
-serde = "1.0.115"
-serde_derive = "1.0.115"
-syn = { version = "1.0.40", features = [ "extra-traits", "full", "fold", "parsing" ] }
+serde = "1.0.116"
+serde_derive = "1.0.116"
+syn = { version = "1.0.41", features = [ "extra-traits", "full", "fold", "parsing" ] }
 toml = "0.5.6"
 unescape = "0.1.0"
