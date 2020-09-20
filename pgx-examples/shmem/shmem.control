@@ -1,5 +1,5 @@
 comment = 'shmem:  Created by pgx'
 default_version = '1.0'
 module_pathname = '$libdir/shmem'
-relocatable = true
+relocatable = false
 superuser = false

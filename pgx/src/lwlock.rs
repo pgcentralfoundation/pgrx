@@ -12,7 +12,7 @@ use uuid::Uuid;
 /// typically allows for read-only access (shared access).
 ///
 /// The lock is valid across processes as the LWLock is managed by Postgres. Data
-/// mutability once a lock is obtained is handled by Rust giving out & or &mut
+/// mutability once a lock is obtained is handled by Rust giving out `&` or `&mut`
 /// pointers.
 ///
 /// When a lock is given out it is wrapped in a PgLwLockShareGuard or
@@ -21,7 +21,6 @@ use uuid::Uuid;
 /// # Poisoning
 /// This lock can not be poisoned from Rust. Panic and Abort are handled by
 /// PostgreSQL cleanly.
-
 pub struct PgLwLock<T> {
     inner: OnceCell<PgLwLockInner<T>>,
     name: OnceCell<&'static str>,
@@ -63,7 +62,7 @@ impl<T> PgLwLock<T> {
         }
     }
 
-    /// Obtain a shared lock (which comes with &T access)
+    /// Obtain a shared lock (which comes with `&T` access)
     pub fn share(&self) -> PgLwLockShareGuard<T> {
         self.inner
             .get()
@@ -71,7 +70,7 @@ impl<T> PgLwLock<T> {
             .share()
     }
 
-    /// Obtain an exclusive lock (which comes with &mut T access)
+    /// Obtain an exclusive lock (which comes with `&mut T` access)
     pub fn exclusive(&self) -> PgLwLockExclusiveGuard<T> {
         self.inner
             .get()

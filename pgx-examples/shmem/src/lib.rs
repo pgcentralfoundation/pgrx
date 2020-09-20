@@ -8,7 +8,10 @@ use std::sync::atomic::Ordering;
 
 pg_module_magic!();
 
-#[derive(PostgresType, Serialize, Deserialize, Eq, PartialEq, Clone, Copy, Debug)]
+// types behind a `LwLock` must derive/implement `Copy` and `Clone`
+#[derive(Copy, Clone)]
+// This is for general Postgres type support -- not strictly necessary if the type is not exposed via SQL
+#[derive(PostgresType, Serialize, Deserialize)]
 pub struct Pgtest {
     value1: i32,
     value2: i32,

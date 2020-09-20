@@ -2,8 +2,41 @@ use crate::lwlock::*;
 use crate::{pg_sys, PgAtomic};
 use uuid::Uuid;
 
+/// Custom types that want to participate in shared memory must implement this marker trait
 pub unsafe trait PGXSharedMemory {}
 
+/// In order to store a type in Postgres Shared Memory, it must be passed to
+/// `pg_shmem_init!()` during `_PG_init()`.
+///
+/// Additionally, the type must be a `static` global and also be `#[derive(Copy, Clone)]`.
+///
+/// > Types that allocate on the heap, such as `String` and `Vec` are not supported.
+///
+/// For complex data structures like vecs and maps, `pgx` prefers the use of types from
+/// [`heapless`](https://crates.io/crates/heapless).
+///
+/// Custom types need to also implement the `PGXSharedMemory` trait.
+///
+/// > Extensions that use shared memory **must** be loaded via `postgresql.conf`'s
+/// `shared_preload_libraries` configuration setting.  
+///
+/// # Example
+///
+/// ```rust,no_run
+/// use pgx::*;
+///
+/// // primitive types must be protected behind a `PgLwLock`
+/// static PRIMITIVE: PgLwLock<i32> = PgLwLock::new();
+///
+/// // Rust atomics can be used without locks, wrapped in a `PgAtomic`
+/// static ATOMIC: PgAtomic<std::sync::atomic::AtomicBool> = PgAtomic::new();
+///
+/// #[pg_guard]
+/// pub extern "C" fn _PG_init() {
+///     pg_shmem_init!(PRIMITIVE);
+///     pg_shmem_init!(ATOMIC);
+/// }
+/// ```
 #[macro_export]
 macro_rules! pg_shmem_init {
     ($thing:expr) => {
@@ -76,14 +109,14 @@ impl PgSharedMem {
         }
     }
 
-    /// Must be run from PG_init for atomics
+    /// Must be run from _PG_init for atomics
     pub fn pg_init_atomic<T: atomic_traits::Atomic + Default>(_atomic: &PgAtomic<T>) {
         unsafe {
             pg_sys::RequestAddinShmemSpace(std::mem::size_of::<T>());
         }
     }
 
-    /// Must be run from the shared memory init hook, use for types which are guarded by a LWLock
+    /// Must be run from the shared memory init hook, use for types which are guarded by a `LWLock`
     pub fn shmem_init_locked<T: Default + PGXSharedMemory>(lock: &PgLwLock<T>) {
         let mut found = false;
         unsafe {
@@ -103,6 +136,7 @@ impl PgSharedMem {
         }
     }
 
+    /// Must be run from the shared memory init hook, use for rust atomics behind `PgAtomic`
     pub fn shmem_init_atomic<T: atomic_traits::Atomic + Default>(atomic: &PgAtomic<T>) {
         unsafe {
             let shm_name =

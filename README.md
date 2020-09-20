@@ -176,6 +176,7 @@ $ psql test
  - [cargo-pgx sub-command](cargo-pgx/)
  - [Custom Types](pgx-examples/custom_types/)
  - [Postgres Operator Funcions and Classes](pgx-examples/operators/)
+ - [Shared Memory Support](pgx-examples/shmem/)
  - [various examples](pgx-examples/)
 
 ## Caveats & Known Issues

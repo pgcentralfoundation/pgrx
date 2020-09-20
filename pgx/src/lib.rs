@@ -71,6 +71,7 @@ pub use inoutfuncs::*;
 pub use itemptr::*;
 pub use list::*;
 pub use log::*;
+pub use lwlock::*;
 pub use memcxt::*;
 pub use namespace::*;
 pub use nodes::{is_a, PgNode, PgNodeFactory}; // be specific since we have multiple versions of these things behind feature gates
