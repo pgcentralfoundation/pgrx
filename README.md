@@ -196,12 +196,10 @@ There's probably more than are listed here, but a primary things of note are:
 
 There's a few things on our immediate TODO list
 
- - Cleanup and merge PR #5 for Background Worker support.  It looks like the only remaining work is another
-procmaro, maybe `#[pg_bgworker_main]` to automate some of the boilerplate and make sure it's safe
  - Better trigger function support.  `pgx` does support creating trigger functions in Rust (need examples!)
 but it doesn't automatically generate any of the DDL for them.  This too likely needs a procmaro like `#[pg_trigger]`
  - Automatic extension schema upgrade scripts, based on diffs from a previous git tag and HEAD.  Likely, this
-will be build into the `cargo-pgx` subcommand and make use of https://github.com/zombodb/postgres-parser.
+will be built into the `cargo-pgx` subcommand and make use of https://github.com/zombodb/postgres-parser.
  - More examples -- especially around memory management and the various derive macros `#[derive(PostgresType/Enum)]`
 
 
