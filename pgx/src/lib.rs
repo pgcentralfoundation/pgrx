@@ -41,13 +41,16 @@ pub mod itemptr;
 pub mod list;
 #[macro_use]
 pub mod log;
+pub mod atomics;
 pub mod bgworkers;
+pub mod lwlock;
 pub mod memcxt;
 pub mod misc;
 pub mod namespace;
 pub mod nodes;
 pub mod pgbox;
 pub mod rel;
+pub mod shmem;
 pub mod spi;
 pub mod stringinfo;
 pub mod trigger_support;
@@ -56,6 +59,7 @@ pub mod varlena;
 pub mod wrappers;
 pub mod xid;
 
+pub use atomics::*;
 pub use callbacks::*;
 pub use datum::*;
 pub use enum_helper::*;

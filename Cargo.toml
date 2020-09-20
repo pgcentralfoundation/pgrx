@@ -25,6 +25,7 @@ exclude = [
     "pgx-examples/custom_types",
     "pgx-examples/errors",
     "pgx-examples/schemas",
+    "pgx-examples/shmem",
     "pgx-examples/spi",
     "pgx-examples/srf",
     "pgx-examples/strings",
