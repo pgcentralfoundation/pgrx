@@ -174,9 +174,9 @@ $ psql test
 ## Digging Deeper
 
  - [cargo-pgx sub-command](cargo-pgx/)
- - [various examples](pgx-examples/)
  - [Custom Types](pgx-examples/custom_types/)
-
+ - [Postgres Operator Funcions and Classes](pgx-examples/operators/)
+ - [various examples](pgx-examples/)
 
 ## Caveats & Known Issues
 

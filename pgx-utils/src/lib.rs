@@ -12,6 +12,8 @@ use std::str::FromStr;
 use syn::export::TokenStream2;
 use syn::{GenericArgument, ItemFn, PathArguments, ReturnType, Type, TypeParamBound};
 
+pub mod operator_common;
+
 pub static BASE_POSTGRES_PORT_NO: u16 = 28800;
 pub static BASE_POSTGRES_TESTING_PORT_NO: u16 = 32200;
 

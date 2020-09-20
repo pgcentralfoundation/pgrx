@@ -27,6 +27,7 @@ no-default-features = true
 enum-primitive-derive = "0.2.1"
 lazy_static = "1.4.0"
 num-traits = "0.2.12"
+seahash = "=4.0.1"
 pgx-macros = { path = "../pgx-macros/", version= "^0.0.14"}
 pgx-pg-sys = { path = "../pgx-pg-sys", version= "^0.0.14"}
 serde = { version = "1.0.116", features = [ "derive" ] }
