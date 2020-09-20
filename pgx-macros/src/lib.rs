@@ -471,10 +471,40 @@ fn parse_postgres_type_args(attributes: &[Attribute]) -> HashSet<PostgresTypeAtt
     categorized_attributes
 }
 
+/// Embed SQL directly into the generated extension script.
+///
+/// The argument must be as single raw string literal.
+///
+/// # Example
+/// ```
+/// # #[macro_use]
+/// # extern crate pgx_macros;
+/// # fn main() {
+/// extension_sql!(r#"
+/// -- sql statements
+/// "#)
+/// # }
+/// ```
+
 #[proc_macro]
-pub fn extension_sql(_: TokenStream) -> TokenStream {
-    // we don't want to output anything here
-    TokenStream::new()
+pub fn extension_sql(input: TokenStream) -> TokenStream {
+    fn is_raw_str(input: &str) -> bool {
+        input.starts_with("r#\"") && input.ends_with("\"#")
+    }
+
+    let tokens: Vec<String> = input.into_iter().map(|t| t.to_string()).collect();
+
+    let ok = (tokens.len() >= 1 && is_raw_str(&tokens[0]))
+        && (tokens.len() == 1 || (tokens.len() >= 2 && tokens[1] == ","));
+
+    if ok {
+        // ignore input
+        TokenStream::new()
+    } else {
+        TokenStream::from(quote! {
+          compile_error!("expected a single raw string literal with sql");
+        })
+    }
 }
 
 #[proc_macro_derive(PostgresEq)]
