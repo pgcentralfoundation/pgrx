@@ -1,7 +1,7 @@
 use pgx::*;
 use serde::{Deserialize, Serialize};
 
-/// standard Rust equality/comparision derives
+/// standard Rust equality/comparison derives
 #[derive(Eq, PartialEq, Ord, Hash, PartialOrd)]
 
 /// Support using this struct as a Postgres type, which the easy way requires Serde
