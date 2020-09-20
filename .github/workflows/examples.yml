@@ -85,6 +85,9 @@ jobs:
     - name: schemas example
       run: cd pgx-examples/schemas && CARGO_TARGET_DIR=~/.cargo/cargo-pgx cargo pgx test pg${{ matrix.version }}
 
+    - name: shmem example
+      run: cd pgx-examples/shmem && CARGO_TARGET_DIR=~/.cargo/cargo-pgx cargo pgx test pg${{ matrix.version }}
+
     - name: spi example
       run: cd pgx-examples/spi && CARGO_TARGET_DIR=~/.cargo/cargo-pgx cargo pgx test pg${{ matrix.version }}
 
