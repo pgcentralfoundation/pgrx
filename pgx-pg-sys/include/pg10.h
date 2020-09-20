@@ -12,6 +12,7 @@
 #include "access/reloptions.h"
 #include "access/relscan.h"
 #include "access/skey.h"
+#include "access/sysattr.h"
 #include "access/xact.h"
 
 #define ScanKey struct ScanKeyData *

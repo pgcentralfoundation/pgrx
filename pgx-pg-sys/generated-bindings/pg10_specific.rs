@@ -1202,6 +1202,10 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
+    pub fn do_pg_abort_backup();
+}
+#[pg_guard]
+extern "C" {
     pub fn do_pg_start_backup(
         backupidstr: *const ::std::os::raw::c_char,
         fast: bool,
@@ -2074,7 +2078,7 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
-    pub fn stringToNode(str: *mut ::std::os::raw::c_char) -> *mut ::std::os::raw::c_void;
+    pub fn stringToNode(str_: *mut ::std::os::raw::c_char) -> *mut ::std::os::raw::c_void;
 }
 #[pg_guard]
 extern "C" {
@@ -2661,19 +2665,8 @@ pub union PgStat_Msg {
 #[derive(Copy, Clone)]
 pub union Value_ValUnion {
     pub ival: ::std::os::raw::c_long,
-    pub str: *mut ::std::os::raw::c_char,
+    pub str_: *mut ::std::os::raw::c_char,
     _bindgen_union_align: u64,
-}
-#[repr(C)]
-#[derive(Debug)]
-pub struct ParamListInfoData {
-    pub paramFetch: ParamFetchHook,
-    pub paramFetchArg: *mut ::std::os::raw::c_void,
-    pub parserSetup: ParserSetupHook,
-    pub parserSetupArg: *mut ::std::os::raw::c_void,
-    pub numParams: ::std::os::raw::c_int,
-    pub paramMask: *mut Bitmapset,
-    pub params: __IncompleteArrayField<ParamExternData>,
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -3088,7 +3081,7 @@ pub struct EState {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct ExplainState {
-    pub str: StringInfo,
+    pub str_: StringInfo,
     pub verbose: bool,
     pub analyze: bool,
     pub costs: bool,
@@ -4651,35 +4644,6 @@ pub struct xl_xact_parsed_commit {
     pub origin_timestamp: TimestampTz,
 }
 #[repr(C)]
-#[derive(Debug, Default)]
-pub struct FormData_pg_index {
-    pub indexrelid: Oid,
-    pub indrelid: Oid,
-    pub indnatts: int16,
-    pub indisunique: bool,
-    pub indisprimary: bool,
-    pub indisexclusion: bool,
-    pub indimmediate: bool,
-    pub indisclustered: bool,
-    pub indisvalid: bool,
-    pub indcheckxmin: bool,
-    pub indisready: bool,
-    pub indislive: bool,
-    pub indisreplident: bool,
-    pub indkey: int2vector,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct ParallelHeapScanDescData {
-    pub phs_relid: Oid,
-    pub phs_syncscan: bool,
-    pub phs_nblocks: BlockNumber,
-    pub phs_mutex: slock_t,
-    pub phs_startblock: BlockNumber,
-    pub phs_cblock: BlockNumber,
-    pub phs_snapshot_data: __IncompleteArrayField<::std::os::raw::c_char>,
-}
-#[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct AggClauseCosts {
     pub numAggs: ::std::os::raw::c_int,
@@ -4814,6 +4778,46 @@ pub struct VariableCacheData {
     pub newestCommitTsXid: TransactionId,
     pub latestCompletedXid: TransactionId,
     pub oldestClogXid: TransactionId,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct FormData_pg_index {
+    pub indexrelid: Oid,
+    pub indrelid: Oid,
+    pub indnatts: int16,
+    pub indisunique: bool,
+    pub indisprimary: bool,
+    pub indisexclusion: bool,
+    pub indimmediate: bool,
+    pub indisclustered: bool,
+    pub indisvalid: bool,
+    pub indcheckxmin: bool,
+    pub indisready: bool,
+    pub indislive: bool,
+    pub indisreplident: bool,
+    pub indkey: int2vector,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct ParallelHeapScanDescData {
+    pub phs_relid: Oid,
+    pub phs_syncscan: bool,
+    pub phs_nblocks: BlockNumber,
+    pub phs_mutex: slock_t,
+    pub phs_startblock: BlockNumber,
+    pub phs_cblock: BlockNumber,
+    pub phs_snapshot_data: __IncompleteArrayField<::std::os::raw::c_char>,
+}
+#[repr(C)]
+#[derive(Debug)]
+pub struct ParamListInfoData {
+    pub paramFetch: ParamFetchHook,
+    pub paramFetchArg: *mut ::std::os::raw::c_void,
+    pub parserSetup: ParserSetupHook,
+    pub parserSetupArg: *mut ::std::os::raw::c_void,
+    pub numParams: ::std::os::raw::c_int,
+    pub paramMask: *mut Bitmapset,
+    pub params: __IncompleteArrayField<ParamExternData>,
 }
 #[repr(C)]
 pub struct FormData_pg_trigger {
@@ -5158,6 +5162,7 @@ pub const FRAMEOPTION_START_VALUE: u32 = 5120;
 pub const FRAMEOPTION_START_VALUE_FOLLOWING: u32 = 4096;
 pub const FRAMEOPTION_START_VALUE_PRECEDING: u32 = 1024;
 pub const FirstBootstrapObjectId: u32 = 10000;
+pub const FirstLowInvalidHeapAttributeNumber: i32 = -8;
 pub const FuncDetailCode_FUNCDETAIL_AGGREGATE: FuncDetailCode = 3;
 pub const FuncDetailCode_FUNCDETAIL_COERCION: FuncDetailCode = 5;
 pub const FuncDetailCode_FUNCDETAIL_WINDOWFUNC: FuncDetailCode = 4;
@@ -5175,7 +5180,6 @@ pub const GrantObjectType_ACL_OBJECT_SEQUENCE: GrantObjectType = 2;
 pub const GrantObjectType_ACL_OBJECT_TABLESPACE: GrantObjectType = 11;
 pub const GrantObjectType_ACL_OBJECT_TYPE: GrantObjectType = 12;
 pub const HAVE_DECL_SNPRINTF: u32 = 1;
-pub const HAVE_DECL_SYS_SIGLIST: u32 = 1;
 pub const HAVE_DECL_VSNPRINTF: u32 = 1;
 pub const HAVE_SNPRINTF: u32 = 1;
 pub const HAVE_STRERROR: u32 = 1;
@@ -5201,6 +5205,10 @@ pub const IndexAttrBitmapKind_INDEX_ATTR_BITMAP_IDENTITY_KEY: IndexAttrBitmapKin
 pub const IndexAttrBitmapKind_INDEX_ATTR_BITMAP_KEY: IndexAttrBitmapKind = 1;
 pub const IndexAttrBitmapKind_INDEX_ATTR_BITMAP_PRIMARY_KEY: IndexAttrBitmapKind = 2;
 pub const LOCK_MANAGER_LWLOCK_OFFSET: u32 = 174;
+pub const MaxCommandIdAttributeNumber: i32 = -6;
+pub const MaxTransactionIdAttributeNumber: i32 = -5;
+pub const MinCommandIdAttributeNumber: i32 = -4;
+pub const MinTransactionIdAttributeNumber: i32 = -3;
 pub const NUM_FIXED_LWLOCKS: u32 = 206;
 pub const NUM_INDIVIDUAL_LWLOCKS: u32 = 46;
 pub const Natts_pg_attribute: u32 = 22;
@@ -5607,6 +5615,7 @@ pub const NodeTag_T_WorkTableScan: NodeTag = 31;
 pub const NodeTag_T_WorkTableScanState: NodeTag = 76;
 pub const NodeTag_T_XmlExpr: NodeTag = 132;
 pub const NodeTag_T_XmlSerialize: NodeTag = 373;
+pub const ObjectIdAttributeNumber: i32 = -2;
 pub const ObjectType_OBJECT_PUBLICATION: ObjectType = 28;
 pub const ObjectType_OBJECT_PUBLICATION_REL: ObjectType = 29;
 pub const ObjectType_OBJECT_ROLE: ObjectType = 30;
@@ -5628,14 +5637,14 @@ pub const ObjectType_OBJECT_TYPE: ObjectType = 45;
 pub const ObjectType_OBJECT_USER_MAPPING: ObjectType = 46;
 pub const ObjectType_OBJECT_VIEW: ObjectType = 47;
 pub const PACKAGE_BUGREPORT: &'static [u8; 26usize] = b"pgsql-bugs@postgresql.org\0";
-pub const PACKAGE_STRING: &'static [u8; 17usize] = b"PostgreSQL 10.13\0";
-pub const PACKAGE_VERSION: &'static [u8; 6usize] = b"10.13\0";
+pub const PACKAGE_STRING: &'static [u8; 17usize] = b"PostgreSQL 10.14\0";
+pub const PACKAGE_VERSION: &'static [u8; 6usize] = b"10.14\0";
 pub const PGSTAT_NUM_PROGRESS_PARAM: u32 = 10;
-pub const PG_BACKEND_VERSIONSTR: &'static [u8; 29usize] = b"postgres (PostgreSQL) 10.13\n\0";
+pub const PG_BACKEND_VERSIONSTR: &'static [u8; 29usize] = b"postgres (PostgreSQL) 10.14\n\0";
 pub const PG_MAJORVERSION: &'static [u8; 3usize] = b"10\0";
-pub const PG_VERSION: &'static [u8; 6usize] = b"10.13\0";
-pub const PG_VERSION_NUM: u32 = 100013;
-pub const PG_VERSION_STR : & 'static [ u8 ; 115usize ] = b"PostgreSQL 10.13 on x86_64-apple-darwin19.0.0, compiled by Apple clang version 11.0.0 (clang-1100.0.33.12), 64-bit\0" ;
+pub const PG_VERSION: &'static [u8; 6usize] = b"10.14\0";
+pub const PG_VERSION_NUM: u32 = 100014;
+pub const PG_VERSION_STR : & 'static [u8 ; 115usize] = b"PostgreSQL 10.14 on x86_64-apple-darwin19.0.0, compiled by Apple clang version 11.0.0 (clang-1100.0.33.12), 64-bit\0" ;
 pub const PREDICATELOCK_MANAGER_LWLOCK_OFFSET: u32 = 190;
 pub const ParseExprKind_EXPR_KIND_ALTER_COL_TRANSFORM: ParseExprKind = 31;
 pub const ParseExprKind_EXPR_KIND_CHECK_CONSTRAINT: ParseExprKind = 25;
@@ -5705,6 +5714,7 @@ pub const TableLikeOption_CREATE_TABLE_LIKE_IDENTITY: TableLikeOption = 4;
 pub const TableLikeOption_CREATE_TABLE_LIKE_INDEXES: TableLikeOption = 8;
 pub const TableLikeOption_CREATE_TABLE_LIKE_STATISTICS: TableLikeOption = 64;
 pub const TableLikeOption_CREATE_TABLE_LIKE_STORAGE: TableLikeOption = 16;
+pub const TableOidAttributeNumber: i32 = -7;
 pub const TypeFuncClass_TYPEFUNC_OTHER: TypeFuncClass = 3;
 pub const TypeFuncClass_TYPEFUNC_RECORD: TypeFuncClass = 2;
 pub const UpperRelationKind_UPPERREL_DISTINCT: UpperRelationKind = 3;
@@ -5745,7 +5755,7 @@ pub const dsm_op_DSM_OP_DESTROY: dsm_op = 4;
 pub const dsm_op_DSM_OP_RESIZE: dsm_op = 3;
 pub const tuplehash_status_tuplehash_EMPTY: tuplehash_status = 0;
 pub const tuplehash_status_tuplehash_IN_USE: tuplehash_status = 1;
-pub type AclObjectKind = u32;
+pub type AclObjectKind = ::std::os::raw::c_uint;
 pub type AttrDefault = attrDefault;
 pub type BoolPtr = *mut bool;
 pub type BulkInsertState = *mut BulkInsertStateData;
@@ -5771,16 +5781,16 @@ pub type GetForeignUpperPaths_function = ::std::option::Option<
         output_rel: *mut RelOptInfo,
     ),
 >;
-pub type GrantObjectType = u32;
-pub type HTSU_Result = u32;
+pub type GrantObjectType = ::std::os::raw::c_uint;
+pub type HTSU_Result = ::std::os::raw::c_uint;
 pub type HeapScanDesc = *mut HeapScanDescData;
 pub type ParallelHeapScanDesc = *mut ParallelHeapScanDescData;
 pub type ParamFetchHook = ::std::option::Option<
     unsafe extern "C" fn(params: ParamListInfo, paramid: ::std::os::raw::c_int),
 >;
 pub type PartitionDispatch = *mut PartitionDispatchData;
-pub type Pattern_Prefix_Status = u32;
-pub type Pattern_Type = u32;
+pub type Pattern_Prefix_Status = ::std::os::raw::c_uint;
+pub type Pattern_Type = ::std::os::raw::c_uint;
 pub type RefetchForeignRow_function = ::std::option::Option<
     unsafe extern "C" fn(
         estate: *mut EState,
@@ -5794,7 +5804,7 @@ pub type SnapshotSatisfiesFunc = ::std::option::Option<
 >;
 pub type TupleConstr = tupleConstr;
 pub type TupleDesc = *mut tupleDesc;
-pub type VacuumOption = u32;
+pub type VacuumOption = ::std::os::raw::c_uint;
 pub type bitmapword = uint32;
 pub type create_upper_paths_hook_type = ::std::option::Option<
     unsafe extern "C" fn(

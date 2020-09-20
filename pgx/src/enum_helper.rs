@@ -3,9 +3,7 @@
 
 //! Helper functions for working with Postgres `enum` types
 
-use crate::{
-    direct_function_call, ereport, pg_sys, rust_str_to_text_p, PgLogLevel, PgSqlErrorCode,
-};
+use crate::{ereport, pg_sys, PgLogLevel, PgSqlErrorCode};
 
 extern "C" {
     fn pgx_GETSTRUCT(tuple: pg_sys::HeapTuple) -> *mut std::os::raw::c_char;
@@ -51,14 +49,7 @@ pub fn lookup_enum_by_oid(enumval: pg_sys::Oid) -> (String, pg_sys::Oid, f32) {
 }
 
 pub fn lookup_enum_by_label(typname: &str, label: &str) -> pg_sys::Datum {
-    let typname_as_text = rust_str_to_text_p(typname);
-    let enumtypoid = unsafe {
-        direct_function_call::<pg_sys::Oid>(
-            pg_sys::to_regtype,
-            vec![Some(typname_as_text.as_ptr() as pg_sys::Datum)],
-        )
-    }
-    .expect("could not convert enum type to oid") as pg_sys::Oid;
+    let enumtypoid = crate::regtypein(typname);
 
     if enumtypoid == pg_sys::InvalidOid {
         panic!("could not locate type oid for type: {}", typname);

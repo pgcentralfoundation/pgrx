@@ -18,6 +18,29 @@ INSERT INTO spi_example (title) VALUES ('I like pudding');
 "#
 );
 
+#[pg_extern]
+fn spi_return_query(
+) -> impl std::iter::Iterator<Item = (name!(oid, Option<pg_sys::Oid>), name!(name, Option<String>))>
+{
+    #[cfg(feature = "pg10")]
+    let query = "SELECT oid, relname::text || '-pg10' FROM pg_class";
+    #[cfg(feature = "pg11")]
+    let query = "SELECT oid, relname::text || '-pg11' FROM pg_class";
+    #[cfg(feature = "pg12")]
+    let query = "SELECT oid, relname::text || '-pg12' FROM pg_class";
+
+    let mut results = Vec::new();
+    Spi::connect(|client| {
+        client
+            .select(query, None, None)
+            .map(|row| (row.get_datum(1), row.get_datum(2)))
+            .for_each(|tuple| results.push(tuple));
+        Ok(Some(()))
+    });
+
+    results.into_iter()
+}
+
 #[pg_extern(immutable, parallel_safe)]
 fn spi_query_random_id() -> Option<i64> {
     Spi::get_one("SELECT id FROM spi.spi_example ORDER BY random() LIMIT 1")

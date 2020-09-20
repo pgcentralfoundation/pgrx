@@ -10,6 +10,7 @@
 #include "access/reloptions.h"
 #include "access/relscan.h"
 #include "access/skey.h"
+#include "access/sysattr.h"
 #include "access/tableam.h"
 #include "access/xact.h"
 #include "catalog/index.h"

@@ -1514,7 +1514,7 @@ extern "C" {
 #[pg_guard]
 extern "C" {
     pub fn appendBinaryStringInfoNT(
-        str: StringInfo,
+        str_: StringInfo,
         data: *const ::std::os::raw::c_char,
         datalen: ::std::os::raw::c_int,
     );
@@ -1931,6 +1931,10 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
+    pub fn do_pg_abort_backup(code: ::std::os::raw::c_int, arg: Datum);
+}
+#[pg_guard]
+extern "C" {
     pub fn do_pg_start_backup(
         backupidstr: *const ::std::os::raw::c_char,
         fast: bool,
@@ -2333,6 +2337,19 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
+    pub fn histogram_selectivity_ext(
+        vardata: *mut VariableStatData,
+        opproc: *mut FmgrInfo,
+        collation: Oid,
+        constval: Datum,
+        varonleft: bool,
+        min_hist_size: ::std::os::raw::c_int,
+        n_skip: ::std::os::raw::c_int,
+        hist_size: *mut ::std::os::raw::c_int,
+    ) -> f64;
+}
+#[pg_guard]
+extern "C" {
     pub fn in_range_date_interval(fcinfo: FunctionCallInfo) -> Datum;
 }
 #[pg_guard]
@@ -2528,6 +2545,19 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
+    pub fn ineq_histogram_selectivity_ext(
+        root: *mut PlannerInfo,
+        vardata: *mut VariableStatData,
+        opproc: *mut FmgrInfo,
+        isgt: bool,
+        iseq: bool,
+        collation: Oid,
+        constval: Datum,
+        consttype: Oid,
+    ) -> f64;
+}
+#[pg_guard]
+extern "C" {
     pub fn initial_cost_hashjoin(
         root: *mut PlannerInfo,
         workspace: *mut JoinCostWorkspace,
@@ -2712,6 +2742,17 @@ extern "C" {
 #[pg_guard]
 extern "C" {
     pub fn mark_dummy_rel(rel: *mut RelOptInfo);
+}
+#[pg_guard]
+extern "C" {
+    pub fn mcv_selectivity_ext(
+        vardata: *mut VariableStatData,
+        opproc: *mut FmgrInfo,
+        collation: Oid,
+        constval: Datum,
+        varonleft: bool,
+        sumcommonp: *mut f64,
+    ) -> f64;
 }
 #[pg_guard]
 extern "C" {
@@ -2909,7 +2950,7 @@ extern "C" {
 #[pg_guard]
 extern "C" {
     pub fn pg_snprintf(
-        str: *mut ::std::os::raw::c_char,
+        str_: *mut ::std::os::raw::c_char,
         count: usize,
         fmt: *const ::std::os::raw::c_char,
         ...
@@ -2918,7 +2959,7 @@ extern "C" {
 #[pg_guard]
 extern "C" {
     pub fn pg_sprintf(
-        str: *mut ::std::os::raw::c_char,
+        str_: *mut ::std::os::raw::c_char,
         fmt: *const ::std::os::raw::c_char,
         ...
     ) -> ::std::os::raw::c_int;
@@ -2950,15 +2991,11 @@ extern "C" {
 #[pg_guard]
 extern "C" {
     pub fn pg_strfromd(
-        str: *mut ::std::os::raw::c_char,
+        str_: *mut ::std::os::raw::c_char,
         count: usize,
         precision: ::std::os::raw::c_int,
         value: f64,
     ) -> ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
-    pub fn pg_strsignal(signum: ::std::os::raw::c_int) -> *const ::std::os::raw::c_char;
 }
 #[pg_guard]
 extern "C" {
@@ -2986,7 +3023,7 @@ extern "C" {
 #[pg_guard]
 extern "C" {
     pub fn pg_vsnprintf(
-        str: *mut ::std::os::raw::c_char,
+        str_: *mut ::std::os::raw::c_char,
         count: usize,
         fmt: *const ::std::os::raw::c_char,
         args: *mut __va_list_tag,
@@ -2995,7 +3032,7 @@ extern "C" {
 #[pg_guard]
 extern "C" {
     pub fn pg_vsprintf(
-        str: *mut ::std::os::raw::c_char,
+        str_: *mut ::std::os::raw::c_char,
         fmt: *const ::std::os::raw::c_char,
         args: *mut __va_list_tag,
     ) -> ::std::os::raw::c_int;
@@ -3094,6 +3131,10 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
+    pub fn register_persistent_abort_backup_handler();
+}
+#[pg_guard]
+extern "C" {
     pub fn reparameterize_path_by_child(
         root: *mut PlannerInfo,
         path: *mut Path,
@@ -3188,7 +3229,7 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
-    pub fn stringToNode(str: *const ::std::os::raw::c_char) -> *mut ::std::os::raw::c_void;
+    pub fn stringToNode(str_: *const ::std::os::raw::c_char) -> *mut ::std::os::raw::c_void;
 }
 #[pg_guard]
 extern "C" {
@@ -3546,6 +3587,18 @@ extern "C" {
     pub fn var_eq_const(
         vardata: *mut VariableStatData,
         oproid: Oid,
+        constval: Datum,
+        constisnull: bool,
+        varonleft: bool,
+        negate: bool,
+    ) -> f64;
+}
+#[pg_guard]
+extern "C" {
+    pub fn var_eq_const_ext(
+        vardata: *mut VariableStatData,
+        oproid: Oid,
+        collation: Oid,
         constval: Datum,
         constisnull: bool,
         varonleft: bool,
@@ -4121,37 +4174,8 @@ pub union PgStat_Msg {
 #[derive(Copy, Clone)]
 pub union Value_ValUnion {
     pub ival: ::std::os::raw::c_int,
-    pub str: *mut ::std::os::raw::c_char,
+    pub str_: *mut ::std::os::raw::c_char,
     _bindgen_union_align: u64,
-}
-#[repr(C)]
-#[derive(Debug)]
-pub struct FunctionCallInfoBaseData {
-    pub flinfo: *mut FmgrInfo,
-    pub context: fmNodePtr,
-    pub resultinfo: fmNodePtr,
-    pub fncollation: Oid,
-    pub isnull: bool,
-    pub nargs: ::std::os::raw::c_short,
-    pub args: __IncompleteArrayField<NullableDatum>,
-}
-#[repr(C)]
-#[derive(Debug)]
-pub struct ParamListInfoData {
-    pub paramFetch: ParamFetchHook,
-    pub paramFetchArg: *mut ::std::os::raw::c_void,
-    pub paramCompile: ParamCompileHook,
-    pub paramCompileArg: *mut ::std::os::raw::c_void,
-    pub parserSetup: ParserSetupHook,
-    pub parserSetupArg: *mut ::std::os::raw::c_void,
-    pub numParams: ::std::os::raw::c_int,
-    pub params: __IncompleteArrayField<ParamExternData>,
-}
-#[repr(C)]
-#[derive(Debug)]
-pub struct SharedSortInfo {
-    pub num_workers: ::std::os::raw::c_int,
-    pub sinstrument: __IncompleteArrayField<TuplesortInstrumentation>,
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -4640,7 +4664,7 @@ pub struct EState {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct ExplainState {
-    pub str: StringInfo,
+    pub str_: StringInfo,
     pub verbose: bool,
     pub analyze: bool,
     pub costs: bool,
@@ -6796,31 +6820,6 @@ pub struct WindowClause {
     pub copiedOrder: bool,
 }
 #[repr(C)]
-#[derive(Debug, Default)]
-pub struct FormData_pg_index {
-    pub indexrelid: Oid,
-    pub indrelid: Oid,
-    pub indnatts: int16,
-    pub indnkeyatts: int16,
-    pub indisunique: bool,
-    pub indisprimary: bool,
-    pub indisexclusion: bool,
-    pub indimmediate: bool,
-    pub indisclustered: bool,
-    pub indisvalid: bool,
-    pub indcheckxmin: bool,
-    pub indisready: bool,
-    pub indislive: bool,
-    pub indisreplident: bool,
-    pub indkey: int2vector,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct SharedHashInfo {
-    pub num_workers: ::std::os::raw::c_int,
-    pub hinstrument: __IncompleteArrayField<HashInstrumentation>,
-}
-#[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct AggClauseCosts {
     pub numAggs: ::std::os::raw::c_int,
@@ -7079,6 +7078,60 @@ pub struct xl_clog_truncate {
     pub pageno: ::std::os::raw::c_int,
     pub oldestXact: TransactionId,
     pub oldestXactDb: Oid,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct FormData_pg_index {
+    pub indexrelid: Oid,
+    pub indrelid: Oid,
+    pub indnatts: int16,
+    pub indnkeyatts: int16,
+    pub indisunique: bool,
+    pub indisprimary: bool,
+    pub indisexclusion: bool,
+    pub indimmediate: bool,
+    pub indisclustered: bool,
+    pub indisvalid: bool,
+    pub indcheckxmin: bool,
+    pub indisready: bool,
+    pub indislive: bool,
+    pub indisreplident: bool,
+    pub indkey: int2vector,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct SharedHashInfo {
+    pub num_workers: ::std::os::raw::c_int,
+    pub hinstrument: __IncompleteArrayField<HashInstrumentation>,
+}
+#[repr(C)]
+#[derive(Debug)]
+pub struct FunctionCallInfoBaseData {
+    pub flinfo: *mut FmgrInfo,
+    pub context: fmNodePtr,
+    pub resultinfo: fmNodePtr,
+    pub fncollation: Oid,
+    pub isnull: bool,
+    pub nargs: ::std::os::raw::c_short,
+    pub args: __IncompleteArrayField<NullableDatum>,
+}
+#[repr(C)]
+#[derive(Debug)]
+pub struct ParamListInfoData {
+    pub paramFetch: ParamFetchHook,
+    pub paramFetchArg: *mut ::std::os::raw::c_void,
+    pub paramCompile: ParamCompileHook,
+    pub paramCompileArg: *mut ::std::os::raw::c_void,
+    pub parserSetup: ParserSetupHook,
+    pub parserSetupArg: *mut ::std::os::raw::c_void,
+    pub numParams: ::std::os::raw::c_int,
+    pub params: __IncompleteArrayField<ParamExternData>,
+}
+#[repr(C)]
+#[derive(Debug)]
+pub struct SharedSortInfo {
+    pub num_workers: ::std::os::raw::c_int,
+    pub sinstrument: __IncompleteArrayField<TuplesortInstrumentation>,
 }
 #[repr(C)]
 pub struct FormData_pg_trigger {
@@ -7648,7 +7701,6 @@ pub const HAVE_PWRITE: u32 = 1;
 pub const HAVE_SPECIALJOININFO_TYPEDEF: u32 = 1;
 pub const HAVE_STDBOOL_H: u32 = 1;
 pub const HAVE_STRNLEN: u32 = 1;
-pub const HAVE_STRSIGNAL: u32 = 1;
 pub const HAVE_STRTOF: u32 = 1;
 pub const HAVE_X86_64_POPCNTQ: u32 = 1;
 pub const HAVE__BOOL: u32 = 1;
@@ -8156,20 +8208,20 @@ pub const ObjectType_OBJECT_TYPE: ObjectType = 47;
 pub const ObjectType_OBJECT_USER_MAPPING: ObjectType = 48;
 pub const ObjectType_OBJECT_VIEW: ObjectType = 49;
 pub const PACKAGE_BUGREPORT: &'static [u8; 32usize] = b"pgsql-bugs@lists.postgresql.org\0";
-pub const PACKAGE_STRING: &'static [u8; 16usize] = b"PostgreSQL 12.3\0";
-pub const PACKAGE_VERSION: &'static [u8; 5usize] = b"12.3\0";
+pub const PACKAGE_STRING: &'static [u8; 16usize] = b"PostgreSQL 12.4\0";
+pub const PACKAGE_VERSION: &'static [u8; 5usize] = b"12.4\0";
 pub const PARTITION_STRATEGY_HASH: u8 = 104u8;
 pub const PATHARRAYOID: u32 = 1019;
 pub const PERFORM_DELETION_CONCURRENT_LOCK: u32 = 32;
 pub const PGMCVLISTOID: u32 = 5017;
 pub const PGSTAT_NUM_PROGRESS_PARAM: u32 = 20;
-pub const PG_BACKEND_VERSIONSTR: &'static [u8; 28usize] = b"postgres (PostgreSQL) 12.3\n\0";
+pub const PG_BACKEND_VERSIONSTR: &'static [u8; 28usize] = b"postgres (PostgreSQL) 12.4\n\0";
 pub const PG_LSNARRAYOID: u32 = 3221;
 pub const PG_MAJORVERSION: &'static [u8; 3usize] = b"12\0";
 pub const PG_STRERROR_R_BUFLEN: u32 = 256;
-pub const PG_VERSION: &'static [u8; 5usize] = b"12.3\0";
-pub const PG_VERSION_NUM: u32 = 120003;
-pub const PG_VERSION_STR : & 'static [ u8 ; 114usize ] = b"PostgreSQL 12.3 on x86_64-apple-darwin19.0.0, compiled by Apple clang version 11.0.0 (clang-1100.0.33.12), 64-bit\0" ;
+pub const PG_VERSION: &'static [u8; 5usize] = b"12.4\0";
+pub const PG_VERSION_NUM: u32 = 120004;
+pub const PG_VERSION_STR : & 'static [u8 ; 114usize] = b"PostgreSQL 12.4 on x86_64-apple-darwin19.0.0, compiled by Apple clang version 11.0.0 (clang-1100.0.33.12), 64-bit\0" ;
 pub const POINTARRAYOID: u32 = 1017;
 pub const POLYGONARRAYOID: u32 = 1027;
 pub const PREDICATELOCK_MANAGER_LWLOCK_OFFSET: u32 = 189;
@@ -8267,7 +8319,6 @@ pub const ScanOptions_SO_TYPE_BITMAPSCAN: ScanOptions = 2;
 pub const ScanOptions_SO_TYPE_SAMPLESCAN: ScanOptions = 4;
 pub const ScanOptions_SO_TYPE_SEQSCAN: ScanOptions = 1;
 pub const ScanOptions_SO_TYPE_TIDSCAN: ScanOptions = 256;
-pub const SelfItemPointerAttributeNumber: i32 = -1;
 pub const SnapshotType_SNAPSHOT_ANY: SnapshotType = 2;
 pub const SnapshotType_SNAPSHOT_DIRTY: SnapshotType = 4;
 pub const SnapshotType_SNAPSHOT_HISTORIC_MVCC: SnapshotType = 5;
@@ -8420,8 +8471,8 @@ pub const tuplehash_status_tuplehash_SH_IN_USE: tuplehash_status = 1;
 pub type BeginForeignInsert_function = ::std::option::Option<
     unsafe extern "C" fn(mtstate: *mut ModifyTableState, rinfo: *mut ResultRelInfo),
 >;
-pub type CTEMaterialize = u32;
-pub type ClusterOption = u32;
+pub type CTEMaterialize = ::std::os::raw::c_uint;
+pub type ClusterOption = ::std::os::raw::c_uint;
 pub type EndForeignInsert_function =
     ::std::option::Option<unsafe extern "C" fn(estate: *mut EState, rinfo: *mut ResultRelInfo)>;
 pub type ExplainOneQuery_hook_type = ::std::option::Option<
@@ -8435,7 +8486,7 @@ pub type ExplainOneQuery_hook_type = ::std::option::Option<
         queryEnv: *mut QueryEnvironment,
     ),
 >;
-pub type ForceParallelMode = u32;
+pub type ForceParallelMode = ::std::os::raw::c_uint;
 pub type FunctionCallInfo = *mut FunctionCallInfoBaseData;
 pub type GetForeignUpperPaths_function = ::std::option::Option<
     unsafe extern "C" fn(
@@ -8446,7 +8497,7 @@ pub type GetForeignUpperPaths_function = ::std::option::Option<
         extra: *mut ::std::os::raw::c_void,
     ),
 >;
-pub type InheritanceKind = u32;
+pub type InheritanceKind = ::std::os::raw::c_uint;
 pub type MemoryStatsPrintFunc = ::std::option::Option<
     unsafe extern "C" fn(
         context: MemoryContext,
@@ -8474,12 +8525,12 @@ pub type ParamFetchHook = ::std::option::Option<
     ) -> *mut ParamExternData,
 >;
 pub type PartitionDirectory = *mut PartitionDirectoryData;
-pub type PartitionPruneCombineOp = u32;
+pub type PartitionPruneCombineOp = ::std::os::raw::c_uint;
 pub type PartitionScheme = *mut PartitionSchemeData;
-pub type PartitionwiseAggregateType = u32;
-pub type PlanCacheMode = u32;
-pub type RVROption = u32;
-pub type RecoveryTargetTimeLineGoal = u32;
+pub type PartitionwiseAggregateType = ::std::os::raw::c_uint;
+pub type PlanCacheMode = ::std::os::raw::c_uint;
+pub type RVROption = ::std::os::raw::c_uint;
+pub type RecoveryTargetTimeLineGoal = ::std::os::raw::c_uint;
 pub type RefetchForeignRow_function = ::std::option::Option<
     unsafe extern "C" fn(
         estate: *mut EState,
@@ -8496,15 +8547,15 @@ pub type ReparameterizeForeignPathByChild_function = ::std::option::Option<
         child_rel: *mut RelOptInfo,
     ) -> *mut List,
 >;
-pub type ScanOptions = u32;
-pub type SnapshotType = u32;
+pub type ScanOptions = ::std::os::raw::c_uint;
+pub type SnapshotType = ::std::os::raw::c_uint;
 pub type SortCoordinate = *mut SortCoordinateData;
-pub type TM_Result = u32;
+pub type TM_Result = ::std::os::raw::c_uint;
 pub type TableScanDesc = *mut TableScanDescData;
-pub type TempNamespaceStatus = u32;
+pub type TempNamespaceStatus = ::std::os::raw::c_uint;
 pub type TupleDesc = *mut TupleDescData;
-pub type TuplesortMethod = u32;
-pub type TuplesortSpaceType = u32;
+pub type TuplesortMethod = ::std::os::raw::c_uint;
+pub type TuplesortSpaceType = ::std::os::raw::c_uint;
 pub type XidStatus = ::std::os::raw::c_int;
 pub type ambuildphasename_function =
     ::std::option::Option<unsafe extern "C" fn(phasenum: int64) -> *mut ::std::os::raw::c_char>;

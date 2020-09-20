@@ -7,11 +7,11 @@ use std::time::Duration;
     `~/.pgx/data-PGVER/postgresql.conf` and add this line to the end:
 
     ```
-    session_preload_libraries = 'bgworker.so'
+    shared_preload_libraries = 'bgworker.so'
     ```
 
     Background workers **must** be initialized in the extension's `_PG_init()` function, and can **only**
-    be started if loaded through the `session_preload_libraries` configuration setting.
+    be started if loaded through the `shared_preload_libraries` configuration setting.
 
     Executing `cargo pgx run <PGVER>` will, when it restarts the specified Postgres instance, also start
     this background worker
@@ -37,8 +37,9 @@ pub extern "C" fn background_worker_main(arg: pg_sys::Datum) {
     // we'll never be able to exit via an external notification
     BackgroundWorker::attach_signal_handlers(SignalWakeFlags::SIGHUP | SignalWakeFlags::SIGTERM);
 
-    // we want to be able to use SPI against the specified table (postgres), as the user postgres
-    BackgroundWorker::connect_worker_to_spi(Some("postgres"), Some("postgres"));
+    // we want to be able to use SPI against the specified database (postgres), as the superuser which 
+    // did the initdb. You can specify a specific user with Some("my_user")
+    BackgroundWorker::connect_worker_to_spi(Some("postgres"), None);
 
     log!(
         "Hello from inside the {} BGWorker!  Argument value={}",

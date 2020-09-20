@@ -6,9 +6,7 @@
 //! Primitive types can never be null, so we do a direct
 //! cast of the primitive type to pg_sys::Datum
 
-use crate::{
-    direct_function_call, pg_sys, rust_byte_slice_to_bytea, rust_str_to_text_p, PgBox, PgOid,
-};
+use crate::{pg_sys, rust_byte_slice_to_bytea, rust_regtypein, rust_str_to_text_p, PgBox, PgOid};
 
 /// Convert a Rust type into a `pg_sys::Datum`.
 ///
@@ -271,12 +269,8 @@ impl<T> IntoDatum for PgBox<T> {
         }
     }
 
-    fn type_oid() -> u32 {
-        let type_name = std::any::type_name::<T>();
-        unsafe {
-            direct_function_call::<pg_sys::Oid>(pg_sys::regtypein, vec![type_name.into_datum()])
-                .expect("unable to lookup type oid")
-        }
+    fn type_oid() -> pg_sys::Oid {
+        rust_regtypein::<T>()
     }
 }
 

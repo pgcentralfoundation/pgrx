@@ -222,7 +222,10 @@ pub fn client() -> (postgres::Client, String) {
 
 fn install_extension() {
     eprintln!("installing extension");
-    let mut command = Command::new("cargo-pgx")
+    let is_release = std::env::var("PGX_BUILD_PROFILE").unwrap_or("debug".into()) == "release";
+
+    let mut command = Command::new("cargo");
+    command
         .arg("pgx")
         .arg("install")
         .stdout(Stdio::inherit())
@@ -238,11 +241,14 @@ fn install_extension() {
                 "pg{} pg_test",
                 pg_sys::get_pg_major_version_string().to_string()
             ),
-        )
-        .spawn()
-        .unwrap();
+        );
 
-    let status = command.wait().unwrap();
+    if is_release {
+        command.arg("--release");
+    }
+
+    let mut child = command.spawn().unwrap();
+    let status = child.wait().unwrap();
     if !status.success() {
         panic!("failed to install extension");
     }
@@ -323,7 +329,7 @@ fn monitor_pg(mut command: Command, cmd_string: String, loglines: LogLines) -> (
         let pid = child.id();
 
         eprintln!(
-            "{}, pid={}",
+            "{}\npid={}",
             cmd_string.bold().blue(),
             pid.to_string().yellow()
         );
@@ -397,6 +403,10 @@ fn monitor_pg(mut command: Command, cmd_string: String, loglines: LogLines) -> (
 
 fn dropdb() {
     let output = Command::new(get_dropdb_path(pg_sys::get_pg_major_version_num()))
+        .env_remove("PGDATABASE")
+        .env_remove("PGHOST")
+        .env_remove("PGPORT")
+        .env_remove("PGUSER")
         .arg("--if-exists")
         .arg("-h")
         .arg(get_pg_host())

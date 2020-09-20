@@ -1,7 +1,7 @@
 //! Wrapper for Postgres 'varlena' type, over Rust types of a fixed size (ie, `impl Copy`)
 use crate::pg_sys::{VARATT_SHORT_MAX, VARHDRSZ_SHORT};
 use crate::{
-    direct_function_call, pg_sys, set_varsize, set_varsize_short, vardata_any, varsize_any,
+    pg_sys, rust_regtypein, set_varsize, set_varsize_short, vardata_any, varsize_any,
     varsize_any_exhdr, void_mut_ptr, FromDatum, IntoDatum, PgMemoryContexts, PostgresType,
     StringInfo,
 };
@@ -258,14 +258,8 @@ where
         Some(self.into_pg() as pg_sys::Datum)
     }
 
-    fn type_oid() -> u32 {
-        unsafe {
-            direct_function_call::<pg_sys::Oid>(
-                pg_sys::regtypein,
-                vec![std::any::type_name::<T>().into_datum()],
-            )
-            .expect("failed to lookup typeoid")
-        }
+    fn type_oid() -> pg_sys::Oid {
+        rust_regtypein::<T>()
     }
 }
 
@@ -315,13 +309,7 @@ where
     }
 
     fn type_oid() -> u32 {
-        unsafe {
-            direct_function_call::<pg_sys::Oid>(
-                pg_sys::regtypein,
-                vec![std::any::type_name::<T>().into_datum()],
-            )
-            .expect("failed to lookup typeoid")
-        }
+        crate::rust_regtypein::<T>()
     }
 }
 
@@ -329,14 +317,24 @@ impl<'de, T> FromDatum for T
 where
     T: PostgresType + Deserialize<'de>,
 {
-    unsafe fn from_datum(datum: usize, is_null: bool, _typoid: u32) -> Option<Self>
-    where
-        Self: Sized,
-    {
+    unsafe fn from_datum(datum: usize, is_null: bool, _typoid: u32) -> Option<Self> {
         if is_null {
             None
         } else {
             cbor_decode(datum as *mut pg_sys::varlena)
+        }
+    }
+
+    unsafe fn from_datum_in_memory_context(
+        memory_context: PgMemoryContexts,
+        datum: usize,
+        is_null: bool,
+        _typoid: u32,
+    ) -> Option<Self> {
+        if is_null {
+            None
+        } else {
+            cbor_decode_into_context(memory_context, datum as *mut pg_sys::varlena)
         }
     }
 }
@@ -359,7 +357,7 @@ where
     varlena as *const pg_sys::varlena
 }
 
-unsafe fn cbor_decode<'de, T>(input: *mut pg_sys::varlena) -> T
+pub unsafe fn cbor_decode<'de, T>(input: *mut pg_sys::varlena) -> T
 where
     T: Deserialize<'de>,
 {
@@ -368,6 +366,20 @@ where
     let data = vardata_any(varlena);
     let slice = std::slice::from_raw_parts(data as *const u8, len);
     serde_cbor::from_slice(slice).expect("failed to decode CBOR")
+}
+
+pub unsafe fn cbor_decode_into_context<'de, T>(
+    mut memory_context: PgMemoryContexts,
+    input: *mut pg_sys::varlena,
+) -> T
+where
+    T: Deserialize<'de>,
+{
+    memory_context.switch_to(|_| {
+        // this gets the varlena Datum copied into this memory context
+        let varlena = pg_sys::pg_detoast_datum_copy(input as *mut pg_sys::varlena);
+        cbor_decode(varlena)
+    })
 }
 
 #[allow(dead_code)]

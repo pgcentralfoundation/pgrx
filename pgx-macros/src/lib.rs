@@ -3,8 +3,10 @@
 
 extern crate proc_macro;
 
+mod operators;
 mod rewriter;
 
+use crate::operators::{impl_postgres_eq, impl_postgres_hash, impl_postgres_ord};
 use pgx_utils::*;
 use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span};
@@ -253,10 +255,7 @@ fn impl_postgres_enum(ast: DeriveInput) -> proc_macro2::TokenStream {
             }
 
             fn type_oid() -> pg_sys::Oid {
-                unsafe {
-                    pgx::direct_function_call::<pgx::pg_sys::Oid>(pgx::pg_sys::regtypein, vec![#enum_name.into_datum()])
-                        .expect("failed to lookup typeoid")
-                }
+                pgx::regtypein(#enum_name)
             }
 
         }
@@ -455,22 +454,73 @@ fn parse_postgres_type_args(attributes: &[Attribute]) -> HashSet<PostgresTypeAtt
 
     for a in attributes {
         match a.path.to_token_stream().to_string().as_str() {
-            "inoutfuncs" => categorized_attributes.insert(PostgresTypeAttribute::InOutFuncs),
-            "pgvarlena_inoutfuncs" => {
-                categorized_attributes.insert(PostgresTypeAttribute::PgVarlenaInOutFuncs)
+            "inoutfuncs" => {
+                categorized_attributes.insert(PostgresTypeAttribute::InOutFuncs);
             }
-            _ => panic!(
-                "unrecognized PostgresType attribute: {}",
-                a.path.to_token_stream().to_string()
-            ),
+
+            "pgvarlena_inoutfuncs" => {
+                categorized_attributes.insert(PostgresTypeAttribute::PgVarlenaInOutFuncs);
+            }
+
+            _ => {
+                // we can just ignore attributes we don't understand
+            }
         };
     }
 
     categorized_attributes
 }
 
+/// Embed SQL directly into the generated extension script.
+///
+/// The argument must be as single raw string literal.
+///
+/// # Example
+/// ```
+/// # #[macro_use]
+/// # extern crate pgx_macros;
+/// # fn main() {
+/// extension_sql!(r#"
+/// -- sql statements
+/// "#)
+/// # }
+/// ```
+
 #[proc_macro]
-pub fn extension_sql(_: TokenStream) -> TokenStream {
-    // we don't want to output anything here
-    TokenStream::new()
+pub fn extension_sql(input: TokenStream) -> TokenStream {
+    fn is_raw_str(input: &str) -> bool {
+        input.starts_with("r#\"") && input.ends_with("\"#")
+    }
+
+    let tokens: Vec<String> = input.into_iter().map(|t| t.to_string()).collect();
+
+    let ok = (tokens.len() >= 1 && is_raw_str(&tokens[0]))
+        && (tokens.len() == 1 || (tokens.len() >= 2 && tokens[1] == ","));
+
+    if ok {
+        // ignore input
+        TokenStream::new()
+    } else {
+        TokenStream::from(quote! {
+          compile_error!("expected a single raw string literal with sql");
+        })
+    }
+}
+
+#[proc_macro_derive(PostgresEq)]
+pub fn postgres_eq(input: TokenStream) -> TokenStream {
+    let ast = parse_macro_input!(input as syn::DeriveInput);
+    impl_postgres_eq(ast).into()
+}
+
+#[proc_macro_derive(PostgresOrd)]
+pub fn postgres_ord(input: TokenStream) -> TokenStream {
+    let ast = parse_macro_input!(input as syn::DeriveInput);
+    impl_postgres_ord(ast).into()
+}
+
+#[proc_macro_derive(PostgresHash)]
+pub fn postgres_hash(input: TokenStream) -> TokenStream {
+    let ast = parse_macro_input!(input as syn::DeriveInput);
+    impl_postgres_hash(ast).into()
 }

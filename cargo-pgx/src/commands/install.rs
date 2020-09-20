@@ -21,6 +21,13 @@ pub(crate) fn install_extension(
     let (control_file, extname) = find_control_file();
     let major_version = get_pg_config_major_version(pg_config);
 
+    if get_property("relocatable") != Some("false".into()) {
+        exit_with_error!(
+            "{}:  The `relocatable` property MUST be `false`.  Please update your .control file.",
+            control_file.display()
+        )
+    }
+
     build_extension(major_version, is_release);
 
     println!();

@@ -6,7 +6,6 @@ extern crate build_deps;
 use bindgen::callbacks::MacroParsingBehavior;
 use pgx_utils::{get_pg_config, get_pgx_config_path, prefix_path, run_pg_config};
 use quote::quote;
-use rayon::prelude::*;
 use std::collections::HashSet;
 use std::path::PathBuf;
 use std::process::{Command, Output};
@@ -47,9 +46,11 @@ impl bindgen::callbacks::ParseCallbacks for IgnoredMacros {
 }
 
 fn main() -> Result<(), std::io::Error> {
-    // dump our environment
-    for (k, v) in std::env::vars() {
-        eprintln!("{}={}", k, v);
+    // dump the environment for debugging if asked
+    if std::env::var("PGX_BUILD_VERBOSE").unwrap_or("false".to_string()) == "true" {
+        for (k, v) in std::env::vars() {
+            eprintln!("{}={}", k, v);
+        }
     }
 
     let manifest_dir = PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").unwrap());
@@ -77,7 +78,7 @@ fn main() -> Result<(), std::io::Error> {
 
     let shim_mutex = Mutex::new(());
 
-    major_versions.into_par_iter().for_each(|major_version| {
+    major_versions.into_iter().for_each(|major_version| {
         let pg_config = get_pg_config(major_version);
         let include_h = PathBuf::from(format!(
             "{}/include/pg{}.h",

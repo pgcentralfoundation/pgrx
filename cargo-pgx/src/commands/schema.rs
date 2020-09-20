@@ -2,6 +2,7 @@
 // governed by the MIT license that can be found in the LICENSE file.
 
 use crate::commands::get::get_property;
+use pgx_utils::operator_common::*;
 use pgx_utils::{
     categorize_type, exit_with_error, get_named_capture, handle_result, CategorizedType, ExternArgs,
 };
@@ -42,6 +43,14 @@ enum CategorizedAttribute {
     SqlFunctionName(String),
     SqlFunctionArgs(String),
     Other(Vec<(Span, String)>),
+}
+
+#[derive(Debug, Eq, PartialEq, Hash)]
+enum DeriveMacros {
+    PostgresType,
+    PostgresEq,
+    PostgresOrd,
+    PostgresHash,
 }
 
 pub(crate) fn generate_schema() -> Result<(), std::io::Error> {
@@ -188,6 +197,12 @@ fn find_rs_files(path: &PathBuf, mut files: Vec<DirEntry>) -> Vec<DirEntry> {
         }
     }
 
+    files.sort_by(|a, b| {
+        a.file_name()
+            .to_str()
+            .unwrap()
+            .cmp(b.file_name().to_str().unwrap())
+    });
     files
 }
 
@@ -233,12 +248,13 @@ fn generate_sql(rs_file: &DirEntry, default_schema: String) -> Vec<String> {
 #[allow(clippy::cognitive_complexity)]
 fn walk_items(
     rs_file: &DirEntry,
-    sql: &mut Vec<String>,
+    all_sql: &mut Vec<String>,
     items: Vec<Item>,
     schema_stack: &mut Vec<String>,
     default_schema: &str,
 ) {
-    let statement_cnt = sql.len();
+    let mut sql = Vec::new();
+    let mut postgres_enums = Vec::new();
     let mut postgres_types = Vec::new();
     let mut operator_sql = Vec::new();
     let current_schema = schema_stack
@@ -249,33 +265,142 @@ fn walk_items(
         if let Item::Mod(module) = item {
             if let Some((_, items)) = module.content {
                 schema_stack.push(module.ident.to_string());
-                walk_items(rs_file, sql, items, schema_stack, default_schema);
+                walk_items(rs_file, &mut sql, items, schema_stack, default_schema);
                 schema_stack.pop();
             }
         } else if let Item::Struct(strct) = item {
-            let mut found_postgres_type = false;
-            for a in strct.attrs {
+            let mut derives = HashSet::<DeriveMacros>::new();
+
+            for a in &strct.attrs {
                 let string = a.to_token_stream().to_string();
 
                 if string.contains("PostgresType") {
-                    found_postgres_type = true;
+                    derives.insert(DeriveMacros::PostgresType);
+                }
+                if string.contains("PostgresEq") {
+                    derives.insert(DeriveMacros::PostgresEq);
+                }
+                if string.contains("PostgresOrd") {
+                    derives.insert(DeriveMacros::PostgresOrd);
+                }
+                if string.contains("PostgresHash") {
+                    derives.insert(DeriveMacros::PostgresHash);
                 }
             }
 
-            if found_postgres_type {
+            if derives.contains(&DeriveMacros::PostgresType) {
                 let name = strct.ident.to_string().to_lowercase();
-                sql.push(format!("CREATE TYPE {}.{};", current_schema, name));
-
+                postgres_types.push(format!(
+                    "CREATE TYPE {};",
+                    qualify_name(&current_schema, &name)
+                ));
                 postgres_types.push(format!("CREATE OR REPLACE FUNCTION {qualified_name}_in(cstring) RETURNS {qualified_name} IMMUTABLE STRICT LANGUAGE C AS 'MODULE_PATHNAME', '{name}_in_wrapper';", qualified_name = qualify_name(&current_schema, &name), name = name));
                 postgres_types.push(format!("CREATE OR REPLACE FUNCTION {qualified_name}_out({qualified_name}) RETURNS cstring IMMUTABLE STRICT LANGUAGE C AS 'MODULE_PATHNAME', '{name}_out_wrapper';", qualified_name = qualify_name(&current_schema, &name), name = name));
                 postgres_types.push(format!(
                     "CREATE TYPE {qualified_name} (
-                        INTERNALLENGTH = variable,
-                        INPUT = {qualified_name}_in,
-                        OUTPUT = {qualified_name}_out,
-                        STORAGE = extended
-                    );",
+                                INTERNALLENGTH = variable,
+                                INPUT = {qualified_name}_in,
+                                OUTPUT = {qualified_name}_out,
+                                STORAGE = extended
+                            );",
                     qualified_name = qualify_name(&current_schema, &name)
+                ));
+            }
+
+            if derives.contains(&DeriveMacros::PostgresEq) {
+                walk_items(
+                    rs_file,
+                    &mut operator_sql,
+                    vec![parse_item(eq(&strct.ident))],
+                    schema_stack,
+                    default_schema,
+                );
+                walk_items(
+                    rs_file,
+                    &mut operator_sql,
+                    vec![parse_item(ne(&strct.ident))],
+                    schema_stack,
+                    default_schema,
+                );
+            }
+
+            if derives.contains(&DeriveMacros::PostgresOrd) {
+                walk_items(
+                    rs_file,
+                    &mut operator_sql,
+                    vec![parse_item(lt(&strct.ident))],
+                    schema_stack,
+                    default_schema,
+                );
+                walk_items(
+                    rs_file,
+                    &mut operator_sql,
+                    vec![parse_item(gt(&strct.ident))],
+                    schema_stack,
+                    default_schema,
+                );
+                walk_items(
+                    rs_file,
+                    &mut operator_sql,
+                    vec![parse_item(le(&strct.ident))],
+                    schema_stack,
+                    default_schema,
+                );
+                walk_items(
+                    rs_file,
+                    &mut operator_sql,
+                    vec![parse_item(ge(&strct.ident))],
+                    schema_stack,
+                    default_schema,
+                );
+                walk_items(
+                    rs_file,
+                    &mut operator_sql,
+                    vec![parse_item(cmp(&strct.ident))],
+                    schema_stack,
+                    default_schema,
+                );
+            }
+
+            if derives.contains(&DeriveMacros::PostgresHash) {
+                walk_items(
+                    rs_file,
+                    &mut operator_sql,
+                    vec![parse_item(hash(&strct.ident))],
+                    schema_stack,
+                    default_schema,
+                );
+
+                let type_name = &strct.ident.to_string().to_lowercase();
+                operator_sql.push(format!(
+                    "CREATE OPERATOR FAMILY {}_hash_ops USING hash;",
+                    type_name
+                ));
+                operator_sql.push(format!(
+                    "CREATE OPERATOR CLASS {type_name}_hash_ops DEFAULT FOR TYPE {type_name} USING hash FAMILY {type_name}_hash_ops AS 
+                        OPERATOR    1   =  ({type_name}, {type_name}),
+                        FUNCTION    1   {type_name}_hash({type_name});",
+                    type_name = type_name
+                ));
+            }
+
+            if derives.contains(&DeriveMacros::PostgresEq)
+                && derives.contains(&DeriveMacros::PostgresOrd)
+            {
+                let type_name = &strct.ident.to_string().to_lowercase();
+                operator_sql.push(format!(
+                    "CREATE OPERATOR FAMILY {}_btree_ops USING btree;",
+                    type_name
+                ));
+                operator_sql.push(format!(
+                    "CREATE OPERATOR CLASS {type_name}_btree_ops DEFAULT FOR TYPE {type_name} USING btree FAMILY {type_name}_btree_ops AS 
+                      OPERATOR 1 < ,
+                      OPERATOR 2 <= ,
+                      OPERATOR 3 = ,
+                      OPERATOR 4 >= ,
+                      OPERATOR 5 > ,
+                      FUNCTION 1 {type_name}_cmp({type_name}, {type_name});",
+                    type_name = type_name
                 ));
             }
         } else if let Item::Enum(enm) = item {
@@ -290,7 +415,7 @@ fn walk_items(
 
             if found_postgres_enum {
                 let name = enm.ident.to_string().to_lowercase();
-                sql.push(format!(
+                postgres_enums.push(format!(
                     "CREATE TYPE {qualified_name} AS ENUM (",
                     qualified_name = qualify_name(&current_schema, &name)
                 ));
@@ -302,9 +427,9 @@ fn walk_items(
                         line.push(',');
                     }
 
-                    sql.push(line);
+                    postgres_enums.push(line);
                 }
-                sql.push(");".to_string());
+                postgres_enums.push(");".to_string());
             }
         } else if let Item::Macro(makro) = item {
             let name = match makro.mac.path.get_ident() {
@@ -349,6 +474,7 @@ fn walk_items(
                             rs_file,
                             None,
                             &current_schema,
+                            schema_stack,
                         ) {
                             function_sql.push(location_comment(rs_file, &span));
                             function_sql.push(statement);
@@ -364,6 +490,7 @@ fn walk_items(
                             rs_file,
                             sql_func_args.clone(),
                             &current_schema,
+                            schema_stack,
                         ) {
                             function_sql.push(location_comment(rs_file, &span));
                             function_sql.push(statement);
@@ -382,6 +509,7 @@ fn walk_items(
                                 rs_file,
                                 sql_func_args.clone(),
                                 &current_schema,
+                                schema_stack,
                             )
                         {
                             if type_names.len() > 2 {
@@ -427,19 +555,19 @@ fn walk_items(
                             for option in options {
                                 match option {
                                     OperatorOptions::Commutator(c) => {
-                                        sql.push_str(",\n   COMMUTATOR=");
+                                        sql.push_str(",\n   COMMUTATOR = ");
                                         sql.push_str(&c);
                                     }
                                     OperatorOptions::Negator(n) => {
-                                        sql.push_str(",\n   NEGATOR=");
+                                        sql.push_str(",\n   NEGATOR = ");
                                         sql.push_str(&n);
                                     }
                                     OperatorOptions::Restrict(r) => {
-                                        sql.push_str(",\n   RESTRICT=");
+                                        sql.push_str(",\n   RESTRICT = ");
                                         sql.push_str(&r);
                                     }
                                     OperatorOptions::Join(j) => {
-                                        sql.push_str(",\n   JOIN=");
+                                        sql.push_str(",\n   JOIN = ");
                                         sql.push_str(&j);
                                     }
                                     OperatorOptions::Hashes => sql.push_str(",\n   HASHES"),
@@ -466,25 +594,27 @@ fn walk_items(
         }
     }
 
-    sql.append(&mut postgres_types);
-    sql.append(&mut operator_sql);
-
-    if sql.len() != statement_cnt {
-        // we added some statements, so inject a CREATE SCHEMA statement ahead of the statements
-        // we just generated
+    if !sql.is_empty() {
         if current_schema != default_schema {
             // pg_catalog is a reserved schema name that we can't even try to create
             if current_schema != "pg_catalog" {
-                sql.insert(
-                    statement_cnt,
-                    format!(
-                        "CREATE SCHEMA IF NOT EXISTS {};",
-                        quote_ident_string(current_schema)
-                    ),
-                );
+                all_sql.push(format!(
+                    "CREATE SCHEMA IF NOT EXISTS {};",
+                    quote_ident_string(current_schema.clone())
+                ));
             }
         }
     }
+
+    // types (with their in/out functions) go first
+    all_sql.append(&mut postgres_enums);
+    all_sql.append(&mut postgres_types);
+
+    // then general sql (mostly just functions)
+    all_sql.append(&mut sql);
+
+    // and finally then operators
+    all_sql.append(&mut operator_sql);
 }
 
 fn qualify_name(schema: &str, name: &str) -> String {
@@ -501,6 +631,7 @@ fn make_create_function_statement(
     rs_file: &DirEntry,
     sql_func_arg: Option<String>,
     schema: &str,
+    schema_stack: &Vec<String>,
 ) -> (Option<String>, Option<String>, Option<Vec<String>>) {
     let exported_func_name = format!("{}_wrapper", func.sig.ident.to_string());
     let mut statement = String::new();
@@ -618,6 +749,28 @@ fn make_create_function_statement(
                 ExternArgs::NoGuard => {}
             }
         }
+    }
+
+    let mut search_path = String::new();
+    for s in schema_stack.iter().rev().filter(|v| *v != "public").chain(
+        vec![if get_property("relocatable") == Some("false".into()) {
+            String::from("@extschema@")
+        } else {
+            // this shouldn't happen as we catch it long before we get here
+            exit_with_error!("pgx extensions are not relocatable")
+        }]
+        .iter(),
+    ) {
+        if !s.is_empty() {
+            if !search_path.is_empty() {
+                search_path.push(',');
+            }
+            search_path.push_str(s);
+        }
+    }
+
+    if !search_path.is_empty() {
+        statement.push_str(&format!(" SET search_path TO {}", search_path));
     }
 
     statement.push_str(&format!(
@@ -746,8 +899,7 @@ fn translate_type(filename: &DirEntry, ty: &Type) -> Option<(String, bool, Optio
 
 fn deconstruct_macro(as_string: &str) -> Option<(String, Option<String>, bool)> {
     if as_string.starts_with("default !") {
-        let regexp =
-            regex::Regex::new(r#"default ! \( (?P<type>.*?)\s*, (?P<value>.*) \)"#).unwrap();
+        let regexp = regex::Regex::new(r#"default ! \((?P<type>.*?)\s*, (?P<value>.*)\)"#).unwrap();
 
         let default_value =
             Some(get_named_capture(&regexp, "value", as_string).expect("no default value"));
@@ -756,7 +908,7 @@ fn deconstruct_macro(as_string: &str) -> Option<(String, Option<String>, bool)> 
             get_named_capture(&regexp, "type", as_string).expect("no type name in default ");
         Some((rust_type, default_value, false))
     } else if as_string.starts_with("variadic !") {
-        let regexp = regex::Regex::new(r#"variadic ! \( (?P<type>.*?) \)"#).unwrap();
+        let regexp = regex::Regex::new(r#"variadic ! \((?P<type>.*?)\)"#).unwrap();
 
         let rust_type =
             get_named_capture(&regexp, "type", as_string).expect("no type name in default ");
@@ -776,7 +928,7 @@ fn translate_type_string(
     subtypes: Option<Vec<String>>,
 ) -> Option<(String, bool, Option<String>, bool)> {
     match rust_type.as_str() {
-        "( )" => Some(("void".to_string(), false, default_value, variadic)),
+        "()" => Some(("void".to_string(), false, default_value, variadic)),
         "i8" => Some(("\"char\"".to_string(), false, default_value, variadic)),
         "i16" => Some(("smallint".to_string(), false, default_value, variadic)),
         "i32" => Some(("integer".to_string(), false, default_value, variadic)),
@@ -798,7 +950,7 @@ fn translate_type_string(
         "& str" | "& 'static str" | "&'static str" | "String" | "& 'static String" | "& String" => {
             Some(("text".to_string(), false, default_value, variadic))
         }
-        "& [ u8 ]" | "& 'static [ u8 ]" | "&'static [ u8 ]" | "Vec < u8 >" => {
+        "& [u8]" | "&[u8]" | "& 'static [u8]" | "&'static [u8]" | "Vec < u8 >" => {
             Some(("bytea".to_string(), false, default_value, variadic))
         }
         "& std :: ffi :: CStr" => Some(("cstring".to_string(), false, default_value, variadic)),
@@ -1093,60 +1245,59 @@ fn collect_attributes(
         let a = attrs.get(i).unwrap();
         let span = a.span();
         let as_string = a.to_token_stream().to_string();
-
-        if as_string == "# [ pg_guard ]" {
+        if as_string == "# [pg_guard]" {
             categorized_attributes.push(CategorizedAttribute::PgGuard(span));
-        } else if as_string.starts_with("# [ pg_extern") {
+        } else if as_string.starts_with("# [pg_extern") {
             categorized_attributes.push(CategorizedAttribute::PgExtern((
                 span,
                 parse_extern_args(&a),
             )));
-        } else if as_string.starts_with("# [ pg_operator") {
+        } else if as_string.starts_with("# [pg_operator") {
             operator = Some(CategorizedAttribute::PgOperator(
                 span,
                 parse_extern_args(&a),
                 Vec::new(),
             ));
-        } else if as_string.starts_with("# [ opname") {
+        } else if as_string.starts_with("# [opname") {
             if let Some(CategorizedAttribute::PgOperator(_, _, options)) = operator.as_mut() {
                 options.push(OperatorOptions::Name(extract_single_arg(a.tokens.clone())));
             }
-        } else if as_string.starts_with("# [ commutator") {
+        } else if as_string.starts_with("# [commutator") {
             if let Some(CategorizedAttribute::PgOperator(_, _, options)) = operator.as_mut() {
                 options.push(OperatorOptions::Commutator(extract_single_arg(
                     a.tokens.clone(),
                 )));
             }
-        } else if as_string.starts_with("# [ negator") {
+        } else if as_string.starts_with("# [negator") {
             if let Some(CategorizedAttribute::PgOperator(_, _, options)) = operator.as_mut() {
                 options.push(OperatorOptions::Negator(extract_single_arg(
                     a.tokens.clone(),
                 )));
             }
-        } else if as_string.starts_with("# [ restrict") {
+        } else if as_string.starts_with("# [restrict") {
             if let Some(CategorizedAttribute::PgOperator(_, _, options)) = operator.as_mut() {
                 options.push(OperatorOptions::Restrict(extract_single_arg(
                     a.tokens.clone(),
                 )));
             }
-        } else if as_string.starts_with("# [ join") {
+        } else if as_string.starts_with("# [join") {
             if let Some(CategorizedAttribute::PgOperator(_, _, options)) = operator.as_mut() {
                 options.push(OperatorOptions::Join(extract_single_arg(a.tokens.clone())));
             }
-        } else if as_string.eq("# [ hashes ]") {
+        } else if as_string.eq("# [hashes]") {
             if let Some(CategorizedAttribute::PgOperator(_, _, options)) = operator.as_mut() {
                 options.push(OperatorOptions::Hashes);
             }
-        } else if as_string.eq("# [ merges ]") {
+        } else if as_string.eq("# [merges]") {
             if let Some(CategorizedAttribute::PgOperator(_, _, options)) = operator.as_mut() {
                 options.push(OperatorOptions::Merges);
             }
-        } else if as_string.starts_with("# [ pg_test") {
+        } else if as_string.starts_with("# [pg_test") {
             categorized_attributes
                 .push(CategorizedAttribute::PgTest((span, parse_extern_args(&a))));
-        } else if as_string == "# [ test ]" {
+        } else if as_string == "# [test]" {
             categorized_attributes.push(CategorizedAttribute::RustTest(span));
-        } else if as_string == "# [ doc = \" ```funcname\" ]" {
+        } else if as_string == "# [doc = \" ```funcname\"]" {
             let (new_i, mut sql_statements) = collect_doc(
                 rs_file,
                 ident,
@@ -1169,7 +1320,7 @@ fn collect_attributes(
             }
 
             i = new_i;
-        } else if as_string == "# [ doc = \" ```funcargs\" ]" {
+        } else if as_string == "# [doc = \" ```funcargs\"]" {
             let (new_i, mut sql_statements) = collect_doc(
                 rs_file,
                 ident,
@@ -1192,7 +1343,7 @@ fn collect_attributes(
             }
 
             i = new_i;
-        } else if as_string == "# [ doc = \" ```sql\" ]" {
+        } else if as_string == "# [doc = \" ```sql\"]" {
             let (new_i, sql_statements) = collect_doc(
                 rs_file,
                 ident,
@@ -1235,7 +1386,9 @@ fn extract_single_arg(attr: TokenStream2) -> String {
             token => arg.push_str(&token.to_string()),
         }
     }
-    arg.trim_start_matches('(').trim_end_matches(')').into()
+    let mut arg: String = arg.trim_start_matches('(').trim_end_matches(')').into();
+    arg.retain(|c| !c.is_whitespace());
+    arg
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -1262,13 +1415,13 @@ fn collect_doc(
         let a = attrs.get(i).unwrap();
         let as_string = a.to_token_stream().to_string();
 
-        if as_string == "# [ doc = \" ```\" ]" {
+        if as_string == "# [doc = \" ```\"]" {
             // we found the end to this ```sql block of documentation
             break;
-        } else if as_string.starts_with("# [ doc = \"") {
+        } else if as_string.starts_with("# [doc = \"") {
             // it's a doc line within the sql block
-            let as_string = as_string.trim_start_matches("# [ doc = \"");
-            let as_string = as_string.trim_end_matches("\" ]");
+            let as_string = as_string.trim_start_matches("# [doc = \"");
+            let as_string = as_string.trim_end_matches("\"]");
             let as_string = as_string.trim();
             let as_string = unescape::unescape(as_string)
                 .unwrap_or_else(|| exit_with_error!("Improperly escaped:\n{}", as_string));
@@ -1295,5 +1448,12 @@ fn location_comment(rs_file: &DirEntry, span: &Span) -> String {
         rs_file.path().display(),
         span.start().line,
         span.start().column,
+    )
+}
+
+fn parse_item(stream: proc_macro2::TokenStream) -> Item {
+    handle_result!(
+        format!("failed to parse Item from:\n{}", stream.to_string()),
+        syn::parse_str(&stream.to_string())
     )
 }

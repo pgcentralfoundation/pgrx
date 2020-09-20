@@ -8,7 +8,7 @@ use crate::pg12_specific::*;
 use pgx_macros::*;
 #[doc = "\t  pmod.h --\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t *"]
 #[doc = "\t\t\tPOSTGRES processing mode definitions.                            *"]
-pub type ProcessingMode = u32;
+pub type ProcessingMode = ::std::os::raw::c_uint;
 #[doc = "\tSupporting data structures for Parse Trees"]
 #[doc = ""]
 #[doc = "\tMost of these node types appear in raw parsetrees output by the grammar,"]
@@ -51,7 +51,7 @@ pub struct InsertStmt {
 #[doc = "\t\tDECLARE CURSOR, EXPLAIN, and CREATE TABLE AS are special cases:"]
 #[doc = "\t\tthey contain optimizable statements, which get processed normally"]
 #[doc = "\t\tby parser/analyze.c."]
-pub type ObjectType = u32;
+pub type ObjectType = ::std::os::raw::c_uint;
 #[doc = "\t\tRaw Grammar Output Statements"]
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -217,7 +217,7 @@ extern "C" {
 extern "C" {
     pub fn AddToDataDirLockFile(
         target_line: ::std::os::raw::c_int,
-        str: *const ::std::os::raw::c_char,
+        str_: *const ::std::os::raw::c_char,
     );
 }
 #[pg_guard]
@@ -1000,7 +1000,7 @@ extern "C" {
 extern "C" {
     pub fn DateTimeParseError(
         dterr: ::std::os::raw::c_int,
-        str: *const ::std::os::raw::c_char,
+        str_: *const ::std::os::raw::c_char,
         datatype: *const ::std::os::raw::c_char,
     );
 }
@@ -1046,7 +1046,7 @@ extern "C" {
 #[pg_guard]
 extern "C" {
     pub fn DecodeISO8601Interval(
-        str: *mut ::std::os::raw::c_char,
+        str_: *mut ::std::os::raw::c_char,
         dtype: *mut ::std::os::raw::c_int,
         tm: *mut pg_tm,
         fsec: *mut fsec_t,
@@ -1087,7 +1087,7 @@ extern "C" {
 #[pg_guard]
 extern "C" {
     pub fn DecodeTimezone(
-        str: *mut ::std::os::raw::c_char,
+        str_: *mut ::std::os::raw::c_char,
         tzp: *mut ::std::os::raw::c_int,
     ) -> ::std::os::raw::c_int;
 }
@@ -1412,7 +1412,7 @@ extern "C" {
     pub fn EncodeDateOnly(
         tm: *mut pg_tm,
         style: ::std::os::raw::c_int,
-        str: *mut ::std::os::raw::c_char,
+        str_: *mut ::std::os::raw::c_char,
     );
 }
 #[pg_guard]
@@ -1424,7 +1424,7 @@ extern "C" {
         tz: ::std::os::raw::c_int,
         tzn: *const ::std::os::raw::c_char,
         style: ::std::os::raw::c_int,
-        str: *mut ::std::os::raw::c_char,
+        str_: *mut ::std::os::raw::c_char,
     );
 }
 #[pg_guard]
@@ -1433,16 +1433,16 @@ extern "C" {
         tm: *mut pg_tm,
         fsec: fsec_t,
         style: ::std::os::raw::c_int,
-        str: *mut ::std::os::raw::c_char,
+        str_: *mut ::std::os::raw::c_char,
     );
 }
 #[pg_guard]
 extern "C" {
-    pub fn EncodeSpecialDate(dt: DateADT, str: *mut ::std::os::raw::c_char);
+    pub fn EncodeSpecialDate(dt: DateADT, str_: *mut ::std::os::raw::c_char);
 }
 #[pg_guard]
 extern "C" {
-    pub fn EncodeSpecialTimestamp(dt: Timestamp, str: *mut ::std::os::raw::c_char);
+    pub fn EncodeSpecialTimestamp(dt: Timestamp, str_: *mut ::std::os::raw::c_char);
 }
 #[pg_guard]
 extern "C" {
@@ -1452,7 +1452,7 @@ extern "C" {
         print_tz: bool,
         tz: ::std::os::raw::c_int,
         style: ::std::os::raw::c_int,
-        str: *mut ::std::os::raw::c_char,
+        str_: *mut ::std::os::raw::c_char,
     );
 }
 #[pg_guard]
@@ -3232,7 +3232,7 @@ extern "C" {
 extern "C" {
     pub fn InputFunctionCall(
         flinfo: *mut FmgrInfo,
-        str: *mut ::std::os::raw::c_char,
+        str_: *mut ::std::os::raw::c_char,
         typioparam: Oid,
         typmod: int32,
     ) -> Datum;
@@ -3883,7 +3883,7 @@ extern "C" {
 extern "C" {
     pub fn OidInputFunctionCall(
         functionId: Oid,
-        str: *mut ::std::os::raw::c_char,
+        str_: *mut ::std::os::raw::c_char,
         typioparam: Oid,
         typmod: int32,
     ) -> Datum;
@@ -6798,31 +6798,31 @@ extern "C" {
 #[pg_guard]
 extern "C" {
     pub fn appendBinaryStringInfo(
-        str: StringInfo,
+        str_: StringInfo,
         data: *const ::std::os::raw::c_char,
         datalen: ::std::os::raw::c_int,
     );
 }
 #[pg_guard]
 extern "C" {
-    pub fn appendStringInfo(str: StringInfo, fmt: *const ::std::os::raw::c_char, ...);
+    pub fn appendStringInfo(str_: StringInfo, fmt: *const ::std::os::raw::c_char, ...);
 }
 #[pg_guard]
 extern "C" {
-    pub fn appendStringInfoChar(str: StringInfo, ch: ::std::os::raw::c_char);
+    pub fn appendStringInfoChar(str_: StringInfo, ch: ::std::os::raw::c_char);
 }
 #[pg_guard]
 extern "C" {
-    pub fn appendStringInfoSpaces(str: StringInfo, count: ::std::os::raw::c_int);
+    pub fn appendStringInfoSpaces(str_: StringInfo, count: ::std::os::raw::c_int);
 }
 #[pg_guard]
 extern "C" {
-    pub fn appendStringInfoString(str: StringInfo, s: *const ::std::os::raw::c_char);
+    pub fn appendStringInfoString(str_: StringInfo, s: *const ::std::os::raw::c_char);
 }
 #[pg_guard]
 extern "C" {
     pub fn appendStringInfoVA(
-        str: StringInfo,
+        str_: StringInfo,
         fmt: *const ::std::os::raw::c_char,
         args: *mut __va_list_tag,
     ) -> ::std::os::raw::c_int;
@@ -10520,10 +10520,6 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
-    pub fn do_pg_abort_backup();
-}
-#[pg_guard]
-extern "C" {
     pub fn do_pg_stop_backup(
         labelfile: *mut ::std::os::raw::c_char,
         waitforarchive: bool,
@@ -10951,7 +10947,7 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
-    pub fn enlargeStringInfo(str: StringInfo, needed: ::std::os::raw::c_int);
+    pub fn enlargeStringInfo(str_: StringInfo, needed: ::std::os::raw::c_int);
 }
 #[pg_guard]
 extern "C" {
@@ -11073,7 +11069,7 @@ extern "C" {
 extern "C" {
     pub fn err_generic_string(
         field: ::std::os::raw::c_int,
-        str: *const ::std::os::raw::c_char,
+        str_: *const ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_int;
 }
 #[pg_guard]
@@ -11208,7 +11204,7 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
-    pub fn escape_json(buf: StringInfo, str: *const ::std::os::raw::c_char);
+    pub fn escape_json(buf: StringInfo, str_: *const ::std::os::raw::c_char);
 }
 #[pg_guard]
 extern "C" {
@@ -12071,6 +12067,14 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
+    pub fn float_time_overflows(
+        hour: ::std::os::raw::c_int,
+        min: ::std::os::raw::c_int,
+        sec: f64,
+    ) -> bool;
+}
+#[pg_guard]
+extern "C" {
     pub fn flock(arg1: ::std::os::raw::c_int, arg2: ::std::os::raw::c_int)
         -> ::std::os::raw::c_int;
 }
@@ -12211,7 +12215,7 @@ extern "C" {
 #[pg_guard]
 extern "C" {
     pub fn forkname_chars(
-        str: *const ::std::os::raw::c_char,
+        str_: *const ::std::os::raw::c_char,
         fork: *mut ForkNumber,
     ) -> ::std::os::raw::c_int;
 }
@@ -15452,7 +15456,7 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
-    pub fn initStringInfo(str: StringInfo);
+    pub fn initStringInfo(str_: StringInfo);
 }
 #[pg_guard]
 extern "C" {
@@ -17793,7 +17797,7 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
-    pub fn makeBitString(str: *mut ::std::os::raw::c_char) -> *mut Value;
+    pub fn makeBitString(str_: *mut ::std::os::raw::c_char) -> *mut Value;
 }
 #[pg_guard]
 extern "C" {
@@ -17930,7 +17934,7 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
-    pub fn makeString(str: *mut ::std::os::raw::c_char) -> *mut Value;
+    pub fn makeString(str_: *mut ::std::os::raw::c_char) -> *mut Value;
 }
 #[pg_guard]
 extern "C" {
@@ -18501,11 +18505,11 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
-    pub fn namestrcmp(name: Name, str: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
+    pub fn namestrcmp(name: Name, str_: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
 }
 #[pg_guard]
 extern "C" {
-    pub fn namestrcpy(name: Name, str: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
+    pub fn namestrcpy(name: Name, str_: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
 }
 #[pg_guard]
 extern "C" {
@@ -19271,12 +19275,12 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
-    pub fn outBitmapset(str: *mut StringInfoData, bms: *const Bitmapset);
+    pub fn outBitmapset(str_: *mut StringInfoData, bms: *const Bitmapset);
 }
 #[pg_guard]
 extern "C" {
     pub fn outDatum(
-        str: *mut StringInfoData,
+        str_: *mut StringInfoData,
         value: usize,
         typlen: ::std::os::raw::c_int,
         typbyval: bool,
@@ -19284,11 +19288,11 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
-    pub fn outNode(str: *mut StringInfoData, obj: *const ::std::os::raw::c_void);
+    pub fn outNode(str_: *mut StringInfoData, obj: *const ::std::os::raw::c_void);
 }
 #[pg_guard]
 extern "C" {
-    pub fn outToken(str: *mut StringInfoData, s: *const ::std::os::raw::c_char);
+    pub fn outToken(str_: *mut StringInfoData, s: *const ::std::os::raw::c_char);
 }
 #[pg_guard]
 extern "C" {
@@ -19354,7 +19358,7 @@ extern "C" {
 #[pg_guard]
 extern "C" {
     pub fn parseTypeString(
-        str: *const ::std::os::raw::c_char,
+        str_: *const ::std::os::raw::c_char,
         typeid_p: *mut Oid,
         typmod_p: *mut int32,
         missing_ok: bool,
@@ -20466,13 +20470,15 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
-    pub fn pg_ltostr(str: *mut ::std::os::raw::c_char, value: int32)
-        -> *mut ::std::os::raw::c_char;
+    pub fn pg_ltostr(
+        str_: *mut ::std::os::raw::c_char,
+        value: int32,
+    ) -> *mut ::std::os::raw::c_char;
 }
 #[pg_guard]
 extern "C" {
     pub fn pg_ltostr_zeropad(
-        str: *mut ::std::os::raw::c_char,
+        str_: *mut ::std::os::raw::c_char,
         value: int32,
         minwidth: int32,
     ) -> *mut ::std::os::raw::c_char;
@@ -21228,8 +21234,12 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
+    pub fn pg_strsignal(signum: ::std::os::raw::c_int) -> *const ::std::os::raw::c_char;
+}
+#[pg_guard]
+extern "C" {
     pub fn pg_strtouint64(
-        str: *const ::std::os::raw::c_char,
+        str_: *const ::std::os::raw::c_char,
         endptr: *mut *mut ::std::os::raw::c_char,
         base: ::std::os::raw::c_int,
     ) -> uint64;
@@ -23143,7 +23153,7 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
-    pub fn resetStringInfo(str: StringInfo);
+    pub fn resetStringInfo(str_: StringInfo);
 }
 #[pg_guard]
 extern "C" {
@@ -25187,6 +25197,15 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
+    pub fn time_overflows(
+        hour: ::std::os::raw::c_int,
+        min: ::std::os::raw::c_int,
+        sec: ::std::os::raw::c_int,
+        fsec: fsec_t,
+    ) -> bool;
+}
+#[pg_guard]
+extern "C" {
     pub fn time_part(fcinfo: FunctionCallInfo) -> Datum;
 }
 #[pg_guard]
@@ -26465,7 +26484,7 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
-    pub fn typeStringToTypeName(str: *const ::std::os::raw::c_char) -> *mut TypeName;
+    pub fn typeStringToTypeName(str_: *const ::std::os::raw::c_char) -> *mut TypeName;
 }
 #[pg_guard]
 extern "C" {
@@ -28316,6 +28335,48 @@ extern "C" {
 extern "C" {
     pub static sys_signame: [*const ::std::os::raw::c_char; 32usize];
 }
+#[repr(C, packed(2))]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct ItemPointerData {
+    pub ip_blkid: BlockIdData,
+    pub ip_posid: OffsetNumber,
+}
+#[repr(C, packed(4))]
+#[derive(Copy, Clone)]
+pub struct __msfilterreq {
+    pub msfr_ifindex: u32,
+    pub msfr_fmode: u32,
+    pub msfr_nsrcs: u32,
+    pub __msfr_align: u32,
+    pub msfr_group: sockaddr_storage,
+    pub msfr_srcs: *mut sockaddr_storage,
+}
+#[repr(C, packed(4))]
+#[derive(Copy, Clone)]
+pub struct group_req {
+    pub gr_interface: u32,
+    pub gr_group: sockaddr_storage,
+}
+#[repr(C, packed(4))]
+#[derive(Copy, Clone)]
+pub struct group_source_req {
+    pub gsr_interface: u32,
+    pub gsr_group: sockaddr_storage,
+    pub gsr_source: sockaddr_storage,
+}
+#[repr(C, packed(4))]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct log2phys {
+    pub l2p_flags: ::std::os::raw::c_uint,
+    pub l2p_contigbytes: off_t,
+    pub l2p_devoffset: off_t,
+}
+#[repr(C)]
+#[derive(Copy, Clone, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub struct __BindgenBitfieldUnit<Storage, Align> {
+    storage: Storage,
+    align: [Align; 0],
+}
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct A_Const {
@@ -29202,42 +29263,6 @@ pub union wait {
     pub w_T: wait__bindgen_ty_1,
     pub w_S: wait__bindgen_ty_2,
     _bindgen_union_align: u32,
-}
-#[repr(C)]
-#[derive(Copy, Clone, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd)]
-pub struct __BindgenBitfieldUnit<Storage, Align> {
-    storage: Storage,
-    align: [Align; 0],
-}
-#[repr(C)]
-#[derive(Debug)]
-pub struct DynamicZoneAbbrev {
-    pub tz: *mut pg_tz,
-    pub zone: __IncompleteArrayField<::std::os::raw::c_char>,
-}
-#[repr(C)]
-#[derive(Debug)]
-pub struct ParallelBitmapHeapState {
-    pub tbmiterator: dsa_pointer,
-    pub prefetch_iterator: dsa_pointer,
-    pub mutex: slock_t,
-    pub prefetch_pages: ::std::os::raw::c_int,
-    pub prefetch_target: ::std::os::raw::c_int,
-    pub state: SharedBitmapState,
-    pub cv: ConditionVariable,
-    pub phs_snapshot_data: __IncompleteArrayField<::std::os::raw::c_char>,
-}
-#[repr(C)]
-#[derive(Debug)]
-pub struct _FuncCandidateList {
-    pub next: *mut _FuncCandidateList,
-    pub pathpos: ::std::os::raw::c_int,
-    pub oid: Oid,
-    pub nargs: ::std::os::raw::c_int,
-    pub nvargs: ::std::os::raw::c_int,
-    pub ndargs: ::std::os::raw::c_int,
-    pub argnumbers: *mut ::std::os::raw::c_int,
-    pub args: __IncompleteArrayField<Oid>,
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -30778,7 +30803,7 @@ pub struct ExtensibleNodeMethods {
         unsafe extern "C" fn(a: *const ExtensibleNode, b: *const ExtensibleNode) -> bool,
     >,
     pub nodeOut: ::std::option::Option<
-        unsafe extern "C" fn(str: *mut StringInfoData, node: *const ExtensibleNode),
+        unsafe extern "C" fn(str_: *mut StringInfoData, node: *const ExtensibleNode),
     >,
     pub nodeRead: ::std::option::Option<unsafe extern "C" fn(node: *mut ExtensibleNode)>,
 }
@@ -33676,183 +33701,6 @@ pub struct varatt_indirect {
     pub pointer: *mut varlena,
 }
 #[repr(C)]
-#[derive(Debug, Default)]
-pub struct Bitmapset {
-    pub nwords: ::std::os::raw::c_int,
-    pub words: __IncompleteArrayField<bitmapword>,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct Jsonb {
-    pub vl_len_: int32,
-    pub root: JsonbContainer,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct JsonbContainer {
-    pub header: uint32,
-    pub children: __IncompleteArrayField<JEntry>,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct MinimalTupleData {
-    pub t_len: uint32,
-    pub mt_padding: [::std::os::raw::c_char; 6usize],
-    pub t_infomask2: uint16,
-    pub t_infomask: uint16,
-    pub t_hoff: uint8,
-    pub t_bits: __IncompleteArrayField<bits8>,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct PATH {
-    pub vl_len_: int32,
-    pub npts: int32,
-    pub closed: int32,
-    pub dummy: int32,
-    pub p: __IncompleteArrayField<Point>,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct POLYGON {
-    pub vl_len_: int32,
-    pub npts: int32,
-    pub boundbox: BOX,
-    pub p: __IncompleteArrayField<Point>,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct PageHeaderData {
-    pub pd_lsn: PageXLogRecPtr,
-    pub pd_checksum: uint16,
-    pub pd_flags: uint16,
-    pub pd_lower: LocationIndex,
-    pub pd_upper: LocationIndex,
-    pub pd_special: LocationIndex,
-    pub pd_pagesize_version: uint16,
-    pub pd_prune_xid: TransactionId,
-    pub pd_linp: __IncompleteArrayField<ItemIdData>,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct ParallelIndexScanDescData {
-    pub ps_relid: Oid,
-    pub ps_indexid: Oid,
-    pub ps_offset: Size,
-    pub ps_snapshot_data: __IncompleteArrayField<::std::os::raw::c_char>,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct TBMIterateResult {
-    pub blockno: BlockNumber,
-    pub ntuples: ::std::os::raw::c_int,
-    pub recheck: bool,
-    pub offsets: __IncompleteArrayField<OffsetNumber>,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct TimeZoneAbbrevTable {
-    pub tblsize: Size,
-    pub numabbrevs: ::std::os::raw::c_int,
-    pub abbrevs: __IncompleteArrayField<datetkn>,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct WorkerInstrumentation {
-    pub num_workers: ::std::os::raw::c_int,
-    pub instrument: __IncompleteArrayField<Instrumentation>,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct int2vector {
-    pub vl_len_: int32,
-    pub ndim: ::std::os::raw::c_int,
-    pub dataoffset: int32,
-    pub elemtype: Oid,
-    pub dim1: ::std::os::raw::c_int,
-    pub lbound1: ::std::os::raw::c_int,
-    pub values: __IncompleteArrayField<int16>,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct oidvector {
-    pub vl_len_: int32,
-    pub ndim: ::std::os::raw::c_int,
-    pub dataoffset: int32,
-    pub elemtype: Oid,
-    pub dim1: ::std::os::raw::c_int,
-    pub lbound1: ::std::os::raw::c_int,
-    pub values: __IncompleteArrayField<Oid>,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct varattrib_1b {
-    pub va_header: uint8,
-    pub va_data: __IncompleteArrayField<::std::os::raw::c_char>,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct varattrib_1b_e {
-    pub va_header: uint8,
-    pub va_tag: uint8,
-    pub va_data: __IncompleteArrayField<::std::os::raw::c_char>,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct varattrib_4b__bindgen_ty_1 {
-    pub va_header: uint32,
-    pub va_data: __IncompleteArrayField<::std::os::raw::c_char>,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct varattrib_4b__bindgen_ty_2 {
-    pub va_header: uint32,
-    pub va_rawsize: uint32,
-    pub va_data: __IncompleteArrayField<::std::os::raw::c_char>,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct varlena {
-    pub vl_len_: [::std::os::raw::c_char; 4usize],
-    pub vl_dat: __IncompleteArrayField<::std::os::raw::c_char>,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct xl_running_xacts {
-    pub xcnt: ::std::os::raw::c_int,
-    pub subxcnt: ::std::os::raw::c_int,
-    pub subxid_overflow: bool,
-    pub nextXid: TransactionId,
-    pub oldestRunningXid: TransactionId,
-    pub latestCompletedXid: TransactionId,
-    pub xids: __IncompleteArrayField<TransactionId>,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct xl_standby_locks {
-    pub nlocks: ::std::os::raw::c_int,
-    pub locks: __IncompleteArrayField<xl_standby_lock>,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct xl_xact_assignment {
-    pub xtop: TransactionId,
-    pub nsubxacts: ::std::os::raw::c_int,
-    pub xsub: __IncompleteArrayField<TransactionId>,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct xl_xact_relfilenodes {
-    pub nrels: ::std::os::raw::c_int,
-    pub xnodes: __IncompleteArrayField<RelFileNode>,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct xl_xact_subxacts {
-    pub nsubxacts: ::std::os::raw::c_int,
-    pub subxacts: __IncompleteArrayField<TransactionId>,
-}
-#[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct AclItem {
     pub ai_grantee: Oid,
@@ -35024,6 +34872,213 @@ pub struct xl_xact_xinfo {
     pub xinfo: uint32,
 }
 #[repr(C)]
+#[derive(Debug, Default)]
+pub struct Bitmapset {
+    pub nwords: ::std::os::raw::c_int,
+    pub words: __IncompleteArrayField<bitmapword>,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct Jsonb {
+    pub vl_len_: int32,
+    pub root: JsonbContainer,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct JsonbContainer {
+    pub header: uint32,
+    pub children: __IncompleteArrayField<JEntry>,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct MinimalTupleData {
+    pub t_len: uint32,
+    pub mt_padding: [::std::os::raw::c_char; 6usize],
+    pub t_infomask2: uint16,
+    pub t_infomask: uint16,
+    pub t_hoff: uint8,
+    pub t_bits: __IncompleteArrayField<bits8>,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct PATH {
+    pub vl_len_: int32,
+    pub npts: int32,
+    pub closed: int32,
+    pub dummy: int32,
+    pub p: __IncompleteArrayField<Point>,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct POLYGON {
+    pub vl_len_: int32,
+    pub npts: int32,
+    pub boundbox: BOX,
+    pub p: __IncompleteArrayField<Point>,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct PageHeaderData {
+    pub pd_lsn: PageXLogRecPtr,
+    pub pd_checksum: uint16,
+    pub pd_flags: uint16,
+    pub pd_lower: LocationIndex,
+    pub pd_upper: LocationIndex,
+    pub pd_special: LocationIndex,
+    pub pd_pagesize_version: uint16,
+    pub pd_prune_xid: TransactionId,
+    pub pd_linp: __IncompleteArrayField<ItemIdData>,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct ParallelIndexScanDescData {
+    pub ps_relid: Oid,
+    pub ps_indexid: Oid,
+    pub ps_offset: Size,
+    pub ps_snapshot_data: __IncompleteArrayField<::std::os::raw::c_char>,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct TBMIterateResult {
+    pub blockno: BlockNumber,
+    pub ntuples: ::std::os::raw::c_int,
+    pub recheck: bool,
+    pub offsets: __IncompleteArrayField<OffsetNumber>,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct TimeZoneAbbrevTable {
+    pub tblsize: Size,
+    pub numabbrevs: ::std::os::raw::c_int,
+    pub abbrevs: __IncompleteArrayField<datetkn>,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct WorkerInstrumentation {
+    pub num_workers: ::std::os::raw::c_int,
+    pub instrument: __IncompleteArrayField<Instrumentation>,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct int2vector {
+    pub vl_len_: int32,
+    pub ndim: ::std::os::raw::c_int,
+    pub dataoffset: int32,
+    pub elemtype: Oid,
+    pub dim1: ::std::os::raw::c_int,
+    pub lbound1: ::std::os::raw::c_int,
+    pub values: __IncompleteArrayField<int16>,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct oidvector {
+    pub vl_len_: int32,
+    pub ndim: ::std::os::raw::c_int,
+    pub dataoffset: int32,
+    pub elemtype: Oid,
+    pub dim1: ::std::os::raw::c_int,
+    pub lbound1: ::std::os::raw::c_int,
+    pub values: __IncompleteArrayField<Oid>,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct varattrib_1b {
+    pub va_header: uint8,
+    pub va_data: __IncompleteArrayField<::std::os::raw::c_char>,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct varattrib_1b_e {
+    pub va_header: uint8,
+    pub va_tag: uint8,
+    pub va_data: __IncompleteArrayField<::std::os::raw::c_char>,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct varattrib_4b__bindgen_ty_1 {
+    pub va_header: uint32,
+    pub va_data: __IncompleteArrayField<::std::os::raw::c_char>,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct varattrib_4b__bindgen_ty_2 {
+    pub va_header: uint32,
+    pub va_rawsize: uint32,
+    pub va_data: __IncompleteArrayField<::std::os::raw::c_char>,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct varlena {
+    pub vl_len_: [::std::os::raw::c_char; 4usize],
+    pub vl_dat: __IncompleteArrayField<::std::os::raw::c_char>,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct xl_running_xacts {
+    pub xcnt: ::std::os::raw::c_int,
+    pub subxcnt: ::std::os::raw::c_int,
+    pub subxid_overflow: bool,
+    pub nextXid: TransactionId,
+    pub oldestRunningXid: TransactionId,
+    pub latestCompletedXid: TransactionId,
+    pub xids: __IncompleteArrayField<TransactionId>,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct xl_standby_locks {
+    pub nlocks: ::std::os::raw::c_int,
+    pub locks: __IncompleteArrayField<xl_standby_lock>,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct xl_xact_assignment {
+    pub xtop: TransactionId,
+    pub nsubxacts: ::std::os::raw::c_int,
+    pub xsub: __IncompleteArrayField<TransactionId>,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct xl_xact_relfilenodes {
+    pub nrels: ::std::os::raw::c_int,
+    pub xnodes: __IncompleteArrayField<RelFileNode>,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct xl_xact_subxacts {
+    pub nsubxacts: ::std::os::raw::c_int,
+    pub subxacts: __IncompleteArrayField<TransactionId>,
+}
+#[repr(C)]
+#[derive(Debug)]
+pub struct DynamicZoneAbbrev {
+    pub tz: *mut pg_tz,
+    pub zone: __IncompleteArrayField<::std::os::raw::c_char>,
+}
+#[repr(C)]
+#[derive(Debug)]
+pub struct ParallelBitmapHeapState {
+    pub tbmiterator: dsa_pointer,
+    pub prefetch_iterator: dsa_pointer,
+    pub mutex: slock_t,
+    pub prefetch_pages: ::std::os::raw::c_int,
+    pub prefetch_target: ::std::os::raw::c_int,
+    pub state: SharedBitmapState,
+    pub cv: ConditionVariable,
+    pub phs_snapshot_data: __IncompleteArrayField<::std::os::raw::c_char>,
+}
+#[repr(C)]
+#[derive(Debug)]
+pub struct _FuncCandidateList {
+    pub next: *mut _FuncCandidateList,
+    pub pathpos: ::std::os::raw::c_int,
+    pub oid: Oid,
+    pub nargs: ::std::os::raw::c_int,
+    pub nvargs: ::std::os::raw::c_int,
+    pub ndargs: ::std::os::raw::c_int,
+    pub argnumbers: *mut ::std::os::raw::c_int,
+    pub args: __IncompleteArrayField<Oid>,
+}
+#[repr(C)]
 #[derive(Default)]
 pub struct __IncompleteArrayField<T>(::std::marker::PhantomData<T>, [T; 0]);
 #[repr(C)]
@@ -35085,42 +35140,6 @@ pub struct xl_invalidations {
 pub struct xl_xact_invals {
     pub nmsgs: ::std::os::raw::c_int,
     pub msgs: __IncompleteArrayField<SharedInvalidationMessage>,
-}
-#[repr(C, packed(2))]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct ItemPointerData {
-    pub ip_blkid: BlockIdData,
-    pub ip_posid: OffsetNumber,
-}
-#[repr(C, packed(4))]
-#[derive(Copy, Clone)]
-pub struct __msfilterreq {
-    pub msfr_ifindex: u32,
-    pub msfr_fmode: u32,
-    pub msfr_nsrcs: u32,
-    pub __msfr_align: u32,
-    pub msfr_group: sockaddr_storage,
-    pub msfr_srcs: *mut sockaddr_storage,
-}
-#[repr(C, packed(4))]
-#[derive(Copy, Clone)]
-pub struct group_req {
-    pub gr_interface: u32,
-    pub gr_group: sockaddr_storage,
-}
-#[repr(C, packed(4))]
-#[derive(Copy, Clone)]
-pub struct group_source_req {
-    pub gsr_interface: u32,
-    pub gsr_group: sockaddr_storage,
-    pub gsr_source: sockaddr_storage,
-}
-#[repr(C, packed(4))]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct log2phys {
-    pub l2p_flags: ::std::os::raw::c_uint,
-    pub l2p_contigbytes: off_t,
-    pub l2p_devoffset: off_t,
 }
 impl<Storage, Align> __BindgenBitfieldUnit<Storage, Align>
 where
@@ -40082,6 +40101,7 @@ pub const HAVE_STRINGS_H: u32 = 1;
 pub const HAVE_STRING_H: u32 = 1;
 pub const HAVE_STRLCAT: u32 = 1;
 pub const HAVE_STRLCPY: u32 = 1;
+pub const HAVE_STRSIGNAL: u32 = 1;
 pub const HAVE_STRTOLL: u32 = 1;
 pub const HAVE_STRTOULL: u32 = 1;
 pub const HAVE_STRUCT_ADDRINFO: u32 = 1;
@@ -41755,6 +41775,7 @@ pub const S_IXUSR: u32 = 64;
 pub const ScanDirection_BackwardScanDirection: ScanDirection = -1;
 pub const ScanDirection_ForwardScanDirection: ScanDirection = 1;
 pub const ScanDirection_NoMovementScanDirection: ScanDirection = 0;
+pub const SelfItemPointerAttributeNumber: i32 = -1;
 pub const SessionBackupState_SESSION_BACKUP_EXCLUSIVE: SessionBackupState = 1;
 pub const SessionBackupState_SESSION_BACKUP_NONE: SessionBackupState = 0;
 pub const SessionBackupState_SESSION_BACKUP_NON_EXCLUSIVE: SessionBackupState = 2;
@@ -42591,11 +42612,11 @@ pub const vartag_external_VARTAG_EXPANDED_RO: vartag_external = 2;
 pub const vartag_external_VARTAG_EXPANDED_RW: vartag_external = 3;
 pub const vartag_external_VARTAG_INDIRECT: vartag_external = 1;
 pub const vartag_external_VARTAG_ONDISK: vartag_external = 18;
-pub type A_Expr_Kind = u32;
+pub type A_Expr_Kind = ::std::os::raw::c_uint;
 pub type Acl = ArrayType;
-pub type AclMaskHow = u32;
+pub type AclMaskHow = ::std::os::raw::c_uint;
 pub type AclMode = uint32;
-pub type AclResult = u32;
+pub type AclResult = ::std::os::raw::c_uint;
 pub type AcquireSampleRowsFunc = ::std::option::Option<
     unsafe extern "C" fn(
         relation: Relation,
@@ -42613,16 +42634,16 @@ pub type AddForeignUpdateTargets_function = ::std::option::Option<
         target_relation: Relation,
     ),
 >;
-pub type AggSplit = u32;
+pub type AggSplit = ::std::os::raw::c_uint;
 pub type AggStatePerAgg = *mut AggStatePerAggData;
 pub type AggStatePerGroup = *mut AggStatePerGroupData;
 pub type AggStatePerHash = *mut AggStatePerHashData;
 pub type AggStatePerPhase = *mut AggStatePerPhaseData;
 pub type AggStatePerTrans = *mut AggStatePerTransData;
-pub type AggStrategy = u32;
-pub type AlterSubscriptionType = u32;
-pub type AlterTSConfigType = u32;
-pub type AlterTableType = u32;
+pub type AggStrategy = ::std::os::raw::c_uint;
+pub type AlterSubscriptionType = ::std::os::raw::c_uint;
+pub type AlterTSConfigType = ::std::os::raw::c_uint;
+pub type AlterTableType = ::std::os::raw::c_uint;
 pub type AnalyzeForeignTable_function = ::std::option::Option<
     unsafe extern "C" fn(
         relation: Relation,
@@ -42630,16 +42651,16 @@ pub type AnalyzeForeignTable_function = ::std::option::Option<
         totalpages: *mut BlockNumber,
     ) -> bool,
 >;
-pub type ArchiveMode = u32;
+pub type ArchiveMode = ::std::os::raw::c_uint;
 pub type ArrayIterator = *mut ArrayIteratorData;
 pub type AttrNumber = int16;
 pub type AuthRequest = uint32;
-pub type AuxProcType = i32;
-pub type BMS_Comparison = u32;
-pub type BMS_Membership = u32;
+pub type AuxProcType = ::std::os::raw::c_int;
+pub type BMS_Comparison = ::std::os::raw::c_uint;
+pub type BMS_Membership = ::std::os::raw::c_uint;
 pub type BackendId = ::std::os::raw::c_int;
-pub type BackendState = u32;
-pub type BackendType = u32;
+pub type BackendState = ::std::os::raw::c_uint;
+pub type BackendType = ::std::os::raw::c_uint;
 pub type BeginDirectModify_function = ::std::option::Option<
     unsafe extern "C" fn(node: *mut ForeignScanState, eflags: ::std::os::raw::c_int),
 >;
@@ -42655,17 +42676,17 @@ pub type BeginForeignModify_function = ::std::option::Option<
 pub type BeginForeignScan_function = ::std::option::Option<
     unsafe extern "C" fn(node: *mut ForeignScanState, eflags: ::std::os::raw::c_int),
 >;
-pub type BgWorkerStartTime = u32;
-pub type BgwHandleStatus = u32;
+pub type BgWorkerStartTime = ::std::os::raw::c_uint;
+pub type BgwHandleStatus = ::std::os::raw::c_uint;
 pub type BlockId = *mut BlockIdData;
 pub type BlockNumber = uint32;
-pub type BoolExprType = u32;
-pub type BoolTestType = u32;
+pub type BoolExprType = ::std::os::raw::c_uint;
+pub type BoolTestType = ::std::os::raw::c_uint;
 pub type BpChar = varlena;
 pub type Buffer = ::std::os::raw::c_int;
 pub type BufferAccessStrategy = *mut BufferAccessStrategyData;
-pub type BuiltinTrancheIds = u32;
-pub type CmdType = u32;
+pub type BuiltinTrancheIds = ::std::os::raw::c_uint;
+pub type CmdType = ::std::os::raw::c_uint;
 pub type CoerceParamHook = ::std::option::Option<
     unsafe extern "C" fn(
         pstate: *mut ParseState,
@@ -42675,25 +42696,25 @@ pub type CoerceParamHook = ::std::option::Option<
         location: ::std::os::raw::c_int,
     ) -> *mut Node,
 >;
-pub type CoercionContext = u32;
-pub type CoercionForm = u32;
-pub type CollectedCommandType = u32;
-pub type CommandDest = u32;
+pub type CoercionContext = ::std::os::raw::c_uint;
+pub type CoercionForm = ::std::os::raw::c_uint;
+pub type CollectedCommandType = ::std::os::raw::c_uint;
+pub type CommandDest = ::std::os::raw::c_uint;
 pub type CommandId = uint32;
-pub type ConstrType = u32;
-pub type ConstraintExclusionType = u32;
+pub type ConstrType = ::std::os::raw::c_uint;
+pub type ConstraintExclusionType = ::std::os::raw::c_uint;
 pub type Cost = f64;
-pub type CostSelector = u32;
+pub type CostSelector = ::std::os::raw::c_uint;
 pub type DateADT = int32;
 pub type Datum = usize;
-pub type DeadLockState = u32;
-pub type DefElemAction = u32;
-pub type DependencyType = u32;
+pub type DeadLockState = ::std::os::raw::c_uint;
+pub type DefElemAction = ::std::os::raw::c_uint;
+pub type DependencyType = ::std::os::raw::c_uint;
 pub type DestReceiver = _DestReceiver;
-pub type DiscardMode = u32;
+pub type DiscardMode = ::std::os::raw::c_uint;
 pub type DistinctExpr = OpExpr;
-pub type DomainConstraintType = u32;
-pub type DropBehavior = u32;
+pub type DomainConstraintType = ::std::os::raw::c_uint;
+pub type DropBehavior = ::std::os::raw::c_uint;
 pub type EOM_flatten_into_method = ::std::option::Option<
     unsafe extern "C" fn(
         eohptr: *mut ExpandedObjectHeader,
@@ -42709,7 +42730,7 @@ pub type EndForeignModify_function =
     ::std::option::Option<unsafe extern "C" fn(estate: *mut EState, rinfo: *mut ResultRelInfo)>;
 pub type EndForeignScan_function =
     ::std::option::Option<unsafe extern "C" fn(node: *mut ForeignScanState)>;
-pub type EphemeralNameRelationType = u32;
+pub type EphemeralNameRelationType = ::std::os::raw::c_uint;
 pub type EphemeralNamedRelation = *mut EphemeralNamedRelationData;
 pub type EphemeralNamedRelationMetadata = *mut EphemeralNamedRelationMetadataData;
 pub type EstimateDSMForeignScan_function = ::std::option::Option<
@@ -42776,9 +42797,9 @@ pub type ExplainForeignModify_function = ::std::option::Option<
 >;
 pub type ExplainForeignScan_function =
     ::std::option::Option<unsafe extern "C" fn(node: *mut ForeignScanState, es: *mut ExplainState)>;
-pub type ExplainFormat = u32;
+pub type ExplainFormat = ::std::os::raw::c_uint;
 pub type ExprContextCallbackFunction = ::std::option::Option<unsafe extern "C" fn(arg: Datum)>;
-pub type ExprDoneCond = u32;
+pub type ExprDoneCond = ::std::os::raw::c_uint;
 pub type ExprStateEvalFunc = ::std::option::Option<
     unsafe extern "C" fn(
         expression: *mut ExprState,
@@ -42787,10 +42808,10 @@ pub type ExprStateEvalFunc = ::std::option::Option<
     ) -> Datum,
 >;
 pub type FILE = __sFILE;
-pub type FetchDirection = u32;
+pub type FetchDirection = ::std::os::raw::c_uint;
 pub type File = ::std::os::raw::c_int;
-pub type FmgrHookEventType = u32;
-pub type ForkNumber = i32;
+pub type FmgrHookEventType = ::std::os::raw::c_uint;
+pub type ForkNumber = ::std::os::raw::c_int;
 pub type Form_pg_attribute = *mut FormData_pg_attribute;
 pub type Form_pg_class = *mut FormData_pg_class;
 pub type Form_pg_enum = *mut FormData_pg_enum;
@@ -42800,9 +42821,9 @@ pub type Form_pg_publication = *mut FormData_pg_publication;
 pub type Form_pg_trigger = *mut FormData_pg_trigger;
 pub type Form_pg_type = *mut FormData_pg_type;
 pub type FuncCandidateList = *mut _FuncCandidateList;
-pub type FuncDetailCode = u32;
-pub type FunctionParameterMode = u32;
-pub type GenericOptionFlags = u32;
+pub type FuncDetailCode = ::std::os::raw::c_uint;
+pub type FunctionParameterMode = ::std::os::raw::c_uint;
+pub type GenericOptionFlags = ::std::os::raw::c_uint;
 pub type GetForeignJoinPaths_function = ::std::option::Option<
     unsafe extern "C" fn(
         root: *mut PlannerInfo,
@@ -42833,9 +42854,9 @@ pub type GetForeignRelSize_function = ::std::option::Option<
 pub type GetForeignRowMarkType_function = ::std::option::Option<
     unsafe extern "C" fn(rte: *mut RangeTblEntry, strength: LockClauseStrength) -> RowMarkType,
 >;
-pub type GrantTargetType = u32;
-pub type GroupingSetKind = u32;
-pub type GucAction = u32;
+pub type GrantTargetType = ::std::os::raw::c_uint;
+pub type GroupingSetKind = ::std::os::raw::c_uint;
+pub type GucAction = ::std::os::raw::c_uint;
 pub type GucBoolAssignHook =
     ::std::option::Option<unsafe extern "C" fn(newval: bool, extra: *mut ::std::os::raw::c_void)>;
 pub type GucBoolCheckHook = ::std::option::Option<
@@ -42845,7 +42866,7 @@ pub type GucBoolCheckHook = ::std::option::Option<
         source: GucSource,
     ) -> bool,
 >;
-pub type GucContext = u32;
+pub type GucContext = ::std::os::raw::c_uint;
 pub type GucEnumAssignHook = ::std::option::Option<
     unsafe extern "C" fn(newval: ::std::os::raw::c_int, extra: *mut ::std::os::raw::c_void),
 >;
@@ -42877,7 +42898,7 @@ pub type GucRealCheckHook = ::std::option::Option<
 >;
 pub type GucShowHook =
     ::std::option::Option<unsafe extern "C" fn() -> *const ::std::os::raw::c_char>;
-pub type GucSource = u32;
+pub type GucSource = ::std::os::raw::c_uint;
 pub type GucStringAssignHook = ::std::option::Option<
     unsafe extern "C" fn(newval: *const ::std::os::raw::c_char, extra: *mut ::std::os::raw::c_void),
 >;
@@ -42888,7 +42909,7 @@ pub type GucStringCheckHook = ::std::option::Option<
         source: GucSource,
     ) -> bool,
 >;
-pub type HASHACTION = u32;
+pub type HASHACTION = ::std::os::raw::c_uint;
 pub type HashAllocFunc =
     ::std::option::Option<unsafe extern "C" fn(request: Size) -> *mut ::std::os::raw::c_void>;
 pub type HashCompareFunc = ::std::option::Option<
@@ -42912,15 +42933,15 @@ pub type HashValueFunc = ::std::option::Option<
 >;
 pub type HeapTuple = *mut HeapTupleData;
 pub type HeapTupleHeader = *mut HeapTupleHeaderData;
-pub type HotStandbyState = u32;
-pub type IOFuncSelector = u32;
-pub type ImportForeignSchemaType = u32;
+pub type HotStandbyState = ::std::os::raw::c_uint;
+pub type IOFuncSelector = ::std::os::raw::c_uint;
+pub type ImportForeignSchemaType = ::std::os::raw::c_uint;
 pub type ImportForeignSchema_function = ::std::option::Option<
     unsafe extern "C" fn(stmt: *mut ImportForeignSchemaStmt, serverOid: Oid) -> *mut List,
 >;
 pub type Index = ::std::os::raw::c_uint;
-pub type IndexAMProperty = u32;
-pub type IndexAttrBitmapKind = u32;
+pub type IndexAMProperty = ::std::os::raw::c_uint;
+pub type IndexAttrBitmapKind = ::std::os::raw::c_uint;
 pub type IndexAttributeBitMap = *mut IndexAttributeBitMapData;
 pub type IndexBuildCallback = ::std::option::Option<
     unsafe extern "C" fn(
@@ -42936,9 +42957,9 @@ pub type IndexBulkDeleteCallback = ::std::option::Option<
     unsafe extern "C" fn(itemptr: ItemPointer, state: *mut ::std::os::raw::c_void) -> bool,
 >;
 pub type IndexScanDesc = *mut IndexScanDescData;
-pub type IndexStateFlagsAction = u32;
+pub type IndexStateFlagsAction = ::std::os::raw::c_uint;
 pub type IndexTuple = *mut IndexTupleData;
-pub type IndexUniqueCheck = u32;
+pub type IndexUniqueCheck = ::std::os::raw::c_uint;
 pub type InitializeDSMForeignScan_function = ::std::option::Option<
     unsafe extern "C" fn(
         node: *mut ForeignScanState,
@@ -42953,7 +42974,7 @@ pub type InitializeWorkerForeignScan_function = ::std::option::Option<
         coordinate: *mut ::std::os::raw::c_void,
     ),
 >;
-pub type InstrumentOption = u32;
+pub type InstrumentOption = ::std::os::raw::c_uint;
 pub type IsForeignRelUpdatable_function =
     ::std::option::Option<unsafe extern "C" fn(rel: Relation) -> ::std::os::raw::c_int>;
 pub type IsForeignScanParallelSafe_function = ::std::option::Option<
@@ -42973,30 +42994,30 @@ pub type IterateDirectModify_function =
 pub type IterateForeignScan_function =
     ::std::option::Option<unsafe extern "C" fn(node: *mut ForeignScanState) -> *mut TupleTableSlot>;
 pub type JEntry = uint32;
-pub type JoinType = u32;
-pub type JsonbIterState = u32;
-pub type JsonbIteratorToken = u32;
+pub type JoinType = ::std::os::raw::c_uint;
+pub type JsonbIterState = ::std::os::raw::c_uint;
+pub type JsonbIteratorToken = ::std::os::raw::c_uint;
 pub type LOCKMASK = ::std::os::raw::c_int;
 pub type LOCKMETHODID = uint16;
 pub type LOCKMODE = ::std::os::raw::c_int;
 pub type LWLockId = *mut LWLock;
-pub type LWLockMode = u32;
-pub type LimitStateCond = u32;
+pub type LWLockMode = ::std::os::raw::c_uint;
+pub type LimitStateCond = ::std::os::raw::c_uint;
 pub type LocalTransactionId = uint32;
 pub type LocationIndex = uint16;
-pub type LockAcquireResult = u32;
-pub type LockClauseStrength = u32;
+pub type LockAcquireResult = ::std::os::raw::c_uint;
+pub type LockClauseStrength = ::std::os::raw::c_uint;
 pub type LockInfo = *mut LockInfoData;
 pub type LockMethod = *const LockMethodData;
-pub type LockTagType = u32;
-pub type LockTupleMode = u32;
-pub type LockWaitPolicy = u32;
-pub type LogStmtLevel = u32;
+pub type LockTagType = ::std::os::raw::c_uint;
+pub type LockTupleMode = ::std::os::raw::c_uint;
+pub type LockWaitPolicy = ::std::os::raw::c_uint;
+pub type LogStmtLevel = ::std::os::raw::c_uint;
 pub type MemoryContext = *mut MemoryContextData;
 pub type MemoryContextCallbackFunction =
     ::std::option::Option<unsafe extern "C" fn(arg: *mut ::std::os::raw::c_void)>;
 pub type MergeJoinClause = *mut MergeJoinClauseData;
-pub type MinMaxOp = u32;
+pub type MinMaxOp = ::std::os::raw::c_uint;
 pub type MinimalTuple = *mut MinimalTupleData;
 pub type MsgType = ProtocolVersion;
 pub type MultiXactId = TransactionId;
@@ -43004,18 +43025,18 @@ pub type MultiXactOffset = uint32;
 pub type Name = *mut NameData;
 pub type NameData = nameData;
 pub type NestPath = JoinPath;
-pub type NodeTag = u32;
+pub type NodeTag = ::std::os::raw::c_uint;
 pub type NullIfExpr = OpExpr;
-pub type NullTestType = u32;
+pub type NullTestType = ::std::os::raw::c_uint;
 pub type Numeric = *mut NumericData;
-pub type ObjectClass = u32;
+pub type ObjectClass = ::std::os::raw::c_uint;
 pub type Offset = ::std::os::raw::c_int;
 pub type OffsetNumber = uint16;
 pub type Oid = ::std::os::raw::c_uint;
-pub type OnCommitAction = u32;
-pub type OnConflictAction = u32;
-pub type OverridingKind = u32;
-pub type PGErrorVerbosity = u32;
+pub type OnCommitAction = ::std::os::raw::c_uint;
+pub type OnConflictAction = ::std::os::raw::c_uint;
+pub type OverridingKind = ::std::os::raw::c_uint;
+pub type PGErrorVerbosity = ::std::os::raw::c_uint;
 pub type PGFInfoFunction = ::std::option::Option<unsafe extern "C" fn() -> *const Pg_finfo_record>;
 pub type PGFunction =
     ::std::option::Option<unsafe extern "C" fn(fcinfo: FunctionCallInfo) -> Datum>;
@@ -43026,9 +43047,9 @@ pub type PacketLen = uint32;
 pub type Page = Pointer;
 pub type PageHeader = *mut PageHeaderData;
 pub type ParallelIndexScanDesc = *mut ParallelIndexScanDescData;
-pub type ParamKind = u32;
+pub type ParamKind = ::std::os::raw::c_uint;
 pub type ParamListInfo = *mut ParamListInfoData;
-pub type ParseExprKind = u32;
+pub type ParseExprKind = ::std::os::raw::c_uint;
 pub type ParseParamRefHook = ::std::option::Option<
     unsafe extern "C" fn(pstate: *mut ParseState, pref: *mut ParamRef) -> *mut Node,
 >;
@@ -43038,11 +43059,11 @@ pub type ParserSetupHook = ::std::option::Option<
 pub type PartitionBoundInfo = *mut PartitionBoundInfoData;
 pub type PartitionDesc = *mut PartitionDescData;
 pub type PartitionKey = *mut PartitionKeyData;
-pub type PartitionRangeDatumKind = i32;
-pub type PathKeysComparison = u32;
+pub type PartitionRangeDatumKind = ::std::os::raw::c_int;
+pub type PathKeysComparison = ::std::os::raw::c_uint;
 pub type PgStat_Counter = int64;
-pub type PgStat_Shared_Reset_Target = u32;
-pub type PgStat_Single_Reset_Type = u32;
+pub type PgStat_Shared_Reset_Target = ::std::os::raw::c_uint;
+pub type PgStat_Single_Reset_Type = ::std::os::raw::c_uint;
 pub type PlanDirectModify_function = ::std::option::Option<
     unsafe extern "C" fn(
         root: *mut PlannerInfo,
@@ -43061,8 +43082,8 @@ pub type PlanForeignModify_function = ::std::option::Option<
 >;
 pub type Pointer = *mut ::std::os::raw::c_char;
 pub type Portal = *mut PortalData;
-pub type PortalStatus = u32;
-pub type PortalStrategy = u32;
+pub type PortalStatus = ::std::os::raw::c_uint;
+pub type PortalStrategy = ::std::os::raw::c_uint;
 pub type PostParseColumnRefHook = ::std::option::Option<
     unsafe extern "C" fn(
         pstate: *mut ParseState,
@@ -43073,8 +43094,8 @@ pub type PostParseColumnRefHook = ::std::option::Option<
 pub type PreParseColumnRefHook = ::std::option::Option<
     unsafe extern "C" fn(pstate: *mut ParseState, cref: *mut ColumnRef) -> *mut Node,
 >;
-pub type ProcSignalReason = u32;
-pub type ProcessUtilityContext = u32;
+pub type ProcSignalReason = ::std::os::raw::c_uint;
+pub type ProcessUtilityContext = ::std::os::raw::c_uint;
 pub type ProcessUtility_hook_type = ::std::option::Option<
     unsafe extern "C" fn(
         pstmt: *mut PlannedStmt,
@@ -43086,10 +43107,10 @@ pub type ProcessUtility_hook_type = ::std::option::Option<
         completionTag: *mut ::std::os::raw::c_char,
     ),
 >;
-pub type ProgressCommandType = u32;
+pub type ProgressCommandType = ::std::os::raw::c_uint;
 pub type ProtocolVersion = uint32;
-pub type QuerySource = u32;
-pub type RTEKind = u32;
+pub type QuerySource = ::std::os::raw::c_uint;
+pub type RTEKind = ::std::os::raw::c_uint;
 pub type RangeVarGetRelidCallback = ::std::option::Option<
     unsafe extern "C" fn(
         relation: *const RangeVar,
@@ -43110,16 +43131,16 @@ pub type ReScanForeignScan_function =
 pub type RecheckForeignScan_function = ::std::option::Option<
     unsafe extern "C" fn(node: *mut ForeignScanState, slot: *mut TupleTableSlot) -> bool,
 >;
-pub type RecoveryState = u32;
-pub type RecoveryTargetType = u32;
+pub type RecoveryState = ::std::os::raw::c_uint;
+pub type RecoveryTargetType = ::std::os::raw::c_uint;
 pub type RegProcedure = regproc;
-pub type ReindexObjectType = u32;
-pub type RelOptKind = u32;
+pub type ReindexObjectType = ::std::os::raw::c_uint;
+pub type RelOptKind = ::std::os::raw::c_uint;
 pub type Relation = *mut RelationData;
 pub type RelationPtr = *mut Relation;
 pub type Relids = *mut Bitmapset;
 pub type RepOriginId = uint16;
-pub type ReplicationKind = u32;
+pub type ReplicationKind = ::std::os::raw::c_uint;
 pub type ResourceOwner = *mut ResourceOwnerData;
 pub type ResourceReleaseCallback = ::std::option::Option<
     unsafe extern "C" fn(
@@ -43129,39 +43150,39 @@ pub type ResourceReleaseCallback = ::std::option::Option<
         arg: *mut ::std::os::raw::c_void,
     ),
 >;
-pub type ResourceReleasePhase = u32;
+pub type ResourceReleasePhase = ::std::os::raw::c_uint;
 pub type RmgrId = uint8;
-pub type RmgrIds = u32;
-pub type RoleSpecType = u32;
-pub type RoleStmtType = u32;
-pub type RowCompareType = u32;
-pub type RowMarkType = u32;
+pub type RmgrIds = ::std::os::raw::c_uint;
+pub type RoleSpecType = ::std::os::raw::c_uint;
+pub type RoleStmtType = ::std::os::raw::c_uint;
+pub type RowCompareType = ::std::os::raw::c_uint;
+pub type RowMarkType = ::std::os::raw::c_uint;
 pub type RunningTransactions = *mut RunningTransactionsData;
 pub type SPIPlanPtr = *mut _SPI_plan;
-pub type SQLValueFunctionOp = u32;
-pub type ScanDirection = i32;
+pub type SQLValueFunctionOp = ::std::os::raw::c_uint;
+pub type ScanDirection = ::std::os::raw::c_int;
 pub type ScanKey = *mut ScanKeyData;
 pub type Selectivity = f64;
 pub type SeqScan = Scan;
-pub type SessionBackupState = u32;
-pub type SetFunctionReturnMode = u32;
-pub type SetOpCmd = u32;
+pub type SessionBackupState = ::std::os::raw::c_uint;
+pub type SetFunctionReturnMode = ::std::os::raw::c_uint;
+pub type SetOpCmd = ::std::os::raw::c_uint;
 pub type SetOpStatePerGroup = *mut SetOpStatePerGroupData;
-pub type SetOpStrategy = u32;
-pub type SetOperation = u32;
-pub type SharedBitmapState = u32;
-pub type SharedDependencyType = u32;
+pub type SetOpStrategy = ::std::os::raw::c_uint;
+pub type SetOperation = ::std::os::raw::c_uint;
+pub type SharedBitmapState = ::std::os::raw::c_uint;
+pub type SharedDependencyType = ::std::os::raw::c_uint;
 pub type ShutdownForeignScan_function =
     ::std::option::Option<unsafe extern "C" fn(node: *mut ForeignScanState)>;
 pub type Size = usize;
 pub type Snapshot = *mut SnapshotData;
-pub type SortByDir = u32;
-pub type SortByNulls = u32;
+pub type SortByDir = ::std::os::raw::c_uint;
+pub type SortByNulls = ::std::os::raw::c_uint;
 pub type SortSupport = *mut SortSupportData;
-pub type StatMsgType = u32;
+pub type StatMsgType = ::std::os::raw::c_uint;
 pub type StrategyNumber = uint16;
 pub type StringInfo = *mut StringInfoData;
-pub type SubLinkType = u32;
+pub type SubLinkType = ::std::os::raw::c_uint;
 pub type SubTransactionId = uint32;
 pub type SubXactCallback = ::std::option::Option<
     unsafe extern "C" fn(
@@ -43171,38 +43192,38 @@ pub type SubXactCallback = ::std::option::Option<
         arg: *mut ::std::os::raw::c_void,
     ),
 >;
-pub type SubXactEvent = u32;
-pub type SyncCommitLevel = u32;
-pub type SysCacheIdentifier = u32;
+pub type SubXactEvent = ::std::os::raw::c_uint;
+pub type SyncCommitLevel = ::std::os::raw::c_uint;
+pub type SysCacheIdentifier = ::std::os::raw::c_uint;
 pub type SysScanDesc = *mut SysScanDescData;
-pub type TableLikeOption = u32;
+pub type TableLikeOption = ::std::os::raw::c_uint;
 pub type TimeADT = int64;
 pub type TimeLineID = uint32;
 pub type TimeOffset = int64;
 pub type Timestamp = int64;
 pub type TimestampTz = int64;
-pub type TrackFunctionsLevel = u32;
+pub type TrackFunctionsLevel = ::std::os::raw::c_uint;
 pub type TransactionId = uint32;
-pub type TransactionStmtKind = u32;
+pub type TransactionStmtKind = ::std::os::raw::c_uint;
 pub type TriggerEvent = uint32;
 pub type TupleHashEntry = *mut TupleHashEntryData;
 pub type TupleHashIterator = tuplehash_iterator;
 pub type TupleHashTable = *mut TupleHashTableData;
 pub type Type = HeapTuple;
-pub type TypeFuncClass = u32;
-pub type UniquePathMethod = u32;
-pub type UpperRelationKind = u32;
+pub type TypeFuncClass = ::std::os::raw::c_uint;
+pub type UniquePathMethod = ::std::os::raw::c_uint;
+pub type UpperRelationKind = ::std::os::raw::c_uint;
 pub type VarChar = varlena;
 pub type VariableCache = *mut VariableCacheData;
-pub type VariableSetKind = u32;
-pub type ViewCheckOption = u32;
-pub type WCOKind = u32;
-pub type WaitEventActivity = u32;
-pub type WaitEventClient = u32;
-pub type WaitEventIO = u32;
-pub type WaitEventIPC = u32;
-pub type WaitEventTimeout = u32;
-pub type WalLevel = u32;
+pub type VariableSetKind = ::std::os::raw::c_uint;
+pub type ViewCheckOption = ::std::os::raw::c_uint;
+pub type WCOKind = ::std::os::raw::c_uint;
+pub type WaitEventActivity = ::std::os::raw::c_uint;
+pub type WaitEventClient = ::std::os::raw::c_uint;
+pub type WaitEventIO = ::std::os::raw::c_uint;
+pub type WaitEventIPC = ::std::os::raw::c_uint;
+pub type WaitEventTimeout = ::std::os::raw::c_uint;
+pub type WalLevel = ::std::os::raw::c_uint;
 pub type WindowStatePerAgg = *mut WindowStatePerAggData;
 pub type WindowStatePerFunc = *mut WindowStatePerFuncData;
 pub type XLogPageReadCB = ::std::option::Option<
@@ -43219,9 +43240,9 @@ pub type XLogRecPtr = uint64;
 pub type XLogSegNo = uint64;
 pub type XactCallback =
     ::std::option::Option<unsafe extern "C" fn(event: XactEvent, arg: *mut ::std::os::raw::c_void)>;
-pub type XactEvent = u32;
-pub type XmlExprOp = u32;
-pub type XmlOptionType = u32;
+pub type XactEvent = ::std::os::raw::c_uint;
+pub type XmlExprOp = ::std::os::raw::c_uint;
+pub type XmlOptionType = ::std::os::raw::c_uint;
 pub type __builtin_va_list = [__va_list_tag; 1usize];
 pub type __darwin_blkcnt_t = __int64_t;
 pub type __darwin_blksize_t = __int32_t;
@@ -43384,7 +43405,7 @@ pub type check_function_callback = ::std::option::Option<
     unsafe extern "C" fn(func_id: Oid, context: *mut ::std::os::raw::c_void) -> bool,
 >;
 pub type clock_t = __darwin_clock_t;
-pub type clockid_t = u32;
+pub type clockid_t = ::std::os::raw::c_uint;
 pub type ct_rune_t = __darwin_ct_rune_t;
 pub type daddr_t = i32;
 pub type dev_t = __darwin_dev_t;
@@ -43393,7 +43414,7 @@ pub type dsa_handle = dsm_handle;
 pub type dsa_pointer = uint64;
 pub type dsa_pointer_atomic = pg_atomic_uint64;
 pub type dsm_handle = uint32;
-pub type dsm_op = u32;
+pub type dsm_op = ::std::os::raw::c_uint;
 pub type ec_matches_callback_type = ::std::option::Option<
     unsafe extern "C" fn(
         root: *mut PlannerInfo,
@@ -43411,7 +43432,7 @@ pub type fbootstraptransfer_t = fbootstraptransfer;
 pub type fchecklv_t = fchecklv;
 pub type fcodeblobs_t = fcodeblobs;
 pub type fd_mask = __int32_t;
-pub type filesec_property_t = u32;
+pub type filesec_property_t = ::std::os::raw::c_uint;
 pub type filesec_t = *mut _filesec;
 pub type fixpt_t = u_int32_t;
 pub type float4 = f32;
@@ -43453,7 +43474,7 @@ pub type get_relation_stats_hook_type = ::std::option::Option<
 >;
 pub type gid_t = __darwin_gid_t;
 pub type id_t = __darwin_id_t;
-pub type idtype_t = u32;
+pub type idtype_t = ::std::os::raw::c_uint;
 pub type in6_addr_t = in6_addr;
 pub type in_addr_t = __uint32_t;
 pub type in_port_t = __uint16_t;
@@ -43474,7 +43495,7 @@ pub type int_least32_t = i32;
 pub type int_least64_t = i64;
 pub type int_least8_t = i8;
 pub type intmax_t = ::std::os::raw::c_long;
-pub type jbvType = u32;
+pub type jbvType = ::std::os::raw::c_uint;
 pub type jmp_buf = [::std::os::raw::c_int; 37usize];
 pub type join_search_hook_type = ::std::option::Option<
     unsafe extern "C" fn(
@@ -43538,8 +43559,8 @@ pub type qsort_arg_comparator = ::std::option::Option<
 pub type quad_t = i64;
 pub type register_t = i64;
 pub type regproc = Oid;
-pub type relopt_kind = u32;
-pub type relopt_type = u32;
+pub type relopt_kind = ::std::os::raw::c_uint;
+pub type relopt_type = ::std::os::raw::c_uint;
 pub type rlim_t = __uint64_t;
 pub type rsize_t = __darwin_size_t;
 pub type rune_t = __darwin_rune_t;
@@ -43568,7 +43589,7 @@ pub type set_rel_pathlist_hook_type = ::std::option::Option<
         rte: *mut RangeTblEntry,
     ),
 >;
-pub type shm_mq_result = u32;
+pub type shm_mq_result = ::std::os::raw::c_uint;
 pub type shmem_startup_hook_type = ::std::option::Option<unsafe extern "C" fn()>;
 pub type sig_atomic_t = ::std::os::raw::c_int;
 pub type sig_t = ::std::option::Option<unsafe extern "C" fn(arg1: ::std::os::raw::c_int)>;
@@ -43583,7 +43604,7 @@ pub type swblk_t = i32;
 pub type syscall_arg_t = u_int64_t;
 pub type text = varlena;
 pub type time_t = __darwin_time_t;
-pub type tuplehash_status = u32;
+pub type tuplehash_status = ::std::os::raw::c_uint;
 pub type u_char = ::std::os::raw::c_uchar;
 pub type u_int = ::std::os::raw::c_uint;
 pub type u_int16_t = ::std::os::raw::c_ushort;
@@ -43622,6 +43643,6 @@ pub type ushort = ::std::os::raw::c_ushort;
 pub type uuid_string_t = __darwin_uuid_string_t;
 pub type uuid_t = __darwin_uuid_t;
 pub type va_list = __darwin_va_list;
-pub type vartag_external = u32;
+pub type vartag_external = ::std::os::raw::c_uint;
 pub type wchar_t = __darwin_wchar_t;
 pub type wint_t = __darwin_wint_t;

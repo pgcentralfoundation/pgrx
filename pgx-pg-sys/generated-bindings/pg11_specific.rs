@@ -1443,7 +1443,7 @@ extern "C" {
 #[pg_guard]
 extern "C" {
     pub fn appendBinaryStringInfoNT(
-        str: StringInfo,
+        str_: StringInfo,
         data: *const ::std::os::raw::c_char,
         datalen: ::std::os::raw::c_int,
     );
@@ -1763,6 +1763,10 @@ extern "C" {
 #[pg_guard]
 extern "C" {
     pub fn do_convert_tuple(tuple: HeapTuple, map: *mut TupleConversionMap) -> HeapTuple;
+}
+#[pg_guard]
+extern "C" {
+    pub fn do_pg_abort_backup(code: ::std::os::raw::c_int, arg: Datum);
 }
 #[pg_guard]
 extern "C" {
@@ -2771,6 +2775,10 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
+    pub fn register_persistent_abort_backup_handler();
+}
+#[pg_guard]
+extern "C" {
     pub fn reltime_interval(fcinfo: FunctionCallInfo) -> Datum;
 }
 #[pg_guard]
@@ -2952,7 +2960,7 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
-    pub fn stringToNode(str: *mut ::std::os::raw::c_char) -> *mut ::std::os::raw::c_void;
+    pub fn stringToNode(str_: *mut ::std::os::raw::c_char) -> *mut ::std::os::raw::c_void;
 }
 #[pg_guard]
 extern "C" {
@@ -3750,26 +3758,8 @@ pub union PgStat_Msg {
 #[derive(Copy, Clone)]
 pub union Value_ValUnion {
     pub ival: ::std::os::raw::c_int,
-    pub str: *mut ::std::os::raw::c_char,
+    pub str_: *mut ::std::os::raw::c_char,
     _bindgen_union_align: u64,
-}
-#[repr(C)]
-#[derive(Debug)]
-pub struct ParamListInfoData {
-    pub paramFetch: ParamFetchHook,
-    pub paramFetchArg: *mut ::std::os::raw::c_void,
-    pub paramCompile: ParamCompileHook,
-    pub paramCompileArg: *mut ::std::os::raw::c_void,
-    pub parserSetup: ParserSetupHook,
-    pub parserSetupArg: *mut ::std::os::raw::c_void,
-    pub numParams: ::std::os::raw::c_int,
-    pub params: __IncompleteArrayField<ParamExternData>,
-}
-#[repr(C)]
-#[derive(Debug)]
-pub struct SharedSortInfo {
-    pub num_workers: ::std::os::raw::c_int,
-    pub sinstrument: __IncompleteArrayField<TuplesortInstrumentation>,
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -4225,7 +4215,7 @@ pub struct EState {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct ExplainState {
-    pub str: StringInfo,
+    pub str_: StringInfo,
     pub verbose: bool,
     pub analyze: bool,
     pub costs: bool,
@@ -5947,43 +5937,6 @@ pub struct tupleConstr {
     pub has_not_null: bool,
 }
 #[repr(C)]
-#[derive(Debug, Default)]
-pub struct FormData_pg_index {
-    pub indexrelid: Oid,
-    pub indrelid: Oid,
-    pub indnatts: int16,
-    pub indnkeyatts: int16,
-    pub indisunique: bool,
-    pub indisprimary: bool,
-    pub indisexclusion: bool,
-    pub indimmediate: bool,
-    pub indisclustered: bool,
-    pub indisvalid: bool,
-    pub indcheckxmin: bool,
-    pub indisready: bool,
-    pub indislive: bool,
-    pub indisreplident: bool,
-    pub indkey: int2vector,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct ParallelHeapScanDescData {
-    pub phs_relid: Oid,
-    pub phs_syncscan: bool,
-    pub phs_nblocks: BlockNumber,
-    pub phs_mutex: slock_t,
-    pub phs_startblock: BlockNumber,
-    pub phs_nallocated: pg_atomic_uint64,
-    pub phs_snapshot_any: bool,
-    pub phs_snapshot_data: __IncompleteArrayField<::std::os::raw::c_char>,
-}
-#[repr(C)]
-#[derive(Debug, Default)]
-pub struct SharedHashInfo {
-    pub num_workers: ::std::os::raw::c_int,
-    pub hinstrument: __IncompleteArrayField<HashInstrumentation>,
-}
-#[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct AggClauseCosts {
     pub numAggs: ::std::os::raw::c_int,
@@ -6174,6 +6127,61 @@ pub struct xl_clog_truncate {
     pub pageno: ::std::os::raw::c_int,
     pub oldestXact: TransactionId,
     pub oldestXactDb: Oid,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct FormData_pg_index {
+    pub indexrelid: Oid,
+    pub indrelid: Oid,
+    pub indnatts: int16,
+    pub indnkeyatts: int16,
+    pub indisunique: bool,
+    pub indisprimary: bool,
+    pub indisexclusion: bool,
+    pub indimmediate: bool,
+    pub indisclustered: bool,
+    pub indisvalid: bool,
+    pub indcheckxmin: bool,
+    pub indisready: bool,
+    pub indislive: bool,
+    pub indisreplident: bool,
+    pub indkey: int2vector,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct ParallelHeapScanDescData {
+    pub phs_relid: Oid,
+    pub phs_syncscan: bool,
+    pub phs_nblocks: BlockNumber,
+    pub phs_mutex: slock_t,
+    pub phs_startblock: BlockNumber,
+    pub phs_nallocated: pg_atomic_uint64,
+    pub phs_snapshot_any: bool,
+    pub phs_snapshot_data: __IncompleteArrayField<::std::os::raw::c_char>,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct SharedHashInfo {
+    pub num_workers: ::std::os::raw::c_int,
+    pub hinstrument: __IncompleteArrayField<HashInstrumentation>,
+}
+#[repr(C)]
+#[derive(Debug)]
+pub struct ParamListInfoData {
+    pub paramFetch: ParamFetchHook,
+    pub paramFetchArg: *mut ::std::os::raw::c_void,
+    pub paramCompile: ParamCompileHook,
+    pub paramCompileArg: *mut ::std::os::raw::c_void,
+    pub parserSetup: ParserSetupHook,
+    pub parserSetupArg: *mut ::std::os::raw::c_void,
+    pub numParams: ::std::os::raw::c_int,
+    pub params: __IncompleteArrayField<ParamExternData>,
+}
+#[repr(C)]
+#[derive(Debug)]
+pub struct SharedSortInfo {
+    pub num_workers: ::std::os::raw::c_int,
+    pub sinstrument: __IncompleteArrayField<TuplesortInstrumentation>,
 }
 #[repr(C)]
 pub struct FormData_pg_trigger {
@@ -6626,6 +6634,7 @@ pub const FRAMEOPTION_START_OFFSET_PRECEDING: u32 = 2048;
 pub const FRAMEOPTION_START_UNBOUNDED_FOLLOWING: u32 = 128;
 pub const FRAMEOPTION_START_UNBOUNDED_PRECEDING: u32 = 32;
 pub const FirstBootstrapObjectId: u32 = 10000;
+pub const FirstLowInvalidHeapAttributeNumber: i32 = -8;
 pub const FuncDetailCode_FUNCDETAIL_AGGREGATE: FuncDetailCode = 4;
 pub const FuncDetailCode_FUNCDETAIL_COERCION: FuncDetailCode = 6;
 pub const FuncDetailCode_FUNCDETAIL_PROCEDURE: FuncDetailCode = 3;
@@ -6638,7 +6647,6 @@ pub const GTSVECTORARRAYOID: u32 = 3644;
 pub const GUC_UNIT_BYTE: u32 = 32768;
 pub const HAVE_DECL_SNPRINTF: u32 = 1;
 pub const HAVE_DECL_STRNLEN: u32 = 1;
-pub const HAVE_DECL_SYS_SIGLIST: u32 = 1;
 pub const HAVE_DECL_VSNPRINTF: u32 = 1;
 pub const HAVE_SNPRINTF: u32 = 1;
 pub const HAVE_STDBOOL_H: u32 = 1;
@@ -6699,6 +6707,10 @@ pub const LSEGARRAYOID: u32 = 1018;
 pub const MACADDR8ARRAYOID: u32 = 775;
 pub const MACADDRARRAYOID: u32 = 1040;
 pub const MONEYARRAYOID: u32 = 791;
+pub const MaxCommandIdAttributeNumber: i32 = -6;
+pub const MaxTransactionIdAttributeNumber: i32 = -5;
+pub const MinCommandIdAttributeNumber: i32 = -4;
+pub const MinTransactionIdAttributeNumber: i32 = -3;
 pub const MovedPartitionsOffsetNumber: u32 = 65533;
 pub const NAMEARRAYOID: u32 = 1003;
 pub const NUMERICARRAYOID: u32 = 1231;
@@ -7120,6 +7132,7 @@ pub const NodeTag_T_XmlExpr: NodeTag = 137;
 pub const NodeTag_T_XmlSerialize: NodeTag = 379;
 pub const OIDCHARS: u32 = 10;
 pub const OIDVECTORARRAYOID: u32 = 1013;
+pub const ObjectIdAttributeNumber: i32 = -2;
 pub const ObjectType_OBJECT_PROCEDURE: ObjectType = 28;
 pub const ObjectType_OBJECT_PUBLICATION: ObjectType = 29;
 pub const ObjectType_OBJECT_PUBLICATION_REL: ObjectType = 30;
@@ -7143,17 +7156,17 @@ pub const ObjectType_OBJECT_TYPE: ObjectType = 47;
 pub const ObjectType_OBJECT_USER_MAPPING: ObjectType = 48;
 pub const ObjectType_OBJECT_VIEW: ObjectType = 49;
 pub const PACKAGE_BUGREPORT: &'static [u8; 26usize] = b"pgsql-bugs@postgresql.org\0";
-pub const PACKAGE_STRING: &'static [u8; 16usize] = b"PostgreSQL 11.8\0";
-pub const PACKAGE_VERSION: &'static [u8; 5usize] = b"11.8\0";
+pub const PACKAGE_STRING: &'static [u8; 16usize] = b"PostgreSQL 11.9\0";
+pub const PACKAGE_VERSION: &'static [u8; 5usize] = b"11.9\0";
 pub const PARTITION_STRATEGY_HASH: u8 = 104u8;
 pub const PATHARRAYOID: u32 = 1019;
 pub const PGSTAT_NUM_PROGRESS_PARAM: u32 = 10;
-pub const PG_BACKEND_VERSIONSTR: &'static [u8; 28usize] = b"postgres (PostgreSQL) 11.8\n\0";
+pub const PG_BACKEND_VERSIONSTR: &'static [u8; 28usize] = b"postgres (PostgreSQL) 11.9\n\0";
 pub const PG_LSNARRAYOID: u32 = 3221;
 pub const PG_MAJORVERSION: &'static [u8; 3usize] = b"11\0";
-pub const PG_VERSION: &'static [u8; 5usize] = b"11.8\0";
-pub const PG_VERSION_NUM: u32 = 110008;
-pub const PG_VERSION_STR : & 'static [ u8 ; 114usize ] = b"PostgreSQL 11.8 on x86_64-apple-darwin19.0.0, compiled by Apple clang version 11.0.0 (clang-1100.0.33.12), 64-bit\0" ;
+pub const PG_VERSION: &'static [u8; 5usize] = b"11.9\0";
+pub const PG_VERSION_NUM: u32 = 110009;
+pub const PG_VERSION_STR : & 'static [u8 ; 114usize] = b"PostgreSQL 11.9 on x86_64-apple-darwin19.0.0, compiled by Apple clang version 11.0.0 (clang-1100.0.33.12), 64-bit\0" ;
 pub const POINTARRAYOID: u32 = 1017;
 pub const POLYGONARRAYOID: u32 = 1027;
 pub const PREDICATELOCK_MANAGER_LWLOCK_OFFSET: u32 = 190;
@@ -7278,6 +7291,7 @@ pub const TableLikeOption_CREATE_TABLE_LIKE_IDENTITY: TableLikeOption = 8;
 pub const TableLikeOption_CREATE_TABLE_LIKE_INDEXES: TableLikeOption = 16;
 pub const TableLikeOption_CREATE_TABLE_LIKE_STATISTICS: TableLikeOption = 32;
 pub const TableLikeOption_CREATE_TABLE_LIKE_STORAGE: TableLikeOption = 64;
+pub const TableOidAttributeNumber: i32 = -7;
 pub const TempNamespaceStatus_TEMP_NAMESPACE_IDLE: TempNamespaceStatus = 1;
 pub const TempNamespaceStatus_TEMP_NAMESPACE_IN_USE: TempNamespaceStatus = 2;
 pub const TempNamespaceStatus_TEMP_NAMESPACE_NOT_TEMP: TempNamespaceStatus = 0;
@@ -7382,9 +7396,9 @@ pub type GetForeignUpperPaths_function = ::std::option::Option<
         extra: *mut ::std::os::raw::c_void,
     ),
 >;
-pub type HTSU_Result = u32;
+pub type HTSU_Result = ::std::os::raw::c_uint;
 pub type HeapScanDesc = *mut HeapScanDescData;
-pub type InheritanceKind = u32;
+pub type InheritanceKind = ::std::os::raw::c_uint;
 pub type MemoryStatsPrintFunc = ::std::option::Option<
     unsafe extern "C" fn(
         context: MemoryContext,
@@ -7411,12 +7425,12 @@ pub type ParamFetchHook = ::std::option::Option<
         workspace: *mut ParamExternData,
     ) -> *mut ParamExternData,
 >;
-pub type PartitionPruneCombineOp = u32;
+pub type PartitionPruneCombineOp = ::std::os::raw::c_uint;
 pub type PartitionScheme = *mut PartitionSchemeData;
-pub type PartitionwiseAggregateType = u32;
-pub type Pattern_Prefix_Status = u32;
-pub type Pattern_Type = u32;
-pub type RVROption = u32;
+pub type PartitionwiseAggregateType = ::std::os::raw::c_uint;
+pub type Pattern_Prefix_Status = ::std::os::raw::c_uint;
+pub type Pattern_Type = ::std::os::raw::c_uint;
+pub type RVROption = ::std::os::raw::c_uint;
 pub type RefetchForeignRow_function = ::std::option::Option<
     unsafe extern "C" fn(
         estate: *mut EState,
@@ -7436,12 +7450,12 @@ pub type SnapshotSatisfiesFunc = ::std::option::Option<
     unsafe extern "C" fn(htup: HeapTuple, snapshot: Snapshot, buffer: Buffer) -> bool,
 >;
 pub type SortCoordinate = *mut SortCoordinateData;
-pub type TempNamespaceStatus = u32;
+pub type TempNamespaceStatus = ::std::os::raw::c_uint;
 pub type TupleConstr = tupleConstr;
 pub type TupleDesc = *mut tupleDesc;
-pub type TuplesortMethod = u32;
-pub type TuplesortSpaceType = u32;
-pub type VacuumOption = u32;
+pub type TuplesortMethod = ::std::os::raw::c_uint;
+pub type TuplesortSpaceType = ::std::os::raw::c_uint;
+pub type VacuumOption = ::std::os::raw::c_uint;
 pub type XidStatus = ::std::os::raw::c_int;
 pub type bitmapword = uint32;
 pub type create_upper_paths_hook_type = ::std::option::Option<

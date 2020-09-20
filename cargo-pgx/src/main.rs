@@ -58,7 +58,7 @@ fn main() -> std::result::Result<(), std::io::Error> {
             ("stop", Some(stop)) => {
                 let pgver = stop.value_of("pg_version").unwrap_or("all");
                 for major_version in make_pg_major_version(pgver) {
-                    stop_postgres(*major_version);
+                    stop_postgres(*major_version, true);
                 }
 
                 Ok(())
@@ -66,7 +66,7 @@ fn main() -> std::result::Result<(), std::io::Error> {
             ("status", Some(status)) => {
                 let pgver = status.value_of("pg_version").unwrap_or("all");
                 for major_version in make_pg_major_version(pgver) {
-                    if status_postgres(*major_version) {
+                    if status_postgres(*major_version, true) {
                         println!(
                             "Postgres v{} is {}",
                             major_version,
@@ -114,8 +114,9 @@ fn main() -> std::result::Result<(), std::io::Error> {
             }
             ("test", Some(test)) => {
                 let pgver = test.value_of("pg_version").unwrap_or("all");
+                let is_release = test.is_present("release");
                 for major_version in make_pg_major_version(pgver) {
-                    test_extension(*major_version);
+                    test_extension(*major_version, is_release);
                 }
                 Ok(())
             }
