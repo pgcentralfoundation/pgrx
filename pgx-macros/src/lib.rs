@@ -3,8 +3,10 @@
 
 extern crate proc_macro;
 
+mod operators;
 mod rewriter;
 
+use crate::operators::{impl_postgres_eq, impl_postgres_hash, impl_postgres_ord};
 use pgx_utils::*;
 use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span};
@@ -452,14 +454,17 @@ fn parse_postgres_type_args(attributes: &[Attribute]) -> HashSet<PostgresTypeAtt
 
     for a in attributes {
         match a.path.to_token_stream().to_string().as_str() {
-            "inoutfuncs" => categorized_attributes.insert(PostgresTypeAttribute::InOutFuncs),
-            "pgvarlena_inoutfuncs" => {
-                categorized_attributes.insert(PostgresTypeAttribute::PgVarlenaInOutFuncs)
+            "inoutfuncs" => {
+                categorized_attributes.insert(PostgresTypeAttribute::InOutFuncs);
             }
-            _ => panic!(
-                "unrecognized PostgresType attribute: {}",
-                a.path.to_token_stream().to_string()
-            ),
+
+            "pgvarlena_inoutfuncs" => {
+                categorized_attributes.insert(PostgresTypeAttribute::PgVarlenaInOutFuncs);
+            }
+
+            _ => {
+                // we can just ignore attributes we don't understand
+            }
         };
     }
 
@@ -470,4 +475,22 @@ fn parse_postgres_type_args(attributes: &[Attribute]) -> HashSet<PostgresTypeAtt
 pub fn extension_sql(_: TokenStream) -> TokenStream {
     // we don't want to output anything here
     TokenStream::new()
+}
+
+#[proc_macro_derive(PostgresEq)]
+pub fn postgres_eq(input: TokenStream) -> TokenStream {
+    let ast = parse_macro_input!(input as syn::DeriveInput);
+    impl_postgres_eq(ast).into()
+}
+
+#[proc_macro_derive(PostgresOrd)]
+pub fn postgres_ord(input: TokenStream) -> TokenStream {
+    let ast = parse_macro_input!(input as syn::DeriveInput);
+    impl_postgres_ord(ast).into()
+}
+
+#[proc_macro_derive(PostgresHash)]
+pub fn postgres_hash(input: TokenStream) -> TokenStream {
+    let ast = parse_macro_input!(input as syn::DeriveInput);
+    impl_postgres_hash(ast).into()
 }

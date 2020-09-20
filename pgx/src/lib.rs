@@ -43,6 +43,7 @@ pub mod list;
 pub mod log;
 pub mod bgworkers;
 pub mod memcxt;
+pub mod misc;
 pub mod namespace;
 pub mod nodes;
 pub mod pgbox;

@@ -3,6 +3,7 @@
 
 use pgx::*;
 use serde::{Deserialize, Serialize};
+mod derived;
 
 pg_module_magic!();
 

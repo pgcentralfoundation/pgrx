@@ -2,6 +2,7 @@
 // governed by the MIT license that can be found in the LICENSE file.
 
 use crate::commands::get::get_property;
+use pgx_utils::operator_common::*;
 use pgx_utils::{
     categorize_type, exit_with_error, get_named_capture, handle_result, CategorizedType, ExternArgs,
 };
@@ -42,6 +43,14 @@ enum CategorizedAttribute {
     SqlFunctionName(String),
     SqlFunctionArgs(String),
     Other(Vec<(Span, String)>),
+}
+
+#[derive(Debug, Eq, PartialEq, Hash)]
+enum DeriveMacros {
+    PostgresType,
+    PostgresEq,
+    PostgresOrd,
+    PostgresHash,
 }
 
 pub(crate) fn generate_schema() -> Result<(), std::io::Error> {
@@ -260,16 +269,26 @@ fn walk_items(
                 schema_stack.pop();
             }
         } else if let Item::Struct(strct) = item {
-            let mut found_postgres_type = false;
-            for a in strct.attrs {
+            let mut derives = HashSet::<DeriveMacros>::new();
+
+            for a in &strct.attrs {
                 let string = a.to_token_stream().to_string();
 
                 if string.contains("PostgresType") {
-                    found_postgres_type = true;
+                    derives.insert(DeriveMacros::PostgresType);
+                }
+                if string.contains("PostgresEq") {
+                    derives.insert(DeriveMacros::PostgresEq);
+                }
+                if string.contains("PostgresOrd") {
+                    derives.insert(DeriveMacros::PostgresOrd);
+                }
+                if string.contains("PostgresHash") {
+                    derives.insert(DeriveMacros::PostgresHash);
                 }
             }
 
-            if found_postgres_type {
+            if derives.contains(&DeriveMacros::PostgresType) {
                 let name = strct.ident.to_string().to_lowercase();
                 postgres_types.push(format!(
                     "CREATE TYPE {};",
@@ -279,12 +298,109 @@ fn walk_items(
                 postgres_types.push(format!("CREATE OR REPLACE FUNCTION {qualified_name}_out({qualified_name}) RETURNS cstring IMMUTABLE STRICT LANGUAGE C AS 'MODULE_PATHNAME', '{name}_out_wrapper';", qualified_name = qualify_name(&current_schema, &name), name = name));
                 postgres_types.push(format!(
                     "CREATE TYPE {qualified_name} (
-                        INTERNALLENGTH = variable,
-                        INPUT = {qualified_name}_in,
-                        OUTPUT = {qualified_name}_out,
-                        STORAGE = extended
-                    );",
+                                INTERNALLENGTH = variable,
+                                INPUT = {qualified_name}_in,
+                                OUTPUT = {qualified_name}_out,
+                                STORAGE = extended
+                            );",
                     qualified_name = qualify_name(&current_schema, &name)
+                ));
+            }
+
+            if derives.contains(&DeriveMacros::PostgresEq) {
+                walk_items(
+                    rs_file,
+                    &mut operator_sql,
+                    vec![parse_item(eq(&strct.ident))],
+                    schema_stack,
+                    default_schema,
+                );
+                walk_items(
+                    rs_file,
+                    &mut operator_sql,
+                    vec![parse_item(ne(&strct.ident))],
+                    schema_stack,
+                    default_schema,
+                );
+            }
+
+            if derives.contains(&DeriveMacros::PostgresOrd) {
+                walk_items(
+                    rs_file,
+                    &mut operator_sql,
+                    vec![parse_item(lt(&strct.ident))],
+                    schema_stack,
+                    default_schema,
+                );
+                walk_items(
+                    rs_file,
+                    &mut operator_sql,
+                    vec![parse_item(gt(&strct.ident))],
+                    schema_stack,
+                    default_schema,
+                );
+                walk_items(
+                    rs_file,
+                    &mut operator_sql,
+                    vec![parse_item(le(&strct.ident))],
+                    schema_stack,
+                    default_schema,
+                );
+                walk_items(
+                    rs_file,
+                    &mut operator_sql,
+                    vec![parse_item(ge(&strct.ident))],
+                    schema_stack,
+                    default_schema,
+                );
+                walk_items(
+                    rs_file,
+                    &mut operator_sql,
+                    vec![parse_item(cmp(&strct.ident))],
+                    schema_stack,
+                    default_schema,
+                );
+            }
+
+            if derives.contains(&DeriveMacros::PostgresHash) {
+                walk_items(
+                    rs_file,
+                    &mut operator_sql,
+                    vec![parse_item(hash(&strct.ident))],
+                    schema_stack,
+                    default_schema,
+                );
+
+                let type_name = &strct.ident.to_string().to_lowercase();
+                operator_sql.push(format!(
+                    "CREATE OPERATOR FAMILY {}_hash_ops USING hash;",
+                    type_name
+                ));
+                operator_sql.push(format!(
+                    "CREATE OPERATOR CLASS {type_name}_hash_ops DEFAULT FOR TYPE {type_name} USING hash FAMILY {type_name}_hash_ops AS 
+                        OPERATOR    1   =  ({type_name}, {type_name}),
+                        FUNCTION    1   {type_name}_hash({type_name});",
+                    type_name = type_name
+                ));
+            }
+
+            if derives.contains(&DeriveMacros::PostgresEq)
+                && derives.contains(&DeriveMacros::PostgresOrd)
+            {
+                let type_name = &strct.ident.to_string().to_lowercase();
+                operator_sql.push(format!(
+                    "CREATE OPERATOR FAMILY {}_btree_ops USING btree;",
+                    type_name
+                ));
+                operator_sql.push(format!(
+                    "CREATE OPERATOR CLASS {type_name}_btree_ops DEFAULT FOR TYPE {type_name} USING btree FAMILY {type_name}_btree_ops AS 
+                      OPERATOR 1 < ,
+                      OPERATOR 2 <= ,
+                      OPERATOR 3 = ,
+                      OPERATOR 4 >= ,
+                      OPERATOR 5 > ,
+                      FUNCTION 1 {type_name}_cmp({type_name}, {type_name});",
+                    type_name = type_name
                 ));
             }
         } else if let Item::Enum(enm) = item {
@@ -439,19 +555,19 @@ fn walk_items(
                             for option in options {
                                 match option {
                                     OperatorOptions::Commutator(c) => {
-                                        sql.push_str(",\n   COMMUTATOR=");
+                                        sql.push_str(",\n   COMMUTATOR = ");
                                         sql.push_str(&c);
                                     }
                                     OperatorOptions::Negator(n) => {
-                                        sql.push_str(",\n   NEGATOR=");
+                                        sql.push_str(",\n   NEGATOR = ");
                                         sql.push_str(&n);
                                     }
                                     OperatorOptions::Restrict(r) => {
-                                        sql.push_str(",\n   RESTRICT=");
+                                        sql.push_str(",\n   RESTRICT = ");
                                         sql.push_str(&r);
                                     }
                                     OperatorOptions::Join(j) => {
-                                        sql.push_str(",\n   JOIN=");
+                                        sql.push_str(",\n   JOIN = ");
                                         sql.push_str(&j);
                                     }
                                     OperatorOptions::Hashes => sql.push_str(",\n   HASHES"),
@@ -1270,7 +1386,9 @@ fn extract_single_arg(attr: TokenStream2) -> String {
             token => arg.push_str(&token.to_string()),
         }
     }
-    arg.trim_start_matches('(').trim_end_matches(')').into()
+    let mut arg: String = arg.trim_start_matches('(').trim_end_matches(')').into();
+    arg.retain(|c| !c.is_whitespace());
+    arg
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -1330,5 +1448,12 @@ fn location_comment(rs_file: &DirEntry, span: &Span) -> String {
         rs_file.path().display(),
         span.start().line,
         span.start().column,
+    )
+}
+
+fn parse_item(stream: proc_macro2::TokenStream) -> Item {
+    handle_result!(
+        format!("failed to parse Item from:\n{}", stream.to_string()),
+        syn::parse_str(&stream.to_string())
     )
 }
