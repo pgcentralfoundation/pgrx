@@ -22,7 +22,7 @@ no-default-features = true
 targets = ["x86_64-unknown-linux-gnu"]
 
 [dependencies]
-memoffset = "0.5.5"
+memoffset = "0.5.6"
 once_cell = "1.4.1"
 pgx-macros = { path = "../pgx-macros/", version= "^0.0.15"}
 
