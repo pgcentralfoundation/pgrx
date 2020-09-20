@@ -1,6 +1,4 @@
 use heapless::consts::*;
-use pgx::lwlock::*;
-use pgx::shmem::*;
 use pgx::*;
 use serde::*;
 use std::iter::Iterator;

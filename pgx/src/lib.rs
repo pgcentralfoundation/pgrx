@@ -77,6 +77,7 @@ pub use namespace::*;
 pub use nodes::{is_a, PgNode, PgNodeFactory}; // be specific since we have multiple versions of these things behind feature gates
 pub use pgbox::*;
 pub use rel::*;
+pub use shmem::*;
 pub use spi::*;
 pub use stringinfo::*;
 pub use trigger_support::*;
