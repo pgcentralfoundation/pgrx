@@ -96,6 +96,18 @@ subcommands:
                     short: r
                     long: release
                     help: compile for release mode (default is debug)
+          - connect:
+              about: connect, via psql, to a Postgres instance
+              args:
+                - pg_version:
+                    value_name: PG_VERSION
+                    takes_value: true
+                    required: true
+                    help: Do you want to run against Postgres 'pg10', 'pg11', pg12'?
+                - dbname:
+                    value_name: DBNAME
+                    takes_value: true
+                    help: The database to connect to (and create if the first time).  Defaults to a database with the same name as the current extension name
           - test:
               about: run the test suite for this crate
               args:

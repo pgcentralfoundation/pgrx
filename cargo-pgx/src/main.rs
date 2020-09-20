@@ -6,6 +6,7 @@ extern crate clap;
 
 mod commands;
 
+use crate::commands::connect::connect_psql;
 use crate::commands::get::get_property;
 use crate::commands::init::init_pgx;
 use crate::commands::install::install_extension;
@@ -110,6 +111,17 @@ fn main() -> std::result::Result<(), std::io::Error> {
                 );
                 let is_release = run.is_present("release");
                 run_psql(make_pg_major_version(pgver)[0], &dbname, is_release);
+                Ok(())
+            }
+            ("connect", Some(run)) => {
+                let pgver = run
+                    .value_of("pg_version")
+                    .expect("<PG_VERSION> is required");
+                let dbname = run.value_of("dbname").map_or_else(
+                    || get_property("extname").expect("could not determine extension name"),
+                    |v| v.to_string(),
+                );
+                connect_psql(make_pg_major_version(pgver)[0], &dbname);
                 Ok(())
             }
             ("test", Some(test)) => {

@@ -40,7 +40,7 @@ pub(crate) fn run_psql(major_version: u16, dbname: &str, is_release: bool) {
     exec_psql(major_version, dbname);
 }
 
-fn exec_psql(major_version: u16, dbname: &str) {
+pub(crate) fn exec_psql(major_version: u16, dbname: &str) {
     let mut command = Command::new(get_psql_path(major_version));
     command
         .env_remove("PGDATABASE")

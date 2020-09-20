@@ -167,6 +167,36 @@ ARGS:
                     name as the current extension name
 ```
 
+## Connect to a Database
+
+![connect](connect.png)
+
+If you'd simply like to connect to a managed version of Postgres without re-compiling and installing
+your extension, use `cargo pgx connect <pg10 | pg11 | pg12>`.
+
+This command will use the default database named for your extension, or you can specify another
+database name as the final argument.
+
+If the specified database doesn't exist, `cargo pgx connect` will create it.  Similarly, if
+the specified version of Postgres isn't running, it'll be automatically started.
+
+```shell script
+cargo-pgx-pgx-connect 
+connect, via psql, to a Postgres instance
+
+USAGE:
+    cargo-pgx pgx connect <PG_VERSION> [DBNAME]
+
+FLAGS:
+    -h, --help       Prints help information
+    -V, --version    Prints version information
+
+ARGS:
+    <PG_VERSION>    Do you want to run against Postgres 'pg10', 'pg11', pg12'?
+    <DBNAME>        The database to connect to (and create if the first time).  Defaults to a database with the same
+                    name as the current extension name
+```
+
 ## Installing Your Extension Locally
 
 ![install](install.png)
