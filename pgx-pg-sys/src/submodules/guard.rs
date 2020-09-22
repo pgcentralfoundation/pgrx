@@ -4,7 +4,6 @@
 #![allow(non_snake_case)]
 
 use crate::FlushErrorState;
-use once_cell::sync::OnceCell;
 use std::any::Any;
 use std::cell::Cell;
 use std::panic::catch_unwind;
@@ -67,28 +66,37 @@ fn take_panic_location() -> PanicLocation {
 
 // via pg_module_magic!() this gets set to Some(()) for the "main" thread, and remains at None
 // for all other threads.
-thread_local! { pub(crate) static IS_MAIN_THREAD: OnceCell<()> = OnceCell::new() }
+#[cfg(debug_assertions)]
+thread_local! { pub(crate) static IS_MAIN_THREAD: once_cell::sync::OnceCell<()> = once_cell::sync::OnceCell::new() }
 
 pub fn register_pg_guard_panic_handler() {
     // first, lets ensure we're not calling ourselves twice
-    if IS_MAIN_THREAD.with(|v| v.get().is_some()) {
-        panic!("IS_MAIN_THREAD has already been set")
+    #[cfg(debug_assertions)]
+    {
+        if IS_MAIN_THREAD.with(|v| v.get().is_some()) {
+            panic!("IS_MAIN_THREAD has already been set")
+        }
+
+        // it's expected that this function will only ever be called by `pg_module_magic!()` by the main thread
+        IS_MAIN_THREAD.with(|v| v.set(()).expect("failed to set main thread sentinel"));
     }
 
-    // it's expected that this function will only ever be called by `pg_module_magic!()` by the main thread
-    IS_MAIN_THREAD.with(|v| v.set(()).expect("failed to set main thread sentinel"));
-
     std::panic::set_hook(Box::new(|info| {
-        if IS_MAIN_THREAD.with(|v| v.get().is_none()) {
-            // a thread that isn't the main thread panic!()d
-            // we make a best effort to push a message to stderr, which hopefully
-            // Postgres is logging somewhere
-            eprintln!(
-                "thread={:?}, id={:?}, {}",
-                std::thread::current().name(),
-                std::thread::current().id(),
-                info
-            );
+        if cfg!(debug_assertions) {
+            #[cfg(debug_assertions)]
+            {
+                if IS_MAIN_THREAD.with(|v| v.get().is_none()) {
+                    // a thread that isn't the main thread panic!()d
+                    // we make a best effort to push a message to stderr, which hopefully
+                    // Postgres is logging somewhere
+                    eprintln!(
+                        "thread={:?}, id={:?}, {}",
+                        std::thread::current().name(),
+                        std::thread::current().id(),
+                        info
+                    );
+                }
+            }
         } else {
             PANIC_LOCATION.with(|p| {
                 let existing = p.take();

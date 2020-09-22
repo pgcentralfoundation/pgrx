@@ -496,6 +496,7 @@ impl PgGuardRewriter {
             pub unsafe fn #func_name ( #arg_list_with_types ) #return_type {
                 // as the panic message says, we can't call Postgres functions from threads
                 // the value of IS_MAIN_THREAD gets set through the pg_module_magic!() macro
+                #[cfg(debug_assertions)]
                 if crate::submodules::guard::IS_MAIN_THREAD.with(|v| v.get().is_none()) {
                     panic!("functions under #[pg_guard] cannot be called from threads");
                 };
