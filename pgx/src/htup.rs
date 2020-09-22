@@ -39,7 +39,11 @@ pub fn deconstruct_row_type<'a>(
     unsafe {
         pgx_deconstruct_row_type(tupdesc.as_ptr(), row, &mut columns, &mut nulls);
 
-        Array::over(columns, nulls, tupdesc.len())
+        Array::over(
+            columns,
+            nulls,
+            tupdesc.iter().filter(|att| !att.is_dropped()).count(),
+        )
     }
 }
 
