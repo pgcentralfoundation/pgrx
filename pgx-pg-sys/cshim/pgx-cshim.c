@@ -109,16 +109,15 @@ void pgx_deconstruct_row_type(TupleDesc tupdesc, Datum row, Datum **columns, boo
     Datum *cols = palloc(natts * sizeof(Datum));
     bool *ns = palloc(natts * sizeof(bool));
 
-    for (int i=0; i<natts; i++) {
+    for (int i=0, j=0; i<natts; i++) {
         Form_pg_attribute att = TupleDescAttr(tupdesc, i);
 
         if (att->attisdropped) {
-            cols[i] = 0;
-            ns[i] = true;
             continue;
         }
 
-        cols[i] = heap_getattr(tuple, i + 1, tupdesc, &ns[i]);
+        cols[j] = heap_getattr(tuple, i + 1, tupdesc, &ns[j]);
+        j++;
     }
 
     *columns = cols;
