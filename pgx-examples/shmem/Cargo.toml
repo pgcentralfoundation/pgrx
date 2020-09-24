@@ -17,7 +17,7 @@ pg12 = ["pgx/pg12"]
 pg_test = []
 
 [dependencies]
-heapless = { git = "https://github.com/japaric/heapless" }
+heapless = "0.5.6"
 pgx = { path = "../../../pgx/pgx/", default-features = false }
 pgx-macros = { path = "../../../pgx/pgx-macros" }
 serde = { version = "1.0.114", features = [ "derive" ] }
