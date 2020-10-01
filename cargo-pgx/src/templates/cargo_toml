@@ -14,11 +14,11 @@ pg12 = ["pgx/pg12"]
 pg_test = []
 
 [dependencies]
-pgx = "0.0.15"
-pgx-macros = "0.0.15"
+pgx = "0.0.16"
+pgx-macros = "0.0.16"
 
 [dev-dependencies]
-pgx-tests = "0.0.15"
+pgx-tests = "0.0.16"
 
 [profile.dev]
 panic = "unwind"
