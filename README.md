@@ -21,7 +21,7 @@ Feel free to join our [Discord Server](https://discord.gg/hPb93Y9).
 ## Key Features
 
 #### A Managed Development Environment
- - A cargo sub-command (`carg-pgx`) for managing the `pgx` development environment
+ - A cargo sub-command (`cargo-pgx`) for managing the `pgx` development environment
     - Quickly create a new extension template crate via `cargo pgx new`
     - Install, configure, compile, and privately install all required Postgres versions via `cargo pgx init`
     - Run your extension and interactively test with `psql` via `cargo pgx run`
