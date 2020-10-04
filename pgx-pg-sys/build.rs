@@ -145,7 +145,8 @@ fn display_nodes(mut items: Vec<syn::Item>) -> Result<Vec<syn::Item>, Box<dyn Er
     let additional_items = {
         let struct_graph: StructGraph = StructGraph::from(&items[..]);
 
-        // collect all the structs with NodeTag as their first member
+        // collect all the structs with `NodeTag` as their first member,
+        // these will serve as roots in our forest of `Node`s
         let mut root_node_structs = Vec::new();
         for descriptor in struct_graph.descriptors.iter() {
             // grab the first field, if any
