@@ -10,7 +10,8 @@ use std::collections::HashSet;
 use std::path::PathBuf;
 use std::process::{Command, Output};
 use std::sync::Mutex;
-use syn::export::{ToTokens, TokenStream2};
+use std::error::Error;
+use syn::export::TokenStream2;
 use syn::Item;
 
 #[derive(Debug)]
@@ -45,7 +46,7 @@ impl bindgen::callbacks::ParseCallbacks for IgnoredMacros {
     }
 }
 
-fn main() -> Result<(), std::io::Error> {
+fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     // dump the environment for debugging if asked
     if std::env::var("PGX_BUILD_VERBOSE").unwrap_or("false".to_string()) == "true" {
         for (k, v) in std::env::vars() {
@@ -78,16 +79,14 @@ fn main() -> Result<(), std::io::Error> {
 
     let shim_mutex = Mutex::new(());
 
-    major_versions.into_iter().for_each(|major_version| {
+    let mut shims: Vec<PgShim> = Vec::with_capacity(major_versions.len());
+    for major_version in major_versions.iter() {
+        let major_version = *major_version;
+
         let pg_config = get_pg_config(major_version);
         let include_h = PathBuf::from(format!(
             "{}/include/pg{}.h",
             manifest_dir.display(),
-            major_version
-        ));
-        let bindings_rs = PathBuf::from(format!(
-            "{}/pg{}_bindings.rs",
-            out_dir.display(),
             major_version
         ));
         let specific_rs = PathBuf::from(format!(
@@ -96,29 +95,55 @@ fn main() -> Result<(), std::io::Error> {
             major_version
         ));
 
-        eprintln!("bindings_rs={}", bindings_rs.display());
         eprintln!("specific_rs={}", specific_rs.display());
 
-        run_bindgen(&pg_config, major_version, &include_h, &bindings_rs);
+        let bindings = run_bindgen(&pg_config, major_version, &include_h)?;
+        let bindings = rewrite_items(bindings)?;
+        shims.push(PgShim { major_version, bindings, pg_config });
+    }
 
-        build_shim(&shim_dir, &shim_mutex, major_version, &pg_config);
-    });
+    // consolidate common items, this step also lands the transformed token streams to disk
+    generate_common_rs(manifest_dir, &out_dir, shims.as_slice());
 
-    generate_common_rs(manifest_dir, &out_dir);
+    // compile .a files from the generated shim code
+    for shim in shims.iter() {
+        build_shim(&shim_dir, &shim_mutex, shim.major_version, &shim.pg_config);
+    }
 
     Ok(())
 }
 
+/// PgShim describes the bindings for a specific postgres version
+struct PgShim {
+    major_version: u16,
+    bindings: TokenStream2,
+    pg_config: Option<String>,
+}
+
+/// Given a token stream representing a file, apply a series of transformations to munge
+/// the bindgen generated code with some postgres specific enhacements
+fn rewrite_items(
+    file: syn::File,
+) -> Result<TokenStream2, Box<dyn Error + Send + Sync>> {
+    let items = apply_pg_guard(file.items)?;
+
+    let mut stream = TokenStream2::new();
+    for item in items.into_iter() {
+        stream.extend(quote! { #item });
+    }
+    Ok(stream)
+}
+
+/// Given a specific postgres version, `run_bindgen` generates bindings for the given
+/// postgres version and returns them as a token stream.
 fn run_bindgen(
     pg_config: &Option<String>,
     major_version: u16,
     include_h: &PathBuf,
-    bindings_rs: &PathBuf,
-) {
+) -> Result<syn::File, Box<dyn Error + Send + Sync>> {
     eprintln!(
-        "Generating bindings for pg{} to {}",
+        "Generating bindings for pg{}",
         major_version,
-        bindings_rs.display()
     );
     let includedir_server = run_pg_config(pg_config, "--includedir-server");
     let bindings = bindgen::Builder::default()
@@ -150,15 +175,7 @@ fn run_bindgen(
             )
         });
 
-    let bindings = apply_pg_guard(bindings.to_string()).unwrap();
-    std::fs::write(&bindings_rs, bindings).unwrap_or_else(|e| {
-        panic!(
-            "Unable to save bindings for pg{} to {}: {:?}",
-            major_version,
-            bindings_rs.display(),
-            e
-        )
-    });
+    syn::parse_file(bindings.to_string().as_str()).map_err(|e| From::from(e))
 }
 
 fn build_shim(
@@ -219,12 +236,12 @@ fn build_shim_for_version(
     Ok(())
 }
 
-fn generate_common_rs(working_dir: PathBuf, out_dir: &PathBuf) {
+fn generate_common_rs(working_dir: PathBuf, out_dir: &PathBuf, shims: &[PgShim]) {
     eprintln!("[all branches] Regenerating common.rs and XX_specific.rs files...");
     let cwd = std::env::current_dir().unwrap();
 
     std::env::set_current_dir(&working_dir).unwrap();
-    let result = bindings_diff::main(out_dir);
+    let result = bindings_diff::main(out_dir, shims);
     std::env::set_current_dir(cwd).unwrap();
 
     if result.is_err() {
@@ -278,25 +295,23 @@ fn run_command(mut command: &mut Command, version: &str) -> Result<Output, std::
     Ok(rc)
 }
 
-fn apply_pg_guard(input: String) -> Result<String, std::io::Error> {
-    let file = syn::parse_file(input.as_str()).unwrap();
-
-    let mut stream = TokenStream2::new();
-    for item in file.items.into_iter() {
+fn apply_pg_guard(items: Vec<syn::Item>) -> Result<Vec<syn::Item>, Box<dyn Error + Send + Sync>> {
+    let mut out = Vec::with_capacity(items.len());
+    for item in items.into_iter() {
         match item {
             Item::ForeignMod(block) => {
-                stream.extend(quote! {
+                out.push(syn::parse2(quote! {
                     #[pg_guard]
                     #block
-                });
+                })?);
             }
             _ => {
-                stream.extend(quote! { #item });
+                out.push(item);
             }
         }
     }
 
-    Ok(format!("{}", stream.into_token_stream()))
+    Ok(out)
 }
 
 fn rust_fmt(path: &str) -> Result<(), std::io::Error> {
@@ -312,14 +327,22 @@ pub(crate) mod bindings_diff {
     use crate::rust_fmt;
     use quote::{quote, ToTokens};
     use std::collections::BTreeSet;
-    use std::io::{Read, Write};
+    use std::io::{Write, BufWriter};
     use std::path::PathBuf;
-    use std::str::FromStr;
+    use super::PgShim;
+    use syn::export::TokenStream2;
 
-    pub(crate) fn main(out_dir: &PathBuf) -> Result<(), std::io::Error> {
-        let mut v10 = read_source_file(&format!("{}pg10_bindings.rs", out_dir.display()));
-        let mut v11 = read_source_file(&format!("{}pg11_bindings.rs", out_dir.display()));
-        let mut v12 = read_source_file(&format!("{}pg12_bindings.rs", out_dir.display()));
+    pub(crate) fn main(out_dir: &PathBuf, shims: &[PgShim]) -> Result<(), std::io::Error> {
+        // NOTE: this gross assertion can be ripped out once the code is made generic
+        //       over different postgres versions.
+        assert!(
+            shims[0].major_version == 10 &&
+            shims[1].major_version == 11 &&
+            shims[2].major_version == 12
+        );
+        let mut v10 = parse_file_stream(&shims[0].bindings);
+        let mut v11 = parse_file_stream(&shims[1].bindings);
+        let mut v12 = parse_file_stream(&shims[2].bindings);
 
         let mut versions = vec![&mut v10, &mut v11, &mut v12];
         let common = build_common_set(&mut versions);
@@ -336,20 +359,6 @@ pub(crate) mod bindings_diff {
         write_source_file(&format!("{}pg10_specific.rs", out_dir.display()), &v10);
         write_source_file(&format!("{}pg11_specific.rs", out_dir.display()), &v11);
         write_source_file(&format!("{}pg12_specific.rs", out_dir.display()), &v12);
-
-        // delete the bindings files when we're done with them
-        std::fs::remove_file(
-            PathBuf::from_str(&format!("{}pg10_bindings.rs", out_dir.display())).unwrap(),
-        )
-        .expect("couldn't delete v10 bindings");
-        std::fs::remove_file(
-            PathBuf::from_str(&format!("{}pg11_bindings.rs", out_dir.display())).unwrap(),
-        )
-        .expect("couldn't delete v11 bindings");
-        std::fs::remove_file(
-            PathBuf::from_str(&format!("{}pg12_bindings.rs", out_dir.display())).unwrap(),
-        )
-        .expect("couldn't delete v12 bindings");
 
         Ok(())
     }
@@ -385,13 +394,10 @@ pub(crate) mod bindings_diff {
         true
     }
 
-    fn read_source_file(filename: &str) -> BTreeSet<String> {
-        let mut file = std::fs::File::open(filename)
-            .unwrap_or_else(|_| panic!("Failed to read: {}", filename));
-        let mut input = String::new();
-
-        file.read_to_string(&mut input).unwrap();
-        let source = syn::parse_file(input.as_str()).unwrap();
+    /// Given a token stream, parse the stream as a file and return
+    /// a set of the items found in the file.
+    fn parse_file_stream(stream: &TokenStream2) -> BTreeSet<String> {
+        let source: syn::File = syn::parse2(stream.clone()).unwrap();
 
         let mut item_map = BTreeSet::new();
         for item in source.items.into_iter() {
@@ -402,9 +408,9 @@ pub(crate) mod bindings_diff {
     }
 
     fn write_source_file(filename: &str, items: &BTreeSet<String>) {
-        let mut file =
-            std::fs::File::create(filename).expect(&format!("failed to create {}", filename));
-        file.write_all(
+        let file = std::fs::File::create(filename).expect(&format!("failed to create {}", filename));
+        let mut writer = BufWriter::new(file);
+        writer.write_all(
             quote! {
                 use crate as pg_sys;
                 use pgx_macros::*;
@@ -415,9 +421,10 @@ pub(crate) mod bindings_diff {
         )
         .expect(&format!("failed to write to {}", filename));
         for item in items {
-            file.write_all(item.as_bytes())
+            writer.write_all(item.as_bytes())
                 .expect(&format!("failed to write to {}", filename));
         }
+        writer.flush().expect(&format!("failed to flush {}", filename));
         rust_fmt(filename)
             .unwrap_or_else(|e| panic!("unable to run rustfmt for {}: {:?}", filename, e));
     }
