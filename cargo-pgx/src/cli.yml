@@ -3,12 +3,10 @@
 
 
 name: "cargo-pgx"
-version: "0.0.16"
 about: Creates and installs pgx based Postgres extensions
 bin_name: "cargo"
 subcommands:
   - pgx:
-        version: "0.0.16"
         subcommands:
           - init:
               about: initize pgx development environment for the first time
