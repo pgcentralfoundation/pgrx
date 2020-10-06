@@ -18,7 +18,7 @@ use crate::commands::start::start_postgres;
 use crate::commands::status::status_postgres;
 use crate::commands::stop::stop_postgres;
 use crate::commands::test::test_extension;
-use clap::App;
+use clap::{App, AppSettings};
 use colored::Colorize;
 use pgx_utils::{exit, exit_with_error, get_pg_config};
 use std::path::PathBuf;
@@ -28,7 +28,10 @@ fn main() -> std::result::Result<(), std::io::Error> {
     let yaml = load_yaml!("cli.yml");
     let app = App::from(yaml);
 
-    let matches = app.get_matches();
+    let matches = app
+        .version(crate_version!())
+        .global_setting(AppSettings::GlobalVersion)
+        .get_matches();
 
     if let Some(extension) = matches.subcommand_matches("pgx") {
         let result = match extension.subcommand() {
