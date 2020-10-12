@@ -2,9 +2,9 @@
 # governed by the MIT license that can be found in the LICENSE file.
 
 
-name: "pgx's development environment tool"
-version: "0.0.16"
+name: "cargo-pgx"
 about: Creates and installs pgx based Postgres extensions
+bin_name: "cargo"
 subcommands:
   - pgx:
         subcommands:

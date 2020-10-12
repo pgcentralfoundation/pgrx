@@ -7,6 +7,29 @@ use serde::*;
 pg_module_magic!();
 
 #[pg_extern]
+fn sq_euclid_pgx(a: Array<f32>, b: Array<f32>) -> f32 {
+    a.as_slice()
+        .iter()
+        .zip(b.as_slice().iter())
+        .map(|(a, b)| (a - b) * (a - b))
+        .sum()
+}
+
+#[pg_extern(immutable, parallel_safe)]
+fn approx_distance_pgx(compressed: Array<i64>, distances: Array<f64>) -> f64 {
+    let distances = distances.as_slice();
+    compressed
+        .as_slice()
+        .iter()
+        .map(|cc| {
+            let d = distances[*cc as usize];
+            pgx::info!("cc={}, d={}", cc, d);
+            d
+        })
+        .sum()
+}
+
+#[pg_extern]
 fn sum_array(input: Array<i32>) -> i64 {
     let mut sum = 0 as i64;
 
