@@ -82,39 +82,37 @@ pub fn register_pg_guard_panic_handler() {
     }
 
     std::panic::set_hook(Box::new(|info| {
-        if cfg!(debug_assertions) {
-            #[cfg(debug_assertions)]
-            {
-                if IS_MAIN_THREAD.with(|v| v.get().is_none()) {
-                    // a thread that isn't the main thread panic!()d
-                    // we make a best effort to push a message to stderr, which hopefully
-                    // Postgres is logging somewhere
-                    eprintln!(
-                        "thread={:?}, id={:?}, {}",
-                        std::thread::current().name(),
-                        std::thread::current().id(),
-                        info
-                    );
-                }
+        #[cfg(debug_assertions)]
+        {
+            if IS_MAIN_THREAD.with(|v| v.get().is_none()) {
+                // a thread that isn't the main thread panic!()d
+                // we make a best effort to push a message to stderr, which hopefully
+                // Postgres is logging somewhere
+                eprintln!(
+                    "thread={:?}, id={:?}, {}",
+                    std::thread::current().name(),
+                    std::thread::current().id(),
+                    info
+                );
             }
-        } else {
-            PANIC_LOCATION.with(|p| {
-                let existing = p.take();
-
-                p.replace(if existing.is_none() {
-                    match info.location() {
-                        Some(location) => Some(PanicLocation {
-                            file: location.file().to_string(),
-                            line: location.line(),
-                            col: location.column(),
-                        }),
-                        None => None,
-                    }
-                } else {
-                    existing
-                })
-            });
         }
+
+        PANIC_LOCATION.with(|p| {
+            let existing = p.take();
+
+            p.replace(if existing.is_none() {
+                match info.location() {
+                    Some(location) => Some(PanicLocation {
+                        file: location.file().to_string(),
+                        line: location.line(),
+                        col: location.column(),
+                    }),
+                    None => None,
+                }
+            } else {
+                existing
+            })
+        });
     }))
 }
 
