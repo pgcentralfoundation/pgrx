@@ -4,5 +4,5 @@
 ##
 
 [build]
-# Postgres symbols won't ve available until runtime
+# Postgres symbols won't be available until runtime
 rustflags = ["-C", "link-args=-Wl,-undefined,dynamic_lookup"]
