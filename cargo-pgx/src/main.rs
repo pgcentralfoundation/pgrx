@@ -44,12 +44,13 @@ fn main() -> std::result::Result<(), std::io::Error> {
             }
             ("new", Some(new)) => {
                 let is_bgworker = new.is_present("bgworker");
+                let skip_git = new.is_present("skipgit");
                 let extname = new
                     .value_of("name")
                     .expect("<NAME> argument to create is required");
                 validate_extension_name(extname);
                 let path = PathBuf::from_str(&format!("{}/", extname)).unwrap();
-                create_crate_template(path, extname, is_bgworker)
+                create_crate_template(path, extname, is_bgworker, skip_git)
             }
             ("start", Some(start)) => {
                 let pgver = start.value_of("pg_version").unwrap_or("all");

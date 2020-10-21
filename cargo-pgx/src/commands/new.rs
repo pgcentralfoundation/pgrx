@@ -9,6 +9,7 @@ pub(crate) fn create_crate_template(
     path: PathBuf,
     name: &str,
     is_bgworker: bool,
+    skip_git: bool,
 ) -> Result<(), std::io::Error> {
     create_directory_structure(&path)?;
     create_control_file(&path, name)?;
@@ -22,8 +23,8 @@ pub(crate) fn create_crate_template(
     crate::generate_schema()?;
     std::env::set_current_dir(cwd)?;
 
-    git_init(&path)?;
-    git_add(&path)
+    git_init(&path, skip_git)?;
+    git_add(&path, skip_git)
 }
 
 fn create_directory_structure(path: &PathBuf) -> Result<(), std::io::Error> {
@@ -104,7 +105,11 @@ fn create_git_ignore(path: &PathBuf, _name: &str) -> Result<(), std::io::Error> 
     Ok(())
 }
 
-fn git_init(path: &PathBuf) -> Result<(), std::io::Error> {
+fn git_init(path: &PathBuf, skip_git: bool) -> Result<(), std::io::Error> {
+    if skip_git {
+        return Ok(())
+    }
+
     let output = Command::new("git")
         .arg("init")
         .arg(".")
@@ -120,7 +125,11 @@ fn git_init(path: &PathBuf) -> Result<(), std::io::Error> {
     }
 }
 
-fn git_add(path: &PathBuf) -> Result<(), std::io::Error> {
+fn git_add(path: &PathBuf, skip_git: bool) -> Result<(), std::io::Error> {
+    if skip_git {
+        return Ok(())
+    }
+
     let output = Command::new("git")
         .arg("add")
         .arg(".")
