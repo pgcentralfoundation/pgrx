@@ -270,7 +270,7 @@ impl PgMemoryContexts {
         }
     }
 
-    /// Allocate memory in this context, which will be free'd whenever Postgres deletes this MeoryContext
+    /// Allocate memory in this context, which will be free'd whenever Postgres deletes this MemoryContext
     pub fn palloc(&mut self, len: usize) -> *mut std::os::raw::c_void {
         unsafe { pg_sys::MemoryContextAlloc(self.value(), len) }
     }
@@ -283,19 +283,19 @@ impl PgMemoryContexts {
         self.palloc0(std::mem::size_of::<T>()) as *mut T
     }
 
-    /// Allocate a slice in this context, which will be free'd whenever Postgres deletes this MeoryContext
+    /// Allocate a slice in this context, which will be free'd whenever Postgres deletes this MemoryContext
     pub fn palloc_slice<'a, T>(&mut self, len: usize) -> &'a mut [T] {
         let buffer = self.palloc(std::mem::size_of::<T>() * len) as *mut T;
         unsafe { std::slice::from_raw_parts_mut(buffer, len) }
     }
 
-    /// Allocate a slice in this context, where the memory is zero'd, which will be free'd whenever Postgres deletes this MeoryContext
+    /// Allocate a slice in this context, where the memory is zero'd, which will be free'd whenever Postgres deletes this MemoryContext
     pub fn palloc0_slice<'a, T>(&mut self, len: usize) -> &'a mut [T] {
         let buffer = self.palloc0(std::mem::size_of::<T>() * len) as *mut T;
         unsafe { std::slice::from_raw_parts_mut(buffer, len) }
     }
 
-    /// Allocate memory in this context, which will be free'd whenever Postgres deletes this MeoryContext
+    /// Allocate memory in this context, which will be free'd whenever Postgres deletes this MemoryContext
     ///
     /// The allocated memory is zero'd
     pub fn palloc0(&mut self, len: usize) -> *mut std::os::raw::c_void {
