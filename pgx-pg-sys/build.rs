@@ -4,13 +4,15 @@
 extern crate build_deps;
 
 use bindgen::callbacks::MacroParsingBehavior;
-use pgx_utils::{get_pg_config, get_pgx_config_path, prefix_path, run_pg_config};
+use pgx_utils::{
+    get_pg_config, get_pg_config_major_version, get_pgx_config_path, prefix_path, run_pg_config,
+};
 use quote::quote;
-use std::collections::{HashSet, HashMap};
+use std::collections::{HashMap, HashSet};
+use std::error::Error;
 use std::path::PathBuf;
 use std::process::{Command, Output};
 use std::sync::Mutex;
-use std::error::Error;
 use syn::export::TokenStream2;
 use syn::Item;
 
@@ -99,7 +101,11 @@ fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
 
         let bindings = run_bindgen(&pg_config, major_version, &include_h)?;
         let bindings = rewrite_items(bindings)?;
-        shims.push(PgShim { major_version, bindings, pg_config });
+        shims.push(PgShim {
+            major_version,
+            bindings,
+            pg_config,
+        });
     }
 
     // consolidate common items, this step also lands the transformed token streams to disk
@@ -122,9 +128,7 @@ struct PgShim {
 
 /// Given a token stream representing a file, apply a series of transformations to munge
 /// the bindgen generated code with some postgres specific enhacements
-fn rewrite_items(
-    file: syn::File,
-) -> Result<TokenStream2, Box<dyn Error + Send + Sync>> {
+fn rewrite_items(file: syn::File) -> Result<TokenStream2, Box<dyn Error + Send + Sync>> {
     let items = apply_pg_guard(file.items)?;
     let items = display_nodes(items)?;
 
@@ -139,7 +143,9 @@ fn rewrite_items(
 /// are postgres `Node`s with a `Display` routine that calls out to
 /// nodeToString (we don't go via the type safe node_to_string wrapper in `pgx`
 /// to avoid depending on `pgx`).
-fn display_nodes(mut items: Vec<syn::Item>) -> Result<Vec<syn::Item>, Box<dyn Error + Send + Sync>> {
+fn display_nodes(
+    mut items: Vec<syn::Item>,
+) -> Result<Vec<syn::Item>, Box<dyn Error + Send + Sync>> {
     // we scope must of the computation so we can borrow `items` and then
     // extend it at the very end.
     let additional_items = {
@@ -155,14 +161,14 @@ fn display_nodes(mut items: Vec<syn::Item>) -> Result<Vec<syn::Item>, Box<dyn Er
                     if let Some(first_field) = fields.named.first() {
                         first_field
                     } else {
-                        continue
+                        continue;
                     }
-                },
+                }
                 syn::Fields::Unnamed(fields) => {
                     if let Some(first_field) = fields.unnamed.first() {
                         first_field
                     } else {
-                        continue
+                        continue;
                     }
                 }
                 _ => continue,
@@ -173,10 +179,10 @@ fn display_nodes(mut items: Vec<syn::Item>) -> Result<Vec<syn::Item>, Box<dyn Er
                 if let Some(last_segment) = p.path.segments.last() {
                     last_segment.ident.to_string()
                 } else {
-                    continue
+                    continue;
                 }
             } else {
-                continue
+                continue;
             };
 
             if ty_name == "NodeTag" {
@@ -229,13 +235,13 @@ fn display_nodes(mut items: Vec<syn::Item>) -> Result<Vec<syn::Item>, Box<dyn Er
 fn dfs_find_nodes<'graph>(
     node: &'graph StructDescriptor<'graph>,
     graph: &'graph StructGraph<'graph>,
-    node_set: &mut HashSet<StructDescriptor<'graph>>
+    node_set: &mut HashSet<StructDescriptor<'graph>>,
 ) {
     node_set.insert(node.clone());
 
     for child in node.children(graph) {
         if node_set.contains(child) {
-            continue
+            continue;
         }
         dfs_find_nodes(child, graph, node_set);
     }
@@ -280,18 +286,26 @@ impl<'a> From<&'a [syn::Item]> for StructGraph<'a> {
         for item in items.iter() {
             // grab the first field if it is struct
             let (id, first_field) = match &item {
-                &syn::Item::Struct(syn::ItemStruct{ ident: id, fields: syn::Fields::Named(fields), ..}) => {
+                &syn::Item::Struct(syn::ItemStruct {
+                    ident: id,
+                    fields: syn::Fields::Named(fields),
+                    ..
+                }) => {
                     if let Some(first_field) = fields.named.first() {
                         (id.to_string(), first_field)
                     } else {
-                        continue
+                        continue;
                     }
-                },
-                &syn::Item::Struct(syn::ItemStruct{ ident: id, fields: syn::Fields::Unnamed(fields), ..}) => {
+                }
+                &syn::Item::Struct(syn::ItemStruct {
+                    ident: id,
+                    fields: syn::Fields::Unnamed(fields),
+                    ..
+                }) => {
                     if let Some(first_field) = fields.unnamed.first() {
                         (id.to_string(), first_field)
                     } else {
-                        continue
+                        continue;
                     }
                 }
                 _ => continue,
@@ -313,7 +327,11 @@ impl<'a> From<&'a [syn::Item]> for StructGraph<'a> {
             }
         }
 
-        StructGraph { name_tab, item_offset_tab, descriptors }
+        StructGraph {
+            name_tab,
+            item_offset_tab,
+            descriptors,
+        }
     }
 }
 
@@ -362,7 +380,6 @@ struct StructDescriptor<'a> {
     children: Vec<usize>,
 }
 
-
 /// Given a specific postgres version, `run_bindgen` generates bindings for the given
 /// postgres version and returns them as a token stream.
 fn run_bindgen(
@@ -370,10 +387,7 @@ fn run_bindgen(
     major_version: u16,
     include_h: &PathBuf,
 ) -> Result<syn::File, Box<dyn Error + Send + Sync>> {
-    eprintln!(
-        "Generating bindings for pg{}",
-        major_version,
-    );
+    eprintln!("Generating bindings for pg{}", major_version);
     let includedir_server = run_pg_config(pg_config, "--includedir-server");
     let bindings = bindgen::Builder::default()
         .header(include_h.display().to_string())
@@ -553,21 +567,21 @@ fn rust_fmt(path: &str) -> Result<(), std::io::Error> {
 }
 
 pub(crate) mod bindings_diff {
+    use super::PgShim;
     use crate::rust_fmt;
     use quote::{quote, ToTokens};
     use std::collections::BTreeSet;
-    use std::io::{Write, BufWriter};
+    use std::io::{BufWriter, Write};
     use std::path::PathBuf;
-    use super::PgShim;
     use syn::export::TokenStream2;
 
     pub(crate) fn main(out_dir: &PathBuf, shims: &[PgShim]) -> Result<(), std::io::Error> {
         // NOTE: this gross assertion can be ripped out once the code is made generic
         //       over different postgres versions.
         assert!(
-            shims[0].major_version == 10 &&
-            shims[1].major_version == 11 &&
-            shims[2].major_version == 12
+            shims[0].major_version == 10
+                && shims[1].major_version == 11
+                && shims[2].major_version == 12
         );
         let mut v10 = parse_file_stream(&shims[0].bindings);
         let mut v11 = parse_file_stream(&shims[1].bindings);
@@ -637,23 +651,28 @@ pub(crate) mod bindings_diff {
     }
 
     fn write_source_file(filename: &str, items: &BTreeSet<String>) {
-        let file = std::fs::File::create(filename).expect(&format!("failed to create {}", filename));
+        let file =
+            std::fs::File::create(filename).expect(&format!("failed to create {}", filename));
         let mut writer = BufWriter::new(file);
-        writer.write_all(
-            quote! {
-                use crate as pg_sys;
-                use pgx_macros::*;
-                use crate::common::*;
-            }
-            .to_string()
-            .as_bytes(),
-        )
-        .expect(&format!("failed to write to {}", filename));
+        writer
+            .write_all(
+                quote! {
+                    use crate as pg_sys;
+                    use pgx_macros::*;
+                    use crate::common::*;
+                }
+                .to_string()
+                .as_bytes(),
+            )
+            .expect(&format!("failed to write to {}", filename));
         for item in items {
-            writer.write_all(item.as_bytes())
+            writer
+                .write_all(item.as_bytes())
                 .expect(&format!("failed to write to {}", filename));
         }
-        writer.flush().expect(&format!("failed to flush {}", filename));
+        writer
+            .flush()
+            .expect(&format!("failed to flush {}", filename));
         rust_fmt(filename)
             .unwrap_or_else(|e| panic!("unable to run rustfmt for {}: {:?}", filename, e));
     }
