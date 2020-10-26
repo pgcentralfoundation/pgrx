@@ -5,7 +5,7 @@ extern crate proc_macro;
 
 use pgx_utils::{categorize_return_type, CategorizedType};
 use proc_macro2::Ident;
-use quote::{quote, quote_spanned};
+use quote::{quote, quote_spanned, ToTokens};
 use std::ops::Deref;
 use std::str::FromStr;
 use syn::export::{Span, TokenStream2};
@@ -426,6 +426,7 @@ impl PgGuardRewriter {
         } else {
             false
         };
+        let is_no_mangle = func.attrs.iter().find(|attr| (attr.path.clone().into_token_stream().to_string() == "no_mangle")).is_some();
 
         // but for the inner function (the one we're wrapping) we don't need any kind of
         // abi classification
@@ -454,8 +455,16 @@ impl PgGuardRewriter {
                 #[no_mangle]
             }
         } else if is_extern_c {
-            quote! {}
+            if is_no_mangle {
+                quote! {
+                    #[no_mangle]
+                }
+            }
+            else {
+                quote! {}
+            }
         } else {
+            // I feel like this is a) incorrect and b) never going to happen
             quote! {
                 #[no_mangle]
             }
