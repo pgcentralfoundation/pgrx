@@ -6,7 +6,7 @@ extern crate build_deps;
 use bindgen::callbacks::MacroParsingBehavior;
 use pgx_utils::{get_pg_config, get_pgx_config_path, prefix_path, run_pg_config};
 use quote::quote;
-use std::collections::HashSet;
+use std::collections::{HashSet, HashMap};
 use std::path::PathBuf;
 use std::process::{Command, Output};
 use std::sync::Mutex;
@@ -126,6 +126,7 @@ fn rewrite_items(
     file: syn::File,
 ) -> Result<TokenStream2, Box<dyn Error + Send + Sync>> {
     let items = apply_pg_guard(file.items)?;
+    let items = display_nodes(items)?;
 
     let mut stream = TokenStream2::new();
     for item in items.into_iter() {
@@ -133,6 +134,234 @@ fn rewrite_items(
     }
     Ok(stream)
 }
+
+/// Given a list of items representing a file, extend all the items which
+/// are postgres `Node`s with a `Display` routine that calls out to
+/// nodeToString (we don't go via the type safe node_to_string wrapper in `pgx`
+/// to avoid depending on `pgx`).
+fn display_nodes(mut items: Vec<syn::Item>) -> Result<Vec<syn::Item>, Box<dyn Error + Send + Sync>> {
+    // we scope must of the computation so we can borrow `items` and then
+    // extend it at the very end.
+    let additional_items = {
+        let struct_graph: StructGraph = StructGraph::from(&items[..]);
+
+        // collect all the structs with `NodeTag` as their first member,
+        // these will serve as roots in our forest of `Node`s
+        let mut root_node_structs = Vec::new();
+        for descriptor in struct_graph.descriptors.iter() {
+            // grab the first field, if any
+            let first_field = match &descriptor.struct_.fields {
+                syn::Fields::Named(fields) => {
+                    if let Some(first_field) = fields.named.first() {
+                        first_field
+                    } else {
+                        continue
+                    }
+                },
+                syn::Fields::Unnamed(fields) => {
+                    if let Some(first_field) = fields.unnamed.first() {
+                        first_field
+                    } else {
+                        continue
+                    }
+                }
+                _ => continue,
+            };
+
+            // grab the type name of the first field
+            let ty_name = if let syn::Type::Path(p) = &first_field.ty {
+                if let Some(last_segment) = p.path.segments.last() {
+                    last_segment.ident.to_string()
+                } else {
+                    continue
+                }
+            } else {
+                continue
+            };
+
+            if ty_name == "NodeTag" {
+                root_node_structs.push(descriptor);
+            }
+        }
+
+        // the set of types which subclass `Node` according to postgres' object system
+        let mut node_set = HashSet::new();
+        // fill in any children of the roots with a recursive DFS
+        // (we are not operating on user input, so it is ok to just
+        //  use direct recursion rather than an explicit stack).
+        for root in root_node_structs.into_iter() {
+            dfs_find_nodes(root, &struct_graph, &mut node_set);
+        }
+
+        // now we can finally iterate the Nodes and emit out Display impl
+        let mut additional_items = Vec::with_capacity(node_set.len());
+        for node_struct in node_set.into_iter() {
+            let struct_name = &node_struct.struct_.ident;
+
+            let impl_item: syn::Item = syn::parse2(quote! {
+                impl ::std::fmt::Display for #struct_name {
+                    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+                        let string = unsafe { crate::nodeToString(self as *const #struct_name as *const ::std::ffi::c_void) };
+                        if string.is_null() {
+                            write!(f, "UNKNOWN-NODE")
+                        } else {
+                            match unsafe { ::std::ffi::CStr::from_ptr(string).to_str() } {
+                                Ok(s) => write!(f, "{}", s),
+                                Err(e) => write!(f, "ffi error: {}", e.to_string()),
+                            }
+                        }
+                    }
+                }
+            })?;
+
+            additional_items.push(impl_item);
+        }
+
+        additional_items
+    };
+
+    items.extend(additional_items);
+
+    Ok(items)
+}
+
+/// Given a root node, dfs_find_nodes adds all its children nodes to `node_set`.
+fn dfs_find_nodes<'graph>(
+    node: &'graph StructDescriptor<'graph>,
+    graph: &'graph StructGraph<'graph>,
+    node_set: &mut HashSet<StructDescriptor<'graph>>
+) {
+    node_set.insert(node.clone());
+
+    for child in node.children(graph) {
+        if node_set.contains(child) {
+            continue
+        }
+        dfs_find_nodes(child, graph, node_set);
+    }
+}
+
+/// A graph describing the inheritance relationships between different nodes
+/// according to postgres' object system.
+///
+/// NOTE: the borrowed lifetime on a StructGraph should also ensure that the offsets
+///       it stores into the underlying items struct are always correct.
+#[derive(Clone, Debug)]
+struct StructGraph<'a> {
+    /// A table mapping struct names to their offset in the descriptor table
+    name_tab: HashMap<String, usize>,
+    /// A table mapping offsets into the underlying items table to offsets in the descriptor table
+    item_offset_tab: Vec<Option<usize>>,
+    /// A table of struct descriptors
+    descriptors: Vec<StructDescriptor<'a>>,
+}
+
+impl<'a> From<&'a [syn::Item]> for StructGraph<'a> {
+    fn from(items: &'a [syn::Item]) -> StructGraph<'a> {
+        let mut descriptors = Vec::new();
+
+        // a table mapping struct names to their offset in `descriptors`
+        let mut name_tab: HashMap<String, usize> = HashMap::new();
+        let mut item_offset_tab: Vec<Option<usize>> = vec![None; items.len()];
+        for (i, item) in items.iter().enumerate() {
+            if let &syn::Item::Struct(struct_) = &item {
+                let next_offset = descriptors.len();
+                descriptors.push(StructDescriptor {
+                    struct_,
+                    items_offset: i,
+                    parent: None,
+                    children: Vec::new(),
+                });
+                name_tab.insert(struct_.ident.to_string(), next_offset);
+                item_offset_tab[i] = Some(next_offset);
+            }
+        }
+
+        for item in items.iter() {
+            // grab the first field if it is struct
+            let (id, first_field) = match &item {
+                &syn::Item::Struct(syn::ItemStruct{ ident: id, fields: syn::Fields::Named(fields), ..}) => {
+                    if let Some(first_field) = fields.named.first() {
+                        (id.to_string(), first_field)
+                    } else {
+                        continue
+                    }
+                },
+                &syn::Item::Struct(syn::ItemStruct{ ident: id, fields: syn::Fields::Unnamed(fields), ..}) => {
+                    if let Some(first_field) = fields.unnamed.first() {
+                        (id.to_string(), first_field)
+                    } else {
+                        continue
+                    }
+                }
+                _ => continue,
+            };
+
+            if let syn::Type::Path(p) = &first_field.ty {
+                // We should be guaranteed that just extracting the last path
+                // segment is ok because these structs are all from the same module.
+                // (also, they are all generated from C code, so collisions should be
+                //  impossible anyway thanks to C's single shared namespace).
+                if let Some(last_segment) = p.path.segments.last() {
+                    if let Some(parent_offset) = name_tab.get(&last_segment.ident.to_string()) {
+                        // establish the 2-way link
+                        let child_offset = name_tab[&id];
+                        descriptors[child_offset].parent = Some(*parent_offset);
+                        descriptors[*parent_offset].children.push(child_offset);
+                    }
+                }
+            }
+        }
+
+        StructGraph { name_tab, item_offset_tab, descriptors }
+    }
+}
+
+impl<'a> StructDescriptor<'a> {
+    /// children returns an iterator over the children of this node in the graph
+    fn children(&'a self, graph: &'a StructGraph) -> StructDescriptorChildren {
+        StructDescriptorChildren {
+            offset: 0,
+            descriptor: self,
+            graph,
+        }
+    }
+}
+
+/// An iterator over a StructDescriptor's children
+struct StructDescriptorChildren<'a> {
+    offset: usize,
+    descriptor: &'a StructDescriptor<'a>,
+    graph: &'a StructGraph<'a>,
+}
+
+impl<'a> std::iter::Iterator for StructDescriptorChildren<'a> {
+    type Item = &'a StructDescriptor<'a>;
+    fn next(&mut self) -> Option<&'a StructDescriptor<'a>> {
+        if self.offset >= self.descriptor.children.len() {
+            None
+        } else {
+            let ret = Some(&self.graph.descriptors[self.descriptor.children[self.offset]]);
+            self.offset += 1;
+            ret
+        }
+    }
+}
+
+/// A node a StructGraph
+#[derive(Clone, Debug, Hash, Eq, PartialEq)]
+struct StructDescriptor<'a> {
+    /// A reference to the underlying struct syntax node
+    struct_: &'a syn::ItemStruct,
+    /// An offset into the items slice that was used to construct the struct graph that
+    /// this StructDescriptor is a part of
+    items_offset: usize,
+    /// The offset of the "parent" (first member) struct (if any).
+    parent: Option<usize>,
+    /// The offsets of the "children" structs (if any).
+    children: Vec<usize>,
+}
+
 
 /// Given a specific postgres version, `run_bindgen` generates bindings for the given
 /// postgres version and returns them as a token stream.
