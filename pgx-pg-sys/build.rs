@@ -4,9 +4,7 @@
 extern crate build_deps;
 
 use bindgen::callbacks::MacroParsingBehavior;
-use pgx_utils::{
-    get_pg_config, get_pg_config_major_version, get_pgx_config_path, prefix_path, run_pg_config,
-};
+use pgx_utils::{get_pg_config, get_pgx_config_path, prefix_path, run_pg_config};
 use quote::quote;
 use std::collections::{HashMap, HashSet};
 use std::error::Error;
@@ -431,13 +429,11 @@ fn build_shim(
         format!("{}/libpgx-cshim-{}.a", shim_dir.display(), major_version).into();
 
     eprintln!("libpgx_cshim={}", libpgx_cshim.display());
-    if !libpgx_cshim.exists() {
-        // build the shim under a lock b/c this can't be built concurrently
-        let _lock = shim_mutex.lock().expect("couldn't obtain shim_mutex");
+    // build the shim under a lock b/c this can't be built concurrently
+    let _lock = shim_mutex.lock().expect("couldn't obtain shim_mutex");
 
-        // then build the shim for the version feature currently being built
-        build_shim_for_version(&shim_dir, major_version, pg_config).expect("shim build failed");
-    }
+    // then build the shim for the version feature currently being built
+    build_shim_for_version(&shim_dir, major_version, pg_config).expect("shim build failed");
 
     // no matter what, tell rustc to link to the library that was built for the feature we're currently building
     if std::env::var("CARGO_FEATURE_PG10").is_ok() {
