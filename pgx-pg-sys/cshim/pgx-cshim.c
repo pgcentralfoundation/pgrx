@@ -97,6 +97,9 @@ void pgx_deconstruct_row_type(TupleDesc tupdesc, Datum row, Datum **columns, boo
     HeapTupleData   tmptup;
     HeapTupleData   *tuple;
     int             natts;
+    int             i, j;
+    Datum           *cols;
+    bool            *ns;
 
     td = DatumGetHeapTupleHeader(row);
 
@@ -106,10 +109,10 @@ void pgx_deconstruct_row_type(TupleDesc tupdesc, Datum row, Datum **columns, boo
     tuple = &tmptup;
     natts = tupdesc->natts;
 
-    Datum *cols = palloc(natts * sizeof(Datum));
-    bool *ns = palloc(natts * sizeof(bool));
+    cols = palloc(natts * sizeof(Datum));
+    ns = palloc(natts * sizeof(bool));
 
-    for (int i=0, j=0; i<natts; i++) {
+    for (i=0, j=0; i<natts; i++) {
         Form_pg_attribute att = TupleDescAttr(tupdesc, i);
 
         if (att->attisdropped) {
