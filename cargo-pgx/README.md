@@ -99,7 +99,7 @@ OPTIONS:
 
 If you'd like to create a "background worker" instead, specify the `--bgworker` argument.
 
-It also initializes the crate directory as a `git` repository.
+`cargo pgx new` does not initialize the directory as a git repo, but it does create a `.gitignore` file in case you decide to do so. 
 
 ```shell script
 $ cargo pgx new --help
