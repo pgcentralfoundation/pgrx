@@ -80,6 +80,7 @@ pub struct PgVarlena<T>
 where
     T: Copy + Sized,
 {
+    leaked: Option<*mut PallocdVarlena>,
     varlena: Cow<'static, PallocdVarlena>,
     need_free: bool,
     __marker: PhantomData<T>,
@@ -126,6 +127,7 @@ where
         }
 
         PgVarlena {
+            leaked: None,
             varlena: Cow::Owned(PallocdVarlena {
                 ptr,
                 len: unsafe { varsize_any(ptr) },
@@ -153,14 +155,17 @@ where
 
         if ptr == datum as *mut pg_sys::varlena {
             // no detoasting happened so we're using borrowed memory
+            let leaked = Box::leak(Box::new(PallocdVarlena { ptr, len }));
             PgVarlena {
-                varlena: Cow::Borrowed(Box::leak(Box::new(PallocdVarlena { ptr, len }))),
+                leaked: Some(leaked),
+                varlena: Cow::Borrowed(leaked),
                 need_free: false,
                 __marker: PhantomData,
             }
         } else {
             // datum was detoasted so we own and it need to free it
             PgVarlena {
+                leaked: None,
                 varlena: Cow::Owned(PallocdVarlena { ptr, len }),
                 need_free: true,
                 __marker: PhantomData,
@@ -190,6 +195,10 @@ where
                 // safe: self.varlena.ptr will never be null
                 pg_sys::pfree(self.varlena.ptr as void_mut_ptr);
             }
+        }
+
+        if let Some(leaked) = self.leaked {
+            unsafe { drop(Box::from_raw(leaked)) }
         }
     }
 }
