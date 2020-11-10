@@ -4835,6 +4835,49 @@ pub struct FormData_pg_trigger {
     pub tgnargs: int16,
     pub tgattr: int2vector,
 }
+impl ::std::fmt::Display for ArrayRef {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        let string =
+            unsafe { crate::nodeToString(self as *const ArrayRef as *const ::std::ffi::c_void) };
+        if string.is_null() {
+            write!(f, "UNKNOWN-NODE")
+        } else {
+            match unsafe { ::std::ffi::CStr::from_ptr(string).to_str() } {
+                Ok(s) => write!(f, "{}", s),
+                Err(e) => write!(f, "ffi error: {}", e.to_string()),
+            }
+        }
+    }
+}
+impl ::std::fmt::Display for PartitionedChildRelInfo {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        let string = unsafe {
+            crate::nodeToString(self as *const PartitionedChildRelInfo as *const ::std::ffi::c_void)
+        };
+        if string.is_null() {
+            write!(f, "UNKNOWN-NODE")
+        } else {
+            match unsafe { ::std::ffi::CStr::from_ptr(string).to_str() } {
+                Ok(s) => write!(f, "{}", s),
+                Err(e) => write!(f, "ffi error: {}", e.to_string()),
+            }
+        }
+    }
+}
+impl ::std::fmt::Display for ResultPath {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        let string =
+            unsafe { crate::nodeToString(self as *const ResultPath as *const ::std::ffi::c_void) };
+        if string.is_null() {
+            write!(f, "UNKNOWN-NODE")
+        } else {
+            match unsafe { ::std::ffi::CStr::from_ptr(string).to_str() } {
+                Ok(s) => write!(f, "{}", s),
+                Err(e) => write!(f, "ffi error: {}", e.to_string()),
+            }
+        }
+    }
+}
 impl Default for ArrayRef {
     fn default() -> Self {
         unsafe { ::std::mem::zeroed() }

@@ -7159,6 +7159,341 @@ pub struct TupleDescData {
     pub constr: *mut TupleConstr,
     pub attrs: __IncompleteArrayField<FormData_pg_attribute>,
 }
+impl ::std::fmt::Display for BufferHeapTupleTableSlot {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        let string = unsafe {
+            crate::nodeToString(
+                self as *const BufferHeapTupleTableSlot as *const ::std::ffi::c_void,
+            )
+        };
+        if string.is_null() {
+            write!(f, "UNKNOWN-NODE")
+        } else {
+            match unsafe { ::std::ffi::CStr::from_ptr(string).to_str() } {
+                Ok(s) => write!(f, "{}", s),
+                Err(e) => write!(f, "ffi error: {}", e.to_string()),
+            }
+        }
+    }
+}
+impl ::std::fmt::Display for CallContext {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        let string =
+            unsafe { crate::nodeToString(self as *const CallContext as *const ::std::ffi::c_void) };
+        if string.is_null() {
+            write!(f, "UNKNOWN-NODE")
+        } else {
+            match unsafe { ::std::ffi::CStr::from_ptr(string).to_str() } {
+                Ok(s) => write!(f, "{}", s),
+                Err(e) => write!(f, "ffi error: {}", e.to_string()),
+            }
+        }
+    }
+}
+impl ::std::fmt::Display for CallStmt {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        let string =
+            unsafe { crate::nodeToString(self as *const CallStmt as *const ::std::ffi::c_void) };
+        if string.is_null() {
+            write!(f, "UNKNOWN-NODE")
+        } else {
+            match unsafe { ::std::ffi::CStr::from_ptr(string).to_str() } {
+                Ok(s) => write!(f, "{}", s),
+                Err(e) => write!(f, "ffi error: {}", e.to_string()),
+            }
+        }
+    }
+}
+impl ::std::fmt::Display for GroupResultPath {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        let string = unsafe {
+            crate::nodeToString(self as *const GroupResultPath as *const ::std::ffi::c_void)
+        };
+        if string.is_null() {
+            write!(f, "UNKNOWN-NODE")
+        } else {
+            match unsafe { ::std::ffi::CStr::from_ptr(string).to_str() } {
+                Ok(s) => write!(f, "{}", s),
+                Err(e) => write!(f, "ffi error: {}", e.to_string()),
+            }
+        }
+    }
+}
+impl ::std::fmt::Display for HeapTupleTableSlot {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        let string = unsafe {
+            crate::nodeToString(self as *const HeapTupleTableSlot as *const ::std::ffi::c_void)
+        };
+        if string.is_null() {
+            write!(f, "UNKNOWN-NODE")
+        } else {
+            match unsafe { ::std::ffi::CStr::from_ptr(string).to_str() } {
+                Ok(s) => write!(f, "{}", s),
+                Err(e) => write!(f, "ffi error: {}", e.to_string()),
+            }
+        }
+    }
+}
+impl ::std::fmt::Display for IndexClause {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        let string =
+            unsafe { crate::nodeToString(self as *const IndexClause as *const ::std::ffi::c_void) };
+        if string.is_null() {
+            write!(f, "UNKNOWN-NODE")
+        } else {
+            match unsafe { ::std::ffi::CStr::from_ptr(string).to_str() } {
+                Ok(s) => write!(f, "{}", s),
+                Err(e) => write!(f, "ffi error: {}", e.to_string()),
+            }
+        }
+    }
+}
+impl ::std::fmt::Display for MinimalTupleTableSlot {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        let string = unsafe {
+            crate::nodeToString(self as *const MinimalTupleTableSlot as *const ::std::ffi::c_void)
+        };
+        if string.is_null() {
+            write!(f, "UNKNOWN-NODE")
+        } else {
+            match unsafe { ::std::ffi::CStr::from_ptr(string).to_str() } {
+                Ok(s) => write!(f, "{}", s),
+                Err(e) => write!(f, "ffi error: {}", e.to_string()),
+            }
+        }
+    }
+}
+impl ::std::fmt::Display for OnConflictSetState {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        let string = unsafe {
+            crate::nodeToString(self as *const OnConflictSetState as *const ::std::ffi::c_void)
+        };
+        if string.is_null() {
+            write!(f, "UNKNOWN-NODE")
+        } else {
+            match unsafe { ::std::ffi::CStr::from_ptr(string).to_str() } {
+                Ok(s) => write!(f, "{}", s),
+                Err(e) => write!(f, "ffi error: {}", e.to_string()),
+            }
+        }
+    }
+}
+impl ::std::fmt::Display for PartitionPruneInfo {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        let string = unsafe {
+            crate::nodeToString(self as *const PartitionPruneInfo as *const ::std::ffi::c_void)
+        };
+        if string.is_null() {
+            write!(f, "UNKNOWN-NODE")
+        } else {
+            match unsafe { ::std::ffi::CStr::from_ptr(string).to_str() } {
+                Ok(s) => write!(f, "{}", s),
+                Err(e) => write!(f, "ffi error: {}", e.to_string()),
+            }
+        }
+    }
+}
+impl ::std::fmt::Display for PartitionPruneStep {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        let string = unsafe {
+            crate::nodeToString(self as *const PartitionPruneStep as *const ::std::ffi::c_void)
+        };
+        if string.is_null() {
+            write!(f, "UNKNOWN-NODE")
+        } else {
+            match unsafe { ::std::ffi::CStr::from_ptr(string).to_str() } {
+                Ok(s) => write!(f, "{}", s),
+                Err(e) => write!(f, "ffi error: {}", e.to_string()),
+            }
+        }
+    }
+}
+impl ::std::fmt::Display for PartitionPruneStepCombine {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        let string = unsafe {
+            crate::nodeToString(
+                self as *const PartitionPruneStepCombine as *const ::std::ffi::c_void,
+            )
+        };
+        if string.is_null() {
+            write!(f, "UNKNOWN-NODE")
+        } else {
+            match unsafe { ::std::ffi::CStr::from_ptr(string).to_str() } {
+                Ok(s) => write!(f, "{}", s),
+                Err(e) => write!(f, "ffi error: {}", e.to_string()),
+            }
+        }
+    }
+}
+impl ::std::fmt::Display for PartitionPruneStepOp {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        let string = unsafe {
+            crate::nodeToString(self as *const PartitionPruneStepOp as *const ::std::ffi::c_void)
+        };
+        if string.is_null() {
+            write!(f, "UNKNOWN-NODE")
+        } else {
+            match unsafe { ::std::ffi::CStr::from_ptr(string).to_str() } {
+                Ok(s) => write!(f, "{}", s),
+                Err(e) => write!(f, "ffi error: {}", e.to_string()),
+            }
+        }
+    }
+}
+impl ::std::fmt::Display for PartitionedRelPruneInfo {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        let string = unsafe {
+            crate::nodeToString(self as *const PartitionedRelPruneInfo as *const ::std::ffi::c_void)
+        };
+        if string.is_null() {
+            write!(f, "UNKNOWN-NODE")
+        } else {
+            match unsafe { ::std::ffi::CStr::from_ptr(string).to_str() } {
+                Ok(s) => write!(f, "{}", s),
+                Err(e) => write!(f, "ffi error: {}", e.to_string()),
+            }
+        }
+    }
+}
+impl ::std::fmt::Display for SubscriptingRef {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        let string = unsafe {
+            crate::nodeToString(self as *const SubscriptingRef as *const ::std::ffi::c_void)
+        };
+        if string.is_null() {
+            write!(f, "UNKNOWN-NODE")
+        } else {
+            match unsafe { ::std::ffi::CStr::from_ptr(string).to_str() } {
+                Ok(s) => write!(f, "{}", s),
+                Err(e) => write!(f, "ffi error: {}", e.to_string()),
+            }
+        }
+    }
+}
+impl ::std::fmt::Display for SupportRequestCost {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        let string = unsafe {
+            crate::nodeToString(self as *const SupportRequestCost as *const ::std::ffi::c_void)
+        };
+        if string.is_null() {
+            write!(f, "UNKNOWN-NODE")
+        } else {
+            match unsafe { ::std::ffi::CStr::from_ptr(string).to_str() } {
+                Ok(s) => write!(f, "{}", s),
+                Err(e) => write!(f, "ffi error: {}", e.to_string()),
+            }
+        }
+    }
+}
+impl ::std::fmt::Display for SupportRequestIndexCondition {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        let string = unsafe {
+            crate::nodeToString(
+                self as *const SupportRequestIndexCondition as *const ::std::ffi::c_void,
+            )
+        };
+        if string.is_null() {
+            write!(f, "UNKNOWN-NODE")
+        } else {
+            match unsafe { ::std::ffi::CStr::from_ptr(string).to_str() } {
+                Ok(s) => write!(f, "{}", s),
+                Err(e) => write!(f, "ffi error: {}", e.to_string()),
+            }
+        }
+    }
+}
+impl ::std::fmt::Display for SupportRequestRows {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        let string = unsafe {
+            crate::nodeToString(self as *const SupportRequestRows as *const ::std::ffi::c_void)
+        };
+        if string.is_null() {
+            write!(f, "UNKNOWN-NODE")
+        } else {
+            match unsafe { ::std::ffi::CStr::from_ptr(string).to_str() } {
+                Ok(s) => write!(f, "{}", s),
+                Err(e) => write!(f, "ffi error: {}", e.to_string()),
+            }
+        }
+    }
+}
+impl ::std::fmt::Display for SupportRequestSelectivity {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        let string = unsafe {
+            crate::nodeToString(
+                self as *const SupportRequestSelectivity as *const ::std::ffi::c_void,
+            )
+        };
+        if string.is_null() {
+            write!(f, "UNKNOWN-NODE")
+        } else {
+            match unsafe { ::std::ffi::CStr::from_ptr(string).to_str() } {
+                Ok(s) => write!(f, "{}", s),
+                Err(e) => write!(f, "ffi error: {}", e.to_string()),
+            }
+        }
+    }
+}
+impl ::std::fmt::Display for SupportRequestSimplify {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        let string = unsafe {
+            crate::nodeToString(self as *const SupportRequestSimplify as *const ::std::ffi::c_void)
+        };
+        if string.is_null() {
+            write!(f, "UNKNOWN-NODE")
+        } else {
+            match unsafe { ::std::ffi::CStr::from_ptr(string).to_str() } {
+                Ok(s) => write!(f, "{}", s),
+                Err(e) => write!(f, "ffi error: {}", e.to_string()),
+            }
+        }
+    }
+}
+impl ::std::fmt::Display for TableAmRoutine {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        let string = unsafe {
+            crate::nodeToString(self as *const TableAmRoutine as *const ::std::ffi::c_void)
+        };
+        if string.is_null() {
+            write!(f, "UNKNOWN-NODE")
+        } else {
+            match unsafe { ::std::ffi::CStr::from_ptr(string).to_str() } {
+                Ok(s) => write!(f, "{}", s),
+                Err(e) => write!(f, "ffi error: {}", e.to_string()),
+            }
+        }
+    }
+}
+impl ::std::fmt::Display for VacuumRelation {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        let string = unsafe {
+            crate::nodeToString(self as *const VacuumRelation as *const ::std::ffi::c_void)
+        };
+        if string.is_null() {
+            write!(f, "UNKNOWN-NODE")
+        } else {
+            match unsafe { ::std::ffi::CStr::from_ptr(string).to_str() } {
+                Ok(s) => write!(f, "{}", s),
+                Err(e) => write!(f, "ffi error: {}", e.to_string()),
+            }
+        }
+    }
+}
+impl ::std::fmt::Display for VirtualTupleTableSlot {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        let string = unsafe {
+            crate::nodeToString(self as *const VirtualTupleTableSlot as *const ::std::ffi::c_void)
+        };
+        if string.is_null() {
+            write!(f, "UNKNOWN-NODE")
+        } else {
+            match unsafe { ::std::ffi::CStr::from_ptr(string).to_str() } {
+                Ok(s) => write!(f, "{}", s),
+                Err(e) => write!(f, "ffi error: {}", e.to_string()),
+            }
+        }
+    }
+}
 impl Default for AttrDefault {
     fn default() -> Self {
         unsafe { ::std::mem::zeroed() }
