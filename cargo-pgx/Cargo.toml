@@ -18,9 +18,9 @@ num_cpus = "1.13.0"
 pgx-utils = { path = "../pgx-utils", version = "^0.0.17"}
 proc-macro2 = { version = "1.0.24", features = [ "span-locations" ] }
 quote = "1.0.7"
-rayon = "1.4.1"
-regex = "1.4.1"
+rayon = "1.5.0"
+regex = "1.4.2"
 rttp_client = { version = "0.1.0", features = ["tls-native"] }
-syn = { version = "1.0.45", features = [ "extra-traits", "full", "fold", "parsing" ] }
+syn = { version = "1.0.48", features = [ "extra-traits", "full", "fold", "parsing" ] }
 unescape = "0.1.0"
-fork = "0.1.17"
+fork = "0.1.18"
