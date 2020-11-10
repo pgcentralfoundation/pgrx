@@ -1,6 +1,6 @@
 [package]
 name = "pgx"
-version = "0.0.17"
+version = "0.0.18"
 authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
 edition = "2018"
 license = "MIT"
@@ -27,8 +27,8 @@ no-default-features = true
 enum-primitive-derive = "0.2.1"
 num-traits = "0.2.14"
 seahash = "4.0.1"
-pgx-macros = { path = "../pgx-macros/", version= "^0.0.17"}
-pgx-pg-sys = { path = "../pgx-pg-sys", version= "^0.0.17"}
+pgx-macros = { path = "../pgx-macros/", version= "^0.0.18"}
+pgx-pg-sys = { path = "../pgx-pg-sys", version= "^0.0.18"}
 serde = { version = "1.0.117", features = [ "derive" ] }
 serde_cbor = "0.11.1"
 serde_json = "1.0.59"
