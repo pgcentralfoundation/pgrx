@@ -23,6 +23,7 @@ use colored::Colorize;
 use pgx_utils::handle_result;
 use pgx_utils::pg_config::{PgConfig, PgConfigSelector, Pgx};
 use pgx_utils::{exit, exit_with_error};
+use std::collections::HashMap;
 use std::path::PathBuf;
 use std::str::FromStr;
 
@@ -42,7 +43,38 @@ fn do_it() -> std::result::Result<(), std::io::Error> {
 
     if let Some(extension) = matches.subcommand_matches("pgx") {
         let result = match extension.subcommand() {
-            ("init", Some(_init)) => init_pgx(&Pgx::default()?),
+            ("init", Some(init)) => {
+                let mut versions = HashMap::new();
+
+                init.value_of("pg10").map(|v| versions.insert("pg10", v));
+                init.value_of("pg11").map(|v| versions.insert("pg11", v));
+                init.value_of("pg12").map(|v| versions.insert("pg12", v));
+                init.value_of("pg13").map(|v| versions.insert("pg13", v));
+
+                if versions.is_empty() {
+                    // no arguments specified, so we'll just install our defaults
+                    init_pgx(&Pgx::default()?)
+                } else {
+                    // user specified arguments, so we'll only install those versions of Postgres
+                    let default_pgx = Pgx::default()?;
+                    let mut pgx = Pgx::new();
+
+                    for pg_config in versions.into_iter().map(|(pgver, pg_config_path)| {
+                        if pg_config_path == "download" {
+                            default_pgx
+                                .get(pgver)
+                                .expect(&format!("{} is not a known Postgres version", pgver))
+                                .clone()
+                        } else {
+                            PgConfig::new(pg_config_path.into())
+                        }
+                    }) {
+                        pgx.push(pg_config);
+                    }
+
+                    init_pgx(&pgx)
+                }
+            }
             ("new", Some(new)) => {
                 let is_bgworker = new.is_present("bgworker");
                 let extname = new
