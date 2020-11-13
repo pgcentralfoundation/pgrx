@@ -3,6 +3,7 @@
 
 use crate::commands::status::status_postgres;
 use colored::Colorize;
+use pgx_utils::pg_config::PgConfig;
 use pgx_utils::{
     exit_with_error, get_pgbin_dir, get_pgdata_dir, get_pglog_file, get_pgx_home, handle_result,
     BASE_POSTGRES_PORT_NO,
@@ -11,24 +12,24 @@ use std::os::unix::process::CommandExt;
 use std::path::PathBuf;
 use std::process::Stdio;
 
-pub(crate) fn start_postgres(major_version: u16) {
-    let datadir = get_pgdata_dir(major_version);
-    let logfile = get_pglog_file(major_version);
-    let bindir = get_pgbin_dir(major_version);
-    let port = BASE_POSTGRES_PORT_NO + major_version;
+pub(crate) fn start_postgres(pg_config: &PgConfig) -> Result<(), std::io::Error> {
+    let datadir = pg_config.data_dir()?;
+    let logfile = pg_config.log_file()?;
+    let bindir = pg_config.bin_dir()?;
+    let port = pg_config.port()?;
 
     if !datadir.exists() {
-        initdb(&bindir, &datadir);
+        initdb(&bindir, &datadir)?;
     }
 
-    if status_postgres(major_version, true) {
-        return;
+    if status_postgres(pg_config)? {
+        return Ok(());
     }
 
     println!(
         "{} Postgres v{} on port {}",
         "    Starting".bold().green(),
-        major_version,
+        pg_config.major_version()?,
         port.to_string().bold().cyan()
     );
     let mut command = std::process::Command::new(format!("{}/pg_ctl", bindir.display()));
@@ -49,9 +50,9 @@ pub(crate) fn start_postgres(major_version: u16) {
                 get_pgx_home().display()
             ))
             .arg("-D")
-            .arg(datadir.display().to_string())
+            .arg(&datadir)
             .arg("-l")
-            .arg(logfile.display().to_string())
+            .arg(&logfile)
             .pre_exec(|| {
                 fork::setsid().expect("setsid call failed for pg_ctl");
                 Ok(())
@@ -60,8 +61,8 @@ pub(crate) fn start_postgres(major_version: u16) {
     let command_str = format!("{:?}", command);
 
     let output = handle_result!(
-        format!("failed to start postgres: {}", command_str),
-        command.output()
+        command.output(),
+        format!("failed to start postgres: {}", command_str)
     );
 
     if !output.status.success() {
@@ -71,9 +72,11 @@ pub(crate) fn start_postgres(major_version: u16) {
             String::from_utf8(output.stderr).unwrap()
         )
     }
+
+    Ok(())
 }
 
-fn initdb(bindir: &PathBuf, datadir: &PathBuf) {
+fn initdb(bindir: &PathBuf, datadir: &PathBuf) -> Result<(), std::io::Error> {
     println!(
         " {} data directory at {}",
         "Initializing".bold().green(),
@@ -84,13 +87,10 @@ fn initdb(bindir: &PathBuf, datadir: &PathBuf) {
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
         .arg("-D")
-        .arg(datadir.display().to_string());
-    let command_str = format!("{:?}", command);
+        .arg(&datadir);
 
-    let output = handle_result!(
-        format!("failed to run initdb: {}", command_str),
-        command.output()
-    );
+    let command_str = format!("{:?}", command);
+    let output = command.output()?;
 
     if !output.status.success() {
         exit_with_error!(
@@ -99,4 +99,6 @@ fn initdb(bindir: &PathBuf, datadir: &PathBuf) {
             String::from_utf8(output.stderr).unwrap()
         )
     }
+
+    Ok(())
 }

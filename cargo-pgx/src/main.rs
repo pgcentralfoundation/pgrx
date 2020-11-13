@@ -20,11 +20,18 @@ use crate::commands::stop::stop_postgres;
 use crate::commands::test::test_extension;
 use clap::{App, AppSettings};
 use colored::Colorize;
+use pgx_utils::handle_result;
+use pgx_utils::pg_config::{PgConfig, PgConfigSelector, Pgx};
 use pgx_utils::{exit, exit_with_error, get_pg_config};
 use std::path::PathBuf;
 use std::str::FromStr;
 
 fn main() -> std::result::Result<(), std::io::Error> {
+    handle_result!(do_it(), "");
+    Ok(())
+}
+
+fn do_it() -> std::result::Result<(), std::io::Error> {
     let yaml = load_yaml!("cli.yml");
     let app = App::from(yaml);
 
@@ -35,13 +42,7 @@ fn main() -> std::result::Result<(), std::io::Error> {
 
     if let Some(extension) = matches.subcommand_matches("pgx") {
         let result = match extension.subcommand() {
-            ("init", Some(init)) => {
-                let pg10_path = init.value_of("pg10");
-                let pg11_path = init.value_of("pg11");
-                let pg12_path = init.value_of("pg12");
-
-                init_pgx(pg10_path, pg11_path, pg12_path)
-            }
+            ("init", Some(init)) => init_pgx(&Pgx::default()?),
             ("new", Some(new)) => {
                 let is_bgworker = new.is_present("bgworker");
                 let extname = new
@@ -53,56 +54,68 @@ fn main() -> std::result::Result<(), std::io::Error> {
             }
             ("start", Some(start)) => {
                 let pgver = start.value_of("pg_version").unwrap_or("all");
-                for major_version in make_pg_major_version(pgver) {
-                    start_postgres(*major_version);
+                let pgx = Pgx::from_config()?;
+                for pg_config in pgx.iter(PgConfigSelector::new(pgver)) {
+                    start_postgres(pg_config?)?
                 }
 
                 Ok(())
             }
             ("stop", Some(stop)) => {
                 let pgver = stop.value_of("pg_version").unwrap_or("all");
-                for major_version in make_pg_major_version(pgver) {
-                    stop_postgres(*major_version, true);
+                let pgx = Pgx::from_config()?;
+                for pg_config in pgx.iter(PgConfigSelector::new(pgver)) {
+                    stop_postgres(pg_config?)?
                 }
 
                 Ok(())
             }
             ("status", Some(status)) => {
                 let pgver = status.value_of("pg_version").unwrap_or("all");
-                for major_version in make_pg_major_version(pgver) {
-                    if status_postgres(*major_version, true) {
+                let pgx = Pgx::from_config()?;
+                for pg_config in pgx.iter(PgConfigSelector::new(pgver)) {
+                    let pg_config = pg_config?;
+                    if status_postgres(pg_config)? {
                         println!(
                             "Postgres v{} is {}",
-                            major_version,
+                            pg_config.major_version()?,
                             "running".bold().green()
                         )
                     } else {
-                        println!("Postgres v{} is {}", major_version, "stopped".bold().red())
+                        println!(
+                            "Postgres v{} is {}",
+                            pg_config.major_version()?,
+                            "stopped".bold().red()
+                        )
                     }
                 }
+
                 Ok(())
             }
             ("install", Some(install)) => {
                 let is_release = install.is_present("release");
                 let pg_config = match std::env::var("PGX_TEST_MODE_VERSION") {
                     // for test mode, we want the pg_config specified in PGX_TEST_MODE_VERSION
-                    Ok(pgver) => get_pg_config(u16::from_str(&pgver).expect(
-                        "PGX_TEST_MODE_VERSION does not contain a valid postgres version number",
-                    )),
+                    Ok(pgver) => match Pgx::from_config()?.get(&pgver) {
+                        Ok(pg_config) => pg_config.clone(),
+                        Err(_) => {
+                            return Err(std::io::Error::new(std::io::ErrorKind::InvalidInput,
+                                                           "PGX_TEST_MODE_VERSION does not contain a valid postgres version number"
+                                ));
+                        }
+                    },
 
                     // otherwise, the user just ran "cargo pgx install", and we use whatever "pg_config" is on the path
-                    Err(_) => Some("pg_config".to_string()),
+                    Err(_) => PgConfig::from_path(),
                 };
 
-                install_extension(&pg_config, is_release, None);
-                Ok(())
+                install_extension(&pg_config, is_release, None)
             }
             ("package", Some(package)) => {
                 let is_debug = package.is_present("debug");
-                let pg_config = Some("pg_config".to_string()); // use whatever "pg_config" is on the path
+                let pg_config = PgConfig::from_path(); // use whatever "pg_config" is on the path
 
-                package_extension(&pg_config, is_debug);
-                Ok(())
+                package_extension(&pg_config, is_debug)
             }
             ("run", Some(run)) => {
                 let pgver = run
@@ -113,8 +126,7 @@ fn main() -> std::result::Result<(), std::io::Error> {
                     |v| v.to_string(),
                 );
                 let is_release = run.is_present("release");
-                run_psql(make_pg_major_version(pgver)[0], &dbname, is_release);
-                Ok(())
+                run_psql(Pgx::from_config()?.get(pgver)?, &dbname, is_release)
             }
             ("connect", Some(run)) => {
                 let pgver = run
@@ -124,8 +136,7 @@ fn main() -> std::result::Result<(), std::io::Error> {
                     || get_property("extname").expect("could not determine extension name"),
                     |v| v.to_string(),
                 );
-                connect_psql(make_pg_major_version(pgver)[0], &dbname);
-                Ok(())
+                connect_psql(Pgx::from_config()?.get(pgver)?, &dbname)
             }
             ("test", Some(test)) => {
                 let pgver = test.value_of("pg_version").unwrap_or("all");
@@ -146,9 +157,7 @@ fn main() -> std::result::Result<(), std::io::Error> {
             _ => exit!(extension.usage()),
         };
 
-        if let Err(e) = result {
-            exit!("{}", e)
-        }
+        return result;
     } else {
         exit!(matches.usage())
     }

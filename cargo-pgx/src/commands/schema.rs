@@ -98,19 +98,19 @@ fn process_schema_load_order(mut created: Vec<String>) {
 
     // rewrite the load_order file
     let mut file = handle_result!(
-        format!("failed to create {}", filename.display()),
-        std::fs::File::create(&filename)
+        std::fs::File::create(&filename),
+        format!("failed to create {}", filename.display())
     );
     load_order.iter().for_each(|v| {
         let v = v.trim_start_matches("./sql/");
 
         handle_result!(
-            format!("failed to write to {}", filename.display()),
-            file.write_all(v.as_bytes())
+            file.write_all(v.as_bytes()),
+            format!("failed to write to {}", filename.display())
         );
         handle_result!(
-            format!("failed to write to {}", filename.display()),
-            file.write_all(&[b'\n'])
+            file.write_all(&[b'\n']),
+            format!("failed to write to {}", filename.display())
         );
     });
 }
@@ -135,8 +135,8 @@ fn write_sql_file(f: &DirEntry, statements: Vec<String>) -> (bool, PathBuf) {
         // delete existing sql file if it exists
         if filename.exists() {
             handle_result!(
-                format!("failed to delete {}", filename.display()),
-                std::fs::remove_file(&filename)
+                std::fs::remove_file(&filename),
+                format!("failed to delete {}", filename.display())
             );
         }
 
@@ -144,17 +144,17 @@ fn write_sql_file(f: &DirEntry, statements: Vec<String>) -> (bool, PathBuf) {
     } else {
         // write the statements out to the sql file
         let mut file = handle_result!(
-            format!("failed to create {}", filename.display()),
-            std::fs::File::create(&filename)
+            std::fs::File::create(&filename),
+            format!("failed to create {}", filename.display())
         );
         for statement in statements {
             handle_result!(
-                format!("failed to write to {}", filename.display()),
-                file.write_all(statement.as_bytes())
+                file.write_all(statement.as_bytes()),
+                format!("failed to write to {}", filename.display())
             );
             handle_result!(
-                format!("failed to write to {}", filename.display()),
-                file.write_all(&[b'\n'])
+                file.write_all(&[b'\n']),
+                format!("failed to write to {}", filename.display())
             );
         }
 
@@ -214,8 +214,8 @@ fn delete_generated_sql() {
 
             if f.metadata().unwrap().is_file() && filename.ends_with(".generated.sql") {
                 handle_result!(
-                    format!("failed to delete {}", filename),
-                    std::fs::remove_file(f.path())
+                    std::fs::remove_file(f.path()),
+                    format!("failed to delete {}", filename)
                 );
             }
         }
@@ -1453,7 +1453,7 @@ fn location_comment(rs_file: &DirEntry, span: &Span) -> String {
 
 fn parse_item(stream: proc_macro2::TokenStream) -> Item {
     handle_result!(
-        format!("failed to parse Item from:\n{}", stream.to_string()),
-        syn::parse_str(&stream.to_string())
+        syn::parse_str(&stream.to_string()),
+        format!("failed to parse Item from:\n{}", stream.to_string())
     )
 }

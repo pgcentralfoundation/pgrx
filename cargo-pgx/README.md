@@ -162,7 +162,7 @@ FLAGS:
     -V, --version    Prints version information
 
 ARGS:
-    <PG_VERSION>    Do you want to run against Postgres 'pg10', 'pg11', pg12'?
+    <PG_VERSION>    Do you want to run against Postgres 'pg10', 'pg11', 'pg12', 'pg13'?
     <DBNAME>        The database to connect to (and create if the first time).  Defaults to a database with the same
                     name as the current extension name
 ```
@@ -192,7 +192,7 @@ FLAGS:
     -V, --version    Prints version information
 
 ARGS:
-    <PG_VERSION>    Do you want to run against Postgres 'pg10', 'pg11', pg12'?
+    <PG_VERSION>    Do you want to run against Postgres 'pg10', 'pg11', 'pg12', 'pg13'?
     <DBNAME>        The database to connect to (and create if the first time).  Defaults to a database with the same
                     name as the current extension name
 ```
@@ -252,7 +252,7 @@ FLAGS:
     -V, --version    Prints version information
 
 ARGS:
-    <PG_VERSION>    Do you want to test for Postgres 'pg10', 'pg11', pg12', or 'all' (default)?
+    <PG_VERSION>    Do you want to test for Postgres 'pg10', 'pg11', 'pg12', 'pg13', or 'all' (default)?
 ```
 
 ## Building an Installation Package

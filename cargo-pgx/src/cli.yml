@@ -36,7 +36,7 @@ subcommands:
                     value_name: PG_VERSION
                     takes_value: true
                     required: true
-                    help: the Postgres version to start ('pg10', 'pg11', pg12', or 'all')
+                    help: the Postgres version to start ('pg10', 'pg11', 'pg12', 'pg13', or 'all')
           - stop:
               about: stop a pgx-managed Postgres instance
               args:
@@ -44,7 +44,7 @@ subcommands:
                     value_name: PG_VERSION
                     takes_value: true
                     required: true
-                    help: the Postgres version to stop ('pg10', 'pg11', pg12', or 'all')
+                    help: the Postgres version to stop ('pg10', 'pg11', 'pg12', 'pg13', or 'all')
           - status:
               about: is a pgx-managed Postgres instance running?
               args:
@@ -87,7 +87,7 @@ subcommands:
                     value_name: PG_VERSION
                     takes_value: true
                     required: true
-                    help: Do you want to run against Postgres 'pg10', 'pg11', pg12'?
+                    help: Do you want to run against Postgres 'pg10', 'pg11', 'pg12', 'pg13'?
                 - dbname:
                     value_name: DBNAME
                     takes_value: true
@@ -103,7 +103,7 @@ subcommands:
                     value_name: PG_VERSION
                     takes_value: true
                     required: true
-                    help: Do you want to run against Postgres 'pg10', 'pg11', pg12'?
+                    help: Do you want to run against Postgres 'pg10', 'pg11', 'pg12', 'pg13'?
                 - dbname:
                     value_name: DBNAME
                     takes_value: true
@@ -114,7 +114,7 @@ subcommands:
                 - pg_version:
                     value_name: PG_VERSION
                     takes_value: true
-                    help: Do you want to test for Postgres 'pg10', 'pg11', pg12', or 'all' (default)?
+                    help: Do you want to test for Postgres 'pg10', 'pg11', 'pg12', 'pg13', or 'all' (default)?
                 - release:
                     short: r
                     long: release

@@ -1,6 +1,7 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
+use crate::pg_config::PgConfig;
 use colored::Colorize;
 use proc_macro2::TokenTree;
 use quote::quote;
@@ -13,6 +14,7 @@ use syn::export::TokenStream2;
 use syn::{GenericArgument, ItemFn, PathArguments, ReturnType, Type, TypeParamBound};
 
 pub mod operator_common;
+pub mod pg_config;
 
 pub static BASE_POSTGRES_PORT_NO: u16 = 28800;
 pub static BASE_POSTGRES_TESTING_PORT_NO: u16 = 32200;
@@ -43,7 +45,7 @@ macro_rules! exit {
 
 #[macro_export]
 macro_rules! handle_result {
-    ($message:expr, $expr:expr) => {{
+    ($expr:expr, $message:expr) => {{
         match $expr {
             Ok(result) => result,
             Err(e) => crate::exit_with_error!("{}: {}", $message, e),
@@ -77,11 +79,11 @@ pub fn load_pgx_config() -> PgConfigPaths {
     }
 
     handle_result!(
-        "config.toml invalid",
         toml::from_str::<Configs>(handle_result!(
-            "Unable to read config.toml",
-            &std::fs::read_to_string(path)
-        ))
+            &std::fs::read_to_string(path),
+            "Unable to read config.toml"
+        )),
+        "config.toml invalid"
     )
     .configs
 }
@@ -136,8 +138,8 @@ pub fn get_pgx_home() -> PathBuf {
             dir.push(".pgx");
             if !dir.exists() {
                 handle_result!(
-                    format!("creating {}", dir.display()),
-                    std::fs::create_dir_all(&dir)
+                    std::fs::create_dir_all(&dir),
+                    format!("creating {}", dir.display())
                 );
             }
 
@@ -197,8 +199,8 @@ pub fn run_pg_config(pg_config: &Option<String>, arg: &str) -> String {
         .clone()
         .unwrap_or_else(|| std::env::var("PG_CONFIG").unwrap_or_else(|_| "pg_config".to_string()));
     let output = handle_result!(
-        format!("{}", pg_config),
-        Command::new(&pg_config).arg(arg).output()
+        Command::new(&pg_config).arg(arg).output(),
+        format!("{}", pg_config)
     );
 
     String::from_utf8(output.stdout).unwrap().trim().to_string()
@@ -216,36 +218,31 @@ pub fn prefix_path<P: Into<PathBuf>>(dir: P) -> String {
 }
 
 pub fn createdb(
-    major_version: u16,
-    host: &str,
-    port: u16,
+    pg_config: &PgConfig,
     dbname: &str,
     if_not_exists: bool,
-) -> bool {
-    if if_not_exists && does_db_exist(major_version, host, port, dbname) {
-        return false;
+) -> Result<bool, std::io::Error> {
+    if if_not_exists && does_db_exist(pg_config, dbname)? {
+        return Ok(false);
     }
 
     println!("{} database {}", "    Creating".bold().green(), dbname);
-    let mut command = Command::new(get_createdb_path(major_version));
+    let mut command = Command::new(pg_config.createdb_path()?);
     command
         .env_remove("PGDATABASE")
         .env_remove("PGHOST")
         .env_remove("PGPORT")
         .env_remove("PGUSER")
         .arg("-h")
-        .arg(host)
+        .arg(pg_config.host())
         .arg("-p")
-        .arg(port.to_string())
+        .arg(pg_config.port()?.to_string())
         .arg(dbname)
         .stdout(Stdio::piped())
         .stderr(Stdio::piped());
     let command_str = format!("{:?}", command);
 
-    let output = handle_result!(
-        format!("Failed to create database {}", dbname),
-        command.output()
-    );
+    let output = command.output()?;
 
     if !output.status.success() {
         exit_with_error!(
@@ -256,17 +253,17 @@ pub fn createdb(
         )
     }
 
-    true
+    Ok(true)
 }
 
-fn does_db_exist(major_version: u16, host: &str, port: u16, dbname: &str) -> bool {
-    let mut command = Command::new(get_psql_path(major_version));
+fn does_db_exist(pg_config: &PgConfig, dbname: &str) -> Result<bool, std::io::Error> {
+    let mut command = Command::new(pg_config.psql_path()?);
     command
         .arg("-XqAt")
         .arg("-h")
-        .arg(host)
+        .arg(pg_config.host())
         .arg("-p")
-        .arg(port.to_string())
+        .arg(pg_config.port()?.to_string())
         .arg("template1")
         .arg("-c")
         .arg(&format!(
@@ -275,12 +272,9 @@ fn does_db_exist(major_version: u16, host: &str, port: u16, dbname: &str) -> boo
         ))
         .stdout(Stdio::piped())
         .stderr(Stdio::piped());
-    let command_str = format!("{:?}", command);
 
-    let output = handle_result!(
-        format!("Failed to create database {}", dbname),
-        command.output()
-    );
+    let command_str = format!("{:?}", command);
+    let output = command.output()?;
 
     if !output.status.success() {
         exit_with_error!(
@@ -293,7 +287,7 @@ fn does_db_exist(major_version: u16, host: &str, port: u16, dbname: &str) -> boo
     } else {
         let count = i32::from_str(&String::from_utf8(output.stdout).unwrap().trim())
             .expect("result is not a number");
-        count > 0
+        Ok(count > 0)
     }
 }
 

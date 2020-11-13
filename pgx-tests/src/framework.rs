@@ -232,7 +232,7 @@ fn install_extension() {
         .stderr(Stdio::inherit())
         .env(
             "PGX_TEST_MODE_VERSION",
-            pg_sys::get_pg_major_version_string().to_string(),
+            format!("pg{}", pg_sys::get_pg_major_version_string()),
         )
         .env("CARGO_TARGET_DIR", get_target_dir())
         .env(
