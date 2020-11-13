@@ -4,9 +4,7 @@
 use crate::commands::status::status_postgres;
 use colored::Colorize;
 use pgx_utils::pg_config::{PgConfig, Pgx};
-use pgx_utils::{
-    exit_with_error, get_pgbin_dir, get_pgdata_dir, get_pgx_config_path, handle_result,
-};
+
 use std::process::Stdio;
 
 pub(crate) fn stop_postgres(pg_config: &PgConfig) -> Result<(), std::io::Error> {

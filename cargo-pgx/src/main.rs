@@ -22,7 +22,7 @@ use clap::{App, AppSettings};
 use colored::Colorize;
 use pgx_utils::handle_result;
 use pgx_utils::pg_config::{PgConfig, PgConfigSelector, Pgx};
-use pgx_utils::{exit, exit_with_error, get_pg_config};
+use pgx_utils::{exit, exit_with_error};
 use std::path::PathBuf;
 use std::str::FromStr;
 
@@ -42,7 +42,7 @@ fn do_it() -> std::result::Result<(), std::io::Error> {
 
     if let Some(extension) = matches.subcommand_matches("pgx") {
         let result = match extension.subcommand() {
-            ("init", Some(init)) => init_pgx(&Pgx::default()?),
+            ("init", Some(_init)) => init_pgx(&Pgx::default()?),
             ("new", Some(new)) => {
                 let is_bgworker = new.is_present("bgworker");
                 let extname = new
@@ -161,8 +161,6 @@ fn do_it() -> std::result::Result<(), std::io::Error> {
     } else {
         exit!(matches.usage())
     }
-
-    Ok(())
 }
 
 fn validate_extension_name(extname: &str) {

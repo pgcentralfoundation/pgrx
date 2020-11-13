@@ -5,9 +5,7 @@ use crate::commands::get::{find_control_file, get_property};
 use crate::commands::schema::read_load_order;
 use colored::Colorize;
 use pgx_utils::pg_config::PgConfig;
-use pgx_utils::{
-    exit_with_error, get_pg_config_major_version, get_target_dir, handle_result, run_pg_config,
-};
+use pgx_utils::{exit_with_error, get_target_dir, handle_result};
 use std::io::Write;
 use std::path::PathBuf;
 use std::process::{Command, Stdio};

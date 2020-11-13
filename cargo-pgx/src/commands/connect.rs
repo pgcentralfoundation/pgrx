@@ -5,7 +5,7 @@ use crate::commands::run::exec_psql;
 use crate::commands::start::start_postgres;
 use colored::Colorize;
 use pgx_utils::pg_config::PgConfig;
-use pgx_utils::{createdb, BASE_POSTGRES_PORT_NO};
+use pgx_utils::{createdb};
 
 pub(crate) fn connect_psql(pg_config: &PgConfig, dbname: &str) -> Result<(), std::io::Error> {
     // restart postgres

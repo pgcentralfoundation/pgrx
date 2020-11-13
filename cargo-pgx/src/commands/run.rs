@@ -6,7 +6,7 @@ use crate::commands::start::start_postgres;
 use crate::commands::stop::stop_postgres;
 use colored::Colorize;
 use pgx_utils::pg_config::PgConfig;
-use pgx_utils::{createdb, get_pg_config, get_psql_path, BASE_POSTGRES_PORT_NO};
+use pgx_utils::{createdb};
 use std::os::unix::process::CommandExt;
 use std::process::Command;
 

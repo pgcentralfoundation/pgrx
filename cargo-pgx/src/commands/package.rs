@@ -3,8 +3,8 @@
 
 use crate::commands::get::get_property;
 use crate::commands::install::install_extension;
+use pgx_utils::get_target_dir;
 use pgx_utils::pg_config::PgConfig;
-use pgx_utils::{get_pg_config_major_version, get_target_dir, handle_result};
 use std::path::PathBuf;
 
 pub(crate) fn package_extension(

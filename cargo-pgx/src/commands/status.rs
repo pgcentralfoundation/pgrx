@@ -2,7 +2,7 @@
 // governed by the MIT license that can be found in the LICENSE file.
 
 use pgx_utils::pg_config::PgConfig;
-use pgx_utils::{exit_with_error, get_pgbin_dir, get_pgdata_dir, handle_result};
+use pgx_utils::{exit_with_error};
 use std::process::Stdio;
 
 pub(crate) fn status_postgres(pg_config: &PgConfig) -> Result<bool, std::io::Error> {

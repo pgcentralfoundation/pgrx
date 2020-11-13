@@ -4,19 +4,15 @@
 use crate::commands::stop::stop_postgres;
 use colored::Colorize;
 use pgx_utils::pg_config::{PgConfig, PgConfigSelector, Pgx};
-use pgx_utils::{
-    exit_with_error, get_pgx_config_path, get_pgx_home, handle_result, prefix_path,
-    BASE_POSTGRES_PORT_NO,
-};
+use pgx_utils::{exit_with_error, handle_result, prefix_path};
 use rayon::prelude::*;
 use rttp_client::{types::Proxy, HttpClient};
-use std::fmt::Display;
+
 use std::fs::File;
 use std::io::Write;
 use std::path::PathBuf;
-use std::str::FromStr;
+
 use std::sync::{Arc, Mutex};
-use syn::export::Formatter;
 
 static PROCESS_ENV_DENYLIST: &'static [&'static str] = &[
     "DEBUG",

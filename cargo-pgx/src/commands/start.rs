@@ -3,11 +3,8 @@
 
 use crate::commands::status::status_postgres;
 use colored::Colorize;
-use pgx_utils::pg_config::PgConfig;
-use pgx_utils::{
-    exit_with_error, get_pgbin_dir, get_pgdata_dir, get_pglog_file, get_pgx_home, handle_result,
-    BASE_POSTGRES_PORT_NO,
-};
+use pgx_utils::pg_config::{PgConfig, Pgx};
+use pgx_utils::{exit_with_error};
 use std::os::unix::process::CommandExt;
 use std::path::PathBuf;
 use std::process::Stdio;
@@ -47,7 +44,7 @@ pub(crate) fn start_postgres(pg_config: &PgConfig) -> Result<(), std::io::Error>
             .arg(format!(
                 "-o -i -p {} -c unix_socket_directories={}",
                 port,
-                get_pgx_home().display()
+                Pgx::home()?.display()
             ))
             .arg("-D")
             .arg(&datadir)
@@ -58,12 +55,9 @@ pub(crate) fn start_postgres(pg_config: &PgConfig) -> Result<(), std::io::Error>
                 Ok(())
             });
     }
-    let command_str = format!("{:?}", command);
 
-    let output = handle_result!(
-        command.output(),
-        format!("failed to start postgres: {}", command_str)
-    );
+    let command_str = format!("{:?}", command);
+    let output = command.output()?;
 
     if !output.status.success() {
         exit_with_error!(
