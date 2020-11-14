@@ -88,6 +88,7 @@ pub use xid::*;
 
 pub use pgx_pg_sys as pg_sys; // the module only, not its contents
 pub use pgx_pg_sys::submodules::*;
+pub use pgx_pg_sys::PgBuiltInOids; // reexport this so it looks like it comes from here
 
 /// A macro for marking a library compatible with the Postgres extension framework.
 ///

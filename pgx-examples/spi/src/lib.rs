@@ -28,6 +28,8 @@ fn spi_return_query(
     let query = "SELECT oid, relname::text || '-pg11' FROM pg_class";
     #[cfg(feature = "pg12")]
     let query = "SELECT oid, relname::text || '-pg12' FROM pg_class";
+    #[cfg(feature = "pg13")]
+    let query = "SELECT oid, relname::text || '-pg13' FROM pg_class";
 
     let mut results = Vec::new();
     Spi::connect(|client| {
