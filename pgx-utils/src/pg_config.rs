@@ -1,3 +1,4 @@
+//! Wrapper around Postgres' `pg_config` command-line tool
 use colored::Colorize;
 use std::collections::HashMap;
 use std::io::ErrorKind;

@@ -5,7 +5,6 @@ use crate::pg_config::PgConfig;
 use colored::Colorize;
 use proc_macro2::TokenTree;
 use quote::quote;
-use serde_derive::Deserialize;
 use std::collections::HashSet;
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
@@ -53,108 +52,6 @@ macro_rules! handle_result {
     }};
 }
 
-#[derive(Debug, Deserialize)]
-pub struct PgConfigPaths {
-    pub pg10: String,
-    pub pg11: String,
-    pub pg12: String,
-}
-
-#[derive(Debug, Deserialize)]
-struct Configs {
-    configs: PgConfigPaths,
-}
-
-pub fn load_pgx_config() -> PgConfigPaths {
-    let path = get_pgx_config_path();
-
-    if !path.exists() {
-        // TODO:  do this automatically if an environment variable is set?
-        //        I think we want/need that ability
-        exit_with_error!(
-            "{} not found.  Have you run `{}` yet?",
-            path.display(),
-            "cargo pgx init".bold().yellow()
-        )
-    }
-
-    handle_result!(
-        toml::from_str::<Configs>(handle_result!(
-            &std::fs::read_to_string(path),
-            "Unable to read config.toml"
-        )),
-        "config.toml invalid"
-    )
-    .configs
-}
-
-pub fn get_pgbin_dir(major_version: u16) -> PathBuf {
-    run_pg_config(&get_pg_config(major_version), "--bindir").into()
-}
-
-pub fn get_postmaster_path(major_version: u16) -> PathBuf {
-    let mut path = get_pgbin_dir(major_version);
-    path.push("postmaster");
-    path
-}
-
-pub fn get_initdb_path(major_version: u16) -> PathBuf {
-    let mut path = get_pgbin_dir(major_version);
-    path.push("initdb");
-    path
-}
-
-pub fn get_createdb_path(major_version: u16) -> PathBuf {
-    let mut path = get_pgbin_dir(major_version);
-    path.push("createdb");
-    path
-}
-
-pub fn get_dropdb_path(major_version: u16) -> PathBuf {
-    let mut path = get_pgbin_dir(major_version);
-    path.push("dropdb");
-    path
-}
-
-pub fn get_pgdata_dir(major_version: u16) -> PathBuf {
-    let mut path = get_pgx_home();
-    path.push(format!("data-{}", major_version));
-    path
-}
-
-pub fn get_pglog_file(major_version: u16) -> PathBuf {
-    let mut path = get_pgx_home();
-    path.push(format!("{}.log", major_version));
-    path
-}
-
-pub fn get_pgx_home() -> PathBuf {
-    std::env::var("PGX_HOME").map_or_else(
-        |_| {
-            let mut dir = match dirs::home_dir() {
-                Some(dir) => dir,
-                None => exit_with_error!("You don't seem to have a home directory"),
-            };
-            dir.push(".pgx");
-            if !dir.exists() {
-                handle_result!(
-                    std::fs::create_dir_all(&dir),
-                    format!("creating {}", dir.display())
-                );
-            }
-
-            dir
-        },
-        |v| v.into(),
-    )
-}
-
-pub fn get_pgx_config_path() -> PathBuf {
-    let mut path = get_pgx_home();
-    path.push("config.toml");
-    path
-}
-
 pub fn get_target_dir() -> PathBuf {
     std::env::var("CARGO_TARGET_DIR").map_or_else(
         |_| {
@@ -164,46 +61,6 @@ pub fn get_target_dir() -> PathBuf {
         },
         |v| v.into(),
     )
-}
-
-pub fn get_pg_config(major_version: u16) -> Option<String> {
-    let paths = load_pgx_config();
-    match major_version {
-        10 => Some(paths.pg10),
-        11 => Some(paths.pg11),
-        12 => Some(paths.pg12),
-        _ => None,
-    }
-}
-
-pub fn get_pg_config_major_version(pg_config: &Option<String>) -> u16 {
-    let version_string = run_pg_config(&pg_config, "--version");
-    let version_parts = version_string.split_whitespace().collect::<Vec<&str>>();
-    let version = version_parts.get(1);
-    let version = f64::from_str(&version.unwrap()).expect("not a valid version number");
-    version.floor() as u16
-}
-
-pub fn get_pg_download_dir() -> PathBuf {
-    std::env::var("PG_DOWNLOAD_TARGET_DIR").map_or_else(|_| get_target_dir(), |v| v.into())
-}
-
-pub fn get_psql_path(major_version: u16) -> PathBuf {
-    let mut bindir = get_pgbin_dir(major_version);
-    bindir.push("psql");
-    bindir
-}
-
-pub fn run_pg_config(pg_config: &Option<String>, arg: &str) -> String {
-    let pg_config = pg_config
-        .clone()
-        .unwrap_or_else(|| std::env::var("PG_CONFIG").unwrap_or_else(|_| "pg_config".to_string()));
-    let output = handle_result!(
-        Command::new(&pg_config).arg(arg).output(),
-        format!("{}", pg_config)
-    );
-
-    String::from_utf8(output.stdout).unwrap().trim().to_string()
 }
 
 pub fn prefix_path<P: Into<PathBuf>>(dir: P) -> String {
