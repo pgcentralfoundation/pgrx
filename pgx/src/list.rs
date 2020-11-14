@@ -65,16 +65,7 @@ impl<T> PgList<T> {
         if self.list.is_null() {
             None
         } else {
-            Some(unsafe {
-                self.list
-                    .as_ref()
-                    .unwrap()
-                    .head
-                    .as_ref()
-                    .unwrap()
-                    .data
-                    .ptr_value
-            } as *mut T)
+            Some(unsafe { pg_sys::pgx_list_nth(self.list, 0) } as *mut T)
         }
     }
 
@@ -83,16 +74,7 @@ impl<T> PgList<T> {
         if self.list.is_null() {
             None
         } else {
-            Some(unsafe {
-                self.list
-                    .as_ref()
-                    .unwrap()
-                    .tail
-                    .as_ref()
-                    .unwrap()
-                    .data
-                    .ptr_value
-            } as *mut T)
+            Some(unsafe { pg_sys::pgx_list_nth(self.list, (self.len() - 1) as i32) } as *mut T)
         }
     }
 
@@ -104,7 +86,7 @@ impl<T> PgList<T> {
         if self.list.is_null() || i >= self.len() {
             None
         } else {
-            Some(unsafe { pg_sys::list_nth(self.list, i as i32) } as *mut T)
+            Some(unsafe { pg_sys::pgx_list_nth(self.list, i as i32) } as *mut T)
         }
     }
 
@@ -117,7 +99,7 @@ impl<T> PgList<T> {
         if self.list.is_null() || i >= self.len() {
             None
         } else {
-            Some(unsafe { pg_sys::list_nth_int(self.list, i as i32) })
+            Some(unsafe { pg_sys::pgx_list_nth_int(self.list, i as i32) })
         }
     }
 
@@ -130,31 +112,63 @@ impl<T> PgList<T> {
         if self.list.is_null() || i >= self.len() {
             None
         } else {
-            Some(unsafe { pg_sys::list_nth_oid(self.list, i as i32) })
+            Some(unsafe { pg_sys::pgx_list_nth_oid(self.list, i as i32) })
         }
     }
 
+    #[cfg(not(feature = "pg13"))]
     #[inline]
     pub fn replace_ptr(&mut self, i: usize, with: *mut T) {
         unsafe {
-            let cell = pg_sys::list_nth_cell(self.list, i as i32);
+            let cell = pg_sys::pgx_list_nth_cell(self.list, i as i32);
+
             cell.as_mut().expect("cell is null").data.ptr_value = with as void_mut_ptr;
         }
     }
 
+    #[cfg(feature = "pg13")]
+    #[inline]
+    pub fn replace_ptr(&mut self, i: usize, with: *mut T) {
+        unsafe {
+            let cell = pg_sys::pgx_list_nth_cell(self.list, i as i32);
+
+            cell.as_mut().expect("cell is null").ptr_value = with as void_mut_ptr;
+        }
+    }
+
+    #[cfg(not(feature = "pg13"))]
     #[inline]
     pub fn replace_int(&mut self, i: usize, with: i32) {
         unsafe {
-            let cell = pg_sys::list_nth_cell(self.list, i as i32);
+            let cell = pg_sys::pgx_list_nth_cell(self.list, i as i32);
             cell.as_mut().expect("cell is null").data.int_value = with;
         }
     }
 
+    #[cfg(feature = "pg13")]
+    #[inline]
+    pub fn replace_int(&mut self, i: usize, with: i32) {
+        unsafe {
+            let cell = pg_sys::pgx_list_nth_cell(self.list, i as i32);
+            cell.as_mut().expect("cell is null").int_value = with;
+        }
+    }
+
+    #[cfg(not(feature = "pg13"))]
     #[inline]
     pub fn replace_oid(&mut self, i: usize, with: pg_sys::Oid) {
         unsafe {
-            let cell = pg_sys::list_nth_cell(self.list, i as i32);
+            let cell = pg_sys::pgx_list_nth_cell(self.list, i as i32);
             cell.as_mut().expect("cell is null").data.oid_value = with;
+        }
+    }
+
+    #[cfg(feature = "pg13")]
+    #[inline]
+    pub fn replace_oid(&mut self, i: usize, with: pg_sys::Oid) {
+        unsafe {
+            let cell = pg_sys::pgx_list_nth_cell(self.list, i as i32);
+            cell.as_mut().expect("cell is null").oid_value = with;
         }
     }
 

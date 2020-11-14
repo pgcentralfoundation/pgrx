@@ -1,7 +1,6 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-
 #[cfg(any(test, feature = "pg_test"))]
 mod tests {
     #[allow(unused_imports)]
@@ -70,16 +69,18 @@ mod tests {
             fn planner(
                 &mut self,
                 parse: PgBox<Query>,
+                query_string: *const std::os::raw::c_char,
                 cursor_options: i32,
                 bound_params: PgBox<ParamListInfoData>,
                 prev_hook: fn(
                     PgBox<Query>,
+                    query_string: *const std::os::raw::c_char,
                     i32,
                     PgBox<ParamListInfoData>,
                 ) -> HookResult<*mut PlannedStmt>,
             ) -> HookResult<*mut PlannedStmt> {
                 self.events += 1;
-                prev_hook(parse, cursor_options, bound_params)
+                prev_hook(parse, query_string, cursor_options, bound_params)
             }
         }
 

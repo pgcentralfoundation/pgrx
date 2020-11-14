@@ -265,10 +265,14 @@ fn impl_pg_node(items: &Vec<syn::Item>) -> Result<Vec<syn::Item>, Box<dyn Error 
             impl pg_sys::PgNode for #struct_name { }
         })?;
 
-        pgnode_impls.push(impl_item);
+        pgnode_impls.push((struct_name.to_string(), impl_item));
     }
 
-    Ok(pgnode_impls)
+    // sort the pgnode impls by their struct name so that we have a consistent ordering in our bindings output
+    pgnode_impls.sort_by(|(a_name, _), (b_name, _)| a_name.cmp(b_name));
+
+    // pluck out the syn::Item field and return as a Vec
+    Ok(pgnode_impls.into_iter().map(|(_, item)| item).collect())
 }
 
 /// Given a root node, dfs_find_nodes adds all its children nodes to `node_set`.
@@ -472,15 +476,10 @@ fn build_shim(shim_dir: &PathBuf, pg_config: &PgConfig) -> Result<(), std::io::E
     build_shim_for_version(&shim_dir, pg_config)?;
 
     // no matter what, tell rustc to link to the library that was built for the feature we're currently building
-    if std::env::var("CARGO_FEATURE_PG10").is_ok() {
+    let envvar_name = format!("CARGO_FEATURE_PG{}", major_version);
+    if std::env::var(envvar_name).is_ok() {
         println!("cargo:rustc-link-search={}", shim_dir.display());
-        println!("cargo:rustc-link-lib=static=pgx-cshim-10");
-    } else if std::env::var("CARGO_FEATURE_PG11").is_ok() {
-        println!("cargo:rustc-link-search={}", shim_dir.display());
-        println!("cargo:rustc-link-lib=static=pgx-cshim-11");
-    } else if std::env::var("CARGO_FEATURE_PG12").is_ok() {
-        println!("cargo:rustc-link-search={}", shim_dir.display());
-        println!("cargo:rustc-link-lib=static=pgx-cshim-12");
+        println!("cargo:rustc-link-lib=static=pgx-cshim-{}", major_version);
     }
 
     Ok(())

@@ -148,6 +148,10 @@ impl PgConfig {
         Ok(BASE_POSTGRES_PORT_NO + self.major_version()?)
     }
 
+    pub fn test_port(&self) -> Result<u16, std::io::Error> {
+        Ok(BASE_POSTGRES_TESTING_PORT_NO + self.major_version()?)
+    }
+
     pub fn host(&self) -> &'static str {
         "localhost"
     }
@@ -234,7 +238,7 @@ pub struct Pgx {
     pg_configs: Vec<PgConfig>,
 }
 
-use crate::BASE_POSTGRES_PORT_NO;
+use crate::{BASE_POSTGRES_PORT_NO, BASE_POSTGRES_TESTING_PORT_NO};
 use serde_derive::{Deserialize, Serialize};
 use std::fmt::Display;
 use syn::export::Formatter;

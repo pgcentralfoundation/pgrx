@@ -21,7 +21,7 @@ pg12 = [ "pgx-pg-sys/pg12" ]
 pg13 = [ "pgx-pg-sys/pg13" ]
 
 [package.metadata.docs.rs]
-features = ["pg12"]
+features = ["pg13"]
 no-default-features = true
 
 [dependencies]

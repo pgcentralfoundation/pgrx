@@ -3,25 +3,7 @@
 
 //! Helper functions and such for Postgres' various query tree `Node`s
 
-#[cfg(feature = "pg10")]
-mod pg10;
-
-#[cfg(feature = "pg11")]
-mod pg11;
-
-#[cfg(feature = "pg12")]
-mod pg12;
-
-#[cfg(feature = "pg10")]
-pub use pg10::*;
-
-#[cfg(feature = "pg11")]
-pub use pg11::*;
-
-#[cfg(feature = "pg12")]
-pub use pg12::*;
-
-use crate::{pg_sys, PgBox};
+use crate::pg_sys;
 
 /// #define IsA(nodeptr,_type_)            (nodeTag(nodeptr) == T_##_type_)
 #[allow(clippy::not_unsafe_ptr_arg_deref)] // ok b/c we check that nodeptr isn't null
@@ -44,13 +26,5 @@ pub fn node_to_string<'a>(nodeptr: *mut pg_sys::Node) -> Option<&'a str> {
                     .expect("unable to convert Node into a &str"),
             )
         }
-    }
-}
-
-impl PgNode {
-    pub fn is<T>(self, boxed: PgBox<T>) -> bool {
-        let node = boxed.as_ptr() as *mut pg_sys::Node;
-        let me = self as u32;
-        !node.is_null() && unsafe { node.as_ref() }.unwrap().type_ == me
     }
 }

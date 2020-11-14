@@ -77,6 +77,7 @@ pub fn prefix_path<P: Into<PathBuf>>(dir: P) -> String {
 pub fn createdb(
     pg_config: &PgConfig,
     dbname: &str,
+    is_test: bool,
     if_not_exists: bool,
 ) -> Result<bool, std::io::Error> {
     if if_not_exists && does_db_exist(pg_config, dbname)? {
@@ -93,7 +94,11 @@ pub fn createdb(
         .arg("-h")
         .arg(pg_config.host())
         .arg("-p")
-        .arg(pg_config.port()?.to_string())
+        .arg(if is_test {
+            pg_config.test_port()?.to_string()
+        } else {
+            pg_config.port()?.to_string()
+        })
         .arg(dbname)
         .stdout(Stdio::piped())
         .stderr(Stdio::piped());

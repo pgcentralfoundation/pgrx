@@ -3,17 +3,6 @@
 
 use crate::pg_sys;
 
-#[cfg(feature = "pg12")]
-#[inline]
-pub fn xid_to_64bit(xid: pg_sys::TransactionId) -> u64 {
-    let full_xid = unsafe { pg_sys::pg12::ReadNextFullTransactionId() };
-
-    let last_xid = full_xid.value as u32;
-    let epoch = (full_xid.value >> 32) as u32;
-
-    convert_xid_common(xid, last_xid, epoch)
-}
-
 #[cfg(any(feature = "pg10", feature = "pg11"))]
 #[inline]
 pub fn xid_to_64bit(xid: pg_sys::TransactionId) -> u64 {
@@ -23,6 +12,17 @@ pub fn xid_to_64bit(xid: pg_sys::TransactionId) -> u64 {
     unsafe {
         pg_sys::GetNextXidAndEpoch(&mut last_xid, &mut epoch);
     }
+
+    convert_xid_common(xid, last_xid, epoch)
+}
+
+#[cfg(any(feature = "pg12", feature = "pg13"))]
+#[inline]
+pub fn xid_to_64bit(xid: pg_sys::TransactionId) -> u64 {
+    let full_xid = unsafe { pg_sys::ReadNextFullTransactionId() };
+
+    let last_xid = full_xid.value as u32;
+    let epoch = (full_xid.value >> 32) as u32;
 
     convert_xid_common(xid, last_xid, epoch)
 }

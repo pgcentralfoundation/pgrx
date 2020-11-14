@@ -5,8 +5,8 @@ use crate::commands::install::install_extension;
 use crate::commands::start::start_postgres;
 use crate::commands::stop::stop_postgres;
 use colored::Colorize;
+use pgx_utils::createdb;
 use pgx_utils::pg_config::PgConfig;
-use pgx_utils::{createdb};
 use std::os::unix::process::CommandExt;
 use std::process::Command;
 
@@ -25,7 +25,7 @@ pub(crate) fn run_psql(
     start_postgres(pg_config)?;
 
     // create the named database
-    if !createdb(pg_config, dbname, true)? {
+    if !createdb(pg_config, dbname, false, true)? {
         println!(
             "{} existing database {}",
             "    Re-using".bold().cyan(),

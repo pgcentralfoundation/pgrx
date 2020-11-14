@@ -29,13 +29,13 @@ pub use submodules::*;
 
 // feature gate each pg version module
 #[cfg(feature = "pg10")]
-mod pg10;
+pub mod pg10;
 #[cfg(feature = "pg11")]
-mod pg11;
+pub mod pg11;
 #[cfg(feature = "pg12")]
-mod pg12;
+pub mod pg12;
 #[cfg(feature = "pg13")]
-mod pg13;
+pub mod pg13;
 
 // export that module publicly
 #[cfg(feature = "pg10")]
@@ -49,13 +49,13 @@ pub use pg13::*;
 
 // feature gate each pg-specific oid module
 #[cfg(feature = "pg10")]
-mod pg10_oids;
+pub mod pg10_oids;
 #[cfg(feature = "pg11")]
-mod pg11_oids;
+pub mod pg11_oids;
 #[cfg(feature = "pg12")]
-mod pg12_oids;
+pub mod pg12_oids;
 #[cfg(feature = "pg13")]
-mod pg13_oids;
+pub mod pg13_oids;
 
 // export that module publicly
 #[cfg(feature = "pg10")]
@@ -101,6 +101,14 @@ mod all_versions {
     pub const FrozenTransactionId: super::TransactionId = 2 as super::TransactionId;
     pub const FirstNormalTransactionId: super::TransactionId = 3 as super::TransactionId;
     pub const MaxTransactionId: super::TransactionId = 0xFFFF_FFFF as super::TransactionId;
+
+    #[pgx_macros::pg_guard]
+    extern "C" {
+        pub fn pgx_list_nth(list: *mut super::List, nth: i32) -> *mut std::os::raw::c_void;
+        pub fn pgx_list_nth_int(list: *mut super::List, nth: i32) -> i32;
+        pub fn pgx_list_nth_oid(list: *mut super::List, nth: i32) -> super::Oid;
+        pub fn pgx_list_nth_cell(list: *mut super::List, nth: i32) -> *mut super::ListCell;
+    }
 
     #[inline]
     pub fn VARHDRSZ_EXTERNAL() -> usize {
@@ -172,7 +180,7 @@ mod all_versions {
         index: super::Index,
         range_table: *mut super::List,
     ) -> *mut super::RangeTblEntry {
-        super::list_nth(range_table, index as i32 - 1) as *mut super::RangeTblEntry
+        pgx_list_nth(range_table, index as i32 - 1) as *mut super::RangeTblEntry
     }
 
     #[inline]
@@ -269,6 +277,7 @@ mod internal {
 
         pub use crate::pg10::tupleDesc as TupleDescData;
         pub use crate::pg10::AllocSetContextCreate as AllocSetContextCreateExtended;
+        pub type QueryCompletion = std::os::raw::c_char;
 
         pub unsafe fn add_string_reloption(
             kinds: bits32,
@@ -365,6 +374,7 @@ mod internal {
         pub use crate::pg11::*;
 
         pub use crate::pg11::tupleDesc as TupleDescData;
+        pub type QueryCompletion = std::os::raw::c_char;
 
         /// # Safety
         ///
@@ -394,6 +404,7 @@ mod internal {
         pub use crate::pg12::*;
 
         pub use crate::pg12::AllocSetContextCreateInternal as AllocSetContextCreateExtended;
+        pub type QueryCompletion = std::os::raw::c_char;
 
         pub const QTW_EXAMINE_RTES: u32 = crate::pg12::QTW_EXAMINE_RTES_BEFORE;
 
@@ -442,7 +453,7 @@ mod internal {
         pub unsafe fn IndexBuildHeapScan<T>(
             heap_relation: crate::Relation,
             index_relation: crate::Relation,
-            index_info: *mut crate::pg12::IndexInfo,
+            index_info: *mut crate::IndexInfo,
             build_callback: crate::IndexBuildCallback,
             build_callback_state: *mut T,
         ) {
