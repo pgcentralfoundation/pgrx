@@ -1,13 +1,12 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-
 use crate::pg_sys;
 
 #[cfg(feature = "pg12")]
 #[inline]
 pub fn xid_to_64bit(xid: pg_sys::TransactionId) -> u64 {
-    let full_xid = unsafe { pg_sys::pg12_specific::ReadNextFullTransactionId() };
+    let full_xid = unsafe { pg_sys::pg12::ReadNextFullTransactionId() };
 
     let last_xid = full_xid.value as u32;
     let epoch = (full_xid.value >> 32) as u32;

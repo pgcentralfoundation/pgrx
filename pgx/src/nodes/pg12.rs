@@ -15,168 +15,168 @@ pub enum PgNode {
     ExprContext = pg_sys::NodeTag_T_ExprContext as isize,
     ProjectionInfo = pg_sys::NodeTag_T_ProjectionInfo as isize,
     JunkFilter = pg_sys::NodeTag_T_JunkFilter as isize,
-    OnConflictSetState = pg_sys::pg12_specific::NodeTag_T_OnConflictSetState as isize,
-    ResultRelInfo = pg_sys::pg12_specific::NodeTag_T_ResultRelInfo as isize,
-    EState = pg_sys::pg12_specific::NodeTag_T_EState as isize,
-    TupleTableSlot = pg_sys::pg12_specific::NodeTag_T_TupleTableSlot as isize,
+    OnConflictSetState = pg_sys::pg12::NodeTag_T_OnConflictSetState as isize,
+    ResultRelInfo = pg_sys::pg12::NodeTag_T_ResultRelInfo as isize,
+    EState = pg_sys::pg12::NodeTag_T_EState as isize,
+    TupleTableSlot = pg_sys::pg12::NodeTag_T_TupleTableSlot as isize,
 
     /*
      * TAGS FOR PLAN NODES (plannodes.h)
      */
-    Plan = pg_sys::pg12_specific::NodeTag_T_Plan as isize,
-    Result = pg_sys::pg12_specific::NodeTag_T_Result as isize,
-    ProjectSet = pg_sys::pg12_specific::NodeTag_T_ProjectSet as isize,
-    ModifyTable = pg_sys::pg12_specific::NodeTag_T_ModifyTable as isize,
-    Append = pg_sys::pg12_specific::NodeTag_T_Append as isize,
-    MergeAppend = pg_sys::pg12_specific::NodeTag_T_MergeAppend as isize,
-    RecursiveUnion = pg_sys::pg12_specific::NodeTag_T_RecursiveUnion as isize,
-    BitmapAnd = pg_sys::pg12_specific::NodeTag_T_BitmapAnd as isize,
-    BitmapOr = pg_sys::pg12_specific::NodeTag_T_BitmapOr as isize,
-    Scan = pg_sys::pg12_specific::NodeTag_T_Scan as isize,
-    SeqScan = pg_sys::pg12_specific::NodeTag_T_SeqScan as isize,
-    SampleScan = pg_sys::pg12_specific::NodeTag_T_SampleScan as isize,
-    IndexScan = pg_sys::pg12_specific::NodeTag_T_IndexScan as isize,
-    IndexOnlyScan = pg_sys::pg12_specific::NodeTag_T_IndexOnlyScan as isize,
-    BitmapIndexScan = pg_sys::pg12_specific::NodeTag_T_BitmapIndexScan as isize,
-    BitmapHeapScan = pg_sys::pg12_specific::NodeTag_T_BitmapHeapScan as isize,
-    TidScan = pg_sys::pg12_specific::NodeTag_T_TidScan as isize,
-    SubqueryScan = pg_sys::pg12_specific::NodeTag_T_SubqueryScan as isize,
-    FunctionScan = pg_sys::pg12_specific::NodeTag_T_FunctionScan as isize,
-    ValuesScan = pg_sys::pg12_specific::NodeTag_T_ValuesScan as isize,
-    TableFuncScan = pg_sys::pg12_specific::NodeTag_T_TableFuncScan as isize,
-    CteScan = pg_sys::pg12_specific::NodeTag_T_CteScan as isize,
-    NamedTuplestoreScan = pg_sys::pg12_specific::NodeTag_T_NamedTuplestoreScan as isize,
-    WorkTableScan = pg_sys::pg12_specific::NodeTag_T_WorkTableScan as isize,
-    ForeignScan = pg_sys::pg12_specific::NodeTag_T_ForeignScan as isize,
-    CustomScan = pg_sys::pg12_specific::NodeTag_T_CustomScan as isize,
-    Join = pg_sys::pg12_specific::NodeTag_T_Join as isize,
-    NestLoop = pg_sys::pg12_specific::NodeTag_T_NestLoop as isize,
-    MergeJoin = pg_sys::pg12_specific::NodeTag_T_MergeJoin as isize,
-    HashJoin = pg_sys::pg12_specific::NodeTag_T_HashJoin as isize,
-    Material = pg_sys::pg12_specific::NodeTag_T_Material as isize,
-    Sort = pg_sys::pg12_specific::NodeTag_T_Sort as isize,
-    Group = pg_sys::pg12_specific::NodeTag_T_Group as isize,
-    Agg = pg_sys::pg12_specific::NodeTag_T_Agg as isize,
-    WindowAgg = pg_sys::pg12_specific::NodeTag_T_WindowAgg as isize,
-    Unique = pg_sys::pg12_specific::NodeTag_T_Unique as isize,
-    Gather = pg_sys::pg12_specific::NodeTag_T_Gather as isize,
-    GatherMerge = pg_sys::pg12_specific::NodeTag_T_GatherMerge as isize,
-    Hash = pg_sys::pg12_specific::NodeTag_T_Hash as isize,
-    SetOp = pg_sys::pg12_specific::NodeTag_T_SetOp as isize,
-    LockRows = pg_sys::pg12_specific::NodeTag_T_LockRows as isize,
-    Limit = pg_sys::pg12_specific::NodeTag_T_Limit as isize,
+    Plan = pg_sys::pg12::NodeTag_T_Plan as isize,
+    Result = pg_sys::pg12::NodeTag_T_Result as isize,
+    ProjectSet = pg_sys::pg12::NodeTag_T_ProjectSet as isize,
+    ModifyTable = pg_sys::pg12::NodeTag_T_ModifyTable as isize,
+    Append = pg_sys::pg12::NodeTag_T_Append as isize,
+    MergeAppend = pg_sys::pg12::NodeTag_T_MergeAppend as isize,
+    RecursiveUnion = pg_sys::pg12::NodeTag_T_RecursiveUnion as isize,
+    BitmapAnd = pg_sys::pg12::NodeTag_T_BitmapAnd as isize,
+    BitmapOr = pg_sys::pg12::NodeTag_T_BitmapOr as isize,
+    Scan = pg_sys::pg12::NodeTag_T_Scan as isize,
+    SeqScan = pg_sys::pg12::NodeTag_T_SeqScan as isize,
+    SampleScan = pg_sys::pg12::NodeTag_T_SampleScan as isize,
+    IndexScan = pg_sys::pg12::NodeTag_T_IndexScan as isize,
+    IndexOnlyScan = pg_sys::pg12::NodeTag_T_IndexOnlyScan as isize,
+    BitmapIndexScan = pg_sys::pg12::NodeTag_T_BitmapIndexScan as isize,
+    BitmapHeapScan = pg_sys::pg12::NodeTag_T_BitmapHeapScan as isize,
+    TidScan = pg_sys::pg12::NodeTag_T_TidScan as isize,
+    SubqueryScan = pg_sys::pg12::NodeTag_T_SubqueryScan as isize,
+    FunctionScan = pg_sys::pg12::NodeTag_T_FunctionScan as isize,
+    ValuesScan = pg_sys::pg12::NodeTag_T_ValuesScan as isize,
+    TableFuncScan = pg_sys::pg12::NodeTag_T_TableFuncScan as isize,
+    CteScan = pg_sys::pg12::NodeTag_T_CteScan as isize,
+    NamedTuplestoreScan = pg_sys::pg12::NodeTag_T_NamedTuplestoreScan as isize,
+    WorkTableScan = pg_sys::pg12::NodeTag_T_WorkTableScan as isize,
+    ForeignScan = pg_sys::pg12::NodeTag_T_ForeignScan as isize,
+    CustomScan = pg_sys::pg12::NodeTag_T_CustomScan as isize,
+    Join = pg_sys::pg12::NodeTag_T_Join as isize,
+    NestLoop = pg_sys::pg12::NodeTag_T_NestLoop as isize,
+    MergeJoin = pg_sys::pg12::NodeTag_T_MergeJoin as isize,
+    HashJoin = pg_sys::pg12::NodeTag_T_HashJoin as isize,
+    Material = pg_sys::pg12::NodeTag_T_Material as isize,
+    Sort = pg_sys::pg12::NodeTag_T_Sort as isize,
+    Group = pg_sys::pg12::NodeTag_T_Group as isize,
+    Agg = pg_sys::pg12::NodeTag_T_Agg as isize,
+    WindowAgg = pg_sys::pg12::NodeTag_T_WindowAgg as isize,
+    Unique = pg_sys::pg12::NodeTag_T_Unique as isize,
+    Gather = pg_sys::pg12::NodeTag_T_Gather as isize,
+    GatherMerge = pg_sys::pg12::NodeTag_T_GatherMerge as isize,
+    Hash = pg_sys::pg12::NodeTag_T_Hash as isize,
+    SetOp = pg_sys::pg12::NodeTag_T_SetOp as isize,
+    LockRows = pg_sys::pg12::NodeTag_T_LockRows as isize,
+    Limit = pg_sys::pg12::NodeTag_T_Limit as isize,
     /* these aren't subclasses of Plan: */
-    NestLoopParam = pg_sys::pg12_specific::NodeTag_T_NestLoopParam as isize,
-    PlanRowMark = pg_sys::pg12_specific::NodeTag_T_PlanRowMark as isize,
-    PartitionPruneInfo = pg_sys::pg12_specific::NodeTag_T_PartitionPruneInfo as isize,
-    PartitionedRelPruneInfo = pg_sys::pg12_specific::NodeTag_T_PartitionedRelPruneInfo as isize,
-    PartitionPruneStepOp = pg_sys::pg12_specific::NodeTag_T_PartitionPruneStepOp as isize,
-    PartitionPruneStepCombine = pg_sys::pg12_specific::NodeTag_T_PartitionPruneStepCombine as isize,
-    PlanInvalItem = pg_sys::pg12_specific::NodeTag_T_PlanInvalItem as isize,
+    NestLoopParam = pg_sys::pg12::NodeTag_T_NestLoopParam as isize,
+    PlanRowMark = pg_sys::pg12::NodeTag_T_PlanRowMark as isize,
+    PartitionPruneInfo = pg_sys::pg12::NodeTag_T_PartitionPruneInfo as isize,
+    PartitionedRelPruneInfo = pg_sys::pg12::NodeTag_T_PartitionedRelPruneInfo as isize,
+    PartitionPruneStepOp = pg_sys::pg12::NodeTag_T_PartitionPruneStepOp as isize,
+    PartitionPruneStepCombine = pg_sys::pg12::NodeTag_T_PartitionPruneStepCombine as isize,
+    PlanInvalItem = pg_sys::pg12::NodeTag_T_PlanInvalItem as isize,
 
     /*
      * TAGS FOR PLAN STATE NODES (execnodes.h)
      *
      * These should correspond one-to-one with Plan node types.
      */
-    PlanState = pg_sys::pg12_specific::NodeTag_T_PlanState as isize,
-    ResultState = pg_sys::pg12_specific::NodeTag_T_ResultState as isize,
-    ProjectSetState = pg_sys::pg12_specific::NodeTag_T_ProjectSetState as isize,
-    ModifyTableState = pg_sys::pg12_specific::NodeTag_T_ModifyTableState as isize,
-    AppendState = pg_sys::pg12_specific::NodeTag_T_AppendState as isize,
-    MergeAppendState = pg_sys::pg12_specific::NodeTag_T_MergeAppendState as isize,
-    RecursiveUnionState = pg_sys::pg12_specific::NodeTag_T_RecursiveUnionState as isize,
-    BitmapAndState = pg_sys::pg12_specific::NodeTag_T_BitmapAndState as isize,
-    BitmapOrState = pg_sys::pg12_specific::NodeTag_T_BitmapOrState as isize,
-    ScanState = pg_sys::pg12_specific::NodeTag_T_ScanState as isize,
-    SeqScanState = pg_sys::pg12_specific::NodeTag_T_SeqScanState as isize,
-    SampleScanState = pg_sys::pg12_specific::NodeTag_T_SampleScanState as isize,
-    IndexScanState = pg_sys::pg12_specific::NodeTag_T_IndexScanState as isize,
-    IndexOnlyScanState = pg_sys::pg12_specific::NodeTag_T_IndexOnlyScanState as isize,
-    BitmapIndexScanState = pg_sys::pg12_specific::NodeTag_T_BitmapIndexScanState as isize,
-    BitmapHeapScanState = pg_sys::pg12_specific::NodeTag_T_BitmapHeapScanState as isize,
-    TidScanState = pg_sys::pg12_specific::NodeTag_T_TidScanState as isize,
-    SubqueryScanState = pg_sys::pg12_specific::NodeTag_T_SubqueryScanState as isize,
-    FunctionScanState = pg_sys::pg12_specific::NodeTag_T_FunctionScanState as isize,
-    TableFuncScanState = pg_sys::pg12_specific::NodeTag_T_TableFuncScanState as isize,
-    ValuesScanState = pg_sys::pg12_specific::NodeTag_T_ValuesScanState as isize,
-    CteScanState = pg_sys::pg12_specific::NodeTag_T_CteScanState as isize,
-    NamedTuplestoreScanState = pg_sys::pg12_specific::NodeTag_T_NamedTuplestoreScanState as isize,
-    WorkTableScanState = pg_sys::pg12_specific::NodeTag_T_WorkTableScanState as isize,
-    ForeignScanState = pg_sys::pg12_specific::NodeTag_T_ForeignScanState as isize,
-    CustomScanState = pg_sys::pg12_specific::NodeTag_T_CustomScanState as isize,
-    JoinState = pg_sys::pg12_specific::NodeTag_T_JoinState as isize,
-    NestLoopState = pg_sys::pg12_specific::NodeTag_T_NestLoopState as isize,
-    MergeJoinState = pg_sys::pg12_specific::NodeTag_T_MergeJoinState as isize,
-    HashJoinState = pg_sys::pg12_specific::NodeTag_T_HashJoinState as isize,
-    MaterialState = pg_sys::pg12_specific::NodeTag_T_MaterialState as isize,
-    SortState = pg_sys::pg12_specific::NodeTag_T_SortState as isize,
-    GroupState = pg_sys::pg12_specific::NodeTag_T_GroupState as isize,
-    AggState = pg_sys::pg12_specific::NodeTag_T_AggState as isize,
-    WindowAggState = pg_sys::pg12_specific::NodeTag_T_WindowAggState as isize,
-    UniqueState = pg_sys::pg12_specific::NodeTag_T_UniqueState as isize,
-    GatherState = pg_sys::pg12_specific::NodeTag_T_GatherState as isize,
-    GatherMergeState = pg_sys::pg12_specific::NodeTag_T_GatherMergeState as isize,
-    HashState = pg_sys::pg12_specific::NodeTag_T_HashState as isize,
-    SetOpState = pg_sys::pg12_specific::NodeTag_T_SetOpState as isize,
-    LockRowsState = pg_sys::pg12_specific::NodeTag_T_LockRowsState as isize,
-    LimitState = pg_sys::pg12_specific::NodeTag_T_LimitState as isize,
+    PlanState = pg_sys::pg12::NodeTag_T_PlanState as isize,
+    ResultState = pg_sys::pg12::NodeTag_T_ResultState as isize,
+    ProjectSetState = pg_sys::pg12::NodeTag_T_ProjectSetState as isize,
+    ModifyTableState = pg_sys::pg12::NodeTag_T_ModifyTableState as isize,
+    AppendState = pg_sys::pg12::NodeTag_T_AppendState as isize,
+    MergeAppendState = pg_sys::pg12::NodeTag_T_MergeAppendState as isize,
+    RecursiveUnionState = pg_sys::pg12::NodeTag_T_RecursiveUnionState as isize,
+    BitmapAndState = pg_sys::pg12::NodeTag_T_BitmapAndState as isize,
+    BitmapOrState = pg_sys::pg12::NodeTag_T_BitmapOrState as isize,
+    ScanState = pg_sys::pg12::NodeTag_T_ScanState as isize,
+    SeqScanState = pg_sys::pg12::NodeTag_T_SeqScanState as isize,
+    SampleScanState = pg_sys::pg12::NodeTag_T_SampleScanState as isize,
+    IndexScanState = pg_sys::pg12::NodeTag_T_IndexScanState as isize,
+    IndexOnlyScanState = pg_sys::pg12::NodeTag_T_IndexOnlyScanState as isize,
+    BitmapIndexScanState = pg_sys::pg12::NodeTag_T_BitmapIndexScanState as isize,
+    BitmapHeapScanState = pg_sys::pg12::NodeTag_T_BitmapHeapScanState as isize,
+    TidScanState = pg_sys::pg12::NodeTag_T_TidScanState as isize,
+    SubqueryScanState = pg_sys::pg12::NodeTag_T_SubqueryScanState as isize,
+    FunctionScanState = pg_sys::pg12::NodeTag_T_FunctionScanState as isize,
+    TableFuncScanState = pg_sys::pg12::NodeTag_T_TableFuncScanState as isize,
+    ValuesScanState = pg_sys::pg12::NodeTag_T_ValuesScanState as isize,
+    CteScanState = pg_sys::pg12::NodeTag_T_CteScanState as isize,
+    NamedTuplestoreScanState = pg_sys::pg12::NodeTag_T_NamedTuplestoreScanState as isize,
+    WorkTableScanState = pg_sys::pg12::NodeTag_T_WorkTableScanState as isize,
+    ForeignScanState = pg_sys::pg12::NodeTag_T_ForeignScanState as isize,
+    CustomScanState = pg_sys::pg12::NodeTag_T_CustomScanState as isize,
+    JoinState = pg_sys::pg12::NodeTag_T_JoinState as isize,
+    NestLoopState = pg_sys::pg12::NodeTag_T_NestLoopState as isize,
+    MergeJoinState = pg_sys::pg12::NodeTag_T_MergeJoinState as isize,
+    HashJoinState = pg_sys::pg12::NodeTag_T_HashJoinState as isize,
+    MaterialState = pg_sys::pg12::NodeTag_T_MaterialState as isize,
+    SortState = pg_sys::pg12::NodeTag_T_SortState as isize,
+    GroupState = pg_sys::pg12::NodeTag_T_GroupState as isize,
+    AggState = pg_sys::pg12::NodeTag_T_AggState as isize,
+    WindowAggState = pg_sys::pg12::NodeTag_T_WindowAggState as isize,
+    UniqueState = pg_sys::pg12::NodeTag_T_UniqueState as isize,
+    GatherState = pg_sys::pg12::NodeTag_T_GatherState as isize,
+    GatherMergeState = pg_sys::pg12::NodeTag_T_GatherMergeState as isize,
+    HashState = pg_sys::pg12::NodeTag_T_HashState as isize,
+    SetOpState = pg_sys::pg12::NodeTag_T_SetOpState as isize,
+    LockRowsState = pg_sys::pg12::NodeTag_T_LockRowsState as isize,
+    LimitState = pg_sys::pg12::NodeTag_T_LimitState as isize,
 
     /*
      * TAGS FOR PRIMITIVE NODES (primnodes.h)
      */
-    Alias = pg_sys::pg12_specific::NodeTag_T_Alias as isize,
-    RangeVar = pg_sys::pg12_specific::NodeTag_T_RangeVar as isize,
-    TableFunc = pg_sys::pg12_specific::NodeTag_T_TableFunc as isize,
-    Expr = pg_sys::pg12_specific::NodeTag_T_Expr as isize,
-    Var = pg_sys::pg12_specific::NodeTag_T_Var as isize,
-    Const = pg_sys::pg12_specific::NodeTag_T_Const as isize,
-    Param = pg_sys::pg12_specific::NodeTag_T_Param as isize,
-    Aggref = pg_sys::pg12_specific::NodeTag_T_Aggref as isize,
-    GroupingFunc = pg_sys::pg12_specific::NodeTag_T_GroupingFunc as isize,
-    WindowFunc = pg_sys::pg12_specific::NodeTag_T_WindowFunc as isize,
-    SubscriptingRef = pg_sys::pg12_specific::NodeTag_T_SubscriptingRef as isize,
-    FuncExpr = pg_sys::pg12_specific::NodeTag_T_FuncExpr as isize,
-    NamedArgExpr = pg_sys::pg12_specific::NodeTag_T_NamedArgExpr as isize,
-    OpExpr = pg_sys::pg12_specific::NodeTag_T_OpExpr as isize,
-    DistinctExpr = pg_sys::pg12_specific::NodeTag_T_DistinctExpr as isize,
-    NullIfExpr = pg_sys::pg12_specific::NodeTag_T_NullIfExpr as isize,
-    ScalarArrayOpExpr = pg_sys::pg12_specific::NodeTag_T_ScalarArrayOpExpr as isize,
-    BoolExpr = pg_sys::pg12_specific::NodeTag_T_BoolExpr as isize,
-    SubLink = pg_sys::pg12_specific::NodeTag_T_SubLink as isize,
-    SubPlan = pg_sys::pg12_specific::NodeTag_T_SubPlan as isize,
-    AlternativeSubPlan = pg_sys::pg12_specific::NodeTag_T_AlternativeSubPlan as isize,
-    FieldSelect = pg_sys::pg12_specific::NodeTag_T_FieldSelect as isize,
-    FieldStore = pg_sys::pg12_specific::NodeTag_T_FieldStore as isize,
-    RelabelType = pg_sys::pg12_specific::NodeTag_T_RelabelType as isize,
-    CoerceViaIO = pg_sys::pg12_specific::NodeTag_T_CoerceViaIO as isize,
-    ArrayCoerceExpr = pg_sys::pg12_specific::NodeTag_T_ArrayCoerceExpr as isize,
-    ConvertRowtypeExpr = pg_sys::pg12_specific::NodeTag_T_ConvertRowtypeExpr as isize,
-    CollateExpr = pg_sys::pg12_specific::NodeTag_T_CollateExpr as isize,
-    CaseExpr = pg_sys::pg12_specific::NodeTag_T_CaseExpr as isize,
-    CaseWhen = pg_sys::pg12_specific::NodeTag_T_CaseWhen as isize,
-    CaseTestExpr = pg_sys::pg12_specific::NodeTag_T_CaseTestExpr as isize,
-    ArrayExpr = pg_sys::pg12_specific::NodeTag_T_ArrayExpr as isize,
-    RowExpr = pg_sys::pg12_specific::NodeTag_T_RowExpr as isize,
-    RowCompareExpr = pg_sys::pg12_specific::NodeTag_T_RowCompareExpr as isize,
-    CoalesceExpr = pg_sys::pg12_specific::NodeTag_T_CoalesceExpr as isize,
-    MinMaxExpr = pg_sys::pg12_specific::NodeTag_T_MinMaxExpr as isize,
-    SQLValueFunction = pg_sys::pg12_specific::NodeTag_T_SQLValueFunction as isize,
-    XmlExpr = pg_sys::pg12_specific::NodeTag_T_XmlExpr as isize,
-    NullTest = pg_sys::pg12_specific::NodeTag_T_NullTest as isize,
-    BooleanTest = pg_sys::pg12_specific::NodeTag_T_BooleanTest as isize,
-    CoerceToDomain = pg_sys::pg12_specific::NodeTag_T_CoerceToDomain as isize,
-    CoerceToDomainValue = pg_sys::pg12_specific::NodeTag_T_CoerceToDomainValue as isize,
-    SetToDefault = pg_sys::pg12_specific::NodeTag_T_SetToDefault as isize,
-    CurrentOfExpr = pg_sys::pg12_specific::NodeTag_T_CurrentOfExpr as isize,
-    NextValueExpr = pg_sys::pg12_specific::NodeTag_T_NextValueExpr as isize,
-    InferenceElem = pg_sys::pg12_specific::NodeTag_T_InferenceElem as isize,
-    TargetEntry = pg_sys::pg12_specific::NodeTag_T_TargetEntry as isize,
-    RangeTblRef = pg_sys::pg12_specific::NodeTag_T_RangeTblRef as isize,
-    JoinExpr = pg_sys::pg12_specific::NodeTag_T_JoinExpr as isize,
-    FromExpr = pg_sys::pg12_specific::NodeTag_T_FromExpr as isize,
-    OnConflictExpr = pg_sys::pg12_specific::NodeTag_T_OnConflictExpr as isize,
-    IntoClause = pg_sys::pg12_specific::NodeTag_T_IntoClause as isize,
+    Alias = pg_sys::pg12::NodeTag_T_Alias as isize,
+    RangeVar = pg_sys::pg12::NodeTag_T_RangeVar as isize,
+    TableFunc = pg_sys::pg12::NodeTag_T_TableFunc as isize,
+    Expr = pg_sys::pg12::NodeTag_T_Expr as isize,
+    Var = pg_sys::pg12::NodeTag_T_Var as isize,
+    Const = pg_sys::pg12::NodeTag_T_Const as isize,
+    Param = pg_sys::pg12::NodeTag_T_Param as isize,
+    Aggref = pg_sys::pg12::NodeTag_T_Aggref as isize,
+    GroupingFunc = pg_sys::pg12::NodeTag_T_GroupingFunc as isize,
+    WindowFunc = pg_sys::pg12::NodeTag_T_WindowFunc as isize,
+    SubscriptingRef = pg_sys::pg12::NodeTag_T_SubscriptingRef as isize,
+    FuncExpr = pg_sys::pg12::NodeTag_T_FuncExpr as isize,
+    NamedArgExpr = pg_sys::pg12::NodeTag_T_NamedArgExpr as isize,
+    OpExpr = pg_sys::pg12::NodeTag_T_OpExpr as isize,
+    DistinctExpr = pg_sys::pg12::NodeTag_T_DistinctExpr as isize,
+    NullIfExpr = pg_sys::pg12::NodeTag_T_NullIfExpr as isize,
+    ScalarArrayOpExpr = pg_sys::pg12::NodeTag_T_ScalarArrayOpExpr as isize,
+    BoolExpr = pg_sys::pg12::NodeTag_T_BoolExpr as isize,
+    SubLink = pg_sys::pg12::NodeTag_T_SubLink as isize,
+    SubPlan = pg_sys::pg12::NodeTag_T_SubPlan as isize,
+    AlternativeSubPlan = pg_sys::pg12::NodeTag_T_AlternativeSubPlan as isize,
+    FieldSelect = pg_sys::pg12::NodeTag_T_FieldSelect as isize,
+    FieldStore = pg_sys::pg12::NodeTag_T_FieldStore as isize,
+    RelabelType = pg_sys::pg12::NodeTag_T_RelabelType as isize,
+    CoerceViaIO = pg_sys::pg12::NodeTag_T_CoerceViaIO as isize,
+    ArrayCoerceExpr = pg_sys::pg12::NodeTag_T_ArrayCoerceExpr as isize,
+    ConvertRowtypeExpr = pg_sys::pg12::NodeTag_T_ConvertRowtypeExpr as isize,
+    CollateExpr = pg_sys::pg12::NodeTag_T_CollateExpr as isize,
+    CaseExpr = pg_sys::pg12::NodeTag_T_CaseExpr as isize,
+    CaseWhen = pg_sys::pg12::NodeTag_T_CaseWhen as isize,
+    CaseTestExpr = pg_sys::pg12::NodeTag_T_CaseTestExpr as isize,
+    ArrayExpr = pg_sys::pg12::NodeTag_T_ArrayExpr as isize,
+    RowExpr = pg_sys::pg12::NodeTag_T_RowExpr as isize,
+    RowCompareExpr = pg_sys::pg12::NodeTag_T_RowCompareExpr as isize,
+    CoalesceExpr = pg_sys::pg12::NodeTag_T_CoalesceExpr as isize,
+    MinMaxExpr = pg_sys::pg12::NodeTag_T_MinMaxExpr as isize,
+    SQLValueFunction = pg_sys::pg12::NodeTag_T_SQLValueFunction as isize,
+    XmlExpr = pg_sys::pg12::NodeTag_T_XmlExpr as isize,
+    NullTest = pg_sys::pg12::NodeTag_T_NullTest as isize,
+    BooleanTest = pg_sys::pg12::NodeTag_T_BooleanTest as isize,
+    CoerceToDomain = pg_sys::pg12::NodeTag_T_CoerceToDomain as isize,
+    CoerceToDomainValue = pg_sys::pg12::NodeTag_T_CoerceToDomainValue as isize,
+    SetToDefault = pg_sys::pg12::NodeTag_T_SetToDefault as isize,
+    CurrentOfExpr = pg_sys::pg12::NodeTag_T_CurrentOfExpr as isize,
+    NextValueExpr = pg_sys::pg12::NodeTag_T_NextValueExpr as isize,
+    InferenceElem = pg_sys::pg12::NodeTag_T_InferenceElem as isize,
+    TargetEntry = pg_sys::pg12::NodeTag_T_TargetEntry as isize,
+    RangeTblRef = pg_sys::pg12::NodeTag_T_RangeTblRef as isize,
+    JoinExpr = pg_sys::pg12::NodeTag_T_JoinExpr as isize,
+    FromExpr = pg_sys::pg12::NodeTag_T_FromExpr as isize,
+    OnConflictExpr = pg_sys::pg12::NodeTag_T_OnConflictExpr as isize,
+    IntoClause = pg_sys::pg12::NodeTag_T_IntoClause as isize,
 
     /*
      * TAGS FOR EXPRESSION STATE NODES (execnodes.h)
@@ -187,290 +187,287 @@ pub enum PgNode {
      * needs to be shared with other parts of the executor, as for example
      * with AggrefExprState, which nodeAgg.c has to modify.
      */
-    ExprState = pg_sys::pg12_specific::NodeTag_T_ExprState as isize,
-    AggrefExprState = pg_sys::pg12_specific::NodeTag_T_AggrefExprState as isize,
-    WindowFuncExprState = pg_sys::pg12_specific::NodeTag_T_WindowFuncExprState as isize,
-    SetExprState = pg_sys::pg12_specific::NodeTag_T_SetExprState as isize,
-    SubPlanState = pg_sys::pg12_specific::NodeTag_T_SubPlanState as isize,
-    AlternativeSubPlanState = pg_sys::pg12_specific::NodeTag_T_AlternativeSubPlanState as isize,
-    DomainConstraintState = pg_sys::pg12_specific::NodeTag_T_DomainConstraintState as isize,
+    ExprState = pg_sys::pg12::NodeTag_T_ExprState as isize,
+    AggrefExprState = pg_sys::pg12::NodeTag_T_AggrefExprState as isize,
+    WindowFuncExprState = pg_sys::pg12::NodeTag_T_WindowFuncExprState as isize,
+    SetExprState = pg_sys::pg12::NodeTag_T_SetExprState as isize,
+    SubPlanState = pg_sys::pg12::NodeTag_T_SubPlanState as isize,
+    AlternativeSubPlanState = pg_sys::pg12::NodeTag_T_AlternativeSubPlanState as isize,
+    DomainConstraintState = pg_sys::pg12::NodeTag_T_DomainConstraintState as isize,
 
     /*
      * TAGS FOR PLANNER NODES (pathnodes.h)
      */
-    PlannerInfo = pg_sys::pg12_specific::NodeTag_T_PlannerInfo as isize,
-    PlannerGlobal = pg_sys::pg12_specific::NodeTag_T_PlannerGlobal as isize,
-    RelOptInfo = pg_sys::pg12_specific::NodeTag_T_RelOptInfo as isize,
-    IndexOptInfo = pg_sys::pg12_specific::NodeTag_T_IndexOptInfo as isize,
-    ForeignKeyOptInfo = pg_sys::pg12_specific::NodeTag_T_ForeignKeyOptInfo as isize,
-    ParamPathInfo = pg_sys::pg12_specific::NodeTag_T_ParamPathInfo as isize,
-    Path = pg_sys::pg12_specific::NodeTag_T_Path as isize,
-    IndexPath = pg_sys::pg12_specific::NodeTag_T_IndexPath as isize,
-    BitmapHeapPath = pg_sys::pg12_specific::NodeTag_T_BitmapHeapPath as isize,
-    BitmapAndPath = pg_sys::pg12_specific::NodeTag_T_BitmapAndPath as isize,
-    BitmapOrPath = pg_sys::pg12_specific::NodeTag_T_BitmapOrPath as isize,
-    TidPath = pg_sys::pg12_specific::NodeTag_T_TidPath as isize,
-    SubqueryScanPath = pg_sys::pg12_specific::NodeTag_T_SubqueryScanPath as isize,
-    ForeignPath = pg_sys::pg12_specific::NodeTag_T_ForeignPath as isize,
-    CustomPath = pg_sys::pg12_specific::NodeTag_T_CustomPath as isize,
-    NestPath = pg_sys::pg12_specific::NodeTag_T_NestPath as isize,
-    MergePath = pg_sys::pg12_specific::NodeTag_T_MergePath as isize,
-    HashPath = pg_sys::pg12_specific::NodeTag_T_HashPath as isize,
-    AppendPath = pg_sys::pg12_specific::NodeTag_T_AppendPath as isize,
-    MergeAppendPath = pg_sys::pg12_specific::NodeTag_T_MergeAppendPath as isize,
-    GroupResultPath = pg_sys::pg12_specific::NodeTag_T_GroupResultPath as isize,
-    MaterialPath = pg_sys::pg12_specific::NodeTag_T_MaterialPath as isize,
-    UniquePath = pg_sys::pg12_specific::NodeTag_T_UniquePath as isize,
-    GatherPath = pg_sys::pg12_specific::NodeTag_T_GatherPath as isize,
-    GatherMergePath = pg_sys::pg12_specific::NodeTag_T_GatherMergePath as isize,
-    ProjectionPath = pg_sys::pg12_specific::NodeTag_T_ProjectionPath as isize,
-    ProjectSetPath = pg_sys::pg12_specific::NodeTag_T_ProjectSetPath as isize,
-    SortPath = pg_sys::pg12_specific::NodeTag_T_SortPath as isize,
-    GroupPath = pg_sys::pg12_specific::NodeTag_T_GroupPath as isize,
-    UpperUniquePath = pg_sys::pg12_specific::NodeTag_T_UpperUniquePath as isize,
-    AggPath = pg_sys::pg12_specific::NodeTag_T_AggPath as isize,
-    GroupingSetsPath = pg_sys::pg12_specific::NodeTag_T_GroupingSetsPath as isize,
-    MinMaxAggPath = pg_sys::pg12_specific::NodeTag_T_MinMaxAggPath as isize,
-    WindowAggPath = pg_sys::pg12_specific::NodeTag_T_WindowAggPath as isize,
-    SetOpPath = pg_sys::pg12_specific::NodeTag_T_SetOpPath as isize,
-    RecursiveUnionPath = pg_sys::pg12_specific::NodeTag_T_RecursiveUnionPath as isize,
-    LockRowsPath = pg_sys::pg12_specific::NodeTag_T_LockRowsPath as isize,
-    ModifyTablePath = pg_sys::pg12_specific::NodeTag_T_ModifyTablePath as isize,
-    LimitPath = pg_sys::pg12_specific::NodeTag_T_LimitPath as isize,
+    PlannerInfo = pg_sys::pg12::NodeTag_T_PlannerInfo as isize,
+    PlannerGlobal = pg_sys::pg12::NodeTag_T_PlannerGlobal as isize,
+    RelOptInfo = pg_sys::pg12::NodeTag_T_RelOptInfo as isize,
+    IndexOptInfo = pg_sys::pg12::NodeTag_T_IndexOptInfo as isize,
+    ForeignKeyOptInfo = pg_sys::pg12::NodeTag_T_ForeignKeyOptInfo as isize,
+    ParamPathInfo = pg_sys::pg12::NodeTag_T_ParamPathInfo as isize,
+    Path = pg_sys::pg12::NodeTag_T_Path as isize,
+    IndexPath = pg_sys::pg12::NodeTag_T_IndexPath as isize,
+    BitmapHeapPath = pg_sys::pg12::NodeTag_T_BitmapHeapPath as isize,
+    BitmapAndPath = pg_sys::pg12::NodeTag_T_BitmapAndPath as isize,
+    BitmapOrPath = pg_sys::pg12::NodeTag_T_BitmapOrPath as isize,
+    TidPath = pg_sys::pg12::NodeTag_T_TidPath as isize,
+    SubqueryScanPath = pg_sys::pg12::NodeTag_T_SubqueryScanPath as isize,
+    ForeignPath = pg_sys::pg12::NodeTag_T_ForeignPath as isize,
+    CustomPath = pg_sys::pg12::NodeTag_T_CustomPath as isize,
+    NestPath = pg_sys::pg12::NodeTag_T_NestPath as isize,
+    MergePath = pg_sys::pg12::NodeTag_T_MergePath as isize,
+    HashPath = pg_sys::pg12::NodeTag_T_HashPath as isize,
+    AppendPath = pg_sys::pg12::NodeTag_T_AppendPath as isize,
+    MergeAppendPath = pg_sys::pg12::NodeTag_T_MergeAppendPath as isize,
+    GroupResultPath = pg_sys::pg12::NodeTag_T_GroupResultPath as isize,
+    MaterialPath = pg_sys::pg12::NodeTag_T_MaterialPath as isize,
+    UniquePath = pg_sys::pg12::NodeTag_T_UniquePath as isize,
+    GatherPath = pg_sys::pg12::NodeTag_T_GatherPath as isize,
+    GatherMergePath = pg_sys::pg12::NodeTag_T_GatherMergePath as isize,
+    ProjectionPath = pg_sys::pg12::NodeTag_T_ProjectionPath as isize,
+    ProjectSetPath = pg_sys::pg12::NodeTag_T_ProjectSetPath as isize,
+    SortPath = pg_sys::pg12::NodeTag_T_SortPath as isize,
+    GroupPath = pg_sys::pg12::NodeTag_T_GroupPath as isize,
+    UpperUniquePath = pg_sys::pg12::NodeTag_T_UpperUniquePath as isize,
+    AggPath = pg_sys::pg12::NodeTag_T_AggPath as isize,
+    GroupingSetsPath = pg_sys::pg12::NodeTag_T_GroupingSetsPath as isize,
+    MinMaxAggPath = pg_sys::pg12::NodeTag_T_MinMaxAggPath as isize,
+    WindowAggPath = pg_sys::pg12::NodeTag_T_WindowAggPath as isize,
+    SetOpPath = pg_sys::pg12::NodeTag_T_SetOpPath as isize,
+    RecursiveUnionPath = pg_sys::pg12::NodeTag_T_RecursiveUnionPath as isize,
+    LockRowsPath = pg_sys::pg12::NodeTag_T_LockRowsPath as isize,
+    ModifyTablePath = pg_sys::pg12::NodeTag_T_ModifyTablePath as isize,
+    LimitPath = pg_sys::pg12::NodeTag_T_LimitPath as isize,
     /* these aren't subclasses of Path: */
-    EquivalenceClass = pg_sys::pg12_specific::NodeTag_T_EquivalenceClass as isize,
-    EquivalenceMember = pg_sys::pg12_specific::NodeTag_T_EquivalenceMember as isize,
-    PathKey = pg_sys::pg12_specific::NodeTag_T_PathKey as isize,
-    PathTarget = pg_sys::pg12_specific::NodeTag_T_PathTarget as isize,
-    RestrictInfo = pg_sys::pg12_specific::NodeTag_T_RestrictInfo as isize,
-    IndexClause = pg_sys::pg12_specific::NodeTag_T_IndexClause as isize,
-    PlaceHolderVar = pg_sys::pg12_specific::NodeTag_T_PlaceHolderVar as isize,
-    SpecialJoinInfo = pg_sys::pg12_specific::NodeTag_T_SpecialJoinInfo as isize,
-    AppendRelInfo = pg_sys::pg12_specific::NodeTag_T_AppendRelInfo as isize,
-    PlaceHolderInfo = pg_sys::pg12_specific::NodeTag_T_PlaceHolderInfo as isize,
-    MinMaxAggInfo = pg_sys::pg12_specific::NodeTag_T_MinMaxAggInfo as isize,
-    PlannerParamItem = pg_sys::pg12_specific::NodeTag_T_PlannerParamItem as isize,
-    RollupData = pg_sys::pg12_specific::NodeTag_T_RollupData as isize,
-    GroupingSetData = pg_sys::pg12_specific::NodeTag_T_GroupingSetData as isize,
-    StatisticExtInfo = pg_sys::pg12_specific::NodeTag_T_StatisticExtInfo as isize,
+    EquivalenceClass = pg_sys::pg12::NodeTag_T_EquivalenceClass as isize,
+    EquivalenceMember = pg_sys::pg12::NodeTag_T_EquivalenceMember as isize,
+    PathKey = pg_sys::pg12::NodeTag_T_PathKey as isize,
+    PathTarget = pg_sys::pg12::NodeTag_T_PathTarget as isize,
+    RestrictInfo = pg_sys::pg12::NodeTag_T_RestrictInfo as isize,
+    IndexClause = pg_sys::pg12::NodeTag_T_IndexClause as isize,
+    PlaceHolderVar = pg_sys::pg12::NodeTag_T_PlaceHolderVar as isize,
+    SpecialJoinInfo = pg_sys::pg12::NodeTag_T_SpecialJoinInfo as isize,
+    AppendRelInfo = pg_sys::pg12::NodeTag_T_AppendRelInfo as isize,
+    PlaceHolderInfo = pg_sys::pg12::NodeTag_T_PlaceHolderInfo as isize,
+    MinMaxAggInfo = pg_sys::pg12::NodeTag_T_MinMaxAggInfo as isize,
+    PlannerParamItem = pg_sys::pg12::NodeTag_T_PlannerParamItem as isize,
+    RollupData = pg_sys::pg12::NodeTag_T_RollupData as isize,
+    GroupingSetData = pg_sys::pg12::NodeTag_T_GroupingSetData as isize,
+    StatisticExtInfo = pg_sys::pg12::NodeTag_T_StatisticExtInfo as isize,
 
     /*
      * TAGS FOR MEMORY NODES (memnodes.h)
      */
-    MemoryContext = pg_sys::pg12_specific::NodeTag_T_MemoryContext as isize,
-    AllocSetContext = pg_sys::pg12_specific::NodeTag_T_AllocSetContext as isize,
-    SlabContext = pg_sys::pg12_specific::NodeTag_T_SlabContext as isize,
-    GenerationContext = pg_sys::pg12_specific::NodeTag_T_GenerationContext as isize,
+    MemoryContext = pg_sys::pg12::NodeTag_T_MemoryContext as isize,
+    AllocSetContext = pg_sys::pg12::NodeTag_T_AllocSetContext as isize,
+    SlabContext = pg_sys::pg12::NodeTag_T_SlabContext as isize,
+    GenerationContext = pg_sys::pg12::NodeTag_T_GenerationContext as isize,
 
     /*
      * TAGS FOR VALUE NODES (value.h)
      */
-    Value = pg_sys::pg12_specific::NodeTag_T_Value as isize,
-    Integer = pg_sys::pg12_specific::NodeTag_T_Integer as isize,
-    Float = pg_sys::pg12_specific::NodeTag_T_Float as isize,
-    String = pg_sys::pg12_specific::NodeTag_T_String as isize,
-    BitString = pg_sys::pg12_specific::NodeTag_T_BitString as isize,
-    Null = pg_sys::pg12_specific::NodeTag_T_Null as isize,
+    Value = pg_sys::pg12::NodeTag_T_Value as isize,
+    Integer = pg_sys::pg12::NodeTag_T_Integer as isize,
+    Float = pg_sys::pg12::NodeTag_T_Float as isize,
+    String = pg_sys::pg12::NodeTag_T_String as isize,
+    BitString = pg_sys::pg12::NodeTag_T_BitString as isize,
+    Null = pg_sys::pg12::NodeTag_T_Null as isize,
 
     /*
      * TAGS FOR LIST NODES (pg_list.h)
      */
-    List = pg_sys::pg12_specific::NodeTag_T_List as isize,
-    IntList = pg_sys::pg12_specific::NodeTag_T_IntList as isize,
-    OidList = pg_sys::pg12_specific::NodeTag_T_OidList as isize,
+    List = pg_sys::pg12::NodeTag_T_List as isize,
+    IntList = pg_sys::pg12::NodeTag_T_IntList as isize,
+    OidList = pg_sys::pg12::NodeTag_T_OidList as isize,
 
     /*
      * TAGS FOR EXTENSIBLE NODES (extensible.h)
      */
-    ExtensibleNode = pg_sys::pg12_specific::NodeTag_T_ExtensibleNode as isize,
+    ExtensibleNode = pg_sys::pg12::NodeTag_T_ExtensibleNode as isize,
 
     /*
      * TAGS FOR STATEMENT NODES (mostly in parsenodes.h)
      */
-    RawStmt = pg_sys::pg12_specific::NodeTag_T_RawStmt as isize,
-    Query = pg_sys::pg12_specific::NodeTag_T_Query as isize,
-    PlannedStmt = pg_sys::pg12_specific::NodeTag_T_PlannedStmt as isize,
-    InsertStmt = pg_sys::pg12_specific::NodeTag_T_InsertStmt as isize,
-    DeleteStmt = pg_sys::pg12_specific::NodeTag_T_DeleteStmt as isize,
-    UpdateStmt = pg_sys::pg12_specific::NodeTag_T_UpdateStmt as isize,
-    SelectStmt = pg_sys::pg12_specific::NodeTag_T_SelectStmt as isize,
-    AlterTableStmt = pg_sys::pg12_specific::NodeTag_T_AlterTableStmt as isize,
-    AlterTableCmd = pg_sys::pg12_specific::NodeTag_T_AlterTableCmd as isize,
-    AlterDomainStmt = pg_sys::pg12_specific::NodeTag_T_AlterDomainStmt as isize,
-    SetOperationStmt = pg_sys::pg12_specific::NodeTag_T_SetOperationStmt as isize,
-    GrantStmt = pg_sys::pg12_specific::NodeTag_T_GrantStmt as isize,
-    GrantRoleStmt = pg_sys::pg12_specific::NodeTag_T_GrantRoleStmt as isize,
-    AlterDefaultPrivilegesStmt =
-        pg_sys::pg12_specific::NodeTag_T_AlterDefaultPrivilegesStmt as isize,
-    ClosePortalStmt = pg_sys::pg12_specific::NodeTag_T_ClosePortalStmt as isize,
-    ClusterStmt = pg_sys::pg12_specific::NodeTag_T_ClusterStmt as isize,
-    CopyStmt = pg_sys::pg12_specific::NodeTag_T_CopyStmt as isize,
-    CreateStmt = pg_sys::pg12_specific::NodeTag_T_CreateStmt as isize,
-    DefineStmt = pg_sys::pg12_specific::NodeTag_T_DefineStmt as isize,
-    DropStmt = pg_sys::pg12_specific::NodeTag_T_DropStmt as isize,
-    TruncateStmt = pg_sys::pg12_specific::NodeTag_T_TruncateStmt as isize,
-    CommentStmt = pg_sys::pg12_specific::NodeTag_T_CommentStmt as isize,
-    FetchStmt = pg_sys::pg12_specific::NodeTag_T_FetchStmt as isize,
-    IndexStmt = pg_sys::pg12_specific::NodeTag_T_IndexStmt as isize,
-    CreateFunctionStmt = pg_sys::pg12_specific::NodeTag_T_CreateFunctionStmt as isize,
-    AlterFunctionStmt = pg_sys::pg12_specific::NodeTag_T_AlterFunctionStmt as isize,
-    DoStmt = pg_sys::pg12_specific::NodeTag_T_DoStmt as isize,
-    RenameStmt = pg_sys::pg12_specific::NodeTag_T_RenameStmt as isize,
-    RuleStmt = pg_sys::pg12_specific::NodeTag_T_RuleStmt as isize,
-    NotifyStmt = pg_sys::pg12_specific::NodeTag_T_NotifyStmt as isize,
-    ListenStmt = pg_sys::pg12_specific::NodeTag_T_ListenStmt as isize,
-    UnlistenStmt = pg_sys::pg12_specific::NodeTag_T_UnlistenStmt as isize,
-    TransactionStmt = pg_sys::pg12_specific::NodeTag_T_TransactionStmt as isize,
-    ViewStmt = pg_sys::pg12_specific::NodeTag_T_ViewStmt as isize,
-    LoadStmt = pg_sys::pg12_specific::NodeTag_T_LoadStmt as isize,
-    CreateDomainStmt = pg_sys::pg12_specific::NodeTag_T_CreateDomainStmt as isize,
-    CreatedbStmt = pg_sys::pg12_specific::NodeTag_T_CreatedbStmt as isize,
-    DropdbStmt = pg_sys::pg12_specific::NodeTag_T_DropdbStmt as isize,
-    VacuumStmt = pg_sys::pg12_specific::NodeTag_T_VacuumStmt as isize,
-    ExplainStmt = pg_sys::pg12_specific::NodeTag_T_ExplainStmt as isize,
-    CreateTableAsStmt = pg_sys::pg12_specific::NodeTag_T_CreateTableAsStmt as isize,
-    CreateSeqStmt = pg_sys::pg12_specific::NodeTag_T_CreateSeqStmt as isize,
-    AlterSeqStmt = pg_sys::pg12_specific::NodeTag_T_AlterSeqStmt as isize,
-    VariableSetStmt = pg_sys::pg12_specific::NodeTag_T_VariableSetStmt as isize,
-    VariableShowStmt = pg_sys::pg12_specific::NodeTag_T_VariableShowStmt as isize,
-    DiscardStmt = pg_sys::pg12_specific::NodeTag_T_DiscardStmt as isize,
-    CreateTrigStmt = pg_sys::pg12_specific::NodeTag_T_CreateTrigStmt as isize,
-    CreatePLangStmt = pg_sys::pg12_specific::NodeTag_T_CreatePLangStmt as isize,
-    CreateRoleStmt = pg_sys::pg12_specific::NodeTag_T_CreateRoleStmt as isize,
-    AlterRoleStmt = pg_sys::pg12_specific::NodeTag_T_AlterRoleStmt as isize,
-    DropRoleStmt = pg_sys::pg12_specific::NodeTag_T_DropRoleStmt as isize,
-    LockStmt = pg_sys::pg12_specific::NodeTag_T_LockStmt as isize,
-    ConstraintsSetStmt = pg_sys::pg12_specific::NodeTag_T_ConstraintsSetStmt as isize,
-    ReindexStmt = pg_sys::pg12_specific::NodeTag_T_ReindexStmt as isize,
-    CheckPointStmt = pg_sys::pg12_specific::NodeTag_T_CheckPointStmt as isize,
-    CreateSchemaStmt = pg_sys::pg12_specific::NodeTag_T_CreateSchemaStmt as isize,
-    AlterDatabaseStmt = pg_sys::pg12_specific::NodeTag_T_AlterDatabaseStmt as isize,
-    AlterDatabaseSetStmt = pg_sys::pg12_specific::NodeTag_T_AlterDatabaseSetStmt as isize,
-    AlterRoleSetStmt = pg_sys::pg12_specific::NodeTag_T_AlterRoleSetStmt as isize,
-    CreateConversionStmt = pg_sys::pg12_specific::NodeTag_T_CreateConversionStmt as isize,
-    CreateCastStmt = pg_sys::pg12_specific::NodeTag_T_CreateCastStmt as isize,
-    CreateOpClassStmt = pg_sys::pg12_specific::NodeTag_T_CreateOpClassStmt as isize,
-    CreateOpFamilyStmt = pg_sys::pg12_specific::NodeTag_T_CreateOpFamilyStmt as isize,
-    AlterOpFamilyStmt = pg_sys::pg12_specific::NodeTag_T_AlterOpFamilyStmt as isize,
-    PrepareStmt = pg_sys::pg12_specific::NodeTag_T_PrepareStmt as isize,
-    ExecuteStmt = pg_sys::pg12_specific::NodeTag_T_ExecuteStmt as isize,
-    DeallocateStmt = pg_sys::pg12_specific::NodeTag_T_DeallocateStmt as isize,
-    DeclareCursorStmt = pg_sys::pg12_specific::NodeTag_T_DeclareCursorStmt as isize,
-    CreateTableSpaceStmt = pg_sys::pg12_specific::NodeTag_T_CreateTableSpaceStmt as isize,
-    DropTableSpaceStmt = pg_sys::pg12_specific::NodeTag_T_DropTableSpaceStmt as isize,
-    AlterObjectDependsStmt = pg_sys::pg12_specific::NodeTag_T_AlterObjectDependsStmt as isize,
-    AlterObjectSchemaStmt = pg_sys::pg12_specific::NodeTag_T_AlterObjectSchemaStmt as isize,
-    AlterOwnerStmt = pg_sys::pg12_specific::NodeTag_T_AlterOwnerStmt as isize,
-    AlterOperatorStmt = pg_sys::pg12_specific::NodeTag_T_AlterOperatorStmt as isize,
-    DropOwnedStmt = pg_sys::pg12_specific::NodeTag_T_DropOwnedStmt as isize,
-    ReassignOwnedStmt = pg_sys::pg12_specific::NodeTag_T_ReassignOwnedStmt as isize,
-    CompositeTypeStmt = pg_sys::pg12_specific::NodeTag_T_CompositeTypeStmt as isize,
-    CreateEnumStmt = pg_sys::pg12_specific::NodeTag_T_CreateEnumStmt as isize,
-    CreateRangeStmt = pg_sys::pg12_specific::NodeTag_T_CreateRangeStmt as isize,
-    AlterEnumStmt = pg_sys::pg12_specific::NodeTag_T_AlterEnumStmt as isize,
-    AlterTSDictionaryStmt = pg_sys::pg12_specific::NodeTag_T_AlterTSDictionaryStmt as isize,
-    AlterTSConfigurationStmt = pg_sys::pg12_specific::NodeTag_T_AlterTSConfigurationStmt as isize,
-    CreateFdwStmt = pg_sys::pg12_specific::NodeTag_T_CreateFdwStmt as isize,
-    AlterFdwStmt = pg_sys::pg12_specific::NodeTag_T_AlterFdwStmt as isize,
-    CreateForeignServerStmt = pg_sys::pg12_specific::NodeTag_T_CreateForeignServerStmt as isize,
-    AlterForeignServerStmt = pg_sys::pg12_specific::NodeTag_T_AlterForeignServerStmt as isize,
-    CreateUserMappingStmt = pg_sys::pg12_specific::NodeTag_T_CreateUserMappingStmt as isize,
-    AlterUserMappingStmt = pg_sys::pg12_specific::NodeTag_T_AlterUserMappingStmt as isize,
-    DropUserMappingStmt = pg_sys::pg12_specific::NodeTag_T_DropUserMappingStmt as isize,
-    AlterTableSpaceOptionsStmt =
-        pg_sys::pg12_specific::NodeTag_T_AlterTableSpaceOptionsStmt as isize,
-    AlterTableMoveAllStmt = pg_sys::pg12_specific::NodeTag_T_AlterTableMoveAllStmt as isize,
-    SecLabelStmt = pg_sys::pg12_specific::NodeTag_T_SecLabelStmt as isize,
-    CreateForeignTableStmt = pg_sys::pg12_specific::NodeTag_T_CreateForeignTableStmt as isize,
-    ImportForeignSchemaStmt = pg_sys::pg12_specific::NodeTag_T_ImportForeignSchemaStmt as isize,
-    CreateExtensionStmt = pg_sys::pg12_specific::NodeTag_T_CreateExtensionStmt as isize,
-    AlterExtensionStmt = pg_sys::pg12_specific::NodeTag_T_AlterExtensionStmt as isize,
-    AlterExtensionContentsStmt =
-        pg_sys::pg12_specific::NodeTag_T_AlterExtensionContentsStmt as isize,
-    CreateEventTrigStmt = pg_sys::pg12_specific::NodeTag_T_CreateEventTrigStmt as isize,
-    AlterEventTrigStmt = pg_sys::pg12_specific::NodeTag_T_AlterEventTrigStmt as isize,
-    RefreshMatViewStmt = pg_sys::pg12_specific::NodeTag_T_RefreshMatViewStmt as isize,
-    ReplicaIdentityStmt = pg_sys::pg12_specific::NodeTag_T_ReplicaIdentityStmt as isize,
-    AlterSystemStmt = pg_sys::pg12_specific::NodeTag_T_AlterSystemStmt as isize,
-    CreatePolicyStmt = pg_sys::pg12_specific::NodeTag_T_CreatePolicyStmt as isize,
-    AlterPolicyStmt = pg_sys::pg12_specific::NodeTag_T_AlterPolicyStmt as isize,
-    CreateTransformStmt = pg_sys::pg12_specific::NodeTag_T_CreateTransformStmt as isize,
-    CreateAmStmt = pg_sys::pg12_specific::NodeTag_T_CreateAmStmt as isize,
-    CreatePublicationStmt = pg_sys::pg12_specific::NodeTag_T_CreatePublicationStmt as isize,
-    AlterPublicationStmt = pg_sys::pg12_specific::NodeTag_T_AlterPublicationStmt as isize,
-    CreateSubscriptionStmt = pg_sys::pg12_specific::NodeTag_T_CreateSubscriptionStmt as isize,
-    AlterSubscriptionStmt = pg_sys::pg12_specific::NodeTag_T_AlterSubscriptionStmt as isize,
-    DropSubscriptionStmt = pg_sys::pg12_specific::NodeTag_T_DropSubscriptionStmt as isize,
-    CreateStatsStmt = pg_sys::pg12_specific::NodeTag_T_CreateStatsStmt as isize,
-    AlterCollationStmt = pg_sys::pg12_specific::NodeTag_T_AlterCollationStmt as isize,
-    CallStmt = pg_sys::pg12_specific::NodeTag_T_CallStmt as isize,
+    RawStmt = pg_sys::pg12::NodeTag_T_RawStmt as isize,
+    Query = pg_sys::pg12::NodeTag_T_Query as isize,
+    PlannedStmt = pg_sys::pg12::NodeTag_T_PlannedStmt as isize,
+    InsertStmt = pg_sys::pg12::NodeTag_T_InsertStmt as isize,
+    DeleteStmt = pg_sys::pg12::NodeTag_T_DeleteStmt as isize,
+    UpdateStmt = pg_sys::pg12::NodeTag_T_UpdateStmt as isize,
+    SelectStmt = pg_sys::pg12::NodeTag_T_SelectStmt as isize,
+    AlterTableStmt = pg_sys::pg12::NodeTag_T_AlterTableStmt as isize,
+    AlterTableCmd = pg_sys::pg12::NodeTag_T_AlterTableCmd as isize,
+    AlterDomainStmt = pg_sys::pg12::NodeTag_T_AlterDomainStmt as isize,
+    SetOperationStmt = pg_sys::pg12::NodeTag_T_SetOperationStmt as isize,
+    GrantStmt = pg_sys::pg12::NodeTag_T_GrantStmt as isize,
+    GrantRoleStmt = pg_sys::pg12::NodeTag_T_GrantRoleStmt as isize,
+    AlterDefaultPrivilegesStmt = pg_sys::pg12::NodeTag_T_AlterDefaultPrivilegesStmt as isize,
+    ClosePortalStmt = pg_sys::pg12::NodeTag_T_ClosePortalStmt as isize,
+    ClusterStmt = pg_sys::pg12::NodeTag_T_ClusterStmt as isize,
+    CopyStmt = pg_sys::pg12::NodeTag_T_CopyStmt as isize,
+    CreateStmt = pg_sys::pg12::NodeTag_T_CreateStmt as isize,
+    DefineStmt = pg_sys::pg12::NodeTag_T_DefineStmt as isize,
+    DropStmt = pg_sys::pg12::NodeTag_T_DropStmt as isize,
+    TruncateStmt = pg_sys::pg12::NodeTag_T_TruncateStmt as isize,
+    CommentStmt = pg_sys::pg12::NodeTag_T_CommentStmt as isize,
+    FetchStmt = pg_sys::pg12::NodeTag_T_FetchStmt as isize,
+    IndexStmt = pg_sys::pg12::NodeTag_T_IndexStmt as isize,
+    CreateFunctionStmt = pg_sys::pg12::NodeTag_T_CreateFunctionStmt as isize,
+    AlterFunctionStmt = pg_sys::pg12::NodeTag_T_AlterFunctionStmt as isize,
+    DoStmt = pg_sys::pg12::NodeTag_T_DoStmt as isize,
+    RenameStmt = pg_sys::pg12::NodeTag_T_RenameStmt as isize,
+    RuleStmt = pg_sys::pg12::NodeTag_T_RuleStmt as isize,
+    NotifyStmt = pg_sys::pg12::NodeTag_T_NotifyStmt as isize,
+    ListenStmt = pg_sys::pg12::NodeTag_T_ListenStmt as isize,
+    UnlistenStmt = pg_sys::pg12::NodeTag_T_UnlistenStmt as isize,
+    TransactionStmt = pg_sys::pg12::NodeTag_T_TransactionStmt as isize,
+    ViewStmt = pg_sys::pg12::NodeTag_T_ViewStmt as isize,
+    LoadStmt = pg_sys::pg12::NodeTag_T_LoadStmt as isize,
+    CreateDomainStmt = pg_sys::pg12::NodeTag_T_CreateDomainStmt as isize,
+    CreatedbStmt = pg_sys::pg12::NodeTag_T_CreatedbStmt as isize,
+    DropdbStmt = pg_sys::pg12::NodeTag_T_DropdbStmt as isize,
+    VacuumStmt = pg_sys::pg12::NodeTag_T_VacuumStmt as isize,
+    ExplainStmt = pg_sys::pg12::NodeTag_T_ExplainStmt as isize,
+    CreateTableAsStmt = pg_sys::pg12::NodeTag_T_CreateTableAsStmt as isize,
+    CreateSeqStmt = pg_sys::pg12::NodeTag_T_CreateSeqStmt as isize,
+    AlterSeqStmt = pg_sys::pg12::NodeTag_T_AlterSeqStmt as isize,
+    VariableSetStmt = pg_sys::pg12::NodeTag_T_VariableSetStmt as isize,
+    VariableShowStmt = pg_sys::pg12::NodeTag_T_VariableShowStmt as isize,
+    DiscardStmt = pg_sys::pg12::NodeTag_T_DiscardStmt as isize,
+    CreateTrigStmt = pg_sys::pg12::NodeTag_T_CreateTrigStmt as isize,
+    CreatePLangStmt = pg_sys::pg12::NodeTag_T_CreatePLangStmt as isize,
+    CreateRoleStmt = pg_sys::pg12::NodeTag_T_CreateRoleStmt as isize,
+    AlterRoleStmt = pg_sys::pg12::NodeTag_T_AlterRoleStmt as isize,
+    DropRoleStmt = pg_sys::pg12::NodeTag_T_DropRoleStmt as isize,
+    LockStmt = pg_sys::pg12::NodeTag_T_LockStmt as isize,
+    ConstraintsSetStmt = pg_sys::pg12::NodeTag_T_ConstraintsSetStmt as isize,
+    ReindexStmt = pg_sys::pg12::NodeTag_T_ReindexStmt as isize,
+    CheckPointStmt = pg_sys::pg12::NodeTag_T_CheckPointStmt as isize,
+    CreateSchemaStmt = pg_sys::pg12::NodeTag_T_CreateSchemaStmt as isize,
+    AlterDatabaseStmt = pg_sys::pg12::NodeTag_T_AlterDatabaseStmt as isize,
+    AlterDatabaseSetStmt = pg_sys::pg12::NodeTag_T_AlterDatabaseSetStmt as isize,
+    AlterRoleSetStmt = pg_sys::pg12::NodeTag_T_AlterRoleSetStmt as isize,
+    CreateConversionStmt = pg_sys::pg12::NodeTag_T_CreateConversionStmt as isize,
+    CreateCastStmt = pg_sys::pg12::NodeTag_T_CreateCastStmt as isize,
+    CreateOpClassStmt = pg_sys::pg12::NodeTag_T_CreateOpClassStmt as isize,
+    CreateOpFamilyStmt = pg_sys::pg12::NodeTag_T_CreateOpFamilyStmt as isize,
+    AlterOpFamilyStmt = pg_sys::pg12::NodeTag_T_AlterOpFamilyStmt as isize,
+    PrepareStmt = pg_sys::pg12::NodeTag_T_PrepareStmt as isize,
+    ExecuteStmt = pg_sys::pg12::NodeTag_T_ExecuteStmt as isize,
+    DeallocateStmt = pg_sys::pg12::NodeTag_T_DeallocateStmt as isize,
+    DeclareCursorStmt = pg_sys::pg12::NodeTag_T_DeclareCursorStmt as isize,
+    CreateTableSpaceStmt = pg_sys::pg12::NodeTag_T_CreateTableSpaceStmt as isize,
+    DropTableSpaceStmt = pg_sys::pg12::NodeTag_T_DropTableSpaceStmt as isize,
+    AlterObjectDependsStmt = pg_sys::pg12::NodeTag_T_AlterObjectDependsStmt as isize,
+    AlterObjectSchemaStmt = pg_sys::pg12::NodeTag_T_AlterObjectSchemaStmt as isize,
+    AlterOwnerStmt = pg_sys::pg12::NodeTag_T_AlterOwnerStmt as isize,
+    AlterOperatorStmt = pg_sys::pg12::NodeTag_T_AlterOperatorStmt as isize,
+    DropOwnedStmt = pg_sys::pg12::NodeTag_T_DropOwnedStmt as isize,
+    ReassignOwnedStmt = pg_sys::pg12::NodeTag_T_ReassignOwnedStmt as isize,
+    CompositeTypeStmt = pg_sys::pg12::NodeTag_T_CompositeTypeStmt as isize,
+    CreateEnumStmt = pg_sys::pg12::NodeTag_T_CreateEnumStmt as isize,
+    CreateRangeStmt = pg_sys::pg12::NodeTag_T_CreateRangeStmt as isize,
+    AlterEnumStmt = pg_sys::pg12::NodeTag_T_AlterEnumStmt as isize,
+    AlterTSDictionaryStmt = pg_sys::pg12::NodeTag_T_AlterTSDictionaryStmt as isize,
+    AlterTSConfigurationStmt = pg_sys::pg12::NodeTag_T_AlterTSConfigurationStmt as isize,
+    CreateFdwStmt = pg_sys::pg12::NodeTag_T_CreateFdwStmt as isize,
+    AlterFdwStmt = pg_sys::pg12::NodeTag_T_AlterFdwStmt as isize,
+    CreateForeignServerStmt = pg_sys::pg12::NodeTag_T_CreateForeignServerStmt as isize,
+    AlterForeignServerStmt = pg_sys::pg12::NodeTag_T_AlterForeignServerStmt as isize,
+    CreateUserMappingStmt = pg_sys::pg12::NodeTag_T_CreateUserMappingStmt as isize,
+    AlterUserMappingStmt = pg_sys::pg12::NodeTag_T_AlterUserMappingStmt as isize,
+    DropUserMappingStmt = pg_sys::pg12::NodeTag_T_DropUserMappingStmt as isize,
+    AlterTableSpaceOptionsStmt = pg_sys::pg12::NodeTag_T_AlterTableSpaceOptionsStmt as isize,
+    AlterTableMoveAllStmt = pg_sys::pg12::NodeTag_T_AlterTableMoveAllStmt as isize,
+    SecLabelStmt = pg_sys::pg12::NodeTag_T_SecLabelStmt as isize,
+    CreateForeignTableStmt = pg_sys::pg12::NodeTag_T_CreateForeignTableStmt as isize,
+    ImportForeignSchemaStmt = pg_sys::pg12::NodeTag_T_ImportForeignSchemaStmt as isize,
+    CreateExtensionStmt = pg_sys::pg12::NodeTag_T_CreateExtensionStmt as isize,
+    AlterExtensionStmt = pg_sys::pg12::NodeTag_T_AlterExtensionStmt as isize,
+    AlterExtensionContentsStmt = pg_sys::pg12::NodeTag_T_AlterExtensionContentsStmt as isize,
+    CreateEventTrigStmt = pg_sys::pg12::NodeTag_T_CreateEventTrigStmt as isize,
+    AlterEventTrigStmt = pg_sys::pg12::NodeTag_T_AlterEventTrigStmt as isize,
+    RefreshMatViewStmt = pg_sys::pg12::NodeTag_T_RefreshMatViewStmt as isize,
+    ReplicaIdentityStmt = pg_sys::pg12::NodeTag_T_ReplicaIdentityStmt as isize,
+    AlterSystemStmt = pg_sys::pg12::NodeTag_T_AlterSystemStmt as isize,
+    CreatePolicyStmt = pg_sys::pg12::NodeTag_T_CreatePolicyStmt as isize,
+    AlterPolicyStmt = pg_sys::pg12::NodeTag_T_AlterPolicyStmt as isize,
+    CreateTransformStmt = pg_sys::pg12::NodeTag_T_CreateTransformStmt as isize,
+    CreateAmStmt = pg_sys::pg12::NodeTag_T_CreateAmStmt as isize,
+    CreatePublicationStmt = pg_sys::pg12::NodeTag_T_CreatePublicationStmt as isize,
+    AlterPublicationStmt = pg_sys::pg12::NodeTag_T_AlterPublicationStmt as isize,
+    CreateSubscriptionStmt = pg_sys::pg12::NodeTag_T_CreateSubscriptionStmt as isize,
+    AlterSubscriptionStmt = pg_sys::pg12::NodeTag_T_AlterSubscriptionStmt as isize,
+    DropSubscriptionStmt = pg_sys::pg12::NodeTag_T_DropSubscriptionStmt as isize,
+    CreateStatsStmt = pg_sys::pg12::NodeTag_T_CreateStatsStmt as isize,
+    AlterCollationStmt = pg_sys::pg12::NodeTag_T_AlterCollationStmt as isize,
+    CallStmt = pg_sys::pg12::NodeTag_T_CallStmt as isize,
 
     /*
      * TAGS FOR PARSE TREE NODES (parsenodes.h)
      */
-    A_Expr = pg_sys::pg12_specific::NodeTag_T_A_Expr as isize,
-    ColumnRef = pg_sys::pg12_specific::NodeTag_T_ColumnRef as isize,
-    ParamRef = pg_sys::pg12_specific::NodeTag_T_ParamRef as isize,
-    A_Const = pg_sys::pg12_specific::NodeTag_T_A_Const as isize,
-    FuncCall = pg_sys::pg12_specific::NodeTag_T_FuncCall as isize,
-    A_Star = pg_sys::pg12_specific::NodeTag_T_A_Star as isize,
-    A_Indices = pg_sys::pg12_specific::NodeTag_T_A_Indices as isize,
-    A_Indirection = pg_sys::pg12_specific::NodeTag_T_A_Indirection as isize,
-    A_ArrayExpr = pg_sys::pg12_specific::NodeTag_T_A_ArrayExpr as isize,
-    ResTarget = pg_sys::pg12_specific::NodeTag_T_ResTarget as isize,
-    MultiAssignRef = pg_sys::pg12_specific::NodeTag_T_MultiAssignRef as isize,
-    TypeCast = pg_sys::pg12_specific::NodeTag_T_TypeCast as isize,
-    CollateClause = pg_sys::pg12_specific::NodeTag_T_CollateClause as isize,
-    SortBy = pg_sys::pg12_specific::NodeTag_T_SortBy as isize,
-    WindowDef = pg_sys::pg12_specific::NodeTag_T_WindowDef as isize,
-    RangeSubselect = pg_sys::pg12_specific::NodeTag_T_RangeSubselect as isize,
-    RangeFunction = pg_sys::pg12_specific::NodeTag_T_RangeFunction as isize,
-    RangeTableSample = pg_sys::pg12_specific::NodeTag_T_RangeTableSample as isize,
-    RangeTableFunc = pg_sys::pg12_specific::NodeTag_T_RangeTableFunc as isize,
-    RangeTableFuncCol = pg_sys::pg12_specific::NodeTag_T_RangeTableFuncCol as isize,
-    TypeName = pg_sys::pg12_specific::NodeTag_T_TypeName as isize,
-    ColumnDef = pg_sys::pg12_specific::NodeTag_T_ColumnDef as isize,
-    IndexElem = pg_sys::pg12_specific::NodeTag_T_IndexElem as isize,
-    Constraint = pg_sys::pg12_specific::NodeTag_T_Constraint as isize,
-    DefElem = pg_sys::pg12_specific::NodeTag_T_DefElem as isize,
-    RangeTblEntry = pg_sys::pg12_specific::NodeTag_T_RangeTblEntry as isize,
-    RangeTblFunction = pg_sys::pg12_specific::NodeTag_T_RangeTblFunction as isize,
-    TableSampleClause = pg_sys::pg12_specific::NodeTag_T_TableSampleClause as isize,
-    WithCheckOption = pg_sys::pg12_specific::NodeTag_T_WithCheckOption as isize,
-    SortGroupClause = pg_sys::pg12_specific::NodeTag_T_SortGroupClause as isize,
-    GroupingSet = pg_sys::pg12_specific::NodeTag_T_GroupingSet as isize,
-    WindowClause = pg_sys::pg12_specific::NodeTag_T_WindowClause as isize,
-    ObjectWithArgs = pg_sys::pg12_specific::NodeTag_T_ObjectWithArgs as isize,
-    AccessPriv = pg_sys::pg12_specific::NodeTag_T_AccessPriv as isize,
-    CreateOpClassItem = pg_sys::pg12_specific::NodeTag_T_CreateOpClassItem as isize,
-    TableLikeClause = pg_sys::pg12_specific::NodeTag_T_TableLikeClause as isize,
-    FunctionParameter = pg_sys::pg12_specific::NodeTag_T_FunctionParameter as isize,
-    LockingClause = pg_sys::pg12_specific::NodeTag_T_LockingClause as isize,
-    RowMarkClause = pg_sys::pg12_specific::NodeTag_T_RowMarkClause as isize,
-    XmlSerialize = pg_sys::pg12_specific::NodeTag_T_XmlSerialize as isize,
-    WithClause = pg_sys::pg12_specific::NodeTag_T_WithClause as isize,
-    InferClause = pg_sys::pg12_specific::NodeTag_T_InferClause as isize,
-    OnConflictClause = pg_sys::pg12_specific::NodeTag_T_OnConflictClause as isize,
-    CommonTableExpr = pg_sys::pg12_specific::NodeTag_T_CommonTableExpr as isize,
-    RoleSpec = pg_sys::pg12_specific::NodeTag_T_RoleSpec as isize,
-    TriggerTransition = pg_sys::pg12_specific::NodeTag_T_TriggerTransition as isize,
-    PartitionElem = pg_sys::pg12_specific::NodeTag_T_PartitionElem as isize,
-    PartitionSpec = pg_sys::pg12_specific::NodeTag_T_PartitionSpec as isize,
-    PartitionBoundSpec = pg_sys::pg12_specific::NodeTag_T_PartitionBoundSpec as isize,
-    PartitionRangeDatum = pg_sys::pg12_specific::NodeTag_T_PartitionRangeDatum as isize,
-    PartitionCmd = pg_sys::pg12_specific::NodeTag_T_PartitionCmd as isize,
-    VacuumRelation = pg_sys::pg12_specific::NodeTag_T_VacuumRelation as isize,
+    A_Expr = pg_sys::pg12::NodeTag_T_A_Expr as isize,
+    ColumnRef = pg_sys::pg12::NodeTag_T_ColumnRef as isize,
+    ParamRef = pg_sys::pg12::NodeTag_T_ParamRef as isize,
+    A_Const = pg_sys::pg12::NodeTag_T_A_Const as isize,
+    FuncCall = pg_sys::pg12::NodeTag_T_FuncCall as isize,
+    A_Star = pg_sys::pg12::NodeTag_T_A_Star as isize,
+    A_Indices = pg_sys::pg12::NodeTag_T_A_Indices as isize,
+    A_Indirection = pg_sys::pg12::NodeTag_T_A_Indirection as isize,
+    A_ArrayExpr = pg_sys::pg12::NodeTag_T_A_ArrayExpr as isize,
+    ResTarget = pg_sys::pg12::NodeTag_T_ResTarget as isize,
+    MultiAssignRef = pg_sys::pg12::NodeTag_T_MultiAssignRef as isize,
+    TypeCast = pg_sys::pg12::NodeTag_T_TypeCast as isize,
+    CollateClause = pg_sys::pg12::NodeTag_T_CollateClause as isize,
+    SortBy = pg_sys::pg12::NodeTag_T_SortBy as isize,
+    WindowDef = pg_sys::pg12::NodeTag_T_WindowDef as isize,
+    RangeSubselect = pg_sys::pg12::NodeTag_T_RangeSubselect as isize,
+    RangeFunction = pg_sys::pg12::NodeTag_T_RangeFunction as isize,
+    RangeTableSample = pg_sys::pg12::NodeTag_T_RangeTableSample as isize,
+    RangeTableFunc = pg_sys::pg12::NodeTag_T_RangeTableFunc as isize,
+    RangeTableFuncCol = pg_sys::pg12::NodeTag_T_RangeTableFuncCol as isize,
+    TypeName = pg_sys::pg12::NodeTag_T_TypeName as isize,
+    ColumnDef = pg_sys::pg12::NodeTag_T_ColumnDef as isize,
+    IndexElem = pg_sys::pg12::NodeTag_T_IndexElem as isize,
+    Constraint = pg_sys::pg12::NodeTag_T_Constraint as isize,
+    DefElem = pg_sys::pg12::NodeTag_T_DefElem as isize,
+    RangeTblEntry = pg_sys::pg12::NodeTag_T_RangeTblEntry as isize,
+    RangeTblFunction = pg_sys::pg12::NodeTag_T_RangeTblFunction as isize,
+    TableSampleClause = pg_sys::pg12::NodeTag_T_TableSampleClause as isize,
+    WithCheckOption = pg_sys::pg12::NodeTag_T_WithCheckOption as isize,
+    SortGroupClause = pg_sys::pg12::NodeTag_T_SortGroupClause as isize,
+    GroupingSet = pg_sys::pg12::NodeTag_T_GroupingSet as isize,
+    WindowClause = pg_sys::pg12::NodeTag_T_WindowClause as isize,
+    ObjectWithArgs = pg_sys::pg12::NodeTag_T_ObjectWithArgs as isize,
+    AccessPriv = pg_sys::pg12::NodeTag_T_AccessPriv as isize,
+    CreateOpClassItem = pg_sys::pg12::NodeTag_T_CreateOpClassItem as isize,
+    TableLikeClause = pg_sys::pg12::NodeTag_T_TableLikeClause as isize,
+    FunctionParameter = pg_sys::pg12::NodeTag_T_FunctionParameter as isize,
+    LockingClause = pg_sys::pg12::NodeTag_T_LockingClause as isize,
+    RowMarkClause = pg_sys::pg12::NodeTag_T_RowMarkClause as isize,
+    XmlSerialize = pg_sys::pg12::NodeTag_T_XmlSerialize as isize,
+    WithClause = pg_sys::pg12::NodeTag_T_WithClause as isize,
+    InferClause = pg_sys::pg12::NodeTag_T_InferClause as isize,
+    OnConflictClause = pg_sys::pg12::NodeTag_T_OnConflictClause as isize,
+    CommonTableExpr = pg_sys::pg12::NodeTag_T_CommonTableExpr as isize,
+    RoleSpec = pg_sys::pg12::NodeTag_T_RoleSpec as isize,
+    TriggerTransition = pg_sys::pg12::NodeTag_T_TriggerTransition as isize,
+    PartitionElem = pg_sys::pg12::NodeTag_T_PartitionElem as isize,
+    PartitionSpec = pg_sys::pg12::NodeTag_T_PartitionSpec as isize,
+    PartitionBoundSpec = pg_sys::pg12::NodeTag_T_PartitionBoundSpec as isize,
+    PartitionRangeDatum = pg_sys::pg12::NodeTag_T_PartitionRangeDatum as isize,
+    PartitionCmd = pg_sys::pg12::NodeTag_T_PartitionCmd as isize,
+    VacuumRelation = pg_sys::pg12::NodeTag_T_VacuumRelation as isize,
 
     /*
      * TAGS FOR REPLICATION GRAMMAR PARSE NODES (replnodes.h)
      */
-    IdentifySystemCmd = pg_sys::pg12_specific::NodeTag_T_IdentifySystemCmd as isize,
-    BaseBackupCmd = pg_sys::pg12_specific::NodeTag_T_BaseBackupCmd as isize,
-    CreateReplicationSlotCmd = pg_sys::pg12_specific::NodeTag_T_CreateReplicationSlotCmd as isize,
-    DropReplicationSlotCmd = pg_sys::pg12_specific::NodeTag_T_DropReplicationSlotCmd as isize,
-    StartReplicationCmd = pg_sys::pg12_specific::NodeTag_T_StartReplicationCmd as isize,
-    TimeLineHistoryCmd = pg_sys::pg12_specific::NodeTag_T_TimeLineHistoryCmd as isize,
-    SQLCmd = pg_sys::pg12_specific::NodeTag_T_SQLCmd as isize,
+    IdentifySystemCmd = pg_sys::pg12::NodeTag_T_IdentifySystemCmd as isize,
+    BaseBackupCmd = pg_sys::pg12::NodeTag_T_BaseBackupCmd as isize,
+    CreateReplicationSlotCmd = pg_sys::pg12::NodeTag_T_CreateReplicationSlotCmd as isize,
+    DropReplicationSlotCmd = pg_sys::pg12::NodeTag_T_DropReplicationSlotCmd as isize,
+    StartReplicationCmd = pg_sys::pg12::NodeTag_T_StartReplicationCmd as isize,
+    TimeLineHistoryCmd = pg_sys::pg12::NodeTag_T_TimeLineHistoryCmd as isize,
+    SQLCmd = pg_sys::pg12::NodeTag_T_SQLCmd as isize,
 
     /*
      * TAGS FOR RANDOM OTHER STUFF
@@ -480,48 +477,47 @@ pub enum PgNode {
      * purposes (usually because they are involved in APIs where we want to
      * pass multiple object types through the same pointer).
      */
-    TriggerData = pg_sys::pg12_specific::NodeTag_T_TriggerData as isize,
+    TriggerData = pg_sys::pg12::NodeTag_T_TriggerData as isize,
     /* in commands/trigger.h */
-    EventTriggerData = pg_sys::pg12_specific::NodeTag_T_EventTriggerData as isize,
+    EventTriggerData = pg_sys::pg12::NodeTag_T_EventTriggerData as isize,
     /* in commands/event_trigger.h */
-    ReturnSetInfo = pg_sys::pg12_specific::NodeTag_T_ReturnSetInfo as isize,
+    ReturnSetInfo = pg_sys::pg12::NodeTag_T_ReturnSetInfo as isize,
     /* in nodes/execnodes.h */
-    WindowObjectData = pg_sys::pg12_specific::NodeTag_T_WindowObjectData as isize,
+    WindowObjectData = pg_sys::pg12::NodeTag_T_WindowObjectData as isize,
     /* private in nodeWindowAgg.c */
-    TIDBitmap = pg_sys::pg12_specific::NodeTag_T_TIDBitmap as isize,
+    TIDBitmap = pg_sys::pg12::NodeTag_T_TIDBitmap as isize,
     /* in nodes/tidbitmap.h */
-    InlineCodeBlock = pg_sys::pg12_specific::NodeTag_T_InlineCodeBlock as isize,
+    InlineCodeBlock = pg_sys::pg12::NodeTag_T_InlineCodeBlock as isize,
     /* in nodes/parsenodes.h */
-    FdwRoutine = pg_sys::pg12_specific::NodeTag_T_FdwRoutine as isize,
+    FdwRoutine = pg_sys::pg12::NodeTag_T_FdwRoutine as isize,
     /* in foreign/fdwapi.h */
-    IndexAmRoutine = pg_sys::pg12_specific::NodeTag_T_IndexAmRoutine as isize,
+    IndexAmRoutine = pg_sys::pg12::NodeTag_T_IndexAmRoutine as isize,
     /* in access/amapi.h */
-    TableAmRoutine = pg_sys::pg12_specific::NodeTag_T_TableAmRoutine as isize,
+    TableAmRoutine = pg_sys::pg12::NodeTag_T_TableAmRoutine as isize,
     /* in access/tableam.h */
-    TsmRoutine = pg_sys::pg12_specific::NodeTag_T_TsmRoutine as isize,
+    TsmRoutine = pg_sys::pg12::NodeTag_T_TsmRoutine as isize,
     /* in access/tsmapi.h */
-    ForeignKeyCacheInfo = pg_sys::pg12_specific::NodeTag_T_ForeignKeyCacheInfo as isize,
+    ForeignKeyCacheInfo = pg_sys::pg12::NodeTag_T_ForeignKeyCacheInfo as isize,
     /* in utils/rel.h */
-    CallContext = pg_sys::pg12_specific::NodeTag_T_CallContext as isize,
+    CallContext = pg_sys::pg12::NodeTag_T_CallContext as isize,
     /* in nodes/parsenodes.h */
-    SupportRequestSimplify = pg_sys::pg12_specific::NodeTag_T_SupportRequestSimplify as isize,
+    SupportRequestSimplify = pg_sys::pg12::NodeTag_T_SupportRequestSimplify as isize,
     /* in nodes/supportnodes.h */
-    SupportRequestSelectivity = pg_sys::pg12_specific::NodeTag_T_SupportRequestSelectivity as isize,
+    SupportRequestSelectivity = pg_sys::pg12::NodeTag_T_SupportRequestSelectivity as isize,
     /* in nodes/supportnodes.h */
-    SupportRequestCost = pg_sys::pg12_specific::NodeTag_T_SupportRequestCost as isize,
+    SupportRequestCost = pg_sys::pg12::NodeTag_T_SupportRequestCost as isize,
     /* in nodes/supportnodes.h */
-    SupportRequestRows = pg_sys::pg12_specific::NodeTag_T_SupportRequestRows as isize,
+    SupportRequestRows = pg_sys::pg12::NodeTag_T_SupportRequestRows as isize,
     /* in nodes/supportnodes.h */
-    SupportRequestIndexCondition =
-        pg_sys::pg12_specific::NodeTag_T_SupportRequestIndexCondition as isize, /* in nodes/supportnodes.h */
+    SupportRequestIndexCondition = pg_sys::pg12::NodeTag_T_SupportRequestIndexCondition as isize, /* in nodes/supportnodes.h */
 }
 
 pub struct PgNodeFactory();
 
 #[allow(non_snake_case)]
 impl PgNodeFactory {
-    pub fn makeIndexInfo() -> PgBox<pg_sys::pg12_specific::IndexInfo> {
-        PgBox::<pg_sys::pg12_specific::IndexInfo>::alloc_node(PgNode::IndexInfo)
+    pub fn makeIndexInfo() -> PgBox<pg_sys::pg12::IndexInfo> {
+        PgBox::<pg_sys::pg12::IndexInfo>::alloc_node(PgNode::IndexInfo)
     }
     pub fn makeExprContext() -> PgBox<pg_sys::ExprContext> {
         PgBox::<pg_sys::ExprContext>::alloc_node(PgNode::ExprContext)
@@ -532,17 +528,17 @@ impl PgNodeFactory {
     pub fn makeJunkFilter() -> PgBox<pg_sys::JunkFilter> {
         PgBox::<pg_sys::JunkFilter>::alloc_node(PgNode::JunkFilter)
     }
-    pub fn makeOnConflictSetState() -> PgBox<pg_sys::pg12_specific::OnConflictSetState> {
-        PgBox::<pg_sys::pg12_specific::OnConflictSetState>::alloc_node(PgNode::OnConflictSetState)
+    pub fn makeOnConflictSetState() -> PgBox<pg_sys::pg12::OnConflictSetState> {
+        PgBox::<pg_sys::pg12::OnConflictSetState>::alloc_node(PgNode::OnConflictSetState)
     }
-    pub fn makeResultRelInfo() -> PgBox<pg_sys::pg12_specific::ResultRelInfo> {
-        PgBox::<pg_sys::pg12_specific::ResultRelInfo>::alloc_node(PgNode::ResultRelInfo)
+    pub fn makeResultRelInfo() -> PgBox<pg_sys::pg12::ResultRelInfo> {
+        PgBox::<pg_sys::pg12::ResultRelInfo>::alloc_node(PgNode::ResultRelInfo)
     }
-    pub fn makeEState() -> PgBox<pg_sys::pg12_specific::EState> {
-        PgBox::<pg_sys::pg12_specific::EState>::alloc_node(PgNode::EState)
+    pub fn makeEState() -> PgBox<pg_sys::pg12::EState> {
+        PgBox::<pg_sys::pg12::EState>::alloc_node(PgNode::EState)
     }
-    pub fn makeTupleTableSlot() -> PgBox<pg_sys::pg12_specific::TupleTableSlot> {
-        PgBox::<pg_sys::pg12_specific::TupleTableSlot>::alloc_node(PgNode::TupleTableSlot)
+    pub fn makeTupleTableSlot() -> PgBox<pg_sys::pg12::TupleTableSlot> {
+        PgBox::<pg_sys::pg12::TupleTableSlot>::alloc_node(PgNode::TupleTableSlot)
     }
 
     pub fn makePlan() -> PgBox<pg_sys::Plan> {
@@ -554,17 +550,17 @@ impl PgNodeFactory {
     pub fn makeProjectSet() -> PgBox<pg_sys::ProjectSet> {
         PgBox::<pg_sys::ProjectSet>::alloc_node(PgNode::ProjectSet)
     }
-    pub fn makeModifyTable() -> PgBox<pg_sys::pg12_specific::ModifyTable> {
-        PgBox::<pg_sys::pg12_specific::ModifyTable>::alloc_node(PgNode::ModifyTable)
+    pub fn makeModifyTable() -> PgBox<pg_sys::pg12::ModifyTable> {
+        PgBox::<pg_sys::pg12::ModifyTable>::alloc_node(PgNode::ModifyTable)
     }
-    pub fn makeAppend() -> PgBox<pg_sys::pg12_specific::Append> {
-        PgBox::<pg_sys::pg12_specific::Append>::alloc_node(PgNode::Append)
+    pub fn makeAppend() -> PgBox<pg_sys::pg12::Append> {
+        PgBox::<pg_sys::pg12::Append>::alloc_node(PgNode::Append)
     }
-    pub fn makeMergeAppend() -> PgBox<pg_sys::pg12_specific::MergeAppend> {
-        PgBox::<pg_sys::pg12_specific::MergeAppend>::alloc_node(PgNode::MergeAppend)
+    pub fn makeMergeAppend() -> PgBox<pg_sys::pg12::MergeAppend> {
+        PgBox::<pg_sys::pg12::MergeAppend>::alloc_node(PgNode::MergeAppend)
     }
-    pub fn makeRecursiveUnion() -> PgBox<pg_sys::pg12_specific::RecursiveUnion> {
-        PgBox::<pg_sys::pg12_specific::RecursiveUnion>::alloc_node(PgNode::RecursiveUnion)
+    pub fn makeRecursiveUnion() -> PgBox<pg_sys::pg12::RecursiveUnion> {
+        PgBox::<pg_sys::pg12::RecursiveUnion>::alloc_node(PgNode::RecursiveUnion)
     }
     pub fn makeBitmapAnd() -> PgBox<pg_sys::BitmapAnd> {
         PgBox::<pg_sys::BitmapAnd>::alloc_node(PgNode::BitmapAnd)
@@ -632,8 +628,8 @@ impl PgNodeFactory {
     pub fn makeMergeJoin() -> PgBox<pg_sys::MergeJoin> {
         PgBox::<pg_sys::MergeJoin>::alloc_node(PgNode::MergeJoin)
     }
-    pub fn makeHashJoin() -> PgBox<pg_sys::pg12_specific::HashJoin> {
-        PgBox::<pg_sys::pg12_specific::HashJoin>::alloc_node(PgNode::HashJoin)
+    pub fn makeHashJoin() -> PgBox<pg_sys::pg12::HashJoin> {
+        PgBox::<pg_sys::pg12::HashJoin>::alloc_node(PgNode::HashJoin)
     }
     pub fn makeMaterial() -> PgBox<pg_sys::Material> {
         PgBox::<pg_sys::Material>::alloc_node(PgNode::Material)
@@ -641,29 +637,29 @@ impl PgNodeFactory {
     pub fn makeSort() -> PgBox<pg_sys::Sort> {
         PgBox::<pg_sys::Sort>::alloc_node(PgNode::Sort)
     }
-    pub fn makeGroup() -> PgBox<pg_sys::pg12_specific::Group> {
-        PgBox::<pg_sys::pg12_specific::Group>::alloc_node(PgNode::Group)
+    pub fn makeGroup() -> PgBox<pg_sys::pg12::Group> {
+        PgBox::<pg_sys::pg12::Group>::alloc_node(PgNode::Group)
     }
-    pub fn makeAgg() -> PgBox<pg_sys::pg12_specific::Agg> {
-        PgBox::<pg_sys::pg12_specific::Agg>::alloc_node(PgNode::Agg)
+    pub fn makeAgg() -> PgBox<pg_sys::pg12::Agg> {
+        PgBox::<pg_sys::pg12::Agg>::alloc_node(PgNode::Agg)
     }
-    pub fn makeWindowAgg() -> PgBox<pg_sys::pg12_specific::WindowAgg> {
-        PgBox::<pg_sys::pg12_specific::WindowAgg>::alloc_node(PgNode::WindowAgg)
+    pub fn makeWindowAgg() -> PgBox<pg_sys::pg12::WindowAgg> {
+        PgBox::<pg_sys::pg12::WindowAgg>::alloc_node(PgNode::WindowAgg)
     }
-    pub fn makeUnique() -> PgBox<pg_sys::pg12_specific::Unique> {
-        PgBox::<pg_sys::pg12_specific::Unique>::alloc_node(PgNode::Unique)
+    pub fn makeUnique() -> PgBox<pg_sys::pg12::Unique> {
+        PgBox::<pg_sys::pg12::Unique>::alloc_node(PgNode::Unique)
     }
-    pub fn makeGather() -> PgBox<pg_sys::pg12_specific::Gather> {
-        PgBox::<pg_sys::pg12_specific::Gather>::alloc_node(PgNode::Gather)
+    pub fn makeGather() -> PgBox<pg_sys::pg12::Gather> {
+        PgBox::<pg_sys::pg12::Gather>::alloc_node(PgNode::Gather)
     }
-    pub fn makeGatherMerge() -> PgBox<pg_sys::pg12_specific::GatherMerge> {
-        PgBox::<pg_sys::pg12_specific::GatherMerge>::alloc_node(PgNode::GatherMerge)
+    pub fn makeGatherMerge() -> PgBox<pg_sys::pg12::GatherMerge> {
+        PgBox::<pg_sys::pg12::GatherMerge>::alloc_node(PgNode::GatherMerge)
     }
-    pub fn makeHash() -> PgBox<pg_sys::pg12_specific::Hash> {
-        PgBox::<pg_sys::pg12_specific::Hash>::alloc_node(PgNode::Hash)
+    pub fn makeHash() -> PgBox<pg_sys::pg12::Hash> {
+        PgBox::<pg_sys::pg12::Hash>::alloc_node(PgNode::Hash)
     }
-    pub fn makeSetOp() -> PgBox<pg_sys::pg12_specific::SetOp> {
-        PgBox::<pg_sys::pg12_specific::SetOp>::alloc_node(PgNode::SetOp)
+    pub fn makeSetOp() -> PgBox<pg_sys::pg12::SetOp> {
+        PgBox::<pg_sys::pg12::SetOp>::alloc_node(PgNode::SetOp)
     }
     pub fn makeLockRows() -> PgBox<pg_sys::LockRows> {
         PgBox::<pg_sys::LockRows>::alloc_node(PgNode::LockRows)
@@ -678,22 +674,17 @@ impl PgNodeFactory {
     pub fn makePlanRowMark() -> PgBox<pg_sys::PlanRowMark> {
         PgBox::<pg_sys::PlanRowMark>::alloc_node(PgNode::PlanRowMark)
     }
-    pub fn makePartitionPruneInfo() -> PgBox<pg_sys::pg12_specific::PartitionPruneInfo> {
-        PgBox::<pg_sys::pg12_specific::PartitionPruneInfo>::alloc_node(PgNode::PartitionPruneInfo)
+    pub fn makePartitionPruneInfo() -> PgBox<pg_sys::pg12::PartitionPruneInfo> {
+        PgBox::<pg_sys::pg12::PartitionPruneInfo>::alloc_node(PgNode::PartitionPruneInfo)
     }
-    pub fn makePartitionedRelPruneInfo() -> PgBox<pg_sys::pg12_specific::PartitionedRelPruneInfo> {
-        PgBox::<pg_sys::pg12_specific::PartitionedRelPruneInfo>::alloc_node(
-            PgNode::PartitionedRelPruneInfo,
-        )
+    pub fn makePartitionedRelPruneInfo() -> PgBox<pg_sys::pg12::PartitionedRelPruneInfo> {
+        PgBox::<pg_sys::pg12::PartitionedRelPruneInfo>::alloc_node(PgNode::PartitionedRelPruneInfo)
     }
-    pub fn makePartitionPruneStepOp() -> PgBox<pg_sys::pg12_specific::PartitionPruneStepOp> {
-        PgBox::<pg_sys::pg12_specific::PartitionPruneStepOp>::alloc_node(
-            PgNode::PartitionPruneStepOp,
-        )
+    pub fn makePartitionPruneStepOp() -> PgBox<pg_sys::pg12::PartitionPruneStepOp> {
+        PgBox::<pg_sys::pg12::PartitionPruneStepOp>::alloc_node(PgNode::PartitionPruneStepOp)
     }
-    pub fn makePartitionPruneStepCombine() -> PgBox<pg_sys::pg12_specific::PartitionPruneStepCombine>
-    {
-        PgBox::<pg_sys::pg12_specific::PartitionPruneStepCombine>::alloc_node(
+    pub fn makePartitionPruneStepCombine() -> PgBox<pg_sys::pg12::PartitionPruneStepCombine> {
+        PgBox::<pg_sys::pg12::PartitionPruneStepCombine>::alloc_node(
             PgNode::PartitionPruneStepCombine,
         )
     }
@@ -701,26 +692,26 @@ impl PgNodeFactory {
         PgBox::<pg_sys::PlanInvalItem>::alloc_node(PgNode::PlanInvalItem)
     }
 
-    pub fn makePlanState() -> PgBox<pg_sys::pg12_specific::PlanState> {
-        PgBox::<pg_sys::pg12_specific::PlanState>::alloc_node(PgNode::PlanState)
+    pub fn makePlanState() -> PgBox<pg_sys::pg12::PlanState> {
+        PgBox::<pg_sys::pg12::PlanState>::alloc_node(PgNode::PlanState)
     }
     pub fn makeResultState() -> PgBox<pg_sys::ResultState> {
         PgBox::<pg_sys::ResultState>::alloc_node(PgNode::ResultState)
     }
-    pub fn makeProjectSetState() -> PgBox<pg_sys::pg12_specific::ProjectSetState> {
-        PgBox::<pg_sys::pg12_specific::ProjectSetState>::alloc_node(PgNode::ProjectSetState)
+    pub fn makeProjectSetState() -> PgBox<pg_sys::pg12::ProjectSetState> {
+        PgBox::<pg_sys::pg12::ProjectSetState>::alloc_node(PgNode::ProjectSetState)
     }
-    pub fn makeModifyTableState() -> PgBox<pg_sys::pg12_specific::ModifyTableState> {
-        PgBox::<pg_sys::pg12_specific::ModifyTableState>::alloc_node(PgNode::ModifyTableState)
+    pub fn makeModifyTableState() -> PgBox<pg_sys::pg12::ModifyTableState> {
+        PgBox::<pg_sys::pg12::ModifyTableState>::alloc_node(PgNode::ModifyTableState)
     }
-    pub fn makeAppendState() -> PgBox<pg_sys::pg12_specific::AppendState> {
-        PgBox::<pg_sys::pg12_specific::AppendState>::alloc_node(PgNode::AppendState)
+    pub fn makeAppendState() -> PgBox<pg_sys::pg12::AppendState> {
+        PgBox::<pg_sys::pg12::AppendState>::alloc_node(PgNode::AppendState)
     }
-    pub fn makeMergeAppendState() -> PgBox<pg_sys::pg12_specific::MergeAppendState> {
-        PgBox::<pg_sys::pg12_specific::MergeAppendState>::alloc_node(PgNode::MergeAppendState)
+    pub fn makeMergeAppendState() -> PgBox<pg_sys::pg12::MergeAppendState> {
+        PgBox::<pg_sys::pg12::MergeAppendState>::alloc_node(PgNode::MergeAppendState)
     }
-    pub fn makeRecursiveUnionState() -> PgBox<pg_sys::pg12_specific::RecursiveUnionState> {
-        PgBox::<pg_sys::pg12_specific::RecursiveUnionState>::alloc_node(PgNode::RecursiveUnionState)
+    pub fn makeRecursiveUnionState() -> PgBox<pg_sys::pg12::RecursiveUnionState> {
+        PgBox::<pg_sys::pg12::RecursiveUnionState>::alloc_node(PgNode::RecursiveUnionState)
     }
     pub fn makeBitmapAndState() -> PgBox<pg_sys::BitmapAndState> {
         PgBox::<pg_sys::BitmapAndState>::alloc_node(PgNode::BitmapAndState)
@@ -728,28 +719,26 @@ impl PgNodeFactory {
     pub fn makeBitmapOrState() -> PgBox<pg_sys::BitmapOrState> {
         PgBox::<pg_sys::BitmapOrState>::alloc_node(PgNode::BitmapOrState)
     }
-    pub fn makeScanState() -> PgBox<pg_sys::pg12_specific::ScanState> {
-        PgBox::<pg_sys::pg12_specific::ScanState>::alloc_node(PgNode::ScanState)
+    pub fn makeScanState() -> PgBox<pg_sys::pg12::ScanState> {
+        PgBox::<pg_sys::pg12::ScanState>::alloc_node(PgNode::ScanState)
     }
     pub fn makeSeqScanState() -> PgBox<pg_sys::SeqScanState> {
         PgBox::<pg_sys::SeqScanState>::alloc_node(PgNode::SeqScanState)
     }
-    pub fn makeSampleScanState() -> PgBox<pg_sys::pg12_specific::SampleScanState> {
-        PgBox::<pg_sys::pg12_specific::SampleScanState>::alloc_node(PgNode::SampleScanState)
+    pub fn makeSampleScanState() -> PgBox<pg_sys::pg12::SampleScanState> {
+        PgBox::<pg_sys::pg12::SampleScanState>::alloc_node(PgNode::SampleScanState)
     }
-    pub fn makeIndexScanState() -> PgBox<pg_sys::pg12_specific::IndexScanState> {
-        PgBox::<pg_sys::pg12_specific::IndexScanState>::alloc_node(PgNode::IndexScanState)
+    pub fn makeIndexScanState() -> PgBox<pg_sys::pg12::IndexScanState> {
+        PgBox::<pg_sys::pg12::IndexScanState>::alloc_node(PgNode::IndexScanState)
     }
-    pub fn makeIndexOnlyScanState() -> PgBox<pg_sys::pg12_specific::IndexOnlyScanState> {
-        PgBox::<pg_sys::pg12_specific::IndexOnlyScanState>::alloc_node(PgNode::IndexOnlyScanState)
+    pub fn makeIndexOnlyScanState() -> PgBox<pg_sys::pg12::IndexOnlyScanState> {
+        PgBox::<pg_sys::pg12::IndexOnlyScanState>::alloc_node(PgNode::IndexOnlyScanState)
     }
-    pub fn makeBitmapIndexScanState() -> PgBox<pg_sys::pg12_specific::BitmapIndexScanState> {
-        PgBox::<pg_sys::pg12_specific::BitmapIndexScanState>::alloc_node(
-            PgNode::BitmapIndexScanState,
-        )
+    pub fn makeBitmapIndexScanState() -> PgBox<pg_sys::pg12::BitmapIndexScanState> {
+        PgBox::<pg_sys::pg12::BitmapIndexScanState>::alloc_node(PgNode::BitmapIndexScanState)
     }
-    pub fn makeBitmapHeapScanState() -> PgBox<pg_sys::pg12_specific::BitmapHeapScanState> {
-        PgBox::<pg_sys::pg12_specific::BitmapHeapScanState>::alloc_node(PgNode::BitmapHeapScanState)
+    pub fn makeBitmapHeapScanState() -> PgBox<pg_sys::pg12::BitmapHeapScanState> {
+        PgBox::<pg_sys::pg12::BitmapHeapScanState>::alloc_node(PgNode::BitmapHeapScanState)
     }
     pub fn makeTidScanState() -> PgBox<pg_sys::TidScanState> {
         PgBox::<pg_sys::TidScanState>::alloc_node(PgNode::TidScanState)
@@ -790,41 +779,41 @@ impl PgNodeFactory {
     pub fn makeMergeJoinState() -> PgBox<pg_sys::MergeJoinState> {
         PgBox::<pg_sys::MergeJoinState>::alloc_node(PgNode::MergeJoinState)
     }
-    pub fn makeHashJoinState() -> PgBox<pg_sys::pg12_specific::HashJoinState> {
-        PgBox::<pg_sys::pg12_specific::HashJoinState>::alloc_node(PgNode::HashJoinState)
+    pub fn makeHashJoinState() -> PgBox<pg_sys::pg12::HashJoinState> {
+        PgBox::<pg_sys::pg12::HashJoinState>::alloc_node(PgNode::HashJoinState)
     }
     pub fn makeMaterialState() -> PgBox<pg_sys::MaterialState> {
         PgBox::<pg_sys::MaterialState>::alloc_node(PgNode::MaterialState)
     }
-    pub fn makeSortState() -> PgBox<pg_sys::pg12_specific::SortState> {
-        PgBox::<pg_sys::pg12_specific::SortState>::alloc_node(PgNode::SortState)
+    pub fn makeSortState() -> PgBox<pg_sys::pg12::SortState> {
+        PgBox::<pg_sys::pg12::SortState>::alloc_node(PgNode::SortState)
     }
-    pub fn makeGroupState() -> PgBox<pg_sys::pg12_specific::GroupState> {
-        PgBox::<pg_sys::pg12_specific::GroupState>::alloc_node(PgNode::GroupState)
+    pub fn makeGroupState() -> PgBox<pg_sys::pg12::GroupState> {
+        PgBox::<pg_sys::pg12::GroupState>::alloc_node(PgNode::GroupState)
     }
-    pub fn makeAggState() -> PgBox<pg_sys::pg12_specific::AggState> {
-        PgBox::<pg_sys::pg12_specific::AggState>::alloc_node(PgNode::AggState)
+    pub fn makeAggState() -> PgBox<pg_sys::pg12::AggState> {
+        PgBox::<pg_sys::pg12::AggState>::alloc_node(PgNode::AggState)
     }
-    pub fn makeWindowAggState() -> PgBox<pg_sys::pg12_specific::WindowAggState> {
-        PgBox::<pg_sys::pg12_specific::WindowAggState>::alloc_node(PgNode::WindowAggState)
+    pub fn makeWindowAggState() -> PgBox<pg_sys::pg12::WindowAggState> {
+        PgBox::<pg_sys::pg12::WindowAggState>::alloc_node(PgNode::WindowAggState)
     }
-    pub fn makeUniqueState() -> PgBox<pg_sys::pg12_specific::UniqueState> {
-        PgBox::<pg_sys::pg12_specific::UniqueState>::alloc_node(PgNode::UniqueState)
+    pub fn makeUniqueState() -> PgBox<pg_sys::pg12::UniqueState> {
+        PgBox::<pg_sys::pg12::UniqueState>::alloc_node(PgNode::UniqueState)
     }
-    pub fn makeGatherState() -> PgBox<pg_sys::pg12_specific::GatherState> {
-        PgBox::<pg_sys::pg12_specific::GatherState>::alloc_node(PgNode::GatherState)
+    pub fn makeGatherState() -> PgBox<pg_sys::pg12::GatherState> {
+        PgBox::<pg_sys::pg12::GatherState>::alloc_node(PgNode::GatherState)
     }
-    pub fn makeGatherMergeState() -> PgBox<pg_sys::pg12_specific::GatherMergeState> {
-        PgBox::<pg_sys::pg12_specific::GatherMergeState>::alloc_node(PgNode::GatherMergeState)
+    pub fn makeGatherMergeState() -> PgBox<pg_sys::pg12::GatherMergeState> {
+        PgBox::<pg_sys::pg12::GatherMergeState>::alloc_node(PgNode::GatherMergeState)
     }
-    pub fn makeHashState() -> PgBox<pg_sys::pg12_specific::HashState> {
-        PgBox::<pg_sys::pg12_specific::HashState>::alloc_node(PgNode::HashState)
+    pub fn makeHashState() -> PgBox<pg_sys::pg12::HashState> {
+        PgBox::<pg_sys::pg12::HashState>::alloc_node(PgNode::HashState)
     }
-    pub fn makeSetOpState() -> PgBox<pg_sys::pg12_specific::SetOpState> {
-        PgBox::<pg_sys::pg12_specific::SetOpState>::alloc_node(PgNode::SetOpState)
+    pub fn makeSetOpState() -> PgBox<pg_sys::pg12::SetOpState> {
+        PgBox::<pg_sys::pg12::SetOpState>::alloc_node(PgNode::SetOpState)
     }
-    pub fn makeLockRowsState() -> PgBox<pg_sys::pg12_specific::LockRowsState> {
-        PgBox::<pg_sys::pg12_specific::LockRowsState>::alloc_node(PgNode::LockRowsState)
+    pub fn makeLockRowsState() -> PgBox<pg_sys::pg12::LockRowsState> {
+        PgBox::<pg_sys::pg12::LockRowsState>::alloc_node(PgNode::LockRowsState)
     }
     pub fn makeLimitState() -> PgBox<pg_sys::LimitState> {
         PgBox::<pg_sys::LimitState>::alloc_node(PgNode::LimitState)
@@ -872,8 +861,8 @@ impl PgNodeFactory {
     pub fn makeWindowFunc() -> PgBox<pg_sys::WindowFunc> {
         PgBox::<pg_sys::WindowFunc>::alloc_node(PgNode::WindowFunc)
     }
-    pub fn makeSubscriptingRef() -> PgBox<pg_sys::pg12_specific::SubscriptingRef> {
-        PgBox::<pg_sys::pg12_specific::SubscriptingRef>::alloc_node(PgNode::SubscriptingRef)
+    pub fn makeSubscriptingRef() -> PgBox<pg_sys::pg12::SubscriptingRef> {
+        PgBox::<pg_sys::pg12::SubscriptingRef>::alloc_node(PgNode::SubscriptingRef)
     }
     pub fn makeFuncExpr() -> PgBox<pg_sys::FuncExpr> {
         PgBox::<pg_sys::FuncExpr>::alloc_node(PgNode::FuncExpr)
@@ -917,8 +906,8 @@ impl PgNodeFactory {
     pub fn makeCoerceViaIO() -> PgBox<pg_sys::CoerceViaIO> {
         PgBox::<pg_sys::CoerceViaIO>::alloc_node(PgNode::CoerceViaIO)
     }
-    pub fn makeArrayCoerceExpr() -> PgBox<pg_sys::pg12_specific::ArrayCoerceExpr> {
-        PgBox::<pg_sys::pg12_specific::ArrayCoerceExpr>::alloc_node(PgNode::ArrayCoerceExpr)
+    pub fn makeArrayCoerceExpr() -> PgBox<pg_sys::pg12::ArrayCoerceExpr> {
+        PgBox::<pg_sys::pg12::ArrayCoerceExpr>::alloc_node(PgNode::ArrayCoerceExpr)
     }
     pub fn makeConvertRowtypeExpr() -> PgBox<pg_sys::ConvertRowtypeExpr> {
         PgBox::<pg_sys::ConvertRowtypeExpr>::alloc_node(PgNode::ConvertRowtypeExpr)
@@ -995,12 +984,12 @@ impl PgNodeFactory {
     pub fn makeOnConflictExpr() -> PgBox<pg_sys::OnConflictExpr> {
         PgBox::<pg_sys::OnConflictExpr>::alloc_node(PgNode::OnConflictExpr)
     }
-    pub fn makeIntoClause() -> PgBox<pg_sys::pg12_specific::IntoClause> {
-        PgBox::<pg_sys::pg12_specific::IntoClause>::alloc_node(PgNode::IntoClause)
+    pub fn makeIntoClause() -> PgBox<pg_sys::pg12::IntoClause> {
+        PgBox::<pg_sys::pg12::IntoClause>::alloc_node(PgNode::IntoClause)
     }
 
-    pub fn makeExprState() -> PgBox<pg_sys::pg12_specific::ExprState> {
-        PgBox::<pg_sys::pg12_specific::ExprState>::alloc_node(PgNode::ExprState)
+    pub fn makeExprState() -> PgBox<pg_sys::pg12::ExprState> {
+        PgBox::<pg_sys::pg12::ExprState>::alloc_node(PgNode::ExprState)
     }
     pub fn makeAggrefExprState() -> PgBox<pg_sys::AggrefExprState> {
         PgBox::<pg_sys::AggrefExprState>::alloc_node(PgNode::AggrefExprState)
@@ -1008,11 +997,11 @@ impl PgNodeFactory {
     pub fn makeWindowFuncExprState() -> PgBox<pg_sys::WindowFuncExprState> {
         PgBox::<pg_sys::WindowFuncExprState>::alloc_node(PgNode::WindowFuncExprState)
     }
-    pub fn makeSetExprState() -> PgBox<pg_sys::pg12_specific::SetExprState> {
-        PgBox::<pg_sys::pg12_specific::SetExprState>::alloc_node(PgNode::SetExprState)
+    pub fn makeSetExprState() -> PgBox<pg_sys::pg12::SetExprState> {
+        PgBox::<pg_sys::pg12::SetExprState>::alloc_node(PgNode::SetExprState)
     }
-    pub fn makeSubPlanState() -> PgBox<pg_sys::pg12_specific::SubPlanState> {
-        PgBox::<pg_sys::pg12_specific::SubPlanState>::alloc_node(PgNode::SubPlanState)
+    pub fn makeSubPlanState() -> PgBox<pg_sys::pg12::SubPlanState> {
+        PgBox::<pg_sys::pg12::SubPlanState>::alloc_node(PgNode::SubPlanState)
     }
     pub fn makeAlternativeSubPlanState() -> PgBox<pg_sys::AlternativeSubPlanState> {
         PgBox::<pg_sys::AlternativeSubPlanState>::alloc_node(PgNode::AlternativeSubPlanState)
@@ -1021,17 +1010,17 @@ impl PgNodeFactory {
         PgBox::<pg_sys::DomainConstraintState>::alloc_node(PgNode::DomainConstraintState)
     }
 
-    pub fn makePlannerInfo() -> PgBox<pg_sys::pg12_specific::PlannerInfo> {
-        PgBox::<pg_sys::pg12_specific::PlannerInfo>::alloc_node(PgNode::PlannerInfo)
+    pub fn makePlannerInfo() -> PgBox<pg_sys::pg12::PlannerInfo> {
+        PgBox::<pg_sys::pg12::PlannerInfo>::alloc_node(PgNode::PlannerInfo)
     }
-    pub fn makePlannerGlobal() -> PgBox<pg_sys::pg12_specific::PlannerGlobal> {
-        PgBox::<pg_sys::pg12_specific::PlannerGlobal>::alloc_node(PgNode::PlannerGlobal)
+    pub fn makePlannerGlobal() -> PgBox<pg_sys::pg12::PlannerGlobal> {
+        PgBox::<pg_sys::pg12::PlannerGlobal>::alloc_node(PgNode::PlannerGlobal)
     }
-    pub fn makeRelOptInfo() -> PgBox<pg_sys::pg12_specific::RelOptInfo> {
-        PgBox::<pg_sys::pg12_specific::RelOptInfo>::alloc_node(PgNode::RelOptInfo)
+    pub fn makeRelOptInfo() -> PgBox<pg_sys::pg12::RelOptInfo> {
+        PgBox::<pg_sys::pg12::RelOptInfo>::alloc_node(PgNode::RelOptInfo)
     }
-    pub fn makeIndexOptInfo() -> PgBox<pg_sys::pg12_specific::IndexOptInfo> {
-        PgBox::<pg_sys::pg12_specific::IndexOptInfo>::alloc_node(PgNode::IndexOptInfo)
+    pub fn makeIndexOptInfo() -> PgBox<pg_sys::pg12::IndexOptInfo> {
+        PgBox::<pg_sys::pg12::IndexOptInfo>::alloc_node(PgNode::IndexOptInfo)
     }
     pub fn makeForeignKeyOptInfo() -> PgBox<pg_sys::ForeignKeyOptInfo> {
         PgBox::<pg_sys::ForeignKeyOptInfo>::alloc_node(PgNode::ForeignKeyOptInfo)
@@ -1042,8 +1031,8 @@ impl PgNodeFactory {
     pub fn makePath() -> PgBox<pg_sys::Path> {
         PgBox::<pg_sys::Path>::alloc_node(PgNode::Path)
     }
-    pub fn makeIndexPath() -> PgBox<pg_sys::pg12_specific::IndexPath> {
-        PgBox::<pg_sys::pg12_specific::IndexPath>::alloc_node(PgNode::IndexPath)
+    pub fn makeIndexPath() -> PgBox<pg_sys::pg12::IndexPath> {
+        PgBox::<pg_sys::pg12::IndexPath>::alloc_node(PgNode::IndexPath)
     }
     pub fn makeBitmapHeapPath() -> PgBox<pg_sys::BitmapHeapPath> {
         PgBox::<pg_sys::BitmapHeapPath>::alloc_node(PgNode::BitmapHeapPath)
@@ -1072,17 +1061,17 @@ impl PgNodeFactory {
     pub fn makeMergePath() -> PgBox<pg_sys::MergePath> {
         PgBox::<pg_sys::MergePath>::alloc_node(PgNode::MergePath)
     }
-    pub fn makeHashPath() -> PgBox<pg_sys::pg12_specific::HashPath> {
-        PgBox::<pg_sys::pg12_specific::HashPath>::alloc_node(PgNode::HashPath)
+    pub fn makeHashPath() -> PgBox<pg_sys::pg12::HashPath> {
+        PgBox::<pg_sys::pg12::HashPath>::alloc_node(PgNode::HashPath)
     }
-    pub fn makeAppendPath() -> PgBox<pg_sys::pg12_specific::AppendPath> {
-        PgBox::<pg_sys::pg12_specific::AppendPath>::alloc_node(PgNode::AppendPath)
+    pub fn makeAppendPath() -> PgBox<pg_sys::pg12::AppendPath> {
+        PgBox::<pg_sys::pg12::AppendPath>::alloc_node(PgNode::AppendPath)
     }
     pub fn makeMergeAppendPath() -> PgBox<pg_sys::MergeAppendPath> {
         PgBox::<pg_sys::MergeAppendPath>::alloc_node(PgNode::MergeAppendPath)
     }
-    pub fn makeGroupResultPath() -> PgBox<pg_sys::pg12_specific::GroupResultPath> {
-        PgBox::<pg_sys::pg12_specific::GroupResultPath>::alloc_node(PgNode::GroupResultPath)
+    pub fn makeGroupResultPath() -> PgBox<pg_sys::pg12::GroupResultPath> {
+        PgBox::<pg_sys::pg12::GroupResultPath>::alloc_node(PgNode::GroupResultPath)
     }
     pub fn makeMaterialPath() -> PgBox<pg_sys::MaterialPath> {
         PgBox::<pg_sys::MaterialPath>::alloc_node(PgNode::MaterialPath)
@@ -1120,8 +1109,8 @@ impl PgNodeFactory {
     pub fn makeMinMaxAggPath() -> PgBox<pg_sys::MinMaxAggPath> {
         PgBox::<pg_sys::MinMaxAggPath>::alloc_node(PgNode::MinMaxAggPath)
     }
-    pub fn makeWindowAggPath() -> PgBox<pg_sys::pg12_specific::WindowAggPath> {
-        PgBox::<pg_sys::pg12_specific::WindowAggPath>::alloc_node(PgNode::WindowAggPath)
+    pub fn makeWindowAggPath() -> PgBox<pg_sys::pg12::WindowAggPath> {
+        PgBox::<pg_sys::pg12::WindowAggPath>::alloc_node(PgNode::WindowAggPath)
     }
     pub fn makeSetOpPath() -> PgBox<pg_sys::SetOpPath> {
         PgBox::<pg_sys::SetOpPath>::alloc_node(PgNode::SetOpPath)
@@ -1132,8 +1121,8 @@ impl PgNodeFactory {
     pub fn makeLockRowsPath() -> PgBox<pg_sys::LockRowsPath> {
         PgBox::<pg_sys::LockRowsPath>::alloc_node(PgNode::LockRowsPath)
     }
-    pub fn makeModifyTablePath() -> PgBox<pg_sys::pg12_specific::ModifyTablePath> {
-        PgBox::<pg_sys::pg12_specific::ModifyTablePath>::alloc_node(PgNode::ModifyTablePath)
+    pub fn makeModifyTablePath() -> PgBox<pg_sys::pg12::ModifyTablePath> {
+        PgBox::<pg_sys::pg12::ModifyTablePath>::alloc_node(PgNode::ModifyTablePath)
     }
     pub fn makeLimitPath() -> PgBox<pg_sys::LimitPath> {
         PgBox::<pg_sys::LimitPath>::alloc_node(PgNode::LimitPath)
@@ -1151,11 +1140,11 @@ impl PgNodeFactory {
     pub fn makePathTarget() -> PgBox<pg_sys::PathTarget> {
         PgBox::<pg_sys::PathTarget>::alloc_node(PgNode::PathTarget)
     }
-    pub fn makeRestrictInfo() -> PgBox<pg_sys::pg12_specific::RestrictInfo> {
-        PgBox::<pg_sys::pg12_specific::RestrictInfo>::alloc_node(PgNode::RestrictInfo)
+    pub fn makeRestrictInfo() -> PgBox<pg_sys::pg12::RestrictInfo> {
+        PgBox::<pg_sys::pg12::RestrictInfo>::alloc_node(PgNode::RestrictInfo)
     }
-    pub fn makeIndexClause() -> PgBox<pg_sys::pg12_specific::IndexClause> {
-        PgBox::<pg_sys::pg12_specific::IndexClause>::alloc_node(PgNode::IndexClause)
+    pub fn makeIndexClause() -> PgBox<pg_sys::pg12::IndexClause> {
+        PgBox::<pg_sys::pg12::IndexClause>::alloc_node(PgNode::IndexClause)
     }
     pub fn makePlaceHolderVar() -> PgBox<pg_sys::PlaceHolderVar> {
         PgBox::<pg_sys::PlaceHolderVar>::alloc_node(PgNode::PlaceHolderVar)
@@ -1251,11 +1240,11 @@ impl PgNodeFactory {
     pub fn makeRawStmt() -> PgBox<pg_sys::RawStmt> {
         PgBox::<pg_sys::RawStmt>::alloc_node(PgNode::RawStmt)
     }
-    pub fn makeQuery() -> PgBox<pg_sys::pg12_specific::Query> {
-        PgBox::<pg_sys::pg12_specific::Query>::alloc_node(PgNode::Query)
+    pub fn makeQuery() -> PgBox<pg_sys::pg12::Query> {
+        PgBox::<pg_sys::pg12::Query>::alloc_node(PgNode::Query)
     }
-    pub fn makePlannedStmt() -> PgBox<pg_sys::pg12_specific::PlannedStmt> {
-        PgBox::<pg_sys::pg12_specific::PlannedStmt>::alloc_node(PgNode::PlannedStmt)
+    pub fn makePlannedStmt() -> PgBox<pg_sys::pg12::PlannedStmt> {
+        PgBox::<pg_sys::pg12::PlannedStmt>::alloc_node(PgNode::PlannedStmt)
     }
     pub fn makeInsertStmt() -> PgBox<pg_sys::InsertStmt> {
         PgBox::<pg_sys::InsertStmt>::alloc_node(PgNode::InsertStmt)
@@ -1272,8 +1261,8 @@ impl PgNodeFactory {
     pub fn makeAlterTableStmt() -> PgBox<pg_sys::AlterTableStmt> {
         PgBox::<pg_sys::AlterTableStmt>::alloc_node(PgNode::AlterTableStmt)
     }
-    pub fn makeAlterTableCmd() -> PgBox<pg_sys::pg12_specific::AlterTableCmd> {
-        PgBox::<pg_sys::pg12_specific::AlterTableCmd>::alloc_node(PgNode::AlterTableCmd)
+    pub fn makeAlterTableCmd() -> PgBox<pg_sys::pg12::AlterTableCmd> {
+        PgBox::<pg_sys::pg12::AlterTableCmd>::alloc_node(PgNode::AlterTableCmd)
     }
     pub fn makeAlterDomainStmt() -> PgBox<pg_sys::AlterDomainStmt> {
         PgBox::<pg_sys::AlterDomainStmt>::alloc_node(PgNode::AlterDomainStmt)
@@ -1281,8 +1270,8 @@ impl PgNodeFactory {
     pub fn makeSetOperationStmt() -> PgBox<pg_sys::SetOperationStmt> {
         PgBox::<pg_sys::SetOperationStmt>::alloc_node(PgNode::SetOperationStmt)
     }
-    pub fn makeGrantStmt() -> PgBox<pg_sys::pg12_specific::GrantStmt> {
-        PgBox::<pg_sys::pg12_specific::GrantStmt>::alloc_node(PgNode::GrantStmt)
+    pub fn makeGrantStmt() -> PgBox<pg_sys::pg12::GrantStmt> {
+        PgBox::<pg_sys::pg12::GrantStmt>::alloc_node(PgNode::GrantStmt)
     }
     pub fn makeGrantRoleStmt() -> PgBox<pg_sys::GrantRoleStmt> {
         PgBox::<pg_sys::GrantRoleStmt>::alloc_node(PgNode::GrantRoleStmt)
@@ -1293,17 +1282,17 @@ impl PgNodeFactory {
     pub fn makeClosePortalStmt() -> PgBox<pg_sys::ClosePortalStmt> {
         PgBox::<pg_sys::ClosePortalStmt>::alloc_node(PgNode::ClosePortalStmt)
     }
-    pub fn makeClusterStmt() -> PgBox<pg_sys::pg12_specific::ClusterStmt> {
-        PgBox::<pg_sys::pg12_specific::ClusterStmt>::alloc_node(PgNode::ClusterStmt)
+    pub fn makeClusterStmt() -> PgBox<pg_sys::pg12::ClusterStmt> {
+        PgBox::<pg_sys::pg12::ClusterStmt>::alloc_node(PgNode::ClusterStmt)
     }
-    pub fn makeCopyStmt() -> PgBox<pg_sys::pg12_specific::CopyStmt> {
-        PgBox::<pg_sys::pg12_specific::CopyStmt>::alloc_node(PgNode::CopyStmt)
+    pub fn makeCopyStmt() -> PgBox<pg_sys::pg12::CopyStmt> {
+        PgBox::<pg_sys::pg12::CopyStmt>::alloc_node(PgNode::CopyStmt)
     }
-    pub fn makeCreateStmt() -> PgBox<pg_sys::pg12_specific::CreateStmt> {
-        PgBox::<pg_sys::pg12_specific::CreateStmt>::alloc_node(PgNode::CreateStmt)
+    pub fn makeCreateStmt() -> PgBox<pg_sys::pg12::CreateStmt> {
+        PgBox::<pg_sys::pg12::CreateStmt>::alloc_node(PgNode::CreateStmt)
     }
-    pub fn makeDefineStmt() -> PgBox<pg_sys::pg12_specific::DefineStmt> {
-        PgBox::<pg_sys::pg12_specific::DefineStmt>::alloc_node(PgNode::DefineStmt)
+    pub fn makeDefineStmt() -> PgBox<pg_sys::pg12::DefineStmt> {
+        PgBox::<pg_sys::pg12::DefineStmt>::alloc_node(PgNode::DefineStmt)
     }
     pub fn makeDropStmt() -> PgBox<pg_sys::DropStmt> {
         PgBox::<pg_sys::DropStmt>::alloc_node(PgNode::DropStmt)
@@ -1317,14 +1306,14 @@ impl PgNodeFactory {
     pub fn makeFetchStmt() -> PgBox<pg_sys::FetchStmt> {
         PgBox::<pg_sys::FetchStmt>::alloc_node(PgNode::FetchStmt)
     }
-    pub fn makeIndexStmt() -> PgBox<pg_sys::pg12_specific::IndexStmt> {
-        PgBox::<pg_sys::pg12_specific::IndexStmt>::alloc_node(PgNode::IndexStmt)
+    pub fn makeIndexStmt() -> PgBox<pg_sys::pg12::IndexStmt> {
+        PgBox::<pg_sys::pg12::IndexStmt>::alloc_node(PgNode::IndexStmt)
     }
-    pub fn makeCreateFunctionStmt() -> PgBox<pg_sys::pg12_specific::CreateFunctionStmt> {
-        PgBox::<pg_sys::pg12_specific::CreateFunctionStmt>::alloc_node(PgNode::CreateFunctionStmt)
+    pub fn makeCreateFunctionStmt() -> PgBox<pg_sys::pg12::CreateFunctionStmt> {
+        PgBox::<pg_sys::pg12::CreateFunctionStmt>::alloc_node(PgNode::CreateFunctionStmt)
     }
-    pub fn makeAlterFunctionStmt() -> PgBox<pg_sys::pg12_specific::AlterFunctionStmt> {
-        PgBox::<pg_sys::pg12_specific::AlterFunctionStmt>::alloc_node(PgNode::AlterFunctionStmt)
+    pub fn makeAlterFunctionStmt() -> PgBox<pg_sys::pg12::AlterFunctionStmt> {
+        PgBox::<pg_sys::pg12::AlterFunctionStmt>::alloc_node(PgNode::AlterFunctionStmt)
     }
     pub fn makeDoStmt() -> PgBox<pg_sys::DoStmt> {
         PgBox::<pg_sys::DoStmt>::alloc_node(PgNode::DoStmt)
@@ -1344,8 +1333,8 @@ impl PgNodeFactory {
     pub fn makeUnlistenStmt() -> PgBox<pg_sys::UnlistenStmt> {
         PgBox::<pg_sys::UnlistenStmt>::alloc_node(PgNode::UnlistenStmt)
     }
-    pub fn makeTransactionStmt() -> PgBox<pg_sys::pg12_specific::TransactionStmt> {
-        PgBox::<pg_sys::pg12_specific::TransactionStmt>::alloc_node(PgNode::TransactionStmt)
+    pub fn makeTransactionStmt() -> PgBox<pg_sys::pg12::TransactionStmt> {
+        PgBox::<pg_sys::pg12::TransactionStmt>::alloc_node(PgNode::TransactionStmt)
     }
     pub fn makeViewStmt() -> PgBox<pg_sys::ViewStmt> {
         PgBox::<pg_sys::ViewStmt>::alloc_node(PgNode::ViewStmt)
@@ -1362,8 +1351,8 @@ impl PgNodeFactory {
     pub fn makeDropdbStmt() -> PgBox<pg_sys::DropdbStmt> {
         PgBox::<pg_sys::DropdbStmt>::alloc_node(PgNode::DropdbStmt)
     }
-    pub fn makeVacuumStmt() -> PgBox<pg_sys::pg12_specific::VacuumStmt> {
-        PgBox::<pg_sys::pg12_specific::VacuumStmt>::alloc_node(PgNode::VacuumStmt)
+    pub fn makeVacuumStmt() -> PgBox<pg_sys::pg12::VacuumStmt> {
+        PgBox::<pg_sys::pg12::VacuumStmt>::alloc_node(PgNode::VacuumStmt)
     }
     pub fn makeExplainStmt() -> PgBox<pg_sys::ExplainStmt> {
         PgBox::<pg_sys::ExplainStmt>::alloc_node(PgNode::ExplainStmt)
@@ -1407,8 +1396,8 @@ impl PgNodeFactory {
     pub fn makeConstraintsSetStmt() -> PgBox<pg_sys::ConstraintsSetStmt> {
         PgBox::<pg_sys::ConstraintsSetStmt>::alloc_node(PgNode::ConstraintsSetStmt)
     }
-    pub fn makeReindexStmt() -> PgBox<pg_sys::pg12_specific::ReindexStmt> {
-        PgBox::<pg_sys::pg12_specific::ReindexStmt>::alloc_node(PgNode::ReindexStmt)
+    pub fn makeReindexStmt() -> PgBox<pg_sys::pg12::ReindexStmt> {
+        PgBox::<pg_sys::pg12::ReindexStmt>::alloc_node(PgNode::ReindexStmt)
     }
     pub fn makeCheckPointStmt() -> PgBox<pg_sys::CheckPointStmt> {
         PgBox::<pg_sys::CheckPointStmt>::alloc_node(PgNode::CheckPointStmt)
@@ -1581,14 +1570,14 @@ impl PgNodeFactory {
     pub fn makeDropSubscriptionStmt() -> PgBox<pg_sys::DropSubscriptionStmt> {
         PgBox::<pg_sys::DropSubscriptionStmt>::alloc_node(PgNode::DropSubscriptionStmt)
     }
-    pub fn makeCreateStatsStmt() -> PgBox<pg_sys::pg12_specific::CreateStatsStmt> {
-        PgBox::<pg_sys::pg12_specific::CreateStatsStmt>::alloc_node(PgNode::CreateStatsStmt)
+    pub fn makeCreateStatsStmt() -> PgBox<pg_sys::pg12::CreateStatsStmt> {
+        PgBox::<pg_sys::pg12::CreateStatsStmt>::alloc_node(PgNode::CreateStatsStmt)
     }
     pub fn makeAlterCollationStmt() -> PgBox<pg_sys::AlterCollationStmt> {
         PgBox::<pg_sys::AlterCollationStmt>::alloc_node(PgNode::AlterCollationStmt)
     }
-    pub fn makeCallStmt() -> PgBox<pg_sys::pg12_specific::CallStmt> {
-        PgBox::<pg_sys::pg12_specific::CallStmt>::alloc_node(PgNode::CallStmt)
+    pub fn makeCallStmt() -> PgBox<pg_sys::pg12::CallStmt> {
+        PgBox::<pg_sys::pg12::CallStmt>::alloc_node(PgNode::CallStmt)
     }
 
     pub fn makeA_Expr() -> PgBox<pg_sys::A_Expr> {
@@ -1654,20 +1643,20 @@ impl PgNodeFactory {
     pub fn makeTypeName() -> PgBox<pg_sys::TypeName> {
         PgBox::<pg_sys::TypeName>::alloc_node(PgNode::TypeName)
     }
-    pub fn makeColumnDef() -> PgBox<pg_sys::pg12_specific::ColumnDef> {
-        PgBox::<pg_sys::pg12_specific::ColumnDef>::alloc_node(PgNode::ColumnDef)
+    pub fn makeColumnDef() -> PgBox<pg_sys::pg12::ColumnDef> {
+        PgBox::<pg_sys::pg12::ColumnDef>::alloc_node(PgNode::ColumnDef)
     }
     pub fn makeIndexElem() -> PgBox<pg_sys::IndexElem> {
         PgBox::<pg_sys::IndexElem>::alloc_node(PgNode::IndexElem)
     }
-    pub fn makeConstraint() -> PgBox<pg_sys::pg12_specific::Constraint> {
-        PgBox::<pg_sys::pg12_specific::Constraint>::alloc_node(PgNode::Constraint)
+    pub fn makeConstraint() -> PgBox<pg_sys::pg12::Constraint> {
+        PgBox::<pg_sys::pg12::Constraint>::alloc_node(PgNode::Constraint)
     }
     pub fn makeDefElem() -> PgBox<pg_sys::DefElem> {
         PgBox::<pg_sys::DefElem>::alloc_node(PgNode::DefElem)
     }
-    pub fn makeRangeTblEntry() -> PgBox<pg_sys::pg12_specific::RangeTblEntry> {
-        PgBox::<pg_sys::pg12_specific::RangeTblEntry>::alloc_node(PgNode::RangeTblEntry)
+    pub fn makeRangeTblEntry() -> PgBox<pg_sys::pg12::RangeTblEntry> {
+        PgBox::<pg_sys::pg12::RangeTblEntry>::alloc_node(PgNode::RangeTblEntry)
     }
     pub fn makeRangeTblFunction() -> PgBox<pg_sys::RangeTblFunction> {
         PgBox::<pg_sys::RangeTblFunction>::alloc_node(PgNode::RangeTblFunction)
@@ -1684,8 +1673,8 @@ impl PgNodeFactory {
     pub fn makeGroupingSet() -> PgBox<pg_sys::GroupingSet> {
         PgBox::<pg_sys::GroupingSet>::alloc_node(PgNode::GroupingSet)
     }
-    pub fn makeWindowClause() -> PgBox<pg_sys::pg12_specific::WindowClause> {
-        PgBox::<pg_sys::pg12_specific::WindowClause>::alloc_node(PgNode::WindowClause)
+    pub fn makeWindowClause() -> PgBox<pg_sys::pg12::WindowClause> {
+        PgBox::<pg_sys::pg12::WindowClause>::alloc_node(PgNode::WindowClause)
     }
     pub fn makeObjectWithArgs() -> PgBox<pg_sys::ObjectWithArgs> {
         PgBox::<pg_sys::ObjectWithArgs>::alloc_node(PgNode::ObjectWithArgs)
@@ -1720,8 +1709,8 @@ impl PgNodeFactory {
     pub fn makeOnConflictClause() -> PgBox<pg_sys::OnConflictClause> {
         PgBox::<pg_sys::OnConflictClause>::alloc_node(PgNode::OnConflictClause)
     }
-    pub fn makeCommonTableExpr() -> PgBox<pg_sys::pg12_specific::CommonTableExpr> {
-        PgBox::<pg_sys::pg12_specific::CommonTableExpr>::alloc_node(PgNode::CommonTableExpr)
+    pub fn makeCommonTableExpr() -> PgBox<pg_sys::pg12::CommonTableExpr> {
+        PgBox::<pg_sys::pg12::CommonTableExpr>::alloc_node(PgNode::CommonTableExpr)
     }
     pub fn makeRoleSpec() -> PgBox<pg_sys::RoleSpec> {
         PgBox::<pg_sys::RoleSpec>::alloc_node(PgNode::RoleSpec)
@@ -1735,8 +1724,8 @@ impl PgNodeFactory {
     pub fn makePartitionSpec() -> PgBox<pg_sys::PartitionSpec> {
         PgBox::<pg_sys::PartitionSpec>::alloc_node(PgNode::PartitionSpec)
     }
-    pub fn makePartitionBoundSpec() -> PgBox<pg_sys::pg12_specific::PartitionBoundSpec> {
-        PgBox::<pg_sys::pg12_specific::PartitionBoundSpec>::alloc_node(PgNode::PartitionBoundSpec)
+    pub fn makePartitionBoundSpec() -> PgBox<pg_sys::pg12::PartitionBoundSpec> {
+        PgBox::<pg_sys::pg12::PartitionBoundSpec>::alloc_node(PgNode::PartitionBoundSpec)
     }
     pub fn makePartitionRangeDatum() -> PgBox<pg_sys::PartitionRangeDatum> {
         PgBox::<pg_sys::PartitionRangeDatum>::alloc_node(PgNode::PartitionRangeDatum)
@@ -1744,8 +1733,8 @@ impl PgNodeFactory {
     pub fn makePartitionCmd() -> PgBox<pg_sys::PartitionCmd> {
         PgBox::<pg_sys::PartitionCmd>::alloc_node(PgNode::PartitionCmd)
     }
-    pub fn makeVacuumRelation() -> PgBox<pg_sys::pg12_specific::VacuumRelation> {
-        PgBox::<pg_sys::pg12_specific::VacuumRelation>::alloc_node(PgNode::VacuumRelation)
+    pub fn makeVacuumRelation() -> PgBox<pg_sys::pg12::VacuumRelation> {
+        PgBox::<pg_sys::pg12::VacuumRelation>::alloc_node(PgNode::VacuumRelation)
     }
 
     pub fn makeIdentifySystemCmd() -> PgBox<pg_sys::IdentifySystemCmd> {
@@ -1770,8 +1759,8 @@ impl PgNodeFactory {
         PgBox::<pg_sys::SQLCmd>::alloc_node(PgNode::SQLCmd)
     }
 
-    pub fn makeTriggerData() -> PgBox<pg_sys::pg12_specific::TriggerData> {
-        PgBox::<pg_sys::pg12_specific::TriggerData>::alloc_node(PgNode::TriggerData)
+    pub fn makeTriggerData() -> PgBox<pg_sys::pg12::TriggerData> {
+        PgBox::<pg_sys::pg12::TriggerData>::alloc_node(PgNode::TriggerData)
     }
 
     pub fn makeEventTriggerData() -> PgBox<pg_sys::EventTriggerData> {
@@ -1790,8 +1779,8 @@ impl PgNodeFactory {
         PgBox::<pg_sys::TIDBitmap>::alloc_node(PgNode::TIDBitmap)
     }
 
-    pub fn makeInlineCodeBlock() -> PgBox<pg_sys::pg12_specific::InlineCodeBlock> {
-        PgBox::<pg_sys::pg12_specific::InlineCodeBlock>::alloc_node(PgNode::InlineCodeBlock)
+    pub fn makeInlineCodeBlock() -> PgBox<pg_sys::pg12::InlineCodeBlock> {
+        PgBox::<pg_sys::pg12::InlineCodeBlock>::alloc_node(PgNode::InlineCodeBlock)
     }
 
     pub fn makeFdwRoutine() -> PgBox<pg_sys::FdwRoutine> {
@@ -1802,46 +1791,42 @@ impl PgNodeFactory {
         PgBox::<pg_sys::IndexAmRoutine>::alloc_node(PgNode::IndexAmRoutine)
     }
 
-    pub fn makeTableAmRoutine() -> PgBox<pg_sys::pg12_specific::TableAmRoutine> {
-        PgBox::<pg_sys::pg12_specific::TableAmRoutine>::alloc_node(PgNode::TableAmRoutine)
+    pub fn makeTableAmRoutine() -> PgBox<pg_sys::pg12::TableAmRoutine> {
+        PgBox::<pg_sys::pg12::TableAmRoutine>::alloc_node(PgNode::TableAmRoutine)
     }
 
     pub fn makeTsmRoutine() -> PgBox<pg_sys::TsmRoutine> {
         PgBox::<pg_sys::TsmRoutine>::alloc_node(PgNode::TsmRoutine)
     }
 
-    pub fn makeForeignKeyCacheInfo() -> PgBox<pg_sys::pg12_specific::ForeignKeyCacheInfo> {
-        PgBox::<pg_sys::pg12_specific::ForeignKeyCacheInfo>::alloc_node(PgNode::ForeignKeyCacheInfo)
+    pub fn makeForeignKeyCacheInfo() -> PgBox<pg_sys::pg12::ForeignKeyCacheInfo> {
+        PgBox::<pg_sys::pg12::ForeignKeyCacheInfo>::alloc_node(PgNode::ForeignKeyCacheInfo)
     }
 
-    pub fn makeCallContext() -> PgBox<pg_sys::pg12_specific::CallContext> {
-        PgBox::<pg_sys::pg12_specific::CallContext>::alloc_node(PgNode::CallContext)
+    pub fn makeCallContext() -> PgBox<pg_sys::pg12::CallContext> {
+        PgBox::<pg_sys::pg12::CallContext>::alloc_node(PgNode::CallContext)
     }
 
-    pub fn makeSupportRequestSimplify() -> PgBox<pg_sys::pg12_specific::SupportRequestSimplify> {
-        PgBox::<pg_sys::pg12_specific::SupportRequestSimplify>::alloc_node(
-            PgNode::SupportRequestSimplify,
-        )
+    pub fn makeSupportRequestSimplify() -> PgBox<pg_sys::pg12::SupportRequestSimplify> {
+        PgBox::<pg_sys::pg12::SupportRequestSimplify>::alloc_node(PgNode::SupportRequestSimplify)
     }
 
-    pub fn makeSupportRequestSelectivity() -> PgBox<pg_sys::pg12_specific::SupportRequestSelectivity>
-    {
-        PgBox::<pg_sys::pg12_specific::SupportRequestSelectivity>::alloc_node(
+    pub fn makeSupportRequestSelectivity() -> PgBox<pg_sys::pg12::SupportRequestSelectivity> {
+        PgBox::<pg_sys::pg12::SupportRequestSelectivity>::alloc_node(
             PgNode::SupportRequestSelectivity,
         )
     }
 
-    pub fn makeSupportRequestCost() -> PgBox<pg_sys::pg12_specific::SupportRequestCost> {
-        PgBox::<pg_sys::pg12_specific::SupportRequestCost>::alloc_node(PgNode::SupportRequestCost)
+    pub fn makeSupportRequestCost() -> PgBox<pg_sys::pg12::SupportRequestCost> {
+        PgBox::<pg_sys::pg12::SupportRequestCost>::alloc_node(PgNode::SupportRequestCost)
     }
 
-    pub fn makeSupportRequestRows() -> PgBox<pg_sys::pg12_specific::SupportRequestRows> {
-        PgBox::<pg_sys::pg12_specific::SupportRequestRows>::alloc_node(PgNode::SupportRequestRows)
+    pub fn makeSupportRequestRows() -> PgBox<pg_sys::pg12::SupportRequestRows> {
+        PgBox::<pg_sys::pg12::SupportRequestRows>::alloc_node(PgNode::SupportRequestRows)
     }
 
-    pub fn makeSupportRequestIndexCondition(
-    ) -> PgBox<pg_sys::pg12_specific::SupportRequestIndexCondition> {
-        PgBox::<pg_sys::pg12_specific::SupportRequestIndexCondition>::alloc_node(
+    pub fn makeSupportRequestIndexCondition() -> PgBox<pg_sys::pg12::SupportRequestIndexCondition> {
+        PgBox::<pg_sys::pg12::SupportRequestIndexCondition>::alloc_node(
             PgNode::SupportRequestIndexCondition,
         )
     }

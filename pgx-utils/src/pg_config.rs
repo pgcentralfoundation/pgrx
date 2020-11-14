@@ -74,6 +74,10 @@ impl PgConfig {
         self.pg_config.clone()
     }
 
+    pub fn parent_path(&self) -> PathBuf {
+        self.path().unwrap().parent().unwrap().to_path_buf()
+    }
+
     pub fn major_version(&self) -> Result<u16, std::io::Error> {
         match &self.version {
             Some(version) => Ok(version.major_version),

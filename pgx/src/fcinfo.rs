@@ -1,7 +1,6 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-
 //! Helper macros and functions for creating Postgres UDFs.
 //!
 //! Other than the exported macros, typically these functions are not necessary to call directly
@@ -151,11 +150,11 @@ mod pg_12 {
     fn get_nullable_datum(
         fcinfo: pg_sys::FunctionCallInfo,
         num: usize,
-    ) -> pg_sys::pg12_specific::NullableDatum {
+    ) -> pg_sys::pg12::NullableDatum {
         let fcinfo = unsafe { fcinfo.as_mut() }.unwrap();
         unsafe {
             let nargs = fcinfo.nargs;
-            let len = std::mem::size_of::<pg_sys::pg12_specific::NullableDatum>() * nargs as usize;
+            let len = std::mem::size_of::<pg_sys::pg12::NullableDatum>() * nargs as usize;
             fcinfo.args.as_slice(len)[num]
         }
     }
@@ -309,8 +308,8 @@ fn make_function_call_info(
     nargs: usize,
     arg_array: [usize; 100],
     null_array: [bool; 100],
-) -> PgBox<pg_sys::pg10_specific::FunctionCallInfoData> {
-    let mut fcinfo_boxed = PgBox::<pg_sys::pg10_specific::FunctionCallInfoData>::alloc0();
+) -> PgBox<pg_sys::pg10::FunctionCallInfoData> {
+    let mut fcinfo_boxed = PgBox::<pg_sys::pg10::FunctionCallInfoData>::alloc0();
     let fcinfo = fcinfo_boxed.deref_mut();
 
     fcinfo.nargs = nargs as i16;
@@ -325,8 +324,8 @@ fn make_function_call_info(
     nargs: usize,
     arg_array: [usize; 100],
     null_array: [bool; 100],
-) -> PgBox<pg_sys::pg11_specific::FunctionCallInfoData> {
-    let mut fcinfo_boxed = PgBox::<pg_sys::pg11_specific::FunctionCallInfoData>::alloc0();
+) -> PgBox<pg_sys::pg11::FunctionCallInfoData> {
+    let mut fcinfo_boxed = PgBox::<pg_sys::pg11::FunctionCallInfoData>::alloc0();
     let fcinfo = fcinfo_boxed.deref_mut();
 
     fcinfo.nargs = nargs as i16;
@@ -341,22 +340,22 @@ fn make_function_call_info(
     nargs: usize,
     arg_array: [usize; 100],
     null_array: [bool; 100],
-) -> PgBox<pg_sys::pg12_specific::FunctionCallInfoBaseData> {
-    let fcid: *mut pg_sys::pg12_specific::FunctionCallInfoBaseData = unsafe {
+) -> PgBox<pg_sys::pg12::FunctionCallInfoBaseData> {
+    let fcid: *mut pg_sys::pg12::FunctionCallInfoBaseData = unsafe {
         pg_sys::palloc0(
-            std::mem::size_of::<pg_sys::pg12_specific::FunctionCallInfoBaseData>()
-                + nargs * std::mem::size_of::<pg_sys::pg12_specific::NullableDatum>(),
-        ) as *mut pg_sys::pg12_specific::FunctionCallInfoBaseData
+            std::mem::size_of::<pg_sys::pg12::FunctionCallInfoBaseData>()
+                + nargs * std::mem::size_of::<pg_sys::pg12::NullableDatum>(),
+        ) as *mut pg_sys::pg12::FunctionCallInfoBaseData
     };
 
-    let mut fcinfo_boxed = PgBox::<pg_sys::pg12_specific::FunctionCallInfoBaseData>::from_pg(fcid);
+    let mut fcinfo_boxed = PgBox::<pg_sys::pg12::FunctionCallInfoBaseData>::from_pg(fcid);
     let fcinfo = fcinfo_boxed.deref_mut();
 
     fcinfo.nargs = nargs as i16;
 
     let slice = unsafe { fcinfo.args.as_mut_slice(nargs) };
     for i in 0..nargs {
-        slice[i] = pg_sys::pg12_specific::NullableDatum {
+        slice[i] = pg_sys::pg12::NullableDatum {
             value: arg_array[i],
             isnull: null_array[i],
         }
