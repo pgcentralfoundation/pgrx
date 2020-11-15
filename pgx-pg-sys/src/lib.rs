@@ -72,11 +72,24 @@ pub use all_versions::*;
 
 // and things that are version-specific
 #[cfg(feature = "pg10")]
+pub use internal::pg10::add_bool_reloption;
+#[cfg(feature = "pg10")]
+pub use internal::pg10::add_int_reloption;
+#[cfg(feature = "pg10")]
+pub use internal::pg10::add_string_reloption;
+#[cfg(feature = "pg10")]
+pub use internal::pg10::IndexBuildHeapScan;
+#[cfg(feature = "pg10")]
 pub use internal::pg10::*;
+
+#[cfg(feature = "pg11")]
+pub use internal::pg11::IndexBuildHeapScan;
 #[cfg(feature = "pg11")]
 pub use internal::pg11::*;
+
 #[cfg(feature = "pg12")]
 pub use internal::pg12::*;
+
 #[cfg(feature = "pg13")]
 pub use internal::pg13::*;
 
@@ -366,7 +379,7 @@ mod internal {
 
         /// # Safety
         ///
-        /// This function wraps Postgres' internal `IndexBuildHeapScan` method, and therfore, is
+        /// This function wraps Postgres' internal `IndexBuildHeapScan` method, and therefore, is
         /// inherently unsafe
         pub unsafe fn IndexBuildHeapScan<T>(
             heap_relation: crate::Relation,
@@ -393,7 +406,7 @@ mod internal {
 
         /// # Safety
         ///
-        /// This function wraps Postgres' internal `IndexBuildHeapScan` method, and therfore, is
+        /// This function wraps Postgres' internal `IndexBuildHeapScan` method, and therefore, is
         /// inherently unsafe
         pub unsafe fn IndexBuildHeapScan<T>(
             heap_relation: crate::Relation,
@@ -423,7 +436,7 @@ mod internal {
 
         /// # Safety
         ///
-        /// This function wraps Postgres' internal `IndexBuildHeapScan` method, and therfore, is
+        /// This function wraps Postgres' internal `IndexBuildHeapScan` method, and therefore, is
         /// inherently unsafe
         pub unsafe fn IndexBuildHeapScan<T>(
             heap_relation: crate::Relation,
@@ -459,7 +472,7 @@ mod internal {
 
         /// # Safety
         ///
-        /// This function wraps Postgres' internal `IndexBuildHeapScan` method, and therfore, is
+        /// This function wraps Postgres' internal `IndexBuildHeapScan` method, and therefore, is
         /// inherently unsafe
         pub unsafe fn IndexBuildHeapScan<T>(
             heap_relation: crate::Relation,
