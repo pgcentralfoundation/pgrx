@@ -5,30 +5,27 @@ use crate::commands::install::install_extension;
 use crate::commands::start::start_postgres;
 use crate::commands::stop::stop_postgres;
 use colored::Colorize;
-use pgx_utils::{createdb, get_pg_config, get_psql_path, BASE_POSTGRES_PORT_NO};
+use pgx_utils::createdb;
+use pgx_utils::pg_config::PgConfig;
 use std::os::unix::process::CommandExt;
 use std::process::Command;
 
-pub(crate) fn run_psql(major_version: u16, dbname: &str, is_release: bool) {
-    let pg_config = get_pg_config(major_version);
-
+pub(crate) fn run_psql(
+    pg_config: &PgConfig,
+    dbname: &str,
+    is_release: bool,
+) -> Result<(), std::io::Error> {
     // stop postgres
-    stop_postgres(major_version, true);
+    stop_postgres(pg_config)?;
 
     // install the extension
-    install_extension(&pg_config, is_release, None);
+    install_extension(pg_config, is_release, None)?;
 
     // restart postgres
-    start_postgres(major_version);
+    start_postgres(pg_config)?;
 
     // create the named database
-    if !createdb(
-        major_version,
-        "localhost",
-        BASE_POSTGRES_PORT_NO + major_version,
-        dbname,
-        true,
-    ) {
+    if !createdb(pg_config, dbname, false, true)? {
         println!(
             "{} existing database {}",
             "    Re-using".bold().cyan(),
@@ -37,20 +34,20 @@ pub(crate) fn run_psql(major_version: u16, dbname: &str, is_release: bool) {
     }
 
     // run psql
-    exec_psql(major_version, dbname);
+    exec_psql(pg_config, dbname)
 }
 
-pub(crate) fn exec_psql(major_version: u16, dbname: &str) {
-    let mut command = Command::new(get_psql_path(major_version));
+pub(crate) fn exec_psql(pg_config: &PgConfig, dbname: &str) -> Result<(), std::io::Error> {
+    let mut command = Command::new(pg_config.psql_path()?);
     command
         .env_remove("PGDATABASE")
         .env_remove("PGHOST")
         .env_remove("PGPORT")
         .env_remove("PGUSER")
         .arg("-h")
-        .arg("localhost")
+        .arg(pg_config.host())
         .arg("-p")
-        .arg((BASE_POSTGRES_PORT_NO + major_version).to_string())
+        .arg(pg_config.port()?.to_string())
         .arg(dbname);
 
     // we'll never return from here as we've now become psql

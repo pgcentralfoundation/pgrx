@@ -59,15 +59,19 @@ SUBCOMMANDS:
 
 `cargo pgx init` is required to be run once to properly configure the `pgx` development environment.
 
-As shown by the screenshot above, it downloads Postgres v10, 11, 12, configures them, compiles them, and installs them to `~/.pgx/`.  Other `pgx` command such as `run` and `test` will fully manage and otherwise use these Postgres installations for you.
+As shown by the screenshot above, it downloads Postgres v10, v11, v12, v13, configures them, compiles them, and installs them to `~/.pgx/`.  Other `pgx` commands such as `run` and `test` will fully manage and otherwise use these Postgres installations for you.
 
-`pgx` is designed to support Postgres v10, 11, 12 in such a way that during development, you'll know if you're trying to use a Postgres API that isn't common across all three versions.  It's also designed to make testing your extension against these versions easy.  This is why it requires you have three fully compiled and installed versions of Postgres during development.
+`pgx` is designed to support Postgres v10, v11, v12, v13 in such a way that during development, you'll know if you're trying to use a Postgres API that isn't common across all three versions.  It's also designed to make testing your extension against these versions easy.  This is why it requires you have three fully compiled and installed versions of Postgres during development.
 
-If you want to use your operating system's package manager to install Postgres, `cargo pgx init` has 3 optional arguments that allow you to specify where they're installed (see below). 
+If you want to use your operating system's package manager to install Postgres, `cargo pgx init` has optional arguments that allow you to specify where they're installed (see below). 
 
 What you're telling `cargo pgx init` is the full path to `pg_config` for each version.
 
 For any version you specify, `cargo pgx init` will forego downloading/compiling/installing it.  `pgx` will then use that locally-installed version just as it uses any version it downloads/compiles/installs itself.
+
+However, if the unless the "path to pg_config" is the literal string `download`, the `pgx` will download and compile that version of Postgres for you.
+
+When the various `--pgXX` options are specified, these are they **only** versions of Postgres that `pgx` will manage for you.  
 
 You'll also want to make sure you have the "postgresql-server-dev" package installed for each version you want to manage yourself.
 
@@ -86,9 +90,24 @@ FLAGS:
     -V, --version    Prints version information
 
 OPTIONS:
-        --pg10 <PG10_PG_CONFIG>    if installed locally, the path to PG10's 'pg_config' tool
-        --pg11 <PG11_PG_CONFIG>    if installed locally, the path to PG11's 'pg_config' tool
-        --pg12 <PG12_PG_CONFIG>    if installed locally, the path to PG12's 'pg_config' tool
+initize pgx development environment for the first time
+
+USAGE:
+    cargo pgx init [OPTIONS]
+
+FLAGS:
+    -h, --help       Prints help information
+    -V, --version    Prints version information
+
+OPTIONS:
+        --pg10 <PG10_PG_CONFIG>    if installed locally, the path to PG10's 'pg_config' tool, or 'download' to have pgx
+                                   download/compile/install it
+        --pg11 <PG11_PG_CONFIG>    if installed locally, the path to PG11's 'pg_config' tool, or 'download' to have pgx
+                                   download/compile/install it
+        --pg12 <PG12_PG_CONFIG>    if installed locally, the path to PG12's 'pg_config' tool, or 'download' to have pgx
+                                   download/compile/install it
+        --pg13 <PG13_PG_CONFIG>    if installed locally, the path to PG13's 'pg_config' tool, or 'download' to have pgx
+                                   download/compile/install it
 ```
 
 ## Creating a new Extension
@@ -136,7 +155,7 @@ Once started, you can connect to them using `psql` (if you have it on your $PATH
 
 ![run](run.png)
 
-`cargo pgx run <pg10 | pg11 | pg12>` is the primary interface into compiling and interactively testing/using your extension during development.
+`cargo pgx run <pg10 | pg11 | pg12 | pg13>` is the primary interface into compiling and interactively testing/using your extension during development.
 
 The very first time you execute `cargo pgx run pgXX`, it needs to compile not only your extension, but pgx itself, along with all its dependencies.  Depending on your computer, this could take a bit of time (`pgx` is nearly 200k lines of Rust when counting the generated bindings for Postgres).  Afterwards, however (as seen in the above screenshot), it's fairly fast.
 
@@ -162,7 +181,7 @@ FLAGS:
     -V, --version    Prints version information
 
 ARGS:
-    <PG_VERSION>    Do you want to run against Postgres 'pg10', 'pg11', pg12'?
+    <PG_VERSION>    Do you want to run against Postgres 'pg10', 'pg11', 'pg12', 'pg13'?
     <DBNAME>        The database to connect to (and create if the first time).  Defaults to a database with the same
                     name as the current extension name
 ```
@@ -172,7 +191,7 @@ ARGS:
 ![connect](connect.png)
 
 If you'd simply like to connect to a managed version of Postgres without re-compiling and installing
-your extension, use `cargo pgx connect <pg10 | pg11 | pg12>`.
+your extension, use `cargo pgx connect <pg10 | pg11 | pg12 | pg13>`.
 
 This command will use the default database named for your extension, or you can specify another
 database name as the final argument.
@@ -192,7 +211,7 @@ FLAGS:
     -V, --version    Prints version information
 
 ARGS:
-    <PG_VERSION>    Do you want to run against Postgres 'pg10', 'pg11', pg12'?
+    <PG_VERSION>    Do you want to run against Postgres 'pg10', 'pg11', 'pg12', 'pg13'?
     <DBNAME>        The database to connect to (and create if the first time).  Defaults to a database with the same
                     name as the current extension name
 ```
@@ -227,7 +246,7 @@ $ cargo pgx install --help
 
 ![test](test.png)
 
-`cargo pgx test [pg10 | pg11 | pg12]` runs your `#[test]` and `#[pg_test]` annotated functions using cargo's test system.
+`cargo pgx test [pg10 | pg11 | pg12 | pg13]` runs your `#[test]` and `#[pg_test]` annotated functions using cargo's test system.
 
 During the testing process, `pgx` starts a tempory instance of Postgres with its `PGDATA` directory in `./target/pgx-test-data-PGVER/`.  This Postgres instance is stopped as soon as the test framework has finished.
 
@@ -252,7 +271,7 @@ FLAGS:
     -V, --version    Prints version information
 
 ARGS:
-    <PG_VERSION>    Do you want to test for Postgres 'pg10', 'pg11', pg12', or 'all' (default)?
+    <PG_VERSION>    Do you want to test for Postgres 'pg10', 'pg11', 'pg12', 'pg13', or 'all' (default)?
 ```
 
 ## Building an Installation Package

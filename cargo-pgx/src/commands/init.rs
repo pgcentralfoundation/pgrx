@@ -3,19 +3,16 @@
 
 use crate::commands::stop::stop_postgres;
 use colored::Colorize;
-use pgx_utils::{
-    exit_with_error, get_pgx_config_path, get_pgx_home, handle_result, prefix_path,
-    BASE_POSTGRES_PORT_NO,
-};
+use pgx_utils::pg_config::{PgConfig, PgConfigSelector, Pgx};
+use pgx_utils::{exit_with_error, handle_result, prefix_path};
 use rayon::prelude::*;
 use rttp_client::{types::Proxy, HttpClient};
-use std::fmt::Display;
+
 use std::fs::File;
 use std::io::Write;
 use std::path::PathBuf;
-use std::str::FromStr;
+
 use std::sync::{Arc, Mutex};
-use syn::export::Formatter;
 
 static PROCESS_ENV_DENYLIST: &'static [&'static str] = &[
     "DEBUG",
@@ -32,134 +29,111 @@ static PROCESS_ENV_DENYLIST: &'static [&'static str] = &[
     "LIBRARY_PATH", // see https://github.com/zombodb/pgx/issues/16
 ];
 
-#[derive(Debug)]
-struct PgVersion {
-    major: u16,
-    minor: u16,
-    url: &'static str,
-}
+pub(crate) fn init_pgx(pgx: &Pgx) -> std::result::Result<(), std::io::Error> {
+    let dir = Pgx::home()?;
 
-impl PgVersion {
-    pub const fn new(major: u16, minor: u16, url: &'static str) -> Self {
-        PgVersion { major, minor, url }
-    }
-
-    fn port(&self) -> u16 {
-        BASE_POSTGRES_PORT_NO + self.major
-    }
-
-    fn label(&self) -> String {
-        format!("pg{}", self.major)
-    }
-}
-
-impl Display for PgVersion {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "Postgres v{}.{}", self.major, self.minor)
-    }
-}
-
-const PG10_VERSION: PgVersion = PgVersion::new(
-    10,
-    14,
-    "https://ftp.postgresql.org/pub/source/v10.14/postgresql-10.14.tar.bz2",
-);
-const PG11_VERSION: PgVersion = PgVersion::new(
-    11,
-    9,
-    "https://ftp.postgresql.org/pub/source/v11.9/postgresql-11.9.tar.bz2",
-);
-const PG12_VERSION: PgVersion = PgVersion::new(
-    12,
-    4,
-    "https://ftp.postgresql.org/pub/source/v12.4/postgresql-12.4.tar.bz2",
-);
-
-pub(crate) fn init_pgx(
-    pg10_config: Option<&str>,
-    pg11_config: Option<&str>,
-    pg12_config: Option<&str>,
-) -> std::result::Result<(), std::io::Error> {
-    let dir = get_pgx_home();
-
-    let input_configs = vec![
-        (pg10_config, &PG10_VERSION),
-        (pg11_config, &PG11_VERSION),
-        (pg12_config, &PG12_VERSION),
-    ];
     let output_configs = Arc::new(Mutex::new(Vec::new()));
 
-    input_configs
-        .into_par_iter()
-        .for_each(|(pg_config, version)| {
-            stop_postgres(version.major, false);
-            let pg_config = pg_config.map_or_else(
-                || download_postgres(version, &dir),
-                |v| PathBuf::from_str(v).unwrap(),
-            );
+    let mut pg_configs = Vec::new();
+    for pg_config in pgx.iter(PgConfigSelector::All) {
+        pg_configs.push(pg_config?);
+    }
 
-            let mut mutex = output_configs.lock();
-            let output_configs = mutex.as_mut().expect("failed to get output_configs lock");
+    pg_configs.into_par_iter().for_each(|pg_config| {
+        let mut pg_config = pg_config.clone();
+        stop_postgres(&pg_config).ok(); // no need to fail on errors trying to stop postgres while initializing
+        if !pg_config.is_real() {
+            pg_config = match download_postgres(&pg_config, &dir) {
+                Ok(pg_config) => pg_config,
+                Err(e) => exit_with_error!(e),
+            }
+        }
 
-            output_configs.push((pg_config, version));
-        });
+        let mut mutex = output_configs.lock();
+        let output_configs = mutex.as_mut().expect("failed to get output_configs lock");
+
+        output_configs.push(pg_config);
+    });
 
     let mut mutex = output_configs.lock();
     let output_configs = mutex.as_mut().unwrap();
 
-    output_configs.sort_by(|(_, a), (_, b)| a.major.cmp(&b.major));
-    for (pg_config, version) in output_configs.iter() {
-        validate_pg_config(pg_config, version);
+    output_configs.sort_by(|a, b| {
+        a.major_version()
+            .ok()
+            .expect("could not determine major version")
+            .cmp(
+                &b.major_version()
+                    .ok()
+                    .expect("could not determine major version"),
+            )
+    });
+    for pg_config in output_configs.iter() {
+        validate_pg_config(pg_config)?
     }
 
     write_config(output_configs)
 }
 
-fn download_postgres(version: &PgVersion, pgxdir: &PathBuf) -> PathBuf {
+fn download_postgres(pg_config: &PgConfig, pgxdir: &PathBuf) -> Result<PgConfig, std::io::Error> {
     println!(
-        "{} {} from {}",
+        "{} Postgres v{}.{} from {}",
         " Downloading".bold().green(),
-        version,
-        version.url
+        pg_config.major_version()?,
+        pg_config.minor_version()?,
+        pg_config.url().expect("no url"),
     );
     let mut http_client = HttpClient::new();
-    http_client.get().url(version.url);
-    if let Some((host, port)) = env_proxy::for_url_str(version.url).host_port() {
+    http_client
+        .get()
+        .url(pg_config.url().expect("no url for pg_config").as_str());
+    if let Some((host, port)) =
+        env_proxy::for_url_str(pg_config.url().expect("no url for pg_config")).host_port()
+    {
         http_client.proxy(Proxy::https(host, port as u32));
     }
-    let result = handle_result!("", http_client.emit());
-    let pgdir = untar(result.body().binary(), pgxdir, version);
-    configure_postgres(version, &pgdir);
-    make_postgres(version, &pgdir);
-    make_install_postgres(version, &pgdir) // returns the path to pg_config
+    let http_response = handle_result!(http_client.emit(), "");
+    if http_response.code() != 200 {
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::InvalidInput,
+            format!(
+                "Problem downloading {}:\ncode={}\n{}",
+                pg_config.url().unwrap().to_string().yellow().bold(),
+                http_response.code(),
+                http_response.body().to_string()
+            ),
+        ));
+    }
+    let pgdir = untar(http_response.body().binary(), pgxdir, pg_config)?;
+    configure_postgres(pg_config, &pgdir)?;
+    make_postgres(pg_config, &pgdir)?;
+    make_install_postgres(pg_config, &pgdir) // returns a new PgConfig object
 }
 
-fn untar(bytes: &[u8], pgxdir: &PathBuf, version: &PgVersion) -> PathBuf {
+fn untar(bytes: &[u8], pgxdir: &PathBuf, pg_config: &PgConfig) -> Result<PathBuf, std::io::Error> {
     let mut pgdir = pgxdir.clone();
-    pgdir.push(format!("{}.{}", version.major, version.minor));
+    pgdir.push(format!(
+        "{}.{}",
+        pg_config.major_version()?,
+        pg_config.minor_version()?
+    ));
     if pgdir.exists() {
         // delete everything at this path if it already exists
         println!("{} {}", "    Removing".bold().green(), pgdir.display());
-        handle_result!(
-            format!("deleting {}", pgdir.display()),
-            std::fs::remove_dir_all(&pgdir)
-        );
+        std::fs::remove_dir_all(&pgdir)?;
     }
-    handle_result!(
-        format!("creating {}", pgdir.display()),
-        std::fs::create_dir_all(&pgdir)
-    );
+    std::fs::create_dir_all(&pgdir)?;
 
     println!(
         "{} Postgres v{}.{} to {}",
         "   Untarring".bold().green(),
-        version.major,
-        version.minor,
+        pg_config.major_version()?,
+        pg_config.minor_version()?,
         pgdir.display()
     );
     let mut child = std::process::Command::new("tar")
         .arg("-C")
-        .arg(pgdir.display().to_string())
+        .arg(&pgdir)
         .arg("--strip-components=1")
         .arg("-xjf")
         .arg("-")
@@ -170,56 +144,69 @@ fn untar(bytes: &[u8], pgxdir: &PathBuf, version: &PgVersion) -> PathBuf {
         .expect("failed to spawn `tar`");
 
     let stdin = child.stdin.as_mut().expect("failed to get `tar`'s stdin");
-    handle_result!("writing tarball to `tar` process", stdin.write_all(bytes));
-    let output = handle_result!("waiting for `tar` to finish", child.wait_with_output());
+    stdin.write_all(bytes)?;
+    let output = child.wait_with_output()?;
 
-    if !output.status.success() {
-        exit_with_error!(String::from_utf8(output.stderr).unwrap())
+    if output.status.success() {
+        Ok(pgdir)
+    } else {
+        Err(std::io::Error::new(
+            std::io::ErrorKind::Other,
+            String::from_utf8(output.stderr).unwrap(),
+        ))
     }
-
-    pgdir
 }
 
-fn configure_postgres(version: &PgVersion, pgdir: &PathBuf) {
-    println!("{} {}", " Configuring".bold().green(), version);
+fn configure_postgres(pg_config: &PgConfig, pgdir: &PathBuf) -> Result<(), std::io::Error> {
+    println!(
+        "{} Postgres v{}.{}",
+        " Configuring".bold().green(),
+        pg_config.major_version()?,
+        pg_config.minor_version()?
+    );
     let mut command = std::process::Command::new("./configure");
 
     command
         .arg(format!("--prefix={}", get_pg_installdir(pgdir).display()))
-        .arg(format!("--with-pgport={}", version.port()))
+        .arg(format!("--with-pgport={}", pg_config.port()?))
         .arg("--enable-debug")
         .arg("--enable-cassert")
         .stdout(std::process::Stdio::piped())
         .stderr(std::process::Stdio::piped())
         .stdin(std::process::Stdio::null())
         .env("PATH", prefix_path(pgdir))
-        .current_dir(pgdir.display().to_string());
+        .current_dir(&pgdir);
     for var in PROCESS_ENV_DENYLIST {
         command.env_remove(var);
     }
 
     let command_str = format!("{:?}", command);
+    let child = command.spawn()?;
+    let output = child.wait_with_output()?;
 
-    let child = handle_result!(format!("Failed: {:?}", command_str), command.spawn());
-
-    let output = handle_result!(
-        format!("could not receive configure's output: {}", command_str),
-        child.wait_with_output()
-    );
-
-    if !output.status.success() {
-        exit_with_error!(format!(
-            "{}\n{}{}",
-            command_str,
-            String::from_utf8(output.stdout).unwrap(),
-            String::from_utf8(output.stderr).unwrap()
-        ))
+    if output.status.success() {
+        Ok(())
+    } else {
+        Err(std::io::Error::new(
+            std::io::ErrorKind::Other,
+            format!(
+                "{}\n{}{}",
+                command_str,
+                String::from_utf8(output.stdout).unwrap(),
+                String::from_utf8(output.stderr).unwrap()
+            ),
+        ))?
     }
 }
 
-fn make_postgres(version: &PgVersion, pgdir: &PathBuf) {
+fn make_postgres(pg_config: &PgConfig, pgdir: &PathBuf) -> Result<(), std::io::Error> {
     let num_cpus = 1.max(num_cpus::get() / 3);
-    println!("{} {}", "   Compiling".bold().green(), version);
+    println!(
+        "{} Postgres v{}.{}",
+        "   Compiling".bold().green(),
+        pg_config.major_version()?,
+        pg_config.minor_version()?
+    );
     let mut command = std::process::Command::new("make");
 
     command
@@ -228,36 +215,37 @@ fn make_postgres(version: &PgVersion, pgdir: &PathBuf) {
         .stdout(std::process::Stdio::piped())
         .stderr(std::process::Stdio::piped())
         .stdin(std::process::Stdio::null())
-        .current_dir(pgdir.display().to_string());
+        .current_dir(&pgdir);
 
     for var in PROCESS_ENV_DENYLIST {
         command.env_remove(var);
     }
 
     let command_str = format!("{:?}", command);
+    let child = command.spawn()?;
+    let output = child.wait_with_output()?;
 
-    let child = handle_result!(format!("Failed: {:?}", command_str), command.spawn());
-
-    let output = handle_result!(
-        format!("could not receive make's output: {}", command_str),
-        child.wait_with_output()
-    );
-
-    if !output.status.success() {
-        exit_with_error!(format!(
-            "{}\n{}{}",
-            command_str,
-            String::from_utf8(output.stdout).unwrap(),
-            String::from_utf8(output.stderr).unwrap()
+    if output.status.success() {
+        Ok(())
+    } else {
+        Err(std::io::Error::new(
+            std::io::ErrorKind::Other,
+            format!(
+                "{}\n{}{}",
+                command_str,
+                String::from_utf8(output.stdout).unwrap(),
+                String::from_utf8(output.stderr).unwrap()
+            ),
         ))
     }
 }
 
-fn make_install_postgres(version: &PgVersion, pgdir: &PathBuf) -> PathBuf {
+fn make_install_postgres(version: &PgConfig, pgdir: &PathBuf) -> Result<PgConfig, std::io::Error> {
     println!(
-        "{} {} to {}",
+        "{} Postgres v{}.{} to {}",
         "  Installing".bold().green(),
-        version,
+        version.major_version()?,
+        version.minor_version()?,
         get_pg_installdir(pgdir).display()
     );
     let mut command = std::process::Command::new("make");
@@ -267,83 +255,58 @@ fn make_install_postgres(version: &PgVersion, pgdir: &PathBuf) -> PathBuf {
         .stdout(std::process::Stdio::piped())
         .stderr(std::process::Stdio::piped())
         .stdin(std::process::Stdio::null())
-        .current_dir(pgdir.display().to_string());
+        .current_dir(&pgdir);
     for var in PROCESS_ENV_DENYLIST {
         command.env_remove(var);
     }
 
     let command_str = format!("{:?}", command);
+    let child = command.spawn()?;
+    let output = child.wait_with_output()?;
 
-    let child = handle_result!(format!("Failed: {:?}", command_str), command.spawn());
-
-    let output = handle_result!(
-        format!("could not receive make's output: {}", command_str),
-        child.wait_with_output()
-    );
-
-    if !output.status.success() {
-        exit_with_error!(format!(
-            "{}\n{}{}",
-            command_str,
-            String::from_utf8(output.stdout).unwrap(),
-            String::from_utf8(output.stderr).unwrap()
+    if output.status.success() {
+        let mut pg_config = get_pg_installdir(pgdir);
+        pg_config.push("bin");
+        pg_config.push("pg_config");
+        Ok(PgConfig::new(pg_config))
+    } else {
+        Err(std::io::Error::new(
+            std::io::ErrorKind::Other,
+            format!(
+                "{}\n{}{}",
+                command_str,
+                String::from_utf8(output.stdout).unwrap(),
+                String::from_utf8(output.stderr).unwrap()
+            ),
         ))
     }
-
-    let mut pg_config = get_pg_installdir(pgdir);
-    pg_config.push("bin");
-    pg_config.push("pg_config");
-    pg_config
 }
 
-fn validate_pg_config(pg_config: &PathBuf, version: &PgVersion) {
-    println!("{} {}", "  Validating".bold().green(), pg_config.display());
-    let mut command = std::process::Command::new(pg_config);
-
-    command
-        .arg("--includedir-server")
-        .stdout(std::process::Stdio::piped())
-        .stderr(std::process::Stdio::piped())
-        .stdin(std::process::Stdio::null());
-    let command_str = format!("{:?}", command);
-
-    let child = handle_result!(format!("Failed: {:?}", command_str), command.spawn());
-
-    let output = handle_result!(
-        format!("could not receive pg_config's output: {}", command_str),
-        child.wait_with_output()
+fn validate_pg_config(pg_config: &PgConfig) -> Result<(), std::io::Error> {
+    println!(
+        "{} {}",
+        "  Validating".bold().green(),
+        pg_config.path().expect("no path for pg_config").display()
     );
 
-    if !output.status.success() {
-        exit_with_error!(
-            "{}: {}\n{}{}",
-            version,
-            command_str,
-            String::from_utf8(output.stdout).unwrap(),
-            String::from_utf8(output.stderr).unwrap()
-        )
-    }
-
-    let includedir = PathBuf::from_str(&String::from_utf8(output.stdout).unwrap().trim()).unwrap();
-    if !includedir.exists() {
-        exit_with_error!(
-            "{}:  {} --includedir-server\n     `{}` does not exist",
-            version,
-            pg_config.display(),
-            includedir.display().to_string().bold().yellow()
-        );
-    }
+    pg_config.includedir_server()?;
+    pg_config.pkglibdir()?;
+    Ok(())
 }
 
-fn write_config(pg_configs: &Vec<(PathBuf, &PgVersion)>) -> Result<(), std::io::Error> {
-    let config_path = get_pgx_config_path();
-    let mut file = handle_result!(
-        format!("Unable to create {}", config_path.display()),
-        File::create(&config_path)
-    );
+fn write_config(pg_configs: &Vec<PgConfig>) -> Result<(), std::io::Error> {
+    let config_path = Pgx::config_toml()?;
+    let mut file = File::create(&config_path)?;
     file.write_all(b"[configs]\n")?;
-    for (pg_config, version) in pg_configs {
-        file.write_all(format!("{}=\"{}\"\n", version.label(), pg_config.display()).as_bytes())?;
+    for pg_config in pg_configs {
+        file.write_all(
+            format!(
+                "{}=\"{}\"\n",
+                pg_config.label()?,
+                pg_config.path().expect("no path for pg_config").display()
+            )
+            .as_bytes(),
+        )?;
     }
 
     Ok(())

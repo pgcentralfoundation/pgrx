@@ -17,7 +17,7 @@ pub fn test_extension(major_version: u16, is_release: bool) {
         .arg("--features")
         .arg(format!("pg{} pg_test", major_version))
         .arg("--no-default-features")
-        .env("CARGO_TARGET_DIR", target_dir.display().to_string())
+        .env("CARGO_TARGET_DIR", &target_dir)
         .env(
             "PGX_BUILD_PROFILE",
             if is_release { "release" } else { "debug" },
@@ -28,7 +28,7 @@ pub fn test_extension(major_version: u16, is_release: bool) {
     }
 
     eprintln!("{:?}", command);
-    let status = handle_result!("failed to run cargo test", command.status());
+    let status = handle_result!(command.status(), "failed to run cargo test");
     if !status.success() {
         exit_with_error!("cargo pgx test failed with status = {:?}", status.code())
     }

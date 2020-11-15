@@ -4,22 +4,21 @@
 use crate::commands::get::{find_control_file, get_property};
 use crate::commands::schema::read_load_order;
 use colored::Colorize;
-use pgx_utils::{
-    exit_with_error, get_pg_config_major_version, get_target_dir, handle_result, run_pg_config,
-};
+use pgx_utils::pg_config::PgConfig;
+use pgx_utils::{exit_with_error, get_target_dir, handle_result};
 use std::io::Write;
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
 use std::str::FromStr;
 
 pub(crate) fn install_extension(
-    pg_config: &Option<String>,
+    pg_config: &PgConfig,
     is_release: bool,
     base_directory: Option<PathBuf>,
-) {
+) -> Result<(), std::io::Error> {
     let base_directory = base_directory.unwrap_or("/".into());
     let (control_file, extname) = find_control_file();
-    let major_version = get_pg_config_major_version(pg_config);
+    let major_version = pg_config.major_version()?;
 
     if get_property("relocatable") != Some("false".into()) {
         exit_with_error!(
@@ -32,8 +31,8 @@ pub(crate) fn install_extension(
 
     println!();
     println!("installing extension");
-    let pkgdir = make_relative(get_pkglibdir(pg_config));
-    let extdir = make_relative(get_extensiondir(pg_config));
+    let pkgdir = make_relative(pg_config.pkglibdir()?);
+    let extdir = make_relative(pg_config.extension_dir()?);
     let shlibpath = find_library_file(&extname, is_release);
 
     {
@@ -51,22 +50,23 @@ pub(crate) fn install_extension(
     }
 
     {
-        handle_result!("failed to generate SQL schema", crate::generate_schema());
+        handle_result!(crate::generate_schema(), "failed to generate SQL schema");
     }
 
     copy_sql_files(&extdir, &extname, &base_directory);
 
     println!("{} installing {}", "    Finished".bold().green(), extname);
+    Ok(())
 }
 
 fn copy_file(src: PathBuf, dest: PathBuf, msg: &str) {
     if !dest.parent().unwrap().exists() {
         handle_result!(
+            std::fs::create_dir_all(dest.parent().unwrap()),
             format!(
                 "failed to create destination directory {}",
                 dest.parent().unwrap().display()
-            ),
-            std::fs::create_dir_all(dest.parent().unwrap())
+            )
         );
     }
 
@@ -78,8 +78,8 @@ fn copy_file(src: PathBuf, dest: PathBuf, msg: &str) {
     );
 
     handle_result!(
-        format!("failed copying `{}` to `{}`", src.display(), dest.display()),
-        std::fs::copy(&src, &dest)
+        std::fs::copy(&src, &dest),
+        format!("failed copying `{}` to `{}`", src.display(), dest.display())
     );
 }
 
@@ -109,8 +109,8 @@ fn build_extension(major_version: u16, is_release: bool) {
         features, command_str
     );
     let status = handle_result!(
-        format!("failed to spawn cargo: {}", command_str),
-        command.status()
+        command.status(),
+        format!("failed to spawn cargo: {}", command_str)
     );
     if !status.success() {
         exit_with_error!("failed to build extension");
@@ -153,7 +153,7 @@ fn copy_sql_files(extdir: &PathBuf, extname: &str, base_directory: &PathBuf) {
     }
 
     // now copy all the version upgrade files too
-    for sql in handle_result!("failed to read ./sql/ directory", std::fs::read_dir("sql/")) {
+    for sql in handle_result!(std::fs::read_dir("sql/"), "failed to read ./sql/ directory") {
         if let Ok(sql) = sql {
             let filename = sql.file_name().into_string().unwrap();
 
@@ -177,8 +177,8 @@ fn find_library_file(extname: &str, is_release: bool) -> PathBuf {
     }
 
     for f in handle_result!(
-        format!("Unable to read {}", target_dir.display()),
-        std::fs::read_dir(&target_dir)
+        std::fs::read_dir(&target_dir),
+        format!("Unable to read {}", target_dir.display())
     ) {
         if let Ok(f) = f {
             let filename = f.file_name().into_string().unwrap();
@@ -202,17 +202,6 @@ fn get_version() -> String {
         Some(v) => v,
         None => exit_with_error!("cannot determine extension version number.  Is the `default_version` property declared in the control file?"),
     }
-}
-
-fn get_pkglibdir(pg_config: &Option<String>) -> PathBuf {
-    run_pg_config(pg_config, "--pkglibdir").into()
-}
-
-fn get_extensiondir(pg_config: &Option<String>) -> PathBuf {
-    let mut dir: PathBuf = run_pg_config(pg_config, "--sharedir").into();
-
-    dir.push("extension");
-    dir
 }
 
 fn make_relative(path: PathBuf) -> PathBuf {

@@ -2,7 +2,6 @@
 // governed by the MIT license that can be found in the LICENSE file.
 
 /// Similar to Rust's `Box<T>` type, `PgBox<T>` also represents heap-allocated memory.
-use crate::nodes::PgNode;
 use crate::{pg_sys, void_mut_ptr, PgMemoryContexts};
 use std::fmt::{Debug, Error, Formatter};
 use std::ops::{Deref, DerefMut};
@@ -209,17 +208,24 @@ impl<T> PgBox<T> {
         }
     }
 
-    /// Allocate a struct that can be cast to Postgres' `Node`
+    /// Allocate a Postgres `pg_sys::Node` subtype, using `palloc` in the `CurrentMemoryContext`.
     ///
-    /// This function automatically fills the struct with zeros and sets
-    /// the `type_` field to the specified [PgNode]
-    pub fn alloc_node(tag: PgNode) -> PgBox<T> {
-        let boxed = PgBox::<T>::alloc0();
-        let node = boxed.as_ptr() as *mut pg_sys::Node;
+    /// The allocated node will have it's `type_` field set to the `node_tag` argument, and will
+    /// otherwise be initialized with all zeros
+    ///
+    /// ## Examples
+    /// ```rust,no_run
+    /// use pgx::{PgBox, pg_sys};
+    /// let create_trigger_statement = PgBox::<pg_sys::CreateTrigStmt>::alloc_node(pg_sys::NodeTag_T_CreateTrigStmt);
+    /// ```
+    pub fn alloc_node(node_tag: pg_sys::NodeTag) -> PgBox<T> {
+        let node = PgBox::<T>::alloc0();
+        let ptr = node.as_ptr();
 
-        unsafe { node.as_mut() }.unwrap().type_ = tag as u32;
-
-        boxed
+        unsafe {
+            (ptr as *mut _ as *mut pg_sys::Node).as_mut().unwrap().type_ = node_tag;
+        }
+        node
     }
 
     /// Box nothing

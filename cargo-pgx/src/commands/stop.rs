@@ -3,30 +3,26 @@
 
 use crate::commands::status::status_postgres;
 use colored::Colorize;
-use pgx_utils::{
-    exit_with_error, get_pgbin_dir, get_pgdata_dir, get_pgx_config_path, handle_result,
-};
+use pgx_utils::pg_config::{PgConfig, Pgx};
+
 use std::process::Stdio;
 
-pub(crate) fn stop_postgres(major_version: u16, fail_on_error: bool) {
-    if !get_pgx_config_path().exists() && !fail_on_error {
-        // we don't have a pgx config path and we're not asked to fail on errors
-        // so just silently return
-        return;
-    }
+pub(crate) fn stop_postgres(pg_config: &PgConfig) -> Result<(), std::io::Error> {
+    Pgx::home()?;
+    let datadir = pg_config.data_dir()?;
+    let bindir = pg_config.bin_dir()?;
 
-    let datadir = get_pgdata_dir(major_version);
-    let bindir = get_pgbin_dir(major_version);
-
-    if !status_postgres(major_version, fail_on_error) {
-        return;
+    if status_postgres(pg_config)? == false {
+        // it's not running, no need to stop it
+        return Ok(());
     }
 
     println!(
         "{} Postgres v{}",
         "    Stopping".bold().green(),
-        major_version
+        pg_config.major_version()?
     );
+
     let mut command = std::process::Command::new(format!("{}/pg_ctl", bindir.display()));
     command
         .stdout(Stdio::piped())
@@ -35,23 +31,16 @@ pub(crate) fn stop_postgres(major_version: u16, fail_on_error: bool) {
         .arg("-m")
         .arg("fast")
         .arg("-D")
-        .arg(datadir.display().to_string());
-    let command_str = format!("{:?}", command);
+        .arg(&datadir);
 
-    if fail_on_error {
-        let output = handle_result!(
-            format!("failed to stop postgres: {}", command_str),
-            command.output()
-        );
+    let output = command.output()?;
 
-        if !output.status.success() {
-            exit_with_error!(
-                "problem running pg_ctl: {}\n\n{}",
-                command_str,
-                String::from_utf8(output.stderr).unwrap()
-            )
-        }
+    if !output.status.success() {
+        Err(std::io::Error::new(
+            std::io::ErrorKind::Other,
+            String::from_utf8(output.stderr).unwrap(),
+        ))
     } else {
-        command.status().ok();
+        Ok(())
     }
 }

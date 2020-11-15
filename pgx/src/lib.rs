@@ -74,7 +74,7 @@ pub use log::*;
 pub use lwlock::*;
 pub use memcxt::*;
 pub use namespace::*;
-pub use nodes::{is_a, PgNode, PgNodeFactory}; // be specific since we have multiple versions of these things behind feature gates
+pub use nodes::*;
 pub use pgbox::*;
 pub use rel::*;
 pub use shmem::*;
@@ -88,6 +88,7 @@ pub use xid::*;
 
 pub use pgx_pg_sys as pg_sys; // the module only, not its contents
 pub use pgx_pg_sys::submodules::*;
+pub use pgx_pg_sys::PgBuiltInOids; // reexport this so it looks like it comes from here
 
 /// A macro for marking a library compatible with the Postgres extension framework.
 ///
@@ -106,6 +107,7 @@ macro_rules! pg_module_magic {
             use std::mem::size_of;
             use std::os::raw::c_int;
 
+            #[cfg(not(feature = "pg13"))]
             const MY_MAGIC: pgx::pg_sys::Pg_magic_struct = pgx::pg_sys::Pg_magic_struct {
                 len: size_of::<pgx::pg_sys::Pg_magic_struct>() as c_int,
                 version: pgx::pg_sys::PG_VERSION_NUM as std::os::raw::c_int / 100,
@@ -113,6 +115,16 @@ macro_rules! pg_module_magic {
                 indexmaxkeys: pgx::pg_sys::INDEX_MAX_KEYS as c_int,
                 namedatalen: pgx::pg_sys::NAMEDATALEN as c_int,
                 float4byval: pgx::pg_sys::USE_FLOAT4_BYVAL as c_int,
+                float8byval: pgx::pg_sys::USE_FLOAT8_BYVAL as c_int,
+            };
+
+            #[cfg(feature = "pg13")]
+            const MY_MAGIC: pgx::pg_sys::Pg_magic_struct = pgx::pg_sys::Pg_magic_struct {
+                len: size_of::<pgx::pg_sys::Pg_magic_struct>() as c_int,
+                version: pgx::pg_sys::PG_VERSION_NUM as std::os::raw::c_int / 100,
+                funcmaxargs: pgx::pg_sys::FUNC_MAX_ARGS as c_int,
+                indexmaxkeys: pgx::pg_sys::INDEX_MAX_KEYS as c_int,
+                namedatalen: pgx::pg_sys::NAMEDATALEN as c_int,
                 float8byval: pgx::pg_sys::USE_FLOAT8_BYVAL as c_int,
             };
 

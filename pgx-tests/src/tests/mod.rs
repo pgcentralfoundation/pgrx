@@ -15,7 +15,6 @@ mod inet_tests;
 mod json_tests;
 mod log_tests;
 mod memcxt_tests;
-mod node_tests;
 mod numeric_tests;
 mod pg_extern_args_tests;
 mod pg_try_tests;

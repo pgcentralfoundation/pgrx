@@ -16,19 +16,25 @@ subcommands:
                     value_name: PG10_PG_CONFIG
                     takes_value: true
                     required: false
-                    help: if installed locally, the path to PG10's 'pg_config' tool
+                    help: if installed locally, the path to PG10's 'pg_config' tool, or 'download' to have pgx download/compile/install it
                 - pg11:
                     long: pg11
                     value_name: PG11_PG_CONFIG
                     takes_value: true
                     required: false
-                    help: if installed locally, the path to PG11's 'pg_config' tool
+                    help: if installed locally, the path to PG11's 'pg_config' tool, or 'download' to have pgx download/compile/install it
                 - pg12:
                     long: pg12
                     value_name: PG12_PG_CONFIG
                     takes_value: true
                     required: false
-                    help: if installed locally, the path to PG12's 'pg_config' tool
+                    help: if installed locally, the path to PG12's 'pg_config' tool, or 'download' to have pgx download/compile/install it
+                - pg13:
+                    long: pg13
+                    value_name: PG13_PG_CONFIG
+                    takes_value: true
+                    required: false
+                    help: if installed locally, the path to PG13's 'pg_config' tool, or 'download' to have pgx download/compile/install it
           - start:
               about: start a pgx-managed Postgres instance
               args:
@@ -36,7 +42,7 @@ subcommands:
                     value_name: PG_VERSION
                     takes_value: true
                     required: true
-                    help: the Postgres version to start ('pg10', 'pg11', pg12', or 'all')
+                    help: the Postgres version to start ('pg10', 'pg11', 'pg12', 'pg13', or 'all')
           - stop:
               about: stop a pgx-managed Postgres instance
               args:
@@ -44,7 +50,7 @@ subcommands:
                     value_name: PG_VERSION
                     takes_value: true
                     required: true
-                    help: the Postgres version to stop ('pg10', 'pg11', pg12', or 'all')
+                    help: the Postgres version to stop ('pg10', 'pg11', 'pg12', 'pg13', or 'all')
           - status:
               about: is a pgx-managed Postgres instance running?
               args:
@@ -87,7 +93,7 @@ subcommands:
                     value_name: PG_VERSION
                     takes_value: true
                     required: true
-                    help: Do you want to run against Postgres 'pg10', 'pg11', pg12'?
+                    help: Do you want to run against Postgres 'pg10', 'pg11', 'pg12', 'pg13'?
                 - dbname:
                     value_name: DBNAME
                     takes_value: true
@@ -103,7 +109,7 @@ subcommands:
                     value_name: PG_VERSION
                     takes_value: true
                     required: true
-                    help: Do you want to run against Postgres 'pg10', 'pg11', pg12'?
+                    help: Do you want to run against Postgres 'pg10', 'pg11', 'pg12', 'pg13'?
                 - dbname:
                     value_name: DBNAME
                     takes_value: true
@@ -114,7 +120,7 @@ subcommands:
                 - pg_version:
                     value_name: PG_VERSION
                     takes_value: true
-                    help: Do you want to test for Postgres 'pg10', 'pg11', pg12', or 'all' (default)?
+                    help: Do you want to test for Postgres 'pg10', 'pg11', 'pg12', 'pg13', or 'all' (default)?
                 - release:
                     short: r
                     long: release

@@ -92,7 +92,7 @@ fn extract_enum_oid(tup: *mut pg_sys::HeapTupleData) -> pg_sys::Oid {
     unsafe { pgx_HeapTupleHeaderGetOid(tup.as_ref().unwrap().t_data) }
 }
 
-#[cfg(feature = "pg12")]
+#[cfg(any(feature = "pg12", feature = "pg13"))]
 fn extract_enum_oid(tup: *mut pg_sys::HeapTupleData) -> pg_sys::Oid {
     let en = unsafe { pgx_GETSTRUCT(tup) } as pg_sys::Form_pg_enum;
     let en = unsafe { en.as_ref() }.unwrap();

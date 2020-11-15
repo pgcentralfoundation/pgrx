@@ -1,10 +1,10 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
+use crate::pg_config::PgConfig;
 use colored::Colorize;
 use proc_macro2::TokenTree;
 use quote::quote;
-use serde_derive::Deserialize;
 use std::collections::HashSet;
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
@@ -13,6 +13,7 @@ use syn::export::TokenStream2;
 use syn::{GenericArgument, ItemFn, PathArguments, ReturnType, Type, TypeParamBound};
 
 pub mod operator_common;
+pub mod pg_config;
 
 pub static BASE_POSTGRES_PORT_NO: u16 = 28800;
 pub static BASE_POSTGRES_TESTING_PORT_NO: u16 = 32200;
@@ -43,114 +44,12 @@ macro_rules! exit {
 
 #[macro_export]
 macro_rules! handle_result {
-    ($message:expr, $expr:expr) => {{
+    ($expr:expr, $message:expr) => {{
         match $expr {
             Ok(result) => result,
             Err(e) => crate::exit_with_error!("{}: {}", $message, e),
         }
     }};
-}
-
-#[derive(Debug, Deserialize)]
-pub struct PgConfigPaths {
-    pub pg10: String,
-    pub pg11: String,
-    pub pg12: String,
-}
-
-#[derive(Debug, Deserialize)]
-struct Configs {
-    configs: PgConfigPaths,
-}
-
-pub fn load_pgx_config() -> PgConfigPaths {
-    let path = get_pgx_config_path();
-
-    if !path.exists() {
-        // TODO:  do this automatically if an environment variable is set?
-        //        I think we want/need that ability
-        exit_with_error!(
-            "{} not found.  Have you run `{}` yet?",
-            path.display(),
-            "cargo pgx init".bold().yellow()
-        )
-    }
-
-    handle_result!(
-        "config.toml invalid",
-        toml::from_str::<Configs>(handle_result!(
-            "Unable to read config.toml",
-            &std::fs::read_to_string(path)
-        ))
-    )
-    .configs
-}
-
-pub fn get_pgbin_dir(major_version: u16) -> PathBuf {
-    run_pg_config(&get_pg_config(major_version), "--bindir").into()
-}
-
-pub fn get_postmaster_path(major_version: u16) -> PathBuf {
-    let mut path = get_pgbin_dir(major_version);
-    path.push("postmaster");
-    path
-}
-
-pub fn get_initdb_path(major_version: u16) -> PathBuf {
-    let mut path = get_pgbin_dir(major_version);
-    path.push("initdb");
-    path
-}
-
-pub fn get_createdb_path(major_version: u16) -> PathBuf {
-    let mut path = get_pgbin_dir(major_version);
-    path.push("createdb");
-    path
-}
-
-pub fn get_dropdb_path(major_version: u16) -> PathBuf {
-    let mut path = get_pgbin_dir(major_version);
-    path.push("dropdb");
-    path
-}
-
-pub fn get_pgdata_dir(major_version: u16) -> PathBuf {
-    let mut path = get_pgx_home();
-    path.push(format!("data-{}", major_version));
-    path
-}
-
-pub fn get_pglog_file(major_version: u16) -> PathBuf {
-    let mut path = get_pgx_home();
-    path.push(format!("{}.log", major_version));
-    path
-}
-
-pub fn get_pgx_home() -> PathBuf {
-    std::env::var("PGX_HOME").map_or_else(
-        |_| {
-            let mut dir = match dirs::home_dir() {
-                Some(dir) => dir,
-                None => exit_with_error!("You don't seem to have a home directory"),
-            };
-            dir.push(".pgx");
-            if !dir.exists() {
-                handle_result!(
-                    format!("creating {}", dir.display()),
-                    std::fs::create_dir_all(&dir)
-                );
-            }
-
-            dir
-        },
-        |v| v.into(),
-    )
-}
-
-pub fn get_pgx_config_path() -> PathBuf {
-    let mut path = get_pgx_home();
-    path.push("config.toml");
-    path
 }
 
 pub fn get_target_dir() -> PathBuf {
@@ -162,46 +61,6 @@ pub fn get_target_dir() -> PathBuf {
         },
         |v| v.into(),
     )
-}
-
-pub fn get_pg_config(major_version: u16) -> Option<String> {
-    let paths = load_pgx_config();
-    match major_version {
-        10 => Some(paths.pg10),
-        11 => Some(paths.pg11),
-        12 => Some(paths.pg12),
-        _ => None,
-    }
-}
-
-pub fn get_pg_config_major_version(pg_config: &Option<String>) -> u16 {
-    let version_string = run_pg_config(&pg_config, "--version");
-    let version_parts = version_string.split_whitespace().collect::<Vec<&str>>();
-    let version = version_parts.get(1);
-    let version = f64::from_str(&version.unwrap()).expect("not a valid version number");
-    version.floor() as u16
-}
-
-pub fn get_pg_download_dir() -> PathBuf {
-    std::env::var("PG_DOWNLOAD_TARGET_DIR").map_or_else(|_| get_target_dir(), |v| v.into())
-}
-
-pub fn get_psql_path(major_version: u16) -> PathBuf {
-    let mut bindir = get_pgbin_dir(major_version);
-    bindir.push("psql");
-    bindir
-}
-
-pub fn run_pg_config(pg_config: &Option<String>, arg: &str) -> String {
-    let pg_config = pg_config
-        .clone()
-        .unwrap_or_else(|| std::env::var("PG_CONFIG").unwrap_or_else(|_| "pg_config".to_string()));
-    let output = handle_result!(
-        format!("{}", pg_config),
-        Command::new(&pg_config).arg(arg).output()
-    );
-
-    String::from_utf8(output.stdout).unwrap().trim().to_string()
 }
 
 pub fn prefix_path<P: Into<PathBuf>>(dir: P) -> String {
@@ -216,36 +75,36 @@ pub fn prefix_path<P: Into<PathBuf>>(dir: P) -> String {
 }
 
 pub fn createdb(
-    major_version: u16,
-    host: &str,
-    port: u16,
+    pg_config: &PgConfig,
     dbname: &str,
+    is_test: bool,
     if_not_exists: bool,
-) -> bool {
-    if if_not_exists && does_db_exist(major_version, host, port, dbname) {
-        return false;
+) -> Result<bool, std::io::Error> {
+    if if_not_exists && does_db_exist(pg_config, dbname)? {
+        return Ok(false);
     }
 
     println!("{} database {}", "    Creating".bold().green(), dbname);
-    let mut command = Command::new(get_createdb_path(major_version));
+    let mut command = Command::new(pg_config.createdb_path()?);
     command
         .env_remove("PGDATABASE")
         .env_remove("PGHOST")
         .env_remove("PGPORT")
         .env_remove("PGUSER")
         .arg("-h")
-        .arg(host)
+        .arg(pg_config.host())
         .arg("-p")
-        .arg(port.to_string())
+        .arg(if is_test {
+            pg_config.test_port()?.to_string()
+        } else {
+            pg_config.port()?.to_string()
+        })
         .arg(dbname)
         .stdout(Stdio::piped())
         .stderr(Stdio::piped());
     let command_str = format!("{:?}", command);
 
-    let output = handle_result!(
-        format!("Failed to create database {}", dbname),
-        command.output()
-    );
+    let output = command.output()?;
 
     if !output.status.success() {
         exit_with_error!(
@@ -256,17 +115,17 @@ pub fn createdb(
         )
     }
 
-    true
+    Ok(true)
 }
 
-fn does_db_exist(major_version: u16, host: &str, port: u16, dbname: &str) -> bool {
-    let mut command = Command::new(get_psql_path(major_version));
+fn does_db_exist(pg_config: &PgConfig, dbname: &str) -> Result<bool, std::io::Error> {
+    let mut command = Command::new(pg_config.psql_path()?);
     command
         .arg("-XqAt")
         .arg("-h")
-        .arg(host)
+        .arg(pg_config.host())
         .arg("-p")
-        .arg(port.to_string())
+        .arg(pg_config.port()?.to_string())
         .arg("template1")
         .arg("-c")
         .arg(&format!(
@@ -275,12 +134,9 @@ fn does_db_exist(major_version: u16, host: &str, port: u16, dbname: &str) -> boo
         ))
         .stdout(Stdio::piped())
         .stderr(Stdio::piped());
-    let command_str = format!("{:?}", command);
 
-    let output = handle_result!(
-        format!("Failed to create database {}", dbname),
-        command.output()
-    );
+    let command_str = format!("{:?}", command);
+    let output = command.output()?;
 
     if !output.status.success() {
         exit_with_error!(
@@ -293,7 +149,7 @@ fn does_db_exist(major_version: u16, host: &str, port: u16, dbname: &str) -> boo
     } else {
         let count = i32::from_str(&String::from_utf8(output.stdout).unwrap().trim())
             .expect("result is not a number");
-        count > 0
+        Ok(count > 0)
     }
 }
 

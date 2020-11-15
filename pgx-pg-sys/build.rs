@@ -4,14 +4,15 @@
 extern crate build_deps;
 
 use bindgen::callbacks::MacroParsingBehavior;
-use pgx_utils::{get_pg_config, get_pgx_config_path, prefix_path, run_pg_config};
+use pgx_utils::pg_config::{PgConfig, PgConfigSelector, Pgx};
+use pgx_utils::{exit_with_error, handle_result, prefix_path};
 use quote::quote;
+use rayon::prelude::*;
 use std::collections::{HashMap, HashSet};
 use std::error::Error;
 use std::path::PathBuf;
 use std::process::{Command, Output};
-use std::sync::Mutex;
-use syn::export::TokenStream2;
+use syn::export::{ToTokens, TokenStream2};
 use syn::Item;
 
 #[derive(Debug)]
@@ -56,177 +57,222 @@ fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
 
     let manifest_dir = PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").unwrap());
     let out_dir = PathBuf::from(format!(
-        "{}/generated-bindings/",
+        "{}/src/",
         std::env::var("CARGO_MANIFEST_DIR").unwrap()
     ));
     let shim_dir = PathBuf::from(format!("{}/cshim", manifest_dir.display()));
-    let common_rs = PathBuf::from(format!("{}/common.rs", out_dir.display(),));
 
     eprintln!("manifest_dir={}", manifest_dir.display());
     eprintln!("shim_dir={}", shim_dir.display());
-    eprintln!("common_rs={}", common_rs.display());
 
-    let major_versions = vec![10, 11, 12];
+    let pgx = Pgx::from_config()?;
 
     if std::env::var("DOCS_RS").unwrap_or("false".into()) == "1" {
         return Ok(());
     }
 
-    build_deps::rerun_if_changed_paths(&get_pgx_config_path().display().to_string()).unwrap();
+    build_deps::rerun_if_changed_paths(&Pgx::config_toml()?.display().to_string()).unwrap();
     build_deps::rerun_if_changed_paths("include/*").unwrap();
     build_deps::rerun_if_changed_paths("cshim/pgx-cshim.c").unwrap();
     build_deps::rerun_if_changed_paths("cshim/Makefile").unwrap();
 
-    let shim_mutex = Mutex::new(());
+    let pg_configs = pgx
+        .iter(PgConfigSelector::All)
+        .map(|v| v.expect("invalid pg_config"))
+        .collect::<Vec<_>>();
+    pg_configs.par_iter().for_each(|pg_config| {
+        let major_version = handle_result!(
+            pg_config.major_version(),
+            "could not determine major version"
+        );
+        let mut include_h = manifest_dir.clone();
+        include_h.push("include");
+        include_h.push(format!("pg{}.h", major_version));
 
-    let mut shims: Vec<PgShim> = Vec::with_capacity(major_versions.len());
-    for major_version in major_versions.iter() {
-        let major_version = *major_version;
+        let bindgen_output = handle_result!(
+            run_bindgen(&pg_config, &include_h),
+            format!("bindgen failed for pg{}", major_version)
+        );
 
-        let pg_config = get_pg_config(major_version);
-        let include_h = PathBuf::from(format!(
-            "{}/include/pg{}.h",
-            manifest_dir.display(),
-            major_version
-        ));
-        let specific_rs = PathBuf::from(format!(
-            "{}/pg{}_specific.rs",
-            out_dir.display(),
-            major_version
-        ));
+        let rewritten_items = handle_result!(
+            rewrite_items(&bindgen_output),
+            format!("failed to rewrite items for pg{}", major_version)
+        );
 
-        eprintln!("specific_rs={}", specific_rs.display());
+        let oids = handle_result!(
+            extract_oids(&bindgen_output),
+            format!("unable to generate oids for pg{}", major_version)
+        );
 
-        let bindings = run_bindgen(&pg_config, major_version, &include_h)?;
-        let bindings = rewrite_items(bindings)?;
-        shims.push(PgShim {
-            major_version,
-            bindings,
-            pg_config,
-        });
-    }
+        let mut bindings_file = out_dir.clone();
+        bindings_file.push(&format!("pg{}.rs", major_version));
+        handle_result!(
+            write_rs_file(
+                rewritten_items,
+                &bindings_file,
+                quote! {
+                    use crate as pg_sys;
+                    use pgx_macros::*;
+                }
+            ),
+            format!("Unable to write bindings file for pg{}", major_version)
+        );
 
-    // consolidate common items, this step also lands the transformed token streams to disk
-    generate_common_rs(manifest_dir, &out_dir, shims.as_slice());
+        let mut oids_file = out_dir.clone();
+        oids_file.push(&format!("pg{}_oids.rs", major_version));
+        handle_result!(
+            write_rs_file(oids, &oids_file, quote! {}),
+            format!("Unable to write oids file for pg{}", major_version)
+        );
+    });
 
-    // compile .a files from the generated shim code
-    for shim in shims.iter() {
-        build_shim(&shim_dir, &shim_mutex, shim.major_version, &shim.pg_config);
+    // compile the cshim for each binding
+    for pg_config in pg_configs {
+        build_shim(&shim_dir, &pg_config)?;
     }
 
     Ok(())
 }
 
-/// PgShim describes the bindings for a specific postgres version
-struct PgShim {
-    major_version: u16,
-    bindings: TokenStream2,
-    pg_config: Option<String>,
+fn write_rs_file(
+    code: TokenStream2,
+    file: &PathBuf,
+    header: TokenStream2,
+) -> Result<(), std::io::Error> {
+    let contents = quote! {
+        #header
+        #code
+    };
+
+    std::fs::write(&file, contents.to_string())?;
+    rust_fmt(&file)
 }
 
 /// Given a token stream representing a file, apply a series of transformations to munge
-/// the bindgen generated code with some postgres specific enhacements
-fn rewrite_items(file: syn::File) -> Result<TokenStream2, Box<dyn Error + Send + Sync>> {
-    let items = apply_pg_guard(file.items)?;
-    let items = display_nodes(items)?;
+/// the bindgen generated code with some postgres specific enhancements
+fn rewrite_items(file: &syn::File) -> Result<TokenStream2, Box<dyn Error + Send + Sync>> {
+    let items = apply_pg_guard(&file.items)?;
+    let pgnode_impls = impl_pg_node(&items)?;
 
     let mut stream = TokenStream2::new();
-    for item in items.into_iter() {
+    for item in items.into_iter().chain(pgnode_impls.into_iter()) {
         stream.extend(quote! { #item });
     }
+
     Ok(stream)
 }
 
-/// Given a list of items representing a file, extend all the items which
-/// are postgres `Node`s with a `Display` routine that calls out to
-/// nodeToString (we don't go via the type safe node_to_string wrapper in `pgx`
-/// to avoid depending on `pgx`).
-fn display_nodes(
-    mut items: Vec<syn::Item>,
-) -> Result<Vec<syn::Item>, Box<dyn Error + Send + Sync>> {
+/// Find all the constants that represent Postgres type OID values.
+///
+/// These are constants of type `u32` whose name ends in the string "OID"
+fn extract_oids(code: &syn::File) -> Result<TokenStream2, Box<dyn Error>> {
+    let mut enum_variants = TokenStream2::new();
+    let mut from_impl = TokenStream2::new();
+    for item in &code.items {
+        match item {
+            Item::Const(c) => {
+                let ident = &c.ident;
+                let name = ident.to_string();
+                let ty = &c.ty.to_token_stream().to_string();
+
+                if ty == "u32" && name.ends_with("OID") && name != "HEAP_HASOID" {
+                    enum_variants.extend(quote! {#ident = crate::#ident as isize, });
+                    from_impl.extend(quote! {crate::#ident => Some(crate::PgBuiltInOids::#ident), })
+                }
+            }
+            _ => {}
+        }
+    }
+
+    Ok(quote! {
+        #[derive(Copy, Clone, Eq, PartialEq, Hash, Ord, PartialOrd, Debug)]
+        pub enum PgBuiltInOids {
+            #enum_variants
+        }
+
+        impl PgBuiltInOids {
+            pub fn from(oid: crate::Oid) -> Option<PgBuiltInOids> {
+                match oid {
+                    #from_impl
+                    _ => None,
+                }
+            }
+        }
+    })
+}
+
+/// Implement our `PgNode` marker trait for `pg_sys::Node` and its "subclasses"
+fn impl_pg_node(items: &Vec<syn::Item>) -> Result<Vec<syn::Item>, Box<dyn Error + Send + Sync>> {
+    let mut pgnode_impls = Vec::new();
+
     // we scope must of the computation so we can borrow `items` and then
     // extend it at the very end.
-    let additional_items = {
-        let struct_graph: StructGraph = StructGraph::from(&items[..]);
+    let struct_graph: StructGraph = StructGraph::from(&items[..]);
 
-        // collect all the structs with `NodeTag` as their first member,
-        // these will serve as roots in our forest of `Node`s
-        let mut root_node_structs = Vec::new();
-        for descriptor in struct_graph.descriptors.iter() {
-            // grab the first field, if any
-            let first_field = match &descriptor.struct_.fields {
-                syn::Fields::Named(fields) => {
-                    if let Some(first_field) = fields.named.first() {
-                        first_field
-                    } else {
-                        continue;
-                    }
-                }
-                syn::Fields::Unnamed(fields) => {
-                    if let Some(first_field) = fields.unnamed.first() {
-                        first_field
-                    } else {
-                        continue;
-                    }
-                }
-                _ => continue,
-            };
-
-            // grab the type name of the first field
-            let ty_name = if let syn::Type::Path(p) = &first_field.ty {
-                if let Some(last_segment) = p.path.segments.last() {
-                    last_segment.ident.to_string()
+    // collect all the structs with `NodeTag` as their first member,
+    // these will serve as roots in our forest of `Node`s
+    let mut root_node_structs = Vec::new();
+    for descriptor in struct_graph.descriptors.iter() {
+        // grab the first field, if any
+        let first_field = match &descriptor.struct_.fields {
+            syn::Fields::Named(fields) => {
+                if let Some(first_field) = fields.named.first() {
+                    first_field
                 } else {
                     continue;
                 }
+            }
+            syn::Fields::Unnamed(fields) => {
+                if let Some(first_field) = fields.unnamed.first() {
+                    first_field
+                } else {
+                    continue;
+                }
+            }
+            _ => continue,
+        };
+
+        // grab the type name of the first field
+        let ty_name = if let syn::Type::Path(p) = &first_field.ty {
+            if let Some(last_segment) = p.path.segments.last() {
+                last_segment.ident.to_string()
             } else {
                 continue;
-            };
-
-            if ty_name == "NodeTag" {
-                root_node_structs.push(descriptor);
             }
+        } else {
+            continue;
+        };
+
+        if ty_name == "NodeTag" {
+            root_node_structs.push(descriptor);
         }
+    }
 
-        // the set of types which subclass `Node` according to postgres' object system
-        let mut node_set = HashSet::new();
-        // fill in any children of the roots with a recursive DFS
-        // (we are not operating on user input, so it is ok to just
-        //  use direct recursion rather than an explicit stack).
-        for root in root_node_structs.into_iter() {
-            dfs_find_nodes(root, &struct_graph, &mut node_set);
-        }
+    // the set of types which subclass `Node` according to postgres' object system
+    let mut node_set = HashSet::new();
+    // fill in any children of the roots with a recursive DFS
+    // (we are not operating on user input, so it is ok to just
+    //  use direct recursion rather than an explicit stack).
+    for root in root_node_structs.into_iter() {
+        dfs_find_nodes(root, &struct_graph, &mut node_set);
+    }
 
-        // now we can finally iterate the Nodes and emit out Display impl
-        let mut additional_items = Vec::with_capacity(node_set.len());
-        for node_struct in node_set.into_iter() {
-            let struct_name = &node_struct.struct_.ident;
+    // now we can finally iterate the Nodes and emit out Display impl
+    for node_struct in node_set.into_iter() {
+        let struct_name = &node_struct.struct_.ident;
 
-            let impl_item: syn::Item = syn::parse2(quote! {
-                impl ::std::fmt::Display for #struct_name {
-                    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-                        let string = unsafe { crate::nodeToString(self as *const #struct_name as *const ::std::ffi::c_void) };
-                        if string.is_null() {
-                            write!(f, "UNKNOWN-NODE")
-                        } else {
-                            match unsafe { ::std::ffi::CStr::from_ptr(string).to_str() } {
-                                Ok(s) => write!(f, "{}", s),
-                                Err(e) => write!(f, "ffi error: {}", e.to_string()),
-                            }
-                        }
-                    }
-                }
-            })?;
+        let impl_item: syn::Item = syn::parse2(quote! {
+            impl pg_sys::PgNode for #struct_name { }
+        })?;
 
-            additional_items.push(impl_item);
-        }
+        pgnode_impls.push((struct_name.to_string(), impl_item));
+    }
 
-        additional_items
-    };
+    // sort the pgnode impls by their struct name so that we have a consistent ordering in our bindings output
+    pgnode_impls.sort_by(|(a_name, _), (b_name, _)| a_name.cmp(b_name));
 
-    items.extend(additional_items);
-
-    Ok(items)
+    // pluck out the syn::Item field and return as a Vec
+    Ok(pgnode_impls.into_iter().map(|(_, item)| item).collect())
 }
 
 /// Given a root node, dfs_find_nodes adds all its children nodes to `node_set`.
@@ -381,15 +427,15 @@ struct StructDescriptor<'a> {
 /// Given a specific postgres version, `run_bindgen` generates bindings for the given
 /// postgres version and returns them as a token stream.
 fn run_bindgen(
-    pg_config: &Option<String>,
-    major_version: u16,
+    pg_config: &PgConfig,
     include_h: &PathBuf,
 ) -> Result<syn::File, Box<dyn Error + Send + Sync>> {
+    let major_version = pg_config.major_version()?;
     eprintln!("Generating bindings for pg{}", major_version);
-    let includedir_server = run_pg_config(pg_config, "--includedir-server");
+    let includedir_server = pg_config.includedir_server()?;
     let bindings = bindgen::Builder::default()
         .header(include_h.display().to_string())
-        .clang_arg(&format!("-I{}", includedir_server))
+        .clang_arg(&format!("-I{}", includedir_server.display()))
         .parse_callbacks(Box::new(IgnoredMacros::default()))
         .blacklist_function("varsize_any") // pgx converts the VARSIZE_ANY macro, so we don't want to also have this function, which is in heaptuple.c
         .blacklist_function("query_tree_walker")
@@ -419,42 +465,29 @@ fn run_bindgen(
     syn::parse_file(bindings.to_string().as_str()).map_err(|e| From::from(e))
 }
 
-fn build_shim(
-    shim_dir: &PathBuf,
-    shim_mutex: &Mutex<()>,
-    major_version: u16,
-    pg_config: &Option<String>,
-) {
-    let libpgx_cshim: PathBuf =
-        format!("{}/libpgx-cshim-{}.a", shim_dir.display(), major_version).into();
+fn build_shim(shim_dir: &PathBuf, pg_config: &PgConfig) -> Result<(), std::io::Error> {
+    let major_version = pg_config.major_version()?;
+    let mut libpgx_cshim: PathBuf = shim_dir.clone();
+
+    libpgx_cshim.push(format!("libpgx-cshim-{}.a", major_version));
 
     eprintln!("libpgx_cshim={}", libpgx_cshim.display());
-    // build the shim under a lock b/c this can't be built concurrently
-    let _lock = shim_mutex.lock().expect("couldn't obtain shim_mutex");
-
     // then build the shim for the version feature currently being built
-    build_shim_for_version(&shim_dir, major_version, pg_config).expect("shim build failed");
+    build_shim_for_version(&shim_dir, pg_config)?;
 
     // no matter what, tell rustc to link to the library that was built for the feature we're currently building
-    if std::env::var("CARGO_FEATURE_PG10").is_ok() {
+    let envvar_name = format!("CARGO_FEATURE_PG{}", major_version);
+    if std::env::var(envvar_name).is_ok() {
         println!("cargo:rustc-link-search={}", shim_dir.display());
-        println!("cargo:rustc-link-lib=static=pgx-cshim-10");
-    } else if std::env::var("CARGO_FEATURE_PG11").is_ok() {
-        println!("cargo:rustc-link-search={}", shim_dir.display());
-        println!("cargo:rustc-link-lib=static=pgx-cshim-11");
-    } else if std::env::var("CARGO_FEATURE_PG12").is_ok() {
-        println!("cargo:rustc-link-search={}", shim_dir.display());
-        println!("cargo:rustc-link-lib=static=pgx-cshim-12");
+        println!("cargo:rustc-link-lib=static=pgx-cshim-{}", major_version);
     }
+
+    Ok(())
 }
 
-fn build_shim_for_version(
-    shim_dir: &PathBuf,
-    major_version: u16,
-    pg_config: &Option<String>,
-) -> Result<(), std::io::Error> {
-    let pg_config: PathBuf = pg_config.as_ref().unwrap().into();
-    let path_env = prefix_path(pg_config.parent().unwrap());
+fn build_shim_for_version(shim_dir: &PathBuf, pg_config: &PgConfig) -> Result<(), std::io::Error> {
+    let path_env = prefix_path(pg_config.parent_path());
+    let major_version = pg_config.major_version()?;
 
     eprintln!("PATH for build_shim={}", path_env);
     eprintln!("shim_dir={}", shim_dir.display());
@@ -473,19 +506,6 @@ fn build_shim_for_version(
     }
 
     Ok(())
-}
-
-fn generate_common_rs(working_dir: PathBuf, out_dir: &PathBuf, shims: &[PgShim]) {
-    eprintln!("[all branches] Regenerating common.rs and XX_specific.rs files...");
-    let cwd = std::env::current_dir().unwrap();
-
-    std::env::set_current_dir(&working_dir).unwrap();
-    let result = bindings_diff::main(out_dir, shims);
-    std::env::set_current_dir(cwd).unwrap();
-
-    if result.is_err() {
-        panic!(result.err().unwrap());
-    }
 }
 
 fn run_command(mut command: &mut Command, version: &str) -> Result<Output, std::io::Error> {
@@ -534,7 +554,7 @@ fn run_command(mut command: &mut Command, version: &str) -> Result<Output, std::
     Ok(rc)
 }
 
-fn apply_pg_guard(items: Vec<syn::Item>) -> Result<Vec<syn::Item>, Box<dyn Error + Send + Sync>> {
+fn apply_pg_guard(items: &Vec<syn::Item>) -> Result<Vec<syn::Item>, Box<dyn Error + Send + Sync>> {
     let mut out = Vec::with_capacity(items.len());
     for item in items.into_iter() {
         match item {
@@ -545,7 +565,7 @@ fn apply_pg_guard(items: Vec<syn::Item>) -> Result<Vec<syn::Item>, Box<dyn Error
                 })?);
             }
             _ => {
-                out.push(item);
+                out.push(item.clone());
             }
         }
     }
@@ -553,150 +573,11 @@ fn apply_pg_guard(items: Vec<syn::Item>) -> Result<Vec<syn::Item>, Box<dyn Error
     Ok(out)
 }
 
-fn rust_fmt(path: &str) -> Result<(), std::io::Error> {
+fn rust_fmt(path: &PathBuf) -> Result<(), std::io::Error> {
     run_command(
         Command::new("rustfmt").arg(path).current_dir("."),
         "[bindings_diff]",
     )?;
 
     Ok(())
-}
-
-pub(crate) mod bindings_diff {
-    use super::PgShim;
-    use crate::rust_fmt;
-    use quote::{quote, ToTokens};
-    use std::collections::BTreeSet;
-    use std::io::{BufWriter, Write};
-    use std::path::PathBuf;
-    use syn::export::TokenStream2;
-
-    pub(crate) fn main(out_dir: &PathBuf, shims: &[PgShim]) -> Result<(), std::io::Error> {
-        // NOTE: this gross assertion can be ripped out once the code is made generic
-        //       over different postgres versions.
-        assert!(
-            shims[0].major_version == 10
-                && shims[1].major_version == 11
-                && shims[2].major_version == 12
-        );
-        let mut v10 = parse_file_stream(&shims[0].bindings);
-        let mut v11 = parse_file_stream(&shims[1].bindings);
-        let mut v12 = parse_file_stream(&shims[2].bindings);
-
-        let mut versions = vec![&mut v10, &mut v11, &mut v12];
-        let common = build_common_set(&mut versions);
-
-        eprintln!(
-            "[all branches]: common={}, v10={}, v11={}, v12={}",
-            common.len(),
-            v10.len(),
-            v11.len(),
-            v12.len(),
-        );
-
-        write_common_file(&format!("{}common.rs", out_dir.display()), &common);
-        write_source_file(&format!("{}pg10_specific.rs", out_dir.display()), &v10);
-        write_source_file(&format!("{}pg11_specific.rs", out_dir.display()), &v11);
-        write_source_file(&format!("{}pg12_specific.rs", out_dir.display()), &v12);
-
-        Ok(())
-    }
-
-    fn build_common_set(versions: &mut Vec<&mut BTreeSet<String>>) -> BTreeSet<String> {
-        let mut common = BTreeSet::new();
-
-        for map in versions.iter() {
-            for key in map.iter() {
-                if !common.contains(key) && all_contain(&versions, &key) {
-                    common.insert(key.clone());
-                }
-            }
-        }
-
-        for map in versions.iter_mut() {
-            for key in common.iter() {
-                map.remove(key);
-            }
-        }
-
-        common
-    }
-
-    #[inline]
-    fn all_contain(maps: &[&mut BTreeSet<String>], key: &String) -> bool {
-        for map in maps.iter() {
-            if !map.contains(key) {
-                return false;
-            }
-        }
-
-        true
-    }
-
-    /// Given a token stream, parse the stream as a file and return
-    /// a set of the items found in the file.
-    fn parse_file_stream(stream: &TokenStream2) -> BTreeSet<String> {
-        let source: syn::File = syn::parse2(stream.clone()).unwrap();
-
-        let mut item_map = BTreeSet::new();
-        for item in source.items.into_iter() {
-            item_map.insert(item.to_token_stream().to_string());
-        }
-
-        item_map
-    }
-
-    fn write_source_file(filename: &str, items: &BTreeSet<String>) {
-        let file =
-            std::fs::File::create(filename).expect(&format!("failed to create {}", filename));
-        let mut writer = BufWriter::new(file);
-        writer
-            .write_all(
-                quote! {
-                    use crate as pg_sys;
-                    use pgx_macros::*;
-                    use crate::common::*;
-                }
-                .to_string()
-                .as_bytes(),
-            )
-            .expect(&format!("failed to write to {}", filename));
-        for item in items {
-            writer
-                .write_all(item.as_bytes())
-                .expect(&format!("failed to write to {}", filename));
-        }
-        writer
-            .flush()
-            .expect(&format!("failed to flush {}", filename));
-        rust_fmt(filename)
-            .unwrap_or_else(|e| panic!("unable to run rustfmt for {}: {:?}", filename, e));
-    }
-
-    fn write_common_file(filename: &str, items: &BTreeSet<String>) {
-        let mut file = std::fs::File::create(filename).expect("failed to create common.rs");
-        file.write_all(
-            quote! {
-                use crate as pg_sys;
-                use pgx_macros::*;
-
-                #[cfg(feature = "pg10")]
-                use crate::pg10_specific::*;
-                #[cfg(feature = "pg11")]
-                use crate::pg11_specific::*;
-                #[cfg(feature = "pg12")]
-                use crate::pg12_specific::*;
-            }
-            .to_string()
-            .as_bytes(),
-        )
-        .expect("failed to write to common.rs");
-
-        for item in items.iter() {
-            file.write_all(item.as_bytes())
-                .expect("failed to write to common.rs");
-        }
-        rust_fmt(filename)
-            .unwrap_or_else(|e| panic!("unable to run rustfmt for {}: {:?}", filename, e));
-    }
 }

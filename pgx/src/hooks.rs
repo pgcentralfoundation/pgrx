@@ -2,7 +2,6 @@
 // governed by the MIT license that can be found in the LICENSE file.
 
 //! A trait and registration system for hooking Postgres internal operations such as its planner and executor
-
 use crate::{pg_guard, pg_sys, void_mut_ptr, PgBox, PgList};
 use std::ops::Deref;
 
@@ -92,7 +91,7 @@ pub trait PgHooks {
         params: PgBox<pg_sys::ParamListInfoData>,
         query_env: PgBox<pg_sys::QueryEnvironment>,
         dest: PgBox<pg_sys::DestReceiver>,
-        completion_tag: *mut ::std::os::raw::c_char,
+        completion_tag: *mut pg_sys::QueryCompletion,
         prev_hook: fn(
             pstmt: PgBox<pg_sys::PlannedStmt>,
             query_string: &std::ffi::CStr,
@@ -100,7 +99,7 @@ pub trait PgHooks {
             params: PgBox<pg_sys::ParamListInfoData>,
             query_env: PgBox<pg_sys::QueryEnvironment>,
             dest: PgBox<pg_sys::DestReceiver>,
-            completion_tag: *mut ::std::os::raw::c_char,
+            completion_tag: *mut pg_sys::QueryCompletion,
         ) -> HookResult<()>,
     ) -> HookResult<()> {
         prev_hook(
@@ -118,15 +117,17 @@ pub trait PgHooks {
     fn planner(
         &mut self,
         parse: PgBox<pg_sys::Query>,
+        query_string: *const std::os::raw::c_char,
         cursor_options: i32,
         bound_params: PgBox<pg_sys::ParamListInfoData>,
         prev_hook: fn(
             parse: PgBox<pg_sys::Query>,
+            query_string: *const std::os::raw::c_char,
             cursor_options: i32,
             bound_params: PgBox<pg_sys::ParamListInfoData>,
         ) -> HookResult<*mut pg_sys::PlannedStmt>,
     ) -> HookResult<*mut pg_sys::PlannedStmt> {
-        prev_hook(parse, cursor_options, bound_params)
+        prev_hook(parse, query_string, cursor_options, bound_params)
     }
 
     /// Called when the transaction aborts
@@ -309,7 +310,7 @@ unsafe extern "C" fn pgx_process_utility(
     params: pg_sys::ParamListInfo,
     query_env: *mut pg_sys::QueryEnvironment,
     dest: *mut pg_sys::DestReceiver,
-    completion_tag: *mut ::std::os::raw::c_char,
+    completion_tag: *mut pg_sys::QueryCompletion,
 ) {
     fn prev(
         pstmt: PgBox<pg_sys::PlannedStmt>,
@@ -318,7 +319,7 @@ unsafe extern "C" fn pgx_process_utility(
         params: PgBox<pg_sys::ParamListInfoData>,
         query_env: PgBox<pg_sys::QueryEnvironment>,
         dest: PgBox<pg_sys::DestReceiver>,
-        completion_tag: *mut ::std::os::raw::c_char,
+        completion_tag: *mut pg_sys::QueryCompletion,
     ) -> HookResult<()> {
         HookResult::new(unsafe {
             (HOOKS
@@ -352,28 +353,65 @@ unsafe extern "C" fn pgx_process_utility(
     .inner
 }
 
+#[cfg(not(feature = "pg13"))]
 #[pg_guard]
 unsafe extern "C" fn pgx_planner(
     parse: *mut pg_sys::Query,
     cursor_options: i32,
     bound_params: pg_sys::ParamListInfo,
 ) -> *mut pg_sys::PlannedStmt {
+    pgx_planner_impl(parse, std::ptr::null(), cursor_options, bound_params)
+}
+
+#[cfg(feature = "pg13")]
+#[pg_guard]
+unsafe extern "C" fn pgx_planner(
+    parse: *mut pg_sys::Query,
+    query_string: *const ::std::os::raw::c_char,
+    cursor_options: i32,
+    bound_params: pg_sys::ParamListInfo,
+) -> *mut pg_sys::PlannedStmt {
+    pgx_planner_impl(parse, query_string, cursor_options, bound_params)
+}
+
+#[pg_guard]
+unsafe extern "C" fn pgx_planner_impl(
+    parse: *mut pg_sys::Query,
+    query_string: *const ::std::os::raw::c_char,
+    cursor_options: i32,
+    bound_params: pg_sys::ParamListInfo,
+) -> *mut pg_sys::PlannedStmt {
     fn prev(
         parse: PgBox<pg_sys::Query>,
+        #[allow(unused_variables)] query_string: *const ::std::os::raw::c_char,
         cursor_options: i32,
         bound_params: PgBox<pg_sys::ParamListInfoData>,
     ) -> HookResult<*mut pg_sys::PlannedStmt> {
         HookResult::new(unsafe {
-            (HOOKS.as_mut().unwrap().prev_planner_hook.as_ref().unwrap())(
-                parse.into_pg(),
-                cursor_options,
-                bound_params.into_pg(),
-            )
+            #[cfg(not(feature = "pg13"))]
+            {
+                (HOOKS.as_mut().unwrap().prev_planner_hook.as_ref().unwrap())(
+                    parse.into_pg(),
+                    cursor_options,
+                    bound_params.into_pg(),
+                )
+            }
+
+            #[cfg(feature = "pg13")]
+            {
+                (HOOKS.as_mut().unwrap().prev_planner_hook.as_ref().unwrap())(
+                    parse.into_pg(),
+                    query_string,
+                    cursor_options,
+                    bound_params.into_pg(),
+                )
+            }
         })
     }
     let hook = &mut HOOKS.as_mut().unwrap().current_hook;
     hook.planner(
         PgBox::from_pg(parse),
+        query_string,
         cursor_options,
         PgBox::from_pg(bound_params),
         prev,
@@ -425,7 +463,7 @@ unsafe extern "C" fn pgx_standard_process_utility_wrapper(
     params: pg_sys::ParamListInfo,
     query_env: *mut pg_sys::QueryEnvironment,
     dest: *mut pg_sys::DestReceiver,
-    completion_tag: *mut ::std::os::raw::c_char,
+    completion_tag: *mut pg_sys::QueryCompletion,
 ) {
     pg_sys::standard_ProcessUtility(
         pstmt,
@@ -438,6 +476,7 @@ unsafe extern "C" fn pgx_standard_process_utility_wrapper(
     )
 }
 
+#[cfg(not(feature = "pg13"))]
 #[pg_guard]
 unsafe extern "C" fn pgx_standard_planner_wrapper(
     parse: *mut pg_sys::Query,
@@ -445,4 +484,15 @@ unsafe extern "C" fn pgx_standard_planner_wrapper(
     bound_params: pg_sys::ParamListInfo,
 ) -> *mut pg_sys::PlannedStmt {
     pg_sys::standard_planner(parse, cursor_options, bound_params)
+}
+
+#[cfg(feature = "pg13")]
+#[pg_guard]
+unsafe extern "C" fn pgx_standard_planner_wrapper(
+    parse: *mut pg_sys::Query,
+    query_string: *const ::std::os::raw::c_char,
+    cursor_options: i32,
+    bound_params: pg_sys::ParamListInfo,
+) -> *mut pg_sys::PlannedStmt {
+    pg_sys::standard_planner(parse, query_string, cursor_options, bound_params)
 }

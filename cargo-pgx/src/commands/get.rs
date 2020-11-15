@@ -38,8 +38,8 @@ pub fn get_property(name: &str) -> Option<String> {
 
 pub(crate) fn find_control_file() -> (PathBuf, String) {
     for f in handle_result!(
-        "cannot open current directory for reading",
-        std::fs::read_dir(".")
+        std::fs::read_dir("."),
+        "cannot open current directory for reading"
     ) {
         if f.is_ok() {
             if let Ok(f) = f {

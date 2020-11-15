@@ -8,6 +8,7 @@
 #define IS_PG_10 (PG_VERSION_NUM >= 100000 && PG_VERSION_NUM < 110000)
 #define IS_PG_11 (PG_VERSION_NUM >= 110000 && PG_VERSION_NUM < 120000)
 #define IS_PG_12 (PG_VERSION_NUM >= 120000 && PG_VERSION_NUM < 130000)
+#define IS_PG_13 (PG_VERSION_NUM >= 130000 && PG_VERSION_NUM < 140000)
 
 #include "access/htup.h"
 #include "access/htup_details.h"
@@ -17,6 +18,7 @@
 #else
 #include "nodes/pathnodes.h"
 #endif
+#include "nodes/pg_list.h"
 #include "parser/parsetree.h"
 #include "utils/memutils.h"
 #include "utils/builtins.h"
@@ -77,6 +79,26 @@ bool pgx_HeapTupleHeaderIsHeapOnly(HeapTupleHeader htup_header) {
 PGDLLEXPORT RangeTblEntry *pgx_planner_rt_fetch(Index index, PlannerInfo *plannerInfo);
 RangeTblEntry *pgx_planner_rt_fetch(Index index, PlannerInfo *root) {
     return planner_rt_fetch(index, root);
+}
+
+PGDLLEXPORT void *pgx_list_nth(List *list, int nth);
+void *pgx_list_nth(List *list, int nth) {
+    return list_nth(list, nth);
+}
+
+PGDLLEXPORT int pgx_list_nth_int(List *list, int nth);
+int pgx_list_nth_int(List *list, int nth) {
+    return list_nth_int(list, nth);
+}
+
+PGDLLEXPORT Oid pgx_list_nth_oid(List *list, int nth);
+Oid pgx_list_nth_oid(List *list, int nth) {
+    return list_nth_oid(list, nth);
+}
+
+PGDLLEXPORT ListCell *pgx_list_nth_cell(List *list, int nth);
+ListCell *pgx_list_nth_cell(List *list, int nth) {
+    return list_nth_cell(list, nth);
 }
 
 #if IS_PG_10 || IS_PG_11

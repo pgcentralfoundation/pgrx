@@ -8,10 +8,8 @@ use std::sync::{Arc, Mutex};
 
 use colored::*;
 use pgx::*;
-use pgx_utils::{
-    createdb, get_dropdb_path, get_initdb_path, get_named_capture, get_postmaster_path,
-    get_target_dir, BASE_POSTGRES_TESTING_PORT_NO,
-};
+use pgx_utils::pg_config::{PgConfig, Pgx};
+use pgx_utils::{createdb, get_named_capture, get_target_dir};
 use postgres::error::DbError;
 use postgres::Client;
 use std::collections::HashMap;
@@ -169,14 +167,9 @@ fn initialize_test_framework(postgresql_conf: Vec<&'static str>) -> (LogLines, S
         initdb(postgresql_conf);
 
         let system_session_id = start_pg(state.loglines.clone());
+        let pg_config = get_pg_config();
         dropdb();
-        createdb(
-            pg_sys::get_pg_major_version_num(),
-            &get_pg_host(),
-            get_pg_port(),
-            get_pg_dbname(),
-            false,
-        );
+        createdb(&pg_config, get_pg_dbname(), true, false).expect("failed to create test database");
         create_extension();
 
         state.installed = true;
@@ -184,6 +177,13 @@ fn initialize_test_framework(postgresql_conf: Vec<&'static str>) -> (LogLines, S
     }
 
     (state.loglines.clone(), state.system_session_id.clone())
+}
+
+fn get_pg_config() -> PgConfig {
+    let pgx = Pgx::from_config().expect("Unable to load pgx config");
+    pgx.get(&format!("pg{}", pg_sys::get_pg_major_version_num()))
+        .expect("not a valid postgres version")
+        .clone()
 }
 
 pub fn client() -> (postgres::Client, String) {
@@ -196,9 +196,14 @@ pub fn client() -> (postgres::Client, String) {
         }
     }
 
+    let pg_config = get_pg_config();
     let mut client = postgres::Config::new()
-        .host(&get_pg_host())
-        .port(get_pg_port())
+        .host(pg_config.host())
+        .port(
+            pg_config
+                .test_port()
+                .expect("unable to determine test port"),
+        )
         .user(&get_pg_user())
         .dbname(&get_pg_dbname())
         .connect(postgres::NoTls)
@@ -232,7 +237,7 @@ fn install_extension() {
         .stderr(Stdio::inherit())
         .env(
             "PGX_TEST_MODE_VERSION",
-            pg_sys::get_pg_major_version_string().to_string(),
+            format!("pg{}", pg_sys::get_pg_major_version_string()),
         )
         .env("CARGO_TARGET_DIR", get_target_dir())
         .env(
@@ -255,16 +260,21 @@ fn install_extension() {
 }
 
 fn initdb(postgresql_conf: Vec<&'static str>) {
+    let pg_config = get_pg_config();
     let pgdata = get_pgdata_path();
 
     if !pgdata.is_dir() {
-        let status = Command::new(get_initdb_path(pg_sys::get_pg_major_version_num()))
-            .arg("-D")
-            .arg(pgdata.to_str().unwrap())
-            .stdout(Stdio::inherit())
-            .stderr(Stdio::inherit())
-            .status()
-            .unwrap();
+        let status = Command::new(
+            pg_config
+                .initdb_path()
+                .expect("unable to determine initdb path"),
+        )
+        .arg("-D")
+        .arg(pgdata.to_str().unwrap())
+        .stdout(Stdio::inherit())
+        .stderr(Stdio::inherit())
+        .status()
+        .unwrap();
 
         if !status.success() {
             panic!("initdb failed");
@@ -292,14 +302,24 @@ fn modify_postgresql_conf(pgdata: PathBuf, postgresql_conf: Vec<&'static str>) {
 }
 
 fn start_pg(loglines: LogLines) -> String {
-    let mut command = Command::new(get_postmaster_path(pg_sys::get_pg_major_version_num()));
+    let pg_config = get_pg_config();
+    let mut command = Command::new(
+        pg_config
+            .postmaster_path()
+            .expect("unable to determine postmaster path"),
+    );
     command
         .arg("-D")
         .arg(get_pgdata_path().to_str().unwrap())
         .arg("-h")
-        .arg(get_pg_host())
+        .arg(pg_config.host())
         .arg("-p")
-        .arg(get_pg_port().to_string())
+        .arg(
+            pg_config
+                .test_port()
+                .expect("unable to determine test port")
+                .to_string(),
+        )
         .stdout(Stdio::inherit())
         .stderr(Stdio::piped());
 
@@ -402,19 +422,29 @@ fn monitor_pg(mut command: Command, cmd_string: String, loglines: LogLines) -> (
 }
 
 fn dropdb() {
-    let output = Command::new(get_dropdb_path(pg_sys::get_pg_major_version_num()))
-        .env_remove("PGDATABASE")
-        .env_remove("PGHOST")
-        .env_remove("PGPORT")
-        .env_remove("PGUSER")
-        .arg("--if-exists")
-        .arg("-h")
-        .arg(get_pg_host())
-        .arg("-p")
-        .arg(get_pg_port().to_string())
-        .arg(get_pg_dbname())
-        .output()
-        .unwrap();
+    let pg_config = get_pg_config();
+    let output = Command::new(
+        pg_config
+            .dropdb_path()
+            .expect("unable to determine dropdb path"),
+    )
+    .env_remove("PGDATABASE")
+    .env_remove("PGHOST")
+    .env_remove("PGPORT")
+    .env_remove("PGUSER")
+    .arg("--if-exists")
+    .arg("-h")
+    .arg(pg_config.host())
+    .arg("-p")
+    .arg(
+        pg_config
+            .test_port()
+            .expect("unable to determine test port")
+            .to_string(),
+    )
+    .arg(get_pg_dbname())
+    .output()
+    .unwrap();
 
     if !output.status.success() {
         // maybe the database didn't exist, and if so that's okay
@@ -452,14 +482,6 @@ fn get_pgdata_path() -> PathBuf {
         pg_sys::get_pg_major_version_num()
     ));
     target_dir
-}
-
-fn get_pg_host() -> String {
-    "localhost".to_string()
-}
-
-fn get_pg_port() -> u16 {
-    BASE_POSTGRES_TESTING_PORT_NO + pg_sys::get_pg_major_version_num()
 }
 
 fn get_pg_dbname() -> &'static str {

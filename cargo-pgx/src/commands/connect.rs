@@ -4,20 +4,15 @@
 use crate::commands::run::exec_psql;
 use crate::commands::start::start_postgres;
 use colored::Colorize;
-use pgx_utils::{createdb, BASE_POSTGRES_PORT_NO};
+use pgx_utils::createdb;
+use pgx_utils::pg_config::PgConfig;
 
-pub(crate) fn connect_psql(major_version: u16, dbname: &str) {
+pub(crate) fn connect_psql(pg_config: &PgConfig, dbname: &str) -> Result<(), std::io::Error> {
     // restart postgres
-    start_postgres(major_version);
+    start_postgres(pg_config)?;
 
     // create the named database
-    if !createdb(
-        major_version,
-        "localhost",
-        BASE_POSTGRES_PORT_NO + major_version,
-        dbname,
-        true,
-    ) {
+    if !createdb(pg_config, dbname, false, true)? {
         println!(
             "{} existing database {}",
             "    Re-using".bold().cyan(),
@@ -26,5 +21,5 @@ pub(crate) fn connect_psql(major_version: u16, dbname: &str) {
     }
 
     // run psql
-    exec_psql(major_version, dbname);
+    exec_psql(pg_config, dbname)
 }

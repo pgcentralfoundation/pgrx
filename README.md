@@ -14,7 +14,7 @@
 
 `pgx` is a framework for developing PostgreSQL extensions in Rust and strives to be as idiomatic and safe as possible.  
 
-`pgx` supports Postgres v10, v11, and v12.
+`pgx` supports Postgres v10, v11, v12, and v13.
 
 Feel free to join our [Discord Server](https://discord.gg/hPb93Y9).
 
@@ -29,8 +29,8 @@ Feel free to join our [Discord Server](https://discord.gg/hPb93Y9).
     - Create installation packages for your extension via `cargo pgx package`
 
 #### Target Multiple Postgres Versions
- - Support Postgres 10, 11, and 12, from the same codebase
-    - Postgres Rust bindings are organized into `common.rs` and `pgXX_specific.rs` modules
+ - Support Postgres v10, v11, v12, and v13 from the same codebase
+    - Postgres Rust bindings are organized into `pgXX.rs` modules
  - Use Rust feature gating to use version-specific APIs
  - Seamlessly test against all versions
 
@@ -138,9 +138,11 @@ Next, `pgx` needs to be initialized.  You only need to do this once.
 $ cargo pgx init
 ```
 
-The `init` command downloads Postgres versions 10, 11, 12, and compiles them to `~/.pgx/`.  These installations
+The `init` command downloads Postgres versions v10, v11, v12, v13 and compiles them to `~/.pgx/`.  These installations
 are needed by `pgx` not only for auto-generating Rust bindings from each version's header files, but also for `pgx`'s 
 test framework.
+
+See the documentation for [`cargo-pgx`](cargo-pgx/README.md) for details on how to limit the required postgres versions.
 
 
 ### Create a new extension
@@ -153,7 +155,7 @@ $ cargo pgx new my_extension
 
 ```shell script
 $ cd my_extension
-$ cargo pgx run pg12  # or pg10 or pg11
+$ cargo pgx run pg13  # or pg10 or pg11 or pg12
 ```
 
 `cargo pgx run` compiles the extension to a shared library, copies it to the specified Postgres installation (in `~/.pgx/`),
