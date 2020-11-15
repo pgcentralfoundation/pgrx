@@ -643,7 +643,7 @@ pub fn interrupt_pending() -> bool {
 }
 
 /// Is an interrupt pending?
-#[cfg(feature = "pg12")]
+#[cfg(any(feature = "pg12", feature = "pg13"))]
 #[inline]
 pub fn interrupt_pending() -> bool {
     unsafe { crate::pg_sys::InterruptPending != 0 }

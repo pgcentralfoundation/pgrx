@@ -98,7 +98,7 @@ Oid pgx_list_nth_oid(List *list, int nth) {
 
 PGDLLEXPORT ListCell *pgx_list_nth_cell(List *list, int nth);
 ListCell *pgx_list_nth_cell(List *list, int nth) {
-    return list_nth_oid(list, nth);
+    return list_nth_cell(list, nth);
 }
 
 #if IS_PG_10 || IS_PG_11

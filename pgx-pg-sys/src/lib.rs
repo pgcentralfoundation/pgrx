@@ -29,15 +29,15 @@ pub use submodules::*;
 
 // feature gate each pg version module
 #[cfg(feature = "pg10")]
-pub mod pg10;
+mod pg10;
 #[cfg(feature = "pg11")]
-pub mod pg11;
+mod pg11;
 #[cfg(feature = "pg12")]
-pub mod pg12;
+mod pg12;
 #[cfg(feature = "pg13")]
-pub mod pg13;
+mod pg13;
 
-// export that module publicly
+// export each module publicly
 #[cfg(feature = "pg10")]
 pub use pg10::*;
 #[cfg(feature = "pg11")]
@@ -49,13 +49,13 @@ pub use pg13::*;
 
 // feature gate each pg-specific oid module
 #[cfg(feature = "pg10")]
-pub mod pg10_oids;
+mod pg10_oids;
 #[cfg(feature = "pg11")]
-pub mod pg11_oids;
+mod pg11_oids;
 #[cfg(feature = "pg12")]
-pub mod pg12_oids;
+mod pg12_oids;
 #[cfg(feature = "pg13")]
-pub mod pg13_oids;
+mod pg13_oids;
 
 // export that module publicly
 #[cfg(feature = "pg10")]
@@ -71,11 +71,39 @@ pub use pg13_oids::*;
 pub use all_versions::*;
 
 // and things that are version-specific
-pub use internal::*;
+#[cfg(feature = "pg10")]
+pub use internal::pg10::*;
+#[cfg(feature = "pg11")]
+pub use internal::pg11::*;
+#[cfg(feature = "pg12")]
+pub use internal::pg12::*;
+#[cfg(feature = "pg13")]
+pub use internal::pg13::*;
 
 pub trait PgNode {
     fn as_node(&self) -> *mut Self {
         self as *const _ as *mut Self
+    }
+}
+
+/// A trait for converting a thing into a `char *` that is allocated by Postgres' palloc
+pub trait AsPgCStr {
+    fn as_pg_cstr(&self) -> *mut std::os::raw::c_char;
+}
+
+impl<'a> AsPgCStr for &'a str {
+    fn as_pg_cstr(&self) -> *mut std::os::raw::c_char {
+        let self_bytes = self.as_bytes();
+        let pg_cstr = unsafe { crate::palloc0(self_bytes.len() + 1) as *mut std::os::raw::c_uchar };
+        let slice = unsafe { std::slice::from_raw_parts_mut(pg_cstr, self_bytes.len()) };
+        slice.copy_from_slice(self_bytes);
+        pg_cstr as *mut std::os::raw::c_char
+    }
+}
+
+impl AsPgCStr for String {
+    fn as_pg_cstr(&self) -> *mut std::os::raw::c_char {
+        self.as_str().as_pg_cstr()
     }
 }
 
@@ -96,7 +124,8 @@ mod all_versions {
     pub const InvalidBlockNumber: u32 = 0xFFFF_FFFF as crate::BlockNumber;
     pub const VARHDRSZ: usize = std::mem::size_of::<super::int32>();
     pub const InvalidTransactionId: super::TransactionId = 0 as super::TransactionId;
-    pub const InvalidCommandId: super::CommandId = 0 as super::CommandId;
+    pub const InvalidCommandId: super::CommandId = (!(0 as super::CommandId)) as super::CommandId;
+    pub const FirstCommandId: super::CommandId = 0 as super::CommandId;
     pub const BootstrapTransactionId: super::TransactionId = 1 as super::TransactionId;
     pub const FrozenTransactionId: super::TransactionId = 2 as super::TransactionId;
     pub const FirstNormalTransactionId: super::TransactionId = 3 as super::TransactionId;
@@ -255,25 +284,13 @@ mod all_versions {
 }
 
 mod internal {
-    #[cfg(feature = "pg10")]
-    pub use pg10::*;
-
-    #[cfg(feature = "pg11")]
-    pub use pg11::*;
-
-    #[cfg(feature = "pg12")]
-    pub use pg12::*;
-
-    #[cfg(feature = "pg13")]
-    pub use pg13::*;
-
     //
     // for specific versions
     //
 
     #[cfg(feature = "pg10")]
-    mod pg10 {
-        pub use crate::pg10::*;
+    pub(crate) mod pg10 {
+        use crate::pg10::*;
 
         pub use crate::pg10::tupleDesc as TupleDescData;
         pub use crate::pg10::AllocSetContextCreate as AllocSetContextCreateExtended;
@@ -370,9 +387,7 @@ mod internal {
     }
 
     #[cfg(feature = "pg11")]
-    mod pg11 {
-        pub use crate::pg11::*;
-
+    pub(crate) mod pg11 {
         pub use crate::pg11::tupleDesc as TupleDescData;
         pub type QueryCompletion = std::os::raw::c_char;
 
@@ -400,9 +415,7 @@ mod internal {
     }
 
     #[cfg(feature = "pg12")]
-    mod pg12 {
-        pub use crate::pg12::*;
-
+    pub(crate) mod pg12 {
         pub use crate::pg12::AllocSetContextCreateInternal as AllocSetContextCreateExtended;
         pub type QueryCompletion = std::os::raw::c_char;
 
@@ -439,9 +452,7 @@ mod internal {
     }
 
     #[cfg(feature = "pg13")]
-    mod pg13 {
-        pub use crate::pg13::*;
-
+    pub(crate) mod pg13 {
         pub use crate::pg13::AllocSetContextCreateInternal as AllocSetContextCreateExtended;
 
         pub const QTW_EXAMINE_RTES: u32 = crate::pg13::QTW_EXAMINE_RTES_BEFORE;

@@ -208,6 +208,26 @@ impl<T> PgBox<T> {
         }
     }
 
+    /// Allocate a Postgres `pg_sys::Node` subtype, using `palloc` in the `CurrentMemoryContext`.
+    ///
+    /// The allocated node will have it's `type_` field set to the `node_tag` argument, and will
+    /// otherwise be initialized with all zeros
+    ///
+    /// ## Examples
+    /// ```rust,no_run
+    /// use pgx::{PgBox, pg_sys};
+    /// let create_trigger_statement = PgBox::<pg_sys::CreateTrigStmt>::alloc_node(pg_sys::NodeTag_T_CreateTrigStmt);
+    /// ```
+    pub fn alloc_node(node_tag: pg_sys::NodeTag) -> PgBox<T> {
+        let node = PgBox::<T>::alloc0();
+        let ptr = node.as_ptr();
+
+        unsafe {
+            (ptr as *mut _ as *mut pg_sys::Node).as_mut().unwrap().type_ = node_tag;
+        }
+        node
+    }
+
     /// Box nothing
     pub fn null() -> PgBox<T> {
         PgBox::<T> {
