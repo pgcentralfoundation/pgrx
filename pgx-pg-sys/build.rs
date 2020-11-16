@@ -48,6 +48,10 @@ impl bindgen::callbacks::ParseCallbacks for IgnoredMacros {
 }
 
 fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    if std::env::var("DOCS_RS").unwrap_or("false".into()) == "1" {
+        return Ok(());
+    }
+
     // dump the environment for debugging if asked
     if std::env::var("PGX_BUILD_VERBOSE").unwrap_or("false".to_string()) == "true" {
         for (k, v) in std::env::vars() {
@@ -66,10 +70,6 @@ fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     eprintln!("shim_dir={}", shim_dir.display());
 
     let pgx = Pgx::from_config()?;
-
-    if std::env::var("DOCS_RS").unwrap_or("false".into()) == "1" {
-        return Ok(());
-    }
 
     build_deps::rerun_if_changed_paths(&Pgx::config_toml()?.display().to_string()).unwrap();
     build_deps::rerun_if_changed_paths("include/*").unwrap();
