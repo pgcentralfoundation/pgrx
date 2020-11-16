@@ -93,9 +93,31 @@ pub use internal::pg12::*;
 #[cfg(feature = "pg13")]
 pub use internal::pg13::*;
 
+/// A trait applied to all of Postgres' `pg_sys::Node` types and its subtypes
 pub trait PgNode {
-    fn as_node(&self) -> *mut Self {
-        self as *const _ as *mut Self
+    type NodeType;
+
+    /// Represent this node as a mutable pointer of its type
+    #[inline]
+    fn as_node_ptr(&self) -> *mut Self::NodeType {
+        self as *const _ as *mut Self::NodeType
+    }
+}
+
+/// implementation function for `impl Display for $NodeType`
+pub(crate) fn node_to_string_for_display(node: *mut crate::Node) -> String {
+    unsafe {
+        // crate::nodeToString() will never return a null pointer
+        let node_to_string = crate::nodeToString(node as *mut std::ffi::c_void);
+
+        let result = match std::ffi::CStr::from_ptr(node_to_string).to_str() {
+            Ok(cstr) => cstr.to_string(),
+            Err(e) => format!("<ffi error: {:?}>", e),
+        };
+
+        crate::pfree(node_to_string as *mut std::ffi::c_void);
+
+        result
     }
 }
 

@@ -113,6 +113,7 @@ fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
                 quote! {
                     use crate as pg_sys;
                     use pgx_macros::*;
+                    use crate::PgNode;
                 }
             ),
             format!("Unable to write bindings file for pg{}", major_version)
@@ -261,11 +262,27 @@ fn impl_pg_node(items: &Vec<syn::Item>) -> Result<Vec<syn::Item>, Box<dyn Error 
     for node_struct in node_set.into_iter() {
         let struct_name = &node_struct.struct_.ident;
 
-        let impl_item: syn::Item = syn::parse2(quote! {
-            impl pg_sys::PgNode for #struct_name { }
-        })?;
+        // impl the PgNode trait for all nodes
+        pgnode_impls.push((
+            struct_name.to_string(),
+            syn::parse2(quote! {
+                impl pg_sys::PgNode for #struct_name {
+                    type NodeType = #struct_name;
+                }
+            })?,
+        ));
 
-        pgnode_impls.push((struct_name.to_string(), impl_item));
+        // impl Rust's Display trait for all nodes
+        pgnode_impls.push((
+            struct_name.to_string(),
+            syn::parse2(quote! {
+                impl std::fmt::Display for #struct_name {
+                    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                        write!(f, "{}", crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node))
+                    }
+                }
+            })?,
+        ));
     }
 
     // sort the pgnode impls by their struct name so that we have a consistent ordering in our bindings output

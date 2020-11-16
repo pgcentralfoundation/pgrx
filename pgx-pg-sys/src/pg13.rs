@@ -1,4 +1,5 @@
 use crate as pg_sys;
+use crate::PgNode;
 use pgx_macros::*;
 #[repr(C)]
 #[derive(Copy, Clone, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd)]
@@ -53454,414 +53455,4935 @@ pub struct SMgrRelationData {
 pub struct RowSecurityDesc {
     pub _address: u8,
 }
-impl pg_sys::PgNode for A_ArrayExpr {}
-impl pg_sys::PgNode for A_Const {}
-impl pg_sys::PgNode for A_Expr {}
-impl pg_sys::PgNode for A_Indices {}
-impl pg_sys::PgNode for A_Indirection {}
-impl pg_sys::PgNode for A_Star {}
-impl pg_sys::PgNode for AccessPriv {}
-impl pg_sys::PgNode for Agg {}
-impl pg_sys::PgNode for AggPath {}
-impl pg_sys::PgNode for AggState {}
-impl pg_sys::PgNode for Aggref {}
-impl pg_sys::PgNode for AggrefExprState {}
-impl pg_sys::PgNode for Alias {}
-impl pg_sys::PgNode for AlterCollationStmt {}
-impl pg_sys::PgNode for AlterDatabaseSetStmt {}
-impl pg_sys::PgNode for AlterDatabaseStmt {}
-impl pg_sys::PgNode for AlterDefaultPrivilegesStmt {}
-impl pg_sys::PgNode for AlterDomainStmt {}
-impl pg_sys::PgNode for AlterEnumStmt {}
-impl pg_sys::PgNode for AlterEventTrigStmt {}
-impl pg_sys::PgNode for AlterExtensionContentsStmt {}
-impl pg_sys::PgNode for AlterExtensionStmt {}
-impl pg_sys::PgNode for AlterFdwStmt {}
-impl pg_sys::PgNode for AlterForeignServerStmt {}
-impl pg_sys::PgNode for AlterFunctionStmt {}
-impl pg_sys::PgNode for AlterObjectDependsStmt {}
-impl pg_sys::PgNode for AlterObjectSchemaStmt {}
-impl pg_sys::PgNode for AlterOpFamilyStmt {}
-impl pg_sys::PgNode for AlterOperatorStmt {}
-impl pg_sys::PgNode for AlterOwnerStmt {}
-impl pg_sys::PgNode for AlterPolicyStmt {}
-impl pg_sys::PgNode for AlterPublicationStmt {}
-impl pg_sys::PgNode for AlterRoleSetStmt {}
-impl pg_sys::PgNode for AlterRoleStmt {}
-impl pg_sys::PgNode for AlterSeqStmt {}
-impl pg_sys::PgNode for AlterStatsStmt {}
-impl pg_sys::PgNode for AlterSubscriptionStmt {}
-impl pg_sys::PgNode for AlterSystemStmt {}
-impl pg_sys::PgNode for AlterTSConfigurationStmt {}
-impl pg_sys::PgNode for AlterTSDictionaryStmt {}
-impl pg_sys::PgNode for AlterTableCmd {}
-impl pg_sys::PgNode for AlterTableMoveAllStmt {}
-impl pg_sys::PgNode for AlterTableSpaceOptionsStmt {}
-impl pg_sys::PgNode for AlterTableStmt {}
-impl pg_sys::PgNode for AlterTypeStmt {}
-impl pg_sys::PgNode for AlterUserMappingStmt {}
-impl pg_sys::PgNode for AlternativeSubPlan {}
-impl pg_sys::PgNode for AlternativeSubPlanState {}
-impl pg_sys::PgNode for Append {}
-impl pg_sys::PgNode for AppendPath {}
-impl pg_sys::PgNode for AppendRelInfo {}
-impl pg_sys::PgNode for AppendState {}
-impl pg_sys::PgNode for ArrayCoerceExpr {}
-impl pg_sys::PgNode for ArrayExpr {}
-impl pg_sys::PgNode for BaseBackupCmd {}
-impl pg_sys::PgNode for BitmapAnd {}
-impl pg_sys::PgNode for BitmapAndPath {}
-impl pg_sys::PgNode for BitmapAndState {}
-impl pg_sys::PgNode for BitmapHeapPath {}
-impl pg_sys::PgNode for BitmapHeapScan {}
-impl pg_sys::PgNode for BitmapHeapScanState {}
-impl pg_sys::PgNode for BitmapIndexScan {}
-impl pg_sys::PgNode for BitmapIndexScanState {}
-impl pg_sys::PgNode for BitmapOr {}
-impl pg_sys::PgNode for BitmapOrPath {}
-impl pg_sys::PgNode for BitmapOrState {}
-impl pg_sys::PgNode for BoolExpr {}
-impl pg_sys::PgNode for BooleanTest {}
-impl pg_sys::PgNode for BufferHeapTupleTableSlot {}
-impl pg_sys::PgNode for CallContext {}
-impl pg_sys::PgNode for CallStmt {}
-impl pg_sys::PgNode for CaseExpr {}
-impl pg_sys::PgNode for CaseTestExpr {}
-impl pg_sys::PgNode for CaseWhen {}
-impl pg_sys::PgNode for CheckPointStmt {}
-impl pg_sys::PgNode for ClosePortalStmt {}
-impl pg_sys::PgNode for ClusterStmt {}
-impl pg_sys::PgNode for CoalesceExpr {}
-impl pg_sys::PgNode for CoerceToDomain {}
-impl pg_sys::PgNode for CoerceToDomainValue {}
-impl pg_sys::PgNode for CoerceViaIO {}
-impl pg_sys::PgNode for CollateClause {}
-impl pg_sys::PgNode for CollateExpr {}
-impl pg_sys::PgNode for ColumnDef {}
-impl pg_sys::PgNode for ColumnRef {}
-impl pg_sys::PgNode for CommentStmt {}
-impl pg_sys::PgNode for CommonTableExpr {}
-impl pg_sys::PgNode for CompositeTypeStmt {}
-impl pg_sys::PgNode for Const {}
-impl pg_sys::PgNode for Constraint {}
-impl pg_sys::PgNode for ConstraintsSetStmt {}
-impl pg_sys::PgNode for ConvertRowtypeExpr {}
-impl pg_sys::PgNode for CopyStmt {}
-impl pg_sys::PgNode for CreateAmStmt {}
-impl pg_sys::PgNode for CreateCastStmt {}
-impl pg_sys::PgNode for CreateConversionStmt {}
-impl pg_sys::PgNode for CreateDomainStmt {}
-impl pg_sys::PgNode for CreateEnumStmt {}
-impl pg_sys::PgNode for CreateEventTrigStmt {}
-impl pg_sys::PgNode for CreateExtensionStmt {}
-impl pg_sys::PgNode for CreateFdwStmt {}
-impl pg_sys::PgNode for CreateForeignServerStmt {}
-impl pg_sys::PgNode for CreateForeignTableStmt {}
-impl pg_sys::PgNode for CreateFunctionStmt {}
-impl pg_sys::PgNode for CreateOpClassItem {}
-impl pg_sys::PgNode for CreateOpClassStmt {}
-impl pg_sys::PgNode for CreateOpFamilyStmt {}
-impl pg_sys::PgNode for CreatePLangStmt {}
-impl pg_sys::PgNode for CreatePolicyStmt {}
-impl pg_sys::PgNode for CreatePublicationStmt {}
-impl pg_sys::PgNode for CreateRangeStmt {}
-impl pg_sys::PgNode for CreateReplicationSlotCmd {}
-impl pg_sys::PgNode for CreateRoleStmt {}
-impl pg_sys::PgNode for CreateSchemaStmt {}
-impl pg_sys::PgNode for CreateSeqStmt {}
-impl pg_sys::PgNode for CreateStatsStmt {}
-impl pg_sys::PgNode for CreateStmt {}
-impl pg_sys::PgNode for CreateSubscriptionStmt {}
-impl pg_sys::PgNode for CreateTableAsStmt {}
-impl pg_sys::PgNode for CreateTableSpaceStmt {}
-impl pg_sys::PgNode for CreateTransformStmt {}
-impl pg_sys::PgNode for CreateTrigStmt {}
-impl pg_sys::PgNode for CreateUserMappingStmt {}
-impl pg_sys::PgNode for CreatedbStmt {}
-impl pg_sys::PgNode for CteScan {}
-impl pg_sys::PgNode for CteScanState {}
-impl pg_sys::PgNode for CurrentOfExpr {}
-impl pg_sys::PgNode for CustomPath {}
-impl pg_sys::PgNode for CustomScan {}
-impl pg_sys::PgNode for CustomScanState {}
-impl pg_sys::PgNode for DeallocateStmt {}
-impl pg_sys::PgNode for DeclareCursorStmt {}
-impl pg_sys::PgNode for DefElem {}
-impl pg_sys::PgNode for DefineStmt {}
-impl pg_sys::PgNode for DeleteStmt {}
-impl pg_sys::PgNode for DiscardStmt {}
-impl pg_sys::PgNode for DoStmt {}
-impl pg_sys::PgNode for DomainConstraintState {}
-impl pg_sys::PgNode for DropOwnedStmt {}
-impl pg_sys::PgNode for DropReplicationSlotCmd {}
-impl pg_sys::PgNode for DropRoleStmt {}
-impl pg_sys::PgNode for DropStmt {}
-impl pg_sys::PgNode for DropSubscriptionStmt {}
-impl pg_sys::PgNode for DropTableSpaceStmt {}
-impl pg_sys::PgNode for DropUserMappingStmt {}
-impl pg_sys::PgNode for DropdbStmt {}
-impl pg_sys::PgNode for EState {}
-impl pg_sys::PgNode for EquivalenceClass {}
-impl pg_sys::PgNode for EquivalenceMember {}
-impl pg_sys::PgNode for EventTriggerData {}
-impl pg_sys::PgNode for ExecuteStmt {}
-impl pg_sys::PgNode for ExplainStmt {}
-impl pg_sys::PgNode for Expr {}
-impl pg_sys::PgNode for ExprContext {}
-impl pg_sys::PgNode for ExprState {}
-impl pg_sys::PgNode for ExtensibleNode {}
-impl pg_sys::PgNode for FdwRoutine {}
-impl pg_sys::PgNode for FetchStmt {}
-impl pg_sys::PgNode for FieldSelect {}
-impl pg_sys::PgNode for FieldStore {}
-impl pg_sys::PgNode for ForeignKeyCacheInfo {}
-impl pg_sys::PgNode for ForeignKeyOptInfo {}
-impl pg_sys::PgNode for ForeignPath {}
-impl pg_sys::PgNode for ForeignScan {}
-impl pg_sys::PgNode for ForeignScanState {}
-impl pg_sys::PgNode for FromExpr {}
-impl pg_sys::PgNode for FuncCall {}
-impl pg_sys::PgNode for FuncExpr {}
-impl pg_sys::PgNode for FunctionParameter {}
-impl pg_sys::PgNode for FunctionScan {}
-impl pg_sys::PgNode for FunctionScanState {}
-impl pg_sys::PgNode for Gather {}
-impl pg_sys::PgNode for GatherMerge {}
-impl pg_sys::PgNode for GatherMergePath {}
-impl pg_sys::PgNode for GatherMergeState {}
-impl pg_sys::PgNode for GatherPath {}
-impl pg_sys::PgNode for GatherState {}
-impl pg_sys::PgNode for GrantRoleStmt {}
-impl pg_sys::PgNode for GrantStmt {}
-impl pg_sys::PgNode for Group {}
-impl pg_sys::PgNode for GroupPath {}
-impl pg_sys::PgNode for GroupResultPath {}
-impl pg_sys::PgNode for GroupState {}
-impl pg_sys::PgNode for GroupingFunc {}
-impl pg_sys::PgNode for GroupingSet {}
-impl pg_sys::PgNode for GroupingSetData {}
-impl pg_sys::PgNode for GroupingSetsPath {}
-impl pg_sys::PgNode for Hash {}
-impl pg_sys::PgNode for HashJoin {}
-impl pg_sys::PgNode for HashJoinState {}
-impl pg_sys::PgNode for HashPath {}
-impl pg_sys::PgNode for HashState {}
-impl pg_sys::PgNode for HeapTupleTableSlot {}
-impl pg_sys::PgNode for IdentifySystemCmd {}
-impl pg_sys::PgNode for ImportForeignSchemaStmt {}
-impl pg_sys::PgNode for IncrementalSort {}
-impl pg_sys::PgNode for IncrementalSortPath {}
-impl pg_sys::PgNode for IncrementalSortState {}
-impl pg_sys::PgNode for IndexAmRoutine {}
-impl pg_sys::PgNode for IndexClause {}
-impl pg_sys::PgNode for IndexElem {}
-impl pg_sys::PgNode for IndexInfo {}
-impl pg_sys::PgNode for IndexOnlyScan {}
-impl pg_sys::PgNode for IndexOnlyScanState {}
-impl pg_sys::PgNode for IndexOptInfo {}
-impl pg_sys::PgNode for IndexPath {}
-impl pg_sys::PgNode for IndexScan {}
-impl pg_sys::PgNode for IndexScanState {}
-impl pg_sys::PgNode for IndexStmt {}
-impl pg_sys::PgNode for InferClause {}
-impl pg_sys::PgNode for InferenceElem {}
-impl pg_sys::PgNode for InlineCodeBlock {}
-impl pg_sys::PgNode for InsertStmt {}
-impl pg_sys::PgNode for IntoClause {}
-impl pg_sys::PgNode for Join {}
-impl pg_sys::PgNode for JoinExpr {}
-impl pg_sys::PgNode for JoinPath {}
-impl pg_sys::PgNode for JoinState {}
-impl pg_sys::PgNode for JunkFilter {}
-impl pg_sys::PgNode for Limit {}
-impl pg_sys::PgNode for LimitPath {}
-impl pg_sys::PgNode for LimitState {}
-impl pg_sys::PgNode for List {}
-impl pg_sys::PgNode for ListenStmt {}
-impl pg_sys::PgNode for LoadStmt {}
-impl pg_sys::PgNode for LockRows {}
-impl pg_sys::PgNode for LockRowsPath {}
-impl pg_sys::PgNode for LockRowsState {}
-impl pg_sys::PgNode for LockStmt {}
-impl pg_sys::PgNode for LockingClause {}
-impl pg_sys::PgNode for Material {}
-impl pg_sys::PgNode for MaterialPath {}
-impl pg_sys::PgNode for MaterialState {}
-impl pg_sys::PgNode for MemoryContextData {}
-impl pg_sys::PgNode for MergeAppend {}
-impl pg_sys::PgNode for MergeAppendPath {}
-impl pg_sys::PgNode for MergeAppendState {}
-impl pg_sys::PgNode for MergeJoin {}
-impl pg_sys::PgNode for MergeJoinState {}
-impl pg_sys::PgNode for MergePath {}
-impl pg_sys::PgNode for MinMaxAggInfo {}
-impl pg_sys::PgNode for MinMaxAggPath {}
-impl pg_sys::PgNode for MinMaxExpr {}
-impl pg_sys::PgNode for MinimalTupleTableSlot {}
-impl pg_sys::PgNode for ModifyTable {}
-impl pg_sys::PgNode for ModifyTablePath {}
-impl pg_sys::PgNode for ModifyTableState {}
-impl pg_sys::PgNode for MultiAssignRef {}
-impl pg_sys::PgNode for NamedArgExpr {}
-impl pg_sys::PgNode for NamedTuplestoreScan {}
-impl pg_sys::PgNode for NamedTuplestoreScanState {}
-impl pg_sys::PgNode for NestLoop {}
-impl pg_sys::PgNode for NestLoopParam {}
-impl pg_sys::PgNode for NestLoopState {}
-impl pg_sys::PgNode for NextValueExpr {}
-impl pg_sys::PgNode for Node {}
-impl pg_sys::PgNode for NotifyStmt {}
-impl pg_sys::PgNode for NullTest {}
-impl pg_sys::PgNode for ObjectWithArgs {}
-impl pg_sys::PgNode for OnConflictClause {}
-impl pg_sys::PgNode for OnConflictExpr {}
-impl pg_sys::PgNode for OnConflictSetState {}
-impl pg_sys::PgNode for OpExpr {}
-impl pg_sys::PgNode for Param {}
-impl pg_sys::PgNode for ParamPathInfo {}
-impl pg_sys::PgNode for ParamRef {}
-impl pg_sys::PgNode for PartitionBoundSpec {}
-impl pg_sys::PgNode for PartitionCmd {}
-impl pg_sys::PgNode for PartitionElem {}
-impl pg_sys::PgNode for PartitionPruneInfo {}
-impl pg_sys::PgNode for PartitionPruneStep {}
-impl pg_sys::PgNode for PartitionPruneStepCombine {}
-impl pg_sys::PgNode for PartitionPruneStepOp {}
-impl pg_sys::PgNode for PartitionRangeDatum {}
-impl pg_sys::PgNode for PartitionSpec {}
-impl pg_sys::PgNode for PartitionedRelPruneInfo {}
-impl pg_sys::PgNode for Path {}
-impl pg_sys::PgNode for PathKey {}
-impl pg_sys::PgNode for PathTarget {}
-impl pg_sys::PgNode for PlaceHolderInfo {}
-impl pg_sys::PgNode for PlaceHolderVar {}
-impl pg_sys::PgNode for Plan {}
-impl pg_sys::PgNode for PlanInvalItem {}
-impl pg_sys::PgNode for PlanRowMark {}
-impl pg_sys::PgNode for PlanState {}
-impl pg_sys::PgNode for PlannedStmt {}
-impl pg_sys::PgNode for PlannerGlobal {}
-impl pg_sys::PgNode for PlannerInfo {}
-impl pg_sys::PgNode for PlannerParamItem {}
-impl pg_sys::PgNode for PrepareStmt {}
-impl pg_sys::PgNode for ProjectSet {}
-impl pg_sys::PgNode for ProjectSetPath {}
-impl pg_sys::PgNode for ProjectSetState {}
-impl pg_sys::PgNode for ProjectionInfo {}
-impl pg_sys::PgNode for ProjectionPath {}
-impl pg_sys::PgNode for Query {}
-impl pg_sys::PgNode for RangeFunction {}
-impl pg_sys::PgNode for RangeSubselect {}
-impl pg_sys::PgNode for RangeTableFunc {}
-impl pg_sys::PgNode for RangeTableFuncCol {}
-impl pg_sys::PgNode for RangeTableSample {}
-impl pg_sys::PgNode for RangeTblEntry {}
-impl pg_sys::PgNode for RangeTblFunction {}
-impl pg_sys::PgNode for RangeTblRef {}
-impl pg_sys::PgNode for RangeVar {}
-impl pg_sys::PgNode for RawStmt {}
-impl pg_sys::PgNode for ReassignOwnedStmt {}
-impl pg_sys::PgNode for RecursiveUnion {}
-impl pg_sys::PgNode for RecursiveUnionPath {}
-impl pg_sys::PgNode for RecursiveUnionState {}
-impl pg_sys::PgNode for RefreshMatViewStmt {}
-impl pg_sys::PgNode for ReindexStmt {}
-impl pg_sys::PgNode for RelOptInfo {}
-impl pg_sys::PgNode for RelabelType {}
-impl pg_sys::PgNode for RenameStmt {}
-impl pg_sys::PgNode for ReplicaIdentityStmt {}
-impl pg_sys::PgNode for ResTarget {}
-impl pg_sys::PgNode for RestrictInfo {}
-impl pg_sys::PgNode for Result {}
-impl pg_sys::PgNode for ResultRelInfo {}
-impl pg_sys::PgNode for ResultState {}
-impl pg_sys::PgNode for ReturnSetInfo {}
-impl pg_sys::PgNode for RoleSpec {}
-impl pg_sys::PgNode for RollupData {}
-impl pg_sys::PgNode for RowCompareExpr {}
-impl pg_sys::PgNode for RowExpr {}
-impl pg_sys::PgNode for RowMarkClause {}
-impl pg_sys::PgNode for RuleStmt {}
-impl pg_sys::PgNode for SQLCmd {}
-impl pg_sys::PgNode for SQLValueFunction {}
-impl pg_sys::PgNode for SampleScan {}
-impl pg_sys::PgNode for SampleScanState {}
-impl pg_sys::PgNode for ScalarArrayOpExpr {}
-impl pg_sys::PgNode for Scan {}
-impl pg_sys::PgNode for ScanState {}
-impl pg_sys::PgNode for SecLabelStmt {}
-impl pg_sys::PgNode for SelectStmt {}
-impl pg_sys::PgNode for SeqScanState {}
-impl pg_sys::PgNode for SetExprState {}
-impl pg_sys::PgNode for SetOp {}
-impl pg_sys::PgNode for SetOpPath {}
-impl pg_sys::PgNode for SetOpState {}
-impl pg_sys::PgNode for SetOperationStmt {}
-impl pg_sys::PgNode for SetToDefault {}
-impl pg_sys::PgNode for Sort {}
-impl pg_sys::PgNode for SortBy {}
-impl pg_sys::PgNode for SortGroupClause {}
-impl pg_sys::PgNode for SortPath {}
-impl pg_sys::PgNode for SortState {}
-impl pg_sys::PgNode for SpecialJoinInfo {}
-impl pg_sys::PgNode for StartReplicationCmd {}
-impl pg_sys::PgNode for StatisticExtInfo {}
-impl pg_sys::PgNode for SubLink {}
-impl pg_sys::PgNode for SubPlan {}
-impl pg_sys::PgNode for SubPlanState {}
-impl pg_sys::PgNode for SubqueryScan {}
-impl pg_sys::PgNode for SubqueryScanPath {}
-impl pg_sys::PgNode for SubqueryScanState {}
-impl pg_sys::PgNode for SubscriptingRef {}
-impl pg_sys::PgNode for SupportRequestCost {}
-impl pg_sys::PgNode for SupportRequestIndexCondition {}
-impl pg_sys::PgNode for SupportRequestRows {}
-impl pg_sys::PgNode for SupportRequestSelectivity {}
-impl pg_sys::PgNode for SupportRequestSimplify {}
-impl pg_sys::PgNode for TableAmRoutine {}
-impl pg_sys::PgNode for TableFunc {}
-impl pg_sys::PgNode for TableFuncScan {}
-impl pg_sys::PgNode for TableFuncScanState {}
-impl pg_sys::PgNode for TableLikeClause {}
-impl pg_sys::PgNode for TableSampleClause {}
-impl pg_sys::PgNode for TargetEntry {}
-impl pg_sys::PgNode for TidPath {}
-impl pg_sys::PgNode for TidScan {}
-impl pg_sys::PgNode for TidScanState {}
-impl pg_sys::PgNode for TimeLineHistoryCmd {}
-impl pg_sys::PgNode for TransactionStmt {}
-impl pg_sys::PgNode for TriggerData {}
-impl pg_sys::PgNode for TriggerTransition {}
-impl pg_sys::PgNode for TruncateStmt {}
-impl pg_sys::PgNode for TupleTableSlot {}
-impl pg_sys::PgNode for TypeCast {}
-impl pg_sys::PgNode for TypeName {}
-impl pg_sys::PgNode for Unique {}
-impl pg_sys::PgNode for UniquePath {}
-impl pg_sys::PgNode for UniqueState {}
-impl pg_sys::PgNode for UnlistenStmt {}
-impl pg_sys::PgNode for UpdateStmt {}
-impl pg_sys::PgNode for UpperUniquePath {}
-impl pg_sys::PgNode for VacuumRelation {}
-impl pg_sys::PgNode for VacuumStmt {}
-impl pg_sys::PgNode for Value {}
-impl pg_sys::PgNode for ValuesScan {}
-impl pg_sys::PgNode for ValuesScanState {}
-impl pg_sys::PgNode for Var {}
-impl pg_sys::PgNode for VariableSetStmt {}
-impl pg_sys::PgNode for VariableShowStmt {}
-impl pg_sys::PgNode for ViewStmt {}
-impl pg_sys::PgNode for VirtualTupleTableSlot {}
-impl pg_sys::PgNode for WindowAgg {}
-impl pg_sys::PgNode for WindowAggPath {}
-impl pg_sys::PgNode for WindowAggState {}
-impl pg_sys::PgNode for WindowClause {}
-impl pg_sys::PgNode for WindowDef {}
-impl pg_sys::PgNode for WindowFunc {}
-impl pg_sys::PgNode for WindowFuncExprState {}
-impl pg_sys::PgNode for WithCheckOption {}
-impl pg_sys::PgNode for WithClause {}
-impl pg_sys::PgNode for WorkTableScan {}
-impl pg_sys::PgNode for WorkTableScanState {}
-impl pg_sys::PgNode for XmlExpr {}
-impl pg_sys::PgNode for XmlSerialize {}
+impl pg_sys::PgNode for A_ArrayExpr {
+    type NodeType = A_ArrayExpr;
+}
+impl std::fmt::Display for A_ArrayExpr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for A_Const {
+    type NodeType = A_Const;
+}
+impl std::fmt::Display for A_Const {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for A_Expr {
+    type NodeType = A_Expr;
+}
+impl std::fmt::Display for A_Expr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for A_Indices {
+    type NodeType = A_Indices;
+}
+impl std::fmt::Display for A_Indices {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for A_Indirection {
+    type NodeType = A_Indirection;
+}
+impl std::fmt::Display for A_Indirection {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for A_Star {
+    type NodeType = A_Star;
+}
+impl std::fmt::Display for A_Star {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for AccessPriv {
+    type NodeType = AccessPriv;
+}
+impl std::fmt::Display for AccessPriv {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for Agg {
+    type NodeType = Agg;
+}
+impl std::fmt::Display for Agg {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for AggPath {
+    type NodeType = AggPath;
+}
+impl std::fmt::Display for AggPath {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for AggState {
+    type NodeType = AggState;
+}
+impl std::fmt::Display for AggState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for Aggref {
+    type NodeType = Aggref;
+}
+impl std::fmt::Display for Aggref {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for AggrefExprState {
+    type NodeType = AggrefExprState;
+}
+impl std::fmt::Display for AggrefExprState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for Alias {
+    type NodeType = Alias;
+}
+impl std::fmt::Display for Alias {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for AlterCollationStmt {
+    type NodeType = AlterCollationStmt;
+}
+impl std::fmt::Display for AlterCollationStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for AlterDatabaseSetStmt {
+    type NodeType = AlterDatabaseSetStmt;
+}
+impl std::fmt::Display for AlterDatabaseSetStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for AlterDatabaseStmt {
+    type NodeType = AlterDatabaseStmt;
+}
+impl std::fmt::Display for AlterDatabaseStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for AlterDefaultPrivilegesStmt {
+    type NodeType = AlterDefaultPrivilegesStmt;
+}
+impl std::fmt::Display for AlterDefaultPrivilegesStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for AlterDomainStmt {
+    type NodeType = AlterDomainStmt;
+}
+impl std::fmt::Display for AlterDomainStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for AlterEnumStmt {
+    type NodeType = AlterEnumStmt;
+}
+impl std::fmt::Display for AlterEnumStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for AlterEventTrigStmt {
+    type NodeType = AlterEventTrigStmt;
+}
+impl std::fmt::Display for AlterEventTrigStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for AlterExtensionContentsStmt {
+    type NodeType = AlterExtensionContentsStmt;
+}
+impl std::fmt::Display for AlterExtensionContentsStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for AlterExtensionStmt {
+    type NodeType = AlterExtensionStmt;
+}
+impl std::fmt::Display for AlterExtensionStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for AlterFdwStmt {
+    type NodeType = AlterFdwStmt;
+}
+impl std::fmt::Display for AlterFdwStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for AlterForeignServerStmt {
+    type NodeType = AlterForeignServerStmt;
+}
+impl std::fmt::Display for AlterForeignServerStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for AlterFunctionStmt {
+    type NodeType = AlterFunctionStmt;
+}
+impl std::fmt::Display for AlterFunctionStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for AlterObjectDependsStmt {
+    type NodeType = AlterObjectDependsStmt;
+}
+impl std::fmt::Display for AlterObjectDependsStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for AlterObjectSchemaStmt {
+    type NodeType = AlterObjectSchemaStmt;
+}
+impl std::fmt::Display for AlterObjectSchemaStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for AlterOpFamilyStmt {
+    type NodeType = AlterOpFamilyStmt;
+}
+impl std::fmt::Display for AlterOpFamilyStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for AlterOperatorStmt {
+    type NodeType = AlterOperatorStmt;
+}
+impl std::fmt::Display for AlterOperatorStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for AlterOwnerStmt {
+    type NodeType = AlterOwnerStmt;
+}
+impl std::fmt::Display for AlterOwnerStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for AlterPolicyStmt {
+    type NodeType = AlterPolicyStmt;
+}
+impl std::fmt::Display for AlterPolicyStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for AlterPublicationStmt {
+    type NodeType = AlterPublicationStmt;
+}
+impl std::fmt::Display for AlterPublicationStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for AlterRoleSetStmt {
+    type NodeType = AlterRoleSetStmt;
+}
+impl std::fmt::Display for AlterRoleSetStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for AlterRoleStmt {
+    type NodeType = AlterRoleStmt;
+}
+impl std::fmt::Display for AlterRoleStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for AlterSeqStmt {
+    type NodeType = AlterSeqStmt;
+}
+impl std::fmt::Display for AlterSeqStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for AlterStatsStmt {
+    type NodeType = AlterStatsStmt;
+}
+impl std::fmt::Display for AlterStatsStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for AlterSubscriptionStmt {
+    type NodeType = AlterSubscriptionStmt;
+}
+impl std::fmt::Display for AlterSubscriptionStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for AlterSystemStmt {
+    type NodeType = AlterSystemStmt;
+}
+impl std::fmt::Display for AlterSystemStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for AlterTSConfigurationStmt {
+    type NodeType = AlterTSConfigurationStmt;
+}
+impl std::fmt::Display for AlterTSConfigurationStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for AlterTSDictionaryStmt {
+    type NodeType = AlterTSDictionaryStmt;
+}
+impl std::fmt::Display for AlterTSDictionaryStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for AlterTableCmd {
+    type NodeType = AlterTableCmd;
+}
+impl std::fmt::Display for AlterTableCmd {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for AlterTableMoveAllStmt {
+    type NodeType = AlterTableMoveAllStmt;
+}
+impl std::fmt::Display for AlterTableMoveAllStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for AlterTableSpaceOptionsStmt {
+    type NodeType = AlterTableSpaceOptionsStmt;
+}
+impl std::fmt::Display for AlterTableSpaceOptionsStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for AlterTableStmt {
+    type NodeType = AlterTableStmt;
+}
+impl std::fmt::Display for AlterTableStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for AlterTypeStmt {
+    type NodeType = AlterTypeStmt;
+}
+impl std::fmt::Display for AlterTypeStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for AlterUserMappingStmt {
+    type NodeType = AlterUserMappingStmt;
+}
+impl std::fmt::Display for AlterUserMappingStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for AlternativeSubPlan {
+    type NodeType = AlternativeSubPlan;
+}
+impl std::fmt::Display for AlternativeSubPlan {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for AlternativeSubPlanState {
+    type NodeType = AlternativeSubPlanState;
+}
+impl std::fmt::Display for AlternativeSubPlanState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for Append {
+    type NodeType = Append;
+}
+impl std::fmt::Display for Append {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for AppendPath {
+    type NodeType = AppendPath;
+}
+impl std::fmt::Display for AppendPath {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for AppendRelInfo {
+    type NodeType = AppendRelInfo;
+}
+impl std::fmt::Display for AppendRelInfo {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for AppendState {
+    type NodeType = AppendState;
+}
+impl std::fmt::Display for AppendState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for ArrayCoerceExpr {
+    type NodeType = ArrayCoerceExpr;
+}
+impl std::fmt::Display for ArrayCoerceExpr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for ArrayExpr {
+    type NodeType = ArrayExpr;
+}
+impl std::fmt::Display for ArrayExpr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for BaseBackupCmd {
+    type NodeType = BaseBackupCmd;
+}
+impl std::fmt::Display for BaseBackupCmd {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for BitmapAnd {
+    type NodeType = BitmapAnd;
+}
+impl std::fmt::Display for BitmapAnd {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for BitmapAndPath {
+    type NodeType = BitmapAndPath;
+}
+impl std::fmt::Display for BitmapAndPath {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for BitmapAndState {
+    type NodeType = BitmapAndState;
+}
+impl std::fmt::Display for BitmapAndState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for BitmapHeapPath {
+    type NodeType = BitmapHeapPath;
+}
+impl std::fmt::Display for BitmapHeapPath {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for BitmapHeapScan {
+    type NodeType = BitmapHeapScan;
+}
+impl std::fmt::Display for BitmapHeapScan {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for BitmapHeapScanState {
+    type NodeType = BitmapHeapScanState;
+}
+impl std::fmt::Display for BitmapHeapScanState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for BitmapIndexScan {
+    type NodeType = BitmapIndexScan;
+}
+impl std::fmt::Display for BitmapIndexScan {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for BitmapIndexScanState {
+    type NodeType = BitmapIndexScanState;
+}
+impl std::fmt::Display for BitmapIndexScanState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for BitmapOr {
+    type NodeType = BitmapOr;
+}
+impl std::fmt::Display for BitmapOr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for BitmapOrPath {
+    type NodeType = BitmapOrPath;
+}
+impl std::fmt::Display for BitmapOrPath {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for BitmapOrState {
+    type NodeType = BitmapOrState;
+}
+impl std::fmt::Display for BitmapOrState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for BoolExpr {
+    type NodeType = BoolExpr;
+}
+impl std::fmt::Display for BoolExpr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for BooleanTest {
+    type NodeType = BooleanTest;
+}
+impl std::fmt::Display for BooleanTest {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for BufferHeapTupleTableSlot {
+    type NodeType = BufferHeapTupleTableSlot;
+}
+impl std::fmt::Display for BufferHeapTupleTableSlot {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for CallContext {
+    type NodeType = CallContext;
+}
+impl std::fmt::Display for CallContext {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for CallStmt {
+    type NodeType = CallStmt;
+}
+impl std::fmt::Display for CallStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for CaseExpr {
+    type NodeType = CaseExpr;
+}
+impl std::fmt::Display for CaseExpr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for CaseTestExpr {
+    type NodeType = CaseTestExpr;
+}
+impl std::fmt::Display for CaseTestExpr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for CaseWhen {
+    type NodeType = CaseWhen;
+}
+impl std::fmt::Display for CaseWhen {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for CheckPointStmt {
+    type NodeType = CheckPointStmt;
+}
+impl std::fmt::Display for CheckPointStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for ClosePortalStmt {
+    type NodeType = ClosePortalStmt;
+}
+impl std::fmt::Display for ClosePortalStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for ClusterStmt {
+    type NodeType = ClusterStmt;
+}
+impl std::fmt::Display for ClusterStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for CoalesceExpr {
+    type NodeType = CoalesceExpr;
+}
+impl std::fmt::Display for CoalesceExpr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for CoerceToDomain {
+    type NodeType = CoerceToDomain;
+}
+impl std::fmt::Display for CoerceToDomain {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for CoerceToDomainValue {
+    type NodeType = CoerceToDomainValue;
+}
+impl std::fmt::Display for CoerceToDomainValue {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for CoerceViaIO {
+    type NodeType = CoerceViaIO;
+}
+impl std::fmt::Display for CoerceViaIO {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for CollateClause {
+    type NodeType = CollateClause;
+}
+impl std::fmt::Display for CollateClause {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for CollateExpr {
+    type NodeType = CollateExpr;
+}
+impl std::fmt::Display for CollateExpr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for ColumnDef {
+    type NodeType = ColumnDef;
+}
+impl std::fmt::Display for ColumnDef {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for ColumnRef {
+    type NodeType = ColumnRef;
+}
+impl std::fmt::Display for ColumnRef {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for CommentStmt {
+    type NodeType = CommentStmt;
+}
+impl std::fmt::Display for CommentStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for CommonTableExpr {
+    type NodeType = CommonTableExpr;
+}
+impl std::fmt::Display for CommonTableExpr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for CompositeTypeStmt {
+    type NodeType = CompositeTypeStmt;
+}
+impl std::fmt::Display for CompositeTypeStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for Const {
+    type NodeType = Const;
+}
+impl std::fmt::Display for Const {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for Constraint {
+    type NodeType = Constraint;
+}
+impl std::fmt::Display for Constraint {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for ConstraintsSetStmt {
+    type NodeType = ConstraintsSetStmt;
+}
+impl std::fmt::Display for ConstraintsSetStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for ConvertRowtypeExpr {
+    type NodeType = ConvertRowtypeExpr;
+}
+impl std::fmt::Display for ConvertRowtypeExpr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for CopyStmt {
+    type NodeType = CopyStmt;
+}
+impl std::fmt::Display for CopyStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for CreateAmStmt {
+    type NodeType = CreateAmStmt;
+}
+impl std::fmt::Display for CreateAmStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for CreateCastStmt {
+    type NodeType = CreateCastStmt;
+}
+impl std::fmt::Display for CreateCastStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for CreateConversionStmt {
+    type NodeType = CreateConversionStmt;
+}
+impl std::fmt::Display for CreateConversionStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for CreateDomainStmt {
+    type NodeType = CreateDomainStmt;
+}
+impl std::fmt::Display for CreateDomainStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for CreateEnumStmt {
+    type NodeType = CreateEnumStmt;
+}
+impl std::fmt::Display for CreateEnumStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for CreateEventTrigStmt {
+    type NodeType = CreateEventTrigStmt;
+}
+impl std::fmt::Display for CreateEventTrigStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for CreateExtensionStmt {
+    type NodeType = CreateExtensionStmt;
+}
+impl std::fmt::Display for CreateExtensionStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for CreateFdwStmt {
+    type NodeType = CreateFdwStmt;
+}
+impl std::fmt::Display for CreateFdwStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for CreateForeignServerStmt {
+    type NodeType = CreateForeignServerStmt;
+}
+impl std::fmt::Display for CreateForeignServerStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for CreateForeignTableStmt {
+    type NodeType = CreateForeignTableStmt;
+}
+impl std::fmt::Display for CreateForeignTableStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for CreateFunctionStmt {
+    type NodeType = CreateFunctionStmt;
+}
+impl std::fmt::Display for CreateFunctionStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for CreateOpClassItem {
+    type NodeType = CreateOpClassItem;
+}
+impl std::fmt::Display for CreateOpClassItem {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for CreateOpClassStmt {
+    type NodeType = CreateOpClassStmt;
+}
+impl std::fmt::Display for CreateOpClassStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for CreateOpFamilyStmt {
+    type NodeType = CreateOpFamilyStmt;
+}
+impl std::fmt::Display for CreateOpFamilyStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for CreatePLangStmt {
+    type NodeType = CreatePLangStmt;
+}
+impl std::fmt::Display for CreatePLangStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for CreatePolicyStmt {
+    type NodeType = CreatePolicyStmt;
+}
+impl std::fmt::Display for CreatePolicyStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for CreatePublicationStmt {
+    type NodeType = CreatePublicationStmt;
+}
+impl std::fmt::Display for CreatePublicationStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for CreateRangeStmt {
+    type NodeType = CreateRangeStmt;
+}
+impl std::fmt::Display for CreateRangeStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for CreateReplicationSlotCmd {
+    type NodeType = CreateReplicationSlotCmd;
+}
+impl std::fmt::Display for CreateReplicationSlotCmd {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for CreateRoleStmt {
+    type NodeType = CreateRoleStmt;
+}
+impl std::fmt::Display for CreateRoleStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for CreateSchemaStmt {
+    type NodeType = CreateSchemaStmt;
+}
+impl std::fmt::Display for CreateSchemaStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for CreateSeqStmt {
+    type NodeType = CreateSeqStmt;
+}
+impl std::fmt::Display for CreateSeqStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for CreateStatsStmt {
+    type NodeType = CreateStatsStmt;
+}
+impl std::fmt::Display for CreateStatsStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for CreateStmt {
+    type NodeType = CreateStmt;
+}
+impl std::fmt::Display for CreateStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for CreateSubscriptionStmt {
+    type NodeType = CreateSubscriptionStmt;
+}
+impl std::fmt::Display for CreateSubscriptionStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for CreateTableAsStmt {
+    type NodeType = CreateTableAsStmt;
+}
+impl std::fmt::Display for CreateTableAsStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for CreateTableSpaceStmt {
+    type NodeType = CreateTableSpaceStmt;
+}
+impl std::fmt::Display for CreateTableSpaceStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for CreateTransformStmt {
+    type NodeType = CreateTransformStmt;
+}
+impl std::fmt::Display for CreateTransformStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for CreateTrigStmt {
+    type NodeType = CreateTrigStmt;
+}
+impl std::fmt::Display for CreateTrigStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for CreateUserMappingStmt {
+    type NodeType = CreateUserMappingStmt;
+}
+impl std::fmt::Display for CreateUserMappingStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for CreatedbStmt {
+    type NodeType = CreatedbStmt;
+}
+impl std::fmt::Display for CreatedbStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for CteScan {
+    type NodeType = CteScan;
+}
+impl std::fmt::Display for CteScan {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for CteScanState {
+    type NodeType = CteScanState;
+}
+impl std::fmt::Display for CteScanState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for CurrentOfExpr {
+    type NodeType = CurrentOfExpr;
+}
+impl std::fmt::Display for CurrentOfExpr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for CustomPath {
+    type NodeType = CustomPath;
+}
+impl std::fmt::Display for CustomPath {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for CustomScan {
+    type NodeType = CustomScan;
+}
+impl std::fmt::Display for CustomScan {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for CustomScanState {
+    type NodeType = CustomScanState;
+}
+impl std::fmt::Display for CustomScanState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for DeallocateStmt {
+    type NodeType = DeallocateStmt;
+}
+impl std::fmt::Display for DeallocateStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for DeclareCursorStmt {
+    type NodeType = DeclareCursorStmt;
+}
+impl std::fmt::Display for DeclareCursorStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for DefElem {
+    type NodeType = DefElem;
+}
+impl std::fmt::Display for DefElem {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for DefineStmt {
+    type NodeType = DefineStmt;
+}
+impl std::fmt::Display for DefineStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for DeleteStmt {
+    type NodeType = DeleteStmt;
+}
+impl std::fmt::Display for DeleteStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for DiscardStmt {
+    type NodeType = DiscardStmt;
+}
+impl std::fmt::Display for DiscardStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for DoStmt {
+    type NodeType = DoStmt;
+}
+impl std::fmt::Display for DoStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for DomainConstraintState {
+    type NodeType = DomainConstraintState;
+}
+impl std::fmt::Display for DomainConstraintState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for DropOwnedStmt {
+    type NodeType = DropOwnedStmt;
+}
+impl std::fmt::Display for DropOwnedStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for DropReplicationSlotCmd {
+    type NodeType = DropReplicationSlotCmd;
+}
+impl std::fmt::Display for DropReplicationSlotCmd {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for DropRoleStmt {
+    type NodeType = DropRoleStmt;
+}
+impl std::fmt::Display for DropRoleStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for DropStmt {
+    type NodeType = DropStmt;
+}
+impl std::fmt::Display for DropStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for DropSubscriptionStmt {
+    type NodeType = DropSubscriptionStmt;
+}
+impl std::fmt::Display for DropSubscriptionStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for DropTableSpaceStmt {
+    type NodeType = DropTableSpaceStmt;
+}
+impl std::fmt::Display for DropTableSpaceStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for DropUserMappingStmt {
+    type NodeType = DropUserMappingStmt;
+}
+impl std::fmt::Display for DropUserMappingStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for DropdbStmt {
+    type NodeType = DropdbStmt;
+}
+impl std::fmt::Display for DropdbStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for EState {
+    type NodeType = EState;
+}
+impl std::fmt::Display for EState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for EquivalenceClass {
+    type NodeType = EquivalenceClass;
+}
+impl std::fmt::Display for EquivalenceClass {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for EquivalenceMember {
+    type NodeType = EquivalenceMember;
+}
+impl std::fmt::Display for EquivalenceMember {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for EventTriggerData {
+    type NodeType = EventTriggerData;
+}
+impl std::fmt::Display for EventTriggerData {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for ExecuteStmt {
+    type NodeType = ExecuteStmt;
+}
+impl std::fmt::Display for ExecuteStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for ExplainStmt {
+    type NodeType = ExplainStmt;
+}
+impl std::fmt::Display for ExplainStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for Expr {
+    type NodeType = Expr;
+}
+impl std::fmt::Display for Expr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for ExprContext {
+    type NodeType = ExprContext;
+}
+impl std::fmt::Display for ExprContext {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for ExprState {
+    type NodeType = ExprState;
+}
+impl std::fmt::Display for ExprState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for ExtensibleNode {
+    type NodeType = ExtensibleNode;
+}
+impl std::fmt::Display for ExtensibleNode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for FdwRoutine {
+    type NodeType = FdwRoutine;
+}
+impl std::fmt::Display for FdwRoutine {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for FetchStmt {
+    type NodeType = FetchStmt;
+}
+impl std::fmt::Display for FetchStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for FieldSelect {
+    type NodeType = FieldSelect;
+}
+impl std::fmt::Display for FieldSelect {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for FieldStore {
+    type NodeType = FieldStore;
+}
+impl std::fmt::Display for FieldStore {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for ForeignKeyCacheInfo {
+    type NodeType = ForeignKeyCacheInfo;
+}
+impl std::fmt::Display for ForeignKeyCacheInfo {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for ForeignKeyOptInfo {
+    type NodeType = ForeignKeyOptInfo;
+}
+impl std::fmt::Display for ForeignKeyOptInfo {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for ForeignPath {
+    type NodeType = ForeignPath;
+}
+impl std::fmt::Display for ForeignPath {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for ForeignScan {
+    type NodeType = ForeignScan;
+}
+impl std::fmt::Display for ForeignScan {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for ForeignScanState {
+    type NodeType = ForeignScanState;
+}
+impl std::fmt::Display for ForeignScanState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for FromExpr {
+    type NodeType = FromExpr;
+}
+impl std::fmt::Display for FromExpr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for FuncCall {
+    type NodeType = FuncCall;
+}
+impl std::fmt::Display for FuncCall {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for FuncExpr {
+    type NodeType = FuncExpr;
+}
+impl std::fmt::Display for FuncExpr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for FunctionParameter {
+    type NodeType = FunctionParameter;
+}
+impl std::fmt::Display for FunctionParameter {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for FunctionScan {
+    type NodeType = FunctionScan;
+}
+impl std::fmt::Display for FunctionScan {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for FunctionScanState {
+    type NodeType = FunctionScanState;
+}
+impl std::fmt::Display for FunctionScanState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for Gather {
+    type NodeType = Gather;
+}
+impl std::fmt::Display for Gather {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for GatherMerge {
+    type NodeType = GatherMerge;
+}
+impl std::fmt::Display for GatherMerge {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for GatherMergePath {
+    type NodeType = GatherMergePath;
+}
+impl std::fmt::Display for GatherMergePath {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for GatherMergeState {
+    type NodeType = GatherMergeState;
+}
+impl std::fmt::Display for GatherMergeState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for GatherPath {
+    type NodeType = GatherPath;
+}
+impl std::fmt::Display for GatherPath {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for GatherState {
+    type NodeType = GatherState;
+}
+impl std::fmt::Display for GatherState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for GrantRoleStmt {
+    type NodeType = GrantRoleStmt;
+}
+impl std::fmt::Display for GrantRoleStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for GrantStmt {
+    type NodeType = GrantStmt;
+}
+impl std::fmt::Display for GrantStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for Group {
+    type NodeType = Group;
+}
+impl std::fmt::Display for Group {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for GroupPath {
+    type NodeType = GroupPath;
+}
+impl std::fmt::Display for GroupPath {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for GroupResultPath {
+    type NodeType = GroupResultPath;
+}
+impl std::fmt::Display for GroupResultPath {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for GroupState {
+    type NodeType = GroupState;
+}
+impl std::fmt::Display for GroupState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for GroupingFunc {
+    type NodeType = GroupingFunc;
+}
+impl std::fmt::Display for GroupingFunc {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for GroupingSet {
+    type NodeType = GroupingSet;
+}
+impl std::fmt::Display for GroupingSet {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for GroupingSetData {
+    type NodeType = GroupingSetData;
+}
+impl std::fmt::Display for GroupingSetData {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for GroupingSetsPath {
+    type NodeType = GroupingSetsPath;
+}
+impl std::fmt::Display for GroupingSetsPath {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for Hash {
+    type NodeType = Hash;
+}
+impl std::fmt::Display for Hash {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for HashJoin {
+    type NodeType = HashJoin;
+}
+impl std::fmt::Display for HashJoin {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for HashJoinState {
+    type NodeType = HashJoinState;
+}
+impl std::fmt::Display for HashJoinState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for HashPath {
+    type NodeType = HashPath;
+}
+impl std::fmt::Display for HashPath {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for HashState {
+    type NodeType = HashState;
+}
+impl std::fmt::Display for HashState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for HeapTupleTableSlot {
+    type NodeType = HeapTupleTableSlot;
+}
+impl std::fmt::Display for HeapTupleTableSlot {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for IdentifySystemCmd {
+    type NodeType = IdentifySystemCmd;
+}
+impl std::fmt::Display for IdentifySystemCmd {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for ImportForeignSchemaStmt {
+    type NodeType = ImportForeignSchemaStmt;
+}
+impl std::fmt::Display for ImportForeignSchemaStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for IncrementalSort {
+    type NodeType = IncrementalSort;
+}
+impl std::fmt::Display for IncrementalSort {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for IncrementalSortPath {
+    type NodeType = IncrementalSortPath;
+}
+impl std::fmt::Display for IncrementalSortPath {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for IncrementalSortState {
+    type NodeType = IncrementalSortState;
+}
+impl std::fmt::Display for IncrementalSortState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for IndexAmRoutine {
+    type NodeType = IndexAmRoutine;
+}
+impl std::fmt::Display for IndexAmRoutine {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for IndexClause {
+    type NodeType = IndexClause;
+}
+impl std::fmt::Display for IndexClause {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for IndexElem {
+    type NodeType = IndexElem;
+}
+impl std::fmt::Display for IndexElem {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for IndexInfo {
+    type NodeType = IndexInfo;
+}
+impl std::fmt::Display for IndexInfo {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for IndexOnlyScan {
+    type NodeType = IndexOnlyScan;
+}
+impl std::fmt::Display for IndexOnlyScan {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for IndexOnlyScanState {
+    type NodeType = IndexOnlyScanState;
+}
+impl std::fmt::Display for IndexOnlyScanState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for IndexOptInfo {
+    type NodeType = IndexOptInfo;
+}
+impl std::fmt::Display for IndexOptInfo {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for IndexPath {
+    type NodeType = IndexPath;
+}
+impl std::fmt::Display for IndexPath {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for IndexScan {
+    type NodeType = IndexScan;
+}
+impl std::fmt::Display for IndexScan {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for IndexScanState {
+    type NodeType = IndexScanState;
+}
+impl std::fmt::Display for IndexScanState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for IndexStmt {
+    type NodeType = IndexStmt;
+}
+impl std::fmt::Display for IndexStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for InferClause {
+    type NodeType = InferClause;
+}
+impl std::fmt::Display for InferClause {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for InferenceElem {
+    type NodeType = InferenceElem;
+}
+impl std::fmt::Display for InferenceElem {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for InlineCodeBlock {
+    type NodeType = InlineCodeBlock;
+}
+impl std::fmt::Display for InlineCodeBlock {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for InsertStmt {
+    type NodeType = InsertStmt;
+}
+impl std::fmt::Display for InsertStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for IntoClause {
+    type NodeType = IntoClause;
+}
+impl std::fmt::Display for IntoClause {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for Join {
+    type NodeType = Join;
+}
+impl std::fmt::Display for Join {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for JoinExpr {
+    type NodeType = JoinExpr;
+}
+impl std::fmt::Display for JoinExpr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for JoinPath {
+    type NodeType = JoinPath;
+}
+impl std::fmt::Display for JoinPath {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for JoinState {
+    type NodeType = JoinState;
+}
+impl std::fmt::Display for JoinState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for JunkFilter {
+    type NodeType = JunkFilter;
+}
+impl std::fmt::Display for JunkFilter {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for Limit {
+    type NodeType = Limit;
+}
+impl std::fmt::Display for Limit {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for LimitPath {
+    type NodeType = LimitPath;
+}
+impl std::fmt::Display for LimitPath {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for LimitState {
+    type NodeType = LimitState;
+}
+impl std::fmt::Display for LimitState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for List {
+    type NodeType = List;
+}
+impl std::fmt::Display for List {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for ListenStmt {
+    type NodeType = ListenStmt;
+}
+impl std::fmt::Display for ListenStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for LoadStmt {
+    type NodeType = LoadStmt;
+}
+impl std::fmt::Display for LoadStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for LockRows {
+    type NodeType = LockRows;
+}
+impl std::fmt::Display for LockRows {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for LockRowsPath {
+    type NodeType = LockRowsPath;
+}
+impl std::fmt::Display for LockRowsPath {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for LockRowsState {
+    type NodeType = LockRowsState;
+}
+impl std::fmt::Display for LockRowsState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for LockStmt {
+    type NodeType = LockStmt;
+}
+impl std::fmt::Display for LockStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for LockingClause {
+    type NodeType = LockingClause;
+}
+impl std::fmt::Display for LockingClause {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for Material {
+    type NodeType = Material;
+}
+impl std::fmt::Display for Material {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for MaterialPath {
+    type NodeType = MaterialPath;
+}
+impl std::fmt::Display for MaterialPath {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for MaterialState {
+    type NodeType = MaterialState;
+}
+impl std::fmt::Display for MaterialState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for MemoryContextData {
+    type NodeType = MemoryContextData;
+}
+impl std::fmt::Display for MemoryContextData {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for MergeAppend {
+    type NodeType = MergeAppend;
+}
+impl std::fmt::Display for MergeAppend {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for MergeAppendPath {
+    type NodeType = MergeAppendPath;
+}
+impl std::fmt::Display for MergeAppendPath {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for MergeAppendState {
+    type NodeType = MergeAppendState;
+}
+impl std::fmt::Display for MergeAppendState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for MergeJoin {
+    type NodeType = MergeJoin;
+}
+impl std::fmt::Display for MergeJoin {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for MergeJoinState {
+    type NodeType = MergeJoinState;
+}
+impl std::fmt::Display for MergeJoinState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for MergePath {
+    type NodeType = MergePath;
+}
+impl std::fmt::Display for MergePath {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for MinMaxAggInfo {
+    type NodeType = MinMaxAggInfo;
+}
+impl std::fmt::Display for MinMaxAggInfo {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for MinMaxAggPath {
+    type NodeType = MinMaxAggPath;
+}
+impl std::fmt::Display for MinMaxAggPath {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for MinMaxExpr {
+    type NodeType = MinMaxExpr;
+}
+impl std::fmt::Display for MinMaxExpr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for MinimalTupleTableSlot {
+    type NodeType = MinimalTupleTableSlot;
+}
+impl std::fmt::Display for MinimalTupleTableSlot {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for ModifyTable {
+    type NodeType = ModifyTable;
+}
+impl std::fmt::Display for ModifyTable {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for ModifyTablePath {
+    type NodeType = ModifyTablePath;
+}
+impl std::fmt::Display for ModifyTablePath {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for ModifyTableState {
+    type NodeType = ModifyTableState;
+}
+impl std::fmt::Display for ModifyTableState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for MultiAssignRef {
+    type NodeType = MultiAssignRef;
+}
+impl std::fmt::Display for MultiAssignRef {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for NamedArgExpr {
+    type NodeType = NamedArgExpr;
+}
+impl std::fmt::Display for NamedArgExpr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for NamedTuplestoreScan {
+    type NodeType = NamedTuplestoreScan;
+}
+impl std::fmt::Display for NamedTuplestoreScan {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for NamedTuplestoreScanState {
+    type NodeType = NamedTuplestoreScanState;
+}
+impl std::fmt::Display for NamedTuplestoreScanState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for NestLoop {
+    type NodeType = NestLoop;
+}
+impl std::fmt::Display for NestLoop {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for NestLoopParam {
+    type NodeType = NestLoopParam;
+}
+impl std::fmt::Display for NestLoopParam {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for NestLoopState {
+    type NodeType = NestLoopState;
+}
+impl std::fmt::Display for NestLoopState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for NextValueExpr {
+    type NodeType = NextValueExpr;
+}
+impl std::fmt::Display for NextValueExpr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for Node {
+    type NodeType = Node;
+}
+impl std::fmt::Display for Node {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for NotifyStmt {
+    type NodeType = NotifyStmt;
+}
+impl std::fmt::Display for NotifyStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for NullTest {
+    type NodeType = NullTest;
+}
+impl std::fmt::Display for NullTest {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for ObjectWithArgs {
+    type NodeType = ObjectWithArgs;
+}
+impl std::fmt::Display for ObjectWithArgs {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for OnConflictClause {
+    type NodeType = OnConflictClause;
+}
+impl std::fmt::Display for OnConflictClause {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for OnConflictExpr {
+    type NodeType = OnConflictExpr;
+}
+impl std::fmt::Display for OnConflictExpr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for OnConflictSetState {
+    type NodeType = OnConflictSetState;
+}
+impl std::fmt::Display for OnConflictSetState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for OpExpr {
+    type NodeType = OpExpr;
+}
+impl std::fmt::Display for OpExpr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for Param {
+    type NodeType = Param;
+}
+impl std::fmt::Display for Param {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for ParamPathInfo {
+    type NodeType = ParamPathInfo;
+}
+impl std::fmt::Display for ParamPathInfo {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for ParamRef {
+    type NodeType = ParamRef;
+}
+impl std::fmt::Display for ParamRef {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for PartitionBoundSpec {
+    type NodeType = PartitionBoundSpec;
+}
+impl std::fmt::Display for PartitionBoundSpec {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for PartitionCmd {
+    type NodeType = PartitionCmd;
+}
+impl std::fmt::Display for PartitionCmd {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for PartitionElem {
+    type NodeType = PartitionElem;
+}
+impl std::fmt::Display for PartitionElem {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for PartitionPruneInfo {
+    type NodeType = PartitionPruneInfo;
+}
+impl std::fmt::Display for PartitionPruneInfo {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for PartitionPruneStep {
+    type NodeType = PartitionPruneStep;
+}
+impl std::fmt::Display for PartitionPruneStep {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for PartitionPruneStepCombine {
+    type NodeType = PartitionPruneStepCombine;
+}
+impl std::fmt::Display for PartitionPruneStepCombine {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for PartitionPruneStepOp {
+    type NodeType = PartitionPruneStepOp;
+}
+impl std::fmt::Display for PartitionPruneStepOp {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for PartitionRangeDatum {
+    type NodeType = PartitionRangeDatum;
+}
+impl std::fmt::Display for PartitionRangeDatum {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for PartitionSpec {
+    type NodeType = PartitionSpec;
+}
+impl std::fmt::Display for PartitionSpec {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for PartitionedRelPruneInfo {
+    type NodeType = PartitionedRelPruneInfo;
+}
+impl std::fmt::Display for PartitionedRelPruneInfo {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for Path {
+    type NodeType = Path;
+}
+impl std::fmt::Display for Path {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for PathKey {
+    type NodeType = PathKey;
+}
+impl std::fmt::Display for PathKey {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for PathTarget {
+    type NodeType = PathTarget;
+}
+impl std::fmt::Display for PathTarget {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for PlaceHolderInfo {
+    type NodeType = PlaceHolderInfo;
+}
+impl std::fmt::Display for PlaceHolderInfo {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for PlaceHolderVar {
+    type NodeType = PlaceHolderVar;
+}
+impl std::fmt::Display for PlaceHolderVar {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for Plan {
+    type NodeType = Plan;
+}
+impl std::fmt::Display for Plan {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for PlanInvalItem {
+    type NodeType = PlanInvalItem;
+}
+impl std::fmt::Display for PlanInvalItem {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for PlanRowMark {
+    type NodeType = PlanRowMark;
+}
+impl std::fmt::Display for PlanRowMark {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for PlanState {
+    type NodeType = PlanState;
+}
+impl std::fmt::Display for PlanState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for PlannedStmt {
+    type NodeType = PlannedStmt;
+}
+impl std::fmt::Display for PlannedStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for PlannerGlobal {
+    type NodeType = PlannerGlobal;
+}
+impl std::fmt::Display for PlannerGlobal {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for PlannerInfo {
+    type NodeType = PlannerInfo;
+}
+impl std::fmt::Display for PlannerInfo {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for PlannerParamItem {
+    type NodeType = PlannerParamItem;
+}
+impl std::fmt::Display for PlannerParamItem {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for PrepareStmt {
+    type NodeType = PrepareStmt;
+}
+impl std::fmt::Display for PrepareStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for ProjectSet {
+    type NodeType = ProjectSet;
+}
+impl std::fmt::Display for ProjectSet {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for ProjectSetPath {
+    type NodeType = ProjectSetPath;
+}
+impl std::fmt::Display for ProjectSetPath {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for ProjectSetState {
+    type NodeType = ProjectSetState;
+}
+impl std::fmt::Display for ProjectSetState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for ProjectionInfo {
+    type NodeType = ProjectionInfo;
+}
+impl std::fmt::Display for ProjectionInfo {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for ProjectionPath {
+    type NodeType = ProjectionPath;
+}
+impl std::fmt::Display for ProjectionPath {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for Query {
+    type NodeType = Query;
+}
+impl std::fmt::Display for Query {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for RangeFunction {
+    type NodeType = RangeFunction;
+}
+impl std::fmt::Display for RangeFunction {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for RangeSubselect {
+    type NodeType = RangeSubselect;
+}
+impl std::fmt::Display for RangeSubselect {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for RangeTableFunc {
+    type NodeType = RangeTableFunc;
+}
+impl std::fmt::Display for RangeTableFunc {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for RangeTableFuncCol {
+    type NodeType = RangeTableFuncCol;
+}
+impl std::fmt::Display for RangeTableFuncCol {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for RangeTableSample {
+    type NodeType = RangeTableSample;
+}
+impl std::fmt::Display for RangeTableSample {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for RangeTblEntry {
+    type NodeType = RangeTblEntry;
+}
+impl std::fmt::Display for RangeTblEntry {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for RangeTblFunction {
+    type NodeType = RangeTblFunction;
+}
+impl std::fmt::Display for RangeTblFunction {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for RangeTblRef {
+    type NodeType = RangeTblRef;
+}
+impl std::fmt::Display for RangeTblRef {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for RangeVar {
+    type NodeType = RangeVar;
+}
+impl std::fmt::Display for RangeVar {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for RawStmt {
+    type NodeType = RawStmt;
+}
+impl std::fmt::Display for RawStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for ReassignOwnedStmt {
+    type NodeType = ReassignOwnedStmt;
+}
+impl std::fmt::Display for ReassignOwnedStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for RecursiveUnion {
+    type NodeType = RecursiveUnion;
+}
+impl std::fmt::Display for RecursiveUnion {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for RecursiveUnionPath {
+    type NodeType = RecursiveUnionPath;
+}
+impl std::fmt::Display for RecursiveUnionPath {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for RecursiveUnionState {
+    type NodeType = RecursiveUnionState;
+}
+impl std::fmt::Display for RecursiveUnionState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for RefreshMatViewStmt {
+    type NodeType = RefreshMatViewStmt;
+}
+impl std::fmt::Display for RefreshMatViewStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for ReindexStmt {
+    type NodeType = ReindexStmt;
+}
+impl std::fmt::Display for ReindexStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for RelOptInfo {
+    type NodeType = RelOptInfo;
+}
+impl std::fmt::Display for RelOptInfo {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for RelabelType {
+    type NodeType = RelabelType;
+}
+impl std::fmt::Display for RelabelType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for RenameStmt {
+    type NodeType = RenameStmt;
+}
+impl std::fmt::Display for RenameStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for ReplicaIdentityStmt {
+    type NodeType = ReplicaIdentityStmt;
+}
+impl std::fmt::Display for ReplicaIdentityStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for ResTarget {
+    type NodeType = ResTarget;
+}
+impl std::fmt::Display for ResTarget {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for RestrictInfo {
+    type NodeType = RestrictInfo;
+}
+impl std::fmt::Display for RestrictInfo {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for Result {
+    type NodeType = Result;
+}
+impl std::fmt::Display for Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for ResultRelInfo {
+    type NodeType = ResultRelInfo;
+}
+impl std::fmt::Display for ResultRelInfo {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for ResultState {
+    type NodeType = ResultState;
+}
+impl std::fmt::Display for ResultState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for ReturnSetInfo {
+    type NodeType = ReturnSetInfo;
+}
+impl std::fmt::Display for ReturnSetInfo {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for RoleSpec {
+    type NodeType = RoleSpec;
+}
+impl std::fmt::Display for RoleSpec {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for RollupData {
+    type NodeType = RollupData;
+}
+impl std::fmt::Display for RollupData {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for RowCompareExpr {
+    type NodeType = RowCompareExpr;
+}
+impl std::fmt::Display for RowCompareExpr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for RowExpr {
+    type NodeType = RowExpr;
+}
+impl std::fmt::Display for RowExpr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for RowMarkClause {
+    type NodeType = RowMarkClause;
+}
+impl std::fmt::Display for RowMarkClause {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for RuleStmt {
+    type NodeType = RuleStmt;
+}
+impl std::fmt::Display for RuleStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for SQLCmd {
+    type NodeType = SQLCmd;
+}
+impl std::fmt::Display for SQLCmd {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for SQLValueFunction {
+    type NodeType = SQLValueFunction;
+}
+impl std::fmt::Display for SQLValueFunction {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for SampleScan {
+    type NodeType = SampleScan;
+}
+impl std::fmt::Display for SampleScan {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for SampleScanState {
+    type NodeType = SampleScanState;
+}
+impl std::fmt::Display for SampleScanState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for ScalarArrayOpExpr {
+    type NodeType = ScalarArrayOpExpr;
+}
+impl std::fmt::Display for ScalarArrayOpExpr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for Scan {
+    type NodeType = Scan;
+}
+impl std::fmt::Display for Scan {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for ScanState {
+    type NodeType = ScanState;
+}
+impl std::fmt::Display for ScanState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for SecLabelStmt {
+    type NodeType = SecLabelStmt;
+}
+impl std::fmt::Display for SecLabelStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for SelectStmt {
+    type NodeType = SelectStmt;
+}
+impl std::fmt::Display for SelectStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for SeqScanState {
+    type NodeType = SeqScanState;
+}
+impl std::fmt::Display for SeqScanState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for SetExprState {
+    type NodeType = SetExprState;
+}
+impl std::fmt::Display for SetExprState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for SetOp {
+    type NodeType = SetOp;
+}
+impl std::fmt::Display for SetOp {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for SetOpPath {
+    type NodeType = SetOpPath;
+}
+impl std::fmt::Display for SetOpPath {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for SetOpState {
+    type NodeType = SetOpState;
+}
+impl std::fmt::Display for SetOpState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for SetOperationStmt {
+    type NodeType = SetOperationStmt;
+}
+impl std::fmt::Display for SetOperationStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for SetToDefault {
+    type NodeType = SetToDefault;
+}
+impl std::fmt::Display for SetToDefault {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for Sort {
+    type NodeType = Sort;
+}
+impl std::fmt::Display for Sort {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for SortBy {
+    type NodeType = SortBy;
+}
+impl std::fmt::Display for SortBy {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for SortGroupClause {
+    type NodeType = SortGroupClause;
+}
+impl std::fmt::Display for SortGroupClause {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for SortPath {
+    type NodeType = SortPath;
+}
+impl std::fmt::Display for SortPath {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for SortState {
+    type NodeType = SortState;
+}
+impl std::fmt::Display for SortState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for SpecialJoinInfo {
+    type NodeType = SpecialJoinInfo;
+}
+impl std::fmt::Display for SpecialJoinInfo {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for StartReplicationCmd {
+    type NodeType = StartReplicationCmd;
+}
+impl std::fmt::Display for StartReplicationCmd {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for StatisticExtInfo {
+    type NodeType = StatisticExtInfo;
+}
+impl std::fmt::Display for StatisticExtInfo {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for SubLink {
+    type NodeType = SubLink;
+}
+impl std::fmt::Display for SubLink {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for SubPlan {
+    type NodeType = SubPlan;
+}
+impl std::fmt::Display for SubPlan {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for SubPlanState {
+    type NodeType = SubPlanState;
+}
+impl std::fmt::Display for SubPlanState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for SubqueryScan {
+    type NodeType = SubqueryScan;
+}
+impl std::fmt::Display for SubqueryScan {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for SubqueryScanPath {
+    type NodeType = SubqueryScanPath;
+}
+impl std::fmt::Display for SubqueryScanPath {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for SubqueryScanState {
+    type NodeType = SubqueryScanState;
+}
+impl std::fmt::Display for SubqueryScanState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for SubscriptingRef {
+    type NodeType = SubscriptingRef;
+}
+impl std::fmt::Display for SubscriptingRef {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for SupportRequestCost {
+    type NodeType = SupportRequestCost;
+}
+impl std::fmt::Display for SupportRequestCost {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for SupportRequestIndexCondition {
+    type NodeType = SupportRequestIndexCondition;
+}
+impl std::fmt::Display for SupportRequestIndexCondition {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for SupportRequestRows {
+    type NodeType = SupportRequestRows;
+}
+impl std::fmt::Display for SupportRequestRows {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for SupportRequestSelectivity {
+    type NodeType = SupportRequestSelectivity;
+}
+impl std::fmt::Display for SupportRequestSelectivity {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for SupportRequestSimplify {
+    type NodeType = SupportRequestSimplify;
+}
+impl std::fmt::Display for SupportRequestSimplify {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for TableAmRoutine {
+    type NodeType = TableAmRoutine;
+}
+impl std::fmt::Display for TableAmRoutine {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for TableFunc {
+    type NodeType = TableFunc;
+}
+impl std::fmt::Display for TableFunc {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for TableFuncScan {
+    type NodeType = TableFuncScan;
+}
+impl std::fmt::Display for TableFuncScan {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for TableFuncScanState {
+    type NodeType = TableFuncScanState;
+}
+impl std::fmt::Display for TableFuncScanState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for TableLikeClause {
+    type NodeType = TableLikeClause;
+}
+impl std::fmt::Display for TableLikeClause {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for TableSampleClause {
+    type NodeType = TableSampleClause;
+}
+impl std::fmt::Display for TableSampleClause {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for TargetEntry {
+    type NodeType = TargetEntry;
+}
+impl std::fmt::Display for TargetEntry {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for TidPath {
+    type NodeType = TidPath;
+}
+impl std::fmt::Display for TidPath {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for TidScan {
+    type NodeType = TidScan;
+}
+impl std::fmt::Display for TidScan {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for TidScanState {
+    type NodeType = TidScanState;
+}
+impl std::fmt::Display for TidScanState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for TimeLineHistoryCmd {
+    type NodeType = TimeLineHistoryCmd;
+}
+impl std::fmt::Display for TimeLineHistoryCmd {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for TransactionStmt {
+    type NodeType = TransactionStmt;
+}
+impl std::fmt::Display for TransactionStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for TriggerData {
+    type NodeType = TriggerData;
+}
+impl std::fmt::Display for TriggerData {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for TriggerTransition {
+    type NodeType = TriggerTransition;
+}
+impl std::fmt::Display for TriggerTransition {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for TruncateStmt {
+    type NodeType = TruncateStmt;
+}
+impl std::fmt::Display for TruncateStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for TupleTableSlot {
+    type NodeType = TupleTableSlot;
+}
+impl std::fmt::Display for TupleTableSlot {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for TypeCast {
+    type NodeType = TypeCast;
+}
+impl std::fmt::Display for TypeCast {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for TypeName {
+    type NodeType = TypeName;
+}
+impl std::fmt::Display for TypeName {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for Unique {
+    type NodeType = Unique;
+}
+impl std::fmt::Display for Unique {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for UniquePath {
+    type NodeType = UniquePath;
+}
+impl std::fmt::Display for UniquePath {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for UniqueState {
+    type NodeType = UniqueState;
+}
+impl std::fmt::Display for UniqueState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for UnlistenStmt {
+    type NodeType = UnlistenStmt;
+}
+impl std::fmt::Display for UnlistenStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for UpdateStmt {
+    type NodeType = UpdateStmt;
+}
+impl std::fmt::Display for UpdateStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for UpperUniquePath {
+    type NodeType = UpperUniquePath;
+}
+impl std::fmt::Display for UpperUniquePath {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for VacuumRelation {
+    type NodeType = VacuumRelation;
+}
+impl std::fmt::Display for VacuumRelation {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for VacuumStmt {
+    type NodeType = VacuumStmt;
+}
+impl std::fmt::Display for VacuumStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for Value {
+    type NodeType = Value;
+}
+impl std::fmt::Display for Value {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for ValuesScan {
+    type NodeType = ValuesScan;
+}
+impl std::fmt::Display for ValuesScan {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for ValuesScanState {
+    type NodeType = ValuesScanState;
+}
+impl std::fmt::Display for ValuesScanState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for Var {
+    type NodeType = Var;
+}
+impl std::fmt::Display for Var {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for VariableSetStmt {
+    type NodeType = VariableSetStmt;
+}
+impl std::fmt::Display for VariableSetStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for VariableShowStmt {
+    type NodeType = VariableShowStmt;
+}
+impl std::fmt::Display for VariableShowStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for ViewStmt {
+    type NodeType = ViewStmt;
+}
+impl std::fmt::Display for ViewStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for VirtualTupleTableSlot {
+    type NodeType = VirtualTupleTableSlot;
+}
+impl std::fmt::Display for VirtualTupleTableSlot {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for WindowAgg {
+    type NodeType = WindowAgg;
+}
+impl std::fmt::Display for WindowAgg {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for WindowAggPath {
+    type NodeType = WindowAggPath;
+}
+impl std::fmt::Display for WindowAggPath {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for WindowAggState {
+    type NodeType = WindowAggState;
+}
+impl std::fmt::Display for WindowAggState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for WindowClause {
+    type NodeType = WindowClause;
+}
+impl std::fmt::Display for WindowClause {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for WindowDef {
+    type NodeType = WindowDef;
+}
+impl std::fmt::Display for WindowDef {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for WindowFunc {
+    type NodeType = WindowFunc;
+}
+impl std::fmt::Display for WindowFunc {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for WindowFuncExprState {
+    type NodeType = WindowFuncExprState;
+}
+impl std::fmt::Display for WindowFuncExprState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for WithCheckOption {
+    type NodeType = WithCheckOption;
+}
+impl std::fmt::Display for WithCheckOption {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for WithClause {
+    type NodeType = WithClause;
+}
+impl std::fmt::Display for WithClause {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for WorkTableScan {
+    type NodeType = WorkTableScan;
+}
+impl std::fmt::Display for WorkTableScan {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for WorkTableScanState {
+    type NodeType = WorkTableScanState;
+}
+impl std::fmt::Display for WorkTableScanState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for XmlExpr {
+    type NodeType = XmlExpr;
+}
+impl std::fmt::Display for XmlExpr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
+impl pg_sys::PgNode for XmlSerialize {
+    type NodeType = XmlSerialize;
+}
+impl std::fmt::Display for XmlSerialize {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node)
+        )
+    }
+}
