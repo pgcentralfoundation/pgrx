@@ -171,10 +171,11 @@ fn do_it() -> std::result::Result<(), std::io::Error> {
                 connect_psql(Pgx::from_config()?.get(pgver)?, &dbname)
             }
             ("test", Some(test)) => {
-                let pgver = test.value_of("pg_version").unwrap_or("all");
                 let is_release = test.is_present("release");
-                for major_version in make_pg_major_version(pgver) {
-                    test_extension(*major_version, is_release);
+                let pgver = test.value_of("pg_version").unwrap_or("all");
+                let pgx = Pgx::from_config()?;
+                for pg_config in pgx.iter(PgConfigSelector::new(pgver)) {
+                    test_extension(pg_config?, is_release)?
                 }
                 Ok(())
             }
@@ -200,15 +201,5 @@ fn validate_extension_name(extname: &str) {
         if !c.is_alphanumeric() && c != '_' && !c.is_lowercase() {
             exit_with_error!("Extension name must be in the set of [a-z0-9_]")
         }
-    }
-}
-
-fn make_pg_major_version(version_string: &str) -> &'static [u16] {
-    match version_string {
-        "all" => &[10, 11, 12],
-        "pg10" => &[10],
-        "pg11" => &[11],
-        "pg12" => &[12],
-        _ => exit_with_error!("unrecognized Postgres version: {}", version_string),
     }
 }
