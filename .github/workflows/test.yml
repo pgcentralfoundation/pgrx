@@ -33,14 +33,14 @@ jobs:
           ~/.cargo/git
           ~/.cargo/cargo-pgx
           target
-        key: ${{ matrix.os }}-${{ matrix.version }}-cargo-${{ hashFiles('~/work/pgx/pgx/**/Cargo.toml') }}
+        key: test-${{ matrix.os }}-${{ matrix.version }}-cargo-${{ hashFiles('~/work/pgx/pgx/**/Cargo.toml') }}
 
     - name: cache cargo pgx init
       id: cargo-pgx-init-cache
       uses: actions/cache@v2
       with:
         path: ~/.pgx/
-        key: ${{ matrix.os }}-${{ matrix.version }}-pgx-init-${{ hashFiles('~/work/pgx/pgx/**/*.h') }}
+        key: test-${{ matrix.os }}-${{ matrix.version }}-pgx-init-${{ hashFiles('~/work/pgx/pgx/**/*.h') }}
 
     - name: cargo version
       run: cargo --version
