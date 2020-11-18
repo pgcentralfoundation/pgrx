@@ -156,6 +156,13 @@ pub fn merges(_attr: TokenStream, item: TokenStream) -> TokenStream {
     item
 }
 
+/// Associated macro for `#[pg_extern] or `#[pg_operator]`.  Used to set the `SEARCH_PATH` option
+/// on the `CREATE FUNCTION` statement.
+#[proc_macro_attribute]
+pub fn search_path(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    item
+}
+
 /// Declare a function as `#[pg_extern]` to indicate that it can be used by Postgres as a UDF
 #[proc_macro_attribute]
 pub fn pg_extern(attr: TokenStream, item: TokenStream) -> TokenStream {

@@ -4,7 +4,8 @@
 use crate::commands::get::get_property;
 use pgx_utils::operator_common::*;
 use pgx_utils::{
-    categorize_type, exit_with_error, get_named_capture, handle_result, CategorizedType, ExternArgs,
+    categorize_type, exit_with_error, get_named_capture, handle_result, CategorizedType,
+    ExternArgs, FunctionArgs,
 };
 use proc_macro2::{Ident, Span, TokenTree};
 use quote::quote;
@@ -35,10 +36,15 @@ enum OperatorOptions {
 #[derive(Debug)]
 enum CategorizedAttribute {
     PgGuard(Span),
-    PgTest((Span, HashSet<ExternArgs>)),
+    PgTest(Span, HashSet<ExternArgs>, Vec<FunctionArgs>),
     RustTest(Span),
-    PgExtern((Span, HashSet<ExternArgs>)),
-    PgOperator(Span, HashSet<ExternArgs>, Vec<OperatorOptions>),
+    PgExtern(Span, HashSet<ExternArgs>, Vec<FunctionArgs>),
+    PgOperator(
+        Span,
+        HashSet<ExternArgs>,
+        Vec<FunctionArgs>,
+        Vec<OperatorOptions>,
+    ),
     Sql(Vec<String>),
     SqlFunctionName(String),
     SqlFunctionArgs(String),
@@ -467,7 +473,7 @@ fn walk_items(
                     // only generate CREATE FUNCTION statements for #[pg_test] functions
                     // if we're in test mode, which is controlled by the PGX_TEST_MODE
                     // environment variable
-                    CategorizedAttribute::PgTest((span, _)) if is_test_mode => {
+                    CategorizedAttribute::PgTest(span, _, funcargs) if is_test_mode => {
                         if let (Some(statement), _, _) = make_create_function_statement(
                             &func,
                             None,
@@ -475,6 +481,7 @@ fn walk_items(
                             None,
                             &current_schema,
                             schema_stack,
+                            &funcargs,
                         ) {
                             function_sql.push(location_comment(rs_file, &span));
                             function_sql.push(statement);
@@ -483,14 +490,17 @@ fn walk_items(
 
                     // for #[pg_extern] attributes, we only want to programatically generate
                     // a CREATE FUNCTION statement if we don't already have some
-                    CategorizedAttribute::PgExtern((span, args)) if function_sql.is_empty() => {
+                    CategorizedAttribute::PgExtern(span, extern_args, funcargs)
+                        if function_sql.is_empty() =>
+                    {
                         if let (Some(statement), _, _) = make_create_function_statement(
                             &func,
-                            Some(args),
+                            Some(extern_args),
                             rs_file,
                             sql_func_args.clone(),
                             &current_schema,
                             schema_stack,
+                            &funcargs,
                         ) {
                             function_sql.push(location_comment(rs_file, &span));
                             function_sql.push(statement);
@@ -499,7 +509,7 @@ fn walk_items(
 
                     // for #[pg_operator] we do the same as above for #[pg_extern], but we also
                     // generate the CREATE OPERATOR sql too
-                    CategorizedAttribute::PgOperator(span, args, options)
+                    CategorizedAttribute::PgOperator(span, args, funcargs, options)
                         if function_sql.is_empty() =>
                     {
                         if let (Some(statement), Some(func_name), Some(type_names)) =
@@ -510,6 +520,7 @@ fn walk_items(
                                 sql_func_args.clone(),
                                 &current_schema,
                                 schema_stack,
+                                &funcargs,
                             )
                         {
                             if type_names.len() > 2 {
@@ -631,7 +642,8 @@ fn make_create_function_statement(
     rs_file: &DirEntry,
     sql_func_arg: Option<String>,
     schema: &str,
-    schema_stack: &Vec<String>,
+    _schema_stack: &Vec<String>, // don't use this, but seems to be a good thing to keep around for the future
+    funcargs: &Vec<FunctionArgs>,
 ) -> (Option<String>, Option<String>, Option<Vec<String>>) {
     let exported_func_name = format!("{}_wrapper", func.sig.ident.to_string());
     let mut statement = String::new();
@@ -752,20 +764,9 @@ fn make_create_function_statement(
     }
 
     let mut search_path = String::new();
-    for s in schema_stack.iter().rev().filter(|v| *v != "public").chain(
-        vec![if get_property("relocatable") == Some("false".into()) {
-            String::from("@extschema@")
-        } else {
-            // this shouldn't happen as we catch it long before we get here
-            exit_with_error!("pgx extensions are not relocatable")
-        }]
-        .iter(),
-    ) {
-        if !s.is_empty() {
-            if !search_path.is_empty() {
-                search_path.push(',');
-            }
-            search_path.push_str(s);
+    for arg in funcargs {
+        match arg {
+            FunctionArgs::SearchPath(sp) => search_path.push_str(&sp),
         }
     }
 
@@ -1238,8 +1239,8 @@ fn collect_attributes(
     let mut categorized_attributes = Vec::new();
     let mut other_attributes = Vec::new();
     let mut operator = None;
+    let mut function = None;
 
-    //    let itr = attrs.iter();
     let mut i = 0;
     while i < attrs.len() {
         let a = attrs.get(i).unwrap();
@@ -1248,53 +1249,76 @@ fn collect_attributes(
         if as_string == "# [pg_guard]" {
             categorized_attributes.push(CategorizedAttribute::PgGuard(span));
         } else if as_string.starts_with("# [pg_extern") {
-            categorized_attributes.push(CategorizedAttribute::PgExtern((
+            function = Some(CategorizedAttribute::PgExtern(
                 span,
                 parse_extern_args(&a),
-            )));
+                Vec::new(),
+            ));
         } else if as_string.starts_with("# [pg_operator") {
             operator = Some(CategorizedAttribute::PgOperator(
                 span,
                 parse_extern_args(&a),
                 Vec::new(),
+                Vec::new(),
             ));
         } else if as_string.starts_with("# [opname") {
-            if let Some(CategorizedAttribute::PgOperator(_, _, options)) = operator.as_mut() {
+            if let Some(CategorizedAttribute::PgOperator(_, _, _, options)) = operator.as_mut() {
                 options.push(OperatorOptions::Name(extract_single_arg(a.tokens.clone())));
             }
         } else if as_string.starts_with("# [commutator") {
-            if let Some(CategorizedAttribute::PgOperator(_, _, options)) = operator.as_mut() {
+            if let Some(CategorizedAttribute::PgOperator(_, _, _, options)) = operator.as_mut() {
                 options.push(OperatorOptions::Commutator(extract_single_arg(
                     a.tokens.clone(),
                 )));
             }
         } else if as_string.starts_with("# [negator") {
-            if let Some(CategorizedAttribute::PgOperator(_, _, options)) = operator.as_mut() {
+            if let Some(CategorizedAttribute::PgOperator(_, _, _, options)) = operator.as_mut() {
                 options.push(OperatorOptions::Negator(extract_single_arg(
                     a.tokens.clone(),
                 )));
             }
         } else if as_string.starts_with("# [restrict") {
-            if let Some(CategorizedAttribute::PgOperator(_, _, options)) = operator.as_mut() {
+            if let Some(CategorizedAttribute::PgOperator(_, _, _, options)) = operator.as_mut() {
                 options.push(OperatorOptions::Restrict(extract_single_arg(
                     a.tokens.clone(),
                 )));
             }
         } else if as_string.starts_with("# [join") {
-            if let Some(CategorizedAttribute::PgOperator(_, _, options)) = operator.as_mut() {
+            if let Some(CategorizedAttribute::PgOperator(_, _, _, options)) = operator.as_mut() {
                 options.push(OperatorOptions::Join(extract_single_arg(a.tokens.clone())));
             }
         } else if as_string.eq("# [hashes]") {
-            if let Some(CategorizedAttribute::PgOperator(_, _, options)) = operator.as_mut() {
+            if let Some(CategorizedAttribute::PgOperator(_, _, _, options)) = operator.as_mut() {
                 options.push(OperatorOptions::Hashes);
             }
         } else if as_string.eq("# [merges]") {
-            if let Some(CategorizedAttribute::PgOperator(_, _, options)) = operator.as_mut() {
+            if let Some(CategorizedAttribute::PgOperator(_, _, _, options)) = operator.as_mut() {
                 options.push(OperatorOptions::Merges);
             }
+        } else if as_string.starts_with("# [search_path") {
+            if let Some(CategorizedAttribute::PgExtern(_, _, funcargs)) = function.as_mut() {
+                funcargs.push(FunctionArgs::SearchPath(extract_single_arg(
+                    a.tokens.clone(),
+                )));
+            }
+
+            if let Some(CategorizedAttribute::PgTest(_, _, funcargs)) = function.as_mut() {
+                funcargs.push(FunctionArgs::SearchPath(extract_single_arg(
+                    a.tokens.clone(),
+                )));
+            }
+
+            if let Some(CategorizedAttribute::PgOperator(_, _, funcargs, _)) = operator.as_mut() {
+                funcargs.push(FunctionArgs::SearchPath(extract_single_arg(
+                    a.tokens.clone(),
+                )));
+            }
         } else if as_string.starts_with("# [pg_test") {
-            categorized_attributes
-                .push(CategorizedAttribute::PgTest((span, parse_extern_args(&a))));
+            function = Some(CategorizedAttribute::PgTest(
+                span,
+                parse_extern_args(&a),
+                Vec::new(),
+            ));
         } else if as_string == "# [test]" {
             categorized_attributes.push(CategorizedAttribute::RustTest(span));
         } else if as_string == "# [doc = \" ```funcname\"]" {
@@ -1369,6 +1393,10 @@ fn collect_attributes(
 
     if let Some(operator) = operator {
         categorized_attributes.push(operator);
+    }
+
+    if let Some(function) = function {
+        categorized_attributes.push(function);
     }
 
     if !other_attributes.is_empty() {

@@ -178,6 +178,11 @@ pub enum ExternArgs {
     Error(String),
 }
 
+#[derive(Debug, Hash, Ord, PartialOrd, Eq, PartialEq)]
+pub enum FunctionArgs {
+    SearchPath(String),
+}
+
 #[derive(Debug)]
 pub enum CategorizedType {
     Iterator(Vec<String>),

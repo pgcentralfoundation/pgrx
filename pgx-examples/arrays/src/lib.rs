@@ -91,6 +91,7 @@ fn strip_nulls(input: Vec<Option<i32>>) -> Vec<i32> {
 pub struct SomeStruct {}
 
 #[pg_extern]
+#[search_path(@extschema@)]
 fn return_vec_of_customtype() -> Vec<SomeStruct> {
     vec![SomeStruct {}]
 }
@@ -113,6 +114,7 @@ pub mod tests {
     use crate::SomeStruct;
     use pgx::*;
     #[pg_test]
+    #[search_path(@extschema@)]
     fn test_vec_of_customtype() {
         let customvec =
             Spi::get_one::<Vec<SomeStruct>>("SELECT arrays.return_vec_of_customtype();")
