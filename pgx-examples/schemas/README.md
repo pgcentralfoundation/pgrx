@@ -23,15 +23,40 @@ function is created in that schema.  If there is no `schema = foo` attribute, th
 function is *not* schema-qualified, which indicates it'll be created in the schema
 determined by the `CREATE EXTENSION` function.
 
-Secondly, `pgx` applies a `search_path` to that function that limits that function's
-search path to the schema of the extension.  If the function is defined in a 
-`mod modname { ... }` block, then that schema is first in the search path, and the extension's
-general schema is the section.
+Secondly, `pgx` can apply `search_path` to that function that limits that function's
+search_path to whatever you specify.  This is done via the `#[search_path(...)]` attribute macro
+applied to the function with `#[pg_extern]` or `#[pg_operator]` or `#[pg_test]`.
 
-In general, this won't have an impact on your Rust code's usage of Postgres, expect through
-`Spi` where a query wants to use some object outside of this fixed `search_path`, and
-also with certain Postgres-internal object/name resolution functions that rely on the
-`search_path`.  Note that `pg_catalog` is always implicitly included in the `search_path`.
+For example:
+ 
+```rust
+#[derive(PostgresType, Serialize, Deserialize, Debug, Eq, PartialEq)]
+pub struct SomeStruct {}
 
+#[pg_extern]
+#[search_path(@extschema@)]
+fn return_vec_of_customtype() -> Vec<SomeStruct> {
+    vec![SomeStruct {}]
+}
+```
 
+`@extschema@` is likely all you'd ever want.  It's a token that Postgres itself will substitute during `CREATE EXTENSION`
+to be that of the schema in which the extension is being installed.
+
+You can, however instead use whatever search_path you'd like:
+
+```rust
+#[derive(PostgresType, Serialize, Deserialize, Debug, Eq, PartialEq)]
+pub struct SomeStruct {}
+
+#[pg_extern]
+#[search_path(schema_a, schema_b, public, $user)]
+fn return_vec_of_customtype() -> Vec<SomeStruct> {
+    vec![SomeStruct {}]
+}
+```
+
+In general this is only necessary when returning a `Vec<T: PostgresType>`.  In this situation, pgx needs to know that type's
+`oid` (from the `pg_catalog.pg_type` system catalog) and as such, the schema in which that type lives must be on that 
+function's `search_path`.
 
