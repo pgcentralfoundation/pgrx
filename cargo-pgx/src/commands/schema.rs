@@ -294,8 +294,8 @@ fn walk_items(
                     "CREATE TYPE {};",
                     qualify_name(&current_schema, &name)
                 ));
-                postgres_types.push(format!("CREATE OR REPLACE FUNCTION {qualified_name}_in(cstring) RETURNS {qualified_name} IMMUTABLE STRICT LANGUAGE C AS 'MODULE_PATHNAME', '{name}_in_wrapper';", qualified_name = qualify_name(&current_schema, &name), name = name));
-                postgres_types.push(format!("CREATE OR REPLACE FUNCTION {qualified_name}_out({qualified_name}) RETURNS cstring IMMUTABLE STRICT LANGUAGE C AS 'MODULE_PATHNAME', '{name}_out_wrapper';", qualified_name = qualify_name(&current_schema, &name), name = name));
+                postgres_types.push(format!("CREATE OR REPLACE FUNCTION {qualified_name}_in(cstring) RETURNS {qualified_name} IMMUTABLE STRICT PARALLEL SAFE LANGUAGE C AS 'MODULE_PATHNAME', '{name}_in_wrapper';", qualified_name = qualify_name(&current_schema, &name), name = name));
+                postgres_types.push(format!("CREATE OR REPLACE FUNCTION {qualified_name}_out({qualified_name}) RETURNS cstring IMMUTABLE STRICT PARALLEL SAFE LANGUAGE C AS 'MODULE_PATHNAME', '{name}_out_wrapper';", qualified_name = qualify_name(&current_schema, &name), name = name));
                 postgres_types.push(format!(
                     "CREATE TYPE {qualified_name} (
                                 INTERNALLENGTH = variable,
