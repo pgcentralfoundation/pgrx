@@ -44,18 +44,28 @@ impl FromDatum for JsonB {
         } else if datum == 0 {
             panic!("a jsonb Datum was flagged as non-null but the datum is zero")
         } else {
-            let cstr =
-                direct_function_call::<&std::ffi::CStr>(pg_sys::jsonb_out, vec![Some(datum)])
-                    .expect("failed to convert jsonb to a cstring");
+            let varlena = datum as *mut pg_sys::varlena;
+            let detoasted = pg_sys::pg_detoast_datum_packed(varlena);
+
+            let cstr = direct_function_call::<&std::ffi::CStr>(
+                pg_sys::jsonb_out,
+                vec![Some(detoasted as pg_sys::Datum)],
+            )
+            .expect("failed to convert jsonb to a cstring");
 
             let value = serde_json::from_str(
                 cstr.to_str()
-                    .expect("text version of json is not valid UTF8"),
+                    .expect("text version of jsonb is not valid UTF8"),
             )
             .expect("failed to parse JsonB value");
 
             // free the cstring returned from direct_function_call -- we don't need it anymore
             pg_sys::pfree(cstr.as_ptr() as void_mut_ptr);
+
+            // free the detoasted datum if it turned out to be a copy
+            if detoasted != varlena {
+                pg_sys::pfree(detoasted as void_mut_ptr);
+            }
 
             // return the parsed serde_json::Value
             Some(JsonB(value))

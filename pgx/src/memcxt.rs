@@ -9,6 +9,7 @@
 //! An enum-based interface (`PgMemoryContexts`) around Postgres' various `MemoryContext`s provides
 //! simple accessibility to working with MemoryContexts in a compiler-checked manner
 //!
+use crate::pg_sys::AsPgCStr;
 use crate::{guard, pg_sys, PgBox};
 use std::fmt::Debug;
 
@@ -139,6 +140,9 @@ pub enum PgMemoryContexts {
     /// in which slots are allocated.
     For(pg_sys::MemoryContext),
 
+    /// A MemoryContext owned by Rust that will be freed when when Dropped
+    Owned(OwnedMemoryContext),
+
     /// Use the MemoryContext in which the specified pointer was allocated.
     ///
     /// It's incredibly important that the specified pointer be one actually allocated by
@@ -159,7 +163,32 @@ pub enum PgMemoryContexts {
     },
 }
 
+/// A `pg_sys::MemoryContext` that is owned by `PgMemoryContexts::Owned`
+#[derive(Debug)]
+pub struct OwnedMemoryContext(pg_sys::MemoryContext);
+
+impl Drop for OwnedMemoryContext {
+    fn drop(&mut self) {
+        unsafe {
+            pg_sys::MemoryContextDelete(self.0);
+        }
+    }
+}
+
 impl PgMemoryContexts {
+    /// Create a new `PgMemoryContext::Owned`
+    pub fn new(name: &str) -> PgMemoryContexts {
+        PgMemoryContexts::Owned(OwnedMemoryContext(unsafe {
+            pg_sys::AllocSetContextCreateExtended(
+                PgMemoryContexts::CurrentMemoryContext.value(),
+                name.as_pg_cstr(),
+                pg_sys::ALLOCSET_DEFAULT_MINSIZE as usize,
+                pg_sys::ALLOCSET_DEFAULT_INITSIZE as usize,
+                pg_sys::ALLOCSET_DEFAULT_MAXSIZE as usize,
+            )
+        }))
+    }
+
     /// Retrieve the underlying Postgres `*mut MemoryContextData`
     ///
     /// This works for every type except the `::Transient` type.
@@ -175,10 +204,30 @@ impl PgMemoryContexts {
             PgMemoryContexts::TopTransactionContext => unsafe { pg_sys::TopTransactionContext },
             PgMemoryContexts::CurTransactionContext => unsafe { pg_sys::CurTransactionContext },
             PgMemoryContexts::For(mc) => *mc,
+            PgMemoryContexts::Owned(mc) => mc.0,
             PgMemoryContexts::Of(ptr) => PgMemoryContexts::get_context_for_pointer(*ptr),
             PgMemoryContexts::Transient { .. } => {
                 panic!("cannot use value() to retrieve a Transient PgMemoryContext")
             }
+        }
+    }
+
+    /// Set this MemoryContext as the `CurrentMemoryContext, returning whatever `CurrentMemoryContext` is
+    pub fn set_as_current(&self) -> PgMemoryContexts {
+        unsafe {
+            let old_context = pg_sys::CurrentMemoryContext;
+
+            pg_sys::CurrentMemoryContext = self.value();
+
+            PgMemoryContexts::For(old_context)
+        }
+    }
+
+    /// Release all space allocated within a context and delete all its descendant contexts (but not
+    /// the context itself).
+    pub fn reset(&mut self) {
+        unsafe {
+            pg_sys::MemoryContextReset(self.value());
         }
     }
 

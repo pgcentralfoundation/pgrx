@@ -329,7 +329,7 @@ fn make_function_call_info(
         ) as *mut pg_sys::FunctionCallInfoBaseData
     };
 
-    let mut fcinfo_boxed = PgBox::<pg_sys::FunctionCallInfoBaseData>::from_pg(fcid);
+    let mut fcinfo_boxed = PgBox::<pg_sys::FunctionCallInfoBaseData>::from_rust(fcid);
     let fcinfo = fcinfo_boxed.deref_mut();
 
     fcinfo.nargs = nargs as i16;
