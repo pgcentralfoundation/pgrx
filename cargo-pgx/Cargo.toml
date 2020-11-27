@@ -8,6 +8,8 @@ description = "cargo subcommand for 'pgx' to make Postgres extension development
 homepage = "https://github.com/zombodb/pgx/cargo-pgx"
 repository = "https://github.com/zombodb/pgx/cargo-pgx"
 documentation = "https://docs.rs/cargo-pgx"
+categories = ["development-tools::cargo-plugins", "command-line-utilities", "database"]
+keywords = ["database", "postgres", "postgresql", "extension"]
 readme = "README.md"
 
 [dependencies]

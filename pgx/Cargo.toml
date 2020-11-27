@@ -8,6 +8,8 @@ description = "pgx:  A Rust framework for creating Postgres extensions"
 homepage = "https://github.com/zombodb/pgx"
 repository = "https://github.com/zombodb/pgx"
 documentation = "https://docs.rs/pgx"
+categories = ["database"]
+keywords = ["database", "postgres", "postgresql", "extension"]
 readme = "../README.md"
 
 [lib]
