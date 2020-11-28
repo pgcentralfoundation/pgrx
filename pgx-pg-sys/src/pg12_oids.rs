@@ -1,5 +1,6 @@
 #[derive(Copy, Clone, Eq, PartialEq, Hash, Ord, PartialOrd, Debug)]
 pub enum PgBuiltInOids {
+    HEAP_TABLE_AM_HANDLER_OID = crate::HEAP_TABLE_AM_HANDLER_OID as isize,
     BOOLOID = crate::BOOLOID as isize,
     BYTEAOID = crate::BYTEAOID as isize,
     CHAROID = crate::CHAROID as isize,
@@ -164,6 +165,9 @@ pub enum PgBuiltInOids {
 impl PgBuiltInOids {
     pub fn from(oid: crate::Oid) -> Option<PgBuiltInOids> {
         match oid {
+            crate::HEAP_TABLE_AM_HANDLER_OID => {
+                Some(crate::PgBuiltInOids::HEAP_TABLE_AM_HANDLER_OID)
+            }
             crate::BOOLOID => Some(crate::PgBuiltInOids::BOOLOID),
             crate::BYTEAOID => Some(crate::PgBuiltInOids::BYTEAOID),
             crate::CHAROID => Some(crate::PgBuiltInOids::CHAROID),

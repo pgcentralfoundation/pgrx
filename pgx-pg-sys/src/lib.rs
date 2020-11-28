@@ -172,6 +172,7 @@ mod all_versions {
         pub fn pgx_list_nth_int(list: *mut super::List, nth: i32) -> i32;
         pub fn pgx_list_nth_oid(list: *mut super::List, nth: i32) -> super::Oid;
         pub fn pgx_list_nth_cell(list: *mut super::List, nth: i32) -> *mut super::ListCell;
+        pub fn pgx_GETSTRUCT(tuple: pg_sys::HeapTuple) -> *mut std::os::raw::c_char;
     }
 
     #[inline]
@@ -291,6 +292,15 @@ mod all_versions {
             panic!("provided HeapTupleHeader is null");
         } else {
             unsafe { pgx_HeapTupleHeaderIsHeapOnly(htup_header) }
+        }
+    }
+
+    #[inline]
+    pub fn heap_tuple_get_struct<T>(htup: super::HeapTuple) -> *mut T {
+        if htup.is_null() {
+            0 as *mut T
+        } else {
+            unsafe { pgx_GETSTRUCT(htup) as *mut T }
         }
     }
 

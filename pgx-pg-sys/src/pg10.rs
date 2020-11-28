@@ -2579,6 +2579,49 @@ pub const Natts_pg_enum: u32 = 3;
 pub const Anum_pg_enum_enumtypid: u32 = 1;
 pub const Anum_pg_enum_enumsortorder: u32 = 2;
 pub const Anum_pg_enum_enumlabel: u32 = 3;
+pub const ProcedureRelationId: u32 = 1255;
+pub const ProcedureRelation_Rowtype_Id: u32 = 81;
+pub const Natts_pg_proc: u32 = 29;
+pub const Anum_pg_proc_proname: u32 = 1;
+pub const Anum_pg_proc_pronamespace: u32 = 2;
+pub const Anum_pg_proc_proowner: u32 = 3;
+pub const Anum_pg_proc_prolang: u32 = 4;
+pub const Anum_pg_proc_procost: u32 = 5;
+pub const Anum_pg_proc_prorows: u32 = 6;
+pub const Anum_pg_proc_provariadic: u32 = 7;
+pub const Anum_pg_proc_protransform: u32 = 8;
+pub const Anum_pg_proc_proisagg: u32 = 9;
+pub const Anum_pg_proc_proiswindow: u32 = 10;
+pub const Anum_pg_proc_prosecdef: u32 = 11;
+pub const Anum_pg_proc_proleakproof: u32 = 12;
+pub const Anum_pg_proc_proisstrict: u32 = 13;
+pub const Anum_pg_proc_proretset: u32 = 14;
+pub const Anum_pg_proc_provolatile: u32 = 15;
+pub const Anum_pg_proc_proparallel: u32 = 16;
+pub const Anum_pg_proc_pronargs: u32 = 17;
+pub const Anum_pg_proc_pronargdefaults: u32 = 18;
+pub const Anum_pg_proc_prorettype: u32 = 19;
+pub const Anum_pg_proc_proargtypes: u32 = 20;
+pub const Anum_pg_proc_proallargtypes: u32 = 21;
+pub const Anum_pg_proc_proargmodes: u32 = 22;
+pub const Anum_pg_proc_proargnames: u32 = 23;
+pub const Anum_pg_proc_proargdefaults: u32 = 24;
+pub const Anum_pg_proc_protrftypes: u32 = 25;
+pub const Anum_pg_proc_prosrc: u32 = 26;
+pub const Anum_pg_proc_probin: u32 = 27;
+pub const Anum_pg_proc_proconfig: u32 = 28;
+pub const Anum_pg_proc_proacl: u32 = 29;
+pub const PROVOLATILE_IMMUTABLE: u8 = 105u8;
+pub const PROVOLATILE_STABLE: u8 = 115u8;
+pub const PROVOLATILE_VOLATILE: u8 = 118u8;
+pub const PROPARALLEL_SAFE: u8 = 115u8;
+pub const PROPARALLEL_RESTRICTED: u8 = 114u8;
+pub const PROPARALLEL_UNSAFE: u8 = 117u8;
+pub const PROARGMODE_IN: u8 = 105u8;
+pub const PROARGMODE_OUT: u8 = 111u8;
+pub const PROARGMODE_INOUT: u8 = 98u8;
+pub const PROARGMODE_VARIADIC: u8 = 118u8;
+pub const PROARGMODE_TABLE: u8 = 116u8;
 pub const TypeRelationId: u32 = 1247;
 pub const TypeRelation_Rowtype_Id: u32 = 71;
 pub const Natts_pg_type: u32 = 30;
@@ -28712,6 +28755,35 @@ extern "C" {
     );
 }
 #[repr(C)]
+pub struct FormData_pg_proc {
+    pub proname: NameData,
+    pub pronamespace: Oid,
+    pub proowner: Oid,
+    pub prolang: Oid,
+    pub procost: float4,
+    pub prorows: float4,
+    pub provariadic: Oid,
+    pub protransform: regproc,
+    pub proisagg: bool,
+    pub proiswindow: bool,
+    pub prosecdef: bool,
+    pub proleakproof: bool,
+    pub proisstrict: bool,
+    pub proretset: bool,
+    pub provolatile: ::std::os::raw::c_char,
+    pub proparallel: ::std::os::raw::c_char,
+    pub pronargs: int16,
+    pub pronargdefaults: int16,
+    pub prorettype: Oid,
+    pub proargtypes: oidvector,
+}
+impl Default for FormData_pg_proc {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+pub type Form_pg_proc = *mut FormData_pg_proc;
+#[repr(C)]
 #[derive(Copy, Clone)]
 pub struct FormData_pg_type {
     pub typname: NameData,
@@ -29384,6 +29456,22 @@ extern "C" {
 #[pg_guard]
 extern "C" {
     pub fn EventTriggerCollectAlterDefPrivs(stmt: *mut AlterDefaultPrivilegesStmt);
+}
+#[pg_guard]
+extern "C" {
+    pub fn CreateProceduralLanguage(stmt: *mut CreatePLangStmt) -> ObjectAddress;
+}
+#[pg_guard]
+extern "C" {
+    pub fn DropProceduralLanguageById(langOid: Oid);
+}
+#[pg_guard]
+extern "C" {
+    pub fn PLTemplateExists(languageName: *const ::std::os::raw::c_char) -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn get_language_oid(langname: *const ::std::os::raw::c_char, missing_ok: bool) -> Oid;
 }
 #[repr(C)]
 pub struct FormData_pg_trigger {

@@ -169,6 +169,7 @@ pub enum PgBuiltInOids {
     DATERANGEARRAYOID = crate::DATERANGEARRAYOID as isize,
     INT8RANGEARRAYOID = crate::INT8RANGEARRAYOID as isize,
     CSTRINGARRAYOID = crate::CSTRINGARRAYOID as isize,
+    HEAP_TABLE_AM_HANDLER_OID = crate::HEAP_TABLE_AM_HANDLER_OID as isize,
 }
 impl PgBuiltInOids {
     pub fn from(oid: crate::Oid) -> Option<PgBuiltInOids> {
@@ -342,6 +343,9 @@ impl PgBuiltInOids {
             crate::DATERANGEARRAYOID => Some(crate::PgBuiltInOids::DATERANGEARRAYOID),
             crate::INT8RANGEARRAYOID => Some(crate::PgBuiltInOids::INT8RANGEARRAYOID),
             crate::CSTRINGARRAYOID => Some(crate::PgBuiltInOids::CSTRINGARRAYOID),
+            crate::HEAP_TABLE_AM_HANDLER_OID => {
+                Some(crate::PgBuiltInOids::HEAP_TABLE_AM_HANDLER_OID)
+            }
             _ => None,
         }
     }

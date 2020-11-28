@@ -3,11 +3,8 @@
 
 //! Helper functions for working with Postgres `enum` types
 
+use crate::pg_sys::pgx_GETSTRUCT;
 use crate::{ereport, pg_sys, PgLogLevel, PgSqlErrorCode};
-
-extern "C" {
-    fn pgx_GETSTRUCT(tuple: pg_sys::HeapTuple) -> *mut std::os::raw::c_char;
-}
 
 pub fn lookup_enum_by_oid(enumval: pg_sys::Oid) -> (String, pg_sys::Oid, f32) {
     let tup = unsafe {
