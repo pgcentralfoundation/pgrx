@@ -320,31 +320,39 @@ impl Pgx {
     }
 
     pub fn from_config() -> Result<Self, std::io::Error> {
-        let path = Pgx::config_toml()?;
-
-        if !path.exists() {
-            // TODO:  do this automatically if an environment variable is set?
-            //        I think we want/need that ability
-            return Err(std::io::Error::new(
-                ErrorKind::NotFound,
-                format!(
-                    "{} not found.  Have you run `{}` yet?",
-                    path.display(),
-                    "cargo pgx init".bold().yellow()
-                ),
-            ));
-        }
-
-        match toml::from_str::<ConfigToml>(&std::fs::read_to_string(path)?) {
-            Ok(configs) => {
+        match std::env::var("PGX_PG_CONFIG_PATH") {
+            Ok(pg_config) => {
+                // we have an environment variable that tells us the pg_config to use
                 let mut pgx = Pgx::new();
-
-                for (_, v) in configs.configs {
-                    pgx.push(PgConfig::new(v));
-                }
+                pgx.push(PgConfig::new(pg_config.into()));
                 Ok(pgx)
             }
-            Err(e) => Err(std::io::Error::new(ErrorKind::InvalidInput, e)),
+            Err(_) => {
+                // we'll get what we need from cargo-pgx' config.toml file
+                let path = Pgx::config_toml()?;
+                if !path.exists() {
+                    return Err(std::io::Error::new(
+                        ErrorKind::NotFound,
+                        format!(
+                            "{} not found.  Have you run `{}` yet?",
+                            path.display(),
+                            "cargo pgx init".bold().yellow()
+                        ),
+                    ));
+                }
+
+                match toml::from_str::<ConfigToml>(&std::fs::read_to_string(path)?) {
+                    Ok(configs) => {
+                        let mut pgx = Pgx::new();
+
+                        for (_, v) in configs.configs {
+                            pgx.push(PgConfig::new(v));
+                        }
+                        Ok(pgx)
+                    }
+                    Err(e) => Err(std::io::Error::new(ErrorKind::InvalidInput, e)),
+                }
+            }
         }
     }
 
