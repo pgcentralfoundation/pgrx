@@ -6,7 +6,9 @@
 use crate::{pg_sys, FromDatum, IntoDatum, Json, PgMemoryContexts, PgOid};
 use enum_primitive_derive::*;
 use num_traits::FromPrimitive;
+use std::collections::HashMap;
 use std::fmt::Debug;
+use std::ops::{Index, IndexMut};
 
 #[derive(Debug, Primitive)]
 pub enum SpiOk {
@@ -50,9 +52,9 @@ pub enum SpiError {
     RelNotFound = 13,
 }
 
-pub struct Spi();
+pub struct Spi;
 
-pub struct SpiClient();
+pub struct SpiClient;
 
 #[derive(Debug)]
 pub struct SpiTupleTable {
@@ -63,9 +65,16 @@ pub struct SpiTupleTable {
     current: isize,
 }
 
+/// Represents a single `pg_sys::Datum` inside a `SpiHeapTupleData`
+pub struct SpiHeapTupleDataEntry {
+    datum: Option<pg_sys::Datum>,
+    type_oid: pg_sys::Oid,
+}
+
+/// Represents the set of `pg_sys::Datum`s in a `pg_sys::HeapTuple`
 pub struct SpiHeapTupleData {
-    data: *mut pg_sys::HeapTupleData,
     tupdesc: pg_sys::TupleDesc,
+    entries: HashMap<usize, SpiHeapTupleDataEntry>,
 }
 
 impl Spi {
@@ -216,7 +225,7 @@ impl Spi {
         // just put us un.  We'll disconnect from SPI when the closure is finished.
         // If there's a panic or elog(ERROR), we don't care about also disconnecting from
         // SPI b/c Postgres will do that for us automatically
-        match f(SpiClient()) {
+        match f(SpiClient) {
             // copy the result to the outer memory context we saved above
             Ok(result) => {
                 // we need to copy the resulting Datum into the outer memory context
@@ -411,10 +420,7 @@ impl SpiTupleTable {
                 Some(tupdesc) => unsafe {
                     let heap_tuple = std::slice::from_raw_parts((*self.table).vals, self.size)
                         [self.current as usize];
-                    Some(SpiHeapTupleData {
-                        data: heap_tuple,
-                        tupdesc,
-                    })
+                    Some(SpiHeapTupleData::new(tupdesc, heap_tuple))
                 },
                 None => panic!("TupDesc is NULL"),
             }
@@ -451,19 +457,203 @@ impl SpiTupleTable {
 }
 
 impl SpiHeapTupleData {
-    pub fn get_datum<T: FromDatum>(&self, ordinal: i32) -> Option<T> {
+    /// Create a new `SpiHeapTupleData` from its constituent parts
+    pub fn new(tupdesc: pg_sys::TupleDesc, htup: *mut pg_sys::HeapTupleData) -> Self {
+        let mut data = SpiHeapTupleData {
+            tupdesc,
+            entries: HashMap::default(),
+        };
+
         unsafe {
-            let natts = (*self.tupdesc).natts;
-
-            if ordinal < 1 || ordinal > natts {
-                None
-            } else {
+            for i in 1..=tupdesc.as_ref().unwrap().natts {
                 let mut is_null = false;
-                let datum = pg_sys::SPI_getbinval(self.data, self.tupdesc, ordinal, &mut is_null);
+                let datum = pg_sys::SPI_getbinval(htup, tupdesc, i, &mut is_null);
 
-                T::from_datum(datum, is_null, pg_sys::SPI_gettypeid(self.tupdesc, ordinal))
+                data.entries
+                    .entry(i as usize)
+                    .or_insert_with(|| SpiHeapTupleDataEntry {
+                        datum: if is_null { None } else { Some(datum) },
+                        type_oid: pg_sys::SPI_gettypeid(tupdesc, i),
+                    });
             }
         }
+
+        data
+    }
+
+    /// Get a typed Datum value from this HeapTuple by its ordinal position.  
+    ///
+    /// The ordinal position is 1-based
+    #[deprecated(since = "0.1.6", note = "Please use the `by_ordinal` function instead")]
+    pub fn get_datum<T: FromDatum>(&self, ordinal: usize) -> Option<T> {
+        match self.entries.get(&ordinal) {
+            Some(datum) => datum.value(),
+            None => None,
+        }
+    }
+
+    /// Get a typed Datum value from this HeapTuple by its ordinal position.  
+    ///
+    /// The ordinal position is 1-based.
+    ///
+    /// If the specified ordinal is out of bounds a `Err(SpiError::Noattribute)` is returned
+    pub fn by_ordinal(
+        &self,
+        ordinal: usize,
+    ) -> std::result::Result<&SpiHeapTupleDataEntry, SpiError> {
+        match self.entries.get(&ordinal) {
+            Some(datum) => Ok(datum),
+            None => Err(SpiError::Noattribute),
+        }
+    }
+
+    /// Get a typed Datum value from this HeapTuple by its field name.  
+    ///
+    /// If the specified name does not exist a `Err(SpiError::Noattribute)` is returned
+    pub fn by_name(&self, name: &str) -> std::result::Result<&SpiHeapTupleDataEntry, SpiError> {
+        use crate::pg_sys::AsPgCStr;
+        unsafe {
+            let fnumber = pg_sys::SPI_fnumber(self.tupdesc, name.as_pg_cstr());
+            if fnumber == pg_sys::SPI_ERROR_NOATTRIBUTE {
+                Err(SpiError::Noattribute)
+            } else {
+                self.by_ordinal(fnumber as usize)
+            }
+        }
+    }
+
+    /// Get a mutable typed Datum value from this HeapTuple by its ordinal position.  
+    ///
+    /// The ordinal position is 1-based.
+    ///
+    /// If the specified ordinal is out of bounds a `Err(SpiError::Noattribute)` is returned
+    pub fn by_ordinal_mut(
+        &mut self,
+        ordinal: usize,
+    ) -> std::result::Result<&mut SpiHeapTupleDataEntry, SpiError> {
+        match self.entries.get_mut(&ordinal) {
+            Some(datum) => Ok(datum),
+            None => Err(SpiError::Noattribute),
+        }
+    }
+
+    /// Get a mutable typed Datum value from this HeapTuple by its field name.  
+    ///
+    /// If the specified name does not exist a `Err(SpiError::Noattribute)` is returned
+    pub fn by_name_mut(
+        &mut self,
+        name: &str,
+    ) -> std::result::Result<&mut SpiHeapTupleDataEntry, SpiError> {
+        use crate::pg_sys::AsPgCStr;
+        unsafe {
+            let fnumber = pg_sys::SPI_fnumber(self.tupdesc, name.as_pg_cstr());
+            if fnumber == pg_sys::SPI_ERROR_NOATTRIBUTE {
+                Err(SpiError::Noattribute)
+            } else {
+                self.by_ordinal_mut(fnumber as usize)
+            }
+        }
+    }
+
+    /// Set a datum value for the specified ordinal position
+    ///
+    /// If the specified ordinal is out of bounds a `Err(SpiError::Noattribute)` is returned
+    pub fn set_by_ordinal<T: IntoDatum + FromDatum>(
+        &mut self,
+        ordinal: usize,
+        datum: T,
+    ) -> std::result::Result<(), SpiError> {
+        unsafe {
+            if ordinal < 1 || ordinal > self.tupdesc.as_ref().unwrap().natts as usize {
+                Err(SpiError::Noattribute)
+            } else {
+                self.entries.insert(
+                    ordinal,
+                    SpiHeapTupleDataEntry {
+                        datum: datum.into_datum(),
+                        type_oid: T::type_oid(),
+                    },
+                );
+                Ok(())
+            }
+        }
+    }
+
+    /// Set a datum value for the specified field name
+    ///
+    /// If the specified name does not exist a `Err(SpiError::Noattribute)` is returned
+    pub fn set_by_name<T: IntoDatum + FromDatum>(
+        &mut self,
+        name: &str,
+        datum: T,
+    ) -> std::result::Result<(), SpiError> {
+        use crate::pg_sys::AsPgCStr;
+        unsafe {
+            let fnumber = pg_sys::SPI_fnumber(self.tupdesc, name.as_pg_cstr());
+            if fnumber == pg_sys::SPI_ERROR_NOATTRIBUTE {
+                Err(SpiError::Noattribute)
+            } else {
+                self.set_by_ordinal(fnumber as usize, datum)
+            }
+        }
+    }
+}
+
+impl<Datum: IntoDatum + FromDatum> From<Datum> for SpiHeapTupleDataEntry {
+    fn from(datum: Datum) -> Self {
+        SpiHeapTupleDataEntry {
+            datum: datum.into_datum(),
+            type_oid: Datum::type_oid(),
+        }
+    }
+}
+
+impl SpiHeapTupleDataEntry {
+    pub fn value<T: FromDatum>(&self) -> Option<T> {
+        match self.datum.as_ref() {
+            Some(datum) => unsafe { T::from_datum(*datum, false, self.type_oid) },
+            None => None,
+        }
+    }
+}
+
+/// Provide ordinal indexing into a `SpiHeapTupleData`.
+///
+/// If the index is out of bounds, it will panic
+impl Index<usize> for SpiHeapTupleData {
+    type Output = SpiHeapTupleDataEntry;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        self.by_ordinal(index).expect("invalid ordinal value")
+    }
+}
+
+/// Provide named indexing into a `SpiHeapTupleData`.  
+///
+/// If the field name doesn't exist, it will panic
+impl Index<&str> for SpiHeapTupleData {
+    type Output = SpiHeapTupleDataEntry;
+
+    fn index(&self, index: &str) -> &Self::Output {
+        self.by_name(index).expect("invalid field name")
+    }
+}
+
+/// Provide mutable ordinal indexing into a `SpiHeapTupleData`.  
+///
+/// If the index is out of bounds, it will panic
+impl IndexMut<usize> for SpiHeapTupleData {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        self.by_ordinal_mut(index).expect("invalid ordinal value")
+    }
+}
+
+/// Provide mutable named indexing into a `SpiHeapTupleData`.  
+///
+/// If the field name doesn't exist, it will panic
+impl IndexMut<&str> for SpiHeapTupleData {
+    fn index_mut(&mut self, index: &str) -> &mut Self::Output {
+        self.by_name_mut(index).expect("invalid field name")
     }
 }
 

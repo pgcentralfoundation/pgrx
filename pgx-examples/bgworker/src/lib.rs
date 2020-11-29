@@ -38,7 +38,7 @@ pub extern "C" fn background_worker_main(arg: pg_sys::Datum) {
     // we'll never be able to exit via an external notification
     BackgroundWorker::attach_signal_handlers(SignalWakeFlags::SIGHUP | SignalWakeFlags::SIGTERM);
 
-    // we want to be able to use SPI against the specified database (postgres), as the superuser which 
+    // we want to be able to use SPI against the specified database (postgres), as the superuser which
     // did the initdb. You can specify a specific user with Some("my_user")
     BackgroundWorker::connect_worker_to_spi(Some("postgres"), None);
 
@@ -63,9 +63,9 @@ pub extern "C" fn background_worker_main(arg: pg_sys::Datum) {
                     None,
                 );
                 tuple_table.for_each(|tuple| {
-                    let a = tuple.get_datum::<String>(1).unwrap();
-                    let b = tuple.get_datum::<i32>(2).unwrap();
-                    let c = tuple.get_datum::<String>(3).unwrap();
+                    let a = tuple.by_ordinal::<String>(1).unwrap();
+                    let b = tuple.by_ordinal::<i32>(2).unwrap();
+                    let c = tuple.by_ordinal::<String>(3).unwrap();
                     log!("from bgworker: ({}, {}, {})", a, b, c);
                 });
             });
