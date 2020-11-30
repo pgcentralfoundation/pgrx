@@ -63,9 +63,9 @@ pub extern "C" fn background_worker_main(arg: pg_sys::Datum) {
                     None,
                 );
                 tuple_table.for_each(|tuple| {
-                    let a = tuple.by_ordinal::<String>(1).unwrap();
-                    let b = tuple.by_ordinal::<i32>(2).unwrap();
-                    let c = tuple.by_ordinal::<String>(3).unwrap();
+                    let a = tuple.by_ordinal(1).unwrap().value::<String>().unwrap();
+                    let b = tuple.by_ordinal(2).unwrap().value::<i32>().unwrap();
+                    let c = tuple.by_ordinal(3).unwrap().value::<String>().unwrap();
                     log!("from bgworker: ({}, {}, {})", a, b, c);
                 });
             });
