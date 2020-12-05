@@ -15,11 +15,11 @@ pg13 = ["pgx/pg13", "pgx-tests/pg13" ]
 pg_test = []
 
 [dependencies]
-pgx = "0.1.5"
-pgx-macros = "0.1.5"
+pgx = "0.1.6"
+pgx-macros = "0.1.6"
 
 [dev-dependencies]
-pgx-tests = "0.1.5"
+pgx-tests = "0.1.6"
 
 [profile.dev]
 panic = "unwind"
