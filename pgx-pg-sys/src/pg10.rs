@@ -28822,6 +28822,35 @@ impl Default for FormData_pg_type {
 pub type Form_pg_type = *mut FormData_pg_type;
 #[pg_guard]
 extern "C" {
+    pub fn CommentObject(stmt: *mut CommentStmt) -> ObjectAddress;
+}
+#[pg_guard]
+extern "C" {
+    pub fn DeleteComments(oid: Oid, classoid: Oid, subid: int32);
+}
+#[pg_guard]
+extern "C" {
+    pub fn CreateComments(
+        oid: Oid,
+        classoid: Oid,
+        subid: int32,
+        comment: *mut ::std::os::raw::c_char,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn DeleteSharedComments(oid: Oid, classoid: Oid);
+}
+#[pg_guard]
+extern "C" {
+    pub fn CreateSharedComments(oid: Oid, classoid: Oid, comment: *mut ::std::os::raw::c_char);
+}
+#[pg_guard]
+extern "C" {
+    pub fn GetComment(oid: Oid, classoid: Oid, subid: int32) -> *mut ::std::os::raw::c_char;
+}
+#[pg_guard]
+extern "C" {
     pub fn createdb(pstate: *mut ParseState, stmt: *const CreatedbStmt) -> Oid;
 }
 #[pg_guard]

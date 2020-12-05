@@ -32620,6 +32620,35 @@ extern "C" {
         typeNamespace: Oid,
     ) -> bool;
 }
+#[pg_guard]
+extern "C" {
+    pub fn CommentObject(stmt: *mut CommentStmt) -> ObjectAddress;
+}
+#[pg_guard]
+extern "C" {
+    pub fn DeleteComments(oid: Oid, classoid: Oid, subid: int32);
+}
+#[pg_guard]
+extern "C" {
+    pub fn CreateComments(
+        oid: Oid,
+        classoid: Oid,
+        subid: int32,
+        comment: *const ::std::os::raw::c_char,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn DeleteSharedComments(oid: Oid, classoid: Oid);
+}
+#[pg_guard]
+extern "C" {
+    pub fn CreateSharedComments(oid: Oid, classoid: Oid, comment: *const ::std::os::raw::c_char);
+}
+#[pg_guard]
+extern "C" {
+    pub fn GetComment(oid: Oid, classoid: Oid, subid: int32) -> *mut ::std::os::raw::c_char;
+}
 pub const ParseExprKind_EXPR_KIND_NONE: ParseExprKind = 0;
 pub const ParseExprKind_EXPR_KIND_OTHER: ParseExprKind = 1;
 pub const ParseExprKind_EXPR_KIND_JOIN_ON: ParseExprKind = 2;

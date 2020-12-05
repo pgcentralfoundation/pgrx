@@ -24,6 +24,7 @@
 #include "catalog/pg_enum.h"
 #include "catalog/pg_proc.h"
 #include "catalog/pg_type.h"
+#include "commands/comment.h"
 #include "commands/dbcommands.h"
 #include "commands/event_trigger.h"
 #include "commands/proclang.h"
