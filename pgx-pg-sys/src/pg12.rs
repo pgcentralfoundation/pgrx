@@ -39306,6 +39306,46 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
+    pub fn QueryRewrite(parsetree: *mut Query) -> *mut List;
+}
+#[pg_guard]
+extern "C" {
+    pub fn AcquireRewriteLocks(parsetree: *mut Query, forExecute: bool, forUpdatePushedDown: bool);
+}
+#[pg_guard]
+extern "C" {
+    pub fn build_column_default(rel: Relation, attrno: ::std::os::raw::c_int) -> *mut Node;
+}
+#[pg_guard]
+extern "C" {
+    pub fn rewriteTargetListUD(
+        parsetree: *mut Query,
+        target_rte: *mut RangeTblEntry,
+        target_relation: Relation,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn get_view_query(view: Relation) -> *mut Query;
+}
+#[pg_guard]
+extern "C" {
+    pub fn view_query_is_auto_updatable(
+        viewquery: *mut Query,
+        check_cols: bool,
+    ) -> *const ::std::os::raw::c_char;
+}
+#[pg_guard]
+extern "C" {
+    pub fn relation_is_updatable(
+        reloid: Oid,
+        outer_reloids: *mut List,
+        include_triggers: bool,
+        include_cols: *mut Bitmapset,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
     pub fn standby_redo(record: *mut XLogReaderState);
 }
 #[pg_guard]

@@ -151,6 +151,7 @@ impl PgRelation {
 
     /// RelationGetRelid
     ///          Returns the OID of the relation
+    #[inline]
     pub fn oid(&self) -> pg_sys::Oid {
         let rel = &self.boxed;
         rel.rd_id
