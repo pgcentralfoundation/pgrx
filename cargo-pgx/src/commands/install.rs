@@ -194,7 +194,11 @@ fn find_library_file(extname: &str, is_release: bool) -> PathBuf {
         }
     }
 
-    exit_with_error!("library file not found in: `{}`", target_dir.display())
+    if extname.contains('-') {
+        exit_with_error!("library file not found in: `{}`.  It looks like your extension/crate name contains a dash (`-`).  The allowed set of characters is `{}`. Try renaming things, including your `{}.control` file", target_dir.display(), "[a-z0-9_]".green(), extname)
+    } else {
+        exit_with_error!("library file not found in: `{}`", target_dir.display())
+    }
 }
 
 fn get_version() -> String {
