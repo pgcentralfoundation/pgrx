@@ -214,6 +214,13 @@ fn find_rs_files(path: &PathBuf, mut files: Vec<DirEntry>) -> Vec<DirEntry> {
 
 fn delete_generated_sql() {
     let path = PathBuf::from_str("./sql").unwrap();
+    if !path.exists() {
+        exit_with_error!(
+            "The path `{}` does not exist.  Try running `{}` to fix this.",
+            path.display().to_string().yellow(),
+            "cargo pgx schema".green()
+        )
+    }
     for f in std::fs::read_dir(&path).unwrap() {
         if let Ok(f) = f {
             let filename = f.file_name().into_string().unwrap();
