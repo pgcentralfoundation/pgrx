@@ -32,7 +32,7 @@ num-traits = "0.2.14"
 seahash = "4.0.1"
 pgx-macros = { path = "../pgx-macros/", version= "^0.1.1"}
 pgx-pg-sys = { path = "../pgx-pg-sys", version= "^0.1.1"}
-serde = { version = "1.0.117", features = [ "derive" ] }
+serde = { version = "1.0.118", features = [ "derive" ] }
 serde_cbor = "0.11.1"
 serde_json = "1.0.60"
 time = "0.2.23"
