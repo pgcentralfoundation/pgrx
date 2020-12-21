@@ -2765,6 +2765,10 @@ pub const TABLE_INSERT_FROZEN: u32 = 4;
 pub const TABLE_INSERT_NO_LOGICAL: u32 = 8;
 pub const TUPLE_LOCK_FLAG_LOCK_UPDATE_IN_PROGRESS: u32 = 1;
 pub const TUPLE_LOCK_FLAG_FIND_LAST_VERSION: u32 = 2;
+pub const HEAP_INSERT_SKIP_FSM: u32 = 2;
+pub const HEAP_INSERT_FROZEN: u32 = 4;
+pub const HEAP_INSERT_NO_LOGICAL: u32 = 8;
+pub const HEAP_INSERT_SPECULATIVE: u32 = 16;
 pub const SHAREDINVALCATALOG_ID: i32 = -1;
 pub const SHAREDINVALRELCACHE_ID: i32 = -2;
 pub const SHAREDINVALSMGR_ID: i32 = -3;
@@ -3127,6 +3131,11 @@ pub const PVC_INCLUDE_WINDOWFUNCS: u32 = 4;
 pub const PVC_RECURSE_WINDOWFUNCS: u32 = 8;
 pub const PVC_INCLUDE_PLACEHOLDERS: u32 = 16;
 pub const PVC_RECURSE_PLACEHOLDERS: u32 = 32;
+pub const OLD_SNAPSHOT_PADDING_ENTRIES: u32 = 10;
+pub const MAX_IO_CONCURRENCY: u32 = 1000;
+pub const BUFFER_LOCK_UNLOCK: u32 = 0;
+pub const BUFFER_LOCK_SHARE: u32 = 1;
+pub const BUFFER_LOCK_EXCLUSIVE: u32 = 2;
 pub const XLOG_STANDBY_LOCK: u32 = 0;
 pub const XLOG_RUNNING_XACTS: u32 = 16;
 pub const XLOG_INVALIDATIONS: u32 = 32;
@@ -3192,7 +3201,6 @@ pub const DEFAULT_MATCHING_SEL: f64 = 0.01;
 pub const DEFAULT_NUM_DISTINCT: u32 = 200;
 pub const DEFAULT_UNK_SEL: f64 = 0.005;
 pub const DEFAULT_NOT_UNK_SEL: f64 = 0.995;
-pub const OLD_SNAPSHOT_PADDING_ENTRIES: u32 = 10;
 pub const TYPECACHE_EQ_OPR: u32 = 1;
 pub const TYPECACHE_LT_OPR: u32 = 2;
 pub const TYPECACHE_GT_OPR: u32 = 4;
@@ -27510,405 +27518,6 @@ extern "C" {
 extern "C" {
     pub fn relation_close(relation: Relation, lockmode: LOCKMODE);
 }
-pub const relopt_type_RELOPT_TYPE_BOOL: relopt_type = 0;
-pub const relopt_type_RELOPT_TYPE_INT: relopt_type = 1;
-pub const relopt_type_RELOPT_TYPE_REAL: relopt_type = 2;
-pub const relopt_type_RELOPT_TYPE_ENUM: relopt_type = 3;
-pub const relopt_type_RELOPT_TYPE_STRING: relopt_type = 4;
-pub type relopt_type = ::std::os::raw::c_uint;
-pub const relopt_kind_RELOPT_KIND_LOCAL: relopt_kind = 0;
-pub const relopt_kind_RELOPT_KIND_HEAP: relopt_kind = 1;
-pub const relopt_kind_RELOPT_KIND_TOAST: relopt_kind = 2;
-pub const relopt_kind_RELOPT_KIND_BTREE: relopt_kind = 4;
-pub const relopt_kind_RELOPT_KIND_HASH: relopt_kind = 8;
-pub const relopt_kind_RELOPT_KIND_GIN: relopt_kind = 16;
-pub const relopt_kind_RELOPT_KIND_GIST: relopt_kind = 32;
-pub const relopt_kind_RELOPT_KIND_ATTRIBUTE: relopt_kind = 64;
-pub const relopt_kind_RELOPT_KIND_TABLESPACE: relopt_kind = 128;
-pub const relopt_kind_RELOPT_KIND_SPGIST: relopt_kind = 256;
-pub const relopt_kind_RELOPT_KIND_VIEW: relopt_kind = 512;
-pub const relopt_kind_RELOPT_KIND_BRIN: relopt_kind = 1024;
-pub const relopt_kind_RELOPT_KIND_PARTITIONED: relopt_kind = 2048;
-pub const relopt_kind_RELOPT_KIND_LAST_DEFAULT: relopt_kind = 2048;
-pub const relopt_kind_RELOPT_KIND_MAX: relopt_kind = 1073741824;
-pub type relopt_kind = ::std::os::raw::c_uint;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct relopt_gen {
-    pub name: *const ::std::os::raw::c_char,
-    pub desc: *const ::std::os::raw::c_char,
-    pub kinds: bits32,
-    pub lockmode: LOCKMODE,
-    pub namelen: ::std::os::raw::c_int,
-    pub type_: relopt_type,
-}
-impl Default for relopt_gen {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub struct relopt_value {
-    pub gen: *mut relopt_gen,
-    pub isset: bool,
-    pub values: relopt_value__bindgen_ty_1,
-}
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub union relopt_value__bindgen_ty_1 {
-    pub bool_val: bool,
-    pub int_val: ::std::os::raw::c_int,
-    pub real_val: f64,
-    pub enum_val: ::std::os::raw::c_int,
-    pub string_val: *mut ::std::os::raw::c_char,
-    _bindgen_union_align: u64,
-}
-impl Default for relopt_value__bindgen_ty_1 {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-impl Default for relopt_value {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct relopt_bool {
-    pub gen: relopt_gen,
-    pub default_val: bool,
-}
-impl Default for relopt_bool {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct relopt_int {
-    pub gen: relopt_gen,
-    pub default_val: ::std::os::raw::c_int,
-    pub min: ::std::os::raw::c_int,
-    pub max: ::std::os::raw::c_int,
-}
-impl Default for relopt_int {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct relopt_real {
-    pub gen: relopt_gen,
-    pub default_val: f64,
-    pub min: f64,
-    pub max: f64,
-}
-impl Default for relopt_real {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct relopt_enum_elt_def {
-    pub string_val: *const ::std::os::raw::c_char,
-    pub symbol_val: ::std::os::raw::c_int,
-}
-impl Default for relopt_enum_elt_def {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct relopt_enum {
-    pub gen: relopt_gen,
-    pub members: *mut relopt_enum_elt_def,
-    pub default_val: ::std::os::raw::c_int,
-    pub detailmsg: *const ::std::os::raw::c_char,
-}
-impl Default for relopt_enum {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-pub type validate_string_relopt =
-    ::std::option::Option<unsafe extern "C" fn(value: *const ::std::os::raw::c_char)>;
-pub type fill_string_relopt = ::std::option::Option<
-    unsafe extern "C" fn(
-        value: *const ::std::os::raw::c_char,
-        ptr: *mut ::std::os::raw::c_void,
-    ) -> Size,
->;
-pub type relopts_validator = ::std::option::Option<
-    unsafe extern "C" fn(
-        parsed_options: *mut ::std::os::raw::c_void,
-        vals: *mut relopt_value,
-        nvals: ::std::os::raw::c_int,
-    ),
->;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct relopt_string {
-    pub gen: relopt_gen,
-    pub default_len: ::std::os::raw::c_int,
-    pub default_isnull: bool,
-    pub validate_cb: validate_string_relopt,
-    pub fill_cb: fill_string_relopt,
-    pub default_val: *mut ::std::os::raw::c_char,
-}
-impl Default for relopt_string {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct relopt_parse_elt {
-    pub optname: *const ::std::os::raw::c_char,
-    pub opttype: relopt_type,
-    pub offset: ::std::os::raw::c_int,
-}
-impl Default for relopt_parse_elt {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct local_relopt {
-    pub option: *mut relopt_gen,
-    pub offset: ::std::os::raw::c_int,
-}
-impl Default for local_relopt {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct local_relopts {
-    pub options: *mut List,
-    pub validators: *mut List,
-    pub relopt_struct_size: Size,
-}
-impl Default for local_relopts {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[pg_guard]
-extern "C" {
-    pub fn add_reloption_kind() -> relopt_kind;
-}
-#[pg_guard]
-extern "C" {
-    pub fn add_bool_reloption(
-        kinds: bits32,
-        name: *const ::std::os::raw::c_char,
-        desc: *const ::std::os::raw::c_char,
-        default_val: bool,
-        lockmode: LOCKMODE,
-    );
-}
-#[pg_guard]
-extern "C" {
-    pub fn add_int_reloption(
-        kinds: bits32,
-        name: *const ::std::os::raw::c_char,
-        desc: *const ::std::os::raw::c_char,
-        default_val: ::std::os::raw::c_int,
-        min_val: ::std::os::raw::c_int,
-        max_val: ::std::os::raw::c_int,
-        lockmode: LOCKMODE,
-    );
-}
-#[pg_guard]
-extern "C" {
-    pub fn add_real_reloption(
-        kinds: bits32,
-        name: *const ::std::os::raw::c_char,
-        desc: *const ::std::os::raw::c_char,
-        default_val: f64,
-        min_val: f64,
-        max_val: f64,
-        lockmode: LOCKMODE,
-    );
-}
-#[pg_guard]
-extern "C" {
-    pub fn add_enum_reloption(
-        kinds: bits32,
-        name: *const ::std::os::raw::c_char,
-        desc: *const ::std::os::raw::c_char,
-        members: *mut relopt_enum_elt_def,
-        default_val: ::std::os::raw::c_int,
-        detailmsg: *const ::std::os::raw::c_char,
-        lockmode: LOCKMODE,
-    );
-}
-#[pg_guard]
-extern "C" {
-    pub fn add_string_reloption(
-        kinds: bits32,
-        name: *const ::std::os::raw::c_char,
-        desc: *const ::std::os::raw::c_char,
-        default_val: *const ::std::os::raw::c_char,
-        validator: validate_string_relopt,
-        lockmode: LOCKMODE,
-    );
-}
-#[pg_guard]
-extern "C" {
-    pub fn init_local_reloptions(opts: *mut local_relopts, relopt_struct_size: Size);
-}
-#[pg_guard]
-extern "C" {
-    pub fn register_reloptions_validator(opts: *mut local_relopts, validator: relopts_validator);
-}
-#[pg_guard]
-extern "C" {
-    pub fn add_local_bool_reloption(
-        opts: *mut local_relopts,
-        name: *const ::std::os::raw::c_char,
-        desc: *const ::std::os::raw::c_char,
-        default_val: bool,
-        offset: ::std::os::raw::c_int,
-    );
-}
-#[pg_guard]
-extern "C" {
-    pub fn add_local_int_reloption(
-        opts: *mut local_relopts,
-        name: *const ::std::os::raw::c_char,
-        desc: *const ::std::os::raw::c_char,
-        default_val: ::std::os::raw::c_int,
-        min_val: ::std::os::raw::c_int,
-        max_val: ::std::os::raw::c_int,
-        offset: ::std::os::raw::c_int,
-    );
-}
-#[pg_guard]
-extern "C" {
-    pub fn add_local_real_reloption(
-        opts: *mut local_relopts,
-        name: *const ::std::os::raw::c_char,
-        desc: *const ::std::os::raw::c_char,
-        default_val: f64,
-        min_val: f64,
-        max_val: f64,
-        offset: ::std::os::raw::c_int,
-    );
-}
-#[pg_guard]
-extern "C" {
-    pub fn add_local_enum_reloption(
-        relopts: *mut local_relopts,
-        name: *const ::std::os::raw::c_char,
-        desc: *const ::std::os::raw::c_char,
-        members: *mut relopt_enum_elt_def,
-        default_val: ::std::os::raw::c_int,
-        detailmsg: *const ::std::os::raw::c_char,
-        offset: ::std::os::raw::c_int,
-    );
-}
-#[pg_guard]
-extern "C" {
-    pub fn add_local_string_reloption(
-        opts: *mut local_relopts,
-        name: *const ::std::os::raw::c_char,
-        desc: *const ::std::os::raw::c_char,
-        default_val: *const ::std::os::raw::c_char,
-        validator: validate_string_relopt,
-        filler: fill_string_relopt,
-        offset: ::std::os::raw::c_int,
-    );
-}
-#[pg_guard]
-extern "C" {
-    pub fn transformRelOptions(
-        oldOptions: Datum,
-        defList: *mut List,
-        namspace: *const ::std::os::raw::c_char,
-        validnsps: *mut *mut ::std::os::raw::c_char,
-        acceptOidsOff: bool,
-        isReset: bool,
-    ) -> Datum;
-}
-#[pg_guard]
-extern "C" {
-    pub fn untransformRelOptions(options: Datum) -> *mut List;
-}
-#[pg_guard]
-extern "C" {
-    pub fn extractRelOptions(
-        tuple: HeapTuple,
-        tupdesc: TupleDesc,
-        amoptions: amoptions_function,
-    ) -> *mut bytea;
-}
-#[pg_guard]
-extern "C" {
-    pub fn build_reloptions(
-        reloptions: Datum,
-        validate: bool,
-        kind: relopt_kind,
-        relopt_struct_size: Size,
-        relopt_elems: *const relopt_parse_elt,
-        num_relopt_elems: ::std::os::raw::c_int,
-    ) -> *mut ::std::os::raw::c_void;
-}
-#[pg_guard]
-extern "C" {
-    pub fn build_local_reloptions(
-        relopts: *mut local_relopts,
-        options: Datum,
-        validate: bool,
-    ) -> *mut ::std::os::raw::c_void;
-}
-#[pg_guard]
-extern "C" {
-    pub fn default_reloptions(reloptions: Datum, validate: bool, kind: relopt_kind) -> *mut bytea;
-}
-#[pg_guard]
-extern "C" {
-    pub fn heap_reloptions(
-        relkind: ::std::os::raw::c_char,
-        reloptions: Datum,
-        validate: bool,
-    ) -> *mut bytea;
-}
-#[pg_guard]
-extern "C" {
-    pub fn view_reloptions(reloptions: Datum, validate: bool) -> *mut bytea;
-}
-#[pg_guard]
-extern "C" {
-    pub fn partitioned_table_reloptions(reloptions: Datum, validate: bool) -> *mut bytea;
-}
-#[pg_guard]
-extern "C" {
-    pub fn index_reloptions(
-        amoptions: amoptions_function,
-        reloptions: Datum,
-        validate: bool,
-    ) -> *mut bytea;
-}
-#[pg_guard]
-extern "C" {
-    pub fn attribute_reloptions(reloptions: Datum, validate: bool) -> *mut bytea;
-}
-#[pg_guard]
-extern "C" {
-    pub fn tablespace_reloptions(reloptions: Datum, validate: bool) -> *mut bytea;
-}
-#[pg_guard]
-extern "C" {
-    pub fn AlterTableGetRelOptionsLockLevel(defList: *mut List) -> LOCKMODE;
-}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct TableScanDescData {
@@ -28010,6 +27619,26 @@ impl Default for SysScanDescData {
     fn default() -> Self {
         unsafe { ::std::mem::zeroed() }
     }
+}
+#[pg_guard]
+extern "C" {
+    pub fn table_open(relationId: Oid, lockmode: LOCKMODE) -> Relation;
+}
+#[pg_guard]
+extern "C" {
+    pub fn table_openrv(relation: *const RangeVar, lockmode: LOCKMODE) -> Relation;
+}
+#[pg_guard]
+extern "C" {
+    pub fn table_openrv_extended(
+        relation: *const RangeVar,
+        lockmode: LOCKMODE,
+        missing_ok: bool,
+    ) -> Relation;
+}
+#[pg_guard]
+extern "C" {
+    pub fn table_close(relation: Relation, lockmode: LOCKMODE);
 }
 pub type EOM_get_flat_size_method =
     ::std::option::Option<unsafe extern "C" fn(eohptr: *mut ExpandedObjectHeader) -> Size>;
@@ -30772,6 +30401,817 @@ extern "C" {
         extra: *mut *mut ::std::os::raw::c_void,
         source: GucSource,
     ) -> bool;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct shm_toc {
+    _unused: [u8; 0],
+}
+#[pg_guard]
+extern "C" {
+    pub fn shm_toc_create(
+        magic: uint64,
+        address: *mut ::std::os::raw::c_void,
+        nbytes: Size,
+    ) -> *mut shm_toc;
+}
+#[pg_guard]
+extern "C" {
+    pub fn shm_toc_attach(magic: uint64, address: *mut ::std::os::raw::c_void) -> *mut shm_toc;
+}
+#[pg_guard]
+extern "C" {
+    pub fn shm_toc_allocate(toc: *mut shm_toc, nbytes: Size) -> *mut ::std::os::raw::c_void;
+}
+#[pg_guard]
+extern "C" {
+    pub fn shm_toc_freespace(toc: *mut shm_toc) -> Size;
+}
+#[pg_guard]
+extern "C" {
+    pub fn shm_toc_insert(toc: *mut shm_toc, key: uint64, address: *mut ::std::os::raw::c_void);
+}
+#[pg_guard]
+extern "C" {
+    pub fn shm_toc_lookup(
+        toc: *mut shm_toc,
+        key: uint64,
+        noError: bool,
+    ) -> *mut ::std::os::raw::c_void;
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct shm_toc_estimator {
+    pub space_for_chunks: Size,
+    pub number_of_keys: Size,
+}
+#[pg_guard]
+extern "C" {
+    pub fn shm_toc_estimate(e: *mut shm_toc_estimator) -> Size;
+}
+pub type BulkInsertState = *mut BulkInsertStateData;
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct HeapScanDescData {
+    pub rs_base: TableScanDescData,
+    pub rs_nblocks: BlockNumber,
+    pub rs_startblock: BlockNumber,
+    pub rs_numblocks: BlockNumber,
+    pub rs_inited: bool,
+    pub rs_cblock: BlockNumber,
+    pub rs_cbuf: Buffer,
+    pub rs_strategy: BufferAccessStrategy,
+    pub rs_ctup: HeapTupleData,
+    pub rs_cindex: ::std::os::raw::c_int,
+    pub rs_ntuples: ::std::os::raw::c_int,
+    pub rs_vistuples: [OffsetNumber; 291usize],
+}
+impl Default for HeapScanDescData {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+pub type HeapScanDesc = *mut HeapScanDescData;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct IndexFetchHeapData {
+    pub xs_base: IndexFetchTableData,
+    pub xs_cbuf: Buffer,
+}
+impl Default for IndexFetchHeapData {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+pub const HTSV_Result_HEAPTUPLE_DEAD: HTSV_Result = 0;
+pub const HTSV_Result_HEAPTUPLE_LIVE: HTSV_Result = 1;
+pub const HTSV_Result_HEAPTUPLE_RECENTLY_DEAD: HTSV_Result = 2;
+pub const HTSV_Result_HEAPTUPLE_INSERT_IN_PROGRESS: HTSV_Result = 3;
+pub const HTSV_Result_HEAPTUPLE_DELETE_IN_PROGRESS: HTSV_Result = 4;
+pub type HTSV_Result = ::std::os::raw::c_uint;
+#[pg_guard]
+extern "C" {
+    pub fn heap_beginscan(
+        relation: Relation,
+        snapshot: Snapshot,
+        nkeys: ::std::os::raw::c_int,
+        key: ScanKey,
+        parallel_scan: ParallelTableScanDesc,
+        flags: uint32,
+    ) -> TableScanDesc;
+}
+#[pg_guard]
+extern "C" {
+    pub fn heap_setscanlimits(scan: TableScanDesc, startBlk: BlockNumber, numBlks: BlockNumber);
+}
+#[pg_guard]
+extern "C" {
+    pub fn heapgetpage(scan: TableScanDesc, page: BlockNumber);
+}
+#[pg_guard]
+extern "C" {
+    pub fn heap_rescan(
+        scan: TableScanDesc,
+        key: ScanKey,
+        set_params: bool,
+        allow_strat: bool,
+        allow_sync: bool,
+        allow_pagemode: bool,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn heap_endscan(scan: TableScanDesc);
+}
+#[pg_guard]
+extern "C" {
+    pub fn heap_getnext(scan: TableScanDesc, direction: ScanDirection) -> HeapTuple;
+}
+#[pg_guard]
+extern "C" {
+    pub fn heap_getnextslot(
+        sscan: TableScanDesc,
+        direction: ScanDirection,
+        slot: *mut TupleTableSlot,
+    ) -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn heap_fetch(
+        relation: Relation,
+        snapshot: Snapshot,
+        tuple: HeapTuple,
+        userbuf: *mut Buffer,
+    ) -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn heap_hot_search_buffer(
+        tid: ItemPointer,
+        relation: Relation,
+        buffer: Buffer,
+        snapshot: Snapshot,
+        heapTuple: HeapTuple,
+        all_dead: *mut bool,
+        first_call: bool,
+    ) -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn heap_get_latest_tid(scan: TableScanDesc, tid: ItemPointer);
+}
+#[pg_guard]
+extern "C" {
+    pub fn setLastTid(tid: ItemPointer);
+}
+#[pg_guard]
+extern "C" {
+    pub fn GetBulkInsertState() -> BulkInsertState;
+}
+#[pg_guard]
+extern "C" {
+    pub fn FreeBulkInsertState(arg1: BulkInsertState);
+}
+#[pg_guard]
+extern "C" {
+    pub fn ReleaseBulkInsertStatePin(bistate: BulkInsertState);
+}
+#[pg_guard]
+extern "C" {
+    pub fn heap_insert(
+        relation: Relation,
+        tup: HeapTuple,
+        cid: CommandId,
+        options: ::std::os::raw::c_int,
+        bistate: BulkInsertState,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn heap_multi_insert(
+        relation: Relation,
+        slots: *mut *mut TupleTableSlot,
+        ntuples: ::std::os::raw::c_int,
+        cid: CommandId,
+        options: ::std::os::raw::c_int,
+        bistate: BulkInsertState,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn heap_delete(
+        relation: Relation,
+        tid: ItemPointer,
+        cid: CommandId,
+        crosscheck: Snapshot,
+        wait: bool,
+        tmfd: *mut TM_FailureData,
+        changingPart: bool,
+    ) -> TM_Result;
+}
+#[pg_guard]
+extern "C" {
+    pub fn heap_finish_speculative(relation: Relation, tid: ItemPointer);
+}
+#[pg_guard]
+extern "C" {
+    pub fn heap_abort_speculative(relation: Relation, tid: ItemPointer);
+}
+#[pg_guard]
+extern "C" {
+    pub fn heap_update(
+        relation: Relation,
+        otid: ItemPointer,
+        newtup: HeapTuple,
+        cid: CommandId,
+        crosscheck: Snapshot,
+        wait: bool,
+        tmfd: *mut TM_FailureData,
+        lockmode: *mut LockTupleMode,
+    ) -> TM_Result;
+}
+#[pg_guard]
+extern "C" {
+    pub fn heap_lock_tuple(
+        relation: Relation,
+        tuple: HeapTuple,
+        cid: CommandId,
+        mode: LockTupleMode,
+        wait_policy: LockWaitPolicy,
+        follow_update: bool,
+        buffer: *mut Buffer,
+        tmfd: *mut TM_FailureData,
+    ) -> TM_Result;
+}
+#[pg_guard]
+extern "C" {
+    pub fn heap_inplace_update(relation: Relation, tuple: HeapTuple);
+}
+#[pg_guard]
+extern "C" {
+    pub fn heap_freeze_tuple(
+        tuple: HeapTupleHeader,
+        relfrozenxid: TransactionId,
+        relminmxid: TransactionId,
+        cutoff_xid: TransactionId,
+        cutoff_multi: TransactionId,
+    ) -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn heap_tuple_needs_freeze(
+        tuple: HeapTupleHeader,
+        cutoff_xid: TransactionId,
+        cutoff_multi: MultiXactId,
+        buf: Buffer,
+    ) -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn heap_tuple_needs_eventual_freeze(tuple: HeapTupleHeader) -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn simple_heap_insert(relation: Relation, tup: HeapTuple);
+}
+#[pg_guard]
+extern "C" {
+    pub fn simple_heap_delete(relation: Relation, tid: ItemPointer);
+}
+#[pg_guard]
+extern "C" {
+    pub fn simple_heap_update(relation: Relation, otid: ItemPointer, tup: HeapTuple);
+}
+#[pg_guard]
+extern "C" {
+    pub fn heap_compute_xid_horizon_for_tuples(
+        rel: Relation,
+        items: *mut ItemPointerData,
+        nitems: ::std::os::raw::c_int,
+    ) -> TransactionId;
+}
+#[pg_guard]
+extern "C" {
+    pub fn heap_page_prune_opt(relation: Relation, buffer: Buffer);
+}
+#[pg_guard]
+extern "C" {
+    pub fn heap_page_prune(
+        relation: Relation,
+        buffer: Buffer,
+        OldestXmin: TransactionId,
+        report_stats: bool,
+        latestRemovedXid: *mut TransactionId,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn heap_page_prune_execute(
+        buffer: Buffer,
+        redirected: *mut OffsetNumber,
+        nredirected: ::std::os::raw::c_int,
+        nowdead: *mut OffsetNumber,
+        ndead: ::std::os::raw::c_int,
+        nowunused: *mut OffsetNumber,
+        nunused: ::std::os::raw::c_int,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn heap_get_root_tuples(page: Page, root_offsets: *mut OffsetNumber);
+}
+#[pg_guard]
+extern "C" {
+    pub fn ss_report_location(rel: Relation, location: BlockNumber);
+}
+#[pg_guard]
+extern "C" {
+    pub fn ss_get_location(rel: Relation, relnblocks: BlockNumber) -> BlockNumber;
+}
+#[pg_guard]
+extern "C" {
+    pub fn SyncScanShmemInit();
+}
+#[pg_guard]
+extern "C" {
+    pub fn SyncScanShmemSize() -> Size;
+}
+#[pg_guard]
+extern "C" {
+    pub fn heap_vacuum_rel(
+        onerel: Relation,
+        params: *mut VacuumParams,
+        bstrategy: BufferAccessStrategy,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn parallel_vacuum_main(seg: *mut dsm_segment, toc: *mut shm_toc);
+}
+#[pg_guard]
+extern "C" {
+    pub fn HeapTupleSatisfiesVisibility(
+        stup: HeapTuple,
+        snapshot: Snapshot,
+        buffer: Buffer,
+    ) -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn HeapTupleSatisfiesUpdate(
+        stup: HeapTuple,
+        curcid: CommandId,
+        buffer: Buffer,
+    ) -> TM_Result;
+}
+#[pg_guard]
+extern "C" {
+    pub fn HeapTupleSatisfiesVacuum(
+        stup: HeapTuple,
+        OldestXmin: TransactionId,
+        buffer: Buffer,
+    ) -> HTSV_Result;
+}
+#[pg_guard]
+extern "C" {
+    pub fn HeapTupleSetHintBits(
+        tuple: HeapTupleHeader,
+        buffer: Buffer,
+        infomask: uint16,
+        xid: TransactionId,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn HeapTupleHeaderIsOnlyLocked(tuple: HeapTupleHeader) -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn XidInMVCCSnapshot(xid: TransactionId, snapshot: Snapshot) -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn HeapTupleIsSurelyDead(htup: HeapTuple, OldestXmin: TransactionId) -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn ResolveCminCmaxDuringDecoding(
+        tuplecid_data: *mut HTAB,
+        snapshot: Snapshot,
+        htup: HeapTuple,
+        buffer: Buffer,
+        cmin: *mut CommandId,
+        cmax: *mut CommandId,
+    ) -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn HeapCheckForSerializableConflictOut(
+        valid: bool,
+        relation: Relation,
+        tuple: HeapTuple,
+        buffer: Buffer,
+        snapshot: Snapshot,
+    );
+}
+pub const relopt_type_RELOPT_TYPE_BOOL: relopt_type = 0;
+pub const relopt_type_RELOPT_TYPE_INT: relopt_type = 1;
+pub const relopt_type_RELOPT_TYPE_REAL: relopt_type = 2;
+pub const relopt_type_RELOPT_TYPE_ENUM: relopt_type = 3;
+pub const relopt_type_RELOPT_TYPE_STRING: relopt_type = 4;
+pub type relopt_type = ::std::os::raw::c_uint;
+pub const relopt_kind_RELOPT_KIND_LOCAL: relopt_kind = 0;
+pub const relopt_kind_RELOPT_KIND_HEAP: relopt_kind = 1;
+pub const relopt_kind_RELOPT_KIND_TOAST: relopt_kind = 2;
+pub const relopt_kind_RELOPT_KIND_BTREE: relopt_kind = 4;
+pub const relopt_kind_RELOPT_KIND_HASH: relopt_kind = 8;
+pub const relopt_kind_RELOPT_KIND_GIN: relopt_kind = 16;
+pub const relopt_kind_RELOPT_KIND_GIST: relopt_kind = 32;
+pub const relopt_kind_RELOPT_KIND_ATTRIBUTE: relopt_kind = 64;
+pub const relopt_kind_RELOPT_KIND_TABLESPACE: relopt_kind = 128;
+pub const relopt_kind_RELOPT_KIND_SPGIST: relopt_kind = 256;
+pub const relopt_kind_RELOPT_KIND_VIEW: relopt_kind = 512;
+pub const relopt_kind_RELOPT_KIND_BRIN: relopt_kind = 1024;
+pub const relopt_kind_RELOPT_KIND_PARTITIONED: relopt_kind = 2048;
+pub const relopt_kind_RELOPT_KIND_LAST_DEFAULT: relopt_kind = 2048;
+pub const relopt_kind_RELOPT_KIND_MAX: relopt_kind = 1073741824;
+pub type relopt_kind = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct relopt_gen {
+    pub name: *const ::std::os::raw::c_char,
+    pub desc: *const ::std::os::raw::c_char,
+    pub kinds: bits32,
+    pub lockmode: LOCKMODE,
+    pub namelen: ::std::os::raw::c_int,
+    pub type_: relopt_type,
+}
+impl Default for relopt_gen {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct relopt_value {
+    pub gen: *mut relopt_gen,
+    pub isset: bool,
+    pub values: relopt_value__bindgen_ty_1,
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub union relopt_value__bindgen_ty_1 {
+    pub bool_val: bool,
+    pub int_val: ::std::os::raw::c_int,
+    pub real_val: f64,
+    pub enum_val: ::std::os::raw::c_int,
+    pub string_val: *mut ::std::os::raw::c_char,
+    _bindgen_union_align: u64,
+}
+impl Default for relopt_value__bindgen_ty_1 {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+impl Default for relopt_value {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct relopt_bool {
+    pub gen: relopt_gen,
+    pub default_val: bool,
+}
+impl Default for relopt_bool {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct relopt_int {
+    pub gen: relopt_gen,
+    pub default_val: ::std::os::raw::c_int,
+    pub min: ::std::os::raw::c_int,
+    pub max: ::std::os::raw::c_int,
+}
+impl Default for relopt_int {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct relopt_real {
+    pub gen: relopt_gen,
+    pub default_val: f64,
+    pub min: f64,
+    pub max: f64,
+}
+impl Default for relopt_real {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct relopt_enum_elt_def {
+    pub string_val: *const ::std::os::raw::c_char,
+    pub symbol_val: ::std::os::raw::c_int,
+}
+impl Default for relopt_enum_elt_def {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct relopt_enum {
+    pub gen: relopt_gen,
+    pub members: *mut relopt_enum_elt_def,
+    pub default_val: ::std::os::raw::c_int,
+    pub detailmsg: *const ::std::os::raw::c_char,
+}
+impl Default for relopt_enum {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+pub type validate_string_relopt =
+    ::std::option::Option<unsafe extern "C" fn(value: *const ::std::os::raw::c_char)>;
+pub type fill_string_relopt = ::std::option::Option<
+    unsafe extern "C" fn(
+        value: *const ::std::os::raw::c_char,
+        ptr: *mut ::std::os::raw::c_void,
+    ) -> Size,
+>;
+pub type relopts_validator = ::std::option::Option<
+    unsafe extern "C" fn(
+        parsed_options: *mut ::std::os::raw::c_void,
+        vals: *mut relopt_value,
+        nvals: ::std::os::raw::c_int,
+    ),
+>;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct relopt_string {
+    pub gen: relopt_gen,
+    pub default_len: ::std::os::raw::c_int,
+    pub default_isnull: bool,
+    pub validate_cb: validate_string_relopt,
+    pub fill_cb: fill_string_relopt,
+    pub default_val: *mut ::std::os::raw::c_char,
+}
+impl Default for relopt_string {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct relopt_parse_elt {
+    pub optname: *const ::std::os::raw::c_char,
+    pub opttype: relopt_type,
+    pub offset: ::std::os::raw::c_int,
+}
+impl Default for relopt_parse_elt {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct local_relopt {
+    pub option: *mut relopt_gen,
+    pub offset: ::std::os::raw::c_int,
+}
+impl Default for local_relopt {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct local_relopts {
+    pub options: *mut List,
+    pub validators: *mut List,
+    pub relopt_struct_size: Size,
+}
+impl Default for local_relopts {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[pg_guard]
+extern "C" {
+    pub fn add_reloption_kind() -> relopt_kind;
+}
+#[pg_guard]
+extern "C" {
+    pub fn add_bool_reloption(
+        kinds: bits32,
+        name: *const ::std::os::raw::c_char,
+        desc: *const ::std::os::raw::c_char,
+        default_val: bool,
+        lockmode: LOCKMODE,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn add_int_reloption(
+        kinds: bits32,
+        name: *const ::std::os::raw::c_char,
+        desc: *const ::std::os::raw::c_char,
+        default_val: ::std::os::raw::c_int,
+        min_val: ::std::os::raw::c_int,
+        max_val: ::std::os::raw::c_int,
+        lockmode: LOCKMODE,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn add_real_reloption(
+        kinds: bits32,
+        name: *const ::std::os::raw::c_char,
+        desc: *const ::std::os::raw::c_char,
+        default_val: f64,
+        min_val: f64,
+        max_val: f64,
+        lockmode: LOCKMODE,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn add_enum_reloption(
+        kinds: bits32,
+        name: *const ::std::os::raw::c_char,
+        desc: *const ::std::os::raw::c_char,
+        members: *mut relopt_enum_elt_def,
+        default_val: ::std::os::raw::c_int,
+        detailmsg: *const ::std::os::raw::c_char,
+        lockmode: LOCKMODE,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn add_string_reloption(
+        kinds: bits32,
+        name: *const ::std::os::raw::c_char,
+        desc: *const ::std::os::raw::c_char,
+        default_val: *const ::std::os::raw::c_char,
+        validator: validate_string_relopt,
+        lockmode: LOCKMODE,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn init_local_reloptions(opts: *mut local_relopts, relopt_struct_size: Size);
+}
+#[pg_guard]
+extern "C" {
+    pub fn register_reloptions_validator(opts: *mut local_relopts, validator: relopts_validator);
+}
+#[pg_guard]
+extern "C" {
+    pub fn add_local_bool_reloption(
+        opts: *mut local_relopts,
+        name: *const ::std::os::raw::c_char,
+        desc: *const ::std::os::raw::c_char,
+        default_val: bool,
+        offset: ::std::os::raw::c_int,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn add_local_int_reloption(
+        opts: *mut local_relopts,
+        name: *const ::std::os::raw::c_char,
+        desc: *const ::std::os::raw::c_char,
+        default_val: ::std::os::raw::c_int,
+        min_val: ::std::os::raw::c_int,
+        max_val: ::std::os::raw::c_int,
+        offset: ::std::os::raw::c_int,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn add_local_real_reloption(
+        opts: *mut local_relopts,
+        name: *const ::std::os::raw::c_char,
+        desc: *const ::std::os::raw::c_char,
+        default_val: f64,
+        min_val: f64,
+        max_val: f64,
+        offset: ::std::os::raw::c_int,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn add_local_enum_reloption(
+        relopts: *mut local_relopts,
+        name: *const ::std::os::raw::c_char,
+        desc: *const ::std::os::raw::c_char,
+        members: *mut relopt_enum_elt_def,
+        default_val: ::std::os::raw::c_int,
+        detailmsg: *const ::std::os::raw::c_char,
+        offset: ::std::os::raw::c_int,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn add_local_string_reloption(
+        opts: *mut local_relopts,
+        name: *const ::std::os::raw::c_char,
+        desc: *const ::std::os::raw::c_char,
+        default_val: *const ::std::os::raw::c_char,
+        validator: validate_string_relopt,
+        filler: fill_string_relopt,
+        offset: ::std::os::raw::c_int,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn transformRelOptions(
+        oldOptions: Datum,
+        defList: *mut List,
+        namspace: *const ::std::os::raw::c_char,
+        validnsps: *mut *mut ::std::os::raw::c_char,
+        acceptOidsOff: bool,
+        isReset: bool,
+    ) -> Datum;
+}
+#[pg_guard]
+extern "C" {
+    pub fn untransformRelOptions(options: Datum) -> *mut List;
+}
+#[pg_guard]
+extern "C" {
+    pub fn extractRelOptions(
+        tuple: HeapTuple,
+        tupdesc: TupleDesc,
+        amoptions: amoptions_function,
+    ) -> *mut bytea;
+}
+#[pg_guard]
+extern "C" {
+    pub fn build_reloptions(
+        reloptions: Datum,
+        validate: bool,
+        kind: relopt_kind,
+        relopt_struct_size: Size,
+        relopt_elems: *const relopt_parse_elt,
+        num_relopt_elems: ::std::os::raw::c_int,
+    ) -> *mut ::std::os::raw::c_void;
+}
+#[pg_guard]
+extern "C" {
+    pub fn build_local_reloptions(
+        relopts: *mut local_relopts,
+        options: Datum,
+        validate: bool,
+    ) -> *mut ::std::os::raw::c_void;
+}
+#[pg_guard]
+extern "C" {
+    pub fn default_reloptions(reloptions: Datum, validate: bool, kind: relopt_kind) -> *mut bytea;
+}
+#[pg_guard]
+extern "C" {
+    pub fn heap_reloptions(
+        relkind: ::std::os::raw::c_char,
+        reloptions: Datum,
+        validate: bool,
+    ) -> *mut bytea;
+}
+#[pg_guard]
+extern "C" {
+    pub fn view_reloptions(reloptions: Datum, validate: bool) -> *mut bytea;
+}
+#[pg_guard]
+extern "C" {
+    pub fn partitioned_table_reloptions(reloptions: Datum, validate: bool) -> *mut bytea;
+}
+#[pg_guard]
+extern "C" {
+    pub fn index_reloptions(
+        amoptions: amoptions_function,
+        reloptions: Datum,
+        validate: bool,
+    ) -> *mut bytea;
+}
+#[pg_guard]
+extern "C" {
+    pub fn attribute_reloptions(reloptions: Datum, validate: bool) -> *mut bytea;
+}
+#[pg_guard]
+extern "C" {
+    pub fn tablespace_reloptions(reloptions: Datum, validate: bool) -> *mut bytea;
+}
+#[pg_guard]
+extern "C" {
+    pub fn AlterTableGetRelOptionsLockLevel(defList: *mut List) -> LOCKMODE;
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
@@ -35059,53 +35499,6 @@ extern "C" {
 #[pg_guard]
 extern "C" {
     pub static shm_mq_minimum_size: Size;
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct shm_toc {
-    _unused: [u8; 0],
-}
-#[pg_guard]
-extern "C" {
-    pub fn shm_toc_create(
-        magic: uint64,
-        address: *mut ::std::os::raw::c_void,
-        nbytes: Size,
-    ) -> *mut shm_toc;
-}
-#[pg_guard]
-extern "C" {
-    pub fn shm_toc_attach(magic: uint64, address: *mut ::std::os::raw::c_void) -> *mut shm_toc;
-}
-#[pg_guard]
-extern "C" {
-    pub fn shm_toc_allocate(toc: *mut shm_toc, nbytes: Size) -> *mut ::std::os::raw::c_void;
-}
-#[pg_guard]
-extern "C" {
-    pub fn shm_toc_freespace(toc: *mut shm_toc) -> Size;
-}
-#[pg_guard]
-extern "C" {
-    pub fn shm_toc_insert(toc: *mut shm_toc, key: uint64, address: *mut ::std::os::raw::c_void);
-}
-#[pg_guard]
-extern "C" {
-    pub fn shm_toc_lookup(
-        toc: *mut shm_toc,
-        key: uint64,
-        noError: bool,
-    ) -> *mut ::std::os::raw::c_void;
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct shm_toc_estimator {
-    pub space_for_chunks: Size,
-    pub number_of_keys: Size,
-}
-#[pg_guard]
-extern "C" {
-    pub fn shm_toc_estimate(e: *mut shm_toc_estimator) -> Size;
 }
 pub type parallel_worker_main_type =
     ::std::option::Option<unsafe extern "C" fn(seg: *mut dsm_segment, toc: *mut shm_toc)>;
@@ -40186,6 +40579,508 @@ extern "C" {
         include_triggers: bool,
         include_cols: *mut Bitmapset,
     ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut old_snapshot_threshold: ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn SnapMgrShmemSize() -> Size;
+}
+#[pg_guard]
+extern "C" {
+    pub fn SnapMgrInit();
+}
+#[pg_guard]
+extern "C" {
+    pub fn GetSnapshotCurrentTimestamp() -> TimestampTz;
+}
+#[pg_guard]
+extern "C" {
+    pub fn GetOldSnapshotThresholdTimestamp() -> TimestampTz;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut FirstSnapshotSet: bool;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut TransactionXmin: TransactionId;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut RecentXmin: TransactionId;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut RecentGlobalXmin: TransactionId;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut RecentGlobalDataXmin: TransactionId;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut SnapshotSelfData: SnapshotData;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut SnapshotAnyData: SnapshotData;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut CatalogSnapshotData: SnapshotData;
+}
+#[pg_guard]
+extern "C" {
+    pub fn GetTransactionSnapshot() -> Snapshot;
+}
+#[pg_guard]
+extern "C" {
+    pub fn GetLatestSnapshot() -> Snapshot;
+}
+#[pg_guard]
+extern "C" {
+    pub fn SnapshotSetCommandId(curcid: CommandId);
+}
+#[pg_guard]
+extern "C" {
+    pub fn GetOldestSnapshot() -> Snapshot;
+}
+#[pg_guard]
+extern "C" {
+    pub fn GetCatalogSnapshot(relid: Oid) -> Snapshot;
+}
+#[pg_guard]
+extern "C" {
+    pub fn GetNonHistoricCatalogSnapshot(relid: Oid) -> Snapshot;
+}
+#[pg_guard]
+extern "C" {
+    pub fn InvalidateCatalogSnapshot();
+}
+#[pg_guard]
+extern "C" {
+    pub fn InvalidateCatalogSnapshotConditionally();
+}
+#[pg_guard]
+extern "C" {
+    pub fn PushActiveSnapshot(snapshot: Snapshot);
+}
+#[pg_guard]
+extern "C" {
+    pub fn PushCopiedSnapshot(snapshot: Snapshot);
+}
+#[pg_guard]
+extern "C" {
+    pub fn UpdateActiveSnapshotCommandId();
+}
+#[pg_guard]
+extern "C" {
+    pub fn PopActiveSnapshot();
+}
+#[pg_guard]
+extern "C" {
+    pub fn GetActiveSnapshot() -> Snapshot;
+}
+#[pg_guard]
+extern "C" {
+    pub fn ActiveSnapshotSet() -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn RegisterSnapshot(snapshot: Snapshot) -> Snapshot;
+}
+#[pg_guard]
+extern "C" {
+    pub fn UnregisterSnapshot(snapshot: Snapshot);
+}
+#[pg_guard]
+extern "C" {
+    pub fn RegisterSnapshotOnOwner(snapshot: Snapshot, owner: ResourceOwner) -> Snapshot;
+}
+#[pg_guard]
+extern "C" {
+    pub fn UnregisterSnapshotFromOwner(snapshot: Snapshot, owner: ResourceOwner);
+}
+#[pg_guard]
+extern "C" {
+    pub fn GetFullRecentGlobalXmin() -> FullTransactionId;
+}
+#[pg_guard]
+extern "C" {
+    pub fn AtSubCommit_Snapshot(level: ::std::os::raw::c_int);
+}
+#[pg_guard]
+extern "C" {
+    pub fn AtSubAbort_Snapshot(level: ::std::os::raw::c_int);
+}
+#[pg_guard]
+extern "C" {
+    pub fn AtEOXact_Snapshot(isCommit: bool, resetXmin: bool);
+}
+#[pg_guard]
+extern "C" {
+    pub fn ImportSnapshot(idstr: *const ::std::os::raw::c_char);
+}
+#[pg_guard]
+extern "C" {
+    pub fn XactHasExportedSnapshots() -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn DeleteAllExportedSnapshotFiles();
+}
+#[pg_guard]
+extern "C" {
+    pub fn ThereAreNoPriorRegisteredSnapshots() -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn TransactionIdLimitedForOldSnapshots(
+        recentXmin: TransactionId,
+        relation: Relation,
+    ) -> TransactionId;
+}
+#[pg_guard]
+extern "C" {
+    pub fn MaintainOldSnapshotTimeMapping(whenTaken: TimestampTz, xmin: TransactionId);
+}
+#[pg_guard]
+extern "C" {
+    pub fn ExportSnapshot(snapshot: Snapshot) -> *mut ::std::os::raw::c_char;
+}
+#[pg_guard]
+extern "C" {
+    pub fn HistoricSnapshotGetTupleCids() -> *mut HTAB;
+}
+#[pg_guard]
+extern "C" {
+    pub fn SetupHistoricSnapshot(snapshot_now: Snapshot, tuplecids: *mut HTAB);
+}
+#[pg_guard]
+extern "C" {
+    pub fn TeardownHistoricSnapshot(is_error: bool);
+}
+#[pg_guard]
+extern "C" {
+    pub fn HistoricSnapshotActive() -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn EstimateSnapshotSpace(snapshot: Snapshot) -> Size;
+}
+#[pg_guard]
+extern "C" {
+    pub fn SerializeSnapshot(snapshot: Snapshot, start_address: *mut ::std::os::raw::c_char);
+}
+#[pg_guard]
+extern "C" {
+    pub fn RestoreSnapshot(start_address: *mut ::std::os::raw::c_char) -> Snapshot;
+}
+#[pg_guard]
+extern "C" {
+    pub fn RestoreTransactionSnapshot(
+        snapshot: Snapshot,
+        master_pgproc: *mut ::std::os::raw::c_void,
+    );
+}
+pub type Block = *mut ::std::os::raw::c_void;
+pub const BufferAccessStrategyType_BAS_NORMAL: BufferAccessStrategyType = 0;
+pub const BufferAccessStrategyType_BAS_BULKREAD: BufferAccessStrategyType = 1;
+pub const BufferAccessStrategyType_BAS_BULKWRITE: BufferAccessStrategyType = 2;
+pub const BufferAccessStrategyType_BAS_VACUUM: BufferAccessStrategyType = 3;
+pub type BufferAccessStrategyType = ::std::os::raw::c_uint;
+pub const ReadBufferMode_RBM_NORMAL: ReadBufferMode = 0;
+pub const ReadBufferMode_RBM_ZERO_AND_LOCK: ReadBufferMode = 1;
+pub const ReadBufferMode_RBM_ZERO_AND_CLEANUP_LOCK: ReadBufferMode = 2;
+pub const ReadBufferMode_RBM_ZERO_ON_ERROR: ReadBufferMode = 3;
+pub const ReadBufferMode_RBM_NORMAL_NO_LOG: ReadBufferMode = 4;
+pub type ReadBufferMode = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct PrefetchBufferResult {
+    pub recent_buffer: Buffer,
+    pub initiated_io: bool,
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct WritebackContext {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct SMgrRelationData {
+    _unused: [u8; 0],
+}
+#[pg_guard]
+extern "C" {
+    pub static mut zero_damaged_pages: bool;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut bgwriter_lru_maxpages: ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut bgwriter_lru_multiplier: f64;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut track_io_timing: bool;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut effective_io_concurrency: ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut maintenance_io_concurrency: ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut checkpoint_flush_after: ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut backend_flush_after: ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut bgwriter_flush_after: ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut BufferBlocks: *mut ::std::os::raw::c_char;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut NLocBuffer: ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut LocalBufferBlockPointers: *mut Block;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut LocalRefCount: *mut int32;
+}
+#[pg_guard]
+extern "C" {
+    pub fn PrefetchSharedBuffer(
+        smgr_reln: *mut SMgrRelationData,
+        forkNum: ForkNumber,
+        blockNum: BlockNumber,
+    ) -> PrefetchBufferResult;
+}
+#[pg_guard]
+extern "C" {
+    pub fn PrefetchBuffer(
+        reln: Relation,
+        forkNum: ForkNumber,
+        blockNum: BlockNumber,
+    ) -> PrefetchBufferResult;
+}
+#[pg_guard]
+extern "C" {
+    pub fn ReadBuffer(reln: Relation, blockNum: BlockNumber) -> Buffer;
+}
+#[pg_guard]
+extern "C" {
+    pub fn ReadBufferExtended(
+        reln: Relation,
+        forkNum: ForkNumber,
+        blockNum: BlockNumber,
+        mode: ReadBufferMode,
+        strategy: BufferAccessStrategy,
+    ) -> Buffer;
+}
+#[pg_guard]
+extern "C" {
+    pub fn ReadBufferWithoutRelcache(
+        rnode: RelFileNode,
+        forkNum: ForkNumber,
+        blockNum: BlockNumber,
+        mode: ReadBufferMode,
+        strategy: BufferAccessStrategy,
+    ) -> Buffer;
+}
+#[pg_guard]
+extern "C" {
+    pub fn ReleaseBuffer(buffer: Buffer);
+}
+#[pg_guard]
+extern "C" {
+    pub fn UnlockReleaseBuffer(buffer: Buffer);
+}
+#[pg_guard]
+extern "C" {
+    pub fn MarkBufferDirty(buffer: Buffer);
+}
+#[pg_guard]
+extern "C" {
+    pub fn IncrBufferRefCount(buffer: Buffer);
+}
+#[pg_guard]
+extern "C" {
+    pub fn ReleaseAndReadBuffer(
+        buffer: Buffer,
+        relation: Relation,
+        blockNum: BlockNumber,
+    ) -> Buffer;
+}
+#[pg_guard]
+extern "C" {
+    pub fn InitBufferPool();
+}
+#[pg_guard]
+extern "C" {
+    pub fn InitBufferPoolAccess();
+}
+#[pg_guard]
+extern "C" {
+    pub fn InitBufferPoolBackend();
+}
+#[pg_guard]
+extern "C" {
+    pub fn AtEOXact_Buffers(isCommit: bool);
+}
+#[pg_guard]
+extern "C" {
+    pub fn PrintBufferLeakWarning(buffer: Buffer);
+}
+#[pg_guard]
+extern "C" {
+    pub fn CheckPointBuffers(flags: ::std::os::raw::c_int);
+}
+#[pg_guard]
+extern "C" {
+    pub fn BufferGetBlockNumber(buffer: Buffer) -> BlockNumber;
+}
+#[pg_guard]
+extern "C" {
+    pub fn RelationGetNumberOfBlocksInFork(relation: Relation, forkNum: ForkNumber) -> BlockNumber;
+}
+#[pg_guard]
+extern "C" {
+    pub fn FlushOneBuffer(buffer: Buffer);
+}
+#[pg_guard]
+extern "C" {
+    pub fn FlushRelationBuffers(rel: Relation);
+}
+#[pg_guard]
+extern "C" {
+    pub fn FlushRelationsAllBuffers(
+        smgrs: *mut *mut SMgrRelationData,
+        nrels: ::std::os::raw::c_int,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn FlushDatabaseBuffers(dbid: Oid);
+}
+#[pg_guard]
+extern "C" {
+    pub fn DropRelFileNodeBuffers(
+        rnode: RelFileNodeBackend,
+        forkNum: *mut ForkNumber,
+        nforks: ::std::os::raw::c_int,
+        firstDelBlock: *mut BlockNumber,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn DropRelFileNodesAllBuffers(
+        rnodes: *mut RelFileNodeBackend,
+        nnodes: ::std::os::raw::c_int,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn DropDatabaseBuffers(dbid: Oid);
+}
+#[pg_guard]
+extern "C" {
+    pub fn BufferIsPermanent(buffer: Buffer) -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn BufferGetLSNAtomic(buffer: Buffer) -> XLogRecPtr;
+}
+#[pg_guard]
+extern "C" {
+    pub fn BufferShmemSize() -> Size;
+}
+#[pg_guard]
+extern "C" {
+    pub fn BufferGetTag(
+        buffer: Buffer,
+        rnode: *mut RelFileNode,
+        forknum: *mut ForkNumber,
+        blknum: *mut BlockNumber,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn MarkBufferDirtyHint(buffer: Buffer, buffer_std: bool);
+}
+#[pg_guard]
+extern "C" {
+    pub fn UnlockBuffers();
+}
+#[pg_guard]
+extern "C" {
+    pub fn LockBuffer(buffer: Buffer, mode: ::std::os::raw::c_int);
+}
+#[pg_guard]
+extern "C" {
+    pub fn ConditionalLockBuffer(buffer: Buffer) -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn LockBufferForCleanup(buffer: Buffer);
+}
+#[pg_guard]
+extern "C" {
+    pub fn ConditionalLockBufferForCleanup(buffer: Buffer) -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn IsBufferCleanupOK(buffer: Buffer) -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn HoldingBufferPinThatDelaysRecovery() -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn AbortBufferIO();
+}
+#[pg_guard]
+extern "C" {
+    pub fn BufmgrCommit();
+}
+#[pg_guard]
+extern "C" {
+    pub fn BgBufferSync(wb_context: *mut WritebackContext) -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn AtProcExit_LocalBuffers();
+}
+#[pg_guard]
+extern "C" {
+    pub fn TestForOldSnapshot_impl(snapshot: Snapshot, relation: Relation);
+}
+#[pg_guard]
+extern "C" {
+    pub fn GetAccessStrategy(btype: BufferAccessStrategyType) -> BufferAccessStrategy;
+}
+#[pg_guard]
+extern "C" {
+    pub fn FreeAccessStrategy(strategy: BufferAccessStrategy);
 }
 pub const ProcSignalReason_PROCSIG_CATCHUP_INTERRUPT: ProcSignalReason = 0;
 pub const ProcSignalReason_PROCSIG_NOTIFY_INTERRUPT: ProcSignalReason = 1;
@@ -53203,216 +54098,6 @@ extern "C" {
         varRelid: ::std::os::raw::c_int,
     ) -> Selectivity;
 }
-#[pg_guard]
-extern "C" {
-    pub static mut old_snapshot_threshold: ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
-    pub fn SnapMgrShmemSize() -> Size;
-}
-#[pg_guard]
-extern "C" {
-    pub fn SnapMgrInit();
-}
-#[pg_guard]
-extern "C" {
-    pub fn GetSnapshotCurrentTimestamp() -> TimestampTz;
-}
-#[pg_guard]
-extern "C" {
-    pub fn GetOldSnapshotThresholdTimestamp() -> TimestampTz;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut FirstSnapshotSet: bool;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut TransactionXmin: TransactionId;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut RecentXmin: TransactionId;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut RecentGlobalXmin: TransactionId;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut RecentGlobalDataXmin: TransactionId;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut SnapshotSelfData: SnapshotData;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut SnapshotAnyData: SnapshotData;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut CatalogSnapshotData: SnapshotData;
-}
-#[pg_guard]
-extern "C" {
-    pub fn GetTransactionSnapshot() -> Snapshot;
-}
-#[pg_guard]
-extern "C" {
-    pub fn GetLatestSnapshot() -> Snapshot;
-}
-#[pg_guard]
-extern "C" {
-    pub fn SnapshotSetCommandId(curcid: CommandId);
-}
-#[pg_guard]
-extern "C" {
-    pub fn GetOldestSnapshot() -> Snapshot;
-}
-#[pg_guard]
-extern "C" {
-    pub fn GetCatalogSnapshot(relid: Oid) -> Snapshot;
-}
-#[pg_guard]
-extern "C" {
-    pub fn GetNonHistoricCatalogSnapshot(relid: Oid) -> Snapshot;
-}
-#[pg_guard]
-extern "C" {
-    pub fn InvalidateCatalogSnapshot();
-}
-#[pg_guard]
-extern "C" {
-    pub fn InvalidateCatalogSnapshotConditionally();
-}
-#[pg_guard]
-extern "C" {
-    pub fn PushActiveSnapshot(snapshot: Snapshot);
-}
-#[pg_guard]
-extern "C" {
-    pub fn PushCopiedSnapshot(snapshot: Snapshot);
-}
-#[pg_guard]
-extern "C" {
-    pub fn UpdateActiveSnapshotCommandId();
-}
-#[pg_guard]
-extern "C" {
-    pub fn PopActiveSnapshot();
-}
-#[pg_guard]
-extern "C" {
-    pub fn GetActiveSnapshot() -> Snapshot;
-}
-#[pg_guard]
-extern "C" {
-    pub fn ActiveSnapshotSet() -> bool;
-}
-#[pg_guard]
-extern "C" {
-    pub fn RegisterSnapshot(snapshot: Snapshot) -> Snapshot;
-}
-#[pg_guard]
-extern "C" {
-    pub fn UnregisterSnapshot(snapshot: Snapshot);
-}
-#[pg_guard]
-extern "C" {
-    pub fn RegisterSnapshotOnOwner(snapshot: Snapshot, owner: ResourceOwner) -> Snapshot;
-}
-#[pg_guard]
-extern "C" {
-    pub fn UnregisterSnapshotFromOwner(snapshot: Snapshot, owner: ResourceOwner);
-}
-#[pg_guard]
-extern "C" {
-    pub fn GetFullRecentGlobalXmin() -> FullTransactionId;
-}
-#[pg_guard]
-extern "C" {
-    pub fn AtSubCommit_Snapshot(level: ::std::os::raw::c_int);
-}
-#[pg_guard]
-extern "C" {
-    pub fn AtSubAbort_Snapshot(level: ::std::os::raw::c_int);
-}
-#[pg_guard]
-extern "C" {
-    pub fn AtEOXact_Snapshot(isCommit: bool, resetXmin: bool);
-}
-#[pg_guard]
-extern "C" {
-    pub fn ImportSnapshot(idstr: *const ::std::os::raw::c_char);
-}
-#[pg_guard]
-extern "C" {
-    pub fn XactHasExportedSnapshots() -> bool;
-}
-#[pg_guard]
-extern "C" {
-    pub fn DeleteAllExportedSnapshotFiles();
-}
-#[pg_guard]
-extern "C" {
-    pub fn ThereAreNoPriorRegisteredSnapshots() -> bool;
-}
-#[pg_guard]
-extern "C" {
-    pub fn TransactionIdLimitedForOldSnapshots(
-        recentXmin: TransactionId,
-        relation: Relation,
-    ) -> TransactionId;
-}
-#[pg_guard]
-extern "C" {
-    pub fn MaintainOldSnapshotTimeMapping(whenTaken: TimestampTz, xmin: TransactionId);
-}
-#[pg_guard]
-extern "C" {
-    pub fn ExportSnapshot(snapshot: Snapshot) -> *mut ::std::os::raw::c_char;
-}
-#[pg_guard]
-extern "C" {
-    pub fn XidInMVCCSnapshot(xid: TransactionId, snapshot: Snapshot) -> bool;
-}
-#[pg_guard]
-extern "C" {
-    pub fn HistoricSnapshotGetTupleCids() -> *mut HTAB;
-}
-#[pg_guard]
-extern "C" {
-    pub fn SetupHistoricSnapshot(snapshot_now: Snapshot, tuplecids: *mut HTAB);
-}
-#[pg_guard]
-extern "C" {
-    pub fn TeardownHistoricSnapshot(is_error: bool);
-}
-#[pg_guard]
-extern "C" {
-    pub fn HistoricSnapshotActive() -> bool;
-}
-#[pg_guard]
-extern "C" {
-    pub fn EstimateSnapshotSpace(snapshot: Snapshot) -> Size;
-}
-#[pg_guard]
-extern "C" {
-    pub fn SerializeSnapshot(snapshot: Snapshot, start_address: *mut ::std::os::raw::c_char);
-}
-#[pg_guard]
-extern "C" {
-    pub fn RestoreSnapshot(start_address: *mut ::std::os::raw::c_char) -> Snapshot;
-}
-#[pg_guard]
-extern "C" {
-    pub fn RestoreTransactionSnapshot(
-        snapshot: Snapshot,
-        master_pgproc: *mut ::std::os::raw::c_void,
-    );
-}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct DomainConstraintCache {
@@ -53640,11 +54325,6 @@ pub struct TupleQueueReader {
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct ResourceOwnerData {
-    pub _address: u8,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct SMgrRelationData {
     pub _address: u8,
 }
 #[repr(C)]

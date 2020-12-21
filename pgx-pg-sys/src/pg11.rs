@@ -1631,6 +1631,8 @@ pub const MCXT_ALLOC_NO_OOM: u32 = 2;
 pub const MCXT_ALLOC_ZERO: u32 = 4;
 pub const VARATT_SHORT_MAX: u32 = 127;
 pub const SIZEOF_DATUM: u32 = 8;
+pub const FLOAT4PASSBYVAL: u32 = 1;
+pub const FLOAT8PASSBYVAL: u32 = 1;
 pub const FIELDNO_FUNCTIONCALLINFODATA_ISNULL: u32 = 4;
 pub const FIELDNO_FUNCTIONCALLINFODATA_ARG: u32 = 6;
 pub const FIELDNO_FUNCTIONCALLINFODATA_ARGNULL: u32 = 7;
@@ -2965,6 +2967,11 @@ pub const DEFAULT_CPU_OPERATOR_COST: f64 = 0.0025;
 pub const DEFAULT_PARALLEL_TUPLE_COST: f64 = 0.1;
 pub const DEFAULT_PARALLEL_SETUP_COST: f64 = 1000.0;
 pub const DEFAULT_EFFECTIVE_CACHE_SIZE: u32 = 524288;
+pub const OLD_SNAPSHOT_PADDING_ENTRIES: u32 = 10;
+pub const MAX_IO_CONCURRENCY: u32 = 1000;
+pub const BUFFER_LOCK_UNLOCK: u32 = 0;
+pub const BUFFER_LOCK_SHARE: u32 = 1;
+pub const BUFFER_LOCK_EXCLUSIVE: u32 = 2;
 pub const XLOG_STANDBY_LOCK: u32 = 0;
 pub const XLOG_RUNNING_XACTS: u32 = 16;
 pub const XLOG_INVALIDATIONS: u32 = 32;
@@ -3162,7 +3169,6 @@ pub const DEFAULT_MATCH_SEL: f64 = 0.005;
 pub const DEFAULT_NUM_DISTINCT: u32 = 200;
 pub const DEFAULT_UNK_SEL: f64 = 0.005;
 pub const DEFAULT_NOT_UNK_SEL: f64 = 0.995;
-pub const OLD_SNAPSHOT_PADDING_ENTRIES: u32 = 10;
 pub const TYPECACHE_EQ_OPR: u32 = 1;
 pub const TYPECACHE_LT_OPR: u32 = 2;
 pub const TYPECACHE_GT_OPR: u32 = 4;
@@ -36891,6 +36897,567 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
+    pub static mut old_snapshot_threshold: ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn SnapMgrShmemSize() -> Size;
+}
+#[pg_guard]
+extern "C" {
+    pub fn SnapMgrInit();
+}
+#[pg_guard]
+extern "C" {
+    pub fn GetSnapshotCurrentTimestamp() -> TimestampTz;
+}
+#[pg_guard]
+extern "C" {
+    pub fn GetOldSnapshotThresholdTimestamp() -> TimestampTz;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut FirstSnapshotSet: bool;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut TransactionXmin: TransactionId;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut RecentXmin: TransactionId;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut RecentGlobalXmin: TransactionId;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut RecentGlobalDataXmin: TransactionId;
+}
+#[pg_guard]
+extern "C" {
+    pub fn GetTransactionSnapshot() -> Snapshot;
+}
+#[pg_guard]
+extern "C" {
+    pub fn GetLatestSnapshot() -> Snapshot;
+}
+#[pg_guard]
+extern "C" {
+    pub fn SnapshotSetCommandId(curcid: CommandId);
+}
+#[pg_guard]
+extern "C" {
+    pub fn GetOldestSnapshot() -> Snapshot;
+}
+#[pg_guard]
+extern "C" {
+    pub fn GetCatalogSnapshot(relid: Oid) -> Snapshot;
+}
+#[pg_guard]
+extern "C" {
+    pub fn GetNonHistoricCatalogSnapshot(relid: Oid) -> Snapshot;
+}
+#[pg_guard]
+extern "C" {
+    pub fn InvalidateCatalogSnapshot();
+}
+#[pg_guard]
+extern "C" {
+    pub fn InvalidateCatalogSnapshotConditionally();
+}
+#[pg_guard]
+extern "C" {
+    pub fn PushActiveSnapshot(snapshot: Snapshot);
+}
+#[pg_guard]
+extern "C" {
+    pub fn PushCopiedSnapshot(snapshot: Snapshot);
+}
+#[pg_guard]
+extern "C" {
+    pub fn UpdateActiveSnapshotCommandId();
+}
+#[pg_guard]
+extern "C" {
+    pub fn PopActiveSnapshot();
+}
+#[pg_guard]
+extern "C" {
+    pub fn GetActiveSnapshot() -> Snapshot;
+}
+#[pg_guard]
+extern "C" {
+    pub fn ActiveSnapshotSet() -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn RegisterSnapshot(snapshot: Snapshot) -> Snapshot;
+}
+#[pg_guard]
+extern "C" {
+    pub fn UnregisterSnapshot(snapshot: Snapshot);
+}
+#[pg_guard]
+extern "C" {
+    pub fn RegisterSnapshotOnOwner(snapshot: Snapshot, owner: ResourceOwner) -> Snapshot;
+}
+#[pg_guard]
+extern "C" {
+    pub fn UnregisterSnapshotFromOwner(snapshot: Snapshot, owner: ResourceOwner);
+}
+#[pg_guard]
+extern "C" {
+    pub fn AtSubCommit_Snapshot(level: ::std::os::raw::c_int);
+}
+#[pg_guard]
+extern "C" {
+    pub fn AtSubAbort_Snapshot(level: ::std::os::raw::c_int);
+}
+#[pg_guard]
+extern "C" {
+    pub fn AtEOXact_Snapshot(isCommit: bool, resetXmin: bool);
+}
+#[pg_guard]
+extern "C" {
+    pub fn ImportSnapshot(idstr: *const ::std::os::raw::c_char);
+}
+#[pg_guard]
+extern "C" {
+    pub fn XactHasExportedSnapshots() -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn DeleteAllExportedSnapshotFiles();
+}
+#[pg_guard]
+extern "C" {
+    pub fn ThereAreNoPriorRegisteredSnapshots() -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn TransactionIdLimitedForOldSnapshots(
+        recentXmin: TransactionId,
+        relation: Relation,
+    ) -> TransactionId;
+}
+#[pg_guard]
+extern "C" {
+    pub fn MaintainOldSnapshotTimeMapping(whenTaken: TimestampTz, xmin: TransactionId);
+}
+#[pg_guard]
+extern "C" {
+    pub fn ExportSnapshot(snapshot: Snapshot) -> *mut ::std::os::raw::c_char;
+}
+#[pg_guard]
+extern "C" {
+    pub fn HistoricSnapshotGetTupleCids() -> *mut HTAB;
+}
+#[pg_guard]
+extern "C" {
+    pub fn SetupHistoricSnapshot(snapshot_now: Snapshot, tuplecids: *mut HTAB);
+}
+#[pg_guard]
+extern "C" {
+    pub fn TeardownHistoricSnapshot(is_error: bool);
+}
+#[pg_guard]
+extern "C" {
+    pub fn HistoricSnapshotActive() -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn EstimateSnapshotSpace(snapshot: Snapshot) -> Size;
+}
+#[pg_guard]
+extern "C" {
+    pub fn SerializeSnapshot(snapshot: Snapshot, start_address: *mut ::std::os::raw::c_char);
+}
+#[pg_guard]
+extern "C" {
+    pub fn RestoreSnapshot(start_address: *mut ::std::os::raw::c_char) -> Snapshot;
+}
+#[pg_guard]
+extern "C" {
+    pub fn RestoreTransactionSnapshot(
+        snapshot: Snapshot,
+        master_pgproc: *mut ::std::os::raw::c_void,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub static mut SnapshotSelfData: SnapshotData;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut SnapshotAnyData: SnapshotData;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut CatalogSnapshotData: SnapshotData;
+}
+pub const HTSV_Result_HEAPTUPLE_DEAD: HTSV_Result = 0;
+pub const HTSV_Result_HEAPTUPLE_LIVE: HTSV_Result = 1;
+pub const HTSV_Result_HEAPTUPLE_RECENTLY_DEAD: HTSV_Result = 2;
+pub const HTSV_Result_HEAPTUPLE_INSERT_IN_PROGRESS: HTSV_Result = 3;
+pub const HTSV_Result_HEAPTUPLE_DELETE_IN_PROGRESS: HTSV_Result = 4;
+pub type HTSV_Result = ::std::os::raw::c_uint;
+#[pg_guard]
+extern "C" {
+    pub fn HeapTupleSatisfiesMVCC(htup: HeapTuple, snapshot: Snapshot, buffer: Buffer) -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn HeapTupleSatisfiesSelf(htup: HeapTuple, snapshot: Snapshot, buffer: Buffer) -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn HeapTupleSatisfiesAny(htup: HeapTuple, snapshot: Snapshot, buffer: Buffer) -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn HeapTupleSatisfiesToast(htup: HeapTuple, snapshot: Snapshot, buffer: Buffer) -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn HeapTupleSatisfiesDirty(htup: HeapTuple, snapshot: Snapshot, buffer: Buffer) -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn HeapTupleSatisfiesNonVacuumable(
+        htup: HeapTuple,
+        snapshot: Snapshot,
+        buffer: Buffer,
+    ) -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn HeapTupleSatisfiesHistoricMVCC(
+        htup: HeapTuple,
+        snapshot: Snapshot,
+        buffer: Buffer,
+    ) -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn HeapTupleSatisfiesUpdate(
+        htup: HeapTuple,
+        curcid: CommandId,
+        buffer: Buffer,
+    ) -> HTSU_Result;
+}
+#[pg_guard]
+extern "C" {
+    pub fn HeapTupleSatisfiesVacuum(
+        htup: HeapTuple,
+        OldestXmin: TransactionId,
+        buffer: Buffer,
+    ) -> HTSV_Result;
+}
+#[pg_guard]
+extern "C" {
+    pub fn HeapTupleIsSurelyDead(htup: HeapTuple, OldestXmin: TransactionId) -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn XidInMVCCSnapshot(xid: TransactionId, snapshot: Snapshot) -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn HeapTupleSetHintBits(
+        tuple: HeapTupleHeader,
+        buffer: Buffer,
+        infomask: uint16,
+        xid: TransactionId,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn HeapTupleHeaderIsOnlyLocked(tuple: HeapTupleHeader) -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn ResolveCminCmaxDuringDecoding(
+        tuplecid_data: *mut HTAB,
+        snapshot: Snapshot,
+        htup: HeapTuple,
+        buffer: Buffer,
+        cmin: *mut CommandId,
+        cmax: *mut CommandId,
+    ) -> bool;
+}
+pub type Block = *mut ::std::os::raw::c_void;
+pub const BufferAccessStrategyType_BAS_NORMAL: BufferAccessStrategyType = 0;
+pub const BufferAccessStrategyType_BAS_BULKREAD: BufferAccessStrategyType = 1;
+pub const BufferAccessStrategyType_BAS_BULKWRITE: BufferAccessStrategyType = 2;
+pub const BufferAccessStrategyType_BAS_VACUUM: BufferAccessStrategyType = 3;
+pub type BufferAccessStrategyType = ::std::os::raw::c_uint;
+pub const ReadBufferMode_RBM_NORMAL: ReadBufferMode = 0;
+pub const ReadBufferMode_RBM_ZERO_AND_LOCK: ReadBufferMode = 1;
+pub const ReadBufferMode_RBM_ZERO_AND_CLEANUP_LOCK: ReadBufferMode = 2;
+pub const ReadBufferMode_RBM_ZERO_ON_ERROR: ReadBufferMode = 3;
+pub const ReadBufferMode_RBM_NORMAL_NO_LOG: ReadBufferMode = 4;
+pub type ReadBufferMode = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct WritebackContext {
+    _unused: [u8; 0],
+}
+#[pg_guard]
+extern "C" {
+    pub static mut zero_damaged_pages: bool;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut bgwriter_lru_maxpages: ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut bgwriter_lru_multiplier: f64;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut track_io_timing: bool;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut target_prefetch_pages: ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut checkpoint_flush_after: ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut backend_flush_after: ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut bgwriter_flush_after: ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut BufferBlocks: *mut ::std::os::raw::c_char;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut effective_io_concurrency: ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut NLocBuffer: ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut LocalBufferBlockPointers: *mut Block;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut LocalRefCount: *mut int32;
+}
+#[pg_guard]
+extern "C" {
+    pub fn ComputeIoConcurrency(io_concurrency: ::std::os::raw::c_int, target: *mut f64) -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn PrefetchBuffer(reln: Relation, forkNum: ForkNumber, blockNum: BlockNumber);
+}
+#[pg_guard]
+extern "C" {
+    pub fn ReadBuffer(reln: Relation, blockNum: BlockNumber) -> Buffer;
+}
+#[pg_guard]
+extern "C" {
+    pub fn ReadBufferExtended(
+        reln: Relation,
+        forkNum: ForkNumber,
+        blockNum: BlockNumber,
+        mode: ReadBufferMode,
+        strategy: BufferAccessStrategy,
+    ) -> Buffer;
+}
+#[pg_guard]
+extern "C" {
+    pub fn ReadBufferWithoutRelcache(
+        rnode: RelFileNode,
+        forkNum: ForkNumber,
+        blockNum: BlockNumber,
+        mode: ReadBufferMode,
+        strategy: BufferAccessStrategy,
+    ) -> Buffer;
+}
+#[pg_guard]
+extern "C" {
+    pub fn ReleaseBuffer(buffer: Buffer);
+}
+#[pg_guard]
+extern "C" {
+    pub fn UnlockReleaseBuffer(buffer: Buffer);
+}
+#[pg_guard]
+extern "C" {
+    pub fn MarkBufferDirty(buffer: Buffer);
+}
+#[pg_guard]
+extern "C" {
+    pub fn IncrBufferRefCount(buffer: Buffer);
+}
+#[pg_guard]
+extern "C" {
+    pub fn ReleaseAndReadBuffer(
+        buffer: Buffer,
+        relation: Relation,
+        blockNum: BlockNumber,
+    ) -> Buffer;
+}
+#[pg_guard]
+extern "C" {
+    pub fn InitBufferPool();
+}
+#[pg_guard]
+extern "C" {
+    pub fn InitBufferPoolAccess();
+}
+#[pg_guard]
+extern "C" {
+    pub fn InitBufferPoolBackend();
+}
+#[pg_guard]
+extern "C" {
+    pub fn AtEOXact_Buffers(isCommit: bool);
+}
+#[pg_guard]
+extern "C" {
+    pub fn PrintBufferLeakWarning(buffer: Buffer);
+}
+#[pg_guard]
+extern "C" {
+    pub fn CheckPointBuffers(flags: ::std::os::raw::c_int);
+}
+#[pg_guard]
+extern "C" {
+    pub fn BufferGetBlockNumber(buffer: Buffer) -> BlockNumber;
+}
+#[pg_guard]
+extern "C" {
+    pub fn RelationGetNumberOfBlocksInFork(relation: Relation, forkNum: ForkNumber) -> BlockNumber;
+}
+#[pg_guard]
+extern "C" {
+    pub fn FlushOneBuffer(buffer: Buffer);
+}
+#[pg_guard]
+extern "C" {
+    pub fn FlushRelationBuffers(rel: Relation);
+}
+#[pg_guard]
+extern "C" {
+    pub fn FlushDatabaseBuffers(dbid: Oid);
+}
+#[pg_guard]
+extern "C" {
+    pub fn DropRelFileNodeBuffers(
+        rnode: RelFileNodeBackend,
+        forkNum: ForkNumber,
+        firstDelBlock: BlockNumber,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn DropRelFileNodesAllBuffers(
+        rnodes: *mut RelFileNodeBackend,
+        nnodes: ::std::os::raw::c_int,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn DropDatabaseBuffers(dbid: Oid);
+}
+#[pg_guard]
+extern "C" {
+    pub fn BufferIsPermanent(buffer: Buffer) -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn BufferGetLSNAtomic(buffer: Buffer) -> XLogRecPtr;
+}
+#[pg_guard]
+extern "C" {
+    pub fn BufferShmemSize() -> Size;
+}
+#[pg_guard]
+extern "C" {
+    pub fn BufferGetTag(
+        buffer: Buffer,
+        rnode: *mut RelFileNode,
+        forknum: *mut ForkNumber,
+        blknum: *mut BlockNumber,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn MarkBufferDirtyHint(buffer: Buffer, buffer_std: bool);
+}
+#[pg_guard]
+extern "C" {
+    pub fn UnlockBuffers();
+}
+#[pg_guard]
+extern "C" {
+    pub fn LockBuffer(buffer: Buffer, mode: ::std::os::raw::c_int);
+}
+#[pg_guard]
+extern "C" {
+    pub fn ConditionalLockBuffer(buffer: Buffer) -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn LockBufferForCleanup(buffer: Buffer);
+}
+#[pg_guard]
+extern "C" {
+    pub fn ConditionalLockBufferForCleanup(buffer: Buffer) -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn IsBufferCleanupOK(buffer: Buffer) -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn HoldingBufferPinThatDelaysRecovery() -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn AbortBufferIO();
+}
+#[pg_guard]
+extern "C" {
+    pub fn BufmgrCommit();
+}
+#[pg_guard]
+extern "C" {
+    pub fn BgBufferSync(wb_context: *mut WritebackContext) -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn AtProcExit_LocalBuffers();
+}
+#[pg_guard]
+extern "C" {
+    pub fn TestForOldSnapshot_impl(snapshot: Snapshot, relation: Relation);
+}
+#[pg_guard]
+extern "C" {
+    pub fn GetAccessStrategy(btype: BufferAccessStrategyType) -> BufferAccessStrategy;
+}
+#[pg_guard]
+extern "C" {
+    pub fn FreeAccessStrategy(strategy: BufferAccessStrategy);
+}
+#[pg_guard]
+extern "C" {
     pub fn standby_redo(record: *mut XLogReaderState);
 }
 #[pg_guard]
@@ -50929,196 +51496,6 @@ extern "C" {
         useOr: bool,
         varRelid: ::std::os::raw::c_int,
     ) -> Selectivity;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut old_snapshot_threshold: ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
-    pub fn SnapMgrShmemSize() -> Size;
-}
-#[pg_guard]
-extern "C" {
-    pub fn SnapMgrInit();
-}
-#[pg_guard]
-extern "C" {
-    pub fn GetSnapshotCurrentTimestamp() -> TimestampTz;
-}
-#[pg_guard]
-extern "C" {
-    pub fn GetOldSnapshotThresholdTimestamp() -> TimestampTz;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut FirstSnapshotSet: bool;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut TransactionXmin: TransactionId;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut RecentXmin: TransactionId;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut RecentGlobalXmin: TransactionId;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut RecentGlobalDataXmin: TransactionId;
-}
-#[pg_guard]
-extern "C" {
-    pub fn GetTransactionSnapshot() -> Snapshot;
-}
-#[pg_guard]
-extern "C" {
-    pub fn GetLatestSnapshot() -> Snapshot;
-}
-#[pg_guard]
-extern "C" {
-    pub fn SnapshotSetCommandId(curcid: CommandId);
-}
-#[pg_guard]
-extern "C" {
-    pub fn GetOldestSnapshot() -> Snapshot;
-}
-#[pg_guard]
-extern "C" {
-    pub fn GetCatalogSnapshot(relid: Oid) -> Snapshot;
-}
-#[pg_guard]
-extern "C" {
-    pub fn GetNonHistoricCatalogSnapshot(relid: Oid) -> Snapshot;
-}
-#[pg_guard]
-extern "C" {
-    pub fn InvalidateCatalogSnapshot();
-}
-#[pg_guard]
-extern "C" {
-    pub fn InvalidateCatalogSnapshotConditionally();
-}
-#[pg_guard]
-extern "C" {
-    pub fn PushActiveSnapshot(snapshot: Snapshot);
-}
-#[pg_guard]
-extern "C" {
-    pub fn PushCopiedSnapshot(snapshot: Snapshot);
-}
-#[pg_guard]
-extern "C" {
-    pub fn UpdateActiveSnapshotCommandId();
-}
-#[pg_guard]
-extern "C" {
-    pub fn PopActiveSnapshot();
-}
-#[pg_guard]
-extern "C" {
-    pub fn GetActiveSnapshot() -> Snapshot;
-}
-#[pg_guard]
-extern "C" {
-    pub fn ActiveSnapshotSet() -> bool;
-}
-#[pg_guard]
-extern "C" {
-    pub fn RegisterSnapshot(snapshot: Snapshot) -> Snapshot;
-}
-#[pg_guard]
-extern "C" {
-    pub fn UnregisterSnapshot(snapshot: Snapshot);
-}
-#[pg_guard]
-extern "C" {
-    pub fn RegisterSnapshotOnOwner(snapshot: Snapshot, owner: ResourceOwner) -> Snapshot;
-}
-#[pg_guard]
-extern "C" {
-    pub fn UnregisterSnapshotFromOwner(snapshot: Snapshot, owner: ResourceOwner);
-}
-#[pg_guard]
-extern "C" {
-    pub fn AtSubCommit_Snapshot(level: ::std::os::raw::c_int);
-}
-#[pg_guard]
-extern "C" {
-    pub fn AtSubAbort_Snapshot(level: ::std::os::raw::c_int);
-}
-#[pg_guard]
-extern "C" {
-    pub fn AtEOXact_Snapshot(isCommit: bool, resetXmin: bool);
-}
-#[pg_guard]
-extern "C" {
-    pub fn ImportSnapshot(idstr: *const ::std::os::raw::c_char);
-}
-#[pg_guard]
-extern "C" {
-    pub fn XactHasExportedSnapshots() -> bool;
-}
-#[pg_guard]
-extern "C" {
-    pub fn DeleteAllExportedSnapshotFiles();
-}
-#[pg_guard]
-extern "C" {
-    pub fn ThereAreNoPriorRegisteredSnapshots() -> bool;
-}
-#[pg_guard]
-extern "C" {
-    pub fn TransactionIdLimitedForOldSnapshots(
-        recentXmin: TransactionId,
-        relation: Relation,
-    ) -> TransactionId;
-}
-#[pg_guard]
-extern "C" {
-    pub fn MaintainOldSnapshotTimeMapping(whenTaken: TimestampTz, xmin: TransactionId);
-}
-#[pg_guard]
-extern "C" {
-    pub fn ExportSnapshot(snapshot: Snapshot) -> *mut ::std::os::raw::c_char;
-}
-#[pg_guard]
-extern "C" {
-    pub fn HistoricSnapshotGetTupleCids() -> *mut HTAB;
-}
-#[pg_guard]
-extern "C" {
-    pub fn SetupHistoricSnapshot(snapshot_now: Snapshot, tuplecids: *mut HTAB);
-}
-#[pg_guard]
-extern "C" {
-    pub fn TeardownHistoricSnapshot(is_error: bool);
-}
-#[pg_guard]
-extern "C" {
-    pub fn HistoricSnapshotActive() -> bool;
-}
-#[pg_guard]
-extern "C" {
-    pub fn EstimateSnapshotSpace(snapshot: Snapshot) -> Size;
-}
-#[pg_guard]
-extern "C" {
-    pub fn SerializeSnapshot(snapshot: Snapshot, start_address: *mut ::std::os::raw::c_char);
-}
-#[pg_guard]
-extern "C" {
-    pub fn RestoreSnapshot(start_address: *mut ::std::os::raw::c_char) -> Snapshot;
-}
-#[pg_guard]
-extern "C" {
-    pub fn RestoreTransactionSnapshot(
-        snapshot: Snapshot,
-        master_pgproc: *mut ::std::os::raw::c_void,
-    );
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]

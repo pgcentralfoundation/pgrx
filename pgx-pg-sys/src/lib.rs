@@ -282,17 +282,69 @@ mod all_versions {
         }
     }
 
+    /// #define HeapTupleHeaderIsHeapOnly(tup) \
+    ///    ( \
+    ///       ((tup)->t_infomask2 & HEAP_ONLY_TUPLE) != 0 \
+    ///    )
     #[inline]
-    pub fn HeapTupleHeaderIsHeapOnly(htup_header: super::HeapTupleHeader) -> bool {
-        extern "C" {
-            pub fn pgx_HeapTupleHeaderIsHeapOnly(htup_header: super::HeapTupleHeader) -> bool;
-        }
+    pub unsafe fn HeapTupleHeaderIsHeapOnly(htup_header: super::HeapTupleHeader) -> bool {
+        ((*htup_header).t_infomask2 & crate::HEAP_ONLY_TUPLE as u16) != 0
+    }
 
-        if htup_header.is_null() {
-            panic!("provided HeapTupleHeader is null");
+    /// #define HeapTupleHeaderIsHotUpdated(tup) \
+    /// ( \
+    ///      ((tup)->t_infomask2 & HEAP_HOT_UPDATED) != 0 && \
+    ///      ((tup)->t_infomask & HEAP_XMAX_INVALID) == 0 && \
+    ///      !HeapTupleHeaderXminInvalid(tup) \
+    /// )
+    #[inline]
+    pub unsafe fn HeapTupleHeaderIsHotUpdated(htup_header: super::HeapTupleHeader) -> bool {
+        (*htup_header).t_infomask2 & crate::HEAP_HOT_UPDATED as u16 != 0
+            && (*htup_header).t_infomask & crate::HEAP_XMAX_INVALID as u16 == 0
+            && !HeapTupleHeaderXminInvalid(htup_header)
+    }
+
+    /// #define HeapTupleHeaderXminInvalid(tup) \
+    /// ( \
+    ///   ((tup)->t_infomask & (HEAP_XMIN_COMMITTED|HEAP_XMIN_INVALID)) == \
+    ///      HEAP_XMIN_INVALID \
+    /// )
+    #[inline]
+    pub unsafe fn HeapTupleHeaderXminInvalid(htup_header: super::HeapTupleHeader) -> bool {
+        (*htup_header).t_infomask
+            & (crate::HEAP_XMIN_COMMITTED as u16 | crate::HEAP_XMIN_INVALID as u16)
+            == crate::HEAP_XMIN_INVALID as u16
+    }
+
+    /// #define BufferGetPage(buffer) ((Page)BufferGetBlock(buffer))
+    #[inline]
+    pub unsafe fn BufferGetPage(buffer: crate::Buffer) -> crate::Page {
+        BufferGetBlock(buffer) as crate::Page
+    }
+
+    /// #define BufferGetBlock(buffer) \
+    /// ( \
+    ///      AssertMacro(BufferIsValid(buffer)), \
+    ///      BufferIsLocal(buffer) ? \
+    ///            LocalBufferBlockPointers[-(buffer) - 1] \
+    ///      : \
+    ///            (Block) (BufferBlocks + ((Size) ((buffer) - 1)) * BLCKSZ) \
+    /// )
+    #[inline]
+    pub unsafe fn BufferGetBlock(buffer: crate::Buffer) -> crate::Block {
+        if BufferIsLocal(buffer) {
+            *crate::LocalBufferBlockPointers.offset(((-buffer) - 1) as isize)
         } else {
-            unsafe { pgx_HeapTupleHeaderIsHeapOnly(htup_header) }
+            crate::BufferBlocks
+                .offset((((buffer as crate::Size) - 1) * crate::BLCKSZ as usize) as isize)
+                as crate::Block
         }
+    }
+
+    /// #define BufferIsLocal(buffer)      ((buffer) < 0)
+    #[inline]
+    pub unsafe fn BufferIsLocal(buffer: crate::Buffer) -> bool {
+        buffer < 0
     }
 
     #[inline]

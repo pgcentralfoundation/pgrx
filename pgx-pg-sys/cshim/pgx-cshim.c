@@ -71,11 +71,6 @@ CommandId pgx_HeapTupleHeaderGetRawCommandId(HeapTupleHeader htup_header) {
     return HeapTupleHeaderGetRawCommandId(htup_header);
 }
 
-PGDLLEXPORT bool pgx_HeapTupleHeaderIsHeapOnly(HeapTupleHeader htup_header);
-bool pgx_HeapTupleHeaderIsHeapOnly(HeapTupleHeader htup_header) {
-    return HeapTupleHeaderIsHeapOnly(htup_header);
-}
-
 PGDLLEXPORT RangeTblEntry *pgx_planner_rt_fetch(Index index, PlannerInfo *plannerInfo);
 RangeTblEntry *pgx_planner_rt_fetch(Index index, PlannerInfo *root) {
     return planner_rt_fetch(index, root);
