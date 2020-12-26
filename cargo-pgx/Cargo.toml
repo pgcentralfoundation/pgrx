@@ -19,10 +19,10 @@ env_proxy = "0.4.1"
 num_cpus = "1.13.0"
 pgx-utils = { path = "../pgx-utils", version = "0.1.8"}
 proc-macro2 = { version = "1.0.24", features = [ "span-locations" ] }
-quote = "1.0.7"
+quote = "1.0.8"
 rayon = "1.5.0"
 regex = "1.4.2"
 rttp_client = { version = "0.1.0", features = ["tls-native"] }
-syn = { version = "1.0.54", features = [ "extra-traits", "full", "fold", "parsing" ] }
+syn = { version = "1.0.55", features = [ "extra-traits", "full", "fold", "parsing" ] }
 unescape = "0.1.0"
 fork = "0.1.18"
