@@ -22,31 +22,6 @@ pub fn composite_row_type_make_tuple(row: pg_sys::Datum) -> PgBox<pg_sys::HeapTu
     tuple
 }
 
-pub fn deconstruct_row_type<'a>(
-    tupdesc: &'a PgTupleDesc,
-    row: pg_sys::Datum,
-) -> Array<'a, pg_sys::Datum> {
-    extern "C" {
-        fn pgx_deconstruct_row_type(
-            tupdesc: pg_sys::TupleDesc,
-            row: pg_sys::Datum,
-            columns: *mut *mut pg_sys::Datum,
-            nulls: *mut *mut bool,
-        );
-    }
-    let mut columns = std::ptr::null_mut();
-    let mut nulls = std::ptr::null_mut();
-    unsafe {
-        pgx_deconstruct_row_type(tupdesc.as_ptr(), row, &mut columns, &mut nulls);
-
-        Array::over(
-            columns,
-            nulls,
-            tupdesc.iter().filter(|att| !att.is_dropped()).count(),
-        )
-    }
-}
-
 /// ## Safety
 ///
 /// This function is safe, but if the provided `HeapTupleHeader` is null, it will `panic!()`
@@ -97,7 +72,7 @@ extern "C" {
 
 }
 
-/// Extract an attribute of a heap tuple and return it as a Datum.
+/// Extract an attribute of a heap tuple and return it as Rust type.
 /// This works for either system or user attributes.  The given `attnum`
 /// is properly range-checked.
 ///
@@ -124,6 +99,37 @@ pub fn heap_getattr<T: FromDatum>(
         None
     } else {
         unsafe { T::from_datum(datum, false, typoid.value()) }
+    }
+}
+
+/// Extract an attribute of a heap tuple and return it as a Datum.
+/// This works for either system or user attributes.  The given `attnum`
+/// is properly range-checked.
+///
+/// If the field in question has a NULL value, we return `None`.
+/// Otherwise, a `Some(pg_sys::Datum)`
+///
+/// 'tup' is the pointer to the heap tuple.  'attnum' is the attribute
+/// number of the column (field) caller wants.  'tupleDesc' is a
+/// pointer to the structure describing the row and all its fields.
+///
+/// `attno` is 1-based
+///
+/// ## Safety
+///
+/// This function is unsafe as it cannot validate that the provided pointers are valid.
+#[inline]
+pub unsafe fn heap_getattr_raw(
+    tuple: *const pg_sys::HeapTupleData,
+    attno: usize,
+    tupdesc: pg_sys::TupleDesc,
+) -> Option<pg_sys::Datum> {
+    let mut is_null = false;
+    let datum = pgx_heap_getattr(tuple, attno as u32, tupdesc, &mut is_null);
+    if is_null {
+        None
+    } else {
+        Some(datum)
     }
 }
 

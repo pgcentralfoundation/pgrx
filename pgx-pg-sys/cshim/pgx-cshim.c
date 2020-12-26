@@ -107,39 +107,3 @@ PGDLLEXPORT char *pgx_GETSTRUCT(HeapTuple tuple);
 char *pgx_GETSTRUCT(HeapTuple tuple) {
     return GETSTRUCT(tuple);
 }
-
-PGDLLEXPORT void pgx_deconstruct_row_type(TupleDesc tupdesc, Datum row, Datum **columns, bool **nulls);
-void pgx_deconstruct_row_type(TupleDesc tupdesc, Datum row, Datum **columns, bool **nulls) {
-    HeapTupleHeader td;
-    HeapTupleData   tmptup;
-    HeapTupleData   *tuple;
-    int             natts;
-    int             i, j;
-    Datum           *cols;
-    bool            *ns;
-
-    td = DatumGetHeapTupleHeader(row);
-
-    /* Build a temporary HeapTuple control structure */
-    tmptup.t_len  = HeapTupleHeaderGetDatumLength(td);
-    tmptup.t_data = td;
-    tuple = &tmptup;
-    natts = tupdesc->natts;
-
-    cols = palloc(natts * sizeof(Datum));
-    ns = palloc(natts * sizeof(bool));
-
-    for (i=0, j=0; i<natts; i++) {
-        Form_pg_attribute att = TupleDescAttr(tupdesc, i);
-
-        if (att->attisdropped) {
-            continue;
-        }
-
-        cols[j] = heap_getattr(tuple, i + 1, tupdesc, &ns[j]);
-        j++;
-    }
-
-    *columns = cols;
-    *nulls = ns;
-}
