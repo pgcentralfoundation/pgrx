@@ -248,4 +248,6 @@ fn filter_contents(mut input: String) -> String {
     }
 
     input = input.replace("@DEFAULT_VERSION@", &get_version());
+
+    input
 }
