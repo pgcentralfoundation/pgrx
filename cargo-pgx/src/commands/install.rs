@@ -140,6 +140,8 @@ fn copy_sql_files(extdir: &PathBuf, extname: &str, base_directory: &PathBuf) {
             file.display()
         ));
 
+        let contents = filter_contents(contents);
+
         sql.write_all(b"--\n")
             .expect("couldn't write version SQL file");
         sql.write_all(format!("-- {}\n", file.display()).as_bytes())
@@ -208,6 +210,15 @@ fn get_version() -> String {
     }
 }
 
+fn get_git_hash() -> String {
+    match get_property("git_hash") {
+        Some(hash) => hash,
+        None => exit_with_error!(
+            "unable to determine git hash.  Is git installed and is this project a git repository?"
+        ),
+    }
+}
+
 fn make_relative(path: PathBuf) -> PathBuf {
     if path.is_relative() {
         return path;
@@ -226,4 +237,15 @@ fn format_display_path(path: &PathBuf) -> String {
         .unwrap_or(&path)
         .display()
         .to_string()
+}
+
+fn filter_contents(mut input: String) -> String {
+    if input.contains("@GIT_HASH@") {
+        // avoid doing this if we don't actually have the token
+        // the project might not be a git repo so running `git`
+        // would fail
+        input = input.replace("@GIT_HASH@", &get_git_hash());
+    }
+
+    input = input.replace("@DEFAULT_VERSION@", &get_version());
 }
