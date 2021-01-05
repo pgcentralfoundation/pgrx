@@ -116,14 +116,22 @@ fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
                     use crate::PgNode;
                 }
             ),
-            format!("Unable to write bindings file for pg{}", major_version)
+            format!(
+                "Unable to write bindings file for pg{} to `{}`",
+                major_version,
+                bindings_file.display()
+            )
         );
 
         let mut oids_file = out_dir.clone();
         oids_file.push(&format!("pg{}_oids.rs", major_version));
         handle_result!(
             write_rs_file(oids, &oids_file, quote! {}),
-            format!("Unable to write oids file for pg{}", major_version)
+            format!(
+                "Unable to write oids file for pg{} to `{}`",
+                major_version,
+                oids_file.display()
+            )
         );
     });
 
