@@ -1075,6 +1075,7 @@ dependencies = [
  "regex",
  "serde",
  "serde_derive",
+ "serde_json",
  "syn",
  "toml",
  "unescape",
