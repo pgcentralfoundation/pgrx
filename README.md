@@ -2,7 +2,7 @@
 [![crates.io badge](https://img.shields.io/crates/v/pgx.svg)](https://crates.io/crates/pgx)
 [![docs.rs badge](https://docs.rs/pgx/badge.svg)](https://docs.rs/pgx)
 [![Twitter Follow](https://img.shields.io/twitter/follow/zombodb.svg?style=flat)](https://twitter.com/zombodb)
-[![Discord Chat](https://img.shields.io/discord/561648697805504526.svg)](https://discord.gg/hPb93Y9)  
+[![Discord Chat](https://img.shields.io/discord/561648697805504526.svg)](https://discord.gg/hPb93Y9)
 
 ---
 
@@ -12,7 +12,7 @@
 
 ###### Build Postgres Extensions with Rust!
 
-`pgx` is a framework for developing PostgreSQL extensions in Rust and strives to be as idiomatic and safe as possible.  
+`pgx` is a framework for developing PostgreSQL extensions in Rust and strives to be as idiomatic and safe as possible.
 
 `pgx` supports Postgres v10, v11, v12, and v13.
 
@@ -41,7 +41,7 @@ Feel free to join our [Discord Server](https://discord.gg/hPb93Y9).
     - Enums
  - Hand-written SQL is supported through the `extension_sql!` macro or through on-disk `.sql` files
  - Control the order in which SQL is executed during `CREATE EXTENSION ...;`
- 
+
 #### Safety First
  - Translates Rust `panic!`s into Postgres `ERROR`s that abort the transaction, not the process
  - Memory Management follows Rust's drop semantics, even in the face of `panic!` and `elog(ERROR)`
@@ -89,8 +89,8 @@ Postgres Type | Rust Type (as `Option<T>`)
 `NULL` | `Option::None`
 `internal` | `pgx::PgBox<T>` where `T` is any Rust/Postgres struct
 
-There are also `IntoDatum` and `FromDatum` traits for implementing additional type conversions, 
-along with `#[derive(PostgresType)]` and `#[derive(PostgresEnum)]` for automatic conversion of 
+There are also `IntoDatum` and `FromDatum` traits for implementing additional type conversions,
+along with `#[derive(PostgresType)]` and `#[derive(PostgresEnum)]` for automatic conversion of
 custom types.
 
 #### Easy Custom Types
@@ -116,21 +116,22 @@ custom types.
 
  - `cargo install rustfmt`
  - `git`
- - A C-compiler toolchain capable of building PostgreSQL, plus
-    - `libreadline-dev` package (might be different for your OS)
-    - `zlib1g-dev` package (might be different for your OS)
-    
+ - `libclang.so`
+   - Ubuntu: `libclang-dev` or `clang`
+   - RHEL: `clang`
+ - [build dependencies for PostgreSQL](https://wiki.postgresql.org/wiki/Compile_and_Install_from_source_code)
+
 ## Getting Started
 
-### Install `cargo pgx`
-First you'll want to install the `pgx` cargo sub-command from crates.io.  You'll use it almost exclusively during
+### 1. Install `cargo-pgx`
+First you'll want to install the `pgx` cargo sub-command from crates.io. You'll use it almost exclusively during
 your development and testing workflow.
 
 ```shell script
 $ cargo install cargo-pgx
 ```
 
-### Initialize it
+### 2. Initialize it
 
 Next, `pgx` needs to be initialized.  You only need to do this once.
 
@@ -139,38 +140,61 @@ $ cargo pgx init
 ```
 
 The `init` command downloads Postgres versions v10, v11, v12, v13 and compiles them to `~/.pgx/`.  These installations
-are needed by `pgx` not only for auto-generating Rust bindings from each version's header files, but also for `pgx`'s 
+are needed by `pgx` not only for auto-generating Rust bindings from each version's header files, but also for `pgx`'s
 test framework.
 
 See the documentation for [`cargo-pgx`](cargo-pgx/README.md) for details on how to limit the required postgres versions.
 
 
-### Create a new extension
+### 3. Create a new extension
 
 ```shell script
 $ cargo pgx new my_extension
-``` 
+$ cd my_extension
+```
 
-### Run your extension
+This will create a new directory for the extension crate.
+
+```
+my_extension/
+├── Cargo.toml
+├── my_extension.control
+├── sql
+│   ├── lib.generated.sql
+│   └── load-order.txt
+└── src
+    └── lib.rs
+```
+
+The new extension includes an example, so you can go ahead an run it right away.
+
+### 4. Run your extension
 
 ```shell script
-$ cd my_extension
 $ cargo pgx run pg13  # or pg10 or pg11 or pg12
 ```
 
-`cargo pgx run` compiles the extension to a shared library, copies it to the specified Postgres installation (in `~/.pgx/`),
+This compiles the extension to a shared library, copies it to the specified Postgres installation (in `~/.pgx/`),
 starts that Postgres instance and connects you, via `psql`, to a database named for the extension.
- 
+
 The first time, compilation takes a few minutes as `pgx` needs to generate almost 200k lines of Rust "bindings" from
 Postgres' header files.
 
-Once compiled you'll be placed in a `psql` shell, for, in this case, Postgres 12.
+Once compiled you'll be placed in a `psql` shell, for, in this case, Postgres 13.
+Now, we can just [load the extension](https://www.postgresql.org/docs/13/sql-createextension.html) and do a select on the example function.
 
-```shell script
-$ createdb test
-$ psql test
-> CREATE EXTENSION my_extension;
-> SELECT hello_my_extension();
+```sql
+CREATE EXTENSION my_extension;
+SELECT hello_my_extension();
+```
+
+This will return something along the lines of
+
+```
+ hello_my_extension
+---------------------
+ Hello, my_extension
+(1 row)
 ```
 
 ## Digging Deeper
@@ -193,7 +217,7 @@ There's probably more than are listed here, but a primary things of note are:
 
  - Not all of Postgres' internals are included or even wrapped.  This isn't due to it not being possible, it's simply due to it being an incredibly large task.  If you identify internal Postgres APIs you need, open an issue and we'll get them exposed, at least through the `pgx::pg_sys` module.
 
- - Windows is not supported.  It could be, but will require a bit of work with `cargo-pgx` and figuring out how to compile `pgx`'s "cshim" static library. 
+ - Windows is not supported.  It could be, but will require a bit of work with `cargo-pgx` and figuring out how to compile `pgx`'s "cshim" static library.
 
 ## TODO
 
@@ -221,6 +245,6 @@ time goes on.  Your feedback about what you'd like to be able to do with `pgx` i
 ## License
 
 ```
-Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. 
+Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 ```
