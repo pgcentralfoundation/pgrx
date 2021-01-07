@@ -13,7 +13,6 @@ use proc_macro2::{Ident, Span};
 use quote::{quote, quote_spanned};
 use rewriter::*;
 use std::collections::HashSet;
-use syn::export::{ToTokens, TokenStream2};
 use syn::spanned::Spanned;
 use syn::{parse_macro_input, Attribute, Data, DeriveInput, Item, ItemFn};
 
@@ -46,7 +45,7 @@ pub fn pg_guard(_attr: TokenStream, item: TokenStream) -> TokenStream {
 #[proc_macro_attribute]
 pub fn pg_test(attr: TokenStream, item: TokenStream) -> TokenStream {
     let mut stream = proc_macro2::TokenStream::new();
-    let args = parse_extern_attributes(TokenStream2::from(attr.clone()));
+    let args = parse_extern_attributes(proc_macro2::TokenStream::from(attr.clone()));
 
     let mut expected_error = None;
     args.into_iter().for_each(|v| {
@@ -76,7 +75,7 @@ pub fn pg_test(attr: TokenStream, item: TokenStream) -> TokenStream {
             let mut att_stream = proc_macro2::TokenStream::new();
 
             for a in attributes.iter() {
-                let as_str = a.tokens.to_token_stream().to_string();
+                let as_str = a.tokens.to_string();
                 att_stream.extend(quote! {
                     options.push(#as_str);
                 });
@@ -166,7 +165,7 @@ pub fn search_path(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// Declare a function as `#[pg_extern]` to indicate that it can be used by Postgres as a UDF
 #[proc_macro_attribute]
 pub fn pg_extern(attr: TokenStream, item: TokenStream) -> TokenStream {
-    let args = parse_extern_attributes(TokenStream2::from(attr));
+    let args = parse_extern_attributes(proc_macro2::TokenStream::from(attr));
     let is_raw = args.contains(&ExternArgs::Raw);
     let no_guard = args.contains(&ExternArgs::NoGuard);
 
@@ -231,7 +230,7 @@ fn impl_postgres_enum(ast: DeriveInput) -> proc_macro2::TokenStream {
 
     for d in enum_data.variants {
         let label_ident = &d.ident;
-        let label_string = label_ident.to_token_stream().to_string();
+        let label_string = label_ident.to_string();
 
         from_datum.extend(quote! { #label_string => Some(#enum_ident::#label_ident), });
         into_datum.extend(quote! { #enum_ident::#label_ident => Some(pgx::lookup_enum_by_label(#enum_name, #label_string)), });
@@ -299,7 +298,7 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
     }
 
     let lifetime = match has_lifetimes {
-        Some(lifetime) => lifetime.to_token_stream(),
+        Some(lifetime) => quote! {#lifetime},
         None => quote! {'static},
     };
 
@@ -312,7 +311,7 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
     // which implements _in and _out #[pg_extern] functions that just return the type itself
     if args.contains(&PostgresTypeAttribute::Default) {
         let inout_generics = if has_lifetimes.is_some() {
-            generics.to_token_stream()
+            quote! {#generics}
         } else {
             quote! {<'_>}
         };
@@ -407,7 +406,8 @@ fn impl_guc_enum(ast: DeriveInput) -> proc_macro2::TokenStream {
         let mut hidden = false;
 
         for att in e.attrs.iter() {
-            if att.to_token_stream().to_string() == "# [hidden]" {
+            let att = quote! {#att}.to_string();
+            if att == "# [hidden]" {
                 hidden = true;
                 break;
             }
@@ -460,7 +460,9 @@ fn parse_postgres_type_args(attributes: &[Attribute]) -> HashSet<PostgresTypeAtt
     let mut categorized_attributes = HashSet::new();
 
     for a in attributes {
-        match a.path.to_token_stream().to_string().as_str() {
+        let path = &a.path;
+        let path = quote! {#path}.to_string();
+        match path.as_str() {
             "inoutfuncs" => {
                 categorized_attributes.insert(PostgresTypeAttribute::InOutFuncs);
             }

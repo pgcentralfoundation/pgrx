@@ -12,7 +12,6 @@ use std::collections::{HashMap, HashSet};
 use std::error::Error;
 use std::path::PathBuf;
 use std::process::{Command, Output};
-use syn::export::{ToTokens, TokenStream2};
 use syn::Item;
 
 #[derive(Debug)]
@@ -144,9 +143,9 @@ fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
 }
 
 fn write_rs_file(
-    code: TokenStream2,
+    code: proc_macro2::TokenStream,
     file: &PathBuf,
-    header: TokenStream2,
+    header: proc_macro2::TokenStream,
 ) -> Result<(), std::io::Error> {
     let contents = quote! {
         #header
@@ -159,11 +158,13 @@ fn write_rs_file(
 
 /// Given a token stream representing a file, apply a series of transformations to munge
 /// the bindgen generated code with some postgres specific enhancements
-fn rewrite_items(file: &syn::File) -> Result<TokenStream2, Box<dyn Error + Send + Sync>> {
+fn rewrite_items(
+    file: &syn::File,
+) -> Result<proc_macro2::TokenStream, Box<dyn Error + Send + Sync>> {
     let items = apply_pg_guard(&file.items)?;
     let pgnode_impls = impl_pg_node(&items)?;
 
-    let mut stream = TokenStream2::new();
+    let mut stream = proc_macro2::TokenStream::new();
     for item in items.into_iter().chain(pgnode_impls.into_iter()) {
         stream.extend(quote! { #item });
     }
@@ -174,15 +175,16 @@ fn rewrite_items(file: &syn::File) -> Result<TokenStream2, Box<dyn Error + Send 
 /// Find all the constants that represent Postgres type OID values.
 ///
 /// These are constants of type `u32` whose name ends in the string "OID"
-fn extract_oids(code: &syn::File) -> Result<TokenStream2, Box<dyn Error>> {
-    let mut enum_variants = TokenStream2::new();
-    let mut from_impl = TokenStream2::new();
+fn extract_oids(code: &syn::File) -> Result<proc_macro2::TokenStream, Box<dyn Error>> {
+    let mut enum_variants = proc_macro2::TokenStream::new();
+    let mut from_impl = proc_macro2::TokenStream::new();
     for item in &code.items {
         match item {
             Item::Const(c) => {
                 let ident = &c.ident;
                 let name = ident.to_string();
-                let ty = &c.ty.to_token_stream().to_string();
+                let ty = &c.ty;
+                let ty = quote! {#ty}.to_string();
 
                 if ty == "u32" && name.ends_with("OID") && name != "HEAP_HASOID" {
                     enum_variants.extend(quote! {#ident = crate::#ident as isize, });

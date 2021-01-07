@@ -18,7 +18,7 @@ quote = "1.0.8"
 regex = "1.4.2"
 serde = "1.0.118"
 serde_derive = "1.0.118"
-syn = { version = "1.0.57", features = [ "extra-traits", "full", "fold", "parsing" ] }
+syn = { version = "1.0.58", features = [ "extra-traits", "full", "fold", "parsing" ] }
 toml = "0.5.8"
 unescape = "0.1.0"
 url = "2.2.0"

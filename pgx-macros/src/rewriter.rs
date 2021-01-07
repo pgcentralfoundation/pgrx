@@ -4,11 +4,10 @@
 extern crate proc_macro;
 
 use pgx_utils::{categorize_return_type, CategorizedType};
-use proc_macro2::Ident;
+use proc_macro2::{Ident, Span};
 use quote::{quote, quote_spanned, ToTokens};
 use std::ops::Deref;
 use std::str::FromStr;
-use syn::export::{Span, TokenStream2};
 use syn::spanned::Spanned;
 use syn::{
     FnArg, ForeignItem, ForeignItemFn, Generics, ItemFn, ItemForeignMod, Pat, ReturnType,
@@ -23,7 +22,7 @@ impl PgGuardRewriter {
     }
 
     pub fn extern_block(&self, block: ItemForeignMod) -> proc_macro2::TokenStream {
-        let mut stream = TokenStream2::new();
+        let mut stream = proc_macro2::TokenStream::new();
 
         for item in block.items.into_iter() {
             stream.extend(self.foreign_item(item));
@@ -202,7 +201,8 @@ impl PgGuardRewriter {
         let func_span = func.span();
         let return_type = func.sig.output;
         let return_type = format!("{}", quote! {#return_type});
-        let return_type = TokenStream2::from_str(return_type.trim_start_matches("->")).unwrap();
+        let return_type =
+            proc_macro2::TokenStream::from_str(return_type.trim_start_matches("->")).unwrap();
         let return_type = quote! {impl std::iter::Iterator<Item = #return_type>};
 
         func.sig.output = ReturnType::Default;
@@ -426,7 +426,11 @@ impl PgGuardRewriter {
         } else {
             false
         };
-        let is_no_mangle = func.attrs.iter().find(|attr| (attr.path.clone().into_token_stream().to_string() == "no_mangle")).is_some();
+        let is_no_mangle = func
+            .attrs
+            .iter()
+            .find(|attr| (attr.path.clone().into_token_stream().to_string() == "no_mangle"))
+            .is_some();
 
         // but for the inner function (the one we're wrapping) we don't need any kind of
         // abi classification
@@ -459,8 +463,7 @@ impl PgGuardRewriter {
                 quote! {
                     #[no_mangle]
                 }
-            }
-            else {
+            } else {
                 quote! {}
             }
         } else {

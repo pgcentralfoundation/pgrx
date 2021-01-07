@@ -3,13 +3,13 @@
 
 use crate::pg_config::PgConfig;
 use colored::Colorize;
+use proc_macro2::TokenStream;
 use proc_macro2::TokenTree;
 use quote::quote;
 use std::collections::HashSet;
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
 use std::str::FromStr;
-use syn::export::TokenStream2;
 use syn::{GenericArgument, ItemFn, PathArguments, ReturnType, Type, TypeParamBound};
 
 pub mod operator_common;
@@ -191,7 +191,7 @@ pub enum CategorizedType {
     Default,
 }
 
-pub fn parse_extern_attributes(attr: TokenStream2) -> HashSet<ExternArgs> {
+pub fn parse_extern_attributes(attr: TokenStream) -> HashSet<ExternArgs> {
     let mut args = HashSet::<ExternArgs>::new();
     let mut itr = attr.into_iter();
     while let Some(t) = itr.next() {
@@ -361,7 +361,7 @@ mod tests {
     #[test]
     fn parse_args() {
         let s = "error = \"syntax error at or near \\\"THIS\\\"\"";
-        let ts = TokenStream2::from_str(s).unwrap();
+        let ts = proc_macro2::TokenStream::from_str(s).unwrap();
 
         let args = parse_extern_attributes(ts);
         assert!(args.contains(&ExternArgs::Error(
