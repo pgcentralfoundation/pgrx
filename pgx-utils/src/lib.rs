@@ -356,7 +356,6 @@ pub fn categorize_type(ty: &Type) -> CategorizedType {
 mod tests {
     use crate::{parse_extern_attributes, ExternArgs};
     use std::str::FromStr;
-    use syn::export::TokenStream2;
 
     #[test]
     fn parse_args() {
