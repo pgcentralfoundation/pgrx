@@ -61,7 +61,7 @@ pub(crate) fn find_control_file() -> (PathBuf, String) {
 }
 
 fn determine_git_hash() -> Option<String> {
-    match Command::new("git").arg("rev-parse").arg("head").output() {
+    match Command::new("git").arg("rev-parse").arg("HEAD").output() {
         Ok(output) => Some(
             String::from_utf8(output.stdout)
                 .expect("`git rev-parse head` did not return valid utf8")
