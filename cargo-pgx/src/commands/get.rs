@@ -62,12 +62,23 @@ pub(crate) fn find_control_file() -> (PathBuf, String) {
 
 fn determine_git_hash() -> Option<String> {
     match Command::new("git").arg("rev-parse").arg("HEAD").output() {
-        Ok(output) => Some(
-            String::from_utf8(output.stdout)
-                .expect("`git rev-parse head` did not return valid utf8")
-                .trim()
-                .into(),
-        ),
+        Ok(output) => {
+            if !output.status.success() {
+                let stderr = String::from_utf8(output.stderr)
+                    .expect("`git rev-parse head` did not return valid utf8");
+                exit_with_error!(
+                    "problem running `git` to determine the current revision hash: {}",
+                    stderr
+                );
+            }
+
+            Some(
+                String::from_utf8(output.stdout)
+                    .expect("`git rev-parse head` did not return valid utf8")
+                    .trim()
+                    .into(),
+            )
+        }
         Err(e) => exit_with_error!(
             "problem running `git` to determine the current revision hash: {}",
             e
