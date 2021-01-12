@@ -53,37 +53,37 @@ jobs:
       run: cd /tmp/ && cargo pgx new sample
 
     - name: arrays example
-      run: cd pgx-examples/arrays cargo pgx test pg${{ matrix.version }}
+      run: cd pgx-examples/arrays && cargo pgx test pg${{ matrix.version }}
 
     - name: bad_ideas example
-      run: cd pgx-examples/bad_ideas cargo pgx test pg${{ matrix.version }}
+      run: cd pgx-examples/bad_ideas && cargo pgx test pg${{ matrix.version }}
 
     - name: bgworker example
-      run: cd pgx-examples/bgworker cargo pgx test pg${{ matrix.version }}
+      run: cd pgx-examples/bgworker && cargo pgx test pg${{ matrix.version }}
 
     - name: bytea example
-      run: cd pgx-examples/bytea cargo pgx test pg${{ matrix.version }}
+      run: cd pgx-examples/bytea && cargo pgx test pg${{ matrix.version }}
 
     - name: custom_types example
-      run: cd pgx-examples/custom_types cargo pgx test pg${{ matrix.version }}
+      run: cd pgx-examples/custom_types && cargo pgx test pg${{ matrix.version }}
 
     - name: errors example
-      run: cd pgx-examples/errors cargo pgx test pg${{ matrix.version }}
+      run: cd pgx-examples/errors && cargo pgx test pg${{ matrix.version }}
 
     - name: operators example
-      run: cd pgx-examples/operators cargo pgx test pg${{ matrix.version }}
+      run: cd pgx-examples/operators && cargo pgx test pg${{ matrix.version }}
 
     - name: schemas example
-      run: cd pgx-examples/schemas cargo pgx test pg${{ matrix.version }}
+      run: cd pgx-examples/schemas && cargo pgx test pg${{ matrix.version }}
 
     - name: shmem example
-      run: cd pgx-examples/shmem cargo pgx test pg${{ matrix.version }}
+      run: cd pgx-examples/shmem && cargo pgx test pg${{ matrix.version }}
 
     - name: spi example
-      run: cd pgx-examples/spi cargo pgx test pg${{ matrix.version }}
+      run: cd pgx-examples/spi && cargo pgx test pg${{ matrix.version }}
 
     - name: srf example
-      run: cd pgx-examples/srf cargo pgx test pg${{ matrix.version }}
+      run: cd pgx-examples/srf && cargo pgx test pg${{ matrix.version }}
 
     - name: strings example
-      run: cd pgx-examples/strings cargo pgx test pg${{ matrix.version }}
+      run: cd pgx-examples/strings && cargo pgx test pg${{ matrix.version }}
