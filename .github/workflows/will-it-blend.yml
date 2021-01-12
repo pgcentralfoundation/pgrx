@@ -3,9 +3,6 @@ name: will-it-blend
 on:
   schedule:
     - cron:  '* 8 * * *'
-    branches:
-      - master
-      - develop
 
 jobs:
   test:
