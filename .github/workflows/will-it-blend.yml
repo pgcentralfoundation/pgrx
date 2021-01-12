@@ -1,0 +1,39 @@
+name: cargo test --all
+
+on:
+  push:
+    branches:
+      - master
+      - develop
+
+jobs:
+  test:
+
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        version: [13]
+        os: ["ubuntu-latest"]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: cargo version
+        run: cargo --version
+
+      # Just install PG13 along with likely necessary build tools
+      - name: install postgres build dependencies
+        run: apt-get install -y clang-10 llvm-10 clang gcc make build-essential libz-dev zlib1g-dev strace libssl-dev pkg-config postgresql-13 postgresql-server-dev-13
+
+      # install cargo-pgx
+      - name: install cargo-pgx
+        run: cargo install --path cargo-pgx/ --debug
+
+      # initialize pgx to use cargo-pgs
+      - name: cargo pgx init
+        run: cargo pgx init --pg13=`which pg_config`
+
+      # just see if the code checks out okay
+      - name: cargo test
+        run: RUST_BACKTRACE=1 cargo check --all --features "pg${{ matrix.version }}"
