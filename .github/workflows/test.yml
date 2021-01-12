@@ -24,17 +24,6 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: cache cargo artifacts
-      id: cargo-artifacts-cache
-      uses: actions/cache@v2
-      with:
-        path: |
-          ~/.cargo/registry
-          ~/.cargo/git
-          ~/.cargo/cargo-pgx
-          target
-        key: test-${{ matrix.os }}-${{ matrix.version }}-cargo-${{ hashFiles('~/work/pgx/pgx/**/Cargo.toml') }}
-
     - name: cache cargo pgx init
       id: cargo-pgx-init-cache
       uses: actions/cache@v2
@@ -61,4 +50,4 @@ jobs:
 
     # test our code
     - name: cargo test
-      run: RUST_BACKTRACE=1 CARGO_TARGET_DIR=~/.cargo/cargo-pgx cargo test --all --features "pg${{ matrix.version }} pg_test" --no-default-features
+      run: RUST_BACKTRACE=1 cargo test --all --features "pg${{ matrix.version }} pg_test" --no-default-features
