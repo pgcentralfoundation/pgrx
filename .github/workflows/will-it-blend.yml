@@ -1,7 +1,8 @@
 name: will-it-blend
 
 on:
-  push:
+  schedule:
+    - cron:  '* 8 * * *'
     branches:
       - master
       - develop
