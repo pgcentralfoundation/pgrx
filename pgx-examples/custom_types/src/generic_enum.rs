@@ -1,11 +1,9 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-
 use pgx::*;
-use serde::export::Formatter;
 use serde::*;
-use std::fmt::Display;
+use std::fmt::{Display, Formatter};
 
 #[derive(PostgresEnum, Serialize)]
 pub enum SomeValue {
