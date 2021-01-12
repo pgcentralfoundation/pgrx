@@ -7,7 +7,7 @@
 //! understandings of Lists of Oids, Integers, and Pointers.
 
 use crate::{is_a, pg_sys, void_mut_ptr};
-use serde::export::PhantomData;
+use std::marker::PhantomData;
 
 pub struct PgList<T> {
     list: *mut pg_sys::List,
