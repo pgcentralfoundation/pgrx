@@ -59,6 +59,7 @@
 #include "parser/parse_type.h"
 #include "parser/parser.h"
 #include "postmaster/bgworker.h"
+#include "replication/output_plugin.h"
 #include "rewrite/rewriteHandler.h"
 #include "storage/block.h"
 #include "storage/bufmgr.h"

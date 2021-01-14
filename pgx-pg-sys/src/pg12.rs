@@ -39690,6 +39690,504 @@ extern "C" {
 extern "C" {
     pub fn SystemTypeName(name: *mut ::std::os::raw::c_char) -> *mut TypeName;
 }
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ReorderBufferTupleBuf {
+    pub node: slist_node,
+    pub tuple: HeapTupleData,
+    pub alloc_tuple_size: Size,
+}
+impl Default for ReorderBufferTupleBuf {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+pub const ReorderBufferChangeType_REORDER_BUFFER_CHANGE_INSERT: ReorderBufferChangeType = 0;
+pub const ReorderBufferChangeType_REORDER_BUFFER_CHANGE_UPDATE: ReorderBufferChangeType = 1;
+pub const ReorderBufferChangeType_REORDER_BUFFER_CHANGE_DELETE: ReorderBufferChangeType = 2;
+pub const ReorderBufferChangeType_REORDER_BUFFER_CHANGE_MESSAGE: ReorderBufferChangeType = 3;
+pub const ReorderBufferChangeType_REORDER_BUFFER_CHANGE_INTERNAL_SNAPSHOT: ReorderBufferChangeType =
+    4;
+pub const ReorderBufferChangeType_REORDER_BUFFER_CHANGE_INTERNAL_COMMAND_ID:
+    ReorderBufferChangeType = 5;
+pub const ReorderBufferChangeType_REORDER_BUFFER_CHANGE_INTERNAL_TUPLECID: ReorderBufferChangeType =
+    6;
+pub const ReorderBufferChangeType_REORDER_BUFFER_CHANGE_INTERNAL_SPEC_INSERT:
+    ReorderBufferChangeType = 7;
+pub const ReorderBufferChangeType_REORDER_BUFFER_CHANGE_INTERNAL_SPEC_CONFIRM:
+    ReorderBufferChangeType = 8;
+pub const ReorderBufferChangeType_REORDER_BUFFER_CHANGE_TRUNCATE: ReorderBufferChangeType = 9;
+pub type ReorderBufferChangeType = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct ReorderBufferChange {
+    pub lsn: XLogRecPtr,
+    pub action: ReorderBufferChangeType,
+    pub origin_id: RepOriginId,
+    pub data: ReorderBufferChange__bindgen_ty_1,
+    pub node: dlist_node,
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub union ReorderBufferChange__bindgen_ty_1 {
+    pub tp: ReorderBufferChange__bindgen_ty_1__bindgen_ty_1,
+    pub truncate: ReorderBufferChange__bindgen_ty_1__bindgen_ty_2,
+    pub msg: ReorderBufferChange__bindgen_ty_1__bindgen_ty_3,
+    pub snapshot: Snapshot,
+    pub command_id: CommandId,
+    pub tuplecid: ReorderBufferChange__bindgen_ty_1__bindgen_ty_4,
+    _bindgen_union_align: [u64; 4usize],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ReorderBufferChange__bindgen_ty_1__bindgen_ty_1 {
+    pub relnode: RelFileNode,
+    pub clear_toast_afterwards: bool,
+    pub oldtuple: *mut ReorderBufferTupleBuf,
+    pub newtuple: *mut ReorderBufferTupleBuf,
+}
+impl Default for ReorderBufferChange__bindgen_ty_1__bindgen_ty_1 {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ReorderBufferChange__bindgen_ty_1__bindgen_ty_2 {
+    pub nrelids: Size,
+    pub cascade: bool,
+    pub restart_seqs: bool,
+    pub relids: *mut Oid,
+}
+impl Default for ReorderBufferChange__bindgen_ty_1__bindgen_ty_2 {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ReorderBufferChange__bindgen_ty_1__bindgen_ty_3 {
+    pub prefix: *mut ::std::os::raw::c_char,
+    pub message_size: Size,
+    pub message: *mut ::std::os::raw::c_char,
+}
+impl Default for ReorderBufferChange__bindgen_ty_1__bindgen_ty_3 {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct ReorderBufferChange__bindgen_ty_1__bindgen_ty_4 {
+    pub node: RelFileNode,
+    pub tid: ItemPointerData,
+    pub cmin: CommandId,
+    pub cmax: CommandId,
+    pub combocid: CommandId,
+}
+impl Default for ReorderBufferChange__bindgen_ty_1 {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+impl Default for ReorderBufferChange {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ReorderBufferTXN {
+    pub xid: TransactionId,
+    pub has_catalog_changes: bool,
+    pub is_known_as_subxact: bool,
+    pub toplevel_xid: TransactionId,
+    pub first_lsn: XLogRecPtr,
+    pub final_lsn: XLogRecPtr,
+    pub end_lsn: XLogRecPtr,
+    pub restart_decoding_lsn: XLogRecPtr,
+    pub origin_id: RepOriginId,
+    pub origin_lsn: XLogRecPtr,
+    pub commit_time: TimestampTz,
+    pub base_snapshot: Snapshot,
+    pub base_snapshot_lsn: XLogRecPtr,
+    pub base_snapshot_node: dlist_node,
+    pub nentries: uint64,
+    pub nentries_mem: uint64,
+    pub serialized: bool,
+    pub changes: dlist_head,
+    pub tuplecids: dlist_head,
+    pub ntuplecids: uint64,
+    pub tuplecid_hash: *mut HTAB,
+    pub toast_hash: *mut HTAB,
+    pub subtxns: dlist_head,
+    pub nsubtxns: uint32,
+    pub ninvalidations: uint32,
+    pub invalidations: *mut SharedInvalidationMessage,
+    pub node: dlist_node,
+}
+impl Default for ReorderBufferTXN {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+pub type ReorderBufferApplyChangeCB = ::std::option::Option<
+    unsafe extern "C" fn(
+        rb: *mut ReorderBuffer,
+        txn: *mut ReorderBufferTXN,
+        relation: Relation,
+        change: *mut ReorderBufferChange,
+    ),
+>;
+pub type ReorderBufferApplyTruncateCB = ::std::option::Option<
+    unsafe extern "C" fn(
+        rb: *mut ReorderBuffer,
+        txn: *mut ReorderBufferTXN,
+        nrelations: ::std::os::raw::c_int,
+        relations: *mut Relation,
+        change: *mut ReorderBufferChange,
+    ),
+>;
+pub type ReorderBufferBeginCB =
+    ::std::option::Option<unsafe extern "C" fn(rb: *mut ReorderBuffer, txn: *mut ReorderBufferTXN)>;
+pub type ReorderBufferCommitCB = ::std::option::Option<
+    unsafe extern "C" fn(
+        rb: *mut ReorderBuffer,
+        txn: *mut ReorderBufferTXN,
+        commit_lsn: XLogRecPtr,
+    ),
+>;
+pub type ReorderBufferMessageCB = ::std::option::Option<
+    unsafe extern "C" fn(
+        rb: *mut ReorderBuffer,
+        txn: *mut ReorderBufferTXN,
+        message_lsn: XLogRecPtr,
+        transactional: bool,
+        prefix: *const ::std::os::raw::c_char,
+        sz: Size,
+        message: *const ::std::os::raw::c_char,
+    ),
+>;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ReorderBuffer {
+    pub by_txn: *mut HTAB,
+    pub toplevel_by_lsn: dlist_head,
+    pub txns_by_base_snapshot_lsn: dlist_head,
+    pub by_txn_last_xid: TransactionId,
+    pub by_txn_last_txn: *mut ReorderBufferTXN,
+    pub begin: ReorderBufferBeginCB,
+    pub apply_change: ReorderBufferApplyChangeCB,
+    pub apply_truncate: ReorderBufferApplyTruncateCB,
+    pub commit: ReorderBufferCommitCB,
+    pub message: ReorderBufferMessageCB,
+    pub private_data: *mut ::std::os::raw::c_void,
+    pub output_rewrites: bool,
+    pub context: MemoryContext,
+    pub change_context: MemoryContext,
+    pub txn_context: MemoryContext,
+    pub tup_context: MemoryContext,
+    pub current_restart_decoding_lsn: XLogRecPtr,
+    pub outbuf: *mut ::std::os::raw::c_char,
+    pub outbufsize: Size,
+}
+impl Default for ReorderBuffer {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[pg_guard]
+extern "C" {
+    pub fn ReorderBufferAllocate() -> *mut ReorderBuffer;
+}
+#[pg_guard]
+extern "C" {
+    pub fn ReorderBufferFree(arg1: *mut ReorderBuffer);
+}
+#[pg_guard]
+extern "C" {
+    pub fn ReorderBufferGetTupleBuf(
+        arg1: *mut ReorderBuffer,
+        tuple_len: Size,
+    ) -> *mut ReorderBufferTupleBuf;
+}
+#[pg_guard]
+extern "C" {
+    pub fn ReorderBufferReturnTupleBuf(arg1: *mut ReorderBuffer, tuple: *mut ReorderBufferTupleBuf);
+}
+#[pg_guard]
+extern "C" {
+    pub fn ReorderBufferGetChange(arg1: *mut ReorderBuffer) -> *mut ReorderBufferChange;
+}
+#[pg_guard]
+extern "C" {
+    pub fn ReorderBufferReturnChange(arg1: *mut ReorderBuffer, arg2: *mut ReorderBufferChange);
+}
+#[pg_guard]
+extern "C" {
+    pub fn ReorderBufferGetRelids(
+        arg1: *mut ReorderBuffer,
+        nrelids: ::std::os::raw::c_int,
+    ) -> *mut Oid;
+}
+#[pg_guard]
+extern "C" {
+    pub fn ReorderBufferReturnRelids(arg1: *mut ReorderBuffer, relids: *mut Oid);
+}
+#[pg_guard]
+extern "C" {
+    pub fn ReorderBufferQueueChange(
+        arg1: *mut ReorderBuffer,
+        arg2: TransactionId,
+        lsn: XLogRecPtr,
+        arg3: *mut ReorderBufferChange,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn ReorderBufferQueueMessage(
+        arg1: *mut ReorderBuffer,
+        arg2: TransactionId,
+        snapshot: Snapshot,
+        lsn: XLogRecPtr,
+        transactional: bool,
+        prefix: *const ::std::os::raw::c_char,
+        message_size: Size,
+        message: *const ::std::os::raw::c_char,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn ReorderBufferCommit(
+        arg1: *mut ReorderBuffer,
+        arg2: TransactionId,
+        commit_lsn: XLogRecPtr,
+        end_lsn: XLogRecPtr,
+        commit_time: TimestampTz,
+        origin_id: RepOriginId,
+        origin_lsn: XLogRecPtr,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn ReorderBufferAssignChild(
+        arg1: *mut ReorderBuffer,
+        arg2: TransactionId,
+        arg3: TransactionId,
+        commit_lsn: XLogRecPtr,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn ReorderBufferCommitChild(
+        arg1: *mut ReorderBuffer,
+        arg2: TransactionId,
+        arg3: TransactionId,
+        commit_lsn: XLogRecPtr,
+        end_lsn: XLogRecPtr,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn ReorderBufferAbort(arg1: *mut ReorderBuffer, arg2: TransactionId, lsn: XLogRecPtr);
+}
+#[pg_guard]
+extern "C" {
+    pub fn ReorderBufferAbortOld(arg1: *mut ReorderBuffer, xid: TransactionId);
+}
+#[pg_guard]
+extern "C" {
+    pub fn ReorderBufferForget(arg1: *mut ReorderBuffer, arg2: TransactionId, lsn: XLogRecPtr);
+}
+#[pg_guard]
+extern "C" {
+    pub fn ReorderBufferSetBaseSnapshot(
+        arg1: *mut ReorderBuffer,
+        arg2: TransactionId,
+        lsn: XLogRecPtr,
+        snap: *mut SnapshotData,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn ReorderBufferAddSnapshot(
+        arg1: *mut ReorderBuffer,
+        arg2: TransactionId,
+        lsn: XLogRecPtr,
+        snap: *mut SnapshotData,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn ReorderBufferAddNewCommandId(
+        arg1: *mut ReorderBuffer,
+        arg2: TransactionId,
+        lsn: XLogRecPtr,
+        cid: CommandId,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn ReorderBufferAddNewTupleCids(
+        arg1: *mut ReorderBuffer,
+        arg2: TransactionId,
+        lsn: XLogRecPtr,
+        node: RelFileNode,
+        pt: ItemPointerData,
+        cmin: CommandId,
+        cmax: CommandId,
+        combocid: CommandId,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn ReorderBufferAddInvalidations(
+        arg1: *mut ReorderBuffer,
+        arg2: TransactionId,
+        lsn: XLogRecPtr,
+        nmsgs: Size,
+        msgs: *mut SharedInvalidationMessage,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn ReorderBufferImmediateInvalidation(
+        arg1: *mut ReorderBuffer,
+        ninvalidations: uint32,
+        invalidations: *mut SharedInvalidationMessage,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn ReorderBufferProcessXid(arg1: *mut ReorderBuffer, xid: TransactionId, lsn: XLogRecPtr);
+}
+#[pg_guard]
+extern "C" {
+    pub fn ReorderBufferXidSetCatalogChanges(
+        arg1: *mut ReorderBuffer,
+        xid: TransactionId,
+        lsn: XLogRecPtr,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn ReorderBufferXidHasCatalogChanges(arg1: *mut ReorderBuffer, xid: TransactionId) -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn ReorderBufferXidHasBaseSnapshot(arg1: *mut ReorderBuffer, xid: TransactionId) -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn ReorderBufferGetOldestTXN(arg1: *mut ReorderBuffer) -> *mut ReorderBufferTXN;
+}
+#[pg_guard]
+extern "C" {
+    pub fn ReorderBufferGetOldestXmin(rb: *mut ReorderBuffer) -> TransactionId;
+}
+#[pg_guard]
+extern "C" {
+    pub fn ReorderBufferSetRestartPoint(arg1: *mut ReorderBuffer, ptr: XLogRecPtr);
+}
+#[pg_guard]
+extern "C" {
+    pub fn StartupReorderBuffer();
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct LogicalDecodingContext {
+    _unused: [u8; 0],
+}
+pub const OutputPluginOutputType_OUTPUT_PLUGIN_BINARY_OUTPUT: OutputPluginOutputType = 0;
+pub const OutputPluginOutputType_OUTPUT_PLUGIN_TEXTUAL_OUTPUT: OutputPluginOutputType = 1;
+pub type OutputPluginOutputType = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct OutputPluginOptions {
+    pub output_type: OutputPluginOutputType,
+    pub receive_rewrites: bool,
+}
+impl Default for OutputPluginOptions {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+pub type LogicalOutputPluginInit =
+    ::std::option::Option<unsafe extern "C" fn(cb: *mut OutputPluginCallbacks)>;
+pub type LogicalDecodeStartupCB = ::std::option::Option<
+    unsafe extern "C" fn(
+        ctx: *mut LogicalDecodingContext,
+        options: *mut OutputPluginOptions,
+        is_init: bool,
+    ),
+>;
+pub type LogicalDecodeBeginCB = ::std::option::Option<
+    unsafe extern "C" fn(ctx: *mut LogicalDecodingContext, txn: *mut ReorderBufferTXN),
+>;
+pub type LogicalDecodeChangeCB = ::std::option::Option<
+    unsafe extern "C" fn(
+        ctx: *mut LogicalDecodingContext,
+        txn: *mut ReorderBufferTXN,
+        relation: Relation,
+        change: *mut ReorderBufferChange,
+    ),
+>;
+pub type LogicalDecodeTruncateCB = ::std::option::Option<
+    unsafe extern "C" fn(
+        ctx: *mut LogicalDecodingContext,
+        txn: *mut ReorderBufferTXN,
+        nrelations: ::std::os::raw::c_int,
+        relations: *mut Relation,
+        change: *mut ReorderBufferChange,
+    ),
+>;
+pub type LogicalDecodeCommitCB = ::std::option::Option<
+    unsafe extern "C" fn(
+        ctx: *mut LogicalDecodingContext,
+        txn: *mut ReorderBufferTXN,
+        commit_lsn: XLogRecPtr,
+    ),
+>;
+pub type LogicalDecodeMessageCB = ::std::option::Option<
+    unsafe extern "C" fn(
+        ctx: *mut LogicalDecodingContext,
+        txn: *mut ReorderBufferTXN,
+        message_lsn: XLogRecPtr,
+        transactional: bool,
+        prefix: *const ::std::os::raw::c_char,
+        message_size: Size,
+        message: *const ::std::os::raw::c_char,
+    ),
+>;
+pub type LogicalDecodeFilterByOriginCB = ::std::option::Option<
+    unsafe extern "C" fn(ctx: *mut LogicalDecodingContext, origin_id: RepOriginId) -> bool,
+>;
+pub type LogicalDecodeShutdownCB =
+    ::std::option::Option<unsafe extern "C" fn(ctx: *mut LogicalDecodingContext)>;
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct OutputPluginCallbacks {
+    pub startup_cb: LogicalDecodeStartupCB,
+    pub begin_cb: LogicalDecodeBeginCB,
+    pub change_cb: LogicalDecodeChangeCB,
+    pub truncate_cb: LogicalDecodeTruncateCB,
+    pub commit_cb: LogicalDecodeCommitCB,
+    pub message_cb: LogicalDecodeMessageCB,
+    pub filter_by_origin_cb: LogicalDecodeFilterByOriginCB,
+    pub shutdown_cb: LogicalDecodeShutdownCB,
+}
+#[pg_guard]
+extern "C" {
+    pub fn OutputPluginPrepareWrite(ctx: *mut LogicalDecodingContext, last_write: bool);
+}
+#[pg_guard]
+extern "C" {
+    pub fn OutputPluginWrite(ctx: *mut LogicalDecodingContext, last_write: bool);
+}
+#[pg_guard]
+extern "C" {
+    pub fn OutputPluginUpdateProgress(ctx: *mut LogicalDecodingContext);
+}
 #[pg_guard]
 extern "C" {
     pub fn QueryRewrite(parsetree: *mut Query) -> *mut List;
