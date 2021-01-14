@@ -20,9 +20,9 @@ jobs:
       - name: cargo version
         run: cargo --version
 
-      # Just install PG13 along with likely necessary build tools
+      # Just install PG along with likely necessary build tools
       - name: install postgres build dependencies
-        run: sudo apt-get install -y clang-10 llvm-10 clang gcc make build-essential libz-dev zlib1g-dev strace libssl-dev pkg-config postgresql-13 postgresql-server-dev-13
+        run: sudo apt-get install -y clang-10 llvm-10 clang gcc make build-essential libz-dev zlib1g-dev strace libssl-dev pkg-config postgresql-${{ matrix.os }} postgresql-server-dev-${{ matrix.os }}
 
       # install cargo-pgx
       - name: install cargo-pgx
@@ -30,7 +30,7 @@ jobs:
 
       # initialize pgx to use cargo-pgs
       - name: cargo pgx init
-        run: cargo pgx init --pg13=`which pg_config`
+        run: cargo pgx init --pg${{ matrix.os }}=`which pg_config`
 
       # just see if the code checks out okay
       - name: cargo test
