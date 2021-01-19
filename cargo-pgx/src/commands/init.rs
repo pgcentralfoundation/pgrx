@@ -164,7 +164,9 @@ fn configure_postgres(pg_config: &PgConfig, pgdir: &PathBuf) -> Result<(), std::
         pg_config.major_version()?,
         pg_config.minor_version()?
     );
-    let mut command = std::process::Command::new("./configure");
+    let mut configure_path = pgdir.clone();
+    configure_path.push("configure");
+    let mut command = std::process::Command::new(configure_path);
 
     command
         .arg(format!("--prefix={}", get_pg_installdir(pgdir).display()))
