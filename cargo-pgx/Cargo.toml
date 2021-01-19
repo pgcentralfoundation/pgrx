@@ -1,6 +1,6 @@
 [package]
 name = "cargo-pgx"
-version = "0.1.16"
+version = "0.1.17"
 authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
 edition = "2018"
 license = "MIT"
@@ -17,7 +17,7 @@ clap = { version = "2.33.3", features = [ "yaml" ] }
 colored = "2.0.0"
 env_proxy = "0.4.1"
 num_cpus = "1.13.0"
-pgx-utils = { path = "../pgx-utils", version = "0.1.16"}
+pgx-utils = { path = "../pgx-utils", version = "0.1.17"}
 proc-macro2 = { version = "1.0.24", features = [ "span-locations" ] }
 quote = "1.0.8"
 rayon = "1.5.0"
