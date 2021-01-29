@@ -279,9 +279,9 @@ impl Pgx {
                 PgConfig {
                     version: Some(PgVersion {
                         major_version: 10,
-                        minor_version: 14,
+                        minor_version: 15,
                         url: Url::parse(
-                            "https://ftp.postgresql.org/pub/source/v10.14/postgresql-10.14.tar.bz2",
+                            "https://ftp.postgresql.org/pub/source/v10.15/postgresql-10.15.tar.bz2",
                         )
                         .expect("invalid url"),
                     }),
@@ -290,9 +290,9 @@ impl Pgx {
                 PgConfig {
                     version: Some(PgVersion {
                         major_version: 11,
-                        minor_version: 9,
+                        minor_version: 10,
                         url: Url::parse(
-                            "https://ftp.postgresql.org/pub/source/v11.9/postgresql-11.9.tar.bz2",
+                            "https://ftp.postgresql.org/pub/source/v11.10/postgresql-11.10.tar.bz2",
                         )
                         .expect("invalid url"),
                     }),
@@ -301,9 +301,9 @@ impl Pgx {
                 PgConfig {
                     version: Some(PgVersion {
                         major_version: 12,
-                        minor_version: 4,
+                        minor_version: 5,
                         url: Url::parse(
-                            "https://ftp.postgresql.org/pub/source/v12.4/postgresql-12.4.tar.bz2",
+                            "https://ftp.postgresql.org/pub/source/v12.5/postgresql-12.5.tar.bz2",
                         )
                         .expect("invalid url"),
                     }),
@@ -312,9 +312,9 @@ impl Pgx {
                 PgConfig {
                     version: Some(PgVersion {
                         major_version: 13,
-                        minor_version: 0,
+                        minor_version: 1,
                         url: Url::parse(
-                            "https://ftp.postgresql.org/pub/source/v13.0/postgresql-13.0.tar.bz2",
+                            "https://ftp.postgresql.org/pub/source/v13.1/postgresql-13.1.tar.bz2",
                         )
                         .expect("invalid url"),
                     }),
