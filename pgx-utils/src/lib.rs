@@ -6,6 +6,7 @@ use colored::Colorize;
 use proc_macro2::TokenStream;
 use proc_macro2::TokenTree;
 use quote::quote;
+use serde_json::value::Value as JsonValue;
 use std::collections::HashSet;
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
@@ -53,14 +54,31 @@ macro_rules! handle_result {
 }
 
 pub fn get_target_dir() -> PathBuf {
-    std::env::var("CARGO_TARGET_DIR").map_or_else(
-        |_| {
-            let mut cwd = std::env::current_dir().unwrap();
-            cwd.push("target");
-            cwd
-        },
-        |v| v.into(),
-    )
+    let mut command = Command::new("cargo");
+    command
+        .arg("metadata")
+        .arg("--format-version=1")
+        .arg("--no-deps");
+    let output = handle_result!(
+        command.output(),
+        "Unable to get target directory from 'cargo metadata'"
+    );
+    if !output.status.success() {
+        exit_with_error!("'cargo metadata' failed with exit code: {}", output.status);
+    }
+
+    let json: JsonValue = handle_result!(
+        serde_json::from_slice(&output.stdout),
+        "Invalid 'cargo metada' response"
+    );
+    let target_dir = json.get("target_directory");
+    match target_dir {
+        Some(JsonValue::String(target_dir)) => target_dir.into(),
+        v => crate::exit_with_error!(
+            "could not read target dir from 'cargo metadata got: {:?}",
+            v,
+        ),
+    }
 }
 
 pub fn prefix_path<P: Into<PathBuf>>(dir: P) -> String {
