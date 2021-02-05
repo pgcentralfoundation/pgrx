@@ -1,9 +1,8 @@
 version: 2
 updates:
-- package-ecosystem: cargo
-  directory: "/"
-  schedule:
-    interval: daily
-    time: "12:00"
-  open-pull-requests-limit: 10
-  target_branch: develop
+  - package-ecosystem: "cargo"
+    directory: "/"
+    schedule:
+      interval: "daily"
+      time: "12:00"
+    target-branch: "develop"
