@@ -3,17 +3,16 @@ use crate::PgNode;
 use pgx_macros::*;
 #[repr(C)]
 #[derive(Copy, Clone, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd)]
-pub struct __BindgenBitfieldUnit<Storage, Align> {
+pub struct __BindgenBitfieldUnit<Storage> {
     storage: Storage,
-    align: [Align; 0],
 }
-impl<Storage, Align> __BindgenBitfieldUnit<Storage, Align> {
+impl<Storage> __BindgenBitfieldUnit<Storage> {
     #[inline]
     pub const fn new(storage: Storage) -> Self {
-        Self { storage, align: [] }
+        Self { storage }
     }
 }
-impl<Storage, Align> __BindgenBitfieldUnit<Storage, Align>
+impl<Storage> __BindgenBitfieldUnit<Storage>
 where
     Storage: AsRef<[u8]> + AsMut<[u8]>,
 {
@@ -330,15 +329,15 @@ pub const MAXIMUM_ALIGNOF: u32 = 8;
 pub const MEMSET_LOOP_LIMIT: u32 = 1024;
 pub const PACKAGE_BUGREPORT: &'static [u8; 32usize] = b"pgsql-bugs@lists.postgresql.org\0";
 pub const PACKAGE_NAME: &'static [u8; 11usize] = b"PostgreSQL\0";
-pub const PACKAGE_STRING: &'static [u8; 16usize] = b"PostgreSQL 12.4\0";
+pub const PACKAGE_STRING: &'static [u8; 16usize] = b"PostgreSQL 12.5\0";
 pub const PACKAGE_TARNAME: &'static [u8; 11usize] = b"postgresql\0";
 pub const PACKAGE_URL: &'static [u8; 1usize] = b"\0";
-pub const PACKAGE_VERSION: &'static [u8; 5usize] = b"12.4\0";
+pub const PACKAGE_VERSION: &'static [u8; 5usize] = b"12.5\0";
 pub const PG_KRB_SRVNAM: &'static [u8; 9usize] = b"postgres\0";
 pub const PG_MAJORVERSION: &'static [u8; 3usize] = b"12\0";
-pub const PG_VERSION: &'static [u8; 5usize] = b"12.4\0";
-pub const PG_VERSION_NUM: u32 = 120004;
-pub const PG_VERSION_STR : & 'static [u8 ; 114usize] = b"PostgreSQL 12.4 on x86_64-apple-darwin19.0.0, compiled by Apple clang version 11.0.0 (clang-1100.0.33.12), 64-bit\0" ;
+pub const PG_VERSION: &'static [u8; 5usize] = b"12.5\0";
+pub const PG_VERSION_NUM: u32 = 120005;
+pub const PG_VERSION_STR : & 'static [u8 ; 114usize] = b"PostgreSQL 12.5 on x86_64-apple-darwin19.0.0, compiled by Apple clang version 11.0.0 (clang-1100.0.33.17), 64-bit\0" ;
 pub const RELSEG_SIZE: u32 = 131072;
 pub const SIZEOF_BOOL: u32 = 1;
 pub const SIZEOF_LONG: u32 = 8;
@@ -1583,7 +1582,7 @@ pub const _PASSWORD_NOEXP: u32 = 8;
 pub const _PASSWORD_WARNDAYS: u32 = 14;
 pub const _PASSWORD_CHGNOW: i32 = -1;
 pub const PGINVALID_SOCKET: i32 = -1;
-pub const PG_BACKEND_VERSIONSTR: &'static [u8; 28usize] = b"postgres (PostgreSQL) 12.4\n\0";
+pub const PG_BACKEND_VERSIONSTR: &'static [u8; 28usize] = b"postgres (PostgreSQL) 12.5\n\0";
 pub const EXE: &'static [u8; 1usize] = b"\0";
 pub const DEVNULL: &'static [u8; 10usize] = b"/dev/null\0";
 pub const USE_REPL_SNPRINTF: u32 = 1;
@@ -1850,6 +1849,8 @@ pub const PG_PAGE_LAYOUT_VERSION: u32 = 4;
 pub const PG_DATA_CHECKSUM_VERSION: u32 = 1;
 pub const PAI_OVERWRITE: u32 = 1;
 pub const PAI_IS_HEAP: u32 = 2;
+pub const PIV_LOG_WARNING: u32 = 1;
+pub const PIV_REPORT_STAT: u32 = 2;
 pub const MaxTupleAttributeNumber: u32 = 1664;
 pub const MaxHeapAttributeNumber: u32 = 1600;
 pub const FIELDNO_HEAPTUPLEHEADERDATA_INFOMASK2: u32 = 2;
@@ -2332,16 +2333,16 @@ pub const ExclusiveLock: u32 = 7;
 pub const AccessExclusiveLock: u32 = 8;
 pub const MaxLockMode: u32 = 8;
 pub const LWLOCK_PADDED_SIZE: u32 = 128;
-pub const NUM_INDIVIDUAL_LWLOCKS: u32 = 45;
+pub const NUM_INDIVIDUAL_LWLOCKS: u32 = 48;
 pub const NUM_BUFFER_PARTITIONS: u32 = 128;
 pub const LOG2_NUM_LOCK_PARTITIONS: u32 = 4;
 pub const NUM_LOCK_PARTITIONS: u32 = 16;
 pub const LOG2_NUM_PREDICATELOCK_PARTITIONS: u32 = 4;
 pub const NUM_PREDICATELOCK_PARTITIONS: u32 = 16;
-pub const BUFFER_MAPPING_LWLOCK_OFFSET: u32 = 45;
-pub const LOCK_MANAGER_LWLOCK_OFFSET: u32 = 173;
-pub const PREDICATELOCK_MANAGER_LWLOCK_OFFSET: u32 = 189;
-pub const NUM_FIXED_LWLOCKS: u32 = 205;
+pub const BUFFER_MAPPING_LWLOCK_OFFSET: u32 = 48;
+pub const LOCK_MANAGER_LWLOCK_OFFSET: u32 = 176;
+pub const PREDICATELOCK_MANAGER_LWLOCK_OFFSET: u32 = 192;
+pub const NUM_FIXED_LWLOCKS: u32 = 208;
 pub const SHMEM_INDEX_KEYSIZE: u32 = 48;
 pub const SHMEM_INDEX_SIZE: u32 = 64;
 pub const InvalidLocalTransactionId: u32 = 0;
@@ -4128,7 +4129,8 @@ pub struct __darwin_i386_thread_state {
 #[repr(align(2))]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct __darwin_fp_control {
-    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 2usize], u8>,
+    pub _bitfield_align_1: [u8; 0],
+    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 2usize]>,
 }
 impl __darwin_fp_control {
     #[inline]
@@ -4229,9 +4231,8 @@ impl __darwin_fp_control {
         __precis: ::std::os::raw::c_ushort,
         __pc: ::std::os::raw::c_ushort,
         __rc: ::std::os::raw::c_ushort,
-    ) -> __BindgenBitfieldUnit<[u8; 2usize], u8> {
-        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 2usize], u8> =
-            Default::default();
+    ) -> __BindgenBitfieldUnit<[u8; 2usize]> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 2usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
             let __invalid: u16 = unsafe { ::std::mem::transmute(__invalid) };
             __invalid as u64
@@ -4272,7 +4273,8 @@ pub type __darwin_fp_control_t = __darwin_fp_control;
 #[repr(align(2))]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct __darwin_fp_status {
-    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 2usize], u8>,
+    pub _bitfield_align_1: [u8; 0],
+    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 2usize]>,
 }
 impl __darwin_fp_status {
     #[inline]
@@ -4445,9 +4447,8 @@ impl __darwin_fp_status {
         __tos: ::std::os::raw::c_ushort,
         __c3: ::std::os::raw::c_ushort,
         __busy: ::std::os::raw::c_ushort,
-    ) -> __BindgenBitfieldUnit<[u8; 2usize], u8> {
-        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 2usize], u8> =
-            Default::default();
+    ) -> __BindgenBitfieldUnit<[u8; 2usize]> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 2usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
             let __invalid: u16 = unsafe { ::std::mem::transmute(__invalid) };
             __invalid as u64
@@ -5511,7 +5512,8 @@ pub union wait {
 #[repr(align(4))]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct wait__bindgen_ty_1 {
-    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 4usize], u16>,
+    pub _bitfield_align_1: [u16; 0],
+    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 4usize]>,
 }
 impl wait__bindgen_ty_1 {
     #[inline]
@@ -5564,9 +5566,8 @@ impl wait__bindgen_ty_1 {
         w_Coredump: ::std::os::raw::c_uint,
         w_Retcode: ::std::os::raw::c_uint,
         w_Filler: ::std::os::raw::c_uint,
-    ) -> __BindgenBitfieldUnit<[u8; 4usize], u16> {
-        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize], u16> =
-            Default::default();
+    ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 7u8, {
             let w_Termsig: u32 = unsafe { ::std::mem::transmute(w_Termsig) };
             w_Termsig as u64
@@ -5590,7 +5591,8 @@ impl wait__bindgen_ty_1 {
 #[repr(align(4))]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct wait__bindgen_ty_2 {
-    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 4usize], u16>,
+    pub _bitfield_align_1: [u16; 0],
+    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 4usize]>,
 }
 impl wait__bindgen_ty_2 {
     #[inline]
@@ -5631,9 +5633,8 @@ impl wait__bindgen_ty_2 {
         w_Stopval: ::std::os::raw::c_uint,
         w_Stopsig: ::std::os::raw::c_uint,
         w_Filler: ::std::os::raw::c_uint,
-    ) -> __BindgenBitfieldUnit<[u8; 4usize], u16> {
-        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize], u16> =
-            Default::default();
+    ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 8u8, {
             let w_Stopval: u32 = unsafe { ::std::mem::transmute(w_Stopval) };
             w_Stopval as u64
@@ -9560,10 +9561,6 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
-    pub fn pqsignal_no_restart(signo: ::std::os::raw::c_int, func: pqsigfunc) -> pqsigfunc;
-}
-#[pg_guard]
-extern "C" {
     pub fn escape_single_quotes_ascii(
         src: *const ::std::os::raw::c_char,
     ) -> *mut ::std::os::raw::c_char;
@@ -11685,7 +11682,8 @@ pub type BlockId = *mut BlockIdData;
 #[repr(align(4))]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct ItemIdData {
-    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 4usize], u16>,
+    pub _bitfield_align_1: [u16; 0],
+    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 4usize]>,
 }
 impl ItemIdData {
     #[inline]
@@ -11726,9 +11724,8 @@ impl ItemIdData {
         lp_off: ::std::os::raw::c_uint,
         lp_flags: ::std::os::raw::c_uint,
         lp_len: ::std::os::raw::c_uint,
-    ) -> __BindgenBitfieldUnit<[u8; 4usize], u16> {
-        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize], u16> =
-            Default::default();
+    ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 15u8, {
             let lp_off: u32 = unsafe { ::std::mem::transmute(lp_off) };
             lp_off as u64
@@ -12196,6 +12193,14 @@ extern "C" {
 #[pg_guard]
 extern "C" {
     pub fn PageIsVerified(page: Page, blkno: BlockNumber) -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn PageIsVerifiedExtended(
+        page: Page,
+        blkno: BlockNumber,
+        flags: ::std::os::raw::c_int,
+    ) -> bool;
 }
 #[pg_guard]
 extern "C" {
@@ -17523,6 +17528,7 @@ pub struct SubPlanState {
     pub lhs_hash_funcs: *mut FmgrInfo,
     pub cur_eq_funcs: *mut FmgrInfo,
     pub cur_eq_comp: *mut ExprState,
+    pub numCols: ::std::os::raw::c_int,
 }
 impl Default for SubPlanState {
     fn default() -> Self {
@@ -19840,6 +19846,7 @@ pub const AlterTableType_AT_DetachPartition: AlterTableType = 62;
 pub const AlterTableType_AT_AddIdentity: AlterTableType = 63;
 pub const AlterTableType_AT_SetIdentity: AlterTableType = 64;
 pub const AlterTableType_AT_DropIdentity: AlterTableType = 65;
+pub const AlterTableType_AT_CookedColumnDefault: AlterTableType = 66;
 pub type AlterTableType = ::std::os::raw::c_uint;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -21859,6 +21866,14 @@ extern "C" {
 #[pg_guard]
 extern "C" {
     pub fn ExecInitJunkFilter(targetList: *mut List, slot: *mut TupleTableSlot) -> *mut JunkFilter;
+}
+#[pg_guard]
+extern "C" {
+    pub fn ExecInitJunkFilterInsertion(
+        targetList: *mut List,
+        cleanTupType: TupleDesc,
+        slot: *mut TupleTableSlot,
+    ) -> *mut JunkFilter;
 }
 #[pg_guard]
 extern "C" {
@@ -24285,32 +24300,32 @@ extern "C" {
 extern "C" {
     pub fn LWLockInitialize(lock: *mut LWLock, tranche_id: ::std::os::raw::c_int);
 }
-pub const BuiltinTrancheIds_LWTRANCHE_CLOG_BUFFERS: BuiltinTrancheIds = 45;
-pub const BuiltinTrancheIds_LWTRANCHE_COMMITTS_BUFFERS: BuiltinTrancheIds = 46;
-pub const BuiltinTrancheIds_LWTRANCHE_SUBTRANS_BUFFERS: BuiltinTrancheIds = 47;
-pub const BuiltinTrancheIds_LWTRANCHE_MXACTOFFSET_BUFFERS: BuiltinTrancheIds = 48;
-pub const BuiltinTrancheIds_LWTRANCHE_MXACTMEMBER_BUFFERS: BuiltinTrancheIds = 49;
-pub const BuiltinTrancheIds_LWTRANCHE_ASYNC_BUFFERS: BuiltinTrancheIds = 50;
-pub const BuiltinTrancheIds_LWTRANCHE_OLDSERXID_BUFFERS: BuiltinTrancheIds = 51;
-pub const BuiltinTrancheIds_LWTRANCHE_WAL_INSERT: BuiltinTrancheIds = 52;
-pub const BuiltinTrancheIds_LWTRANCHE_BUFFER_CONTENT: BuiltinTrancheIds = 53;
-pub const BuiltinTrancheIds_LWTRANCHE_BUFFER_IO_IN_PROGRESS: BuiltinTrancheIds = 54;
-pub const BuiltinTrancheIds_LWTRANCHE_REPLICATION_ORIGIN: BuiltinTrancheIds = 55;
-pub const BuiltinTrancheIds_LWTRANCHE_REPLICATION_SLOT_IO_IN_PROGRESS: BuiltinTrancheIds = 56;
-pub const BuiltinTrancheIds_LWTRANCHE_PROC: BuiltinTrancheIds = 57;
-pub const BuiltinTrancheIds_LWTRANCHE_BUFFER_MAPPING: BuiltinTrancheIds = 58;
-pub const BuiltinTrancheIds_LWTRANCHE_LOCK_MANAGER: BuiltinTrancheIds = 59;
-pub const BuiltinTrancheIds_LWTRANCHE_PREDICATE_LOCK_MANAGER: BuiltinTrancheIds = 60;
-pub const BuiltinTrancheIds_LWTRANCHE_PARALLEL_HASH_JOIN: BuiltinTrancheIds = 61;
-pub const BuiltinTrancheIds_LWTRANCHE_PARALLEL_QUERY_DSA: BuiltinTrancheIds = 62;
-pub const BuiltinTrancheIds_LWTRANCHE_SESSION_DSA: BuiltinTrancheIds = 63;
-pub const BuiltinTrancheIds_LWTRANCHE_SESSION_RECORD_TABLE: BuiltinTrancheIds = 64;
-pub const BuiltinTrancheIds_LWTRANCHE_SESSION_TYPMOD_TABLE: BuiltinTrancheIds = 65;
-pub const BuiltinTrancheIds_LWTRANCHE_SHARED_TUPLESTORE: BuiltinTrancheIds = 66;
-pub const BuiltinTrancheIds_LWTRANCHE_TBM: BuiltinTrancheIds = 67;
-pub const BuiltinTrancheIds_LWTRANCHE_PARALLEL_APPEND: BuiltinTrancheIds = 68;
-pub const BuiltinTrancheIds_LWTRANCHE_SXACT: BuiltinTrancheIds = 69;
-pub const BuiltinTrancheIds_LWTRANCHE_FIRST_USER_DEFINED: BuiltinTrancheIds = 70;
+pub const BuiltinTrancheIds_LWTRANCHE_CLOG_BUFFERS: BuiltinTrancheIds = 48;
+pub const BuiltinTrancheIds_LWTRANCHE_COMMITTS_BUFFERS: BuiltinTrancheIds = 49;
+pub const BuiltinTrancheIds_LWTRANCHE_SUBTRANS_BUFFERS: BuiltinTrancheIds = 50;
+pub const BuiltinTrancheIds_LWTRANCHE_MXACTOFFSET_BUFFERS: BuiltinTrancheIds = 51;
+pub const BuiltinTrancheIds_LWTRANCHE_MXACTMEMBER_BUFFERS: BuiltinTrancheIds = 52;
+pub const BuiltinTrancheIds_LWTRANCHE_ASYNC_BUFFERS: BuiltinTrancheIds = 53;
+pub const BuiltinTrancheIds_LWTRANCHE_OLDSERXID_BUFFERS: BuiltinTrancheIds = 54;
+pub const BuiltinTrancheIds_LWTRANCHE_WAL_INSERT: BuiltinTrancheIds = 55;
+pub const BuiltinTrancheIds_LWTRANCHE_BUFFER_CONTENT: BuiltinTrancheIds = 56;
+pub const BuiltinTrancheIds_LWTRANCHE_BUFFER_IO_IN_PROGRESS: BuiltinTrancheIds = 57;
+pub const BuiltinTrancheIds_LWTRANCHE_REPLICATION_ORIGIN: BuiltinTrancheIds = 58;
+pub const BuiltinTrancheIds_LWTRANCHE_REPLICATION_SLOT_IO_IN_PROGRESS: BuiltinTrancheIds = 59;
+pub const BuiltinTrancheIds_LWTRANCHE_PROC: BuiltinTrancheIds = 60;
+pub const BuiltinTrancheIds_LWTRANCHE_BUFFER_MAPPING: BuiltinTrancheIds = 61;
+pub const BuiltinTrancheIds_LWTRANCHE_LOCK_MANAGER: BuiltinTrancheIds = 62;
+pub const BuiltinTrancheIds_LWTRANCHE_PREDICATE_LOCK_MANAGER: BuiltinTrancheIds = 63;
+pub const BuiltinTrancheIds_LWTRANCHE_PARALLEL_HASH_JOIN: BuiltinTrancheIds = 64;
+pub const BuiltinTrancheIds_LWTRANCHE_PARALLEL_QUERY_DSA: BuiltinTrancheIds = 65;
+pub const BuiltinTrancheIds_LWTRANCHE_SESSION_DSA: BuiltinTrancheIds = 66;
+pub const BuiltinTrancheIds_LWTRANCHE_SESSION_RECORD_TABLE: BuiltinTrancheIds = 67;
+pub const BuiltinTrancheIds_LWTRANCHE_SESSION_TYPMOD_TABLE: BuiltinTrancheIds = 68;
+pub const BuiltinTrancheIds_LWTRANCHE_SHARED_TUPLESTORE: BuiltinTrancheIds = 69;
+pub const BuiltinTrancheIds_LWTRANCHE_TBM: BuiltinTrancheIds = 70;
+pub const BuiltinTrancheIds_LWTRANCHE_PARALLEL_APPEND: BuiltinTrancheIds = 71;
+pub const BuiltinTrancheIds_LWTRANCHE_SXACT: BuiltinTrancheIds = 72;
+pub const BuiltinTrancheIds_LWTRANCHE_FIRST_USER_DEFINED: BuiltinTrancheIds = 73;
 pub type BuiltinTrancheIds = ::std::os::raw::c_uint;
 pub type LWLockId = *mut LWLock;
 #[repr(C)]
@@ -24484,6 +24499,7 @@ pub const LockTagType_LOCKTAG_SPECULATIVE_TOKEN: LockTagType = 6;
 pub const LockTagType_LOCKTAG_OBJECT: LockTagType = 7;
 pub const LockTagType_LOCKTAG_USERLOCK: LockTagType = 8;
 pub const LockTagType_LOCKTAG_ADVISORY: LockTagType = 9;
+pub const LockTagType_LOCKTAG_DATABASE_FROZEN_IDS: LockTagType = 10;
 pub type LockTagType = ::std::os::raw::c_uint;
 #[pg_guard]
 extern "C" {
@@ -37707,6 +37723,18 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
+    pub fn applyRelabelType(
+        arg: *mut Node,
+        rtype: Oid,
+        rtypmod: int32,
+        rcollid: Oid,
+        rformat: CoercionForm,
+        rlocation: ::std::os::raw::c_int,
+        overwrite_ok: bool,
+    ) -> *mut Node;
+}
+#[pg_guard]
+extern "C" {
     pub fn relabel_to_typmod(expr: *mut Node, typmod: int32) -> *mut Node;
 }
 #[pg_guard]
@@ -38021,6 +38049,10 @@ extern "C" {
 #[pg_guard]
 extern "C" {
     pub fn contain_nonstrict_functions(clause: *mut Node) -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn contain_exec_param(clause: *mut Node, param_ids: *mut List) -> bool;
 }
 #[pg_guard]
 extern "C" {
@@ -41200,6 +41232,10 @@ extern "C" {
         target_rte: *mut RangeTblEntry,
         target_relation: Relation,
     );
+}
+#[pg_guard]
+extern "C" {
+    pub fn fill_extraUpdatedCols(target_rte: *mut RangeTblEntry, target_relation: Relation);
 }
 #[pg_guard]
 extern "C" {

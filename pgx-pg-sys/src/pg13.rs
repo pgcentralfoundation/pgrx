@@ -3,17 +3,16 @@ use crate::PgNode;
 use pgx_macros::*;
 #[repr(C)]
 #[derive(Copy, Clone, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd)]
-pub struct __BindgenBitfieldUnit<Storage, Align> {
+pub struct __BindgenBitfieldUnit<Storage> {
     storage: Storage,
-    align: [Align; 0],
 }
-impl<Storage, Align> __BindgenBitfieldUnit<Storage, Align> {
+impl<Storage> __BindgenBitfieldUnit<Storage> {
     #[inline]
     pub const fn new(storage: Storage) -> Self {
-        Self { storage, align: [] }
+        Self { storage }
     }
 }
-impl<Storage, Align> __BindgenBitfieldUnit<Storage, Align>
+impl<Storage> __BindgenBitfieldUnit<Storage>
 where
     Storage: AsRef<[u8]> + AsMut<[u8]>,
 {
@@ -179,7 +178,7 @@ pub const ALIGNOF_LONG: u32 = 8;
 pub const ALIGNOF_PG_INT128_TYPE: u32 = 16;
 pub const ALIGNOF_SHORT: u32 = 2;
 pub const BLCKSZ: u32 = 8192;
-pub const CONFIGURE_ARGS : & 'static [u8 ; 107usize] = b" '--prefix=/Users/e_ridge/.pgx/13.0/pgx-install' '--with-pgport=28813' '--enable-debug' '--enable-cassert'\0" ;
+pub const CONFIGURE_ARGS : & 'static [u8 ; 107usize] = b" '--prefix=/Users/e_ridge/.pgx/13.1/pgx-install' '--with-pgport=28813' '--enable-debug' '--enable-cassert'\0" ;
 pub const DEF_PGPORT: u32 = 28813;
 pub const DEF_PGPORT_STR: &'static [u8; 6usize] = b"28813\0";
 pub const ENABLE_THREAD_SAFETY: u32 = 1;
@@ -322,18 +321,18 @@ pub const MAXIMUM_ALIGNOF: u32 = 8;
 pub const MEMSET_LOOP_LIMIT: u32 = 1024;
 pub const PACKAGE_BUGREPORT: &'static [u8; 32usize] = b"pgsql-bugs@lists.postgresql.org\0";
 pub const PACKAGE_NAME: &'static [u8; 11usize] = b"PostgreSQL\0";
-pub const PACKAGE_STRING: &'static [u8; 16usize] = b"PostgreSQL 13.0\0";
+pub const PACKAGE_STRING: &'static [u8; 16usize] = b"PostgreSQL 13.1\0";
 pub const PACKAGE_TARNAME: &'static [u8; 11usize] = b"postgresql\0";
 pub const PACKAGE_URL: &'static [u8; 28usize] = b"https://www.postgresql.org/\0";
-pub const PACKAGE_VERSION: &'static [u8; 5usize] = b"13.0\0";
+pub const PACKAGE_VERSION: &'static [u8; 5usize] = b"13.1\0";
 pub const PG_KRB_SRVNAM: &'static [u8; 9usize] = b"postgres\0";
 pub const PG_MAJORVERSION: &'static [u8; 3usize] = b"13\0";
 pub const PG_MAJORVERSION_NUM: u32 = 13;
-pub const PG_MINORVERSION_NUM: u32 = 0;
+pub const PG_MINORVERSION_NUM: u32 = 1;
 pub const PG_USE_STDBOOL: u32 = 1;
-pub const PG_VERSION: &'static [u8; 5usize] = b"13.0\0";
-pub const PG_VERSION_NUM: u32 = 130000;
-pub const PG_VERSION_STR : & 'static [u8 ; 114usize] = b"PostgreSQL 13.0 on x86_64-apple-darwin19.0.0, compiled by Apple clang version 11.0.0 (clang-1100.0.33.12), 64-bit\0" ;
+pub const PG_VERSION: &'static [u8; 5usize] = b"13.1\0";
+pub const PG_VERSION_NUM: u32 = 130001;
+pub const PG_VERSION_STR : & 'static [u8 ; 114usize] = b"PostgreSQL 13.1 on x86_64-apple-darwin19.0.0, compiled by Apple clang version 11.0.0 (clang-1100.0.33.17), 64-bit\0" ;
 pub const RELSEG_SIZE: u32 = 131072;
 pub const SIZEOF_BOOL: u32 = 1;
 pub const SIZEOF_LONG: u32 = 8;
@@ -1576,7 +1575,7 @@ pub const _PASSWORD_NOEXP: u32 = 8;
 pub const _PASSWORD_WARNDAYS: u32 = 14;
 pub const _PASSWORD_CHGNOW: i32 = -1;
 pub const PGINVALID_SOCKET: i32 = -1;
-pub const PG_BACKEND_VERSIONSTR: &'static [u8; 28usize] = b"postgres (PostgreSQL) 13.0\n\0";
+pub const PG_BACKEND_VERSIONSTR: &'static [u8; 28usize] = b"postgres (PostgreSQL) 13.1\n\0";
 pub const EXE: &'static [u8; 1usize] = b"\0";
 pub const DEVNULL: &'static [u8; 10usize] = b"/dev/null\0";
 pub const USE_REPL_SNPRINTF: u32 = 1;
@@ -2061,6 +2060,8 @@ pub const PG_PAGE_LAYOUT_VERSION: u32 = 4;
 pub const PG_DATA_CHECKSUM_VERSION: u32 = 1;
 pub const PAI_OVERWRITE: u32 = 1;
 pub const PAI_IS_HEAP: u32 = 2;
+pub const PIV_LOG_WARNING: u32 = 1;
+pub const PIV_REPORT_STAT: u32 = 2;
 pub const MaxTupleAttributeNumber: u32 = 1664;
 pub const MaxHeapAttributeNumber: u32 = 1600;
 pub const FIELDNO_HEAPTUPLEHEADERDATA_INFOMASK2: u32 = 2;
@@ -4123,7 +4124,8 @@ pub struct __darwin_i386_thread_state {
 #[repr(align(2))]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct __darwin_fp_control {
-    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 2usize], u8>,
+    pub _bitfield_align_1: [u8; 0],
+    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 2usize]>,
 }
 impl __darwin_fp_control {
     #[inline]
@@ -4224,9 +4226,8 @@ impl __darwin_fp_control {
         __precis: ::std::os::raw::c_ushort,
         __pc: ::std::os::raw::c_ushort,
         __rc: ::std::os::raw::c_ushort,
-    ) -> __BindgenBitfieldUnit<[u8; 2usize], u8> {
-        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 2usize], u8> =
-            Default::default();
+    ) -> __BindgenBitfieldUnit<[u8; 2usize]> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 2usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
             let __invalid: u16 = unsafe { ::std::mem::transmute(__invalid) };
             __invalid as u64
@@ -4267,7 +4268,8 @@ pub type __darwin_fp_control_t = __darwin_fp_control;
 #[repr(align(2))]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct __darwin_fp_status {
-    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 2usize], u8>,
+    pub _bitfield_align_1: [u8; 0],
+    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 2usize]>,
 }
 impl __darwin_fp_status {
     #[inline]
@@ -4440,9 +4442,8 @@ impl __darwin_fp_status {
         __tos: ::std::os::raw::c_ushort,
         __c3: ::std::os::raw::c_ushort,
         __busy: ::std::os::raw::c_ushort,
-    ) -> __BindgenBitfieldUnit<[u8; 2usize], u8> {
-        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 2usize], u8> =
-            Default::default();
+    ) -> __BindgenBitfieldUnit<[u8; 2usize]> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 2usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
             let __invalid: u16 = unsafe { ::std::mem::transmute(__invalid) };
             __invalid as u64
@@ -5506,7 +5507,8 @@ pub union wait {
 #[repr(align(4))]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct wait__bindgen_ty_1 {
-    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 4usize], u16>,
+    pub _bitfield_align_1: [u16; 0],
+    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 4usize]>,
 }
 impl wait__bindgen_ty_1 {
     #[inline]
@@ -5559,9 +5561,8 @@ impl wait__bindgen_ty_1 {
         w_Coredump: ::std::os::raw::c_uint,
         w_Retcode: ::std::os::raw::c_uint,
         w_Filler: ::std::os::raw::c_uint,
-    ) -> __BindgenBitfieldUnit<[u8; 4usize], u16> {
-        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize], u16> =
-            Default::default();
+    ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 7u8, {
             let w_Termsig: u32 = unsafe { ::std::mem::transmute(w_Termsig) };
             w_Termsig as u64
@@ -5585,7 +5586,8 @@ impl wait__bindgen_ty_1 {
 #[repr(align(4))]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct wait__bindgen_ty_2 {
-    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 4usize], u16>,
+    pub _bitfield_align_1: [u16; 0],
+    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 4usize]>,
 }
 impl wait__bindgen_ty_2 {
     #[inline]
@@ -5626,9 +5628,8 @@ impl wait__bindgen_ty_2 {
         w_Stopval: ::std::os::raw::c_uint,
         w_Stopsig: ::std::os::raw::c_uint,
         w_Filler: ::std::os::raw::c_uint,
-    ) -> __BindgenBitfieldUnit<[u8; 4usize], u16> {
-        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize], u16> =
-            Default::default();
+    ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 8u8, {
             let w_Stopval: u32 = unsafe { ::std::mem::transmute(w_Stopval) };
             w_Stopval as u64
@@ -11214,7 +11215,8 @@ pub type BlockId = *mut BlockIdData;
 #[repr(align(4))]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct ItemIdData {
-    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 4usize], u16>,
+    pub _bitfield_align_1: [u16; 0],
+    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 4usize]>,
 }
 impl ItemIdData {
     #[inline]
@@ -11255,9 +11257,8 @@ impl ItemIdData {
         lp_off: ::std::os::raw::c_uint,
         lp_flags: ::std::os::raw::c_uint,
         lp_len: ::std::os::raw::c_uint,
-    ) -> __BindgenBitfieldUnit<[u8; 4usize], u16> {
-        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize], u16> =
-            Default::default();
+    ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 15u8, {
             let lp_off: u32 = unsafe { ::std::mem::transmute(lp_off) };
             lp_off as u64
@@ -11721,6 +11722,14 @@ extern "C" {
 #[pg_guard]
 extern "C" {
     pub fn PageIsVerified(page: Page, blkno: BlockNumber) -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn PageIsVerifiedExtended(
+        page: Page,
+        blkno: BlockNumber,
+        flags: ::std::os::raw::c_int,
+    ) -> bool;
 }
 #[pg_guard]
 extern "C" {
@@ -22541,6 +22550,14 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
+    pub fn ExecInitJunkFilterInsertion(
+        targetList: *mut List,
+        cleanTupType: TupleDesc,
+        slot: *mut TupleTableSlot,
+    ) -> *mut JunkFilter;
+}
+#[pg_guard]
+extern "C" {
     pub fn ExecInitJunkFilterConversion(
         targetList: *mut List,
         cleanTupType: TupleDesc,
@@ -31480,6 +31497,10 @@ extern "C" {
         timestamp: Timestamp,
         overflow: *mut ::std::os::raw::c_int,
     ) -> TimestampTz;
+}
+#[pg_guard]
+extern "C" {
+    pub fn timestamp_cmp_timestamptz_internal(timestampVal: Timestamp, dt2: TimestampTz) -> int32;
 }
 #[pg_guard]
 extern "C" {
@@ -40567,6 +40588,13 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
+    pub fn find_em_expr_usable_for_sorting_rel(
+        ec: *mut EquivalenceClass,
+        rel: *mut RelOptInfo,
+    ) -> *mut Expr;
+}
+#[pg_guard]
+extern "C" {
     pub fn generate_base_implied_equalities(root: *mut PlannerInfo);
 }
 #[pg_guard]
@@ -42064,6 +42092,10 @@ extern "C" {
         target_rte: *mut RangeTblEntry,
         target_relation: Relation,
     );
+}
+#[pg_guard]
+extern "C" {
+    pub fn fill_extraUpdatedCols(target_rte: *mut RangeTblEntry, target_relation: Relation);
 }
 #[pg_guard]
 extern "C" {
@@ -54113,6 +54145,14 @@ extern "C" {
         dateVal: DateADT,
         overflow: *mut ::std::os::raw::c_int,
     ) -> TimestampTz;
+}
+#[pg_guard]
+extern "C" {
+    pub fn date_cmp_timestamp_internal(dateVal: DateADT, dt2: Timestamp) -> int32;
+}
+#[pg_guard]
+extern "C" {
+    pub fn date_cmp_timestamptz_internal(dateVal: DateADT, dt2: TimestampTz) -> int32;
 }
 #[pg_guard]
 extern "C" {
