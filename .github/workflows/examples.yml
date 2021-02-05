@@ -20,70 +20,29 @@ jobs:
       matrix:
         version: [10, 11, 12, 13]
         os: ["ubuntu-latest"]
+        examples: ["arrays", "bad_ideas", "bgworker", "bytea", "custom_types", "errors", "operators", "schemas", "shmem", "spi", "srf", "strings"]
 
     steps:
     - uses: actions/checkout@v2
-
-    - name: cache cargo pgx init
-      id: cargo-pgx-init-cache
-      uses: actions/cache@v2
-      with:
-        path: ~/.pgx/
-        key: examples-${{ matrix.os }}-${{ matrix.version }}-pgx-init-${{ hashFiles('~/work/pgx/pgx/**/*.h') }}
 
     - name: cargo version
       run: cargo --version
 
     # Ubuntu system dependencies required to build Postgres from sources
     - name: install postgres build dependencies
-      if: steps.cargo-pgx-init-cache.outputs.cache-hit != 'true'
       run: sudo apt install -y bison flex zlib1g zlib1g-dev pkg-config libssl-dev libreadline-dev
 
     # install cargo-pgx
     - name: install cargo-pgx
       run: cargo install --path cargo-pgx/ --debug
 
-    # initialize pgx
+    # initialize pgx for this PG version
     - name: cargo pgx init
-      if: steps.cargo-pgx-init-cache.outputs.cache-hit != 'true'
-      run: cargo pgx init
+      run: cargo pgx init --pg${{ matrix.version }}=download
 
-    # make sure the examples build too
     - name: create new sample extension
       run: cd /tmp/ && cargo pgx new sample
 
-    - name: arrays example
-      run: cd pgx-examples/arrays && cargo pgx test pg${{ matrix.version }}
-
-    - name: bad_ideas example
-      run: cd pgx-examples/bad_ideas && cargo pgx test pg${{ matrix.version }}
-
-    - name: bgworker example
-      run: cd pgx-examples/bgworker && cargo pgx test pg${{ matrix.version }}
-
-    - name: bytea example
-      run: cd pgx-examples/bytea && cargo pgx test pg${{ matrix.version }}
-
-    - name: custom_types example
-      run: cd pgx-examples/custom_types && cargo pgx test pg${{ matrix.version }}
-
-    - name: errors example
-      run: cd pgx-examples/errors && cargo pgx test pg${{ matrix.version }}
-
-    - name: operators example
-      run: cd pgx-examples/operators && cargo pgx test pg${{ matrix.version }}
-
-    - name: schemas example
-      run: cd pgx-examples/schemas && cargo pgx test pg${{ matrix.version }}
-
-    - name: shmem example
-      run: cd pgx-examples/shmem && cargo pgx test pg${{ matrix.version }}
-
-    - name: spi example
-      run: cd pgx-examples/spi && cargo pgx test pg${{ matrix.version }}
-
-    - name: srf example
-      run: cd pgx-examples/srf && cargo pgx test pg${{ matrix.version }}
-
-    - name: strings example
-      run: cd pgx-examples/strings && cargo pgx test pg${{ matrix.version }}
+      # make sure the examples build too and build them in the matrix
+    - name: ${{ matrix.examples }} example on pg${{ matrix.version }}
+      run: cd pgx-examples/${{ matrix.examples }} && cargo pgx test pg${{ matrix.version }}
