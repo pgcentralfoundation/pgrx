@@ -28,6 +28,8 @@ jobs:
       run: cargo --version
 
     # Ubuntu system dependencies required to build Postgres from sources
+    - name: remove old postgres
+      run: sudo apt remove -y postgres*
     - name: install postgres build dependencies
       run: sudo apt install -y bison flex zlib1g zlib1g-dev pkg-config libssl-dev libreadline-dev
 
