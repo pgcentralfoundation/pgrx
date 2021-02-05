@@ -658,12 +658,12 @@ dependencies = [
 
 [[package]]
 name = "heapless"
-version = "0.6.0"
+version = "0.5.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "efb22866f8416bc2b65389ebcb8b48e1be541650c44063ea1288d04bcf903808"
+checksum = "74911a68a1658cfcfb61bc0ccfbd536e3b6e906f8c2f7883ee50157e3e2184f1"
 dependencies = [
  "as-slice",
- "generic-array 0.14.4",
+ "generic-array 0.13.2",
  "hash32",
  "stable_deref_trait",
 ]
