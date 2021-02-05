@@ -24,19 +24,11 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: cache cargo pgx init
-      id: cargo-pgx-init-cache
-      uses: actions/cache@v2
-      with:
-        path: ~/.pgx/
-        key: test-${{ matrix.os }}-${{ matrix.version }}-pgx-init-${{ hashFiles('~/work/pgx/pgx/**/*.h') }}
-
     - name: cargo version
       run: cargo --version
 
     # Ubuntu system dependencies required to build Postgres from sources
     - name: install postgres build dependencies
-      if: steps.cargo-pgx-init-cache.outputs.cache-hit != 'true'
       run: sudo apt install -y bison flex zlib1g zlib1g-dev pkg-config libssl-dev libreadline-dev
 
     # install cargo-pgx
@@ -45,7 +37,6 @@ jobs:
 
     # initialize pgx
     - name: cargo pgx init
-      if: steps.cargo-pgx-init-cache.outputs.cache-hit != 'true'
       run: cargo pgx init --pg${{ matrix.version }}=download
 
     # test our code
