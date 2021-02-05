@@ -41,7 +41,7 @@ jobs:
 
     # initialize pgx
     - name: cargo pgx init
-      run: cargo pgx init --pg${{ matrix.version }}=download
+      run: cargo pgx init --pg${{ matrix.version }}=`which pg_config`
 
     # test our code
     - name: cargo test
