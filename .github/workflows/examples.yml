@@ -29,7 +29,7 @@ jobs:
       run: cargo --version
 
     # Ubuntu system dependencies required to build Postgres from sources
-    - name: install postgres build dependencies
+    - name: install postgres
       run: sudo apt-get install -y clang-10 llvm-10 clang gcc make build-essential libz-dev zlib1g-dev strace libssl-dev pkg-config postgresql-${{ matrix.version }} postgresql-server-dev-${{ matrix.version }}
 
     # install cargo-pgx
@@ -39,6 +39,12 @@ jobs:
     # initialize pgx for this PG version
     - name: cargo pgx init
       run: cargo pgx init --pg${{ matrix.version }}=`which pg_config`
+
+    - name: config.toml
+      run: cat ~/.pgx/config.toml
+
+    - name: pg_config version
+      run: pg_config --version
 
     - name: create new sample extension
       run: cd /tmp/ && cargo pgx new sample
