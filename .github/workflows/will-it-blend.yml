@@ -5,7 +5,7 @@ on:
     - cron:  '* 8 * * *'
 
 jobs:
-  test:
+  check:
 
     runs-on: ${{ matrix.os }}
 
@@ -22,7 +22,7 @@ jobs:
 
       # Just install PG along with likely necessary build tools
       - name: install postgres build dependencies
-        run: sudo apt-get install -y clang-10 llvm-10 clang gcc make build-essential libz-dev zlib1g-dev strace libssl-dev pkg-config postgresql-${{ matrix.os }} postgresql-server-dev-${{ matrix.os }}
+        run: sudo apt-get install -y clang-10 llvm-10 clang gcc make build-essential libz-dev zlib1g-dev strace libssl-dev pkg-config postgresql-${{ matrix.version }} postgresql-server-dev-${{ matrix.version }}
 
       # install cargo-pgx
       - name: install cargo-pgx
@@ -30,8 +30,8 @@ jobs:
 
       # initialize pgx to use cargo-pgs
       - name: cargo pgx init
-        run: cargo pgx init --pg${{ matrix.os }}=`which pg_config`
+        run: cargo pgx init --pg${{ matrix.version }}=`which pg_config`
 
       # just see if the code checks out okay
-      - name: cargo test
+      - name: cargo check
         run: RUST_BACKTRACE=1 cargo check --all --features "pg${{ matrix.version }}"
