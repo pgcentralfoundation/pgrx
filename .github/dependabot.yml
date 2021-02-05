@@ -5,4 +5,4 @@ updates:
     schedule:
       interval: "daily"
       time: "12:00"
-    target_branch: "develop"
+    target-branch: "develop"
