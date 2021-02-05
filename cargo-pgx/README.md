@@ -55,13 +55,13 @@ SUBCOMMANDS:
 
 ## First Time Initialization
 
-![init](init.png)
+![init](https://raw.githubusercontent.com/zombodb/pgx/master/cargo-pgx/init.png)
 
 `cargo pgx init` is required to be run once to properly configure the `pgx` development environment.
 
-As shown by the screenshot above, it downloads Postgres v10, v11, v12, v13, configures them, compiles them, and installs them to `~/.pgx/`.  Other `pgx` commands such as `run` and `test` will fully manage and otherwise use these Postgres installations for you.
+As shown by the screenshot above, it downloads the latest versions of Postgres v10, v11, v12, v13, configures them, compiles them, and installs them to `~/.pgx/`.  Other `pgx` commands such as `run` and `test` will fully manage and otherwise use these Postgres installations for you.
 
-`pgx` is designed to support Postgres v10, v11, v12, v13 in such a way that during development, you'll know if you're trying to use a Postgres API that isn't common across all three versions.  It's also designed to make testing your extension against these versions easy.  This is why it requires you have three fully compiled and installed versions of Postgres during development.
+`pgx` is designed to support multiple Postgres versions in such a way that during development, you'll know if you're trying to use a Postgres API that isn't common across all three versions.  It's also designed to make testing your extension against these versions easy.  This is why it requires you have three fully compiled and installed versions of Postgres during development.
 
 If you want to use your operating system's package manager to install Postgres, `cargo pgx init` has optional arguments that allow you to specify where they're installed (see below). 
 
@@ -76,6 +76,8 @@ When the various `--pgXX` options are specified, these are they **only** version
 You'll also want to make sure you have the "postgresql-server-dev" package installed for each version you want to manage yourself.
 
 Once complete, `cargo pgx init` also creates a configuration file (`~/.pgx/config.toml`) that describes where to find each version's `pg_config` tool.
+
+If a new minor Postgres version is released in the future you can simply run `cargo pgx init [args]` again, and your local version will be updated, preserving all existing databases and configuration.
 
 ```shell script
 $ cargo pgx init --help
@@ -112,7 +114,7 @@ OPTIONS:
 
 ## Creating a new Extension
 
- ![new](new.png)
+ ![new](https://raw.githubusercontent.com/zombodb/pgx/master/cargo-pgx/new.png)
 
 `cargo pgx new <extname>` is an easy way to get started creating a new extension.  It's similar to `cargo new <name>`, but does the additional things necessary to support building a Rust Postgres extension.
 
@@ -141,7 +143,7 @@ ARGS:
  
 ## Managing Your Postgres Installations
   
-![status](status.png)
+![status](https://raw.githubusercontent.com/zombodb/pgx/master/cargo-pgx/status.png)
   
 `cargo pgx` has three commands for managing each Postgres installation:  `start`, `stop`, and `status`.  Additionally, `cargo pgx run` (see below) will automatically start its target Postgres instance if not already running.
 
@@ -153,7 +155,7 @@ Once started, you can connect to them using `psql` (if you have it on your $PATH
 
 ## Compiling and Running Your Extension
 
-![run](run.png)
+![run](https://raw.githubusercontent.com/zombodb/pgx/master/cargo-pgx/run.png)
 
 `cargo pgx run <pg10 | pg11 | pg12 | pg13>` is the primary interface into compiling and interactively testing/using your extension during development.
 
@@ -188,7 +190,7 @@ ARGS:
 
 ## Connect to a Database
 
-![connect](connect.png)
+![connect](https://raw.githubusercontent.com/zombodb/pgx/master/cargo-pgx/connect.png)
 
 If you'd simply like to connect to a managed version of Postgres without re-compiling and installing
 your extension, use `cargo pgx connect <pg10 | pg11 | pg12 | pg13>`.
@@ -218,7 +220,7 @@ ARGS:
 
 ## Installing Your Extension Locally
 
-![install](install.png)
+![install](https://raw.githubusercontent.com/zombodb/pgx/master/cargo-pgx/install.png)
 
 If for some reason `cargo pgx run <PG_VERSION>` isn't your style, you can use `cargo pgx install` to install your extension
 to the Postgres installation described by the `pg_config` tool currently on your `$PATH`.
@@ -244,7 +246,7 @@ $ cargo pgx install --help
 
 ## Testing Your Extension
 
-![test](test.png)
+![test](https://raw.githubusercontent.com/zombodb/pgx/master/cargo-pgx/test.png)
 
 `cargo pgx test [pg10 | pg11 | pg12 | pg13]` runs your `#[test]` and `#[pg_test]` annotated functions using cargo's test system.
 
@@ -276,7 +278,7 @@ ARGS:
 
 ## Building an Installation Package
 
-![package](package.png)
+![package](https://raw.githubusercontent.com/zombodb/pgx/master/cargo-pgx/package.png)
 
 `cargo pgx package [--debug]` builds your extension, in `--release` mode, to a directory structure in 
 `./target/[debug | release]/extension_name-PGVER` using the Postgres installation path information from the `pg_config` 

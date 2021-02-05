@@ -273,54 +273,15 @@ impl Pgx {
         Pgx { pg_configs: vec![] }
     }
 
-    pub fn default() -> Result<Self, std::io::Error> {
+    pub fn default(supported_major_versions: &[u16]) -> Result<Self, std::io::Error> {
         Ok(Pgx {
-            pg_configs: vec![
-                PgConfig {
-                    version: Some(PgVersion {
-                        major_version: 10,
-                        minor_version: 14,
-                        url: Url::parse(
-                            "https://ftp.postgresql.org/pub/source/v10.14/postgresql-10.14.tar.bz2",
-                        )
-                        .expect("invalid url"),
-                    }),
+            pg_configs: rss::PostgreSQLVersionRss::new(supported_major_versions)?
+                .into_iter()
+                .map(|version| PgConfig {
+                    version: Some(version),
                     pg_config: None,
-                },
-                PgConfig {
-                    version: Some(PgVersion {
-                        major_version: 11,
-                        minor_version: 9,
-                        url: Url::parse(
-                            "https://ftp.postgresql.org/pub/source/v11.9/postgresql-11.9.tar.bz2",
-                        )
-                        .expect("invalid url"),
-                    }),
-                    pg_config: None,
-                },
-                PgConfig {
-                    version: Some(PgVersion {
-                        major_version: 12,
-                        minor_version: 4,
-                        url: Url::parse(
-                            "https://ftp.postgresql.org/pub/source/v12.4/postgresql-12.4.tar.bz2",
-                        )
-                        .expect("invalid url"),
-                    }),
-                    pg_config: None,
-                },
-                PgConfig {
-                    version: Some(PgVersion {
-                        major_version: 13,
-                        minor_version: 0,
-                        url: Url::parse(
-                            "https://ftp.postgresql.org/pub/source/v13.0/postgresql-13.0.tar.bz2",
-                        )
-                        .expect("invalid url"),
-                    }),
-                    pg_config: None,
-                },
-            ],
+                })
+                .collect(),
         })
     }
 
@@ -432,5 +393,96 @@ impl Pgx {
         let mut path = Pgx::home()?;
         path.push("config.toml");
         Ok(path)
+    }
+}
+
+mod rss {
+    use crate::handle_result;
+    use crate::pg_config::PgVersion;
+    use colored::Colorize;
+    use rttp_client::{types::Proxy, HttpClient};
+    use serde_derive::Deserialize;
+    use url::Url;
+
+    pub(super) struct PostgreSQLVersionRss;
+
+    impl PostgreSQLVersionRss {
+        pub(super) fn new(
+            supported_major_versions: &[u16],
+        ) -> Result<Vec<PgVersion>, std::io::Error> {
+            static VERSIONS_RSS_URL: &str = "https://www.postgresql.org/versions.rss";
+
+            let mut http_client = HttpClient::new();
+            http_client.get().url(VERSIONS_RSS_URL);
+            if let Some((host, port)) = env_proxy::for_url_str(VERSIONS_RSS_URL).host_port() {
+                http_client.proxy(Proxy::https(host, port as u32));
+            }
+
+            let response = handle_result!(
+                http_client.emit(),
+                &format!("unable to retrieve {}", VERSIONS_RSS_URL)
+            );
+            let rss: Rss = match serde_xml_rs::from_str(&response.body().to_string()) {
+                Ok(rss) => rss,
+                Err(e) => {
+                    return Err(std::io::Error::new(
+                        std::io::ErrorKind::InvalidInput,
+                        format!("{:?}", e),
+                    ))
+                }
+            };
+
+            let mut versions = Vec::new();
+            for item in rss.channel.item {
+                let title = item.title.trim();
+                let mut parts = title.split('.');
+                let major = parts.next();
+                let minor = parts.next();
+
+                // if we don't have major/minor versions or if they don't parse correctly
+                // we'll just assume zero for them and eventually skip them
+                let major = major.unwrap().parse::<u16>().unwrap_or_default();
+                let minor = minor.unwrap().parse::<u16>().unwrap_or_default();
+
+                if supported_major_versions.contains(&major) {
+                    versions.push(PgVersion {
+                        major_version: major,
+                        minor_version: minor,
+                        url: Url::parse(
+                            &format!("https://ftp.postgresql.org/pub/source/v{major}.{minor}/postgresql-{major}.{minor}.tar.bz2",
+                                     major = major, minor = minor)
+                        )
+                            .expect("invalid url")
+                    })
+                }
+            }
+
+            println!(
+                "{} Postgres {}",
+                "  Discovered".white().bold(),
+                versions
+                    .iter()
+                    .map(|v| format!("v{}.{}", v.major_version, v.minor_version))
+                    .collect::<Vec<_>>()
+                    .join(", ")
+            );
+
+            Ok(versions)
+        }
+    }
+
+    #[derive(Deserialize)]
+    struct Rss {
+        channel: Channel,
+    }
+
+    #[derive(Deserialize)]
+    struct Channel {
+        item: Vec<Item>,
+    }
+
+    #[derive(Deserialize)]
+    struct Item {
+        title: String,
     }
 }

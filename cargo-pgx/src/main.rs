@@ -27,6 +27,8 @@ use std::collections::HashMap;
 use std::path::PathBuf;
 use std::str::FromStr;
 
+const SUPPORTED_MAJOR_VERSIONS: &[u16] = &[10, 11, 12, 13];
+
 fn main() -> std::result::Result<(), std::io::Error> {
     handle_result!(do_it(), "");
     Ok(())
@@ -46,23 +48,23 @@ fn do_it() -> std::result::Result<(), std::io::Error> {
             ("init", Some(init)) => {
                 let mut versions = HashMap::new();
 
-                init.value_of("pg10").map(|v| versions.insert("pg10", v));
-                init.value_of("pg11").map(|v| versions.insert("pg11", v));
-                init.value_of("pg12").map(|v| versions.insert("pg12", v));
-                init.value_of("pg13").map(|v| versions.insert("pg13", v));
+                for major in SUPPORTED_MAJOR_VERSIONS {
+                    let name = format!("pg{}", major);
+                    init.value_of(&name).map(|v| versions.insert(name, v));
+                }
 
                 if versions.is_empty() {
                     // no arguments specified, so we'll just install our defaults
-                    init_pgx(&Pgx::default()?)
+                    init_pgx(&Pgx::default(SUPPORTED_MAJOR_VERSIONS)?)
                 } else {
                     // user specified arguments, so we'll only install those versions of Postgres
-                    let default_pgx = Pgx::default()?;
+                    let default_pgx = Pgx::default(SUPPORTED_MAJOR_VERSIONS)?;
                     let mut pgx = Pgx::new();
 
                     for pg_config in versions.into_iter().map(|(pgver, pg_config_path)| {
                         if pg_config_path == "download" {
                             default_pgx
-                                .get(pgver)
+                                .get(&pgver)
                                 .expect(&format!("{} is not a known Postgres version", pgver))
                                 .clone()
                         } else {
