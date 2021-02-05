@@ -50,9 +50,6 @@ jobs:
     - name: pg_config version
       run: pg_config --version
 
-    - name: create new sample extension
-      run: cd /tmp/ && cargo pgx new sample
-
     # make sure the examples build too and build them in the matrix
     - name: ${{ matrix.examples }} example on pg${{ matrix.version }}
       run: cd pgx-examples/${{ matrix.examples }} && cargo pgx test pg${{ matrix.version }}
