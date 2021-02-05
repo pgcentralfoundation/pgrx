@@ -27,11 +27,11 @@ jobs:
     - name: cargo version
       run: cargo --version
 
-    # Ubuntu system dependencies required to build Postgres from sources
+    # Ubuntu system dependencies for Postgres
     - name: remove old postgres
       run: sudo apt remove -y postgres*
-    - name: install postgres build dependencies
-      run: sudo apt install -y bison flex zlib1g zlib1g-dev pkg-config libssl-dev libreadline-dev
+    - name: install postgres
+      run: sudo apt-get install -y clang-10 llvm-10 clang gcc make build-essential libz-dev zlib1g-dev strace libssl-dev pkg-config postgresql-${{ matrix.version }} postgresql-server-dev-${{ matrix.version }}
     - name: hack Postgres permissions
       run: sudo chmod a+rwx `pg_config --pkglibdir` `pg_config --sharedir`/extension /var/run/postgresql/
 
