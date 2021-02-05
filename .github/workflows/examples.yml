@@ -29,6 +29,8 @@ jobs:
       run: cargo --version
 
     # Ubuntu system dependencies required to build Postgres from sources
+    - name: remove old postgres
+      run: sudo apt remove -y postgres*
     - name: install postgres
       run: sudo apt-get install -y clang-10 llvm-10 clang gcc make build-essential libz-dev zlib1g-dev strace libssl-dev pkg-config postgresql-${{ matrix.version }} postgresql-server-dev-${{ matrix.version }}
 
