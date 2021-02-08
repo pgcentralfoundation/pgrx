@@ -35,6 +35,6 @@ pgx-utils = { path = "../pgx-utils", version= "0.1.18"}
 postgres = "0.19.0"
 regex = "1.4.3"
 serde = "1.0.123"
-serde_json = "1.0.61"
+serde_json = "1.0.62"
 shutdown_hooks = "0.1.0"
 time = "0.2.25"
