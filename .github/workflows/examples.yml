@@ -31,6 +31,12 @@ jobs:
     # Ubuntu system dependencies for Postgres
     - name: remove old postgres
       run: sudo apt remove -y postgres*
+
+    # Update apt
+    - name: update apt
+      run: sudo apt-get update -y -qq --fix-missing
+
+    # Install Postgres
     - name: install postgres
       run: sudo apt-get install -y clang-10 llvm-10 clang gcc make build-essential libz-dev zlib1g-dev strace libssl-dev pkg-config postgresql-${{ matrix.version }} postgresql-server-dev-${{ matrix.version }}
     - name: hack Postgres permissions

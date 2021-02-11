@@ -20,6 +20,10 @@ jobs:
       - name: cargo version
         run: cargo --version
 
+      # Update apt
+      - name: update apt
+        run: sudo apt-get update -y -qq --fix-missing
+
       # Just install PG along with likely necessary build tools
       - name: install postgres build dependencies
         run: sudo apt-get install -y clang-10 llvm-10 clang gcc make build-essential libz-dev zlib1g-dev strace libssl-dev pkg-config postgresql-${{ matrix.version }} postgresql-server-dev-${{ matrix.version }}
