@@ -10,7 +10,7 @@ use pgx_utils::{
 use proc_macro2::{Ident, Span, TokenTree};
 use quote::quote;
 use std::borrow::BorrowMut;
-use std::collections::HashSet;
+use std::collections::{BTreeSet, HashSet};
 use std::fs::DirEntry;
 use std::io::{BufRead, Write};
 use std::ops::Deref;
@@ -34,12 +34,12 @@ enum OperatorOptions {
 #[derive(Debug)]
 enum CategorizedAttribute {
     PgGuard(Span),
-    PgTest(Span, HashSet<ExternArgs>, Vec<FunctionArgs>),
+    PgTest(Span, BTreeSet<ExternArgs>, Vec<FunctionArgs>),
     RustTest(Span),
-    PgExtern(Span, HashSet<ExternArgs>, Vec<FunctionArgs>),
+    PgExtern(Span, BTreeSet<ExternArgs>, Vec<FunctionArgs>),
     PgOperator(
         Span,
-        HashSet<ExternArgs>,
+        BTreeSet<ExternArgs>,
         Vec<FunctionArgs>,
         Vec<OperatorOptions>,
     ),
@@ -233,8 +233,10 @@ fn delete_generated_sql() {
     }
 }
 
-fn parse_extern_args(att: &Attribute) -> HashSet<ExternArgs> {
+fn parse_extern_args(att: &Attribute) -> BTreeSet<ExternArgs> {
     pgx_utils::parse_extern_attributes(att.tokens.clone())
+        .into_iter()
+        .collect()
 }
 
 fn generate_sql(rs_file: &DirEntry, default_schema: String) -> Vec<String> {
@@ -643,7 +645,7 @@ fn qualify_name(schema: &str, name: &str) -> String {
 
 fn make_create_function_statement(
     func: &ItemFn,
-    mut extern_args: Option<HashSet<ExternArgs>>,
+    mut extern_args: Option<BTreeSet<ExternArgs>>,
     rs_file: &DirEntry,
     sql_func_arg: Option<String>,
     schema: &str,

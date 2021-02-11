@@ -117,10 +117,13 @@ fn build_extension(major_version: u16, is_release: bool) {
     }
 }
 
-fn copy_sql_files(extdir: &PathBuf, extname: &str, base_directory: &PathBuf) {
+pub(crate) fn write_full_schema_file(dir: &PathBuf, extdir: Option<&PathBuf>) {
+    let (_, extname) = find_control_file();
     let load_order = read_load_order(&PathBuf::from_str("./sql/load-order.txt").unwrap());
-    let mut target_filename = base_directory.clone();
-    target_filename.push(extdir);
+    let mut target_filename = dir.clone();
+    if extdir.is_some() {
+        target_filename.push(extdir.unwrap());
+    }
     target_filename.push(format!("{}--{}.sql", extname, get_version()));
 
     let mut sql = std::fs::File::create(&target_filename).unwrap();
@@ -153,6 +156,10 @@ fn copy_sql_files(extdir: &PathBuf, extname: &str, base_directory: &PathBuf) {
         sql.write_all(b"\n\n\n")
             .expect("couldn't write version SQL file");
     }
+}
+
+fn copy_sql_files(extdir: &PathBuf, extname: &str, base_directory: &PathBuf) {
+    write_full_schema_file(&base_directory, Some(extdir));
 
     // now copy all the version upgrade files too
     for sql in handle_result!(std::fs::read_dir("sql/"), "failed to read ./sql/ directory") {

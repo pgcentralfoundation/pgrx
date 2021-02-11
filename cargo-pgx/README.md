@@ -309,3 +309,26 @@ $ cargo pgx package --help
      -h, --help       Prints help information
      -V, --version    Prints version information
 ```
+
+## Dump Your Extension Schema
+
+If you just want to look at the full extension schema that pgx will generate, use
+`cargo pgx dump-schema /dir/to/write/it/`.
+
+![dumpschema](https://raw.githubusercontent.com/zombodb/pgx/master/cargo-pgx/dump-schema.png)
+
+```shell script
+$ cargo pgx dump-schema --help
+cargo-pgx-dump-schema 0.1.18
+dump the full extension SQL schema file
+
+USAGE:
+    cargo pgx dump-schema <DIRECTORY>
+
+FLAGS:
+    -h, --help       Prints help information
+    -V, --version    Prints version information
+
+ARGS:
+    <DIRECTORY>    Where should the extension .sql file be written?
+```

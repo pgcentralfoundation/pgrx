@@ -86,6 +86,14 @@ subcommands:
                     help: compile for debug mode (default is release)
           - schema:
               about: generate extension schema files (typically not necessary)
+          - dump-schema:
+              about: dump the full extension SQL schema file
+              args:
+                - directory:
+                    value_name: DIRECTORY
+                    takes_value: true
+                    required: true
+                    help: Where should the extension .sql file be written?
           - run:
               about: compile/install extension to a pgx-managed Postgres instance and start psql
               args:

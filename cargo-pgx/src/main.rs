@@ -9,7 +9,7 @@ mod commands;
 use crate::commands::connect::connect_psql;
 use crate::commands::get::get_property;
 use crate::commands::init::init_pgx;
-use crate::commands::install::install_extension;
+use crate::commands::install::{install_extension, write_full_schema_file};
 use crate::commands::new::create_crate_template;
 use crate::commands::package::package_extension;
 use crate::commands::run::run_psql;
@@ -182,6 +182,15 @@ fn do_it() -> std::result::Result<(), std::io::Error> {
                 Ok(())
             }
             ("schema", Some(_schema)) => generate_schema(),
+            ("dump-schema", Some(dump_schema)) => {
+                let dir = dump_schema
+                    .value_of("directory")
+                    .expect("the directory argument is required")
+                    .into();
+                generate_schema()?;
+                write_full_schema_file(&dir, None);
+                Ok(())
+            }
             ("get", Some(get)) => {
                 let name = get.value_of("name").expect("no property name specified");
                 if let Some(value) = get_property(name) {
