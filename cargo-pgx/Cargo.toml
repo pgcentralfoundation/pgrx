@@ -25,4 +25,4 @@ regex = "1.4.3"
 rttp_client = { version = "0.1.0", features = ["tls-native"] }
 syn = { version = "1.0.60", features = [ "extra-traits", "full", "fold", "parsing" ] }
 unescape = "0.1.0"
-fork = "0.1.19"
+fork = "0.1.18"
