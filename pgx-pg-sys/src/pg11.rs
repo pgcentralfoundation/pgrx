@@ -325,15 +325,15 @@ pub const MAXIMUM_ALIGNOF: u32 = 8;
 pub const MEMSET_LOOP_LIMIT: u32 = 1024;
 pub const PACKAGE_BUGREPORT: &'static [u8; 26usize] = b"pgsql-bugs@postgresql.org\0";
 pub const PACKAGE_NAME: &'static [u8; 11usize] = b"PostgreSQL\0";
-pub const PACKAGE_STRING: &'static [u8; 17usize] = b"PostgreSQL 11.10\0";
+pub const PACKAGE_STRING: &'static [u8; 17usize] = b"PostgreSQL 11.11\0";
 pub const PACKAGE_TARNAME: &'static [u8; 11usize] = b"postgresql\0";
 pub const PACKAGE_URL: &'static [u8; 1usize] = b"\0";
-pub const PACKAGE_VERSION: &'static [u8; 6usize] = b"11.10\0";
+pub const PACKAGE_VERSION: &'static [u8; 6usize] = b"11.11\0";
 pub const PG_KRB_SRVNAM: &'static [u8; 9usize] = b"postgres\0";
 pub const PG_MAJORVERSION: &'static [u8; 3usize] = b"11\0";
-pub const PG_VERSION: &'static [u8; 6usize] = b"11.10\0";
-pub const PG_VERSION_NUM: u32 = 110010;
-pub const PG_VERSION_STR : & 'static [u8 ; 115usize] = b"PostgreSQL 11.10 on x86_64-apple-darwin19.0.0, compiled by Apple clang version 11.0.0 (clang-1100.0.33.17), 64-bit\0" ;
+pub const PG_VERSION: &'static [u8; 6usize] = b"11.11\0";
+pub const PG_VERSION_NUM: u32 = 110011;
+pub const PG_VERSION_STR : & 'static [u8 ; 115usize] = b"PostgreSQL 11.11 on x86_64-apple-darwin20.3.0, compiled by Apple clang version 12.0.0 (clang-1200.0.32.29), 64-bit\0" ;
 pub const RELSEG_SIZE: u32 = 131072;
 pub const SIZEOF_BOOL: u32 = 1;
 pub const SIZEOF_LONG: u32 = 8;
@@ -421,6 +421,7 @@ pub const __MAC_10_14_1: u32 = 101401;
 pub const __MAC_10_14_4: u32 = 101404;
 pub const __MAC_10_15: u32 = 101500;
 pub const __MAC_10_15_1: u32 = 101501;
+pub const __MAC_10_15_4: u32 = 101504;
 pub const __IPHONE_2_0: u32 = 20000;
 pub const __IPHONE_2_1: u32 = 20100;
 pub const __IPHONE_2_2: u32 = 20200;
@@ -462,6 +463,10 @@ pub const __IPHONE_12_3: u32 = 120300;
 pub const __IPHONE_13_0: u32 = 130000;
 pub const __IPHONE_13_1: u32 = 130100;
 pub const __IPHONE_13_2: u32 = 130200;
+pub const __IPHONE_13_3: u32 = 130300;
+pub const __IPHONE_13_4: u32 = 130400;
+pub const __IPHONE_13_5: u32 = 130500;
+pub const __IPHONE_13_6: u32 = 130600;
 pub const __TVOS_9_0: u32 = 90000;
 pub const __TVOS_9_1: u32 = 90100;
 pub const __TVOS_9_2: u32 = 90200;
@@ -479,7 +484,9 @@ pub const __TVOS_12_1: u32 = 120100;
 pub const __TVOS_12_2: u32 = 120200;
 pub const __TVOS_12_3: u32 = 120300;
 pub const __TVOS_13_0: u32 = 130000;
-pub const __TVOS_13_1: u32 = 130100;
+pub const __TVOS_13_2: u32 = 130200;
+pub const __TVOS_13_3: u32 = 130300;
+pub const __TVOS_13_4: u32 = 130400;
 pub const __WATCHOS_1_0: u32 = 10000;
 pub const __WATCHOS_2_0: u32 = 20000;
 pub const __WATCHOS_2_1: u32 = 20100;
@@ -496,7 +503,8 @@ pub const __WATCHOS_5_0: u32 = 50000;
 pub const __WATCHOS_5_1: u32 = 50100;
 pub const __WATCHOS_5_2: u32 = 50200;
 pub const __WATCHOS_6_0: u32 = 60000;
-pub const __WATCHOS_6_0_1: u32 = 60001;
+pub const __WATCHOS_6_1: u32 = 60100;
+pub const __WATCHOS_6_2: u32 = 60200;
 pub const __DRIVERKIT_19_0: u32 = 190000;
 pub const __MAC_OS_X_VERSION_MAX_ALLOWED: u32 = 101500;
 pub const __ENABLE_LEGACY_MAC_AVAILABILITY: u32 = 1;
@@ -1578,7 +1586,7 @@ pub const _PASSWORD_NOEXP: u32 = 8;
 pub const _PASSWORD_WARNDAYS: u32 = 14;
 pub const _PASSWORD_CHGNOW: i32 = -1;
 pub const PGINVALID_SOCKET: i32 = -1;
-pub const PG_BACKEND_VERSIONSTR: &'static [u8; 29usize] = b"postgres (PostgreSQL) 11.10\n\0";
+pub const PG_BACKEND_VERSIONSTR: &'static [u8; 29usize] = b"postgres (PostgreSQL) 11.11\n\0";
 pub const EXE: &'static [u8; 1usize] = b"\0";
 pub const DEVNULL: &'static [u8; 10usize] = b"/dev/null\0";
 pub const PG_IOLBF: u32 = 1;
@@ -2184,6 +2192,9 @@ pub const CURSOR_OPT_CUSTOM_PLAN: u32 = 128;
 pub const CURSOR_OPT_PARALLEL_OK: u32 = 256;
 pub const FETCH_ALL: u64 = 9223372036854775807;
 pub const REINDEXOPT_VERBOSE: u32 = 1;
+pub const GROUPING_CAN_USE_SORT: u32 = 1;
+pub const GROUPING_CAN_USE_HASH: u32 = 2;
+pub const GROUPING_CAN_PARTIAL_AGG: u32 = 4;
 pub const MaxAllocHugeSize: u32 = 0;
 pub const ALLOCSET_DEFAULT_MINSIZE: u32 = 0;
 pub const ALLOCSET_DEFAULT_INITSIZE: u32 = 8192;
@@ -3034,9 +3045,6 @@ pub const BGW_NEVER_RESTART: i32 = -1;
 pub const BGW_MAXLEN: u32 = 96;
 pub const BGW_EXTRALEN: u32 = 128;
 pub const BGWORKER_BYPASS_ALLOWCONN: u32 = 1;
-pub const GROUPING_CAN_USE_SORT: u32 = 1;
-pub const GROUPING_CAN_USE_HASH: u32 = 2;
-pub const GROUPING_CAN_PARTIAL_AGG: u32 = 4;
 pub const EXTNODENAME_MAX_LEN: u32 = 64;
 pub const CUSTOMPATH_SUPPORT_BACKWARD_SCAN: u32 = 1;
 pub const CUSTOMPATH_SUPPORT_MARK_RESTORE: u32 = 2;
@@ -6784,6 +6792,14 @@ pub type suseconds_t = __darwin_suseconds_t;
 #[derive(Debug, Default, Copy, Clone)]
 pub struct fd_set {
     pub fds_bits: [__int32_t; 32usize],
+}
+#[pg_guard]
+extern "C" {
+    pub fn __darwin_check_fd_set_overflow(
+        arg1: ::std::os::raw::c_int,
+        arg2: *const ::std::os::raw::c_void,
+        arg3: ::std::os::raw::c_int,
+    ) -> ::std::os::raw::c_int;
 }
 pub type fd_mask = __int32_t;
 pub type pthread_cond_t = __darwin_pthread_cond_t;
@@ -14491,6 +14507,13 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
+    pub fn execute_attr_map_cols(
+        inbitmap: *mut Bitmapset,
+        map: *mut TupleConversionMap,
+    ) -> *mut Bitmapset;
+}
+#[pg_guard]
+extern "C" {
     pub fn free_conversion_map(map: *mut TupleConversionMap);
 }
 #[repr(C)]
@@ -17305,7 +17328,7 @@ pub struct ResultRelInfo {
     pub ri_onConflict: *mut OnConflictSetState,
     pub ri_PartitionCheck: *mut List,
     pub ri_PartitionCheckExpr: *mut ExprState,
-    pub ri_PartitionRoot: Relation,
+    pub ri_RootResultRelInfo: *mut ResultRelInfo,
     pub ri_PartitionReadyForRouting: bool,
 }
 impl Default for ResultRelInfo {
@@ -17737,11 +17760,6 @@ impl Default for ModifyTableState {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct ParallelAppendState {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PartitionPruneState {
     _unused: [u8; 0],
 }
 #[repr(C)]
@@ -19227,6 +19245,7 @@ pub struct TableLikeClause {
     pub type_: NodeTag,
     pub relation: *mut RangeVar,
     pub options: bits32,
+    pub relationOid: Oid,
 }
 impl Default for TableLikeClause {
     fn default() -> Self {
@@ -21567,6 +21586,1278 @@ impl Default for DropSubscriptionStmt {
         unsafe { ::std::mem::zeroed() }
     }
 }
+pub type Relids = *mut Bitmapset;
+pub const CostSelector_STARTUP_COST: CostSelector = 0;
+pub const CostSelector_TOTAL_COST: CostSelector = 1;
+pub type CostSelector = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct QualCost {
+    pub startup: Cost,
+    pub per_tuple: Cost,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct AggClauseCosts {
+    pub numAggs: ::std::os::raw::c_int,
+    pub numOrderedAggs: ::std::os::raw::c_int,
+    pub hasNonPartial: bool,
+    pub hasNonSerial: bool,
+    pub transCost: QualCost,
+    pub finalCost: Cost,
+    pub transitionSpace: Size,
+}
+pub const UpperRelationKind_UPPERREL_SETOP: UpperRelationKind = 0;
+pub const UpperRelationKind_UPPERREL_PARTIAL_GROUP_AGG: UpperRelationKind = 1;
+pub const UpperRelationKind_UPPERREL_GROUP_AGG: UpperRelationKind = 2;
+pub const UpperRelationKind_UPPERREL_WINDOW: UpperRelationKind = 3;
+pub const UpperRelationKind_UPPERREL_DISTINCT: UpperRelationKind = 4;
+pub const UpperRelationKind_UPPERREL_ORDERED: UpperRelationKind = 5;
+pub const UpperRelationKind_UPPERREL_FINAL: UpperRelationKind = 6;
+pub type UpperRelationKind = ::std::os::raw::c_uint;
+pub const InheritanceKind_INHKIND_NONE: InheritanceKind = 0;
+pub const InheritanceKind_INHKIND_INHERITED: InheritanceKind = 1;
+pub const InheritanceKind_INHKIND_PARTITIONED: InheritanceKind = 2;
+pub type InheritanceKind = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PlannerGlobal {
+    pub type_: NodeTag,
+    pub boundParams: ParamListInfo,
+    pub subplans: *mut List,
+    pub subroots: *mut List,
+    pub rewindPlanIDs: *mut Bitmapset,
+    pub finalrtable: *mut List,
+    pub finalrowmarks: *mut List,
+    pub resultRelations: *mut List,
+    pub nonleafResultRelations: *mut List,
+    pub rootResultRelations: *mut List,
+    pub relationOids: *mut List,
+    pub invalItems: *mut List,
+    pub paramExecTypes: *mut List,
+    pub lastPHId: Index,
+    pub lastRowMarkId: Index,
+    pub lastPlanNodeId: ::std::os::raw::c_int,
+    pub transientPlan: bool,
+    pub dependsOnRole: bool,
+    pub parallelModeOK: bool,
+    pub parallelModeNeeded: bool,
+    pub maxParallelHazard: ::std::os::raw::c_char,
+}
+impl Default for PlannerGlobal {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PlannerInfo {
+    pub type_: NodeTag,
+    pub parse: *mut Query,
+    pub glob: *mut PlannerGlobal,
+    pub query_level: Index,
+    pub parent_root: *mut PlannerInfo,
+    pub plan_params: *mut List,
+    pub outer_params: *mut Bitmapset,
+    pub simple_rel_array: *mut *mut RelOptInfo,
+    pub simple_rel_array_size: ::std::os::raw::c_int,
+    pub simple_rte_array: *mut *mut RangeTblEntry,
+    pub append_rel_array: *mut *mut AppendRelInfo,
+    pub all_baserels: Relids,
+    pub nullable_baserels: Relids,
+    pub join_rel_list: *mut List,
+    pub join_rel_hash: *mut HTAB,
+    pub join_rel_level: *mut *mut List,
+    pub join_cur_level: ::std::os::raw::c_int,
+    pub init_plans: *mut List,
+    pub cte_plan_ids: *mut List,
+    pub multiexpr_params: *mut List,
+    pub eq_classes: *mut List,
+    pub canon_pathkeys: *mut List,
+    pub left_join_clauses: *mut List,
+    pub right_join_clauses: *mut List,
+    pub full_join_clauses: *mut List,
+    pub join_info_list: *mut List,
+    pub append_rel_list: *mut List,
+    pub rowMarks: *mut List,
+    pub placeholder_list: *mut List,
+    pub fkey_list: *mut List,
+    pub query_pathkeys: *mut List,
+    pub group_pathkeys: *mut List,
+    pub window_pathkeys: *mut List,
+    pub distinct_pathkeys: *mut List,
+    pub sort_pathkeys: *mut List,
+    pub part_schemes: *mut List,
+    pub initial_rels: *mut List,
+    pub upper_rels: [*mut List; 7usize],
+    pub upper_targets: [*mut PathTarget; 7usize],
+    pub processed_tlist: *mut List,
+    pub grouping_map: *mut AttrNumber,
+    pub minmax_aggs: *mut List,
+    pub planner_cxt: MemoryContext,
+    pub total_table_pages: f64,
+    pub tuple_fraction: f64,
+    pub limit_tuples: f64,
+    pub qual_security_level: Index,
+    pub inhTargetKind: InheritanceKind,
+    pub hasJoinRTEs: bool,
+    pub hasLateralRTEs: bool,
+    pub hasDeletedRTEs: bool,
+    pub hasHavingQual: bool,
+    pub hasPseudoConstantQuals: bool,
+    pub hasRecursion: bool,
+    pub wt_param_id: ::std::os::raw::c_int,
+    pub non_recursive_path: *mut Path,
+    pub curOuterRels: Relids,
+    pub curOuterParams: *mut List,
+    pub join_search_private: *mut ::std::os::raw::c_void,
+    pub partColsUpdated: bool,
+}
+impl Default for PlannerInfo {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PartitionSchemeData {
+    pub strategy: ::std::os::raw::c_char,
+    pub partnatts: int16,
+    pub partopfamily: *mut Oid,
+    pub partopcintype: *mut Oid,
+    pub partcollation: *mut Oid,
+    pub parttyplen: *mut int16,
+    pub parttypbyval: *mut bool,
+    pub partsupfunc: *mut FmgrInfo,
+}
+impl Default for PartitionSchemeData {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+pub type PartitionScheme = *mut PartitionSchemeData;
+pub const RelOptKind_RELOPT_BASEREL: RelOptKind = 0;
+pub const RelOptKind_RELOPT_JOINREL: RelOptKind = 1;
+pub const RelOptKind_RELOPT_OTHER_MEMBER_REL: RelOptKind = 2;
+pub const RelOptKind_RELOPT_OTHER_JOINREL: RelOptKind = 3;
+pub const RelOptKind_RELOPT_UPPER_REL: RelOptKind = 4;
+pub const RelOptKind_RELOPT_OTHER_UPPER_REL: RelOptKind = 5;
+pub const RelOptKind_RELOPT_DEADREL: RelOptKind = 6;
+pub type RelOptKind = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct RelOptInfo {
+    pub type_: NodeTag,
+    pub reloptkind: RelOptKind,
+    pub relids: Relids,
+    pub rows: f64,
+    pub consider_startup: bool,
+    pub consider_param_startup: bool,
+    pub consider_parallel: bool,
+    pub reltarget: *mut PathTarget,
+    pub pathlist: *mut List,
+    pub ppilist: *mut List,
+    pub partial_pathlist: *mut List,
+    pub cheapest_startup_path: *mut Path,
+    pub cheapest_total_path: *mut Path,
+    pub cheapest_unique_path: *mut Path,
+    pub cheapest_parameterized_paths: *mut List,
+    pub direct_lateral_relids: Relids,
+    pub lateral_relids: Relids,
+    pub relid: Index,
+    pub reltablespace: Oid,
+    pub rtekind: RTEKind,
+    pub min_attr: AttrNumber,
+    pub max_attr: AttrNumber,
+    pub attr_needed: *mut Relids,
+    pub attr_widths: *mut int32,
+    pub lateral_vars: *mut List,
+    pub lateral_referencers: Relids,
+    pub indexlist: *mut List,
+    pub statlist: *mut List,
+    pub pages: BlockNumber,
+    pub tuples: f64,
+    pub allvisfrac: f64,
+    pub subroot: *mut PlannerInfo,
+    pub subplan_params: *mut List,
+    pub rel_parallel_workers: ::std::os::raw::c_int,
+    pub serverid: Oid,
+    pub userid: Oid,
+    pub useridiscurrent: bool,
+    pub fdwroutine: *mut FdwRoutine,
+    pub fdw_private: *mut ::std::os::raw::c_void,
+    pub unique_for_rels: *mut List,
+    pub non_unique_for_rels: *mut List,
+    pub baserestrictinfo: *mut List,
+    pub baserestrictcost: QualCost,
+    pub baserestrict_min_security: Index,
+    pub joininfo: *mut List,
+    pub has_eclass_joins: bool,
+    pub consider_partitionwise_join: bool,
+    pub top_parent_relids: Relids,
+    pub part_scheme: PartitionScheme,
+    pub nparts: ::std::os::raw::c_int,
+    pub boundinfo: *mut PartitionBoundInfoData,
+    pub partition_qual: *mut List,
+    pub part_rels: *mut *mut RelOptInfo,
+    pub partexprs: *mut *mut List,
+    pub nullable_partexprs: *mut *mut List,
+    pub partitioned_child_rels: *mut List,
+}
+impl Default for RelOptInfo {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct IndexOptInfo {
+    pub type_: NodeTag,
+    pub indexoid: Oid,
+    pub reltablespace: Oid,
+    pub rel: *mut RelOptInfo,
+    pub pages: BlockNumber,
+    pub tuples: f64,
+    pub tree_height: ::std::os::raw::c_int,
+    pub ncolumns: ::std::os::raw::c_int,
+    pub nkeycolumns: ::std::os::raw::c_int,
+    pub indexkeys: *mut ::std::os::raw::c_int,
+    pub indexcollations: *mut Oid,
+    pub opfamily: *mut Oid,
+    pub opcintype: *mut Oid,
+    pub sortopfamily: *mut Oid,
+    pub reverse_sort: *mut bool,
+    pub nulls_first: *mut bool,
+    pub canreturn: *mut bool,
+    pub relam: Oid,
+    pub indexprs: *mut List,
+    pub indpred: *mut List,
+    pub indextlist: *mut List,
+    pub indrestrictinfo: *mut List,
+    pub predOK: bool,
+    pub unique: bool,
+    pub immediate: bool,
+    pub hypothetical: bool,
+    pub amcanorderbyop: bool,
+    pub amoptionalkey: bool,
+    pub amsearcharray: bool,
+    pub amsearchnulls: bool,
+    pub amhasgettuple: bool,
+    pub amhasgetbitmap: bool,
+    pub amcanparallel: bool,
+    pub amcanmarkpos: bool,
+    pub amcostestimate: ::std::option::Option<unsafe extern "C" fn()>,
+}
+impl Default for IndexOptInfo {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ForeignKeyOptInfo {
+    pub type_: NodeTag,
+    pub con_relid: Index,
+    pub ref_relid: Index,
+    pub nkeys: ::std::os::raw::c_int,
+    pub conkey: [AttrNumber; 32usize],
+    pub confkey: [AttrNumber; 32usize],
+    pub conpfeqop: [Oid; 32usize],
+    pub nmatched_ec: ::std::os::raw::c_int,
+    pub nmatched_rcols: ::std::os::raw::c_int,
+    pub nmatched_ri: ::std::os::raw::c_int,
+    pub eclass: [*mut EquivalenceClass; 32usize],
+    pub rinfos: [*mut List; 32usize],
+}
+impl Default for ForeignKeyOptInfo {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct StatisticExtInfo {
+    pub type_: NodeTag,
+    pub statOid: Oid,
+    pub rel: *mut RelOptInfo,
+    pub kind: ::std::os::raw::c_char,
+    pub keys: *mut Bitmapset,
+}
+impl Default for StatisticExtInfo {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct EquivalenceClass {
+    pub type_: NodeTag,
+    pub ec_opfamilies: *mut List,
+    pub ec_collation: Oid,
+    pub ec_members: *mut List,
+    pub ec_sources: *mut List,
+    pub ec_derives: *mut List,
+    pub ec_relids: Relids,
+    pub ec_has_const: bool,
+    pub ec_has_volatile: bool,
+    pub ec_below_outer_join: bool,
+    pub ec_broken: bool,
+    pub ec_sortref: Index,
+    pub ec_min_security: Index,
+    pub ec_max_security: Index,
+    pub ec_merged: *mut EquivalenceClass,
+}
+impl Default for EquivalenceClass {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct EquivalenceMember {
+    pub type_: NodeTag,
+    pub em_expr: *mut Expr,
+    pub em_relids: Relids,
+    pub em_nullable_relids: Relids,
+    pub em_is_const: bool,
+    pub em_is_child: bool,
+    pub em_datatype: Oid,
+}
+impl Default for EquivalenceMember {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PathKey {
+    pub type_: NodeTag,
+    pub pk_eclass: *mut EquivalenceClass,
+    pub pk_opfamily: Oid,
+    pub pk_strategy: ::std::os::raw::c_int,
+    pub pk_nulls_first: bool,
+}
+impl Default for PathKey {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PathTarget {
+    pub type_: NodeTag,
+    pub exprs: *mut List,
+    pub sortgrouprefs: *mut Index,
+    pub cost: QualCost,
+    pub width: ::std::os::raw::c_int,
+}
+impl Default for PathTarget {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ParamPathInfo {
+    pub type_: NodeTag,
+    pub ppi_req_outer: Relids,
+    pub ppi_rows: f64,
+    pub ppi_clauses: *mut List,
+}
+impl Default for ParamPathInfo {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct Path {
+    pub type_: NodeTag,
+    pub pathtype: NodeTag,
+    pub parent: *mut RelOptInfo,
+    pub pathtarget: *mut PathTarget,
+    pub param_info: *mut ParamPathInfo,
+    pub parallel_aware: bool,
+    pub parallel_safe: bool,
+    pub parallel_workers: ::std::os::raw::c_int,
+    pub rows: f64,
+    pub startup_cost: Cost,
+    pub total_cost: Cost,
+    pub pathkeys: *mut List,
+}
+impl Default for Path {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct IndexPath {
+    pub path: Path,
+    pub indexinfo: *mut IndexOptInfo,
+    pub indexclauses: *mut List,
+    pub indexquals: *mut List,
+    pub indexqualcols: *mut List,
+    pub indexorderbys: *mut List,
+    pub indexorderbycols: *mut List,
+    pub indexscandir: ScanDirection,
+    pub indextotalcost: Cost,
+    pub indexselectivity: Selectivity,
+}
+impl Default for IndexPath {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct BitmapHeapPath {
+    pub path: Path,
+    pub bitmapqual: *mut Path,
+}
+impl Default for BitmapHeapPath {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct BitmapAndPath {
+    pub path: Path,
+    pub bitmapquals: *mut List,
+    pub bitmapselectivity: Selectivity,
+}
+impl Default for BitmapAndPath {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct BitmapOrPath {
+    pub path: Path,
+    pub bitmapquals: *mut List,
+    pub bitmapselectivity: Selectivity,
+}
+impl Default for BitmapOrPath {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct TidPath {
+    pub path: Path,
+    pub tidquals: *mut List,
+}
+impl Default for TidPath {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct SubqueryScanPath {
+    pub path: Path,
+    pub subpath: *mut Path,
+}
+impl Default for SubqueryScanPath {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ForeignPath {
+    pub path: Path,
+    pub fdw_outerpath: *mut Path,
+    pub fdw_private: *mut List,
+}
+impl Default for ForeignPath {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct CustomPath {
+    pub path: Path,
+    pub flags: uint32,
+    pub custom_paths: *mut List,
+    pub custom_private: *mut List,
+    pub methods: *const CustomPathMethods,
+}
+impl Default for CustomPath {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct AppendPath {
+    pub path: Path,
+    pub partitioned_rels: *mut List,
+    pub subpaths: *mut List,
+    pub first_partial_path: ::std::os::raw::c_int,
+}
+impl Default for AppendPath {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[pg_guard]
+extern "C" {
+    pub fn is_dummy_rel(rel: *mut RelOptInfo) -> bool;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct MergeAppendPath {
+    pub path: Path,
+    pub partitioned_rels: *mut List,
+    pub subpaths: *mut List,
+    pub limit_tuples: f64,
+}
+impl Default for MergeAppendPath {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ResultPath {
+    pub path: Path,
+    pub quals: *mut List,
+}
+impl Default for ResultPath {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct MaterialPath {
+    pub path: Path,
+    pub subpath: *mut Path,
+}
+impl Default for MaterialPath {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+pub const UniquePathMethod_UNIQUE_PATH_NOOP: UniquePathMethod = 0;
+pub const UniquePathMethod_UNIQUE_PATH_HASH: UniquePathMethod = 1;
+pub const UniquePathMethod_UNIQUE_PATH_SORT: UniquePathMethod = 2;
+pub type UniquePathMethod = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct UniquePath {
+    pub path: Path,
+    pub subpath: *mut Path,
+    pub umethod: UniquePathMethod,
+    pub in_operators: *mut List,
+    pub uniq_exprs: *mut List,
+}
+impl Default for UniquePath {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct GatherPath {
+    pub path: Path,
+    pub subpath: *mut Path,
+    pub single_copy: bool,
+    pub num_workers: ::std::os::raw::c_int,
+}
+impl Default for GatherPath {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct GatherMergePath {
+    pub path: Path,
+    pub subpath: *mut Path,
+    pub num_workers: ::std::os::raw::c_int,
+}
+impl Default for GatherMergePath {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct JoinPath {
+    pub path: Path,
+    pub jointype: JoinType,
+    pub inner_unique: bool,
+    pub outerjoinpath: *mut Path,
+    pub innerjoinpath: *mut Path,
+    pub joinrestrictinfo: *mut List,
+}
+impl Default for JoinPath {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+pub type NestPath = JoinPath;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct MergePath {
+    pub jpath: JoinPath,
+    pub path_mergeclauses: *mut List,
+    pub outersortkeys: *mut List,
+    pub innersortkeys: *mut List,
+    pub skip_mark_restore: bool,
+    pub materialize_inner: bool,
+}
+impl Default for MergePath {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct HashPath {
+    pub jpath: JoinPath,
+    pub path_hashclauses: *mut List,
+    pub num_batches: ::std::os::raw::c_int,
+    pub inner_rows_total: f64,
+}
+impl Default for HashPath {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ProjectionPath {
+    pub path: Path,
+    pub subpath: *mut Path,
+    pub dummypp: bool,
+}
+impl Default for ProjectionPath {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ProjectSetPath {
+    pub path: Path,
+    pub subpath: *mut Path,
+}
+impl Default for ProjectSetPath {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct SortPath {
+    pub path: Path,
+    pub subpath: *mut Path,
+}
+impl Default for SortPath {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct GroupPath {
+    pub path: Path,
+    pub subpath: *mut Path,
+    pub groupClause: *mut List,
+    pub qual: *mut List,
+}
+impl Default for GroupPath {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct UpperUniquePath {
+    pub path: Path,
+    pub subpath: *mut Path,
+    pub numkeys: ::std::os::raw::c_int,
+}
+impl Default for UpperUniquePath {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct AggPath {
+    pub path: Path,
+    pub subpath: *mut Path,
+    pub aggstrategy: AggStrategy,
+    pub aggsplit: AggSplit,
+    pub numGroups: f64,
+    pub groupClause: *mut List,
+    pub qual: *mut List,
+}
+impl Default for AggPath {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct GroupingSetData {
+    pub type_: NodeTag,
+    pub set: *mut List,
+    pub numGroups: f64,
+}
+impl Default for GroupingSetData {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct RollupData {
+    pub type_: NodeTag,
+    pub groupClause: *mut List,
+    pub gsets: *mut List,
+    pub gsets_data: *mut List,
+    pub numGroups: f64,
+    pub hashable: bool,
+    pub is_hashed: bool,
+}
+impl Default for RollupData {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct GroupingSetsPath {
+    pub path: Path,
+    pub subpath: *mut Path,
+    pub aggstrategy: AggStrategy,
+    pub rollups: *mut List,
+    pub qual: *mut List,
+}
+impl Default for GroupingSetsPath {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct MinMaxAggPath {
+    pub path: Path,
+    pub mmaggregates: *mut List,
+    pub quals: *mut List,
+}
+impl Default for MinMaxAggPath {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct WindowAggPath {
+    pub path: Path,
+    pub subpath: *mut Path,
+    pub winclause: *mut WindowClause,
+}
+impl Default for WindowAggPath {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct SetOpPath {
+    pub path: Path,
+    pub subpath: *mut Path,
+    pub cmd: SetOpCmd,
+    pub strategy: SetOpStrategy,
+    pub distinctList: *mut List,
+    pub flagColIdx: AttrNumber,
+    pub firstFlag: ::std::os::raw::c_int,
+    pub numGroups: f64,
+}
+impl Default for SetOpPath {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct RecursiveUnionPath {
+    pub path: Path,
+    pub leftpath: *mut Path,
+    pub rightpath: *mut Path,
+    pub distinctList: *mut List,
+    pub wtParam: ::std::os::raw::c_int,
+    pub numGroups: f64,
+}
+impl Default for RecursiveUnionPath {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct LockRowsPath {
+    pub path: Path,
+    pub subpath: *mut Path,
+    pub rowMarks: *mut List,
+    pub epqParam: ::std::os::raw::c_int,
+}
+impl Default for LockRowsPath {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ModifyTablePath {
+    pub path: Path,
+    pub operation: CmdType,
+    pub canSetTag: bool,
+    pub nominalRelation: Index,
+    pub partitioned_rels: *mut List,
+    pub partColsUpdated: bool,
+    pub resultRelations: *mut List,
+    pub subpaths: *mut List,
+    pub subroots: *mut List,
+    pub withCheckOptionLists: *mut List,
+    pub returningLists: *mut List,
+    pub rowMarks: *mut List,
+    pub onconflict: *mut OnConflictExpr,
+    pub epqParam: ::std::os::raw::c_int,
+}
+impl Default for ModifyTablePath {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct LimitPath {
+    pub path: Path,
+    pub subpath: *mut Path,
+    pub limitOffset: *mut Node,
+    pub limitCount: *mut Node,
+}
+impl Default for LimitPath {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct RestrictInfo {
+    pub type_: NodeTag,
+    pub clause: *mut Expr,
+    pub is_pushed_down: bool,
+    pub outerjoin_delayed: bool,
+    pub can_join: bool,
+    pub pseudoconstant: bool,
+    pub leakproof: bool,
+    pub security_level: Index,
+    pub clause_relids: Relids,
+    pub required_relids: Relids,
+    pub outer_relids: Relids,
+    pub nullable_relids: Relids,
+    pub left_relids: Relids,
+    pub right_relids: Relids,
+    pub orclause: *mut Expr,
+    pub parent_ec: *mut EquivalenceClass,
+    pub eval_cost: QualCost,
+    pub norm_selec: Selectivity,
+    pub outer_selec: Selectivity,
+    pub mergeopfamilies: *mut List,
+    pub left_ec: *mut EquivalenceClass,
+    pub right_ec: *mut EquivalenceClass,
+    pub left_em: *mut EquivalenceMember,
+    pub right_em: *mut EquivalenceMember,
+    pub scansel_cache: *mut List,
+    pub outer_is_left: bool,
+    pub hashjoinoperator: Oid,
+    pub left_bucketsize: Selectivity,
+    pub right_bucketsize: Selectivity,
+    pub left_mcvfreq: Selectivity,
+    pub right_mcvfreq: Selectivity,
+}
+impl Default for RestrictInfo {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct MergeScanSelCache {
+    pub opfamily: Oid,
+    pub collation: Oid,
+    pub strategy: ::std::os::raw::c_int,
+    pub nulls_first: bool,
+    pub leftstartsel: Selectivity,
+    pub leftendsel: Selectivity,
+    pub rightstartsel: Selectivity,
+    pub rightendsel: Selectivity,
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PlaceHolderVar {
+    pub xpr: Expr,
+    pub phexpr: *mut Expr,
+    pub phrels: Relids,
+    pub phid: Index,
+    pub phlevelsup: Index,
+}
+impl Default for PlaceHolderVar {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct SpecialJoinInfo {
+    pub type_: NodeTag,
+    pub min_lefthand: Relids,
+    pub min_righthand: Relids,
+    pub syn_lefthand: Relids,
+    pub syn_righthand: Relids,
+    pub jointype: JoinType,
+    pub lhs_strict: bool,
+    pub delay_upper_joins: bool,
+    pub semi_can_btree: bool,
+    pub semi_can_hash: bool,
+    pub semi_operators: *mut List,
+    pub semi_rhs_exprs: *mut List,
+}
+impl Default for SpecialJoinInfo {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct AppendRelInfo {
+    pub type_: NodeTag,
+    pub parent_relid: Index,
+    pub child_relid: Index,
+    pub parent_reltype: Oid,
+    pub child_reltype: Oid,
+    pub translated_vars: *mut List,
+    pub parent_reloid: Oid,
+}
+impl Default for AppendRelInfo {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PlaceHolderInfo {
+    pub type_: NodeTag,
+    pub phid: Index,
+    pub ph_var: *mut PlaceHolderVar,
+    pub ph_eval_at: Relids,
+    pub ph_lateral: Relids,
+    pub ph_needed: Relids,
+    pub ph_width: int32,
+}
+impl Default for PlaceHolderInfo {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct MinMaxAggInfo {
+    pub type_: NodeTag,
+    pub aggfnoid: Oid,
+    pub aggsortop: Oid,
+    pub target: *mut Expr,
+    pub subroot: *mut PlannerInfo,
+    pub path: *mut Path,
+    pub pathcost: Cost,
+    pub param: *mut Param,
+}
+impl Default for MinMaxAggInfo {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PlannerParamItem {
+    pub type_: NodeTag,
+    pub item: *mut Node,
+    pub paramId: ::std::os::raw::c_int,
+}
+impl Default for PlannerParamItem {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct SemiAntiJoinFactors {
+    pub outer_match_frac: Selectivity,
+    pub match_count: Selectivity,
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct JoinPathExtraData {
+    pub restrictlist: *mut List,
+    pub mergeclause_list: *mut List,
+    pub inner_unique: bool,
+    pub sjinfo: *mut SpecialJoinInfo,
+    pub semifactors: SemiAntiJoinFactors,
+    pub param_source_rels: Relids,
+}
+impl Default for JoinPathExtraData {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+pub const PartitionwiseAggregateType_PARTITIONWISE_AGGREGATE_NONE: PartitionwiseAggregateType = 0;
+pub const PartitionwiseAggregateType_PARTITIONWISE_AGGREGATE_FULL: PartitionwiseAggregateType = 1;
+pub const PartitionwiseAggregateType_PARTITIONWISE_AGGREGATE_PARTIAL: PartitionwiseAggregateType =
+    2;
+pub type PartitionwiseAggregateType = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct GroupPathExtraData {
+    pub flags: ::std::os::raw::c_int,
+    pub partial_costs_set: bool,
+    pub agg_partial_costs: AggClauseCosts,
+    pub agg_final_costs: AggClauseCosts,
+    pub target_parallel_safe: bool,
+    pub havingQual: *mut Node,
+    pub targetList: *mut List,
+    pub patype: PartitionwiseAggregateType,
+}
+impl Default for GroupPathExtraData {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct JoinCostWorkspace {
+    pub startup_cost: Cost,
+    pub total_cost: Cost,
+    pub run_cost: Cost,
+    pub inner_run_cost: Cost,
+    pub inner_rescan_run_cost: Cost,
+    pub outer_rows: f64,
+    pub inner_rows: f64,
+    pub outer_skip_rows: f64,
+    pub inner_skip_rows: f64,
+    pub numbuckets: ::std::os::raw::c_int,
+    pub numbatches: ::std::os::raw::c_int,
+    pub inner_rows_total: f64,
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PartitionPruneContext {
+    pub partrel: Relation,
+    pub strategy: ::std::os::raw::c_char,
+    pub partnatts: ::std::os::raw::c_int,
+    pub nparts: ::std::os::raw::c_int,
+    pub boundinfo: PartitionBoundInfo,
+    pub partcollation: *mut Oid,
+    pub partsupfunc: *mut FmgrInfo,
+    pub stepcmpfuncs: *mut FmgrInfo,
+    pub ppccontext: MemoryContext,
+    pub planstate: *mut PlanState,
+    pub exprstates: *mut *mut ExprState,
+}
+impl Default for PartitionPruneContext {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[pg_guard]
+extern "C" {
+    pub fn make_partition_pruneinfo(
+        root: *mut PlannerInfo,
+        parentrel: *mut RelOptInfo,
+        subpaths: *mut List,
+        partitioned_rels: *mut List,
+        prunequal: *mut List,
+    ) -> *mut PartitionPruneInfo;
+}
+#[pg_guard]
+extern "C" {
+    pub fn prune_append_rel_partitions(rel: *mut RelOptInfo) -> Relids;
+}
+#[pg_guard]
+extern "C" {
+    pub fn get_matching_partitions(
+        context: *mut PartitionPruneContext,
+        pruning_steps: *mut List,
+    ) -> *mut Bitmapset;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PartitionDispatchData {
+    _unused: [u8; 0],
+}
+pub type PartitionDispatch = *mut PartitionDispatchData;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PartitionTupleRouting {
+    pub partition_dispatch_info: *mut PartitionDispatch,
+    pub num_dispatch: ::std::os::raw::c_int,
+    pub partition_oids: *mut Oid,
+    pub partitions: *mut *mut ResultRelInfo,
+    pub num_partitions: ::std::os::raw::c_int,
+    pub parent_child_tupconv_maps: *mut *mut TupleConversionMap,
+    pub child_parent_tupconv_maps: *mut *mut TupleConversionMap,
+    pub child_parent_map_not_required: *mut bool,
+    pub subplan_partition_offsets: *mut ::std::os::raw::c_int,
+    pub num_subplan_partition_offsets: ::std::os::raw::c_int,
+    pub partition_tuple_slot: *mut TupleTableSlot,
+    pub root_tuple_slot: *mut TupleTableSlot,
+}
+impl Default for PartitionTupleRouting {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct PartitionedRelPruningData {
+    pub nparts: ::std::os::raw::c_int,
+    pub subplan_map: *mut ::std::os::raw::c_int,
+    pub subpart_map: *mut ::std::os::raw::c_int,
+    pub present_parts: *mut Bitmapset,
+    pub initial_pruning_steps: *mut List,
+    pub exec_pruning_steps: *mut List,
+    pub initial_context: PartitionPruneContext,
+    pub exec_context: PartitionPruneContext,
+}
+impl Default for PartitionedRelPruningData {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug)]
+pub struct PartitionPruningData {
+    pub num_partrelprunedata: ::std::os::raw::c_int,
+    pub partrelprunedata: __IncompleteArrayField<PartitionedRelPruningData>,
+}
+impl Default for PartitionPruningData {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug)]
+pub struct PartitionPruneState {
+    pub execparamids: *mut Bitmapset,
+    pub other_subplans: *mut Bitmapset,
+    pub prune_context: MemoryContext,
+    pub do_initial_prune: bool,
+    pub do_exec_prune: bool,
+    pub num_partprunedata: ::std::os::raw::c_int,
+    pub partprunedata: __IncompleteArrayField<*mut PartitionPruningData>,
+}
+impl Default for PartitionPruneState {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[pg_guard]
+extern "C" {
+    pub fn ExecSetupPartitionTupleRouting(
+        mtstate: *mut ModifyTableState,
+        rootResultRelInfo: *mut ResultRelInfo,
+    ) -> *mut PartitionTupleRouting;
+}
+#[pg_guard]
+extern "C" {
+    pub fn ExecFindPartition(
+        resultRelInfo: *mut ResultRelInfo,
+        pd: *mut PartitionDispatch,
+        slot: *mut TupleTableSlot,
+        estate: *mut EState,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn ExecInitPartitionInfo(
+        mtstate: *mut ModifyTableState,
+        rootResultRelInfo: *mut ResultRelInfo,
+        proute: *mut PartitionTupleRouting,
+        estate: *mut EState,
+        partidx: ::std::os::raw::c_int,
+    ) -> *mut ResultRelInfo;
+}
+#[pg_guard]
+extern "C" {
+    pub fn ExecInitRoutingInfo(
+        mtstate: *mut ModifyTableState,
+        estate: *mut EState,
+        proute: *mut PartitionTupleRouting,
+        partRelInfo: *mut ResultRelInfo,
+        partidx: ::std::os::raw::c_int,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn ExecSetupChildParentMapForLeaf(proute: *mut PartitionTupleRouting);
+}
+#[pg_guard]
+extern "C" {
+    pub fn TupConvMapForLeaf(
+        proute: *mut PartitionTupleRouting,
+        rootRelInfo: *mut ResultRelInfo,
+        leaf_index: ::std::os::raw::c_int,
+    ) -> *mut TupleConversionMap;
+}
+#[pg_guard]
+extern "C" {
+    pub fn ConvertPartitionTupleSlot(
+        map: *mut TupleConversionMap,
+        tuple: HeapTuple,
+        new_slot: *mut TupleTableSlot,
+        p_my_slot: *mut *mut TupleTableSlot,
+    ) -> HeapTuple;
+}
+#[pg_guard]
+extern "C" {
+    pub fn ExecCleanupTupleRouting(
+        mtstate: *mut ModifyTableState,
+        proute: *mut PartitionTupleRouting,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn ExecCreatePartitionPruneState(
+        planstate: *mut PlanState,
+        partitionpruneinfo: *mut PartitionPruneInfo,
+    ) -> *mut PartitionPruneState;
+}
+#[pg_guard]
+extern "C" {
+    pub fn ExecDestroyPartitionPruneState(prunestate: *mut PartitionPruneState);
+}
+#[pg_guard]
+extern "C" {
+    pub fn ExecFindMatchingSubPlans(prunestate: *mut PartitionPruneState) -> *mut Bitmapset;
+}
+#[pg_guard]
+extern "C" {
+    pub fn ExecFindInitialMatchingSubPlans(
+        prunestate: *mut PartitionPruneState,
+        nsubplans: ::std::os::raw::c_int,
+    ) -> *mut Bitmapset;
+}
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct MemoryContextCounters {
@@ -22018,7 +23309,7 @@ extern "C" {
         resultRelInfo: *mut ResultRelInfo,
         resultRelationDesc: Relation,
         resultRelationIndex: Index,
-        partition_root: Relation,
+        partition_root_rri: *mut ResultRelInfo,
         instrument_options: ::std::os::raw::c_int,
     );
 }
@@ -22501,6 +23792,14 @@ extern "C" {
 #[pg_guard]
 extern "C" {
     pub fn ExecCleanTargetListLength(targetlist: *mut List) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn ExecGetInsertedCols(relinfo: *mut ResultRelInfo, estate: *mut EState) -> *mut Bitmapset;
+}
+#[pg_guard]
+extern "C" {
+    pub fn ExecGetUpdatedCols(relinfo: *mut ResultRelInfo, estate: *mut EState) -> *mut Bitmapset;
 }
 #[pg_guard]
 extern "C" {
@@ -27148,6 +28447,13 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
+    pub fn TimestampDifferenceMilliseconds(
+        start_time: TimestampTz,
+        stop_time: TimestampTz,
+    ) -> ::std::os::raw::c_long;
+}
+#[pg_guard]
+extern "C" {
     pub fn TimestampDifferenceExceeds(
         start_time: TimestampTz,
         stop_time: TimestampTz,
@@ -29308,6 +30614,7 @@ pub const SharedDependencyType_SHARED_DEPENDENCY_PIN: SharedDependencyType = 112
 pub const SharedDependencyType_SHARED_DEPENDENCY_OWNER: SharedDependencyType = 111;
 pub const SharedDependencyType_SHARED_DEPENDENCY_ACL: SharedDependencyType = 97;
 pub const SharedDependencyType_SHARED_DEPENDENCY_POLICY: SharedDependencyType = 114;
+pub const SharedDependencyType_SHARED_DEPENDENCY_TABLESPACE: SharedDependencyType = 116;
 pub const SharedDependencyType_SHARED_DEPENDENCY_INVALID: SharedDependencyType = 0;
 pub type SharedDependencyType = ::std::os::raw::c_uint;
 #[repr(C)]
@@ -29529,6 +30836,14 @@ extern "C" {
 #[pg_guard]
 extern "C" {
     pub fn changeDependencyOnOwner(classId: Oid, objectId: Oid, newOwnerId: Oid);
+}
+#[pg_guard]
+extern "C" {
+    pub fn recordDependencyOnTablespace(classId: Oid, objectId: Oid, tablespace: Oid);
+}
+#[pg_guard]
+extern "C" {
+    pub fn changeDependencyOnTablespace(classId: Oid, objectId: Oid, newTablespaceId: Oid);
 }
 #[pg_guard]
 extern "C" {
@@ -33277,1079 +34592,6 @@ extern "C" {
 #[pg_guard]
 extern "C" {
     pub fn ParallelWorkerMain(main_arg: Datum);
-}
-pub type Relids = *mut Bitmapset;
-pub const CostSelector_STARTUP_COST: CostSelector = 0;
-pub const CostSelector_TOTAL_COST: CostSelector = 1;
-pub type CostSelector = ::std::os::raw::c_uint;
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct QualCost {
-    pub startup: Cost,
-    pub per_tuple: Cost,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct AggClauseCosts {
-    pub numAggs: ::std::os::raw::c_int,
-    pub numOrderedAggs: ::std::os::raw::c_int,
-    pub hasNonPartial: bool,
-    pub hasNonSerial: bool,
-    pub transCost: QualCost,
-    pub finalCost: Cost,
-    pub transitionSpace: Size,
-}
-pub const UpperRelationKind_UPPERREL_SETOP: UpperRelationKind = 0;
-pub const UpperRelationKind_UPPERREL_PARTIAL_GROUP_AGG: UpperRelationKind = 1;
-pub const UpperRelationKind_UPPERREL_GROUP_AGG: UpperRelationKind = 2;
-pub const UpperRelationKind_UPPERREL_WINDOW: UpperRelationKind = 3;
-pub const UpperRelationKind_UPPERREL_DISTINCT: UpperRelationKind = 4;
-pub const UpperRelationKind_UPPERREL_ORDERED: UpperRelationKind = 5;
-pub const UpperRelationKind_UPPERREL_FINAL: UpperRelationKind = 6;
-pub type UpperRelationKind = ::std::os::raw::c_uint;
-pub const InheritanceKind_INHKIND_NONE: InheritanceKind = 0;
-pub const InheritanceKind_INHKIND_INHERITED: InheritanceKind = 1;
-pub const InheritanceKind_INHKIND_PARTITIONED: InheritanceKind = 2;
-pub type InheritanceKind = ::std::os::raw::c_uint;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PlannerGlobal {
-    pub type_: NodeTag,
-    pub boundParams: ParamListInfo,
-    pub subplans: *mut List,
-    pub subroots: *mut List,
-    pub rewindPlanIDs: *mut Bitmapset,
-    pub finalrtable: *mut List,
-    pub finalrowmarks: *mut List,
-    pub resultRelations: *mut List,
-    pub nonleafResultRelations: *mut List,
-    pub rootResultRelations: *mut List,
-    pub relationOids: *mut List,
-    pub invalItems: *mut List,
-    pub paramExecTypes: *mut List,
-    pub lastPHId: Index,
-    pub lastRowMarkId: Index,
-    pub lastPlanNodeId: ::std::os::raw::c_int,
-    pub transientPlan: bool,
-    pub dependsOnRole: bool,
-    pub parallelModeOK: bool,
-    pub parallelModeNeeded: bool,
-    pub maxParallelHazard: ::std::os::raw::c_char,
-}
-impl Default for PlannerGlobal {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PlannerInfo {
-    pub type_: NodeTag,
-    pub parse: *mut Query,
-    pub glob: *mut PlannerGlobal,
-    pub query_level: Index,
-    pub parent_root: *mut PlannerInfo,
-    pub plan_params: *mut List,
-    pub outer_params: *mut Bitmapset,
-    pub simple_rel_array: *mut *mut RelOptInfo,
-    pub simple_rel_array_size: ::std::os::raw::c_int,
-    pub simple_rte_array: *mut *mut RangeTblEntry,
-    pub append_rel_array: *mut *mut AppendRelInfo,
-    pub all_baserels: Relids,
-    pub nullable_baserels: Relids,
-    pub join_rel_list: *mut List,
-    pub join_rel_hash: *mut HTAB,
-    pub join_rel_level: *mut *mut List,
-    pub join_cur_level: ::std::os::raw::c_int,
-    pub init_plans: *mut List,
-    pub cte_plan_ids: *mut List,
-    pub multiexpr_params: *mut List,
-    pub eq_classes: *mut List,
-    pub canon_pathkeys: *mut List,
-    pub left_join_clauses: *mut List,
-    pub right_join_clauses: *mut List,
-    pub full_join_clauses: *mut List,
-    pub join_info_list: *mut List,
-    pub append_rel_list: *mut List,
-    pub rowMarks: *mut List,
-    pub placeholder_list: *mut List,
-    pub fkey_list: *mut List,
-    pub query_pathkeys: *mut List,
-    pub group_pathkeys: *mut List,
-    pub window_pathkeys: *mut List,
-    pub distinct_pathkeys: *mut List,
-    pub sort_pathkeys: *mut List,
-    pub part_schemes: *mut List,
-    pub initial_rels: *mut List,
-    pub upper_rels: [*mut List; 7usize],
-    pub upper_targets: [*mut PathTarget; 7usize],
-    pub processed_tlist: *mut List,
-    pub grouping_map: *mut AttrNumber,
-    pub minmax_aggs: *mut List,
-    pub planner_cxt: MemoryContext,
-    pub total_table_pages: f64,
-    pub tuple_fraction: f64,
-    pub limit_tuples: f64,
-    pub qual_security_level: Index,
-    pub inhTargetKind: InheritanceKind,
-    pub hasJoinRTEs: bool,
-    pub hasLateralRTEs: bool,
-    pub hasDeletedRTEs: bool,
-    pub hasHavingQual: bool,
-    pub hasPseudoConstantQuals: bool,
-    pub hasRecursion: bool,
-    pub wt_param_id: ::std::os::raw::c_int,
-    pub non_recursive_path: *mut Path,
-    pub curOuterRels: Relids,
-    pub curOuterParams: *mut List,
-    pub join_search_private: *mut ::std::os::raw::c_void,
-    pub partColsUpdated: bool,
-}
-impl Default for PlannerInfo {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PartitionSchemeData {
-    pub strategy: ::std::os::raw::c_char,
-    pub partnatts: int16,
-    pub partopfamily: *mut Oid,
-    pub partopcintype: *mut Oid,
-    pub partcollation: *mut Oid,
-    pub parttyplen: *mut int16,
-    pub parttypbyval: *mut bool,
-    pub partsupfunc: *mut FmgrInfo,
-}
-impl Default for PartitionSchemeData {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-pub type PartitionScheme = *mut PartitionSchemeData;
-pub const RelOptKind_RELOPT_BASEREL: RelOptKind = 0;
-pub const RelOptKind_RELOPT_JOINREL: RelOptKind = 1;
-pub const RelOptKind_RELOPT_OTHER_MEMBER_REL: RelOptKind = 2;
-pub const RelOptKind_RELOPT_OTHER_JOINREL: RelOptKind = 3;
-pub const RelOptKind_RELOPT_UPPER_REL: RelOptKind = 4;
-pub const RelOptKind_RELOPT_OTHER_UPPER_REL: RelOptKind = 5;
-pub const RelOptKind_RELOPT_DEADREL: RelOptKind = 6;
-pub type RelOptKind = ::std::os::raw::c_uint;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct RelOptInfo {
-    pub type_: NodeTag,
-    pub reloptkind: RelOptKind,
-    pub relids: Relids,
-    pub rows: f64,
-    pub consider_startup: bool,
-    pub consider_param_startup: bool,
-    pub consider_parallel: bool,
-    pub reltarget: *mut PathTarget,
-    pub pathlist: *mut List,
-    pub ppilist: *mut List,
-    pub partial_pathlist: *mut List,
-    pub cheapest_startup_path: *mut Path,
-    pub cheapest_total_path: *mut Path,
-    pub cheapest_unique_path: *mut Path,
-    pub cheapest_parameterized_paths: *mut List,
-    pub direct_lateral_relids: Relids,
-    pub lateral_relids: Relids,
-    pub relid: Index,
-    pub reltablespace: Oid,
-    pub rtekind: RTEKind,
-    pub min_attr: AttrNumber,
-    pub max_attr: AttrNumber,
-    pub attr_needed: *mut Relids,
-    pub attr_widths: *mut int32,
-    pub lateral_vars: *mut List,
-    pub lateral_referencers: Relids,
-    pub indexlist: *mut List,
-    pub statlist: *mut List,
-    pub pages: BlockNumber,
-    pub tuples: f64,
-    pub allvisfrac: f64,
-    pub subroot: *mut PlannerInfo,
-    pub subplan_params: *mut List,
-    pub rel_parallel_workers: ::std::os::raw::c_int,
-    pub serverid: Oid,
-    pub userid: Oid,
-    pub useridiscurrent: bool,
-    pub fdwroutine: *mut FdwRoutine,
-    pub fdw_private: *mut ::std::os::raw::c_void,
-    pub unique_for_rels: *mut List,
-    pub non_unique_for_rels: *mut List,
-    pub baserestrictinfo: *mut List,
-    pub baserestrictcost: QualCost,
-    pub baserestrict_min_security: Index,
-    pub joininfo: *mut List,
-    pub has_eclass_joins: bool,
-    pub consider_partitionwise_join: bool,
-    pub top_parent_relids: Relids,
-    pub part_scheme: PartitionScheme,
-    pub nparts: ::std::os::raw::c_int,
-    pub boundinfo: *mut PartitionBoundInfoData,
-    pub partition_qual: *mut List,
-    pub part_rels: *mut *mut RelOptInfo,
-    pub partexprs: *mut *mut List,
-    pub nullable_partexprs: *mut *mut List,
-    pub partitioned_child_rels: *mut List,
-}
-impl Default for RelOptInfo {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct IndexOptInfo {
-    pub type_: NodeTag,
-    pub indexoid: Oid,
-    pub reltablespace: Oid,
-    pub rel: *mut RelOptInfo,
-    pub pages: BlockNumber,
-    pub tuples: f64,
-    pub tree_height: ::std::os::raw::c_int,
-    pub ncolumns: ::std::os::raw::c_int,
-    pub nkeycolumns: ::std::os::raw::c_int,
-    pub indexkeys: *mut ::std::os::raw::c_int,
-    pub indexcollations: *mut Oid,
-    pub opfamily: *mut Oid,
-    pub opcintype: *mut Oid,
-    pub sortopfamily: *mut Oid,
-    pub reverse_sort: *mut bool,
-    pub nulls_first: *mut bool,
-    pub canreturn: *mut bool,
-    pub relam: Oid,
-    pub indexprs: *mut List,
-    pub indpred: *mut List,
-    pub indextlist: *mut List,
-    pub indrestrictinfo: *mut List,
-    pub predOK: bool,
-    pub unique: bool,
-    pub immediate: bool,
-    pub hypothetical: bool,
-    pub amcanorderbyop: bool,
-    pub amoptionalkey: bool,
-    pub amsearcharray: bool,
-    pub amsearchnulls: bool,
-    pub amhasgettuple: bool,
-    pub amhasgetbitmap: bool,
-    pub amcanparallel: bool,
-    pub amcostestimate: ::std::option::Option<unsafe extern "C" fn()>,
-}
-impl Default for IndexOptInfo {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ForeignKeyOptInfo {
-    pub type_: NodeTag,
-    pub con_relid: Index,
-    pub ref_relid: Index,
-    pub nkeys: ::std::os::raw::c_int,
-    pub conkey: [AttrNumber; 32usize],
-    pub confkey: [AttrNumber; 32usize],
-    pub conpfeqop: [Oid; 32usize],
-    pub nmatched_ec: ::std::os::raw::c_int,
-    pub nmatched_rcols: ::std::os::raw::c_int,
-    pub nmatched_ri: ::std::os::raw::c_int,
-    pub eclass: [*mut EquivalenceClass; 32usize],
-    pub rinfos: [*mut List; 32usize],
-}
-impl Default for ForeignKeyOptInfo {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct StatisticExtInfo {
-    pub type_: NodeTag,
-    pub statOid: Oid,
-    pub rel: *mut RelOptInfo,
-    pub kind: ::std::os::raw::c_char,
-    pub keys: *mut Bitmapset,
-}
-impl Default for StatisticExtInfo {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct EquivalenceClass {
-    pub type_: NodeTag,
-    pub ec_opfamilies: *mut List,
-    pub ec_collation: Oid,
-    pub ec_members: *mut List,
-    pub ec_sources: *mut List,
-    pub ec_derives: *mut List,
-    pub ec_relids: Relids,
-    pub ec_has_const: bool,
-    pub ec_has_volatile: bool,
-    pub ec_below_outer_join: bool,
-    pub ec_broken: bool,
-    pub ec_sortref: Index,
-    pub ec_min_security: Index,
-    pub ec_max_security: Index,
-    pub ec_merged: *mut EquivalenceClass,
-}
-impl Default for EquivalenceClass {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct EquivalenceMember {
-    pub type_: NodeTag,
-    pub em_expr: *mut Expr,
-    pub em_relids: Relids,
-    pub em_nullable_relids: Relids,
-    pub em_is_const: bool,
-    pub em_is_child: bool,
-    pub em_datatype: Oid,
-}
-impl Default for EquivalenceMember {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PathKey {
-    pub type_: NodeTag,
-    pub pk_eclass: *mut EquivalenceClass,
-    pub pk_opfamily: Oid,
-    pub pk_strategy: ::std::os::raw::c_int,
-    pub pk_nulls_first: bool,
-}
-impl Default for PathKey {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PathTarget {
-    pub type_: NodeTag,
-    pub exprs: *mut List,
-    pub sortgrouprefs: *mut Index,
-    pub cost: QualCost,
-    pub width: ::std::os::raw::c_int,
-}
-impl Default for PathTarget {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ParamPathInfo {
-    pub type_: NodeTag,
-    pub ppi_req_outer: Relids,
-    pub ppi_rows: f64,
-    pub ppi_clauses: *mut List,
-}
-impl Default for ParamPathInfo {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct Path {
-    pub type_: NodeTag,
-    pub pathtype: NodeTag,
-    pub parent: *mut RelOptInfo,
-    pub pathtarget: *mut PathTarget,
-    pub param_info: *mut ParamPathInfo,
-    pub parallel_aware: bool,
-    pub parallel_safe: bool,
-    pub parallel_workers: ::std::os::raw::c_int,
-    pub rows: f64,
-    pub startup_cost: Cost,
-    pub total_cost: Cost,
-    pub pathkeys: *mut List,
-}
-impl Default for Path {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct IndexPath {
-    pub path: Path,
-    pub indexinfo: *mut IndexOptInfo,
-    pub indexclauses: *mut List,
-    pub indexquals: *mut List,
-    pub indexqualcols: *mut List,
-    pub indexorderbys: *mut List,
-    pub indexorderbycols: *mut List,
-    pub indexscandir: ScanDirection,
-    pub indextotalcost: Cost,
-    pub indexselectivity: Selectivity,
-}
-impl Default for IndexPath {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct BitmapHeapPath {
-    pub path: Path,
-    pub bitmapqual: *mut Path,
-}
-impl Default for BitmapHeapPath {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct BitmapAndPath {
-    pub path: Path,
-    pub bitmapquals: *mut List,
-    pub bitmapselectivity: Selectivity,
-}
-impl Default for BitmapAndPath {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct BitmapOrPath {
-    pub path: Path,
-    pub bitmapquals: *mut List,
-    pub bitmapselectivity: Selectivity,
-}
-impl Default for BitmapOrPath {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct TidPath {
-    pub path: Path,
-    pub tidquals: *mut List,
-}
-impl Default for TidPath {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct SubqueryScanPath {
-    pub path: Path,
-    pub subpath: *mut Path,
-}
-impl Default for SubqueryScanPath {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ForeignPath {
-    pub path: Path,
-    pub fdw_outerpath: *mut Path,
-    pub fdw_private: *mut List,
-}
-impl Default for ForeignPath {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct CustomPath {
-    pub path: Path,
-    pub flags: uint32,
-    pub custom_paths: *mut List,
-    pub custom_private: *mut List,
-    pub methods: *const CustomPathMethods,
-}
-impl Default for CustomPath {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct AppendPath {
-    pub path: Path,
-    pub partitioned_rels: *mut List,
-    pub subpaths: *mut List,
-    pub first_partial_path: ::std::os::raw::c_int,
-}
-impl Default for AppendPath {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[pg_guard]
-extern "C" {
-    pub fn is_dummy_rel(rel: *mut RelOptInfo) -> bool;
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct MergeAppendPath {
-    pub path: Path,
-    pub partitioned_rels: *mut List,
-    pub subpaths: *mut List,
-    pub limit_tuples: f64,
-}
-impl Default for MergeAppendPath {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ResultPath {
-    pub path: Path,
-    pub quals: *mut List,
-}
-impl Default for ResultPath {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct MaterialPath {
-    pub path: Path,
-    pub subpath: *mut Path,
-}
-impl Default for MaterialPath {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-pub const UniquePathMethod_UNIQUE_PATH_NOOP: UniquePathMethod = 0;
-pub const UniquePathMethod_UNIQUE_PATH_HASH: UniquePathMethod = 1;
-pub const UniquePathMethod_UNIQUE_PATH_SORT: UniquePathMethod = 2;
-pub type UniquePathMethod = ::std::os::raw::c_uint;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct UniquePath {
-    pub path: Path,
-    pub subpath: *mut Path,
-    pub umethod: UniquePathMethod,
-    pub in_operators: *mut List,
-    pub uniq_exprs: *mut List,
-}
-impl Default for UniquePath {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct GatherPath {
-    pub path: Path,
-    pub subpath: *mut Path,
-    pub single_copy: bool,
-    pub num_workers: ::std::os::raw::c_int,
-}
-impl Default for GatherPath {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct GatherMergePath {
-    pub path: Path,
-    pub subpath: *mut Path,
-    pub num_workers: ::std::os::raw::c_int,
-}
-impl Default for GatherMergePath {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct JoinPath {
-    pub path: Path,
-    pub jointype: JoinType,
-    pub inner_unique: bool,
-    pub outerjoinpath: *mut Path,
-    pub innerjoinpath: *mut Path,
-    pub joinrestrictinfo: *mut List,
-}
-impl Default for JoinPath {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-pub type NestPath = JoinPath;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct MergePath {
-    pub jpath: JoinPath,
-    pub path_mergeclauses: *mut List,
-    pub outersortkeys: *mut List,
-    pub innersortkeys: *mut List,
-    pub skip_mark_restore: bool,
-    pub materialize_inner: bool,
-}
-impl Default for MergePath {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct HashPath {
-    pub jpath: JoinPath,
-    pub path_hashclauses: *mut List,
-    pub num_batches: ::std::os::raw::c_int,
-    pub inner_rows_total: f64,
-}
-impl Default for HashPath {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ProjectionPath {
-    pub path: Path,
-    pub subpath: *mut Path,
-    pub dummypp: bool,
-}
-impl Default for ProjectionPath {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ProjectSetPath {
-    pub path: Path,
-    pub subpath: *mut Path,
-}
-impl Default for ProjectSetPath {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct SortPath {
-    pub path: Path,
-    pub subpath: *mut Path,
-}
-impl Default for SortPath {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct GroupPath {
-    pub path: Path,
-    pub subpath: *mut Path,
-    pub groupClause: *mut List,
-    pub qual: *mut List,
-}
-impl Default for GroupPath {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct UpperUniquePath {
-    pub path: Path,
-    pub subpath: *mut Path,
-    pub numkeys: ::std::os::raw::c_int,
-}
-impl Default for UpperUniquePath {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct AggPath {
-    pub path: Path,
-    pub subpath: *mut Path,
-    pub aggstrategy: AggStrategy,
-    pub aggsplit: AggSplit,
-    pub numGroups: f64,
-    pub groupClause: *mut List,
-    pub qual: *mut List,
-}
-impl Default for AggPath {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct GroupingSetData {
-    pub type_: NodeTag,
-    pub set: *mut List,
-    pub numGroups: f64,
-}
-impl Default for GroupingSetData {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct RollupData {
-    pub type_: NodeTag,
-    pub groupClause: *mut List,
-    pub gsets: *mut List,
-    pub gsets_data: *mut List,
-    pub numGroups: f64,
-    pub hashable: bool,
-    pub is_hashed: bool,
-}
-impl Default for RollupData {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct GroupingSetsPath {
-    pub path: Path,
-    pub subpath: *mut Path,
-    pub aggstrategy: AggStrategy,
-    pub rollups: *mut List,
-    pub qual: *mut List,
-}
-impl Default for GroupingSetsPath {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct MinMaxAggPath {
-    pub path: Path,
-    pub mmaggregates: *mut List,
-    pub quals: *mut List,
-}
-impl Default for MinMaxAggPath {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct WindowAggPath {
-    pub path: Path,
-    pub subpath: *mut Path,
-    pub winclause: *mut WindowClause,
-}
-impl Default for WindowAggPath {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct SetOpPath {
-    pub path: Path,
-    pub subpath: *mut Path,
-    pub cmd: SetOpCmd,
-    pub strategy: SetOpStrategy,
-    pub distinctList: *mut List,
-    pub flagColIdx: AttrNumber,
-    pub firstFlag: ::std::os::raw::c_int,
-    pub numGroups: f64,
-}
-impl Default for SetOpPath {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct RecursiveUnionPath {
-    pub path: Path,
-    pub leftpath: *mut Path,
-    pub rightpath: *mut Path,
-    pub distinctList: *mut List,
-    pub wtParam: ::std::os::raw::c_int,
-    pub numGroups: f64,
-}
-impl Default for RecursiveUnionPath {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct LockRowsPath {
-    pub path: Path,
-    pub subpath: *mut Path,
-    pub rowMarks: *mut List,
-    pub epqParam: ::std::os::raw::c_int,
-}
-impl Default for LockRowsPath {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ModifyTablePath {
-    pub path: Path,
-    pub operation: CmdType,
-    pub canSetTag: bool,
-    pub nominalRelation: Index,
-    pub partitioned_rels: *mut List,
-    pub partColsUpdated: bool,
-    pub resultRelations: *mut List,
-    pub subpaths: *mut List,
-    pub subroots: *mut List,
-    pub withCheckOptionLists: *mut List,
-    pub returningLists: *mut List,
-    pub rowMarks: *mut List,
-    pub onconflict: *mut OnConflictExpr,
-    pub epqParam: ::std::os::raw::c_int,
-}
-impl Default for ModifyTablePath {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct LimitPath {
-    pub path: Path,
-    pub subpath: *mut Path,
-    pub limitOffset: *mut Node,
-    pub limitCount: *mut Node,
-}
-impl Default for LimitPath {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct RestrictInfo {
-    pub type_: NodeTag,
-    pub clause: *mut Expr,
-    pub is_pushed_down: bool,
-    pub outerjoin_delayed: bool,
-    pub can_join: bool,
-    pub pseudoconstant: bool,
-    pub leakproof: bool,
-    pub security_level: Index,
-    pub clause_relids: Relids,
-    pub required_relids: Relids,
-    pub outer_relids: Relids,
-    pub nullable_relids: Relids,
-    pub left_relids: Relids,
-    pub right_relids: Relids,
-    pub orclause: *mut Expr,
-    pub parent_ec: *mut EquivalenceClass,
-    pub eval_cost: QualCost,
-    pub norm_selec: Selectivity,
-    pub outer_selec: Selectivity,
-    pub mergeopfamilies: *mut List,
-    pub left_ec: *mut EquivalenceClass,
-    pub right_ec: *mut EquivalenceClass,
-    pub left_em: *mut EquivalenceMember,
-    pub right_em: *mut EquivalenceMember,
-    pub scansel_cache: *mut List,
-    pub outer_is_left: bool,
-    pub hashjoinoperator: Oid,
-    pub left_bucketsize: Selectivity,
-    pub right_bucketsize: Selectivity,
-    pub left_mcvfreq: Selectivity,
-    pub right_mcvfreq: Selectivity,
-}
-impl Default for RestrictInfo {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct MergeScanSelCache {
-    pub opfamily: Oid,
-    pub collation: Oid,
-    pub strategy: ::std::os::raw::c_int,
-    pub nulls_first: bool,
-    pub leftstartsel: Selectivity,
-    pub leftendsel: Selectivity,
-    pub rightstartsel: Selectivity,
-    pub rightendsel: Selectivity,
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PlaceHolderVar {
-    pub xpr: Expr,
-    pub phexpr: *mut Expr,
-    pub phrels: Relids,
-    pub phid: Index,
-    pub phlevelsup: Index,
-}
-impl Default for PlaceHolderVar {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct SpecialJoinInfo {
-    pub type_: NodeTag,
-    pub min_lefthand: Relids,
-    pub min_righthand: Relids,
-    pub syn_lefthand: Relids,
-    pub syn_righthand: Relids,
-    pub jointype: JoinType,
-    pub lhs_strict: bool,
-    pub delay_upper_joins: bool,
-    pub semi_can_btree: bool,
-    pub semi_can_hash: bool,
-    pub semi_operators: *mut List,
-    pub semi_rhs_exprs: *mut List,
-}
-impl Default for SpecialJoinInfo {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct AppendRelInfo {
-    pub type_: NodeTag,
-    pub parent_relid: Index,
-    pub child_relid: Index,
-    pub parent_reltype: Oid,
-    pub child_reltype: Oid,
-    pub translated_vars: *mut List,
-    pub parent_reloid: Oid,
-}
-impl Default for AppendRelInfo {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PlaceHolderInfo {
-    pub type_: NodeTag,
-    pub phid: Index,
-    pub ph_var: *mut PlaceHolderVar,
-    pub ph_eval_at: Relids,
-    pub ph_lateral: Relids,
-    pub ph_needed: Relids,
-    pub ph_width: int32,
-}
-impl Default for PlaceHolderInfo {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct MinMaxAggInfo {
-    pub type_: NodeTag,
-    pub aggfnoid: Oid,
-    pub aggsortop: Oid,
-    pub target: *mut Expr,
-    pub subroot: *mut PlannerInfo,
-    pub path: *mut Path,
-    pub pathcost: Cost,
-    pub param: *mut Param,
-}
-impl Default for MinMaxAggInfo {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PlannerParamItem {
-    pub type_: NodeTag,
-    pub item: *mut Node,
-    pub paramId: ::std::os::raw::c_int,
-}
-impl Default for PlannerParamItem {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct SemiAntiJoinFactors {
-    pub outer_match_frac: Selectivity,
-    pub match_count: Selectivity,
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct JoinPathExtraData {
-    pub restrictlist: *mut List,
-    pub mergeclause_list: *mut List,
-    pub inner_unique: bool,
-    pub sjinfo: *mut SpecialJoinInfo,
-    pub semifactors: SemiAntiJoinFactors,
-    pub param_source_rels: Relids,
-}
-impl Default for JoinPathExtraData {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-pub const PartitionwiseAggregateType_PARTITIONWISE_AGGREGATE_NONE: PartitionwiseAggregateType = 0;
-pub const PartitionwiseAggregateType_PARTITIONWISE_AGGREGATE_FULL: PartitionwiseAggregateType = 1;
-pub const PartitionwiseAggregateType_PARTITIONWISE_AGGREGATE_PARTIAL: PartitionwiseAggregateType =
-    2;
-pub type PartitionwiseAggregateType = ::std::os::raw::c_uint;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct GroupPathExtraData {
-    pub flags: ::std::os::raw::c_int,
-    pub partial_costs_set: bool,
-    pub agg_partial_costs: AggClauseCosts,
-    pub agg_final_costs: AggClauseCosts,
-    pub target_parallel_safe: bool,
-    pub havingQual: *mut Node,
-    pub targetList: *mut List,
-    pub patype: PartitionwiseAggregateType,
-}
-impl Default for GroupPathExtraData {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct JoinCostWorkspace {
-    pub startup_cost: Cost,
-    pub total_cost: Cost,
-    pub run_cost: Cost,
-    pub inner_run_cost: Cost,
-    pub inner_rescan_run_cost: Cost,
-    pub outer_rows: f64,
-    pub inner_rows: f64,
-    pub outer_skip_rows: f64,
-    pub inner_skip_rows: f64,
-    pub numbuckets: ::std::os::raw::c_int,
-    pub numbatches: ::std::os::raw::c_int,
-    pub inner_rows_total: f64,
 }
 pub type GetForeignRelSize_function = ::std::option::Option<
     unsafe extern "C" fn(root: *mut PlannerInfo, baserel: *mut RelOptInfo, foreigntableid: Oid),
@@ -39475,6 +39717,14 @@ extern "C" {
 extern "C" {
     pub fn CancelVirtualTransaction(vxid: VirtualTransactionId, sigmode: ProcSignalReason)
         -> pid_t;
+}
+#[pg_guard]
+extern "C" {
+    pub fn SignalVirtualTransaction(
+        vxid: VirtualTransactionId,
+        sigmode: ProcSignalReason,
+        conflictPending: bool,
+    ) -> pid_t;
 }
 #[pg_guard]
 extern "C" {
@@ -53293,11 +53543,6 @@ pub struct JitInstrumentation {
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct SharedJitInstrumentation {
-    pub _address: u8,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct PartitionTupleRouting {
     pub _address: u8,
 }
 #[repr(C)]

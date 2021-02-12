@@ -327,15 +327,15 @@ pub const MAXIMUM_ALIGNOF: u32 = 8;
 pub const MEMSET_LOOP_LIMIT: u32 = 1024;
 pub const PACKAGE_BUGREPORT: &'static [u8; 26usize] = b"pgsql-bugs@postgresql.org\0";
 pub const PACKAGE_NAME: &'static [u8; 11usize] = b"PostgreSQL\0";
-pub const PACKAGE_STRING: &'static [u8; 17usize] = b"PostgreSQL 10.15\0";
+pub const PACKAGE_STRING: &'static [u8; 17usize] = b"PostgreSQL 10.16\0";
 pub const PACKAGE_TARNAME: &'static [u8; 11usize] = b"postgresql\0";
 pub const PACKAGE_URL: &'static [u8; 1usize] = b"\0";
-pub const PACKAGE_VERSION: &'static [u8; 6usize] = b"10.15\0";
+pub const PACKAGE_VERSION: &'static [u8; 6usize] = b"10.16\0";
 pub const PG_KRB_SRVNAM: &'static [u8; 9usize] = b"postgres\0";
 pub const PG_MAJORVERSION: &'static [u8; 3usize] = b"10\0";
-pub const PG_VERSION: &'static [u8; 6usize] = b"10.15\0";
-pub const PG_VERSION_NUM: u32 = 100015;
-pub const PG_VERSION_STR : & 'static [u8 ; 115usize] = b"PostgreSQL 10.15 on x86_64-apple-darwin19.0.0, compiled by Apple clang version 11.0.0 (clang-1100.0.33.17), 64-bit\0" ;
+pub const PG_VERSION: &'static [u8; 6usize] = b"10.16\0";
+pub const PG_VERSION_NUM: u32 = 100016;
+pub const PG_VERSION_STR : & 'static [u8 ; 115usize] = b"PostgreSQL 10.16 on x86_64-apple-darwin20.3.0, compiled by Apple clang version 12.0.0 (clang-1200.0.32.29), 64-bit\0" ;
 pub const RELSEG_SIZE: u32 = 131072;
 pub const SIZEOF_LONG: u32 = 8;
 pub const SIZEOF_OFF_T: u32 = 8;
@@ -422,6 +422,7 @@ pub const __MAC_10_14_1: u32 = 101401;
 pub const __MAC_10_14_4: u32 = 101404;
 pub const __MAC_10_15: u32 = 101500;
 pub const __MAC_10_15_1: u32 = 101501;
+pub const __MAC_10_15_4: u32 = 101504;
 pub const __IPHONE_2_0: u32 = 20000;
 pub const __IPHONE_2_1: u32 = 20100;
 pub const __IPHONE_2_2: u32 = 20200;
@@ -463,6 +464,10 @@ pub const __IPHONE_12_3: u32 = 120300;
 pub const __IPHONE_13_0: u32 = 130000;
 pub const __IPHONE_13_1: u32 = 130100;
 pub const __IPHONE_13_2: u32 = 130200;
+pub const __IPHONE_13_3: u32 = 130300;
+pub const __IPHONE_13_4: u32 = 130400;
+pub const __IPHONE_13_5: u32 = 130500;
+pub const __IPHONE_13_6: u32 = 130600;
 pub const __TVOS_9_0: u32 = 90000;
 pub const __TVOS_9_1: u32 = 90100;
 pub const __TVOS_9_2: u32 = 90200;
@@ -480,7 +485,9 @@ pub const __TVOS_12_1: u32 = 120100;
 pub const __TVOS_12_2: u32 = 120200;
 pub const __TVOS_12_3: u32 = 120300;
 pub const __TVOS_13_0: u32 = 130000;
-pub const __TVOS_13_1: u32 = 130100;
+pub const __TVOS_13_2: u32 = 130200;
+pub const __TVOS_13_3: u32 = 130300;
+pub const __TVOS_13_4: u32 = 130400;
 pub const __WATCHOS_1_0: u32 = 10000;
 pub const __WATCHOS_2_0: u32 = 20000;
 pub const __WATCHOS_2_1: u32 = 20100;
@@ -497,7 +504,8 @@ pub const __WATCHOS_5_0: u32 = 50000;
 pub const __WATCHOS_5_1: u32 = 50100;
 pub const __WATCHOS_5_2: u32 = 50200;
 pub const __WATCHOS_6_0: u32 = 60000;
-pub const __WATCHOS_6_0_1: u32 = 60001;
+pub const __WATCHOS_6_1: u32 = 60100;
+pub const __WATCHOS_6_2: u32 = 60200;
 pub const __DRIVERKIT_19_0: u32 = 190000;
 pub const __MAC_OS_X_VERSION_MAX_ALLOWED: u32 = 101500;
 pub const __ENABLE_LEGACY_MAC_AVAILABILITY: u32 = 1;
@@ -1577,7 +1585,7 @@ pub const _PASSWORD_NOEXP: u32 = 8;
 pub const _PASSWORD_WARNDAYS: u32 = 14;
 pub const _PASSWORD_CHGNOW: i32 = -1;
 pub const PGINVALID_SOCKET: i32 = -1;
-pub const PG_BACKEND_VERSIONSTR: &'static [u8; 29usize] = b"postgres (PostgreSQL) 10.15\n\0";
+pub const PG_BACKEND_VERSIONSTR: &'static [u8; 29usize] = b"postgres (PostgreSQL) 10.16\n\0";
 pub const EXE: &'static [u8; 1usize] = b"\0";
 pub const DEVNULL: &'static [u8; 10usize] = b"/dev/null\0";
 pub const PG_IOLBF: u32 = 1;
@@ -6626,6 +6634,14 @@ pub type suseconds_t = __darwin_suseconds_t;
 #[derive(Debug, Default, Copy, Clone)]
 pub struct fd_set {
     pub fds_bits: [__int32_t; 32usize],
+}
+#[pg_guard]
+extern "C" {
+    pub fn __darwin_check_fd_set_overflow(
+        arg1: ::std::os::raw::c_int,
+        arg2: *const ::std::os::raw::c_void,
+        arg3: ::std::os::raw::c_int,
+    ) -> ::std::os::raw::c_int;
 }
 pub type fd_mask = __int32_t;
 pub type pthread_cond_t = __darwin_pthread_cond_t;
@@ -17170,6 +17186,7 @@ pub struct TableLikeClause {
     pub type_: NodeTag,
     pub relation: *mut RangeVar,
     pub options: bits32,
+    pub relationOid: Oid,
 }
 impl Default for TableLikeClause {
     fn default() -> Self {
@@ -27432,6 +27449,13 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
+    pub fn TimestampDifferenceMilliseconds(
+        start_time: TimestampTz,
+        stop_time: TimestampTz,
+    ) -> ::std::os::raw::c_long;
+}
+#[pg_guard]
+extern "C" {
     pub fn TimestampDifferenceExceeds(
         start_time: TimestampTz,
         stop_time: TimestampTz,
@@ -32120,6 +32144,7 @@ pub struct IndexOptInfo {
     pub amhasgettuple: bool,
     pub amhasgetbitmap: bool,
     pub amcanparallel: bool,
+    pub amcanmarkpos: bool,
     pub amcostestimate: ::std::option::Option<unsafe extern "C" fn()>,
 }
 impl Default for IndexOptInfo {
@@ -37851,6 +37876,14 @@ extern "C" {
 extern "C" {
     pub fn CancelVirtualTransaction(vxid: VirtualTransactionId, sigmode: ProcSignalReason)
         -> pid_t;
+}
+#[pg_guard]
+extern "C" {
+    pub fn SignalVirtualTransaction(
+        vxid: VirtualTransactionId,
+        sigmode: ProcSignalReason,
+        conflictPending: bool,
+    ) -> pid_t;
 }
 #[pg_guard]
 extern "C" {
