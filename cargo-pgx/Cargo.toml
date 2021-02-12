@@ -11,6 +11,8 @@ documentation = "https://docs.rs/cargo-pgx"
 categories = ["development-tools::cargo-plugins", "command-line-utilities", "database"]
 keywords = ["database", "postgres", "postgresql", "extension"]
 readme = "README.md"
+exclude = [ "*.png" ]
+
 
 [dependencies]
 clap = { version = "2.33.3", features = [ "yaml" ] }
