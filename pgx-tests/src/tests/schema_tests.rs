@@ -1,5 +1,6 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
+use pgx::*;
 
 
 mod test_schema {
@@ -8,6 +9,9 @@ mod test_schema {
     #[pg_extern]
     fn func_in_diff_schema() {}
 }
+
+#[pg_extern(schema="test_schema")]
+fn func_in_diff_schema2() {}
 
 #[cfg(any(test, feature = "pg_test"))]
 mod tests {
@@ -19,5 +23,10 @@ mod tests {
     #[pg_test]
     fn test_in_different_schema() {
         Spi::run("SELECT test_schema.func_in_diff_schema();");
+    }
+
+    #[pg_test]
+    fn test_in_different_schema2() {
+        Spi::run("SELECT test_schema.func_in_diff_schema2();");
     }
 }
