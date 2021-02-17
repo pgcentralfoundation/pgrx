@@ -57,7 +57,7 @@ enum DeriveMacros {
     PostgresHash,
 }
 
-pub(crate) fn generate_schema() -> Result<(), std::io::Error> {
+pub(crate) fn generate_schema(features: &[&str]) -> Result<(), std::io::Error> {
     let path = PathBuf::from_str("./src").unwrap();
     let files = find_rs_files(&path, Vec::new());
     let default_schema = get_property("schema").unwrap_or_else(|| "public".to_string());
