@@ -1212,7 +1212,14 @@ fn translate_type_string(
                 Some(idx) => unknown[0..idx].trim(),
                 None => unknown,
             };
-            Some((unknown.trim().to_string(), false, default_value, variadic))
+            let parts: Vec<_> = unknown.split("::").collect();
+            if parts.len() == 1 {
+                return Some((unknown.trim().to_string(), false, default_value, variadic))
+            }
+
+            let (schema, name) = (parts[parts.len()-2], parts[parts.len()-1]);
+            let qualified_name = format!("{}.{}", schema.trim(), name.trim());
+            return Some((qualified_name.to_string(), false, default_value, variadic))
         }
     }
 }
