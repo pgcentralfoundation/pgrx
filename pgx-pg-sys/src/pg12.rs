@@ -377,8 +377,8 @@ pub const PG_CACHE_LINE_SIZE: u32 = 128;
 pub const TRACE_SORT: u32 = 1;
 pub const __darwin__: u32 = 1;
 pub const __DARWIN_ONLY_64_BIT_INO_T: u32 = 0;
-pub const __DARWIN_ONLY_VERS_1050: u32 = 0;
 pub const __DARWIN_ONLY_UNIX_CONFORMANCE: u32 = 1;
+pub const __DARWIN_ONLY_VERS_1050: u32 = 0;
 pub const __DARWIN_UNIX03: u32 = 1;
 pub const __DARWIN_64_BIT_INO_T: u32 = 1;
 pub const __DARWIN_VERS_1050: u32 = 1;
@@ -423,9 +423,13 @@ pub const __MAC_10_13_4: u32 = 101304;
 pub const __MAC_10_14: u32 = 101400;
 pub const __MAC_10_14_1: u32 = 101401;
 pub const __MAC_10_14_4: u32 = 101404;
+pub const __MAC_10_14_6: u32 = 101406;
 pub const __MAC_10_15: u32 = 101500;
 pub const __MAC_10_15_1: u32 = 101501;
 pub const __MAC_10_15_4: u32 = 101504;
+pub const __MAC_10_16: u32 = 101600;
+pub const __MAC_11_0: u32 = 110000;
+pub const __MAC_11_1: u32 = 110100;
 pub const __IPHONE_2_0: u32 = 20000;
 pub const __IPHONE_2_1: u32 = 20100;
 pub const __IPHONE_2_2: u32 = 20200;
@@ -464,6 +468,7 @@ pub const __IPHONE_12_0: u32 = 120000;
 pub const __IPHONE_12_1: u32 = 120100;
 pub const __IPHONE_12_2: u32 = 120200;
 pub const __IPHONE_12_3: u32 = 120300;
+pub const __IPHONE_12_4: u32 = 120400;
 pub const __IPHONE_13_0: u32 = 130000;
 pub const __IPHONE_13_1: u32 = 130100;
 pub const __IPHONE_13_2: u32 = 130200;
@@ -471,6 +476,11 @@ pub const __IPHONE_13_3: u32 = 130300;
 pub const __IPHONE_13_4: u32 = 130400;
 pub const __IPHONE_13_5: u32 = 130500;
 pub const __IPHONE_13_6: u32 = 130600;
+pub const __IPHONE_13_7: u32 = 130700;
+pub const __IPHONE_14_0: u32 = 140000;
+pub const __IPHONE_14_1: u32 = 140100;
+pub const __IPHONE_14_2: u32 = 140200;
+pub const __IPHONE_14_3: u32 = 140300;
 pub const __TVOS_9_0: u32 = 90000;
 pub const __TVOS_9_1: u32 = 90100;
 pub const __TVOS_9_2: u32 = 90200;
@@ -487,10 +497,15 @@ pub const __TVOS_12_0: u32 = 120000;
 pub const __TVOS_12_1: u32 = 120100;
 pub const __TVOS_12_2: u32 = 120200;
 pub const __TVOS_12_3: u32 = 120300;
+pub const __TVOS_12_4: u32 = 120400;
 pub const __TVOS_13_0: u32 = 130000;
 pub const __TVOS_13_2: u32 = 130200;
 pub const __TVOS_13_3: u32 = 130300;
 pub const __TVOS_13_4: u32 = 130400;
+pub const __TVOS_14_0: u32 = 140000;
+pub const __TVOS_14_1: u32 = 140100;
+pub const __TVOS_14_2: u32 = 140200;
+pub const __TVOS_14_3: u32 = 140300;
 pub const __WATCHOS_1_0: u32 = 10000;
 pub const __WATCHOS_2_0: u32 = 20000;
 pub const __WATCHOS_2_1: u32 = 20100;
@@ -506,11 +521,49 @@ pub const __WATCHOS_4_3: u32 = 40300;
 pub const __WATCHOS_5_0: u32 = 50000;
 pub const __WATCHOS_5_1: u32 = 50100;
 pub const __WATCHOS_5_2: u32 = 50200;
+pub const __WATCHOS_5_3: u32 = 50300;
 pub const __WATCHOS_6_0: u32 = 60000;
 pub const __WATCHOS_6_1: u32 = 60100;
 pub const __WATCHOS_6_2: u32 = 60200;
+pub const __WATCHOS_7_0: u32 = 70000;
+pub const __WATCHOS_7_1: u32 = 70100;
+pub const __WATCHOS_7_2: u32 = 70200;
+pub const MAC_OS_X_VERSION_10_0: u32 = 1000;
+pub const MAC_OS_X_VERSION_10_1: u32 = 1010;
+pub const MAC_OS_X_VERSION_10_2: u32 = 1020;
+pub const MAC_OS_X_VERSION_10_3: u32 = 1030;
+pub const MAC_OS_X_VERSION_10_4: u32 = 1040;
+pub const MAC_OS_X_VERSION_10_5: u32 = 1050;
+pub const MAC_OS_X_VERSION_10_6: u32 = 1060;
+pub const MAC_OS_X_VERSION_10_7: u32 = 1070;
+pub const MAC_OS_X_VERSION_10_8: u32 = 1080;
+pub const MAC_OS_X_VERSION_10_9: u32 = 1090;
+pub const MAC_OS_X_VERSION_10_10: u32 = 101000;
+pub const MAC_OS_X_VERSION_10_10_2: u32 = 101002;
+pub const MAC_OS_X_VERSION_10_10_3: u32 = 101003;
+pub const MAC_OS_X_VERSION_10_11: u32 = 101100;
+pub const MAC_OS_X_VERSION_10_11_2: u32 = 101102;
+pub const MAC_OS_X_VERSION_10_11_3: u32 = 101103;
+pub const MAC_OS_X_VERSION_10_11_4: u32 = 101104;
+pub const MAC_OS_X_VERSION_10_12: u32 = 101200;
+pub const MAC_OS_X_VERSION_10_12_1: u32 = 101201;
+pub const MAC_OS_X_VERSION_10_12_2: u32 = 101202;
+pub const MAC_OS_X_VERSION_10_12_4: u32 = 101204;
+pub const MAC_OS_X_VERSION_10_13: u32 = 101300;
+pub const MAC_OS_X_VERSION_10_13_1: u32 = 101301;
+pub const MAC_OS_X_VERSION_10_13_2: u32 = 101302;
+pub const MAC_OS_X_VERSION_10_13_4: u32 = 101304;
+pub const MAC_OS_X_VERSION_10_14: u32 = 101400;
+pub const MAC_OS_X_VERSION_10_14_1: u32 = 101401;
+pub const MAC_OS_X_VERSION_10_14_4: u32 = 101404;
+pub const MAC_OS_X_VERSION_10_14_6: u32 = 101406;
+pub const MAC_OS_X_VERSION_10_15: u32 = 101500;
+pub const MAC_OS_X_VERSION_10_15_1: u32 = 101501;
+pub const MAC_OS_X_VERSION_10_16: u32 = 101600;
+pub const MAC_OS_VERSION_11_0: u32 = 110000;
 pub const __DRIVERKIT_19_0: u32 = 190000;
-pub const __MAC_OS_X_VERSION_MAX_ALLOWED: u32 = 101500;
+pub const __DRIVERKIT_20_0: u32 = 200000;
+pub const __MAC_OS_X_VERSION_MAX_ALLOWED: u32 = 110100;
 pub const __ENABLE_LEGACY_MAC_AVAILABILITY: u32 = 1;
 pub const __PTHREAD_SIZE__: u32 = 8176;
 pub const __PTHREAD_ATTR_SIZE__: u32 = 56;
@@ -600,6 +653,9 @@ pub const FP_RND_DOWN: u32 = 1;
 pub const FP_RND_UP: u32 = 2;
 pub const FP_CHOP: u32 = 3;
 pub const FP_STATE_BYTES: u32 = 512;
+pub const _X86_INSTRUCTION_STATE_MAX_INSN_BYTES: u32 = 2380;
+pub const _X86_INSTRUCTION_STATE_CACHELINE_SIZE: u32 = 64;
+pub const __LASTBRANCH_MAX: u32 = 32;
 pub const SIGEV_NONE: u32 = 0;
 pub const SIGEV_SIGNAL: u32 = 1;
 pub const SIGEV_THREAD: u32 = 3;
@@ -733,7 +789,9 @@ pub const RUSAGE_INFO_V1: u32 = 1;
 pub const RUSAGE_INFO_V2: u32 = 2;
 pub const RUSAGE_INFO_V3: u32 = 3;
 pub const RUSAGE_INFO_V4: u32 = 4;
-pub const RUSAGE_INFO_CURRENT: u32 = 4;
+pub const RUSAGE_INFO_V5: u32 = 5;
+pub const RUSAGE_INFO_CURRENT: u32 = 5;
+pub const RU_PROC_RUNS_RESLIDE: u32 = 1;
 pub const RLIMIT_CPU: u32 = 0;
 pub const RLIMIT_FSIZE: u32 = 1;
 pub const RLIMIT_DATA: u32 = 2;
@@ -761,6 +819,8 @@ pub const IOPOL_TYPE_DISK: u32 = 0;
 pub const IOPOL_TYPE_VFS_ATIME_UPDATES: u32 = 2;
 pub const IOPOL_TYPE_VFS_MATERIALIZE_DATALESS_FILES: u32 = 3;
 pub const IOPOL_TYPE_VFS_STATFS_NO_DATA_VOLUME: u32 = 4;
+pub const IOPOL_TYPE_VFS_TRIGGER_RESOLVE: u32 = 5;
+pub const IOPOL_TYPE_VFS_IGNORE_CONTENT_PROTECTION: u32 = 6;
 pub const IOPOL_SCOPE_PROCESS: u32 = 0;
 pub const IOPOL_SCOPE_THREAD: u32 = 1;
 pub const IOPOL_SCOPE_DARWIN_BG: u32 = 2;
@@ -779,6 +839,10 @@ pub const IOPOL_MATERIALIZE_DATALESS_FILES_OFF: u32 = 1;
 pub const IOPOL_MATERIALIZE_DATALESS_FILES_ON: u32 = 2;
 pub const IOPOL_VFS_STATFS_NO_DATA_VOLUME_DEFAULT: u32 = 0;
 pub const IOPOL_VFS_STATFS_FORCE_NO_DATA_VOLUME: u32 = 1;
+pub const IOPOL_VFS_TRIGGER_RESOLVE_DEFAULT: u32 = 0;
+pub const IOPOL_VFS_TRIGGER_RESOLVE_OFF: u32 = 1;
+pub const IOPOL_VFS_CONTENT_PROTECTION_DEFAULT: u32 = 0;
+pub const IOPOL_VFS_CONTENT_PROTECTION_IGNORE: u32 = 1;
 pub const WNOHANG: u32 = 1;
 pub const WUNTRACED: u32 = 2;
 pub const WCOREFLAG: u32 = 128;
@@ -1131,7 +1195,8 @@ pub const pseudo_AF_HDRCMPLT: u32 = 35;
 pub const AF_RESERVED_36: u32 = 36;
 pub const AF_IEEE80211: u32 = 37;
 pub const AF_UTUN: u32 = 38;
-pub const AF_MAX: u32 = 40;
+pub const AF_VSOCK: u32 = 40;
+pub const AF_MAX: u32 = 41;
 pub const SOCK_MAXADDRLEN: u32 = 255;
 pub const _SS_MAXSIZE: u32 = 128;
 pub const PF_UNSPEC: u32 = 0;
@@ -1172,8 +1237,9 @@ pub const PF_NETBIOS: u32 = 33;
 pub const PF_PPP: u32 = 34;
 pub const PF_RESERVED_36: u32 = 36;
 pub const PF_UTUN: u32 = 38;
-pub const PF_MAX: u32 = 40;
-pub const NET_MAXID: u32 = 40;
+pub const PF_VSOCK: u32 = 40;
+pub const PF_MAX: u32 = 41;
+pub const NET_MAXID: u32 = 41;
 pub const NET_RT_DUMP: u32 = 1;
 pub const NET_RT_FLAGS: u32 = 2;
 pub const NET_RT_IFLIST: u32 = 3;
@@ -1200,6 +1266,7 @@ pub const MSG_SEND: u32 = 4096;
 pub const MSG_HAVEMORE: u32 = 8192;
 pub const MSG_RCVMORE: u32 = 16384;
 pub const MSG_NEEDSA: u32 = 65536;
+pub const MSG_NOSIGNAL: u32 = 524288;
 pub const SCM_RIGHTS: u32 = 1;
 pub const SCM_TIMESTAMP: u32 = 2;
 pub const SCM_CREDS: u32 = 3;
@@ -1364,6 +1431,7 @@ pub const IP_BOUND_IF: u32 = 25;
 pub const IP_PKTINFO: u32 = 26;
 pub const IP_RECVPKTINFO: u32 = 26;
 pub const IP_RECVTOS: u32 = 27;
+pub const IP_DONTFRAG: u32 = 28;
 pub const IP_FW_ADD: u32 = 40;
 pub const IP_FW_DEL: u32 = 41;
 pub const IP_FW_FLUSH: u32 = 42;
@@ -1437,6 +1505,9 @@ pub const __IPV6_ADDR_SCOPE_LINKLOCAL: u32 = 2;
 pub const __IPV6_ADDR_SCOPE_SITELOCAL: u32 = 5;
 pub const __IPV6_ADDR_SCOPE_ORGLOCAL: u32 = 8;
 pub const __IPV6_ADDR_SCOPE_GLOBAL: u32 = 14;
+pub const IPV6_ADDR_MC_FLAGS_TRANSIENT: u32 = 16;
+pub const IPV6_ADDR_MC_FLAGS_PREFIX: u32 = 32;
+pub const IPV6_ADDR_MC_FLAGS_UNICAST_BASED: u32 = 48;
 pub const IPV6_SOCKOPT_RESERVED1: u32 = 3;
 pub const IPV6_UNICAST_HOPS: u32 = 4;
 pub const IPV6_MULTICAST_IF: u32 = 9;
@@ -1722,6 +1793,13 @@ pub const O_NOFOLLOW: u32 = 256;
 pub const O_CREAT: u32 = 512;
 pub const O_TRUNC: u32 = 1024;
 pub const O_EXCL: u32 = 2048;
+pub const O_EVTONLY: u32 = 32768;
+pub const O_NOCTTY: u32 = 131072;
+pub const O_DIRECTORY: u32 = 1048576;
+pub const O_SYMLINK: u32 = 2097152;
+pub const O_DSYNC: u32 = 4194304;
+pub const O_CLOEXEC: u32 = 16777216;
+pub const O_NOFOLLOW_ANY: u32 = 536870912;
 pub const AT_FDCWD: i32 = -2;
 pub const AT_EACCESS: u32 = 16;
 pub const AT_SYMLINK_NOFOLLOW: u32 = 32;
@@ -1729,12 +1807,6 @@ pub const AT_SYMLINK_FOLLOW: u32 = 64;
 pub const AT_REMOVEDIR: u32 = 128;
 pub const AT_REALDEV: u32 = 512;
 pub const AT_FDONLY: u32 = 1024;
-pub const O_EVTONLY: u32 = 32768;
-pub const O_NOCTTY: u32 = 131072;
-pub const O_DIRECTORY: u32 = 1048576;
-pub const O_SYMLINK: u32 = 2097152;
-pub const O_DSYNC: u32 = 4194304;
-pub const O_CLOEXEC: u32 = 16777216;
 pub const O_DP_GETRAWENCRYPTED: u32 = 1;
 pub const O_DP_GETRAWUNENCRYPTED: u32 = 2;
 pub const FAPPEND: u32 = 8;
@@ -1796,6 +1868,9 @@ pub const F_PUNCHHOLE: u32 = 99;
 pub const F_TRIM_ACTIVE_FILE: u32 = 100;
 pub const F_SPECULATIVE_READ: u32 = 101;
 pub const F_GETPATH_NOFIRMLINK: u32 = 102;
+pub const F_ADDFILESIGS_INFO: u32 = 103;
+pub const F_ADDFILESUPPL: u32 = 104;
+pub const F_GETSIGSINFO: u32 = 105;
 pub const FCNTL_FS_SPECIFIC_BASE: u32 = 65536;
 pub const F_DUPFD_CLOEXEC: u32 = 67;
 pub const FD_CLOEXEC: u32 = 1;
@@ -1836,6 +1911,8 @@ pub const F_ALLOCATECONTIG: u32 = 2;
 pub const F_ALLOCATEALL: u32 = 4;
 pub const F_PEOFPOSMODE: u32 = 3;
 pub const F_VOLPOSMODE: u32 = 4;
+pub const USER_FSIGNATURES_CDHASH_LEN: u32 = 20;
+pub const GETSIGSINFO_PLATFORM_BINARY: u32 = 1;
 pub const LOCK_SH: u32 = 1;
 pub const LOCK_EX: u32 = 2;
 pub const LOCK_NB: u32 = 4;
@@ -2059,7 +2136,7 @@ pub const SIZE_T_MAX: i32 = -1;
 pub const UQUAD_MAX: i32 = -1;
 pub const QUAD_MAX: u64 = 9223372036854775807;
 pub const QUAD_MIN: i64 = -9223372036854775808;
-pub const ARG_MAX: u32 = 262144;
+pub const ARG_MAX: u32 = 1048576;
 pub const CHILD_MAX: u32 = 266;
 pub const GID_MAX: u32 = 2147483647;
 pub const LINK_MAX: u32 = 32767;
@@ -2272,6 +2349,7 @@ pub const LOCAL_PEERPID: u32 = 2;
 pub const LOCAL_PEEREPID: u32 = 3;
 pub const LOCAL_PEERUUID: u32 = 4;
 pub const LOCAL_PEEREUUID: u32 = 5;
+pub const LOCAL_PEERTOKEN: u32 = 6;
 pub const SM_DATABASE: u32 = 64;
 pub const SM_USER: u32 = 32;
 pub const SM_DATABASE_USER: u32 = 97;
@@ -2393,35 +2471,20 @@ pub const SK_SEARCHARRAY: u32 = 32;
 pub const SK_SEARCHNULL: u32 = 64;
 pub const SK_SEARCHNOTNULL: u32 = 128;
 pub const SK_ORDER_BY: u32 = 256;
-pub const EOH_HEADER_MAGIC: i32 = -1;
-pub const EA_MAGIC: u32 = 689375833;
-pub const MAX_KILOBYTES: u32 = 2147483647;
-pub const PG_AUTOCONF_FILENAME: &'static [u8; 21usize] = b"postgresql.auto.conf\0";
-pub const GUC_QUALIFIER_SEPARATOR: u8 = 46u8;
-pub const GUC_LIST_INPUT: u32 = 1;
-pub const GUC_LIST_QUOTE: u32 = 2;
-pub const GUC_NO_SHOW_ALL: u32 = 4;
-pub const GUC_NO_RESET_ALL: u32 = 8;
-pub const GUC_REPORT: u32 = 16;
-pub const GUC_NOT_IN_SAMPLE: u32 = 32;
-pub const GUC_DISALLOW_IN_FILE: u32 = 64;
-pub const GUC_CUSTOM_PLACEHOLDER: u32 = 128;
-pub const GUC_SUPERUSER_ONLY: u32 = 256;
-pub const GUC_IS_NAME: u32 = 512;
-pub const GUC_NOT_WHILE_SEC_REST: u32 = 1024;
-pub const GUC_DISALLOW_IN_AUTO_FILE: u32 = 2048;
-pub const GUC_UNIT_KB: u32 = 4096;
-pub const GUC_UNIT_BLOCKS: u32 = 8192;
-pub const GUC_UNIT_XBLOCKS: u32 = 12288;
-pub const GUC_UNIT_MB: u32 = 16384;
-pub const GUC_UNIT_BYTE: u32 = 32768;
-pub const GUC_UNIT_MEMORY: u32 = 61440;
-pub const GUC_UNIT_MS: u32 = 65536;
-pub const GUC_UNIT_S: u32 = 131072;
-pub const GUC_UNIT_MIN: u32 = 196608;
-pub const GUC_UNIT_TIME: u32 = 983040;
-pub const GUC_EXPLAIN: u32 = 1048576;
-pub const GUC_UNIT: u32 = 1044480;
+pub const GIN_COMPARE_PROC: u32 = 1;
+pub const GIN_EXTRACTVALUE_PROC: u32 = 2;
+pub const GIN_EXTRACTQUERY_PROC: u32 = 3;
+pub const GIN_CONSISTENT_PROC: u32 = 4;
+pub const GIN_COMPARE_PARTIAL_PROC: u32 = 5;
+pub const GIN_TRICONSISTENT_PROC: u32 = 6;
+pub const GINNProcs: u32 = 6;
+pub const GIN_SEARCH_MODE_DEFAULT: u32 = 0;
+pub const GIN_SEARCH_MODE_INCLUDE_EMPTY: u32 = 1;
+pub const GIN_SEARCH_MODE_ALL: u32 = 2;
+pub const GIN_SEARCH_MODE_EVERYTHING: u32 = 3;
+pub const GIN_FALSE: u32 = 0;
+pub const GIN_TRUE: u32 = 1;
+pub const GIN_MAYBE: u32 = 2;
 pub const XLR_NORMAL_MAX_BLOCK_ID: u32 = 4;
 pub const XLR_NORMAL_RDATAS: u32 = 20;
 pub const REGBUF_FORCE_IMAGE: u32 = 1;
@@ -2453,6 +2516,51 @@ pub const TABLESPACE_MAP: &'static [u8; 15usize] = b"tablespace_map\0";
 pub const TABLESPACE_MAP_OLD: &'static [u8; 19usize] = b"tablespace_map.old\0";
 pub const PROMOTE_SIGNAL_FILE: &'static [u8; 8usize] = b"promote\0";
 pub const FALLBACK_PROMOTE_SIGNAL_FILE: &'static [u8; 17usize] = b"fallback_promote\0";
+pub const GIST_CONSISTENT_PROC: u32 = 1;
+pub const GIST_UNION_PROC: u32 = 2;
+pub const GIST_COMPRESS_PROC: u32 = 3;
+pub const GIST_DECOMPRESS_PROC: u32 = 4;
+pub const GIST_PENALTY_PROC: u32 = 5;
+pub const GIST_PICKSPLIT_PROC: u32 = 6;
+pub const GIST_EQUAL_PROC: u32 = 7;
+pub const GIST_DISTANCE_PROC: u32 = 8;
+pub const GIST_FETCH_PROC: u32 = 9;
+pub const GISTNProcs: u32 = 9;
+pub const F_LEAF: u32 = 1;
+pub const F_DELETED: u32 = 2;
+pub const F_TUPLES_DELETED: u32 = 4;
+pub const F_FOLLOW_RIGHT: u32 = 8;
+pub const F_HAS_GARBAGE: u32 = 16;
+pub const GIST_PAGE_ID: u32 = 65409;
+pub const EOH_HEADER_MAGIC: i32 = -1;
+pub const EA_MAGIC: u32 = 689375833;
+pub const MAX_KILOBYTES: u32 = 2147483647;
+pub const PG_AUTOCONF_FILENAME: &'static [u8; 21usize] = b"postgresql.auto.conf\0";
+pub const GUC_QUALIFIER_SEPARATOR: u8 = 46u8;
+pub const GUC_LIST_INPUT: u32 = 1;
+pub const GUC_LIST_QUOTE: u32 = 2;
+pub const GUC_NO_SHOW_ALL: u32 = 4;
+pub const GUC_NO_RESET_ALL: u32 = 8;
+pub const GUC_REPORT: u32 = 16;
+pub const GUC_NOT_IN_SAMPLE: u32 = 32;
+pub const GUC_DISALLOW_IN_FILE: u32 = 64;
+pub const GUC_CUSTOM_PLACEHOLDER: u32 = 128;
+pub const GUC_SUPERUSER_ONLY: u32 = 256;
+pub const GUC_IS_NAME: u32 = 512;
+pub const GUC_NOT_WHILE_SEC_REST: u32 = 1024;
+pub const GUC_DISALLOW_IN_AUTO_FILE: u32 = 2048;
+pub const GUC_UNIT_KB: u32 = 4096;
+pub const GUC_UNIT_BLOCKS: u32 = 8192;
+pub const GUC_UNIT_XBLOCKS: u32 = 12288;
+pub const GUC_UNIT_MB: u32 = 16384;
+pub const GUC_UNIT_BYTE: u32 = 32768;
+pub const GUC_UNIT_MEMORY: u32 = 61440;
+pub const GUC_UNIT_MS: u32 = 65536;
+pub const GUC_UNIT_S: u32 = 131072;
+pub const GUC_UNIT_MIN: u32 = 196608;
+pub const GUC_UNIT_TIME: u32 = 983040;
+pub const GUC_EXPLAIN: u32 = 1048576;
+pub const GUC_UNIT: u32 = 1044480;
 pub const RelationRelationId: u32 = 1259;
 pub const RelationRelation_Rowtype_Id: u32 = 83;
 pub const Anum_pg_class_oid: u32 = 1;
@@ -4726,6 +4834,182 @@ pub struct __darwin_x86_debug_state32 {
     pub __dr7: ::std::os::raw::c_uint,
 }
 #[repr(C)]
+#[derive(Copy, Clone)]
+pub struct __x86_instruction_state {
+    pub __insn_stream_valid_bytes: ::std::os::raw::c_int,
+    pub __insn_offset: ::std::os::raw::c_int,
+    pub __out_of_synch: ::std::os::raw::c_int,
+    pub __insn_bytes: [__uint8_t; 2380usize],
+    pub __insn_cacheline: [__uint8_t; 64usize],
+}
+impl Default for __x86_instruction_state {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct __last_branch_record {
+    pub __from_ip: __uint64_t,
+    pub __to_ip: __uint64_t,
+    pub _bitfield_align_1: [u16; 0],
+    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 4usize]>,
+    pub __bindgen_padding_0: u32,
+}
+impl __last_branch_record {
+    #[inline]
+    pub fn __mispredict(&self) -> __uint32_t {
+        unsafe { ::std::mem::transmute(self._bitfield_1.get(0usize, 1u8) as u32) }
+    }
+    #[inline]
+    pub fn set___mispredict(&mut self, val: __uint32_t) {
+        unsafe {
+            let val: u32 = ::std::mem::transmute(val);
+            self._bitfield_1.set(0usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn __tsx_abort(&self) -> __uint32_t {
+        unsafe { ::std::mem::transmute(self._bitfield_1.get(1usize, 1u8) as u32) }
+    }
+    #[inline]
+    pub fn set___tsx_abort(&mut self, val: __uint32_t) {
+        unsafe {
+            let val: u32 = ::std::mem::transmute(val);
+            self._bitfield_1.set(1usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn __in_tsx(&self) -> __uint32_t {
+        unsafe { ::std::mem::transmute(self._bitfield_1.get(2usize, 1u8) as u32) }
+    }
+    #[inline]
+    pub fn set___in_tsx(&mut self, val: __uint32_t) {
+        unsafe {
+            let val: u32 = ::std::mem::transmute(val);
+            self._bitfield_1.set(2usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn __cycle_count(&self) -> __uint32_t {
+        unsafe { ::std::mem::transmute(self._bitfield_1.get(3usize, 16u8) as u32) }
+    }
+    #[inline]
+    pub fn set___cycle_count(&mut self, val: __uint32_t) {
+        unsafe {
+            let val: u32 = ::std::mem::transmute(val);
+            self._bitfield_1.set(3usize, 16u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn __reserved(&self) -> __uint32_t {
+        unsafe { ::std::mem::transmute(self._bitfield_1.get(19usize, 13u8) as u32) }
+    }
+    #[inline]
+    pub fn set___reserved(&mut self, val: __uint32_t) {
+        unsafe {
+            let val: u32 = ::std::mem::transmute(val);
+            self._bitfield_1.set(19usize, 13u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn new_bitfield_1(
+        __mispredict: __uint32_t,
+        __tsx_abort: __uint32_t,
+        __in_tsx: __uint32_t,
+        __cycle_count: __uint32_t,
+        __reserved: __uint32_t,
+    ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
+        __bindgen_bitfield_unit.set(0usize, 1u8, {
+            let __mispredict: u32 = unsafe { ::std::mem::transmute(__mispredict) };
+            __mispredict as u64
+        });
+        __bindgen_bitfield_unit.set(1usize, 1u8, {
+            let __tsx_abort: u32 = unsafe { ::std::mem::transmute(__tsx_abort) };
+            __tsx_abort as u64
+        });
+        __bindgen_bitfield_unit.set(2usize, 1u8, {
+            let __in_tsx: u32 = unsafe { ::std::mem::transmute(__in_tsx) };
+            __in_tsx as u64
+        });
+        __bindgen_bitfield_unit.set(3usize, 16u8, {
+            let __cycle_count: u32 = unsafe { ::std::mem::transmute(__cycle_count) };
+            __cycle_count as u64
+        });
+        __bindgen_bitfield_unit.set(19usize, 13u8, {
+            let __reserved: u32 = unsafe { ::std::mem::transmute(__reserved) };
+            __reserved as u64
+        });
+        __bindgen_bitfield_unit
+    }
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct __last_branch_state {
+    pub __lbr_count: ::std::os::raw::c_int,
+    pub _bitfield_align_1: [u32; 0],
+    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 4usize]>,
+    pub __lbrs: [__last_branch_record; 32usize],
+}
+impl __last_branch_state {
+    #[inline]
+    pub fn __lbr_supported_tsx(&self) -> __uint32_t {
+        unsafe { ::std::mem::transmute(self._bitfield_1.get(0usize, 1u8) as u32) }
+    }
+    #[inline]
+    pub fn set___lbr_supported_tsx(&mut self, val: __uint32_t) {
+        unsafe {
+            let val: u32 = ::std::mem::transmute(val);
+            self._bitfield_1.set(0usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn __lbr_supported_cycle_count(&self) -> __uint32_t {
+        unsafe { ::std::mem::transmute(self._bitfield_1.get(1usize, 1u8) as u32) }
+    }
+    #[inline]
+    pub fn set___lbr_supported_cycle_count(&mut self, val: __uint32_t) {
+        unsafe {
+            let val: u32 = ::std::mem::transmute(val);
+            self._bitfield_1.set(1usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn __reserved(&self) -> __uint32_t {
+        unsafe { ::std::mem::transmute(self._bitfield_1.get(2usize, 30u8) as u32) }
+    }
+    #[inline]
+    pub fn set___reserved(&mut self, val: __uint32_t) {
+        unsafe {
+            let val: u32 = ::std::mem::transmute(val);
+            self._bitfield_1.set(2usize, 30u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn new_bitfield_1(
+        __lbr_supported_tsx: __uint32_t,
+        __lbr_supported_cycle_count: __uint32_t,
+        __reserved: __uint32_t,
+    ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
+        __bindgen_bitfield_unit.set(0usize, 1u8, {
+            let __lbr_supported_tsx: u32 = unsafe { ::std::mem::transmute(__lbr_supported_tsx) };
+            __lbr_supported_tsx as u64
+        });
+        __bindgen_bitfield_unit.set(1usize, 1u8, {
+            let __lbr_supported_cycle_count: u32 =
+                unsafe { ::std::mem::transmute(__lbr_supported_cycle_count) };
+            __lbr_supported_cycle_count as u64
+        });
+        __bindgen_bitfield_unit.set(2usize, 30u8, {
+            let __reserved: u32 = unsafe { ::std::mem::transmute(__reserved) };
+            __reserved as u64
+        });
+        __bindgen_bitfield_unit
+    }
+}
+#[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct __x86_pagein_state {
     pub __pagein_error: ::std::os::raw::c_int,
@@ -5456,7 +5740,48 @@ pub struct rusage_info_v4 {
     pub ri_interval_max_phys_footprint: u64,
     pub ri_runnable_time: u64,
 }
-pub type rusage_info_current = rusage_info_v4;
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct rusage_info_v5 {
+    pub ri_uuid: [u8; 16usize],
+    pub ri_user_time: u64,
+    pub ri_system_time: u64,
+    pub ri_pkg_idle_wkups: u64,
+    pub ri_interrupt_wkups: u64,
+    pub ri_pageins: u64,
+    pub ri_wired_size: u64,
+    pub ri_resident_size: u64,
+    pub ri_phys_footprint: u64,
+    pub ri_proc_start_abstime: u64,
+    pub ri_proc_exit_abstime: u64,
+    pub ri_child_user_time: u64,
+    pub ri_child_system_time: u64,
+    pub ri_child_pkg_idle_wkups: u64,
+    pub ri_child_interrupt_wkups: u64,
+    pub ri_child_pageins: u64,
+    pub ri_child_elapsed_abstime: u64,
+    pub ri_diskio_bytesread: u64,
+    pub ri_diskio_byteswritten: u64,
+    pub ri_cpu_time_qos_default: u64,
+    pub ri_cpu_time_qos_maintenance: u64,
+    pub ri_cpu_time_qos_background: u64,
+    pub ri_cpu_time_qos_utility: u64,
+    pub ri_cpu_time_qos_legacy: u64,
+    pub ri_cpu_time_qos_user_initiated: u64,
+    pub ri_cpu_time_qos_user_interactive: u64,
+    pub ri_billed_system_time: u64,
+    pub ri_serviced_system_time: u64,
+    pub ri_logical_writes: u64,
+    pub ri_lifetime_max_phys_footprint: u64,
+    pub ri_instructions: u64,
+    pub ri_cycles: u64,
+    pub ri_billed_energy: u64,
+    pub ri_serviced_energy: u64,
+    pub ri_interval_max_phys_footprint: u64,
+    pub ri_runnable_time: u64,
+    pub ri_flags: u64,
+}
+pub type rusage_info_current = rusage_info_v5;
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct rlimit {
@@ -6402,6 +6727,15 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
+    pub fn strtonum(
+        __numstr: *const ::std::os::raw::c_char,
+        __minval: ::std::os::raw::c_longlong,
+        __maxval: ::std::os::raw::c_longlong,
+        __errstrp: *mut *const ::std::os::raw::c_char,
+    ) -> ::std::os::raw::c_longlong;
+}
+#[pg_guard]
+extern "C" {
     pub fn strtoq(
         __str: *const ::std::os::raw::c_char,
         __endptr: *mut *mut ::std::os::raw::c_char,
@@ -6736,6 +7070,14 @@ extern "C" {
         __b1: *const ::std::os::raw::c_void,
         __b2: *const ::std::os::raw::c_void,
         __len: usize,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn strsignal_r(
+        __sig: ::std::os::raw::c_int,
+        __strsignalbuf: *mut ::std::os::raw::c_char,
+        __buflen: usize,
     ) -> ::std::os::raw::c_int;
 }
 #[pg_guard]
@@ -11841,27 +12183,13 @@ pub struct radvisory {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct fcodeblobs {
-    pub f_cd_hash: *mut ::std::os::raw::c_void,
-    pub f_hash_size: usize,
-    pub f_cd_buffer: *mut ::std::os::raw::c_void,
-    pub f_cd_size: usize,
-    pub f_out_size: *mut ::std::os::raw::c_uint,
-    pub f_arch: ::std::os::raw::c_int,
-    pub __padding: ::std::os::raw::c_int,
-}
-impl Default for fcodeblobs {
-    fn default() -> Self {
-        unsafe { ::std::mem::zeroed() }
-    }
-}
-pub type fcodeblobs_t = fcodeblobs;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
 pub struct fsignatures {
     pub fs_file_start: off_t,
     pub fs_blob_start: *mut ::std::os::raw::c_void,
     pub fs_blob_size: usize,
+    pub fs_fsignatures_size: usize,
+    pub fs_cdhash: [::std::os::raw::c_char; 20usize],
+    pub fs_hash_type: ::std::os::raw::c_int,
 }
 impl Default for fsignatures {
     fn default() -> Self {
@@ -11869,6 +12197,15 @@ impl Default for fsignatures {
     }
 }
 pub type fsignatures_t = fsignatures;
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct fsupplement {
+    pub fs_file_start: off_t,
+    pub fs_blob_start: off_t,
+    pub fs_blob_size: usize,
+    pub fs_orig_fd: ::std::os::raw::c_int,
+}
+pub type fsupplement_t = fsupplement;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct fchecklv {
@@ -11882,6 +12219,14 @@ impl Default for fchecklv {
     }
 }
 pub type fchecklv_t = fchecklv;
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct fgetsigsinfo {
+    pub fg_file_start: off_t,
+    pub fg_info_request: ::std::os::raw::c_int,
+    pub fg_sig_is_platform: ::std::os::raw::c_int,
+}
+pub type fgetsigsinfo_t = fgetsigsinfo;
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct fstore {
@@ -26735,6 +27080,691 @@ extern "C" {
 extern "C" {
     pub fn GetIndexAmRoutineByAmId(amoid: Oid, noerror: bool) -> *mut IndexAmRoutine;
 }
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct GinStatsData {
+    pub nPendingPages: BlockNumber,
+    pub nTotalPages: BlockNumber,
+    pub nEntryPages: BlockNumber,
+    pub nDataPages: BlockNumber,
+    pub nEntries: int64,
+    pub ginVersion: int32,
+}
+pub type GinTernaryValue = ::std::os::raw::c_char;
+#[pg_guard]
+extern "C" {
+    pub static mut GinFuzzySearchLimit: ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut gin_pending_list_limit: ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn ginGetStats(index: Relation, stats: *mut GinStatsData);
+}
+#[pg_guard]
+extern "C" {
+    pub fn ginUpdateStats(index: Relation, stats: *const GinStatsData, is_build: bool);
+}
+#[pg_guard]
+extern "C" {
+    pub fn XLogBeginInsert();
+}
+#[pg_guard]
+extern "C" {
+    pub fn XLogSetRecordFlags(flags: uint8);
+}
+#[pg_guard]
+extern "C" {
+    pub fn XLogInsert(rmid: RmgrId, info: uint8) -> XLogRecPtr;
+}
+#[pg_guard]
+extern "C" {
+    pub fn XLogEnsureRecordSpace(nbuffers: ::std::os::raw::c_int, ndatas: ::std::os::raw::c_int);
+}
+#[pg_guard]
+extern "C" {
+    pub fn XLogRegisterData(data: *mut ::std::os::raw::c_char, len: ::std::os::raw::c_int);
+}
+#[pg_guard]
+extern "C" {
+    pub fn XLogRegisterBuffer(block_id: uint8, buffer: Buffer, flags: uint8);
+}
+#[pg_guard]
+extern "C" {
+    pub fn XLogRegisterBlock(
+        block_id: uint8,
+        rnode: *mut RelFileNode,
+        forknum: ForkNumber,
+        blknum: BlockNumber,
+        page: *mut ::std::os::raw::c_char,
+        flags: uint8,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn XLogRegisterBufData(
+        block_id: uint8,
+        data: *mut ::std::os::raw::c_char,
+        len: ::std::os::raw::c_int,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn XLogResetInsertion();
+}
+#[pg_guard]
+extern "C" {
+    pub fn XLogCheckBufferNeedsBackup(buffer: Buffer) -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn log_newpage(
+        rnode: *mut RelFileNode,
+        forkNum: ForkNumber,
+        blk: BlockNumber,
+        page: *mut ::std::os::raw::c_char,
+        page_std: bool,
+    ) -> XLogRecPtr;
+}
+#[pg_guard]
+extern "C" {
+    pub fn log_newpage_buffer(buffer: Buffer, page_std: bool) -> XLogRecPtr;
+}
+#[pg_guard]
+extern "C" {
+    pub fn log_newpage_range(
+        rel: Relation,
+        forkNum: ForkNumber,
+        startblk: BlockNumber,
+        endblk: BlockNumber,
+        page_std: bool,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn XLogSaveBufferForHint(buffer: Buffer, buffer_std: bool) -> XLogRecPtr;
+}
+#[pg_guard]
+extern "C" {
+    pub fn InitXLogInsert();
+}
+#[pg_guard]
+extern "C" {
+    pub static mut sync_method: ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut ThisTimeLineID: TimeLineID;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut InRecovery: bool;
+}
+pub const HotStandbyState_STANDBY_DISABLED: HotStandbyState = 0;
+pub const HotStandbyState_STANDBY_INITIALIZED: HotStandbyState = 1;
+pub const HotStandbyState_STANDBY_SNAPSHOT_PENDING: HotStandbyState = 2;
+pub const HotStandbyState_STANDBY_SNAPSHOT_READY: HotStandbyState = 3;
+pub type HotStandbyState = ::std::os::raw::c_uint;
+#[pg_guard]
+extern "C" {
+    pub static mut standbyState: HotStandbyState;
+}
+pub const RecoveryTargetType_RECOVERY_TARGET_UNSET: RecoveryTargetType = 0;
+pub const RecoveryTargetType_RECOVERY_TARGET_XID: RecoveryTargetType = 1;
+pub const RecoveryTargetType_RECOVERY_TARGET_TIME: RecoveryTargetType = 2;
+pub const RecoveryTargetType_RECOVERY_TARGET_NAME: RecoveryTargetType = 3;
+pub const RecoveryTargetType_RECOVERY_TARGET_LSN: RecoveryTargetType = 4;
+pub const RecoveryTargetType_RECOVERY_TARGET_IMMEDIATE: RecoveryTargetType = 5;
+pub type RecoveryTargetType = ::std::os::raw::c_uint;
+pub const RecoveryTargetTimeLineGoal_RECOVERY_TARGET_TIMELINE_CONTROLFILE:
+    RecoveryTargetTimeLineGoal = 0;
+pub const RecoveryTargetTimeLineGoal_RECOVERY_TARGET_TIMELINE_LATEST: RecoveryTargetTimeLineGoal =
+    1;
+pub const RecoveryTargetTimeLineGoal_RECOVERY_TARGET_TIMELINE_NUMERIC: RecoveryTargetTimeLineGoal =
+    2;
+pub type RecoveryTargetTimeLineGoal = ::std::os::raw::c_uint;
+#[pg_guard]
+extern "C" {
+    pub static mut ProcLastRecPtr: XLogRecPtr;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut XactLastRecEnd: XLogRecPtr;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut XactLastCommitEnd: XLogRecPtr;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut reachedConsistency: bool;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut wal_segment_size: ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut min_wal_size_mb: ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut max_wal_size_mb: ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut wal_keep_segments: ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut XLOGbuffers: ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut XLogArchiveTimeout: ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut wal_retrieve_retry_interval: ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut XLogArchiveCommand: *mut ::std::os::raw::c_char;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut EnableHotStandby: bool;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut fullPageWrites: bool;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut wal_log_hints: bool;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut wal_compression: bool;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut wal_init_zero: bool;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut wal_recycle: bool;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut wal_consistency_checking: *mut bool;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut wal_consistency_checking_string: *mut ::std::os::raw::c_char;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut log_checkpoints: bool;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut recoveryRestoreCommand: *mut ::std::os::raw::c_char;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut recoveryEndCommand: *mut ::std::os::raw::c_char;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut archiveCleanupCommand: *mut ::std::os::raw::c_char;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut recoveryTargetInclusive: bool;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut recoveryTargetAction: ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut recovery_min_apply_delay: ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut PrimaryConnInfo: *mut ::std::os::raw::c_char;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut PrimarySlotName: *mut ::std::os::raw::c_char;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut recoveryTargetXid: TransactionId;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut recovery_target_time_string: *mut ::std::os::raw::c_char;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut recoveryTargetName: *const ::std::os::raw::c_char;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut recoveryTargetLSN: XLogRecPtr;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut recoveryTarget: RecoveryTargetType;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut PromoteTriggerFile: *mut ::std::os::raw::c_char;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut recoveryTargetTimeLineGoal: RecoveryTargetTimeLineGoal;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut recoveryTargetTLIRequested: TimeLineID;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut recoveryTargetTLI: TimeLineID;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut CheckPointSegments: ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut StandbyModeRequested: bool;
+}
+#[pg_guard]
+extern "C" {
+    pub static mut StandbyMode: bool;
+}
+pub const ArchiveMode_ARCHIVE_MODE_OFF: ArchiveMode = 0;
+pub const ArchiveMode_ARCHIVE_MODE_ON: ArchiveMode = 1;
+pub const ArchiveMode_ARCHIVE_MODE_ALWAYS: ArchiveMode = 2;
+pub type ArchiveMode = ::std::os::raw::c_uint;
+#[pg_guard]
+extern "C" {
+    pub static mut XLogArchiveMode: ::std::os::raw::c_int;
+}
+pub const WalLevel_WAL_LEVEL_MINIMAL: WalLevel = 0;
+pub const WalLevel_WAL_LEVEL_REPLICA: WalLevel = 1;
+pub const WalLevel_WAL_LEVEL_LOGICAL: WalLevel = 2;
+pub type WalLevel = ::std::os::raw::c_uint;
+pub const RecoveryState_RECOVERY_STATE_CRASH: RecoveryState = 0;
+pub const RecoveryState_RECOVERY_STATE_ARCHIVE: RecoveryState = 1;
+pub const RecoveryState_RECOVERY_STATE_DONE: RecoveryState = 2;
+pub type RecoveryState = ::std::os::raw::c_uint;
+#[pg_guard]
+extern "C" {
+    pub static mut wal_level: ::std::os::raw::c_int;
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct CheckpointStatsData {
+    pub ckpt_start_t: TimestampTz,
+    pub ckpt_write_t: TimestampTz,
+    pub ckpt_sync_t: TimestampTz,
+    pub ckpt_sync_end_t: TimestampTz,
+    pub ckpt_end_t: TimestampTz,
+    pub ckpt_bufs_written: ::std::os::raw::c_int,
+    pub ckpt_segs_added: ::std::os::raw::c_int,
+    pub ckpt_segs_removed: ::std::os::raw::c_int,
+    pub ckpt_segs_recycled: ::std::os::raw::c_int,
+    pub ckpt_sync_rels: ::std::os::raw::c_int,
+    pub ckpt_longest_sync: uint64,
+    pub ckpt_agg_sync_time: uint64,
+}
+#[pg_guard]
+extern "C" {
+    pub static mut CheckpointStats: CheckpointStatsData;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct XLogRecData {
+    _unused: [u8; 0],
+}
+#[pg_guard]
+extern "C" {
+    pub fn XLogInsertRecord(
+        rdata: *mut XLogRecData,
+        fpw_lsn: XLogRecPtr,
+        flags: uint8,
+    ) -> XLogRecPtr;
+}
+#[pg_guard]
+extern "C" {
+    pub fn XLogFlush(RecPtr: XLogRecPtr);
+}
+#[pg_guard]
+extern "C" {
+    pub fn XLogBackgroundFlush() -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn XLogNeedsFlush(RecPtr: XLogRecPtr) -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn XLogFileInit(
+        segno: XLogSegNo,
+        use_existent: *mut bool,
+        use_lock: bool,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn XLogFileOpen(segno: XLogSegNo) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn CheckXLogRemoved(segno: XLogSegNo, tli: TimeLineID);
+}
+#[pg_guard]
+extern "C" {
+    pub fn XLogGetLastRemovedSegno() -> XLogSegNo;
+}
+#[pg_guard]
+extern "C" {
+    pub fn XLogSetAsyncXactLSN(record: XLogRecPtr);
+}
+#[pg_guard]
+extern "C" {
+    pub fn XLogSetReplicationSlotMinimumLSN(lsn: XLogRecPtr);
+}
+#[pg_guard]
+extern "C" {
+    pub fn xlog_redo(record: *mut XLogReaderState);
+}
+#[pg_guard]
+extern "C" {
+    pub fn xlog_desc(buf: StringInfo, record: *mut XLogReaderState);
+}
+#[pg_guard]
+extern "C" {
+    pub fn xlog_identify(info: uint8) -> *const ::std::os::raw::c_char;
+}
+#[pg_guard]
+extern "C" {
+    pub fn issue_xlog_fsync(fd: ::std::os::raw::c_int, segno: XLogSegNo);
+}
+#[pg_guard]
+extern "C" {
+    pub fn RecoveryInProgress() -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn GetRecoveryState() -> RecoveryState;
+}
+#[pg_guard]
+extern "C" {
+    pub fn HotStandbyActive() -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn HotStandbyActiveInReplay() -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn XLogInsertAllowed() -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn GetXLogReceiptTime(rtime: *mut TimestampTz, fromStream: *mut bool);
+}
+#[pg_guard]
+extern "C" {
+    pub fn GetXLogReplayRecPtr(replayTLI: *mut TimeLineID) -> XLogRecPtr;
+}
+#[pg_guard]
+extern "C" {
+    pub fn GetXLogInsertRecPtr() -> XLogRecPtr;
+}
+#[pg_guard]
+extern "C" {
+    pub fn GetXLogWriteRecPtr() -> XLogRecPtr;
+}
+#[pg_guard]
+extern "C" {
+    pub fn RecoveryIsPaused() -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn SetRecoveryPause(recoveryPause: bool);
+}
+#[pg_guard]
+extern "C" {
+    pub fn GetLatestXTime() -> TimestampTz;
+}
+#[pg_guard]
+extern "C" {
+    pub fn GetCurrentChunkReplayStartTime() -> TimestampTz;
+}
+#[pg_guard]
+extern "C" {
+    pub fn XLogFileNameP(tli: TimeLineID, segno: XLogSegNo) -> *mut ::std::os::raw::c_char;
+}
+#[pg_guard]
+extern "C" {
+    pub fn UpdateControlFile();
+}
+#[pg_guard]
+extern "C" {
+    pub fn GetSystemIdentifier() -> uint64;
+}
+#[pg_guard]
+extern "C" {
+    pub fn GetMockAuthenticationNonce() -> *mut ::std::os::raw::c_char;
+}
+#[pg_guard]
+extern "C" {
+    pub fn DataChecksumsEnabled() -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn GetFakeLSNForUnloggedRel() -> XLogRecPtr;
+}
+#[pg_guard]
+extern "C" {
+    pub fn XLOGShmemSize() -> Size;
+}
+#[pg_guard]
+extern "C" {
+    pub fn XLOGShmemInit();
+}
+#[pg_guard]
+extern "C" {
+    pub fn BootStrapXLOG();
+}
+#[pg_guard]
+extern "C" {
+    pub fn LocalProcessControlFile(reset: bool);
+}
+#[pg_guard]
+extern "C" {
+    pub fn StartupXLOG();
+}
+#[pg_guard]
+extern "C" {
+    pub fn ShutdownXLOG(code: ::std::os::raw::c_int, arg: Datum);
+}
+#[pg_guard]
+extern "C" {
+    pub fn InitXLOGAccess();
+}
+#[pg_guard]
+extern "C" {
+    pub fn CreateCheckPoint(flags: ::std::os::raw::c_int);
+}
+#[pg_guard]
+extern "C" {
+    pub fn CreateRestartPoint(flags: ::std::os::raw::c_int) -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn XLogPutNextOid(nextOid: Oid);
+}
+#[pg_guard]
+extern "C" {
+    pub fn XLogRestorePoint(rpName: *const ::std::os::raw::c_char) -> XLogRecPtr;
+}
+#[pg_guard]
+extern "C" {
+    pub fn UpdateFullPageWrites();
+}
+#[pg_guard]
+extern "C" {
+    pub fn GetFullPageWriteInfo(RedoRecPtr_p: *mut XLogRecPtr, doPageWrites_p: *mut bool);
+}
+#[pg_guard]
+extern "C" {
+    pub fn GetRedoRecPtr() -> XLogRecPtr;
+}
+#[pg_guard]
+extern "C" {
+    pub fn GetInsertRecPtr() -> XLogRecPtr;
+}
+#[pg_guard]
+extern "C" {
+    pub fn GetFlushRecPtr() -> XLogRecPtr;
+}
+#[pg_guard]
+extern "C" {
+    pub fn GetLastImportantRecPtr() -> XLogRecPtr;
+}
+#[pg_guard]
+extern "C" {
+    pub fn RemovePromoteSignalFiles();
+}
+#[pg_guard]
+extern "C" {
+    pub fn CheckPromoteSignal() -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn WakeupRecovery();
+}
+#[pg_guard]
+extern "C" {
+    pub fn SetWalWriterSleeping(sleeping: bool);
+}
+#[pg_guard]
+extern "C" {
+    pub fn XLogRequestWalReceiverReply();
+}
+#[pg_guard]
+extern "C" {
+    pub fn assign_max_wal_size(newval: ::std::os::raw::c_int, extra: *mut ::std::os::raw::c_void);
+}
+#[pg_guard]
+extern "C" {
+    pub fn assign_checkpoint_completion_target(newval: f64, extra: *mut ::std::os::raw::c_void);
+}
+pub const SessionBackupState_SESSION_BACKUP_NONE: SessionBackupState = 0;
+pub const SessionBackupState_SESSION_BACKUP_EXCLUSIVE: SessionBackupState = 1;
+pub const SessionBackupState_SESSION_BACKUP_NON_EXCLUSIVE: SessionBackupState = 2;
+pub type SessionBackupState = ::std::os::raw::c_uint;
+#[pg_guard]
+extern "C" {
+    pub fn do_pg_start_backup(
+        backupidstr: *const ::std::os::raw::c_char,
+        fast: bool,
+        starttli_p: *mut TimeLineID,
+        labelfile: StringInfo,
+        tablespaces: *mut *mut List,
+        tblspcmapfile: StringInfo,
+        infotbssize: bool,
+        needtblspcmapfile: bool,
+    ) -> XLogRecPtr;
+}
+#[pg_guard]
+extern "C" {
+    pub fn do_pg_stop_backup(
+        labelfile: *mut ::std::os::raw::c_char,
+        waitforarchive: bool,
+        stoptli_p: *mut TimeLineID,
+    ) -> XLogRecPtr;
+}
+#[pg_guard]
+extern "C" {
+    pub fn do_pg_abort_backup(code: ::std::os::raw::c_int, arg: Datum);
+}
+#[pg_guard]
+extern "C" {
+    pub fn register_persistent_abort_backup_handler();
+}
+#[pg_guard]
+extern "C" {
+    pub fn get_backup_status() -> SessionBackupState;
+}
+pub type GistNSN = XLogRecPtr;
+pub type PageGistNSN = PageXLogRecPtr;
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct GISTPageOpaqueData {
+    pub nsn: PageGistNSN,
+    pub rightlink: BlockNumber,
+    pub flags: uint16,
+    pub gist_page_id: uint16,
+}
+pub type GISTPageOpaque = *mut GISTPageOpaqueData;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct GIST_SPLITVEC {
+    pub spl_left: *mut OffsetNumber,
+    pub spl_nleft: ::std::os::raw::c_int,
+    pub spl_ldatum: Datum,
+    pub spl_ldatum_exists: bool,
+    pub spl_right: *mut OffsetNumber,
+    pub spl_nright: ::std::os::raw::c_int,
+    pub spl_rdatum: Datum,
+    pub spl_rdatum_exists: bool,
+}
+impl Default for GIST_SPLITVEC {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct GISTENTRY {
+    pub key: Datum,
+    pub rel: Relation,
+    pub page: Page,
+    pub offset: OffsetNumber,
+    pub leafkey: bool,
+}
+impl Default for GISTENTRY {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct GISTDeletedPageContents {
+    pub deleteXid: FullTransactionId,
+}
+#[repr(C)]
+#[derive(Debug)]
+pub struct GistEntryVector {
+    pub n: int32,
+    pub vector: __IncompleteArrayField<GISTENTRY>,
+}
+impl Default for GistEntryVector {
+    fn default() -> Self {
+        unsafe { ::std::mem::zeroed() }
+    }
+}
 #[pg_guard]
 extern "C" {
     pub fn relation_open(relationId: Oid, lockmode: LOCKMODE) -> Relation;
@@ -28057,606 +29087,6 @@ extern "C" {
         new_sync_method: ::std::os::raw::c_int,
         extra: *mut ::std::os::raw::c_void,
     );
-}
-#[pg_guard]
-extern "C" {
-    pub fn XLogBeginInsert();
-}
-#[pg_guard]
-extern "C" {
-    pub fn XLogSetRecordFlags(flags: uint8);
-}
-#[pg_guard]
-extern "C" {
-    pub fn XLogInsert(rmid: RmgrId, info: uint8) -> XLogRecPtr;
-}
-#[pg_guard]
-extern "C" {
-    pub fn XLogEnsureRecordSpace(nbuffers: ::std::os::raw::c_int, ndatas: ::std::os::raw::c_int);
-}
-#[pg_guard]
-extern "C" {
-    pub fn XLogRegisterData(data: *mut ::std::os::raw::c_char, len: ::std::os::raw::c_int);
-}
-#[pg_guard]
-extern "C" {
-    pub fn XLogRegisterBuffer(block_id: uint8, buffer: Buffer, flags: uint8);
-}
-#[pg_guard]
-extern "C" {
-    pub fn XLogRegisterBlock(
-        block_id: uint8,
-        rnode: *mut RelFileNode,
-        forknum: ForkNumber,
-        blknum: BlockNumber,
-        page: *mut ::std::os::raw::c_char,
-        flags: uint8,
-    );
-}
-#[pg_guard]
-extern "C" {
-    pub fn XLogRegisterBufData(
-        block_id: uint8,
-        data: *mut ::std::os::raw::c_char,
-        len: ::std::os::raw::c_int,
-    );
-}
-#[pg_guard]
-extern "C" {
-    pub fn XLogResetInsertion();
-}
-#[pg_guard]
-extern "C" {
-    pub fn XLogCheckBufferNeedsBackup(buffer: Buffer) -> bool;
-}
-#[pg_guard]
-extern "C" {
-    pub fn log_newpage(
-        rnode: *mut RelFileNode,
-        forkNum: ForkNumber,
-        blk: BlockNumber,
-        page: *mut ::std::os::raw::c_char,
-        page_std: bool,
-    ) -> XLogRecPtr;
-}
-#[pg_guard]
-extern "C" {
-    pub fn log_newpage_buffer(buffer: Buffer, page_std: bool) -> XLogRecPtr;
-}
-#[pg_guard]
-extern "C" {
-    pub fn log_newpage_range(
-        rel: Relation,
-        forkNum: ForkNumber,
-        startblk: BlockNumber,
-        endblk: BlockNumber,
-        page_std: bool,
-    );
-}
-#[pg_guard]
-extern "C" {
-    pub fn XLogSaveBufferForHint(buffer: Buffer, buffer_std: bool) -> XLogRecPtr;
-}
-#[pg_guard]
-extern "C" {
-    pub fn InitXLogInsert();
-}
-#[pg_guard]
-extern "C" {
-    pub static mut sync_method: ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut ThisTimeLineID: TimeLineID;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut InRecovery: bool;
-}
-pub const HotStandbyState_STANDBY_DISABLED: HotStandbyState = 0;
-pub const HotStandbyState_STANDBY_INITIALIZED: HotStandbyState = 1;
-pub const HotStandbyState_STANDBY_SNAPSHOT_PENDING: HotStandbyState = 2;
-pub const HotStandbyState_STANDBY_SNAPSHOT_READY: HotStandbyState = 3;
-pub type HotStandbyState = ::std::os::raw::c_uint;
-#[pg_guard]
-extern "C" {
-    pub static mut standbyState: HotStandbyState;
-}
-pub const RecoveryTargetType_RECOVERY_TARGET_UNSET: RecoveryTargetType = 0;
-pub const RecoveryTargetType_RECOVERY_TARGET_XID: RecoveryTargetType = 1;
-pub const RecoveryTargetType_RECOVERY_TARGET_TIME: RecoveryTargetType = 2;
-pub const RecoveryTargetType_RECOVERY_TARGET_NAME: RecoveryTargetType = 3;
-pub const RecoveryTargetType_RECOVERY_TARGET_LSN: RecoveryTargetType = 4;
-pub const RecoveryTargetType_RECOVERY_TARGET_IMMEDIATE: RecoveryTargetType = 5;
-pub type RecoveryTargetType = ::std::os::raw::c_uint;
-pub const RecoveryTargetTimeLineGoal_RECOVERY_TARGET_TIMELINE_CONTROLFILE:
-    RecoveryTargetTimeLineGoal = 0;
-pub const RecoveryTargetTimeLineGoal_RECOVERY_TARGET_TIMELINE_LATEST: RecoveryTargetTimeLineGoal =
-    1;
-pub const RecoveryTargetTimeLineGoal_RECOVERY_TARGET_TIMELINE_NUMERIC: RecoveryTargetTimeLineGoal =
-    2;
-pub type RecoveryTargetTimeLineGoal = ::std::os::raw::c_uint;
-#[pg_guard]
-extern "C" {
-    pub static mut ProcLastRecPtr: XLogRecPtr;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut XactLastRecEnd: XLogRecPtr;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut XactLastCommitEnd: XLogRecPtr;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut reachedConsistency: bool;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut wal_segment_size: ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut min_wal_size_mb: ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut max_wal_size_mb: ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut wal_keep_segments: ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut XLOGbuffers: ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut XLogArchiveTimeout: ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut wal_retrieve_retry_interval: ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut XLogArchiveCommand: *mut ::std::os::raw::c_char;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut EnableHotStandby: bool;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut fullPageWrites: bool;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut wal_log_hints: bool;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut wal_compression: bool;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut wal_init_zero: bool;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut wal_recycle: bool;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut wal_consistency_checking: *mut bool;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut wal_consistency_checking_string: *mut ::std::os::raw::c_char;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut log_checkpoints: bool;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut recoveryRestoreCommand: *mut ::std::os::raw::c_char;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut recoveryEndCommand: *mut ::std::os::raw::c_char;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut archiveCleanupCommand: *mut ::std::os::raw::c_char;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut recoveryTargetInclusive: bool;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut recoveryTargetAction: ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut recovery_min_apply_delay: ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut PrimaryConnInfo: *mut ::std::os::raw::c_char;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut PrimarySlotName: *mut ::std::os::raw::c_char;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut recoveryTargetXid: TransactionId;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut recovery_target_time_string: *mut ::std::os::raw::c_char;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut recoveryTargetName: *const ::std::os::raw::c_char;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut recoveryTargetLSN: XLogRecPtr;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut recoveryTarget: RecoveryTargetType;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut PromoteTriggerFile: *mut ::std::os::raw::c_char;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut recoveryTargetTimeLineGoal: RecoveryTargetTimeLineGoal;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut recoveryTargetTLIRequested: TimeLineID;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut recoveryTargetTLI: TimeLineID;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut CheckPointSegments: ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut StandbyModeRequested: bool;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut StandbyMode: bool;
-}
-pub const ArchiveMode_ARCHIVE_MODE_OFF: ArchiveMode = 0;
-pub const ArchiveMode_ARCHIVE_MODE_ON: ArchiveMode = 1;
-pub const ArchiveMode_ARCHIVE_MODE_ALWAYS: ArchiveMode = 2;
-pub type ArchiveMode = ::std::os::raw::c_uint;
-#[pg_guard]
-extern "C" {
-    pub static mut XLogArchiveMode: ::std::os::raw::c_int;
-}
-pub const WalLevel_WAL_LEVEL_MINIMAL: WalLevel = 0;
-pub const WalLevel_WAL_LEVEL_REPLICA: WalLevel = 1;
-pub const WalLevel_WAL_LEVEL_LOGICAL: WalLevel = 2;
-pub type WalLevel = ::std::os::raw::c_uint;
-pub const RecoveryState_RECOVERY_STATE_CRASH: RecoveryState = 0;
-pub const RecoveryState_RECOVERY_STATE_ARCHIVE: RecoveryState = 1;
-pub const RecoveryState_RECOVERY_STATE_DONE: RecoveryState = 2;
-pub type RecoveryState = ::std::os::raw::c_uint;
-#[pg_guard]
-extern "C" {
-    pub static mut wal_level: ::std::os::raw::c_int;
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct CheckpointStatsData {
-    pub ckpt_start_t: TimestampTz,
-    pub ckpt_write_t: TimestampTz,
-    pub ckpt_sync_t: TimestampTz,
-    pub ckpt_sync_end_t: TimestampTz,
-    pub ckpt_end_t: TimestampTz,
-    pub ckpt_bufs_written: ::std::os::raw::c_int,
-    pub ckpt_segs_added: ::std::os::raw::c_int,
-    pub ckpt_segs_removed: ::std::os::raw::c_int,
-    pub ckpt_segs_recycled: ::std::os::raw::c_int,
-    pub ckpt_sync_rels: ::std::os::raw::c_int,
-    pub ckpt_longest_sync: uint64,
-    pub ckpt_agg_sync_time: uint64,
-}
-#[pg_guard]
-extern "C" {
-    pub static mut CheckpointStats: CheckpointStatsData;
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct XLogRecData {
-    _unused: [u8; 0],
-}
-#[pg_guard]
-extern "C" {
-    pub fn XLogInsertRecord(
-        rdata: *mut XLogRecData,
-        fpw_lsn: XLogRecPtr,
-        flags: uint8,
-    ) -> XLogRecPtr;
-}
-#[pg_guard]
-extern "C" {
-    pub fn XLogFlush(RecPtr: XLogRecPtr);
-}
-#[pg_guard]
-extern "C" {
-    pub fn XLogBackgroundFlush() -> bool;
-}
-#[pg_guard]
-extern "C" {
-    pub fn XLogNeedsFlush(RecPtr: XLogRecPtr) -> bool;
-}
-#[pg_guard]
-extern "C" {
-    pub fn XLogFileInit(
-        segno: XLogSegNo,
-        use_existent: *mut bool,
-        use_lock: bool,
-    ) -> ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
-    pub fn XLogFileOpen(segno: XLogSegNo) -> ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
-    pub fn CheckXLogRemoved(segno: XLogSegNo, tli: TimeLineID);
-}
-#[pg_guard]
-extern "C" {
-    pub fn XLogGetLastRemovedSegno() -> XLogSegNo;
-}
-#[pg_guard]
-extern "C" {
-    pub fn XLogSetAsyncXactLSN(record: XLogRecPtr);
-}
-#[pg_guard]
-extern "C" {
-    pub fn XLogSetReplicationSlotMinimumLSN(lsn: XLogRecPtr);
-}
-#[pg_guard]
-extern "C" {
-    pub fn xlog_redo(record: *mut XLogReaderState);
-}
-#[pg_guard]
-extern "C" {
-    pub fn xlog_desc(buf: StringInfo, record: *mut XLogReaderState);
-}
-#[pg_guard]
-extern "C" {
-    pub fn xlog_identify(info: uint8) -> *const ::std::os::raw::c_char;
-}
-#[pg_guard]
-extern "C" {
-    pub fn issue_xlog_fsync(fd: ::std::os::raw::c_int, segno: XLogSegNo);
-}
-#[pg_guard]
-extern "C" {
-    pub fn RecoveryInProgress() -> bool;
-}
-#[pg_guard]
-extern "C" {
-    pub fn GetRecoveryState() -> RecoveryState;
-}
-#[pg_guard]
-extern "C" {
-    pub fn HotStandbyActive() -> bool;
-}
-#[pg_guard]
-extern "C" {
-    pub fn HotStandbyActiveInReplay() -> bool;
-}
-#[pg_guard]
-extern "C" {
-    pub fn XLogInsertAllowed() -> bool;
-}
-#[pg_guard]
-extern "C" {
-    pub fn GetXLogReceiptTime(rtime: *mut TimestampTz, fromStream: *mut bool);
-}
-#[pg_guard]
-extern "C" {
-    pub fn GetXLogReplayRecPtr(replayTLI: *mut TimeLineID) -> XLogRecPtr;
-}
-#[pg_guard]
-extern "C" {
-    pub fn GetXLogInsertRecPtr() -> XLogRecPtr;
-}
-#[pg_guard]
-extern "C" {
-    pub fn GetXLogWriteRecPtr() -> XLogRecPtr;
-}
-#[pg_guard]
-extern "C" {
-    pub fn RecoveryIsPaused() -> bool;
-}
-#[pg_guard]
-extern "C" {
-    pub fn SetRecoveryPause(recoveryPause: bool);
-}
-#[pg_guard]
-extern "C" {
-    pub fn GetLatestXTime() -> TimestampTz;
-}
-#[pg_guard]
-extern "C" {
-    pub fn GetCurrentChunkReplayStartTime() -> TimestampTz;
-}
-#[pg_guard]
-extern "C" {
-    pub fn XLogFileNameP(tli: TimeLineID, segno: XLogSegNo) -> *mut ::std::os::raw::c_char;
-}
-#[pg_guard]
-extern "C" {
-    pub fn UpdateControlFile();
-}
-#[pg_guard]
-extern "C" {
-    pub fn GetSystemIdentifier() -> uint64;
-}
-#[pg_guard]
-extern "C" {
-    pub fn GetMockAuthenticationNonce() -> *mut ::std::os::raw::c_char;
-}
-#[pg_guard]
-extern "C" {
-    pub fn DataChecksumsEnabled() -> bool;
-}
-#[pg_guard]
-extern "C" {
-    pub fn GetFakeLSNForUnloggedRel() -> XLogRecPtr;
-}
-#[pg_guard]
-extern "C" {
-    pub fn XLOGShmemSize() -> Size;
-}
-#[pg_guard]
-extern "C" {
-    pub fn XLOGShmemInit();
-}
-#[pg_guard]
-extern "C" {
-    pub fn BootStrapXLOG();
-}
-#[pg_guard]
-extern "C" {
-    pub fn LocalProcessControlFile(reset: bool);
-}
-#[pg_guard]
-extern "C" {
-    pub fn StartupXLOG();
-}
-#[pg_guard]
-extern "C" {
-    pub fn ShutdownXLOG(code: ::std::os::raw::c_int, arg: Datum);
-}
-#[pg_guard]
-extern "C" {
-    pub fn InitXLOGAccess();
-}
-#[pg_guard]
-extern "C" {
-    pub fn CreateCheckPoint(flags: ::std::os::raw::c_int);
-}
-#[pg_guard]
-extern "C" {
-    pub fn CreateRestartPoint(flags: ::std::os::raw::c_int) -> bool;
-}
-#[pg_guard]
-extern "C" {
-    pub fn XLogPutNextOid(nextOid: Oid);
-}
-#[pg_guard]
-extern "C" {
-    pub fn XLogRestorePoint(rpName: *const ::std::os::raw::c_char) -> XLogRecPtr;
-}
-#[pg_guard]
-extern "C" {
-    pub fn UpdateFullPageWrites();
-}
-#[pg_guard]
-extern "C" {
-    pub fn GetFullPageWriteInfo(RedoRecPtr_p: *mut XLogRecPtr, doPageWrites_p: *mut bool);
-}
-#[pg_guard]
-extern "C" {
-    pub fn GetRedoRecPtr() -> XLogRecPtr;
-}
-#[pg_guard]
-extern "C" {
-    pub fn GetInsertRecPtr() -> XLogRecPtr;
-}
-#[pg_guard]
-extern "C" {
-    pub fn GetFlushRecPtr() -> XLogRecPtr;
-}
-#[pg_guard]
-extern "C" {
-    pub fn GetLastImportantRecPtr() -> XLogRecPtr;
-}
-#[pg_guard]
-extern "C" {
-    pub fn RemovePromoteSignalFiles();
-}
-#[pg_guard]
-extern "C" {
-    pub fn CheckPromoteSignal() -> bool;
-}
-#[pg_guard]
-extern "C" {
-    pub fn WakeupRecovery();
-}
-#[pg_guard]
-extern "C" {
-    pub fn SetWalWriterSleeping(sleeping: bool);
-}
-#[pg_guard]
-extern "C" {
-    pub fn XLogRequestWalReceiverReply();
-}
-#[pg_guard]
-extern "C" {
-    pub fn assign_max_wal_size(newval: ::std::os::raw::c_int, extra: *mut ::std::os::raw::c_void);
-}
-#[pg_guard]
-extern "C" {
-    pub fn assign_checkpoint_completion_target(newval: f64, extra: *mut ::std::os::raw::c_void);
-}
-pub const SessionBackupState_SESSION_BACKUP_NONE: SessionBackupState = 0;
-pub const SessionBackupState_SESSION_BACKUP_EXCLUSIVE: SessionBackupState = 1;
-pub const SessionBackupState_SESSION_BACKUP_NON_EXCLUSIVE: SessionBackupState = 2;
-pub type SessionBackupState = ::std::os::raw::c_uint;
-#[pg_guard]
-extern "C" {
-    pub fn do_pg_start_backup(
-        backupidstr: *const ::std::os::raw::c_char,
-        fast: bool,
-        starttli_p: *mut TimeLineID,
-        labelfile: StringInfo,
-        tablespaces: *mut *mut List,
-        tblspcmapfile: StringInfo,
-        infotbssize: bool,
-        needtblspcmapfile: bool,
-    ) -> XLogRecPtr;
-}
-#[pg_guard]
-extern "C" {
-    pub fn do_pg_stop_backup(
-        labelfile: *mut ::std::os::raw::c_char,
-        waitforarchive: bool,
-        stoptli_p: *mut TimeLineID,
-    ) -> XLogRecPtr;
-}
-#[pg_guard]
-extern "C" {
-    pub fn do_pg_abort_backup(code: ::std::os::raw::c_int, arg: Datum);
-}
-#[pg_guard]
-extern "C" {
-    pub fn register_persistent_abort_backup_handler();
-}
-#[pg_guard]
-extern "C" {
-    pub fn get_backup_status() -> SessionBackupState;
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
