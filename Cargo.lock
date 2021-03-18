@@ -182,7 +182,7 @@ checksum = "b700ce4376041dcd0a327fd0097c41095743c4c8af8887265942faf1100bd040"
 
 [[package]]
 name = "cargo-pgx"
-version = "0.1.19"
+version = "0.1.20"
 dependencies = [
  "clap",
  "colored",
@@ -983,7 +983,7 @@ checksum = "d4fd5641d01c8f18a23da7b6fe29298ff4b55afcccdf78973b24cf3175fee32e"
 
 [[package]]
 name = "pgx"
-version = "0.1.19"
+version = "0.1.20"
 dependencies = [
  "atomic-traits",
  "bitflags",
@@ -1004,7 +1004,7 @@ dependencies = [
 
 [[package]]
 name = "pgx-macros"
-version = "0.1.19"
+version = "0.1.20"
 dependencies = [
  "pgx-utils",
  "proc-macro2",
@@ -1015,7 +1015,7 @@ dependencies = [
 
 [[package]]
 name = "pgx-parent"
-version = "0.1.19"
+version = "0.1.20"
 dependencies = [
  "cargo-pgx",
  "pgx",
@@ -1026,7 +1026,7 @@ dependencies = [
 
 [[package]]
 name = "pgx-pg-sys"
-version = "0.1.19"
+version = "0.1.20"
 dependencies = [
  "bindgen",
  "build-deps",
@@ -1044,7 +1044,7 @@ dependencies = [
 
 [[package]]
 name = "pgx-tests"
-version = "0.1.19"
+version = "0.1.20"
 dependencies = [
  "colored",
  "lazy_static",
@@ -1062,7 +1062,7 @@ dependencies = [
 
 [[package]]
 name = "pgx-utils"
-version = "0.1.19"
+version = "0.1.20"
 dependencies = [
  "colored",
  "dirs",
