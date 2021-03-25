@@ -9,6 +9,7 @@ use std::process::{Command, Stdio};
 pub fn test_extension(
     pg_config: &PgConfig,
     is_release: bool,
+    test_workspace: bool,
     additional_features: Vec<&str>,
 ) -> Result<(), std::io::Error> {
     let major_version = pg_config.major_version()?;
@@ -23,7 +24,6 @@ pub fn test_extension(
         .stdout(Stdio::inherit())
         .stderr(Stdio::inherit())
         .arg("test")
-        .arg("--all")
         .arg("--features")
         .arg(features)
         .arg("--no-default-features")
@@ -35,6 +35,10 @@ pub fn test_extension(
 
     if is_release {
         command.arg("--release");
+    }
+
+    if test_workspace {
+        command.arg("all");
     }
 
     eprintln!("{:?}", command);
