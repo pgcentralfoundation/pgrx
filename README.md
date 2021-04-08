@@ -219,6 +219,8 @@ There's probably more than are listed here, but a primary things of note are:
 
  - Windows is not supported.  It could be, but will require a bit of work with `cargo-pgx` and figuring out how to compile `pgx`'s "cshim" static library.
 
+ - Sessions started before `ALTER EXTENSION my_extension UPDATE;` will continue to see the old version of `my_extension`. New sessions will see the updated version of the extension.
+
 ## TODO
 
 There's a few things on our immediate TODO list
