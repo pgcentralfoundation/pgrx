@@ -77,6 +77,11 @@ subcommands:
                     short: r
                     long: release
                     help: compile for release mode (default is debug)
+                - features:
+                    long: features
+                    help: additional cargo features to activate (default is '--no-default-features')
+                    takes_value: true
+                    multiple: true
           - package:
               about: create an installation package directory (in ./target/[debug|release]/extname-pgXX/) for the Postgres installation specified by whatever "pg_config" is currently on your $PATH
               args:
@@ -84,8 +89,19 @@ subcommands:
                     short: d
                     long: debug
                     help: compile for debug mode (default is release)
+                - features:
+                    long: features
+                    help: additional cargo features to activate (default is '--no-default-features')
+                    takes_value: true
+                    multiple: true
           - schema:
               about: generate extension schema files (typically not necessary)
+              args:
+                - features:
+                    long: features
+                    help: additional cargo features to activate (default is '--no-default-features')
+                    takes_value: true
+                    multiple: true
           - dump-schema:
               about: dump the full extension SQL schema file
               args:
@@ -94,6 +110,11 @@ subcommands:
                     takes_value: true
                     required: true
                     help: Where should the extension .sql file be written?
+                - features:
+                    long: features
+                    help: additional cargo features to activate (default is '--no-default-features')
+                    takes_value: true
+                    multiple: true
           - run:
               about: compile/install extension to a pgx-managed Postgres instance and start psql
               args:
@@ -110,6 +131,11 @@ subcommands:
                     short: r
                     long: release
                     help: compile for release mode (default is debug)
+                - features:
+                    long: features
+                    help: additional cargo features to activate (default is '--no-default-features')
+                    takes_value: true
+                    multiple: true
           - connect:
               about: connect, via psql, to a Postgres instance
               args:
@@ -133,6 +159,11 @@ subcommands:
                     short: r
                     long: release
                     help: compile for release mode (default is debug)
+                - features:
+                    long: features
+                    help: additional cargo features to activate (default is '--no-default-features')
+                    takes_value: true
+                    multiple: true
           - get:
               about: get a property from the extension control file
               args:

@@ -18,7 +18,7 @@ pub(crate) fn create_crate_template(
 
     let cwd = std::env::current_dir().unwrap();
     std::env::set_current_dir(&path)?;
-    crate::generate_schema()?;
+    crate::generate_schema(&[])?;
     std::env::set_current_dir(cwd)?;
 
     Ok(())

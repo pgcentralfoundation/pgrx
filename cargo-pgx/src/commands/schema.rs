@@ -57,7 +57,11 @@ enum DeriveMacros {
     PostgresHash,
 }
 
-pub(crate) fn generate_schema() -> Result<(), std::io::Error> {
+pub(crate) fn generate_schema(features: &[&str]) -> Result<(), std::io::Error> {
+    let mut features: HashSet<String> = features.into_iter().map(|s| s.to_string()).collect();
+    if let Ok(pg_features) = std::env::var("PGX_BUILD_FEATURES") {
+        features.extend(pg_features.split(' ').map(|s| s.to_string()))
+    }
     let path = PathBuf::from_str("./src").unwrap();
     let files = find_rs_files(&path, Vec::new());
     let default_schema = get_property("schema").unwrap_or_else(|| "public".to_string());
@@ -66,7 +70,7 @@ pub(crate) fn generate_schema() -> Result<(), std::io::Error> {
 
     let mut created = Vec::new();
     files.iter().for_each(|f: &DirEntry| {
-        let statemets = generate_sql(f, default_schema.clone());
+        let statemets = generate_sql(f, default_schema.clone(), &features);
         let (did_write, filename) = write_sql_file(f, statemets);
 
         // strip the leading ./sql/ from the filenames we generated
@@ -239,7 +243,7 @@ fn parse_extern_args(att: &Attribute) -> BTreeSet<ExternArgs> {
         .collect()
 }
 
-fn generate_sql(rs_file: &DirEntry, default_schema: String) -> Vec<String> {
+fn generate_sql(rs_file: &DirEntry, default_schema: String, features: &HashSet<String>) -> Vec<String> {
     let mut sql = Vec::new();
     let file = std::fs::read_to_string(rs_file.path()).unwrap();
     let ast = syn::parse_file(file.as_str()).unwrap();
@@ -253,6 +257,7 @@ fn generate_sql(rs_file: &DirEntry, default_schema: String) -> Vec<String> {
         ast.items,
         &mut schema_stack,
         &default_schema,
+        features,
     );
 
     sql
@@ -265,6 +270,7 @@ fn walk_items(
     items: Vec<Item>,
     schema_stack: &mut Vec<String>,
     default_schema: &str,
+    features: &HashSet<String>,
 ) {
     let mut sql = Vec::new();
     let mut postgres_enums = Vec::new();
@@ -275,10 +281,14 @@ fn walk_items(
         .expect("couldn't determine the current schema")
         .clone();
     for item in items {
+        if !is_active(&item, features) {
+            continue
+        }
         if let Item::Mod(module) = item {
+            module.attrs;
             if let Some((_, items)) = module.content {
                 schema_stack.push(module.ident.to_string());
-                walk_items(rs_file, &mut sql, items, schema_stack, default_schema);
+                walk_items(rs_file, &mut sql, items, schema_stack, default_schema, features);
                 schema_stack.pop();
             }
         } else if let Item::Struct(strct) = item {
@@ -327,6 +337,7 @@ fn walk_items(
                     vec![parse_item(eq(&strct.ident))],
                     schema_stack,
                     default_schema,
+                    features,
                 );
                 walk_items(
                     rs_file,
@@ -334,6 +345,7 @@ fn walk_items(
                     vec![parse_item(ne(&strct.ident))],
                     schema_stack,
                     default_schema,
+                    features,
                 );
             }
 
@@ -344,6 +356,7 @@ fn walk_items(
                     vec![parse_item(lt(&strct.ident))],
                     schema_stack,
                     default_schema,
+                    features,
                 );
                 walk_items(
                     rs_file,
@@ -351,6 +364,7 @@ fn walk_items(
                     vec![parse_item(gt(&strct.ident))],
                     schema_stack,
                     default_schema,
+                    features,
                 );
                 walk_items(
                     rs_file,
@@ -358,6 +372,7 @@ fn walk_items(
                     vec![parse_item(le(&strct.ident))],
                     schema_stack,
                     default_schema,
+                    features,
                 );
                 walk_items(
                     rs_file,
@@ -365,6 +380,7 @@ fn walk_items(
                     vec![parse_item(ge(&strct.ident))],
                     schema_stack,
                     default_schema,
+                    features,
                 );
                 walk_items(
                     rs_file,
@@ -372,6 +388,7 @@ fn walk_items(
                     vec![parse_item(cmp(&strct.ident))],
                     schema_stack,
                     default_schema,
+                    features,
                 );
             }
 
@@ -382,6 +399,7 @@ fn walk_items(
                     vec![parse_item(hash(&strct.ident))],
                     schema_stack,
                     default_schema,
+                    features,
                 );
 
                 let type_name = &strct.ident.to_string().to_lowercase();
@@ -634,6 +652,99 @@ fn walk_items(
     // and finally then operators
     all_sql.append(&mut operator_sql);
 }
+
+fn is_active(item: &syn::Item, features: &HashSet<String>) -> bool {
+    for attr in item_attrs(item) {
+        if !attr.path.is_ident("cfg") {
+            continue
+        }
+
+        let meta = match attr.parse_meta() {
+            Ok(syn::Meta::List(meta)) => meta,
+            _ => continue,
+        };
+
+        if !is_active_inner(meta.nested.iter(), features, true) {
+            return false
+        }
+
+        fn is_active_inner<'a>(
+            metas: impl Iterator<Item=&'a syn::NestedMeta>,
+            features: &HashSet<String>,
+            is_any: bool,
+        ) -> bool {
+            let mut active = !is_any;
+            for meta in metas {
+                let meta = match meta {
+                    syn::NestedMeta::Meta(meta) => meta,
+                    syn::NestedMeta::Lit(_) => return true,
+                };
+
+                match meta {
+                    // cannot tell, just continue
+                    syn::Meta::Path(_) => continue,
+                    syn::Meta::NameValue(inner) => {
+                        if !inner.path.is_ident("feature") {
+                            continue // cannot tell, just continue
+                        }
+                        match &inner.lit {
+                            syn::Lit::Str(s) => {
+                                match (features.contains(&*s.value()), is_any) {
+                                    (true, true) => active |= true,
+                                    (true, false) => active &= true,
+                                    (false, true) => active |= false,
+                                    (false, false) => active &= false,
+                                }
+                            }
+                            _ => continue,
+                        }
+
+                    }
+                    // if we find a list, there can only be one element
+                    syn::Meta::List(list) => {
+                        if list.path.is_ident("not") {
+                            return !is_active_inner(list.nested.iter(), features, is_any);
+                        }
+
+                        if list.path.is_ident("any") {
+                            return is_active_inner(list.nested.iter(), features, true);
+                        }
+
+                        if list.path.is_ident("all") {
+                            return is_active_inner(list.nested.iter(), features, false);
+                        }
+                    }
+                }
+            }
+            active
+        }
+    }
+    true
+}
+
+fn item_attrs(item: &syn::Item) -> impl Iterator<Item=&syn::Attribute> {
+    match item {
+        syn::Item::Const(i) => i.attrs.iter(),
+        syn::Item::Enum(i) => i.attrs.iter(),
+        syn::Item::ExternCrate(i) => i.attrs.iter(),
+        syn::Item::Fn(i) => i.attrs.iter(),
+        syn::Item::ForeignMod(i) => i.attrs.iter(),
+        syn::Item::Impl(i) => i.attrs.iter(),
+        syn::Item::Macro(i) => i.attrs.iter(),
+        syn::Item::Macro2(i) => i.attrs.iter(),
+        syn::Item::Mod(i) => i.attrs.iter(),
+        syn::Item::Static(i) => i.attrs.iter(),
+        syn::Item::Struct(i) => i.attrs.iter(),
+        syn::Item::Trait(i) => i.attrs.iter(),
+        syn::Item::TraitAlias(i) => i.attrs.iter(),
+        syn::Item::Type(i) => i.attrs.iter(),
+        syn::Item::Union(i) => i.attrs.iter(),
+        syn::Item::Use(i) => i.attrs.iter(),
+        _ => [].iter(),
+
+    }
+}
+
 
 fn qualify_name(schema: &str, name: &str) -> String {
     if "public" == schema {

@@ -10,6 +10,7 @@ use std::path::PathBuf;
 pub(crate) fn package_extension(
     pg_config: &PgConfig,
     is_debug: bool,
+    additional_features: Vec<&str>,
 ) -> Result<(), std::io::Error> {
     let base_path = build_base_path(pg_config, is_debug)?;
 
@@ -20,7 +21,7 @@ pub(crate) fn package_extension(
     if !base_path.exists() {
         std::fs::create_dir_all(&base_path)?;
     }
-    install_extension(pg_config, !is_debug, Some(base_path))
+    install_extension(pg_config, !is_debug, Some(base_path), additional_features)
 }
 
 fn build_base_path(pg_config: &PgConfig, is_debug: bool) -> Result<PathBuf, std::io::Error> {
