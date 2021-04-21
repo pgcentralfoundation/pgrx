@@ -3,8 +3,8 @@
 
 use pgx_utils::pg_config::PgConfig;
 use pgx_utils::{exit_with_error, get_target_dir, handle_result};
-use std::process::{Command, Stdio};
 use std::fmt::Write;
+use std::process::{Command, Stdio};
 
 pub fn test_extension(
     pg_config: &PgConfig,

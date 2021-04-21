@@ -35,4 +35,3 @@ where
 
 unsafe impl<T> Send for PgAtomic<T> where T: atomic_traits::Atomic + Default {}
 unsafe impl<T> Sync for PgAtomic<T> where T: atomic_traits::Atomic + Default {}
-

@@ -1,8 +1,8 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
+use pgx_utils::exit_with_error;
 use pgx_utils::pg_config::PgConfig;
-use pgx_utils::{exit_with_error};
 use std::process::Stdio;
 
 pub(crate) fn status_postgres(pg_config: &PgConfig) -> Result<bool, std::io::Error> {

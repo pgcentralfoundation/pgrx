@@ -243,7 +243,11 @@ fn parse_extern_args(att: &Attribute) -> BTreeSet<ExternArgs> {
         .collect()
 }
 
-fn generate_sql(rs_file: &DirEntry, default_schema: String, features: &HashSet<String>) -> Vec<String> {
+fn generate_sql(
+    rs_file: &DirEntry,
+    default_schema: String,
+    features: &HashSet<String>,
+) -> Vec<String> {
     let mut sql = Vec::new();
     let file = std::fs::read_to_string(rs_file.path()).unwrap();
     let ast = syn::parse_file(file.as_str()).unwrap();
@@ -282,13 +286,20 @@ fn walk_items(
         .clone();
     for item in items {
         if !is_active(&item, features) {
-            continue
+            continue;
         }
         if let Item::Mod(module) = item {
             module.attrs;
             if let Some((_, items)) = module.content {
                 schema_stack.push(module.ident.to_string());
-                walk_items(rs_file, &mut sql, items, schema_stack, default_schema, features);
+                walk_items(
+                    rs_file,
+                    &mut sql,
+                    items,
+                    schema_stack,
+                    default_schema,
+                    features,
+                );
                 schema_stack.pop();
             }
         } else if let Item::Struct(strct) = item {
@@ -656,7 +667,7 @@ fn walk_items(
 fn is_active(item: &syn::Item, features: &HashSet<String>) -> bool {
     for attr in item_attrs(item) {
         if !attr.path.is_ident("cfg") {
-            continue
+            continue;
         }
 
         let meta = match attr.parse_meta() {
@@ -665,11 +676,11 @@ fn is_active(item: &syn::Item, features: &HashSet<String>) -> bool {
         };
 
         if !is_active_inner(meta.nested.iter(), features, true) {
-            return false
+            return false;
         }
 
         fn is_active_inner<'a>(
-            metas: impl Iterator<Item=&'a syn::NestedMeta>,
+            metas: impl Iterator<Item = &'a syn::NestedMeta>,
             features: &HashSet<String>,
             is_any: bool,
         ) -> bool {
@@ -685,20 +696,17 @@ fn is_active(item: &syn::Item, features: &HashSet<String>) -> bool {
                     syn::Meta::Path(_) => continue,
                     syn::Meta::NameValue(inner) => {
                         if !inner.path.is_ident("feature") {
-                            continue // cannot tell, just continue
+                            continue; // cannot tell, just continue
                         }
                         match &inner.lit {
-                            syn::Lit::Str(s) => {
-                                match (features.contains(&*s.value()), is_any) {
-                                    (true, true) => active |= true,
-                                    (true, false) => active &= true,
-                                    (false, true) => active |= false,
-                                    (false, false) => active &= false,
-                                }
-                            }
+                            syn::Lit::Str(s) => match (features.contains(&*s.value()), is_any) {
+                                (true, true) => active |= true,
+                                (true, false) => active &= true,
+                                (false, true) => active |= false,
+                                (false, false) => active &= false,
+                            },
                             _ => continue,
                         }
-
                     }
                     // if we find a list, there can only be one element
                     syn::Meta::List(list) => {
@@ -722,7 +730,7 @@ fn is_active(item: &syn::Item, features: &HashSet<String>) -> bool {
     true
 }
 
-fn item_attrs(item: &syn::Item) -> impl Iterator<Item=&syn::Attribute> {
+fn item_attrs(item: &syn::Item) -> impl Iterator<Item = &syn::Attribute> {
     match item {
         syn::Item::Const(i) => i.attrs.iter(),
         syn::Item::Enum(i) => i.attrs.iter(),
@@ -741,10 +749,8 @@ fn item_attrs(item: &syn::Item) -> impl Iterator<Item=&syn::Attribute> {
         syn::Item::Union(i) => i.attrs.iter(),
         syn::Item::Use(i) => i.attrs.iter(),
         _ => [].iter(),
-
     }
 }
-
 
 fn qualify_name(schema: &str, name: &str) -> String {
     if "public" == schema {
@@ -887,7 +893,8 @@ fn make_create_function_statement(
             custom_schema.as_ref().map(|s| &**s).unwrap_or(schema),
             &sql_func_name
         ),
-    statement);
+        statement
+    );
 
     let mut search_path = String::new();
     for arg in funcargs {
@@ -1325,12 +1332,12 @@ fn translate_type_string(
             };
             let parts: Vec<_> = unknown.split("::").collect();
             if parts.len() == 1 {
-                return Some((unknown.trim().to_string(), false, default_value, variadic))
+                return Some((unknown.trim().to_string(), false, default_value, variadic));
             }
 
-            let (schema, name) = (parts[parts.len()-2], parts[parts.len()-1]);
+            let (schema, name) = (parts[parts.len() - 2], parts[parts.len() - 1]);
             let qualified_name = format!("{}.{}", schema.trim(), name.trim());
-            return Some((qualified_name.to_string(), false, default_value, variadic))
+            return Some((qualified_name.to_string(), false, default_value, variadic));
         }
     }
 }

@@ -1,7 +1,6 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-
 use crate::{
     direct_function_call, direct_function_call_as_datum, pg_sys, pg_try, void_mut_ptr, FromDatum,
     IntoDatum,

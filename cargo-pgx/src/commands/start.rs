@@ -3,8 +3,8 @@
 
 use crate::commands::status::status_postgres;
 use colored::Colorize;
+use pgx_utils::exit_with_error;
 use pgx_utils::pg_config::{PgConfig, Pgx};
-use pgx_utils::{exit_with_error};
 use std::os::unix::process::CommandExt;
 use std::path::PathBuf;
 use std::process::Stdio;

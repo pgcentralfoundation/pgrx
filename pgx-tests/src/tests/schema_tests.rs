@@ -2,7 +2,6 @@
 // governed by the MIT license that can be found in the LICENSE file.
 use pgx::*;
 
-
 mod test_schema {
     use pgx::*;
     use serde::{Deserialize, Serialize};
@@ -14,7 +13,7 @@ mod test_schema {
     pub struct TestType(pub u64);
 }
 
-#[pg_extern(schema="test_schema")]
+#[pg_extern(schema = "test_schema")]
 fn func_in_diff_schema2() {}
 
 #[pg_extern]

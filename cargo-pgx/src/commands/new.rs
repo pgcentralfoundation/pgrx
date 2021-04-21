@@ -101,4 +101,3 @@ fn create_git_ignore(path: &PathBuf, _name: &str) -> Result<(), std::io::Error> 
 
     Ok(())
 }
-

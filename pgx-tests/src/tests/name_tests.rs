@@ -1,6 +1,6 @@
 use pgx::*;
 
-#[pg_extern(name="renamed_func")]
+#[pg_extern(name = "renamed_func")]
 fn func_to_rename() {}
 
 #[cfg(any(test, feature = "pg_test"))]

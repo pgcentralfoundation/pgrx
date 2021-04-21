@@ -51,7 +51,10 @@ pub(crate) fn install_extension(
     }
 
     {
-        handle_result!(crate::generate_schema(&*additional_features), "failed to generate SQL schema");
+        handle_result!(
+            crate::generate_schema(&*additional_features),
+            "failed to generate SQL schema"
+        );
     }
 
     copy_sql_files(&extdir, &extname, &base_directory);
@@ -84,8 +87,9 @@ fn copy_file(src: PathBuf, dest: PathBuf, msg: &str) {
     );
 }
 
-fn build_extension(major_version: u16, is_release: bool, additional_features: &[&str],) {
-    let mut features = std::env::var("PGX_BUILD_FEATURES").unwrap_or(format!("pg{}", major_version));
+fn build_extension(major_version: u16, is_release: bool, additional_features: &[&str]) {
+    let mut features =
+        std::env::var("PGX_BUILD_FEATURES").unwrap_or(format!("pg{}", major_version));
     let flags = std::env::var("PGX_BUILD_FLAGS").unwrap_or_default();
     if !additional_features.is_empty() {
         use std::fmt::Write;
