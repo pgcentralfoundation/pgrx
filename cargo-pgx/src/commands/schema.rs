@@ -390,7 +390,7 @@ fn walk_items(
                     type_name
                 ));
                 operator_sql.push(format!(
-                    "CREATE OPERATOR CLASS {type_name}_hash_ops DEFAULT FOR TYPE {type_name} USING hash FAMILY {type_name}_hash_ops AS 
+                    "CREATE OPERATOR CLASS {type_name}_hash_ops DEFAULT FOR TYPE {type_name} USING hash FAMILY {type_name}_hash_ops AS
                         OPERATOR    1   =  ({type_name}, {type_name}),
                         FUNCTION    1   {type_name}_hash({type_name});",
                     type_name = type_name
@@ -406,7 +406,7 @@ fn walk_items(
                     type_name
                 ));
                 operator_sql.push(format!(
-                    "CREATE OPERATOR CLASS {type_name}_btree_ops DEFAULT FOR TYPE {type_name} USING btree FAMILY {type_name}_btree_ops AS 
+                    "CREATE OPERATOR CLASS {type_name}_btree_ops DEFAULT FOR TYPE {type_name} USING btree FAMILY {type_name}_btree_ops AS
                       OPERATOR 1 < ,
                       OPERATOR 2 <= ,
                       OPERATOR 3 = ,
@@ -653,17 +653,14 @@ fn make_create_function_statement(
     funcargs: &Vec<FunctionArgs>,
 ) -> (Option<String>, Option<String>, Option<Vec<String>>) {
     let exported_func_name = format!("{}_wrapper", func.sig.ident.to_string());
-    let mut statement = String::new();
+
     let has_option_arg = func_args_have_option(func, rs_file);
     let attributes = collect_attributes(rs_file, &func.sig.ident, &func.attrs);
-    let sql_func_name =
+    let mut sql_func_name =
         extract_funcname_attribute(&attributes).unwrap_or_else(|| quote_ident(&func.sig.ident));
     let mut sql_argument_type_names = Vec::new();
 
-    statement.push_str(&format!(
-        "CREATE OR REPLACE FUNCTION {}",
-        qualify_name(schema, &sql_func_name)
-    ));
+    let mut statement = String::new();
 
     if let Some(sql_func_arg) = sql_func_arg {
         statement.push_str(sql_func_arg.as_str());
@@ -752,6 +749,7 @@ fn make_create_function_statement(
         ),
     }
 
+    let mut custom_schema = None;
     // modifiers
     if let Some(extern_args) = extern_args {
         for extern_arg in extern_args {
@@ -766,9 +764,19 @@ fn make_create_function_statement(
                 ExternArgs::ParallelRestricted => statement.push_str(" PARALLEL RESTRICTED"),
                 ExternArgs::Error(_) => { /* noop */ }
                 ExternArgs::NoGuard => {}
+                ExternArgs::Schema(s) => custom_schema = Some(s),
+                ExternArgs::Name(n) => sql_func_name = n,
             }
         }
     }
+
+    statement = format!(
+        "CREATE OR REPLACE FUNCTION {}{}",
+        qualify_name(
+            custom_schema.as_ref().map(|s| &**s).unwrap_or(schema),
+            &sql_func_name
+        ),
+    statement);
 
     let mut search_path = String::new();
     for arg in funcargs {
@@ -1204,7 +1212,14 @@ fn translate_type_string(
                 Some(idx) => unknown[0..idx].trim(),
                 None => unknown,
             };
-            Some((unknown.trim().to_string(), false, default_value, variadic))
+            let parts: Vec<_> = unknown.split("::").collect();
+            if parts.len() == 1 {
+                return Some((unknown.trim().to_string(), false, default_value, variadic))
+            }
+
+            let (schema, name) = (parts[parts.len()-2], parts[parts.len()-1]);
+            let qualified_name = format!("{}.{}", schema.trim(), name.trim());
+            return Some((qualified_name.to_string(), false, default_value, variadic))
         }
     }
 }

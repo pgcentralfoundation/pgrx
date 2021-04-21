@@ -194,6 +194,8 @@ pub enum ExternArgs {
     ParallelUnsafe,
     ParallelRestricted,
     Error(String),
+    Schema(String),
+    Name(String),
 }
 
 #[derive(Debug, Hash, Ord, PartialOrd, Eq, PartialEq)]
@@ -240,6 +242,26 @@ pub fn parse_extern_attributes(attr: TokenStream) -> HashSet<ExternArgs> {
                         // trim leading/trailing quotes around the literal
                         let message = message[1..message.len() - 1].to_string();
                         args.insert(ExternArgs::Error(message.to_string()))
+                    }
+                    "schema" => {
+                        let _punc = itr.next().unwrap();
+                        let literal = itr.next().unwrap();
+                        let schema = literal.to_string();
+                        let schema = unescape::unescape(&schema).expect("failed to unescape");
+
+                        // trim leading/trailing quotes around the literal
+                        let schema = schema[1..schema.len() - 1].to_string();
+                        args.insert(ExternArgs::Schema(schema.to_string()))
+                    }
+                    "name" => {
+                        let _punc = itr.next().unwrap();
+                        let literal = itr.next().unwrap();
+                        let name = literal.to_string();
+                        let name = unescape::unescape(&name).expect("failed to unescape");
+
+                        // trim leading/trailing quotes around the literal
+                        let name = name[1..name.len() - 1].to_string();
+                        args.insert(ExternArgs::Name(name.to_string()))
                     }
                     _ => false,
                 };
