@@ -11,6 +11,7 @@ use rttp_client::{types::Proxy, HttpClient};
 use std::fs::File;
 use std::io::Write;
 use std::path::PathBuf;
+use std::process::Stdio;
 
 use std::sync::{Arc, Mutex};
 
@@ -69,10 +70,17 @@ pub(crate) fn init_pgx(pgx: &Pgx) -> std::result::Result<(), std::io::Error> {
             )
     });
     for pg_config in output_configs.iter() {
-        validate_pg_config(pg_config)?
+        validate_pg_config(pg_config)?;
+
+        let datadir = pg_config.data_dir()?;
+        let bindir = pg_config.bin_dir()?;
+        if !datadir.exists() {
+            initdb(&bindir, &datadir)?;
+        }
     }
 
-    write_config(output_configs)
+    write_config(output_configs)?;
+    Ok(())
 }
 
 fn download_postgres(pg_config: &PgConfig, pgxdir: &PathBuf) -> Result<PgConfig, std::io::Error> {
@@ -318,4 +326,31 @@ fn get_pg_installdir(pgdir: &PathBuf) -> PathBuf {
     let mut dir = PathBuf::from(pgdir);
     dir.push("pgx-install");
     dir
+}
+
+pub(crate) fn initdb(bindir: &PathBuf, datadir: &PathBuf) -> Result<(), std::io::Error> {
+    println!(
+        " {} data directory at {}",
+        "Initializing".bold().green(),
+        datadir.display()
+    );
+    let mut command = std::process::Command::new(format!("{}/initdb", bindir.display()));
+    command
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .arg("-D")
+        .arg(&datadir);
+
+    let command_str = format!("{:?}", command);
+    let output = command.output()?;
+
+    if !output.status.success() {
+        exit_with_error!(
+            "problem running initdb: {}\n{}",
+            command_str,
+            String::from_utf8(output.stderr).unwrap()
+        )
+    }
+
+    Ok(())
 }
