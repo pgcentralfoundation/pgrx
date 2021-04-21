@@ -182,6 +182,9 @@ FLAGS:
     -r, --release    compile for release mode (default is debug)
     -V, --version    Prints version information
 
+OPTIONS:
+        --features <features>...    additional cargo features to activate (default is '--no-default-features')
+
 ARGS:
     <PG_VERSION>    Do you want to run against Postgres 'pg10', 'pg11', 'pg12', 'pg13'?
     <DBNAME>        The database to connect to (and create if the first time).  Defaults to a database with the same
@@ -242,6 +245,9 @@ $ cargo pgx install --help
       -h, --help       Prints help information
       -r, --release    compile for release mode (default is debug)
       -V, --version    Prints version information
+
+OPTIONS:
+        --features <features>...    additional cargo features to activate (default is '--no-default-features')
 ```
 
 ## Testing Your Extension
@@ -271,6 +277,9 @@ FLAGS:
     -h, --help       Prints help information
     -r, --release    compile for release mode (default is debug)
     -V, --version    Prints version information
+
+OPTIONS:
+        --features <features>...    additional cargo features to activate (default is '--no-default-features')
 
 ARGS:
     <PG_VERSION>    Do you want to test for Postgres 'pg10', 'pg11', 'pg12', 'pg13', or 'all' (default)?
@@ -308,6 +317,9 @@ $ cargo pgx package --help
      -d, --debug      compile for debug mode (default is release)
      -h, --help       Prints help information
      -V, --version    Prints version information
+
+OPTIONS:
+        --features <features>...    additional cargo features to activate (default is '--no-default-features')
 ```
 
 ## Dump Your Extension Schema
@@ -328,6 +340,9 @@ USAGE:
 FLAGS:
     -h, --help       Prints help information
     -V, --version    Prints version information
+
+OPTIONS:
+        --features <features>...    additional cargo features to activate (default is '--no-default-features')
 
 ARGS:
     <DIRECTORY>    Where should the extension .sql file be written?
