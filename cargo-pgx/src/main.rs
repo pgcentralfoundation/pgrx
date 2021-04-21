@@ -58,20 +58,22 @@ fn do_it() -> std::result::Result<(), std::io::Error> {
                     init_pgx(&Pgx::default(SUPPORTED_MAJOR_VERSIONS)?)
                 } else {
                     // user specified arguments, so we'll only install those versions of Postgres
-                    let default_pgx = Pgx::default(SUPPORTED_MAJOR_VERSIONS)?;
+                    let mut default_pgx = None;
                     let mut pgx = Pgx::new();
 
-                    for pg_config in versions.into_iter().map(|(pgver, pg_config_path)| {
-                        if pg_config_path == "download" {
-                            default_pgx
+                    for (pgver, pg_config_path) in versions {
+                        let config = if pg_config_path == "download" {
+                            if default_pgx.is_none() {
+                                default_pgx = Some(Pgx::default(SUPPORTED_MAJOR_VERSIONS)?);
+                            }
+                            default_pgx.as_ref().unwrap() // We just set this
                                 .get(&pgver)
                                 .expect(&format!("{} is not a known Postgres version", pgver))
                                 .clone()
                         } else {
                             PgConfig::new(pg_config_path.into())
-                        }
-                    }) {
-                        pgx.push(pg_config);
+                        };
+                        pgx.push(config);
                     }
 
                     init_pgx(&pgx)
