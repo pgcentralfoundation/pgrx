@@ -72,7 +72,7 @@ pub fn run_test(
             result
         }
 
-        Err(e) => panic!(e),
+        Err(e) => panic!("{}", e),
     };
 
     if let Err(e) = result {
@@ -125,10 +125,10 @@ pub fn run_test(
                     );
                 }
             } else {
-                panic!(e)
+                panic!("{}", e)
             }
         } else {
-            panic!(format!("{}", error_as_string.bold().red()))
+            panic!("{}", error_as_string.bold().red())
         }
     } else if let Some(expected_error_message) = expected_error {
         // we expected an ERROR, but didn't get one
@@ -401,7 +401,7 @@ fn monitor_pg(mut command: Command, cmd_string: String, loglines: LogLines) -> (
                     let session_lines = loglines.entry(session_id).or_insert_with(Vec::new);
                     session_lines.push(line);
                 }
-                Err(e) => panic!(e),
+                Err(e) => panic!("{}", e),
             }
         }
 
@@ -412,7 +412,7 @@ fn monitor_pg(mut command: Command, cmd_string: String, loglines: LogLines) -> (
                     // we exited normally
                 }
             }
-            Err(e) => panic!(e),
+            Err(e) => panic!("{}", e),
         }
     });
 

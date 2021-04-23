@@ -255,7 +255,7 @@ impl Spi {
             }
 
             // closure returned an error
-            Err(e) => panic!(e),
+            Err(e) => panic!("{:?}", e),
         }
     }
 
@@ -269,7 +269,7 @@ impl Spi {
         } else {
             let status_enum = SpiError::from_i32(-status_code);
             match status_enum {
-                Some(e) => panic!(e),
+                Some(e) => panic!("{:?}", e),
                 None => panic!("unrecognized SPI status code {}", status_code),
             }
         }

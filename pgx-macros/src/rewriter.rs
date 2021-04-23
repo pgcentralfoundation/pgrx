@@ -528,7 +528,7 @@ impl PgGuardRewriter {
                 } else {
                     pg_sys::PG_exception_stack = prev_exception_stack;
                     pg_sys::error_context_stack = prev_error_context_stack;
-                    panic!(pg_sys::JumpContext { });
+                    std::panic::panic_any(pg_sys::JumpContext { });
                 };
 
                 pg_sys::PG_exception_stack = prev_exception_stack;
