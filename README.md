@@ -139,9 +139,9 @@ Next, `pgx` needs to be initialized.  You only need to do this once.
 $ cargo pgx init
 ```
 
-The `init` command downloads Postgres versions v10, v11, v12, v13 and compiles them to `~/.pgx/`.  These installations
-are needed by `pgx` not only for auto-generating Rust bindings from each version's header files, but also for `pgx`'s
-test framework.
+The `init` command downloads Postgres versions v10, v11, v12, v13, compiles them to `~/.pgx/`, and runs `initdb`.
+These installations are needed by `pgx` not only for auto-generating Rust bindings from each version's header files,
+but also for `pgx`'s test framework.
 
 See the documentation for [`cargo-pgx`](cargo-pgx/README.md) for details on how to limit the required postgres versions.
 

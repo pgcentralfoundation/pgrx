@@ -1,6 +1,7 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
+use crate::commands::init::initdb;
 use crate::commands::status::status_postgres;
 use colored::Colorize;
 use pgx_utils::exit_with_error;
@@ -62,33 +63,6 @@ pub(crate) fn start_postgres(pg_config: &PgConfig) -> Result<(), std::io::Error>
     if !output.status.success() {
         exit_with_error!(
             "problem running pg_ctl: {}\n\n{}",
-            command_str,
-            String::from_utf8(output.stderr).unwrap()
-        )
-    }
-
-    Ok(())
-}
-
-fn initdb(bindir: &PathBuf, datadir: &PathBuf) -> Result<(), std::io::Error> {
-    println!(
-        " {} data directory at {}",
-        "Initializing".bold().green(),
-        datadir.display()
-    );
-    let mut command = std::process::Command::new(format!("{}/initdb", bindir.display()));
-    command
-        .stdout(Stdio::piped())
-        .stderr(Stdio::piped())
-        .arg("-D")
-        .arg(&datadir);
-
-    let command_str = format!("{:?}", command);
-    let output = command.output()?;
-
-    if !output.status.success() {
-        exit_with_error!(
-            "problem running initdb: {}\n{}",
             command_str,
             String::from_utf8(output.stderr).unwrap()
         )
