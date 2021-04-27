@@ -32,7 +32,7 @@ libc = "0.2.89"
 pgx = { path = "../pgx", default-features = false, version= "0.1.20"}
 pgx-macros = { path = "../pgx-macros", version= "0.1.20"}
 pgx-utils = { path = "../pgx-utils", version= "0.1.20"}
-postgres = "0.19.0"
+postgres = "0.19.1"
 regex = "1.4.5"
 serde = "1.0.124"
 serde_json = "1.0.64"
