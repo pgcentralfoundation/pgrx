@@ -18,7 +18,7 @@ pg13 = ["pgx/pg13", "pgx-tests/pg13" ]
 pg_test = []
 
 [dependencies]
-heapless = "0.5.6"
+heapless = "0.6.1"
 pgx = { path = "../../../pgx/pgx/", default-features = false }
 pgx-macros = { path = "../../../pgx/pgx-macros" }
 serde = { version = "1.0.114", features = [ "derive" ] }

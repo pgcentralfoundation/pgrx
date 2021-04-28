@@ -7,7 +7,6 @@ use colored::Colorize;
 use pgx_utils::exit_with_error;
 use pgx_utils::pg_config::{PgConfig, Pgx};
 use std::os::unix::process::CommandExt;
-use std::path::PathBuf;
 use std::process::Stdio;
 
 pub(crate) fn start_postgres(pg_config: &PgConfig) -> Result<(), std::io::Error> {

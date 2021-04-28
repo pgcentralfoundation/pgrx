@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /usr/bin/env bash
 
 # requires:  "cargo install cargo-edit" from https://github.com/killercup/cargo-edit
 cargo update
