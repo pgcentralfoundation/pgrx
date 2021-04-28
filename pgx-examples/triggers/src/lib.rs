@@ -61,6 +61,16 @@ INSERT INTO test (title, description, payload) VALUES ('the title', 'a descripti
 "#
 );
 
+#[cfg(any(test, feature = "pg_test"))]
+mod tests {
+    use pgx::*;
+
+    #[pg_test]
+    fn test_uuid_set() {
+        // Nothing
+    }
+}
+
 #[cfg(test)]
 pub mod pg_test {
     pub fn setup(_options: Vec<&str>) {
