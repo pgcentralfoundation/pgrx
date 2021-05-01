@@ -50,7 +50,7 @@
             nixpkgs-fmt
             cargo-pgx
           ];
-          LIBCLANG_PATH="${pkgs.llvmPackages.libclang}/lib";
+          LIBCLANG_PATH = "${pkgs.llvmPackages.libclang}/lib";
         });
 
       checks = forAllSystems (system:

@@ -30,10 +30,12 @@ pub fn lookup_enum_by_oid(enumval: pg_sys::Oid) -> (String, pg_sys::Oid, f32) {
     let en = unsafe { pgx_GETSTRUCT(tup) } as pg_sys::Form_pg_enum;
     let en = unsafe { en.as_ref() }.unwrap();
     let result = (
-        unsafe { std::ffi::CStr::from_ptr(en.enumlabel.data.as_ptr() as *const std::os::raw::c_char) }
-            .to_str()
-            .unwrap()
-            .to_string(),
+        unsafe {
+            std::ffi::CStr::from_ptr(en.enumlabel.data.as_ptr() as *const std::os::raw::c_char)
+        }
+        .to_str()
+        .unwrap()
+        .to_string(),
         en.enumtypid,
         en.enumsortorder as f32,
     );
