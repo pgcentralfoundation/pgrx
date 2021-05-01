@@ -464,12 +464,12 @@ fn run_bindgen(
         .header(include_h.display().to_string())
         .clang_arg(&format!("-I{}", includedir_server.display()))
         .parse_callbacks(Box::new(IgnoredMacros::default()))
-        .blacklist_function("varsize_any") // pgx converts the VARSIZE_ANY macro, so we don't want to also have this function, which is in heaptuple.c
-        .blacklist_function("query_tree_walker")
-        .blacklist_function("expression_tree_walker")
-        .blacklist_function("sigsetjmp")
-        .blacklist_function("siglongjmp")
-        .blacklist_function("pg_re_throw")
+        .blocklist_function("varsize_any") // pgx converts the VARSIZE_ANY macro, so we don't want to also have this function, which is in heaptuple.c
+        .blocklist_function("query_tree_walker")
+        .blocklist_function("expression_tree_walker")
+        .blocklist_function("sigsetjmp")
+        .blocklist_function("siglongjmp")
+        .blocklist_function("pg_re_throw")
         .size_t_is_usize(true)
         .rustfmt_bindings(false)
         .derive_debug(true)

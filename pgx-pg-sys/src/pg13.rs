@@ -332,7 +332,7 @@ pub const PG_MINORVERSION_NUM: u32 = 2;
 pub const PG_USE_STDBOOL: u32 = 1;
 pub const PG_VERSION: &'static [u8; 5usize] = b"13.2\0";
 pub const PG_VERSION_NUM: u32 = 130002;
-pub const PG_VERSION_STR : & 'static [u8 ; 114usize] = b"PostgreSQL 13.2 on x86_64-apple-darwin20.3.0, compiled by Apple clang version 12.0.0 (clang-1200.0.32.29), 64-bit\0" ;
+pub const PG_VERSION_STR : & 'static [u8 ; 113usize] = b"PostgreSQL 13.2 on x86_64-apple-darwin20.3.0, compiled by Apple clang version 12.0.5 (clang-1205.0.22.9), 64-bit\0" ;
 pub const RELSEG_SIZE: u32 = 131072;
 pub const SIZEOF_BOOL: u32 = 1;
 pub const SIZEOF_LONG: u32 = 8;
@@ -3405,7 +3405,6 @@ pub type __darwin_ct_rune_t = ::std::os::raw::c_int;
 pub union __mbstate_t {
     pub __mbstate8: [::std::os::raw::c_char; 128usize],
     pub _mbstateL: ::std::os::raw::c_longlong,
-    _bindgen_union_align: [u64; 16usize],
 }
 impl Default for __mbstate_t {
     fn default() -> Self {
@@ -5437,7 +5436,6 @@ pub type uid_t = __darwin_uid_t;
 pub union sigval {
     pub sival_int: ::std::os::raw::c_int,
     pub sival_ptr: *mut ::std::os::raw::c_void,
-    _bindgen_union_align: u64,
 }
 impl Default for sigval {
     fn default() -> Self {
@@ -5489,7 +5487,6 @@ pub union __sigaction_u {
             arg3: *mut ::std::os::raw::c_void,
         ),
     >,
-    _bindgen_union_align: u64,
 }
 impl Default for __sigaction_u {
     fn default() -> Self {
@@ -5836,7 +5833,6 @@ pub union wait {
     pub w_status: ::std::os::raw::c_int,
     pub w_T: wait__bindgen_ty_1,
     pub w_S: wait__bindgen_ty_2,
-    _bindgen_union_align: u32,
 }
 #[repr(C)]
 #[repr(align(4))]
@@ -7343,7 +7339,6 @@ pub union PGAlignedBlock {
     pub data: [::std::os::raw::c_char; 8192usize],
     pub force_align_d: f64,
     pub force_align_i64: int64,
-    _bindgen_union_align: [u64; 1024usize],
 }
 impl Default for PGAlignedBlock {
     fn default() -> Self {
@@ -7356,7 +7351,6 @@ pub union PGAlignedXLogBlock {
     pub data: [::std::os::raw::c_char; 8192usize],
     pub force_align_d: f64,
     pub force_align_i64: int64,
-    _bindgen_union_align: [u64; 1024usize],
 }
 impl Default for PGAlignedXLogBlock {
     fn default() -> Self {
@@ -7909,7 +7903,6 @@ pub union in6_addr__bindgen_ty_1 {
     pub __u6_addr8: [__uint8_t; 16usize],
     pub __u6_addr16: [__uint16_t; 8usize],
     pub __u6_addr32: [__uint32_t; 4usize],
-    _bindgen_union_align: [u32; 4usize],
 }
 impl Default for in6_addr__bindgen_ty_1 {
     fn default() -> Self {
@@ -11037,7 +11030,6 @@ pub union ListCell {
     pub ptr_value: *mut ::std::os::raw::c_void,
     pub int_value: ::std::os::raw::c_int,
     pub oid_value: Oid,
-    _bindgen_union_align: u64,
 }
 impl Default for ListCell {
     fn default() -> Self {
@@ -12185,7 +12177,6 @@ pub struct HeapTupleFields {
 pub union HeapTupleFields__bindgen_ty_1 {
     pub t_cid: CommandId,
     pub t_xvac: TransactionId,
-    _bindgen_union_align: u32,
 }
 impl Default for HeapTupleFields__bindgen_ty_1 {
     fn default() -> Self {
@@ -12218,7 +12209,6 @@ pub struct HeapTupleHeaderData {
 pub union HeapTupleHeaderData__bindgen_ty_1 {
     pub t_heap: HeapTupleFields,
     pub t_datum: DatumTupleFields,
-    _bindgen_union_align: [u32; 3usize],
 }
 impl Default for HeapTupleHeaderData__bindgen_ty_1 {
     fn default() -> Self {
@@ -19690,7 +19680,6 @@ pub struct Value {
 pub union Value_ValUnion {
     pub ival: ::std::os::raw::c_int,
     pub str_: *mut ::std::os::raw::c_char,
-    _bindgen_union_align: u64,
 }
 impl Default for Value_ValUnion {
     fn default() -> Self {
@@ -25327,7 +25316,6 @@ pub struct LWLock {
 pub union LWLockPadded {
     pub lock: LWLock,
     pub pad: [::std::os::raw::c_char; 128usize],
-    _bindgen_union_align: [u32; 32usize],
 }
 impl Default for LWLockPadded {
     fn default() -> Self {
@@ -25339,7 +25327,6 @@ impl Default for LWLockPadded {
 pub union LWLockMinimallyPadded {
     pub lock: LWLock,
     pub pad: [::std::os::raw::c_char; 32usize],
-    _bindgen_union_align: [u32; 8usize],
 }
 impl Default for LWLockMinimallyPadded {
     fn default() -> Self {
@@ -26723,7 +26710,6 @@ pub union PgStat_Msg {
     pub msg_deadlock: PgStat_MsgDeadlock,
     pub msg_tempfile: PgStat_MsgTempFile,
     pub msg_checksumfailure: PgStat_MsgChecksumFailure,
-    _bindgen_union_align: [u64; 125usize],
 }
 impl Default for PgStat_Msg {
     fn default() -> Self {
@@ -28918,7 +28904,6 @@ impl Default for ExpandedArrayHeader {
 pub union AnyArrayType {
     pub flt: ArrayType,
     pub xpn: ExpandedArrayHeader,
-    _bindgen_union_align: [u64; 17usize],
 }
 impl Default for AnyArrayType {
     fn default() -> Self {
@@ -31405,7 +31390,6 @@ pub union relopt_value__bindgen_ty_1 {
     pub real_val: f64,
     pub enum_val: ::std::os::raw::c_int,
     pub string_val: *mut ::std::os::raw::c_char,
-    _bindgen_union_align: u64,
 }
 impl Default for relopt_value__bindgen_ty_1 {
     fn default() -> Self {
@@ -31804,7 +31788,6 @@ pub union SharedInvalidationMessage {
     pub sm: SharedInvalSmgrMsg,
     pub rm: SharedInvalRelmapMsg,
     pub sn: SharedInvalSnapshotMsg,
-    _bindgen_union_align: [u32; 4usize],
 }
 impl Default for SharedInvalidationMessage {
     fn default() -> Self {
@@ -34750,7 +34733,6 @@ pub union CollectedCommand__bindgen_ty_1 {
     pub createopc: CollectedCommand__bindgen_ty_1__bindgen_ty_5,
     pub atscfg: CollectedCommand__bindgen_ty_1__bindgen_ty_6,
     pub defprivs: CollectedCommand__bindgen_ty_1__bindgen_ty_7,
-    _bindgen_union_align: [u64; 4usize],
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
@@ -42156,7 +42138,6 @@ pub union ReorderBufferChange__bindgen_ty_1 {
     pub snapshot: Snapshot,
     pub command_id: CommandId,
     pub tuplecid: ReorderBufferChange__bindgen_ty_1__bindgen_ty_4,
-    _bindgen_union_align: [u64; 4usize],
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -54971,7 +54952,6 @@ pub union JsonbValue__bindgen_ty_1 {
     pub object: JsonbValue__bindgen_ty_1__bindgen_ty_3,
     pub binary: JsonbValue__bindgen_ty_1__bindgen_ty_4,
     pub datetime: JsonbValue__bindgen_ty_1__bindgen_ty_5,
-    _bindgen_union_align: [u64; 3usize],
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]

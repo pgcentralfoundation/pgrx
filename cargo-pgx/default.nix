@@ -2,12 +2,12 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "cargo-pgx";
-  version = "0.1.20";
+  version = "0.1.21";
 
   src = ../.;
 
   #cargoSha256 = lib.fakeSha256;
-  cargoSha256 = "l/IJ8IjXPoPVnIJojA4i9wLtSqfWHT5OqpdvyK11OAg=";
+  cargoSha256 = "hKpqdvPEyBnfcjA98wQWgJyEZEf3eaaEi99nB/e7+ck=";
   cargoBuildFlags = [ "--package" "cargo-pgx" ];
   cargoCheckFlags = [ "--package" "cargo-pgx" ];
   cargoTestFlags = [ "--package" "cargo-pgx" ];
@@ -37,7 +37,7 @@ rustPlatform.buildRustPackage rec {
     openssl
   ];
 
-  LIBCLANG_PATH="${llvmPackages.libclang}/lib";
+  LIBCLANG_PATH = "${llvmPackages.libclang}/lib";
 
   meta = with lib; {
     description = "Build PostgreSQL extensions with Rust.";

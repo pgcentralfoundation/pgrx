@@ -26,7 +26,7 @@ macro_rules! exit_with_error {
     ($msg:expr,) => ({ exit_with_error!($msg) });
     ($fmt:expr, $($arg:tt)+) => ({
         use colored::Colorize;
-        eprint!("{} ", "     [error]".bold().red());
+        eprint!("{} ", "      [error]".bold().red());
         eprintln!($fmt, $($arg)+);
         std::process::exit(1);
     });
@@ -102,7 +102,7 @@ pub fn createdb(
         return Ok(false);
     }
 
-    println!("{} database {}", "    Creating".bold().green(), dbname);
+    println!("{} database {}", "     Creating".bold().green(), dbname);
     let mut command = Command::new(pg_config.createdb_path()?);
     command
         .env_remove("PGDATABASE")
