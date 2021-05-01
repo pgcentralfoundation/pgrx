@@ -25,7 +25,7 @@ pub(crate) fn start_postgres(pg_config: &PgConfig) -> Result<(), std::io::Error>
 
     println!(
         "{} Postgres v{} on port {}",
-        "    Starting".bold().green(),
+        "     Starting".bold().green(),
         pg_config.major_version()?,
         port.to_string().bold().cyan()
     );
