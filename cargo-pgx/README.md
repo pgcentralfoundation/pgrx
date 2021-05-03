@@ -248,6 +248,7 @@ $ cargo pgx install --help
 
 OPTIONS:
         --features <features>...    additional cargo features to activate (default is '--no-default-features')
+    -c, --pg_config <pg_config>     the `pg_config` path (default is first in $PATH)
 ```
 
 ## Testing Your Extension
@@ -319,7 +320,8 @@ $ cargo pgx package --help
      -V, --version    Prints version information
 
 OPTIONS:
-        --features <features>...    additional cargo features to activate (default is '--no-default-features')
+        --features <features>...        additional cargo features to activate (default is '--no-default-features')
+        -c, --pg_config <pg_config>     the `pg_config` path (default is first in $PATH)
 ```
 
 ## Dump Your Extension Schema
