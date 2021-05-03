@@ -7,7 +7,7 @@ rustPlatform.buildRustPackage rec {
   src = ../.;
 
   #cargoSha256 = lib.fakeSha256;
-  cargoSha256 = "hKpqdvPEyBnfcjA98wQWgJyEZEf3eaaEi99nB/e7+ck=";
+  cargoSha256 = "sKfjOcuCa2QvqERSrNry1RTUTaZIXudON3Ky1UWp89w=";
   cargoBuildFlags = [ "--package" "cargo-pgx" ];
   cargoCheckFlags = [ "--package" "cargo-pgx" ];
   cargoTestFlags = [ "--package" "cargo-pgx" ];
