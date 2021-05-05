@@ -103,35 +103,37 @@ fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
             format!("unable to generate oids for pg{}", major_version)
         );
 
-        let mut bindings_file = out_dir.clone();
-        bindings_file.push(&format!("pg{}.rs", major_version));
-        handle_result!(
-            write_rs_file(
-                rewritten_items,
-                &bindings_file,
-                quote! {
-                    use crate as pg_sys;
-                    use pgx_macros::*;
-                    use crate::PgNode;
-                }
-            ),
-            format!(
-                "Unable to write bindings file for pg{} to `{}`",
-                major_version,
-                bindings_file.display()
-            )
-        );
+        if std::env::var("PGX_PG_SYS_SKIP_BINDING_REWRITE").unwrap_or("false".into()) != "1" {
+            let mut bindings_file = out_dir.clone();
+            bindings_file.push(&format!("pg{}.rs", major_version));
+            handle_result!(
+                write_rs_file(
+                    rewritten_items,
+                    &bindings_file,
+                    quote! {
+                        use crate as pg_sys;
+                        use pgx_macros::*;
+                        use crate::PgNode;
+                    }
+                ),
+                format!(
+                    "Unable to write bindings file for pg{} to `{}`",
+                    major_version,
+                    bindings_file.display()
+                )
+            );
 
-        let mut oids_file = out_dir.clone();
-        oids_file.push(&format!("pg{}_oids.rs", major_version));
-        handle_result!(
-            write_rs_file(oids, &oids_file, quote! {}),
-            format!(
-                "Unable to write oids file for pg{} to `{}`",
-                major_version,
-                oids_file.display()
-            )
-        );
+            let mut oids_file = out_dir.clone();
+            oids_file.push(&format!("pg{}_oids.rs", major_version));
+            handle_result!(
+                write_rs_file(oids, &oids_file, quote! {}),
+                format!(
+                    "Unable to write oids file for pg{} to `{}`",
+                    major_version,
+                    oids_file.display()
+                )
+            );
+        };
     });
 
     // compile the cshim for each binding
