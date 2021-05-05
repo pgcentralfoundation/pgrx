@@ -147,8 +147,11 @@ fn do_it() -> std::result::Result<(), std::io::Error> {
                         }
                     },
 
-                    // otherwise, the user just ran "cargo pgx install", and we use whatever "pg_config" is on the path
-                    Err(_) => PgConfig::from_path(),
+                    // otherwise, the user just ran "cargo pgx install", and we use whatever "pg_config" is configured
+                    Err(_) => match install.value_of("pg_config") {
+                        None => PgConfig::from_path(),
+                        Some(config) => PgConfig::new(PathBuf::from(config)),
+                    },
                 };
 
                 install_extension(&pg_config, is_release, None, features)
@@ -159,8 +162,10 @@ fn do_it() -> std::result::Result<(), std::io::Error> {
                     .values_of("features")
                     .map(|v| v.collect())
                     .unwrap_or(vec![]);
-                let pg_config = PgConfig::from_path(); // use whatever "pg_config" is on the path
-
+                let pg_config = match package.value_of("pg_config") {
+                    None => PgConfig::from_path(),
+                    Some(config) => PgConfig::new(PathBuf::from(config)),
+                };
                 package_extension(&pg_config, is_debug, features)
             }
             ("run", Some(run)) => {

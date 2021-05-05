@@ -69,6 +69,7 @@
             ${pkgs.nixpkgs-fmt}/bin/nixpkgs-fmt --check ${./.}
             touch $out # it worked!
           '';
+          pkgs-cargo-pgx = pkgs.cargo-pgx.out;
         });
     };
 }
