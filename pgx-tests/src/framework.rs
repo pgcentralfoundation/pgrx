@@ -299,6 +299,12 @@ fn modify_postgresql_conf(pgdata: PathBuf, postgresql_conf: Vec<&'static str>) {
             .write_all(format!("{}\n", setting).as_bytes())
             .expect("couldn't append custom setting to postgresql.conf");
     }
+
+    // pgx does not use a unix socket, so avoid unnecessarily creating it.
+    postgresql_conf_file
+        .write_all("unix_socket_directories = ''".as_bytes())
+        .expect("couldn't append `unix_socket_directories` setting to postgresql.conf");
+    
 }
 
 fn start_pg(loglines: LogLines) -> String {
