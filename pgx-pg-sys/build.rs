@@ -504,7 +504,11 @@ fn run_bindgen(
     syn::parse_file(bindings.to_string().as_str()).map_err(|e| From::from(e))
 }
 
-fn build_shim(shim_src: &PathBuf, shim_dst: &PathBuf, pg_config: &PgConfig) -> Result<(), std::io::Error> {
+fn build_shim(
+    shim_src: &PathBuf,
+    shim_dst: &PathBuf,
+    pg_config: &PgConfig,
+) -> Result<(), std::io::Error> {
     let major_version = pg_config.major_version()?;
     let mut libpgx_cshim: PathBuf = shim_dst.clone();
 
@@ -524,7 +528,11 @@ fn build_shim(shim_src: &PathBuf, shim_dst: &PathBuf, pg_config: &PgConfig) -> R
     Ok(())
 }
 
-fn build_shim_for_version(shim_src: &PathBuf, shim_dst: &PathBuf, pg_config: &PgConfig) -> Result<(), std::io::Error> {
+fn build_shim_for_version(
+    shim_src: &PathBuf,
+    shim_dst: &PathBuf,
+    pg_config: &PgConfig,
+) -> Result<(), std::io::Error> {
     let path_env = prefix_path(pg_config.parent_path());
     let major_version = pg_config.major_version()?;
 
@@ -536,11 +544,13 @@ fn build_shim_for_version(shim_src: &PathBuf, shim_dst: &PathBuf, pg_config: &Pg
     std::fs::copy(
         format!("{}/Makefile", shim_src.display()),
         format!("{}/Makefile", shim_dst.display()),
-    ).unwrap();
+    )
+    .unwrap();
     std::fs::copy(
         format!("{}/pgx-cshim.c", shim_src.display()),
         format!("{}/pgx-cshim.c", shim_dst.display()),
-    ).unwrap();
+    )
+    .unwrap();
 
     let rc = run_command(
         Command::new("make")
