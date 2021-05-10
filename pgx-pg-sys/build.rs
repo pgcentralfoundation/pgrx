@@ -541,16 +541,20 @@ fn build_shim_for_version(
     eprintln!("shim_dst={}", shim_dst.display());
 
     std::fs::create_dir_all(shim_dst).unwrap();
-    std::fs::copy(
-        format!("{}/Makefile", shim_src.display()),
-        format!("{}/Makefile", shim_dst.display()),
-    )
-    .unwrap();
-    std::fs::copy(
-        format!("{}/pgx-cshim.c", shim_src.display()),
-        format!("{}/pgx-cshim.c", shim_dst.display()),
-    )
-    .unwrap();
+
+    if !std::path::Path::new(&format!("{}/Makefile", shim_dst.display())).exists() {
+        std::fs::copy(
+            format!("{}/Makefile", shim_src.display()),
+            format!("{}/Makefile", shim_dst.display()),
+        ).unwrap();
+    }
+
+    if !std::path::Path::new(&format!("{}/pgx-cshim.c", shim_dst.display())).exists() {
+        std::fs::copy(
+            format!("{}/pgx-cshim.c", shim_src.display()),
+            format!("{}/pgx-cshim.c", shim_dst.display()),
+        ).unwrap();
+    }
 
     let rc = run_command(
         Command::new("make")
