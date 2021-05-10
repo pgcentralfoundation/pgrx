@@ -106,11 +106,12 @@ fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
             format!("unable to generate oids for pg{}", major_version)
         );
 
-        let bindings_files = if std::env::var("PGX_PG_SYS_SKIP_BINDING_REWRITE").unwrap_or("false".into()) != "1" {
-            vec![out_dir.clone(), src_dir.clone()]
-        } else {
-            vec![out_dir.clone()]
-        };
+        let bindings_files =
+            if std::env::var("PGX_PG_SYS_SKIP_BINDING_REWRITE").unwrap_or("false".into()) != "1" {
+                vec![out_dir.clone(), src_dir.clone()]
+            } else {
+                vec![out_dir.clone()]
+            };
         for mut bindings_file in bindings_files {
             bindings_file.push(&format!("pg{}.rs", major_version));
             handle_result!(
@@ -140,7 +141,7 @@ fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
                     oids_file.display()
                 )
             );
-        };
+        }
     });
 
     // compile the cshim for each binding
