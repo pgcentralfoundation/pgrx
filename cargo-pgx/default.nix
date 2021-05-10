@@ -12,7 +12,6 @@ naersk.lib."${hostPlatform.system}".buildPackage rec {
 
   cargoBuildOptions = final: final ++ [ "--package" "cargo-pgx" ];
   cargoTestOptions = final: final ++ [ "--package" "cargo-pgx" ];
-  cargoCheckOptions = "--package cargo-pgx";
 
   nativeBuildInputs = [
     pkg-config
