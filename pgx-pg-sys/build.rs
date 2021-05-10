@@ -62,14 +62,16 @@ fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
 
     let manifest_dir = PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").unwrap());
     let out_dir = PathBuf::from(std::env::var("OUT_DIR").unwrap());
-    let src_dir = PathBuf::from(format!(
-        "{}/src/",
-        std::env::var("CARGO_MANIFEST_DIR").unwrap()
-    ));
-    let shim_dir = PathBuf::from(format!("{}/cshim", manifest_dir.display()));
+    let mut src_dir = manifest_dir.clone();
+    src_dir.push("src");
+    let mut shim_src = manifest_dir.clone();
+    shim_src.push("cshim");
+    let mut shim_dst = out_dir.clone();
+    shim_dst.push("cshim");
 
     eprintln!("manifest_dir={}", manifest_dir.display());
-    eprintln!("shim_dir={}", shim_dir.display());
+    eprintln!("shim_src={}", shim_src.display());
+    eprintln!("shim_dst={}", shim_dst.display());
 
     let pgx = Pgx::from_config()?;
 
@@ -146,7 +148,7 @@ fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
 
     // compile the cshim for each binding
     for pg_config in pg_configs {
-        build_shim(&shim_dir, &pg_config)?;
+        build_shim(&shim_src, &shim_dst, &pg_config)?;
     }
 
     Ok(())
@@ -502,39 +504,51 @@ fn run_bindgen(
     syn::parse_file(bindings.to_string().as_str()).map_err(|e| From::from(e))
 }
 
-fn build_shim(shim_dir: &PathBuf, pg_config: &PgConfig) -> Result<(), std::io::Error> {
+fn build_shim(shim_src: &PathBuf, shim_dst: &PathBuf, pg_config: &PgConfig) -> Result<(), std::io::Error> {
     let major_version = pg_config.major_version()?;
-    let mut libpgx_cshim: PathBuf = shim_dir.clone();
+    let mut libpgx_cshim: PathBuf = shim_dst.clone();
 
     libpgx_cshim.push(format!("libpgx-cshim-{}.a", major_version));
 
     eprintln!("libpgx_cshim={}", libpgx_cshim.display());
     // then build the shim for the version feature currently being built
-    build_shim_for_version(&shim_dir, pg_config)?;
+    build_shim_for_version(&shim_src, &shim_dst, pg_config)?;
 
     // no matter what, tell rustc to link to the library that was built for the feature we're currently building
     let envvar_name = format!("CARGO_FEATURE_PG{}", major_version);
     if std::env::var(envvar_name).is_ok() {
-        println!("cargo:rustc-link-search={}", shim_dir.display());
+        println!("cargo:rustc-link-search={}", shim_dst.display());
         println!("cargo:rustc-link-lib=static=pgx-cshim-{}", major_version);
     }
 
     Ok(())
 }
 
-fn build_shim_for_version(shim_dir: &PathBuf, pg_config: &PgConfig) -> Result<(), std::io::Error> {
+fn build_shim_for_version(shim_src: &PathBuf, shim_dst: &PathBuf, pg_config: &PgConfig) -> Result<(), std::io::Error> {
     let path_env = prefix_path(pg_config.parent_path());
     let major_version = pg_config.major_version()?;
 
     eprintln!("PATH for build_shim={}", path_env);
-    eprintln!("shim_dir={}", shim_dir.display());
+    eprintln!("shim_src={}", shim_src.display());
+    eprintln!("shim_dst={}", shim_dst.display());
+
+    std::fs::create_dir_all(shim_dst).unwrap();
+    std::fs::copy(
+        format!("{}/Makefile", shim_src.display()),
+        format!("{}/Makefile", shim_dst.display()),
+    ).unwrap();
+    std::fs::copy(
+        format!("{}/pgx-cshim.c", shim_src.display()),
+        format!("{}/pgx-cshim.c", shim_dst.display()),
+    ).unwrap();
+
     let rc = run_command(
         Command::new("make")
             .arg("clean")
             .arg(&format!("libpgx-cshim-{}.a", major_version))
             .env("PG_TARGET_VERSION", format!("{}", major_version))
             .env("PATH", path_env)
-            .current_dir(shim_dir),
+            .current_dir(shim_dst),
         &format!("shim for PG v{}", major_version),
     )?;
 
