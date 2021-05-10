@@ -42,6 +42,7 @@ pg_test = [ "pgx-tests/pg_test" ]
 [package.metadata.docs.rs]
 features = ["pg13"]
 no-default-features = true
+rustc-args = ["--cfg", "docsrs"]
 
 [dependencies]
 cargo-pgx = { path = "cargo-pgx" }

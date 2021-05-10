@@ -58,8 +58,11 @@ fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
         }
     }
 
+    println!("cargo:rerun-if-env-changed=PGX_PG_SYS_SKIP_BINDING_REWRITE");
+
     let manifest_dir = PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").unwrap());
-    let out_dir = PathBuf::from(format!(
+    let out_dir = PathBuf::from(std::env::var("OUT_DIR").unwrap());
+    let src_dir = PathBuf::from(format!(
         "{}/src/",
         std::env::var("CARGO_MANIFEST_DIR").unwrap()
     ));
@@ -103,12 +106,16 @@ fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
             format!("unable to generate oids for pg{}", major_version)
         );
 
-        if std::env::var("PGX_PG_SYS_SKIP_BINDING_REWRITE").unwrap_or("false".into()) != "1" {
-            let mut bindings_file = out_dir.clone();
+        let bindings_files = if std::env::var("PGX_PG_SYS_SKIP_BINDING_REWRITE").unwrap_or("false".into()) != "1" {
+            vec![out_dir.clone(), src_dir.clone()]
+        } else {
+            vec![out_dir.clone()]
+        };
+        for mut bindings_file in bindings_files {
             bindings_file.push(&format!("pg{}.rs", major_version));
             handle_result!(
                 write_rs_file(
-                    rewritten_items,
+                    rewritten_items.clone(),
                     &bindings_file,
                     quote! {
                         use crate as pg_sys;
@@ -126,7 +133,7 @@ fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
             let mut oids_file = out_dir.clone();
             oids_file.push(&format!("pg{}_oids.rs", major_version));
             handle_result!(
-                write_rs_file(oids, &oids_file, quote! {}),
+                write_rs_file(oids.clone(), &oids_file, quote! {}),
                 format!(
                     "Unable to write oids file for pg{} to `{}`",
                     major_version,
