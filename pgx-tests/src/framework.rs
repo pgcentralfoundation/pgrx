@@ -300,9 +300,8 @@ fn modify_postgresql_conf(pgdata: PathBuf, postgresql_conf: Vec<&'static str>) {
             .expect("couldn't append custom setting to postgresql.conf");
     }
 
-    // pgx does not use a unix socket, so avoid unnecessarily creating it.
     postgresql_conf_file
-        .write_all("unix_socket_directories = ''".as_bytes())
+        .write_all(format!("unix_socket_directories = '{}'", Pgx::home().unwrap().display()).as_bytes())
         .expect("couldn't append `unix_socket_directories` setting to postgresql.conf");
     
 }
