@@ -130,7 +130,7 @@ impl BackgroundWorker {
 
         unsafe {
             #[cfg(feature = "pg10")]
-            pg_sys::BackgroundWorkerInitializeConnection(db as *mut i8, user as *mut i8);
+            pg_sys::BackgroundWorkerInitializeConnection(db as *mut c_char, user as *mut c_char);
 
             #[cfg(any(feature = "pg11", feature = "pg12", feature = "pg13"))]
             pg_sys::BackgroundWorkerInitializeConnection(db, user, 0);
@@ -441,13 +441,13 @@ type RpgffiChar = RpgffiChar64;
 #[cfg(any(feature = "pg11", feature = "pg12", feature = "pg13"))]
 type RpgffiChar = RpgffiChar96;
 
-struct RpgffiChar64([i8; 64]);
+struct RpgffiChar64([c_char; 64]);
 
 impl<'a> From<&'a str> for RpgffiChar64 {
     fn from(string: &str) -> Self {
         let mut r = [0; 64];
         for (dest, src) in r.iter_mut().zip(string.as_bytes()) {
-            *dest = *src as i8;
+            *dest = *src as c_char;
         }
         RpgffiChar64(r)
     }
