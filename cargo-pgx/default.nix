@@ -5,7 +5,7 @@ let
 in
 
 naersk.lib."${hostPlatform.system}".buildPackage rec {
-  pname = cargoToml.package.name;
+  name = cargoToml.package.name;
   version = cargoToml.package.version;
 
   src = ../.;
