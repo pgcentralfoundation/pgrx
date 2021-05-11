@@ -3,8 +3,4 @@
 /target
 *.iml
 **/*.rs.bk
-*.o
-*.so
-*.a
-cmake*/
-.direnv
+sql/*.generated.sql
