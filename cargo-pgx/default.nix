@@ -1,4 +1,4 @@
-{ lib, naersk, hostPlatform, fetchFromGitHub, postgresql_10, postgresql_11, postgresql_12, postgresql_13, pkg-config, openssl, rustfmt, llvmPackages, }:
+{ lib, naersk, hostPlatform, fetchFromGitHub, postgresql_10, postgresql_11, postgresql_12, postgresql_13, pkg-config, openssl, rustfmt, libiconv, llvmPackages, }:
 
 let
   cargoToml = (builtins.fromTOML (builtins.readFile ./Cargo.toml));
@@ -18,6 +18,7 @@ naersk.lib."${hostPlatform.system}".buildPackage rec {
   ];
   buildInputs = [
     openssl
+    libiconv
   ];
 
   LIBCLANG_PATH = "${llvmPackages.libclang}/lib";
