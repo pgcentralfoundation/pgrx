@@ -28,13 +28,32 @@ pub use submodules::*;
 //
 
 // feature gate each pg version module
-#[cfg(feature = "pg10")]
+#[cfg(all(feature = "pg10", not(docsrs)))]
+mod pg10 {
+    include!(concat!(env!("OUT_DIR"), "/pg10.rs"));
+}
+#[cfg(all(feature = "pg10", docsrs))]
 mod pg10;
-#[cfg(feature = "pg11")]
+
+#[cfg(all(feature = "pg11", not(docsrs)))]
+mod pg11 {
+    include!(concat!(env!("OUT_DIR"), "/pg11.rs"));
+}
+#[cfg(all(feature = "pg11", docsrs))]
 mod pg11;
-#[cfg(feature = "pg12")]
+
+#[cfg(all(feature = "pg12", not(docsrs)))]
+mod pg12 {
+    include!(concat!(env!("OUT_DIR"), "/pg12.rs"));
+}
+#[cfg(all(feature = "pg12", docsrs))]
 mod pg12;
-#[cfg(feature = "pg13")]
+
+#[cfg(all(feature = "pg13", not(docsrs)))]
+mod pg13 {
+    include!(concat!(env!("OUT_DIR"), "/pg13.rs"));
+}
+#[cfg(all(feature = "pg13", docsrs))]
 mod pg13;
 
 // export each module publicly
