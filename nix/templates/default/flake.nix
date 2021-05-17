@@ -4,7 +4,7 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     naersk.url = "github:nmattia/naersk";
-    pgx.url = "github:hoverbear/pgx/omni";
+    pgx.url = "github:hoverbear/pgx/develop";
     pgx.inputs.nixpkgs.follows = "nixpkgs";
   };
 
