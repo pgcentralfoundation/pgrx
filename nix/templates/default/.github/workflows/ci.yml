@@ -1,0 +1,71 @@
+on: [push]
+
+jobs:
+  check:
+    strategy:
+      matrix:
+        target:
+          - os: ubuntu-latest
+            target: x86_64-linux
+    runs-on: ${{ matrix.target.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          sh <(curl -L https://nixos.org/nix/install) --darwin-use-unencrypted-nix-store-volume
+          . ~/.nix-profile/etc/profile.d/nix.sh
+          nix-env -iA nixpkgs.nixUnstable
+          mkdir -p ~/.config/nix/
+          echo "experimental-features = nix-command flakes" >> ~/.config/nix/nix.conf
+          nix flake show
+          nix flake check --print-build-logs --no-build --verbose
+          
+  build:
+    needs: check
+    strategy:
+      matrix:
+        pg_version:
+          - 10
+          - 11
+          - 12
+          - 13
+        target:
+          - os: ubuntu-latest
+            platform: x86_64-linux
+          - os: macos-latest
+            platform: x86_64-darwin
+          - os: ubuntu-latest
+            platform: aarch64-linux
+    runs-on: ${{ matrix.target.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - if: ${{ matrix.target.platform == 'aarch64-linux' }} 
+        uses: docker/setup-qemu-action@v1
+        with:
+          image: tonistiigi/binfmt:latest
+          platforms: arm64
+      - run: |
+          sh <(curl -L https://nixos.org/nix/install) --darwin-use-unencrypted-nix-store-volume
+          . ~/.nix-profile/etc/profile.d/nix.sh
+          nix-env -iA nixpkgs.nixUnstable
+          mkdir -p ~/.config/nix/
+          echo "experimental-features = nix-command flakes" >> ~/.config/nix/nix.conf
+          mkdir -p ~/.config/nixpkgs/
+          echo "{ allowUnsupportedSystem = true; }" > ~/.config/nixpkgs/config.nix
+          export NIXPKGS_ALLOW_UNSUPPORTED_SYSTEM=1
+          
+          export EXTENSION=$(grep 'name = ".*"' Cargo.toml | sed 's/name = "\(.*\)"$/\1/')
+          echo "EXTENSION=${EXTENSION}" >> $GITHUB_ENV
+
+          nix build \
+            --option system ${{ matrix.target.platform }} \
+            .#${EXTENSION}_${{ matrix.pg_version }} \
+            --out-link out-${{ matrix.target.platform }}.${EXTENSION}_${{ matrix.pg_version }} \
+            --print-build-logs \
+            --verbose
+          
+          mkdir -p ${{ matrix.target.platform }}.${EXTENSION}_${{ matrix.pg_version }}
+          cp -L out-${{ matrix.target.platform }}.${EXTENSION}_${{ matrix.pg_version }}/* ${{ matrix.target.platform }}.${EXTENSION}_${{ matrix.pg_version }}/
+      - uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.target.platform }}.${{ env.EXTENSION }}_${{ matrix.pg_version }}
+          path: ${{ matrix.target.platform }}.${{ env.EXTENSION }}_${{ matrix.pg_version }}

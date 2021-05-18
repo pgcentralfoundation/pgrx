@@ -72,5 +72,13 @@
           '';
           pkgs-cargo-pgx = pkgs.cargo-pgx.out;
         });
+
+      defaultTemplate = self.templates.default;
+      templates = {
+        default = {
+          path = ./nix/templates/default;
+          description = "A basic PGX extension";
+        };
+      };
     };
 }
