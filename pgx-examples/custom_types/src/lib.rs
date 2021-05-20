@@ -13,6 +13,8 @@ pg_module_magic!();
 #[cfg(test)]
 pub mod pg_test {
     pub fn setup(_options: Vec<&str>) {
+        crate::generate_meta();
+        todo!();
         // perform one-off initialization when the pg_test framework starts
     }
 

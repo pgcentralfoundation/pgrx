@@ -112,6 +112,14 @@ subcommands:
                     help: additional cargo features to activate (default is '--no-default-features')
                     takes_value: true
                     multiple: true
+          - schema2:
+              about: generate extension schema files
+              args:
+                - features:
+                    long: features
+                    help: additional cargo features to activate (default is '--no-default-features')
+                    takes_value: true
+                    multiple: true
           - dump-schema:
               about: dump the full extension SQL schema file
               args:

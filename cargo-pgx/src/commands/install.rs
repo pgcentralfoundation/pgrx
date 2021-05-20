@@ -52,7 +52,7 @@ pub(crate) fn install_extension(
 
     {
         handle_result!(
-            crate::generate_schema(&*additional_features),
+            crate::schema::generate_schema(&*additional_features),
             "failed to generate SQL schema"
         );
     }

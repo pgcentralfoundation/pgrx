@@ -190,14 +190,28 @@ fn rewrite_item_fn(mut func: ItemFn, is_raw: bool, no_guard: bool) -> proc_macro
     // make the function 'extern "C"' because this is for the #[pg_extern[ macro
     func.sig.abi = Some(syn::parse_str("extern \"C\"").unwrap());
     let func_span = func.span();
-    let (rewritten_func, need_wrapper) = rewriter.item_fn(func, true, is_raw, no_guard);
+    let (rewritten_func, need_wrapper) = rewriter.item_fn(func.clone(), true, is_raw, no_guard);
 
     if need_wrapper {
+        let sig = func.sig;
+        let ident = sig.ident;
+        let args = sig.inputs.iter().flat_map(|input| {
+            match input {
+                syn::FnArg::Typed(pat) => Some(pat.ty.clone()),
+                _ => None,
+            }
+        }).collect::<Vec<_>>();
+
         quote_spanned! {func_span=>
             #[no_mangle]
             pub extern "C" fn #finfo_name() -> &'static pg_sys::Pg_finfo_record {
                 const V1_API: pg_sys::Pg_finfo_record = pg_sys::Pg_finfo_record { api_version: 1 };
                 &V1_API
+            }
+
+            pgx::inventory::submit! {
+                let inputs = vec![#( core::any::type_name::<#args>() ),*];
+                crate::PgxExtern(stringify!(#ident), inputs)
             }
 
             #rewritten_func

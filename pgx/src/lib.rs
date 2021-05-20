@@ -59,6 +59,9 @@ pub mod varlena;
 pub mod wrappers;
 pub mod xid;
 
+#[doc(hidden)]
+pub use inventory;
+
 pub use atomics::*;
 pub use callbacks::*;
 pub use datum::*;
@@ -134,6 +137,16 @@ macro_rules! pg_module_magic {
 
             // return the magic
             &MY_MAGIC
+        }
+
+        #[derive(Debug)]
+        pub struct PgxExtern(pub &'static str, pub  Vec<&'static str>);
+        pgx::inventory::collect!(PgxExtern);
+
+        fn generate_meta() {
+            for pgx_extern in pgx::inventory::iter::<PgxExtern> {
+                panic!("{:?}", pgx_extern);
+            }
         }
     };
 }

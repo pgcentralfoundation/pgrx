@@ -13,7 +13,8 @@ use crate::commands::install::{install_extension, write_full_schema_file};
 use crate::commands::new::create_crate_template;
 use crate::commands::package::package_extension;
 use crate::commands::run::run_psql;
-use crate::commands::schema::generate_schema;
+use crate::commands::schema;
+use crate::commands::schema2;
 use crate::commands::start::start_postgres;
 use crate::commands::status::status_postgres;
 use crate::commands::stop::stop_postgres;
@@ -216,7 +217,14 @@ fn do_it() -> std::result::Result<(), std::io::Error> {
                     .values_of("features")
                     .map(|v| v.collect())
                     .unwrap_or(vec![]);
-                generate_schema(&*features)
+                schema::generate_schema(&*features)
+            }
+            ("schema2", Some(schema)) => {
+                let features = schema
+                    .values_of("features")
+                    .map(|v| v.collect())
+                    .unwrap_or(vec![]);
+                schema2::generate_schema(&*features)
             }
             ("dump-schema", Some(dump_schema)) => {
                 let dir = dump_schema
@@ -227,7 +235,7 @@ fn do_it() -> std::result::Result<(), std::io::Error> {
                     .values_of("features")
                     .map(|v| v.collect())
                     .unwrap_or(vec![]);
-                generate_schema(&*features)?;
+                schema::generate_schema(&*features)?;
                 write_full_schema_file(&dir, None);
                 Ok(())
             }
