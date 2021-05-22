@@ -140,13 +140,33 @@ macro_rules! pg_module_magic {
         }
 
         #[derive(Debug)]
-        pub struct PgxExtern(pub &'static str, pub  Vec<&'static str>);
+        pub struct PgxSchema {
+            pgx_externs: Vec<&'static PgxExtern>,
+        }
+
+        #[derive(Debug)]
+        pub struct PgxExtern {
+            name: &'static str,
+            args: Vec<&'static str>,
+            returning: Option<&'static str>,
+        }
         pgx::inventory::collect!(PgxExtern);
 
-        fn generate_meta() {
-            for pgx_extern in pgx::inventory::iter::<PgxExtern> {
-                panic!("{:?}", pgx_extern);
-            }
+        pub fn generate_meta() -> PgxSchema {
+            use std::fmt::Write;
+            let mut generated_sql = PgxSchema {
+                pgx_externs: pgx::inventory::iter::<PgxExtern>().collect(),
+            };
+
+            generated_sql
+        }
+
+        #[no_mangle]
+        pub extern "C" fn alloc_meta() -> *mut std::os::raw::c_char {
+            let schema = self::generate_meta();
+            let schema_str = format!("{:?}", schema);
+            let c_str = std::ffi::CString::new(schema_str).expect("Could not build CString.");
+            c_str.into_raw()
         }
     };
 }

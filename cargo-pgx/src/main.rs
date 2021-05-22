@@ -220,11 +220,30 @@ fn do_it() -> std::result::Result<(), std::io::Error> {
                 schema::generate_schema(&*features)
             }
             ("schema2", Some(schema)) => {
+                let is_release = schema.is_present("release");
                 let features = schema
                     .values_of("features")
                     .map(|v| v.collect())
                     .unwrap_or(vec![]);
-                schema2::generate_schema(&*features)
+                let pg_config = match std::env::var("PGX_TEST_MODE_VERSION") {
+                    // for test mode, we want the pg_config specified in PGX_TEST_MODE_VERSION
+                    Ok(pgver) => match Pgx::from_config()?.get(&pgver) {
+                        Ok(pg_config) => pg_config.clone(),
+                        Err(_) => {
+                            return Err(std::io::Error::new(std::io::ErrorKind::InvalidInput,
+                                                           "PGX_TEST_MODE_VERSION does not contain a valid postgres version number"
+                            ));
+                        }
+                    },
+
+                    // otherwise, the user just ran "cargo pgx install", and we use whatever "pg_config" is configured
+                    Err(_) => match schema.value_of("pg_config") {
+                        None => PgConfig::from_path(),
+                        Some(config) => PgConfig::new(PathBuf::from(config)),
+                    },
+                };
+
+                schema2::generate_schema(&pg_config, is_release,  &features)
             }
             ("dump-schema", Some(dump_schema)) => {
                 let dir = dump_schema

@@ -115,6 +115,15 @@ subcommands:
           - schema2:
               about: generate extension schema files
               args:
+                - release:
+                    short: r
+                    long: release
+                    help: compile for release mode (default is debug)
+                - pg_config:
+                    short: c
+                    long: pg_config
+                    takes_value: true
+                    help: the `pg_config` path (default is first in $PATH)
                 - features:
                     long: features
                     help: additional cargo features to activate (default is '--no-default-features')

@@ -201,6 +201,16 @@ fn rewrite_item_fn(mut func: ItemFn, is_raw: bool, no_guard: bool) -> proc_macro
                 _ => None,
             }
         }).collect::<Vec<_>>();
+        let returning = match sig.output {
+            syn::ReturnType::Default => None,
+            syn::ReturnType::Type(_, ty) => match *ty {
+                syn::Type::ImplTrait(_) => None,
+                ty => Some(ty),
+            }
+        };
+        eprintln!("{:?}", returning);
+        let returning_iter = returning.into_iter();
+
 
         quote_spanned! {func_span=>
             #[no_mangle]
@@ -211,7 +221,11 @@ fn rewrite_item_fn(mut func: ItemFn, is_raw: bool, no_guard: bool) -> proc_macro
 
             pgx::inventory::submit! {
                 let inputs = vec![#( core::any::type_name::<#args>() ),*];
-                crate::PgxExtern(stringify!(#ident), inputs)
+                crate::PgxExtern {
+                    name: stringify!(#ident),
+                    args: inputs,
+                    returning: None#( .unwrap_or(Some(core::any::type_name::<#returning_iter>())) )*,
+                }
             }
 
             #rewritten_func

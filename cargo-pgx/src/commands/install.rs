@@ -87,7 +87,7 @@ fn copy_file(src: PathBuf, dest: PathBuf, msg: &str) {
     );
 }
 
-fn build_extension(major_version: u16, is_release: bool, additional_features: &[&str]) {
+pub(crate) fn build_extension(major_version: u16, is_release: bool, additional_features: &[&str]) {
     let mut features =
         std::env::var("PGX_BUILD_FEATURES").unwrap_or(format!("pg{}", major_version));
     let flags = std::env::var("PGX_BUILD_FLAGS").unwrap_or_default();
@@ -188,7 +188,7 @@ fn copy_sql_files(extdir: &PathBuf, extname: &str, base_directory: &PathBuf) {
     }
 }
 
-fn find_library_file(extname: &str, is_release: bool) -> PathBuf {
+pub(crate) fn find_library_file(extname: &str, is_release: bool) -> PathBuf {
     let mut target_dir = get_target_dir();
     target_dir.push(if is_release { "release" } else { "debug" });
 

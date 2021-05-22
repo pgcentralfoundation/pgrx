@@ -165,6 +165,7 @@ dependencies = [
  "colored",
  "env_proxy",
  "fork",
+ "libloading",
  "num_cpus",
  "pgx-utils",
  "proc-macro2",
