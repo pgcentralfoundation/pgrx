@@ -166,17 +166,18 @@ pub fn search_path(_attr: TokenStream, item: TokenStream) -> TokenStream {
 #[proc_macro_attribute]
 pub fn pg_extern(attr: TokenStream, item: TokenStream) -> TokenStream {
     let args = parse_extern_attributes(proc_macro2::TokenStream::from(attr));
-    let is_raw = args.contains(&ExternArgs::Raw);
-    let no_guard = args.contains(&ExternArgs::NoGuard);
 
     let ast = parse_macro_input!(item as syn::Item);
     match ast {
-        Item::Fn(func) => rewrite_item_fn(func, is_raw, no_guard).into(),
+        Item::Fn(func) => rewrite_item_fn(func, args).into(),
         _ => panic!("#[pg_extern] can only be applied to top-level functions"),
     }
 }
 
-fn rewrite_item_fn(mut func: ItemFn, is_raw: bool, no_guard: bool) -> proc_macro2::TokenStream {
+fn rewrite_item_fn(mut func: ItemFn, extern_args: HashSet<ExternArgs>) -> proc_macro2::TokenStream {
+    let is_raw = extern_args.contains(&ExternArgs::Raw);
+    let no_guard = extern_args.contains(&ExternArgs::NoGuard);
+
     let finfo_name = syn::Ident::new(
         &format!("pg_finfo_{}_wrapper", func.sig.ident),
         Span::call_site(),
@@ -195,22 +196,22 @@ fn rewrite_item_fn(mut func: ItemFn, is_raw: bool, no_guard: bool) -> proc_macro
     if need_wrapper {
         let sig = func.sig;
         let ident = sig.ident;
-        let args = sig.inputs.iter().flat_map(|input| {
+
+        let fn_args = sig.inputs.iter().flat_map(|input| {
             match input {
                 syn::FnArg::Typed(pat) => Some(pat.ty.clone()),
                 _ => None,
             }
         }).collect::<Vec<_>>();
-        let returning = match sig.output {
+        let fn_return = match sig.output {
             syn::ReturnType::Default => None,
             syn::ReturnType::Type(_, ty) => match *ty {
                 syn::Type::ImplTrait(_) => None,
                 ty => Some(ty),
             }
         };
-        eprintln!("{:?}", returning);
-        let returning_iter = returning.into_iter();
-
+        let fn_return_iter = fn_return.into_iter();
+        let extern_args_iter = extern_args.into_iter();
 
         quote_spanned! {func_span=>
             #[no_mangle]
@@ -220,11 +221,12 @@ fn rewrite_item_fn(mut func: ItemFn, is_raw: bool, no_guard: bool) -> proc_macro
             }
 
             pgx::inventory::submit! {
-                let inputs = vec![#( core::any::type_name::<#args>() ),*];
+                let inputs = vec![#( core::any::type_name::<#fn_args>() ),*];
                 crate::PgxExtern {
                     name: stringify!(#ident),
-                    args: inputs,
-                    returning: None#( .unwrap_or(Some(core::any::type_name::<#returning_iter>())) )*,
+                    pg_extern_args: vec![#(pgx_utils::ExternArgs::#extern_args_iter),*].into_iter().collect(),
+                    fn_args: inputs,
+                    fn_return: None#( .unwrap_or(Some(core::any::type_name::<#fn_return_iter>())) )*,
                 }
             }
 

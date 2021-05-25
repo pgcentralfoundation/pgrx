@@ -20,6 +20,7 @@ pg_test = []
 [dependencies]
 pgx = { path = "../../../pgx/pgx/", default-features = false }
 pgx-macros = { path = "../../../pgx/pgx-macros" }
+pgx-utils = { path = "../../../pgx/pgx-utils" }
 maplit = "1.0.2"
 serde = "1.0.114"
 

@@ -3,15 +3,15 @@
 
 use crate::pg_config::PgConfig;
 use colored::Colorize;
-use proc_macro2::TokenStream;
+use proc_macro2::{TokenStream, Punct, Spacing};
 use proc_macro2::TokenTree;
-use quote::quote;
+use quote::{quote, ToTokens, format_ident, TokenStreamExt};
 use serde_json::value::Value as JsonValue;
 use std::collections::HashSet;
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
 use std::str::FromStr;
-use syn::{GenericArgument, ItemFn, PathArguments, ReturnType, Type, TypeParamBound};
+use syn::{GenericArgument, braced, parenthesized, ItemFn, PathArguments, ReturnType, Type, TypeParamBound};
 
 pub mod operator_common;
 pub mod pg_config;
@@ -182,7 +182,7 @@ pub fn get_named_capture(
     }
 }
 
-#[derive(Debug, Hash, Ord, PartialOrd, Eq, PartialEq)]
+#[derive(Debug, Hash, Ord, PartialOrd, Eq, PartialEq, Clone)]
 pub enum ExternArgs {
     Immutable,
     Strict,
@@ -196,6 +196,37 @@ pub enum ExternArgs {
     Error(String),
     Schema(String),
     Name(String),
+}
+
+impl ToTokens for ExternArgs {
+    fn to_tokens(&self, tokens: &mut TokenStream) {
+        match self {
+            ExternArgs::Immutable => tokens.append(format_ident!("Immutable")),
+            ExternArgs::Strict => tokens.append(format_ident!("Strict")),
+            ExternArgs::Stable => tokens.append(format_ident!("Stable")),
+            ExternArgs::Volatile => tokens.append(format_ident!("Volatile")),
+            ExternArgs::Raw => tokens.append(format_ident!("Raw")),
+            ExternArgs::NoGuard => tokens.append(format_ident!("NoGuard")),
+            ExternArgs::ParallelSafe => tokens.append(format_ident!("ParallelSafe")),
+            ExternArgs::ParallelUnsafe => tokens.append(format_ident!("ParallelUnsafe")),
+            ExternArgs::ParallelRestricted => tokens.append(format_ident!("ParallelRestricted")),
+            ExternArgs::Error(s) => {
+                tokens.append_all(quote! {
+                    Error(String::from("#s"))
+                }.to_token_stream());
+            },
+            ExternArgs::Schema(s) => {
+                tokens.append_all(quote! {
+                    Schema(String::from("#s"))
+                }.to_token_stream());
+            },
+            ExternArgs::Name(s) => {
+                tokens.append_all(quote! {
+                    Name(String::from("#s"))
+                }.to_token_stream());
+            },
+        }
+    }
 }
 
 #[derive(Debug, Hash, Ord, PartialOrd, Eq, PartialEq)]
