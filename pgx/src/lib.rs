@@ -149,8 +149,8 @@ macro_rules! pg_module_magic {
             name: &'static str,
             pg_extern_args: std::collections::HashSet<pgx_utils::ExternArgs>,
             search_path: Vec<&'static str>,
-            fn_args: Vec<&'static str>,
-            fn_return: Option<&'static str>,
+            fn_args: Vec<(core::any::TypeId, &'static str)>,
+            fn_return: Option<(core::any::TypeId, &'static str)>,
         }
         pgx::inventory::collect!(PgxExtern);
 

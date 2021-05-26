@@ -275,7 +275,7 @@ fn rewrite_item_fn(mut func: ItemFn, extern_args: HashSet<ExternArgs>) -> proc_m
                 ty => Some(ty),
             }
         };
-        let fn_return_iter = fn_return.into_iter();
+        let fn_return_iter = fn_return.iter();
         let extern_args_iter = extern_args.into_iter();
 
         quote_spanned! {func_span=>
@@ -286,13 +286,14 @@ fn rewrite_item_fn(mut func: ItemFn, extern_args: HashSet<ExternArgs>) -> proc_m
             }
 
             pgx::inventory::submit! {
-                let inputs = vec![#( core::any::type_name::<#fn_args>() ),*];
+                use core::any::TypeId;
+                let inputs = vec![#( (TypeId::of::<#fn_args>(), core::any::type_name::<#fn_args>()) ),*];
                 crate::PgxExtern {
                     name: stringify!(#ident),
                     pg_extern_args: vec![#(pgx_utils::ExternArgs::#extern_args_iter),*].into_iter().collect(),
                     search_path: vec![#search_path],
                     fn_args: inputs,
-                    fn_return: None#( .unwrap_or(Some(core::any::type_name::<#fn_return_iter>())) )*,
+                    fn_return: None#( .unwrap_or(Some((TypeId::of::<#fn_return_iter>(), core::any::type_name::<#fn_return_iter>()))) )*,
                 }
             }
 
