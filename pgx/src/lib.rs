@@ -149,11 +149,19 @@ macro_rules! pg_module_magic {
             name: &'static str,
             module_path: &'static str,
             pg_extern_args: std::collections::HashSet<pgx_utils::ExternArgs>,
-            search_path: Vec<&'static str>,
-            fn_args: Vec<( &'static str, core::any::TypeId, &'static str)>,
+            search_path: Option<Vec<&'static str>>,
+            fn_args: Vec<PgxExternInputs>,
             fn_return: Option<(core::any::TypeId, &'static str)>,
         }
         pgx::inventory::collect!(PgxExtern);
+
+        #[derive(Debug)]
+        pub struct PgxExternInputs {
+            pattern: &'static str,
+            ty_id: core::any::TypeId,
+            ty_name: &'static str,
+            default: &'static str
+        }
 
         pub fn generate_meta() -> PgxSchema {
             use std::fmt::Write;

@@ -9,14 +9,14 @@ mod rewriter;
 use crate::operators::{impl_postgres_eq, impl_postgres_hash, impl_postgres_ord};
 use pgx_utils::*;
 use proc_macro::TokenStream;
-use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
-use quote::{quote, quote_spanned, ToTokens};
+use proc_macro2::{Ident, Span, TokenStream as TokenStream2, Punct, Spacing};
+use quote::{quote, quote_spanned, ToTokens, TokenStreamExt};
 use rewriter::*;
 use std::collections::HashSet;
 use syn::spanned::Spanned;
-use syn::{parse_macro_input, Attribute, Data, DeriveInput, Item, ItemFn};
+use syn::{parenthesized, parse_macro_input, Attribute, Data, DeriveInput, Item, ItemFn, Type};
 use syn::Token;
-use syn::parse::{ParseStream, Parse};
+use syn::parse::{ParseStream, Parse, Parser};
 use syn::punctuated::Punctuated;
 
 /// Declare a function as `#[pg_guard]` to indcate that it is called from a Postgres `extern "C"`
@@ -178,6 +178,23 @@ pub fn pg_extern(attr: TokenStream, item: TokenStream) -> TokenStream {
 }
 
 #[derive(Debug)]
+struct DefaultMacro {
+    ty: syn::Type,
+    comma: Token![,],
+    expr: syn::Lit,
+}
+
+impl Parse for DefaultMacro {
+    fn parse(input: ParseStream) -> Result<Self, syn::Error> {
+        Ok(DefaultMacro {
+            ty: input.parse()?,
+            comma: input.parse()?,
+            expr: input.parse()?,
+        })
+    }
+}
+
+#[derive(Debug)]
 struct SearchPath {
     at_start: Option<syn::token::At>,
     dollar: Option<syn::token::Dollar>,
@@ -211,7 +228,7 @@ impl ToTokens for SearchPath {
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug)]
 struct SearchPathList {
     fields: Punctuated<SearchPath, Token![,]>,
 }
@@ -256,17 +273,37 @@ fn rewrite_item_fn(mut func: ItemFn, extern_args: HashSet<ExternArgs>) -> proc_m
     });
     let search_path = search_path_attr.and_then(|attr| {
         Some(attr.parse_args::<SearchPathList>().unwrap())
-    }).unwrap_or_default();
+    });
+    let search_path_iter = search_path.iter();
 
     let sig = func.sig;
     let ident = sig.ident;
 
-    let (fn_names, fn_args) = sig.inputs.iter().flat_map(|input| {
+    let mut fn_pat = vec![];
+    let mut fn_ty = vec![];
+    let mut fn_default = vec![];
+    sig.inputs.iter().flat_map(|input| {
         match input {
-            syn::FnArg::Typed(pat) => Some((pat.pat.clone(), pat.ty.clone())),
+            syn::FnArg::Typed(pat) => {
+                let default = match pat.ty.as_ref() {
+                    syn::Type::Macro(macro_pat) => {
+                        let mac = &macro_pat.mac;
+                        let out: DefaultMacro = mac.parse_body().expect(&*format!("{:?}", mac));
+                        Some(out.expr)
+                    },
+                    _ => None,
+                };
+
+                Some((pat.pat.clone(), pat.ty.clone(), default))
+            },
             _ => None,
         }
-    }).unzip::<_, _, Vec<_>, Vec<_>>();
+    }).for_each(|(pat, ty, default)| {
+        fn_pat.push(pat);
+        fn_ty.push(ty);
+        fn_default.push(default);
+    });
+
     let fn_return = match sig.output {
         syn::ReturnType::Default => None,
         syn::ReturnType::Type(_, ty) => match *ty {
@@ -278,6 +315,28 @@ fn rewrite_item_fn(mut func: ItemFn, extern_args: HashSet<ExternArgs>) -> proc_m
     let fn_return_iter = fn_return.iter();
     let extern_args_iter = extern_args.into_iter();
 
+    let inv = quote! {
+        pgx::inventory::submit! {
+            use core::any::TypeId;
+            let inputs = vec![#(
+                crate::PgxExternInputs {
+                    pattern: stringify!(#fn_pat),
+                    ty_id: TypeId::of::<#fn_ty>(),
+                    ty_name: core::any::type_name::<#fn_ty>(),
+                    default: stringify!(#fn_default),
+                }
+            ),*];
+            crate::PgxExtern {
+                name: stringify!(#ident),
+                module_path: core::module_path!(),
+                pg_extern_args: vec![#(pgx_utils::ExternArgs::#extern_args_iter),*].into_iter().collect(),
+                search_path: None#( .unwrap_or(Some(vec![#search_path_iter])) )*,
+                fn_args: inputs,
+                fn_return: None#( .unwrap_or(Some((TypeId::of::<#fn_return_iter>(), core::any::type_name::<#fn_return_iter>()))) )*,
+            }
+        }
+    };
+
     if need_wrapper {
         quote_spanned! {func_span=>
             #[no_mangle]
@@ -286,35 +345,13 @@ fn rewrite_item_fn(mut func: ItemFn, extern_args: HashSet<ExternArgs>) -> proc_m
                 &V1_API
             }
 
-            pgx::inventory::submit! {
-                use core::any::TypeId;
-                let inputs = vec![#( (stringify!(#fn_names), TypeId::of::<#fn_args>(), core::any::type_name::<#fn_args>()) ),*];
-                crate::PgxExtern {
-                    name: stringify!(#ident),
-                    module_path: core::module_path!(),
-                    pg_extern_args: vec![#(pgx_utils::ExternArgs::#extern_args_iter),*].into_iter().collect(),
-                    search_path: vec![#search_path],
-                    fn_args: inputs,
-                    fn_return: None#( .unwrap_or(Some((TypeId::of::<#fn_return_iter>(), core::any::type_name::<#fn_return_iter>()))) )*,
-                }
-            }
+            #inv
 
             #rewritten_func
         }
     } else {
         quote_spanned! {func_span=>
-            pgx::inventory::submit! {
-                use core::any::TypeId;
-                let inputs = vec![#( (stringify!(#fn_names), TypeId::of::<#fn_args>(), core::any::type_name::<#fn_args>()) ),*];
-                crate::PgxExtern {
-                    name: stringify!(#ident),
-                    module_path: core::module_path!(),
-                    pg_extern_args: vec![#(pgx_utils::ExternArgs::#extern_args_iter),*].into_iter().collect(),
-                    search_path: vec![#search_path],
-                    fn_args: inputs,
-                    fn_return: None#( .unwrap_or(Some((TypeId::of::<#fn_return_iter>(), core::any::type_name::<#fn_return_iter>()))) )*,
-                }
-            }
+            #inv
 
             #rewritten_func
         }
