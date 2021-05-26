@@ -262,15 +262,16 @@ fn rewrite_item_fn(mut func: ItemFn, extern_args: HashSet<ExternArgs>) -> proc_m
         let sig = func.sig;
         let ident = sig.ident;
 
-        let fn_args = sig.inputs.iter().flat_map(|input| {
+        let (fn_names, fn_args) = sig.inputs.iter().flat_map(|input| {
             match input {
-                syn::FnArg::Typed(pat) => Some(pat.ty.clone()),
+                syn::FnArg::Typed(pat) => Some((pat.pat.clone(), pat.ty.clone())),
                 _ => None,
             }
-        }).collect::<Vec<_>>();
+        }).unzip::<_, _, Vec<_>, Vec<_>>();
         let fn_return = match sig.output {
             syn::ReturnType::Default => None,
             syn::ReturnType::Type(_, ty) => match *ty {
+                // TODO: Handle this!
                 syn::Type::ImplTrait(_) => None,
                 ty => Some(ty),
             }
@@ -287,9 +288,10 @@ fn rewrite_item_fn(mut func: ItemFn, extern_args: HashSet<ExternArgs>) -> proc_m
 
             pgx::inventory::submit! {
                 use core::any::TypeId;
-                let inputs = vec![#( (TypeId::of::<#fn_args>(), core::any::type_name::<#fn_args>()) ),*];
+                let inputs = vec![#( (stringify!(#fn_names), TypeId::of::<#fn_args>(), core::any::type_name::<#fn_args>()) ),*];
                 crate::PgxExtern {
                     name: stringify!(#ident),
+                    module_path: core::module_path!(),
                     pg_extern_args: vec![#(pgx_utils::ExternArgs::#extern_args_iter),*].into_iter().collect(),
                     search_path: vec![#search_path],
                     fn_args: inputs,
