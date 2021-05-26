@@ -9,14 +9,14 @@ mod rewriter;
 use crate::operators::{impl_postgres_eq, impl_postgres_hash, impl_postgres_ord};
 use pgx_utils::*;
 use proc_macro::TokenStream;
-use proc_macro2::{Ident, Span, TokenStream as TokenStream2, Punct, Spacing};
-use quote::{quote, quote_spanned, ToTokens, TokenStreamExt};
+use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
+use quote::{quote, quote_spanned, ToTokens};
 use rewriter::*;
 use std::collections::HashSet;
 use syn::spanned::Spanned;
-use syn::{parse_macro_input, bracketed, parenthesized, Attribute, Data, DeriveInput, Item, ItemFn, AttributeArgs, Type, MetaList};
+use syn::{parse_macro_input, Attribute, Data, DeriveInput, Item, ItemFn};
 use syn::Token;
-use syn::parse::{ParseStream, Parse, Parser};
+use syn::parse::{ParseStream, Parse};
 use syn::punctuated::Punctuated;
 
 /// Declare a function as `#[pg_guard]` to indcate that it is called from a Postgres `extern "C"`
@@ -188,10 +188,10 @@ struct SearchPath {
 impl Parse for SearchPath {
     fn parse(input: ParseStream) -> Result<Self, syn::Error> {
         Ok(SearchPath {
-            at_start: input.parse().expect(&format!("Got {}", input)),
-            dollar: input.parse().expect(&format!("Got {}", input)),
-            path: input.parse().expect(&format!("Got {}", input)),
-            at_end: input.parse().expect(&format!("Got {}", input)),
+            at_start: input.parse()?,
+            dollar: input.parse()?,
+            path: input.parse()?,
+            at_end: input.parse()?,
         })
     }
 }

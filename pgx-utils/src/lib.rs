@@ -3,7 +3,7 @@
 
 use crate::pg_config::PgConfig;
 use colored::Colorize;
-use proc_macro2::{TokenStream, Punct, Spacing};
+use proc_macro2::{TokenStream};
 use proc_macro2::TokenTree;
 use quote::{quote, ToTokens, format_ident, TokenStreamExt};
 use serde_json::value::Value as JsonValue;
@@ -11,7 +11,7 @@ use std::collections::HashSet;
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
 use std::str::FromStr;
-use syn::{GenericArgument, braced, parenthesized, ItemFn, PathArguments, ReturnType, Type, TypeParamBound};
+use syn::{GenericArgument, ItemFn, PathArguments, ReturnType, Type, TypeParamBound};
 
 pub mod operator_common;
 pub mod pg_config;
@@ -210,19 +210,19 @@ impl ToTokens for ExternArgs {
             ExternArgs::ParallelSafe => tokens.append(format_ident!("ParallelSafe")),
             ExternArgs::ParallelUnsafe => tokens.append(format_ident!("ParallelUnsafe")),
             ExternArgs::ParallelRestricted => tokens.append(format_ident!("ParallelRestricted")),
-            ExternArgs::Error(s) => {
+            ExternArgs::Error(_s) => {
                 tokens.append_all(quote! {
-                    Error(String::from("#s"))
+                    Error(String::from("#_s"))
                 }.to_token_stream());
             },
-            ExternArgs::Schema(s) => {
+            ExternArgs::Schema(_s) => {
                 tokens.append_all(quote! {
-                    Schema(String::from("#s"))
+                    Schema(String::from("#_s"))
                 }.to_token_stream());
             },
-            ExternArgs::Name(s) => {
+            ExternArgs::Name(_s) => {
                 tokens.append_all(quote! {
-                    Name(String::from("#s"))
+                    Name(String::from("#_s"))
                 }.to_token_stream());
             },
         }
