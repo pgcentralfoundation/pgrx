@@ -9,12 +9,15 @@ mod rewriter;
 use crate::operators::{impl_postgres_eq, impl_postgres_hash, impl_postgres_ord};
 use pgx_utils::*;
 use proc_macro::TokenStream;
-use proc_macro2::{Ident, Span};
-use quote::{quote, quote_spanned};
+use proc_macro2::{Ident, Span, TokenStream as TokenStream2, Punct, Spacing};
+use quote::{quote, quote_spanned, ToTokens, TokenStreamExt};
 use rewriter::*;
 use std::collections::HashSet;
 use syn::spanned::Spanned;
-use syn::{parse_macro_input, Attribute, Data, DeriveInput, Item, ItemFn};
+use syn::{parse_macro_input, bracketed, parenthesized, Attribute, Data, DeriveInput, Item, ItemFn, AttributeArgs, Type, MetaList};
+use syn::Token;
+use syn::parse::{ParseStream, Parse, Parser};
+use syn::punctuated::Punctuated;
 
 /// Declare a function as `#[pg_guard]` to indcate that it is called from a Postgres `extern "C"`
 /// function so that Rust `panic!()`s (and Postgres `elog(ERROR)`s) will be properly handled by `pgx`
@@ -174,6 +177,59 @@ pub fn pg_extern(attr: TokenStream, item: TokenStream) -> TokenStream {
     }
 }
 
+#[derive(Debug)]
+struct SearchPath {
+    at_start: Option<syn::token::At>,
+    dollar: Option<syn::token::Dollar>,
+    path: syn::Ident,
+    at_end: Option<syn::token::At>,
+}
+
+impl Parse for SearchPath {
+    fn parse(input: ParseStream) -> Result<Self, syn::Error> {
+        Ok(SearchPath {
+            at_start: input.parse().expect(&format!("Got {}", input)),
+            dollar: input.parse().expect(&format!("Got {}", input)),
+            path: input.parse().expect(&format!("Got {}", input)),
+            at_end: input.parse().expect(&format!("Got {}", input)),
+        })
+    }
+}
+
+impl ToTokens for SearchPath {
+    fn to_tokens(&self, tokens: &mut TokenStream2) {
+        let at_start = self.at_start;
+        let dollar = self.dollar;
+        let path = &self.path;
+        let at_end = self.at_end;
+
+        let quoted = quote! {
+            #at_start#dollar#path#at_end
+        };
+
+        quoted.to_string().to_tokens(tokens);
+    }
+}
+
+#[derive(Debug, Default)]
+struct SearchPathList {
+    fields: Punctuated<SearchPath, Token![,]>,
+}
+
+impl Parse for SearchPathList {
+    fn parse(input: ParseStream) -> Result<Self, syn::Error> {
+        Ok(SearchPathList {
+            fields: input.parse_terminated(SearchPath::parse).expect(&format!("Got {}", input)),
+        })
+    }
+}
+
+impl ToTokens for SearchPathList {
+    fn to_tokens(&self, tokens: &mut TokenStream2) {
+        self.fields.to_tokens(tokens)
+    }
+}
+
 fn rewrite_item_fn(mut func: ItemFn, extern_args: HashSet<ExternArgs>) -> proc_macro2::TokenStream {
     let is_raw = extern_args.contains(&ExternArgs::Raw);
     let no_guard = extern_args.contains(&ExternArgs::NoGuard);
@@ -188,10 +244,19 @@ fn rewrite_item_fn(mut func: ItemFn, extern_args: HashSet<ExternArgs>) -> proc_m
     // errors/warnings indicate the proper line numbers
     let rewriter = PgGuardRewriter::new();
 
-    // make the function 'extern "C"' because this is for the #[pg_extern[ macro
+    // make the function 'extern "C"' because this is for the #[pg_extern] macro
     func.sig.abi = Some(syn::parse_str("extern \"C\"").unwrap());
     let func_span = func.span();
     let (rewritten_func, need_wrapper) = rewriter.item_fn(func.clone(), true, is_raw, no_guard);
+
+    let search_path_attr = func.attrs.into_iter().find(|f| {
+        f.path.segments.first().map(|f| {
+            f.ident == Ident::new("search_path", Span::call_site())
+        }).unwrap_or_default()
+    });
+    let search_path = search_path_attr.and_then(|attr| {
+        Some(attr.parse_args::<SearchPathList>().unwrap())
+    }).unwrap_or_default();
 
     if need_wrapper {
         let sig = func.sig;
@@ -225,6 +290,7 @@ fn rewrite_item_fn(mut func: ItemFn, extern_args: HashSet<ExternArgs>) -> proc_m
                 crate::PgxExtern {
                     name: stringify!(#ident),
                     pg_extern_args: vec![#(pgx_utils::ExternArgs::#extern_args_iter),*].into_iter().collect(),
+                    search_path: vec![#search_path],
                     fn_args: inputs,
                     fn_return: None#( .unwrap_or(Some(core::any::type_name::<#fn_return_iter>())) )*,
                 }

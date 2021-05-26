@@ -148,6 +148,7 @@ macro_rules! pg_module_magic {
         pub struct PgxExtern {
             name: &'static str,
             pg_extern_args: std::collections::HashSet<pgx_utils::ExternArgs>,
+            search_path: Vec<&'static str>,
             fn_args: Vec<&'static str>,
             fn_return: Option<&'static str>,
         }
