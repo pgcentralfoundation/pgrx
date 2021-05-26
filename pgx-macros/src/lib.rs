@@ -258,27 +258,27 @@ fn rewrite_item_fn(mut func: ItemFn, extern_args: HashSet<ExternArgs>) -> proc_m
         Some(attr.parse_args::<SearchPathList>().unwrap())
     }).unwrap_or_default();
 
+    let sig = func.sig;
+    let ident = sig.ident;
+
+    let (fn_names, fn_args) = sig.inputs.iter().flat_map(|input| {
+        match input {
+            syn::FnArg::Typed(pat) => Some((pat.pat.clone(), pat.ty.clone())),
+            _ => None,
+        }
+    }).unzip::<_, _, Vec<_>, Vec<_>>();
+    let fn_return = match sig.output {
+        syn::ReturnType::Default => None,
+        syn::ReturnType::Type(_, ty) => match *ty {
+            // TODO: Handle this!
+            syn::Type::ImplTrait(_) => None,
+            ty => Some(ty),
+        }
+    };
+    let fn_return_iter = fn_return.iter();
+    let extern_args_iter = extern_args.into_iter();
+
     if need_wrapper {
-        let sig = func.sig;
-        let ident = sig.ident;
-
-        let (fn_names, fn_args) = sig.inputs.iter().flat_map(|input| {
-            match input {
-                syn::FnArg::Typed(pat) => Some((pat.pat.clone(), pat.ty.clone())),
-                _ => None,
-            }
-        }).unzip::<_, _, Vec<_>, Vec<_>>();
-        let fn_return = match sig.output {
-            syn::ReturnType::Default => None,
-            syn::ReturnType::Type(_, ty) => match *ty {
-                // TODO: Handle this!
-                syn::Type::ImplTrait(_) => None,
-                ty => Some(ty),
-            }
-        };
-        let fn_return_iter = fn_return.iter();
-        let extern_args_iter = extern_args.into_iter();
-
         quote_spanned! {func_span=>
             #[no_mangle]
             pub extern "C" fn #finfo_name() -> &'static pg_sys::Pg_finfo_record {
@@ -302,7 +302,22 @@ fn rewrite_item_fn(mut func: ItemFn, extern_args: HashSet<ExternArgs>) -> proc_m
             #rewritten_func
         }
     } else {
-        quote_spanned! {func_span=>#rewritten_func}
+        quote_spanned! {func_span=>
+            pgx::inventory::submit! {
+                use core::any::TypeId;
+                let inputs = vec![#( (stringify!(#fn_names), TypeId::of::<#fn_args>(), core::any::type_name::<#fn_args>()) ),*];
+                crate::PgxExtern {
+                    name: stringify!(#ident),
+                    module_path: core::module_path!(),
+                    pg_extern_args: vec![#(pgx_utils::ExternArgs::#extern_args_iter),*].into_iter().collect(),
+                    search_path: vec![#search_path],
+                    fn_args: inputs,
+                    fn_return: None#( .unwrap_or(Some((TypeId::of::<#fn_return_iter>(), core::any::type_name::<#fn_return_iter>()))) )*,
+                }
+            }
+
+            #rewritten_func
+        }
     }
 }
 
