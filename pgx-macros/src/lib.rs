@@ -314,6 +314,7 @@ fn rewrite_item_fn(mut func: ItemFn, extern_args: HashSet<ExternArgs>) -> proc_m
     };
     let fn_return_iter = fn_return.iter();
     let extern_args_iter = extern_args.into_iter();
+    let default_iter = fn_default.iter().map(|f| f.iter().collect::<Vec<_>>());
 
     let inv = quote! {
         pgx::inventory::submit! {
@@ -323,7 +324,7 @@ fn rewrite_item_fn(mut func: ItemFn, extern_args: HashSet<ExternArgs>) -> proc_m
                     pattern: stringify!(#fn_pat),
                     ty_id: TypeId::of::<#fn_ty>(),
                     ty_name: core::any::type_name::<#fn_ty>(),
-                    default: stringify!(#fn_default),
+                    default: None#( .unwrap_or(Some(stringify!(#default_iter))) )*,
                 }
             ),*];
             crate::PgxExtern {

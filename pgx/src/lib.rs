@@ -160,7 +160,7 @@ macro_rules! pg_module_magic {
             pattern: &'static str,
             ty_id: core::any::TypeId,
             ty_name: &'static str,
-            default: &'static str
+            default: Option<&'static str>,
         }
 
         pub fn generate_meta() -> PgxSchema {
