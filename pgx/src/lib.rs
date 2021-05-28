@@ -151,9 +151,17 @@ macro_rules! pg_module_magic {
             pg_extern_args: std::collections::HashSet<pgx_utils::ExternArgs>,
             search_path: Option<Vec<&'static str>>,
             fn_args: Vec<PgxExternInputs>,
-            fn_return: Option<(core::any::TypeId, &'static str)>,
+            fn_return: Option<PgxExternReturn>,
         }
         pgx::inventory::collect!(PgxExtern);
+
+        // Multiple return types are an iterator.
+        #[derive(Debug)]
+        pub struct PgxExternReturn {
+            ty_ids: Vec<core::any::TypeId>,
+            ty_names: Vec<&'static str>,
+            names: Vec<Option<&'static str>>,
+        }
 
         #[derive(Debug)]
         pub struct PgxExternInputs {

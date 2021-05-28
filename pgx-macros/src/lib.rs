@@ -186,10 +186,27 @@ struct DefaultMacro {
 
 impl Parse for DefaultMacro {
     fn parse(input: ParseStream) -> Result<Self, syn::Error> {
-        Ok(DefaultMacro {
+        Ok(Self {
             ty: input.parse()?,
             comma: input.parse()?,
             expr: input.parse()?,
+        })
+    }
+}
+
+#[derive(Debug)]
+struct NameMacro {
+    ident: syn::Ident,
+    comma: Token![,],
+    ty: syn::Type,
+}
+
+impl Parse for NameMacro {
+    fn parse(input: ParseStream) -> Result<Self, syn::Error> {
+        Ok(Self {
+            ident: input.parse()?,
+            comma: input.parse()?,
+            ty: input.parse()?,
         })
     }
 }
@@ -204,7 +221,7 @@ struct SearchPath {
 
 impl Parse for SearchPath {
     fn parse(input: ParseStream) -> Result<Self, syn::Error> {
-        Ok(SearchPath {
+        Ok(Self {
             at_start: input.parse()?,
             dollar: input.parse()?,
             path: input.parse()?,
@@ -235,7 +252,7 @@ struct SearchPathList {
 
 impl Parse for SearchPathList {
     fn parse(input: ParseStream) -> Result<Self, syn::Error> {
-        Ok(SearchPathList {
+        Ok(Self {
             fields: input.parse_terminated(SearchPath::parse).expect(&format!("Got {}", input)),
         })
     }
@@ -288,8 +305,14 @@ fn rewrite_item_fn(mut func: ItemFn, extern_args: HashSet<ExternArgs>) -> proc_m
                 let default = match pat.ty.as_ref() {
                     syn::Type::Macro(macro_pat) => {
                         let mac = &macro_pat.mac;
-                        let out: DefaultMacro = mac.parse_body().expect(&*format!("{:?}", mac));
-                        Some(out.expr)
+                        let archetype = mac.path.segments.last().unwrap();
+                        match archetype.ident.to_string().as_str() {
+                            "default" => {
+                                let out: DefaultMacro = mac.parse_body().expect(&*format!("{:?}", mac));
+                                Some(out.expr)
+                            },
+                            _ => None,
+                        }
                     },
                     _ => None,
                 };
@@ -306,15 +329,55 @@ fn rewrite_item_fn(mut func: ItemFn, extern_args: HashSet<ExternArgs>) -> proc_m
 
     let fn_return = match sig.output {
         syn::ReturnType::Default => None,
-        syn::ReturnType::Type(_, ty) => match *ty {
+        syn::ReturnType::Type(_, ty) => match *ty.clone() {
             // TODO: Handle this!
-            syn::Type::ImplTrait(_) => None,
-            ty => Some(ty),
+            syn::Type::ImplTrait(impl_trait) => match impl_trait.bounds.first().unwrap() {
+                syn::TypeParamBound::Trait(trait_bound) => {
+                    let last_path_segment = trait_bound.path.segments.last().unwrap();
+                    match last_path_segment.ident.to_string().as_str() {
+                        "Iterator" => match &last_path_segment.arguments {
+                            syn::PathArguments::AngleBracketed(args) => {
+                                match args.args.first().unwrap() {
+                                    syn::GenericArgument::Binding(binding) => match &binding.ty {
+                                        syn::Type::Tuple(tuple_type) => {
+                                            let (return_types, return_names): (Vec<_>, Vec<_>) = tuple_type.elems.iter().flat_map(|elem| {
+                                                match elem {
+                                                    syn::Type::Macro(macro_pat) => {
+                                                        let mac = &macro_pat.mac;
+                                                        let archetype = mac.path.segments.last().unwrap();
+                                                        match archetype.ident.to_string().as_str() {
+                                                            "name" => {
+                                                                let out: NameMacro = mac.parse_body().expect(&*format!("{:?}", mac));
+                                                                Some((out.ty, Some(out.ident)))
+                                                            },
+                                                            _ => unimplemented!("Don't support anything other than name."),
+                                                        }
+                                                    },
+                                                    ty => Some((ty.clone(), None)),
+                                                }
+                                            }).unzip();
+                                            Some((return_types, return_names))
+                                        }
+                                        _ => unimplemented!("Only iters with tuples"),
+                                    },
+                                    _ => unimplemented!(),
+                                }
+                            },
+                            _ => unimplemented!(),
+                        },
+                        _ => unimplemented!(),
+                    }
+                },
+                _ => None,
+            },
+            _ => Some((vec![*ty], vec![None])),
         }
     };
-    let fn_return_iter = fn_return.iter();
+    let (fn_return_ty_iter, fn_return_name_iter): (Vec<_>, Vec<_>) = fn_return.into_iter().map(|(ty, name)| {
+        (ty, name.into_iter().map(|inner| inner.into_iter().collect::<Vec<_>>()).collect::<Vec<_>>())
+    }).unzip();
     let extern_args_iter = extern_args.into_iter();
-    let default_iter = fn_default.iter().map(|f| f.iter().collect::<Vec<_>>());
+    let default_iter = fn_default.iter().map(|f| f.into_iter().collect::<Vec<_>>());
 
     let inv = quote! {
         pgx::inventory::submit! {
@@ -327,13 +390,18 @@ fn rewrite_item_fn(mut func: ItemFn, extern_args: HashSet<ExternArgs>) -> proc_m
                     default: None#( .unwrap_or(Some(stringify!(#default_iter))) )*,
                 }
             ),*];
+            let returns = None#( .unwrap_or(Some(crate::PgxExternReturn {
+                ty_ids: vec![ #( TypeId::of::<#fn_return_ty_iter>() ),* ],
+                ty_names: vec![ #( core::any::type_name::<#fn_return_ty_iter>() ),*  ],
+                names: vec![ #( None#( .unwrap_or(Some(stringify!(#fn_return_name_iter))) )* ),* ],
+            })))*;
             crate::PgxExtern {
                 name: stringify!(#ident),
                 module_path: core::module_path!(),
                 pg_extern_args: vec![#(pgx_utils::ExternArgs::#extern_args_iter),*].into_iter().collect(),
                 search_path: None#( .unwrap_or(Some(vec![#search_path_iter])) )*,
                 fn_args: inputs,
-                fn_return: None#( .unwrap_or(Some((TypeId::of::<#fn_return_iter>(), core::any::type_name::<#fn_return_iter>()))) )*,
+                fn_return: returns,
             }
         }
     };
