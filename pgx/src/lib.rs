@@ -139,42 +139,47 @@ macro_rules! pg_module_magic {
             &MY_MAGIC
         }
 
-        #[derive(Debug)]
-        pub struct PgxSchema {
-            pgx_externs: Vec<&'static PgxExtern>,
+        mod __pgx_internals {
+            #[derive(Debug)]
+            pub struct PgxSchema {
+                pub pgx_externs: Vec<&'static PgxExtern>,
+            }
+
+            #[derive(Debug)]
+            pub struct PgxExtern {
+                pub name: &'static str,
+                pub module_path: &'static str,
+                pub extern_attrs: Vec<pgx_utils::ExternArgs>,
+                pub search_path: Option<Vec<&'static str>>,
+                pub fn_args: Vec<PgxExternInputs>,
+                pub fn_return: PgxExternReturn,
+            }
+            pgx::inventory::collect!(PgxExtern);
+
+            // Multiple return types are an iterator.
+            #[derive(Debug)]
+            pub enum PgxExternReturn {
+                None,
+                Type {
+                    id: core::any::TypeId,
+                    name: &'static str,
+                },
+                Iterated(Vec<(core::any::TypeId, &'static str, Option<&'static str>)>),
+            }
+
+            #[derive(Debug)]
+            pub struct PgxExternInputs {
+                pub pattern: &'static str,
+                pub ty_id: core::any::TypeId,
+                pub ty_name: &'static str,
+                pub default: Option<&'static str>,
+            }
         }
 
-        #[derive(Debug)]
-        pub struct PgxExtern {
-            name: &'static str,
-            module_path: &'static str,
-            pg_extern_args: std::collections::HashSet<pgx_utils::ExternArgs>,
-            search_path: Option<Vec<&'static str>>,
-            fn_args: Vec<PgxExternInputs>,
-            fn_return: Option<PgxExternReturn>,
-        }
-        pgx::inventory::collect!(PgxExtern);
-
-        // Multiple return types are an iterator.
-        #[derive(Debug)]
-        pub struct PgxExternReturn {
-            ty_ids: Vec<core::any::TypeId>,
-            ty_names: Vec<&'static str>,
-            names: Vec<Option<&'static str>>,
-        }
-
-        #[derive(Debug)]
-        pub struct PgxExternInputs {
-            pattern: &'static str,
-            ty_id: core::any::TypeId,
-            ty_name: &'static str,
-            default: Option<&'static str>,
-        }
-
-        pub fn generate_meta() -> PgxSchema {
+        pub fn generate_meta() -> crate::__pgx_internals::PgxSchema {
             use std::fmt::Write;
-            let mut generated_sql = PgxSchema {
-                pgx_externs: pgx::inventory::iter::<PgxExtern>().collect(),
+            let mut generated_sql = crate::__pgx_internals::PgxSchema {
+                pgx_externs: pgx::inventory::iter::<crate::__pgx_internals::PgxExtern>().collect(),
             };
 
             generated_sql

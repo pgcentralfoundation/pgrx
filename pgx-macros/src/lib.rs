@@ -5,6 +5,7 @@ extern crate proc_macro;
 
 mod operators;
 mod rewriter;
+mod pg_extern_inventory;
 
 use crate::operators::{impl_postgres_eq, impl_postgres_hash, impl_postgres_ord};
 use pgx_utils::*;
@@ -18,6 +19,7 @@ use syn::{parenthesized, parse_macro_input, Attribute, Data, DeriveInput, Item, 
 use syn::Token;
 use syn::parse::{ParseStream, Parse, Parser};
 use syn::punctuated::Punctuated;
+use crate::pg_extern_inventory::PgxExternInventory;
 
 /// Declare a function as `#[pg_guard]` to indcate that it is called from a Postgres `extern "C"`
 /// function so that Rust `panic!()`s (and Postgres `elog(ERROR)`s) will be properly handled by `pgx`
@@ -168,103 +170,18 @@ pub fn search_path(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// Declare a function as `#[pg_extern]` to indicate that it can be used by Postgres as a UDF
 #[proc_macro_attribute]
 pub fn pg_extern(attr: TokenStream, item: TokenStream) -> TokenStream {
-    let args = parse_extern_attributes(proc_macro2::TokenStream::from(attr));
+    let args = parse_extern_attributes(proc_macro2::TokenStream::from(attr.clone()));
+
+    let inventory_submission = pg_extern_inventory::PgxExternInventory::new(attr, item.clone());
 
     let ast = parse_macro_input!(item as syn::Item);
     match ast {
-        Item::Fn(func) => rewrite_item_fn(func, args).into(),
+        Item::Fn(func) => rewrite_item_fn(func, args, inventory_submission.unwrap()).into(),
         _ => panic!("#[pg_extern] can only be applied to top-level functions"),
     }
 }
 
-#[derive(Debug)]
-struct DefaultMacro {
-    ty: syn::Type,
-    comma: Token![,],
-    expr: syn::Lit,
-}
-
-impl Parse for DefaultMacro {
-    fn parse(input: ParseStream) -> Result<Self, syn::Error> {
-        Ok(Self {
-            ty: input.parse()?,
-            comma: input.parse()?,
-            expr: input.parse()?,
-        })
-    }
-}
-
-#[derive(Debug)]
-struct NameMacro {
-    ident: syn::Ident,
-    comma: Token![,],
-    ty: syn::Type,
-}
-
-impl Parse for NameMacro {
-    fn parse(input: ParseStream) -> Result<Self, syn::Error> {
-        Ok(Self {
-            ident: input.parse()?,
-            comma: input.parse()?,
-            ty: input.parse()?,
-        })
-    }
-}
-
-#[derive(Debug)]
-struct SearchPath {
-    at_start: Option<syn::token::At>,
-    dollar: Option<syn::token::Dollar>,
-    path: syn::Ident,
-    at_end: Option<syn::token::At>,
-}
-
-impl Parse for SearchPath {
-    fn parse(input: ParseStream) -> Result<Self, syn::Error> {
-        Ok(Self {
-            at_start: input.parse()?,
-            dollar: input.parse()?,
-            path: input.parse()?,
-            at_end: input.parse()?,
-        })
-    }
-}
-
-impl ToTokens for SearchPath {
-    fn to_tokens(&self, tokens: &mut TokenStream2) {
-        let at_start = self.at_start;
-        let dollar = self.dollar;
-        let path = &self.path;
-        let at_end = self.at_end;
-
-        let quoted = quote! {
-            #at_start#dollar#path#at_end
-        };
-
-        quoted.to_string().to_tokens(tokens);
-    }
-}
-
-#[derive(Debug)]
-struct SearchPathList {
-    fields: Punctuated<SearchPath, Token![,]>,
-}
-
-impl Parse for SearchPathList {
-    fn parse(input: ParseStream) -> Result<Self, syn::Error> {
-        Ok(Self {
-            fields: input.parse_terminated(SearchPath::parse).expect(&format!("Got {}", input)),
-        })
-    }
-}
-
-impl ToTokens for SearchPathList {
-    fn to_tokens(&self, tokens: &mut TokenStream2) {
-        self.fields.to_tokens(tokens)
-    }
-}
-
-fn rewrite_item_fn(mut func: ItemFn, extern_args: HashSet<ExternArgs>) -> proc_macro2::TokenStream {
+fn rewrite_item_fn(mut func: ItemFn, extern_args: HashSet<ExternArgs>, inventory_submission: PgxExternInventory) -> proc_macro2::TokenStream {
     let is_raw = extern_args.contains(&ExternArgs::Raw);
     let no_guard = extern_args.contains(&ExternArgs::NoGuard);
 
@@ -278,133 +195,10 @@ fn rewrite_item_fn(mut func: ItemFn, extern_args: HashSet<ExternArgs>) -> proc_m
     // errors/warnings indicate the proper line numbers
     let rewriter = PgGuardRewriter::new();
 
-    // make the function 'extern "C"' because this is for the #[pg_extern] macro
+    // make the function 'extern "C"' because this is for the #[pg_extern[ macro
     func.sig.abi = Some(syn::parse_str("extern \"C\"").unwrap());
     let func_span = func.span();
-    let (rewritten_func, need_wrapper) = rewriter.item_fn(func.clone(), true, is_raw, no_guard);
-
-    let search_path_attr = func.attrs.into_iter().find(|f| {
-        f.path.segments.first().map(|f| {
-            f.ident == Ident::new("search_path", Span::call_site())
-        }).unwrap_or_default()
-    });
-    let search_path = search_path_attr.and_then(|attr| {
-        Some(attr.parse_args::<SearchPathList>().unwrap())
-    });
-    let search_path_iter = search_path.iter();
-
-    let sig = func.sig;
-    let ident = sig.ident;
-
-    let mut fn_pat = vec![];
-    let mut fn_ty = vec![];
-    let mut fn_default = vec![];
-    sig.inputs.iter().flat_map(|input| {
-        match input {
-            syn::FnArg::Typed(pat) => {
-                let default = match pat.ty.as_ref() {
-                    syn::Type::Macro(macro_pat) => {
-                        let mac = &macro_pat.mac;
-                        let archetype = mac.path.segments.last().unwrap();
-                        match archetype.ident.to_string().as_str() {
-                            "default" => {
-                                let out: DefaultMacro = mac.parse_body().expect(&*format!("{:?}", mac));
-                                Some(out.expr)
-                            },
-                            _ => None,
-                        }
-                    },
-                    _ => None,
-                };
-
-                Some((pat.pat.clone(), pat.ty.clone(), default))
-            },
-            _ => None,
-        }
-    }).for_each(|(pat, ty, default)| {
-        fn_pat.push(pat);
-        fn_ty.push(ty);
-        fn_default.push(default);
-    });
-
-    let fn_return = match sig.output {
-        syn::ReturnType::Default => None,
-        syn::ReturnType::Type(_, ty) => match *ty.clone() {
-            // TODO: Handle this!
-            syn::Type::ImplTrait(impl_trait) => match impl_trait.bounds.first().unwrap() {
-                syn::TypeParamBound::Trait(trait_bound) => {
-                    let last_path_segment = trait_bound.path.segments.last().unwrap();
-                    match last_path_segment.ident.to_string().as_str() {
-                        "Iterator" => match &last_path_segment.arguments {
-                            syn::PathArguments::AngleBracketed(args) => {
-                                match args.args.first().unwrap() {
-                                    syn::GenericArgument::Binding(binding) => match &binding.ty {
-                                        syn::Type::Tuple(tuple_type) => {
-                                            let (return_types, return_names): (Vec<_>, Vec<_>) = tuple_type.elems.iter().flat_map(|elem| {
-                                                match elem {
-                                                    syn::Type::Macro(macro_pat) => {
-                                                        let mac = &macro_pat.mac;
-                                                        let archetype = mac.path.segments.last().unwrap();
-                                                        match archetype.ident.to_string().as_str() {
-                                                            "name" => {
-                                                                let out: NameMacro = mac.parse_body().expect(&*format!("{:?}", mac));
-                                                                Some((out.ty, Some(out.ident)))
-                                                            },
-                                                            _ => unimplemented!("Don't support anything other than name."),
-                                                        }
-                                                    },
-                                                    ty => Some((ty.clone(), None)),
-                                                }
-                                            }).unzip();
-                                            Some((return_types, return_names))
-                                        }
-                                        _ => unimplemented!("Only iters with tuples"),
-                                    },
-                                    _ => unimplemented!(),
-                                }
-                            },
-                            _ => unimplemented!(),
-                        },
-                        _ => unimplemented!(),
-                    }
-                },
-                _ => None,
-            },
-            _ => Some((vec![*ty], vec![None])),
-        }
-    };
-    let (fn_return_ty_iter, fn_return_name_iter): (Vec<_>, Vec<_>) = fn_return.into_iter().map(|(ty, name)| {
-        (ty, name.into_iter().map(|inner| inner.into_iter().collect::<Vec<_>>()).collect::<Vec<_>>())
-    }).unzip();
-    let extern_args_iter = extern_args.into_iter();
-    let default_iter = fn_default.iter().map(|f| f.into_iter().collect::<Vec<_>>());
-
-    let inv = quote! {
-        pgx::inventory::submit! {
-            use core::any::TypeId;
-            let inputs = vec![#(
-                crate::PgxExternInputs {
-                    pattern: stringify!(#fn_pat),
-                    ty_id: TypeId::of::<#fn_ty>(),
-                    ty_name: core::any::type_name::<#fn_ty>(),
-                    default: None#( .unwrap_or(Some(stringify!(#default_iter))) )*,
-                }
-            ),*];
-            let returns = None#( .unwrap_or(Some(crate::PgxExternReturn {
-                ty_ids: vec![ #( TypeId::of::<#fn_return_ty_iter>() ),* ],
-                ty_names: vec![ #( core::any::type_name::<#fn_return_ty_iter>() ),*  ],
-                names: vec![ #( None#( .unwrap_or(Some(stringify!(#fn_return_name_iter))) )* ),* ],
-            })))*;
-            crate::PgxExtern {
-                name: stringify!(#ident),
-                module_path: core::module_path!(),
-                pg_extern_args: vec![#(pgx_utils::ExternArgs::#extern_args_iter),*].into_iter().collect(),
-                search_path: None#( .unwrap_or(Some(vec![#search_path_iter])) )*,
-                fn_args: inputs,
-                fn_return: returns,
-            }
-        }
-    };
+    let (rewritten_func, need_wrapper) = rewriter.item_fn(func, true, is_raw, no_guard);
 
     if need_wrapper {
         quote_spanned! {func_span=>
@@ -414,13 +208,13 @@ fn rewrite_item_fn(mut func: ItemFn, extern_args: HashSet<ExternArgs>) -> proc_m
                 &V1_API
             }
 
-            #inv
+            #inventory_submission
 
             #rewritten_func
         }
     } else {
         quote_spanned! {func_span=>
-            #inv
+            #inventory_submission
 
             #rewritten_func
         }
