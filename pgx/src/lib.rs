@@ -156,7 +156,6 @@ macro_rules! pg_module_magic {
             }
             pgx::inventory::collect!(PgxExtern);
 
-            // Multiple return types are an iterator.
             #[derive(Debug)]
             pub enum PgxExternReturn {
                 None,
