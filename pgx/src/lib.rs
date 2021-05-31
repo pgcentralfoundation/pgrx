@@ -144,6 +144,7 @@ macro_rules! pg_module_magic {
             pub struct PgxSchema {
                 pub externs: Vec<&'static PgxExtern>,
                 pub types: Vec<&'static PgxPostgresType>,
+                pub enums: Vec<&'static PgxPostgresEnum>,
             }
 
             #[derive(Debug)]
@@ -165,6 +166,14 @@ macro_rules! pg_module_magic {
                 pub fn_return: PgxExternReturn,
             }
             pgx::inventory::collect!(PgxExtern);
+
+            #[derive(Debug)]
+            pub struct PgxPostgresEnum {
+                pub name: &'static str,
+                pub id: core::any::TypeId,
+                pub variants: Vec<&'static str>,
+            }
+            pgx::inventory::collect!(PgxPostgresEnum);
 
             #[derive(Debug)]
             pub enum PgxExternReturn {
@@ -190,6 +199,7 @@ macro_rules! pg_module_magic {
             let mut generated_sql = crate::__pgx_internals::PgxSchema {
                 externs: pgx::inventory::iter::<crate::__pgx_internals::PgxExtern>().collect(),
                 types: pgx::inventory::iter::<crate::__pgx_internals::PgxPostgresType>().collect(),
+                enums: pgx::inventory::iter::<crate::__pgx_internals::PgxPostgresEnum>().collect(),
             };
 
             generated_sql

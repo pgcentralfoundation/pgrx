@@ -242,7 +242,7 @@ fn impl_postgres_enum(ast: DeriveInput) -> proc_macro2::TokenStream {
     let mut from_datum = proc_macro2::TokenStream::new();
     let mut into_datum = proc_macro2::TokenStream::new();
 
-    for d in enum_data.variants {
+    for d in enum_data.variants.clone() {
         let label_ident = &d.ident;
         let label_string = label_ident.to_string();
 
@@ -280,6 +280,11 @@ fn impl_postgres_enum(ast: DeriveInput) -> proc_macro2::TokenStream {
 
         }
     });
+
+    inventory::PostgresEnum::new(
+        enum_ident.clone(),
+        enum_data.variants
+    ).to_tokens(&mut stream);
 
     stream
 }
@@ -381,7 +386,7 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
     inventory::PostgresType::new(
         name.clone(),
         funcname_in.clone(),
-        funcname_out.clone()
+        funcname_out.clone(),
     ).to_tokens(&mut stream);
 
     stream
