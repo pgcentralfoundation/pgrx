@@ -378,6 +378,12 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
         });
     }
 
+    inventory::PostgresType::new(
+        name.clone(),
+        funcname_in.clone(),
+        funcname_out.clone()
+    ).to_tokens(&mut stream);
+
     stream
 }
 

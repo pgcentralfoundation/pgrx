@@ -142,8 +142,18 @@ macro_rules! pg_module_magic {
         mod __pgx_internals {
             #[derive(Debug)]
             pub struct PgxSchema {
-                pub pgx_externs: Vec<&'static PgxExtern>,
+                pub externs: Vec<&'static PgxExtern>,
+                pub types: Vec<&'static PgxPostgresType>,
             }
+
+            #[derive(Debug)]
+            pub struct PgxPostgresType {
+                pub name: &'static str,
+                pub id: core::any::TypeId,
+                pub in_fn: &'static str,
+                pub out_fn: &'static str,
+            }
+            pgx::inventory::collect!(PgxPostgresType);
 
             #[derive(Debug)]
             pub struct PgxExtern {
@@ -178,7 +188,8 @@ macro_rules! pg_module_magic {
         pub fn generate_meta() -> crate::__pgx_internals::PgxSchema {
             use std::fmt::Write;
             let mut generated_sql = crate::__pgx_internals::PgxSchema {
-                pgx_externs: pgx::inventory::iter::<crate::__pgx_internals::PgxExtern>().collect(),
+                externs: pgx::inventory::iter::<crate::__pgx_internals::PgxExtern>().collect(),
+                types: pgx::inventory::iter::<crate::__pgx_internals::PgxPostgresType>().collect(),
             };
 
             generated_sql
