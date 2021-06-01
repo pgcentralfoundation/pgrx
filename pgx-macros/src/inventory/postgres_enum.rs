@@ -1,8 +1,6 @@
 use proc_macro2::{TokenStream as TokenStream2, Span};
-use proc_macro::TokenStream;
-use syn::{Ident, Token, punctuated::Punctuated, parse::{Parse, ParseStream}, FnArg};
+use syn::{Ident, Token, punctuated::Punctuated};
 use quote::{quote, ToTokens, TokenStreamExt};
-use std::{convert::TryFrom, ops::Deref};
 
 pub struct PostgresEnum {
     pub name: Ident,
