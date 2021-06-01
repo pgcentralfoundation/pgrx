@@ -125,7 +125,7 @@ macro_rules! pg_module_magic {
             use pgx;
             use pgx::pg_sys::{
                 Pg_magic_struct, FUNC_MAX_ARGS, INDEX_MAX_KEYS, NAMEDATALEN, PG_VERSION_NUM,
-                USE_FLOAT4_BYVAL, USE_FLOAT8_BYVAL,
+                USE_FLOAT8_BYVAL,
             };
             use std::mem::size_of;
             use std::os::raw::c_int;
@@ -137,7 +137,7 @@ macro_rules! pg_module_magic {
                 funcmaxargs: FUNC_MAX_ARGS as c_int,
                 indexmaxkeys: INDEX_MAX_KEYS as c_int,
                 namedatalen: NAMEDATALEN as c_int,
-                float4byval: USE_FLOAT4_BYVAL as c_int,
+                float4byval: pgx::pg_sys::USE_FLOAT4_BYVAL as c_int,
                 float8byval: USE_FLOAT8_BYVAL as c_int,
             };
 
