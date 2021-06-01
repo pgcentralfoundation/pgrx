@@ -123,32 +123,28 @@ macro_rules! pg_module_magic {
         #[link_name = "Pg_magic_func"]
         pub extern "C" fn Pg_magic_func() -> &'static pgx::pg_sys::Pg_magic_struct {
             use pgx;
-            use pgx::pg_sys::{
-                Pg_magic_struct, FUNC_MAX_ARGS, INDEX_MAX_KEYS, NAMEDATALEN, PG_VERSION_NUM,
-                USE_FLOAT8_BYVAL,
-            };
             use std::mem::size_of;
             use std::os::raw::c_int;
 
             #[cfg(not(feature = "pg13"))]
-            const MY_MAGIC: Pg_magic_struct = Pg_magic_struct {
+            const MY_MAGIC: pgx::pg_sys::Pg_magic_struct = pgx::pg_sys::Pg_magic_struct {
                 len: size_of::<pgx::pg_sys::Pg_magic_struct>() as c_int,
-                version: PG_VERSION_NUM as c_int / 100,
-                funcmaxargs: FUNC_MAX_ARGS as c_int,
-                indexmaxkeys: INDEX_MAX_KEYS as c_int,
-                namedatalen: NAMEDATALEN as c_int,
+                version: pgx::pg_sys::PG_VERSION_NUM as c_int / 100,
+                funcmaxargs: pgx::pg_sys::FUNC_MAX_ARGS as c_int,
+                indexmaxkeys: pgx::pg_sys::INDEX_MAX_KEYS as c_int,
+                namedatalen: pgx::pg_sys::NAMEDATALEN as c_int,
                 float4byval: pgx::pg_sys::USE_FLOAT4_BYVAL as c_int,
-                float8byval: USE_FLOAT8_BYVAL as c_int,
+                float8byval: pgx::pg_sys::USE_FLOAT8_BYVAL as c_int,
             };
 
             #[cfg(feature = "pg13")]
-            const MY_MAGIC: Pg_magic_struct = Pg_magic_struct {
+            const MY_MAGIC: pgx::pg_sys::Pg_magic_struct = pgx::pg_sys::Pg_magic_struct {
                 len: size_of::<pgx::pg_sys::Pg_magic_struct>() as c_int,
-                version: PG_VERSION_NUM as c_int / 100,
-                funcmaxargs: FUNC_MAX_ARGS as c_int,
-                indexmaxkeys: INDEX_MAX_KEYS as c_int,
-                namedatalen: NAMEDATALEN as c_int,
-                float8byval: USE_FLOAT8_BYVAL as c_int,
+                version: pgx::pg_sys::PG_VERSION_NUM as c_int / 100,
+                funcmaxargs: pgx::pg_sys::FUNC_MAX_ARGS as c_int,
+                indexmaxkeys: pgx::pg_sys::INDEX_MAX_KEYS as c_int,
+                namedatalen: pgx::pg_sys::NAMEDATALEN as c_int,
+                float8byval: pgx::pg_sys::USE_FLOAT8_BYVAL as c_int,
             };
 
             // go ahead and register our panic handler since Postgres
