@@ -4,12 +4,12 @@ use syn::{Token, punctuated::Punctuated, parse::{Parse, ParseStream}};
 use quote::{quote, ToTokens, TokenStreamExt};
 
 #[derive(Debug)]
-pub struct Attributes {
+pub struct PgxAttributes {
     attrs: Punctuated<Attribute, Token![,]>,
 }
 
 
-impl Parse for Attributes {
+impl Parse for PgxAttributes {
     fn parse(input: ParseStream) -> Result<Self, syn::Error> {
         Ok(Self {
             attrs: input.parse_terminated(Attribute::parse)?,
@@ -17,7 +17,7 @@ impl Parse for Attributes {
     }
 }
 
-impl ToTokens for Attributes {
+impl ToTokens for PgxAttributes {
     fn to_tokens(&self, tokens: &mut TokenStream2) {
         let attrs = &self.attrs;
         let quoted = quote! {

@@ -2,11 +2,13 @@ mod attribute;
 mod argument;
 mod returning;
 mod search_path;
+mod operator;
 
-use attribute::Attributes;
+use attribute::PgxAttributes;
 use argument::Argument;
 use returning::Returning;
 use search_path::SearchPathList;
+use operator::{PgxOperator, PgxOperatorAttributeWithIdent};
 
 use syn::{Token, token::Token, ItemFn, FnArg};
 use syn::parse::{Parse, ParseStream, ParseBuffer};
@@ -17,17 +19,50 @@ use syn::punctuated::Punctuated;
 use std::collections::HashSet;
 use std::convert::TryFrom;
 use std::ops::Deref;
+use crate::inventory::pg_extern::operator::PgxOperatorOpName;
 
 #[derive(Debug)]
 pub struct PgxExtern {
-    attrs: Attributes,
+    attrs: PgxAttributes,
     func: syn::ItemFn,
 }
 
-
 impl PgxExtern {
-    fn extern_attrs(&self) -> &Attributes {
+    fn extern_attrs(&self) -> &PgxAttributes {
         &self.attrs
+    }
+
+    fn operator(&self) -> Option<PgxOperator> {
+        let mut skel = Option::<PgxOperator>::default();
+        for attr in &self.func.attrs {
+            let last_segment = attr.path.segments.last().unwrap();
+            match last_segment.ident.to_string().as_str() {
+                "opname" => {
+                    let attr: PgxOperatorOpName = syn::parse2(attr.tokens.clone()).expect(&format!("Unable to parse {:?}", &attr.tokens));
+                    skel.get_or_insert_with(Default::default).opname.get_or_insert(attr);
+                }
+                "commutator" => {
+                    let attr: PgxOperatorAttributeWithIdent = syn::parse2(attr.tokens.clone()).expect(&format!("Unable to parse {:?}", &attr.tokens));
+                    skel.get_or_insert_with(Default::default).commutator.get_or_insert(attr);
+                },
+                "negator" => {
+                    let attr: PgxOperatorAttributeWithIdent = syn::parse2(attr.tokens.clone()).expect(&format!("Unable to parse {:?}", &attr.tokens));
+                    skel.get_or_insert_with(Default::default).negator.get_or_insert(attr);
+                },
+                "restrict" => {
+                    let attr: PgxOperatorAttributeWithIdent = syn::parse2(attr.tokens.clone()).expect(&format!("Unable to parse {:?}", &attr.tokens));
+                    skel.get_or_insert_with(Default::default).restrict.get_or_insert(attr);
+                },
+                "hashes" => {
+                    skel.get_or_insert_with(Default::default).hashes = true;
+                },
+                "merges" => {
+                    skel.get_or_insert_with(Default::default).merges = true;
+                },
+                _ => (),
+            }
+        }
+        skel
     }
 
     fn search_path(&self) -> Option<SearchPathList> {
@@ -52,7 +87,7 @@ impl PgxExtern {
 
 
     pub(crate) fn new(attr: TokenStream, item: TokenStream) -> Result<Self, syn::Error> {
-        let attrs = syn::parse::<Attributes>(attr)?;
+        let attrs = syn::parse::<PgxAttributes>(attr)?;
         let func = syn::parse::<syn::ItemFn>(item)?;
         Ok(Self {
             attrs,
@@ -69,6 +104,7 @@ impl ToTokens for PgxExtern {
         let search_path = self.search_path().into_iter();
         let inputs = self.inputs();
         let returns = self.returns();
+        let operator = self.operator().into_iter();
 
         let inv = quote! {
             pgx::inventory::submit! {
@@ -80,6 +116,7 @@ impl ToTokens for PgxExtern {
                     search_path: None#( .unwrap_or(Some(vec![#search_path])) )*,
                     fn_args: vec![#(#inputs),*],
                     fn_return: #returns,
+                    operator: None#( .unwrap_or(Some(#operator)) )*,
                 }
             }
         };

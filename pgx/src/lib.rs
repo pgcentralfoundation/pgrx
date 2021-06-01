@@ -157,6 +157,17 @@ macro_rules! pg_module_magic {
             pgx::inventory::collect!(PgxPostgresType);
 
             #[derive(Debug)]
+            pub struct PgxOperator {
+                pub opname: Option<&'static str>,
+                pub commutator: Option<&'static str>,
+                pub negator: Option<&'static str>,
+                pub restrict: Option<&'static str>,
+                pub join: Option<&'static str>,
+                pub hashes: bool,
+                pub merges: bool,
+            }
+
+            #[derive(Debug)]
             pub struct PgxExtern {
                 pub name: &'static str,
                 pub module_path: &'static str,
@@ -164,6 +175,7 @@ macro_rules! pg_module_magic {
                 pub search_path: Option<Vec<&'static str>>,
                 pub fn_args: Vec<PgxExternInputs>,
                 pub fn_return: PgxExternReturn,
+                pub operator: Option<PgxOperator>,
             }
             pgx::inventory::collect!(PgxExtern);
 
