@@ -24,7 +24,9 @@ impl ToTokens for PostgresEnum {
             pgx::inventory::submit! {
                 use core::any::TypeId;
                 crate::__pgx_internals::PgxPostgresEnum {
-                    name: core::any::type_name::<#name>(),
+                    name: stringify!(#name),
+                    file: file!(),
+                    full_path: core::any::type_name::<#name>(),
                     id: TypeId::of::<#name>(),
                     variants: vec![ #(  stringify!(#variants)  ),* ],
                 }

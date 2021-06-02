@@ -26,7 +26,9 @@ impl ToTokens for PostgresType {
             pgx::inventory::submit! {
                 use core::any::TypeId;
                 crate::__pgx_internals::PgxPostgresType {
-                    name: core::any::type_name::<#name>(),
+                    name: stringify!(#name),
+                    file: file!(),
+                    full_path: core::any::type_name::<#name>(),
                     id: TypeId::of::<#name>(),
                     in_fn: stringify!(#in_fn),
                     out_fn: stringify!(#out_fn),

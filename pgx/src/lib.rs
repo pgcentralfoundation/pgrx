@@ -147,9 +147,123 @@ macro_rules! pg_module_magic {
                 pub enums: Vec<&'static PgxPostgresEnum>,
             }
 
+            impl PgxSchema {
+                pub fn to_sql(&self) -> String {
+                    format!("\
+                            {enums}\n\
+                            {shell_types}\n\
+                            {externs_with_operators}\n\
+                            {materialized_types}\n\
+                            {operator_classes}\n\
+                        ",
+                        enums = self.enums(),
+                        shell_types = self.shell_types(),
+                        externs_with_operators = self.externs_with_operators(),
+                        materialized_types = self.materialized_types(),
+                        operator_classes = self.operator_classes(),
+                    )
+                }
+
+                fn enums(&self) -> String {
+                    self.enums.iter().map(|en| {
+                        format!("\n\
+                                -- {file}\n\
+                                -- {full_path}\n\
+                                -- {id:?}\n\
+                                CREATE TYPE {name} AS ENUM (\n\
+                                    {variants}\
+                                )\n\
+                            ",
+                            full_path = en.full_path,
+                            file = en.file,
+                            id = en.id,
+                            name = en.name,
+                            variants = en.variants.iter().map(|variant| format!("\t'{}'\n", variant)).collect::<String>(),
+                        )
+                    }).by_ref().collect()
+                }
+
+                fn shell_types(&self) -> String {
+                    self.types.iter().map(|ty| {
+                        format!("\n\
+                                -- {file}\n\
+                                -- {full_path}\n\
+                                -- {id:?}\n\
+                                CREATE TYPE {name};\n\
+                            ",
+                            full_path = ty.full_path,
+                            file = ty.file,
+                            id = ty.id,
+                            name = ty.name,
+                        )
+                    }).by_ref().collect()
+                }
+
+                fn externs_with_operators(&self) -> String {
+                    self.externs.iter().map(|ext| {
+                        let ext_sql = format!("\n\
+                                -- {file}\n\
+                                -- {module_path}::{name}\n\
+                                CREATE OR REPLACE FUNCTION {name};\n\
+                            ",
+                            name = ext.name,
+                            module_path = ext.module_path,
+                            file = ext.file,
+                        );
+                        match &ext.operator {
+                            Some(op) => {
+                                let operator_sql = format!("\n\
+                                        -- {file}\n\
+                                        -- {module_path}::{name}\n\
+                                        CREATE OPERATOR {opname} (\n\
+                                            \tPROCEDURE=\"{name}\"\n\
+                                        )\n\
+                                    ",
+                                    opname = op.opname.unwrap(),
+                                    file = ext.file,
+                                    name = ext.name,
+                                    module_path = ext.module_path,
+                                );
+                                ext_sql + &operator_sql
+                            },
+                            None => ext_sql,
+                        }
+                    }).by_ref().collect()
+                }
+
+                fn materialized_types(&self) -> String {
+                    self.types.iter().map(|ty| {
+                        format!("\n\
+                                -- {file}\n\
+                                -- {full_path}\n\
+                                -- {id:?}\n\
+                                CREATE TYPE {name} ( ... );\n\
+                            ",
+                            full_path = ty.full_path,
+                            file = ty.file,
+                            id = ty.id,
+                            name = ty.name,
+                        )
+                    }).by_ref().collect()
+                }
+
+                fn operator_classes(&self) -> String {
+                    self.externs.iter().filter(|ext| ext.operator.is_some()).map(|ext| {
+                        format!("\
+                                CREATE OPERATOR FAMILY {name};\n\
+                                CREATE OPERATOR CLASS {name};\n\
+                            ",
+                            name = ext.name,
+                        )
+                    }).collect()
+                }
+            }
+
             #[derive(Debug)]
             pub struct PgxPostgresType {
                 pub name: &'static str,
+                pub file: &'static str,
+                pub full_path: &'static str,
                 pub id: core::any::TypeId,
                 pub in_fn: &'static str,
                 pub out_fn: &'static str,
@@ -170,6 +284,7 @@ macro_rules! pg_module_magic {
             #[derive(Debug)]
             pub struct PgxExtern {
                 pub name: &'static str,
+                pub file: &'static str,
                 pub module_path: &'static str,
                 pub extern_attrs: Vec<pgx_utils::ExternArgs>,
                 pub search_path: Option<Vec<&'static str>>,
@@ -182,6 +297,8 @@ macro_rules! pg_module_magic {
             #[derive(Debug)]
             pub struct PgxPostgresEnum {
                 pub name: &'static str,
+                pub file: &'static str,
+                pub full_path: &'static str,
                 pub id: core::any::TypeId,
                 pub variants: Vec<&'static str>,
             }
