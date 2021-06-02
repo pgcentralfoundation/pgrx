@@ -226,13 +226,33 @@ macro_rules! pg_module_magic {
                         );
                         match &ext.operator {
                             Some(op) => {
+                                let mut optionals = vec![];
+                                if let Some(it) = op.commutator {
+                                    optionals.push(format!("\tCOMMUTATOR = {}", it));
+                                };
+                                if let Some(it) = op.negator {
+                                    optionals.push(format!("\tNEGATOR = {}", it));
+                                };
+                                if let Some(it) = op.restrict {
+                                    optionals.push(format!("\tRESTRICT = {}", it));
+                                };
+                                if let Some(it) = op.join {
+                                    optionals.push(format!("\tJOIN = {}", it));
+                                };
+                                if op.hashes {
+                                    optionals.push(String::from("\tHASHES"));
+                                };
+                                if op.merges {
+                                    optionals.push(String::from("\tMERGES"));
+                                };
                                 let operator_sql = format!("\n\
                                         -- {file}\n\
                                         -- {module_path}::{name}\n\
                                         CREATE OPERATOR {opname} (\n\
-                                            \tPROCEDURE=\"{name}\"\n\
-                                            \tLEFTARG={left_arg}\n\
+                                            \tPROCEDURE=\"{name},\"\n\
+                                            \tLEFTARG={left_arg},\n\
                                             \tRIGHTARG={right_arg}\n\
+                                            {optionals}\n\
                                         )\n\
                                     ",
                                     opname = op.opname.unwrap(),
@@ -241,6 +261,7 @@ macro_rules! pg_module_magic {
                                     module_path = ext.module_path,
                                     left_arg = ext.fn_args.get(0).unwrap().ty_name,
                                     right_arg = ext.fn_args.get(1).unwrap().ty_name,
+                                    optionals = optionals.join(",\n")
                                 );
                                 ext_sql + &operator_sql
                             },
@@ -301,7 +322,7 @@ macro_rules! pg_module_magic {
                                   \tOPERATOR 3 = ,\n\
                                   \tOPERATOR 4 >= ,\n\
                                   \tOPERATOR 5 > ,\n\
-                                  \tFUNCTION 1 thing_cmp({name}, {name});\n\
+                                  \tFUNCTION 1 {name}_cmp({name}, {name});\n\
                             ",
                             name = ord_derive.name,
                             full_path = ord_derive.full_path,
