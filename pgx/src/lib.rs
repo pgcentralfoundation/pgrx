@@ -178,7 +178,7 @@ macro_rules! pg_module_magic {
                             file = en.file,
                             id = en.id,
                             name = en.name,
-                            variants = en.variants.iter().map(|variant| format!("\t'{}'\n", variant)).collect::<String>(),
+                            variants = en.variants.iter().map(|variant| format!("\t'{}',\n", variant)).collect::<String>(),
                         )
                     }).by_ref().collect()
                 }
@@ -237,12 +237,19 @@ macro_rules! pg_module_magic {
                                 -- {file}\n\
                                 -- {full_path}\n\
                                 -- {id:?}\n\
-                                CREATE TYPE {name} ( ... );\n\
+                                CREATE TYPE {name} (\n\
+                                    \tINTERNALLENGTH = variable,\n\
+                                    \tINPUT = {in_fn},\n\
+                                    \tOUTPUT = {out_fn},\n\
+                                    \tSTORAGE = extended\n\
+                                );\n\
                             ",
                             full_path = ty.full_path,
                             file = ty.file,
                             id = ty.id,
                             name = ty.name,
+                            in_fn = ty.in_fn,
+                            out_fn = ty.out_fn,
                         )
                     }).by_ref().collect()
                 }
