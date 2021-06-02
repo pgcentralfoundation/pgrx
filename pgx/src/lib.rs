@@ -207,19 +207,19 @@ macro_rules! pg_module_magic {
                         let ext_sql = format!("\n\
                                 -- {file}\n\
                                 -- {module_path}::{name}\n\
-                                CREATE OR REPLACE FUNCTION {name}({arguments}) {returns} {extern_attrs} LANGUAGE c AS 'MODULE_PATHNAME', '{name}';\n\
+                                CREATE OR REPLACE FUNCTION \"{name}\"({arguments}) {returns} {extern_attrs} LANGUAGE c AS 'MODULE_PATHNAME', '{name}';\n\
                             ",
                             name = ext.name,
                             module_path = ext.module_path,
                             file = ext.file,
                             arguments = ext.fn_args.iter().map(|arg|
-                                format!("\"{}\" {}", arg.pattern, arg.ty_name)
+                                format!("\"{}\" {}", arg.pattern, pgx::type_id_to_sql_type(arg.ty_id).unwrap_or(arg.ty_name))
                             ).collect::<Vec<_>>().join(", "),
                             returns = match &ext.fn_return {
                                 PgxExternReturn::None => String::default(),
-                                PgxExternReturn::Type { id, name } => format!("RETURNS {}", name),
+                                PgxExternReturn::Type { id, name } => format!("RETURNS {}", pgx::type_id_to_sql_type(*id).unwrap_or(name)),
                                 PgxExternReturn::Iterated(vec) => format!("RETURNS TABLE ({})",
-                                    vec.iter().map(|(id, ty_name, col_name)| format!("\"{}\" {}", col_name.unwrap(), ty_name)).collect::<Vec<_>>().join(", ")
+                                    vec.iter().map(|(id, ty_name, col_name)| format!("\"{}\" {}", col_name.unwrap(), pgx::type_id_to_sql_type(*id).unwrap_or(ty_name))).collect::<Vec<_>>().join(", ")
                                 ),
                             },
                             extern_attrs = ext.extern_attrs.iter().map(|attr| format!(" {:?} ", attr)).collect::<String>(),
@@ -444,4 +444,34 @@ macro_rules! pg_module_magic {
 #[allow(unused)]
 pub fn initialize() {
     register_pg_guard_panic_handler();
+}
+
+use once_cell::sync::Lazy;
+use std::collections::HashMap;
+use std::sync::{RwLock, Arc};
+use core::any::TypeId;
+
+static TYPEID_SQL_BIMAP: Lazy<Arc<RwLock<HashMap<TypeId, &'static str>>>> = Lazy::new(|| {
+    let mut m = HashMap::new();
+    m.insert(TypeId::of::<&'static str>(), "text");
+    m.insert(TypeId::of::<&std::ffi::CStr>(), "cstring");
+    m.insert(TypeId::of::<String>(), "text");
+    m.insert(TypeId::of::<()>(), "void");
+    m.insert(TypeId::of::<i8>(), "\"char\"");
+    m.insert(TypeId::of::<i16>(), "smallint");
+    m.insert(TypeId::of::<i32>(), "integer");
+    m.insert(TypeId::of::<i64>(), "bigint");
+    m.insert(TypeId::of::<bool>(), "bool");
+    m.insert(TypeId::of::<char>(), "varchar");
+    m.insert(TypeId::of::<f32>(), "real");
+    m.insert(TypeId::of::<f64>(), "double precision");
+    m.insert(TypeId::of::<&[u8]>(), "bytea");
+    m.insert(TypeId::of::<Vec<u8>>(), "bytea");
+    Arc::from(RwLock::from(m))
+});
+pub fn type_id_to_sql_type(id: TypeId) -> Option<&'static str> {
+    TYPEID_SQL_BIMAP.read().unwrap().get(&id).map(|f| *f)
+}
+pub fn insert_mapping(id: TypeId, sql: &'static str) {
+    TYPEID_SQL_BIMAP.write().unwrap().insert(id, sql);
 }
