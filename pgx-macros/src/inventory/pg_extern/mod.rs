@@ -8,18 +8,13 @@ use attribute::PgxAttributes;
 use argument::Argument;
 use returning::Returning;
 use search_path::SearchPathList;
-use operator::{PgxOperator, PgxOperatorAttributeWithIdent};
+use operator::{PgxOperator, PgxOperatorAttributeWithIdent, PgxOperatorOpName};
 
-use syn::{Token, token::Token, ItemFn, FnArg};
-use syn::parse::{Parse, ParseStream, ParseBuffer};
+use syn::parse::{Parse, ParseStream};
 use quote::{ToTokens, quote, TokenStreamExt};
 use proc_macro2::{TokenStream as TokenStream2, Span, Ident};
 use proc_macro::TokenStream;
-use syn::punctuated::Punctuated;
-use std::collections::HashSet;
 use std::convert::TryFrom;
-use std::ops::Deref;
-use crate::inventory::pg_extern::operator::PgxOperatorOpName;
 
 #[derive(Debug)]
 pub struct PgxExtern {

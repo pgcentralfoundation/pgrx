@@ -1,7 +1,6 @@
-use proc_macro2::{TokenStream as TokenStream2, Span};
-use proc_macro::TokenStream;
+use proc_macro2::{TokenStream as TokenStream2};
 use syn::{Token, punctuated::Punctuated, parse::{Parse, ParseStream}};
-use quote::{quote, ToTokens, TokenStreamExt};
+use quote::{quote, ToTokens};
 
 #[derive(Debug)]
 pub struct SearchPath {

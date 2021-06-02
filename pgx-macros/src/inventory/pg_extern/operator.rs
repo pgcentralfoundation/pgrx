@@ -1,5 +1,5 @@
-use syn::{parenthesized, Token, token::Paren, punctuated::Punctuated};
-use proc_macro2::{TokenStream as TokenStream2, Ident};
+use syn::{parenthesized, token::Paren};
+use proc_macro2::{TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
 use syn::parse::{Parse, ParseBuffer};
 

@@ -6,20 +6,17 @@ extern crate proc_macro;
 mod operators;
 mod rewriter;
 mod inventory;
+use operators::{impl_postgres_eq, impl_postgres_hash, impl_postgres_ord};
 
-use crate::operators::{impl_postgres_eq, impl_postgres_hash, impl_postgres_ord};
 use pgx_utils::*;
 use proc_macro::TokenStream;
-use proc_macro2::{Ident, Span, TokenStream as TokenStream2, Punct, Spacing};
-use quote::{quote, quote_spanned, ToTokens, TokenStreamExt};
+use proc_macro2::{Ident, Span};
+use quote::{quote, quote_spanned, ToTokens};
 use rewriter::*;
 use std::collections::HashSet;
 use syn::spanned::Spanned;
-use syn::{parenthesized, parse_macro_input, Attribute, Data, DeriveInput, Item, ItemFn, Type};
-use syn::Token;
-use syn::parse::{ParseStream, Parse, Parser};
-use syn::punctuated::Punctuated;
-use crate::inventory::PgxExtern;
+use syn::{parse_macro_input, Attribute, Data, DeriveInput, Item, ItemFn};
+
 
 /// Declare a function as `#[pg_guard]` to indcate that it is called from a Postgres `extern "C"`
 /// function so that Rust `panic!()`s (and Postgres `elog(ERROR)`s) will be properly handled by `pgx`

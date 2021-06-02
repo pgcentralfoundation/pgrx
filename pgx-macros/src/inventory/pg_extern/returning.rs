@@ -1,6 +1,5 @@
-use proc_macro2::{TokenStream as TokenStream2, Span};
-use proc_macro::TokenStream;
-use syn::{Token, punctuated::Punctuated, parse::{Parse, ParseStream}, FnArg};
+use proc_macro2::{TokenStream as TokenStream2};
+use syn::{Token, parse::{Parse, ParseStream}};
 use quote::{quote, ToTokens, TokenStreamExt};
 use std::{convert::TryFrom, ops::Deref};
 
