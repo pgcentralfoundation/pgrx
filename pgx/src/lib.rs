@@ -145,6 +145,8 @@ macro_rules! pg_module_magic {
                 pub externs: Vec<&'static PgxExtern>,
                 pub types: Vec<&'static PgxPostgresType>,
                 pub enums: Vec<&'static PgxPostgresEnum>,
+                pub ords: Vec<&'static PgxPostgresOrd>,
+                pub hashes: Vec<&'static PgxPostgresHash>
             }
 
             impl PgxSchema {
@@ -271,14 +273,43 @@ macro_rules! pg_module_magic {
                 }
 
                 fn operator_classes(&self) -> String {
-                    self.externs.iter().filter(|ext| ext.operator.is_some()).map(|ext| {
-                        format!("\
-                                CREATE OPERATOR FAMILY {name};\n\
-                                CREATE OPERATOR CLASS {name};\n\
+                    let hashes = self.hashes.iter().map(|hash_derive| {
+                        format!("\n\
+                            -- {file}\n\
+                            -- {full_path}\n\
+                            -- {id:?}\n\
+                            CREATE OPERATOR FAMILY {name}_hash_ops USING hash;\n\
+                            CREATE OPERATOR CLASS {name}_hash_ops DEFAULT FOR TYPE {name} USING hash FAMILY {name}_hash_ops AS\n\
+                                \tOPERATOR    1   =  ({name}, {name}),\n\
+                                \tFUNCTION    1   {name}_hash({name});\n\
                             ",
-                            name = ext.name,
+                            name = hash_derive.name,
+                            full_path = hash_derive.full_path,
+                            file = hash_derive.file,
+                            id = hash_derive.id,
                         )
-                    }).collect()
+                    }).collect::<String>();
+                    let ords = self.ords.iter().map(|ord_derive| {
+                        format!("\n\
+                            -- {file}\n\
+                            -- {full_path}\n\
+                            -- {id:?}\n\
+                            CREATE OPERATOR FAMILY {name}_btree_ops USING btree;\n\
+                            CREATE OPERATOR CLASS {name}_btree_ops DEFAULT FOR TYPE {name} USING btree FAMILY {name}_btree_ops AS\n\
+                                  \tOPERATOR 1 < ,\n\
+                                  \tOPERATOR 2 <= ,\n\
+                                  \tOPERATOR 3 = ,\n\
+                                  \tOPERATOR 4 >= ,\n\
+                                  \tOPERATOR 5 > ,\n\
+                                  \tFUNCTION 1 thing_cmp({name}, {name});\n\
+                            ",
+                            name = ord_derive.name,
+                            full_path = ord_derive.full_path,
+                            file = ord_derive.file,
+                            id = ord_derive.id,
+                        )
+                    }).collect::<String>();
+                    hashes + &ords
                 }
             }
 
@@ -344,6 +375,24 @@ macro_rules! pg_module_magic {
                 pub ty_name: &'static str,
                 pub default: Option<&'static str>,
             }
+
+            #[derive(Debug)]
+            pub struct PgxPostgresHash {
+                pub name: &'static str,
+                pub file: &'static str,
+                pub full_path: &'static str,
+                pub id: core::any::TypeId,
+            }
+            pgx::inventory::collect!(PgxPostgresHash);
+
+            #[derive(Debug)]
+            pub struct PgxPostgresOrd {
+                pub name: &'static str,
+                pub file: &'static str,
+                pub full_path: &'static str,
+                pub id: core::any::TypeId,
+            }
+            pgx::inventory::collect!(PgxPostgresOrd);
         }
 
         pub fn generate_meta() -> crate::__pgx_internals::PgxSchema {
@@ -352,6 +401,8 @@ macro_rules! pg_module_magic {
                 externs: pgx::inventory::iter::<crate::__pgx_internals::PgxExtern>().collect(),
                 types: pgx::inventory::iter::<crate::__pgx_internals::PgxPostgresType>().collect(),
                 enums: pgx::inventory::iter::<crate::__pgx_internals::PgxPostgresEnum>().collect(),
+                hashes: pgx::inventory::iter::<crate::__pgx_internals::PgxPostgresHash>().collect(),
+                ords: pgx::inventory::iter::<crate::__pgx_internals::PgxPostgresOrd>().collect(),
             };
 
             generated_sql
