@@ -200,15 +200,27 @@ macro_rules! pg_module_magic {
                 }
 
                 fn externs_with_operators(&self) -> String {
+                    use crate::__pgx_internals::PgxExternReturn;
                     self.externs.iter().map(|ext| {
                         let ext_sql = format!("\n\
                                 -- {file}\n\
                                 -- {module_path}::{name}\n\
-                                CREATE OR REPLACE FUNCTION {name};\n\
+                                CREATE OR REPLACE FUNCTION {name}({arguments}) {returns} {extern_attrs} LANGUAGE c AS 'MODULE_PATHNAME', '{name}';\n\
                             ",
                             name = ext.name,
                             module_path = ext.module_path,
                             file = ext.file,
+                            arguments = ext.fn_args.iter().map(|arg|
+                                format!("\"{}\" {}", arg.pattern, arg.ty_name)
+                            ).collect::<Vec<_>>().join(", "),
+                            returns = match &ext.fn_return {
+                                PgxExternReturn::None => String::default(),
+                                PgxExternReturn::Type { id, name } => format!("RETURNS {}", name),
+                                PgxExternReturn::Iterated(vec) => format!("RETURNS TABLE ({})",
+                                    vec.iter().map(|(id, ty_name, col_name)| format!("\"{}\" {}", col_name.unwrap(), ty_name)).collect::<Vec<_>>().join(", ")
+                                ),
+                            },
+                            extern_attrs = ext.extern_attrs.iter().map(|attr| format!(" {:?} ", attr)).collect::<String>(),
                         );
                         match &ext.operator {
                             Some(op) => {
@@ -217,12 +229,16 @@ macro_rules! pg_module_magic {
                                         -- {module_path}::{name}\n\
                                         CREATE OPERATOR {opname} (\n\
                                             \tPROCEDURE=\"{name}\"\n\
+                                            \tLEFTARG={left_arg}\n\
+                                            \tRIGHTARG={right_arg}\n\
                                         )\n\
                                     ",
                                     opname = op.opname.unwrap(),
                                     file = ext.file,
                                     name = ext.name,
                                     module_path = ext.module_path,
+                                    left_arg = ext.fn_args.get(0).unwrap().ty_name,
+                                    right_arg = ext.fn_args.get(1).unwrap().ty_name,
                                 );
                                 ext_sql + &operator_sql
                             },
