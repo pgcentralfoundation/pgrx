@@ -221,7 +221,14 @@ macro_rules! pg_module_magic {
                             module_path = ext.module_path,
                             file = ext.file,
                             arguments = ext.fn_args.iter().map(|arg|
-                                format!("\t\"{}\" {} /* {} */", arg.pattern, pgx::type_id_to_sql_type(arg.ty_id).unwrap_or_else(|| arg.ty_name.to_string()), arg.ty_name)
+                                format!("\
+                                        \t\"{pattern}\" {sql_type} {default}/* {ty_name} */\
+                                    ",
+                                    pattern = arg.pattern,
+                                    sql_type = pgx::type_id_to_sql_type(arg.ty_id).unwrap_or_else(|| arg.ty_name.to_string()),
+                                    default = if let Some(def) = arg.default { format!("DEFAULT {} ", def) } else { String::from("") },
+                                    ty_name = arg.ty_name,
+                                )
                             ).collect::<Vec<_>>().join(",\n"),
                             returns = match &ext.fn_return {
                                 PgxExternReturn::None => String::default(),
