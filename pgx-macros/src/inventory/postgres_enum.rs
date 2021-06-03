@@ -28,6 +28,8 @@ impl ToTokens for PostgresEnum {
                     file: file!(),
                     full_path: core::any::type_name::<#name>(),
                     id: TypeId::of::<#name>(),
+                    option_id: TypeId::of::<Option<#name>>(),
+                    vec_id: TypeId::of::<Vec<#name>>(),
                     variants: vec![ #(  stringify!(#variants)  ),* ],
                 }
             }

@@ -171,8 +171,9 @@ macro_rules! pg_module_magic {
                     self.enums.iter().map(|en| {
                         format!("\n\
                                 -- {file}\n\
-                                -- {full_path}\n\
-                                -- {id:?}\n\
+                                -- {full_path} - {id:?}\n\
+                                -- Option<{full_path}> - {option_id:?}\n\
+                                -- Vec<{full_path}> - {vec_id:?}\n\
                                 CREATE TYPE {name} AS ENUM (\n\
                                     {variants}\
                                 )\n\
@@ -180,6 +181,8 @@ macro_rules! pg_module_magic {
                             full_path = en.full_path,
                             file = en.file,
                             id = en.id,
+                            option_id = en.option_id,
+                            vec_id = en.vec_id,
                             name = en.name,
                             variants = en.variants.iter().map(|variant| format!("\t'{}',\n", variant)).collect::<String>(),
                         )
@@ -191,12 +194,16 @@ macro_rules! pg_module_magic {
                         format!("\n\
                                 -- {file}\n\
                                 -- {full_path}\n\
-                                -- {id:?}\n\
+                                -- {full_path} - {id:?}\n\
+                                -- Option<{full_path}> - {option_id:?}\n\
+                                -- Vec<{full_path}> - {vec_id:?}\n\
                                 CREATE TYPE {name};\n\
                             ",
                             full_path = ty.full_path,
                             file = ty.file,
                             id = ty.id,
+                            option_id = ty.option_id,
+                            vec_id = ty.vec_id,
                             name = ty.name,
                         )
                     }).by_ref().collect()
@@ -214,13 +221,13 @@ macro_rules! pg_module_magic {
                             module_path = ext.module_path,
                             file = ext.file,
                             arguments = ext.fn_args.iter().map(|arg|
-                                format!("\t\"{}\" {} /* {:?} */", arg.pattern, pgx::type_id_to_sql_type(arg.ty_id).unwrap_or(arg.ty_name), arg.ty_id)
+                                format!("\t\"{}\" {} /* {} */", arg.pattern, pgx::type_id_to_sql_type(arg.ty_id).unwrap_or_else(|| arg.ty_name.to_string()), arg.ty_name)
                             ).collect::<Vec<_>>().join(",\n"),
                             returns = match &ext.fn_return {
                                 PgxExternReturn::None => String::default(),
-                                PgxExternReturn::Type { id, name } => format!("RETURNS {} /* {:?} */", pgx::type_id_to_sql_type(*id).unwrap_or(name), id),
+                                PgxExternReturn::Type { id, name } => format!("RETURNS {} /* {} */", pgx::type_id_to_sql_type(*id).unwrap_or_else(|| name.to_string()), name),
                                 PgxExternReturn::Iterated(vec) => format!("RETURNS TABLE ({})",
-                                    vec.iter().map(|(id, ty_name, col_name)| format!("\"{}\" {} /* {:?} */", col_name.unwrap(), pgx::type_id_to_sql_type(*id).unwrap_or(ty_name), id)).collect::<Vec<_>>().join(",")
+                                    vec.iter().map(|(id, ty_name, col_name)| format!("\"{}\" {} /* {} */", col_name.unwrap(), pgx::type_id_to_sql_type(*id).unwrap_or_else(|| ty_name.to_string()), ty_name)).collect::<Vec<_>>().join(",")
                                 ),
                             },
                             extern_attrs = ext.extern_attrs.iter().map(|attr| format!("{:?}", attr)).collect::<Vec<_>>().join(" "),
@@ -251,8 +258,8 @@ macro_rules! pg_module_magic {
                                         -- {module_path}::{name}\n\
                                         CREATE OPERATOR {opname} (\n\
                                             \tPROCEDURE=\"{name},\"\n\
-                                            \tLEFTARG={left_arg} /* {left_id:?} */,\n\
-                                            \tRIGHTARG={right_arg} /* {right_id:?} */\n\
+                                            \tLEFTARG={left_arg} /* {left_name} */,\n\
+                                            \tRIGHTARG={right_arg} /* {right_name} */\n\
                                             {optionals}\n\
                                         )\n\
                                     ",
@@ -260,10 +267,10 @@ macro_rules! pg_module_magic {
                                     file = ext.file,
                                     name = ext.name,
                                     module_path = ext.module_path,
-                                    left_arg = ext.fn_args.get(0).unwrap().ty_name,
-                                    right_arg = ext.fn_args.get(1).unwrap().ty_name,
-                                    left_id = ext.fn_args.get(0).unwrap().ty_id,
-                                    right_id = ext.fn_args.get(1).unwrap().ty_id,
+                                    left_name = ext.fn_args.get(0).unwrap().ty_name,
+                                    right_name = ext.fn_args.get(1).unwrap().ty_name,
+                                    left_arg = pgx::type_id_to_sql_type(ext.fn_args.get(0).unwrap().ty_id).unwrap_or_else(|| ext.fn_args.get(0).unwrap().ty_name.to_string()),
+                                    right_arg = pgx::type_id_to_sql_type(ext.fn_args.get(1).unwrap().ty_id).unwrap_or_else(|| ext.fn_args.get(1).unwrap().ty_name.to_string()),
                                     optionals = optionals.join(",\n")
                                 );
                                 ext_sql + &operator_sql
@@ -277,8 +284,9 @@ macro_rules! pg_module_magic {
                     self.types.iter().map(|ty| {
                         format!("\n\
                                 -- {file}\n\
-                                -- {full_path}\n\
-                                -- {id:?}\n\
+                                -- {full_path} - {id:?}\n\
+                                -- Option<{full_path}> - {option_id:?}\n\
+                                -- Vec<{full_path}> - {vec_id:?}\n\
                                 CREATE TYPE {name} (\n\
                                     \tINTERNALLENGTH = variable,\n\
                                     \tINPUT = {in_fn},\n\
@@ -289,6 +297,8 @@ macro_rules! pg_module_magic {
                             full_path = ty.full_path,
                             file = ty.file,
                             id = ty.id,
+                            option_id = ty.option_id,
+                            vec_id = ty.vec_id,
                             name = ty.name,
                             in_fn = ty.in_fn,
                             out_fn = ty.out_fn,
@@ -339,9 +349,13 @@ macro_rules! pg_module_magic {
                 pub fn register_types(&self) {
                     for en in &self.enums {
                         pgx::map_type_id_to_sql_type(en.id, en.name);
+                        pgx::map_type_id_to_sql_type(en.option_id, en.name);
+                        pgx::map_type_id_to_sql_type(en.vec_id, format!("{}[]", en.name));
                     }
                     for ty in &self.types {
                         pgx::map_type_id_to_sql_type(ty.id, ty.name);
+                        pgx::map_type_id_to_sql_type(ty.option_id, ty.name);
+                        pgx::map_type_id_to_sql_type(ty.vec_id, format!("{}[]", ty.name));
                     }
                 }
             }
@@ -352,6 +366,8 @@ macro_rules! pg_module_magic {
                 pub file: &'static str,
                 pub full_path: &'static str,
                 pub id: core::any::TypeId,
+                pub option_id: core::any::TypeId,
+                pub vec_id: core::any::TypeId,
                 pub in_fn: &'static str,
                 pub out_fn: &'static str,
             }
@@ -387,6 +403,8 @@ macro_rules! pg_module_magic {
                 pub file: &'static str,
                 pub full_path: &'static str,
                 pub id: core::any::TypeId,
+                pub option_id: core::any::TypeId,
+                pub vec_id: core::any::TypeId,
                 pub variants: Vec<&'static str>,
             }
             pgx::inventory::collect!(PgxPostgresEnum);
@@ -464,27 +482,70 @@ use std::collections::HashMap;
 use std::sync::{RwLock, Arc};
 use core::any::TypeId;
 
-static TYPEID_SQL_BIMAP: Lazy<Arc<RwLock<HashMap<TypeId, &'static str>>>> = Lazy::new(|| {
+static TYPEID_SQL_MAPPING: Lazy<Arc<RwLock<HashMap<TypeId, String>>>> = Lazy::new(|| {
     let mut m = HashMap::new();
-    m.insert(TypeId::of::<&'static str>(), "text");
-    m.insert(TypeId::of::<&std::ffi::CStr>(), "cstring");
-    m.insert(TypeId::of::<String>(), "text");
-    m.insert(TypeId::of::<()>(), "void");
-    m.insert(TypeId::of::<i8>(), "\"char\"");
-    m.insert(TypeId::of::<i16>(), "smallint");
-    m.insert(TypeId::of::<i32>(), "integer");
-    m.insert(TypeId::of::<i64>(), "bigint");
-    m.insert(TypeId::of::<bool>(), "bool");
-    m.insert(TypeId::of::<char>(), "varchar");
-    m.insert(TypeId::of::<f32>(), "real");
-    m.insert(TypeId::of::<f64>(), "double precision");
-    m.insert(TypeId::of::<&[u8]>(), "bytea");
-    m.insert(TypeId::of::<Vec<u8>>(), "bytea");
+    m.insert(TypeId::of::<&'static str>(), String::from("text"));
+    m.insert(TypeId::of::<Option<&'static str>>(), String::from("text"));
+
+    m.insert(TypeId::of::<&std::ffi::CStr>(), String::from("cstring"));
+    m.insert(TypeId::of::<Option<&std::ffi::CStr>>(), String::from("cstring"));
+
+    m.insert(TypeId::of::<String>(), String::from("text"));
+    m.insert(TypeId::of::<datum::Array<String>>(), String::from("text[]"));
+    m.insert(TypeId::of::<Option<String>>(), String::from("text"));
+
+    m.insert(TypeId::of::<()>(), String::from("void"));
+
+    m.insert(TypeId::of::<i8>(), String::from("\"char\""));
+    m.insert(TypeId::of::<Option<i8>>(), String::from("\"char\""));
+
+    m.insert(TypeId::of::<i16>(), String::from("smallint"));
+    m.insert(TypeId::of::<Option<i16>>(), String::from("smallint"));
+    m.insert(TypeId::of::<datum::Array<i16>>(), String::from("smallint[]"));
+
+    m.insert(TypeId::of::<i32>(), String::from("integer"));
+    m.insert(TypeId::of::<Option<i32>>(), String::from("integer"));
+    m.insert(TypeId::of::<datum::Array<i32>>(), String::from("integer[]"));
+
+    m.insert(TypeId::of::<i64>(), String::from("bigint"));
+    m.insert(TypeId::of::<Option<i64>>(), String::from("bigint"));
+    m.insert(TypeId::of::<datum::Array<i64>>(), String::from("bigint[]"));
+
+    m.insert(TypeId::of::<bool>(), String::from("bool"));
+    m.insert(TypeId::of::<Option<bool>>(), String::from("bool"));
+    m.insert(TypeId::of::<datum::Array<bool>>(), String::from("bool[]"));
+
+    m.insert(TypeId::of::<char>(), String::from("varchar"));
+    m.insert(TypeId::of::<Option<char>>(), String::from("varchar"));
+    m.insert(TypeId::of::<datum::Array<char>>(), String::from("varchar[]"));
+
+    m.insert(TypeId::of::<f32>(), String::from("real"));
+        m.insert(TypeId::of::<Option<f32>>(), String::from("real"));
+    m.insert(TypeId::of::<datum::Array<f32>>(), String::from("real[]"));
+
+    m.insert(TypeId::of::<f64>(), String::from("double precision"));
+    m.insert(TypeId::of::<Option<f64>>(), String::from("double precision"));
+    // TODO: Maybe????
+    m.insert(TypeId::of::<datum::Array<f64>>(), String::from("double precision[]"));
+
+    m.insert(TypeId::of::<&[u8]>(), String::from("bytea"));
+    m.insert(TypeId::of::<Option<&[u8]>>(), String::from("bytea"));
+    m.insert(TypeId::of::<Vec<u8>>(), String::from("bytea"));
+    m.insert(TypeId::of::<Option<Vec<u8>>>(), String::from("bytea"));
+
     Arc::from(RwLock::from(m))
 });
-pub fn type_id_to_sql_type(id: TypeId) -> Option<&'static str> {
-    TYPEID_SQL_BIMAP.read().unwrap().get(&id).map(|f| *f)
+pub fn type_id_to_sql_type(id: TypeId) -> Option<String> {
+    TYPEID_SQL_MAPPING.read().unwrap().get(&id).map(|f| f.clone())
 }
-pub fn map_type_id_to_sql_type(id: TypeId, sql: &'static str) {
-    TYPEID_SQL_BIMAP.write().unwrap().insert(id, sql);
+pub fn map_type_to_sql_type<T: 'static>(sql: impl AsRef<str>) {
+    let sql = sql.as_ref().to_string();
+    TYPEID_SQL_MAPPING.write().unwrap().insert(TypeId::of::<T>(), sql.clone());
+    TYPEID_SQL_MAPPING.write().unwrap().insert(TypeId::of::<Option<T>>(), sql.clone());
+    TYPEID_SQL_MAPPING.write().unwrap().insert(TypeId::of::<Vec<T>>(), format!("{}[]", sql));
+}
+
+pub fn map_type_id_to_sql_type(id: TypeId, sql: impl AsRef<str>) {
+    let sql = sql.as_ref().to_string();
+    TYPEID_SQL_MAPPING.write().unwrap().insert(id, sql);
 }

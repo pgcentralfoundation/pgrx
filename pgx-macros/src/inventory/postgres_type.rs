@@ -30,6 +30,8 @@ impl ToTokens for PostgresType {
                     file: file!(),
                     full_path: core::any::type_name::<#name>(),
                     id: TypeId::of::<#name>(),
+                    option_id: TypeId::of::<Option<#name>>(),
+                    vec_id: TypeId::of::<Vec<#name>>(),
                     in_fn: stringify!(#in_fn),
                     out_fn: stringify!(#out_fn),
                 }

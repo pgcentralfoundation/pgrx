@@ -1,11 +1,11 @@
 use proc_macro2::{TokenStream as TokenStream2, Span};
-use syn::{Token, parse::{Parse, ParseStream}, FnArg};
+use syn::{Token, parse::{Parse, ParseStream}, FnArg, Pat};
 use quote::{quote, ToTokens, TokenStreamExt};
 use std::convert::TryFrom;
 
 #[derive(Debug)]
 pub struct Argument {
-    pat: syn::Pat,
+    pat: syn::Ident,
     ty: syn::Type,
     default: Option<syn::Lit>,
 }
@@ -16,6 +16,14 @@ impl TryFrom<syn::FnArg> for Argument {
     fn try_from(value: FnArg) -> Result<Self, Self::Error> {
         match value {
             syn::FnArg::Typed(pat) => {
+                let identifier = match *pat.pat {
+                    Pat::Ident(ref p) => p.ident.clone(),
+                    Pat::Reference(ref p) => match *p.pat {
+                        Pat::Ident(ref p) => p.ident.clone(),
+                        _ => return Err(Box::new(syn::Error::new(Span::call_site(), "Unable to parse FnArg."))),
+                    },
+                    _ => return Err(Box::new(syn::Error::new(Span::call_site(), "Unable to parse FnArg."))),
+                };
                 let default = match pat.ty.as_ref() {
                     syn::Type::Macro(macro_pat) => {
                         let mac = &macro_pat.mac;
@@ -32,7 +40,7 @@ impl TryFrom<syn::FnArg> for Argument {
                 };
 
                 Ok(Argument {
-                    pat: *pat.pat.clone(),
+                    pat: identifier,
                     ty: *pat.ty.clone(),
                     default,
                 })
