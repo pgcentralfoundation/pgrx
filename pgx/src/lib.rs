@@ -231,7 +231,7 @@ macro_rules! pg_module_magic {
                     use crate::__pgx_internals::PgxExternReturn;
                     self.externs.iter().map(|ext| {
                         let fn_sql = format!(
-                            "CREATE OR REPLACE FUNCTION \"{name}\"(\n{arguments}\n) {returns}\n{extern_attrs}\nLANGUAGE c\nAS 'MODULE_PATHNAME', '{name}';\n",
+                            "CREATE OR REPLACE FUNCTION \"{name}\"(\n{arguments}\n) {returns}\n{extern_attrs}LANGUAGE c\nAS 'MODULE_PATHNAME', '{name}';\n",
                             name = ext.name,
                             arguments = ext.fn_args.iter().map(|arg|
                                 format!("\
@@ -246,12 +246,18 @@ macro_rules! pg_module_magic {
                             returns = match &ext.fn_return {
                                 PgxExternReturn::None => String::default(),
                                 PgxExternReturn::Type { id, name } => format!("RETURNS {} /* {} */", pgx::type_id_to_sql_type(*id).unwrap_or_else(|| name.to_string()), name),
-                                PgxExternReturn::Iterated(vec) => format!("RETURNS TABLE ({})",
+                                PgxExternReturn::Iterated(vec) => format!("RETURNS TABLE ({}\n)",
                                     vec.iter().map(|(id, ty_name, col_name)| format!("\n\t\"{}\" {} /* {} */", col_name.unwrap(), pgx::type_id_to_sql_type(*id).unwrap_or_else(|| ty_name.to_string()), ty_name)).collect::<Vec<_>>().join(",")
                                 ),
                             },
                             // TODO: Search Path
-                            extern_attrs = ext.extern_attrs.iter().map(|attr| format!("{:?}", attr)).collect::<Vec<_>>().join(" "),
+                            extern_attrs = if ext.extern_attrs.is_empty() {
+                                String::default()
+                            } else {
+                                let mut retval = ext.extern_attrs.iter().map(|attr| format!("{:?}", attr)).collect::<Vec<_>>().join(" ");
+                                retval.push('\n');
+                                retval
+                            },
                         );
 
                         let ext_sql = format!("\n\

@@ -1,5 +1,5 @@
 use proc_macro2::{TokenStream as TokenStream2};
-use syn::{Ident, Token, punctuated::Punctuated};
+use syn::Ident;
 use quote::{quote, ToTokens, TokenStreamExt};
 
 pub struct PostgresHash {
