@@ -230,15 +230,9 @@ macro_rules! pg_module_magic {
                 fn externs_with_operators(&self) -> String {
                     use crate::__pgx_internals::PgxExternReturn;
                     self.externs.iter().map(|ext| {
-                        let ext_sql = format!("\n\
-                                -- {file}:{line}\n\
-                                -- {module_path}::{name}\n\
-                                CREATE OR REPLACE FUNCTION \"{name}\"(\n{arguments}\n) {returns}\n{extern_attrs} LANGUAGE c\nAS 'MODULE_PATHNAME', '{name}';\n\
-                            ",
+                        let fn_sql = format!(
+                            "CREATE OR REPLACE FUNCTION \"{name}\"(\n{arguments}\n) {returns}\n{extern_attrs}\nLANGUAGE c\nAS 'MODULE_PATHNAME', '{name}';\n",
                             name = ext.name,
-                            module_path = ext.module_path,
-                            file = ext.file,
-                            line = ext.line,
                             arguments = ext.fn_args.iter().map(|arg|
                                 format!("\
                                         \t\"{pattern}\" {sql_type} {default}/* {ty_name} */\
@@ -253,13 +247,34 @@ macro_rules! pg_module_magic {
                                 PgxExternReturn::None => String::default(),
                                 PgxExternReturn::Type { id, name } => format!("RETURNS {} /* {} */", pgx::type_id_to_sql_type(*id).unwrap_or_else(|| name.to_string()), name),
                                 PgxExternReturn::Iterated(vec) => format!("RETURNS TABLE ({})",
-                                    vec.iter().map(|(id, ty_name, col_name)| format!("\"{}\" {} /* {} */", col_name.unwrap(), pgx::type_id_to_sql_type(*id).unwrap_or_else(|| ty_name.to_string()), ty_name)).collect::<Vec<_>>().join(",")
+                                    vec.iter().map(|(id, ty_name, col_name)| format!("\n\t\"{}\" {} /* {} */", col_name.unwrap(), pgx::type_id_to_sql_type(*id).unwrap_or_else(|| ty_name.to_string()), ty_name)).collect::<Vec<_>>().join(",")
                                 ),
                             },
+                            // TODO: Search Path
                             extern_attrs = ext.extern_attrs.iter().map(|attr| format!("{:?}", attr)).collect::<Vec<_>>().join(" "),
                         );
-                        match &ext.operator {
-                            Some(op) => {
+
+                        let ext_sql = format!("\n\
+                                -- {file}:{line}\n\
+                                -- {module_path}::{name}\n\
+                                {fn_sql}\n\
+                                {overridden}
+                            ",
+                            name = ext.name,
+                            module_path = ext.module_path,
+                            file = ext.file,
+                            line = ext.line,
+                            fn_sql = if ext.overridden.is_some() {
+                                let mut inner = fn_sql.lines().map(|f| format!("-- {}", f)).collect::<Vec<_>>().join("\n");
+                                inner.push_str("\n--\n-- Overridden as (due to a `//` comment with a `sql` code block):");
+                                inner
+                            } else {
+                                fn_sql
+                            },
+                            overridden = ext.overridden.map(|f| f.to_owned() + "\n").unwrap_or_default(),
+                        );
+                        match (ext.overridden, &ext.operator) {
+                            (Some(_overridden), Some(op)) => {
                                 let mut optionals = vec![];
                                 if let Some(it) = op.commutator {
                                     optionals.push(format!("\tCOMMUTATOR = {}", it));
@@ -302,7 +317,7 @@ macro_rules! pg_module_magic {
                                 );
                                 ext_sql + &operator_sql
                             },
-                            None => ext_sql,
+                            (None, None) | (None, Some(_)) | (Some(_), None) => ext_sql,
                         }
                     }).by_ref().collect()
                 }
@@ -434,6 +449,7 @@ macro_rules! pg_module_magic {
                 pub fn_args: Vec<PgxExternInputs>,
                 pub fn_return: PgxExternReturn,
                 pub operator: Option<PgxOperator>,
+                pub overridden: Option<&'static str>,
             }
             pgx::inventory::collect!(PgxExtern);
 

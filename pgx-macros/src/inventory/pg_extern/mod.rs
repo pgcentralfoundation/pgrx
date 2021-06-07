@@ -15,6 +15,7 @@ use quote::{ToTokens, quote, TokenStreamExt};
 use proc_macro2::{TokenStream as TokenStream2, Span, Ident};
 use proc_macro::TokenStream;
 use std::convert::TryFrom;
+use syn::Meta;
 
 #[derive(Debug)]
 pub struct PgxExtern {
@@ -25,6 +26,33 @@ pub struct PgxExtern {
 impl PgxExtern {
     fn extern_attrs(&self) -> &PgxAttributes {
         &self.attrs
+    }
+
+    fn overridden(&self) -> Option<String> {
+        let mut retval = None;
+        let mut in_commented_sql_block = false;
+        for attr in &self.func.attrs {
+            let meta = attr.parse_meta().ok();
+            if let Some(meta) = meta {
+                if meta.path().is_ident("doc") {
+                    let content = match meta {
+                        Meta::Path(_) | Meta::List(_) => continue,
+                        Meta::NameValue(mnv) => mnv,
+                    };
+                    if let syn::Lit::Str(inner) = content.lit {
+                        if !in_commented_sql_block && inner.value().trim() == "```sql" {
+                            in_commented_sql_block = true;
+                        } else if in_commented_sql_block && inner.value().trim() == "```" {
+                            in_commented_sql_block = false;
+                        } else if in_commented_sql_block {
+                            let sql = retval.get_or_insert_with(String::default);
+                            sql.push_str(&inner.value().trim_start());
+                        }
+                    }
+                }
+            }
+        }
+        retval
     }
 
     fn operator(&self) -> Option<PgxOperator> {
@@ -100,6 +128,7 @@ impl ToTokens for PgxExtern {
         let inputs = self.inputs();
         let returns = self.returns();
         let operator = self.operator().into_iter();
+        let overridden = self.overridden().into_iter();
 
         let inv = quote! {
             pgx::inventory::submit! {
@@ -114,6 +143,7 @@ impl ToTokens for PgxExtern {
                     fn_args: vec![#(#inputs),*],
                     fn_return: #returns,
                     operator: None#( .unwrap_or(Some(#operator)) )*,
+                    overridden: None#( .unwrap_or(Some(#overridden)) )*,
                 }
             }
         };
