@@ -40,7 +40,7 @@ impl PgxExtern {
                         Meta::NameValue(mnv) => mnv,
                     };
                     if let syn::Lit::Str(inner) = content.lit {
-                        if !in_commented_sql_block && inner.value().trim() == "```sql" {
+                        if !in_commented_sql_block && inner.value().trim() == "```pgxsql" {
                             in_commented_sql_block = true;
                         } else if in_commented_sql_block && inner.value().trim() == "```" {
                             in_commented_sql_block = false;
