@@ -26,6 +26,7 @@ impl ToTokens for PostgresEnum {
                 crate::__pgx_internals::PgxPostgresEnum {
                     name: stringify!(#name),
                     file: file!(),
+                    line: line!(),
                     full_path: core::any::type_name::<#name>(),
                     id: TypeId::of::<#name>(),
                     option_id: TypeId::of::<Option<#name>>(),

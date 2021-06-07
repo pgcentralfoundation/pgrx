@@ -23,6 +23,7 @@ impl ToTokens for PostgresOrd {
                 crate::__pgx_internals::PgxPostgresOrd {
                     name: stringify!(#name),
                     file: file!(),
+                    line: line!(),
                     full_path: core::any::type_name::<#name>(),
                     id: TypeId::of::<#name>(),
                 }

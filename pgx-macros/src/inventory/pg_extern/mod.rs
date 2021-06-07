@@ -107,6 +107,7 @@ impl ToTokens for PgxExtern {
                 crate::__pgx_internals::PgxExtern {
                     name: stringify!(#ident),
                     file: file!(),
+                    line: line!(),
                     module_path: core::module_path!(),
                     extern_attrs: #extern_attrs,
                     search_path: None#( .unwrap_or(Some(vec![#search_path])) )*,

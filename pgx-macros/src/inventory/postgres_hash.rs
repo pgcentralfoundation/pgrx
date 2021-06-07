@@ -23,6 +23,7 @@ impl ToTokens for PostgresHash {
                 crate::__pgx_internals::PgxPostgresHash {
                     name: stringify!(#name),
                     file: file!(),
+                    line: line!(),
                     full_path: core::any::type_name::<#name>(),
                     id: TypeId::of::<#name>(),
                 }

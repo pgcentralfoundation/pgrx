@@ -28,6 +28,7 @@ impl ToTokens for PostgresType {
                 crate::__pgx_internals::PgxPostgresType {
                     name: stringify!(#name),
                     file: file!(),
+                    line: line!(),
                     full_path: core::any::type_name::<#name>(),
                     id: TypeId::of::<#name>(),
                     option_id: TypeId::of::<Option<#name>>(),

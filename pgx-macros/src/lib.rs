@@ -519,22 +519,27 @@ fn parse_postgres_type_args(attributes: &[Attribute]) -> HashSet<PostgresTypeAtt
 
 #[proc_macro]
 pub fn extension_sql(input: TokenStream) -> TokenStream {
-    fn is_raw_str(input: &str) -> bool {
-        input.starts_with("r#\"") && input.ends_with("\"#")
+    fn wrapped(input: TokenStream) -> Result<TokenStream, syn::Error> {
+        let sql: syn::LitStr = syn::parse(input)?;
+        Ok(quote! {
+            pgx::inventory::submit! {
+                crate::__pgx_internals::PgxExtensionSql {
+                    sql: #sql,
+                    file: file!(),
+                    line: line!(),
+                }
+            }
+        }.into())
     }
 
-    let tokens: Vec<String> = input.into_iter().map(|t| t.to_string()).collect();
-
-    let ok = (tokens.len() >= 1 && is_raw_str(&tokens[0]))
-        && (tokens.len() == 1 || (tokens.len() >= 2 && tokens[1] == ","));
-
-    if ok {
-        // ignore input
-        TokenStream::new()
-    } else {
-        TokenStream::from(quote! {
-          compile_error!("expected a single raw string literal with sql");
-        })
+    match wrapped(input) {
+        Ok(tokens) => tokens,
+        Err(e) => {
+            let msg = e.to_string();
+            TokenStream::from(quote! {
+              compile_error!(#msg);
+            })
+        },
     }
 }
 
