@@ -1,6 +1,6 @@
-use proc_macro2::{TokenStream as TokenStream2};
-use syn::{Ident, Token, punctuated::Punctuated};
+use proc_macro2::TokenStream as TokenStream2;
 use quote::{quote, ToTokens, TokenStreamExt};
+use syn::{punctuated::Punctuated, Ident, Token};
 
 pub struct PostgresEnum {
     pub name: Ident,
@@ -9,10 +9,7 @@ pub struct PostgresEnum {
 
 impl PostgresEnum {
     pub(crate) fn new(name: Ident, variants: Punctuated<syn::Variant, Token![,]>) -> Self {
-        Self {
-            name,
-            variants,
-        }
+        Self { name, variants }
     }
 }
 

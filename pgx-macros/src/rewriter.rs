@@ -42,7 +42,10 @@ impl PgGuardRewriter {
         if rewrite_args {
             self.item_fn_with_rewrite(func, inventory_submission, is_raw, no_guard)
         } else {
-            (self.item_fn_without_rewrite(func, inventory_submission, no_guard), true)
+            (
+                self.item_fn_without_rewrite(func, inventory_submission, no_guard),
+                true,
+            )
         }
     }
 

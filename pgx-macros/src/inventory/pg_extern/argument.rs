@@ -1,7 +1,10 @@
-use proc_macro2::{TokenStream as TokenStream2, Span};
-use syn::{Token, parse::{Parse, ParseStream}, FnArg, Pat};
+use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
 use std::convert::TryFrom;
+use syn::{
+    parse::{Parse, ParseStream},
+    FnArg, Pat, Token,
+};
 
 #[derive(Debug, Clone)]
 pub struct Argument {
@@ -20,9 +23,19 @@ impl TryFrom<syn::FnArg> for Argument {
                     Pat::Ident(ref p) => p.ident.clone(),
                     Pat::Reference(ref p) => match *p.pat {
                         Pat::Ident(ref p) => p.ident.clone(),
-                        _ => return Err(Box::new(syn::Error::new(Span::call_site(), "Unable to parse FnArg."))),
+                        _ => {
+                            return Err(Box::new(syn::Error::new(
+                                Span::call_site(),
+                                "Unable to parse FnArg.",
+                            )))
+                        }
                     },
-                    _ => return Err(Box::new(syn::Error::new(Span::call_site(), "Unable to parse FnArg."))),
+                    _ => {
+                        return Err(Box::new(syn::Error::new(
+                            Span::call_site(),
+                            "Unable to parse FnArg.",
+                        )))
+                    }
                 };
                 let default = match pat.ty.as_ref() {
                     syn::Type::Macro(macro_pat) => {
@@ -32,10 +45,10 @@ impl TryFrom<syn::FnArg> for Argument {
                             "default" => {
                                 let out: DefaultMacro = mac.parse_body()?;
                                 Some(out.expr)
-                            },
+                            }
                             _ => None,
                         }
-                    },
+                    }
                     _ => None,
                 };
 
@@ -44,8 +57,11 @@ impl TryFrom<syn::FnArg> for Argument {
                     ty: *pat.ty.clone(),
                     default,
                 })
-            },
-            _ => Err(Box::new(syn::Error::new(Span::call_site(), "Unable to parse FnArg."))),
+            }
+            _ => Err(Box::new(syn::Error::new(
+                Span::call_site(),
+                "Unable to parse FnArg.",
+            ))),
         }
     }
 }
@@ -67,7 +83,6 @@ impl ToTokens for Argument {
         tokens.append_all(quoted);
     }
 }
-
 
 #[derive(Debug, Clone)]
 pub(crate) struct DefaultMacro {

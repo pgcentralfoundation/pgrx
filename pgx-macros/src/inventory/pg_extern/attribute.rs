@@ -1,12 +1,15 @@
-use proc_macro2::{TokenStream as TokenStream2, Span};
-use syn::{Token, punctuated::Punctuated, parse::{Parse, ParseStream}};
+use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
+use syn::{
+    parse::{Parse, ParseStream},
+    punctuated::Punctuated,
+    Token,
+};
 
 #[derive(Debug, Clone)]
 pub struct PgxAttributes {
     attrs: Punctuated<Attribute, Token![,]>,
 }
-
 
 impl Parse for PgxAttributes {
     fn parse(input: ParseStream) -> Result<Self, syn::Error> {
@@ -80,19 +83,19 @@ impl Parse for Attribute {
                 let _punc: syn::token::Paren = syn::parenthesized!(inner in input);
                 let literal: syn::LitStr = inner.parse()?;
                 Attribute::Error(literal)
-            },
+            }
             "schema" => {
                 let inner;
                 let _punc: syn::token::Paren = syn::parenthesized!(inner in input);
                 let literal: syn::LitStr = inner.parse()?;
                 Attribute::Schema(literal)
-            },
+            }
             "name" => {
                 let inner;
                 let _punc: syn::token::Paren = syn::parenthesized!(inner in input);
                 let literal: syn::LitStr = inner.parse()?;
                 Attribute::Name(literal)
-            },
+            }
             _ => return Err(syn::Error::new(Span::call_site(), "Invalid option")),
         };
         Ok(found)

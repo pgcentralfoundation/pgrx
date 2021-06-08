@@ -1,7 +1,10 @@
-use proc_macro2::{TokenStream as TokenStream2};
-use syn::{Token, parse::{Parse, ParseStream}};
+use proc_macro2::TokenStream as TokenStream2;
 use quote::{quote, ToTokens, TokenStreamExt};
 use std::{convert::TryFrom, ops::Deref};
+use syn::{
+    parse::{Parse, ParseStream},
+    Token,
+};
 
 #[derive(Debug, Clone)]
 pub enum Returning {
@@ -24,7 +27,8 @@ impl TryFrom<&syn::ReturnType> for Returning {
                             "Iterator" => match &last_path_segment.arguments {
                                 syn::PathArguments::AngleBracketed(args) => {
                                     match args.args.first().unwrap() {
-                                        syn::GenericArgument::Binding(binding) => match &binding.ty {
+                                        syn::GenericArgument::Binding(binding) => match &binding.ty
+                                        {
                                             syn::Type::Tuple(tuple_type) => {
                                                 let returns: Vec<(syn::Type, Option<syn::Ident>)> = tuple_type.elems.iter().flat_map(|elem| {
                                                     match elem {
@@ -48,16 +52,16 @@ impl TryFrom<&syn::ReturnType> for Returning {
                                         },
                                         _ => unimplemented!(),
                                     }
-                                },
+                                }
                                 _ => unimplemented!(),
                             },
                             _ => unimplemented!(),
                         }
-                    },
+                    }
                     _ => Returning::None,
                 },
                 _ => Returning::Type(ty.deref().clone()),
-            }
+            },
         })
     }
 }
@@ -75,22 +79,25 @@ impl ToTokens for Returning {
                 }
             },
             Returning::Iterated(items) => {
-                let quoted_items = items.iter().map(|(ty, name)| {
-                    let name_iter = name.iter();
-                    quote! {
-                        (
-                            TypeId::of::<#ty>(),
-                            core::any::type_name::<#ty>(),
-                            None#( .unwrap_or(Some(stringify!(#name_iter))) )*,
-                        )
-                    }
-                }).collect::<Vec<_>>();
+                let quoted_items = items
+                    .iter()
+                    .map(|(ty, name)| {
+                        let name_iter = name.iter();
+                        quote! {
+                            (
+                                TypeId::of::<#ty>(),
+                                core::any::type_name::<#ty>(),
+                                None#( .unwrap_or(Some(stringify!(#name_iter))) )*,
+                            )
+                        }
+                    })
+                    .collect::<Vec<_>>();
                 quote! {
                     crate::__pgx_internals::PgxExternReturn::Iterated(vec![
                         #(#quoted_items),*
                     ])
                 }
-            },
+            }
         };
         tokens.append_all(quoted);
     }

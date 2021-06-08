@@ -3,9 +3,9 @@
 
 extern crate proc_macro;
 
+mod inventory;
 mod operators;
 mod rewriter;
-mod inventory;
 use operators::{impl_postgres_eq, impl_postgres_hash, impl_postgres_ord};
 
 use pgx_utils::*;
@@ -16,7 +16,6 @@ use rewriter::*;
 use std::collections::HashSet;
 use syn::spanned::Spanned;
 use syn::{parse_macro_input, Attribute, Data, DeriveInput, Item, ItemFn};
-
 
 /// Declare a function as `#[pg_guard]` to indcate that it is called from a Postgres `extern "C"`
 /// function so that Rust `panic!()`s (and Postgres `elog(ERROR)`s) will be properly handled by `pgx`
@@ -178,7 +177,11 @@ pub fn pg_extern(attr: TokenStream, item: TokenStream) -> TokenStream {
     }
 }
 
-fn rewrite_item_fn(mut func: ItemFn, extern_args: HashSet<ExternArgs>, inventory_submission: Option<&inventory::PgxExtern>) -> proc_macro2::TokenStream {
+fn rewrite_item_fn(
+    mut func: ItemFn,
+    extern_args: HashSet<ExternArgs>,
+    inventory_submission: Option<&inventory::PgxExtern>,
+) -> proc_macro2::TokenStream {
     let is_raw = extern_args.contains(&ExternArgs::Raw);
     let no_guard = extern_args.contains(&ExternArgs::NoGuard);
 
@@ -195,7 +198,8 @@ fn rewrite_item_fn(mut func: ItemFn, extern_args: HashSet<ExternArgs>, inventory
     // make the function 'extern "C"' because this is for the #[pg_extern[ macro
     func.sig.abi = Some(syn::parse_str("extern \"C\"").unwrap());
     let func_span = func.span();
-    let (rewritten_func, need_wrapper) = rewriter.item_fn(func, inventory_submission.into(), true, is_raw, no_guard);
+    let (rewritten_func, need_wrapper) =
+        rewriter.item_fn(func, inventory_submission.into(), true, is_raw, no_guard);
 
     if need_wrapper {
         quote_spanned! {func_span=>
@@ -275,10 +279,7 @@ fn impl_postgres_enum(ast: DeriveInput) -> proc_macro2::TokenStream {
         }
     });
 
-    inventory::PostgresEnum::new(
-        enum_ident.clone(),
-        enum_data.variants
-    ).to_tokens(&mut stream);
+    inventory::PostgresEnum::new(enum_ident.clone(), enum_data.variants).to_tokens(&mut stream);
 
     stream
 }
@@ -377,11 +378,8 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
         });
     }
 
-    inventory::PostgresType::new(
-        name.clone(),
-        funcname_in.clone(),
-        funcname_out.clone(),
-    ).to_tokens(&mut stream);
+    inventory::PostgresType::new(name.clone(), funcname_in.clone(), funcname_out.clone())
+        .to_tokens(&mut stream);
 
     stream
 }
@@ -526,7 +524,8 @@ pub fn extension_sql(input: TokenStream) -> TokenStream {
                     line: line!(),
                 }
             }
-        }.into())
+        }
+        .into())
     }
 
     match wrapped(input) {
@@ -536,7 +535,7 @@ pub fn extension_sql(input: TokenStream) -> TokenStream {
             TokenStream::from(quote! {
               compile_error!(#msg);
             })
-        },
+        }
     }
 }
 

@@ -1,6 +1,10 @@
-use proc_macro2::{TokenStream as TokenStream2};
-use syn::{Token, punctuated::Punctuated, parse::{Parse, ParseStream}};
+use proc_macro2::TokenStream as TokenStream2;
 use quote::{quote, ToTokens};
+use syn::{
+    parse::{Parse, ParseStream},
+    punctuated::Punctuated,
+    Token,
+};
 
 #[derive(Debug, Clone)]
 pub struct SearchPath {
@@ -44,7 +48,9 @@ pub struct SearchPathList {
 impl Parse for SearchPathList {
     fn parse(input: ParseStream) -> Result<Self, syn::Error> {
         Ok(Self {
-            fields: input.parse_terminated(SearchPath::parse).expect(&format!("Got {}", input)),
+            fields: input
+                .parse_terminated(SearchPath::parse)
+                .expect(&format!("Got {}", input)),
         })
     }
 }

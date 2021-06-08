@@ -1,10 +1,10 @@
-use proc_macro2::{TokenStream as TokenStream2, Ident};
+use proc_macro2::{Ident, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
 
 pub struct PostgresType {
     name: Ident,
     in_fn: Ident,
-    out_fn: Ident
+    out_fn: Ident,
 }
 
 impl PostgresType {

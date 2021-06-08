@@ -3,9 +3,9 @@
 
 use crate::pg_config::PgConfig;
 use colored::Colorize;
-use proc_macro2::{TokenStream};
+use proc_macro2::TokenStream;
 use proc_macro2::TokenTree;
-use quote::{quote, ToTokens, format_ident, TokenStreamExt};
+use quote::{format_ident, quote, ToTokens, TokenStreamExt};
 use serde_json::value::Value as JsonValue;
 use std::collections::HashSet;
 use std::path::PathBuf;
@@ -211,20 +211,29 @@ impl ToTokens for ExternArgs {
             ExternArgs::ParallelUnsafe => tokens.append(format_ident!("ParallelUnsafe")),
             ExternArgs::ParallelRestricted => tokens.append(format_ident!("ParallelRestricted")),
             ExternArgs::Error(_s) => {
-                tokens.append_all(quote! {
-                    Error(String::from("#_s"))
-                }.to_token_stream());
-            },
+                tokens.append_all(
+                    quote! {
+                        Error(String::from("#_s"))
+                    }
+                    .to_token_stream(),
+                );
+            }
             ExternArgs::Schema(_s) => {
-                tokens.append_all(quote! {
-                    Schema(String::from("#_s"))
-                }.to_token_stream());
-            },
+                tokens.append_all(
+                    quote! {
+                        Schema(String::from("#_s"))
+                    }
+                    .to_token_stream(),
+                );
+            }
             ExternArgs::Name(_s) => {
-                tokens.append_all(quote! {
-                    Name(String::from("#_s"))
-                }.to_token_stream());
-            },
+                tokens.append_all(
+                    quote! {
+                        Name(String::from("#_s"))
+                    }
+                    .to_token_stream(),
+                );
+            }
         }
     }
 }

@@ -243,7 +243,7 @@ fn do_it() -> std::result::Result<(), std::io::Error> {
                     },
                 };
 
-                schema2::generate_schema(&pg_config, is_release,  &features)
+                schema2::generate_schema(&pg_config, is_release, &features)
             }
             ("dump-schema", Some(dump_schema)) => {
                 let dir = dump_schema

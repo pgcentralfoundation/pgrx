@@ -1,7 +1,7 @@
-use syn::{parenthesized, token::Paren};
-use proc_macro2::{TokenStream as TokenStream2};
+use proc_macro2::TokenStream as TokenStream2;
 use quote::{quote, ToTokens, TokenStreamExt};
 use syn::parse::{Parse, ParseBuffer};
+use syn::{parenthesized, token::Paren};
 
 #[derive(Debug, Default, Clone)]
 pub struct PgxOperator {
@@ -13,7 +13,6 @@ pub struct PgxOperator {
     pub hashes: bool,
     pub merges: bool,
 }
-
 
 impl ToTokens for PgxOperator {
     fn to_tokens(&self, tokens: &mut TokenStream2) {

@@ -1,6 +1,6 @@
-use proc_macro2::{TokenStream as TokenStream2};
-use syn::Ident;
+use proc_macro2::TokenStream as TokenStream2;
 use quote::{quote, ToTokens, TokenStreamExt};
+use syn::Ident;
 
 pub struct PostgresOrd {
     pub name: Ident,
@@ -8,9 +8,7 @@ pub struct PostgresOrd {
 
 impl PostgresOrd {
     pub(crate) fn new(name: Ident) -> Self {
-        Self {
-            name,
-        }
+        Self { name }
     }
 }
 

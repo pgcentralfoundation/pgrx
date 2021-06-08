@@ -553,20 +553,26 @@ pub fn initialize() {
     register_pg_guard_panic_handler();
 }
 
+use core::any::TypeId;
 use once_cell::sync::Lazy;
 use std::collections::HashMap;
-use std::sync::{RwLock, Arc};
-use core::any::TypeId;
+use std::sync::{Arc, RwLock};
 
 static TYPEID_SQL_MAPPING: Lazy<Arc<RwLock<HashMap<TypeId, String>>>> = Lazy::new(|| {
     let mut m = HashMap::new();
     m.insert(TypeId::of::<&'static str>(), String::from("text"));
     m.insert(TypeId::of::<Option<&'static str>>(), String::from("text"));
     m.insert(TypeId::of::<Vec<&'static str>>(), String::from("text[]"));
-    m.insert(TypeId::of::<Vec<Option<&'static str>>>(), String::from("text[]"));
+    m.insert(
+        TypeId::of::<Vec<Option<&'static str>>>(),
+        String::from("text[]"),
+    );
 
     m.insert(TypeId::of::<&std::ffi::CStr>(), String::from("cstring"));
-    m.insert(TypeId::of::<Option<&std::ffi::CStr>>(), String::from("cstring"));
+    m.insert(
+        TypeId::of::<Option<&std::ffi::CStr>>(),
+        String::from("cstring"),
+    );
 
     m.insert(TypeId::of::<String>(), String::from("text"));
     m.insert(TypeId::of::<Option<String>>(), String::from("text"));
@@ -583,7 +589,10 @@ static TYPEID_SQL_MAPPING: Lazy<Arc<RwLock<HashMap<TypeId, String>>>> = Lazy::ne
 
     m.insert(TypeId::of::<i16>(), String::from("smallint"));
     m.insert(TypeId::of::<Option<i16>>(), String::from("smallint"));
-    m.insert(TypeId::of::<datum::Array<i16>>(), String::from("smallint[]"));
+    m.insert(
+        TypeId::of::<datum::Array<i16>>(),
+        String::from("smallint[]"),
+    );
     m.insert(TypeId::of::<Vec<i8>>(), String::from("\"char\""));
     m.insert(TypeId::of::<Vec<Option<i8>>>(), String::from("\"char\""));
 
@@ -607,7 +616,10 @@ static TYPEID_SQL_MAPPING: Lazy<Arc<RwLock<HashMap<TypeId, String>>>> = Lazy::ne
 
     m.insert(TypeId::of::<char>(), String::from("varchar"));
     m.insert(TypeId::of::<Option<char>>(), String::from("varchar"));
-    m.insert(TypeId::of::<datum::Array<char>>(), String::from("varchar[]"));
+    m.insert(
+        TypeId::of::<datum::Array<char>>(),
+        String::from("varchar[]"),
+    );
     m.insert(TypeId::of::<Vec<char>>(), String::from("varchar[]"));
     m.insert(TypeId::of::<Vec<Option<char>>>(), String::from("varchar[]"));
 
@@ -618,11 +630,20 @@ static TYPEID_SQL_MAPPING: Lazy<Arc<RwLock<HashMap<TypeId, String>>>> = Lazy::ne
     m.insert(TypeId::of::<Vec<Option<f32>>>(), String::from("real[]"));
 
     m.insert(TypeId::of::<f64>(), String::from("double precision"));
-    m.insert(TypeId::of::<Option<f64>>(), String::from("double precision"));
+    m.insert(
+        TypeId::of::<Option<f64>>(),
+        String::from("double precision"),
+    );
     // TODO: Maybe????
-    m.insert(TypeId::of::<datum::Array<f64>>(), String::from("double precision[]"));
+    m.insert(
+        TypeId::of::<datum::Array<f64>>(),
+        String::from("double precision[]"),
+    );
     m.insert(TypeId::of::<Vec<f64>>(), String::from("double precision[]"));
-    m.insert(TypeId::of::<Vec<Option<f64>>>(), String::from("double precision[]"));
+    m.insert(
+        TypeId::of::<Vec<Option<f64>>>(),
+        String::from("double precision[]"),
+    );
 
     m.insert(TypeId::of::<&[u8]>(), String::from("bytea"));
     m.insert(TypeId::of::<Option<&[u8]>>(), String::from("bytea"));
@@ -632,13 +653,26 @@ static TYPEID_SQL_MAPPING: Lazy<Arc<RwLock<HashMap<TypeId, String>>>> = Lazy::ne
     Arc::from(RwLock::from(m))
 });
 pub fn type_id_to_sql_type(id: TypeId) -> Option<String> {
-    TYPEID_SQL_MAPPING.read().unwrap().get(&id).map(|f| f.clone())
+    TYPEID_SQL_MAPPING
+        .read()
+        .unwrap()
+        .get(&id)
+        .map(|f| f.clone())
 }
 pub fn map_type_to_sql_type<T: 'static>(sql: impl AsRef<str>) {
     let sql = sql.as_ref().to_string();
-    TYPEID_SQL_MAPPING.write().unwrap().insert(TypeId::of::<T>(), sql.clone());
-    TYPEID_SQL_MAPPING.write().unwrap().insert(TypeId::of::<Option<T>>(), sql.clone());
-    TYPEID_SQL_MAPPING.write().unwrap().insert(TypeId::of::<Vec<T>>(), format!("{}[]", sql));
+    TYPEID_SQL_MAPPING
+        .write()
+        .unwrap()
+        .insert(TypeId::of::<T>(), sql.clone());
+    TYPEID_SQL_MAPPING
+        .write()
+        .unwrap()
+        .insert(TypeId::of::<Option<T>>(), sql.clone());
+    TYPEID_SQL_MAPPING
+        .write()
+        .unwrap()
+        .insert(TypeId::of::<Vec<T>>(), format!("{}[]", sql));
 }
 
 pub fn map_type_id_to_sql_type(id: TypeId, sql: impl AsRef<str>) {
