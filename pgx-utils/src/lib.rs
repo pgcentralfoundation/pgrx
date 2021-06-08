@@ -198,6 +198,25 @@ pub enum ExternArgs {
     Name(String),
 }
 
+impl core::fmt::Display for ExternArgs {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            ExternArgs::Immutable => write!(f, "IMMUTABLE"),
+            ExternArgs::Strict => write!(f, "STRICT"),
+            ExternArgs::Stable => write!(f, "STABLE"),
+            ExternArgs::Volatile => write!(f, "VOLATILE"),
+            ExternArgs::Raw => Ok(()),
+            ExternArgs::ParallelSafe => write!(f, "PARALLEL SAFE"),
+            ExternArgs::ParallelUnsafe => write!(f, "PARALLEL UNSAFE"),
+            ExternArgs::ParallelRestricted => write!(f, "PARALLEL RESTRICTED"),
+            ExternArgs::Error(_) => Ok(()),
+            ExternArgs::NoGuard => Ok(()),
+            ExternArgs::Schema(s) => Ok(()),
+            ExternArgs::Name(n) => Ok(()),
+        }
+    }
+}
+
 impl ToTokens for ExternArgs {
     fn to_tokens(&self, tokens: &mut TokenStream) {
         match self {

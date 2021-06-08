@@ -260,7 +260,7 @@ macro_rules! pg_module_magic {
                     use crate::__pgx_internals::PgxExternReturn;
                     self.externs.iter().map(|ext| {
                         let fn_sql = format!("\
-                                CREATE OR REPLACE FUNCTION \"{name}\"({arguments}) {returns}\n{extern_attrs}LANGUAGE c\nAS 'MODULE_PATHNAME', '{name}';\
+                                CREATE OR REPLACE FUNCTION \"{name}\"({arguments}) {returns}\n{extern_attrs}LANGUAGE c /* Rust */\nAS 'MODULE_PATHNAME', '{name}';\
                                 \
                             ",
                             name = ext.name,
@@ -279,6 +279,7 @@ macro_rules! pg_module_magic {
                             returns = match &ext.fn_return {
                                 PgxExternReturn::None => String::default(),
                                 PgxExternReturn::Type { id, name } => format!("RETURNS {} /* {} */", pgx::type_id_to_sql_type(*id).unwrap_or_else(|| name.to_string()), name),
+                                PgxExternReturn::SetOf { id, name } => format!("RETURNS SETOF {} /* {} */", pgx::type_id_to_sql_type(*id).unwrap_or_else(|| name.to_string()), name),
                                 PgxExternReturn::Iterated(vec) => format!("RETURNS TABLE ({}\n)",
                                     vec.iter().map(|(id, ty_name, col_name)| format!("\n\t\"{}\" {} /* {} */", col_name.unwrap(), pgx::type_id_to_sql_type(*id).unwrap_or_else(|| ty_name.to_string()), ty_name)).collect::<Vec<_>>().join(",")
                                 ),
@@ -287,7 +288,7 @@ macro_rules! pg_module_magic {
                             extern_attrs = if ext.extern_attrs.is_empty() {
                                 String::default()
                             } else {
-                                let mut retval = ext.extern_attrs.iter().map(|attr| format!("{:?}", attr).to_uppercase()).collect::<Vec<_>>().join(" ");
+                                let mut retval = ext.extern_attrs.iter().map(|attr| format!("{}", attr).to_uppercase()).collect::<Vec<_>>().join(" ");
                                 retval.push('\n');
                                 retval
                             },
@@ -509,6 +510,10 @@ macro_rules! pg_module_magic {
             pub enum PgxExternReturn {
                 None,
                 Type {
+                    id: core::any::TypeId,
+                    name: &'static str,
+                },
+                SetOf {
                     id: core::any::TypeId,
                     name: &'static str,
                 },

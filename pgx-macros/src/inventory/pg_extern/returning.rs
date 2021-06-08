@@ -10,6 +10,7 @@ use syn::{
 pub enum Returning {
     None,
     Type(syn::Type),
+    SetOf(syn::TypePath),
     Iterated(Vec<(syn::Type, Option<proc_macro2::Ident>)>),
 }
 
@@ -47,8 +48,11 @@ impl TryFrom<&syn::ReturnType> for Returning {
                                                     }
                                                 }).collect();
                                                 Returning::Iterated(returns)
-                                            }
-                                            _ => unimplemented!("Only iters with tuples"),
+                                            },
+                                            syn::Type::Path(path) => {
+                                                Returning::SetOf(path.clone())
+                                            },
+                                            ty => unimplemented!("Only iters with tuples, got {:?}.", ty),
                                         },
                                         _ => unimplemented!(),
                                     }
@@ -74,6 +78,12 @@ impl ToTokens for Returning {
             },
             Returning::Type(ty) => quote! {
                 crate::__pgx_internals::PgxExternReturn::Type {
+                    id: TypeId::of::<#ty>(),
+                    name: core::any::type_name::<#ty>(),
+                }
+            },
+            Returning::SetOf(ty) => quote! {
+                crate::__pgx_internals::PgxExternReturn::SetOf {
                     id: TypeId::of::<#ty>(),
                     name: core::any::type_name::<#ty>(),
                 }
