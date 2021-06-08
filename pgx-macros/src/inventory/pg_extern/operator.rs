@@ -3,7 +3,7 @@ use proc_macro2::{TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
 use syn::parse::{Parse, ParseBuffer};
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct PgxOperator {
     pub opname: Option<PgxOperatorOpName>,
     pub commutator: Option<PgxOperatorAttributeWithIdent>,
@@ -39,7 +39,7 @@ impl ToTokens for PgxOperator {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PgxOperatorAttributeWithIdent {
     pub paren_token: Paren,
     pub fn_name: TokenStream2,
@@ -65,7 +65,7 @@ impl ToTokens for PgxOperatorAttributeWithIdent {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PgxOperatorOpName {
     pub paren_token: Paren,
     pub op_name: TokenStream2,

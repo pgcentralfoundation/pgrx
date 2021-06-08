@@ -3,7 +3,7 @@ use syn::{Token, parse::{Parse, ParseStream}, FnArg, Pat};
 use quote::{quote, ToTokens, TokenStreamExt};
 use std::convert::TryFrom;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Argument {
     pat: syn::Ident,
     ty: syn::Type,
@@ -69,7 +69,7 @@ impl ToTokens for Argument {
 }
 
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub(crate) struct DefaultMacro {
     ty: syn::Type,
     comma: Token![,],

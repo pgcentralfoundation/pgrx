@@ -35,7 +35,7 @@ pub fn pg_guard(_attr: TokenStream, item: TokenStream) -> TokenStream {
         // process top-level functions
         // these functions get wrapped as public extern "C" functions with #[no_mangle] so they
         // can also be called from C code
-        Item::Fn(func) => rewriter.item_fn(func, false, false, false).0.into(),
+        Item::Fn(func) => rewriter.item_fn(func, None, false, false, false).0.into(),
         _ => {
             panic!("#[pg_guard] can only be applied to extern \"C\" blocks and top-level functions")
         }
@@ -169,16 +169,16 @@ pub fn search_path(_attr: TokenStream, item: TokenStream) -> TokenStream {
 pub fn pg_extern(attr: TokenStream, item: TokenStream) -> TokenStream {
     let args = parse_extern_attributes(proc_macro2::TokenStream::from(attr.clone()));
 
-    let inventory_submission = inventory::PgxExtern::new(attr, item.clone());
+    let inventory_submission = inventory::PgxExtern::new(attr, item.clone()).ok();
 
     let ast = parse_macro_input!(item as syn::Item);
     match ast {
-        Item::Fn(func) => rewrite_item_fn(func, args, inventory_submission.unwrap()).into(),
+        Item::Fn(func) => rewrite_item_fn(func, args, inventory_submission.as_ref()).into(),
         _ => panic!("#[pg_extern] can only be applied to top-level functions"),
     }
 }
 
-fn rewrite_item_fn(mut func: ItemFn, extern_args: HashSet<ExternArgs>, inventory_submission: inventory::PgxExtern) -> proc_macro2::TokenStream {
+fn rewrite_item_fn(mut func: ItemFn, extern_args: HashSet<ExternArgs>, inventory_submission: Option<&inventory::PgxExtern>) -> proc_macro2::TokenStream {
     let is_raw = extern_args.contains(&ExternArgs::Raw);
     let no_guard = extern_args.contains(&ExternArgs::NoGuard);
 
@@ -195,7 +195,7 @@ fn rewrite_item_fn(mut func: ItemFn, extern_args: HashSet<ExternArgs>, inventory
     // make the function 'extern "C"' because this is for the #[pg_extern[ macro
     func.sig.abi = Some(syn::parse_str("extern \"C\"").unwrap());
     let func_span = func.span();
-    let (rewritten_func, need_wrapper) = rewriter.item_fn(func, true, is_raw, no_guard);
+    let (rewritten_func, need_wrapper) = rewriter.item_fn(func, inventory_submission.into(), true, is_raw, no_guard);
 
     if need_wrapper {
         quote_spanned! {func_span=>
@@ -205,13 +205,10 @@ fn rewrite_item_fn(mut func: ItemFn, extern_args: HashSet<ExternArgs>, inventory
                 &V1_API
             }
 
-            #inventory_submission
-
             #rewritten_func
         }
     } else {
         quote_spanned! {func_span=>
-            #inventory_submission
 
             #rewritten_func
         }

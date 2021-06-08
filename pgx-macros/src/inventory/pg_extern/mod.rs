@@ -17,7 +17,7 @@ use proc_macro::TokenStream;
 use std::convert::TryFrom;
 use syn::Meta;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PgxExtern {
     attrs: PgxAttributes,
     func: syn::ItemFn,

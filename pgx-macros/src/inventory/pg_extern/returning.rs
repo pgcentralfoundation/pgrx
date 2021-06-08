@@ -3,7 +3,7 @@ use syn::{Token, parse::{Parse, ParseStream}};
 use quote::{quote, ToTokens, TokenStreamExt};
 use std::{convert::TryFrom, ops::Deref};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Returning {
     None,
     Type(syn::Type),

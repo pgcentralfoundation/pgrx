@@ -2,7 +2,7 @@ use proc_macro2::{TokenStream as TokenStream2, Span};
 use syn::{Token, punctuated::Punctuated, parse::{Parse, ParseStream}};
 use quote::{quote, ToTokens, TokenStreamExt};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PgxAttributes {
     attrs: Punctuated<Attribute, Token![,]>,
 }
@@ -26,7 +26,7 @@ impl ToTokens for PgxAttributes {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Attribute {
     Immutable,
     Strict,

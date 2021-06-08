@@ -2,7 +2,7 @@ use proc_macro2::{TokenStream as TokenStream2};
 use syn::{Token, punctuated::Punctuated, parse::{Parse, ParseStream}};
 use quote::{quote, ToTokens};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SearchPath {
     at_start: Option<syn::token::At>,
     dollar: Option<syn::token::Dollar>,
