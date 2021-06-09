@@ -259,6 +259,19 @@ macro_rules! pg_module_magic {
                 fn externs_with_operators(&self) -> String {
                     use crate::__pgx_internals::PgxExternReturn;
                     self.externs.iter().map(|ext| {
+                        let mut extern_attrs = ext.extern_attrs.clone();
+                        let mut strict_upgrade = false;
+                        if !extern_attrs.iter().any(|i| i == &pgx_utils::ExternArgs::Strict) {
+                            for arg in &ext.fn_args {
+                                if arg.is_optional {
+                                    strict_upgrade = true;
+                                }
+                            }
+                        }
+                        if strict_upgrade {
+                            extern_attrs.push(pgx_utils::ExternArgs::Strict);
+                        }
+
                         let fn_sql = format!("\
                                 CREATE OR REPLACE FUNCTION \"{name}\"({arguments}) {returns}\n{extern_attrs}LANGUAGE c /* Rust */\nAS 'MODULE_PATHNAME', '{name}';\
                                 \
@@ -285,10 +298,10 @@ macro_rules! pg_module_magic {
                                 ),
                             },
                             // TODO: Search Path
-                            extern_attrs = if ext.extern_attrs.is_empty() {
+                            extern_attrs = if extern_attrs.is_empty() {
                                 String::default()
                             } else {
-                                let mut retval = ext.extern_attrs.iter().map(|attr| format!("{}", attr).to_uppercase()).collect::<Vec<_>>().join(" ");
+                                let mut retval = extern_attrs.iter().map(|attr| format!("{}", attr).to_uppercase()).collect::<Vec<_>>().join(" ");
                                 retval.push('\n');
                                 retval
                             },
@@ -525,6 +538,7 @@ macro_rules! pg_module_magic {
                 pub pattern: &'static str,
                 pub ty_id: core::any::TypeId,
                 pub ty_name: &'static str,
+                pub is_optional: bool,
                 pub default: Option<&'static str>,
             }
 

@@ -71,12 +71,26 @@ impl ToTokens for Argument {
         let pat = &self.pat;
         let ty = &self.ty;
         let default = self.default.iter();
+        let is_optional = match self.ty {
+            syn::Type::Path(ref type_path) => {
+                let path = &type_path.path;
+                let mut found_optional = false;
+                for segment in &path.segments {
+                    if segment.ident.to_string().as_str() == "Option" {
+                        found_optional = true;
+                    }
+                }
+                found_optional
+            },
+            _ => false,
+        };
 
         let quoted = quote! {
             crate::__pgx_internals::PgxExternInputs {
                 pattern: stringify!(#pat),
                 ty_id: TypeId::of::<#ty>(),
                 ty_name: core::any::type_name::<#ty>(),
+                is_optional: #is_optional,
                 default: None#( .unwrap_or(Some(stringify!(#default))) )*,
             }
         };

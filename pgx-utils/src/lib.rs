@@ -211,8 +211,8 @@ impl core::fmt::Display for ExternArgs {
             ExternArgs::ParallelRestricted => write!(f, "PARALLEL RESTRICTED"),
             ExternArgs::Error(_) => Ok(()),
             ExternArgs::NoGuard => Ok(()),
-            ExternArgs::Schema(s) => Ok(()),
-            ExternArgs::Name(n) => Ok(()),
+            ExternArgs::Schema(_) => Ok(()),
+            ExternArgs::Name(_) => Ok(()),
         }
     }
 }
