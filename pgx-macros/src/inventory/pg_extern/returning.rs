@@ -49,9 +49,13 @@ impl TryFrom<&syn::ReturnType> for Returning {
                                                 }).collect();
                                                 Returning::Iterated(returns)
                                             },
-                                            syn::Type::Path(path) => {
-                                                Returning::SetOf(path.clone())
-                                            },
+                                            syn::Type::Path(path) => Returning::SetOf(path.clone()),
+                                            syn::Type::Reference(type_ref) => {
+                                                match &*type_ref.elem {
+                                                    syn::Type::Path(path) => Returning::SetOf(path.clone()),
+                                                    _ => unimplemented!("Expected path")
+                                                }
+                                            }
                                             ty => unimplemented!("Only iters with tuples, got {:?}.", ty),
                                         },
                                         _ => unimplemented!(),

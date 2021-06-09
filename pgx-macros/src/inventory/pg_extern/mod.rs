@@ -66,34 +66,41 @@ impl PgxExtern {
                     skel.get_or_insert_with(Default::default)
                         .opname
                         .get_or_insert(attr);
-                }
+                },
                 "commutator" => {
                     let attr: PgxOperatorAttributeWithIdent = syn::parse2(attr.tokens.clone())
                         .expect(&format!("Unable to parse {:?}", &attr.tokens));
                     skel.get_or_insert_with(Default::default)
                         .commutator
                         .get_or_insert(attr);
-                }
+                },
                 "negator" => {
                     let attr: PgxOperatorAttributeWithIdent = syn::parse2(attr.tokens.clone())
                         .expect(&format!("Unable to parse {:?}", &attr.tokens));
                     skel.get_or_insert_with(Default::default)
                         .negator
                         .get_or_insert(attr);
-                }
+                },
+                "join" => {
+                    let attr: PgxOperatorAttributeWithIdent = syn::parse2(attr.tokens.clone())
+                        .expect(&format!("Unable to parse {:?}", &attr.tokens));
+                    skel.get_or_insert_with(Default::default)
+                        .join
+                        .get_or_insert(attr);
+                },
                 "restrict" => {
                     let attr: PgxOperatorAttributeWithIdent = syn::parse2(attr.tokens.clone())
                         .expect(&format!("Unable to parse {:?}", &attr.tokens));
                     skel.get_or_insert_with(Default::default)
                         .restrict
                         .get_or_insert(attr);
-                }
+                },
                 "hashes" => {
                     skel.get_or_insert_with(Default::default).hashes = true;
-                }
+                },
                 "merges" => {
                     skel.get_or_insert_with(Default::default).merges = true;
-                }
+                },
                 _ => (),
             }
         }
