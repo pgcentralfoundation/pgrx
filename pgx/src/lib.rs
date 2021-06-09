@@ -260,11 +260,11 @@ macro_rules! pg_module_magic {
                     use crate::__pgx_internals::PgxExternReturn;
                     self.externs.iter().map(|ext| {
                         let mut extern_attrs = ext.extern_attrs.clone();
-                        let mut strict_upgrade = false;
+                        let mut strict_upgrade = true;
                         if !extern_attrs.iter().any(|i| i == &pgx_utils::ExternArgs::Strict) {
                             for arg in &ext.fn_args {
                                 if arg.is_optional {
-                                    strict_upgrade = true;
+                                    strict_upgrade = false;
                                 }
                             }
                         }
