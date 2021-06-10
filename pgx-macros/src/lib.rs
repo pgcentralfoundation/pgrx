@@ -177,6 +177,14 @@ pub fn pg_extern(attr: TokenStream, item: TokenStream) -> TokenStream {
     }
 }
 
+/// Declare a function as `#[pg_guard]` to indcate that it is called from a Postgres `extern "C"`
+/// function so that Rust `panic!()`s (and Postgres `elog(ERROR)`s) will be properly handled by `pgx`
+#[proc_macro_attribute]
+pub fn pg_schema(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    let pgx_schema = parse_macro_input!(item as inventory::PgxSchema);
+    pgx_schema.to_token_stream().into()
+}
+
 fn rewrite_item_fn(
     mut func: ItemFn,
     extern_args: HashSet<ExternArgs>,

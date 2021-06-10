@@ -29,6 +29,7 @@ impl ToTokens for PostgresType {
                     name: stringify!(#name),
                     file: file!(),
                     line: line!(),
+                    module_path: module_path!(),
                     full_path: core::any::type_name::<#name>(),
                     id: TypeId::of::<#name>(),
                     option_id: TypeId::of::<Option<#name>>(),

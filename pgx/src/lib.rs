@@ -139,10 +139,15 @@ macro_rules! pg_module_magic {
             &MY_MAGIC
         }
 
-        pub use __pgx_internals::PgxSchema;
+        pub use __pgx_internals::PgxSql;
         mod __pgx_internals {
+            use core::convert::TryFrom;
+
+            static CONTROL_FILE: &str = include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/", env!("CARGO_CRATE_NAME"), ".control"));
+
             #[derive(Debug)]
-            pub struct PgxSchema {
+            pub struct PgxSql {
+                pub schemas: Vec<&'static PgxSchema>,
                 pub extension_sql: Vec<&'static PgxExtensionSql>,
                 pub externs: Vec<&'static PgxExtern>,
                 pub types: Vec<&'static PgxPostgresType>,
@@ -151,10 +156,11 @@ macro_rules! pg_module_magic {
                 pub hashes: Vec<&'static PgxPostgresHash>
             }
 
-            impl PgxSchema {
+            impl PgxSql {
                 pub fn generate() -> Self {
                     use std::fmt::Write;
                     let mut generated = Self {
+                        schemas: pgx::inventory::iter::<PgxSchema>().collect(),
                         extension_sql: pgx::inventory::iter::<PgxExtensionSql>().collect(),
                         externs: pgx::inventory::iter::<PgxExtern>().collect(),
                         types: pgx::inventory::iter::<PgxPostgresType>().collect(),
@@ -178,6 +184,24 @@ macro_rules! pg_module_magic {
                     let mut out = File::create(path)?;
                     write!(out, "{}", generated)?;
                     Ok(())
+                }
+
+                pub fn schema_alias_of(&self, module_path: &'static str) -> Option<String> {
+                    let mut needle = None;
+                    for schema in &self.schemas {
+                        if schema.module_path.starts_with(module_path) {
+                            needle = Some(schema.name.to_string());
+                            break;
+                        }
+                    }
+                    needle
+                }
+
+                pub fn schema_prefix_for(&self, module_path: &'static str) -> String {
+                    self.schema_alias_of(module_path).or_else(|| {
+                        let control = pgx::ControlFile::try_from(CONTROL_FILE).unwrap();
+                        control.schema
+                    }).map(|v| (v + ".").to_string()).unwrap_or_else(|| "".to_string())
                 }
 
                 pub fn to_sql(&self) -> String {
@@ -225,10 +249,11 @@ macro_rules! pg_module_magic {
                                 -- {full_path} - {id:?}\n\
                                 -- Option<{full_path}> - {option_id:?}\n\
                                 -- Vec<{full_path}> - {vec_id:?}\n\
-                                CREATE TYPE {name} AS ENUM (\n\
+                                CREATE TYPE {schema}{name} AS ENUM (\n\
                                     {variants}\
                                 );\
                             ",
+                            schema = self.schema_prefix_for(en.module_path),
                             full_path = en.full_path,
                             file = en.file,
                             line = en.line,
@@ -249,8 +274,9 @@ macro_rules! pg_module_magic {
                                 -- {full_path} - {id:?}\n\
                                 -- Option<{full_path}> - {option_id:?}\n\
                                 -- Vec<{full_path}> - {vec_id:?}\n\
-                                CREATE TYPE {name};\
+                                CREATE TYPE {schema}{name};\
                             ",
+                            schema = self.schema_prefix_for(ty.module_path),
                             full_path = ty.full_path,
                             file = ty.file,
                             line = ty.line,
@@ -279,13 +305,14 @@ macro_rules! pg_module_magic {
                         }
 
                         let fn_sql = format!("\
-                                CREATE OR REPLACE FUNCTION \"{name}\"({arguments}) {returns}\n\
+                                CREATE OR REPLACE FUNCTION {schema}\"{name}\"({arguments}) {returns}\n\
                                 {extern_attrs}\
                                 {search_path}\
                                 LANGUAGE c /* Rust */\n\
-                                AS 'MODULE_PATHNAME', '{name}';\
+                                AS 'MODULE_PATHNAME', '{name}_wrapper';\
                                 \
                             ",
+                            schema = self.schema_prefix_for(ext.module_path),
                             name = ext.name,
                             arguments = if !ext.fn_args.is_empty() {
                                 String::from("\n") + &ext.fn_args.iter().enumerate().map(|(idx, arg)| {
@@ -397,7 +424,7 @@ macro_rules! pg_module_magic {
                                 -- {full_path} - {id:?}\n\
                                 -- Option<{full_path}> - {option_id:?}\n\
                                 -- Vec<{full_path}> - {vec_id:?}\n\
-                                CREATE TYPE {name} (\n\
+                                CREATE TYPE {schema}{name} (\n\
                                     \tINTERNALLENGTH = variable,\n\
                                     \tINPUT = {in_fn},\n\
                                     \tOUTPUT = {out_fn},\n\
@@ -407,6 +434,7 @@ macro_rules! pg_module_magic {
                             full_path = ty.full_path,
                             file = ty.file,
                             line = ty.line,
+                            schema = self.schema_prefix_for(ty.module_path),
                             id = ty.id,
                             option_id = ty.option_id,
                             vec_id = ty.vec_id,
@@ -487,6 +515,7 @@ macro_rules! pg_module_magic {
                 pub file: &'static str,
                 pub line: u32,
                 pub full_path: &'static str,
+                pub module_path: &'static str,
                 pub id: core::any::TypeId,
                 pub option_id: core::any::TypeId,
                 pub vec_id: core::any::TypeId,
@@ -527,6 +556,7 @@ macro_rules! pg_module_magic {
                 pub file: &'static str,
                 pub line: u32,
                 pub full_path: &'static str,
+                pub module_path: &'static str,
                 pub id: core::any::TypeId,
                 pub option_id: core::any::TypeId,
                 pub vec_id: core::any::TypeId,
@@ -563,6 +593,7 @@ macro_rules! pg_module_magic {
                 pub file: &'static str,
                 pub line: u32,
                 pub full_path: &'static str,
+                pub module_path: &'static str,
                 pub id: core::any::TypeId,
             }
             pgx::inventory::collect!(PgxPostgresHash);
@@ -573,9 +604,19 @@ macro_rules! pg_module_magic {
                 pub file: &'static str,
                 pub line: u32,
                 pub full_path: &'static str,
+                pub module_path: &'static str,
                 pub id: core::any::TypeId,
             }
             pgx::inventory::collect!(PgxPostgresOrd);
+
+            #[derive(Debug)]
+            pub struct PgxSchema {
+                pub module_path: &'static str,
+                pub name: &'static str,
+                pub file: &'static str,
+                pub line: u32,
+            }
+            pgx::inventory::collect!(PgxSchema);
         }
     };
 }
@@ -591,6 +632,7 @@ use core::any::TypeId;
 use once_cell::sync::Lazy;
 use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
+use std::convert::TryFrom;
 
 static TYPEID_SQL_MAPPING: Lazy<Arc<RwLock<HashMap<TypeId, String>>>> = Lazy::new(|| {
     let mut m = HashMap::new();
@@ -712,4 +754,59 @@ pub fn map_type_to_sql_type<T: 'static>(sql: impl AsRef<str>) {
 pub fn map_type_id_to_sql_type(id: TypeId, sql: impl AsRef<str>) {
     let sql = sql.as_ref().to_string();
     TYPEID_SQL_MAPPING.write().unwrap().insert(id, sql);
+}
+
+#[derive(Debug)]
+pub struct ControlFile {
+    pub comment: String,
+    pub default_version: String,
+    pub module_pathname: String,
+    pub relocatable: bool,
+    pub superuser: bool,
+    pub schema: Option<String>,
+}
+
+#[derive(Debug)]
+pub enum ControlFileError {
+    MissingField(&'static str),
+}
+
+impl std::fmt::Display for ControlFileError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            ControlFileError::MissingField(field) => write!(f, "Missing field in control file! Please add `{}`", field),
+        }
+    }
+}
+
+impl std::error::Error for ControlFileError {}
+
+impl TryFrom<&str> for ControlFile {
+    type Error = Box<dyn std::error::Error>;
+
+    fn try_from(input: &str) -> Result<Self, Self::Error> {
+        let mut temp = HashMap::new();
+        for line in input.lines() {
+            let parts: Vec<&str> = line.split('=').collect();
+
+            if parts.len() != 2 {
+                continue;
+            }
+
+            let (k, v) = (parts.get(0).unwrap().trim(), parts.get(1).unwrap().trim());
+
+            let v = v.trim_start_matches('\'');
+            let v = v.trim_end_matches('\'');
+
+            temp.insert(k, v);
+        }
+        Ok(ControlFile {
+            comment: temp.get("comment").ok_or(ControlFileError::MissingField("comment"))?.to_string(),
+            default_version: temp.get("default_version").ok_or(ControlFileError::MissingField("default_version"))?.to_string(),
+            module_pathname: temp.get("module_pathname").ok_or(ControlFileError::MissingField("module_pathname"))?.to_string(),
+            relocatable: temp.get("relocatable").ok_or(ControlFileError::MissingField("relocatable"))? == &"true",
+            superuser: temp.get("superuser").ok_or(ControlFileError::MissingField("superuser"))? == &"true",
+            schema: temp.get("schema").map(|v| v.to_string()),
+        })
+    }
 }

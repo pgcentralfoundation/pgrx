@@ -23,6 +23,7 @@ impl ToTokens for PostgresOrd {
                     file: file!(),
                     line: line!(),
                     full_path: core::any::type_name::<#name>(),
+                    module_path: module_path!(),
                     id: TypeId::of::<#name>(),
                 }
             }
