@@ -144,11 +144,13 @@ macro_rules! pg_module_magic {
 
         pub use __pgx_internals::PgxSql;
         mod __pgx_internals {
-            use core::convert::TryFrom;
+            use std::collections::HashMap;
+            use core::{convert::TryFrom, any::TypeId};
             use pgx::{once_cell::sync::Lazy, inventory, ControlFile};
 
             #[derive(Debug)]
             pub struct PgxSql {
+                pub type_mappings: HashMap<TypeId, String>,
                 pub control: ControlFile,
                 pub schemas: Vec<&'static Schema>,
                 pub extension_sql: Vec<&'static ExtensionSql>,
@@ -163,6 +165,7 @@ macro_rules! pg_module_magic {
                 pub fn generate() -> Self {
                     use std::fmt::Write;
                     let mut generated = Self {
+                        type_mappings: pgx::DEFAULT_TYPEID_SQL_MAPPING.clone(),
                         control: ControlFile::try_from(
                             include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/", env!("CARGO_CRATE_NAME"), ".control"))
                         ).expect("Invalid .control file"),
@@ -343,7 +346,7 @@ macro_rules! pg_module_magic {
                                             \t\"{pattern}\" {sql_type} {default}{maybe_comma}/* {ty_name} */\
                                         ",
                                         pattern = arg.pattern,
-                                        sql_type = pgx::type_id_to_sql_type(arg.ty_id).unwrap_or_else(|| arg.ty_name.to_string()),
+                                        sql_type = self.type_id_to_sql_type(arg.ty_id).unwrap_or_else(|| arg.ty_name.to_string()),
                                         default = if let Some(def) = arg.default { format!("DEFAULT {} ", def) } else { String::from("") },
                                         maybe_comma = if needs_comma { "," } else { "" },
                                         ty_name = arg.ty_name,
@@ -352,10 +355,10 @@ macro_rules! pg_module_magic {
                             } else { Default::default() },
                             returns = match &item.fn_return {
                                 pgx_utils::pg_inventory::InventoryPgExternReturn::None => String::from("RETURNS void"),
-                                pgx_utils::pg_inventory::InventoryPgExternReturn::Type { id, name } => format!("RETURNS {} /* {} */", pgx::type_id_to_sql_type(*id).unwrap_or_else(|| name.to_string()), name),
-                                pgx_utils::pg_inventory::InventoryPgExternReturn::SetOf { id, name } => format!("RETURNS SETOF {} /* {} */", pgx::type_id_to_sql_type(*id).unwrap_or_else(|| name.to_string()), name),
+                                pgx_utils::pg_inventory::InventoryPgExternReturn::Type { id, name } => format!("RETURNS {} /* {} */", self.type_id_to_sql_type(*id).unwrap_or_else(|| name.to_string()), name),
+                                pgx_utils::pg_inventory::InventoryPgExternReturn::SetOf { id, name } => format!("RETURNS SETOF {} /* {} */", self.type_id_to_sql_type(*id).unwrap_or_else(|| name.to_string()), name),
                                 pgx_utils::pg_inventory::InventoryPgExternReturn::Iterated(vec) => format!("RETURNS TABLE ({}\n)",
-                                    vec.iter().map(|(id, ty_name, col_name)| format!("\n\t\"{}\" {} /* {} */", col_name.unwrap(), pgx::type_id_to_sql_type(*id).unwrap_or_else(|| ty_name.to_string()), ty_name)).collect::<Vec<_>>().join(",")
+                                    vec.iter().map(|(id, ty_name, col_name)| format!("\n\t\"{}\" {} /* {} */", col_name.unwrap(), self.type_id_to_sql_type(*id).unwrap_or_else(|| ty_name.to_string()), ty_name)).collect::<Vec<_>>().join(",")
                                 ),
                             },
                             search_path = if let Some(search_path) = &item.search_path {
@@ -429,8 +432,8 @@ macro_rules! pg_module_magic {
                                     module_path = item.module_path,
                                     left_name = item.fn_args.get(0).unwrap().ty_name,
                                     right_name = item.fn_args.get(1).unwrap().ty_name,
-                                    left_arg = pgx::type_id_to_sql_type(item.fn_args.get(0).unwrap().ty_id).unwrap_or_else(|| item.fn_args.get(0).unwrap().ty_name.to_string()),
-                                    right_arg = pgx::type_id_to_sql_type(item.fn_args.get(1).unwrap().ty_id).unwrap_or_else(|| item.fn_args.get(1).unwrap().ty_name.to_string()),
+                                    left_arg = self.type_id_to_sql_type(item.fn_args.get(0).unwrap().ty_id).unwrap_or_else(|| item.fn_args.get(0).unwrap().ty_name.to_string()),
+                                    right_arg = self.type_id_to_sql_type(item.fn_args.get(1).unwrap().ty_id).unwrap_or_else(|| item.fn_args.get(1).unwrap().ty_name.to_string()),
                                     optionals = optionals.join(",\n") + "\n"
                                 );
                                 ext_sql + &operator_sql
@@ -511,18 +514,39 @@ macro_rules! pg_module_magic {
                     buf
                 }
 
-                pub fn register_types(&self) {
-                    for &PostgresEnum(ref item) in &self.enums {
-                        pgx::map_type_id_to_sql_type(item.id, item.name);
-                        pgx::map_type_id_to_sql_type(item.option_id, item.name);
-                        pgx::map_type_id_to_sql_type(item.vec_id, format!("{}[]", item.name));
+                pub fn register_types(&mut self) {
+                    for PostgresEnum(item) in self.enums.clone() {
+                        self.map_type_id_to_sql_type(item.id, item.name);
+                        self.map_type_id_to_sql_type(item.option_id, item.name);
+                        self.map_type_id_to_sql_type(item.vec_id, format!("{}[]", item.name));
                     }
-                    for &PostgresType(ref item) in &self.types {
-                        pgx::map_type_id_to_sql_type(item.id, item.name);
-                        pgx::map_type_id_to_sql_type(item.option_id, item.name);
-                        pgx::map_type_id_to_sql_type(item.vec_id, format!("{}[]", item.name));
+                    for PostgresType(item) in self.types.clone() {
+                        self.map_type_id_to_sql_type(item.id, item.name);
+                        self.map_type_id_to_sql_type(item.option_id, item.name);
+                        self.map_type_id_to_sql_type(item.vec_id, format!("{}[]", item.name));
                     }
                 }
+
+                pub fn type_id_to_sql_type(&self, id: TypeId) -> Option<String> {
+                    self.type_mappings
+                        .get(&id)
+                        .map(|f| f.clone())
+                }
+                pub fn map_type_to_sql_type<T: 'static>(&mut self, sql: impl AsRef<str>) {
+                    let sql = sql.as_ref().to_string();
+                    self.type_mappings
+                        .insert(TypeId::of::<T>(), sql.clone());
+                    self.type_mappings
+                        .insert(TypeId::of::<Option<T>>(), sql.clone());
+                    self.type_mappings
+                        .insert(TypeId::of::<Vec<T>>(), format!("{}[]", sql));
+                }
+
+                pub fn map_type_id_to_sql_type(&mut self, id: TypeId, sql: impl AsRef<str>) {
+                    let sql = sql.as_ref().to_string();
+                    self.type_mappings.insert(id, sql);
+                }
+
             }
 
             #[derive(Debug)]
@@ -566,10 +590,9 @@ pub fn initialize() {
 use core::any::TypeId;
 use once_cell::sync::Lazy;
 use std::collections::HashMap;
-use std::sync::{Arc, RwLock};
 use std::convert::TryFrom;
 
-static TYPEID_SQL_MAPPING: Lazy<Arc<RwLock<HashMap<TypeId, String>>>> = Lazy::new(|| {
+pub static DEFAULT_TYPEID_SQL_MAPPING: Lazy<HashMap<TypeId, String>> = Lazy::new(|| {
     let mut m = HashMap::new();
     m.insert(TypeId::of::<&'static str>(), String::from("text"));
     m.insert(TypeId::of::<Option<&'static str>>(), String::from("text"));
@@ -661,35 +684,8 @@ static TYPEID_SQL_MAPPING: Lazy<Arc<RwLock<HashMap<TypeId, String>>>> = Lazy::ne
     m.insert(TypeId::of::<Vec<u8>>(), String::from("bytea"));
     m.insert(TypeId::of::<Option<Vec<u8>>>(), String::from("bytea"));
 
-    Arc::from(RwLock::from(m))
+    m
 });
-pub fn type_id_to_sql_type(id: TypeId) -> Option<String> {
-    TYPEID_SQL_MAPPING
-        .read()
-        .unwrap()
-        .get(&id)
-        .map(|f| f.clone())
-}
-pub fn map_type_to_sql_type<T: 'static>(sql: impl AsRef<str>) {
-    let sql = sql.as_ref().to_string();
-    TYPEID_SQL_MAPPING
-        .write()
-        .unwrap()
-        .insert(TypeId::of::<T>(), sql.clone());
-    TYPEID_SQL_MAPPING
-        .write()
-        .unwrap()
-        .insert(TypeId::of::<Option<T>>(), sql.clone());
-    TYPEID_SQL_MAPPING
-        .write()
-        .unwrap()
-        .insert(TypeId::of::<Vec<T>>(), format!("{}[]", sql));
-}
-
-pub fn map_type_id_to_sql_type(id: TypeId, sql: impl AsRef<str>) {
-    let sql = sql.as_ref().to_string();
-    TYPEID_SQL_MAPPING.write().unwrap().insert(id, sql);
-}
 
 #[derive(Debug)]
 pub struct ControlFile {
