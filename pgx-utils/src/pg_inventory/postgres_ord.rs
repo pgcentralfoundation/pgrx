@@ -7,7 +7,7 @@ pub struct PostgresOrd {
 }
 
 impl PostgresOrd {
-    pub(crate) fn new(name: Ident) -> Self {
+    pub fn new(name: Ident) -> Self {
         Self { name }
     }
 }

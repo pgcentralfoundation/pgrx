@@ -8,7 +8,7 @@ pub struct PostgresType {
 }
 
 impl PostgresType {
-    pub(crate) fn new(name: Ident, in_fn: Ident, out_fn: Ident) -> Self {
+    pub fn new(name: Ident, in_fn: Ident, out_fn: Ident) -> Self {
         Self {
             name,
             in_fn,

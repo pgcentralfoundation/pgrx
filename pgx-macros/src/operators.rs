@@ -1,5 +1,4 @@
-use crate::inventory;
-use pgx_utils::operator_common::*;
+use pgx_utils::{operator_common::*, pg_inventory};
 use quote::ToTokens;
 use syn::DeriveInput;
 
@@ -21,7 +20,7 @@ pub(crate) fn impl_postgres_ord(ast: DeriveInput) -> proc_macro2::TokenStream {
     stream.extend(ge(&ast.ident));
     stream.extend(cmp(&ast.ident));
 
-    inventory::PostgresOrd::new(ast.ident.clone()).to_tokens(&mut stream);
+    pg_inventory::PostgresOrd::new(ast.ident.clone()).to_tokens(&mut stream);
 
     stream
 }
@@ -31,7 +30,7 @@ pub(crate) fn impl_postgres_hash(ast: DeriveInput) -> proc_macro2::TokenStream {
 
     stream.extend(hash(&ast.ident));
 
-    inventory::PostgresHash::new(ast.ident.clone()).to_tokens(&mut stream);
+    pg_inventory::PostgresHash::new(ast.ident.clone()).to_tokens(&mut stream);
 
     stream
 }

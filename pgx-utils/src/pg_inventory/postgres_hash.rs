@@ -7,7 +7,7 @@ pub struct PostgresHash {
 }
 
 impl PostgresHash {
-    pub(crate) fn new(name: Ident) -> Self {
+    pub fn new(name: Ident) -> Self {
         Self { name }
     }
 }

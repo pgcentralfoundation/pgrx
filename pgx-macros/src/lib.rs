@@ -3,7 +3,6 @@
 
 extern crate proc_macro;
 
-mod inventory;
 mod operators;
 mod rewriter;
 use operators::{impl_postgres_eq, impl_postgres_hash, impl_postgres_ord};
@@ -168,7 +167,7 @@ pub fn search_path(_attr: TokenStream, item: TokenStream) -> TokenStream {
 pub fn pg_extern(attr: TokenStream, item: TokenStream) -> TokenStream {
     let args = parse_extern_attributes(proc_macro2::TokenStream::from(attr.clone()));
 
-    let inventory_submission = inventory::PgxExtern::new(attr, item.clone()).ok();
+    let inventory_submission = pg_inventory::PgxExtern::new(attr.clone().into(), item.clone().into()).ok();
 
     let ast = parse_macro_input!(item as syn::Item);
     match ast {
@@ -181,14 +180,14 @@ pub fn pg_extern(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// function so that Rust `panic!()`s (and Postgres `elog(ERROR)`s) will be properly handled by `pgx`
 #[proc_macro_attribute]
 pub fn pg_schema(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    let pgx_schema = parse_macro_input!(item as inventory::PgxSchema);
+    let pgx_schema = parse_macro_input!(item as pg_inventory::PgxSchema);
     pgx_schema.to_token_stream().into()
 }
 
 fn rewrite_item_fn(
     mut func: ItemFn,
     extern_args: HashSet<ExternArgs>,
-    inventory_submission: Option<&inventory::PgxExtern>,
+    inventory_submission: Option<&pg_inventory::PgxExtern>,
 ) -> proc_macro2::TokenStream {
     let is_raw = extern_args.contains(&ExternArgs::Raw);
     let no_guard = extern_args.contains(&ExternArgs::NoGuard);
@@ -287,7 +286,7 @@ fn impl_postgres_enum(ast: DeriveInput) -> proc_macro2::TokenStream {
         }
     });
 
-    inventory::PostgresEnum::new(enum_ident.clone(), enum_data.variants).to_tokens(&mut stream);
+    pg_inventory::PostgresEnum::new(enum_ident.clone(), enum_data.variants).to_tokens(&mut stream);
 
     stream
 }
@@ -386,7 +385,7 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
         });
     }
 
-    inventory::PostgresType::new(name.clone(), funcname_in.clone(), funcname_out.clone())
+    pg_inventory::PostgresType::new(name.clone(), funcname_in.clone(), funcname_out.clone())
         .to_tokens(&mut stream);
 
     stream

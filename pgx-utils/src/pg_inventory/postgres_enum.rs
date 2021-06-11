@@ -8,7 +8,7 @@ pub struct PostgresEnum {
 }
 
 impl PostgresEnum {
-    pub(crate) fn new(name: Ident, variants: Punctuated<syn::Variant, Token![,]>) -> Self {
+    pub fn new(name: Ident, variants: Punctuated<syn::Variant, Token![,]>) -> Self {
         Self { name, variants }
     }
 }

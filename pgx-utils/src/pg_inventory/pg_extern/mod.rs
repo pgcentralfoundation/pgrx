@@ -10,7 +10,6 @@ use operator::{PgxOperator, PgxOperatorAttributeWithIdent, PgxOperatorOpName};
 use returning::Returning;
 use search_path::SearchPathList;
 
-use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
 use std::convert::TryFrom;
@@ -134,9 +133,9 @@ impl PgxExtern {
         Returning::try_from(&self.func.sig.output).unwrap()
     }
 
-    pub(crate) fn new(attr: TokenStream, item: TokenStream) -> Result<Self, syn::Error> {
-        let attrs = syn::parse::<PgxAttributes>(attr)?;
-        let func = syn::parse::<syn::ItemFn>(item)?;
+    pub fn new(attr: TokenStream2, item: TokenStream2) -> Result<Self, syn::Error> {
+        let attrs = syn::parse2::<PgxAttributes>(attr)?;
+        let func = syn::parse2::<syn::ItemFn>(item)?;
         Ok(Self { attrs, func })
     }
 }
