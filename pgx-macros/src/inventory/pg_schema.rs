@@ -1,6 +1,6 @@
 use proc_macro2::TokenStream as TokenStream2;
 use quote::{quote, ToTokens, TokenStreamExt};
-use syn::{parse::{Parse, ParseStream}, punctuated::Punctuated, Ident, Token, ItemMod};
+use syn::{parse::{Parse, ParseStream}, ItemMod};
 
 #[derive(Debug)]
 pub struct PgxSchema {
@@ -27,12 +27,9 @@ impl ToTokens for PgxSchema {
 
         let mut updated_content = content_items.clone();
         updated_content.push(syn::parse_quote! {
-            struct __marker;
-        });
-        updated_content.push(syn::parse_quote! {
             pgx::inventory::submit! {
                 crate::__pgx_internals::PgxSchema {
-                    module_path: core::any::type_name::<__marker>(),
+                    module_path: module_path!(),
                     name: stringify!(#ident),
                     file: file!(),
                     line: line!(),
