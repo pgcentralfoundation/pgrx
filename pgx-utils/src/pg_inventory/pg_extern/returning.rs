@@ -78,16 +78,16 @@ impl ToTokens for Returning {
     fn to_tokens(&self, tokens: &mut TokenStream2) {
         let quoted = match self {
             Returning::None => quote! {
-                crate::__pgx_internals::PgxExternReturn::None
+                pgx_utils::pg_inventory::InventoryPgExternReturn::None
             },
             Returning::Type(ty) => quote! {
-                crate::__pgx_internals::PgxExternReturn::Type {
+                pgx_utils::pg_inventory::InventoryPgExternReturn::Type {
                     id: TypeId::of::<#ty>(),
                     name: core::any::type_name::<#ty>(),
                 }
             },
             Returning::SetOf(ty) => quote! {
-                crate::__pgx_internals::PgxExternReturn::SetOf {
+                pgx_utils::pg_inventory::InventoryPgExternReturn::SetOf {
                     id: TypeId::of::<#ty>(),
                     name: core::any::type_name::<#ty>(),
                 }
@@ -107,7 +107,7 @@ impl ToTokens for Returning {
                     })
                     .collect::<Vec<_>>();
                 quote! {
-                    crate::__pgx_internals::PgxExternReturn::Iterated(vec![
+                    pgx_utils::pg_inventory::InventoryPgExternReturn::Iterated(vec![
                         #(#quoted_items),*
                     ])
                 }
@@ -132,4 +132,18 @@ impl Parse for NameMacro {
             ty: input.parse()?,
         })
     }
+}
+
+#[derive(Debug)]
+pub enum InventoryPgExternReturn {
+    None,
+    Type {
+        id: core::any::TypeId,
+        name: &'static str,
+    },
+    SetOf {
+        id: core::any::TypeId,
+        name: &'static str,
+    },
+    Iterated(Vec<(core::any::TypeId, &'static str, Option<&'static str>)>),
 }

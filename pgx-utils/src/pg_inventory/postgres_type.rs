@@ -25,7 +25,7 @@ impl ToTokens for PostgresType {
         let inv = quote! {
             pgx::inventory::submit! {
                 use core::any::TypeId;
-                crate::__pgx_internals::PgxPostgresType {
+                crate::__pgx_internals::PostgresType(pgx_utils::pg_inventory::InventoryPostgresType {
                     name: stringify!(#name),
                     file: file!(),
                     line: line!(),
@@ -36,9 +36,23 @@ impl ToTokens for PostgresType {
                     vec_id: TypeId::of::<Vec<#name>>(),
                     in_fn: stringify!(#in_fn),
                     out_fn: stringify!(#out_fn),
-                }
+                })
             }
         };
         tokens.append_all(inv);
     }
+}
+
+#[derive(Debug)]
+pub struct InventoryPostgresType {
+    pub name: &'static str,
+    pub file: &'static str,
+    pub line: u32,
+    pub full_path: &'static str,
+    pub module_path: &'static str,
+    pub id: core::any::TypeId,
+    pub option_id: core::any::TypeId,
+    pub vec_id: core::any::TypeId,
+    pub in_fn: &'static str,
+    pub out_fn: &'static str,
 }

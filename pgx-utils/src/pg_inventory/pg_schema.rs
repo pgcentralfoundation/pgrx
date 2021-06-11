@@ -3,12 +3,11 @@ use quote::{quote, ToTokens, TokenStreamExt};
 use syn::{parse::{Parse, ParseStream}, ItemMod};
 
 #[derive(Debug)]
-pub struct PgxSchema {
+pub struct Schema {
     pub module: ItemMod,
-
 }
 
-impl Parse for PgxSchema {
+impl Parse for Schema {
     fn parse(input: ParseStream) -> Result<Self, syn::Error> {
         Ok(Self {
             module: input.parse()?,
@@ -16,8 +15,7 @@ impl Parse for PgxSchema {
     }
 }
 
-
-impl ToTokens for PgxSchema {
+impl ToTokens for Schema {
     fn to_tokens(&self, tokens: &mut TokenStream2) {
         let attrs = &self.module.attrs;
         let vis = &self.module.vis;
@@ -28,12 +26,12 @@ impl ToTokens for PgxSchema {
         let mut updated_content = content_items.clone();
         updated_content.push(syn::parse_quote! {
             pgx::inventory::submit! {
-                crate::__pgx_internals::PgxSchema {
+                crate::__pgx_internals::PgxSchema(pgx_utils::pg_inventory::InventorySchema {
                     module_path: module_path!(),
                     name: stringify!(#ident),
                     file: file!(),
                     line: line!(),
-                }
+                })
             }
         });
 
@@ -47,4 +45,13 @@ impl ToTokens for PgxSchema {
         };
         tokens.append_all(inv);
     }
+}
+
+
+#[derive(Debug)]
+pub struct InventorySchema {
+    pub module_path: &'static str,
+    pub name: &'static str,
+    pub file: &'static str,
+    pub line: u32,
 }

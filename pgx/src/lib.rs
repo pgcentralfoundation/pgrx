@@ -61,6 +61,9 @@ pub mod xid;
 
 #[doc(hidden)]
 pub use inventory;
+#[doc(hidden)]
+pub use once_cell;
+
 
 pub use atomics::*;
 pub use callbacks::*;
@@ -142,31 +145,35 @@ macro_rules! pg_module_magic {
         pub use __pgx_internals::PgxSql;
         mod __pgx_internals {
             use core::convert::TryFrom;
+            use pgx::{once_cell::sync::Lazy, inventory, ControlFile};
 
-            static CONTROL_FILE: &str = include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/", env!("CARGO_CRATE_NAME"), ".control"));
+            static CONTROL: Lazy<ControlFile> = Lazy::new(|| {
+                let file = include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/", env!("CARGO_CRATE_NAME"), ".control"));
+                ControlFile::try_from(file).expect("Invalid .control file")
+            });
 
             #[derive(Debug)]
             pub struct PgxSql {
-                pub schemas: Vec<&'static PgxSchema>,
-                pub extension_sql: Vec<&'static PgxExtensionSql>,
-                pub externs: Vec<&'static PgxExtern>,
-                pub types: Vec<&'static PgxPostgresType>,
-                pub enums: Vec<&'static PgxPostgresEnum>,
-                pub ords: Vec<&'static PgxPostgresOrd>,
-                pub hashes: Vec<&'static PgxPostgresHash>
+                pub schemas: Vec<&'static Schema>,
+                pub extension_sql: Vec<&'static ExtensionSql>,
+                pub externs: Vec<&'static PgExtern>,
+                pub types: Vec<&'static PostgresType>,
+                pub enums: Vec<&'static PostgresEnum>,
+                pub ords: Vec<&'static PostgresOrd>,
+                pub hashes: Vec<&'static PostgresHash>
             }
 
             impl PgxSql {
                 pub fn generate() -> Self {
                     use std::fmt::Write;
                     let mut generated = Self {
-                        schemas: pgx::inventory::iter::<PgxSchema>().collect(),
-                        extension_sql: pgx::inventory::iter::<PgxExtensionSql>().collect(),
-                        externs: pgx::inventory::iter::<PgxExtern>().collect(),
-                        types: pgx::inventory::iter::<PgxPostgresType>().collect(),
-                        enums: pgx::inventory::iter::<PgxPostgresEnum>().collect(),
-                        hashes: pgx::inventory::iter::<PgxPostgresHash>().collect(),
-                        ords: pgx::inventory::iter::<PgxPostgresOrd>().collect(),
+                        schemas: inventory::iter::<Schema>().collect(),
+                        extension_sql: inventory::iter::<ExtensionSql>().collect(),
+                        externs: inventory::iter::<PgExtern>().collect(),
+                        types: inventory::iter::<PostgresType>().collect(),
+                        enums: inventory::iter::<PostgresEnum>().collect(),
+                        hashes: inventory::iter::<PostgresHash>().collect(),
+                        ords: inventory::iter::<PostgresOrd>().collect(),
                     };
                     generated.register_types();
 
@@ -188,7 +195,7 @@ macro_rules! pg_module_magic {
 
                 pub fn schema_alias_of(&self, module_path: &'static str) -> Option<String> {
                     let mut needle = None;
-                    for schema in &self.schemas {
+                    for Schema(schema) in &self.schemas {
                         if schema.module_path.starts_with(module_path) {
                             needle = Some(schema.name.to_string());
                             break;
@@ -199,8 +206,7 @@ macro_rules! pg_module_magic {
 
                 pub fn schema_prefix_for(&self, module_path: &'static str) -> String {
                     self.schema_alias_of(module_path).or_else(|| {
-                        let control = pgx::ControlFile::try_from(CONTROL_FILE).unwrap();
-                        control.schema
+                        CONTROL.schema.clone()
                     }).map(|v| (v + ".").to_string()).unwrap_or_else(|| "".to_string())
                 }
 
@@ -233,83 +239,86 @@ macro_rules! pg_module_magic {
                 }
 
                 fn extension_sql(&self) -> String {
-                    self.extension_sql.iter().map(|fragment| {
-                        format!("\
+                    let mut buf = String::new();
+                    for &ExtensionSql(ref item) in &self.extension_sql {
+                        buf.push_str(&format!("\
                                 -- {file}:{line}\n\
                                 {sql}\
                             ",
-                            file = fragment.file,
-                            line = fragment.line,
-                            sql = fragment.sql,
-                        )
-                    }).collect::<Vec<_>>().join("\n")
+                            file = item.file,
+                            line = item.line,
+                            sql = item.sql,
+                        ))
+                    }
+                    buf
                 }
 
                 fn schemas(&self) -> String {
-                    let control_schema = pgx::ControlFile::try_from(CONTROL_FILE).ok().and_then(|c| c.schema).map(|schema| {
-                        format!("CREATE SCHEMA IF NOT EXISTS {};\n", schema)
-                    });
-                    let rest = self.schemas.iter().flat_map(|sch| {
-                        match sch.name {
-                            "pg_catalog" | "public" => None,
-                            name => Some(format!("\
+                    let mut buf = String::new();
+                    if let Some(schema) = &CONTROL.schema {
+                        buf.push_str(&format!("CREATE SCHEMA IF NOT EXISTS {};\n", schema));
+                    }
+                    for &Schema(ref item) in &self.schemas {
+                        match item.name {
+                            "pg_catalog" | "public" =>  (),
+                            name => buf.push_str(&format!("\
                                     CREATE SCHEMA IF NOT EXISTS {name}; /* {module_path} */\n\
                                 ",
                                 name = name,
-                                module_path = sch.module_path,
-                            ))
-                        }
-                    });
-                    control_schema.into_iter().chain(rest).collect()
+                                module_path = item.module_path,
+                            )),
+                        };
+                    }
+                    buf
                 }
 
                 fn enums(&self) -> String {
-                    self.enums.iter().map(|en| {
-                        format!("\
+                    let mut buf = String::new();
+                    for &PostgresEnum(ref item) in &self.enums {
+                        buf.push_str(&format!("\
                                 -- {file}:{line}\n\
                                 -- {full_path} - {id:?}\n\
-                                -- Option<{full_path}> - {option_id:?}\n\
-                                -- Vec<{full_path}> - {vec_id:?}\n\
                                 CREATE TYPE {schema}{name} AS ENUM (\n\
                                     {variants}\
                                 );\n\
                             ",
-                            schema = self.schema_prefix_for(en.module_path),
-                            full_path = en.full_path,
-                            file = en.file,
-                            line = en.line,
-                            id = en.id,
-                            option_id = en.option_id,
-                            vec_id = en.vec_id,
-                            name = en.name,
-                            variants = en.variants.iter().map(|variant| format!("\t'{}',\n", variant)).collect::<String>(),
-                        )
-                    }).by_ref().collect()
+                            schema = self.schema_prefix_for(item.module_path),
+                            full_path = item.full_path,
+                            file = item.file,
+                            line = item.line,
+                            id = item.id,
+                            name = item.name,
+                            variants = item.variants.iter().map(|variant| format!("\t'{}',\n", variant)).collect::<String>(),
+                        ));
+                    }
+                    buf
                 }
 
                 fn shell_types(&self) -> String {
-                    self.types.iter().map(|ty| {
-                        format!("\n\
+                    let mut buf = String::new();
+                    for &PostgresType(ref item) in &self.types {
+                        buf.push_str(&format!("\n\
                                 -- {file}:{line}\n\
                                 -- {full_path}\n\
                                 CREATE TYPE {schema}{name};\n\
                             ",
-                            schema = self.schema_prefix_for(ty.module_path),
-                            full_path = ty.full_path,
-                            file = ty.file,
-                            line = ty.line,
-                            name = ty.name,
-                        )
-                    }).by_ref().collect()
+                            schema = self.schema_prefix_for(item.module_path),
+                            full_path = item.full_path,
+                            file = item.file,
+                            line = item.line,
+                            name = item.name,
+                        ))
+                    }
+                    buf
                 }
 
                 fn externs_with_operators(&self) -> String {
-                    use crate::__pgx_internals::PgxExternReturn;
-                    self.externs.iter().map(|ext| {
-                        let mut extern_attrs = ext.extern_attrs.clone();
+                    let mut buf = String::new();
+                    for &PgExtern(ref item) in &self.externs {
+                        let mut extern_attrs = item.extern_attrs.clone();
                         let mut strict_upgrade = true;
                         if !extern_attrs.iter().any(|i| i == &pgx_utils::ExternArgs::Strict) {
-                            for arg in &ext.fn_args {
+                            for arg in &item.fn_args {
                                 if arg.is_optional {
                                     strict_upgrade = false;
                                 }
@@ -326,11 +335,11 @@ macro_rules! pg_module_magic {
                                 LANGUAGE c /* Rust */\n\
                                 AS 'MODULE_PATHNAME', '{name}_wrapper';\
                             ",
-                            schema = self.schema_prefix_for(ext.module_path),
-                            name = ext.name,
-                            arguments = if !ext.fn_args.is_empty() {
-                                String::from("\n") + &ext.fn_args.iter().enumerate().map(|(idx, arg)| {
-                                    let needs_comma = idx < (ext.fn_args.len() - 1);
+                            schema = self.schema_prefix_for(item.module_path),
+                            name = item.name,
+                            arguments = if !item.fn_args.is_empty() {
+                                String::from("\n") + &item.fn_args.iter().enumerate().map(|(idx, arg)| {
+                                    let needs_comma = idx < (item.fn_args.len() - 1);
                                     format!("\
                                             \t\"{pattern}\" {sql_type} {default}{maybe_comma}/* {ty_name} */\
                                         ",
@@ -342,15 +351,15 @@ macro_rules! pg_module_magic {
                                     )
                                 }).collect::<Vec<_>>().join("\n") + "\n"
                             } else { Default::default() },
-                            returns = match &ext.fn_return {
-                                PgxExternReturn::None => String::from("RETURNS void"),
-                                PgxExternReturn::Type { id, name } => format!("RETURNS {} /* {} */", pgx::type_id_to_sql_type(*id).unwrap_or_else(|| name.to_string()), name),
-                                PgxExternReturn::SetOf { id, name } => format!("RETURNS SETOF {} /* {} */", pgx::type_id_to_sql_type(*id).unwrap_or_else(|| name.to_string()), name),
-                                PgxExternReturn::Iterated(vec) => format!("RETURNS TABLE ({}\n)",
+                            returns = match &item.fn_return {
+                                pgx_utils::pg_inventory::InventoryPgExternReturn::None => String::from("RETURNS void"),
+                                pgx_utils::pg_inventory::InventoryPgExternReturn::Type { id, name } => format!("RETURNS {} /* {} */", pgx::type_id_to_sql_type(*id).unwrap_or_else(|| name.to_string()), name),
+                                pgx_utils::pg_inventory::InventoryPgExternReturn::SetOf { id, name } => format!("RETURNS SETOF {} /* {} */", pgx::type_id_to_sql_type(*id).unwrap_or_else(|| name.to_string()), name),
+                                pgx_utils::pg_inventory::InventoryPgExternReturn::Iterated(vec) => format!("RETURNS TABLE ({}\n)",
                                     vec.iter().map(|(id, ty_name, col_name)| format!("\n\t\"{}\" {} /* {} */", col_name.unwrap(), pgx::type_id_to_sql_type(*id).unwrap_or_else(|| ty_name.to_string()), ty_name)).collect::<Vec<_>>().join(",")
                                 ),
                             },
-                            search_path = if let Some(search_path) = &ext.search_path {
+                            search_path = if let Some(search_path) = &item.search_path {
                                 let retval = format!("SET search_path TO {}", search_path.join(", "));
                                 retval + "\n"
                             } else { Default::default() },
@@ -369,20 +378,21 @@ macro_rules! pg_module_magic {
                                 {fn_sql}\n\
                                 {overridden}\
                             ",
-                            name = ext.name,
-                            module_path = ext.module_path,
-                            file = ext.file,
-                            line = ext.line,
-                            fn_sql = if ext.overridden.is_some() {
+                            name = item.name,
+                            module_path = item.module_path,
+                            file = item.file,
+                            line = item.line,
+                            fn_sql = if item.overridden.is_some() {
                                 let mut inner = fn_sql.lines().map(|f| format!("-- {}", f)).collect::<Vec<_>>().join("\n");
                                 inner.push_str("\n--\n-- Overridden as (due to a `//` comment with a `sql` code block):");
                                 inner
                             } else {
                                 fn_sql
                             },
-                            overridden = ext.overridden.map(|f| f.to_owned() + "\n").unwrap_or_default(),
+                            overridden = item.overridden.map(|f| f.to_owned() + "\n").unwrap_or_default(),
                         );
-                        match (ext.overridden, &ext.operator) {
+
+                        let rendered = match (item.overridden, &item.operator) {
                             (None, Some(op)) => {
                                 let mut optionals = vec![];
                                 if let Some(it) = op.commutator {
@@ -414,30 +424,31 @@ macro_rules! pg_module_magic {
                                         );
                                     ",
                                     opname = op.opname.unwrap(),
-                                    file = ext.file,
-                                    line = ext.line,
-                                    name = ext.name,
-                                    module_path = ext.module_path,
-                                    left_name = ext.fn_args.get(0).unwrap().ty_name,
-                                    right_name = ext.fn_args.get(1).unwrap().ty_name,
-                                    left_arg = pgx::type_id_to_sql_type(ext.fn_args.get(0).unwrap().ty_id).unwrap_or_else(|| ext.fn_args.get(0).unwrap().ty_name.to_string()),
-                                    right_arg = pgx::type_id_to_sql_type(ext.fn_args.get(1).unwrap().ty_id).unwrap_or_else(|| ext.fn_args.get(1).unwrap().ty_name.to_string()),
+                                    file = item.file,
+                                    line = item.line,
+                                    name = item.name,
+                                    module_path = item.module_path,
+                                    left_name = item.fn_args.get(0).unwrap().ty_name,
+                                    right_name = item.fn_args.get(1).unwrap().ty_name,
+                                    left_arg = pgx::type_id_to_sql_type(item.fn_args.get(0).unwrap().ty_id).unwrap_or_else(|| item.fn_args.get(0).unwrap().ty_name.to_string()),
+                                    right_arg = pgx::type_id_to_sql_type(item.fn_args.get(1).unwrap().ty_id).unwrap_or_else(|| item.fn_args.get(1).unwrap().ty_name.to_string()),
                                     optionals = optionals.join(",\n") + "\n"
                                 );
                                 ext_sql + &operator_sql
                             },
                             (None, None) | (Some(_), Some(_)) | (Some(_), None) => ext_sql,
-                        }
-                    }).by_ref().collect()
+                        };
+                        buf.push_str(&rendered)
+                    }
+                    buf
                 }
 
                 fn materialized_types(&self) -> String {
-                    self.types.iter().map(|ty| {
-                        format!("\n\
+                    let mut buf = String::new();
+                    for &PostgresType(ref item) in &self.types {
+                        buf.push_str(&format!("\n\
                                 -- {file}:{line}\n\
                                 -- {full_path} - {id:?}\n\
-                                -- Option<{full_path}> - {option_id:?}\n\
-                                -- Vec<{full_path}> - {vec_id:?}\n\
                                 CREATE TYPE {schema}{name} (\n\
                                     \tINTERNALLENGTH = variable,\n\
                                     \tINPUT = {in_fn},\n\
@@ -445,23 +456,23 @@ macro_rules! pg_module_magic {
                                     \tSTORAGE = extended\n\
                                 );
                             ",
-                            full_path = ty.full_path,
-                            file = ty.file,
-                            line = ty.line,
-                            schema = self.schema_prefix_for(ty.module_path),
-                            id = ty.id,
-                            option_id = ty.option_id,
-                            vec_id = ty.vec_id,
-                            name = ty.name,
-                            in_fn = ty.in_fn,
-                            out_fn = ty.out_fn,
-                        )
-                    }).by_ref().collect()
+                            full_path = item.full_path,
+                            file = item.file,
+                            line = item.line,
+                            schema = self.schema_prefix_for(item.module_path),
+                            id = item.id,
+                            name = item.name,
+                            in_fn = item.in_fn,
+                            out_fn = item.out_fn,
+                        ));
+                    }
+                    buf
                 }
 
                 fn operator_classes(&self) -> String {
-                    let hashes = self.hashes.iter().map(|hash_derive| {
-                        format!("\n\
+                    let mut buf = String::new();
+                    for &PostgresHash(ref item) in &self.hashes {
+                        buf.push_str(&format!("\n\
                             -- {file}:{line}\n\
                             -- {full_path}\n\
                             -- {id:?}\n\
@@ -470,15 +481,15 @@ macro_rules! pg_module_magic {
                                 \tOPERATOR    1   =  ({name}, {name}),\n\
                                 \tFUNCTION    1   {name}_hash({name});\
                             ",
-                            name = hash_derive.name,
-                            full_path = hash_derive.full_path,
-                            file = hash_derive.file,
-                            line = hash_derive.line,
-                            id = hash_derive.id,
-                        )
-                    }).collect::<String>();
-                    let ords = self.ords.iter().map(|ord_derive| {
-                        format!("\n\
+                            name = item.name,
+                            full_path = item.full_path,
+                            file = item.file,
+                            line = item.line,
+                            id = item.id,
+                        ));
+                    }
+                    for &PostgresOrd(ref item) in &self.ords {
+                        buf.push_str(&format!("\n\
                             -- {file}:{line}\n\
                             -- {full_path}\n\
                             -- {id:?}\n\
@@ -491,146 +502,57 @@ macro_rules! pg_module_magic {
                                   \tOPERATOR 5 > ,\n\
                                   \tFUNCTION 1 {name}_cmp({name}, {name});\n\
                             ",
-                            name = ord_derive.name,
-                            full_path = ord_derive.full_path,
-                            file = ord_derive.file,
-                            line = ord_derive.line,
-                            id = ord_derive.id,
-                        )
-                    }).collect::<String>();
-                    hashes + &ords
+                            name = item.name,
+                            full_path = item.full_path,
+                            file = item.file,
+                            line = item.line,
+                            id = item.id,
+                        ))
+                    }
+                    buf
                 }
 
                 pub fn register_types(&self) {
-                    for en in &self.enums {
-                        pgx::map_type_id_to_sql_type(en.id, en.name);
-                        pgx::map_type_id_to_sql_type(en.option_id, en.name);
-                        pgx::map_type_id_to_sql_type(en.vec_id, format!("{}[]", en.name));
+                    for &PostgresEnum(ref item) in &self.enums {
+                        pgx::map_type_id_to_sql_type(item.id, item.name);
+                        pgx::map_type_id_to_sql_type(item.option_id, item.name);
+                        pgx::map_type_id_to_sql_type(item.vec_id, format!("{}[]", item.name));
                     }
-                    for ty in &self.types {
-                        pgx::map_type_id_to_sql_type(ty.id, ty.name);
-                        pgx::map_type_id_to_sql_type(ty.option_id, ty.name);
-                        pgx::map_type_id_to_sql_type(ty.vec_id, format!("{}[]", ty.name));
+                    for &PostgresType(ref item) in &self.types {
+                        pgx::map_type_id_to_sql_type(item.id, item.name);
+                        pgx::map_type_id_to_sql_type(item.option_id, item.name);
+                        pgx::map_type_id_to_sql_type(item.vec_id, format!("{}[]", item.name));
                     }
                 }
             }
 
             #[derive(Debug)]
-            pub struct PgxExtensionSql {
-                pub sql: &'static str,
-                pub file: &'static str,
-                pub line: u32,
-            }
-            pgx::inventory::collect!(PgxExtensionSql);
+            pub struct ExtensionSql(pub pgx_utils::pg_inventory::InventoryExtensionSql);
+            inventory::collect!(ExtensionSql);
 
             #[derive(Debug)]
-            pub struct PgxPostgresType {
-                pub name: &'static str,
-                pub file: &'static str,
-                pub line: u32,
-                pub full_path: &'static str,
-                pub module_path: &'static str,
-                pub id: core::any::TypeId,
-                pub option_id: core::any::TypeId,
-                pub vec_id: core::any::TypeId,
-                pub in_fn: &'static str,
-                pub out_fn: &'static str,
-            }
-            pgx::inventory::collect!(PgxPostgresType);
+            pub struct PostgresType(pub pgx_utils::pg_inventory::InventoryPostgresType);
+            inventory::collect!(PostgresType);
 
             #[derive(Debug)]
-            pub struct PgxOperator {
-                pub opname: Option<&'static str>,
-                pub commutator: Option<&'static str>,
-                pub negator: Option<&'static str>,
-                pub restrict: Option<&'static str>,
-                pub join: Option<&'static str>,
-                pub hashes: bool,
-                pub merges: bool,
-            }
+            pub struct PgExtern(pub pgx_utils::pg_inventory::InventoryPgExtern);
+            inventory::collect!(PgExtern);
 
             #[derive(Debug)]
-            pub struct PgxExtern {
-                pub name: &'static str,
-                pub file: &'static str,
-                pub line: u32,
-                pub module_path: &'static str,
-                pub extern_attrs: Vec<pgx_utils::ExternArgs>,
-                pub search_path: Option<Vec<&'static str>>,
-                pub fn_args: Vec<PgxExternInputs>,
-                pub fn_return: PgxExternReturn,
-                pub operator: Option<PgxOperator>,
-                pub overridden: Option<&'static str>,
-            }
-            pgx::inventory::collect!(PgxExtern);
+            pub struct PostgresEnum(pub pgx_utils::pg_inventory::InventoryPostgresEnum);
+            inventory::collect!(PostgresEnum);
 
             #[derive(Debug)]
-            pub struct PgxPostgresEnum {
-                pub name: &'static str,
-                pub file: &'static str,
-                pub line: u32,
-                pub full_path: &'static str,
-                pub module_path: &'static str,
-                pub id: core::any::TypeId,
-                pub option_id: core::any::TypeId,
-                pub vec_id: core::any::TypeId,
-                pub variants: Vec<&'static str>,
-            }
-            pgx::inventory::collect!(PgxPostgresEnum);
+            pub struct PostgresHash(pub pgx_utils::pg_inventory::InventoryPostgresHash);
+            inventory::collect!(PostgresHash);
 
             #[derive(Debug)]
-            pub enum PgxExternReturn {
-                None,
-                Type {
-                    id: core::any::TypeId,
-                    name: &'static str,
-                },
-                SetOf {
-                    id: core::any::TypeId,
-                    name: &'static str,
-                },
-                Iterated(Vec<(core::any::TypeId, &'static str, Option<&'static str>)>),
-            }
+            pub struct PostgresOrd(pub pgx_utils::pg_inventory::InventoryPostgresOrd);
+            inventory::collect!(PostgresOrd);
 
             #[derive(Debug)]
-            pub struct PgxExternInputs {
-                pub pattern: &'static str,
-                pub ty_id: core::any::TypeId,
-                pub ty_name: &'static str,
-                pub is_optional: bool,
-                pub default: Option<&'static str>,
-            }
-
-            #[derive(Debug)]
-            pub struct PgxPostgresHash {
-                pub name: &'static str,
-                pub file: &'static str,
-                pub line: u32,
-                pub full_path: &'static str,
-                pub module_path: &'static str,
-                pub id: core::any::TypeId,
-            }
-            pgx::inventory::collect!(PgxPostgresHash);
-
-            #[derive(Debug)]
-            pub struct PgxPostgresOrd {
-                pub name: &'static str,
-                pub file: &'static str,
-                pub line: u32,
-                pub full_path: &'static str,
-                pub module_path: &'static str,
-                pub id: core::any::TypeId,
-            }
-            pgx::inventory::collect!(PgxPostgresOrd);
-
-            #[derive(Debug)]
-            pub struct PgxSchema {
-                pub module_path: &'static str,
-                pub name: &'static str,
-                pub file: &'static str,
-                pub line: u32,
-            }
-            pgx::inventory::collect!(PgxSchema);
+            pub struct Schema(pub pgx_utils::pg_inventory::InventorySchema);
+            inventory::collect!(Schema);
         }
     };
 }

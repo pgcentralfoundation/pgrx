@@ -86,7 +86,7 @@ impl ToTokens for Argument {
         };
 
         let quoted = quote! {
-            crate::__pgx_internals::PgxExternInputs {
+            pgx_utils::pg_inventory::InventoryPgExternInput {
                 pattern: stringify!(#pat),
                 ty_id: TypeId::of::<#ty>(),
                 ty_name: core::any::type_name::<#ty>(),
@@ -113,4 +113,13 @@ impl Parse for DefaultMacro {
             expr: input.parse()?,
         })
     }
+}
+
+#[derive(Debug)]
+pub struct InventoryPgExternInput {
+    pub pattern: &'static str,
+    pub ty_id: core::any::TypeId,
+    pub ty_name: &'static str,
+    pub is_optional: bool,
+    pub default: Option<&'static str>,
 }

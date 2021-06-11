@@ -20,7 +20,7 @@ impl ToTokens for PostgresEnum {
         let inv = quote! {
             pgx::inventory::submit! {
                 use core::any::TypeId;
-                crate::__pgx_internals::PgxPostgresEnum {
+                crate::__pgx_internals::PostgresEnum(pgx_utils::pg_inventory::InventoryPostgresEnum {
                     name: stringify!(#name),
                     file: file!(),
                     line: line!(),
@@ -30,9 +30,23 @@ impl ToTokens for PostgresEnum {
                     option_id: TypeId::of::<Option<#name>>(),
                     vec_id: TypeId::of::<Vec<#name>>(),
                     variants: vec![ #(  stringify!(#variants)  ),* ],
-                }
+                })
             }
         };
         tokens.append_all(inv);
     }
+}
+
+
+#[derive(Debug)]
+pub struct InventoryPostgresEnum {
+    pub name: &'static str,
+    pub file: &'static str,
+    pub line: u32,
+    pub full_path: &'static str,
+    pub module_path: &'static str,
+    pub id: core::any::TypeId,
+    pub option_id: core::any::TypeId,
+    pub vec_id: core::any::TypeId,
+    pub variants: Vec<&'static str>,
 }

@@ -24,7 +24,7 @@ impl ToTokens for PgxOperator {
         let hashes = self.hashes;
         let merges = self.merges;
         let quoted = quote! {
-            crate::__pgx_internals::PgxOperator {
+            pgx_utils::pg_inventory::InventoryPgOperator {
                 opname: None#( .unwrap_or(Some(#opname)) )*,
                 commutator: None#( .unwrap_or(Some(#commutator)) )*,
                 negator: None#( .unwrap_or(Some(#negator)) )*,
@@ -88,4 +88,15 @@ impl ToTokens for PgxOperatorOpName {
         };
         tokens.append_all(quoted);
     }
+}
+
+#[derive(Debug)]
+pub struct InventoryPgOperator {
+    pub opname: Option<&'static str>,
+    pub commutator: Option<&'static str>,
+    pub negator: Option<&'static str>,
+    pub restrict: Option<&'static str>,
+    pub join: Option<&'static str>,
+    pub hashes: bool,
+    pub merges: bool,
 }

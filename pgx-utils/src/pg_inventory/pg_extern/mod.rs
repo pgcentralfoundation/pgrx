@@ -16,13 +16,17 @@ use std::convert::TryFrom;
 use syn::parse::{Parse, ParseStream};
 use syn::Meta;
 
+pub use returning::InventoryPgExternReturn;
+pub use argument::InventoryPgExternInput;
+pub use operator::InventoryPgOperator;
+
 #[derive(Debug, Clone)]
-pub struct PgxExtern {
+pub struct PgExtern {
     attrs: PgxAttributes,
     func: syn::ItemFn,
 }
 
-impl PgxExtern {
+impl PgExtern {
     fn extern_attrs(&self) -> &PgxAttributes {
         &self.attrs
     }
@@ -140,7 +144,7 @@ impl PgxExtern {
     }
 }
 
-impl ToTokens for PgxExtern {
+impl ToTokens for PgExtern {
     fn to_tokens(&self, tokens: &mut TokenStream2) {
         let ident = &self.func.sig.ident;
         let extern_attrs = self.extern_attrs();
@@ -153,7 +157,7 @@ impl ToTokens for PgxExtern {
         let inv = quote! {
             pgx::inventory::submit! {
                 use core::any::TypeId;
-                crate::__pgx_internals::PgxExtern {
+                crate::__pgx_internals::PgExtern(pgx_utils::pg_inventory::InventoryPgExtern {
                     name: stringify!(#ident),
                     file: file!(),
                     line: line!(),
@@ -164,18 +168,32 @@ impl ToTokens for PgxExtern {
                     fn_return: #returns,
                     operator: None#( .unwrap_or(Some(#operator)) )*,
                     overridden: None#( .unwrap_or(Some(#overridden)) )*,
-                }
+                })
             }
         };
         tokens.append_all(inv);
     }
 }
 
-impl Parse for PgxExtern {
+impl Parse for PgExtern {
     fn parse(input: ParseStream) -> Result<Self, syn::Error> {
         Ok(Self {
             attrs: input.parse()?,
             func: input.parse()?,
         })
     }
+}
+
+#[derive(Debug)]
+pub struct InventoryPgExtern {
+    pub name: &'static str,
+    pub file: &'static str,
+    pub line: u32,
+    pub module_path: &'static str,
+    pub extern_attrs: Vec<crate::ExternArgs>,
+    pub search_path: Option<Vec<&'static str>>,
+    pub fn_args: Vec<InventoryPgExternInput>,
+    pub fn_return: InventoryPgExternReturn,
+    pub operator: Option<InventoryPgOperator>,
+    pub overridden: Option<&'static str>,
 }

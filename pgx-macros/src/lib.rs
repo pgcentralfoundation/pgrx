@@ -167,7 +167,7 @@ pub fn search_path(_attr: TokenStream, item: TokenStream) -> TokenStream {
 pub fn pg_extern(attr: TokenStream, item: TokenStream) -> TokenStream {
     let args = parse_extern_attributes(proc_macro2::TokenStream::from(attr.clone()));
 
-    let inventory_submission = pg_inventory::PgxExtern::new(attr.clone().into(), item.clone().into()).ok();
+    let inventory_submission = pg_inventory::PgExtern::new(attr.clone().into(), item.clone().into()).ok();
 
     let ast = parse_macro_input!(item as syn::Item);
     match ast {
@@ -180,14 +180,14 @@ pub fn pg_extern(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// function so that Rust `panic!()`s (and Postgres `elog(ERROR)`s) will be properly handled by `pgx`
 #[proc_macro_attribute]
 pub fn pg_schema(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    let pgx_schema = parse_macro_input!(item as pg_inventory::PgxSchema);
+    let pgx_schema = parse_macro_input!(item as pg_inventory::Schema);
     pgx_schema.to_token_stream().into()
 }
 
 fn rewrite_item_fn(
     mut func: ItemFn,
     extern_args: HashSet<ExternArgs>,
-    inventory_submission: Option<&pg_inventory::PgxExtern>,
+    inventory_submission: Option<&pg_inventory::PgExtern>,
 ) -> proc_macro2::TokenStream {
     let is_raw = extern_args.contains(&ExternArgs::Raw);
     let no_guard = extern_args.contains(&ExternArgs::NoGuard);

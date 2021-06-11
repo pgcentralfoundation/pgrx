@@ -18,16 +18,27 @@ impl ToTokens for PostgresHash {
         let inv = quote! {
             pgx::inventory::submit! {
                 use core::any::TypeId;
-                crate::__pgx_internals::PgxPostgresHash {
+                crate::__pgx_internals::PgxPostgresHash(pgx_utils::pg_inventory::InventoryPostgresHash {
                     name: stringify!(#name),
                     file: file!(),
                     line: line!(),
                     full_path: core::any::type_name::<#name>(),
                     module_path: module_path!(),
                     id: TypeId::of::<#name>(),
-                }
+                })
             }
         };
         tokens.append_all(inv);
     }
+}
+
+
+#[derive(Debug)]
+pub struct InventoryPostgresHash {
+    pub name: &'static str,
+    pub file: &'static str,
+    pub line: u32,
+    pub full_path: &'static str,
+    pub module_path: &'static str,
+    pub id: core::any::TypeId,
 }
