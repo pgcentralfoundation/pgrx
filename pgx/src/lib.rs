@@ -147,13 +147,9 @@ macro_rules! pg_module_magic {
             use core::convert::TryFrom;
             use pgx::{once_cell::sync::Lazy, inventory, ControlFile};
 
-            static CONTROL: Lazy<ControlFile> = Lazy::new(|| {
-                let file = include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/", env!("CARGO_CRATE_NAME"), ".control"));
-                ControlFile::try_from(file).expect("Invalid .control file")
-            });
-
             #[derive(Debug)]
             pub struct PgxSql {
+                pub control: ControlFile,
                 pub schemas: Vec<&'static Schema>,
                 pub extension_sql: Vec<&'static ExtensionSql>,
                 pub externs: Vec<&'static PgExtern>,
@@ -167,6 +163,9 @@ macro_rules! pg_module_magic {
                 pub fn generate() -> Self {
                     use std::fmt::Write;
                     let mut generated = Self {
+                        control: ControlFile::try_from(
+                            include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/", env!("CARGO_CRATE_NAME"), ".control"))
+                        ).expect("Invalid .control file"),
                         schemas: inventory::iter::<Schema>().collect(),
                         extension_sql: inventory::iter::<ExtensionSql>().collect(),
                         externs: inventory::iter::<PgExtern>().collect(),
@@ -206,7 +205,7 @@ macro_rules! pg_module_magic {
 
                 pub fn schema_prefix_for(&self, module_path: &'static str) -> String {
                     self.schema_alias_of(module_path).or_else(|| {
-                        CONTROL.schema.clone()
+                        self.control.schema.clone()
                     }).map(|v| (v + ".").to_string()).unwrap_or_else(|| "".to_string())
                 }
 
@@ -255,7 +254,7 @@ macro_rules! pg_module_magic {
 
                 fn schemas(&self) -> String {
                     let mut buf = String::new();
-                    if let Some(schema) = &CONTROL.schema {
+                    if let Some(schema) = &self.control.schema {
                         buf.push_str(&format!("CREATE SCHEMA IF NOT EXISTS {};\n", schema));
                     }
                     for &Schema(ref item) in &self.schemas {
