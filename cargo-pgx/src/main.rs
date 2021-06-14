@@ -14,7 +14,7 @@ use crate::commands::new::create_crate_template;
 use crate::commands::package::package_extension;
 use crate::commands::run::run_psql;
 use crate::commands::schema_deprecated;
-use crate::commands::schema2;
+use crate::commands::schema;
 use crate::commands::start::start_postgres;
 use crate::commands::status::status_postgres;
 use crate::commands::stop::stop_postgres;
@@ -243,7 +243,7 @@ fn do_it() -> std::result::Result<(), std::io::Error> {
                     },
                 };
 
-                schema2::generate_schema(&pg_config, is_release, &features)
+                schema::generate_schema(&pg_config, is_release, &features)
             }
             ("dump-schema", Some(dump_schema)) => {
                 let dir = dump_schema

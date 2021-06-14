@@ -11,7 +11,7 @@ pub enum Returning {
     None,
     Type(syn::Type),
     SetOf(syn::TypePath),
-    Iterated(Vec<(syn::Type, Option<proc_macro2::Ident>)>),
+    Iterated(Vec<(syn::Type, Option<String>)>),
 }
 
 impl TryFrom<&syn::ReturnType> for Returning {
@@ -31,7 +31,7 @@ impl TryFrom<&syn::ReturnType> for Returning {
                                         syn::GenericArgument::Binding(binding) => match &binding.ty
                                         {
                                             syn::Type::Tuple(tuple_type) => {
-                                                let returns: Vec<(syn::Type, Option<syn::Ident>)> = tuple_type.elems.iter().flat_map(|elem| {
+                                                let returns: Vec<(syn::Type, Option<_>)> = tuple_type.elems.iter().flat_map(|elem| {
                                                     match elem {
                                                         syn::Type::Macro(macro_pat) => {
                                                             let mac = &macro_pat.mac;
@@ -119,7 +119,7 @@ impl ToTokens for Returning {
 
 #[derive(Debug, Clone)]
 pub(crate) struct NameMacro {
-    pub(crate) ident: syn::Ident,
+    pub(crate) ident: String,
     comma: Token![,],
     pub(crate) ty: syn::Type,
 }
@@ -127,7 +127,13 @@ pub(crate) struct NameMacro {
 impl Parse for NameMacro {
     fn parse(input: ParseStream) -> Result<Self, syn::Error> {
         Ok(Self {
-            ident: input.parse()?,
+            ident: input.parse::<syn::Ident>().map(|v| v.to_string())
+                .or_else(|_| input.parse::<syn::Token![type]>().map(|_| String::from("type")))
+                .or_else(|_| input.parse::<syn::Token![mod]>().map(|_| String::from("mod")))
+                .or_else(|_| input.parse::<syn::Token![extern]>().map(|_| String::from("extern")))
+                .or_else(|_| input.parse::<syn::Token![async]>().map(|_| String::from("async")))
+                .or_else(|_| input.parse::<syn::Token![crate]>().map(|_| String::from("crate")))
+                .or_else(|_| input.parse::<syn::Token![use]>().map(|_| String::from("use")))?,
             comma: input.parse()?,
             ty: input.parse()?,
         })

@@ -525,7 +525,7 @@ pub fn extension_sql(input: TokenStream) -> TokenStream {
         let sql: syn::LitStr = syn::parse(input)?;
         Ok(quote! {
             pgx::inventory::submit! {
-                crate::__pgx_internals::PgxExtensionSql {
+                crate::__pgx_internals::ExtensionSql {
                     sql: #sql,
                     file: file!(),
                     line: line!(),
