@@ -13,7 +13,7 @@ use crate::commands::install::{install_extension, write_full_schema_file};
 use crate::commands::new::create_crate_template;
 use crate::commands::package::package_extension;
 use crate::commands::run::run_psql;
-use crate::commands::schema;
+use crate::commands::schema_deprecated;
 use crate::commands::schema2;
 use crate::commands::start::start_postgres;
 use crate::commands::status::status_postgres;
@@ -217,7 +217,7 @@ fn do_it() -> std::result::Result<(), std::io::Error> {
                     .values_of("features")
                     .map(|v| v.collect())
                     .unwrap_or(vec![]);
-                schema::generate_schema(&*features)
+                schema_deprecated::generate_schema(&*features)
             }
             ("schema2", Some(schema)) => {
                 let is_release = schema.is_present("release");
@@ -254,7 +254,7 @@ fn do_it() -> std::result::Result<(), std::io::Error> {
                     .values_of("features")
                     .map(|v| v.collect())
                     .unwrap_or(vec![]);
-                schema::generate_schema(&*features)?;
+                schema_deprecated::generate_schema(&*features)?;
                 write_full_schema_file(&dir, None);
                 Ok(())
             }

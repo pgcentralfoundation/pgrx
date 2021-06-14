@@ -4,33 +4,65 @@ use crate::commands::{
 };
 use libloading::Library;
 use pgx_utils::pg_config::PgConfig;
-use std::ffi::CString;
+use std::process::{Command, Stdio};
+use crate::commands::get::get_property;
+use pgx_utils::{exit_with_error, handle_result};
 
 pub(crate) fn generate_schema(
     pg_config: &PgConfig,
     is_release: bool,
     additional_features: &[&str],
 ) -> Result<(), std::io::Error> {
-    let major_version = pg_config.major_version()?;
-    build_extension(major_version, is_release, additional_features);
+    // TODO: Ensure a `src/bin/sql_generator.rs` exists and is up to date.
     let (control_file, extname) = find_control_file();
-    let shlibpath = find_library_file(&extname, is_release);
-    let c_schema = unsafe {
-        let library = Library::new(&shlibpath).expect("Could not load library.");
-        let alloc_meta: libloading::Symbol<unsafe extern "C" fn() -> *mut std::os::raw::c_char> =
-            library
-                .get(&"alloc_meta".as_bytes())
-                .expect("No alloc_meta fn.");
-        let drop_meta: libloading::Symbol<unsafe extern "C" fn(*mut std::os::raw::c_char)> =
-            library
-                .get(&"drop_meta".as_bytes())
-                .expect("No alloc_meta fn.");
-        let c_schema = alloc_meta();
-        let schema = CString::from_raw(c_schema);
-        schema
-    };
-    let alloc_meta = c_schema.into_string().expect("Failed to make string");
+    let major_version = pg_config.major_version()?;
 
-    panic!("{}", alloc_meta);
+    if get_property("relocatable") != Some("false".into()) {
+        exit_with_error!(
+            "{}:  The `relocatable` property MUST be `false`.  Please update your .control file.",
+            control_file.display()
+        )
+    }
+
+    let mut features =
+        std::env::var("PGX_BUILD_FEATURES").unwrap_or(format!("pg{}", major_version));
+    let flags = std::env::var("PGX_BUILD_FLAGS").unwrap_or_default();
+    if !additional_features.is_empty() {
+        use std::fmt::Write;
+        let mut additional_features = additional_features.join(" ");
+        let _ = write!(&mut additional_features, " {}", features);
+        features = additional_features
+    }
+    let mut command = Command::new("cargo");
+    command.args(&["run", "--bin", "sql-generator"]);
+    if is_release {
+        command.arg("--release");
+    }
+
+    if !features.trim().is_empty() {
+        command.arg("--features");
+        command.arg(&features);
+        command.arg("--no-default-features");
+    }
+
+    for arg in flags.split_ascii_whitespace() {
+        command.arg(arg);
+    }
+
+    let command = command.stdout(Stdio::inherit()).stderr(Stdio::inherit());
+    let command_str = format!("{:?}", command);
+    println!(
+        "running SQL generator features `{}`\n{}",
+        features, command_str
+    );
+    let status = handle_result!(
+        command.status(),
+        format!("failed to spawn cargo: {}", command_str)
+    );
+    if status.success() {
+        println!("SQL written to `sql/generated.sql`.")
+    } else {
+        exit_with_error!("failed to run SQL generator");
+    }
     Ok(())
 }
