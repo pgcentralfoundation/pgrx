@@ -25,6 +25,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "anyhow"
+version = "1.0.41"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "15af2628f6890fe2609a3b91bef4c83450512802e59489f9c1cb1fa5df064a61"
+
+[[package]]
 name = "as-slice"
 version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -700,6 +706,30 @@ dependencies = [
 ]
 
 [[package]]
+name = "include_dir"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "23d58bdeb22b1c4691106c084b1063781904c35d0f22eda2a283598968eac61a"
+dependencies = [
+ "glob",
+ "include_dir_impl",
+ "proc-macro-hack",
+]
+
+[[package]]
+name = "include_dir_impl"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "327869970574819d24d1dca25c891856144d29159ab797fa9dc725c5c3f57215"
+dependencies = [
+ "anyhow",
+ "proc-macro-hack",
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "instant"
 version = "0.1.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1087,6 +1117,9 @@ dependencies = [
  "colored",
  "dirs",
  "env_proxy",
+ "include_dir",
+ "inventory",
+ "once_cell",
  "proc-macro2",
  "quote",
  "regex",
