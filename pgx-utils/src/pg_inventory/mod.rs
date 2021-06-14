@@ -161,7 +161,7 @@ impl<'a> PgxSql<'a> {
         for item in &self.enums {
             buf.push_str(&format!("\
                                 -- {file}:{line}\n\
-                                -- {full_path} - {id:?}\n\
+                                -- {full_path}\n\
                                 CREATE TYPE {schema}{name} AS ENUM (\n\
                                     {variants}\
                                 );\n\
@@ -170,7 +170,6 @@ impl<'a> PgxSql<'a> {
                                   full_path = item.full_path,
                                   file = item.file,
                                   line = item.line,
-                                  id = item.id,
                                   name = item.name,
                                   variants = item.variants.iter().map(|variant| format!("\t'{}',\n", variant)).collect::<String>(),
             ));
@@ -229,8 +228,8 @@ impl<'a> PgxSql<'a> {
                                         ",
                                                  pattern = arg.pattern,
                                                  sql_type = self.type_id_to_sql_type(arg.ty_id).unwrap_or_else(|| arg.ty_name.to_string()),
-                                                 default = if let Some(def) = arg.default { format!("DEFAULT {} ", def) } else { String::from("") },
-                                                 maybe_comma = if needs_comma { "," } else { "" },
+                                                 default = if let Some(def) = arg.default { format!("DEFAULT {}", def) } else { String::from("") },
+                                                 maybe_comma = if needs_comma { ", " } else { " " },
                                                  ty_name = arg.ty_name,
                                          )
                                      }).collect::<Vec<_>>().join("\n") + "\n"
