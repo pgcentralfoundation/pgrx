@@ -90,7 +90,7 @@ impl ToTokens for PgxOperatorOpName {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct InventoryPgOperator {
     pub opname: Option<&'static str>,
     pub commutator: Option<&'static str>,

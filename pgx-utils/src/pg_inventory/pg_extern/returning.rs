@@ -117,7 +117,7 @@ impl ToTokens for Returning {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub(crate) struct NameMacro {
     pub(crate) ident: syn::Ident,
     comma: Token![,],
@@ -134,7 +134,7 @@ impl Parse for NameMacro {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum InventoryPgExternReturn {
     None,
     Type {

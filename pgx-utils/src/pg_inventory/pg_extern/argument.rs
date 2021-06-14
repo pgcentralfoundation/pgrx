@@ -115,7 +115,7 @@ impl Parse for DefaultMacro {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct InventoryPgExternInput {
     pub pattern: &'static str,
     pub ty_id: core::any::TypeId,

@@ -2,7 +2,7 @@ use proc_macro2::TokenStream as TokenStream2;
 use quote::{quote, ToTokens, TokenStreamExt};
 use syn::{parse::{Parse, ParseStream}, ItemMod};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Schema {
     pub module: ItemMod,
 }
@@ -48,7 +48,7 @@ impl ToTokens for Schema {
 }
 
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct InventorySchema {
     pub module_path: &'static str,
     pub name: &'static str,

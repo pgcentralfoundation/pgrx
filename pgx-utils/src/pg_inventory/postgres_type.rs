@@ -1,6 +1,7 @@
 use proc_macro2::{Ident, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
 
+#[derive(Debug, Clone)]
 pub struct PostgresType {
     name: Ident,
     in_fn: Ident,
@@ -43,7 +44,7 @@ impl ToTokens for PostgresType {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct InventoryPostgresType {
     pub name: &'static str,
     pub file: &'static str,

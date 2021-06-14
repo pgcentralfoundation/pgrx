@@ -2,6 +2,7 @@ use proc_macro2::TokenStream as TokenStream2;
 use quote::{quote, ToTokens, TokenStreamExt};
 use syn::{punctuated::Punctuated, Ident, Token};
 
+#[derive(Debug, Clone)]
 pub struct PostgresEnum {
     pub name: Ident,
     pub variants: Punctuated<syn::Variant, Token![,]>,
@@ -38,7 +39,7 @@ impl ToTokens for PostgresEnum {
 }
 
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct InventoryPostgresEnum {
     pub name: &'static str,
     pub file: &'static str,

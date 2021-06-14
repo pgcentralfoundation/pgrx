@@ -2,6 +2,7 @@ use proc_macro2::TokenStream as TokenStream2;
 use quote::{quote, ToTokens, TokenStreamExt};
 use syn::Ident;
 
+#[derive(Debug, Clone)]
 pub struct PostgresOrd {
     pub name: Ident,
 }
@@ -33,7 +34,7 @@ impl ToTokens for PostgresOrd {
 }
 
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct InventoryPostgresOrd {
     pub name: &'static str,
     pub file: &'static str,
