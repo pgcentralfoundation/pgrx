@@ -96,6 +96,17 @@ pub use pgx_pg_sys as pg_sys; // the module only, not its contents
 pub use pgx_pg_sys::submodules::*;
 pub use pgx_pg_sys::PgBuiltInOids; // reexport this so it looks like it comes from here
 
+use core::any::TypeId;
+use once_cell::sync::Lazy;
+use std::collections::HashMap;
+
+/// Top-level initialization function.  This is called automatically by the `pg_module_magic!()`
+/// macro and need not be called directly
+#[allow(unused)]
+pub fn initialize() {
+    register_pg_guard_panic_handler();
+}
+
 /// A macro for marking a library compatible with the Postgres extension framework.
 ///
 /// This macro was initially inspired from the `pg_module` macro in https://github.com/thehydroimpulse/postgres-extension.rs
@@ -146,8 +157,11 @@ macro_rules! pg_module_magic {
         mod __pgx_internals {
             use ::pgx_utils::pg_inventory::*;
             use ::core::convert::TryFrom;
+            use ::std::collections::HashMap;
 
-            static CONTROL_FILE_PATH: &str = include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/", env!("CARGO_CRATE_NAME"), ".control"));
+            static CONTROL_FILE: &str = include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/", env!("CARGO_CRATE_NAME"), ".control"));
+            static LOAD_ORDER_FILE: &str = include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/sql/load-order.txt"));
+            static LOAD_ORDER_DIR: include_dir::Dir = include_dir::include_dir!("sql");
 
             #[derive(Debug)]
             pub struct ExtensionSql(pub pgx_utils::pg_inventory::ExtensionSql);
@@ -177,10 +191,38 @@ macro_rules! pg_module_magic {
             pub struct Schema(pub pgx_utils::pg_inventory::InventorySchema);
             inventory::collect!(Schema);
 
+            #[derive(Debug)]
+            pub enum LoadOrderError {
+                NoListing,
+                Missing(&'static str),
+            }
+
+            impl ::std::fmt::Display for LoadOrderError {
+                fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                    match self {
+                        LoadOrderError::NoListing => write!(f, "No `load-order.txt` file found or empty."),
+                        LoadOrderError::Missing(field) => write!(f, "File from `load-order.txt` does not exist: `{}`.", field),
+                    }
+                }
+            }
+
+            impl ::std::error::Error for LoadOrderError {}
+
             pub fn generate_sql() -> Result<PgxSql<'static>, Box<dyn std::error::Error>> {
                 use std::fmt::Write;
                 let mut generated = PgxSql {
-                    control: ControlFile::try_from(CONTROL_FILE_PATH)?,
+                    load_order: {
+                        let mut mapping = HashMap::default();
+                        let listing = LOAD_ORDER_DIR.get_file("load-order.txt").ok_or(LoadOrderError::NoListing)?;
+                        let listing_str = listing.contents_utf8().ok_or(LoadOrderError::NoListing)?;
+                        for item in listing_str.lines() {
+                            let item_content = LOAD_ORDER_DIR.get_file(item).ok_or(LoadOrderError::Missing(item))?;
+                            let item_str = item_content.contents_utf8().unwrap_or_default();
+                            mapping.insert(item, item_str);
+                        }
+                        mapping
+                    },
+                    control: ControlFile::try_from(CONTROL_FILE)?,
                     type_mappings: pgx::DEFAULT_TYPEID_SQL_MAPPING.clone(),
                     schemas: inventory::iter::<Schema>().map(|i| &i.0).collect(),
                     extension_sql: inventory::iter::<ExtensionSql>().map(|i| &i.0).collect(),
@@ -197,18 +239,6 @@ macro_rules! pg_module_magic {
         }
     };
 }
-
-/// Top-level initialization function.  This is called automatically by the `pg_module_magic!()`
-/// macro and need not be called directly
-#[allow(unused)]
-pub fn initialize() {
-    register_pg_guard_panic_handler();
-}
-
-use core::any::TypeId;
-use once_cell::sync::Lazy;
-use std::collections::HashMap;
-use std::convert::TryFrom;
 
 pub static DEFAULT_TYPEID_SQL_MAPPING: Lazy<HashMap<TypeId, String>> = Lazy::new(|| {
     let mut m = HashMap::new();
