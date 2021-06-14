@@ -311,6 +311,12 @@ pub static DEFAULT_TYPEID_SQL_MAPPING: Lazy<HashMap<TypeId, String>> = Lazy::new
     m.insert(TypeId::of::<Vec<f32>>(), String::from("real[]"));
     m.insert(TypeId::of::<Vec<Option<f32>>>(), String::from("real[]"));
 
+    m.insert(TypeId::of::<datum::JsonB>(), String::from("jsonb"));
+    m.insert(TypeId::of::<Option<datum::JsonB>>(), String::from("jsonb"));
+    m.insert(TypeId::of::<datum::Array<datum::JsonB>>(), String::from("jsonb[]"));
+    m.insert(TypeId::of::<Vec<datum::JsonB>>(), String::from("jsonb[]"));
+    m.insert(TypeId::of::<Vec<Option<datum::JsonB>>>(), String::from("jsonb[]"));
+
     m.insert(TypeId::of::<f64>(), String::from("double precision"));
     m.insert(
         TypeId::of::<Option<f64>>(),
