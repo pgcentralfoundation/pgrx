@@ -19,6 +19,10 @@ pub use control_file::{ControlFile, ControlFileError};
 pub use inventory;
 #[doc(hidden)]
 pub use include_dir;
+#[doc(hidden)]
+pub use impls;
+#[doc(hidden)]
+pub use once_cell;
 
 #[derive(Debug, Clone)]
 pub struct ExtensionSql {
@@ -30,6 +34,8 @@ pub struct ExtensionSql {
 use std::collections::HashMap;
 use core::any::TypeId;
 use crate::ExternArgs;
+use std::ops::Deref;
+use std::marker::PhantomData;
 
 #[derive(Debug, Clone)]
 pub struct PgxSql<'a> {
@@ -236,8 +242,8 @@ impl<'a> PgxSql<'a> {
                                  } else { Default::default() },
                                  returns = match &item.fn_return {
                                      InventoryPgExternReturn::None => String::from("RETURNS void"),
-                                     InventoryPgExternReturn::Type { id, name } => format!("RETURNS {} /* {} */", self.type_id_to_sql_type(*id).unwrap_or_else(|| name.to_string()), name),
-                                     InventoryPgExternReturn::SetOf { id, name } => format!("RETURNS SETOF {} /* {} */", self.type_id_to_sql_type(*id).unwrap_or_else(|| name.to_string()), name),
+                                     InventoryPgExternReturn::Type { id, name } => format!("RETURNS {} /* {} */", self.type_id_to_sql_type(*id).expect(&format!("Failed to map type {}", name)), name),
+                                     InventoryPgExternReturn::SetOf { id, name } => format!("RETURNS SETOF {} /* {} */", self.type_id_to_sql_type(*id).expect(&format!("Failed to map type {}", name)), name),
                                      InventoryPgExternReturn::Iterated(vec) => format!("RETURNS TABLE ({}\n)",
                                                                                                                 vec.iter().map(|(id, ty_name, col_name)| format!("\n\t\"{}\" {} /* {} */", col_name.unwrap(), self.type_id_to_sql_type(*id).unwrap_or_else(|| ty_name.to_string()), ty_name)).collect::<Vec<_>>().join(",")
                                      ),
@@ -313,8 +319,8 @@ impl<'a> PgxSql<'a> {
                                                module_path = item.module_path,
                                                left_name = item.fn_args.get(0).unwrap().ty_name,
                                                right_name = item.fn_args.get(1).unwrap().ty_name,
-                                               left_arg = self.type_id_to_sql_type(item.fn_args.get(0).unwrap().ty_id).unwrap_or_else(|| item.fn_args.get(0).unwrap().ty_name.to_string()),
-                                               right_arg = self.type_id_to_sql_type(item.fn_args.get(1).unwrap().ty_id).unwrap_or_else(|| item.fn_args.get(1).unwrap().ty_name.to_string()),
+                                               left_arg = self.type_id_to_sql_type(item.fn_args.get(0).unwrap().ty_id).expect(&format!("Failed to map type {}", item.fn_args.get(0).unwrap().ty_name.to_string())),
+                                               right_arg = self.type_id_to_sql_type(item.fn_args.get(1).unwrap().ty_id).expect(&format!("Failed to map type {}", item.fn_args.get(1).unwrap().ty_name.to_string())),
                                                optionals = optionals.join(",\n") + "\n"
                     );
                     ext_sql + &operator_sql
@@ -405,6 +411,12 @@ impl<'a> PgxSql<'a> {
             self.map_type_id_to_sql_type(item.id, item.name);
             self.map_type_id_to_sql_type(item.option_id, item.name);
             self.map_type_id_to_sql_type(item.vec_id, format!("{}[]", item.name));
+            if let Some(val) = item.varlena_id {
+                self.map_type_id_to_sql_type(val, item.name);
+            }
+            if let Some(val) = item.array_id {
+                self.map_type_id_to_sql_type(val, format!("{}[]", item.name));
+            }
         }
     }
 
@@ -417,15 +429,10 @@ impl<'a> PgxSql<'a> {
         let sql = sql.as_ref().to_string();
         self.type_mappings
             .insert(TypeId::of::<T>(), sql.clone());
-        self.type_mappings
-            .insert(TypeId::of::<Option<T>>(), sql.clone());
-        self.type_mappings
-            .insert(TypeId::of::<Vec<T>>(), format!("{}[]", sql));
     }
 
     pub fn map_type_id_to_sql_type(&mut self, id: TypeId, sql: impl AsRef<str>) {
         let sql = sql.as_ref().to_string();
         self.type_mappings.insert(id, sql);
     }
-
 }

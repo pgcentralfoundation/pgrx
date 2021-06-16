@@ -155,9 +155,10 @@ macro_rules! pg_module_magic {
 
         pub use __pgx_internals::generate_sql;
         mod __pgx_internals {
-            use ::pgx_utils::pg_inventory::*;
-            use ::core::convert::TryFrom;
+            use ::pgx_utils::pg_inventory::{*, once_cell::sync::Lazy};
+            use ::core::{any::TypeId, convert::TryFrom};
             use ::std::collections::HashMap;
+            use ::pgx::datum::{FromDatum, PgVarlena, Array};
 
             static CONTROL_FILE: &str = include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/", env!("CARGO_CRATE_NAME"), ".control"));
             static LOAD_ORDER_FILE: &str = include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/sql/load-order.txt"));
@@ -195,6 +196,47 @@ macro_rules! pg_module_magic {
             pub enum LoadOrderError {
                 NoListing,
                 Missing(&'static str),
+            }
+
+
+            pub trait WithoutTypeIds {
+                const ITEM_ID: Lazy<Option<TypeId>> = Lazy::new(|| None);
+                const OPTION_ID: Lazy<Option<TypeId>> = Lazy::new(|| None);
+                const VEC_ID: Lazy<Option<TypeId>> = Lazy::new(|| None);
+            }
+
+            impl<T: 'static> WithoutTypeIds for T {}
+
+            pub struct WithBasicTypeIds<T>(std::marker::PhantomData<T>);
+
+            impl<T: Sized + 'static> WithBasicTypeIds<T> {
+                const ITEM_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(TypeId::of::<T>()));
+                const OPTION_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(TypeId::of::<Option<T>>()));
+                const VEC_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(TypeId::of::<Vec<T>>()));
+            }
+
+            pub trait WithoutArrayTypeId {
+                const ARRAY_ID: Lazy<Option<TypeId>> = Lazy::new(|| None);
+            }
+
+            impl<T: 'static> WithoutArrayTypeId for T {}
+
+            pub struct WithArrayTypeId<T>(std::marker::PhantomData<T>);
+
+            impl<T: FromDatum + 'static> WithArrayTypeId<T> {
+                const ARRAY_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(TypeId::of::<Array<T>>()));
+            }
+
+            pub trait WithoutVarlenaTypeId {
+                const VARLENA_ID: Lazy<Option<TypeId>> = Lazy::new(|| None);
+            }
+
+            impl<T: 'static> WithoutVarlenaTypeId for T {}
+
+            pub struct WithVarlenaTypeId<T>(std::marker::PhantomData<T>);
+
+            impl<T: Copy + 'static> WithVarlenaTypeId<T> {
+                const VARLENA_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(TypeId::of::<PgVarlena<T>>()));
             }
 
             impl ::std::fmt::Display for LoadOrderError {

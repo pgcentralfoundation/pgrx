@@ -20,7 +20,16 @@ impl ToTokens for PostgresEnum {
         let variants = self.variants.iter();
         let inv = quote! {
             pgx::inventory::submit! {
-                use core::any::TypeId;
+                use core::{mem::MaybeUninit, any::{TypeId, Any}, marker::PhantomData};
+                use crate::__pgx_internals::{WithoutTypeIds, WithoutArrayTypeId, WithoutVarlenaTypeId};
+                println!("WithBasicTypeIds {:?} base {:?} opt {:?} vec {:?} arr {:?} varl {:?}",
+                    stringify!(#name),
+                    *crate::__pgx_internals::WithBasicTypeIds::<#name>::ITEM_ID,
+                    *crate::__pgx_internals::WithBasicTypeIds::<#name>::OPTION_ID,
+                    *crate::__pgx_internals::WithBasicTypeIds::<#name>::VEC_ID,
+                    *crate::__pgx_internals::WithArrayTypeId::<#name>::ARRAY_ID,
+                    *crate::__pgx_internals::WithVarlenaTypeId::<#name>::VARLENA_ID,
+                );
                 crate::__pgx_internals::PostgresEnum(pgx_utils::pg_inventory::InventoryPostgresEnum {
                     name: stringify!(#name),
                     file: file!(),
@@ -30,6 +39,8 @@ impl ToTokens for PostgresEnum {
                     id: TypeId::of::<#name>(),
                     option_id: TypeId::of::<Option<#name>>(),
                     vec_id: TypeId::of::<Vec<#name>>(),
+                    array_id: *crate::__pgx_internals::WithArrayTypeId::<#name>::ARRAY_ID,
+                    varlena_id: *crate::__pgx_internals::WithVarlenaTypeId::<#name>::VARLENA_ID,
                     variants: vec![ #(  stringify!(#variants)  ),* ],
                 })
             }
@@ -49,5 +60,7 @@ pub struct InventoryPostgresEnum {
     pub id: core::any::TypeId,
     pub option_id: core::any::TypeId,
     pub vec_id: core::any::TypeId,
+    pub array_id: Option<core::any::TypeId>,
+    pub varlena_id: Option<core::any::TypeId>,
     pub variants: Vec<&'static str>,
 }
