@@ -19,7 +19,7 @@ impl ToTokens for PostgresOrd {
         let inv = quote! {
             pgx::inventory::submit! {
                 use core::any::TypeId;
-                crate::__pgx_internals::PgxPostgresOrd(pgx_utils::pg_inventory::InventoryPostgresOrd {
+                crate::__pgx_internals::PostgresOrd(pgx_utils::pg_inventory::InventoryPostgresOrd {
                     name: stringify!(#name),
                     file: file!(),
                     line: line!(),

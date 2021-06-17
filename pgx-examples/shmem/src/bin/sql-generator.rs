@@ -1,3 +1,3 @@
 fn main() -> Result<(), Box<dyn std::error::Error>>{
-    shmem::PgxSql::generate().to_file("sql/generated.sql")
+    shmem::generate_sql()?.to_file("sql/arrays.sql")
 }

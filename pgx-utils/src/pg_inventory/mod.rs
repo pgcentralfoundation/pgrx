@@ -24,18 +24,16 @@ pub use impls;
 #[doc(hidden)]
 pub use once_cell;
 
+use std::collections::HashMap;
+use core::any::TypeId;
+use crate::ExternArgs;
+
 #[derive(Debug, Clone)]
 pub struct ExtensionSql {
     pub sql: &'static str,
     pub file: &'static str,
     pub line: u32,
 }
-
-use std::collections::HashMap;
-use core::any::TypeId;
-use crate::ExternArgs;
-use std::ops::Deref;
-use std::marker::PhantomData;
 
 #[derive(Debug, Clone)]
 pub struct PgxSql<'a> {

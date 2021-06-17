@@ -1,8 +1,5 @@
 use proc_macro2::{Ident, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
-use core::{any::Any, marker::PhantomData};
-use std::mem::MaybeUninit;
-use std::rc::Rc;
 
 #[derive(Debug, Clone)]
 pub struct PostgresType {
@@ -29,26 +26,24 @@ impl ToTokens for PostgresType {
         let inv = quote! {
             pgx::inventory::submit! {
                 use core::{mem::MaybeUninit, any::{TypeId, Any}, marker::PhantomData};
-                use crate::__pgx_internals::{WithoutTypeIds, WithoutArrayTypeId, WithoutVarlenaTypeId};
-                println!("WithBasicTypeIds {:?} base {:?} opt {:?} vec {:?} arr {:?} varl {:?}",
-                    stringify!(#name),
-                    *crate::__pgx_internals::WithBasicTypeIds::<#name>::ITEM_ID,
-                    *crate::__pgx_internals::WithBasicTypeIds::<#name>::OPTION_ID,
-                    *crate::__pgx_internals::WithBasicTypeIds::<#name>::VEC_ID,
-                    *crate::__pgx_internals::WithArrayTypeId::<#name>::ARRAY_ID,
-                    *crate::__pgx_internals::WithVarlenaTypeId::<#name>::VARLENA_ID,
-                );
+                use ::pgx::datum::{
+                    WithTypeIds,
+                    WithoutArrayTypeId,
+                    WithVarlenaTypeId,
+                    WithArrayTypeId,
+                    WithoutVarlenaTypeId
+                };
                 crate::__pgx_internals::PostgresType(pgx_utils::pg_inventory::InventoryPostgresType {
                     name: stringify!(#name),
                     file: file!(),
                     line: line!(),
                     module_path: module_path!(),
                     full_path: core::any::type_name::<#name>(),
-                    id: TypeId::of::<#name>(),
-                    option_id: TypeId::of::<Option<#name>>(),
-                    vec_id: TypeId::of::<Vec<#name>>(),
-                    array_id: *crate::__pgx_internals::WithArrayTypeId::<#name>::ARRAY_ID,
-                    varlena_id: *crate::__pgx_internals::WithVarlenaTypeId::<#name>::VARLENA_ID,
+                    id: *<#name as WithTypeIds>::ITEM_ID,
+                    option_id: *<#name as WithTypeIds>::OPTION_ID,
+                    vec_id: *<#name as WithTypeIds>::VEC_ID,
+                    array_id: *WithArrayTypeId::<#name>::ARRAY_ID,
+                    varlena_id: *WithVarlenaTypeId::<#name>::VARLENA_ID,
                     in_fn: stringify!(#in_fn),
                     out_fn: stringify!(#out_fn),
                 })

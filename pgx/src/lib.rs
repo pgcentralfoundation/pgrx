@@ -198,47 +198,6 @@ macro_rules! pg_module_magic {
                 Missing(&'static str),
             }
 
-
-            pub trait WithoutTypeIds {
-                const ITEM_ID: Lazy<Option<TypeId>> = Lazy::new(|| None);
-                const OPTION_ID: Lazy<Option<TypeId>> = Lazy::new(|| None);
-                const VEC_ID: Lazy<Option<TypeId>> = Lazy::new(|| None);
-            }
-
-            impl<T: 'static> WithoutTypeIds for T {}
-
-            pub struct WithBasicTypeIds<T>(std::marker::PhantomData<T>);
-
-            impl<T: Sized + 'static> WithBasicTypeIds<T> {
-                const ITEM_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(TypeId::of::<T>()));
-                const OPTION_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(TypeId::of::<Option<T>>()));
-                const VEC_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(TypeId::of::<Vec<T>>()));
-            }
-
-            pub trait WithoutArrayTypeId {
-                const ARRAY_ID: Lazy<Option<TypeId>> = Lazy::new(|| None);
-            }
-
-            impl<T: 'static> WithoutArrayTypeId for T {}
-
-            pub struct WithArrayTypeId<T>(std::marker::PhantomData<T>);
-
-            impl<T: FromDatum + 'static> WithArrayTypeId<T> {
-                const ARRAY_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(TypeId::of::<Array<T>>()));
-            }
-
-            pub trait WithoutVarlenaTypeId {
-                const VARLENA_ID: Lazy<Option<TypeId>> = Lazy::new(|| None);
-            }
-
-            impl<T: 'static> WithoutVarlenaTypeId for T {}
-
-            pub struct WithVarlenaTypeId<T>(std::marker::PhantomData<T>);
-
-            impl<T: Copy + 'static> WithVarlenaTypeId<T> {
-                const VARLENA_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(TypeId::of::<PgVarlena<T>>()));
-            }
-
             impl ::std::fmt::Display for LoadOrderError {
                 fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
                     match self {
@@ -284,6 +243,7 @@ macro_rules! pg_module_magic {
 
 pub static DEFAULT_TYPEID_SQL_MAPPING: Lazy<HashMap<TypeId, String>> = Lazy::new(|| {
     let mut m = HashMap::new();
+    m.insert(TypeId::of::<str>(), String::from("text"));
     m.insert(TypeId::of::<&'static str>(), String::from("text"));
     m.insert(TypeId::of::<Option<&'static str>>(), String::from("text"));
     m.insert(TypeId::of::<Vec<&'static str>>(), String::from("text[]"));

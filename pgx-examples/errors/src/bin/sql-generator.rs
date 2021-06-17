@@ -1,3 +1,3 @@
 fn main() -> Result<(), Box<dyn std::error::Error>>{
-    errors::PgxSql::generate().to_file("sql/generated.sql")
+    errors::generate_sql()?.to_file("sql/arrays.sql")
 }

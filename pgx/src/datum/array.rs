@@ -2,10 +2,8 @@
 // governed by the MIT license that can be found in the LICENSE file.
 
 use crate::{pg_sys, void_mut_ptr, FromDatum, IntoDatum, PgMemoryContexts};
-use serde::{Serializer, Deserialize};
+use serde::{Serializer};
 use std::marker::PhantomData;
-use std::any::TypeId;
-use once_cell::sync::Lazy;
 
 pub type VariadicArray<'a, T> = Array<'a, T>;
 
