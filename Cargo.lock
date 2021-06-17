@@ -706,6 +706,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "impls"
+version = "1.0.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7a46645bbd70538861a90d0f26c31537cdf1e44aae99a794fb75a664b70951bc"
+
+[[package]]
 name = "include_dir"
 version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1117,6 +1123,7 @@ dependencies = [
  "colored",
  "dirs",
  "env_proxy",
+ "impls",
  "include_dir",
  "inventory",
  "once_cell",
