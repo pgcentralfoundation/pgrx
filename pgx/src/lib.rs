@@ -113,6 +113,11 @@ pub static DEFAULT_TYPEID_SQL_MAPPING: Lazy<HashMap<TypeId, String>> = Lazy::new
     m.insert(TypeId::of::<&'static str>(), String::from("text"));
     m.insert(TypeId::of::<Option<&'static str>>(), String::from("text"));
     m.insert(TypeId::of::<Vec<&'static str>>(), String::from("text[]"));
+    m.insert(TypeId::of::<Option<Vec<&'static str>>>(), String::from("text[]"));
+    m.insert(TypeId::of::<Vec<Option<&'static str>>>(), String::from("text[]"));
+    m.insert(TypeId::of::<datum::Array<&'static str>>(), String::from("text[]"));
+    m.insert(TypeId::of::<Option<datum::Array<&'static str>>>(), String::from("text[]"));
+
     m.insert(
         TypeId::of::<Vec<Option<&'static str>>>(),
         String::from("text[]"),
@@ -210,12 +215,48 @@ pub static DEFAULT_TYPEID_SQL_MAPPING: Lazy<HashMap<TypeId, String>> = Lazy::new
 
     m.insert(TypeId::of::<pgx_pg_sys::ItemPointerData>(), String::from("tid"));
     m.insert(TypeId::of::<Vec<pgx_pg_sys::ItemPointerData>>(), String::from("tid[]"));
+
+    m.insert(TypeId::of::<pgx_pg_sys::ItemPointerData>(), String::from("tid"));
+    m.insert(TypeId::of::<Vec<pgx_pg_sys::ItemPointerData>>(), String::from("tid[]"));
+    m.insert(TypeId::of::<datum::Array<pgx_pg_sys::ItemPointerData>>(), String::from("tid[]"));
+
+    m.insert(TypeId::of::<pgx_pg_sys::Point>(), String::from("point"));
+    m.insert(TypeId::of::<Vec<pgx_pg_sys::Point>>(), String::from("point[]"));
+    m.insert(TypeId::of::<datum::Array<pgx_pg_sys::Point>>(), String::from("point[]"));
+
+    m.insert(TypeId::of::<pgx_pg_sys::BOX>(), String::from("box"));
+    m.insert(TypeId::of::<Vec<pgx_pg_sys::BOX>>(), String::from("box[]"));
+    m.insert(TypeId::of::<datum::Array<pgx_pg_sys::BOX>>(), String::from("box[]"));
+
     m.insert(TypeId::of::<Date>(), String::from("date"));
     m.insert(TypeId::of::<Time>(), String::from("time"));
-    m.insert(TypeId::of::<datum::Json>(), String::from("jsonb"));
-    m.insert(TypeId::of::<Option<datum::Json>>(), String::from("jsonb"));
-    m.insert(TypeId::of::<Vec<Option<datum::Json>>>(), String::from("jsonb"));
-    m.insert(TypeId::of::<Option<Vec<Option<datum::Json>>>>(), String::from("jsonb"));
+    m.insert(TypeId::of::<Timestamp>(), String::from("timestamp"));
+    m.insert(TypeId::of::<TimeWithTimeZone>(), String::from("time with time zone"));
+    m.insert(TypeId::of::<TimestampWithTimeZone>(), String::from("timestamp with time zone"));
+
+    m.insert(TypeId::of::<datum::Json>(), String::from("json"));
+    m.insert(TypeId::of::<Vec<datum::Json>>(), String::from("json[]"));
+    m.insert(TypeId::of::<Option<datum::Json>>(), String::from("json"));
+    m.insert(TypeId::of::<Vec<datum::Json>>(), String::from("json[]"));
+    m.insert(TypeId::of::<Option<Vec<datum::Json>>>(), String::from("json[]"));
+    m.insert(TypeId::of::<Vec<Option<datum::Json>>>(), String::from("json[]"));
+    m.insert(TypeId::of::<Option<Vec<Option<datum::Json>>>>(), String::from("json[]"));
+
+    m.insert(TypeId::of::<datum::JsonB>(), String::from("jsonb"));
+    m.insert(TypeId::of::<Vec<datum::JsonB>>(), String::from("jsonb[]"));
+    m.insert(TypeId::of::<Option<datum::JsonB>>(), String::from("jsonb"));
+    m.insert(TypeId::of::<Vec<datum::JsonB>>(), String::from("jsonb[]"));
+    m.insert(TypeId::of::<Option<Vec<datum::JsonB>>>(), String::from("jsonb[]"));
+    m.insert(TypeId::of::<Vec<Option<datum::JsonB>>>(), String::from("jsonb[]"));
+    m.insert(TypeId::of::<Option<Vec<Option<datum::JsonB>>>>(), String::from("jsonb[]"));
+
+    m.insert(TypeId::of::<datum::Internal<pgx_pg_sys::PlannerInfo>>(), String::from("internal"));
+    m.insert(TypeId::of::<datum::Internal<pgx_pg_sys::List>>(), String::from("internal"));
+    m.insert(TypeId::of::<pg_sys::Oid>(), String::from("oid"));
+    m.insert(TypeId::of::<datum::AnyElement>(), String::from("anyelement"));
+    m.insert(TypeId::of::<datum::AnyArray>(), String::from("anyarray"));
+
+    m.insert(TypeId::of::<rel::PgRelation>(), String::from("regclass"));
 
     m
 });

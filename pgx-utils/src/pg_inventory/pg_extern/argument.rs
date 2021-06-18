@@ -52,6 +52,58 @@ impl TryFrom<syn::FnArg> for Argument {
                     _ => None,
                 };
 
+                // We special case ignore `*mut pg_sys::FunctionCallInfoData`
+                match pat.ty.as_ref() {
+                    syn::Type::Path(ref path) => {
+                        let segments = &path.path;
+                        let mut saw_pg_sys = false;
+                        let mut saw_functioncallinfobasedata = false;
+                        for segment in &segments.segments {
+                            if segment.ident.to_string() == "pg_sys" {
+                                saw_pg_sys = true;
+                            }
+                            if segment.ident.to_string() == "FunctionCallInfo" {
+                                saw_functioncallinfobasedata = true;
+                            }
+                        }
+                        if (saw_pg_sys && saw_functioncallinfobasedata) || (saw_functioncallinfobasedata && segments.segments.len() == 1)  {
+                            return Err(Box::new(syn::Error::new(
+                                Span::call_site(),
+                                "It's a FunctionCallInfoBaseData, skipping.",
+                            )));
+                        }
+                    },
+                    syn::Type::Ptr(ref ptr) => {
+                        match *ptr.elem {
+                            syn::Type::Path(ref path) => {
+                                let segments = &path.path;
+                                let mut saw_pg_sys = false;
+                                let mut saw_functioncallinfobasedata = false;
+                                for segment in &segments.segments {
+                                    if segment.ident.to_string() == "pg_sys" {
+                                        saw_pg_sys = true;
+                                    }
+                                    if segment.ident.to_string() == "FunctionCallInfo" {
+                                        saw_functioncallinfobasedata = true;
+                                    }
+                                }
+                                if (saw_pg_sys && saw_functioncallinfobasedata) || (saw_functioncallinfobasedata && segments.segments.len() == 1)  {
+                                    return Err(Box::new(syn::Error::new(
+                                        Span::call_site(),
+                                        "It's a FunctionCallInfoBaseData, skipping.",
+                                    )));
+                                }
+                            },
+                            _ => {
+                                ()
+                            }
+                        }
+                    },
+                    _ => {
+                        ()
+                    }
+                };
+
                 Ok(Argument {
                     pat: identifier,
                     ty: *pat.ty.clone(),
