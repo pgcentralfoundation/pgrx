@@ -261,7 +261,7 @@ impl<'a> PgxSql<'a> {
                                             \t\"{pattern}\" {sql_type} {default}{maybe_comma}/* {ty_name} */\
                                         ",
                                                  pattern = arg.pattern,
-                                                 sql_type = self.type_id_to_sql_type(arg.ty_id).ok_or_else(|| eyre_err!("Failed to map argument `{}` type `{}` to SQL type while building function {}.", arg.pattern, arg.ty_name, item.name))?,
+                                                 sql_type = self.type_id_to_sql_type(arg.ty_id).ok_or_else(|| eyre_err!("Failed to map argument `{}` type `{}` to SQL type while building function `{}`.", arg.pattern, arg.ty_name, item.name))?,
                                                  default = if let Some(def) = arg.default { format!("DEFAULT {}", def) } else { String::from("") },
                                                  maybe_comma = if needs_comma { ", " } else { " " },
                                                  ty_name = arg.ty_name,
