@@ -107,140 +107,6 @@ pub fn initialize() {
     register_pg_guard_panic_handler();
 }
 
-/// A macro for marking a library compatible with the Postgres extension framework.
-///
-/// This macro was initially inspired from the `pg_module` macro in https://github.com/thehydroimpulse/postgres-extension.rs
-///
-/// Shamelessly cribbed from https://github.com/bluejekyll/pg-extend-rs
-#[macro_export]
-macro_rules! pg_module_magic {
-    () => {
-        #[no_mangle]
-        #[allow(non_snake_case)]
-        #[allow(unused)]
-        #[link_name = "Pg_magic_func"]
-        pub extern "C" fn Pg_magic_func() -> &'static pgx::pg_sys::Pg_magic_struct {
-            use pgx;
-            use std::mem::size_of;
-            use std::os::raw::c_int;
-
-            #[cfg(not(feature = "pg13"))]
-            const MY_MAGIC: pgx::pg_sys::Pg_magic_struct = pgx::pg_sys::Pg_magic_struct {
-                len: size_of::<pgx::pg_sys::Pg_magic_struct>() as c_int,
-                version: pgx::pg_sys::PG_VERSION_NUM as std::os::raw::c_int / 100,
-                funcmaxargs: pgx::pg_sys::FUNC_MAX_ARGS as c_int,
-                indexmaxkeys: pgx::pg_sys::INDEX_MAX_KEYS as c_int,
-                namedatalen: pgx::pg_sys::NAMEDATALEN as c_int,
-                float4byval: pgx::pg_sys::USE_FLOAT4_BYVAL as c_int,
-                float8byval: pgx::pg_sys::USE_FLOAT8_BYVAL as c_int,
-            };
-
-            #[cfg(feature = "pg13")]
-            const MY_MAGIC: pgx::pg_sys::Pg_magic_struct = pgx::pg_sys::Pg_magic_struct {
-                len: size_of::<pgx::pg_sys::Pg_magic_struct>() as c_int,
-                version: pgx::pg_sys::PG_VERSION_NUM as std::os::raw::c_int / 100,
-                funcmaxargs: pgx::pg_sys::FUNC_MAX_ARGS as c_int,
-                indexmaxkeys: pgx::pg_sys::INDEX_MAX_KEYS as c_int,
-                namedatalen: pgx::pg_sys::NAMEDATALEN as c_int,
-                float8byval: pgx::pg_sys::USE_FLOAT8_BYVAL as c_int,
-            };
-
-            // go ahead and register our panic handler since Postgres
-            // calls this function first
-            pgx::initialize();
-
-            // return the magic
-            &MY_MAGIC
-        }
-
-        pub use __pgx_internals::generate_sql;
-        mod __pgx_internals {
-            use ::pgx_utils::pg_inventory::{*, once_cell::sync::Lazy};
-            use ::core::{any::TypeId, convert::TryFrom};
-            use ::std::collections::HashMap;
-            use ::pgx::datum::{FromDatum, PgVarlena, Array};
-
-            static CONTROL_FILE: &str = include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/", env!("CARGO_CRATE_NAME"), ".control"));
-            static LOAD_ORDER_FILE: &str = include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/sql/load-order.txt"));
-            static LOAD_ORDER_DIR: include_dir::Dir = include_dir::include_dir!("sql");
-
-            #[derive(Debug)]
-            pub struct ExtensionSql(pub pgx_utils::pg_inventory::ExtensionSql);
-            inventory::collect!(ExtensionSql);
-
-            #[derive(Debug)]
-            pub struct PostgresType(pub pgx_utils::pg_inventory::InventoryPostgresType);
-            inventory::collect!(PostgresType);
-
-            #[derive(Debug)]
-            pub struct PgExtern(pub pgx_utils::pg_inventory::InventoryPgExtern);
-            inventory::collect!(PgExtern);
-
-            #[derive(Debug)]
-            pub struct PostgresEnum(pub pgx_utils::pg_inventory::InventoryPostgresEnum);
-            inventory::collect!(PostgresEnum);
-
-            #[derive(Debug)]
-            pub struct PostgresHash(pub pgx_utils::pg_inventory::InventoryPostgresHash);
-            inventory::collect!(PostgresHash);
-
-            #[derive(Debug)]
-            pub struct PostgresOrd(pub pgx_utils::pg_inventory::InventoryPostgresOrd);
-            inventory::collect!(PostgresOrd);
-
-            #[derive(Debug)]
-            pub struct Schema(pub pgx_utils::pg_inventory::InventorySchema);
-            inventory::collect!(Schema);
-
-            #[derive(Debug)]
-            pub enum LoadOrderError {
-                NoListing,
-                Missing(&'static str),
-            }
-
-            impl ::std::fmt::Display for LoadOrderError {
-                fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                    match self {
-                        LoadOrderError::NoListing => write!(f, "No `load-order.txt` file found or empty."),
-                        LoadOrderError::Missing(field) => write!(f, "File from `load-order.txt` does not exist: `{}`.", field),
-                    }
-                }
-            }
-
-            impl ::std::error::Error for LoadOrderError {}
-
-            pub fn generate_sql() -> Result<PgxSql<'static>, Box<dyn std::error::Error>> {
-                use std::fmt::Write;
-                let mut generated = PgxSql {
-                    load_order: {
-                        let mut mapping = HashMap::default();
-                        let listing = LOAD_ORDER_DIR.get_file("load-order.txt").ok_or(LoadOrderError::NoListing)?;
-                        let listing_str = listing.contents_utf8().ok_or(LoadOrderError::NoListing)?;
-                        for item in listing_str.lines() {
-                            let item_content = LOAD_ORDER_DIR.get_file(item).ok_or(LoadOrderError::Missing(item))?;
-                            let item_str = item_content.contents_utf8().unwrap_or_default();
-                            mapping.insert(item, item_str);
-                        }
-                        mapping
-                    },
-                    control: ControlFile::try_from(CONTROL_FILE)?,
-                    type_mappings: pgx::DEFAULT_TYPEID_SQL_MAPPING.clone(),
-                    schemas: inventory::iter::<Schema>().map(|i| &i.0).collect(),
-                    extension_sql: inventory::iter::<ExtensionSql>().map(|i| &i.0).collect(),
-                    externs: inventory::iter::<PgExtern>().map(|i| &i.0).collect(),
-                    types: inventory::iter::<PostgresType>().map(|i| &i.0).collect(),
-                    enums: inventory::iter::<PostgresEnum>().map(|i| &i.0).collect(),
-                    hashes: inventory::iter::<PostgresHash>().map(|i| &i.0).collect(),
-                    ords: inventory::iter::<PostgresOrd>().map(|i| &i.0).collect(),
-                };
-                generated.register_types();
-
-                Ok(generated)
-            }
-        }
-    };
-}
-
 pub static DEFAULT_TYPEID_SQL_MAPPING: Lazy<HashMap<TypeId, String>> = Lazy::new(|| {
     let mut m = HashMap::new();
     m.insert(TypeId::of::<str>(), String::from("text"));
@@ -353,3 +219,137 @@ pub static DEFAULT_TYPEID_SQL_MAPPING: Lazy<HashMap<TypeId, String>> = Lazy::new
 
     m
 });
+
+/// A macro for marking a library compatible with the Postgres extension framework.
+///
+/// This macro was initially inspired from the `pg_module` macro in https://github.com/thehydroimpulse/postgres-extension.rs
+///
+/// Shamelessly cribbed from https://github.com/bluejekyll/pg-extend-rs
+#[macro_export]
+macro_rules! pg_module_magic {
+    () => {
+        #[no_mangle]
+        #[allow(non_snake_case)]
+        #[allow(unused)]
+        #[link_name = "Pg_magic_func"]
+        pub extern "C" fn Pg_magic_func() -> &'static pgx::pg_sys::Pg_magic_struct {
+            use pgx;
+            use std::mem::size_of;
+            use std::os::raw::c_int;
+
+            #[cfg(not(feature = "pg13"))]
+            const MY_MAGIC: pgx::pg_sys::Pg_magic_struct = pgx::pg_sys::Pg_magic_struct {
+                len: size_of::<pgx::pg_sys::Pg_magic_struct>() as c_int,
+                version: pgx::pg_sys::PG_VERSION_NUM as std::os::raw::c_int / 100,
+                funcmaxargs: pgx::pg_sys::FUNC_MAX_ARGS as c_int,
+                indexmaxkeys: pgx::pg_sys::INDEX_MAX_KEYS as c_int,
+                namedatalen: pgx::pg_sys::NAMEDATALEN as c_int,
+                float4byval: pgx::pg_sys::USE_FLOAT4_BYVAL as c_int,
+                float8byval: pgx::pg_sys::USE_FLOAT8_BYVAL as c_int,
+            };
+
+            #[cfg(feature = "pg13")]
+            const MY_MAGIC: pgx::pg_sys::Pg_magic_struct = pgx::pg_sys::Pg_magic_struct {
+                len: size_of::<pgx::pg_sys::Pg_magic_struct>() as c_int,
+                version: pgx::pg_sys::PG_VERSION_NUM as std::os::raw::c_int / 100,
+                funcmaxargs: pgx::pg_sys::FUNC_MAX_ARGS as c_int,
+                indexmaxkeys: pgx::pg_sys::INDEX_MAX_KEYS as c_int,
+                namedatalen: pgx::pg_sys::NAMEDATALEN as c_int,
+                float8byval: pgx::pg_sys::USE_FLOAT8_BYVAL as c_int,
+            };
+
+            // go ahead and register our panic handler since Postgres
+            // calls this function first
+            pgx::initialize();
+
+            // return the magic
+            &MY_MAGIC
+        }
+
+        pub use __pgx_internals::generate_sql;
+        mod __pgx_internals {
+            use ::pgx_utils::pg_inventory::{*, once_cell::sync::Lazy};
+            use ::core::{any::TypeId, convert::TryFrom};
+            use ::std::collections::HashMap;
+            use ::pgx::datum::{FromDatum, PgVarlena, Array};
+
+            static CONTROL_FILE: &str = include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/", env!("CARGO_CRATE_NAME"), ".control"));
+            static LOAD_ORDER_FILE: &str = include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/sql/load-order.txt"));
+            static LOAD_ORDER_DIR: include_dir::Dir = include_dir::include_dir!("sql");
+
+            #[derive(Debug)]
+            pub struct ExtensionSql(pub pgx_utils::pg_inventory::ExtensionSql);
+            inventory::collect!(ExtensionSql);
+
+            #[derive(Debug)]
+            pub struct PostgresType(pub pgx_utils::pg_inventory::InventoryPostgresType);
+            inventory::collect!(PostgresType);
+
+            #[derive(Debug)]
+            pub struct PgExtern(pub pgx_utils::pg_inventory::InventoryPgExtern);
+            inventory::collect!(PgExtern);
+
+            #[derive(Debug)]
+            pub struct PostgresEnum(pub pgx_utils::pg_inventory::InventoryPostgresEnum);
+            inventory::collect!(PostgresEnum);
+
+            #[derive(Debug)]
+            pub struct PostgresHash(pub pgx_utils::pg_inventory::InventoryPostgresHash);
+            inventory::collect!(PostgresHash);
+
+            #[derive(Debug)]
+            pub struct PostgresOrd(pub pgx_utils::pg_inventory::InventoryPostgresOrd);
+            inventory::collect!(PostgresOrd);
+
+            #[derive(Debug)]
+            pub struct Schema(pub pgx_utils::pg_inventory::InventorySchema);
+            inventory::collect!(Schema);
+
+            #[derive(Debug)]
+            pub enum LoadOrderError {
+                NoListing,
+                Missing(&'static str),
+            }
+
+            impl ::std::fmt::Display for LoadOrderError {
+                fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                    match self {
+                        LoadOrderError::NoListing => write!(f, "No `load-order.txt` file found or empty."),
+                        LoadOrderError::Missing(field) => write!(f, "File from `load-order.txt` does not exist: `{}`.", field),
+                    }
+                }
+            }
+
+            impl ::std::error::Error for LoadOrderError {}
+
+            pub fn generate_sql() -> pgx_utils::pg_inventory::eyre::Result<PgxSql<'static>> {
+                use std::fmt::Write;
+                let mut generated = PgxSql {
+                    load_order: {
+                        let mut mapping = HashMap::default();
+                        let listing = LOAD_ORDER_DIR.get_file("load-order.txt").ok_or(LoadOrderError::NoListing)?;
+                        let listing_str = listing.contents_utf8().ok_or(LoadOrderError::NoListing)?;
+                        for item in listing_str.lines() {
+                            let item_content = LOAD_ORDER_DIR.get_file(item).ok_or(LoadOrderError::Missing(item))?;
+                            let item_str = item_content.contents_utf8().unwrap_or_default();
+                            mapping.insert(item, item_str);
+                        }
+                        mapping
+                    },
+                    control: ControlFile::try_from(CONTROL_FILE)?,
+                    type_mappings: pgx::DEFAULT_TYPEID_SQL_MAPPING.clone(),
+                    schemas: inventory::iter::<Schema>().map(|i| &i.0).collect(),
+                    extension_sql: inventory::iter::<ExtensionSql>().map(|i| &i.0).collect(),
+                    externs: inventory::iter::<PgExtern>().map(|i| &i.0).collect(),
+                    types: inventory::iter::<PostgresType>().map(|i| &i.0).collect(),
+                    enums: inventory::iter::<PostgresEnum>().map(|i| &i.0).collect(),
+                    hashes: inventory::iter::<PostgresHash>().map(|i| &i.0).collect(),
+                    ords: inventory::iter::<PostgresOrd>().map(|i| &i.0).collect(),
+                };
+                generated.register_types();
+
+                Ok(generated)
+            }
+        }
+    };
+}

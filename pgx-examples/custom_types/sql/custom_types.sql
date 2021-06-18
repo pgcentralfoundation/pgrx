@@ -18,10 +18,6 @@ CREATE TYPE SomeValue AS ENUM (
 
 -- Shell types for types defined by `#[derive(PostgresType)]`
 
--- src/complex.rs:10
--- custom_types::complex::Animals
-CREATE TYPE Animals;
-
 -- src/hstore_clone.rs:10
 -- custom_types::hstore_clone::RustStore
 CREATE TYPE RustStore;
@@ -30,53 +26,11 @@ CREATE TYPE RustStore;
 -- custom_types::fixed_size::FixedF32Array
 CREATE TYPE FixedF32Array;
 
+-- src/complex.rs:10
+-- custom_types::complex::Animals
+CREATE TYPE Animals;
+
 -- Functions defined by `#[pg_extern]`
-
--- src/complex.rs:42
--- custom_types::complex::add_animal
-CREATE OR REPLACE FUNCTION "add_animal"(
-	"animals" Animals , /* custom_types::complex::Animals */
-	"name" text , /* alloc::string::String */
-	"age" integer  /* i32 */
-) RETURNS Animals /* custom_types::complex::Animals */
-STRICT
-LANGUAGE c /* Rust */
-AS 'MODULE_PATHNAME', 'add_animal_wrapper';
-
--- src/complex.rs:24
--- custom_types::complex::make_animals
-CREATE OR REPLACE FUNCTION "make_animals"(
-	"animals" text[] , /* pgx::datum::array::Array<alloc::string::String> */
-	"ages" integer[]  /* pgx::datum::array::Array<i32> */
-) RETURNS Animals /* custom_types::complex::Animals */
-STRICT
-LANGUAGE c /* Rust */
-AS 'MODULE_PATHNAME', 'make_animals_wrapper';
-
--- src/complex.rs:16
--- custom_types::complex::known_animals
-CREATE OR REPLACE FUNCTION "known_animals"() RETURNS Animals /* custom_types::complex::Animals */
-STRICT
-LANGUAGE c /* Rust */
-AS 'MODULE_PATHNAME', 'known_animals_wrapper';
-
--- src/complex.rs:10
--- custom_types::complex::animals_out
-CREATE OR REPLACE FUNCTION "animals_out"(
-	"input" Animals  /* custom_types::complex::Animals */
-) RETURNS cstring /* &std::ffi::c_str::CStr */
-IMMUTABLE PARALLEL SAFE STRICT
-LANGUAGE c /* Rust */
-AS 'MODULE_PATHNAME', 'animals_out_wrapper';
-
--- src/complex.rs:10
--- custom_types::complex::animals_in
-CREATE OR REPLACE FUNCTION "animals_in"(
-	"input" cstring  /* &std::ffi::c_str::CStr */
-) RETURNS Animals /* custom_types::complex::Animals */
-IMMUTABLE PARALLEL SAFE STRICT
-LANGUAGE c /* Rust */
-AS 'MODULE_PATHNAME', 'animals_in_wrapper';
 
 -- src/generic_enum.rs:29
 -- custom_types::generic_enum::get_some_value_name
@@ -218,17 +172,54 @@ IMMUTABLE PARALLEL SAFE STRICT
 LANGUAGE c /* Rust */
 AS 'MODULE_PATHNAME', 'fixedf32array_in_wrapper';
 
--- Types defined by `#[derive(PostgresType)]`
+-- src/complex.rs:42
+-- custom_types::complex::add_animal
+CREATE OR REPLACE FUNCTION "add_animal"(
+	"animals" Animals , /* custom_types::complex::Animals */
+	"name" text , /* alloc::string::String */
+	"age" integer  /* i32 */
+) RETURNS Animals /* custom_types::complex::Animals */
+STRICT
+LANGUAGE c /* Rust */
+AS 'MODULE_PATHNAME', 'add_animal_wrapper';
+
+-- src/complex.rs:24
+-- custom_types::complex::make_animals
+CREATE OR REPLACE FUNCTION "make_animals"(
+	"animals" text[] , /* pgx::datum::array::Array<alloc::string::String> */
+	"ages" integer[]  /* pgx::datum::array::Array<i32> */
+) RETURNS Animals /* custom_types::complex::Animals */
+STRICT
+LANGUAGE c /* Rust */
+AS 'MODULE_PATHNAME', 'make_animals_wrapper';
+
+-- src/complex.rs:16
+-- custom_types::complex::known_animals
+CREATE OR REPLACE FUNCTION "known_animals"() RETURNS Animals /* custom_types::complex::Animals */
+STRICT
+LANGUAGE c /* Rust */
+AS 'MODULE_PATHNAME', 'known_animals_wrapper';
 
 -- src/complex.rs:10
--- custom_types::complex::Animals - TypeId { t: 11043359249224717473 }
-CREATE TYPE Animals (
-	INTERNALLENGTH = variable,
-	INPUT = animals_in,
-	OUTPUT = animals_out,
-	STORAGE = extended
-);
-                            
+-- custom_types::complex::animals_out
+CREATE OR REPLACE FUNCTION "animals_out"(
+	"input" Animals  /* custom_types::complex::Animals */
+) RETURNS cstring /* &std::ffi::c_str::CStr */
+IMMUTABLE PARALLEL SAFE STRICT
+LANGUAGE c /* Rust */
+AS 'MODULE_PATHNAME', 'animals_out_wrapper';
+
+-- src/complex.rs:10
+-- custom_types::complex::animals_in
+CREATE OR REPLACE FUNCTION "animals_in"(
+	"input" cstring  /* &std::ffi::c_str::CStr */
+) RETURNS Animals /* custom_types::complex::Animals */
+IMMUTABLE PARALLEL SAFE STRICT
+LANGUAGE c /* Rust */
+AS 'MODULE_PATHNAME', 'animals_in_wrapper';
+
+-- Types defined by `#[derive(PostgresType)]`
+
 -- src/hstore_clone.rs:10
 -- custom_types::hstore_clone::RustStore - TypeId { t: 5376120889181564465 }
 CREATE TYPE RustStore (
@@ -244,6 +235,15 @@ CREATE TYPE FixedF32Array (
 	INTERNALLENGTH = variable,
 	INPUT = fixedf32array_in,
 	OUTPUT = fixedf32array_out,
+	STORAGE = extended
+);
+                            
+-- src/complex.rs:10
+-- custom_types::complex::Animals - TypeId { t: 11043359249224717473 }
+CREATE TYPE Animals (
+	INTERNALLENGTH = variable,
+	INPUT = animals_in,
+	OUTPUT = animals_out,
 	STORAGE = extended
 );
                             
