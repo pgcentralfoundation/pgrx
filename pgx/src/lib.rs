@@ -263,6 +263,8 @@ pub static DEFAULT_TYPEID_SQL_MAPPING: Lazy<HashMap<TypeId, String>> = Lazy::new
     m.insert(TypeId::of::<datum::Array<String>>(), String::from("text[]"));
     m.insert(TypeId::of::<Vec<String>>(), String::from("text[]"));
     m.insert(TypeId::of::<Vec<Option<String>>>(), String::from("text[]"));
+    m.insert(TypeId::of::<Option<Vec<Option<String>>>>(), String::from("text[]"));
+    m.insert(TypeId::of::<Option<Vec<Option<&String>>>>(), String::from("text[]"));
 
     m.insert(TypeId::of::<()>(), String::from("void"));
 
@@ -339,6 +341,15 @@ pub static DEFAULT_TYPEID_SQL_MAPPING: Lazy<HashMap<TypeId, String>> = Lazy::new
     m.insert(TypeId::of::<Option<&[u8]>>(), String::from("bytea"));
     m.insert(TypeId::of::<Vec<u8>>(), String::from("bytea"));
     m.insert(TypeId::of::<Option<Vec<u8>>>(), String::from("bytea"));
+
+    m.insert(TypeId::of::<pgx_pg_sys::ItemPointerData>(), String::from("tid"));
+    m.insert(TypeId::of::<Vec<pgx_pg_sys::ItemPointerData>>(), String::from("tid[]"));
+    m.insert(TypeId::of::<Date>(), String::from("date"));
+    m.insert(TypeId::of::<Time>(), String::from("time"));
+    m.insert(TypeId::of::<datum::Json>(), String::from("jsonb"));
+    m.insert(TypeId::of::<Option<datum::Json>>(), String::from("jsonb"));
+    m.insert(TypeId::of::<Vec<Option<datum::Json>>>(), String::from("jsonb"));
+    m.insert(TypeId::of::<Option<Vec<Option<datum::Json>>>>(), String::from("jsonb"));
 
     m
 });
