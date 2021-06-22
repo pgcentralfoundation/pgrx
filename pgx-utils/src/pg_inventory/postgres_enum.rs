@@ -37,7 +37,9 @@ impl ToTokens for PostgresEnum {
                     id: *<#name as WithTypeIds>::ITEM_ID,
                     option_id: *<#name as WithTypeIds>::OPTION_ID,
                     vec_id: *<#name as WithTypeIds>::VEC_ID,
+                    vec_option_id: *<#name as WithTypeIds>::VEC_OPTION_ID,
                     array_id: *WithArrayTypeId::<#name>::ARRAY_ID,
+                    option_array_id: *WithArrayTypeId::<#name>::OPTION_ARRAY_ID,
                     varlena_id: *WithVarlenaTypeId::<#name>::VARLENA_ID,
                     variants: vec![ #(  stringify!(#variants)  ),* ],
                 })
@@ -58,7 +60,9 @@ pub struct InventoryPostgresEnum {
     pub id: core::any::TypeId,
     pub option_id: core::any::TypeId,
     pub vec_id: core::any::TypeId,
+    pub vec_option_id: core::any::TypeId,
     pub array_id: Option<core::any::TypeId>,
+    pub option_array_id: Option<core::any::TypeId>,
     pub varlena_id: Option<core::any::TypeId>,
     pub variants: Vec<&'static str>,
 }

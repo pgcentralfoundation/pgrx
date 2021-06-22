@@ -229,10 +229,15 @@ pub static DEFAULT_TYPEID_SQL_MAPPING: Lazy<HashMap<TypeId, String>> = Lazy::new
     m.insert(TypeId::of::<datum::Array<pgx_pg_sys::BOX>>(), String::from("box[]"));
 
     m.insert(TypeId::of::<Date>(), String::from("date"));
+    m.insert(TypeId::of::<Option<Date>>(), String::from("date"));
     m.insert(TypeId::of::<Time>(), String::from("time"));
+    m.insert(TypeId::of::<Option<Time>>(), String::from("time"));
     m.insert(TypeId::of::<Timestamp>(), String::from("timestamp"));
+    m.insert(TypeId::of::<Option<Timestamp>>(), String::from("timestamp"));
     m.insert(TypeId::of::<TimeWithTimeZone>(), String::from("time with time zone"));
+    m.insert(TypeId::of::<Option<TimeWithTimeZone>>(), String::from("time with time zone"));
     m.insert(TypeId::of::<TimestampWithTimeZone>(), String::from("timestamp with time zone"));
+    m.insert(TypeId::of::<Option<TimestampWithTimeZone>>(), String::from("timestamp with time zone"));
 
     m.insert(TypeId::of::<datum::Json>(), String::from("json"));
     m.insert(TypeId::of::<Vec<datum::Json>>(), String::from("json[]"));
@@ -252,6 +257,17 @@ pub static DEFAULT_TYPEID_SQL_MAPPING: Lazy<HashMap<TypeId, String>> = Lazy::new
 
     m.insert(TypeId::of::<datum::Internal<pgx_pg_sys::PlannerInfo>>(), String::from("internal"));
     m.insert(TypeId::of::<datum::Internal<pgx_pg_sys::List>>(), String::from("internal"));
+    m.insert(TypeId::of::<pgbox::PgBox<pgx_pg_sys::IndexAmRoutine>>(), String::from("internal"));
+    m.insert(TypeId::of::<pgx_pg_sys::ItemPointerData>(), String::from("internal"));
+    m.insert(TypeId::of::<Option<pgx_pg_sys::ItemPointerData>>(), String::from("internal"));
+
+    m.insert(TypeId::of::<datum::Numeric>(), String::from("pg_catalog.\"numeric\""));
+    m.insert(TypeId::of::<Option<datum::Numeric>>(), String::from("pg_catalog.\"numeric\""));
+    m.insert(TypeId::of::<Vec<datum::Numeric>>(), String::from("pg_catalog.\"numeric\"[]"));
+    m.insert(TypeId::of::<Vec<Option<datum::Numeric>>>(), String::from("pg_catalog.\"numeric\"[]"));
+    m.insert(TypeId::of::<Option<Vec<Option<datum::Numeric>>>>(), String::from("pg_catalog.\"numeric\"[]"));
+
+
     m.insert(TypeId::of::<pg_sys::Oid>(), String::from("oid"));
     m.insert(TypeId::of::<datum::AnyElement>(), String::from("anyelement"));
     m.insert(TypeId::of::<datum::AnyArray>(), String::from("anyarray"));

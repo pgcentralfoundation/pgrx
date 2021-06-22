@@ -51,26 +51,31 @@ pub trait WithTypeIds {
     const ITEM_ID: Lazy<TypeId>;
     const OPTION_ID: Lazy<TypeId>;
     const VEC_ID: Lazy<TypeId>;
+    const VEC_OPTION_ID: Lazy<TypeId>;
 }
 
 impl<T: 'static> WithTypeIds for T {
     const ITEM_ID: Lazy<TypeId> = Lazy::new(|| TypeId::of::<T>());
     const OPTION_ID: Lazy<TypeId> = Lazy::new(|| TypeId::of::<Option<T>>());
     const VEC_ID: Lazy<TypeId> = Lazy::new(|| TypeId::of::<Vec<T>>());
+    const VEC_OPTION_ID: Lazy<TypeId> = Lazy::new(|| TypeId::of::<Vec<Option<T>>>());
 }
 
 pub trait WithoutArrayTypeId {
     const ARRAY_ID: Lazy<Option<TypeId>>;
+    const OPTION_ARRAY_ID: Lazy<Option<TypeId>>;
 }
 
 impl<T: 'static> WithoutArrayTypeId for T {
     const ARRAY_ID: Lazy<Option<TypeId>> = Lazy::new(|| None);
+    const OPTION_ARRAY_ID: Lazy<Option<TypeId>> = Lazy::new(|| None);
 }
 
 pub struct WithArrayTypeId<T>(pub std::marker::PhantomData<T>);
 
 impl<T: FromDatum + 'static> WithArrayTypeId<T> {
     pub const ARRAY_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(TypeId::of::<Array<T>>()));
+    pub const OPTION_ARRAY_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(TypeId::of::<Option<Array<T>>>()));
 }
 
 pub trait WithoutVarlenaTypeId {

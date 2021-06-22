@@ -228,7 +228,7 @@ impl<'a> PgxSql<'a> {
     fn externs_with_operators(&self) -> eyre::Result<String> {
         let mut buf = String::new();
         for item in &self.externs {
-            let span = span!(Level::INFO, "generate `CREATE OR REPLACE FUNCTION` block", name = ?item.name, file = ?item.file, line = ?item.line);
+            let span = span!(Level::INFO, "externs_with_operators::`CREATE OR REPLACE FUNCTION`", name = ?item.name, file = ?item.file, line = ?item.line);
             let _entered = span.enter();
 
             let mut extern_attrs = item.extern_attrs.clone();
@@ -314,7 +314,7 @@ impl<'a> PgxSql<'a> {
             let rendered = match (item.overridden, &item.operator) {
                 (None, Some(op)) => {
                     drop(_entered);
-                    let span = span!(Level::INFO, "generate `CREATE OPERATOR` block", name = ?item.name, file = ?item.file, line = ?item.line);
+                    let span = span!(Level::INFO, "externs_with_operators::`CREATE OPERATOR`", name = ?item.name, file = ?item.file, line = ?item.line);
                     let _entered = span.enter();
 
                     let mut optionals = vec![];
@@ -447,15 +447,28 @@ impl<'a> PgxSql<'a> {
             self.map_type_id_to_sql_type(item.id, item.name);
             self.map_type_id_to_sql_type(item.option_id, item.name);
             self.map_type_id_to_sql_type(item.vec_id, format!("{}[]", item.name));
+            if let Some(val) = item.varlena_id {
+                self.map_type_id_to_sql_type(val, item.name);
+            }
+            if let Some(val) = item.array_id {
+                self.map_type_id_to_sql_type(val, format!("{}[]", item.name));
+            }
+            if let Some(val) = item.option_array_id {
+                self.map_type_id_to_sql_type(val, format!("{}[]", item.name));
+            }
         }
         for item in self.types.clone() {
             self.map_type_id_to_sql_type(item.id, item.name);
             self.map_type_id_to_sql_type(item.option_id, item.name);
             self.map_type_id_to_sql_type(item.vec_id, format!("{}[]", item.name));
+            self.map_type_id_to_sql_type(item.vec_option_id, format!("{}[]", item.name));
             if let Some(val) = item.varlena_id {
                 self.map_type_id_to_sql_type(val, item.name);
             }
             if let Some(val) = item.array_id {
+                self.map_type_id_to_sql_type(val, format!("{}[]", item.name));
+            }
+            if let Some(val) = item.option_array_id {
                 self.map_type_id_to_sql_type(val, format!("{}[]", item.name));
             }
         }
