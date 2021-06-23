@@ -134,6 +134,7 @@ pub static DEFAULT_TYPEID_SQL_MAPPING: Lazy<HashMap<TypeId, String>> = Lazy::new
     m.insert(TypeId::of::<datum::Array<String>>(), String::from("text[]"));
     m.insert(TypeId::of::<Vec<String>>(), String::from("text[]"));
     m.insert(TypeId::of::<Vec<Option<String>>>(), String::from("text[]"));
+    m.insert(TypeId::of::<Option<Vec<String>>>(), String::from("text[]"));
     m.insert(TypeId::of::<Option<Vec<Option<String>>>>(), String::from("text[]"));
     m.insert(TypeId::of::<Option<Vec<Option<&String>>>>(), String::from("text[]"));
 
@@ -273,6 +274,7 @@ pub static DEFAULT_TYPEID_SQL_MAPPING: Lazy<HashMap<TypeId, String>> = Lazy::new
     m.insert(TypeId::of::<datum::AnyArray>(), String::from("anyarray"));
 
     m.insert(TypeId::of::<rel::PgRelation>(), String::from("regclass"));
+    m.insert(TypeId::of::<Option<rel::PgRelation>>(), String::from("regclass"));
 
     m
 });

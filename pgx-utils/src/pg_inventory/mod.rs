@@ -277,6 +277,7 @@ impl<'a> PgxSql<'a> {
                                      InventoryPgExternReturn::Iterated(vec) => format!("RETURNS TABLE ({}\n)",
                                                                                                                 vec.iter().map(|(id, ty_name, col_name)| format!("\n\t\"{}\" {} /* {} */", col_name.unwrap(), self.type_id_to_sql_type(*id).unwrap_or_else(|| ty_name.to_string()), ty_name)).collect::<Vec<_>>().join(",")
                                      ),
+                                     InventoryPgExternReturn::Trigger => String::from("RETURNS trigger"),
                                  },
                                  search_path = if let Some(search_path) = &item.search_path {
                                      let retval = format!("SET search_path TO {}", search_path.join(", "));

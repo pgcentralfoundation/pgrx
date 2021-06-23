@@ -12,6 +12,8 @@ pub enum Returning {
     Type(syn::Type),
     SetOf(syn::TypePath),
     Iterated(Vec<(syn::Type, Option<String>)>),
+    /// `pgx_pg_sys::Datum`
+    Trigger,
 }
 
 impl TryFrom<&syn::ReturnType> for Returning {
@@ -68,7 +70,27 @@ impl TryFrom<&syn::ReturnType> for Returning {
                     }
                     _ => Returning::None,
                 },
-                _ => Returning::Type(ty.deref().clone()),
+                syn::Type::Path(typepath) => {
+                    let path = &typepath.path;
+                    let mut saw_pgx_pg_sys = false;
+                    let mut saw_datum = false;
+
+                    for segment in &path.segments {
+                        if segment.ident.to_string() == "pg_sys" {
+                            saw_pgx_pg_sys = true;
+                        }
+                        if segment.ident.to_string() == "Datum" {
+                            saw_datum = true;
+                        }
+                    }
+                    if (saw_datum && saw_pgx_pg_sys) || (saw_datum && path.segments.len() == 1) {
+                        Returning::Trigger
+                    } else {
+                        Returning::Type(ty.deref().clone())
+                    }
+
+                },
+                _ => Returning::Type(ty.deref().clone())
             },
         })
     }
@@ -111,7 +133,10 @@ impl ToTokens for Returning {
                         #(#quoted_items),*
                     ])
                 }
-            }
+            },
+            Returning::Trigger => quote! {
+                pgx_utils::pg_inventory::InventoryPgExternReturn::Trigger
+            },
         };
         tokens.append_all(quoted);
     }
@@ -152,4 +177,5 @@ pub enum InventoryPgExternReturn {
         name: &'static str,
     },
     Iterated(Vec<(core::any::TypeId, &'static str, Option<&'static str>)>),
+    Trigger,
 }
