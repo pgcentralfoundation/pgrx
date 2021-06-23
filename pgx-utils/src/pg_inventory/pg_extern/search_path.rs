@@ -33,10 +33,10 @@ impl ToTokens for SearchPath {
         let at_end = self.at_end;
 
         let quoted = quote! {
-            #at_start#dollar#path#at_end
+            concat!(stringify!(#at_start), stringify!(#dollar), stringify!(#path), stringify!(#at_end))
         };
 
-        quoted.to_string().to_tokens(tokens);
+        quoted.to_tokens(tokens);
     }
 }
 

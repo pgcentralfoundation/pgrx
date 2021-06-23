@@ -40,7 +40,6 @@ use std::collections::HashMap;
 use core::{any::TypeId, fmt::Debug};
 use crate::ExternArgs;
 use eyre::eyre as eyre_err;
-use tracing_error::InstrumentError;
 
 #[derive(Debug, Clone)]
 pub struct ExtensionSql {

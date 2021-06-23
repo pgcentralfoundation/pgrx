@@ -333,7 +333,7 @@ pub const PG_MAJORVERSION: &'static [u8; 3usize] = b"12\0";
 pub const PG_VERSION: &'static [u8; 5usize] = b"12.7\0";
 pub const PG_VERSION_NUM: u32 = 120007;
 pub const PG_VERSION_STR: &'static [u8; 77usize] =
-    b"PostgreSQL 12.7 on x86_64-pc-linux-gnu, compiled by gcc (GCC) 10.2.0, 64-bit\0";
+    b"PostgreSQL 12.7 on x86_64-pc-linux-gnu, compiled by gcc (GCC) 10.3.0, 64-bit\0";
 pub const RELSEG_SIZE: u32 = 131072;
 pub const SIZEOF_BOOL: u32 = 1;
 pub const SIZEOF_LONG: u32 = 8;

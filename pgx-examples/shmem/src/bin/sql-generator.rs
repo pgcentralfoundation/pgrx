@@ -1,6 +1,6 @@
 use ::pgx_utils::pg_inventory::{
     tracing_error::ErrorLayer,
-    tracing_subscriber::{self, util::SubscriberInitExt, layer::SubscriberExt, fmt, EnvFilter, Registry},
+    tracing_subscriber::{self, util::SubscriberInitExt, layer::SubscriberExt, EnvFilter},
     color_eyre,
 };
 

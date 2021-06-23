@@ -9,11 +9,10 @@ mod commands;
 use crate::commands::connect::connect_psql;
 use crate::commands::get::get_property;
 use crate::commands::init::init_pgx;
-use crate::commands::install::{install_extension, write_full_schema_file};
+use crate::commands::install::{install_extension};
 use crate::commands::new::create_crate_template;
 use crate::commands::package::package_extension;
 use crate::commands::run::run_psql;
-use crate::commands::schema_deprecated;
 use crate::commands::schema;
 use crate::commands::start::start_postgres;
 use crate::commands::status::status_postgres;
@@ -213,13 +212,11 @@ fn do_it() -> std::result::Result<(), std::io::Error> {
                 Ok(())
             }
             ("schema", Some(schema)) => {
-                let features = schema
-                    .values_of("features")
-                    .map(|v| v.collect())
-                    .unwrap_or(vec![]);
-                schema_deprecated::generate_schema(&*features)
-            }
-            ("schema2", Some(schema)) => {
+                let (_, extname) = crate::commands::get::find_control_file();
+                let out = schema
+                    .value_of("out")
+                    .map(|x| x.to_string())
+                    .unwrap_or_else(|| format!("sql/{}-{}.sql", extname, crate::commands::install::get_version()));
                 let is_release = schema.is_present("release");
                 let features = schema
                     .values_of("features")
@@ -243,20 +240,7 @@ fn do_it() -> std::result::Result<(), std::io::Error> {
                     },
                 };
 
-                schema::generate_schema(&pg_config, is_release, &features)
-            }
-            ("dump-schema", Some(dump_schema)) => {
-                let dir = dump_schema
-                    .value_of("directory")
-                    .expect("the directory argument is required")
-                    .into();
-                let features = dump_schema
-                    .values_of("features")
-                    .map(|v| v.collect())
-                    .unwrap_or(vec![]);
-                schema_deprecated::generate_schema(&*features)?;
-                write_full_schema_file(&dir, None);
-                Ok(())
+                schema::generate_schema(&pg_config, is_release, &features, &out)
             }
             ("get", Some(get)) => {
                 let name = get.value_of("name").expect("no property name specified");

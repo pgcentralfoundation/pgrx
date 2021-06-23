@@ -1,8 +1,6 @@
 use crate::commands::{
     get::find_control_file,
-    install::{build_extension, find_library_file},
 };
-use libloading::Library;
 use pgx_utils::pg_config::PgConfig;
 use std::process::{Command, Stdio};
 use crate::commands::get::get_property;
@@ -12,9 +10,10 @@ pub(crate) fn generate_schema(
     pg_config: &PgConfig,
     is_release: bool,
     additional_features: &[&str],
+    path: impl AsRef<std::path::Path>,
 ) -> Result<(), std::io::Error> {
     // TODO: Ensure a `src/bin/sql_generator.rs` exists and is up to date.
-    let (control_file, extname) = find_control_file();
+    let (control_file, _extname) = find_control_file();
     let major_version = pg_config.major_version()?;
 
     if get_property("relocatable") != Some("false".into()) {
@@ -49,6 +48,11 @@ pub(crate) fn generate_schema(
         command.arg(arg);
     }
 
+    let path = path.as_ref();
+    let _ = path.parent().map(|p| std::fs::create_dir_all(&p).unwrap());
+    command.arg("--");
+    command.arg(path);
+
     let command = command.stdout(Stdio::inherit()).stderr(Stdio::inherit());
     let command_str = format!("{:?}", command);
     println!(
@@ -59,9 +63,7 @@ pub(crate) fn generate_schema(
         command.status(),
         format!("failed to spawn cargo: {}", command_str)
     );
-    if status.success() {
-        println!("SQL written to `sql/generated.sql`.")
-    } else {
+    if !status.success() {
         exit_with_error!("failed to run SQL generator");
     }
     Ok(())

@@ -8,7 +8,6 @@ pub(crate) mod install;
 pub(crate) mod new;
 pub(crate) mod package;
 pub(crate) mod run;
-pub(crate) mod schema_deprecated;
 pub(crate) mod schema;
 pub(crate) mod start;
 pub(crate) mod status;

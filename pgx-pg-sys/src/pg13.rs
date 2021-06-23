@@ -178,7 +178,7 @@ pub const ALIGNOF_LONG: u32 = 8;
 pub const ALIGNOF_PG_INT128_TYPE: u32 = 16;
 pub const ALIGNOF_SHORT: u32 = 2;
 pub const BLCKSZ: u32 = 8192;
-pub const CONFIGURE_ARGS : & 'static [u8 ; 842usize] = b" '--prefix=/home/ana/.pgx/13.3/pgx-install' '--with-pgport=28813' '--enable-debug' '--enable-cassert' 'CC=gcc' 'CXX=g++' 'PKG_CONFIG=pkg-config' 'PKG_CONFIG_PATH=/nix/store/bx0y0scv9dc56wk1zz9yi14lkc5js0p4-zlib-1.2.11-dev/lib/pkgconfig:/nix/store/l5mk60cf43s5lz0q9apyxans26csv6zn-ncurses-6.2-dev/lib/pkgconfig:/nix/store/8iyzxj2ysxnknxc7jrldcsk2zzhv7ff1-openssl-1.1.1k-dev/lib/pkgconfig:/nix/store/pj89fimswl2c12dazdfy8cyka7037s6r-libxml2-2.9.10-dev/lib/pkgconfig:/nix/store/shdgwx215iw2n5kc0c26czzlzylwvxjv-icu4c-67.1-dev/lib/pkgconfig:/nix/store/fdgc7i7m6bdfn4c68n4fd6gi68w9f6rp-systemd-247.6-dev/lib/pkgconfig:/nix/store/fdgc7i7m6bdfn4c68n4fd6gi68w9f6rp-systemd-247.6-dev/share/pkgconfig:/nix/store/5ln3yvnk02c0w5j4n0czi948aaxm5jbz-libossp-uuid-1.6.2/lib/pkgconfig:/nix/store/pa00csq40q1xn0ns9qhhdlmw7ngvqrk9-icu4c-68.2-dev/lib/pkgconfig'\0" ;
+pub const CONFIGURE_ARGS : & 'static [u8 ; 992usize] = b" '--prefix=/home/ana/.pgx/13.3/pgx-install' '--with-pgport=28813' '--enable-debug' '--enable-cassert' 'CC=gcc' 'CXX=g++' 'PKG_CONFIG=pkg-config' 'PKG_CONFIG_PATH=/nix/store/jx6b2dd9005cqnd9vrjfk6plii030cn3-postgresql-11.11/lib/pkgconfig:/nix/store/4nnqijxym3hfh34mm2ypz9jzi7n2f9zd-zlib-1.2.11-dev/lib/pkgconfig:/nix/store/vcymhccq2xcwf17fxv0hapcsd58bkhv5-ncurses-6.2-dev/lib/pkgconfig:/nix/store/h6ah3kva53w9bf88y6rp27w2sr7g0s0d-openssl-1.1.1k-dev/lib/pkgconfig:/nix/store/yfjcmkh15y1vpgi4mj136m8zy132vccm-libxml2-2.9.10-dev/lib/pkgconfig:/nix/store/qsq03iwcvd58awbm9csy2sq8ffypc9gr-icu4c-67.1-dev/lib/pkgconfig:/nix/store/g7vifxq7kjx7iam70ssfjs4p10kl96zc-systemd-247.6-dev/lib/pkgconfig:/nix/store/g7vifxq7kjx7iam70ssfjs4p10kl96zc-systemd-247.6-dev/share/pkgconfig:/nix/store/cb063a2s6bpvk34gdd1rs9wjpwchl7qq-libkrb5-1.18-dev/lib/pkgconfig:/nix/store/b3syjj323dlxjs9bsx2m9f8w108n39ym-libossp-uuid-1.6.2/lib/pkgconfig:/nix/store/ysjpybla5ld585zx20b9dpmc4axajw32-icu4c-69.1-dev/lib/pkgconfig'\0" ;
 pub const DEF_PGPORT: u32 = 28813;
 pub const DEF_PGPORT_STR: &'static [u8; 6usize] = b"28813\0";
 pub const ENABLE_THREAD_SAFETY: u32 = 1;
@@ -328,7 +328,7 @@ pub const PG_USE_STDBOOL: u32 = 1;
 pub const PG_VERSION: &'static [u8; 5usize] = b"13.3\0";
 pub const PG_VERSION_NUM: u32 = 130003;
 pub const PG_VERSION_STR: &'static [u8; 77usize] =
-    b"PostgreSQL 13.3 on x86_64-pc-linux-gnu, compiled by gcc (GCC) 10.2.0, 64-bit\0";
+    b"PostgreSQL 13.3 on x86_64-pc-linux-gnu, compiled by gcc (GCC) 10.3.0, 64-bit\0";
 pub const RELSEG_SIZE: u32 = 131072;
 pub const SIZEOF_BOOL: u32 = 1;
 pub const SIZEOF_LONG: u32 = 8;
