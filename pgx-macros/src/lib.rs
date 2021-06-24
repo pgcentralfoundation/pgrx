@@ -527,6 +527,8 @@ pub fn extension_sql(input: TokenStream) -> TokenStream {
             pgx::inventory::submit! {
                 crate::__pgx_internals::ExtensionSql(pgx_utils::pg_inventory::ExtensionSql {
                     sql: #sql,
+                    module_path: module_path!(),
+                    full_path: concat!(file!(), ':', line!()),
                     file: file!(),
                     line: line!(),
                 })
