@@ -80,10 +80,10 @@ impl<'a> PgxSql<'a> {
     }
 
     #[instrument(level = "info", skip(self))]
-    pub fn schema_alias_of(&self, module_path: &'static str) -> Option<String> {
+    pub fn schema_alias_of(&self, module_path: impl AsRef<str> + Debug) -> Option<String> {
         let mut needle = None;
         for (_full_path, item) in &self.schemas {
-            if item.module_path.starts_with(module_path) {
+            if item.module_path.starts_with(module_path.as_ref()) {
                 needle = Some(item.name.to_string());
                 break;
             }
@@ -91,9 +91,8 @@ impl<'a> PgxSql<'a> {
         needle
     }
 
-    #[instrument(level = "info", skip(self))]
-    pub fn schema_prefix_for(&self, module_path: &'static str) -> String {
-        self.schema_alias_of(module_path).or_else(|| {
+    pub fn schema_prefix_for(&self, module_path: impl AsRef<str> + Debug) -> String {
+        self.schema_alias_of(module_path.as_ref()).or_else(|| {
             self.control.schema.clone()
         }).map(|v| (v + ".").to_string()).unwrap_or_else(|| "".to_string())
     }
@@ -268,9 +267,10 @@ impl<'a> PgxSql<'a> {
                                  for (idx, arg) in item.fn_args.iter().enumerate() {
                                      let needs_comma = idx < (item.fn_args.len() - 1);
                                      let buf = format!("\
-                                            \t\"{pattern}\" {sql_type}{default}{maybe_comma}/* {ty_name} */\
+                                            \t\"{pattern}\" {schema_prefix}{sql_type}{default}{maybe_comma}/* {ty_name} */\
                                         ",
                                                        pattern = arg.pattern,
+                                                       schema_prefix = self.schema_prefix_for(arg.module_path.clone()),
                                                        sql_type = self.type_id_to_sql_type(arg.ty_id).ok_or_else(|| eyre_err!("Failed to map argument `{}` type `{}` to SQL type while building function `{}`.", arg.pattern, arg.ty_name, item.name))?,
                                                        default = if let Some(def) = arg.default { format!(" DEFAULT {}", def) } else { String::from("") },
                                                        maybe_comma = if needs_comma { ", " } else { " " },
@@ -282,14 +282,27 @@ impl<'a> PgxSql<'a> {
                              } else { Default::default() },
                              returns = match &item.fn_return {
                                  InventoryPgExternReturn::None => String::from("RETURNS void"),
-                                 InventoryPgExternReturn::Type { id, name } => format!("RETURNS {} /* {} */", self.type_id_to_sql_type(*id).ok_or_else(|| eyre_err!("Failed to map return type `{}` to SQL type while building function `{}`.", name, item.name))?, name),
-                                 InventoryPgExternReturn::SetOf { id, name } => format!("RETURNS SETOF {} /* {} */", self.type_id_to_sql_type(*id).ok_or_else(|| eyre_err!("Failed to map return type `{}` to SQL type while building function `{}`.", name, item.name))?, name),
+                                 InventoryPgExternReturn::Type { id, name, module_path } => {
+                                     format!("RETURNS {schema_prefix}{sql_type} /* {name} */",
+                                             sql_type = self.type_id_to_sql_type(*id).ok_or_else(|| eyre_err!("Failed to map return type `{}` to SQL type while building function `{}`.", name, item.name))?,
+                                             schema_prefix = self.schema_prefix_for(module_path.clone()),
+                                             name = name
+                                     )
+                                 },
+                                 InventoryPgExternReturn::SetOf { id, name, module_path } => {
+                                     format!("RETURNS SETOF {schema_prefix}{sql_type} /* {name} */",
+                                             sql_type = self.type_id_to_sql_type(*id).ok_or_else(|| eyre_err!("Failed to map return type `{}` to SQL type while building function `{}`.", name, item.name))?,
+                                             schema_prefix = self.schema_prefix_for(module_path.clone()),
+                                             name = name
+                                     )
+                                 },
                                  InventoryPgExternReturn::Iterated(table_items) => {
                                      let mut items = String::new();
-                                     for (idx, (id, ty_name, col_name)) in table_items.iter().enumerate() {
+                                     for (idx, (id, ty_name, module_path, col_name)) in table_items.iter().enumerate() {
                                          let needs_comma = idx < (table_items.len() - 1);
-                                         let item = format!("\n\t{} {ty_resolved}{needs_comma} /* {ty_name} */",
+                                         let item = format!("\n\t{col_name} {schema_prefix}{ty_resolved}{needs_comma} /* {ty_name} */",
                                                             col_name = col_name.unwrap(),
+                                                            schema_prefix = self.schema_prefix_for(module_path.clone()),
                                                             ty_resolved = self.type_id_to_sql_type(*id).unwrap_or_else(|| ty_name.to_string()),
                                                             needs_comma = if needs_comma { ", " } else { " " },
                                                             ty_name = ty_name
@@ -364,8 +377,8 @@ impl<'a> PgxSql<'a> {
                                         -- {module_path}::{name}\n\
                                         CREATE OPERATOR {opname} (\n\
                                             \tPROCEDURE=\"{name}\",\n\
-                                            \tLEFTARG={left_arg}, /* {left_name} */\n\
-                                            \tRIGHTARG={right_arg} /* {right_name} */\n\
+                                            \tLEFTARG={schema_prefix_left}{left_arg}, /* {left_name} */\n\
+                                            \tRIGHTARG={schema_prefix_right}{right_arg}{maybe_comma} /* {right_name} */\n\
                                             {optionals}\
                                         );
                                     ",
@@ -376,8 +389,11 @@ impl<'a> PgxSql<'a> {
                                            module_path = item.module_path,
                                            left_name = left_arg.ty_name,
                                            right_name = right_arg.ty_name,
+                                           schema_prefix_left = self.schema_prefix_for(left_arg.module_path.clone()),
                                            left_arg = self.type_id_to_sql_type(left_arg.ty_id).ok_or_else(|| eyre_err!("Failed to map argument `{}` type `{}` to SQL type while building operator `{}`.", left_arg.pattern, left_arg.ty_name, item.name))?,
+                                           schema_prefix_right = self.schema_prefix_for(right_arg.module_path.clone()),
                                            right_arg = self.type_id_to_sql_type(right_arg.ty_id).ok_or_else(|| eyre_err!("Failed to map argument `{}` type `{}` to SQL type while building operator `{}`.", right_arg.pattern, right_arg.ty_name, item.name))?,
+                                           maybe_comma = if optionals.len() >= 1 { "," } else { "" },
                                            optionals = optionals.join(",\n") + "\n"
                 );
                 tracing::debug!(operator = %operator_sql);
@@ -396,20 +412,38 @@ impl<'a> PgxSql<'a> {
         // - CREATE FUNCTION _out;
         // - CREATE TYPE (...);
 
-        let in_fn_path = format!("{}::{}", item.module_path, item.in_fn);
+        let in_fn_module_path = if !item.in_fn_module_path.is_empty() {
+            item.in_fn_module_path.clone()
+        } else {
+            item.module_path.to_string() // Presume a local
+        };
+        let in_fn_path = format!("{module_path}{maybe_colons}{in_fn}",
+                                  module_path = in_fn_module_path,
+                                  maybe_colons = if !in_fn_module_path.is_empty() { "::" } else { "" },
+                                  in_fn = item.in_fn,
+        );
         let (_, in_fn) = self.externs.iter().find(|(k, _v)| {
             tracing::trace!(%k, %in_fn_path, "Checked");
             **k == in_fn_path.as_str()
-        }).ok_or_else(|| eyre::eyre!("Did not find `in_fn`."))?;
+        }).ok_or_else(|| eyre::eyre!("Did not find `in_fn: {}`.", in_fn_path))?;
         tracing::debug!(in_fn = ?in_fn_path, "Found matching `in_fn`");
         let in_fn_sql = self.inventory_extern_to_sql(in_fn)?;
         tracing::debug!(%in_fn_sql);
 
-        let out_fn_path = format!("{}::{}", item.module_path, item.out_fn);
+        let out_fn_module_path = if !item.out_fn_module_path.is_empty() {
+            item.out_fn_module_path.clone()
+        } else {
+            item.module_path.to_string() // Presume a local
+        };
+        let out_fn_path = format!("{module_path}{maybe_colons}{out_fn}",
+                                  module_path = out_fn_module_path,
+                                  maybe_colons = if !out_fn_module_path.is_empty() { "::" } else { "" },
+                                  out_fn = item.out_fn,
+        );
         let (_, out_fn) = self.externs.iter().find(|(k, _v)| {
             tracing::trace!(%k, %out_fn_path, "Checked");
             **k == out_fn_path.as_str()
-        }).ok_or_else(|| eyre::eyre!("Did not find `out_fn`."))?;
+        }).ok_or_else(|| eyre::eyre!("Did not find `out_fn: {}`.", out_fn_path))?;
         tracing::debug!(out_fn = ?out_fn_path, "Found matching `out_fn`");
         let out_fn_sql = self.inventory_extern_to_sql(out_fn)?;
         tracing::debug!(%out_fn_sql);
@@ -432,8 +466,8 @@ impl<'a> PgxSql<'a> {
                                 -- {full_path} - {id:?}\n\
                                 CREATE TYPE {schema}{name} (\n\
                                     \tINTERNALLENGTH = variable,\n\
-                                    \tINPUT = {in_fn}, /* {in_fn_path} */\n\
-                                    \tOUTPUT = {out_fn}, /* {out_fn_path} */\n\
+                                    \tINPUT = {schema_prefix_in_fn}{in_fn}, /* {in_fn_path} */\n\
+                                    \tOUTPUT = {schema_prefix_out_fn}{out_fn}, /* {out_fn_path} */\n\
                                     \tSTORAGE = extended\n\
                                 );
                             ",
@@ -443,8 +477,10 @@ impl<'a> PgxSql<'a> {
                                         schema = self.schema_prefix_for(item.module_path),
                                         id = item.id,
                                         name = item.name,
+                                        schema_prefix_in_fn = self.schema_prefix_for(in_fn_module_path.clone()),
                                         in_fn = item.in_fn,
                                         in_fn_path = in_fn_path,
+                                        schema_prefix_out_fn = self.schema_prefix_for(out_fn_module_path.clone()),
                                         out_fn = item.out_fn,
                                         out_fn_path = out_fn_path,
         );
@@ -480,11 +516,11 @@ impl<'a> PgxSql<'a> {
                             -- {id:?}\n\
                             CREATE OPERATOR FAMILY {name}_btree_ops USING btree;\n\
                             CREATE OPERATOR CLASS {name}_btree_ops DEFAULT FOR TYPE {name} USING btree FAMILY {name}_btree_ops AS\n\
-                                  \tOPERATOR 1 < ,\n\
-                                  \tOPERATOR 2 <= ,\n\
-                                  \tOPERATOR 3 = ,\n\
-                                  \tOPERATOR 4 >= ,\n\
-                                  \tOPERATOR 5 > ,\n\
+                                  \tOPERATOR 1 <,\n\
+                                  \tOPERATOR 2 <=,\n\
+                                  \tOPERATOR 3 =,\n\
+                                  \tOPERATOR 4 >=,\n\
+                                  \tOPERATOR 5 >,\n\
                                   \tFUNCTION 1 {name}_cmp({name}, {name});\n\
                             ",
                                   name = item.name,

@@ -142,6 +142,12 @@ impl ToTokens for Argument {
                 pattern: stringify!(#pat),
                 ty_id: TypeId::of::<#ty>(),
                 ty_name: core::any::type_name::<#ty>(),
+                module_path: {
+                    let ty_name = core::any::type_name::<#ty>();
+                    let mut path_items: Vec<_> = ty_name.split("::").collect();
+                    let _ = path_items.pop(); // Drop the one we don't want.
+                    path_items.join("::")
+                },
                 is_optional: #is_optional,
                 default: None#( .unwrap_or(Some(#default)) )*,
             }
@@ -172,6 +178,7 @@ pub struct InventoryPgExternInput {
     pub pattern: &'static str,
     pub ty_id: core::any::TypeId,
     pub ty_name: &'static str,
+    pub module_path: String,
     pub is_optional: bool,
     pub default: Option<&'static str>,
 }

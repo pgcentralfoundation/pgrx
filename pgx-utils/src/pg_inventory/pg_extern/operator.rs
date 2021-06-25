@@ -57,8 +57,9 @@ impl Parse for PgxOperatorAttributeWithIdent {
 impl ToTokens for PgxOperatorAttributeWithIdent {
     fn to_tokens(&self, tokens: &mut TokenStream2) {
         let fn_name = &self.fn_name;
+        let operator = fn_name.to_string().replace(" ", "");
         let quoted = quote! {
-            stringify!(#fn_name)
+            #operator
         };
         tokens.append_all(quoted);
     }

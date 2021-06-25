@@ -106,12 +106,24 @@ impl ToTokens for Returning {
                 pgx_utils::pg_inventory::InventoryPgExternReturn::Type {
                     id: TypeId::of::<#ty>(),
                     name: core::any::type_name::<#ty>(),
+                    module_path: {
+                        let type_name = core::any::type_name::<#ty>();
+                        let mut path_items: Vec<_> = type_name.split("::").collect();
+                        let _ = path_items.pop(); // Drop the one we don't want.
+                        path_items.join("::")
+                    },
                 }
             },
             Returning::SetOf(ty) => quote! {
                 pgx_utils::pg_inventory::InventoryPgExternReturn::SetOf {
                     id: TypeId::of::<#ty>(),
                     name: core::any::type_name::<#ty>(),
+                    module_path: {
+                        let type_name = core::any::type_name::<#ty>();
+                        let mut path_items: Vec<_> = type_name.split("::").collect();
+                        let _ = path_items.pop(); // Drop the one we don't want.
+                        path_items.join("::")
+                    }
                 }
             },
             Returning::Iterated(items) => {
@@ -123,6 +135,12 @@ impl ToTokens for Returning {
                             (
                                 TypeId::of::<#ty>(),
                                 core::any::type_name::<#ty>(),
+                                out_fn_module_path: {
+                                    let type_name = core::any::type_name::<#ty>();
+                                    let mut path_items: Vec<_> = type_name.split("::").collect();
+                                    let _ = path_items.pop(); // Drop the one we don't want.
+                                    path_items.join("::")
+                                },
                                 None#( .unwrap_or(Some(stringify!(#name_iter))) )*,
                             )
                         }
@@ -171,11 +189,13 @@ pub enum InventoryPgExternReturn {
     Type {
         id: core::any::TypeId,
         name: &'static str,
+        module_path: String,
     },
     SetOf {
         id: core::any::TypeId,
         name: &'static str,
+        module_path: String,
     },
-    Iterated(Vec<(core::any::TypeId, &'static str, Option<&'static str>)>),
+    Iterated(Vec<(core::any::TypeId, &'static str, String, Option<&'static str>)>),
     Trigger,
 }

@@ -47,7 +47,19 @@ impl ToTokens for PostgresType {
                     option_array_id: *WithArrayTypeId::<#name>::OPTION_ARRAY_ID,
                     varlena_id: *WithVarlenaTypeId::<#name>::VARLENA_ID,
                     in_fn: stringify!(#in_fn),
+                    in_fn_module_path: {
+                        let in_fn = stringify!(#in_fn);
+                        let mut path_items: Vec<_> = in_fn.split("::").collect();
+                        let _ = path_items.pop(); // Drop the one we don't want.
+                        path_items.join("::")
+                    },
                     out_fn: stringify!(#out_fn),
+                    out_fn_module_path: {
+                        let out_fn = stringify!(#out_fn);
+                        let mut path_items: Vec<_> = out_fn.split("::").collect();
+                        let _ = path_items.pop(); // Drop the one we don't want.
+                        path_items.join("::")
+                    }
                 })
             }
         };
@@ -70,5 +82,7 @@ pub struct InventoryPostgresType {
     pub option_array_id: Option<core::any::TypeId>,
     pub varlena_id: Option<core::any::TypeId>,
     pub in_fn: &'static str,
+    pub in_fn_module_path: String,
     pub out_fn: &'static str,
+    pub out_fn_module_path: String,
 }

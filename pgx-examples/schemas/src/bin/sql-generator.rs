@@ -27,7 +27,7 @@ fn main() -> color_eyre::Result<()> {
         return Err(eyre::eyre!("Only accepts one argument, the destination path."));
     }
 
-    schemas::info!(path = %path, "Writing SQL.");
-    errors::generate_sql()?.to_file(path)?;
+    tracing::info!(path = %path, "Writing SQL.");
+    schemas::generate_sql()?.to_file(path)?;
     Ok(())
 }
