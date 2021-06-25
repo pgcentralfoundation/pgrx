@@ -1,8 +1,11 @@
 use ::pgx_utils::pg_inventory::{
     tracing_error::ErrorLayer,
-    tracing_subscriber::{self, util::SubscriberInitExt, layer::SubscriberExt, fmt, EnvFilter, Registry},
+    tracing,
+    tracing_subscriber::{self, util::SubscriberInitExt, layer::SubscriberExt, EnvFilter},
     color_eyre,
+    eyre,
 };
+use std::env;
 
 fn main() -> color_eyre::Result<()> {
     // Initialize tracing with tracing-error.
@@ -18,6 +21,13 @@ fn main() -> color_eyre::Result<()> {
 
     color_eyre::install()?;
 
-    schemas::generate_sql()?.to_file("sql/schemas.sql")?;
+    let mut args = env::args().skip(1);
+    let path = args.next().unwrap_or("./sql/schemas.sql".into());
+    if args.next().is_some() {
+        return Err(eyre::eyre!("Only accepts one argument, the destination path."));
+    }
+
+    schemas::info!(path = %path, "Writing SQL.");
+    errors::generate_sql()?.to_file(path)?;
     Ok(())
 }

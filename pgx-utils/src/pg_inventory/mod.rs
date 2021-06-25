@@ -197,7 +197,7 @@ impl<'a> PgxSql<'a> {
                                   file = item.file,
                                   line = item.line,
                                   name = item.name,
-                                  variants = item.variants.iter().map(|variant| format!("\t'{}',\n", variant)).collect::<String>(),
+                                  variants = item.variants.iter().map(|variant| format!("\t'{}'\n", variant)).collect::<Vec<_>>().join(","),
             ));
         }
         buf
@@ -269,11 +269,11 @@ impl<'a> PgxSql<'a> {
                                  for (idx, arg) in item.fn_args.iter().enumerate() {
                                      let needs_comma = idx < (item.fn_args.len() - 1);
                                      let buf = format!("\
-                                            \t\"{pattern}\" {sql_type} {default}{maybe_comma}/* {ty_name} */\
+                                            \t\"{pattern}\" {sql_type}{default}{maybe_comma}/* {ty_name} */\
                                         ",
                                                        pattern = arg.pattern,
                                                        sql_type = self.type_id_to_sql_type(arg.ty_id).ok_or_else(|| eyre_err!("Failed to map argument `{}` type `{}` to SQL type while building function `{}`.", arg.pattern, arg.ty_name, item.name))?,
-                                                       default = if let Some(def) = arg.default { format!("DEFAULT {}", def) } else { String::from("") },
+                                                       default = if let Some(def) = arg.default { format!(" DEFAULT {}", def) } else { String::from("") },
                                                        maybe_comma = if needs_comma { ", " } else { " " },
                                                        ty_name = arg.ty_name,
                                      );
@@ -285,9 +285,20 @@ impl<'a> PgxSql<'a> {
                                  InventoryPgExternReturn::None => String::from("RETURNS void"),
                                  InventoryPgExternReturn::Type { id, name } => format!("RETURNS {} /* {} */", self.type_id_to_sql_type(*id).ok_or_else(|| eyre_err!("Failed to map return type `{}` to SQL type while building function `{}`.", name, item.name))?, name),
                                  InventoryPgExternReturn::SetOf { id, name } => format!("RETURNS SETOF {} /* {} */", self.type_id_to_sql_type(*id).ok_or_else(|| eyre_err!("Failed to map return type `{}` to SQL type while building function `{}`.", name, item.name))?, name),
-                                 InventoryPgExternReturn::Iterated(vec) => format!("RETURNS TABLE ({}\n)",
-                                                                                   vec.iter().map(|(id, ty_name, col_name)| format!("\n\t\"{}\" {} /* {} */", col_name.unwrap(), self.type_id_to_sql_type(*id).unwrap_or_else(|| ty_name.to_string()), ty_name)).collect::<Vec<_>>().join(",")
-                                 ),
+                                 InventoryPgExternReturn::Iterated(table_items) => {
+                                     let mut items = String::new();
+                                     for (idx, (id, ty_name, col_name)) in table_items.iter().enumerate() {
+                                         let needs_comma = idx < (table_items.len() - 1);
+                                         let item = format!("\n\t{} {ty_resolved}{needs_comma} /* {ty_name} */",
+                                                            col_name = col_name.unwrap(),
+                                                            ty_resolved = self.type_id_to_sql_type(*id).unwrap_or_else(|| ty_name.to_string()),
+                                                            needs_comma = if needs_comma { ", " } else { " " },
+                                                            ty_name = ty_name
+                                         );
+                                         items.push_str(&item);
+                                     }
+                                     format!("RETURNS TABLE ({}\n)", items)
+                                 },
                                  InventoryPgExternReturn::Trigger => String::from("RETURNS trigger"),
                              },
                              search_path = if let Some(search_path) = &item.search_path {
@@ -355,7 +366,7 @@ impl<'a> PgxSql<'a> {
                                         CREATE OPERATOR {opname} (\n\
                                             \tPROCEDURE=\"{name}\",\n\
                                             \tLEFTARG={left_arg}, /* {left_name} */\n\
-                                            \tRIGHTARG={right_arg}, /* {right_name} */\n\
+                                            \tRIGHTARG={right_arg} /* {right_name} */\n\
                                             {optionals}\
                                         );
                                     ",

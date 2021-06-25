@@ -83,8 +83,9 @@ impl Parse for PgxOperatorOpName {
 impl ToTokens for PgxOperatorOpName {
     fn to_tokens(&self, tokens: &mut TokenStream2) {
         let op_name = &self.op_name;
+        let op_string = op_name.to_string().replacen(" ", "", 256);
         let quoted = quote! {
-            stringify!(#op_name)
+            #op_string
         };
         tokens.append_all(quoted);
     }
