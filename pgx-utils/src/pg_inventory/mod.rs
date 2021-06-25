@@ -34,8 +34,7 @@ pub use tracing_error;
 #[doc(hidden)]
 pub use tracing_subscriber;
 
-use tracing::{instrument, span, Level};
-
+use tracing::instrument;
 use std::collections::HashMap;
 use core::{any::TypeId, fmt::Debug};
 use crate::ExternArgs;
@@ -398,7 +397,7 @@ impl<'a> PgxSql<'a> {
         // - CREATE TYPE (...);
 
         let in_fn_path = format!("{}::{}", item.module_path, item.in_fn);
-        let (_, in_fn) = self.externs.iter().find(|(k, v)| {
+        let (_, in_fn) = self.externs.iter().find(|(k, _v)| {
             tracing::trace!(%k, %in_fn_path, "Checked");
             **k == in_fn_path.as_str()
         }).ok_or_else(|| eyre::eyre!("Did not find `in_fn`."))?;
@@ -407,7 +406,7 @@ impl<'a> PgxSql<'a> {
         tracing::debug!(%in_fn_sql);
 
         let out_fn_path = format!("{}::{}", item.module_path, item.out_fn);
-        let (_, out_fn) = self.externs.iter().find(|(k, v)| {
+        let (_, out_fn) = self.externs.iter().find(|(k, _v)| {
             tracing::trace!(%k, %out_fn_path, "Checked");
             **k == out_fn_path.as_str()
         }).ok_or_else(|| eyre::eyre!("Did not find `out_fn`."))?;

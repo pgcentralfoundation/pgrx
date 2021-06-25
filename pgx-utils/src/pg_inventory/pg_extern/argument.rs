@@ -143,7 +143,7 @@ impl ToTokens for Argument {
                 ty_id: TypeId::of::<#ty>(),
                 ty_name: core::any::type_name::<#ty>(),
                 is_optional: #is_optional,
-                default: None#( .unwrap_or(Some(stringify!(#default))) )*,
+                default: None#( .unwrap_or(Some(#default)) )*,
             }
         };
         tokens.append_all(quoted);
