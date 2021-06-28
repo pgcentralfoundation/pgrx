@@ -371,37 +371,9 @@ macro_rules! pg_module_magic {
             pub struct Schema(pub pgx_utils::pg_inventory::InventorySchema);
             inventory::collect!(Schema);
 
-            #[derive(Debug)]
-            pub enum LoadOrderError {
-                NoListing,
-                Missing(&'static str),
-            }
-
-            impl ::std::fmt::Display for LoadOrderError {
-                fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                    match self {
-                        LoadOrderError::NoListing => write!(f, "No `load-order.txt` file found or empty."),
-                        LoadOrderError::Missing(field) => write!(f, "File from `load-order.txt` does not exist: `{}`.", field),
-                    }
-                }
-            }
-
-            impl ::std::error::Error for LoadOrderError {}
-
             pub fn generate_sql() -> pgx_utils::pg_inventory::eyre::Result<PgxSql<'static>> {
                 use std::fmt::Write;
                 let mut generated = PgxSql {
-                    load_order: {
-                        let mut mapping = HashMap::default();
-                        let listing = LOAD_ORDER_DIR.get_file("load-order.txt").ok_or(LoadOrderError::NoListing)?;
-                        let listing_str = listing.contents_utf8().ok_or(LoadOrderError::NoListing)?;
-                        for item in listing_str.lines() {
-                            let item_content = LOAD_ORDER_DIR.get_file(item).ok_or(LoadOrderError::Missing(item))?;
-                            let item_str = item_content.contents_utf8().unwrap_or_default();
-                            mapping.insert(item, item_str);
-                        }
-                        mapping
-                    },
                     control: ControlFile::try_from(CONTROL_FILE)?,
                     type_mappings: pgx::DEFAULT_TYPEID_SQL_MAPPING.clone(),
                     schemas: inventory::iter::<Schema>().map(|i| (i.0.module_path, &i.0)).collect(),
