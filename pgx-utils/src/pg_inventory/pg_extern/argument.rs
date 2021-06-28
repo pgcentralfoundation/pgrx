@@ -149,7 +149,7 @@ impl ToTokens for Argument {
                     path_items.join("::")
                 },
                 is_optional: #is_optional,
-                default: None#( .unwrap_or(Some(#default)) )*,
+                default: None#( .unwrap_or(Some(stringify!(#default))) )*,
             }
         };
         tokens.append_all(quoted);

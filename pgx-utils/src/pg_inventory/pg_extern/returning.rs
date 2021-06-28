@@ -135,7 +135,7 @@ impl ToTokens for Returning {
                             (
                                 TypeId::of::<#ty>(),
                                 core::any::type_name::<#ty>(),
-                                out_fn_module_path: {
+                                {
                                     let type_name = core::any::type_name::<#ty>();
                                     let mut path_items: Vec<_> = type_name.split("::").collect();
                                     let _ = path_items.pop(); // Drop the one we don't want.
@@ -171,6 +171,7 @@ impl Parse for NameMacro {
     fn parse(input: ParseStream) -> Result<Self, syn::Error> {
         Ok(Self {
             ident: input.parse::<syn::Ident>().map(|v| v.to_string())
+                // Avoid making folks unable to use rust keywords.
                 .or_else(|_| input.parse::<syn::Token![type]>().map(|_| String::from("type")))
                 .or_else(|_| input.parse::<syn::Token![mod]>().map(|_| String::from("mod")))
                 .or_else(|_| input.parse::<syn::Token![extern]>().map(|_| String::from("extern")))
