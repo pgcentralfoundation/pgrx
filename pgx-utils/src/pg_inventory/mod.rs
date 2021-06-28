@@ -92,9 +92,8 @@ impl<'a> PgxSql<'a> {
     }
 
     pub fn schema_prefix_for(&self, module_path: impl AsRef<str> + Debug) -> String {
-        self.schema_alias_of(module_path.as_ref()).or_else(|| {
-            self.control.schema.clone()
-        }).map(|v| (v + ".").to_string()).unwrap_or_else(|| "".to_string())
+        self.schema_alias_of(module_path.as_ref())
+            .map(|v| (v + ".").to_string()).unwrap_or_else(|| "".to_string())
     }
 
     #[instrument(level = "info", err, skip(self))]
@@ -303,7 +302,7 @@ impl<'a> PgxSql<'a> {
                                          let item = format!("\n\t{col_name} {schema_prefix}{ty_resolved}{needs_comma} /* {ty_name} */",
                                                             col_name = col_name.unwrap(),
                                                             schema_prefix = self.schema_prefix_for(module_path.clone()),
-                                                            ty_resolved = self.type_id_to_sql_type(*id).unwrap_or_else(|| ty_name.to_string()),
+                                                            ty_resolved = self.type_id_to_sql_type(*id).ok_or_else(|| eyre_err!("Failed to map return type `{}` to SQL type while building function `{}`.", ty_name, item.name))?,
                                                             needs_comma = if needs_comma { ", " } else { " " },
                                                             ty_name = ty_name
                                          );

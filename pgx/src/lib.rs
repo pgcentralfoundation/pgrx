@@ -276,6 +276,13 @@ pub static DEFAULT_TYPEID_SQL_MAPPING: Lazy<HashMap<TypeId, String>> = Lazy::new
     m.insert(TypeId::of::<rel::PgRelation>(), String::from("regclass"));
     m.insert(TypeId::of::<Option<rel::PgRelation>>(), String::from("regclass"));
 
+    m.insert(TypeId::of::<Option<datum::Inet>>(), String::from("inet"));
+    m.insert(TypeId::of::<datum::Inet>(), String::from("inet"));
+    m.insert(TypeId::of::<Vec<Option<datum::Inet>>>(), String::from("inet[]"));
+    m.insert(TypeId::of::<Vec<datum::Inet>>(), String::from("inet[]"));
+    m.insert(TypeId::of::<Option<Vec<Option<datum::Inet>>>>(), String::from("inet[]"));
+    m.insert(TypeId::of::<Option<Vec<datum::Inet>>>(), String::from("inet[]"));
+
     m
 });
 
