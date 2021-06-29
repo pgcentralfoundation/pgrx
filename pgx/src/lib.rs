@@ -373,18 +373,18 @@ macro_rules! pg_module_magic {
 
             pub fn generate_sql() -> pgx_utils::pg_inventory::eyre::Result<PgxSql<'static>> {
                 use std::fmt::Write;
-                let mut generated = PgxSql {
-                    control: ControlFile::try_from(CONTROL_FILE)?,
-                    type_mappings: pgx::DEFAULT_TYPEID_SQL_MAPPING.clone(),
-                    schemas: inventory::iter::<Schema>().map(|i| (i.0.module_path, &i.0)).collect(),
-                    extension_sql: inventory::iter::<ExtensionSql>().map(|i| (i.0.full_path, &i.0)).collect(),
-                    externs: inventory::iter::<PgExtern>().map(|i| (i.0.full_path, &i.0)).collect(),
-                    types: inventory::iter::<PostgresType>().map(|i| (i.0.full_path, &i.0)).collect(),
-                    enums: inventory::iter::<PostgresEnum>().map(|i| (i.0.full_path, &i.0)).collect(),
-                    hashes: inventory::iter::<PostgresHash>().map(|i| (i.0.full_path, &i.0)).collect(),
-                    ords: inventory::iter::<PostgresOrd>().map(|i| (i.0.full_path, &i.0)).collect(),
-                };
-                generated.register_types();
+                let mut generated = PgxSql::build(
+                    ControlFile::try_from(CONTROL_FILE)?,
+                    pgx::DEFAULT_TYPEID_SQL_MAPPING.clone(),
+                    inventory::iter::<Schema>().map(|i| (i.0.module_path, &i.0)).collect(),
+                    inventory::iter::<ExtensionSql>().map(|i| (i.0.full_path, &i.0)).collect(),
+                    inventory::iter::<PgExtern>().map(|i| (i.0.full_path, &i.0)).collect(),
+                    inventory::iter::<PostgresType>().map(|i| (i.0.full_path, &i.0)).collect(),
+                    inventory::iter::<PostgresEnum>().map(|i| (i.0.full_path, &i.0)).collect(),
+                    inventory::iter::<PostgresOrd>().map(|i| (i.0.full_path, &i.0)).collect(),
+                    inventory::iter::<PostgresHash>().map(|i| (i.0.full_path, &i.0)).collect(),
+                );
+
 
                 Ok(generated)
             }

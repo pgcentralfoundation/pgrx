@@ -39,6 +39,7 @@ use std::collections::HashMap;
 use core::{any::TypeId, fmt::Debug};
 use crate::ExternArgs;
 use eyre::eyre as eyre_err;
+use petgraph::{Graph, visit::IntoNodeReferences};
 
 #[derive(Debug, Clone)]
 pub struct ExtensionSql {
@@ -53,16 +54,141 @@ pub struct ExtensionSql {
 pub struct PgxSql<'a> {
     pub type_mappings: HashMap<TypeId, String>,
     pub control: ControlFile,
+    pub graph: Graph<SqlGraphEntity<'a>, SqlGraphRelationship>,
     pub schemas: HashMap<&'a str, &'a InventorySchema>,
-    pub extension_sql: HashMap<&'a str, &'a ExtensionSql>,
+    pub extension_sqls: HashMap<&'a str, &'a ExtensionSql>,
     pub externs: HashMap<&'a str, &'a InventoryPgExtern>,
     pub types: HashMap<&'a str, &'a InventoryPostgresType>,
     pub enums: HashMap<&'a str, &'a InventoryPostgresEnum>,
     pub ords: HashMap<&'a str, &'a InventoryPostgresOrd>,
-    pub hashes: HashMap<&'a str, &'a InventoryPostgresHash>
+    pub hashes: HashMap<&'a str, &'a InventoryPostgresHash>,
+}
+
+#[derive(Debug, Clone)]
+pub enum SqlGraphEntity<'a> {
+    Schema(&'a InventorySchema),
+    CustomSql(&'a ExtensionSql),
+    Function(&'a InventoryPgExtern),
+    Type(&'a InventoryPostgresType),
+    Enum(&'a InventoryPostgresEnum),
+    Ord(&'a InventoryPostgresOrd),
+    Hash(&'a InventoryPostgresHash),
+}
+use SqlGraphEntity::*;
+
+impl<'a> From<&'a InventorySchema> for SqlGraphEntity<'a> {
+    fn from(item: &'a InventorySchema) -> Self {
+        SqlGraphEntity::Schema(&item)
+    }
+}
+
+impl<'a> From<&'a ExtensionSql> for SqlGraphEntity<'a> {
+    fn from(item: &'a ExtensionSql) -> Self {
+        SqlGraphEntity::CustomSql(&item)
+    }
+}
+
+impl<'a> From<&'a InventoryPgExtern> for SqlGraphEntity<'a> {
+    fn from(item: &'a InventoryPgExtern) -> Self {
+        SqlGraphEntity::Function(&item)
+    }
+}
+
+impl<'a> From<&'a InventoryPostgresType> for SqlGraphEntity<'a> {
+    fn from(item: &'a InventoryPostgresType) -> Self {
+        SqlGraphEntity::Type(&item)
+    }
+}
+
+impl<'a> From<&'a InventoryPostgresEnum> for SqlGraphEntity<'a> {
+    fn from(item: &'a InventoryPostgresEnum) -> Self {
+        SqlGraphEntity::Enum(&item)
+    }
+}
+
+impl<'a> From<&'a InventoryPostgresOrd> for SqlGraphEntity<'a> {
+    fn from(item: &'a InventoryPostgresOrd) -> Self {
+        SqlGraphEntity::Ord(&item)
+    }
+}
+
+impl<'a> From<&'a InventoryPostgresHash> for SqlGraphEntity<'a> {
+    fn from(item: &'a InventoryPostgresHash) -> Self {
+        SqlGraphEntity::Hash(&item)
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Eq, Ord)]
+pub enum SqlGraphRelationship {
+    DependsOn,
+}
+
+
+impl<'a> SqlGraphEntity<'a> {
+    fn to_sql(&self, context: &PgxSql<'a>) -> eyre::Result<String> {
+        let sql = match self {
+            Schema(item) => context.inventory_schema_to_sql(item),
+            CustomSql(item) => context.inventory_extension_sql_to_sql(item),
+            Function(item) => context.inventory_extern_to_sql(item)?,
+            Type(item) => context.inventory_type_to_sql(item)?,
+            Enum(item) => context.inventory_enums_to_sql(item),
+            Ord(item) => context.inventory_ord_to_sql(item),
+            Hash(item) => context.inventory_hash_to_sql(item),
+        };
+        Ok(sql)
+    }
 }
 
 impl<'a> PgxSql<'a> {
+    pub fn build(
+        control: ControlFile,
+        type_mappings: HashMap<TypeId, String>,
+        schemas: HashMap<&'a str, &'a InventorySchema>,
+        extension_sqls: HashMap<&'a str, &'a ExtensionSql>,
+        externs: HashMap<&'a str, &'a InventoryPgExtern>,
+        types: HashMap<&'a str, &'a InventoryPostgresType>,
+        enums: HashMap<&'a str, &'a InventoryPostgresEnum>,
+        ords: HashMap<&'a str, &'a InventoryPostgresOrd>,
+        hashes: HashMap<&'a str, &'a InventoryPostgresHash>,
+    ) -> Self {
+        let mut graph = Graph::new();
+        for (_, &item) in &schemas {
+            graph.add_node(item.into());
+        }
+        for (_, &item) in &extension_sqls {
+            graph.add_node(item.into());
+        }
+        for (_, &item) in &externs {
+            graph.add_node(item.into());
+        }
+        for (_, &item) in &types {
+            graph.add_node(item.into());
+        }
+        for (_, &item) in &enums {
+            graph.add_node(item.into());
+        }
+        for (_, &item) in &ords {
+            graph.add_node(item.into());
+        }
+        for (_, &item) in &hashes {
+            graph.add_node(item.into());
+        }
+        let mut this = Self {
+            type_mappings,
+            control,
+            schemas,
+            extension_sqls,
+            externs,
+            types,
+            enums,
+            ords,
+            hashes,
+            graph,
+        };
+        this.register_types();
+        this
+    }
+
     #[instrument(level = "info", err, skip(self))]
     pub fn to_file(self, file: impl AsRef<str> + Debug) -> eyre::Result<()> {
         use std::{fs::{File, create_dir_all}, path::Path, io::Write};
@@ -98,37 +224,27 @@ impl<'a> PgxSql<'a> {
     #[instrument(level = "info", err, skip(self))]
     pub fn to_sql(self) -> eyre::Result<String> {
         let sql = format!("\
-                -- This file is auto generated by pgx.\n\
-                -- `extension_sql!()` defined SQL.\n\
-                {extension_sql}\n\
-                -- Schemas defined by `#[pg_schema] mod {{ /* ... */ }}` blocks (except `public` & `pg_catalog`)\n\
-                {schemas}\n\
-                -- Enums derived via `#[derive(PostgresEnum)]`\n\
-                {enums}\n\
-                -- Types defined by `#[derive(PostgresType)]`\n\
-                {types}\n\
-                -- Functions defined by `#[pg_extern]`\n\
-                {externs_with_operators}\n\
-                -- Operator classes defined by `#[derive(PostgresHash, PostgresOrd)]`\n\
-                {operator_classes}\n\
+                /* \
+                   This file is auto generated by pgx.\n\
+                   \n\
+                   The ordering of items is not stable, it is driven by a dependency graph.\n\
+                */
+                {sql}\n\
             ",
-            extension_sql = self.extension_sql(),
-            schemas = self.schemas(),
-            enums = self.enums(),
-            types = self.types()?,
-            externs_with_operators = self.externs_with_operators()?,
-            operator_classes = self.operator_classes(),
+            sql = {
+                let mut sql = String::new();
+                for step in self.walk() {
+                    let item_sql = step.to_sql(&self)?;
+                    sql.push_str(&item_sql)
+                }
+                sql
+            },
         );
         Ok(sql)
     }
 
-    #[instrument(level = "info", skip(self))]
-    fn extension_sql(&self) -> String {
-        let mut buf = String::new();
-        for (_full_path, item) in &self.extension_sql {
-            buf.push_str(&self.inventory_extension_sql_to_sql(item))
-        }
-        buf
+    pub fn walk(&self) -> impl Iterator<Item=&SqlGraphEntity>  + '_ {
+        self.graph.node_references().map(|x| x.1)
     }
 
     #[instrument(level = "info", skip(self, item), fields(item = item.full_path))]
@@ -175,15 +291,6 @@ impl<'a> PgxSql<'a> {
         sql
     }
 
-    #[instrument(level = "info", skip(self))]
-    fn enums(&self) -> String {
-        let mut buf = String::new();
-        for (_full_path, item) in &self.enums {
-            buf.push_str(&self.inventory_enums_to_sql(item));
-        }
-        buf
-    }
-
     #[instrument(level = "info", skip(self, item), fields(item = item.full_path))]
     fn inventory_enums_to_sql(&self, item: &InventoryPostgresEnum) -> String {
         let sql = format!("\
@@ -203,33 +310,6 @@ impl<'a> PgxSql<'a> {
         tracing::debug!(%sql);
         sql
     }
-
-    #[instrument(level = "info", skip(self))]
-    fn externs_with_operators(&self) -> eyre::Result<String> {
-        let mut buf = String::new();
-        for (_full_path, item) in &self.externs {
-            // We need to skip the `in_fn`/`out_fn` functions used by types!
-
-            let is_in_fn = self.types.iter().any(|(_, ty)| {
-                let in_fn_path = format!("{}::{}", ty.module_path, ty.in_fn);
-                item.full_path == in_fn_path.as_str()
-            });
-
-            let is_out_fn = self.types.iter().any(|(_, ty)| {
-                let out_fn_path = format!("{}::{}", ty.module_path, ty.out_fn);
-                item.full_path == out_fn_path.as_str()
-            });
-
-            if is_in_fn || is_out_fn {
-                tracing::trace!(item.full_path, is_in_fn, is_out_fn, "Skipping");
-                continue
-            }
-
-            buf.push_str(&self.inventory_extern_to_sql(item)?);
-        }
-        Ok(buf)
-    }
-
 
     #[instrument(level = "info", err, skip(self, item), fields(item = item.full_path))]
     fn inventory_extern_to_sql(&self, item: &InventoryPgExtern) -> eyre::Result<String> {
@@ -399,17 +479,6 @@ impl<'a> PgxSql<'a> {
         Ok(rendered)
     }
 
-
-    #[instrument(level = "info", err, skip(self))]
-    fn types(&self) -> eyre::Result<String> {
-        let mut buf = String::new();
-        for (_full_path, item) in self.types.clone() {
-            buf.push_str(&self.inventory_type_to_sql(item)?);
-        }
-        Ok(buf)
-    }
-
-
     #[instrument(level = "info", err, skip(self, item), fields(item = item.full_path))]
     fn inventory_type_to_sql(&self, item: &InventoryPostgresType) -> eyre::Result<String> {
         // The `in_fn`/`out_fn` need to be present in a certain order:
@@ -493,18 +562,6 @@ impl<'a> PgxSql<'a> {
         tracing::debug!(sql = %materialized_type);
 
         Ok(shell_type + &in_fn_sql + &out_fn_sql + &materialized_type)
-    }
-
-    #[instrument(level = "info", skip(self))]
-    fn operator_classes(&self) -> String {
-        let mut buf = String::new();
-        for (_full_path, item) in &self.hashes {
-            buf.push_str(&self.inventory_hash_to_sql(item))
-        }
-        for (_full_path, item) in &self.ords {
-            buf.push_str(&self.inventory_ord_to_sql(item))
-        }
-        buf
     }
 
     #[instrument(level = "info", skip(self, item), fields(item = item.full_path))]
