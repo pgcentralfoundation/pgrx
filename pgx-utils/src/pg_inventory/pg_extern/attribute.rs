@@ -29,7 +29,7 @@ impl ToTokens for PgxAttributes {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Hash)]
 pub enum Attribute {
     Immutable,
     Strict,

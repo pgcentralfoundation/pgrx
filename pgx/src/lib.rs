@@ -375,16 +375,15 @@ macro_rules! pg_module_magic {
                 use std::fmt::Write;
                 let mut generated = PgxSql::build(
                     ControlFile::try_from(CONTROL_FILE)?,
-                    pgx::DEFAULT_TYPEID_SQL_MAPPING.clone(),
-                    inventory::iter::<Schema>().map(|i| (i.0.module_path, &i.0)).collect(),
-                    inventory::iter::<ExtensionSql>().map(|i| (i.0.full_path, &i.0)).collect(),
-                    inventory::iter::<PgExtern>().map(|i| (i.0.full_path, &i.0)).collect(),
-                    inventory::iter::<PostgresType>().map(|i| (i.0.full_path, &i.0)).collect(),
-                    inventory::iter::<PostgresEnum>().map(|i| (i.0.full_path, &i.0)).collect(),
-                    inventory::iter::<PostgresOrd>().map(|i| (i.0.full_path, &i.0)).collect(),
-                    inventory::iter::<PostgresHash>().map(|i| (i.0.full_path, &i.0)).collect(),
+                    (*pgx::DEFAULT_TYPEID_SQL_MAPPING).iter().map(|(x, y)| (x.clone(), y.clone())),
+                    inventory::iter::<Schema>().map(|x| &x.0),
+                    inventory::iter::<ExtensionSql>().map(|x| &x.0),
+                    inventory::iter::<PgExtern>().map(|x| &x.0),
+                    inventory::iter::<PostgresType>().map(|x| &x.0),
+                    inventory::iter::<PostgresEnum>().map(|x| &x.0),
+                    inventory::iter::<PostgresOrd>().map(|x| &x.0),
+                    inventory::iter::<PostgresHash>().map(|x| &x.0),
                 );
-
 
                 Ok(generated)
             }

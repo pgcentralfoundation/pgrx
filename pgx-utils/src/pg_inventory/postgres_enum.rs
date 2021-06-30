@@ -50,7 +50,7 @@ impl ToTokens for PostgresEnum {
 }
 
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub struct InventoryPostgresEnum {
     pub name: &'static str,
     pub file: &'static str,

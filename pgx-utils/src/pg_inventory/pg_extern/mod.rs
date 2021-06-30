@@ -185,7 +185,7 @@ impl Parse for PgExtern {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub struct InventoryPgExtern {
     pub name: &'static str,
     pub file: &'static str,

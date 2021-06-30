@@ -48,7 +48,7 @@ impl ToTokens for Schema {
 }
 
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub struct InventorySchema {
     pub module_path: &'static str,
     pub name: &'static str,

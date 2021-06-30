@@ -34,7 +34,7 @@ impl ToTokens for PostgresHash {
 }
 
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub struct InventoryPostgresHash {
     pub name: &'static str,
     pub file: &'static str,

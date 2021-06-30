@@ -184,7 +184,7 @@ impl Parse for NameMacro {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub enum InventoryPgExternReturn {
     None,
     Type {
