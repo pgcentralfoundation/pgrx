@@ -141,7 +141,7 @@ impl ToTokens for Argument {
             pgx_utils::pg_inventory::InventoryPgExternInput {
                 pattern: stringify!(#pat),
                 ty_id: TypeId::of::<#ty>(),
-                ty_name: core::any::type_name::<#ty>(),
+                full_path: core::any::type_name::<#ty>(),
                 module_path: {
                     let ty_name = core::any::type_name::<#ty>();
                     let mut path_items: Vec<_> = ty_name.split("::").collect();
@@ -177,7 +177,7 @@ impl Parse for DefaultMacro {
 pub struct InventoryPgExternInput {
     pub pattern: &'static str,
     pub ty_id: core::any::TypeId,
-    pub ty_name: &'static str,
+    pub full_path: &'static str,
     pub module_path: String,
     pub is_optional: bool,
     pub default: Option<&'static str>,

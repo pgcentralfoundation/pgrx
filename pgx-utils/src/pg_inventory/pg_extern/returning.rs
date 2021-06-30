@@ -105,7 +105,7 @@ impl ToTokens for Returning {
             Returning::Type(ty) => quote! {
                 pgx_utils::pg_inventory::InventoryPgExternReturn::Type {
                     id: TypeId::of::<#ty>(),
-                    name: core::any::type_name::<#ty>(),
+                    full_path: core::any::type_name::<#ty>(),
                     module_path: {
                         let type_name = core::any::type_name::<#ty>();
                         let mut path_items: Vec<_> = type_name.split("::").collect();
@@ -117,7 +117,7 @@ impl ToTokens for Returning {
             Returning::SetOf(ty) => quote! {
                 pgx_utils::pg_inventory::InventoryPgExternReturn::SetOf {
                     id: TypeId::of::<#ty>(),
-                    name: core::any::type_name::<#ty>(),
+                    full_path: core::any::type_name::<#ty>(),
                     module_path: {
                         let type_name = core::any::type_name::<#ty>();
                         let mut path_items: Vec<_> = type_name.split("::").collect();
@@ -189,12 +189,12 @@ pub enum InventoryPgExternReturn {
     None,
     Type {
         id: core::any::TypeId,
-        name: &'static str,
+        full_path: &'static str,
         module_path: String,
     },
     SetOf {
         id: core::any::TypeId,
-        name: &'static str,
+        full_path: &'static str,
         module_path: String,
     },
     Iterated(Vec<(core::any::TypeId, &'static str, String, Option<&'static str>)>),
