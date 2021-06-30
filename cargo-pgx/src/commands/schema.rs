@@ -11,6 +11,7 @@ pub(crate) fn generate_schema(
     is_release: bool,
     additional_features: &[&str],
     path: impl AsRef<std::path::Path>,
+    dot: Option<impl AsRef<std::path::Path>>,
 ) -> Result<(), std::io::Error> {
     // TODO: Ensure a `src/bin/sql_generator.rs` exists and is up to date.
     let (control_file, _extname) = find_control_file();
@@ -52,6 +53,9 @@ pub(crate) fn generate_schema(
     let _ = path.parent().map(|p| std::fs::create_dir_all(&p).unwrap());
     command.arg("--");
     command.arg(path);
+    if let Some(dot) = dot {
+        command.arg(dot);
+    }
 
     let command = command.stdout(Stdio::inherit()).stderr(Stdio::inherit());
     let command_str = format!("{:?}", command);

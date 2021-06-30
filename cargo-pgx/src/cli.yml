@@ -121,6 +121,10 @@ subcommands:
                     help: additional cargo features to activate (default is '--no-default-features')
                     takes_value: true
                     multiple: true
+                - dot:
+                    long: build-dot
+                    help: A path to output a produced GraphViz DOT file.
+                    takes_value: true
           - dump-schema:
               about: dump the full extension SQL schema file
               args:

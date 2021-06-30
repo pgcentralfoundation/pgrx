@@ -23,11 +23,16 @@ fn main() -> color_eyre::Result<()> {
 
     let mut args = env::args().skip(1);
     let path = args.next().unwrap_or("./sql/bad_ideas.sql".into());
+    let dot: Option<String> = args.next();
     if args.next().is_some() {
-        return Err(eyre::eyre!("Only accepts one argument, the destination path."));
+        return Err(eyre::eyre!("Only accepts two arguments, the destination path, and an optional (GraphViz) dot output path."));
     }
 
     tracing::info!(path = %path, "Writing SQL.");
-    bad_ideas::generate_sql()?.to_file(path)?;
+    let sql = bad_ideas::generate_sql()?;
+    sql.to_file(path)?;
+    if let Some(dot) = dot {
+        sql.to_dot(dot)?;
+    }
     Ok(())
 }
