@@ -39,7 +39,7 @@ use std::collections::HashMap;
 use core::{any::TypeId, fmt::Debug};
 use crate::ExternArgs;
 use eyre::eyre as eyre_err;
-use petgraph::{Graph, graph::NodeIndex, visit::IntoNodeReferences};
+use petgraph::{stable_graph::{NodeIndex, StableGraph}, visit::{IntoNodeReferences, IntoNeighborsDirected}, algo::toposort};
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub struct ExtensionSql {
@@ -54,7 +54,8 @@ pub struct ExtensionSql {
 pub struct PgxSql<'a> {
     pub type_mappings: HashMap<TypeId, String>,
     pub control: ControlFile,
-    pub graph: Graph<SqlGraphEntity<'a>, SqlGraphRelationship>,
+    pub graph: StableGraph<SqlGraphEntity<'a>, SqlGraphRelationship>,
+    pub graph_root: NodeIndex,
     pub schemas: HashMap<&'a InventorySchema, NodeIndex>,
     pub extension_sqls: HashMap<&'a ExtensionSql, NodeIndex>,
     pub externs: HashMap<&'a InventoryPgExtern, NodeIndex>,
@@ -66,6 +67,7 @@ pub struct PgxSql<'a> {
 
 #[derive(Debug, Clone)]
 pub enum SqlGraphEntity<'a> {
+    ExtensionRoot,
     Schema(&'a InventorySchema),
     CustomSql(&'a ExtensionSql),
     Function(&'a InventoryPgExtern),
@@ -120,13 +122,15 @@ impl<'a> From<&'a InventoryPostgresHash> for SqlGraphEntity<'a> {
 
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Eq, Ord)]
 pub enum SqlGraphRelationship {
-    DependsOn,
+    RequiredBy,
 }
+use SqlGraphRelationship::*;
 
 
 impl<'a> SqlGraphEntity<'a> {
     fn to_sql(&self, context: &PgxSql<'a>) -> eyre::Result<String> {
         let sql = match self {
+            Root => String::default(),
             Schema(item) => context.inventory_schema_to_sql(item),
             CustomSql(item) => context.inventory_extension_sql_to_sql(item),
             Function(item) => context.inventory_extern_to_sql(item)?,
@@ -152,42 +156,82 @@ impl<'a> PgxSql<'a> {
         ords: impl Iterator<Item=&'a InventoryPostgresOrd>,
         hashes: impl Iterator<Item=&'a InventoryPostgresHash>,
     ) -> Self {
-        let mut graph = Graph::new();
+        let mut graph = StableGraph::new();
+
+        let root = graph.add_node(SqlGraphEntity::ExtensionRoot);
+
+        // The initial build phase.
+        //
+        // Notably, we do not set non-root edges here. We do that in a second step. This is
+        // primarily because externs, types, operators, and the like tend to intertwine. If we tried
+        // to do it here, we'd find ourselves trying to create edges to non-existing entities.
         let mut mapped_schemas = HashMap::default();
         for item in schemas {
             let index = graph.add_node(item.into());
             mapped_schemas.insert(item, index);
+            graph.add_edge(root, index, SqlGraphRelationship::RequiredBy);
         }
         let mut mapped_extension_sqls = HashMap::default();
         for item in extension_sqls {
             let index = graph.add_node(item.into());
             mapped_extension_sqls.insert(item, index);
-        }
-        let mut mapped_externs = HashMap::default();
-        for item in externs {
-            let index = graph.add_node(item.into());
-            mapped_externs.insert(item, index);
-        }
-        let mut mapped_types = HashMap::default();
-        for item in types {
-            let index = graph.add_node(item.into());
-            mapped_types.insert(item, index);
+            graph.add_edge(root, index, SqlGraphRelationship::RequiredBy);
         }
         let mut mapped_enums = HashMap::default();
         for item in enums {
             let index = graph.add_node(item.into());
             mapped_enums.insert(item, index);
+            graph.add_edge(root, index, SqlGraphRelationship::RequiredBy);
+        }
+        let mut mapped_types = HashMap::default();
+        for item in types {
+            let index = graph.add_node(item.into());
+            mapped_types.insert(item, index);
+            graph.add_edge(root, index, SqlGraphRelationship::RequiredBy);
+        }
+        let mut mapped_externs = HashMap::default();
+        for item in externs {
+            let index = graph.add_node(item.into());
+            mapped_externs.insert(item, index);
+            graph.add_edge(root, index, SqlGraphRelationship::RequiredBy);
         }
         let mut mapped_ords = HashMap::default();
         for item in ords {
             let index = graph.add_node(item.into());
             mapped_ords.insert(item, index);
+            graph.add_edge(root, index, SqlGraphRelationship::RequiredBy);
         }
         let mut mapped_hashes = HashMap::default();
         for item in hashes {
             let index = graph.add_node(item.into());
             mapped_hashes.insert(item, index);
+            graph.add_edge(root, index, SqlGraphRelationship::RequiredBy);
         }
+
+        // Now we can circle back and build up the edge sets.
+        for (index, item) in &mapped_schemas {
+
+        }
+        for (index, item) in &mapped_extension_sqls {
+
+        }
+        for (index, item) in &mapped_enums {
+
+        }
+        for (index, item) in &mapped_types {
+
+        }
+        for (index, item) in &mapped_externs {
+
+        }
+        for (index, item) in &mapped_ords {
+
+        }
+        for (index, item) in &mapped_hashes {
+
+        }
+
+        tracing::error!(graph = ?graph);
         let mut this = Self {
             type_mappings: type_mappings.collect(),
             control,
@@ -199,6 +243,7 @@ impl<'a> PgxSql<'a> {
             ords: mapped_ords,
             hashes: mapped_hashes,
             graph: graph,
+            graph_root: root,
         };
         this.register_types();
         this
@@ -248,7 +293,9 @@ impl<'a> PgxSql<'a> {
             ",
             sql = {
                 let mut sql = String::new();
-                for step in self.walk() {
+                for step_id in toposort(&self.graph, None).map_err(|e| eyre_err!("Depgraph was Cyclic."))? {
+                    let step = &self.graph[step_id];
+                    tracing::info!("Stepping over {:#?}", step);
                     let item_sql = step.to_sql(&self)?;
                     sql.push_str(&item_sql)
                 }
