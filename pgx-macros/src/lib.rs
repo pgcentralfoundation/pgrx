@@ -548,6 +548,35 @@ pub fn extension_sql(input: TokenStream) -> TokenStream {
     }
 }
 
+#[proc_macro]
+pub fn extension_sql_file(input: TokenStream) -> TokenStream {
+    fn wrapped(input: TokenStream) -> Result<TokenStream, syn::Error> {
+        let path: syn::LitStr = syn::parse(input)?;
+        Ok(quote! {
+            pgx::inventory::submit! {
+                crate::__pgx_internals::ExtensionSql(pgx_utils::pg_inventory::ExtensionSql {
+                    sql: include_str!(#path),
+                    module_path: module_path!(),
+                    full_path: concat!(file!(), ':', line!()),
+                    file: file!(),
+                    line: line!(),
+                })
+            }
+        }
+        .into())
+    }
+
+    match wrapped(input) {
+        Ok(tokens) => tokens,
+        Err(e) => {
+            let msg = e.to_string();
+            TokenStream::from(quote! {
+              compile_error!(#msg);
+            })
+        }
+    }
+}
+
 #[proc_macro_derive(PostgresEq)]
 pub fn postgres_eq(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
