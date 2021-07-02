@@ -219,8 +219,7 @@ fn do_it() -> std::result::Result<(), std::io::Error> {
                     .unwrap_or_else(|| format!("sql/{}-{}.sql", extname, crate::commands::install::get_version()));
                 let dot = schema
                     .value_of("dot")
-                    .map(|x| x.to_string())
-                    .unwrap_or_else(|| None);
+                    .map(|x| x.to_string());
                 let is_release = schema.is_present("release");
                 let is_release = schema.is_present("release");
                 let features = schema
@@ -245,7 +244,7 @@ fn do_it() -> std::result::Result<(), std::io::Error> {
                     },
                 };
 
-                schema::generate_schema(&pg_config, is_release, &features, &out, &dot)
+                schema::generate_schema(&pg_config, is_release, &features, &out, dot)
             }
             ("get", Some(get)) => {
                 let name = get.value_of("name").expect("no property name specified");

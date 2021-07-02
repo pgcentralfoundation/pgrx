@@ -54,7 +54,7 @@ pub(crate) fn generate_schema(
     command.arg("--");
     command.arg(path);
     if let Some(dot) = dot {
-        command.arg(dot);
+        command.arg(dot.as_ref());
     }
 
     let command = command.stdout(Stdio::inherit()).stderr(Stdio::inherit());

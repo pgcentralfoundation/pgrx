@@ -278,31 +278,19 @@ impl<'a> PgxSql<'a> {
                 tracing::trace!(from = ?item.full_path, to = ?SqlGraphEntity::ExtensionRoot, "Adding Types to ExtensionRoot edge.");
                 this.graph.add_edge(root, index, SqlGraphRelationship::RequiredBy);
             }
-            if let Some(in_fn_schema) = this.schema_alias_of(&item.in_fn_module_path) {
-                for (schema_item, &schema_index) in &this.schemas {
-                    if schema_item.name == in_fn_schema {
-                        tracing::trace!(from = ?item.full_path, to = schema_item.module_path, "Adding Type(in_fn) to Schema edge.");
-                        this.graph.add_edge(schema_index, index, SqlGraphRelationship::RequiredByInFn);
-                    }
+            for (extern_item, &extern_index) in &this.externs {
+                if extern_item.full_path == item.in_fn {
+                    tracing::trace!(from = ?item.full_path, to = extern_item.full_path, "Adding Type(in_fn) to Extern edge.");
+                    this.graph.add_edge(extern_index, index, SqlGraphRelationship::RequiredByInFn);
                 }
-            } else {
-                tracing::trace!(from = ?item.full_path, to = ?SqlGraphEntity::ExtensionRoot, "Adding Type(in_fn) to ExtensionRoot edge.");
-                this.graph.add_edge(root, index, SqlGraphRelationship::RequiredBy);
-            }
-            if let Some(out_fn_schema) = this.schema_alias_of(&item.out_fn_module_path) {
-                for (schema_item, &schema_index) in &this.schemas {
-                    if schema_item.name == out_fn_schema {
-                        tracing::trace!(from = ?item.full_path, to = schema_item.module_path, "Adding Type(out_fn) to Schema edge.");
-                        this.graph.add_edge(schema_index, index, SqlGraphRelationship::RequiredByOutFn);
-                    }
+                if extern_item.full_path == item.out_fn {
+                    tracing::trace!(from = ?item.full_path, to = extern_item.full_path, "Adding Type(out_fn) to Extern edge.");
+                    this.graph.add_edge(extern_index, index, SqlGraphRelationship::RequiredByOutFn);
                 }
-            } else {
-                tracing::trace!(from = ?item.full_path, to = ?SqlGraphEntity::ExtensionRoot, "Adding Type(out_fn) to ExtensionRoot edge.");
-                this.graph.add_edge(root, index, SqlGraphRelationship::RequiredBy);
             }
         }
         for (item, &index) in &this.externs {
-            if let Some(schema_alias) = this.schema_alias_of(&item.full_path) {
+            if let Some(schema_alias) = this.schema_alias_of(&item.module_path) {
                 for (schema_item, &schema_index) in &this.schemas {
                     if schema_item.name == schema_alias {
                         tracing::trace!(from = ?item.full_path, to = schema_item.module_path, "Adding Extern to Schema edge.");
@@ -314,54 +302,30 @@ impl<'a> PgxSql<'a> {
                 this.graph.add_edge(root, index, SqlGraphRelationship::RequiredBy);
             }
             for arg in &item.fn_args {
-                let arg_schema = this.schema_alias_of(&arg.full_path);
-                if let Some(arg_schema) = arg_schema {
-                    for (schema_item, &schema_index) in &this.schemas {
-                        if schema_item.name == arg_schema {
-                            tracing::trace!(from = ?item.full_path, to = schema_item.module_path, "Adding Extern(arg) to Schema edge.");
-                            this.graph.add_edge(schema_index, index, SqlGraphRelationship::RequiredByArg);
-                        }
-                    }
-                } else {
-                    tracing::trace!(from = ?item.full_path, to = ?SqlGraphEntity::ExtensionRoot, "Adding Extern(arg) to ExtensionRoot edge.");
-                    this.graph.add_edge(root, index, SqlGraphRelationship::RequiredBy);
-                }
-                for (type_item, &type_index) in &this.types {
-                    if type_item.full_path == arg.full_path {
-                        tracing::trace!(from = ?item.full_path, to = type_item.full_path, "Adding Extern(arg) to Type edge.");
-                        this.graph.add_edge(type_index, index, SqlGraphRelationship::RequiredByArg);
+                for (ty_item, &ty_index) in &this.types {
+                    if ty_item.full_path == arg.full_path {
+                        tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Extern(arg) to Type edge.");
+                        this.graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredByArg);
                     }
                 }
             }
             match &item.fn_return {
                 InventoryPgExternReturn::None | InventoryPgExternReturn::Trigger => (),
                 InventoryPgExternReturn::Type { full_path, .. } | InventoryPgExternReturn::SetOf { full_path, .. } => {
-                    let return_schema = this.schema_alias_of(&full_path);
-                    if let Some(return_schema) = return_schema {
-                        for (schema_item, &schema_index) in &this.schemas {
-                            if schema_item.name == return_schema {
-                                tracing::trace!(from = ?item.full_path, to = schema_item.module_path, "Adding Extern(return) to Schema edge.");
-                                this.graph.add_edge(schema_index, index, SqlGraphRelationship::RequiredByReturn);
-                            }
+                    for (ty_item, &ty_index) in &this.types {
+                        if ty_item.full_path == *full_path {
+                            tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Extern(return) to Type edge.");
+                            this.graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredByArg);
                         }
-                    } else {
-                        tracing::trace!(from = ?item.full_path, to = ?SqlGraphEntity::ExtensionRoot, "Adding Extern(return) to ExtensionRoot edge.");
-                        this.graph.add_edge(root, index, SqlGraphRelationship::RequiredBy);
                     }
                 },
                 InventoryPgExternReturn::Iterated(iterated_returns) => {
                     for iterated_return in iterated_returns {
-                        let return_schema = this.schema_alias_of(&iterated_return.1);
-                        if let Some(return_schema) = return_schema {
-                            for (schema_item, &schema_index) in &this.schemas {
-                                if schema_item.name == return_schema {
-                                    tracing::trace!(from = ?item.full_path, to = schema_item.module_path, "Adding Extern(return) to Schema edge.");
-                                    this.graph.add_edge(schema_index, index, SqlGraphRelationship::RequiredByReturn);
-                                }
+                        for (ty_item, &ty_index) in &this.types {
+                            if ty_item.full_path == iterated_return.1 {
+                                tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Extern(return) to Type edge.");
+                                this.graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredByArg);
                             }
-                        } else {
-                            tracing::trace!(from = ?item.full_path, to = ?SqlGraphEntity::ExtensionRoot, "Adding Extern(return) to ExtensionRoot edge.");
-                            this.graph.add_edge(root, index, SqlGraphRelationship::RequiredBy);
                         }
                     }
                 },
@@ -433,7 +397,7 @@ impl<'a> PgxSql<'a> {
         Ok(())
     }
 
-    #[instrument(level = "info", skip(self))]
+    #[instrument(level = "trace", skip(self))]
     pub fn schema_alias_of(&self, module_path: impl AsRef<str> + Debug) -> Option<String> {
         let mut needle = None;
         for (item, _index) in &self.schemas {

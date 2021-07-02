@@ -141,7 +141,7 @@ fn copy_sql_files(pg_config: &PgConfig, is_release: bool, additional_features: V
     let version = get_version();
     dest.push(format!("{}--{}.sql", extname, version));
 
-    crate::schema::generate_schema(pg_config, is_release, &*additional_features, &dest).unwrap();
+    crate::schema::generate_schema(pg_config, is_release, &*additional_features, &dest, Option::<String>::None).unwrap();
     let written = std::fs::read_to_string(&dest).unwrap();
     let written = filter_contents(written);
     std::fs::write(&dest, written).unwrap();
