@@ -39,7 +39,7 @@ use std::collections::HashMap;
 use core::{any::TypeId, fmt::Debug};
 use crate::ExternArgs;
 use eyre::eyre as eyre_err;
-use petgraph::{stable_graph::{NodeIndex, StableGraph}, dot::Dot, algo::toposort};
+use petgraph::{stable_graph::{NodeIndex, StableGraph, EdgeReference}, dot::Dot, algo::toposort};
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub struct ExtensionSql {
@@ -125,8 +125,6 @@ pub enum SqlGraphRelationship {
     RequiredBy,
     RequiredByArg,
     RequiredByReturn,
-    RequiredByInFn,
-    RequiredByOutFn,
 }
 
 
@@ -150,15 +148,17 @@ impl<'a> SqlGraphEntity<'a> {
         };
         Ok(sql)
     }
-    fn source_path(&self) -> String {
+    fn dot_format(&self) -> String {
         match self {
-            Schema(item) => item.module_path.to_string(),
-            CustomSql(item) => item.full_path.to_string(),
-            Function(item) => item.full_path.to_string(),
-            Type(item) => item.full_path.to_string(),
-            Enum(item) => item.full_path.to_string(),
-            Ord(item) => item.full_path.to_string(),
-            Hash(item) => item.full_path.to_string(),
+            Schema(item) => format!("mod {}", item.module_path.to_string()),
+            CustomSql(item) => format!("sql {}", item.full_path.to_string()),
+            Function(item) => format!("fn {}",
+                item.full_path.to_string(),
+            ),
+            Type(item) => format!("type {}", item.full_path.to_string()),
+            Enum(item) => format!("enum {}", item.full_path.to_string()),
+            Ord(item) => format!("ord {}", item.full_path.to_string()),
+            Hash(item) => format!("hash {}", item.full_path.to_string()),
             ExtensionRoot => format!("ExtensionRoot"),
         }
     }
@@ -278,16 +278,6 @@ impl<'a> PgxSql<'a> {
                 tracing::trace!(from = ?item.full_path, to = ?SqlGraphEntity::ExtensionRoot, "Adding Types to ExtensionRoot edge.");
                 this.graph.add_edge(root, index, SqlGraphRelationship::RequiredBy);
             }
-            for (extern_item, &extern_index) in &this.externs {
-                if extern_item.full_path == item.in_fn {
-                    tracing::trace!(from = ?item.full_path, to = extern_item.full_path, "Adding Type(in_fn) to Extern edge.");
-                    this.graph.add_edge(extern_index, index, SqlGraphRelationship::RequiredByInFn);
-                }
-                if extern_item.full_path == item.out_fn {
-                    tracing::trace!(from = ?item.full_path, to = extern_item.full_path, "Adding Type(out_fn) to Extern edge.");
-                    this.graph.add_edge(extern_index, index, SqlGraphRelationship::RequiredByOutFn);
-                }
-            }
         }
         for (item, &index) in &this.externs {
             if let Some(schema_alias) = this.schema_alias_of(&item.module_path) {
@@ -303,7 +293,7 @@ impl<'a> PgxSql<'a> {
             }
             for arg in &item.fn_args {
                 for (ty_item, &ty_index) in &this.types {
-                    if ty_item.full_path == arg.full_path {
+                    if ty_item.id_matches(&arg.ty_id) {
                         tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Extern(arg) to Type edge.");
                         this.graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredByArg);
                     }
@@ -311,20 +301,20 @@ impl<'a> PgxSql<'a> {
             }
             match &item.fn_return {
                 InventoryPgExternReturn::None | InventoryPgExternReturn::Trigger => (),
-                InventoryPgExternReturn::Type { full_path, .. } | InventoryPgExternReturn::SetOf { full_path, .. } => {
+                InventoryPgExternReturn::Type { id, full_path, .. } | InventoryPgExternReturn::SetOf { id, full_path, .. } => {
                     for (ty_item, &ty_index) in &this.types {
-                        if ty_item.full_path == *full_path {
+                        if ty_item.id_matches(id) {
                             tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Extern(return) to Type edge.");
-                            this.graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredByArg);
+                            this.graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredByReturn);
                         }
                     }
                 },
                 InventoryPgExternReturn::Iterated(iterated_returns) => {
                     for iterated_return in iterated_returns {
                         for (ty_item, &ty_index) in &this.types {
-                            if ty_item.full_path == iterated_return.1 {
+                            if ty_item.id_matches(&iterated_return.0) {
                                 tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Extern(return) to Type edge.");
-                                this.graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredByArg);
+                                this.graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredByReturn);
                             }
                         }
                     }
@@ -383,8 +373,48 @@ impl<'a> PgxSql<'a> {
         let generated = Dot::with_attr_getters(
             &self.graph,
             &[petgraph::dot::Config::EdgeNoLabel, petgraph::dot::Config::NodeNoLabel],
-            &|_graph, edge| { format!("label = {:?}", edge.weight()) },
-            &|_graph, (_index, node)| { format!("label = {:?}", node.source_path()) },
+            &|_graph, edge| {
+                match edge.weight() {
+                    SqlGraphRelationship::RequiredBy => format!(r#"color = "gray""#),
+                    SqlGraphRelationship::RequiredByArg => format!(r#"color = "darkgrey""#),
+                    SqlGraphRelationship::RequiredByReturn => format!(r#"dir = "darkgrey", color = "black""#),
+                }
+            },
+            &|_graph, (_index, node)| {
+                match node {
+                    SqlGraphEntity::Schema(item) => format!(
+                        "label = \"{}\", weight = 6, shape = \"tab\"",
+                        node.dot_format()
+                    ),
+                    SqlGraphEntity::Function(item) => format!(
+                        "label = \"{}\", penwidth = 0, style = \"filled\", fillcolor = \"#FFB7B2\", weight = 4, shape = \"box\"",
+                        node.dot_format()
+                    ),
+                    SqlGraphEntity::Type(item) => format!(
+                        "label = \"{}\", penwidth = 0, style = \"filled\", fillcolor = \"#B5EAD7\", weight = 5, shape = \"oval\"",
+                        node.dot_format()
+                    ),
+                    SqlGraphEntity::Enum(item) => format!(
+                        "label = \"{}\" penwidth = 0, style = \"filled\", fillcolor = \"#C7CEEA\", weight = 5, shape = \"oval\"",
+                        node.dot_format()
+                    ),
+                    SqlGraphEntity::Ord(item) => format!(
+                        "label = \"{}\", shape = \"point\"",
+                        node.dot_format()
+                    ),
+                    SqlGraphEntity::Hash(item) => format!(
+                        "label = \"{}\", shape = \"point\"",
+                        node.dot_format()
+                    ),
+                    SqlGraphEntity::CustomSql(item) => format!(
+                        "label = \"{}\", weight = 3, shape = \"signature\"",
+                        node.dot_format()
+                    ),
+                    SqlGraphEntity::ExtensionRoot => format!(
+                        "label = \"Extension\", shape = \"cylinder\""
+                    ),
+                }
+            },
         );
         let path = Path::new(file.as_ref());
 
