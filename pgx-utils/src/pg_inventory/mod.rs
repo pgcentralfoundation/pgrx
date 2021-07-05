@@ -39,7 +39,7 @@ use std::collections::HashMap;
 use core::{any::TypeId, fmt::Debug};
 use crate::ExternArgs;
 use eyre::eyre as eyre_err;
-use petgraph::{stable_graph::{NodeIndex, StableGraph}, dot::Dot, algo::toposort};
+use petgraph::{algo::toposort, dot::Dot, stable_graph::{NodeIndex, StableGraph}};
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub struct ExtensionSql {
@@ -60,6 +60,7 @@ pub struct PgxSql<'a> {
     pub extension_sqls: HashMap<&'a ExtensionSql, NodeIndex>,
     pub externs: HashMap<&'a InventoryPgExtern, NodeIndex>,
     pub types: HashMap<&'a InventoryPostgresType, NodeIndex>,
+    pub builtin_types: HashMap<&'a str, NodeIndex>,
     pub enums: HashMap<&'a InventoryPostgresEnum, NodeIndex>,
     pub ords: HashMap<&'a InventoryPostgresOrd, NodeIndex>,
     pub hashes: HashMap<&'a InventoryPostgresHash, NodeIndex>,
@@ -72,6 +73,7 @@ pub enum SqlGraphEntity<'a> {
     CustomSql(&'a ExtensionSql),
     Function(&'a InventoryPgExtern),
     Type(&'a InventoryPostgresType),
+    BuiltinType(&'a str),
     Enum(&'a InventoryPostgresEnum),
     Ord(&'a InventoryPostgresOrd),
     Hash(&'a InventoryPostgresHash),
@@ -135,6 +137,7 @@ impl<'a> SqlGraphEntity<'a> {
             CustomSql(item) => context.inventory_extension_sql_to_sql(item),
             Function(item) => context.inventory_extern_to_sql(item)?,
             Type(item) => context.inventory_type_to_sql(item)?,
+            BuiltinType(_) => String::default(),
             Enum(item) => context.inventory_enums_to_sql(item),
             Ord(item) => context.inventory_ord_to_sql(item),
             Hash(item) => context.inventory_hash_to_sql(item),
@@ -156,6 +159,7 @@ impl<'a> SqlGraphEntity<'a> {
                 item.full_path.to_string(),
             ),
             Type(item) => format!("type {}", item.full_path.to_string()),
+            BuiltinType(item) => format!("interal type {}", item),
             Enum(item) => format!("enum {}", item.full_path.to_string()),
             Ord(item) => format!("ord {}", item.full_path.to_string()),
             Hash(item) => format!("hash {}", item.full_path.to_string()),
@@ -207,9 +211,77 @@ impl<'a> PgxSql<'a> {
             mapped_types.insert(item, index);
         }
         let mut mapped_externs = HashMap::default();
+        let mut mapped_builtin_types = HashMap::default();
         for item in externs {
             let index = graph.add_node(item.into());
             mapped_externs.insert(item, index);
+
+            for arg in &item.fn_args {
+                let mut found = false;
+                for (ty_item, &_ty_index) in &mapped_types {
+                    if ty_item.id_matches(&arg.ty_id) {
+                        found = true;
+                        break
+                    }
+                };
+                for (ty_item, &_ty_index) in &mapped_enums {
+                    if ty_item.id == arg.ty_id {
+                        found = true;
+                        break
+                    }
+                };
+                if !found {
+                    mapped_builtin_types.entry(arg.full_path).or_insert_with(||
+                        graph.add_node(SqlGraphEntity::BuiltinType(arg.full_path))
+                    );
+                }
+            }
+
+            match &item.fn_return {
+                InventoryPgExternReturn::None | InventoryPgExternReturn::Trigger => (),
+                InventoryPgExternReturn::Type { id, full_path, .. } | InventoryPgExternReturn::SetOf { id, full_path, .. } => {
+                    let mut found = false;
+                    for (ty_item, &_ty_index) in &mapped_types {
+                        if ty_item.id_matches(id) {
+                            found = true;
+                            break
+                        }
+                    }
+                    for (ty_item, &_ty_index) in &mapped_enums {
+                        if ty_item.id == *id {
+                            found = true;
+                            break
+                        }
+                    };
+                    if !found {
+                        mapped_builtin_types.entry(full_path).or_insert_with(||
+                            graph.add_node(SqlGraphEntity::BuiltinType(full_path))
+                        );
+                    }
+                },
+                InventoryPgExternReturn::Iterated(iterated_returns) => {
+                    for iterated_return in iterated_returns {
+                        let mut found = false;
+                        for (ty_item, &_ty_index) in &mapped_types {
+                            if ty_item.id_matches(&iterated_return.0) {
+                                found = true;
+                                break
+                            }
+                        }
+                        for (ty_item, &_ty_index) in &mapped_enums {
+                            if ty_item.id == iterated_return.0 {
+                                found = true;
+                                break
+                            }
+                        };
+                        if !found {
+                            mapped_builtin_types.entry(iterated_return.1).or_insert_with(||
+                                graph.add_node(SqlGraphEntity::BuiltinType(iterated_return.1))
+                            );
+                        }
+                    }
+                },
+            }
         }
         let mut mapped_ords = HashMap::default();
         for item in ords {
@@ -229,6 +301,7 @@ impl<'a> PgxSql<'a> {
             extension_sqls: mapped_extension_sqls,
             externs: mapped_externs,
             types: mapped_types,
+            builtin_types: mapped_builtin_types,
             enums: mapped_enums,
             ords: mapped_ords,
             hashes: mapped_hashes,
@@ -296,33 +369,78 @@ impl<'a> PgxSql<'a> {
                 this.graph.add_edge(root, index, SqlGraphRelationship::RequiredBy);
             }
             for arg in &item.fn_args {
+                let mut found = false;
                 for (ty_item, &ty_index) in &this.types {
                     if ty_item.id_matches(&arg.ty_id) {
                         tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Extern(arg) to Type edge.");
                         this.graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredByArg);
+                        found = true;
                         break
                     }
+                };
+                for (ty_item, &ty_index) in &this.enums {
+                    if ty_item.id == arg.ty_id {
+                        tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Extern(arg) to Enum edge.");
+                        this.graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredByArg);
+                        found = true;
+                        break
+                    }
+                };
+                if !found {
+                    let builtin_index = this.builtin_types.get(arg.full_path).expect(&format!("Could not fetch Builtin Type {}.", arg.full_path));
+                    tracing::trace!(from = ?item.full_path, to = arg.full_path, "Adding Extern(arg) to BuiltIn Type edge.");
+                    this.graph.add_edge(*builtin_index, index, SqlGraphRelationship::RequiredByArg);
                 }
             }
             match &item.fn_return {
                 InventoryPgExternReturn::None | InventoryPgExternReturn::Trigger => (),
-                InventoryPgExternReturn::Type { id, .. } | InventoryPgExternReturn::SetOf { id, .. } => {
+                InventoryPgExternReturn::Type { id, full_path, .. } | InventoryPgExternReturn::SetOf { id, full_path, .. } => {
+                    let mut found = false;
                     for (ty_item, &ty_index) in &this.types {
                         if ty_item.id_matches(id) {
                             tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Extern(return) to Type edge.");
                             this.graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredByReturn);
+                            found = true;
                             break
                         }
+                    }
+                    for (ty_item, &ty_index) in &this.enums {
+                        if ty_item.id == *id {
+                            tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Extern(return) to Enum edge.");
+                            this.graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredByReturn);
+                            found = true;
+                            break
+                        }
+                    }
+                    if !found {
+                        let builtin_index = this.builtin_types.get(full_path).expect(&format!("Could not fetch Builtin Type {}.", full_path));
+                        tracing::trace!(from = ?item.full_path, to = full_path, "Adding Extern(return) to BuiltIn Type edge.");
+                        this.graph.add_edge(*builtin_index, index, SqlGraphRelationship::RequiredByArg);
                     }
                 },
                 InventoryPgExternReturn::Iterated(iterated_returns) => {
                     for iterated_return in iterated_returns {
+                        let mut found = false;
                         for (ty_item, &ty_index) in &this.types {
                             if ty_item.id_matches(&iterated_return.0) {
                                 tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Extern(return) to Type edge.");
                                 this.graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredByReturn);
+                                found = true;
                                 break
                             }
+                        }
+                        for (ty_item, &ty_index) in &this.enums {
+                            if ty_item.id == iterated_return.0 {
+                                tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Extern(return) to Enum edge.");
+                                this.graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredByReturn);
+                                found = true;
+                                break
+                            }
+                        }
+                        if !found {
+                            let builtin_index = this.builtin_types.get(&iterated_return.1).expect(&format!("Could not fetch Builtin Type {}.", iterated_return.1));
+                            tracing::trace!(from = ?item.full_path, to = iterated_return.1, "Adding Extern(return) to BuiltIn Type edge.");
+                            this.graph.add_edge(*builtin_index, index, SqlGraphRelationship::RequiredByArg);
                         }
                     }
                 },
@@ -391,28 +509,33 @@ impl<'a> PgxSql<'a> {
             },
             &|_graph, (_index, node)| {
                 match node {
+                    // Colors derived from https://www.schemecolor.com/touch-of-creativity.php
                     SqlGraphEntity::Schema(_item) => format!(
                         "label = \"{}\", weight = 6, shape = \"tab\"",
                         node.dot_format()
                     ),
                     SqlGraphEntity::Function(_item) => format!(
-                        "label = \"{}\", penwidth = 0, style = \"filled\", fillcolor = \"#FFB7B2\", weight = 4, shape = \"box\"",
+                        "label = \"{}\", penwidth = 0, style = \"filled\", fillcolor = \"#ADC7C6\", weight = 4, shape = \"box\"",
                         node.dot_format()
                     ),
                     SqlGraphEntity::Type(_item) => format!(
-                        "label = \"{}\", penwidth = 0, style = \"filled\", fillcolor = \"#B5EAD7\", weight = 5, shape = \"oval\"",
+                        "label = \"{}\", penwidth = 0, style = \"filled\", fillcolor = \"#AE9BBD\", weight = 5, shape = \"oval\"",
+                        node.dot_format()
+                    ),
+                    SqlGraphEntity::BuiltinType(_item) => format!(
+                        "label = \"{}\", shape = \"plain\"",
                         node.dot_format()
                     ),
                     SqlGraphEntity::Enum(_item) => format!(
-                        "label = \"{}\" penwidth = 0, style = \"filled\", fillcolor = \"#C7CEEA\", weight = 5, shape = \"oval\"",
+                        "label = \"{}\", penwidth = 0, style = \"filled\", fillcolor = \"#C9A7C8\", weight = 5, shape = \"oval\"",
                         node.dot_format()
                     ),
                     SqlGraphEntity::Ord(_item) => format!(
-                        "label = \"{}\", shape = \"point\"",
+                        "label = \"{}\", penwidth = 0, style = \"filled\", fillcolor = \"#FFCFD3\", weight = 5, shape = \"diamond\"",
                         node.dot_format()
                     ),
                     SqlGraphEntity::Hash(_item) => format!(
-                        "label = \"{}\", shape = \"point\"",
+                        "label = \"{}\", penwidth = 0, style = \"filled\", fillcolor = \"#FFE4E0\", weight = 5, shape = \"diamond\"",
                         node.dot_format()
                     ),
                     SqlGraphEntity::CustomSql(_item) => format!(
