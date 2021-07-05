@@ -19,7 +19,7 @@ impl ToTokens for PostgresEnum {
         let name = &self.name;
         let variants = self.variants.iter();
         let inv = quote! {
-            pgx::inventory::submit! {
+            pgx_utils::pg_inventory::inventory::submit! {
                 use core::{mem::MaybeUninit, any::{TypeId, Any}, marker::PhantomData};
                 use ::pgx::datum::{
                     WithTypeIds,

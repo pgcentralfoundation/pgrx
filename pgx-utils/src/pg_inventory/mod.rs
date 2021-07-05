@@ -133,7 +133,9 @@ pub enum SqlGraphRelationship {
 impl<'a> SqlGraphEntity<'a> {
     fn to_sql(&self, context: &PgxSql<'a>) -> eyre::Result<String> {
         let sql = match self {
-            Schema(item) => context.inventory_schema_to_sql(item),
+            Schema(item) => if item.name != "public" && item.name != "pg_catalog" {
+                context.inventory_schema_to_sql(item)
+            } else { String::default() },
             CustomSql(item) => context.inventory_extension_sql_to_sql(item),
             Function(item) => context.inventory_extern_to_sql(item)?,
             Type(item) => context.inventory_type_to_sql(item)?,

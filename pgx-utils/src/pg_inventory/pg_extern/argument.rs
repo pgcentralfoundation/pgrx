@@ -1,6 +1,5 @@
 use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
-use std::convert::TryFrom;
 use syn::{
     parse::{Parse, ParseStream},
     FnArg, Pat, Token,
@@ -10,13 +9,11 @@ use syn::{
 pub struct Argument {
     pat: syn::Ident,
     ty: syn::Type,
-    default: Option<syn::Lit>,
+    default: Option<String>,
 }
 
-impl TryFrom<syn::FnArg> for Argument {
-    type Error = Box<dyn std::error::Error>;
-
-    fn try_from(value: FnArg) -> Result<Self, Self::Error> {
+impl Argument {
+    pub fn build(value: FnArg) -> Result<Option<Self>, syn::Error> {
         match value {
             syn::FnArg::Typed(pat) => {
                 let identifier = match *pat.pat {
@@ -24,17 +21,17 @@ impl TryFrom<syn::FnArg> for Argument {
                     Pat::Reference(ref p) => match *p.pat {
                         Pat::Ident(ref p) => p.ident.clone(),
                         _ => {
-                            return Err(Box::new(syn::Error::new(
+                            return Err(syn::Error::new(
                                 Span::call_site(),
                                 "Unable to parse FnArg.",
-                            )))
+                            ))
                         }
                     },
                     _ => {
-                        return Err(Box::new(syn::Error::new(
+                        return Err(syn::Error::new(
                             Span::call_site(),
                             "Unable to parse FnArg.",
-                        )))
+                        ))
                     }
                 };
                 let default = match pat.ty.as_ref() {
@@ -44,7 +41,13 @@ impl TryFrom<syn::FnArg> for Argument {
                         match archetype.ident.to_string().as_str() {
                             "default" => {
                                 let out: DefaultMacro = mac.parse_body()?;
-                                Some(out.expr)
+                                match out.expr {
+                                    syn::Expr::Lit(syn::ExprLit { lit: syn::Lit::Str(def), .. }) => {
+                                        let value = def.value();
+                                        Some(value)
+                                    },
+                                    _ => None,
+                                }
                             }
                             _ => None,
                         }
@@ -67,10 +70,7 @@ impl TryFrom<syn::FnArg> for Argument {
                             }
                         }
                         if (saw_pg_sys && saw_functioncallinfobasedata) || (saw_functioncallinfobasedata && segments.segments.len() == 1)  {
-                            return Err(Box::new(syn::Error::new(
-                                Span::call_site(),
-                                "It's a FunctionCallInfoBaseData, skipping.",
-                            )));
+                            return Ok(None);
                         }
                     },
                     syn::Type::Ptr(ref ptr) => {
@@ -88,10 +88,10 @@ impl TryFrom<syn::FnArg> for Argument {
                                     }
                                 }
                                 if (saw_pg_sys && saw_functioncallinfobasedata) || (saw_functioncallinfobasedata && segments.segments.len() == 1)  {
-                                    return Err(Box::new(syn::Error::new(
+                                    return Err(syn::Error::new(
                                         Span::call_site(),
                                         "It's a FunctionCallInfoBaseData, skipping.",
-                                    )));
+                                    ));
                                 }
                             },
                             _ => {
@@ -104,16 +104,16 @@ impl TryFrom<syn::FnArg> for Argument {
                     }
                 };
 
-                Ok(Argument {
+                Ok(Some(Argument {
                     pat: identifier,
                     ty: *pat.ty.clone(),
                     default,
-                })
+                }))
             }
-            _ => Err(Box::new(syn::Error::new(
+            _ => Err(syn::Error::new(
                 Span::call_site(),
                 "Unable to parse FnArg.",
-            ))),
+            )),
         }
     }
 }
@@ -149,7 +149,7 @@ impl ToTokens for Argument {
                     path_items.join("::")
                 },
                 is_optional: #is_optional,
-                default: None#( .unwrap_or(Some(stringify!(#default))) )*,
+                default: None#( .unwrap_or(Some(#default)) )*,
             }
         };
         tokens.append_all(quoted);
@@ -160,7 +160,7 @@ impl ToTokens for Argument {
 pub(crate) struct DefaultMacro {
     ty: syn::Type,
     comma: Token![,],
-    pub(crate) expr: syn::Lit,
+    pub(crate) expr: syn::Expr,
 }
 
 impl Parse for DefaultMacro {

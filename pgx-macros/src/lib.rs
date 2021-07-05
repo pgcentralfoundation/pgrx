@@ -524,7 +524,7 @@ pub fn extension_sql(input: TokenStream) -> TokenStream {
     fn wrapped(input: TokenStream) -> Result<TokenStream, syn::Error> {
         let sql: syn::LitStr = syn::parse(input)?;
         Ok(quote! {
-            pgx::inventory::submit! {
+            pgx_utils::pg_inventory::inventory::submit! {
                 crate::__pgx_internals::ExtensionSql(pgx_utils::pg_inventory::ExtensionSql {
                     sql: #sql,
                     module_path: module_path!(),
@@ -553,7 +553,7 @@ pub fn extension_sql_file(input: TokenStream) -> TokenStream {
     fn wrapped(input: TokenStream) -> Result<TokenStream, syn::Error> {
         let path: syn::LitStr = syn::parse(input)?;
         Ok(quote! {
-            pgx::inventory::submit! {
+            pgx_utils::pg_inventory::inventory::submit! {
                 crate::__pgx_internals::ExtensionSql(pgx_utils::pg_inventory::ExtensionSql {
                     sql: include_str!(#path),
                     module_path: module_path!(),

@@ -17,7 +17,7 @@ impl ToTokens for PostgresHash {
     fn to_tokens(&self, tokens: &mut TokenStream2) {
         let name = &self.name;
         let inv = quote! {
-            pgx::inventory::submit! {
+            pgx_utils::pg_inventory::inventory::submit! {
                 use core::any::TypeId;
                 crate::__pgx_internals::PostgresHash(pgx_utils::pg_inventory::InventoryPostgresHash {
                     name: stringify!(#name),

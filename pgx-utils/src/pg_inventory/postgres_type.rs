@@ -24,7 +24,7 @@ impl ToTokens for PostgresType {
         let in_fn = &self.in_fn;
         let out_fn = &self.out_fn;
         let inv = quote! {
-            pgx::inventory::submit! {
+            pgx_utils::pg_inventory::inventory::submit! {
                 use core::{mem::MaybeUninit, any::{TypeId, Any}, marker::PhantomData};
                 use ::pgx::datum::{
                     WithTypeIds,

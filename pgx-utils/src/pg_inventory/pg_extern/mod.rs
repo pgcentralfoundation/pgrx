@@ -15,6 +15,7 @@ use quote::{quote, ToTokens, TokenStreamExt};
 use std::convert::TryFrom;
 use syn::parse::{Parse, ParseStream};
 use syn::Meta;
+use eyre::WrapErr;
 
 pub use returning::InventoryPgExternReturn;
 pub use argument::InventoryPgExternInput;
@@ -124,13 +125,15 @@ impl PgExtern {
             .and_then(|attr| Some(attr.parse_args::<SearchPathList>().unwrap()))
     }
 
-    fn inputs(&self) -> Vec<Argument> {
-        self.func
-            .sig
-            .inputs
-            .iter()
-            .flat_map(|input| Argument::try_from(input.clone()).ok())
-            .collect()
+    fn inputs(&self) -> eyre::Result<Vec<Argument>> {
+        let mut args = Vec::default();
+        for input in &self.func.sig.inputs {
+            let arg = Argument::build(input.clone()).wrap_err_with(|| format!("Could not map {:?}", input))?;
+            if let Some(arg) = arg {
+                args.push(arg);
+            }
+        }
+        Ok(args)
     }
 
     fn returns(&self) -> Returning {
@@ -149,13 +152,13 @@ impl ToTokens for PgExtern {
         let ident = &self.func.sig.ident;
         let extern_attrs = self.extern_attrs();
         let search_path = self.search_path().into_iter();
-        let inputs = self.inputs();
+        let inputs = self.inputs().unwrap();
         let returns = self.returns();
         let operator = self.operator().into_iter();
         let overridden = self.overridden().into_iter();
 
         let inv = quote! {
-            pgx::inventory::submit! {
+            pgx_utils::pg_inventory::inventory::submit! {
                 use core::any::TypeId;
                 crate::__pgx_internals::PgExtern(pgx_utils::pg_inventory::InventoryPgExtern {
                     name: stringify!(#ident),

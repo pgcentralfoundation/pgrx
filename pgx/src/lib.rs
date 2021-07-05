@@ -215,12 +215,12 @@ pub static DEFAULT_TYPEID_SQL_MAPPING: Lazy<HashMap<TypeId, String>> = Lazy::new
     m.insert(TypeId::of::<Option<Vec<u8>>>(), String::from("bytea"));
 
     m.insert(TypeId::of::<pgx_pg_sys::ItemPointerData>(), String::from("tid"));
+    m.insert(TypeId::of::<Option<pgx_pg_sys::ItemPointerData>>(), String::from("tid"));
     m.insert(TypeId::of::<Vec<pgx_pg_sys::ItemPointerData>>(), String::from("tid[]"));
-
-    m.insert(TypeId::of::<pgx_pg_sys::ItemPointerData>(), String::from("tid"));
-    m.insert(TypeId::of::<Vec<pgx_pg_sys::ItemPointerData>>(), String::from("tid[]"));
+    m.insert(TypeId::of::<Vec<Option<pgx_pg_sys::ItemPointerData>>>(), String::from("tid[]"));
     m.insert(TypeId::of::<datum::Array<pgx_pg_sys::ItemPointerData>>(), String::from("tid[]"));
-
+    m.insert(TypeId::of::<Option<datum::Array<pgx_pg_sys::ItemPointerData>>>(), String::from("tid[]"));
+    
     m.insert(TypeId::of::<pgx_pg_sys::Point>(), String::from("point"));
     m.insert(TypeId::of::<Vec<pgx_pg_sys::Point>>(), String::from("point[]"));
     m.insert(TypeId::of::<datum::Array<pgx_pg_sys::Point>>(), String::from("point[]"));
@@ -259,8 +259,6 @@ pub static DEFAULT_TYPEID_SQL_MAPPING: Lazy<HashMap<TypeId, String>> = Lazy::new
     m.insert(TypeId::of::<datum::Internal<pgx_pg_sys::PlannerInfo>>(), String::from("internal"));
     m.insert(TypeId::of::<datum::Internal<pgx_pg_sys::List>>(), String::from("internal"));
     m.insert(TypeId::of::<pgbox::PgBox<pgx_pg_sys::IndexAmRoutine>>(), String::from("internal"));
-    m.insert(TypeId::of::<pgx_pg_sys::ItemPointerData>(), String::from("internal"));
-    m.insert(TypeId::of::<Option<pgx_pg_sys::ItemPointerData>>(), String::from("internal"));
 
     m.insert(TypeId::of::<datum::Numeric>(), String::from("pg_catalog.\"numeric\""));
     m.insert(TypeId::of::<Option<datum::Numeric>>(), String::from("pg_catalog.\"numeric\""));
