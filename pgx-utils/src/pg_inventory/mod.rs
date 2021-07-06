@@ -131,13 +131,32 @@ pub enum SqlGraphRelationship {
 
 
 impl<'a> SqlGraphEntity<'a> {
+    #[instrument(level = "info", skip(self, context), fields(item = %self.dot_format()))]
     fn to_sql(&self, context: &PgxSql<'a>) -> eyre::Result<String> {
         let sql = match self {
             Schema(item) => if item.name != "public" && item.name != "pg_catalog" {
                 context.inventory_schema_to_sql(item)
             } else { String::default() },
             CustomSql(item) => context.inventory_extension_sql_to_sql(item),
-            Function(item) => context.inventory_extern_to_sql(item)?,
+            Function(item) => if context.graph.neighbors_undirected(context.externs.get(item).unwrap().clone()).any(|neighbor| {
+                let neighbor_item = &context.graph[neighbor];
+                match neighbor_item {
+                    SqlGraphEntity::Type(InventoryPostgresType { in_fn, in_fn_module_path, out_fn, out_fn_module_path, .. }) => {
+                        let is_in_fn = item.full_path.starts_with(in_fn_module_path) && item.full_path.ends_with(in_fn);
+                        if is_in_fn {
+                            tracing::debug!(r#type = %neighbor_item.dot_format(), "Skipping, is an in_fn.");
+                        }
+                        let is_out_fn = item.full_path.starts_with(out_fn_module_path) && item.full_path.ends_with(out_fn);
+                        if is_out_fn {
+                            tracing::debug!(r#type = %neighbor_item.dot_format(), "Skipping, is an out_fn.");
+                        }
+                        is_in_fn || is_out_fn
+                    },
+                    _ => false,
+                }
+            }) {
+                String::default()
+            } else { context.inventory_extern_to_sql(item)? },
             Type(item) => context.inventory_type_to_sql(item)?,
             BuiltinType(_) => String::default(),
             Enum(item) => context.inventory_enums_to_sql(item),
@@ -561,7 +580,6 @@ impl<'a> PgxSql<'a> {
         Ok(())
     }
 
-    #[instrument(level = "trace", skip(self))]
     pub fn schema_alias_of(&self, module_path: impl AsRef<str> + Debug) -> Option<String> {
         let mut needle = None;
         for (item, _index) in &self.schemas {
@@ -578,7 +596,6 @@ impl<'a> PgxSql<'a> {
             .map(|v| (v + ".").to_string()).unwrap_or_else(|| "".to_string())
     }
 
-    #[instrument(level = "info", err, skip(self))]
     pub fn to_sql(&self) -> eyre::Result<String> {
         let mut sql = String::new();
         for step_id in toposort(&self.graph, None).map_err(|_e| eyre_err!("Depgraph was Cyclic."))? {
@@ -632,7 +649,7 @@ impl<'a> PgxSql<'a> {
             file = item.file,
             line = item.line,
             name = item.name,
-            variants = item.variants.iter().map(|variant| format!("\t'{}'\n", variant)).collect::<Vec<_>>().join(","),
+            variants = item.variants.iter().map(|variant| format!("\t'{}'", variant)).collect::<Vec<_>>().join(",\n") + "\n",
         );
         tracing::debug!(%sql);
         sql
@@ -825,7 +842,6 @@ impl<'a> PgxSql<'a> {
                                   in_fn = item.in_fn,
         );
         let (in_fn, _index) = self.externs.iter().find(|(k, _v)| {
-            tracing::trace!(%k.full_path, %in_fn_path, "Checked");
             (**k).full_path == in_fn_path.as_str()
         }).ok_or_else(|| eyre::eyre!("Did not find `in_fn: {}`.", in_fn_path))?;
         tracing::trace!(in_fn = ?in_fn_path, "Found matching `in_fn`");
@@ -865,7 +881,7 @@ impl<'a> PgxSql<'a> {
 
         let materialized_type = format!("\n\
                                 -- {file}:{line}\n\
-                                -- {full_path} - {id:?}\n\
+                                -- {full_path}\n\
                                 CREATE TYPE {schema}{name} (\n\
                                     \tINTERNALLENGTH = variable,\n\
                                     \tINPUT = {schema_prefix_in_fn}{in_fn}, /* {in_fn_path} */\n\
@@ -877,7 +893,6 @@ impl<'a> PgxSql<'a> {
                                         file = item.file,
                                         line = item.line,
                                         schema = self.schema_prefix_for(item.module_path),
-                                        id = item.id,
                                         name = item.name,
                                         schema_prefix_in_fn = self.schema_prefix_for(in_fn_module_path.clone()),
                                         in_fn = item.in_fn,
