@@ -68,7 +68,7 @@ pub struct PgxSql<'a> {
 
 #[derive(Debug, Clone)]
 pub enum SqlGraphEntity<'a> {
-    ExtensionRoot,
+    ExtensionRoot(ControlFile),
     Schema(&'a InventorySchema),
     CustomSql(&'a ExtensionSql),
     Function(&'a InventoryPgExtern),
@@ -144,7 +144,7 @@ impl<'a> SqlGraphEntity<'a> {
             Enum(item) => format!("enum {}", item.full_path.to_string()),
             Ord(item) => format!("ord {}", item.full_path.to_string()),
             Hash(item) => format!("hash {}", item.full_path.to_string()),
-            ExtensionRoot => format!("ExtensionRoot"),
+            ExtensionRoot(_control) => format!("ExtensionRoot"),
         }
     }
 }
@@ -164,7 +164,7 @@ impl<'a> PgxSql<'a> {
     ) -> Self {
         let mut graph = StableGraph::new();
 
-        let root = graph.add_node(SqlGraphEntity::ExtensionRoot);
+        let root = graph.add_node(SqlGraphEntity::ExtensionRoot(control.clone()));
 
         // The initial build phase.
         //
@@ -305,7 +305,7 @@ impl<'a> PgxSql<'a> {
                 }
             }
             if !found {
-                tracing::trace!(from = ?item.full_path, to = ?SqlGraphEntity::ExtensionRoot, "Adding ExtensionSQL to ExtensionRoot edge.");
+                tracing::trace!(from = ?item.full_path, to = ?root, "Adding ExtensionSQL to ExtensionRoot edge.");
                 this.graph.add_edge(root, index, SqlGraphRelationship::RequiredBy);
             }
         }
@@ -320,7 +320,7 @@ impl<'a> PgxSql<'a> {
                 }
             }
             if !found {
-                tracing::trace!(from = ?item.full_path, to = ?SqlGraphEntity::ExtensionRoot, "Adding Enum to ExtensionRoot edge.");
+                tracing::trace!(from = ?item.full_path, to = ?root, "Adding Enum to ExtensionRoot edge.");
                 this.graph.add_edge(root, index, SqlGraphRelationship::RequiredBy);
             }
         }
@@ -335,7 +335,7 @@ impl<'a> PgxSql<'a> {
                 }
             }
             if !found {
-                tracing::trace!(from = ?item.full_path, to = ?SqlGraphEntity::ExtensionRoot, "Adding Types to ExtensionRoot edge.");
+                tracing::trace!(from = ?item.full_path, to = ?root, "Adding Types to ExtensionRoot edge.");
                 this.graph.add_edge(root, index, SqlGraphRelationship::RequiredBy);
             }
         }
@@ -350,7 +350,7 @@ impl<'a> PgxSql<'a> {
                 }
             }
             if !found {
-                tracing::trace!(from = ?item.full_path, to = ?SqlGraphEntity::ExtensionRoot, "Adding Extern to ExtensionRoot edge.");
+                tracing::trace!(from = ?item.full_path, to = ?root, "Adding Extern to ExtensionRoot edge.");
                 this.graph.add_edge(root, index, SqlGraphRelationship::RequiredBy);
             }
             for arg in &item.fn_args {
@@ -442,7 +442,7 @@ impl<'a> PgxSql<'a> {
                 }
             }
             if !found {
-                tracing::trace!(from = ?item.full_path, to = ?SqlGraphEntity::ExtensionRoot, "Adding Ord to ExtensionRoot edge.");
+                tracing::trace!(from = ?item.full_path, to = ?root, "Adding Ord to ExtensionRoot edge.");
                 this.graph.add_edge(root, index, SqlGraphRelationship::RequiredBy);
             }
         }
@@ -457,7 +457,7 @@ impl<'a> PgxSql<'a> {
                 }
             }
             if !found {
-                tracing::trace!(from = ?item.full_path, to = ?SqlGraphEntity::ExtensionRoot, "Adding Hash to ExtensionRoot edge.");
+                tracing::trace!(from = ?item.full_path, to = ?root, "Adding Hash to ExtensionRoot edge.");
                 this.graph.add_edge(root, index, SqlGraphRelationship::RequiredBy);
             }
         }
@@ -529,8 +529,9 @@ impl<'a> PgxSql<'a> {
                         "label = \"{}\", weight = 3, shape = \"signature\"",
                         node.dot_format()
                     ),
-                    SqlGraphEntity::ExtensionRoot => format!(
-                        "label = \"Extension\", shape = \"cylinder\""
+                    SqlGraphEntity::ExtensionRoot(_item) => format!(
+                        "label = \"{}\", shape = \"cylinder\"",
+                        node.dot_format()
                     ),
                 }
             },
@@ -549,6 +550,11 @@ impl<'a> PgxSql<'a> {
     pub fn schema_alias_of(&self, item_index: &NodeIndex) -> Option<String> {
         self.graph.neighbors_undirected(*item_index).flat_map(|neighbor_index| match &self.graph[neighbor_index] {
             SqlGraphEntity::Schema(s) => Some(String::from(s.name)),
+            SqlGraphEntity::ExtensionRoot(control) => if !control.relocatable {
+                control.schema.clone()
+            } else {
+                Some(String::from("@extname@"))
+            },
             _ => None,
         }).next()
     }
@@ -592,7 +598,7 @@ impl<'a> PgxSql<'a> {
                 Enum(item) => self.inventory_enums_to_sql(&step_id)?,
                 Ord(item) => self.inventory_ord_to_sql(&step_id)?,
                 Hash(item) => self.inventory_hash_to_sql(&step_id)?,
-                ExtensionRoot => format!("\
+                ExtensionRoot(item) => format!("\
                     /* \n\
                        This file is auto generated by pgx.\n\
                        \n\
@@ -929,7 +935,7 @@ impl<'a> PgxSql<'a> {
             (**k).full_path == out_fn_path.as_str()
         }).ok_or_else(|| eyre::eyre!("Did not find `out_fn: {}`.", out_fn_path))?;
         let out_fn_graph_index = self.graph.neighbors_undirected(*item_index).find(|neighbor| match &self.graph[*neighbor] {
-            SqlGraphEntity::Function(func) => func.full_path == in_fn_path,
+            SqlGraphEntity::Function(func) => func.full_path == out_fn_path,
             _ => false,
         }).ok_or_else(|| eyre_err!("Could not find out_fn graph entity."))?;
         tracing::trace!(out_fn = ?out_fn_path, "Found matching `out_fn`");
