@@ -5,6 +5,7 @@ use pgx_utils::pg_config::PgConfig;
 use std::process::{Command, Stdio};
 use crate::commands::get::get_property;
 use pgx_utils::{exit_with_error, handle_result};
+use std::io::{Write, Read};
 
 pub(crate) fn generate_schema(
     pg_config: &PgConfig,
@@ -16,6 +17,40 @@ pub(crate) fn generate_schema(
     // TODO: Ensure a `src/bin/sql_generator.rs` exists and is up to date.
     let (control_file, _extname) = find_control_file();
     let major_version = pg_config.major_version()?;
+
+    let cargo_toml = {
+        let mut buf = String::default();
+        let mut cargo_file = std::fs::File::open("Cargo.toml")
+            .expect(&format!("Could not open Cargo.toml"));
+        cargo_file.read_to_string(&mut buf)
+            .expect(&format!("Could not read Cargo.toml"));
+        buf
+    };
+    let crate_name = cargo_toml.lines().find(|line| {
+        line.starts_with("name")
+    }).and_then(|line| line.split(" = ").last())
+        .map(|line| line.trim_matches('\"').to_string()).expect("Expected crate name");
+    let expected_bin_source_content = String::from("pgx::pg_binary_magic!(") + &crate_name + ");";
+    std::fs::create_dir_all("src/bin")
+        .expect("Could not create bin dir.");
+    let generator_source_path =  "src/bin/sql-generator.rs";
+    let mut sql_gen_source_file = std::fs::OpenOptions::new()
+        .create(true)
+        .read(true)
+        .write(true)
+        .truncate(false)
+        .open(&generator_source_path)
+        .expect(&format!("Could not open `{}`.", generator_source_path));
+    let mut current_bin_source_content = String::default();
+    sql_gen_source_file.read_to_string(&mut current_bin_source_content).expect(&format!("Couldn't read {}.", generator_source_path));
+    if current_bin_source_content != expected_bin_source_content {
+        println!("`{}` exists and is not what is expected. If you encounter problems please delete it and use the generated version.", generator_source_path)
+    }
+    if current_bin_source_content == "" {
+        println!("Created `{}` with content `{}`.", generator_source_path, expected_bin_source_content);
+        sql_gen_source_file.write_all(expected_bin_source_content.as_bytes()).expect("Couldn't write bin source.");
+    }
+    drop(sql_gen_source_file);
 
     if get_property("relocatable") != Some("false".into()) {
         exit_with_error!(
