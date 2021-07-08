@@ -811,7 +811,7 @@ impl<'a> PgxSql<'a> {
                               line = item.line,
                               fn_sql = if item.overridden.is_some() {
                                   let mut inner = fn_sql.lines().map(|f| format!("-- {}", f)).collect::<Vec<_>>().join("\n");
-                                  inner.push_str("\n--\n-- Overridden as (due to a `//` comment with a `sql` code block):");
+                                  inner.push_str("\n--\n-- Overridden as (due to a `//` comment with a `pgxsql` code block):");
                                   inner
                               } else {
                                   fn_sql

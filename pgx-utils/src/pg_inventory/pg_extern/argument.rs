@@ -1,9 +1,6 @@
 use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
-use syn::{
-    parse::{Parse, ParseStream},
-    FnArg, Pat, Token,
-};
+use syn::{parse::{Parse, ParseStream}, FnArg, Pat, Token, GenericArgument};
 
 #[derive(Debug, Clone)]
 pub struct Argument {
@@ -46,12 +43,55 @@ impl Argument {
                                         let value = def.value();
                                         Some(value)
                                     },
+                                    syn::Expr::Lit(syn::ExprLit { lit: syn::Lit::Int(def), .. }) => {
+                                        let value = def.base10_digits();
+                                        Some(value.to_string())
+                                    },
                                     _ => None,
                                 }
                             }
                             _ => None,
                         }
-                    }
+                    },
+                    syn::Type::Path(ref path) => {
+                        let segments = &path.path;
+                        let mut default = None;
+                        let mut saw_functioncallinfobasedata = false;
+                        for segment in &segments.segments {
+                            if segment.ident.to_string().ends_with("Option") {
+                                match &segment.arguments {
+                                    syn::PathArguments::AngleBracketed(path_arg) => {
+                                        match path_arg.args.first() {
+                                            Some(syn::GenericArgument::Type(syn::Type::Macro(macro_pat))) => {
+                                                let mac = &macro_pat.mac;
+                                                let archetype = mac.path.segments.last().expect("No last segment.");
+                                                match archetype.ident.to_string().as_str() {
+                                                    "default" => {
+                                                        let out: DefaultMacro = mac.parse_body()?;
+                                                        match out.expr {
+                                                            syn::Expr::Lit(syn::ExprLit { lit: syn::Lit::Str(def), .. }) => {
+                                                                let value = def.value();
+                                                                default = Some(value)
+                                                            },
+                                                            syn::Expr::Lit(syn::ExprLit { lit: syn::Lit::Int(def), .. }) => {
+                                                                let value = def.base10_digits();
+                                                                default = Some(value.to_string())
+                                                            },
+                                                            _ => (),
+                                                        }
+                                                    }
+                                                    _ => (),
+                                                }
+                                            }
+                                            _ => (),
+                                        }
+                                    },
+                                     _ => continue,
+                                }
+                            }
+                        }
+                        default
+                    },
                     _ => None,
                 };
 
