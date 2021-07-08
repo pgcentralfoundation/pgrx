@@ -77,6 +77,9 @@ impl Argument {
                                                                 let value = def.base10_digits();
                                                                 default = Some(value.to_string())
                                                             },
+                                                            syn::Expr::Lit(syn::ExprLit { lit: syn::Lit::Bool(def), .. }) => {
+                                                                default = Some(def.value.to_string())
+                                                            },
                                                             _ => (),
                                                         }
                                                     }
