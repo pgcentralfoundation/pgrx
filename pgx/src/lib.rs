@@ -391,7 +391,7 @@ macro_rules! pg_module_magic {
 
 #[macro_export]
 macro_rules! pg_binary_magic {
-    ($prelude:path) => {
+    ($($prelude:ident)::*) => {
         fn main() -> ::pgx_utils::pg_inventory::color_eyre::Result<()> {
             use ::pgx_utils::pg_inventory::{
                 tracing_error::ErrorLayer,
@@ -401,7 +401,7 @@ macro_rules! pg_binary_magic {
                 eyre,
             };
             use std::env;
-            use $prelude::{generate_sql};
+            use $($prelude :: )*generate_sql;
 
             // Initialize tracing with tracing-error.
             let fmt_layer = tracing_subscriber::fmt::layer().with_target(false);
@@ -417,7 +417,7 @@ macro_rules! pg_binary_magic {
             color_eyre::install()?;
 
             let mut args = env::args().skip(1);
-            let path = args.next().unwrap_or(concat!("./sql/", stringify!($prelude), ".sql").into());
+            let path = args.next().unwrap_or(concat!("./sql/", stringify!($($prelude :: )*), ".sql").into());
             let dot: Option<String> = args.next();
             if args.next().is_some() {
                 return Err(eyre::eyre!("Only accepts two arguments, the destination path, and an optional (GraphViz) dot output path."));
