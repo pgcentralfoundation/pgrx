@@ -1,6 +1,6 @@
 use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
-use syn::{parse::{Parse, ParseStream}, FnArg, Pat, Token, GenericArgument};
+use syn::{parse::{Parse, ParseStream}, FnArg, Pat, Token};
 
 #[derive(Debug, Clone)]
 pub struct Argument {
@@ -56,7 +56,6 @@ impl Argument {
                     syn::Type::Path(ref path) => {
                         let segments = &path.path;
                         let mut default = None;
-                        let mut saw_functioncallinfobasedata = false;
                         for segment in &segments.segments {
                             if segment.ident.to_string().ends_with("Option") {
                                 match &segment.arguments {

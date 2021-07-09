@@ -49,7 +49,7 @@ impl PgExtern {
                         } else if in_commented_sql_block && inner.value().trim() == "```" {
                             in_commented_sql_block = false;
                         } else if in_commented_sql_block {
-                            let mut sql = retval.get_or_insert_with(String::default);
+                            let sql = retval.get_or_insert_with(String::default);
                             let line = inner.value()
                                 .trim_start()
                                 .replace("@FUNCTION_NAME@", &*(self.func.sig.ident.to_string() + "_wrapper")) + "\n";
