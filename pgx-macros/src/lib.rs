@@ -155,6 +155,67 @@ pub fn merges(_attr: TokenStream, item: TokenStream) -> TokenStream {
     item
 }
 
+
+#[proc_macro_attribute]
+pub fn pg_schema(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    let pgx_schema = parse_macro_input!(item as pg_inventory::Schema);
+    pgx_schema.to_token_stream().into()
+}
+
+/// Embed SQL directly into the generated extension script.
+///
+/// The argument must be as single raw string literal.
+///
+/// # Example
+/// ```
+/// # #[macro_use]
+/// # extern crate pgx_macros;
+/// # fn main() {
+/// extension_sql!(r#"
+/// -- sql statements
+/// "#)
+/// # }
+/// ```
+
+#[proc_macro]
+pub fn extension_sql(input: TokenStream) -> TokenStream {
+    fn wrapped(input: TokenStream) -> Result<TokenStream, syn::Error> {
+        let ext_sql: pg_inventory::ExtensionSql = syn::parse(input)?;
+        Ok(ext_sql.to_token_stream().into())
+        
+    }
+
+    match wrapped(input) {
+        Ok(tokens) => tokens,
+        Err(e) => {
+            let msg = e.to_string();
+            TokenStream::from(quote! {
+              compile_error!(#msg);
+            })
+        }
+    }
+}
+
+#[proc_macro]
+pub fn extension_sql_file(input: TokenStream) -> TokenStream {
+    fn wrapped(input: TokenStream) -> Result<TokenStream, syn::Error> {
+        let ext_sql: pg_inventory::ExtensionSqlFile = syn::parse(input)?;
+        Ok(ext_sql.to_token_stream().into())
+        
+    }
+
+    match wrapped(input) {
+        Ok(tokens) => tokens,
+        Err(e) => {
+            let msg = e.to_string();
+            TokenStream::from(quote! {
+              compile_error!(#msg);
+            })
+        }
+    }
+}
+
+
 /// Associated macro for `#[pg_extern] or `#[pg_operator]`.  Used to set the `SEARCH_PATH` option
 /// on the `CREATE FUNCTION` statement.
 #[proc_macro_attribute]
@@ -174,14 +235,6 @@ pub fn pg_extern(attr: TokenStream, item: TokenStream) -> TokenStream {
         Item::Fn(func) => rewrite_item_fn(func, args, inventory_submission.as_ref()).into(),
         _ => panic!("#[pg_extern] can only be applied to top-level functions"),
     }
-}
-
-/// Declare a function as `#[pg_guard]` to indcate that it is called from a Postgres `extern "C"`
-/// function so that Rust `panic!()`s (and Postgres `elog(ERROR)`s) will be properly handled by `pgx`
-#[proc_macro_attribute]
-pub fn pg_schema(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    let pgx_schema = parse_macro_input!(item as pg_inventory::Schema);
-    pgx_schema.to_token_stream().into()
 }
 
 fn rewrite_item_fn(
@@ -502,79 +555,6 @@ fn parse_postgres_type_args(attributes: &[Attribute]) -> HashSet<PostgresTypeAtt
     }
 
     categorized_attributes
-}
-
-/// Embed SQL directly into the generated extension script.
-///
-/// The argument must be as single raw string literal.
-///
-/// # Example
-/// ```
-/// # #[macro_use]
-/// # extern crate pgx_macros;
-/// # fn main() {
-/// extension_sql!(r#"
-/// -- sql statements
-/// "#)
-/// # }
-/// ```
-
-#[proc_macro]
-pub fn extension_sql(input: TokenStream) -> TokenStream {
-    fn wrapped(input: TokenStream) -> Result<TokenStream, syn::Error> {
-        let sql: syn::LitStr = syn::parse(input)?;
-        Ok(quote! {
-            pgx_utils::pg_inventory::inventory::submit! {
-                crate::__pgx_internals::ExtensionSql(pgx_utils::pg_inventory::ExtensionSql {
-                    sql: #sql,
-                    module_path: module_path!(),
-                    full_path: concat!(file!(), ':', line!()),
-                    file: file!(),
-                    line: line!(),
-                })
-            }
-        }
-        .into())
-    }
-
-    match wrapped(input) {
-        Ok(tokens) => tokens,
-        Err(e) => {
-            let msg = e.to_string();
-            TokenStream::from(quote! {
-              compile_error!(#msg);
-            })
-        }
-    }
-}
-
-#[proc_macro]
-pub fn extension_sql_file(input: TokenStream) -> TokenStream {
-    fn wrapped(input: TokenStream) -> Result<TokenStream, syn::Error> {
-        let path: syn::LitStr = syn::parse(input)?;
-        Ok(quote! {
-            pgx_utils::pg_inventory::inventory::submit! {
-                crate::__pgx_internals::ExtensionSql(pgx_utils::pg_inventory::ExtensionSql {
-                    sql: include_str!(#path),
-                    module_path: module_path!(),
-                    full_path: concat!(file!(), ':', line!()),
-                    file: file!(),
-                    line: line!(),
-                })
-            }
-        }
-        .into())
-    }
-
-    match wrapped(input) {
-        Ok(tokens) => tokens,
-        Err(e) => {
-            let msg = e.to_string();
-            TokenStream::from(quote! {
-              compile_error!(#msg);
-            })
-        }
-    }
 }
 
 #[proc_macro_derive(PostgresEq)]

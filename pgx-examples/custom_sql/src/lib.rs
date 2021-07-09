@@ -43,7 +43,7 @@ extension_sql!("\n\
 extension_sql!("\n
         INSERT INTO extension_sql VALUES ('single');\n\
     ",
-    after = "bootstrap.sql",
+    after = ["bootstrap.sql"],
     name = "multiple"
 );
 extension_sql!("\n\
@@ -53,7 +53,7 @@ extension_sql!("\n\
         Dog,
         home::Ball
     ],
-    before = "multiple", // This points to the above `extension_sql!()` with `name = multiple`
+    before = ["multiple"], // This points to the above `extension_sql!()` with `name = multiple`
 );
 extension_sql!("\n\
 INSERT INTO extension_sql VALUES ('finalizer');\n\
@@ -61,14 +61,14 @@ INSERT INTO extension_sql VALUES ('finalizer');\n\
 
 // `extension_sql_file` does the same as `extension_sql` but automatically sets the `name` to the
 // filename (not the full path).
-extension_sql_file!("../sql/bootstraper.sql", bootstrap);
-extension_sql_file!("../sql/single.sql", after = "bootstrap.sql");
+extension_sql_file!("../sql/bootstrap.sql", bootstrap);
+extension_sql_file!("../sql/single.sql", after = ["bootstrap.sql"]);
 extension_sql_file!("../sql/multiple.sql",
     after = [
         query_dsl::bool::dsl,
         query_dsl::filter::dsl
     ],
-    before = "single.sql",
+    before = ["single.sql"],
 );
 extension_sql_file!("../sql/finalizer.sql");
 

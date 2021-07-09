@@ -342,7 +342,7 @@ macro_rules! pg_module_magic {
             static LOAD_ORDER_DIR: include_dir::Dir = include_dir::include_dir!("sql");
 
             #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
-            pub struct ExtensionSql(pub pgx_utils::pg_inventory::ExtensionSql);
+            pub struct ExtensionSql(pub pgx_utils::pg_inventory::InventoryExtensionSql);
             inventory::collect!(ExtensionSql);
 
             #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
@@ -369,7 +369,7 @@ macro_rules! pg_module_magic {
             pub struct Schema(pub pgx_utils::pg_inventory::InventorySchema);
             inventory::collect!(Schema);
 
-            pub fn generate_sql() -> pgx_utils::pg_inventory::eyre::Result<PgxSql<'static>> {
+            pub fn generate_sql<'a>() -> pgx_utils::pg_inventory::eyre::Result<PgxSql<'a>> {
                 use std::fmt::Write;
                 let mut generated = PgxSql::build(
                     ControlFile::try_from(CONTROL_FILE)?,

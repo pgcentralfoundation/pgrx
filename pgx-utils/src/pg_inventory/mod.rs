@@ -5,6 +5,7 @@ mod postgres_ord;
 mod postgres_type;
 mod pg_schema;
 mod control_file;
+mod extension_sql;
 
 pub use pg_extern::{PgExtern, InventoryPgExtern, InventoryPgExternReturn, InventoryPgExternInput, InventoryPgOperator};
 pub use postgres_enum::{PostgresEnum, InventoryPostgresEnum};
@@ -13,6 +14,7 @@ pub use postgres_ord::{PostgresOrd, InventoryPostgresOrd};
 pub use postgres_type::{PostgresType, InventoryPostgresType};
 pub use pg_schema::{Schema, InventorySchema};
 pub use control_file::{ControlFile, ControlFileError};
+pub use extension_sql::{ExtensionSql, ExtensionSqlFile, InventoryExtensionSql, InventoryExtensionSqlPositioningRef};
 
 // Reexports for the pgx extension inventory builders.
 #[doc(hidden)]
@@ -41,14 +43,6 @@ use crate::ExternArgs;
 use eyre::eyre as eyre_err;
 use petgraph::{algo::toposort, dot::Dot, stable_graph::{NodeIndex, StableGraph}};
 
-#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub struct ExtensionSql {
-    pub module_path: &'static str,
-    pub full_path: &'static str,
-    pub sql: &'static str,
-    pub file: &'static str,
-    pub line: u32,
-}
 
 #[derive(Debug, Clone)]
 pub struct PgxSql<'a> {
@@ -57,7 +51,7 @@ pub struct PgxSql<'a> {
     pub graph: StableGraph<SqlGraphEntity<'a>, SqlGraphRelationship>,
     pub graph_root: NodeIndex,
     pub schemas: HashMap<&'a InventorySchema, NodeIndex>,
-    pub extension_sqls: HashMap<&'a ExtensionSql, NodeIndex>,
+    pub extension_sqls: HashMap<&'a InventoryExtensionSql, NodeIndex>,
     pub externs: HashMap<&'a InventoryPgExtern, NodeIndex>,
     pub types: HashMap<&'a InventoryPostgresType, NodeIndex>,
     pub builtin_types: HashMap<&'a str, NodeIndex>,
@@ -70,7 +64,7 @@ pub struct PgxSql<'a> {
 pub enum SqlGraphEntity<'a> {
     ExtensionRoot(ControlFile),
     Schema(&'a InventorySchema),
-    CustomSql(&'a ExtensionSql),
+    CustomSql(&'a InventoryExtensionSql),
     Function(&'a InventoryPgExtern),
     Type(&'a InventoryPostgresType),
     BuiltinType(&'a str),
@@ -86,8 +80,8 @@ impl<'a> From<&'a InventorySchema> for SqlGraphEntity<'a> {
     }
 }
 
-impl<'a> From<&'a ExtensionSql> for SqlGraphEntity<'a> {
-    fn from(item: &'a ExtensionSql) -> Self {
+impl<'a> From<&'a InventoryExtensionSql> for SqlGraphEntity<'a> {
+    fn from(item: &'a InventoryExtensionSql) -> Self {
         SqlGraphEntity::CustomSql(&item)
     }
 }
@@ -154,7 +148,7 @@ impl<'a> PgxSql<'a> {
         control: ControlFile,
         type_mappings: impl Iterator<Item=(TypeId, String)>,
         schemas: impl Iterator<Item=&'a InventorySchema>,
-        extension_sqls: impl Iterator<Item=&'a ExtensionSql>,
+        extension_sqls: impl Iterator<Item=&'a InventoryExtensionSql>,
         externs: impl Iterator<Item=&'a InventoryPgExtern>,
         types: impl Iterator<Item=&'a InventoryPostgresType>,
         enums: impl Iterator<Item=&'a InventoryPostgresEnum>,
@@ -306,6 +300,80 @@ impl<'a> PgxSql<'a> {
             if !found {
                 tracing::trace!(from = ?item.full_path, to = ?root, "Adding ExtensionSQL to ExtensionRoot edge.");
                 this.graph.add_edge(root, index, SqlGraphRelationship::RequiredBy);
+            }
+            for before in &item.before {
+                match before {
+                    InventoryExtensionSqlPositioningRef::FullPath(path) => {
+                        tracing::error!(?path, "BEFORE");
+                        for (other, other_index) in &this.types {
+                            if other.full_path == *path {
+                                tracing::trace!(from = ?item.full_path, to = ?other.full_path, "Adding ExtensionSQL before Type edge.");
+                                this.graph.add_edge(*other_index, index, SqlGraphRelationship::RequiredBy);
+                                break;
+                            }
+                        }
+                        for (other, other_index) in &this.enums {
+                            if other.full_path == *path {
+                                tracing::trace!(from = ?item.full_path, to = ?other.full_path, "Adding ExtensionSQL before Enum edge.");
+                                this.graph.add_edge(*other_index, index, SqlGraphRelationship::RequiredBy);
+                                break;
+                            }
+                        }
+                        for (other, other_index) in &this.externs {
+                            if other.full_path == *path {
+                                tracing::trace!(from = ?item.full_path, to = ?other.full_path, "Adding ExtensionSQL before Extern edge.");
+                                this.graph.add_edge(*other_index, index, SqlGraphRelationship::RequiredBy);
+                                break;
+                            }
+                        }
+                    },
+                    InventoryExtensionSqlPositioningRef::Name(name) => {
+                        for (other, other_index) in &this.extension_sqls {
+                            if other.name == Some(name) {
+                                tracing::trace!(from = ?item.full_path, to = ?other.full_path, "Adding ExtensionSQL before ExtensionSql edge.");
+                                this.graph.add_edge(*other_index, index, SqlGraphRelationship::RequiredBy);
+                                break;
+                            }
+                        }
+                    },
+                }
+            }
+            for after in &item.after {
+                match after {
+                    InventoryExtensionSqlPositioningRef::FullPath(path) => {
+                        tracing::error!(?path, "AFTER");
+                        for (other, other_index) in &this.types {
+                            if other.full_path == *path {
+                                tracing::trace!(from = ?item.full_path, to = ?other.full_path, "Adding ExtensionSQL after Type edge.");
+                                this.graph.add_edge(index, *other_index, SqlGraphRelationship::RequiredBy);
+                                break;
+                            }
+                        }
+                        for (other, other_index) in &this.enums {
+                            if other.full_path == *path {
+                                tracing::trace!(from = ?item.full_path, to = ?other.full_path, "Adding ExtensionSQL after Enum edge.");
+                                this.graph.add_edge(index, *other_index, SqlGraphRelationship::RequiredBy);
+                                break;
+                            }
+                        }
+                        for (other, other_index) in &this.externs {
+                            if other.full_path == *path {
+                                tracing::trace!(from = ?item.full_path, to = ?other.full_path, "Adding ExtensionSQL after Extern edge.");
+                                this.graph.add_edge(index, *other_index, SqlGraphRelationship::RequiredBy);
+                                break;
+                            }
+                        }
+                    },
+                    InventoryExtensionSqlPositioningRef::Name(name) => {
+                        for (other, other_index) in &this.extension_sqls {
+                            if other.name == Some(name) {
+                                tracing::trace!(from = ?item.full_path, to = ?other.full_path, "Adding ExtensionSQL after ExtensionSql edge.");
+                                this.graph.add_edge(*other_index, index, SqlGraphRelationship::RequiredBy);
+                                break;
+                            }
+                        }
+                    },
+                }
             }
         }
         for (item, &index) in &this.enums {
