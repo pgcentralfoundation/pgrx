@@ -2,7 +2,7 @@ use core::convert::TryFrom;
 use std::collections::HashMap;
 use tracing_error::SpanTrace;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Hash, PartialOrd, Ord, PartialEq, Eq)]
 pub struct ControlFile {
     pub comment: String,
     pub default_version: String,

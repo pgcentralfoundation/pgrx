@@ -341,31 +341,31 @@ macro_rules! pg_module_magic {
             static LOAD_ORDER_FILE: &str = include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/sql/load-order.txt"));
             static LOAD_ORDER_DIR: include_dir::Dir = include_dir::include_dir!("sql");
 
-            #[derive(Debug)]
+            #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
             pub struct ExtensionSql(pub pgx_utils::pg_inventory::ExtensionSql);
             inventory::collect!(ExtensionSql);
 
-            #[derive(Debug)]
+            #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
             pub struct PostgresType(pub pgx_utils::pg_inventory::InventoryPostgresType);
             inventory::collect!(PostgresType);
 
-            #[derive(Debug)]
+            #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
             pub struct PgExtern(pub pgx_utils::pg_inventory::InventoryPgExtern);
             inventory::collect!(PgExtern);
 
-            #[derive(Debug)]
+            #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
             pub struct PostgresEnum(pub pgx_utils::pg_inventory::InventoryPostgresEnum);
             inventory::collect!(PostgresEnum);
 
-            #[derive(Debug)]
+            #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
             pub struct PostgresHash(pub pgx_utils::pg_inventory::InventoryPostgresHash);
             inventory::collect!(PostgresHash);
 
-            #[derive(Debug)]
+            #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
             pub struct PostgresOrd(pub pgx_utils::pg_inventory::InventoryPostgresOrd);
             inventory::collect!(PostgresOrd);
 
-            #[derive(Debug)]
+            #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
             pub struct Schema(pub pgx_utils::pg_inventory::InventorySchema);
             inventory::collect!(Schema);
 
@@ -374,13 +374,41 @@ macro_rules! pg_module_magic {
                 let mut generated = PgxSql::build(
                     ControlFile::try_from(CONTROL_FILE)?,
                     (*pgx::DEFAULT_TYPEID_SQL_MAPPING).iter().map(|(x, y)| (x.clone(), y.clone())),
-                    inventory::iter::<Schema>().map(|x| &x.0),
-                    inventory::iter::<ExtensionSql>().map(|x| &x.0),
-                    inventory::iter::<PgExtern>().map(|x| &x.0),
-                    inventory::iter::<PostgresType>().map(|x| &x.0),
-                    inventory::iter::<PostgresEnum>().map(|x| &x.0),
-                    inventory::iter::<PostgresOrd>().map(|x| &x.0),
-                    inventory::iter::<PostgresHash>().map(|x| &x.0),
+                    {
+                        let mut set = inventory::iter::<Schema>().collect::<Vec<_>>();
+                        set.sort();
+                        set.into_iter().map(|x| &x.0)
+                    },
+                    {
+                        let mut set = inventory::iter::<ExtensionSql>().collect::<Vec<_>>();
+                        set.sort();
+                        set.into_iter().map(|x| &x.0)
+                    },
+                    {
+                        let mut set = inventory::iter::<PgExtern>().collect::<Vec<_>>();
+                        set.sort();
+                        set.into_iter().map(|x| &x.0)
+                    },
+                    {
+                        let mut set = inventory::iter::<PostgresType>().collect::<Vec<_>>();
+                        set.sort();
+                        set.into_iter().map(|x| &x.0)
+                    },
+                    {
+                        let mut set = inventory::iter::<PostgresEnum>().collect::<Vec<_>>();
+                        set.sort();
+                        set.into_iter().map(|x| &x.0)
+                    },
+                    {
+                        let mut set = inventory::iter::<PostgresOrd>().collect::<Vec<_>>();
+                        set.sort();
+                        set.into_iter().map(|x| &x.0)
+                    },
+                    {
+                        let mut set = inventory::iter::<PostgresHash>().collect::<Vec<_>>();
+                        set.sort();
+                        set.into_iter().map(|x| &x.0)
+                    },
                 );
 
                 Ok(generated)

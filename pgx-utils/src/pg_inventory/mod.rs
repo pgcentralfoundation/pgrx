@@ -41,7 +41,7 @@ use crate::ExternArgs;
 use eyre::eyre as eyre_err;
 use petgraph::{algo::toposort, dot::Dot, stable_graph::{NodeIndex, StableGraph}};
 
-#[derive(Debug, Clone, Hash, PartialEq, Eq)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct ExtensionSql {
     pub module_path: &'static str,
     pub full_path: &'static str,
@@ -66,7 +66,7 @@ pub struct PgxSql<'a> {
     pub hashes: HashMap<&'a InventoryPostgresHash, NodeIndex>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub enum SqlGraphEntity<'a> {
     ExtensionRoot(ControlFile),
     Schema(&'a InventorySchema),

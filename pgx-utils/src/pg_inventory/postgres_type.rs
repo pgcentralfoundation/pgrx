@@ -67,7 +67,7 @@ impl ToTokens for PostgresType {
     }
 }
 
-#[derive(Debug, Clone, Hash, PartialEq, Eq)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct InventoryPostgresType {
     pub name: &'static str,
     pub file: &'static str,
