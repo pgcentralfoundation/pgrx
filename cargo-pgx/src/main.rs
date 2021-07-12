@@ -9,7 +9,7 @@ mod commands;
 use crate::commands::connect::connect_psql;
 use crate::commands::get::get_property;
 use crate::commands::init::init_pgx;
-use crate::commands::install::{install_extension};
+use crate::commands::install::install_extension;
 use crate::commands::new::create_crate_template;
 use crate::commands::package::package_extension;
 use crate::commands::run::run_psql;
@@ -216,10 +216,14 @@ fn do_it() -> std::result::Result<(), std::io::Error> {
                 let out = schema
                     .value_of("out")
                     .map(|x| x.to_string())
-                    .unwrap_or_else(|| format!("sql/{}-{}.sql", extname, crate::commands::install::get_version()));
-                let dot = schema
-                    .value_of("dot")
-                    .map(|x| x.to_string());
+                    .unwrap_or_else(|| {
+                        format!(
+                            "sql/{}-{}.sql",
+                            extname,
+                            crate::commands::install::get_version()
+                        )
+                    });
+                let dot = schema.value_of("dot").map(|x| x.to_string());
                 let is_release = schema.is_present("release");
                 let is_release = schema.is_present("release");
                 let features = schema

@@ -33,7 +33,6 @@ impl ToTokens for PostgresOrd {
     }
 }
 
-
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct InventoryPostgresOrd {
     pub name: &'static str,

@@ -89,12 +89,24 @@ pub struct InventoryPostgresType {
 
 impl InventoryPostgresType {
     pub fn id_matches(&self, candidate: &core::any::TypeId) -> bool {
-        *candidate == self.id ||
-        *candidate == self.option_id ||
-        *candidate == self.vec_id ||
-        *candidate == self.vec_option_id ||
-        if let Some(array_id) = self.array_id { *candidate == array_id } else { false } ||
-        if let Some(option_array_id) = self.option_array_id { *candidate == option_array_id } else { false } ||
-        if let Some(varlena_id) = self.varlena_id { *candidate == varlena_id } else { false }
+        *candidate == self.id
+            || *candidate == self.option_id
+            || *candidate == self.vec_id
+            || *candidate == self.vec_option_id
+            || if let Some(array_id) = self.array_id {
+                *candidate == array_id
+            } else {
+                false
+            }
+            || if let Some(option_array_id) = self.option_array_id {
+                *candidate == option_array_id
+            } else {
+                false
+            }
+            || if let Some(varlena_id) = self.varlena_id {
+                *candidate == varlena_id
+            } else {
+                false
+            }
     }
 }

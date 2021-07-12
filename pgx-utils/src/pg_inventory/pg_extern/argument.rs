@@ -1,6 +1,9 @@
 use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
-use syn::{parse::{Parse, ParseStream}, FnArg, Pat, Token};
+use syn::{
+    parse::{Parse, ParseStream},
+    FnArg, Pat, Token,
+};
 
 #[derive(Debug, Clone)]
 pub struct Argument {
@@ -24,12 +27,7 @@ impl Argument {
                             ))
                         }
                     },
-                    _ => {
-                        return Err(syn::Error::new(
-                            Span::call_site(),
-                            "Unable to parse FnArg.",
-                        ))
-                    }
+                    _ => return Err(syn::Error::new(Span::call_site(), "Unable to parse FnArg.")),
                 };
                 let default = match pat.ty.as_ref() {
                     syn::Type::Macro(macro_pat) => {
@@ -39,20 +37,26 @@ impl Argument {
                             "default" => {
                                 let out: DefaultMacro = mac.parse_body()?;
                                 match out.expr {
-                                    syn::Expr::Lit(syn::ExprLit { lit: syn::Lit::Str(def), .. }) => {
+                                    syn::Expr::Lit(syn::ExprLit {
+                                        lit: syn::Lit::Str(def),
+                                        ..
+                                    }) => {
                                         let value = def.value();
                                         Some(value)
-                                    },
-                                    syn::Expr::Lit(syn::ExprLit { lit: syn::Lit::Int(def), .. }) => {
+                                    }
+                                    syn::Expr::Lit(syn::ExprLit {
+                                        lit: syn::Lit::Int(def),
+                                        ..
+                                    }) => {
                                         let value = def.base10_digits();
                                         Some(value.to_string())
-                                    },
+                                    }
                                     _ => None,
                                 }
                             }
                             _ => None,
                         }
-                    },
+                    }
                     syn::Type::Path(ref path) => {
                         let segments = &path.path;
                         let mut default = None;
@@ -61,24 +65,40 @@ impl Argument {
                                 match &segment.arguments {
                                     syn::PathArguments::AngleBracketed(path_arg) => {
                                         match path_arg.args.first() {
-                                            Some(syn::GenericArgument::Type(syn::Type::Macro(macro_pat))) => {
+                                            Some(syn::GenericArgument::Type(syn::Type::Macro(
+                                                macro_pat,
+                                            ))) => {
                                                 let mac = &macro_pat.mac;
-                                                let archetype = mac.path.segments.last().expect("No last segment.");
+                                                let archetype = mac
+                                                    .path
+                                                    .segments
+                                                    .last()
+                                                    .expect("No last segment.");
                                                 match archetype.ident.to_string().as_str() {
                                                     "default" => {
                                                         let out: DefaultMacro = mac.parse_body()?;
                                                         match out.expr {
-                                                            syn::Expr::Lit(syn::ExprLit { lit: syn::Lit::Str(def), .. }) => {
+                                                            syn::Expr::Lit(syn::ExprLit {
+                                                                lit: syn::Lit::Str(def),
+                                                                ..
+                                                            }) => {
                                                                 let value = def.value();
                                                                 default = Some(value)
-                                                            },
-                                                            syn::Expr::Lit(syn::ExprLit { lit: syn::Lit::Int(def), .. }) => {
+                                                            }
+                                                            syn::Expr::Lit(syn::ExprLit {
+                                                                lit: syn::Lit::Int(def),
+                                                                ..
+                                                            }) => {
                                                                 let value = def.base10_digits();
                                                                 default = Some(value.to_string())
-                                                            },
-                                                            syn::Expr::Lit(syn::ExprLit { lit: syn::Lit::Bool(def), .. }) => {
-                                                                default = Some(def.value.to_string())
-                                                            },
+                                                            }
+                                                            syn::Expr::Lit(syn::ExprLit {
+                                                                lit: syn::Lit::Bool(def),
+                                                                ..
+                                                            }) => {
+                                                                default =
+                                                                    Some(def.value.to_string())
+                                                            }
                                                             _ => (),
                                                         }
                                                     }
@@ -87,13 +107,13 @@ impl Argument {
                                             }
                                             _ => (),
                                         }
-                                    },
-                                     _ => continue,
+                                    }
+                                    _ => continue,
                                 }
                             }
                         }
                         default
-                    },
+                    }
                     _ => None,
                 };
 
@@ -111,39 +131,37 @@ impl Argument {
                                 saw_functioncallinfobasedata = true;
                             }
                         }
-                        if (saw_pg_sys && saw_functioncallinfobasedata) || (saw_functioncallinfobasedata && segments.segments.len() == 1)  {
+                        if (saw_pg_sys && saw_functioncallinfobasedata)
+                            || (saw_functioncallinfobasedata && segments.segments.len() == 1)
+                        {
                             return Ok(None);
                         }
-                    },
-                    syn::Type::Ptr(ref ptr) => {
-                        match *ptr.elem {
-                            syn::Type::Path(ref path) => {
-                                let segments = &path.path;
-                                let mut saw_pg_sys = false;
-                                let mut saw_functioncallinfobasedata = false;
-                                for segment in &segments.segments {
-                                    if segment.ident.to_string() == "pg_sys" {
-                                        saw_pg_sys = true;
-                                    }
-                                    if segment.ident.to_string() == "FunctionCallInfo" {
-                                        saw_functioncallinfobasedata = true;
-                                    }
+                    }
+                    syn::Type::Ptr(ref ptr) => match *ptr.elem {
+                        syn::Type::Path(ref path) => {
+                            let segments = &path.path;
+                            let mut saw_pg_sys = false;
+                            let mut saw_functioncallinfobasedata = false;
+                            for segment in &segments.segments {
+                                if segment.ident.to_string() == "pg_sys" {
+                                    saw_pg_sys = true;
                                 }
-                                if (saw_pg_sys && saw_functioncallinfobasedata) || (saw_functioncallinfobasedata && segments.segments.len() == 1)  {
-                                    return Err(syn::Error::new(
-                                        Span::call_site(),
-                                        "It's a FunctionCallInfoBaseData, skipping.",
-                                    ));
+                                if segment.ident.to_string() == "FunctionCallInfo" {
+                                    saw_functioncallinfobasedata = true;
                                 }
-                            },
-                            _ => {
-                                ()
+                            }
+                            if (saw_pg_sys && saw_functioncallinfobasedata)
+                                || (saw_functioncallinfobasedata && segments.segments.len() == 1)
+                            {
+                                return Err(syn::Error::new(
+                                    Span::call_site(),
+                                    "It's a FunctionCallInfoBaseData, skipping.",
+                                ));
                             }
                         }
+                        _ => (),
                     },
-                    _ => {
-                        ()
-                    }
+                    _ => (),
                 };
 
                 Ok(Some(Argument {
@@ -152,10 +170,7 @@ impl Argument {
                     default,
                 }))
             }
-            _ => Err(syn::Error::new(
-                Span::call_site(),
-                "Unable to parse FnArg.",
-            )),
+            _ => Err(syn::Error::new(Span::call_site(), "Unable to parse FnArg.")),
         }
     }
 }
@@ -175,7 +190,7 @@ impl ToTokens for Argument {
                     }
                 }
                 found_optional
-            },
+            }
             _ => false,
         };
 

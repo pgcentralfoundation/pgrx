@@ -155,7 +155,6 @@ pub fn merges(_attr: TokenStream, item: TokenStream) -> TokenStream {
     item
 }
 
-
 #[proc_macro_attribute]
 pub fn pg_schema(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let pgx_schema = parse_macro_input!(item as pg_inventory::Schema);
@@ -182,7 +181,6 @@ pub fn extension_sql(input: TokenStream) -> TokenStream {
     fn wrapped(input: TokenStream) -> Result<TokenStream, syn::Error> {
         let ext_sql: pg_inventory::ExtensionSql = syn::parse(input)?;
         Ok(ext_sql.to_token_stream().into())
-        
     }
 
     match wrapped(input) {
@@ -201,7 +199,6 @@ pub fn extension_sql_file(input: TokenStream) -> TokenStream {
     fn wrapped(input: TokenStream) -> Result<TokenStream, syn::Error> {
         let ext_sql: pg_inventory::ExtensionSqlFile = syn::parse(input)?;
         Ok(ext_sql.to_token_stream().into())
-        
     }
 
     match wrapped(input) {
@@ -215,7 +212,6 @@ pub fn extension_sql_file(input: TokenStream) -> TokenStream {
     }
 }
 
-
 /// Associated macro for `#[pg_extern] or `#[pg_operator]`.  Used to set the `SEARCH_PATH` option
 /// on the `CREATE FUNCTION` statement.
 #[proc_macro_attribute]
@@ -228,7 +224,8 @@ pub fn search_path(_attr: TokenStream, item: TokenStream) -> TokenStream {
 pub fn pg_extern(attr: TokenStream, item: TokenStream) -> TokenStream {
     let args = parse_extern_attributes(proc_macro2::TokenStream::from(attr.clone()));
 
-    let inventory_submission = pg_inventory::PgExtern::new(attr.clone().into(), item.clone().into()).ok();
+    let inventory_submission =
+        pg_inventory::PgExtern::new(attr.clone().into(), item.clone().into()).ok();
 
     let ast = parse_macro_input!(item as syn::Item);
     match ast {

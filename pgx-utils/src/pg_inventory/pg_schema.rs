@@ -1,6 +1,9 @@
 use proc_macro2::TokenStream as TokenStream2;
 use quote::{quote, ToTokens, TokenStreamExt};
-use syn::{parse::{Parse, ParseStream}, ItemMod};
+use syn::{
+    parse::{Parse, ParseStream},
+    ItemMod,
+};
 
 #[derive(Debug, Clone)]
 pub struct Schema {
@@ -21,7 +24,11 @@ impl ToTokens for Schema {
         let vis = &self.module.vis;
         let mod_token = &self.module.mod_token;
         let ident = &self.module.ident;
-        let (_content_brace, content_items) = &self.module.content.as_ref().expect("Can only support `mod {}` right now.");
+        let (_content_brace, content_items) = &self
+            .module
+            .content
+            .as_ref()
+            .expect("Can only support `mod {}` right now.");
 
         let mut updated_content = content_items.clone();
         updated_content.push(syn::parse_quote! {
@@ -46,7 +53,6 @@ impl ToTokens for Schema {
         tokens.append_all(inv);
     }
 }
-
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct InventorySchema {

@@ -1,34 +1,39 @@
+mod control_file;
+mod extension_sql;
 mod pg_extern;
+mod pg_schema;
 mod postgres_enum;
 mod postgres_hash;
 mod postgres_ord;
 mod postgres_type;
-mod pg_schema;
-mod control_file;
-mod extension_sql;
 
-pub use pg_extern::{PgExtern, InventoryPgExtern, InventoryPgExternReturn, InventoryPgExternInput, InventoryPgOperator};
-pub use postgres_enum::{PostgresEnum, InventoryPostgresEnum};
-pub use postgres_hash::{PostgresHash, InventoryPostgresHash};
-pub use postgres_ord::{PostgresOrd, InventoryPostgresOrd};
-pub use postgres_type::{PostgresType, InventoryPostgresType};
-pub use pg_schema::{Schema, InventorySchema};
 pub use control_file::{ControlFile, ControlFileError};
-pub use extension_sql::{ExtensionSql, ExtensionSqlFile, InventoryExtensionSql, InventoryExtensionSqlPositioningRef};
+pub use extension_sql::{
+    ExtensionSql, ExtensionSqlFile, InventoryExtensionSql, InventoryExtensionSqlPositioningRef,
+};
+pub use pg_extern::{
+    InventoryPgExtern, InventoryPgExternInput, InventoryPgExternReturn, InventoryPgOperator,
+    PgExtern,
+};
+pub use pg_schema::{InventorySchema, Schema};
+pub use postgres_enum::{InventoryPostgresEnum, PostgresEnum};
+pub use postgres_hash::{InventoryPostgresHash, PostgresHash};
+pub use postgres_ord::{InventoryPostgresOrd, PostgresOrd};
+pub use postgres_type::{InventoryPostgresType, PostgresType};
 
 // Reexports for the pgx extension inventory builders.
 #[doc(hidden)]
-pub use inventory;
-#[doc(hidden)]
-pub use include_dir;
-#[doc(hidden)]
-pub use impls;
-#[doc(hidden)]
-pub use once_cell;
+pub use color_eyre;
 #[doc(hidden)]
 pub use eyre;
 #[doc(hidden)]
-pub use color_eyre;
+pub use impls;
+#[doc(hidden)]
+pub use include_dir;
+#[doc(hidden)]
+pub use inventory;
+#[doc(hidden)]
+pub use once_cell;
 #[doc(hidden)]
 pub use tracing;
 #[doc(hidden)]
@@ -36,13 +41,16 @@ pub use tracing_error;
 #[doc(hidden)]
 pub use tracing_subscriber;
 
-use tracing::instrument;
-use std::collections::HashMap;
-use core::{any::TypeId, fmt::Debug};
 use crate::ExternArgs;
+use core::{any::TypeId, fmt::Debug};
 use eyre::eyre as eyre_err;
-use petgraph::{algo::toposort, dot::Dot, stable_graph::{NodeIndex, StableGraph}};
-
+use petgraph::{
+    algo::toposort,
+    dot::Dot,
+    stable_graph::{NodeIndex, StableGraph},
+};
+use std::collections::HashMap;
+use tracing::instrument;
 
 #[derive(Debug, Clone)]
 pub struct PgxSql<'a> {
@@ -123,15 +131,12 @@ pub enum SqlGraphRelationship {
     RequiredByReturn,
 }
 
-
 impl<'a> SqlGraphEntity<'a> {
     fn dot_format(&self) -> String {
         match self {
             Schema(item) => format!("mod {}", item.module_path.to_string()),
             CustomSql(item) => format!("sql {}", item.full_path.to_string()),
-            Function(item) => format!("fn {}",
-                item.full_path.to_string(),
-            ),
+            Function(item) => format!("fn {}", item.full_path.to_string(),),
             Type(item) => format!("type {}", item.full_path.to_string()),
             BuiltinType(item) => format!("interal type {}", item),
             Enum(item) => format!("enum {}", item.full_path.to_string()),
@@ -143,17 +148,30 @@ impl<'a> SqlGraphEntity<'a> {
 }
 
 impl<'a> PgxSql<'a> {
-    #[instrument(level = "debug", skip(control, type_mappings, schemas, extension_sqls, externs, types, enums, ords, hashes))]
+    #[instrument(
+        level = "debug",
+        skip(
+            control,
+            type_mappings,
+            schemas,
+            extension_sqls,
+            externs,
+            types,
+            enums,
+            ords,
+            hashes
+        )
+    )]
     pub fn build(
         control: ControlFile,
-        type_mappings: impl Iterator<Item=(TypeId, String)>,
-        schemas: impl Iterator<Item=&'a InventorySchema>,
-        extension_sqls: impl Iterator<Item=&'a InventoryExtensionSql>,
-        externs: impl Iterator<Item=&'a InventoryPgExtern>,
-        types: impl Iterator<Item=&'a InventoryPostgresType>,
-        enums: impl Iterator<Item=&'a InventoryPostgresEnum>,
-        ords: impl Iterator<Item=&'a InventoryPostgresOrd>,
-        hashes: impl Iterator<Item=&'a InventoryPostgresHash>,
+        type_mappings: impl Iterator<Item = (TypeId, String)>,
+        schemas: impl Iterator<Item = &'a InventorySchema>,
+        extension_sqls: impl Iterator<Item = &'a InventoryExtensionSql>,
+        externs: impl Iterator<Item = &'a InventoryPgExtern>,
+        types: impl Iterator<Item = &'a InventoryPostgresType>,
+        enums: impl Iterator<Item = &'a InventoryPostgresEnum>,
+        ords: impl Iterator<Item = &'a InventoryPostgresOrd>,
+        hashes: impl Iterator<Item = &'a InventoryPostgresHash>,
     ) -> Self {
         let mut graph = StableGraph::new();
 
@@ -195,66 +213,71 @@ impl<'a> PgxSql<'a> {
                 for (ty_item, &_ty_index) in &mapped_types {
                     if ty_item.id_matches(&arg.ty_id) {
                         found = true;
-                        break
+                        break;
                     }
-                };
+                }
                 for (ty_item, &_ty_index) in &mapped_enums {
                     if ty_item.id == arg.ty_id {
                         found = true;
-                        break
+                        break;
                     }
-                };
+                }
                 if !found {
-                    mapped_builtin_types.entry(arg.full_path).or_insert_with(||
-                        graph.add_node(SqlGraphEntity::BuiltinType(arg.full_path))
-                    );
+                    mapped_builtin_types
+                        .entry(arg.full_path)
+                        .or_insert_with(|| {
+                            graph.add_node(SqlGraphEntity::BuiltinType(arg.full_path))
+                        });
                 }
             }
 
             match &item.fn_return {
                 InventoryPgExternReturn::None | InventoryPgExternReturn::Trigger => (),
-                InventoryPgExternReturn::Type { id, full_path, .. } | InventoryPgExternReturn::SetOf { id, full_path, .. } => {
+                InventoryPgExternReturn::Type { id, full_path, .. }
+                | InventoryPgExternReturn::SetOf { id, full_path, .. } => {
                     let mut found = false;
                     for (ty_item, &_ty_index) in &mapped_types {
                         if ty_item.id_matches(id) {
                             found = true;
-                            break
+                            break;
                         }
                     }
                     for (ty_item, &_ty_index) in &mapped_enums {
                         if ty_item.id == *id {
                             found = true;
-                            break
+                            break;
                         }
-                    };
-                    if !found {
-                        mapped_builtin_types.entry(full_path).or_insert_with(||
-                            graph.add_node(SqlGraphEntity::BuiltinType(full_path))
-                        );
                     }
-                },
+                    if !found {
+                        mapped_builtin_types.entry(full_path).or_insert_with(|| {
+                            graph.add_node(SqlGraphEntity::BuiltinType(full_path))
+                        });
+                    }
+                }
                 InventoryPgExternReturn::Iterated(iterated_returns) => {
                     for iterated_return in iterated_returns {
                         let mut found = false;
                         for (ty_item, &_ty_index) in &mapped_types {
                             if ty_item.id_matches(&iterated_return.0) {
                                 found = true;
-                                break
+                                break;
                             }
                         }
                         for (ty_item, &_ty_index) in &mapped_enums {
                             if ty_item.id == iterated_return.0 {
                                 found = true;
-                                break
+                                break;
                             }
-                        };
+                        }
                         if !found {
-                            mapped_builtin_types.entry(iterated_return.1).or_insert_with(||
-                                graph.add_node(SqlGraphEntity::BuiltinType(iterated_return.1))
-                            );
+                            mapped_builtin_types
+                                .entry(iterated_return.1)
+                                .or_insert_with(|| {
+                                    graph.add_node(SqlGraphEntity::BuiltinType(iterated_return.1))
+                                });
                         }
                     }
-                },
+                }
             }
         }
         let mut mapped_ords = HashMap::default();
@@ -285,21 +308,24 @@ impl<'a> PgxSql<'a> {
 
         // Now we can circle back and build up the edge sets.
         for (_item, &index) in &this.schemas {
-            this.graph.add_edge(root, index, SqlGraphRelationship::RequiredBy);
+            this.graph
+                .add_edge(root, index, SqlGraphRelationship::RequiredBy);
         }
         for (item, &index) in &this.extension_sqls {
             let mut found = false;
             for (schema_item, &schema_index) in &this.schemas {
                 if item.module_path.starts_with(schema_item.module_path) {
                     tracing::trace!(from = ?item.full_path, to = schema_item.module_path, "Adding ExtensionSQL to Schema edge.");
-                    this.graph.add_edge(schema_index, index, SqlGraphRelationship::RequiredBy);
+                    this.graph
+                        .add_edge(schema_index, index, SqlGraphRelationship::RequiredBy);
                     found = true;
-                    break
+                    break;
                 }
             }
             if !found {
                 tracing::trace!(from = ?item.full_path, to = ?root, "Adding ExtensionSQL to ExtensionRoot edge.");
-                this.graph.add_edge(root, index, SqlGraphRelationship::RequiredBy);
+                this.graph
+                    .add_edge(root, index, SqlGraphRelationship::RequiredBy);
             }
             for before in &item.before {
                 match before {
@@ -308,34 +334,50 @@ impl<'a> PgxSql<'a> {
                         for (other, other_index) in &this.types {
                             if other.full_path == *path {
                                 tracing::trace!(from = ?item.full_path, to = ?other.full_path, "Adding ExtensionSQL before Type edge.");
-                                this.graph.add_edge(*other_index, index, SqlGraphRelationship::RequiredBy);
+                                this.graph.add_edge(
+                                    *other_index,
+                                    index,
+                                    SqlGraphRelationship::RequiredBy,
+                                );
                                 break;
                             }
                         }
                         for (other, other_index) in &this.enums {
                             if other.full_path == *path {
                                 tracing::trace!(from = ?item.full_path, to = ?other.full_path, "Adding ExtensionSQL before Enum edge.");
-                                this.graph.add_edge(*other_index, index, SqlGraphRelationship::RequiredBy);
+                                this.graph.add_edge(
+                                    *other_index,
+                                    index,
+                                    SqlGraphRelationship::RequiredBy,
+                                );
                                 break;
                             }
                         }
                         for (other, other_index) in &this.externs {
                             if other.full_path == *path {
                                 tracing::trace!(from = ?item.full_path, to = ?other.full_path, "Adding ExtensionSQL before Extern edge.");
-                                this.graph.add_edge(*other_index, index, SqlGraphRelationship::RequiredBy);
+                                this.graph.add_edge(
+                                    *other_index,
+                                    index,
+                                    SqlGraphRelationship::RequiredBy,
+                                );
                                 break;
                             }
                         }
-                    },
+                    }
                     InventoryExtensionSqlPositioningRef::Name(name) => {
                         for (other, other_index) in &this.extension_sqls {
                             if other.name == Some(name) {
                                 tracing::trace!(from = ?item.full_path, to = ?other.full_path, "Adding ExtensionSQL before ExtensionSql edge.");
-                                this.graph.add_edge(*other_index, index, SqlGraphRelationship::RequiredBy);
+                                this.graph.add_edge(
+                                    *other_index,
+                                    index,
+                                    SqlGraphRelationship::RequiredBy,
+                                );
                                 break;
                             }
                         }
-                    },
+                    }
                 }
             }
             for after in &item.after {
@@ -345,34 +387,50 @@ impl<'a> PgxSql<'a> {
                         for (other, other_index) in &this.types {
                             if other.full_path == *path {
                                 tracing::trace!(from = ?item.full_path, to = ?other.full_path, "Adding ExtensionSQL after Type edge.");
-                                this.graph.add_edge(index, *other_index, SqlGraphRelationship::RequiredBy);
+                                this.graph.add_edge(
+                                    index,
+                                    *other_index,
+                                    SqlGraphRelationship::RequiredBy,
+                                );
                                 break;
                             }
                         }
                         for (other, other_index) in &this.enums {
                             if other.full_path == *path {
                                 tracing::trace!(from = ?item.full_path, to = ?other.full_path, "Adding ExtensionSQL after Enum edge.");
-                                this.graph.add_edge(index, *other_index, SqlGraphRelationship::RequiredBy);
+                                this.graph.add_edge(
+                                    index,
+                                    *other_index,
+                                    SqlGraphRelationship::RequiredBy,
+                                );
                                 break;
                             }
                         }
                         for (other, other_index) in &this.externs {
                             if other.full_path == *path {
                                 tracing::trace!(from = ?item.full_path, to = ?other.full_path, "Adding ExtensionSQL after Extern edge.");
-                                this.graph.add_edge(index, *other_index, SqlGraphRelationship::RequiredBy);
+                                this.graph.add_edge(
+                                    index,
+                                    *other_index,
+                                    SqlGraphRelationship::RequiredBy,
+                                );
                                 break;
                             }
                         }
-                    },
+                    }
                     InventoryExtensionSqlPositioningRef::Name(name) => {
                         for (other, other_index) in &this.extension_sqls {
                             if other.name == Some(name) {
                                 tracing::trace!(from = ?item.full_path, to = ?other.full_path, "Adding ExtensionSQL after ExtensionSql edge.");
-                                this.graph.add_edge(*other_index, index, SqlGraphRelationship::RequiredBy);
+                                this.graph.add_edge(
+                                    *other_index,
+                                    index,
+                                    SqlGraphRelationship::RequiredBy,
+                                );
                                 break;
                             }
                         }
-                    },
+                    }
                 }
             }
         }
@@ -381,14 +439,16 @@ impl<'a> PgxSql<'a> {
             for (schema_item, &schema_index) in &this.schemas {
                 if item.module_path.starts_with(schema_item.module_path) {
                     tracing::trace!(from = ?item.full_path, to = schema_item.module_path, "Adding Enum to Schema edge.");
-                    this.graph.add_edge(schema_index, index, SqlGraphRelationship::RequiredBy);
+                    this.graph
+                        .add_edge(schema_index, index, SqlGraphRelationship::RequiredBy);
                     found = true;
-                    break
+                    break;
                 }
             }
             if !found {
                 tracing::trace!(from = ?item.full_path, to = ?root, "Adding Enum to ExtensionRoot edge.");
-                this.graph.add_edge(root, index, SqlGraphRelationship::RequiredBy);
+                this.graph
+                    .add_edge(root, index, SqlGraphRelationship::RequiredBy);
             }
         }
         for (item, &index) in &this.types {
@@ -396,14 +456,16 @@ impl<'a> PgxSql<'a> {
             for (schema_item, &schema_index) in &this.schemas {
                 if item.module_path.starts_with(schema_item.module_path) {
                     tracing::trace!(from = ?item.full_path, to = schema_item.module_path, "Adding Type to Schema edge.");
-                    this.graph.add_edge(schema_index, index, SqlGraphRelationship::RequiredBy);
+                    this.graph
+                        .add_edge(schema_index, index, SqlGraphRelationship::RequiredBy);
                     found = true;
-                    break
+                    break;
                 }
             }
             if !found {
                 tracing::trace!(from = ?item.full_path, to = ?root, "Adding Types to ExtensionRoot edge.");
-                this.graph.add_edge(root, index, SqlGraphRelationship::RequiredBy);
+                this.graph
+                    .add_edge(root, index, SqlGraphRelationship::RequiredBy);
             }
         }
         for (item, &index) in &this.externs {
@@ -411,91 +473,129 @@ impl<'a> PgxSql<'a> {
             for (schema_item, &schema_index) in &this.schemas {
                 if item.module_path.starts_with(schema_item.module_path) {
                     tracing::trace!(from = ?item.full_path, to = schema_item.module_path, "Adding Extern to Schema edge.");
-                    this.graph.add_edge(schema_index, index, SqlGraphRelationship::RequiredBy);
+                    this.graph
+                        .add_edge(schema_index, index, SqlGraphRelationship::RequiredBy);
                     found = true;
-                    break
+                    break;
                 }
             }
             if !found {
                 tracing::trace!(from = ?item.full_path, to = ?root, "Adding Extern to ExtensionRoot edge.");
-                this.graph.add_edge(root, index, SqlGraphRelationship::RequiredBy);
+                this.graph
+                    .add_edge(root, index, SqlGraphRelationship::RequiredBy);
             }
             for arg in &item.fn_args {
                 let mut found = false;
                 for (ty_item, &ty_index) in &this.types {
                     if ty_item.id_matches(&arg.ty_id) {
                         tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Extern(arg) to Type edge.");
-                        this.graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredByArg);
+                        this.graph
+                            .add_edge(ty_index, index, SqlGraphRelationship::RequiredByArg);
                         found = true;
-                        break
+                        break;
                     }
-                };
+                }
                 for (ty_item, &ty_index) in &this.enums {
                     if ty_item.id_matches(&arg.ty_id) {
                         tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Extern(arg) to Enum edge.");
-                        this.graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredByArg);
+                        this.graph
+                            .add_edge(ty_index, index, SqlGraphRelationship::RequiredByArg);
                         found = true;
-                        break
+                        break;
                     }
-                };
+                }
                 if !found {
-                    let builtin_index = this.builtin_types.get(arg.full_path).expect(&format!("Could not fetch Builtin Type {}.", arg.full_path));
+                    let builtin_index = this
+                        .builtin_types
+                        .get(arg.full_path)
+                        .expect(&format!("Could not fetch Builtin Type {}.", arg.full_path));
                     tracing::trace!(from = ?item.full_path, to = arg.full_path, "Adding Extern(arg) to BuiltIn Type edge.");
-                    this.graph.add_edge(*builtin_index, index, SqlGraphRelationship::RequiredByArg);
+                    this.graph
+                        .add_edge(*builtin_index, index, SqlGraphRelationship::RequiredByArg);
                 }
             }
             match &item.fn_return {
                 InventoryPgExternReturn::None | InventoryPgExternReturn::Trigger => (),
-                InventoryPgExternReturn::Type { id, full_path, .. } | InventoryPgExternReturn::SetOf { id, full_path, .. } => {
+                InventoryPgExternReturn::Type { id, full_path, .. }
+                | InventoryPgExternReturn::SetOf { id, full_path, .. } => {
                     let mut found = false;
                     for (ty_item, &ty_index) in &this.types {
                         if ty_item.id_matches(id) {
                             tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Extern(return) to Type edge.");
-                            this.graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredByReturn);
+                            this.graph.add_edge(
+                                ty_index,
+                                index,
+                                SqlGraphRelationship::RequiredByReturn,
+                            );
                             found = true;
-                            break
+                            break;
                         }
                     }
                     for (ty_item, &ty_index) in &this.enums {
                         if ty_item.id_matches(id) {
                             tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Extern(return) to Enum edge.");
-                            this.graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredByReturn);
+                            this.graph.add_edge(
+                                ty_index,
+                                index,
+                                SqlGraphRelationship::RequiredByReturn,
+                            );
                             found = true;
-                            break
+                            break;
                         }
                     }
                     if !found {
-                        let builtin_index = this.builtin_types.get(full_path).expect(&format!("Could not fetch Builtin Type {}.", full_path));
+                        let builtin_index = this
+                            .builtin_types
+                            .get(full_path)
+                            .expect(&format!("Could not fetch Builtin Type {}.", full_path));
                         tracing::trace!(from = ?item.full_path, to = full_path, "Adding Extern(return) to BuiltIn Type edge.");
-                        this.graph.add_edge(*builtin_index, index, SqlGraphRelationship::RequiredByArg);
+                        this.graph.add_edge(
+                            *builtin_index,
+                            index,
+                            SqlGraphRelationship::RequiredByArg,
+                        );
                     }
-                },
+                }
                 InventoryPgExternReturn::Iterated(iterated_returns) => {
                     for iterated_return in iterated_returns {
                         let mut found = false;
                         for (ty_item, &ty_index) in &this.types {
                             if ty_item.id_matches(&iterated_return.0) {
                                 tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Extern(return) to Type edge.");
-                                this.graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredByReturn);
+                                this.graph.add_edge(
+                                    ty_index,
+                                    index,
+                                    SqlGraphRelationship::RequiredByReturn,
+                                );
                                 found = true;
-                                break
+                                break;
                             }
                         }
                         for (ty_item, &ty_index) in &this.enums {
                             if ty_item.id_matches(&iterated_return.0) {
                                 tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Extern(return) to Enum edge.");
-                                this.graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredByReturn);
+                                this.graph.add_edge(
+                                    ty_index,
+                                    index,
+                                    SqlGraphRelationship::RequiredByReturn,
+                                );
                                 found = true;
-                                break
+                                break;
                             }
                         }
                         if !found {
-                            let builtin_index = this.builtin_types.get(&iterated_return.1).expect(&format!("Could not fetch Builtin Type {}.", iterated_return.1));
+                            let builtin_index = this.builtin_types.get(&iterated_return.1).expect(
+                                &format!("Could not fetch Builtin Type {}.", iterated_return.1),
+                            );
                             tracing::trace!(from = ?item.full_path, to = iterated_return.1, "Adding Extern(return) to BuiltIn Type edge.");
-                            this.graph.add_edge(*builtin_index, index, SqlGraphRelationship::RequiredByArg);
+                            this.graph.add_edge(
+                                *builtin_index,
+                                index,
+                                SqlGraphRelationship::RequiredByArg,
+                            );
                         }
                     }
-                },
+                }
             }
         }
         for (item, &index) in &this.ords {
@@ -503,14 +603,16 @@ impl<'a> PgxSql<'a> {
             for (schema_item, &schema_index) in &this.schemas {
                 if item.module_path.starts_with(schema_item.module_path) {
                     tracing::trace!(from = ?item.full_path, to = schema_item.module_path, "Adding Ord to Schema edge.");
-                    this.graph.add_edge(schema_index, index, SqlGraphRelationship::RequiredBy);
+                    this.graph
+                        .add_edge(schema_index, index, SqlGraphRelationship::RequiredBy);
                     found = true;
-                    break
+                    break;
                 }
             }
             if !found {
                 tracing::trace!(from = ?item.full_path, to = ?root, "Adding Ord to ExtensionRoot edge.");
-                this.graph.add_edge(root, index, SqlGraphRelationship::RequiredBy);
+                this.graph
+                    .add_edge(root, index, SqlGraphRelationship::RequiredBy);
             }
         }
         for (item, &index) in &this.hashes {
@@ -518,14 +620,16 @@ impl<'a> PgxSql<'a> {
             for (schema_item, &schema_index) in &this.schemas {
                 if item.module_path.starts_with(schema_item.module_path) {
                     tracing::trace!(from = ?item.full_path, to = schema_item.module_path, "Adding Hash to Schema edge.");
-                    this.graph.add_edge(schema_index, index, SqlGraphRelationship::RequiredBy);
+                    this.graph
+                        .add_edge(schema_index, index, SqlGraphRelationship::RequiredBy);
                     found = true;
-                    break
+                    break;
                 }
             }
             if !found {
                 tracing::trace!(from = ?item.full_path, to = ?root, "Adding Hash to ExtensionRoot edge.");
-                this.graph.add_edge(root, index, SqlGraphRelationship::RequiredBy);
+                this.graph
+                    .add_edge(root, index, SqlGraphRelationship::RequiredBy);
             }
         }
 
@@ -535,7 +639,11 @@ impl<'a> PgxSql<'a> {
 
     #[instrument(level = "info", err, skip(self))]
     pub fn to_file(&self, file: impl AsRef<str> + Debug) -> eyre::Result<()> {
-        use std::{fs::{File, create_dir_all}, path::Path, io::Write};
+        use std::{
+            fs::{create_dir_all, File},
+            io::Write,
+            path::Path,
+        };
         let generated = self.to_sql()?;
         let path = Path::new(file.as_ref());
 
@@ -550,15 +658,22 @@ impl<'a> PgxSql<'a> {
 
     #[instrument(level = "info", err, skip(self))]
     pub fn to_dot(&self, file: impl AsRef<str> + Debug) -> eyre::Result<()> {
-        use std::{fs::{File, create_dir_all}, path::Path, io::Write};
+        use std::{
+            fs::{create_dir_all, File},
+            io::Write,
+            path::Path,
+        };
         let generated = Dot::with_attr_getters(
             &self.graph,
-            &[petgraph::dot::Config::EdgeNoLabel, petgraph::dot::Config::NodeNoLabel],
-            &|_graph, edge| {
-                match edge.weight() {
-                    SqlGraphRelationship::RequiredBy => format!(r#"color = "gray""#),
-                    SqlGraphRelationship::RequiredByArg => format!(r#"color = "black""#),
-                    SqlGraphRelationship::RequiredByReturn => format!(r#"dir = "back", color = "black""#),
+            &[
+                petgraph::dot::Config::EdgeNoLabel,
+                petgraph::dot::Config::NodeNoLabel,
+            ],
+            &|_graph, edge| match edge.weight() {
+                SqlGraphRelationship::RequiredBy => format!(r#"color = "gray""#),
+                SqlGraphRelationship::RequiredByArg => format!(r#"color = "black""#),
+                SqlGraphRelationship::RequiredByReturn => {
+                    format!(r#"dir = "back", color = "black""#)
                 }
             },
             &|_graph, (_index, node)| {
@@ -615,25 +730,33 @@ impl<'a> PgxSql<'a> {
     }
 
     pub fn schema_alias_of(&self, item_index: &NodeIndex) -> Option<String> {
-        self.graph.neighbors_undirected(*item_index).flat_map(|neighbor_index| match &self.graph[neighbor_index] {
-            SqlGraphEntity::Schema(s) => Some(String::from(s.name)),
-            SqlGraphEntity::ExtensionRoot(control) => if !control.relocatable {
-                control.schema.clone()
-            } else {
-                Some(String::from("@extname@"))
-            },
-            _ => None,
-        }).next()
+        self.graph
+            .neighbors_undirected(*item_index)
+            .flat_map(|neighbor_index| match &self.graph[neighbor_index] {
+                SqlGraphEntity::Schema(s) => Some(String::from(s.name)),
+                SqlGraphEntity::ExtensionRoot(control) => {
+                    if !control.relocatable {
+                        control.schema.clone()
+                    } else {
+                        Some(String::from("@extname@"))
+                    }
+                }
+                _ => None,
+            })
+            .next()
     }
 
     pub fn schema_prefix_for(&self, target: &NodeIndex) -> String {
         self.schema_alias_of(target)
-            .map(|v| (v + ".").to_string()).unwrap_or_else(|| "".to_string())
+            .map(|v| (v + ".").to_string())
+            .unwrap_or_else(|| "".to_string())
     }
 
     pub fn to_sql(&self) -> eyre::Result<String> {
         let mut full_sql = String::new();
-        for step_id in toposort(&self.graph, None).map_err(|_e| eyre_err!("Depgraph was Cyclic."))? {
+        for step_id in
+            toposort(&self.graph, None).map_err(|_e| eyre_err!("Depgraph was Cyclic."))?
+        {
             let step = &self.graph[step_id];
 
             let sql = match step {
@@ -684,16 +807,22 @@ impl<'a> PgxSql<'a> {
         let item_node = &self.graph[*item_index];
         let item = match item_node {
             SqlGraphEntity::CustomSql(item) => item,
-            _ => return Err(eyre_err!("Was not called on a ExtensionSql. Got: {:?}", item_node)),
+            _ => {
+                return Err(eyre_err!(
+                    "Was not called on a ExtensionSql. Got: {:?}",
+                    item_node
+                ))
+            }
         };
 
-        let sql = format!("\
+        let sql = format!(
+            "\
                 -- {file}:{line}\n\
                 {sql}\
                 ",
-                file = item.file,
-                line = item.line,
-                sql = item.sql,
+            file = item.file,
+            line = item.line,
+            sql = item.sql,
         );
         tracing::debug!(%sql);
         Ok(sql)
@@ -704,17 +833,23 @@ impl<'a> PgxSql<'a> {
         let item_node = &self.graph[*item_index];
         let item = match item_node {
             SqlGraphEntity::Schema(item) => item,
-            _ => return Err(eyre_err!("Was not called on a Schema. Got: {:?}", item_node)),
+            _ => {
+                return Err(eyre_err!(
+                    "Was not called on a Schema. Got: {:?}",
+                    item_node
+                ))
+            }
         };
 
-        let sql = format!("\
+        let sql = format!(
+            "\
                     -- {file}:{line}\n\
                     CREATE SCHEMA IF NOT EXISTS {name}; /* {module_path} */\n\
                 ",
-                name = item.name,
-                file = item.file,
-                line = item.line,
-                module_path = item.module_path,
+            name = item.name,
+            file = item.file,
+            line = item.line,
+            module_path = item.module_path,
         );
         tracing::debug!(%sql);
         Ok(sql)
@@ -728,7 +863,8 @@ impl<'a> PgxSql<'a> {
             _ => return Err(eyre_err!("Was not called on an Enum. Got: {:?}", item_node)),
         };
 
-        let sql = format!("\
+        let sql = format!(
+            "\
                     -- {file}:{line}\n\
                     -- {full_path}\n\
                     CREATE TYPE {schema}{name} AS ENUM (\n\
@@ -740,7 +876,13 @@ impl<'a> PgxSql<'a> {
             file = item.file,
             line = item.line,
             name = item.name,
-            variants = item.variants.iter().map(|variant| format!("\t'{}'", variant)).collect::<Vec<_>>().join(",\n") + "\n",
+            variants = item
+                .variants
+                .iter()
+                .map(|variant| format!("\t'{}'", variant))
+                .collect::<Vec<_>>()
+                .join(",\n")
+                + "\n",
         );
         tracing::debug!(%sql);
         Ok(sql)
@@ -751,7 +893,12 @@ impl<'a> PgxSql<'a> {
         let item_node = &self.graph[*item_index];
         let item = match item_node {
             SqlGraphEntity::Function(item) => item,
-            _ => return Err(eyre_err!("Was not called on a function. Got: {:?}", item_node)),
+            _ => {
+                return Err(eyre_err!(
+                    "Was not called on a function. Got: {:?}",
+                    item_node
+                ))
+            }
         };
 
         let mut extern_attrs = item.extern_attrs.clone();
@@ -866,24 +1013,34 @@ impl<'a> PgxSql<'a> {
                              },
         );
 
-        let ext_sql = format!("\n\
+        let ext_sql = format!(
+            "\n\
                                 -- {file}:{line}\n\
                                 -- {module_path}::{name}\n\
                                 {fn_sql}\n\
                                 {overridden}\
                             ",
-                              name = item.name,
-                              module_path = item.module_path,
-                              file = item.file,
-                              line = item.line,
-                              fn_sql = if item.overridden.is_some() {
-                                  let mut inner = fn_sql.lines().map(|f| format!("-- {}", f)).collect::<Vec<_>>().join("\n");
-                                  inner.push_str("\n--\n-- Overridden as (due to a `//` comment with a `pgxsql` code block):");
-                                  inner
-                              } else {
-                                  fn_sql
-                              },
-                              overridden = item.overridden.map(|f| f.to_owned() + "\n").unwrap_or_default(),
+            name = item.name,
+            module_path = item.module_path,
+            file = item.file,
+            line = item.line,
+            fn_sql = if item.overridden.is_some() {
+                let mut inner = fn_sql
+                    .lines()
+                    .map(|f| format!("-- {}", f))
+                    .collect::<Vec<_>>()
+                    .join("\n");
+                inner.push_str(
+                    "\n--\n-- Overridden as (due to a `//` comment with a `pgxsql` code block):",
+                );
+                inner
+            } else {
+                fn_sql
+            },
+            overridden = item
+                .overridden
+                .map(|f| f.to_owned() + "\n")
+                .unwrap_or_default(),
         );
         tracing::debug!(sql = %ext_sql);
 
@@ -909,16 +1066,28 @@ impl<'a> PgxSql<'a> {
                     optionals.push(String::from("\tMERGES"));
                 };
 
-                let left_arg = item.fn_args.get(0).ok_or_else(|| eyre_err!("Did not find `left_arg` for operator `{}`.", item.name))?;
-                let left_arg_graph_index = self.graph.neighbors_undirected(*item_index).find(|neighbor| match &self.graph[*neighbor] {
-                    SqlGraphEntity::Type(ty) => ty.id_matches(&left_arg.ty_id),
-                    _ => false,
-                }).ok_or_else(|| eyre_err!("Could not find left arg function in graph."))?;
-                let right_arg = item.fn_args.get(1).ok_or_else(|| eyre_err!("Did not find `left_arg` for operator `{}`.", item.name))?;
-                let right_arg_graph_index = self.graph.neighbors_undirected(*item_index).find(|neighbor| match &self.graph[*neighbor] {
-                    SqlGraphEntity::Type(ty) => ty.id_matches(&right_arg.ty_id),
-                    _ => false,
-                }).ok_or_else(|| eyre_err!("Could not find right arg function in graph."))?;
+                let left_arg = item.fn_args.get(0).ok_or_else(|| {
+                    eyre_err!("Did not find `left_arg` for operator `{}`.", item.name)
+                })?;
+                let left_arg_graph_index = self
+                    .graph
+                    .neighbors_undirected(*item_index)
+                    .find(|neighbor| match &self.graph[*neighbor] {
+                        SqlGraphEntity::Type(ty) => ty.id_matches(&left_arg.ty_id),
+                        _ => false,
+                    })
+                    .ok_or_else(|| eyre_err!("Could not find left arg function in graph."))?;
+                let right_arg = item.fn_args.get(1).ok_or_else(|| {
+                    eyre_err!("Did not find `left_arg` for operator `{}`.", item.name)
+                })?;
+                let right_arg_graph_index = self
+                    .graph
+                    .neighbors_undirected(*item_index)
+                    .find(|neighbor| match &self.graph[*neighbor] {
+                        SqlGraphEntity::Type(ty) => ty.id_matches(&right_arg.ty_id),
+                        _ => false,
+                    })
+                    .ok_or_else(|| eyre_err!("Could not find right arg function in graph."))?;
 
                 let operator_sql = format!("\n\
                                         -- {file}:{line}\n\
@@ -946,7 +1115,7 @@ impl<'a> PgxSql<'a> {
                 );
                 tracing::debug!(sql = %operator_sql);
                 ext_sql + &operator_sql
-            },
+            }
             (None, None) | (Some(_), Some(_)) | (Some(_), None) => ext_sql,
         };
         Ok(rendered)
@@ -971,18 +1140,29 @@ impl<'a> PgxSql<'a> {
         } else {
             item.module_path.to_string() // Presume a local
         };
-        let in_fn_path = format!("{module_path}{maybe_colons}{in_fn}",
-                                  module_path = in_fn_module_path,
-                                  maybe_colons = if !in_fn_module_path.is_empty() { "::" } else { "" },
-                                  in_fn = item.in_fn,
+        let in_fn_path = format!(
+            "{module_path}{maybe_colons}{in_fn}",
+            module_path = in_fn_module_path,
+            maybe_colons = if !in_fn_module_path.is_empty() {
+                "::"
+            } else {
+                ""
+            },
+            in_fn = item.in_fn,
         );
-        let (_, _index) = self.externs.iter().find(|(k, _v)| {
-            (**k).full_path == in_fn_path.as_str()
-        }).ok_or_else(|| eyre::eyre!("Did not find `in_fn: {}`.", in_fn_path))?;
-        let in_fn_graph_index = self.graph.neighbors_undirected(*item_index).find(|neighbor| match &self.graph[*neighbor] {
-            SqlGraphEntity::Function(func) => func.full_path == in_fn_path,
-            _ => false,
-        }).ok_or_else(|| eyre_err!("Could not find in_fn graph entity."))?;
+        let (_, _index) = self
+            .externs
+            .iter()
+            .find(|(k, _v)| (**k).full_path == in_fn_path.as_str())
+            .ok_or_else(|| eyre::eyre!("Did not find `in_fn: {}`.", in_fn_path))?;
+        let in_fn_graph_index = self
+            .graph
+            .neighbors_undirected(*item_index)
+            .find(|neighbor| match &self.graph[*neighbor] {
+                SqlGraphEntity::Function(func) => func.full_path == in_fn_path,
+                _ => false,
+            })
+            .ok_or_else(|| eyre_err!("Could not find in_fn graph entity."))?;
         tracing::trace!(in_fn = ?in_fn_path, "Found matching `in_fn`");
         let in_fn_sql = self.inventory_extern_to_sql(&in_fn_graph_index)?;
         tracing::trace!(%in_fn_sql);
@@ -992,33 +1172,47 @@ impl<'a> PgxSql<'a> {
         } else {
             item.module_path.to_string() // Presume a local
         };
-        let out_fn_path = format!("{module_path}{maybe_colons}{out_fn}",
-                                  module_path = out_fn_module_path,
-                                  maybe_colons = if !out_fn_module_path.is_empty() { "::" } else { "" },
-                                  out_fn = item.out_fn,
+        let out_fn_path = format!(
+            "{module_path}{maybe_colons}{out_fn}",
+            module_path = out_fn_module_path,
+            maybe_colons = if !out_fn_module_path.is_empty() {
+                "::"
+            } else {
+                ""
+            },
+            out_fn = item.out_fn,
         );
-        let (_, _index) = self.externs.iter().find(|(k, _v)| {
-            tracing::trace!(%k.full_path, %out_fn_path, "Checked");
-            (**k).full_path == out_fn_path.as_str()
-        }).ok_or_else(|| eyre::eyre!("Did not find `out_fn: {}`.", out_fn_path))?;
-        let out_fn_graph_index = self.graph.neighbors_undirected(*item_index).find(|neighbor| match &self.graph[*neighbor] {
-            SqlGraphEntity::Function(func) => func.full_path == out_fn_path,
-            _ => false,
-        }).ok_or_else(|| eyre_err!("Could not find out_fn graph entity."))?;
+        let (_, _index) = self
+            .externs
+            .iter()
+            .find(|(k, _v)| {
+                tracing::trace!(%k.full_path, %out_fn_path, "Checked");
+                (**k).full_path == out_fn_path.as_str()
+            })
+            .ok_or_else(|| eyre::eyre!("Did not find `out_fn: {}`.", out_fn_path))?;
+        let out_fn_graph_index = self
+            .graph
+            .neighbors_undirected(*item_index)
+            .find(|neighbor| match &self.graph[*neighbor] {
+                SqlGraphEntity::Function(func) => func.full_path == out_fn_path,
+                _ => false,
+            })
+            .ok_or_else(|| eyre_err!("Could not find out_fn graph entity."))?;
         tracing::trace!(out_fn = ?out_fn_path, "Found matching `out_fn`");
         let out_fn_sql = self.inventory_extern_to_sql(&out_fn_graph_index)?;
         tracing::trace!(%out_fn_sql);
 
-        let shell_type = format!("\n\
+        let shell_type = format!(
+            "\n\
                                 -- {file}:{line}\n\
                                 -- {full_path}\n\
                                 CREATE TYPE {schema}{name};\n\
                             ",
-                                 schema = self.schema_prefix_for(item_index),
-                                 full_path = item.full_path,
-                                 file = item.file,
-                                 line = item.line,
-                                 name = item.name,
+            schema = self.schema_prefix_for(item_index),
+            full_path = item.full_path,
+            file = item.file,
+            line = item.line,
+            name = item.name,
         );
         tracing::debug!(sql = %shell_type);
 
@@ -1107,7 +1301,6 @@ impl<'a> PgxSql<'a> {
         Ok(sql)
     }
 
-
     #[instrument(level = "debug", skip(self))]
     pub fn register_types(&mut self) {
         for (item, _index) in self.enums.clone() {
@@ -1143,16 +1336,13 @@ impl<'a> PgxSql<'a> {
 
     #[instrument(level = "debug")]
     pub fn type_id_to_sql_type(&self, id: TypeId) -> Option<String> {
-        self.type_mappings
-            .get(&id)
-            .map(|f| f.clone())
+        self.type_mappings.get(&id).map(|f| f.clone())
     }
 
     #[instrument(level = "debug")]
     pub fn map_type_to_sql_type<T: 'static>(&mut self, sql: impl AsRef<str> + Debug) {
         let sql = sql.as_ref().to_string();
-        self.type_mappings
-            .insert(TypeId::of::<T>(), sql.clone());
+        self.type_mappings.insert(TypeId::of::<T>(), sql.clone());
     }
 
     #[instrument(level = "debug")]

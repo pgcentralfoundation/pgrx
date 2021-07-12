@@ -23,6 +23,7 @@ mod tuples;
 mod varlena;
 
 pub use self::time::*;
+use crate::once_cell::sync::Lazy;
 pub use anyarray::*;
 pub use anyelement::*;
 pub use array::*;
@@ -35,13 +36,12 @@ pub use into::*;
 pub use item_pointer_data::*;
 pub use json::*;
 pub use numeric::*;
+use std::any::TypeId;
 pub use time_stamp::*;
 pub use time_stamp_with_timezone::*;
 pub use time_with_timezone::*;
 pub use tuples::*;
 pub use varlena::*;
-use std::any::TypeId;
-use crate::once_cell::sync::Lazy;
 
 /// A tagging trait to indicate a user type is also meant to be used by Postgres
 /// Implemented automatically by `#[derive(PostgresType)]`
@@ -75,7 +75,8 @@ pub struct WithArrayTypeId<T>(pub std::marker::PhantomData<T>);
 
 impl<T: FromDatum + 'static> WithArrayTypeId<T> {
     pub const ARRAY_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(TypeId::of::<Array<T>>()));
-    pub const OPTION_ARRAY_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(TypeId::of::<Option<Array<T>>>()));
+    pub const OPTION_ARRAY_ID: Lazy<Option<TypeId>> =
+        Lazy::new(|| Some(TypeId::of::<Option<Array<T>>>()));
 }
 
 pub trait WithoutVarlenaTypeId {

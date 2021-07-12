@@ -10,16 +10,16 @@ use operator::{PgxOperator, PgxOperatorAttributeWithIdent, PgxOperatorOpName};
 use returning::Returning;
 use search_path::SearchPathList;
 
+use eyre::WrapErr;
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
 use std::convert::TryFrom;
 use syn::parse::{Parse, ParseStream};
 use syn::Meta;
-use eyre::WrapErr;
 
-pub use returning::InventoryPgExternReturn;
 pub use argument::InventoryPgExternInput;
 pub use operator::InventoryPgOperator;
+pub use returning::InventoryPgExternReturn;
 
 #[derive(Debug, Clone)]
 pub struct PgExtern {
@@ -50,9 +50,10 @@ impl PgExtern {
                             in_commented_sql_block = false;
                         } else if in_commented_sql_block {
                             let sql = retval.get_or_insert_with(String::default);
-                            let line = inner.value()
-                                .trim_start()
-                                .replace("@FUNCTION_NAME@", &*(self.func.sig.ident.to_string() + "_wrapper")) + "\n";
+                            let line = inner.value().trim_start().replace(
+                                "@FUNCTION_NAME@",
+                                &*(self.func.sig.ident.to_string() + "_wrapper"),
+                            ) + "\n";
                             sql.push_str(&*line);
                         }
                     }
@@ -73,41 +74,41 @@ impl PgExtern {
                     skel.get_or_insert_with(Default::default)
                         .opname
                         .get_or_insert(attr);
-                },
+                }
                 "commutator" => {
                     let attr: PgxOperatorAttributeWithIdent = syn::parse2(attr.tokens.clone())
                         .expect(&format!("Unable to parse {:?}", &attr.tokens));
                     skel.get_or_insert_with(Default::default)
                         .commutator
                         .get_or_insert(attr);
-                },
+                }
                 "negator" => {
                     let attr: PgxOperatorAttributeWithIdent = syn::parse2(attr.tokens.clone())
                         .expect(&format!("Unable to parse {:?}", &attr.tokens));
                     skel.get_or_insert_with(Default::default)
                         .negator
                         .get_or_insert(attr);
-                },
+                }
                 "join" => {
                     let attr: PgxOperatorAttributeWithIdent = syn::parse2(attr.tokens.clone())
                         .expect(&format!("Unable to parse {:?}", &attr.tokens));
                     skel.get_or_insert_with(Default::default)
                         .join
                         .get_or_insert(attr);
-                },
+                }
                 "restrict" => {
                     let attr: PgxOperatorAttributeWithIdent = syn::parse2(attr.tokens.clone())
                         .expect(&format!("Unable to parse {:?}", &attr.tokens));
                     skel.get_or_insert_with(Default::default)
                         .restrict
                         .get_or_insert(attr);
-                },
+                }
                 "hashes" => {
                     skel.get_or_insert_with(Default::default).hashes = true;
-                },
+                }
                 "merges" => {
                     skel.get_or_insert_with(Default::default).merges = true;
-                },
+                }
                 _ => (),
             }
         }
@@ -131,7 +132,8 @@ impl PgExtern {
     fn inputs(&self) -> eyre::Result<Vec<Argument>> {
         let mut args = Vec::default();
         for input in &self.func.sig.inputs {
-            let arg = Argument::build(input.clone()).wrap_err_with(|| format!("Could not map {:?}", input))?;
+            let arg = Argument::build(input.clone())
+                .wrap_err_with(|| format!("Could not map {:?}", input))?;
             if let Some(arg) = arg {
                 args.push(arg);
             }

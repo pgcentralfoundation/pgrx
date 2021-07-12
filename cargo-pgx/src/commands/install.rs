@@ -5,10 +5,8 @@ use crate::commands::get::{find_control_file, get_property};
 use colored::Colorize;
 use pgx_utils::pg_config::PgConfig;
 use pgx_utils::{exit_with_error, get_target_dir, handle_result};
-use std::io::{Write, BufRead};
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
-use std::str::FromStr;
 
 pub(crate) fn install_extension(
     pg_config: &PgConfig,
@@ -49,7 +47,13 @@ pub(crate) fn install_extension(
         copy_file(shlibpath, dest, "shared library");
     }
 
-    copy_sql_files(pg_config, is_release, additional_features, &extdir, &extname, &base_directory);
+    copy_sql_files(
+        pg_config,
+        is_release,
+        additional_features,
+        &extdir,
+        &base_directory,
+    );
 
     println!("{} installing {}", "     Finished".bold().green(), extname);
     Ok(())
@@ -120,20 +124,13 @@ pub(crate) fn build_extension(major_version: u16, is_release: bool, additional_f
     }
 }
 
-pub(crate) fn read_load_order(filename: &PathBuf) -> Vec<String> {
-    let mut load_order = Vec::new();
-
-    if let Ok(file) = std::fs::File::open(&filename) {
-        let reader = std::io::BufReader::new(file);
-        for (_, line) in reader.lines().enumerate() {
-            load_order.push(line.unwrap());
-        }
-    }
-
-    load_order
-}
-
-fn copy_sql_files(pg_config: &PgConfig, is_release: bool, additional_features: Vec<&str>, extdir: &PathBuf, extname: &str, base_directory: &PathBuf) {
+fn copy_sql_files(
+    pg_config: &PgConfig,
+    is_release: bool,
+    additional_features: Vec<&str>,
+    extdir: &PathBuf,
+    base_directory: &PathBuf,
+) {
     let mut dest = base_directory.clone();
     dest.push(extdir);
 
@@ -141,7 +138,14 @@ fn copy_sql_files(pg_config: &PgConfig, is_release: bool, additional_features: V
     let version = get_version();
     dest.push(format!("{}--{}.sql", extname, version));
 
-    crate::schema::generate_schema(pg_config, is_release, &*additional_features, &dest, Option::<String>::None).unwrap();
+    crate::schema::generate_schema(
+        pg_config,
+        is_release,
+        &*additional_features,
+        &dest,
+        Option::<String>::None,
+    )
+    .unwrap();
     let written = std::fs::read_to_string(&dest).unwrap();
     let written = filter_contents(written);
     std::fs::write(&dest, written).unwrap();

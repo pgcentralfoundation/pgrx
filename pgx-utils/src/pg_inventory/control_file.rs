@@ -23,13 +23,10 @@ pub enum ControlFileError {
 impl std::fmt::Display for ControlFileError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            ControlFileError::MissingField {
-                field,
-                context,
-            } => {
+            ControlFileError::MissingField { field, context } => {
                 write!(f, "Missing field in control file! Please add `{}`.", field)?;
                 context.fmt(f)?;
-            },
+            }
         };
         Ok(())
     }
@@ -57,11 +54,41 @@ impl TryFrom<&str> for ControlFile {
             temp.insert(k, v);
         }
         Ok(ControlFile {
-            comment: temp.get("comment").ok_or(ControlFileError::MissingField { field: "comment", context: SpanTrace::capture(), })?.to_string(),
-            default_version: temp.get("default_version").ok_or(ControlFileError::MissingField { field: "default_version", context: SpanTrace::capture(), })?.to_string(),
-            module_pathname: temp.get("module_pathname").ok_or(ControlFileError::MissingField { field: "module_pathname", context: SpanTrace::capture(), })?.to_string(),
-            relocatable: temp.get("relocatable").ok_or(ControlFileError::MissingField { field: "relocatable", context: SpanTrace::capture(), })? == &"true",
-            superuser: temp.get("superuser").ok_or(ControlFileError::MissingField { field: "superuser", context: SpanTrace::capture(), })? == &"true",
+            comment: temp
+                .get("comment")
+                .ok_or(ControlFileError::MissingField {
+                    field: "comment",
+                    context: SpanTrace::capture(),
+                })?
+                .to_string(),
+            default_version: temp
+                .get("default_version")
+                .ok_or(ControlFileError::MissingField {
+                    field: "default_version",
+                    context: SpanTrace::capture(),
+                })?
+                .to_string(),
+            module_pathname: temp
+                .get("module_pathname")
+                .ok_or(ControlFileError::MissingField {
+                    field: "module_pathname",
+                    context: SpanTrace::capture(),
+                })?
+                .to_string(),
+            relocatable: temp
+                .get("relocatable")
+                .ok_or(ControlFileError::MissingField {
+                    field: "relocatable",
+                    context: SpanTrace::capture(),
+                })?
+                == &"true",
+            superuser: temp
+                .get("superuser")
+                .ok_or(ControlFileError::MissingField {
+                    field: "superuser",
+                    context: SpanTrace::capture(),
+                })?
+                == &"true",
             schema: temp.get("schema").map(|v| v.to_string()),
         })
     }

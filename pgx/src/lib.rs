@@ -64,7 +64,6 @@ pub use inventory;
 #[doc(hidden)]
 pub use once_cell;
 
-
 pub use atomics::*;
 pub use callbacks::*;
 pub use datum::*;
@@ -113,10 +112,22 @@ pub static DEFAULT_TYPEID_SQL_MAPPING: Lazy<HashMap<TypeId, String>> = Lazy::new
     m.insert(TypeId::of::<&'static str>(), String::from("text"));
     m.insert(TypeId::of::<Option<&'static str>>(), String::from("text"));
     m.insert(TypeId::of::<Vec<&'static str>>(), String::from("text[]"));
-    m.insert(TypeId::of::<Option<Vec<&'static str>>>(), String::from("text[]"));
-    m.insert(TypeId::of::<Vec<Option<&'static str>>>(), String::from("text[]"));
-    m.insert(TypeId::of::<datum::Array<&'static str>>(), String::from("text[]"));
-    m.insert(TypeId::of::<Option<datum::Array<&'static str>>>(), String::from("text[]"));
+    m.insert(
+        TypeId::of::<Option<Vec<&'static str>>>(),
+        String::from("text[]"),
+    );
+    m.insert(
+        TypeId::of::<Vec<Option<&'static str>>>(),
+        String::from("text[]"),
+    );
+    m.insert(
+        TypeId::of::<datum::Array<&'static str>>(),
+        String::from("text[]"),
+    );
+    m.insert(
+        TypeId::of::<Option<datum::Array<&'static str>>>(),
+        String::from("text[]"),
+    );
 
     m.insert(
         TypeId::of::<Vec<Option<&'static str>>>(),
@@ -135,8 +146,14 @@ pub static DEFAULT_TYPEID_SQL_MAPPING: Lazy<HashMap<TypeId, String>> = Lazy::new
     m.insert(TypeId::of::<Vec<String>>(), String::from("text[]"));
     m.insert(TypeId::of::<Vec<Option<String>>>(), String::from("text[]"));
     m.insert(TypeId::of::<Option<Vec<String>>>(), String::from("text[]"));
-    m.insert(TypeId::of::<Option<Vec<Option<String>>>>(), String::from("text[]"));
-    m.insert(TypeId::of::<Option<Vec<Option<&String>>>>(), String::from("text[]"));
+    m.insert(
+        TypeId::of::<Option<Vec<Option<String>>>>(),
+        String::from("text[]"),
+    );
+    m.insert(
+        TypeId::of::<Option<Vec<Option<&String>>>>(),
+        String::from("text[]"),
+    );
 
     m.insert(TypeId::of::<()>(), String::from("void"));
 
@@ -189,9 +206,15 @@ pub static DEFAULT_TYPEID_SQL_MAPPING: Lazy<HashMap<TypeId, String>> = Lazy::new
 
     m.insert(TypeId::of::<datum::JsonB>(), String::from("jsonb"));
     m.insert(TypeId::of::<Option<datum::JsonB>>(), String::from("jsonb"));
-    m.insert(TypeId::of::<datum::Array<datum::JsonB>>(), String::from("jsonb[]"));
+    m.insert(
+        TypeId::of::<datum::Array<datum::JsonB>>(),
+        String::from("jsonb[]"),
+    );
     m.insert(TypeId::of::<Vec<datum::JsonB>>(), String::from("jsonb[]"));
-    m.insert(TypeId::of::<Vec<Option<datum::JsonB>>>(), String::from("jsonb[]"));
+    m.insert(
+        TypeId::of::<Vec<Option<datum::JsonB>>>(),
+        String::from("jsonb[]"),
+    );
 
     m.insert(TypeId::of::<f64>(), String::from("double precision"));
     m.insert(
@@ -214,20 +237,47 @@ pub static DEFAULT_TYPEID_SQL_MAPPING: Lazy<HashMap<TypeId, String>> = Lazy::new
     m.insert(TypeId::of::<Vec<u8>>(), String::from("bytea"));
     m.insert(TypeId::of::<Option<Vec<u8>>>(), String::from("bytea"));
 
-    m.insert(TypeId::of::<pgx_pg_sys::ItemPointerData>(), String::from("tid"));
-    m.insert(TypeId::of::<Option<pgx_pg_sys::ItemPointerData>>(), String::from("tid"));
-    m.insert(TypeId::of::<Vec<pgx_pg_sys::ItemPointerData>>(), String::from("tid[]"));
-    m.insert(TypeId::of::<Vec<Option<pgx_pg_sys::ItemPointerData>>>(), String::from("tid[]"));
-    m.insert(TypeId::of::<datum::Array<pgx_pg_sys::ItemPointerData>>(), String::from("tid[]"));
-    m.insert(TypeId::of::<Option<datum::Array<pgx_pg_sys::ItemPointerData>>>(), String::from("tid[]"));
-    
+    m.insert(
+        TypeId::of::<pgx_pg_sys::ItemPointerData>(),
+        String::from("tid"),
+    );
+    m.insert(
+        TypeId::of::<Option<pgx_pg_sys::ItemPointerData>>(),
+        String::from("tid"),
+    );
+    m.insert(
+        TypeId::of::<Vec<pgx_pg_sys::ItemPointerData>>(),
+        String::from("tid[]"),
+    );
+    m.insert(
+        TypeId::of::<Vec<Option<pgx_pg_sys::ItemPointerData>>>(),
+        String::from("tid[]"),
+    );
+    m.insert(
+        TypeId::of::<datum::Array<pgx_pg_sys::ItemPointerData>>(),
+        String::from("tid[]"),
+    );
+    m.insert(
+        TypeId::of::<Option<datum::Array<pgx_pg_sys::ItemPointerData>>>(),
+        String::from("tid[]"),
+    );
+
     m.insert(TypeId::of::<pgx_pg_sys::Point>(), String::from("point"));
-    m.insert(TypeId::of::<Vec<pgx_pg_sys::Point>>(), String::from("point[]"));
-    m.insert(TypeId::of::<datum::Array<pgx_pg_sys::Point>>(), String::from("point[]"));
+    m.insert(
+        TypeId::of::<Vec<pgx_pg_sys::Point>>(),
+        String::from("point[]"),
+    );
+    m.insert(
+        TypeId::of::<datum::Array<pgx_pg_sys::Point>>(),
+        String::from("point[]"),
+    );
 
     m.insert(TypeId::of::<pgx_pg_sys::BOX>(), String::from("box"));
     m.insert(TypeId::of::<Vec<pgx_pg_sys::BOX>>(), String::from("box[]"));
-    m.insert(TypeId::of::<datum::Array<pgx_pg_sys::BOX>>(), String::from("box[]"));
+    m.insert(
+        TypeId::of::<datum::Array<pgx_pg_sys::BOX>>(),
+        String::from("box[]"),
+    );
 
     m.insert(TypeId::of::<Date>(), String::from("date"));
     m.insert(TypeId::of::<Option<Date>>(), String::from("date"));
@@ -235,51 +285,119 @@ pub static DEFAULT_TYPEID_SQL_MAPPING: Lazy<HashMap<TypeId, String>> = Lazy::new
     m.insert(TypeId::of::<Option<Time>>(), String::from("time"));
     m.insert(TypeId::of::<Timestamp>(), String::from("timestamp"));
     m.insert(TypeId::of::<Option<Timestamp>>(), String::from("timestamp"));
-    m.insert(TypeId::of::<TimeWithTimeZone>(), String::from("time with time zone"));
-    m.insert(TypeId::of::<Option<TimeWithTimeZone>>(), String::from("time with time zone"));
-    m.insert(TypeId::of::<TimestampWithTimeZone>(), String::from("timestamp with time zone"));
-    m.insert(TypeId::of::<Option<TimestampWithTimeZone>>(), String::from("timestamp with time zone"));
+    m.insert(
+        TypeId::of::<TimeWithTimeZone>(),
+        String::from("time with time zone"),
+    );
+    m.insert(
+        TypeId::of::<Option<TimeWithTimeZone>>(),
+        String::from("time with time zone"),
+    );
+    m.insert(
+        TypeId::of::<TimestampWithTimeZone>(),
+        String::from("timestamp with time zone"),
+    );
+    m.insert(
+        TypeId::of::<Option<TimestampWithTimeZone>>(),
+        String::from("timestamp with time zone"),
+    );
 
     m.insert(TypeId::of::<datum::Json>(), String::from("json"));
     m.insert(TypeId::of::<Vec<datum::Json>>(), String::from("json[]"));
     m.insert(TypeId::of::<Option<datum::Json>>(), String::from("json"));
     m.insert(TypeId::of::<Vec<datum::Json>>(), String::from("json[]"));
-    m.insert(TypeId::of::<Option<Vec<datum::Json>>>(), String::from("json[]"));
-    m.insert(TypeId::of::<Vec<Option<datum::Json>>>(), String::from("json[]"));
-    m.insert(TypeId::of::<Option<Vec<Option<datum::Json>>>>(), String::from("json[]"));
+    m.insert(
+        TypeId::of::<Option<Vec<datum::Json>>>(),
+        String::from("json[]"),
+    );
+    m.insert(
+        TypeId::of::<Vec<Option<datum::Json>>>(),
+        String::from("json[]"),
+    );
+    m.insert(
+        TypeId::of::<Option<Vec<Option<datum::Json>>>>(),
+        String::from("json[]"),
+    );
 
     m.insert(TypeId::of::<datum::JsonB>(), String::from("jsonb"));
     m.insert(TypeId::of::<Vec<datum::JsonB>>(), String::from("jsonb[]"));
     m.insert(TypeId::of::<Option<datum::JsonB>>(), String::from("jsonb"));
     m.insert(TypeId::of::<Vec<datum::JsonB>>(), String::from("jsonb[]"));
-    m.insert(TypeId::of::<Option<Vec<datum::JsonB>>>(), String::from("jsonb[]"));
-    m.insert(TypeId::of::<Vec<Option<datum::JsonB>>>(), String::from("jsonb[]"));
-    m.insert(TypeId::of::<Option<Vec<Option<datum::JsonB>>>>(), String::from("jsonb[]"));
+    m.insert(
+        TypeId::of::<Option<Vec<datum::JsonB>>>(),
+        String::from("jsonb[]"),
+    );
+    m.insert(
+        TypeId::of::<Vec<Option<datum::JsonB>>>(),
+        String::from("jsonb[]"),
+    );
+    m.insert(
+        TypeId::of::<Option<Vec<Option<datum::JsonB>>>>(),
+        String::from("jsonb[]"),
+    );
 
-    m.insert(TypeId::of::<datum::Internal<pgx_pg_sys::PlannerInfo>>(), String::from("internal"));
-    m.insert(TypeId::of::<datum::Internal<pgx_pg_sys::List>>(), String::from("internal"));
-    m.insert(TypeId::of::<pgbox::PgBox<pgx_pg_sys::IndexAmRoutine>>(), String::from("internal"));
+    m.insert(
+        TypeId::of::<datum::Internal<pgx_pg_sys::PlannerInfo>>(),
+        String::from("internal"),
+    );
+    m.insert(
+        TypeId::of::<datum::Internal<pgx_pg_sys::List>>(),
+        String::from("internal"),
+    );
+    m.insert(
+        TypeId::of::<pgbox::PgBox<pgx_pg_sys::IndexAmRoutine>>(),
+        String::from("internal"),
+    );
 
-    m.insert(TypeId::of::<datum::Numeric>(), String::from("pg_catalog.\"numeric\""));
-    m.insert(TypeId::of::<Option<datum::Numeric>>(), String::from("pg_catalog.\"numeric\""));
-    m.insert(TypeId::of::<Vec<datum::Numeric>>(), String::from("pg_catalog.\"numeric\"[]"));
-    m.insert(TypeId::of::<Vec<Option<datum::Numeric>>>(), String::from("pg_catalog.\"numeric\"[]"));
-    m.insert(TypeId::of::<Option<Vec<Option<datum::Numeric>>>>(), String::from("pg_catalog.\"numeric\"[]"));
-
+    m.insert(
+        TypeId::of::<datum::Numeric>(),
+        String::from("pg_catalog.\"numeric\""),
+    );
+    m.insert(
+        TypeId::of::<Option<datum::Numeric>>(),
+        String::from("pg_catalog.\"numeric\""),
+    );
+    m.insert(
+        TypeId::of::<Vec<datum::Numeric>>(),
+        String::from("pg_catalog.\"numeric\"[]"),
+    );
+    m.insert(
+        TypeId::of::<Vec<Option<datum::Numeric>>>(),
+        String::from("pg_catalog.\"numeric\"[]"),
+    );
+    m.insert(
+        TypeId::of::<Option<Vec<Option<datum::Numeric>>>>(),
+        String::from("pg_catalog.\"numeric\"[]"),
+    );
 
     m.insert(TypeId::of::<pg_sys::Oid>(), String::from("oid"));
-    m.insert(TypeId::of::<datum::AnyElement>(), String::from("anyelement"));
+    m.insert(
+        TypeId::of::<datum::AnyElement>(),
+        String::from("anyelement"),
+    );
     m.insert(TypeId::of::<datum::AnyArray>(), String::from("anyarray"));
 
     m.insert(TypeId::of::<rel::PgRelation>(), String::from("regclass"));
-    m.insert(TypeId::of::<Option<rel::PgRelation>>(), String::from("regclass"));
+    m.insert(
+        TypeId::of::<Option<rel::PgRelation>>(),
+        String::from("regclass"),
+    );
 
     m.insert(TypeId::of::<Option<datum::Inet>>(), String::from("inet"));
     m.insert(TypeId::of::<datum::Inet>(), String::from("inet"));
-    m.insert(TypeId::of::<Vec<Option<datum::Inet>>>(), String::from("inet[]"));
+    m.insert(
+        TypeId::of::<Vec<Option<datum::Inet>>>(),
+        String::from("inet[]"),
+    );
     m.insert(TypeId::of::<Vec<datum::Inet>>(), String::from("inet[]"));
-    m.insert(TypeId::of::<Option<Vec<Option<datum::Inet>>>>(), String::from("inet[]"));
-    m.insert(TypeId::of::<Option<Vec<datum::Inet>>>(), String::from("inet[]"));
+    m.insert(
+        TypeId::of::<Option<Vec<Option<datum::Inet>>>>(),
+        String::from("inet[]"),
+    );
+    m.insert(
+        TypeId::of::<Option<Vec<datum::Inet>>>(),
+        String::from("inet[]"),
+    );
 
     m
 });
@@ -332,13 +450,19 @@ macro_rules! pg_module_magic {
 
         pub use __pgx_internals::generate_sql;
         mod __pgx_internals {
-            use ::pgx_utils::pg_inventory::{*, once_cell::sync::Lazy};
             use ::core::{any::TypeId, convert::TryFrom};
+            use ::pgx::datum::{Array, FromDatum, PgVarlena};
+            use ::pgx_utils::pg_inventory::{once_cell::sync::Lazy, *};
             use ::std::collections::HashMap;
-            use ::pgx::datum::{FromDatum, PgVarlena, Array};
 
-            static CONTROL_FILE: &str = include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/", env!("CARGO_CRATE_NAME"), ".control"));
-            static LOAD_ORDER_FILE: &str = include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/sql/load-order.txt"));
+            static CONTROL_FILE: &str = include_str!(concat!(
+                env!("CARGO_MANIFEST_DIR"),
+                "/",
+                env!("CARGO_CRATE_NAME"),
+                ".control"
+            ));
+            static LOAD_ORDER_FILE: &str =
+                include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/sql/load-order.txt"));
             static LOAD_ORDER_DIR: include_dir::Dir = include_dir::include_dir!("sql");
 
             #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
@@ -373,7 +497,9 @@ macro_rules! pg_module_magic {
                 use std::fmt::Write;
                 let mut generated = PgxSql::build(
                     ControlFile::try_from(CONTROL_FILE)?,
-                    (*pgx::DEFAULT_TYPEID_SQL_MAPPING).iter().map(|(x, y)| (x.clone(), y.clone())),
+                    (*pgx::DEFAULT_TYPEID_SQL_MAPPING)
+                        .iter()
+                        .map(|(x, y)| (x.clone(), y.clone())),
                     {
                         let mut set = inventory::iter::<Schema>().collect::<Vec<_>>();
                         set.sort();

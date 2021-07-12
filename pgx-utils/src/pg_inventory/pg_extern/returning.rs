@@ -50,15 +50,20 @@ impl TryFrom<&syn::ReturnType> for Returning {
                                                     }
                                                 }).collect();
                                                 Returning::Iterated(returns)
-                                            },
+                                            }
                                             syn::Type::Path(path) => Returning::SetOf(path.clone()),
                                             syn::Type::Reference(type_ref) => {
                                                 match &*type_ref.elem {
-                                                    syn::Type::Path(path) => Returning::SetOf(path.clone()),
-                                                    _ => unimplemented!("Expected path")
+                                                    syn::Type::Path(path) => {
+                                                        Returning::SetOf(path.clone())
+                                                    }
+                                                    _ => unimplemented!("Expected path"),
                                                 }
                                             }
-                                            ty => unimplemented!("Only iters with tuples, got {:?}.", ty),
+                                            ty => unimplemented!(
+                                                "Only iters with tuples, got {:?}.",
+                                                ty
+                                            ),
                                         },
                                         _ => unimplemented!(),
                                     }
@@ -88,9 +93,8 @@ impl TryFrom<&syn::ReturnType> for Returning {
                     } else {
                         Returning::Type(ty.deref().clone())
                     }
-
-                },
-                _ => Returning::Type(ty.deref().clone())
+                }
+                _ => Returning::Type(ty.deref().clone()),
             },
         })
     }
@@ -151,7 +155,7 @@ impl ToTokens for Returning {
                         #(#quoted_items),*
                     ])
                 }
-            },
+            }
             Returning::Trigger => quote! {
                 pgx_utils::pg_inventory::InventoryPgExternReturn::Trigger
             },
@@ -170,14 +174,40 @@ pub(crate) struct NameMacro {
 impl Parse for NameMacro {
     fn parse(input: ParseStream) -> Result<Self, syn::Error> {
         Ok(Self {
-            ident: input.parse::<syn::Ident>().map(|v| v.to_string())
+            ident: input
+                .parse::<syn::Ident>()
+                .map(|v| v.to_string())
                 // Avoid making folks unable to use rust keywords.
-                .or_else(|_| input.parse::<syn::Token![type]>().map(|_| String::from("type")))
-                .or_else(|_| input.parse::<syn::Token![mod]>().map(|_| String::from("mod")))
-                .or_else(|_| input.parse::<syn::Token![extern]>().map(|_| String::from("extern")))
-                .or_else(|_| input.parse::<syn::Token![async]>().map(|_| String::from("async")))
-                .or_else(|_| input.parse::<syn::Token![crate]>().map(|_| String::from("crate")))
-                .or_else(|_| input.parse::<syn::Token![use]>().map(|_| String::from("use")))?,
+                .or_else(|_| {
+                    input
+                        .parse::<syn::Token![type]>()
+                        .map(|_| String::from("type"))
+                })
+                .or_else(|_| {
+                    input
+                        .parse::<syn::Token![mod]>()
+                        .map(|_| String::from("mod"))
+                })
+                .or_else(|_| {
+                    input
+                        .parse::<syn::Token![extern]>()
+                        .map(|_| String::from("extern"))
+                })
+                .or_else(|_| {
+                    input
+                        .parse::<syn::Token![async]>()
+                        .map(|_| String::from("async"))
+                })
+                .or_else(|_| {
+                    input
+                        .parse::<syn::Token![crate]>()
+                        .map(|_| String::from("crate"))
+                })
+                .or_else(|_| {
+                    input
+                        .parse::<syn::Token![use]>()
+                        .map(|_| String::from("use"))
+                })?,
             comma: input.parse()?,
             ty: input.parse()?,
         })
@@ -197,6 +227,13 @@ pub enum InventoryPgExternReturn {
         full_path: &'static str,
         module_path: String,
     },
-    Iterated(Vec<(core::any::TypeId, &'static str, String, Option<&'static str>)>),
+    Iterated(
+        Vec<(
+            core::any::TypeId,
+            &'static str,
+            String,
+            Option<&'static str>,
+        )>,
+    ),
     Trigger,
 }
