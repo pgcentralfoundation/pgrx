@@ -203,7 +203,7 @@ impl ToTokens for ExtensionSqlPositioning {
             ExtensionSqlPositioning::Expr(ex) => {
                 let path = ex.to_token_stream().to_string().replace(" ", "");
                 (quote! {
-                    ::pgx_utils::pg_inventory::InventoryExtensionSqlPositioningRef::FullPath(stringify!(#path))
+                    ::pgx_utils::pg_inventory::InventoryExtensionSqlPositioningRef::FullPath(#path)
                 }).to_token_stream()
             }
             ExtensionSqlPositioning::Name(name) => quote! {
@@ -225,6 +225,12 @@ pub struct InventoryExtensionSql {
     pub bootstrap: bool,
     pub before: Vec<InventoryExtensionSqlPositioningRef<'static>>,
     pub after: Vec<InventoryExtensionSqlPositioningRef<'static>>,
+}
+
+impl InventoryExtensionSql {
+    pub fn identifier(&self) -> &str {
+        self.name.unwrap_or(self.full_path)
+    }
 }
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]

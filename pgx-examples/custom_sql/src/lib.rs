@@ -37,23 +37,26 @@ use home::Dog;
 //  * `name` is an optional string identifier for the item, in case you need to refer to it in
 //    other positioning.
 extension_sql!("\n\
-    CREATE TABLE extension_sql VALUES (message TEXT);\n\
-    INSERT INTO extension_sql VALUES ('bootstrap');\n\
-", bootstrap, name = "bootstrap");
+        CREATE TABLE extension_sql VALUES (message TEXT);\n\
+        INSERT INTO extension_sql VALUES ('bootstrap');\n\
+    ",
+    name = "bootstrap",
+    bootstrap,
+);
 extension_sql!("\n
         INSERT INTO extension_sql VALUES ('single');\n\
     ",
-    after = ["bootstrap.sql"],
-    name = "multiple"
+    name = "single",
+    after = ["bootstrap"],
 );
 extension_sql!("\n\
     INSERT INTO extension_sql VALUES ('multiple');\n\
 ",
     after = [
         Dog,
-        home::Ball
+        home::Ball,
     ],
-    before = ["multiple"], // This points to the above `extension_sql!()` with `name = multiple`
+    before = ["single"], // This points to the above `extension_sql!()` with `name = multiple`
 );
 extension_sql!("\n\
 INSERT INTO extension_sql VALUES ('finalizer');\n\
@@ -65,8 +68,8 @@ extension_sql_file!("../sql/bootstrap.sql", bootstrap);
 extension_sql_file!("../sql/single.sql", after = ["bootstrap.sql"]);
 extension_sql_file!("../sql/multiple.sql",
     after = [
-        query_dsl::bool::dsl,
-        query_dsl::filter::dsl
+        Dog,
+        home::Ball,
     ],
     before = ["single.sql"],
 );
