@@ -328,7 +328,6 @@ impl<'a> PgxSql<'a> {
                     .add_edge(root, index, SqlGraphRelationship::RequiredBy);
             }
             for after in &item.after {
-                tracing::error!(?after, "AFTER");
                 match after {
                     InventoryExtensionSqlPositioningRef::FullPath(path) => {
                         for (other, other_index) in &this.types {

@@ -2,7 +2,7 @@
 // governed by the MIT license that can be found in the LICENSE file.
 
 use pgx::*;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 pg_module_magic!();
 
@@ -24,7 +24,7 @@ mod home {
 use home::Dog;
 
 // `extension_sql` allows you to define your own custom SQL.
-// 
+//
 // Since PostgreSQL is is order dependent, you may need to specify a positioning.
 //
 // Valid options are:
@@ -36,41 +36,41 @@ use home::Dog;
 //  * `before = [$ident, $ident2, ident3]` & `after = [$ident]` A variable number of positionings.
 //  * `name` is an optional string identifier for the item, in case you need to refer to it in
 //    other positioning.
-extension_sql!("\n\
+extension_sql!(
+    "\n\
         CREATE TABLE extension_sql VALUES (message TEXT);\n\
         INSERT INTO extension_sql VALUES ('bootstrap');\n\
     ",
     name = "bootstrap",
     bootstrap,
 );
-extension_sql!("\n
+extension_sql!(
+    "\n
         INSERT INTO extension_sql VALUES ('single');\n\
     ",
     name = "single",
     after = ["bootstrap"],
 );
-extension_sql!("\n\
+extension_sql!(
+    "\n\
     INSERT INTO extension_sql VALUES ('multiple');\n\
 ",
-    after = [
-        Dog,
-        home::Ball,
-    ],
+    after = [Dog, home::Ball],
     before = ["single"], // This points to the above `extension_sql!()` with `name = multiple`
 );
-extension_sql!("\n\
+extension_sql!(
+    "\n\
 INSERT INTO extension_sql VALUES ('finalizer');\n\
-");
+"
+);
 
 // `extension_sql_file` does the same as `extension_sql` but automatically sets the `name` to the
 // filename (not the full path).
 extension_sql_file!("../sql/bootstrap.sql", bootstrap);
 extension_sql_file!("../sql/single.sql", after = ["bootstrap.sql"]);
-extension_sql_file!("../sql/multiple.sql",
-    after = [
-        Dog,
-        home::Ball,
-    ],
+extension_sql_file!(
+    "../sql/multiple.sql",
+    after = [Dog, home::Ball],
     before = ["single.sql"],
 );
 extension_sql_file!("../sql/finalizer.sql");
