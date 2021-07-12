@@ -28,6 +28,7 @@ impl ToTokens for ExtensionSqlFile {
         let path = &self.path;
         let mut name = None;
         let mut bootstrap = false;
+        let mut finalize = false;
         let mut before = vec![];
         let mut after = vec![];
         for attr in &self.attrs {
@@ -40,6 +41,9 @@ impl ToTokens for ExtensionSqlFile {
                 }
                 ExtensionSqlAttribute::Bootstrap => {
                     bootstrap = true;
+                }
+                ExtensionSqlAttribute::Finalize => {
+                    finalize = true;
                 }
                 ExtensionSqlAttribute::Name(found_name) => {
                     name = Some(found_name.value());
@@ -67,6 +71,7 @@ impl ToTokens for ExtensionSqlFile {
                     line: line!(),
                     name: None#( .unwrap_or(Some(#name_iter)) )*,
                     bootstrap: #bootstrap,
+                    finalize: #finalize,
                     before: vec![#(#before_iter),*],
                     after: vec![#(#after_iter),*],
                 })
@@ -98,6 +103,7 @@ impl ToTokens for ExtensionSql {
         let sql = &self.sql;
         let mut name = None;
         let mut bootstrap = false;
+        let mut finalize = false;
         let mut before = vec![];
         let mut after = vec![];
         for attr in &self.attrs {
@@ -110,6 +116,9 @@ impl ToTokens for ExtensionSql {
                 }
                 ExtensionSqlAttribute::Bootstrap => {
                     bootstrap = true;
+                }
+                ExtensionSqlAttribute::Finalize => {
+                    finalize = true;
                 }
                 ExtensionSqlAttribute::Name(found_name) => {
                     name = Some(found_name.value());
@@ -129,6 +138,7 @@ impl ToTokens for ExtensionSql {
                     line: line!(),
                     name: None#( .unwrap_or(Some(#name_iter)) )*,
                     bootstrap: #bootstrap,
+                    finalize: #finalize,
                     before: vec![#(#before_iter),*],
                     after: vec![#(#after_iter),*],
                 })
@@ -143,6 +153,7 @@ pub enum ExtensionSqlAttribute {
     Before(Punctuated<ExtensionSqlPositioning, Token![,]>),
     After(Punctuated<ExtensionSqlPositioning, Token![,]>),
     Bootstrap,
+    Finalize,
     Name(LitStr),
 }
 
@@ -163,6 +174,7 @@ impl Parse for ExtensionSqlAttribute {
                 Self::After(content.parse_terminated(ExtensionSqlPositioning::parse)?)
             }
             "bootstrap" => Self::Bootstrap,
+            "finalize" => Self::Finalize,
             "name" => {
                 let _eq: syn::token::Eq = input.parse()?;
                 Self::Name(input.parse()?)
@@ -223,6 +235,7 @@ pub struct InventoryExtensionSql {
     pub line: u32,
     pub name: Option<&'static str>,
     pub bootstrap: bool,
+    pub finalize: bool,
     pub before: Vec<InventoryExtensionSqlPositioningRef<'static>>,
     pub after: Vec<InventoryExtensionSqlPositioningRef<'static>>,
 }

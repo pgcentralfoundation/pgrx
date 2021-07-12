@@ -461,9 +461,6 @@ macro_rules! pg_module_magic {
                 env!("CARGO_CRATE_NAME"),
                 ".control"
             ));
-            static LOAD_ORDER_FILE: &str =
-                include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/sql/load-order.txt"));
-            static LOAD_ORDER_DIR: include_dir::Dir = include_dir::include_dir!("sql");
 
             #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
             pub struct ExtensionSql(pub pgx_utils::pg_inventory::InventoryExtensionSql);
@@ -535,7 +532,7 @@ macro_rules! pg_module_magic {
                         set.sort();
                         set.into_iter().map(|x| &x.0)
                     },
-                );
+                )?;
 
                 Ok(generated)
             }

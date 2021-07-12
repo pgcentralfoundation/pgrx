@@ -58,22 +58,16 @@ extension_sql!(
     after = [Dog, home::Ball],
     before = ["single"], // This points to the above `extension_sql!()` with `name = multiple`
 );
-extension_sql!(
-    "\n\
-INSERT INTO extension_sql VALUES ('finalizer');\n\
-"
-);
 
 // `extension_sql_file` does the same as `extension_sql` but automatically sets the `name` to the
 // filename (not the full path).
-extension_sql_file!("../sql/bootstrap.sql", bootstrap);
-extension_sql_file!("../sql/single.sql", after = ["bootstrap.sql"]);
+extension_sql_file!("../sql/single.sql", after = ["bootstrap"]);
 extension_sql_file!(
     "../sql/multiple.sql",
     after = [Dog, home::Ball],
     before = ["single.sql"],
 );
-extension_sql_file!("../sql/finalizer.sql");
+extension_sql_file!("../sql/finalizer.sql", finalize);
 
 #[cfg(test)]
 pub mod pg_test {

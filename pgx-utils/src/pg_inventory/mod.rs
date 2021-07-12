@@ -27,10 +27,6 @@ pub use color_eyre;
 #[doc(hidden)]
 pub use eyre;
 #[doc(hidden)]
-pub use impls;
-#[doc(hidden)]
-pub use include_dir;
-#[doc(hidden)]
 pub use inventory;
 #[doc(hidden)]
 pub use once_cell;
@@ -58,6 +54,8 @@ pub struct PgxSql<'a> {
     pub control: ControlFile,
     pub graph: StableGraph<SqlGraphEntity<'a>, SqlGraphRelationship>,
     pub graph_root: NodeIndex,
+    pub graph_bootstrap: Option<NodeIndex>,
+    pub graph_finalize: Option<NodeIndex>,
     pub schemas: HashMap<&'a InventorySchema, NodeIndex>,
     pub extension_sqls: HashMap<&'a InventoryExtensionSql, NodeIndex>,
     pub externs: HashMap<&'a InventoryPgExtern, NodeIndex>,
@@ -172,10 +170,12 @@ impl<'a> PgxSql<'a> {
         enums: impl Iterator<Item = &'a InventoryPostgresEnum>,
         ords: impl Iterator<Item = &'a InventoryPostgresOrd>,
         hashes: impl Iterator<Item = &'a InventoryPostgresHash>,
-    ) -> Self {
+    ) -> eyre::Result<Self> {
         let mut graph = StableGraph::new();
 
         let root = graph.add_node(SqlGraphEntity::ExtensionRoot(control.clone()));
+        let mut bootstrap = None;
+        let mut finalize = None;
 
         // The initial build phase.
         //
@@ -191,21 +191,68 @@ impl<'a> PgxSql<'a> {
         for item in extension_sqls {
             let index = graph.add_node(item.into());
             mapped_extension_sqls.insert(item, index);
+            if item.bootstrap {
+                if bootstrap.is_some() {
+                    return Err(eyre_err!("Cannot have multiple `extension_sql!()` with `bootstrap` positioning."))
+                }
+                bootstrap = Some(index)
+            }
+            if item.finalize {
+                if finalize.is_some() {
+                    return Err(eyre_err!("Cannot have multiple `extension_sql!()` with `finalize` positioning."))
+                }
+                finalize = Some(index)
+            }
+        }
+        for (item, index) in &mapped_extension_sqls {
+            graph.add_edge(root, *index, SqlGraphRelationship::RequiredBy);
+            if !item.bootstrap {
+                if let Some(bootstrap) = bootstrap {
+                    graph.add_edge(bootstrap, *index, SqlGraphRelationship::RequiredBy);
+                }
+            }
+            if !item.finalize {
+                if let Some(finalize) = finalize {
+                    graph.add_edge(*index, finalize, SqlGraphRelationship::RequiredBy);
+                }
+            }
         }
         let mut mapped_enums = HashMap::default();
         for item in enums {
             let index = graph.add_node(item.into());
             mapped_enums.insert(item, index);
+            graph.add_edge(root, index, SqlGraphRelationship::RequiredBy);
+            if let Some(bootstrap) = bootstrap {
+                graph.add_edge(bootstrap, index, SqlGraphRelationship::RequiredBy);
+            }
+            if let Some(finalize) = finalize {
+                graph.add_edge(index, finalize, SqlGraphRelationship::RequiredBy);
+            }
         }
         let mut mapped_types = HashMap::default();
         for item in types {
             let index = graph.add_node(item.into());
             mapped_types.insert(item, index);
+            graph.add_edge(root, index, SqlGraphRelationship::RequiredBy);
+            if let Some(bootstrap) = bootstrap {
+                graph.add_edge(bootstrap, index, SqlGraphRelationship::RequiredBy);
+            }
+            if let Some(finalize) = finalize {
+                graph.add_edge(index, finalize, SqlGraphRelationship::RequiredBy);
+            }
         }
         let mut mapped_externs = HashMap::default();
         let mut mapped_builtin_types = HashMap::default();
         for item in externs {
             let index = graph.add_node(item.into());
+            graph.add_edge(root, index, SqlGraphRelationship::RequiredBy);
+            if let Some(bootstrap) = bootstrap {
+                graph.add_edge(bootstrap, index, SqlGraphRelationship::RequiredBy);
+            }
+            if let Some(finalize) = finalize {
+                graph.add_edge(index, finalize, SqlGraphRelationship::RequiredBy);
+            }
+
             mapped_externs.insert(item, index);
 
             for arg in &item.fn_args {
@@ -284,11 +331,25 @@ impl<'a> PgxSql<'a> {
         for item in ords {
             let index = graph.add_node(item.into());
             mapped_ords.insert(item, index);
+            graph.add_edge(root, index, SqlGraphRelationship::RequiredBy);
+            if let Some(bootstrap) = bootstrap {
+                graph.add_edge(bootstrap, index, SqlGraphRelationship::RequiredBy);
+            }
+            if let Some(finalize) = finalize {
+                graph.add_edge(index, finalize, SqlGraphRelationship::RequiredBy);
+            }
         }
         let mut mapped_hashes = HashMap::default();
         for item in hashes {
             let index = graph.add_node(item.into());
             mapped_hashes.insert(item, index);
+                        graph.add_edge(root, index, SqlGraphRelationship::RequiredBy);
+            if let Some(bootstrap) = bootstrap {
+                graph.add_edge(bootstrap, index, SqlGraphRelationship::RequiredBy);
+            }
+            if let Some(finalize) = finalize {
+                graph.add_edge(index, finalize, SqlGraphRelationship::RequiredBy);
+            }
         }
 
         let mut this = Self {
@@ -304,6 +365,8 @@ impl<'a> PgxSql<'a> {
             hashes: mapped_hashes,
             graph: graph,
             graph_root: root,
+            graph_bootstrap: bootstrap,
+            graph_finalize: finalize,
         };
 
         // Now we can circle back and build up the edge sets.
@@ -312,20 +375,13 @@ impl<'a> PgxSql<'a> {
                 .add_edge(root, index, SqlGraphRelationship::RequiredBy);
         }
         for (item, &index) in &this.extension_sqls {
-            let mut found = false;
             for (schema_item, &schema_index) in &this.schemas {
                 if item.module_path.starts_with(schema_item.module_path) {
                     tracing::trace!(from = ?item.identifier(), to = schema_item.module_path, "Adding ExtensionSQL after Schema edge.");
                     this.graph
                         .add_edge(schema_index, index, SqlGraphRelationship::RequiredBy);
-                    found = true;
                     break;
                 }
-            }
-            if !found {
-                tracing::trace!(from = ?item.identifier(), to = ?root, "Adding ExtensionSQL after ExtensionRoot edge.");
-                this.graph
-                    .add_edge(root, index, SqlGraphRelationship::RequiredBy);
             }
             for after in &item.after {
                 match after {
@@ -433,54 +489,33 @@ impl<'a> PgxSql<'a> {
             }
         }
         for (item, &index) in &this.enums {
-            let mut found = false;
             for (schema_item, &schema_index) in &this.schemas {
                 if item.module_path.starts_with(schema_item.module_path) {
                     tracing::trace!(from = ?item.full_path, to = schema_item.module_path, "Adding Enum after Schema edge.");
                     this.graph
                         .add_edge(schema_index, index, SqlGraphRelationship::RequiredBy);
-                    found = true;
                     break;
                 }
             }
-            if !found {
-                tracing::trace!(from = ?item.full_path, to = ?root, "Adding Enum after ExtensionRoot edge.");
-                this.graph
-                    .add_edge(root, index, SqlGraphRelationship::RequiredBy);
-            }
         }
         for (item, &index) in &this.types {
-            let mut found = false;
             for (schema_item, &schema_index) in &this.schemas {
                 if item.module_path.starts_with(schema_item.module_path) {
                     tracing::trace!(from = ?item.full_path, to = schema_item.module_path, "Adding Type after Schema edge.");
                     this.graph
                         .add_edge(schema_index, index, SqlGraphRelationship::RequiredBy);
-                    found = true;
                     break;
                 }
             }
-            if !found {
-                tracing::trace!(from = ?item.full_path, to = ?root, "Adding Types after ExtensionRoot edge.");
-                this.graph
-                    .add_edge(root, index, SqlGraphRelationship::RequiredBy);
-            }
         }
         for (item, &index) in &this.externs {
-            let mut found = false;
             for (schema_item, &schema_index) in &this.schemas {
                 if item.module_path.starts_with(schema_item.module_path) {
                     tracing::trace!(from = ?item.full_path, to = schema_item.module_path, "Adding Extern after Schema edge.");
                     this.graph
                         .add_edge(schema_index, index, SqlGraphRelationship::RequiredBy);
-                    found = true;
                     break;
                 }
-            }
-            if !found {
-                tracing::trace!(from = ?item.full_path, to = ?root, "Adding Extern after ExtensionRoot edge.");
-                this.graph
-                    .add_edge(root, index, SqlGraphRelationship::RequiredBy);
             }
             for arg in &item.fn_args {
                 let mut found = false;
@@ -597,42 +632,28 @@ impl<'a> PgxSql<'a> {
             }
         }
         for (item, &index) in &this.ords {
-            let mut found = false;
             for (schema_item, &schema_index) in &this.schemas {
                 if item.module_path.starts_with(schema_item.module_path) {
                     tracing::trace!(from = ?item.full_path, to = schema_item.module_path, "Adding Ord after Schema edge.");
                     this.graph
                         .add_edge(schema_index, index, SqlGraphRelationship::RequiredBy);
-                    found = true;
                     break;
                 }
             }
-            if !found {
-                tracing::trace!(from = ?item.full_path, to = ?root, "Adding Ord after ExtensionRoot edge.");
-                this.graph
-                    .add_edge(root, index, SqlGraphRelationship::RequiredBy);
-            }
         }
         for (item, &index) in &this.hashes {
-            let mut found = false;
             for (schema_item, &schema_index) in &this.schemas {
                 if item.module_path.starts_with(schema_item.module_path) {
                     tracing::trace!(from = ?item.full_path, to = schema_item.module_path, "Adding Hash after Schema edge.");
                     this.graph
                         .add_edge(schema_index, index, SqlGraphRelationship::RequiredBy);
-                    found = true;
                     break;
                 }
-            }
-            if !found {
-                tracing::trace!(from = ?item.full_path, to = ?root, "Adding Hash after ExtensionRoot edge.");
-                this.graph
-                    .add_edge(root, index, SqlGraphRelationship::RequiredBy);
             }
         }
 
         this.register_types();
-        this
+        Ok(this)
     }
 
     #[instrument(level = "info", err, skip(self))]
@@ -814,7 +835,7 @@ impl<'a> PgxSql<'a> {
         };
 
         let sql = format!(
-            "\
+            "\n\
                 -- {file}:{line}\n\
                 {sql}\
                 ",
@@ -840,7 +861,7 @@ impl<'a> PgxSql<'a> {
         };
 
         let sql = format!(
-            "\
+            "\n\
                     -- {file}:{line}\n\
                     CREATE SCHEMA IF NOT EXISTS {name}; /* {module_path} */\n\
                 ",
@@ -862,7 +883,7 @@ impl<'a> PgxSql<'a> {
         };
 
         let sql = format!(
-            "\
+            "\n\
                     -- {file}:{line}\n\
                     -- {full_path}\n\
                     CREATE TYPE {schema}{name} AS ENUM (\n\
@@ -914,7 +935,7 @@ impl<'a> PgxSql<'a> {
             extern_attrs.push(ExternArgs::Strict);
         }
 
-        let fn_sql = format!("\
+        let fn_sql = format!("\n\
                                 CREATE OR REPLACE FUNCTION {schema}\"{name}\"({arguments}) {returns}\n\
                                 {extern_attrs}\
                                 {search_path}\
