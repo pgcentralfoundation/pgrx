@@ -182,11 +182,6 @@ impl<'a> PgxSql<'a> {
         // Notably, we do not set non-root edges here. We do that in a second step. This is
         // primarily because externs, types, operators, and the like tend to intertwine. If we tried
         // to do it here, we'd find ourselves trying to create edges to non-existing entities.
-        let mut mapped_schemas = HashMap::default();
-        for item in schemas {
-            let index = graph.add_node(item.into());
-            mapped_schemas.insert(item, index);
-        }
         let mut mapped_extension_sqls = HashMap::default();
         for item in extension_sqls {
             let index = graph.add_node(item.into());
@@ -215,6 +210,17 @@ impl<'a> PgxSql<'a> {
                 if let Some(finalize) = finalize {
                     graph.add_edge(*index, finalize, SqlGraphRelationship::RequiredBy);
                 }
+            }
+        }
+        let mut mapped_schemas = HashMap::default();
+        for item in schemas {
+            let index = graph.add_node(item.into());
+            mapped_schemas.insert(item, index);
+            if let Some(bootstrap) = bootstrap {
+                graph.add_edge(bootstrap, index, SqlGraphRelationship::RequiredBy);
+            }
+            if let Some(finalize) = finalize {
+                graph.add_edge(index, finalize, SqlGraphRelationship::RequiredBy);
             }
         }
         let mut mapped_enums = HashMap::default();
@@ -935,12 +941,12 @@ impl<'a> PgxSql<'a> {
             extern_attrs.push(ExternArgs::Strict);
         }
 
-        let fn_sql = format!("\n\
+        let fn_sql = format!("\
                                 CREATE OR REPLACE FUNCTION {schema}\"{name}\"({arguments}) {returns}\n\
                                 {extern_attrs}\
                                 {search_path}\
                                 LANGUAGE c /* Rust */\n\
-                                AS 'MODULE_PATHNAME', '{name}_wrapper';\
+                                AS 'MODULE_PATHNAME', '{name}_wrapper';\n\
                             ",
                              schema = self.schema_prefix_for(item_index),
                              name = item.name,

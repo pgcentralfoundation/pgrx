@@ -351,23 +351,23 @@ pub static DEFAULT_TYPEID_SQL_MAPPING: Lazy<HashMap<TypeId, String>> = Lazy::new
 
     m.insert(
         TypeId::of::<datum::Numeric>(),
-        String::from("pg_catalog.\"numeric\""),
+        String::from("numeric"),
     );
     m.insert(
         TypeId::of::<Option<datum::Numeric>>(),
-        String::from("pg_catalog.\"numeric\""),
+        String::from("numeric"),
     );
     m.insert(
         TypeId::of::<Vec<datum::Numeric>>(),
-        String::from("pg_catalog.\"numeric\"[]"),
+        String::from("numeric[]"),
     );
     m.insert(
         TypeId::of::<Vec<Option<datum::Numeric>>>(),
-        String::from("pg_catalog.\"numeric\"[]"),
+        String::from("numeric[]"),
     );
     m.insert(
         TypeId::of::<Option<Vec<Option<datum::Numeric>>>>(),
-        String::from("pg_catalog.\"numeric\"[]"),
+        String::from("numeric[]"),
     );
 
     m.insert(TypeId::of::<pg_sys::Oid>(), String::from("oid"));
