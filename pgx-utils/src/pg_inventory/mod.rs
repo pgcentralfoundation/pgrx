@@ -1330,8 +1330,12 @@ impl<'a> PgxSql<'a> {
     pub fn register_types(&mut self) {
         for (item, _index) in self.enums.clone() {
             self.map_type_id_to_sql_type(item.id, item.name);
-            self.map_type_id_to_sql_type(item.option_id, item.name);
-            self.map_type_id_to_sql_type(item.vec_id, format!("{}[]", item.name));
+            if let Some(val) = item.option_id {
+                self.map_type_id_to_sql_type(val, item.name);
+            };
+            if let Some(val) = item.varlena_id {
+                self.map_type_id_to_sql_type(val, format!("{}[]", item.name));
+            }
             if let Some(val) = item.varlena_id {
                 self.map_type_id_to_sql_type(val, item.name);
             }

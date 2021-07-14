@@ -35,9 +35,9 @@ impl ToTokens for PostgresEnum {
                     module_path: module_path!(),
                     full_path: core::any::type_name::<#name>(),
                     id: *<#name as WithTypeIds>::ITEM_ID,
-                    option_id: *<#name as WithTypeIds>::OPTION_ID,
-                    vec_id: *<#name as WithTypeIds>::VEC_ID,
-                    vec_option_id: *<#name as WithTypeIds>::VEC_OPTION_ID,
+                    option_id: *<#name as WithSizedTypeIds>::OPTION_ID,
+                    vec_id: *<#name as WithSizedTypeIds>::VEC_ID,
+                    vec_option_id: *<#name as WithSizedTypeIds>::VEC_OPTION_ID,
                     array_id: *WithArrayTypeId::<#name>::ARRAY_ID,
                     option_array_id: *WithArrayTypeId::<#name>::OPTION_ARRAY_ID,
                     varlena_id: *WithVarlenaTypeId::<#name>::VARLENA_ID,
@@ -57,9 +57,9 @@ pub struct InventoryPostgresEnum {
     pub full_path: &'static str,
     pub module_path: &'static str,
     pub id: core::any::TypeId,
-    pub option_id: core::any::TypeId,
-    pub vec_id: core::any::TypeId,
-    pub vec_option_id: core::any::TypeId,
+    pub option_id: Option<core::any::TypeId>,
+    pub vec_id: Option<core::any::TypeId>,
+    pub vec_option_id: Option<core::any::TypeId>,
     pub array_id: Option<core::any::TypeId>,
     pub option_array_id: Option<core::any::TypeId>,
     pub varlena_id: Option<core::any::TypeId>,
@@ -69,9 +69,17 @@ pub struct InventoryPostgresEnum {
 impl InventoryPostgresEnum {
     pub fn id_matches(&self, candidate: &core::any::TypeId) -> bool {
         *candidate == self.id
-            || *candidate == self.option_id
-            || *candidate == self.vec_id
-            || *candidate == self.vec_option_id
+            || if let Some(option_id) = self.option_id {
+                *candidate == option_id
+            } else { false }
+            || if let Some(vec_id) = self.vec_id {
+                *candidate == vec_id
+            } else { false }
+            || if let Some(vec_option_id) = self.vec_option_id {
+                *candidate == vec_option_id
+            } else {
+                false
+            }
             || if let Some(array_id) = self.array_id {
                 *candidate == array_id
             } else {
