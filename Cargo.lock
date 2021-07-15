@@ -1176,6 +1176,7 @@ dependencies = [
  "once_cell",
  "pgx-macros",
  "pgx-pg-sys",
+ "pgx-utils",
  "seahash",
  "serde",
  "serde_cbor",

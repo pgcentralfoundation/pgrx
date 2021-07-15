@@ -98,6 +98,7 @@ pub use pgx_pg_sys::PgBuiltInOids; // reexport this so it looks like it comes fr
 use core::any::TypeId;
 use once_cell::sync::Lazy;
 use std::collections::HashMap;
+use pgx_utils::pg_inventory::RustSqlMapping;
 
 /// Top-level initialization function.  This is called automatically by the `pg_module_magic!()`
 /// macro and need not be called directly
@@ -106,76 +107,78 @@ pub fn initialize() {
     register_pg_guard_panic_handler();
 }
 
-pub fn map_unsized_type<T: 'static + ?Sized>(map: &mut HashMap<TypeId, String>, sql: &str) {
-    let single_sql = sql.to_string();
+macro_rules! map_type {
+    ($map:ident, $rust:ty, $sql:expr) => {
+        {
+            <$rust as WithTypeIds>::register_with_refs(&mut $map, $sql.to_string());
+            WithSizedTypeIds::<$rust>::register_sized_with_refs(&mut $map, $sql.to_string());
+            WithArrayTypeIds::<$rust>::register_array_with_refs(&mut $map, $sql.to_string());
+            WithVarlenaTypeIds::<$rust>::register_varlena_with_refs(&mut $map, $sql.to_string());
+        }
 
-    map.insert(*<T as WithTypeIds>::ITEM_ID, single_sql.clone());
+    };
 }
 
-pub fn map_type<T: 'static>(map: &mut HashMap<TypeId, String>, sql: &str) {
-    let single_sql = sql.to_string();
-    let set_sql = format!("{}[]", single_sql);
-
-    map.insert(*<T as WithTypeIds>::ITEM_ID, single_sql.clone());
-
-    if let Some(id) = *WithSizedTypeIds::<T>::OPTION_ID {
-        map.insert(id, single_sql.clone());
-    }
-    if let Some(id) = *WithSizedTypeIds::<T>::VEC_ID {
-        map.insert(id, set_sql.clone());
-    }
-    if let Some(id) = *WithSizedTypeIds::<T>::VEC_OPTION_ID {
-        map.insert(id, set_sql.clone());
-    }
-    
-    if let Some(id) = *WithArrayTypeIds::<T>::ARRAY_ID {
-        map.insert(id, set_sql.clone());
-    }
-    if let Some(id) = *WithArrayTypeIds::<T>::OPTION_ARRAY_ID {
-        map.insert(id, set_sql.clone());
-    }
-
-    if let Some(id) = *WithArrayTypeIds::<T>::VARLENA_ID {
-        map.insert(id, set_sql.clone());
-    }
-}
-
-pub static DEFAULT_TYPEID_SQL_MAPPING: Lazy<HashMap<TypeId, String>> = Lazy::new(|| {
+pub static DEFAULT_TYPEID_SQL_MAPPING: Lazy<HashMap<TypeId, RustSqlMapping>> = Lazy::new(|| {
     let mut m = HashMap::new();
 
-    map_unsized_type::<str>(&mut m, "text");
-    map_type::<&str>(&mut m, "text");
-    map_type::<String>(&mut m, "text");
-    map_type::<&std::ffi::CStr>(&mut m, "cstring");
-    map_type::<()>(&mut m, "void");
-    map_type::<i8>(&mut m, "\"char\"");
-    map_type::<i16>(&mut m, "smallint");
-    map_type::<i32>(&mut m, "integer");
-    map_type::<i64>(&mut m, "bigint");
-    map_type::<bool>(&mut m, "bool");
-    map_type::<char>(&mut m, "varchar");
-    map_type::<f32>(&mut m, "real");
-    map_type::<f64>(&mut m, "double precision");
-    map_type::<datum::JsonB>(&mut m, "jsonb");
-    map_type::<datum::Json>(&mut m, "json");
-    map_type::<pgx_pg_sys::ItemPointerData>(&mut m, "tid");
-    map_type::<pgx_pg_sys::Point>(&mut m, "point");
-    map_type::<pgx_pg_sys::BOX>(&mut m, "box");
-    map_type::<Date>(&mut m, "date");
-    map_type::<Time>(&mut m, "time");
-    map_type::<Timestamp>(&mut m, "timestamp");
-    map_type::<TimeWithTimeZone>(&mut m, "time with time zone");
-    map_type::<pgx_pg_sys::PlannerInfo>(&mut m, "internal");
-    map_type::<datum::Numeric>(&mut m, "numeric");
-    map_type::<pg_sys::Oid>(&mut m, "oid");
-    map_type::<datum::AnyElement>(&mut m, "anyelement");
-    map_type::<datum::Inet>(&mut m, "inet");
+    // `str` isn't sized, so we can't lean on the macro.
+    <str as WithTypeIds>::register(&mut m, "text".to_string());
+    map_type!(m, &str, "text");
 
-    // Bytea is a special case...
-    m.insert(TypeId::of::<&[u8]>(), String::from("bytea"));
-    m.insert(TypeId::of::<Option<&[u8]>>(), String::from("bytea"));
-    m.insert(TypeId::of::<Vec<u8>>(), String::from("bytea"));
-    m.insert(TypeId::of::<Option<Vec<u8>>>(), String::from("bytea"));
+    // Bytea is a special case, notice how it has no `bytea[]`.
+    m.insert(TypeId::of::<&[u8]>(), RustSqlMapping {
+        sql: String::from("bytea"),
+        id: TypeId::of::<&[u8]>(),
+        rust: core::any::type_name::<&[u8]>().to_string(),
+    });
+    m.insert(TypeId::of::<Option<&[u8]>>(), RustSqlMapping {
+        sql: String::from("bytea"),
+        id: TypeId::of::<Option<&[u8]>>(),
+        rust: core::any::type_name::<Option<&[u8]>>().to_string(),
+    });
+    m.insert(TypeId::of::<Vec<u8>>(), RustSqlMapping {
+        sql: String::from("bytea"),
+        id: TypeId::of::<Vec<u8>>(),
+        rust: core::any::type_name::<Vec<u8>>().to_string(),
+    });
+    m.insert(TypeId::of::<Option<Vec<u8>>>(), RustSqlMapping {
+        sql: String::from("bytea"),
+        id: TypeId::of::<Option<Vec<u8>>>(),
+        rust: core::any::type_name::<Option<Vec<u8>>>().to_string()
+    });
+
+    map_type!(m, String, "text");
+    map_type!(m, &std::ffi::CStr, "cstring");
+    map_type!(m, (), "void");
+    map_type!(m, i8, "\"char\"");
+    map_type!(m, i16, "smallint");
+    map_type!(m, i32, "integer");
+    map_type!(m, i64, "bigint");
+    map_type!(m, bool, "bool");
+    map_type!(m, char, "varchar");
+    map_type!(m, f32, "real");
+    map_type!(m, f64, "double precision");
+    map_type!(m, datum::JsonB, "jsonb");
+    map_type!(m, datum::Json, "json");
+    map_type!(m, pgx_pg_sys::ItemPointerData, "tid");
+    map_type!(m, pgx_pg_sys::Point, "point");
+    map_type!(m, pgx_pg_sys::BOX, "box");
+    map_type!(m, Date, "date");
+    map_type!(m, Time, "time");
+    map_type!(m, TimeWithTimeZone, "time with time zone");
+    map_type!(m, Timestamp, "timestamp");
+    map_type!(m, TimestampWithTimeZone, "timestamp with time zone");
+    map_type!(m, pgx_pg_sys::PlannerInfo, "internal");
+    map_type!(m, datum::Internal<pgx_pg_sys::PlannerInfo>, "internal");
+    map_type!(m, datum::Internal<pgx_pg_sys::List>, "internal");
+    map_type!(m, pgbox::PgBox<pgx_pg_sys::IndexAmRoutine>, "internal");
+    map_type!(m, rel::PgRelation, "regclass");
+    map_type!(m, datum::Numeric, "numeric");
+    map_type!(m, pg_sys::Oid, "oid");
+    map_type!(m, datum::AnyElement, "anyelement");
+    map_type!(m, datum::AnyArray, "anyarray");
+    map_type!(m, datum::Inet, "inet");
 
     m
 });

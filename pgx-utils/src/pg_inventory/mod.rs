@@ -48,9 +48,16 @@ use petgraph::{
 use std::collections::HashMap;
 use tracing::instrument;
 
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+pub struct RustSqlMapping {
+    pub rust: String,
+    pub sql: String,
+    pub id: TypeId,
+}
+
 #[derive(Debug, Clone)]
 pub struct PgxSql<'a> {
-    pub type_mappings: HashMap<TypeId, String>,
+    pub type_mappings: HashMap<TypeId, RustSqlMapping>,
     pub control: ControlFile,
     pub graph: StableGraph<SqlGraphEntity<'a>, SqlGraphRelationship>,
     pub graph_root: NodeIndex,
@@ -162,7 +169,7 @@ impl<'a> PgxSql<'a> {
     )]
     pub fn build(
         control: ControlFile,
-        type_mappings: impl Iterator<Item = (TypeId, String)>,
+        type_mappings: impl Iterator<Item = (TypeId, RustSqlMapping)>,
         schemas: impl Iterator<Item = &'a InventorySchema>,
         extension_sqls: impl Iterator<Item = &'a InventoryExtensionSql>,
         externs: impl Iterator<Item = &'a InventoryPgExtern>,
@@ -1329,54 +1336,39 @@ impl<'a> PgxSql<'a> {
     #[instrument(level = "debug", skip(self))]
     pub fn register_types(&mut self) {
         for (item, _index) in self.enums.clone() {
-            self.map_type_id_to_sql_type(item.id, item.name);
-            if let Some(val) = item.option_id {
-                self.map_type_id_to_sql_type(val, item.name);
-            };
-            if let Some(val) = item.varlena_id {
-                self.map_type_id_to_sql_type(val, format!("{}[]", item.name));
-            }
-            if let Some(val) = item.varlena_id {
-                self.map_type_id_to_sql_type(val, item.name);
-            }
-            if let Some(val) = item.array_id {
-                self.map_type_id_to_sql_type(val, format!("{}[]", item.name));
-            }
-            if let Some(val) = item.option_array_id {
-                self.map_type_id_to_sql_type(val, format!("{}[]", item.name));
+            for (rust_id, mapping) in &item.mappings {
+                assert_eq!(
+                    self.type_mappings.insert(*rust_id, mapping.clone()),
+                    None,
+                    "Cannot map `{}` twice.",
+                    item.full_path,
+                );
             }
         }
         for (item, _index) in self.types.clone() {
-            self.map_type_id_to_sql_type(item.id, item.name);
-            self.map_type_id_to_sql_type(item.option_id, item.name);
-            self.map_type_id_to_sql_type(item.vec_id, format!("{}[]", item.name));
-            self.map_type_id_to_sql_type(item.vec_option_id, format!("{}[]", item.name));
-            if let Some(val) = item.varlena_id {
-                self.map_type_id_to_sql_type(val, item.name);
-            }
-            if let Some(val) = item.array_id {
-                self.map_type_id_to_sql_type(val, format!("{}[]", item.name));
-            }
-            if let Some(val) = item.option_array_id {
-                self.map_type_id_to_sql_type(val, format!("{}[]", item.name));
+            for (rust_id, mapping) in &item.mappings {
+                assert_eq!(
+                    self.type_mappings.insert(*rust_id, mapping.clone()),
+                    None,
+                    "Cannot map `{}` twice.",
+                    item.full_path,
+                );
             }
         }
     }
 
     #[instrument(level = "debug")]
     pub fn type_id_to_sql_type(&self, id: TypeId) -> Option<String> {
-        self.type_mappings.get(&id).map(|f| f.clone())
+        self.type_mappings.get(&id).map(|f| f.sql.clone())
     }
 
     #[instrument(level = "debug")]
     pub fn map_type_to_sql_type<T: 'static>(&mut self, sql: impl AsRef<str> + Debug) {
         let sql = sql.as_ref().to_string();
-        self.type_mappings.insert(TypeId::of::<T>(), sql.clone());
-    }
-
-    #[instrument(level = "debug")]
-    pub fn map_type_id_to_sql_type(&mut self, id: TypeId, sql: impl AsRef<str> + Debug) {
-        let sql = sql.as_ref().to_string();
-        self.type_mappings.insert(id, sql);
+        self.type_mappings.insert(TypeId::of::<T>(), RustSqlMapping {
+            rust: core::any::type_name::<T>().to_string(),
+            sql: sql.clone(),
+            id: core::any::TypeId::of::<T>(),
+        });
     }
 }
