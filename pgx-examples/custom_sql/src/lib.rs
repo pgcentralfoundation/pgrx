@@ -72,7 +72,7 @@ extension_sql_file!("../sql/finalizer.sql", finalize);
 #[cfg(test)]
 pub mod pg_test {
     pub fn setup(_options: Vec<&str>) {
-        todo!();
+        // todo!();
         // perform one-off initialization when the pg_test framework starts
     }
 
