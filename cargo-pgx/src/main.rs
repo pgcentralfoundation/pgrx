@@ -225,7 +225,7 @@ fn do_it() -> std::result::Result<(), std::io::Error> {
                     });
                 let dot = schema.value_of("dot").map(|x| x.to_string());
                 let is_release = schema.is_present("release");
-                let is_release = schema.is_present("release");
+                let verbose = schema.is_present("verbose");
                 let features = schema
                     .values_of("features")
                     .map(|v| v.collect())
@@ -248,7 +248,7 @@ fn do_it() -> std::result::Result<(), std::io::Error> {
                     },
                 };
 
-                schema::generate_schema(&pg_config, is_release, &features, &out, dot)
+                schema::generate_schema(&pg_config, is_release, &features, &out, dot, verbose)
             }
             ("get", Some(get)) => {
                 let name = get.value_of("name").expect("no property name specified");

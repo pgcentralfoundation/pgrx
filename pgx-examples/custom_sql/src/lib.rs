@@ -21,7 +21,7 @@ mod home {
         last_chomp: Dog,
     }
 }
-use home::Dog;
+pub use home::Dog;
 
 // `extension_sql` allows you to define your own custom SQL.
 //

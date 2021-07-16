@@ -122,9 +122,15 @@ subcommands:
                     takes_value: true
                     multiple: true
                 - dot:
-                    long: build-dot
-                    help: A path to output a produced GraphViz DOT file.
+                    long: dot
+                    short: d
+                    help: A path to output a produced GraphViz DOT file
                     takes_value: true
+                    default_value: extension.dot
+                - verbose:
+                    long: verbose
+                    short: v
+                    help: Enable debug logging
           - dump-schema:
               about: dump the full extension SQL schema file
               args:

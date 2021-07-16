@@ -11,8 +11,8 @@ pub(crate) fn generate_schema(
     additional_features: &[&str],
     path: impl AsRef<std::path::Path>,
     dot: Option<impl AsRef<std::path::Path>>,
+    verbose: bool,
 ) -> Result<(), std::io::Error> {
-    // TODO: Ensure a `src/bin/sql_generator.rs` exists and is up to date.
     let (control_file, _extname) = find_control_file();
     let major_version = pg_config.major_version()?;
 
@@ -53,7 +53,10 @@ pub(crate) fn generate_schema(
         .read_to_string(&mut current_bin_source_content)
         .expect(&format!("Couldn't read {}.", generator_source_path));
     if current_bin_source_content != expected_bin_source_content {
-        println!("`{}` does not exist or is not what is expected.\nIf you encounter problems please delete it and use the generated version.", generator_source_path)
+        println!("
+            `{}` does not exist or is not what is expected.\n\
+            If you encounter problems please delete it and use the generated version.\
+        ", generator_source_path)
     }
     if current_bin_source_content == "" {
         println!(
@@ -86,6 +89,10 @@ pub(crate) fn generate_schema(
     command.args(&["run", "--bin", "sql-generator"]);
     if is_release {
         command.arg("--release");
+    }
+
+    if verbose {
+        command.env("RUST_LOG", "debug");
     }
 
     if !features.trim().is_empty() {

@@ -359,6 +359,7 @@ macro_rules! pg_binary_magic {
             let sql = generate_sql()?;
             sql.to_file(path)?;
             if let Some(dot) = dot {
+                tracing::info!(dot = %dot, "Writing Graphviz DOT.");
                 sql.to_dot(dot)?;
             }
             Ok(())
