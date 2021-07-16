@@ -223,7 +223,11 @@ fn do_it() -> std::result::Result<(), std::io::Error> {
                             crate::commands::install::get_version()
                         )
                     });
-                let dot = schema.value_of("dot").map(|x| x.to_string());
+                let dot = if schema.occurrences_of("dot") == 1 {
+                    schema.value_of("dot").map(|x| x.to_string())
+                } else {
+                    None
+                };
                 let is_release = schema.is_present("release");
 
                 let log_level = if let Ok(log_level) = std::env::var("RUST_LOG") {
