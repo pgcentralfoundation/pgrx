@@ -141,8 +141,8 @@ impl PgExtern {
         Ok(args)
     }
 
-    fn returns(&self) -> Returning {
-        Returning::try_from(&self.func.sig.output).unwrap()
+    fn returns(&self) -> Result<Returning, eyre::Error> {
+        Returning::try_from(&self.func.sig.output)
     }
 
     pub fn new(attr: TokenStream2, item: TokenStream2) -> Result<Self, syn::Error> {
@@ -158,7 +158,16 @@ impl ToTokens for PgExtern {
         let extern_attrs = self.extern_attrs();
         let search_path = self.search_path().into_iter();
         let inputs = self.inputs().unwrap();
-        let returns = self.returns();
+        let returns = match self.returns() {
+            Ok(returns) => returns,
+            Err(e) => {
+                let msg = e.to_string();
+                tokens.append_all(quote! {
+                    std::compile_error!(#msg);
+                });
+                return;
+            },
+        };
         let operator = self.operator().into_iter();
         let overridden = self.overridden().into_iter();
 

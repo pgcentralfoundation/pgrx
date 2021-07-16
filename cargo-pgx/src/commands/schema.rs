@@ -31,6 +31,7 @@ pub(crate) fn generate_schema(
         .find(|line| line.starts_with("name"))
         .and_then(|line| line.split(" = ").last())
         .map(|line| line.trim_matches('\"').to_string())
+        .map(|item| item.replace("-", "_"))
         .expect("Expected crate name");
     let expected_bin_source_content = format!(
         "\
@@ -53,14 +54,14 @@ pub(crate) fn generate_schema(
         .read_to_string(&mut current_bin_source_content)
         .expect(&format!("Couldn't read {}.", generator_source_path));
     if current_bin_source_content != expected_bin_source_content {
-        println!("
+        println!("\
             `{}` does not exist or is not what is expected.\n\
             If you encounter problems please delete it and use the generated version.\
         ", generator_source_path)
     }
     if current_bin_source_content == "" {
         println!(
-            "Created `{}` with content ```\n{}\n```.",
+            "Created `{}` with content\n```\n{}\n```.",
             generator_source_path, expected_bin_source_content
         );
         sql_gen_source_file

@@ -5,6 +5,7 @@ use syn::{
     parse::{Parse, ParseStream},
     Token,
 };
+use eyre::eyre as eyre_err;
 
 #[derive(Debug, Clone)]
 pub enum Returning {
@@ -16,65 +17,71 @@ pub enum Returning {
     Trigger,
 }
 
+impl Returning {
+    fn parse_impl_trait(impl_trait: syn::TypeImplTrait) -> Returning {
+        match impl_trait.bounds.first().unwrap() {
+            syn::TypeParamBound::Trait(trait_bound) => {
+                let last_path_segment = trait_bound.path.segments.last().unwrap();
+                match last_path_segment.ident.to_string().as_str() {
+                    "Iterator" => match &last_path_segment.arguments {
+                        syn::PathArguments::AngleBracketed(args) => {
+                            match args.args.first().unwrap() {
+                                syn::GenericArgument::Binding(binding) => match &binding.ty
+                                {
+                                    syn::Type::Tuple(tuple_type) => {
+                                        let returns: Vec<(syn::Type, Option<_>)> = tuple_type.elems.iter().flat_map(|elem| {
+                                            match elem {
+                                                syn::Type::Macro(macro_pat) => {
+                                                    let mac = &macro_pat.mac;
+                                                    let archetype = mac.path.segments.last().unwrap();
+                                                    match archetype.ident.to_string().as_str() {
+                                                        "name" => {
+                                                            let out: NameMacro = mac.parse_body().expect(&*format!("{:?}", mac));
+                                                            Some((out.ty, Some(out.ident)))
+                                                        },
+                                                        _ => unimplemented!("Don't support anything other than name."),
+                                                    }
+                                                },
+                                                ty => Some((ty.clone(), None)),
+                                            }
+                                        }).collect();
+                                        Returning::Iterated(returns)
+                                    }
+                                    syn::Type::Path(path) => Returning::SetOf(path.clone()),
+                                    syn::Type::Reference(type_ref) => {
+                                        match &*type_ref.elem {
+                                            syn::Type::Path(path) => {
+                                                Returning::SetOf(path.clone())
+                                            }
+                                            _ => unimplemented!("Expected path"),
+                                        }
+                                    }
+                                    ty => unimplemented!(
+                                        "Only iters with tuples, got {:?}.",
+                                        ty
+                                    ),
+                                },
+                                _ => unimplemented!(),
+                            }
+                        }
+                        _ => unimplemented!(),
+                    },
+                    _ => unimplemented!(),
+                }
+            }
+            _ => Returning::None,
+        }
+    }
+}
+
 impl TryFrom<&syn::ReturnType> for Returning {
-    type Error = ();
+    type Error = eyre::Error;
 
     fn try_from(value: &syn::ReturnType) -> Result<Self, Self::Error> {
         Ok(match &value {
             syn::ReturnType::Default => Returning::None,
             syn::ReturnType::Type(_, ty) => match *ty.clone() {
-                syn::Type::ImplTrait(impl_trait) => match impl_trait.bounds.first().unwrap() {
-                    syn::TypeParamBound::Trait(trait_bound) => {
-                        let last_path_segment = trait_bound.path.segments.last().unwrap();
-                        match last_path_segment.ident.to_string().as_str() {
-                            "Iterator" => match &last_path_segment.arguments {
-                                syn::PathArguments::AngleBracketed(args) => {
-                                    match args.args.first().unwrap() {
-                                        syn::GenericArgument::Binding(binding) => match &binding.ty
-                                        {
-                                            syn::Type::Tuple(tuple_type) => {
-                                                let returns: Vec<(syn::Type, Option<_>)> = tuple_type.elems.iter().flat_map(|elem| {
-                                                    match elem {
-                                                        syn::Type::Macro(macro_pat) => {
-                                                            let mac = &macro_pat.mac;
-                                                            let archetype = mac.path.segments.last().unwrap();
-                                                            match archetype.ident.to_string().as_str() {
-                                                                "name" => {
-                                                                    let out: NameMacro = mac.parse_body().expect(&*format!("{:?}", mac));
-                                                                    Some((out.ty, Some(out.ident)))
-                                                                },
-                                                                _ => unimplemented!("Don't support anything other than name."),
-                                                            }
-                                                        },
-                                                        ty => Some((ty.clone(), None)),
-                                                    }
-                                                }).collect();
-                                                Returning::Iterated(returns)
-                                            }
-                                            syn::Type::Path(path) => Returning::SetOf(path.clone()),
-                                            syn::Type::Reference(type_ref) => {
-                                                match &*type_ref.elem {
-                                                    syn::Type::Path(path) => {
-                                                        Returning::SetOf(path.clone())
-                                                    }
-                                                    _ => unimplemented!("Expected path"),
-                                                }
-                                            }
-                                            ty => unimplemented!(
-                                                "Only iters with tuples, got {:?}.",
-                                                ty
-                                            ),
-                                        },
-                                        _ => unimplemented!(),
-                                    }
-                                }
-                                _ => unimplemented!(),
-                            },
-                            _ => unimplemented!(),
-                        }
-                    }
-                    _ => Returning::None,
-                },
+                syn::Type::ImplTrait(impl_trait) => Returning::parse_impl_trait(impl_trait),
                 syn::Type::Path(typepath) => {
                     let path = &typepath.path;
                     let mut saw_pgx_pg_sys = false;
@@ -94,7 +101,13 @@ impl TryFrom<&syn::ReturnType> for Returning {
                         Returning::Type(ty.deref().clone())
                     }
                 }
-                _ => Returning::Type(ty.deref().clone()),
+                syn::Type::Reference(_) => Returning::Type(ty.deref().clone()),
+                syn::Type::Tuple(tup) => if tup.elems.is_empty() {
+                    Returning::Type(ty.deref().clone())
+                } else {
+                    return Err(eyre_err!("Got non-empty tuple return type: {}", &ty.to_token_stream()))
+                }
+                _ => return Err(eyre_err!("Got unknown return type: {}", &ty.to_token_stream())),
             },
         })
     }
