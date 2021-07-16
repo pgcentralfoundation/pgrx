@@ -598,7 +598,7 @@ impl<'a> PgxSql<'a> {
                         this.graph.add_edge(
                             *builtin_index,
                             index,
-                            SqlGraphRelationship::RequiredByArg,
+                            SqlGraphRelationship::RequiredByReturn,
                         );
                     }
                 }
@@ -637,7 +637,7 @@ impl<'a> PgxSql<'a> {
                             this.graph.add_edge(
                                 *builtin_index,
                                 index,
-                                SqlGraphRelationship::RequiredByArg,
+                                SqlGraphRelationship::RequiredByReturn,
                             );
                         }
                     }
