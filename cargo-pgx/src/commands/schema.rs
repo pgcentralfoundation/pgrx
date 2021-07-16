@@ -11,7 +11,7 @@ pub(crate) fn generate_schema(
     additional_features: &[&str],
     path: impl AsRef<std::path::Path>,
     dot: Option<impl AsRef<std::path::Path>>,
-    verbose: bool,
+    log_level: &str,
 ) -> Result<(), std::io::Error> {
     let (control_file, _extname) = find_control_file();
     let major_version = pg_config.major_version()?;
@@ -91,9 +91,7 @@ pub(crate) fn generate_schema(
         command.arg("--release");
     }
 
-    if verbose {
-        command.env("RUST_LOG", "debug");
-    }
+    command.env("RUST_LOG", log_level);
 
     if !features.trim().is_empty() {
         command.arg("--features");

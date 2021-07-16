@@ -130,7 +130,8 @@ subcommands:
                 - verbose:
                     long: verbose
                     short: v
-                    help: Enable debug logging
+                    multiple: true
+                    help: Enable debug logging (-vv for trace)
           - dump-schema:
               about: dump the full extension SQL schema file
               args:

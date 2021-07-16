@@ -225,7 +225,12 @@ fn do_it() -> std::result::Result<(), std::io::Error> {
                     });
                 let dot = schema.value_of("dot").map(|x| x.to_string());
                 let is_release = schema.is_present("release");
-                let verbose = schema.is_present("verbose");
+                let log_level = match schema.occurrences_of("verbose") {
+                    0 => "info",
+                    1 => "debug",
+                    2 => "trace",
+                    _ => panic!("Cannot set a log level more verbose than `trace` (-vv). Please reduce the log level."),
+                };
                 let features = schema
                     .values_of("features")
                     .map(|v| v.collect())
@@ -248,7 +253,7 @@ fn do_it() -> std::result::Result<(), std::io::Error> {
                     },
                 };
 
-                schema::generate_schema(&pg_config, is_release, &features, &out, dot, verbose)
+                schema::generate_schema(&pg_config, is_release, &features, &out, dot, log_level)
             }
             ("get", Some(get)) => {
                 let name = get.value_of("name").expect("no property name specified");
