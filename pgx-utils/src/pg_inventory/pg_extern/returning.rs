@@ -1,4 +1,4 @@
-use proc_macro2::TokenStream as TokenStream2;
+use proc_macro2::{TokenStream as TokenStream2, Ident, Span};
 use quote::{quote, ToTokens, TokenStreamExt};
 use std::{convert::TryFrom, ops::Deref};
 use syn::{
@@ -84,24 +84,65 @@ impl TryFrom<&syn::ReturnType> for Returning {
                 syn::Type::ImplTrait(impl_trait) => Returning::parse_impl_trait(impl_trait),
                 syn::Type::Path(typepath) => {
                     let path = &typepath.path;
-                    let mut saw_pgx_pg_sys = false;
+                    let mut saw_pg_sys = false;
                     let mut saw_datum = false;
+                    let mut saw_option_ident = false;
+                    let mut saw_box_ident = false;
+                    let mut maybe_inner_impl_trait = None;
 
                     for segment in &path.segments {
-                        if segment.ident.to_string() == "pg_sys" {
-                            saw_pgx_pg_sys = true;
+                        let ident_string = segment.ident.to_string();
+                        match ident_string.as_str() {
+                            "pg_sys" => saw_pg_sys = true,
+                            "Datum" => saw_datum = true,
+                            "Option" => saw_option_ident = true,
+                            "Box" => saw_box_ident = true,
+                            _ => (),
                         }
-                        if segment.ident.to_string() == "Datum" {
-                            saw_datum = true;
+                        if saw_option_ident || saw_box_ident {
+                            match &segment.arguments {
+                                syn::PathArguments::AngleBracketed(inside_brackets) => {
+                                    match inside_brackets.args.first() {
+                                        Some(syn::GenericArgument::Type(syn::Type::ImplTrait(impl_trait))) => {
+                                            maybe_inner_impl_trait = Some(impl_trait.clone());
+                                        },
+                                        _ => (),
+                                    }
+                                },
+                                syn::PathArguments::None | syn::PathArguments::Parenthesized(_) => (),
+                            }
                         }
                     }
-                    if (saw_datum && saw_pgx_pg_sys) || (saw_datum && path.segments.len() == 1) {
+                    if (saw_datum && saw_pg_sys) || (saw_datum && path.segments.len() == 1) {
                         Returning::Trigger
+                    } else if let Some(inner_impl_trait) = maybe_inner_impl_trait {
+                        Returning::parse_impl_trait(inner_impl_trait)
                     } else {
-                        Returning::Type(ty.deref().clone())
+                        let mut static_ty = typepath.clone();
+                        for segment in &mut static_ty.path.segments {
+                            match &mut segment.arguments {
+                                syn::PathArguments::AngleBracketed(ref mut inside_brackets) => {
+                                    for mut arg in &mut inside_brackets.args {
+                                        match &mut arg {
+                                            syn::GenericArgument::Lifetime(ref mut lifetime) => {
+                                                lifetime.ident = Ident::new("static", Span::call_site())
+                                            },
+                                            _ => (),
+                                        }   
+                                    }
+                                },
+                                _ => (),
+                            }
+                        }
+                        Returning::Type(syn::Type::Path(static_ty.clone()))
                     }
                 }
-                syn::Type::Reference(_) => Returning::Type(ty.deref().clone()),
+                syn::Type::Reference(mut ty_ref) => {
+                    if let Some(ref mut lifetime) = &mut ty_ref.lifetime {
+                        lifetime.ident = Ident::new("static", Span::call_site());
+                    }
+                    Returning::Type(syn::Type::Reference(ty_ref))
+                },
                 syn::Type::Tuple(tup) => if tup.elems.is_empty() {
                     Returning::Type(ty.deref().clone())
                 } else {

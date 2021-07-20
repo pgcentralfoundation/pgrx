@@ -15,11 +15,11 @@ pub struct Argument {
 impl Argument {
     pub fn build(value: FnArg) -> Result<Option<Self>, syn::Error> {
         match value {
-            syn::FnArg::Typed(pat) => {
+            syn::FnArg::Typed(mut pat) => {
                 let identifier = match *pat.pat {
                     Pat::Ident(ref p) => p.ident.clone(),
-                    Pat::Reference(ref p) => match *p.pat {
-                        Pat::Ident(ref p) => p.ident.clone(),
+                    Pat::Reference(ref p_ref) => match *p_ref.pat {
+                        Pat::Ident(ref inner_ident) => inner_ident.ident.clone(),
                         _ => {
                             return Err(syn::Error::new(
                                 Span::call_site(),
@@ -118,24 +118,48 @@ impl Argument {
                 };
 
                 // We special case ignore `*mut pg_sys::FunctionCallInfoData`
-                match pat.ty.as_ref() {
-                    syn::Type::Path(ref path) => {
-                        let segments = &path.path;
+                match pat.ty.as_mut() {
+                    syn::Type::Reference(ref mut ty_ref) => {
+                        if let Some(ref mut lifetime) = &mut ty_ref.lifetime {
+                            lifetime.ident = syn::Ident::new("static", Span::call_site());
+                        }
+                    }
+                    syn::Type::Path(ref mut path) => {
+                        let segments = &mut path.path;
                         let mut saw_pg_sys = false;
                         let mut saw_functioncallinfobasedata = false;
-                        for segment in &segments.segments {
-                            if segment.ident.to_string() == "pg_sys" {
-                                saw_pg_sys = true;
-                            }
-                            if segment.ident.to_string() == "FunctionCallInfo" {
-                                saw_functioncallinfobasedata = true;
+                        let mut saw_option_ident = false;
+                        let mut saw_box_ident = false;
+
+                        for segment in &mut segments.segments {
+                            let ident_string = segment.ident.to_string();
+                            match ident_string.as_str() {
+                                "pg_sys" => saw_pg_sys = true,
+                                "FunctionCallInfo" => saw_functioncallinfobasedata = true,
+                                _ => (),
                             }
                         }
                         if (saw_pg_sys && saw_functioncallinfobasedata)
                             || (saw_functioncallinfobasedata && segments.segments.len() == 1)
                         {
                             return Ok(None);
+                        } else {
+                        for segment in &mut path.path.segments {
+                            match &mut segment.arguments {
+                                syn::PathArguments::AngleBracketed(ref mut inside_brackets) => {
+                                    for mut arg in &mut inside_brackets.args {
+                                        match &mut arg {
+                                            syn::GenericArgument::Lifetime(ref mut lifetime) => {
+                                                lifetime.ident = syn::Ident::new("static", Span::call_site())
+                                            },
+                                            _ => (),
+                                        }   
+                                    }
+                                },
+                                _ => (),
+                            }
                         }
+                    }
                     }
                     syn::Type::Ptr(ref ptr) => match *ptr.elem {
                         syn::Type::Path(ref path) => {
