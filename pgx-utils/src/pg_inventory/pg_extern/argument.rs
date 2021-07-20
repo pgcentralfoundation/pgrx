@@ -128,8 +128,6 @@ impl Argument {
                         let segments = &mut path.path;
                         let mut saw_pg_sys = false;
                         let mut saw_functioncallinfobasedata = false;
-                        let mut saw_option_ident = false;
-                        let mut saw_box_ident = false;
 
                         for segment in &mut segments.segments {
                             let ident_string = segment.ident.to_string();

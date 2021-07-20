@@ -122,6 +122,7 @@ impl<T: 'static + ?Sized> WithTypeIds for T {
 pub struct WithSizedTypeIds<T>(pub std::marker::PhantomData<T>);
 
 impl<T: 'static> WithSizedTypeIds<T>  {
+    pub const PG_BOX_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(TypeId::of::<crate::PgBox<T>>()));
     pub const OPTION_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(TypeId::of::<Option<T>>()));
     pub const VEC_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(TypeId::of::<Vec<T>>()));
     pub const VEC_OPTION_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(TypeId::of::<Vec<Option<T>>>()));
@@ -137,6 +138,21 @@ impl<T: 'static> WithSizedTypeIds<T>  {
     pub fn register_sized(map: &mut std::collections::HashMap<TypeId, RustSqlMapping>, single_sql: String) {
         let set_sql = format!("{}[]", single_sql);
     
+        if let Some(id) = *WithSizedTypeIds::<T>::PG_BOX_ID {
+            let rust = core::any::type_name::<crate::PgBox<T>>().to_string();
+            assert_eq!(
+                map.insert(id, RustSqlMapping {
+                    sql: single_sql.clone(),
+                    rust: rust.to_string(),
+                    id,
+                }),
+                None,
+                "Cannot map `{}` twice.",
+                rust,
+            );
+            println!("BOOP DOOP {:?}", rust);
+        }
+
         if let Some(id) = *WithSizedTypeIds::<T>::OPTION_ID {
             let rust = core::any::type_name::<Option<T>>().to_string();
             assert_eq!(
@@ -150,6 +166,7 @@ impl<T: 'static> WithSizedTypeIds<T>  {
                 rust,
             );
         }
+        
         if let Some(id) = *WithSizedTypeIds::<T>::VEC_ID {
             let rust = core::any::type_name::<T>().to_string();
             assert_eq!(
