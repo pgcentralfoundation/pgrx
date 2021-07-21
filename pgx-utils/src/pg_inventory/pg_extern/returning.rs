@@ -1,11 +1,11 @@
-use proc_macro2::{TokenStream as TokenStream2, Ident, Span};
+use eyre::eyre as eyre_err;
+use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
 use std::{convert::TryFrom, ops::Deref};
 use syn::{
     parse::{Parse, ParseStream},
     Token,
 };
-use eyre::eyre as eyre_err;
 
 #[derive(Debug, Clone)]
 pub enum Returning {
@@ -26,8 +26,7 @@ impl Returning {
                     "Iterator" => match &last_path_segment.arguments {
                         syn::PathArguments::AngleBracketed(args) => {
                             match args.args.first().unwrap() {
-                                syn::GenericArgument::Binding(binding) => match &binding.ty
-                                {
+                                syn::GenericArgument::Binding(binding) => match &binding.ty {
                                     syn::Type::Tuple(tuple_type) => {
                                         let returns: Vec<(syn::Type, Option<_>)> = tuple_type.elems.iter().flat_map(|elem| {
                                             match elem {
@@ -48,18 +47,11 @@ impl Returning {
                                         Returning::Iterated(returns)
                                     }
                                     syn::Type::Path(path) => Returning::SetOf(path.clone()),
-                                    syn::Type::Reference(type_ref) => {
-                                        match &*type_ref.elem {
-                                            syn::Type::Path(path) => {
-                                                Returning::SetOf(path.clone())
-                                            }
-                                            _ => unimplemented!("Expected path"),
-                                        }
-                                    }
-                                    ty => unimplemented!(
-                                        "Only iters with tuples, got {:?}.",
-                                        ty
-                                    ),
+                                    syn::Type::Reference(type_ref) => match &*type_ref.elem {
+                                        syn::Type::Path(path) => Returning::SetOf(path.clone()),
+                                        _ => unimplemented!("Expected path"),
+                                    },
+                                    ty => unimplemented!("Only iters with tuples, got {:?}.", ty),
                                 },
                                 _ => unimplemented!(),
                             }
@@ -103,13 +95,17 @@ impl TryFrom<&syn::ReturnType> for Returning {
                             match &segment.arguments {
                                 syn::PathArguments::AngleBracketed(inside_brackets) => {
                                     match inside_brackets.args.first() {
-                                        Some(syn::GenericArgument::Type(syn::Type::ImplTrait(impl_trait))) => {
+                                        Some(syn::GenericArgument::Type(syn::Type::ImplTrait(
+                                            impl_trait,
+                                        ))) => {
                                             maybe_inner_impl_trait = Some(impl_trait.clone());
-                                        },
+                                        }
                                         _ => (),
                                     }
-                                },
-                                syn::PathArguments::None | syn::PathArguments::Parenthesized(_) => (),
+                                }
+                                syn::PathArguments::None | syn::PathArguments::Parenthesized(_) => {
+                                    ()
+                                }
                             }
                         }
                     }
@@ -125,12 +121,13 @@ impl TryFrom<&syn::ReturnType> for Returning {
                                     for mut arg in &mut inside_brackets.args {
                                         match &mut arg {
                                             syn::GenericArgument::Lifetime(ref mut lifetime) => {
-                                                lifetime.ident = Ident::new("static", Span::call_site())
-                                            },
+                                                lifetime.ident =
+                                                    Ident::new("static", Span::call_site())
+                                            }
                                             _ => (),
-                                        }   
+                                        }
                                     }
-                                },
+                                }
                                 _ => (),
                             }
                         }
@@ -142,13 +139,23 @@ impl TryFrom<&syn::ReturnType> for Returning {
                         lifetime.ident = Ident::new("static", Span::call_site());
                     }
                     Returning::Type(syn::Type::Reference(ty_ref))
-                },
-                syn::Type::Tuple(tup) => if tup.elems.is_empty() {
-                    Returning::Type(ty.deref().clone())
-                } else {
-                    return Err(eyre_err!("Got non-empty tuple return type: {}", &ty.to_token_stream()))
                 }
-                _ => return Err(eyre_err!("Got unknown return type: {}", &ty.to_token_stream())),
+                syn::Type::Tuple(tup) => {
+                    if tup.elems.is_empty() {
+                        Returning::Type(ty.deref().clone())
+                    } else {
+                        return Err(eyre_err!(
+                            "Got non-empty tuple return type: {}",
+                            &ty.to_token_stream()
+                        ));
+                    }
+                }
+                _ => {
+                    return Err(eyre_err!(
+                        "Got unknown return type: {}",
+                        &ty.to_token_stream()
+                    ))
+                }
             },
         })
     }

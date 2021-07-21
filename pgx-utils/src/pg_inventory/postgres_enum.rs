@@ -1,9 +1,9 @@
-use std::hash::{Hasher, Hash};
+use std::hash::{Hash, Hasher};
 
 use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
-use syn::{punctuated::Punctuated, Ident, Token};
 use syn::Generics;
+use syn::{punctuated::Punctuated, Ident, Token};
 
 #[derive(Debug, Clone)]
 pub struct PostgresEnum {
@@ -13,8 +13,16 @@ pub struct PostgresEnum {
 }
 
 impl PostgresEnum {
-    pub fn new(name: Ident, generics: Generics, variants: Punctuated<syn::Variant, Token![,]>) -> Self {
-        Self { name, generics, variants }
+    pub fn new(
+        name: Ident,
+        generics: Generics,
+        variants: Punctuated<syn::Variant, Token![,]>,
+    ) -> Self {
+        Self {
+            name,
+            generics,
+            variants,
+        }
     }
 }
 
@@ -85,6 +93,8 @@ impl Ord for InventoryPostgresEnum {
 
 impl InventoryPostgresEnum {
     pub fn id_matches(&self, candidate: &core::any::TypeId) -> bool {
-        self.mappings.iter().any(|(tester, _)| *candidate == *tester)
+        self.mappings
+            .iter()
+            .any(|(tester, _)| *candidate == *tester)
     }
 }

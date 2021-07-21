@@ -216,7 +216,8 @@ impl ToTokens for ExtensionSqlPositioning {
                 let path = ex.to_token_stream().to_string().replace(" ", "");
                 (quote! {
                     ::pgx_utils::pg_inventory::InventoryExtensionSqlPositioningRef::FullPath(#path)
-                }).to_token_stream()
+                })
+                .to_token_stream()
             }
             ExtensionSqlPositioning::Name(name) => quote! {
                 ::pgx_utils::pg_inventory::InventoryExtensionSqlPositioningRef::Name(#name)

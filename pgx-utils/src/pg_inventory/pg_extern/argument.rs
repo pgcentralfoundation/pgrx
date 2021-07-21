@@ -15,9 +15,7 @@ pub struct Argument {
 impl Argument {
     pub fn build(value: FnArg) -> Result<Option<Self>, syn::Error> {
         match value {
-            syn::FnArg::Typed(pat) => {
-                Self::build_from_pat_type(pat)
-            }
+            syn::FnArg::Typed(pat) => Self::build_from_pat_type(pat),
             _ => Err(syn::Error::new(Span::call_site(), "Unable to parse FnArg.")),
         }
     }
@@ -28,12 +26,7 @@ impl Argument {
             Pat::Ident(ref p) => p.ident.clone(),
             Pat::Reference(ref p_ref) => match *p_ref.pat {
                 Pat::Ident(ref inner_ident) => inner_ident.ident.clone(),
-                _ => {
-                    return Err(syn::Error::new(
-                        Span::call_site(),
-                        "Unable to parse FnArg.",
-                    ))
-                }
+                _ => return Err(syn::Error::new(Span::call_site(), "Unable to parse FnArg.")),
             },
             _ => return Err(syn::Error::new(Span::call_site(), "Unable to parse FnArg.")),
         };
@@ -78,11 +71,8 @@ impl Argument {
                                         macro_pat,
                                     ))) => {
                                         let mac = &macro_pat.mac;
-                                        let archetype = mac
-                                            .path
-                                            .segments
-                                            .last()
-                                            .expect("No last segment.");
+                                        let archetype =
+                                            mac.path.segments.last().expect("No last segment.");
                                         match archetype.ident.to_string().as_str() {
                                             "default" => {
                                                 let out: DefaultMacro = mac.parse_body()?;
@@ -104,10 +94,7 @@ impl Argument {
                                                     syn::Expr::Lit(syn::ExprLit {
                                                         lit: syn::Lit::Bool(def),
                                                         ..
-                                                    }) => {
-                                                        default =
-                                                            Some(def.value.to_string())
-                                                    }
+                                                    }) => default = Some(def.value.to_string()),
                                                     _ => (),
                                                 }
                                             }
@@ -151,22 +138,23 @@ impl Argument {
                 {
                     return Ok(None);
                 } else {
-                for segment in &mut path.path.segments {
-                    match &mut segment.arguments {
-                        syn::PathArguments::AngleBracketed(ref mut inside_brackets) => {
-                            for mut arg in &mut inside_brackets.args {
-                                match &mut arg {
-                                    syn::GenericArgument::Lifetime(ref mut lifetime) => {
-                                        lifetime.ident = syn::Ident::new("static", Span::call_site())
-                                    },
-                                    _ => (),
-                                }   
+                    for segment in &mut path.path.segments {
+                        match &mut segment.arguments {
+                            syn::PathArguments::AngleBracketed(ref mut inside_brackets) => {
+                                for mut arg in &mut inside_brackets.args {
+                                    match &mut arg {
+                                        syn::GenericArgument::Lifetime(ref mut lifetime) => {
+                                            lifetime.ident =
+                                                syn::Ident::new("static", Span::call_site())
+                                        }
+                                        _ => (),
+                                    }
+                                }
                             }
-                        },
-                        _ => (),
+                            _ => (),
+                        }
                     }
                 }
-            }
             }
             syn::Type::Ptr(ref ptr) => match *ptr.elem {
                 syn::Type::Path(ref path) => {

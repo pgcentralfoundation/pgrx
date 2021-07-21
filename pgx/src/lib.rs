@@ -97,8 +97,8 @@ pub use pgx_pg_sys::PgBuiltInOids; // reexport this so it looks like it comes fr
 
 use core::any::TypeId;
 use once_cell::sync::Lazy;
-use std::collections::HashMap;
 use pgx_utils::pg_inventory::RustSqlMapping;
+use std::collections::HashMap;
 
 /// Top-level initialization function.  This is called automatically by the `pg_module_magic!()`
 /// macro and need not be called directly
@@ -108,15 +108,12 @@ pub fn initialize() {
 }
 
 macro_rules! map_type {
-    ($map:ident, $rust:ty, $sql:expr) => {
-        {
-            <$rust as WithTypeIds>::register_with_refs(&mut $map, $sql.to_string());
-            WithSizedTypeIds::<$rust>::register_sized_with_refs(&mut $map, $sql.to_string());
-            WithArrayTypeIds::<$rust>::register_array_with_refs(&mut $map, $sql.to_string());
-            WithVarlenaTypeIds::<$rust>::register_varlena_with_refs(&mut $map, $sql.to_string());
-        }
-
-    };
+    ($map:ident, $rust:ty, $sql:expr) => {{
+        <$rust as WithTypeIds>::register_with_refs(&mut $map, $sql.to_string());
+        WithSizedTypeIds::<$rust>::register_sized_with_refs(&mut $map, $sql.to_string());
+        WithArrayTypeIds::<$rust>::register_array_with_refs(&mut $map, $sql.to_string());
+        WithVarlenaTypeIds::<$rust>::register_varlena_with_refs(&mut $map, $sql.to_string());
+    }};
 }
 
 pub static DEFAULT_TYPEID_SQL_MAPPING: Lazy<HashMap<TypeId, RustSqlMapping>> = Lazy::new(|| {
@@ -127,26 +124,38 @@ pub static DEFAULT_TYPEID_SQL_MAPPING: Lazy<HashMap<TypeId, RustSqlMapping>> = L
     map_type!(m, &str, "text");
 
     // Bytea is a special case, notice how it has no `bytea[]`.
-    m.insert(TypeId::of::<&[u8]>(), RustSqlMapping {
-        sql: String::from("bytea"),
-        id: TypeId::of::<&[u8]>(),
-        rust: core::any::type_name::<&[u8]>().to_string(),
-    });
-    m.insert(TypeId::of::<Option<&[u8]>>(), RustSqlMapping {
-        sql: String::from("bytea"),
-        id: TypeId::of::<Option<&[u8]>>(),
-        rust: core::any::type_name::<Option<&[u8]>>().to_string(),
-    });
-    m.insert(TypeId::of::<Vec<u8>>(), RustSqlMapping {
-        sql: String::from("bytea"),
-        id: TypeId::of::<Vec<u8>>(),
-        rust: core::any::type_name::<Vec<u8>>().to_string(),
-    });
-    m.insert(TypeId::of::<Option<Vec<u8>>>(), RustSqlMapping {
-        sql: String::from("bytea"),
-        id: TypeId::of::<Option<Vec<u8>>>(),
-        rust: core::any::type_name::<Option<Vec<u8>>>().to_string()
-    });
+    m.insert(
+        TypeId::of::<&[u8]>(),
+        RustSqlMapping {
+            sql: String::from("bytea"),
+            id: TypeId::of::<&[u8]>(),
+            rust: core::any::type_name::<&[u8]>().to_string(),
+        },
+    );
+    m.insert(
+        TypeId::of::<Option<&[u8]>>(),
+        RustSqlMapping {
+            sql: String::from("bytea"),
+            id: TypeId::of::<Option<&[u8]>>(),
+            rust: core::any::type_name::<Option<&[u8]>>().to_string(),
+        },
+    );
+    m.insert(
+        TypeId::of::<Vec<u8>>(),
+        RustSqlMapping {
+            sql: String::from("bytea"),
+            id: TypeId::of::<Vec<u8>>(),
+            rust: core::any::type_name::<Vec<u8>>().to_string(),
+        },
+    );
+    m.insert(
+        TypeId::of::<Option<Vec<u8>>>(),
+        RustSqlMapping {
+            sql: String::from("bytea"),
+            id: TypeId::of::<Option<Vec<u8>>>(),
+            rust: core::any::type_name::<Option<Vec<u8>>>().to_string(),
+        },
+    );
 
     map_type!(m, String, "text");
     map_type!(m, &std::ffi::CStr, "cstring");

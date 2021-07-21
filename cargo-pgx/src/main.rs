@@ -240,7 +240,7 @@ fn do_it() -> std::result::Result<(), std::io::Error> {
                         _ => panic!("Cannot set a log level more verbose than `trace` (-vv). Please reduce the log level."),
                     }.to_string()
                 };
-                
+
                 let features = schema
                     .values_of("features")
                     .map(|v| v.collect())

@@ -54,10 +54,13 @@ pub(crate) fn generate_schema(
         .read_to_string(&mut current_bin_source_content)
         .expect(&format!("Couldn't read {}.", generator_source_path));
     if current_bin_source_content != expected_bin_source_content {
-        println!("\
+        println!(
+            "\
             `{}` does not exist or is not what is expected.\n\
             If you encounter problems please delete it and use the generated version.\
-        ", generator_source_path)
+        ",
+            generator_source_path
+        )
     }
     if current_bin_source_content == "" {
         println!(

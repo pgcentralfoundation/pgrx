@@ -1,6 +1,6 @@
-use proc_macro2::{Span, Ident, TokenStream as TokenStream2};
+use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
-use std::hash::{Hasher, Hash};
+use std::hash::{Hash, Hasher};
 use syn::Generics;
 
 #[derive(Debug, Clone)]
@@ -85,7 +85,6 @@ pub struct InventoryPostgresType {
     pub out_fn_module_path: String,
 }
 
-
 impl Hash for InventoryPostgresType {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.id.hash(state);
@@ -106,6 +105,8 @@ impl Ord for InventoryPostgresType {
 
 impl InventoryPostgresType {
     pub fn id_matches(&self, candidate: &core::any::TypeId) -> bool {
-        self.mappings.iter().any(|(tester, _)| *candidate == *tester)
+        self.mappings
+            .iter()
+            .any(|(tester, _)| *candidate == *tester)
     }
 }

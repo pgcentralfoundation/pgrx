@@ -5,7 +5,7 @@ mod returning;
 mod search_path;
 
 use argument::Argument;
-use attribute::{PgxAttributes, Attribute};
+use attribute::{Attribute, PgxAttributes};
 use operator::{PgxOperator, PgxOperatorAttributeWithIdent, PgxOperatorOpName};
 use returning::Returning;
 use search_path::SearchPathList;
@@ -29,21 +29,24 @@ pub struct PgExtern {
 
 impl PgExtern {
     fn name(&self) -> String {
-        self.attrs.attrs.iter().find_map(|candidate| match candidate {
-            Attribute::Name(name) => {
-                Some(name.value())
-            },
-            _ => None,
-        }).unwrap_or_else(|| self.func.sig.ident.to_string())
+        self.attrs
+            .attrs
+            .iter()
+            .find_map(|candidate| match candidate {
+                Attribute::Name(name) => Some(name.value()),
+                _ => None,
+            })
+            .unwrap_or_else(|| self.func.sig.ident.to_string())
     }
 
     fn schema(&self) -> Option<String> {
-        self.attrs.attrs.iter().find_map(|candidate| match candidate {
-            Attribute::Schema(name) => {
-                Some(name.value())
-            },
-            _ => None,
-        })
+        self.attrs
+            .attrs
+            .iter()
+            .find_map(|candidate| match candidate {
+                Attribute::Schema(name) => Some(name.value()),
+                _ => None,
+            })
     }
 
     fn extern_attrs(&self) -> &PgxAttributes {
@@ -187,7 +190,7 @@ impl ToTokens for PgExtern {
                     std::compile_error!(#msg);
                 });
                 return;
-            },
+            }
         };
         let operator = self.operator().into_iter();
         let overridden = self.overridden().into_iter();

@@ -195,13 +195,17 @@ impl<'a> PgxSql<'a> {
             mapped_extension_sqls.insert(item, index);
             if item.bootstrap {
                 if bootstrap.is_some() {
-                    return Err(eyre_err!("Cannot have multiple `extension_sql!()` with `bootstrap` positioning."))
+                    return Err(eyre_err!(
+                        "Cannot have multiple `extension_sql!()` with `bootstrap` positioning."
+                    ));
                 }
                 bootstrap = Some(index)
             }
             if item.finalize {
                 if finalize.is_some() {
-                    return Err(eyre_err!("Cannot have multiple `extension_sql!()` with `finalize` positioning."))
+                    return Err(eyre_err!(
+                        "Cannot have multiple `extension_sql!()` with `finalize` positioning."
+                    ));
                 }
                 finalize = Some(index)
             }
@@ -356,7 +360,7 @@ impl<'a> PgxSql<'a> {
         for item in hashes {
             let index = graph.add_node(item.into());
             mapped_hashes.insert(item, index);
-                        graph.add_edge(root, index, SqlGraphRelationship::RequiredBy);
+            graph.add_edge(root, index, SqlGraphRelationship::RequiredBy);
             if let Some(bootstrap) = bootstrap {
                 graph.add_edge(bootstrap, index, SqlGraphRelationship::RequiredBy);
             }
@@ -1366,10 +1370,13 @@ impl<'a> PgxSql<'a> {
     #[instrument(level = "debug")]
     pub fn map_type_to_sql_type<T: 'static>(&mut self, sql: impl AsRef<str> + Debug) {
         let sql = sql.as_ref().to_string();
-        self.type_mappings.insert(TypeId::of::<T>(), RustSqlMapping {
-            rust: core::any::type_name::<T>().to_string(),
-            sql: sql.clone(),
-            id: core::any::TypeId::of::<T>(),
-        });
+        self.type_mappings.insert(
+            TypeId::of::<T>(),
+            RustSqlMapping {
+                rust: core::any::type_name::<T>().to_string(),
+                sql: sql.clone(),
+                id: core::any::TypeId::of::<T>(),
+            },
+        );
     }
 }

@@ -337,7 +337,12 @@ fn impl_postgres_enum(ast: DeriveInput) -> proc_macro2::TokenStream {
         }
     });
 
-    pg_inventory::PostgresEnum::new(enum_ident.clone(), enum_generics.clone(), enum_data.variants).to_tokens(&mut stream);
+    pg_inventory::PostgresEnum::new(
+        enum_ident.clone(),
+        enum_generics.clone(),
+        enum_data.variants,
+    )
+    .to_tokens(&mut stream);
 
     stream
 }
@@ -436,8 +441,13 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
         });
     }
 
-    pg_inventory::PostgresType::new(name.clone(), generics.clone(), funcname_in.clone(), funcname_out.clone())
-        .to_tokens(&mut stream);
+    pg_inventory::PostgresType::new(
+        name.clone(),
+        generics.clone(),
+        funcname_in.clone(),
+        funcname_out.clone(),
+    )
+    .to_tokens(&mut stream);
 
     stream
 }
