@@ -393,7 +393,7 @@ impl<'a> PgxSql<'a> {
         }
         for (item, &index) in &this.extension_sqls {
             for (schema_item, &schema_index) in &this.schemas {
-                if item.module_path.starts_with(schema_item.module_path) {
+                if item.module_path == schema_item.module_path {
                     tracing::trace!(from = ?item.identifier(), to = schema_item.module_path, "Adding ExtensionSQL after Schema edge.");
                     this.graph
                         .add_edge(schema_index, index, SqlGraphRelationship::RequiredBy);
@@ -507,7 +507,7 @@ impl<'a> PgxSql<'a> {
         }
         for (item, &index) in &this.enums {
             for (schema_item, &schema_index) in &this.schemas {
-                if item.module_path.starts_with(schema_item.module_path) {
+                if item.module_path == schema_item.module_path {
                     tracing::trace!(from = ?item.full_path, to = schema_item.module_path, "Adding Enum after Schema edge.");
                     this.graph
                         .add_edge(schema_index, index, SqlGraphRelationship::RequiredBy);
@@ -517,7 +517,7 @@ impl<'a> PgxSql<'a> {
         }
         for (item, &index) in &this.types {
             for (schema_item, &schema_index) in &this.schemas {
-                if item.module_path.starts_with(schema_item.module_path) {
+                if item.module_path == schema_item.module_path {
                     tracing::trace!(from = ?item.full_path, to = schema_item.module_path, "Adding Type after Schema edge.");
                     this.graph
                         .add_edge(schema_index, index, SqlGraphRelationship::RequiredBy);
@@ -527,7 +527,7 @@ impl<'a> PgxSql<'a> {
         }
         for (item, &index) in &this.externs {
             for (schema_item, &schema_index) in &this.schemas {
-                if item.module_path.starts_with(schema_item.module_path) {
+                if item.module_path == schema_item.module_path {
                     tracing::trace!(from = ?item.full_path, to = schema_item.module_path, "Adding Extern after Schema edge.");
                     this.graph
                         .add_edge(schema_index, index, SqlGraphRelationship::RequiredBy);
@@ -650,7 +650,7 @@ impl<'a> PgxSql<'a> {
         }
         for (item, &index) in &this.ords {
             for (schema_item, &schema_index) in &this.schemas {
-                if item.module_path.starts_with(schema_item.module_path) {
+                if item.module_path == schema_item.module_path {
                     tracing::trace!(from = ?item.full_path, to = schema_item.module_path, "Adding Ord after Schema edge.");
                     this.graph
                         .add_edge(schema_index, index, SqlGraphRelationship::RequiredBy);
@@ -660,7 +660,7 @@ impl<'a> PgxSql<'a> {
         }
         for (item, &index) in &this.hashes {
             for (schema_item, &schema_index) in &this.schemas {
-                if item.module_path.starts_with(schema_item.module_path) {
+                if item.module_path == schema_item.module_path {
                     tracing::trace!(from = ?item.full_path, to = schema_item.module_path, "Adding Hash after Schema edge.");
                     this.graph
                         .add_edge(schema_index, index, SqlGraphRelationship::RequiredBy);

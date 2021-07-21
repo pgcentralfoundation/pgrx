@@ -169,11 +169,10 @@ pub fn pg_schema(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// ```
 /// # #[macro_use]
 /// # extern crate pgx_macros;
-/// # fn main() {
 /// extension_sql!(r#"
 /// -- sql statements
 /// "#)
-/// # }
+/// # fn main() {}
 /// ```
 
 #[proc_macro]
