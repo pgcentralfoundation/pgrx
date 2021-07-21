@@ -150,7 +150,6 @@ impl<T: 'static> WithSizedTypeIds<T>  {
                 "Cannot map `{}` twice.",
                 rust,
             );
-            println!("BOOP DOOP {:?}", rust);
         }
 
         if let Some(id) = *WithSizedTypeIds::<T>::OPTION_ID {
