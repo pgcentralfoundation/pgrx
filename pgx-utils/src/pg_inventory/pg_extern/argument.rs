@@ -196,13 +196,17 @@ impl ToTokens for Argument {
         let pat = &self.pat;
         let ty = &self.ty;
         let default = self.default.iter();
-        let is_optional = match self.ty {
+        let mut found_optional = false;
+        let mut found_variadic = false;
+        match self.ty {
             syn::Type::Path(ref type_path) => {
                 let path = &type_path.path;
-                let mut found_optional = false;
                 for segment in &path.segments {
-                    if segment.ident.to_string().as_str() == "Option" {
-                        found_optional = true;
+                    let ident_string = segment.ident.to_string();
+                    match ident_string.as_str() {
+                        "Option" => found_optional = true,
+                        "VariadicArray" => found_variadic = true,
+                        _ => (),
                     }
                 }
                 found_optional
@@ -221,7 +225,8 @@ impl ToTokens for Argument {
                     let _ = path_items.pop(); // Drop the one we don't want.
                     path_items.join("::")
                 },
-                is_optional: #is_optional,
+                is_optional: #found_optional,
+                is_variadic: #found_variadic,
                 default: None#( .unwrap_or(Some(#default)) )*,
             }
         };
@@ -253,5 +258,6 @@ pub struct InventoryPgExternInput {
     pub full_path: &'static str,
     pub module_path: String,
     pub is_optional: bool,
+    pub is_variadic: bool,
     pub default: Option<&'static str>,
 }

@@ -973,12 +973,13 @@ impl<'a> PgxSql<'a> {
                                      }).ok_or_else(|| eyre_err!("Could not find arg type in graph. Got: {:?}", arg))?;
                                      let needs_comma = idx < (item.fn_args.len() - 1);
                                      let buf = format!("\
-                                            \t\"{pattern}\" {schema_prefix}{sql_type}{default}{maybe_comma}/* {full_path} */\
+                                            \t\"{pattern}\" {schema_prefix}{variadic}{sql_type}{default}{maybe_comma}/* {full_path} */\
                                         ",
                                                        pattern = arg.pattern,
                                                        schema_prefix = self.schema_prefix_for(&graph_index),
                                                        sql_type = self.type_id_to_sql_type(arg.ty_id).ok_or_else(|| eyre_err!("Failed to map argument `{}` type `{}` to SQL type while building function `{}`.", arg.pattern, arg.full_path, item.name))?,
                                                        default = if let Some(def) = arg.default { format!(" DEFAULT {}", def) } else { String::from("") },
+                                                       variadic = if arg.is_variadic { " VARIADIC " } else { "" },
                                                        maybe_comma = if needs_comma { ", " } else { " " },
                                                        full_path = arg.full_path,
                                      );
