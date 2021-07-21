@@ -32,6 +32,9 @@ impl ToTokens for Schema {
 
         let mut updated_content = content_items.clone();
         updated_content.push(syn::parse_quote! {
+            use pgx_utils::pg_inventory::inventory;
+        });
+        updated_content.push(syn::parse_quote! {
             pgx_utils::pg_inventory::inventory::submit! {
                 crate::__pgx_internals::Schema(pgx_utils::pg_inventory::InventorySchema {
                     module_path: module_path!(),

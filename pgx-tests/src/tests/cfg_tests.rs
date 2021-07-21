@@ -11,6 +11,7 @@ fn func_test_cfg() {}
 fn func_non_existent_cfg(t: NonexistentType) {}
 
 #[cfg(any(test, feature = "pg_test"))]
+#[pgx::pg_schema]
 mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;

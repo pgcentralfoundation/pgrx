@@ -4,6 +4,7 @@ use pgx::*;
 fn func_to_rename() {}
 
 #[cfg(any(test, feature = "pg_test"))]
+#[pgx::pg_schema]
 mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;

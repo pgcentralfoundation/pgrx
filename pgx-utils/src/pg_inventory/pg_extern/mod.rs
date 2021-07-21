@@ -5,7 +5,7 @@ mod returning;
 mod search_path;
 
 use argument::Argument;
-use attribute::PgxAttributes;
+use attribute::{PgxAttributes, Attribute};
 use operator::{PgxOperator, PgxOperatorAttributeWithIdent, PgxOperatorOpName};
 use returning::Returning;
 use search_path::SearchPathList;
@@ -28,6 +28,24 @@ pub struct PgExtern {
 }
 
 impl PgExtern {
+    fn name(&self) -> String {
+        self.attrs.attrs.iter().find_map(|candidate| match candidate {
+            Attribute::Name(name) => {
+                Some(name.value())
+            },
+            _ => None,
+        }).unwrap_or_else(|| self.func.sig.ident.to_string())
+    }
+
+    fn schema(&self) -> Option<String> {
+        self.attrs.attrs.iter().find_map(|candidate| match candidate {
+            Attribute::Schema(name) => {
+                Some(name.value())
+            },
+            _ => None,
+        })
+    }
+
     fn extern_attrs(&self) -> &PgxAttributes {
         &self.attrs
     }
@@ -155,6 +173,9 @@ impl PgExtern {
 impl ToTokens for PgExtern {
     fn to_tokens(&self, tokens: &mut TokenStream2) {
         let ident = &self.func.sig.ident;
+        let name = self.name();
+        let schema = self.schema();
+        let schema_iter = schema.iter();
         let extern_attrs = self.extern_attrs();
         let search_path = self.search_path().into_iter();
         let inputs = self.inputs().unwrap();
@@ -175,7 +196,9 @@ impl ToTokens for PgExtern {
             pgx_utils::pg_inventory::inventory::submit! {
                 use core::any::TypeId;
                 crate::__pgx_internals::PgExtern(pgx_utils::pg_inventory::InventoryPgExtern {
-                    name: stringify!(#ident),
+                    name: #name,
+                    unaliased_name: stringify!(#ident),
+                    schema: None#( .unwrap_or(Some(#schema_iter)) )*,
                     file: file!(),
                     line: line!(),
                     module_path: core::module_path!(),
@@ -205,6 +228,8 @@ impl Parse for PgExtern {
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct InventoryPgExtern {
     pub name: &'static str,
+    pub unaliased_name: &'static str,
+    pub schema: Option<&'static str>,
     pub file: &'static str,
     pub line: u32,
     pub module_path: &'static str,

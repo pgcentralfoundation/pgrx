@@ -8,7 +8,7 @@ use syn::{
 
 #[derive(Debug, Clone)]
 pub struct PgxAttributes {
-    attrs: Punctuated<Attribute, Token![,]>,
+    pub attrs: Punctuated<Attribute, Token![,]>,
 }
 
 impl Parse for PgxAttributes {
@@ -79,21 +79,18 @@ impl Parse for Attribute {
             "parallel_unsafe" => Attribute::ParallelUnsafe,
             "parallel_restricted" => Attribute::ParallelRestricted,
             "error" => {
-                let inner;
-                let _punc: syn::token::Paren = syn::parenthesized!(inner in input);
-                let literal: syn::LitStr = inner.parse()?;
+                let _eq: Token![=] = input.parse()?;
+                let literal: syn::LitStr = input.parse()?;
                 Attribute::Error(literal)
             }
             "schema" => {
-                let inner;
-                let _punc: syn::token::Paren = syn::parenthesized!(inner in input);
-                let literal: syn::LitStr = inner.parse()?;
+                let _eq: Token![=] = input.parse()?;
+                let literal: syn::LitStr = input.parse()?;
                 Attribute::Schema(literal)
             }
             "name" => {
-                let inner;
-                let _punc: syn::token::Paren = syn::parenthesized!(inner in input);
-                let literal: syn::LitStr = inner.parse()?;
+                let _eq: Token![=] = input.parse()?;
+                let literal: syn::LitStr = input.parse()?;
                 Attribute::Name(literal)
             }
             _ => return Err(syn::Error::new(Span::call_site(), "Invalid option")),

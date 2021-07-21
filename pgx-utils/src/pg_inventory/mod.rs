@@ -953,10 +953,11 @@ impl<'a> PgxSql<'a> {
                                 {extern_attrs}\
                                 {search_path}\
                                 LANGUAGE c /* Rust */\n\
-                                AS 'MODULE_PATHNAME', '{name}_wrapper';\n\
+                                AS 'MODULE_PATHNAME', '{unaliased_name}_wrapper';\n\
                             ",
-                             schema = self.schema_prefix_for(item_index),
+                             schema = item.schema.map(|schema| format!("{}.", schema)).unwrap_or_else(|| self.schema_prefix_for(item_index)),
                              name = item.name,
+                             unaliased_name = item.unaliased_name,
                              arguments = if !item.fn_args.is_empty() {
                                  let mut args = Vec::new();
                                  for (idx, arg) in item.fn_args.iter().enumerate() {

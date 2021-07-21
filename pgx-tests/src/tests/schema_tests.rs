@@ -2,6 +2,7 @@
 // governed by the MIT license that can be found in the LICENSE file.
 use pgx::*;
 
+#[pgx::pg_schema]
 mod test_schema {
     use pgx::*;
     use serde::{Deserialize, Serialize};
@@ -22,6 +23,7 @@ fn type_in_diff_schema() -> test_schema::TestType {
 }
 
 #[cfg(any(test, feature = "pg_test"))]
+#[pgx::pg_schema]
 mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
