@@ -38,11 +38,11 @@ impl Clone for PallocdVarlena {
 /// ## Example
 ///
 /// ```rust,no_run
-/// use pgx::*;
 /// use std::ffi::CStr;
 /// use std::str::FromStr;
 ///
-/// pg_module_magic!();
+/// use crate::pgx::*;
+/// pgx::pg_module_magic!();
 ///
 /// #[derive(Copy, Clone, PostgresType)]
 /// #[pgvarlena_inoutfuncs]

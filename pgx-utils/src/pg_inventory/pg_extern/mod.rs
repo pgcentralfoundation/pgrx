@@ -198,7 +198,7 @@ impl ToTokens for PgExtern {
         let inv = quote! {
             pgx_utils::pg_inventory::inventory::submit! {
                 use core::any::TypeId;
-                crate::__pgx_internals::PgExtern(pgx_utils::pg_inventory::InventoryPgExtern {
+                let submission = pgx_utils::pg_inventory::InventoryPgExtern {
                     name: #name,
                     unaliased_name: stringify!(#ident),
                     schema: None#( .unwrap_or(Some(#schema_iter)) )*,
@@ -212,7 +212,9 @@ impl ToTokens for PgExtern {
                     fn_return: #returns,
                     operator: None#( .unwrap_or(Some(#operator)) )*,
                     overridden: None#( .unwrap_or(Some(#overridden)) )*,
-                })
+                };
+                let retval = crate::__pgx_internals::PgExtern(submission);
+                retval
             }
         };
         tokens.append_all(inv);

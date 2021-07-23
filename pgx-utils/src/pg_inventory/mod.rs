@@ -657,6 +657,29 @@ impl<'a> PgxSql<'a> {
                     break;
                 }
             }
+            for (ty_item, &ty_index) in &this.types {
+                if ty_item.id_matches(&item.id) {
+                    tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Ord after Type edge.");
+                    this.graph.add_edge(
+                        ty_index,
+                        index,
+                        SqlGraphRelationship::RequiredBy,
+                    );
+                    break;
+                }
+            }
+            for (ty_item, &ty_index) in &this.enums {
+                if ty_item.id_matches(&item.id) {
+                    tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Ord after Enum edge.");
+                    this.graph.add_edge(
+                        ty_index,
+                        index,
+                        SqlGraphRelationship::RequiredBy,
+                    );
+                    break;
+                }
+            }
+            
         }
         for (item, &index) in &this.hashes {
             for (schema_item, &schema_index) in &this.schemas {
@@ -664,6 +687,28 @@ impl<'a> PgxSql<'a> {
                     tracing::trace!(from = ?item.full_path, to = schema_item.module_path, "Adding Hash after Schema edge.");
                     this.graph
                         .add_edge(schema_index, index, SqlGraphRelationship::RequiredBy);
+                    break;
+                }
+            }
+            for (ty_item, &ty_index) in &this.types {
+                if ty_item.id_matches(&item.id) {
+                    tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Hash after Type edge.");
+                    this.graph.add_edge(
+                        ty_index,
+                        index,
+                        SqlGraphRelationship::RequiredBy,
+                    );
+                    break;
+                }
+            }
+            for (ty_item, &ty_index) in &this.enums {
+                if ty_item.id_matches(&item.id) {
+                    tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Hash after Enum edge.");
+                    this.graph.add_edge(
+                        ty_index,
+                        index,
+                        SqlGraphRelationship::RequiredBy,
+                    );
                     break;
                 }
             }

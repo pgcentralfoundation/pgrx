@@ -166,12 +166,12 @@ pub fn pg_schema(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// The argument must be as single raw string literal.
 ///
 /// # Example
-/// ```
+/// ```no_run
 /// # #[macro_use]
 /// # extern crate pgx_macros;
 /// extension_sql!(r#"
 /// -- sql statements
-/// "#)
+/// "#);
 /// # fn main() {}
 /// ```
 

@@ -32,7 +32,7 @@ impl ToTokens for PostgresType {
         let (_impl_generics, ty_generics, _where_clauses) = static_generics.split_for_impl();
 
         let in_fn = &self.in_fn;
-        let out_fn = &self.out_fn;
+        let out_fn = &self.out_fn;      
         let inv = quote! {
             pgx_utils::pg_inventory::inventory::submit! {
                 let mut mappings = std::collections::HashMap::default();
@@ -40,8 +40,7 @@ impl ToTokens for PostgresType {
                 ::pgx::datum::WithSizedTypeIds::<#name #ty_generics>::register_sized_with_refs(&mut mappings, stringify!(#name).to_string());
                 ::pgx::datum::WithArrayTypeIds::<#name #ty_generics>::register_array_with_refs(&mut mappings, stringify!(#name).to_string());
                 ::pgx::datum::WithVarlenaTypeIds::<#name #ty_generics>::register_varlena_with_refs(&mut mappings, stringify!(#name).to_string());
-
-                crate::__pgx_internals::PostgresType(pgx_utils::pg_inventory::InventoryPostgresType {
+                let submission = pgx_utils::pg_inventory::InventoryPostgresType {
                     name: stringify!(#name),
                     file: file!(),
                     line: line!(),
@@ -63,7 +62,9 @@ impl ToTokens for PostgresType {
                         let _ = path_items.pop(); // Drop the one we don't want.
                         path_items.join("::")
                     }
-                })
+                };
+                let retval = crate::__pgx_internals::PostgresType(submission);
+                retval
             }
         };
         tokens.append_all(inv);

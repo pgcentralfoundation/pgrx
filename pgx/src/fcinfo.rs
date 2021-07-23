@@ -18,8 +18,9 @@ use crate::{pg_sys, void_mut_ptr, FromDatum, PgBox, PgMemoryContexts};
 /// CREATE OR REPLACE FUNCTION fun_with_default_arg_value(a integer, b integer DEFAULT 99) RETURNS integer ...;
 /// ```
 ///
-/// ```rust
+/// ```rust,no_run
 /// use crate::pgx::*;
+/// pgx::pg_module_magic!();
 ///
 /// #[pg_extern]
 /// fn fun_with_default_arg_value(a: i32, b: default!(i32, 99)) -> i32 {
@@ -55,6 +56,8 @@ macro_rules! default {
 ///
 /// ```rust,no_run
 /// use pgx::*;
+/// # pgx::pg_module_magic!();
+///
 /// #[pg_extern]
 /// fn get_a_set() -> impl std::iter::Iterator<Item=(name!(id, i32), name!(title, &'static str))> {
 ///     vec![1, 2, 3].into_iter().zip(vec!["A", "B", "C"].into_iter())
@@ -243,6 +246,8 @@ pub fn pg_func_extra<ReturnType, DefaultValue: FnOnce() -> ReturnType>(
 /// ## Examples
 /// ```rust,no_run
 /// use pgx::*;
+///
+/// pg_module_magic!();
 ///
 /// #[pg_extern]
 /// fn add_two_numbers(a: i32, b: i32) -> i32 {

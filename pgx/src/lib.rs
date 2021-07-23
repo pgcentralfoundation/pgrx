@@ -238,12 +238,16 @@ macro_rules! pg_module_magic {
             &MY_MAGIC
         }
 
-        pub use __pgx_internals::generate_sql;
-        mod __pgx_internals {
-            use ::core::{any::TypeId, convert::TryFrom};
-            use ::pgx::datum::{Array, FromDatum, PgVarlena};
-            use ::pgx_utils::pg_inventory::{once_cell::sync::Lazy, *};
-            use ::std::collections::HashMap;
+        $crate::pg_inventory_magic!();
+    };
+}
+
+#[macro_export]
+macro_rules! pg_inventory_magic {
+    () => {
+        pub mod __pgx_internals {
+            use ::core::convert::TryFrom;
+            use ::pgx_utils::pg_inventory::*;
 
             static CONTROL_FILE: &str = include_str!(concat!(
                 env!("CARGO_MANIFEST_DIR"),
@@ -281,10 +285,9 @@ macro_rules! pg_module_magic {
             inventory::collect!(Schema);
 
             pub fn generate_sql<'a>() -> pgx_utils::pg_inventory::eyre::Result<PgxSql<'a>> {
-                use std::fmt::Write;
-                let mut generated = PgxSql::build(
+                let generated = PgxSql::build(
                     ControlFile::try_from(CONTROL_FILE)?,
-                    (*pgx::DEFAULT_TYPEID_SQL_MAPPING)
+                    (*$crate::DEFAULT_TYPEID_SQL_MAPPING)
                         .iter()
                         .map(|(x, y)| (x.clone(), y.clone())),
                     {
@@ -342,7 +345,7 @@ macro_rules! pg_binary_magic {
                 eyre,
             };
             use std::env;
-            use $($prelude :: )*generate_sql;
+            use $($prelude :: )*__pgx_internals::generate_sql;
 
             // Initialize tracing with tracing-error.
             let fmt_layer = tracing_subscriber::fmt::layer().with_target(false);
