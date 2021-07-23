@@ -28,3 +28,5 @@ mod struct_type_tests;
 mod variadic_tests;
 mod xact_callback_tests;
 mod xid64_tests;
+
+pgx::pg_magic_func!();

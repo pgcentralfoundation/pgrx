@@ -200,6 +200,15 @@ pub static DEFAULT_TYPEID_SQL_MAPPING: Lazy<HashMap<TypeId, RustSqlMapping>> = L
 #[macro_export]
 macro_rules! pg_module_magic {
     () => {
+
+        $crate::pg_magic_func!();
+        $crate::pg_inventory_magic!();
+    };
+}
+
+#[macro_export]
+macro_rules! pg_magic_func {
+    () => {
         #[no_mangle]
         #[allow(non_snake_case)]
         #[allow(unused)]
@@ -237,9 +246,7 @@ macro_rules! pg_module_magic {
             // return the magic
             &MY_MAGIC
         }
-
-        $crate::pg_inventory_magic!();
-    };
+    }
 }
 
 #[macro_export]
