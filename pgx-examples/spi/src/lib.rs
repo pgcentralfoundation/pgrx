@@ -109,6 +109,7 @@ CREATE TABLE foo ();
 );
 
 #[cfg(any(test, feature = "pg_test"))]
+#[pg_schema]
 mod tests {
     use crate::spi_query_by_id;
     use pgx::*;

@@ -152,16 +152,18 @@ fn copy_sql_files(
     std::fs::write(&dest, written).unwrap();
 
     // now copy all the version upgrade files too
-    for sql in handle_result!(std::fs::read_dir("sql/"), "failed to read ./sql/ directory") {
-        if let Ok(sql) = sql {
-            let filename = sql.file_name().into_string().unwrap();
-
-            if filename.starts_with(&format!("{}--", extname)) && filename.ends_with(".sql") {
-                let mut dest = base_directory.clone();
-                dest.push(extdir);
-                dest.push(filename);
-
-                copy_file(sql.path(), dest, "extension schema file");
+    if let Ok(dir) = std::fs::read_dir("sql/") {
+        for sql in dir {
+            if let Ok(sql) = sql {
+                let filename = sql.file_name().into_string().unwrap();
+    
+                if filename.starts_with(&format!("{}--", extname)) && filename.ends_with(".sql") {
+                    let mut dest = base_directory.clone();
+                    dest.push(extdir);
+                    dest.push(filename);
+    
+                    copy_file(sql.path(), dest, "extension schema file");
+                }
             }
         }
     }
