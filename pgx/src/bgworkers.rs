@@ -193,7 +193,7 @@ unsafe extern "C" fn worker_spi_sigterm(_signal_args: i32) {
 ///
 /// ## Example
 ///
-/// ```rust,no_run
+/// ```rust,ignore
 /// use pgx::bgworkers::BackgroundWorkerBuilder;
 /// use pgx::*;
 ///
