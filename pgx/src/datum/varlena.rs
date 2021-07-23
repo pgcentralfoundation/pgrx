@@ -37,7 +37,7 @@ impl Clone for PallocdVarlena {
 ///
 /// ## Example
 ///
-/// ```rust,no_run
+/// ```rust,ignore
 /// use std::ffi::CStr;
 /// use std::str::FromStr;
 ///
