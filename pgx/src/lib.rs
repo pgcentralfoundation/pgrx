@@ -116,6 +116,10 @@ macro_rules! map_type {
     }};
 }
 
+/// The default lookup for [`TypeId`]s to both Rust and SQL types via a [`RustSqlMapping`].
+///
+/// This only contains types known to [`pgx`](crate), so it will not include types defined by things
+/// like [`derive@PostgresType`] in the local extension.
 pub static DEFAULT_TYPEID_SQL_MAPPING: Lazy<HashMap<TypeId, RustSqlMapping>> = Lazy::new(|| {
     let mut m = HashMap::new();
 
@@ -216,8 +220,8 @@ macro_rules! pg_module_magic {
 /// <div class="example-wrap" style="display:inline-block">
 /// <pre class="ignore" style="white-space:normal;font:inherit;">
 ///
-/// **Note**: Using [`pg_module_magic!()`](pg_module_magic) results in this macro being called.
-/// Generally this macro should only be directly called in advanced use cases.
+/// **Note**: Generally [`pg_module_magic`] is preferred, and results in this macro being called.
+/// This macro should only be directly called in advanced use cases.
 ///
 /// </pre></div>
 ///
@@ -272,8 +276,8 @@ macro_rules! pg_magic_func {
 /// <div class="example-wrap" style="display:inline-block">
 /// <pre class="ignore" style="white-space:normal;font:inherit;">
 ///
-/// **Note**: Using [`pg_module_magic`] results in this macro being called.
-/// Generally this macro should only be directly called in advanced use cases.
+/// **Note**: Generally [`pg_module_magic`] is preferred, and results in this macro being called.
+/// This macro should only be directly called in advanced use cases.
 ///
 /// </pre></div>
 #[macro_export]
@@ -365,6 +369,9 @@ macro_rules! pg_inventory_magic {
             inventory::collect!(Schema);
 
             /// Build the SQL generator using the inventories of the wrappers in this module.
+            ///
+            ///  Most often, this is done by the [`macro@pgx::pg_binary_magic`] inside a
+            /// `src/bin/sql-generator.rs`.
             pub fn generate_sql<'a>() -> pgx_utils::pg_inventory::eyre::Result<PgxSql<'a>> {
                 let generated = PgxSql::build(
                     ControlFile::try_from(CONTROL_FILE)?,
@@ -414,6 +421,30 @@ macro_rules! pg_inventory_magic {
     };
 }
 
+/// Create the default SQL generator code.
+///
+/// Accepts a single argument, which should be the crate name.
+///
+/// ```ignore
+/// // src/bin/sql-generator.rs
+/// pg_binary_magic!(crate_name);
+/// ```
+///
+/// This creates a binary that:
+///  * Has [`tracing`](pgx_utils::pg_inventory::tracing) and [`color_eyre`](`pgx_utils::pg_inventory::color_eyre`) set up.
+///  * Supports [`EnvFilter`](pgx_utils::pg_inventory::tracing_subscriber::EnvFilter) log level configuration.
+///  * Accepts up to two arguments, an SQL destination and (optionally) a GraphViz DOT destination.
+/// 
+/// Using different SQL generator code should be considered an advanced use case, and not
+/// recommended.
+///
+/// <div class="example-wrap" style="display:inline-block">
+/// <pre class="ignore" style="white-space:normal;font:inherit;">
+///
+/// **Note**: `cargo pgx schema` or similar commands will automatically scaffold your
+/// `src/bin/sql-generator.rs` with this if it's not already present.
+///
+/// </pre></div>
 #[macro_export]
 macro_rules! pg_binary_magic {
     ($($prelude:ident)::*) => {
@@ -442,7 +473,7 @@ macro_rules! pg_binary_magic {
             color_eyre::install()?;
 
             let mut args = env::args().skip(1);
-            let path = args.next().unwrap_or(concat!("./sql/", stringify!($($prelude :: )*), ".sql").into());
+            let path = args.next().unwrap_or(concat!("./sql/", core::env!("CARGO_PKG_NAME"), ".sql").into());
             let dot: Option<String> = args.next();
             if args.next().is_some() {
                 return Err(eyre::eyre!("Only accepts two arguments, the destination path, and an optional (GraphViz) dot output path."));

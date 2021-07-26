@@ -161,20 +161,64 @@ pub fn pg_schema(_attr: TokenStream, item: TokenStream) -> TokenStream {
     pgx_schema.to_token_stream().into()
 }
 
-/// Embed SQL directly into the generated extension script.
+/// Declare SQL to be included in generated extension script.
 ///
-/// The argument must be as single raw string literal.
+/// Accepts a String literal, and optionally the attributes:
 ///
-/// # Example
+/// * `name = "item"`: Set the unique identifer to `"item"` for use in `before`/`after` declarations. 
+/// * `before = [item, item_two]`: References to other `name`s or Rust items which this SQL should be present before.
+/// * `after = [item, item_two]`: References to other `name`s or Rust items which this SQL should be present after.
+/// * `bootstrap` (**Unique**): Hint that this is SQL intended to go before all other generated SQL.
+/// * `finalize` (**Unique**): Hint that this is SQL intended to go after all other generated SQL. 
+///
+/// You can declare some SQL without any positioning information, meaning it can end up anywhere in the generated SQL:
+///
 /// ```ignore
-/// # #[macro_use]
-/// # extern crate pgx_macros;
 /// extension_sql!(r#"
-/// -- sql statements
+/// -- SQL statements
 /// "#);
-/// # fn main() {}
 /// ```
-
+///
+/// To cause the SQL to be output at the start of the generated SQL:
+///
+/// ```ignore
+/// extension_sql!(r#"
+/// -- SQL statements
+/// "#, bootstrap);
+/// ```
+///
+/// To cause the SQL to be output at the end of the generated SQL:
+///
+/// ```ignore
+/// extension_sql!(r#"
+/// -- SQL statements
+/// "#, finalize);
+/// ```
+///
+/// To declare the SQL dependant, or a dependency of, other items:
+///
+/// ```ignore
+/// struct Treat;
+/// 
+/// mod dog_characteristics {
+///     enum DogAlignment {
+///         Good
+///     }
+/// }
+///
+/// extension_sql!(r#"
+/// -- SQL statements
+/// "#,
+///     name = "named_one",
+/// );
+/// 
+/// extension_sql!(r#"
+/// -- SQL statements
+/// "#,
+///     before = [ Treat, "named_one" ],
+///     after = [ dog_characteristics::DogAlignment ],
+/// );
+/// ```
 #[proc_macro]
 pub fn extension_sql(input: TokenStream) -> TokenStream {
     fn wrapped(input: TokenStream) -> Result<TokenStream, syn::Error> {
@@ -193,6 +237,23 @@ pub fn extension_sql(input: TokenStream) -> TokenStream {
     }
 }
 
+/// Declare SQL (from a file) to be included in generated extension script.
+/// 
+/// Accepts the same options as [`macro@extension_sql`]. `name` is automatically set to the file name (not the full path).
+///
+/// You can declare some SQL without any positioning information, meaning it can end up anywhere in the generated SQL:
+///
+/// ```ignore
+/// extension_sql_file!("sql/best_dogs.sql");
+/// ```
+///
+/// To override the default name:
+///
+/// ```ignore
+/// extension_sql_file!("sql/best_dogs.sql", name = "best_creatures");
+/// ```
+///
+/// For all other options, and examples of them, see [`macro@extension_sql`].
 #[proc_macro]
 pub fn extension_sql_file(input: TokenStream) -> TokenStream {
     fn wrapped(input: TokenStream) -> Result<TokenStream, syn::Error> {

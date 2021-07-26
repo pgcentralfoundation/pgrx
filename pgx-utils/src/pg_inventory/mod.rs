@@ -55,6 +55,17 @@ pub struct RustSqlMapping {
     pub id: TypeId,
 }
 
+/// A generator for SQL.
+///
+/// Consumes a base mapping of types (typically `pgx::DEFAULT_TYPEID_SQL_MAPPING`), a
+/// [`ControlFile`], and collections of inventory types for each SQL entity.
+/// 
+/// During construction, a Directed Acyclic Graph is formed out the dependencies. For example,
+/// an item `detect_dog(x: &[u8]) -> animals::Dog` would have have a relationship with
+/// `animals::Dog`.
+///
+/// Typically, [`PgxSql`] types are constructed in a `pgx::pg_binary_magic!()` call in a binary
+/// out of inventory items collected during a `pgx::pg_module_magic!()` call in a library.
 #[derive(Debug, Clone)]
 pub struct PgxSql<'a> {
     pub type_mappings: HashMap<TypeId, RustSqlMapping>,
@@ -73,6 +84,7 @@ pub struct PgxSql<'a> {
     pub hashes: HashMap<&'a InventoryPostgresHash, NodeIndex>,
 }
 
+/// An entity corresponding to some SQL required by the extension.
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub enum SqlGraphEntity<'a> {
     ExtensionRoot(ControlFile),
@@ -85,7 +97,6 @@ pub enum SqlGraphEntity<'a> {
     Ord(&'a InventoryPostgresOrd),
     Hash(&'a InventoryPostgresHash),
 }
-use SqlGraphEntity::*;
 
 impl<'a> From<&'a InventorySchema> for SqlGraphEntity<'a> {
     fn from(item: &'a InventorySchema) -> Self {
@@ -139,15 +150,15 @@ pub enum SqlGraphRelationship {
 impl<'a> SqlGraphEntity<'a> {
     fn dot_format(&self) -> String {
         match self {
-            Schema(item) => format!("mod {}", item.module_path.to_string()),
-            CustomSql(item) => format!("sql {}", item.name.unwrap_or(item.full_path).to_string()),
-            Function(item) => format!("fn {}", item.full_path.to_string(),),
-            Type(item) => format!("type {}", item.full_path.to_string()),
-            BuiltinType(item) => format!("internal type {}", item),
-            Enum(item) => format!("enum {}", item.full_path.to_string()),
-            Ord(item) => format!("ord {}", item.full_path.to_string()),
-            Hash(item) => format!("hash {}", item.full_path.to_string()),
-            ExtensionRoot(_control) => format!("ExtensionRoot"),
+            SqlGraphEntity::Schema(item) => format!("mod {}", item.module_path.to_string()),
+            SqlGraphEntity::CustomSql(item) => format!("sql {}", item.name.unwrap_or(item.full_path).to_string()),
+            SqlGraphEntity::Function(item) => format!("fn {}", item.full_path.to_string(),),
+            SqlGraphEntity::Type(item) => format!("type {}", item.full_path.to_string()),
+            SqlGraphEntity::BuiltinType(item) => format!("internal type {}", item),
+            SqlGraphEntity::Enum(item) => format!("enum {}", item.full_path.to_string()),
+            SqlGraphEntity::Ord(item) => format!("ord {}", item.full_path.to_string()),
+            SqlGraphEntity::Hash(item) => format!("hash {}", item.full_path.to_string()),
+            SqlGraphEntity::ExtensionRoot(_control) => format!("ExtensionRoot"),
         }
     }
 }
@@ -841,11 +852,11 @@ impl<'a> PgxSql<'a> {
             let step = &self.graph[step_id];
 
             let sql = match step {
-                Schema(item) => if item.name != "public" && item.name != "pg_catalog" {
+                SqlGraphEntity::Schema(item) => if item.name != "public" && item.name != "pg_catalog" {
                     self.inventory_schema_to_sql(&step_id)?
                 } else { String::default() },
-                CustomSql(_item) => self.inventory_extension_sql_to_sql(&step_id)?,
-                Function(item) => if self.graph.neighbors_undirected(self.externs.get(item).unwrap().clone()).any(|neighbor| {
+                SqlGraphEntity::CustomSql(_item) => self.inventory_extension_sql_to_sql(&step_id)?,
+                SqlGraphEntity::Function(item) => if self.graph.neighbors_undirected(self.externs.get(item).unwrap().clone()).any(|neighbor| {
                     let neighbor_item = &self.graph[neighbor];
                     match neighbor_item {
                         SqlGraphEntity::Type(InventoryPostgresType { in_fn, in_fn_module_path, out_fn, out_fn_module_path, .. }) => {
@@ -864,12 +875,12 @@ impl<'a> PgxSql<'a> {
                 }) {
                     String::default()
                 } else { self.inventory_extern_to_sql(&step_id)? },
-                Type(_item) => self.inventory_type_to_sql(&step_id)?,
-                BuiltinType(_) => String::default(),
-                Enum(_item) => self.inventory_enums_to_sql(&step_id)?,
-                Ord(_item) => self.inventory_ord_to_sql(&step_id)?,
-                Hash(_item) => self.inventory_hash_to_sql(&step_id)?,
-                ExtensionRoot(_item) => format!("\
+                SqlGraphEntity::Type(_item) => self.inventory_type_to_sql(&step_id)?,
+                SqlGraphEntity::BuiltinType(_) => String::default(),
+                SqlGraphEntity::Enum(_item) => self.inventory_enums_to_sql(&step_id)?,
+                SqlGraphEntity::Ord(_item) => self.inventory_ord_to_sql(&step_id)?,
+                SqlGraphEntity::Hash(_item) => self.inventory_hash_to_sql(&step_id)?,
+                SqlGraphEntity::ExtensionRoot(_item) => format!("\
                     /* \n\
                        This file is auto generated by pgx.\n\
                        \n\
