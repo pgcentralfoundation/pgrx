@@ -5,7 +5,7 @@ use quote::{quote, ToTokens, TokenStreamExt};
 use syn::Generics;
 use syn::{punctuated::Punctuated, Ident, Token};
 
-use super::{DotFormat, SqlGraphEntity};
+use super::{DotFormat, SqlGraphEntity, ToSql};
 
 #[derive(Debug, Clone)]
 pub struct PostgresEnum {
@@ -112,3 +112,34 @@ impl DotFormat for InventoryPostgresEnum {
         format!("enum {}", self.full_path.to_string())
     }
 }
+
+impl ToSql for InventoryPostgresEnum {
+    #[tracing::instrument(level = "debug", err, skip(self, context))]
+    fn to_sql(&self, context: &super::PgxSql) -> eyre::Result<String> {
+        let self_index = context.enums[self];
+        let sql = format!(
+            "\n\
+                    -- {file}:{line}\n\
+                    -- {full_path}\n\
+                    CREATE TYPE {schema}{name} AS ENUM (\n\
+                        {variants}\
+                    );\n\
+                ",
+            schema = context.schema_prefix_for(&self_index),
+            full_path = self.full_path,
+            file = self.file,
+            line = self.line,
+            name = self.name,
+            variants = self
+                .variants
+                .iter()
+                .map(|variant| format!("\t'{}'", variant))
+                .collect::<Vec<_>>()
+                .join(",\n")
+                + "\n",
+        );
+        tracing::debug!(%sql);
+        Ok(sql)
+    }
+}
+

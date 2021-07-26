@@ -6,7 +6,7 @@ use syn::{
     LitStr, Token,
 };
 
-use super::{DotFormat, SqlGraphEntity};
+use super::{DotFormat, SqlGraphEntity, ToSql};
 
 #[derive(Debug, Clone)]
 pub struct ExtensionSqlFile {
@@ -258,6 +258,23 @@ impl<'a> Into<SqlGraphEntity<'a>> for &'a InventoryExtensionSql {
 impl DotFormat for InventoryExtensionSql {
     fn dot_format(&self) -> String {
         format!("schema {}", self.full_path.to_string())
+    }
+}
+
+impl ToSql for InventoryExtensionSql {
+    #[tracing::instrument(level = "debug", err, skip(self, _context))]
+    fn to_sql(&self, _context: &super::PgxSql) -> eyre::Result<String> {
+        let sql = format!(
+            "\n\
+                -- {file}:{line}\n\
+                {sql}\
+                ",
+            file = self.file,
+            line = self.line,
+            sql = self.sql,
+        );
+        tracing::debug!(%sql);
+        Ok(sql)
     }
 }
 

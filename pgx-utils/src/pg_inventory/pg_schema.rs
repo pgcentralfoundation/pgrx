@@ -1,4 +1,4 @@
-use super::{DotFormat, SqlGraphEntity};
+use super::{DotFormat, SqlGraphEntity, ToSql};
 use proc_macro2::TokenStream as TokenStream2;
 use quote::{quote, ToTokens, TokenStreamExt};
 use syn::{
@@ -75,5 +75,23 @@ impl<'a> Into<SqlGraphEntity<'a>> for &'a InventorySchema {
 impl DotFormat for InventorySchema {
     fn dot_format(&self) -> String {
         format!("schema {}", self.module_path.to_string())
+    }
+}
+
+impl ToSql for InventorySchema {
+    #[tracing::instrument(level = "debug", err, skip(self, _context))]
+    fn to_sql(&self, _context: &super::PgxSql) -> eyre::Result<String> {
+        let sql = format!(
+            "\n\
+                    -- {file}:{line}\n\
+                    CREATE SCHEMA IF NOT EXISTS {name}; /* {module_path} */\n\
+                ",
+            name = self.name,
+            file = self.file,
+            line = self.line,
+            module_path = self.module_path,
+        );
+        tracing::debug!(%sql);
+        Ok(sql)
     }
 }

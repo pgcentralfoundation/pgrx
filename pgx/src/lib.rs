@@ -302,15 +302,23 @@ macro_rules! pg_inventory_magic {
         /// </pre></div>
         pub mod __pgx_internals {
             use ::core::convert::TryFrom;
-            use ::pgx_utils::pg_inventory::*;
+            use ::pgx_utils::pg_inventory::{
+                once_cell::sync::Lazy,
+                inventory,
+                PgxSql,
+                ControlFile,
+            };
 
             /// The contents of the `*.control` file of the crate.
-            static CONTROL_FILE: &str = include_str!(concat!(
-                env!("CARGO_MANIFEST_DIR"),
-                "/",
-                env!("CARGO_CRATE_NAME"),
-                ".control"
-            ));
+            static CONTROL_FILE: Lazy<ControlFile> = Lazy::new(|| {
+                let context = include_str!(concat!(
+                    env!("CARGO_MANIFEST_DIR"),
+                    "/",
+                    env!("CARGO_CRATE_NAME"),
+                    ".control"
+                ));
+                ControlFile::try_from(context).expect("Could not parse control file, was it valid?")
+            });
 
             /// A wrapper type used by [`pgx::extension_sql`] and [`pgx::extension_sql_file`].
             ///
@@ -374,7 +382,7 @@ macro_rules! pg_inventory_magic {
             /// `src/bin/sql-generator.rs`.
             pub fn generate_sql<'a>() -> pgx_utils::pg_inventory::eyre::Result<PgxSql<'a>> {
                 let generated = PgxSql::build(
-                    ControlFile::try_from(CONTROL_FILE)?,
+                    &*CONTROL_FILE,
                     (*$crate::DEFAULT_TYPEID_SQL_MAPPING)
                         .iter()
                         .map(|(x, y)| (x.clone(), y.clone())),

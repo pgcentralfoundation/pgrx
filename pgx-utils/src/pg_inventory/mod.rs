@@ -53,3 +53,7 @@ pub struct RustSqlMapping {
 pub trait DotFormat {
     fn dot_format(&self) -> String;
 }
+
+pub trait ToSql {
+    fn to_sql(&self, context: &PgxSql) -> eyre::Result<String>;
+}

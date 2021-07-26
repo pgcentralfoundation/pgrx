@@ -7,7 +7,6 @@ mod tests;
 
 pub use framework::*;
 
-#[cfg(any(test, feature = "pg_test"))]
 pgx::pg_inventory_magic!();
 
 #[cfg(test)]
