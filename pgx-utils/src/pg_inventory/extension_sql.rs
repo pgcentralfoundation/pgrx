@@ -6,7 +6,7 @@ use syn::{
     LitStr, Token,
 };
 
-use super::SqlGraphEntity;
+use super::{DotFormat, SqlGraphEntity};
 
 #[derive(Debug, Clone)]
 pub struct ExtensionSqlFile {
@@ -252,6 +252,12 @@ impl InventoryExtensionSql {
 impl<'a> Into<SqlGraphEntity<'a>> for &'a InventoryExtensionSql {
     fn into(self) -> SqlGraphEntity<'a> {
         SqlGraphEntity::CustomSql(self)
+    }
+}
+
+impl DotFormat for InventoryExtensionSql {
+    fn dot_format(&self) -> String {
+        format!("schema {}", self.full_path.to_string())
     }
 }
 

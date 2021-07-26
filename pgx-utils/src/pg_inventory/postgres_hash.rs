@@ -2,7 +2,7 @@ use proc_macro2::TokenStream as TokenStream2;
 use quote::{quote, ToTokens, TokenStreamExt};
 use syn::Ident;
 
-use super::SqlGraphEntity;
+use super::{DotFormat, SqlGraphEntity};
 
 #[derive(Debug, Clone)]
 pub struct PostgresHash {
@@ -48,5 +48,11 @@ pub struct InventoryPostgresHash {
 impl<'a> Into<SqlGraphEntity<'a>> for &'a InventoryPostgresHash {
     fn into(self) -> SqlGraphEntity<'a> {
         SqlGraphEntity::Hash(self)
+    }
+}
+
+impl DotFormat for InventoryPostgresHash {
+    fn dot_format(&self) -> String {
+        format!("hash {}", self.full_path.to_string())
     }
 }

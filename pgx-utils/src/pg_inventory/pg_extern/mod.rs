@@ -21,7 +21,7 @@ pub use argument::InventoryPgExternInput;
 pub use operator::InventoryPgOperator;
 pub use returning::InventoryPgExternReturn;
 
-use super::SqlGraphEntity;
+use super::{DotFormat, SqlGraphEntity};
 
 #[derive(Debug, Clone)]
 pub struct PgExtern {
@@ -252,5 +252,11 @@ pub struct InventoryPgExtern {
 impl<'a> Into<SqlGraphEntity<'a>> for &'a InventoryPgExtern {
     fn into(self) -> SqlGraphEntity<'a> {
         SqlGraphEntity::Function(self)
+    }
+}
+
+impl DotFormat for InventoryPgExtern {
+    fn dot_format(&self) -> String {
+        format!("fn {}", self.full_path.to_string())
     }
 }

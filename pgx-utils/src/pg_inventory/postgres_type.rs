@@ -3,7 +3,7 @@ use quote::{quote, ToTokens, TokenStreamExt};
 use std::hash::{Hash, Hasher};
 use syn::Generics;
 
-use super::SqlGraphEntity;
+use super::{DotFormat, SqlGraphEntity};
 
 #[derive(Debug, Clone)]
 pub struct PostgresType {
@@ -117,5 +117,11 @@ impl InventoryPostgresType {
 impl<'a> Into<SqlGraphEntity<'a>> for &'a InventoryPostgresType {
     fn into(self) -> SqlGraphEntity<'a> {
         SqlGraphEntity::Type(self)
+    }
+}
+
+impl DotFormat for InventoryPostgresType {
+    fn dot_format(&self) -> String {
+        format!("type {}", self.full_path.to_string())
     }
 }

@@ -1,4 +1,4 @@
-use super::SqlGraphEntity;
+use super::{DotFormat, SqlGraphEntity};
 use core::convert::TryFrom;
 use std::collections::HashMap;
 use tracing_error::SpanTrace;
@@ -98,5 +98,11 @@ impl TryFrom<&str> for ControlFile {
                 == &"true",
             schema: temp.get("schema").map(|v| v.to_string()),
         })
+    }
+}
+
+impl DotFormat for ControlFile {
+    fn dot_format(&self) -> String {
+        format!("extension root")
     }
 }
