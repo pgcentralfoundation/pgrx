@@ -21,6 +21,8 @@ pub use argument::InventoryPgExternInput;
 pub use operator::InventoryPgOperator;
 pub use returning::InventoryPgExternReturn;
 
+use super::SqlGraphEntity;
+
 #[derive(Debug, Clone)]
 pub struct PgExtern {
     attrs: PgxAttributes,
@@ -245,4 +247,10 @@ pub struct InventoryPgExtern {
     pub fn_return: InventoryPgExternReturn,
     pub operator: Option<InventoryPgOperator>,
     pub overridden: Option<&'static str>,
+}
+
+impl<'a> Into<SqlGraphEntity<'a>> for &'a InventoryPgExtern {
+    fn into(self) -> SqlGraphEntity<'a> {
+        SqlGraphEntity::Function(self)
+    }
 }

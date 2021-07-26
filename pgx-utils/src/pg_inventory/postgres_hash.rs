@@ -2,6 +2,8 @@ use proc_macro2::TokenStream as TokenStream2;
 use quote::{quote, ToTokens, TokenStreamExt};
 use syn::Ident;
 
+use super::SqlGraphEntity;
+
 #[derive(Debug, Clone)]
 pub struct PostgresHash {
     pub name: Ident,
@@ -41,4 +43,10 @@ pub struct InventoryPostgresHash {
     pub full_path: &'static str,
     pub module_path: &'static str,
     pub id: core::any::TypeId,
+}
+
+impl<'a> Into<SqlGraphEntity<'a>> for &'a InventoryPostgresHash {
+    fn into(self) -> SqlGraphEntity<'a> {
+        SqlGraphEntity::Hash(self)
+    }
 }

@@ -1,3 +1,4 @@
+use super::SqlGraphEntity;
 use proc_macro2::TokenStream as TokenStream2;
 use quote::{quote, ToTokens, TokenStreamExt};
 use syn::{
@@ -63,4 +64,10 @@ pub struct InventorySchema {
     pub name: &'static str,
     pub file: &'static str,
     pub line: u32,
+}
+
+impl<'a> Into<SqlGraphEntity<'a>> for &'a InventorySchema {
+    fn into(self) -> SqlGraphEntity<'a> {
+        SqlGraphEntity::Schema(self)
+    }
 }

@@ -1,3 +1,4 @@
+use super::SqlGraphEntity;
 use core::convert::TryFrom;
 use std::collections::HashMap;
 use tracing_error::SpanTrace;
@@ -10,6 +11,12 @@ pub struct ControlFile {
     pub relocatable: bool,
     pub superuser: bool,
     pub schema: Option<String>,
+}
+
+impl<'a> Into<SqlGraphEntity<'a>> for &'a ControlFile {
+    fn into(self) -> SqlGraphEntity<'a> {
+        SqlGraphEntity::ExtensionRoot(self)
+    }
 }
 
 #[derive(Debug, Clone)]

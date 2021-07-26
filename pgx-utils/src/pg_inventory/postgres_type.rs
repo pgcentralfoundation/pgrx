@@ -3,6 +3,8 @@ use quote::{quote, ToTokens, TokenStreamExt};
 use std::hash::{Hash, Hasher};
 use syn::Generics;
 
+use super::SqlGraphEntity;
+
 #[derive(Debug, Clone)]
 pub struct PostgresType {
     name: Ident,
@@ -32,7 +34,7 @@ impl ToTokens for PostgresType {
         let (_impl_generics, ty_generics, _where_clauses) = static_generics.split_for_impl();
 
         let in_fn = &self.in_fn;
-        let out_fn = &self.out_fn;      
+        let out_fn = &self.out_fn;
         let inv = quote! {
             pgx_utils::pg_inventory::inventory::submit! {
                 let mut mappings = std::collections::HashMap::default();
@@ -109,5 +111,11 @@ impl InventoryPostgresType {
         self.mappings
             .iter()
             .any(|(tester, _)| *candidate == *tester)
+    }
+}
+
+impl<'a> Into<SqlGraphEntity<'a>> for &'a InventoryPostgresType {
+    fn into(self) -> SqlGraphEntity<'a> {
+        SqlGraphEntity::Type(self)
     }
 }

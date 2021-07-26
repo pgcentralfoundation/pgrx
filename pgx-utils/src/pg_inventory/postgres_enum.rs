@@ -5,6 +5,8 @@ use quote::{quote, ToTokens, TokenStreamExt};
 use syn::Generics;
 use syn::{punctuated::Punctuated, Ident, Token};
 
+use super::SqlGraphEntity;
+
 #[derive(Debug, Clone)]
 pub struct PostgresEnum {
     name: Ident,
@@ -96,5 +98,11 @@ impl InventoryPostgresEnum {
         self.mappings
             .iter()
             .any(|(tester, _)| *candidate == *tester)
+    }
+}
+
+impl<'a> Into<SqlGraphEntity<'a>> for &'a InventoryPostgresEnum {
+    fn into(self) -> SqlGraphEntity<'a> {
+        SqlGraphEntity::Enum(self)
     }
 }

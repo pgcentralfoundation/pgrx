@@ -43,7 +43,7 @@ use eyre::eyre as eyre_err;
 use petgraph::{
     algo::toposort,
     dot::Dot,
-    stable_graph::{NodeIndex, StableGraph},
+    stable_graph::{NodeIndex, StableDiGraph, StableGraph},
 };
 use std::collections::HashMap;
 use tracing::instrument;
@@ -59,7 +59,7 @@ pub struct RustSqlMapping {
 ///
 /// Consumes a base mapping of types (typically `pgx::DEFAULT_TYPEID_SQL_MAPPING`), a
 /// [`ControlFile`], and collections of inventory types for each SQL entity.
-/// 
+///
 /// During construction, a Directed Acyclic Graph is formed out the dependencies. For example,
 /// an item `detect_dog(x: &[u8]) -> animals::Dog` would have have a relationship with
 /// `animals::Dog`.
@@ -69,7 +69,7 @@ pub struct RustSqlMapping {
 #[derive(Debug, Clone)]
 pub struct PgxSql<'a> {
     pub type_mappings: HashMap<TypeId, RustSqlMapping>,
-    pub control: ControlFile,
+    pub control: &'a ControlFile,
     pub graph: StableGraph<SqlGraphEntity<'a>, SqlGraphRelationship>,
     pub graph_root: NodeIndex,
     pub graph_bootstrap: Option<NodeIndex>,
@@ -87,7 +87,7 @@ pub struct PgxSql<'a> {
 /// An entity corresponding to some SQL required by the extension.
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub enum SqlGraphEntity<'a> {
-    ExtensionRoot(ControlFile),
+    ExtensionRoot(&'a ControlFile),
     Schema(&'a InventorySchema),
     CustomSql(&'a InventoryExtensionSql),
     Function(&'a InventoryPgExtern),
@@ -98,45 +98,21 @@ pub enum SqlGraphEntity<'a> {
     Hash(&'a InventoryPostgresHash),
 }
 
-impl<'a> From<&'a InventorySchema> for SqlGraphEntity<'a> {
-    fn from(item: &'a InventorySchema) -> Self {
-        SqlGraphEntity::Schema(&item)
-    }
-}
-
-impl<'a> From<&'a InventoryExtensionSql> for SqlGraphEntity<'a> {
-    fn from(item: &'a InventoryExtensionSql) -> Self {
-        SqlGraphEntity::CustomSql(&item)
-    }
-}
-
-impl<'a> From<&'a InventoryPgExtern> for SqlGraphEntity<'a> {
-    fn from(item: &'a InventoryPgExtern) -> Self {
-        SqlGraphEntity::Function(&item)
-    }
-}
-
-impl<'a> From<&'a InventoryPostgresType> for SqlGraphEntity<'a> {
-    fn from(item: &'a InventoryPostgresType) -> Self {
-        SqlGraphEntity::Type(&item)
-    }
-}
-
-impl<'a> From<&'a InventoryPostgresEnum> for SqlGraphEntity<'a> {
-    fn from(item: &'a InventoryPostgresEnum) -> Self {
-        SqlGraphEntity::Enum(&item)
-    }
-}
-
-impl<'a> From<&'a InventoryPostgresOrd> for SqlGraphEntity<'a> {
-    fn from(item: &'a InventoryPostgresOrd) -> Self {
-        SqlGraphEntity::Ord(&item)
-    }
-}
-
-impl<'a> From<&'a InventoryPostgresHash> for SqlGraphEntity<'a> {
-    fn from(item: &'a InventoryPostgresHash) -> Self {
-        SqlGraphEntity::Hash(&item)
+impl<'a> SqlGraphEntity<'a> {
+    fn dot_format(&self) -> String {
+        match self {
+            SqlGraphEntity::Schema(item) => format!("mod {}", item.module_path.to_string()),
+            SqlGraphEntity::CustomSql(item) => {
+                format!("sql {}", item.name.unwrap_or(item.full_path).to_string())
+            }
+            SqlGraphEntity::Function(item) => format!("fn {}", item.full_path.to_string(),),
+            SqlGraphEntity::Type(item) => format!("type {}", item.full_path.to_string()),
+            SqlGraphEntity::BuiltinType(item) => format!("internal type {}", item),
+            SqlGraphEntity::Enum(item) => format!("enum {}", item.full_path.to_string()),
+            SqlGraphEntity::Ord(item) => format!("ord {}", item.full_path.to_string()),
+            SqlGraphEntity::Hash(item) => format!("hash {}", item.full_path.to_string()),
+            SqlGraphEntity::ExtensionRoot(item) => format!("root {}", item.module_pathname.clone()),
+        }
     }
 }
 
@@ -145,22 +121,6 @@ pub enum SqlGraphRelationship {
     RequiredBy,
     RequiredByArg,
     RequiredByReturn,
-}
-
-impl<'a> SqlGraphEntity<'a> {
-    fn dot_format(&self) -> String {
-        match self {
-            SqlGraphEntity::Schema(item) => format!("mod {}", item.module_path.to_string()),
-            SqlGraphEntity::CustomSql(item) => format!("sql {}", item.name.unwrap_or(item.full_path).to_string()),
-            SqlGraphEntity::Function(item) => format!("fn {}", item.full_path.to_string(),),
-            SqlGraphEntity::Type(item) => format!("type {}", item.full_path.to_string()),
-            SqlGraphEntity::BuiltinType(item) => format!("internal type {}", item),
-            SqlGraphEntity::Enum(item) => format!("enum {}", item.full_path.to_string()),
-            SqlGraphEntity::Ord(item) => format!("ord {}", item.full_path.to_string()),
-            SqlGraphEntity::Hash(item) => format!("hash {}", item.full_path.to_string()),
-            SqlGraphEntity::ExtensionRoot(_control) => format!("ExtensionRoot"),
-        }
-    }
 }
 
 impl<'a> PgxSql<'a> {
@@ -179,7 +139,7 @@ impl<'a> PgxSql<'a> {
         )
     )]
     pub fn build(
-        control: ControlFile,
+        control: &'a ControlFile,
         type_mappings: impl Iterator<Item = (TypeId, RustSqlMapping)>,
         schemas: impl Iterator<Item = &'a InventorySchema>,
         extension_sqls: impl Iterator<Item = &'a InventoryExtensionSql>,
@@ -191,21 +151,24 @@ impl<'a> PgxSql<'a> {
     ) -> eyre::Result<Self> {
         let mut graph = StableGraph::new();
 
-        let root = graph.add_node(SqlGraphEntity::ExtensionRoot(control.clone()));
-        let mut bootstrap = None;
-        let mut finalize = None;
+        let root = graph.add_node(SqlGraphEntity::ExtensionRoot(control));
 
         // The initial build phase.
         //
         // Notably, we do not set non-root edges here. We do that in a second step. This is
         // primarily because externs, types, operators, and the like tend to intertwine. If we tried
         // to do it here, we'd find ourselves trying to create edges to non-existing entities.
+
+        // Both of these must be unique, so we can only hold one.
+        let mut bootstrap = None;
+        let mut finalize = None;
+
         let mut mapped_extension_sqls = HashMap::default();
         for item in extension_sqls {
             let index = graph.add_node(item.into());
             mapped_extension_sqls.insert(item, index);
             if item.bootstrap {
-                if bootstrap.is_some() {
+                if let Some(index) = bootstrap {
                     return Err(eyre_err!(
                         "Cannot have multiple `extension_sql!()` with `bootstrap` positioning."
                     ));
@@ -213,7 +176,7 @@ impl<'a> PgxSql<'a> {
                 bootstrap = Some(index)
             }
             if item.finalize {
-                if finalize.is_some() {
+                if let Some(index) = finalize {
                     return Err(eyre_err!(
                         "Cannot have multiple `extension_sql!()` with `finalize` positioning."
                     ));
@@ -382,7 +345,7 @@ impl<'a> PgxSql<'a> {
 
         let mut this = Self {
             type_mappings: type_mappings.collect(),
-            control,
+            control: &control,
             schemas: mapped_schemas,
             extension_sqls: mapped_extension_sqls,
             externs: mapped_externs,
@@ -671,26 +634,19 @@ impl<'a> PgxSql<'a> {
             for (ty_item, &ty_index) in &this.types {
                 if ty_item.id_matches(&item.id) {
                     tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Ord after Type edge.");
-                    this.graph.add_edge(
-                        ty_index,
-                        index,
-                        SqlGraphRelationship::RequiredBy,
-                    );
+                    this.graph
+                        .add_edge(ty_index, index, SqlGraphRelationship::RequiredBy);
                     break;
                 }
             }
             for (ty_item, &ty_index) in &this.enums {
                 if ty_item.id_matches(&item.id) {
                     tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Ord after Enum edge.");
-                    this.graph.add_edge(
-                        ty_index,
-                        index,
-                        SqlGraphRelationship::RequiredBy,
-                    );
+                    this.graph
+                        .add_edge(ty_index, index, SqlGraphRelationship::RequiredBy);
                     break;
                 }
             }
-            
         }
         for (item, &index) in &this.hashes {
             for (schema_item, &schema_index) in &this.schemas {
@@ -704,22 +660,16 @@ impl<'a> PgxSql<'a> {
             for (ty_item, &ty_index) in &this.types {
                 if ty_item.id_matches(&item.id) {
                     tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Hash after Type edge.");
-                    this.graph.add_edge(
-                        ty_index,
-                        index,
-                        SqlGraphRelationship::RequiredBy,
-                    );
+                    this.graph
+                        .add_edge(ty_index, index, SqlGraphRelationship::RequiredBy);
                     break;
                 }
             }
             for (ty_item, &ty_index) in &this.enums {
                 if ty_item.id_matches(&item.id) {
                     tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Hash after Enum edge.");
-                    this.graph.add_edge(
-                        ty_index,
-                        index,
-                        SqlGraphRelationship::RequiredBy,
-                    );
+                    this.graph
+                        .add_edge(ty_index, index, SqlGraphRelationship::RequiredBy);
                     break;
                 }
             }

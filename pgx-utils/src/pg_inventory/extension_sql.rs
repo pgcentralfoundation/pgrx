@@ -6,6 +6,8 @@ use syn::{
     LitStr, Token,
 };
 
+use super::SqlGraphEntity;
+
 #[derive(Debug, Clone)]
 pub struct ExtensionSqlFile {
     pub path: LitStr,
@@ -244,6 +246,12 @@ pub struct InventoryExtensionSql {
 impl InventoryExtensionSql {
     pub fn identifier(&self) -> &str {
         self.name.unwrap_or(self.full_path)
+    }
+}
+
+impl<'a> Into<SqlGraphEntity<'a>> for &'a InventoryExtensionSql {
+    fn into(self) -> SqlGraphEntity<'a> {
+        SqlGraphEntity::CustomSql(self)
     }
 }
 
