@@ -150,8 +150,8 @@ pub enum PgMemoryContexts {
     /// **absolutely** crash Postgres
     Of(void_ptr),
 
-    /// Create a temporary MemoryContext for use with [::switch_to()].  It gets deleted as soon
-    /// as [::switch_to()] exits.
+    /// Create a temporary MemoryContext for use with `::switch_to()`.  It gets deleted as soon
+    /// as `::switch_to()` exits.
     ///
     /// Trying to use this context through [::value{}] will result in a panic!().
     Transient {

@@ -192,11 +192,16 @@ pub static DEFAULT_TYPEID_SQL_MAPPING: Lazy<HashMap<TypeId, RustSqlMapping>> = L
     m
 });
 
-/// A macro for marking a library compatible with the Postgres extension framework.
+/// A macro for marking a library compatible with [`pgx`][crate].
+/// 
+/// <div class="example-wrap" style="display:inline-block">
+/// <pre class="ignore" style="white-space:normal;font:inherit;">
 ///
-/// This macro was initially inspired from the `pg_module` macro in https://github.com/thehydroimpulse/postgres-extension.rs
+/// **Note**: Every [`pgx`][crate] extension **must** have this macro called at top level (usually `src/lib.rs`) to be valid.
 ///
-/// Shamelessly cribbed from https://github.com/bluejekyll/pg-extend-rs
+/// </pre></div>
+///
+/// This calls both [`pg_magic_func!()`](pg_magic_func) and [`pg_inventory_magic!()`](pg_inventory_magic).
 #[macro_export]
 macro_rules! pg_module_magic {
     () => {
@@ -206,6 +211,19 @@ macro_rules! pg_module_magic {
     };
 }
 
+/// Create the `Pg_magic_func` required by PGX in extensions.
+///
+/// <div class="example-wrap" style="display:inline-block">
+/// <pre class="ignore" style="white-space:normal;font:inherit;">
+///
+/// **Note**: Using [`pg_module_magic!()`](pg_module_magic) results in this macro being called.
+/// Generally this macro should only be directly called in advanced use cases.
+///
+/// </pre></div>
+///
+/// This macro was initially inspired from the `pg_module` macro in [`thehydroimpulse/postgres-extension.rs`](https://github.com/thehydroimpulse/postgres-extension.rs)
+///
+/// Shamelessly cribbed from [`bluejekyll/pg-extend-rs`](https://github.com/bluejekyll/pg-extend-rs).
 #[macro_export]
 macro_rules! pg_magic_func {
     () => {
@@ -249,13 +267,40 @@ macro_rules! pg_magic_func {
     }
 }
 
+/// Create neccessary extension-local internal types for use with SQL generation.
+///
+/// <div class="example-wrap" style="display:inline-block">
+/// <pre class="ignore" style="white-space:normal;font:inherit;">
+///
+/// **Note**: Using [`pg_module_magic`] results in this macro being called.
+/// Generally this macro should only be directly called in advanced use cases.
+///
+/// </pre></div>
 #[macro_export]
 macro_rules! pg_inventory_magic {
     () => {
+        /// A module containing [`pgx`] internals.
+        ///
+        /// This is created by [`macro@pgx::pg_module_magic`] (or, in rare cases,
+        /// [`macro@pgx::pg_inventory_magic`].)
+        ///
+        /// Most often, these are used by the [`macro@pgx::pg_binary_magic`] inside a
+        /// `src/bin/sql-generator.rs`.
+        ///
+        /// <div class="example-wrap" style="display:inline-block">
+        /// <pre class="ignore" style="white-space:normal;font:inherit;">
+        ///
+        /// **Note**: These should be considered [`pgx`] **internals**, they may
+        /// change between versions without warning or documentation. While you 
+        /// *may* use them, you are signing up for pain later. Please, open an
+        /// issue about what you need instead.
+        ///
+        /// </pre></div>
         pub mod __pgx_internals {
             use ::core::convert::TryFrom;
             use ::pgx_utils::pg_inventory::*;
 
+            /// The contents of the `*.control` file of the crate.
             static CONTROL_FILE: &str = include_str!(concat!(
                 env!("CARGO_MANIFEST_DIR"),
                 "/",
@@ -263,34 +308,63 @@ macro_rules! pg_inventory_magic {
                 ".control"
             ));
 
+            /// A wrapper type used by [`pgx::extension_sql`] and [`pgx::extension_sql_file`].
+            ///
+            /// Required inside the extension so that we can use [`inventory`] and collect the 
+            /// [`pgx_utils::pg_inventory::InventoryExtensionSql`] used in SQL generation.
             #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
             pub struct ExtensionSql(pub pgx_utils::pg_inventory::InventoryExtensionSql);
             inventory::collect!(ExtensionSql);
 
+            /// A wrapper type used by [`#[derive(PostgresType)]`](derive@pgx::PostgresType).
+            ///
+            /// Required inside the extension so that we can use [`inventory`] and collect the 
+            /// [`pgx_utils::pg_inventory::InventoryPostgresType`] used in SQL generation.
             #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
             pub struct PostgresType(pub pgx_utils::pg_inventory::InventoryPostgresType);
             inventory::collect!(PostgresType);
 
+            /// A wrapper type used by [`#[pg_extern]`](pgx::pg_extern).
+            ///
+            /// Required inside the extension so that we can use [`inventory`] and collect the 
+            /// [`pgx_utils::pg_inventory::InventoryPgExtern`] used in SQL generation.
             #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
             pub struct PgExtern(pub pgx_utils::pg_inventory::InventoryPgExtern);
             inventory::collect!(PgExtern);
 
+            /// A wrapper type used by [`#[derive(PostgresEnum)]`](derive@pgx::PostgresEnum).
+            ///
+            /// Required inside the extension so that we can use [`inventory`] and collect the 
+            /// [`pgx_utils::pg_inventory::InventoryPostgresEnum`] used in SQL generation.
             #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
             pub struct PostgresEnum(pub pgx_utils::pg_inventory::InventoryPostgresEnum);
             inventory::collect!(PostgresEnum);
 
+            /// A wrapper type used by [`#[derive(PostgresHash)]`](derive@pgx::PostgresHash).
+            ///
+            /// Required inside the extension so that we can use [`inventory`] and collect the 
+            /// [`pgx_utils::pg_inventory::InventoryPostgresHash`] used in SQL generation.
             #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
             pub struct PostgresHash(pub pgx_utils::pg_inventory::InventoryPostgresHash);
             inventory::collect!(PostgresHash);
 
+            /// A wrapper type used by [`#[derive(PostgresOrd)]`](derive@pgx::PostgresOrd).
+            ///
+            /// Required inside the extension so that we can use [`inventory`] and collect the 
+            /// [`pgx_utils::pg_inventory::InventoryPostgresOrd`] used in SQL generation.
             #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
             pub struct PostgresOrd(pub pgx_utils::pg_inventory::InventoryPostgresOrd);
             inventory::collect!(PostgresOrd);
 
+            /// A wrapper type used by [`#[pg_schema]`](pgx::pg_schema).
+            ///
+            /// Required inside the extension so that we can use [`inventory`] and collect the 
+            /// [`pgx_utils::pg_inventory::InventorySchema`] used in SQL generation.
             #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
             pub struct Schema(pub pgx_utils::pg_inventory::InventorySchema);
             inventory::collect!(Schema);
 
+            /// Build the SQL generator using the inventories of the wrappers in this module.
             pub fn generate_sql<'a>() -> pgx_utils::pg_inventory::eyre::Result<PgxSql<'a>> {
                 let generated = PgxSql::build(
                     ControlFile::try_from(CONTROL_FILE)?,

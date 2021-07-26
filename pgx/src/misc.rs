@@ -1,10 +1,10 @@
 use std::hash::{Hash, Hasher};
 
-/// wrapper around `SeaHasher` from (https://crates.io/crates/seahash)
+/// wrapper around `SeaHasher` from [Seahash](https://crates.io/crates/seahash)
 ///
 /// Primarily used by `pgx`'s `#[derive(PostgresHash)]` macro.
 pub fn pgx_seahash<T: Hash>(value: &T) -> u64 {
-    // taken from sources of "SeaHasher, v4.0.1" (https://crates.io/crates/seahash)
+    // taken from sources of "SeaHasher, v4.0.1" [Seahash](https://crates.io/crates/seahash)
     // assuming the underlying implementation doesn't change, we
     // also want to ensure however we seed it doesn't change either
     //

@@ -211,7 +211,7 @@ pub fn extension_sql_file(input: TokenStream) -> TokenStream {
     }
 }
 
-/// Associated macro for `#[pg_extern] or `#[pg_operator]`.  Used to set the `SEARCH_PATH` option
+/// Associated macro for `#[pg_extern] or `#[macro@pg_operator]`.  Used to set the `SEARCH_PATH` option
 /// on the `CREATE FUNCTION` statement.
 #[proc_macro_attribute]
 pub fn search_path(_attr: TokenStream, item: TokenStream) -> TokenStream {

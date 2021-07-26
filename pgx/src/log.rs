@@ -37,8 +37,8 @@ pub enum PgLogLevel {
     /// Helpful messages to users about query operation; sent to client and not to server log by default.
     NOTICE = crate::pg_sys::NOTICE as isize,
 
-    /// Warnings.  [NOTICE] is for expected messages like implicit sequence creation by SERIAL.
-    /// [WARNING] is for unexpected messages.
+    /// Warnings.  \[NOTICE\] is for expected messages like implicit sequence creation by SERIAL.
+    /// \[WARNING\] is for unexpected messages.
     WARNING = crate::pg_sys::WARNING as isize,
 
     /// user error - abort transaction; return to known state
