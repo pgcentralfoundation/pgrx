@@ -134,39 +134,20 @@ impl<'a> PgxSql<'a> {
         for item in enums {
             let index = graph.add_node(item.into());
             mapped_enums.insert(item, index);
-            graph.add_edge(root, index, SqlGraphRelationship::RequiredBy);
-            if let Some(bootstrap) = bootstrap {
-                graph.add_edge(bootstrap, index, SqlGraphRelationship::RequiredBy);
-            }
-            if let Some(finalize) = finalize {
-                graph.add_edge(index, finalize, SqlGraphRelationship::RequiredBy);
-            }
+            build_base_edges(&mut graph, index, root, bootstrap, finalize);
         }
         let mut mapped_types = HashMap::default();
         for item in types {
             let index = graph.add_node(item.into());
             mapped_types.insert(item, index);
-            graph.add_edge(root, index, SqlGraphRelationship::RequiredBy);
-            if let Some(bootstrap) = bootstrap {
-                graph.add_edge(bootstrap, index, SqlGraphRelationship::RequiredBy);
-            }
-            if let Some(finalize) = finalize {
-                graph.add_edge(index, finalize, SqlGraphRelationship::RequiredBy);
-            }
+            build_base_edges(&mut graph, index, root, bootstrap, finalize);
         }
         let mut mapped_externs = HashMap::default();
         let mut mapped_builtin_types = HashMap::default();
         for item in externs {
             let index = graph.add_node(item.into());
-            graph.add_edge(root, index, SqlGraphRelationship::RequiredBy);
-            if let Some(bootstrap) = bootstrap {
-                graph.add_edge(bootstrap, index, SqlGraphRelationship::RequiredBy);
-            }
-            if let Some(finalize) = finalize {
-                graph.add_edge(index, finalize, SqlGraphRelationship::RequiredBy);
-            }
-
             mapped_externs.insert(item, index);
+            build_base_edges(&mut graph, index, root, bootstrap, finalize);
 
             for arg in &item.fn_args {
                 let mut found = false;
@@ -244,25 +225,13 @@ impl<'a> PgxSql<'a> {
         for item in ords {
             let index = graph.add_node(item.into());
             mapped_ords.insert(item, index);
-            graph.add_edge(root, index, SqlGraphRelationship::RequiredBy);
-            if let Some(bootstrap) = bootstrap {
-                graph.add_edge(bootstrap, index, SqlGraphRelationship::RequiredBy);
-            }
-            if let Some(finalize) = finalize {
-                graph.add_edge(index, finalize, SqlGraphRelationship::RequiredBy);
-            }
+            build_base_edges(&mut graph, index, root, bootstrap, finalize);
         }
         let mut mapped_hashes = HashMap::default();
         for item in hashes {
             let index = graph.add_node(item.into());
             mapped_hashes.insert(item, index);
-            graph.add_edge(root, index, SqlGraphRelationship::RequiredBy);
-            if let Some(bootstrap) = bootstrap {
-                graph.add_edge(bootstrap, index, SqlGraphRelationship::RequiredBy);
-            }
-            if let Some(finalize) = finalize {
-                graph.add_edge(index, finalize, SqlGraphRelationship::RequiredBy);
-            }
+            build_base_edges(&mut graph, index, root, bootstrap, finalize);
         }
 
 
@@ -771,3 +740,12 @@ impl<'a> PgxSql<'a> {
     }
 }
 
+fn build_base_edges(graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>, index: NodeIndex, root: NodeIndex, bootstrap: Option<NodeIndex>, finalize: Option<NodeIndex>) {
+    graph.add_edge(root, index, SqlGraphRelationship::RequiredBy);
+    if let Some(bootstrap) = bootstrap {
+        graph.add_edge(bootstrap, index, SqlGraphRelationship::RequiredBy);
+    }
+    if let Some(finalize) = finalize {
+        graph.add_edge(index, finalize, SqlGraphRelationship::RequiredBy);
+    }
+}
