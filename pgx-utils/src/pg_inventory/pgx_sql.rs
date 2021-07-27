@@ -61,7 +61,7 @@ impl<'a> PgxSql<'a> {
     )]
     pub fn build(
         control: &'a ControlFile,
-        type_mappings: impl Iterator<Item = (TypeId, RustSqlMapping)>,
+        type_mappings: impl Iterator<Item = RustSqlMapping>,
         schemas: impl Iterator<Item = &'a InventorySchema>,
         extension_sqls: impl Iterator<Item = &'a InventoryExtensionSql>,
         externs: impl Iterator<Item = &'a InventoryPgExtern>,
@@ -549,7 +549,7 @@ impl<'a> PgxSql<'a> {
         }
 
         let mut this = Self {
-            type_mappings: type_mappings.collect(),
+            type_mappings: type_mappings.map(|x| (x.id, x)).collect(),
             control: &control,
             schemas: mapped_schemas,
             extension_sqls: mapped_extension_sqls,
