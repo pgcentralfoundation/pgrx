@@ -13,6 +13,7 @@ pub use control_file::{ControlFile, ControlFileError};
 pub use extension_sql::{
     ExtensionSql, ExtensionSqlFile, InventoryExtensionSql, InventoryExtensionSqlPositioningRef,
 };
+use petgraph::{graph::NodeIndex, stable_graph::StableGraph};
 pub use pg_extern::{
     InventoryPgExtern, InventoryPgExternInput, InventoryPgExternReturn, InventoryPgOperator,
     PgExtern,
@@ -42,6 +43,8 @@ pub use tracing_error;
 pub use tracing_subscriber;
 
 use core::{any::TypeId, fmt::Debug};
+
+use self::pgx_sql::SqlGraphRelationship;
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct RustSqlMapping {

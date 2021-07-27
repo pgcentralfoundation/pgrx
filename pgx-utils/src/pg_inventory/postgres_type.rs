@@ -1,10 +1,11 @@
+use petgraph::{graph::NodeIndex, stable_graph::StableGraph};
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
 use std::hash::{Hash, Hasher};
 use syn::Generics;
 use eyre::eyre as eyre_err;
 
-use super::{DotIdentifier, SqlGraphEntity, ToSql};
+use super::{DotIdentifier, PgxSql, SqlGraphEntity, ToSql, pgx_sql::SqlGraphRelationship};
 
 #[derive(Debug, Clone)]
 pub struct PostgresType {
@@ -256,4 +257,3 @@ impl ToSql for InventoryPostgresType {
         Ok(shell_type + &in_fn_sql + &out_fn_sql + &materialized_type)
     }
 }
-
