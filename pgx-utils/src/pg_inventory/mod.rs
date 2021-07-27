@@ -50,10 +50,20 @@ pub struct RustSqlMapping {
     pub id: TypeId,
 }
 
-pub trait DotFormat {
-    fn dot_format(&self) -> String;
+/// Able to produce a GraphViz DOT format identifier.
+pub trait DotIdentifier {
+    /// An identifier for the entity.
+    ///
+    /// Typically this is the result of [`std::module_path`], [`core::any::type_name`],
+    /// or some combination of [`std::file`] and [`std::line`].
+    fn dot_identifier(&self) -> String;
 }
 
+/// Able to be transformed into to SQL.
 pub trait ToSql {
+    /// Attempt to transform this type into SQL.
+    ///
+    /// Some entities require additional context from a [`PgxSql`], such as
+    /// `#[derive(PostgresType)]` which must include it's relevant in/out functions.
     fn to_sql(&self, context: &PgxSql) -> eyre::Result<String>;
 }

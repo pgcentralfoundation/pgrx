@@ -1,4 +1,4 @@
-use super::{DotFormat, SqlGraphEntity, ToSql};
+use super::{DotIdentifier, SqlGraphEntity, ToSql};
 use proc_macro2::TokenStream as TokenStream2;
 use quote::{quote, ToTokens, TokenStreamExt};
 use syn::{
@@ -72,8 +72,8 @@ impl<'a> Into<SqlGraphEntity<'a>> for &'a InventorySchema {
     }
 }
 
-impl DotFormat for InventorySchema {
-    fn dot_format(&self) -> String {
+impl DotIdentifier for InventorySchema {
+    fn dot_identifier(&self) -> String {
         format!("schema {}", self.module_path.to_string())
     }
 }

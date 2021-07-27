@@ -5,7 +5,7 @@ use quote::{quote, ToTokens, TokenStreamExt};
 use syn::Generics;
 use syn::{punctuated::Punctuated, Ident, Token};
 
-use super::{DotFormat, SqlGraphEntity, ToSql};
+use super::{DotIdentifier, SqlGraphEntity, ToSql};
 
 #[derive(Debug, Clone)]
 pub struct PostgresEnum {
@@ -107,8 +107,8 @@ impl<'a> Into<SqlGraphEntity<'a>> for &'a InventoryPostgresEnum {
     }
 }
 
-impl DotFormat for InventoryPostgresEnum {
-    fn dot_format(&self) -> String {
+impl DotIdentifier for InventoryPostgresEnum {
+    fn dot_identifier(&self) -> String {
         format!("enum {}", self.full_path.to_string())
     }
 }

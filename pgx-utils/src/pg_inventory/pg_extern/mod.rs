@@ -24,7 +24,7 @@ pub use returning::InventoryPgExternReturn;
 
 use crate::ExternArgs;
 
-use super::{DotFormat, SqlGraphEntity, ToSql};
+use super::{DotIdentifier, SqlGraphEntity, ToSql};
 
 #[derive(Debug, Clone)]
 pub struct PgExtern {
@@ -258,8 +258,8 @@ impl<'a> Into<SqlGraphEntity<'a>> for &'a InventoryPgExtern {
     }
 }
 
-impl DotFormat for InventoryPgExtern {
-    fn dot_format(&self) -> String {
+impl DotIdentifier for InventoryPgExtern {
+    fn dot_identifier(&self) -> String {
         format!("fn {}", self.full_path.to_string())
     }
 }

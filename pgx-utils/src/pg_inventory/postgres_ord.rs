@@ -2,7 +2,7 @@ use proc_macro2::TokenStream as TokenStream2;
 use quote::{quote, ToTokens, TokenStreamExt};
 use syn::Ident;
 
-use super::{DotFormat, SqlGraphEntity, ToSql};
+use super::{DotIdentifier, SqlGraphEntity, ToSql};
 
 #[derive(Debug, Clone)]
 pub struct PostgresOrd {
@@ -51,8 +51,8 @@ impl<'a> Into<SqlGraphEntity<'a>> for &'a InventoryPostgresOrd {
     }
 }
 
-impl DotFormat for InventoryPostgresOrd {
-    fn dot_format(&self) -> String {
+impl DotIdentifier for InventoryPostgresOrd {
+    fn dot_identifier(&self) -> String {
         format!("ord {}", self.full_path.to_string())
     }
 }

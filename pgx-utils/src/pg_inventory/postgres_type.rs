@@ -4,7 +4,7 @@ use std::hash::{Hash, Hasher};
 use syn::Generics;
 use eyre::eyre as eyre_err;
 
-use super::{DotFormat, SqlGraphEntity, ToSql};
+use super::{DotIdentifier, SqlGraphEntity, ToSql};
 
 #[derive(Debug, Clone)]
 pub struct PostgresType {
@@ -121,8 +121,8 @@ impl<'a> Into<SqlGraphEntity<'a>> for &'a InventoryPostgresType {
     }
 }
 
-impl DotFormat for InventoryPostgresType {
-    fn dot_format(&self) -> String {
+impl DotIdentifier for InventoryPostgresType {
+    fn dot_identifier(&self) -> String {
         format!("type {}", self.full_path.to_string())
     }
 }

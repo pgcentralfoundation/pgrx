@@ -1,4 +1,4 @@
-use super::{ControlFile, DotFormat, InventoryExtensionSql, InventoryPgExtern, InventoryPostgresEnum, InventoryPostgresHash, InventoryPostgresOrd, InventoryPostgresType, InventorySchema, ToSql};
+use super::{ControlFile, DotIdentifier, InventoryExtensionSql, InventoryPgExtern, InventoryPostgresEnum, InventoryPostgresHash, InventoryPostgresOrd, InventoryPostgresType, InventorySchema, ToSql};
 
 /// An entity corresponding to some SQL required by the extension.
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
@@ -17,15 +17,15 @@ pub enum SqlGraphEntity<'a> {
 impl<'a> SqlGraphEntity<'a> {
     pub fn dot_format(&self) -> String {
         match self {
-            SqlGraphEntity::Schema(item) => item.dot_format(),
-            SqlGraphEntity::CustomSql(item) => item.dot_format(),
-            SqlGraphEntity::Function(item) => item.dot_format(),
-            SqlGraphEntity::Type(item) => item.dot_format(),
+            SqlGraphEntity::Schema(item) => item.dot_identifier(),
+            SqlGraphEntity::CustomSql(item) => item.dot_identifier(),
+            SqlGraphEntity::Function(item) => item.dot_identifier(),
+            SqlGraphEntity::Type(item) => item.dot_identifier(),
             SqlGraphEntity::BuiltinType(item) => format!("preexisting type {}", item),
-            SqlGraphEntity::Enum(item) => item.dot_format(),
-            SqlGraphEntity::Ord(item) => item.dot_format(),
-            SqlGraphEntity::Hash(item) => item.dot_format(),
-            SqlGraphEntity::ExtensionRoot(item) => item.dot_format(),
+            SqlGraphEntity::Enum(item) => item.dot_identifier(),
+            SqlGraphEntity::Ord(item) => item.dot_identifier(),
+            SqlGraphEntity::Hash(item) => item.dot_identifier(),
+            SqlGraphEntity::ExtensionRoot(item) => item.dot_identifier(),
         }
     }
 }
