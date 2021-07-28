@@ -63,7 +63,6 @@ impl ToSql for InventoryPostgresHash {
         let sql = format!("\n\
                             -- {file}:{line}\n\
                             -- {full_path}\n\
-                            -- {id:?}\n\
                             CREATE OPERATOR FAMILY {name}_hash_ops USING hash;\n\
                             CREATE OPERATOR CLASS {name}_hash_ops DEFAULT FOR TYPE {name} USING hash FAMILY {name}_hash_ops AS\n\
                                 \tOPERATOR    1   =  ({name}, {name}),\n\
@@ -73,7 +72,6 @@ impl ToSql for InventoryPostgresHash {
                           full_path = self.full_path,
                           file = self.file,
                           line = self.line,
-                          id = self.id,
         );
         tracing::debug!(%sql);
         Ok(sql)

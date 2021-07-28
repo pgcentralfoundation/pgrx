@@ -30,22 +30,30 @@ impl ToTokens for Schema {
             .content
             .as_ref()
             .expect("Can only support `mod {}` right now.");
+        let found_skip_inventory = self.module.attrs.iter().any(|x| {
+            x.path
+                .get_ident()
+                .map(|x| x.to_string() == "skip_inventory")
+                .unwrap_or(false)
+        }); 
 
         let mut updated_content = content_items.clone();
-        updated_content.push(syn::parse_quote! {
-            use pgx_utils::pg_inventory::inventory;
-        });
-        updated_content.push(syn::parse_quote! {
-            pgx_utils::pg_inventory::inventory::submit! {
-                crate::__pgx_internals::Schema(pgx_utils::pg_inventory::InventorySchema {
-                    module_path: module_path!(),
-                    name: stringify!(#ident),
-                    file: file!(),
-                    line: line!(),
-                })
-            }
-        });
-
+        if !found_skip_inventory {
+            updated_content.push(syn::parse_quote! {
+                use pgx_utils::pg_inventory::inventory;
+            });
+            updated_content.push(syn::parse_quote! {
+                pgx_utils::pg_inventory::inventory::submit! {
+                    crate::__pgx_internals::Schema(pgx_utils::pg_inventory::InventorySchema {
+                        module_path: module_path!(),
+                        name: stringify!(#ident),
+                        file: file!(),
+                        line: line!(),
+                    })
+                }
+            });
+    
+        }
         let _semi = &self.module.semi;
 
         let inv = quote! {

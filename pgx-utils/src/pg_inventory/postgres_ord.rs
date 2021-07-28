@@ -63,7 +63,6 @@ impl ToSql for InventoryPostgresOrd {
         let sql = format!("\n\
                             -- {file}:{line}\n\
                             -- {full_path}\n\
-                            -- {id:?}\n\
                             CREATE OPERATOR FAMILY {name}_btree_ops USING btree;\n\
                             CREATE OPERATOR CLASS {name}_btree_ops DEFAULT FOR TYPE {name} USING btree FAMILY {name}_btree_ops AS\n\
                                   \tOPERATOR 1 <,\n\
@@ -77,7 +76,6 @@ impl ToSql for InventoryPostgresOrd {
                           full_path = self.full_path,
                           file = self.file,
                           line = self.line,
-                          id = self.id,
         );
         tracing::debug!(%sql);
         Ok(sql)

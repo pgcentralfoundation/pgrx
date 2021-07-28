@@ -303,7 +303,7 @@ pub fn extension_sql_file(input: TokenStream) -> TokenStream {
     }
 }
 
-/// Associated macro for `#[pg_extern] or `#[macro@pg_operator]`.  Used to set the `SEARCH_PATH` option
+/// Associated macro for `#[pg_extern]` or `#[macro@pg_operator]`.  Used to set the `SEARCH_PATH` option
 /// on the `CREATE FUNCTION` statement.
 #[proc_macro_attribute]
 pub fn search_path(_attr: TokenStream, item: TokenStream) -> TokenStream {
@@ -708,18 +708,34 @@ fn parse_postgres_type_args(attributes: &[Attribute]) -> HashSet<PostgresTypeAtt
     categorized_attributes
 }
 
+/// Generate necessary code using the type in operators like `==` and `!=`.
+///
+/// Optionally accepts the following attributes:
+/// * `skip_inventory`: Skip SQL generator inventory submission. **Use always (and only) in Doctests!**
+///
 #[proc_macro_derive(PostgresEq)]
 pub fn postgres_eq(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
     impl_postgres_eq(ast).into()
 }
 
+
+/// Generate necessary code using the type in operators like `>`, `<`, `<=`, and `>=`.
+///
+/// Optionally accepts the following attributes:
+/// * `skip_inventory`: Skip SQL generator inventory submission. **Use always (and only) in Doctests!**
+///
 #[proc_macro_derive(PostgresOrd)]
 pub fn postgres_ord(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
     impl_postgres_ord(ast).into()
 }
 
+/// Generate necessary code for stable hashing the type so it can be used with `USING hash` indexes.
+///
+/// Optionally accepts the following attributes:
+/// * `skip_inventory`: Skip SQL generator inventory submission. **Use always (and only) in Doctests!**
+///
 #[proc_macro_derive(PostgresHash)]
 pub fn postgres_hash(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
