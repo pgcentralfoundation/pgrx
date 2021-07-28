@@ -700,9 +700,9 @@ impl<'a> PgxSql<'a> {
     #[instrument(level = "debug", skip(self))]
     pub fn register_types(&mut self) {
         for (item, _index) in self.enums.clone() {
-            for (rust_id, mapping) in &item.mappings {
+            for mapping in &item.mappings {
                 assert_eq!(
-                    self.type_mappings.insert(*rust_id, mapping.clone()),
+                    self.type_mappings.insert(mapping.id, mapping.clone()),
                     None,
                     "Cannot map `{}` twice.",
                     item.full_path,
@@ -710,9 +710,9 @@ impl<'a> PgxSql<'a> {
             }
         }
         for (item, _index) in self.types.clone() {
-            for (rust_id, mapping) in &item.mappings {
+            for mapping in &item.mappings {
                 assert_eq!(
-                    self.type_mappings.insert(*rust_id, mapping.clone()),
+                    self.type_mappings.insert(mapping.id, mapping.clone()),
                     None,
                     "Cannot map `{}` twice.",
                     item.full_path,

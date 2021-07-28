@@ -1,11 +1,10 @@
-use petgraph::{graph::NodeIndex, stable_graph::StableGraph};
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
 use std::hash::{Hash, Hasher};
 use syn::Generics;
 use eyre::eyre as eyre_err;
 
-use super::{DotIdentifier, PgxSql, SqlGraphEntity, ToSql, pgx_sql::SqlGraphRelationship};
+use super::{DotIdentifier, SqlGraphEntity, ToSql};
 
 #[derive(Debug, Clone)]
 pub struct PostgresType {
@@ -39,7 +38,7 @@ impl ToTokens for PostgresType {
         let out_fn = &self.out_fn;
         let inv = quote! {
             pgx_utils::pg_inventory::inventory::submit! {
-                let mut mappings = std::collections::HashMap::default();
+                let mut mappings = Default::default();
                 <#name #ty_generics as ::pgx::datum::WithTypeIds>::register_with_refs(&mut mappings, stringify!(#name).to_string());
                 ::pgx::datum::WithSizedTypeIds::<#name #ty_generics>::register_sized_with_refs(&mut mappings, stringify!(#name).to_string());
                 ::pgx::datum::WithArrayTypeIds::<#name #ty_generics>::register_array_with_refs(&mut mappings, stringify!(#name).to_string());
@@ -83,7 +82,7 @@ pub struct InventoryPostgresType {
     pub full_path: &'static str,
     pub module_path: &'static str,
     pub id: core::any::TypeId,
-    pub mappings: std::collections::HashMap<core::any::TypeId, super::RustSqlMapping>,
+    pub mappings: std::collections::HashSet<super::RustSqlMapping>,
     pub in_fn: &'static str,
     pub in_fn_module_path: String,
     pub out_fn: &'static str,
@@ -112,7 +111,7 @@ impl InventoryPostgresType {
     pub fn id_matches(&self, candidate: &core::any::TypeId) -> bool {
         self.mappings
             .iter()
-            .any(|(tester, _)| *candidate == *tester)
+            .any(|tester| *candidate == tester.id)
     }
 }
 

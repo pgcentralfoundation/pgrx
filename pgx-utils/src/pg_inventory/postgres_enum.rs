@@ -41,7 +41,7 @@ impl ToTokens for PostgresEnum {
         let variants = self.variants.iter();
         let inv = quote! {
             pgx_utils::pg_inventory::inventory::submit! {
-                let mut mappings = std::collections::HashMap::default();
+                let mut mappings = Default::default();
                 <#name #ty_generics as ::pgx::datum::WithTypeIds>::register_with_refs(&mut mappings, stringify!(#name).to_string());
                 ::pgx::datum::WithSizedTypeIds::<#name #ty_generics>::register_sized_with_refs(&mut mappings, stringify!(#name).to_string());
                 ::pgx::datum::WithArrayTypeIds::<#name #ty_generics>::register_array_with_refs(&mut mappings, stringify!(#name).to_string());
@@ -71,7 +71,7 @@ pub struct InventoryPostgresEnum {
     pub full_path: &'static str,
     pub module_path: &'static str,
     pub id: core::any::TypeId,
-    pub mappings: std::collections::HashMap<core::any::TypeId, super::RustSqlMapping>,
+    pub mappings: std::collections::HashSet<super::RustSqlMapping>,
     pub variants: Vec<&'static str>,
 }
 
@@ -97,7 +97,7 @@ impl InventoryPostgresEnum {
     pub fn id_matches(&self, candidate: &core::any::TypeId) -> bool {
         self.mappings
             .iter()
-            .any(|(tester, _)| *candidate == *tester)
+            .any(|tester| *candidate == tester.id)
     }
 }
 

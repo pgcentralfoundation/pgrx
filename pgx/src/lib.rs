@@ -98,7 +98,7 @@ pub use pgx_pg_sys::PgBuiltInOids; // reexport this so it looks like it comes fr
 use core::any::TypeId;
 use once_cell::sync::Lazy;
 use pgx_utils::pg_inventory::RustSqlMapping;
-use std::collections::HashMap;
+use std::collections::HashSet;
 
 /// Top-level initialization function.  This is called automatically by the `pg_module_magic!()`
 /// macro and need not be called directly
@@ -120,8 +120,8 @@ macro_rules! map_type {
 ///
 /// This only contains types known to [`pgx`](crate), so it will not include types defined by things
 /// like [`derive@PostgresType`] in the local extension.
-pub static DEFAULT_TYPEID_SQL_MAPPING: Lazy<HashMap<TypeId, RustSqlMapping>> = Lazy::new(|| {
-    let mut m = HashMap::new();
+pub static DEFAULT_TYPEID_SQL_MAPPING: Lazy<HashSet<RustSqlMapping>> = Lazy::new(|| {
+    let mut m = HashSet::new();
 
     // `str` isn't sized, so we can't lean on the macro.
     <str as WithTypeIds>::register(&mut m, "text".to_string());
@@ -129,7 +129,6 @@ pub static DEFAULT_TYPEID_SQL_MAPPING: Lazy<HashMap<TypeId, RustSqlMapping>> = L
 
     // Bytea is a special case, notice how it has no `bytea[]`.
     m.insert(
-        TypeId::of::<&[u8]>(),
         RustSqlMapping {
             sql: String::from("bytea"),
             id: TypeId::of::<&[u8]>(),
@@ -137,7 +136,6 @@ pub static DEFAULT_TYPEID_SQL_MAPPING: Lazy<HashMap<TypeId, RustSqlMapping>> = L
         },
     );
     m.insert(
-        TypeId::of::<Option<&[u8]>>(),
         RustSqlMapping {
             sql: String::from("bytea"),
             id: TypeId::of::<Option<&[u8]>>(),
@@ -145,7 +143,6 @@ pub static DEFAULT_TYPEID_SQL_MAPPING: Lazy<HashMap<TypeId, RustSqlMapping>> = L
         },
     );
     m.insert(
-        TypeId::of::<Vec<u8>>(),
         RustSqlMapping {
             sql: String::from("bytea"),
             id: TypeId::of::<Vec<u8>>(),
@@ -153,7 +150,6 @@ pub static DEFAULT_TYPEID_SQL_MAPPING: Lazy<HashMap<TypeId, RustSqlMapping>> = L
         },
     );
     m.insert(
-        TypeId::of::<Option<Vec<u8>>>(),
         RustSqlMapping {
             sql: String::from("bytea"),
             id: TypeId::of::<Option<Vec<u8>>>(),
@@ -385,7 +381,7 @@ macro_rules! pg_inventory_magic {
                     &*CONTROL_FILE,
                     (*$crate::DEFAULT_TYPEID_SQL_MAPPING)
                         .iter()
-                        .map(|(x, y)| (x.clone(), y.clone())),
+                        .cloned(),
                     {
                         let mut set = inventory::iter::<Schema>().collect::<Vec<_>>();
                         set.sort();
@@ -467,7 +463,7 @@ macro_rules! pg_binary_magic {
             use std::env;
             use $($prelude :: )*__pgx_internals::generate_sql;
 
-            // Initialize tracing with tracing-error.
+            // Initialize tracing with tracing-error, and eyre
             let fmt_layer = tracing_subscriber::fmt::layer().with_target(false);
             let filter_layer = EnvFilter::try_from_default_env()
                 .or_else(|_| EnvFilter::try_new("info"))
@@ -477,9 +473,9 @@ macro_rules! pg_binary_magic {
                 .with(fmt_layer)
                 .with(ErrorLayer::default())
                 .init();
-
             color_eyre::install()?;
 
+            // We don't really need a full argument parser here quite yet.
             let mut args = env::args().skip(1);
             let path = args.next().unwrap_or(concat!("./sql/", core::env!("CARGO_PKG_NAME"), ".sql").into());
             let dot: Option<String> = args.next();
