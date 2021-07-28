@@ -197,6 +197,7 @@ pub enum ExternArgs {
     Error(String),
     Schema(String),
     Name(String),
+    SkipInventory,
 }
 
 impl core::fmt::Display for ExternArgs {
@@ -214,6 +215,7 @@ impl core::fmt::Display for ExternArgs {
             ExternArgs::NoGuard => Ok(()),
             ExternArgs::Schema(_) => Ok(()),
             ExternArgs::Name(_) => Ok(()),
+            ExternArgs::SkipInventory => Ok(()),
         }
     }
 }
@@ -254,6 +256,7 @@ impl ToTokens for ExternArgs {
                     .to_token_stream(),
                 );
             }
+            ExternArgs::SkipInventory => (),
         }
     }
 }
@@ -323,6 +326,7 @@ pub fn parse_extern_attributes(attr: TokenStream) -> HashSet<ExternArgs> {
                         let name = name[1..name.len() - 1].to_string();
                         args.insert(ExternArgs::Name(name.to_string()))
                     }
+                    "skip_inventory" => args.insert(ExternArgs::SkipInventory),
                     _ => false,
                 };
             }

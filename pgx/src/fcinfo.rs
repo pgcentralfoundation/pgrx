@@ -22,7 +22,7 @@ use crate::{pg_sys, void_mut_ptr, FromDatum, PgBox, PgMemoryContexts};
 /// use crate::pgx::*;
 /// pgx::pg_module_magic!();
 ///
-/// #[pg_extern]
+/// #[pg_extern(skip_inventory)] // Only use `skip_inventory` in doctests.
 /// fn fun_with_default_arg_value(a: i32, b: default!(i32, 99)) -> i32 {
 ///    a + b
 /// }
@@ -58,7 +58,7 @@ macro_rules! default {
 /// use pgx::*;
 /// # pgx::pg_module_magic!();
 ///
-/// #[pg_extern]
+/// #[pg_extern(skip_inventory)] // Only use `skip_inventory` in doctests.
 /// fn get_a_set() -> impl std::iter::Iterator<Item=(name!(id, i32), name!(title, &'static str))> {
 ///     vec![1, 2, 3].into_iter().zip(vec!["A", "B", "C"].into_iter())
 /// }
@@ -244,12 +244,10 @@ pub fn pg_func_extra<ReturnType, DefaultValue: FnOnce() -> ReturnType>(
 /// This function is unsafe as the underlying function being called is likely unsafe
 ///
 /// ## Examples
-/// ```rust,ignore
+/// ```rust
 /// use pgx::*;
 ///
-/// pg_module_magic!();
-///
-/// #[pg_extern]
+/// #[pg_extern(skip_inventory)] // Only use `skip_inventory` in doctests.
 /// fn add_two_numbers(a: i32, b: i32) -> i32 {
 ///    a + b
 /// }

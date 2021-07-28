@@ -5,13 +5,13 @@
 //!
 //! ## Example
 //!
-//! ```rust,ignore
+//! ```rust
 //! use pgx::*;
 //!
 //! pg_module_magic!();
 //!
 //! // Convert the input string to lowercase and return
-//! #[pg_extern]
+//! #[pg_extern(skip_inventory)] // Only use `skip_inventory` in doctests.
 //! fn my_to_lowercase(input: &'static str) -> String {
 //!     input.to_lowercase()
 //! }

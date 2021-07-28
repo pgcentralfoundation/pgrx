@@ -49,6 +49,30 @@ use pgx_utils::pg_inventory::RustSqlMapping;
 /// Implemented automatically by `#[derive(PostgresType)]`
 pub trait PostgresType {}
 
+/// A type which can have it's [`core::any::TypeId`]s registered for Rust to SQL mapping.
+///
+/// An example use of this trait:
+/// 
+/// ```rust
+/// use pgx::{
+///     datum::{WithTypeIds, WithSizedTypeIds, WithArrayTypeIds, WithVarlenaTypeIds, PgVarlena},
+///     Array, PostgresType, StringInfo, JsonInOutFuncs, pg_extern, pg_sys, IntoDatum, pg_guard,
+/// };
+/// use serde::{Serialize, Deserialize};
+///
+/// #[derive(Debug, Clone, Copy, Serialize, Deserialize, PostgresType)]
+/// # #[skip_inventory]
+/// struct Treat<'a> { best_part: &'a str, };
+///
+/// let mut mappings = Default::default();
+/// let treat_string = stringify!(Treat).to_string();
+/// <Treat<'static> as WithTypeIds>::register_with_refs(&mut mappings, treat_string.clone());
+///
+/// assert!(mappings.iter().any(|x| x.id == core::any::TypeId::of::<Treat<'static>>()));
+/// ```
+/// 
+/// This trait uses the fact that inherent implementations are a higher priority than trait
+/// implementations.
 pub trait WithTypeIds {
     const ITEM_ID: Lazy<TypeId>;
     const OPTION_ID: Lazy<Option<TypeId>>;

@@ -31,6 +31,7 @@ impl ToTokens for ExtensionSqlFile {
         let mut name = None;
         let mut bootstrap = false;
         let mut finalize = false;
+        let mut skip_inventory = false;
         let mut before = vec![];
         let mut after = vec![];
         for attr in &self.attrs {
@@ -46,6 +47,9 @@ impl ToTokens for ExtensionSqlFile {
                 }
                 ExtensionSqlAttribute::Finalize => {
                     finalize = true;
+                }
+                ExtensionSqlAttribute::SkipInventory => {
+                    skip_inventory = true;
                 }
                 ExtensionSqlAttribute::Name(found_name) => {
                     name = Some(found_name.value());
@@ -63,23 +67,25 @@ impl ToTokens for ExtensionSqlFile {
         let before_iter = before.iter();
         let after_iter = after.iter();
         let name_iter = name.iter();
-        let inv = quote! {
-            pgx_utils::pg_inventory::inventory::submit! {
-                crate::__pgx_internals::ExtensionSql(pgx_utils::pg_inventory::InventoryExtensionSql {
-                    sql: include_str!(#path),
-                    module_path: module_path!(),
-                    full_path: concat!(file!(), ':', line!()),
-                    file: file!(),
-                    line: line!(),
-                    name: None#( .unwrap_or(Some(#name_iter)) )*,
-                    bootstrap: #bootstrap,
-                    finalize: #finalize,
-                    before: vec![#(#before_iter),*],
-                    after: vec![#(#after_iter),*],
-                })
-            }
-        };
-        tokens.append_all(inv);
+        if !skip_inventory {
+            let inv = quote! {
+                pgx_utils::pg_inventory::inventory::submit! {
+                    crate::__pgx_internals::ExtensionSql(pgx_utils::pg_inventory::InventoryExtensionSql {
+                        sql: include_str!(#path),
+                        module_path: module_path!(),
+                        full_path: concat!(file!(), ':', line!()),
+                        file: file!(),
+                        line: line!(),
+                        name: None#( .unwrap_or(Some(#name_iter)) )*,
+                        bootstrap: #bootstrap,
+                        finalize: #finalize,
+                        before: vec![#(#before_iter),*],
+                        after: vec![#(#after_iter),*],
+                    })
+                }
+            };
+            tokens.append_all(inv);
+        }
     }
 }
 
@@ -106,6 +112,7 @@ impl ToTokens for ExtensionSql {
         let mut name = None;
         let mut bootstrap = false;
         let mut finalize = false;
+        let mut skip_inventory = false;
         let mut before = vec![];
         let mut after = vec![];
         for attr in &self.attrs {
@@ -122,6 +129,9 @@ impl ToTokens for ExtensionSql {
                 ExtensionSqlAttribute::Finalize => {
                     finalize = true;
                 }
+                ExtensionSqlAttribute::SkipInventory => {
+                    skip_inventory = true;
+                }
                 ExtensionSqlAttribute::Name(found_name) => {
                     name = Some(found_name.value());
                 }
@@ -130,23 +140,25 @@ impl ToTokens for ExtensionSql {
         let before_iter = before.iter();
         let after_iter = after.iter();
         let name_iter = name.iter();
-        let inv = quote! {
-            pgx_utils::pg_inventory::inventory::submit! {
-                crate::__pgx_internals::ExtensionSql(pgx_utils::pg_inventory::InventoryExtensionSql {
-                    sql: #sql,
-                    module_path: module_path!(),
-                    full_path: concat!(file!(), ':', line!()),
-                    file: file!(),
-                    line: line!(),
-                    name: None#( .unwrap_or(Some(#name_iter)) )*,
-                    bootstrap: #bootstrap,
-                    finalize: #finalize,
-                    before: vec![#(#before_iter),*],
-                    after: vec![#(#after_iter),*],
-                })
-            }
-        };
-        tokens.append_all(inv);
+        if !skip_inventory {
+            let inv = quote! {
+                pgx_utils::pg_inventory::inventory::submit! {
+                    crate::__pgx_internals::ExtensionSql(pgx_utils::pg_inventory::InventoryExtensionSql {
+                        sql: #sql,
+                        module_path: module_path!(),
+                        full_path: concat!(file!(), ':', line!()),
+                        file: file!(),
+                        line: line!(),
+                        name: None#( .unwrap_or(Some(#name_iter)) )*,
+                        bootstrap: #bootstrap,
+                        finalize: #finalize,
+                        before: vec![#(#before_iter),*],
+                        after: vec![#(#after_iter),*],
+                    })
+                }
+            };
+            tokens.append_all(inv);
+        }
     }
 }
 
@@ -157,6 +169,7 @@ pub enum ExtensionSqlAttribute {
     Bootstrap,
     Finalize,
     Name(LitStr),
+    SkipInventory,
 }
 
 impl Parse for ExtensionSqlAttribute {
@@ -180,6 +193,9 @@ impl Parse for ExtensionSqlAttribute {
             "name" => {
                 let _eq: syn::token::Eq = input.parse()?;
                 Self::Name(input.parse()?)
+            }
+            "skip_inventory" => {
+                Self::SkipInventory
             }
             _ => {
                 return Err(syn::Error::new(

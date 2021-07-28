@@ -173,31 +173,50 @@ pub fn pg_schema(_attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 /// You can declare some SQL without any positioning information, meaning it can end up anywhere in the generated SQL:
 ///
-/// ```ignore
-/// extension_sql!(r#"
-/// -- SQL statements
-/// "#);
+/// ```rust
+/// use pgx_macros::extension_sql;
+///
+/// extension_sql!(
+///     r#"
+///     -- SQL statements
+///     "#,
+/// #   skip_inventory,
+/// );
 /// ```
 ///
 /// To cause the SQL to be output at the start of the generated SQL:
 ///
-/// ```ignore
-/// extension_sql!(r#"
-/// -- SQL statements
-/// "#, bootstrap);
+/// ```rust
+/// use pgx_macros::extension_sql;
+///
+/// extension_sql!(
+///     r#"
+///     -- SQL statements
+///     "#,
+///     bootstrap,
+/// #   skip_inventory,
+/// );
 /// ```
 ///
 /// To cause the SQL to be output at the end of the generated SQL:
 ///
-/// ```ignore
-/// extension_sql!(r#"
-/// -- SQL statements
-/// "#, finalize);
+/// ```rust
+/// use pgx_macros::extension_sql;
+///
+/// extension_sql!(
+///     r#"
+///     -- SQL statements
+///     "#,
+///     finalize,
+/// #   skip_inventory,    
+/// );
 /// ```
 ///
 /// To declare the SQL dependant, or a dependency of, other items:
 ///
-/// ```ignore
+/// ```rust
+/// use pgx_macros::extension_sql;
+///
 /// struct Treat;
 /// 
 /// mod dog_characteristics {
@@ -210,6 +229,7 @@ pub fn pg_schema(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// -- SQL statements
 /// "#,
 ///     name = "named_one",
+/// #   skip_inventory,
 /// );
 /// 
 /// extension_sql!(r#"
@@ -217,6 +237,7 @@ pub fn pg_schema(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// "#,
 ///     before = [ Treat, "named_one" ],
 ///     after = [ dog_characteristics::DogAlignment ],
+/// #   skip_inventory,
 /// );
 /// ```
 #[proc_macro]
@@ -243,14 +264,23 @@ pub fn extension_sql(input: TokenStream) -> TokenStream {
 ///
 /// You can declare some SQL without any positioning information, meaning it can end up anywhere in the generated SQL:
 ///
-/// ```ignore
-/// extension_sql_file!("sql/best_dogs.sql");
+/// ```rust
+/// use pgx_macros::extension_sql_file;
+/// extension_sql_file!(
+///     "sql/best_dogs.sql",
+/// #   skip_inventory,
+/// );
 /// ```
 ///
 /// To override the default name:
 ///
-/// ```ignore
-/// extension_sql_file!("sql/best_dogs.sql", name = "best_creatures");
+/// ```rust
+/// use pgx_macros::extension_sql_file;
+/// extension_sql_file!(
+///     "sql/best_dogs.sql",
+///     name = "best_creatures",
+/// #   skip_inventory,
+/// );
 /// ```
 ///
 /// For all other options, and examples of them, see [`macro@extension_sql`].
@@ -284,8 +314,11 @@ pub fn search_path(_attr: TokenStream, item: TokenStream) -> TokenStream {
 pub fn pg_extern(attr: TokenStream, item: TokenStream) -> TokenStream {
     let args = parse_extern_attributes(proc_macro2::TokenStream::from(attr.clone()));
 
-    let inventory_submission =
-        pg_inventory::PgExtern::new(attr.clone().into(), item.clone().into()).ok();
+    let inventory_submission = if args.iter().any(|x| *x == ExternArgs::SkipInventory) {
+        None
+    } else {
+        Some(pg_inventory::PgExtern::new(attr.clone().into(), item.clone().into()).unwrap())
+    };
 
     let ast = parse_macro_input!(item as syn::Item);
     match ast {
@@ -336,7 +369,7 @@ fn rewrite_item_fn(
     }
 }
 
-#[proc_macro_derive(PostgresEnum)]
+#[proc_macro_derive(PostgresEnum, attributes(skip_inventory))]
 pub fn postgres_enum(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
 
@@ -348,6 +381,7 @@ fn impl_postgres_enum(ast: DeriveInput) -> proc_macro2::TokenStream {
     let enum_ident = ast.ident;
     let enum_generics = ast.generics;
     let enum_name = enum_ident.to_string();
+    let found_skip_inventory = ast.attrs.iter().any(|x| x.path.get_ident().map(|x| x.to_string() == "skip_inventory").unwrap_or(false));
 
     // validate that we're only operating on an enum
     let enum_data = match ast.data {
@@ -397,17 +431,19 @@ fn impl_postgres_enum(ast: DeriveInput) -> proc_macro2::TokenStream {
         }
     });
 
-    pg_inventory::PostgresEnum::new(
-        enum_ident.clone(),
-        enum_generics.clone(),
-        enum_data.variants,
-    )
-    .to_tokens(&mut stream);
+    if !found_skip_inventory {
+        pg_inventory::PostgresEnum::new(
+            enum_ident.clone(),
+            enum_generics.clone(),
+            enum_data.variants,
+        )
+        .to_tokens(&mut stream);
+    }
 
     stream
 }
 
-#[proc_macro_derive(PostgresType, attributes(inoutfuncs, pgvarlena_inoutfuncs))]
+#[proc_macro_derive(PostgresType, attributes(inoutfuncs, pgvarlena_inoutfuncs, skip_inventory))]
 pub fn postgres_type(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
 
@@ -422,6 +458,12 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
     let funcname_out = Ident::new(&format!("{}_out", name).to_lowercase(), name.span());
     let mut args = parse_postgres_type_args(&ast.attrs);
     let mut stream = proc_macro2::TokenStream::new();
+    let found_skip_inventory = ast.attrs.iter().any(|x| x.path.get_ident().map(|x| x.to_string() == "skip_inventory").unwrap_or(false));
+    let maybe_skip_inventory_attr = if found_skip_inventory {
+        quote! { , skip_inventory }
+    } else {
+        quote! { }
+    };
 
     // validate that we're only operating on a struct
     match ast.data {
@@ -456,12 +498,12 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
         stream.extend(quote! {
             impl #generics JsonInOutFuncs #inout_generics for #name #generics {}
 
-            #[pg_extern(immutable,parallel_safe)]
+            #[pg_extern(immutable,parallel_safe #maybe_skip_inventory_attr)]
             pub fn #funcname_in #generics(input: &#lifetime std::ffi::CStr) -> #name #generics {
                 #name::input(input)
             }
 
-            #[pg_extern(immutable,parallel_safe)]
+            #[pg_extern(immutable,parallel_safe #maybe_skip_inventory_attr)]
             pub fn #funcname_out #generics(input: #name #generics) -> &#lifetime std::ffi::CStr {
                 let mut buffer = StringInfo::new();
                 input.output(&mut buffer);
@@ -472,12 +514,12 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
     } else if args.contains(&PostgresTypeAttribute::InOutFuncs) {
         // otherwise if it's InOutFuncs our _in/_out functions use an owned type instance
         stream.extend(quote! {
-            #[pg_extern(immutable,parallel_safe)]
+            #[pg_extern(immutable,parallel_safe #maybe_skip_inventory_attr)]
             pub fn #funcname_in #generics(input: &#lifetime std::ffi::CStr) -> #name #generics {
                 #name::input(input)
             }
 
-            #[pg_extern(immutable,parallel_safe)]
+            #[pg_extern(immutable,parallel_safe #maybe_skip_inventory_attr)]
             pub fn #funcname_out #generics(input: #name #generics) -> &#lifetime std::ffi::CStr {
                 let mut buffer = StringInfo::new();
                 input.output(&mut buffer);
@@ -487,12 +529,12 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
     } else if args.contains(&PostgresTypeAttribute::PgVarlenaInOutFuncs) {
         // otherwise if it's PgVarlenaInOutFuncs our _in/_out functions use a PgVarlena
         stream.extend(quote! {
-            #[pg_extern(immutable,parallel_safe)]
+            #[pg_extern(immutable,parallel_safe #maybe_skip_inventory_attr)]
             pub fn #funcname_in #generics(input: &#lifetime std::ffi::CStr) -> pgx::PgVarlena<#name #generics> {
                 #name::input(input)
             }
 
-            #[pg_extern(immutable,parallel_safe)]
+            #[pg_extern(immutable,parallel_safe #maybe_skip_inventory_attr)]
             pub fn #funcname_out #generics(input: pgx::PgVarlena<#name #generics>) -> &#lifetime std::ffi::CStr {
                 let mut buffer = StringInfo::new();
                 input.output(&mut buffer);
@@ -501,13 +543,15 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
         });
     }
 
-    pg_inventory::PostgresType::new(
-        name.clone(),
-        generics.clone(),
-        funcname_in.clone(),
-        funcname_out.clone(),
-    )
-    .to_tokens(&mut stream);
+    if !found_skip_inventory {
+        pg_inventory::PostgresType::new(
+            name.clone(),
+            generics.clone(),
+            funcname_in.clone(),
+            funcname_out.clone(),
+        )
+        .to_tokens(&mut stream);
+    }
 
     stream
 }
