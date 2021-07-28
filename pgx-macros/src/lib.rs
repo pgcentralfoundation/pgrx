@@ -169,7 +169,8 @@ pub fn pg_schema(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// * `before = [item, item_two]`: References to other `name`s or Rust items which this SQL should be present before.
 /// * `after = [item, item_two]`: References to other `name`s or Rust items which this SQL should be present after.
 /// * `bootstrap` (**Unique**): Hint that this is SQL intended to go before all other generated SQL.
-/// * `finalize` (**Unique**): Hint that this is SQL intended to go after all other generated SQL. 
+/// * `finalize` (**Unique**): Hint that this is SQL intended to go after all other generated SQL.
+/// * `skip_inventory`: Skip SQL generator inventory submission. **Use always (and only) in Doctests!**
 ///
 /// You can declare some SQL without any positioning information, meaning it can end up anywhere in the generated SQL:
 ///
@@ -309,7 +310,20 @@ pub fn search_path(_attr: TokenStream, item: TokenStream) -> TokenStream {
     item
 }
 
-/// Declare a function as `#[pg_extern]` to indicate that it can be used by Postgres as a UDF
+/// Declare a function as `#[pg_extern]` to indicate that it can be used by Postgres as a UDF.
+///
+/// Optionally accepts the following attributes:
+/// * `immutable`: Corresponds to [`IMMUTABLE`](https://www.postgresql.org/docs/current/sql-createfunction.html).
+/// * `strict`: Corresponds to [`STRICT`](https://www.postgresql.org/docs/current/sql-createfunction.html).
+/// * `stable`: Corresponds to [`STABLE`](https://www.postgresql.org/docs/current/sql-createfunction.html).
+/// * `volatile`: Corresponds to [`VOLATILE`](https://www.postgresql.org/docs/current/sql-createfunction.html).
+/// * `raw`: Corresponds to [`RAW`](https://www.postgresql.org/docs/current/sql-createfunction.html).
+/// * `parallel_safe`: Corresponds to [`PARALLEL SAFE`](https://www.postgresql.org/docs/current/sql-createfunction.html).
+/// * `parallel_unsafe`: Corresponds to [`PARALLEL UNSAFE`](https://www.postgresql.org/docs/current/sql-createfunction.html).
+/// * `parallel_restricted`: Corresponds to [`PARALLEL RESTRICTED`](https://www.postgresql.org/docs/current/sql-createfunction.html).
+/// * `no_guard`: Do not use `#[pg_guard]` with the function.
+/// * `skip_inventory`: Skip SQL generator inventory submission. **Use always (and only) in Doctests!**
+///
 #[proc_macro_attribute]
 pub fn pg_extern(attr: TokenStream, item: TokenStream) -> TokenStream {
     let args = parse_extern_attributes(proc_macro2::TokenStream::from(attr.clone()));
@@ -369,6 +383,11 @@ fn rewrite_item_fn(
     }
 }
 
+/// Generate necessary bindings for using the enum with PostgreSQL.
+///
+/// Optionally accepts the following attributes:
+/// * `skip_inventory`: Skip SQL generator inventory submission. **Use always (and only) in Doctests!**
+///
 #[proc_macro_derive(PostgresEnum, attributes(skip_inventory))]
 pub fn postgres_enum(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
@@ -443,6 +462,13 @@ fn impl_postgres_enum(ast: DeriveInput) -> proc_macro2::TokenStream {
     stream
 }
 
+/// Generate necessary bindings for using the type with PostgreSQL.
+///
+/// Optionally accepts the following attributes:
+/// * `inoutfuncs(some_in_fn, some_out_fn)`: Define custom in/out functions for the type.
+/// * `pgvarlena_inoutfuncs(some_in_fn, some_out_fn)`: Define custom in/out functions for the `PgVarlena` of this type.
+/// * `skip_inventory`: Skip SQL generator inventory submission. **Use always (and only) in Doctests!**
+///
 #[proc_macro_derive(PostgresType, attributes(inoutfuncs, pgvarlena_inoutfuncs, skip_inventory))]
 pub fn postgres_type(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
