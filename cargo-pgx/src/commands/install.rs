@@ -156,12 +156,12 @@ fn copy_sql_files(
         for sql in dir {
             if let Ok(sql) = sql {
                 let filename = sql.file_name().into_string().unwrap();
-    
+
                 if filename.starts_with(&format!("{}--", extname)) && filename.ends_with(".sql") {
                     let mut dest = base_directory.clone();
                     dest.push(extdir);
                     dest.push(filename);
-    
+
                     copy_file(sql.path(), dest, "extension schema file");
                 }
             }

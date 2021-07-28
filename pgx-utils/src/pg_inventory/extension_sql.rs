@@ -194,9 +194,7 @@ impl Parse for ExtensionSqlAttribute {
                 let _eq: syn::token::Eq = input.parse()?;
                 Self::Name(input.parse()?)
             }
-            "skip_inventory" => {
-                Self::SkipInventory
-            }
+            "skip_inventory" => Self::SkipInventory,
             _ => {
                 return Err(syn::Error::new(
                     ident.span(),

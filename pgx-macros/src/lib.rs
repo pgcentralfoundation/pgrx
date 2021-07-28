@@ -165,7 +165,7 @@ pub fn pg_schema(_attr: TokenStream, item: TokenStream) -> TokenStream {
 ///
 /// Accepts a String literal, and optionally the attributes:
 ///
-/// * `name = "item"`: Set the unique identifer to `"item"` for use in `before`/`after` declarations. 
+/// * `name = "item"`: Set the unique identifer to `"item"` for use in `before`/`after` declarations.
 /// * `before = [item, item_two]`: References to other `name`s or Rust items which this SQL should be present before.
 /// * `after = [item, item_two]`: References to other `name`s or Rust items which this SQL should be present after.
 /// * `bootstrap` (**Unique**): Hint that this is SQL intended to go before all other generated SQL.
@@ -219,7 +219,7 @@ pub fn pg_schema(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// use pgx_macros::extension_sql;
 ///
 /// struct Treat;
-/// 
+///
 /// mod dog_characteristics {
 ///     enum DogAlignment {
 ///         Good
@@ -232,7 +232,7 @@ pub fn pg_schema(_attr: TokenStream, item: TokenStream) -> TokenStream {
 ///     name = "named_one",
 /// #   skip_inventory,
 /// );
-/// 
+///
 /// extension_sql!(r#"
 /// -- SQL statements
 /// "#,
@@ -260,7 +260,7 @@ pub fn extension_sql(input: TokenStream) -> TokenStream {
 }
 
 /// Declare SQL (from a file) to be included in generated extension script.
-/// 
+///
 /// Accepts the same options as [`macro@extension_sql`]. `name` is automatically set to the file name (not the full path).
 ///
 /// You can declare some SQL without any positioning information, meaning it can end up anywhere in the generated SQL:
@@ -400,7 +400,12 @@ fn impl_postgres_enum(ast: DeriveInput) -> proc_macro2::TokenStream {
     let enum_ident = ast.ident;
     let enum_generics = ast.generics;
     let enum_name = enum_ident.to_string();
-    let found_skip_inventory = ast.attrs.iter().any(|x| x.path.get_ident().map(|x| x.to_string() == "skip_inventory").unwrap_or(false));
+    let found_skip_inventory = ast.attrs.iter().any(|x| {
+        x.path
+            .get_ident()
+            .map(|x| x.to_string() == "skip_inventory")
+            .unwrap_or(false)
+    });
 
     // validate that we're only operating on an enum
     let enum_data = match ast.data {
@@ -469,7 +474,10 @@ fn impl_postgres_enum(ast: DeriveInput) -> proc_macro2::TokenStream {
 /// * `pgvarlena_inoutfuncs(some_in_fn, some_out_fn)`: Define custom in/out functions for the `PgVarlena` of this type.
 /// * `skip_inventory`: Skip SQL generator inventory submission. **Use always (and only) in Doctests!**
 ///
-#[proc_macro_derive(PostgresType, attributes(inoutfuncs, pgvarlena_inoutfuncs, skip_inventory))]
+#[proc_macro_derive(
+    PostgresType,
+    attributes(inoutfuncs, pgvarlena_inoutfuncs, skip_inventory)
+)]
 pub fn postgres_type(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
 
@@ -484,11 +492,16 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
     let funcname_out = Ident::new(&format!("{}_out", name).to_lowercase(), name.span());
     let mut args = parse_postgres_type_args(&ast.attrs);
     let mut stream = proc_macro2::TokenStream::new();
-    let found_skip_inventory = ast.attrs.iter().any(|x| x.path.get_ident().map(|x| x.to_string() == "skip_inventory").unwrap_or(false));
+    let found_skip_inventory = ast.attrs.iter().any(|x| {
+        x.path
+            .get_ident()
+            .map(|x| x.to_string() == "skip_inventory")
+            .unwrap_or(false)
+    });
     let maybe_skip_inventory_attr = if found_skip_inventory {
         quote! { , skip_inventory }
     } else {
-        quote! { }
+        quote! {}
     };
 
     // validate that we're only operating on a struct

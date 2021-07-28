@@ -1,8 +1,8 @@
+use eyre::eyre as eyre_err;
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
 use std::hash::{Hash, Hasher};
 use syn::Generics;
-use eyre::eyre as eyre_err;
 
 use super::{DotIdentifier, SqlGraphEntity, ToSql};
 
@@ -109,9 +109,7 @@ impl Ord for InventoryPostgresType {
 
 impl InventoryPostgresType {
     pub fn id_matches(&self, candidate: &core::any::TypeId) -> bool {
-        self.mappings
-            .iter()
-            .any(|tester| *candidate == tester.id)
+        self.mappings.iter().any(|tester| *candidate == tester.id)
     }
 }
 
@@ -126,7 +124,6 @@ impl DotIdentifier for InventoryPostgresType {
         format!("type {}", self.full_path.to_string())
     }
 }
-
 
 impl ToSql for InventoryPostgresType {
     #[tracing::instrument(level = "debug", err, skip(self, context))]
@@ -170,7 +167,7 @@ impl ToSql for InventoryPostgresType {
             .find_map(|neighbor| match &context.graph[neighbor] {
                 SqlGraphEntity::Function(func) if func.full_path == in_fn_path => {
                     Some((neighbor, func))
-                },
+                }
                 _ => None,
             })
             .ok_or_else(|| eyre_err!("Could not find in_fn graph entity."))?;
@@ -207,7 +204,7 @@ impl ToSql for InventoryPostgresType {
             .find_map(|neighbor| match &context.graph[neighbor] {
                 SqlGraphEntity::Function(func) if func.full_path == out_fn_path => {
                     Some((neighbor, func))
-                },
+                }
                 _ => None,
             })
             .ok_or_else(|| eyre_err!("Could not find out_fn graph entity."))?;

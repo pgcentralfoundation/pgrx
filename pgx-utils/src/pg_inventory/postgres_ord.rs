@@ -83,4 +83,3 @@ impl ToSql for InventoryPostgresOrd {
         Ok(sql)
     }
 }
-

@@ -79,4 +79,3 @@ impl ToSql for InventoryPostgresHash {
         Ok(sql)
     }
 }
-

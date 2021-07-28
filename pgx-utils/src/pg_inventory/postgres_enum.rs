@@ -95,9 +95,7 @@ impl Ord for InventoryPostgresEnum {
 
 impl InventoryPostgresEnum {
     pub fn id_matches(&self, candidate: &core::any::TypeId) -> bool {
-        self.mappings
-            .iter()
-            .any(|tester| *candidate == tester.id)
+        self.mappings.iter().any(|tester| *candidate == tester.id)
     }
 }
 
@@ -142,4 +140,3 @@ impl ToSql for InventoryPostgresEnum {
         Ok(sql)
     }
 }
-

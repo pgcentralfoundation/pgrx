@@ -6,7 +6,11 @@ use tracing::instrument;
 
 use crate::pg_inventory::DotIdentifier;
 
-use super::{ControlFile, InventoryExtensionSql, InventoryExtensionSqlPositioningRef, InventoryPgExtern, InventoryPgExternReturn, InventoryPostgresEnum, InventoryPostgresHash, InventoryPostgresOrd, InventoryPostgresType, InventorySchema, RustSqlMapping, SqlGraphEntity, ToSql};
+use super::{
+    ControlFile, InventoryExtensionSql, InventoryExtensionSqlPositioningRef, InventoryPgExtern,
+    InventoryPgExternReturn, InventoryPostgresEnum, InventoryPostgresHash, InventoryPostgresOrd,
+    InventoryPostgresType, InventorySchema, RustSqlMapping, SqlGraphEntity, ToSql,
+};
 
 /// A generator for SQL.
 ///
@@ -118,7 +122,7 @@ impl<'a> PgxSql<'a> {
                 }
             }
         }
-        
+
         let mut mapped_schemas = HashMap::default();
         for item in schemas {
             let index = graph.add_node(item.into());
@@ -234,18 +238,15 @@ impl<'a> PgxSql<'a> {
             build_base_edges(&mut graph, index, root, bootstrap, finalize);
         }
 
-
         // Now we can circle back and build up the edge sets.
         for (_item, &index) in &mapped_schemas {
-            graph
-                .add_edge(root, index, SqlGraphRelationship::RequiredBy);
+            graph.add_edge(root, index, SqlGraphRelationship::RequiredBy);
         }
         for (item, &index) in &mapped_extension_sqls {
             for (schema_item, &schema_index) in &mapped_schemas {
                 if item.module_path == schema_item.module_path {
                     tracing::trace!(from = ?item.identifier(), to = schema_item.module_path, "Adding ExtensionSQL after Schema edge.");
-                    graph
-                        .add_edge(schema_index, index, SqlGraphRelationship::RequiredBy);
+                    graph.add_edge(schema_index, index, SqlGraphRelationship::RequiredBy);
                     break;
                 }
             }
@@ -358,8 +359,7 @@ impl<'a> PgxSql<'a> {
             for (schema_item, &schema_index) in &mapped_schemas {
                 if item.module_path == schema_item.module_path {
                     tracing::trace!(from = ?item.full_path, to = schema_item.module_path, "Adding Enum after Schema edge.");
-                    graph
-                        .add_edge(schema_index, index, SqlGraphRelationship::RequiredBy);
+                    graph.add_edge(schema_index, index, SqlGraphRelationship::RequiredBy);
                     break;
                 }
             }
@@ -368,8 +368,7 @@ impl<'a> PgxSql<'a> {
             for (schema_item, &schema_index) in &mapped_schemas {
                 if item.module_path == schema_item.module_path {
                     tracing::trace!(from = ?item.full_path, to = schema_item.module_path, "Adding Type after Schema edge.");
-                    graph
-                        .add_edge(schema_index, index, SqlGraphRelationship::RequiredBy);
+                    graph.add_edge(schema_index, index, SqlGraphRelationship::RequiredBy);
                     break;
                 }
             }
@@ -378,8 +377,7 @@ impl<'a> PgxSql<'a> {
             for (schema_item, &schema_index) in &mapped_schemas {
                 if item.module_path == schema_item.module_path {
                     tracing::trace!(from = ?item.full_path, to = schema_item.module_path, "Adding Extern after Schema edge.");
-                    graph
-                        .add_edge(schema_index, index, SqlGraphRelationship::RequiredBy);
+                    graph.add_edge(schema_index, index, SqlGraphRelationship::RequiredBy);
                     break;
                 }
             }
@@ -388,8 +386,7 @@ impl<'a> PgxSql<'a> {
                 for (ty_item, &ty_index) in &mapped_types {
                     if ty_item.id_matches(&arg.ty_id) {
                         tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Extern after Type (due to argument) edge.");
-                        graph
-                            .add_edge(ty_index, index, SqlGraphRelationship::RequiredByArg);
+                        graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredByArg);
                         found = true;
                         break;
                     }
@@ -397,8 +394,7 @@ impl<'a> PgxSql<'a> {
                 for (ty_item, &ty_index) in &mapped_enums {
                     if ty_item.id_matches(&arg.ty_id) {
                         tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Extern after Enum (due to argument) edge.");
-                        graph
-                            .add_edge(ty_index, index, SqlGraphRelationship::RequiredByArg);
+                        graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredByArg);
                         found = true;
                         break;
                     }
@@ -408,8 +404,7 @@ impl<'a> PgxSql<'a> {
                         .get(arg.full_path)
                         .expect(&format!("Could not fetch Builtin Type {}.", arg.full_path));
                     tracing::trace!(from = ?item.full_path, to = arg.full_path, "Adding Extern(arg) after BuiltIn Type (due to argument) edge.");
-                    graph
-                        .add_edge(*builtin_index, index, SqlGraphRelationship::RequiredByArg);
+                    graph.add_edge(*builtin_index, index, SqlGraphRelationship::RequiredByArg);
                 }
             }
             match &item.fn_return {
@@ -420,11 +415,7 @@ impl<'a> PgxSql<'a> {
                     for (ty_item, &ty_index) in &mapped_types {
                         if ty_item.id_matches(id) {
                             tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Extern after Type (due to return) edge.");
-                            graph.add_edge(
-                                ty_index,
-                                index,
-                                SqlGraphRelationship::RequiredByReturn,
-                            );
+                            graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredByReturn);
                             found = true;
                             break;
                         }
@@ -432,11 +423,7 @@ impl<'a> PgxSql<'a> {
                     for (ty_item, &ty_index) in &mapped_enums {
                         if ty_item.id_matches(id) {
                             tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Extern after Enum (due to return) edge.");
-                            graph.add_edge(
-                                ty_index,
-                                index,
-                                SqlGraphRelationship::RequiredByReturn,
-                            );
+                            graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredByReturn);
                             found = true;
                             break;
                         }
@@ -481,9 +468,12 @@ impl<'a> PgxSql<'a> {
                             }
                         }
                         if !found {
-                            let builtin_index = mapped_builtin_types.get(&iterated_return.1).expect(
-                                &format!("Could not fetch Builtin Type {}.", iterated_return.1),
-                            );
+                            let builtin_index = mapped_builtin_types
+                                .get(&iterated_return.1)
+                                .expect(&format!(
+                                    "Could not fetch Builtin Type {}.",
+                                    iterated_return.1
+                                ));
                             tracing::trace!(from = ?item.full_path, to = iterated_return.1, "Adding Extern after BuiltIn Type (due to return) edge.");
                             graph.add_edge(
                                 *builtin_index,
@@ -499,24 +489,21 @@ impl<'a> PgxSql<'a> {
             for (schema_item, &schema_index) in &mapped_schemas {
                 if item.module_path == schema_item.module_path {
                     tracing::trace!(from = ?item.full_path, to = schema_item.module_path, "Adding Ord after Schema edge.");
-                    graph
-                        .add_edge(schema_index, index, SqlGraphRelationship::RequiredBy);
+                    graph.add_edge(schema_index, index, SqlGraphRelationship::RequiredBy);
                     break;
                 }
             }
             for (ty_item, &ty_index) in &mapped_types {
                 if ty_item.id_matches(&item.id) {
                     tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Ord after Type edge.");
-                    graph
-                        .add_edge(ty_index, index, SqlGraphRelationship::RequiredBy);
+                    graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredBy);
                     break;
                 }
             }
             for (ty_item, &ty_index) in &mapped_enums {
                 if ty_item.id_matches(&item.id) {
                     tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Ord after Enum edge.");
-                    graph
-                        .add_edge(ty_index, index, SqlGraphRelationship::RequiredBy);
+                    graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredBy);
                     break;
                 }
             }
@@ -525,24 +512,21 @@ impl<'a> PgxSql<'a> {
             for (schema_item, &schema_index) in &mapped_schemas {
                 if item.module_path == schema_item.module_path {
                     tracing::trace!(from = ?item.full_path, to = schema_item.module_path, "Adding Hash after Schema edge.");
-                    graph
-                        .add_edge(schema_index, index, SqlGraphRelationship::RequiredBy);
+                    graph.add_edge(schema_index, index, SqlGraphRelationship::RequiredBy);
                     break;
                 }
             }
             for (ty_item, &ty_index) in &mapped_types {
                 if ty_item.id_matches(&item.id) {
                     tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Hash after Type edge.");
-                    graph
-                        .add_edge(ty_index, index, SqlGraphRelationship::RequiredBy);
+                    graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredBy);
                     break;
                 }
             }
             for (ty_item, &ty_index) in &mapped_enums {
                 if ty_item.id_matches(&item.id) {
                     tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Hash after Enum edge.");
-                    graph
-                        .add_edge(ty_index, index, SqlGraphRelationship::RequiredBy);
+                    graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredBy);
                     break;
                 }
             }
@@ -740,7 +724,13 @@ impl<'a> PgxSql<'a> {
     }
 }
 
-fn build_base_edges(graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>, index: NodeIndex, root: NodeIndex, bootstrap: Option<NodeIndex>, finalize: Option<NodeIndex>) {
+fn build_base_edges(
+    graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
+    index: NodeIndex,
+    root: NodeIndex,
+    bootstrap: Option<NodeIndex>,
+    finalize: Option<NodeIndex>,
+) {
     graph.add_edge(root, index, SqlGraphRelationship::RequiredBy);
     if let Some(bootstrap) = bootstrap {
         graph.add_edge(bootstrap, index, SqlGraphRelationship::RequiredBy);

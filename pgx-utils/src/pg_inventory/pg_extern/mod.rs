@@ -10,13 +10,13 @@ use operator::{PgxOperator, PgxOperatorAttributeWithIdent, PgxOperatorOpName};
 use returning::Returning;
 use search_path::SearchPathList;
 
+use eyre::eyre as eyre_err;
 use eyre::WrapErr;
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
 use std::convert::TryFrom;
 use syn::parse::{Parse, ParseStream};
 use syn::Meta;
-use eyre::eyre as eyre_err;
 
 pub use argument::InventoryPgExternInput;
 pub use operator::InventoryPgOperator;

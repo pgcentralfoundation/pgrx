@@ -128,34 +128,26 @@ pub static DEFAULT_TYPEID_SQL_MAPPING: Lazy<HashSet<RustSqlMapping>> = Lazy::new
     map_type!(m, &str, "text");
 
     // Bytea is a special case, notice how it has no `bytea[]`.
-    m.insert(
-        RustSqlMapping {
-            sql: String::from("bytea"),
-            id: TypeId::of::<&[u8]>(),
-            rust: core::any::type_name::<&[u8]>().to_string(),
-        },
-    );
-    m.insert(
-        RustSqlMapping {
-            sql: String::from("bytea"),
-            id: TypeId::of::<Option<&[u8]>>(),
-            rust: core::any::type_name::<Option<&[u8]>>().to_string(),
-        },
-    );
-    m.insert(
-        RustSqlMapping {
-            sql: String::from("bytea"),
-            id: TypeId::of::<Vec<u8>>(),
-            rust: core::any::type_name::<Vec<u8>>().to_string(),
-        },
-    );
-    m.insert(
-        RustSqlMapping {
-            sql: String::from("bytea"),
-            id: TypeId::of::<Option<Vec<u8>>>(),
-            rust: core::any::type_name::<Option<Vec<u8>>>().to_string(),
-        },
-    );
+    m.insert(RustSqlMapping {
+        sql: String::from("bytea"),
+        id: TypeId::of::<&[u8]>(),
+        rust: core::any::type_name::<&[u8]>().to_string(),
+    });
+    m.insert(RustSqlMapping {
+        sql: String::from("bytea"),
+        id: TypeId::of::<Option<&[u8]>>(),
+        rust: core::any::type_name::<Option<&[u8]>>().to_string(),
+    });
+    m.insert(RustSqlMapping {
+        sql: String::from("bytea"),
+        id: TypeId::of::<Vec<u8>>(),
+        rust: core::any::type_name::<Vec<u8>>().to_string(),
+    });
+    m.insert(RustSqlMapping {
+        sql: String::from("bytea"),
+        id: TypeId::of::<Option<Vec<u8>>>(),
+        rust: core::any::type_name::<Option<Vec<u8>>>().to_string(),
+    });
 
     map_type!(m, String, "text");
     map_type!(m, &std::ffi::CStr, "cstring");
@@ -193,7 +185,7 @@ pub static DEFAULT_TYPEID_SQL_MAPPING: Lazy<HashSet<RustSqlMapping>> = Lazy::new
 });
 
 /// A macro for marking a library compatible with [`pgx`][crate].
-/// 
+///
 /// <div class="example-wrap" style="display:inline-block">
 /// <pre class="ignore" style="white-space:normal;font:inherit;">
 ///
@@ -205,7 +197,6 @@ pub static DEFAULT_TYPEID_SQL_MAPPING: Lazy<HashSet<RustSqlMapping>> = Lazy::new
 #[macro_export]
 macro_rules! pg_module_magic {
     () => {
-
         $crate::pg_magic_func!();
         $crate::pg_inventory_magic!();
     };
@@ -264,7 +255,7 @@ macro_rules! pg_magic_func {
             // return the magic
             &MY_MAGIC
         }
-    }
+    };
 }
 
 /// Create neccessary extension-local internal types for use with SQL generation.
@@ -291,7 +282,7 @@ macro_rules! pg_inventory_magic {
         /// <pre class="ignore" style="white-space:normal;font:inherit;">
         ///
         /// **Note**: These should be considered [`pgx`] **internals**, they may
-        /// change between versions without warning or documentation. While you 
+        /// change between versions without warning or documentation. While you
         /// *may* use them, you are signing up for pain later. Please, open an
         /// issue about what you need instead.
         ///
@@ -299,10 +290,7 @@ macro_rules! pg_inventory_magic {
         pub mod __pgx_internals {
             use ::core::convert::TryFrom;
             use ::pgx_utils::pg_inventory::{
-                once_cell::sync::Lazy,
-                inventory,
-                PgxSql,
-                ControlFile,
+                inventory, once_cell::sync::Lazy, ControlFile, PgxSql,
             };
 
             /// The contents of the `*.control` file of the crate.
@@ -318,7 +306,7 @@ macro_rules! pg_inventory_magic {
 
             /// A wrapper type used by [`pgx::extension_sql`] and [`pgx::extension_sql_file`].
             ///
-            /// Required inside the extension so that we can use [`inventory`] and collect the 
+            /// Required inside the extension so that we can use [`inventory`] and collect the
             /// [`pgx_utils::pg_inventory::InventoryExtensionSql`] used in SQL generation.
             #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
             pub struct ExtensionSql(pub pgx_utils::pg_inventory::InventoryExtensionSql);
@@ -326,7 +314,7 @@ macro_rules! pg_inventory_magic {
 
             /// A wrapper type used by [`#[derive(PostgresType)]`](derive@pgx::PostgresType).
             ///
-            /// Required inside the extension so that we can use [`inventory`] and collect the 
+            /// Required inside the extension so that we can use [`inventory`] and collect the
             /// [`pgx_utils::pg_inventory::InventoryPostgresType`] used in SQL generation.
             #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
             pub struct PostgresType(pub pgx_utils::pg_inventory::InventoryPostgresType);
@@ -334,7 +322,7 @@ macro_rules! pg_inventory_magic {
 
             /// A wrapper type used by [`#[pg_extern]`](pgx::pg_extern).
             ///
-            /// Required inside the extension so that we can use [`inventory`] and collect the 
+            /// Required inside the extension so that we can use [`inventory`] and collect the
             /// [`pgx_utils::pg_inventory::InventoryPgExtern`] used in SQL generation.
             #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
             pub struct PgExtern(pub pgx_utils::pg_inventory::InventoryPgExtern);
@@ -342,7 +330,7 @@ macro_rules! pg_inventory_magic {
 
             /// A wrapper type used by [`#[derive(PostgresEnum)]`](derive@pgx::PostgresEnum).
             ///
-            /// Required inside the extension so that we can use [`inventory`] and collect the 
+            /// Required inside the extension so that we can use [`inventory`] and collect the
             /// [`pgx_utils::pg_inventory::InventoryPostgresEnum`] used in SQL generation.
             #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
             pub struct PostgresEnum(pub pgx_utils::pg_inventory::InventoryPostgresEnum);
@@ -350,7 +338,7 @@ macro_rules! pg_inventory_magic {
 
             /// A wrapper type used by [`#[derive(PostgresHash)]`](derive@pgx::PostgresHash).
             ///
-            /// Required inside the extension so that we can use [`inventory`] and collect the 
+            /// Required inside the extension so that we can use [`inventory`] and collect the
             /// [`pgx_utils::pg_inventory::InventoryPostgresHash`] used in SQL generation.
             #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
             pub struct PostgresHash(pub pgx_utils::pg_inventory::InventoryPostgresHash);
@@ -358,7 +346,7 @@ macro_rules! pg_inventory_magic {
 
             /// A wrapper type used by [`#[derive(PostgresOrd)]`](derive@pgx::PostgresOrd).
             ///
-            /// Required inside the extension so that we can use [`inventory`] and collect the 
+            /// Required inside the extension so that we can use [`inventory`] and collect the
             /// [`pgx_utils::pg_inventory::InventoryPostgresOrd`] used in SQL generation.
             #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
             pub struct PostgresOrd(pub pgx_utils::pg_inventory::InventoryPostgresOrd);
@@ -366,7 +354,7 @@ macro_rules! pg_inventory_magic {
 
             /// A wrapper type used by [`#[pg_schema]`](pgx::pg_schema).
             ///
-            /// Required inside the extension so that we can use [`inventory`] and collect the 
+            /// Required inside the extension so that we can use [`inventory`] and collect the
             /// [`pgx_utils::pg_inventory::InventorySchema`] used in SQL generation.
             #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
             pub struct Schema(pub pgx_utils::pg_inventory::InventorySchema);
@@ -379,9 +367,7 @@ macro_rules! pg_inventory_magic {
             pub fn generate_sql<'a>() -> pgx_utils::pg_inventory::eyre::Result<PgxSql<'a>> {
                 let generated = PgxSql::build(
                     &*CONTROL_FILE,
-                    (*$crate::DEFAULT_TYPEID_SQL_MAPPING)
-                        .iter()
-                        .cloned(),
+                    (*$crate::DEFAULT_TYPEID_SQL_MAPPING).iter().cloned(),
                     {
                         let mut set = inventory::iter::<Schema>().collect::<Vec<_>>();
                         set.sort();
@@ -438,7 +424,7 @@ macro_rules! pg_inventory_magic {
 ///  * Has [`tracing`](pgx_utils::pg_inventory::tracing) and [`color_eyre`](`pgx_utils::pg_inventory::color_eyre`) set up.
 ///  * Supports [`EnvFilter`](pgx_utils::pg_inventory::tracing_subscriber::EnvFilter) log level configuration.
 ///  * Accepts up to two arguments, an SQL destination and (optionally) a GraphViz DOT destination.
-/// 
+///
 /// Using different SQL generator code should be considered an advanced use case, and not
 /// recommended.
 ///

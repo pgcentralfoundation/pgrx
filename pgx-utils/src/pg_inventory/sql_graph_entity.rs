@@ -1,4 +1,7 @@
-use super::{ControlFile, DotIdentifier, InventoryExtensionSql, InventoryPgExtern, InventoryPostgresEnum, InventoryPostgresHash, InventoryPostgresOrd, InventoryPostgresType, InventorySchema, ToSql};
+use super::{
+    ControlFile, DotIdentifier, InventoryExtensionSql, InventoryPgExtern, InventoryPostgresEnum,
+    InventoryPostgresHash, InventoryPostgresOrd, InventoryPostgresType, InventorySchema, ToSql,
+};
 
 /// An entity corresponding to some SQL required by the extension.
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
@@ -14,9 +17,7 @@ pub enum SqlGraphEntity<'a> {
     Hash(&'a InventoryPostgresHash),
 }
 
-impl<'a> SqlGraphEntity<'a> {
-
-}
+impl<'a> SqlGraphEntity<'a> {}
 
 impl<'a> DotIdentifier for SqlGraphEntity<'a> {
     fn dot_identifier(&self) -> String {
@@ -33,7 +34,6 @@ impl<'a> DotIdentifier for SqlGraphEntity<'a> {
         }
     }
 }
-
 
 impl<'a> ToSql for SqlGraphEntity<'a> {
     fn to_sql(&self, context: &super::PgxSql) -> eyre::Result<String> {
@@ -70,4 +70,3 @@ impl<'a> ToSql for SqlGraphEntity<'a> {
         }
     }
 }
-
