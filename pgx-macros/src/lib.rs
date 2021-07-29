@@ -385,6 +385,18 @@ fn rewrite_item_fn(
 
 /// Generate necessary bindings for using the enum with PostgreSQL.
 ///
+/// ```rust
+/// use pgx_pg_sys as pg_sys;
+/// use pgx::{PostgresEnum};
+/// use serde::{Deserialize, Serialize};
+/// #[derive(Debug, Serialize, Deserialize, PostgresEnum)]
+/// # #[skip_inventory]
+/// enum DogNames {
+///     Nami,
+///     Brandy,
+/// }
+/// ```
+///
 /// Optionally accepts the following attributes:
 /// * `skip_inventory`: Skip SQL generator inventory submission. **Use always (and only) in Doctests!**
 ///
@@ -468,6 +480,18 @@ fn impl_postgres_enum(ast: DeriveInput) -> proc_macro2::TokenStream {
 }
 
 /// Generate necessary bindings for using the type with PostgreSQL.
+///
+/// ```rust
+/// use pgx_pg_sys as pg_sys;
+/// use pgx::{PostgresType, StringInfo, JsonInOutFuncs, pg_extern, IntoDatum, pg_guard};
+/// use serde::{Deserialize, Serialize};
+/// #[derive(Debug, Serialize, Deserialize, PostgresType)]
+/// # #[skip_inventory]
+/// struct Dog {
+///     treats_recieved: i64,
+///     pets_gotten: i64,
+/// }
+/// ```
 ///
 /// Optionally accepts the following attributes:
 /// * `inoutfuncs(some_in_fn, some_out_fn)`: Define custom in/out functions for the type.
@@ -710,6 +734,18 @@ fn parse_postgres_type_args(attributes: &[Attribute]) -> HashSet<PostgresTypeAtt
 
 /// Generate necessary code using the type in operators like `==` and `!=`.
 ///
+/// ```rust
+/// use pgx_pg_sys as pg_sys;
+/// use pgx::{PostgresEnum, PostgresEq, merges, hashes, join, negator, IntoDatum, opname, restrict, pg_guard, pg_operator};
+/// use serde::{Deserialize, Serialize};
+/// #[derive(Debug, Serialize, Deserialize, PostgresEnum, PartialEq, Eq, PostgresEq)]
+/// # #[skip_inventory]
+/// enum DogNames {
+///     Nami,
+///     Brandy,
+/// }
+/// ```
+///
 /// Optionally accepts the following attributes:
 /// * `skip_inventory`: Skip SQL generator inventory submission. **Use always (and only) in Doctests!**
 ///
@@ -722,6 +758,18 @@ pub fn postgres_eq(input: TokenStream) -> TokenStream {
 
 /// Generate necessary code using the type in operators like `>`, `<`, `<=`, and `>=`.
 ///
+/// ```rust
+/// use pgx_pg_sys as pg_sys;
+/// use pgx::{PostgresEnum, PostgresOrd, join, restrict, commutator, negator, opname, pg_guard, pg_extern, pg_operator, IntoDatum};
+/// use serde::{Deserialize, Serialize};
+/// #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord, PostgresEnum, PostgresOrd)]
+/// # #[skip_inventory]
+/// enum DogNames {
+///     Nami,
+///     Brandy,
+/// }
+/// ```
+///
 /// Optionally accepts the following attributes:
 /// * `skip_inventory`: Skip SQL generator inventory submission. **Use always (and only) in Doctests!**
 ///
@@ -732,6 +780,18 @@ pub fn postgres_ord(input: TokenStream) -> TokenStream {
 }
 
 /// Generate necessary code for stable hashing the type so it can be used with `USING hash` indexes.
+///
+/// ```rust
+/// use pgx_pg_sys as pg_sys;
+/// use pgx::{PostgresEnum, PostgresHash, pg_extern, IntoDatum, pg_guard};
+/// use serde::{Deserialize, Serialize};
+/// #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Hash, PostgresEnum, PostgresHash)]
+/// # #[skip_inventory]
+/// enum DogNames {
+///     Nami,
+///     Brandy,
+/// }
+/// ```
 ///
 /// Optionally accepts the following attributes:
 /// * `skip_inventory`: Skip SQL generator inventory submission. **Use always (and only) in Doctests!**
