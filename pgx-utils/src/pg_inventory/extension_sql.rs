@@ -8,19 +8,43 @@ use syn::{
 
 use super::{DotIdentifier, SqlGraphEntity, ToSql};
 
+/// A parsed `extension_sql_file!()` item.
+///
+/// It should be used with [`syn::parse::Parse`] functions.
+///
+/// Using [`quote::ToTokens`] will output the declaration for a [`InventoryExtensionSql`].
+///
+/// ```rust
+/// use syn::{Macro, parse::Parse, parse_quote, parse};
+/// use quote::{quote, ToTokens};
+/// use pgx_utils::pg_inventory::ExtensionSqlFile;
+///
+/// # fn main() -> eyre::Result<()> {
+/// let parsed: Macro = parse_quote! {
+///     extension_sql_file!("sql/example.sql", bootstrap)
+/// };
+/// let inner_tokens = parsed.tokens;
+/// let inner: ExtensionSqlFile = parse_quote! {
+///     #inner_tokens
+/// };
+/// let inventory_tokens = inner.to_token_stream();
+/// # Ok(())
+/// # }
+/// ```
 #[derive(Debug, Clone)]
 pub struct ExtensionSqlFile {
     pub path: LitStr,
-    pub after_sql_comma: Option<Token![,]>,
     pub attrs: Punctuated<ExtensionSqlAttribute, Token![,]>,
 }
 
 impl Parse for ExtensionSqlFile {
     fn parse(input: ParseStream) -> Result<Self, syn::Error> {
+        let path = input.parse()?;
+        let _after_sql_comma: Option<Token![,]> = input.parse()?;
+        let attrs = input.parse_terminated(ExtensionSqlAttribute::parse)?;
         Ok(Self {
-            path: input.parse()?,
-            after_sql_comma: input.parse()?,
-            attrs: input.parse_terminated(ExtensionSqlAttribute::parse)?,
+            path,
+            attrs,
         })
     }
 }
@@ -89,19 +113,43 @@ impl ToTokens for ExtensionSqlFile {
     }
 }
 
+/// A parsed `extension_sql!()` item.
+///
+/// It should be used with [`syn::parse::Parse`] functions.
+///
+/// Using [`quote::ToTokens`] will output the declaration for a [`InventoryExtensionSql`].
+///
+/// ```rust
+/// use syn::{Macro, parse::Parse, parse_quote, parse};
+/// use quote::{quote, ToTokens};
+/// use pgx_utils::pg_inventory::ExtensionSql;
+///
+/// # fn main() -> eyre::Result<()> {
+/// let parsed: Macro = parse_quote! {
+///     extension_sql!("-- Example content", bootstrap)
+/// };
+/// let inner_tokens = parsed.tokens;
+/// let inner: ExtensionSql = parse_quote! {
+///     #inner_tokens
+/// };
+/// let inventory_tokens = inner.to_token_stream();
+/// # Ok(())
+/// # }
+/// ```
 #[derive(Debug, Clone)]
 pub struct ExtensionSql {
     pub sql: LitStr,
-    pub after_sql_comma: Option<Token![,]>,
     pub attrs: Punctuated<ExtensionSqlAttribute, Token![,]>,
 }
 
 impl Parse for ExtensionSql {
     fn parse(input: ParseStream) -> Result<Self, syn::Error> {
+        let sql = input.parse()?;
+        let _after_sql_comma: Option<Token![,]> = input.parse()?;
+        let attrs = input.parse_terminated(ExtensionSqlAttribute::parse)?;
         Ok(Self {
-            sql: input.parse()?,
-            after_sql_comma: input.parse()?,
-            attrs: input.parse_terminated(ExtensionSqlAttribute::parse)?,
+            sql,
+            attrs,
         })
     }
 }

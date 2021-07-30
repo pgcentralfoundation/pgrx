@@ -37,7 +37,7 @@ impl Clone for PallocdVarlena {
 ///
 /// ## Example
 ///
-/// ```rust,ignore
+/// ```rust
 /// use std::ffi::CStr;
 /// use std::str::FromStr;
 ///
@@ -46,6 +46,7 @@ impl Clone for PallocdVarlena {
 ///
 /// #[derive(Copy, Clone, PostgresType)]
 /// #[pgvarlena_inoutfuncs]
+/// # #[skip_inventory]
 /// struct MyType {
 ///    a: f32,
 ///    b: f32,
@@ -70,7 +71,7 @@ impl Clone for PallocdVarlena {
 ///     }
 /// }
 ///
-/// #[pg_extern]
+/// #[pg_extern(skip_inventory)] // Only use `skip_inventory` in doctests.
 /// fn do_a_thing(mut input: PgVarlena<MyType>) -> PgVarlena<MyType> {
 ///     input.c += 99;  // performs a copy-on-write
 ///     input

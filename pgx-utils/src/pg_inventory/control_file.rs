@@ -3,6 +3,17 @@ use core::convert::TryFrom;
 use std::collections::HashMap;
 use tracing_error::SpanTrace;
 
+/// The parsed contents of a `.control` file.
+///
+/// ```rust
+/// use pgx_utils::pg_inventory::ControlFile;
+/// use std::convert::TryFrom;
+/// # fn main() -> eyre::Result<()> {
+/// let context = include_str!("../../../pgx-examples/custom_types/custom_types.control");
+/// let _control_file = ControlFile::try_from(context)?;
+/// # Ok(())
+/// # }
+/// ```
 #[derive(Debug, Clone, Hash, PartialOrd, Ord, PartialEq, Eq)]
 pub struct ControlFile {
     pub comment: String,
@@ -13,38 +24,18 @@ pub struct ControlFile {
     pub schema: Option<String>,
 }
 
-impl<'a> Into<SqlGraphEntity<'a>> for &'a ControlFile {
-    fn into(self) -> SqlGraphEntity<'a> {
-        SqlGraphEntity::ExtensionRoot(self)
-    }
-}
-
-#[derive(Debug, Clone)]
-pub enum ControlFileError {
-    MissingField {
-        field: &'static str,
-        context: SpanTrace,
-    },
-}
-
-impl std::fmt::Display for ControlFileError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            ControlFileError::MissingField { field, context } => {
-                write!(f, "Missing field in control file! Please add `{}`.", field)?;
-                context.fmt(f)?;
-            }
-        };
-        Ok(())
-    }
-}
-
-impl std::error::Error for ControlFileError {}
-
-impl TryFrom<&str> for ControlFile {
-    type Error = ControlFileError;
-
-    fn try_from(input: &str) -> Result<Self, Self::Error> {
+impl ControlFile {
+    /// Parse a `.control` file.
+    ///
+    /// ```rust
+    /// use pgx_utils::pg_inventory::ControlFile;
+    /// # fn main() -> eyre::Result<()> {
+    /// let context = include_str!("../../../pgx-examples/custom_types/custom_types.control");
+    /// let _control_file = ControlFile::from_str(context)?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn from_str(input: &str) -> Result<Self, ControlFileError> {
         let mut temp = HashMap::new();
         for line in input.lines() {
             let parts: Vec<&str> = line.split('=').collect();
@@ -98,6 +89,43 @@ impl TryFrom<&str> for ControlFile {
                 == &"true",
             schema: temp.get("schema").map(|v| v.to_string()),
         })
+    }
+}
+
+impl<'a> Into<SqlGraphEntity<'a>> for &'a ControlFile {
+    fn into(self) -> SqlGraphEntity<'a> {
+        SqlGraphEntity::ExtensionRoot(self)
+    }
+}
+
+/// An error met while parsing a `.control` file.
+#[derive(Debug, Clone)]
+pub enum ControlFileError {
+    MissingField {
+        field: &'static str,
+        context: SpanTrace,
+    },
+}
+
+impl std::fmt::Display for ControlFileError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            ControlFileError::MissingField { field, context } => {
+                write!(f, "Missing field in control file! Please add `{}`.", field)?;
+                context.fmt(f)?;
+            }
+        };
+        Ok(())
+    }
+}
+
+impl std::error::Error for ControlFileError {}
+
+impl TryFrom<&str> for ControlFile {
+    type Error = ControlFileError;
+
+    fn try_from(input: &str) -> Result<Self, Self::Error> {
+        Self::from_str(input)
     }
 }
 

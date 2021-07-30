@@ -18,7 +18,7 @@ use crate::{pg_sys, void_mut_ptr, FromDatum, PgBox, PgMemoryContexts};
 /// CREATE OR REPLACE FUNCTION fun_with_default_arg_value(a integer, b integer DEFAULT 99) RETURNS integer ...;
 /// ```
 ///
-/// ```rust,ignore
+/// ```rust
 /// use crate::pgx::*;
 /// pgx::pg_module_magic!();
 ///
@@ -54,7 +54,7 @@ macro_rules! default {
 /// CREATE OR REPLACE FUNCTION get_a_set() RETURNS TABLE (id integer, title text) ...;
 /// ```
 ///
-/// ```rust,ignore
+/// ```rust
 /// use pgx::*;
 /// # pgx::pg_module_magic!();
 ///

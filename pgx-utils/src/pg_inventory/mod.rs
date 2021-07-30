@@ -43,6 +43,7 @@ pub use tracing_subscriber;
 
 use core::{any::TypeId, fmt::Debug};
 
+/// A mapping from a Rust type to a SQL type, with a `TypeId`.
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct RustSqlMapping {
     pub rust: String,
