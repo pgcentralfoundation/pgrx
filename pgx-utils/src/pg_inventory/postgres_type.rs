@@ -10,7 +10,7 @@ use super::{DotIdentifier, SqlGraphEntity, ToSql};
 ///
 /// It should be used with [`syn::parse::Parse`] functions.
 ///
-/// Using [`quote::ToTokens`] will output the declaration for a [`InventoryPostgresEnum`].
+/// Using [`quote::ToTokens`] will output the declaration for a [`InventoryPostgresType`].
 ///
 /// ```rust
 /// use syn::{Macro, parse::Parse, parse_quote, parse};

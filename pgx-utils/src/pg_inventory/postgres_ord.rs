@@ -1,9 +1,52 @@
 use proc_macro2::TokenStream as TokenStream2;
 use quote::{quote, ToTokens, TokenStreamExt};
-use syn::Ident;
+use syn::{DeriveInput, Ident, ItemEnum, ItemStruct, parse::{Parse, ParseStream}};
 
 use super::{DotIdentifier, SqlGraphEntity, ToSql};
 
+/// A parsed `#[derive(PostgresOrd)]` item.
+///
+/// It should be used with [`syn::parse::Parse`] functions.
+///
+/// Using [`quote::ToTokens`] will output the declaration for a [`InventoryPostgresOrd`].
+///
+/// On structs:
+///
+/// ```rust
+/// use syn::{Macro, parse::Parse, parse_quote, parse};
+/// use quote::{quote, ToTokens};
+/// use pgx_utils::pg_inventory::PostgresOrd;
+///
+/// # fn main() -> eyre::Result<()> {
+/// let parsed: PostgresOrd = parse_quote! {
+///     #[derive(PostgresOrd)]
+///     struct Example<'a> {
+///         demo: &'a str,
+///     }
+/// };
+/// let inventory_tokens = parsed.to_token_stream();
+/// # Ok(())
+/// # }
+/// ```
+///
+/// On enums:
+///
+/// ```rust
+/// use syn::{Macro, parse::Parse, parse_quote, parse};
+/// use quote::{quote, ToTokens};
+/// use pgx_utils::pg_inventory::PostgresOrd;
+///
+/// # fn main() -> eyre::Result<()> {
+/// let parsed: PostgresOrd = parse_quote! {
+///     #[derive(PostgresOrd)]
+///     enum Demo {
+///         Example,
+///     }
+/// };
+/// let inventory_tokens = parsed.to_token_stream();
+/// # Ok(())
+/// # }
+/// ```
 #[derive(Debug, Clone)]
 pub struct PostgresOrd {
     pub name: Ident,
@@ -12,6 +55,27 @@ pub struct PostgresOrd {
 impl PostgresOrd {
     pub fn new(name: Ident) -> Self {
         Self { name }
+    }
+
+    pub fn from_derive_input(
+        derive_input: DeriveInput,
+    ) -> Result<Self, syn::Error> {
+        Ok(Self::new(
+            derive_input.ident,
+        ))
+    }
+}
+
+impl Parse for PostgresOrd {
+    fn parse(input: ParseStream) -> Result<Self, syn::Error> {
+        let parsed_enum: Result<ItemEnum, syn::Error> = input.parse();
+        let parsed_struct: Result<ItemStruct,syn::Error> = input.parse();
+        let ident = parsed_enum.map(|x| x.ident)
+            .or_else(|_| parsed_struct.map(|x| x.ident))
+            .map_err(|_| syn::Error::new(input.span(), "expected enum or struct"))?;
+        Ok(Self::new(
+            ident,
+        ))
     }
 }
 
