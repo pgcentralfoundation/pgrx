@@ -59,11 +59,11 @@ impl PostgresEnum {
             syn::Data::Union(_) | syn::Data::Struct(_) => 
                 return Err(syn::Error::new(derive_input.ident.span(), "expected enum")),
         };
-        Ok(Self {
-            name: derive_input.ident,
-            generics: derive_input.generics,
-            variants: data_enum.variants,
-        })
+        Ok(Self::new(
+            derive_input.ident,
+            derive_input.generics,
+            data_enum.variants,
+        ))
     }
 }
 

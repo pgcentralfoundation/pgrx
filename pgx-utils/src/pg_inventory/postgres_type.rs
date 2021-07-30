@@ -2,10 +2,32 @@ use eyre::eyre as eyre_err;
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
 use std::hash::{Hash, Hasher};
-use syn::Generics;
+use syn::{DeriveInput, Generics, ItemStruct, parse::{Parse, ParseStream}};
 
 use super::{DotIdentifier, SqlGraphEntity, ToSql};
 
+/// A parsed `#[derive(PostgresType)]` item.
+///
+/// It should be used with [`syn::parse::Parse`] functions.
+///
+/// Using [`quote::ToTokens`] will output the declaration for a [`InventoryPostgresEnum`].
+///
+/// ```rust
+/// use syn::{Macro, parse::Parse, parse_quote, parse};
+/// use quote::{quote, ToTokens};
+/// use pgx_utils::pg_inventory::PostgresType;
+///
+/// # fn main() -> eyre::Result<()> {
+/// let parsed: PostgresType = parse_quote! {
+///     #[derive(PostgresType)]
+///     struct Example<'a> {
+///         demo: &'a str,
+///     }
+/// };
+/// let inventory_tokens = parsed.to_token_stream();
+/// # Ok(())
+/// # }
+/// ```
 #[derive(Debug, Clone)]
 pub struct PostgresType {
     name: Ident,
@@ -22,6 +44,39 @@ impl PostgresType {
             in_fn,
             out_fn,
         }
+    }
+
+    pub fn from_derive_input(
+        derive_input: DeriveInput,
+    ) -> Result<Self, syn::Error> {
+        let _data_struct = match derive_input.data {
+            syn::Data::Struct(data_struct) => data_struct,
+            syn::Data::Union(_) | syn::Data::Enum(_) => 
+                return Err(syn::Error::new(derive_input.ident.span(), "expected struct")),
+        };
+        let funcname_in = Ident::new(&format!("{}_in", derive_input.ident).to_lowercase(), derive_input.ident.span());
+        let funcname_out = Ident::new(&format!("{}_out", derive_input.ident).to_lowercase(), derive_input.ident.span());
+        Ok(Self::new(
+            derive_input.ident,
+            derive_input.generics,
+            funcname_in,
+            funcname_out,
+        ))
+    }
+}
+
+
+impl Parse for PostgresType {
+    fn parse(input: ParseStream) -> Result<Self, syn::Error> {
+        let parsed: ItemStruct = input.parse()?;
+        let funcname_in = Ident::new(&format!("{}_in", parsed.ident).to_lowercase(), parsed.ident.span());
+        let funcname_out = Ident::new(&format!("{}_out", parsed.ident).to_lowercase(), parsed.ident.span());
+        Ok(Self::new(
+            parsed.ident,
+            parsed.generics,
+            funcname_in,
+            funcname_out,
+        ))
     }
 }
 

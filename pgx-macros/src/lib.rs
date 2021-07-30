@@ -409,8 +409,8 @@ pub fn postgres_enum(input: TokenStream) -> TokenStream {
 
 fn impl_postgres_enum(ast: DeriveInput) -> proc_macro2::TokenStream {
     let mut stream = proc_macro2::TokenStream::new();
+    let inventory_ast = ast.clone();
     let enum_ident = ast.ident;
-    let enum_generics = ast.generics;
     let enum_name = enum_ident.to_string();
     let found_skip_inventory = ast.attrs.iter().any(|x| {
         x.path
@@ -469,9 +469,8 @@ fn impl_postgres_enum(ast: DeriveInput) -> proc_macro2::TokenStream {
 
     if !found_skip_inventory {
         pg_inventory::PostgresEnum::from_derive_input(
-            ast
-        )
-        .to_tokens(&mut stream);
+            inventory_ast
+        ).unwrap().to_tokens(&mut stream);
     }
 
     stream
@@ -605,13 +604,9 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
     }
 
     if !found_skip_inventory {
-        pg_inventory::PostgresType::new(
-            name.clone(),
-            generics.clone(),
-            funcname_in.clone(),
-            funcname_out.clone(),
-        )
-        .to_tokens(&mut stream);
+        pg_inventory::PostgresType::from_derive_input(
+            ast
+        ).unwrap().to_tokens(&mut stream);
     }
 
     stream
