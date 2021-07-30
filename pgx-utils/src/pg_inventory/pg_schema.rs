@@ -6,6 +6,25 @@ use syn::{
     ItemMod,
 };
 
+/// A parsed `#[pg_schema] mod example {}` item.
+///
+/// It should be used with [`syn::parse::Parse`] functions.
+///
+/// Using [`quote::ToTokens`] will output the declaration for a [`InventorySchema`].
+///
+/// ```rust
+/// use syn::{Macro, parse::Parse, parse_quote, parse};
+/// use quote::{quote, ToTokens};
+/// use pgx_utils::pg_inventory::Schema;
+///
+/// # fn main() -> eyre::Result<()> {
+/// let parsed: Schema = parse_quote! {
+///     #[pg_schema] mod example {}
+/// };
+/// let inventory_tokens = parsed.to_token_stream();
+/// # Ok(())
+/// # }
+/// ```
 #[derive(Debug, Clone)]
 pub struct Schema {
     pub module: ItemMod,

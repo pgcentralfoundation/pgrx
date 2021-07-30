@@ -468,10 +468,8 @@ fn impl_postgres_enum(ast: DeriveInput) -> proc_macro2::TokenStream {
     });
 
     if !found_skip_inventory {
-        pg_inventory::PostgresEnum::new(
-            enum_ident.clone(),
-            enum_generics.clone(),
-            enum_data.variants,
+        pg_inventory::PostgresEnum::from_derive_input(
+            ast
         )
         .to_tokens(&mut stream);
     }

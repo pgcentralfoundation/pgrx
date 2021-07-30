@@ -2,11 +2,35 @@ use std::hash::{Hash, Hasher};
 
 use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
-use syn::Generics;
+use syn::{parse::{Parse, ParseStream}, ItemEnum, DeriveInput, Generics};
 use syn::{punctuated::Punctuated, Ident, Token};
 
 use super::{DotIdentifier, SqlGraphEntity, ToSql};
 
+
+
+/// A parsed `#[derive(PostgresEnum)]` item.
+///
+/// It should be used with [`syn::parse::Parse`] functions.
+///
+/// Using [`quote::ToTokens`] will output the declaration for a [`InventoryPostgresEnum`].
+///
+/// ```rust
+/// use syn::{Macro, parse::Parse, parse_quote, parse};
+/// use quote::{quote, ToTokens};
+/// use pgx_utils::pg_inventory::PostgresEnum;
+///
+/// # fn main() -> eyre::Result<()> {
+/// let parsed: PostgresEnum = parse_quote! {
+///     #[derive(PostgresEnum)]
+///     enum Demo {
+///         Example,
+///     }
+/// };
+/// let inventory_tokens = parsed.to_token_stream();
+/// # Ok(())
+/// # }
+/// ```
 #[derive(Debug, Clone)]
 pub struct PostgresEnum {
     name: Ident,
@@ -25,6 +49,33 @@ impl PostgresEnum {
             generics,
             variants,
         }
+    }
+
+    pub fn from_derive_input(
+        derive_input: DeriveInput,
+    ) -> Result<Self, syn::Error> {
+        let data_enum = match derive_input.data {
+            syn::Data::Enum(data_enum) => data_enum,
+            syn::Data::Union(_) | syn::Data::Struct(_) => 
+                return Err(syn::Error::new(derive_input.ident.span(), "expected enum")),
+        };
+        Ok(Self {
+            name: derive_input.ident,
+            generics: derive_input.generics,
+            variants: data_enum.variants,
+        })
+    }
+}
+
+
+impl Parse for PostgresEnum {
+    fn parse(input: ParseStream) -> Result<Self, syn::Error> {
+        let parsed: ItemEnum = input.parse()?;
+        Ok(Self::new(
+            parsed.ident,
+            parsed.generics,
+            parsed.variants,
+        ))
     }
 }
 
