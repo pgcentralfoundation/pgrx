@@ -1,4 +1,5 @@
 use crate::{pg_sys, FromDatum, IntoDatum, PgMemoryContexts};
+use core::fmt::Write;
 use std::ops::{Deref, DerefMut};
 
 const UUID_BYTES_LEN: usize = 16;
@@ -42,6 +43,11 @@ impl FromDatum for Uuid {
     }
 }
 
+enum UuidFormatCase {
+    Lowercase,
+    Uppercase,
+}
+
 impl Uuid {
     pub fn from_bytes(b: UuidBytes) -> Self {
         Uuid(b)
@@ -61,6 +67,20 @@ impl Uuid {
         bytes.copy_from_slice(b);
         Ok(Uuid::from_bytes(bytes))
     }
+
+    fn format(&self, f: &mut std::fmt::Formatter<'_>, case: UuidFormatCase) -> std::fmt::Result {
+        let hyphenated = f.sign_minus();
+        for (i, b) in self.0.iter().enumerate() {
+            if hyphenated && (i == 4 || i == 6 || i == 8 || i == 10) {
+                f.write_char('-')?;
+            }
+            match case {
+                UuidFormatCase::Lowercase => write!(f, "{:02x}", b)?,
+                UuidFormatCase::Uppercase => write!(f, "{:02X}", b)?,
+            };
+        }
+        Ok(())
+    }
 }
 
 impl Deref for Uuid {
@@ -74,5 +94,23 @@ impl Deref for Uuid {
 impl DerefMut for Uuid {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.0
+    }
+}
+
+impl std::fmt::Display for Uuid {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:-x}", self)
+    }
+}
+
+impl<'a> std::fmt::LowerHex for Uuid {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
+        self.format(f, UuidFormatCase::Lowercase)
+    }
+}
+
+impl<'a> std::fmt::UpperHex for Uuid {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
+        self.format(f, UuidFormatCase::Uppercase)
     }
 }
