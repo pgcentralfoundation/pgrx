@@ -19,31 +19,32 @@ As new versions of `pgx` are released, you'll want to make sure you run this com
 ## Usage
 
 ```shell script
-$ cargo pgx --help                
-cargo-pgx-pgx 
+$ cargo pgx --help
+cargo-pgx
 
 USAGE:
-    cargo-pgx pgx [SUBCOMMAND]
+    cargo pgx [SUBCOMMAND]
 
 FLAGS:
     -h, --help       Prints help information
     -V, --version    Prints version information
 
 SUBCOMMANDS:
-    get        get a property from the extension control file
-    help       Prints this message or the help of the given subcommand(s)
-    init       initize pgx development environment for the first time
-    install    install the extension from the current crate to the Postgres specified by whatever "pg_config" is
-               currently on your $PATH
-    new        create a new extension crate
-    package    create an installation package directory (in ./target/[debug|release]/extname-pgXX/) for the
-               Postgres installation specified by whatever "pg_config" is currently on your $PATH
-    run        compile/install extension to a pgx-managed Postgres instance and start psql
-    schema     generate extension schema files (typically not necessary)
-    start      start a pgx-managed Postgres instance
-    status     is a pgx-managed Postgres instance running?
-    stop       stop a pgx-managed Postgres instance
-    test       run the test suite for this crate
+    connect        connect, via psql, to a Postgres instance
+    dump-schema    dump the full extension SQL schema file
+    get            get a property from the extension control file
+    help           Prints this message or the help of the given subcommand(s)
+    init           initize pgx development environment for the first time
+    install        install the extension from the current crate to the Postgres specified by whatever "pg_config" is
+                   currently on your $PATH
+    new            create a new extension crate
+    package        create an installation package directory (in ./target/[debug|release]/extname-pgXX/).
+    run            compile/install extension to a pgx-managed Postgres instance and start psql
+    schema         generate extension schema files
+    start          start a pgx-managed Postgres instance
+    status         is a pgx-managed Postgres instance running?
+    stop           stop a pgx-managed Postgres instance
+    test           run the test suite for this crate
 ```
 
 ## Environment Variables
@@ -55,7 +56,35 @@ SUBCOMMANDS:
 
 ## First Time Initialization
 
-![init](https://raw.githubusercontent.com/zombodb/pgx/master/cargo-pgx/init.png)
+```shell script
+$ cargo pgx init
+  Discovered Postgres v13.3, v12.7, v11.12, v10.17
+  Downloading Postgres v12.7 from https://ftp.postgresql.org/pub/source/v12.7/postgresql-12.7.tar.bz2
+     Stopping Postgres v13
+  Downloading Postgres v11.12 from https://ftp.postgresql.org/pub/source/v11.12/postgresql-11.12.tar.bz2
+  Downloading Postgres v10.17 from https://ftp.postgresql.org/pub/source/v10.17/postgresql-10.17.tar.bz2
+  Downloading Postgres v13.3 from https://ftp.postgresql.org/pub/source/v13.3/postgresql-13.3.tar.bz2
+    Untarring Postgres v10.17 to /home/yourself/.pgx/10.17
+    Untarring Postgres v11.12 to /home/yourself/.pgx/11.12
+    Untarring Postgres v12.7 to /home/yourself/.pgx/12.7
+    Untarring Postgres v13.3 to /home/yourself/.pgx/13.3
+  Configuring Postgres v10.17
+  Configuring Postgres v11.12
+  Configuring Postgres v12.7
+  Configuring Postgres v13.3
+    Compiling Postgres v10.17
+    Compiling Postgres v13.3
+    Compiling Postgres v11.12
+    Compiling Postgres v12.7
+   Installing Postgres v10.17 to /home/yourself/.pgx/10.17/pgx-install
+   Installing Postgres v11.12 to /home/yourself/.pgx/11.12/pgx-install
+   Installing Postgres v12.7 to /home/yourself/.pgx/12.7/pgx-install
+   Installing Postgres v13.3 to /home/yourself/.pgx/13.3/pgx-install
+   Validating /home/yourself/.pgx/10.17/pgx-install/bin/pg_config
+   Validating /home/yourself/.pgx/11.12/pgx-install/bin/pg_config
+   Validating /home/yourself/.pgx/12.7/pgx-install/bin/pg_config
+   Validating /home/yourself/.pgx/13.3/pgx-install/bin/pg_config
+```
 
 `cargo pgx init` is required to be run once to properly configure the `pgx` development environment.
 
@@ -81,17 +110,7 @@ If a new minor Postgres version is released in the future you can simply run `ca
 
 ```shell script
 $ cargo pgx init --help
-cargo-pgx-pgx-init 
-initize pgx development environment for the first time
-
-USAGE:
-    cargo-pgx pgx init [OPTIONS]
-
-FLAGS:
-    -h, --help       Prints help information
-    -V, --version    Prints version information
-
-OPTIONS:
+cargo-pgx-init
 initize pgx development environment for the first time
 
 USAGE:
@@ -124,11 +143,11 @@ If you'd like to create a "background worker" instead, specify the `--bgworker` 
 
 ```shell script
 $ cargo pgx new --help
-cargo-pgx-pgx-new 
+cargo-pgx-new 0.1.21
 create a new extension crate
 
 USAGE:
-    cargo-pgx pgx new [FLAGS] <NAME>
+    cargo pgx new [FLAGS] <NAME>
 
 FLAGS:
     -b, --bgworker    create a background worker template
@@ -143,7 +162,34 @@ ARGS:
  
 ## Managing Your Postgres Installations
   
-![status](https://raw.githubusercontent.com/zombodb/pgx/master/cargo-pgx/status.png)
+```shell script
+$ cargo pgx status
+Postgres v10 is stopped
+Postgres v11 is stopped
+Postgres v12 is stopped
+Postgres v13 is stopped
+
+$ cargo pgx start all
+     Starting Postgres v10 on port 28810
+     Starting Postgres v11 on port 28811
+     Starting Postgres v12 on port 28812
+     Starting Postgres v13 on port 28813
+
+$ cargo pgx status
+Postgres v10 is running
+Postgres v11 is running
+Postgres v12 is running
+Postgres v13 is running
+
+$ cargo pgx stop pg10
+     Stopping Postgres v10
+
+$ cargo pgx status
+Postgres v10 is stopped
+Postgres v11 is running
+Postgres v12 is running
+Postgres v13 is running
+```
   
 `cargo pgx` has three commands for managing each Postgres installation:  `start`, `stop`, and `status`.  Additionally, `cargo pgx run` (see below) will automatically start its target Postgres instance if not already running.
 
@@ -155,7 +201,51 @@ Once started, you can connect to them using `psql` (if you have it on your $PATH
 
 ## Compiling and Running Your Extension
 
-![run](https://raw.githubusercontent.com/zombodb/pgx/master/cargo-pgx/run.png)
+```shell script
+$ cargo pgx run pg13
+     Stopping Postgres v13
+building extension with features `pg13`
+"cargo" "build" "--features" "pg13" "--no-default-features"
+    Finished dev [unoptimized + debuginfo] target(s) in 0.09s
+
+installing extension
+      Copying control file to `/home/yourself/.pgx/13.3/pgx-install/share/postgresql/extension/strings.control`
+      Copying shared library to `/home/yourself/.pgx/13.3/pgx-install/lib/postgresql/strings.so`
+`src/bin/sql-generator.rs` does not exist or is not what is expected.
+If you encounter problems please delete it and use the generated version.
+running SQL generator features `pg13`
+"cargo" "run" "--bin" "sql-generator" "--features" "pg13" "--no-default-features" "--" "/home/yourself/.pgx/13.3/pgx-install/share/postgresql/extension/strings--1.0.sql"
+    Finished dev [unoptimized + debuginfo] target(s) in 0.09s
+     Running `target/debug/sql-generator /home/yourself/.pgx/13.3/pgx-install/share/postgresql/extension/strings--1.0.sql`
+Aug 03 10:04:24.602  INFO Writing SQL. path=/home/yourself/.pgx/13.3/pgx-install/share/postgresql/extension/strings--1.0.sql
+     Finished installing strings
+     Starting Postgres v13 on port 28813
+     Re-using existing database strings
+psql (13.3)
+Type "help" for help.
+
+strings=# DROP EXTENSION strings;
+DROP EXTENSION
+strings=# CREATE EXTENSION strings;
+CREATE EXTENSION
+strings=# \df strings.*
+                                      List of functions
+ Schema  |     Name      | Result data type |           Argument data types            | Type 
+---------+---------------+------------------+------------------------------------------+------
+ strings | append        | text             | input text, extra text                   | func
+ strings | return_static | text             |                                          | func
+ strings | split         | text[]           | input text, pattern text                 | func
+ strings | split_set     | SETOF text       | input text, pattern text                 | func
+ strings | substring     | text             | input text, start integer, "end" integer | func
+ strings | to_lowercase  | text             | input text                               | func
+(6 rows)
+
+strings=# select strings.to_lowercase('PGX');
+ to_lowercase 
+--------------
+ pgx
+(1 row)
+```
 
 `cargo pgx run <pg10 | pg11 | pg12 | pg13>` is the primary interface into compiling and interactively testing/using your extension during development.
 
@@ -171,11 +261,11 @@ For Postgres installations which are already on your computer, `cargo pgx run` w
 
 ```shell script
 $ cargo pgx run --help
-cargo-pgx-pgx-run
+cargo-pgx-run
 compile/install extension to a pgx-managed Postgres instance and start psql
 
 USAGE:
-    cargo-pgx pgx run [FLAGS] <PG_VERSION> [DBNAME]
+    cargo pgx run [FLAGS] [OPTIONS] <PG_VERSION> [--] [DBNAME]
 
 FLAGS:
     -h, --help       Prints help information
@@ -193,7 +283,18 @@ ARGS:
 
 ## Connect to a Database
 
-![connect](https://raw.githubusercontent.com/zombodb/pgx/master/cargo-pgx/connect.png)
+```shell script
+$ cargo pgx connect pg13 strings
+     Re-using existing database strings
+psql (13.3)
+Type "help" for help.
+
+strings=# select strings.to_lowercase('PGX');
+ to_lowercase 
+--------------
+ pgx
+(1 row)
+```
 
 If you'd simply like to connect to a managed version of Postgres without re-compiling and installing
 your extension, use `cargo pgx connect <pg10 | pg11 | pg12 | pg13>`.
@@ -205,11 +306,12 @@ If the specified database doesn't exist, `cargo pgx connect` will create it.  Si
 the specified version of Postgres isn't running, it'll be automatically started.
 
 ```shell script
-cargo-pgx-pgx-connect 
+$ cargo pgx connect --help
+cargo-pgx-connect
 connect, via psql, to a Postgres instance
 
 USAGE:
-    cargo-pgx pgx connect <PG_VERSION> [DBNAME]
+    cargo pgx connect <PG_VERSION> [DBNAME]
 
 FLAGS:
     -h, --help       Prints help information
@@ -223,7 +325,24 @@ ARGS:
 
 ## Installing Your Extension Locally
 
-![install](https://raw.githubusercontent.com/zombodb/pgx/master/cargo-pgx/install.png)
+```shell script
+cargo pgx install
+building extension with features `pg12`
+"cargo" "build" "--features" "pg12" "--no-default-features"
+    Finished dev [unoptimized + debuginfo] target(s) in 0.18s
+
+installing extension
+      Copying control file to `/home/yourself/pg12/share/postgresql/extension/strings.control`
+      Copying shared library to `/home/yourself/pg12/lib/postgresql/strings.so`
+`src/bin/sql-generator.rs` does not exist or is not what is expected.
+If you encounter problems please delete it and use the generated version.
+running SQL generator features `pg12`
+"cargo" "run" "--bin" "sql-generator" "--features" "pg12" "--no-default-features" "--" "/home/yourself/pg12/share/postgresql/extension/strings--1.0.sql"
+    Finished dev [unoptimized + debuginfo] target(s) in 0.11s
+     Running `target/debug/sql-generator /home/yourself/pg12/share/postgresql/extension/strings--1.0.sql`
+Aug 03 11:45:27.651  INFO Writing SQL. path=/home/yourself/pg12/share/postgresql/extension/strings--1.0.sql
+     Finished installing strings
+```
 
 If for some reason `cargo pgx run <PG_VERSION>` isn't your style, you can use `cargo pgx install` to install your extension
 to the Postgres installation described by the `pg_config` tool currently on your `$PATH`.
@@ -234,17 +353,17 @@ By default, `cargo pgx install` builds your extension in debug mode.  Specifying
 
 ```shell script
 $ cargo pgx install --help
-  cargo-pgx-pgx-install 
-  install the extension from the current crate to the Postgres specified by whatever "pg_config" is currently on your
-  $PATH
-  
-  USAGE:
-      cargo-pgx pgx install [FLAGS]
-  
-  FLAGS:
-      -h, --help       Prints help information
-      -r, --release    compile for release mode (default is debug)
-      -V, --version    Prints version information
+cargo-pgx-install
+install the extension from the current crate to the Postgres specified by whatever "pg_config" is currently on your
+$PATH
+
+USAGE:
+    cargo pgx install [FLAGS] [OPTIONS]
+
+FLAGS:
+    -h, --help       Prints help information
+    -r, --release    compile for release mode (default is debug)
+    -V, --version    Prints version information
 
 OPTIONS:
         --features <features>...    additional cargo features to activate (default is '--no-default-features')
@@ -253,7 +372,47 @@ OPTIONS:
 
 ## Testing Your Extension
 
-![test](https://raw.githubusercontent.com/zombodb/pgx/master/cargo-pgx/test.png)
+```shell script
+$ cargo pgx test pg13
+"cargo" "test" "--all" "--features" " pg13 pg_test" "--no-default-features"
+    Finished test [unoptimized + debuginfo] target(s) in 0.11s
+     Running unittests (target/debug/deps/spi-ce9e68c581d521ac)
+
+running 2 tests
+building extension with features `pg13 pg_test`
+"cargo" "build" "--features" "pg13 pg_test" "--no-default-features"
+    Finished dev [unoptimized + debuginfo] target(s) in 0.09s
+
+installing extension
+      Copying control file to `/home/yourself/.pgx/13.3/pgx-install/share/postgresql/extension/spi.control`
+      Copying shared library to `/home/yourself/.pgx/13.3/pgx-install/lib/postgresql/spi.so`
+`src/bin/sql-generator.rs` does not exist or is not what is expected.
+If you encounter problems please delete it and use the generated version.
+running SQL generator features `pg13 pg_test`
+"cargo" "run" "--bin" "sql-generator" "--features" "pg13 pg_test" "--no-default-features" "--" "/home/yourself/.pgx/13.3/pgx-install/share/postgresql/extension/spi--1.0.sql"
+    Finished dev [unoptimized + debuginfo] target(s) in 0.09s
+     Running `target/debug/sql-generator /home/yourself/.pgx/13.3/pgx-install/share/postgresql/extension/spi--1.0.sql`
+Aug 03 10:26:39.108  INFO Writing SQL. path=/home/yourself/.pgx/13.3/pgx-install/share/postgresql/extension/spi--1.0.sql
+     Finished installing spi
+test tests::pg_test_spi_query_by_id_direct ... ok
+test tests::pg_test_spi_query_by_id_via_spi ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.56s
+
+Stopping Postgres
+
+     Running unittests (target/debug/deps/sql_generator-0bc6e7d903af4637)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests spi
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+```
 
 `cargo pgx test [pg10 | pg11 | pg12 | pg13]` runs your `#[test]` and `#[pg_test]` annotated functions using cargo's test system.
 
@@ -268,11 +427,11 @@ make to the database are not preserved.
 
 ```shell script
 $ cargo pgx test --help
-cargo-pgx-pgx-test 
+cargo-pgx-test
 run the test suite for this crate
 
 USAGE:
-    cargo-pgx pgx test [FLAGS] [PG_VERSION]
+    cargo pgx test [FLAGS] [OPTIONS] [--] [PG_VERSION]
 
 FLAGS:
     -h, --help       Prints help information
@@ -288,7 +447,23 @@ ARGS:
 
 ## Building an Installation Package
 
-![package](https://raw.githubusercontent.com/zombodb/pgx/master/cargo-pgx/package.png)
+```shell script
+$ cargo pgx package 
+building extension with features `pg13`
+"cargo" "build" "--release" "--features" "pg13" "--no-default-features"
+   Compiling spi v0.0.0 (/home/yourself/git/zombodb/pgx/pgx-examples/spi)
+    Finished release [optimized] target(s) in 2.67s
+
+installing extension
+      Copying control file to `target/release/spi-pg13/postgresql-13.3/share/postgresql/extension/spi.control`
+      Copying shared library to `target/release/spi-pg13/nix/store/mrnx57km55v55pix2mrhrjckjlsygzwv-postgresql-13.3-lib/lib/spi.so`
+running SQL generator features `pg13`
+"cargo" "run" "--bin" "sql-generator" "--release" "--features" "pg13" "--no-default-features" "--" "/home/yourself/git/zombodb/pgx/pgx-examples/spi/target/release/spi-pg13/postgresql-13.3/share/postgresql/extension/spi--1.0.sql"
+    Finished release [optimized] target(s) in 0.10s
+     Running `target/release/sql-generator /home/yourself/git/zombodb/pgx/pgx-examples/spi/target/release/spi-pg13/postgresql-13.3/share/postgresql/extension/spi--1.0.sql`
+Aug 03 10:33:23.128  INFO Writing SQL. path=/home/yourself/git/zombodb/pgx/pgx-examples/spi/target/release/spi-pg13/postgresql-13.3/share/postgresql/extension/spi--1.0.sql
+     Finished installing spi
+```
 
 `cargo pgx package [--debug]` builds your extension, in `--release` mode, to a directory structure in 
 `./target/[debug | release]/extension_name-PGVER` using the Postgres installation path information from the `pg_config` 
@@ -307,45 +482,18 @@ distobutions or MacOS Postgres installations.
 
 ```shell script
 $ cargo pgx package --help
- cargo-pgx-pgx-package 
- create an installation package directory (in ./target/[debug|release]/extname-pgXX/) for the Postgres installation
- specified by whatever "pg_config" is currently on your $PATH
- 
- USAGE:
-     cargo-pgx pgx package [FLAGS]
- 
- FLAGS:
-     -d, --debug      compile for debug mode (default is release)
-     -h, --help       Prints help information
-     -V, --version    Prints version information
-
-OPTIONS:
-        --features <features>...        additional cargo features to activate (default is '--no-default-features')
-        -c, --pg_config <pg_config>     the `pg_config` path (default is first in $PATH)
-```
-
-## Dump Your Extension Schema
-
-If you just want to look at the full extension schema that pgx will generate, use
-`cargo pgx dump-schema /dir/to/write/it/`.
-
-![dumpschema](https://raw.githubusercontent.com/zombodb/pgx/master/cargo-pgx/dump-schema.png)
-
-```shell script
-$ cargo pgx dump-schema --help
-cargo-pgx-dump-schema 0.1.18
-dump the full extension SQL schema file
+cargo-pgx-package
+create an installation package directory (in ./target/[debug|release]/extname-pgXX/).
 
 USAGE:
-    cargo pgx dump-schema <DIRECTORY>
+    cargo pgx package [FLAGS] [OPTIONS]
 
 FLAGS:
+    -d, --debug      compile for debug mode (default is release)
     -h, --help       Prints help information
     -V, --version    Prints version information
 
 OPTIONS:
         --features <features>...    additional cargo features to activate (default is '--no-default-features')
-
-ARGS:
-    <DIRECTORY>    Where should the extension .sql file be written?
+    -c, --pg_config <pg_config>     the `pg_config` path (default is first in $PATH)
 ```

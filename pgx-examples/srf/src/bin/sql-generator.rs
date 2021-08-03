@@ -1,1 +1,0 @@
-pgx::pg_binary_magic!(srf);
