@@ -1,6 +1,9 @@
 use proc_macro2::TokenStream as TokenStream2;
 use quote::{quote, ToTokens, TokenStreamExt};
-use syn::{DeriveInput, Ident, ItemEnum, ItemStruct, parse::{Parse, ParseStream}};
+use syn::{
+    parse::{Parse, ParseStream},
+    DeriveInput, Ident, ItemEnum, ItemStruct,
+};
 
 use super::{DotIdentifier, SqlGraphEntity, ToSql};
 
@@ -57,28 +60,22 @@ impl PostgresHash {
         Self { name }
     }
 
-    pub fn from_derive_input(
-        derive_input: DeriveInput,
-    ) -> Result<Self, syn::Error> {
-        Ok(Self::new(
-            derive_input.ident,
-        ))
+    pub fn from_derive_input(derive_input: DeriveInput) -> Result<Self, syn::Error> {
+        Ok(Self::new(derive_input.ident))
     }
 }
 
 impl Parse for PostgresHash {
     fn parse(input: ParseStream) -> Result<Self, syn::Error> {
         let parsed_enum: Result<ItemEnum, syn::Error> = input.parse();
-        let parsed_struct: Result<ItemStruct,syn::Error> = input.parse();
-        let ident = parsed_enum.map(|x| x.ident)
+        let parsed_struct: Result<ItemStruct, syn::Error> = input.parse();
+        let ident = parsed_enum
+            .map(|x| x.ident)
             .or_else(|_| parsed_struct.map(|x| x.ident))
             .map_err(|_| syn::Error::new(input.span(), "expected enum or struct"))?;
-        Ok(Self::new(
-            ident,
-        ))
+        Ok(Self::new(ident))
     }
 }
-
 
 impl ToTokens for PostgresHash {
     fn to_tokens(&self, tokens: &mut TokenStream2) {

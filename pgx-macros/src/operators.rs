@@ -1,5 +1,5 @@
 use pgx_utils::{operator_common::*, pg_inventory};
-use quote::{ToTokens};
+use quote::ToTokens;
 use syn::DeriveInput;
 
 pub(crate) fn impl_postgres_eq(ast: DeriveInput) -> proc_macro2::TokenStream {
@@ -8,7 +8,7 @@ pub(crate) fn impl_postgres_eq(ast: DeriveInput) -> proc_macro2::TokenStream {
             .get_ident()
             .map(|x| x.to_string() == "skip_inventory")
             .unwrap_or(false)
-    }); 
+    });
     let mut stream = proc_macro2::TokenStream::new();
 
     stream.extend(eq(&ast.ident, found_skip_inventory));

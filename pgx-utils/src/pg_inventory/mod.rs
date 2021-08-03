@@ -44,11 +44,34 @@ pub use tracing_subscriber;
 use core::{any::TypeId, fmt::Debug};
 
 /// A mapping from a Rust type to a SQL type, with a `TypeId`.
+///
+/// ```rust
+/// use pgx_utils::pg_inventory::RustSqlMapping;
+///
+/// let constructed = RustSqlMapping::of::<i32>(String::from("int"));
+/// let raw = RustSqlMapping {
+///     rust: core::any::type_name::<i32>().to_string(),
+///     sql: String::from("int"),
+///     id: core::any::TypeId::of::<i32>(),
+/// };
+///
+/// assert_eq!(constructed, raw);
+/// ```
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct RustSqlMapping {
     pub rust: String,
     pub sql: String,
     pub id: TypeId,
+}
+
+impl RustSqlMapping {
+    pub fn of<T: 'static>(sql: String) -> Self {
+        Self {
+            rust: core::any::type_name::<T>().to_string(),
+            sql: sql.to_string(),
+            id: core::any::TypeId::of::<T>(),
+        }
+    }
 }
 
 /// Able to produce a GraphViz DOT format identifier.

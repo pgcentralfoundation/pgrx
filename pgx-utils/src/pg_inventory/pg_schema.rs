@@ -54,7 +54,7 @@ impl ToTokens for Schema {
                 .get_ident()
                 .map(|x| x.to_string() == "skip_inventory")
                 .unwrap_or(false)
-        }); 
+        });
 
         let mut updated_content = content_items.clone();
         if !found_skip_inventory {
@@ -71,7 +71,6 @@ impl ToTokens for Schema {
                     })
                 }
             });
-    
         }
         let _semi = &self.module.semi;
 

@@ -42,10 +42,7 @@ impl Parse for ExtensionSqlFile {
         let path = input.parse()?;
         let _after_sql_comma: Option<Token![,]> = input.parse()?;
         let attrs = input.parse_terminated(ExtensionSqlAttribute::parse)?;
-        Ok(Self {
-            path,
-            attrs,
-        })
+        Ok(Self { path, attrs })
     }
 }
 
@@ -147,10 +144,7 @@ impl Parse for ExtensionSql {
         let sql = input.parse()?;
         let _after_sql_comma: Option<Token![,]> = input.parse()?;
         let attrs = input.parse_terminated(ExtensionSqlAttribute::parse)?;
-        Ok(Self {
-            sql,
-            attrs,
-        })
+        Ok(Self { sql, attrs })
     }
 }
 

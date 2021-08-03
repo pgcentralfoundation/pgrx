@@ -386,8 +386,8 @@ fn rewrite_item_fn(
 /// Generate necessary bindings for using the enum with PostgreSQL.
 ///
 /// ```rust
-/// use pgx_pg_sys as pg_sys;
-/// use pgx::{PostgresEnum};
+/// # use pgx_pg_sys as pg_sys;
+/// use pgx::*;
 /// use serde::{Deserialize, Serialize};
 /// #[derive(Debug, Serialize, Deserialize, PostgresEnum)]
 /// # #[skip_inventory]
@@ -468,9 +468,9 @@ fn impl_postgres_enum(ast: DeriveInput) -> proc_macro2::TokenStream {
     });
 
     if !found_skip_inventory {
-        pg_inventory::PostgresEnum::from_derive_input(
-            inventory_ast
-        ).unwrap().to_tokens(&mut stream);
+        pg_inventory::PostgresEnum::from_derive_input(inventory_ast)
+            .unwrap()
+            .to_tokens(&mut stream);
     }
 
     stream
@@ -479,8 +479,8 @@ fn impl_postgres_enum(ast: DeriveInput) -> proc_macro2::TokenStream {
 /// Generate necessary bindings for using the type with PostgreSQL.
 ///
 /// ```rust
-/// use pgx_pg_sys as pg_sys;
-/// use pgx::{PostgresType, StringInfo, JsonInOutFuncs, pg_extern, IntoDatum, pg_guard};
+/// # use pgx_pg_sys as pg_sys;
+/// use pgx::*;
 /// use serde::{Deserialize, Serialize};
 /// #[derive(Debug, Serialize, Deserialize, PostgresType)]
 /// # #[skip_inventory]
@@ -604,9 +604,9 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
     }
 
     if !found_skip_inventory {
-        pg_inventory::PostgresType::from_derive_input(
-            ast
-        ).unwrap().to_tokens(&mut stream);
+        pg_inventory::PostgresType::from_derive_input(ast)
+            .unwrap()
+            .to_tokens(&mut stream);
     }
 
     stream
@@ -728,8 +728,8 @@ fn parse_postgres_type_args(attributes: &[Attribute]) -> HashSet<PostgresTypeAtt
 /// Generate necessary code using the type in operators like `==` and `!=`.
 ///
 /// ```rust
-/// use pgx_pg_sys as pg_sys;
-/// use pgx::{PostgresEnum, PostgresEq, merges, hashes, join, negator, IntoDatum, opname, restrict, pg_guard, pg_operator};
+/// # use pgx_pg_sys as pg_sys;
+/// use pgx::*;
 /// use serde::{Deserialize, Serialize};
 /// #[derive(Debug, Serialize, Deserialize, PostgresEnum, PartialEq, Eq, PostgresEq)]
 /// # #[skip_inventory]
@@ -748,14 +748,16 @@ pub fn postgres_eq(input: TokenStream) -> TokenStream {
     impl_postgres_eq(ast).into()
 }
 
-
 /// Generate necessary code using the type in operators like `>`, `<`, `<=`, and `>=`.
 ///
 /// ```rust
-/// use pgx_pg_sys as pg_sys;
-/// use pgx::{PostgresEnum, PostgresOrd, join, restrict, commutator, negator, opname, pg_guard, pg_extern, pg_operator, IntoDatum};
+/// # use pgx_pg_sys as pg_sys;
+/// use pgx::*;
 /// use serde::{Deserialize, Serialize};
-/// #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord, PostgresEnum, PostgresOrd)]
+/// #[derive(
+///     Debug, Serialize, Deserialize, PartialEq, Eq,
+///      PartialOrd, Ord, PostgresEnum, PostgresOrd
+/// )]
 /// # #[skip_inventory]
 /// enum DogNames {
 ///     Nami,
@@ -775,8 +777,8 @@ pub fn postgres_ord(input: TokenStream) -> TokenStream {
 /// Generate necessary code for stable hashing the type so it can be used with `USING hash` indexes.
 ///
 /// ```rust
-/// use pgx_pg_sys as pg_sys;
-/// use pgx::{PostgresEnum, PostgresHash, pg_extern, IntoDatum, pg_guard};
+/// # use pgx_pg_sys as pg_sys;
+/// use pgx::*;
 /// use serde::{Deserialize, Serialize};
 /// #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Hash, PostgresEnum, PostgresHash)]
 /// # #[skip_inventory]

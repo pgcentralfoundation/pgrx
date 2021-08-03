@@ -2,12 +2,13 @@ use std::hash::{Hash, Hasher};
 
 use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
-use syn::{parse::{Parse, ParseStream}, ItemEnum, DeriveInput, Generics};
+use syn::{
+    parse::{Parse, ParseStream},
+    DeriveInput, Generics, ItemEnum,
+};
 use syn::{punctuated::Punctuated, Ident, Token};
 
 use super::{DotIdentifier, SqlGraphEntity, ToSql};
-
-
 
 /// A parsed `#[derive(PostgresEnum)]` item.
 ///
@@ -51,13 +52,12 @@ impl PostgresEnum {
         }
     }
 
-    pub fn from_derive_input(
-        derive_input: DeriveInput,
-    ) -> Result<Self, syn::Error> {
+    pub fn from_derive_input(derive_input: DeriveInput) -> Result<Self, syn::Error> {
         let data_enum = match derive_input.data {
             syn::Data::Enum(data_enum) => data_enum,
-            syn::Data::Union(_) | syn::Data::Struct(_) => 
-                return Err(syn::Error::new(derive_input.ident.span(), "expected enum")),
+            syn::Data::Union(_) | syn::Data::Struct(_) => {
+                return Err(syn::Error::new(derive_input.ident.span(), "expected enum"))
+            }
         };
         Ok(Self::new(
             derive_input.ident,
@@ -67,15 +67,10 @@ impl PostgresEnum {
     }
 }
 
-
 impl Parse for PostgresEnum {
     fn parse(input: ParseStream) -> Result<Self, syn::Error> {
         let parsed: ItemEnum = input.parse()?;
-        Ok(Self::new(
-            parsed.ident,
-            parsed.generics,
-            parsed.variants,
-        ))
+        Ok(Self::new(parsed.ident, parsed.generics, parsed.variants))
     }
 }
 

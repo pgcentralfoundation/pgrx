@@ -2,7 +2,10 @@ use eyre::eyre as eyre_err;
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
 use std::hash::{Hash, Hasher};
-use syn::{DeriveInput, Generics, ItemStruct, parse::{Parse, ParseStream}};
+use syn::{
+    parse::{Parse, ParseStream},
+    DeriveInput, Generics, ItemStruct,
+};
 
 use super::{DotIdentifier, SqlGraphEntity, ToSql};
 
@@ -46,16 +49,24 @@ impl PostgresType {
         }
     }
 
-    pub fn from_derive_input(
-        derive_input: DeriveInput,
-    ) -> Result<Self, syn::Error> {
+    pub fn from_derive_input(derive_input: DeriveInput) -> Result<Self, syn::Error> {
         let _data_struct = match derive_input.data {
             syn::Data::Struct(data_struct) => data_struct,
-            syn::Data::Union(_) | syn::Data::Enum(_) => 
-                return Err(syn::Error::new(derive_input.ident.span(), "expected struct")),
+            syn::Data::Union(_) | syn::Data::Enum(_) => {
+                return Err(syn::Error::new(
+                    derive_input.ident.span(),
+                    "expected struct",
+                ))
+            }
         };
-        let funcname_in = Ident::new(&format!("{}_in", derive_input.ident).to_lowercase(), derive_input.ident.span());
-        let funcname_out = Ident::new(&format!("{}_out", derive_input.ident).to_lowercase(), derive_input.ident.span());
+        let funcname_in = Ident::new(
+            &format!("{}_in", derive_input.ident).to_lowercase(),
+            derive_input.ident.span(),
+        );
+        let funcname_out = Ident::new(
+            &format!("{}_out", derive_input.ident).to_lowercase(),
+            derive_input.ident.span(),
+        );
         Ok(Self::new(
             derive_input.ident,
             derive_input.generics,
@@ -65,12 +76,17 @@ impl PostgresType {
     }
 }
 
-
 impl Parse for PostgresType {
     fn parse(input: ParseStream) -> Result<Self, syn::Error> {
         let parsed: ItemStruct = input.parse()?;
-        let funcname_in = Ident::new(&format!("{}_in", parsed.ident).to_lowercase(), parsed.ident.span());
-        let funcname_out = Ident::new(&format!("{}_out", parsed.ident).to_lowercase(), parsed.ident.span());
+        let funcname_in = Ident::new(
+            &format!("{}_in", parsed.ident).to_lowercase(),
+            parsed.ident.span(),
+        );
+        let funcname_out = Ident::new(
+            &format!("{}_out", parsed.ident).to_lowercase(),
+            parsed.ident.span(),
+        );
         Ok(Self::new(
             parsed.ident,
             parsed.generics,
