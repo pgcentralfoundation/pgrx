@@ -26,36 +26,59 @@ use crate::ExternArgs;
 
 use super::{DotIdentifier, SqlGraphEntity, ToSql};
 
+/// A parsed `#[pg_extern]` item.
+///
+/// It should be used with [`syn::parse::Parse`] functions.
+///
+/// Using [`quote::ToTokens`] will output the declaration for a [`InventoryPostgresType`].
+///
+/// ```rust
+/// use syn::{Macro, parse::Parse, parse_quote, parse};
+/// use quote::{quote, ToTokens};
+/// use pgx_utils::pg_inventory::PgExtern;
+///
+/// # fn main() -> eyre::Result<()> {
+/// let parsed: PgExtern = parse_quote! {
+///     fn example(x: Option<str>) -> Option<&'a str> {
+///         unimplemented!()
+///     }
+/// };
+/// let inventory_tokens = parsed.to_token_stream();
+/// # Ok(())
+/// # }
+/// ```
 #[derive(Debug, Clone)]
 pub struct PgExtern {
-    attrs: PgxAttributes,
+    attrs: Option<PgxAttributes>,
     func: syn::ItemFn,
 }
 
 impl PgExtern {
     fn name(&self) -> String {
-        self.attrs
-            .attrs
-            .iter()
-            .find_map(|candidate| match candidate {
-                Attribute::Name(name) => Some(name.value()),
-                _ => None,
-            })
+        self.attrs.as_ref().and_then(|a| {
+            a.attrs
+                .iter()
+                .find_map(|candidate| match candidate {
+                    Attribute::Name(name) => Some(name.value()),
+                    _ => None,
+                })
+        })
             .unwrap_or_else(|| self.func.sig.ident.to_string())
     }
 
     fn schema(&self) -> Option<String> {
-        self.attrs
-            .attrs
+        self.attrs.as_ref().and_then(|a| {
+            a.attrs
             .iter()
             .find_map(|candidate| match candidate {
                 Attribute::Schema(name) => Some(name.value()),
                 _ => None,
             })
+        })
     }
 
-    fn extern_attrs(&self) -> &PgxAttributes {
-        &self.attrs
+    fn extern_attrs(&self) -> Option<&PgxAttributes> {
+        self.attrs.as_ref()
     }
 
     fn overridden(&self) -> Option<String> {
@@ -172,7 +195,7 @@ impl PgExtern {
     }
 
     pub fn new(attr: TokenStream2, item: TokenStream2) -> Result<Self, syn::Error> {
-        let attrs = syn::parse2::<PgxAttributes>(attr)?;
+        let attrs = syn::parse2::<PgxAttributes>(attr).ok();
         let func = syn::parse2::<syn::ItemFn>(item)?;
         Ok(Self { attrs, func })
     }
@@ -229,7 +252,7 @@ impl ToTokens for PgExtern {
 impl Parse for PgExtern {
     fn parse(input: ParseStream) -> Result<Self, syn::Error> {
         Ok(Self {
-            attrs: input.parse()?,
+            attrs: input.parse().ok(),
             func: input.parse()?,
         })
     }
