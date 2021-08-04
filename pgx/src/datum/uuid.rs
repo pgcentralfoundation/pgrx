@@ -53,6 +53,10 @@ impl Uuid {
         Uuid(b)
     }
 
+    pub const fn as_bytes(&self) -> &UuidBytes {
+        &self.0
+    }
+
     pub fn from_slice(b: &[u8]) -> Result<Uuid, String> {
         let len = b.len();
 
