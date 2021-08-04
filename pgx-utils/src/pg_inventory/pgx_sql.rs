@@ -387,12 +387,14 @@ impl<'a> PgxSql<'a> {
                         break;
                     }
                 }
-                for (ty_item, &ty_index) in &mapped_enums {
-                    if ty_item.id_matches(&arg.ty_id) {
-                        tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Extern after Enum (due to argument) edge.");
-                        graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredByArg);
-                        found = true;
-                        break;
+                if !found {
+                    for (enum_item, &enum_index) in &mapped_enums {
+                        if enum_item.id_matches(&arg.ty_id) {
+                            tracing::trace!(from = ?item.full_path, to = enum_item.full_path, "Adding Extern after Enum (due to argument) edge.");
+                            graph.add_edge(enum_index, index, SqlGraphRelationship::RequiredByArg);
+                            found = true;
+                            break;
+                        }
                     }
                 }
                 if !found {
@@ -401,6 +403,17 @@ impl<'a> PgxSql<'a> {
                         .expect(&format!("Could not fetch Builtin Type {}.", arg.full_path));
                     tracing::trace!(from = ?item.full_path, to = arg.full_path, "Adding Extern(arg) after BuiltIn Type (due to argument) edge.");
                     graph.add_edge(*builtin_index, index, SqlGraphRelationship::RequiredByArg);
+                }
+                if !found {
+                    for (ext_item, ext_index) in &mapped_extension_sqls {
+                        if let Some(_) = ext_item.has_sql_declared_entity(&SqlDeclaredEntity::Type(arg.full_path.to_string())) {
+                            tracing::trace!(from = ?item.full_path, to = arg.full_path, "Adding Extern(arg) after Extension SQL (due to argument) edge.");
+                            graph.add_edge(*ext_index, index, SqlGraphRelationship::RequiredByArg);
+                        } else if let Some(_) = ext_item.has_sql_declared_entity(&SqlDeclaredEntity::Enum(arg.full_path.to_string())) {
+                            tracing::trace!(from = ?item.full_path, to = arg.full_path, "Adding Extern(arg) after Extension SQL (due to argument) edge.");
+                            graph.add_edge(*ext_index, index, SqlGraphRelationship::RequiredByArg);
+                        }
+                    }
                 }
             }
             match &item.fn_return {
@@ -416,12 +429,14 @@ impl<'a> PgxSql<'a> {
                             break;
                         }
                     }
-                    for (ty_item, &ty_index) in &mapped_enums {
-                        if ty_item.id_matches(id) {
-                            tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Extern after Enum (due to return) edge.");
-                            graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredByReturn);
-                            found = true;
-                            break;
+                    if !found {
+                        for (ty_item, &ty_index) in &mapped_enums {
+                            if ty_item.id_matches(id) {
+                                tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Extern after Enum (due to return) edge.");
+                                graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredByReturn);
+                                found = true;
+                                break;
+                            }
                         }
                     }
                     if !found {
@@ -434,6 +449,17 @@ impl<'a> PgxSql<'a> {
                             index,
                             SqlGraphRelationship::RequiredByReturn,
                         );
+                    }
+                    if !found {
+                        for (ext_item, ext_index) in &mapped_extension_sqls {
+                            if let Some(_) = ext_item.has_sql_declared_entity(&SqlDeclaredEntity::Type(full_path.to_string())) {
+                                tracing::trace!(from = ?item.full_path, to = full_path, "Adding Extern(arg) after Extension SQL (due to argument) edge.");
+                                graph.add_edge(*ext_index, index, SqlGraphRelationship::RequiredByArg);
+                            } else if let Some(_) = ext_item.has_sql_declared_entity(&SqlDeclaredEntity::Enum(full_path.to_string())) {
+                                tracing::trace!(from = ?item.full_path, to = full_path, "Adding Extern(arg) after Extension SQL (due to argument) edge.");
+                                graph.add_edge(*ext_index, index, SqlGraphRelationship::RequiredByArg);
+                            }
+                        }
                     }
                 }
                 InventoryPgExternReturn::Iterated(iterated_returns) => {
@@ -451,16 +477,18 @@ impl<'a> PgxSql<'a> {
                                 break;
                             }
                         }
-                        for (ty_item, &ty_index) in &mapped_enums {
-                            if ty_item.id_matches(&iterated_return.0) {
-                                tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Extern after Enum (due to return) edge.");
-                                graph.add_edge(
-                                    ty_index,
-                                    index,
-                                    SqlGraphRelationship::RequiredByReturn,
-                                );
-                                found = true;
-                                break;
+                        if !found {
+                            for (ty_item, &ty_index) in &mapped_enums {
+                                if ty_item.id_matches(&iterated_return.0) {
+                                    tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Extern after Enum (due to return) edge.");
+                                    graph.add_edge(
+                                        ty_index,
+                                        index,
+                                        SqlGraphRelationship::RequiredByReturn,
+                                    );
+                                    found = true;
+                                    break;
+                                }
                             }
                         }
                         if !found {
@@ -476,6 +504,17 @@ impl<'a> PgxSql<'a> {
                                 index,
                                 SqlGraphRelationship::RequiredByReturn,
                             );
+                        }
+                        if !found {
+                            for (ext_item, ext_index) in &mapped_extension_sqls {
+                                if let Some(_) = ext_item.has_sql_declared_entity(&SqlDeclaredEntity::Type(iterated_return.1.to_string())) {
+                                    tracing::trace!(from = ?item.full_path, to = iterated_return.1, "Adding Extern(arg) after Extension SQL (due to argument) edge.");
+                                    graph.add_edge(*ext_index, index, SqlGraphRelationship::RequiredByArg);
+                                } else if let Some(_) = ext_item.has_sql_declared_entity(&SqlDeclaredEntity::Enum(iterated_return.1.to_string())) {
+                                    tracing::trace!(from = ?item.full_path, to = iterated_return.1, "Adding Extern(arg) after Extension SQL (due to argument) edge.");
+                                    graph.add_edge(*ext_index, index, SqlGraphRelationship::RequiredByArg);
+                                }
+                            }
                         }
                     }
                 }
@@ -703,90 +742,12 @@ impl<'a> PgxSql<'a> {
     }
 
 
-    pub fn has_sql_declared_entity(&self, identifier: &SqlDeclaredEntity) -> bool {
-        self.extension_sqls.iter().any(|(item, _index)| {
-            let retval = item.creates.iter().any(|create_entity| {
-                match (identifier, &create_entity) {
-                    (
-                        SqlDeclaredEntity::Type(identifier_name),
-                        &InventorySqlDeclaredEntity::Type {
-                            name,
-                            option,
-                            vec,
-                            vec_option,
-                            option_vec,
-                            option_vec_option,
-                            array,
-                            option_array,
-                            varlena,
-                            pg_box
-                        },
-                    ) => {
-                        identifier_name == name ||
-                            identifier_name == option ||
-                            identifier_name == vec ||
-                            identifier_name == vec_option ||
-                            identifier_name == option_vec ||
-                            identifier_name == option_vec_option ||
-                            identifier_name == array ||
-                            identifier_name == option_array ||
-                            identifier_name == varlena ||
-                            identifier_name == pg_box
-                    },
-                    (
-                        SqlDeclaredEntity::Enum(identifier_name),
-                        &InventorySqlDeclaredEntity::Enum {
-                            name,
-                            option,
-                            vec,
-                            vec_option,
-                            option_vec,
-                            option_vec_option,
-                            array,
-                            option_array,
-                            varlena,
-                            pg_box
-                        },
-                    ) => {
-                        identifier_name == name ||
-                            identifier_name == option ||
-                            identifier_name == vec ||
-                            identifier_name == vec_option ||
-                            identifier_name == option_vec ||
-                            identifier_name == option_vec_option ||
-                            identifier_name == array ||
-                            identifier_name == option_array ||
-                            identifier_name == varlena ||
-                            identifier_name == pg_box
-                    },
-                    (
-                        SqlDeclaredEntity::Function(identifier_name),
-                        &InventorySqlDeclaredEntity::Function {
-                            name,
-                            option,
-                            vec,
-                            vec_option,
-                            option_vec,
-                            option_vec_option,
-                            array,
-                            option_array,
-                            varlena,
-                            pg_box
-                        },
-                    ) => {
-                        identifier_name == name ||
-                            identifier_name == option ||
-                            identifier_name == vec ||
-                            identifier_name == vec_option ||
-                            identifier_name == option_vec ||
-                            identifier_name == option_vec_option ||
-                            identifier_name == array ||
-                            identifier_name == option_array ||
-                            identifier_name == varlena ||
-                            identifier_name == pg_box
-                    },
-                    _ => false,
-                }
+    pub fn has_sql_declared_entity(&self, identifier: &SqlDeclaredEntity) -> Option<&InventorySqlDeclaredEntity> {
+        self.extension_sqls.iter().find_map(|(item, _index)| {
+            let retval = item.creates.iter().find_map(|create_entity| if create_entity.has_sql_declared_entity(identifier) {
+                Some(create_entity)
+            } else {
+                None
             });
             retval
         })

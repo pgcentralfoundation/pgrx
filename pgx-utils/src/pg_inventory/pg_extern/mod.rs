@@ -337,10 +337,11 @@ impl ToSql for InventoryPgExtern {
                                             schema_prefix = context.schema_prefix_for(&graph_index),
                                             sql_type = context.type_id_to_sql_type(arg.ty_id).or_else(|| {
                                                 let pat = arg.full_path.to_string();
-                                                if context.has_sql_declared_entity(&SqlDeclaredEntity::Type(pat.clone()))
-                                                    || context.has_sql_declared_entity(&SqlDeclaredEntity::Enum(pat.clone())) {
-                                                    Some(pat)
-                                                }  else {
+                                                if let Some(found) = context.has_sql_declared_entity(&SqlDeclaredEntity::Type(pat.clone())) {
+                                                    Some(found.sql())
+                                                }  else if let Some(found) = context.has_sql_declared_entity(&SqlDeclaredEntity::Enum(pat.clone())) {
+                                                    Some(found.sql())
+                                                } else {
                                                     None
                                                 }
                                             }).ok_or_else(|| eyre_err!(
@@ -369,14 +370,15 @@ impl ToSql for InventoryPgExtern {
                                      }).ok_or_else(|| eyre_err!("Could not find return type in graph."))?;
                                      format!("RETURNS {schema_prefix}{sql_type} /* {full_path} */",
                                              sql_type = context.type_id_to_sql_type(*id).or_else(|| {
-                                                let pat = full_path.to_string();
-                                                if context.has_sql_declared_entity(&SqlDeclaredEntity::Type(pat.clone()))
-                                                    || context.has_sql_declared_entity(&SqlDeclaredEntity::Enum(pat.clone())) {
-                                                    Some(pat)
-                                                }  else {
-                                                    None
-                                                }
-                                            }).ok_or_else(|| eyre_err!("Failed to map return type `{}` to SQL type while building function `{}`.", full_path, self.full_path))?,
+                                                    let pat = full_path.to_string();
+                                                    if let Some(found) = context.has_sql_declared_entity(&SqlDeclaredEntity::Type(pat.clone())) {
+                                                        Some(found.sql())
+                                                    }  else if let Some(found) = context.has_sql_declared_entity(&SqlDeclaredEntity::Enum(pat.clone())) {
+                                                        Some(found.sql())
+                                                    } else {
+                                                        None
+                                                    }
+                                                }).ok_or_else(|| eyre_err!("Failed to map return type `{}` to SQL type while building function `{}`.", full_path, self.full_path))?,
                                              schema_prefix = context.schema_prefix_for(&graph_index),
                                              full_path = full_path
                                      )
@@ -390,13 +392,14 @@ impl ToSql for InventoryPgExtern {
                                      }).ok_or_else(|| eyre_err!("Could not find return type in graph."))?;
                                      format!("RETURNS SETOF {schema_prefix}{sql_type} /* {full_path} */",
                                              sql_type = context.type_id_to_sql_type(*id).or_else(|| {
-                                                let pat = full_path.to_string();
-                                                if context.has_sql_declared_entity(&SqlDeclaredEntity::Type(pat.clone()))
-                                                    || context.has_sql_declared_entity(&SqlDeclaredEntity::Enum(pat.clone())) {
-                                                    Some(pat)
-                                                }  else {
-                                                    None
-                                                }
+                                                    let pat = full_path.to_string();
+                                                    if let Some(found) = context.has_sql_declared_entity(&SqlDeclaredEntity::Type(pat.clone())) {
+                                                        Some(found.sql())
+                                                    }  else if let Some(found) = context.has_sql_declared_entity(&SqlDeclaredEntity::Enum(pat.clone())) {
+                                                        Some(found.sql())
+                                                    } else {
+                                                        None
+                                                    }
                                                 }).ok_or_else(|| eyre_err!("Failed to map return type `{}` to SQL type while building function `{}`.", full_path, self.full_path))?,
                                              schema_prefix = context.schema_prefix_for(&graph_index),
                                              full_path = full_path
@@ -417,13 +420,14 @@ impl ToSql for InventoryPgExtern {
                                                             schema_prefix = context.schema_prefix_for(&graph_index),
                                                             ty_resolved = context.type_id_to_sql_type(*id).or_else(|| {
                                                                 let pat = ty_name.to_string();
-                                                                if context.has_sql_declared_entity(&SqlDeclaredEntity::Type(pat.clone()))
-                                                                    || context.has_sql_declared_entity(&SqlDeclaredEntity::Enum(pat.clone())) {
-                                                                    Some(pat)
-                                                                }  else {
+                                                                if let Some(found) = context.has_sql_declared_entity(&SqlDeclaredEntity::Type(pat.clone())) {
+                                                                    Some(found.sql())
+                                                                }  else if let Some(found) = context.has_sql_declared_entity(&SqlDeclaredEntity::Enum(pat.clone())) {
+                                                                    Some(found.sql())
+                                                                } else {
                                                                     None
                                                                 }
-                                                                }).ok_or_else(|| eyre_err!("Failed to map return type `{}` to SQL type while building function `{}`.", ty_name, self.name))?,
+                                                            }).ok_or_else(|| eyre_err!("Failed to map return type `{}` to SQL type while building function `{}`.", ty_name, self.name))?,
                                                             needs_comma = if needs_comma { ", " } else { " " },
                                                             ty_name = ty_name
                                          );

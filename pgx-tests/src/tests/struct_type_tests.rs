@@ -14,7 +14,8 @@ struct Complex {
 
 extension_sql!(
     r#"CREATE TYPE complex;"#,
-    creates = [Type("pgx_tests::tests::struct_type_tests::Complex")]
+    name = "create_complex_type",
+    creates = [Type(Complex)]
 );
 
 #[pg_extern(immutable)]
@@ -48,7 +49,7 @@ CREATE TYPE complex (
    output = complex_out,
    alignment = double
 );
-"#);
+"#, after = ["create_complex_type"]);
 
 #[cfg(any(test, feature = "pg_test"))]
 mod tests {
