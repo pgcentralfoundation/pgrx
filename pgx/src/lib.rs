@@ -290,7 +290,7 @@ macro_rules! pg_inventory_magic {
         pub mod __pgx_internals {
             use ::core::convert::TryFrom;
             use ::pgx_utils::pg_inventory::{
-                inventory, once_cell::sync::Lazy, ControlFile, PgxSql,
+                inventory, once_cell::sync::Lazy, ControlFile, PgxSql, tracing,
             };
 
             /// The contents of the `*.control` file of the crate.
@@ -364,6 +364,7 @@ macro_rules! pg_inventory_magic {
             ///
             ///  Most often, this is done by the [`macro@pgx::pg_binary_magic`] inside a
             /// `src/bin/sql-generator.rs`.
+            #[tracing::instrument(level = "info")]
             pub fn generate_sql<'a>() -> pgx_utils::pg_inventory::eyre::Result<PgxSql<'a>> {
                 let generated = PgxSql::build(
                     &*CONTROL_FILE,
@@ -450,7 +451,9 @@ macro_rules! pg_binary_magic {
             use $($prelude :: )*__pgx_internals::generate_sql;
 
             // Initialize tracing with tracing-error, and eyre
-            let fmt_layer = tracing_subscriber::fmt::layer().with_target(false);
+            let fmt_layer = tracing_subscriber::fmt::Layer::new()
+                .with_target(false)
+                .without_time();
             let filter_layer = EnvFilter::try_from_default_env()
                 .or_else(|_| EnvFilter::try_new("info"))
                 .unwrap();
@@ -466,14 +469,14 @@ macro_rules! pg_binary_magic {
             let path = args.next().unwrap_or(concat!("./sql/", core::env!("CARGO_PKG_NAME"), ".sql").into());
             let dot: Option<String> = args.next();
             if args.next().is_some() {
-                return Err(eyre::eyre!("Only accepts two arguments, the destination path, and an optional (GraphViz) dot output path."));
+                return Err(eyre::eyre!("Only accepts two arguments, the destination path, and an optional (GraphViz) dot output path"));
             }
 
-            tracing::info!(path = %path, "Writing SQL.");
+            tracing::info!(path = %path, "Writing SQL");
             let sql = generate_sql()?;
             sql.to_file(path)?;
             if let Some(dot) = dot {
-                tracing::info!(dot = %dot, "Writing Graphviz DOT.");
+                tracing::info!(dot = %dot, "Writing Graphviz DOT");
                 sql.to_dot(dot)?;
             }
             Ok(())

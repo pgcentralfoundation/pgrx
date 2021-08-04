@@ -55,8 +55,12 @@ impl ToTokens for ExtensionSqlFile {
         let mut skip_inventory = false;
         let mut before = vec![];
         let mut after = vec![];
+        let mut creates = vec![];
         for attr in &self.attrs {
             match attr {
+                ExtensionSqlAttribute::Creates(items) => {
+                    creates.append(&mut items.iter().map(|x| x.to_token_stream()).collect());
+                }
                 ExtensionSqlAttribute::Before(items) => {
                     before.append(&mut items.iter().map(|x| x.to_token_stream()).collect());
                 }
@@ -156,6 +160,7 @@ impl ToTokens for ExtensionSql {
         let mut finalize = false;
         let mut skip_inventory = false;
         let mut before = vec![];
+        let mut creates = vec![];
         let mut after = vec![];
         for attr in &self.attrs {
             match attr {
@@ -164,6 +169,9 @@ impl ToTokens for ExtensionSql {
                 }
                 ExtensionSqlAttribute::After(items) => {
                     after.append(&mut items.iter().map(|x| x.to_token_stream()).collect());
+                }
+                ExtensionSqlAttribute::Creates(items) => {
+                    creates.append(&mut items.iter().map(|x| x.to_token_stream()).collect());
                 }
                 ExtensionSqlAttribute::Bootstrap => {
                     bootstrap = true;
@@ -181,6 +189,7 @@ impl ToTokens for ExtensionSql {
         }
         let before_iter = before.iter();
         let after_iter = after.iter();
+        let creates_iter = creates.iter();
         let name_iter = name.iter();
         if !skip_inventory {
             let inv = quote! {
@@ -196,6 +205,7 @@ impl ToTokens for ExtensionSql {
                         finalize: #finalize,
                         before: vec![#(#before_iter),*],
                         after: vec![#(#after_iter),*],
+                        creates: vec![#(#creates_iter),*],
                     })
                 }
             };
@@ -208,6 +218,7 @@ impl ToTokens for ExtensionSql {
 pub enum ExtensionSqlAttribute {
     Before(Punctuated<ExtensionSqlPositioning, Token![,]>),
     After(Punctuated<ExtensionSqlPositioning, Token![,]>),
+    Creates(Punctuated<SqlDeclaredEntity, Token![,]>),
     Bootstrap,
     Finalize,
     Name(LitStr),
@@ -218,6 +229,12 @@ impl Parse for ExtensionSqlAttribute {
     fn parse(input: ParseStream) -> Result<Self, syn::Error> {
         let ident: Ident = input.parse()?;
         let found = match ident.to_string().as_str() {
+            "creates" => {
+                let _eq: syn::token::Eq = input.parse()?;
+                let content;
+                let _bracket = syn::bracketed!(content in input);
+                Self::Creates(content.parse_terminated(SqlDeclaredEntity::parse)?)
+            }
             "before" => {
                 let _eq: syn::token::Eq = input.parse()?;
                 let content;
@@ -297,6 +314,7 @@ pub struct InventoryExtensionSql {
     pub finalize: bool,
     pub before: Vec<InventoryExtensionSqlPositioningRef<'static>>,
     pub after: Vec<InventoryExtensionSqlPositioningRef<'static>>,
+    pub creates: Vec<SqlDeclaredEntity>,
 }
 
 impl InventoryExtensionSql {
@@ -318,7 +336,7 @@ impl DotIdentifier for InventoryExtensionSql {
 }
 
 impl ToSql for InventoryExtensionSql {
-    #[tracing::instrument(level = "debug", err, skip(self, _context))]
+    #[tracing::instrument(level = "debug", skip(self, _context))]
     fn to_sql(&self, _context: &super::PgxSql) -> eyre::Result<String> {
         let sql = format!(
             "\n\
@@ -338,4 +356,54 @@ impl ToSql for InventoryExtensionSql {
 pub enum InventoryExtensionSqlPositioningRef<'a> {
     FullPath(&'a str),
     Name(&'a str),
+}
+
+#[derive(Debug, Clone, Hash, PartialEq, Eq, Ord, PartialOrd)]
+pub enum SqlDeclaredEntity {
+    Type(String),
+    Enum(String),
+    Function(String),
+}
+
+impl Parse for SqlDeclaredEntity {
+    fn parse(input: ParseStream) -> syn::Result<Self> {
+        let variant: Ident = input.parse()?;
+        let content;
+        let _bracket: syn::token::Paren = syn::parenthesized!(content in input);
+        let identifier_litstr: LitStr = content.parse()?;
+        let identifier = identifier_litstr.value();
+        let this = match variant.to_string().as_str() {
+            "Type" => SqlDeclaredEntity::Type(identifier),
+            "Enum" => SqlDeclaredEntity::Enum(identifier),
+            "Function" => SqlDeclaredEntity::Function(identifier),
+            _ => return Err(syn::Error::new(
+                variant.span(),
+                "SQL declared entities must be `Type(ident)`, `Enum(ident)`, or `Function(ident)`",
+            ))
+        };
+        Ok(this)
+    }
+}
+
+impl ToTokens for SqlDeclaredEntity {
+    fn to_tokens(&self, tokens: &mut TokenStream2) {
+        let (variant, identifier) = match &self {
+            SqlDeclaredEntity::Type(val) => (
+                Ident::new("Type", proc_macro2::Span::call_site()),
+                val
+            ),
+            SqlDeclaredEntity::Enum(val) => (
+                Ident::new("Enum", proc_macro2::Span::call_site()), 
+                val
+            ),
+            SqlDeclaredEntity::Function(val) => (
+                Ident::new("Function", proc_macro2::Span::call_site()),
+                val
+            ),
+        };
+        let inv = quote! {
+            pgx_utils::pg_inventory::SqlDeclaredEntity::#variant(String::from(#identifier))
+        };
+        tokens.append_all(inv);
+    }
 }

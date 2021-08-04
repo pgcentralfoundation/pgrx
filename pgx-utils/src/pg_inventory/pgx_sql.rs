@@ -6,11 +6,7 @@ use tracing::instrument;
 
 use crate::pg_inventory::DotIdentifier;
 
-use super::{
-    ControlFile, InventoryExtensionSql, InventoryExtensionSqlPositioningRef, InventoryPgExtern,
-    InventoryPgExternReturn, InventoryPostgresEnum, InventoryPostgresHash, InventoryPostgresOrd,
-    InventoryPostgresType, InventorySchema, RustSqlMapping, SqlGraphEntity, ToSql,
-};
+use super::{ControlFile, InventoryExtensionSql, InventoryExtensionSqlPositioningRef, InventoryPgExtern, InventoryPgExternReturn, InventoryPostgresEnum, InventoryPostgresHash, InventoryPostgresOrd, InventoryPostgresType, InventorySchema, RustSqlMapping, SqlDeclaredEntity, SqlGraphEntity, ToSql};
 
 /// A generator for SQL.
 ///
@@ -50,7 +46,7 @@ pub enum SqlGraphRelationship {
 
 impl<'a> PgxSql<'a> {
     #[instrument(
-        level = "debug",
+        level = "info",
         skip(
             control,
             type_mappings,
@@ -552,7 +548,7 @@ impl<'a> PgxSql<'a> {
         Ok(this)
     }
 
-    #[instrument(level = "info", err, skip(self))]
+    #[instrument(level = "info", skip(self))]
     pub fn to_file(&self, file: impl AsRef<str> + Debug) -> eyre::Result<()> {
         use std::{
             fs::{create_dir_all, File},
@@ -667,6 +663,7 @@ impl<'a> PgxSql<'a> {
             .unwrap_or_else(|| "".to_string())
     }
 
+    #[instrument(level = "info", skip(self))]
     pub fn to_sql(&self) -> eyre::Result<String> {
         let mut full_sql = String::new();
         for step_id in petgraph::algo::toposort(&self.graph, None)
@@ -681,7 +678,7 @@ impl<'a> PgxSql<'a> {
         Ok(full_sql)
     }
 
-    #[instrument(level = "debug", skip(self))]
+    #[instrument(level = "info", skip(self))]
     pub fn register_types(&mut self) {
         for (item, _index) in self.enums.clone() {
             for mapping in &item.mappings {
@@ -705,12 +702,19 @@ impl<'a> PgxSql<'a> {
         }
     }
 
-    #[instrument(level = "debug")]
+
+    pub fn has_sql_declared_entity(&self, identifier: &SqlDeclaredEntity) -> bool {
+        self.extension_sqls.iter().any(|(item, _index)| {
+            let retval = item.creates.contains(identifier);
+            retval
+        })
+    }
+
+
     pub fn type_id_to_sql_type(&self, id: TypeId) -> Option<String> {
         self.type_mappings.get(&id).map(|f| f.sql.clone())
     }
 
-    #[instrument(level = "debug")]
     pub fn map_type_to_sql_type<T: 'static>(&mut self, sql: impl AsRef<str> + Debug) {
         let sql = sql.as_ref().to_string();
         self.type_mappings.insert(
