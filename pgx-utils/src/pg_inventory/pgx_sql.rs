@@ -4,7 +4,7 @@ use std::{any::TypeId, collections::HashMap, fmt::Debug};
 use petgraph::{dot::Dot, graph::NodeIndex, stable_graph::StableGraph};
 use tracing::instrument;
 
-use crate::pg_inventory::DotIdentifier;
+use crate::pg_inventory::{DotIdentifier, InventorySqlDeclaredEntity};
 
 use super::{ControlFile, InventoryExtensionSql, InventoryExtensionSqlPositioningRef, InventoryPgExtern, InventoryPgExternReturn, InventoryPostgresEnum, InventoryPostgresHash, InventoryPostgresOrd, InventoryPostgresType, InventorySchema, RustSqlMapping, SqlDeclaredEntity, SqlGraphEntity, ToSql};
 
@@ -705,7 +705,89 @@ impl<'a> PgxSql<'a> {
 
     pub fn has_sql_declared_entity(&self, identifier: &SqlDeclaredEntity) -> bool {
         self.extension_sqls.iter().any(|(item, _index)| {
-            let retval = item.creates.contains(identifier);
+            let retval = item.creates.iter().any(|create_entity| {
+                match (identifier, &create_entity) {
+                    (
+                        SqlDeclaredEntity::Type(identifier_name),
+                        &InventorySqlDeclaredEntity::Type {
+                            name,
+                            option,
+                            vec,
+                            vec_option,
+                            option_vec,
+                            option_vec_option,
+                            array,
+                            option_array,
+                            varlena,
+                            pg_box
+                        },
+                    ) => {
+                        identifier_name == name ||
+                            identifier_name == option ||
+                            identifier_name == vec ||
+                            identifier_name == vec_option ||
+                            identifier_name == option_vec ||
+                            identifier_name == option_vec_option ||
+                            identifier_name == array ||
+                            identifier_name == option_array ||
+                            identifier_name == varlena ||
+                            identifier_name == pg_box
+                    },
+                    (
+                        SqlDeclaredEntity::Enum(identifier_name),
+                        &InventorySqlDeclaredEntity::Enum {
+                            name,
+                            option,
+                            vec,
+                            vec_option,
+                            option_vec,
+                            option_vec_option,
+                            array,
+                            option_array,
+                            varlena,
+                            pg_box
+                        },
+                    ) => {
+                        identifier_name == name ||
+                            identifier_name == option ||
+                            identifier_name == vec ||
+                            identifier_name == vec_option ||
+                            identifier_name == option_vec ||
+                            identifier_name == option_vec_option ||
+                            identifier_name == array ||
+                            identifier_name == option_array ||
+                            identifier_name == varlena ||
+                            identifier_name == pg_box
+                    },
+                    (
+                        SqlDeclaredEntity::Function(identifier_name),
+                        &InventorySqlDeclaredEntity::Function {
+                            name,
+                            option,
+                            vec,
+                            vec_option,
+                            option_vec,
+                            option_vec_option,
+                            array,
+                            option_array,
+                            varlena,
+                            pg_box
+                        },
+                    ) => {
+                        identifier_name == name ||
+                            identifier_name == option ||
+                            identifier_name == vec ||
+                            identifier_name == vec_option ||
+                            identifier_name == option_vec ||
+                            identifier_name == option_vec_option ||
+                            identifier_name == array ||
+                            identifier_name == option_array ||
+                            identifier_name == varlena ||
+                            identifier_name == pg_box
+                    },
+                    _ => false,
+                }
+            });
             retval
         })
     }

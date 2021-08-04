@@ -14,7 +14,7 @@ struct Complex {
 
 extension_sql!(
     r#"CREATE TYPE complex;"#,
-    creates = [Type("pgx::pgbox::PgBox<pgx_tests::tests::struct_type_tests::Complex>")]
+    creates = [Type("pgx_tests::tests::struct_type_tests::Complex")]
 );
 
 #[pg_extern(immutable)]

@@ -314,7 +314,7 @@ pub struct InventoryExtensionSql {
     pub finalize: bool,
     pub before: Vec<InventoryExtensionSqlPositioningRef<'static>>,
     pub after: Vec<InventoryExtensionSqlPositioningRef<'static>>,
-    pub creates: Vec<SqlDeclaredEntity>,
+    pub creates: Vec<InventorySqlDeclaredEntity>,
 }
 
 impl InventoryExtensionSql {
@@ -389,21 +389,107 @@ impl ToTokens for SqlDeclaredEntity {
     fn to_tokens(&self, tokens: &mut TokenStream2) {
         let (variant, identifier) = match &self {
             SqlDeclaredEntity::Type(val) => (
-                Ident::new("Type", proc_macro2::Span::call_site()),
+                "Type",
                 val
             ),
             SqlDeclaredEntity::Enum(val) => (
-                Ident::new("Enum", proc_macro2::Span::call_site()), 
+                "Enum",
                 val
             ),
             SqlDeclaredEntity::Function(val) => (
-                Ident::new("Function", proc_macro2::Span::call_site()),
+                "Function",
                 val
             ),
         };
         let inv = quote! {
-            pgx_utils::pg_inventory::SqlDeclaredEntity::#variant(String::from(#identifier))
+            pgx_utils::pg_inventory::InventorySqlDeclaredEntity::build(#variant, #identifier).unwrap()
         };
         tokens.append_all(inv);
+    }
+}
+
+#[derive(Debug, Clone, Hash, PartialEq, Eq, Ord, PartialOrd)]
+pub enum InventorySqlDeclaredEntity {
+    Type {
+        name: String,
+        option: String,
+        vec: String,
+        vec_option: String,
+        option_vec: String,
+        option_vec_option: String,
+        array: String,
+        option_array: String,
+        varlena: String,
+        pg_box: String,
+    },
+    Enum {
+        name: String,
+        option: String,
+        vec: String,
+        vec_option: String,
+        option_vec: String,
+        option_vec_option: String,
+        array: String,
+        option_array: String,
+        varlena: String,
+        pg_box: String,
+    },
+    Function {
+        name: String,
+        option: String,
+        vec: String,
+        vec_option: String,
+        option_vec: String,
+        option_vec_option: String,
+        array: String,
+        option_array: String,
+        varlena: String,
+        pg_box: String,
+    },
+}
+
+impl InventorySqlDeclaredEntity {
+    pub fn build(variant: impl AsRef<str>, name: impl AsRef<str>) -> eyre::Result<Self> {
+        let name = name.as_ref();
+        let retval = match variant.as_ref() {
+            "Type" => Self::Type {
+                name: name.to_string(),
+                option: format!("Option<{}>", name),
+                vec: format!("Vec<{}>", name),
+                vec_option: format!("Vec<Option<{}>>", name),
+                option_vec: format!("Option<Vec<{}>>", name),
+                option_vec_option: format!("Option<Vec<Option<{}>>", name),
+                array: format!("Array<{}>", name),
+                option_array: format!("Option<{}>", name),
+                varlena: format!("Varlena<{}>", name),
+                pg_box: format!("pgx::pgbox::PgBox<{}>", name),
+            },
+            "Enum" => Self::Enum {
+                name: name.to_string(),
+                option: format!("Option<{}>", name),
+                vec: format!("Vec<{}>", name),
+                vec_option: format!("Vec<Option<{}>>", name),
+                option_vec: format!("Option<Vec<{}>>", name),
+                option_vec_option: format!("Option<Vec<Option<{}>>", name),
+                array: format!("Array<{}>", name),
+                option_array: format!("Option<{}>", name),
+                varlena: format!("Varlena<{}>", name),
+                pg_box: format!("pgx::pgbox::PgBox<{}>", name),
+            },
+            "function" => Self::Function {
+                name: name.to_string(),
+                option: format!("Option<{}>", name),
+                vec: format!("Vec<{}>", name),
+                vec_option: format!("Vec<Option<{}>>", name),
+                option_vec: format!("Option<Vec<{}>>", name),
+                option_vec_option: format!("Option<Vec<Option<{}>>", name),
+                array: format!("Array<{}>", name),
+                option_array: format!("Option<{}>", name),
+                varlena: format!("Varlena<{}>", name),
+                pg_box: format!("pgx::pgbox::PgBox<{}>", name),
+            },
+            _ => return Err(eyre::eyre!("Can only declare `Type(Ident)`, `Enum(Ident)` or `Function(Ident)`")),
+        };
+        Ok(retval)
     }
 }
