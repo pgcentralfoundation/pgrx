@@ -49,9 +49,10 @@ CREATE TYPE complex (
    output = complex_out,
    alignment = double
 );
-"#, after = ["create_complex_type"]);
+"#, after = ["create_complex_type", complex_in, complex_out]);
 
 #[cfg(any(test, feature = "pg_test"))]
+#[pg_schema]
 mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
