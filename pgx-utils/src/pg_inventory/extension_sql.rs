@@ -321,9 +321,14 @@ impl InventoryExtensionSql {
     pub fn identifier(&self) -> &str {
         self.name.unwrap_or(self.full_path)
     }
-    
-    pub fn has_sql_declared_entity(&self, identifier: &SqlDeclaredEntity) -> Option<&InventorySqlDeclaredEntity> {
-        self.creates.iter().find(|created| created.has_sql_declared_entity(identifier))
+
+    pub fn has_sql_declared_entity(
+        &self,
+        identifier: &SqlDeclaredEntity,
+    ) -> Option<&InventorySqlDeclaredEntity> {
+        self.creates
+            .iter()
+            .find(|created| created.has_sql_declared_entity(identifier))
     }
 }
 
@@ -389,7 +394,7 @@ impl Parse for SqlDeclaredEntity {
             _ => return Err(syn::Error::new(
                 variant.span(),
                 "SQL declared entities must be `Type(ident)`, `Enum(ident)`, or `Function(ident)`",
-            ))
+            )),
         };
         Ok(this)
     }
@@ -398,22 +403,16 @@ impl Parse for SqlDeclaredEntity {
 impl ToTokens for SqlDeclaredEntity {
     fn to_tokens(&self, tokens: &mut TokenStream2) {
         let (variant, identifier) = match &self {
-            SqlDeclaredEntity::Type(val) => (
-                "Type",
-                val
-            ),
-            SqlDeclaredEntity::Enum(val) => (
-                "Enum",
-                val
-            ),
-            SqlDeclaredEntity::Function(val) => (
-                "Function",
-                val
-            ),
+            SqlDeclaredEntity::Type(val) => ("Type", val),
+            SqlDeclaredEntity::Enum(val) => ("Enum", val),
+            SqlDeclaredEntity::Function(val) => ("Function", val),
         };
         let identifier_split = identifier.split("::").collect::<Vec<_>>();
         let identifier = if identifier_split.len() == 1 {
-            let identifier_infer = Ident::new(identifier_split.last().unwrap(), proc_macro2::Span::call_site());
+            let identifier_infer = Ident::new(
+                identifier_split.last().unwrap(),
+                proc_macro2::Span::call_site(),
+            );
             quote! { concat!(module_path!(), "::", stringify!(#identifier_infer)) }
         } else {
             quote! { stringify!(#identifier) }
@@ -473,7 +472,11 @@ impl InventorySqlDeclaredEntity {
         let name = name.as_ref();
         let retval = match variant.as_ref() {
             "Type" => Self::Type {
-                sql: name.split("::").last().ok_or_else(|| eyre::eyre!("Did not get SQL for `{}`", name))?.to_string(),
+                sql: name
+                    .split("::")
+                    .last()
+                    .ok_or_else(|| eyre::eyre!("Did not get SQL for `{}`", name))?
+                    .to_string(),
                 name: name.to_string(),
                 option: format!("Option<{}>", name),
                 vec: format!("Vec<{}>", name),
@@ -486,7 +489,11 @@ impl InventorySqlDeclaredEntity {
                 pg_box: format!("pgx::pgbox::PgBox<{}>", name),
             },
             "Enum" => Self::Enum {
-                sql: name.split("::").last().ok_or_else(|| eyre::eyre!("Did not get SQL for `{}`", name))?.to_string(),
+                sql: name
+                    .split("::")
+                    .last()
+                    .ok_or_else(|| eyre::eyre!("Did not get SQL for `{}`", name))?
+                    .to_string(),
                 name: name.to_string(),
                 option: format!("Option<{}>", name),
                 vec: format!("Vec<{}>", name),
@@ -499,7 +506,11 @@ impl InventorySqlDeclaredEntity {
                 pg_box: format!("pgx::pgbox::PgBox<{}>", name),
             },
             "function" => Self::Function {
-                sql: name.split("::").last().ok_or_else(|| eyre::eyre!("Did not get SQL for `{}`", name))?.to_string(),
+                sql: name
+                    .split("::")
+                    .last()
+                    .ok_or_else(|| eyre::eyre!("Did not get SQL for `{}`", name))?
+                    .to_string(),
                 name: name.to_string(),
                 option: format!("Option<{}>", name),
                 vec: format!("Vec<{}>", name),
@@ -511,7 +522,11 @@ impl InventorySqlDeclaredEntity {
                 varlena: format!("Varlena<{}>", name),
                 pg_box: format!("pgx::pgbox::PgBox<{}>", name),
             },
-            _ => return Err(eyre::eyre!("Can only declare `Type(Ident)`, `Enum(Ident)` or `Function(Ident)`")),
+            _ => {
+                return Err(eyre::eyre!(
+                    "Can only declare `Type(Ident)`, `Enum(Ident)` or `Function(Ident)`"
+                ))
+            }
         };
         Ok(retval)
     }
@@ -522,7 +537,7 @@ impl InventorySqlDeclaredEntity {
             InventorySqlDeclaredEntity::Function { sql, .. } => sql.clone(),
         }
     }
-    
+
     pub fn has_sql_declared_entity(&self, identifier: &SqlDeclaredEntity) -> bool {
         match (&identifier, &self) {
             (
@@ -538,20 +553,20 @@ impl InventorySqlDeclaredEntity {
                     array,
                     option_array,
                     varlena,
-                    pg_box
+                    pg_box,
                 },
             ) => {
-                identifier_name == name ||
-                    identifier_name == option ||
-                    identifier_name == vec ||
-                    identifier_name == vec_option ||
-                    identifier_name == option_vec ||
-                    identifier_name == option_vec_option ||
-                    identifier_name == array ||
-                    identifier_name == option_array ||
-                    identifier_name == varlena ||
-                    identifier_name == pg_box
-            },
+                identifier_name == name
+                    || identifier_name == option
+                    || identifier_name == vec
+                    || identifier_name == vec_option
+                    || identifier_name == option_vec
+                    || identifier_name == option_vec_option
+                    || identifier_name == array
+                    || identifier_name == option_array
+                    || identifier_name == varlena
+                    || identifier_name == pg_box
+            }
             (
                 SqlDeclaredEntity::Enum(identifier_name),
                 &InventorySqlDeclaredEntity::Enum {
@@ -565,20 +580,20 @@ impl InventorySqlDeclaredEntity {
                     array,
                     option_array,
                     varlena,
-                    pg_box
+                    pg_box,
                 },
             ) => {
-                identifier_name == name ||
-                    identifier_name == option ||
-                    identifier_name == vec ||
-                    identifier_name == vec_option ||
-                    identifier_name == option_vec ||
-                    identifier_name == option_vec_option ||
-                    identifier_name == array ||
-                    identifier_name == option_array ||
-                    identifier_name == varlena ||
-                    identifier_name == pg_box
-            },
+                identifier_name == name
+                    || identifier_name == option
+                    || identifier_name == vec
+                    || identifier_name == vec_option
+                    || identifier_name == option_vec
+                    || identifier_name == option_vec_option
+                    || identifier_name == array
+                    || identifier_name == option_array
+                    || identifier_name == varlena
+                    || identifier_name == pg_box
+            }
             (
                 SqlDeclaredEntity::Function(identifier_name),
                 &InventorySqlDeclaredEntity::Function {
@@ -592,20 +607,20 @@ impl InventorySqlDeclaredEntity {
                     array,
                     option_array,
                     varlena,
-                    pg_box
+                    pg_box,
                 },
             ) => {
-                identifier_name == name ||
-                    identifier_name == option ||
-                    identifier_name == vec ||
-                    identifier_name == vec_option ||
-                    identifier_name == option_vec ||
-                    identifier_name == option_vec_option ||
-                    identifier_name == array ||
-                    identifier_name == option_array ||
-                    identifier_name == varlena ||
-                    identifier_name == pg_box
-            },
+                identifier_name == name
+                    || identifier_name == option
+                    || identifier_name == vec
+                    || identifier_name == vec_option
+                    || identifier_name == option_vec
+                    || identifier_name == option_vec_option
+                    || identifier_name == array
+                    || identifier_name == option_array
+                    || identifier_name == varlena
+                    || identifier_name == pg_box
+            }
             _ => false,
         }
     }

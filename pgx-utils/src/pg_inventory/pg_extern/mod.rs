@@ -24,7 +24,7 @@ pub use returning::InventoryPgExternReturn;
 
 use crate::ExternArgs;
 
-use super::{DotIdentifier, SqlGraphEntity, ToSql, SqlDeclaredEntity};
+use super::{DotIdentifier, SqlDeclaredEntity, SqlGraphEntity, ToSql};
 
 /// A parsed `#[pg_extern]` item.
 ///
@@ -55,22 +55,20 @@ pub struct PgExtern {
 
 impl PgExtern {
     fn name(&self) -> String {
-        self.attrs.as_ref().and_then(|a| {
-            a.attrs
-                .iter()
-                .find_map(|candidate| match candidate {
+        self.attrs
+            .as_ref()
+            .and_then(|a| {
+                a.attrs.iter().find_map(|candidate| match candidate {
                     Attribute::Name(name) => Some(name.value()),
                     _ => None,
                 })
-        })
+            })
             .unwrap_or_else(|| self.func.sig.ident.to_string())
     }
 
     fn schema(&self) -> Option<String> {
         self.attrs.as_ref().and_then(|a| {
-            a.attrs
-            .iter()
-            .find_map(|candidate| match candidate {
+            a.attrs.iter().find_map(|candidate| match candidate {
                 Attribute::Schema(name) => Some(name.value()),
                 _ => None,
             })

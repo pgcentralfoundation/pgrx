@@ -42,14 +42,17 @@ fn complex_out(complex: PgBox<Complex>) -> &'static std::ffi::CStr {
     sb.into()
 }
 
-extension_sql!(r#"
+extension_sql!(
+    r#"
 CREATE TYPE complex (
    internallength = 16,
    input = complex_in,
    output = complex_out,
    alignment = double
 );
-"#, after = ["create_complex_type", complex_in, complex_out]);
+"#,
+    after = ["create_complex_type", complex_in, complex_out]
+);
 
 #[cfg(any(test, feature = "pg_test"))]
 #[pg_schema]

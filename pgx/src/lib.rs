@@ -290,7 +290,7 @@ macro_rules! pg_inventory_magic {
         pub mod __pgx_internals {
             use ::core::convert::TryFrom;
             use ::pgx_utils::pg_inventory::{
-                inventory, once_cell::sync::Lazy, ControlFile, PgxSql, tracing,
+                inventory, once_cell::sync::Lazy, tracing, ControlFile, PgxSql,
             };
 
             /// The contents of the `*.control` file of the crate.

@@ -6,7 +6,12 @@ use tracing::instrument;
 
 use crate::pg_inventory::{DotIdentifier, InventorySqlDeclaredEntity};
 
-use super::{ControlFile, InventoryExtensionSql, InventoryExtensionSqlPositioningRef, InventoryPgExtern, InventoryPgExternReturn, InventoryPostgresEnum, InventoryPostgresHash, InventoryPostgresOrd, InventoryPostgresType, InventorySchema, RustSqlMapping, SqlDeclaredEntity, SqlGraphEntity, ToSql};
+use super::{
+    ControlFile, InventoryExtensionSql, InventoryExtensionSqlPositioningRef, InventoryPgExtern,
+    InventoryPgExternReturn, InventoryPostgresEnum, InventoryPostgresHash, InventoryPostgresOrd,
+    InventoryPostgresType, InventorySchema, RustSqlMapping, SqlDeclaredEntity, SqlGraphEntity,
+    ToSql,
+};
 
 /// A generator for SQL.
 ///
@@ -406,10 +411,14 @@ impl<'a> PgxSql<'a> {
                 }
                 if !found {
                     for (ext_item, ext_index) in &mapped_extension_sqls {
-                        if let Some(_) = ext_item.has_sql_declared_entity(&SqlDeclaredEntity::Type(arg.full_path.to_string())) {
+                        if let Some(_) = ext_item.has_sql_declared_entity(&SqlDeclaredEntity::Type(
+                            arg.full_path.to_string(),
+                        )) {
                             tracing::trace!(from = ?item.full_path, to = arg.full_path, "Adding Extern(arg) after Extension SQL (due to argument) edge.");
                             graph.add_edge(*ext_index, index, SqlGraphRelationship::RequiredByArg);
-                        } else if let Some(_) = ext_item.has_sql_declared_entity(&SqlDeclaredEntity::Enum(arg.full_path.to_string())) {
+                        } else if let Some(_) = ext_item.has_sql_declared_entity(
+                            &SqlDeclaredEntity::Enum(arg.full_path.to_string()),
+                        ) {
                             tracing::trace!(from = ?item.full_path, to = arg.full_path, "Adding Extern(arg) after Extension SQL (due to argument) edge.");
                             graph.add_edge(*ext_index, index, SqlGraphRelationship::RequiredByArg);
                         }
@@ -433,7 +442,11 @@ impl<'a> PgxSql<'a> {
                         for (ty_item, &ty_index) in &mapped_enums {
                             if ty_item.id_matches(id) {
                                 tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Extern after Enum (due to return) edge.");
-                                graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredByReturn);
+                                graph.add_edge(
+                                    ty_index,
+                                    index,
+                                    SqlGraphRelationship::RequiredByReturn,
+                                );
                                 found = true;
                                 break;
                             }
@@ -452,12 +465,24 @@ impl<'a> PgxSql<'a> {
                     }
                     if !found {
                         for (ext_item, ext_index) in &mapped_extension_sqls {
-                            if let Some(_) = ext_item.has_sql_declared_entity(&SqlDeclaredEntity::Type(full_path.to_string())) {
+                            if let Some(_) = ext_item.has_sql_declared_entity(
+                                &SqlDeclaredEntity::Type(full_path.to_string()),
+                            ) {
                                 tracing::trace!(from = ?item.full_path, to = full_path, "Adding Extern(arg) after Extension SQL (due to argument) edge.");
-                                graph.add_edge(*ext_index, index, SqlGraphRelationship::RequiredByArg);
-                            } else if let Some(_) = ext_item.has_sql_declared_entity(&SqlDeclaredEntity::Enum(full_path.to_string())) {
+                                graph.add_edge(
+                                    *ext_index,
+                                    index,
+                                    SqlGraphRelationship::RequiredByArg,
+                                );
+                            } else if let Some(_) = ext_item.has_sql_declared_entity(
+                                &SqlDeclaredEntity::Enum(full_path.to_string()),
+                            ) {
                                 tracing::trace!(from = ?item.full_path, to = full_path, "Adding Extern(arg) after Extension SQL (due to argument) edge.");
-                                graph.add_edge(*ext_index, index, SqlGraphRelationship::RequiredByArg);
+                                graph.add_edge(
+                                    *ext_index,
+                                    index,
+                                    SqlGraphRelationship::RequiredByArg,
+                                );
                             }
                         }
                     }
@@ -507,12 +532,24 @@ impl<'a> PgxSql<'a> {
                         }
                         if !found {
                             for (ext_item, ext_index) in &mapped_extension_sqls {
-                                if let Some(_) = ext_item.has_sql_declared_entity(&SqlDeclaredEntity::Type(iterated_return.1.to_string())) {
+                                if let Some(_) = ext_item.has_sql_declared_entity(
+                                    &SqlDeclaredEntity::Type(iterated_return.1.to_string()),
+                                ) {
                                     tracing::trace!(from = ?item.full_path, to = iterated_return.1, "Adding Extern(arg) after Extension SQL (due to argument) edge.");
-                                    graph.add_edge(*ext_index, index, SqlGraphRelationship::RequiredByArg);
-                                } else if let Some(_) = ext_item.has_sql_declared_entity(&SqlDeclaredEntity::Enum(iterated_return.1.to_string())) {
+                                    graph.add_edge(
+                                        *ext_index,
+                                        index,
+                                        SqlGraphRelationship::RequiredByArg,
+                                    );
+                                } else if let Some(_) = ext_item.has_sql_declared_entity(
+                                    &SqlDeclaredEntity::Enum(iterated_return.1.to_string()),
+                                ) {
                                     tracing::trace!(from = ?item.full_path, to = iterated_return.1, "Adding Extern(arg) after Extension SQL (due to argument) edge.");
-                                    graph.add_edge(*ext_index, index, SqlGraphRelationship::RequiredByArg);
+                                    graph.add_edge(
+                                        *ext_index,
+                                        index,
+                                        SqlGraphRelationship::RequiredByArg,
+                                    );
                                 }
                             }
                         }
@@ -741,18 +778,21 @@ impl<'a> PgxSql<'a> {
         }
     }
 
-
-    pub fn has_sql_declared_entity(&self, identifier: &SqlDeclaredEntity) -> Option<&InventorySqlDeclaredEntity> {
+    pub fn has_sql_declared_entity(
+        &self,
+        identifier: &SqlDeclaredEntity,
+    ) -> Option<&InventorySqlDeclaredEntity> {
         self.extension_sqls.iter().find_map(|(item, _index)| {
-            let retval = item.creates.iter().find_map(|create_entity| if create_entity.has_sql_declared_entity(identifier) {
-                Some(create_entity)
-            } else {
-                None
+            let retval = item.creates.iter().find_map(|create_entity| {
+                if create_entity.has_sql_declared_entity(identifier) {
+                    Some(create_entity)
+                } else {
+                    None
+                }
             });
             retval
         })
     }
-
 
     pub fn type_id_to_sql_type(&self, id: TypeId) -> Option<String> {
         self.type_mappings.get(&id).map(|f| f.sql.clone())

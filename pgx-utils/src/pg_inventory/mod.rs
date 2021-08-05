@@ -11,8 +11,8 @@ mod sql_graph_entity;
 
 pub use control_file::{ControlFile, ControlFileError};
 pub use extension_sql::{
-    ExtensionSql, ExtensionSqlFile, InventoryExtensionSql,
-    InventoryExtensionSqlPositioningRef, SqlDeclaredEntity, InventorySqlDeclaredEntity,
+    ExtensionSql, ExtensionSqlFile, InventoryExtensionSql, InventoryExtensionSqlPositioningRef,
+    InventorySqlDeclaredEntity, SqlDeclaredEntity,
 };
 pub use pg_extern::{
     InventoryPgExtern, InventoryPgExternInput, InventoryPgExternReturn, InventoryPgOperator,
