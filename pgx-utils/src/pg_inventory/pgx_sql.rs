@@ -256,7 +256,10 @@ impl<'a> PgxSql<'a> {
 
             let sql = step.to_sql(self)?;
 
-            full_sql.push_str(&sql)
+            if !sql.is_empty() {
+                full_sql.push_str(&sql);
+                full_sql.push('\n');
+            }
         }
         Ok(full_sql)
     }

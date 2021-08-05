@@ -345,7 +345,7 @@ impl DotIdentifier for InventoryExtensionSql {
 }
 
 impl ToSql for InventoryExtensionSql {
-    #[tracing::instrument(level = "debug", skip(self, _context))]
+    #[tracing::instrument(level = "debug", skip(self, _context), fields(identifier = self.full_path))]
     fn to_sql(&self, _context: &super::PgxSql) -> eyre::Result<String> {
         let sql = format!(
             "\n\

@@ -105,12 +105,12 @@ impl DotIdentifier for InventorySchema {
 }
 
 impl ToSql for InventorySchema {
-    #[tracing::instrument(level = "debug", err, skip(self, _context))]
+    #[tracing::instrument(level = "debug", err, skip(self, _context), fields(identifier = self.module_path))]
     fn to_sql(&self, _context: &super::PgxSql) -> eyre::Result<String> {
         let sql = format!(
             "\n\
                     -- {file}:{line}\n\
-                    CREATE SCHEMA IF NOT EXISTS {name}; /* {module_path} */\n\
+                    CREATE SCHEMA IF NOT EXISTS {name}; /* {module_path} */\
                 ",
             name = self.name,
             file = self.file,

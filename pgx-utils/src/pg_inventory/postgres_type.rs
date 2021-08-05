@@ -197,7 +197,7 @@ impl DotIdentifier for InventoryPostgresType {
 }
 
 impl ToSql for InventoryPostgresType {
-    #[tracing::instrument(level = "debug", err, skip(self, context))]
+    #[tracing::instrument(level = "debug", err, skip(self, context), fields(identifier = self.full_path))]
     fn to_sql(&self, context: &super::PgxSql) -> eyre::Result<String> {
         let self_index = context.types[self];
         let item_node = &context.graph[self_index];
@@ -287,7 +287,7 @@ impl ToSql for InventoryPostgresType {
             "\n\
                                 -- {file}:{line}\n\
                                 -- {full_path}\n\
-                                CREATE TYPE {schema}{name};\n\
+                                CREATE TYPE {schema}{name};\
                             ",
             schema = context.schema_prefix_for(&self_index),
             full_path = item.full_path,
@@ -305,7 +305,7 @@ impl ToSql for InventoryPostgresType {
                                     \tINPUT = {schema_prefix_in_fn}{in_fn}, /* {in_fn_path} */\n\
                                     \tOUTPUT = {schema_prefix_out_fn}{out_fn}, /* {out_fn_path} */\n\
                                     \tSTORAGE = extended\n\
-                                );
+                                );\
                             ",
                                         full_path = item.full_path,
                                         file = item.file,

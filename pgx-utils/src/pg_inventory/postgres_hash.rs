@@ -120,7 +120,7 @@ impl DotIdentifier for InventoryPostgresHash {
 }
 
 impl ToSql for InventoryPostgresHash {
-    #[tracing::instrument(level = "debug", err, skip(self, _context))]
+    #[tracing::instrument(level = "debug", err, skip(self, _context), fields(identifier = self.full_path))]
     fn to_sql(&self, _context: &super::PgxSql) -> eyre::Result<String> {
         let sql = format!("\n\
                             -- {file}:{line}\n\

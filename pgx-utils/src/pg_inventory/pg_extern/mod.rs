@@ -313,7 +313,7 @@ impl ToSql for InventoryPgExtern {
                                 {extern_attrs}\
                                 {search_path}\
                                 LANGUAGE c /* Rust */\n\
-                                AS 'MODULE_PATHNAME', '{unaliased_name}_wrapper';\n\
+                                AS 'MODULE_PATHNAME', '{unaliased_name}_wrapper';\
                             ",
                              schema = self.schema.map(|schema| format!("{}.", schema)).unwrap_or_else(|| context.schema_prefix_for(&self_index)),
                              name = self.name,
@@ -452,7 +452,7 @@ impl ToSql for InventoryPgExtern {
             "\n\
                                 -- {file}:{line}\n\
                                 -- {module_path}::{name}\n\
-                                {fn_sql}\n\
+                                {fn_sql}\
                                 {overridden}\
                             ",
             name = self.name,
@@ -532,7 +532,7 @@ impl ToSql for InventoryPgExtern {
                                             \tLEFTARG={schema_prefix_left}{left_arg}, /* {left_name} */\n\
                                             \tRIGHTARG={schema_prefix_right}{right_arg}{maybe_comma} /* {right_name} */\n\
                                             {optionals}\
-                                        );
+                                        );\
                                     ",
                                            opname = op.opname.unwrap(),
                                            file = self.file,

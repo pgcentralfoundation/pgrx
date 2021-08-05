@@ -48,11 +48,11 @@ impl<'a> ToSql for SqlGraphEntity<'a> {
                     SqlGraphEntity::Type(InventoryPostgresType { in_fn, in_fn_module_path, out_fn, out_fn_module_path, .. }) => {
                         let is_in_fn = item.full_path.starts_with(in_fn_module_path) && item.full_path.ends_with(in_fn);
                         if is_in_fn {
-                            tracing::debug!(r#type = %neighbor_item.dot_identifier(), "Skipping, is an in_fn.");
+                            tracing::trace!(r#type = %neighbor_item.dot_identifier(), "Skipping, is an in_fn.");
                         }
                         let is_out_fn = item.full_path.starts_with(out_fn_module_path) && item.full_path.ends_with(out_fn);
                         if is_out_fn {
-                            tracing::debug!(r#type = %neighbor_item.dot_identifier(), "Skipping, is an out_fn.");
+                            tracing::trace!(r#type = %neighbor_item.dot_identifier(), "Skipping, is an out_fn.");
                         }
                         is_in_fn || is_out_fn
                     },

@@ -120,7 +120,7 @@ impl DotIdentifier for InventoryPostgresOrd {
 }
 
 impl ToSql for InventoryPostgresOrd {
-    #[tracing::instrument(level = "debug", err, skip(self, _context))]
+    #[tracing::instrument(level = "debug", err, skip(self, _context), fields(identifier = self.full_path))]
     fn to_sql(&self, _context: &super::PgxSql) -> eyre::Result<String> {
         let sql = format!("\n\
                             -- {file}:{line}\n\
@@ -132,7 +132,7 @@ impl ToSql for InventoryPostgresOrd {
                                   \tOPERATOR 3 =,\n\
                                   \tOPERATOR 4 >=,\n\
                                   \tOPERATOR 5 >,\n\
-                                  \tFUNCTION 1 {name}_cmp({name}, {name});\n\
+                                  \tFUNCTION 1 {name}_cmp({name}, {name});\
                             ",
                           name = self.name,
                           full_path = self.full_path,

@@ -158,7 +158,7 @@ impl DotIdentifier for InventoryPostgresEnum {
 }
 
 impl ToSql for InventoryPostgresEnum {
-    #[tracing::instrument(level = "debug", err, skip(self, context))]
+    #[tracing::instrument(level = "debug", err, skip(self, context), fields(identifier = self.full_path))]
     fn to_sql(&self, context: &super::PgxSql) -> eyre::Result<String> {
         let self_index = context.enums[self];
         let sql = format!(
@@ -167,7 +167,7 @@ impl ToSql for InventoryPostgresEnum {
                     -- {full_path}\n\
                     CREATE TYPE {schema}{name} AS ENUM (\n\
                         {variants}\
-                    );\n\
+                    );\
                 ",
             schema = context.schema_prefix_for(&self_index),
             full_path = self.full_path,
