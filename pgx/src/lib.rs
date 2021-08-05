@@ -452,8 +452,7 @@ macro_rules! pg_binary_magic {
 
             // Initialize tracing with tracing-error, and eyre
             let fmt_layer = tracing_subscriber::fmt::Layer::new()
-                .with_target(false)
-                .without_time();
+                .pretty();
             let filter_layer = EnvFilter::try_from_default_env()
                 .or_else(|_| EnvFilter::try_new("info"))
                 .unwrap();

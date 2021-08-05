@@ -86,523 +86,30 @@ impl<'a> PgxSql<'a> {
         // to do it here, we'd find ourselves trying to create edges to non-existing entities.
 
         // Both of these must be unique, so we can only hold one.
-        let mut bootstrap = None;
-        let mut finalize = None;
-        let mut mapped_extension_sqls = HashMap::default();
         // Populate nodes, but don't build edges until we know if there is a bootstrap/finalize.
-        for item in extension_sqls {
-            let index = graph.add_node(item.into());
-            mapped_extension_sqls.insert(item, index);
-            if item.bootstrap {
-                if let Some(_index) = bootstrap {
-                    return Err(eyre_err!(
-                        "Cannot have multiple `extension_sql!()` with `bootstrap` positioning."
-                    ));
-                }
-                bootstrap = Some(index)
-            }
-            if item.finalize {
-                if let Some(_index) = finalize {
-                    return Err(eyre_err!(
-                        "Cannot have multiple `extension_sql!()` with `finalize` positioning."
-                    ));
-                }
-                finalize = Some(index)
-            }
-        }
-        for (item, index) in &mapped_extension_sqls {
-            graph.add_edge(root, *index, SqlGraphRelationship::RequiredBy);
-            if !item.bootstrap {
-                if let Some(bootstrap) = bootstrap {
-                    graph.add_edge(bootstrap, *index, SqlGraphRelationship::RequiredBy);
-                }
-            }
-            if !item.finalize {
-                if let Some(finalize) = finalize {
-                    graph.add_edge(*index, finalize, SqlGraphRelationship::RequiredBy);
-                }
-            }
-        }
-
-        let mut mapped_schemas = HashMap::default();
-        for item in schemas {
-            let index = graph.add_node(item.into());
-            mapped_schemas.insert(item, index);
-            if let Some(bootstrap) = bootstrap {
-                graph.add_edge(bootstrap, index, SqlGraphRelationship::RequiredBy);
-            }
-            if let Some(finalize) = finalize {
-                graph.add_edge(index, finalize, SqlGraphRelationship::RequiredBy);
-            }
-        }
-        let mut mapped_enums = HashMap::default();
-        for item in enums {
-            let index = graph.add_node(item.into());
-            mapped_enums.insert(item, index);
-            build_base_edges(&mut graph, index, root, bootstrap, finalize);
-        }
-        let mut mapped_types = HashMap::default();
-        for item in types {
-            let index = graph.add_node(item.into());
-            mapped_types.insert(item, index);
-            build_base_edges(&mut graph, index, root, bootstrap, finalize);
-        }
-        let mut mapped_externs = HashMap::default();
-        let mut mapped_builtin_types = HashMap::default();
-        for item in externs {
-            let index = graph.add_node(item.into());
-            mapped_externs.insert(item, index);
-            build_base_edges(&mut graph, index, root, bootstrap, finalize);
-
-            for arg in &item.fn_args {
-                let mut found = false;
-                for (ty_item, &_ty_index) in &mapped_types {
-                    if ty_item.id_matches(&arg.ty_id) {
-                        found = true;
-                        break;
-                    }
-                }
-                for (ty_item, &_ty_index) in &mapped_enums {
-                    if ty_item.id == arg.ty_id {
-                        found = true;
-                        break;
-                    }
-                }
-                if !found {
-                    mapped_builtin_types
-                        .entry(arg.full_path)
-                        .or_insert_with(|| {
-                            graph.add_node(SqlGraphEntity::BuiltinType(arg.full_path))
-                        });
-                }
-            }
-
-            match &item.fn_return {
-                InventoryPgExternReturn::None | InventoryPgExternReturn::Trigger => (),
-                InventoryPgExternReturn::Type { id, full_path, .. }
-                | InventoryPgExternReturn::SetOf { id, full_path, .. } => {
-                    let mut found = false;
-                    for (ty_item, &_ty_index) in &mapped_types {
-                        if ty_item.id_matches(id) {
-                            found = true;
-                            break;
-                        }
-                    }
-                    for (ty_item, &_ty_index) in &mapped_enums {
-                        if ty_item.id == *id {
-                            found = true;
-                            break;
-                        }
-                    }
-                    if !found {
-                        mapped_builtin_types.entry(full_path).or_insert_with(|| {
-                            graph.add_node(SqlGraphEntity::BuiltinType(full_path))
-                        });
-                    }
-                }
-                InventoryPgExternReturn::Iterated(iterated_returns) => {
-                    for iterated_return in iterated_returns {
-                        let mut found = false;
-                        for (ty_item, &_ty_index) in &mapped_types {
-                            if ty_item.id_matches(&iterated_return.0) {
-                                found = true;
-                                break;
-                            }
-                        }
-                        for (ty_item, &_ty_index) in &mapped_enums {
-                            if ty_item.id == iterated_return.0 {
-                                found = true;
-                                break;
-                            }
-                        }
-                        if !found {
-                            mapped_builtin_types
-                                .entry(iterated_return.1)
-                                .or_insert_with(|| {
-                                    graph.add_node(SqlGraphEntity::BuiltinType(iterated_return.1))
-                                });
-                        }
-                    }
-                }
-            }
-        }
-        let mut mapped_ords = HashMap::default();
-        for item in ords {
-            let index = graph.add_node(item.into());
-            mapped_ords.insert(item, index);
-            build_base_edges(&mut graph, index, root, bootstrap, finalize);
-        }
-        let mut mapped_hashes = HashMap::default();
-        for item in hashes {
-            let index = graph.add_node(item.into());
-            mapped_hashes.insert(item, index);
-            build_base_edges(&mut graph, index, root, bootstrap, finalize);
-        }
+        let (mapped_extension_sqls, bootstrap, finalize) =
+            initialize_extension_sqls(&mut graph, root, extension_sqls)?;
+        let mapped_schemas =
+            initialize_schemas(&mut graph, bootstrap, finalize, schemas)?;
+        let mapped_enums =
+            initialize_enums(&mut graph, root, bootstrap, finalize, enums)?;
+        let mapped_types =
+            initialize_types(&mut graph, root, bootstrap, finalize, types)?;
+        let (mapped_externs, mapped_builtin_types) =
+            initialize_externs(&mut graph, root, bootstrap, finalize, externs, &mapped_types, &mapped_enums)?;
+        let mapped_ords =
+            initialize_ords(&mut graph, root, bootstrap, finalize, ords)?;
+        let mapped_hashes =
+            initialize_hashes(&mut graph, root, bootstrap, finalize, hashes)?;
 
         // Now we can circle back and build up the edge sets.
-        for (_item, &index) in &mapped_schemas {
-            graph.add_edge(root, index, SqlGraphRelationship::RequiredBy);
-        }
-        for (item, &index) in &mapped_extension_sqls {
-            for (schema_item, &schema_index) in &mapped_schemas {
-                if item.module_path == schema_item.module_path {
-                    tracing::trace!(from = ?item.identifier(), to = schema_item.module_path, "Adding ExtensionSQL after Schema edge.");
-                    graph.add_edge(schema_index, index, SqlGraphRelationship::RequiredBy);
-                    break;
-                }
-            }
-            for after in &item.after {
-                match after {
-                    InventoryExtensionSqlPositioningRef::FullPath(path) => {
-                        for (other, other_index) in &mapped_types {
-                            if other.full_path.ends_with(*path) {
-                                tracing::trace!(from = ?item.identifier(), to = ?other.full_path, "Adding ExtensionSQL after Type edge.");
-                                graph.add_edge(
-                                    *other_index,
-                                    index,
-                                    SqlGraphRelationship::RequiredBy,
-                                );
-                                break;
-                            }
-                        }
-                        for (other, other_index) in &mapped_enums {
-                            if other.full_path.ends_with(*path) {
-                                tracing::trace!(from = ?item.identifier(), to = ?other.full_path, "Adding ExtensionSQL after Enum edge.");
-                                graph.add_edge(
-                                    *other_index,
-                                    index,
-                                    SqlGraphRelationship::RequiredBy,
-                                );
-                                break;
-                            }
-                        }
-                        for (other, other_index) in &mapped_externs {
-                            if other.full_path.ends_with(*path) {
-                                tracing::trace!(from = ?item.identifier(), to = ?other.full_path, "Adding ExtensionSQL after Extern edge.");
-                                graph.add_edge(
-                                    *other_index,
-                                    index,
-                                    SqlGraphRelationship::RequiredBy,
-                                );
-                                break;
-                            }
-                        }
-                    }
-                    InventoryExtensionSqlPositioningRef::Name(name) => {
-                        for (other, other_index) in &mapped_extension_sqls {
-                            if other.name == Some(name) {
-                                tracing::trace!(from = ?item.identifier(), to = ?other.identifier(), "Adding ExtensionSQL after ExtensionSql edge.");
-                                graph.add_edge(
-                                    *other_index,
-                                    index,
-                                    SqlGraphRelationship::RequiredBy,
-                                );
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-            for before in &item.before {
-                match before {
-                    InventoryExtensionSqlPositioningRef::FullPath(path) => {
-                        for (other, other_index) in &mapped_types {
-                            if other.full_path == *path {
-                                tracing::trace!(from = ?item.full_path, to = ?other.full_path, "Adding ExtensionSQL after Type edge.");
-                                graph.add_edge(
-                                    index,
-                                    *other_index,
-                                    SqlGraphRelationship::RequiredBy,
-                                );
-                                break;
-                            }
-                        }
-                        for (other, other_index) in &mapped_enums {
-                            if other.full_path == *path {
-                                tracing::trace!(from = ?item.full_path, to = ?other.full_path, "Adding ExtensionSQL after Enum edge.");
-                                graph.add_edge(
-                                    index,
-                                    *other_index,
-                                    SqlGraphRelationship::RequiredBy,
-                                );
-                                break;
-                            }
-                        }
-                        for (other, other_index) in &mapped_externs {
-                            if other.full_path == *path {
-                                tracing::trace!(from = ?item.full_path, to = ?other.full_path, "Adding ExtensionSQL after Extern edge.");
-                                graph.add_edge(
-                                    index,
-                                    *other_index,
-                                    SqlGraphRelationship::RequiredBy,
-                                );
-                                break;
-                            }
-                        }
-                    }
-                    InventoryExtensionSqlPositioningRef::Name(name) => {
-                        for (other, other_index) in &mapped_extension_sqls {
-                            if other.name == Some(name) {
-                                tracing::trace!(from = ?item.full_path, to = ?other.full_path, "Adding ExtensionSQL after ExtensionSql edge.");
-                                graph.add_edge(
-                                    index,
-                                    *other_index,
-                                    SqlGraphRelationship::RequiredBy,
-                                );
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        for (item, &index) in &mapped_enums {
-            for (schema_item, &schema_index) in &mapped_schemas {
-                if item.module_path == schema_item.module_path {
-                    tracing::trace!(from = ?item.full_path, to = schema_item.module_path, "Adding Enum after Schema edge.");
-                    graph.add_edge(schema_index, index, SqlGraphRelationship::RequiredBy);
-                    break;
-                }
-            }
-        }
-        for (item, &index) in &mapped_types {
-            for (schema_item, &schema_index) in &mapped_schemas {
-                if item.module_path == schema_item.module_path {
-                    tracing::trace!(from = ?item.full_path, to = schema_item.module_path, "Adding Type after Schema edge.");
-                    graph.add_edge(schema_index, index, SqlGraphRelationship::RequiredBy);
-                    break;
-                }
-            }
-        }
-        for (item, &index) in &mapped_externs {
-            for (schema_item, &schema_index) in &mapped_schemas {
-                if item.module_path == schema_item.module_path {
-                    tracing::trace!(from = ?item.full_path, to = schema_item.module_path, "Adding Extern after Schema edge.");
-                    graph.add_edge(schema_index, index, SqlGraphRelationship::RequiredBy);
-                    break;
-                }
-            }
-            for arg in &item.fn_args {
-                let mut found = false;
-                for (ty_item, &ty_index) in &mapped_types {
-                    if ty_item.id_matches(&arg.ty_id) {
-                        tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Extern after Type (due to argument) edge.");
-                        graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredByArg);
-                        found = true;
-                        break;
-                    }
-                }
-                if !found {
-                    for (enum_item, &enum_index) in &mapped_enums {
-                        if enum_item.id_matches(&arg.ty_id) {
-                            tracing::trace!(from = ?item.full_path, to = enum_item.full_path, "Adding Extern after Enum (due to argument) edge.");
-                            graph.add_edge(enum_index, index, SqlGraphRelationship::RequiredByArg);
-                            found = true;
-                            break;
-                        }
-                    }
-                }
-                if !found {
-                    let builtin_index = mapped_builtin_types
-                        .get(arg.full_path)
-                        .expect(&format!("Could not fetch Builtin Type {}.", arg.full_path));
-                    tracing::trace!(from = ?item.full_path, to = arg.full_path, "Adding Extern(arg) after BuiltIn Type (due to argument) edge.");
-                    graph.add_edge(*builtin_index, index, SqlGraphRelationship::RequiredByArg);
-                }
-                if !found {
-                    for (ext_item, ext_index) in &mapped_extension_sqls {
-                        if let Some(_) = ext_item.has_sql_declared_entity(&SqlDeclaredEntity::Type(
-                            arg.full_path.to_string(),
-                        )) {
-                            tracing::trace!(from = ?item.full_path, to = arg.full_path, "Adding Extern(arg) after Extension SQL (due to argument) edge.");
-                            graph.add_edge(*ext_index, index, SqlGraphRelationship::RequiredByArg);
-                        } else if let Some(_) = ext_item.has_sql_declared_entity(
-                            &SqlDeclaredEntity::Enum(arg.full_path.to_string()),
-                        ) {
-                            tracing::trace!(from = ?item.full_path, to = arg.full_path, "Adding Extern(arg) after Extension SQL (due to argument) edge.");
-                            graph.add_edge(*ext_index, index, SqlGraphRelationship::RequiredByArg);
-                        }
-                    }
-                }
-            }
-            match &item.fn_return {
-                InventoryPgExternReturn::None | InventoryPgExternReturn::Trigger => (),
-                InventoryPgExternReturn::Type { id, full_path, .. }
-                | InventoryPgExternReturn::SetOf { id, full_path, .. } => {
-                    let mut found = false;
-                    for (ty_item, &ty_index) in &mapped_types {
-                        if ty_item.id_matches(id) {
-                            tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Extern after Type (due to return) edge.");
-                            graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredByReturn);
-                            found = true;
-                            break;
-                        }
-                    }
-                    if !found {
-                        for (ty_item, &ty_index) in &mapped_enums {
-                            if ty_item.id_matches(id) {
-                                tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Extern after Enum (due to return) edge.");
-                                graph.add_edge(
-                                    ty_index,
-                                    index,
-                                    SqlGraphRelationship::RequiredByReturn,
-                                );
-                                found = true;
-                                break;
-                            }
-                        }
-                    }
-                    if !found {
-                        let builtin_index = mapped_builtin_types
-                            .get(full_path)
-                            .expect(&format!("Could not fetch Builtin Type {}.", full_path));
-                        tracing::trace!(from = ?item.full_path, to = full_path, "Adding Extern(return) after BuiltIn Type (due to return) edge.");
-                        graph.add_edge(
-                            *builtin_index,
-                            index,
-                            SqlGraphRelationship::RequiredByReturn,
-                        );
-                    }
-                    if !found {
-                        for (ext_item, ext_index) in &mapped_extension_sqls {
-                            if let Some(_) = ext_item.has_sql_declared_entity(
-                                &SqlDeclaredEntity::Type(full_path.to_string()),
-                            ) {
-                                tracing::trace!(from = ?item.full_path, to = full_path, "Adding Extern(arg) after Extension SQL (due to argument) edge.");
-                                graph.add_edge(
-                                    *ext_index,
-                                    index,
-                                    SqlGraphRelationship::RequiredByArg,
-                                );
-                            } else if let Some(_) = ext_item.has_sql_declared_entity(
-                                &SqlDeclaredEntity::Enum(full_path.to_string()),
-                            ) {
-                                tracing::trace!(from = ?item.full_path, to = full_path, "Adding Extern(arg) after Extension SQL (due to argument) edge.");
-                                graph.add_edge(
-                                    *ext_index,
-                                    index,
-                                    SqlGraphRelationship::RequiredByArg,
-                                );
-                            }
-                        }
-                    }
-                }
-                InventoryPgExternReturn::Iterated(iterated_returns) => {
-                    for iterated_return in iterated_returns {
-                        let mut found = false;
-                        for (ty_item, &ty_index) in &mapped_types {
-                            if ty_item.id_matches(&iterated_return.0) {
-                                tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Extern after Type (due to return) edge.");
-                                graph.add_edge(
-                                    ty_index,
-                                    index,
-                                    SqlGraphRelationship::RequiredByReturn,
-                                );
-                                found = true;
-                                break;
-                            }
-                        }
-                        if !found {
-                            for (ty_item, &ty_index) in &mapped_enums {
-                                if ty_item.id_matches(&iterated_return.0) {
-                                    tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Extern after Enum (due to return) edge.");
-                                    graph.add_edge(
-                                        ty_index,
-                                        index,
-                                        SqlGraphRelationship::RequiredByReturn,
-                                    );
-                                    found = true;
-                                    break;
-                                }
-                            }
-                        }
-                        if !found {
-                            let builtin_index = mapped_builtin_types
-                                .get(&iterated_return.1)
-                                .expect(&format!(
-                                    "Could not fetch Builtin Type {}.",
-                                    iterated_return.1
-                                ));
-                            tracing::trace!(from = ?item.full_path, to = iterated_return.1, "Adding Extern after BuiltIn Type (due to return) edge.");
-                            graph.add_edge(
-                                *builtin_index,
-                                index,
-                                SqlGraphRelationship::RequiredByReturn,
-                            );
-                        }
-                        if !found {
-                            for (ext_item, ext_index) in &mapped_extension_sqls {
-                                if let Some(_) = ext_item.has_sql_declared_entity(
-                                    &SqlDeclaredEntity::Type(iterated_return.1.to_string()),
-                                ) {
-                                    tracing::trace!(from = ?item.full_path, to = iterated_return.1, "Adding Extern(arg) after Extension SQL (due to argument) edge.");
-                                    graph.add_edge(
-                                        *ext_index,
-                                        index,
-                                        SqlGraphRelationship::RequiredByArg,
-                                    );
-                                } else if let Some(_) = ext_item.has_sql_declared_entity(
-                                    &SqlDeclaredEntity::Enum(iterated_return.1.to_string()),
-                                ) {
-                                    tracing::trace!(from = ?item.full_path, to = iterated_return.1, "Adding Extern(arg) after Extension SQL (due to argument) edge.");
-                                    graph.add_edge(
-                                        *ext_index,
-                                        index,
-                                        SqlGraphRelationship::RequiredByArg,
-                                    );
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        for (item, &index) in &mapped_ords {
-            for (schema_item, &schema_index) in &mapped_schemas {
-                if item.module_path == schema_item.module_path {
-                    tracing::trace!(from = ?item.full_path, to = schema_item.module_path, "Adding Ord after Schema edge.");
-                    graph.add_edge(schema_index, index, SqlGraphRelationship::RequiredBy);
-                    break;
-                }
-            }
-            for (ty_item, &ty_index) in &mapped_types {
-                if ty_item.id_matches(&item.id) {
-                    tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Ord after Type edge.");
-                    graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredBy);
-                    break;
-                }
-            }
-            for (ty_item, &ty_index) in &mapped_enums {
-                if ty_item.id_matches(&item.id) {
-                    tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Ord after Enum edge.");
-                    graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredBy);
-                    break;
-                }
-            }
-        }
-        for (item, &index) in &mapped_hashes {
-            for (schema_item, &schema_index) in &mapped_schemas {
-                if item.module_path == schema_item.module_path {
-                    tracing::trace!(from = ?item.full_path, to = schema_item.module_path, "Adding Hash after Schema edge.");
-                    graph.add_edge(schema_index, index, SqlGraphRelationship::RequiredBy);
-                    break;
-                }
-            }
-            for (ty_item, &ty_index) in &mapped_types {
-                if ty_item.id_matches(&item.id) {
-                    tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Hash after Type edge.");
-                    graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredBy);
-                    break;
-                }
-            }
-            for (ty_item, &ty_index) in &mapped_enums {
-                if ty_item.id_matches(&item.id) {
-                    tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Hash after Enum edge.");
-                    graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredBy);
-                    break;
-                }
-            }
-        }
+        connect_schemas(&mut graph, &mapped_schemas, root);
+        connect_extension_sqls(&mut graph, &mapped_extension_sqls, &mapped_schemas, &mapped_types, &mapped_enums, &mapped_externs);
+        connect_enums(&mut graph, &mapped_enums, &mapped_schemas);
+        connect_types(&mut graph, &mapped_types, &mapped_schemas);
+        connect_externs(&mut graph, &mapped_externs, &mapped_schemas, &mapped_types, &mapped_enums, &mapped_builtin_types, &mapped_extension_sqls);
+        connect_ords(&mut graph, &mapped_ords, &mapped_schemas, &mapped_types, &mapped_enums);
+        connect_hashes(&mut graph, &mapped_hashes, &mapped_schemas, &mapped_types, &mapped_enums);
 
         let mut this = Self {
             type_mappings: type_mappings.map(|x| (x.id, x)).collect(),
@@ -824,5 +331,670 @@ fn build_base_edges(
     }
     if let Some(finalize) = finalize {
         graph.add_edge(index, finalize, SqlGraphRelationship::RequiredBy);
+    }
+}
+
+fn initialize_extension_sqls<'a>(
+    graph: &mut StableGraph<SqlGraphEntity<'a>, SqlGraphRelationship>,
+    root: NodeIndex,
+    extension_sqls: impl Iterator<Item = &'a InventoryExtensionSql>,
+) -> eyre::Result<(
+    HashMap<&'a InventoryExtensionSql, NodeIndex>,
+    Option<NodeIndex>,
+    Option<NodeIndex>,
+)> {
+    let mut bootstrap = None;
+    let mut finalize = None;
+    let mut mapped_extension_sqls = HashMap::default();
+
+    for item in extension_sqls {
+        let index = graph.add_node(item.into());
+
+        mapped_extension_sqls.insert(item, index);
+        if item.bootstrap {
+            if let Some(_index) = bootstrap {
+                return Err(eyre_err!(
+                    "Cannot have multiple `extension_sql!()` with `bootstrap` positioning."
+                ));
+            }
+            bootstrap = Some(index)
+        }
+        if item.finalize {
+            if let Some(_index) = finalize {
+                return Err(eyre_err!(
+                    "Cannot have multiple `extension_sql!()` with `finalize` positioning."
+                ));
+            }
+            finalize = Some(index)
+        }
+    }
+    for (item, index) in &mapped_extension_sqls {
+        graph.add_edge(root, *index, SqlGraphRelationship::RequiredBy);
+        if !item.bootstrap {
+            if let Some(bootstrap) = bootstrap {
+                graph.add_edge(bootstrap, *index, SqlGraphRelationship::RequiredBy);
+            }
+        }
+        if !item.finalize {
+            if let Some(finalize) = finalize {
+                graph.add_edge(*index, finalize, SqlGraphRelationship::RequiredBy);
+            }
+        }
+    }
+    Ok((mapped_extension_sqls, bootstrap, finalize))
+}
+
+fn connect_extension_sqls<'a>(
+    graph: &mut StableGraph<SqlGraphEntity<'a>, SqlGraphRelationship>,
+    extension_sqls: &HashMap<&'a InventoryExtensionSql, NodeIndex>,
+    schemas: &HashMap<&'a InventorySchema, NodeIndex>,
+    types: &HashMap<&'a InventoryPostgresType, NodeIndex>,
+    enums: &HashMap<&'a InventoryPostgresEnum, NodeIndex>,
+    externs: &HashMap<&'a InventoryPgExtern, NodeIndex>,
+) {
+    for (item, &index) in extension_sqls {
+        for (schema_item, &schema_index) in schemas {
+            if item.module_path == schema_item.module_path {
+                tracing::trace!(from = ?item.identifier(), to = schema_item.module_path, "Adding ExtensionSQL after Schema edge.");
+                graph.add_edge(schema_index, index, SqlGraphRelationship::RequiredBy);
+                break;
+            }
+        }
+        for after in &item.after {
+            match after {
+                InventoryExtensionSqlPositioningRef::FullPath(path) => {
+                    for (other, other_index) in types {
+                        if other.full_path.ends_with(*path) {
+                            tracing::trace!(from = ?item.identifier(), to = ?other.full_path, "Adding ExtensionSQL after Type edge.");
+                            graph.add_edge(
+                                *other_index,
+                                index,
+                                SqlGraphRelationship::RequiredBy,
+                            );
+                            break;
+                        }
+                    }
+                    for (other, other_index) in enums {
+                        if other.full_path.ends_with(*path) {
+                            tracing::trace!(from = ?item.identifier(), to = ?other.full_path, "Adding ExtensionSQL after Enum edge.");
+                            graph.add_edge(
+                                *other_index,
+                                index,
+                                SqlGraphRelationship::RequiredBy,
+                            );
+                            break;
+                        }
+                    }
+                    for (other, other_index) in externs {
+                        if other.full_path.ends_with(*path) {
+                            tracing::trace!(from = ?item.identifier(), to = ?other.full_path, "Adding ExtensionSQL after Extern edge.");
+                            graph.add_edge(
+                                *other_index,
+                                index,
+                                SqlGraphRelationship::RequiredBy,
+                            );
+                            break;
+                        }
+                    }
+                }
+                InventoryExtensionSqlPositioningRef::Name(name) => {
+                    for (other, other_index) in extension_sqls {
+                        if other.name == Some(name) {
+                            tracing::trace!(from = ?item.identifier(), to = ?other.identifier(), "Adding ExtensionSQL after ExtensionSql edge.");
+                            graph.add_edge(
+                                *other_index,
+                                index,
+                                SqlGraphRelationship::RequiredBy,
+                            );
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        for before in &item.before {
+            match before {
+                InventoryExtensionSqlPositioningRef::FullPath(path) => {
+                    for (other, other_index) in types {
+                        if other.full_path == *path {
+                            tracing::trace!(from = ?item.full_path, to = ?other.full_path, "Adding ExtensionSQL after Type edge.");
+                            graph.add_edge(
+                                index,
+                                *other_index,
+                                SqlGraphRelationship::RequiredBy,
+                            );
+                            break;
+                        }
+                    }
+                    for (other, other_index) in enums {
+                        if other.full_path == *path {
+                            tracing::trace!(from = ?item.full_path, to = ?other.full_path, "Adding ExtensionSQL after Enum edge.");
+                            graph.add_edge(
+                                index,
+                                *other_index,
+                                SqlGraphRelationship::RequiredBy,
+                            );
+                            break;
+                        }
+                    }
+                    for (other, other_index) in externs {
+                        if other.full_path == *path {
+                            tracing::trace!(from = ?item.full_path, to = ?other.full_path, "Adding ExtensionSQL after Extern edge.");
+                            graph.add_edge(
+                                index,
+                                *other_index,
+                                SqlGraphRelationship::RequiredBy,
+                            );
+                            break;
+                        }
+                    }
+                }
+                InventoryExtensionSqlPositioningRef::Name(name) => {
+                    for (other, other_index) in extension_sqls {
+                        if other.name == Some(name) {
+                            tracing::trace!(from = ?item.full_path, to = ?other.full_path, "Adding ExtensionSQL after ExtensionSql edge.");
+                            graph.add_edge(
+                                index,
+                                *other_index,
+                                SqlGraphRelationship::RequiredBy,
+                            );
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+fn initialize_schemas<'a>(
+    graph: &mut StableGraph<SqlGraphEntity<'a>, SqlGraphRelationship>,
+    bootstrap: Option<NodeIndex>,
+    finalize: Option<NodeIndex>,
+    schemas: impl Iterator<Item = &'a InventorySchema>,
+) -> eyre::Result<
+    HashMap<&'a InventorySchema, NodeIndex>,
+> {
+    let mut mapped_schemas = HashMap::default();
+    for item in schemas {
+        let index = graph.add_node(item.into());
+        mapped_schemas.insert(item, index);
+        if let Some(bootstrap) = bootstrap {
+            graph.add_edge(bootstrap, index, SqlGraphRelationship::RequiredBy);
+        }
+        if let Some(finalize) = finalize {
+            graph.add_edge(index, finalize, SqlGraphRelationship::RequiredBy);
+        }
+    }
+    Ok(mapped_schemas)
+}
+
+fn connect_schemas<'a>(
+    graph: &mut StableGraph<SqlGraphEntity<'a>, SqlGraphRelationship>,
+    schemas: &HashMap<&'a InventorySchema, NodeIndex>,
+    root: NodeIndex,
+) {
+    for (_item, &index) in schemas {
+        graph.add_edge(root, index, SqlGraphRelationship::RequiredBy);
+    }
+}
+
+fn initialize_enums<'a>(
+    graph: &mut StableGraph<SqlGraphEntity<'a>, SqlGraphRelationship>,
+    root: NodeIndex,
+    bootstrap: Option<NodeIndex>,
+    finalize: Option<NodeIndex>,
+    enums: impl Iterator<Item = &'a InventoryPostgresEnum>,
+) -> eyre::Result<
+    HashMap<&'a InventoryPostgresEnum, NodeIndex>,
+> {
+    let mut mapped_enums = HashMap::default();
+    for item in enums {
+        let index = graph.add_node(item.into());
+        mapped_enums.insert(item, index);
+        build_base_edges(graph, index, root, bootstrap, finalize);
+    }
+    Ok(mapped_enums)
+}
+
+fn connect_enums<'a>(
+    graph: &mut StableGraph<SqlGraphEntity<'a>, SqlGraphRelationship>,
+    enums: &HashMap<&'a InventoryPostgresEnum, NodeIndex>,
+    schemas: &HashMap<&'a InventorySchema, NodeIndex>,
+) {
+    for (item, &index) in enums {
+        for (schema_item, &schema_index) in schemas {
+            if item.module_path == schema_item.module_path {
+                tracing::trace!(from = ?item.full_path, to = schema_item.module_path, "Adding Enum after Schema edge.");
+                graph.add_edge(schema_index, index, SqlGraphRelationship::RequiredBy);
+                break;
+            }
+        }
+    }
+}
+
+fn initialize_types<'a>(
+    graph: &mut StableGraph<SqlGraphEntity<'a>, SqlGraphRelationship>,
+    root: NodeIndex,
+    bootstrap: Option<NodeIndex>,
+    finalize: Option<NodeIndex>,
+    types: impl Iterator<Item = &'a InventoryPostgresType>,
+) -> eyre::Result<
+    HashMap<&'a InventoryPostgresType, NodeIndex>,
+> {
+    let mut mapped_types = HashMap::default();
+    for item in types {
+        let index = graph.add_node(item.into());
+        mapped_types.insert(item, index);
+        build_base_edges(graph, index, root, bootstrap, finalize);
+    }
+    Ok(mapped_types)
+}
+
+
+fn connect_types<'a>(
+    graph: &mut StableGraph<SqlGraphEntity<'a>, SqlGraphRelationship>,
+    types: &HashMap<&'a InventoryPostgresType, NodeIndex>,
+    schemas: &HashMap<&'a InventorySchema, NodeIndex>,
+) {
+    for (item, &index) in types {
+        for (schema_item, &schema_index) in schemas {
+            if item.module_path == schema_item.module_path {
+                tracing::trace!(from = ?item.full_path, to = schema_item.module_path, "Adding Type after Schema edge.");
+                graph.add_edge(schema_index, index, SqlGraphRelationship::RequiredBy);
+                break;
+            }
+        }
+    }
+}
+
+
+fn initialize_externs<'a>(
+    graph: &mut StableGraph<SqlGraphEntity<'a>, SqlGraphRelationship>,
+    root: NodeIndex,
+    bootstrap: Option<NodeIndex>,
+    finalize: Option<NodeIndex>,
+    externs: impl Iterator<Item = &'a InventoryPgExtern>,
+    mapped_types: &HashMap<&'a InventoryPostgresType, NodeIndex>,
+    mapped_enums: &HashMap<&'a InventoryPostgresEnum, NodeIndex>,
+) -> eyre::Result<
+    (HashMap<&'a InventoryPgExtern, NodeIndex>, HashMap<&'a str, NodeIndex>)
+> {
+
+    let mut mapped_externs = HashMap::default();
+    let mut mapped_builtin_types = HashMap::default();
+    for item in externs {
+        let index = graph.add_node(item.into());
+        mapped_externs.insert(item, index);
+        build_base_edges(graph, index, root, bootstrap, finalize);
+
+        for arg in &item.fn_args {
+            let mut found = false;
+            for (ty_item, &_ty_index) in mapped_types {
+                if ty_item.id_matches(&arg.ty_id) {
+                    found = true;
+                    break;
+                }
+            }
+            for (ty_item, &_ty_index) in mapped_enums {
+                if ty_item.id == arg.ty_id {
+                    found = true;
+                    break;
+                }
+            }
+            if !found {
+                mapped_builtin_types
+                    .entry(arg.full_path)
+                    .or_insert_with(|| {
+                        graph.add_node(SqlGraphEntity::BuiltinType(arg.full_path))
+                    });
+            }
+        }
+
+        match &item.fn_return {
+            InventoryPgExternReturn::None | InventoryPgExternReturn::Trigger => (),
+            InventoryPgExternReturn::Type { id, full_path, .. }
+            | InventoryPgExternReturn::SetOf { id, full_path, .. } => {
+                let mut found = false;
+                for (ty_item, &_ty_index) in mapped_types {
+                    if ty_item.id_matches(id) {
+                        found = true;
+                        break;
+                    }
+                }
+                for (ty_item, &_ty_index) in mapped_enums {
+                    if ty_item.id == *id {
+                        found = true;
+                        break;
+                    }
+                }
+                if !found {
+                    mapped_builtin_types.entry(full_path).or_insert_with(|| {
+                        graph.add_node(SqlGraphEntity::BuiltinType(full_path))
+                    });
+                }
+            }
+            InventoryPgExternReturn::Iterated(iterated_returns) => {
+                for iterated_return in iterated_returns {
+                    let mut found = false;
+                    for (ty_item, &_ty_index) in mapped_types {
+                        if ty_item.id_matches(&iterated_return.0) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    for (ty_item, &_ty_index) in mapped_enums {
+                        if ty_item.id == iterated_return.0 {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if !found {
+                        mapped_builtin_types
+                            .entry(iterated_return.1)
+                            .or_insert_with(|| {
+                                graph.add_node(SqlGraphEntity::BuiltinType(iterated_return.1))
+                            });
+                    }
+                }
+            }
+        }
+    }
+    Ok((mapped_externs, mapped_builtin_types))
+}
+
+
+fn connect_externs<'a>(
+    graph: &mut StableGraph<SqlGraphEntity<'a>, SqlGraphRelationship>,
+    externs: &HashMap<&'a InventoryPgExtern, NodeIndex>,
+    schemas: &HashMap<&'a InventorySchema, NodeIndex>,
+    types: &HashMap<&'a InventoryPostgresType, NodeIndex>,
+    enums: &HashMap<&'a InventoryPostgresEnum, NodeIndex>,
+    builtin_types: &HashMap<&'a str, NodeIndex>,
+    extension_sqls: &HashMap<&'a InventoryExtensionSql, NodeIndex>,
+) {
+    for (item, &index) in externs {
+        for (schema_item, &schema_index) in schemas {
+            if item.module_path == schema_item.module_path {
+                tracing::trace!(from = ?item.full_path, to = schema_item.module_path, "Adding Extern after Schema edge.");
+                graph.add_edge(schema_index, index, SqlGraphRelationship::RequiredBy);
+                break;
+            }
+        }
+        for arg in &item.fn_args {
+            let mut found = false;
+            for (ty_item, &ty_index) in types {
+                if ty_item.id_matches(&arg.ty_id) {
+                    tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Extern after Type (due to argument) edge.");
+                    graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredByArg);
+                    found = true;
+                    break;
+                }
+            }
+            if !found {
+                for (enum_item, &enum_index) in enums {
+                    if enum_item.id_matches(&arg.ty_id) {
+                        tracing::trace!(from = ?item.full_path, to = enum_item.full_path, "Adding Extern after Enum (due to argument) edge.");
+                        graph.add_edge(enum_index, index, SqlGraphRelationship::RequiredByArg);
+                        found = true;
+                        break;
+                    }
+                }
+            }
+            if !found {
+                let builtin_index = builtin_types
+                    .get(arg.full_path)
+                    .expect(&format!("Could not fetch Builtin Type {}.", arg.full_path));
+                tracing::trace!(from = ?item.full_path, to = arg.full_path, "Adding Extern(arg) after BuiltIn Type (due to argument) edge.");
+                graph.add_edge(*builtin_index, index, SqlGraphRelationship::RequiredByArg);
+            }
+            if !found {
+                for (ext_item, ext_index) in extension_sqls {
+                    if let Some(_) = ext_item.has_sql_declared_entity(&SqlDeclaredEntity::Type(
+                        arg.full_path.to_string(),
+                    )) {
+                        tracing::trace!(from = ?item.full_path, to = arg.full_path, "Adding Extern(arg) after Extension SQL (due to argument) edge.");
+                        graph.add_edge(*ext_index, index, SqlGraphRelationship::RequiredByArg);
+                    } else if let Some(_) = ext_item.has_sql_declared_entity(
+                        &SqlDeclaredEntity::Enum(arg.full_path.to_string()),
+                    ) {
+                        tracing::trace!(from = ?item.full_path, to = arg.full_path, "Adding Extern(arg) after Extension SQL (due to argument) edge.");
+                        graph.add_edge(*ext_index, index, SqlGraphRelationship::RequiredByArg);
+                    }
+                }
+            }
+        }
+        match &item.fn_return {
+            InventoryPgExternReturn::None | InventoryPgExternReturn::Trigger => (),
+            InventoryPgExternReturn::Type { id, full_path, .. }
+            | InventoryPgExternReturn::SetOf { id, full_path, .. } => {
+                let mut found = false;
+                for (ty_item, &ty_index) in types {
+                    if ty_item.id_matches(id) {
+                        tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Extern after Type (due to return) edge.");
+                        graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredByReturn);
+                        found = true;
+                        break;
+                    }
+                }
+                if !found {
+                    for (ty_item, &ty_index) in enums {
+                        if ty_item.id_matches(id) {
+                            tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Extern after Enum (due to return) edge.");
+                            graph.add_edge(
+                                ty_index,
+                                index,
+                                SqlGraphRelationship::RequiredByReturn,
+                            );
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+                if !found {
+                    let builtin_index = builtin_types
+                        .get(full_path)
+                        .expect(&format!("Could not fetch Builtin Type {}.", full_path));
+                    tracing::trace!(from = ?item.full_path, to = full_path, "Adding Extern(return) after BuiltIn Type (due to return) edge.");
+                    graph.add_edge(
+                        *builtin_index,
+                        index,
+                        SqlGraphRelationship::RequiredByReturn,
+                    );
+                }
+                if !found {
+                    for (ext_item, ext_index) in extension_sqls {
+                        if let Some(_) = ext_item.has_sql_declared_entity(
+                            &SqlDeclaredEntity::Type(full_path.to_string()),
+                        ) {
+                            tracing::trace!(from = ?item.full_path, to = full_path, "Adding Extern(arg) after Extension SQL (due to argument) edge.");
+                            graph.add_edge(
+                                *ext_index,
+                                index,
+                                SqlGraphRelationship::RequiredByArg,
+                            );
+                        } else if let Some(_) = ext_item.has_sql_declared_entity(
+                            &SqlDeclaredEntity::Enum(full_path.to_string()),
+                        ) {
+                            tracing::trace!(from = ?item.full_path, to = full_path, "Adding Extern(arg) after Extension SQL (due to argument) edge.");
+                            graph.add_edge(
+                                *ext_index,
+                                index,
+                                SqlGraphRelationship::RequiredByArg,
+                            );
+                        }
+                    }
+                }
+            }
+            InventoryPgExternReturn::Iterated(iterated_returns) => {
+                for iterated_return in iterated_returns {
+                    let mut found = false;
+                    for (ty_item, &ty_index) in types {
+                        if ty_item.id_matches(&iterated_return.0) {
+                            tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Extern after Type (due to return) edge.");
+                            graph.add_edge(
+                                ty_index,
+                                index,
+                                SqlGraphRelationship::RequiredByReturn,
+                            );
+                            found = true;
+                            break;
+                        }
+                    }
+                    if !found {
+                        for (ty_item, &ty_index) in enums {
+                            if ty_item.id_matches(&iterated_return.0) {
+                                tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Extern after Enum (due to return) edge.");
+                                graph.add_edge(
+                                    ty_index,
+                                    index,
+                                    SqlGraphRelationship::RequiredByReturn,
+                                );
+                                found = true;
+                                break;
+                            }
+                        }
+                    }
+                    if !found {
+                        let builtin_index = builtin_types
+                            .get(&iterated_return.1)
+                            .expect(&format!(
+                                "Could not fetch Builtin Type {}.",
+                                iterated_return.1
+                            ));
+                        tracing::trace!(from = ?item.full_path, to = iterated_return.1, "Adding Extern after BuiltIn Type (due to return) edge.");
+                        graph.add_edge(
+                            *builtin_index,
+                            index,
+                            SqlGraphRelationship::RequiredByReturn,
+                        );
+                    }
+                    if !found {
+                        for (ext_item, ext_index) in extension_sqls {
+                            if let Some(_) = ext_item.has_sql_declared_entity(
+                                &SqlDeclaredEntity::Type(iterated_return.1.to_string()),
+                            ) {
+                                tracing::trace!(from = ?item.full_path, to = iterated_return.1, "Adding Extern(arg) after Extension SQL (due to argument) edge.");
+                                graph.add_edge(
+                                    *ext_index,
+                                    index,
+                                    SqlGraphRelationship::RequiredByArg,
+                                );
+                            } else if let Some(_) = ext_item.has_sql_declared_entity(
+                                &SqlDeclaredEntity::Enum(iterated_return.1.to_string()),
+                            ) {
+                                tracing::trace!(from = ?item.full_path, to = iterated_return.1, "Adding Extern(arg) after Extension SQL (due to argument) edge.");
+                                graph.add_edge(
+                                    *ext_index,
+                                    index,
+                                    SqlGraphRelationship::RequiredByArg,
+                                );
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+fn initialize_ords<'a>(
+    graph: &mut StableGraph<SqlGraphEntity<'a>, SqlGraphRelationship>,
+    root: NodeIndex,
+    bootstrap: Option<NodeIndex>,
+    finalize: Option<NodeIndex>,
+    ords: impl Iterator<Item = &'a InventoryPostgresOrd>,
+) -> eyre::Result<
+    HashMap<&'a InventoryPostgresOrd, NodeIndex>,
+> {
+    let mut mapped_ords = HashMap::default();
+    for item in ords {
+        let index = graph.add_node(item.into());
+        mapped_ords.insert(item, index);
+        build_base_edges(graph, index, root, bootstrap, finalize);
+    }
+    Ok(mapped_ords)
+}
+
+fn connect_ords<'a>(
+    graph: &mut StableGraph<SqlGraphEntity<'a>, SqlGraphRelationship>,
+    ords: &HashMap<&'a InventoryPostgresOrd, NodeIndex>,
+    schemas: &HashMap<&'a InventorySchema, NodeIndex>,
+    types: &HashMap<&'a InventoryPostgresType, NodeIndex>,
+    enums: &HashMap<&'a InventoryPostgresEnum, NodeIndex>,
+) {
+    for (item, &index) in ords {
+        for (schema_item, &schema_index) in schemas {
+            if item.module_path == schema_item.module_path {
+                tracing::trace!(from = ?item.full_path, to = schema_item.module_path, "Adding Ord after Schema edge.");
+                graph.add_edge(schema_index, index, SqlGraphRelationship::RequiredBy);
+                break;
+            }
+        }
+        for (ty_item, &ty_index) in types {
+            if ty_item.id_matches(&item.id) {
+                tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Ord after Type edge.");
+                graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredBy);
+                break;
+            }
+        }
+        for (ty_item, &ty_index) in enums {
+            if ty_item.id_matches(&item.id) {
+                tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Ord after Enum edge.");
+                graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredBy);
+                break;
+            }
+        }
+    }
+}
+
+fn initialize_hashes<'a>(
+    graph: &mut StableGraph<SqlGraphEntity<'a>, SqlGraphRelationship>,
+    root: NodeIndex,
+    bootstrap: Option<NodeIndex>,
+    finalize: Option<NodeIndex>,
+    hashes: impl Iterator<Item = &'a InventoryPostgresHash>,
+) -> eyre::Result<
+    HashMap<&'a InventoryPostgresHash, NodeIndex>,
+> {
+    let mut mapped_hashes = HashMap::default();
+    for item in hashes {
+        let index = graph.add_node(item.into());
+        mapped_hashes.insert(item, index);
+        build_base_edges(graph, index, root, bootstrap, finalize);
+    }
+    Ok(mapped_hashes)
+}
+
+fn connect_hashes<'a>(
+    graph: &mut StableGraph<SqlGraphEntity<'a>, SqlGraphRelationship>,
+    hashes: &HashMap<&'a InventoryPostgresHash, NodeIndex>,
+    schemas: &HashMap<&'a InventorySchema, NodeIndex>,
+    types: &HashMap<&'a InventoryPostgresType, NodeIndex>,
+    enums: &HashMap<&'a InventoryPostgresEnum, NodeIndex>,
+) {
+    for (item, &index) in hashes {
+        for (schema_item, &schema_index) in schemas {
+            if item.module_path == schema_item.module_path {
+                tracing::trace!(from = ?item.full_path, to = schema_item.module_path, "Adding Hash after Schema edge.");
+                graph.add_edge(schema_index, index, SqlGraphRelationship::RequiredBy);
+                break;
+            }
+        }
+        for (ty_item, &ty_index) in types {
+            if ty_item.id_matches(&item.id) {
+                tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Hash after Type edge.");
+                graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredBy);
+                break;
+            }
+        }
+        for (ty_item, &ty_index) in enums {
+            if ty_item.id_matches(&item.id) {
+                tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Hash after Enum edge.");
+                graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredBy);
+                break;
+            }
+        }
     }
 }
