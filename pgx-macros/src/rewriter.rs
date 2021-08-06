@@ -113,7 +113,7 @@ impl PgGuardRewriter {
                 true,
             ),
 
-            CategorizedType::Tuple(_types) => (PgGuardRewriter::impl_tuple_udf(func), false),
+            CategorizedType::Tuple(_types) => (PgGuardRewriter::impl_tuple_udf(func, inventory_submission), false),
 
             CategorizedType::Iterator(types) if types.len() == 1 => (
                 PgGuardRewriter::impl_setof_srf(
@@ -211,7 +211,7 @@ impl PgGuardRewriter {
         }
     }
 
-    fn impl_tuple_udf(mut func: ItemFn) -> proc_macro2::TokenStream {
+    fn impl_tuple_udf(mut func: ItemFn, inventory_submission: Option<&pgx_utils::pg_inventory::PgExtern>) -> proc_macro2::TokenStream {
         let func_span = func.span();
         let return_type = func.sig.output;
         let return_type = format!("{}", quote! {#return_type});
@@ -222,8 +222,14 @@ impl PgGuardRewriter {
         func.sig.output = ReturnType::Default;
         let sig = func.sig;
         let body = func.block;
+        let maybe_skip_inventory_attr = if inventory_submission.is_none() {
+            quote! { (skip_inventory) }
+        } else {
+            quote! {}
+        };
+    
         quote_spanned! {func_span=>
-            #[pg_extern]
+            #[pg_extern #maybe_skip_inventory_attr]
             #sig -> #return_type {
                 Some(#body).into_iter()
             }

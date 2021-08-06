@@ -315,6 +315,7 @@ pub fn search_path(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// Optionally accepts the following attributes:
 /// * `immutable`: Corresponds to [`IMMUTABLE`](https://www.postgresql.org/docs/current/sql-createfunction.html).
 /// * `strict`: Corresponds to [`STRICT`](https://www.postgresql.org/docs/current/sql-createfunction.html).
+///   + In most cases, `#[pg_extern]` can detect when no `Option<T>`s are used, and automatically set this.
 /// * `stable`: Corresponds to [`STABLE`](https://www.postgresql.org/docs/current/sql-createfunction.html).
 /// * `volatile`: Corresponds to [`VOLATILE`](https://www.postgresql.org/docs/current/sql-createfunction.html).
 /// * `raw`: Corresponds to [`RAW`](https://www.postgresql.org/docs/current/sql-createfunction.html).
@@ -324,14 +325,96 @@ pub fn search_path(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// * `no_guard`: Do not use `#[pg_guard]` with the function.
 /// * `skip_inventory`: Skip SQL generator inventory submission. **Use always (and only) in Doctests!**
 ///
+/// Functions can accept and return any type which `pgx` supports. `pgx` supports many PostgreSQL types by default.
+/// New types can be defined via [`macro@PostgresType`] or [`macro@PostgresEnum`].
+///
+/// Without any arguments or returns:
+///
+/// ```rust
+/// use pgx::*;
+/// #[pg_extern(skip_inventory)]  // Only use `skip_inventory` in doctests.
+/// fn foo() { unimplemented!() }
+/// ```
+///
+/// # Arguments
+///
+/// It's possible to pass even complex arguments:
+///
+/// ```rust
+/// use pgx::*;
+/// #[pg_extern(skip_inventory)]  // Only use `skip_inventory` in doctests.
+/// fn boop(
+///     a: i32,
+///     b: Option<i32>,
+///     c: Vec<i32>,
+///     d: Option<Vec<Option<i32>>>
+/// ) { unimplemented!() }
+/// ```
+///
+/// It's possible to set argument defaults, set by PostgreSQL when the function is invoked:
+///
+/// ```rust
+/// use pgx::*;
+/// #[pg_extern(skip_inventory)]  // Only use `skip_inventory` in doctests.
+/// fn boop(a: default!(i32, 11111)) { unimplemented!() }
+///
+/// #[pg_extern(skip_inventory)]  // Only use `skip_inventory` in doctests.
+/// fn doop(
+///     a: default!(Vec<Option<&str>>, "ARRAY[]::text[]"),
+///     b: default!(String, "'note the inner quotes!'")
+/// ) { unimplemented!() }
+/// ```
+/// The `default!()` macro may only be used in argument position.
+///
+/// It accepts 2 arguments:
+/// 
+/// * A type
+/// * A `bool`, numeric, or string literal to represent the default. `"NULL"` is a possible value, as is `"'string'"`
+///
+/// # Returns
+///
+/// It's possible to return even complex values, as well:
+/// 
+/// ```rust
+/// use pgx::*;
+/// #[pg_extern(skip_inventory)]  // Only use `skip_inventory` in doctests.
+/// fn boop() -> i32 { unimplemented!() }
+///
+/// #[pg_extern(skip_inventory)]  // Only use `skip_inventory` in doctests.
+/// fn doop() -> Option<i32> { unimplemented!() }
+///
+/// #[pg_extern(skip_inventory)]  // Only use `skip_inventory` in doctests.
+/// fn swoop() -> Option<Vec<Option<i32>>> { unimplemented!() }
+///
+/// #[pg_extern(skip_inventory)]  // Only use `skip_inventory` in doctests.
+/// fn floop() -> (i32, i32) { unimplemented!() }
+/// ```
+///
+/// Like in PostgreSQL, it's possible to return tables using iterators and the `name!()` macro:
+///
+/// ```rust
+/// use pgx::*;
+/// #[pg_extern(skip_inventory)]  // Only use `skip_inventory` in doctests.
+/// fn floop() -> impl Iterator<Item = (name!(a, i32), name!(b, i32))> { 
+///     None.into_iter() // Help type inference...
+/// }
+/// ```
+///
+/// The `name!()` macro may only be used in return position inside the `Item` of an `impl Iterator`.
+///
+/// It accepts 2 arguments:
+///
+/// * A name, such as `example`
+/// * A type
 #[proc_macro_attribute]
 pub fn pg_extern(attr: TokenStream, item: TokenStream) -> TokenStream {
     let args = parse_extern_attributes(proc_macro2::TokenStream::from(attr.clone()));
 
+    let inventory_item = pg_inventory::PgExtern::new(attr.clone().into(), item.clone().into()).unwrap();
     let inventory_submission = if args.iter().any(|x| *x == ExternArgs::SkipInventory) {
         None
     } else {
-        Some(pg_inventory::PgExtern::new(attr.clone().into(), item.clone().into()).unwrap())
+        Some(inventory_item)
     };
 
     let ast = parse_macro_input!(item as syn::Item);
@@ -467,10 +550,9 @@ fn impl_postgres_enum(ast: DeriveInput) -> proc_macro2::TokenStream {
         }
     });
 
+    let inventory_item = pg_inventory::PostgresEnum::from_derive_input(inventory_ast).unwrap();
     if !found_skip_inventory {
-        pg_inventory::PostgresEnum::from_derive_input(inventory_ast)
-            .unwrap()
-            .to_tokens(&mut stream);
+        inventory_item.to_tokens(&mut stream);
     }
 
     stream
@@ -603,10 +685,9 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
         });
     }
 
+    let inventory_item = pg_inventory::PostgresType::from_derive_input(ast).unwrap();
     if !found_skip_inventory {
-        pg_inventory::PostgresType::from_derive_input(ast)
-            .unwrap()
-            .to_tokens(&mut stream);
+        inventory_item.to_tokens(&mut stream);
     }
 
     stream
