@@ -161,86 +161,135 @@ pub fn pg_schema(_attr: TokenStream, item: TokenStream) -> TokenStream {
     pgx_schema.to_token_stream().into()
 }
 
-/// Declare SQL to be included in generated extension script.
-///
-/// Accepts a String literal, and optionally the attributes:
-///
-/// * `name = "item"`: Set the unique identifer to `"item"` for use in `before`/`after` declarations.
-/// * `before = [item, item_two]`: References to other `name`s or Rust items which this SQL should be present before.
-/// * `after = [item, item_two]`: References to other `name`s or Rust items which this SQL should be present after.
-/// * `bootstrap` (**Unique**): Hint that this is SQL intended to go before all other generated SQL.
-/// * `finalize` (**Unique**): Hint that this is SQL intended to go after all other generated SQL.
-/// * `skip_inventory`: Skip SQL generator inventory submission. **Use always (and only) in Doctests!**
-///
-/// You can declare some SQL without any positioning information, meaning it can end up anywhere in the generated SQL:
-///
-/// ```rust
-/// use pgx_macros::extension_sql;
-///
-/// extension_sql!(
-///     r#"
-///     -- SQL statements
-///     "#,
-/// #   skip_inventory,
-/// );
-/// ```
-///
-/// To cause the SQL to be output at the start of the generated SQL:
-///
-/// ```rust
-/// use pgx_macros::extension_sql;
-///
-/// extension_sql!(
-///     r#"
-///     -- SQL statements
-///     "#,
-///     bootstrap,
-/// #   skip_inventory,
-/// );
-/// ```
-///
-/// To cause the SQL to be output at the end of the generated SQL:
-///
-/// ```rust
-/// use pgx_macros::extension_sql;
-///
-/// extension_sql!(
-///     r#"
-///     -- SQL statements
-///     "#,
-///     finalize,
-/// #   skip_inventory,    
-/// );
-/// ```
-///
-/// To declare the SQL dependant, or a dependency of, other items:
-///
-/// ```rust
-/// use pgx_macros::extension_sql;
-///
-/// struct Treat;
-///
-/// mod dog_characteristics {
-///     enum DogAlignment {
-///         Good
-///     }
-/// }
-///
-/// extension_sql!(r#"
-/// -- SQL statements
-/// "#,
-///     name = "named_one",
-/// #   skip_inventory,
-/// );
-///
-/// extension_sql!(r#"
-/// -- SQL statements
-/// "#,
-///     before = [ Treat, "named_one" ],
-///     after = [ dog_characteristics::DogAlignment ],
-/// #   skip_inventory,
-/// );
-/// ```
+/**
+Declare SQL to be included in generated extension script.
+
+Accepts a String literal, and optionally the attributes:
+
+* `name = "item"`: Set the unique identifer to `"item"` for use in `before`/`after` declarations.
+* `before = [item, item_two]`: References to other `name`s or Rust items which this SQL should be present before.
+* `after = [item, item_two]`: References to other `name`s or Rust items which this SQL should be present after.
+* `creates = [ Type(submod::Cust), Enum(Pre), Function(defined)]`: Communicates to the [`pgx-utils::PgxSql`] dependency graph
+    that this SQL block creates certain entities. Please note it **does not** create matching Rust types.
+* `bootstrap` (**Unique**): Hint that this is SQL intended to go before all other generated SQL.
+* `finalize` (**Unique**): Hint that this is SQL intended to go after all other generated SQL.
+* `skip_inventory`: Skip SQL generator inventory submission. **Use always (and only) in Doctests!**
+
+You can declare some SQL without any positioning information, meaning it can end up anywhere in the generated SQL:
+
+```rust
+use pgx_macros::extension_sql;
+
+extension_sql!(
+    r#"
+    -- SQL statements
+    "#,
+#   skip_inventory,
+);
+```
+
+To cause the SQL to be output at the start of the generated SQL:
+
+```rust
+use pgx_macros::extension_sql;
+
+extension_sql!(
+    r#"
+    -- SQL statements
+    "#,
+    bootstrap,
+#   skip_inventory,
+);
+```
+
+To cause the SQL to be output at the end of the generated SQL:
+
+```rust
+use pgx_macros::extension_sql;
+
+extension_sql!(
+    r#"
+    -- SQL statements
+    "#,
+    finalize,
+#   skip_inventory,    
+);
+```
+
+To declare the SQL dependant, or a dependency of, other items:
+
+```rust
+use pgx_macros::extension_sql;
+
+struct Treat;
+
+mod dog_characteristics {
+    enum DogAlignment {
+        Good
+    }
+}
+
+extension_sql!(r#"
+    -- SQL statements
+    "#,
+        name = "named_one",
+#   skip_inventory,
+);
+
+extension_sql!(r#"
+    -- SQL statements
+    "#,
+        before = [ Treat, "named_one" ],
+        after = [ dog_characteristics::DogAlignment ],
+#   skip_inventory,
+);
+```
+
+To declare the SQL defines some entity (**Caution:** This is not recommended usage):
+
+```rust
+use pgx::stringinfo::StringInfo;
+use pgx::*;
+use pgx_utils::get_named_capture;
+
+#[derive(Debug)]
+#[repr(C)]
+struct Complex {
+    x: f64,
+    y: f64,
+}
+
+extension_sql!(
+    r#"CREATE TYPE complex;"#,
+    name = "create_complex_type",
+    creates = [Type(Complex)],
+#   skip_inventory,
+);
+
+#[pg_extern(immutable, skip_inventory)] // Only use `skip_inventory` in doctests.
+fn complex_in(input: &std::ffi::CStr) -> PgBox<Complex> {
+    todo!()
+}
+
+#[pg_extern(immutable, skip_inventory)] // Only use `skip_inventory` in doctests.
+fn complex_out(complex: PgBox<Complex>) -> &'static std::ffi::CStr {
+    todo!()
+}
+
+extension_sql!(r#"
+        CREATE TYPE complex (
+            internallength = 16,
+            input = complex_in,
+            output = complex_out,
+            alignment = double
+        );
+    "#,
+    after = ["create_complex_type", complex_in, complex_out],
+#   skip_inventory,
+);
+
+```
+*/
 #[proc_macro]
 pub fn extension_sql(input: TokenStream) -> TokenStream {
     fn wrapped(input: TokenStream) -> Result<TokenStream, syn::Error> {
@@ -333,7 +382,7 @@ pub fn search_path(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// ```rust
 /// use pgx::*;
 /// #[pg_extern(skip_inventory)]  // Only use `skip_inventory` in doctests.
-/// fn foo() { unimplemented!() }
+/// fn foo() { todo!() }
 /// ```
 ///
 /// # Arguments
@@ -348,7 +397,7 @@ pub fn search_path(_attr: TokenStream, item: TokenStream) -> TokenStream {
 ///     b: Option<i32>,
 ///     c: Vec<i32>,
 ///     d: Option<Vec<Option<i32>>>
-/// ) { unimplemented!() }
+/// ) { todo!() }
 /// ```
 ///
 /// It's possible to set argument defaults, set by PostgreSQL when the function is invoked:
@@ -356,13 +405,13 @@ pub fn search_path(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// ```rust
 /// use pgx::*;
 /// #[pg_extern(skip_inventory)]  // Only use `skip_inventory` in doctests.
-/// fn boop(a: default!(i32, 11111)) { unimplemented!() }
+/// fn boop(a: default!(i32, 11111)) { todo!() }
 ///
 /// #[pg_extern(skip_inventory)]  // Only use `skip_inventory` in doctests.
 /// fn doop(
 ///     a: default!(Vec<Option<&str>>, "ARRAY[]::text[]"),
 ///     b: default!(String, "'note the inner quotes!'")
-/// ) { unimplemented!() }
+/// ) { todo!() }
 /// ```
 /// The `default!()` macro may only be used in argument position.
 ///
@@ -378,16 +427,16 @@ pub fn search_path(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// ```rust
 /// use pgx::*;
 /// #[pg_extern(skip_inventory)]  // Only use `skip_inventory` in doctests.
-/// fn boop() -> i32 { unimplemented!() }
+/// fn boop() -> i32 { todo!() }
 ///
 /// #[pg_extern(skip_inventory)]  // Only use `skip_inventory` in doctests.
-/// fn doop() -> Option<i32> { unimplemented!() }
+/// fn doop() -> Option<i32> { todo!() }
 ///
 /// #[pg_extern(skip_inventory)]  // Only use `skip_inventory` in doctests.
-/// fn swoop() -> Option<Vec<Option<i32>>> { unimplemented!() }
+/// fn swoop() -> Option<Vec<Option<i32>>> { todo!() }
 ///
 /// #[pg_extern(skip_inventory)]  // Only use `skip_inventory` in doctests.
-/// fn floop() -> (i32, i32) { unimplemented!() }
+/// fn floop() -> (i32, i32) { todo!() }
 /// ```
 ///
 /// Like in PostgreSQL, it's possible to return tables using iterators and the `name!()` macro:
