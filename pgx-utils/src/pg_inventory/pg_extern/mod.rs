@@ -466,7 +466,7 @@ impl ToSql for InventoryPgExtern {
                     .collect::<Vec<_>>()
                     .join("\n");
                 inner.push_str(
-                    "\n--\n-- Overridden as (due to a `//` comment with a `pgxsql` code block):",
+                    "\n--\n-- Overridden as (due to a `///` comment with a `pgxsql` code block):",
                 );
                 inner
             } else {
@@ -474,7 +474,7 @@ impl ToSql for InventoryPgExtern {
             },
             overridden = self
                 .overridden
-                .map(|f| f.to_owned() + "\n")
+                .map(|f| String::from("\n") + f + "\n")
                 .unwrap_or_default(),
         );
         tracing::debug!(sql = %ext_sql);
