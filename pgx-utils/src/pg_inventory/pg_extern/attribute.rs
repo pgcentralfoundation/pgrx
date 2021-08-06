@@ -61,7 +61,7 @@ impl ToTokens for Attribute {
             Attribute::Error(s) => quote! { pgx_utils::ExternArgs::Error(String::from(#s)) },
             Attribute::Schema(s) => quote! { pgx_utils::ExternArgs::Schema(String::from(#s)) },
             Attribute::Name(s) => quote! { pgx_utils::ExternArgs::Name(String::from(#s)) },
-            Attribute::SkipInventory => quote! { /* SkipInventory */ },
+            Attribute::SkipInventory => quote! { pgx_utils::ExternArgs::SkipInventory },
         };
         tokens.append_all(quoted);
     }

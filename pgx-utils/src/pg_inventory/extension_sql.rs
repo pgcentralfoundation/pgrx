@@ -91,6 +91,7 @@ impl ToTokens for ExtensionSqlFile {
         );
         let before_iter = before.iter();
         let after_iter = after.iter();
+        let creates_iter = creates.iter();
         let name_iter = name.iter();
         if !skip_inventory {
             let inv = quote! {
@@ -106,6 +107,7 @@ impl ToTokens for ExtensionSqlFile {
                         finalize: #finalize,
                         before: vec![#(#before_iter),*],
                         after: vec![#(#after_iter),*],
+                        creates: vec![#(#creates_iter),*],
                     })
                 }
             };

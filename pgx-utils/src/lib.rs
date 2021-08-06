@@ -256,7 +256,7 @@ impl ToTokens for ExternArgs {
                     .to_token_stream(),
                 );
             }
-            ExternArgs::SkipInventory => (),
+            ExternArgs::SkipInventory => tokens.append(format_ident!("SkipInventory")),
         }
     }
 }
