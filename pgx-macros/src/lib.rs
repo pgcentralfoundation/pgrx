@@ -212,7 +212,7 @@ extension_sql!(
     -- SQL statements
     "#,
     finalize,
-#   skip_inventory,    
+#   skip_inventory,
 );
 ```
 
@@ -259,8 +259,9 @@ struct Complex {
     y: f64,
 }
 
-extension_sql!(
-    r#"CREATE TYPE complex;"#,
+extension_sql!(r#"\
+        CREATE TYPE complex;\
+    "#,
     name = "create_complex_type",
     creates = [Type(Complex)],
 #   skip_inventory,
@@ -276,13 +277,13 @@ fn complex_out(complex: PgBox<Complex>) -> &'static std::ffi::CStr {
     todo!()
 }
 
-extension_sql!(r#"
+extension_sql!(r#"\
         CREATE TYPE complex (
             internallength = 16,
             input = complex_in,
             output = complex_out,
             alignment = double
-        );
+        );\
     "#,
     after = ["create_complex_type", complex_in, complex_out],
 #   skip_inventory,
@@ -416,14 +417,14 @@ pub fn search_path(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// The `default!()` macro may only be used in argument position.
 ///
 /// It accepts 2 arguments:
-/// 
+///
 /// * A type
 /// * A `bool`, numeric, or string literal to represent the default. `"NULL"` is a possible value, as is `"'string'"`
 ///
 /// # Returns
 ///
 /// It's possible to return even complex values, as well:
-/// 
+///
 /// ```rust
 /// use pgx::*;
 /// #[pg_extern(skip_inventory)]  // Only use `skip_inventory` in doctests.
@@ -444,7 +445,7 @@ pub fn search_path(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// ```rust
 /// use pgx::*;
 /// #[pg_extern(skip_inventory)]  // Only use `skip_inventory` in doctests.
-/// fn floop() -> impl Iterator<Item = (name!(a, i32), name!(b, i32))> { 
+/// fn floop() -> impl Iterator<Item = (name!(a, i32), name!(b, i32))> {
 ///     None.into_iter() // Help type inference...
 /// }
 /// ```
@@ -459,7 +460,8 @@ pub fn search_path(_attr: TokenStream, item: TokenStream) -> TokenStream {
 pub fn pg_extern(attr: TokenStream, item: TokenStream) -> TokenStream {
     let args = parse_extern_attributes(proc_macro2::TokenStream::from(attr.clone()));
 
-    let inventory_item = pg_inventory::PgExtern::new(attr.clone().into(), item.clone().into()).unwrap();
+    let inventory_item =
+        pg_inventory::PgExtern::new(attr.clone().into(), item.clone().into()).unwrap();
     let inventory_submission = if args.iter().any(|x| *x == ExternArgs::SkipInventory) {
         None
     } else {
