@@ -329,7 +329,7 @@ impl ToSql for InventoryPgExtern {
                                      }).ok_or_else(|| eyre_err!("Could not find arg type in graph. Got: {:?}", arg))?;
                                      let needs_comma = idx < (self.fn_args.len() - 1);
                                      let buf = format!("\
-                                            \t\"{pattern}\" {schema_prefix}{variadic}{sql_type}{default}{maybe_comma}/* {full_path} */\
+                                            \t\"{pattern}\" {variadic}{schema_prefix}{sql_type}{default}{maybe_comma}/* {full_path} */\
                                         ",
                                             pattern = arg.pattern,
                                             schema_prefix = context.schema_prefix_for(&graph_index),
@@ -349,7 +349,7 @@ impl ToSql for InventoryPgExtern {
                                                 self.name
                                             ))?,
                                             default = if let Some(def) = arg.default { format!(" DEFAULT {}", def) } else { String::from("") },
-                                            variadic = if arg.is_variadic { " VARIADIC " } else { "" },
+                                            variadic = if arg.is_variadic { "VARIADIC " } else { "" },
                                             maybe_comma = if needs_comma { ", " } else { " " },
                                             full_path = arg.full_path,
                                      );

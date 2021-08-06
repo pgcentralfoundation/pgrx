@@ -321,6 +321,6 @@ impl ToSql for InventoryPostgresType {
         );
         tracing::debug!(sql = %materialized_type);
 
-        Ok(shell_type + &in_fn_sql + &out_fn_sql + &materialized_type)
+        Ok(shell_type + "\n" + &in_fn_sql + "\n" + &out_fn_sql + "\n" + &materialized_type)
     }
 }
