@@ -1,1 +1,1 @@
-INSERT INTO extension_sql VALUES ('multiple');
+INSERT INTO extension_sql VALUES ('multiple.sql');

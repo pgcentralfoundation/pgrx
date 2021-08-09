@@ -13,7 +13,6 @@ mod home {
     pub enum Dog {
         Brandy,
         Nami,
-        Koda,
     }
 
     #[derive(PostgresType, Serialize, Deserialize)]
@@ -38,7 +37,7 @@ pub use home::Dog;
 //    other positioning.
 extension_sql!(
     "\n\
-        CREATE TABLE extension_sql VALUES (message TEXT);\n\
+        CREATE TABLE extension_sql (message TEXT);\n\
         INSERT INTO extension_sql VALUES ('bootstrap');\n\
     ",
     name = "bootstrap",
@@ -49,30 +48,55 @@ extension_sql!(
         INSERT INTO extension_sql VALUES ('single');\n\
     ",
     name = "single",
-    after = ["bootstrap"],
 );
 extension_sql!(
     "\n\
     INSERT INTO extension_sql VALUES ('multiple');\n\
 ",
-    after = [Dog, home::Ball],
-    before = ["single"], // This points to the above `extension_sql!()` with `name = multiple`
+    name = "multiple",
+    after = [Dog, home::Ball, "single", "single.sql"],
 );
 
 // `extension_sql_file` does the same as `extension_sql` but automatically sets the `name` to the
 // filename (not the full path).
-extension_sql_file!("../sql/single.sql", after = ["bootstrap"]);
+extension_sql_file!("../sql/single.sql", after = ["single"]);
 extension_sql_file!(
     "../sql/multiple.sql",
-    after = [Dog, home::Ball],
-    before = ["single.sql"],
+    after = [Dog, home::Ball, "single", "single.sql", "multiple"],
 );
 extension_sql_file!("../sql/finalizer.sql", finalize);
+
+#[cfg(any(test, feature = "pg_test"))]
+#[pg_schema]
+mod tests {
+    use pgx::*;
+
+    #[pg_test]
+    fn test_ordering() {
+        let buf = Spi::connect(|client| {
+            let buf = client
+                .select("SELECT * FROM extension_sql", None, None)
+                .flat_map(|tup| tup.by_ordinal(1).ok()
+                    .and_then(|ord| ord.value::<String>()))
+                .collect::<Vec<String>>();
+
+            Ok(Some(buf))
+        });
+
+        assert_eq!(buf.unwrap(), vec![
+            String::from("bootstrap"),
+            String::from("single"),
+            String::from("single.sql"),
+            String::from("multiple"),
+            String::from("multiple.sql"),
+            String::from("finalizer")
+        ])
+    }
+}
 
 #[cfg(test)]
 pub mod pg_test {
     pub fn setup(_options: Vec<&str>) {
-        // todo!();
         // perform one-off initialization when the pg_test framework starts
     }
 
@@ -80,4 +104,6 @@ pub mod pg_test {
         // return any postgresql.conf settings that are required for your tests
         vec![]
     }
+
+
 }

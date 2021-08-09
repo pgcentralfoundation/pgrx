@@ -1,1 +1,1 @@
-INSERT INTO extension_sql VALUES ('single');
+INSERT INTO extension_sql VALUES ('single.sql');
