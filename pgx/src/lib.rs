@@ -28,6 +28,7 @@ extern crate bitflags;
 
 // expose our various derive macros
 pub use pgx_macros::*;
+pub use pgx_utils::pg_inventory;
 
 pub mod callbacks;
 pub mod datum;
@@ -288,8 +289,8 @@ macro_rules! pg_inventory_magic {
         ///
         /// </pre></div>
         pub mod __pgx_internals {
-            use ::core::convert::TryFrom;
-            use ::pgx_utils::pg_inventory::{
+            use core::convert::TryFrom;
+            use pgx::pg_inventory::{
                 inventory, once_cell::sync::Lazy, tracing, ControlFile, PgxSql,
             };
 
@@ -307,57 +308,57 @@ macro_rules! pg_inventory_magic {
             /// A wrapper type used by [`pgx::extension_sql`] and [`pgx::extension_sql_file`].
             ///
             /// Required inside the extension so that we can use [`inventory`] and collect the
-            /// [`pgx_utils::pg_inventory::InventoryExtensionSql`] used in SQL generation.
+            /// [`pgx::pg_inventory::InventoryExtensionSql`] used in SQL generation.
             #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
-            pub struct ExtensionSql(pub pgx_utils::pg_inventory::InventoryExtensionSql);
+            pub struct ExtensionSql(pub pgx::pg_inventory::InventoryExtensionSql);
             inventory::collect!(ExtensionSql);
 
             /// A wrapper type used by [`#[derive(PostgresType)]`](derive@pgx::PostgresType).
             ///
             /// Required inside the extension so that we can use [`inventory`] and collect the
-            /// [`pgx_utils::pg_inventory::InventoryPostgresType`] used in SQL generation.
+            /// [`pgx::pg_inventory::InventoryPostgresType`] used in SQL generation.
             #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
-            pub struct PostgresType(pub pgx_utils::pg_inventory::InventoryPostgresType);
+            pub struct PostgresType(pub pgx::pg_inventory::InventoryPostgresType);
             inventory::collect!(PostgresType);
 
             /// A wrapper type used by [`#[pg_extern]`](pgx::pg_extern).
             ///
             /// Required inside the extension so that we can use [`inventory`] and collect the
-            /// [`pgx_utils::pg_inventory::InventoryPgExtern`] used in SQL generation.
+            /// [`pgx::pg_inventory::InventoryPgExtern`] used in SQL generation.
             #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
-            pub struct PgExtern(pub pgx_utils::pg_inventory::InventoryPgExtern);
+            pub struct PgExtern(pub pgx::pg_inventory::InventoryPgExtern);
             inventory::collect!(PgExtern);
 
             /// A wrapper type used by [`#[derive(PostgresEnum)]`](derive@pgx::PostgresEnum).
             ///
             /// Required inside the extension so that we can use [`inventory`] and collect the
-            /// [`pgx_utils::pg_inventory::InventoryPostgresEnum`] used in SQL generation.
+            /// [`pgx::pg_inventory::InventoryPostgresEnum`] used in SQL generation.
             #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
-            pub struct PostgresEnum(pub pgx_utils::pg_inventory::InventoryPostgresEnum);
+            pub struct PostgresEnum(pub pgx::pg_inventory::InventoryPostgresEnum);
             inventory::collect!(PostgresEnum);
 
             /// A wrapper type used by [`#[derive(PostgresHash)]`](derive@pgx::PostgresHash).
             ///
             /// Required inside the extension so that we can use [`inventory`] and collect the
-            /// [`pgx_utils::pg_inventory::InventoryPostgresHash`] used in SQL generation.
+            /// [`pgx::pg_inventory::InventoryPostgresHash`] used in SQL generation.
             #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
-            pub struct PostgresHash(pub pgx_utils::pg_inventory::InventoryPostgresHash);
+            pub struct PostgresHash(pub pgx::pg_inventory::InventoryPostgresHash);
             inventory::collect!(PostgresHash);
 
             /// A wrapper type used by [`#[derive(PostgresOrd)]`](derive@pgx::PostgresOrd).
             ///
             /// Required inside the extension so that we can use [`inventory`] and collect the
-            /// [`pgx_utils::pg_inventory::InventoryPostgresOrd`] used in SQL generation.
+            /// [`pgx::pg_inventory::InventoryPostgresOrd`] used in SQL generation.
             #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
-            pub struct PostgresOrd(pub pgx_utils::pg_inventory::InventoryPostgresOrd);
+            pub struct PostgresOrd(pub pgx::pg_inventory::InventoryPostgresOrd);
             inventory::collect!(PostgresOrd);
 
             /// A wrapper type used by [`#[pg_schema]`](pgx::pg_schema).
             ///
             /// Required inside the extension so that we can use [`inventory`] and collect the
-            /// [`pgx_utils::pg_inventory::InventorySchema`] used in SQL generation.
+            /// [`pgx::pg_inventory::InventorySchema`] used in SQL generation.
             #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
-            pub struct Schema(pub pgx_utils::pg_inventory::InventorySchema);
+            pub struct Schema(pub pgx::pg_inventory::InventorySchema);
             inventory::collect!(Schema);
 
             /// Build the SQL generator using the inventories of the wrappers in this module.
@@ -365,7 +366,7 @@ macro_rules! pg_inventory_magic {
             ///  Most often, this is done by the [`macro@pgx::pg_binary_magic`] inside a
             /// `src/bin/sql-generator.rs`.
             #[tracing::instrument(level = "info")]
-            pub fn generate_sql<'a>() -> pgx_utils::pg_inventory::eyre::Result<PgxSql<'a>> {
+            pub fn generate_sql<'a>() -> pgx::pg_inventory::eyre::Result<PgxSql<'a>> {
                 let generated = PgxSql::build(
                     &*CONTROL_FILE,
                     (*$crate::DEFAULT_TYPEID_SQL_MAPPING).iter().cloned(),
@@ -439,8 +440,8 @@ macro_rules! pg_inventory_magic {
 #[macro_export]
 macro_rules! pg_binary_magic {
     ($($prelude:ident)::*) => {
-        fn main() -> ::pgx_utils::pg_inventory::color_eyre::Result<()> {
-            use ::pgx_utils::pg_inventory::{
+        fn main() -> pgx::pg_inventory::color_eyre::Result<()> {
+            use pgx::pg_inventory::{
                 tracing_error::ErrorLayer,
                 tracing,
                 tracing_subscriber::{self, util::SubscriberInitExt, layer::SubscriberExt, EnvFilter},

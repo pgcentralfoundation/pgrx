@@ -63,7 +63,7 @@ impl ToTokens for Schema {
             });
             updated_content.push(syn::parse_quote! {
                 pgx_utils::pg_inventory::inventory::submit! {
-                    crate::__pgx_internals::Schema(pgx_utils::pg_inventory::InventorySchema {
+                    crate::__pgx_internals::Schema(pgx::pg_inventory::InventorySchema {
                         module_path: module_path!(),
                         name: stringify!(#ident),
                         file: file!(),

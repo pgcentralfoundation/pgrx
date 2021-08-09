@@ -19,8 +19,6 @@ pg_test = []
 
 [dependencies]
 pgx = { path = "../../../pgx/pgx/", default-features = false }
-pgx-macros = { path = "../../../pgx/pgx-macros" }
-pgx-utils = { path = "../../../pgx/pgx-utils" }
 rand = "0.7.3"
 
 [dev-dependencies]

@@ -93,7 +93,7 @@ impl ToTokens for PostgresEnum {
                 ::pgx::datum::WithArrayTypeIds::<#name #ty_generics>::register_array_with_refs(&mut mappings, stringify!(#name).to_string());
                 ::pgx::datum::WithVarlenaTypeIds::<#name #ty_generics>::register_varlena_with_refs(&mut mappings, stringify!(#name).to_string());
 
-                crate::__pgx_internals::PostgresEnum(pgx_utils::pg_inventory::InventoryPostgresEnum {
+                crate::__pgx_internals::PostgresEnum(pgx::pg_inventory::InventoryPostgresEnum {
                     name: stringify!(#name),
                     file: file!(),
                     line: line!(),

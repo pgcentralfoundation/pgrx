@@ -20,8 +20,6 @@ pg_test = []
 [dependencies]
 heapless = "0.6.1"
 pgx = { path = "../../../pgx/pgx/", default-features = false }
-pgx-macros = { path = "../../../pgx/pgx-macros" }
-pgx-utils = { path = "../../../pgx/pgx-utils" }
 serde = { version = "1.0.114", features = [ "derive" ] }
 
 [dev-dependencies]

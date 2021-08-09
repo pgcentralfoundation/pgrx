@@ -96,7 +96,7 @@ impl ToTokens for ExtensionSqlFile {
         if !skip_inventory {
             let inv = quote! {
                 pgx_utils::pg_inventory::inventory::submit! {
-                    crate::__pgx_internals::ExtensionSql(pgx_utils::pg_inventory::InventoryExtensionSql {
+                    crate::__pgx_internals::ExtensionSql(pgx::pg_inventory::InventoryExtensionSql {
                         sql: include_str!(#path),
                         module_path: module_path!(),
                         full_path: concat!(file!(), ':', line!()),
@@ -196,7 +196,7 @@ impl ToTokens for ExtensionSql {
         if !skip_inventory {
             let inv = quote! {
                 pgx_utils::pg_inventory::inventory::submit! {
-                    crate::__pgx_internals::ExtensionSql(pgx_utils::pg_inventory::InventoryExtensionSql {
+                    crate::__pgx_internals::ExtensionSql(pgx::pg_inventory::InventoryExtensionSql {
                         sql: #sql,
                         module_path: module_path!(),
                         full_path: concat!(file!(), ':', line!()),
