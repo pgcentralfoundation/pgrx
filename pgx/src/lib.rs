@@ -465,7 +465,13 @@ macro_rules! pg_binary_magic {
 
             // We don't really need a full argument parser here quite yet.
             let mut args = env::args().skip(1);
-            let path = args.next().unwrap_or(concat!("./sql/", core::env!("CARGO_PKG_NAME"), ".sql").into());
+            let path = args.next().unwrap_or(concat!(
+                "./sql/",
+                core::env!("CARGO_PKG_NAME"),
+                "--",
+                core::env!("CARGO_PKG_VERSION"),
+                ".sql"
+            ).into());
             let dot: Option<String> = args.next();
             if args.next().is_some() {
                 return Err(eyre::eyre!("Only accepts two arguments, the destination path, and an optional (GraphViz) dot output path"));
