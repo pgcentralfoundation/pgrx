@@ -30,10 +30,10 @@ pub use home::Dog;
 // Valid options are:
 //  * `bootstrap` positions the block before any other generated SQL. It should be unique.
 //     Errors if `before`/`after` are also present.
-//  * `before = $ident` & `after = $ident` positions the block before/after `$ident`
+//  * `before = [$ident]` & `after = [$ident]` positions the block before/after `$ident`
 //    where `$ident` is a string identifier or a path to a SQL entity (such as a type which derives
 //    `PostgresType`)
-//  * `before = [$ident, $ident2, ident3]` & `after = [$ident]` A variable number of positionings.
+//  * `creates = [Enum($ident), Type($ident), Function($ident)]` tells the dependency graph that this block creates a given entity.
 //  * `name` is an optional string identifier for the item, in case you need to refer to it in
 //    other positioning.
 extension_sql!(
