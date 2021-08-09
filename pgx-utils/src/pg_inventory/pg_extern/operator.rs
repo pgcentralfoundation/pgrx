@@ -24,7 +24,7 @@ impl ToTokens for PgxOperator {
         let hashes = self.hashes;
         let merges = self.merges;
         let quoted = quote! {
-            pgx_utils::pg_inventory::InventoryPgOperator {
+            pgx::pg_inventory::InventoryPgOperator {
                 opname: None#( .unwrap_or(Some(#opname)) )*,
                 commutator: None#( .unwrap_or(Some(#commutator)) )*,
                 negator: None#( .unwrap_or(Some(#negator)) )*,

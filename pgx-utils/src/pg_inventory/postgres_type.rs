@@ -110,10 +110,10 @@ impl ToTokens for PostgresType {
         let inv = quote! {
             pgx::pg_inventory::inventory::submit! {
                 let mut mappings = Default::default();
-                <#name #ty_generics as ::pgx::datum::WithTypeIds>::register_with_refs(&mut mappings, stringify!(#name).to_string());
-                ::pgx::datum::WithSizedTypeIds::<#name #ty_generics>::register_sized_with_refs(&mut mappings, stringify!(#name).to_string());
-                ::pgx::datum::WithArrayTypeIds::<#name #ty_generics>::register_array_with_refs(&mut mappings, stringify!(#name).to_string());
-                ::pgx::datum::WithVarlenaTypeIds::<#name #ty_generics>::register_varlena_with_refs(&mut mappings, stringify!(#name).to_string());
+                <#name #ty_generics as pgx::datum::WithTypeIds>::register_with_refs(&mut mappings, stringify!(#name).to_string());
+                pgx::datum::WithSizedTypeIds::<#name #ty_generics>::register_sized_with_refs(&mut mappings, stringify!(#name).to_string());
+                pgx::datum::WithArrayTypeIds::<#name #ty_generics>::register_array_with_refs(&mut mappings, stringify!(#name).to_string());
+                pgx::datum::WithVarlenaTypeIds::<#name #ty_generics>::register_varlena_with_refs(&mut mappings, stringify!(#name).to_string());
                 let submission = pgx::pg_inventory::InventoryPostgresType {
                     name: stringify!(#name),
                     file: file!(),

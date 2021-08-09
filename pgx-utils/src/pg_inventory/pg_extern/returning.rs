@@ -165,10 +165,10 @@ impl ToTokens for Returning {
     fn to_tokens(&self, tokens: &mut TokenStream2) {
         let quoted = match self {
             Returning::None => quote! {
-                pgx_utils::pg_inventory::InventoryPgExternReturn::None
+                pgx::pg_inventory::InventoryPgExternReturn::None
             },
             Returning::Type(ty) => quote! {
-                pgx_utils::pg_inventory::InventoryPgExternReturn::Type {
+                pgx::pg_inventory::InventoryPgExternReturn::Type {
                     id: TypeId::of::<#ty>(),
                     full_path: core::any::type_name::<#ty>(),
                     module_path: {
@@ -180,7 +180,7 @@ impl ToTokens for Returning {
                 }
             },
             Returning::SetOf(ty) => quote! {
-                pgx_utils::pg_inventory::InventoryPgExternReturn::SetOf {
+                pgx::pg_inventory::InventoryPgExternReturn::SetOf {
                     id: TypeId::of::<#ty>(),
                     full_path: core::any::type_name::<#ty>(),
                     module_path: {
@@ -212,13 +212,13 @@ impl ToTokens for Returning {
                     })
                     .collect::<Vec<_>>();
                 quote! {
-                    pgx_utils::pg_inventory::InventoryPgExternReturn::Iterated(vec![
+                    pgx::pg_inventory::InventoryPgExternReturn::Iterated(vec![
                         #(#quoted_items),*
                     ])
                 }
             }
             Returning::Trigger => quote! {
-                pgx_utils::pg_inventory::InventoryPgExternReturn::Trigger
+                pgx::pg_inventory::InventoryPgExternReturn::Trigger
             },
         };
         tokens.append_all(quoted);

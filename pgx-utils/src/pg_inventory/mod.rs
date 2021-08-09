@@ -25,6 +25,7 @@ pub use postgres_hash::{InventoryPostgresHash, PostgresHash};
 pub use postgres_ord::{InventoryPostgresOrd, PostgresOrd};
 pub use postgres_type::{InventoryPostgresType, PostgresType};
 pub use sql_graph_entity::SqlGraphEntity;
+pub use super::ExternArgs;
 
 // Reexports for the pgx extension inventory builders.
 #[doc(hidden)]

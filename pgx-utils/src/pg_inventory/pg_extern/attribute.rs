@@ -49,19 +49,19 @@ pub enum Attribute {
 impl ToTokens for Attribute {
     fn to_tokens(&self, tokens: &mut TokenStream2) {
         let quoted = match self {
-            Attribute::Immutable => quote! { pgx_utils::ExternArgs::Immutable },
-            Attribute::Strict => quote! { pgx_utils::ExternArgs::Strict },
-            Attribute::Stable => quote! { pgx_utils::ExternArgs::Stable },
-            Attribute::Volatile => quote! { pgx_utils::ExternArgs::Volatile },
-            Attribute::Raw => quote! { pgx_utils::ExternArgs::Raw },
-            Attribute::NoGuard => quote! { pgx_utils::ExternArgs::NoGuard },
-            Attribute::ParallelSafe => quote! { pgx_utils::ExternArgs::ParallelSafe },
-            Attribute::ParallelUnsafe => quote! { pgx_utils::ExternArgs::ParallelUnsafe },
-            Attribute::ParallelRestricted => quote! { pgx_utils::ExternArgs::ParallelRestricted },
-            Attribute::Error(s) => quote! { pgx_utils::ExternArgs::Error(String::from(#s)) },
-            Attribute::Schema(s) => quote! { pgx_utils::ExternArgs::Schema(String::from(#s)) },
-            Attribute::Name(s) => quote! { pgx_utils::ExternArgs::Name(String::from(#s)) },
-            Attribute::SkipInventory => quote! { pgx_utils::ExternArgs::SkipInventory },
+            Attribute::Immutable => quote! { pgx::pg_inventory::ExternArgs::Immutable },
+            Attribute::Strict => quote! { pgx::pg_inventory::ExternArgs::Strict },
+            Attribute::Stable => quote! { pgx::pg_inventory::ExternArgs::Stable },
+            Attribute::Volatile => quote! { pgx::pg_inventory::ExternArgs::Volatile },
+            Attribute::Raw => quote! { pgx::pg_inventory::ExternArgs::Raw },
+            Attribute::NoGuard => quote! { pgx::pg_inventory::ExternArgs::NoGuard },
+            Attribute::ParallelSafe => quote! { pgx::pg_inventory::ExternArgs::ParallelSafe },
+            Attribute::ParallelUnsafe => quote! { pgx::pg_inventory::ExternArgs::ParallelUnsafe },
+            Attribute::ParallelRestricted => quote! { pgx::pg_inventory::ExternArgs::ParallelRestricted },
+            Attribute::Error(s) => quote! { pgx::pg_inventory::ExternArgs::Error(String::from(#s)) },
+            Attribute::Schema(s) => quote! { pgx::pg_inventory::ExternArgs::Schema(String::from(#s)) },
+            Attribute::Name(s) => quote! { pgx::pg_inventory::ExternArgs::Name(String::from(#s)) },
+            Attribute::SkipInventory => quote! { pgx::pg_inventory::ExternArgs::SkipInventory },
         };
         tokens.append_all(quoted);
     }

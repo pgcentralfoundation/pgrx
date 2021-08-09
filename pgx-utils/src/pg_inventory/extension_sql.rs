@@ -95,7 +95,7 @@ impl ToTokens for ExtensionSqlFile {
         let name_iter = name.iter();
         if !skip_inventory {
             let inv = quote! {
-                pgx_utils::pg_inventory::inventory::submit! {
+                pgx::pg_inventory::inventory::submit! {
                     crate::__pgx_internals::ExtensionSql(pgx::pg_inventory::InventoryExtensionSql {
                         sql: include_str!(#path),
                         module_path: module_path!(),
@@ -292,12 +292,12 @@ impl ToTokens for ExtensionSqlPositioning {
             ExtensionSqlPositioning::Expr(ex) => {
                 let path = ex.to_token_stream().to_string().replace(" ", "");
                 (quote! {
-                    ::pgx_utils::pg_inventory::InventoryExtensionSqlPositioningRef::FullPath(#path)
+                    pgx::pg_inventory::InventoryExtensionSqlPositioningRef::FullPath(#path)
                 })
                 .to_token_stream()
             }
             ExtensionSqlPositioning::Name(name) => quote! {
-                ::pgx_utils::pg_inventory::InventoryExtensionSqlPositioningRef::Name(#name)
+                pgx::pg_inventory::InventoryExtensionSqlPositioningRef::Name(#name)
             },
         };
         tokens.append_all(toks);
@@ -420,7 +420,7 @@ impl ToTokens for SqlDeclaredEntity {
             quote! { stringify!(#identifier) }
         };
         let inv = quote! {
-            pgx_utils::pg_inventory::InventorySqlDeclaredEntity::build(#variant, #identifier).unwrap()
+            pgx::pg_inventory::InventorySqlDeclaredEntity::build(#variant, #identifier).unwrap()
         };
         tokens.append_all(inv);
     }

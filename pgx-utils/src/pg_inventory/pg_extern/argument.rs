@@ -215,7 +215,7 @@ impl ToTokens for Argument {
         };
 
         let quoted = quote! {
-            pgx_utils::pg_inventory::InventoryPgExternInput {
+            pgx::pg_inventory::InventoryPgExternInput {
                 pattern: stringify!(#pat),
                 ty_id: TypeId::of::<#ty>(),
                 full_path: core::any::type_name::<#ty>(),
