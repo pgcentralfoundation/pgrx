@@ -31,7 +31,6 @@ FLAGS:
 
 SUBCOMMANDS:
     connect        connect, via psql, to a Postgres instance
-    dump-schema    dump the full extension SQL schema file
     get            get a property from the extension control file
     help           Prints this message or the help of the given subcommand(s)
     init           initize pgx development environment for the first time
