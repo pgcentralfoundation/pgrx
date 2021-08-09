@@ -222,9 +222,9 @@ impl ToTokens for PgExtern {
         let overridden = self.overridden().into_iter();
 
         let inv = quote! {
-            pgx_utils::pg_inventory::inventory::submit! {
+            pgx::pg_inventory::inventory::submit! {
                 use core::any::TypeId;
-                let submission = pgx_utils::pg_inventory::InventoryPgExtern {
+                let submission = pgx::pg_inventory::InventoryPgExtern {
                     name: #name,
                     unaliased_name: stringify!(#ident),
                     schema: None#( .unwrap_or(Some(#schema_iter)) )*,

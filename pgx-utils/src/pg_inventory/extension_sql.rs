@@ -195,7 +195,7 @@ impl ToTokens for ExtensionSql {
         let name_iter = name.iter();
         if !skip_inventory {
             let inv = quote! {
-                pgx_utils::pg_inventory::inventory::submit! {
+                pgx::pg_inventory::inventory::submit! {
                     crate::__pgx_internals::ExtensionSql(pgx::pg_inventory::InventoryExtensionSql {
                         sql: #sql,
                         module_path: module_path!(),

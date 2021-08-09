@@ -81,7 +81,7 @@ impl ToTokens for PostgresOrd {
     fn to_tokens(&self, tokens: &mut TokenStream2) {
         let name = &self.name;
         let inv = quote! {
-            pgx_utils::pg_inventory::inventory::submit! {
+            pgx::pg_inventory::inventory::submit! {
                 use core::any::TypeId;
                 crate::__pgx_internals::PostgresOrd(pgx::pg_inventory::InventoryPostgresOrd {
                     name: stringify!(#name),
