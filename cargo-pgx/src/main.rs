@@ -258,7 +258,10 @@ fn do_it() -> std::result::Result<(), std::io::Error> {
 
                     // otherwise, the user just ran "cargo pgx install", and we use whatever "pg_config" is configured
                     Err(_) => match schema.value_of("pg_config") {
-                        None => PgConfig::from_path(),
+                        None => match schema.value_of("pg_version") {
+                            None => PgConfig::from_path(),
+                            Some(pgver) => Pgx::from_config()?.get(pgver)?.clone(),
+                        },
                         Some(config) => PgConfig::new(PathBuf::from(config)),
                     },
                 };

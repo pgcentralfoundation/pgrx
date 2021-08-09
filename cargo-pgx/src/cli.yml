@@ -107,6 +107,11 @@ subcommands:
           - schema:
               about: generate extension schema files
               args:
+                - pg_version:
+                    value_name: PG_VERSION
+                    takes_value: true
+                    required: true
+                    help: Do you want to run against Postgres 'pg10', 'pg11', 'pg12', 'pg13'?
                 - release:
                     short: r
                     long: release
