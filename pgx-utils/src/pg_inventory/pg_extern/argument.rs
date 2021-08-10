@@ -1,9 +1,8 @@
+use std::ops::Deref;
+
 use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
-use syn::{
-    parse::{Parse, ParseStream},
-    FnArg, Pat, Token,
-};
+use syn::{FnArg, Pat, Token, parse::{Parse, ParseStream}, parse_quote};
 
 #[derive(Debug, Clone)]
 pub struct Argument {
@@ -16,7 +15,7 @@ impl Argument {
     pub fn build(value: FnArg) -> Result<Option<Self>, syn::Error> {
         match value {
             syn::FnArg::Typed(pat) => Self::build_from_pat_type(pat),
-            _ => Err(syn::Error::new(Span::call_site(), "Unable to parse FnArg.")),
+            _ => Err(syn::Error::new(Span::call_site(), "Unable to parse FnArg")),
         }
     }
 
@@ -26,38 +25,17 @@ impl Argument {
             Pat::Ident(ref p) => p.ident.clone(),
             Pat::Reference(ref p_ref) => match *p_ref.pat {
                 Pat::Ident(ref inner_ident) => inner_ident.ident.clone(),
-                _ => return Err(syn::Error::new(Span::call_site(), "Unable to parse FnArg.")),
+                _ => return Err(syn::Error::new(Span::call_site(), "Unable to parse FnArg")),
             },
-            _ => return Err(syn::Error::new(Span::call_site(), "Unable to parse FnArg.")),
+            _ => return Err(syn::Error::new(Span::call_site(), "Unable to parse FnArg")),
         };
         let default = match value.ty.as_ref() {
             syn::Type::Macro(macro_pat) => {
                 let mac = &macro_pat.mac;
-                let archetype = mac.path.segments.last().expect("No last segment.");
-                match archetype.ident.to_string().as_str() {
-                    "default" => {
-                        let out: DefaultMacro = mac.parse_body()?;
-                        true_ty = out.ty;
-                        match out.expr {
-                            syn::Expr::Lit(syn::ExprLit {
-                                lit: syn::Lit::Str(def),
-                                ..
-                            }) => {
-                                let value = def.value();
-                                Some(value)
-                            }
-                            syn::Expr::Lit(syn::ExprLit {
-                                lit: syn::Lit::Int(def),
-                                ..
-                            }) => {
-                                let value = def.base10_digits();
-                                Some(value.to_string())
-                            }
-                            _ => None,
-                        }
-                    }
-                    _ => None,
-                }
+                let archetype = mac.path.segments.last().expect("No last segment");
+                let (maybe_new_true_ty, default_value) = handle_default(true_ty.clone(), archetype, mac)?;
+                true_ty = maybe_new_true_ty;
+                default_value
             }
             syn::Type::Path(ref path) => {
                 let segments = &path.path;
@@ -72,34 +50,10 @@ impl Argument {
                                     ))) => {
                                         let mac = &macro_pat.mac;
                                         let archetype =
-                                            mac.path.segments.last().expect("No last segment.");
-                                        match archetype.ident.to_string().as_str() {
-                                            "default" => {
-                                                let out: DefaultMacro = mac.parse_body()?;
-                                                match out.expr {
-                                                    syn::Expr::Lit(syn::ExprLit {
-                                                        lit: syn::Lit::Str(def),
-                                                        ..
-                                                    }) => {
-                                                        let value = def.value();
-                                                        default = Some(value)
-                                                    }
-                                                    syn::Expr::Lit(syn::ExprLit {
-                                                        lit: syn::Lit::Int(def),
-                                                        ..
-                                                    }) => {
-                                                        let value = def.base10_digits();
-                                                        default = Some(value.to_string())
-                                                    }
-                                                    syn::Expr::Lit(syn::ExprLit {
-                                                        lit: syn::Lit::Bool(def),
-                                                        ..
-                                                    }) => default = Some(def.value.to_string()),
-                                                    _ => (),
-                                                }
-                                            }
-                                            _ => (),
-                                        }
+                                            mac.path.segments.last().expect("No last segment");
+                                        let (inner_type, default_value) = handle_default(true_ty.clone(), archetype, mac)?;
+                                        true_ty = parse_quote!{ Option<#inner_type> };
+                                        default = default_value;
                                     }
                                     _ => (),
                                 }
@@ -174,7 +128,7 @@ impl Argument {
                     {
                         return Err(syn::Error::new(
                             Span::call_site(),
-                            "It's a FunctionCallInfoBaseData, skipping.",
+                            "It's a FunctionCallInfoBaseData, skipping",
                         ));
                     }
                 }
@@ -188,6 +142,54 @@ impl Argument {
             ty: true_ty,
             default,
         }))
+    }
+}
+
+fn handle_default(ty: syn::Type, archetype: &syn::PathSegment, mac: &syn::Macro) -> syn::Result<(syn::Type, Option<String>)> {
+    match archetype.ident.to_string().as_str() {
+        "default" => {
+            let out: DefaultMacro = mac.parse_body()?;
+            let true_ty = out.ty;
+            match out.expr {
+                syn::Expr::Lit(syn::ExprLit {
+                    lit: syn::Lit::Str(def),
+                    ..
+                }) => {
+                    let value = def.value();
+                    Ok((true_ty, Some(value)))
+                },
+                syn::Expr::Lit(syn::ExprLit {
+                    lit: syn::Lit::Int(def),
+                    ..
+                }) => {
+                    let value = def.base10_digits();
+                    Ok((true_ty, Some(value.to_string())))
+                },
+                syn::Expr::Type(syn::ExprType { ref ty, .. }) => match ty.deref() {
+                    syn::Type::Path(syn::TypePath { path: syn::Path { segments, .. }, .. }) => {
+                        let last = segments.last().expect("No last segment");
+                        let last_string = last.ident.to_string();
+                        if last_string.as_str() == "NULL" {
+                            Ok((true_ty, Some(last_string)))
+                        } else {
+                            return Err(syn::Error::new(Span::call_site(), format!("Unable to parse default value of `default!()` macro, got: {:?}", out.expr)))
+                        }
+                    },
+                    _ => return Err(syn::Error::new(Span::call_site(), format!("Unable to parse default value of `default!()` macro, got: {:?}", out.expr))),
+                },
+                syn::Expr::Path(syn::ExprPath { path: syn::Path { ref segments, .. }, .. }) => {
+                    let last = segments.last().expect("No last segment");
+                    let last_string = last.ident.to_string();
+                    if last_string.as_str() == "NULL" {
+                        Ok((true_ty, Some(last_string)))
+                    } else {
+                        return Err(syn::Error::new(Span::call_site(), format!("Unable to parse default value of `default!()` macro, got: {:?}", out.expr)))
+                    }
+                },
+                _ => return Err(syn::Error::new(Span::call_site(), format!("Unable to parse default value of `default!()` macro, got: {:?}", out.expr))),
+            }
+        }
+        _ => Ok((ty, None))
     }
 }
 

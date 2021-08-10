@@ -43,6 +43,11 @@ macro_rules! default {
     };
 }
 
+/// The equivalent of a PostgreSQL `NULL`.
+///
+/// This is used primarily in `default!()` macros.
+pub struct NULL;
+
 /// A macro for providing SQL names for the returned fields for functions that return a Rust tuple,
 /// especially those that return a `std::iter::Iterator<Item=(f1, f2, f3)>`
 ///
