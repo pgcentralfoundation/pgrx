@@ -182,29 +182,37 @@ impl ToTokens for Returning {
             Returning::None => quote! {
                 pgx::pg_inventory::InventoryPgExternReturn::None
             },
-            Returning::Type(ty) => quote! {
-                pgx::pg_inventory::InventoryPgExternReturn::Type {
-                    id: TypeId::of::<#ty>(),
-                    source: stringify!(#ty),
-                    full_path: core::any::type_name::<#ty>(),
-                    module_path: {
-                        let type_name = core::any::type_name::<#ty>();
-                        let mut path_items: Vec<_> = type_name.split("::").collect();
-                        let _ = path_items.pop(); // Drop the one we don't want.
-                        path_items.join("::")
-                    },
+            Returning::Type(ty) => {
+                let ty_string = ty.to_token_stream().to_string()
+                    .replace(" ", "");
+                quote! {
+                    pgx::pg_inventory::InventoryPgExternReturn::Type {
+                        id: TypeId::of::<#ty>(),
+                        source: #ty_string,
+                        full_path: core::any::type_name::<#ty>(),
+                        module_path: {
+                            let type_name = core::any::type_name::<#ty>();
+                            let mut path_items: Vec<_> = type_name.split("::").collect();
+                            let _ = path_items.pop(); // Drop the one we don't want.
+                            path_items.join("::")
+                        },
+                    }
                 }
             },
-            Returning::SetOf(ty) => quote! {
-                pgx::pg_inventory::InventoryPgExternReturn::SetOf {
-                    id: TypeId::of::<#ty>(),
-                    source: stringify!(#ty),
-                    full_path: core::any::type_name::<#ty>(),
-                    module_path: {
-                        let type_name = core::any::type_name::<#ty>();
-                        let mut path_items: Vec<_> = type_name.split("::").collect();
-                        let _ = path_items.pop(); // Drop the one we don't want.
-                        path_items.join("::")
+            Returning::SetOf(ty) => {
+                let ty_string = ty.to_token_stream().to_string()
+                    .replace(" ", "");
+                quote! {
+                    pgx::pg_inventory::InventoryPgExternReturn::SetOf {
+                        id: TypeId::of::<#ty>(),
+                        source: #ty_string,
+                        full_path: core::any::type_name::<#ty>(),
+                        module_path: {
+                            let type_name = core::any::type_name::<#ty>();
+                            let mut path_items: Vec<_> = type_name.split("::").collect();
+                            let _ = path_items.pop(); // Drop the one we don't want.
+                            path_items.join("::")
+                        }
                     }
                 }
             },
@@ -212,11 +220,13 @@ impl ToTokens for Returning {
                 let quoted_items = items
                     .iter()
                     .map(|(ty, name)| {
+                        let ty_string = ty.to_token_stream().to_string()
+                            .replace(" ", "");
                         let name_iter = name.iter();
                         quote! {
                             (
                                 TypeId::of::<#ty>(),
-                                stringify!(#ty),
+                                #ty_string,
                                 core::any::type_name::<#ty>(),
                                 {
                                     let type_name = core::any::type_name::<#ty>();

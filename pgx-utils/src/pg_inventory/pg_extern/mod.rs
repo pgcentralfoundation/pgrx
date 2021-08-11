@@ -422,7 +422,7 @@ impl ToSql for InventoryPgExtern {
                                          });
                                          let needs_comma = idx < (table_items.len() - 1);
                                          let item = format!("\n\t{col_name} {schema_prefix}{ty_resolved}{needs_comma} /* {ty_name} */",
-                                                            col_name = col_name.unwrap(),
+                                                            col_name = col_name.expect("An iterator of tuples should have `named!()` macro declarations."),
                                                             schema_prefix = if let Some(graph_index) = graph_index {
                                                                 context.schema_prefix_for(&graph_index)
                                                             } else { "".into() },
