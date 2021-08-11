@@ -363,7 +363,7 @@ impl ToSql for InventoryPgExtern {
                              } else { Default::default() },
                              returns = match &self.fn_return {
                                  InventoryPgExternReturn::None => String::from("RETURNS void"),
-                                 InventoryPgExternReturn::Type { id, full_path, .. } => {
+                                 InventoryPgExternReturn::Type { id, source, full_path, .. } => {
                                      let graph_index = context.graph.neighbors_undirected(self_index).find(|neighbor| match &context.graph[*neighbor] {
                                          SqlGraphEntity::Type(ty) => ty.id_matches(&id),
                                          SqlGraphEntity::Enum(en) => en.id_matches(&id),
@@ -371,7 +371,9 @@ impl ToSql for InventoryPgExtern {
                                          _ => false,
                                      }).ok_or_else(|| eyre_err!("Could not find return type in graph."))?;
                                      format!("RETURNS {schema_prefix}{sql_type} /* {full_path} */",
-                                             sql_type = context.type_id_to_sql_type(*id).or_else(|| {
+                                             sql_type = context.source_only_to_sql_type(source).or_else(|| {
+                                                 context.type_id_to_sql_type(*id)
+                                             }).or_else(|| {
                                                     let pat = full_path.to_string();
                                                     if let Some(found) = context.has_sql_declared_entity(&SqlDeclaredEntity::Type(pat.clone())) {
                                                         Some(found.sql())
@@ -385,7 +387,7 @@ impl ToSql for InventoryPgExtern {
                                              full_path = full_path
                                      )
                                  },
-                                 InventoryPgExternReturn::SetOf { id, full_path, .. } => {
+                                 InventoryPgExternReturn::SetOf { id, source, full_path, .. } => {
                                      let graph_index = context.graph.neighbors_undirected(self_index).find(|neighbor| match &context.graph[*neighbor] {
                                          SqlGraphEntity::Type(ty) => ty.id_matches(&id),
                                          SqlGraphEntity::Enum(en) => en.id_matches(&id),
@@ -393,7 +395,9 @@ impl ToSql for InventoryPgExtern {
                                          _ => false,
                                      }).ok_or_else(|| eyre_err!("Could not find return type in graph."))?;
                                      format!("RETURNS SETOF {schema_prefix}{sql_type} /* {full_path} */",
-                                             sql_type = context.type_id_to_sql_type(*id).or_else(|| {
+                                             sql_type = context.source_only_to_sql_type(source).or_else(|| {
+                                                 context.type_id_to_sql_type(*id)
+                                             }).or_else(|| {
                                                     let pat = full_path.to_string();
                                                     if let Some(found) = context.has_sql_declared_entity(&SqlDeclaredEntity::Type(pat.clone())) {
                                                         Some(found.sql())
@@ -409,7 +413,7 @@ impl ToSql for InventoryPgExtern {
                                  },
                                  InventoryPgExternReturn::Iterated(table_items) => {
                                      let mut items = String::new();
-                                     for (idx, (id, ty_name, _module_path, col_name)) in table_items.iter().enumerate() {
+                                     for (idx, (id, source, ty_name, _module_path, col_name)) in table_items.iter().enumerate() {
                                          let graph_index = context.graph.neighbors_undirected(self_index).find(|neighbor| match &context.graph[*neighbor] {
                                              SqlGraphEntity::Type(ty) => ty.id_matches(&id),
                                              SqlGraphEntity::Enum(en) => en.id_matches(&id),
@@ -420,7 +424,9 @@ impl ToSql for InventoryPgExtern {
                                          let item = format!("\n\t{col_name} {schema_prefix}{ty_resolved}{needs_comma} /* {ty_name} */",
                                                             col_name = col_name.unwrap(),
                                                             schema_prefix = context.schema_prefix_for(&graph_index),
-                                                            ty_resolved = context.type_id_to_sql_type(*id).or_else(|| {
+                                                            ty_resolved = context.source_only_to_sql_type(source).or_else(|| {
+                                                                context.type_id_to_sql_type(*id)
+                                                            }).or_else(|| {
                                                                 let pat = ty_name.to_string();
                                                                 if let Some(found) = context.has_sql_declared_entity(&SqlDeclaredEntity::Type(pat.clone())) {
                                                                     Some(found.sql())

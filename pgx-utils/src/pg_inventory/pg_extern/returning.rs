@@ -170,6 +170,7 @@ impl ToTokens for Returning {
             Returning::Type(ty) => quote! {
                 pgx::pg_inventory::InventoryPgExternReturn::Type {
                     id: TypeId::of::<#ty>(),
+                    source: stringify!(#ty),
                     full_path: core::any::type_name::<#ty>(),
                     module_path: {
                         let type_name = core::any::type_name::<#ty>();
@@ -182,6 +183,7 @@ impl ToTokens for Returning {
             Returning::SetOf(ty) => quote! {
                 pgx::pg_inventory::InventoryPgExternReturn::SetOf {
                     id: TypeId::of::<#ty>(),
+                    source: stringify!(#ty),
                     full_path: core::any::type_name::<#ty>(),
                     module_path: {
                         let type_name = core::any::type_name::<#ty>();
@@ -199,6 +201,7 @@ impl ToTokens for Returning {
                         quote! {
                             (
                                 TypeId::of::<#ty>(),
+                                stringify!(#ty),
                                 core::any::type_name::<#ty>(),
                                 {
                                     let type_name = core::any::type_name::<#ty>();
@@ -280,20 +283,23 @@ pub enum InventoryPgExternReturn {
     None,
     Type {
         id: core::any::TypeId,
+        source: &'static str,
         full_path: &'static str,
         module_path: String,
     },
     SetOf {
         id: core::any::TypeId,
+        source: &'static str,
         full_path: &'static str,
         module_path: String,
     },
     Iterated(
         Vec<(
-            core::any::TypeId,
-            &'static str,
-            String,
-            Option<&'static str>,
+            core::any::TypeId, // Type Id
+            &'static str, // Source
+            &'static str, // Full path
+            String, // Module path
+            Option<&'static str>, // Name
         )>,
     ),
     Trigger,
