@@ -419,11 +419,13 @@ impl ToSql for InventoryPgExtern {
                                              SqlGraphEntity::Enum(en) => en.id_matches(&id),
                                              SqlGraphEntity::BuiltinType(defined) => defined == ty_name,
                                              _ => false,
-                                         }).ok_or_else(|| eyre_err!("Could not find return type in graph."))?;
+                                         });
                                          let needs_comma = idx < (table_items.len() - 1);
                                          let item = format!("\n\t{col_name} {schema_prefix}{ty_resolved}{needs_comma} /* {ty_name} */",
                                                             col_name = col_name.unwrap(),
-                                                            schema_prefix = context.schema_prefix_for(&graph_index),
+                                                            schema_prefix = if let Some(graph_index) = graph_index {
+                                                                context.schema_prefix_for(&graph_index)
+                                                            } else { "".into() },
                                                             ty_resolved = context.source_only_to_sql_type(source).or_else(|| {
                                                                 context.type_id_to_sql_type(*id)
                                                             }).or_else(|| {

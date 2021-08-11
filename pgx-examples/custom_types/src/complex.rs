@@ -46,6 +46,11 @@ fn add_animal(mut animals: Animals, name: String, age: i32) -> Animals {
     animals
 }
 
+#[pg_extern]
+fn boop() -> Box<dyn Iterator<Item = i32>> {
+    todo!()
+}
+
 #[cfg(any(test, feature = "pg_test"))]
 #[pg_schema]
 mod tests {

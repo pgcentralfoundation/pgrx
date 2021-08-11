@@ -351,7 +351,8 @@ pub fn categorize_type(ty: &Type) -> CategorizedType {
         Type::Path(ty) => {
             let segments = &ty.path.segments;
             for segment in segments {
-                if segment.ident.to_string() == "Option" {
+                let segment_ident = segment.ident.to_string();
+                if segment_ident == "Option" {
                     match &segment.arguments {
                         PathArguments::AngleBracketed(a) => match a.args.first().unwrap() {
                             GenericArgument::Type(ty) => {
@@ -374,69 +375,34 @@ pub fn categorize_type(ty: &Type) -> CategorizedType {
                         }
                     }
                 }
+                if segment_ident == "Box" {
+                    match &segment.arguments {
+                        PathArguments::AngleBracketed(a) => match a.args.first().unwrap() {
+                            GenericArgument::Type(ty) => {
+                                return categorize_type(ty)
+                            }
+                            _ => {
+                                break;
+                            }
+                        },
+                        _ => {
+                            break;
+                        }
+                    }
+                }
             }
             CategorizedType::Default
         }
+        Type::TraitObject(trait_object) => {
+            for bound in &trait_object.bounds {
+                return categorize_trait_bound(bound)
+            }
 
+            panic!("Unsupported trait return type");
+        }
         Type::ImplTrait(ty) => {
             for bound in &ty.bounds {
-                match bound {
-                    TypeParamBound::Trait(trait_bound) => {
-                        let segments = &trait_bound.path.segments;
-
-                        let mut ident = String::new();
-                        for segment in segments {
-                            if !ident.is_empty() {
-                                ident.push_str("::")
-                            }
-                            ident.push_str(segment.ident.to_string().as_str());
-                        }
-
-                        match ident.as_str() {
-                            "Iterator" | "std::iter::Iterator" => {
-                                let segment = segments.last().unwrap();
-                                match &segment.arguments {
-                                    PathArguments::None => {
-                                        panic!("Iterator must have at least one generic type")
-                                    }
-                                    PathArguments::Parenthesized(_) => {
-                                        panic!("Unsupported arguments to Iterator")
-                                    }
-                                    PathArguments::AngleBracketed(a) => {
-                                        let args = &a.args;
-                                        if args.len() > 1 {
-                                            panic!("Only one generic type is supported when returning an Iterator")
-                                        }
-
-                                        match args.first().unwrap() {
-                                            GenericArgument::Binding(b) => {
-                                                let mut types = Vec::new();
-                                                let ty = &b.ty;
-                                                match ty {
-                                                    Type::Tuple(tuple) => {
-                                                        for e in &tuple.elems {
-                                                            types.push(quote! {#e}.to_string());
-                                                        }
-                                                    },
-                                                    _ => {
-                                                        types.push(quote! {#ty}.to_string())
-                                                    }
-                                                }
-
-                                                return CategorizedType::Iterator(types);
-                                            }
-                                            _ => panic!("Only binding type arguments are supported when returning an Iterator")
-                                        }
-                                    }
-                                }
-                            }
-                            _ => panic!("Unsupported trait return type"),
-                        }
-                    }
-                    TypeParamBound::Lifetime(_) => {
-                        panic!("Functions can't return traits with lifetime bounds")
-                    }
-                }
+                return categorize_trait_bound(bound)
             }
 
             panic!("Unsupported trait return type");
@@ -453,6 +419,66 @@ pub fn categorize_type(ty: &Type) -> CategorizedType {
             }
         }
         _ => CategorizedType::Default,
+    }
+}
+
+pub fn categorize_trait_bound(bound: &TypeParamBound) -> CategorizedType {
+    match bound {
+        TypeParamBound::Trait(trait_bound) => {
+            let segments = &trait_bound.path.segments;
+
+            let mut ident = String::new();
+            for segment in segments {
+                if !ident.is_empty() {
+                    ident.push_str("::")
+                }
+                ident.push_str(segment.ident.to_string().as_str());
+            }
+
+            match ident.as_str() {
+                "Iterator" | "std::iter::Iterator" => {
+                    let segment = segments.last().unwrap();
+                    match &segment.arguments {
+                        PathArguments::None => {
+                            panic!("Iterator must have at least one generic type")
+                        }
+                        PathArguments::Parenthesized(_) => {
+                            panic!("Unsupported arguments to Iterator")
+                        }
+                        PathArguments::AngleBracketed(a) => {
+                            let args = &a.args;
+                            if args.len() > 1 {
+                                panic!("Only one generic type is supported when returning an Iterator")
+                            }
+
+                            match args.first().unwrap() {
+                                GenericArgument::Binding(b) => {
+                                    let mut types = Vec::new();
+                                    let ty = &b.ty;
+                                    match ty {
+                                        Type::Tuple(tuple) => {
+                                            for e in &tuple.elems {
+                                                types.push(quote! {#e}.to_string());
+                                            }
+                                        },
+                                        _ => {
+                                            types.push(quote! {#ty}.to_string())
+                                        }
+                                    }
+
+                                    return CategorizedType::Iterator(types);
+                                }
+                                _ => panic!("Only binding type arguments are supported when returning an Iterator")
+                            }
+                        }
+                    }
+                }
+                _ => panic!("Unsupported trait return type"),
+            }
+        }
+        TypeParamBound::Lifetime(_) => {
+            panic!("Functions can't return traits with lifetime bounds")
+        }
     }
 }
 
