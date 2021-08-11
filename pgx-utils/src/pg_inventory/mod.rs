@@ -61,6 +61,7 @@ use core::{any::TypeId, fmt::Debug};
 /// ```
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct RustSqlMapping {
+    // This is the **resolved** type, not the raw source. This means a Type Aliase of `type Foo = u32` would appear as `u32`.
     pub rust: String,
     pub sql: String,
     pub id: TypeId,
@@ -72,6 +73,33 @@ impl RustSqlMapping {
             rust: core::any::type_name::<T>().to_string(),
             sql: sql.to_string(),
             id: core::any::TypeId::of::<T>(),
+        }
+    }
+}
+
+/// A mapping from a Rust source fragment to a SQL type, typically for type aliases.
+///
+/// In general, this can only offer a fuzzy matching, as it does not use [`core::any::TypeId`].
+///
+/// ```rust
+/// use pgx_utils::pg_inventory::RustSourceOnlySqlMapping;
+///
+/// let constructed = RustSourceOnlySqlMapping::new(
+///     String::from("Oid"),
+///     String::from("int"),
+/// );
+/// ```
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+pub struct RustSourceOnlySqlMapping {
+    pub rust: String,
+    pub sql: String
+}
+
+impl RustSourceOnlySqlMapping {
+    pub fn new(rust: String, sql: String) -> Self {
+        Self {
+            rust: rust.to_string(),
+            sql: sql.to_string(),
         }
     }
 }

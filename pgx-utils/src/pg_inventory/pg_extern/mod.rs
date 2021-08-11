@@ -333,11 +333,15 @@ impl ToSql for InventoryPgExtern {
                                         ",
                                             pattern = arg.pattern,
                                             schema_prefix = context.schema_prefix_for(&graph_index),
-                                            sql_type = context.type_id_to_sql_type(arg.ty_id).or_else(|| {
-                                                let pat = arg.full_path.to_string();
-                                                if let Some(found) = context.has_sql_declared_entity(&SqlDeclaredEntity::Type(pat.clone())) {
+                                            // First try to match on [`TypeId`] since it's most reliable.
+                                            sql_type = context.source_only_to_sql_type(arg.ty_source).or_else(|| {
+                                                context.type_id_to_sql_type(arg.ty_id)
+                                            }).or_else(|| {
+                                                // Fall back to fuzzy matching.
+                                                let path = arg.full_path.to_string();
+                                                if let Some(found) = context.has_sql_declared_entity(&SqlDeclaredEntity::Type(path.clone())) {
                                                     Some(found.sql())
-                                                }  else if let Some(found) = context.has_sql_declared_entity(&SqlDeclaredEntity::Enum(pat.clone())) {
+                                                }  else if let Some(found) = context.has_sql_declared_entity(&SqlDeclaredEntity::Enum(path.clone())) {
                                                     Some(found.sql())
                                                 } else {
                                                     None

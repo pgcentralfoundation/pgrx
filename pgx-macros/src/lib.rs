@@ -458,6 +458,25 @@ It accepts 2 arguments:
 * A name, such as `example`
 * A type
 
+# Special Cases
+
+[`pg_sys::Oid`] is a special cased type alias, in order to use it as an argument or return it must be
+passed with it's full module path ([`pg_sys::Oid`]) in order to be resolved.
+
+```rust
+use pgx::*;
+
+#[pg_extern(skip_inventory)]  // Only use `skip_inventory` in doctests.
+fn example_arg(animals: pg_sys::Oid) {
+    todo!()
+}
+
+#[pg_extern(skip_inventory)]  // Only use `skip_inventory` in doctests.
+fn example_return() -> pg_sys::Oid {
+    todo!()
+}
+```
+
 */
 #[proc_macro_attribute]
 pub fn pg_extern(attr: TokenStream, item: TokenStream) -> TokenStream {

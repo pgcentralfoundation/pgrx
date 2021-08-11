@@ -82,6 +82,7 @@ pub use memcxt::*;
 pub use namespace::*;
 pub use nodes::*;
 pub use pgbox::*;
+use pgx_utils::pg_inventory::RustSourceOnlySqlMapping;
 pub use rel::*;
 pub use shmem::*;
 pub use spi::*;
@@ -107,6 +108,42 @@ use std::collections::HashSet;
 pub fn initialize() {
     register_pg_guard_panic_handler();
 }
+
+macro_rules! map_source_only {
+    ($map:ident, $rust:ty, $sql:expr) => {{
+        let ty = stringify!($rust).to_string().replace(" ", "");
+        assert_eq!($map.insert(RustSourceOnlySqlMapping::new(
+            ty.clone(),
+            $sql.to_string(),
+        )), true, "Cannot map {} twice", ty); 
+
+        let ty = stringify!(Option<$rust>).to_string().replace(" ", "");
+        assert_eq!($map.insert(RustSourceOnlySqlMapping::new(
+            ty.clone(),
+            $sql.to_string(),
+        )), true, "Cannot map {} twice", ty); 
+
+        let ty = stringify!(Vec<$rust>).to_string().replace(" ", "");
+        assert_eq!($map.insert(RustSourceOnlySqlMapping::new(
+            ty.clone(),
+            format!("{}[]", $sql),
+        )), true, "Cannot map {} twice", ty); 
+
+        let ty = stringify!(Array<$rust>).to_string().replace(" ", "");
+        assert_eq!($map.insert(RustSourceOnlySqlMapping::new(
+            ty.clone(),
+            format!("{}[]", $sql),
+        )), true, "Cannot map {} twice", ty); 
+    }};
+}
+
+pub static DEFAULT_SOURCE_ONLY_SQL_MAPPING: Lazy<HashSet<RustSourceOnlySqlMapping>> = Lazy::new(|| {
+    let mut m = HashSet::new();
+
+    map_source_only!(m, pg_sys::Oid, "Oid");
+
+    m
+});
 
 macro_rules! map_type {
     ($map:ident, $rust:ty, $sql:expr) => {{
@@ -177,7 +214,6 @@ pub static DEFAULT_TYPEID_SQL_MAPPING: Lazy<HashSet<RustSqlMapping>> = Lazy::new
     map_type!(m, pgbox::PgBox<pgx_pg_sys::IndexAmRoutine>, "internal");
     map_type!(m, rel::PgRelation, "regclass");
     map_type!(m, datum::Numeric, "numeric");
-    map_type!(m, pg_sys::Oid, "oid");
     map_type!(m, datum::AnyElement, "anyelement");
     map_type!(m, datum::AnyArray, "anyarray");
     map_type!(m, datum::Inet, "inet");
@@ -370,6 +406,7 @@ macro_rules! pg_inventory_magic {
                 let generated = PgxSql::build(
                     &*CONTROL_FILE,
                     (*$crate::DEFAULT_TYPEID_SQL_MAPPING).iter().cloned(),
+                    (*$crate::DEFAULT_SOURCE_ONLY_SQL_MAPPING).iter().cloned(),
                     {
                         let mut set = inventory::iter::<Schema>().collect::<Vec<_>>();
                         set.sort();

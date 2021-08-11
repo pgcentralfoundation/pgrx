@@ -6,12 +6,7 @@ use tracing::instrument;
 
 use crate::pg_inventory::{DotIdentifier, InventorySqlDeclaredEntity};
 
-use super::{
-    ControlFile, InventoryExtensionSql, InventoryExtensionSqlPositioningRef, InventoryPgExtern,
-    InventoryPgExternReturn, InventoryPostgresEnum, InventoryPostgresHash, InventoryPostgresOrd,
-    InventoryPostgresType, InventorySchema, RustSqlMapping, SqlDeclaredEntity, SqlGraphEntity,
-    ToSql,
-};
+use super::{ControlFile, InventoryExtensionSql, InventoryExtensionSqlPositioningRef, InventoryPgExtern, InventoryPgExternReturn, InventoryPostgresEnum, InventoryPostgresHash, InventoryPostgresOrd, InventoryPostgresType, InventorySchema, RustSourceOnlySqlMapping, RustSqlMapping, SqlDeclaredEntity, SqlGraphEntity, ToSql};
 
 /// A generator for SQL.
 ///
@@ -27,6 +22,7 @@ use super::{
 #[derive(Debug, Clone)]
 pub struct PgxSql<'a> {
     pub type_mappings: HashMap<TypeId, RustSqlMapping>,
+    pub source_mappings: HashMap<String, RustSourceOnlySqlMapping>,
     pub control: &'a ControlFile,
     pub graph: StableGraph<SqlGraphEntity<'a>, SqlGraphRelationship>,
     pub graph_root: NodeIndex,
@@ -55,6 +51,7 @@ impl<'a> PgxSql<'a> {
         skip(
             control,
             type_mappings,
+            source_mappings,
             schemas,
             extension_sqls,
             externs,
@@ -67,6 +64,7 @@ impl<'a> PgxSql<'a> {
     pub fn build(
         control: &'a ControlFile,
         type_mappings: impl Iterator<Item = RustSqlMapping>,
+        source_mappings: impl Iterator<Item = RustSourceOnlySqlMapping>,
         schemas: impl Iterator<Item = &'a InventorySchema>,
         extension_sqls: impl Iterator<Item = &'a InventoryExtensionSql>,
         externs: impl Iterator<Item = &'a InventoryPgExtern>,
@@ -142,6 +140,7 @@ impl<'a> PgxSql<'a> {
 
         let mut this = Self {
             type_mappings: type_mappings.map(|x| (x.id, x)).collect(),
+            source_mappings: source_mappings.map(|x| (x.rust.clone(), x)).collect(),
             control: &control,
             schemas: mapped_schemas,
             extension_sqls: mapped_extension_sqls,
@@ -335,6 +334,10 @@ impl<'a> PgxSql<'a> {
 
     pub fn type_id_to_sql_type(&self, id: TypeId) -> Option<String> {
         self.type_mappings.get(&id).map(|f| f.sql.clone())
+    }
+
+    pub fn source_only_to_sql_type(&self, ty_source: &str) -> Option<String> {
+        self.source_mappings.get(ty_source).map(|f| f.sql.clone())
     }
 
     pub fn map_type_to_sql_type<T: 'static>(&mut self, sql: impl AsRef<str> + Debug) {
