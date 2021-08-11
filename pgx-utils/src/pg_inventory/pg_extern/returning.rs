@@ -18,48 +18,61 @@ pub enum Returning {
 }
 
 impl Returning {
-    fn parse_impl_trait(impl_trait: syn::TypeImplTrait) -> Returning {
+    fn parse_trait_bound(trait_bound: &syn::TraitBound) -> Returning {
+        let last_path_segment = trait_bound.path.segments.last().unwrap();
+        match last_path_segment.ident.to_string().as_str() {
+            "Iterator" => match &last_path_segment.arguments {
+                syn::PathArguments::AngleBracketed(args) => {
+                    match args.args.first().unwrap() {
+                        syn::GenericArgument::Binding(binding) => match &binding.ty {
+                            syn::Type::Tuple(tuple_type) => {
+                                let returns: Vec<(syn::Type, Option<_>)> = tuple_type.elems.iter().flat_map(|elem| {
+                                    match elem {
+                                        syn::Type::Macro(macro_pat) => {
+                                            let mac = &macro_pat.mac;
+                                            let archetype = mac.path.segments.last().unwrap();
+                                            match archetype.ident.to_string().as_str() {
+                                                "name" => {
+                                                    let out: NameMacro = mac.parse_body().expect(&*format!("{:?}", mac));
+                                                    Some((out.ty, Some(out.ident)))
+                                                },
+                                                _ => unimplemented!("Don't support anything other than name."),
+                                            }
+                                        },
+                                        ty => Some((ty.clone(), None)),
+                                    }
+                                }).collect();
+                                Returning::Iterated(returns)
+                            }
+                            syn::Type::Path(path) => Returning::SetOf(path.clone()),
+                            syn::Type::Reference(type_ref) => match &*type_ref.elem {
+                                syn::Type::Path(path) => Returning::SetOf(path.clone()),
+                                _ => unimplemented!("Expected path"),
+                            },
+                            ty => unimplemented!("Only iters with tuples, got {:?}.", ty),
+                        },
+                        _ => unimplemented!(),
+                    }
+                }
+                _ => unimplemented!(),
+            },
+            _ => unimplemented!(),
+        }
+    }
+
+    fn parse_impl_trait(impl_trait: &syn::TypeImplTrait) -> Returning {
         match impl_trait.bounds.first().unwrap() {
             syn::TypeParamBound::Trait(trait_bound) => {
-                let last_path_segment = trait_bound.path.segments.last().unwrap();
-                match last_path_segment.ident.to_string().as_str() {
-                    "Iterator" => match &last_path_segment.arguments {
-                        syn::PathArguments::AngleBracketed(args) => {
-                            match args.args.first().unwrap() {
-                                syn::GenericArgument::Binding(binding) => match &binding.ty {
-                                    syn::Type::Tuple(tuple_type) => {
-                                        let returns: Vec<(syn::Type, Option<_>)> = tuple_type.elems.iter().flat_map(|elem| {
-                                            match elem {
-                                                syn::Type::Macro(macro_pat) => {
-                                                    let mac = &macro_pat.mac;
-                                                    let archetype = mac.path.segments.last().unwrap();
-                                                    match archetype.ident.to_string().as_str() {
-                                                        "name" => {
-                                                            let out: NameMacro = mac.parse_body().expect(&*format!("{:?}", mac));
-                                                            Some((out.ty, Some(out.ident)))
-                                                        },
-                                                        _ => unimplemented!("Don't support anything other than name."),
-                                                    }
-                                                },
-                                                ty => Some((ty.clone(), None)),
-                                            }
-                                        }).collect();
-                                        Returning::Iterated(returns)
-                                    }
-                                    syn::Type::Path(path) => Returning::SetOf(path.clone()),
-                                    syn::Type::Reference(type_ref) => match &*type_ref.elem {
-                                        syn::Type::Path(path) => Returning::SetOf(path.clone()),
-                                        _ => unimplemented!("Expected path"),
-                                    },
-                                    ty => unimplemented!("Only iters with tuples, got {:?}.", ty),
-                                },
-                                _ => unimplemented!(),
-                            }
-                        }
-                        _ => unimplemented!(),
-                    },
-                    _ => unimplemented!(),
-                }
+                Self::parse_trait_bound(trait_bound)
+            }
+            _ => Returning::None,
+        }
+    }
+
+    fn parse_dyn_trait(dyn_trait: &syn::TypeTraitObject) -> Returning {
+        match dyn_trait.bounds.first().unwrap() {
+            syn::TypeParamBound::Trait(trait_bound) => {
+                Self::parse_trait_bound(trait_bound)
             }
             _ => Returning::None,
         }
@@ -73,7 +86,8 @@ impl TryFrom<&syn::ReturnType> for Returning {
         Ok(match &value {
             syn::ReturnType::Default => Returning::None,
             syn::ReturnType::Type(_, ty) => match *ty.clone() {
-                syn::Type::ImplTrait(impl_trait) => Returning::parse_impl_trait(impl_trait),
+                syn::Type::ImplTrait(impl_trait) => Returning::parse_impl_trait(&impl_trait),
+                syn::Type::TraitObject(dyn_trait) => Returning::parse_dyn_trait(&dyn_trait),
                 syn::Type::Path(typepath) => {
                     let path = &typepath.path;
                     let mut saw_pg_sys = false;
@@ -98,21 +112,22 @@ impl TryFrom<&syn::ReturnType> for Returning {
                                         Some(syn::GenericArgument::Type(syn::Type::ImplTrait(
                                             impl_trait,
                                         ))) => {
-                                            maybe_inner_impl_trait = Some(impl_trait.clone());
+                                            maybe_inner_impl_trait = Some(Returning::parse_impl_trait(&impl_trait));
                                         }
+                                        Some(syn::GenericArgument::Type(syn::Type::TraitObject(
+                                            dyn_trait
+                                        ))) => maybe_inner_impl_trait = Some(Returning::parse_dyn_trait(&dyn_trait)),
                                         _ => (),
                                     }
                                 }
-                                syn::PathArguments::None | syn::PathArguments::Parenthesized(_) => {
-                                    ()
-                                }
+                                syn::PathArguments::None | syn::PathArguments::Parenthesized(_) => ()
                             }
                         }
                     }
                     if (saw_datum && saw_pg_sys) || (saw_datum && path.segments.len() == 1) {
                         Returning::Trigger
-                    } else if let Some(inner_impl_trait) = maybe_inner_impl_trait {
-                        Returning::parse_impl_trait(inner_impl_trait)
+                    } else if let Some(returning) = maybe_inner_impl_trait {
+                        returning
                     } else {
                         let mut static_ty = typepath.clone();
                         for segment in &mut static_ty.path.segments {
