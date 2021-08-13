@@ -172,6 +172,13 @@ fn handle_default(ty: syn::Type, archetype: &syn::PathSegment, mac: &syn::Macro)
                     let value = def.base10_digits();
                     Ok((true_ty, Some(value.to_string())))
                 },
+                syn::Expr::Lit(syn::ExprLit {
+                    lit: syn::Lit::Bool(def),
+                    ..
+                }) => {
+                    let value = def.value();
+                    Ok((true_ty, Some(value.to_string())))
+                },
                 syn::Expr::Type(syn::ExprType { ref ty, .. }) => match ty.deref() {
                     syn::Type::Path(syn::TypePath { path: syn::Path { segments, .. }, .. }) => {
                         let last = segments.last().expect("No last segment");
