@@ -38,3 +38,14 @@ serde = "1.0.125"
 serde_json = "1.0.64"
 shutdown_hooks = "0.1.0"
 time = "0.2.26"
+
+[profile.dev]
+panic = "unwind"
+# Required until https://github.com/dtolnay/inventory/issues/32 is resolved.
+codegen-units = 1
+
+[profile.release]
+panic = "unwind"
+opt-level = 3
+lto = "fat"
+codegen-units = 1
