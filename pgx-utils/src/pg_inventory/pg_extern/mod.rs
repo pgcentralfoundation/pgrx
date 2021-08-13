@@ -302,8 +302,7 @@ impl ToSql for InventoryPgExtern {
                 }
             }
         }
-        tracing::trace!(?extern_attrs, strict_upgrade);
-
+        
         if strict_upgrade {
             extern_attrs.push(ExternArgs::Strict);
         }

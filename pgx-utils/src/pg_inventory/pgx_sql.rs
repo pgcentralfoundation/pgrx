@@ -381,7 +381,6 @@ fn initialize_extension_sqls<'a>(
     let mut bootstrap = None;
     let mut finalize = None;
     let mut mapped_extension_sqls = HashMap::default();
-
     for item in extension_sqls {
         let index = graph.add_node(item.into());
 

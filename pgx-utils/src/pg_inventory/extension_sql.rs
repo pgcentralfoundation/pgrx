@@ -5,6 +5,7 @@ use syn::{
     punctuated::Punctuated,
     LitStr, Token,
 };
+use std::fmt::Display;
 
 use super::{DotIdentifier, SqlGraphEntity, ToSql};
 
@@ -352,10 +353,51 @@ impl ToSql for InventoryExtensionSql {
         let sql = format!(
             "\n\
                 -- {file}:{line}\n\
+                {bootstrap}\
+                {creates}\
+                {before}\
+                {after}\
+                {finalize}\
                 {sql}\
                 ",
             file = self.file,
             line = self.line,
+            bootstrap = if self.bootstrap {
+                "-- bootstrap\n"
+            } else { "" },
+            creates = if !self.creates.is_empty() {
+                format!("\
+                    -- creates:\n\
+                    {}\n\
+                ", self.creates.iter().map(|i| 
+                    format!("--   {}", i)
+                ).collect::<Vec<_>>().join("\n")) + "\n"
+            } else {
+                "".to_string()
+            },
+            before = if !self.before.is_empty() {
+                format!("\
+                    -- before:\n\
+                    {}\n\
+                ", self.before.iter().map(|i| 
+                    format!("--   {}", i)
+                ).collect::<Vec<_>>().join("\n")) + "\n"
+            } else {
+                "".to_string()
+            },
+            after = if !self.after.is_empty() {
+                format!("\
+                   -- after\n\
+                    {}\n\
+                ", self.after.iter().map(|i| 
+                    format!("--   {}", i)
+                ).collect::<Vec<_>>().join("\n")) + "\n"
+            } else {
+                "".to_string()
+            },
+            finalize = if self.finalize {
+                "-- finalize\n"
+            } else { "" },
             sql = self.sql,
         );
         tracing::debug!(%sql);
@@ -367,6 +409,15 @@ impl ToSql for InventoryExtensionSql {
 pub enum InventoryExtensionSqlPositioningRef<'a> {
     FullPath(&'a str),
     Name(&'a str),
+}
+
+impl<'a> Display for InventoryExtensionSqlPositioningRef<'a> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            InventoryExtensionSqlPositioningRef::FullPath(i) => f.write_str(i),
+            InventoryExtensionSqlPositioningRef::Name(i) => f.write_str(i),
+        }
+    }
 }
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq, Ord, PartialOrd)]
@@ -467,6 +518,16 @@ pub enum InventorySqlDeclaredEntity {
         varlena: String,
         pg_box: String,
     },
+}
+
+impl Display for InventorySqlDeclaredEntity {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            InventorySqlDeclaredEntity::Type { name, .. } => f.write_str(&(String::from("Type(") + name + ")")),
+            InventorySqlDeclaredEntity::Enum { name, .. } => f.write_str(&(String::from("Enum(") + name + ")")),
+            InventorySqlDeclaredEntity::Function { name, .. } => f.write_str(&(String::from("Function ") + name + ")")),
+        }
+    }
 }
 
 impl InventorySqlDeclaredEntity {

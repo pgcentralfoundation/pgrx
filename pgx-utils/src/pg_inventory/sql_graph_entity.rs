@@ -41,7 +41,9 @@ impl<'a> ToSql for SqlGraphEntity<'a> {
             SqlGraphEntity::Schema(item) => if item.name != "public" && item.name != "pg_catalog" {
                 item.to_sql(context)
             } else { Ok(String::default()) },
-            SqlGraphEntity::CustomSql(item) => item.to_sql(context),
+            SqlGraphEntity::CustomSql(item) => {
+                item.to_sql(context)
+            },
             SqlGraphEntity::Function(item) => if context.graph.neighbors_undirected(context.externs.get(item).unwrap().clone()).any(|neighbor| {
                 let neighbor_item = &context.graph[neighbor];
                 match neighbor_item {

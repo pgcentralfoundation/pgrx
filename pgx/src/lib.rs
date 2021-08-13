@@ -414,6 +414,7 @@ macro_rules! pg_inventory_magic {
                     },
                     {
                         let mut set = inventory::iter::<ExtensionSql>().collect::<Vec<_>>();
+                        eprintln!("SET {:?}", set);
                         set.sort();
                         set.into_iter().map(|x| &x.0)
                     },
