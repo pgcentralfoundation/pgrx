@@ -159,6 +159,13 @@ fn handle_default(ty: syn::Type, archetype: &syn::PathSegment, mac: &syn::Macro)
                     Ok((true_ty, Some(value)))
                 },
                 syn::Expr::Lit(syn::ExprLit {
+                    lit: syn::Lit::Float(def),
+                    ..
+                }) => {
+                    let value = def.base10_digits();
+                    Ok((true_ty, Some(value.to_string())))
+                },
+                syn::Expr::Lit(syn::ExprLit {
                     lit: syn::Lit::Int(def),
                     ..
                 }) => {
