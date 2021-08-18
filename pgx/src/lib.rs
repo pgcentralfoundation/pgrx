@@ -82,7 +82,7 @@ pub use memcxt::*;
 pub use namespace::*;
 pub use nodes::*;
 pub use pgbox::*;
-use pgx_utils::pg_inventory::RustSourceOnlySqlMapping;
+use datum::inventory::{RustSourceOnlySqlMapping, RustSqlMapping};
 pub use rel::*;
 pub use shmem::*;
 pub use spi::*;
@@ -99,7 +99,6 @@ pub use pgx_pg_sys::PgBuiltInOids; // reexport this so it looks like it comes fr
 
 use core::any::TypeId;
 use once_cell::sync::Lazy;
-use pgx_utils::pg_inventory::RustSqlMapping;
 use std::collections::HashSet;
 
 /// Top-level initialization function.  This is called automatically by the `pg_module_magic!()`
@@ -168,22 +167,22 @@ pub static DEFAULT_TYPEID_SQL_MAPPING: Lazy<HashSet<RustSqlMapping>> = Lazy::new
     // Bytea is a special case, notice how it has no `bytea[]`.
     m.insert(RustSqlMapping {
         sql: String::from("bytea"),
-        id: TypeId::of::<&[u8]>(),
+        id: format!("{:?}", TypeId::of::<&[u8]>()),
         rust: core::any::type_name::<&[u8]>().to_string(),
     });
     m.insert(RustSqlMapping {
         sql: String::from("bytea"),
-        id: TypeId::of::<Option<&[u8]>>(),
+        id: format!("{:?}", TypeId::of::<Option<&[u8]>>()),
         rust: core::any::type_name::<Option<&[u8]>>().to_string(),
     });
     m.insert(RustSqlMapping {
         sql: String::from("bytea"),
-        id: TypeId::of::<Vec<u8>>(),
+        id: format!("{:?}", TypeId::of::<Vec<u8>>()),
         rust: core::any::type_name::<Vec<u8>>().to_string(),
     });
     m.insert(RustSqlMapping {
         sql: String::from("bytea"),
-        id: TypeId::of::<Option<Vec<u8>>>(),
+        id: format!("{:?}", TypeId::of::<Option<Vec<u8>>>()),
         rust: core::any::type_name::<Option<Vec<u8>>>().to_string(),
     });
 
@@ -326,9 +325,13 @@ macro_rules! pg_inventory_magic {
         /// </pre></div>
         pub mod __pgx_internals {
             use core::convert::TryFrom;
-            use pgx::pg_inventory::{
-                inventory, once_cell::sync::Lazy, tracing, ControlFile, PgxSql,
+            use pgx::{
+                pg_sys,
+                inventory::{
+                    ControlFile, PgxSql,
+                }
             };
+            use crate::once_cell::sync::Lazy;
 
             /// The contents of the `*.control` file of the crate.
             static CONTROL_FILE: Lazy<ControlFile> = Lazy::new(|| {
@@ -341,188 +344,7 @@ macro_rules! pg_inventory_magic {
                 ControlFile::try_from(context).expect("Could not parse control file, was it valid?")
             });
 
-            /// A wrapper type used by [`pgx::extension_sql`] and [`pgx::extension_sql_file`].
-            ///
-            /// Required inside the extension so that we can use [`inventory`] and collect the
-            /// [`pgx::pg_inventory::InventoryExtensionSql`] used in SQL generation.
-            #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
-            pub struct ExtensionSql(pub pgx::pg_inventory::InventoryExtensionSql);
-            inventory::collect!(ExtensionSql);
-
-            /// A wrapper type used by [`#[derive(PostgresType)]`](derive@pgx::PostgresType).
-            ///
-            /// Required inside the extension so that we can use [`inventory`] and collect the
-            /// [`pgx::pg_inventory::InventoryPostgresType`] used in SQL generation.
-            #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
-            pub struct PostgresType(pub pgx::pg_inventory::InventoryPostgresType);
-            inventory::collect!(PostgresType);
-
-            /// A wrapper type used by [`#[pg_extern]`](pgx::pg_extern).
-            ///
-            /// Required inside the extension so that we can use [`inventory`] and collect the
-            /// [`pgx::pg_inventory::InventoryPgExtern`] used in SQL generation.
-            #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
-            pub struct PgExtern(pub pgx::pg_inventory::InventoryPgExtern);
-            inventory::collect!(PgExtern);
-
-            /// A wrapper type used by [`#[derive(PostgresEnum)]`](derive@pgx::PostgresEnum).
-            ///
-            /// Required inside the extension so that we can use [`inventory`] and collect the
-            /// [`pgx::pg_inventory::InventoryPostgresEnum`] used in SQL generation.
-            #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
-            pub struct PostgresEnum(pub pgx::pg_inventory::InventoryPostgresEnum);
-            inventory::collect!(PostgresEnum);
-
-            /// A wrapper type used by [`#[derive(PostgresHash)]`](derive@pgx::PostgresHash).
-            ///
-            /// Required inside the extension so that we can use [`inventory`] and collect the
-            /// [`pgx::pg_inventory::InventoryPostgresHash`] used in SQL generation.
-            #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
-            pub struct PostgresHash(pub pgx::pg_inventory::InventoryPostgresHash);
-            inventory::collect!(PostgresHash);
-
-            /// A wrapper type used by [`#[derive(PostgresOrd)]`](derive@pgx::PostgresOrd).
-            ///
-            /// Required inside the extension so that we can use [`inventory`] and collect the
-            /// [`pgx::pg_inventory::InventoryPostgresOrd`] used in SQL generation.
-            #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
-            pub struct PostgresOrd(pub pgx::pg_inventory::InventoryPostgresOrd);
-            inventory::collect!(PostgresOrd);
-
-            /// A wrapper type used by [`#[pg_schema]`](pgx::pg_schema).
-            ///
-            /// Required inside the extension so that we can use [`inventory`] and collect the
-            /// [`pgx::pg_inventory::InventorySchema`] used in SQL generation.
-            #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
-            pub struct Schema(pub pgx::pg_inventory::InventorySchema);
-            inventory::collect!(Schema);
-
-            /// Build the SQL generator using the inventories of the wrappers in this module.
-            ///
-            ///  Most often, this is done by the [`macro@pgx::pg_binary_magic`] inside a
-            /// `src/bin/sql-generator.rs`.
-            #[tracing::instrument(level = "info")]
-            pub fn generate_sql<'a>() -> pgx::pg_inventory::eyre::Result<PgxSql<'a>> {
-                let generated = PgxSql::build(
-                    &*CONTROL_FILE,
-                    (*$crate::DEFAULT_TYPEID_SQL_MAPPING).iter().cloned(),
-                    (*$crate::DEFAULT_SOURCE_ONLY_SQL_MAPPING).iter().cloned(),
-                    {
-                        let mut set = inventory::iter::<Schema>().collect::<Vec<_>>();
-                        set.sort();
-                        set.into_iter().map(|x| &x.0)
-                    },
-                    {
-                        let mut set = inventory::iter::<ExtensionSql>().collect::<Vec<_>>();
-                        set.sort();
-                        set.into_iter().map(|x| &x.0)
-                    },
-                    {
-                        let mut set = inventory::iter::<PgExtern>().collect::<Vec<_>>();
-                        set.sort();
-                        set.into_iter().map(|x| &x.0)
-                    },
-                    {
-                        let mut set = inventory::iter::<PostgresType>().collect::<Vec<_>>();
-                        set.sort();
-                        set.into_iter().map(|x| &x.0)
-                    },
-                    {
-                        let mut set = inventory::iter::<PostgresEnum>().collect::<Vec<_>>();
-                        set.sort();
-                        set.into_iter().map(|x| &x.0)
-                    },
-                    {
-                        let mut set = inventory::iter::<PostgresOrd>().collect::<Vec<_>>();
-                        set.sort();
-                        set.into_iter().map(|x| &x.0)
-                    },
-                    {
-                        let mut set = inventory::iter::<PostgresHash>().collect::<Vec<_>>();
-                        set.sort();
-                        set.into_iter().map(|x| &x.0)
-                    },
-                )?;
-
-                Ok(generated)
-            }
-        }
-    };
-}
-
-/// Create the default SQL generator code.
-///
-/// Accepts a single argument, which should be the crate name.
-///
-/// ```ignore
-/// // src/bin/sql-generator.rs
-/// pg_binary_magic!(crate_name);
-/// ```
-///
-/// This creates a binary that:
-///  * Has [`tracing`](pgx_utils::pg_inventory::tracing) and [`color_eyre`](`pgx_utils::pg_inventory::color_eyre`) set up.
-///  * Supports [`EnvFilter`](pgx_utils::pg_inventory::tracing_subscriber::EnvFilter) log level configuration.
-///  * Accepts up to two arguments, an SQL destination and (optionally) a GraphViz DOT destination.
-///
-/// Using different SQL generator code should be considered an advanced use case, and not
-/// recommended.
-///
-/// <div class="example-wrap" style="display:inline-block">
-/// <pre class="ignore" style="white-space:normal;font:inherit;">
-///
-/// **Note**: `cargo pgx schema` or similar commands will automatically scaffold your
-/// `src/bin/sql-generator.rs` with this if it's not already present.
-///
-/// </pre></div>
-#[macro_export]
-macro_rules! pg_binary_magic {
-    ($($prelude:ident)::*) => {
-        fn main() -> pgx::pg_inventory::color_eyre::Result<()> {
-            use pgx::pg_inventory::{
-                tracing_error::ErrorLayer,
-                tracing,
-                tracing_subscriber::{self, util::SubscriberInitExt, layer::SubscriberExt, EnvFilter},
-                color_eyre,
-                eyre,
-            };
-            use std::env;
-            use $($prelude :: )*__pgx_internals::generate_sql;
-
-            // Initialize tracing with tracing-error, and eyre
-            let fmt_layer = tracing_subscriber::fmt::Layer::new()
-                .pretty();
-            let filter_layer = EnvFilter::try_from_default_env()
-                .or_else(|_| EnvFilter::try_new("info"))
-                .unwrap();
-            tracing_subscriber::registry()
-                .with(filter_layer)
-                .with(fmt_layer)
-                .with(ErrorLayer::default())
-                .init();
-            color_eyre::install()?;
-
-            // We don't really need a full argument parser here quite yet.
-            let mut args = env::args().skip(1);
-            let path = args.next().unwrap_or(concat!(
-                "./sql/",
-                core::env!("CARGO_PKG_NAME"),
-                "--",
-                core::env!("CARGO_PKG_VERSION"),
-                ".sql"
-            ).into());
-            let dot: Option<String> = args.next();
-            if args.next().is_some() {
-                return Err(eyre::eyre!("Only accepts two arguments, the destination path, and an optional (GraphViz) dot output path"));
-            }
-
-            tracing::info!(path = %path, "Writing SQL");
-            let sql = generate_sql()?;
-            sql.to_file(path)?;
-            if let Some(dot) = dot {
-                tracing::info!(dot = %dot, "Writing Graphviz DOT");
-                sql.to_dot(dot)?;
-            }
-            Ok(())
+            static INVENTORY_DIR: &str = pgx::inventory_dir!();
         }
     };
 }

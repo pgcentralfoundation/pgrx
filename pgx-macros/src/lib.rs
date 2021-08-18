@@ -482,8 +482,9 @@ fn example_return() -> pg_sys::Oid {
 pub fn pg_extern(attr: TokenStream, item: TokenStream) -> TokenStream {
     let args = parse_extern_attributes(proc_macro2::TokenStream::from(attr.clone()));
 
-    let inventory_item =
-        pg_inventory::PgExtern::new(attr.clone().into(), item.clone().into()).unwrap();
+    let inventory_item = pg_inventory::PgExtern::new(attr.clone().into(), item.clone().into()).unwrap();
+    inventory_item.inventory(inventory_dir_fn().into());
+    eprintln!("{:}", inventory_dir_fn());
     let inventory_submission = if args.iter().any(|x| *x == ExternArgs::SkipInventory) {
         None
     } else {
@@ -627,6 +628,7 @@ fn impl_postgres_enum(ast: DeriveInput) -> proc_macro2::TokenStream {
     });
 
     let inventory_item = pg_inventory::PostgresEnum::from_derive_input(inventory_ast).unwrap();
+    inventory_item.inventory(inventory_dir_fn().into());
     if !found_skip_inventory {
         inventory_item.to_tokens(&mut stream);
     }
@@ -765,6 +767,7 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
     }
 
     let inventory_item = pg_inventory::PostgresType::from_derive_input(ast).unwrap();
+    inventory_item.inventory(inventory_dir_fn().into());
     if !found_skip_inventory {
         inventory_item.to_tokens(&mut stream);
     }
@@ -964,4 +967,17 @@ Optionally accepts the following attributes:
 pub fn postgres_hash(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
     impl_postgres_hash(ast).into()
+}
+
+#[proc_macro]
+pub fn inventory_dir(_input: TokenStream) -> TokenStream {
+    let inventory_dir =inventory_dir_fn();
+    let tokens = quote! {
+        #inventory_dir
+    };
+    tokens.into()
+}
+
+fn inventory_dir_fn() -> &'static str {
+    concat!(env!("OUT_DIR"), "/inventory")
 }

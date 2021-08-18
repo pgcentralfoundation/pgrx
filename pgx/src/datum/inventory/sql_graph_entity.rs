@@ -1,6 +1,6 @@
 use super::{
     ControlFile, DotIdentifier, InventoryExtensionSql, InventoryPgExtern, InventoryPostgresEnum,
-    InventoryPostgresHash, InventoryPostgresOrd, InventoryPostgresType, InventorySchema, ToSql,
+    InventoryPostgresHash, InventoryPostgresOrd, InventorySchema, InventoryPostgresType, ToSql,
 };
 
 /// An entity corresponding to some SQL required by the extension.

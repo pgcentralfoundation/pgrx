@@ -7,6 +7,7 @@ use proc_macro2::TokenStream;
 use proc_macro2::TokenTree;
 use quote::{format_ident, quote, ToTokens, TokenStreamExt};
 use serde_json::value::Value as JsonValue;
+use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
@@ -183,7 +184,7 @@ pub fn get_named_capture(
     }
 }
 
-#[derive(Debug, Hash, Ord, PartialOrd, Eq, PartialEq, Clone)]
+#[derive(Debug, Hash, Ord, PartialOrd, Eq, PartialEq, Clone, Serialize, Deserialize)]
 pub enum ExternArgs {
     Immutable,
     Strict,

@@ -1,9 +1,12 @@
-use super::{DotIdentifier, SqlGraphEntity, ToSql};
-use proc_macro2::TokenStream as TokenStream2;
+use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
 use syn::{
     parse::{Parse, ParseStream},
     ItemMod,
+};
+use std::{
+    io::Write,
+    fs::{create_dir_all, File}
 };
 
 /// A parsed `#[pg_schema] mod example {}` item.
@@ -28,6 +31,19 @@ use syn::{
 #[derive(Debug, Clone)]
 pub struct Schema {
     pub module: ItemMod,
+}
+
+impl Schema {
+    pub fn inventory_fn_name(&self) -> String {
+        "__inventory_schema_".to_string() + &self.module.ident.to_string()
+    }
+
+    pub fn inventory(&self, inventory_dir: String) {
+        create_dir_all(&inventory_dir).expect("Couldn't create inventory dir.");
+        let mut fd = File::create(inventory_dir.to_string() + "/" + &self.inventory_fn_name() + ".json").expect("Couldn't create inventory file");
+        let inventory_fn_json = serde_json::to_string(&self.inventory_fn_name()).expect("Could not serialize inventory item.");
+        write!(fd, "{}", inventory_fn_json).expect("Couldn't write to inventory file");
+    }
 }
 
 impl Parse for Schema {
@@ -58,18 +74,33 @@ impl ToTokens for Schema {
 
         let mut updated_content = content_items.clone();
         if !found_skip_inventory {
+            let inventory_fn_name = syn::Ident::new(
+                &format!("__pgx_internals_schema_{}", ident),
+                Span::call_site(),
+            );
+            let pg_finfo_fn_name = syn::Ident::new(
+                &format!("pg_finfo_{}_wrapper", inventory_fn_name),
+                Span::call_site(),
+            );
             updated_content.push(syn::parse_quote! {
-                use pgx::pg_inventory::inventory;
-            });
-            updated_content.push(syn::parse_quote! {
-                pgx::pg_inventory::inventory::submit! {
-                    crate::__pgx_internals::Schema(pgx::pg_inventory::InventorySchema {
-                        module_path: module_path!(),
-                        name: stringify!(#ident),
-                        file: file!(),
-                        line: line!(),
-                    })
-                }
+                    #[no_mangle]
+                    pub extern "C" fn  #pg_finfo_fn_name() -> &'static pg_sys::Pg_finfo_record {
+                        const V1_API: pg_sys::Pg_finfo_record = pg_sys::Pg_finfo_record { api_version: 1 };
+                        &V1_API
+                    }
+        
+                    #[pgx::pg_guard]
+                    #[no_mangle]
+                    pub extern "C" fn  #inventory_fn_name(fcinfo: pgx::pg_sys::FunctionCallInfo) -> pgx::pg_sys::Datum {
+                        let submission = pgx::pg_inventory::InventorySchema {
+                            module_path: module_path!(),
+                            name: stringify!(#ident),
+                            file: file!(),
+                            line: line!(),
+                        };
+                        use pgx::IntoDatum;
+                        return submission.into_datum().unwrap();
+                    }
             });
         }
         let _semi = &self.module.semi;
@@ -81,43 +112,5 @@ impl ToTokens for Schema {
             }
         };
         tokens.append_all(inv);
-    }
-}
-
-#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub struct InventorySchema {
-    pub module_path: &'static str,
-    pub name: &'static str,
-    pub file: &'static str,
-    pub line: u32,
-}
-
-impl<'a> Into<SqlGraphEntity<'a>> for &'a InventorySchema {
-    fn into(self) -> SqlGraphEntity<'a> {
-        SqlGraphEntity::Schema(self)
-    }
-}
-
-impl DotIdentifier for InventorySchema {
-    fn dot_identifier(&self) -> String {
-        format!("schema {}", self.module_path.to_string())
-    }
-}
-
-impl ToSql for InventorySchema {
-    #[tracing::instrument(level = "debug", err, skip(self, _context), fields(identifier = self.module_path))]
-    fn to_sql(&self, _context: &super::PgxSql) -> eyre::Result<String> {
-        let sql = format!(
-            "\n\
-                    -- {file}:{line}\n\
-                    CREATE SCHEMA IF NOT EXISTS {name}; /* {module_path} */\
-                ",
-            name = self.name,
-            file = self.file,
-            line = self.line,
-            module_path = self.module_path,
-        );
-        tracing::debug!(%sql);
-        Ok(sql)
     }
 }

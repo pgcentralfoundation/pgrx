@@ -1,11 +1,11 @@
-use proc_macro2::TokenStream as TokenStream2;
+use std::{io::Write, fs::{create_dir_all, File}};
+
+use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
 use syn::{
     parse::{Parse, ParseStream},
     DeriveInput, Ident, ItemEnum, ItemStruct,
 };
-
-use super::{DotIdentifier, SqlGraphEntity, ToSql};
 
 /// A parsed `#[derive(PostgresHash)]` item.
 ///
@@ -63,6 +63,17 @@ impl PostgresHash {
     pub fn from_derive_input(derive_input: DeriveInput) -> Result<Self, syn::Error> {
         Ok(Self::new(derive_input.ident))
     }
+    
+    pub fn inventory_fn_name(&self) -> String {
+        "__inventory_hash_".to_string() + &self.name.to_string()
+    }
+
+    pub fn inventory(&self, inventory_dir: String) {
+        create_dir_all(&inventory_dir).expect("Couldn't create inventory dir.");
+        let mut fd = File::create(inventory_dir.to_string() + "/" + &self.inventory_fn_name() + ".json").expect("Couldn't create inventory file");
+        let inventory_fn_json = serde_json::to_string(&self.inventory_fn_name()).expect("Could not serialize inventory item.");
+        write!(fd, "{}", inventory_fn_json).expect("Couldn't write to inventory file");
+    }
 }
 
 impl Parse for PostgresHash {
@@ -80,62 +91,37 @@ impl Parse for PostgresHash {
 impl ToTokens for PostgresHash {
     fn to_tokens(&self, tokens: &mut TokenStream2) {
         let name = &self.name;
+        let inventory_fn_name = syn::Ident::new(
+            &format!("__pgx_internals_hash_{}", self.name),
+            Span::call_site(),
+        );
+        let pg_finfo_fn_name = syn::Ident::new(
+            &format!("pg_finfo_{}_wrapper", inventory_fn_name),
+            Span::call_site(),
+        );
         let inv = quote! {
-            pgx::pg_inventory::inventory::submit! {
+            #[no_mangle]
+            pub extern "C" fn  #pg_finfo_fn_name() -> &'static pg_sys::Pg_finfo_record {
+                const V1_API: pg_sys::Pg_finfo_record = pg_sys::Pg_finfo_record { api_version: 1 };
+                &V1_API
+            }
+
+            #[pgx::pg_guard]
+            #[no_mangle]
+            pub extern "C" fn  #inventory_fn_name(fcinfo: pgx::pg_sys::FunctionCallInfo) -> pgx::pg_sys::Datum {
                 use core::any::TypeId;
-                crate::__pgx_internals::PostgresHash(pgx::pg_inventory::InventoryPostgresHash {
+                let submission = pgx::pg_inventory::InventoryPostgresHash {
                     name: stringify!(#name),
                     file: file!(),
                     line: line!(),
                     full_path: core::any::type_name::<#name>(),
                     module_path: module_path!(),
                     id: TypeId::of::<#name>(),
-                })
+                };
+                use pgx::IntoDatum;
+                return submission.into_datum().unwrap();
             }
         };
         tokens.append_all(inv);
-    }
-}
-
-#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub struct InventoryPostgresHash {
-    pub name: &'static str,
-    pub file: &'static str,
-    pub line: u32,
-    pub full_path: &'static str,
-    pub module_path: &'static str,
-    pub id: core::any::TypeId,
-}
-
-impl<'a> Into<SqlGraphEntity<'a>> for &'a InventoryPostgresHash {
-    fn into(self) -> SqlGraphEntity<'a> {
-        SqlGraphEntity::Hash(self)
-    }
-}
-
-impl DotIdentifier for InventoryPostgresHash {
-    fn dot_identifier(&self) -> String {
-        format!("hash {}", self.full_path.to_string())
-    }
-}
-
-impl ToSql for InventoryPostgresHash {
-    #[tracing::instrument(level = "debug", err, skip(self, _context), fields(identifier = self.full_path))]
-    fn to_sql(&self, _context: &super::PgxSql) -> eyre::Result<String> {
-        let sql = format!("\n\
-                            -- {file}:{line}\n\
-                            -- {full_path}\n\
-                            CREATE OPERATOR FAMILY {name}_hash_ops USING hash;\n\
-                            CREATE OPERATOR CLASS {name}_hash_ops DEFAULT FOR TYPE {name} USING hash FAMILY {name}_hash_ops AS\n\
-                                \tOPERATOR    1   =  ({name}, {name}),\n\
-                                \tFUNCTION    1   {name}_hash({name});\
-                            ",
-                          name = self.name,
-                          full_path = self.full_path,
-                          file = self.file,
-                          line = self.line,
-        );
-        tracing::debug!(%sql);
-        Ok(sql)
     }
 }

@@ -33,9 +33,10 @@ pub(crate) fn impl_postgres_ord(ast: DeriveInput) -> proc_macro2::TokenStream {
     stream.extend(ge(&ast.ident, found_skip_inventory));
     stream.extend(cmp(&ast.ident, found_skip_inventory));
 
+    let inventory_item = pg_inventory::PostgresOrd::new(ast.ident.clone());
+    inventory_item.inventory(super::inventory_dir_fn().into());
     if !found_skip_inventory {
-        // Unfallable, don't need to check.
-        pg_inventory::PostgresOrd::new(ast.ident.clone()).to_tokens(&mut stream);
+        inventory_item.to_tokens(&mut stream);
     }
 
     stream
@@ -53,9 +54,10 @@ pub(crate) fn impl_postgres_hash(ast: DeriveInput) -> proc_macro2::TokenStream {
 
     stream.extend(hash(&ast.ident, found_skip_inventory));
 
+    let inventory_item = pg_inventory::PostgresHash::new(ast.ident.clone());
+    inventory_item.inventory(super::inventory_dir_fn().into());
     if !found_skip_inventory {
-        // Unfallable, don't need to check.
-        pg_inventory::PostgresHash::new(ast.ident.clone()).to_tokens(&mut stream);
+        inventory_item.to_tokens(&mut stream);
     }
 
     stream

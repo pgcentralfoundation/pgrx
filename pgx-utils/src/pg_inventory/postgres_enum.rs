@@ -1,4 +1,8 @@
-use std::hash::{Hash, Hasher};
+use std::{
+    hash::{Hash, Hasher},
+    io::Write,
+    fs::{create_dir_all, File},
+};
 
 use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
@@ -7,8 +11,6 @@ use syn::{
     DeriveInput, Generics, ItemEnum,
 };
 use syn::{punctuated::Punctuated, Ident, Token};
-
-use super::{DotIdentifier, SqlGraphEntity, ToSql};
 
 /// A parsed `#[derive(PostgresEnum)]` item.
 ///
@@ -65,6 +67,17 @@ impl PostgresEnum {
             data_enum.variants,
         ))
     }
+
+    pub fn inventory_fn_name(&self) -> String {
+        "__inventory_enum_".to_string() + &self.name.to_string()
+    }
+
+    pub fn inventory(&self, inventory_dir: String) {
+        create_dir_all(&inventory_dir).expect("Couldn't create inventory dir.");
+        let mut fd = File::create(inventory_dir.to_string() + "/" + &self.inventory_fn_name() + ".json").expect("Couldn't create inventory file");
+        let inventory_fn_json = serde_json::to_string(&self.inventory_fn_name()).expect("Could not serialize inventory item.");
+        write!(fd, "{}", inventory_fn_json).expect("Couldn't write to inventory file");
+    }
 }
 
 impl Parse for PostgresEnum {
@@ -85,104 +98,44 @@ impl ToTokens for PostgresEnum {
         let (_impl_generics, ty_generics, _where_clauses) = static_generics.split_for_impl();
 
         let variants = self.variants.iter();
+        let inventory_fn_name = syn::Ident::new(
+            &format!("__pgx_internals_enum_{}", name),
+            Span::call_site(),
+        );
+        let pg_finfo_fn_name = syn::Ident::new(
+            &format!("pg_finfo_{}_wrapper", inventory_fn_name),
+            Span::call_site(),
+        );
         let inv = quote! {
-            pgx::pg_inventory::inventory::submit! {
+            #[no_mangle]
+            pub extern "C" fn  #pg_finfo_fn_name() -> &'static pg_sys::Pg_finfo_record {
+                const V1_API: pg_sys::Pg_finfo_record = pg_sys::Pg_finfo_record { api_version: 1 };
+                &V1_API
+            }
+
+            #[pgx::pg_guard]
+            #[no_mangle]
+            pub extern "C" fn  #inventory_fn_name(fcinfo: pgx::pg_sys::FunctionCallInfo) -> pgx::pg_sys::Datum {
                 let mut mappings = Default::default();
                 <#name #ty_generics as pgx::datum::WithTypeIds>::register_with_refs(&mut mappings, stringify!(#name).to_string());
                 pgx::datum::WithSizedTypeIds::<#name #ty_generics>::register_sized_with_refs(&mut mappings, stringify!(#name).to_string());
                 pgx::datum::WithArrayTypeIds::<#name #ty_generics>::register_array_with_refs(&mut mappings, stringify!(#name).to_string());
                 pgx::datum::WithVarlenaTypeIds::<#name #ty_generics>::register_varlena_with_refs(&mut mappings, stringify!(#name).to_string());
 
-                crate::__pgx_internals::PostgresEnum(pgx::pg_inventory::InventoryPostgresEnum {
+                let submission = pgx::inventory::InventoryPostgresEnum {
                     name: stringify!(#name),
                     file: file!(),
                     line: line!(),
                     module_path: module_path!(),
                     full_path: core::any::type_name::<#name #ty_generics>(),
-                    id: *<#name #ty_generics as WithTypeIds>::ITEM_ID,
                     mappings,
                     variants: vec![ #(  stringify!(#variants)  ),* ],
-                })
+                };
+                use pgx::IntoDatum;
+                return submission.into_datum().unwrap();
             }
         };
         tokens.append_all(inv);
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct InventoryPostgresEnum {
-    pub name: &'static str,
-    pub file: &'static str,
-    pub line: u32,
-    pub full_path: &'static str,
-    pub module_path: &'static str,
-    pub id: core::any::TypeId,
-    pub mappings: std::collections::HashSet<super::RustSqlMapping>,
-    pub variants: Vec<&'static str>,
-}
-
-impl Hash for InventoryPostgresEnum {
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        self.id.hash(state);
-    }
-}
-
-impl PartialOrd for InventoryPostgresEnum {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        self.id.partial_cmp(&other.id)
-    }
-}
-
-impl Ord for InventoryPostgresEnum {
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        self.id.cmp(&other.id)
-    }
-}
-
-impl InventoryPostgresEnum {
-    pub fn id_matches(&self, candidate: &core::any::TypeId) -> bool {
-        self.mappings.iter().any(|tester| *candidate == tester.id)
-    }
-}
-
-impl<'a> Into<SqlGraphEntity<'a>> for &'a InventoryPostgresEnum {
-    fn into(self) -> SqlGraphEntity<'a> {
-        SqlGraphEntity::Enum(self)
-    }
-}
-
-impl DotIdentifier for InventoryPostgresEnum {
-    fn dot_identifier(&self) -> String {
-        format!("enum {}", self.full_path.to_string())
-    }
-}
-
-impl ToSql for InventoryPostgresEnum {
-    #[tracing::instrument(level = "debug", err, skip(self, context), fields(identifier = self.full_path))]
-    fn to_sql(&self, context: &super::PgxSql) -> eyre::Result<String> {
-        let self_index = context.enums[self];
-        let sql = format!(
-            "\n\
-                    -- {file}:{line}\n\
-                    -- {full_path}\n\
-                    CREATE TYPE {schema}{name} AS ENUM (\n\
-                        {variants}\
-                    );\
-                ",
-            schema = context.schema_prefix_for(&self_index),
-            full_path = self.full_path,
-            file = self.file,
-            line = self.line,
-            name = self.name,
-            variants = self
-                .variants
-                .iter()
-                .map(|variant| format!("\t'{}'", variant))
-                .collect::<Vec<_>>()
-                .join(",\n")
-                + "\n",
-        );
-        tracing::debug!(%sql);
-        Ok(sql)
-    }
-}

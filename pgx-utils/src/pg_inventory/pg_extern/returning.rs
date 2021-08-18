@@ -180,14 +180,14 @@ impl ToTokens for Returning {
     fn to_tokens(&self, tokens: &mut TokenStream2) {
         let quoted = match self {
             Returning::None => quote! {
-                pgx::pg_inventory::InventoryPgExternReturn::None
+                pgx::nventory::InventoryPgExternReturn::None
             },
             Returning::Type(ty) => {
                 let ty_string = ty.to_token_stream().to_string()
                     .replace(" ", "");
                 quote! {
-                    pgx::pg_inventory::InventoryPgExternReturn::Type {
-                        id: TypeId::of::<#ty>(),
+                    pgx::inventory::InventoryPgExternReturn::Type {
+                        id: format!("{:?}", TypeId::of::<#ty>()),
                         source: #ty_string,
                         full_path: core::any::type_name::<#ty>(),
                         module_path: {
@@ -203,8 +203,8 @@ impl ToTokens for Returning {
                 let ty_string = ty.to_token_stream().to_string()
                     .replace(" ", "");
                 quote! {
-                    pgx::pg_inventory::InventoryPgExternReturn::SetOf {
-                        id: TypeId::of::<#ty>(),
+                    pgx::inventory::InventoryPgExternReturn::SetOf {
+                        id: format!("{:?}", TypeId::of::<#ty>()),
                         source: #ty_string,
                         full_path: core::any::type_name::<#ty>(),
                         module_path: {
@@ -225,7 +225,7 @@ impl ToTokens for Returning {
                         let name_iter = name.iter();
                         quote! {
                             (
-                                TypeId::of::<#ty>(),
+                                format!("{:?}", TypeId::of::<#ty>()),
                                 #ty_string,
                                 core::any::type_name::<#ty>(),
                                 {
@@ -240,13 +240,13 @@ impl ToTokens for Returning {
                     })
                     .collect::<Vec<_>>();
                 quote! {
-                    pgx::pg_inventory::InventoryPgExternReturn::Iterated(vec![
+                    pgx::inventory::InventoryPgExternReturn::Iterated(vec![
                         #(#quoted_items),*
                     ])
                 }
             }
             Returning::Trigger => quote! {
-                pgx::pg_inventory::InventoryPgExternReturn::Trigger
+                pgx::inventory::InventoryPgExternReturn::Trigger
             },
         };
         tokens.append_all(quoted);
@@ -301,31 +301,4 @@ impl Parse for NameMacro {
             ty: input.parse()?,
         })
     }
-}
-
-#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub enum InventoryPgExternReturn {
-    None,
-    Type {
-        id: core::any::TypeId,
-        source: &'static str,
-        full_path: &'static str,
-        module_path: String,
-    },
-    SetOf {
-        id: core::any::TypeId,
-        source: &'static str,
-        full_path: &'static str,
-        module_path: String,
-    },
-    Iterated(
-        Vec<(
-            core::any::TypeId, // Type Id
-            &'static str, // Source
-            &'static str, // Full path
-            String, // Module path
-            Option<&'static str>, // Name
-        )>,
-    ),
-    Trigger,
 }

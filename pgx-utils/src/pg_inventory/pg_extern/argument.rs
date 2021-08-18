@@ -232,10 +232,10 @@ impl ToTokens for Argument {
         let ty_string = self.ty.to_token_stream().to_string().replace(" ", "");
 
         let quoted = quote! {
-            pgx::pg_inventory::InventoryPgExternInput {
+            pgx::inventory::InventoryPgExternInput {
                 pattern: stringify!(#pat),
                 ty_source: #ty_string,
-                ty_id: TypeId::of::<#ty>(),
+                ty_id: format!("{:?}", TypeId::of::<#ty>()),
                 full_path: core::any::type_name::<#ty>(),
                 module_path: {
                     let ty_name = core::any::type_name::<#ty>();
@@ -267,16 +267,4 @@ impl Parse for DefaultMacro {
             expr: input.parse()?,
         })
     }
-}
-
-#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub struct InventoryPgExternInput {
-    pub pattern: &'static str,
-    pub ty_source: &'static str,
-    pub ty_id: core::any::TypeId,
-    pub full_path: &'static str,
-    pub module_path: String,
-    pub is_optional: bool,
-    pub is_variadic: bool,
-    pub default: Option<&'static str>,
 }

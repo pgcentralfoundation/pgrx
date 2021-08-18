@@ -10,21 +10,16 @@ use operator::{PgxOperator, PgxOperatorAttributeWithIdent, PgxOperatorOpName};
 use returning::Returning;
 use search_path::SearchPathList;
 
-use eyre::eyre as eyre_err;
 use eyre::WrapErr;
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
-use std::convert::TryFrom;
 use syn::parse::{Parse, ParseStream};
 use syn::Meta;
-
-pub use argument::InventoryPgExternInput;
-pub use operator::InventoryPgOperator;
-pub use returning::InventoryPgExternReturn;
-
-use crate::ExternArgs;
-
-use super::{DotIdentifier, SqlDeclaredEntity, SqlGraphEntity, ToSql};
+use std::{
+    io::Write,
+    fs::{create_dir_all, File},
+    convert::TryFrom
+};
 
 /// A parsed `#[pg_extern]` item.
 ///
@@ -197,6 +192,18 @@ impl PgExtern {
         let func = syn::parse2::<syn::ItemFn>(item)?;
         Ok(Self { attrs, func })
     }
+
+        
+    pub fn inventory_fn_name(&self) -> String {
+        "__inventory_fn_".to_string() + &self.func.sig.ident.to_string()
+    }
+
+    pub fn inventory(&self, inventory_dir: String) {
+        create_dir_all(&inventory_dir).expect("Couldn't create inventory dir.");
+        let mut fd = File::create(inventory_dir.to_string() + "/" + &self.inventory_fn_name() + ".json").expect("Couldn't create inventory file");
+        let inventory_fn_json = serde_json::to_string(&self.inventory_fn_name()).expect("Could not serialize inventory item.");
+        write!(fd, "{}", inventory_fn_json).expect("Couldn't write to inventory file");
+    }
 }
 
 impl ToTokens for PgExtern {
@@ -220,11 +227,27 @@ impl ToTokens for PgExtern {
         };
         let operator = self.operator().into_iter();
         let overridden = self.overridden().into_iter();
-
+        
+        let inventory_fn_name = syn::Ident::new(
+            &format!("fn_{}", name),
+            Span::call_site(),
+        );
+        let pg_finfo_fn_name = syn::Ident::new(
+            &format!("pg_finfo_{}_wrapper", inventory_fn_name),
+            Span::call_site(),
+        );
         let inv = quote! {
-            pgx::pg_inventory::inventory::submit! {
+            #[no_mangle]
+            pub extern "C" fn  #pg_finfo_fn_name() -> &'static pg_sys::Pg_finfo_record {
+                const V1_API: pg_sys::Pg_finfo_record = pg_sys::Pg_finfo_record { api_version: 1 };
+                &V1_API
+            }
+
+            #[pgx::pg_guard]
+            #[no_mangle]
+            pub extern "C" fn  #inventory_fn_name(fcinfo: pgx::pg_sys::FunctionCallInfo) -> pgx::pg_sys::Datum {
                 use core::any::TypeId;
-                let submission = pgx::pg_inventory::InventoryPgExtern {
+                let submission = pgx::inventory::InventoryPgExtern {
                     name: #name,
                     unaliased_name: stringify!(#ident),
                     schema: None#( .unwrap_or(Some(#schema_iter)) )*,
@@ -239,8 +262,8 @@ impl ToTokens for PgExtern {
                     operator: None#( .unwrap_or(Some(#operator)) )*,
                     overridden: None#( .unwrap_or(Some(#overridden)) )*,
                 };
-                let retval = crate::__pgx_internals::PgExtern(submission);
-                retval
+                use pgx::IntoDatum;
+                return submission.into_datum().unwrap();
             }
         };
         tokens.append_all(inv);
@@ -253,317 +276,5 @@ impl Parse for PgExtern {
             attrs: input.parse().ok(),
             func: input.parse()?,
         })
-    }
-}
-
-#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub struct InventoryPgExtern {
-    pub name: &'static str,
-    pub unaliased_name: &'static str,
-    pub schema: Option<&'static str>,
-    pub file: &'static str,
-    pub line: u32,
-    pub module_path: &'static str,
-    pub full_path: &'static str,
-    pub extern_attrs: Vec<crate::ExternArgs>,
-    pub search_path: Option<Vec<&'static str>>,
-    pub fn_args: Vec<InventoryPgExternInput>,
-    pub fn_return: InventoryPgExternReturn,
-    pub operator: Option<InventoryPgOperator>,
-    pub overridden: Option<&'static str>,
-}
-
-impl<'a> Into<SqlGraphEntity<'a>> for &'a InventoryPgExtern {
-    fn into(self) -> SqlGraphEntity<'a> {
-        SqlGraphEntity::Function(self)
-    }
-}
-
-impl DotIdentifier for InventoryPgExtern {
-    fn dot_identifier(&self) -> String {
-        format!("fn {}", self.full_path.to_string())
-    }
-}
-
-impl ToSql for InventoryPgExtern {
-    #[tracing::instrument(
-        level = "info",
-        skip(self, context),
-        fields(identifier = self.name),
-    )]
-    fn to_sql(&self, context: &super::PgxSql) -> eyre::Result<String> {
-        let self_index = context.externs[self];
-        let mut extern_attrs = self.extern_attrs.clone();
-        let mut strict_upgrade = true;
-        if !extern_attrs.iter().any(|i| i == &ExternArgs::Strict) {
-            for arg in &self.fn_args {
-                if arg.is_optional {
-                    strict_upgrade = false;
-                }
-            }
-        }
-        
-        if strict_upgrade {
-            extern_attrs.push(ExternArgs::Strict);
-        }
-
-        let fn_sql = format!("\
-                                CREATE OR REPLACE FUNCTION {schema}\"{name}\"({arguments}) {returns}\n\
-                                {extern_attrs}\
-                                {search_path}\
-                                LANGUAGE c /* Rust */\n\
-                                AS 'MODULE_PATHNAME', '{unaliased_name}_wrapper';\
-                            ",
-                             schema = self.schema.map(|schema| format!("{}.", schema)).unwrap_or_else(|| context.schema_prefix_for(&self_index)),
-                             name = self.name,
-                             unaliased_name = self.unaliased_name,
-                             arguments = if !self.fn_args.is_empty() {
-                                 let mut args = Vec::new();
-                                 for (idx, arg) in self.fn_args.iter().enumerate() {
-                                     let graph_index = context.graph.neighbors_undirected(self_index).find(|neighbor| match &context.graph[*neighbor] {
-                                         SqlGraphEntity::Type(ty) => ty.id_matches(&arg.ty_id),
-                                         SqlGraphEntity::Enum(en) => en.id_matches(&arg.ty_id),
-                                         SqlGraphEntity::BuiltinType(defined) => defined == &arg.full_path,
-                                         _ => false,
-                                     }).ok_or_else(|| eyre_err!("Could not find arg type in graph. Got: {:?}", arg))?;
-                                     let needs_comma = idx < (self.fn_args.len() - 1);
-                                     let buf = format!("\
-                                            \t\"{pattern}\" {variadic}{schema_prefix}{sql_type}{default}{maybe_comma}/* {full_path} */\
-                                        ",
-                                            pattern = arg.pattern,
-                                            schema_prefix = context.schema_prefix_for(&graph_index),
-                                            // First try to match on [`TypeId`] since it's most reliable.
-                                            sql_type = context.source_only_to_sql_type(arg.ty_source).or_else(|| {
-                                                context.type_id_to_sql_type(arg.ty_id)
-                                            }).or_else(|| {
-                                                // Fall back to fuzzy matching.
-                                                let path = arg.full_path.to_string();
-                                                if let Some(found) = context.has_sql_declared_entity(&SqlDeclaredEntity::Type(path.clone())) {
-                                                    Some(found.sql())
-                                                }  else if let Some(found) = context.has_sql_declared_entity(&SqlDeclaredEntity::Enum(path.clone())) {
-                                                    Some(found.sql())
-                                                } else {
-                                                    None
-                                                }
-                                            }).ok_or_else(|| eyre_err!(
-                                                "Failed to map argument `{}` type `{}` to SQL type while building function `{}`.",
-                                                arg.pattern,
-                                                arg.full_path,
-                                                self.name
-                                            ))?,
-                                            default = if let Some(def) = arg.default { format!(" DEFAULT {}", def) } else { String::from("") },
-                                            variadic = if arg.is_variadic { "VARIADIC " } else { "" },
-                                            maybe_comma = if needs_comma { ", " } else { " " },
-                                            full_path = arg.full_path,
-                                     );
-                                     args.push(buf);
-                                 };
-                                 String::from("\n") + &args.join("\n") + "\n"
-                             } else { Default::default() },
-                             returns = match &self.fn_return {
-                                 InventoryPgExternReturn::None => String::from("RETURNS void"),
-                                 InventoryPgExternReturn::Type { id, source, full_path, .. } => {
-                                     let graph_index = context.graph.neighbors_undirected(self_index).find(|neighbor| match &context.graph[*neighbor] {
-                                         SqlGraphEntity::Type(ty) => ty.id_matches(&id),
-                                         SqlGraphEntity::Enum(en) => en.id_matches(&id),
-                                         SqlGraphEntity::BuiltinType(defined) => &*defined == full_path,
-                                         _ => false,
-                                     }).ok_or_else(|| eyre_err!("Could not find return type in graph."))?;
-                                     format!("RETURNS {schema_prefix}{sql_type} /* {full_path} */",
-                                             sql_type = context.source_only_to_sql_type(source).or_else(|| {
-                                                 context.type_id_to_sql_type(*id)
-                                             }).or_else(|| {
-                                                    let pat = full_path.to_string();
-                                                    if let Some(found) = context.has_sql_declared_entity(&SqlDeclaredEntity::Type(pat.clone())) {
-                                                        Some(found.sql())
-                                                    }  else if let Some(found) = context.has_sql_declared_entity(&SqlDeclaredEntity::Enum(pat.clone())) {
-                                                        Some(found.sql())
-                                                    } else {
-                                                        None
-                                                    }
-                                                }).ok_or_else(|| eyre_err!("Failed to map return type `{}` to SQL type while building function `{}`.", full_path, self.full_path))?,
-                                             schema_prefix = context.schema_prefix_for(&graph_index),
-                                             full_path = full_path
-                                     )
-                                 },
-                                 InventoryPgExternReturn::SetOf { id, source, full_path, .. } => {
-                                     let graph_index = context.graph.neighbors_undirected(self_index).find(|neighbor| match &context.graph[*neighbor] {
-                                         SqlGraphEntity::Type(ty) => ty.id_matches(&id),
-                                         SqlGraphEntity::Enum(en) => en.id_matches(&id),
-                                         SqlGraphEntity::BuiltinType(defined) => defined == full_path,
-                                         _ => false,
-                                     }).ok_or_else(|| eyre_err!("Could not find return type in graph."))?;
-                                     format!("RETURNS SETOF {schema_prefix}{sql_type} /* {full_path} */",
-                                             sql_type = context.source_only_to_sql_type(source).or_else(|| {
-                                                 context.type_id_to_sql_type(*id)
-                                             }).or_else(|| {
-                                                    let pat = full_path.to_string();
-                                                    if let Some(found) = context.has_sql_declared_entity(&SqlDeclaredEntity::Type(pat.clone())) {
-                                                        Some(found.sql())
-                                                    }  else if let Some(found) = context.has_sql_declared_entity(&SqlDeclaredEntity::Enum(pat.clone())) {
-                                                        Some(found.sql())
-                                                    } else {
-                                                        None
-                                                    }
-                                                }).ok_or_else(|| eyre_err!("Failed to map return type `{}` to SQL type while building function `{}`.", full_path, self.full_path))?,
-                                             schema_prefix = context.schema_prefix_for(&graph_index),
-                                             full_path = full_path
-                                     )
-                                 },
-                                 InventoryPgExternReturn::Iterated(table_items) => {
-                                     let mut items = String::new();
-                                     for (idx, (id, source, ty_name, _module_path, col_name)) in table_items.iter().enumerate() {
-                                         let graph_index = context.graph.neighbors_undirected(self_index).find(|neighbor| match &context.graph[*neighbor] {
-                                             SqlGraphEntity::Type(ty) => ty.id_matches(&id),
-                                             SqlGraphEntity::Enum(en) => en.id_matches(&id),
-                                             SqlGraphEntity::BuiltinType(defined) => defined == ty_name,
-                                             _ => false,
-                                         });
-                                         let needs_comma = idx < (table_items.len() - 1);
-                                         let item = format!("\n\t{col_name} {schema_prefix}{ty_resolved}{needs_comma} /* {ty_name} */",
-                                                            col_name = col_name.expect("An iterator of tuples should have `named!()` macro declarations."),
-                                                            schema_prefix = if let Some(graph_index) = graph_index {
-                                                                context.schema_prefix_for(&graph_index)
-                                                            } else { "".into() },
-                                                            ty_resolved = context.source_only_to_sql_type(source).or_else(|| {
-                                                                context.type_id_to_sql_type(*id)
-                                                            }).or_else(|| {
-                                                                let pat = ty_name.to_string();
-                                                                if let Some(found) = context.has_sql_declared_entity(&SqlDeclaredEntity::Type(pat.clone())) {
-                                                                    Some(found.sql())
-                                                                }  else if let Some(found) = context.has_sql_declared_entity(&SqlDeclaredEntity::Enum(pat.clone())) {
-                                                                    Some(found.sql())
-                                                                } else {
-                                                                    None
-                                                                }
-                                                            }).ok_or_else(|| eyre_err!("Failed to map return type `{}` to SQL type while building function `{}`.", ty_name, self.name))?,
-                                                            needs_comma = if needs_comma { ", " } else { " " },
-                                                            ty_name = ty_name
-                                         );
-                                         items.push_str(&item);
-                                     }
-                                     format!("RETURNS TABLE ({}\n)", items)
-                                 },
-                                 InventoryPgExternReturn::Trigger => String::from("RETURNS trigger"),
-                             },
-                             search_path = if let Some(search_path) = &self.search_path {
-                                 let retval = format!("SET search_path TO {}", search_path.join(", "));
-                                 retval + "\n"
-                             } else { Default::default() },
-                             extern_attrs = if extern_attrs.is_empty() {
-                                 String::default()
-                             } else {
-                                 let mut retval = extern_attrs.iter().map(|attr| format!("{}", attr).to_uppercase()).collect::<Vec<_>>().join(" ");
-                                 retval.push('\n');
-                                 retval
-                             },
-        );
-
-        let ext_sql = format!(
-            "\n\
-                                -- {file}:{line}\n\
-                                -- {module_path}::{name}\n\
-                                {fn_sql}\
-                                {overridden}\
-                            ",
-            name = self.name,
-            module_path = self.module_path,
-            file = self.file,
-            line = self.line,
-            fn_sql = if self.overridden.is_some() {
-                let mut inner = fn_sql
-                    .lines()
-                    .map(|f| format!("-- {}", f))
-                    .collect::<Vec<_>>()
-                    .join("\n");
-                inner.push_str(
-                    "\n--\n-- Overridden as (due to a `///` comment with a `pgxsql` code block):",
-                );
-                inner
-            } else {
-                fn_sql
-            },
-            overridden = self
-                .overridden
-                .map(|f| String::from("\n") + f + "\n")
-                .unwrap_or_default(),
-        );
-        tracing::debug!(sql = %ext_sql);
-
-        let rendered = match (self.overridden, &self.operator) {
-            (None, Some(op)) => {
-                let mut optionals = vec![];
-                if let Some(it) = op.commutator {
-                    optionals.push(format!("\tCOMMUTATOR = {}", it));
-                };
-                if let Some(it) = op.negator {
-                    optionals.push(format!("\tNEGATOR = {}", it));
-                };
-                if let Some(it) = op.restrict {
-                    optionals.push(format!("\tRESTRICT = {}", it));
-                };
-                if let Some(it) = op.join {
-                    optionals.push(format!("\tJOIN = {}", it));
-                };
-                if op.hashes {
-                    optionals.push(String::from("\tHASHES"));
-                };
-                if op.merges {
-                    optionals.push(String::from("\tMERGES"));
-                };
-
-                let left_arg = self.fn_args.get(0).ok_or_else(|| {
-                    eyre_err!("Did not find `left_arg` for operator `{}`.", self.name)
-                })?;
-                let left_arg_graph_index = context
-                    .graph
-                    .neighbors_undirected(self_index)
-                    .find(|neighbor| match &context.graph[*neighbor] {
-                        SqlGraphEntity::Type(ty) => ty.id_matches(&left_arg.ty_id),
-                        _ => false,
-                    })
-                    .ok_or_else(|| eyre_err!("Could not find left arg function in graph."))?;
-                let right_arg = self.fn_args.get(1).ok_or_else(|| {
-                    eyre_err!("Did not find `left_arg` for operator `{}`.", self.name)
-                })?;
-                let right_arg_graph_index = context
-                    .graph
-                    .neighbors_undirected(self_index)
-                    .find(|neighbor| match &context.graph[*neighbor] {
-                        SqlGraphEntity::Type(ty) => ty.id_matches(&right_arg.ty_id),
-                        _ => false,
-                    })
-                    .ok_or_else(|| eyre_err!("Could not find right arg function in graph."))?;
-
-                let operator_sql = format!("\n\
-                                        -- {file}:{line}\n\
-                                        -- {module_path}::{name}\n\
-                                        CREATE OPERATOR {opname} (\n\
-                                            \tPROCEDURE=\"{name}\",\n\
-                                            \tLEFTARG={schema_prefix_left}{left_arg}, /* {left_name} */\n\
-                                            \tRIGHTARG={schema_prefix_right}{right_arg}{maybe_comma} /* {right_name} */\n\
-                                            {optionals}\
-                                        );\
-                                    ",
-                                           opname = op.opname.unwrap(),
-                                           file = self.file,
-                                           line = self.line,
-                                           name = self.name,
-                                           module_path = self.module_path,
-                                           left_name = left_arg.full_path,
-                                           right_name = right_arg.full_path,
-                                           schema_prefix_left = context.schema_prefix_for(&left_arg_graph_index),
-                                           left_arg = context.type_id_to_sql_type(left_arg.ty_id).ok_or_else(|| eyre_err!("Failed to map argument `{}` type `{}` to SQL type while building operator `{}`.", left_arg.pattern, left_arg.full_path, self.name))?,
-                                           schema_prefix_right = context.schema_prefix_for(&right_arg_graph_index),
-                                           right_arg = context.type_id_to_sql_type(right_arg.ty_id).ok_or_else(|| eyre_err!("Failed to map argument `{}` type `{}` to SQL type while building operator `{}`.", right_arg.pattern, right_arg.full_path, self.name))?,
-                                           maybe_comma = if optionals.len() >= 1 { "," } else { "" },
-                                           optionals = optionals.join(",\n") + "\n"
-                );
-                tracing::debug!(sql = %operator_sql);
-                ext_sql + &operator_sql
-            }
-            (None, None) | (Some(_), Some(_)) | (Some(_), None) => ext_sql,
-        };
-        Ok(rendered)
     }
 }
