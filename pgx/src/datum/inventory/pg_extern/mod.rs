@@ -3,7 +3,6 @@ mod operator;
 mod returning;
 
 use eyre::eyre as eyre_err;
-use eyre::WrapErr;
 
 pub use argument::InventoryPgExternInput;
 pub use operator::InventoryPgOperator;

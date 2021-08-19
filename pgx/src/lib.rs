@@ -306,6 +306,11 @@ macro_rules! pg_magic_func {
 #[macro_export]
 macro_rules! pg_inventory_magic {
     () => {
+        #[no_mangle]
+        #[link(name = "unwind", kind = "static")]
+        pub extern "C" fn __pgx_internals_dummy() {
+            // ...
+        }
         /// A module containing [`pgx`] internals.
         ///
         /// This is created by [`macro@pgx::pg_module_magic`] (or, in rare cases,
@@ -345,6 +350,85 @@ macro_rules! pg_inventory_magic {
             });
 
             static INVENTORY_DIR: &str = pgx::inventory_dir!();
+        }
+    };
+}
+
+/// Create the default SQL generator code.
+///
+/// Accepts a single argument, which should be the crate name.
+///
+/// ```ignore
+/// // src/bin/sql-generator.rs
+/// pg_binary_magic!(crate_name);
+/// ```
+///
+/// This creates a binary that:
+///  * Has [`tracing`](pgx_utils::pg_inventory::tracing) and [`color_eyre`](`pgx_utils::pg_inventory::color_eyre`) set up.
+///  * Supports [`EnvFilter`](pgx_utils::pg_inventory::tracing_subscriber::EnvFilter) log level configuration.
+///  * Accepts up to two arguments, an SQL destination and (optionally) a GraphViz DOT destination.
+///
+/// Using different SQL generator code should be considered an advanced use case, and not
+/// recommended.
+///
+/// <div class="example-wrap" style="display:inline-block">
+/// <pre class="ignore" style="white-space:normal;font:inherit;">
+///
+/// **Note**: `cargo pgx schema` or similar commands will automatically scaffold your
+/// `src/bin/sql-generator.rs` with this if it's not already present.
+///
+/// </pre></div>
+#[macro_export]
+macro_rules! pg_binary_magic {
+    ($($prelude:ident)::*) => {
+        fn main() -> pgx::pg_inventory::color_eyre::Result<()> {
+            use pgx::pg_inventory::{
+                tracing_error::ErrorLayer,
+                tracing,
+                tracing_subscriber::{self, util::SubscriberInitExt, layer::SubscriberExt, EnvFilter},
+                color_eyre,
+                eyre,
+                libloading,
+            };
+            pub use $($prelude :: )*__pgx_internals_dummy;
+            use std::env;
+
+            // Initialize tracing with tracing-error, and eyre
+            let fmt_layer = tracing_subscriber::fmt::Layer::new()
+                .pretty();
+            let filter_layer = EnvFilter::try_from_default_env()
+                .or_else(|_| EnvFilter::try_new("info"))
+                .unwrap();
+            tracing_subscriber::registry()
+                .with(filter_layer)
+                .with(fmt_layer)
+                .with(ErrorLayer::default())
+                .init();
+            color_eyre::install()?;
+
+            // We don't really need a full argument parser here quite yet.
+            let mut args = env::args().skip(1);
+            let path = args.next().unwrap_or(concat!(
+                "./sql/",
+                core::env!("CARGO_PKG_NAME"),
+                "--",
+                core::env!("CARGO_PKG_VERSION"),
+                ".sql"
+            ).into());
+            let dot: Option<String> = args.next();
+            if args.next().is_some() {
+                return Err(eyre::eyre!("Only accepts two arguments, the destination path, and an optional (GraphViz) dot output path"));
+            }
+
+            tracing::info!(path = %path, "Writing SQL");
+            unsafe {
+                __pgx_internals_dummy(); // We *must* use this.
+                let lib = libloading::os::unix::Library::this();
+                let sym: libloading::os::unix::Symbol<
+                    unsafe extern fn()
+                > = lib.get("__pgx_internals_fn_rstore".as_bytes()).unwrap();
+            };
+            Ok(())
         }
     };
 }

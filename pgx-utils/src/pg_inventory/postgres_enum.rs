@@ -1,5 +1,4 @@
 use std::{
-    hash::{Hash, Hasher},
     io::Write,
     fs::{create_dir_all, File},
 };
@@ -113,9 +112,9 @@ impl ToTokens for PostgresEnum {
                 &V1_API
             }
 
-            #[pgx::pg_guard]
             #[no_mangle]
-            pub extern "C" fn  #inventory_fn_name(fcinfo: pgx::pg_sys::FunctionCallInfo) -> pgx::pg_sys::Datum {
+            #[link(kind = "static")]
+            pub extern "C" fn  #inventory_fn_name() -> pgx::inventory::InventoryPostgresEnum {
                 let mut mappings = Default::default();
                 <#name #ty_generics as pgx::datum::WithTypeIds>::register_with_refs(&mut mappings, stringify!(#name).to_string());
                 pgx::datum::WithSizedTypeIds::<#name #ty_generics>::register_sized_with_refs(&mut mappings, stringify!(#name).to_string());
@@ -131,8 +130,7 @@ impl ToTokens for PostgresEnum {
                     mappings,
                     variants: vec![ #(  stringify!(#variants)  ),* ],
                 };
-                use pgx::IntoDatum;
-                return submission.into_datum().unwrap();
+                submission
             }
         };
         tokens.append_all(inv);

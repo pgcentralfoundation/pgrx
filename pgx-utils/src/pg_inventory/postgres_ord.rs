@@ -110,9 +110,9 @@ impl ToTokens for PostgresOrd {
                 &V1_API
             }
 
-            #[pgx::pg_guard]
             #[no_mangle]
-            pub extern "C" fn  #inventory_fn_name(fcinfo: pgx::pg_sys::FunctionCallInfo) -> pgx::pg_sys::Datum {
+            #[link(kind = "static")]
+            pub extern "C" fn  #inventory_fn_name() -> pgx::pg_inventory::InventoryPostgresOrd {
                 use core::any::TypeId;
                 let submission = pgx::pg_inventory::InventoryPostgresOrd {
                     name: stringify!(#name),
@@ -122,8 +122,7 @@ impl ToTokens for PostgresOrd {
                     module_path: module_path!(),
                     id: TypeId::of::<#name>(),
                 };
-                use pgx::IntoDatum;
-                return submission.into_datum().unwrap();
+                submission
             }
         };
         tokens.append_all(inv);

@@ -34,7 +34,6 @@ pub(crate) fn impl_postgres_ord(ast: DeriveInput) -> proc_macro2::TokenStream {
     stream.extend(cmp(&ast.ident, found_skip_inventory));
 
     let inventory_item = pg_inventory::PostgresOrd::new(ast.ident.clone());
-    inventory_item.inventory(super::inventory_dir_fn().into());
     if !found_skip_inventory {
         inventory_item.to_tokens(&mut stream);
     }

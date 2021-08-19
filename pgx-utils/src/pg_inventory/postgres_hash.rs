@@ -95,20 +95,10 @@ impl ToTokens for PostgresHash {
             &format!("__pgx_internals_hash_{}", self.name),
             Span::call_site(),
         );
-        let pg_finfo_fn_name = syn::Ident::new(
-            &format!("pg_finfo_{}_wrapper", inventory_fn_name),
-            Span::call_site(),
-        );
         let inv = quote! {
             #[no_mangle]
-            pub extern "C" fn  #pg_finfo_fn_name() -> &'static pg_sys::Pg_finfo_record {
-                const V1_API: pg_sys::Pg_finfo_record = pg_sys::Pg_finfo_record { api_version: 1 };
-                &V1_API
-            }
-
-            #[pgx::pg_guard]
-            #[no_mangle]
-            pub extern "C" fn  #inventory_fn_name(fcinfo: pgx::pg_sys::FunctionCallInfo) -> pgx::pg_sys::Datum {
+            #[link(kind = "static")]
+            pub extern "C" fn  #inventory_fn_name(fcinfo: pgx::pg_sys::FunctionCallInfo) -> pgx::pg_inventory::InventoryPostgresHash {
                 use core::any::TypeId;
                 let submission = pgx::pg_inventory::InventoryPostgresHash {
                     name: stringify!(#name),
@@ -118,8 +108,7 @@ impl ToTokens for PostgresHash {
                     module_path: module_path!(),
                     id: TypeId::of::<#name>(),
                 };
-                use pgx::IntoDatum;
-                return submission.into_datum().unwrap();
+                submission
             }
         };
         tokens.append_all(inv);

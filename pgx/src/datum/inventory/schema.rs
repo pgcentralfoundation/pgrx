@@ -1,8 +1,4 @@
 use super::{DotIdentifier, SqlGraphEntity, ToSql};
-use std::{
-    io::Write,
-    fs::{create_dir_all, File}
-};
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct InventorySchema {

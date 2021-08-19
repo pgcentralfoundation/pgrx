@@ -1,4 +1,4 @@
-use std::{io::Write, fs::{create_dir_all, File}, fmt::Display};
+use std::fmt::Display;
 
 use super::{DotIdentifier, SqlGraphEntity, ToSql};
 use pgx_utils::pg_inventory::SqlDeclaredEntity;

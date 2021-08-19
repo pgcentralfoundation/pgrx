@@ -20,7 +20,6 @@ pub use postgres_hash::PostgresHash;
 pub use postgres_ord::PostgresOrd;
 pub use postgres_type::PostgresType;
 pub use super::ExternArgs;
-use serde::{Deserialize, Serialize, Serializer};
 
 // Reexports for the pgx extension inventory builders.
 #[doc(hidden)]
@@ -37,5 +36,5 @@ pub use tracing;
 pub use tracing_error;
 #[doc(hidden)]
 pub use tracing_subscriber;
-
-use core::{any::TypeId, fmt::Debug};
+#[doc(hidden)]
+pub use libloading;
