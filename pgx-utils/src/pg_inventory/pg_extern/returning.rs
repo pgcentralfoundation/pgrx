@@ -180,13 +180,13 @@ impl ToTokens for Returning {
     fn to_tokens(&self, tokens: &mut TokenStream2) {
         let quoted = match self {
             Returning::None => quote! {
-                pgx::nventory::InventoryPgExternReturn::None
+                pgx::datum::inventory::InventoryPgExternReturn::None
             },
             Returning::Type(ty) => {
                 let ty_string = ty.to_token_stream().to_string()
                     .replace(" ", "");
                 quote! {
-                    pgx::inventory::InventoryPgExternReturn::Type {
+                    pgx::datum::inventory::InventoryPgExternReturn::Type {
                         id: format!("{:?}", TypeId::of::<#ty>()),
                         source: #ty_string,
                         full_path: core::any::type_name::<#ty>(),
@@ -203,7 +203,7 @@ impl ToTokens for Returning {
                 let ty_string = ty.to_token_stream().to_string()
                     .replace(" ", "");
                 quote! {
-                    pgx::inventory::InventoryPgExternReturn::SetOf {
+                    pgx::datum::inventory::InventoryPgExternReturn::SetOf {
                         id: format!("{:?}", TypeId::of::<#ty>()),
                         source: #ty_string,
                         full_path: core::any::type_name::<#ty>(),

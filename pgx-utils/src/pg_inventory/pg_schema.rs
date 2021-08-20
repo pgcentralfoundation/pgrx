@@ -82,7 +82,7 @@ impl ToTokens for Schema {
                     #[no_mangle]
                     #[link(kind = "static")]
                     pub extern "C" fn  #inventory_fn_name() -> pgx::datum::inventory::SqlGraphEntity {
-                        let submission = pgx::pg_inventory::InventorySchema {
+                        let submission = pgx::datum::inventory::InventorySchema {
                             module_path: module_path!(),
                             name: stringify!(#ident),
                             file: file!(),
