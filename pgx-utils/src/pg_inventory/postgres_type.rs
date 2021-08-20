@@ -124,7 +124,7 @@ impl ToTokens for PostgresType {
         let inv = quote! {
             #[no_mangle]
             #[link(kind = "static")]
-            pub extern "C" fn  #inventory_fn_name() -> pgx::inventory::InventoryPostgresType {
+            pub extern "C" fn  #inventory_fn_name() -> pgx::datum::inventory::SqlGraphEntity {
                //let filename = pgx::fcinfo::pg_getarg::<String>(fcinfo, 0).expect("filename arg was NULL");
 
                 let mut mappings = Default::default();
@@ -154,7 +154,7 @@ impl ToTokens for PostgresType {
                         path_items.join("::")
                     }
                 };
-                submission
+                pgx::datum::inventory::SqlGraphEntity::Type(submission)
             }
         };
         tokens.append_all(inv);

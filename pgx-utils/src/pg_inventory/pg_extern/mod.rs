@@ -235,7 +235,7 @@ impl ToTokens for PgExtern {
         let inv = quote! {
             #[no_mangle]
             #[link(kind = "static")]
-            pub extern "C" fn  #inventory_fn_name() -> pgx::inventory::InventoryPgExtern {
+            pub extern "C" fn  #inventory_fn_name() -> pgx::datum::inventory::SqlGraphEntity {
                 use core::any::TypeId;
                 let submission = pgx::inventory::InventoryPgExtern {
                     name: #name,
@@ -252,7 +252,7 @@ impl ToTokens for PgExtern {
                     operator: None#( .unwrap_or(Some(#operator)) )*,
                     overridden: None#( .unwrap_or(Some(#overridden)) )*,
                 };
-                submission
+                pgx::datum::inventory::SqlGraphEntity::Function(submission)
             }
         };
         tokens.append_all(inv);

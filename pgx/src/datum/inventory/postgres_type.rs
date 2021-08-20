@@ -47,8 +47,8 @@ impl InventoryPostgresType {
     }
 }
 
-impl<'a> Into<SqlGraphEntity<'a>> for &'a InventoryPostgresType {
-    fn into(self) -> SqlGraphEntity<'a> {
+impl Into<SqlGraphEntity> for InventoryPostgresType {
+    fn into(self) -> SqlGraphEntity {
         SqlGraphEntity::Type(self)
     }
 }

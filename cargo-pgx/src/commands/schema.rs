@@ -2,7 +2,7 @@ use crate::commands::get::find_control_file;
 use crate::commands::get::get_property;
 use pgx_utils::pg_config::PgConfig;
 use pgx_utils::{exit_with_error, handle_result};
-use std::{process::{Command, Stdio}, io::{Read, Write}, path::Path};
+use std::{process::{Command, Stdio}, io::{Read, Write}, path::PathBuf};
 use symbolic::{common::{ByteView, DSymPathExt}, debuginfo::{Archive, SymbolIterator}};
 
 pub(crate) fn generate_schema(
@@ -40,6 +40,7 @@ pub(crate) fn generate_schema(
     ",
         crate_name
     );
+
     std::fs::create_dir_all("src/bin").expect("Could not create bin dir.");
     let generator_source_path = "src/bin/sql-generator.rs";
     let mut sql_gen_source_file = std::fs::OpenOptions::new()
@@ -124,9 +125,9 @@ pub(crate) fn generate_schema(
     }
     
     // Inspect the symbol table for a list of `__pgx_internals` we should have the generator call]
-    let sql_gen_path = Path::new("target/debug/sql-generator");
+    let sql_gen_path = PathBuf::from(format!("target/{}/sql-generator", if is_release { "release" } else { "debug" }));
     let dsym_path = sql_gen_path.resolve_dsym();
-    let buffer = ByteView::open(dsym_path.as_deref().unwrap_or(sql_gen_path))?;
+    let buffer = ByteView::open(dsym_path.as_deref().unwrap_or(&sql_gen_path))?;
     let archive = Archive::parse(&buffer).unwrap();
 
     let mut fns_to_call = Vec::new();

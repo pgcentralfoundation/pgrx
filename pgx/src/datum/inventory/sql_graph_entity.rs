@@ -5,21 +5,21 @@ use super::{
 
 /// An entity corresponding to some SQL required by the extension.
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub enum SqlGraphEntity<'a> {
-    ExtensionRoot(&'a ControlFile),
-    Schema(&'a InventorySchema),
-    CustomSql(&'a InventoryExtensionSql),
-    Function(&'a InventoryPgExtern),
-    Type(&'a InventoryPostgresType),
-    BuiltinType(&'a str),
-    Enum(&'a InventoryPostgresEnum),
-    Ord(&'a InventoryPostgresOrd),
-    Hash(&'a InventoryPostgresHash),
+pub enum SqlGraphEntity {
+    ExtensionRoot(ControlFile),
+    Schema(InventorySchema),
+    CustomSql(InventoryExtensionSql),
+    Function(InventoryPgExtern),
+    Type(InventoryPostgresType),
+    BuiltinType(String),
+    Enum(InventoryPostgresEnum),
+    Ord(InventoryPostgresOrd),
+    Hash(InventoryPostgresHash),
 }
 
-impl<'a> SqlGraphEntity<'a> {}
+impl SqlGraphEntity {}
 
-impl<'a> DotIdentifier for SqlGraphEntity<'a> {
+impl DotIdentifier for SqlGraphEntity {
     fn dot_identifier(&self) -> String {
         match self {
             SqlGraphEntity::Schema(item) => item.dot_identifier(),
@@ -35,7 +35,7 @@ impl<'a> DotIdentifier for SqlGraphEntity<'a> {
     }
 }
 
-impl<'a> ToSql for SqlGraphEntity<'a> {
+impl ToSql for SqlGraphEntity {
     fn to_sql(&self, context: &super::PgxSql) -> eyre::Result<String> {
         match self {
             SqlGraphEntity::Schema(item) => if item.name != "public" && item.name != "pg_catalog" {

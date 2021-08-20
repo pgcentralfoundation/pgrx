@@ -98,7 +98,7 @@ impl ToTokens for PostgresHash {
         let inv = quote! {
             #[no_mangle]
             #[link(kind = "static")]
-            pub extern "C" fn  #inventory_fn_name(fcinfo: pgx::pg_sys::FunctionCallInfo) -> pgx::pg_inventory::InventoryPostgresHash {
+            pub extern "C" fn  #inventory_fn_name() -> pgx::datum::inventory::SqlGraphEntity {
                 use core::any::TypeId;
                 let submission = pgx::pg_inventory::InventoryPostgresHash {
                     name: stringify!(#name),
@@ -108,7 +108,7 @@ impl ToTokens for PostgresHash {
                     module_path: module_path!(),
                     id: TypeId::of::<#name>(),
                 };
-                submission
+                pgx::datum::inventory::SqlGraphEntity::Hash(submission)
             }
         };
         tokens.append_all(inv);

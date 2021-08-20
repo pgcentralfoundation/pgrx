@@ -8,8 +8,8 @@ pub struct InventorySchema {
     pub line: u32,
 }
 
-impl<'a> Into<SqlGraphEntity<'a>> for &'a InventorySchema {
-    fn into(self) -> SqlGraphEntity<'a> {
+impl Into<SqlGraphEntity> for InventorySchema {
+    fn into(self) -> SqlGraphEntity {
         SqlGraphEntity::Schema(self)
     }
 }

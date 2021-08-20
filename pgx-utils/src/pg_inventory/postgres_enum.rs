@@ -114,7 +114,7 @@ impl ToTokens for PostgresEnum {
 
             #[no_mangle]
             #[link(kind = "static")]
-            pub extern "C" fn  #inventory_fn_name() -> pgx::inventory::InventoryPostgresEnum {
+            pub extern "C" fn  #inventory_fn_name() -> pgx::datum::inventory::SqlGraphEntity {
                 let mut mappings = Default::default();
                 <#name #ty_generics as pgx::datum::WithTypeIds>::register_with_refs(&mut mappings, stringify!(#name).to_string());
                 pgx::datum::WithSizedTypeIds::<#name #ty_generics>::register_sized_with_refs(&mut mappings, stringify!(#name).to_string());
@@ -130,7 +130,7 @@ impl ToTokens for PostgresEnum {
                     mappings,
                     variants: vec![ #(  stringify!(#variants)  ),* ],
                 };
-                submission
+                pgx::datum::inventory::SqlGraphEntity::Enum(submission)
             }
         };
         tokens.append_all(inv);

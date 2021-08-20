@@ -112,7 +112,7 @@ impl ToTokens for PostgresOrd {
 
             #[no_mangle]
             #[link(kind = "static")]
-            pub extern "C" fn  #inventory_fn_name() -> pgx::pg_inventory::InventoryPostgresOrd {
+            pub extern "C" fn  #inventory_fn_name() -> pgx::datum::inventory::SqlGraphEntity {
                 use core::any::TypeId;
                 let submission = pgx::pg_inventory::InventoryPostgresOrd {
                     name: stringify!(#name),
@@ -122,7 +122,7 @@ impl ToTokens for PostgresOrd {
                     module_path: module_path!(),
                     id: TypeId::of::<#name>(),
                 };
-                submission
+                pgx::datum::inventory::SqlGraphEntity::Ord(submission)
             }
         };
         tokens.append_all(inv);

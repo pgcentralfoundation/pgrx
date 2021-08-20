@@ -33,8 +33,8 @@ pub struct InventoryPgExtern {
 
 impl crate::PostgresType for InventoryPgExtern {}
 
-impl<'a> Into<SqlGraphEntity<'a>> for &'a InventoryPgExtern {
-    fn into(self) -> SqlGraphEntity<'a> {
+impl Into<SqlGraphEntity> for InventoryPgExtern {
+    fn into(self) -> SqlGraphEntity {
         SqlGraphEntity::Function(self)
     }
 }

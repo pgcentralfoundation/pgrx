@@ -33,8 +33,8 @@ impl InventoryExtensionSql {
     }
 }
 
-impl<'a> Into<SqlGraphEntity<'a>> for &'a InventoryExtensionSql {
-    fn into(self) -> SqlGraphEntity<'a> {
+impl Into<SqlGraphEntity> for InventoryExtensionSql {
+    fn into(self) -> SqlGraphEntity {
         SqlGraphEntity::CustomSql(self)
     }
 }

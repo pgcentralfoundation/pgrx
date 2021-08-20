@@ -93,8 +93,8 @@ impl ControlFile {
     }
 }
 
-impl<'a> Into<SqlGraphEntity<'a>> for &'a ControlFile {
-    fn into(self) -> SqlGraphEntity<'a> {
+impl Into<SqlGraphEntity> for ControlFile {
+    fn into(self) -> SqlGraphEntity {
         SqlGraphEntity::ExtensionRoot(self)
     }
 }

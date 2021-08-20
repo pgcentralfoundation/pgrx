@@ -307,9 +307,9 @@ macro_rules! pg_magic_func {
 macro_rules! pg_inventory_magic {
     () => {
         #[no_mangle]
-        #[link(name = "unwind", kind = "static")]
-        pub extern "C" fn __pgx_internals_dummy() {
-            // ...
+        #[link(kind = "static")]
+        pub extern "C" fn __pgx_marker() {
+            ()
         }
         /// A module containing [`pgx`] internals.
         ///
@@ -339,7 +339,7 @@ macro_rules! pg_inventory_magic {
             use crate::once_cell::sync::Lazy;
 
             /// The contents of the `*.control` file of the crate.
-            static CONTROL_FILE: Lazy<ControlFile> = Lazy::new(|| {
+            pub static CONTROL_FILE: Lazy<ControlFile> = Lazy::new(|| {
                 let context = include_str!(concat!(
                     env!("CARGO_MANIFEST_DIR"),
                     "/",
@@ -348,8 +348,7 @@ macro_rules! pg_inventory_magic {
                 ));
                 ControlFile::try_from(context).expect("Could not parse control file, was it valid?")
             });
-
-            static INVENTORY_DIR: &str = pgx::inventory_dir!();
+            pub static INVENTORY_DIR: &str = pgx::inventory_dir!();
         }
     };
 }
@@ -382,17 +381,20 @@ macro_rules! pg_inventory_magic {
 macro_rules! pg_binary_magic {
     ($($prelude:ident)::*) => {
         fn main() -> pgx::pg_inventory::color_eyre::Result<()> {
-            use pgx::pg_inventory::{
-                tracing_error::ErrorLayer,
-                tracing,
-                tracing_subscriber::{self, util::SubscriberInitExt, layer::SubscriberExt, EnvFilter},
-                color_eyre,
-                eyre,
-                libloading,
-                clap,
+            use pgx::{
+                pg_inventory::{
+                    tracing_error::ErrorLayer,
+                    tracing,
+                    tracing_subscriber::{self, util::SubscriberInitExt, layer::SubscriberExt, EnvFilter},
+                    color_eyre,
+                    eyre,
+                    libloading,
+                    clap,
+                },
+                inventory::PgxSql,
             };
-            pub use $($prelude :: )*__pgx_internals_dummy;
-            __pgx_internals_dummy(); // We *must* use this.
+            pub use $($prelude :: )*{__pgx_marker, __pgx_internals::CONTROL_FILE};
+            __pgx_marker(); // We *must* use this.
             use std::env;
 
             let matches = clap::App::new("sql-generator")
@@ -423,19 +425,30 @@ macro_rules! pg_binary_magic {
                 ".sql"
             ).into());
             let dot = matches.value_of("dot");
-            let symbols_to_call = matches.values_of("symbols").unwrap();
+            let symbols_to_call = matches.values_of("symbols").unwrap_or(Default::default());
 
             tracing::info!(path = %path, "Writing SQL");
+            let mut entities = Vec::default();
+            entities.push(pgx::inventory::SqlGraphEntity::ExtensionRoot(CONTROL_FILE.clone()));
             unsafe {
                 let lib = libloading::os::unix::Library::this();
                 for symbol_to_call in symbols_to_call {
                     let symbol: libloading::os::unix::Symbol<
-                        unsafe extern fn()
+                        unsafe extern fn() -> pgx::datum::inventory::SqlGraphEntity
                     > = lib.get(symbol_to_call.as_bytes()).unwrap();
-                    symbol();
-                    println!("Called {}", symbol_to_call);
+                    let entity = symbol();
+                    entities.push(entity);
                 }
             };
+
+            let pgx_sql = PgxSql::build(pgx::DEFAULT_TYPEID_SQL_MAPPING.clone().into_iter(), pgx::DEFAULT_SOURCE_ONLY_SQL_MAPPING.clone().into_iter(), entities.into_iter()).unwrap();
+
+            tracing::info!(path = %path, "Writing SQL");
+            pgx_sql.to_file(path)?;
+            if let Some(dot_path) = dot {
+                tracing::info!(dot = %dot_path, "Writing Graphviz DOT");
+                pgx_sql.to_dot(dot_path)?;
+            }
             Ok(())
         }
     };

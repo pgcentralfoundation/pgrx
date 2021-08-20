@@ -43,8 +43,8 @@ impl InventoryPostgresEnum {
     }
 }
 
-impl<'a> Into<SqlGraphEntity<'a>> for &'a InventoryPostgresEnum {
-    fn into(self) -> SqlGraphEntity<'a> {
+impl Into<SqlGraphEntity> for InventoryPostgresEnum {
+    fn into(self) -> SqlGraphEntity {
         SqlGraphEntity::Enum(self)
     }
 }

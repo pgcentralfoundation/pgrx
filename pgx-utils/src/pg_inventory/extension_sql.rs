@@ -118,7 +118,7 @@ impl ToTokens for ExtensionSqlFile {
             let inv = quote! {
                 #[no_mangle]
                 #[link(kind = "static")]
-                pub extern "C" fn  #inventory_fn_name() -> pgx::pg_inventory::InventoryExtensionSql {
+                pub extern "C" fn  #inventory_fn_name() -> pgx::datum::inventory::SqlGraphEntity {
                     let submission = pgx::pg_inventory::InventoryExtensionSql {
                         sql: include_str!(#path),
                         module_path: module_path!(),
@@ -132,8 +132,7 @@ impl ToTokens for ExtensionSqlFile {
                         after: vec![#(#after_iter),*],
                         creates: vec![#(#creates_iter),*],
                     };
-                    use pgx::IntoDatum;
-                    return submission.into_datum().unwrap();
+                    pgx::datum::inventory::SqlGraphEntity::Sql(submission);
                 }
             };
             tokens.append_all(inv);

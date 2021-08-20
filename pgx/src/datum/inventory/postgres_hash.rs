@@ -10,8 +10,8 @@ pub struct InventoryPostgresHash {
     pub id: core::any::TypeId,
 }
 
-impl<'a> Into<SqlGraphEntity<'a>> for &'a InventoryPostgresHash {
-    fn into(self) -> SqlGraphEntity<'a> {
+impl Into<SqlGraphEntity> for InventoryPostgresHash {
+    fn into(self) -> SqlGraphEntity {
         SqlGraphEntity::Hash(self)
     }
 }
