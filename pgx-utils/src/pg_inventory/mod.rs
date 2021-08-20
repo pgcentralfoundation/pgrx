@@ -38,3 +38,5 @@ pub use tracing_error;
 pub use tracing_subscriber;
 #[doc(hidden)]
 pub use libloading;
+#[doc(hidden)]
+pub use clap;

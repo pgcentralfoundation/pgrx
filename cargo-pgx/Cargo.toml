@@ -29,3 +29,4 @@ syn = { version = "1.0.71", features = [ "extra-traits", "full", "fold", "parsin
 unescape = "0.1.0"
 fork = "0.1.18"
 libloading = "0.7"
+symbolic = "8.3.0"

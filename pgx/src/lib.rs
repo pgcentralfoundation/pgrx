@@ -389,9 +389,17 @@ macro_rules! pg_binary_magic {
                 color_eyre,
                 eyre,
                 libloading,
+                clap,
             };
             pub use $($prelude :: )*__pgx_internals_dummy;
+            __pgx_internals_dummy(); // We *must* use this.
             use std::env;
+
+            let matches = clap::App::new("sql-generator")
+                .arg(clap::Arg::with_name("sql").long("sql").value_name("FILE").takes_value(true))
+                .arg(clap::Arg::with_name("dot").long("dot").value_name("FILE").takes_value(true))
+                .arg(clap::Arg::with_name("symbols").value_name("SYMBOL").multiple(true).takes_value(true))
+                .get_matches();
 
             // Initialize tracing with tracing-error, and eyre
             let fmt_layer = tracing_subscriber::fmt::Layer::new()
@@ -407,26 +415,26 @@ macro_rules! pg_binary_magic {
             color_eyre::install()?;
 
             // We don't really need a full argument parser here quite yet.
-            let mut args = env::args().skip(1);
-            let path = args.next().unwrap_or(concat!(
+            let path = matches.value_of("sql").unwrap_or(concat!(
                 "./sql/",
                 core::env!("CARGO_PKG_NAME"),
                 "--",
                 core::env!("CARGO_PKG_VERSION"),
                 ".sql"
             ).into());
-            let dot: Option<String> = args.next();
-            if args.next().is_some() {
-                return Err(eyre::eyre!("Only accepts two arguments, the destination path, and an optional (GraphViz) dot output path"));
-            }
+            let dot = matches.value_of("dot");
+            let symbols_to_call = matches.values_of("symbols").unwrap();
 
             tracing::info!(path = %path, "Writing SQL");
             unsafe {
-                __pgx_internals_dummy(); // We *must* use this.
                 let lib = libloading::os::unix::Library::this();
-                let sym: libloading::os::unix::Symbol<
-                    unsafe extern fn()
-                > = lib.get("__pgx_internals_fn_rstore".as_bytes()).unwrap();
+                for symbol_to_call in symbols_to_call {
+                    let symbol: libloading::os::unix::Symbol<
+                        unsafe extern fn()
+                    > = lib.get(symbol_to_call.as_bytes()).unwrap();
+                    symbol();
+                    println!("Called {}", symbol_to_call);
+                }
             };
             Ok(())
         }

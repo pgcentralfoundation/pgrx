@@ -2,8 +2,8 @@ use crate::commands::get::find_control_file;
 use crate::commands::get::get_property;
 use pgx_utils::pg_config::PgConfig;
 use pgx_utils::{exit_with_error, handle_result};
-use std::io::{Read, Write};
-use std::process::{Command, Stdio};
+use std::{process::{Command, Stdio}, io::{Read, Write}, path::Path};
+use symbolic::{common::{ByteView, DSymPathExt}, debuginfo::{Archive, SymbolIterator}};
 
 pub(crate) fn generate_schema(
     pg_config: &PgConfig,
@@ -89,6 +89,70 @@ pub(crate) fn generate_schema(
         let _ = write!(&mut additional_features, " {}", features);
         features = additional_features
     }
+
+    // First, build the SQL generator so we can get a look at the symbol table.
+    let mut command = Command::new("cargo");
+    command.args(&["build", "--bin", "sql-generator"]);
+    if is_release {
+        command.arg("--release");
+    }
+
+    command.env("RUST_LOG", log_level);
+
+    if !features.trim().is_empty() {
+        command.arg("--features");
+        command.arg(&features);
+        command.arg("--no-default-features");
+    }
+
+    for arg in flags.split_ascii_whitespace() {
+        command.arg(arg);
+    }
+
+    let command = command.stdout(Stdio::inherit()).stderr(Stdio::inherit());
+    let command_str = format!("{:?}", command);
+    println!(
+        "building SQL generator with features `{}`\n{}",
+        features, command_str
+    );
+    let status = handle_result!(
+        command.status(),
+        format!("failed to spawn cargo: {}", command_str)
+    );
+    if !status.success() {
+        exit_with_error!("failed to build SQL generator");
+    }
+    
+    // Inspect the symbol table for a list of `__pgx_internals` we should have the generator call]
+    let sql_gen_path = Path::new("target/debug/sql-generator");
+    let dsym_path = sql_gen_path.resolve_dsym();
+    let buffer = ByteView::open(dsym_path.as_deref().unwrap_or(sql_gen_path))?;
+    let archive = Archive::parse(&buffer).unwrap();
+
+    let mut fns_to_call = Vec::new();
+    for object in archive.objects() {
+        match object {
+            Ok(object) => {
+                match object.symbols() {
+                    SymbolIterator::Elf(iter) => {
+                        for symbol in iter {
+                            if let Some(name) = symbol.name {
+                                if name.starts_with("__pgx_internals") {
+                                    fns_to_call.push(name);
+                                }
+                            }
+                        }
+                    },
+                    _ => unimplemented!(),
+                }
+            }
+            Err(_e) => {
+                unimplemented!();
+            }
+        }
+    }
+
+    // Now run the generator with the correct symbol table
     let mut command = Command::new("cargo");
     command.args(&["run", "--bin", "sql-generator"]);
     if is_release {
@@ -110,15 +174,20 @@ pub(crate) fn generate_schema(
     let path = path.as_ref();
     let _ = path.parent().map(|p| std::fs::create_dir_all(&p).unwrap());
     command.arg("--");
+    command.arg("--sql");
     command.arg(path);
     if let Some(dot) = dot {
+        command.arg("--dot");
         command.arg(dot.as_ref());
+    }
+    for fn_to_call in fns_to_call {
+        command.arg(fn_to_call.to_string());
     }
 
     let command = command.stdout(Stdio::inherit()).stderr(Stdio::inherit());
     let command_str = format!("{:?}", command);
     println!(
-        "running SQL generator features `{}`\n{}",
+        "running SQL generator with features `{}`\n{}",
         features, command_str
     );
     let status = handle_result!(
