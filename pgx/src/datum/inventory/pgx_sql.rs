@@ -485,7 +485,7 @@ fn connect_extension_sqls(
                 }
                 InventoryExtensionSqlPositioningRef::Name(name) => {
                     for (other, other_index) in extension_sqls {
-                        if other.name == Some(name) {
+                        if other.name == *name {
                             tracing::trace!(from = ?item.identifier(), to = ?other.identifier(), "Adding ExtensionSQL after ExtensionSql edge.");
                             graph.add_edge(*other_index, index, SqlGraphRelationship::RequiredBy);
                             break;
@@ -521,7 +521,7 @@ fn connect_extension_sqls(
                 }
                 InventoryExtensionSqlPositioningRef::Name(name) => {
                     for (other, other_index) in extension_sqls {
-                        if other.name == Some(name) {
+                        if other.name == *name {
                             tracing::trace!(from = ?item.full_path, to = ?other.full_path, "Adding ExtensionSQL after ExtensionSql edge.");
                             graph.add_edge(index, *other_index, SqlGraphRelationship::RequiredBy);
                             break;

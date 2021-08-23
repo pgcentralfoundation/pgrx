@@ -52,36 +52,36 @@ CREATE TYPE Dog AS ENUM (
 -- src/lib.rs:46
 
 
-        INSERT INTO extension_sql VALUES ('single');
+        INSERT INTO extension_sql VALUES ('single_raw');
 
 
 -- src/lib.rs:62
 -- after
---   single
+--   single_raw
 
-INSERT INTO extension_sql VALUES ('single.sql');
+INSERT INTO extension_sql VALUES ('single');
 
 
 -- src/lib.rs:52
 -- after
 --   Dog
 --   home::Ball
+--   single_raw
 --   single
---   single.sql
 
 
-INSERT INTO extension_sql VALUES ('multiple');
+INSERT INTO extension_sql VALUES ('multiple_raw');
 
 
 -- src/lib.rs:63
 -- after
 --   Dog
 --   home::Ball
+--   single_raw
 --   single
---   single.sql
---   multiple
+--   multiple_raw
 
-INSERT INTO extension_sql VALUES ('multiple.sql');
+INSERT INTO extension_sql VALUES ('multiple');
 
 
 -- src/lib.rs:67

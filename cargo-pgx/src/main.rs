@@ -266,7 +266,10 @@ fn do_it() -> std::result::Result<(), std::io::Error> {
                     },
                 };
 
-                schema::generate_schema(&pg_config, is_release, &features, &out, dot, &log_level)
+                let default = schema.is_present("force-default");
+                let manual = schema.is_present("manual");
+
+                schema::generate_schema(&pg_config, is_release, &features, &out, dot, &log_level, default, manual)
             }
             ("get", Some(get)) => {
                 let name = get.value_of("name").expect("no property name specified");

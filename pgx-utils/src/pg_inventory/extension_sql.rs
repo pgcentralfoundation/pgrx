@@ -98,9 +98,9 @@ impl ToTokens for ExtensionSqlFile {
                 }
             }
         }
-        name.get_or_insert(
+        let name = name.unwrap_or(
             std::path::PathBuf::from(path.value())
-                .file_name()
+                .file_stem()
                 .expect("No file name for extension_sql_file!()")
                 .to_str()
                 .expect("No UTF-8 file name for extension_sql_file!()")
@@ -109,30 +109,29 @@ impl ToTokens for ExtensionSqlFile {
         let before_iter = before.iter();
         let after_iter = after.iter();
         let creates_iter = creates.iter();
-        let name_iter = name.iter();
         if !skip_inventory {
             let inventory_fn_name = syn::Ident::new(
-                &format!("__pgx_internals_sql_{}", name.clone().expect("Unnamed extension_sql not supported yet.")),
+                &format!("__pgx_internals_sql_{}", name.clone()),
                 Span::call_site(),
             );
             let inv = quote! {
                 #[no_mangle]
                 #[link(kind = "static")]
                 pub extern "C" fn  #inventory_fn_name() -> pgx::datum::inventory::SqlGraphEntity {
-                    let submission = pgx::pg_inventory::InventoryExtensionSql {
+                    let submission = pgx::datum::inventory::InventoryExtensionSql {
                         sql: include_str!(#path),
                         module_path: module_path!(),
                         full_path: concat!(file!(), ':', line!()),
                         file: file!(),
                         line: line!(),
-                        name: None#( .unwrap_or(Some(#name_iter)) )*,
+                        name: #name,
                         bootstrap: #bootstrap,
                         finalize: #finalize,
                         before: vec![#(#before_iter),*],
                         after: vec![#(#after_iter),*],
                         creates: vec![#(#creates_iter),*],
                     };
-                    pgx::datum::inventory::SqlGraphEntity::Sql(submission);
+                    pgx::datum::inventory::SqlGraphEntity::CustomSql(submission)
                 }
             };
             tokens.append_all(inv);
@@ -166,21 +165,13 @@ impl ToTokens for ExtensionSqlFile {
 #[derive(Debug, Clone)]
 pub struct ExtensionSql {
     pub sql: LitStr,
+    pub name: LitStr,
     pub attrs: Punctuated<ExtensionSqlAttribute, Token![,]>,
 }
 
 impl ExtensionSql {
     pub fn inventory_fn_name(&self) -> String {
-        let mut name = None;
-        for attr in &self.attrs {
-            match attr {
-                ExtensionSqlAttribute::Name(found_name) => {
-                    name = Some(found_name.value());
-                },
-                _ => (),
-            }
-        }
-        name.expect("No name on extension_sql")
+        self.name.value()
     }
 
     pub fn inventory(&self, inventory_dir: String) {
@@ -196,14 +187,23 @@ impl Parse for ExtensionSql {
         let sql = input.parse()?;
         let _after_sql_comma: Option<Token![,]> = input.parse()?;
         let attrs = input.parse_terminated(ExtensionSqlAttribute::parse)?;
-        Ok(Self { sql, attrs })
+        let mut name = None;
+        for attr in &attrs {
+            match attr {
+                ExtensionSqlAttribute::Name(found_name) => {
+                    name = Some(found_name.clone());
+                },
+                _ => (),
+            }
+        }
+        let name = name.ok_or_else(|| syn::Error::new(input.span(), "expected `name` to be set"))?;
+        Ok(Self { sql, attrs, name })
     }
 }
 
 impl ToTokens for ExtensionSql {
     fn to_tokens(&self, tokens: &mut TokenStream2) {
         let sql = &self.sql;
-        let mut name = None;
         let mut bootstrap = false;
         let mut finalize = false;
         let mut skip_inventory = false;
@@ -230,31 +230,36 @@ impl ToTokens for ExtensionSql {
                 ExtensionSqlAttribute::SkipInventory => {
                     skip_inventory = true;
                 }
-                ExtensionSqlAttribute::Name(found_name) => {
-                    name = Some(found_name.value());
-                }
+                ExtensionSqlAttribute::Name(_found_name) => (), // Already done
             }
         }
         let before_iter = before.iter();
         let after_iter = after.iter();
         let creates_iter = creates.iter();
-        let name_iter = name.iter();
+        let name = &self.name;
         if !skip_inventory {
+            let inventory_fn_name = syn::Ident::new(
+                &format!("__pgx_internals_sql_{}", name.value()),
+                Span::call_site(),
+            );
             let inv = quote! {
-                pgx::pg_inventory::inventory::submit! {
-                    crate::__pgx_internals::ExtensionSql(pgx::pg_inventory::InventoryExtensionSql {
+                #[no_mangle]
+                #[link(kind = "static")]
+                pub extern "C" fn  #inventory_fn_name() -> pgx::datum::inventory::SqlGraphEntity {
+                    let submission = pgx::inventory::InventoryExtensionSql {
                         sql: #sql,
                         module_path: module_path!(),
                         full_path: concat!(file!(), ':', line!()),
                         file: file!(),
                         line: line!(),
-                        name: None#( .unwrap_or(Some(#name_iter)) )*,
+                        name: #name,
                         bootstrap: #bootstrap,
                         finalize: #finalize,
                         before: vec![#(#before_iter),*],
                         after: vec![#(#after_iter),*],
                         creates: vec![#(#creates_iter),*],
-                    })
+                    };
+                    pgx::datum::inventory::SqlGraphEntity::CustomSql(submission)
                 }
             };
             tokens.append_all(inv);
@@ -338,12 +343,12 @@ impl ToTokens for ExtensionSqlPositioning {
             ExtensionSqlPositioning::Expr(ex) => {
                 let path = ex.to_token_stream().to_string().replace(" ", "");
                 (quote! {
-                    pgx::pg_inventory::InventoryExtensionSqlPositioningRef::FullPath(#path)
+                    pgx::inventory::InventoryExtensionSqlPositioningRef::FullPath(#path)
                 })
                 .to_token_stream()
             }
             ExtensionSqlPositioning::Name(name) => quote! {
-                pgx::pg_inventory::InventoryExtensionSqlPositioningRef::Name(#name)
+                pgx::inventory::InventoryExtensionSqlPositioningRef::Name(#name)
             },
         };
         tokens.append_all(toks);
@@ -401,7 +406,7 @@ impl ToTokens for SqlDeclaredEntity {
             quote! { stringify!(#identifier) }
         };
         let inv = quote! {
-            pgx::pg_inventory::InventorySqlDeclaredEntity::build(#variant, #identifier).unwrap()
+            pgx::inventory::InventorySqlDeclaredEntity::build(#variant, #identifier).unwrap()
         };
         tokens.append_all(inv);
     }

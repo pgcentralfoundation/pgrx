@@ -40,29 +40,29 @@ extension_sql!(
         CREATE TABLE extension_sql (message TEXT);\n\
         INSERT INTO extension_sql VALUES ('bootstrap');\n\
     ",
-    name = "bootstrap",
+    name = "bootstrap_raw",
     bootstrap,
 );
 extension_sql!(
     "\n
-        INSERT INTO extension_sql VALUES ('single');\n\
+        INSERT INTO extension_sql VALUES ('single_raw');\n\
     ",
-    name = "single",
+    name = "single_raw",
 );
 extension_sql!(
     "\n\
-    INSERT INTO extension_sql VALUES ('multiple');\n\
+    INSERT INTO extension_sql VALUES ('multiple_raw');\n\
 ",
-    name = "multiple",
-    after = [Dog, home::Ball, "single", "single.sql"],
+    name = "multiple_raw",
+    after = [Dog, home::Ball, "single_raw", "single"],
 );
 
 // `extension_sql_file` does the same as `extension_sql` but automatically sets the `name` to the
 // filename (not the full path).
-extension_sql_file!("../sql/single.sql", after = ["single"]);
+extension_sql_file!("../sql/single.sql", after = ["single_raw"]);
 extension_sql_file!(
     "../sql/multiple.sql",
-    after = [Dog, home::Ball, "single", "single.sql", "multiple"],
+    after = [Dog, home::Ball, "single_raw", "single", "multiple_raw"],
 );
 extension_sql_file!("../sql/finalizer.sql", finalize);
 
@@ -85,10 +85,10 @@ mod tests {
 
         assert_eq!(buf.unwrap(), vec![
             String::from("bootstrap"),
+            String::from("single_raw"),
             String::from("single"),
-            String::from("single.sql"),
+            String::from("multiple_raw"),
             String::from("multiple"),
-            String::from("multiple.sql"),
             String::from("finalizer")
         ])
     }

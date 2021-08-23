@@ -10,7 +10,7 @@ pub struct InventoryExtensionSql {
     pub sql: &'static str,
     pub file: &'static str,
     pub line: u32,
-    pub name: Option<&'static str>,
+    pub name: &'static str,
     pub bootstrap: bool,
     pub finalize: bool,
     pub before: Vec<InventoryExtensionSqlPositioningRef<'static>>,
@@ -20,7 +20,7 @@ pub struct InventoryExtensionSql {
 
 impl InventoryExtensionSql {
     pub fn identifier(&self) -> &str {
-        self.name.unwrap_or(self.full_path)
+        self.name
     }
 
     pub fn has_sql_declared_entity(
@@ -41,7 +41,7 @@ impl Into<SqlGraphEntity> for InventoryExtensionSql {
 
 impl DotIdentifier for InventoryExtensionSql {
     fn dot_identifier(&self) -> String {
-        format!("schema {}", self.full_path.to_string())
+        format!("sql {}", self.name.to_string())
     }
 }
 

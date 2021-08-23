@@ -106,7 +106,43 @@ subcommands:
                     multiple: true
           - schema:
               about: generate extension schema files
+              after_help: |
+                REQUIREMENTS
+                    SQL generation requires some linker flags, as well as a binary.
+                    
+                    The flags are typically set by a linker script:
+                        
+                        #! /usr/bin/env bash
+                        if [[ $CARGO_BIN_NAME == "sql-generator" ]]; then
+                            gcc -Wl,-undefined,dynamic_lookup,-dynamic-list=$CARGO_MANIFEST_DIR/.cargo/pgx-dynamic-list.txt $@
+                        else 
+                            gcc -Wl,-undefined,dynamic_lookup $@
+                        fi
+                    
+                    Which would be configured in `.cargo/config` for supported targets:
+
+                        [target.aarch64-unknown-linux-gnu]
+                        linker = "./.cargo/linker-script.sh"
+
+                    The content of `.cargo/pgx-dynamic-list.txt` would typically be:
+
+                        { __pgx_internals_*; };
+                    
+                    Then, a `src/bin/sql-generator.rs` binary would exist with the following:
+
+                        pgx::pg_binary_magic!(extension_name);
+
+                    If `cargo pgx schema` does not detect these, it will create them automatically with defaults.
+                    To skip writing defaults, use `-m`, to overwrite exiting files with these defaults, use `-f`.
               args:
+                - manual:
+                    short: m
+                    long: manual
+                    help: Skip checking for required files
+                - force-default:
+                    short: f
+                    long: force-default
+                    help: Force the generation of default required files
                 - pg_version:
                     value_name: PG_VERSION
                     takes_value: true
@@ -115,7 +151,7 @@ subcommands:
                 - release:
                     short: r
                     long: release
-                    help: compile for release mode (default is debug)
+                    help: Compile for release mode (default is debug)
                 - pg_config:
                     short: c
                     long: pg_config

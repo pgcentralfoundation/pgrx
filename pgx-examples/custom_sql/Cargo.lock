@@ -1070,11 +1070,12 @@ dependencies = [
  "atomic-traits",
  "bitflags",
  "enum-primitive-derive",
+ "eyre",
  "hash32",
  "heapless",
- "inventory",
  "num-traits",
  "once_cell",
+ "petgraph",
  "pgx-macros",
  "pgx-pg-sys",
  "pgx-utils",
@@ -1083,6 +1084,8 @@ dependencies = [
  "serde_cbor",
  "serde_json",
  "time",
+ "tracing",
+ "tracing-error",
  "uuid",
 ]
 
@@ -1138,14 +1141,15 @@ dependencies = [
 name = "pgx-utils"
 version = "0.1.21"
 dependencies = [
+ "clap",
  "color-eyre",
  "colored",
  "dirs",
  "env_proxy",
  "eyre",
  "inventory",
+ "libloading",
  "once_cell",
- "petgraph",
  "proc-macro2",
  "quote",
  "regex",

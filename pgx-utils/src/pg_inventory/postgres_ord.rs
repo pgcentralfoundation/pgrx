@@ -114,7 +114,7 @@ impl ToTokens for PostgresOrd {
             #[link(kind = "static")]
             pub extern "C" fn  #inventory_fn_name() -> pgx::datum::inventory::SqlGraphEntity {
                 use core::any::TypeId;
-                let submission = pgx::pg_inventory::InventoryPostgresOrd {
+                let submission = pgx::datum::inventory::InventoryPostgresOrd {
                     name: stringify!(#name),
                     file: file!(),
                     line: line!(),
