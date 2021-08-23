@@ -229,7 +229,7 @@ impl ToTokens for PgExtern {
         let overridden = self.overridden().into_iter();
         
         let inventory_fn_name = syn::Ident::new(
-            &format!("__pgx_internals_fn_{}", name),
+            &format!("__pgx_internals_fn_{}", ident),
             Span::call_site(),
         );
         let inv = quote! {
