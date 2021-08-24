@@ -25,11 +25,6 @@ rttp_client = "0.1.0"
 [dev-dependencies]
 pgx-tests = { path = "../../../pgx/pgx-tests" }
 
-[profile.dev]
-panic = "unwind"
-# Required until https://github.com/dtolnay/inventory/issues/32 is resolved.
-codegen-units = 1
-
 [profile.release]
 panic = "unwind"
 opt-level = 3
