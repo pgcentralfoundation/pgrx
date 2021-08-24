@@ -15,11 +15,7 @@ use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
 use syn::parse::{Parse, ParseStream};
 use syn::Meta;
-use std::{
-    io::Write,
-    fs::{create_dir_all, File},
-    convert::TryFrom
-};
+use std::convert::TryFrom;
 
 /// A parsed `#[pg_extern]` item.
 ///
@@ -191,18 +187,6 @@ impl PgExtern {
         let attrs = syn::parse2::<PgxAttributes>(attr).ok();
         let func = syn::parse2::<syn::ItemFn>(item)?;
         Ok(Self { attrs, func })
-    }
-
-        
-    pub fn inventory_fn_name(&self) -> String {
-        "__inventory_fn_".to_string() + &self.func.sig.ident.to_string()
-    }
-
-    pub fn inventory(&self, inventory_dir: String) {
-        create_dir_all(&inventory_dir).expect("Couldn't create inventory dir.");
-        let mut fd = File::create(inventory_dir.to_string() + "/" + &self.inventory_fn_name() + ".json").expect("Couldn't create inventory file");
-        let inventory_fn_json = serde_json::to_string(&self.inventory_fn_name()).expect("Could not serialize inventory item.");
-        write!(fd, "{}", inventory_fn_json).expect("Couldn't write to inventory file");
     }
 }
 

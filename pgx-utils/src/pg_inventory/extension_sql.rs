@@ -5,7 +5,6 @@ use syn::{
     punctuated::Punctuated,
     LitStr, Token,
 };
-use std::{io::Write, fs::{create_dir_all, File}};
 
 /// A parsed `extension_sql_file!()` item.
 ///
@@ -34,24 +33,6 @@ use std::{io::Write, fs::{create_dir_all, File}};
 pub struct ExtensionSqlFile {
     pub path: LitStr,
     pub attrs: Punctuated<ExtensionSqlAttribute, Token![,]>,
-}
-
-impl ExtensionSqlFile {
-    pub fn inventory_fn_name(&self) -> String {
-        std::path::PathBuf::from(self.path.value())
-            .file_name()
-            .expect("No file name for extension_sql_file!()")
-            .to_str()
-            .expect("No UTF-8 file name for extension_sql_file!()")
-            .to_string()
-    }
-
-    pub fn inventory(&self, inventory_dir: String) {
-        create_dir_all(&inventory_dir).expect("Couldn't create inventory dir.");
-        let mut fd = File::create(inventory_dir.to_string() + "/sql_" + &self.inventory_fn_name() + ".json").expect("Couldn't create inventory file");
-        let inventory_fn_json = serde_json::to_string(&self.inventory_fn_name()).expect("Could not serialize inventory item.");
-        write!(fd, "{}", inventory_fn_json).expect("Couldn't write to inventory file");
-    }
 }
 
 impl Parse for ExtensionSqlFile {
@@ -167,19 +148,6 @@ pub struct ExtensionSql {
     pub sql: LitStr,
     pub name: LitStr,
     pub attrs: Punctuated<ExtensionSqlAttribute, Token![,]>,
-}
-
-impl ExtensionSql {
-    pub fn inventory_fn_name(&self) -> String {
-        self.name.value()
-    }
-
-    pub fn inventory(&self, inventory_dir: String) {
-        create_dir_all(&inventory_dir).expect("Couldn't create inventory dir.");
-        let mut fd = File::create(inventory_dir.to_string() + "/sql_" + &self.inventory_fn_name() + ".json").expect("Couldn't create inventory file");
-        let inventory_fn_json = serde_json::to_string(&self.inventory_fn_name()).expect("Could not serialize inventory item.");
-        write!(fd, "{}", inventory_fn_json).expect("Couldn't write to inventory file");
-    }
 }
 
 impl Parse for ExtensionSql {

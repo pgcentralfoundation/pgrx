@@ -54,7 +54,6 @@ pub(crate) fn impl_postgres_hash(ast: DeriveInput) -> proc_macro2::TokenStream {
     stream.extend(hash(&ast.ident, found_skip_inventory));
 
     let inventory_item = pg_inventory::PostgresHash::new(ast.ident.clone());
-    inventory_item.inventory(super::inventory_dir_fn().into());
     if !found_skip_inventory {
         inventory_item.to_tokens(&mut stream);
     }

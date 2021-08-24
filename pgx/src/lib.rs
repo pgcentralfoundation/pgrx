@@ -348,7 +348,6 @@ macro_rules! pg_inventory_magic {
                 ));
                 ControlFile::try_from(context).expect("Could not parse control file, was it valid?")
             });
-            pub static INVENTORY_DIR: &str = pgx::inventory_dir!();
         }
     };
 }

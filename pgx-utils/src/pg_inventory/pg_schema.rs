@@ -4,10 +4,6 @@ use syn::{
     parse::{Parse, ParseStream},
     ItemMod,
 };
-use std::{
-    io::Write,
-    fs::{create_dir_all, File}
-};
 
 /// A parsed `#[pg_schema] mod example {}` item.
 ///
@@ -31,19 +27,6 @@ use std::{
 #[derive(Debug, Clone)]
 pub struct Schema {
     pub module: ItemMod,
-}
-
-impl Schema {
-    pub fn inventory_fn_name(&self) -> String {
-        "__inventory_schema_".to_string() + &self.module.ident.to_string()
-    }
-
-    pub fn inventory(&self, inventory_dir: String) {
-        create_dir_all(&inventory_dir).expect("Couldn't create inventory dir.");
-        let mut fd = File::create(inventory_dir.to_string() + "/" + &self.inventory_fn_name() + ".json").expect("Couldn't create inventory file");
-        let inventory_fn_json = serde_json::to_string(&self.inventory_fn_name()).expect("Could not serialize inventory item.");
-        write!(fd, "{}", inventory_fn_json).expect("Couldn't write to inventory file");
-    }
 }
 
 impl Parse for Schema {

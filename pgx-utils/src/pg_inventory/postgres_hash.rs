@@ -1,5 +1,3 @@
-use std::{io::Write, fs::{create_dir_all, File}};
-
 use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
 use syn::{
@@ -62,17 +60,6 @@ impl PostgresHash {
 
     pub fn from_derive_input(derive_input: DeriveInput) -> Result<Self, syn::Error> {
         Ok(Self::new(derive_input.ident))
-    }
-    
-    pub fn inventory_fn_name(&self) -> String {
-        "__inventory_hash_".to_string() + &self.name.to_string()
-    }
-
-    pub fn inventory(&self, inventory_dir: String) {
-        create_dir_all(&inventory_dir).expect("Couldn't create inventory dir.");
-        let mut fd = File::create(inventory_dir.to_string() + "/" + &self.inventory_fn_name() + ".json").expect("Couldn't create inventory file");
-        let inventory_fn_json = serde_json::to_string(&self.inventory_fn_name()).expect("Could not serialize inventory item.");
-        write!(fd, "{}", inventory_fn_json).expect("Couldn't write to inventory file");
     }
 }
 
