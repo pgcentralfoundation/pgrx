@@ -48,12 +48,15 @@ impl Schema {
 
 impl Parse for Schema {
     fn parse(input: ParseStream) -> Result<Self, syn::Error> {
+        let module: ItemMod = input.parse()?;
+
         Ok(Self {
-            module: input.parse()?,
+            module,
         })
     }
 }
 
+use std::hash::{Hash, Hasher};
 impl ToTokens for Schema {
     fn to_tokens(&self, tokens: &mut TokenStream2) {
         let attrs = &self.module.attrs;
@@ -65,6 +68,13 @@ impl ToTokens for Schema {
             .content
             .as_ref()
             .expect("Can only support `mod {}` right now.");
+
+        // A hack until https://github.com/rust-lang/rust/issues/54725 is fixed.
+        let mut hasher = std::collections::hash_map::DefaultHasher::new();
+        content_items.hash(&mut hasher);
+        let postfix = hasher.finish();
+        // End of hack
+        
         let found_skip_inventory = self.module.attrs.iter().any(|x| {
             x.path
                 .get_ident()
@@ -75,7 +85,7 @@ impl ToTokens for Schema {
         let mut updated_content = content_items.clone();
         if !found_skip_inventory {
             let inventory_fn_name = syn::Ident::new(
-                &format!("__pgx_internals_schema_{}", ident),
+                &format!("__pgx_internals_schema_{}_{}", ident, postfix),
                 Span::call_site(),
             );
             updated_content.push(syn::parse_quote! {
