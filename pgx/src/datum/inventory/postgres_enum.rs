@@ -1,9 +1,8 @@
 use std::hash::{Hash, Hasher};
-use serde::{Deserialize, Serialize};
 
 use super::{DotIdentifier, SqlGraphEntity, ToSql};
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct InventoryPostgresEnum {
     pub name: &'static str,
     pub file: &'static str,
@@ -36,10 +35,7 @@ impl Ord for InventoryPostgresEnum {
 
 impl InventoryPostgresEnum {
     pub fn id_matches(&self, candidate: &core::any::TypeId) -> bool {
-        self.mappings.iter().any(|tester| format!("{:?}", *candidate) == tester.id)
-    }
-    pub fn id_str_matches(&self, candidate: &str) -> bool {
-        self.mappings.iter().any(|tester| candidate == tester.id)
+        self.mappings.iter().any(|tester| *candidate == tester.id)
     }
 }
 

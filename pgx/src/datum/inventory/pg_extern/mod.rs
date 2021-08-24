@@ -12,9 +12,8 @@ use pgx_utils::ExternArgs;
 
 use super::{DotIdentifier, SqlGraphEntity, ToSql};
 use pgx_utils::pg_inventory::SqlDeclaredEntity;
-use serde::{Serialize, Deserialize};
 
-#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct InventoryPgExtern {
     pub name: &'static str,
     pub unaliased_name: &'static str,
@@ -81,8 +80,8 @@ impl ToSql for InventoryPgExtern {
                                  let mut args = Vec::new();
                                  for (idx, arg) in self.fn_args.iter().enumerate() {
                                      let graph_index = context.graph.neighbors_undirected(self_index).find(|neighbor| match &context.graph[*neighbor] {
-                                         SqlGraphEntity::Type(ty) => ty.id_str_matches(&arg.ty_id),
-                                         SqlGraphEntity::Enum(en) => en.id_str_matches(&arg.ty_id),
+                                         SqlGraphEntity::Type(ty) => ty.id_matches(&arg.ty_id),
+                                         SqlGraphEntity::Enum(en) => en.id_matches(&arg.ty_id),
                                          SqlGraphEntity::BuiltinType(defined) => defined == &arg.full_path,
                                          _ => false,
                                      }).ok_or_else(|| eyre_err!("Could not find arg type in graph. Got: {:?}", arg))?;
@@ -94,7 +93,7 @@ impl ToSql for InventoryPgExtern {
                                             schema_prefix = context.schema_prefix_for(&graph_index),
                                             // First try to match on [`TypeId`] since it's most reliable.
                                             sql_type = context.source_only_to_sql_type(arg.ty_source).or_else(|| {
-                                                context.type_id_str_to_sql_type(&arg.ty_id)
+                                                context.type_id_to_sql_type(arg.ty_id)
                                             }).or_else(|| {
                                                 // Fall back to fuzzy matching.
                                                 let path = arg.full_path.to_string();
@@ -124,14 +123,14 @@ impl ToSql for InventoryPgExtern {
                                  InventoryPgExternReturn::None => String::from("RETURNS void"),
                                  InventoryPgExternReturn::Type { id, source, full_path, .. } => {
                                      let graph_index = context.graph.neighbors_undirected(self_index).find(|neighbor| match &context.graph[*neighbor] {
-                                         SqlGraphEntity::Type(ty) => ty.id_str_matches(&id),
-                                         SqlGraphEntity::Enum(en) => en.id_str_matches(&id),
+                                         SqlGraphEntity::Type(ty) => ty.id_matches(&id),
+                                         SqlGraphEntity::Enum(en) => en.id_matches(&id),
                                          SqlGraphEntity::BuiltinType(defined) => &*defined == full_path,
                                          _ => false,
                                      }).ok_or_else(|| eyre_err!("Could not find return type in graph."))?;
                                      format!("RETURNS {schema_prefix}{sql_type} /* {full_path} */",
                                              sql_type = context.source_only_to_sql_type(source).or_else(|| {
-                                                 context.type_id_str_to_sql_type(id)
+                                                 context.type_id_to_sql_type(*id)
                                              }).or_else(|| {
                                                     let pat = full_path.to_string();
                                                     if let Some(found) = context.has_sql_declared_entity(&SqlDeclaredEntity::Type(pat.clone())) {
@@ -148,14 +147,14 @@ impl ToSql for InventoryPgExtern {
                                  },
                                  InventoryPgExternReturn::SetOf { id, source, full_path, .. } => {
                                      let graph_index = context.graph.neighbors_undirected(self_index).find(|neighbor| match &context.graph[*neighbor] {
-                                         SqlGraphEntity::Type(ty) => ty.id_str_matches(&id),
-                                         SqlGraphEntity::Enum(en) => en.id_str_matches(&id),
+                                         SqlGraphEntity::Type(ty) => ty.id_matches(&id),
+                                         SqlGraphEntity::Enum(en) => en.id_matches(&id),
                                          SqlGraphEntity::BuiltinType(defined) => defined == full_path,
                                          _ => false,
                                      }).ok_or_else(|| eyre_err!("Could not find return type in graph."))?;
                                      format!("RETURNS SETOF {schema_prefix}{sql_type} /* {full_path} */",
                                              sql_type = context.source_only_to_sql_type(source).or_else(|| {
-                                                 context.type_id_str_to_sql_type(id)
+                                                 context.type_id_to_sql_type(*id)
                                              }).or_else(|| {
                                                     let pat = full_path.to_string();
                                                     if let Some(found) = context.has_sql_declared_entity(&SqlDeclaredEntity::Type(pat.clone())) {
@@ -174,8 +173,8 @@ impl ToSql for InventoryPgExtern {
                                      let mut items = String::new();
                                      for (idx, (id, source, ty_name, _module_path, col_name)) in table_items.iter().enumerate() {
                                          let graph_index = context.graph.neighbors_undirected(self_index).find(|neighbor| match &context.graph[*neighbor] {
-                                             SqlGraphEntity::Type(ty) => ty.id_str_matches(&id),
-                                             SqlGraphEntity::Enum(en) => en.id_str_matches(&id),
+                                             SqlGraphEntity::Type(ty) => ty.id_matches(&id),
+                                             SqlGraphEntity::Enum(en) => en.id_matches(&id),
                                              SqlGraphEntity::BuiltinType(defined) => defined == ty_name,
                                              _ => false,
                                          });
@@ -186,7 +185,7 @@ impl ToSql for InventoryPgExtern {
                                                                 context.schema_prefix_for(&graph_index)
                                                             } else { "".into() },
                                                             ty_resolved = context.source_only_to_sql_type(source).or_else(|| {
-                                                                context.type_id_str_to_sql_type(id)
+                                                                context.type_id_to_sql_type(*id)
                                                             }).or_else(|| {
                                                                 let pat = ty_name.to_string();
                                                                 if let Some(found) = context.has_sql_declared_entity(&SqlDeclaredEntity::Type(pat.clone())) {
@@ -279,7 +278,7 @@ impl ToSql for InventoryPgExtern {
                     .graph
                     .neighbors_undirected(self_index)
                     .find(|neighbor| match &context.graph[*neighbor] {
-                        SqlGraphEntity::Type(ty) => ty.id_str_matches(&left_arg.ty_id),
+                        SqlGraphEntity::Type(ty) => ty.id_matches(&left_arg.ty_id),
                         _ => false,
                     })
                     .ok_or_else(|| eyre_err!("Could not find left arg function in graph."))?;
@@ -290,7 +289,7 @@ impl ToSql for InventoryPgExtern {
                     .graph
                     .neighbors_undirected(self_index)
                     .find(|neighbor| match &context.graph[*neighbor] {
-                        SqlGraphEntity::Type(ty) => ty.id_str_matches(&right_arg.ty_id),
+                        SqlGraphEntity::Type(ty) => ty.id_matches(&right_arg.ty_id),
                         _ => false,
                     })
                     .ok_or_else(|| eyre_err!("Could not find right arg function in graph."))?;
@@ -313,9 +312,9 @@ impl ToSql for InventoryPgExtern {
                                            left_name = left_arg.full_path,
                                            right_name = right_arg.full_path,
                                            schema_prefix_left = context.schema_prefix_for(&left_arg_graph_index),
-                                           left_arg = context.type_id_str_to_sql_type(&left_arg.ty_id).ok_or_else(|| eyre_err!("Failed to map argument `{}` type `{}` to SQL type while building operator `{}`.", left_arg.pattern, left_arg.full_path, self.name))?,
+                                           left_arg = context.type_id_to_sql_type(left_arg.ty_id).ok_or_else(|| eyre_err!("Failed to map argument `{}` type `{}` to SQL type while building operator `{}`.", left_arg.pattern, left_arg.full_path, self.name))?,
                                            schema_prefix_right = context.schema_prefix_for(&right_arg_graph_index),
-                                           right_arg = context.type_id_str_to_sql_type(&right_arg.ty_id).ok_or_else(|| eyre_err!("Failed to map argument `{}` type `{}` to SQL type while building operator `{}`.", right_arg.pattern, right_arg.full_path, self.name))?,
+                                           right_arg = context.type_id_to_sql_type(right_arg.ty_id).ok_or_else(|| eyre_err!("Failed to map argument `{}` type `{}` to SQL type while building operator `{}`.", right_arg.pattern, right_arg.full_path, self.name))?,
                                            maybe_comma = if optionals.len() >= 1 { "," } else { "" },
                                            optionals = optionals.join(",\n") + "\n"
                 );

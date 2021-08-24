@@ -28,7 +28,7 @@ pub use postgres_hash::InventoryPostgresHash;
 mod sql_graph_entity;
 pub use sql_graph_entity::SqlGraphEntity;
 
-use serde::{Serialize, Deserialize};
+use core::any::TypeId;
 
 /// Able to produce a GraphViz DOT format identifier.
 pub trait DotIdentifier {
@@ -63,15 +63,12 @@ pub trait ToSql {
 ///
 /// assert_eq!(constructed, raw);
 /// ```
-#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord, Deserialize, Serialize)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct RustSqlMapping {
     // This is the **resolved** type, not the raw source. This means a Type Aliase of `type Foo = u32` would appear as `u32`.
     pub rust: String,
     pub sql: String,
-    // This is actually the Debug format of a TypeId!
-    //
-    // This is not a good idea, but without a stable way to create or serialize TypeIds, we have to.
-    pub id: String,
+    pub id: TypeId,
 }
 
 impl RustSqlMapping {
@@ -79,7 +76,7 @@ impl RustSqlMapping {
         Self {
             rust: core::any::type_name::<T>().to_string(),
             sql: sql.to_string(),
-            id: format!("{:?}", core::any::TypeId::of::<T>()),
+            id: core::any::TypeId::of::<T>(),
         }
     }
 }

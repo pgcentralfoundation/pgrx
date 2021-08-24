@@ -187,7 +187,7 @@ impl ToTokens for Returning {
                     .replace(" ", "");
                 quote! {
                     pgx::datum::inventory::InventoryPgExternReturn::Type {
-                        id: format!("{:?}", TypeId::of::<#ty>()),
+                        id: TypeId::of::<#ty>(),
                         source: #ty_string,
                         full_path: core::any::type_name::<#ty>(),
                         module_path: {
@@ -204,7 +204,7 @@ impl ToTokens for Returning {
                     .replace(" ", "");
                 quote! {
                     pgx::datum::inventory::InventoryPgExternReturn::SetOf {
-                        id: format!("{:?}", TypeId::of::<#ty>()),
+                        id: TypeId::of::<#ty>(),
                         source: #ty_string,
                         full_path: core::any::type_name::<#ty>(),
                         module_path: {
@@ -225,7 +225,7 @@ impl ToTokens for Returning {
                         let name_iter = name.iter();
                         quote! {
                             (
-                                format!("{:?}", TypeId::of::<#ty>()),
+                                TypeId::of::<#ty>(),
                                 #ty_string,
                                 core::any::type_name::<#ty>(),
                                 {

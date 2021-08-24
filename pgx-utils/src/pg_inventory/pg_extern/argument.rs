@@ -235,7 +235,7 @@ impl ToTokens for Argument {
             pgx::inventory::InventoryPgExternInput {
                 pattern: stringify!(#pat),
                 ty_source: #ty_string,
-                ty_id: format!("{:?}", TypeId::of::<#ty>()),
+                ty_id: TypeId::of::<#ty>(),
                 full_path: core::any::type_name::<#ty>(),
                 module_path: {
                     let ty_name = core::any::type_name::<#ty>();

@@ -150,7 +150,7 @@ pub trait WithTypeIds {
             set.insert(RustSqlMapping {
                 sql: single_sql.clone(),
                 rust: rust.to_string(),
-                id: format!("{:?}", *Self::ITEM_ID),
+                id: *Self::ITEM_ID,
             }),
             true,
             "Cannot set mapping of `{}` twice, was already `{}`.",
@@ -205,7 +205,7 @@ impl<T: 'static> WithSizedTypeIds<T> {
                 map.insert(RustSqlMapping {
                     sql: single_sql.clone(),
                     rust: rust.to_string(),
-                    id: format!("{:?}", id),
+                    id: id,
                 }),
                 true,
                 "Cannot map `{}` twice.",
@@ -219,7 +219,7 @@ impl<T: 'static> WithSizedTypeIds<T> {
                 map.insert(RustSqlMapping {
                     sql: single_sql.clone(),
                     rust: rust.to_string(),
-                    id: format!("{:?}", id),
+                    id: id,
                 }),
                 true,
                 "Cannot map `{}` twice.",
@@ -233,7 +233,7 @@ impl<T: 'static> WithSizedTypeIds<T> {
                 map.insert(RustSqlMapping {
                     sql: set_sql.clone(),
                     rust: rust.to_string(),
-                    id: format!("{:?}", id),
+                    id: id,
                 }),
                 true,
                 "Cannot map `{}` twice.",
@@ -246,7 +246,7 @@ impl<T: 'static> WithSizedTypeIds<T> {
                 map.insert(RustSqlMapping {
                     sql: set_sql.clone(),
                     rust: rust.to_string(),
-                    id: format!("{:?}", id),
+                    id: id,
                 }),
                 true,
                 "Cannot map `{}` twice.",
@@ -259,7 +259,7 @@ impl<T: 'static> WithSizedTypeIds<T> {
                 map.insert(RustSqlMapping {
                     sql: set_sql.clone(),
                     rust: rust.to_string(),
-                    id: format!("{:?}", id),
+                    id: id,
                 }),
                 true,
                 "Cannot map `{}` twice.",
@@ -272,7 +272,7 @@ impl<T: 'static> WithSizedTypeIds<T> {
                 map.insert(RustSqlMapping {
                     sql: set_sql.clone(),
                     rust: rust.to_string(),
-                    id: format!("{:?}", id),
+                    id: id,
                 }),
                 true,
                 "Cannot map `{}` twice.",
@@ -309,7 +309,7 @@ impl<T: FromDatum + 'static> WithArrayTypeIds<T> {
                 map.insert(RustSqlMapping {
                     sql: set_sql.clone(),
                     rust: rust.to_string(),
-                    id: format!("{:?}", id),
+                    id: id,
                 }),
                 true,
                 "Cannot map `{}` twice.",
@@ -322,7 +322,7 @@ impl<T: FromDatum + 'static> WithArrayTypeIds<T> {
                 map.insert(RustSqlMapping {
                     sql: set_sql.clone(),
                     rust: rust.to_string(),
-                    id: format!("{:?}", id),
+                    id: id,
                 }),
                 true,
                 "Cannot map `{}` twice.",
@@ -358,7 +358,7 @@ impl<T: Copy + 'static> WithVarlenaTypeIds<T> {
                 map.insert(RustSqlMapping {
                     sql: single_sql.clone(),
                     rust: rust.to_string(),
-                    id: format!("{:?}", id),
+                    id: id,
                 }),
                 true,
                 "Cannot map `{}` twice.",

@@ -1,10 +1,9 @@
 use eyre::eyre as eyre_err;
 use std::hash::{Hash, Hasher};
-use serde::{Serialize, Deserialize};
 use super::RustSqlMapping;
 
 use super::{DotIdentifier, SqlGraphEntity, ToSql};
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct InventoryPostgresType {
     pub name: &'static str,
     pub file: &'static str,
@@ -40,10 +39,7 @@ impl Ord for InventoryPostgresType {
 
 impl InventoryPostgresType {
     pub fn id_matches(&self, candidate: &core::any::TypeId) -> bool {
-        self.mappings.iter().any(|tester| format!("{:?}", candidate) == tester.id)
-    }
-    pub fn id_str_matches(&self, candidate: &str) -> bool {
-        self.mappings.iter().any(|tester| candidate == tester.id)
+        self.mappings.iter().any(|tester| *candidate == tester.id)
     }
 }
 

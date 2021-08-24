@@ -30,7 +30,7 @@ pub struct PgxSql {
     // This is actually the Debug format of a TypeId!
     //
     // This is not a good idea, but without a stable way to create or serialize TypeIds, we have to.
-    pub type_mappings: HashMap<String, RustSqlMapping>,
+    pub type_mappings: HashMap<TypeId, RustSqlMapping>,
     pub source_mappings: HashMap<String, RustSourceOnlySqlMapping>,
     pub control: ControlFile,
     pub graph: StableGraph<SqlGraphEntity, SqlGraphRelationship>,
@@ -352,11 +352,7 @@ impl PgxSql {
     }
 
     pub fn type_id_to_sql_type(&self, id: TypeId) -> Option<String> {
-        self.type_mappings.get(&format!("{:?}", id)).map(|f| f.sql.clone())
-    }
-
-    pub fn type_id_str_to_sql_type(&self, id: &str) -> Option<String> {
-        self.type_mappings.get(id).map(|f| f.sql.clone())
+        self.type_mappings.get(&id).map(|f| f.sql.clone())
     }
 
     pub fn source_only_to_sql_type(&self, ty_source: &str) -> Option<String> {
@@ -366,11 +362,11 @@ impl PgxSql {
     pub fn map_type_to_sql_type<T: 'static>(&mut self, sql: impl AsRef<str> + Debug) {
         let sql = sql.as_ref().to_string();
         self.type_mappings.insert(
-            format!("{:?}", TypeId::of::<T>()),
+            TypeId::of::<T>(),
             RustSqlMapping {
                 rust: core::any::type_name::<T>().to_string(),
                 sql: sql.clone(),
-                id: format!("{:?}", core::any::TypeId::of::<T>()),
+                id: core::any::TypeId::of::<T>(),
             },
         );
     }
@@ -653,13 +649,13 @@ fn initialize_externs(
         for arg in &item.fn_args {
             let mut found = false;
             for (ty_item, &_ty_index) in mapped_types {
-                if ty_item.id_str_matches(&arg.ty_id) {
+                if ty_item.id_matches(&arg.ty_id) {
                     found = true;
                     break;
                 }
             }
             for (ty_item, &_ty_index) in mapped_enums {
-                if ty_item.id_str_matches(&arg.ty_id) {
+                if ty_item.id_matches(&arg.ty_id) {
                     found = true;
                     break;
                 }
@@ -677,13 +673,13 @@ fn initialize_externs(
             | InventoryPgExternReturn::SetOf { id, full_path, .. } => {
                 let mut found = false;
                 for (ty_item, &_ty_index) in mapped_types {
-                    if ty_item.id_str_matches(id) {
+                    if ty_item.id_matches(id) {
                         found = true;
                         break;
                     }
                 }
                 for (ty_item, &_ty_index) in mapped_enums {
-                    if ty_item.id_str_matches(id) {
+                    if ty_item.id_matches(id) {
                         found = true;
                         break;
                     }
@@ -698,13 +694,13 @@ fn initialize_externs(
                 for iterated_return in iterated_returns {
                     let mut found = false;
                     for (ty_item, &_ty_index) in mapped_types {
-                        if ty_item.id_str_matches(&iterated_return.0) {
+                        if ty_item.id_matches(&iterated_return.0) {
                             found = true;
                             break;
                         }
                     }
                     for (ty_item, &_ty_index) in mapped_enums {
-                        if ty_item.id_str_matches(&iterated_return.0) {
+                        if ty_item.id_matches(&iterated_return.0) {
                             found = true;
                             break;
                         }
@@ -743,7 +739,7 @@ fn connect_externs(
         for arg in &item.fn_args {
             let mut found = false;
             for (ty_item, &ty_index) in types {
-                if ty_item.id_str_matches(&arg.ty_id) {
+                if ty_item.id_matches(&arg.ty_id) {
                     tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Extern after Type (due to argument) edge.");
                     graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredByArg);
                     found = true;
@@ -752,7 +748,7 @@ fn connect_externs(
             }
             if !found {
                 for (enum_item, &enum_index) in enums {
-                    if enum_item.id_str_matches(&arg.ty_id) {
+                    if enum_item.id_matches(&arg.ty_id) {
                         tracing::trace!(from = ?item.full_path, to = enum_item.full_path, "Adding Extern after Enum (due to argument) edge.");
                         graph.add_edge(enum_index, index, SqlGraphRelationship::RequiredByArg);
                         found = true;
@@ -789,7 +785,7 @@ fn connect_externs(
             | InventoryPgExternReturn::SetOf { id, full_path, .. } => {
                 let mut found = false;
                 for (ty_item, &ty_index) in types {
-                    if ty_item.id_str_matches(id) {
+                    if ty_item.id_matches(id) {
                         tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Extern after Type (due to return) edge.");
                         graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredByReturn);
                         found = true;
@@ -798,7 +794,7 @@ fn connect_externs(
                 }
                 if !found {
                     for (ty_item, &ty_index) in enums {
-                        if ty_item.id_str_matches(id) {
+                        if ty_item.id_matches(id) {
                             tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Extern after Enum (due to return) edge.");
                             graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredByReturn);
                             found = true;
@@ -837,7 +833,7 @@ fn connect_externs(
                 for iterated_return in iterated_returns {
                     let mut found = false;
                     for (ty_item, &ty_index) in types {
-                        if ty_item.id_str_matches(&iterated_return.0) {
+                        if ty_item.id_matches(&iterated_return.0) {
                             tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Extern after Type (due to return) edge.");
                             graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredByReturn);
                             found = true;
@@ -846,7 +842,7 @@ fn connect_externs(
                     }
                     if !found {
                         for (ty_item, &ty_index) in enums {
-                            if ty_item.id_str_matches(&iterated_return.0) {
+                            if ty_item.id_matches(&iterated_return.0) {
                                 tracing::trace!(from = ?item.full_path, to = ty_item.full_path, "Adding Extern after Enum (due to return) edge.");
                                 graph.add_edge(
                                     ty_index,

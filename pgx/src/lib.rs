@@ -167,22 +167,22 @@ pub static DEFAULT_TYPEID_SQL_MAPPING: Lazy<HashSet<RustSqlMapping>> = Lazy::new
     // Bytea is a special case, notice how it has no `bytea[]`.
     m.insert(RustSqlMapping {
         sql: String::from("bytea"),
-        id: format!("{:?}", TypeId::of::<&[u8]>()),
+        id: TypeId::of::<&[u8]>(),
         rust: core::any::type_name::<&[u8]>().to_string(),
     });
     m.insert(RustSqlMapping {
         sql: String::from("bytea"),
-        id: format!("{:?}", TypeId::of::<Option<&[u8]>>()),
+        id: TypeId::of::<Option<&[u8]>>(),
         rust: core::any::type_name::<Option<&[u8]>>().to_string(),
     });
     m.insert(RustSqlMapping {
         sql: String::from("bytea"),
-        id: format!("{:?}", TypeId::of::<Vec<u8>>()),
+        id: TypeId::of::<Vec<u8>>(),
         rust: core::any::type_name::<Vec<u8>>().to_string(),
     });
     m.insert(RustSqlMapping {
         sql: String::from("bytea"),
-        id: format!("{:?}", TypeId::of::<Option<Vec<u8>>>()),
+        id: TypeId::of::<Option<Vec<u8>>>(),
         rust: core::any::type_name::<Option<Vec<u8>>>().to_string(),
     });
 
