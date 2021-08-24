@@ -107,8 +107,15 @@ pub(crate) fn generate_schema(
         exit_with_error!("failed to build SQL generator");
     }
     
-    // Inspect the symbol table for a list of `__pgx_internals` we should have the generator call]
-    let sql_gen_path = PathBuf::from(format!("target/{}/sql-generator", if is_release { "release" } else { "debug" }));
+    // Inspect the symbol table for a list of `__pgx_internals` we should have the generator call\
+    let mut sql_gen_path = pgx_utils::get_target_dir();
+    sql_gen_path.push(if is_release { "release" } else { "debug" });
+    sql_gen_path.push("sql-generator");
+    println!(
+        "{} SQL entities in `{}`",
+        " Discovering".bold().green(),
+        sql_gen_path.display().to_string().bold().cyan()
+    );
     let dsym_path = sql_gen_path.resolve_dsym();
     let buffer = ByteView::open(dsym_path.as_deref().unwrap_or(&sql_gen_path))?;
     let archive = Archive::parse(&buffer).unwrap();
@@ -135,6 +142,12 @@ pub(crate) fn generate_schema(
             }
         }
     }
+    println!(
+        "{} a total of {} SQL entities in `{}`",
+        "  Discovered".bold().green(),
+        fns_to_call.len().to_string().bold().cyan(),
+        sql_gen_path.display().to_string().bold().cyan()
+    );
 
     // Now run the generator with the correct symbol table
     let mut command = Command::new("cargo");

@@ -14,7 +14,7 @@ struct Complex {
 
 extension_sql!(
     r#"CREATE TYPE complex;"#,
-    name = "create_complex_type",
+    name = "create_complex_shell_type",
     creates = [Type(Complex)]
 );
 
@@ -51,7 +51,8 @@ CREATE TYPE complex (
    alignment = double
 );
 "#,
-    after = ["create_complex_type", complex_in, complex_out]
+    name = "create_complex_type",
+    after = ["create_complex_shell_type", complex_in, complex_out]
 );
 
 #[cfg(any(test, feature = "pg_test"))]

@@ -336,7 +336,7 @@ macro_rules! pg_inventory_magic {
                     ControlFile, PgxSql,
                 }
             };
-            use crate::once_cell::sync::Lazy;
+            use pgx_utils::pg_inventory::once_cell::sync::Lazy;
 
             /// The contents of the `*.control` file of the crate.
             pub static CONTROL_FILE: Lazy<ControlFile> = Lazy::new(|| {

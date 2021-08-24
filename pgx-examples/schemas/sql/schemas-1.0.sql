@@ -28,37 +28,6 @@ STRICT
 LANGUAGE c /* Rust */
 AS 'MODULE_PATHNAME', 'hello_public_wrapper';
 
--- src/lib.rs:9
--- schemas::MyType
-CREATE TYPE MyType;
-
--- src/lib.rs:9
--- schemas::mytype_in
-CREATE OR REPLACE FUNCTION "mytype_in"(
-	"input" cstring /* &std::ffi::c_str::CStr */
-) RETURNS MyType /* schemas::MyType */
-IMMUTABLE PARALLEL SAFE STRICT
-LANGUAGE c /* Rust */
-AS 'MODULE_PATHNAME', 'mytype_in_wrapper';
-
--- src/lib.rs:9
--- schemas::mytype_out
-CREATE OR REPLACE FUNCTION "mytype_out"(
-	"input" MyType /* schemas::MyType */
-) RETURNS cstring /* &std::ffi::c_str::CStr */
-IMMUTABLE PARALLEL SAFE STRICT
-LANGUAGE c /* Rust */
-AS 'MODULE_PATHNAME', 'mytype_out_wrapper';
-
--- src/lib.rs:9
--- schemas::MyType
-CREATE TYPE MyType (
-	INTERNALLENGTH = variable,
-	INPUT = mytype_in, /* schemas::mytype_in */
-	OUTPUT = mytype_out, /* schemas::mytype_out */
-	STORAGE = extended
-);
-
 -- src/lib.rs:24
 -- schemas::some_schema::MySomeSchemaType
 CREATE TYPE some_schema.MySomeSchemaType;
@@ -87,6 +56,37 @@ CREATE TYPE some_schema.MySomeSchemaType (
 	INTERNALLENGTH = variable,
 	INPUT = some_schema.mysomeschematype_in, /* schemas::some_schema::mysomeschematype_in */
 	OUTPUT = some_schema.mysomeschematype_out, /* schemas::some_schema::mysomeschematype_out */
+	STORAGE = extended
+);
+
+-- src/lib.rs:9
+-- schemas::MyType
+CREATE TYPE MyType;
+
+-- src/lib.rs:9
+-- schemas::mytype_in
+CREATE OR REPLACE FUNCTION "mytype_in"(
+	"input" cstring /* &std::ffi::c_str::CStr */
+) RETURNS MyType /* schemas::MyType */
+IMMUTABLE PARALLEL SAFE STRICT
+LANGUAGE c /* Rust */
+AS 'MODULE_PATHNAME', 'mytype_in_wrapper';
+
+-- src/lib.rs:9
+-- schemas::mytype_out
+CREATE OR REPLACE FUNCTION "mytype_out"(
+	"input" MyType /* schemas::MyType */
+) RETURNS cstring /* &std::ffi::c_str::CStr */
+IMMUTABLE PARALLEL SAFE STRICT
+LANGUAGE c /* Rust */
+AS 'MODULE_PATHNAME', 'mytype_out_wrapper';
+
+-- src/lib.rs:9
+-- schemas::MyType
+CREATE TYPE MyType (
+	INTERNALLENGTH = variable,
+	INPUT = mytype_in, /* schemas::mytype_in */
+	OUTPUT = mytype_out, /* schemas::mytype_out */
 	STORAGE = extended
 );
 
