@@ -4,7 +4,7 @@ use pgx_utils::pg_config::PgConfig;
 use pgx_utils::{exit_with_error, handle_result};
 use std::fs::File;
 use std::os::unix::prelude::PermissionsExt;
-use std::{path::Path, process::{Command, Stdio}, io::{Read, Write}, path::PathBuf};
+use std::{path::Path, process::{Command, Stdio}, io::{Read, Write}};
 use symbolic::{common::{ByteView, DSymPathExt}, debuginfo::{Archive, SymbolIterator}};
 use colored::Colorize;
 
@@ -177,9 +177,7 @@ pub(crate) fn generate_schema(
         command.arg("--dot");
         command.arg(dot.as_ref());
     }
-    for fn_to_call in fns_to_call {
-        command.arg(fn_to_call.to_string());
-    }
+    command.env("PGX_SQL_ENTITY_SYMBOLS", fns_to_call.iter().map(|f| f.to_string()).collect::<Vec<_>>().join(","));
 
     let command = command.stdout(Stdio::inherit()).stderr(Stdio::inherit());
     let command_str = format!("{:?}", command);
