@@ -6,7 +6,7 @@ use tracing::instrument;
 
 use super::{
     DotIdentifier, InventorySqlDeclaredEntity, ControlFile,
-    InventoryExtensionSql, InventoryExtensionSqlPositioningRef,
+    InventoryExtensionSql, InventoryPositioningRef,
     InventoryPgExtern, InventoryPgExternReturn, InventoryPostgresEnum,
     InventoryPostgresHash, InventoryPostgresOrd, InventorySchema,
     RustSourceOnlySqlMapping, RustSqlMapping, InventoryPostgresType,
@@ -454,72 +454,36 @@ fn connect_extension_sqls(
                 break;
             }
         }
-        for after in &item.after {
-            match after {
-                InventoryExtensionSqlPositioningRef::FullPath(path) => {
+        for requires in &item.requires {
+            match requires {
+                InventoryPositioningRef::FullPath(path) => {
                     for (other, other_index) in types {
-                        if other.full_path.ends_with(*path) {
+                        if other.full_path.ends_with(path) {
                             tracing::trace!(from = ?item.identifier(), to = ?other.full_path, "Adding ExtensionSQL after Type edge.");
                             graph.add_edge(*other_index, index, SqlGraphRelationship::RequiredBy);
                             break;
                         }
                     }
                     for (other, other_index) in enums {
-                        if other.full_path.ends_with(*path) {
+                        if other.full_path.ends_with(path) {
                             tracing::trace!(from = ?item.identifier(), to = ?other.full_path, "Adding ExtensionSQL after Enum edge.");
                             graph.add_edge(*other_index, index, SqlGraphRelationship::RequiredBy);
                             break;
                         }
                     }
                     for (other, other_index) in externs {
-                        if other.full_path.ends_with(*path) {
+                        if other.full_path.ends_with(path) {
                             tracing::trace!(from = ?item.identifier(), to = ?other.full_path, "Adding ExtensionSQL after Extern edge.");
                             graph.add_edge(*other_index, index, SqlGraphRelationship::RequiredBy);
                             break;
                         }
                     }
                 }
-                InventoryExtensionSqlPositioningRef::Name(name) => {
+                InventoryPositioningRef::Name(name) => {
                     for (other, other_index) in extension_sqls {
                         if other.name == *name {
                             tracing::trace!(from = ?item.identifier(), to = ?other.identifier(), "Adding ExtensionSQL after ExtensionSql edge.");
                             graph.add_edge(*other_index, index, SqlGraphRelationship::RequiredBy);
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-        for before in &item.before {
-            match before {
-                InventoryExtensionSqlPositioningRef::FullPath(path) => {
-                    for (other, other_index) in types {
-                        if other.full_path == *path {
-                            tracing::trace!(from = ?item.full_path, to = ?other.full_path, "Adding ExtensionSQL after Type edge.");
-                            graph.add_edge(index, *other_index, SqlGraphRelationship::RequiredBy);
-                            break;
-                        }
-                    }
-                    for (other, other_index) in enums {
-                        if other.full_path == *path {
-                            tracing::trace!(from = ?item.full_path, to = ?other.full_path, "Adding ExtensionSQL after Enum edge.");
-                            graph.add_edge(index, *other_index, SqlGraphRelationship::RequiredBy);
-                            break;
-                        }
-                    }
-                    for (other, other_index) in externs {
-                        if other.full_path == *path {
-                            tracing::trace!(from = ?item.full_path, to = ?other.full_path, "Adding ExtensionSQL after Extern edge.");
-                            graph.add_edge(index, *other_index, SqlGraphRelationship::RequiredBy);
-                            break;
-                        }
-                    }
-                }
-                InventoryExtensionSqlPositioningRef::Name(name) => {
-                    for (other, other_index) in extension_sqls {
-                        if other.name == *name {
-                            tracing::trace!(from = ?item.full_path, to = ?other.full_path, "Adding ExtensionSQL after ExtensionSql edge.");
-                            graph.add_edge(index, *other_index, SqlGraphRelationship::RequiredBy);
                             break;
                         }
                     }

@@ -11,7 +11,7 @@ mod pg_extern;
 pub use pg_extern::{InventoryPgExtern, InventoryPgExternReturn, InventoryPgExternInput, InventoryPgOperator};
 
 mod extension_sql;
-pub use extension_sql::{InventoryExtensionSql, InventorySqlDeclaredEntity, InventoryExtensionSqlPositioningRef};
+pub use extension_sql::{InventoryExtensionSql, InventorySqlDeclaredEntity};
 
 mod postgres_enum;
 pub use postgres_enum::InventoryPostgresEnum;
@@ -27,6 +27,9 @@ pub use postgres_hash::InventoryPostgresHash;
 
 mod sql_graph_entity;
 pub use sql_graph_entity::SqlGraphEntity;
+
+mod inventory_positioning_ref;
+pub use inventory_positioning_ref::InventoryPositioningRef;
 
 use core::any::TypeId;
 pub use pgx_utils::inventory::*;

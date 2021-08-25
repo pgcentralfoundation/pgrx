@@ -296,7 +296,7 @@ impl ToSql for InventoryPgExtern {
 
                 let operator_sql = format!("\n\
                                         -- {file}:{line}\n\
-                                        -- {module_path}::{name}\n\
+                                        -- {module_path}::{unaliased_name}\n\
                                         CREATE OPERATOR {opname} (\n\
                                             \tPROCEDURE=\"{name}\",\n\
                                             \tLEFTARG={schema_prefix_left}{left_arg}, /* {left_name} */\n\
@@ -308,6 +308,7 @@ impl ToSql for InventoryPgExtern {
                                            file = self.file,
                                            line = self.line,
                                            name = self.name,
+                                           unaliased_name = self.unaliased_name,
                                            module_path = self.module_path,
                                            left_name = left_arg.full_path,
                                            right_name = right_arg.full_path,

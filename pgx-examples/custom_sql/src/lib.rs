@@ -54,15 +54,15 @@ extension_sql!(
     INSERT INTO extension_sql VALUES ('multiple_raw');\n\
 ",
     name = "multiple_raw",
-    after = [Dog, home::Ball, "single_raw", "single"],
+    requires = [Dog, home::Ball, "single_raw", "single"],
 );
 
 // `extension_sql_file` does the same as `extension_sql` but automatically sets the `name` to the
 // filename (not the full path).
-extension_sql_file!("../sql/single.sql", after = ["single_raw"]);
+extension_sql_file!("../sql/single.sql", requires = ["single_raw"]);
 extension_sql_file!(
     "../sql/multiple.sql",
-    after = [Dog, home::Ball, "single_raw", "single", "multiple_raw"],
+    requires = [Dog, home::Ball, "single_raw", "single", "multiple_raw"],
 );
 extension_sql_file!("../sql/finalizer.sql", finalize);
 

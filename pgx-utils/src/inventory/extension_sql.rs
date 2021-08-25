@@ -51,19 +51,15 @@ impl ToTokens for ExtensionSqlFile {
         let mut bootstrap = false;
         let mut finalize = false;
         let mut skip_inventory = false;
-        let mut before = vec![];
-        let mut after = vec![];
+        let mut requires = vec![];
         let mut creates = vec![];
         for attr in &self.attrs {
             match attr {
                 ExtensionSqlAttribute::Creates(items) => {
                     creates.append(&mut items.iter().map(|x| x.to_token_stream()).collect());
                 }
-                ExtensionSqlAttribute::Before(items) => {
-                    before.append(&mut items.iter().map(|x| x.to_token_stream()).collect());
-                }
-                ExtensionSqlAttribute::After(items) => {
-                    after.append(&mut items.iter().map(|x| x.to_token_stream()).collect());
+                ExtensionSqlAttribute::Requires(items) => {
+                    requires.append(&mut items.iter().map(|x| x.to_token_stream()).collect());
                 }
                 ExtensionSqlAttribute::Bootstrap => {
                     bootstrap = true;
@@ -87,8 +83,7 @@ impl ToTokens for ExtensionSqlFile {
                 .expect("No UTF-8 file name for extension_sql_file!()")
                 .to_string(),
         );
-        let before_iter = before.iter();
-        let after_iter = after.iter();
+        let requires_iter = requires.iter();
         let creates_iter = creates.iter();
         if !skip_inventory {
             let inventory_fn_name = syn::Ident::new(
@@ -108,8 +103,7 @@ impl ToTokens for ExtensionSqlFile {
                         name: #name,
                         bootstrap: #bootstrap,
                         finalize: #finalize,
-                        before: vec![#(#before_iter),*],
-                        after: vec![#(#after_iter),*],
+                        requires: vec![#(#requires_iter),*],
                         creates: vec![#(#creates_iter),*],
                     };
                     pgx::datum::inventory::SqlGraphEntity::CustomSql(submission)
@@ -175,16 +169,12 @@ impl ToTokens for ExtensionSql {
         let mut bootstrap = false;
         let mut finalize = false;
         let mut skip_inventory = false;
-        let mut before = vec![];
         let mut creates = vec![];
-        let mut after = vec![];
+        let mut requires = vec![];
         for attr in &self.attrs {
             match attr {
-                ExtensionSqlAttribute::Before(items) => {
-                    before.append(&mut items.iter().map(|x| x.to_token_stream()).collect());
-                }
-                ExtensionSqlAttribute::After(items) => {
-                    after.append(&mut items.iter().map(|x| x.to_token_stream()).collect());
+                ExtensionSqlAttribute::Requires(items) => {
+                    requires.append(&mut items.iter().map(|x| x.to_token_stream()).collect());
                 }
                 ExtensionSqlAttribute::Creates(items) => {
                     creates.append(&mut items.iter().map(|x| x.to_token_stream()).collect());
@@ -201,8 +191,7 @@ impl ToTokens for ExtensionSql {
                 ExtensionSqlAttribute::Name(_found_name) => (), // Already done
             }
         }
-        let before_iter = before.iter();
-        let after_iter = after.iter();
+        let requires_iter = requires.iter();
         let creates_iter = creates.iter();
         let name = &self.name;
         if !skip_inventory {
@@ -223,8 +212,7 @@ impl ToTokens for ExtensionSql {
                         name: #name,
                         bootstrap: #bootstrap,
                         finalize: #finalize,
-                        before: vec![#(#before_iter),*],
-                        after: vec![#(#after_iter),*],
+                        requires: vec![#(#requires_iter),*],
                         creates: vec![#(#creates_iter),*],
                     };
                     pgx::datum::inventory::SqlGraphEntity::CustomSql(submission)
@@ -237,8 +225,7 @@ impl ToTokens for ExtensionSql {
 
 #[derive(Debug, Clone)]
 pub enum ExtensionSqlAttribute {
-    Before(Punctuated<ExtensionSqlPositioning, Token![,]>),
-    After(Punctuated<ExtensionSqlPositioning, Token![,]>),
+    Requires(Punctuated<ExtensionSqlPositioning, Token![,]>),
     Creates(Punctuated<SqlDeclaredEntity, Token![,]>),
     Bootstrap,
     Finalize,
@@ -256,17 +243,11 @@ impl Parse for ExtensionSqlAttribute {
                 let _bracket = syn::bracketed!(content in input);
                 Self::Creates(content.parse_terminated(SqlDeclaredEntity::parse)?)
             }
-            "before" => {
+            "requires" => {
                 let _eq: syn::token::Eq = input.parse()?;
                 let content;
                 let _bracket = syn::bracketed!(content in input);
-                Self::Before(content.parse_terminated(ExtensionSqlPositioning::parse)?)
-            }
-            "after" => {
-                let _eq: syn::token::Eq = input.parse()?;
-                let content;
-                let _bracket = syn::bracketed!(content in input);
-                Self::After(content.parse_terminated(ExtensionSqlPositioning::parse)?)
+                Self::Requires(content.parse_terminated(ExtensionSqlPositioning::parse)?)
             }
             "bootstrap" => Self::Bootstrap,
             "finalize" => Self::Finalize,
@@ -311,12 +292,12 @@ impl ToTokens for ExtensionSqlPositioning {
             ExtensionSqlPositioning::Expr(ex) => {
                 let path = ex.to_token_stream().to_string().replace(" ", "");
                 (quote! {
-                    pgx::inventory::InventoryExtensionSqlPositioningRef::FullPath(#path)
+                    pgx::inventory::InventoryPositioningRef::FullPath(#path)
                 })
                 .to_token_stream()
             }
             ExtensionSqlPositioning::Name(name) => quote! {
-                pgx::inventory::InventoryExtensionSqlPositioningRef::Name(#name)
+                pgx::inventory::InventoryPositioningRef::Name(#name)
             },
         };
         tokens.append_all(toks);

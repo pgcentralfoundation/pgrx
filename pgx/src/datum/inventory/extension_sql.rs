@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-use super::{DotIdentifier, SqlGraphEntity, ToSql};
+use super::{DotIdentifier, SqlGraphEntity, ToSql, InventoryPositioningRef};
 use pgx_utils::inventory::SqlDeclaredEntity;
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
@@ -13,8 +13,7 @@ pub struct InventoryExtensionSql {
     pub name: &'static str,
     pub bootstrap: bool,
     pub finalize: bool,
-    pub before: Vec<InventoryExtensionSqlPositioningRef<'static>>,
-    pub after: Vec<InventoryExtensionSqlPositioningRef<'static>>,
+    pub requires: Vec<InventoryPositioningRef<'static>>,
     pub creates: Vec<InventorySqlDeclaredEntity>,
 }
 
@@ -53,8 +52,7 @@ impl ToSql for InventoryExtensionSql {
                 -- {file}:{line}\n\
                 {bootstrap}\
                 {creates}\
-                {before}\
-                {after}\
+                {requires}\
                 {finalize}\
                 {sql}\
                 ",
@@ -73,21 +71,11 @@ impl ToSql for InventoryExtensionSql {
             } else {
                 "".to_string()
             },
-            before = if !self.before.is_empty() {
+            requires = if !self.requires.is_empty() {
                 format!("\
-                    -- before:\n\
+                   -- requires\n\
                     {}\n\
-                ", self.before.iter().map(|i| 
-                    format!("--   {}", i)
-                ).collect::<Vec<_>>().join("\n")) + "\n"
-            } else {
-                "".to_string()
-            },
-            after = if !self.after.is_empty() {
-                format!("\
-                   -- after\n\
-                    {}\n\
-                ", self.after.iter().map(|i| 
+                ", self.requires.iter().map(|i| 
                     format!("--   {}", i)
                 ).collect::<Vec<_>>().join("\n")) + "\n"
             } else {
@@ -102,22 +90,6 @@ impl ToSql for InventoryExtensionSql {
         Ok(sql)
     }
 }
-
-#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub enum InventoryExtensionSqlPositioningRef<'a> {
-    FullPath(&'a str),
-    Name(&'a str),
-}
-
-impl<'a> Display for InventoryExtensionSqlPositioningRef<'a> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            InventoryExtensionSqlPositioningRef::FullPath(i) => f.write_str(i),
-            InventoryExtensionSqlPositioningRef::Name(i) => f.write_str(i),
-        }
-    }
-}
-
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq, Ord, PartialOrd)]
 pub enum InventorySqlDeclaredEntity {
