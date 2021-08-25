@@ -401,9 +401,10 @@ macro_rules! pg_binary_magic {
 
             // Initialize tracing with tracing-error, and eyre
             let fmt_layer = tracing_subscriber::fmt::Layer::new()
+                .without_time()
                 .pretty();
             let filter_layer = EnvFilter::try_from_default_env()
-                .or_else(|_| EnvFilter::try_new("info"))
+                .or_else(|_| EnvFilter::try_new("warn"))
                 .unwrap();
             tracing_subscriber::registry()
                 .with(filter_layer)
@@ -412,7 +413,6 @@ macro_rules! pg_binary_magic {
                 .init();
             color_eyre::install()?;
 
-            // We don't really need a full argument parser here quite yet.
             let path = matches.value_of("sql").unwrap_or(concat!(
                 "./sql/",
                 core::env!("CARGO_PKG_NAME"),
@@ -429,7 +429,7 @@ macro_rules! pg_binary_magic {
                 Default::default()
             };
 
-            tracing::info!(path = %path, "Writing SQL");
+            tracing::info!(path = %path, "Collecting {} SQL entities", symbols_to_call.len());
             let mut entities = Vec::default();
             entities.push(SqlGraphEntity::ExtensionRoot(CONTROL_FILE.clone()));
             unsafe {
