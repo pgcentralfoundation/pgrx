@@ -1,7 +1,7 @@
 use std::fmt::Display;
 
 use super::{DotIdentifier, SqlGraphEntity, ToSql};
-use pgx_utils::pg_inventory::SqlDeclaredEntity;
+use pgx_utils::inventory::SqlDeclaredEntity;
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct InventoryExtensionSql {
@@ -25,7 +25,7 @@ impl InventoryExtensionSql {
 
     pub fn has_sql_declared_entity(
         &self,
-        identifier: &pgx_utils::pg_inventory::SqlDeclaredEntity,
+        identifier: &pgx_utils::inventory::SqlDeclaredEntity,
     ) -> Option<&InventorySqlDeclaredEntity> {
         self.creates
             .iter()

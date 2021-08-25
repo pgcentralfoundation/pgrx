@@ -28,7 +28,6 @@ extern crate bitflags;
 
 // expose our various derive macros
 pub use pgx_macros::*;
-pub use pgx_utils::pg_inventory;
 
 pub mod callbacks;
 pub mod datum;
@@ -60,8 +59,6 @@ pub mod varlena;
 pub mod wrappers;
 pub mod xid;
 
-#[doc(hidden)]
-pub use inventory;
 #[doc(hidden)]
 pub use once_cell;
 
@@ -332,11 +329,11 @@ macro_rules! pg_inventory_magic {
             use core::convert::TryFrom;
             use pgx::{
                 pg_sys,
-                inventory::{
+                datum::inventory::{
                     ControlFile, PgxSql,
-                }
+                    reexports::once_cell::sync::Lazy,
+                },
             };
-            use pgx_utils::pg_inventory::once_cell::sync::Lazy;
 
             /// The contents of the `*.control` file of the crate.
             pub static CONTROL_FILE: Lazy<ControlFile> = Lazy::new(|| {
@@ -362,8 +359,8 @@ macro_rules! pg_inventory_magic {
 /// ```
 ///
 /// This creates a binary that:
-///  * Has [`tracing`](pgx_utils::pg_inventory::tracing) and [`color_eyre`](`pgx_utils::pg_inventory::color_eyre`) set up.
-///  * Supports [`EnvFilter`](pgx_utils::pg_inventory::tracing_subscriber::EnvFilter) log level configuration.
+///  * Has [`tracing`](pgx_utils::inventory::tracing) and [`color_eyre`](`pgx_utils::inventory::color_eyre`) set up.
+///  * Supports [`EnvFilter`](pgx_utils::inventory::tracing_subscriber::EnvFilter) log level configuration.
 ///  * Accepts up to two arguments, an SQL destination and (optionally) a GraphViz DOT destination.
 ///
 /// Using different SQL generator code should be considered an advanced use case, and not
@@ -379,18 +376,18 @@ macro_rules! pg_inventory_magic {
 #[macro_export]
 macro_rules! pg_binary_magic {
     ($($prelude:ident)::*) => {
-        fn main() -> pgx::pg_inventory::color_eyre::Result<()> {
-            use pgx::{
-                pg_inventory::{
+        fn main() -> pgx::datum::inventory::reexports::color_eyre::Result<()> {
+            use pgx::datum::inventory::{
+                reexports::{
                     tracing_error::ErrorLayer,
                     tracing,
                     tracing_subscriber::{self, util::SubscriberInitExt, layer::SubscriberExt, EnvFilter},
                     color_eyre,
-                    eyre,
+                    eyre::{self, eyre as eyre_err},
                     libloading,
                     clap,
                 },
-                inventory::PgxSql,
+                PgxSql, SqlGraphEntity,
             };
             pub use $($prelude :: )*{__pgx_marker, __pgx_internals::CONTROL_FILE};
             __pgx_marker(); // We *must* use this.
@@ -399,7 +396,7 @@ macro_rules! pg_binary_magic {
             let matches = clap::App::new("sql-generator")
                 .arg(clap::Arg::with_name("sql").long("sql").value_name("FILE").takes_value(true))
                 .arg(clap::Arg::with_name("dot").long("dot").value_name("FILE").takes_value(true))
-                .arg(clap::Arg::with_name("symbols").value_name("SYMBOL").multiple(true).takes_value(true))
+                .arg(clap::Arg::with_name("symbols").value_name("SYMBOL").env("PGX_SQL_ENTITY_SYMBOLS").use_delimiter(true).multiple(true).takes_value(true))
                 .get_matches();
 
             // Initialize tracing with tracing-error, and eyre
@@ -424,16 +421,22 @@ macro_rules! pg_binary_magic {
                 ".sql"
             ).into());
             let dot = matches.value_of("dot");
-            let symbols_to_call = matches.values_of("symbols").unwrap_or(Default::default());
+            let symbols_to_call: Vec<_> = if let Some(symbols) = matches.values_of("symbols") {
+                symbols.map(|x| x.to_string()).collect()
+            } else if let Ok(symbols) = std::env::var("PGX_SQL_ENTITY_SYMBOLS") {
+                symbols.split(",").map(|x| x.to_string()).collect()
+            } else {
+                Default::default()
+            };
 
             tracing::info!(path = %path, "Writing SQL");
             let mut entities = Vec::default();
-            entities.push(pgx::inventory::SqlGraphEntity::ExtensionRoot(CONTROL_FILE.clone()));
+            entities.push(SqlGraphEntity::ExtensionRoot(CONTROL_FILE.clone()));
             unsafe {
                 let lib = libloading::os::unix::Library::this();
                 for symbol_to_call in symbols_to_call {
                     let symbol: libloading::os::unix::Symbol<
-                        unsafe extern fn() -> pgx::datum::inventory::SqlGraphEntity
+                        unsafe extern fn() -> SqlGraphEntity
                     > = lib.get(symbol_to_call.as_bytes()).unwrap();
                     let entity = symbol();
                     entities.push(entity);

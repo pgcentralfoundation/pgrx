@@ -16,7 +16,7 @@ use syn::{
 /// ```rust
 /// use syn::{Macro, parse::Parse, parse_quote, parse};
 /// use quote::{quote, ToTokens};
-/// use pgx_utils::pg_inventory::PostgresOrd;
+/// use pgx_utils::inventory::PostgresOrd;
 ///
 /// # fn main() -> eyre::Result<()> {
 /// let parsed: PostgresOrd = parse_quote! {
@@ -35,7 +35,7 @@ use syn::{
 /// ```rust
 /// use syn::{Macro, parse::Parse, parse_quote, parse};
 /// use quote::{quote, ToTokens};
-/// use pgx_utils::pg_inventory::PostgresOrd;
+/// use pgx_utils::inventory::PostgresOrd;
 ///
 /// # fn main() -> eyre::Result<()> {
 /// let parsed: PostgresOrd = parse_quote! {

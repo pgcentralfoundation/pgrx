@@ -11,7 +11,7 @@ pub use returning::InventoryPgExternReturn;
 use pgx_utils::ExternArgs;
 
 use super::{DotIdentifier, SqlGraphEntity, ToSql};
-use pgx_utils::pg_inventory::SqlDeclaredEntity;
+use pgx_utils::inventory::SqlDeclaredEntity;
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct InventoryPgExtern {

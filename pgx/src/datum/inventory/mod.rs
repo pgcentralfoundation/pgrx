@@ -29,6 +29,7 @@ mod sql_graph_entity;
 pub use sql_graph_entity::SqlGraphEntity;
 
 use core::any::TypeId;
+pub use pgx_utils::inventory::*;
 
 /// Able to produce a GraphViz DOT format identifier.
 pub trait DotIdentifier {
@@ -52,7 +53,7 @@ pub trait ToSql {
 /// A mapping from a Rust type to a SQL type, with a `TypeId`.
 ///
 /// ```rust
-/// use pgx_utils::pg_inventory::RustSqlMapping;
+/// use pgx_utils::inventory::RustSqlMapping;
 ///
 /// let constructed = RustSqlMapping::of::<i32>(String::from("int"));
 /// let raw = RustSqlMapping {
@@ -86,7 +87,7 @@ impl RustSqlMapping {
 /// In general, this can only offer a fuzzy matching, as it does not use [`core::any::TypeId`].
 ///
 /// ```rust
-/// use pgx_utils::pg_inventory::RustSourceOnlySqlMapping;
+/// use pgx_utils::inventory::RustSourceOnlySqlMapping;
 ///
 /// let constructed = RustSourceOnlySqlMapping::new(
 ///     String::from("Oid"),

@@ -34,7 +34,7 @@ impl PgGuardRewriter {
     pub fn item_fn(
         &self,
         func: ItemFn,
-        inventory_submission: Option<&pgx_utils::pg_inventory::PgExtern>,
+        inventory_submission: Option<&pgx_utils::inventory::PgExtern>,
         rewrite_args: bool,
         is_raw: bool,
         no_guard: bool,
@@ -52,7 +52,7 @@ impl PgGuardRewriter {
     fn item_fn_with_rewrite(
         &self,
         mut func: ItemFn,
-        inventory_submission: Option<&pgx_utils::pg_inventory::PgExtern>,
+        inventory_submission: Option<&pgx_utils::inventory::PgExtern>,
         is_raw: bool,
         no_guard: bool,
     ) -> (proc_macro2::TokenStream, bool) {
@@ -188,7 +188,7 @@ impl PgGuardRewriter {
         generics: &Generics,
         func_call: proc_macro2::TokenStream,
         rewritten_return_type: proc_macro2::TokenStream,
-        inventory_submission: Option<&pgx_utils::pg_inventory::PgExtern>,
+        inventory_submission: Option<&pgx_utils::inventory::PgExtern>,
         no_guard: bool,
     ) -> proc_macro2::TokenStream {
         let guard = if no_guard {
@@ -216,7 +216,7 @@ impl PgGuardRewriter {
 
     fn impl_tuple_udf(
         mut func: ItemFn,
-        inventory_submission: Option<&pgx_utils::pg_inventory::PgExtern>,
+        inventory_submission: Option<&pgx_utils::inventory::PgExtern>,
     ) -> proc_macro2::TokenStream {
         let func_span = func.span();
         let return_type = func.sig.output;
@@ -250,7 +250,7 @@ impl PgGuardRewriter {
         func_name_wrapper: Ident,
         generics: &Generics,
         func_call: proc_macro2::TokenStream,
-        inventory_submission: Option<&pgx_utils::pg_inventory::PgExtern>,
+        inventory_submission: Option<&pgx_utils::inventory::PgExtern>,
         optional: bool,
     ) -> proc_macro2::TokenStream {
         let generic_type = proc_macro2::TokenStream::from_str(types.first().unwrap()).unwrap();
@@ -335,7 +335,7 @@ impl PgGuardRewriter {
         func_name_wrapper: Ident,
         generics: &Generics,
         func_call: proc_macro2::TokenStream,
-        inventory_submission: Option<&pgx_utils::pg_inventory::PgExtern>,
+        inventory_submission: Option<&pgx_utils::inventory::PgExtern>,
         optional: bool,
     ) -> proc_macro2::TokenStream {
         let numtypes = types.len();
@@ -445,7 +445,7 @@ impl PgGuardRewriter {
     fn item_fn_without_rewrite(
         &self,
         mut func: ItemFn,
-        inventory_submission: Option<&pgx_utils::pg_inventory::PgExtern>,
+        inventory_submission: Option<&pgx_utils::inventory::PgExtern>,
         no_guard: bool,
     ) -> proc_macro2::TokenStream {
         // remember the original visibility and signature classifications as we want

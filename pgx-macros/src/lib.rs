@@ -157,7 +157,7 @@ pub fn merges(_attr: TokenStream, item: TokenStream) -> TokenStream {
 
 #[proc_macro_attribute]
 pub fn pg_schema(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    let pgx_schema = parse_macro_input!(item as pg_inventory::Schema);
+    let pgx_schema = parse_macro_input!(item as inventory::Schema);
     pgx_schema.to_token_stream().into()
 }
 
@@ -294,7 +294,7 @@ extension_sql!(r#"\
 #[proc_macro]
 pub fn extension_sql(input: TokenStream) -> TokenStream {
     fn wrapped(input: TokenStream) -> Result<TokenStream, syn::Error> {
-        let ext_sql: pg_inventory::ExtensionSql = syn::parse(input)?;
+        let ext_sql: inventory::ExtensionSql = syn::parse(input)?;
         Ok(ext_sql.to_token_stream().into())
     }
 
@@ -341,7 +341,7 @@ For all other options, and examples of them, see [`macro@extension_sql`].
 #[proc_macro]
 pub fn extension_sql_file(input: TokenStream) -> TokenStream {
     fn wrapped(input: TokenStream) -> Result<TokenStream, syn::Error> {
-        let ext_sql: pg_inventory::ExtensionSqlFile = syn::parse(input)?;
+        let ext_sql: inventory::ExtensionSqlFile = syn::parse(input)?;
         Ok(ext_sql.to_token_stream().into())
     }
 
@@ -482,7 +482,7 @@ fn example_return() -> pg_sys::Oid {
 pub fn pg_extern(attr: TokenStream, item: TokenStream) -> TokenStream {
     let args = parse_extern_attributes(proc_macro2::TokenStream::from(attr.clone()));
 
-    let inventory_item = pg_inventory::PgExtern::new(attr.clone().into(), item.clone().into()).unwrap();
+    let inventory_item = inventory::PgExtern::new(attr.clone().into(), item.clone().into()).unwrap();
     let inventory_submission = if args.iter().any(|x| *x == ExternArgs::SkipInventory) {
         None
     } else {
@@ -499,7 +499,7 @@ pub fn pg_extern(attr: TokenStream, item: TokenStream) -> TokenStream {
 fn rewrite_item_fn(
     mut func: ItemFn,
     extern_args: HashSet<ExternArgs>,
-    inventory_submission: Option<&pg_inventory::PgExtern>,
+    inventory_submission: Option<&inventory::PgExtern>,
 ) -> proc_macro2::TokenStream {
     let is_raw = extern_args.contains(&ExternArgs::Raw);
     let no_guard = extern_args.contains(&ExternArgs::NoGuard);
@@ -625,7 +625,7 @@ fn impl_postgres_enum(ast: DeriveInput) -> proc_macro2::TokenStream {
         }
     });
 
-    let inventory_item = pg_inventory::PostgresEnum::from_derive_input(inventory_ast).unwrap();
+    let inventory_item = inventory::PostgresEnum::from_derive_input(inventory_ast).unwrap();
     if !found_skip_inventory {
         inventory_item.to_tokens(&mut stream);
     }
@@ -763,7 +763,7 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
         });
     }
 
-    let inventory_item = pg_inventory::PostgresType::from_derive_input(ast).unwrap();
+    let inventory_item = inventory::PostgresType::from_derive_input(ast).unwrap();
     if !found_skip_inventory {
         inventory_item.to_tokens(&mut stream);
     }

@@ -25,8 +25,12 @@ rttp_client = "0.1.0"
 [dev-dependencies]
 pgx-tests = { path = "../../../pgx/pgx-tests" }
 
-[profile.release]
-panic = "unwind"
-opt-level = 3
-lto = "fat"
-codegen-units = 1
+# uncomment these if compiling outside of 'pgx'
+# [profile.dev]
+# panic = "unwind"
+
+# [profile.release]
+# panic = "unwind"
+# opt-level = 3
+# lto = "fat"
+# codegen-units = 1

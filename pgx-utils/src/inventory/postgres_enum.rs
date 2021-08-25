@@ -15,7 +15,7 @@ use syn::{punctuated::Punctuated, Ident, Token};
 /// ```rust
 /// use syn::{Macro, parse::Parse, parse_quote, parse};
 /// use quote::{quote, ToTokens};
-/// use pgx_utils::pg_inventory::PostgresEnum;
+/// use pgx_utils::inventory::PostgresEnum;
 ///
 /// # fn main() -> eyre::Result<()> {
 /// let parsed: PostgresEnum = parse_quote! {

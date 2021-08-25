@@ -15,7 +15,7 @@ use syn::{
 /// ```rust
 /// use syn::{Macro, parse::Parse, parse_quote, parse};
 /// use quote::{quote, ToTokens};
-/// use pgx_utils::pg_inventory::ExtensionSqlFile;
+/// use pgx_utils::inventory::ExtensionSqlFile;
 ///
 /// # fn main() -> eyre::Result<()> {
 /// let parsed: Macro = parse_quote! {
@@ -129,7 +129,7 @@ impl ToTokens for ExtensionSqlFile {
 /// ```rust
 /// use syn::{Macro, parse::Parse, parse_quote, parse};
 /// use quote::{quote, ToTokens};
-/// use pgx_utils::pg_inventory::ExtensionSql;
+/// use pgx_utils::inventory::ExtensionSql;
 ///
 /// # fn main() -> eyre::Result<()> {
 /// let parsed: Macro = parse_quote! {

@@ -15,7 +15,7 @@ use syn::{
 /// ```rust
 /// use syn::{Macro, parse::Parse, parse_quote, parse};
 /// use quote::{quote, ToTokens};
-/// use pgx_utils::pg_inventory::PostgresType;
+/// use pgx_utils::inventory::PostgresType;
 ///
 /// # fn main() -> eyre::Result<()> {
 /// let parsed: PostgresType = parse_quote! {

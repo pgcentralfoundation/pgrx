@@ -1,4 +1,4 @@
-use pgx_utils::{operator_common::*, pg_inventory};
+use pgx_utils::{operator_common::*, inventory};
 use quote::ToTokens;
 use syn::DeriveInput;
 
@@ -33,7 +33,7 @@ pub(crate) fn impl_postgres_ord(ast: DeriveInput) -> proc_macro2::TokenStream {
     stream.extend(ge(&ast.ident, found_skip_inventory));
     stream.extend(cmp(&ast.ident, found_skip_inventory));
 
-    let inventory_item = pg_inventory::PostgresOrd::new(ast.ident.clone());
+    let inventory_item = inventory::PostgresOrd::new(ast.ident.clone());
     if !found_skip_inventory {
         inventory_item.to_tokens(&mut stream);
     }
@@ -53,7 +53,7 @@ pub(crate) fn impl_postgres_hash(ast: DeriveInput) -> proc_macro2::TokenStream {
 
     stream.extend(hash(&ast.ident, found_skip_inventory));
 
-    let inventory_item = pg_inventory::PostgresHash::new(ast.ident.clone());
+    let inventory_item = inventory::PostgresHash::new(ast.ident.clone());
     if !found_skip_inventory {
         inventory_item.to_tokens(&mut stream);
     }

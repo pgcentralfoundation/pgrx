@@ -16,7 +16,7 @@ use syn::{
 /// ```rust
 /// use syn::{Macro, parse::Parse, parse_quote, parse};
 /// use quote::{quote, ToTokens};
-/// use pgx_utils::pg_inventory::PostgresHash;
+/// use pgx_utils::inventory::PostgresHash;
 ///
 /// # fn main() -> eyre::Result<()> {
 /// let parsed: PostgresHash = parse_quote! {
@@ -35,7 +35,7 @@ use syn::{
 /// ```rust
 /// use syn::{Macro, parse::Parse, parse_quote, parse};
 /// use quote::{quote, ToTokens};
-/// use pgx_utils::pg_inventory::PostgresHash;
+/// use pgx_utils::inventory::PostgresHash;
 ///
 /// # fn main() -> eyre::Result<()> {
 /// let parsed: PostgresHash = parse_quote! {

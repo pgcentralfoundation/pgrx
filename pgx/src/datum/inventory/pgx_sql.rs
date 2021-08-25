@@ -12,7 +12,7 @@ use super::{
     RustSourceOnlySqlMapping, RustSqlMapping, InventoryPostgresType,
     SqlGraphEntity, ToSql
 };
-use pgx_utils::pg_inventory::SqlDeclaredEntity;
+use pgx_utils::inventory::SqlDeclaredEntity;
 
 /// A generator for SQL.
 ///
