@@ -256,10 +256,10 @@ impl Parse for ExtensionSqlAttribute {
                 Self::Name(input.parse()?)
             }
             "skip_inventory" => Self::SkipInventory,
-            _ => {
+            other => {
                 return Err(syn::Error::new(
                     ident.span(),
-                    "Unknown extension_sql attribute",
+                    &format!("Unknown extension_sql attribute: {}", other),
                 ))
             }
         };

@@ -166,9 +166,9 @@ Declare SQL to be included in generated extension script.
 
 Accepts a String literal, a `name` attribute, and optionally others:
 
-* `name = "item"`: Set the unique identifer to `"item"` for use in `before`/`after` declarations.
+* `name = "item"`: Set the unique identifer to `"item"` for use in `requires` declarations.
 * `before = [item, item_two]`: References to other `name`s or Rust items which this SQL should be present before.
-* `after = [item, item_two]`: References to other `name`s or Rust items which this SQL should be present after.
+* `requires = [item, item_two]`: References to other `name`s or Rust items which this SQL should be present after.
 * `creates = [ Type(submod::Cust), Enum(Pre), Function(defined)]`: Communicates to the [`pgx-utils::PgxSql`] dependency graph
     that this SQL block creates certain entities. Please note it **does not** create matching Rust types.
 * `bootstrap` (**Unique**): Hint that this is SQL intended to go before all other generated SQL.
@@ -243,8 +243,7 @@ extension_sql!(r#"
     -- SQL statements
     "#,
     name = "demo",
-    before = [ Treat, "named_one" ],
-    after = [ dog_characteristics::DogAlignment ],
+    requires = [ "named_one", dog_characteristics::DogAlignment ],
 #   skip_inventory,
 );
 ```
@@ -290,7 +289,7 @@ extension_sql!(r#"\
         );\
     "#,
     name = "demo",
-    after = ["create_complex_type", complex_in, complex_out],
+    requires = ["create_complex_type", complex_in, complex_out],
 #   skip_inventory,
 );
 

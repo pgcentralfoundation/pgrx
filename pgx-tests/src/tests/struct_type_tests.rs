@@ -52,7 +52,7 @@ CREATE TYPE complex (
 );
 "#,
     name = "create_complex_type",
-    after = ["create_complex_shell_type", complex_in, complex_out]
+    requires = ["create_complex_shell_type", complex_in, complex_out]
 );
 
 #[cfg(any(test, feature = "pg_test"))]
