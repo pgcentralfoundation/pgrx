@@ -144,7 +144,7 @@ fn copy_sql_files(
         &*additional_features,
         &dest,
         Option::<String>::None,
-        "info",
+        None,
         false,
         true
     )

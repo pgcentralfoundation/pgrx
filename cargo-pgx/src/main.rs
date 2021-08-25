@@ -231,14 +231,14 @@ fn do_it() -> std::result::Result<(), std::io::Error> {
                 let is_release = schema.is_present("release");
 
                 let log_level = if let Ok(log_level) = std::env::var("RUST_LOG") {
-                    log_level
+                    Some(log_level)
                 } else {
                     match schema.occurrences_of("verbose") {
-                        0 => "warn",
-                        1 => "debug",
-                        2 => "trace",
+                        0 => None,
+                        1 => Some("debug".to_string()),
+                        2 => Some("trace".to_string()),
                         _ => panic!("Cannot set a log level more verbose than `trace` (-vv). Please reduce the log level."),
-                    }.to_string()
+                    }
                 };
 
                 let features = schema
@@ -269,7 +269,7 @@ fn do_it() -> std::result::Result<(), std::io::Error> {
                 let default = schema.is_present("force-default");
                 let manual = schema.is_present("manual");
 
-                schema::generate_schema(&pg_config, is_release, &features, &out, dot, &log_level, default, manual)
+                schema::generate_schema(&pg_config, is_release, &features, &out, dot, log_level, default, manual)
             }
             ("get", Some(get)) => {
                 let name = get.value_of("name").expect("no property name specified");

@@ -14,7 +14,7 @@ pub(crate) fn generate_schema(
     additional_features: &[&str],
     path: impl AsRef<std::path::Path>,
     dot: Option<impl AsRef<std::path::Path>>,
-    log_level: &str,
+    log_level: Option<String>,
     force_default: bool,
     manual: bool,
 ) -> Result<(), std::io::Error> {
@@ -81,7 +81,9 @@ pub(crate) fn generate_schema(
         command.arg("--release");
     }
 
-    command.env("RUST_LOG", log_level);
+    if let Some(log_level) = &log_level {
+        command.env("RUST_LOG", log_level);
+    }
 
     if !features.trim().is_empty() {
         command.arg("--features");
@@ -156,7 +158,9 @@ pub(crate) fn generate_schema(
         command.arg("--release");
     }
 
-    command.env("RUST_LOG", log_level);
+    if let Some(log_level) = &log_level {
+        command.env("RUST_LOG", log_level);
+    }
 
     if !features.trim().is_empty() {
         command.arg("--features");

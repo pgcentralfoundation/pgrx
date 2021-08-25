@@ -53,7 +53,7 @@ pub trait ToSql {
 /// A mapping from a Rust type to a SQL type, with a `TypeId`.
 ///
 /// ```rust
-/// use pgx_utils::inventory::RustSqlMapping;
+/// use pgx::inventory::RustSqlMapping;
 ///
 /// let constructed = RustSqlMapping::of::<i32>(String::from("int"));
 /// let raw = RustSqlMapping {
@@ -87,7 +87,7 @@ impl RustSqlMapping {
 /// In general, this can only offer a fuzzy matching, as it does not use [`core::any::TypeId`].
 ///
 /// ```rust
-/// use pgx_utils::inventory::RustSourceOnlySqlMapping;
+/// use pgx::inventory::RustSourceOnlySqlMapping;
 ///
 /// let constructed = RustSourceOnlySqlMapping::new(
 ///     String::from("Oid"),

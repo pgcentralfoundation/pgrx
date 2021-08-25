@@ -164,7 +164,7 @@ pub fn pg_schema(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /**
 Declare SQL to be included in generated extension script.
 
-Accepts a String literal, and optionally the attributes:
+Accepts a String literal, a `name` attribute, and optionally others:
 
 * `name = "item"`: Set the unique identifer to `"item"` for use in `before`/`after` declarations.
 * `before = [item, item_two]`: References to other `name`s or Rust items which this SQL should be present before.
@@ -184,6 +184,7 @@ extension_sql!(
     r#"
     -- SQL statements
     "#,
+    name = "demo",
 #   skip_inventory,
 );
 ```
@@ -197,6 +198,7 @@ extension_sql!(
     r#"
     -- SQL statements
     "#,
+    name = "demo",
     bootstrap,
 #   skip_inventory,
 );
@@ -211,6 +213,7 @@ extension_sql!(
     r#"
     -- SQL statements
     "#,
+    name = "demo",
     finalize,
 #   skip_inventory,
 );
@@ -232,15 +235,16 @@ mod dog_characteristics {
 extension_sql!(r#"
     -- SQL statements
     "#,
-        name = "named_one",
+    name = "named_one",
 #   skip_inventory,
 );
 
 extension_sql!(r#"
     -- SQL statements
     "#,
-        before = [ Treat, "named_one" ],
-        after = [ dog_characteristics::DogAlignment ],
+    name = "demo",
+    before = [ Treat, "named_one" ],
+    after = [ dog_characteristics::DogAlignment ],
 #   skip_inventory,
 );
 ```
@@ -285,6 +289,7 @@ extension_sql!(r#"\
             alignment = double
         );\
     "#,
+    name = "demo",
     after = ["create_complex_type", complex_in, complex_out],
 #   skip_inventory,
 );

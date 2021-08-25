@@ -19,7 +19,7 @@ use syn::{
 ///
 /// # fn main() -> eyre::Result<()> {
 /// let parsed: Macro = parse_quote! {
-///     extension_sql_file!("sql/example.sql", bootstrap)
+///     extension_sql_file!("sql/example.sql", name = "example", bootstrap)
 /// };
 /// let inner_tokens = parsed.tokens;
 /// let inner: ExtensionSqlFile = parse_quote! {
@@ -133,7 +133,7 @@ impl ToTokens for ExtensionSqlFile {
 ///
 /// # fn main() -> eyre::Result<()> {
 /// let parsed: Macro = parse_quote! {
-///     extension_sql!("-- Example content", bootstrap)
+///     extension_sql!("-- Example content", name = "example", bootstrap)
 /// };
 /// let inner_tokens = parsed.tokens;
 /// let inner: ExtensionSql = parse_quote! {
