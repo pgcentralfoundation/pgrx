@@ -134,6 +134,13 @@ subcommands:
 
                     If `cargo pgx schema` does not detect these, it will create them automatically with defaults.
                     To skip writing defaults, use `-m`, to overwrite exiting files with these defaults, use `-f`.
+                        
+                    Finally, `lib.crate-type` should be set in `Cargo.toml`:
+                    
+                        [lib]
+                        crate-type = ["cdylib", "rlib"]
+                    
+                    `cargo pgx schema` does not update your `Cargo.toml`, this must be manually set.
               args:
                 - manual:
                     short: m
