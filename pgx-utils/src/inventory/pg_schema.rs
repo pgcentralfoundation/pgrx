@@ -58,33 +58,24 @@ impl ToTokens for Schema {
         let postfix = hasher.finish();
         // End of hack
         
-        let found_skip_inventory = self.module.attrs.iter().any(|x| {
-            x.path
-                .get_ident()
-                .map(|x| x.to_string() == "skip_inventory")
-                .unwrap_or(false)
-        });
-
         let mut updated_content = content_items.clone();
-        if !found_skip_inventory {
-            let inventory_fn_name = syn::Ident::new(
-                &format!("__pgx_internals_schema_{}_{}", ident, postfix),
-                Span::call_site(),
-            );
-            updated_content.push(syn::parse_quote! {
-                    #[no_mangle]
-                    #[link(kind = "static")]
-                    pub extern "C" fn  #inventory_fn_name() -> pgx::datum::inventory::SqlGraphEntity {
-                        let submission = pgx::datum::inventory::InventorySchema {
-                            module_path: module_path!(),
-                            name: stringify!(#ident),
-                            file: file!(),
-                            line: line!(),
-                        };
-                        pgx::datum::inventory::SqlGraphEntity::Schema(submission)
-                    }
-            });
-        }
+        let inventory_fn_name = syn::Ident::new(
+            &format!("__pgx_internals_schema_{}_{}", ident, postfix),
+            Span::call_site(),
+        );
+        updated_content.push(syn::parse_quote! {
+                #[no_mangle]
+                #[link(kind = "static")]
+                pub extern "C" fn  #inventory_fn_name() -> pgx::datum::inventory::SqlGraphEntity {
+                    let submission = pgx::datum::inventory::InventorySchema {
+                        module_path: module_path!(),
+                        name: stringify!(#ident),
+                        file: file!(),
+                        line: line!(),
+                    };
+                    pgx::datum::inventory::SqlGraphEntity::Schema(submission)
+                }
+        });
         let _semi = &self.module.semi;
 
         let inv = quote! {

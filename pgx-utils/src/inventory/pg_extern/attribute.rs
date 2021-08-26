@@ -43,7 +43,6 @@ pub enum Attribute {
     Error(syn::LitStr),
     Schema(syn::LitStr),
     Name(syn::LitStr),
-    SkipInventory,
 }
 
 impl ToTokens for Attribute {
@@ -61,7 +60,6 @@ impl ToTokens for Attribute {
             Attribute::Error(s) => quote! { pgx::inventory::ExternArgs::Error(String::from(#s)) },
             Attribute::Schema(s) => quote! { pgx::inventory::ExternArgs::Schema(String::from(#s)) },
             Attribute::Name(s) => quote! { pgx::inventory::ExternArgs::Name(String::from(#s)) },
-            Attribute::SkipInventory => quote! { pgx::inventory::ExternArgs::SkipInventory },
         };
         tokens.append_all(quoted);
     }
@@ -95,7 +93,6 @@ impl Parse for Attribute {
                 let literal: syn::LitStr = input.parse()?;
                 Attribute::Name(literal)
             }
-            "skip_inventory" => Attribute::SkipInventory,
             _ => return Err(syn::Error::new(Span::call_site(), "Invalid option")),
         };
         Ok(found)

@@ -61,7 +61,6 @@ pub trait PostgresType {}
 /// use serde::{Serialize, Deserialize};
 ///
 /// #[derive(Debug, Clone, Copy, Serialize, Deserialize, PostgresType)]
-/// # #[skip_inventory]
 /// struct Treat<'a> { best_part: &'a str, };
 ///
 /// let mut mappings = Default::default();

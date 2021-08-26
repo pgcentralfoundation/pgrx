@@ -327,7 +327,6 @@ pub fn parse_extern_attributes(attr: TokenStream) -> HashSet<ExternArgs> {
                         let name = name[1..name.len() - 1].to_string();
                         args.insert(ExternArgs::Name(name.to_string()))
                     }
-                    "skip_inventory" => args.insert(ExternArgs::SkipInventory),
                     _ => false,
                 };
             }

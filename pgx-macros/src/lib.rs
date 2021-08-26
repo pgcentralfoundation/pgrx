@@ -173,7 +173,6 @@ Accepts a String literal, a `name` attribute, and optionally others:
     that this SQL block creates certain entities. Please note it **does not** create matching Rust types.
 * `bootstrap` (**Unique**): Hint that this is SQL intended to go before all other generated SQL.
 * `finalize` (**Unique**): Hint that this is SQL intended to go after all other generated SQL.
-* `skip_inventory`: Skip SQL generator inventory submission. **Use always (and only) in Doctests!**
 
 You can declare some SQL without any positioning information, meaning it can end up anywhere in the generated SQL:
 
@@ -185,7 +184,6 @@ extension_sql!(
     -- SQL statements
     "#,
     name = "demo",
-#   skip_inventory,
 );
 ```
 
@@ -200,7 +198,6 @@ extension_sql!(
     "#,
     name = "demo",
     bootstrap,
-#   skip_inventory,
 );
 ```
 
@@ -215,7 +212,6 @@ extension_sql!(
     "#,
     name = "demo",
     finalize,
-#   skip_inventory,
 );
 ```
 
@@ -236,7 +232,6 @@ extension_sql!(r#"
     -- SQL statements
     "#,
     name = "named_one",
-#   skip_inventory,
 );
 
 extension_sql!(r#"
@@ -244,7 +239,6 @@ extension_sql!(r#"
     "#,
     name = "demo",
     requires = [ "named_one", dog_characteristics::DogAlignment ],
-#   skip_inventory,
 );
 ```
 
@@ -267,15 +261,14 @@ extension_sql!(r#"\
     "#,
     name = "create_complex_type",
     creates = [Type(Complex)],
-#   skip_inventory,
 );
 
-#[pg_extern(immutable, skip_inventory)] // Only use `skip_inventory` in doctests.
+#[pg_extern(immutable)]
 fn complex_in(input: &std::ffi::CStr) -> PgBox<Complex> {
     todo!()
 }
 
-#[pg_extern(immutable, skip_inventory)] // Only use `skip_inventory` in doctests.
+#[pg_extern(immutable)]
 fn complex_out(complex: PgBox<Complex>) -> &'static std::ffi::CStr {
     todo!()
 }
@@ -290,7 +283,6 @@ extension_sql!(r#"\
     "#,
     name = "demo",
     requires = ["create_complex_type", complex_in, complex_out],
-#   skip_inventory,
 );
 
 ```
@@ -323,8 +315,7 @@ You can declare some SQL without any positioning information, meaning it can end
 ```rust
 use pgx_macros::extension_sql_file;
 extension_sql_file!(
-    "sql/best_dogs.sql",
-#   skip_inventory,
+    "../static/demo.sql",
 );
 ```
 
@@ -334,9 +325,8 @@ To override the default name:
 use pgx_macros::extension_sql_file;
 
 extension_sql_file!(
-    "sql/best_dogs.sql",
-    name = "best_creatures",
-#   skip_inventory,
+    "../static/demo.sql",
+    name = "singlular",
 );
 ```
 
@@ -382,7 +372,6 @@ Optionally accepts the following attributes:
 * `parallel_unsafe`: Corresponds to [`PARALLEL UNSAFE`](https://www.postgresql.org/docs/current/sql-createfunction.html).
 * `parallel_restricted`: Corresponds to [`PARALLEL RESTRICTED`](https://www.postgresql.org/docs/current/sql-createfunction.html).
 * `no_guard`: Do not use `#[pg_guard]` with the function.
-* `skip_inventory`: Skip SQL generator inventory submission. **Use always (and only) in Doctests!**
 
 Functions can accept and return any type which `pgx` supports. `pgx` supports many PostgreSQL types by default.
 New types can be defined via [`macro@PostgresType`] or [`macro@PostgresEnum`].
@@ -391,7 +380,7 @@ New types can be defined via [`macro@PostgresType`] or [`macro@PostgresEnum`].
 Without any arguments or returns:
 ```rust
 use pgx::*;
-#[pg_extern(skip_inventory)]  // Only use `skip_inventory` in doctests.
+#[pg_extern]
 fn foo() { todo!() }
 ```
 
@@ -400,7 +389,7 @@ It's possible to pass even complex arguments:
 
 ```rust
 use pgx::*;
-#[pg_extern(skip_inventory)]  // Only use `skip_inventory` in doctests.
+#[pg_extern]
 fn boop(
     a: i32,
     b: Option<i32>,
@@ -413,9 +402,9 @@ It's possible to set argument defaults, set by PostgreSQL when the function is i
 
 ```rust
 use pgx::*;
-#[pg_extern(skip_inventory)]  // Only use `skip_inventory` in doctests.
+#[pg_extern]
 fn boop(a: default!(i32, 11111)) { todo!() }
-#[pg_extern(skip_inventory)]  // Only use `skip_inventory` in doctests.
+#[pg_extern]
 fn doop(
     a: default!(Vec<Option<&str>>, "ARRAY[]::text[]"),
     b: default!(String, "'note the inner quotes!'")
@@ -435,13 +424,13 @@ It's possible to return even complex values, as well:
 
 ```rust
 use pgx::*;
-#[pg_extern(skip_inventory)]  // Only use `skip_inventory` in doctests.
+#[pg_extern]
 fn boop() -> i32 { todo!() }
-#[pg_extern(skip_inventory)]  // Only use `skip_inventory` in doctests.
+#[pg_extern]
 fn doop() -> Option<i32> { todo!() }
-#[pg_extern(skip_inventory)]  // Only use `skip_inventory` in doctests.
+#[pg_extern]
 fn swoop() -> Option<Vec<Option<i32>>> { todo!() }
-#[pg_extern(skip_inventory)]  // Only use `skip_inventory` in doctests.
+#[pg_extern]
 fn floop() -> (i32, i32) { todo!() }
 ```
 
@@ -449,7 +438,7 @@ Like in PostgreSQL, it's possible to return tables using iterators and the `name
 
 ```rust
 use pgx::*;
-#[pg_extern(skip_inventory)]  // Only use `skip_inventory` in doctests.
+#[pg_extern]
 fn floop() -> impl Iterator<Item = (name!(a, i32), name!(b, i32))> {
     None.into_iter() // Help type inference...
 }
@@ -470,12 +459,12 @@ passed with it's full module path ([`pg_sys::Oid`]) in order to be resolved.
 ```rust
 use pgx::*;
 
-#[pg_extern(skip_inventory)]  // Only use `skip_inventory` in doctests.
+#[pg_extern]
 fn example_arg(animals: pg_sys::Oid) {
     todo!()
 }
 
-#[pg_extern(skip_inventory)]  // Only use `skip_inventory` in doctests.
+#[pg_extern]
 fn example_return() -> pg_sys::Oid {
     todo!()
 }
@@ -550,19 +539,14 @@ Generate necessary bindings for using the enum with PostgreSQL.
 use pgx::*;
 use serde::{Deserialize, Serialize};
 #[derive(Debug, Serialize, Deserialize, PostgresEnum)]
-# #[skip_inventory]
 enum DogNames {
     Nami,
     Brandy,
 }
 ```
 
-Optionally accepts the following attributes:
-
-* `skip_inventory`: Skip SQL generator inventory submission. **Use always (and only) in Doctests!**
-
 */
-#[proc_macro_derive(PostgresEnum, attributes(skip_inventory))]
+#[proc_macro_derive(PostgresEnum)]
 pub fn postgres_enum(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
 
@@ -574,12 +558,6 @@ fn impl_postgres_enum(ast: DeriveInput) -> proc_macro2::TokenStream {
     let inventory_ast = ast.clone();
     let enum_ident = ast.ident;
     let enum_name = enum_ident.to_string();
-    let found_skip_inventory = ast.attrs.iter().any(|x| {
-        x.path
-            .get_ident()
-            .map(|x| x.to_string() == "skip_inventory")
-            .unwrap_or(false)
-    });
 
     // validate that we're only operating on an enum
     let enum_data = match ast.data {
@@ -630,9 +608,7 @@ fn impl_postgres_enum(ast: DeriveInput) -> proc_macro2::TokenStream {
     });
 
     let inventory_item = inventory::PostgresEnum::from_derive_input(inventory_ast).unwrap();
-    if !found_skip_inventory {
-        inventory_item.to_tokens(&mut stream);
-    }
+    inventory_item.to_tokens(&mut stream);
 
     stream
 }
@@ -645,7 +621,6 @@ Generate necessary bindings for using the type with PostgreSQL.
 use pgx::*;
 use serde::{Deserialize, Serialize};
 #[derive(Debug, Serialize, Deserialize, PostgresType)]
-# #[skip_inventory]
 struct Dog {
     treats_recieved: i64,
     pets_gotten: i64,
@@ -656,12 +631,11 @@ Optionally accepts the following attributes:
 
 * `inoutfuncs(some_in_fn, some_out_fn)`: Define custom in/out functions for the type.
 * `pgvarlena_inoutfuncs(some_in_fn, some_out_fn)`: Define custom in/out functions for the `PgVarlena` of this type.
-* `skip_inventory`: Skip SQL generator inventory submission. **Use always (and only) in Doctests!**
 
 */
 #[proc_macro_derive(
     PostgresType,
-    attributes(inoutfuncs, pgvarlena_inoutfuncs, skip_inventory)
+    attributes(inoutfuncs, pgvarlena_inoutfuncs)
 )]
 pub fn postgres_type(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
@@ -677,17 +651,6 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
     let funcname_out = Ident::new(&format!("{}_out", name).to_lowercase(), name.span());
     let mut args = parse_postgres_type_args(&ast.attrs);
     let mut stream = proc_macro2::TokenStream::new();
-    let found_skip_inventory = ast.attrs.iter().any(|x| {
-        x.path
-            .get_ident()
-            .map(|x| x.to_string() == "skip_inventory")
-            .unwrap_or(false)
-    });
-    let maybe_skip_inventory_attr = if found_skip_inventory {
-        quote! { , skip_inventory }
-    } else {
-        quote! {}
-    };
 
     // validate that we're only operating on a struct
     match ast.data {
@@ -722,12 +685,12 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
         stream.extend(quote! {
             impl #generics JsonInOutFuncs #inout_generics for #name #generics {}
 
-            #[pg_extern(immutable,parallel_safe #maybe_skip_inventory_attr)]
+            #[pg_extern(immutable,parallel_safe)]
             pub fn #funcname_in #generics(input: &#lifetime std::ffi::CStr) -> #name #generics {
                 #name::input(input)
             }
 
-            #[pg_extern(immutable,parallel_safe #maybe_skip_inventory_attr)]
+            #[pg_extern(immutable,parallel_safe)]
             pub fn #funcname_out #generics(input: #name #generics) -> &#lifetime std::ffi::CStr {
                 let mut buffer = StringInfo::new();
                 input.output(&mut buffer);
@@ -738,12 +701,12 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
     } else if args.contains(&PostgresTypeAttribute::InOutFuncs) {
         // otherwise if it's InOutFuncs our _in/_out functions use an owned type instance
         stream.extend(quote! {
-            #[pg_extern(immutable,parallel_safe #maybe_skip_inventory_attr)]
+            #[pg_extern(immutable,parallel_safe)]
             pub fn #funcname_in #generics(input: &#lifetime std::ffi::CStr) -> #name #generics {
                 #name::input(input)
             }
 
-            #[pg_extern(immutable,parallel_safe #maybe_skip_inventory_attr)]
+            #[pg_extern(immutable,parallel_safe)]
             pub fn #funcname_out #generics(input: #name #generics) -> &#lifetime std::ffi::CStr {
                 let mut buffer = StringInfo::new();
                 input.output(&mut buffer);
@@ -753,12 +716,12 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
     } else if args.contains(&PostgresTypeAttribute::PgVarlenaInOutFuncs) {
         // otherwise if it's PgVarlenaInOutFuncs our _in/_out functions use a PgVarlena
         stream.extend(quote! {
-            #[pg_extern(immutable,parallel_safe #maybe_skip_inventory_attr)]
+            #[pg_extern(immutable,parallel_safe)]
             pub fn #funcname_in #generics(input: &#lifetime std::ffi::CStr) -> pgx::PgVarlena<#name #generics> {
                 #name::input(input)
             }
 
-            #[pg_extern(immutable,parallel_safe #maybe_skip_inventory_attr)]
+            #[pg_extern(immutable,parallel_safe)]
             pub fn #funcname_out #generics(input: pgx::PgVarlena<#name #generics>) -> &#lifetime std::ffi::CStr {
                 let mut buffer = StringInfo::new();
                 input.output(&mut buffer);
@@ -768,9 +731,7 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
     }
 
     let inventory_item = inventory::PostgresType::from_derive_input(ast).unwrap();
-    if !found_skip_inventory {
-        inventory_item.to_tokens(&mut stream);
-    }
+    inventory_item.to_tokens(&mut stream);
 
     stream
 }
@@ -896,16 +857,11 @@ Generate necessary code using the type in operators like `==` and `!=`.
 use pgx::*;
 use serde::{Deserialize, Serialize};
 #[derive(Debug, Serialize, Deserialize, PostgresEnum, PartialEq, Eq, PostgresEq)]
-# #[skip_inventory]
 enum DogNames {
     Nami,
     Brandy,
 }
 ```
-
-Optionally accepts the following attributes:
-
-* `skip_inventory`: Skip SQL generator inventory submission. **Use always (and only) in Doctests!**
 
 */
 #[proc_macro_derive(PostgresEq)]
@@ -925,16 +881,11 @@ use serde::{Deserialize, Serialize};
     Debug, Serialize, Deserialize, PartialEq, Eq,
      PartialOrd, Ord, PostgresEnum, PostgresOrd
 )]
-# #[skip_inventory]
 enum DogNames {
     Nami,
     Brandy,
 }
 ```
-
-Optionally accepts the following attributes:
-
-* `skip_inventory`: Skip SQL generator inventory submission. **Use always (and only) in Doctests!**
 
 */
 #[proc_macro_derive(PostgresOrd)]
@@ -951,16 +902,11 @@ Generate necessary code for stable hashing the type so it can be used with `USIN
 use pgx::*;
 use serde::{Deserialize, Serialize};
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Hash, PostgresEnum, PostgresHash)]
-# #[skip_inventory]
 enum DogNames {
     Nami,
     Brandy,
 }
 ```
-
-Optionally accepts the following attributes:
-
-* `skip_inventory`: Skip SQL generator inventory submission. **Use always (and only) in Doctests!**
 
 */
 #[proc_macro_derive(PostgresHash)]

@@ -46,7 +46,6 @@ impl Clone for PallocdVarlena {
 ///
 /// #[derive(Copy, Clone, PostgresType)]
 /// #[pgvarlena_inoutfuncs]
-/// # #[skip_inventory]
 /// struct MyType {
 ///    a: f32,
 ///    b: f32,
@@ -71,7 +70,7 @@ impl Clone for PallocdVarlena {
 ///     }
 /// }
 ///
-/// #[pg_extern(skip_inventory)] // Only use `skip_inventory` in doctests.
+/// #[pg_extern]
 /// fn do_a_thing(mut input: PgVarlena<MyType>) -> PgVarlena<MyType> {
 ///     input.c += 99;  // performs a copy-on-write
 ///     input

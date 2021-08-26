@@ -50,7 +50,6 @@ impl ToTokens for ExtensionSqlFile {
         let mut name = None;
         let mut bootstrap = false;
         let mut finalize = false;
-        let mut skip_inventory = false;
         let mut requires = vec![];
         let mut creates = vec![];
         for attr in &self.attrs {
@@ -67,9 +66,6 @@ impl ToTokens for ExtensionSqlFile {
                 ExtensionSqlAttribute::Finalize => {
                     finalize = true;
                 }
-                ExtensionSqlAttribute::SkipInventory => {
-                    skip_inventory = true;
-                }
                 ExtensionSqlAttribute::Name(found_name) => {
                     name = Some(found_name.value());
                 }
@@ -85,32 +81,30 @@ impl ToTokens for ExtensionSqlFile {
         );
         let requires_iter = requires.iter();
         let creates_iter = creates.iter();
-        if !skip_inventory {
-            let inventory_fn_name = syn::Ident::new(
-                &format!("__pgx_internals_sql_{}", name.clone()),
-                Span::call_site(),
-            );
-            let inv = quote! {
-                #[no_mangle]
-                #[link(kind = "static")]
-                pub extern "C" fn  #inventory_fn_name() -> pgx::datum::inventory::SqlGraphEntity {
-                    let submission = pgx::datum::inventory::InventoryExtensionSql {
-                        sql: include_str!(#path),
-                        module_path: module_path!(),
-                        full_path: concat!(file!(), ':', line!()),
-                        file: file!(),
-                        line: line!(),
-                        name: #name,
-                        bootstrap: #bootstrap,
-                        finalize: #finalize,
-                        requires: vec![#(#requires_iter),*],
-                        creates: vec![#(#creates_iter),*],
-                    };
-                    pgx::datum::inventory::SqlGraphEntity::CustomSql(submission)
-                }
-            };
-            tokens.append_all(inv);
-        }
+        let inventory_fn_name = syn::Ident::new(
+            &format!("__pgx_internals_sql_{}", name.clone()),
+            Span::call_site(),
+        );
+        let inv = quote! {
+            #[no_mangle]
+            #[link(kind = "static")]
+            pub extern "C" fn  #inventory_fn_name() -> pgx::datum::inventory::SqlGraphEntity {
+                let submission = pgx::datum::inventory::InventoryExtensionSql {
+                    sql: include_str!(#path),
+                    module_path: module_path!(),
+                    full_path: concat!(file!(), ':', line!()),
+                    file: file!(),
+                    line: line!(),
+                    name: #name,
+                    bootstrap: #bootstrap,
+                    finalize: #finalize,
+                    requires: vec![#(#requires_iter),*],
+                    creates: vec![#(#creates_iter),*],
+                };
+                pgx::datum::inventory::SqlGraphEntity::CustomSql(submission)
+            }
+        };
+        tokens.append_all(inv);
     }
 }
 
@@ -168,7 +162,6 @@ impl ToTokens for ExtensionSql {
         let sql = &self.sql;
         let mut bootstrap = false;
         let mut finalize = false;
-        let mut skip_inventory = false;
         let mut creates = vec![];
         let mut requires = vec![];
         for attr in &self.attrs {
@@ -185,41 +178,37 @@ impl ToTokens for ExtensionSql {
                 ExtensionSqlAttribute::Finalize => {
                     finalize = true;
                 }
-                ExtensionSqlAttribute::SkipInventory => {
-                    skip_inventory = true;
-                }
                 ExtensionSqlAttribute::Name(_found_name) => (), // Already done
             }
         }
         let requires_iter = requires.iter();
         let creates_iter = creates.iter();
         let name = &self.name;
-        if !skip_inventory {
-            let inventory_fn_name = syn::Ident::new(
-                &format!("__pgx_internals_sql_{}", name.value()),
-                Span::call_site(),
-            );
-            let inv = quote! {
-                #[no_mangle]
-                #[link(kind = "static")]
-                pub extern "C" fn  #inventory_fn_name() -> pgx::datum::inventory::SqlGraphEntity {
-                    let submission = pgx::inventory::InventoryExtensionSql {
-                        sql: #sql,
-                        module_path: module_path!(),
-                        full_path: concat!(file!(), ':', line!()),
-                        file: file!(),
-                        line: line!(),
-                        name: #name,
-                        bootstrap: #bootstrap,
-                        finalize: #finalize,
-                        requires: vec![#(#requires_iter),*],
-                        creates: vec![#(#creates_iter),*],
-                    };
-                    pgx::datum::inventory::SqlGraphEntity::CustomSql(submission)
-                }
-            };
-            tokens.append_all(inv);
-        }
+
+        let inventory_fn_name = syn::Ident::new(
+            &format!("__pgx_internals_sql_{}", name.value()),
+            Span::call_site(),
+        );
+        let inv = quote! {
+            #[no_mangle]
+            #[link(kind = "static")]
+            pub extern "C" fn  #inventory_fn_name() -> pgx::datum::inventory::SqlGraphEntity {
+                let submission = pgx::inventory::InventoryExtensionSql {
+                    sql: #sql,
+                    module_path: module_path!(),
+                    full_path: concat!(file!(), ':', line!()),
+                    file: file!(),
+                    line: line!(),
+                    name: #name,
+                    bootstrap: #bootstrap,
+                    finalize: #finalize,
+                    requires: vec![#(#requires_iter),*],
+                    creates: vec![#(#creates_iter),*],
+                };
+                pgx::datum::inventory::SqlGraphEntity::CustomSql(submission)
+            }
+        };
+        tokens.append_all(inv);
     }
 }
 
@@ -230,7 +219,6 @@ pub enum ExtensionSqlAttribute {
     Bootstrap,
     Finalize,
     Name(LitStr),
-    SkipInventory,
 }
 
 impl Parse for ExtensionSqlAttribute {
@@ -255,7 +243,6 @@ impl Parse for ExtensionSqlAttribute {
                 let _eq: syn::token::Eq = input.parse()?;
                 Self::Name(input.parse()?)
             }
-            "skip_inventory" => Self::SkipInventory,
             other => {
                 return Err(syn::Error::new(
                     ident.span(),

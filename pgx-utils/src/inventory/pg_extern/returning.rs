@@ -26,23 +26,7 @@ impl Returning {
                     match args.args.first().unwrap() {
                         syn::GenericArgument::Binding(binding) => match &binding.ty {
                             syn::Type::Tuple(tuple_type) => {
-                                let returns: Vec<(syn::Type, Option<_>)> = tuple_type.elems.iter().flat_map(|elem| {
-                                    match elem {
-                                        syn::Type::Macro(macro_pat) => {
-                                            let mac = &macro_pat.mac;
-                                            let archetype = mac.path.segments.last().unwrap();
-                                            match archetype.ident.to_string().as_str() {
-                                                "name" => {
-                                                    let out: NameMacro = mac.parse_body().expect(&*format!("{:?}", mac));
-                                                    Some((out.ty, Some(out.ident)))
-                                                },
-                                                _ => unimplemented!("Don't support anything other than name."),
-                                            }
-                                        },
-                                        ty => Some((ty.clone(), None)),
-                                    }
-                                }).collect();
-                                Returning::Iterated(returns)
+                                Self::parse_type_tuple(tuple_type)
                             }
                             syn::Type::Path(path) => Returning::SetOf(path.clone()),
                             syn::Type::Reference(type_ref) => match &*type_ref.elem {
@@ -58,6 +42,26 @@ impl Returning {
             },
             _ => unimplemented!(),
         }
+    }
+
+    fn parse_type_tuple(type_tuple: &syn::TypeTuple) -> Returning {
+        let returns: Vec<(syn::Type, Option<_>)> = type_tuple.elems.iter().flat_map(|elem| {
+            match elem {
+                syn::Type::Macro(macro_pat) => {
+                    let mac = &macro_pat.mac;
+                    let archetype = mac.path.segments.last().unwrap();
+                    match archetype.ident.to_string().as_str() {
+                        "name" => {
+                            let out: NameMacro = mac.parse_body().expect(&*format!("{:?}", mac));
+                            Some((out.ty, Some(out.ident)))
+                        },
+                        _ => unimplemented!("Don't support anything other than name."),
+                    }
+                },
+                ty => Some((ty.clone(), None)),
+            }
+        }).collect();
+        Returning::Iterated(returns)
     }
 
     fn parse_impl_trait(impl_trait: &syn::TypeImplTrait) -> Returning {
@@ -159,10 +163,7 @@ impl TryFrom<&syn::ReturnType> for Returning {
                     if tup.elems.is_empty() {
                         Returning::Type(ty.deref().clone())
                     } else {
-                        return Err(eyre_err!(
-                            "Got non-empty tuple return type: {}",
-                            &ty.to_token_stream()
-                        ));
+                        Self::parse_type_tuple(&tup)
                     }
                 }
                 _ => {
