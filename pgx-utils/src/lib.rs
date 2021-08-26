@@ -1,13 +1,12 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-use crate::pg_config::PgConfig;
+use crate::{pg_config::PgConfig, inventory::InventoryPositioningRef};
 use colored::Colorize;
 use proc_macro2::TokenStream;
 use proc_macro2::TokenTree;
 use quote::{format_ident, quote, ToTokens, TokenStreamExt};
 use serde_json::value::Value as JsonValue;
-use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
@@ -184,7 +183,7 @@ pub fn get_named_capture(
     }
 }
 
-#[derive(Debug, Hash, Ord, PartialOrd, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, Hash, Eq, PartialEq, Clone)]
 pub enum ExternArgs {
     Immutable,
     Strict,
@@ -198,7 +197,7 @@ pub enum ExternArgs {
     Error(String),
     Schema(String),
     Name(String),
-    SkipInventory,
+    Requires(Vec<InventoryPositioningRef>)
 }
 
 impl core::fmt::Display for ExternArgs {
@@ -216,7 +215,7 @@ impl core::fmt::Display for ExternArgs {
             ExternArgs::NoGuard => Ok(()),
             ExternArgs::Schema(_) => Ok(()),
             ExternArgs::Name(_) => Ok(()),
-            ExternArgs::SkipInventory => Ok(()),
+            ExternArgs::Requires(_) => Ok(()),
         }
     }
 }
@@ -257,7 +256,14 @@ impl ToTokens for ExternArgs {
                     .to_token_stream(),
                 );
             }
-            ExternArgs::SkipInventory => tokens.append(format_ident!("SkipInventory")),
+            ExternArgs::Requires(items) => {
+                tokens.append_all(
+                    quote! {
+                        Requires(vec![#(#items),*])
+                    }
+                    .to_token_stream(),
+                );
+            },
         }
     }
 }

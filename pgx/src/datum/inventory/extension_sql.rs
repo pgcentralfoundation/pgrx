@@ -13,7 +13,7 @@ pub struct InventoryExtensionSql {
     pub name: &'static str,
     pub bootstrap: bool,
     pub finalize: bool,
-    pub requires: Vec<InventoryPositioningRef<'static>>,
+    pub requires: Vec<InventoryPositioningRef>,
     pub creates: Vec<InventorySqlDeclaredEntity>,
 }
 
@@ -73,7 +73,7 @@ impl ToSql for InventoryExtensionSql {
             },
             requires = if !self.requires.is_empty() {
                 format!("\
-                   -- requires\n\
+                   -- requires:\n\
                     {}\n\
                 ", self.requires.iter().map(|i| 
                     format!("--   {}", i)

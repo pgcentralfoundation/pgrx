@@ -6,6 +6,8 @@ use syn::{
     LitStr, Token,
 };
 
+use crate::inventory::PositioningRef;
+
 /// A parsed `extension_sql_file!()` item.
 ///
 /// It should be used with [`syn::parse::Parse`] functions.
@@ -214,7 +216,7 @@ impl ToTokens for ExtensionSql {
 
 #[derive(Debug, Clone)]
 pub enum ExtensionSqlAttribute {
-    Requires(Punctuated<ExtensionSqlPositioning, Token![,]>),
+    Requires(Punctuated<PositioningRef, Token![,]>),
     Creates(Punctuated<SqlDeclaredEntity, Token![,]>),
     Bootstrap,
     Finalize,
@@ -235,7 +237,7 @@ impl Parse for ExtensionSqlAttribute {
                 let _eq: syn::token::Eq = input.parse()?;
                 let content;
                 let _bracket = syn::bracketed!(content in input);
-                Self::Requires(content.parse_terminated(ExtensionSqlPositioning::parse)?)
+                Self::Requires(content.parse_terminated(PositioningRef::parse)?)
             }
             "bootstrap" => Self::Bootstrap,
             "finalize" => Self::Finalize,
@@ -251,43 +253,6 @@ impl Parse for ExtensionSqlAttribute {
             }
         };
         Ok(found)
-    }
-}
-
-#[derive(Debug, Clone)]
-pub enum ExtensionSqlPositioning {
-    Expr(syn::Expr),
-    Name(syn::LitStr),
-}
-
-impl Parse for ExtensionSqlPositioning {
-    fn parse(input: ParseStream) -> Result<Self, syn::Error> {
-        let maybe_litstr: Option<syn::LitStr> = input.parse()?;
-        let found = if let Some(litstr) = maybe_litstr {
-            Self::Name(litstr)
-        } else {
-            let path: syn::Expr = input.parse()?;
-            Self::Expr(path)
-        };
-        Ok(found)
-    }
-}
-
-impl ToTokens for ExtensionSqlPositioning {
-    fn to_tokens(&self, tokens: &mut TokenStream2) {
-        let toks = match self {
-            ExtensionSqlPositioning::Expr(ex) => {
-                let path = ex.to_token_stream().to_string().replace(" ", "");
-                (quote! {
-                    pgx::inventory::InventoryPositioningRef::FullPath(#path)
-                })
-                .to_token_stream()
-            }
-            ExtensionSqlPositioning::Name(name) => quote! {
-                pgx::inventory::InventoryPositioningRef::Name(#name)
-            },
-        };
-        tokens.append_all(toks);
     }
 }
 

@@ -5,6 +5,7 @@ use syn::{
     punctuated::Punctuated,
     Token,
 };
+use crate::inventory::PositioningRef;
 
 #[derive(Debug, Clone)]
 pub struct PgxAttributes {
@@ -43,23 +44,28 @@ pub enum Attribute {
     Error(syn::LitStr),
     Schema(syn::LitStr),
     Name(syn::LitStr),
+    Requires(Punctuated<PositioningRef, Token![,]>),
 }
 
 impl ToTokens for Attribute {
     fn to_tokens(&self, tokens: &mut TokenStream2) {
         let quoted = match self {
-            Attribute::Immutable => quote! { pgx::inventory::ExternArgs::Immutable },
-            Attribute::Strict => quote! { pgx::inventory::ExternArgs::Strict },
-            Attribute::Stable => quote! { pgx::inventory::ExternArgs::Stable },
-            Attribute::Volatile => quote! { pgx::inventory::ExternArgs::Volatile },
-            Attribute::Raw => quote! { pgx::inventory::ExternArgs::Raw },
-            Attribute::NoGuard => quote! { pgx::inventory::ExternArgs::NoGuard },
-            Attribute::ParallelSafe => quote! { pgx::inventory::ExternArgs::ParallelSafe },
-            Attribute::ParallelUnsafe => quote! { pgx::inventory::ExternArgs::ParallelUnsafe },
-            Attribute::ParallelRestricted => quote! { pgx::inventory::ExternArgs::ParallelRestricted },
-            Attribute::Error(s) => quote! { pgx::inventory::ExternArgs::Error(String::from(#s)) },
-            Attribute::Schema(s) => quote! { pgx::inventory::ExternArgs::Schema(String::from(#s)) },
-            Attribute::Name(s) => quote! { pgx::inventory::ExternArgs::Name(String::from(#s)) },
+            Attribute::Immutable => quote! { pgx::datum::inventory::ExternArgs::Immutable },
+            Attribute::Strict => quote! { pgx::datum::inventory::ExternArgs::Strict },
+            Attribute::Stable => quote! { pgx::datum::inventory::ExternArgs::Stable },
+            Attribute::Volatile => quote! { pgx::datum::inventory::ExternArgs::Volatile },
+            Attribute::Raw => quote! { pgx::datum::inventory::ExternArgs::Raw },
+            Attribute::NoGuard => quote! { pgx::datum::inventory::ExternArgs::NoGuard },
+            Attribute::ParallelSafe => quote! { pgx::datum::inventory::ExternArgs::ParallelSafe },
+            Attribute::ParallelUnsafe => quote! { pgx::datum::inventory::ExternArgs::ParallelUnsafe },
+            Attribute::ParallelRestricted => quote! { pgx::datum::inventory::ExternArgs::ParallelRestricted },
+            Attribute::Error(s) => quote! { pgx::datum::inventory::ExternArgs::Error(String::from(#s)) },
+            Attribute::Schema(s) => quote! { pgx::datum::inventory::ExternArgs::Schema(String::from(#s)) },
+            Attribute::Name(s) => quote! { pgx::datum::inventory::ExternArgs::Name(String::from(#s)) },
+            Attribute::Requires(items) => {
+                let items_iter = items.iter().map(|x| x.to_token_stream()).collect::<Vec<_>>();
+                quote! { pgx::inventory::ExternArgs::Requires(vec![#(#items_iter),*],) }
+            },
         };
         tokens.append_all(quoted);
     }
@@ -69,19 +75,19 @@ impl Parse for Attribute {
     fn parse(input: ParseStream) -> Result<Self, syn::Error> {
         let ident: syn::Ident = input.parse()?;
         let found = match ident.to_string().as_str() {
-            "immutable" => Attribute::Immutable,
-            "strict" => Attribute::Strict,
-            "stable" => Attribute::Stable,
-            "volatile" => Attribute::Volatile,
-            "raw" => Attribute::Raw,
-            "no_guard" => Attribute::NoGuard,
-            "parallel_safe" => Attribute::ParallelSafe,
-            "parallel_unsafe" => Attribute::ParallelUnsafe,
-            "parallel_restricted" => Attribute::ParallelRestricted,
+            "immutable" => Self::Immutable,
+            "strict" => Self::Strict,
+            "stable" => Self::Stable,
+            "volatile" => Self::Volatile,
+            "raw" => Self::Raw,
+            "no_guard" => Self::NoGuard,
+            "parallel_safe" => Self::ParallelSafe,
+            "parallel_unsafe" => Self::ParallelUnsafe,
+            "parallel_restricted" => Self::ParallelRestricted,
             "error" => {
                 let _eq: Token![=] = input.parse()?;
                 let literal: syn::LitStr = input.parse()?;
-                Attribute::Error(literal)
+                Self::Error(literal)
             }
             "schema" => {
                 let _eq: Token![=] = input.parse()?;
@@ -91,7 +97,13 @@ impl Parse for Attribute {
             "name" => {
                 let _eq: Token![=] = input.parse()?;
                 let literal: syn::LitStr = input.parse()?;
-                Attribute::Name(literal)
+                Self::Name(literal)
+            }
+            "requires" => {
+                let _eq: syn::token::Eq = input.parse()?;
+                let content;
+                let _bracket = syn::bracketed!(content in input);
+                Self::Requires(content.parse_terminated(PositioningRef::parse)?)
             }
             _ => return Err(syn::Error::new(Span::call_site(), "Invalid option")),
         };

@@ -6,6 +6,7 @@ mod postgres_enum;
 mod postgres_hash;
 mod postgres_ord;
 mod postgres_type;
+mod inventory_positioning_ref;
 
 pub use extension_sql::{
     ExtensionSql, ExtensionSqlFile,
@@ -20,6 +21,11 @@ pub use postgres_hash::PostgresHash;
 pub use postgres_ord::PostgresOrd;
 pub use postgres_type::PostgresType;
 pub use super::ExternArgs;
+pub use inventory_positioning_ref::InventoryPositioningRef;
+
+use syn::parse::{Parse, ParseStream};
+use proc_macro2::TokenStream as TokenStream2;
+use quote::{ToTokens, quote, TokenStreamExt};
 
 /// Reexports for the pgx SQL generator binaries.
 pub mod reexports {
@@ -44,3 +50,39 @@ pub mod reexports {
 }
 
 
+#[derive(Debug, Clone, Hash, Eq, PartialEq)]
+pub enum PositioningRef {
+    Expr(syn::Expr),
+    Name(syn::LitStr),
+}
+
+impl Parse for PositioningRef {
+    fn parse(input: ParseStream) -> Result<Self, syn::Error> {
+        let maybe_litstr: Option<syn::LitStr> = input.parse()?;
+        let found = if let Some(litstr) = maybe_litstr {
+            Self::Name(litstr)
+        } else {
+            let path: syn::Expr = input.parse()?;
+            Self::Expr(path)
+        };
+        Ok(found)
+    }
+}
+
+impl ToTokens for PositioningRef {
+    fn to_tokens(&self, tokens: &mut TokenStream2) {
+        let toks = match self {
+            PositioningRef::Expr(ex) => {
+                let path = ex.to_token_stream().to_string().replace(" ", "");
+                (quote! {
+                    pgx::inventory::InventoryPositioningRef::FullPath(String::from(#path))
+                })
+                .to_token_stream()
+            }
+            PositioningRef::Name(name) => quote! {
+                pgx::inventory::InventoryPositioningRef::Name(String::from(#name))
+            },
+        };
+        tokens.append_all(toks);
+    }
+}

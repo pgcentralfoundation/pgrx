@@ -700,6 +700,50 @@ fn connect_externs(
                 break;
             }
         }
+
+        for extern_attr in &item.extern_attrs {
+            match extern_attr {
+                pgx_utils::ExternArgs::Requires(requirements) => for requires in requirements {
+                    match requires {
+                        InventoryPositioningRef::FullPath(path) => {
+                            for (other, other_index) in types {
+                                if other.full_path.ends_with(path) {
+                                    tracing::trace!(from = ?item.full_path, to = ?other.full_path, "Adding ExtensionSQL after Type edge.");
+                                    graph.add_edge(*other_index, index, SqlGraphRelationship::RequiredBy);
+                                    break;
+                                }
+                            }
+                            for (other, other_index) in enums {
+                                if other.full_path.ends_with(path) {
+                                    tracing::trace!(from = ?item.full_path, to = ?other.full_path, "Adding ExtensionSQL after Enum edge.");
+                                    graph.add_edge(*other_index, index, SqlGraphRelationship::RequiredBy);
+                                    break;
+                                }
+                            }
+                            for (other, other_index) in externs {
+                                if other.full_path.ends_with(path) {
+                                    tracing::trace!(from = ?item.full_path, to = ?other.full_path, "Adding ExtensionSQL after Extern edge.");
+                                    graph.add_edge(*other_index, index, SqlGraphRelationship::RequiredBy);
+                                    break;
+                                }
+                            }
+                        }
+                        InventoryPositioningRef::Name(name) => {
+                            for (other, other_index) in extension_sqls {
+                                if other.name == *name {
+                                    tracing::trace!(from = ?item.full_path, to = ?other.identifier(), "Adding ExtensionSQL after ExtensionSql edge.");
+                                    graph.add_edge(*other_index, index, SqlGraphRelationship::RequiredBy);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                },
+                _ => (),
+            }
+            
+        }
+
         for arg in &item.fn_args {
             let mut found = false;
             for (ty_item, &ty_index) in types {

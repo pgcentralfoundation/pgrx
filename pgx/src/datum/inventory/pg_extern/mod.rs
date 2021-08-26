@@ -13,7 +13,7 @@ use pgx_utils::ExternArgs;
 use super::{DotIdentifier, SqlGraphEntity, ToSql};
 use pgx_utils::inventory::SqlDeclaredEntity;
 
-#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub struct InventoryPgExtern {
     pub name: &'static str,
     pub unaliased_name: &'static str,
@@ -222,6 +222,7 @@ impl ToSql for InventoryPgExtern {
             "\n\
                                 -- {file}:{line}\n\
                                 -- {module_path}::{name}\n\
+                                {requires}\
                                 {fn_sql}\
                                 {overridden}\
                             ",
@@ -242,10 +243,27 @@ impl ToSql for InventoryPgExtern {
             } else {
                 fn_sql
             },
+            requires = {
+                let requires_attrs = self.extern_attrs.iter().filter_map(|x| match x {
+                    ExternArgs::Requires(requirements) => Some(requirements),
+                    _ => None,
+                }).flatten().collect::<Vec<_>>();
+                if !requires_attrs.is_empty() {
+                    format!("\
+                       -- requires:\n\
+                        {}\n\
+                    ", requires_attrs.iter().map(|i| 
+                        format!("--   {}", i)
+                    ).collect::<Vec<_>>().join("\n"))
+                } else {
+                    "".to_string()
+                }
+            },
             overridden = self
                 .overridden
                 .map(|f| String::from("\n") + f + "\n")
                 .unwrap_or_default(),
+            
         );
         tracing::debug!(sql = %ext_sql);
 

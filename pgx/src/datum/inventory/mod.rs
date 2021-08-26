@@ -28,9 +28,6 @@ pub use postgres_hash::InventoryPostgresHash;
 mod sql_graph_entity;
 pub use sql_graph_entity::SqlGraphEntity;
 
-mod inventory_positioning_ref;
-pub use inventory_positioning_ref::InventoryPositioningRef;
-
 use core::any::TypeId;
 pub use pgx_utils::inventory::*;
 

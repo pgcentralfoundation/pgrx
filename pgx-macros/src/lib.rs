@@ -416,7 +416,23 @@ The `default!()` macro may only be used in argument position.
 It accepts 2 arguments:
 
 * A type
-* A `bool`, numeric, or string literal to represent the default. `"NULL"` is a possible value, as is `"'string'"`
+* A `bool`, numeric, or SQL string to represent the default. `"NULL"` is a possible value, as is `"'string'"`
+
+**If the default SQL entity created by the extension:** ensure it is added to `requires` as a dependency:
+
+```rust
+use pgx::*;
+#[pg_extern]
+fn default_value() -> i32 { todo!() }
+
+#[pg_extern(
+    requires = [ default_value, ],
+)]
+fn do_it(
+    a: default!(i32, "default_value()"),
+) { todo!() }
+```
+
 
 # Returns
 
@@ -476,15 +492,10 @@ pub fn pg_extern(attr: TokenStream, item: TokenStream) -> TokenStream {
     let args = parse_extern_attributes(proc_macro2::TokenStream::from(attr.clone()));
 
     let inventory_item = inventory::PgExtern::new(attr.clone().into(), item.clone().into()).unwrap();
-    let inventory_submission = if args.iter().any(|x| *x == ExternArgs::SkipInventory) {
-        None
-    } else {
-        Some(inventory_item)
-    };
 
     let ast = parse_macro_input!(item as syn::Item);
     match ast {
-        Item::Fn(func) => rewrite_item_fn(func, args, inventory_submission.as_ref()).into(),
+        Item::Fn(func) => rewrite_item_fn(func, args, &inventory_item).into(),
         _ => panic!("#[pg_extern] can only be applied to top-level functions"),
     }
 }
@@ -492,7 +503,7 @@ pub fn pg_extern(attr: TokenStream, item: TokenStream) -> TokenStream {
 fn rewrite_item_fn(
     mut func: ItemFn,
     extern_args: HashSet<ExternArgs>,
-    inventory_submission: Option<&inventory::PgExtern>,
+    inventory_submission: &inventory::PgExtern,
 ) -> proc_macro2::TokenStream {
     let is_raw = extern_args.contains(&ExternArgs::Raw);
     let no_guard = extern_args.contains(&ExternArgs::NoGuard);
@@ -511,7 +522,7 @@ fn rewrite_item_fn(
     func.sig.abi = Some(syn::parse_str("extern \"C\"").unwrap());
     let func_span = func.span();
     let (rewritten_func, need_wrapper) =
-        rewriter.item_fn(func, inventory_submission.into(), true, is_raw, no_guard);
+        rewriter.item_fn(func, Some(inventory_submission), true, is_raw, no_guard);
 
     if need_wrapper {
         quote_spanned! {func_span=>
@@ -546,7 +557,7 @@ enum DogNames {
 ```
 
 */
-#[proc_macro_derive(PostgresEnum)]
+#[proc_macro_derive(PostgresEnum, attributes(requires))]
 pub fn postgres_enum(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
 
@@ -635,7 +646,7 @@ Optionally accepts the following attributes:
 */
 #[proc_macro_derive(
     PostgresType,
-    attributes(inoutfuncs, pgvarlena_inoutfuncs)
+    attributes(inoutfuncs, pgvarlena_inoutfuncs, requires)
 )]
 pub fn postgres_type(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);

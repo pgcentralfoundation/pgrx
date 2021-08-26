@@ -4,7 +4,7 @@ use super::{
 };
 
 /// An entity corresponding to some SQL required by the extension.
-#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub enum SqlGraphEntity {
     ExtensionRoot(ControlFile),
     Schema(InventorySchema),
