@@ -1,4 +1,4 @@
-use super::{DotIdentifier, SqlGraphEntity, ToSql};
+use super::{SqlGraphIdentifier, SqlGraphEntity, ToSql};
 use core::convert::TryFrom;
 use std::collections::HashMap;
 use tracing_error::SpanTrace;
@@ -147,8 +147,11 @@ impl ToSql for ControlFile {
     }
 }
 
-impl DotIdentifier for ControlFile {
+impl SqlGraphIdentifier for ControlFile {
     fn dot_identifier(&self) -> String {
         format!("extension root")
+    }
+    fn rust_identifier(&self) -> String {
+        format!("root")
     }
 }

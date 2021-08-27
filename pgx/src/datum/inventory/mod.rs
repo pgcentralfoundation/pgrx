@@ -32,12 +32,19 @@ use core::any::TypeId;
 pub use pgx_utils::inventory::*;
 
 /// Able to produce a GraphViz DOT format identifier.
-pub trait DotIdentifier {
-    /// An identifier for the entity.
+pub trait SqlGraphIdentifier {
+    /// A dot style identifier for the entity.
+    ///
+    /// Typically this is a 'archetype' prefix (eg `fn` or `type`) then result of 
+    /// [`std::module_path`], [`core::any::type_name`], or some combination of [`std::file`] and 
+    /// [`std::line`].
+    fn dot_identifier(&self) -> String;
+
+    /// A Rust identifier for the entity.
     ///
     /// Typically this is the result of [`std::module_path`], [`core::any::type_name`],
     /// or some combination of [`std::file`] and [`std::line`].
-    fn dot_identifier(&self) -> String;
+    fn rust_identifier(&self) -> String;
 }
 
 /// Able to be transformed into to SQL.

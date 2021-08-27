@@ -2,7 +2,7 @@ use eyre::eyre as eyre_err;
 use std::hash::{Hash, Hasher};
 use super::RustSqlMapping;
 
-use super::{DotIdentifier, SqlGraphEntity, ToSql};
+use super::{SqlGraphIdentifier, SqlGraphEntity, ToSql};
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct InventoryPostgresType {
     pub name: &'static str,
@@ -49,14 +49,17 @@ impl Into<SqlGraphEntity> for InventoryPostgresType {
     }
 }
 
-impl DotIdentifier for InventoryPostgresType {
+impl SqlGraphIdentifier for InventoryPostgresType {
     fn dot_identifier(&self) -> String {
-        format!("type {}", self.full_path.to_string())
+        format!("type {}", self.full_path)
+    }
+    fn rust_identifier(&self) -> String {
+        self.full_path.to_string()
     }
 }
 
 impl ToSql for InventoryPostgresType {
-    #[tracing::instrument(level = "debug", err, skip(self, context), fields(identifier = self.full_path))]
+    #[tracing::instrument(level = "debug", err, skip(self, context), fields(identifier = %self.rust_identifier()))]
     fn to_sql(&self, context: &super::PgxSql) -> eyre::Result<String> {
         let self_index = context.types[self];
         let item_node = &context.graph[self_index];

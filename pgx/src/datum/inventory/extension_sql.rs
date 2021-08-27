@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-use super::{DotIdentifier, SqlGraphEntity, ToSql, InventoryPositioningRef};
+use super::{SqlGraphIdentifier, SqlGraphEntity, ToSql, InventoryPositioningRef};
 use pgx_utils::inventory::SqlDeclaredEntity;
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
@@ -18,10 +18,6 @@ pub struct InventoryExtensionSql {
 }
 
 impl InventoryExtensionSql {
-    pub fn identifier(&self) -> &str {
-        self.name
-    }
-
     pub fn has_sql_declared_entity(
         &self,
         identifier: &pgx_utils::inventory::SqlDeclaredEntity,
@@ -38,9 +34,12 @@ impl Into<SqlGraphEntity> for InventoryExtensionSql {
     }
 }
 
-impl DotIdentifier for InventoryExtensionSql {
+impl SqlGraphIdentifier for InventoryExtensionSql {
     fn dot_identifier(&self) -> String {
-        format!("sql {}", self.name.to_string())
+        format!("sql {}", self.name)
+    }
+    fn rust_identifier(&self) -> String {
+        self.name.to_string()
     }
 }
 

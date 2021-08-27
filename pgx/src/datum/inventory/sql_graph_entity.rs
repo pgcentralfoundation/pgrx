@@ -1,5 +1,5 @@
 use super::{
-    ControlFile, DotIdentifier, InventoryExtensionSql, InventoryPgExtern, InventoryPostgresEnum,
+    ControlFile, SqlGraphIdentifier, InventoryExtensionSql, InventoryPgExtern, InventoryPostgresEnum,
     InventoryPostgresHash, InventoryPostgresOrd, InventorySchema, InventoryPostgresType, ToSql,
 };
 
@@ -19,7 +19,7 @@ pub enum SqlGraphEntity {
 
 impl SqlGraphEntity {}
 
-impl DotIdentifier for SqlGraphEntity {
+impl SqlGraphIdentifier for SqlGraphEntity {
     fn dot_identifier(&self) -> String {
         match self {
             SqlGraphEntity::Schema(item) => item.dot_identifier(),
@@ -33,9 +33,23 @@ impl DotIdentifier for SqlGraphEntity {
             SqlGraphEntity::ExtensionRoot(item) => item.dot_identifier(),
         }
     }
+    fn rust_identifier(&self) -> String {
+        match self {
+            SqlGraphEntity::Schema(item) => item.rust_identifier(),
+            SqlGraphEntity::CustomSql(item) => item.rust_identifier(),
+            SqlGraphEntity::Function(item) => item.rust_identifier(),
+            SqlGraphEntity::Type(item) => item.rust_identifier(),
+            SqlGraphEntity::BuiltinType(item) => item.to_string(),
+            SqlGraphEntity::Enum(item) => item.rust_identifier(),
+            SqlGraphEntity::Ord(item) => item.rust_identifier(),
+            SqlGraphEntity::Hash(item) => item.rust_identifier(),
+            SqlGraphEntity::ExtensionRoot(item) => item.rust_identifier(),
+        }
+    }
 }
 
 impl ToSql for SqlGraphEntity {
+    #[tracing::instrument(level = "debug", skip(self, context), fields(identifier = %self.rust_identifier()))]
     fn to_sql(&self, context: &super::PgxSql) -> eyre::Result<String> {
         match self {
             SqlGraphEntity::Schema(item) => if item.name != "public" && item.name != "pg_catalog" {

@@ -10,7 +10,7 @@ pub use returning::InventoryPgExternReturn;
 
 use pgx_utils::ExternArgs;
 
-use super::{DotIdentifier, SqlGraphEntity, ToSql};
+use super::{SqlGraphIdentifier, SqlGraphEntity, ToSql};
 use pgx_utils::inventory::SqlDeclaredEntity;
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
@@ -38,9 +38,12 @@ impl Into<SqlGraphEntity> for InventoryPgExtern {
     }
 }
 
-impl DotIdentifier for InventoryPgExtern {
+impl SqlGraphIdentifier for InventoryPgExtern {
     fn dot_identifier(&self) -> String {
-        format!("fn {}", self.full_path.to_string())
+        format!("fn {}", self.full_path)
+    }
+    fn rust_identifier(&self) -> String {
+        self.full_path.to_string()
     }
 }
 
@@ -48,7 +51,7 @@ impl ToSql for InventoryPgExtern {
     #[tracing::instrument(
         level = "info",
         skip(self, context),
-        fields(identifier = self.name),
+        fields(identifier = %self.rust_identifier()),
     )]
     fn to_sql(&self, context: &super::PgxSql) -> eyre::Result<String> {
         let self_index = context.externs[self];

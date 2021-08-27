@@ -1,6 +1,6 @@
 use std::hash::{Hash, Hasher};
 
-use super::{DotIdentifier, SqlGraphEntity, ToSql};
+use super::{SqlGraphIdentifier, SqlGraphEntity, ToSql};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct InventoryPostgresEnum {
@@ -45,14 +45,17 @@ impl Into<SqlGraphEntity> for InventoryPostgresEnum {
     }
 }
 
-impl DotIdentifier for InventoryPostgresEnum {
+impl SqlGraphIdentifier for InventoryPostgresEnum {
     fn dot_identifier(&self) -> String {
-        format!("enum {}", self.full_path.to_string())
+        format!("enum {}", self.full_path)
+    }
+    fn rust_identifier(&self) -> String {
+        self.full_path.to_string()
     }
 }
 
 impl ToSql for InventoryPostgresEnum {
-    #[tracing::instrument(level = "debug", err, skip(self, context), fields(identifier = self.full_path))]
+    #[tracing::instrument(level = "debug", err, skip(self, context), fields(identifier = %self.rust_identifier()))]
     fn to_sql(&self, context: &super::PgxSql) -> eyre::Result<String> {
         let self_index = context.enums[self];
         let sql = format!(

@@ -1,4 +1,4 @@
-use super::{DotIdentifier, SqlGraphEntity, ToSql};
+use super::{SqlGraphIdentifier, SqlGraphEntity, ToSql};
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct InventorySchema {
@@ -14,14 +14,17 @@ impl Into<SqlGraphEntity> for InventorySchema {
     }
 }
 
-impl DotIdentifier for InventorySchema {
+impl SqlGraphIdentifier for InventorySchema {
     fn dot_identifier(&self) -> String {
-        format!("schema {}", self.module_path.to_string())
+        format!("schema {}", self.module_path)
+    }
+    fn rust_identifier(&self) -> String {
+        self.module_path.to_string()
     }
 }
 
 impl ToSql for InventorySchema {
-    #[tracing::instrument(level = "debug", err, skip(self, _context), fields(identifier = self.module_path))]
+    #[tracing::instrument(level = "debug", err, skip(self, _context), fields(identifier = %self.rust_identifier()))]
     fn to_sql(&self, _context: &super::PgxSql) -> eyre::Result<String> {
         let sql = format!(
             "\n\
