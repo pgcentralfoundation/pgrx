@@ -438,7 +438,8 @@ fn initialize_extension_sqls<'a>(
     Ok((mapped_extension_sqls, bootstrap, finalize))
 }
 
-fn find_positioning_ref_target<'a>(
+/// A best effort attempt to find the related [`NodeIndex`] for some [`InventoryPositioningRef`].
+pub fn find_positioning_ref_target<'a>(
     positioning_ref: &'a InventoryPositioningRef,
     types: &'a HashMap<InventoryPostgresType, NodeIndex>,
     enums: &'a HashMap<InventoryPostgresEnum, NodeIndex>,
