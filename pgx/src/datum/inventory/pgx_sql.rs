@@ -447,18 +447,24 @@ fn find_positioning_ref_target<'a>(
 ) -> Option<&'a NodeIndex> {
     match positioning_ref {
         InventoryPositioningRef::FullPath(path) => {
+            // The best we can do here is a fuzzy search.
+            let segments = path.split("::").collect::<Vec<_>>();
+            let last_segment = segments.last().expect("Expected at least one segment.");
+            let rest = &segments[..segments.len() - 1];
+            let module_path = rest.join("::");
+
             for (other, other_index) in types {
-                if other.full_path.ends_with(path) {
+                if *last_segment == other.name && other.module_path.ends_with(&module_path) {
                     return Some(&other_index);
                 }
             }
             for (other, other_index) in enums {
-                if other.full_path.ends_with(path) {
+                if last_segment == &other.name && other.module_path.ends_with(&module_path) {
                     return Some(&other_index);
                 }
             }
             for (other, other_index) in externs {
-                if other.full_path.ends_with(path) {
+                if *last_segment == other.name && other.module_path.ends_with(&module_path) {
                     return Some(&other_index);
                 }
             }
