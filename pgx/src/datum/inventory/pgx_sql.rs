@@ -130,7 +130,7 @@ impl PgxSql {
             &mapped_types,
             &mapped_enums,
             &mapped_externs,
-        );
+        )?;
         connect_enums(&mut graph, &mapped_enums, &mapped_schemas);
         connect_types(&mut graph, &mapped_types, &mapped_schemas);
         connect_externs(
@@ -141,7 +141,7 @@ impl PgxSql {
             &mapped_enums,
             &mapped_builtin_types,
             &mapped_extension_sqls,
-        );
+        )?;
         connect_ords(
             &mut graph,
             &mapped_ords,
@@ -488,23 +488,25 @@ fn connect_extension_sqls(
     types: &HashMap<InventoryPostgresType, NodeIndex>,
     enums: &HashMap<InventoryPostgresEnum, NodeIndex>,
     externs: &HashMap<InventoryPgExtern, NodeIndex>,
-) {
+) -> eyre::Result<()> {
     for (item, &index) in extension_sqls {
         for (schema_item, &schema_index) in schemas {
             if item.module_path == schema_item.module_path {
-                tracing::trace!(from = %item.rust_identifier(), to = schema_item.module_path, "Adding ExtensionSQL after Schema edge.");
+                tracing::debug!(from = %item.rust_identifier(), to = schema_item.module_path, "Adding ExtensionSQL after Schema edge");
                 graph.add_edge(schema_index, index, SqlGraphRelationship::RequiredBy);
                 break;
             }
         }
         for requires in &item.requires {
             if let Some(target) = find_positioning_ref_target(requires, types, enums, externs, extension_sqls) {
-                tracing::trace!(from = %item.rust_identifier(), to = ?graph[*target].rust_identifier(), "Adding ExtensionSQL after positioning ref target.");
+                tracing::debug!(from = %item.rust_identifier(), to = ?graph[*target].rust_identifier(), "Adding ExtensionSQL after positioning ref target");
                 graph.add_edge(*target, index, SqlGraphRelationship::RequiredBy);
-                break;
+            } else {
+                return Err(eyre_err!("Could not find `requires` target: {:?}", requires));
             }
         }
     }
+    Ok(())
 }
 
 fn initialize_schemas(
@@ -705,7 +707,7 @@ fn connect_externs(
     enums: &HashMap<InventoryPostgresEnum, NodeIndex>,
     builtin_types: &HashMap<String, NodeIndex>,
     extension_sqls: &HashMap<InventoryExtensionSql, NodeIndex>,
-) {
+) -> eyre::Result<()> {
     for (item, &index) in externs {
         for (schema_item, &schema_index) in schemas {
             if item.module_path == schema_item.module_path {
@@ -721,7 +723,8 @@ fn connect_externs(
                     if let Some(target) = find_positioning_ref_target(requires, types, enums, externs, extension_sqls) {
                         tracing::debug!(from = %item.rust_identifier(), to = %graph[*target].rust_identifier(), "Adding Extern after positioning ref target");
                         graph.add_edge(*target, index, SqlGraphRelationship::RequiredBy);
-                        break;
+                    }  else {
+                        return Err(eyre_err!("Could not find `requires` target: {:?}", requires));
                     }
                 },
                 _ => (),
@@ -886,6 +889,7 @@ fn connect_externs(
             }
         }
     }
+    Ok(())
 }
 
 fn initialize_ords(
