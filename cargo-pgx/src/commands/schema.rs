@@ -98,7 +98,8 @@ pub(crate) fn generate_schema(
     let command = command.stdout(Stdio::inherit()).stderr(Stdio::inherit());
     let command_str = format!("{:?}", command);
     println!(
-        "building SQL generator with features `{}`\n{}",
+        "{} SQL generator with features `{}`\n{}",
+        "    Building".bold().green(),
         features, command_str
     );
     let status = handle_result!(
