@@ -183,7 +183,7 @@ pub fn get_named_capture(
     }
 }
 
-#[derive(Debug, Hash, Eq, PartialEq, Clone)]
+#[derive(Debug, Hash, Eq, PartialEq, Clone, PartialOrd, Ord)]
 pub enum ExternArgs {
     Immutable,
     Strict,

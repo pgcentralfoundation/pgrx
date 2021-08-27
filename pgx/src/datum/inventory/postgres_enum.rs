@@ -1,4 +1,4 @@
-use std::hash::{Hash, Hasher};
+use std::{hash::{Hash, Hasher}, cmp::Ordering};
 
 use super::{SqlGraphIdentifier, SqlGraphEntity, ToSql};
 
@@ -21,15 +21,15 @@ impl Hash for InventoryPostgresEnum {
     }
 }
 
-impl PartialOrd for InventoryPostgresEnum {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        self.full_path.partial_cmp(&other.full_path)
+impl Ord for InventoryPostgresEnum {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.file.cmp(other.file).then_with(|| self.file.cmp(other.file))
     }
 }
 
-impl Ord for InventoryPostgresEnum {
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        self.full_path.cmp(&other.full_path)
+impl PartialOrd for InventoryPostgresEnum {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
     }
 }
 

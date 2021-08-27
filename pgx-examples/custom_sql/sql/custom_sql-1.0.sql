@@ -56,14 +56,14 @@ CREATE TYPE Dog AS ENUM (
 
 
 -- src/lib.rs:62
--- requires
+-- requires:
 --   single_raw
 
 INSERT INTO extension_sql VALUES ('single');
 
 
 -- src/lib.rs:52
--- requires
+-- requires:
 --   Dog
 --   home::Ball
 --   single_raw
@@ -74,7 +74,7 @@ INSERT INTO extension_sql VALUES ('multiple_raw');
 
 
 -- src/lib.rs:63
--- requires
+-- requires:
 --   Dog
 --   home::Ball
 --   single_raw

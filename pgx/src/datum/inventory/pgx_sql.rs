@@ -1,5 +1,5 @@
 use eyre::eyre as eyre_err;
-use std::{any::TypeId, collections::{HashMap, HashSet}, fmt::Debug};
+use std::{any::TypeId, collections::{HashMap}, fmt::Debug};
 
 use petgraph::{dot::Dot, graph::NodeIndex, stable_graph::StableGraph};
 use tracing::instrument;
@@ -70,26 +70,28 @@ impl PgxSql {
     ) -> eyre::Result<Self> {
         let mut graph = StableGraph::new();
 
+        let mut entities = entities.collect::<Vec<_>>();
+        entities.sort();
         // Split up things into their specific types:
         let mut control: Option<ControlFile> = None;
-        let mut schemas: HashSet<InventorySchema> = HashSet::default();
-        let mut extension_sqls: HashSet<InventoryExtensionSql> = HashSet::default();
-        let mut externs: HashSet<InventoryPgExtern> = HashSet::default();
-        let mut types: HashSet<InventoryPostgresType> = HashSet::default();
-        let mut enums: HashSet<InventoryPostgresEnum> = HashSet::default();
-        let mut ords: HashSet<InventoryPostgresOrd> = HashSet::default();
-        let mut hashes: HashSet<InventoryPostgresHash> = HashSet::default();
+        let mut schemas: Vec<InventorySchema> = Vec::default();
+        let mut extension_sqls: Vec<InventoryExtensionSql> = Vec::default();
+        let mut externs: Vec<InventoryPgExtern> = Vec::default();
+        let mut types: Vec<InventoryPostgresType> = Vec::default();
+        let mut enums: Vec<InventoryPostgresEnum> = Vec::default();
+        let mut ords: Vec<InventoryPostgresOrd> = Vec::default();
+        let mut hashes: Vec<InventoryPostgresHash> = Vec::default();
         for entity in entities {
             match entity {
                 SqlGraphEntity::ExtensionRoot(input_control) => { control = Some(input_control); },
-                SqlGraphEntity::Schema(input_schema) => { schemas.insert(input_schema); },
-                SqlGraphEntity::CustomSql(input_sql) => { extension_sqls.insert(input_sql); },
-                SqlGraphEntity::Function(input_function) => { externs.insert(input_function); },
-                SqlGraphEntity::Type(input_type) => { types.insert(input_type); },
+                SqlGraphEntity::Schema(input_schema) => { schemas.push(input_schema); },
+                SqlGraphEntity::CustomSql(input_sql) => { extension_sqls.push(input_sql); },
+                SqlGraphEntity::Function(input_function) => { externs.push(input_function); },
+                SqlGraphEntity::Type(input_type) => { types.push(input_type); },
                 SqlGraphEntity::BuiltinType(_) => (),
-                SqlGraphEntity::Enum(input_enum) => { enums.insert(input_enum); },
-                SqlGraphEntity::Ord(input_ord) => { ords.insert(input_ord); },
-                SqlGraphEntity::Hash(input_hash) => { hashes.insert(input_hash); },
+                SqlGraphEntity::Enum(input_enum) => { enums.push(input_enum); },
+                SqlGraphEntity::Ord(input_ord) => { ords.push(input_ord); },
+                SqlGraphEntity::Hash(input_hash) => { hashes.push(input_hash); },
             }
         }
 
@@ -391,7 +393,7 @@ fn build_base_edges(
 fn initialize_extension_sqls<'a>(
     graph: &'a mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
     root: NodeIndex,
-    extension_sqls: HashSet<InventoryExtensionSql>,
+    extension_sqls: Vec<InventoryExtensionSql>,
 ) -> eyre::Result<(
     HashMap<InventoryExtensionSql, NodeIndex>,
     Option<NodeIndex>,
@@ -502,7 +504,7 @@ fn connect_extension_sqls(
                 tracing::debug!(from = %item.rust_identifier(), to = ?graph[*target].rust_identifier(), "Adding ExtensionSQL after positioning ref target");
                 graph.add_edge(*target, index, SqlGraphRelationship::RequiredBy);
             } else {
-                return Err(eyre_err!("Could not find `requires` target: {:?}", requires));
+                return Err(eyre_err!("Could not find `requires` target of `{}`: {:?}", item.rust_identifier(), requires));
             }
         }
     }
@@ -513,7 +515,7 @@ fn initialize_schemas(
     graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
     bootstrap: Option<NodeIndex>,
     finalize: Option<NodeIndex>,
-    schemas: HashSet<InventorySchema>,
+    schemas: Vec<InventorySchema>,
 ) -> eyre::Result<HashMap<InventorySchema, NodeIndex>> {
     let mut mapped_schemas = HashMap::default();
     for item in schemas {
@@ -545,7 +547,7 @@ fn initialize_enums(
     root: NodeIndex,
     bootstrap: Option<NodeIndex>,
     finalize: Option<NodeIndex>,
-    enums: HashSet<InventoryPostgresEnum>,
+    enums: Vec<InventoryPostgresEnum>,
 ) -> eyre::Result<HashMap<InventoryPostgresEnum, NodeIndex>> {
     let mut mapped_enums = HashMap::default();
     for item in enums {
@@ -578,7 +580,7 @@ fn initialize_types(
     root: NodeIndex,
     bootstrap: Option<NodeIndex>,
     finalize: Option<NodeIndex>,
-    types: HashSet<InventoryPostgresType>,
+    types: Vec<InventoryPostgresType>,
 ) -> eyre::Result<HashMap<InventoryPostgresType, NodeIndex>> {
     let mut mapped_types = HashMap::default();
     for item in types {
@@ -611,7 +613,7 @@ fn initialize_externs(
     root: NodeIndex,
     bootstrap: Option<NodeIndex>,
     finalize: Option<NodeIndex>,
-    externs: HashSet<InventoryPgExtern>,
+    externs: Vec<InventoryPgExtern>,
     mapped_types: &HashMap<InventoryPostgresType, NodeIndex>,
     mapped_enums: &HashMap<InventoryPostgresEnum, NodeIndex>,
 ) -> eyre::Result<(
@@ -897,7 +899,7 @@ fn initialize_ords(
     root: NodeIndex,
     bootstrap: Option<NodeIndex>,
     finalize: Option<NodeIndex>,
-    ords: HashSet<InventoryPostgresOrd>,
+    ords: Vec<InventoryPostgresOrd>,
 ) -> eyre::Result<HashMap<InventoryPostgresOrd, NodeIndex>> {
     let mut mapped_ords = HashMap::default();
     for item in ords {
@@ -946,7 +948,7 @@ fn initialize_hashes(
     root: NodeIndex,
     bootstrap: Option<NodeIndex>,
     finalize: Option<NodeIndex>,
-    hashes: HashSet<InventoryPostgresHash>,
+    hashes: Vec<InventoryPostgresHash>,
 ) -> eyre::Result<HashMap<InventoryPostgresHash, NodeIndex>> {
     let mut mapped_hashes = HashMap::default();
     for item in hashes {

@@ -1,11 +1,24 @@
 use super::{SqlGraphIdentifier, SqlGraphEntity, ToSql};
+use std::cmp::Ordering;
 
-#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub struct InventorySchema {
     pub module_path: &'static str,
     pub name: &'static str,
     pub file: &'static str,
     pub line: u32,
+}
+
+impl Ord for InventorySchema {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.file.cmp(other.file).then_with(|| self.file.cmp(other.file))
+    }
+}
+
+impl PartialOrd for InventorySchema {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
 }
 
 impl Into<SqlGraphEntity> for InventorySchema {

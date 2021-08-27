@@ -12,6 +12,7 @@ use pgx_utils::ExternArgs;
 
 use super::{SqlGraphIdentifier, SqlGraphEntity, ToSql};
 use pgx_utils::inventory::SqlDeclaredEntity;
+use std::cmp::Ordering;
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub struct InventoryPgExtern {
@@ -28,6 +29,18 @@ pub struct InventoryPgExtern {
     pub fn_return: InventoryPgExternReturn,
     pub operator: Option<InventoryPgOperator>,
     pub overridden: Option<&'static str>,
+}
+
+impl Ord for InventoryPgExtern {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.file.cmp(other.file).then_with(|| self.file.cmp(other.file))
+    }
+}
+
+impl PartialOrd for InventoryPgExtern {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
 }
 
 impl crate::PostgresType for InventoryPgExtern {}

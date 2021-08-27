@@ -303,11 +303,6 @@ macro_rules! pg_magic_func {
 #[macro_export]
 macro_rules! pg_inventory_magic {
     () => {
-        #[no_mangle]
-        #[link(kind = "static")]
-        pub extern "C" fn __pgx_marker() {
-            ()
-        }
         /// A module containing [`pgx`] internals.
         ///
         /// This is created by [`macro@pgx::pg_module_magic`] (or, in rare cases,
@@ -334,6 +329,12 @@ macro_rules! pg_inventory_magic {
                     reexports::once_cell::sync::Lazy,
                 },
             };
+
+            #[no_mangle]
+            #[link(kind = "static")]
+            pub extern "C" fn __pgx_marker() {
+                ()
+            }
 
             /// The contents of the `*.control` file of the crate.
             pub static CONTROL_FILE: Lazy<ControlFile> = Lazy::new(|| {
@@ -389,7 +390,7 @@ macro_rules! pg_binary_magic {
                 },
                 PgxSql, SqlGraphEntity,
             };
-            pub use $($prelude :: )*{__pgx_marker, __pgx_internals::CONTROL_FILE};
+            pub use $($prelude :: )*__pgx_internals::{CONTROL_FILE, __pgx_marker};
             __pgx_marker(); // We *must* use this.
             use std::env;
 
@@ -422,9 +423,7 @@ macro_rules! pg_binary_magic {
             ).into());
             let dot = matches.value_of("dot");
             let symbols_to_call: Vec<_> = if let Some(symbols) = matches.values_of("symbols") {
-                symbols.map(|x| x.to_string()).collect()
-            } else if let Ok(symbols) = std::env::var("PGX_SQL_ENTITY_SYMBOLS") {
-                symbols.split(",").map(|x| x.to_string()).collect()
+                symbols.flat_map(|x| if x.is_empty() { None } else { Some(x.to_string()) }).collect()
             } else {
                 Default::default()
             };
@@ -437,7 +436,7 @@ macro_rules! pg_binary_magic {
                 for symbol_to_call in symbols_to_call {
                     let symbol: libloading::os::unix::Symbol<
                         unsafe extern fn() -> SqlGraphEntity
-                    > = lib.get(symbol_to_call.as_bytes()).unwrap();
+                    > = lib.get(symbol_to_call.as_bytes()).expect(&format!("Couldn't call {:?}", symbol_to_call));
                     let entity = symbol();
                     entities.push(entity);
                 }
