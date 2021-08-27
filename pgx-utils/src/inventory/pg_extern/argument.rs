@@ -225,9 +225,18 @@ impl ToTokens for Argument {
                         _ => (),
                     }
                 }
-                found_optional
-            }
-            _ => false,
+            },
+            syn::Type::Macro(ref type_macro) => {
+                let path = &type_macro.mac.path;
+                for segment in &path.segments {
+                    let ident_string = segment.ident.to_string();
+                    match ident_string.as_str() {
+                        "variadic" => found_variadic = true,
+                        _ => (),
+                    }
+                }
+            },
+            _ => (),
         };
         let ty_string = self.ty.to_token_stream().to_string().replace(" ", "");
 
