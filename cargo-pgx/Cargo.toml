@@ -20,11 +20,11 @@ colored = "2.0.0"
 env_proxy = "0.4.1"
 num_cpus = "1.13.0"
 pgx-utils = { path = "../pgx-utils", version = "0.1.21"}
-proc-macro2 = { version = "1.0.26", features = [ "span-locations" ] }
+proc-macro2 = { version = "1.0.28", features = [ "span-locations" ] }
 quote = "1.0.9"
-rayon = "1.5.0"
-regex = "1.5.2"
+rayon = "1.5.1"
+regex = "1.5.4"
 rttp_client = { version = "0.1.0", features = ["tls-native"] }
-syn = { version = "1.0.71", features = [ "extra-traits", "full", "fold", "parsing" ] }
+syn = { version = "1.0.75", features = [ "extra-traits", "full", "fold", "parsing" ] }
 unescape = "0.1.0"
 fork = "0.1.18"
