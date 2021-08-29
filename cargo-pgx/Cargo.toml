@@ -19,7 +19,7 @@ clap = { version = "2.33.3", features = [ "yaml" ] }
 colored = "2.0.0"
 env_proxy = "0.4.1"
 num_cpus = "1.13.0"
-pgx-utils = { path = "../pgx-utils", version = "0.1.21"}
+pgx-utils = { path = "../pgx-utils", version = "0.1.22" }
 proc-macro2 = { version = "1.0.28", features = [ "span-locations" ] }
 quote = "1.0.9"
 rayon = "1.5.1"
