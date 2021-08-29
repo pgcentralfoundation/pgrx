@@ -1,6 +1,6 @@
 [package]
 name = "pgx-macros"
-version = "0.1.21"
+version = "0.1.22"
 authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
 edition = "2018"
 license = "MIT"
@@ -14,7 +14,7 @@ readme = "README.md"
 proc-macro = true
 
 [dependencies]
-pgx-utils = { path = "../pgx-utils", version = "0.1.21"}
+pgx-utils = { path = "../pgx-utils" }
 proc-macro2 = "1.0.28"
 quote = "1.0.9"
 syn = { version = "1.0.75", features = [ "extra-traits", "full", "fold", "parsing" ] }
