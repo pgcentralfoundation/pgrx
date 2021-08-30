@@ -56,7 +56,7 @@ pub enum SqlGraphRelationship {
 
 impl PgxSql {
     #[instrument(
-        level = "info",
+        level = "error",
         skip(
             type_mappings,
             source_mappings,
@@ -180,7 +180,7 @@ impl PgxSql {
         Ok(this)
     }
 
-    #[instrument(level = "info", skip(self))]
+    #[instrument(level = "error", skip(self))]
     pub fn to_file(&self, file: impl AsRef<str> + Debug) -> eyre::Result<()> {
         use std::{
             fs::{create_dir_all, File},
@@ -199,7 +199,7 @@ impl PgxSql {
         Ok(())
     }
 
-    #[instrument(level = "info", err, skip(self))]
+    #[instrument(level = "error", err, skip(self))]
     pub fn to_dot(&self, file: impl AsRef<str> + Debug) -> eyre::Result<()> {
         use std::{
             fs::{create_dir_all, File},
@@ -295,7 +295,7 @@ impl PgxSql {
             .unwrap_or_else(|| "".to_string())
     }
 
-    #[instrument(level = "info", skip(self))]
+    #[instrument(level = "error", skip(self))]
     pub fn to_sql(&self) -> eyre::Result<String> {
         let mut full_sql = String::new();
         for step_id in petgraph::algo::toposort(&self.graph, None)
@@ -313,7 +313,7 @@ impl PgxSql {
         Ok(full_sql)
     }
 
-    #[instrument(level = "info", skip(self))]
+    #[instrument(level = "error", skip(self))]
     pub fn register_types(&mut self) {
         for (item, _index) in self.enums.clone() {
             for mapping in &item.mappings {
@@ -390,6 +390,7 @@ fn build_base_edges(
     }
 }
 
+#[instrument(level = "error", skip(graph, root, extension_sqls))]
 fn initialize_extension_sqls<'a>(
     graph: &'a mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
     root: NodeIndex,
@@ -408,17 +409,23 @@ fn initialize_extension_sqls<'a>(
         mapped_extension_sqls.insert(item.clone(), index);
 
         if item.bootstrap {
-            if let Some(_index) = bootstrap {
+            if let Some(exiting_index) = bootstrap {
+                let existing: &SqlGraphEntity = &graph[exiting_index];
                 return Err(eyre_err!(
-                    "Cannot have multiple `extension_sql!()` with `bootstrap` positioning."
+                    "Cannot have multiple `extension_sql!()` with `bootstrap` positioning, found `{}`, other was `{}`",
+                    item.rust_identifier(),
+                    existing.rust_identifier(),
                 ));
             }
             bootstrap = Some(index)
         }
         if item.finalize {
-            if let Some(_index) = finalize {
+            if let Some(exiting_index) = finalize {
+                let existing: &SqlGraphEntity = &graph[exiting_index];
                 return Err(eyre_err!(
-                    "Cannot have multiple `extension_sql!()` with `finalize` positioning."
+                    "Cannot have multiple `extension_sql!()` with `finalize` positioning, found `{}`, other was `{}`",
+                    item.rust_identifier(),
+                    existing.rust_identifier(),
                 ));
             }
             finalize = Some(index)
@@ -504,7 +511,17 @@ fn connect_extension_sqls(
                 tracing::debug!(from = %item.rust_identifier(), to = ?graph[*target].rust_identifier(), "Adding ExtensionSQL after positioning ref target");
                 graph.add_edge(*target, index, SqlGraphRelationship::RequiredBy);
             } else {
-                return Err(eyre_err!("Could not find `requires` target of `{}`: {:?}", item.rust_identifier(), requires));
+                return Err(eyre_err!(
+                    "Could not find `requires` target of `{}`{}: {}",
+                    item.rust_identifier(),
+                    if let (Some(file), Some(line)) = (item.file(), item.line()) {
+                        format!(" ({}:{})", file, line)
+                    } else { "".to_string() },
+                    match requires {
+                        InventoryPositioningRef::FullPath(path) => path.to_string(),
+                        InventoryPositioningRef::Name(name) => format!(r#""{}""#, name),
+                    },
+                ));
             }
         }
     }

@@ -52,6 +52,14 @@ impl SqlGraphIdentifier for InventoryPostgresEnum {
     fn rust_identifier(&self) -> String {
         self.full_path.to_string()
     }
+
+    fn file(&self) -> Option<&'static str> {
+        Some(self.file)
+    }
+
+    fn line(&self) -> Option<u32> {
+        Some(self.line)
+    }
 }
 
 impl ToSql for InventoryPostgresEnum {

@@ -154,4 +154,12 @@ impl SqlGraphIdentifier for ControlFile {
     fn rust_identifier(&self) -> String {
         format!("root")
     }
+
+    fn file(&self) -> Option<&'static str> {
+        None
+    }
+
+    fn line(&self) -> Option<u32> {
+        None
+    }
 }

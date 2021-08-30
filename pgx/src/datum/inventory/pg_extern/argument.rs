@@ -20,4 +20,12 @@ impl SqlGraphIdentifier for InventoryPgExternInput {
     fn rust_identifier(&self) -> String {
         self.full_path.to_string()
     }
+
+    fn file(&self) -> Option<&'static str> {
+        None
+    }
+
+    fn line(&self) -> Option<u32> {
+        None
+    }
 }

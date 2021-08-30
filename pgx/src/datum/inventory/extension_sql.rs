@@ -41,6 +41,14 @@ impl SqlGraphIdentifier for InventoryExtensionSql {
     fn rust_identifier(&self) -> String {
         self.name.to_string()
     }
+
+    fn file(&self) -> Option<&'static str> {
+        Some(self.file)
+    }
+
+    fn line(&self) -> Option<u32> {
+        Some(self.line)
+    }
 }
 
 impl ToSql for InventoryExtensionSql {

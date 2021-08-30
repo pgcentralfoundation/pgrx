@@ -172,7 +172,7 @@ pub(crate) fn generate_schema(
     }
 
     println!(
-        "{} a total of {} SQL entities. ({} unique schemas, {} functions, {} types, {} enums, {} sqls, {} ords, {} hashes)",
+        "{} {} SQL entities: {} unique schemas, {} functions, {} types, {} enums, {} sqls, {} ords, {} hashes",
         "  Discovered".bold().green(),
         fns_to_call.len().to_string().bold().cyan(),
         seen_schemas.iter().count().to_string().bold().cyan(),

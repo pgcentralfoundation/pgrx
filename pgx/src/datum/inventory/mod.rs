@@ -45,6 +45,10 @@ pub trait SqlGraphIdentifier {
     /// Typically this is the result of [`std::module_path`], [`core::any::type_name`],
     /// or some combination of [`std::file`] and [`std::line`].
     fn rust_identifier(&self) -> String;
+
+    fn file(&self) -> Option<&'static str>;
+
+    fn line(&self) -> Option<u32>;
 }
 
 /// Able to be transformed into to SQL.

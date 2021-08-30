@@ -46,6 +46,34 @@ impl SqlGraphIdentifier for SqlGraphEntity {
             SqlGraphEntity::ExtensionRoot(item) => item.rust_identifier(),
         }
     }
+
+    fn file(&self) -> Option<&'static str> {
+        match self {
+            SqlGraphEntity::Schema(item) => item.file(),
+            SqlGraphEntity::CustomSql(item) => item.file(),
+            SqlGraphEntity::Function(item) => item.file(),
+            SqlGraphEntity::Type(item) => item.file(),
+            SqlGraphEntity::BuiltinType(_item) => None,
+            SqlGraphEntity::Enum(item) => item.file(),
+            SqlGraphEntity::Ord(item) => item.file(),
+            SqlGraphEntity::Hash(item) => item.file(),
+            SqlGraphEntity::ExtensionRoot(item) => item.file(),
+        }
+    }
+
+    fn line(&self) -> Option<u32> {
+        match self {
+            SqlGraphEntity::Schema(item) => item.line(),
+            SqlGraphEntity::CustomSql(item) => item.line(),
+            SqlGraphEntity::Function(item) => item.line(),
+            SqlGraphEntity::Type(item) => item.line(),
+            SqlGraphEntity::BuiltinType(_item) => None,
+            SqlGraphEntity::Enum(item) => item.line(),
+            SqlGraphEntity::Ord(item) => item.line(),
+            SqlGraphEntity::Hash(item) => item.line(),
+            SqlGraphEntity::ExtensionRoot(item) => item.line(),
+        }
+    }
 }
 
 impl ToSql for SqlGraphEntity {
