@@ -22,6 +22,7 @@ use quote::{quote, ToTokens, TokenStreamExt};
 use syn::parse::{Parse, ParseStream};
 
 /// Reexports for the pgx SQL generator binaries.
+#[doc(hidden)]
 pub mod reexports {
     #[doc(hidden)]
     pub use clap;

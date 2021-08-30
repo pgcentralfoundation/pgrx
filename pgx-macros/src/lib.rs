@@ -179,7 +179,7 @@ mod dsl {
 }
 ```
 
-File modules (like `mod name;`) aren't able to be supported due to [`rust/#54725](https://github.com/rust-lang/rust/issues/54725).
+File modules (like `mod name;`) aren't able to be supported due to [`rust/#54725`](https://github.com/rust-lang/rust/issues/54725).
 
 */
 #[proc_macro_attribute]
@@ -194,12 +194,11 @@ Declare SQL to be included in generated extension script.
 Accepts a String literal, a `name` attribute, and optionally others:
 
 * `name = "item"`: Set the unique identifer to `"item"` for use in `requires` declarations.
-* `before = [item, item_two]`: References to other `name`s or Rust items which this SQL should be present before.
 * `requires = [item, item_two]`: References to other `name`s or Rust items which this SQL should be present after.
-* `creates = [ Type(submod::Cust), Enum(Pre), Function(defined)]`: Communicates to the [`pgx-utils::PgxSql`] dependency graph
-    that this SQL block creates certain entities. Please note it **does not** create matching Rust types.
-* `bootstrap` (**Unique**): Hint that this is SQL intended to go before all other generated SQL.
-* `finalize` (**Unique**): Hint that this is SQL intended to go after all other generated SQL.
+* `creates = [ Type(submod::Cust), Enum(Pre), Function(defined)]`: Communicates that this SQL block creates certain entities.
+  Please note it **does not** create matching Rust types.
+* `bootstrap` (**Unique**): Communicates that this is SQL intended to go before all other generated SQL.
+* `finalize` (**Unique**): Communicates that this is SQL intended to go after all other generated SQL.
 
 You can declare some SQL without any positioning information, meaning it can end up anywhere in the generated SQL:
 
