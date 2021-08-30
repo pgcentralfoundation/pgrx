@@ -155,6 +155,33 @@ pub fn merges(_attr: TokenStream, item: TokenStream) -> TokenStream {
     item
 }
 
+/**
+Declare a Rust module and its contents to be in a schema.
+
+The schema name will always be the `mod`'s identifier. So `mod flop` will create a `flop` schema.
+
+If there is a schema inside a schema, the most specific schema is chosen.
+
+In this example, the created `example` function is in the `dsl_filters` schema.
+
+```rust
+use pgx::*;
+
+#[pg_schema]
+mod dsl {
+    use pgx::*;
+    #[pg_schema]
+    mod dsl_filters {
+        use pgx::*;
+        #[pg_extern]
+        fn example() { todo!() }
+    }
+}
+```
+
+File modules (like `mod name;`) aren't able to be supported due to [`rust/#54725](https://github.com/rust-lang/rust/issues/54725).
+
+*/
 #[proc_macro_attribute]
 pub fn pg_schema(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let pgx_schema = parse_macro_input!(item as inventory::Schema);
@@ -926,17 +953,4 @@ enum DogNames {
 pub fn postgres_hash(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
     impl_postgres_hash(ast).into()
-}
-
-#[proc_macro]
-pub fn inventory_dir(_input: TokenStream) -> TokenStream {
-    let inventory_dir = inventory_dir_fn();
-    let tokens = quote! {
-        #inventory_dir
-    };
-    tokens.into()
-}
-
-fn inventory_dir_fn() -> &'static str {
-    concat!(env!("OUT_DIR"), "/inventory")
 }

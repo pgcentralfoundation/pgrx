@@ -32,4 +32,3 @@ pgx-tests = { path = "../../../pgx/pgx-tests" }
 # opt-level = 3
 # lto = "fat"
 # codegen-units = 1
-
