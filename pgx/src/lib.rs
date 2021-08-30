@@ -303,6 +303,13 @@ macro_rules! pg_magic_func {
 #[macro_export]
 macro_rules! pg_inventory_magic {
     () => {
+        // A marker which must exist in the root of the extension.
+        #[no_mangle]
+        #[link(kind = "static")]
+        pub extern "C" fn __pgx_marker() {
+            ()
+        }
+
         /// A module containing [`pgx`] internals.
         ///
         /// This is created by [`macro@pgx::pg_module_magic`] (or, in rare cases,
@@ -329,12 +336,6 @@ macro_rules! pg_inventory_magic {
                     reexports::once_cell::sync::Lazy,
                 },
             };
-
-            #[no_mangle]
-            #[link(kind = "static")]
-            pub extern "C" fn __pgx_marker() {
-                ()
-            }
 
             /// The contents of the `*.control` file of the crate.
             pub static CONTROL_FILE: Lazy<ControlFile> = Lazy::new(|| {
@@ -390,7 +391,7 @@ macro_rules! pg_binary_magic {
                 },
                 PgxSql, SqlGraphEntity,
             };
-            pub use $($prelude :: )*__pgx_internals::{CONTROL_FILE, __pgx_marker};
+            pub use $($prelude :: )*{__pgx_marker, __pgx_internals::CONTROL_FILE};
             __pgx_marker(); // We *must* use this.
             use std::env;
 
