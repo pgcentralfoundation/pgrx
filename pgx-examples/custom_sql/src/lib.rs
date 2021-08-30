@@ -6,6 +6,7 @@ use serde::{Deserialize, Serialize};
 
 pg_module_magic!();
 
+#[pg_schema]
 mod home {
     use super::*;
 
@@ -48,6 +49,7 @@ extension_sql!(
         INSERT INTO extension_sql VALUES ('single_raw');\n\
     ",
     name = "single_raw",
+    requires = [home]
 );
 extension_sql!(
     "\n\

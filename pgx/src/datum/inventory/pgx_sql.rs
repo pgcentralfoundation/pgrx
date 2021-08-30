@@ -453,6 +453,7 @@ pub fn find_positioning_ref_target<'a>(
     types: &'a HashMap<InventoryPostgresType, NodeIndex>,
     enums: &'a HashMap<InventoryPostgresEnum, NodeIndex>,
     externs: &'a HashMap<InventoryPgExtern, NodeIndex>,
+    schemas: &'a HashMap<InventorySchema, NodeIndex>,
     extension_sqls: &'a HashMap<InventoryExtensionSql, NodeIndex>,
 ) -> Option<&'a NodeIndex> {
     match positioning_ref {
@@ -475,6 +476,11 @@ pub fn find_positioning_ref_target<'a>(
             }
             for (other, other_index) in externs {
                 if *last_segment == other.name && other.module_path.ends_with(&module_path) {
+                    return Some(&other_index);
+                }
+            }
+            for (other, other_index) in schemas {
+                if *path == other.name {
                     return Some(&other_index);
                 }
             }
@@ -507,7 +513,7 @@ fn connect_extension_sqls(
             }
         }
         for requires in &item.requires {
-            if let Some(target) = find_positioning_ref_target(requires, types, enums, externs, extension_sqls) {
+            if let Some(target) = find_positioning_ref_target(requires, types, enums, externs, schemas, extension_sqls) {
                 tracing::debug!(from = %item.rust_identifier(), to = ?graph[*target].rust_identifier(), "Adding ExtensionSQL after positioning ref target");
                 graph.add_edge(*target, index, SqlGraphRelationship::RequiredBy);
             } else {
@@ -739,7 +745,7 @@ fn connect_externs(
         for extern_attr in &item.extern_attrs {
             match extern_attr {
                 pgx_utils::ExternArgs::Requires(requirements) => for requires in requirements {
-                    if let Some(target) = find_positioning_ref_target(requires, types, enums, externs, extension_sqls) {
+                    if let Some(target) = find_positioning_ref_target(requires, types, enums, externs, schemas, extension_sqls) {
                         tracing::debug!(from = %item.rust_identifier(), to = %graph[*target].rust_identifier(), "Adding Extern after positioning ref target");
                         graph.add_edge(*target, index, SqlGraphRelationship::RequiredBy);
                     }  else {
