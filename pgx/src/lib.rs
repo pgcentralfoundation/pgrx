@@ -291,15 +291,7 @@ macro_rules! pg_magic_func {
     };
 }
 
-/// Create neccessary extension-local internal types for use with SQL generation.
-///
-/// <div class="example-wrap" style="display:inline-block">
-/// <pre class="ignore" style="white-space:normal;font:inherit;">
-///
-/// **Note**: Generally [`pg_module_magic`] is preferred, and results in this macro being called.
-/// This macro should only be directly called in advanced use cases.
-///
-/// </pre></div>
+/// Create neccessary extension-local internal marker for use with SQL generation.
 #[macro_export]
 macro_rules! pg_inventory_magic {
     () => {
@@ -367,6 +359,7 @@ macro_rules! pg_binary_magic {
             let matches = clap::App::new("sql-generator")
                 .arg(clap::Arg::with_name("sql").long("sql").value_name("FILE").takes_value(true))
                 .arg(clap::Arg::with_name("dot").long("dot").value_name("FILE").takes_value(true))
+                // The `cargo-pgx` tool passes via env.
                 .arg(clap::Arg::with_name("symbols").value_name("SYMBOL").env("PGX_SQL_ENTITY_SYMBOLS").use_delimiter(true).multiple(true).takes_value(true))
                 .get_matches();
 
@@ -374,6 +367,7 @@ macro_rules! pg_binary_magic {
             let fmt_layer = tracing_subscriber::fmt::Layer::new()
                 .without_time()
                 .pretty();
+            // Unless the user opts in specifically we don't want to impact `cargo-pgx schema` output.
             let filter_layer = EnvFilter::try_from_default_env()
                 .or_else(|_| EnvFilter::try_new("warn"))
                 .unwrap();
