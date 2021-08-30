@@ -49,9 +49,9 @@ pub(crate) fn generate_schema(
         );
         check_templated_file("src/bin/sql-generator.rs", expected_bin_source_content, force_default)?;
     
-        let expected_linker_script = include_str!("../templates/linker-script.sh");
-        check_templated_file(".cargo/linker-script.sh", expected_linker_script.to_string(), force_default)?;
-        std::fs::set_permissions(".cargo/linker-script.sh", std::fs::Permissions::from_mode(0o755)).unwrap();
+        let expected_linker_script = include_str!("../templates/pgx-linker-script.sh");
+        check_templated_file(".cargo/pgx-linker-script.sh", expected_linker_script.to_string(), force_default)?;
+        std::fs::set_permissions(".cargo/pgx-linker-script.sh", std::fs::Permissions::from_mode(0o755)).unwrap();
         let expected_dynamic_list = include_str!("../templates/pgx-dynamic-list.txt");
         check_templated_file(".cargo/pgx-dynamic-list.txt", expected_dynamic_list.to_string(), force_default)?;
         let expected_cargo_config = include_str!("../templates/cargo_config");

@@ -112,6 +112,27 @@ LANGUAGE c /* Rust */
 AS 'MODULE_PATHNAME', 'thing_hash_wrapper';
 
 -- src/derived.rs:16
+-- operators::derived::thing_ge
+CREATE OR REPLACE FUNCTION "thing_ge"(
+	"left" Thing, /* operators::derived::Thing */
+	"right" Thing /* operators::derived::Thing */
+) RETURNS bool /* bool */
+IMMUTABLE PARALLEL SAFE STRICT
+LANGUAGE c /* Rust */
+AS 'MODULE_PATHNAME', 'thing_ge_wrapper';
+-- src/derived.rs:16
+-- operators::derived::thing_ge
+CREATE OPERATOR >= (
+	PROCEDURE="thing_ge",
+	LEFTARG=Thing, /* operators::derived::Thing */
+	RIGHTARG=Thing, /* operators::derived::Thing */
+	COMMUTATOR = <=,
+	NEGATOR = <,
+	RESTRICT = scalargesel,
+	JOIN = scalargejoinsel
+);
+
+-- src/derived.rs:16
 -- operators::derived::thing_gt
 CREATE OR REPLACE FUNCTION "thing_gt"(
 	"left" Thing, /* operators::derived::Thing */
@@ -155,6 +176,16 @@ CREATE OPERATOR = (
 );
 
 -- src/derived.rs:16
+-- operators::derived::thing_cmp
+CREATE OR REPLACE FUNCTION "thing_cmp"(
+	"left" Thing, /* operators::derived::Thing */
+	"right" Thing /* operators::derived::Thing */
+) RETURNS integer /* i32 */
+IMMUTABLE PARALLEL SAFE STRICT
+LANGUAGE c /* Rust */
+AS 'MODULE_PATHNAME', 'thing_cmp_wrapper';
+
+-- src/derived.rs:16
 -- operators::derived::thing_lt
 CREATE OR REPLACE FUNCTION "thing_lt"(
 	"left" Thing, /* operators::derived::Thing */
@@ -173,48 +204,6 @@ CREATE OPERATOR < (
 	NEGATOR = >=,
 	RESTRICT = scalarltsel,
 	JOIN = scalarltjoinsel
-);
-
--- src/derived.rs:16
--- operators::derived::thing_ge
-CREATE OR REPLACE FUNCTION "thing_ge"(
-	"left" Thing, /* operators::derived::Thing */
-	"right" Thing /* operators::derived::Thing */
-) RETURNS bool /* bool */
-IMMUTABLE PARALLEL SAFE STRICT
-LANGUAGE c /* Rust */
-AS 'MODULE_PATHNAME', 'thing_ge_wrapper';
--- src/derived.rs:16
--- operators::derived::thing_ge
-CREATE OPERATOR >= (
-	PROCEDURE="thing_ge",
-	LEFTARG=Thing, /* operators::derived::Thing */
-	RIGHTARG=Thing, /* operators::derived::Thing */
-	COMMUTATOR = <=,
-	NEGATOR = <,
-	RESTRICT = scalargesel,
-	JOIN = scalargejoinsel
-);
-
--- src/derived.rs:16
--- operators::derived::thing_le
-CREATE OR REPLACE FUNCTION "thing_le"(
-	"left" Thing, /* operators::derived::Thing */
-	"right" Thing /* operators::derived::Thing */
-) RETURNS bool /* bool */
-IMMUTABLE PARALLEL SAFE STRICT
-LANGUAGE c /* Rust */
-AS 'MODULE_PATHNAME', 'thing_le_wrapper';
--- src/derived.rs:16
--- operators::derived::thing_le
-CREATE OPERATOR <= (
-	PROCEDURE="thing_le",
-	LEFTARG=Thing, /* operators::derived::Thing */
-	RIGHTARG=Thing, /* operators::derived::Thing */
-	COMMUTATOR = >=,
-	NEGATOR = >,
-	RESTRICT = scalarlesel,
-	JOIN = scalarlejoinsel
 );
 
 -- src/derived.rs:11
@@ -238,11 +227,22 @@ CREATE OPERATOR <> (
 );
 
 -- src/derived.rs:16
--- operators::derived::thing_cmp
-CREATE OR REPLACE FUNCTION "thing_cmp"(
+-- operators::derived::thing_le
+CREATE OR REPLACE FUNCTION "thing_le"(
 	"left" Thing, /* operators::derived::Thing */
 	"right" Thing /* operators::derived::Thing */
-) RETURNS integer /* i32 */
+) RETURNS bool /* bool */
 IMMUTABLE PARALLEL SAFE STRICT
 LANGUAGE c /* Rust */
-AS 'MODULE_PATHNAME', 'thing_cmp_wrapper';
+AS 'MODULE_PATHNAME', 'thing_le_wrapper';
+-- src/derived.rs:16
+-- operators::derived::thing_le
+CREATE OPERATOR <= (
+	PROCEDURE="thing_le",
+	LEFTARG=Thing, /* operators::derived::Thing */
+	RIGHTARG=Thing, /* operators::derived::Thing */
+	COMMUTATOR = >=,
+	NEGATOR = >,
+	RESTRICT = scalarlesel,
+	JOIN = scalarlejoinsel
+);

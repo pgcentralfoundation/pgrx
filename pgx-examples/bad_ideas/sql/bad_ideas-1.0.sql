@@ -11,29 +11,6 @@ STRICT
 LANGUAGE c /* Rust */
 AS 'MODULE_PATHNAME', 'loop_forever_wrapper';
 
--- src/lib.rs:36
--- bad_ideas::write_file
-CREATE OR REPLACE FUNCTION "write_file"(
-	"filename" text, /* &str */
-	"bytes" bytea /* &[u8] */
-) RETURNS bigint /* i64 */
-STRICT
-LANGUAGE c /* Rust */
-AS 'MODULE_PATHNAME', 'write_file_wrapper';
-
--- src/lib.rs:9
--- bad_ideas::exec
-CREATE OR REPLACE FUNCTION "exec"(
-	"command" text, /* &str */
-	"args" text[] DEFAULT ARRAY[]::text[] /* alloc::vec::Vec<core::option::Option<&str>> */
-) RETURNS TABLE (
-	"status" integer,  /* core::option::Option<i32> */
-	"stdout" text  /* alloc::string::String */
-)
-STRICT
-LANGUAGE c /* Rust */
-AS 'MODULE_PATHNAME', 'exec_wrapper';
-
 -- src/lib.rs:90
 -- bad_ideas::crash_postgres
 CREATE OR REPLACE FUNCTION "crash_postgres"() RETURNS void
@@ -48,13 +25,6 @@ STRICT
 LANGUAGE c /* Rust */
 AS 'MODULE_PATHNAME', 'drop_struct_wrapper';
 
--- src/lib.rs:61
--- bad_ideas::random_abort
-CREATE OR REPLACE FUNCTION "random_abort"() RETURNS void
-STRICT
-LANGUAGE c /* Rust */
-AS 'MODULE_PATHNAME', 'random_abort_wrapper';
-
 -- src/lib.rs:43
 -- bad_ideas::http
 CREATE OR REPLACE FUNCTION "http"(
@@ -63,3 +33,33 @@ CREATE OR REPLACE FUNCTION "http"(
 STRICT
 LANGUAGE c /* Rust */
 AS 'MODULE_PATHNAME', 'http_wrapper';
+
+-- src/lib.rs:9
+-- bad_ideas::exec
+CREATE OR REPLACE FUNCTION "exec"(
+	"command" text, /* &str */
+	"args" text[] DEFAULT ARRAY[]::text[] /* alloc::vec::Vec<core::option::Option<&str>> */
+) RETURNS TABLE (
+	"status" integer,  /* core::option::Option<i32> */
+	"stdout" text  /* alloc::string::String */
+)
+STRICT
+LANGUAGE c /* Rust */
+AS 'MODULE_PATHNAME', 'exec_wrapper';
+
+-- src/lib.rs:61
+-- bad_ideas::random_abort
+CREATE OR REPLACE FUNCTION "random_abort"() RETURNS void
+STRICT
+LANGUAGE c /* Rust */
+AS 'MODULE_PATHNAME', 'random_abort_wrapper';
+
+-- src/lib.rs:36
+-- bad_ideas::write_file
+CREATE OR REPLACE FUNCTION "write_file"(
+	"filename" text, /* &str */
+	"bytes" bytea /* &[u8] */
+) RETURNS bigint /* i64 */
+STRICT
+LANGUAGE c /* Rust */
+AS 'MODULE_PATHNAME', 'write_file_wrapper';
