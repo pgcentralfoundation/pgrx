@@ -145,7 +145,7 @@ pub(crate) fn generate_schema(
             }
         }
     }
-    let mut seen_schemas = std::collections::HashSet::new();
+    let mut seen_schemas = Vec::new();
     let mut num_funcs = 0;
     let mut num_types = 0;
     let mut num_enums = 0;
@@ -155,7 +155,7 @@ pub(crate) fn generate_schema(
     for func in &fns_to_call {
         if func.starts_with("__pgx_internals_schema_") {
             let schema = func.split("_").skip(5).next().expect("Schema extern name was not of expected format");
-            seen_schemas.insert(schema);
+            seen_schemas.push(schema);
         } else if func.starts_with("__pgx_internals_fn_") {
             num_funcs += 1;
         } else if func.starts_with("__pgx_internals_type_") {
@@ -172,10 +172,11 @@ pub(crate) fn generate_schema(
     }
 
     println!(
-        "{} {} SQL entities: {} unique schemas, {} functions, {} types, {} enums, {} sqls, {} ords, {} hashes",
+        "{} {} SQL entities: {} schemas ({} unique), {} functions, {} types, {} enums, {} sqls, {} ords, {} hashes",
         "  Discovered".bold().green(),
         fns_to_call.len().to_string().bold().cyan(),
         seen_schemas.iter().count().to_string().bold().cyan(),
+        seen_schemas.iter().collect::<std::collections::HashSet<_>>().iter().count().to_string().bold().cyan(),
         num_funcs.to_string().bold().cyan(),
         num_types.to_string().bold().cyan(),
         num_enums.to_string().bold().cyan(),

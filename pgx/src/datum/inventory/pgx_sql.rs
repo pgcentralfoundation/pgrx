@@ -480,7 +480,7 @@ pub fn find_positioning_ref_target<'a>(
                 }
             }
             for (other, other_index) in schemas {
-                if *path == other.name {
+                if other.module_path.ends_with(path) {
                     return Some(&other_index);
                 }
             }

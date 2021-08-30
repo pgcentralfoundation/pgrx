@@ -10,18 +10,24 @@ pg_module_magic!();
 mod home {
     use super::*;
 
-    #[derive(PostgresEnum, Serialize, Deserialize)]
-    pub enum Dog {
-        Brandy,
-        Nami,
+    #[pg_schema]
+    pub mod dogs {
+        use super::*;
+        
+        #[derive(PostgresEnum, Serialize, Deserialize)]
+        pub enum Dog {
+            Brandy,
+            Nami,
+        }
     }
+
 
     #[derive(PostgresType, Serialize, Deserialize)]
     pub struct Ball {
         last_chomp: Dog,
     }
 }
-pub use home::Dog;
+pub use home::dogs::Dog;
 
 // `extension_sql` allows you to define your own custom SQL.
 //
@@ -49,7 +55,7 @@ extension_sql!(
         INSERT INTO extension_sql VALUES ('single_raw');\n\
     ",
     name = "single_raw",
-    requires = [home]
+    requires = [home::dogs]
 );
 extension_sql!(
     "\n\
