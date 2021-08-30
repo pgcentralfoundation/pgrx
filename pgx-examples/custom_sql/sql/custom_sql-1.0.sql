@@ -49,16 +49,6 @@ CREATE TYPE Dog AS ENUM (
 	'Nami'
 );
 
--- src/lib.rs:70
-CREATE SCHEMA IF NOT EXISTS tests; /* custom_sql::tests */
-
--- src/lib.rs:74
--- custom_sql::tests::test_ordering
-CREATE OR REPLACE FUNCTION tests."test_ordering"() RETURNS void
-STRICT
-LANGUAGE c /* Rust */
-AS 'MODULE_PATHNAME', 'test_ordering_wrapper';
-
 -- src/lib.rs:46
 
 

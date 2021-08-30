@@ -117,7 +117,7 @@ impl ToTokens for PostgresType {
         let out_fn = &self.out_fn;
 
         let inventory_fn_name = syn::Ident::new(
-            &format!("__pgx_internals_fn_{}", self.name),
+            &format!("__pgx_internals_type_{}", self.name),
             Span::call_site(),
         );
 

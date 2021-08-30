@@ -433,7 +433,6 @@ fn do_it(
 ) { todo!() }
 ```
 
-
 # Returns
 
 It's possible to return even complex values, as well:
@@ -457,6 +456,11 @@ use pgx::*;
 #[pg_extern]
 fn floop() -> impl Iterator<Item = (name!(a, i32), name!(b, i32))> {
     None.into_iter() // Help type inference...
+}
+
+#[pg_extern]
+fn singlular_floop() -> (name!(a, i32), name!(b, i32)) {
+    todo!()
 }
 ```
 
