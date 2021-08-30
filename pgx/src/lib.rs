@@ -306,47 +306,17 @@ macro_rules! pg_inventory_magic {
         // A marker which must exist in the root of the extension.
         #[no_mangle]
         #[link(kind = "static")]
-        pub extern "C" fn __pgx_marker() {
-            ()
-        }
-
-        /// A module containing [`pgx`] internals.
-        ///
-        /// This is created by [`macro@pgx::pg_module_magic`] (or, in rare cases,
-        /// [`macro@pgx::pg_inventory_magic`].)
-        ///
-        /// Most often, these are used by the [`macro@pgx::pg_binary_magic`] inside a
-        /// `src/bin/sql-generator.rs`.
-        ///
-        /// <div class="example-wrap" style="display:inline-block">
-        /// <pre class="ignore" style="white-space:normal;font:inherit;">
-        ///
-        /// **Note**: These should be considered [`pgx`] **internals**, they may
-        /// change between versions without warning or documentation. While you
-        /// *may* use them, you are signing up for pain later. Please, open an
-        /// issue about what you need instead.
-        ///
-        /// </pre></div>
-        pub mod __pgx_internals {
-            use core::convert::TryFrom;
-            use pgx::{
-                pg_sys,
-                datum::inventory::{
-                    ControlFile, PgxSql,
-                    reexports::once_cell::sync::Lazy,
-                },
-            };
-
-            /// The contents of the `*.control` file of the crate.
-            pub static CONTROL_FILE: Lazy<ControlFile> = Lazy::new(|| {
-                let context = include_str!(concat!(
-                    env!("CARGO_MANIFEST_DIR"),
-                    "/",
-                    env!("CARGO_CRATE_NAME"),
-                    ".control"
-                ));
-                ControlFile::try_from(context).expect("Could not parse control file, was it valid?")
-            });
+        pub extern "C" fn __pgx_marker() -> pgx::datum::inventory::reexports::eyre::Result<pgx::datum::inventory::ControlFile> {
+            use std::convert::TryFrom;
+            use pgx::datum::inventory::reexports::eyre::WrapErr;
+            let context = include_str!(concat!(
+                env!("CARGO_MANIFEST_DIR"),
+                "/",
+                env!("CARGO_CRATE_NAME"),
+                ".control"
+            ));
+            let control_file = pgx::datum::inventory::ControlFile::try_from(context).wrap_err_with(|| "Could not parse control file, is it valid?")?;
+            Ok(control_file)
         }
     };
 }
@@ -391,8 +361,7 @@ macro_rules! pg_binary_magic {
                 },
                 PgxSql, SqlGraphEntity,
             };
-            pub use $($prelude :: )*{__pgx_marker, __pgx_internals::CONTROL_FILE};
-            __pgx_marker(); // We *must* use this.
+            pub use $($prelude :: )*__pgx_marker;
             use std::env;
 
             let matches = clap::App::new("sql-generator")
@@ -431,7 +400,8 @@ macro_rules! pg_binary_magic {
 
             tracing::info!(path = %path, "Collecting {} SQL entities", symbols_to_call.len());
             let mut entities = Vec::default();
-            entities.push(SqlGraphEntity::ExtensionRoot(CONTROL_FILE.clone()));
+            let control_file = __pgx_marker()?; // We *must* use this.
+            entities.push(SqlGraphEntity::ExtensionRoot(control_file));
             unsafe {
                 let lib = libloading::os::unix::Library::this();
                 for symbol_to_call in symbols_to_call {
