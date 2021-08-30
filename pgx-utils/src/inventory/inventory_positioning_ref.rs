@@ -1,6 +1,5 @@
-
+use quote::{quote, ToTokens};
 use std::fmt::Display;
-use quote::{ToTokens, quote};
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub enum InventoryPositioningRef {

@@ -1,6 +1,9 @@
-use std::{hash::{Hash, Hasher}, cmp::Ordering};
+use std::{
+    cmp::Ordering,
+    hash::{Hash, Hasher},
+};
 
-use super::{SqlGraphIdentifier, SqlGraphEntity, ToSql};
+use super::{SqlGraphEntity, SqlGraphIdentifier, ToSql};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct InventoryPostgresEnum {
@@ -23,7 +26,9 @@ impl Hash for InventoryPostgresEnum {
 
 impl Ord for InventoryPostgresEnum {
     fn cmp(&self, other: &Self) -> Ordering {
-        self.file.cmp(other.file).then_with(|| self.file.cmp(other.file))
+        self.file
+            .cmp(other.file)
+            .then_with(|| self.file.cmp(other.file))
     }
 }
 

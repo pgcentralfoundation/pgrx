@@ -64,6 +64,7 @@ pub use once_cell;
 
 pub use atomics::*;
 pub use callbacks::*;
+use datum::inventory::{RustSourceOnlySqlMapping, RustSqlMapping};
 pub use datum::*;
 pub use enum_helper::*;
 pub use fcinfo::*;
@@ -79,7 +80,6 @@ pub use memcxt::*;
 pub use namespace::*;
 pub use nodes::*;
 pub use pgbox::*;
-use datum::inventory::{RustSourceOnlySqlMapping, RustSqlMapping};
 pub use rel::*;
 pub use shmem::*;
 pub use spi::*;
@@ -108,38 +108,53 @@ pub fn initialize() {
 macro_rules! map_source_only {
     ($map:ident, $rust:ty, $sql:expr) => {{
         let ty = stringify!($rust).to_string().replace(" ", "");
-        assert_eq!($map.insert(RustSourceOnlySqlMapping::new(
-            ty.clone(),
-            $sql.to_string(),
-        )), true, "Cannot map {} twice", ty); 
+        assert_eq!(
+            $map.insert(RustSourceOnlySqlMapping::new(ty.clone(), $sql.to_string(),)),
+            true,
+            "Cannot map {} twice",
+            ty
+        );
 
         let ty = stringify!(Option<$rust>).to_string().replace(" ", "");
-        assert_eq!($map.insert(RustSourceOnlySqlMapping::new(
-            ty.clone(),
-            $sql.to_string(),
-        )), true, "Cannot map {} twice", ty); 
+        assert_eq!(
+            $map.insert(RustSourceOnlySqlMapping::new(ty.clone(), $sql.to_string(),)),
+            true,
+            "Cannot map {} twice",
+            ty
+        );
 
         let ty = stringify!(Vec<$rust>).to_string().replace(" ", "");
-        assert_eq!($map.insert(RustSourceOnlySqlMapping::new(
-            ty.clone(),
-            format!("{}[]", $sql),
-        )), true, "Cannot map {} twice", ty); 
+        assert_eq!(
+            $map.insert(RustSourceOnlySqlMapping::new(
+                ty.clone(),
+                format!("{}[]", $sql),
+            )),
+            true,
+            "Cannot map {} twice",
+            ty
+        );
 
         let ty = stringify!(Array<$rust>).to_string().replace(" ", "");
-        assert_eq!($map.insert(RustSourceOnlySqlMapping::new(
-            ty.clone(),
-            format!("{}[]", $sql),
-        )), true, "Cannot map {} twice", ty); 
+        assert_eq!(
+            $map.insert(RustSourceOnlySqlMapping::new(
+                ty.clone(),
+                format!("{}[]", $sql),
+            )),
+            true,
+            "Cannot map {} twice",
+            ty
+        );
     }};
 }
 
-pub static DEFAULT_SOURCE_ONLY_SQL_MAPPING: Lazy<HashSet<RustSourceOnlySqlMapping>> = Lazy::new(|| {
-    let mut m = HashSet::new();
+pub static DEFAULT_SOURCE_ONLY_SQL_MAPPING: Lazy<HashSet<RustSourceOnlySqlMapping>> =
+    Lazy::new(|| {
+        let mut m = HashSet::new();
 
-    map_source_only!(m, pg_sys::Oid, "Oid");
+        map_source_only!(m, pg_sys::Oid, "Oid");
 
-    m
-});
+        m
+    });
 
 macro_rules! map_type {
     ($map:ident, $rust:ty, $sql:expr) => {{
@@ -298,16 +313,18 @@ macro_rules! pg_inventory_magic {
         // A marker which must exist in the root of the extension.
         #[no_mangle]
         #[link(kind = "static")]
-        pub extern "C" fn __pgx_marker() -> pgx::datum::inventory::reexports::eyre::Result<pgx::datum::inventory::ControlFile> {
-            use std::convert::TryFrom;
+        pub extern "C" fn __pgx_marker(
+        ) -> pgx::datum::inventory::reexports::eyre::Result<pgx::datum::inventory::ControlFile> {
             use pgx::datum::inventory::reexports::eyre::WrapErr;
+            use std::convert::TryFrom;
             let context = include_str!(concat!(
                 env!("CARGO_MANIFEST_DIR"),
                 "/",
                 env!("CARGO_CRATE_NAME"),
                 ".control"
             ));
-            let control_file = pgx::datum::inventory::ControlFile::try_from(context).wrap_err_with(|| "Could not parse control file, is it valid?")?;
+            let control_file = pgx::datum::inventory::ControlFile::try_from(context)
+                .wrap_err_with(|| "Could not parse control file, is it valid?")?;
             Ok(control_file)
         }
     };

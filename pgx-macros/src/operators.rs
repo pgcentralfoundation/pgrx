@@ -1,4 +1,4 @@
-use pgx_utils::{operator_common::*, inventory};
+use pgx_utils::{inventory, operator_common::*};
 use quote::ToTokens;
 use syn::DeriveInput;
 

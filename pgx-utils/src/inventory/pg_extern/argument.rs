@@ -2,7 +2,10 @@ use std::ops::Deref;
 
 use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
-use syn::{FnArg, Pat, Token, parse::{Parse, ParseStream}, parse_quote};
+use syn::{
+    parse::{Parse, ParseStream},
+    parse_quote, FnArg, Pat, Token,
+};
 
 #[derive(Debug, Clone)]
 pub struct Argument {
@@ -33,7 +36,8 @@ impl Argument {
             syn::Type::Macro(macro_pat) => {
                 let mac = &macro_pat.mac;
                 let archetype = mac.path.segments.last().expect("No last segment");
-                let (maybe_new_true_ty, default_value) = handle_default(true_ty.clone(), archetype, mac)?;
+                let (maybe_new_true_ty, default_value) =
+                    handle_default(true_ty.clone(), archetype, mac)?;
                 true_ty = maybe_new_true_ty;
                 default_value
             }
@@ -51,8 +55,9 @@ impl Argument {
                                         let mac = &macro_pat.mac;
                                         let archetype =
                                             mac.path.segments.last().expect("No last segment");
-                                        let (inner_type, default_value) = handle_default(true_ty.clone(), archetype, mac)?;
-                                        true_ty = parse_quote!{ Option<#inner_type> };
+                                        let (inner_type, default_value) =
+                                            handle_default(true_ty.clone(), archetype, mac)?;
+                                        true_ty = parse_quote! { Option<#inner_type> };
                                         default = default_value;
                                     }
                                     _ => (),
@@ -145,7 +150,11 @@ impl Argument {
     }
 }
 
-fn handle_default(ty: syn::Type, archetype: &syn::PathSegment, mac: &syn::Macro) -> syn::Result<(syn::Type, Option<String>)> {
+fn handle_default(
+    ty: syn::Type,
+    archetype: &syn::PathSegment,
+    mac: &syn::Macro,
+) -> syn::Result<(syn::Type, Option<String>)> {
     match archetype.ident.to_string().as_str() {
         "default" => {
             let out: DefaultMacro = mac.parse_body()?;
@@ -157,53 +166,81 @@ fn handle_default(ty: syn::Type, archetype: &syn::PathSegment, mac: &syn::Macro)
                 }) => {
                     let value = def.value();
                     Ok((true_ty, Some(value)))
-                },
+                }
                 syn::Expr::Lit(syn::ExprLit {
                     lit: syn::Lit::Float(def),
                     ..
                 }) => {
                     let value = def.base10_digits();
                     Ok((true_ty, Some(value.to_string())))
-                },
+                }
                 syn::Expr::Lit(syn::ExprLit {
                     lit: syn::Lit::Int(def),
                     ..
                 }) => {
                     let value = def.base10_digits();
                     Ok((true_ty, Some(value.to_string())))
-                },
+                }
                 syn::Expr::Lit(syn::ExprLit {
                     lit: syn::Lit::Bool(def),
                     ..
                 }) => {
                     let value = def.value();
                     Ok((true_ty, Some(value.to_string())))
-                },
-                syn::Expr::Type(syn::ExprType { ref ty, .. }) => match ty.deref() {
-                    syn::Type::Path(syn::TypePath { path: syn::Path { segments, .. }, .. }) => {
-                        let last = segments.last().expect("No last segment");
-                        let last_string = last.ident.to_string();
-                        if last_string.as_str() == "NULL" {
-                            Ok((true_ty, Some(last_string)))
-                        } else {
-                            return Err(syn::Error::new(Span::call_site(), format!("Unable to parse default value of `default!()` macro, got: {:?}", out.expr)))
+                }
+                syn::Expr::Type(syn::ExprType { ref ty, .. }) => {
+                    match ty.deref() {
+                        syn::Type::Path(syn::TypePath {
+                            path: syn::Path { segments, .. },
+                            ..
+                        }) => {
+                            let last = segments.last().expect("No last segment");
+                            let last_string = last.ident.to_string();
+                            if last_string.as_str() == "NULL" {
+                                Ok((true_ty, Some(last_string)))
+                            } else {
+                                return Err(syn::Error::new(Span::call_site(), format!("Unable to parse default value of `default!()` macro, got: {:?}", out.expr)));
+                            }
                         }
-                    },
-                    _ => return Err(syn::Error::new(Span::call_site(), format!("Unable to parse default value of `default!()` macro, got: {:?}", out.expr))),
-                },
-                syn::Expr::Path(syn::ExprPath { path: syn::Path { ref segments, .. }, .. }) => {
+                        _ => return Err(syn::Error::new(
+                            Span::call_site(),
+                            format!(
+                                "Unable to parse default value of `default!()` macro, got: {:?}",
+                                out.expr
+                            ),
+                        )),
+                    }
+                }
+                syn::Expr::Path(syn::ExprPath {
+                    path: syn::Path { ref segments, .. },
+                    ..
+                }) => {
                     let last = segments.last().expect("No last segment");
                     let last_string = last.ident.to_string();
                     if last_string.as_str() == "NULL" {
                         Ok((true_ty, Some(last_string)))
                     } else {
-                        return Err(syn::Error::new(Span::call_site(), format!("Unable to parse default value of `default!()` macro, got: {:?}", out.expr)))
+                        return Err(syn::Error::new(
+                            Span::call_site(),
+                            format!(
+                                "Unable to parse default value of `default!()` macro, got: {:?}",
+                                out.expr
+                            ),
+                        ));
                     }
-                },
-                _ => return Err(syn::Error::new(Span::call_site(), format!("Unable to parse default value of `default!()` macro, got: {:?}", out.expr))),
+                }
+                _ => {
+                    return Err(syn::Error::new(
+                        Span::call_site(),
+                        format!(
+                            "Unable to parse default value of `default!()` macro, got: {:?}",
+                            out.expr
+                        ),
+                    ))
+                }
             }
         }
-        _ => Ok((ty, None))
+        _ => Ok((ty, None)),
     }
 }
 
@@ -225,7 +262,7 @@ impl ToTokens for Argument {
                         _ => (),
                     }
                 }
-            },
+            }
             syn::Type::Macro(ref type_macro) => {
                 let path = &type_macro.mac.path;
                 for segment in &path.segments {
@@ -235,7 +272,7 @@ impl ToTokens for Argument {
                         _ => (),
                     }
                 }
-            },
+            }
             _ => (),
         };
         let ty_string = self.ty.to_token_stream().to_string().replace(" ", "");

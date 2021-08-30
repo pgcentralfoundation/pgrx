@@ -10,7 +10,7 @@ pub use returning::InventoryPgExternReturn;
 
 use pgx_utils::ExternArgs;
 
-use super::{SqlGraphIdentifier, SqlGraphEntity, ToSql};
+use super::{SqlGraphEntity, SqlGraphIdentifier, ToSql};
 use pgx_utils::inventory::SqlDeclaredEntity;
 use std::cmp::Ordering;
 
@@ -33,7 +33,9 @@ pub struct InventoryPgExtern {
 
 impl Ord for InventoryPgExtern {
     fn cmp(&self, other: &Self) -> Ordering {
-        self.file.cmp(other.file).then_with(|| self.file.cmp(other.file))
+        self.file
+            .cmp(other.file)
+            .then_with(|| self.file.cmp(other.file))
     }
 }
 
@@ -85,7 +87,7 @@ impl ToSql for InventoryPgExtern {
                 }
             }
         }
-        
+
         if strict_upgrade {
             extern_attrs.push(ExternArgs::Strict);
         }
@@ -268,17 +270,27 @@ impl ToSql for InventoryPgExtern {
                 fn_sql
             },
             requires = {
-                let requires_attrs = self.extern_attrs.iter().filter_map(|x| match x {
-                    ExternArgs::Requires(requirements) => Some(requirements),
-                    _ => None,
-                }).flatten().collect::<Vec<_>>();
+                let requires_attrs = self
+                    .extern_attrs
+                    .iter()
+                    .filter_map(|x| match x {
+                        ExternArgs::Requires(requirements) => Some(requirements),
+                        _ => None,
+                    })
+                    .flatten()
+                    .collect::<Vec<_>>();
                 if !requires_attrs.is_empty() {
-                    format!("\
+                    format!(
+                        "\
                        -- requires:\n\
                         {}\n\
-                    ", requires_attrs.iter().map(|i| 
-                        format!("--   {}", i)
-                    ).collect::<Vec<_>>().join("\n"))
+                    ",
+                        requires_attrs
+                            .iter()
+                            .map(|i| format!("--   {}", i))
+                            .collect::<Vec<_>>()
+                            .join("\n")
+                    )
                 } else {
                     "".to_string()
                 }
@@ -287,7 +299,6 @@ impl ToSql for InventoryPgExtern {
                 .overridden
                 .map(|f| String::from("\n") + f + "\n")
                 .unwrap_or_default(),
-            
         );
         tracing::debug!(sql = %ext_sql);
 

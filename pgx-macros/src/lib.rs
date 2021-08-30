@@ -495,7 +495,8 @@ fn example_return() -> pg_sys::Oid {
 pub fn pg_extern(attr: TokenStream, item: TokenStream) -> TokenStream {
     let args = parse_extern_attributes(proc_macro2::TokenStream::from(attr.clone()));
 
-    let inventory_item = inventory::PgExtern::new(attr.clone().into(), item.clone().into()).unwrap();
+    let inventory_item =
+        inventory::PgExtern::new(attr.clone().into(), item.clone().into()).unwrap();
 
     let ast = parse_macro_input!(item as syn::Item);
     match ast {
@@ -648,10 +649,7 @@ Optionally accepts the following attributes:
 * `pgvarlena_inoutfuncs(some_in_fn, some_out_fn)`: Define custom in/out functions for the `PgVarlena` of this type.
 
 */
-#[proc_macro_derive(
-    PostgresType,
-    attributes(inoutfuncs, pgvarlena_inoutfuncs, requires)
-)]
+#[proc_macro_derive(PostgresType, attributes(inoutfuncs, pgvarlena_inoutfuncs, requires))]
 pub fn postgres_type(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
 
@@ -932,7 +930,7 @@ pub fn postgres_hash(input: TokenStream) -> TokenStream {
 
 #[proc_macro]
 pub fn inventory_dir(_input: TokenStream) -> TokenStream {
-    let inventory_dir =inventory_dir_fn();
+    let inventory_dir = inventory_dir_fn();
     let tokens = quote! {
         #inventory_dir
     };

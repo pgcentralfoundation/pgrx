@@ -1,4 +1,4 @@
-use super::{SqlGraphIdentifier, SqlGraphEntity, ToSql};
+use super::{SqlGraphEntity, SqlGraphIdentifier, ToSql};
 use std::cmp::Ordering;
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
@@ -13,7 +13,9 @@ pub struct InventoryPostgresHash {
 
 impl Ord for InventoryPostgresHash {
     fn cmp(&self, other: &Self) -> Ordering {
-        self.file.cmp(other.file).then_with(|| self.file.cmp(other.file))
+        self.file
+            .cmp(other.file)
+            .then_with(|| self.file.cmp(other.file))
     }
 }
 

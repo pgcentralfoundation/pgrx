@@ -1,7 +1,7 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-use crate::{pg_config::PgConfig, inventory::InventoryPositioningRef};
+use crate::{inventory::InventoryPositioningRef, pg_config::PgConfig};
 use colored::Colorize;
 use proc_macro2::TokenStream;
 use proc_macro2::TokenTree;
@@ -13,9 +13,9 @@ use std::process::{Command, Stdio};
 use std::str::FromStr;
 use syn::{GenericArgument, ItemFn, PathArguments, ReturnType, Type, TypeParamBound};
 
+pub mod inventory;
 pub mod operator_common;
 pub mod pg_config;
-pub mod inventory;
 
 pub static BASE_POSTGRES_PORT_NO: u16 = 28800;
 pub static BASE_POSTGRES_TESTING_PORT_NO: u16 = 32200;
@@ -197,7 +197,7 @@ pub enum ExternArgs {
     Error(String),
     Schema(String),
     Name(String),
-    Requires(Vec<InventoryPositioningRef>)
+    Requires(Vec<InventoryPositioningRef>),
 }
 
 impl core::fmt::Display for ExternArgs {
@@ -263,7 +263,7 @@ impl ToTokens for ExternArgs {
                     }
                     .to_token_stream(),
                 );
-            },
+            }
         }
     }
 }
@@ -384,9 +384,7 @@ pub fn categorize_type(ty: &Type) -> CategorizedType {
                 if segment_ident == "Box" {
                     match &segment.arguments {
                         PathArguments::AngleBracketed(a) => match a.args.first().unwrap() {
-                            GenericArgument::Type(ty) => {
-                                return categorize_type(ty)
-                            }
+                            GenericArgument::Type(ty) => return categorize_type(ty),
                             _ => {
                                 break;
                             }
@@ -401,14 +399,14 @@ pub fn categorize_type(ty: &Type) -> CategorizedType {
         }
         Type::TraitObject(trait_object) => {
             for bound in &trait_object.bounds {
-                return categorize_trait_bound(bound)
+                return categorize_trait_bound(bound);
             }
 
             panic!("Unsupported trait return type");
         }
         Type::ImplTrait(ty) => {
             for bound in &ty.bounds {
-                return categorize_trait_bound(bound)
+                return categorize_trait_bound(bound);
             }
 
             panic!("Unsupported trait return type");
@@ -454,7 +452,9 @@ pub fn categorize_trait_bound(bound: &TypeParamBound) -> CategorizedType {
                         PathArguments::AngleBracketed(a) => {
                             let args = &a.args;
                             if args.len() > 1 {
-                                panic!("Only one generic type is supported when returning an Iterator")
+                                panic!(
+                                    "Only one generic type is supported when returning an Iterator"
+                                )
                             }
 
                             match args.first().unwrap() {

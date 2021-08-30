@@ -18,9 +18,9 @@ pub enum InventoryPgExternReturn {
     Iterated(
         Vec<(
             TypeId,
-            &'static str, // Source
-            &'static str, // Full path
-            String, // Module path
+            &'static str,         // Source
+            &'static str,         // Full path
+            String,               // Module path
             Option<&'static str>, // Name
         )>,
     ),

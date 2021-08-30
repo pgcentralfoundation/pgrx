@@ -150,11 +150,12 @@ impl Parse for ExtensionSql {
             match attr {
                 ExtensionSqlAttribute::Name(found_name) => {
                     name = Some(found_name.clone());
-                },
+                }
                 _ => (),
             }
         }
-        let name = name.ok_or_else(|| syn::Error::new(input.span(), "expected `name` to be set"))?;
+        let name =
+            name.ok_or_else(|| syn::Error::new(input.span(), "expected `name` to be set"))?;
         Ok(Self { sql, attrs, name })
     }
 }

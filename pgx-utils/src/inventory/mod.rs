@@ -1,40 +1,38 @@
-
 mod extension_sql;
+mod inventory_positioning_ref;
 mod pg_extern;
 mod pg_schema;
 mod postgres_enum;
 mod postgres_hash;
 mod postgres_ord;
 mod postgres_type;
-mod inventory_positioning_ref;
 
-pub use extension_sql::{
-    ExtensionSql, ExtensionSqlFile,
-    SqlDeclaredEntity,
-};
-pub use pg_extern::{
-    PgExtern,
-};
+pub use super::ExternArgs;
+pub use extension_sql::{ExtensionSql, ExtensionSqlFile, SqlDeclaredEntity};
+pub use inventory_positioning_ref::InventoryPositioningRef;
+pub use pg_extern::PgExtern;
 pub use pg_schema::Schema;
 pub use postgres_enum::PostgresEnum;
 pub use postgres_hash::PostgresHash;
 pub use postgres_ord::PostgresOrd;
 pub use postgres_type::PostgresType;
-pub use super::ExternArgs;
-pub use inventory_positioning_ref::InventoryPositioningRef;
 
-use syn::parse::{Parse, ParseStream};
 use proc_macro2::TokenStream as TokenStream2;
-use quote::{ToTokens, quote, TokenStreamExt};
+use quote::{quote, ToTokens, TokenStreamExt};
+use syn::parse::{Parse, ParseStream};
 
 /// Reexports for the pgx SQL generator binaries.
 pub mod reexports {
+    #[doc(hidden)]
+    pub use clap;
     #[doc(hidden)]
     pub use color_eyre;
     #[doc(hidden)]
     pub use eyre;
     #[doc(hidden)]
     pub use inventory;
+    #[doc(hidden)]
+    pub use libloading;
     #[doc(hidden)]
     pub use once_cell;
     #[doc(hidden)]
@@ -43,12 +41,7 @@ pub mod reexports {
     pub use tracing_error;
     #[doc(hidden)]
     pub use tracing_subscriber;
-    #[doc(hidden)]
-    pub use libloading;
-    #[doc(hidden)]
-    pub use clap;
 }
-
 
 #[derive(Debug, Clone, Hash, Eq, PartialEq)]
 pub enum PositioningRef {

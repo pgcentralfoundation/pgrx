@@ -113,10 +113,7 @@ impl PgGuardRewriter {
                 true,
             ),
 
-            CategorizedType::Tuple(_types) => (
-                PgGuardRewriter::impl_tuple_udf(func),
-                false,
-            ),
+            CategorizedType::Tuple(_types) => (PgGuardRewriter::impl_tuple_udf(func), false),
 
             CategorizedType::Iterator(types) if types.len() == 1 => (
                 PgGuardRewriter::impl_setof_srf(
@@ -214,9 +211,7 @@ impl PgGuardRewriter {
         }
     }
 
-    fn impl_tuple_udf(
-        mut func: ItemFn,
-    ) -> proc_macro2::TokenStream {
+    fn impl_tuple_udf(mut func: ItemFn) -> proc_macro2::TokenStream {
         let func_span = func.span();
         let return_type = func.sig.output;
         let return_type = format!("{}", quote! {#return_type});

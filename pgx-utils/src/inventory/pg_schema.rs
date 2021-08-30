@@ -33,9 +33,7 @@ impl Parse for Schema {
     fn parse(input: ParseStream) -> Result<Self, syn::Error> {
         let module: ItemMod = input.parse()?;
 
-        Ok(Self {
-            module,
-        })
+        Ok(Self { module })
     }
 }
 
@@ -57,7 +55,7 @@ impl ToTokens for Schema {
         content_items.hash(&mut hasher);
         let postfix = hasher.finish();
         // End of hack
-        
+
         let mut updated_content = content_items.clone();
         let inventory_fn_name = syn::Ident::new(
             &format!("__pgx_internals_schema_{}_{}", ident, postfix),

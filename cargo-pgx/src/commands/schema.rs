@@ -1,12 +1,19 @@
 use crate::commands::get::find_control_file;
 use crate::commands::get::get_property;
+use colored::Colorize;
 use pgx_utils::pg_config::PgConfig;
 use pgx_utils::{exit_with_error, handle_result};
 use std::fs::File;
 use std::os::unix::prelude::PermissionsExt;
-use std::{path::Path, process::{Command, Stdio}, io::{Read, Write}};
-use symbolic::{common::{ByteView, DSymPathExt}, debuginfo::{Archive, SymbolIterator}};
-use colored::Colorize;
+use std::{
+    io::{Read, Write},
+    path::Path,
+    process::{Command, Stdio},
+};
+use symbolic::{
+    common::{ByteView, DSymPathExt},
+    debuginfo::{Archive, SymbolIterator},
+};
 
 pub(crate) fn generate_schema(
     pg_config: &PgConfig,
@@ -47,15 +54,35 @@ pub(crate) fn generate_schema(
         ",
             crate_name
         );
-        check_templated_file("src/bin/sql-generator.rs", expected_bin_source_content, force_default)?;
-    
+        check_templated_file(
+            "src/bin/sql-generator.rs",
+            expected_bin_source_content,
+            force_default,
+        )?;
+
         let expected_linker_script = include_str!("../templates/pgx-linker-script.sh");
-        check_templated_file(".cargo/pgx-linker-script.sh", expected_linker_script.to_string(), force_default)?;
-        std::fs::set_permissions(".cargo/pgx-linker-script.sh", std::fs::Permissions::from_mode(0o755)).unwrap();
+        check_templated_file(
+            ".cargo/pgx-linker-script.sh",
+            expected_linker_script.to_string(),
+            force_default,
+        )?;
+        std::fs::set_permissions(
+            ".cargo/pgx-linker-script.sh",
+            std::fs::Permissions::from_mode(0o755),
+        )
+        .unwrap();
         let expected_dynamic_list = include_str!("../templates/pgx-dynamic-list.txt");
-        check_templated_file(".cargo/pgx-dynamic-list.txt", expected_dynamic_list.to_string(), force_default)?;
+        check_templated_file(
+            ".cargo/pgx-dynamic-list.txt",
+            expected_dynamic_list.to_string(),
+            force_default,
+        )?;
         let expected_cargo_config = include_str!("../templates/cargo_config");
-        check_templated_file(".cargo/config", expected_cargo_config.to_string(), force_default)?;
+        check_templated_file(
+            ".cargo/config",
+            expected_cargo_config.to_string(),
+            force_default,
+        )?;
     }
 
     if get_property("relocatable") != Some("false".into()) {
@@ -101,7 +128,8 @@ pub(crate) fn generate_schema(
     println!(
         "{} SQL generator with features `{}`\n{}",
         "    Building".bold().green(),
-        features, command_str
+        features,
+        command_str
     );
     let status = handle_result!(
         command.status(),
@@ -110,15 +138,12 @@ pub(crate) fn generate_schema(
     if !status.success() {
         exit_with_error!("failed to build SQL generator");
     }
-    
+
     // Inspect the symbol table for a list of `__pgx_internals` we should have the generator call\
     let mut sql_gen_path = pgx_utils::get_target_dir();
     sql_gen_path.push(if is_release { "release" } else { "debug" });
     sql_gen_path.push("sql-generator");
-    println!(
-        "{} SQL entities",
-        " Discovering".bold().green(),
-    );
+    println!("{} SQL entities", " Discovering".bold().green(),);
     let dsym_path = sql_gen_path.resolve_dsym();
     let buffer = ByteView::open(dsym_path.as_deref().unwrap_or(&sql_gen_path))?;
     let archive = Archive::parse(&buffer).unwrap();
@@ -126,20 +151,18 @@ pub(crate) fn generate_schema(
     let mut fns_to_call = Vec::new();
     for object in archive.objects() {
         match object {
-            Ok(object) => {
-                match object.symbols() {
-                    SymbolIterator::Elf(iter) => {
-                        for symbol in iter {
-                            if let Some(name) = symbol.name {
-                                if name.starts_with("__pgx_internals") {
-                                    fns_to_call.push(name);
-                                }
+            Ok(object) => match object.symbols() {
+                SymbolIterator::Elf(iter) => {
+                    for symbol in iter {
+                        if let Some(name) = symbol.name {
+                            if name.starts_with("__pgx_internals") {
+                                fns_to_call.push(name);
                             }
                         }
-                    },
-                    _ => unimplemented!(),
+                    }
                 }
-            }
+                _ => unimplemented!(),
+            },
             Err(_e) => {
                 unimplemented!();
             }
@@ -154,7 +177,11 @@ pub(crate) fn generate_schema(
     let mut num_hashes = 0;
     for func in &fns_to_call {
         if func.starts_with("__pgx_internals_schema_") {
-            let schema = func.split("_").skip(5).next().expect("Schema extern name was not of expected format");
+            let schema = func
+                .split("_")
+                .skip(5)
+                .next()
+                .expect("Schema extern name was not of expected format");
             seen_schemas.push(schema);
         } else if func.starts_with("__pgx_internals_fn_") {
             num_funcs += 1;
@@ -215,7 +242,14 @@ pub(crate) fn generate_schema(
         command.arg("--dot");
         command.arg(dot.as_ref());
     }
-    command.env("PGX_SQL_ENTITY_SYMBOLS", fns_to_call.iter().map(|f| f.to_string()).collect::<Vec<_>>().join(","));
+    command.env(
+        "PGX_SQL_ENTITY_SYMBOLS",
+        fns_to_call
+            .iter()
+            .map(|f| f.to_string())
+            .collect::<Vec<_>>()
+            .join(","),
+    );
 
     let command = command.stdout(Stdio::inherit()).stderr(Stdio::inherit());
     let command_str = format!("{:?}", command);
@@ -233,9 +267,12 @@ pub(crate) fn generate_schema(
     Ok(())
 }
 
-
 /// Returns Ok(true) if something was created.
-fn check_templated_file(path: impl AsRef<Path>, expected_content: String, overwrite: bool) -> Result<bool, std::io::Error> {
+fn check_templated_file(
+    path: impl AsRef<Path>,
+    expected_content: String,
+    overwrite: bool,
+) -> Result<bool, std::io::Error> {
     let path = path.as_ref();
     let existing_contents = match File::open(&path) {
         Ok(mut file) => Some({
@@ -251,7 +288,7 @@ fn check_templated_file(path: impl AsRef<Path>, expected_content: String, overwr
             }
         }
     };
-    
+
     match existing_contents {
         Some(contents) if contents == Some(expected_content.clone()) => Ok(false),
         Some(_content) => {
@@ -274,7 +311,7 @@ fn check_templated_file(path: impl AsRef<Path>, expected_content: String, overwr
                     "   Detecting".bold().green(),
                     path.display().to_string().bold().cyan()
                 );
-                Ok(false)   
+                Ok(false)
             }
         }
         None => {

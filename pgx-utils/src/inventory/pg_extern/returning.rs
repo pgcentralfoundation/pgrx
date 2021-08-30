@@ -22,22 +22,18 @@ impl Returning {
         let last_path_segment = trait_bound.path.segments.last().unwrap();
         match last_path_segment.ident.to_string().as_str() {
             "Iterator" => match &last_path_segment.arguments {
-                syn::PathArguments::AngleBracketed(args) => {
-                    match args.args.first().unwrap() {
-                        syn::GenericArgument::Binding(binding) => match &binding.ty {
-                            syn::Type::Tuple(tuple_type) => {
-                                Self::parse_type_tuple(tuple_type)
-                            }
+                syn::PathArguments::AngleBracketed(args) => match args.args.first().unwrap() {
+                    syn::GenericArgument::Binding(binding) => match &binding.ty {
+                        syn::Type::Tuple(tuple_type) => Self::parse_type_tuple(tuple_type),
+                        syn::Type::Path(path) => Returning::SetOf(path.clone()),
+                        syn::Type::Reference(type_ref) => match &*type_ref.elem {
                             syn::Type::Path(path) => Returning::SetOf(path.clone()),
-                            syn::Type::Reference(type_ref) => match &*type_ref.elem {
-                                syn::Type::Path(path) => Returning::SetOf(path.clone()),
-                                _ => unimplemented!("Expected path"),
-                            },
-                            ty => unimplemented!("Only iters with tuples, got {:?}.", ty),
+                            _ => unimplemented!("Expected path"),
                         },
-                        _ => unimplemented!(),
-                    }
-                }
+                        ty => unimplemented!("Only iters with tuples, got {:?}.", ty),
+                    },
+                    _ => unimplemented!(),
+                },
                 _ => unimplemented!(),
             },
             _ => unimplemented!(),
@@ -45,8 +41,10 @@ impl Returning {
     }
 
     fn parse_type_tuple(type_tuple: &syn::TypeTuple) -> Returning {
-        let returns: Vec<(syn::Type, Option<_>)> = type_tuple.elems.iter().flat_map(|elem| {
-            match elem {
+        let returns: Vec<(syn::Type, Option<_>)> = type_tuple
+            .elems
+            .iter()
+            .flat_map(|elem| match elem {
                 syn::Type::Macro(macro_pat) => {
                     let mac = &macro_pat.mac;
                     let archetype = mac.path.segments.last().unwrap();
@@ -54,30 +52,26 @@ impl Returning {
                         "name" => {
                             let out: NameMacro = mac.parse_body().expect(&*format!("{:?}", mac));
                             Some((out.ty, Some(out.ident)))
-                        },
+                        }
                         _ => unimplemented!("Don't support anything other than name."),
                     }
-                },
+                }
                 ty => Some((ty.clone(), None)),
-            }
-        }).collect();
+            })
+            .collect();
         Returning::Iterated(returns)
     }
 
     fn parse_impl_trait(impl_trait: &syn::TypeImplTrait) -> Returning {
         match impl_trait.bounds.first().unwrap() {
-            syn::TypeParamBound::Trait(trait_bound) => {
-                Self::parse_trait_bound(trait_bound)
-            }
+            syn::TypeParamBound::Trait(trait_bound) => Self::parse_trait_bound(trait_bound),
             _ => Returning::None,
         }
     }
 
     fn parse_dyn_trait(dyn_trait: &syn::TypeTraitObject) -> Returning {
         match dyn_trait.bounds.first().unwrap() {
-            syn::TypeParamBound::Trait(trait_bound) => {
-                Self::parse_trait_bound(trait_bound)
-            }
+            syn::TypeParamBound::Trait(trait_bound) => Self::parse_trait_bound(trait_bound),
             _ => Returning::None,
         }
     }
@@ -116,15 +110,21 @@ impl TryFrom<&syn::ReturnType> for Returning {
                                         Some(syn::GenericArgument::Type(syn::Type::ImplTrait(
                                             impl_trait,
                                         ))) => {
-                                            maybe_inner_impl_trait = Some(Returning::parse_impl_trait(&impl_trait));
+                                            maybe_inner_impl_trait =
+                                                Some(Returning::parse_impl_trait(&impl_trait));
                                         }
-                                        Some(syn::GenericArgument::Type(syn::Type::TraitObject(
-                                            dyn_trait
-                                        ))) => maybe_inner_impl_trait = Some(Returning::parse_dyn_trait(&dyn_trait)),
+                                        Some(syn::GenericArgument::Type(
+                                            syn::Type::TraitObject(dyn_trait),
+                                        )) => {
+                                            maybe_inner_impl_trait =
+                                                Some(Returning::parse_dyn_trait(&dyn_trait))
+                                        }
                                         _ => (),
                                     }
                                 }
-                                syn::PathArguments::None | syn::PathArguments::Parenthesized(_) => ()
+                                syn::PathArguments::None | syn::PathArguments::Parenthesized(_) => {
+                                    ()
+                                }
                             }
                         }
                     }
@@ -184,8 +184,7 @@ impl ToTokens for Returning {
                 pgx::datum::inventory::InventoryPgExternReturn::None
             },
             Returning::Type(ty) => {
-                let ty_string = ty.to_token_stream().to_string()
-                    .replace(" ", "");
+                let ty_string = ty.to_token_stream().to_string().replace(" ", "");
                 quote! {
                     pgx::datum::inventory::InventoryPgExternReturn::Type {
                         id: TypeId::of::<#ty>(),
@@ -199,10 +198,9 @@ impl ToTokens for Returning {
                         },
                     }
                 }
-            },
+            }
             Returning::SetOf(ty) => {
-                let ty_string = ty.to_token_stream().to_string()
-                    .replace(" ", "");
+                let ty_string = ty.to_token_stream().to_string().replace(" ", "");
                 quote! {
                     pgx::datum::inventory::InventoryPgExternReturn::SetOf {
                         id: TypeId::of::<#ty>(),
@@ -216,13 +214,12 @@ impl ToTokens for Returning {
                         }
                     }
                 }
-            },
+            }
             Returning::Iterated(items) => {
                 let quoted_items = items
                     .iter()
                     .map(|(ty, name)| {
-                        let ty_string = ty.to_token_stream().to_string()
-                            .replace(" ", "");
+                        let ty_string = ty.to_token_stream().to_string().replace(" ", "");
                         let name_iter = name.iter();
                         quote! {
                             (

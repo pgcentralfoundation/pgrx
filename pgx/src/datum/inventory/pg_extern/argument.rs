@@ -12,7 +12,6 @@ pub struct InventoryPgExternInput {
     pub default: Option<&'static str>,
 }
 
-
 impl SqlGraphIdentifier for InventoryPgExternInput {
     fn dot_identifier(&self) -> String {
         format!("arg {}", self.full_path)

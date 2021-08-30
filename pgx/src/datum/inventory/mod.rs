@@ -8,7 +8,9 @@ mod schema;
 pub use schema::InventorySchema;
 
 mod pg_extern;
-pub use pg_extern::{InventoryPgExtern, InventoryPgExternReturn, InventoryPgExternInput, InventoryPgOperator};
+pub use pg_extern::{
+    InventoryPgExtern, InventoryPgExternInput, InventoryPgExternReturn, InventoryPgOperator,
+};
 
 mod extension_sql;
 pub use extension_sql::{InventoryExtensionSql, InventorySqlDeclaredEntity};
@@ -35,8 +37,8 @@ pub use pgx_utils::inventory::*;
 pub trait SqlGraphIdentifier {
     /// A dot style identifier for the entity.
     ///
-    /// Typically this is a 'archetype' prefix (eg `fn` or `type`) then result of 
-    /// [`std::module_path`], [`core::any::type_name`], or some combination of [`std::file`] and 
+    /// Typically this is a 'archetype' prefix (eg `fn` or `type`) then result of
+    /// [`std::module_path`], [`core::any::type_name`], or some combination of [`std::file`] and
     /// [`std::line`].
     fn dot_identifier(&self) -> String;
 
@@ -59,7 +61,6 @@ pub trait ToSql {
     /// `#[derive(PostgresType)]` which must include it's relevant in/out functions.
     fn to_sql(&self, context: &PgxSql) -> eyre::Result<String>;
 }
-
 
 /// A mapping from a Rust type to a SQL type, with a `TypeId`.
 ///
@@ -108,7 +109,7 @@ impl RustSqlMapping {
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct RustSourceOnlySqlMapping {
     pub rust: String,
-    pub sql: String
+    pub sql: String,
 }
 
 impl RustSourceOnlySqlMapping {

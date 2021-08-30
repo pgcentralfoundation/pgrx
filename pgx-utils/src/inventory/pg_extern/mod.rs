@@ -13,9 +13,9 @@ use search_path::SearchPathList;
 use eyre::WrapErr;
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
+use std::convert::TryFrom;
 use syn::parse::{Parse, ParseStream};
 use syn::Meta;
-use std::convert::TryFrom;
 
 /// A parsed `#[pg_extern]` item.
 ///
@@ -211,11 +211,9 @@ impl ToTokens for PgExtern {
         };
         let operator = self.operator().into_iter();
         let overridden = self.overridden().into_iter();
-        
-        let inventory_fn_name = syn::Ident::new(
-            &format!("__pgx_internals_fn_{}", ident),
-            Span::call_site(),
-        );
+
+        let inventory_fn_name =
+            syn::Ident::new(&format!("__pgx_internals_fn_{}", ident), Span::call_site());
         let inv = quote! {
             #[no_mangle]
             #[link(kind = "static")]

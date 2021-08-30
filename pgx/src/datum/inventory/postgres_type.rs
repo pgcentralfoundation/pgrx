@@ -1,8 +1,11 @@
-use eyre::eyre as eyre_err;
-use std::{hash::{Hash, Hasher}, cmp::Ordering};
 use super::RustSqlMapping;
+use eyre::eyre as eyre_err;
+use std::{
+    cmp::Ordering,
+    hash::{Hash, Hasher},
+};
 
-use super::{SqlGraphIdentifier, SqlGraphEntity, ToSql};
+use super::{SqlGraphEntity, SqlGraphIdentifier, ToSql};
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct InventoryPostgresType {
     pub name: &'static str,
@@ -27,7 +30,9 @@ impl Hash for InventoryPostgresType {
 
 impl Ord for InventoryPostgresType {
     fn cmp(&self, other: &Self) -> Ordering {
-        self.file.cmp(other.file).then_with(|| self.file.cmp(other.file))
+        self.file
+            .cmp(other.file)
+            .then_with(|| self.file.cmp(other.file))
     }
 }
 

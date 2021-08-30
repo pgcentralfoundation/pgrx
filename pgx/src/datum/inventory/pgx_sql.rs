@@ -1,16 +1,14 @@
 use eyre::eyre as eyre_err;
-use std::{any::TypeId, collections::{HashMap}, fmt::Debug};
+use std::{any::TypeId, collections::HashMap, fmt::Debug};
 
 use petgraph::{dot::Dot, graph::NodeIndex, stable_graph::StableGraph};
 use tracing::instrument;
 
 use super::{
-    SqlGraphIdentifier, InventorySqlDeclaredEntity, ControlFile,
-    InventoryExtensionSql, InventoryPositioningRef,
-    InventoryPgExtern, InventoryPgExternReturn, InventoryPostgresEnum,
-    InventoryPostgresHash, InventoryPostgresOrd, InventorySchema,
-    RustSourceOnlySqlMapping, RustSqlMapping, InventoryPostgresType,
-    SqlGraphEntity, ToSql
+    ControlFile, InventoryExtensionSql, InventoryPgExtern, InventoryPgExternReturn,
+    InventoryPositioningRef, InventoryPostgresEnum, InventoryPostgresHash, InventoryPostgresOrd,
+    InventoryPostgresType, InventorySchema, InventorySqlDeclaredEntity, RustSourceOnlySqlMapping,
+    RustSqlMapping, SqlGraphEntity, SqlGraphIdentifier, ToSql,
 };
 use pgx_utils::inventory::SqlDeclaredEntity;
 
@@ -55,14 +53,7 @@ pub enum SqlGraphRelationship {
 }
 
 impl PgxSql {
-    #[instrument(
-        level = "error",
-        skip(
-            type_mappings,
-            source_mappings,
-            entities,
-        ),
-    )]
+    #[instrument(level = "error", skip(type_mappings, source_mappings, entities,))]
     pub fn build(
         type_mappings: impl Iterator<Item = RustSqlMapping>,
         source_mappings: impl Iterator<Item = RustSourceOnlySqlMapping>,
@@ -83,15 +74,31 @@ impl PgxSql {
         let mut hashes: Vec<InventoryPostgresHash> = Vec::default();
         for entity in entities {
             match entity {
-                SqlGraphEntity::ExtensionRoot(input_control) => { control = Some(input_control); },
-                SqlGraphEntity::Schema(input_schema) => { schemas.push(input_schema); },
-                SqlGraphEntity::CustomSql(input_sql) => { extension_sqls.push(input_sql); },
-                SqlGraphEntity::Function(input_function) => { externs.push(input_function); },
-                SqlGraphEntity::Type(input_type) => { types.push(input_type); },
+                SqlGraphEntity::ExtensionRoot(input_control) => {
+                    control = Some(input_control);
+                }
+                SqlGraphEntity::Schema(input_schema) => {
+                    schemas.push(input_schema);
+                }
+                SqlGraphEntity::CustomSql(input_sql) => {
+                    extension_sqls.push(input_sql);
+                }
+                SqlGraphEntity::Function(input_function) => {
+                    externs.push(input_function);
+                }
+                SqlGraphEntity::Type(input_type) => {
+                    types.push(input_type);
+                }
                 SqlGraphEntity::BuiltinType(_) => (),
-                SqlGraphEntity::Enum(input_enum) => { enums.push(input_enum); },
-                SqlGraphEntity::Ord(input_ord) => { ords.push(input_ord); },
-                SqlGraphEntity::Hash(input_hash) => { hashes.push(input_hash); },
+                SqlGraphEntity::Enum(input_enum) => {
+                    enums.push(input_enum);
+                }
+                SqlGraphEntity::Ord(input_ord) => {
+                    ords.push(input_ord);
+                }
+                SqlGraphEntity::Hash(input_hash) => {
+                    hashes.push(input_hash);
+                }
             }
         }
 
@@ -318,7 +325,8 @@ impl PgxSql {
         for (item, _index) in self.enums.clone() {
             for mapping in &item.mappings {
                 assert_eq!(
-                    self.type_mappings.insert(mapping.id.clone(), mapping.clone()),
+                    self.type_mappings
+                        .insert(mapping.id.clone(), mapping.clone()),
                     None,
                     "Cannot map `{}` twice.",
                     item.full_path,
@@ -328,7 +336,8 @@ impl PgxSql {
         for (item, _index) in self.types.clone() {
             for mapping in &item.mappings {
                 assert_eq!(
-                    self.type_mappings.insert(mapping.id.clone(), mapping.clone()),
+                    self.type_mappings
+                        .insert(mapping.id.clone(), mapping.clone()),
                     None,
                     "Cannot map `{}` twice.",
                     item.full_path,
@@ -513,7 +522,14 @@ fn connect_extension_sqls(
             }
         }
         for requires in &item.requires {
-            if let Some(target) = find_positioning_ref_target(requires, types, enums, externs, schemas, extension_sqls) {
+            if let Some(target) = find_positioning_ref_target(
+                requires,
+                types,
+                enums,
+                externs,
+                schemas,
+                extension_sqls,
+            ) {
                 tracing::debug!(from = %item.rust_identifier(), to = ?graph[*target].rust_identifier(), "Adding ExtensionSQL after positioning ref target");
                 graph.add_edge(*target, index, SqlGraphRelationship::RequiredBy);
             } else {
@@ -522,7 +538,9 @@ fn connect_extension_sqls(
                     item.rust_identifier(),
                     if let (Some(file), Some(line)) = (item.file(), item.line()) {
                         format!(" ({}:{})", file, line)
-                    } else { "".to_string() },
+                    } else {
+                        "".to_string()
+                    },
                     match requires {
                         InventoryPositioningRef::FullPath(path) => path.to_string(),
                         InventoryPositioningRef::Name(name) => format!(r#""{}""#, name),
@@ -668,7 +686,9 @@ fn initialize_externs(
             if !found {
                 mapped_builtin_types
                     .entry(arg.full_path.to_string())
-                    .or_insert_with(|| graph.add_node(SqlGraphEntity::BuiltinType(arg.full_path.to_string())));
+                    .or_insert_with(|| {
+                        graph.add_node(SqlGraphEntity::BuiltinType(arg.full_path.to_string()))
+                    });
             }
         }
 
@@ -692,7 +712,9 @@ fn initialize_externs(
                 if !found {
                     mapped_builtin_types
                         .entry(full_path.to_string())
-                        .or_insert_with(|| graph.add_node(SqlGraphEntity::BuiltinType(full_path.to_string())));
+                        .or_insert_with(|| {
+                            graph.add_node(SqlGraphEntity::BuiltinType(full_path.to_string()))
+                        });
                 }
             }
             InventoryPgExternReturn::Iterated(iterated_returns) => {
@@ -714,7 +736,9 @@ fn initialize_externs(
                         mapped_builtin_types
                             .entry(iterated_return.1.to_string())
                             .or_insert_with(|| {
-                                graph.add_node(SqlGraphEntity::BuiltinType(iterated_return.1.to_string()))
+                                graph.add_node(SqlGraphEntity::BuiltinType(
+                                    iterated_return.1.to_string(),
+                                ))
                             });
                     }
                 }
@@ -744,17 +768,28 @@ fn connect_externs(
 
         for extern_attr in &item.extern_attrs {
             match extern_attr {
-                pgx_utils::ExternArgs::Requires(requirements) => for requires in requirements {
-                    if let Some(target) = find_positioning_ref_target(requires, types, enums, externs, schemas, extension_sqls) {
-                        tracing::debug!(from = %item.rust_identifier(), to = %graph[*target].rust_identifier(), "Adding Extern after positioning ref target");
-                        graph.add_edge(*target, index, SqlGraphRelationship::RequiredBy);
-                    }  else {
-                        return Err(eyre_err!("Could not find `requires` target: {:?}", requires));
+                pgx_utils::ExternArgs::Requires(requirements) => {
+                    for requires in requirements {
+                        if let Some(target) = find_positioning_ref_target(
+                            requires,
+                            types,
+                            enums,
+                            externs,
+                            schemas,
+                            extension_sqls,
+                        ) {
+                            tracing::debug!(from = %item.rust_identifier(), to = %graph[*target].rust_identifier(), "Adding Extern after positioning ref target");
+                            graph.add_edge(*target, index, SqlGraphRelationship::RequiredBy);
+                        } else {
+                            return Err(eyre_err!(
+                                "Could not find `requires` target: {:?}",
+                                requires
+                            ));
+                        }
                     }
-                },
+                }
                 _ => (),
             }
-            
         }
 
         for arg in &item.fn_args {
@@ -876,10 +911,12 @@ fn connect_externs(
                         }
                     }
                     if !found {
-                        let builtin_index = builtin_types.get(&iterated_return.1.to_string()).expect(&format!(
-                            "Could not fetch Builtin Type {}.",
-                            iterated_return.1
-                        ));
+                        let builtin_index = builtin_types
+                            .get(&iterated_return.1.to_string())
+                            .expect(&format!(
+                                "Could not fetch Builtin Type {}.",
+                                iterated_return.1
+                            ));
                         tracing::debug!(from = %item.rust_identifier(), to = iterated_return.1, "Adding Extern after BuiltIn Type (due to return) edge");
                         graph.add_edge(
                             *builtin_index,

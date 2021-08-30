@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-use super::{SqlGraphIdentifier, SqlGraphEntity, ToSql, InventoryPositioningRef};
+use super::{InventoryPositioningRef, SqlGraphEntity, SqlGraphIdentifier, ToSql};
 use pgx_utils::inventory::SqlDeclaredEntity;
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
@@ -65,32 +65,38 @@ impl ToSql for InventoryExtensionSql {
                 ",
             file = self.file,
             line = self.line,
-            bootstrap = if self.bootstrap {
-                "-- bootstrap\n"
-            } else { "" },
+            bootstrap = if self.bootstrap { "-- bootstrap\n" } else { "" },
             creates = if !self.creates.is_empty() {
-                format!("\
+                format!(
+                    "\
                     -- creates:\n\
                     {}\n\
-                ", self.creates.iter().map(|i| 
-                    format!("--   {}", i)
-                ).collect::<Vec<_>>().join("\n")) + "\n"
+                ",
+                    self.creates
+                        .iter()
+                        .map(|i| format!("--   {}", i))
+                        .collect::<Vec<_>>()
+                        .join("\n")
+                ) + "\n"
             } else {
                 "".to_string()
             },
             requires = if !self.requires.is_empty() {
-                format!("\
+                format!(
+                    "\
                    -- requires:\n\
                     {}\n\
-                ", self.requires.iter().map(|i| 
-                    format!("--   {}", i)
-                ).collect::<Vec<_>>().join("\n")) + "\n"
+                ",
+                    self.requires
+                        .iter()
+                        .map(|i| format!("--   {}", i))
+                        .collect::<Vec<_>>()
+                        .join("\n")
+                ) + "\n"
             } else {
                 "".to_string()
             },
-            finalize = if self.finalize {
-                "-- finalize\n"
-            } else { "" },
+            finalize = if self.finalize { "-- finalize\n" } else { "" },
             sql = self.sql,
         );
         tracing::debug!(%sql);
@@ -144,9 +150,15 @@ pub enum InventorySqlDeclaredEntity {
 impl Display for InventorySqlDeclaredEntity {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            InventorySqlDeclaredEntity::Type { name, .. } => f.write_str(&(String::from("Type(") + name + ")")),
-            InventorySqlDeclaredEntity::Enum { name, .. } => f.write_str(&(String::from("Enum(") + name + ")")),
-            InventorySqlDeclaredEntity::Function { name, .. } => f.write_str(&(String::from("Function ") + name + ")")),
+            InventorySqlDeclaredEntity::Type { name, .. } => {
+                f.write_str(&(String::from("Type(") + name + ")"))
+            }
+            InventorySqlDeclaredEntity::Enum { name, .. } => {
+                f.write_str(&(String::from("Enum(") + name + ")"))
+            }
+            InventorySqlDeclaredEntity::Function { name, .. } => {
+                f.write_str(&(String::from("Function ") + name + ")"))
+            }
         }
     }
 }

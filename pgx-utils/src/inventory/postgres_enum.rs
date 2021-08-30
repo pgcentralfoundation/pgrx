@@ -81,10 +81,8 @@ impl ToTokens for PostgresEnum {
         let (_impl_generics, ty_generics, _where_clauses) = static_generics.split_for_impl();
 
         let variants = self.variants.iter();
-        let inventory_fn_name = syn::Ident::new(
-            &format!("__pgx_internals_enum_{}", name),
-            Span::call_site(),
-        );
+        let inventory_fn_name =
+            syn::Ident::new(&format!("__pgx_internals_enum_{}", name), Span::call_site());
         let pg_finfo_fn_name = syn::Ident::new(
             &format!("pg_finfo_{}_wrapper", inventory_fn_name),
             Span::call_site(),
@@ -120,4 +118,3 @@ impl ToTokens for PostgresEnum {
         tokens.append_all(inv);
     }
 }
-

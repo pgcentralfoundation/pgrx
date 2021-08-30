@@ -1,3 +1,4 @@
+use crate::inventory::PositioningRef;
 use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
 use syn::{
@@ -5,7 +6,6 @@ use syn::{
     punctuated::Punctuated,
     Token,
 };
-use crate::inventory::PositioningRef;
 
 #[derive(Debug, Clone)]
 pub struct PgxAttributes {
@@ -57,15 +57,28 @@ impl ToTokens for Attribute {
             Attribute::Raw => quote! { pgx::datum::inventory::ExternArgs::Raw },
             Attribute::NoGuard => quote! { pgx::datum::inventory::ExternArgs::NoGuard },
             Attribute::ParallelSafe => quote! { pgx::datum::inventory::ExternArgs::ParallelSafe },
-            Attribute::ParallelUnsafe => quote! { pgx::datum::inventory::ExternArgs::ParallelUnsafe },
-            Attribute::ParallelRestricted => quote! { pgx::datum::inventory::ExternArgs::ParallelRestricted },
-            Attribute::Error(s) => quote! { pgx::datum::inventory::ExternArgs::Error(String::from(#s)) },
-            Attribute::Schema(s) => quote! { pgx::datum::inventory::ExternArgs::Schema(String::from(#s)) },
-            Attribute::Name(s) => quote! { pgx::datum::inventory::ExternArgs::Name(String::from(#s)) },
+            Attribute::ParallelUnsafe => {
+                quote! { pgx::datum::inventory::ExternArgs::ParallelUnsafe }
+            }
+            Attribute::ParallelRestricted => {
+                quote! { pgx::datum::inventory::ExternArgs::ParallelRestricted }
+            }
+            Attribute::Error(s) => {
+                quote! { pgx::datum::inventory::ExternArgs::Error(String::from(#s)) }
+            }
+            Attribute::Schema(s) => {
+                quote! { pgx::datum::inventory::ExternArgs::Schema(String::from(#s)) }
+            }
+            Attribute::Name(s) => {
+                quote! { pgx::datum::inventory::ExternArgs::Name(String::from(#s)) }
+            }
             Attribute::Requires(items) => {
-                let items_iter = items.iter().map(|x| x.to_token_stream()).collect::<Vec<_>>();
+                let items_iter = items
+                    .iter()
+                    .map(|x| x.to_token_stream())
+                    .collect::<Vec<_>>();
                 quote! { pgx::inventory::ExternArgs::Requires(vec![#(#items_iter),*],) }
-            },
+            }
         };
         tokens.append_all(quoted);
     }

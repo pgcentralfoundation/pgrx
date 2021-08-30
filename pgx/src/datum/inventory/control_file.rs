@@ -1,4 +1,4 @@
-use super::{SqlGraphIdentifier, SqlGraphEntity, ToSql};
+use super::{SqlGraphEntity, SqlGraphIdentifier, ToSql};
 use core::convert::TryFrom;
 use std::collections::HashMap;
 use tracing_error::SpanTrace;

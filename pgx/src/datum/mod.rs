@@ -12,6 +12,7 @@ mod geo;
 mod inet;
 mod internal;
 mod into;
+pub mod inventory;
 mod item_pointer_data;
 mod json;
 mod numeric;
@@ -21,7 +22,6 @@ mod time_stamp_with_timezone;
 mod time_with_timezone;
 mod tuples;
 mod varlena;
-pub mod inventory;
 
 pub use self::time::*;
 use crate::once_cell::sync::Lazy;
@@ -34,6 +34,7 @@ pub use geo::*;
 pub use inet::*;
 pub use internal::*;
 pub use into::*;
+use inventory::RustSqlMapping;
 pub use item_pointer_data::*;
 pub use json::*;
 pub use numeric::*;
@@ -43,7 +44,6 @@ pub use time_stamp_with_timezone::*;
 pub use time_with_timezone::*;
 pub use tuples::*;
 pub use varlena::*;
-use inventory::RustSqlMapping;
 
 /// A tagging trait to indicate a user type is also meant to be used by Postgres
 /// Implemented automatically by `#[derive(PostgresType)]`

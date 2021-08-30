@@ -146,7 +146,7 @@ fn copy_sql_files(
         Option::<String>::None,
         None,
         false,
-        true
+        true,
     )
     .unwrap();
     let written = std::fs::read_to_string(&dest).unwrap();

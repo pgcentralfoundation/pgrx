@@ -1,6 +1,9 @@
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
-use std::{fs::{File, create_dir_all}, io::Write};
+use std::{
+    fs::{create_dir_all, File},
+    io::Write,
+};
 use syn::{
     parse::{Parse, ParseStream},
     DeriveInput, Generics, ItemStruct,
@@ -78,8 +81,11 @@ impl PostgresType {
 
     pub fn inventory(&self, inventory_dir: String) {
         create_dir_all(&inventory_dir).expect("Couldn't create inventory dir.");
-        let mut fd = File::create(inventory_dir.to_string() + "/" + &self.inventory_fn_name() + ".json").expect("Couldn't create inventory file");
-        let inventory_fn_json = serde_json::to_string(&self.inventory_fn_name()).expect("Could not serialize inventory item.");
+        let mut fd =
+            File::create(inventory_dir.to_string() + "/" + &self.inventory_fn_name() + ".json")
+                .expect("Couldn't create inventory file");
+        let inventory_fn_json = serde_json::to_string(&self.inventory_fn_name())
+            .expect("Could not serialize inventory item.");
         write!(fd, "{}", inventory_fn_json).expect("Couldn't write to inventory file");
     }
 }
