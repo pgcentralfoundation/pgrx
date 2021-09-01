@@ -7,6 +7,9 @@ use syn::{
     parse_quote, FnArg, Pat, Token,
 };
 
+/// A parsed `#[pg_extern]` argument.
+///
+/// It is created during [`PgExtern`](intentory::PgExtern) parsing.
 #[derive(Debug, Clone)]
 pub struct Argument {
     pat: syn::Ident,

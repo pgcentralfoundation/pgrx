@@ -3,6 +3,9 @@ use quote::{quote, ToTokens, TokenStreamExt};
 use syn::parse::{Parse, ParseBuffer};
 use syn::{parenthesized, token::Paren};
 
+/// A parsed `#[pg_operator]` operator.
+///
+/// It is created during [`PgExtern`](intentory::PgExtern) parsing.
 #[derive(Debug, Default, Clone)]
 pub struct PgOperator {
     pub opname: Option<PgxOperatorOpName>,
