@@ -1,5 +1,6 @@
 use crate::inventory::SqlGraphIdentifier;
 
+/// The output of a [`Argument`](crate::datum::inventory::Argument) from `quote::ToTokens::to_tokens`.
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct InventoryPgExternInput {
     pub pattern: &'static str,

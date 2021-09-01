@@ -4,9 +4,10 @@ mod operator;
 mod returning;
 mod search_path;
 
-use argument::Argument;
+pub use argument::Argument;
+pub use operator::PgOperator;
 use attribute::{Attribute, PgxAttributes};
-use operator::{PgxOperator, PgxOperatorAttributeWithIdent, PgxOperatorOpName};
+use operator::{PgxOperatorAttributeWithIdent, PgxOperatorOpName};
 use returning::Returning;
 use search_path::SearchPathList;
 
@@ -21,7 +22,7 @@ use syn::Meta;
 ///
 /// It should be used with [`syn::parse::Parse`] functions.
 ///
-/// Using [`quote::ToTokens`] will output the declaration for a [`InventoryPgExtern`].
+/// Using [`quote::ToTokens`] will output the declaration for a `pgx::datum::inventory::InventoryPgExtern`.
 ///
 /// ```rust
 /// use syn::{Macro, parse::Parse, parse_quote, parse};
@@ -101,8 +102,8 @@ impl PgExtern {
         retval
     }
 
-    fn operator(&self) -> Option<PgxOperator> {
-        let mut skel = Option::<PgxOperator>::default();
+    fn operator(&self) -> Option<PgOperator> {
+        let mut skel = Option::<PgOperator>::default();
         for attr in &self.func.attrs {
             let last_segment = attr.path.segments.last().unwrap();
             match last_segment.ident.to_string().as_str() {

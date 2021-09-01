@@ -6,6 +6,8 @@ use std::{
 };
 
 use super::{SqlGraphEntity, SqlGraphIdentifier, ToSql};
+
+/// The output of a [`PostgresType`](crate::datum::inventory::PostgresType) from `quote::ToTokens::to_tokens`.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct InventoryPostgresType {
     pub name: &'static str,

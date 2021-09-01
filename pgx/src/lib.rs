@@ -307,6 +307,14 @@ macro_rules! pg_magic_func {
 }
 
 /// Create neccessary extension-local internal marker for use with SQL generation.
+///
+/// <div class="example-wrap" style="display:inline-block">
+/// <pre class="ignore" style="white-space:normal;font:inherit;">
+///
+/// **Note**: Generally [`pg_module_magic`] is preferred, and results in this macro being called.
+/// This macro should only be directly called in advanced use cases.
+///
+/// </pre></div>
 #[macro_export]
 macro_rules! pg_inventory_magic {
     () => {
@@ -340,9 +348,10 @@ macro_rules! pg_inventory_magic {
 /// ```
 ///
 /// This creates a binary that:
-///  * Has [`tracing`](pgx_utils::inventory::tracing) and [`color_eyre`](`pgx_utils::inventory::color_eyre`) set up.
-///  * Supports [`EnvFilter`](pgx_utils::inventory::tracing_subscriber::EnvFilter) log level configuration.
-///  * Accepts up to two arguments, an SQL destination and (optionally) a GraphViz DOT destination.
+///  * Has [`tracing`](pgx_utils::inventory::reexports::tracing) and [`color_eyre`](`pgx_utils::inventory::reexports::color_eyre`) set up.
+///  * Supports [`EnvFilter`](pgx_utils::inventory::reexports::tracing_subscriber::EnvFilter) log level configuration.
+///  * Accepts `--sql path` and `--dot path` args, as well as a list of symbols. 
+///    These symbols are the `__pgx_internals` prefixed ones which `cargo pgx schema` detects.
 ///
 /// Using different SQL generator code should be considered an advanced use case, and not
 /// recommended.

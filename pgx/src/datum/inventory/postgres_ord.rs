@@ -1,6 +1,7 @@
 use super::{SqlGraphEntity, SqlGraphIdentifier, ToSql};
 use std::cmp::Ordering;
 
+/// The output of a [`PostgresOrd`](crate::datum::inventory::PostgresOrd) from `quote::ToTokens::to_tokens`.
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub struct InventoryPostgresOrd {
     pub name: &'static str,

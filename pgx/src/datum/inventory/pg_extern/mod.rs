@@ -14,6 +14,7 @@ use super::{SqlGraphEntity, SqlGraphIdentifier, ToSql};
 use pgx_utils::inventory::SqlDeclaredEntity;
 use std::cmp::Ordering;
 
+/// The output of a [`Schema`](crate::datum::inventory::Schema) from `quote::ToTokens::to_tokens`.
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub struct InventoryPgExtern {
     pub name: &'static str,

@@ -12,7 +12,7 @@ use crate::inventory::PositioningRef;
 ///
 /// It should be used with [`syn::parse::Parse`] functions.
 ///
-/// Using [`quote::ToTokens`] will output the declaration for a [`InventoryExtensionSql`].
+/// Using [`quote::ToTokens`] will output the declaration for a `pgx::datum::inventory::InventoryExtensionSql`.
 ///
 /// ```rust
 /// use syn::{Macro, parse::Parse, parse_quote, parse};
@@ -114,7 +114,7 @@ impl ToTokens for ExtensionSqlFile {
 ///
 /// It should be used with [`syn::parse::Parse`] functions.
 ///
-/// Using [`quote::ToTokens`] will output the declaration for a [`InventoryExtensionSql`].
+/// Using [`quote::ToTokens`] will output the declaration for a `pgx::datum::inventory::InventoryExtensionSql`.
 ///
 /// ```rust
 /// use syn::{Macro, parse::Parse, parse_quote, parse};

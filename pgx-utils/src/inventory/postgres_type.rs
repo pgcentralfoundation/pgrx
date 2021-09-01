@@ -13,7 +13,7 @@ use syn::{
 ///
 /// It should be used with [`syn::parse::Parse`] functions.
 ///
-/// Using [`quote::ToTokens`] will output the declaration for a [`InventoryPostgresType`].
+/// Using [`quote::ToTokens`] will output the declaration for a `pgx::datum::inventory::InventoryPostgresType`.
 ///
 /// ```rust
 /// use syn::{Macro, parse::Parse, parse_quote, parse};
@@ -131,13 +131,23 @@ impl ToTokens for PostgresType {
             #[no_mangle]
             #[link(kind = "static")]
             pub extern "C" fn  #inventory_fn_name() -> pgx::datum::inventory::SqlGraphEntity {
-               //let filename = pgx::fcinfo::pg_getarg::<String>(fcinfo, 0).expect("filename arg was NULL");
-
                 let mut mappings = Default::default();
-                <#name #ty_generics as pgx::datum::WithTypeIds>::register_with_refs(&mut mappings, stringify!(#name).to_string());
-                pgx::datum::WithSizedTypeIds::<#name #ty_generics>::register_sized_with_refs(&mut mappings, stringify!(#name).to_string());
-                pgx::datum::WithArrayTypeIds::<#name #ty_generics>::register_array_with_refs(&mut mappings, stringify!(#name).to_string());
-                pgx::datum::WithVarlenaTypeIds::<#name #ty_generics>::register_varlena_with_refs(&mut mappings, stringify!(#name).to_string());
+                <#name #ty_generics as pgx::datum::WithTypeIds>::register_with_refs(
+                    &mut mappings,
+                    stringify!(#name).to_string()
+                );
+                pgx::datum::WithSizedTypeIds::<#name #ty_generics>::register_sized_with_refs(
+                    &mut mappings,
+                    stringify!(#name).to_string()
+                );
+                pgx::datum::WithArrayTypeIds::<#name #ty_generics>::register_array_with_refs(
+                    &mut mappings, 
+                    stringify!(#name).to_string()
+                );
+                pgx::datum::WithVarlenaTypeIds::<#name #ty_generics>::register_varlena_with_refs(
+                    &mut mappings,
+                    stringify!(#name).to_string()
+                );
                 let submission = pgx::inventory::InventoryPostgresType {
                     name: stringify!(#name),
                     file: file!(),

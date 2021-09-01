@@ -10,7 +10,7 @@ mod postgres_type;
 pub use super::ExternArgs;
 pub use extension_sql::{ExtensionSql, ExtensionSqlFile, SqlDeclaredEntity};
 pub use inventory_positioning_ref::InventoryPositioningRef;
-pub use pg_extern::PgExtern;
+pub use pg_extern::{PgExtern, Argument, PgOperator};
 pub use pg_schema::Schema;
 pub use postgres_enum::PostgresEnum;
 pub use postgres_hash::PostgresHash;

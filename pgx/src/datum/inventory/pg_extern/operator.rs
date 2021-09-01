@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 
+/// The output of a [`PgOperator`](crate::datum::inventory::PgOperator) from `quote::ToTokens::to_tokens`.
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 pub struct InventoryPgOperator {
     pub opname: Option<&'static str>,

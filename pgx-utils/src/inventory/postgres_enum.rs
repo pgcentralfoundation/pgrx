@@ -10,7 +10,7 @@ use syn::{punctuated::Punctuated, Ident, Token};
 ///
 /// It should be used with [`syn::parse::Parse`] functions.
 ///
-/// Using [`quote::ToTokens`] will output the declaration for a [`InventoryPostgresEnum`].
+/// Using [`quote::ToTokens`] will output the declaration for a `pgx::datum::inventory::InventoryPostgresEnum`.
 ///
 /// ```rust
 /// use syn::{Macro, parse::Parse, parse_quote, parse};

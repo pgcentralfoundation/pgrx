@@ -499,8 +499,8 @@ It accepts 2 arguments:
 
 # Special Cases
 
-[`pg_sys::Oid`] is a special cased type alias, in order to use it as an argument or return it must be
-passed with it's full module path ([`pg_sys::Oid`]) in order to be resolved.
+`pg_sys::Oid` is a special cased type alias, in order to use it as an argument or return it must be
+passed with it's full module path (`pg_sys::Oid`) in order to be resolved.
 
 ```rust
 use pgx::*;

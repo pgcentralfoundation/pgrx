@@ -4,7 +4,7 @@ use syn::parse::{Parse, ParseBuffer};
 use syn::{parenthesized, token::Paren};
 
 #[derive(Debug, Default, Clone)]
-pub struct PgxOperator {
+pub struct PgOperator {
     pub opname: Option<PgxOperatorOpName>,
     pub commutator: Option<PgxOperatorAttributeWithIdent>,
     pub negator: Option<PgxOperatorAttributeWithIdent>,
@@ -14,7 +14,7 @@ pub struct PgxOperator {
     pub merges: bool,
 }
 
-impl ToTokens for PgxOperator {
+impl ToTokens for PgOperator {
     fn to_tokens(&self, tokens: &mut TokenStream2) {
         let opname = self.opname.iter().clone();
         let commutator = self.commutator.iter().clone();

@@ -5,6 +5,7 @@ use std::{
 
 use super::{SqlGraphEntity, SqlGraphIdentifier, ToSql};
 
+/// The output of a [`PostgresEnum`](crate::datum::inventory::PostgresEnum) from `quote::ToTokens::to_tokens`.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct InventoryPostgresEnum {
     pub name: &'static str,

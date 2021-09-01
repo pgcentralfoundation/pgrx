@@ -3,6 +3,7 @@ use std::fmt::Display;
 use super::{InventoryPositioningRef, SqlGraphEntity, SqlGraphIdentifier, ToSql};
 use pgx_utils::inventory::SqlDeclaredEntity;
 
+/// The output of a [`ExtensionSql`](crate::datum::inventory::ExtensionSql) from `quote::ToTokens::to_tokens`.
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct InventoryExtensionSql {
     pub module_path: &'static str,

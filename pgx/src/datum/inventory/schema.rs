@@ -1,6 +1,7 @@
 use super::{SqlGraphEntity, SqlGraphIdentifier, ToSql};
 use std::cmp::Ordering;
 
+/// The output of a [`Schema`](crate::datum::inventory::Schema) from `quote::ToTokens::to_tokens`.
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub struct InventorySchema {
     pub module_path: &'static str,
