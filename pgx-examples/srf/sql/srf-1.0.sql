@@ -15,6 +15,18 @@ STRICT
 LANGUAGE c /* Rust */
 AS 'MODULE_PATHNAME', 'return_tuple_wrapper';
 
+-- src/lib.rs:17
+-- srf::random_values
+CREATE OR REPLACE FUNCTION srf."random_values"(
+	"num_rows" integer /* i32 */
+) RETURNS TABLE (
+	"index" integer,  /* i32 */
+	"value" double precision  /* f64 */
+)
+STRICT
+LANGUAGE c /* Rust */
+AS 'MODULE_PATHNAME', 'random_values_wrapper';
+
 -- src/lib.rs:24
 -- srf::vector_of_static_values
 CREATE OR REPLACE FUNCTION srf."vector_of_static_values"() RETURNS SETOF text /* str */
@@ -32,15 +44,3 @@ CREATE OR REPLACE FUNCTION srf."generate_series"(
 STRICT
 LANGUAGE c /* Rust */
 AS 'MODULE_PATHNAME', 'generate_series_wrapper';
-
--- src/lib.rs:17
--- srf::random_values
-CREATE OR REPLACE FUNCTION srf."random_values"(
-	"num_rows" integer /* i32 */
-) RETURNS TABLE (
-	"index" integer,  /* i32 */
-	"value" double precision  /* f64 */
-)
-STRICT
-LANGUAGE c /* Rust */
-AS 'MODULE_PATHNAME', 'random_values_wrapper';
