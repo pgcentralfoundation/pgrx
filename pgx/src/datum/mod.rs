@@ -171,7 +171,34 @@ impl<T: 'static + ?Sized> WithTypeIds for T {
     const VARLENA_ID: Lazy<Option<TypeId>> = Lazy::new(|| None);
 }
 
-pub struct WithSizedTypeIds<T>(pub std::marker::PhantomData<T>);
+/// A type which can have it's [`core::any::TypeId`]s registered for Rust to SQL mapping.
+///
+/// An example use of this trait:
+///
+/// ```rust
+/// use pgx::{
+///     datum::{WithTypeIds, WithSizedTypeIds, WithArrayTypeIds, WithVarlenaTypeIds, PgVarlena},
+///     Array, PostgresType, StringInfo, JsonInOutFuncs, pg_extern, pg_sys, IntoDatum, pg_guard,
+/// };
+/// use serde::{Serialize, Deserialize};
+///
+/// #[derive(Debug, Clone, Copy, Serialize, Deserialize, PostgresType)]
+/// pub struct Treat<'a> { best_part: &'a str, };
+///
+/// let mut mappings = Default::default();
+/// let treat_string = stringify!(Treat).to_string();
+///
+/// pgx::datum::WithSizedTypeIds::<Treat<'static>>::register_sized_with_refs(
+///     &mut mappings,
+///     treat_string.clone()
+/// );
+///
+/// assert!(mappings.iter().any(|x| x.id == core::any::TypeId::of::<Option<Treat<'static>>>()));
+/// ```
+///
+/// This trait uses the fact that inherent implementations are a higher priority than trait
+/// implementations.
+pub struct WithSizedTypeIds<T>(pub core::marker::PhantomData<T>);
 
 impl<T: 'static> WithSizedTypeIds<T> {
     pub const PG_BOX_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(TypeId::of::<crate::PgBox<T>>()));
@@ -281,7 +308,34 @@ impl<T: 'static> WithSizedTypeIds<T> {
     }
 }
 
-pub struct WithArrayTypeIds<T>(pub std::marker::PhantomData<T>);
+/// A [`datum::Array`] compatible type which can have it's [`core::any::TypeId`]s registered for Rust to SQL mapping.
+///
+/// An example use of this trait:
+///
+/// ```rust
+/// use pgx::{
+///     datum::{WithTypeIds, WithSizedTypeIds, WithArrayTypeIds, WithVarlenaTypeIds, PgVarlena},
+///     Array, PostgresType, StringInfo, JsonInOutFuncs, pg_extern, pg_sys, FromDatum, IntoDatum, pg_guard,
+/// };
+/// use serde::{Serialize, Deserialize};
+///
+/// #[derive(Debug, Clone, Serialize, Deserialize, PostgresType)]
+/// pub struct Treat { best_part: String, };
+///
+/// let mut mappings = Default::default();
+/// let treat_string = stringify!(Treat).to_string();
+///
+/// pgx::datum::WithArrayTypeIds::<Treat>::register_array_with_refs(
+///     &mut mappings,
+///     treat_string.clone()
+/// );
+///
+/// assert!(mappings.iter().any(|x| x.id == core::any::TypeId::of::<Array<Treat>>()));
+/// ```
+///
+/// This trait uses the fact that inherent implementations are a higher priority than trait
+/// implementations.
+pub struct WithArrayTypeIds<T>(pub core::marker::PhantomData<T>);
 
 impl<T: FromDatum + 'static> WithArrayTypeIds<T> {
     pub const ARRAY_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(TypeId::of::<Array<T>>()));
@@ -331,7 +385,34 @@ impl<T: FromDatum + 'static> WithArrayTypeIds<T> {
     }
 }
 
-pub struct WithVarlenaTypeIds<T>(pub std::marker::PhantomData<T>);
+/// A [`datum::PgVarlena`] compatible type which can have it's [`core::any::TypeId`]s registered for Rust to SQL mapping.
+///
+/// An example use of this trait:
+///
+/// ```rust
+/// use pgx::{
+///     datum::{WithTypeIds, WithSizedTypeIds, WithArrayTypeIds, WithVarlenaTypeIds, PgVarlena},
+///     Array, PostgresType, StringInfo, JsonInOutFuncs, pg_extern, pg_sys, IntoDatum, pg_guard,
+/// };
+/// use serde::{Serialize, Deserialize};
+///
+/// #[derive(Debug, Clone, Copy, Serialize, Deserialize, PostgresType)]
+/// pub struct Treat<'a> { best_part: &'a str, };
+///
+/// let mut mappings = Default::default();
+/// let treat_string = stringify!(Treat).to_string();
+///
+/// pgx::datum::WithVarlenaTypeIds::<Treat<'static>>::register_varlena_with_refs(
+///     &mut mappings,
+///     treat_string.clone()
+/// );
+///
+/// assert!(mappings.iter().any(|x| x.id == core::any::TypeId::of::<PgVarlena<Treat<'static>>>()));
+/// ```
+///
+/// This trait uses the fact that inherent implementations are a higher priority than trait
+/// implementations.
+pub struct WithVarlenaTypeIds<T>(pub core::marker::PhantomData<T>);
 
 impl<T: Copy + 'static> WithVarlenaTypeIds<T> {
     pub const VARLENA_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(TypeId::of::<PgVarlena<T>>()));
