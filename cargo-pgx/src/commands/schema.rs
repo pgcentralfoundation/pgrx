@@ -161,10 +161,10 @@ pub(crate) fn generate_schema(
                         }
                     }
                 }
-                _ => unimplemented!(),
+                _ => panic!("Unable to parse non-ELF symbols. (Please report this, we can  probably fix this!)"),
             },
-            Err(_e) => {
-                unimplemented!();
+            Err(e) => {
+                panic!("Got error inspecting objects: {}", e);
             }
         }
     }

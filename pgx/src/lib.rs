@@ -411,7 +411,7 @@ macro_rules! pg_binary_magic {
 
             tracing::info!(path = %path, "Collecting {} SQL entities", symbols_to_call.len());
             let mut entities = Vec::default();
-            let control_file = __pgx_marker()?; // We *must* use this.
+            let control_file = __pgx_marker()?; // We *must* use this or the extension might not link in.
             entities.push(SqlGraphEntity::ExtensionRoot(control_file));
             unsafe {
                 let lib = libloading::os::unix::Library::this();
