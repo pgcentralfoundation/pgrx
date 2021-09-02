@@ -13,6 +13,10 @@ readme = "README.md"
 [lib]
 proc-macro = true
 
+[package.metadata.docs.rs]
+# Enable `#[cfg(docsrs)]` (https://docs.rs/about/builds#cross-compiling)
+rustc-args = ["--cfg", "docsrs"]
+
 [dependencies]
 pgx-utils = { path = "../pgx-utils", version = "0.1.22" }
 proc-macro2 = "1.0.28"

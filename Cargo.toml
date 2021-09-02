@@ -42,6 +42,7 @@ pg_test = [ "pgx-tests/pg_test" ]
 [package.metadata.docs.rs]
 features = ["pg13"]
 no-default-features = true
+# Enable `#[cfg(docsrs)]` (https://docs.rs/about/builds#cross-compiling)
 rustc-args = ["--cfg", "docsrs"]
 
 [dependencies]
