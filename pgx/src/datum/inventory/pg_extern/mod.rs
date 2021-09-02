@@ -348,7 +348,7 @@ impl ToSql for InventoryPgExtern {
                     })
                     .ok_or_else(|| eyre_err!("Could not find right arg function in graph."))?;
 
-                let operator_sql = format!("\n\
+                let operator_sql = format!("\n\n\
                                         -- {file}:{line}\n\
                                         -- {module_path}::{unaliased_name}\n\
                                         CREATE OPERATOR {opname} (\n\
@@ -371,7 +371,7 @@ impl ToSql for InventoryPgExtern {
                                            schema_prefix_right = context.schema_prefix_for(&right_arg_graph_index),
                                            right_arg = context.type_id_to_sql_type(right_arg.ty_id).ok_or_else(|| eyre_err!("Failed to map argument `{}` type `{}` to SQL type while building operator `{}`.", right_arg.pattern, right_arg.full_path, self.name))?,
                                            maybe_comma = if optionals.len() >= 1 { "," } else { "" },
-                                           optionals = optionals.join(",\n") + "\n"
+                                           optionals = if !optionals.is_empty() { optionals.join(",\n") + "\n" } else { "".to_string() },
                 );
                 tracing::debug!(sql = %operator_sql);
                 ext_sql + &operator_sql
