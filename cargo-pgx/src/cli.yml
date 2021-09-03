@@ -169,6 +169,9 @@ subcommands:
                     short: r
                     long: release
                     help: compile for release mode (default is debug)
+                - workspace:
+                    long: workspace
+                    help: Test all packages in the workspace
                 - features:
                     long: features
                     help: additional cargo features to activate (default is '--no-default-features')
