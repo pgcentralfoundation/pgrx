@@ -90,7 +90,15 @@ mod pg_10_11 {
     pub fn pg_getarg<T: FromDatum>(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> Option<T> {
         let datum = unsafe { fcinfo.as_ref() }.unwrap().arg[num];
         let isnull = pg_arg_is_null(fcinfo, num);
-        unsafe { T::from_datum(datum, isnull, crate::get_getarg_type(fcinfo, num)) }
+        unsafe {
+            let typid =
+                if T::NEEDS_TYPID {
+                    crate::get_getarg_type(fcinfo, num)
+                } else {
+                    pg_sys::InvalidOid
+                };
+            T::from_datum(datum, isnull, typid)
+        }
     }
 
     #[inline]
@@ -127,10 +135,16 @@ mod pg_12_13 {
     pub fn pg_getarg<T: FromDatum>(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> Option<T> {
         let datum = get_nullable_datum(fcinfo, num);
         unsafe {
+            let typid =
+                if T::NEEDS_TYPID {
+                    crate::get_getarg_type(fcinfo, num)
+                } else {
+                    pg_sys::InvalidOid
+                };
             T::from_datum(
                 datum.value,
                 datum.isnull,
-                crate::get_getarg_type(fcinfo, num),
+                typid,
             )
         }
     }
