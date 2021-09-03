@@ -191,29 +191,29 @@ fn handle_default(
                     let value = def.value();
                     Ok((true_ty, Some(value.to_string())))
                 }
-                syn::Expr::Type(syn::ExprType { ref ty, .. }) => {
-                    match ty.deref() {
-                        syn::Type::Path(syn::TypePath {
-                            path: syn::Path { segments, .. },
-                            ..
-                        }) => {
-                            let last = segments.last().expect("No last segment");
-                            let last_string = last.ident.to_string();
-                            if last_string.as_str() == "NULL" {
-                                Ok((true_ty, Some(last_string)))
-                            } else {
-                                return Err(syn::Error::new(Span::call_site(), format!("Unable to parse default value of `default!()` macro, got: {:?}", out.expr)));
-                            }
+                syn::Expr::Type(syn::ExprType { ref ty, .. }) => match ty.deref() {
+                    syn::Type::Path(syn::TypePath {
+                        path: syn::Path { segments, .. },
+                        ..
+                    }) => {
+                        let last = segments.last().expect("No last segment");
+                        let last_string = last.ident.to_string();
+                        if last_string.as_str() == "NULL" {
+                            Ok((true_ty, Some(last_string)))
+                        } else {
+                            return Err(syn::Error::new(Span::call_site(), format!("Unable to parse default value of `default!()` macro, got: {:?}", out.expr)));
                         }
-                        _ => return Err(syn::Error::new(
+                    }
+                    _ => {
+                        return Err(syn::Error::new(
                             Span::call_site(),
                             format!(
                                 "Unable to parse default value of `default!()` macro, got: {:?}",
                                 out.expr
                             ),
-                        )),
+                        ))
                     }
-                }
+                },
                 syn::Expr::Path(syn::ExprPath {
                     path: syn::Path { ref segments, .. },
                     ..

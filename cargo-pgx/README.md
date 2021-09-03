@@ -210,13 +210,8 @@ building extension with features `pg13`
 installing extension
       Copying control file to `/home/yourself/.pgx/13.3/pgx-install/share/postgresql/extension/strings.control`
       Copying shared library to `/home/yourself/.pgx/13.3/pgx-install/lib/postgresql/strings.so`
-`src/bin/sql-generator.rs` does not exist or is not what is expected.
-If you encounter problems please delete it and use the generated version.
-running SQL generator features `pg13`
-"cargo" "run" "--bin" "sql-generator" "--features" "pg13" "--no-default-features" "--" "/home/yourself/.pgx/13.3/pgx-install/share/postgresql/extension/strings--1.0.sql"
     Finished dev [unoptimized + debuginfo] target(s) in 0.09s
      Running `target/debug/sql-generator /home/yourself/.pgx/13.3/pgx-install/share/postgresql/extension/strings--1.0.sql`
-Aug 03 10:04:24.602  INFO Writing SQL. path=/home/yourself/.pgx/13.3/pgx-install/share/postgresql/extension/strings--1.0.sql
      Finished installing strings
      Starting Postgres v13 on port 28813
      Re-using existing database strings
@@ -339,7 +334,6 @@ running SQL generator features `pg12`
 "cargo" "run" "--bin" "sql-generator" "--features" "pg12" "--no-default-features" "--" "/home/yourself/pg12/share/postgresql/extension/strings--1.0.sql"
     Finished dev [unoptimized + debuginfo] target(s) in 0.11s
      Running `target/debug/sql-generator /home/yourself/pg12/share/postgresql/extension/strings--1.0.sql`
-Aug 03 11:45:27.651  INFO Writing SQL. path=/home/yourself/pg12/share/postgresql/extension/strings--1.0.sql
      Finished installing strings
 ```
 

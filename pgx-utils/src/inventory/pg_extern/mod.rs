@@ -5,8 +5,8 @@ mod returning;
 mod search_path;
 
 pub use argument::Argument;
-pub use operator::PgOperator;
 use attribute::{Attribute, PgxAttributes};
+pub use operator::PgOperator;
 use operator::{PgxOperatorAttributeWithIdent, PgxOperatorOpName};
 use returning::Returning;
 use search_path::SearchPathList;

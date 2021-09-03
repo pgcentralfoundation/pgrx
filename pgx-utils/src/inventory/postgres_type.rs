@@ -141,7 +141,7 @@ impl ToTokens for PostgresType {
                     stringify!(#name).to_string()
                 );
                 pgx::datum::WithArrayTypeIds::<#name #ty_generics>::register_array_with_refs(
-                    &mut mappings, 
+                    &mut mappings,
                     stringify!(#name).to_string()
                 );
                 pgx::datum::WithVarlenaTypeIds::<#name #ty_generics>::register_varlena_with_refs(
