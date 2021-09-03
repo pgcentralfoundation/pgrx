@@ -102,7 +102,7 @@ pub(crate) fn generate_schema(
         features = additional_features
     }
 
-    // First, build the SQL generator so we can get a look at the symbol table.
+    // First, build the SQL generator so we can get a look at the symbol table
     let mut command = Command::new("cargo");
     command.args(&["build", "--bin", "sql-generator"]);
     if is_release {
@@ -139,7 +139,7 @@ pub(crate) fn generate_schema(
         exit_with_error!("failed to build SQL generator");
     }
 
-    // Inspect the symbol table for a list of `__pgx_internals` we should have the generator call\
+    // Inspect the symbol table for a list of `__pgx_internals` we should have the generator call
     let mut sql_gen_path = pgx_utils::get_target_dir();
     sql_gen_path.push(if is_release { "release" } else { "debug" });
     sql_gen_path.push("sql-generator");
