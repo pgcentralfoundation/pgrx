@@ -25,6 +25,7 @@ mod schema_tests;
 mod spi_tests;
 mod srf_tests;
 mod struct_type_tests;
+mod uuid_tests;
 mod variadic_tests;
 mod xact_callback_tests;
 mod xid64_tests;

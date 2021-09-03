@@ -228,6 +228,7 @@ pub static DEFAULT_TYPEID_SQL_MAPPING: Lazy<HashSet<RustSqlMapping>> = Lazy::new
     map_type!(m, datum::AnyElement, "anyelement");
     map_type!(m, datum::AnyArray, "anyarray");
     map_type!(m, datum::Inet, "inet");
+    map_type!(m, datum::Uuid, "uuid");
 
     m
 });
