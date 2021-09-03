@@ -201,6 +201,7 @@ fn do_it() -> std::result::Result<(), std::io::Error> {
             ("test", Some(test)) => {
                 let is_release = test.is_present("release");
                 let pgver = test.value_of("pg_version").unwrap_or("all");
+                let test_workspace = test.is_present("workspace");
                 let features = test
                     .values_of("features")
                     .map(|v| v.collect())
@@ -209,7 +210,7 @@ fn do_it() -> std::result::Result<(), std::io::Error> {
                     .value_of("testname");
                 let pgx = Pgx::from_config()?;
                 for pg_config in pgx.iter(PgConfigSelector::new(pgver)) {
-                    test_extension(pg_config?, is_release, features.clone(), testname)?
+                    test_extension(pg_config?, is_release, test_workspace, features.clone(), testname)?
                 }
                 Ok(())
             }
