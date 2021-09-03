@@ -38,7 +38,7 @@ pub fn test_extension(
     }
 
     if test_workspace {
-        command.arg("all");
+        command.arg("--all");
     }
 
     eprintln!("{:?}", command);
