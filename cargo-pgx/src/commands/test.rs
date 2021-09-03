@@ -10,6 +10,7 @@ pub fn test_extension(
     pg_config: &PgConfig,
     is_release: bool,
     additional_features: Vec<&str>,
+    testname: Option<&str>,
 ) -> Result<(), std::io::Error> {
     let major_version = pg_config.major_version()?;
     let target_dir = get_target_dir();
@@ -35,6 +36,10 @@ pub fn test_extension(
 
     if is_release {
         command.arg("--release");
+    }
+
+    if let Some(testname) = testname {
+        command.arg(testname);
     }
 
     eprintln!("{:?}", command);
