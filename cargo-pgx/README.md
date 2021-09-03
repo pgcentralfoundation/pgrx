@@ -234,21 +234,21 @@ By default, `cargo pgx install` builds your extension in debug mode.  Specifying
 
 ```shell script
 $ cargo pgx install --help
-  cargo-pgx-pgx-install
-  install the extension from the current crate to the Postgres specified by whatever "pg_config" is currently on your
-  $PATH
+cargo-pgx-pgx-install
+install the extension from the current crate to the Postgres specified by whatever "pg_config" is currently on your
+$PATH
 
-  USAGE:
-      cargo-pgx pgx install [FLAGS]
+USAGE:
+    cargo-pgx pgx install [FLAGS]
 
-  FLAGS:
-      -h, --help       Prints help information
-      -r, --release    compile for release mode (default is debug)
-      -V, --version    Prints version information
+FLAGS:
+    -h, --help       Prints help information
+    -r, --release    compile for release mode (default is debug)
+    -V, --version    Prints version information
 
 OPTIONS:
-        --features <features>...    additional cargo features to activate (default is '--no-default-features')
-    -c, --pg_config <pg_config>     the `pg_config` path (default is first in $PATH)
+    --features <features>...    additional cargo features to activate (default is '--no-default-features')
+-c, --pg_config <pg_config>     the `pg_config` path (default is first in $PATH)
 ```
 
 ## Testing Your Extension
@@ -268,16 +268,16 @@ make to the database are not preserved.
 
 ```shell script
 $ cargo pgx test --help
-cargo-pgx-pgx-test
+cargo-pgx-test
 run the test suite for this crate
 
 USAGE:
-    cargo-pgx pgx test [FLAGS] [PG_VERSION]
+    cargo pgx test [FLAGS] [OPTIONS] [--] [ARGS]
 
 FLAGS:
-    -h, --help       Prints help information
-    -r, --release    compile for release mode (default is debug)
-    -V, --version    Prints version information
+    -h, --help         Prints help information
+    -r, --release      compile for release mode (default is debug)
+    -V, --version      Prints version information
         --workspace    Test all packages in the workspace
 
 OPTIONS:
@@ -285,6 +285,7 @@ OPTIONS:
 
 ARGS:
     <PG_VERSION>    Do you want to test for Postgres 'pg10', 'pg11', 'pg12', 'pg13', or 'all' (default)?
+    <TESTNAME>      If specified, only run tests containing this string in their names
 ```
 
 ## Building an Installation Package
