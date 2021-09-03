@@ -169,6 +169,11 @@ subcommands:
                     help: additional cargo features to activate (default is '--no-default-features')
                     takes_value: true
                     multiple: true
+                - out:
+                    long: out
+                    short: o
+                    help: A path to output a produced SQL file (default is `sql/$EXTNAME-$VERSION.sql`)
+                    takes_value: true
                 - dot:
                     long: dot
                     short: d
