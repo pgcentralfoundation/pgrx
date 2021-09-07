@@ -11,6 +11,7 @@ pub fn test_extension(
     is_release: bool,
     test_workspace: bool,
     additional_features: Vec<&str>,
+    testname: Option<&str>,
 ) -> Result<(), std::io::Error> {
     let major_version = pg_config.major_version()?;
     let target_dir = get_target_dir();
@@ -39,6 +40,10 @@ pub fn test_extension(
 
     if test_workspace {
         command.arg("--all");
+    }
+
+    if let Some(testname) = testname {
+        command.arg(testname);
     }
 
     eprintln!("{:?}", command);

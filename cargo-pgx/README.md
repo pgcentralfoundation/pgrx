@@ -356,12 +356,20 @@ By default, `cargo pgx install` builds your extension in debug mode.  Specifying
 
 ```shell script
 $ cargo pgx install --help
+<<<<<<< HEAD
 cargo-pgx-install
+=======
+cargo-pgx-pgx-install
+>>>>>>> develop
 install the extension from the current crate to the Postgres specified by whatever "pg_config" is currently on your
 $PATH
 
 USAGE:
+<<<<<<< HEAD
     cargo pgx install [FLAGS] [OPTIONS]
+=======
+    cargo-pgx pgx install [FLAGS]
+>>>>>>> develop
 
 FLAGS:
     -h, --help       Prints help information
@@ -369,8 +377,8 @@ FLAGS:
     -V, --version    Prints version information
 
 OPTIONS:
-        --features <features>...    additional cargo features to activate (default is '--no-default-features')
-    -c, --pg_config <pg_config>     the `pg_config` path (default is first in $PATH)
+    --features <features>...    additional cargo features to activate (default is '--no-default-features')
+-c, --pg_config <pg_config>     the `pg_config` path (default is first in $PATH)
 ```
 
 ## Testing Your Extension
@@ -434,12 +442,16 @@ cargo-pgx-test
 run the test suite for this crate
 
 USAGE:
+<<<<<<< HEAD
     cargo pgx test [FLAGS] [OPTIONS] [--] [PG_VERSION]
+=======
+    cargo pgx test [FLAGS] [OPTIONS] [--] [ARGS]
+>>>>>>> develop
 
 FLAGS:
-    -h, --help       Prints help information
-    -r, --release    compile for release mode (default is debug)
-    -V, --version    Prints version information
+    -h, --help         Prints help information
+    -r, --release      compile for release mode (default is debug)
+    -V, --version      Prints version information
         --workspace    Test all packages in the workspace
 
 OPTIONS:
@@ -447,6 +459,7 @@ OPTIONS:
 
 ARGS:
     <PG_VERSION>    Do you want to test for Postgres 'pg10', 'pg11', 'pg12', 'pg13', or 'all' (default)?
+    <TESTNAME>      If specified, only run tests containing this string in their names
 ```
 
 ## Building an Installation Package
