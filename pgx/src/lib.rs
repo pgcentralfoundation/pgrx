@@ -159,13 +159,13 @@ macro_rules! pg_module_magic {
 
 /// Initialize the extension with Postgres
 ///
-/// Sets up panic handling with [register_pg_guard_panic_handler()][register_pg_guard_panic_handler]
-/// to ensure that a crash within the extension does not adversely affect the entire server process.
+/// Sets up panic handling with [`register_pg_guard_panic_handler()`] to ensure that a crash within
+/// the extension does not adversely affect the entire server process.
 ///
 /// ## Note
 ///
-/// This is called automatically by the `[pg_module_magic!()]`
-/// macro and need not be called directly
+/// This is called automatically by the [`pg_module_magic!()`] macro and need not be called
+/// directly.
 #[allow(unused)]
 pub fn initialize() {
     register_pg_guard_panic_handler();
