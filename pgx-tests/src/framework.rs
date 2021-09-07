@@ -470,7 +470,10 @@ fn create_extension() {
     let (mut client, _) = client();
 
     client
-        .simple_query(&format!("CREATE EXTENSION {};", get_extension_name()))
+        .simple_query(&format!(
+            "CREATE EXTENSION {} CASCADE;",
+            get_extension_name()
+        ))
         .unwrap();
 }
 

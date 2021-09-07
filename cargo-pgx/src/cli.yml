@@ -165,10 +165,17 @@ subcommands:
                     value_name: PG_VERSION
                     takes_value: true
                     help: Do you want to test for Postgres 'pg10', 'pg11', 'pg12', 'pg13', or 'all' (default)?
+                - testname:
+                    value_name: TESTNAME
+                    takes_value: true
+                    help: If specified, only run tests containing this string in their names
                 - release:
                     short: r
                     long: release
                     help: compile for release mode (default is debug)
+                - workspace:
+                    long: workspace
+                    help: Test all packages in the workspace
                 - features:
                     long: features
                     help: additional cargo features to activate (default is '--no-default-features')

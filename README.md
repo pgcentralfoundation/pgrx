@@ -54,7 +54,7 @@ Feel free to join our [Discord Server](https://discord.gg/hPb93Y9).
  - Return `impl std::iter::Iterator<Item = T> where T: IntoDatum` for automatic set-returning-functions (both `RETURNS SETOF` and `RETURNS TABLE (...)` variants
  - DDL automatically generated
 
-#### Most Postgres Datatypes Transparently Converted to Rust
+#### Most Postgres Data Types Transparently Converted to Rust
 
 Postgres Type | Rust Type (as `Option<T>`)
 --------------|-----------
@@ -88,6 +88,7 @@ Postgres Type | Rust Type (as `Option<T>`)
 `ARRAY[]::<type>` | `Vec<Option<T>>` or `pgx::Array<T>` (zero-copy)
 `NULL` | `Option::None`
 `internal` | `pgx::PgBox<T>` where `T` is any Rust/Postgres struct
+`uuid` | `pgx::Uuid([u8; 16])`
 
 There are also `IntoDatum` and `FromDatum` traits for implementing additional type conversions,
 along with `#[derive(PostgresType)]` and `#[derive(PostgresEnum)]` for automatic conversion of
@@ -99,7 +100,7 @@ custom types.
  - `#[derive(PostgresEnum)]` to use a Rust enum as a Postgres enum
  - DDL automatically generated
 
-#### Server Prgramming Interface (SPI)
+#### Server Programming Interface (SPI)
  - Safe access into SPI
  - Transparently return owned Datums from an SPI context
 
@@ -166,7 +167,7 @@ my_extension/
     └── lib.rs
 ```
 
-The new extension includes an example, so you can go ahead an run it right away.
+The new extension includes an example, so you can go ahead and run it right away.
 
 ### 4. Run your extension
 

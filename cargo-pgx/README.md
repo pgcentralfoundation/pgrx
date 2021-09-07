@@ -5,7 +5,7 @@
 You'll want to use `cargo pgx` during your extension development process.  It automates the process of creating new Rust crate projects, auto-generating the SQL schema for your extension, installing your extension locally for testing with Postgres, and running your test suite against one or more versions of Postgres.
 
 A video walkthrough of its abilities can be found here:  https://www.twitch.tv/videos/684087991
- 
+
 ## Installing
 
 Installing via crates.io is really easy.
@@ -19,8 +19,8 @@ As new versions of `pgx` are released, you'll want to make sure you run this com
 ## Usage
 
 ```shell script
-$ cargo pgx --help                
-cargo-pgx-pgx 
+$ cargo pgx --help
+cargo-pgx-pgx
 
 USAGE:
     cargo-pgx pgx [SUBCOMMAND]
@@ -63,7 +63,7 @@ As shown by the screenshot above, it downloads the latest versions of Postgres v
 
 `pgx` is designed to support multiple Postgres versions in such a way that during development, you'll know if you're trying to use a Postgres API that isn't common across all three versions.  It's also designed to make testing your extension against these versions easy.  This is why it requires you have three fully compiled and installed versions of Postgres during development.
 
-If you want to use your operating system's package manager to install Postgres, `cargo pgx init` has optional arguments that allow you to specify where they're installed (see below). 
+If you want to use your operating system's package manager to install Postgres, `cargo pgx init` has optional arguments that allow you to specify where they're installed (see below).
 
 What you're telling `cargo pgx init` is the full path to `pg_config` for each version.
 
@@ -71,7 +71,7 @@ For any version you specify, `cargo pgx init` will forego downloading/compiling/
 
 However, if the unless the "path to pg_config" is the literal string `download`, the `pgx` will download and compile that version of Postgres for you.
 
-When the various `--pgXX` options are specified, these are they **only** versions of Postgres that `pgx` will manage for you.  
+When the various `--pgXX` options are specified, these are they **only** versions of Postgres that `pgx` will manage for you.
 
 You'll also want to make sure you have the "postgresql-server-dev" package installed for each version you want to manage yourself.
 
@@ -81,7 +81,7 @@ If a new minor Postgres version is released in the future you can simply run `ca
 
 ```shell script
 $ cargo pgx init --help
-cargo-pgx-pgx-init 
+cargo-pgx-pgx-init
 initize pgx development environment for the first time
 
 USAGE:
@@ -120,11 +120,11 @@ OPTIONS:
 
 If you'd like to create a "background worker" instead, specify the `--bgworker` argument.
 
-`cargo pgx new` does not initialize the directory as a git repo, but it does create a `.gitignore` file in case you decide to do so. 
+`cargo pgx new` does not initialize the directory as a git repo, but it does create a `.gitignore` file in case you decide to do so.
 
 ```shell script
 $ cargo pgx new --help
-cargo-pgx-pgx-new 
+cargo-pgx-pgx-new
 create a new extension crate
 
 USAGE:
@@ -140,11 +140,11 @@ ARGS:
 ```
 
 
- 
+
 ## Managing Your Postgres Installations
-  
+
 ![status](https://raw.githubusercontent.com/zombodb/pgx/master/cargo-pgx/status.png)
-  
+
 `cargo pgx` has three commands for managing each Postgres installation:  `start`, `stop`, and `status`.  Additionally, `cargo pgx run` (see below) will automatically start its target Postgres instance if not already running.
 
 When starting a Postgres instance, `pgx` starts it on port `28800 + PG_MAJOR_VERSION`, so Postgres 10 runs on `28810`, 11 on `28811`, etc.  Additionally, the first time any of these are started, it'll automaticaly initialize a `PGDATA` directory in `~/.pgx/data-[10 | 11 | 12]`.  Doing so allows `pgx` to manage either Postgres versions it installed or ones already on your computer, and to make sure that in the latter case, `pgx` managed versions don't interfere with what might already be running.
@@ -205,7 +205,7 @@ If the specified database doesn't exist, `cargo pgx connect` will create it.  Si
 the specified version of Postgres isn't running, it'll be automatically started.
 
 ```shell script
-cargo-pgx-pgx-connect 
+cargo-pgx-pgx-connect
 connect, via psql, to a Postgres instance
 
 USAGE:
@@ -230,25 +230,25 @@ to the Postgres installation described by the `pg_config` tool currently on your
 
 You'll need write permissions to the directories described by `pg_config --pkglibdir` and `pg_config --sharedir`.
 
-By default, `cargo pgx install` builds your extension in debug mode.  Specifying `--release` changes that. 
+By default, `cargo pgx install` builds your extension in debug mode.  Specifying `--release` changes that.
 
 ```shell script
 $ cargo pgx install --help
-  cargo-pgx-pgx-install 
-  install the extension from the current crate to the Postgres specified by whatever "pg_config" is currently on your
-  $PATH
-  
-  USAGE:
-      cargo-pgx pgx install [FLAGS]
-  
-  FLAGS:
-      -h, --help       Prints help information
-      -r, --release    compile for release mode (default is debug)
-      -V, --version    Prints version information
+cargo-pgx-pgx-install
+install the extension from the current crate to the Postgres specified by whatever "pg_config" is currently on your
+$PATH
+
+USAGE:
+    cargo-pgx pgx install [FLAGS]
+
+FLAGS:
+    -h, --help       Prints help information
+    -r, --release    compile for release mode (default is debug)
+    -V, --version    Prints version information
 
 OPTIONS:
-        --features <features>...    additional cargo features to activate (default is '--no-default-features')
-    -c, --pg_config <pg_config>     the `pg_config` path (default is first in $PATH)
+    --features <features>...    additional cargo features to activate (default is '--no-default-features')
+-c, --pg_config <pg_config>     the `pg_config` path (default is first in $PATH)
 ```
 
 ## Testing Your Extension
@@ -268,30 +268,32 @@ make to the database are not preserved.
 
 ```shell script
 $ cargo pgx test --help
-cargo-pgx-pgx-test 
+cargo-pgx-test
 run the test suite for this crate
 
 USAGE:
-    cargo-pgx pgx test [FLAGS] [PG_VERSION]
+    cargo pgx test [FLAGS] [OPTIONS] [--] [ARGS]
 
 FLAGS:
-    -h, --help       Prints help information
-    -r, --release    compile for release mode (default is debug)
-    -V, --version    Prints version information
+    -h, --help         Prints help information
+    -r, --release      compile for release mode (default is debug)
+    -V, --version      Prints version information
+        --workspace    Test all packages in the workspace
 
 OPTIONS:
         --features <features>...    additional cargo features to activate (default is '--no-default-features')
 
 ARGS:
     <PG_VERSION>    Do you want to test for Postgres 'pg10', 'pg11', 'pg12', 'pg13', or 'all' (default)?
+    <TESTNAME>      If specified, only run tests containing this string in their names
 ```
 
 ## Building an Installation Package
 
 ![package](https://raw.githubusercontent.com/zombodb/pgx/master/cargo-pgx/package.png)
 
-`cargo pgx package [--debug]` builds your extension, in `--release` mode, to a directory structure in 
-`./target/[debug | release]/extension_name-PGVER` using the Postgres installation path information from the `pg_config` 
+`cargo pgx package [--debug]` builds your extension, in `--release` mode, to a directory structure in
+`./target/[debug | release]/extension_name-PGVER` using the Postgres installation path information from the `pg_config`
 tool on your `$PATH`.
 
 The intent is that you'd then change into that directory and build a tarball or a .deb or .rpm package.
@@ -307,13 +309,13 @@ distobutions or MacOS Postgres installations.
 
 ```shell script
 $ cargo pgx package --help
- cargo-pgx-pgx-package 
+ cargo-pgx-pgx-package
  create an installation package directory (in ./target/[debug|release]/extname-pgXX/) for the Postgres installation
  specified by whatever "pg_config" is currently on your $PATH
- 
+
  USAGE:
      cargo-pgx pgx package [FLAGS]
- 
+
  FLAGS:
      -d, --debug      compile for debug mode (default is release)
      -h, --help       Prints help information

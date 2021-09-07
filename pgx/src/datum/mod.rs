@@ -20,9 +20,11 @@ mod time_stamp;
 mod time_stamp_with_timezone;
 mod time_with_timezone;
 mod tuples;
+mod uuid;
 mod varlena;
 
 pub use self::time::*;
+pub use self::uuid::*;
 pub use anyarray::*;
 pub use anyelement::*;
 pub use array::*;
