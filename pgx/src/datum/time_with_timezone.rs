@@ -1,9 +1,10 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-use crate::datum::time::Time;
+use crate::datum::{time::Time};
 use crate::{pg_sys, FromDatum, IntoDatum, PgBox};
 use std::ops::{Deref, DerefMut};
+use time::format_description::FormatItem;
 
 #[derive(Debug)]
 pub struct TimeWithTimeZone(Time);
@@ -45,7 +46,7 @@ impl IntoDatum for TimeWithTimeZone {
 impl TimeWithTimeZone {
     /// This shifts the provided `time` back to UTC using the specified `utc_offset`
     pub fn new(mut time: time::Time, at_tz_offset: time::UtcOffset) -> Self {
-        time -= time::Duration::seconds(at_tz_offset.as_seconds() as i64);
+        time -= time::Duration::seconds(at_tz_offset.whole_seconds() as i64);
         TimeWithTimeZone(Time(time))
     }
 }
@@ -72,9 +73,20 @@ impl serde::Serialize for TimeWithTimeZone {
         S: serde::Serializer,
     {
         if self.millisecond() > 0 {
-            serializer.serialize_str(&self.format(&format!("%H:%M:%S.{}-00", self.millisecond())))
+            serializer.serialize_str(
+                &self.format(
+                    &time::format_description::parse(&format!("[hour]:[minute]:[second].{}-00", self.millisecond()))
+                        .map_err(|e| serde::ser::Error::custom(format!("TimeWithTimeZone invalid format problem: {:?}", e)))?
+                ).map_err(|e| serde::ser::Error::custom(format!("TimeWithTimeZone formatting problem: {:?}", e)))?
+            )
         } else {
-            serializer.serialize_str(&self.format("%H:%M:%S-00"))
+            serializer.serialize_str(
+                &self.format(
+                    &DEFAULT_TIMESTAMP_WITH_TIMEZONE_FORMAT
+                ).map_err(|e| serde::ser::Error::custom(format!("TimeWithTimeZone formatting problem: {:?}", e)))?
+            )
         }
     }
 }
+
+static DEFAULT_TIMESTAMP_WITH_TIMEZONE_FORMAT: &[FormatItem<'static>] = time::macros::format_description!("[hour]:[minute]:[second]-00");
