@@ -16,9 +16,7 @@
 
 `pgx` supports Postgres v10, v11, v12, and v13.
 
-## Community and Support
-
-Feel free to join our [Discord Server](https://discord.gg/hPb93Y9).
+**Feel free to join our [Discord Server](https://discord.gg/hPb93Y9).**
 
 ## Key Features
 
@@ -116,7 +114,7 @@ custom types.
 
 ## System Requirements
 
-- `rustc` (minimum version 1.50) and `cargo` 
+- `rustc` (minimum version 1.52) and `cargo` 
 - `cargo install rustfmt`
  - `git`
  - `libclang.so`
