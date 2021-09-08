@@ -3,7 +3,6 @@ use std::{
     str::FromStr,
     ffi::CStr,
 };
-use serde::{Deserialize, Serialize};
 
 pg_module_magic!();
 
@@ -32,9 +31,7 @@ impl PgVarlenaInOutFuncs for IntegerAvgState {
         result
     }
     fn output(&self, buffer: &mut StringInfo) {
-        buffer.push_str(&self.sum.to_string());
-        buffer.push(',');
-        buffer.push_str(&self.n.to_string());
+        buffer.push_str(&format!("{},{}", self.sum, self.n));
     }
 }
 
