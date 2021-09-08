@@ -208,15 +208,8 @@ where
     E: PGXSharedMemory + Default,
 {
 }
-unsafe impl<T, const N: usize> PGXSharedMemory
-    for heapless::Vec<T, N>
-{
-}
-unsafe impl<
-        K: Eq + hash32::Hash,
-        V: Default,
-        S,
-        const N: usize,
-    > PGXSharedMemory for heapless::IndexMap<K, V, S, N>
+unsafe impl<T, const N: usize> PGXSharedMemory for heapless::Vec<T, N> {}
+unsafe impl<K: Eq + hash32::Hash, V: Default, S, const N: usize> PGXSharedMemory
+    for heapless::IndexMap<K, V, S, N>
 {
 }

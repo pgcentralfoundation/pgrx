@@ -3,7 +3,6 @@
 
 use crate::{pg_sys, FromDatum, IntoDatum};
 use std::ops::{Deref, DerefMut};
-use once_cell::sync::Lazy;
 use time::format_description::FormatItem;
 
 #[derive(Debug)]
@@ -15,9 +14,10 @@ impl FromDatum for Date {
         if is_null {
             None
         } else {
-            Some(Date(time::Date::from_julian_day(
-                datum as i32 + pg_sys::POSTGRES_EPOCH_JDATE as i32,
-            ).expect("Unexpected error getting the Julian day in Date::from_datum")))
+            Some(Date(
+                time::Date::from_julian_day(datum as i32 + pg_sys::POSTGRES_EPOCH_JDATE as i32)
+                    .expect("Unexpected error getting the Julian day in Date::from_datum"),
+            ))
         }
     }
 }
@@ -60,13 +60,13 @@ impl serde::Serialize for Date {
     where
         S: serde::Serializer,
     {
-        serializer.serialize_str(&self.format(&*DATE_FORMAT)
-            .map_err(|e| serde::ser::Error::custom(format!("Date formatting problem: {:?}", e)))?
+        serializer.serialize_str(
+            &self.format(&DATE_FORMAT).map_err(|e| {
+                serde::ser::Error::custom(format!("Date formatting problem: {:?}", e))
+            })?,
         )
     }
 }
 
-static DATE_FORMAT: Lazy<Vec<FormatItem<'static>>> = Lazy::new(||
-    time::format_description::parse("[year]-[month]-[day]")
-        .expect("Date invalid format problem")
-);
+static DATE_FORMAT: &[FormatItem<'static>] =
+    time::macros::format_description!("[year]-[month]-[day]");

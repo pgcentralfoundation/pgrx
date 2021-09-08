@@ -3,8 +3,11 @@
 
 use crate::datum::time::USECS_PER_SEC;
 use crate::{direct_function_call_as_datum, pg_sys, FromDatum, IntoDatum};
-use std::{ops::{Deref, DerefMut}, convert::TryFrom};
-use time::{UtcOffset, format_description::FormatItem};
+use std::{
+    convert::TryFrom,
+    ops::{Deref, DerefMut},
+};
+use time::{format_description::FormatItem, UtcOffset};
 
 #[derive(Debug)]
 pub struct TimestampWithTimeZone(time::OffsetDateTime);
@@ -45,9 +48,11 @@ impl FromDatum for TimestampWithTimeZone {
             );
             let date = time::Date::from_calendar_date(
                 tm.tm_year,
-                time::Month::try_from(tm.tm_mon as u8).expect("Got month outside of range in TimestampWithTimeZone::from_datum"),
-                tm.tm_mday as u8
-            ).expect("failed to create date from TimestampWithTimeZone");
+                time::Month::try_from(tm.tm_mon as u8)
+                    .expect("Got month outside of range in TimestampWithTimeZone::from_datum"),
+                tm.tm_mday as u8,
+            )
+            .expect("failed to create date from TimestampWithTimeZone");
 
             let time = time::Time::from_hms_micro(
                 tm.tm_hour as u8,
@@ -134,18 +139,40 @@ impl serde::Serialize for TimestampWithTimeZone {
     {
         if self.millisecond() > 0 {
             serializer.serialize_str(
-                &self.format(
-                    &time::format_description::parse(&format!("[year]-[month]-[day]T[hour]:[minute]:[second].{}-00", self.millisecond()))
-                        .map_err(|e| serde::ser::Error::custom(format!("TimeStampWithTimeZone invalid format problem: {:?}", e)))?
-                ).map_err(|e| serde::ser::Error::custom(format!("TimeStampWithTimeZone formatting problem: {:?}", e)))?
+                &self
+                    .format(
+                        &time::format_description::parse(&format!(
+                            "[year]-[month]-[day]T[hour]:[minute]:[second].{}-00",
+                            self.millisecond()
+                        ))
+                        .map_err(|e| {
+                            serde::ser::Error::custom(format!(
+                                "TimeStampWithTimeZone invalid format problem: {:?}",
+                                e
+                            ))
+                        })?,
+                    )
+                    .map_err(|e| {
+                        serde::ser::Error::custom(format!(
+                            "TimeStampWithTimeZone formatting problem: {:?}",
+                            e
+                        ))
+                    })?,
             )
         } else {
             serializer.serialize_str(
-                &self.format(&DEFAULT_TIMESTAMP_WITH_TIMEZONE_FORMAT)
-                    .map_err(|e| serde::ser::Error::custom(format!("TimeStampWithTimeZone formatting problem: {:?}", e)))?
+                &self
+                    .format(&DEFAULT_TIMESTAMP_WITH_TIMEZONE_FORMAT)
+                    .map_err(|e| {
+                        serde::ser::Error::custom(format!(
+                            "TimeStampWithTimeZone formatting problem: {:?}",
+                            e
+                        ))
+                    })?,
             )
         }
     }
 }
 
-static DEFAULT_TIMESTAMP_WITH_TIMEZONE_FORMAT: &[FormatItem<'static>] = time::macros::format_description!("[year]-[month]-[day]T[hour]:[minute]:[second]-00");
+static DEFAULT_TIMESTAMP_WITH_TIMEZONE_FORMAT: &[FormatItem<'static>] =
+    time::macros::format_description!("[year]-[month]-[day]T[hour]:[minute]:[second]-00");

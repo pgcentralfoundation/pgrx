@@ -1,7 +1,7 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-use crate::datum::{time::Time};
+use crate::datum::time::Time;
 use crate::{pg_sys, FromDatum, IntoDatum, PgBox};
 use std::ops::{Deref, DerefMut};
 use time::format_description::FormatItem;
@@ -74,19 +74,40 @@ impl serde::Serialize for TimeWithTimeZone {
     {
         if self.millisecond() > 0 {
             serializer.serialize_str(
-                &self.format(
-                    &time::format_description::parse(&format!("[hour]:[minute]:[second].{}-00", self.millisecond()))
-                        .map_err(|e| serde::ser::Error::custom(format!("TimeWithTimeZone invalid format problem: {:?}", e)))?
-                ).map_err(|e| serde::ser::Error::custom(format!("TimeWithTimeZone formatting problem: {:?}", e)))?
+                &self
+                    .format(
+                        &time::format_description::parse(&format!(
+                            "[hour]:[minute]:[second].{}-00",
+                            self.millisecond()
+                        ))
+                        .map_err(|e| {
+                            serde::ser::Error::custom(format!(
+                                "TimeWithTimeZone invalid format problem: {:?}",
+                                e
+                            ))
+                        })?,
+                    )
+                    .map_err(|e| {
+                        serde::ser::Error::custom(format!(
+                            "TimeWithTimeZone formatting problem: {:?}",
+                            e
+                        ))
+                    })?,
             )
         } else {
             serializer.serialize_str(
-                &self.format(
-                    &DEFAULT_TIMESTAMP_WITH_TIMEZONE_FORMAT
-                ).map_err(|e| serde::ser::Error::custom(format!("TimeWithTimeZone formatting problem: {:?}", e)))?
+                &self
+                    .format(&DEFAULT_TIMESTAMP_WITH_TIMEZONE_FORMAT)
+                    .map_err(|e| {
+                        serde::ser::Error::custom(format!(
+                            "TimeWithTimeZone formatting problem: {:?}",
+                            e
+                        ))
+                    })?,
             )
         }
     }
 }
 
-static DEFAULT_TIMESTAMP_WITH_TIMEZONE_FORMAT: &[FormatItem<'static>] = time::macros::format_description!("[hour]:[minute]:[second]-00");
+static DEFAULT_TIMESTAMP_WITH_TIMEZONE_FORMAT: &[FormatItem<'static>] =
+    time::macros::format_description!("[hour]:[minute]:[second]-00");

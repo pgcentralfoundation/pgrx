@@ -33,13 +33,8 @@ impl FromDatum for Time {
             let microsecond = time;
 
             Some(Time(
-                time::Time::from_hms_micro(
-                    hour as u8,
-                    min as u8,
-                    second as u8,
-                    microsecond as u32,
-                )
-                .expect("failed to convert time"),
+                time::Time::from_hms_micro(hour as u8, min as u8, second as u8, microsecond as u32)
+                    .expect("failed to convert time"),
             ))
         }
     }
@@ -91,18 +86,30 @@ impl serde::Serialize for Time {
     {
         if self.millisecond() > 0 {
             serializer.serialize_str(
-                &self.format(
-                    &time::format_description::parse(&format!("[hour]:[minute]:[second].{}", self.millisecond()))
-                        .map_err(|e| serde::ser::Error::custom(format!("Time invalid format problem: {:?}", e)))?
-                ).map_err(|e| serde::ser::Error::custom(format!("Time formatting problem: {:?}", e)))?
+                &self
+                    .format(
+                        &time::format_description::parse(&format!(
+                            "[hour]:[minute]:[second].{}",
+                            self.millisecond()
+                        ))
+                        .map_err(|e| {
+                            serde::ser::Error::custom(format!(
+                                "Time invalid format problem: {:?}",
+                                e
+                            ))
+                        })?,
+                    )
+                    .map_err(|e| {
+                        serde::ser::Error::custom(format!("Time formatting problem: {:?}", e))
+                    })?,
             )
         } else {
-            serializer.serialize_str(
-                &self.format(&DEFAULT_TIME_FORMAT)
-                    .map_err(|e| serde::ser::Error::custom(format!("Time formatting problem: {:?}", e)))?
-            )
+            serializer.serialize_str(&self.format(&DEFAULT_TIME_FORMAT).map_err(|e| {
+                serde::ser::Error::custom(format!("Time formatting problem: {:?}", e))
+            })?)
         }
     }
 }
 
-static DEFAULT_TIME_FORMAT: &[FormatItem<'static>] = time::macros::format_description!("[hour]:[minute]:[second]");
+static DEFAULT_TIME_FORMAT: &[FormatItem<'static>] =
+    time::macros::format_description!("[hour]:[minute]:[second]");

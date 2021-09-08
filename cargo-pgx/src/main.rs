@@ -206,11 +206,16 @@ fn do_it() -> std::result::Result<(), std::io::Error> {
                     .values_of("features")
                     .map(|v| v.collect())
                     .unwrap_or(vec![]);
-                let testname = test
-                    .value_of("testname");
+                let testname = test.value_of("testname");
                 let pgx = Pgx::from_config()?;
                 for pg_config in pgx.iter(PgConfigSelector::new(pgver)) {
-                    test_extension(pg_config?, is_release, test_workspace, features.clone(), testname)?
+                    test_extension(
+                        pg_config?,
+                        is_release,
+                        test_workspace,
+                        features.clone(),
+                        testname,
+                    )?
                 }
                 Ok(())
             }
