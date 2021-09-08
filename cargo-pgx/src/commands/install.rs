@@ -59,7 +59,7 @@ pub(crate) fn install_extension(
 
     copy_sql_files(&extdir, &extname, &base_directory);
 
-    println!("{} installing {}", "    Finished".bold().green(), extname);
+    println!("{} installing {}", "     Finished".bold().green(), extname);
     Ok(())
 }
 
@@ -76,7 +76,7 @@ fn copy_file(src: PathBuf, dest: PathBuf, msg: &str) {
 
     println!(
         "{} {} to `{}`",
-        "     Copying".bold().green(),
+        "      Copying".bold().green(),
         msg,
         format_display_path(&dest)
     );
@@ -140,7 +140,7 @@ pub(crate) fn write_full_schema_file(dir: &PathBuf, extdir: Option<&PathBuf>) {
     let mut sql = std::fs::File::create(&target_filename).unwrap();
     println!(
         "{} extension schema to `{}`",
-        "     Writing".bold().green(),
+        "      Writing".bold().green(),
         format_display_path(&target_filename)
     );
 

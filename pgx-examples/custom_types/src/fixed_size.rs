@@ -10,7 +10,7 @@ pub struct FixedF32Array {
 
 impl PgVarlenaInOutFuncs for FixedF32Array {
     fn input(input: &CStr) -> PgVarlena<Self> {
-        let mut result = PgVarlena::<FixedF32Array>::new();
+        let mut result = PgVarlena::<Self>::new();
 
         for (i, value) in input.to_bytes().split(|b| *b == b',').enumerate() {
             result.array[i] =

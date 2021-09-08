@@ -7,7 +7,6 @@ use colored::Colorize;
 use pgx_utils::exit_with_error;
 use pgx_utils::pg_config::{PgConfig, Pgx};
 use std::os::unix::process::CommandExt;
-use std::path::PathBuf;
 use std::process::Stdio;
 
 pub(crate) fn start_postgres(pg_config: &PgConfig) -> Result<(), std::io::Error> {
@@ -26,7 +25,7 @@ pub(crate) fn start_postgres(pg_config: &PgConfig) -> Result<(), std::io::Error>
 
     println!(
         "{} Postgres v{} on port {}",
-        "    Starting".bold().green(),
+        "     Starting".bold().green(),
         pg_config.major_version()?,
         port.to_string().bold().cyan()
     );

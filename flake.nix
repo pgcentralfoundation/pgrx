@@ -2,12 +2,13 @@
   description = "Postgres extensions in Rust.";
 
   inputs = {
+    naersk.url = "github:nmattia/naersk";
     nixpkgs.url = "github:NixOS/nixpkgs";
   };
 
-  outputs = { self, nixpkgs }:
+  outputs = { self, nixpkgs, naersk }:
     let
-      supportedSystems = [ "x86_64-linux" "aarch64-linux" ];
+      supportedSystems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" ];
       forAllSystems = f: nixpkgs.lib.genAttrs supportedSystems (system: f system);
     in
     {
@@ -28,7 +29,7 @@
         });
 
       overlay = final: prev: {
-        cargo-pgx = final.callPackage ./cargo-pgx { };
+        cargo-pgx = final.callPackage ./cargo-pgx { inherit naersk; };
       };
 
       devShell = forAllSystems (system:
@@ -50,7 +51,7 @@
             nixpkgs-fmt
             cargo-pgx
           ];
-          LIBCLANG_PATH="${pkgs.llvmPackages.libclang}/lib";
+          LIBCLANG_PATH = "${pkgs.llvmPackages.libclang.lib}/lib";
         });
 
       checks = forAllSystems (system:
@@ -69,6 +70,15 @@
             ${pkgs.nixpkgs-fmt}/bin/nixpkgs-fmt --check ${./.}
             touch $out # it worked!
           '';
+          pkgs-cargo-pgx = pkgs.cargo-pgx.out;
         });
+
+      defaultTemplate = self.templates.default;
+      templates = {
+        default = {
+          path = ./nix/templates/default;
+          description = "A basic PGX extension";
+        };
+      };
     };
 }

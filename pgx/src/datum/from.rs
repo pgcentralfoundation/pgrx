@@ -13,6 +13,7 @@ use std::ffi::CStr;
 /// If implementing this, also implement `IntoDatum` for the reverse
 /// conversion.
 pub trait FromDatum {
+    const NEEDS_TYPID: bool = true;
     /// ## Safety
     ///
     /// This method is inherently unsafe as the `datum` argument can represent an arbitrary
@@ -56,6 +57,7 @@ pub trait FromDatum {
 
 /// for pg_sys::Datum
 impl FromDatum for pg_sys::Datum {
+    const NEEDS_TYPID: bool = false;
     #[inline]
     unsafe fn from_datum(
         datum: pg_sys::Datum,
@@ -72,6 +74,7 @@ impl FromDatum for pg_sys::Datum {
 
 /// for bool
 impl FromDatum for bool {
+    const NEEDS_TYPID: bool = false;
     #[inline]
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<bool> {
         if is_null {
@@ -84,6 +87,7 @@ impl FromDatum for bool {
 
 /// for `"char"`
 impl FromDatum for i8 {
+    const NEEDS_TYPID: bool = false;
     #[inline]
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<i8> {
         if is_null {
@@ -96,6 +100,7 @@ impl FromDatum for i8 {
 
 /// for smallint
 impl FromDatum for i16 {
+    const NEEDS_TYPID: bool = false;
     #[inline]
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<i16> {
         if is_null {
@@ -108,6 +113,7 @@ impl FromDatum for i16 {
 
 /// for integer
 impl FromDatum for i32 {
+    const NEEDS_TYPID: bool = false;
     #[inline]
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<i32> {
         if is_null {
@@ -120,6 +126,7 @@ impl FromDatum for i32 {
 
 /// for oid
 impl FromDatum for u32 {
+    const NEEDS_TYPID: bool = false;
     #[inline]
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<u32> {
         if is_null {
@@ -132,6 +139,7 @@ impl FromDatum for u32 {
 
 /// for bigint
 impl FromDatum for i64 {
+    const NEEDS_TYPID: bool = false;
     #[inline]
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<i64> {
         if is_null {
@@ -144,6 +152,7 @@ impl FromDatum for i64 {
 
 /// for real
 impl FromDatum for f32 {
+    const NEEDS_TYPID: bool = false;
     #[inline]
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<f32> {
         if is_null {
@@ -156,6 +165,7 @@ impl FromDatum for f32 {
 
 /// for double precision
 impl FromDatum for f64 {
+    const NEEDS_TYPID: bool = false;
     #[inline]
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<f64> {
         if is_null {
@@ -168,6 +178,7 @@ impl FromDatum for f64 {
 
 /// for text, varchar
 impl<'a> FromDatum for &'a str {
+    const NEEDS_TYPID: bool = false;
     #[inline]
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<&'a str> {
         if is_null {
@@ -212,6 +223,7 @@ impl<'a> FromDatum for &'a str {
 ///
 /// This returns a **copy**, allocated and managed by Rust, of the underlying `varlena` Datum
 impl FromDatum for String {
+    const NEEDS_TYPID: bool = false;
     #[inline]
     unsafe fn from_datum(
         datum: pg_sys::Datum,
@@ -227,6 +239,7 @@ impl FromDatum for String {
 }
 
 impl FromDatum for char {
+    const NEEDS_TYPID: bool = false;
     #[inline]
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, typoid: pg_sys::Oid) -> Option<char> {
         let refstr: Option<&str> = FromDatum::from_datum(datum, is_null, typoid);
@@ -239,6 +252,7 @@ impl FromDatum for char {
 
 /// for cstring
 impl<'a> FromDatum for &'a std::ffi::CStr {
+    const NEEDS_TYPID: bool = false;
     #[inline]
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<&'a CStr> {
         if is_null {
@@ -255,6 +269,7 @@ impl<'a> FromDatum for &'a std::ffi::CStr {
 
 /// for bytea
 impl<'a> FromDatum for &'a [u8] {
+    const NEEDS_TYPID: bool = false;
     #[inline]
     unsafe fn from_datum(datum: usize, is_null: bool, _typoid: u32) -> Option<&'a [u8]> {
         if is_null {
@@ -296,6 +311,7 @@ impl<'a> FromDatum for &'a [u8] {
 }
 
 impl FromDatum for Vec<u8> {
+    const NEEDS_TYPID: bool = false;
     #[inline]
     unsafe fn from_datum(datum: usize, is_null: bool, typoid: u32) -> Option<Vec<u8>> {
         if is_null {
@@ -318,6 +334,7 @@ impl FromDatum for Vec<u8> {
 
 /// for NULL -- always converts to a `None`, even if the is_null argument is false
 impl FromDatum for () {
+    const NEEDS_TYPID: bool = false;
     #[inline]
     unsafe fn from_datum(_datum: pg_sys::Datum, _is_null: bool, _: pg_sys::Oid) -> Option<()> {
         None
@@ -326,6 +343,7 @@ impl FromDatum for () {
 
 /// for user types
 impl<T> FromDatum for PgBox<T> {
+    const NEEDS_TYPID: bool = false;
     #[inline]
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<PgBox<T>> {
         if is_null {

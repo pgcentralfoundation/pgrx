@@ -86,7 +86,7 @@ pub(crate) fn init_pgx(pgx: &Pgx) -> std::result::Result<(), std::io::Error> {
 fn download_postgres(pg_config: &PgConfig, pgxdir: &PathBuf) -> Result<PgConfig, std::io::Error> {
     println!(
         "{} Postgres v{}.{} from {}",
-        " Downloading".bold().green(),
+        "  Downloading".bold().green(),
         pg_config.major_version()?,
         pg_config.minor_version()?,
         pg_config.url().expect("no url"),
@@ -127,14 +127,14 @@ fn untar(bytes: &[u8], pgxdir: &PathBuf, pg_config: &PgConfig) -> Result<PathBuf
     ));
     if pgdir.exists() {
         // delete everything at this path if it already exists
-        println!("{} {}", "    Removing".bold().green(), pgdir.display());
+        println!("{} {}", "     Removing".bold().green(), pgdir.display());
         std::fs::remove_dir_all(&pgdir)?;
     }
     std::fs::create_dir_all(&pgdir)?;
 
     println!(
         "{} Postgres v{}.{} to {}",
-        "   Untarring".bold().green(),
+        "    Untarring".bold().green(),
         pg_config.major_version()?,
         pg_config.minor_version()?,
         pgdir.display()
@@ -168,7 +168,7 @@ fn untar(bytes: &[u8], pgxdir: &PathBuf, pg_config: &PgConfig) -> Result<PathBuf
 fn configure_postgres(pg_config: &PgConfig, pgdir: &PathBuf) -> Result<(), std::io::Error> {
     println!(
         "{} Postgres v{}.{}",
-        " Configuring".bold().green(),
+        "  Configuring".bold().green(),
         pg_config.major_version()?,
         pg_config.minor_version()?
     );
@@ -213,7 +213,7 @@ fn make_postgres(pg_config: &PgConfig, pgdir: &PathBuf) -> Result<(), std::io::E
     let num_cpus = 1.max(num_cpus::get() / 3);
     println!(
         "{} Postgres v{}.{}",
-        "   Compiling".bold().green(),
+        "    Compiling".bold().green(),
         pg_config.major_version()?,
         pg_config.minor_version()?
     );
@@ -253,7 +253,7 @@ fn make_postgres(pg_config: &PgConfig, pgdir: &PathBuf) -> Result<(), std::io::E
 fn make_install_postgres(version: &PgConfig, pgdir: &PathBuf) -> Result<PgConfig, std::io::Error> {
     println!(
         "{} Postgres v{}.{} to {}",
-        "  Installing".bold().green(),
+        "   Installing".bold().green(),
         version.major_version()?,
         version.minor_version()?,
         get_pg_installdir(pgdir).display()
@@ -295,7 +295,7 @@ fn make_install_postgres(version: &PgConfig, pgdir: &PathBuf) -> Result<PgConfig
 fn validate_pg_config(pg_config: &PgConfig) -> Result<(), std::io::Error> {
     println!(
         "{} {}",
-        "  Validating".bold().green(),
+        "   Validating".bold().green(),
         pg_config.path().expect("no path for pg_config").display()
     );
 
