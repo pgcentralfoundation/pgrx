@@ -3,12 +3,9 @@ use std::{
     str::FromStr,
     ffi::CStr,
 };
-
-pg_module_magic!();
-
-
 use serde::{Deserialize, Serialize};
 
+pg_module_magic!();
 
 #[derive(Copy, Clone, PostgresType)]
 #[pgvarlena_inoutfuncs]
