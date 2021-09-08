@@ -66,8 +66,8 @@ mod tests {
     use pgx::*;
 
     #[pg_test]
-    fn test_uuid_set() {
-        // Nothing
+    fn test_insert() {
+        Spi::run(r#"INSERT INTO test (title, description, payload) VALUES ('a different title', 'a different description', '{"key": "value"}')"#);
     }
 }
 
