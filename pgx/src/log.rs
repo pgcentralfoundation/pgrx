@@ -617,6 +617,8 @@ macro_rules! log {
 /// Given some function:
 ///
 /// ```rust,no_run
+/// use pgx::*;
+///
 /// #[pg_extern]
 /// fn sum_array(input: Array<i32>) -> i64 {
 ///     let mut sum = 0 as i64;
@@ -632,7 +634,7 @@ macro_rules! log {
 ///
 /// When run inside PostgreSQL would output:
 ///
-/// ```
+/// ```sql
 /// arrays=# SELECT arrays.sum_array('{1,2,3}');
 /// INFO:  i=Some(1), sum=0
 /// INFO:  i=Some(2), sum=1
@@ -657,6 +659,8 @@ macro_rules! info {
 /// Given some function:
 ///
 /// ```rust,no_run
+/// use pgx::*;
+///
 /// #[pg_extern]
 /// fn sum_array(input: Array<i32>) -> i64 {
 ///     let mut sum = 0 as i64;
@@ -672,7 +676,7 @@ macro_rules! info {
 ///
 /// When run inside PostgreSQL would output:
 ///
-/// ```
+/// ```sql
 /// arrays=# SELECT arrays.sum_array('{1,2,3}');
 /// NOTICE:  i=Some(1), sum=0
 /// NOTICE:  i=Some(2), sum=1
@@ -697,6 +701,8 @@ macro_rules! notice {
 /// Given some function:
 ///
 /// ```rust,no_run
+/// use pgx::*;
+///
 /// #[pg_extern]
 /// fn sum_array(input: Array<i32>) -> i64 {
 ///     let mut sum = 0 as i64;
@@ -712,7 +718,7 @@ macro_rules! notice {
 ///
 /// When run inside PostgreSQL would output:
 ///
-/// ```
+/// ```sql
 /// arrays=# SELECT arrays.sum_array('{1,2,3}');
 /// WARNING:  i=Some(1), sum=0
 /// WARNING:  i=Some(2), sum=1
@@ -737,6 +743,8 @@ macro_rules! warning {
 /// Given some function:
 ///
 /// ```rust,no_run
+/// use pgx::*;
+///
 /// #[pg_extern]
 /// fn sum_array(input: Array<i32>) -> i64 {
 ///     let mut sum = 0 as i64;
@@ -752,7 +760,7 @@ macro_rules! warning {
 ///
 /// When run inside PostgreSQL would output:
 ///
-/// ```
+/// ```sql
 /// arrays=# SELECT arrays.sum_array('{1,2,3}');
 /// ERROR:  i=Some(1), sum=0
 /// CONTEXT:  src/lib.rs:37:9
@@ -775,6 +783,8 @@ macro_rules! error {
 /// Given some function:
 ///
 /// ```rust,no_run
+/// use pgx::*;
+///
 /// #[pg_extern]
 /// fn sum_array(input: Array<i32>) -> i64 {
 ///     let mut sum = 0 as i64;
@@ -790,7 +800,7 @@ macro_rules! error {
 ///
 /// When run inside PostgreSQL would output:
 ///
-/// ```
+/// ```sql
 /// arrays=# SELECT arrays.sum_array('{1,2,3}');
 /// FATAL:  i=Some(1), sum=0
 /// server closed the connection unexpectedly
@@ -814,6 +824,8 @@ macro_rules! FATAL {
 /// Given some function:
 ///
 /// ```rust,no_run
+/// use pgx::*;
+///
 /// #[pg_extern]
 /// fn sum_array(input: Array<i32>) -> i64 {
 ///     let mut sum = 0 as i64;
@@ -829,7 +841,7 @@ macro_rules! FATAL {
 ///
 /// When run inside PostgreSQL would output:
 ///
-/// ```
+/// ```sql
 /// arrays=# SELECT arrays.sum_array('{1,2,3}');
 /// PANIC:  i=Some(1), sum=0
 /// server closed the connection unexpectedly
