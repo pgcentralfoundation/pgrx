@@ -184,7 +184,7 @@ The first time, compilation takes a few minutes as `pgx` needs to generate almos
 Postgres' header files.
 
 Once compiled you'll be placed in a `psql` shell, for, in this case, Postgres 13.
-Now, we can just [load the extension](https://www.postgresql.org/docs/13/sql-createextension.html) and do a SELECT on the example function.
+Now, we can [load the extension](https://www.postgresql.org/docs/13/sql-createextension.html) and do a SELECT on the example function.
 
 ```console
 my_extension=# CREATE EXTENSION my_extension;
@@ -200,7 +200,7 @@ my_extension=# SELECT hello_my_extension();
 
 ## Upgrading
 
-You can upgrade your current `pgx` installation by passing the `--force` flag
+You can upgrade your current `cargo-pgx` installation by passing the `--force` flag
 to `cargo install`:
 
 ```shell script
