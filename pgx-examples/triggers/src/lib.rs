@@ -55,7 +55,7 @@ CREATE TABLE test (
     payload jsonb
 );
 
-CREATE TRIGGER test_trigger BEFORE INSERT ON test FOR EACH ROW EXECUTE FUNCTION trigger_example();
+CREATE TRIGGER test_trigger BEFORE INSERT ON test FOR EACH ROW EXECUTE PROCEDURE trigger_example();
 INSERT INTO test (title, description, payload) VALUES ('the title', 'a description', '{"key": "value"}');
 
 "#
