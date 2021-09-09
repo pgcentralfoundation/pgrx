@@ -642,7 +642,15 @@ fn rust_fmt(path: &PathBuf) -> Result<(), std::io::Error> {
     run_command(
         Command::new("rustfmt").arg(path).current_dir("."),
         "[bindings_diff]",
+    ).map_err(|e|
+        if e.kind() == std::io::ErrorKind::NotFound {
+            std::io::Error::new(
+                std::io::ErrorKind::Other,
+                "Failed to run `rustfmt`, is it installed?"
+            )
+        } else {
+            e
+        }
     )?;
-
     Ok(())
 }
