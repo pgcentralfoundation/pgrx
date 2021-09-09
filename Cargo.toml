@@ -19,16 +19,19 @@ members = [
     "pgx-utils",
 ]
 exclude = [
+    "pgx-examples/aggregate",
     "pgx-examples/arrays",
     "pgx-examples/bad_ideas",
     "pgx-examples/bytea",
     "pgx-examples/custom_types",
+    "pgx-examples/custom_sql",
     "pgx-examples/errors",
     "pgx-examples/schemas",
     "pgx-examples/shmem",
     "pgx-examples/spi",
     "pgx-examples/srf",
     "pgx-examples/strings",
+    "pgx-examples/triggers",
 ]
 
 [features]
