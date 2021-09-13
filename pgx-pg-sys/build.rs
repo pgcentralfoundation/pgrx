@@ -546,14 +546,16 @@ fn build_shim_for_version(
         std::fs::copy(
             format!("{}/Makefile", shim_src.display()),
             format!("{}/Makefile", shim_dst.display()),
-        ).unwrap();
+        )
+        .unwrap();
     }
 
     if !std::path::Path::new(&format!("{}/pgx-cshim.c", shim_dst.display())).exists() {
         std::fs::copy(
             format!("{}/pgx-cshim.c", shim_src.display()),
             format!("{}/pgx-cshim.c", shim_dst.display()),
-        ).unwrap();
+        )
+        .unwrap();
     }
 
     let rc = run_command(
@@ -642,7 +644,16 @@ fn rust_fmt(path: &PathBuf) -> Result<(), std::io::Error> {
     run_command(
         Command::new("rustfmt").arg(path).current_dir("."),
         "[bindings_diff]",
-    )?;
-
+    )
+    .map_err(|e| {
+        if e.kind() == std::io::ErrorKind::NotFound {
+            std::io::Error::new(
+                std::io::ErrorKind::Other,
+                "Failed to run `rustfmt`, is it installed?",
+            )
+        } else {
+            e
+        }
+    })?;
     Ok(())
 }
