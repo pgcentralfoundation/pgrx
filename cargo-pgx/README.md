@@ -510,21 +510,36 @@ If you just want to look at the full extension schema that pgx will generate, us
 `cargo pgx schema /dir/to/write/it/`.
 
 ```shell script
-$ cargo pgx dump-schema --help
-cargo-pgx-dump-schema 0.1.18
-dump the full extension SQL schema file
+$ cargo pgx schema --help
+cargo-pgx-schema 0.1.22
+generate extension schema files
 
 USAGE:
-    cargo pgx package [FLAGS] [OPTIONS]
+    cargo pgx schema [FLAGS] [OPTIONS] [--] [PG_VERSION]
 
 FLAGS:
-    -d, --debug      compile for debug mode (default is release)
-    -h, --help       Prints help information
-    -V, --version    Prints version information
+    -f, --force-default    Force the generation of default required files
+    -h, --help             Prints help information
+    -m, --manual           Skip checking for required files
+    -r, --release          Compile for release mode (default is debug)
+    -V, --version          Prints version information
+    -v, --verbose          Enable debug logging (-vv for trace)
 
 OPTIONS:
-        --features <features>...    additional cargo features to activate (default is '--no-default-features')
+    -d, --dot <dot>                 A path to output a produced GraphViz DOT file [default: extension.dot]
+        --features <features>...    additional cargo features to activate (default is none)
+    -o, --out <out>                 A path to output a produced SQL file (default is `sql/$EXTNAME-$VERSION.sql`)
     -c, --pg_config <pg_config>     the `pg_config` path (default is first in $PATH)
+
+ARGS:
+    <PG_VERSION>    Do you want to run against Postgres 'pg10', 'pg11', 'pg12', 'pg13'?
+
+REQUIREMENTS
+    The SQL generation process requires configuring a few settings in the crate. Normally 'cargo pgx schema --force-
+default'
+    can set these automatically.
+    
+    They are documented in the README.md of cargo-pgx: https://github.com/zombodb/pgx/tree/master/cargo-pgx#Manual-SQL-Generation
 ```
 
 ### Manual SQL Generation

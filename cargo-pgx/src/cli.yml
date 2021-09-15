@@ -111,7 +111,7 @@ subcommands:
                     The SQL generation process requires configuring a few settings in the crate. Normally 'cargo pgx schema --force-default'
                     can set these automatically.
                     
-                    They are documented in the README.md of cargo-pgx: https://github.com/zombodb/pgx/tree/master/cargo-pgx
+                    They are documented in the README.md of cargo-pgx: https://github.com/zombodb/pgx/tree/master/cargo-pgx#Manual-SQL-Generation
               args:
                 - manual:
                     short: m
