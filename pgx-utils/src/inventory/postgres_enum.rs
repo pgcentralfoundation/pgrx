@@ -83,17 +83,8 @@ impl ToTokens for PostgresEnum {
         let variants = self.variants.iter();
         let inventory_fn_name =
             syn::Ident::new(&format!("__pgx_internals_enum_{}", name), Span::call_site());
-        let pg_finfo_fn_name = syn::Ident::new(
-            &format!("pg_finfo_{}_wrapper", inventory_fn_name),
-            Span::call_site(),
-        );
+            
         let inv = quote! {
-            #[no_mangle]
-            pub extern "C" fn  #pg_finfo_fn_name() -> &'static pg_sys::Pg_finfo_record {
-                const V1_API: pg_sys::Pg_finfo_record = pg_sys::Pg_finfo_record { api_version: 1 };
-                &V1_API
-            }
-
             #[no_mangle]
             #[link(kind = "static")]
             pub extern "C" fn  #inventory_fn_name() -> pgx::datum::inventory::SqlGraphEntity {
