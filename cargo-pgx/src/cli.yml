@@ -108,39 +108,10 @@ subcommands:
               about: generate extension schema files
               after_help: |
                 REQUIREMENTS
-                    SQL generation requires some linker flags, as well as a binary.
+                    The SQL generation process requires configuring a few settings in the crate. Normally 'cargo pgx schema --force-default'
+                    can set these automatically.
                     
-                    The flags are typically set by a linker script:
-                        
-                        #! /usr/bin/env bash
-                        if [[ $CARGO_BIN_NAME == "sql-generator" ]]; then
-                            gcc -Wl,-undefined,dynamic_lookup,-dynamic-list=$CARGO_MANIFEST_DIR/.cargo/pgx-dynamic-list.txt $@
-                        else 
-                            gcc -Wl,-undefined,dynamic_lookup $@
-                        fi
-                    
-                    Which would be configured in `.cargo/config` for supported targets:
-
-                        [target.aarch64-unknown-linux-gnu]
-                        linker = "./.cargo/linker-script.sh"
-
-                    The content of `.cargo/pgx-dynamic-list.txt` would typically be:
-
-                        { __pgx_internals_*; };
-                    
-                    Then, a `src/bin/sql-generator.rs` binary would exist with the following:
-
-                        pgx::pg_binary_magic!(extension_name);
-
-                    If `cargo pgx schema` does not detect these, it will create them automatically with defaults.
-                    To skip writing defaults, use `-m`, to overwrite exiting files with these defaults, use `-f`.
-                        
-                    Finally, `lib.crate-type` should be set in `Cargo.toml`:
-                    
-                        [lib]
-                        crate-type = ["cdylib", "rlib"]
-                    
-                    `cargo pgx schema` does not update your `Cargo.toml`, this must be manually set.
+                    They are documented in the README.md of cargo-pgx: https://github.com/zombodb/pgx/tree/master/cargo-pgx
               args:
                 - manual:
                     short: m
@@ -166,7 +137,7 @@ subcommands:
                     help: the `pg_config` path (default is first in $PATH)
                 - features:
                     long: features
-                    help: additional cargo features to activate (default is '--no-default-features')
+                    help: additional cargo features to activate (default is none)
                     takes_value: true
                     multiple: true
                 - out:

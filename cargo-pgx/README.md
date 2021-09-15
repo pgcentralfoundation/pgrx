@@ -504,12 +504,10 @@ OPTIONS:
         -c, --pg_config <pg_config>     the `pg_config` path (default is first in $PATH)
 ```
 
-## Dump Your Extension Schema
+## Inspect you Extension Schema
 
 If you just want to look at the full extension schema that pgx will generate, use
-`cargo pgx dump-schema /dir/to/write/it/`.
-
-![dumpschema](https://raw.githubusercontent.com/zombodb/pgx/master/cargo-pgx/dump-schema.png)
+`cargo pgx schema /dir/to/write/it/`.
 
 ```shell script
 $ cargo pgx dump-schema --help
@@ -528,3 +526,53 @@ OPTIONS:
         --features <features>...    additional cargo features to activate (default is '--no-default-features')
     -c, --pg_config <pg_config>     the `pg_config` path (default is first in $PATH)
 ```
+
+### Manual SQL Generation
+
+> **This section is for users with custom `.cargo/config` settings or advanced requirements.**
+>
+> If you are not using `cargo pgx init` to generate your extension, or you're upgrading your extension from `pgx` 0.1.21 or earlier, you can usually have `cargo-pgx` provision it's base requirements with `cargo pgx schema --force-default`. 
+
+SQL generation requires some linker flags, as well as a binary.
+    
+The flags are typically set by a linker script:
+
+```bash  
+#! /usr/bin/env bash
+if [[ $CARGO_BIN_NAME == "sql-generator" ]]; then
+    gcc -Wl,-undefined,dynamic_lookup,-dynamic-list=$CARGO_MANIFEST_DIR/.cargo/pgx-dynamic-list.txt $@
+else 
+    gcc -Wl,-undefined,dynamic_lookup $@
+fi
+```
+
+Which would be configured in `.cargo/config` for supported targets:
+
+```toml
+[target.aarch64-unknown-linux-gnu]
+linker = "./.cargo/linker-script.sh"
+```
+
+The content of `.cargo/pgx-dynamic-list.txt` would typically be:
+
+```
+{ __pgx_internals_*; };
+```
+
+Then, a `src/bin/sql-generator.rs` binary would exist with the following:
+
+```rust
+pgx::pg_binary_magic!(extension_name);
+```
+
+If `cargo pgx schema` does not detect these, it will create them automatically with defaults.
+To skip writing defaults, use `-m`, to overwrite exiting files with these defaults, use `-f`.
+    
+Finally, `lib.crate-type` should be set in `Cargo.toml`:
+
+```toml
+[lib]
+crate-type = ["cdylib", "rlib"]
+```
+
+`cargo pgx schema --force-default` does not update your `Cargo.toml`, this must be manually set.
