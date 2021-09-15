@@ -83,7 +83,7 @@ impl ToTokens for PostgresEnum {
         let variants = self.variants.iter();
         let inventory_fn_name =
             syn::Ident::new(&format!("__pgx_internals_enum_{}", name), Span::call_site());
-            
+
         let inv = quote! {
             #[no_mangle]
             #[link(kind = "static")]

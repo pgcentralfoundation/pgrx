@@ -25,7 +25,6 @@ mod uuid;
 mod varlena;
 
 pub use self::time::*;
-use once_cell::sync::Lazy;
 pub use self::uuid::*;
 pub use anyarray::*;
 pub use anyelement::*;
@@ -40,6 +39,7 @@ use inventory::RustSqlMapping;
 pub use item_pointer_data::*;
 pub use json::*;
 pub use numeric::*;
+use once_cell::sync::Lazy;
 use std::any::TypeId;
 pub use time_stamp::*;
 pub use time_stamp_with_timezone::*;
