@@ -239,8 +239,7 @@ fn do_it() -> std::result::Result<(), std::io::Error> {
                     match schema.occurrences_of("verbose") {
                         0 => None,
                         1 => Some("debug".to_string()),
-                        2 => Some("trace".to_string()),
-                        _ => panic!("Cannot set a log level more verbose than `trace` (-vv). Please reduce the log level."),
+                        _ => Some("trace".to_string()),
                     }
                 };
 
