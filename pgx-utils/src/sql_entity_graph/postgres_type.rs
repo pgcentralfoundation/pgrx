@@ -13,12 +13,12 @@ use syn::{
 ///
 /// It should be used with [`syn::parse::Parse`] functions.
 ///
-/// Using [`quote::ToTokens`] will output the declaration for a `pgx::datum::inventory::InventoryPostgresType`.
+/// Using [`quote::ToTokens`] will output the declaration for a `pgx::datum::sql_entity_graph::PostgresTypeEntity`.
 ///
 /// ```rust
 /// use syn::{Macro, parse::Parse, parse_quote, parse};
 /// use quote::{quote, ToTokens};
-/// use pgx_utils::inventory::PostgresType;
+/// use pgx_utils::sql_entity_graph::PostgresType;
 ///
 /// # fn main() -> eyre::Result<()> {
 /// let parsed: PostgresType = parse_quote! {
@@ -27,7 +27,7 @@ use syn::{
 ///         demo: &'a str,
 ///     }
 /// };
-/// let inventory_tokens = parsed.to_token_stream();
+/// let sql_graph_entity_tokens = parsed.to_token_stream();
 /// # Ok(())
 /// # }
 /// ```
@@ -84,9 +84,9 @@ impl PostgresType {
         let mut fd =
             File::create(inventory_dir.to_string() + "/" + &self.inventory_fn_name() + ".json")
                 .expect("Couldn't create inventory file");
-        let inventory_fn_json = serde_json::to_string(&self.inventory_fn_name())
+        let sql_graph_entity_fn_json = serde_json::to_string(&self.inventory_fn_name())
             .expect("Could not serialize inventory item.");
-        write!(fd, "{}", inventory_fn_json).expect("Couldn't write to inventory file");
+        write!(fd, "{}", sql_graph_entity_fn_json).expect("Couldn't write to inventory file");
     }
 }
 
@@ -122,7 +122,7 @@ impl ToTokens for PostgresType {
         let in_fn = &self.in_fn;
         let out_fn = &self.out_fn;
 
-        let inventory_fn_name = syn::Ident::new(
+        let sql_graph_entity_fn_name = syn::Ident::new(
             &format!("__pgx_internals_type_{}", self.name),
             Span::call_site(),
         );
@@ -130,7 +130,7 @@ impl ToTokens for PostgresType {
         let inv = quote! {
             #[no_mangle]
             #[link(kind = "static")]
-            pub extern "C" fn  #inventory_fn_name() -> pgx::datum::inventory::SqlGraphEntity {
+            pub extern "C" fn  #sql_graph_entity_fn_name() -> pgx::datum::sql_entity_graph::SqlGraphEntity {
                 let mut mappings = Default::default();
                 <#name #ty_generics as pgx::datum::WithTypeIds>::register_with_refs(
                     &mut mappings,
@@ -148,7 +148,7 @@ impl ToTokens for PostgresType {
                     &mut mappings,
                     stringify!(#name).to_string()
                 );
-                let submission = pgx::inventory::InventoryPostgresType {
+                let submission = pgx::datum::sql_entity_graph::PostgresTypeEntity {
                     name: stringify!(#name),
                     file: file!(),
                     line: line!(),
@@ -170,7 +170,7 @@ impl ToTokens for PostgresType {
                         path_items.join("::")
                     }
                 };
-                pgx::datum::inventory::SqlGraphEntity::Type(submission)
+                pgx::datum::sql_entity_graph::SqlGraphEntity::Type(submission)
             }
         };
         tokens.append_all(inv);

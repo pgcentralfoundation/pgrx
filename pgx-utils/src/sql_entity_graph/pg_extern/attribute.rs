@@ -1,4 +1,4 @@
-use crate::inventory::PositioningRef;
+use crate::sql_entity_graph::PositioningRef;
 use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
 use syn::{
@@ -50,34 +50,34 @@ pub enum Attribute {
 impl ToTokens for Attribute {
     fn to_tokens(&self, tokens: &mut TokenStream2) {
         let quoted = match self {
-            Attribute::Immutable => quote! { pgx::datum::inventory::ExternArgs::Immutable },
-            Attribute::Strict => quote! { pgx::datum::inventory::ExternArgs::Strict },
-            Attribute::Stable => quote! { pgx::datum::inventory::ExternArgs::Stable },
-            Attribute::Volatile => quote! { pgx::datum::inventory::ExternArgs::Volatile },
-            Attribute::Raw => quote! { pgx::datum::inventory::ExternArgs::Raw },
-            Attribute::NoGuard => quote! { pgx::datum::inventory::ExternArgs::NoGuard },
-            Attribute::ParallelSafe => quote! { pgx::datum::inventory::ExternArgs::ParallelSafe },
+            Attribute::Immutable => quote! { pgx::datum::sql_entity_graph::ExternArgs::Immutable },
+            Attribute::Strict => quote! { pgx::datum::sql_entity_graph::ExternArgs::Strict },
+            Attribute::Stable => quote! { pgx::datum::sql_entity_graph::ExternArgs::Stable },
+            Attribute::Volatile => quote! { pgx::datum::sql_entity_graph::ExternArgs::Volatile },
+            Attribute::Raw => quote! { pgx::datum::sql_entity_graph::ExternArgs::Raw },
+            Attribute::NoGuard => quote! { pgx::datum::sql_entity_graph::ExternArgs::NoGuard },
+            Attribute::ParallelSafe => quote! { pgx::datum::sql_entity_graph::ExternArgs::ParallelSafe },
             Attribute::ParallelUnsafe => {
-                quote! { pgx::datum::inventory::ExternArgs::ParallelUnsafe }
+                quote! { pgx::datum::sql_entity_graph::ExternArgs::ParallelUnsafe }
             }
             Attribute::ParallelRestricted => {
-                quote! { pgx::datum::inventory::ExternArgs::ParallelRestricted }
+                quote! { pgx::datum::sql_entity_graph::ExternArgs::ParallelRestricted }
             }
             Attribute::Error(s) => {
-                quote! { pgx::datum::inventory::ExternArgs::Error(String::from(#s)) }
+                quote! { pgx::datum::sql_entity_graph::ExternArgs::Error(String::from(#s)) }
             }
             Attribute::Schema(s) => {
-                quote! { pgx::datum::inventory::ExternArgs::Schema(String::from(#s)) }
+                quote! { pgx::datum::sql_entity_graph::ExternArgs::Schema(String::from(#s)) }
             }
             Attribute::Name(s) => {
-                quote! { pgx::datum::inventory::ExternArgs::Name(String::from(#s)) }
+                quote! { pgx::datum::sql_entity_graph::ExternArgs::Name(String::from(#s)) }
             }
             Attribute::Requires(items) => {
                 let items_iter = items
                     .iter()
                     .map(|x| x.to_token_stream())
                     .collect::<Vec<_>>();
-                quote! { pgx::inventory::ExternArgs::Requires(vec![#(#items_iter),*],) }
+                quote! { pgx::datum::sql_entity_graph::ExternArgs::Requires(vec![#(#items_iter),*],) }
             }
         };
         tokens.append_all(quoted);

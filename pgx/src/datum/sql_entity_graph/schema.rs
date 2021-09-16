@@ -1,16 +1,16 @@
 use super::{SqlGraphEntity, SqlGraphIdentifier, ToSql};
 use std::cmp::Ordering;
 
-/// The output of a [`Schema`](crate::datum::inventory::Schema) from `quote::ToTokens::to_tokens`.
+/// The output of a [`Schema`](crate::datum::sql_entity_graph::Schema) from `quote::ToTokens::to_tokens`.
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
-pub struct InventorySchema {
+pub struct SchemaEntity {
     pub module_path: &'static str,
     pub name: &'static str,
     pub file: &'static str,
     pub line: u32,
 }
 
-impl Ord for InventorySchema {
+impl Ord for SchemaEntity {
     fn cmp(&self, other: &Self) -> Ordering {
         self.file
             .cmp(other.file)
@@ -18,19 +18,19 @@ impl Ord for InventorySchema {
     }
 }
 
-impl PartialOrd for InventorySchema {
+impl PartialOrd for SchemaEntity {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
 
-impl Into<SqlGraphEntity> for InventorySchema {
+impl Into<SqlGraphEntity> for SchemaEntity {
     fn into(self) -> SqlGraphEntity {
         SqlGraphEntity::Schema(self)
     }
 }
 
-impl SqlGraphIdentifier for InventorySchema {
+impl SqlGraphIdentifier for SchemaEntity {
     fn dot_identifier(&self) -> String {
         format!("schema {}", self.module_path)
     }
@@ -47,7 +47,7 @@ impl SqlGraphIdentifier for InventorySchema {
     }
 }
 
-impl ToSql for InventorySchema {
+impl ToSql for SchemaEntity {
     #[tracing::instrument(level = "debug", err, skip(self, _context), fields(identifier = %self.rust_identifier()))]
     fn to_sql(&self, _context: &super::PgxSql) -> eyre::Result<String> {
         let sql = format!(

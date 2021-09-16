@@ -1,6 +1,6 @@
 use super::{
-    ControlFile, InventoryExtensionSql, InventoryPgExtern, InventoryPostgresEnum,
-    InventoryPostgresHash, InventoryPostgresOrd, InventoryPostgresType, InventorySchema,
+    ControlFile, ExtensionSqlEntity, PgExternEntity, PostgresEnumEntity,
+    PostgresHashEntity, PostgresOrdEntity, PostgresTypeEntity, SchemaEntity,
     SqlGraphIdentifier, ToSql,
 };
 
@@ -8,14 +8,14 @@ use super::{
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub enum SqlGraphEntity {
     ExtensionRoot(ControlFile),
-    Schema(InventorySchema),
-    CustomSql(InventoryExtensionSql),
-    Function(InventoryPgExtern),
-    Type(InventoryPostgresType),
+    Schema(SchemaEntity),
+    CustomSql(ExtensionSqlEntity),
+    Function(PgExternEntity),
+    Type(PostgresTypeEntity),
     BuiltinType(String),
-    Enum(InventoryPostgresEnum),
-    Ord(InventoryPostgresOrd),
-    Hash(InventoryPostgresHash),
+    Enum(PostgresEnumEntity),
+    Ord(PostgresOrdEntity),
+    Hash(PostgresHashEntity),
 }
 
 impl SqlGraphEntity {}
@@ -90,7 +90,7 @@ impl ToSql for SqlGraphEntity {
             SqlGraphEntity::Function(item) => if context.graph.neighbors_undirected(context.externs.get(item).unwrap().clone()).any(|neighbor| {
                 let neighbor_item = &context.graph[neighbor];
                 match neighbor_item {
-                    SqlGraphEntity::Type(InventoryPostgresType { in_fn, in_fn_module_path, out_fn, out_fn_module_path, .. }) => {
+                    SqlGraphEntity::Type(PostgresTypeEntity { in_fn, in_fn_module_path, out_fn, out_fn_module_path, .. }) => {
                         let is_in_fn = item.full_path.starts_with(in_fn_module_path) && item.full_path.ends_with(in_fn);
                         if is_in_fn {
                             tracing::trace!(r#type = %neighbor_item.dot_identifier(), "Skipping, is an in_fn.");

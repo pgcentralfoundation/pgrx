@@ -181,12 +181,12 @@ impl ToTokens for Returning {
     fn to_tokens(&self, tokens: &mut TokenStream2) {
         let quoted = match self {
             Returning::None => quote! {
-                pgx::datum::inventory::InventoryPgExternReturn::None
+                pgx::datum::sql_entity_graph::PgExternReturnEntity::None
             },
             Returning::Type(ty) => {
                 let ty_string = ty.to_token_stream().to_string().replace(" ", "");
                 quote! {
-                    pgx::datum::inventory::InventoryPgExternReturn::Type {
+                    pgx::datum::sql_entity_graph::PgExternReturnEntity::Type {
                         id: TypeId::of::<#ty>(),
                         source: #ty_string,
                         full_path: core::any::type_name::<#ty>(),
@@ -202,7 +202,7 @@ impl ToTokens for Returning {
             Returning::SetOf(ty) => {
                 let ty_string = ty.to_token_stream().to_string().replace(" ", "");
                 quote! {
-                    pgx::datum::inventory::InventoryPgExternReturn::SetOf {
+                    pgx::datum::sql_entity_graph::PgExternReturnEntity::SetOf {
                         id: TypeId::of::<#ty>(),
                         source: #ty_string,
                         full_path: core::any::type_name::<#ty>(),
@@ -238,13 +238,13 @@ impl ToTokens for Returning {
                     })
                     .collect::<Vec<_>>();
                 quote! {
-                    pgx::inventory::InventoryPgExternReturn::Iterated(vec![
+                    pgx::datum::sql_entity_graph::PgExternReturnEntity::Iterated(vec![
                         #(#quoted_items),*
                     ])
                 }
             }
             Returning::Trigger => quote! {
-                pgx::inventory::InventoryPgExternReturn::Trigger
+                pgx::datum::sql_entity_graph::PgExternReturnEntity::Trigger
             },
         };
         tokens.append_all(quoted);

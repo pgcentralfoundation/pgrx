@@ -64,7 +64,7 @@ pub use once_cell;
 
 pub use atomics::*;
 pub use callbacks::*;
-use datum::inventory::{RustSourceOnlySqlMapping, RustSqlMapping};
+use datum::sql_entity_graph::{RustSourceOnlySqlMapping, RustSqlMapping};
 pub use datum::*;
 pub use enum_helper::*;
 pub use fcinfo::*;
@@ -235,12 +235,12 @@ pub static DEFAULT_TYPEID_SQL_MAPPING: Lazy<HashSet<RustSqlMapping>> = Lazy::new
 ///
 /// </pre></div>
 ///
-/// This calls both [`pg_magic_func!()`](pg_magic_func) and [`pg_inventory_magic!()`](pg_inventory_magic).
+/// This calls both [`pg_magic_func!()`](pg_magic_func) and [`pg_sql_graph_magic!()`](pg_sql_graph_magic).
 #[macro_export]
 macro_rules! pg_module_magic {
     () => {
         $crate::pg_magic_func!();
-        $crate::pg_inventory_magic!();
+        $crate::pg_sql_graph_magic!();
     };
 }
 
@@ -329,14 +329,14 @@ macro_rules! pg_magic_func {
 ///
 /// </pre></div>
 #[macro_export]
-macro_rules! pg_inventory_magic {
+macro_rules! pg_sql_graph_magic {
     () => {
         // A marker which must exist in the root of the extension.
         #[no_mangle]
         #[link(kind = "static")]
         pub extern "C" fn __pgx_marker(
-        ) -> pgx::datum::inventory::reexports::eyre::Result<pgx::datum::inventory::ControlFile> {
-            use pgx::datum::inventory::reexports::eyre::WrapErr;
+        ) -> pgx::datum::sql_entity_graph::reexports::eyre::Result<pgx::datum::sql_entity_graph::ControlFile> {
+            use pgx::datum::sql_entity_graph::reexports::eyre::WrapErr;
             use std::convert::TryFrom;
             let context = include_str!(concat!(
                 env!("CARGO_MANIFEST_DIR"),
@@ -344,7 +344,7 @@ macro_rules! pg_inventory_magic {
                 env!("CARGO_CRATE_NAME"),
                 ".control"
             ));
-            let control_file = pgx::datum::inventory::ControlFile::try_from(context)
+            let control_file = pgx::datum::sql_entity_graph::ControlFile::try_from(context)
                 .wrap_err_with(|| "Could not parse control file, is it valid?")?;
             Ok(control_file)
         }
@@ -361,8 +361,8 @@ macro_rules! pg_inventory_magic {
 /// ```
 ///
 /// This creates a binary that:
-///  * Has [`tracing`](pgx_utils::inventory::reexports::tracing) and [`color_eyre`](`pgx_utils::inventory::reexports::color_eyre`) set up.
-///  * Supports [`EnvFilter`](pgx_utils::inventory::reexports::tracing_subscriber::EnvFilter) log level configuration.
+///  * Has [`tracing`](pgx_utils::sql_entity_graph::reexports::tracing) and [`color_eyre`](`pgx_utils::sql_entity_graph::reexports::color_eyre`) set up.
+///  * Supports [`EnvFilter`](pgx_utils::sql_entity_graph::reexports::tracing_subscriber::EnvFilter) log level configuration.
 ///  * Accepts `--sql path` and `--dot path` args, as well as a list of symbols.
 ///    These symbols are the `__pgx_internals` prefixed ones which `cargo pgx schema` detects.
 ///
@@ -379,8 +379,8 @@ macro_rules! pg_inventory_magic {
 #[macro_export]
 macro_rules! pg_binary_magic {
     ($($prelude:ident)::*) => {
-        fn main() -> pgx::datum::inventory::reexports::color_eyre::Result<()> {
-            use pgx::datum::inventory::{
+        fn main() -> pgx::datum::sql_entity_graph::reexports::color_eyre::Result<()> {
+            use pgx::datum::sql_entity_graph::{
                 reexports::{
                     tracing_error::ErrorLayer,
                     tracing,

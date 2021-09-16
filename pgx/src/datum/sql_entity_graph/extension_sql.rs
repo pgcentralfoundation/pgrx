@@ -1,11 +1,11 @@
 use std::fmt::Display;
 
-use super::{InventoryPositioningRef, SqlGraphEntity, SqlGraphIdentifier, ToSql};
-use pgx_utils::inventory::SqlDeclaredEntity;
+use super::{PositioningRef, SqlGraphEntity, SqlGraphIdentifier, ToSql};
+use pgx_utils::sql_entity_graph::SqlDeclared;
 
-/// The output of a [`ExtensionSql`](crate::datum::inventory::ExtensionSql) from `quote::ToTokens::to_tokens`.
+/// The output of a [`ExtensionSql`](crate::datum::sql_entity_graph::ExtensionSql) from `quote::ToTokens::to_tokens`.
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub struct InventoryExtensionSql {
+pub struct ExtensionSqlEntity {
     pub module_path: &'static str,
     pub full_path: &'static str,
     pub sql: &'static str,
@@ -14,28 +14,28 @@ pub struct InventoryExtensionSql {
     pub name: &'static str,
     pub bootstrap: bool,
     pub finalize: bool,
-    pub requires: Vec<InventoryPositioningRef>,
-    pub creates: Vec<InventorySqlDeclaredEntity>,
+    pub requires: Vec<PositioningRef>,
+    pub creates: Vec<SqlDeclaredEntity>,
 }
 
-impl InventoryExtensionSql {
+impl ExtensionSqlEntity {
     pub fn has_sql_declared_entity(
         &self,
-        identifier: &pgx_utils::inventory::SqlDeclaredEntity,
-    ) -> Option<&InventorySqlDeclaredEntity> {
+        identifier: &pgx_utils::sql_entity_graph::SqlDeclared,
+    ) -> Option<&SqlDeclaredEntity> {
         self.creates
             .iter()
             .find(|created| created.has_sql_declared_entity(identifier))
     }
 }
 
-impl Into<SqlGraphEntity> for InventoryExtensionSql {
+impl Into<SqlGraphEntity> for ExtensionSqlEntity {
     fn into(self) -> SqlGraphEntity {
         SqlGraphEntity::CustomSql(self)
     }
 }
 
-impl SqlGraphIdentifier for InventoryExtensionSql {
+impl SqlGraphIdentifier for ExtensionSqlEntity {
     fn dot_identifier(&self) -> String {
         format!("sql {}", self.name)
     }
@@ -52,7 +52,7 @@ impl SqlGraphIdentifier for InventoryExtensionSql {
     }
 }
 
-impl ToSql for InventoryExtensionSql {
+impl ToSql for ExtensionSqlEntity {
     #[tracing::instrument(level = "debug", skip(self, _context), fields(identifier = self.full_path))]
     fn to_sql(&self, _context: &super::PgxSql) -> eyre::Result<String> {
         let sql = format!(
@@ -106,7 +106,7 @@ impl ToSql for InventoryExtensionSql {
 }
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq, Ord, PartialOrd)]
-pub enum InventorySqlDeclaredEntity {
+pub enum SqlDeclaredEntity {
     Type {
         sql: String,
         name: String,
@@ -148,23 +148,23 @@ pub enum InventorySqlDeclaredEntity {
     },
 }
 
-impl Display for InventorySqlDeclaredEntity {
+impl Display for SqlDeclaredEntity {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            InventorySqlDeclaredEntity::Type { name, .. } => {
+            SqlDeclaredEntity::Type { name, .. } => {
                 f.write_str(&(String::from("Type(") + name + ")"))
             }
-            InventorySqlDeclaredEntity::Enum { name, .. } => {
+            SqlDeclaredEntity::Enum { name, .. } => {
                 f.write_str(&(String::from("Enum(") + name + ")"))
             }
-            InventorySqlDeclaredEntity::Function { name, .. } => {
+            SqlDeclaredEntity::Function { name, .. } => {
                 f.write_str(&(String::from("Function ") + name + ")"))
             }
         }
     }
 }
 
-impl InventorySqlDeclaredEntity {
+impl SqlDeclaredEntity {
     pub fn build(variant: impl AsRef<str>, name: impl AsRef<str>) -> eyre::Result<Self> {
         let name = name.as_ref();
         let retval = match variant.as_ref() {
@@ -229,17 +229,17 @@ impl InventorySqlDeclaredEntity {
     }
     pub fn sql(&self) -> String {
         match self {
-            InventorySqlDeclaredEntity::Type { sql, .. } => sql.clone(),
-            InventorySqlDeclaredEntity::Enum { sql, .. } => sql.clone(),
-            InventorySqlDeclaredEntity::Function { sql, .. } => sql.clone(),
+            SqlDeclaredEntity::Type { sql, .. } => sql.clone(),
+            SqlDeclaredEntity::Enum { sql, .. } => sql.clone(),
+            SqlDeclaredEntity::Function { sql, .. } => sql.clone(),
         }
     }
 
-    pub fn has_sql_declared_entity(&self, identifier: &SqlDeclaredEntity) -> bool {
+    pub fn has_sql_declared_entity(&self, identifier: &SqlDeclared) -> bool {
         match (&identifier, &self) {
             (
-                SqlDeclaredEntity::Type(identifier_name),
-                &InventorySqlDeclaredEntity::Type {
+                SqlDeclared::Type(identifier_name),
+                &SqlDeclaredEntity::Type {
                     sql: _sql,
                     name,
                     option,
@@ -265,8 +265,8 @@ impl InventorySqlDeclaredEntity {
                     || identifier_name == pg_box
             }
             (
-                SqlDeclaredEntity::Enum(identifier_name),
-                &InventorySqlDeclaredEntity::Enum {
+                SqlDeclared::Enum(identifier_name),
+                &SqlDeclaredEntity::Enum {
                     sql: _sql,
                     name,
                     option,
@@ -292,8 +292,8 @@ impl InventorySqlDeclaredEntity {
                     || identifier_name == pg_box
             }
             (
-                SqlDeclaredEntity::Function(identifier_name),
-                &InventorySqlDeclaredEntity::Function {
+                SqlDeclared::Function(identifier_name),
+                &SqlDeclaredEntity::Function {
                     sql: _sql,
                     name,
                     option,

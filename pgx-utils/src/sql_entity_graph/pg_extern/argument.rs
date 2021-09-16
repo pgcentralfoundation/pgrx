@@ -281,7 +281,7 @@ impl ToTokens for Argument {
         let ty_string = self.ty.to_token_stream().to_string().replace(" ", "");
 
         let quoted = quote! {
-            pgx::inventory::InventoryPgExternInput {
+            pgx::datum::sql_entity_graph::PgExternArgumentEntity {
                 pattern: stringify!(#pat),
                 ty_source: #ty_string,
                 ty_id: TypeId::of::<#ty>(),

@@ -5,24 +5,24 @@ use petgraph::{dot::Dot, graph::NodeIndex, stable_graph::StableGraph};
 use tracing::instrument;
 
 use super::{
-    ControlFile, InventoryExtensionSql, InventoryPgExtern, InventoryPgExternReturn,
-    InventoryPositioningRef, InventoryPostgresEnum, InventoryPostgresHash, InventoryPostgresOrd,
-    InventoryPostgresType, InventorySchema, InventorySqlDeclaredEntity, RustSourceOnlySqlMapping,
+    ControlFile, ExtensionSqlEntity, PgExternEntity, PgExternReturnEntity,
+    PositioningRef, PostgresEnumEntity, PostgresHashEntity, PostgresOrdEntity,
+    PostgresTypeEntity, SchemaEntity, SqlDeclaredEntity, RustSourceOnlySqlMapping,
     RustSqlMapping, SqlGraphEntity, SqlGraphIdentifier, ToSql,
 };
-use pgx_utils::inventory::SqlDeclaredEntity;
+use pgx_utils::sql_entity_graph::SqlDeclared;
 
 /// A generator for SQL.
 ///
 /// Consumes a base mapping of types (typically `pgx::DEFAULT_TYPEID_SQL_MAPPING`), a
-/// [`ControlFile`], and collections of inventory types for each SQL entity.
+/// [`ControlFile`], and collections of each SQL entity.
 ///
 /// During construction, a Directed Acyclic Graph is formed out the dependencies. For example,
 /// an item `detect_dog(x: &[u8]) -> animals::Dog` would have have a relationship with
 /// `animals::Dog`.
 ///
 /// Typically, [`PgxSql`] types are constructed in a `pgx::pg_binary_magic!()` call in a binary
-/// out of inventory items collected during a `pgx::pg_module_magic!()` call in a library.
+/// out of entities collected during a `pgx::pg_module_magic!()` call in a library.
 #[derive(Debug, Clone)]
 pub struct PgxSql {
     // This is actually the Debug format of a TypeId!
@@ -35,14 +35,14 @@ pub struct PgxSql {
     pub graph_root: NodeIndex,
     pub graph_bootstrap: Option<NodeIndex>,
     pub graph_finalize: Option<NodeIndex>,
-    pub schemas: HashMap<InventorySchema, NodeIndex>,
-    pub extension_sqls: HashMap<InventoryExtensionSql, NodeIndex>,
-    pub externs: HashMap<InventoryPgExtern, NodeIndex>,
-    pub types: HashMap<InventoryPostgresType, NodeIndex>,
+    pub schemas: HashMap<SchemaEntity, NodeIndex>,
+    pub extension_sqls: HashMap<ExtensionSqlEntity, NodeIndex>,
+    pub externs: HashMap<PgExternEntity, NodeIndex>,
+    pub types: HashMap<PostgresTypeEntity, NodeIndex>,
     pub builtin_types: HashMap<String, NodeIndex>,
-    pub enums: HashMap<InventoryPostgresEnum, NodeIndex>,
-    pub ords: HashMap<InventoryPostgresOrd, NodeIndex>,
-    pub hashes: HashMap<InventoryPostgresHash, NodeIndex>,
+    pub enums: HashMap<PostgresEnumEntity, NodeIndex>,
+    pub ords: HashMap<PostgresOrdEntity, NodeIndex>,
+    pub hashes: HashMap<PostgresHashEntity, NodeIndex>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Eq, Ord)]
@@ -65,13 +65,13 @@ impl PgxSql {
         entities.sort();
         // Split up things into their specific types:
         let mut control: Option<ControlFile> = None;
-        let mut schemas: Vec<InventorySchema> = Vec::default();
-        let mut extension_sqls: Vec<InventoryExtensionSql> = Vec::default();
-        let mut externs: Vec<InventoryPgExtern> = Vec::default();
-        let mut types: Vec<InventoryPostgresType> = Vec::default();
-        let mut enums: Vec<InventoryPostgresEnum> = Vec::default();
-        let mut ords: Vec<InventoryPostgresOrd> = Vec::default();
-        let mut hashes: Vec<InventoryPostgresHash> = Vec::default();
+        let mut schemas: Vec<SchemaEntity> = Vec::default();
+        let mut extension_sqls: Vec<ExtensionSqlEntity> = Vec::default();
+        let mut externs: Vec<PgExternEntity> = Vec::default();
+        let mut types: Vec<PostgresTypeEntity> = Vec::default();
+        let mut enums: Vec<PostgresEnumEntity> = Vec::default();
+        let mut ords: Vec<PostgresOrdEntity> = Vec::default();
+        let mut hashes: Vec<PostgresHashEntity> = Vec::default();
         for entity in entities {
             match entity {
                 SqlGraphEntity::ExtensionRoot(input_control) => {
@@ -348,8 +348,8 @@ impl PgxSql {
 
     pub fn has_sql_declared_entity(
         &self,
-        identifier: &SqlDeclaredEntity,
-    ) -> Option<&InventorySqlDeclaredEntity> {
+        identifier: &SqlDeclared,
+    ) -> Option<&SqlDeclaredEntity> {
         self.extension_sqls.iter().find_map(|(item, _index)| {
             let retval = item.creates.iter().find_map(|create_entity| {
                 if create_entity.has_sql_declared_entity(identifier) {
@@ -403,9 +403,9 @@ fn build_base_edges(
 fn initialize_extension_sqls<'a>(
     graph: &'a mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
     root: NodeIndex,
-    extension_sqls: Vec<InventoryExtensionSql>,
+    extension_sqls: Vec<ExtensionSqlEntity>,
 ) -> eyre::Result<(
-    HashMap<InventoryExtensionSql, NodeIndex>,
+    HashMap<ExtensionSqlEntity, NodeIndex>,
     Option<NodeIndex>,
     Option<NodeIndex>,
 )> {
@@ -456,17 +456,17 @@ fn initialize_extension_sqls<'a>(
     Ok((mapped_extension_sqls, bootstrap, finalize))
 }
 
-/// A best effort attempt to find the related [`NodeIndex`] for some [`InventoryPositioningRef`].
+/// A best effort attempt to find the related [`NodeIndex`] for some [`PositioningRef`].
 pub fn find_positioning_ref_target<'a>(
-    positioning_ref: &'a InventoryPositioningRef,
-    types: &'a HashMap<InventoryPostgresType, NodeIndex>,
-    enums: &'a HashMap<InventoryPostgresEnum, NodeIndex>,
-    externs: &'a HashMap<InventoryPgExtern, NodeIndex>,
-    schemas: &'a HashMap<InventorySchema, NodeIndex>,
-    extension_sqls: &'a HashMap<InventoryExtensionSql, NodeIndex>,
+    positioning_ref: &'a PositioningRef,
+    types: &'a HashMap<PostgresTypeEntity, NodeIndex>,
+    enums: &'a HashMap<PostgresEnumEntity, NodeIndex>,
+    externs: &'a HashMap<PgExternEntity, NodeIndex>,
+    schemas: &'a HashMap<SchemaEntity, NodeIndex>,
+    extension_sqls: &'a HashMap<ExtensionSqlEntity, NodeIndex>,
 ) -> Option<&'a NodeIndex> {
     match positioning_ref {
-        InventoryPositioningRef::FullPath(path) => {
+        PositioningRef::FullPath(path) => {
             // The best we can do here is a fuzzy search.
             let segments = path.split("::").collect::<Vec<_>>();
             let last_segment = segments.last().expect("Expected at least one segment.");
@@ -494,7 +494,7 @@ pub fn find_positioning_ref_target<'a>(
                 }
             }
         }
-        InventoryPositioningRef::Name(name) => {
+        PositioningRef::Name(name) => {
             for (other, other_index) in extension_sqls {
                 if other.name == *name {
                     return Some(&other_index);
@@ -507,11 +507,11 @@ pub fn find_positioning_ref_target<'a>(
 
 fn connect_extension_sqls(
     graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
-    extension_sqls: &HashMap<InventoryExtensionSql, NodeIndex>,
-    schemas: &HashMap<InventorySchema, NodeIndex>,
-    types: &HashMap<InventoryPostgresType, NodeIndex>,
-    enums: &HashMap<InventoryPostgresEnum, NodeIndex>,
-    externs: &HashMap<InventoryPgExtern, NodeIndex>,
+    extension_sqls: &HashMap<ExtensionSqlEntity, NodeIndex>,
+    schemas: &HashMap<SchemaEntity, NodeIndex>,
+    types: &HashMap<PostgresTypeEntity, NodeIndex>,
+    enums: &HashMap<PostgresEnumEntity, NodeIndex>,
+    externs: &HashMap<PgExternEntity, NodeIndex>,
 ) -> eyre::Result<()> {
     for (item, &index) in extension_sqls {
         for (schema_item, &schema_index) in schemas {
@@ -542,8 +542,8 @@ fn connect_extension_sqls(
                         "".to_string()
                     },
                     match requires {
-                        InventoryPositioningRef::FullPath(path) => path.to_string(),
-                        InventoryPositioningRef::Name(name) => format!(r#""{}""#, name),
+                        PositioningRef::FullPath(path) => path.to_string(),
+                        PositioningRef::Name(name) => format!(r#""{}""#, name),
                     },
                 ));
             }
@@ -556,8 +556,8 @@ fn initialize_schemas(
     graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
     bootstrap: Option<NodeIndex>,
     finalize: Option<NodeIndex>,
-    schemas: Vec<InventorySchema>,
-) -> eyre::Result<HashMap<InventorySchema, NodeIndex>> {
+    schemas: Vec<SchemaEntity>,
+) -> eyre::Result<HashMap<SchemaEntity, NodeIndex>> {
     let mut mapped_schemas = HashMap::default();
     for item in schemas {
         let entity = item.clone().into();
@@ -575,7 +575,7 @@ fn initialize_schemas(
 
 fn connect_schemas(
     graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
-    schemas: &HashMap<InventorySchema, NodeIndex>,
+    schemas: &HashMap<SchemaEntity, NodeIndex>,
     root: NodeIndex,
 ) {
     for (_item, &index) in schemas {
@@ -588,8 +588,8 @@ fn initialize_enums(
     root: NodeIndex,
     bootstrap: Option<NodeIndex>,
     finalize: Option<NodeIndex>,
-    enums: Vec<InventoryPostgresEnum>,
-) -> eyre::Result<HashMap<InventoryPostgresEnum, NodeIndex>> {
+    enums: Vec<PostgresEnumEntity>,
+) -> eyre::Result<HashMap<PostgresEnumEntity, NodeIndex>> {
     let mut mapped_enums = HashMap::default();
     for item in enums {
         let entity: SqlGraphEntity = item.clone().into();
@@ -602,8 +602,8 @@ fn initialize_enums(
 
 fn connect_enums(
     graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
-    enums: &HashMap<InventoryPostgresEnum, NodeIndex>,
-    schemas: &HashMap<InventorySchema, NodeIndex>,
+    enums: &HashMap<PostgresEnumEntity, NodeIndex>,
+    schemas: &HashMap<SchemaEntity, NodeIndex>,
 ) {
     for (item, &index) in enums {
         for (schema_item, &schema_index) in schemas {
@@ -621,8 +621,8 @@ fn initialize_types(
     root: NodeIndex,
     bootstrap: Option<NodeIndex>,
     finalize: Option<NodeIndex>,
-    types: Vec<InventoryPostgresType>,
-) -> eyre::Result<HashMap<InventoryPostgresType, NodeIndex>> {
+    types: Vec<PostgresTypeEntity>,
+) -> eyre::Result<HashMap<PostgresTypeEntity, NodeIndex>> {
     let mut mapped_types = HashMap::default();
     for item in types {
         let entity = item.clone().into();
@@ -635,8 +635,8 @@ fn initialize_types(
 
 fn connect_types(
     graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
-    types: &HashMap<InventoryPostgresType, NodeIndex>,
-    schemas: &HashMap<InventorySchema, NodeIndex>,
+    types: &HashMap<PostgresTypeEntity, NodeIndex>,
+    schemas: &HashMap<SchemaEntity, NodeIndex>,
 ) {
     for (item, &index) in types {
         for (schema_item, &schema_index) in schemas {
@@ -654,11 +654,11 @@ fn initialize_externs(
     root: NodeIndex,
     bootstrap: Option<NodeIndex>,
     finalize: Option<NodeIndex>,
-    externs: Vec<InventoryPgExtern>,
-    mapped_types: &HashMap<InventoryPostgresType, NodeIndex>,
-    mapped_enums: &HashMap<InventoryPostgresEnum, NodeIndex>,
+    externs: Vec<PgExternEntity>,
+    mapped_types: &HashMap<PostgresTypeEntity, NodeIndex>,
+    mapped_enums: &HashMap<PostgresEnumEntity, NodeIndex>,
 ) -> eyre::Result<(
-    HashMap<InventoryPgExtern, NodeIndex>,
+    HashMap<PgExternEntity, NodeIndex>,
     HashMap<String, NodeIndex>,
 )> {
     let mut mapped_externs = HashMap::default();
@@ -693,9 +693,9 @@ fn initialize_externs(
         }
 
         match &item.fn_return {
-            InventoryPgExternReturn::None | InventoryPgExternReturn::Trigger => (),
-            InventoryPgExternReturn::Type { id, full_path, .. }
-            | InventoryPgExternReturn::SetOf { id, full_path, .. } => {
+            PgExternReturnEntity::None | PgExternReturnEntity::Trigger => (),
+            PgExternReturnEntity::Type { id, full_path, .. }
+            | PgExternReturnEntity::SetOf { id, full_path, .. } => {
                 let mut found = false;
                 for (ty_item, &_ty_index) in mapped_types {
                     if ty_item.id_matches(id) {
@@ -717,7 +717,7 @@ fn initialize_externs(
                         });
                 }
             }
-            InventoryPgExternReturn::Iterated(iterated_returns) => {
+            PgExternReturnEntity::Iterated(iterated_returns) => {
                 for iterated_return in iterated_returns {
                     let mut found = false;
                     for (ty_item, &_ty_index) in mapped_types {
@@ -750,12 +750,12 @@ fn initialize_externs(
 
 fn connect_externs(
     graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
-    externs: &HashMap<InventoryPgExtern, NodeIndex>,
-    schemas: &HashMap<InventorySchema, NodeIndex>,
-    types: &HashMap<InventoryPostgresType, NodeIndex>,
-    enums: &HashMap<InventoryPostgresEnum, NodeIndex>,
+    externs: &HashMap<PgExternEntity, NodeIndex>,
+    schemas: &HashMap<SchemaEntity, NodeIndex>,
+    types: &HashMap<PostgresTypeEntity, NodeIndex>,
+    enums: &HashMap<PostgresEnumEntity, NodeIndex>,
     builtin_types: &HashMap<String, NodeIndex>,
-    extension_sqls: &HashMap<InventoryExtensionSql, NodeIndex>,
+    extension_sqls: &HashMap<ExtensionSqlEntity, NodeIndex>,
 ) -> eyre::Result<()> {
     for (item, &index) in externs {
         for (schema_item, &schema_index) in schemas {
@@ -821,13 +821,13 @@ fn connect_externs(
             }
             if !found {
                 for (ext_item, ext_index) in extension_sqls {
-                    if let Some(_) = ext_item.has_sql_declared_entity(&SqlDeclaredEntity::Type(
+                    if let Some(_) = ext_item.has_sql_declared_entity(&SqlDeclared::Type(
                         arg.full_path.to_string(),
                     )) {
                         tracing::debug!(from = %item.rust_identifier(), to = %arg.rust_identifier(), "Adding Extern(arg) after Extension SQL (due to argument) edge");
                         graph.add_edge(*ext_index, index, SqlGraphRelationship::RequiredByArg);
                     } else if let Some(_) = ext_item.has_sql_declared_entity(
-                        &SqlDeclaredEntity::Enum(arg.full_path.to_string()),
+                        &SqlDeclared::Enum(arg.full_path.to_string()),
                     ) {
                         tracing::debug!(from = %item.rust_identifier(), to = %arg.rust_identifier(), "Adding Extern(arg) after Extension SQL (due to argument) edge");
                         graph.add_edge(*ext_index, index, SqlGraphRelationship::RequiredByArg);
@@ -836,9 +836,9 @@ fn connect_externs(
             }
         }
         match &item.fn_return {
-            InventoryPgExternReturn::None | InventoryPgExternReturn::Trigger => (),
-            InventoryPgExternReturn::Type { id, full_path, .. }
-            | InventoryPgExternReturn::SetOf { id, full_path, .. } => {
+            PgExternReturnEntity::None | PgExternReturnEntity::Trigger => (),
+            PgExternReturnEntity::Type { id, full_path, .. }
+            | PgExternReturnEntity::SetOf { id, full_path, .. } => {
                 let mut found = false;
                 for (ty_item, &ty_index) in types {
                     if ty_item.id_matches(id) {
@@ -871,13 +871,13 @@ fn connect_externs(
                 }
                 if !found {
                     for (ext_item, ext_index) in extension_sqls {
-                        if let Some(_) = ext_item.has_sql_declared_entity(&SqlDeclaredEntity::Type(
+                        if let Some(_) = ext_item.has_sql_declared_entity(&SqlDeclared::Type(
                             full_path.to_string(),
                         )) {
                             tracing::debug!(from = %item.rust_identifier(), to = full_path, "Adding Extern(arg) after Extension SQL (due to argument) edge");
                             graph.add_edge(*ext_index, index, SqlGraphRelationship::RequiredByArg);
                         } else if let Some(_) = ext_item.has_sql_declared_entity(
-                            &SqlDeclaredEntity::Enum(full_path.to_string()),
+                            &SqlDeclared::Enum(full_path.to_string()),
                         ) {
                             tracing::debug!(from = %item.rust_identifier(), to = full_path, "Adding Extern(arg) after Extension SQL (due to argument) edge");
                             graph.add_edge(*ext_index, index, SqlGraphRelationship::RequiredByArg);
@@ -885,7 +885,7 @@ fn connect_externs(
                     }
                 }
             }
-            InventoryPgExternReturn::Iterated(iterated_returns) => {
+            PgExternReturnEntity::Iterated(iterated_returns) => {
                 for iterated_return in iterated_returns {
                     let mut found = false;
                     for (ty_item, &ty_index) in types {
@@ -927,7 +927,7 @@ fn connect_externs(
                     if !found {
                         for (ext_item, ext_index) in extension_sqls {
                             if let Some(_) = ext_item.has_sql_declared_entity(
-                                &SqlDeclaredEntity::Type(iterated_return.1.to_string()),
+                                &SqlDeclared::Type(iterated_return.1.to_string()),
                             ) {
                                 tracing::debug!(from = %item.rust_identifier(), to = iterated_return.1, "Adding Extern(arg) after Extension SQL (due to argument) edge");
                                 graph.add_edge(
@@ -936,7 +936,7 @@ fn connect_externs(
                                     SqlGraphRelationship::RequiredByArg,
                                 );
                             } else if let Some(_) = ext_item.has_sql_declared_entity(
-                                &SqlDeclaredEntity::Enum(iterated_return.1.to_string()),
+                                &SqlDeclared::Enum(iterated_return.1.to_string()),
                             ) {
                                 tracing::debug!(from = %item.rust_identifier(), to = iterated_return.1, "Adding Extern(arg) after Extension SQL (due to argument) edge");
                                 graph.add_edge(
@@ -959,8 +959,8 @@ fn initialize_ords(
     root: NodeIndex,
     bootstrap: Option<NodeIndex>,
     finalize: Option<NodeIndex>,
-    ords: Vec<InventoryPostgresOrd>,
-) -> eyre::Result<HashMap<InventoryPostgresOrd, NodeIndex>> {
+    ords: Vec<PostgresOrdEntity>,
+) -> eyre::Result<HashMap<PostgresOrdEntity, NodeIndex>> {
     let mut mapped_ords = HashMap::default();
     for item in ords {
         let entity = item.clone().into();
@@ -973,10 +973,10 @@ fn initialize_ords(
 
 fn connect_ords(
     graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
-    ords: &HashMap<InventoryPostgresOrd, NodeIndex>,
-    schemas: &HashMap<InventorySchema, NodeIndex>,
-    types: &HashMap<InventoryPostgresType, NodeIndex>,
-    enums: &HashMap<InventoryPostgresEnum, NodeIndex>,
+    ords: &HashMap<PostgresOrdEntity, NodeIndex>,
+    schemas: &HashMap<SchemaEntity, NodeIndex>,
+    types: &HashMap<PostgresTypeEntity, NodeIndex>,
+    enums: &HashMap<PostgresEnumEntity, NodeIndex>,
 ) {
     for (item, &index) in ords {
         for (schema_item, &schema_index) in schemas {
@@ -1008,8 +1008,8 @@ fn initialize_hashes(
     root: NodeIndex,
     bootstrap: Option<NodeIndex>,
     finalize: Option<NodeIndex>,
-    hashes: Vec<InventoryPostgresHash>,
-) -> eyre::Result<HashMap<InventoryPostgresHash, NodeIndex>> {
+    hashes: Vec<PostgresHashEntity>,
+) -> eyre::Result<HashMap<PostgresHashEntity, NodeIndex>> {
     let mut mapped_hashes = HashMap::default();
     for item in hashes {
         let entity: SqlGraphEntity = item.clone().into();
@@ -1022,10 +1022,10 @@ fn initialize_hashes(
 
 fn connect_hashes(
     graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
-    hashes: &HashMap<InventoryPostgresHash, NodeIndex>,
-    schemas: &HashMap<InventorySchema, NodeIndex>,
-    types: &HashMap<InventoryPostgresType, NodeIndex>,
-    enums: &HashMap<InventoryPostgresEnum, NodeIndex>,
+    hashes: &HashMap<PostgresHashEntity, NodeIndex>,
+    schemas: &HashMap<SchemaEntity, NodeIndex>,
+    types: &HashMap<PostgresTypeEntity, NodeIndex>,
+    enums: &HashMap<PostgresEnumEntity, NodeIndex>,
 ) {
     for (item, &index) in hashes {
         for (schema_item, &schema_index) in schemas {

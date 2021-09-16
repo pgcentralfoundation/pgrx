@@ -1,8 +1,8 @@
-use crate::inventory::SqlGraphIdentifier;
+use crate::sql_entity_graph::SqlGraphIdentifier;
 
-/// The output of a [`Argument`](crate::datum::inventory::Argument) from `quote::ToTokens::to_tokens`.
+/// The output of a [`Argument`](crate::datum::sql_entity_graph::Argument) from `quote::ToTokens::to_tokens`.
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub struct InventoryPgExternInput {
+pub struct PgExternArgumentEntity {
     pub pattern: &'static str,
     pub ty_source: &'static str,
     pub ty_id: core::any::TypeId,
@@ -13,7 +13,7 @@ pub struct InventoryPgExternInput {
     pub default: Option<&'static str>,
 }
 
-impl SqlGraphIdentifier for InventoryPgExternInput {
+impl SqlGraphIdentifier for PgExternArgumentEntity {
     fn dot_identifier(&self) -> String {
         format!("arg {}", self.full_path)
     }

@@ -1,7 +1,7 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-use crate::{inventory::InventoryPositioningRef, pg_config::PgConfig};
+use crate::{sql_entity_graph::PositioningRef, pg_config::PgConfig};
 use colored::Colorize;
 use proc_macro2::TokenStream;
 use proc_macro2::TokenTree;
@@ -13,7 +13,7 @@ use std::process::{Command, Stdio};
 use std::str::FromStr;
 use syn::{GenericArgument, ItemFn, PathArguments, ReturnType, Type, TypeParamBound};
 
-pub mod inventory;
+pub mod sql_entity_graph;
 pub mod operator_common;
 pub mod pg_config;
 
@@ -197,7 +197,7 @@ pub enum ExternArgs {
     Error(String),
     Schema(String),
     Name(String),
-    Requires(Vec<InventoryPositioningRef>),
+    Requires(Vec<PositioningRef>),
 }
 
 impl core::fmt::Display for ExternArgs {

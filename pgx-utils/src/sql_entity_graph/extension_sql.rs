@@ -6,18 +6,18 @@ use syn::{
     LitStr, Token,
 };
 
-use crate::inventory::PositioningRef;
+use crate::sql_entity_graph::PositioningRef;
 
 /// A parsed `extension_sql_file!()` item.
 ///
 /// It should be used with [`syn::parse::Parse`] functions.
 ///
-/// Using [`quote::ToTokens`] will output the declaration for a `pgx::datum::inventory::InventoryExtensionSql`.
+/// Using [`quote::ToTokens`] will output the declaration for a `pgx::datum::sql_entity_graph::ExtensionSqlEntity`.
 ///
 /// ```rust
 /// use syn::{Macro, parse::Parse, parse_quote, parse};
 /// use quote::{quote, ToTokens};
-/// use pgx_utils::inventory::ExtensionSqlFile;
+/// use pgx_utils::sql_entity_graph::ExtensionSqlFile;
 ///
 /// # fn main() -> eyre::Result<()> {
 /// let parsed: Macro = parse_quote! {
@@ -27,7 +27,7 @@ use crate::inventory::PositioningRef;
 /// let inner: ExtensionSqlFile = parse_quote! {
 ///     #inner_tokens
 /// };
-/// let inventory_tokens = inner.to_token_stream();
+/// let sql_graph_entity_tokens = inner.to_token_stream();
 /// # Ok(())
 /// # }
 /// ```
@@ -83,15 +83,15 @@ impl ToTokens for ExtensionSqlFile {
         );
         let requires_iter = requires.iter();
         let creates_iter = creates.iter();
-        let inventory_fn_name = syn::Ident::new(
+        let sql_graph_entity_fn_name = syn::Ident::new(
             &format!("__pgx_internals_sql_{}", name.clone()),
             Span::call_site(),
         );
         let inv = quote! {
             #[no_mangle]
             #[link(kind = "static")]
-            pub extern "C" fn  #inventory_fn_name() -> pgx::datum::inventory::SqlGraphEntity {
-                let submission = pgx::datum::inventory::InventoryExtensionSql {
+            pub extern "C" fn  #sql_graph_entity_fn_name() -> pgx::datum::sql_entity_graph::SqlGraphEntity {
+                let submission = pgx::datum::sql_entity_graph::ExtensionSqlEntity {
                     sql: include_str!(#path),
                     module_path: module_path!(),
                     full_path: concat!(file!(), ':', line!()),
@@ -103,7 +103,7 @@ impl ToTokens for ExtensionSqlFile {
                     requires: vec![#(#requires_iter),*],
                     creates: vec![#(#creates_iter),*],
                 };
-                pgx::datum::inventory::SqlGraphEntity::CustomSql(submission)
+                pgx::datum::sql_entity_graph::SqlGraphEntity::CustomSql(submission)
             }
         };
         tokens.append_all(inv);
@@ -114,12 +114,12 @@ impl ToTokens for ExtensionSqlFile {
 ///
 /// It should be used with [`syn::parse::Parse`] functions.
 ///
-/// Using [`quote::ToTokens`] will output the declaration for a `pgx::datum::inventory::InventoryExtensionSql`.
+/// Using [`quote::ToTokens`] will output the declaration for a `pgx::datum::sql_entity_graph::ExtensionSqlEntity`.
 ///
 /// ```rust
 /// use syn::{Macro, parse::Parse, parse_quote, parse};
 /// use quote::{quote, ToTokens};
-/// use pgx_utils::inventory::ExtensionSql;
+/// use pgx_utils::sql_entity_graph::ExtensionSql;
 ///
 /// # fn main() -> eyre::Result<()> {
 /// let parsed: Macro = parse_quote! {
@@ -129,7 +129,7 @@ impl ToTokens for ExtensionSqlFile {
 /// let inner: ExtensionSql = parse_quote! {
 ///     #inner_tokens
 /// };
-/// let inventory_tokens = inner.to_token_stream();
+/// let sql_graph_entity_tokens = inner.to_token_stream();
 /// # Ok(())
 /// # }
 /// ```
@@ -188,15 +188,15 @@ impl ToTokens for ExtensionSql {
         let creates_iter = creates.iter();
         let name = &self.name;
 
-        let inventory_fn_name = syn::Ident::new(
+        let sql_graph_entity_fn_name = syn::Ident::new(
             &format!("__pgx_internals_sql_{}", name.value()),
             Span::call_site(),
         );
         let inv = quote! {
             #[no_mangle]
             #[link(kind = "static")]
-            pub extern "C" fn  #inventory_fn_name() -> pgx::datum::inventory::SqlGraphEntity {
-                let submission = pgx::inventory::InventoryExtensionSql {
+            pub extern "C" fn  #sql_graph_entity_fn_name() -> pgx::datum::sql_entity_graph::SqlGraphEntity {
+                let submission = pgx::datum::sql_entity_graph::ExtensionSqlEntity {
                     sql: #sql,
                     module_path: module_path!(),
                     full_path: concat!(file!(), ':', line!()),
@@ -208,7 +208,7 @@ impl ToTokens for ExtensionSql {
                     requires: vec![#(#requires_iter),*],
                     creates: vec![#(#creates_iter),*],
                 };
-                pgx::datum::inventory::SqlGraphEntity::CustomSql(submission)
+                pgx::datum::sql_entity_graph::SqlGraphEntity::CustomSql(submission)
             }
         };
         tokens.append_all(inv);
@@ -218,7 +218,7 @@ impl ToTokens for ExtensionSql {
 #[derive(Debug, Clone)]
 pub enum ExtensionSqlAttribute {
     Requires(Punctuated<PositioningRef, Token![,]>),
-    Creates(Punctuated<SqlDeclaredEntity, Token![,]>),
+    Creates(Punctuated<SqlDeclared, Token![,]>),
     Bootstrap,
     Finalize,
     Name(LitStr),
@@ -232,7 +232,7 @@ impl Parse for ExtensionSqlAttribute {
                 let _eq: syn::token::Eq = input.parse()?;
                 let content;
                 let _bracket = syn::bracketed!(content in input);
-                Self::Creates(content.parse_terminated(SqlDeclaredEntity::parse)?)
+                Self::Creates(content.parse_terminated(SqlDeclared::parse)?)
             }
             "requires" => {
                 let _eq: syn::token::Eq = input.parse()?;
@@ -258,13 +258,13 @@ impl Parse for ExtensionSqlAttribute {
 }
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq, Ord, PartialOrd)]
-pub enum SqlDeclaredEntity {
+pub enum SqlDeclared {
     Type(String),
     Enum(String),
     Function(String),
 }
 
-impl Parse for SqlDeclaredEntity {
+impl Parse for SqlDeclared {
     fn parse(input: ParseStream) -> syn::Result<Self> {
         let variant: Ident = input.parse()?;
         let content;
@@ -278,9 +278,9 @@ impl Parse for SqlDeclaredEntity {
             identifier_segments.join("::")
         };
         let this = match variant.to_string().as_str() {
-            "Type" => SqlDeclaredEntity::Type(identifier_str),
-            "Enum" => SqlDeclaredEntity::Enum(identifier_str),
-            "Function" => SqlDeclaredEntity::Function(identifier_str),
+            "Type" => SqlDeclared::Type(identifier_str),
+            "Enum" => SqlDeclared::Enum(identifier_str),
+            "Function" => SqlDeclared::Function(identifier_str),
             _ => return Err(syn::Error::new(
                 variant.span(),
                 "SQL declared entities must be `Type(ident)`, `Enum(ident)`, or `Function(ident)`",
@@ -290,12 +290,12 @@ impl Parse for SqlDeclaredEntity {
     }
 }
 
-impl ToTokens for SqlDeclaredEntity {
+impl ToTokens for SqlDeclared {
     fn to_tokens(&self, tokens: &mut TokenStream2) {
         let (variant, identifier) = match &self {
-            SqlDeclaredEntity::Type(val) => ("Type", val),
-            SqlDeclaredEntity::Enum(val) => ("Enum", val),
-            SqlDeclaredEntity::Function(val) => ("Function", val),
+            SqlDeclared::Type(val) => ("Type", val),
+            SqlDeclared::Enum(val) => ("Enum", val),
+            SqlDeclared::Function(val) => ("Function", val),
         };
         let identifier_split = identifier.split("::").collect::<Vec<_>>();
         let identifier = if identifier_split.len() == 1 {
@@ -308,7 +308,7 @@ impl ToTokens for SqlDeclaredEntity {
             quote! { stringify!(#identifier) }
         };
         let inv = quote! {
-            pgx::inventory::InventorySqlDeclaredEntity::build(#variant, #identifier).unwrap()
+            pgx::datum::sql_entity_graph::SqlDeclaredEntity::build(#variant, #identifier).unwrap()
         };
         tokens.append_all(inv);
     }

@@ -5,33 +5,33 @@ mod control_file;
 pub use control_file::ControlFile;
 
 mod schema;
-pub use schema::InventorySchema;
+pub use schema::SchemaEntity;
 
 mod pg_extern;
 pub use pg_extern::{
-    InventoryPgExtern, InventoryPgExternInput, InventoryPgExternReturn, InventoryPgOperator,
+    PgExternEntity, PgExternArgumentEntity, PgExternReturnEntity, PgOperatorEntity,
 };
 
 mod extension_sql;
-pub use extension_sql::{InventoryExtensionSql, InventorySqlDeclaredEntity};
+pub use extension_sql::{ExtensionSqlEntity, SqlDeclaredEntity};
 
 mod postgres_enum;
-pub use postgres_enum::InventoryPostgresEnum;
+pub use postgres_enum::PostgresEnumEntity;
 
 mod postgres_type;
-pub use postgres_type::InventoryPostgresType;
+pub use postgres_type::PostgresTypeEntity;
 
 mod postgres_ord;
-pub use postgres_ord::InventoryPostgresOrd;
+pub use postgres_ord::PostgresOrdEntity;
 
 mod postgres_hash;
-pub use postgres_hash::InventoryPostgresHash;
+pub use postgres_hash::PostgresHashEntity;
 
 mod sql_graph_entity;
 pub use sql_graph_entity::SqlGraphEntity;
 
 use core::any::TypeId;
-pub use pgx_utils::inventory::*;
+pub use pgx_utils::sql_entity_graph::*;
 
 /// Able to produce a GraphViz DOT format identifier.
 pub trait SqlGraphIdentifier {
@@ -65,7 +65,7 @@ pub trait ToSql {
 /// A mapping from a Rust type to a SQL type, with a `TypeId`.
 ///
 /// ```rust
-/// use pgx::inventory::RustSqlMapping;
+/// use pgx::datum::sql_entity_graph::RustSqlMapping;
 ///
 /// let constructed = RustSqlMapping::of::<i32>(String::from("int"));
 /// let raw = RustSqlMapping {
@@ -99,7 +99,7 @@ impl RustSqlMapping {
 /// In general, this can only offer a fuzzy matching, as it does not use [`core::any::TypeId`].
 ///
 /// ```rust
-/// use pgx::inventory::RustSourceOnlySqlMapping;
+/// use pgx::datum::sql_entity_graph::RustSourceOnlySqlMapping;
 ///
 /// let constructed = RustSourceOnlySqlMapping::new(
 ///     String::from("Oid"),

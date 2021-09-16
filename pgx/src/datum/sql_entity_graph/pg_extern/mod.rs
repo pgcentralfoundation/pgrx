@@ -4,19 +4,19 @@ mod returning;
 
 use eyre::eyre as eyre_err;
 
-pub use argument::InventoryPgExternInput;
-pub use operator::InventoryPgOperator;
-pub use returning::InventoryPgExternReturn;
+pub use argument::PgExternArgumentEntity;
+pub use operator::PgOperatorEntity;
+pub use returning::PgExternReturnEntity;
 
 use pgx_utils::ExternArgs;
 
 use super::{SqlGraphEntity, SqlGraphIdentifier, ToSql};
-use pgx_utils::inventory::SqlDeclaredEntity;
+use pgx_utils::sql_entity_graph::SqlDeclared;
 use std::cmp::Ordering;
 
-/// The output of a [`Schema`](crate::datum::inventory::Schema) from `quote::ToTokens::to_tokens`.
+/// The output of a [`Schema`](crate::datum::sql_entity_graph::Schema) from `quote::ToTokens::to_tokens`.
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
-pub struct InventoryPgExtern {
+pub struct PgExternEntity {
     pub name: &'static str,
     pub unaliased_name: &'static str,
     pub schema: Option<&'static str>,
@@ -26,13 +26,13 @@ pub struct InventoryPgExtern {
     pub full_path: &'static str,
     pub extern_attrs: Vec<ExternArgs>,
     pub search_path: Option<Vec<&'static str>>,
-    pub fn_args: Vec<InventoryPgExternInput>,
-    pub fn_return: InventoryPgExternReturn,
-    pub operator: Option<InventoryPgOperator>,
+    pub fn_args: Vec<PgExternArgumentEntity>,
+    pub fn_return: PgExternReturnEntity,
+    pub operator: Option<PgOperatorEntity>,
     pub overridden: Option<&'static str>,
 }
 
-impl Ord for InventoryPgExtern {
+impl Ord for PgExternEntity {
     fn cmp(&self, other: &Self) -> Ordering {
         self.file
             .cmp(other.file)
@@ -40,21 +40,21 @@ impl Ord for InventoryPgExtern {
     }
 }
 
-impl PartialOrd for InventoryPgExtern {
+impl PartialOrd for PgExternEntity {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
 
-impl crate::PostgresType for InventoryPgExtern {}
+impl crate::PostgresType for PgExternEntity {}
 
-impl Into<SqlGraphEntity> for InventoryPgExtern {
+impl Into<SqlGraphEntity> for PgExternEntity {
     fn into(self) -> SqlGraphEntity {
         SqlGraphEntity::Function(self)
     }
 }
 
-impl SqlGraphIdentifier for InventoryPgExtern {
+impl SqlGraphIdentifier for PgExternEntity {
     fn dot_identifier(&self) -> String {
         format!("fn {}", self.full_path)
     }
@@ -71,7 +71,7 @@ impl SqlGraphIdentifier for InventoryPgExtern {
     }
 }
 
-impl ToSql for InventoryPgExtern {
+impl ToSql for PgExternEntity {
     #[tracing::instrument(
         level = "info",
         skip(self, context),
@@ -124,9 +124,9 @@ impl ToSql for InventoryPgExtern {
                                             }).or_else(|| {
                                                 // Fall back to fuzzy matching.
                                                 let path = arg.full_path.to_string();
-                                                if let Some(found) = context.has_sql_declared_entity(&SqlDeclaredEntity::Type(path.clone())) {
+                                                if let Some(found) = context.has_sql_declared_entity(&SqlDeclared::Type(path.clone())) {
                                                     Some(found.sql())
-                                                }  else if let Some(found) = context.has_sql_declared_entity(&SqlDeclaredEntity::Enum(path.clone())) {
+                                                }  else if let Some(found) = context.has_sql_declared_entity(&SqlDeclared::Enum(path.clone())) {
                                                     Some(found.sql())
                                                 } else {
                                                     None
@@ -147,8 +147,8 @@ impl ToSql for InventoryPgExtern {
                                  String::from("\n") + &args.join("\n") + "\n"
                              } else { Default::default() },
                              returns = match &self.fn_return {
-                                 InventoryPgExternReturn::None => String::from("RETURNS void"),
-                                 InventoryPgExternReturn::Type { id, source, full_path, .. } => {
+                                 PgExternReturnEntity::None => String::from("RETURNS void"),
+                                 PgExternReturnEntity::Type { id, source, full_path, .. } => {
                                      let graph_index = context.graph.neighbors_undirected(self_index).find(|neighbor| match &context.graph[*neighbor] {
                                          SqlGraphEntity::Type(ty) => ty.id_matches(&id),
                                          SqlGraphEntity::Enum(en) => en.id_matches(&id),
@@ -160,9 +160,9 @@ impl ToSql for InventoryPgExtern {
                                                  context.type_id_to_sql_type(*id)
                                              }).or_else(|| {
                                                     let pat = full_path.to_string();
-                                                    if let Some(found) = context.has_sql_declared_entity(&SqlDeclaredEntity::Type(pat.clone())) {
+                                                    if let Some(found) = context.has_sql_declared_entity(&SqlDeclared::Type(pat.clone())) {
                                                         Some(found.sql())
-                                                    }  else if let Some(found) = context.has_sql_declared_entity(&SqlDeclaredEntity::Enum(pat.clone())) {
+                                                    }  else if let Some(found) = context.has_sql_declared_entity(&SqlDeclared::Enum(pat.clone())) {
                                                         Some(found.sql())
                                                     } else {
                                                         None
@@ -172,7 +172,7 @@ impl ToSql for InventoryPgExtern {
                                              full_path = full_path
                                      )
                                  },
-                                 InventoryPgExternReturn::SetOf { id, source, full_path, .. } => {
+                                 PgExternReturnEntity::SetOf { id, source, full_path, .. } => {
                                      let graph_index = context.graph.neighbors_undirected(self_index).find(|neighbor| match &context.graph[*neighbor] {
                                          SqlGraphEntity::Type(ty) => ty.id_matches(&id),
                                          SqlGraphEntity::Enum(en) => en.id_matches(&id),
@@ -184,9 +184,9 @@ impl ToSql for InventoryPgExtern {
                                                  context.type_id_to_sql_type(*id)
                                              }).or_else(|| {
                                                     let pat = full_path.to_string();
-                                                    if let Some(found) = context.has_sql_declared_entity(&SqlDeclaredEntity::Type(pat.clone())) {
+                                                    if let Some(found) = context.has_sql_declared_entity(&SqlDeclared::Type(pat.clone())) {
                                                         Some(found.sql())
-                                                    }  else if let Some(found) = context.has_sql_declared_entity(&SqlDeclaredEntity::Enum(pat.clone())) {
+                                                    }  else if let Some(found) = context.has_sql_declared_entity(&SqlDeclared::Enum(pat.clone())) {
                                                         Some(found.sql())
                                                     } else {
                                                         None
@@ -196,7 +196,7 @@ impl ToSql for InventoryPgExtern {
                                              full_path = full_path
                                      )
                                  },
-                                 InventoryPgExternReturn::Iterated(table_items) => {
+                                 PgExternReturnEntity::Iterated(table_items) => {
                                      let mut items = String::new();
                                      for (idx, (id, source, ty_name, _module_path, col_name)) in table_items.iter().enumerate() {
                                          let graph_index = context.graph.neighbors_undirected(self_index).find(|neighbor| match &context.graph[*neighbor] {
@@ -215,9 +215,9 @@ impl ToSql for InventoryPgExtern {
                                                                 context.type_id_to_sql_type(*id)
                                                             }).or_else(|| {
                                                                 let pat = ty_name.to_string();
-                                                                if let Some(found) = context.has_sql_declared_entity(&SqlDeclaredEntity::Type(pat.clone())) {
+                                                                if let Some(found) = context.has_sql_declared_entity(&SqlDeclared::Type(pat.clone())) {
                                                                     Some(found.sql())
-                                                                }  else if let Some(found) = context.has_sql_declared_entity(&SqlDeclaredEntity::Enum(pat.clone())) {
+                                                                }  else if let Some(found) = context.has_sql_declared_entity(&SqlDeclared::Enum(pat.clone())) {
                                                                     Some(found.sql())
                                                                 } else {
                                                                     None
@@ -230,7 +230,7 @@ impl ToSql for InventoryPgExtern {
                                      }
                                      format!("RETURNS TABLE ({}\n)", items)
                                  },
-                                 InventoryPgExternReturn::Trigger => String::from("RETURNS trigger"),
+                                 PgExternReturnEntity::Trigger => String::from("RETURNS trigger"),
                              },
                              search_path = if let Some(search_path) = &self.search_path {
                                  let retval = format!("SET search_path TO {}", search_path.join(", "));

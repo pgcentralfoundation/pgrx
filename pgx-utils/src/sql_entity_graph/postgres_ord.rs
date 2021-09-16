@@ -5,27 +5,27 @@ use syn::{
     DeriveInput, Ident, ItemEnum, ItemStruct,
 };
 
-/// A parsed `#[derive(PostgresHash)]` item.
+/// A parsed `#[derive(PostgresOrd)]` item.
 ///
 /// It should be used with [`syn::parse::Parse`] functions.
 ///
-/// Using [`quote::ToTokens`] will output the declaration for a `pgx::datum::inventory::InventoryPostgresHash`.
+/// Using [`quote::ToTokens`] will output the declaration for a `pgx::datum::sql_entity_graph::InventoryPostgresOrd`.
 ///
 /// On structs:
 ///
 /// ```rust
 /// use syn::{Macro, parse::Parse, parse_quote, parse};
 /// use quote::{quote, ToTokens};
-/// use pgx_utils::inventory::PostgresHash;
+/// use pgx_utils::sql_entity_graph::PostgresOrd;
 ///
 /// # fn main() -> eyre::Result<()> {
-/// let parsed: PostgresHash = parse_quote! {
-///     #[derive(PostgresHash)]
+/// let parsed: PostgresOrd = parse_quote! {
+///     #[derive(PostgresOrd)]
 ///     struct Example<'a> {
 ///         demo: &'a str,
 ///     }
 /// };
-/// let inventory_tokens = parsed.to_token_stream();
+/// let sql_graph_entity_tokens = parsed.to_token_stream();
 /// # Ok(())
 /// # }
 /// ```
@@ -35,25 +35,25 @@ use syn::{
 /// ```rust
 /// use syn::{Macro, parse::Parse, parse_quote, parse};
 /// use quote::{quote, ToTokens};
-/// use pgx_utils::inventory::PostgresHash;
+/// use pgx_utils::sql_entity_graph::PostgresOrd;
 ///
 /// # fn main() -> eyre::Result<()> {
-/// let parsed: PostgresHash = parse_quote! {
-///     #[derive(PostgresHash)]
+/// let parsed: PostgresOrd = parse_quote! {
+///     #[derive(PostgresOrd)]
 ///     enum Demo {
 ///         Example,
 ///     }
 /// };
-/// let inventory_tokens = parsed.to_token_stream();
+/// let sql_graph_entity_tokens = parsed.to_token_stream();
 /// # Ok(())
 /// # }
 /// ```
 #[derive(Debug, Clone)]
-pub struct PostgresHash {
+pub struct PostgresOrd {
     pub name: Ident,
 }
 
-impl PostgresHash {
+impl PostgresOrd {
     pub fn new(name: Ident) -> Self {
         Self { name }
     }
@@ -63,7 +63,7 @@ impl PostgresHash {
     }
 }
 
-impl Parse for PostgresHash {
+impl Parse for PostgresOrd {
     fn parse(input: ParseStream) -> Result<Self, syn::Error> {
         let parsed_enum: Result<ItemEnum, syn::Error> = input.parse();
         let parsed_struct: Result<ItemStruct, syn::Error> = input.parse();
@@ -75,19 +75,19 @@ impl Parse for PostgresHash {
     }
 }
 
-impl ToTokens for PostgresHash {
+impl ToTokens for PostgresOrd {
     fn to_tokens(&self, tokens: &mut TokenStream2) {
         let name = &self.name;
-        let inventory_fn_name = syn::Ident::new(
-            &format!("__pgx_internals_hash_{}", self.name),
+        let sql_graph_entity_fn_name = syn::Ident::new(
+            &format!("__pgx_internals_ord_{}", self.name),
             Span::call_site(),
         );
         let inv = quote! {
             #[no_mangle]
             #[link(kind = "static")]
-            pub extern "C" fn  #inventory_fn_name() -> pgx::datum::inventory::SqlGraphEntity {
+            pub extern "C" fn  #sql_graph_entity_fn_name() -> pgx::datum::sql_entity_graph::SqlGraphEntity {
                 use core::any::TypeId;
-                let submission = pgx::datum::inventory::InventoryPostgresHash {
+                let submission = pgx::datum::sql_entity_graph::InventoryPostgresOrd {
                     name: stringify!(#name),
                     file: file!(),
                     line: line!(),
@@ -95,7 +95,7 @@ impl ToTokens for PostgresHash {
                     module_path: module_path!(),
                     id: TypeId::of::<#name>(),
                 };
-                pgx::datum::inventory::SqlGraphEntity::Hash(submission)
+                pgx::datum::sql_entity_graph::SqlGraphEntity::Ord(submission)
             }
         };
         tokens.append_all(inv);

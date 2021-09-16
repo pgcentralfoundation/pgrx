@@ -22,12 +22,12 @@ use syn::Meta;
 ///
 /// It should be used with [`syn::parse::Parse`] functions.
 ///
-/// Using [`quote::ToTokens`] will output the declaration for a `pgx::datum::inventory::InventoryPgExtern`.
+/// Using [`quote::ToTokens`] will output the declaration for a `pgx::datum::sql_entity_graph::InventoryPgExtern`.
 ///
 /// ```rust
 /// use syn::{Macro, parse::Parse, parse_quote, parse};
 /// use quote::{quote, ToTokens};
-/// use pgx_utils::inventory::PgExtern;
+/// use pgx_utils::sql_entity_graph::PgExtern;
 ///
 /// # fn main() -> eyre::Result<()> {
 /// let parsed: PgExtern = parse_quote! {
@@ -35,7 +35,7 @@ use syn::Meta;
 ///         unimplemented!()
 ///     }
 /// };
-/// let inventory_tokens = parsed.to_token_stream();
+/// let sql_graph_entity_tokens = parsed.to_token_stream();
 /// # Ok(())
 /// # }
 /// ```
@@ -213,14 +213,14 @@ impl ToTokens for PgExtern {
         let operator = self.operator().into_iter();
         let overridden = self.overridden().into_iter();
 
-        let inventory_fn_name =
+        let sql_graph_entity_fn_name =
             syn::Ident::new(&format!("__pgx_internals_fn_{}", ident), Span::call_site());
         let inv = quote! {
             #[no_mangle]
             #[link(kind = "static")]
-            pub extern "C" fn  #inventory_fn_name() -> pgx::datum::inventory::SqlGraphEntity {
+            pub extern "C" fn  #sql_graph_entity_fn_name() -> pgx::datum::sql_entity_graph::SqlGraphEntity {
                 use core::any::TypeId;
-                let submission = pgx::inventory::InventoryPgExtern {
+                let submission = pgx::datum::sql_entity_graph::PgExternEntity {
                     name: #name,
                     unaliased_name: stringify!(#ident),
                     schema: None#( .unwrap_or(Some(#schema_iter)) )*,
@@ -235,7 +235,7 @@ impl ToTokens for PgExtern {
                     operator: None#( .unwrap_or(Some(#operator)) )*,
                     overridden: None#( .unwrap_or(Some(#overridden)) )*,
                 };
-                pgx::datum::inventory::SqlGraphEntity::Function(submission)
+                pgx::datum::sql_entity_graph::SqlGraphEntity::Function(submission)
             }
         };
         tokens.append_all(inv);

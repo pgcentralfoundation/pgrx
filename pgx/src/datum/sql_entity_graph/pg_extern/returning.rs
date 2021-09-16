@@ -1,7 +1,7 @@
 use core::any::TypeId;
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub enum InventoryPgExternReturn {
+pub enum PgExternReturnEntity {
     None,
     Type {
         id: TypeId,

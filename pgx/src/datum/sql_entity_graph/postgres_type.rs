@@ -7,9 +7,9 @@ use std::{
 
 use super::{SqlGraphEntity, SqlGraphIdentifier, ToSql};
 
-/// The output of a [`PostgresType`](crate::datum::inventory::PostgresType) from `quote::ToTokens::to_tokens`.
+/// The output of a [`PostgresType`](crate::datum::sql_entity_graph::PostgresType) from `quote::ToTokens::to_tokens`.
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct InventoryPostgresType {
+pub struct PostgresTypeEntity {
     pub name: &'static str,
     pub file: &'static str,
     pub line: u32,
@@ -22,15 +22,15 @@ pub struct InventoryPostgresType {
     pub out_fn_module_path: String,
 }
 
-impl crate::PostgresType for InventoryPostgresType {}
+impl crate::PostgresType for PostgresTypeEntity {}
 
-impl Hash for InventoryPostgresType {
+impl Hash for PostgresTypeEntity {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.full_path.hash(state);
     }
 }
 
-impl Ord for InventoryPostgresType {
+impl Ord for PostgresTypeEntity {
     fn cmp(&self, other: &Self) -> Ordering {
         self.file
             .cmp(other.file)
@@ -38,25 +38,25 @@ impl Ord for InventoryPostgresType {
     }
 }
 
-impl PartialOrd for InventoryPostgresType {
+impl PartialOrd for PostgresTypeEntity {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
 
-impl InventoryPostgresType {
+impl PostgresTypeEntity {
     pub fn id_matches(&self, candidate: &core::any::TypeId) -> bool {
         self.mappings.iter().any(|tester| *candidate == tester.id)
     }
 }
 
-impl Into<SqlGraphEntity> for InventoryPostgresType {
+impl Into<SqlGraphEntity> for PostgresTypeEntity {
     fn into(self) -> SqlGraphEntity {
         SqlGraphEntity::Type(self)
     }
 }
 
-impl SqlGraphIdentifier for InventoryPostgresType {
+impl SqlGraphIdentifier for PostgresTypeEntity {
     fn dot_identifier(&self) -> String {
         format!("type {}", self.full_path)
     }
@@ -73,7 +73,7 @@ impl SqlGraphIdentifier for InventoryPostgresType {
     }
 }
 
-impl ToSql for InventoryPostgresType {
+impl ToSql for PostgresTypeEntity {
     #[tracing::instrument(level = "debug", err, skip(self, context), fields(identifier = %self.rust_identifier()))]
     fn to_sql(&self, context: &super::PgxSql) -> eyre::Result<String> {
         let self_index = context.types[self];

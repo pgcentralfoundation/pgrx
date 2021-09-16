@@ -10,12 +10,12 @@ use syn::{punctuated::Punctuated, Ident, Token};
 ///
 /// It should be used with [`syn::parse::Parse`] functions.
 ///
-/// Using [`quote::ToTokens`] will output the declaration for a `pgx::datum::inventory::InventoryPostgresEnum`.
+/// Using [`quote::ToTokens`] will output the declaration for a `pgx::datum::sql_entity_graph::PostgresEnumEntity`.
 ///
 /// ```rust
 /// use syn::{Macro, parse::Parse, parse_quote, parse};
 /// use quote::{quote, ToTokens};
-/// use pgx_utils::inventory::PostgresEnum;
+/// use pgx_utils::sql_entity_graph::PostgresEnum;
 ///
 /// # fn main() -> eyre::Result<()> {
 /// let parsed: PostgresEnum = parse_quote! {
@@ -24,7 +24,7 @@ use syn::{punctuated::Punctuated, Ident, Token};
 ///         Example,
 ///     }
 /// };
-/// let inventory_tokens = parsed.to_token_stream();
+/// let sql_graph_entity_tokens = parsed.to_token_stream();
 /// # Ok(())
 /// # }
 /// ```
@@ -81,20 +81,20 @@ impl ToTokens for PostgresEnum {
         let (_impl_generics, ty_generics, _where_clauses) = static_generics.split_for_impl();
 
         let variants = self.variants.iter();
-        let inventory_fn_name =
+        let sql_graph_entity_fn_name =
             syn::Ident::new(&format!("__pgx_internals_enum_{}", name), Span::call_site());
 
         let inv = quote! {
             #[no_mangle]
             #[link(kind = "static")]
-            pub extern "C" fn  #inventory_fn_name() -> pgx::datum::inventory::SqlGraphEntity {
+            pub extern "C" fn  #sql_graph_entity_fn_name() -> pgx::datum::sql_entity_graph::SqlGraphEntity {
                 let mut mappings = Default::default();
                 <#name #ty_generics as pgx::datum::WithTypeIds>::register_with_refs(&mut mappings, stringify!(#name).to_string());
                 pgx::datum::WithSizedTypeIds::<#name #ty_generics>::register_sized_with_refs(&mut mappings, stringify!(#name).to_string());
                 pgx::datum::WithArrayTypeIds::<#name #ty_generics>::register_array_with_refs(&mut mappings, stringify!(#name).to_string());
                 pgx::datum::WithVarlenaTypeIds::<#name #ty_generics>::register_varlena_with_refs(&mut mappings, stringify!(#name).to_string());
 
-                let submission = pgx::inventory::InventoryPostgresEnum {
+                let submission = pgx::datum::sql_entity_graph::PostgresEnumEntity {
                     name: stringify!(#name),
                     file: file!(),
                     line: line!(),
@@ -103,7 +103,7 @@ impl ToTokens for PostgresEnum {
                     mappings,
                     variants: vec![ #(  stringify!(#variants)  ),* ],
                 };
-                pgx::datum::inventory::SqlGraphEntity::Enum(submission)
+                pgx::datum::sql_entity_graph::SqlGraphEntity::Enum(submission)
             }
         };
         tokens.append_all(inv);

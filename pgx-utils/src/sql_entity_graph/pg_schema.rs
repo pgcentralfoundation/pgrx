@@ -4,23 +4,24 @@ use syn::{
     parse::{Parse, ParseStream},
     ItemMod,
 };
+use std::hash::{Hash, Hasher};
 
 /// A parsed `#[pg_schema] mod example {}` item.
 ///
 /// It should be used with [`syn::parse::Parse`] functions.
 ///
-/// Using [`quote::ToTokens`] will output the declaration for a `pgx::datum::inventory::InventorySchema`.
+/// Using [`quote::ToTokens`] will output the declaration for a `pgx::datum::sql_entity_graph::InventorySchema`.
 ///
 /// ```rust
 /// use syn::{Macro, parse::Parse, parse_quote, parse};
 /// use quote::{quote, ToTokens};
-/// use pgx_utils::inventory::Schema;
+/// use pgx_utils::sql_entity_graph::Schema;
 ///
 /// # fn main() -> eyre::Result<()> {
 /// let parsed: Schema = parse_quote! {
 ///     #[pg_schema] mod example {}
 /// };
-/// let inventory_tokens = parsed.to_token_stream();
+/// let entity_tokens = parsed.to_token_stream();
 /// # Ok(())
 /// # }
 /// ```
@@ -37,7 +38,6 @@ impl Parse for Schema {
     }
 }
 
-use std::hash::{Hash, Hasher};
 impl ToTokens for Schema {
     fn to_tokens(&self, tokens: &mut TokenStream2) {
         let attrs = &self.module.attrs;
@@ -57,21 +57,21 @@ impl ToTokens for Schema {
         // End of hack
 
         let mut updated_content = content_items.clone();
-        let inventory_fn_name = syn::Ident::new(
+        let sql_graph_entity_fn_name = syn::Ident::new(
             &format!("__pgx_internals_schema_{}_{}", ident, postfix),
             Span::call_site(),
         );
         updated_content.push(syn::parse_quote! {
                 #[no_mangle]
                 #[link(kind = "static")]
-                pub extern "C" fn  #inventory_fn_name() -> pgx::datum::inventory::SqlGraphEntity {
-                    let submission = pgx::datum::inventory::InventorySchema {
+                pub extern "C" fn  #sql_graph_entity_fn_name() -> pgx::datum::sql_entity_graph::SqlGraphEntity {
+                    let submission = pgx::datum::sql_entity_graph::SchemaEntity {
                         module_path: module_path!(),
                         name: stringify!(#ident),
                         file: file!(),
                         line: line!(),
                     };
-                    pgx::datum::inventory::SqlGraphEntity::Schema(submission)
+                    pgx::datum::sql_entity_graph::SqlGraphEntity::Schema(submission)
                 }
         });
         let _semi = &self.module.semi;

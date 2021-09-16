@@ -184,7 +184,7 @@ File modules (like `mod name;`) aren't able to be supported due to [`rust/#54725
 */
 #[proc_macro_attribute]
 pub fn pg_schema(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    let pgx_schema = parse_macro_input!(item as inventory::Schema);
+    let pgx_schema = parse_macro_input!(item as sql_entity_graph::Schema);
     pgx_schema.to_token_stream().into()
 }
 
@@ -316,7 +316,7 @@ extension_sql!(r#"\
 #[proc_macro]
 pub fn extension_sql(input: TokenStream) -> TokenStream {
     fn wrapped(input: TokenStream) -> Result<TokenStream, syn::Error> {
-        let ext_sql: inventory::ExtensionSql = syn::parse(input)?;
+        let ext_sql: sql_entity_graph::ExtensionSql = syn::parse(input)?;
         Ok(ext_sql.to_token_stream().into())
     }
 
@@ -361,7 +361,7 @@ For all other options, and examples of them, see [`macro@extension_sql`].
 #[proc_macro]
 pub fn extension_sql_file(input: TokenStream) -> TokenStream {
     fn wrapped(input: TokenStream) -> Result<TokenStream, syn::Error> {
-        let ext_sql: inventory::ExtensionSqlFile = syn::parse(input)?;
+        let ext_sql: sql_entity_graph::ExtensionSqlFile = syn::parse(input)?;
         Ok(ext_sql.to_token_stream().into())
     }
 
@@ -521,12 +521,12 @@ fn example_return() -> pg_sys::Oid {
 pub fn pg_extern(attr: TokenStream, item: TokenStream) -> TokenStream {
     let args = parse_extern_attributes(proc_macro2::TokenStream::from(attr.clone()));
 
-    let inventory_item =
-        inventory::PgExtern::new(attr.clone().into(), item.clone().into()).unwrap();
+    let sql_graph_entity_item =
+        sql_entity_graph::PgExtern::new(attr.clone().into(), item.clone().into()).unwrap();
 
     let ast = parse_macro_input!(item as syn::Item);
     match ast {
-        Item::Fn(func) => rewrite_item_fn(func, args, &inventory_item).into(),
+        Item::Fn(func) => rewrite_item_fn(func, args, &sql_graph_entity_item).into(),
         _ => panic!("#[pg_extern] can only be applied to top-level functions"),
     }
 }
@@ -534,7 +534,7 @@ pub fn pg_extern(attr: TokenStream, item: TokenStream) -> TokenStream {
 fn rewrite_item_fn(
     mut func: ItemFn,
     extern_args: HashSet<ExternArgs>,
-    inventory_submission: &inventory::PgExtern,
+    sql_graph_entity_submission: &sql_entity_graph::PgExtern,
 ) -> proc_macro2::TokenStream {
     let is_raw = extern_args.contains(&ExternArgs::Raw);
     let no_guard = extern_args.contains(&ExternArgs::NoGuard);
@@ -553,7 +553,7 @@ fn rewrite_item_fn(
     func.sig.abi = Some(syn::parse_str("extern \"C\"").unwrap());
     let func_span = func.span();
     let (rewritten_func, need_wrapper) =
-        rewriter.item_fn(func, Some(inventory_submission), true, is_raw, no_guard);
+        rewriter.item_fn(func, Some(sql_graph_entity_submission), true, is_raw, no_guard);
 
     if need_wrapper {
         quote_spanned! {func_span=>
@@ -597,7 +597,7 @@ pub fn postgres_enum(input: TokenStream) -> TokenStream {
 
 fn impl_postgres_enum(ast: DeriveInput) -> proc_macro2::TokenStream {
     let mut stream = proc_macro2::TokenStream::new();
-    let inventory_ast = ast.clone();
+    let sql_graph_entity_ast = ast.clone();
     let enum_ident = ast.ident;
     let enum_name = enum_ident.to_string();
 
@@ -649,8 +649,8 @@ fn impl_postgres_enum(ast: DeriveInput) -> proc_macro2::TokenStream {
         }
     });
 
-    let inventory_item = inventory::PostgresEnum::from_derive_input(inventory_ast).unwrap();
-    inventory_item.to_tokens(&mut stream);
+    let sql_graph_entity_item = sql_entity_graph::PostgresEnum::from_derive_input(sql_graph_entity_ast).unwrap();
+    sql_graph_entity_item.to_tokens(&mut stream);
 
     stream
 }
@@ -769,8 +769,8 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
         });
     }
 
-    let inventory_item = inventory::PostgresType::from_derive_input(ast).unwrap();
-    inventory_item.to_tokens(&mut stream);
+    let sql_graph_entity_item = sql_entity_graph::PostgresType::from_derive_input(ast).unwrap();
+    sql_graph_entity_item.to_tokens(&mut stream);
 
     stream
 }

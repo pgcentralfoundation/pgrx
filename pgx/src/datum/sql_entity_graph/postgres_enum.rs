@@ -5,9 +5,9 @@ use std::{
 
 use super::{SqlGraphEntity, SqlGraphIdentifier, ToSql};
 
-/// The output of a [`PostgresEnum`](crate::datum::inventory::PostgresEnum) from `quote::ToTokens::to_tokens`.
+/// The output of a [`PostgresEnum`](crate::datum::sql_entity_graph::PostgresEnum) from `quote::ToTokens::to_tokens`.
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct InventoryPostgresEnum {
+pub struct PostgresEnumEntity {
     pub name: &'static str,
     pub file: &'static str,
     pub line: u32,
@@ -17,15 +17,15 @@ pub struct InventoryPostgresEnum {
     pub variants: Vec<&'static str>,
 }
 
-impl crate::PostgresType for InventoryPostgresEnum {}
+impl crate::PostgresType for PostgresEnumEntity {}
 
-impl Hash for InventoryPostgresEnum {
+impl Hash for PostgresEnumEntity {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.full_path.hash(state);
     }
 }
 
-impl Ord for InventoryPostgresEnum {
+impl Ord for PostgresEnumEntity {
     fn cmp(&self, other: &Self) -> Ordering {
         self.file
             .cmp(other.file)
@@ -33,25 +33,25 @@ impl Ord for InventoryPostgresEnum {
     }
 }
 
-impl PartialOrd for InventoryPostgresEnum {
+impl PartialOrd for PostgresEnumEntity {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
 
-impl InventoryPostgresEnum {
+impl PostgresEnumEntity {
     pub fn id_matches(&self, candidate: &core::any::TypeId) -> bool {
         self.mappings.iter().any(|tester| *candidate == tester.id)
     }
 }
 
-impl Into<SqlGraphEntity> for InventoryPostgresEnum {
+impl Into<SqlGraphEntity> for PostgresEnumEntity {
     fn into(self) -> SqlGraphEntity {
         SqlGraphEntity::Enum(self)
     }
 }
 
-impl SqlGraphIdentifier for InventoryPostgresEnum {
+impl SqlGraphIdentifier for PostgresEnumEntity {
     fn dot_identifier(&self) -> String {
         format!("enum {}", self.full_path)
     }
@@ -68,7 +68,7 @@ impl SqlGraphIdentifier for InventoryPostgresEnum {
     }
 }
 
-impl ToSql for InventoryPostgresEnum {
+impl ToSql for PostgresEnumEntity {
     #[tracing::instrument(level = "debug", err, skip(self, context), fields(identifier = %self.rust_identifier()))]
     fn to_sql(&self, context: &super::PgxSql) -> eyre::Result<String> {
         let self_index = context.enums[self];
