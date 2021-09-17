@@ -134,10 +134,8 @@ impl Argument {
                     if (saw_pg_sys && saw_functioncallinfobasedata)
                         || (saw_functioncallinfobasedata && segments.segments.len() == 1)
                     {
-                        return Err(syn::Error::new(
-                            Span::call_site(),
-                            "It's a FunctionCallInfoBaseData, skipping",
-                        ));
+                        // It's a FunctionCallInfoBaseData, skipping
+                        return Ok(None)
                     }
                 }
                 _ => (),
