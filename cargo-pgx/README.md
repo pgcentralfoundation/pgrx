@@ -453,21 +453,24 @@ ARGS:
 ## Building an Installation Package
 
 ```shell script
-$ cargo pgx package 
-building extension with features `pg13`
-"cargo" "build" "--release" "--features" "pg13" "--no-default-features"
-   Compiling spi v0.0.0 (/home/yourself/git/zombodb/pgx/pgx-examples/spi)
-    Finished release [optimized] target(s) in 2.67s
+$ cargo pgx package
+building extension with features `pg12`
+"cargo" "build" "--release" "--features" "pg12" "--no-default-features"
+    Finished release [optimized] target(s) in 0.07s
 
 installing extension
-      Copying control file to `target/release/spi-pg13/postgresql-13.3/share/postgresql/extension/spi.control`
-      Copying shared library to `target/release/spi-pg13/nix/store/mrnx57km55v55pix2mrhrjckjlsygzwv-postgresql-13.3-lib/lib/spi.so`
-running SQL generator features `pg13`
-"cargo" "run" "--bin" "sql-generator" "--release" "--features" "pg13" "--no-default-features" "--" "/home/yourself/git/zombodb/pgx/pgx-examples/spi/target/release/spi-pg13/postgresql-13.3/share/postgresql/extension/spi--1.0.sql"
-    Finished release [optimized] target(s) in 0.10s
-     Running `target/release/sql-generator /home/yourself/git/zombodb/pgx/pgx-examples/spi/target/release/spi-pg13/postgresql-13.3/share/postgresql/extension/spi--1.0.sql`
-Aug 03 10:33:23.128  INFO Writing SQL. path=/home/yourself/git/zombodb/pgx/pgx-examples/spi/target/release/spi-pg13/postgresql-13.3/share/postgresql/extension/spi--1.0.sql
-     Finished installing spi
+     Copying control file to `target/release/spi-pg12/usr/share/postgresql/12/extension/spi.control`
+     Copying shared library to `target/release/spi-pg12/usr/lib/postgresql/12/lib/spi.so`
+    Building SQL generator with features `pg12`
+"cargo" "build" "--bin" "sql-generator" "--release" "--features" "pg12" "--no-default-features"
+    Finished release [optimized] target(s) in 0.07s
+ Discovering SQL entities
+  Discovered 8 SQL entities: 0 schemas (0 unique), 6 functions, 0 types, 0 enums, 2 sqls, 0 ords, 0 hashes
+running SQL generator with features `pg12`
+"cargo" "run" "--bin" "sql-generator" "--release" "--features" "pg12" "--no-default-features" "--" "--sql" "/home/yourself/pgx/pgx-examples/spi/target/release/spi-pg12/usr/share/postgresql/12/extension/spi--1.0.sql"
+    Finished release [optimized] target(s) in 0.07s
+     Running `target/release/sql-generator --sql /home/yourself/pgx/pgx-examples/spi/target/release/spi-pg12/usr/share/postgresql/12/extension/spi--1.0.sql`
+    Finished installing spi
 ```
 
 `cargo pgx package [--debug]` builds your extension, in `--release` mode, to a directory structure in
