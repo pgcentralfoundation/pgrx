@@ -20,6 +20,7 @@ use crate::{pg_sys, void_mut_ptr, FromDatum, PgBox, PgMemoryContexts};
 ///
 /// ```rust
 /// use crate::pgx::*;
+/// pgx::pg_module_magic!();
 ///
 /// #[pg_extern]
 /// fn fun_with_default_arg_value(a: i32, b: default!(i32, 99)) -> i32 {
@@ -42,6 +43,11 @@ macro_rules! default {
     };
 }
 
+/// The equivalent of a PostgreSQL `NULL`.
+///
+/// This is used primarily in `default!()` macros.
+pub struct NULL;
+
 /// A macro for providing SQL names for the returned fields for functions that return a Rust tuple,
 /// especially those that return a `std::iter::Iterator<Item=(f1, f2, f3)>`
 ///
@@ -53,8 +59,10 @@ macro_rules! default {
 /// CREATE OR REPLACE FUNCTION get_a_set() RETURNS TABLE (id integer, title text) ...;
 /// ```
 ///
-/// ```rust,no_run
+/// ```rust
 /// use pgx::*;
+/// # pgx::pg_module_magic!();
+///
 /// #[pg_extern]
 /// fn get_a_set() -> impl std::iter::Iterator<Item=(name!(id, i32), name!(title, &'static str))> {
 ///     vec![1, 2, 3].into_iter().zip(vec!["A", "B", "C"].into_iter())
@@ -249,7 +257,7 @@ pub fn pg_func_extra<ReturnType, DefaultValue: FnOnce() -> ReturnType>(
 /// This function is unsafe as the underlying function being called is likely unsafe
 ///
 /// ## Examples
-/// ```rust,no_run
+/// ```rust
 /// use pgx::*;
 ///
 /// #[pg_extern]

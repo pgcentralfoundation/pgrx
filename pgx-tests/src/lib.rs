@@ -7,6 +7,9 @@ mod tests;
 
 pub use framework::*;
 
+#[cfg(any(test, feature = "pg_test"))]
+pgx::pg_sql_graph_magic!();
+
 #[cfg(test)]
 pub mod pg_test {
     pub fn setup(_options: Vec<&str>) {

@@ -29,7 +29,7 @@ pub(crate) fn run_psql(
     if !createdb(pg_config, dbname, false, true)? {
         println!(
             "{} existing database {}",
-            "     Re-using".bold().cyan(),
+            "    Re-using".bold().cyan(),
             dbname
         );
     }

@@ -47,6 +47,7 @@ fn add_animal(mut animals: Animals, name: String, age: i32) -> Animals {
 }
 
 #[cfg(any(test, feature = "pg_test"))]
+#[pg_schema]
 mod tests {
     use crate::complex::{known_animals, Animals};
     use maplit::*;

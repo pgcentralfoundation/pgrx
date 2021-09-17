@@ -15,7 +15,8 @@ INSERT INTO spi_example (title) VALUES ('Hello There!');
 INSERT INTO spi_example (title) VALUES ('I like pudding');
 
 
-"#
+"#,
+    name = "create_sqi_example_table",
 );
 
 #[pg_extern]
@@ -105,10 +106,12 @@ extension_sql!(
 CREATE TABLE foo ();
 
 
-"#
+"#,
+    name = "create_foo_table"
 );
 
 #[cfg(any(test, feature = "pg_test"))]
+#[pg_schema]
 mod tests {
     use crate::spi_query_by_id;
     use pgx::*;

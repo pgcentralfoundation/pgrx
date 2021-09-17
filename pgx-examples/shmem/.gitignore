@@ -4,4 +4,4 @@
 *.iml
 **/*.rs.bk
 Cargo.lock
-sql/*.generated.sql
+sql/shmem-1.0.sql

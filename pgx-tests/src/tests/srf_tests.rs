@@ -62,6 +62,7 @@ fn return_none_setof_iterator() -> Option<impl std::iter::Iterator<Item = i32>> 
 }
 
 #[cfg(any(test, feature = "pg_test"))]
+#[pgx::pg_schema]
 mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;

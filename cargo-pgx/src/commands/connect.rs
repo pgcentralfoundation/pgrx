@@ -15,7 +15,7 @@ pub(crate) fn connect_psql(pg_config: &PgConfig, dbname: &str) -> Result<(), std
     if !createdb(pg_config, dbname, false, true)? {
         println!(
             "{} existing database {}",
-            "     Re-using".bold().cyan(),
+            "    Re-using".bold().cyan(),
             dbname
         );
     }

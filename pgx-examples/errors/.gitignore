@@ -4,4 +4,4 @@
 *.iml
 **/*.rs.bk
 Cargo.lock
-sql/*.generated.sql
+sql/errors-1.0.sql
