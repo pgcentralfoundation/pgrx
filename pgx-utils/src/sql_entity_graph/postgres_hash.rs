@@ -87,7 +87,7 @@ impl ToTokens for PostgresHash {
             #[link(kind = "static")]
             pub extern "C" fn  #sql_graph_entity_fn_name() -> pgx::datum::sql_entity_graph::SqlGraphEntity {
                 use core::any::TypeId;
-                let submission = pgx::datum::sql_entity_graph::InventoryPostgresHash {
+                let submission = pgx::datum::sql_entity_graph::PostgresHashEntity {
                     name: stringify!(#name),
                     file: file!(),
                     line: line!(),
