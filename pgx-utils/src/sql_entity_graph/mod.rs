@@ -29,8 +29,6 @@ pub mod reexports {
     #[doc(hidden)]
     pub use libloading;
     #[doc(hidden)]
-    pub use once_cell;
-    #[doc(hidden)]
     pub use tracing;
     #[doc(hidden)]
     pub use tracing_error;

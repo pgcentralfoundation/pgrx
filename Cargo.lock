@@ -1478,7 +1478,6 @@ dependencies = [
  "env_proxy",
  "eyre",
  "libloading",
- "once_cell",
  "proc-macro2",
  "quote",
  "regex",
