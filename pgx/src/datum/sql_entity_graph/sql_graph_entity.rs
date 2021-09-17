@@ -1,7 +1,6 @@
 use super::{
-    ControlFile, ExtensionSqlEntity, PgExternEntity, PostgresEnumEntity,
-    PostgresHashEntity, PostgresOrdEntity, PostgresTypeEntity, SchemaEntity,
-    SqlGraphIdentifier, ToSql,
+    ControlFile, ExtensionSqlEntity, PgExternEntity, PostgresEnumEntity, PostgresHashEntity,
+    PostgresOrdEntity, PostgresTypeEntity, SchemaEntity, SqlGraphIdentifier, ToSql,
 };
 
 /// An entity corresponding to some SQL required by the extension.

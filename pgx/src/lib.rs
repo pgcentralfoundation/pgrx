@@ -334,8 +334,9 @@ macro_rules! pg_sql_graph_magic {
         // A marker which must exist in the root of the extension.
         #[no_mangle]
         #[link(kind = "static")]
-        pub extern "C" fn __pgx_marker(
-        ) -> pgx::datum::sql_entity_graph::reexports::eyre::Result<pgx::datum::sql_entity_graph::ControlFile> {
+        pub extern "C" fn __pgx_marker() -> pgx::datum::sql_entity_graph::reexports::eyre::Result<
+            pgx::datum::sql_entity_graph::ControlFile,
+        > {
             use pgx::datum::sql_entity_graph::reexports::eyre::WrapErr;
             use std::convert::TryFrom;
             let context = include_str!(concat!(

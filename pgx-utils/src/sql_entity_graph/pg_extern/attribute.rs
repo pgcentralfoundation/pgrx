@@ -56,7 +56,9 @@ impl ToTokens for Attribute {
             Attribute::Volatile => quote! { pgx::datum::sql_entity_graph::ExternArgs::Volatile },
             Attribute::Raw => quote! { pgx::datum::sql_entity_graph::ExternArgs::Raw },
             Attribute::NoGuard => quote! { pgx::datum::sql_entity_graph::ExternArgs::NoGuard },
-            Attribute::ParallelSafe => quote! { pgx::datum::sql_entity_graph::ExternArgs::ParallelSafe },
+            Attribute::ParallelSafe => {
+                quote! { pgx::datum::sql_entity_graph::ExternArgs::ParallelSafe }
+            }
             Attribute::ParallelUnsafe => {
                 quote! { pgx::datum::sql_entity_graph::ExternArgs::ParallelUnsafe }
             }

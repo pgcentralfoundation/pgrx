@@ -552,8 +552,13 @@ fn rewrite_item_fn(
     // make the function 'extern "C"' because this is for the #[pg_extern[ macro
     func.sig.abi = Some(syn::parse_str("extern \"C\"").unwrap());
     let func_span = func.span();
-    let (rewritten_func, need_wrapper) =
-        rewriter.item_fn(func, Some(sql_graph_entity_submission), true, is_raw, no_guard);
+    let (rewritten_func, need_wrapper) = rewriter.item_fn(
+        func,
+        Some(sql_graph_entity_submission),
+        true,
+        is_raw,
+        no_guard,
+    );
 
     if need_wrapper {
         quote_spanned! {func_span=>
@@ -649,7 +654,8 @@ fn impl_postgres_enum(ast: DeriveInput) -> proc_macro2::TokenStream {
         }
     });
 
-    let sql_graph_entity_item = sql_entity_graph::PostgresEnum::from_derive_input(sql_graph_entity_ast).unwrap();
+    let sql_graph_entity_item =
+        sql_entity_graph::PostgresEnum::from_derive_input(sql_graph_entity_ast).unwrap();
     sql_graph_entity_item.to_tokens(&mut stream);
 
     stream

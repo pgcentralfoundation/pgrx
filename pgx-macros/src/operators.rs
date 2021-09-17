@@ -1,4 +1,4 @@
-use pgx_utils::{sql_entity_graph, operator_common::*};
+use pgx_utils::{operator_common::*, sql_entity_graph};
 use quote::ToTokens;
 use syn::DeriveInput;
 

@@ -5,10 +5,10 @@ use petgraph::{dot::Dot, graph::NodeIndex, stable_graph::StableGraph};
 use tracing::instrument;
 
 use super::{
-    ControlFile, ExtensionSqlEntity, PgExternEntity, PgExternReturnEntity,
-    PositioningRef, PostgresEnumEntity, PostgresHashEntity, PostgresOrdEntity,
-    PostgresTypeEntity, SchemaEntity, SqlDeclaredEntity, RustSourceOnlySqlMapping,
-    RustSqlMapping, SqlGraphEntity, SqlGraphIdentifier, ToSql,
+    ControlFile, ExtensionSqlEntity, PgExternEntity, PgExternReturnEntity, PositioningRef,
+    PostgresEnumEntity, PostgresHashEntity, PostgresOrdEntity, PostgresTypeEntity,
+    RustSourceOnlySqlMapping, RustSqlMapping, SchemaEntity, SqlDeclaredEntity, SqlGraphEntity,
+    SqlGraphIdentifier, ToSql,
 };
 use pgx_utils::sql_entity_graph::SqlDeclared;
 
@@ -346,10 +346,7 @@ impl PgxSql {
         }
     }
 
-    pub fn has_sql_declared_entity(
-        &self,
-        identifier: &SqlDeclared,
-    ) -> Option<&SqlDeclaredEntity> {
+    pub fn has_sql_declared_entity(&self, identifier: &SqlDeclared) -> Option<&SqlDeclaredEntity> {
         self.extension_sqls.iter().find_map(|(item, _index)| {
             let retval = item.creates.iter().find_map(|create_entity| {
                 if create_entity.has_sql_declared_entity(identifier) {
@@ -821,14 +818,14 @@ fn connect_externs(
             }
             if !found {
                 for (ext_item, ext_index) in extension_sqls {
-                    if let Some(_) = ext_item.has_sql_declared_entity(&SqlDeclared::Type(
-                        arg.full_path.to_string(),
-                    )) {
+                    if let Some(_) = ext_item
+                        .has_sql_declared_entity(&SqlDeclared::Type(arg.full_path.to_string()))
+                    {
                         tracing::debug!(from = %item.rust_identifier(), to = %arg.rust_identifier(), "Adding Extern(arg) after Extension SQL (due to argument) edge");
                         graph.add_edge(*ext_index, index, SqlGraphRelationship::RequiredByArg);
-                    } else if let Some(_) = ext_item.has_sql_declared_entity(
-                        &SqlDeclared::Enum(arg.full_path.to_string()),
-                    ) {
+                    } else if let Some(_) = ext_item
+                        .has_sql_declared_entity(&SqlDeclared::Enum(arg.full_path.to_string()))
+                    {
                         tracing::debug!(from = %item.rust_identifier(), to = %arg.rust_identifier(), "Adding Extern(arg) after Extension SQL (due to argument) edge");
                         graph.add_edge(*ext_index, index, SqlGraphRelationship::RequiredByArg);
                     }
@@ -871,14 +868,14 @@ fn connect_externs(
                 }
                 if !found {
                     for (ext_item, ext_index) in extension_sqls {
-                        if let Some(_) = ext_item.has_sql_declared_entity(&SqlDeclared::Type(
-                            full_path.to_string(),
-                        )) {
+                        if let Some(_) = ext_item
+                            .has_sql_declared_entity(&SqlDeclared::Type(full_path.to_string()))
+                        {
                             tracing::debug!(from = %item.rust_identifier(), to = full_path, "Adding Extern(arg) after Extension SQL (due to argument) edge");
                             graph.add_edge(*ext_index, index, SqlGraphRelationship::RequiredByArg);
-                        } else if let Some(_) = ext_item.has_sql_declared_entity(
-                            &SqlDeclared::Enum(full_path.to_string()),
-                        ) {
+                        } else if let Some(_) = ext_item
+                            .has_sql_declared_entity(&SqlDeclared::Enum(full_path.to_string()))
+                        {
                             tracing::debug!(from = %item.rust_identifier(), to = full_path, "Adding Extern(arg) after Extension SQL (due to argument) edge");
                             graph.add_edge(*ext_index, index, SqlGraphRelationship::RequiredByArg);
                         }
@@ -926,9 +923,9 @@ fn connect_externs(
                     }
                     if !found {
                         for (ext_item, ext_index) in extension_sqls {
-                            if let Some(_) = ext_item.has_sql_declared_entity(
-                                &SqlDeclared::Type(iterated_return.1.to_string()),
-                            ) {
+                            if let Some(_) = ext_item.has_sql_declared_entity(&SqlDeclared::Type(
+                                iterated_return.1.to_string(),
+                            )) {
                                 tracing::debug!(from = %item.rust_identifier(), to = iterated_return.1, "Adding Extern(arg) after Extension SQL (due to argument) edge");
                                 graph.add_edge(
                                     *ext_index,

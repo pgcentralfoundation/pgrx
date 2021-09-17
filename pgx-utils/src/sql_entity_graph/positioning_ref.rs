@@ -1,6 +1,6 @@
 use quote::{quote, ToTokens};
-use syn::parse::{Parse, ParseStream};
 use std::fmt::Display;
+use syn::parse::{Parse, ParseStream};
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub enum PositioningRef {

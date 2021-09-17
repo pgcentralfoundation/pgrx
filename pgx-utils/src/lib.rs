@@ -1,7 +1,7 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-use crate::{sql_entity_graph::PositioningRef, pg_config::PgConfig};
+use crate::{pg_config::PgConfig, sql_entity_graph::PositioningRef};
 use colored::Colorize;
 use proc_macro2::TokenStream;
 use proc_macro2::TokenTree;
@@ -13,9 +13,9 @@ use std::process::{Command, Stdio};
 use std::str::FromStr;
 use syn::{GenericArgument, ItemFn, PathArguments, ReturnType, Type, TypeParamBound};
 
-pub mod sql_entity_graph;
 pub mod operator_common;
 pub mod pg_config;
+pub mod sql_entity_graph;
 
 pub static BASE_POSTGRES_PORT_NO: u16 = 28800;
 pub static BASE_POSTGRES_TESTING_PORT_NO: u16 = 32200;

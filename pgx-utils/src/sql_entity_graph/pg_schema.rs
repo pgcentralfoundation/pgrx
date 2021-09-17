@@ -1,10 +1,10 @@
 use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
+use std::hash::{Hash, Hasher};
 use syn::{
     parse::{Parse, ParseStream},
     ItemMod,
 };
-use std::hash::{Hash, Hasher};
 
 /// A parsed `#[pg_schema] mod example {}` item.
 ///

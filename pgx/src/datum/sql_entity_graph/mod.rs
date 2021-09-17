@@ -9,7 +9,7 @@ pub use schema::SchemaEntity;
 
 mod pg_extern;
 pub use pg_extern::{
-    PgExternEntity, PgExternArgumentEntity, PgExternReturnEntity, PgOperatorEntity,
+    PgExternArgumentEntity, PgExternEntity, PgExternReturnEntity, PgOperatorEntity,
 };
 
 mod extension_sql;
