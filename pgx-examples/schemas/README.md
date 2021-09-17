@@ -6,12 +6,12 @@ it is the schema argument to `CREATE EXTENSION`.
 
 In general, any `pgx` object (a function, operator, type, etc), regardless of the Rust source
 file it is defined in, is created in that schema unless that object appears in a 
-`mod modname { ... }` block.  In this case, `pgx` generates a top-level schema named the
+`#[pg_schema] mod modname { ... }` block.  In this case, `pgx` generates a top-level schema named the
 same as the module, and creates the contained objects within that schema.    
 
 Unlike Rust, which supports nested modules, Postgres only supports one-level of schemas,
 although a Postgres session can have many schemas in its `search_path`.  As such, any
-`mod modname { ... }` block containing `pgx` objects is hoisted to a top-level schema.
+`#[pg_schema] mod modname { ... }` block containing `pgx` objects is hoisted to a top-level schema.
 
 ### `#[pg_extern]/#[pg_operator]` Functions and their Postgres `search_path`
 

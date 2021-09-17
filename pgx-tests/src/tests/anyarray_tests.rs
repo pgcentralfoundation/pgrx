@@ -10,6 +10,7 @@ fn anyarray_arg(array: AnyArray) -> Json {
 }
 
 #[cfg(any(test, feature = "pg_test"))]
+#[pgx::pg_schema]
 mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;

@@ -42,6 +42,7 @@ fn return_3pm_mountain_time() -> TimestampWithTimeZone {
 }
 
 #[cfg(test)]
+#[pgx::pg_schema]
 mod serialization_tests {
     use pgx::*;
     use serde_json::*;
@@ -106,6 +107,7 @@ mod serialization_tests {
 }
 
 #[cfg(any(test, feature = "pg_test"))]
+#[pgx::pg_schema]
 mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;

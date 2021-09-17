@@ -50,8 +50,10 @@
             rustfmt
             nixpkgs-fmt
             cargo-pgx
+            postgresql
           ];
           LIBCLANG_PATH = "${pkgs.llvmPackages.libclang.lib}/lib";
+          PGX_PG_SYS_SKIP_BINDING_REWRITE = "1";
         });
 
       checks = forAllSystems (system:

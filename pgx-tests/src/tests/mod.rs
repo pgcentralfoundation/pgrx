@@ -30,4 +30,4 @@ mod variadic_tests;
 mod xact_callback_tests;
 mod xid64_tests;
 
-pgx::pg_module_magic!();
+pgx::pg_magic_func!();

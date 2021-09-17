@@ -4,34 +4,22 @@
 use pgx::*;
 use serde_json::*;
 
-/// ```funcname
-/// sum_array
-/// ```
-#[pg_extern]
+#[pg_extern(name = "sum_array")]
 fn sum_array_i32(values: Array<i32>) -> i32 {
     values.iter().map(|v| v.unwrap_or(0i32)).sum()
 }
 
-/// ```funcname
-/// sum_array
-/// ```
-#[pg_extern]
+#[pg_extern(name = "sum_array")]
 fn sum_array_i64(values: Array<i64>) -> i64 {
     values.iter().map(|v| v.unwrap_or(0i64)).sum()
 }
 
-/// ```funcname
-/// sum_array_siced
-/// ```
-#[pg_extern]
+#[pg_extern(name = "sum_array_siced")]
 fn sum_array_i32_sliced(values: Array<i32>) -> i32 {
     values.as_slice().iter().sum()
 }
 
-/// ```funcname
-/// sum_array_sliced
-/// ```
-#[pg_extern]
+#[pg_extern(name = "sum_array_sliced")]
 fn sum_array_i64_sliced(values: Array<i64>) -> i64 {
     values.as_slice().iter().sum()
 }
@@ -94,6 +82,7 @@ fn return_zero_length_vec() -> Vec<i32> {
 }
 
 #[cfg(any(test, feature = "pg_test"))]
+#[pgx::pg_schema]
 mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;

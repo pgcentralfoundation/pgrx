@@ -19,7 +19,7 @@ pub(crate) fn stop_postgres(pg_config: &PgConfig) -> Result<(), std::io::Error> 
 
     println!(
         "{} Postgres v{}",
-        "     Stopping".bold().green(),
+        "    Stopping".bold().green(),
         pg_config.major_version()?
     );
 

@@ -38,10 +38,10 @@ impl<'a, T: FromDatum + serde::Serialize> serde::Serialize for ArrayTypedIterato
 }
 
 impl<'a, T: FromDatum> Array<'a, T> {
-    /// Create an [`Array`] over an array of [pg_sys::Datum] values and a corresponding array
+    /// Create an [`Array`](crate::datum::Array) over an array of [`pg_sys::Datum`](pg_sys::Datum) values and a corresponding array
     /// of "is_null" indicators
     ///
-    /// [`T`] can be [pg_sys::Datum] if the elements are not all of the same type
+    /// `T` can be [`pg_sys::Datum`](pg_sys::Datum) if the elements are not all of the same type
     ///
     /// # Safety
     ///

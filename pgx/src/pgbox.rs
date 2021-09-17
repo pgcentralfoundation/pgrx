@@ -86,7 +86,7 @@ use std::ops::{Deref, DerefMut};
 ///
 /// TODO:
 ///  - Interatctions with Rust's panic!() macro
-///  - Interactions with Poastgres' error!() macro
+///  - Interactions with Postgres' error!() macro
 ///  - Boxing a null pointer -- it works ::from_pg(), ::into_pg(), and ::to_pg(), but will panic!() on all other uses
 ///
 pub struct PgBox<T> {

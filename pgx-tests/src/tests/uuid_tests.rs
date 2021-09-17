@@ -20,6 +20,7 @@ fn display_uuid(uuid: Uuid) -> String {
 }
 
 #[cfg(any(test, feature = "pg_test"))]
+#[pg_schema]
 mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;

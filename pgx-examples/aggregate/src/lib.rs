@@ -76,10 +76,12 @@ extension_sql!(
         finalfunc = integer_avg_final_func,
         initcond = '0,0'
     );
-    "#
+    "#,
+    name = "create_demoavg_aggregate",
 );
 
 #[cfg(any(test, feature = "pg_test"))]
+#[pg_schema]
 mod tests {
     use pgx::*;
     use crate::IntegerAvgState;

@@ -17,6 +17,7 @@ fn option_default_argument(a: Option<default!(&str, "NULL")>) -> &str {
 }
 
 #[cfg(any(test, feature = "pg_test"))]
+#[pgx::pg_schema]
 mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;

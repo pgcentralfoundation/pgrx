@@ -39,7 +39,7 @@
     - Functions
     - Types
     - Enums
- - Hand-written SQL is supported through the `extension_sql!` macro or through on-disk `.sql` files
+ - Hand-written SQL is supported through the `extension_sql!` & `extension_sql_file!` macros
  - Control the order in which SQL is executed during `CREATE EXTENSION ...;`
 
 #### Safety First
