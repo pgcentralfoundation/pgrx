@@ -8,6 +8,7 @@ By our team:
 
 By others (chronological order):
 
+* ["A Rust PostgreSQL Extension for CAS Numbers"](https://depth-first.com/articles/2021/09/07/a-rust-postgresql-extension-for-cas-numbers/) by [Richard L. Apodaca](https://github.com/rapodaca/) ([Metamolecular](https://metamolecular.com/))
 * ["Postgres Extensions in Rust"](https://depth-first.com/articles/2021/08/25/postgres-extensions-in-rust/) by [Richard L. Apodaca](https://github.com/rapodaca/) ([Metamolecular](https://metamolecular.com/))
 * ["Building PostgreSQL Extensions with Rust"](https://tech.marksblogg.com/postgresql-extension-rust.html) by [Mark Litwintschik](https://github.com/marklit)
 * ["Introducing hyperfunctions: new SQL functions to simplify working with time-series data in PostgreSQL"](https://blog.timescale.com/blog/introducing-hyperfunctions-new-sql-functions-to-simplify-working-with-time-series-data-in-postgresql/) by [Joshua Lockerman](https://github.com/JLockerman), [David Kohn](https://github.com/davidkohn88), [Brian Rowe](https://github.com/WireBaron) ([Timescale](https://www.timescale.com/))
