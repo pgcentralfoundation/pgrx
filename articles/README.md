@@ -4,7 +4,7 @@ Articles about `pgx`!
 
 By our team:
 
-* ["Forging SQL from Rust"](TODO) ([archive](forging-sql-from-rust.md)) by [Ana Hobden (`pgx` maintainer)](https://github.com/Hoverbear/)
+* ["Forging SQL from Rust"](TODO) ([archive](forging-sql-from-rust.md)) by [Ana Hobden (a `pgx` maintainer)](https://github.com/Hoverbear/)
 
 By others (chronological order):
 
