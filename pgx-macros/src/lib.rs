@@ -959,3 +959,30 @@ pub fn postgres_hash(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
     impl_postgres_hash(ast).into()
 }
+
+/**
+Declare a type as a `#[pg_aggregate]` to indicate that it can be used by Postgres as an aggregate.
+
+
+*/
+#[proc_macro_attribute]
+pub fn pg_aggregate(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    // We don't care about `_attr` as we can find it in the `ItemMod`.
+    fn wrapped(item: TokenStream) -> Result<TokenStream, syn::Error> {
+        let item_impl = parse_macro_input!(input as syn::ItemImpl);
+        let sql_graph_entity_item = sql_entity_graph::PgAggregate::new(item_impl.into())?;
+
+        sql_graph_entity_item.to_token_stream()
+    }
+
+    
+    match wrapped(item) {
+        Ok(tokens) => tokens,
+        Err(e) => {
+            let msg = e.to_string();
+            TokenStream::from(quote! {
+              compile_error!(#msg);
+            })
+        }
+    }
+}
