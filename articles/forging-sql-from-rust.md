@@ -1,4 +1,5 @@
 # Forging SQL from Rust
+<!-- Written 2021-09-20 -->
 
 > How `pgx` creates PostgreSQL extension SQL definitions that bind to Rust.
 
