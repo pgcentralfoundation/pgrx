@@ -71,12 +71,6 @@ pub(crate) fn generate_schema(
             std::fs::Permissions::from_mode(0o755),
         )
         .unwrap();
-        let expected_dynamic_list = include_str!("../templates/pgx-dynamic-list.txt");
-        check_templated_file(
-            ".cargo/pgx-dynamic-list.txt",
-            expected_dynamic_list.to_string(),
-            force_default,
-        )?;
         let expected_cargo_config = include_str!("../templates/cargo_config");
         check_templated_file(
             ".cargo/config",
@@ -161,7 +155,16 @@ pub(crate) fn generate_schema(
                         }
                     }
                 }
-                _ => panic!("Unable to parse non-ELF symbols. (Please report this, we can  probably fix this!)"),
+                SymbolIterator::MachO(iter) => {
+                    for symbol in iter {
+                        if let Some(name) = symbol.name {
+                            if name.starts_with("__pgx_internals") {
+                                fns_to_call.push(name);
+                            }
+                        }
+                    }
+                }
+                _ => panic!("Unable to parse non-ELF or Mach0 symbols. (Please report this, we can  probably fix this!)"),
             },
             Err(e) => {
                 panic!("Got error inspecting objects: {}", e);
