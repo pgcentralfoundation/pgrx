@@ -63,7 +63,6 @@ impl ToTokens for Schema {
         );
         updated_content.push(syn::parse_quote! {
                 #[no_mangle]
-                #[link(kind = "static")]
                 pub extern "C" fn  #sql_graph_entity_fn_name() -> pgx::datum::sql_entity_graph::SqlGraphEntity {
                     let submission = pgx::datum::sql_entity_graph::SchemaEntity {
                         module_path: module_path!(),

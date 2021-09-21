@@ -8,8 +8,6 @@
 //! ```rust
 //! use pgx::*;
 //!
-//! pg_module_magic!();
-//!
 //! // Convert the input string to lowercase and return
 //! #[pg_extern]
 //! fn my_to_lowercase(input: &'static str) -> String {
@@ -333,7 +331,6 @@ macro_rules! pg_sql_graph_magic {
     () => {
         // A marker which must exist in the root of the extension.
         #[no_mangle]
-        #[link(kind = "static")]
         pub extern "C" fn __pgx_marker() -> pgx::datum::sql_entity_graph::reexports::eyre::Result<
             pgx::datum::sql_entity_graph::ControlFile,
         > {
