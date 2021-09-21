@@ -89,7 +89,6 @@ impl ToTokens for ExtensionSqlFile {
         );
         let inv = quote! {
             #[no_mangle]
-            #[link(kind = "static")]
             pub extern "C" fn  #sql_graph_entity_fn_name() -> pgx::datum::sql_entity_graph::SqlGraphEntity {
                 let submission = pgx::datum::sql_entity_graph::ExtensionSqlEntity {
                     sql: include_str!(#path),
@@ -194,7 +193,6 @@ impl ToTokens for ExtensionSql {
         );
         let inv = quote! {
             #[no_mangle]
-            #[link(kind = "static")]
             pub extern "C" fn  #sql_graph_entity_fn_name() -> pgx::datum::sql_entity_graph::SqlGraphEntity {
                 let submission = pgx::datum::sql_entity_graph::ExtensionSqlEntity {
                     sql: #sql,
