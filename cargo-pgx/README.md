@@ -575,7 +575,6 @@ if [[ $CARGO_BIN_NAME == "sql-generator" ]]; then
 else
     gcc -Wl,-undefined,dynamic_lookup $@
 fi
-
 ```
 
 Which would be configured in `.cargo/config` for supported targets:

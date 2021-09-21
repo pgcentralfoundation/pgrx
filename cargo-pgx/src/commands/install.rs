@@ -53,7 +53,7 @@ pub(crate) fn install_extension(
         additional_features,
         &extdir,
         &base_directory,
-    );
+    )?;
 
     println!("{} installing {}", "    Finished".bold().green(), extname);
     Ok(())
@@ -130,7 +130,7 @@ fn copy_sql_files(
     additional_features: Vec<&str>,
     extdir: &PathBuf,
     base_directory: &PathBuf,
-) {
+) -> Result<(), std::io::Error> {
     let mut dest = base_directory.clone();
     dest.push(extdir);
 
@@ -147,8 +147,7 @@ fn copy_sql_files(
         None,
         false,
         true,
-    )
-    .unwrap();
+    )?;
     let written = std::fs::read_to_string(&dest).unwrap();
     let written = filter_contents(written);
     std::fs::write(&dest, written).unwrap();
@@ -169,6 +168,7 @@ fn copy_sql_files(
             }
         }
     }
+    Ok(())
 }
 
 pub(crate) fn find_library_file(extname: &str, is_release: bool) -> PathBuf {
