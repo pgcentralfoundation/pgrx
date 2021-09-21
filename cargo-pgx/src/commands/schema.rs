@@ -140,7 +140,7 @@ pub(crate) fn generate_schema(
     println!("{} SQL entities", " Discovering".bold().green(),);
     let dsym_path = sql_gen_path.resolve_dsym();
     let buffer = ByteView::open(dsym_path.as_deref().unwrap_or(&sql_gen_path))?;
-    let archive = Archive::parse(&buffer).unwrap();
+    let archive = Archive::parse(&buffer).expect("Could not parse archive");
 
     let mut fns_to_call = Vec::new();
     for object in archive.objects() {
