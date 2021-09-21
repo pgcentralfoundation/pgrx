@@ -569,7 +569,7 @@ if [[ $CARGO_BIN_NAME == "sql-generator" ]]; then
     else
         TEMP=$(mktemp pgx-XXX)
         echo "{ __pgx_internals_*; };" > ${TEMP}
-        gcc -Wl,-undefined,dynamic_lookup,-dynamic-list=${TEMP} $@
+        gcc -Wl,-dynamic-list=${TEMP} $@
         rm -rf ${TEMP}
     fi
 else
