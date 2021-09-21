@@ -6,6 +6,7 @@ mod postgres_enum;
 mod postgres_hash;
 mod postgres_ord;
 mod postgres_type;
+mod pg_aggregate;
 
 pub use super::ExternArgs;
 pub use extension_sql::{ExtensionSql, ExtensionSqlFile, SqlDeclared};

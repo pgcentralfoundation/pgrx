@@ -1,6 +1,11 @@
 mod pgx_sql;
 pub use pgx_sql::PgxSql;
 
+mod aggregate;
+pub use aggregate::{
+    Aggregate, ParallelOption
+};
+
 mod control_file;
 pub use control_file::ControlFile;
 

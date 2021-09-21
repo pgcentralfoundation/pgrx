@@ -6,9 +6,17 @@ use syn::{
 };
 use syn::{punctuated::Punctuated, Ident, Token};
 
-
+#[derive(Debug, Clone, Hash, Eq, PartialEq)]
 pub struct AggregateAttrs {
     attrs: Punctuated<AggregateAttr, Token![,]>
+}
+
+impl Parse for AggregateAttrs {
+    fn parse(input: ParseStream) -> Result<Self, syn::Error> {
+        Ok(Self {
+            attrs: input.parse_terminated(AggregateAttr::parse)?,
+        })
+    }
 }
 
 impl ToTokens for AggregateAttrs {
@@ -23,44 +31,27 @@ impl ToTokens for AggregateAttrs {
 
 #[derive(Debug, Clone, Hash, Eq, PartialEq)]
 pub enum AggregateAttr {
-    Parallel(ParallelOption),
+    Parallel(syn::TypePath),
     InitialCondition(syn::LitStr),
     MovingInitialCondition(syn::LitStr),
     Hypothetical,
 }
 
-pub enum ParallelOption {
-    Safe,
-    Restricted,
-    Unsafe,
-}
-
-impl Parse for ParallelOption {
+impl Parse for AggregateAttr {
     fn parse(input: ParseStream) -> Result<Self, syn::Error> {
-        let parallel_option: syn::Path = input.parse()?;
-        if let Some(ident) = parallel_option.get_ident() {
-            match ident.to_tokens().to_string() {
-                "Safe" => Ok(Self::Safe),
-                "Restricted" => Ok(Self::Restricted),
-                "Unsafe" => Ok(Self::Unsafe),
+        let ident: syn::Ident = input.parse()?;
+        let found = match ident.to_string().as_str() {
+            "immutable" => Self::Immutable,
+            "parallel" => {
+                let _eq: Token![=] = input.parse()?;
+                let literal: syn::TypePath = input.parse()?;
+                Self::Error(literal)
             }
-        } else {
-            Ok(Vec::new())
-        }
-        
-        Ok()
-    }
-}
-
-
-impl ToTokens for ParallelOption {
-    fn to_tokens(&self, tokens: &mut TokenStream2) {
-        let quoted = quote! {
-            #self
         };
-        tokens.append_all(quoted);
+        Ok(found)
     }
 }
+
 
 /** A parsed `#[pg_aggregate]` item.
 */
