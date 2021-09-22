@@ -197,8 +197,6 @@ unsafe extern "C" fn worker_spi_sigterm(_signal_args: i32) {
 /// use pgx::bgworkers::BackgroundWorkerBuilder;
 /// use pgx::*;
 ///
-/// pg_module_magic!();
-///
 /// #[pg_guard]
 /// pub extern "C" fn _PG_init() {
 ///     BackgroundWorkerBuilder::new("My Example BGWorker")

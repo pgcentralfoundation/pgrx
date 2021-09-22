@@ -20,7 +20,6 @@ use crate::{pg_sys, void_mut_ptr, FromDatum, PgBox, PgMemoryContexts};
 ///
 /// ```rust
 /// use crate::pgx::*;
-/// pgx::pg_module_magic!();
 ///
 /// #[pg_extern]
 /// fn fun_with_default_arg_value(a: i32, b: default!(i32, 99)) -> i32 {
@@ -61,7 +60,6 @@ pub struct NULL;
 ///
 /// ```rust
 /// use pgx::*;
-/// # pgx::pg_module_magic!();
 ///
 /// #[pg_extern]
 /// fn get_a_set() -> impl std::iter::Iterator<Item=(name!(id, i32), name!(title, &'static str))> {
