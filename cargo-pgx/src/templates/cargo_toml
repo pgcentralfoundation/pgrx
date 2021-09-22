@@ -23,6 +23,7 @@ pgx-tests = "0.1.22"
 
 [profile.dev]
 panic = "unwind"
+lto = "fat"
 
 [profile.release]
 panic = "unwind"
