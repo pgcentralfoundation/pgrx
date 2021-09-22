@@ -296,7 +296,7 @@ fn toml_value_has_setting(
             None => false,
         }
     } else {
-        panic!("Got zero segments in cargo toml setting to search for.")
+        panic!("Got zero segments in Cargo.toml setting to search for.")
     }
 }
 
