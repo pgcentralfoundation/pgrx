@@ -270,6 +270,7 @@ dependencies = [
  "rttp_client",
  "symbolic",
  "syn",
+ "toml",
  "unescape",
 ]
 

@@ -3,6 +3,7 @@ use crate::commands::get::get_property;
 use colored::Colorize;
 use pgx_utils::pg_config::PgConfig;
 use pgx_utils::{exit_with_error, handle_result};
+use std::collections::HashMap;
 use std::fs::File;
 use std::os::unix::prelude::PermissionsExt;
 use std::{
@@ -77,6 +78,15 @@ pub(crate) fn generate_schema(
             expected_cargo_config.to_string(),
             force_default,
         )?;
+
+        let mut settings = HashMap::new();
+        settings.insert(["lib", "crate-type"].as_ref(), toml::Value::Array(vec![
+            toml::Value::String("cdylib".into()),
+            toml::Value::String("rlib".into()),
+        ]));
+        settings.insert(["profile", "dev", "lto"].as_ref(), toml::Value::String("thin".into()));
+        settings.insert(["profile", "release", "lto"].as_ref(), toml::Value::String("fat".into()));
+        check_cargo_toml_settings(settings)?;
     }
 
     if get_property("relocatable") != Some("false".into()) {
@@ -270,6 +280,60 @@ pub(crate) fn generate_schema(
     Ok(())
 }
 
+fn toml_value_has_setting(
+    target: &toml::Value,
+    segments: &[&str],
+    expected_value: toml::Value,
+) -> bool {
+    if let Some(segment) = segments.first() {
+        let rest = &segments[1..];
+        match target.get(&segment) {
+            Some(existing_value) if existing_value == &expected_value => true,
+            Some(existing_value @ toml::Value::Table(_)) => {
+                toml_value_has_setting(existing_value, rest, expected_value)
+            }
+            Some(_existing_value) => false,
+            None => false,
+        }
+    } else {
+        panic!("Got zero segments in cargo toml setting to search for.")
+    }
+}
+
+/// Returns Ok(()) if something was changed.
+fn check_cargo_toml_settings(
+    expected_settings: HashMap<&[&str], toml::Value>,
+) -> Result<(), std::io::Error> {
+    let cargo_toml_contents = match File::open(&"Cargo.toml") {
+        Ok(mut file) => {
+            let mut buf = String::default();
+            file.read_to_string(&mut buf)?;
+            buf
+        },
+        Err(err) => {
+            if err.kind() == std::io::ErrorKind::NotFound {
+                panic!("Could not get Cargo.toml in crate directory.")
+            } else {
+                return Err(err);
+            }
+        }
+    };
+
+    let cargo_toml: toml::Value = toml::from_str(&cargo_toml_contents)?;
+
+    for (setting, expected_value) in expected_settings {
+        if !toml_value_has_setting(&cargo_toml, setting, expected_value) {
+            println!(
+                "{} custom Cargo.toml setting `{}`. (having trouble? `cargo pgx schema --help` details settings needed)",
+                "   Detecting".bold().green(),
+                setting.join("."),
+            );
+        }
+    }
+    
+    Ok(())
+}
+
 /// Returns Ok(true) if something was created.
 fn check_templated_file(
     path: impl AsRef<Path>,
@@ -278,11 +342,11 @@ fn check_templated_file(
 ) -> Result<bool, std::io::Error> {
     let path = path.as_ref();
     let existing_contents = match File::open(&path) {
-        Ok(mut file) => Some({
+        Ok(mut file) => {
             let mut buf = String::default();
             file.read_to_string(&mut buf)?;
             Some(buf)
-        }),
+        },
         Err(err) => {
             if err.kind() == std::io::ErrorKind::NotFound {
                 None
@@ -293,7 +357,7 @@ fn check_templated_file(
     };
 
     match existing_contents {
-        Some(contents) if contents == Some(expected_content.clone()) => Ok(false),
+        Some(contents) if contents == expected_content.clone() => Ok(false),
         Some(_content) => {
             if overwrite {
                 println!(
