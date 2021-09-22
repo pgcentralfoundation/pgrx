@@ -2,7 +2,9 @@
 // governed by the MIT license that can be found in the LICENSE file.
 
 use std::io::Write;
+use std::fs;
 use std::path::PathBuf;
+use std::os::unix::fs::PermissionsExt;
 
 pub(crate) fn create_crate_template(
     path: PathBuf,
@@ -57,13 +59,28 @@ fn create_cargo_toml(path: &PathBuf, name: &str) -> Result<(), std::io::Error> {
 }
 
 fn create_dotcargo_config(path: &PathBuf, _name: &str) -> Result<(), std::io::Error> {
-    let mut filename = path.clone();
+    let mut cargo_dir = path.clone();
+    cargo_dir.push(".cargo");
+    if !cargo_dir.exists() {
+        std::fs::create_dir(&cargo_dir).expect(format!("cannot create dir {}", cargo_dir.clone().display()).as_str());
+    }
 
-    filename.push(".cargo");
-    filename.push("config");
-    let mut file = std::fs::File::create(filename)?;
+    let mut filepath = cargo_dir.clone();
+    filepath.push("config");
+    let mut file =  std::fs::File::create(&filepath).expect(format!("cannot create {}", filepath.clone().display()).as_str());
+    file.write_all(include_bytes!("../templates/cargo_config")).expect(format!("cannot write {}", filepath.clone().display()).as_str());
 
-    file.write_all(include_bytes!("../templates/cargo_config"))?;
+
+    let mut filepath = cargo_dir.clone();
+    filepath.push("pgx-linker-script.sh");
+    let mut file =  std::fs::File::create(&filepath).expect(format!("cannot create {}", filepath.clone().display()).as_str());
+    file.write_all(include_bytes!("../templates/pgx-linker-script.sh")).expect(format!("cannot write {}", filepath.clone().display()).as_str());
+    fs::set_permissions(&filepath, PermissionsExt::from_mode(0o771)).expect(format!("cannot set executable {}", filepath.clone().display()).as_str());
+
+    let mut filepath = cargo_dir.clone();
+    filepath.push("pgx-dynamic-list.txt");
+    let mut file =  std::fs::File::create(&filepath).expect(format!("cannot create {}", filepath.clone().display()).as_str());
+    file.write_all(include_bytes!("../templates/pgx-dynamic-list.txt")).expect(format!("cannot write {}", filepath.clone().display()).as_str());
 
     Ok(())
 }
