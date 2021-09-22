@@ -74,7 +74,7 @@ thread_local! { pub(crate) static MAIN_THREAD: once_cell::sync::OnceCell<()> = o
 /// concurrency invariants have been satisfied, e.g. no concurrency.
 #[cfg(debug_assertions)]
 pub(crate) fn is_main_thread() -> bool {
-    MAIN_THREAD.with(|v| v.get().is_some()
+    MAIN_THREAD.with(|v| v.get().is_some())
 }
 
 pub fn register_pg_guard_panic_handler() {
