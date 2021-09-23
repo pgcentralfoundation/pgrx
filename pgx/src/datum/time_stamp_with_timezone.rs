@@ -3,11 +3,15 @@
 
 use crate::datum::time::USECS_PER_SEC;
 use crate::{direct_function_call_as_datum, pg_sys, FromDatum, IntoDatum};
-use std::ops::{Deref, DerefMut};
-use time::UtcOffset;
+use std::{
+    convert::TryFrom,
+    ops::{Deref, DerefMut},
+};
+use time::{format_description::FormatItem, UtcOffset};
 
 #[derive(Debug)]
 pub struct TimestampWithTimeZone(time::OffsetDateTime);
+
 impl FromDatum for TimestampWithTimeZone {
     #[inline]
     unsafe fn from_datum(
@@ -42,10 +46,15 @@ impl FromDatum for TimestampWithTimeZone {
                 &mut tzn,
                 std::ptr::null_mut(),
             );
-            let date = time::Date::try_from_ymd(tm.tm_year, tm.tm_mon as u8, tm.tm_mday as u8)
-                .expect("failed to create date from TimestampWithTimeZonez");
+            let date = time::Date::from_calendar_date(
+                tm.tm_year,
+                time::Month::try_from(tm.tm_mon as u8)
+                    .expect("Got month outside of range in TimestampWithTimeZone::from_datum"),
+                tm.tm_mday as u8,
+            )
+            .expect("failed to create date from TimestampWithTimeZone");
 
-            let time = time::Time::try_from_hms_micro(
+            let time = time::Time::from_hms_micro(
                 tm.tm_hour as u8,
                 tm.tm_min as u8,
                 tm.tm_sec as u8,
@@ -56,11 +65,15 @@ impl FromDatum for TimestampWithTimeZone {
             Some(TimestampWithTimeZone(
                 time::PrimitiveDateTime::new(date, time)
                     .assume_utc()
-                    .to_offset(UtcOffset::seconds(tz)),
+                    .to_offset(
+                        UtcOffset::from_whole_seconds(tz)
+                            .expect("Unexpected error in `UtcOffset::from_whole_seconds` during `TimestampWithTimeZone::from_datum`")
+                    ),
             ))
         }
     }
 }
+
 impl IntoDatum for TimestampWithTimeZone {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
@@ -95,7 +108,10 @@ impl TimestampWithTimeZone {
     pub fn new(time: time::PrimitiveDateTime, at_tz_offset: time::UtcOffset) -> Self {
         TimestampWithTimeZone(
             time.assume_utc()
-                .to_offset(UtcOffset::seconds(-at_tz_offset.as_seconds())),
+                .to_offset(
+                    UtcOffset::from_whole_seconds(-at_tz_offset.whole_seconds())
+                        .expect("Unexpected error in `UtcOffset::from_whole_seconds` during `TimestampWithTimeZone::new`")
+                ),
         )
     }
 }
@@ -123,10 +139,40 @@ impl serde::Serialize for TimestampWithTimeZone {
     {
         if self.millisecond() > 0 {
             serializer.serialize_str(
-                &self.format(&format!("%Y-%m-%dT%H:%M:%S.{}-00", self.millisecond())),
+                &self
+                    .format(
+                        &time::format_description::parse(&format!(
+                            "[year]-[month]-[day]T[hour]:[minute]:[second].{}-00",
+                            self.millisecond()
+                        ))
+                        .map_err(|e| {
+                            serde::ser::Error::custom(format!(
+                                "TimeStampWithTimeZone invalid format problem: {:?}",
+                                e
+                            ))
+                        })?,
+                    )
+                    .map_err(|e| {
+                        serde::ser::Error::custom(format!(
+                            "TimeStampWithTimeZone formatting problem: {:?}",
+                            e
+                        ))
+                    })?,
             )
         } else {
-            serializer.serialize_str(&self.format("%Y-%m-%dT%H:%M:%S-00"))
+            serializer.serialize_str(
+                &self
+                    .format(&DEFAULT_TIMESTAMP_WITH_TIMEZONE_FORMAT)
+                    .map_err(|e| {
+                        serde::ser::Error::custom(format!(
+                            "TimeStampWithTimeZone formatting problem: {:?}",
+                            e
+                        ))
+                    })?,
+            )
         }
     }
 }
+
+static DEFAULT_TIMESTAMP_WITH_TIMEZONE_FORMAT: &[FormatItem<'static>] =
+    time::macros::format_description!("[year]-[month]-[day]T[hour]:[minute]:[second]-00");

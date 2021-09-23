@@ -1,4 +1,3 @@
-use heapless::consts::*;
 use pgx::*;
 use serde::*;
 use std::iter::Iterator;
@@ -24,8 +23,8 @@ impl Default for Pgtest {
 }
 unsafe impl PGXSharedMemory for Pgtest {}
 
-static VEC: PgLwLock<heapless::Vec<Pgtest, U400>> = PgLwLock::new();
-static HASH: PgLwLock<heapless::FnvIndexMap<i32, i32, U4>> = PgLwLock::new();
+static VEC: PgLwLock<heapless::Vec<Pgtest, 400>> = PgLwLock::new();
+static HASH: PgLwLock<heapless::FnvIndexMap<i32, i32, 4>> = PgLwLock::new();
 static STRUCT: PgLwLock<Pgtest> = PgLwLock::new();
 static PRIMITIVE: PgLwLock<i32> = PgLwLock::new();
 static ATOMIC: PgAtomic<std::sync::atomic::AtomicBool> = PgAtomic::new();

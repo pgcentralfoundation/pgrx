@@ -3,6 +3,7 @@
 
 use crate::{pg_sys, FromDatum, IntoDatum};
 use std::ops::{Deref, DerefMut};
+use time::format_description::FormatItem;
 
 pub(crate) const USECS_PER_HOUR: i64 = 3_600_000_000;
 pub(crate) const USECS_PER_MINUTE: i64 = 60_000_000;
@@ -32,13 +33,8 @@ impl FromDatum for Time {
             let microsecond = time;
 
             Some(Time(
-                time::Time::try_from_hms_micro(
-                    hour as u8,
-                    min as u8,
-                    second as u8,
-                    microsecond as u32,
-                )
-                .expect("failed to convert time"),
+                time::Time::from_hms_micro(hour as u8, min as u8, second as u8, microsecond as u32)
+                    .expect("failed to convert time"),
             ))
         }
     }
@@ -89,9 +85,31 @@ impl serde::Serialize for Time {
         S: serde::Serializer,
     {
         if self.millisecond() > 0 {
-            serializer.serialize_str(&self.format(&format!("%H:%M:%S.{}", self.millisecond())))
+            serializer.serialize_str(
+                &self
+                    .format(
+                        &time::format_description::parse(&format!(
+                            "[hour]:[minute]:[second].{}",
+                            self.millisecond()
+                        ))
+                        .map_err(|e| {
+                            serde::ser::Error::custom(format!(
+                                "Time invalid format problem: {:?}",
+                                e
+                            ))
+                        })?,
+                    )
+                    .map_err(|e| {
+                        serde::ser::Error::custom(format!("Time formatting problem: {:?}", e))
+                    })?,
+            )
         } else {
-            serializer.serialize_str(&self.format("%H:%M:%S"))
+            serializer.serialize_str(&self.format(&DEFAULT_TIME_FORMAT).map_err(|e| {
+                serde::ser::Error::custom(format!("Time formatting problem: {:?}", e))
+            })?)
         }
     }
 }
+
+static DEFAULT_TIME_FORMAT: &[FormatItem<'static>] =
+    time::macros::format_description!("[hour]:[minute]:[second]");
