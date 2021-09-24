@@ -310,7 +310,7 @@ impl<T: 'static> WithSizedTypeIds<T> {
     }
 }
 
-/// A [`datum::Array`] compatible type which can have it's [`core::any::TypeId`]s registered for Rust to SQL mapping.
+/// A [`Array`] compatible type which can have it's [`core::any::TypeId`]s registered for Rust to SQL mapping.
 ///
 /// An example use of this trait:
 ///
@@ -387,7 +387,7 @@ impl<T: FromDatum + 'static> WithArrayTypeIds<T> {
     }
 }
 
-/// A [`datum::PgVarlena`] compatible type which can have it's [`core::any::TypeId`]s registered for Rust to SQL mapping.
+/// A [`PgVarlena`] compatible type which can have it's [`core::any::TypeId`]s registered for Rust to SQL mapping.
 ///
 /// An example use of this trait:
 ///

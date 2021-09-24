@@ -9,7 +9,7 @@ use syn::{
 
 /// A parsed `#[pg_extern]` argument.
 ///
-/// It is created during [`PgExtern`](intentory::PgExtern) parsing.
+/// It is created during [`PgExtern`](pgx_utils::sql_entity_graph::PgExtern) parsing.
 #[derive(Debug, Clone)]
 pub struct Argument {
     pat: syn::Ident,
