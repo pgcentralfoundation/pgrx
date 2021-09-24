@@ -14,7 +14,7 @@ use quote::{quote, quote_spanned, ToTokens};
 use rewriter::*;
 use std::collections::HashSet;
 use syn::spanned::Spanned;
-use syn::{parse_macro_input, Attribute, Data, DeriveInput, Item, ItemFn};
+use syn::{Attribute, Data, DeriveInput, Item, ItemFn, ItemImpl, parse_macro_input};
 
 /// Declare a function as `#[pg_guard]` to indicate that it is called from a Postgres `extern "C"`
 /// function so that Rust `panic!()`s (and Postgres `elog(ERROR)`s) will be properly handled by `pgx`
@@ -968,15 +968,14 @@ Declare a type as a `#[pg_aggregate]` to indicate that it can be used by Postgre
 #[proc_macro_attribute]
 pub fn pg_aggregate(_attr: TokenStream, item: TokenStream) -> TokenStream {
     // We don't care about `_attr` as we can find it in the `ItemMod`.
-    fn wrapped(item: TokenStream) -> Result<TokenStream, syn::Error> {
-        let item_impl = parse_macro_input!(input as syn::ItemImpl);
+    fn wrapped(item_impl: ItemImpl) -> Result<TokenStream, syn::Error> {
         let sql_graph_entity_item = sql_entity_graph::PgAggregate::new(item_impl.into())?;
 
-        sql_graph_entity_item.to_token_stream()
+        Ok(sql_graph_entity_item.to_token_stream().into())
     }
 
-    
-    match wrapped(item) {
+    let parsed_base = parse_macro_input!(item as syn::ItemImpl);
+    match wrapped(parsed_base) {
         Ok(tokens) => tokens,
         Err(e) => {
             let msg = e.to_string();
