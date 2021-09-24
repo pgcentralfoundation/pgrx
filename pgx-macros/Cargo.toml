@@ -1,6 +1,6 @@
 [package]
 name = "pgx-macros"
-version = "0.1.22"
+version = "0.2.0-beta.0"
 authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
 edition = "2018"
 license = "MIT"
@@ -26,7 +26,7 @@ proc-macro = true
 rustc-args = ["--cfg", "docsrs"]
 
 [dependencies]
-pgx-utils = { path = "../pgx-utils", version = "0.1.22" }
+pgx-utils = { path = "../pgx-utils", version = "0.2.0-beta.0" }
 proc-macro2 = "1.0.29"
 quote = "1.0.9"
 syn = { version = "1.0.76", features = [ "extra-traits", "full", "fold", "parsing" ] }
@@ -34,6 +34,6 @@ unescape = "0.1.0"
 proc-macro-crate = "1.0.0"
 
 [dev-dependencies]
-pgx = { path = "../pgx", version = "0.1.21" }
-pgx-pg-sys = { path = "../pgx-pg-sys", version = "0.1.21" }
+pgx = { path = "../pgx", version = "0.2.0-beta.0" }
+pgx-pg-sys = { path = "../pgx-pg-sys", version = "0.2.0-beta.0" }
 serde = "1.0.117"

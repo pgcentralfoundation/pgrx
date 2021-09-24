@@ -254,7 +254,7 @@ dependencies = [
 
 [[package]]
 name = "cargo-pgx"
-version = "0.1.22"
+version = "0.2.0-beta.0"
 dependencies = [
  "clap",
  "colored",
@@ -1330,7 +1330,7 @@ dependencies = [
 
 [[package]]
 name = "pgx"
-version = "0.1.22"
+version = "0.2.0-beta.0"
 dependencies = [
  "atomic-traits",
  "bitflags",
@@ -1356,7 +1356,7 @@ dependencies = [
 
 [[package]]
 name = "pgx-macros"
-version = "0.1.22"
+version = "0.2.0-beta.0"
 dependencies = [
  "pgx",
  "pgx-pg-sys",
@@ -1371,7 +1371,7 @@ dependencies = [
 
 [[package]]
 name = "pgx-parent"
-version = "0.1.22"
+version = "0.2.0-beta.0"
 dependencies = [
  "cargo-pgx",
  "pgx",
@@ -1382,7 +1382,7 @@ dependencies = [
 
 [[package]]
 name = "pgx-pg-sys"
-version = "0.1.22"
+version = "0.2.0-beta.0"
 dependencies = [
  "bindgen",
  "build-deps",
@@ -1400,7 +1400,7 @@ dependencies = [
 
 [[package]]
 name = "pgx-tests"
-version = "0.1.22"
+version = "0.2.0-beta.0"
 dependencies = [
  "colored",
  "lazy_static",
@@ -1418,7 +1418,7 @@ dependencies = [
 
 [[package]]
 name = "pgx-utils"
-version = "0.1.22"
+version = "0.2.0-beta.0"
 dependencies = [
  "clap",
  "color-eyre",
