@@ -420,6 +420,8 @@ impl SpiTupleTable {
                 Some(tupdesc) => unsafe {
                     let heap_tuple = std::slice::from_raw_parts((*self.table).vals, self.size)
                         [self.current as usize];
+
+                    // SAFETY:  we know heap_tuple is valid because we just made it
                     Some(SpiHeapTupleData::new(tupdesc, heap_tuple))
                 },
                 None => panic!("TupDesc is NULL"),
@@ -458,24 +460,22 @@ impl SpiTupleTable {
 
 impl SpiHeapTupleData {
     /// Create a new `SpiHeapTupleData` from its constituent parts
-    pub fn new(tupdesc: pg_sys::TupleDesc, htup: *mut pg_sys::HeapTupleData) -> Self {
+    pub unsafe fn new(tupdesc: pg_sys::TupleDesc, htup: *mut pg_sys::HeapTupleData) -> Self {
         let mut data = SpiHeapTupleData {
             tupdesc,
             entries: HashMap::default(),
         };
 
-        unsafe {
-            for i in 1..=tupdesc.as_ref().unwrap().natts {
-                let mut is_null = false;
-                let datum = pg_sys::SPI_getbinval(htup, tupdesc, i, &mut is_null);
+        for i in 1..=tupdesc.as_ref().unwrap().natts {
+            let mut is_null = false;
+            let datum = pg_sys::SPI_getbinval(htup, tupdesc, i, &mut is_null);
 
-                data.entries
-                    .entry(i as usize)
-                    .or_insert_with(|| SpiHeapTupleDataEntry {
-                        datum: if is_null { None } else { Some(datum) },
-                        type_oid: pg_sys::SPI_gettypeid(tupdesc, i),
-                    });
-            }
+            data.entries
+                .entry(i as usize)
+                .or_insert_with(|| SpiHeapTupleDataEntry {
+                    datum: if is_null { None } else { Some(datum) },
+                    type_oid: pg_sys::SPI_gettypeid(tupdesc, i),
+                });
         }
 
         data
