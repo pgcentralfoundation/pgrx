@@ -283,12 +283,12 @@ pub(crate) fn generate_schema(
 fn toml_value_has_setting(
     target: &toml::Value,
     segments: &[&str],
-    expected_value: toml::Value,
+    expected_value: &toml::Value,
 ) -> bool {
     if let Some(segment) = segments.first() {
         let rest = &segments[1..];
         match target.get(&segment) {
-            Some(existing_value) if existing_value == &expected_value => true,
+            Some(existing_value) if existing_value == expected_value => true,
             Some(existing_value @ toml::Value::Table(_)) => {
                 toml_value_has_setting(existing_value, rest, expected_value)
             }
@@ -322,11 +322,12 @@ fn check_cargo_toml_settings(
     let cargo_toml: toml::Value = toml::from_str(&cargo_toml_contents)?;
 
     for (setting, expected_value) in expected_settings {
-        if !toml_value_has_setting(&cargo_toml, setting, expected_value) {
+        if !toml_value_has_setting(&cargo_toml, setting, &expected_value) {
             println!(
-                "{} custom Cargo.toml setting `{}`. (having trouble? `cargo pgx schema --help` details settings needed)",
+                "{} custom Cargo.toml setting `{}`, expected `{}`. (having trouble? `cargo pgx schema --help` details settings needed)",
                 "   Detecting".bold().green(),
                 setting.join("."),
+                expected_value,
             );
         }
     }
