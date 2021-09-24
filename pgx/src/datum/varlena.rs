@@ -19,8 +19,11 @@ struct PallocdVarlena {
 impl Clone for PallocdVarlena {
     fn clone(&self) -> Self {
         let len = self.len;
-        let ptr = PgMemoryContexts::Of(self.ptr as void_mut_ptr)
-            .copy_ptr_into(self.ptr as void_mut_ptr, len) as *mut pg_sys::varlena;
+
+        // SAFETY:  we know that `self.ptr` is valid as the only way we could have gotten one
+        // is internally via Postgres
+        let ptr = unsafe { PgMemoryContexts::Of(self.ptr as void_mut_ptr)
+            .copy_ptr_into(self.ptr as void_mut_ptr, len) as *mut pg_sys::varlena };
 
         PallocdVarlena { ptr, len }
     }

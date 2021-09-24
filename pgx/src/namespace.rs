@@ -25,8 +25,12 @@ impl PgQualifiedNameBuilder {
     }
 
     pub fn push(mut self, value: &str) -> PgQualifiedNameBuilder {
-        self.list
-            .push(unsafe { pg_sys::makeString(std::ffi::CString::new(value).unwrap().into_raw()) });
+        unsafe {
+            // SAFETY:  the result of pg_sys::makeString is always a valid pointer
+            self.list.push(pg_sys::makeString(
+                std::ffi::CString::new(value).unwrap().into_raw(),
+            ));
+        }
         self
     }
 

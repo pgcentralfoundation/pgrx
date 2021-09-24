@@ -72,7 +72,8 @@ impl<'a> PgTupleDesc<'a> {
     /// When this instance is dropped, the copied TupleDesc is `pfree()`'d
     pub fn from_pg_copy<'b>(ptr: pg_sys::TupleDesc) -> PgTupleDesc<'b> {
         PgTupleDesc {
-            tupdesc: PgBox::from_pg(unsafe { pg_sys::CreateTupleDescCopyConstr(ptr) }),
+            // SAFETY:  pg_sys::CreateTupleDescCopyConstr will be returning a valid pointer
+            tupdesc: unsafe { PgBox::from_pg(pg_sys::CreateTupleDescCopyConstr(ptr)) },
             parent: None,
             data: None,
             need_release: false,
@@ -116,7 +117,8 @@ impl<'a> PgTupleDesc<'a> {
     /// wrap the `pg_sys::TupleDesc` contained by the specified `PgRelation`
     pub fn from_relation(parent: &PgRelation) -> PgTupleDesc {
         PgTupleDesc {
-            tupdesc: PgBox::from_pg(parent.rd_att),
+            // SAFETY:  `parent` is a Rust reference, and as such its rd_att attribute will be property initialized
+            tupdesc: unsafe { PgBox::from_pg(parent.rd_att) },
             parent: Some(parent),
             data: None,
             need_release: false,

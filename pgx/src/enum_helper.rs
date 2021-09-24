@@ -73,27 +73,26 @@ pub fn lookup_enum_by_label(typname: &str, label: &str) -> pg_sys::Datum {
         );
     }
 
-    let oid = extract_enum_oid(tup);
-
+    // SAFETY:  we know that `tup` is valid because we just got it from Postgres above
     unsafe {
+        let oid = extract_enum_oid(tup);
         pg_sys::ReleaseSysCache(tup);
+        oid as pg_sys::Datum
     }
-
-    oid as pg_sys::Datum
 }
 
 #[cfg(any(feature = "pg10", feature = "pg11"))]
-fn extract_enum_oid(tup: *mut pg_sys::HeapTupleData) -> pg_sys::Oid {
+unsafe fn extract_enum_oid(tup: *mut pg_sys::HeapTupleData) -> pg_sys::Oid {
     extern "C" {
         fn pgx_HeapTupleHeaderGetOid(htup_header: pg_sys::HeapTupleHeader) -> pg_sys::Oid;
     }
 
-    unsafe { pgx_HeapTupleHeaderGetOid(tup.as_ref().unwrap().t_data) }
+    pgx_HeapTupleHeaderGetOid(tup.as_ref().unwrap().t_data)
 }
 
 #[cfg(any(feature = "pg12", feature = "pg13"))]
-fn extract_enum_oid(tup: *mut pg_sys::HeapTupleData) -> pg_sys::Oid {
-    let en = unsafe { pgx_GETSTRUCT(tup) } as pg_sys::Form_pg_enum;
-    let en = unsafe { en.as_ref() }.unwrap();
+unsafe fn extract_enum_oid(tup: *mut pg_sys::HeapTupleData) -> pg_sys::Oid {
+    let en = pgx_GETSTRUCT(tup) as pg_sys::Form_pg_enum;
+    let en = en.as_ref().unwrap();
     en.oid
 }
