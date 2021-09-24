@@ -67,7 +67,7 @@ use std::ops::{Deref, DerefMut};
 ///     // open a relation and project it as a pg_sys::Relation
 ///     let relid: pg_sys::Oid = 42;
 ///     let lockmode = pg_sys::AccessShareLock as i32;
-///     let relation = PgBox::from_pg(unsafe { pg_sys::relation_open(relid, lockmode) });
+///     let relation = unsafe { PgBox::from_pg(unsafe { pg_sys::relation_open(relid, lockmode) }) };
 ///
 ///     // do something with/to 'relation'
 ///     // ...
