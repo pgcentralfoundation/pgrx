@@ -197,11 +197,13 @@ pub fn pg_getarg_pointer<T>(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> Opt
     }
 }
 
+/// # Safety
+/// 
+/// The provided `fcinfo` must be valid otherwise this function results in undefined behavior due
+/// to an out of bounds read.
 #[inline]
-pub fn get_getarg_type(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> pg_sys::Oid {
-    unsafe {
-        pg_sys::get_fn_expr_argtype(fcinfo.as_ref().unwrap().flinfo, num as std::os::raw::c_int)
-    }
+pub unsafe fn get_getarg_type(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> pg_sys::Oid {
+    pg_sys::get_fn_expr_argtype(fcinfo.as_ref().unwrap().flinfo, num as std::os::raw::c_int)
 }
 
 /// this is intended for Postgres functions that take an actual `cstring` argument, not for getting
