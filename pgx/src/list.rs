@@ -80,7 +80,7 @@ impl<T> PgList<T> {
 
     #[inline]
     pub fn get_ptr(&self, i: usize) -> Option<*mut T> {
-        if !self.is_empty() && !is_a(self.list as *mut pg_sys::Node, pg_sys::NodeTag_T_List) {
+        if !self.is_empty() && unsafe { !is_a(self.list as *mut pg_sys::Node, pg_sys::NodeTag_T_List) } {
             panic!("PgList does not contain pointers")
         }
         if self.list.is_null() || i >= self.len() {
@@ -92,7 +92,7 @@ impl<T> PgList<T> {
 
     #[inline]
     pub fn get_int(&self, i: usize) -> Option<i32> {
-        if !self.is_empty() && !is_a(self.list as *mut pg_sys::Node, pg_sys::NodeTag_T_IntList) {
+        if !self.is_empty() && unsafe { !is_a(self.list as *mut pg_sys::Node, pg_sys::NodeTag_T_IntList) } {
             panic!("PgList does not contain ints")
         }
 
@@ -105,7 +105,7 @@ impl<T> PgList<T> {
 
     #[inline]
     pub fn get_oid(&self, i: usize) -> Option<pg_sys::Oid> {
-        if !self.is_empty() && !is_a(self.list as *mut pg_sys::Node, pg_sys::NodeTag_T_OidList) {
+        if !self.is_empty() && unsafe { !is_a(self.list as *mut pg_sys::Node, pg_sys::NodeTag_T_OidList) } {
             panic!("PgList does not contain oids")
         }
 
