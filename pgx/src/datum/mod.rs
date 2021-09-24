@@ -39,7 +39,7 @@ pub use item_pointer_data::*;
 pub use json::*;
 pub use numeric::*;
 use once_cell::sync::Lazy;
-use sql_entity_graph::RustSqlMapping;
+pub use sql_entity_graph::{RustSqlMapping, Aggregate};
 use std::any::TypeId;
 pub use time_stamp::*;
 pub use time_stamp_with_timezone::*;

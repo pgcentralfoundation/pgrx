@@ -1,5 +1,6 @@
 
 
+use crate::Internal;
 
 pub trait Aggregate where Self: Sized {
     type Arg;
@@ -7,8 +8,8 @@ pub trait Aggregate where Self: Sized {
     type MovingState;
 
     const PARALLEL: Option<ParallelOption> = None;
-    const INITIAL_CONDITION: Option<&str> = None;
-    const MOVING_INITIAL_CONDITION: Option<&str> = None;
+    const INITIAL_CONDITION: Option<&'static str> = None;
+    const MOVING_INITIAL_CONDITION: Option<&'static str> = None;
     const HYPOTHETICAL: bool = false;
 
     fn state(&self, v: Self::Arg) -> Self;
@@ -17,7 +18,7 @@ pub trait Aggregate where Self: Sized {
         unimplemented!("pgx stub, define in impls")
     }
 
-    fn combine(&self, other: Self) -> Self {
+    fn combine(&self, _other: Self) -> Self {
         unimplemented!("pgx stub, define in impls")
     }
     
@@ -25,15 +26,15 @@ pub trait Aggregate where Self: Sized {
         unimplemented!("pgx stub, define in impls")
     }
 
-    fn deserial(&self, buf: Vec<u8>, internal: Internal<Self>) -> Internal<Self> {
+    fn deserial(&self, _buf: Vec<u8>, _internal: Internal<Self>) -> Internal<Self> {
         unimplemented!("pgx stub, define in impls")
     }
 
-    fn moving_state(mstate: Self::MovingState, v: Self::Arg) -> Self::MovingState {
+    fn moving_state(_mstate: Self::MovingState, _v: Self::Arg) -> Self::MovingState {
         unimplemented!("pgx stub, define in impls")
     }
 
-    fn moving_finalize(mstate: Self::MovingState) -> Self::Finalize {
+    fn moving_finalize(_mstate: Self::MovingState) -> Self::Finalize {
         unimplemented!("pgx stub, define in impls")
     }
 
