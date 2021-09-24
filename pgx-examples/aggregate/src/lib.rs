@@ -38,8 +38,14 @@ impl PgVarlenaInOutFuncs for IntegerAvgState {
 #[pg_aggregate]
 impl Aggregate for IntegerAvgState {
     type Arg = i32;
-    type Finalize = i32;
-    // type MovingState = ();
+    
+    // You can skip this:
+    // type Finalize = i32;
+
+    // You can skip this:
+    type MovingState = ();
+
+
     fn state(&self, _: i32) -> Self { todo!() }
 }
 

@@ -1,6 +1,6 @@
 use proc_macro2::{TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
-use syn::{ItemImpl, parse::{Parse, ParseStream}, parse_quote};
+use syn::{ImplItemType, Item, ItemImpl, parse::{Parse, ParseStream}, parse_quote};
 use syn::{punctuated::Punctuated, Token};
 
 #[derive(Debug, Clone, Hash, Eq, PartialEq)]
@@ -100,21 +100,19 @@ impl PgAggregate {
             }
         }
 
-        let mut moving_state = None;
-        for impl_item in &item_impl.items {
-            match impl_item {
-                syn::ImplItem::Type(impl_item_type) => {
-                    let ident_string = impl_item_type.ident.to_string();
-                    if ident_string == "MovingState" {
-                        moving_state = Some(impl_item_type);
-                    }
-                },
-                _ => (),
-            }
-        }
+        // `MovingState` is an optional value, we default to nothing.
+        let moving_state = get_impl_type_by_name(&item_impl, "MovingState");
         if moving_state.is_none() {
             item_impl.items.push(parse_quote! {
                 type MovingState = ();
+            })
+        }
+
+        // `Finalize` is an optional value, we default to nothing.
+        let finalize = get_impl_type_by_name(&item_impl, "Finalize");
+        if finalize.is_none() {
+            item_impl.items.push(parse_quote! {
+                type Finalize = ();
             })
         }
 
@@ -140,4 +138,20 @@ impl ToTokens for PgAggregate {
         };
         tokens.append_all(inv);
     }
+}
+
+fn get_impl_type_by_name<'a>(item_impl: &'a ItemImpl, name: &str) -> Option<&'a ImplItemType> {
+    let mut needle = None;
+    for impl_item in item_impl.items.iter() {
+        match impl_item {
+            syn::ImplItem::Type(impl_item_type) => {
+                let ident_string = impl_item_type.ident.to_string();
+                if ident_string == name {
+                    needle = Some(impl_item_type);
+                }
+            },
+            _ => (),
+        }
+    }
+    needle
 }
