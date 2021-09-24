@@ -6,9 +6,9 @@
 use crate::{is_a, pg_sys};
 
 #[inline]
-pub fn called_as_trigger(fcinfo: pg_sys::FunctionCallInfo) -> bool {
-    let fcinfo = unsafe { fcinfo.as_ref() }.expect("fcinfo was null");
-    !fcinfo.context.is_null() && unsafe { is_a(fcinfo.context, pg_sys::NodeTag_T_TriggerData) }
+pub unsafe fn called_as_trigger(fcinfo: pg_sys::FunctionCallInfo) -> bool {
+    let fcinfo = fcinfo.as_ref().expect("fcinfo was null");
+    !fcinfo.context.is_null() && is_a(fcinfo.context, pg_sys::NodeTag_T_TriggerData)
 }
 
 #[inline]
