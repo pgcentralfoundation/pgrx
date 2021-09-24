@@ -70,10 +70,15 @@ impl<'a> PgTupleDesc<'a> {
     /// allocated in the `CurrentMemoryContext`
     ///
     /// When this instance is dropped, the copied TupleDesc is `pfree()`'d
-    pub fn from_pg_copy<'b>(ptr: pg_sys::TupleDesc) -> PgTupleDesc<'b> {
+    ///
+    /// ## Safety
+    ///
+    /// This method is unsafe as we cannot validate that the provided `pg_sys::TupleDesc` is valid
+    /// or requires reference counting.
+    pub unsafe fn from_pg_copy<'b>(ptr: pg_sys::TupleDesc) -> PgTupleDesc<'b> {
         PgTupleDesc {
             // SAFETY:  pg_sys::CreateTupleDescCopyConstr will be returning a valid pointer
-            tupdesc: unsafe { PgBox::from_pg(pg_sys::CreateTupleDescCopyConstr(ptr)) },
+            tupdesc: PgBox::from_pg(pg_sys::CreateTupleDescCopyConstr(ptr)),
             parent: None,
             data: None,
             need_release: false,
