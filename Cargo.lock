@@ -1358,8 +1358,6 @@ dependencies = [
 name = "pgx-macros"
 version = "0.2.0-beta.0"
 dependencies = [
- "pgx",
- "pgx-pg-sys",
  "pgx-utils",
  "proc-macro-crate",
  "proc-macro2",
