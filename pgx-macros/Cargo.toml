@@ -1,6 +1,6 @@
 [package]
 name = "pgx-macros"
-version = "0.2.0-beta.0"
+version = "0.2.0-beta.1"
 authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
 edition = "2018"
 license = "MIT"
@@ -10,14 +10,6 @@ repository = "https://github.com/zombodb/pgx/pg-macros"
 documentation = "https://docs.rs/pgx-macros"
 readme = "README.md"
 
-# These aren't actually used except for in tests.
-[features]
-default = [ ]
-pg10 = [ "pgx/pg10", "pgx-pg-sys/pg10" ]
-pg11 = [ "pgx/pg11", "pgx-pg-sys/pg11" ]
-pg12 = [ "pgx/pg12", "pgx-pg-sys/pg12" ]
-pg13 = [ "pgx/pg13", "pgx-pg-sys/pg13" ]
-
 [lib]
 proc-macro = true
 
@@ -26,7 +18,7 @@ proc-macro = true
 rustc-args = ["--cfg", "docsrs"]
 
 [dependencies]
-pgx-utils = { path = "../pgx-utils", version = "0.2.0-beta.0" }
+pgx-utils = { path = "../pgx-utils", version = "0.2.0-beta.1" }
 proc-macro2 = "1.0.29"
 quote = "1.0.9"
 syn = { version = "1.0.76", features = [ "extra-traits", "full", "fold", "parsing" ] }
@@ -34,6 +26,4 @@ unescape = "0.1.0"
 proc-macro-crate = "1.0.0"
 
 [dev-dependencies]
-pgx = { path = "../pgx", version = "0.2.0-beta.0" }
-pgx-pg-sys = { path = "../pgx-pg-sys", version = "0.2.0-beta.0" }
-serde = "1.0.117"
+serde = { version = "1.0.117", features = ["derive"] }
