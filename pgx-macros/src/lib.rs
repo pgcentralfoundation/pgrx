@@ -164,7 +164,7 @@ If there is a schema inside a schema, the most specific schema is chosen.
 
 In this example, the created `example` function is in the `dsl_filters` schema.
 
-```rust
+```rust,ignore
 use pgx::*;
 
 #[pg_schema]
@@ -202,7 +202,7 @@ Accepts a String literal, a `name` attribute, and optionally others:
 
 You can declare some SQL without any positioning information, meaning it can end up anywhere in the generated SQL:
 
-```rust
+```rust,ignore
 use pgx_macros::extension_sql;
 
 extension_sql!(
@@ -215,7 +215,7 @@ extension_sql!(
 
 To cause the SQL to be output at the start of the generated SQL:
 
-```rust
+```rust,ignore
 use pgx_macros::extension_sql;
 
 extension_sql!(
@@ -229,7 +229,7 @@ extension_sql!(
 
 To cause the SQL to be output at the end of the generated SQL:
 
-```rust
+```rust,ignore
 use pgx_macros::extension_sql;
 
 extension_sql!(
@@ -243,7 +243,7 @@ extension_sql!(
 
 To declare the SQL dependant, or a dependency of, other items:
 
-```rust
+```rust,ignore
 use pgx_macros::extension_sql;
 
 struct Treat;
@@ -270,7 +270,7 @@ extension_sql!(r#"
 
 To declare the SQL defines some entity (**Caution:** This is not recommended usage):
 
-```rust
+```rust,ignore
 use pgx::stringinfo::StringInfo;
 use pgx::*;
 use pgx_utils::get_named_capture;
@@ -338,7 +338,7 @@ Accepts the same options as [`macro@extension_sql`]. `name` is automatically set
 
 You can declare some SQL without any positioning information, meaning it can end up anywhere in the generated SQL:
 
-```rust
+```rust,ignore
 use pgx_macros::extension_sql_file;
 extension_sql_file!(
     "../static/demo.sql",
@@ -347,7 +347,7 @@ extension_sql_file!(
 
 To override the default name:
 
-```rust
+```rust,ignore
 use pgx_macros::extension_sql_file;
 
 extension_sql_file!(
@@ -404,7 +404,7 @@ New types can be defined via [`macro@PostgresType`] or [`macro@PostgresEnum`].
 
 
 Without any arguments or returns:
-```rust
+```rust,ignore
 use pgx::*;
 #[pg_extern]
 fn foo() { todo!() }
@@ -413,7 +413,7 @@ fn foo() { todo!() }
 # Arguments
 It's possible to pass even complex arguments:
 
-```rust
+```rust,ignore
 use pgx::*;
 #[pg_extern]
 fn boop(
@@ -426,7 +426,7 @@ fn boop(
 
 It's possible to set argument defaults, set by PostgreSQL when the function is invoked:
 
-```rust
+```rust,ignore
 use pgx::*;
 #[pg_extern]
 fn boop(a: default!(i32, 11111)) { todo!() }
@@ -446,7 +446,7 @@ It accepts 2 arguments:
 
 **If the default SQL entity created by the extension:** ensure it is added to `requires` as a dependency:
 
-```rust
+```rust,ignore
 use pgx::*;
 #[pg_extern]
 fn default_value() -> i32 { todo!() }
@@ -463,7 +463,7 @@ fn do_it(
 
 It's possible to return even complex values, as well:
 
-```rust
+```rust,ignore
 use pgx::*;
 #[pg_extern]
 fn boop() -> i32 { todo!() }
@@ -477,7 +477,7 @@ fn floop() -> (i32, i32) { todo!() }
 
 Like in PostgreSQL, it's possible to return tables using iterators and the `name!()` macro:
 
-```rust
+```rust,ignore
 use pgx::*;
 #[pg_extern]
 fn floop() -> impl Iterator<Item = (name!(a, i32), name!(b, i32))> {
@@ -502,7 +502,7 @@ It accepts 2 arguments:
 `pg_sys::Oid` is a special cased type alias, in order to use it as an argument or return it must be
 passed with it's full module path (`pg_sys::Oid`) in order to be resolved.
 
-```rust
+```rust,ignore
 use pgx::*;
 
 #[pg_extern]
@@ -581,7 +581,7 @@ fn rewrite_item_fn(
 /**
 Generate necessary bindings for using the enum with PostgreSQL.
 
-```rust
+```rust,ignore
 # use pgx_pg_sys as pg_sys;
 use pgx::*;
 use serde::{Deserialize, Serialize};
@@ -664,7 +664,7 @@ fn impl_postgres_enum(ast: DeriveInput) -> proc_macro2::TokenStream {
 /**
 Generate necessary bindings for using the type with PostgreSQL.
 
-```rust
+```rust,ignore
 # use pgx_pg_sys as pg_sys;
 use pgx::*;
 use serde::{Deserialize, Serialize};
@@ -897,7 +897,7 @@ fn parse_postgres_type_args(attributes: &[Attribute]) -> HashSet<PostgresTypeAtt
 /**
 Generate necessary code using the type in operators like `==` and `!=`.
 
-```rust
+```rust,ignore
 # use pgx_pg_sys as pg_sys;
 use pgx::*;
 use serde::{Deserialize, Serialize};
@@ -918,7 +918,7 @@ pub fn postgres_eq(input: TokenStream) -> TokenStream {
 /**
 Generate necessary code using the type in operators like `>`, `<`, `<=`, and `>=`.
 
-```rust
+```rust,ignore
 # use pgx_pg_sys as pg_sys;
 use pgx::*;
 use serde::{Deserialize, Serialize};
@@ -942,7 +942,7 @@ pub fn postgres_ord(input: TokenStream) -> TokenStream {
 /**
 Generate necessary code for stable hashing the type so it can be used with `USING hash` indexes.
 
-```rust
+```rust,ignore
 # use pgx_pg_sys as pg_sys;
 use pgx::*;
 use serde::{Deserialize, Serialize};
