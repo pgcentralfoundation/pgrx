@@ -38,10 +38,10 @@ impl<'a, T: FromDatum + serde::Serialize> serde::Serialize for ArrayTypedIterato
 }
 
 impl<'a, T: FromDatum> Array<'a, T> {
-    /// Create an [`Array`] over an array of [pg_sys::Datum] values and a corresponding array
+    /// Create an [`Array`](crate::datum::Array) over an array of [`pg_sys::Datum`](pg_sys::Datum) values and a corresponding array
     /// of "is_null" indicators
     ///
-    /// [`T`] can be [pg_sys::Datum] if the elements are not all of the same type
+    /// `T` can be [`pg_sys::Datum`](pg_sys::Datum) if the elements are not all of the same type
     ///
     /// # Safety
     ///
@@ -65,7 +65,7 @@ impl<'a, T: FromDatum> Array<'a, T> {
         }
     }
 
-    fn from_pg(
+    unsafe fn from_pg(
         ptr: *mut pg_sys::varlena,
         array_type: *mut pg_sys::ArrayType,
         elements: *mut pg_sys::Datum,
@@ -80,8 +80,8 @@ impl<'a, T: FromDatum> Array<'a, T> {
             nulls,
             typoid,
             nelems,
-            elem_slice: unsafe { std::slice::from_raw_parts(elements, nelems) },
-            null_slice: unsafe { std::slice::from_raw_parts(nulls, nelems) },
+            elem_slice: std::slice::from_raw_parts(elements, nelems),
+            null_slice: std::slice::from_raw_parts(nulls, nelems),
             _marker: PhantomData,
         }
     }

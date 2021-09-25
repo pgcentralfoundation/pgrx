@@ -34,20 +34,25 @@ impl PgGuardRewriter {
     pub fn item_fn(
         &self,
         func: ItemFn,
+        entity_submission: Option<&pgx_utils::sql_entity_graph::PgExtern>,
         rewrite_args: bool,
         is_raw: bool,
         no_guard: bool,
     ) -> (proc_macro2::TokenStream, bool) {
         if rewrite_args {
-            self.item_fn_with_rewrite(func, is_raw, no_guard)
+            self.item_fn_with_rewrite(func, entity_submission, is_raw, no_guard)
         } else {
-            (self.item_fn_without_rewrite(func, no_guard), true)
+            (
+                self.item_fn_without_rewrite(func, entity_submission, no_guard),
+                true,
+            )
         }
     }
 
     fn item_fn_with_rewrite(
         &self,
         mut func: ItemFn,
+        entity_submission: Option<&pgx_utils::sql_entity_graph::PgExtern>,
         is_raw: bool,
         no_guard: bool,
     ) -> (proc_macro2::TokenStream, bool) {
@@ -102,6 +107,7 @@ impl PgGuardRewriter {
                     generics,
                     func_call,
                     rewritten_return_type,
+                    entity_submission,
                     no_guard,
                 ),
                 true,
@@ -118,6 +124,7 @@ impl PgGuardRewriter {
                     func_name_wrapper,
                     generics,
                     func_call,
+                    entity_submission,
                     false,
                 ),
                 true,
@@ -132,6 +139,7 @@ impl PgGuardRewriter {
                     func_name_wrapper,
                     generics,
                     func_call,
+                    entity_submission,
                     true,
                 ),
                 true,
@@ -146,6 +154,7 @@ impl PgGuardRewriter {
                     func_name_wrapper,
                     generics,
                     func_call,
+                    entity_submission,
                     false,
                 ),
                 true,
@@ -160,6 +169,7 @@ impl PgGuardRewriter {
                     func_name_wrapper,
                     generics,
                     func_call,
+                    entity_submission,
                     true,
                 ),
                 true,
@@ -175,6 +185,7 @@ impl PgGuardRewriter {
         generics: &Generics,
         func_call: proc_macro2::TokenStream,
         rewritten_return_type: proc_macro2::TokenStream,
+        sql_graph_entity_submission: Option<&pgx_utils::sql_entity_graph::PgExtern>,
         no_guard: bool,
     ) -> proc_macro2::TokenStream {
         let guard = if no_guard {
@@ -182,6 +193,7 @@ impl PgGuardRewriter {
         } else {
             quote! {#[pg_guard]}
         };
+        let sql_graph_entity_submission = sql_graph_entity_submission.cloned().into_iter();
         quote_spanned! {func_span=>
             #prolog
 
@@ -194,6 +206,8 @@ impl PgGuardRewriter {
 
                 #rewritten_return_type
             }
+
+            #(#sql_graph_entity_submission)*
         }
     }
 
@@ -208,6 +222,7 @@ impl PgGuardRewriter {
         func.sig.output = ReturnType::Default;
         let sig = func.sig;
         let body = func.block;
+        // We do **not** put an entity submission here as there still exists a `pg_extern` attribute.
         quote_spanned! {func_span=>
             #[pg_extern]
             #sig -> #return_type {
@@ -224,6 +239,7 @@ impl PgGuardRewriter {
         func_name_wrapper: Ident,
         generics: &Generics,
         func_call: proc_macro2::TokenStream,
+        sql_graph_entity_submission: Option<&pgx_utils::sql_entity_graph::PgExtern>,
         optional: bool,
     ) -> proc_macro2::TokenStream {
         let generic_type = proc_macro2::TokenStream::from_str(types.first().unwrap()).unwrap();
@@ -233,7 +249,7 @@ impl PgGuardRewriter {
                 let result = match pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).switch_to(|_| { #func_call result }) {
                     Some(result) => result,
                     None => {
-                        pgx::srf_return_done(fcinfo, &mut funcctx);
+                        unsafe { pgx::srf_return_done(fcinfo, &mut funcctx); }
                         return pgx::pg_return_null(fcinfo)
                     }
                 };
@@ -243,6 +259,8 @@ impl PgGuardRewriter {
                 let result = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).switch_to(|_| { #func_call result });
             }
         };
+
+        let sql_graph_entity_submission = sql_graph_entity_submission.cloned().into_iter();
 
         quote_spanned! {func_span=>
             #prolog
@@ -256,19 +274,19 @@ impl PgGuardRewriter {
                 let mut funcctx: pgx::PgBox<pg_sys::FuncCallContext>;
                 let mut iterator_holder: pgx::PgBox<IteratorHolder<#generic_type>>;
 
-                if srf_is_first_call(fcinfo) {
-                    funcctx = pgx::srf_first_call_init(fcinfo);
+                if unsafe { srf_is_first_call(fcinfo) } {
+                    funcctx = unsafe { pgx::srf_first_call_init(fcinfo) };
                     funcctx.user_fctx = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).palloc_struct::<IteratorHolder<#generic_type>>() as void_mut_ptr;
 
-                    iterator_holder = pgx::PgBox::from_pg(funcctx.user_fctx as *mut IteratorHolder<#generic_type>);
+                    iterator_holder = unsafe { pgx::PgBox::from_pg(funcctx.user_fctx as *mut IteratorHolder<#generic_type>) };
 
                     #result_handler
 
                     iterator_holder.iter = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).leak_and_drop_on_delete(result);
                 }
 
-                funcctx = pgx::srf_per_call_setup(fcinfo);
-                iterator_holder = pgx::PgBox::from_pg(funcctx.user_fctx as *mut IteratorHolder<#generic_type>);
+                funcctx = unsafe { pgx::srf_per_call_setup(fcinfo) };
+                iterator_holder = unsafe { pgx::PgBox::from_pg(funcctx.user_fctx as *mut IteratorHolder<#generic_type>) };
 
                 let mut iter = unsafe { Box::from_raw(iterator_holder.iter) };
                 match iter.next() {
@@ -277,7 +295,7 @@ impl PgGuardRewriter {
                         // continue to use it
                         Box::leak(iter);
 
-                        pgx::srf_return_next(fcinfo, &mut funcctx);
+                        unsafe { pgx::srf_return_next(fcinfo, &mut funcctx) };
                         match result.into_datum() {
                             Some(datum) => datum,
                             None => pgx::pg_return_null(fcinfo),
@@ -288,11 +306,13 @@ impl PgGuardRewriter {
                         // function is going to properly drop it for us
                         Box::leak(iter);
 
-                        pgx::srf_return_done(fcinfo, &mut funcctx);
+                        unsafe { pgx::srf_return_done(fcinfo, &mut funcctx) };
                         pgx::pg_return_null(fcinfo)
                     },
                 }
             }
+
+            #(#sql_graph_entity_submission)*
         }
     }
 
@@ -304,6 +324,7 @@ impl PgGuardRewriter {
         func_name_wrapper: Ident,
         generics: &Generics,
         func_call: proc_macro2::TokenStream,
+        entity_submission: Option<&pgx_utils::sql_entity_graph::PgExtern>,
         optional: bool,
     ) -> proc_macro2::TokenStream {
         let numtypes = types.len();
@@ -333,7 +354,7 @@ impl PgGuardRewriter {
                 let result = match pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).switch_to(|_| { #func_call result }) {
                     Some(result) => result,
                     None => {
-                        pgx::srf_return_done(fcinfo, &mut funcctx);
+                        unsafe { pgx::srf_return_done(fcinfo, &mut funcctx); }
                         return pgx::pg_return_null(fcinfo)
                     }
                 };
@@ -343,6 +364,7 @@ impl PgGuardRewriter {
                 let result = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).switch_to(|_| { #func_call result });
             }
         };
+        let sql_graph_entity_submission = entity_submission.cloned().into_iter();
 
         quote_spanned! {func_span=>
             #prolog
@@ -356,8 +378,8 @@ impl PgGuardRewriter {
                 let mut funcctx: pgx::PgBox<pg_sys::FuncCallContext>;
                 let mut iterator_holder: pgx::PgBox<IteratorHolder<#generic_type>>;
 
-                if srf_is_first_call(fcinfo) {
-                    funcctx = pgx::srf_first_call_init(fcinfo);
+                if unsafe { srf_is_first_call(fcinfo) } {
+                    funcctx = unsafe { pgx::srf_first_call_init(fcinfo) };
                     funcctx.user_fctx = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).palloc_struct::<IteratorHolder<#generic_type>>() as void_mut_ptr;
                     funcctx.tuple_desc = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).switch_to(|_| {
                         let mut tupdesc: *mut pgx::pg_sys::TupleDescData = std::ptr::null_mut();
@@ -371,15 +393,15 @@ impl PgGuardRewriter {
                             pgx::pg_sys::BlessTupleDesc(tupdesc)
                         }
                     });
-                    iterator_holder = pgx::PgBox::from_pg(funcctx.user_fctx as *mut IteratorHolder<#generic_type>);
+                    iterator_holder = unsafe { pgx::PgBox::from_pg(funcctx.user_fctx as *mut IteratorHolder<#generic_type>) };
 
                     #result_handler
 
                     iterator_holder.iter = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).leak_and_drop_on_delete(result);
                 }
 
-                funcctx = pgx::srf_per_call_setup(fcinfo);
-                iterator_holder = pgx::PgBox::from_pg(funcctx.user_fctx as *mut IteratorHolder<#generic_type>);
+                funcctx = unsafe { pgx::srf_per_call_setup(fcinfo) };
+                iterator_holder = unsafe { pgx::PgBox::from_pg(funcctx.user_fctx as *mut IteratorHolder<#generic_type>) };
 
                 let mut iter = unsafe { Box::from_raw(iterator_holder.iter) };
                 match iter.next() {
@@ -391,7 +413,7 @@ impl PgGuardRewriter {
                         #create_heap_tuple
 
                         let datum = pgx::heap_tuple_get_datum(heap_tuple);
-                        pgx::srf_return_next(fcinfo, &mut funcctx);
+                        unsafe { pgx::srf_return_next(fcinfo, &mut funcctx); }
                         datum as pgx::pg_sys::Datum
                     },
                     None => {
@@ -399,17 +421,20 @@ impl PgGuardRewriter {
                         // function is going to properly drop it for us
                         Box::leak(iter);
 
-                        pgx::srf_return_done(fcinfo, &mut funcctx);
+                        unsafe { pgx::srf_return_done(fcinfo, &mut funcctx); }
                         pgx::pg_return_null(fcinfo)
                     },
                 }
             }
+
+            #(#sql_graph_entity_submission)*
         }
     }
 
     fn item_fn_without_rewrite(
         &self,
         mut func: ItemFn,
+        entity_submission: Option<&pgx_utils::sql_entity_graph::PgExtern>,
         no_guard: bool,
     ) -> proc_macro2::TokenStream {
         // remember the original visibility and signature classifications as we want
@@ -473,6 +498,8 @@ impl PgGuardRewriter {
             }
         };
 
+        let sql_graph_entity_submission = entity_submission.cloned().into_iter();
+
         quote_spanned! {func.span()=>
             #prolog
             #vis #sig {
@@ -480,6 +507,8 @@ impl PgGuardRewriter {
                 #func
                 #func_call
             }
+
+            #(#sql_graph_entity_submission)*
         }
     }
 

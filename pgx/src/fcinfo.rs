@@ -42,6 +42,11 @@ macro_rules! default {
     };
 }
 
+/// The equivalent of a PostgreSQL `NULL`.
+///
+/// This is used primarily in `default!()` macros.
+pub struct NULL;
+
 /// A macro for providing SQL names for the returned fields for functions that return a Rust tuple,
 /// especially those that return a `std::iter::Iterator<Item=(f1, f2, f3)>`
 ///
@@ -53,8 +58,9 @@ macro_rules! default {
 /// CREATE OR REPLACE FUNCTION get_a_set() RETURNS TABLE (id integer, title text) ...;
 /// ```
 ///
-/// ```rust,no_run
+/// ```rust
 /// use pgx::*;
+///
 /// #[pg_extern]
 /// fn get_a_set() -> impl std::iter::Iterator<Item=(name!(id, i32), name!(title, &'static str))> {
 ///     vec![1, 2, 3].into_iter().zip(vec!["A", "B", "C"].into_iter())
@@ -82,7 +88,14 @@ mod pg_10_11 {
     pub fn pg_getarg<T: FromDatum>(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> Option<T> {
         let datum = unsafe { fcinfo.as_ref() }.unwrap().arg[num];
         let isnull = pg_arg_is_null(fcinfo, num);
-        unsafe { T::from_datum(datum, isnull, crate::get_getarg_type(fcinfo, num)) }
+        unsafe {
+            let typid = if T::NEEDS_TYPID {
+                crate::get_getarg_type(fcinfo, num)
+            } else {
+                pg_sys::InvalidOid
+            };
+            T::from_datum(datum, isnull, typid)
+        }
     }
 
     #[inline]
@@ -119,11 +132,12 @@ mod pg_12_13 {
     pub fn pg_getarg<T: FromDatum>(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> Option<T> {
         let datum = get_nullable_datum(fcinfo, num);
         unsafe {
-            T::from_datum(
-                datum.value,
-                datum.isnull,
-                crate::get_getarg_type(fcinfo, num),
-            )
+            let typid = if T::NEEDS_TYPID {
+                crate::get_getarg_type(fcinfo, num)
+            } else {
+                pg_sys::InvalidOid
+            };
+            T::from_datum(datum.value, datum.isnull, typid)
         }
     }
 
@@ -183,11 +197,13 @@ pub fn pg_getarg_pointer<T>(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> Opt
     }
 }
 
+/// # Safety
+/// 
+/// The provided `fcinfo` must be valid otherwise this function results in undefined behavior due
+/// to an out of bounds read.
 #[inline]
-pub fn get_getarg_type(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> pg_sys::Oid {
-    unsafe {
-        pg_sys::get_fn_expr_argtype(fcinfo.as_ref().unwrap().flinfo, num as std::os::raw::c_int)
-    }
+pub unsafe fn get_getarg_type(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> pg_sys::Oid {
+    pg_sys::get_fn_expr_argtype(fcinfo.as_ref().unwrap().flinfo, num as std::os::raw::c_int)
 }
 
 /// this is intended for Postgres functions that take an actual `cstring` argument, not for getting
@@ -208,7 +224,10 @@ pub fn pg_return_void() -> pg_sys::Datum {
     0 as pg_sys::Datum
 }
 
-pub fn pg_func_extra<ReturnType, DefaultValue: FnOnce() -> ReturnType>(
+/// Retrieve the `.flinfo.fn_extra` pointer (as a PgBox'd type) from [pg_sys::FunctionCallInfo].
+///
+/// This function is unsafe as we cannot guarantee the provided [fcinfo] pointer is valid
+pub unsafe fn pg_func_extra<ReturnType, DefaultValue: FnOnce() -> ReturnType>(
     fcinfo: pg_sys::FunctionCallInfo,
     default: DefaultValue,
 ) -> PgBox<ReturnType> {
@@ -241,7 +260,7 @@ pub fn pg_func_extra<ReturnType, DefaultValue: FnOnce() -> ReturnType>(
 /// This function is unsafe as the underlying function being called is likely unsafe
 ///
 /// ## Examples
-/// ```rust,no_run
+/// ```rust
 /// use pgx::*;
 ///
 /// #[pg_extern]
@@ -329,7 +348,8 @@ fn make_function_call_info(
         ) as *mut pg_sys::FunctionCallInfoBaseData
     };
 
-    let mut fcinfo_boxed = PgBox::<pg_sys::FunctionCallInfoBaseData>::from_rust(fcid);
+    // SAFETY:  we know fcid is valid as we just created it
+    let mut fcinfo_boxed = unsafe { PgBox::<pg_sys::FunctionCallInfoBaseData>::from_rust(fcid) };
     let fcinfo = fcinfo_boxed.deref_mut();
 
     fcinfo.nargs = nargs as i16;
@@ -346,7 +366,7 @@ fn make_function_call_info(
 }
 
 #[inline]
-pub fn srf_is_first_call(fcinfo: pg_sys::FunctionCallInfo) -> bool {
+pub unsafe fn srf_is_first_call(fcinfo: pg_sys::FunctionCallInfo) -> bool {
     let fcinfo = PgBox::from_pg(fcinfo);
     let flinfo = PgBox::from_pg(fcinfo.flinfo);
 
@@ -354,19 +374,23 @@ pub fn srf_is_first_call(fcinfo: pg_sys::FunctionCallInfo) -> bool {
 }
 
 #[inline]
-pub fn srf_first_call_init(fcinfo: pg_sys::FunctionCallInfo) -> PgBox<pg_sys::FuncCallContext> {
-    let funcctx = unsafe { pg_sys::init_MultiFuncCall(fcinfo) };
+pub unsafe fn srf_first_call_init(
+    fcinfo: pg_sys::FunctionCallInfo,
+) -> PgBox<pg_sys::FuncCallContext> {
+    let funcctx = pg_sys::init_MultiFuncCall(fcinfo);
     PgBox::from_pg(funcctx)
 }
 
 #[inline]
-pub fn srf_per_call_setup(fcinfo: pg_sys::FunctionCallInfo) -> PgBox<pg_sys::FuncCallContext> {
-    let funcctx = unsafe { pg_sys::per_MultiFuncCall(fcinfo) };
+pub unsafe fn srf_per_call_setup(
+    fcinfo: pg_sys::FunctionCallInfo,
+) -> PgBox<pg_sys::FuncCallContext> {
+    let funcctx = pg_sys::per_MultiFuncCall(fcinfo);
     PgBox::from_pg(funcctx)
 }
 
 #[inline]
-pub fn srf_return_next(
+pub unsafe fn srf_return_next(
     fcinfo: pg_sys::FunctionCallInfo,
     funcctx: &mut PgBox<pg_sys::FuncCallContext>,
 ) {
@@ -378,14 +402,11 @@ pub fn srf_return_next(
 }
 
 #[inline]
-pub fn srf_return_done(
+pub unsafe fn srf_return_done(
     fcinfo: pg_sys::FunctionCallInfo,
     funcctx: &mut PgBox<pg_sys::FuncCallContext>,
 ) {
-    unsafe {
-        pg_sys::end_MultiFuncCall(fcinfo, funcctx.as_ptr());
-    }
-
+    pg_sys::end_MultiFuncCall(fcinfo, funcctx.as_ptr());
     let fcinfo = PgBox::from_pg(fcinfo);
     let mut rsi = PgBox::from_pg(fcinfo.resultinfo as *mut pg_sys::ReturnSetInfo);
     rsi.isDone = pg_sys::ExprDoneCond_ExprEndResult;

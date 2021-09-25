@@ -4,6 +4,7 @@
 use crate::{direct_function_call_as_datum, pg_sys, FromDatum, IntoDatum};
 
 impl FromDatum for pg_sys::BOX {
+    const NEEDS_TYPID: bool = false;
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<Self>
     where
         Self: Sized,

@@ -61,6 +61,7 @@ fn throw_pg_fatal(message: &str) {
 }
 
 #[cfg(any(test, feature = "pg_test"))]
+#[pg_schema]
 mod tests {
     use pgx::*;
 

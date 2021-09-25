@@ -1,11 +1,11 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-use crate::pg_config::PgConfig;
+use crate::{pg_config::PgConfig, sql_entity_graph::PositioningRef};
 use colored::Colorize;
 use proc_macro2::TokenStream;
 use proc_macro2::TokenTree;
-use quote::quote;
+use quote::{format_ident, quote, ToTokens, TokenStreamExt};
 use serde_json::value::Value as JsonValue;
 use std::collections::HashSet;
 use std::path::PathBuf;
@@ -15,6 +15,7 @@ use syn::{GenericArgument, ItemFn, PathArguments, ReturnType, Type, TypeParamBou
 
 pub mod operator_common;
 pub mod pg_config;
+pub mod sql_entity_graph;
 
 pub static BASE_POSTGRES_PORT_NO: u16 = 28800;
 pub static BASE_POSTGRES_TESTING_PORT_NO: u16 = 32200;
@@ -182,7 +183,7 @@ pub fn get_named_capture(
     }
 }
 
-#[derive(Debug, Hash, Ord, PartialOrd, Eq, PartialEq)]
+#[derive(Debug, Hash, Eq, PartialEq, Clone, PartialOrd, Ord)]
 pub enum ExternArgs {
     Immutable,
     Strict,
@@ -196,6 +197,75 @@ pub enum ExternArgs {
     Error(String),
     Schema(String),
     Name(String),
+    Requires(Vec<PositioningRef>),
+}
+
+impl core::fmt::Display for ExternArgs {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            ExternArgs::Immutable => write!(f, "IMMUTABLE"),
+            ExternArgs::Strict => write!(f, "STRICT"),
+            ExternArgs::Stable => write!(f, "STABLE"),
+            ExternArgs::Volatile => write!(f, "VOLATILE"),
+            ExternArgs::Raw => Ok(()),
+            ExternArgs::ParallelSafe => write!(f, "PARALLEL SAFE"),
+            ExternArgs::ParallelUnsafe => write!(f, "PARALLEL UNSAFE"),
+            ExternArgs::ParallelRestricted => write!(f, "PARALLEL RESTRICTED"),
+            ExternArgs::Error(_) => Ok(()),
+            ExternArgs::NoGuard => Ok(()),
+            ExternArgs::Schema(_) => Ok(()),
+            ExternArgs::Name(_) => Ok(()),
+            ExternArgs::Requires(_) => Ok(()),
+        }
+    }
+}
+
+impl ToTokens for ExternArgs {
+    fn to_tokens(&self, tokens: &mut TokenStream) {
+        match self {
+            ExternArgs::Immutable => tokens.append(format_ident!("Immutable")),
+            ExternArgs::Strict => tokens.append(format_ident!("Strict")),
+            ExternArgs::Stable => tokens.append(format_ident!("Stable")),
+            ExternArgs::Volatile => tokens.append(format_ident!("Volatile")),
+            ExternArgs::Raw => tokens.append(format_ident!("Raw")),
+            ExternArgs::NoGuard => tokens.append(format_ident!("NoGuard")),
+            ExternArgs::ParallelSafe => tokens.append(format_ident!("ParallelSafe")),
+            ExternArgs::ParallelUnsafe => tokens.append(format_ident!("ParallelUnsafe")),
+            ExternArgs::ParallelRestricted => tokens.append(format_ident!("ParallelRestricted")),
+            ExternArgs::Error(_s) => {
+                tokens.append_all(
+                    quote! {
+                        Error(String::from("#_s"))
+                    }
+                    .to_token_stream(),
+                );
+            }
+            ExternArgs::Schema(_s) => {
+                tokens.append_all(
+                    quote! {
+                        Schema(String::from("#_s"))
+                    }
+                    .to_token_stream(),
+                );
+            }
+            ExternArgs::Name(_s) => {
+                tokens.append_all(
+                    quote! {
+                        Name(String::from("#_s"))
+                    }
+                    .to_token_stream(),
+                );
+            }
+            ExternArgs::Requires(items) => {
+                tokens.append_all(
+                    quote! {
+                        Requires(vec![#(#items),*])
+                    }
+                    .to_token_stream(),
+                );
+            }
+        }
+    }
 }
 
 #[derive(Debug, Hash, Ord, PartialOrd, Eq, PartialEq)]
@@ -287,7 +357,8 @@ pub fn categorize_type(ty: &Type) -> CategorizedType {
         Type::Path(ty) => {
             let segments = &ty.path.segments;
             for segment in segments {
-                if segment.ident.to_string() == "Option" {
+                let segment_ident = segment.ident.to_string();
+                if segment_ident == "Option" {
                     match &segment.arguments {
                         PathArguments::AngleBracketed(a) => match a.args.first().unwrap() {
                             GenericArgument::Type(ty) => {
@@ -310,69 +381,32 @@ pub fn categorize_type(ty: &Type) -> CategorizedType {
                         }
                     }
                 }
+                if segment_ident == "Box" {
+                    match &segment.arguments {
+                        PathArguments::AngleBracketed(a) => match a.args.first().unwrap() {
+                            GenericArgument::Type(ty) => return categorize_type(ty),
+                            _ => {
+                                break;
+                            }
+                        },
+                        _ => {
+                            break;
+                        }
+                    }
+                }
             }
             CategorizedType::Default
         }
+        Type::TraitObject(trait_object) => {
+            for bound in &trait_object.bounds {
+                return categorize_trait_bound(bound);
+            }
 
+            panic!("Unsupported trait return type");
+        }
         Type::ImplTrait(ty) => {
             for bound in &ty.bounds {
-                match bound {
-                    TypeParamBound::Trait(trait_bound) => {
-                        let segments = &trait_bound.path.segments;
-
-                        let mut ident = String::new();
-                        for segment in segments {
-                            if !ident.is_empty() {
-                                ident.push_str("::")
-                            }
-                            ident.push_str(segment.ident.to_string().as_str());
-                        }
-
-                        match ident.as_str() {
-                            "Iterator" | "std::iter::Iterator" => {
-                                let segment = segments.last().unwrap();
-                                match &segment.arguments {
-                                    PathArguments::None => {
-                                        panic!("Iterator must have at least one generic type")
-                                    }
-                                    PathArguments::Parenthesized(_) => {
-                                        panic!("Unsupported arguments to Iterator")
-                                    }
-                                    PathArguments::AngleBracketed(a) => {
-                                        let args = &a.args;
-                                        if args.len() > 1 {
-                                            panic!("Only one generic type is supported when returning an Iterator")
-                                        }
-
-                                        match args.first().unwrap() {
-                                            GenericArgument::Binding(b) => {
-                                                let mut types = Vec::new();
-                                                let ty = &b.ty;
-                                                match ty {
-                                                    Type::Tuple(tuple) => {
-                                                        for e in &tuple.elems {
-                                                            types.push(quote! {#e}.to_string());
-                                                        }
-                                                    },
-                                                    _ => {
-                                                        types.push(quote! {#ty}.to_string())
-                                                    }
-                                                }
-
-                                                return CategorizedType::Iterator(types);
-                                            }
-                                            _ => panic!("Only binding type arguments are supported when returning an Iterator")
-                                        }
-                                    }
-                                }
-                            }
-                            _ => panic!("Unsupported trait return type"),
-                        }
-                    }
-                    TypeParamBound::Lifetime(_) => {
-                        panic!("Functions can't return traits with lifetime bounds")
-                    }
-                }
+                return categorize_trait_bound(bound);
             }
 
             panic!("Unsupported trait return type");
@@ -389,6 +423,68 @@ pub fn categorize_type(ty: &Type) -> CategorizedType {
             }
         }
         _ => CategorizedType::Default,
+    }
+}
+
+pub fn categorize_trait_bound(bound: &TypeParamBound) -> CategorizedType {
+    match bound {
+        TypeParamBound::Trait(trait_bound) => {
+            let segments = &trait_bound.path.segments;
+
+            let mut ident = String::new();
+            for segment in segments {
+                if !ident.is_empty() {
+                    ident.push_str("::")
+                }
+                ident.push_str(segment.ident.to_string().as_str());
+            }
+
+            match ident.as_str() {
+                "Iterator" | "std::iter::Iterator" => {
+                    let segment = segments.last().unwrap();
+                    match &segment.arguments {
+                        PathArguments::None => {
+                            panic!("Iterator must have at least one generic type")
+                        }
+                        PathArguments::Parenthesized(_) => {
+                            panic!("Unsupported arguments to Iterator")
+                        }
+                        PathArguments::AngleBracketed(a) => {
+                            let args = &a.args;
+                            if args.len() > 1 {
+                                panic!(
+                                    "Only one generic type is supported when returning an Iterator"
+                                )
+                            }
+
+                            match args.first().unwrap() {
+                                GenericArgument::Binding(b) => {
+                                    let mut types = Vec::new();
+                                    let ty = &b.ty;
+                                    match ty {
+                                        Type::Tuple(tuple) => {
+                                            for e in &tuple.elems {
+                                                types.push(quote! {#e}.to_string());
+                                            }
+                                        },
+                                        _ => {
+                                            types.push(quote! {#ty}.to_string())
+                                        }
+                                    }
+
+                                    return CategorizedType::Iterator(types);
+                                }
+                                _ => panic!("Only binding type arguments are supported when returning an Iterator")
+                            }
+                        }
+                    }
+                }
+                _ => panic!("Unsupported trait return type"),
+            }
+        }
+        TypeParamBound::Lifetime(_) => {
+            panic!("Functions can't return traits with lifetime bounds")
+        }
     }
 }
 

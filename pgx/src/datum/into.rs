@@ -16,7 +16,7 @@ use crate::{pg_sys, rust_byte_slice_to_bytea, rust_regtypein, rust_str_to_text_p
 /// conversion.
 ///
 /// Note that any conversions that need to allocate memory (ie, for a `varlena *` representation
-/// of a Rust type, that memory **must** be allocated within a [PgMemoryContext]
+/// of a Rust type, that memory **must** be allocated within a [`PgMemoryContexts`](crate::PgMemoryContexts).
 pub trait IntoDatum {
     fn into_datum(self) -> Option<pg_sys::Datum>;
     fn type_oid() -> pg_sys::Oid;

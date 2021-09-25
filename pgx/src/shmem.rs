@@ -208,16 +208,8 @@ where
     E: PGXSharedMemory + Default,
 {
 }
-unsafe impl<N: Default + PGXSharedMemory, T: heapless::ArrayLength<N>> PGXSharedMemory
-    for heapless::Vec<N, T>
-{
-}
-unsafe impl<
-        K: Eq + hash32::Hash,
-        V: Default,
-        N: heapless::ArrayLength<heapless::Bucket<K, V>>
-            + heapless::ArrayLength<Option<heapless::Pos>>,
-        S,
-    > PGXSharedMemory for heapless::IndexMap<K, V, N, S>
+unsafe impl<T, const N: usize> PGXSharedMemory for heapless::Vec<T, N> {}
+unsafe impl<K: Eq + hash32::Hash, V: Default, S, const N: usize> PGXSharedMemory
+    for heapless::IndexMap<K, V, S, N>
 {
 }

@@ -30,7 +30,12 @@ fn approx_distance_pgx(compressed: Array<i64>, distances: Array<f64>) -> f64 {
 }
 
 #[pg_extern]
-fn sum_array(input: Array<i32>) -> i64 {
+fn default_array() -> Vec<i32> {
+    Default::default()
+}
+
+#[pg_extern(requires = [ default_array, ])]
+fn sum_array(input: default!(Array<i32>, "default_array()")) -> i64 {
     let mut sum = 0 as i64;
 
     for i in input {
@@ -109,6 +114,7 @@ pub mod pg_test {
     }
 }
 
+#[pg_schema]
 #[cfg(any(test, feature = "pg_test"))]
 pub mod tests {
     use crate::SomeStruct;

@@ -105,26 +105,57 @@ subcommands:
                     takes_value: true
                     multiple: true
           - schema:
-              about: generate extension schema files (typically not necessary)
+              about: generate extension schema files
+              after_help: |
+                REQUIREMENTS
+                    The SQL generation process requires configuring a few settings in the crate. Normally 'cargo pgx schema --force-default'
+                    can set these automatically.
+                    
+                    They are documented in the README.md of cargo-pgx: https://github.com/zombodb/pgx/tree/master/cargo-pgx#Manual-SQL-Generation
               args:
+                - manual:
+                    short: m
+                    long: manual
+                    help: Skip checking for required files
+                - force-default:
+                    short: f
+                    long: force-default
+                    help: Force the generation of default required files
+                - pg_version:
+                    value_name: PG_VERSION
+                    takes_value: true
+                    required: false
+                    help: Do you want to run against Postgres 'pg10', 'pg11', 'pg12', 'pg13'?
+                - release:
+                    short: r
+                    long: release
+                    help: Compile for release mode (default is debug)
+                - pg_config:
+                    short: c
+                    long: pg_config
+                    takes_value: true
+                    help: the `pg_config` path (default is first in $PATH)
                 - features:
                     long: features
-                    help: additional cargo features to activate (default is '--no-default-features')
+                    help: additional cargo features to activate (default is none)
                     takes_value: true
                     multiple: true
-          - dump-schema:
-              about: dump the full extension SQL schema file
-              args:
-                - directory:
-                    value_name: DIRECTORY
+                - out:
+                    long: out
+                    short: o
+                    help: A path to output a produced SQL file (default is `sql/$EXTNAME-$VERSION.sql`)
                     takes_value: true
-                    required: true
-                    help: Where should the extension .sql file be written?
-                - features:
-                    long: features
-                    help: additional cargo features to activate (default is '--no-default-features')
+                - dot:
+                    long: dot
+                    short: d
+                    help: A path to output a produced GraphViz DOT file
                     takes_value: true
+                    default_value: extension.dot
+                - verbose:
+                    long: verbose
+                    short: v
                     multiple: true
+                    help: Enable debug logging (-vv for trace)
           - run:
               about: compile/install extension to a pgx-managed Postgres instance and start psql
               args:
@@ -165,10 +196,17 @@ subcommands:
                     value_name: PG_VERSION
                     takes_value: true
                     help: Do you want to test for Postgres 'pg10', 'pg11', 'pg12', 'pg13', or 'all' (default)?
+                - testname:
+                    value_name: TESTNAME
+                    takes_value: true
+                    help: If specified, only run tests containing this string in their names
                 - release:
                     short: r
                     long: release
                     help: compile for release mode (default is debug)
+                - workspace:
+                    long: workspace
+                    help: Test all packages in the workspace
                 - features:
                     long: features
                     help: additional cargo features to activate (default is '--no-default-features')

@@ -1,6 +1,6 @@
 [package]
 name = "pgx-pg-sys"
-version = "0.1.22"
+version = "0.2.0-beta.0"
 authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
 edition = "2018"
 license = "MIT"
@@ -21,19 +21,21 @@ pg13 = [ ]
 features = ["pg13"]
 no-default-features = true
 targets = ["x86_64-unknown-linux-gnu"]
+# Enable `#[cfg(docsrs)]` (https://docs.rs/about/builds#cross-compiling)
+rustc-args = ["--cfg", "docsrs"]
 
 [dependencies]
 memoffset = "0.6.4"
 once_cell = "1.8.0"
-pgx-macros = { path = "../pgx-macros/", version = "0.1.22" }
+pgx-macros = { path = "../pgx-macros/", version = "0.2.0-beta.0" }
 
 [build-dependencies]
 bindgen = "0.59.1"
 build-deps = "0.1.4"
 colored = "2.0.0"
 num_cpus = "1.13.0"
-pgx-utils = { path = "../pgx-utils/", version = "0.1.22" }
-proc-macro2 = "1.0.28"
+pgx-utils = { path = "../pgx-utils/", version = "0.2.0-beta.0" }
+proc-macro2 = "1.0.29"
 quote = "1.0.9"
 rayon = "1.5.1"
-syn = { version = "1.0.75", features = [ "extra-traits", "full", "fold", "parsing" ] }
+syn = { version = "1.0.76", features = [ "extra-traits", "full", "fold", "parsing" ] }

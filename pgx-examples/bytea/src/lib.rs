@@ -36,6 +36,7 @@ fn gunzip_as_text(bytes: &[u8]) -> String {
 }
 
 #[cfg(any(test, feature = "pg_test"))]
+#[pg_schema]
 mod tests {
     use pgx::*;
 

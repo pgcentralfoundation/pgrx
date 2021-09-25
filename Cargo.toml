@@ -1,6 +1,6 @@
 [package]
 name = "pgx-parent"
-version = "0.1.22"
+version = "0.2.0-beta.0"
 authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
 edition = "2018"
 license = "MIT"
@@ -19,16 +19,19 @@ members = [
     "pgx-utils",
 ]
 exclude = [
+    "pgx-examples/aggregate",
     "pgx-examples/arrays",
     "pgx-examples/bad_ideas",
     "pgx-examples/bytea",
     "pgx-examples/custom_types",
+    "pgx-examples/custom_sql",
     "pgx-examples/errors",
     "pgx-examples/schemas",
     "pgx-examples/shmem",
     "pgx-examples/spi",
     "pgx-examples/srf",
     "pgx-examples/strings",
+    "pgx-examples/triggers",
 ]
 
 [features]
@@ -42,11 +45,12 @@ pg_test = [ "pgx-tests/pg_test" ]
 [package.metadata.docs.rs]
 features = ["pg13"]
 no-default-features = true
+# Enable `#[cfg(docsrs)]` (https://docs.rs/about/builds#cross-compiling)
 rustc-args = ["--cfg", "docsrs"]
 
 [dependencies]
-cargo-pgx = { path = "cargo-pgx" }
-pgx = { path = "pgx", default-features = false }
-pgx-macros = { path = "pgx-macros" }
-pgx-pg-sys = { path = "pgx-pg-sys", default-features = false }
-pgx-tests = { path = "pgx-tests", default-features = false }
+cargo-pgx = { path = "cargo-pgx", version = "0.2.0-beta.0" }
+pgx = { path = "pgx", version = "0.2.0-beta.0", default-features = false }
+pgx-macros = { path = "pgx-macros", version = "0.2.0-beta.0" }
+pgx-pg-sys = { path = "pgx-pg-sys", version = "0.2.0-beta.0", default-features = false }
+pgx-tests = { path = "pgx-tests", version = "0.2.0-beta.0", default-features = false }

@@ -1,6 +1,7 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
+#[pgx::pg_schema]
 mod test {
     use pgx::*;
 
@@ -11,6 +12,7 @@ mod test {
 }
 
 #[cfg(any(test, feature = "pg_test"))]
+#[pgx::pg_schema]
 mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;

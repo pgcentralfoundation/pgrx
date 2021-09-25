@@ -103,11 +103,11 @@ pub fn u64_to_item_pointer_parts(value: u64) -> (pg_sys::BlockNumber, pg_sys::Of
 
 #[allow(clippy::not_unsafe_ptr_arg_deref)] // this is okay b/c we guard against ctid being null
 #[inline]
-pub fn item_pointer_is_valid(ctid: *const pg_sys::ItemPointerData) -> bool {
+pub unsafe fn item_pointer_is_valid(ctid: *const pg_sys::ItemPointerData) -> bool {
     if ctid.is_null() {
         false
     } else {
-        unsafe { *ctid }.ip_posid != pg_sys::InvalidOffsetNumber
+        (*ctid).ip_posid != pg_sys::InvalidOffsetNumber
     }
 }
 

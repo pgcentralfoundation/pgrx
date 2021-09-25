@@ -4,4 +4,4 @@
 *.iml
 **/*.rs.bk
 Cargo.lock
-sql/*.generated.sql
+sql/custom_types-1.0.sql

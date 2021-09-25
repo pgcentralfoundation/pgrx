@@ -1,6 +1,6 @@
 [package]
 name = "pgx-utils"
-version = "0.1.22"
+version = "0.2.0-beta.0"
 authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
 edition = "2018"
 license = "MIT"
@@ -14,7 +14,7 @@ readme = "README.md"
 colored = "2.0.0"
 dirs = "3.0.2"
 env_proxy = "0.4.1"
-proc-macro2 = "1.0.28"
+proc-macro2 = { version = "1.0.29", features = [ "span-locations" ] }
 quote = "1.0.9"
 regex = "1.5.4"
 rttp_client = "0.1.0"
@@ -22,7 +22,14 @@ serde = "1.0.130"
 serde_derive = "1.0.130"
 serde-xml-rs = "0.5.0"
 serde_json = "1.0.67"
-syn = { version = "1.0.75", features = [ "extra-traits", "full", "fold", "parsing" ] }
+syn = { version = "1.0.76", features = [ "extra-traits", "full", "fold", "parsing" ] }
 toml = "0.5.8"
 unescape = "0.1.0"
 url = "2.2.2"
+eyre = "0.6.5"
+color-eyre = "0.5.11"
+tracing = "0.1.26"
+tracing-error = "0.1.2"
+tracing-subscriber = "0.2.20"
+libloading = "0.7.0"
+clap = { version = "2.33.3", default-features = false }

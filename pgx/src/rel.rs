@@ -35,7 +35,7 @@ impl PgRelation {
     /// Wrap a Postgres-provided `pg_sys::Relation`.
     ///
     /// The provided `Relation` will be closed via `pg_sys::RelationClose` when this instance is dropped
-    pub fn from_pg_owned(ptr: pg_sys::Relation) -> Self {
+    pub unsafe fn from_pg_owned(ptr: pg_sys::Relation) -> Self {
         PgRelation {
             boxed: PgBox::from_pg(ptr),
             need_close: true,
@@ -161,7 +161,8 @@ impl PgRelation {
     /// RelationGetNamespace
     ///            Returns the rel's namespace OID.
     pub fn namespace_oid(&self) -> pg_sys::Oid {
-        let rd_rel: PgBox<pg_sys::FormData_pg_class> = PgBox::from_pg(self.boxed.rd_rel);
+        // SAFETY: we know self.boxed and its members are correct as we created it
+        let rd_rel: PgBox<pg_sys::FormData_pg_class> = unsafe { PgBox::from_pg(self.boxed.rd_rel) };
         rd_rel.relnamespace
     }
 
@@ -175,7 +176,9 @@ impl PgRelation {
     /// If this `PgRelation` represents an index, return the `PgRelation` for the heap
     /// relation to which it is attached
     pub fn heap_relation(&self) -> Option<PgRelation> {
-        let rd_index: PgBox<pg_sys::FormData_pg_index> = PgBox::from_pg(self.boxed.rd_index);
+        // SAFETY: we know self.boxed and its members are correct as we created it
+        let rd_index: PgBox<pg_sys::FormData_pg_index> =
+            unsafe { PgBox::from_pg(self.boxed.rd_index) };
         if rd_index.is_null() {
             None
         } else {
@@ -188,9 +191,10 @@ impl PgRelation {
         &self,
         lockmode: pg_sys::LOCKMODE,
     ) -> impl std::iter::Iterator<Item = PgRelation> {
-        let list = PgList::<pg_sys::Oid>::from_pg(unsafe {
-            pg_sys::RelationGetIndexList(self.boxed.as_ptr())
-        });
+        // SAFETY: we know self.boxed is a valid pointer as we created it
+        let list = unsafe {
+            PgList::<pg_sys::Oid>::from_pg(pg_sys::RelationGetIndexList(self.boxed.as_ptr()))
+        };
 
         list.iter_oid()
             .filter(|oid| *oid != pg_sys::InvalidOid)
@@ -298,6 +302,7 @@ impl Clone for PgRelation {
 }
 
 impl FromDatum for PgRelation {
+    const NEEDS_TYPID: bool = false;
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _typoid: u32) -> Option<PgRelation> {
         if is_null {
             None

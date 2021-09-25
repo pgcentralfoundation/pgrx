@@ -3,25 +3,28 @@
 
 use crate::{pg_sys, FromDatum, IntoDatum};
 use std::ops::{Deref, DerefMut};
+use time::format_description::FormatItem;
 
 #[derive(Debug)]
 pub struct Date(time::Date);
 impl FromDatum for Date {
+    const NEEDS_TYPID: bool = false;
     #[inline]
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _typoid: u32) -> Option<Date> {
         if is_null {
             None
         } else {
-            Some(Date(time::Date::from_julian_day(
-                (datum as i32 + pg_sys::POSTGRES_EPOCH_JDATE as i32) as i64,
-            )))
+            Some(Date(
+                time::Date::from_julian_day(datum as i32 + pg_sys::POSTGRES_EPOCH_JDATE as i32)
+                    .expect("Unexpected error getting the Julian day in Date::from_datum"),
+            ))
         }
     }
 }
 impl IntoDatum for Date {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        Some((self.julian_day() as i32 - pg_sys::POSTGRES_EPOCH_JDATE as i32) as pg_sys::Datum)
+        Some((self.to_julian_day() as i32 - pg_sys::POSTGRES_EPOCH_JDATE as i32) as pg_sys::Datum)
     }
 
     fn type_oid() -> u32 {
@@ -57,6 +60,13 @@ impl serde::Serialize for Date {
     where
         S: serde::Serializer,
     {
-        serializer.serialize_str(&self.format("%Y-%m-%d"))
+        serializer.serialize_str(
+            &self.format(&DATE_FORMAT).map_err(|e| {
+                serde::ser::Error::custom(format!("Date formatting problem: {:?}", e))
+            })?,
+        )
     }
 }
+
+static DATE_FORMAT: &[FormatItem<'static>] =
+    time::macros::format_description!("[year]-[month]-[day]");

@@ -11,6 +11,7 @@ mod hstore_clone;
 pg_module_magic!();
 
 #[cfg(test)]
+#[pg_schema]
 pub mod pg_test {
     pub fn setup(_options: Vec<&str>) {
         // perform one-off initialization when the pg_test framework starts

@@ -67,7 +67,7 @@ use std::ops::{Deref, DerefMut};
 ///     // open a relation and project it as a pg_sys::Relation
 ///     let relid: pg_sys::Oid = 42;
 ///     let lockmode = pg_sys::AccessShareLock as i32;
-///     let relation = PgBox::from_pg(unsafe { pg_sys::relation_open(relid, lockmode) });
+///     let relation = unsafe { PgBox::from_pg(unsafe { pg_sys::relation_open(relid, lockmode) }) };
 ///
 ///     // do something with/to 'relation'
 ///     // ...
@@ -86,7 +86,7 @@ use std::ops::{Deref, DerefMut};
 ///
 /// TODO:
 ///  - Interatctions with Rust's panic!() macro
-///  - Interactions with Poastgres' error!() macro
+///  - Interactions with Postgres' error!() macro
 ///  - Boxing a null pointer -- it works ::from_pg(), ::into_pg(), and ::to_pg(), but will panic!() on all other uses
 ///
 pub struct PgBox<T> {
@@ -243,7 +243,7 @@ impl<T> PgBox<T> {
     /// When this `PgBox<T>` is dropped, the boxed memory is **not** freed.  Since Postgres
     /// allocated it, Postgres is responsible for freeing it.
     #[inline]
-    pub fn from_pg(ptr: *mut T) -> PgBox<T> {
+    pub unsafe fn from_pg(ptr: *mut T) -> PgBox<T> {
         PgBox::<T> {
             inner: Inner::<T> {
                 ptr: if ptr.is_null() { None } else { Some(ptr) },
@@ -258,7 +258,7 @@ impl<T> PgBox<T> {
     /// allocated it, Rust is responsible for freeing it.
     ///
     /// If you need to give the boxed pointer to Postgres, call `.into_pg()`
-    pub fn from_rust(ptr: *mut T) -> PgBox<T> {
+    pub unsafe fn from_rust(ptr: *mut T) -> PgBox<T> {
         PgBox::<T> {
             inner: Inner {
                 ptr: if ptr.is_null() { None } else { Some(ptr) },
@@ -302,7 +302,7 @@ impl<T> PgBox<T> {
     }
 
     /// Execute a closure with a mutable, `PgBox`'d form of the specified `ptr`
-    pub fn with<F: FnOnce(&mut PgBox<T>)>(ptr: *mut T, func: F) {
+    pub unsafe fn with<F: FnOnce(&mut PgBox<T>)>(ptr: *mut T, func: F) {
         func(&mut PgBox::from_pg(ptr))
     }
 }

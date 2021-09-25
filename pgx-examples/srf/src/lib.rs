@@ -33,6 +33,7 @@ fn return_tuple() -> (name!(id, i32), name!(name, &'static str), name!(age, f64)
 }
 
 #[cfg(any(test, feature = "pg_test"))]
+#[pg_schema]
 mod tests {
     use pgx::*;
 

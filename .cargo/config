@@ -1,8 +1,0 @@
-##
-## This is necessary on the top-level so that we can build the pgx-tests/ package, as a library, as
-## part of the top-level Cargo.toml workspace manifest
-##
-
-[build]
-# Postgres symbols won't be available until runtime
-rustflags = ["-C", "link-args=-Wl,-undefined,dynamic_lookup"]

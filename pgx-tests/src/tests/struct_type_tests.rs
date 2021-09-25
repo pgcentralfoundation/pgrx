@@ -12,7 +12,11 @@ struct Complex {
     y: f64,
 }
 
-extension_sql! { r#"CREATE TYPE complex;"# }
+extension_sql!(
+    r#"CREATE TYPE complex;"#,
+    name = "create_complex_shell_type",
+    creates = [Type(Complex)]
+);
 
 #[pg_extern(immutable)]
 fn complex_in(input: &std::ffi::CStr) -> PgBox<Complex> {
@@ -38,16 +42,21 @@ fn complex_out(complex: PgBox<Complex>) -> &'static std::ffi::CStr {
     sb.into()
 }
 
-extension_sql! { r#"
+extension_sql!(
+    r#"
 CREATE TYPE complex (
    internallength = 16,
    input = complex_in,
    output = complex_out,
    alignment = double
 );
-"#}
+"#,
+    name = "create_complex_type",
+    requires = ["create_complex_shell_type", complex_in, complex_out]
+);
 
 #[cfg(any(test, feature = "pg_test"))]
+#[pg_schema]
 mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;

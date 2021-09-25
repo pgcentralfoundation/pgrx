@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2018"
 
 [lib]
-crate-type = ["cdylib"]
+crate-type = ["cdylib", "rlib"]
 
 # remove this empty 'workspace' declaration if compiling outside of 'pgx'
 [workspace]
@@ -18,20 +18,20 @@ pg13 = ["pgx/pg13", "pgx-tests/pg13" ]
 pg_test = []
 
 [dependencies]
-heapless = "0.6.1"
+heapless = "0.7.5"
 pgx = { path = "../../../pgx/pgx/", default-features = false }
-pgx-macros = { path = "../../../pgx/pgx-macros" }
 serde = { version = "1.0.114", features = [ "derive" ] }
 
 [dev-dependencies]
 pgx-tests = { path = "../../../pgx/pgx-tests" }
 
 # uncomment these if compiling outside of 'pgx'
-#[profile.dev]
-#panic = "unwind"
-#
-#[profile.release]
-#panic = "unwind"
-#opt-level = 3
-#lto = "fat"
-#codegen-units = 1
+# [profile.dev]
+# panic = "unwind"
+# lto = "thin"
+
+# [profile.release]
+# panic = "unwind"
+# opt-level = 3
+# lto = "fat"
+# codegen-units = 1

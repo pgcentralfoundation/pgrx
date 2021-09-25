@@ -16,7 +16,7 @@
 
 `pgx` supports Postgres v10, v11, v12, and v13.
 
-Feel free to join our [Discord Server](https://discord.gg/hPb93Y9).
+**Feel free to join our [Discord Server](https://discord.gg/hPb93Y9).**
 
 ## Key Features
 
@@ -39,7 +39,7 @@ Feel free to join our [Discord Server](https://discord.gg/hPb93Y9).
     - Functions
     - Types
     - Enums
- - Hand-written SQL is supported through the `extension_sql!` macro or through on-disk `.sql` files
+ - Hand-written SQL is supported through the `extension_sql!` & `extension_sql_file!` macros
  - Control the order in which SQL is executed during `CREATE EXTENSION ...;`
 
 #### Safety First
@@ -54,7 +54,7 @@ Feel free to join our [Discord Server](https://discord.gg/hPb93Y9).
  - Return `impl std::iter::Iterator<Item = T> where T: IntoDatum` for automatic set-returning-functions (both `RETURNS SETOF` and `RETURNS TABLE (...)` variants
  - DDL automatically generated
 
-#### Most Postgres Datatypes Transparently Converted to Rust
+#### Most Postgres Data Types Transparently Converted to Rust
 
 Postgres Type | Rust Type (as `Option<T>`)
 --------------|-----------
@@ -88,6 +88,7 @@ Postgres Type | Rust Type (as `Option<T>`)
 `ARRAY[]::<type>` | `Vec<Option<T>>` or `pgx::Array<T>` (zero-copy)
 `NULL` | `Option::None`
 `internal` | `pgx::PgBox<T>` where `T` is any Rust/Postgres struct
+`uuid` | `pgx::Uuid([u8; 16])`
 
 There are also `IntoDatum` and `FromDatum` traits for implementing additional type conversions,
 along with `#[derive(PostgresType)]` and `#[derive(PostgresEnum)]` for automatic conversion of
@@ -99,7 +100,7 @@ custom types.
  - `#[derive(PostgresEnum)]` to use a Rust enum as a Postgres enum
  - DDL automatically generated
 
-#### Server Prgramming Interface (SPI)
+#### Server Programming Interface (SPI)
  - Safe access into SPI
  - Transparently return owned Datums from an SPI context
 
@@ -114,12 +115,15 @@ custom types.
 
 ## System Requirements
 
- - `cargo install rustfmt`
+- `rustc` (minimum version 1.52) and `cargo` 
+- `cargo install rustfmt`
  - `git`
  - `libclang.so`
    - Ubuntu: `libclang-dev` or `clang`
    - RHEL: `clang`
  - [build dependencies for PostgreSQL](https://wiki.postgresql.org/wiki/Compile_and_Install_from_source_code)
+
+Note that a local Postgres installation is not required. `pgx` will download and compile Postgres itself.
 
 ## Getting Started
 
@@ -166,7 +170,7 @@ my_extension/
     └── lib.rs
 ```
 
-The new extension includes an example, so you can go ahead an run it right away.
+The new extension includes an example, so you can go ahead and run it right away.
 
 ### 4. Run your extension
 
@@ -181,20 +185,33 @@ The first time, compilation takes a few minutes as `pgx` needs to generate almos
 Postgres' header files.
 
 Once compiled you'll be placed in a `psql` shell, for, in this case, Postgres 13.
-Now, we can just [load the extension](https://www.postgresql.org/docs/13/sql-createextension.html) and do a select on the example function.
+Now, we can [load the extension](https://www.postgresql.org/docs/13/sql-createextension.html) and do a SELECT on the example function.
 
-```sql
-CREATE EXTENSION my_extension;
-SELECT hello_my_extension();
-```
+```console
+my_extension=# CREATE EXTENSION my_extension;
+CREATE EXTENSION
 
-This will return something along the lines of
-
-```
+my_extension=# SELECT hello_my_extension();
  hello_my_extension
 ---------------------
  Hello, my_extension
 (1 row)
+```
+
+
+## Upgrading
+
+You can upgrade your current `cargo-pgx` installation by passing the `--force` flag
+to `cargo install`:
+
+```shell script
+$ cargo install --force cargo-pgx
+```
+
+As new Postgres versions are supported by `pgx`, you can re-run the `pgx init` process to download and compile them:
+
+```shell script
+$ cargo pgx init
 ```
 
 ## Digging Deeper

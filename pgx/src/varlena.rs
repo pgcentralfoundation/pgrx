@@ -318,7 +318,8 @@ pub fn rust_str_to_text_p(s: &str) -> PgBox<pg_sys::varlena> {
     let bytea = rust_byte_slice_to_bytea(s.as_bytes());
 
     // a pg_sys::bytea is a type alias for pg_sys::varlena so this cast is fine
-    PgBox::from_pg(bytea.as_ptr() as *mut pg_sys::varlena)
+    // SAFETY: bytea will be a valid pointer
+    unsafe { PgBox::from_pg(bytea.as_ptr() as *mut pg_sys::varlena) }
 }
 
 /// Convert a Rust `&[u8]]` into a Postgres `bytea *` (which is really a varchar)
@@ -326,10 +327,11 @@ pub fn rust_str_to_text_p(s: &str) -> PgBox<pg_sys::varlena> {
 /// This allocates the returned Postgres `bytea *` in `CurrentMemoryContext`.
 #[inline]
 pub fn rust_byte_slice_to_bytea(slice: &[u8]) -> PgBox<pg_sys::bytea> {
-    let len = slice.len();
-    let ptr = slice.as_ptr();
-
-    PgBox::from_pg(unsafe {
-        pg_sys::cstring_to_text_with_len(ptr as *const std::os::raw::c_char, len as i32)
-    })
+    // SAFETY:  `slice` will provide a valid pointer and pg_sys::cstring_to_text_with_len() will too
+    unsafe {
+        PgBox::from_pg(pg_sys::cstring_to_text_with_len(
+            slice.as_ptr() as *const std::os::raw::c_char,
+            slice.len() as i32,
+        ))
+    }
 }

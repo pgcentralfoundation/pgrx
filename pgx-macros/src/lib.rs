@@ -5,18 +5,18 @@ extern crate proc_macro;
 
 mod operators;
 mod rewriter;
+use operators::{impl_postgres_eq, impl_postgres_hash, impl_postgres_ord};
 
-use crate::operators::{impl_postgres_eq, impl_postgres_hash, impl_postgres_ord};
 use pgx_utils::*;
 use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span};
-use quote::{quote, quote_spanned};
+use quote::{quote, quote_spanned, ToTokens};
 use rewriter::*;
 use std::collections::HashSet;
 use syn::spanned::Spanned;
 use syn::{parse_macro_input, Attribute, Data, DeriveInput, Item, ItemFn};
 
-/// Declare a function as `#[pg_guard]` to indcate that it is called from a Postgres `extern "C"`
+/// Declare a function as `#[pg_guard]` to indicate that it is called from a Postgres `extern "C"`
 /// function so that Rust `panic!()`s (and Postgres `elog(ERROR)`s) will be properly handled by `pgx`
 #[proc_macro_attribute]
 pub fn pg_guard(_attr: TokenStream, item: TokenStream) -> TokenStream {
@@ -33,7 +33,7 @@ pub fn pg_guard(_attr: TokenStream, item: TokenStream) -> TokenStream {
         // process top-level functions
         // these functions get wrapped as public extern "C" functions with #[no_mangle] so they
         // can also be called from C code
-        Item::Fn(func) => rewriter.item_fn(func, false, false, false).0.into(),
+        Item::Fn(func) => rewriter.item_fn(func, None, false, false, false).0.into(),
         _ => {
             panic!("#[pg_guard] can only be applied to extern \"C\" blocks and top-level functions")
         }
@@ -155,28 +155,390 @@ pub fn merges(_attr: TokenStream, item: TokenStream) -> TokenStream {
     item
 }
 
-/// Associated macro for `#[pg_extern] or `#[pg_operator]`.  Used to set the `SEARCH_PATH` option
+/**
+Declare a Rust module and its contents to be in a schema.
+
+The schema name will always be the `mod`'s identifier. So `mod flop` will create a `flop` schema.
+
+If there is a schema inside a schema, the most specific schema is chosen.
+
+In this example, the created `example` function is in the `dsl_filters` schema.
+
+```rust
+use pgx::*;
+
+#[pg_schema]
+mod dsl {
+    use pgx::*;
+    #[pg_schema]
+    mod dsl_filters {
+        use pgx::*;
+        #[pg_extern]
+        fn example() { todo!() }
+    }
+}
+```
+
+File modules (like `mod name;`) aren't able to be supported due to [`rust/#54725`](https://github.com/rust-lang/rust/issues/54725).
+
+*/
+#[proc_macro_attribute]
+pub fn pg_schema(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    let pgx_schema = parse_macro_input!(item as sql_entity_graph::Schema);
+    pgx_schema.to_token_stream().into()
+}
+
+/**
+Declare SQL to be included in generated extension script.
+
+Accepts a String literal, a `name` attribute, and optionally others:
+
+* `name = "item"`: Set the unique identifer to `"item"` for use in `requires` declarations.
+* `requires = [item, item_two]`: References to other `name`s or Rust items which this SQL should be present after.
+* `creates = [ Type(submod::Cust), Enum(Pre), Function(defined)]`: Communicates that this SQL block creates certain entities.
+  Please note it **does not** create matching Rust types.
+* `bootstrap` (**Unique**): Communicates that this is SQL intended to go before all other generated SQL.
+* `finalize` (**Unique**): Communicates that this is SQL intended to go after all other generated SQL.
+
+You can declare some SQL without any positioning information, meaning it can end up anywhere in the generated SQL:
+
+```rust
+use pgx_macros::extension_sql;
+
+extension_sql!(
+    r#"
+    -- SQL statements
+    "#,
+    name = "demo",
+);
+```
+
+To cause the SQL to be output at the start of the generated SQL:
+
+```rust
+use pgx_macros::extension_sql;
+
+extension_sql!(
+    r#"
+    -- SQL statements
+    "#,
+    name = "demo",
+    bootstrap,
+);
+```
+
+To cause the SQL to be output at the end of the generated SQL:
+
+```rust
+use pgx_macros::extension_sql;
+
+extension_sql!(
+    r#"
+    -- SQL statements
+    "#,
+    name = "demo",
+    finalize,
+);
+```
+
+To declare the SQL dependant, or a dependency of, other items:
+
+```rust
+use pgx_macros::extension_sql;
+
+struct Treat;
+
+mod dog_characteristics {
+    enum DogAlignment {
+        Good
+    }
+}
+
+extension_sql!(r#"
+    -- SQL statements
+    "#,
+    name = "named_one",
+);
+
+extension_sql!(r#"
+    -- SQL statements
+    "#,
+    name = "demo",
+    requires = [ "named_one", dog_characteristics::DogAlignment ],
+);
+```
+
+To declare the SQL defines some entity (**Caution:** This is not recommended usage):
+
+```rust
+use pgx::stringinfo::StringInfo;
+use pgx::*;
+use pgx_utils::get_named_capture;
+
+#[derive(Debug)]
+#[repr(C)]
+struct Complex {
+    x: f64,
+    y: f64,
+}
+
+extension_sql!(r#"\
+        CREATE TYPE complex;\
+    "#,
+    name = "create_complex_type",
+    creates = [Type(Complex)],
+);
+
+#[pg_extern(immutable)]
+fn complex_in(input: &std::ffi::CStr) -> PgBox<Complex> {
+    todo!()
+}
+
+#[pg_extern(immutable)]
+fn complex_out(complex: PgBox<Complex>) -> &'static std::ffi::CStr {
+    todo!()
+}
+
+extension_sql!(r#"\
+        CREATE TYPE complex (
+            internallength = 16,
+            input = complex_in,
+            output = complex_out,
+            alignment = double
+        );\
+    "#,
+    name = "demo",
+    requires = ["create_complex_type", complex_in, complex_out],
+);
+
+```
+*/
+#[proc_macro]
+pub fn extension_sql(input: TokenStream) -> TokenStream {
+    fn wrapped(input: TokenStream) -> Result<TokenStream, syn::Error> {
+        let ext_sql: sql_entity_graph::ExtensionSql = syn::parse(input)?;
+        Ok(ext_sql.to_token_stream().into())
+    }
+
+    match wrapped(input) {
+        Ok(tokens) => tokens,
+        Err(e) => {
+            let msg = e.to_string();
+            TokenStream::from(quote! {
+              compile_error!(#msg);
+            })
+        }
+    }
+}
+
+/**
+Declare SQL (from a file) to be included in generated extension script.
+
+Accepts the same options as [`macro@extension_sql`]. `name` is automatically set to the file name (not the full path).
+
+You can declare some SQL without any positioning information, meaning it can end up anywhere in the generated SQL:
+
+```rust
+use pgx_macros::extension_sql_file;
+extension_sql_file!(
+    "../static/demo.sql",
+);
+```
+
+To override the default name:
+
+```rust
+use pgx_macros::extension_sql_file;
+
+extension_sql_file!(
+    "../static/demo.sql",
+    name = "singlular",
+);
+```
+
+For all other options, and examples of them, see [`macro@extension_sql`].
+*/
+#[proc_macro]
+pub fn extension_sql_file(input: TokenStream) -> TokenStream {
+    fn wrapped(input: TokenStream) -> Result<TokenStream, syn::Error> {
+        let ext_sql: sql_entity_graph::ExtensionSqlFile = syn::parse(input)?;
+        Ok(ext_sql.to_token_stream().into())
+    }
+
+    match wrapped(input) {
+        Ok(tokens) => tokens,
+        Err(e) => {
+            let msg = e.to_string();
+            TokenStream::from(quote! {
+              compile_error!(#msg);
+            })
+        }
+    }
+}
+
+/// Associated macro for `#[pg_extern]` or `#[macro@pg_operator]`.  Used to set the `SEARCH_PATH` option
 /// on the `CREATE FUNCTION` statement.
 #[proc_macro_attribute]
 pub fn search_path(_attr: TokenStream, item: TokenStream) -> TokenStream {
     item
 }
 
-/// Declare a function as `#[pg_extern]` to indicate that it can be used by Postgres as a UDF
+/**
+Declare a function as `#[pg_extern]` to indicate that it can be used by Postgres as a UDF.
+
+Optionally accepts the following attributes:
+
+* `immutable`: Corresponds to [`IMMUTABLE`](https://www.postgresql.org/docs/current/sql-createfunction.html).
+* `strict`: Corresponds to [`STRICT`](https://www.postgresql.org/docs/current/sql-createfunction.html).
+  + In most cases, `#[pg_extern]` can detect when no `Option<T>`s are used, and automatically set this.
+* `stable`: Corresponds to [`STABLE`](https://www.postgresql.org/docs/current/sql-createfunction.html).
+* `volatile`: Corresponds to [`VOLATILE`](https://www.postgresql.org/docs/current/sql-createfunction.html).
+* `raw`: Corresponds to [`RAW`](https://www.postgresql.org/docs/current/sql-createfunction.html).
+* `parallel_safe`: Corresponds to [`PARALLEL SAFE`](https://www.postgresql.org/docs/current/sql-createfunction.html).
+* `parallel_unsafe`: Corresponds to [`PARALLEL UNSAFE`](https://www.postgresql.org/docs/current/sql-createfunction.html).
+* `parallel_restricted`: Corresponds to [`PARALLEL RESTRICTED`](https://www.postgresql.org/docs/current/sql-createfunction.html).
+* `no_guard`: Do not use `#[pg_guard]` with the function.
+
+Functions can accept and return any type which `pgx` supports. `pgx` supports many PostgreSQL types by default.
+New types can be defined via [`macro@PostgresType`] or [`macro@PostgresEnum`].
+
+
+Without any arguments or returns:
+```rust
+use pgx::*;
+#[pg_extern]
+fn foo() { todo!() }
+```
+
+# Arguments
+It's possible to pass even complex arguments:
+
+```rust
+use pgx::*;
+#[pg_extern]
+fn boop(
+    a: i32,
+    b: Option<i32>,
+    c: Vec<i32>,
+    d: Option<Vec<Option<i32>>>
+) { todo!() }
+```
+
+It's possible to set argument defaults, set by PostgreSQL when the function is invoked:
+
+```rust
+use pgx::*;
+#[pg_extern]
+fn boop(a: default!(i32, 11111)) { todo!() }
+#[pg_extern]
+fn doop(
+    a: default!(Vec<Option<&str>>, "ARRAY[]::text[]"),
+    b: default!(String, "'note the inner quotes!'")
+) { todo!() }
+```
+
+The `default!()` macro may only be used in argument position.
+
+It accepts 2 arguments:
+
+* A type
+* A `bool`, numeric, or SQL string to represent the default. `"NULL"` is a possible value, as is `"'string'"`
+
+**If the default SQL entity created by the extension:** ensure it is added to `requires` as a dependency:
+
+```rust
+use pgx::*;
+#[pg_extern]
+fn default_value() -> i32 { todo!() }
+
+#[pg_extern(
+    requires = [ default_value, ],
+)]
+fn do_it(
+    a: default!(i32, "default_value()"),
+) { todo!() }
+```
+
+# Returns
+
+It's possible to return even complex values, as well:
+
+```rust
+use pgx::*;
+#[pg_extern]
+fn boop() -> i32 { todo!() }
+#[pg_extern]
+fn doop() -> Option<i32> { todo!() }
+#[pg_extern]
+fn swoop() -> Option<Vec<Option<i32>>> { todo!() }
+#[pg_extern]
+fn floop() -> (i32, i32) { todo!() }
+```
+
+Like in PostgreSQL, it's possible to return tables using iterators and the `name!()` macro:
+
+```rust
+use pgx::*;
+#[pg_extern]
+fn floop() -> impl Iterator<Item = (name!(a, i32), name!(b, i32))> {
+    None.into_iter() // Help type inference...
+}
+
+#[pg_extern]
+fn singlular_floop() -> (name!(a, i32), name!(b, i32)) {
+    todo!()
+}
+```
+
+The `name!()` macro may only be used in return position inside the `Item` of an `impl Iterator`.
+
+It accepts 2 arguments:
+
+* A name, such as `example`
+* A type
+
+# Special Cases
+
+`pg_sys::Oid` is a special cased type alias, in order to use it as an argument or return it must be
+passed with it's full module path (`pg_sys::Oid`) in order to be resolved.
+
+```rust
+use pgx::*;
+
+#[pg_extern]
+fn example_arg(animals: pg_sys::Oid) {
+    todo!()
+}
+
+#[pg_extern]
+fn example_return() -> pg_sys::Oid {
+    todo!()
+}
+```
+
+*/
 #[proc_macro_attribute]
 pub fn pg_extern(attr: TokenStream, item: TokenStream) -> TokenStream {
-    let args = parse_extern_attributes(proc_macro2::TokenStream::from(attr));
-    let is_raw = args.contains(&ExternArgs::Raw);
-    let no_guard = args.contains(&ExternArgs::NoGuard);
+    let args = parse_extern_attributes(proc_macro2::TokenStream::from(attr.clone()));
+
+    let sql_graph_entity_item =
+        sql_entity_graph::PgExtern::new(attr.clone().into(), item.clone().into()).unwrap();
 
     let ast = parse_macro_input!(item as syn::Item);
     match ast {
-        Item::Fn(func) => rewrite_item_fn(func, is_raw, no_guard).into(),
+        Item::Fn(func) => rewrite_item_fn(func, args, &sql_graph_entity_item).into(),
         _ => panic!("#[pg_extern] can only be applied to top-level functions"),
     }
 }
 
-fn rewrite_item_fn(mut func: ItemFn, is_raw: bool, no_guard: bool) -> proc_macro2::TokenStream {
+fn rewrite_item_fn(
+    mut func: ItemFn,
+    extern_args: HashSet<ExternArgs>,
+    sql_graph_entity_submission: &sql_entity_graph::PgExtern,
+) -> proc_macro2::TokenStream {
+    let is_raw = extern_args.contains(&ExternArgs::Raw);
+    let no_guard = extern_args.contains(&ExternArgs::NoGuard);
+
     let finfo_name = syn::Ident::new(
         &format!("pg_finfo_{}_wrapper", func.sig.ident),
         Span::call_site(),
@@ -190,7 +552,13 @@ fn rewrite_item_fn(mut func: ItemFn, is_raw: bool, no_guard: bool) -> proc_macro
     // make the function 'extern "C"' because this is for the #[pg_extern[ macro
     func.sig.abi = Some(syn::parse_str("extern \"C\"").unwrap());
     let func_span = func.span();
-    let (rewritten_func, need_wrapper) = rewriter.item_fn(func, true, is_raw, no_guard);
+    let (rewritten_func, need_wrapper) = rewriter.item_fn(
+        func,
+        Some(sql_graph_entity_submission),
+        true,
+        is_raw,
+        no_guard,
+    );
 
     if need_wrapper {
         quote_spanned! {func_span=>
@@ -203,11 +571,29 @@ fn rewrite_item_fn(mut func: ItemFn, is_raw: bool, no_guard: bool) -> proc_macro
             #rewritten_func
         }
     } else {
-        quote_spanned! {func_span=>#rewritten_func}
+        quote_spanned! {func_span=>
+
+            #rewritten_func
+        }
     }
 }
 
-#[proc_macro_derive(PostgresEnum)]
+/**
+Generate necessary bindings for using the enum with PostgreSQL.
+
+```rust
+# use pgx_pg_sys as pg_sys;
+use pgx::*;
+use serde::{Deserialize, Serialize};
+#[derive(Debug, Serialize, Deserialize, PostgresEnum)]
+enum DogNames {
+    Nami,
+    Brandy,
+}
+```
+
+*/
+#[proc_macro_derive(PostgresEnum, attributes(requires))]
 pub fn postgres_enum(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
 
@@ -216,6 +602,7 @@ pub fn postgres_enum(input: TokenStream) -> TokenStream {
 
 fn impl_postgres_enum(ast: DeriveInput) -> proc_macro2::TokenStream {
     let mut stream = proc_macro2::TokenStream::new();
+    let sql_graph_entity_ast = ast.clone();
     let enum_ident = ast.ident;
     let enum_name = enum_ident.to_string();
 
@@ -228,7 +615,7 @@ fn impl_postgres_enum(ast: DeriveInput) -> proc_macro2::TokenStream {
     let mut from_datum = proc_macro2::TokenStream::new();
     let mut into_datum = proc_macro2::TokenStream::new();
 
-    for d in enum_data.variants {
+    for d in enum_data.variants.clone() {
         let label_ident = &d.ident;
         let label_string = label_ident.to_string();
 
@@ -267,10 +654,34 @@ fn impl_postgres_enum(ast: DeriveInput) -> proc_macro2::TokenStream {
         }
     });
 
+    let sql_graph_entity_item =
+        sql_entity_graph::PostgresEnum::from_derive_input(sql_graph_entity_ast).unwrap();
+    sql_graph_entity_item.to_tokens(&mut stream);
+
     stream
 }
 
-#[proc_macro_derive(PostgresType, attributes(inoutfuncs, pgvarlena_inoutfuncs))]
+/**
+Generate necessary bindings for using the type with PostgreSQL.
+
+```rust
+# use pgx_pg_sys as pg_sys;
+use pgx::*;
+use serde::{Deserialize, Serialize};
+#[derive(Debug, Serialize, Deserialize, PostgresType)]
+struct Dog {
+    treats_recieved: i64,
+    pets_gotten: i64,
+}
+```
+
+Optionally accepts the following attributes:
+
+* `inoutfuncs(some_in_fn, some_out_fn)`: Define custom in/out functions for the type.
+* `pgvarlena_inoutfuncs(some_in_fn, some_out_fn)`: Define custom in/out functions for the `PgVarlena` of this type.
+
+*/
+#[proc_macro_derive(PostgresType, attributes(inoutfuncs, pgvarlena_inoutfuncs, requires))]
 pub fn postgres_type(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
 
@@ -363,6 +774,9 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
             }
         });
     }
+
+    let sql_graph_entity_item = sql_entity_graph::PostgresType::from_derive_input(ast).unwrap();
+    sql_graph_entity_item.to_tokens(&mut stream);
 
     stream
 }
@@ -480,54 +894,66 @@ fn parse_postgres_type_args(attributes: &[Attribute]) -> HashSet<PostgresTypeAtt
     categorized_attributes
 }
 
-/// Embed SQL directly into the generated extension script.
-///
-/// The argument must be as single raw string literal.
-///
-/// # Example
-/// ```
-/// # #[macro_use]
-/// # extern crate pgx_macros;
-/// # fn main() {
-/// extension_sql!(r#"
-/// -- sql statements
-/// "#)
-/// # }
-/// ```
+/**
+Generate necessary code using the type in operators like `==` and `!=`.
 
-#[proc_macro]
-pub fn extension_sql(input: TokenStream) -> TokenStream {
-    fn is_raw_str(input: &str) -> bool {
-        input.starts_with("r#\"") && input.ends_with("\"#")
-    }
-
-    let tokens: Vec<String> = input.into_iter().map(|t| t.to_string()).collect();
-
-    let ok = (tokens.len() >= 1 && is_raw_str(&tokens[0]))
-        && (tokens.len() == 1 || (tokens.len() >= 2 && tokens[1] == ","));
-
-    if ok {
-        // ignore input
-        TokenStream::new()
-    } else {
-        TokenStream::from(quote! {
-          compile_error!("expected a single raw string literal with sql");
-        })
-    }
+```rust
+# use pgx_pg_sys as pg_sys;
+use pgx::*;
+use serde::{Deserialize, Serialize};
+#[derive(Debug, Serialize, Deserialize, PostgresEnum, PartialEq, Eq, PostgresEq)]
+enum DogNames {
+    Nami,
+    Brandy,
 }
+```
 
+*/
 #[proc_macro_derive(PostgresEq)]
 pub fn postgres_eq(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
     impl_postgres_eq(ast).into()
 }
 
+/**
+Generate necessary code using the type in operators like `>`, `<`, `<=`, and `>=`.
+
+```rust
+# use pgx_pg_sys as pg_sys;
+use pgx::*;
+use serde::{Deserialize, Serialize};
+#[derive(
+    Debug, Serialize, Deserialize, PartialEq, Eq,
+     PartialOrd, Ord, PostgresEnum, PostgresOrd
+)]
+enum DogNames {
+    Nami,
+    Brandy,
+}
+```
+
+*/
 #[proc_macro_derive(PostgresOrd)]
 pub fn postgres_ord(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
     impl_postgres_ord(ast).into()
 }
 
+/**
+Generate necessary code for stable hashing the type so it can be used with `USING hash` indexes.
+
+```rust
+# use pgx_pg_sys as pg_sys;
+use pgx::*;
+use serde::{Deserialize, Serialize};
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Hash, PostgresEnum, PostgresHash)]
+enum DogNames {
+    Nami,
+    Brandy,
+}
+```
+
+*/
 #[proc_macro_derive(PostgresHash)]
 pub fn postgres_hash(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);

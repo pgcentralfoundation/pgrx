@@ -150,8 +150,8 @@ pub enum PgMemoryContexts {
     /// **absolutely** crash Postgres
     Of(void_ptr),
 
-    /// Create a temporary MemoryContext for use with [::switch_to()].  It gets deleted as soon
-    /// as [::switch_to()] exits.
+    /// Create a temporary MemoryContext for use with `::switch_to()`.  It gets deleted as soon
+    /// as `::switch_to()` exits.
     ///
     /// Trying to use this context through [::value{}] will result in a panic!().
     Transient {
@@ -308,15 +308,14 @@ impl PgMemoryContexts {
 
     /// Copies `len` bytes, starting at `src` into this memory context and
     /// returns a raw `*mut T` pointer to the newly allocated location
-    pub fn copy_ptr_into<T>(&mut self, src: *mut T, len: usize) -> *mut T {
+    pub unsafe fn copy_ptr_into<T>(&mut self, src: *mut T, len: usize) -> *mut T {
         if src.is_null() {
             panic!("attempt to copy a null pointer");
         }
-        unsafe {
-            let dest = pg_sys::MemoryContextAlloc(self.value(), len);
-            pg_sys::memcpy(dest, src as void_mut_ptr, len as u64);
-            dest as *mut T
-        }
+
+        let dest = pg_sys::MemoryContextAlloc(self.value(), len);
+        pg_sys::memcpy(dest, src as void_mut_ptr, len as u64);
+        dest as *mut T
     }
 
     /// Allocate memory in this context, which will be free'd whenever Postgres deletes this MemoryContext
@@ -358,8 +357,9 @@ impl PgMemoryContexts {
         }
 
         let leaked_ptr = Box::leak(Box::new(v));
+        // SAFETY:  we know the result of `self.palloc_struct()` is a valid pointer
         let mut memcxt_callback =
-            PgBox::from_pg(self.palloc_struct::<pg_sys::MemoryContextCallback>());
+            unsafe { PgBox::from_pg(self.palloc_struct::<pg_sys::MemoryContextCallback>()) };
         memcxt_callback.func = Some(drop_on_delete::<T>);
         memcxt_callback.arg = leaked_ptr as *mut T as void_mut_ptr;
         unsafe {

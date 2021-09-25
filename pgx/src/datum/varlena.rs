@@ -19,8 +19,11 @@ struct PallocdVarlena {
 impl Clone for PallocdVarlena {
     fn clone(&self) -> Self {
         let len = self.len;
-        let ptr = PgMemoryContexts::Of(self.ptr as void_mut_ptr)
-            .copy_ptr_into(self.ptr as void_mut_ptr, len) as *mut pg_sys::varlena;
+
+        // SAFETY:  we know that `self.ptr` is valid as the only way we could have gotten one
+        // is internally via Postgres
+        let ptr = unsafe { PgMemoryContexts::Of(self.ptr as void_mut_ptr)
+            .copy_ptr_into(self.ptr as void_mut_ptr, len) as *mut pg_sys::varlena };
 
         PallocdVarlena { ptr, len }
     }
@@ -37,12 +40,11 @@ impl Clone for PallocdVarlena {
 ///
 /// ## Example
 ///
-/// ```rust,no_run
-/// use pgx::*;
+/// ```rust
 /// use std::ffi::CStr;
 /// use std::str::FromStr;
 ///
-/// pg_module_magic!();
+/// use crate::pgx::*;
 ///
 /// #[derive(Copy, Clone, PostgresType)]
 /// #[pgvarlena_inoutfuncs]
@@ -276,6 +278,7 @@ impl<T> FromDatum for PgVarlena<T>
 where
     T: Copy + Sized,
 {
+    const NEEDS_TYPID: bool = false;
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _typoid: u32) -> Option<Self> {
         if is_null {
             None

@@ -2,6 +2,7 @@
 // governed by the MIT license that can be found in the LICENSE file.
 
 use pgx::*;
+use std::convert::TryFrom;
 use time::UtcOffset;
 
 #[pg_extern]
@@ -32,24 +33,31 @@ fn accept_timestamp_with_time_zone(t: TimestampWithTimeZone) -> TimestampWithTim
 #[pg_extern]
 fn return_3pm_mountain_time() -> TimestampWithTimeZone {
     let three_pm = TimestampWithTimeZone::new(
-        time::PrimitiveDateTime::new(time::date!(2020 - 02 - 19), time::time!(15:00:00)),
-        UtcOffset::hours(-7),
+        time::PrimitiveDateTime::new(
+            time::Date::from_calendar_date(2020, time::Month::try_from(2).unwrap(), 19).unwrap(),
+            time::Time::from_hms(15, 0, 0).unwrap(),
+        ),
+        UtcOffset::from_hms(-7, 0, 0).unwrap(),
     );
 
-    assert_eq!(7, three_pm.offset().as_hours());
+    assert_eq!(7, three_pm.offset().whole_hours());
 
     three_pm
 }
 
 #[cfg(test)]
+#[pgx::pg_schema]
 mod serialization_tests {
     use pgx::*;
     use serde_json::*;
+    use std::convert::TryFrom;
     use time::{PrimitiveDateTime, UtcOffset};
 
     #[test]
     fn test_date_serialization() {
-        let date = Date::new(time::date!(2020 - 04 - 07));
+        let date = Date::new(
+            time::Date::from_calendar_date(2020, time::Month::try_from(4).unwrap(), 07).unwrap(),
+        );
         let json = json!({ "date test": date });
 
         assert_eq!(json!({"date test":"2020-04-07"}), json);
@@ -57,15 +65,17 @@ mod serialization_tests {
 
     #[test]
     fn test_time_serialization() {
-        let time = Time::new(time::time!(0:00));
+        let time = Time::new(time::Time::from_hms(0, 0, 0).unwrap());
         let json = json!({ "time test": time });
 
         assert_eq!(json!({"time test":"00:00:00"}), json);
     }
     #[test]
     fn test_time_with_timezone_serialization() {
-        let time_with_timezone =
-            TimeWithTimeZone::new(time::time!(12: 23: 34), time::UtcOffset::hours(2));
+        let time_with_timezone = TimeWithTimeZone::new(
+            time::Time::from_hms(12, 23, 34).unwrap(),
+            time::UtcOffset::from_hms(2, 0, 0).unwrap(),
+        );
         let json = json!({ "time W/ Zone test": time_with_timezone });
 
         // we automatically converted to UTC upon construction in ::new()
@@ -78,8 +88,8 @@ mod serialization_tests {
     #[test]
     fn test_timestamp_serialization() {
         let time_stamp = Timestamp::new(PrimitiveDateTime::new(
-            time::date!(2020 - 1 - 01),
-            time::time!(12:34:54),
+            time::Date::from_calendar_date(2020, time::Month::try_from(1).unwrap(), 1).unwrap(),
+            time::Time::from_hms(12, 34, 54).unwrap(),
         ));
         let json = json!({ "time stamp test": time_stamp });
 
@@ -88,8 +98,15 @@ mod serialization_tests {
     #[test]
     fn test_timestamp_with_timezone_serialization() {
         let time_stamp_with_timezone = TimestampWithTimeZone::new(
-            PrimitiveDateTime::new(time::date!(2022 - 2 - 02), time::time!(16:57:11)),
-            UtcOffset::parse("+0200", "%z").unwrap(),
+            PrimitiveDateTime::new(
+                time::Date::from_calendar_date(2022, time::Month::try_from(2).unwrap(), 2).unwrap(),
+                time::Time::from_hms(16, 57, 11).unwrap(),
+            ),
+            UtcOffset::parse(
+                "+0200",
+                &time::format_description::parse("[offset_hour][offset_minute]").unwrap(),
+            )
+            .unwrap(),
         );
 
         let json = json!({ "time stamp with timezone test": time_stamp_with_timezone });
@@ -106,6 +123,7 @@ mod serialization_tests {
 }
 
 #[cfg(any(test, feature = "pg_test"))]
+#[pgx::pg_schema]
 mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;

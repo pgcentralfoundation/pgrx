@@ -37,8 +37,8 @@ pub enum PgLogLevel {
     /// Helpful messages to users about query operation; sent to client and not to server log by default.
     NOTICE = crate::pg_sys::NOTICE as isize,
 
-    /// Warnings.  [NOTICE] is for expected messages like implicit sequence creation by SERIAL.
-    /// [WARNING] is for unexpected messages.
+    /// Warnings.  \[NOTICE\] is for expected messages like implicit sequence creation by SERIAL.
+    /// \[WARNING\] is for unexpected messages.
     WARNING = crate::pg_sys::WARNING as isize,
 
     /// user error - abort transaction; return to known state
@@ -525,7 +525,13 @@ pub fn ereport(
     }
 }
 
-/// Log to Postgres' `debug5` log level
+/// Log to Postgres' `debug5` log level.
+///
+/// This macro accepts arguments like the [`println`](std::println) and [`format`](std::format) macros.
+/// See [`fmt`](std::fmt) for information about options.
+///
+/// The output these logs goes to the PostgreSQL log file at `DEBUG5` level, depending on how the 
+/// [PostgreSQL settings](https://www.postgresql.org/docs/current/runtime-config-logging.html) are configured.
 #[macro_export]
 macro_rules! debug5 {
     ($($arg:tt)*) => (
@@ -533,7 +539,13 @@ macro_rules! debug5 {
     )
 }
 
-/// Log to Postgres' `debug4` log level
+/// Log to Postgres' `debug4` log level.
+///
+/// This macro accepts arguments like the [`println`](std::println) and [`format`](std::format) macros.
+/// See [`fmt`](std::fmt) for information about options.
+///
+/// The output these logs goes to the PostgreSQL log file at `DEBUG4` level, depending on how the 
+/// [PostgreSQL settings](https://www.postgresql.org/docs/current/runtime-config-logging.html) are configured.
 #[macro_export]
 macro_rules! debug4 {
     ($($arg:tt)*) => (
@@ -541,7 +553,13 @@ macro_rules! debug4 {
     )
 }
 
-/// Log to Postgres' `debug3` log level
+/// Log to Postgres' `debug3` log level.
+///
+/// This macro accepts arguments like the [`println`](std::println) and [`format`](std::format) macros.
+/// See [`fmt`](std::fmt) for information about options.
+///
+/// The output these logs goes to the PostgreSQL log file at `DEBUG3` level, depending on how the 
+/// [PostgreSQL settings](https://www.postgresql.org/docs/current/runtime-config-logging.html) are configured.
 #[macro_export]
 macro_rules! debug3 {
     ($($arg:tt)*) => (
@@ -549,7 +567,13 @@ macro_rules! debug3 {
     )
 }
 
-/// Log to Postgres' `debug2` log level
+/// Log to Postgres' `debug2` log level.
+///
+/// This macro accepts arguments like the [`println`](std::println) and [`format`](std::format) macros.
+/// See [`fmt`](std::fmt) for information about options.
+///
+/// The output these logs goes to the PostgreSQL log file at `DEBUG2` level, depending on how the 
+/// [PostgreSQL settings](https://www.postgresql.org/docs/current/runtime-config-logging.html) are configured.
 #[macro_export]
 macro_rules! debug2 {
     ($($arg:tt)*) => (
@@ -557,7 +581,13 @@ macro_rules! debug2 {
     )
 }
 
-/// Log to Postgres' `debug1` log level
+/// Log to Postgres' `debug1` log level.
+///
+/// This macro accepts arguments like the [`println`](std::println) and [`format`](std::format) macros.
+/// See [`fmt`](std::fmt) for information about options.
+///
+/// The output these logs goes to the PostgreSQL log file at `DEBUG1` level, depending on how the 
+/// [PostgreSQL settings](https://www.postgresql.org/docs/current/runtime-config-logging.html) are configured.
 #[macro_export]
 macro_rules! debug1 {
     ($($arg:tt)*) => (
@@ -565,7 +595,13 @@ macro_rules! debug1 {
     )
 }
 
-/// Log to Postgres' `log` log level
+/// Log to Postgres' `log` log level.
+///
+/// This macro accepts arguments like the [`println`](std::println) and [`format`](std::format) macros.
+/// See [`fmt`](std::fmt) for information about options.
+///
+/// The output these logs goes to the PostgreSQL log file at `LOG` level, depending on how the 
+/// [PostgreSQL settings](https://www.postgresql.org/docs/current/runtime-config-logging.html) are configured.
 #[macro_export]
 macro_rules! log {
     ($($arg:tt)*) => (
@@ -573,7 +609,41 @@ macro_rules! log {
     )
 }
 
-/// Log to Postgres' `info` log level
+/// Log to Postgres' `info` log level.
+///
+/// This macro accepts arguments like the [`println`](std::println) and [`format`](std::format) macros.
+/// See [`fmt`](std::fmt) for information about options.
+///
+/// Given some function:
+///
+/// ```rust,no_run
+/// use pgx::*;
+///
+/// #[pg_extern]
+/// fn sum_array(input: Array<i32>) -> i64 {
+///     let mut sum = 0 as i64;
+/// 
+///     for i in input {
+///         pgx::info!("i={index:?}, sum={}", sum, index = i);
+///         sum += i.unwrap_or(-1) as i64;
+///     }
+/// 
+///     sum
+/// }
+/// ```
+///
+/// When run inside PostgreSQL would output:
+///
+/// ```sql
+/// arrays=# SELECT arrays.sum_array('{1,2,3}');
+/// INFO:  i=Some(1), sum=0
+/// INFO:  i=Some(2), sum=1
+/// INFO:  i=Some(3), sum=3
+///  sum_array 
+/// -----------
+///          6
+/// (1 row)
+/// ```
 #[macro_export]
 macro_rules! info {
     ($($arg:tt)*) => (
@@ -581,7 +651,41 @@ macro_rules! info {
     )
 }
 
-/// Log to Postgres' `notice` log level
+/// Log to Postgres' `notice` log level.
+///
+/// This macro accepts arguments like the [`println`](std::println) and [`format`](std::format) macros.
+/// See [`fmt`](std::fmt) for information about options.
+///
+/// Given some function:
+///
+/// ```rust,no_run
+/// use pgx::*;
+///
+/// #[pg_extern]
+/// fn sum_array(input: Array<i32>) -> i64 {
+///     let mut sum = 0 as i64;
+/// 
+///     for i in input {
+///         pgx::notice!("i={index:?}, sum={}", sum, index = i);
+///         sum += i.unwrap_or(-1) as i64;
+///     }
+/// 
+///     sum
+/// }
+/// ```
+///
+/// When run inside PostgreSQL would output:
+///
+/// ```sql
+/// arrays=# SELECT arrays.sum_array('{1,2,3}');
+/// NOTICE:  i=Some(1), sum=0
+/// NOTICE:  i=Some(2), sum=1
+/// NOTICE:  i=Some(3), sum=3
+///  sum_array 
+/// -----------
+///          6
+/// (1 row)
+/// ```
 #[macro_export]
 macro_rules! notice {
     ($($arg:tt)*) => (
@@ -589,7 +693,41 @@ macro_rules! notice {
     )
 }
 
-/// Log to Postgres' `warning` log level
+/// Log to Postgres' `warning` log level.
+///
+/// This macro accepts arguments like the [`println`](std::println) and [`format`](std::format) macros.
+/// See [`fmt`](std::fmt) for information about options.
+///
+/// Given some function:
+///
+/// ```rust,no_run
+/// use pgx::*;
+///
+/// #[pg_extern]
+/// fn sum_array(input: Array<i32>) -> i64 {
+///     let mut sum = 0 as i64;
+/// 
+///     for i in input {
+///         pgx::warning!("i={index:?}, sum={}", sum, index = i);
+///         sum += i.unwrap_or(-1) as i64;
+///     }
+/// 
+///     sum
+/// }
+/// ```
+///
+/// When run inside PostgreSQL would output:
+///
+/// ```sql
+/// arrays=# SELECT arrays.sum_array('{1,2,3}');
+/// WARNING:  i=Some(1), sum=0
+/// WARNING:  i=Some(2), sum=1
+/// WARNING:  i=Some(3), sum=3
+///  sum_array 
+/// -----------
+///          6
+/// (1 row)
+/// ```
 #[macro_export]
 macro_rules! warning {
     ($($arg:tt)*) => (
@@ -598,6 +736,35 @@ macro_rules! warning {
 }
 
 /// Log to Postgres' `error` log level.  This will abort the current Postgres transaction.
+///
+/// This macro accepts arguments like the [`println`](std::println) and [`format`](std::format) macros.
+/// See [`fmt`](std::fmt) for information about options.
+///
+/// Given some function:
+///
+/// ```rust,no_run
+/// use pgx::*;
+///
+/// #[pg_extern]
+/// fn sum_array(input: Array<i32>) -> i64 {
+///     let mut sum = 0 as i64;
+/// 
+///     for i in input {
+///         pgx::error!("i={index:?}, sum={}", sum, index = i);
+///         sum += i.unwrap_or(-1) as i64;
+///     }
+/// 
+///     sum
+/// }
+/// ```
+///
+/// When run inside PostgreSQL would output:
+///
+/// ```sql
+/// arrays=# SELECT arrays.sum_array('{1,2,3}');
+/// ERROR:  i=Some(1), sum=0
+/// CONTEXT:  src/lib.rs:37:9
+/// ```
 #[macro_export]
 macro_rules! error {
     () => ({ panic!("explicit ERROR") });
@@ -608,7 +775,39 @@ macro_rules! error {
     });
 }
 
-/// Log to Postgres' `fatal` log level.  This will abort the current Postgres backend connection processs
+/// Log to Postgres' `fatal` log level.  This will abort the current Postgres backend connection processs.
+///
+/// This macro accepts arguments like the [`println`](std::println) and [`format`](std::format) macros.
+/// See [`fmt`](std::fmt) for information about options.
+///
+/// Given some function:
+///
+/// ```rust,no_run
+/// use pgx::*;
+///
+/// #[pg_extern]
+/// fn sum_array(input: Array<i32>) -> i64 {
+///     let mut sum = 0 as i64;
+/// 
+///     for i in input {
+///         pgx::FATAL!("i={index:?}, sum={}", sum, index = i);
+///         sum += i.unwrap_or(-1) as i64;
+///     }
+/// 
+///     sum
+/// }
+/// ```
+///
+/// When run inside PostgreSQL would output:
+///
+/// ```sql
+/// arrays=# SELECT arrays.sum_array('{1,2,3}');
+/// FATAL:  i=Some(1), sum=0
+/// server closed the connection unexpectedly
+///         This probably means the server terminated abnormally
+///         before or while processing the request.
+/// The connection to the server was lost. Attempting reset: Succeeded.
+/// ```
 #[allow(non_snake_case)]
 #[macro_export]
 macro_rules! FATAL {
@@ -617,7 +816,39 @@ macro_rules! FATAL {
     )
 }
 
-/// Log to Postgres' `panic` log level.  This will cause the entire Postgres cluster to crash
+/// Log to Postgres' `panic` log level.  This will cause the entire Postgres cluster to crash.
+///
+/// This macro accepts arguments like the [`println`](std::println) and [`format`](std::format) macros.
+/// See [`fmt`](std::fmt) for information about options.
+///
+/// Given some function:
+///
+/// ```rust,no_run
+/// use pgx::*;
+///
+/// #[pg_extern]
+/// fn sum_array(input: Array<i32>) -> i64 {
+///     let mut sum = 0 as i64;
+/// 
+///     for i in input {
+///         pgx::PANIC!("i={index:?}, sum={}", sum, index = i);
+///         sum += i.unwrap_or(-1) as i64;
+///     }
+/// 
+///     sum
+/// }
+/// ```
+///
+/// When run inside PostgreSQL would output:
+///
+/// ```sql
+/// arrays=# SELECT arrays.sum_array('{1,2,3}');
+/// PANIC:  i=Some(1), sum=0
+/// server closed the connection unexpectedly
+///         This probably means the server terminated abnormally
+///         before or while processing the request.
+/// The connection to the server was lost. Attempting reset: Failed.
+/// ```
 #[allow(non_snake_case)]
 #[macro_export]
 macro_rules! PANIC {
