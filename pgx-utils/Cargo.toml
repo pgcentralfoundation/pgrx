@@ -12,7 +12,7 @@ readme = "README.md"
 
 [dependencies]
 colored = "2.0.0"
-dirs = "3.0.2"
+dirs = "4.0.0"
 env_proxy = "0.4.1"
 proc-macro2 = { version = "1.0.29", features = [ "span-locations" ] }
 quote = "1.0.9"
@@ -20,8 +20,8 @@ regex = "1.5.4"
 rttp_client = "0.1.0"
 serde = "1.0.130"
 serde_derive = "1.0.130"
-serde-xml-rs = "0.5.0"
-serde_json = "1.0.67"
+serde-xml-rs = "0.5.1"
+serde_json = "1.0.68"
 syn = { version = "1.0.76", features = [ "extra-traits", "full", "fold", "parsing" ] }
 toml = "0.5.8"
 unescape = "0.1.0"
