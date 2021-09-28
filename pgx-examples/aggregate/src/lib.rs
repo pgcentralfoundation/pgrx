@@ -3,10 +3,11 @@ use std::{
     str::FromStr,
     ffi::CStr,
 };
+use serde::{Serialize, Deserialize};
 
 pg_module_magic!();
 
-#[derive(Copy, Clone, PostgresType)]
+#[derive(Copy, Clone, PostgresType, Serialize, Deserialize)]
 #[pgvarlena_inoutfuncs]
 pub struct IntegerAvgState {
     sum: i32,
@@ -38,15 +39,39 @@ impl PgVarlenaInOutFuncs for IntegerAvgState {
 #[pg_aggregate]
 impl Aggregate for IntegerAvgState {
     type Arg = i32;
-    
-    // You can skip this:
-    // type Finalize = i32;
-
-    // You can skip this:
-    type MovingState = ();
-
 
     fn state(&self, _: i32) -> Self { todo!() }
+    
+    // You can skip this:
+    type Finalize = i32;
+
+    // You can skip this:
+    type MovingState = i32;
+
+    // You can skip all these:
+    fn finalize(&self) -> Self::Finalize {
+        unimplemented!("pgx stub, define in impls")
+    }
+
+    fn combine(&self, other: Self) -> Self {
+        unimplemented!("pgx stub, define in impls")
+    }
+    
+    fn serial(&self) -> Vec<u8> {
+        unimplemented!("pgx stub, define in impls")
+    }
+
+    fn deserial(&self, buf: Vec<u8>, internal: PgBox<Self>) -> PgBox<Self> {
+        unimplemented!("pgx stub, define in impls")
+    }
+
+    fn moving_state(mstate: Self::MovingState, v: Self::Arg) -> Self::MovingState {
+        unimplemented!("pgx stub, define in impls")
+    }
+
+    fn moving_finalize(mstate: Self::MovingState) -> Self::Finalize {
+        unimplemented!("pgx stub, define in impls")
+    } 
 }
 
 impl Default for IntegerAvgState {

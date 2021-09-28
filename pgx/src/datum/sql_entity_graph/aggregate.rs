@@ -1,6 +1,4 @@
-
-
-use crate::Internal;
+use crate::{Internal, PgBox};
 
 pub trait Aggregate where Self: Sized {
     type Arg;
@@ -14,29 +12,17 @@ pub trait Aggregate where Self: Sized {
 
     fn state(&self, v: Self::Arg) -> Self;
 
-    fn finalize(&self) -> Self::Finalize {
-        unimplemented!("pgx stub, define in impls")
-    }
+    fn finalize(&self) -> Self::Finalize;
 
-    fn combine(&self, _other: Self) -> Self {
-        unimplemented!("pgx stub, define in impls")
-    }
+    fn combine(&self, _other: Self) -> Self;
     
-    fn serial(&self) -> Vec<u8> {
-        unimplemented!("pgx stub, define in impls")
-    }
+    fn serial(&self) -> Vec<u8>;
 
-    fn deserial(&self, _buf: Vec<u8>, _internal: Internal<Self>) -> Internal<Self> {
-        unimplemented!("pgx stub, define in impls")
-    }
+    fn deserial(&self, _buf: Vec<u8>, _internal: PgBox<Self>) -> PgBox<Self>;
 
-    fn moving_state(_mstate: Self::MovingState, _v: Self::Arg) -> Self::MovingState {
-        unimplemented!("pgx stub, define in impls")
-    }
+    fn moving_state(_mstate: Self::MovingState, _v: Self::Arg) -> Self::MovingState;
 
-    fn moving_finalize(_mstate: Self::MovingState) -> Self::Finalize {
-        unimplemented!("pgx stub, define in impls")
-    }
+    fn moving_finalize(_mstate: Self::MovingState) -> Self::Finalize;
 
 }
 
