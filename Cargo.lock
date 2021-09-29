@@ -1348,7 +1348,7 @@ dependencies = [
  "serde",
  "serde_cbor",
  "serde_json",
- "time 0.3.2",
+ "time 0.3.3",
  "tracing",
  "tracing-error",
  "uuid",
@@ -1411,7 +1411,7 @@ dependencies = [
  "serde",
  "serde_json",
  "shutdown_hooks",
- "time 0.3.2",
+ "time 0.3.3",
 ]
 
 [[package]]
@@ -2213,9 +2213,9 @@ dependencies = [
 
 [[package]]
 name = "time"
-version = "0.3.2"
+version = "0.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3e0a10c9a9fb3a5dce8c2239ed670f1a2569fcf42da035f5face1b19860d52b0"
+checksum = "cde1cf55178e0293453ba2cca0d5f8392a922e52aa958aee9c28ed02becc6d03"
 dependencies = [
  "itoa",
  "libc",
@@ -2224,9 +2224,9 @@ dependencies = [
 
 [[package]]
 name = "time-macros"
-version = "0.2.2"
+version = "0.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "72c7ca5e81982d152f0788b131ebf96cc4bbd1b4575a7ed51f0f6fc866a05fdb"
+checksum = "25eb0ca3468fc0acc11828786797f6ef9aa1555e4a211a60d64cc8e4d1be47d6"
 
 [[package]]
 name = "tinyvec"
