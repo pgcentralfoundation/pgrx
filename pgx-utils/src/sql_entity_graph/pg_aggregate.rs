@@ -81,18 +81,11 @@ impl PgAggregate {
     pub fn new(
         mut item_impl: ItemImpl,
     ) -> Result<Self, syn::Error> {
-        let target_ident = match *item_impl.self_ty {
-            syn::Type::Path(ref type_path) => {
-                let last_segment = type_path.path.segments.last().ok_or_else(|| 
-                    syn::Error::new(type_path.span(), "`#[pg_aggregate]` only works with types whose path have a final segment.")
-                )?;
-                last_segment.ident.clone()
-            },
-            something_else => return Err(syn::Error::new(something_else.span(), "`#[pg_aggregate]` only works with types."))
-        };
+        let target_ident = get_target_ident(&item_impl)?;
         let mut pg_externs = Vec::default(); 
 
         if let Some((_, ref path, _)) = item_impl.trait_ {
+            // TODO: Consider checking the path if there is more than one segment to make sure it's pgx.
             if let Some(last) = path.segments.last() {
                 if last.ident.to_string() != "Aggregate" {
                     return Err(syn::Error::new(last.ident.span(), "`#[pg_aggregate]` only works with the `Aggregate` trait."))
@@ -102,6 +95,7 @@ impl PgAggregate {
 
         let mut aggregate_attrs = None;
         for attr in item_impl.attrs.clone() {
+            // TODO: Consider checking the path if there is more than one segment to make sure it's pgx.
             let attr_path = attr.path.segments.last();
             if let Some(candidate_path) = attr_path {
                 if candidate_path.ident.to_string() == "pg_aggregate" {
@@ -119,6 +113,14 @@ impl PgAggregate {
             })
         }
 
+        // `OrderBy` is an optional value, we default to nothing.
+        let type_order_by = get_impl_type_by_name(&item_impl, "OrderBy");
+        if type_order_by.is_none() {
+            item_impl.items.push(parse_quote! {
+                type OrderBy = ();
+            })
+        }
+
         // `Finalize` is an optional value, we default to nothing.
         let type_finalize = get_impl_type_by_name(&item_impl, "Finalize");
         if type_finalize.is_none() {
@@ -132,7 +134,7 @@ impl PgAggregate {
             let fn_name = Ident::new(&format!("{}_state", target_ident), found.sig.ident.span());
             pg_externs.push(parse_quote! {
                 #[pg_extern]
-                fn #fn_name(this: #target_ident, v: <#target_ident as pgx::Aggregate>::Arg) -> #target_ident {
+                fn #fn_name(this: #target_ident, v: <#target_ident as pgx::Aggregate>::Args) -> #target_ident {
                     this.state(v)
                 }
             })
@@ -215,7 +217,7 @@ impl PgAggregate {
                 #[pg_extern]
                 fn #fn_name(
                     mstate: <#target_ident as pgx::Aggregate>::MovingState,
-                    v: <#target_ident as pgx::Aggregate>::Arg,
+                    v: <#target_ident as pgx::Aggregate>::Args,
                 ) -> <#target_ident as pgx::Aggregate>::MovingState {
                     <#target_ident as pgx::Aggregate>::moving_state(mstate, v)
                 }
@@ -224,7 +226,30 @@ impl PgAggregate {
             item_impl.items.push(parse_quote! {
                 fn moving_state(
                     _mstate: <#target_ident as pgx::Aggregate>::MovingState,
-                    _v: Self::Arg
+                    _v: Self::Args
+                ) -> <#target_ident as pgx::Aggregate>::MovingState {
+                    unimplemented!("Call to moving_state on an aggregate which does not support it.")
+                }
+            })
+        }
+
+        let func_moving_state_inverse = get_impl_func_by_name(&item_impl, "moving_state_inverse");
+        if let Some(found) = func_moving_state_inverse {
+            let fn_name = Ident::new(&format!("{}_moving_state_inverse", target_ident), found.sig.ident.span());
+            pg_externs.push(parse_quote! {
+                #[pg_extern]
+                fn #fn_name(
+                    mstate: <#target_ident as pgx::Aggregate>::MovingState,
+                    v: <#target_ident as pgx::Aggregate>::Args,
+                ) -> <#target_ident as pgx::Aggregate>::MovingState {
+                    <#target_ident as pgx::Aggregate>::moving_state(mstate, v)
+                }
+            })
+        } else {
+            item_impl.items.push(parse_quote! {
+                fn moving_state_inverse(
+                    _mstate: <#target_ident as pgx::Aggregate>::MovingState,
+                    _v: Self::Args,
                 ) -> <#target_ident as pgx::Aggregate>::MovingState {
                     unimplemented!("Call to moving_state on an aggregate which does not support it.")
                 }
@@ -254,6 +279,36 @@ impl PgAggregate {
             pg_externs,
         })
     }
+
+    fn entity_fn(&self) -> ItemFn {
+        let target_ident = get_target_ident(&self.item_impl)
+            .expect("Expected constructed PgAggregate to have target ident.");
+        let sql_graph_entity_fn_name = syn::Ident::new(
+            &format!("__pgx_internals_aggregate_{}", target_ident),
+            target_ident.span(),
+        );
+        let entity_item_fn: ItemFn = parse_quote! {
+            #[no_mangle]
+            pub extern "C" fn #sql_graph_entity_fn_name() -> pgx::datum::sql_entity_graph::SqlGraphEntity {
+                todo!()
+            }
+        };
+        entity_item_fn
+    }
+}
+
+fn get_target_ident(item_impl: &ItemImpl) -> Result<Ident, syn::Error> {
+    let target_ident = match &*item_impl.self_ty {
+        syn::Type::Path(ref type_path) => {
+            // TODO: Consider checking the path if there is more than one segment to make sure it's pgx.
+            let last_segment = type_path.path.segments.last().ok_or_else(|| 
+                syn::Error::new(type_path.span(), "`#[pg_aggregate]` only works with types whose path have a final segment.")
+            )?;
+            last_segment.ident.clone()
+        },
+        something_else => return Err(syn::Error::new(something_else.span(), "`#[pg_aggregate]` only works with types."))
+    };
+    Ok(target_ident)
 }
 
 impl Parse for PgAggregate {
@@ -265,12 +320,15 @@ impl Parse for PgAggregate {
 
 impl ToTokens for PgAggregate {
     fn to_tokens(&self, tokens: &mut TokenStream2) {
+        let entity_fn = self.entity_fn();
         let impl_item = &self.item_impl;
         let pg_externs = self.pg_externs.iter();
         let inv = quote! {
             #impl_item
 
             #(#pg_externs)*
+
+            #entity_fn
         };
         tokens.append_all(inv);
     }
