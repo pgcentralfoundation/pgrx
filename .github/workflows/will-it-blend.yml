@@ -42,4 +42,4 @@ jobs:
 
       # just see if the code checks out okay
       - name: cargo check
-        run: RUST_BACKTRACE=1 cargo check --all --features "pg${{ matrix.version }}"
+        run: RUST_BACKTRACE=1 cargo check --all --features "pg${{ matrix.version }} pg_test"
