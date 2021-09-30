@@ -3,6 +3,7 @@ use crate::commands::get::get_property;
 use colored::Colorize;
 use pgx_utils::pg_config::PgConfig;
 use pgx_utils::{exit_with_error, handle_result};
+use std::collections::HashSet;
 use std::fs::File;
 use std::os::unix::prelude::PermissionsExt;
 use std::{
@@ -142,7 +143,9 @@ pub(crate) fn generate_schema(
     let buffer = ByteView::open(dsym_path.as_deref().unwrap_or(&sql_gen_path))?;
     let archive = Archive::parse(&buffer).expect("Could not parse archive");
 
-    let mut fns_to_call = Vec::new();
+    // Some users reported experiencing duplicate entries if we don't ensure `fns_to_call`
+    // has unique entries.
+    let mut fns_to_call = HashSet::new();
     for object in archive.objects() {
         match object {
             Ok(object) => match object.symbols() {
@@ -150,7 +153,7 @@ pub(crate) fn generate_schema(
                     for symbol in iter {
                         if let Some(name) = symbol.name {
                             if name.starts_with("__pgx_internals") {
-                                fns_to_call.push(name);
+                                fns_to_call.insert(name);
                             }
                         }
                     }
@@ -159,7 +162,7 @@ pub(crate) fn generate_schema(
                     for symbol in iter {
                         if let Some(name) = symbol.name {
                             if name.starts_with("__pgx_internals") {
-                                fns_to_call.push(name);
+                                fns_to_call.insert(name);
                             }
                         }
                     }
