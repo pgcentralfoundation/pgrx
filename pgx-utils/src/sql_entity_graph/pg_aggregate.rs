@@ -277,6 +277,7 @@ impl PgAggregate {
             aggregate_attrs,
             item_impl,
             pg_externs,
+            has_order_by: type_order_by
         })
     }
 
@@ -287,10 +288,31 @@ impl PgAggregate {
             &format!("__pgx_internals_aggregate_{}", target_ident),
             target_ident.span(),
         );
+
+        // TODO: Get all the params.
+
         let entity_item_fn: ItemFn = parse_quote! {
             #[no_mangle]
             pub extern "C" fn #sql_graph_entity_fn_name() -> pgx::datum::sql_entity_graph::SqlGraphEntity {
-                todo!()
+                PgAggregateEntity {
+                    args: &[],
+                    order_by: &[],
+                    stype: "todo",
+                    sfunc: "todo",
+                    finalfunc: None,
+                    finalfunc_modify: None,
+                    serialfunc: None,
+                    deserialfunc: None,
+                    msfunc: None,
+                    mvinvfunc: None,
+                    mstype: None,
+                    mfinalfunc: None,
+                    mfinalfunc_modify: None,
+                    minitcond: None,
+                    sortop: None,
+                    parallel: None,
+                    hypothetical: None,
+                }
             }
         };
         entity_item_fn

@@ -101,7 +101,7 @@ pub struct PgAggregateEntity {
     /// The `ORDER BY arg_data_type` list.
     ///
     /// Corresponds to `OrderBy` in [`Aggregate`].
-    pub order_by: &'static [&'static str],
+    pub order_by: Option<&'static [&'static str]>,
 
     /// The `STYPE` and `name` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
