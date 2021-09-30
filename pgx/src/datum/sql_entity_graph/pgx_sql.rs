@@ -4,12 +4,7 @@ use std::{any::TypeId, collections::HashMap, fmt::Debug};
 use petgraph::{dot::Dot, graph::NodeIndex, stable_graph::StableGraph};
 use tracing::instrument;
 
-use super::{
-    ControlFile, ExtensionSqlEntity, PgExternEntity, PgExternReturnEntity, PositioningRef,
-    PostgresEnumEntity, PostgresHashEntity, PostgresOrdEntity, PostgresTypeEntity,
-    RustSourceOnlySqlMapping, RustSqlMapping, SchemaEntity, SqlDeclaredEntity, SqlGraphEntity,
-    SqlGraphIdentifier, ToSql,
-};
+use super::{ControlFile, ExtensionSqlEntity, PgExternEntity, PgExternReturnEntity, PositioningRef, PostgresEnumEntity, PostgresHashEntity, PostgresOrdEntity, PostgresTypeEntity, RustSourceOnlySqlMapping, RustSqlMapping, SchemaEntity, SqlDeclaredEntity, SqlGraphEntity, SqlGraphIdentifier, ToSql, aggregate::PgAggregateEntity};
 use pgx_utils::sql_entity_graph::SqlDeclared;
 
 /// A generator for SQL.
@@ -43,6 +38,7 @@ pub struct PgxSql {
     pub enums: HashMap<PostgresEnumEntity, NodeIndex>,
     pub ords: HashMap<PostgresOrdEntity, NodeIndex>,
     pub hashes: HashMap<PostgresHashEntity, NodeIndex>,
+    pub aggregates: HashMap<PgAggregateEntity, NodeIndex>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Eq, Ord)]
@@ -72,6 +68,7 @@ impl PgxSql {
         let mut enums: Vec<PostgresEnumEntity> = Vec::default();
         let mut ords: Vec<PostgresOrdEntity> = Vec::default();
         let mut hashes: Vec<PostgresHashEntity> = Vec::default();
+        let mut aggregates: Vec<PgAggregateEntity> = Vec::default();
         for entity in entities {
             match entity {
                 SqlGraphEntity::ExtensionRoot(input_control) => {
@@ -98,6 +95,9 @@ impl PgxSql {
                 }
                 SqlGraphEntity::Hash(input_hash) => {
                     hashes.push(input_hash);
+                }
+                SqlGraphEntity::Aggregate(input_hash) => {
+                    aggregates.push(input_hash);
                 }
             }
         }
@@ -129,6 +129,7 @@ impl PgxSql {
         )?;
         let mapped_ords = initialize_ords(&mut graph, root, bootstrap, finalize, ords)?;
         let mapped_hashes = initialize_hashes(&mut graph, root, bootstrap, finalize, hashes)?;
+        let mapped_aggregates = initialize_aggregates(&mut graph, root, bootstrap, finalize, aggregates)?;
 
         // Now we can circle back and build up the edge sets.
         connect_schemas(&mut graph, &mapped_schemas, root);
@@ -165,6 +166,13 @@ impl PgxSql {
             &mapped_types,
             &mapped_enums,
         );
+        connect_aggregates(
+            &mut graph,
+            &mapped_aggregates,
+            &mapped_schemas,
+            &mapped_types,
+            &mapped_enums,
+        );
 
         let mut this = Self {
             type_mappings: type_mappings.map(|x| (x.id.clone(), x)).collect(),
@@ -178,6 +186,7 @@ impl PgxSql {
             enums: mapped_enums,
             ords: mapped_ords,
             hashes: mapped_hashes,
+            aggregates: mapped_aggregates,
             graph: graph,
             graph_root: root,
             graph_bootstrap: bootstrap,
@@ -254,6 +263,10 @@ impl PgxSql {
                         node.dot_identifier()
                     ),
                     SqlGraphEntity::Hash(_item) => format!(
+                        "label = \"{}\", penwidth = 0, style = \"filled\", fillcolor = \"#FFE4E0\", weight = 5, shape = \"diamond\"",
+                        node.dot_identifier()
+                    ),
+                    SqlGraphEntity::Aggregate(_item) => format!(
                         "label = \"{}\", penwidth = 0, style = \"filled\", fillcolor = \"#FFE4E0\", weight = 5, shape = \"diamond\"",
                         node.dot_identifier()
                     ),
@@ -1042,6 +1055,56 @@ fn connect_hashes(
         for (ty_item, &ty_index) in enums {
             if ty_item.id_matches(&item.id) {
                 tracing::debug!(from = ?item.full_path, to = ty_item.full_path, "Adding Hash after Enum edge.");
+                graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredBy);
+                break;
+            }
+        }
+    }
+}
+
+
+fn initialize_aggregates(
+    graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
+    root: NodeIndex,
+    bootstrap: Option<NodeIndex>,
+    finalize: Option<NodeIndex>,
+    aggregates: Vec<PgAggregateEntity>,
+) -> eyre::Result<HashMap<PgAggregateEntity, NodeIndex>> {
+    let mut mapped_aggregates = HashMap::default();
+    for item in aggregates {
+        let entity: SqlGraphEntity = item.clone().into();
+        let index = graph.add_node(entity);
+        mapped_aggregates.insert(item, index);
+        build_base_edges(graph, index, root, bootstrap, finalize);
+    }
+    Ok(mapped_aggregates)
+}
+
+fn connect_aggregates(
+    graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
+    aggregates: &HashMap<PgAggregateEntity, NodeIndex>,
+    schemas: &HashMap<SchemaEntity, NodeIndex>,
+    types: &HashMap<PostgresTypeEntity, NodeIndex>,
+    enums: &HashMap<PostgresEnumEntity, NodeIndex>,
+) {
+    for (item, &index) in aggregates {
+        for (schema_item, &schema_index) in schemas {
+            if item.module_path == schema_item.module_path {
+                tracing::debug!(from = ?item.full_path, to = schema_item.module_path, "Adding Aggregate after Schema edge.");
+                graph.add_edge(schema_index, index, SqlGraphRelationship::RequiredBy);
+                break;
+            }
+        }
+        for (ty_item, &ty_index) in types {
+            if ty_item.id_matches(&item.ty_id) {
+                tracing::debug!(from = ?item.full_path, to = ty_item.full_path, "Adding Aggregate after Type edge.");
+                graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredBy);
+                break;
+            }
+        }
+        for (ty_item, &ty_index) in enums {
+            if ty_item.id_matches(&item.ty_id) {
+                tracing::debug!(from = ?item.full_path, to = ty_item.full_path, "Adding Aggregate after Enum edge.");
                 graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredBy);
                 break;
             }

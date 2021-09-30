@@ -1,5 +1,6 @@
-use crate::{Internal, PgBox};
+use crate::{sql_entity_graph::{SqlGraphIdentifier, SqlGraphEntity, ToSql}, Internal, PgBox};
 use pgx_utils::sql_entity_graph::PgAggregate;
+use std::{cmp::Ordering, any::TypeId};
 
 pub trait Aggregate where Self: Sized {
     /// The type of the argument(s).
@@ -79,6 +80,7 @@ pub trait Aggregate where Self: Sized {
 }
 
 /// Corresponds to the `PARALLEL` and `MFINALFUNC_MODIFY` in [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html).
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub enum ParallelOption {
     Safe,
     Restricted,
@@ -86,13 +88,21 @@ pub enum ParallelOption {
 }
 
 /// Corresponds to the `FINALFUNC_MODIFY` and `MFINALFUNC_MODIFY` in [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html).
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub enum FinalizeModify {
     ReadOnly,
     Shareable,
     ReadWrite,
 }
 
+#[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub struct PgAggregateEntity {
+    pub full_path: &'static str,
+    pub module_path: &'static str,
+    pub file: &'static str,
+    pub line: u32,
+    pub ty_id: TypeId,
+
     /// The `arg_data_type` list.
     ///
     /// Corresponds to `Args` in [`Aggregate`].
@@ -187,4 +197,55 @@ pub struct PgAggregateEntity {
     ///
     /// Corresponds to `hypothetical` in [`Aggregate`].
     pub hypothetical: Option<ParallelOption>,
+}
+
+impl Ord for PgAggregateEntity {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.file
+            .cmp(other.full_path)
+            .then_with(|| self.file.cmp(other.full_path))
+    }
+}
+
+impl PartialOrd for PgAggregateEntity {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Into<SqlGraphEntity> for PgAggregateEntity {
+    fn into(self) -> SqlGraphEntity {
+        SqlGraphEntity::Aggregate(self)
+    }
+}
+
+impl SqlGraphIdentifier for PgAggregateEntity {
+    fn dot_identifier(&self) -> String {
+        format!("aggregate {}", self.full_path)
+    }
+    fn rust_identifier(&self) -> String {
+        self.full_path.to_string()
+    }
+    fn file(&self) -> Option<&'static str> {
+        Some(self.file)
+    }
+    fn line(&self) -> Option<u32> {
+        Some(self.line)
+    }
+}
+
+impl ToSql for PgAggregateEntity {
+    #[tracing::instrument(level = "debug", err, skip(self, _context), fields(identifier = %self.rust_identifier()))]
+    fn to_sql(&self, _context: &super::PgxSql) -> eyre::Result<String> {
+        let sql = format!("\n\
+                            -- {file}:{line}\n\
+                            -- {full_path}\n\
+                            -- AGGREGATE STUFF HERE",
+                          full_path = self.full_path,
+                          file = self.file,
+                          line = self.line,
+        );
+        tracing::debug!(%sql);
+        Ok(sql)
+    }
 }

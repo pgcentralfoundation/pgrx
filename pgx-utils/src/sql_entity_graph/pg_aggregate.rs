@@ -1,6 +1,6 @@
 use proc_macro2::{Ident, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
-use syn::{ImplItemMethod, ImplItemType, ItemFn, ItemImpl, parse::{Parse, ParseStream}, parse_quote, spanned::Spanned};
+use syn::{ImplItemConst, ImplItemMethod, ImplItemType, ItemFn, ItemImpl, parse::{Parse, ParseStream}, parse_quote, spanned::Spanned};
 use syn::{punctuated::Punctuated, Token};
 
 #[derive(Debug, Clone, Hash, Eq, PartialEq)]
@@ -75,6 +75,23 @@ pub struct PgAggregate {
     aggregate_attrs: Option<PgAggregateAttrs>,
     item_impl: ItemImpl,
     pg_externs: Vec<ItemFn>,
+    has_type_order_by: bool,
+    has_type_finalize: bool,
+    has_type_moving_state: bool,
+    has_const_parallel: bool,
+    has_const_finalize_modify: bool,
+    has_const_moving_finalize_modify: bool,
+    has_const_initial_condition: bool,
+    has_const_sort_operator: bool,
+    has_const_moving_intial_condition: bool,
+    has_const_hypothetical: bool,
+    has_fn_finalize: bool,
+    has_fn_combine: bool,
+    has_fn_serial: bool,
+    has_fn_deserial: bool,
+    has_fn_moving_state: bool,
+    has_fn_moving_state_inverse: bool,
+    has_fn_moving_finalize: bool,
 }
 
 impl PgAggregate {
@@ -83,7 +100,10 @@ impl PgAggregate {
     ) -> Result<Self, syn::Error> {
         let target_ident = get_target_ident(&item_impl)?;
         let mut pg_externs = Vec::default(); 
-
+        // We want to avoid having multiple borrows, so we take a snapshot to scan from,
+        // and mutate the actual one.
+        let item_impl_snapshot = item_impl.clone();
+        
         if let Some((_, ref path, _)) = item_impl.trait_ {
             // TODO: Consider checking the path if there is more than one segment to make sure it's pgx.
             if let Some(last) = path.segments.last() {
@@ -106,7 +126,7 @@ impl PgAggregate {
         }
 
         // `MovingState` is an optional value, we default to nothing.
-        let type_moving_state = get_impl_type_by_name(&item_impl, "MovingState");
+        let type_moving_state = get_impl_type_by_name(&item_impl_snapshot, "MovingState");
         if type_moving_state.is_none() {
             item_impl.items.push(parse_quote! {
                 type MovingState = ();
@@ -114,7 +134,7 @@ impl PgAggregate {
         }
 
         // `OrderBy` is an optional value, we default to nothing.
-        let type_order_by = get_impl_type_by_name(&item_impl, "OrderBy");
+        let type_order_by = get_impl_type_by_name(&item_impl_snapshot, "OrderBy");
         if type_order_by.is_none() {
             item_impl.items.push(parse_quote! {
                 type OrderBy = ();
@@ -122,15 +142,15 @@ impl PgAggregate {
         }
 
         // `Finalize` is an optional value, we default to nothing.
-        let type_finalize = get_impl_type_by_name(&item_impl, "Finalize");
+        let type_finalize = get_impl_type_by_name(&item_impl_snapshot, "Finalize");
         if type_finalize.is_none() {
             item_impl.items.push(parse_quote! {
                 type Finalize = ();
             })
         }
 
-        let func_state = get_impl_func_by_name(&item_impl, "state");
-        if let Some(found) = func_state {
+        let fn_state = get_impl_func_by_name(&item_impl_snapshot, "state");
+        if let Some(found) = fn_state {
             let fn_name = Ident::new(&format!("{}_state", target_ident), found.sig.ident.span());
             pg_externs.push(parse_quote! {
                 #[pg_extern]
@@ -142,8 +162,8 @@ impl PgAggregate {
             return Err(syn::Error::new(item_impl.span(), "Aggregate implementation must include state function."))
         }
 
-        let func_combine = get_impl_func_by_name(&item_impl, "combine");
-        if let Some(found) = func_combine {
+        let fn_combine = get_impl_func_by_name(&item_impl_snapshot, "combine");
+        if let Some(found) = fn_combine {
             let fn_name = Ident::new(&format!("{}_combine", target_ident), found.sig.ident.span());
             pg_externs.push(parse_quote! {
                 #[pg_extern]
@@ -159,8 +179,8 @@ impl PgAggregate {
             })
         }
 
-        let func_finalize = get_impl_func_by_name(&item_impl, "finalize");
-        if let Some(found) = func_finalize {
+        let fn_finalize = get_impl_func_by_name(&item_impl_snapshot, "finalize");
+        if let Some(found) = fn_finalize {
             let fn_name = Ident::new(&format!("{}_finalize", target_ident), found.sig.ident.span());
             pg_externs.push(parse_quote! {
                 #[pg_extern]
@@ -176,8 +196,8 @@ impl PgAggregate {
             })
         }
 
-        let func_serial = get_impl_func_by_name(&item_impl, "serial");
-        if let Some(found) = func_serial {
+        let fn_serial = get_impl_func_by_name(&item_impl_snapshot, "serial");
+        if let Some(found) = fn_serial {
             let fn_name = Ident::new(&format!("{}_serial", target_ident), found.sig.ident.span());
             pg_externs.push(parse_quote! {
                 #[pg_extern]
@@ -193,8 +213,8 @@ impl PgAggregate {
             })
         }
 
-        let func_deserial = get_impl_func_by_name(&item_impl, "deserial");
-        if let Some(found) = func_deserial {
+        let fn_deserial = get_impl_func_by_name(&item_impl_snapshot, "deserial");
+        if let Some(found) = fn_deserial {
             let fn_name = Ident::new(&format!("{}_deserial", target_ident), found.sig.ident.span());
             pg_externs.push(parse_quote! {
                 #[pg_extern]
@@ -210,8 +230,8 @@ impl PgAggregate {
             })
         }
 
-        let func_moving_state = get_impl_func_by_name(&item_impl, "moving_state");
-        if let Some(found) = func_moving_state {
+        let fn_moving_state = get_impl_func_by_name(&item_impl_snapshot, "moving_state");
+        if let Some(found) = fn_moving_state {
             let fn_name = Ident::new(&format!("{}_moving_state", target_ident), found.sig.ident.span());
             pg_externs.push(parse_quote! {
                 #[pg_extern]
@@ -233,8 +253,8 @@ impl PgAggregate {
             })
         }
 
-        let func_moving_state_inverse = get_impl_func_by_name(&item_impl, "moving_state_inverse");
-        if let Some(found) = func_moving_state_inverse {
+        let fn_moving_state_inverse = get_impl_func_by_name(&item_impl_snapshot, "moving_state_inverse");
+        if let Some(found) = fn_moving_state_inverse {
             let fn_name = Ident::new(&format!("{}_moving_state_inverse", target_ident), found.sig.ident.span());
             pg_externs.push(parse_quote! {
                 #[pg_extern]
@@ -256,8 +276,8 @@ impl PgAggregate {
             })
         }
 
-        let func_moving_finalize = get_impl_func_by_name(&item_impl, "moving_finalize");
-        if let Some(found) = func_moving_finalize {
+        let fn_moving_finalize = get_impl_func_by_name(&item_impl_snapshot, "moving_finalize");
+        if let Some(found) = fn_moving_finalize {
             let fn_name = Ident::new(&format!("{}_moving_finalize", target_ident), found.sig.ident.span());
             pg_externs.push(parse_quote! {
                 #[pg_extern]
@@ -277,7 +297,23 @@ impl PgAggregate {
             aggregate_attrs,
             item_impl,
             pg_externs,
-            has_order_by: type_order_by
+            has_type_order_by: type_order_by.is_some(),
+            has_type_finalize: type_finalize.is_some(),
+            has_type_moving_state: type_moving_state.is_some(),
+            has_const_parallel: get_impl_const_by_name(&item_impl_snapshot, "PARALLEL").is_some(),
+            has_const_finalize_modify: get_impl_const_by_name(&item_impl_snapshot, "FINALIZE_MODIFY").is_some(),
+            has_const_moving_finalize_modify: get_impl_const_by_name(&item_impl_snapshot, "MOVING_FINALIZE_MODIFY").is_some(), // const_moving_finalize_modify.is_some(),
+            has_const_initial_condition: get_impl_const_by_name(&item_impl_snapshot, "INITIAL_CONDITION").is_some(),
+            has_const_sort_operator: get_impl_const_by_name(&item_impl_snapshot, "SORT_OPERATOR").is_some(),
+            has_const_moving_intial_condition: get_impl_const_by_name(&item_impl_snapshot, "MOVING_INITIAL_CONDITION").is_some(),
+            has_const_hypothetical:  get_impl_const_by_name(&item_impl_snapshot, "HYPOTHETICAL").is_some(),
+            has_fn_finalize: fn_finalize.is_some(),
+            has_fn_combine: fn_combine.is_some(),
+            has_fn_serial: fn_serial.is_some(),
+            has_fn_deserial: fn_deserial.is_some(),
+            has_fn_moving_state: fn_moving_state.is_some(),
+            has_fn_moving_state_inverse: fn_moving_state_inverse.is_some(),
+            has_fn_moving_finalize: fn_moving_finalize.is_some(),
         })
     }
 
@@ -294,17 +330,23 @@ impl PgAggregate {
         let entity_item_fn: ItemFn = parse_quote! {
             #[no_mangle]
             pub extern "C" fn #sql_graph_entity_fn_name() -> pgx::datum::sql_entity_graph::SqlGraphEntity {
-                PgAggregateEntity {
+                let submission = pgx::datum::sql_entity_graph::PgAggregateEntity {
+                    full_path: core::any::type_name::<#target_ident>(),
+                    module_path: module_path!(),
+                    file: file!(),
+                    line: line!(),
+                    ty_id: core::any::TypeId::of::<#target_ident>(),
                     args: &[],
-                    order_by: &[],
+                    order_by: None,
                     stype: "todo",
                     sfunc: "todo",
                     finalfunc: None,
                     finalfunc_modify: None,
+                    initcond: None,
                     serialfunc: None,
                     deserialfunc: None,
                     msfunc: None,
-                    mvinvfunc: None,
+                    minvfunc: None,
                     mstype: None,
                     mfinalfunc: None,
                     mfinalfunc_modify: None,
@@ -312,7 +354,8 @@ impl PgAggregate {
                     sortop: None,
                     parallel: None,
                     hypothetical: None,
-                }
+                };
+                pgx::datum::sql_entity_graph::SqlGraphEntity::Aggregate(submission)
             }
         };
         entity_item_fn
@@ -380,6 +423,22 @@ fn get_impl_func_by_name<'a>(item_impl: &'a ItemImpl, name: &str) -> Option<&'a 
                 let ident_string = impl_item_method.sig.ident.to_string();
                 if ident_string == name {
                     needle = Some(impl_item_method);
+                }
+            },
+            _ => (),
+        }
+    }
+    needle
+}
+
+fn get_impl_const_by_name<'a>(item_impl: &'a ItemImpl, name: &str) -> Option<&'a ImplItemConst> {
+    let mut needle = None;
+    for impl_item in item_impl.items.iter() {
+        match impl_item {
+            syn::ImplItem::Const(impl_item_const) => {
+                let ident_string = impl_item_const.ident.to_string();
+                if ident_string == name {
+                    needle = Some(impl_item_const);
                 }
             },
             _ => (),
