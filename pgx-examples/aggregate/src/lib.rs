@@ -1,4 +1,5 @@
 use pgx::*;
+use pgx::datum::sql_entity_graph::{ParallelOption, FinalizeModify};
 use std::{
     str::FromStr,
     ffi::CStr,
@@ -42,12 +43,19 @@ impl Aggregate for IntegerAvgState {
     const NAME: &'static str = "DEMOAVG";
 
     fn state(&self, _: i32) -> Self { todo!() }
-    
-    // You can skip this:
-    type Finalize = i32;
 
-    // You can skip this:
+    // You can skip all these:
+    type Finalize = i32;
+    type OrderBy = i32;
     type MovingState = i32;
+
+    const PARALLEL: Option<ParallelOption> = Some(ParallelOption::Unsafe);
+    const FINALIZE_MODIFY: Option<FinalizeModify> = Some(FinalizeModify::ReadWrite);
+    const MOVING_FINALIZE_MODIFY: Option<FinalizeModify> = Some(FinalizeModify::ReadWrite);
+    const INITIAL_CONDITION: Option<&'static str> = Some("0,0");
+    const SORT_OPERATOR: Option<&'static str> = Some("sortop");
+    const MOVING_INITIAL_CONDITION: Option<&'static str> = Some("1,1");
+    const HYPOTHETICAL: bool = true;
 
     // You can skip all these:
     fn finalize(&self) -> Self::Finalize {

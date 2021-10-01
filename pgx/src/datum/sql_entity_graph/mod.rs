@@ -3,7 +3,7 @@ pub use pgx_sql::PgxSql;
 
 mod aggregate;
 pub use aggregate::{
-    Aggregate, ParallelOption, PgAggregateEntity,
+    Aggregate, ParallelOption, FinalizeModify, PgAggregateEntity,
 };
 
 mod control_file;
