@@ -1344,6 +1344,7 @@ dependencies = [
  "pgx-macros",
  "pgx-pg-sys",
  "pgx-utils",
+ "quote",
  "seahash",
  "serde",
  "serde_cbor",

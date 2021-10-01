@@ -1,6 +1,7 @@
-use crate::{sql_entity_graph::{SqlGraphIdentifier, SqlGraphEntity, ToSql}, Internal, PgBox};
+use crate::{sql_entity_graph::{SqlGraphIdentifier, SqlGraphEntity, ToSql, PgxSql}, Internal, PgBox};
 use pgx_utils::sql_entity_graph::PgAggregate;
 use std::{cmp::Ordering, any::TypeId};
+use quote::{quote, ToTokens};
 
 pub trait Aggregate where Self: Sized {
     /// The type of the argument(s).
@@ -32,6 +33,9 @@ pub trait Aggregate where Self: Sized {
 
     /// **Optional:** The `#[pg_aggregate]` macro will populate these if not provided.
     type MovingState;
+
+    /// The name of the aggregate. (eg. What you'd pass to `SELECT agg(col) FROM tab`.)
+    const NAME: &'static str;
 
     /// **Optional:** The `#[pg_aggregate]` macro will populate these if not provided.
     const PARALLEL: Option<ParallelOption> = None;
@@ -80,19 +84,41 @@ pub trait Aggregate where Self: Sized {
 }
 
 /// Corresponds to the `PARALLEL` and `MFINALFUNC_MODIFY` in [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html).
-#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub enum ParallelOption {
     Safe,
     Restricted,
     Unsafe,
 }
 
+impl ToSql for ParallelOption {
+    fn to_sql(&self, _context: &PgxSql) -> eyre::Result<String> {
+        let value = match self {
+            ParallelOption::Safe => String::from("SAFE"),
+            ParallelOption::Restricted => String::from("RESTRICTED"),
+            ParallelOption::Unsafe => String::from("UNSAFE"),
+        };
+        Ok(value)
+    }
+}
+
 /// Corresponds to the `FINALFUNC_MODIFY` and `MFINALFUNC_MODIFY` in [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html).
-#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub enum FinalizeModify {
     ReadOnly,
     Shareable,
     ReadWrite,
+}
+
+impl ToSql for FinalizeModify {
+    fn to_sql(&self, _context: &PgxSql) -> eyre::Result<String> {
+        let value = match self {
+            FinalizeModify::ReadOnly => String::from("READ_ONLY"),
+            FinalizeModify::Shareable => String::from("SHAREABLE"),
+            FinalizeModify::ReadWrite => String::from("READ_WRITE"),
+        };
+        Ok(value)
+    }
 }
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
@@ -102,6 +128,8 @@ pub struct PgAggregateEntity {
     pub file: &'static str,
     pub line: u32,
     pub ty_id: TypeId,
+
+    pub name: &'static str,
 
     /// The `arg_data_type` list.
     ///
@@ -126,12 +154,17 @@ pub struct PgAggregateEntity {
     /// The `FINALFUNC` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
     /// Corresponds to `final` in [`Aggregate`].
-    pub finalfunc: Option<FinalizeModify>,
+    pub finalfunc: Option<&'static str>,
     
     /// The `FINALFUNC_MODIFY` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
     /// Corresponds to `FINALIZE_MODIFY` in [`Aggregate`].
-    pub finalfunc_modify: Option<&'static str>,
+    pub finalfunc_modify: Option<FinalizeModify>,
+
+    /// The `COMBINEFUNC` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
+    ///
+    /// Corresponds to `combine` in [`Aggregate`].
+    pub combinefunc: Option<&'static str>,
 
     /// The `SERIALFUNC` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
@@ -163,10 +196,10 @@ pub struct PgAggregateEntity {
     /// Corresponds to `MovingState` in [`Aggregate`].
     pub mstype: Option<&'static str>,
     
-    /// The `MSSPACE` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
-    ///
-    /// TODO: Currently unused.
-    /// pub msspace: &'static str,
+    // The `MSSPACE` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
+    //
+    // TODO: Currently unused.
+    // pub msspace: &'static str,
 
     /// The `MFINALFUNC` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
@@ -175,8 +208,8 @@ pub struct PgAggregateEntity {
 
     /// The `MFINALFUNC_MODIFY` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
-    /// Corresponds to `moving_state_finalize` in [`Aggregate`].
-    pub mfinalfunc_modify: Option<&'static str>,
+    /// Corresponds to `MOVING_FINALIZE_MODIFY` in [`Aggregate`].
+    pub mfinalfunc_modify: Option<FinalizeModify>,
 
     /// The `MINITCOND` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
@@ -196,7 +229,7 @@ pub struct PgAggregateEntity {
     /// The `HYPOTHETICAL` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
     /// Corresponds to `hypothetical` in [`Aggregate`].
-    pub hypothetical: Option<ParallelOption>,
+    pub hypothetical: bool,
 }
 
 impl Ord for PgAggregateEntity {
@@ -235,15 +268,79 @@ impl SqlGraphIdentifier for PgAggregateEntity {
 }
 
 impl ToSql for PgAggregateEntity {
-    #[tracing::instrument(level = "debug", err, skip(self, _context), fields(identifier = %self.rust_identifier()))]
-    fn to_sql(&self, _context: &super::PgxSql) -> eyre::Result<String> {
+    #[tracing::instrument(level = "debug", err, skip(self, context), fields(identifier = %self.rust_identifier()))]
+    fn to_sql(&self, context: &super::PgxSql) -> eyre::Result<String> {
+        let mut optional_attributes = Vec::new();
+
+        if let Some(value) = self.order_by {
+            optional_attributes.push(format!("ORDER_BY = {}", ""));
+        }
+        if let Some(value) = self.finalfunc {
+            optional_attributes.push(format!("FINALFUNC = {}", value));
+        }
+        if let Some(value) = self.finalfunc_modify {
+            optional_attributes.push(format!("FINALFUNC_MODIFY = {}", value.to_sql(context)?));
+        }
+        if let Some(value) = self.combinefunc {
+            optional_attributes.push(format!("COMBINEFUNC = {}", value));
+        }
+        if let Some(value) = self.serialfunc {
+            optional_attributes.push(format!("SERIALFUNC = {}", value));
+        }
+        if let Some(value) = self.deserialfunc {
+            optional_attributes.push(format!("DESERIALFUNC = {}", value));
+        }
+        if let Some(value) = self.initcond {
+            optional_attributes.push(format!("INITCOND = {}", value));
+        }
+        if let Some(value) = self.msfunc {
+            optional_attributes.push(format!("MSFUNC = {}", value));
+        }
+        if let Some(value) = self.minvfunc {
+            optional_attributes.push(format!("MINVFUNC = {}", value));
+        }
+        if let Some(value) = self.mstype {
+            optional_attributes.push(format!("MSTYPE = {}", value));
+        }
+        if let Some(value) = self.mfinalfunc {
+            optional_attributes.push(format!("MFINALFUNC = {}", value));
+        }
+        if let Some(value) = self.mfinalfunc_modify {
+            optional_attributes.push(format!("MFINALFUNC_MODIFY = {}", value.to_sql(context)?));
+        }
+        if let Some(value) = self.minitcond {
+            optional_attributes.push(format!("MINITCOND = {}", value));
+        }
+        if let Some(value) = self.sortop {
+            optional_attributes.push(format!("SORTOP = {}", value));
+        }
+        if let Some(value) = self.parallel {
+            optional_attributes.push(format!("PARALLEL = {}", value.to_sql(context)?));
+        }
+        if self.hypothetical {
+            optional_attributes.push(String::from("HYPOTHETICAL"))
+        }
+
         let sql = format!("\n\
-                            -- {file}:{line}\n\
-                            -- {full_path}\n\
-                            -- AGGREGATE STUFF HERE",
-                          full_path = self.full_path,
-                          file = self.file,
-                          line = self.line,
+                -- {file}:{line}\n\
+                -- {full_path}\n\
+                CREATE AGGREGATE {name} ({args})\n\
+                {maybe_order_by}\
+                (\n\
+                    \tsfunc = {sfunc},\n\
+                    \tstype = {stype},\n\
+                    {optional_attributes}\
+                )\n\
+            ",
+            name = self.name,
+            full_path = self.full_path,
+            file = self.file,
+            line = self.line,
+            sfunc = "$SFUNC",
+            stype = "$STYPE",
+            args = "$ARGS",
+            maybe_order_by = "\t$ORDER_BY\n",
+            optional_attributes = String::from("\t") + &optional_attributes.join(",\n\t") + "\n",
         );
         tracing::debug!(%sql);
         Ok(sql)

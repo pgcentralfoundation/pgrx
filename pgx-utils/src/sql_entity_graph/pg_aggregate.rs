@@ -75,23 +75,25 @@ pub struct PgAggregate {
     aggregate_attrs: Option<PgAggregateAttrs>,
     item_impl: ItemImpl,
     pg_externs: Vec<ItemFn>,
-    has_type_order_by: bool,
-    has_type_finalize: bool,
-    has_type_moving_state: bool,
-    has_const_parallel: bool,
-    has_const_finalize_modify: bool,
-    has_const_moving_finalize_modify: bool,
-    has_const_initial_condition: bool,
-    has_const_sort_operator: bool,
-    has_const_moving_intial_condition: bool,
-    has_const_hypothetical: bool,
-    has_fn_finalize: bool,
-    has_fn_combine: bool,
-    has_fn_serial: bool,
-    has_fn_deserial: bool,
-    has_fn_moving_state: bool,
-    has_fn_moving_state_inverse: bool,
-    has_fn_moving_finalize: bool,
+    // Note these should not be considered *writable*, they're snapshots from construction.
+    type_order_by: Option<syn::Type>,
+    type_finalize: Option<syn::Type>,
+    type_moving_state: Option<syn::Type>,
+    const_parallel: Option<ImplItemConst>,
+    const_finalize_modify: Option<ImplItemConst>,
+    const_moving_finalize_modify: Option<ImplItemConst>,
+    const_initial_condition: Option<ImplItemConst>,
+    const_sort_operator: Option<ImplItemConst>,
+    const_moving_intial_condition: Option<ImplItemConst>,
+    fn_state: Ident,
+    fn_finalize: Option<Ident>,
+    fn_combine: Option<Ident>,
+    fn_serial: Option<Ident>,
+    fn_deserial: Option<Ident>,
+    fn_moving_state: Option<Ident>,
+    fn_moving_state_inverse: Option<Ident>,
+    fn_moving_finalize: Option<Ident>,
+    hypothetical: bool,
 }
 
 impl PgAggregate {
@@ -127,6 +129,7 @@ impl PgAggregate {
 
         // `MovingState` is an optional value, we default to nothing.
         let type_moving_state = get_impl_type_by_name(&item_impl_snapshot, "MovingState");
+        let type_moving_state_value = type_moving_state.map(|v| v.ty.clone());
         if type_moving_state.is_none() {
             item_impl.items.push(parse_quote! {
                 type MovingState = ();
@@ -135,6 +138,7 @@ impl PgAggregate {
 
         // `OrderBy` is an optional value, we default to nothing.
         let type_order_by = get_impl_type_by_name(&item_impl_snapshot, "OrderBy");
+        let type_order_by_value = type_order_by.map(|v| v.ty.clone());
         if type_order_by.is_none() {
             item_impl.items.push(parse_quote! {
                 type OrderBy = ();
@@ -143,6 +147,7 @@ impl PgAggregate {
 
         // `Finalize` is an optional value, we default to nothing.
         let type_finalize = get_impl_type_by_name(&item_impl_snapshot, "Finalize");
+        let type_finalize_value = type_finalize.map(|v| v.ty.clone());
         if type_finalize.is_none() {
             item_impl.items.push(parse_quote! {
                 type Finalize = ();
@@ -150,88 +155,97 @@ impl PgAggregate {
         }
 
         let fn_state = get_impl_func_by_name(&item_impl_snapshot, "state");
-        if let Some(found) = fn_state {
+        let fn_state_name = if let Some(found) = fn_state {
             let fn_name = Ident::new(&format!("{}_state", target_ident), found.sig.ident.span());
             pg_externs.push(parse_quote! {
                 #[pg_extern]
                 fn #fn_name(this: #target_ident, v: <#target_ident as pgx::Aggregate>::Args) -> #target_ident {
                     this.state(v)
                 }
-            })
+            });
+            fn_name
         } else {
             return Err(syn::Error::new(item_impl.span(), "Aggregate implementation must include state function."))
-        }
+        };
 
         let fn_combine = get_impl_func_by_name(&item_impl_snapshot, "combine");
-        if let Some(found) = fn_combine {
+        let fn_combine_name = if let Some(found) = fn_combine {
             let fn_name = Ident::new(&format!("{}_combine", target_ident), found.sig.ident.span());
             pg_externs.push(parse_quote! {
                 #[pg_extern]
                 fn #fn_name(this: #target_ident, v: #target_ident) -> #target_ident {
                     this.combine(v)
                 }
-            })
+            });
+            Some(fn_name)
         } else {
             item_impl.items.push(parse_quote! {
                 fn combine(&self, _other: Self) -> Self {
                     unimplemented!("Call to combine on an aggregate which does not support it.")
                 }
-            })
-        }
+            });
+            None
+        };
 
         let fn_finalize = get_impl_func_by_name(&item_impl_snapshot, "finalize");
-        if let Some(found) = fn_finalize {
+        let fn_finalize_name = if let Some(found) = fn_finalize {
             let fn_name = Ident::new(&format!("{}_finalize", target_ident), found.sig.ident.span());
             pg_externs.push(parse_quote! {
                 #[pg_extern]
                 fn #fn_name(this: #target_ident) -> <#target_ident as pgx::Aggregate>::Finalize {
                     this.finalize()
                 }
-            })
+            });
+            Some(fn_name)
         } else {
             item_impl.items.push(parse_quote! {
                 fn finalize(&self) -> Self::Finalize {
                     unimplemented!("Call to finalize on an aggregate which does not support it.")
                 }
-            })
-        }
+            });
+            None
+        };
 
         let fn_serial = get_impl_func_by_name(&item_impl_snapshot, "serial");
-        if let Some(found) = fn_serial {
+        let fn_serial_name = if let Some(found) = fn_serial {
             let fn_name = Ident::new(&format!("{}_serial", target_ident), found.sig.ident.span());
             pg_externs.push(parse_quote! {
                 #[pg_extern]
                 fn #fn_name(this: #target_ident) -> Vec<u8> {
                     this.serial()
                 }
-            })
+            });
+            Some(fn_name)
         } else {
             item_impl.items.push(parse_quote! {
                 fn serial(&self) -> Vec<u8> {
                     unimplemented!("Call to serial on an aggregate which does not support it.")
                 }
-            })
-        }
+            });
+            None
+        };
 
         let fn_deserial = get_impl_func_by_name(&item_impl_snapshot, "deserial");
-        if let Some(found) = fn_deserial {
+        let fn_deserial_name = if let Some(found) = fn_deserial {
             let fn_name = Ident::new(&format!("{}_deserial", target_ident), found.sig.ident.span());
             pg_externs.push(parse_quote! {
                 #[pg_extern]
                 fn #fn_name(this: #target_ident, buf: Vec<u8>, internal: pgx::PgBox<#target_ident>) -> pgx::PgBox<#target_ident> {
                     this.deserial(buf, internal)
                 }
-            })
+            });
+            Some(fn_name)
         } else {
             item_impl.items.push(parse_quote! {
                 fn deserial(&self, _buf: Vec<u8>, _internal: pgx::PgBox<Self>) -> pgx::PgBox<Self> {
                     unimplemented!("Call to deserial on an aggregate which does not support it.")
                 }
-            })
-        }
+            });
+            None
+        };
 
         let fn_moving_state = get_impl_func_by_name(&item_impl_snapshot, "moving_state");
-        if let Some(found) = fn_moving_state {
+        let fn_moving_state_name = if let Some(found) = fn_moving_state {
             let fn_name = Ident::new(&format!("{}_moving_state", target_ident), found.sig.ident.span());
             pg_externs.push(parse_quote! {
                 #[pg_extern]
@@ -241,7 +255,8 @@ impl PgAggregate {
                 ) -> <#target_ident as pgx::Aggregate>::MovingState {
                     <#target_ident as pgx::Aggregate>::moving_state(mstate, v)
                 }
-            })
+            });
+            Some(fn_name)
         } else {
             item_impl.items.push(parse_quote! {
                 fn moving_state(
@@ -250,11 +265,12 @@ impl PgAggregate {
                 ) -> <#target_ident as pgx::Aggregate>::MovingState {
                     unimplemented!("Call to moving_state on an aggregate which does not support it.")
                 }
-            })
-        }
+            });
+            None
+        };
 
         let fn_moving_state_inverse = get_impl_func_by_name(&item_impl_snapshot, "moving_state_inverse");
-        if let Some(found) = fn_moving_state_inverse {
+        let fn_moving_state_inverse_name = if let Some(found) = fn_moving_state_inverse {
             let fn_name = Ident::new(&format!("{}_moving_state_inverse", target_ident), found.sig.ident.span());
             pg_externs.push(parse_quote! {
                 #[pg_extern]
@@ -264,7 +280,8 @@ impl PgAggregate {
                 ) -> <#target_ident as pgx::Aggregate>::MovingState {
                     <#target_ident as pgx::Aggregate>::moving_state(mstate, v)
                 }
-            })
+            });
+            Some(fn_name)
         } else {
             item_impl.items.push(parse_quote! {
                 fn moving_state_inverse(
@@ -273,47 +290,59 @@ impl PgAggregate {
                 ) -> <#target_ident as pgx::Aggregate>::MovingState {
                     unimplemented!("Call to moving_state on an aggregate which does not support it.")
                 }
-            })
-        }
+            });
+            None
+        };
 
         let fn_moving_finalize = get_impl_func_by_name(&item_impl_snapshot, "moving_finalize");
-        if let Some(found) = fn_moving_finalize {
+        let fn_moving_finalize_name = if let Some(found) = fn_moving_finalize {
             let fn_name = Ident::new(&format!("{}_moving_finalize", target_ident), found.sig.ident.span());
             pg_externs.push(parse_quote! {
                 #[pg_extern]
                 fn #fn_name(mstate: <#target_ident as pgx::Aggregate>::MovingState) -> <#target_ident as pgx::Aggregate>::Finalize {
                     <#target_ident as pgx::Aggregate>::moving_finalize(mstate)
                 }
-            })
+            });
+            Some(fn_name)
         } else {
             item_impl.items.push(parse_quote! {
                 fn moving_finalize(_mstate: Self::MovingState) -> Self::Finalize {
                     unimplemented!("Call to moving_finalize on an aggregate which does not support it.")
                 }
-            })
-        }
+            });
+            None
+        };
 
         Ok(Self {
             aggregate_attrs,
             item_impl,
             pg_externs,
-            has_type_order_by: type_order_by.is_some(),
-            has_type_finalize: type_finalize.is_some(),
-            has_type_moving_state: type_moving_state.is_some(),
-            has_const_parallel: get_impl_const_by_name(&item_impl_snapshot, "PARALLEL").is_some(),
-            has_const_finalize_modify: get_impl_const_by_name(&item_impl_snapshot, "FINALIZE_MODIFY").is_some(),
-            has_const_moving_finalize_modify: get_impl_const_by_name(&item_impl_snapshot, "MOVING_FINALIZE_MODIFY").is_some(), // const_moving_finalize_modify.is_some(),
-            has_const_initial_condition: get_impl_const_by_name(&item_impl_snapshot, "INITIAL_CONDITION").is_some(),
-            has_const_sort_operator: get_impl_const_by_name(&item_impl_snapshot, "SORT_OPERATOR").is_some(),
-            has_const_moving_intial_condition: get_impl_const_by_name(&item_impl_snapshot, "MOVING_INITIAL_CONDITION").is_some(),
-            has_const_hypothetical:  get_impl_const_by_name(&item_impl_snapshot, "HYPOTHETICAL").is_some(),
-            has_fn_finalize: fn_finalize.is_some(),
-            has_fn_combine: fn_combine.is_some(),
-            has_fn_serial: fn_serial.is_some(),
-            has_fn_deserial: fn_deserial.is_some(),
-            has_fn_moving_state: fn_moving_state.is_some(),
-            has_fn_moving_state_inverse: fn_moving_state_inverse.is_some(),
-            has_fn_moving_finalize: fn_moving_finalize.is_some(),
+            type_order_by: type_order_by_value,
+            type_finalize: type_finalize_value,
+            type_moving_state: type_moving_state_value,
+            const_parallel: get_impl_const_by_name(&item_impl_snapshot, "PARALLEL").cloned(),
+            const_finalize_modify: get_impl_const_by_name(&item_impl_snapshot, "FINALIZE_MODIFY").cloned(),
+            const_moving_finalize_modify: get_impl_const_by_name(&item_impl_snapshot, "MOVING_FINALIZE_MODIFY").cloned(),
+            const_initial_condition: get_impl_const_by_name(&item_impl_snapshot, "INITIAL_CONDITION").cloned(),
+            const_sort_operator: get_impl_const_by_name(&item_impl_snapshot, "SORT_OPERATOR").cloned(),
+            const_moving_intial_condition: get_impl_const_by_name(&item_impl_snapshot, "MOVING_INITIAL_CONDITION").cloned(),
+            fn_state: fn_state_name,
+            fn_finalize: fn_finalize_name,
+            fn_combine: fn_combine_name,
+            fn_serial: fn_serial_name,
+            fn_deserial: fn_deserial_name,
+            fn_moving_state: fn_moving_state_name,
+            fn_moving_state_inverse: fn_moving_state_inverse_name,
+            fn_moving_finalize: fn_moving_finalize_name,
+            hypothetical: if let Some(value) = get_impl_const_by_name(&item_impl_snapshot, "HYPOTHETICAL") {
+                match &value.expr {
+                    syn::Expr::Lit(expr_lit) => match &expr_lit.lit {
+                        syn::Lit::Bool(lit) => lit.value,
+                        _ => return Err(syn::Error::new(value.span(), "`#[pg_aggregate]` required the `HYPOTHETICAL` value to be a literal boolean.")),
+                    },
+                    _ => return Err(syn::Error::new(value.span(), "`#[pg_aggregate]` required the `HYPOTHETICAL` value to be a literal boolean.")),
+                }
+            } else { false },
         })
     }
 
@@ -326,6 +355,35 @@ impl PgAggregate {
         );
 
         // TODO: Get all the params.
+        let name = match get_impl_const_by_name(&self.item_impl, "NAME")
+            .expect("`NAME` is a required const for Aggregate implementations.")
+            .expr {
+                syn::Expr::Lit(ref expr) => if let syn::Lit::Str(ref litstr) = expr.lit {
+                    litstr.clone()
+                } else {
+                    panic!("`NAME: &'static str` is a required const for Aggregate implementations.")
+                },
+                _ => panic!("`NAME: &'static str` is a required const for Aggregate implementations."),
+            };
+
+        let type_order_by_iter = self.type_order_by.iter();
+        let type_finalize_iter = self.type_finalize.iter();
+        let type_moving_state_iter = self.type_moving_state.iter();
+        let const_parallel_iter = self.const_parallel.iter();
+        let const_finalize_modify_iter = self.const_finalize_modify.iter();
+        let const_moving_finalize_modify_iter = self.const_moving_finalize_modify.iter();
+        let const_initial_condition_iter = self.const_initial_condition.iter();
+        let const_sort_operator_iter = self.const_sort_operator.iter();
+        let const_moving_intial_condition_iter = self.const_moving_intial_condition.iter();
+        let hypothetical = self.hypothetical;
+        let fn_state = &self.fn_state;
+        let fn_finalize_iter = self.fn_finalize.iter();
+        let fn_combine_iter = self.fn_combine.iter();
+        let fn_serial_iter = self.fn_serial.iter();
+        let fn_deserial_iter = self.fn_deserial.iter();
+        let fn_moving_state_iter = self.fn_moving_state.iter();
+        let fn_moving_state_inverse_iter = self.fn_moving_state_inverse.iter();
+        let fn_moving_finalize_iter = self.fn_moving_finalize.iter();
 
         let entity_item_fn: ItemFn = parse_quote! {
             #[no_mangle]
@@ -335,25 +393,27 @@ impl PgAggregate {
                     module_path: module_path!(),
                     file: file!(),
                     line: line!(),
+                    name: #name,
                     ty_id: core::any::TypeId::of::<#target_ident>(),
                     args: &[],
                     order_by: None,
                     stype: "todo",
-                    sfunc: "todo",
-                    finalfunc: None,
-                    finalfunc_modify: None,
-                    initcond: None,
-                    serialfunc: None,
-                    deserialfunc: None,
-                    msfunc: None,
-                    minvfunc: None,
-                    mstype: None,
-                    mfinalfunc: None,
-                    mfinalfunc_modify: None,
-                    minitcond: None,
-                    sortop: None,
-                    parallel: None,
-                    hypothetical: None,
+                    sfunc: stringify!(#fn_state),
+                    combinefunc: None#( .unwrap_or(Some(stringify!(#fn_combine_iter))) )*,
+                    finalfunc: None#( .unwrap_or(Some(stringify!(#fn_finalize_iter))) )*,
+                    finalfunc_modify: None#( .unwrap_or(Some(stringify!(#const_finalize_modify_iter))) )*,
+                    initcond: None#( .unwrap_or(Some(stringify!(#const_initial_condition_iter))) )*,
+                    serialfunc: None#( .unwrap_or(Some(stringify!(#fn_serial_iter))) )*,
+                    deserialfunc: None#( .unwrap_or(Some(stringify!(#fn_deserial_iter))) )*,
+                    msfunc: None#( .unwrap_or(Some(stringify!(#fn_moving_state_iter))) )*,
+                    minvfunc: None#( .unwrap_or(Some(stringify!(#fn_moving_state_inverse_iter))) )*,
+                    mstype: None#( .unwrap_or(Some(stringify!(#type_moving_state_iter))) )*,
+                    mfinalfunc: None#( .unwrap_or(Some(stringify!(#fn_moving_finalize_iter))) )*,
+                    mfinalfunc_modify: None#( .unwrap_or(Some(stringify!(#const_moving_finalize_modify_iter))) )*,
+                    minitcond: None#( .unwrap_or(Some(stringify!(#const_moving_intial_condition_iter))) )*,
+                    sortop: None#( .unwrap_or(Some(stringify!(#const_sort_operator_iter))) )*,
+                    parallel: None#( .unwrap_or(Some(stringify!(#const_parallel_iter))) )*,
+                    hypothetical: #hypothetical,
                 };
                 pgx::datum::sql_entity_graph::SqlGraphEntity::Aggregate(submission)
             }
