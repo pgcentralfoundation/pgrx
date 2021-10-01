@@ -175,7 +175,7 @@ An earlier version of `cargo-pgx` had `cargo-pgx pgx schema` command that would 
 
 **This worked okay!** But gosh, it's not fun to do that, and there are a lot of complications such as trying to resolve types!
 
-*So, what's more fun than parsing Rust source code and generating SQL?* Parsing Rust code in procedural macros to inject metadata foreign functions, then later creating a binary which re-exports those functions via linker tricks, dynamically loads itself, and calls them all to collect metadata, then builds a depdency graph of them to drive the output!
+*So, what's more fun than parsing Rust source code and generating SQL?* Parsing Rust code in procedural macros to inject metadata foreign functions, then later creating a binary which re-exports those functions via linker tricks, dynamically loads itself, and calls them all to collect metadata, then builds a dependency graph of them to drive the output!
 
 > Wait... What, that was not your answer? Oh no... Well, bear with me because that's what we're doing.
 
