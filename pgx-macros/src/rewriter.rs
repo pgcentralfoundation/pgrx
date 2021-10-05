@@ -5,7 +5,7 @@ extern crate proc_macro;
 
 use pgx_utils::{categorize_return_type, CategorizedType};
 use proc_macro2::{Ident, Span};
-use quote::{quote, quote_spanned, ToTokens};
+use quote::{quote, quote_spanned};
 use std::ops::Deref;
 use std::str::FromStr;
 use syn::spanned::Spanned;
@@ -188,7 +188,7 @@ impl PgGuardRewriter {
             #[allow(clippy::missing_safety_doc)]
             #[allow(clippy::redundant_closure)]
             #guard
-            #vis unsafe fn #func_name_wrapper #generics(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+            #vis unsafe extern "C" fn #func_name_wrapper #generics(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
 
                 #func_call
 
@@ -247,7 +247,7 @@ impl PgGuardRewriter {
         quote_spanned! {func_span=>
             #prolog
             #[pg_guard]
-            #vis fn #func_name_wrapper #generics(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+            #vis unsafe extern "C" fn #func_name_wrapper #generics(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
 
                 struct IteratorHolder<T> {
                     iter: *mut dyn Iterator<Item=T>,
@@ -270,7 +270,7 @@ impl PgGuardRewriter {
                 funcctx = pgx::srf_per_call_setup(fcinfo);
                 iterator_holder = pgx::PgBox::from_pg(funcctx.user_fctx as *mut IteratorHolder<#generic_type>);
 
-                let mut iter = unsafe { Box::from_raw(iterator_holder.iter) };
+                let mut iter = Box::from_raw(iterator_holder.iter);
                 match iter.next() {
                     Some(result) => {
                         // we need to leak the boxed iterator so that it's not freed by rust and we can
@@ -322,7 +322,7 @@ impl PgGuardRewriter {
                 }
             )*
 
-            let heap_tuple = unsafe { pgx::pg_sys::heap_form_tuple(funcctx.tuple_desc, datums.as_mut_ptr(), nulls.as_mut_ptr()) };
+            let heap_tuple = pgx::pg_sys::heap_form_tuple(funcctx.tuple_desc, datums.as_mut_ptr(), nulls.as_mut_ptr());
         };
 
         let composite_type = format!("({})", types.join(","));
@@ -347,7 +347,7 @@ impl PgGuardRewriter {
         quote_spanned! {func_span=>
             #prolog
             #[pg_guard]
-            #vis fn #func_name_wrapper #generics(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+            #vis unsafe extern "C" fn #func_name_wrapper #generics(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
 
                 struct IteratorHolder<T> {
                     iter: *mut dyn Iterator<Item=T>,
@@ -362,14 +362,12 @@ impl PgGuardRewriter {
                     funcctx.tuple_desc = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).switch_to(|_| {
                         let mut tupdesc: *mut pgx::pg_sys::TupleDescData = std::ptr::null_mut();
 
-                        unsafe {
-                            /* Build a tuple descriptor for our result type */
-                            if pgx::pg_sys::get_call_result_type(fcinfo, std::ptr::null_mut(), &mut tupdesc) != pgx::pg_sys::TypeFuncClass_TYPEFUNC_COMPOSITE {
-                                pgx::error!("return type must be a row type");
-                            }
-
-                            pgx::pg_sys::BlessTupleDesc(tupdesc)
+                        /* Build a tuple descriptor for our result type */
+                        if pgx::pg_sys::get_call_result_type(fcinfo, std::ptr::null_mut(), &mut tupdesc) != pgx::pg_sys::TypeFuncClass_TYPEFUNC_COMPOSITE {
+                            pgx::error!("return type must be a row type");
                         }
+
+                        pgx::pg_sys::BlessTupleDesc(tupdesc)
                     });
                     iterator_holder = pgx::PgBox::from_pg(funcctx.user_fctx as *mut IteratorHolder<#generic_type>);
 
@@ -381,7 +379,7 @@ impl PgGuardRewriter {
                 funcctx = pgx::srf_per_call_setup(fcinfo);
                 iterator_holder = pgx::PgBox::from_pg(funcctx.user_fctx as *mut IteratorHolder<#generic_type>);
 
-                let mut iter = unsafe { Box::from_raw(iterator_holder.iter) };
+                let mut iter = Box::from_raw(iterator_holder.iter);
                 match iter.next() {
                     Some(result) => {
                         // we need to leak the boxed iterator so that it's not freed by rust and we can
@@ -417,20 +415,6 @@ impl PgGuardRewriter {
         let input_func_name = func.sig.ident.to_string();
         let sig = func.sig.clone();
         let vis = func.vis.clone();
-        let is_extern_c = if let Some(abi) = func.sig.abi.as_ref() {
-            if let Some(name) = abi.name.as_ref() {
-                name.value() == "C"
-            } else {
-                false
-            }
-        } else {
-            false
-        };
-        let is_no_mangle = func
-            .attrs
-            .iter()
-            .find(|attr| (attr.path.clone().into_token_stream().to_string() == "no_mangle"))
-            .is_some();
 
         // but for the inner function (the one we're wrapping) we don't need any kind of
         // abi classification
@@ -458,16 +442,7 @@ impl PgGuardRewriter {
                 #[allow(non_snake_case)]
                 #[no_mangle]
             }
-        } else if is_extern_c {
-            if is_no_mangle {
-                quote! {
-                    #[no_mangle]
-                }
-            } else {
-                quote! {}
-            }
         } else {
-            // I feel like this is a) incorrect and b) never going to happen
             quote! {
                 #[no_mangle]
             }
@@ -505,7 +480,8 @@ impl PgGuardRewriter {
         quote! {
             #[allow(clippy::missing_safety_doc)]
             #[allow(clippy::redundant_closure)]
-            pub unsafe fn #func_name ( #arg_list_with_types ) #return_type {
+            #[allow(improper_ctypes_definitions)] /* for i128 */
+            pub unsafe extern "C" fn #func_name ( #arg_list_with_types ) #return_type {
                 // as the panic message says, we can't call Postgres functions from threads
                 // the value of IS_MAIN_THREAD gets set through the pg_module_magic!() macro
                 #[cfg(debug_assertions)]
