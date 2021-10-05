@@ -372,6 +372,20 @@ impl PgxSql {
         })
     }
 
+    pub fn rust_to_sql(&self, ty_id: TypeId, ty_source: &str, full_path: &str) -> Option<String> {
+        self.source_only_to_sql_type(ty_source).or_else(|| {
+            self.type_id_to_sql_type(ty_id)
+        }).or_else(|| {
+            if let Some(found) = self.has_sql_declared_entity(&SqlDeclared::Type(full_path.to_string())) {
+                Some(found.sql())
+            }  else if let Some(found) = self.has_sql_declared_entity(&SqlDeclared::Enum(full_path.to_string())) {
+                Some(found.sql())
+            } else {
+                None
+            }
+        })
+    }
+
     pub fn type_id_to_sql_type(&self, id: TypeId) -> Option<String> {
         self.type_mappings.get(&id).map(|f| f.sql.clone())
     }

@@ -1,6 +1,6 @@
 use proc_macro2::{Ident, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
-use syn::{ImplItemConst, ImplItemMethod, ImplItemType, ItemFn, ItemImpl, parse::{Parse, ParseStream}, parse_quote, spanned::Spanned};
+use syn::{ImplItemConst, ImplItemMethod, ImplItemType, ItemFn, ItemImpl, Type, parse::{Parse, ParseStream}, parse_quote, spanned::Spanned};
 use syn::{punctuated::Punctuated, Token};
 
 #[derive(Debug, Clone, Hash, Eq, PartialEq)]
@@ -76,7 +76,8 @@ pub struct PgAggregate {
     item_impl: ItemImpl,
     pg_externs: Vec<ItemFn>,
     // Note these should not be considered *writable*, they're snapshots from construction.
-    type_order_by: Option<syn::Type>,
+    type_args: ParsedTypeMaybeList,
+    type_order_by: Option<ParsedTypeMaybeList>,
     type_finalize: Option<syn::Type>,
     type_moving_state: Option<syn::Type>,
     const_parallel: Option<syn::Expr>,
@@ -138,12 +139,19 @@ impl PgAggregate {
 
         // `OrderBy` is an optional value, we default to nothing.
         let type_order_by = get_impl_type_by_name(&item_impl_snapshot, "OrderBy");
-        let type_order_by_value = type_order_by.map(|v| v.ty.clone());
+        let type_order_by_value = type_order_by.map(|v| ParsedTypeMaybeList::new(v.ty.clone()))
+            .transpose()?;
         if type_order_by.is_none() {
             item_impl.items.push(parse_quote! {
                 type OrderBy = ();
             })
         }
+
+        // `Args` is an optional value, we default to nothing.
+        let type_args = get_impl_type_by_name(&item_impl_snapshot, "OrderBy").ok_or_else(||
+            syn::Error::new(item_impl_snapshot.span(), "`#[pg_aggregate]` requires the `Args` type defined.")
+        )?;
+        let type_args_value = ParsedTypeMaybeList::new(type_args.ty.clone())?;
 
         // `Finalize` is an optional value, we default to nothing.
         let type_finalize = get_impl_type_by_name(&item_impl_snapshot, "Finalize");
@@ -317,6 +325,7 @@ impl PgAggregate {
             aggregate_attrs,
             item_impl,
             pg_externs,
+            type_args: type_args_value,
             type_order_by: type_order_by_value,
             type_finalize: type_finalize_value,
             type_moving_state: type_moving_state_value,
@@ -395,7 +404,7 @@ impl PgAggregate {
                     line: line!(),
                     name: stringify!(#name),
                     ty_id: core::any::TypeId::of::<#target_ident>(),
-                    args: &[],
+                    args: vec![],
                     order_by: None,
                     stype: stringify!(#target_ident),
                     sfunc: stringify!(#fn_state),
@@ -514,5 +523,72 @@ fn get_const_litstr<'a>(item: &'a ImplItemConst) -> Option<String> {
             _ => None,
         },
         _ => None,
+    }
+}
+
+#[derive(Debug, Clone)]
+struct ParsedTypeMaybeList {
+    found: Vec<ParsedType>,
+}
+
+impl ParsedTypeMaybeList {
+    fn new(maybe_type_list: syn::Type) -> Result<Self, syn::Error> {
+        match maybe_type_list {
+            Type::Tuple(tuple) => {
+                let mut coll = Vec::new();
+                for elem in tuple.elems {
+                    let parsed_elem = ParsedType::new(elem)?;
+                    coll.push(parsed_elem);
+                }
+                Ok(Self {
+                    found: coll,
+                })
+            },
+            ty => Ok(Self {
+                found: vec![ ParsedType::new(ty)?, ],
+            })
+        }
+    }
+}
+
+impl Parse for ParsedTypeMaybeList {
+    fn parse(input: ParseStream) -> Result<Self, syn::Error> {
+        Self::new(input.parse()?)
+    }
+}
+
+#[derive(Debug, Clone)]
+struct ParsedType {
+    /// **If the input type is `Variadic<T>`, this will be `T`. Otherwise it will be the input type.
+    ty: Type,
+    /// If the input type was `Variadic<T>`.
+    is_variadic: bool,
+}
+
+impl ParsedType {
+    fn new(ty: syn::Type) -> Result<Self, syn::Error> {
+        let is_variadic = match ty {
+            syn::Type::Path(ty_path) => {
+                let found_pgx = false;
+                let found_variadic = false;
+                todo!();
+                for segment in ty_path.path.segments {
+                    todo!();
+                }
+                todo!()
+            }
+            _ => false,
+        };
+        let retval = Self {
+            ty,
+            is_variadic: todo!(),
+        };
+        Ok(retval)
+    }
+}
+
+impl Parse for ParsedType {
+    fn parse(input: ParseStream) -> Result<Self, syn::Error> {
+        Self::new(input.parse()?)
     }
 }
