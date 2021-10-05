@@ -275,7 +275,7 @@ pub unsafe fn pg_func_extra<ReturnType, DefaultValue: FnOnce() -> ReturnType>(
 /// }
 /// ```
 pub unsafe fn direct_function_call<R: FromDatum>(
-    func: unsafe fn(pg_sys::FunctionCallInfo) -> pg_sys::Datum,
+    func: unsafe extern "C" fn(pg_sys::FunctionCallInfo) -> pg_sys::Datum,
     args: Vec<Option<pg_sys::Datum>>,
 ) -> Option<R> {
     let datum = direct_function_call_as_datum(func, args);
@@ -288,7 +288,7 @@ pub unsafe fn direct_function_call<R: FromDatum>(
 /// Same as [direct_function_call] but instead returns the direct `Option<pg_sys::Datum>` instead
 /// of converting it to a value
 pub fn direct_function_call_as_datum(
-    func: unsafe fn(pg_sys::FunctionCallInfo) -> pg_sys::Datum,
+    func: unsafe extern "C" fn(pg_sys::FunctionCallInfo) -> pg_sys::Datum,
     args: Vec<Option<pg_sys::Datum>>,
 ) -> Option<pg_sys::Datum> {
     let mut null_array = [false; 100usize];
