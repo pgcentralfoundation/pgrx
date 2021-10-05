@@ -63,4 +63,6 @@ jobs:
       run: cd /tmp/sample && cargo pgx test pg12
     - name: test sample on pg13
       run: cd /tmp/sample && cargo pgx test pg13
+    - name: test sample on pg14
+      run: cd /tmp/sample && cargo pgx test pg14
 
