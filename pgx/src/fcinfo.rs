@@ -124,8 +124,8 @@ mod pg_10_11 {
     }
 }
 
-#[cfg(any(feature = "pg12", feature = "pg13"))]
-mod pg_12_13 {
+#[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14"))]
+mod pg_12_13_14 {
     use crate::{pg_sys, FromDatum};
 
     #[inline]
@@ -185,8 +185,8 @@ mod pg_12_13 {
 #[cfg(any(feature = "pg10", feature = "pg11"))]
 pub use pg_10_11::*;
 
-#[cfg(any(feature = "pg12", feature = "pg13"))]
-pub use pg_12_13::*;
+#[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14"))]
+pub use pg_12_13_14::*;
 use std::ops::DerefMut;
 
 #[inline]
@@ -335,7 +335,7 @@ fn make_function_call_info(
     fcinfo_boxed
 }
 
-#[cfg(any(feature = "pg12", feature = "pg13"))]
+#[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14"))]
 fn make_function_call_info(
     nargs: usize,
     arg_array: [usize; 100],

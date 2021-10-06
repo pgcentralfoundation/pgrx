@@ -110,13 +110,14 @@ fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
             format!("unable to generate oids for pg{}", major_version)
         );
 
-        let bindings_files =
+        let dest_dirs =
             if std::env::var("PGX_PG_SYS_SKIP_BINDING_REWRITE").unwrap_or("false".into()) != "1" {
                 vec![out_dir.clone(), src_dir.clone()]
             } else {
                 vec![out_dir.clone()]
             };
-        for mut bindings_file in bindings_files {
+        for dest_dir in dest_dirs {
+            let mut bindings_file = dest_dir.clone();
             eprintln!("Writing bindings file for pg{}", major_version);
             bindings_file.push(&format!("pg{}.rs", major_version));
             handle_result!(
@@ -136,7 +137,7 @@ fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
                 )
             );
 
-            let mut oids_file = out_dir.clone();
+            let mut oids_file = dest_dir.clone();
             oids_file.push(&format!("pg{}_oids.rs", major_version));
             eprintln!("Writing oids file for pg{}", major_version);
             handle_result!(
