@@ -286,7 +286,7 @@ macro_rules! pg_magic_func {
             use std::mem::size_of;
             use std::os::raw::c_int;
 
-            #[cfg(not(feature = "pg13"))]
+            #[cfg(any(feature = "pg10", feature = "pg11", feature = "pg12"))]
             const MY_MAGIC: pgx::pg_sys::Pg_magic_struct = pgx::pg_sys::Pg_magic_struct {
                 len: size_of::<pgx::pg_sys::Pg_magic_struct>() as c_int,
                 version: pgx::pg_sys::PG_VERSION_NUM as c_int / 100,
@@ -297,7 +297,7 @@ macro_rules! pg_magic_func {
                 float8byval: pgx::pg_sys::USE_FLOAT8_BYVAL as c_int,
             };
 
-            #[cfg(feature = "pg13")]
+            #[cfg(any(feature = "pg13", feature = "pg14"))]
             const MY_MAGIC: pgx::pg_sys::Pg_magic_struct = pgx::pg_sys::Pg_magic_struct {
                 len: size_of::<pgx::pg_sys::Pg_magic_struct>() as c_int,
                 version: pgx::pg_sys::PG_VERSION_NUM as c_int / 100,

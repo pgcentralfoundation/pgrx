@@ -256,6 +256,7 @@ pub const HAVE_RINT: u32 = 1;
 pub const HAVE_RL_COMPLETION_APPEND_CHARACTER: u32 = 1;
 pub const HAVE_RL_COMPLETION_MATCHES: u32 = 1;
 pub const HAVE_RL_FILENAME_COMPLETION_FUNCTION: u32 = 1;
+pub const HAVE_SETENV: u32 = 1;
 pub const HAVE_SETSID: u32 = 1;
 pub const HAVE_SHM_OPEN: u32 = 1;
 pub const HAVE_SPINLOCKS: u32 = 1;
@@ -329,15 +330,15 @@ pub const MAXIMUM_ALIGNOF: u32 = 8;
 pub const MEMSET_LOOP_LIMIT: u32 = 1024;
 pub const PACKAGE_BUGREPORT: &'static [u8; 32usize] = b"pgsql-bugs@lists.postgresql.org\0";
 pub const PACKAGE_NAME: &'static [u8; 11usize] = b"PostgreSQL\0";
-pub const PACKAGE_STRING: &'static [u8; 16usize] = b"PostgreSQL 12.7\0";
+pub const PACKAGE_STRING: &'static [u8; 16usize] = b"PostgreSQL 12.8\0";
 pub const PACKAGE_TARNAME: &'static [u8; 11usize] = b"postgresql\0";
 pub const PACKAGE_URL: &'static [u8; 1usize] = b"\0";
-pub const PACKAGE_VERSION: &'static [u8; 5usize] = b"12.7\0";
+pub const PACKAGE_VERSION: &'static [u8; 5usize] = b"12.8\0";
 pub const PG_KRB_SRVNAM: &'static [u8; 9usize] = b"postgres\0";
 pub const PG_MAJORVERSION: &'static [u8; 3usize] = b"12\0";
-pub const PG_VERSION: &'static [u8; 5usize] = b"12.7\0";
-pub const PG_VERSION_NUM: u32 = 120007;
-pub const PG_VERSION_STR : & 'static [u8 ; 114usize] = b"PostgreSQL 12.7 on x86_64-apple-darwin20.4.0, compiled by Apple clang version 12.0.5 (clang-1205.0.22.11), 64-bit\0" ;
+pub const PG_VERSION: &'static [u8; 5usize] = b"12.8\0";
+pub const PG_VERSION_NUM: u32 = 120008;
+pub const PG_VERSION_STR : & 'static [u8 ; 114usize] = b"PostgreSQL 12.8 on x86_64-apple-darwin20.4.0, compiled by Apple clang version 12.0.5 (clang-1205.0.22.11), 64-bit\0" ;
 pub const RELSEG_SIZE: u32 = 131072;
 pub const SIZEOF_BOOL: u32 = 1;
 pub const SIZEOF_LONG: u32 = 8;
@@ -1672,7 +1673,7 @@ pub const _PASSWORD_NOEXP: u32 = 8;
 pub const _PASSWORD_WARNDAYS: u32 = 14;
 pub const _PASSWORD_CHGNOW: i32 = -1;
 pub const PGINVALID_SOCKET: i32 = -1;
-pub const PG_BACKEND_VERSIONSTR: &'static [u8; 28usize] = b"postgres (PostgreSQL) 12.7\n\0";
+pub const PG_BACKEND_VERSIONSTR: &'static [u8; 28usize] = b"postgres (PostgreSQL) 12.8\n\0";
 pub const EXE: &'static [u8; 1usize] = b"\0";
 pub const DEVNULL: &'static [u8; 10usize] = b"/dev/null\0";
 pub const USE_REPL_SNPRINTF: u32 = 1;
@@ -25290,6 +25291,15 @@ extern "C" {
     #[doc = " allowing die interrupts: HOLD_CANCEL_INTERRUPTS() and"]
     #[doc = " RESUME_CANCEL_INTERRUPTS()."]
     #[doc = ""]
+    #[doc = " Note that ProcessInterrupts() has also acquired a number of tasks that"]
+    #[doc = " do not necessarily cause a query-cancel-or-die response.  Hence, it's"]
+    #[doc = " possible that it will just clear InterruptPending and return."]
+    #[doc = ""]
+    #[doc = " INTERRUPTS_PENDING_CONDITION() can be checked to see whether an"]
+    #[doc = " interrupt needs to be serviced, without trying to do so immediately."]
+    #[doc = " Some callers are also interested in INTERRUPTS_CAN_BE_PROCESSED(),"]
+    #[doc = " which tells whether ProcessInterrupts is sure to clear the interrupt."]
+    #[doc = ""]
     #[doc = " Special mechanisms are used to let an interrupt be accepted when we are"]
     #[doc = " waiting for a lock or when we are waiting for command input (but, of"]
     #[doc = " course, only if the interrupt holdoff counter is zero).  See the"]
@@ -37076,6 +37086,23 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
+    pub fn CreateTriggerFiringOn(
+        stmt: *mut CreateTrigStmt,
+        queryString: *const ::std::os::raw::c_char,
+        relOid: Oid,
+        refRelOid: Oid,
+        constraintOid: Oid,
+        indexOid: Oid,
+        funcoid: Oid,
+        parentTriggerOid: Oid,
+        whenClause: *mut Node,
+        isInternal: bool,
+        in_partition: bool,
+        trigger_fires_when: ::std::os::raw::c_char,
+    ) -> ObjectAddress;
+}
+#[pg_guard]
+extern "C" {
     pub fn RemoveTriggerById(trigOid: Oid);
 }
 #[pg_guard]
@@ -37890,6 +37917,7 @@ pub struct PortalData {
     pub portalPos: uint64,
     pub creation_time: TimestampTz,
     pub visible: bool,
+    pub portalSnapshot: Snapshot,
 }
 impl Default for PortalData {
     fn default() -> Self {
@@ -38011,6 +38039,10 @@ extern "C" {
 #[pg_guard]
 extern "C" {
     pub fn HoldPinnedPortals();
+}
+#[pg_guard]
+extern "C" {
+    pub fn ForgetPortalSnapshots();
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -44044,6 +44076,8 @@ pub const ReorderBufferChangeType_REORDER_BUFFER_CHANGE_INTERNAL_SPEC_INSERT:
 pub const ReorderBufferChangeType_REORDER_BUFFER_CHANGE_INTERNAL_SPEC_CONFIRM:
     ReorderBufferChangeType = 8;
 pub const ReorderBufferChangeType_REORDER_BUFFER_CHANGE_TRUNCATE: ReorderBufferChangeType = 9;
+pub const ReorderBufferChangeType_REORDER_BUFFER_CHANGE_INTERNAL_SPEC_ABORT:
+    ReorderBufferChangeType = 10;
 pub type ReorderBufferChangeType = ::std::os::raw::c_uint;
 #[repr(C)]
 #[derive(Copy, Clone)]
