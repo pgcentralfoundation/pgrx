@@ -17,8 +17,6 @@ members = [
     "pgx-pg-sys",
     "pgx-tests",
     "pgx-utils",
-]
-exclude = [
     "pgx-examples/aggregate",
     "pgx-examples/arrays",
     "pgx-examples/bad_ideas",

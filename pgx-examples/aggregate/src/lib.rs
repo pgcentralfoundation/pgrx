@@ -1,8 +1,5 @@
 use pgx::*;
-use std::{
-    str::FromStr,
-    ffi::CStr,
-};
+use std::{ffi::CStr, str::FromStr};
 
 pg_module_magic!();
 
@@ -18,12 +15,18 @@ impl PgVarlenaInOutFuncs for IntegerAvgState {
         let mut result = PgVarlena::<Self>::new();
 
         let mut split = input.to_bytes().split(|b| *b == b',');
-        let sum = split.next().map(|value| 
-            i32::from_str(unsafe { std::str::from_utf8_unchecked(value) }).expect("invalid i32")
-        ).expect("expected sum");
-        let n = split.next().map(|value| 
-            i32::from_str(unsafe { std::str::from_utf8_unchecked(value) }).expect("invalid i32")
-        ).expect("expected n");
+        let sum = split
+            .next()
+            .map(|value| {
+                i32::from_str(unsafe { std::str::from_utf8_unchecked(value) }).expect("invalid i32")
+            })
+            .expect("expected sum");
+        let n = split
+            .next()
+            .map(|value| {
+                i32::from_str(unsafe { std::str::from_utf8_unchecked(value) }).expect("invalid i32")
+            })
+            .expect("expected n");
 
         result.sum = sum;
         result.n = n;
@@ -34,7 +37,6 @@ impl PgVarlenaInOutFuncs for IntegerAvgState {
         buffer.push_str(&format!("{},{}", self.sum, self.n));
     }
 }
-
 
 impl Default for IntegerAvgState {
     fn default() -> Self {
@@ -83,8 +85,8 @@ extension_sql!(
 #[cfg(any(test, feature = "pg_test"))]
 #[pg_schema]
 mod tests {
-    use pgx::*;
     use crate::IntegerAvgState;
+    use pgx::*;
 
     #[pg_test]
     fn test_integer_avg_state() {
@@ -98,9 +100,8 @@ mod tests {
     fn test_integer_avg_state_sql() {
         Spi::run("CREATE TABLE demo_table (value INTEGER);");
         Spi::run("INSERT INTO demo_table (value) VALUES (1), (2), (3);");
-        let retval =
-            Spi::get_one::<i32>("SELECT DEMOAVG(value) FROM demo_table;")
-                .expect("SQL select failed");
+        let retval = Spi::get_one::<i32>("SELECT DEMOAVG(value) FROM demo_table;")
+            .expect("SQL select failed");
         assert_eq!(retval, 2);
     }
 }

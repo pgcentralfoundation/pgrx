@@ -135,7 +135,7 @@ impl Argument {
                         || (saw_functioncallinfobasedata && segments.segments.len() == 1)
                     {
                         // It's a FunctionCallInfoBaseData, skipping
-                        return Ok(None)
+                        return Ok(None);
                     }
                 }
                 _ => (),

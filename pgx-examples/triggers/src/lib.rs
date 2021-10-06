@@ -69,7 +69,9 @@ mod tests {
 
     #[pg_test]
     fn test_insert() {
-        Spi::run(r#"INSERT INTO test (title, description, payload) VALUES ('a different title', 'a different description', '{"key": "value"}')"#);
+        Spi::run(
+            r#"INSERT INTO test (title, description, payload) VALUES ('a different title', 'a different description', '{"key": "value"}')"#,
+        );
     }
 }
 

@@ -98,11 +98,13 @@ fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
             format!("bindgen failed for pg{}", major_version)
         );
 
+        eprintln!("Rewriting items for pg{}", major_version);
         let rewritten_items = handle_result!(
             rewrite_items(&bindgen_output),
             format!("failed to rewrite items for pg{}", major_version)
         );
 
+        eprintln!("Extracting oids for pg{}", major_version);
         let oids = handle_result!(
             extract_oids(&bindgen_output),
             format!("unable to generate oids for pg{}", major_version)
@@ -115,6 +117,7 @@ fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
                 vec![out_dir.clone()]
             };
         for mut bindings_file in bindings_files {
+            eprintln!("Writing bindings file for pg{}", major_version);
             bindings_file.push(&format!("pg{}.rs", major_version));
             handle_result!(
                 write_rs_file(
@@ -135,6 +138,7 @@ fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
 
             let mut oids_file = out_dir.clone();
             oids_file.push(&format!("pg{}_oids.rs", major_version));
+            eprintln!("Writing oids file for pg{}", major_version);
             handle_result!(
                 write_rs_file(oids.clone(), &oids_file, quote! {}),
                 format!(
@@ -148,6 +152,12 @@ fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
 
     // compile the cshim for each binding
     for pg_config in pg_configs {
+        eprintln!(
+            "Building shim for pg{}",
+            pg_config
+                .major_version()
+                .expect("pg_config had no major_version")
+        );
         build_shim(&shim_src, &shim_dst, &pg_config)?;
     }
 

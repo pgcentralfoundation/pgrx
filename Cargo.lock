@@ -18,6 +18,21 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f26201604c87b1e01bd3d98f8d5d9a8fcbb815e8cedb41ffccbeb4bf593a35fe"
 
 [[package]]
+name = "adler32"
+version = "1.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "aae1277d39aeec15cb388266ecc24b11c80469deae6067e17a1a7aa9e5c1f234"
+
+[[package]]
+name = "aggregate"
+version = "0.0.0"
+dependencies = [
+ "pgx",
+ "pgx-tests",
+ "serde",
+]
+
+[[package]]
 name = "aho-corasick"
 version = "0.7.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -49,6 +64,15 @@ name = "anyhow"
 version = "1.0.43"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "28ae2b3dec75a406790005a200b1bd89785afc02517a00ca99ecfe093ee9e6cf"
+
+[[package]]
+name = "arrays"
+version = "0.1.0"
+dependencies = [
+ "pgx",
+ "pgx-tests",
+ "serde",
+]
 
 [[package]]
 name = "arrayvec"
@@ -122,6 +146,16 @@ dependencies = [
  "miniz_oxide",
  "object",
  "rustc-demangle",
+]
+
+[[package]]
+name = "bad_ideas"
+version = "0.0.0"
+dependencies = [
+ "pgx",
+ "pgx-tests",
+ "rand 0.7.3",
+ "rttp_client",
 ]
 
 [[package]]
@@ -217,6 +251,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "64f14468960818ce4f3e3553c32d524446687884f8e7af5d3e252331d8a87e43"
 dependencies = [
  "glob",
+]
+
+[[package]]
+name = "bytea"
+version = "0.1.0"
+dependencies = [
+ "libflate",
+ "pgx",
+ "pgx-tests",
 ]
 
 [[package]]
@@ -472,6 +515,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "custom_sql"
+version = "0.0.0"
+dependencies = [
+ "pgx",
+ "pgx-tests",
+ "serde",
+]
+
+[[package]]
+name = "custom_types"
+version = "0.1.0"
+dependencies = [
+ "maplit",
+ "pgx",
+ "pgx-tests",
+ "serde",
+]
+
+[[package]]
 name = "debugid"
 version = "0.7.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -573,6 +635,14 @@ checksum = "3a5019be18538406a43b5419a5501461f0c8b49ea7dfda0cfc32f4e51fc44be1"
 dependencies = [
  "log",
  "url",
+]
+
+[[package]]
+name = "errors"
+version = "0.1.0"
+dependencies = [
+ "pgx",
+ "pgx-tests",
 ]
 
 [[package]]
@@ -972,6 +1042,26 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3cb00336871be5ed2c8ed44b60ae9959dc5b9f08539422ed43f09e34ecaeba21"
 
 [[package]]
+name = "libflate"
+version = "1.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "16364af76ebb39b5869bb32c81fa93573267cd8c62bb3474e28d78fac3fb141e"
+dependencies = [
+ "adler32",
+ "crc32fast",
+ "libflate_lz77",
+]
+
+[[package]]
+name = "libflate_lz77"
+version = "1.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "39a734c0493409afcd49deee13c006a04e3586b9761a03543c6272c9c51f2f5a"
+dependencies = [
+ "rle-decode-fast",
+]
+
+[[package]]
 name = "libloading"
 version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -998,6 +1088,12 @@ checksum = "51b9bbe6c47d51fc3e1a9b945965946b4c44142ab8792c50835a980d362c2710"
 dependencies = [
  "cfg-if",
 ]
+
+[[package]]
+name = "maplit"
+version = "1.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3e2e65a1a2e43cfcb47a895c4c8b10d1f4a61097f9f254f183aee60cad9c651d"
 
 [[package]]
 name = "matchers"
@@ -1746,6 +1842,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "rle-decode-fast"
+version = "1.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cabe4fa914dec5870285fa7f71f602645da47c486e68486d2b4ceb4a343e90ac"
+
+[[package]]
 name = "rttp_client"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1807,6 +1909,15 @@ checksum = "8f05ba609c234e60bee0d547fe94a4c7e9da733d1c962cf6e59efa4cd9c8bc75"
 dependencies = [
  "lazy_static",
  "winapi 0.3.9",
+]
+
+[[package]]
+name = "schemas"
+version = "0.0.0"
+dependencies = [
+ "pgx",
+ "pgx-tests",
+ "serde",
 ]
 
 [[package]]
@@ -1979,6 +2090,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "43b2853a4d09f215c24cc5489c992ce46052d359b5109343cbafbf26bc62f8a3"
 
 [[package]]
+name = "shmem"
+version = "0.1.0"
+dependencies = [
+ "heapless",
+ "pgx",
+ "pgx-tests",
+ "serde",
+]
+
+[[package]]
 name = "shutdown_hooks"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2025,6 +2146,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "spi"
+version = "0.0.0"
+dependencies = [
+ "pgx",
+ "pgx-tests",
+]
+
+[[package]]
+name = "srf"
+version = "0.1.0"
+dependencies = [
+ "pgx",
+ "pgx-tests",
+ "rand 0.7.3",
+]
+
+[[package]]
 name = "stable_deref_trait"
 version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2057,6 +2195,14 @@ checksum = "8ee348cb74b87454fff4b551cbf727025810a004f88aeacae7f85b87f4e9a1c1"
 dependencies = [
  "unicode-bidi",
  "unicode-normalization",
+]
+
+[[package]]
+name = "strings"
+version = "0.1.0"
+dependencies = [
+ "pgx",
+ "pgx-tests",
 ]
 
 [[package]]
@@ -2387,6 +2533,15 @@ dependencies = [
  "tracing-core",
  "tracing-log",
  "tracing-serde",
+]
+
+[[package]]
+name = "triggers"
+version = "0.0.0"
+dependencies = [
+ "pgx",
+ "pgx-macros",
+ "pgx-tests",
 ]
 
 [[package]]

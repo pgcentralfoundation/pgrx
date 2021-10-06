@@ -198,7 +198,7 @@ pub fn pg_getarg_pointer<T>(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> Opt
 }
 
 /// # Safety
-/// 
+///
 /// The provided `fcinfo` must be valid otherwise this function results in undefined behavior due
 /// to an out of bounds read.
 #[inline]
