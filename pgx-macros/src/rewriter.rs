@@ -437,7 +437,10 @@ impl PgGuardRewriter {
             quote! { pg_sys::guard::guard( || #func_name(#arg_list) ) }
         };
 
-        let prolog = if input_func_name == "_PG_init" || input_func_name == "_PG_fini" {
+        let prolog = if input_func_name == "__pgx_private_shmem_hook" {
+            // we do not want "no_mangle" on this function
+            quote! {}
+        } else if input_func_name == "_PG_init" || input_func_name == "_PG_fini" {
             quote! {
                 #[allow(non_snake_case)]
                 #[no_mangle]
