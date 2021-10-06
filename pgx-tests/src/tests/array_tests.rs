@@ -200,4 +200,26 @@ mod tests {
             .expect("failed to get SPI result");
         assert!(rc)
     }
+
+    #[pg_test]
+    fn test_slice_to_array() {
+        let owned_vec = vec![Some(1), Some(2), Some(3), None, Some(4)];
+        let json = Spi::connect(|client| {
+            let json = client
+                .select(
+                    "SELECT serde_serialize_array_i32($1)",
+                    None,
+                    Some(vec![(
+                        PgBuiltInOids::INT4ARRAYOID.oid(),
+                        owned_vec.as_slice().into_datum(),
+                    )]),
+                )
+                .first()
+                .get_one::<Json>()
+                .expect("returned json was null");
+            Ok(Some(json))
+        })
+        .expect("Failed to return json even though it's right there ^^");
+        assert_eq!(json.0, json! {{"values": [1, 2, 3, null, 4]}});
+    }
 }
