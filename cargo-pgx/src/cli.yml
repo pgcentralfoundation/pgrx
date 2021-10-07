@@ -93,6 +93,10 @@ subcommands:
                     help: additional cargo features to activate (default is '--no-default-features')
                     takes_value: true
                     multiple: true
+                - package:
+                    long: package
+                    short: p
+                    takes_value: true
           - package:
               about: create an installation package directory (in ./target/[debug|release]/extname-pgXX/).
               args:
@@ -162,6 +166,10 @@ subcommands:
                     short: v
                     multiple: true
                     help: Enable debug logging (-vv for trace)
+                - package:
+                    long: package
+                    short: p
+                    takes_value: true
           - run:
               about: compile/install extension to a pgx-managed Postgres instance and start psql
               args:

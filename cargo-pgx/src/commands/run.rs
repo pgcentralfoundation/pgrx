@@ -20,7 +20,7 @@ pub(crate) fn run_psql(
     stop_postgres(pg_config)?;
 
     // install the extension
-    install_extension(pg_config, is_release, None, additional_features)?;
+    install_extension(pg_config, None, is_release, None, additional_features)?;
 
     // restart postgres
     start_postgres(pg_config)?;

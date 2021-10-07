@@ -10,6 +10,7 @@ use std::process::{Command, Stdio};
 
 pub(crate) fn install_extension(
     pg_config: &PgConfig,
+    package: Option<&str>,
     is_release: bool,
     base_directory: Option<PathBuf>,
     additional_features: Vec<&str>,
@@ -25,18 +26,19 @@ pub(crate) fn install_extension(
         )
     }
 
-    build_extension(major_version, is_release, &*additional_features);
+    build_extension(major_version, package, is_release, &*additional_features);
 
     println!();
     println!("installing extension");
     let pkgdir = make_relative(pg_config.pkglibdir()?);
     let extdir = make_relative(pg_config.extension_dir()?);
+    let control_file_name = control_file.file_name().expect("Expected control file to have filename.");
     let shlibpath = find_library_file(&extname, is_release);
 
     {
         let mut dest = base_directory.clone();
         dest.push(&extdir);
-        dest.push(&control_file);
+        dest.push(&control_file_name);
         copy_file(control_file, dest, "control file");
     }
 
@@ -49,6 +51,7 @@ pub(crate) fn install_extension(
 
     copy_sql_files(
         pg_config,
+        package,
         is_release,
         additional_features,
         &extdir,
@@ -71,9 +74,10 @@ fn copy_file(src: PathBuf, dest: PathBuf, msg: &str) {
     }
 
     println!(
-        "{} {} to `{}`",
+        "{} {} from `{}` to `{}`",
         "     Copying".bold().green(),
         msg,
+        format_display_path(&src),
         format_display_path(&dest)
     );
 
@@ -83,7 +87,7 @@ fn copy_file(src: PathBuf, dest: PathBuf, msg: &str) {
     );
 }
 
-pub(crate) fn build_extension(major_version: u16, is_release: bool, additional_features: &[&str]) {
+pub(crate) fn build_extension(major_version: u16, package: Option<&str>, is_release: bool, additional_features: &[&str]) {
     let mut features =
         std::env::var("PGX_BUILD_FEATURES").unwrap_or(format!("pg{}", major_version));
     let flags = std::env::var("PGX_BUILD_FLAGS").unwrap_or_default();
@@ -95,8 +99,16 @@ pub(crate) fn build_extension(major_version: u16, is_release: bool, additional_f
     }
     let mut command = Command::new("cargo");
     command.arg("build");
+
+    command.env("CARGO_TARGET_DIR", get_target_dir());
+
     if is_release {
         command.arg("--release");
+    }
+
+    if let Some(pkg) = package {
+        command.arg("--package");
+        command.arg(pkg);
     }
 
     if !features.trim().is_empty() {
@@ -126,6 +138,7 @@ pub(crate) fn build_extension(major_version: u16, is_release: bool, additional_f
 
 fn copy_sql_files(
     pg_config: &PgConfig,
+    package: Option<&str>,
     is_release: bool,
     additional_features: Vec<&str>,
     extdir: &PathBuf,
@@ -140,6 +153,7 @@ fn copy_sql_files(
 
     crate::schema::generate_schema(
         pg_config,
+        package,
         is_release,
         &*additional_features,
         &dest,

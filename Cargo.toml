@@ -7,6 +7,7 @@ license = "MIT"
 description = "Top-level repo for 'pgx' (not on crates.io)"
 homepage = "https://github.com/zombodb/pgx/"
 repository = "https://github.com/zombodb/pgx/"
+resolver = "2"
 
 [workspace]
 members = [

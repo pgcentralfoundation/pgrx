@@ -18,6 +18,7 @@ use symbolic::{
 
 pub(crate) fn generate_schema(
     pg_config: &PgConfig,
+    package: Option<&str>,
     is_release: bool,
     additional_features: &[&str],
     path: impl AsRef<std::path::Path>,
@@ -102,6 +103,11 @@ pub(crate) fn generate_schema(
     command.args(&["build", "--bin", "sql-generator"]);
     if is_release {
         command.arg("--release");
+    }
+
+    if let Some(pkg) = package {
+        command.arg("--package");
+        command.arg(pkg);
     }
 
     if let Some(log_level) = &log_level {
@@ -223,6 +229,11 @@ pub(crate) fn generate_schema(
     command.args(&["run", "--bin", "sql-generator"]);
     if is_release {
         command.arg("--release");
+    }
+
+    if let Some(pkg) = package {
+        command.arg("--package");
+        command.arg(pkg);
     }
 
     if let Some(log_level) = &log_level {

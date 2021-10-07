@@ -11,6 +11,7 @@ use std::collections::HashSet;
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
 use std::str::FromStr;
+use std::io::Read;
 use syn::{GenericArgument, ItemFn, PathArguments, ReturnType, Type, TypeParamBound};
 
 pub mod operator_common;
@@ -54,7 +55,7 @@ macro_rules! handle_result {
     }};
 }
 
-pub fn get_target_dir() -> PathBuf {
+pub fn get_cargo_metadata() -> Result<JsonValue, serde_json::Error> {
     let mut command = Command::new("cargo");
     command
         .arg("metadata")
@@ -62,14 +63,19 @@ pub fn get_target_dir() -> PathBuf {
         .arg("--no-deps");
     let output = handle_result!(
         command.output(),
-        "Unable to get target directory from 'cargo metadata'"
+        "Invalid 'cargo metada' response"
     );
+
     if !output.status.success() {
         exit_with_error!("'cargo metadata' failed with exit code: {}", output.status);
     }
 
+    serde_json::from_slice(&output.stdout)
+}
+
+pub fn get_target_dir() -> PathBuf {
     let json: JsonValue = handle_result!(
-        serde_json::from_slice(&output.stdout),
+        get_cargo_metadata(),
         "Invalid 'cargo metada' response"
     );
     let target_dir = json.get("target_directory");
@@ -79,6 +85,48 @@ pub fn get_target_dir() -> PathBuf {
             "could not read target dir from 'cargo metadata got: {:?}",
             v,
         ),
+    }
+}
+
+pub fn get_cargo_toml() -> Result<toml::Value, toml::de::Error> {
+    let manifest = std::env::var("CARGO_MANIFEST_DIR").expect("No CARGO_MANIFEST_DIR provided");
+    let mut manifest = PathBuf::from(manifest);
+    manifest.push("Cargo.toml");
+    let mut buf = Vec::default();
+    let mut file = handle_result!(
+        std::fs::File::open(manifest),
+        "Couldn't open Cargo.toml"
+    );
+    handle_result!(
+        file.read_to_end(&mut buf),
+        "Couldn't read Cargo.toml"
+    );
+    toml::from_slice(&buf)
+}
+
+pub fn get_package_name() -> Option<String> {
+    let toml: toml::Value = handle_result!(
+        get_cargo_toml(),
+        "Couldn't read 'Cargo.toml'"
+    );
+    println!("thing {:?}", toml);
+    let package = toml.get("package")?;
+    let package_name = package.get("name");
+    match package_name {
+        Some(toml::Value::String(package_name)) => Some(package_name.into()),
+        _ => None,
+    }
+}
+
+pub fn get_workspace_root() -> Option<PathBuf> {
+    let json: JsonValue = handle_result!(
+        get_cargo_metadata(),
+        "Invalid 'cargo metada' response"
+    );
+    let workspace_root = json.get("workspace_root");
+    match workspace_root {
+        Some(JsonValue::String(workspace_root)) => Some(workspace_root.into()),
+        _ => None,
     }
 }
 

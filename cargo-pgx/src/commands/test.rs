@@ -26,7 +26,7 @@ pub fn test_extension(
         .stderr(Stdio::inherit())
         .arg("test")
         .arg("--features")
-        .arg(features)
+        .arg(&features)
         .arg("--no-default-features")
         .env("CARGO_TARGET_DIR", &target_dir)
         .env(
@@ -46,7 +46,11 @@ pub fn test_extension(
         command.arg(testname);
     }
 
-    eprintln!("{:?}", command);
+    let command_str = format!("{:?}", command);
+    println!(
+        "testing extension with features `{}`\n{}",
+        features, command_str
+    );
     let status = handle_result!(command.status(), "failed to run cargo test");
     if !status.success() {
         exit_with_error!("cargo pgx test failed with status = {:?}", status.code())

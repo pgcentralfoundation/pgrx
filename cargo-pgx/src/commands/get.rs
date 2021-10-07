@@ -16,7 +16,7 @@ pub fn get_property(name: &str) -> Option<String> {
         return determine_git_hash();
     }
 
-    let control_file = File::open(control_file).unwrap();
+    let control_file = File::open(control_file).expect("Could not open control file.");
     let reader = BufReader::new(control_file);
 
     for line in reader.lines() {
@@ -40,8 +40,9 @@ pub fn get_property(name: &str) -> Option<String> {
 }
 
 pub(crate) fn find_control_file() -> (PathBuf, String) {
+    let manifest = std::env::var("CARGO_MANIFEST_DIR").expect("No CARGO_MANIFEST_DIR provided");
     for f in handle_result!(
-        std::fs::read_dir("."),
+        std::fs::read_dir(manifest),
         "cannot open current directory for reading"
     ) {
         if f.is_ok() {
@@ -51,7 +52,7 @@ pub(crate) fn find_control_file() -> (PathBuf, String) {
                     let mut extname: Vec<&str> = filename.split('.').collect();
                     extname.pop();
                     let extname = extname.pop().unwrap();
-                    return (filename.clone().into(), extname.to_string());
+                    return (f.path(), extname.to_string());
                 }
             }
         }

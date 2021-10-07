@@ -226,7 +226,6 @@ pub fn client() -> (postgres::Client, String) {
 }
 
 fn install_extension() {
-    eprintln!("installing extension");
     let is_release = std::env::var("PGX_BUILD_PROFILE").unwrap_or("debug".into()) == "release";
 
     let mut command = Command::new("cargo");
@@ -248,10 +247,20 @@ fn install_extension() {
             ),
         );
 
+    if let Some(workspace_root) = pgx_utils::get_workspace_root() {
+        command.current_dir(workspace_root);
+        command.arg("--package");
+        command.arg(pgx_utils::get_package_name().expect("No package name"));
+    }
+
     if is_release {
         command.arg("--release");
     }
 
+    println!(
+        "installing extension\n{:?}",
+        command
+    );
     let mut child = command.spawn().unwrap();
     let status = child.wait().unwrap();
     if !status.success() {

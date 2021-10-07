@@ -132,6 +132,7 @@ fn do_it() -> std::result::Result<(), std::io::Error> {
             }
             ("install", Some(install)) => {
                 let is_release = install.is_present("release");
+                let package = install.value_of("package");
                 let features = install
                     .values_of("features")
                     .map(|v| v.collect())
@@ -154,7 +155,7 @@ fn do_it() -> std::result::Result<(), std::io::Error> {
                     },
                 };
 
-                install_extension(&pg_config, is_release, None, features)
+                install_extension(&pg_config, package, is_release, None, features)
             }
             ("package", Some(package)) => {
                 let is_debug = package.is_present("debug");
@@ -221,6 +222,7 @@ fn do_it() -> std::result::Result<(), std::io::Error> {
             }
             ("schema", Some(schema)) => {
                 let (_, extname) = crate::commands::get::find_control_file();
+                let package = schema.value_of("package");
                 let out = schema
                     .value_of("out")
                     .map(|x| x.to_string())
@@ -277,7 +279,7 @@ fn do_it() -> std::result::Result<(), std::io::Error> {
                 let manual = schema.is_present("manual");
 
                 schema::generate_schema(
-                    &pg_config, is_release, &features, &out, dot, log_level, default, manual,
+                    &pg_config, package, is_release, &features, &out, dot, log_level, default, manual,
                 )
             }
             ("get", Some(get)) => {
