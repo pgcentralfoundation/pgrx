@@ -1,9 +1,9 @@
 mod pgx_sql;
 pub use pgx_sql::PgxSql;
 
-mod aggregate;
+pub mod aggregate;
 pub use aggregate::{
-    Aggregate, ParallelOption, FinalizeModify, PgAggregateEntity,
+    Aggregate,
 };
 
 mod control_file;

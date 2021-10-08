@@ -1,6 +1,6 @@
 use proc_macro2::{Ident, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
-use syn::{ImplItemConst, ImplItemMethod, ImplItemType, ItemFn, ItemImpl, Type, parse::{Parse, ParseStream}, parse_quote, spanned::Spanned};
+use syn::{Expr, GenericArgument, ImplItemConst, ImplItemMethod, ImplItemType, ItemFn, ItemImpl, PathArguments, Type, parse::{Parse, ParseStream}, parse_quote, spanned::Spanned};
 use syn::{punctuated::Punctuated, Token};
 
 #[derive(Debug, Clone, Hash, Eq, PartialEq)]
@@ -76,8 +76,8 @@ pub struct PgAggregate {
     item_impl: ItemImpl,
     pg_externs: Vec<ItemFn>,
     // Note these should not be considered *writable*, they're snapshots from construction.
-    type_args: ParsedTypeMaybeList,
-    type_order_by: Option<ParsedTypeMaybeList>,
+    type_args: MaybeVariadicTypeList,
+    type_order_by: Option<AggregateTypeList>,
     type_finalize: Option<syn::Type>,
     type_moving_state: Option<syn::Type>,
     const_parallel: Option<syn::Expr>,
@@ -139,7 +139,7 @@ impl PgAggregate {
 
         // `OrderBy` is an optional value, we default to nothing.
         let type_order_by = get_impl_type_by_name(&item_impl_snapshot, "OrderBy");
-        let type_order_by_value = type_order_by.map(|v| ParsedTypeMaybeList::new(v.ty.clone()))
+        let type_order_by_value = type_order_by.map(|v| AggregateTypeList::new(v.ty.clone()))
             .transpose()?;
         if type_order_by.is_none() {
             item_impl.items.push(parse_quote! {
@@ -151,7 +151,7 @@ impl PgAggregate {
         let type_args = get_impl_type_by_name(&item_impl_snapshot, "OrderBy").ok_or_else(||
             syn::Error::new(item_impl_snapshot.span(), "`#[pg_aggregate]` requires the `Args` type defined.")
         )?;
-        let type_args_value = ParsedTypeMaybeList::new(type_args.ty.clone())?;
+        let type_args_value = MaybeVariadicTypeList::new(type_args.ty.clone())?;
 
         // `Finalize` is an optional value, we default to nothing.
         let type_finalize = get_impl_type_by_name(&item_impl_snapshot, "Finalize");
@@ -355,7 +355,7 @@ impl PgAggregate {
         })
     }
 
-    fn entity_fn(&self) -> ItemFn {
+    fn entity_tokens(&self) -> ItemFn {
         let target_ident = get_target_ident(&self.item_impl)
             .expect("Expected constructed PgAggregate to have target ident.");
         let sql_graph_entity_fn_name = syn::Ident::new(
@@ -375,8 +375,8 @@ impl PgAggregate {
                 _ => panic!("`NAME: &'static str` is a required const for Aggregate implementations."),
             };
 
-        let type_order_by_iter = self.type_order_by.iter();
-        let type_finalize_iter = self.type_finalize.iter();
+        let type_args_iter = &self.type_args.entity_tokens();
+        let type_order_by_iter = self.type_order_by.iter().map(|x| x.entity_tokens());
         let type_moving_state_iter = self.type_moving_state.iter();
         let const_parallel_iter = self.const_parallel.iter();
         let const_finalize_modify_iter = self.const_finalize_modify.iter();
@@ -397,15 +397,15 @@ impl PgAggregate {
         let entity_item_fn: ItemFn = parse_quote! {
             #[no_mangle]
             pub extern "C" fn #sql_graph_entity_fn_name() -> pgx::datum::sql_entity_graph::SqlGraphEntity {
-                let submission = pgx::datum::sql_entity_graph::PgAggregateEntity {
+                let submission = pgx::datum::sql_entity_graph::aggregate::PgAggregateEntity {
                     full_path: core::any::type_name::<#target_ident>(),
                     module_path: module_path!(),
                     file: file!(),
                     line: line!(),
                     name: stringify!(#name),
                     ty_id: core::any::TypeId::of::<#target_ident>(),
-                    args: vec![],
-                    order_by: None,
+                    args: #type_args_iter,
+                    order_by: None#( .unwrap_or(Some(#type_order_by_iter)) )*,
                     stype: stringify!(#target_ident),
                     sfunc: stringify!(#fn_state),
                     combinefunc: None#( .unwrap_or(Some(stringify!(#fn_combine_iter))) )*,
@@ -454,7 +454,7 @@ impl Parse for PgAggregate {
 
 impl ToTokens for PgAggregate {
     fn to_tokens(&self, tokens: &mut TokenStream2) {
-        let entity_fn = self.entity_fn();
+        let entity_fn = self.entity_tokens();
         let impl_item = &self.item_impl;
         let pg_externs = self.pg_externs.iter();
         let inv = quote! {
@@ -527,67 +527,208 @@ fn get_const_litstr<'a>(item: &'a ImplItemConst) -> Option<String> {
 }
 
 #[derive(Debug, Clone)]
-struct ParsedTypeMaybeList {
-    found: Vec<ParsedType>,
+struct MaybeVariadicTypeList {
+    found: Vec<MaybeVariadicType>,
+    original: syn::Type,
 }
 
-impl ParsedTypeMaybeList {
+impl MaybeVariadicTypeList {
     fn new(maybe_type_list: syn::Type) -> Result<Self, syn::Error> {
-        match maybe_type_list {
+        match &maybe_type_list {
             Type::Tuple(tuple) => {
                 let mut coll = Vec::new();
-                for elem in tuple.elems {
-                    let parsed_elem = ParsedType::new(elem)?;
+                for elem in &tuple.elems {
+                    let parsed_elem = MaybeVariadicType::new(elem.clone())?;
                     coll.push(parsed_elem);
                 }
                 Ok(Self {
                     found: coll,
+                    original: maybe_type_list,
                 })
             },
             ty => Ok(Self {
-                found: vec![ ParsedType::new(ty)?, ],
+                found: vec![ MaybeVariadicType::new(ty.clone())?, ],
+                original: maybe_type_list,
             })
+        }
+    }
+
+    fn entity_tokens(&self) -> Expr {
+        let found = self.found.iter().map(|x| x.entity_tokens());
+        parse_quote! {
+            vec![#(#found),*]
         }
     }
 }
 
-impl Parse for ParsedTypeMaybeList {
+impl Parse for MaybeVariadicTypeList {
     fn parse(input: ParseStream) -> Result<Self, syn::Error> {
         Self::new(input.parse()?)
     }
 }
 
-#[derive(Debug, Clone)]
-struct ParsedType {
-    /// **If the input type is `Variadic<T>`, this will be `T`. Otherwise it will be the input type.
-    ty: Type,
-    /// If the input type was `Variadic<T>`.
-    is_variadic: bool,
-}
-
-impl ParsedType {
-    fn new(ty: syn::Type) -> Result<Self, syn::Error> {
-        let is_variadic = match ty {
-            syn::Type::Path(ty_path) => {
-                let found_pgx = false;
-                let found_variadic = false;
-                todo!();
-                for segment in ty_path.path.segments {
-                    todo!();
-                }
-                todo!()
-            }
-            _ => false,
-        };
-        let retval = Self {
-            ty,
-            is_variadic: todo!(),
-        };
-        Ok(retval)
+impl ToTokens for MaybeVariadicTypeList {
+    fn to_tokens(&self, tokens: &mut TokenStream2) {
+        self.original.to_tokens(tokens)
     }
 }
 
-impl Parse for ParsedType {
+#[derive(Debug, Clone)]
+struct MaybeVariadicType {
+    ty: Type,
+    /// The inner of a variadic, if it exists.
+    variadic_ty: Option<Type>,
+}
+
+impl MaybeVariadicType {
+    fn new(ty: syn::Type) -> Result<Self, syn::Error> {
+        let variadic_ty = match &ty {
+            syn::Type::Path(ty_path) => {
+                let mut found_pgx = false;
+                let mut found_variadic = false;
+                // We don't actually have type resolution here, this is a "Best guess".
+                for (idx, segment) in ty_path.path.segments.iter().enumerate() {
+                    match segment.ident.to_string().as_str() {
+                        "pgx" if idx == 1 => found_pgx = true,
+                        "Variadic" => found_variadic = true,
+                        _ => (),
+                    }
+                }
+                if (ty_path.path.segments.len() == 1 && found_variadic) || (found_pgx && found_variadic) {
+                    if let Some(last_seg) = ty_path.path.segments.last() {
+                        match &last_seg.arguments {
+                            PathArguments::AngleBracketed(angle_args) => {
+                                match angle_args.args.last() {
+                                    Some(GenericArgument::Type(ty)) => Some(ty.clone()),
+                                    _ => None,
+                                }
+                            },
+                            _ => None,
+                        }
+                    } else {
+                        None
+                    }
+                } else {
+                    None
+                }
+            }
+            _ => None,
+        };
+        let retval = Self {
+            ty,
+            variadic_ty,
+        };
+        Ok(retval)
+    }
+
+    fn entity_tokens(&self) -> Expr {
+        let ty = self.variadic_ty.as_ref().unwrap_or(&self.ty);
+        let variadic = self.variadic_ty.is_some();
+        parse_quote! {
+            pgx::datum::sql_entity_graph::aggregate::MaybeVariadicAggregateArgType {
+                agg_ty: pgx::datum::sql_entity_graph::aggregate::AggregateArgType {
+                    ty_source: stringify!(#ty),
+                    ty_id: core::any::TypeId::of::<#ty>(),
+                    full_path: core::any::type_name::<#ty>(),
+                },
+                variadic: #variadic,
+            }
+        }
+    }
+}
+
+impl ToTokens for MaybeVariadicType {
+    fn to_tokens(&self, tokens: &mut TokenStream2) {
+        self.ty.to_tokens(tokens)
+    }
+}
+
+impl Parse for MaybeVariadicType {
+    fn parse(input: ParseStream) -> Result<Self, syn::Error> {
+        Self::new(input.parse()?)
+    }
+}
+
+
+#[derive(Debug, Clone)]
+struct AggregateTypeList {
+    found: Vec<AggregateType>,
+    original: syn::Type,
+}
+
+impl AggregateTypeList {
+    fn new(maybe_type_list: syn::Type) -> Result<Self, syn::Error> {
+        match &maybe_type_list {
+            Type::Tuple(tuple) => {
+                let mut coll = Vec::new();
+                for elem in &tuple.elems {
+                    let parsed_elem = AggregateType::new(elem.clone())?;
+                    coll.push(parsed_elem);
+                }
+                Ok(Self {
+                    found: coll,
+                    original: maybe_type_list,
+                })
+            },
+            ty => Ok(Self {
+                found: vec![ AggregateType::new(ty.clone())?, ],
+                original: maybe_type_list,
+            })
+        }
+    }
+
+    fn entity_tokens(&self) -> Expr {
+        let found = self.found.iter().map(|x| x.entity_tokens());
+        parse_quote! {
+            vec![#(#found),*]
+        }
+    }
+}
+
+impl Parse for AggregateTypeList {
+    fn parse(input: ParseStream) -> Result<Self, syn::Error> {
+        Self::new(input.parse()?)
+    }
+}
+
+impl ToTokens for AggregateTypeList {
+    fn to_tokens(&self, tokens: &mut TokenStream2) {
+        self.original.to_tokens(tokens)
+    }
+}
+
+#[derive(Debug, Clone)]
+struct AggregateType {
+    ty: Type,
+}
+
+impl AggregateType {
+    fn new(ty: syn::Type) -> Result<Self, syn::Error> {
+        let retval = Self {
+            ty,
+        };
+        Ok(retval)
+    }
+
+    fn entity_tokens(&self) -> Expr {
+        let ty = &self.ty;
+        parse_quote! {
+            pgx::datum::sql_entity_graph::aggregate::AggregateArgType {
+                ty_source: stringify!(#ty),
+                ty_id: core::any::TypeId::of::<#ty>(),
+                full_path: core::any::type_name::<#ty>(),
+            }
+        }
+    }
+}
+
+impl ToTokens for AggregateType {
+    fn to_tokens(&self, tokens: &mut TokenStream2) {
+        self.ty.to_tokens(tokens)
+    }
+}
+
+impl Parse for AggregateType {
     fn parse(input: ParseStream) -> Result<Self, syn::Error> {
         Self::new(input.parse()?)
     }

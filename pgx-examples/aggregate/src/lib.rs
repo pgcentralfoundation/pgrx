@@ -1,5 +1,5 @@
 use pgx::*;
-use pgx::datum::sql_entity_graph::{ParallelOption, FinalizeModify};
+use pgx::datum::sql_entity_graph::aggregate::{ParallelOption, FinalizeModify};
 use std::{
     str::FromStr,
     ffi::CStr,

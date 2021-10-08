@@ -2,6 +2,7 @@ use crate::{sql_entity_graph::{SqlGraphIdentifier, SqlGraphEntity, ToSql, PgxSql
 use pgx_utils::sql_entity_graph::PgAggregate;
 use std::{cmp::Ordering, any::TypeId};
 use quote::{quote, ToTokens};
+use eyre::eyre as eyre_err;
 
 pub trait Aggregate where Self: Sized {
     /// The type of the argument(s).
@@ -122,6 +123,19 @@ impl ToSql for FinalizeModify {
 }
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
+pub struct AggregateArgType {
+    pub ty_source: &'static str,
+    pub ty_id: TypeId,
+    pub full_path: &'static str,
+}
+
+#[derive(Debug, Clone, Hash, PartialEq, Eq)]
+pub struct MaybeVariadicAggregateArgType {
+    pub agg_ty: AggregateArgType,
+    pub variadic: bool,
+}
+
+#[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub struct PgAggregateEntity {
     pub full_path: &'static str,
     pub module_path: &'static str,
@@ -134,12 +148,12 @@ pub struct PgAggregateEntity {
     /// The `arg_data_type` list.
     ///
     /// Corresponds to `Args` in [`Aggregate`].
-    pub args: &'static [&'static str],
+    pub args: Vec<MaybeVariadicAggregateArgType>,
 
     /// The `ORDER BY arg_data_type` list.
     ///
     /// Corresponds to `OrderBy` in [`Aggregate`].
-    pub order_by: Option<&'static [&'static str]>,
+    pub order_by: Option<Vec<AggregateArgType>>,
 
     /// The `STYPE` and `name` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
@@ -270,11 +284,9 @@ impl SqlGraphIdentifier for PgAggregateEntity {
 impl ToSql for PgAggregateEntity {
     #[tracing::instrument(level = "debug", err, skip(self, context), fields(identifier = %self.rust_identifier()))]
     fn to_sql(&self, context: &super::PgxSql) -> eyre::Result<String> {
+        let self_index = context.aggregates[self];
         let mut optional_attributes = Vec::new();
 
-        if let Some(value) = self.order_by {
-            optional_attributes.push(format!("ORDER_BY = {}", ""));
-        }
         if let Some(value) = self.finalfunc {
             optional_attributes.push(format!("FINALFUNC = {}", value));
         }
@@ -338,8 +350,61 @@ impl ToSql for PgAggregateEntity {
             line = self.line,
             sfunc = self.sfunc,
             stype = self.stype,
-            args = "$ARGS",
-            maybe_order_by = "\t$ORDER_BY\n",
+            args = {
+                let mut args = Vec::new();
+                for (idx, arg) in self.args.iter().enumerate() {
+                    let graph_index = context.graph.neighbors_undirected(self_index).find(|neighbor| match &context.graph[*neighbor] {
+                        SqlGraphEntity::Type(ty) => ty.id_matches(&arg.agg_ty.ty_id),
+                        SqlGraphEntity::Enum(en) => en.id_matches(&arg.agg_ty.ty_id),
+                        SqlGraphEntity::BuiltinType(defined) => defined == &arg.agg_ty.full_path,
+                        _ => false,
+                    }).ok_or_else(|| eyre_err!("Could not find arg type in graph. Got: {:?}", arg.agg_ty))?;
+                    let needs_comma = idx < (self.args.len() - 1);
+                    let buf = format!("\
+                           \t{variadic}{schema_prefix}{sql_type}{maybe_comma}/* {full_path} */\
+                       ",
+                           schema_prefix = context.schema_prefix_for(&graph_index),
+                           // First try to match on [`TypeId`] since it's most reliable.
+                           sql_type = context.rust_to_sql(arg.agg_ty.ty_id, arg.agg_ty.ty_source, arg.agg_ty.full_path).ok_or_else(|| eyre_err!(
+                               "Failed to map argument type `{}` to SQL type while building aggregate `{}`.",
+                               arg.agg_ty.full_path,
+                               self.name
+                           ))?,
+                           variadic = if arg.variadic { "VARIADIC " } else { "" },
+                           maybe_comma = if needs_comma { ", " } else { " " },
+                           full_path = arg.agg_ty.full_path,
+                    );
+                    args.push(buf);
+                };
+                String::from("\n") + &args.join("\n") + "\n"
+            },
+            maybe_order_by = if let Some(order_by) = &self.order_by {
+                let mut args = Vec::new();
+                for (idx, arg) in order_by.iter().enumerate() {
+                    let graph_index = context.graph.neighbors_undirected(self_index).find(|neighbor| match &context.graph[*neighbor] {
+                        SqlGraphEntity::Type(ty) => ty.id_matches(&arg.ty_id),
+                        SqlGraphEntity::Enum(en) => en.id_matches(&arg.ty_id),
+                        SqlGraphEntity::BuiltinType(defined) => defined == &arg.full_path,
+                        _ => false,
+                    }).ok_or_else(|| eyre_err!("Could not find arg type in graph. Got: {:?}", arg))?;
+                    let needs_comma = idx < (order_by.len() - 1);
+                    let buf = format!("\
+                           \t{schema_prefix}{sql_type}{maybe_comma}/* {full_path} */\
+                       ",
+                           schema_prefix = context.schema_prefix_for(&graph_index),
+                           // First try to match on [`TypeId`] since it's most reliable.
+                           sql_type = context.rust_to_sql(arg.ty_id, arg.ty_source, arg.full_path).ok_or_else(|| eyre_err!(
+                               "Failed to map argument type `{}` to SQL type while building aggregate `{}`.",
+                               arg.full_path,
+                               self.name
+                           ))?,
+                           maybe_comma = if needs_comma { ", " } else { " " },
+                           full_path = arg.full_path,
+                    );
+                    args.push(buf);
+                };
+                String::from("\n") + &args.join("\n") + "\n"
+            } else { String::default() },
             optional_attributes = String::from("\t") + &optional_attributes.join(",\n\t") + "\n",
         );
         tracing::debug!(%sql);
