@@ -484,7 +484,7 @@ impl PgGuardRewriter {
             #[allow(clippy::missing_safety_doc)]
             #[allow(clippy::redundant_closure)]
             #[allow(improper_ctypes_definitions)] /* for i128 */
-            pub unsafe extern "C" fn #func_name ( #arg_list_with_types ) #return_type {
+            pub unsafe fn #func_name ( #arg_list_with_types ) #return_type {
                 // as the panic message says, we can't call Postgres functions from threads
                 // the value of IS_MAIN_THREAD gets set through the pg_module_magic!() macro
                 #[cfg(debug_assertions)]

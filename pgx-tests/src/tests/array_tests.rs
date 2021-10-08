@@ -9,7 +9,19 @@ use serde_json::*;
 /// ```
 #[pg_extern]
 fn sum_array_i32(values: Array<i32>) -> i32 {
-    values.iter().map(|v| v.unwrap_or(0i32)).sum()
+    // we implement it this way so we can trap an overflow (as we have a test for this) and
+    // catch it correctly in both --debug and --release modes
+    let mut sum = 0_i32;
+    for v in values {
+        let v = v.unwrap_or(0);
+        let tmp = sum.overflowing_add(v);
+        if tmp.1 {
+            panic!("attempt to add with overflow");
+        } else {
+            sum = tmp.0;
+        }
+    }
+    sum
 }
 
 /// ```funcname
