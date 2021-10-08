@@ -39,10 +39,10 @@ impl PgVarlenaInOutFuncs for IntegerAvgState {
 
 #[pg_aggregate]
 impl Aggregate for IntegerAvgState {
-    type Args = i32;
+    type Args = (i32, variadic!(i32));
     const NAME: &'static str = "DEMOAVG";
 
-    fn state(&self, _: i32) -> Self { todo!() }
+    fn state(&self, _: Self::Args) -> Self { todo!() }
 
     // You can skip all these:
     type Finalize = i32;
@@ -62,7 +62,7 @@ impl Aggregate for IntegerAvgState {
         unimplemented!("pgx stub, define in impls")
     }
 
-    fn combine(&self, other: Self) -> Self {
+    fn combine(&self, _other: Self) -> Self {
         unimplemented!("pgx stub, define in impls")
     }
     
@@ -70,15 +70,15 @@ impl Aggregate for IntegerAvgState {
         unimplemented!("pgx stub, define in impls")
     }
 
-    fn deserial(&self, buf: Vec<u8>, internal: PgBox<Self>) -> PgBox<Self> {
+    fn deserial(&self, _buf: Vec<u8>, _internal: PgBox<Self>) -> PgBox<Self> {
         unimplemented!("pgx stub, define in impls")
     }
 
-    fn moving_state(mstate: Self::MovingState, v: Self::Args) -> Self::MovingState {
+    fn moving_state(_mstate: Self::MovingState, _v: Self::Args) -> Self::MovingState {
         unimplemented!("pgx stub, define in impls")
     }
 
-    fn moving_finalize(mstate: Self::MovingState) -> Self::Finalize {
+    fn moving_finalize(_mstate: Self::MovingState) -> Self::Finalize {
         unimplemented!("pgx stub, define in impls")
     } 
 }

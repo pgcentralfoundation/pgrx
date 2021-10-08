@@ -1,5 +1,3 @@
-use pgx_utils::sql_entity_graph::PgAggregate;
-
 use super::{ControlFile, ExtensionSqlEntity, PgExternEntity, PostgresEnumEntity, PostgresHashEntity, PostgresOrdEntity, PostgresTypeEntity, SchemaEntity, SqlGraphIdentifier, ToSql, aggregate::PgAggregateEntity};
 
 /// An entity corresponding to some SQL required by the extension.

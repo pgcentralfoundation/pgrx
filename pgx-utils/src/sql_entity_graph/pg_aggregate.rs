@@ -166,6 +166,7 @@ impl PgAggregate {
         let fn_state_name = if let Some(found) = fn_state {
             let fn_name = Ident::new(&format!("{}_state", target_ident), found.sig.ident.span());
             pg_externs.push(parse_quote! {
+                #[allow(non_snake_case)]
                 #[pg_extern]
                 fn #fn_name(this: #target_ident, v: <#target_ident as pgx::Aggregate>::Args) -> #target_ident {
                     this.state(v)
@@ -180,6 +181,7 @@ impl PgAggregate {
         let fn_combine_name = if let Some(found) = fn_combine {
             let fn_name = Ident::new(&format!("{}_combine", target_ident), found.sig.ident.span());
             pg_externs.push(parse_quote! {
+                #[allow(non_snake_case)]
                 #[pg_extern]
                 fn #fn_name(this: #target_ident, v: #target_ident) -> #target_ident {
                     this.combine(v)
@@ -199,6 +201,7 @@ impl PgAggregate {
         let fn_finalize_name = if let Some(found) = fn_finalize {
             let fn_name = Ident::new(&format!("{}_finalize", target_ident), found.sig.ident.span());
             pg_externs.push(parse_quote! {
+                #[allow(non_snake_case)]
                 #[pg_extern]
                 fn #fn_name(this: #target_ident) -> <#target_ident as pgx::Aggregate>::Finalize {
                     this.finalize()
@@ -218,6 +221,7 @@ impl PgAggregate {
         let fn_serial_name = if let Some(found) = fn_serial {
             let fn_name = Ident::new(&format!("{}_serial", target_ident), found.sig.ident.span());
             pg_externs.push(parse_quote! {
+                #[allow(non_snake_case)]
                 #[pg_extern]
                 fn #fn_name(this: #target_ident) -> Vec<u8> {
                     this.serial()
@@ -237,6 +241,7 @@ impl PgAggregate {
         let fn_deserial_name = if let Some(found) = fn_deserial {
             let fn_name = Ident::new(&format!("{}_deserial", target_ident), found.sig.ident.span());
             pg_externs.push(parse_quote! {
+                #[allow(non_snake_case)]
                 #[pg_extern]
                 fn #fn_name(this: #target_ident, buf: Vec<u8>, internal: pgx::PgBox<#target_ident>) -> pgx::PgBox<#target_ident> {
                     this.deserial(buf, internal)
@@ -256,6 +261,7 @@ impl PgAggregate {
         let fn_moving_state_name = if let Some(found) = fn_moving_state {
             let fn_name = Ident::new(&format!("{}_moving_state", target_ident), found.sig.ident.span());
             pg_externs.push(parse_quote! {
+                #[allow(non_snake_case)]
                 #[pg_extern]
                 fn #fn_name(
                     mstate: <#target_ident as pgx::Aggregate>::MovingState,
@@ -281,6 +287,7 @@ impl PgAggregate {
         let fn_moving_state_inverse_name = if let Some(found) = fn_moving_state_inverse {
             let fn_name = Ident::new(&format!("{}_moving_state_inverse", target_ident), found.sig.ident.span());
             pg_externs.push(parse_quote! {
+                #[allow(non_snake_case)]
                 #[pg_extern]
                 fn #fn_name(
                     mstate: <#target_ident as pgx::Aggregate>::MovingState,
@@ -306,6 +313,7 @@ impl PgAggregate {
         let fn_moving_finalize_name = if let Some(found) = fn_moving_finalize {
             let fn_name = Ident::new(&format!("{}_moving_finalize", target_ident), found.sig.ident.span());
             pg_externs.push(parse_quote! {
+                #[allow(non_snake_case)]
                 #[pg_extern]
                 fn #fn_name(mstate: <#target_ident as pgx::Aggregate>::MovingState) -> <#target_ident as pgx::Aggregate>::Finalize {
                     <#target_ident as pgx::Aggregate>::moving_finalize(mstate)
@@ -416,7 +424,11 @@ impl PgAggregate {
                     deserialfunc: None#( .unwrap_or(Some(stringify!(#fn_deserial_iter))) )*,
                     msfunc: None#( .unwrap_or(Some(stringify!(#fn_moving_state_iter))) )*,
                     minvfunc: None#( .unwrap_or(Some(stringify!(#fn_moving_state_inverse_iter))) )*,
-                    mstype: None#( .unwrap_or(Some(stringify!(#type_moving_state_iter))) )*,
+                    mstype: None#( .unwrap_or(Some(pgx::datum::sql_entity_graph::aggregate::AggregateType {
+                        ty_source: stringify!(#type_moving_state_iter),
+                        ty_id: core::any::TypeId::of::<#type_moving_state_iter>(),
+                        full_path: core::any::type_name::<#type_moving_state_iter>(),
+                    })) )*,
                     mfinalfunc: None#( .unwrap_or(Some(stringify!(#fn_moving_finalize_iter))) )*,
                     mfinalfunc_modify: None#( .unwrap_or(#const_moving_finalize_modify_iter) )*,
                     minitcond: None#( .unwrap_or(Some(#const_moving_intial_condition_iter)) )*,
@@ -583,19 +595,19 @@ struct MaybeVariadicType {
 impl MaybeVariadicType {
     fn new(ty: syn::Type) -> Result<Self, syn::Error> {
         let variadic_ty = match &ty {
-            syn::Type::Path(ty_path) => {
+            syn::Type::Macro(ty_macro) => {
                 let mut found_pgx = false;
                 let mut found_variadic = false;
                 // We don't actually have type resolution here, this is a "Best guess".
-                for (idx, segment) in ty_path.path.segments.iter().enumerate() {
+                for (idx, segment) in ty_macro.mac.path.segments.iter().enumerate() {
                     match segment.ident.to_string().as_str() {
                         "pgx" if idx == 1 => found_pgx = true,
-                        "Variadic" => found_variadic = true,
+                        "variadic" => found_variadic = true,
                         _ => (),
                     }
                 }
-                if (ty_path.path.segments.len() == 1 && found_variadic) || (found_pgx && found_variadic) {
-                    if let Some(last_seg) = ty_path.path.segments.last() {
+                if (ty_macro.mac.path.segments.len() == 1 && found_variadic) || (found_pgx && found_variadic) {
+                    if let Some(last_seg) = ty_macro.mac.path.segments.last() {
                         match &last_seg.arguments {
                             PathArguments::AngleBracketed(angle_args) => {
                                 match angle_args.args.last() {
@@ -625,8 +637,8 @@ impl MaybeVariadicType {
         let ty = self.variadic_ty.as_ref().unwrap_or(&self.ty);
         let variadic = self.variadic_ty.is_some();
         parse_quote! {
-            pgx::datum::sql_entity_graph::aggregate::MaybeVariadicAggregateArgType {
-                agg_ty: pgx::datum::sql_entity_graph::aggregate::AggregateArgType {
+            pgx::datum::sql_entity_graph::aggregate::MaybeVariadicAggregateType {
+                agg_ty: pgx::datum::sql_entity_graph::aggregate::AggregateType {
                     ty_source: stringify!(#ty),
                     ty_id: core::any::TypeId::of::<#ty>(),
                     full_path: core::any::type_name::<#ty>(),
@@ -713,7 +725,7 @@ impl AggregateType {
     fn entity_tokens(&self) -> Expr {
         let ty = &self.ty;
         parse_quote! {
-            pgx::datum::sql_entity_graph::aggregate::AggregateArgType {
+            pgx::datum::sql_entity_graph::aggregate::AggregateType {
                 ty_source: stringify!(#ty),
                 ty_id: core::any::TypeId::of::<#ty>(),
                 full_path: core::any::type_name::<#ty>(),

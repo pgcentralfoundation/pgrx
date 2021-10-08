@@ -1,7 +1,5 @@
-use crate::{sql_entity_graph::{SqlGraphIdentifier, SqlGraphEntity, ToSql, PgxSql}, Internal, PgBox};
-use pgx_utils::sql_entity_graph::PgAggregate;
+use crate::{sql_entity_graph::{SqlGraphIdentifier, SqlGraphEntity, ToSql, PgxSql}, PgBox};
 use std::{cmp::Ordering, any::TypeId};
-use quote::{quote, ToTokens};
 use eyre::eyre as eyre_err;
 
 pub trait Aggregate where Self: Sized {
@@ -123,15 +121,15 @@ impl ToSql for FinalizeModify {
 }
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
-pub struct AggregateArgType {
+pub struct AggregateType {
     pub ty_source: &'static str,
     pub ty_id: TypeId,
     pub full_path: &'static str,
 }
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
-pub struct MaybeVariadicAggregateArgType {
-    pub agg_ty: AggregateArgType,
+pub struct MaybeVariadicAggregateType {
+    pub agg_ty: AggregateType,
     pub variadic: bool,
 }
 
@@ -148,12 +146,12 @@ pub struct PgAggregateEntity {
     /// The `arg_data_type` list.
     ///
     /// Corresponds to `Args` in [`Aggregate`].
-    pub args: Vec<MaybeVariadicAggregateArgType>,
+    pub args: Vec<MaybeVariadicAggregateType>,
 
     /// The `ORDER BY arg_data_type` list.
     ///
     /// Corresponds to `OrderBy` in [`Aggregate`].
-    pub order_by: Option<Vec<AggregateArgType>>,
+    pub order_by: Option<Vec<AggregateType>>,
 
     /// The `STYPE` and `name` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
@@ -208,7 +206,7 @@ pub struct PgAggregateEntity {
     /// The `MSTYPE` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
     /// Corresponds to `MovingState` in [`Aggregate`].
-    pub mstype: Option<&'static str>,
+    pub mstype: Option<AggregateType>,
     
     // The `MSSPACE` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     //
@@ -311,9 +309,6 @@ impl ToSql for PgAggregateEntity {
         if let Some(value) = self.minvfunc {
             optional_attributes.push(format!("MINVFUNC = {}", value));
         }
-        if let Some(value) = self.mstype {
-            optional_attributes.push(format!("MSTYPE = {}", value));
-        }
         if let Some(value) = self.mfinalfunc {
             optional_attributes.push(format!("MFINALFUNC = {}", value));
         }
@@ -332,12 +327,19 @@ impl ToSql for PgAggregateEntity {
         if self.hypothetical {
             optional_attributes.push(String::from("HYPOTHETICAL"))
         }
+        if let Some(value) = &self.mstype {
+            let sql = context.rust_to_sql(value.ty_id, value.ty_source, value.full_path).ok_or_else(|| eyre_err!(
+                "Failed to map moving state type `{}` to SQL type while building aggregate `{}`.",
+                value.full_path,
+                self.name
+            ))?;
+            optional_attributes.push(format!("MSTYPE = {} /* {} */", sql, value.full_path));
+        }
 
         let sql = format!("\n\
                 -- {file}:{line}\n\
                 -- {full_path}\n\
-                CREATE AGGREGATE {name} ({args})\n\
-                {maybe_order_by}\
+                CREATE AGGREGATE {name} ({args}{maybe_order_by})\n\
                 (\n\
                     \tsfunc = {sfunc},\n\
                     \tstype = {stype},\n\
@@ -376,7 +378,7 @@ impl ToSql for PgAggregateEntity {
                     );
                     args.push(buf);
                 };
-                String::from("\n") + &args.join("\n") + "\n"
+                String::from("\n") + &args.join("\n")
             },
             maybe_order_by = if let Some(order_by) = &self.order_by {
                 let mut args = Vec::new();
@@ -389,7 +391,7 @@ impl ToSql for PgAggregateEntity {
                     }).ok_or_else(|| eyre_err!("Could not find arg type in graph. Got: {:?}", arg))?;
                     let needs_comma = idx < (order_by.len() - 1);
                     let buf = format!("\
-                           \t{schema_prefix}{sql_type}{maybe_comma}/* {full_path} */\
+                           {schema_prefix}{sql_type}{maybe_comma}/* {full_path} */\
                        ",
                            schema_prefix = context.schema_prefix_for(&graph_index),
                            // First try to match on [`TypeId`] since it's most reliable.
@@ -403,7 +405,7 @@ impl ToSql for PgAggregateEntity {
                     );
                     args.push(buf);
                 };
-                String::from("\n") + &args.join("\n") + "\n"
+                String::from("\n\tORDER BY ") + &args.join("\n,") + "\n"
             } else { String::default() },
             optional_attributes = String::from("\t") + &optional_attributes.join(",\n\t") + "\n",
         );
