@@ -46,8 +46,6 @@ impl PartialOrd for PgExternEntity {
     }
 }
 
-impl crate::PostgresType for PgExternEntity {}
-
 impl Into<SqlGraphEntity> for PgExternEntity {
     fn into(self) -> SqlGraphEntity {
         SqlGraphEntity::Function(self)

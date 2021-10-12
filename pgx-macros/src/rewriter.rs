@@ -759,7 +759,7 @@ impl FunctionSignatureRewriter {
 
                         i += 1;
                     }
-                    _ => panic!("Unrecognized function arg type"),
+                    _ => panic!("Unrecognized function arg type: {}", arg.to_token_stream().to_string()),
                 },
             }
         }

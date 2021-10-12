@@ -39,48 +39,48 @@ impl PgVarlenaInOutFuncs for IntegerAvgState {
 
 #[pg_aggregate]
 impl Aggregate for IntegerAvgState {
-    type Args = (i32, variadic!(i32));
+    type Args = (i32, i32);
     const NAME: &'static str = "DEMOAVG";
 
     fn state(&self, _: Self::Args) -> Self { todo!() }
 
     // You can skip all these:
-    type Finalize = i32;
-    type OrderBy = i32;
-    type MovingState = i32;
+    // type Finalize = i32;
+    // type OrderBy = i32;
+    // type MovingState = i32;
 
-    const PARALLEL: Option<ParallelOption> = Some(ParallelOption::Unsafe);
-    const FINALIZE_MODIFY: Option<FinalizeModify> = Some(FinalizeModify::ReadWrite);
-    const MOVING_FINALIZE_MODIFY: Option<FinalizeModify> = Some(FinalizeModify::ReadWrite);
-    const INITIAL_CONDITION: Option<&'static str> = Some("0,0");
-    const SORT_OPERATOR: Option<&'static str> = Some("sortop");
-    const MOVING_INITIAL_CONDITION: Option<&'static str> = Some("1,1");
-    const HYPOTHETICAL: bool = true;
+    // const PARALLEL: Option<ParallelOption> = Some(ParallelOption::Unsafe);
+    // const FINALIZE_MODIFY: Option<FinalizeModify> = Some(FinalizeModify::ReadWrite);
+    // const MOVING_FINALIZE_MODIFY: Option<FinalizeModify> = Some(FinalizeModify::ReadWrite);
+    // const INITIAL_CONDITION: Option<&'static str> = Some("0,0");
+    // const SORT_OPERATOR: Option<&'static str> = Some("sortop");
+    // const MOVING_INITIAL_CONDITION: Option<&'static str> = Some("1,1");
+    // const HYPOTHETICAL: bool = true;
 
-    // You can skip all these:
-    fn finalize(&self) -> Self::Finalize {
-        unimplemented!("pgx stub, define in impls")
-    }
+    // // You can skip all these:
+    // fn finalize(&self) -> Self::Finalize {
+    //     unimplemented!("pgx stub, define in impls")
+    // }
 
-    fn combine(&self, _other: Self) -> Self {
-        unimplemented!("pgx stub, define in impls")
-    }
+    // fn combine(&self, _other: Self) -> Self {
+    //     unimplemented!("pgx stub, define in impls")
+    // }
     
-    fn serial(&self) -> Vec<u8> {
-        unimplemented!("pgx stub, define in impls")
-    }
+    // fn serial(&self) -> Vec<u8> {
+    //     unimplemented!("pgx stub, define in impls")
+    // }
 
-    fn deserial(&self, _buf: Vec<u8>, _internal: PgBox<Self>) -> PgBox<Self> {
-        unimplemented!("pgx stub, define in impls")
-    }
+    // fn deserial(&self, _buf: Vec<u8>, _internal: PgBox<Self>) -> PgBox<Self> {
+    //     unimplemented!("pgx stub, define in impls")
+    // }
 
-    fn moving_state(_mstate: Self::MovingState, _v: Self::Args) -> Self::MovingState {
-        unimplemented!("pgx stub, define in impls")
-    }
+    // fn moving_state(_mstate: Self::MovingState, _v: Self::Args) -> Self::MovingState {
+    //     unimplemented!("pgx stub, define in impls")
+    // }
 
-    fn moving_finalize(_mstate: Self::MovingState) -> Self::Finalize {
-        unimplemented!("pgx stub, define in impls")
-    } 
+    // fn moving_finalize(_mstate: Self::MovingState) -> Self::Finalize {
+    //     unimplemented!("pgx stub, define in impls")
+    // } 
 }
 
 impl Default for IntegerAvgState {
@@ -88,44 +88,6 @@ impl Default for IntegerAvgState {
         Self { sum: 0, n: 0 }
     }
 }
-
-impl IntegerAvgState {
-    fn acc(&self, v: i32) -> PgVarlena<Self> {
-        let mut new = PgVarlena::<Self>::new();
-        new.sum = self.sum + v;
-        new.n = self.n + 1;
-        new
-    }
-    fn finalize(&self) -> i32 {
-        self.sum / self.n
-    }
-}
-
-#[pg_extern]
-fn integer_avg_state_func(
-    internal_state: PgVarlena<IntegerAvgState>,
-    next_data_value: i32,
-) -> PgVarlena<IntegerAvgState> {
-    internal_state.acc(next_data_value)
-}
-
-#[pg_extern]
-fn integer_avg_final_func(internal_state: PgVarlena<IntegerAvgState>) -> i32 {
-    internal_state.finalize()
-}
-
-extension_sql!(
-    r#"
-    CREATE AGGREGATE DEMOAVG (integer)
-    (
-        sfunc = integer_avg_state_func,
-        stype = IntegerAvgState,
-        finalfunc = integer_avg_final_func,
-        initcond = '0,0'
-    );
-    "#,
-    name = "create_demoavg_aggregate",
-);
 
 #[cfg(any(test, feature = "pg_test"))]
 #[pg_schema]

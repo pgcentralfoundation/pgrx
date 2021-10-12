@@ -286,46 +286,46 @@ impl ToSql for PgAggregateEntity {
         let mut optional_attributes = Vec::new();
 
         if let Some(value) = self.finalfunc {
-            optional_attributes.push(format!("FINALFUNC = {}", value));
+            optional_attributes.push(format!("\tFINALFUNC = {}", value));
         }
         if let Some(value) = self.finalfunc_modify {
-            optional_attributes.push(format!("FINALFUNC_MODIFY = {}", value.to_sql(context)?));
+            optional_attributes.push(format!("\tFINALFUNC_MODIFY = {}", value.to_sql(context)?));
         }
         if let Some(value) = self.combinefunc {
-            optional_attributes.push(format!("COMBINEFUNC = {}", value));
+            optional_attributes.push(format!("\tCOMBINEFUNC = {}", value));
         }
         if let Some(value) = self.serialfunc {
-            optional_attributes.push(format!("SERIALFUNC = {}", value));
+            optional_attributes.push(format!("\tSERIALFUNC = {}", value));
         }
         if let Some(value) = self.deserialfunc {
-            optional_attributes.push(format!("DESERIALFUNC = {}", value));
+            optional_attributes.push(format!("\tDESERIALFUNC = {}", value));
         }
         if let Some(value) = self.initcond {
-            optional_attributes.push(format!("INITCOND = {}", value));
+            optional_attributes.push(format!("\tINITCOND = {}", value));
         }
         if let Some(value) = self.msfunc {
-            optional_attributes.push(format!("MSFUNC = {}", value));
+            optional_attributes.push(format!("\tMSFUNC = {}", value));
         }
         if let Some(value) = self.minvfunc {
-            optional_attributes.push(format!("MINVFUNC = {}", value));
+            optional_attributes.push(format!("\tMINVFUNC = {}", value));
         }
         if let Some(value) = self.mfinalfunc {
-            optional_attributes.push(format!("MFINALFUNC = {}", value));
+            optional_attributes.push(format!("\tMFINALFUNC = {}", value));
         }
         if let Some(value) = self.mfinalfunc_modify {
-            optional_attributes.push(format!("MFINALFUNC_MODIFY = {}", value.to_sql(context)?));
+            optional_attributes.push(format!("\tMFINALFUNC_MODIFY = {}", value.to_sql(context)?));
         }
         if let Some(value) = self.minitcond {
-            optional_attributes.push(format!("MINITCOND = {}", value));
+            optional_attributes.push(format!("\tMINITCOND = {}", value));
         }
         if let Some(value) = self.sortop {
-            optional_attributes.push(format!("SORTOP = {}", value));
+            optional_attributes.push(format!("\tSORTOP = {}", value));
         }
         if let Some(value) = self.parallel {
-            optional_attributes.push(format!("PARALLEL = {}", value.to_sql(context)?));
+            optional_attributes.push(format!("\tPARALLEL = {}", value.to_sql(context)?));
         }
         if self.hypothetical {
-            optional_attributes.push(String::from("HYPOTHETICAL"))
+            optional_attributes.push(String::from("\tHYPOTHETICAL"))
         }
         if let Some(value) = &self.mstype {
             let sql = context.rust_to_sql(value.ty_id, value.ty_source, value.full_path).ok_or_else(|| eyre_err!(
@@ -342,9 +342,9 @@ impl ToSql for PgAggregateEntity {
                 CREATE AGGREGATE {name} ({args}{maybe_order_by})\n\
                 (\n\
                     \tsfunc = {sfunc},\n\
-                    \tstype = {stype},\n\
+                    \tstype = {stype}{maybe_comma_after_stype}\n\
                     {optional_attributes}\
-                )\n\
+                );\
             ",
             name = self.name,
             full_path = self.full_path,
@@ -352,6 +352,7 @@ impl ToSql for PgAggregateEntity {
             line = self.line,
             sfunc = self.sfunc,
             stype = self.stype,
+            maybe_comma_after_stype = if optional_attributes.len() == 0 { "" } else { "," },
             args = {
                 let mut args = Vec::new();
                 for (idx, arg) in self.args.iter().enumerate() {
@@ -361,7 +362,7 @@ impl ToSql for PgAggregateEntity {
                         SqlGraphEntity::BuiltinType(defined) => defined == &arg.agg_ty.full_path,
                         _ => false,
                     }).ok_or_else(|| eyre_err!("Could not find arg type in graph. Got: {:?}", arg.agg_ty))?;
-                    let needs_comma = idx < (self.args.len() - 1);
+                    let needs_comma = idx < (self.args.len() - 1) || self.order_by.is_some();
                     let buf = format!("\
                            \t{variadic}{schema_prefix}{sql_type}{maybe_comma}/* {full_path} */\
                        ",
@@ -378,7 +379,7 @@ impl ToSql for PgAggregateEntity {
                     );
                     args.push(buf);
                 };
-                String::from("\n") + &args.join("\n")
+                String::from("\n") + &args.join("\n") + if self.order_by.is_none() { "\n" } else { "" }
             },
             maybe_order_by = if let Some(order_by) = &self.order_by {
                 let mut args = Vec::new();
@@ -407,7 +408,7 @@ impl ToSql for PgAggregateEntity {
                 };
                 String::from("\n\tORDER BY ") + &args.join("\n,") + "\n"
             } else { String::default() },
-            optional_attributes = String::from("\t") + &optional_attributes.join(",\n\t") + "\n",
+            optional_attributes = if optional_attributes.len() == 0 { String::from("") } else { String::from("\n")} + &optional_attributes.join(",\n") + if optional_attributes.len() == 0 { "" } else { "\n" },
         );
         tracing::debug!(%sql);
         Ok(sql)

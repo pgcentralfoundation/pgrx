@@ -17,8 +17,6 @@ pub struct PostgresEnumEntity {
     pub variants: Vec<&'static str>,
 }
 
-impl crate::PostgresType for PostgresEnumEntity {}
-
 impl Hash for PostgresEnumEntity {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.full_path.hash(state);

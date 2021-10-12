@@ -1,7 +1,44 @@
-use proc_macro2::{Ident, TokenStream as TokenStream2};
+use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
-use syn::{Expr, GenericArgument, ImplItemConst, ImplItemMethod, ImplItemType, ItemFn, ItemImpl, PathArguments, Type, parse::{Parse, ParseStream}, parse_quote, spanned::Spanned};
+use syn::{Expr, ImplItemConst, ImplItemMethod, ImplItemType, ItemFn, ItemImpl, Type, parse::{Parse, ParseStream}, parse_quote, spanned::Spanned};
 use syn::{punctuated::Punctuated, Token};
+
+
+// We support only 32 tuples...
+const ARG_NAMES: [&str; 32] = [
+    "arg_one",
+    "arg_two",
+    "arg_three",
+    "arg_four",
+    "arg_five",
+    "arg_six",
+    "arg_seven",
+    "arg_eight",
+    "arg_nine",
+    "arg_ten",
+    "arg_eleven",
+    "arg_twelve",
+    "arg_thirteen",
+    "arg_fourteen",
+    "arg_fifteen",
+    "arg_sixteen",
+    "arg_seventeen",
+    "arg_eighteen",
+    "arg_nineteen",
+    "arg_twenty",
+    "arg_twenty_one",
+    "arg_twenty_two",
+    "arg_twenty_three",
+    "arg_twenty_four",
+    "arg_twenty_five",
+    "arg_twenty_six",
+    "arg_twenty_seven",
+    "arg_twenty_eight",
+    "arg_twenty_nine",
+    "arg_thirty",
+    "arg_thirty_one",
+    "arg_thirty_two",
+];
 
 #[derive(Debug, Clone, Hash, Eq, PartialEq)]
 pub struct PgAggregateAttrs {
@@ -148,7 +185,7 @@ impl PgAggregate {
         }
 
         // `Args` is an optional value, we default to nothing.
-        let type_args = get_impl_type_by_name(&item_impl_snapshot, "OrderBy").ok_or_else(||
+        let type_args = get_impl_type_by_name(&item_impl_snapshot, "Args").ok_or_else(||
             syn::Error::new(item_impl_snapshot.span(), "`#[pg_aggregate]` requires the `Args` type defined.")
         )?;
         let type_args_value = MaybeVariadicTypeList::new(type_args.ty.clone())?;
@@ -165,11 +202,19 @@ impl PgAggregate {
         let fn_state = get_impl_func_by_name(&item_impl_snapshot, "state");
         let fn_state_name = if let Some(found) = fn_state {
             let fn_name = Ident::new(&format!("{}_state", target_ident), found.sig.ident.span());
+            let args = type_args_value.found.iter().map(|x| x.variadic_ty.clone().unwrap_or(x.ty.clone())).collect::<Vec<_>>();
+            let args_with_names = args.iter().zip(ARG_NAMES.iter()).map(|(arg, name)| {
+                let name_ident = Ident::new(name, Span::call_site());
+                quote! {
+                    #name_ident: #arg
+                }
+            });
+            let arg_names = ARG_NAMES[0..args.len()].iter().map(|name| Ident::new(name, fn_state.span()));
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case)]
                 #[pg_extern]
-                fn #fn_name(this: #target_ident, v: <#target_ident as pgx::Aggregate>::Args) -> #target_ident {
-                    this.state(v)
+                fn #fn_name(this: #target_ident, #(#args_with_names),*) -> #target_ident {
+                    this.state((#(#arg_names),*))
                 }
             });
             fn_name
@@ -260,14 +305,22 @@ impl PgAggregate {
         let fn_moving_state = get_impl_func_by_name(&item_impl_snapshot, "moving_state");
         let fn_moving_state_name = if let Some(found) = fn_moving_state {
             let fn_name = Ident::new(&format!("{}_moving_state", target_ident), found.sig.ident.span());
+            let args = type_args_value.found.iter().map(|x| x.variadic_ty.clone().unwrap_or(x.ty.clone())).collect::<Vec<_>>();
+            let args_with_names = args.iter().zip(ARG_NAMES.iter()).map(|(arg, name)| {
+                let name_ident = Ident::new(name, Span::call_site());
+                quote! {
+                    #name_ident: #arg
+                }
+            });
+            let arg_names = ARG_NAMES[0..args.len()].iter().map(|name| Ident::new(name, fn_state.span()));
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case)]
                 #[pg_extern]
                 fn #fn_name(
                     mstate: <#target_ident as pgx::Aggregate>::MovingState,
-                    v: <#target_ident as pgx::Aggregate>::Args,
+                    #(#args_with_names),*
                 ) -> <#target_ident as pgx::Aggregate>::MovingState {
-                    <#target_ident as pgx::Aggregate>::moving_state(mstate, v)
+                    <#target_ident as pgx::Aggregate>::moving_state(mstate, (#(#arg_names),*))
                 }
             });
             Some(fn_name)
@@ -607,19 +660,8 @@ impl MaybeVariadicType {
                     }
                 }
                 if (ty_macro.mac.path.segments.len() == 1 && found_variadic) || (found_pgx && found_variadic) {
-                    if let Some(last_seg) = ty_macro.mac.path.segments.last() {
-                        match &last_seg.arguments {
-                            PathArguments::AngleBracketed(angle_args) => {
-                                match angle_args.args.last() {
-                                    Some(GenericArgument::Type(ty)) => Some(ty.clone()),
-                                    _ => None,
-                                }
-                            },
-                            _ => None,
-                        }
-                    } else {
-                        None
-                    }
+                    let ty: syn::Type = syn::parse2(ty_macro.mac.tokens.clone())?;
+                    Some(ty)
                 } else {
                     None
                 }

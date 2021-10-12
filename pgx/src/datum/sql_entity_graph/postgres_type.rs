@@ -22,8 +22,6 @@ pub struct PostgresTypeEntity {
     pub out_fn_module_path: String,
 }
 
-impl crate::PostgresType for PostgresTypeEntity {}
-
 impl Hash for PostgresTypeEntity {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.full_path.hash(state);
