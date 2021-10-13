@@ -424,7 +424,6 @@ impl PgAggregate {
             target_ident.span(),
         );
 
-        // TODO: Get all the params.
         let name = match get_impl_const_by_name(&self.item_impl, "NAME")
             .expect("`NAME` is a required const for Aggregate implementations.")
             .expr {
@@ -469,20 +468,20 @@ impl PgAggregate {
                     order_by: None#( .unwrap_or(Some(#type_order_by_iter)) )*,
                     stype: stringify!(#target_ident),
                     sfunc: stringify!(#fn_state),
-                    combinefunc: None#( .unwrap_or(Some(concat!(module_path!(), "::", stringify!(#fn_combine_iter)))) )*,
-                    finalfunc: None#( .unwrap_or(Some(concat!(module_path!(), "::", stringify!(#fn_finalize_iter)))) )*,
+                    combinefunc: None#( .unwrap_or(Some(stringify!(#fn_combine_iter))) )*,
+                    finalfunc: None#( .unwrap_or(Some(stringify!(#fn_finalize_iter))) )*,
                     finalfunc_modify: None#( .unwrap_or(#const_finalize_modify_iter) )*,
                     initcond: None#( .unwrap_or(Some(#const_initial_condition_iter)) )*,
-                    serialfunc: None#( .unwrap_or(Some(concat!(module_path!(), "::", stringify!(#fn_serial_iter)))) )*,
-                    deserialfunc: None#( .unwrap_or(Some(concat!(module_path!(), "::", stringify!(#fn_deserial_iter)))) )*,
-                    msfunc: None#( .unwrap_or(Some(concat!(module_path!(), "::", stringify!(#fn_moving_state_iter)))) )*,
-                    minvfunc: None#( .unwrap_or(Some(concat!(module_path!(), "::", stringify!(#fn_moving_state_inverse_iter)))) )*,
+                    serialfunc: None#( .unwrap_or(Some(stringify!(#fn_serial_iter))) )*,
+                    deserialfunc: None#( .unwrap_or(Some(stringify!(#fn_deserial_iter))) )*,
+                    msfunc: None#( .unwrap_or(Some(stringify!(#fn_moving_state_iter))) )*,
+                    minvfunc: None#( .unwrap_or(Some(stringify!(#fn_moving_state_inverse_iter))) )*,
                     mstype: None#( .unwrap_or(Some(pgx::datum::sql_entity_graph::aggregate::AggregateType {
                         ty_source: stringify!(#type_moving_state_iter),
                         ty_id: core::any::TypeId::of::<#type_moving_state_iter>(),
                         full_path: core::any::type_name::<#type_moving_state_iter>(),
                     })) )*,
-                    mfinalfunc: None#( .unwrap_or(Some(concat!(module_path!(), "::", stringify!(#fn_moving_finalize_iter)))) )*,
+                    mfinalfunc: None#( .unwrap_or(Some(stringify!(#fn_moving_finalize_iter))) )*,
                     mfinalfunc_modify: None#( .unwrap_or(#const_moving_finalize_modify_iter) )*,
                     minitcond: None#( .unwrap_or(Some(#const_moving_intial_condition_iter)) )*,
                     sortop: None#( .unwrap_or(Some(#const_sort_operator_iter)) )*,
@@ -587,7 +586,25 @@ fn get_const_litstr<'a>(item: &'a ImplItemConst) -> Option<String> {
             syn::Lit::Str(lit) => Some(lit.value()),
             _ => None,
         },
-        _ => None,
+        syn::Expr::Call(expr_call) => {
+            match &*expr_call.func {
+                syn::Expr::Path(expr_path) => {
+                    if expr_path.path.segments.last()?.ident.to_string() == "Some" {
+                        match expr_call.args.first()? {
+                            syn::Expr::Lit(expr_lit) => match &expr_lit.lit {
+                                syn::Lit::Str(lit) => Some(lit.value()),
+                                _ => None,
+                            },
+                            _ => None,
+                        }
+                    } else {
+                        None
+                    }
+                },
+                _ => None,
+            }
+        },
+        _ => panic!("Got {:?}", item.expr),
     }
 }
 

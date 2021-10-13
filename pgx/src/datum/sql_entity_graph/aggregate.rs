@@ -284,42 +284,43 @@ impl ToSql for PgAggregateEntity {
     fn to_sql(&self, context: &super::PgxSql) -> eyre::Result<String> {
         let self_index = context.aggregates[self];
         let mut optional_attributes = Vec::new();
+        let schema = context.schema_prefix_for(&self_index);
 
         if let Some(value) = self.finalfunc {
-            optional_attributes.push(format!("\tFINALFUNC = {}", value));
+            optional_attributes.push(format!("\tFINALFUNC = {}\"{}\"", schema, value));
         }
         if let Some(value) = self.finalfunc_modify {
             optional_attributes.push(format!("\tFINALFUNC_MODIFY = {}", value.to_sql(context)?));
         }
         if let Some(value) = self.combinefunc {
-            optional_attributes.push(format!("\tCOMBINEFUNC = {}", value));
+            optional_attributes.push(format!("\tCOMBINEFUNC = {}\"{}\"", schema, value));
         }
         if let Some(value) = self.serialfunc {
-            optional_attributes.push(format!("\tSERIALFUNC = {}", value));
+            optional_attributes.push(format!("\tSERIALFUNC = {}\"{}\"", schema, value));
         }
         if let Some(value) = self.deserialfunc {
-            optional_attributes.push(format!("\tDESERIALFUNC = {}", value));
+            optional_attributes.push(format!("\tDESERIALFUNC ={} \"{}\"", schema, value));
         }
         if let Some(value) = self.initcond {
-            optional_attributes.push(format!("\tINITCOND = {}", value));
+            optional_attributes.push(format!("\tINITCOND = \"{}\"", value));
         }
         if let Some(value) = self.msfunc {
-            optional_attributes.push(format!("\tMSFUNC = {}", value));
+            optional_attributes.push(format!("\tMSFUNC = {}\"{}\"", schema, value));
         }
         if let Some(value) = self.minvfunc {
-            optional_attributes.push(format!("\tMINVFUNC = {}", value));
+            optional_attributes.push(format!("\tMINVFUNC = {}\"{}\"", schema, value));
         }
         if let Some(value) = self.mfinalfunc {
-            optional_attributes.push(format!("\tMFINALFUNC = {}", value));
+            optional_attributes.push(format!("\tMFINALFUNC = {}\"{}\"", schema, value));
         }
         if let Some(value) = self.mfinalfunc_modify {
             optional_attributes.push(format!("\tMFINALFUNC_MODIFY = {}", value.to_sql(context)?));
         }
         if let Some(value) = self.minitcond {
-            optional_attributes.push(format!("\tMINITCOND = {}", value));
+            optional_attributes.push(format!("\tMINITCOND = \"{}\"", value));
         }
         if let Some(value) = self.sortop {
-            optional_attributes.push(format!("\tSORTOP = {}", value));
+            optional_attributes.push(format!("\tSORTOP = \"{}\"", value));
         }
         if let Some(value) = self.parallel {
             optional_attributes.push(format!("\tPARALLEL = {}", value.to_sql(context)?));
@@ -333,19 +334,20 @@ impl ToSql for PgAggregateEntity {
                 value.full_path,
                 self.name
             ))?;
-            optional_attributes.push(format!("MSTYPE = {} /* {} */", sql, value.full_path));
+            optional_attributes.push(format!("\tMSTYPE = {} /* {} */", sql, value.full_path));
         }
 
         let sql = format!("\n\
                 -- {file}:{line}\n\
                 -- {full_path}\n\
-                CREATE AGGREGATE {name} ({args}{maybe_order_by})\n\
+                CREATE AGGREGATE {schema}{name} ({args}{maybe_order_by})\n\
                 (\n\
-                    \tsfunc = {sfunc},\n\
-                    \tstype = {stype}{maybe_comma_after_stype}\n\
+                    \tSFUNC = {schema}\"{sfunc}\",\n\
+                    \tSTYPE = {schema}{stype}{maybe_comma_after_stype}\
                     {optional_attributes}\
                 );\
             ",
+            schema = schema,
             name = self.name,
             full_path = self.full_path,
             file = self.file,
@@ -362,7 +364,7 @@ impl ToSql for PgAggregateEntity {
                         SqlGraphEntity::BuiltinType(defined) => defined == &arg.agg_ty.full_path,
                         _ => false,
                     }).ok_or_else(|| eyre_err!("Could not find arg type in graph. Got: {:?}", arg.agg_ty))?;
-                    let needs_comma = idx < (self.args.len() - 1) || self.order_by.is_some();
+                    let needs_comma = idx < (self.args.len() - 1);
                     let buf = format!("\
                            \t{variadic}{schema_prefix}{sql_type}{maybe_comma}/* {full_path} */\
                        ",

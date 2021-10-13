@@ -1111,35 +1111,36 @@ fn connect_aggregates(
             }
         }
 
+        make_extern_connection(graph, "Aggregate", index, &item.rust_identifier(), &(item.module_path.to_string() + "::" + item.sfunc), externs);
         if let Some(value) = item.finalfunc {
-            make_extern_connection(graph, "Aggregate", index, &item.rust_identifier(), value, externs);
+            make_extern_connection(graph, "Aggregate", index, &item.rust_identifier(), &(item.module_path.to_string() + "::" + value), externs);
         }
         if let Some(value) = item.combinefunc {
-            make_extern_connection(graph, "Aggregate", index, &item.rust_identifier(), value, externs);
+            make_extern_connection(graph, "Aggregate", index, &item.rust_identifier(), &(item.module_path.to_string() + "::" + value), externs);
         }
         if let Some(value) = item.serialfunc {
-            make_extern_connection(graph, "Aggregate", index, &item.rust_identifier(), value, externs);
+            make_extern_connection(graph, "Aggregate", index, &item.rust_identifier(), &(item.module_path.to_string() + "::" + value), externs);
         }
         if let Some(value) = item.deserialfunc {
-            make_extern_connection(graph, "Aggregate", index, &item.rust_identifier(), value, externs);
+            make_extern_connection(graph, "Aggregate", index, &item.rust_identifier(), &(item.module_path.to_string() + "::" + value), externs);
         }
         if let Some(value) = item.initcond {
-            make_extern_connection(graph, "Aggregate", index, &item.rust_identifier(), value, externs);
+            make_extern_connection(graph, "Aggregate", index, &item.rust_identifier(), &(item.module_path.to_string() + "::" + value), externs);
         }
         if let Some(value) = item.msfunc {
-            make_extern_connection(graph, "Aggregate", index, &item.rust_identifier(), value, externs);
+            make_extern_connection(graph, "Aggregate", index, &item.rust_identifier(), &(item.module_path.to_string() + "::" + value), externs);
         }
         if let Some(value) = item.minvfunc {
-            make_extern_connection(graph, "Aggregate", index, &item.rust_identifier(), value, externs);
+            make_extern_connection(graph, "Aggregate", index, &item.rust_identifier(), &(item.module_path.to_string() + "::" + value), externs);
         }
         if let Some(value) = item.mfinalfunc {
-            make_extern_connection(graph, "Aggregate", index, &item.rust_identifier(), value, externs);
+            make_extern_connection(graph, "Aggregate", index, &item.rust_identifier(), &(item.module_path.to_string() + "::" + value), externs);
         }
         if let Some(value) = item.minitcond {
-            make_extern_connection(graph, "Aggregate", index, &item.rust_identifier(), value, externs);
+            make_extern_connection(graph, "Aggregate", index, &item.rust_identifier(), &(item.module_path.to_string() + "::" + value), externs);
         }
         if let Some(value) = item.sortop {
-            make_extern_connection(graph, "Aggregate", index, &item.rust_identifier(), value, externs);
+            make_extern_connection(graph, "Aggregate", index, &item.rust_identifier(), &(item.module_path.to_string() + "::" + value), externs);
         }
     }
 }
