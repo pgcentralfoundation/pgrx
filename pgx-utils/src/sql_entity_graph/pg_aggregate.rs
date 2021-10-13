@@ -2,7 +2,7 @@ use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
 use syn::{Expr, ImplItemConst, ImplItemMethod, ImplItemType, ItemFn, ItemImpl, Type, parse::{Parse, ParseStream}, parse_quote, spanned::Spanned};
 use syn::{punctuated::Punctuated, Token};
-
+use convert_case::{Case, Casing};
 
 // We support only 32 tuples...
 const ARG_NAMES: [&str; 32] = [
@@ -139,6 +139,7 @@ impl PgAggregate {
         mut item_impl: ItemImpl,
     ) -> Result<Self, syn::Error> {
         let target_ident = get_target_ident(&item_impl)?;
+        let snake_case_target_ident = Ident::new(&target_ident.to_string().to_case(Case::Snake), target_ident.span());
         let mut pg_externs = Vec::default(); 
         // We want to avoid having multiple borrows, so we take a snapshot to scan from,
         // and mutate the actual one.
@@ -201,7 +202,7 @@ impl PgAggregate {
 
         let fn_state = get_impl_func_by_name(&item_impl_snapshot, "state");
         let fn_state_name = if let Some(found) = fn_state {
-            let fn_name = Ident::new(&format!("{}_state", target_ident), found.sig.ident.span());
+            let fn_name = Ident::new(&format!("{}_state", snake_case_target_ident), found.sig.ident.span());
             let args = type_args_value.found.iter().map(|x| x.variadic_ty.clone().unwrap_or(x.ty.clone())).collect::<Vec<_>>();
             let args_with_names = args.iter().zip(ARG_NAMES.iter()).map(|(arg, name)| {
                 let name_ident = Ident::new(name, Span::call_site());
@@ -224,7 +225,7 @@ impl PgAggregate {
 
         let fn_combine = get_impl_func_by_name(&item_impl_snapshot, "combine");
         let fn_combine_name = if let Some(found) = fn_combine {
-            let fn_name = Ident::new(&format!("{}_combine", target_ident), found.sig.ident.span());
+            let fn_name = Ident::new(&format!("{}_combine", snake_case_target_ident), found.sig.ident.span());
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case)]
                 #[pg_extern]
@@ -244,7 +245,7 @@ impl PgAggregate {
 
         let fn_finalize = get_impl_func_by_name(&item_impl_snapshot, "finalize");
         let fn_finalize_name = if let Some(found) = fn_finalize {
-            let fn_name = Ident::new(&format!("{}_finalize", target_ident), found.sig.ident.span());
+            let fn_name = Ident::new(&format!("{}_finalize", snake_case_target_ident), found.sig.ident.span());
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case)]
                 #[pg_extern]
@@ -264,7 +265,7 @@ impl PgAggregate {
 
         let fn_serial = get_impl_func_by_name(&item_impl_snapshot, "serial");
         let fn_serial_name = if let Some(found) = fn_serial {
-            let fn_name = Ident::new(&format!("{}_serial", target_ident), found.sig.ident.span());
+            let fn_name = Ident::new(&format!("{}_serial", snake_case_target_ident), found.sig.ident.span());
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case)]
                 #[pg_extern]
@@ -284,7 +285,7 @@ impl PgAggregate {
 
         let fn_deserial = get_impl_func_by_name(&item_impl_snapshot, "deserial");
         let fn_deserial_name = if let Some(found) = fn_deserial {
-            let fn_name = Ident::new(&format!("{}_deserial", target_ident), found.sig.ident.span());
+            let fn_name = Ident::new(&format!("{}_deserial", snake_case_target_ident), found.sig.ident.span());
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case)]
                 #[pg_extern]
@@ -304,7 +305,7 @@ impl PgAggregate {
 
         let fn_moving_state = get_impl_func_by_name(&item_impl_snapshot, "moving_state");
         let fn_moving_state_name = if let Some(found) = fn_moving_state {
-            let fn_name = Ident::new(&format!("{}_moving_state", target_ident), found.sig.ident.span());
+            let fn_name = Ident::new(&format!("{}_moving_state", snake_case_target_ident), found.sig.ident.span());
             let args = type_args_value.found.iter().map(|x| x.variadic_ty.clone().unwrap_or(x.ty.clone())).collect::<Vec<_>>();
             let args_with_names = args.iter().zip(ARG_NAMES.iter()).map(|(arg, name)| {
                 let name_ident = Ident::new(name, Span::call_site());
@@ -338,7 +339,7 @@ impl PgAggregate {
 
         let fn_moving_state_inverse = get_impl_func_by_name(&item_impl_snapshot, "moving_state_inverse");
         let fn_moving_state_inverse_name = if let Some(found) = fn_moving_state_inverse {
-            let fn_name = Ident::new(&format!("{}_moving_state_inverse", target_ident), found.sig.ident.span());
+            let fn_name = Ident::new(&format!("{}_moving_state_inverse", snake_case_target_ident), found.sig.ident.span());
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case)]
                 #[pg_extern]
@@ -364,7 +365,7 @@ impl PgAggregate {
 
         let fn_moving_finalize = get_impl_func_by_name(&item_impl_snapshot, "moving_finalize");
         let fn_moving_finalize_name = if let Some(found) = fn_moving_finalize {
-            let fn_name = Ident::new(&format!("{}_moving_finalize", target_ident), found.sig.ident.span());
+            let fn_name = Ident::new(&format!("{}_moving_finalize", snake_case_target_ident), found.sig.ident.span());
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case)]
                 #[pg_extern]
@@ -419,8 +420,9 @@ impl PgAggregate {
     fn entity_tokens(&self) -> ItemFn {
         let target_ident = get_target_ident(&self.item_impl)
             .expect("Expected constructed PgAggregate to have target ident.");
+        let snake_case_target_ident = Ident::new(&target_ident.to_string().to_case(Case::Snake), target_ident.span());
         let sql_graph_entity_fn_name = syn::Ident::new(
-            &format!("__pgx_internals_aggregate_{}", target_ident),
+            &format!("__pgx_internals_aggregate_{}", snake_case_target_ident),
             target_ident.span(),
         );
 
