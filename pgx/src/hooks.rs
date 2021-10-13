@@ -87,6 +87,7 @@ pub trait PgHooks {
         &mut self,
         pstmt: PgBox<pg_sys::PlannedStmt>,
         query_string: &std::ffi::CStr,
+        read_only_tree: Option<bool>,
         context: pg_sys::ProcessUtilityContext,
         params: PgBox<pg_sys::ParamListInfoData>,
         query_env: PgBox<pg_sys::QueryEnvironment>,
@@ -95,6 +96,7 @@ pub trait PgHooks {
         prev_hook: fn(
             pstmt: PgBox<pg_sys::PlannedStmt>,
             query_string: &std::ffi::CStr,
+            read_only_tree: Option<bool>,
             context: pg_sys::ProcessUtilityContext,
             params: PgBox<pg_sys::ParamListInfoData>,
             query_env: PgBox<pg_sys::QueryEnvironment>,
@@ -105,6 +107,7 @@ pub trait PgHooks {
         prev_hook(
             pstmt,
             query_string,
+            read_only_tree,
             context,
             params,
             query_env,
@@ -302,6 +305,7 @@ unsafe extern "C" fn pgx_executor_check_perms(
         .inner
 }
 
+#[cfg(any(feature = "pg10", feature = "pg11", feature = "pg12", feature = "pg13"))]
 #[pg_guard]
 unsafe extern "C" fn pgx_process_utility(
     pstmt: *mut pg_sys::PlannedStmt,
@@ -315,6 +319,7 @@ unsafe extern "C" fn pgx_process_utility(
     fn prev(
         pstmt: PgBox<pg_sys::PlannedStmt>,
         query_string: &std::ffi::CStr,
+        _read_only_tree: Option<bool>,
         context: pg_sys::ProcessUtilityContext,
         params: PgBox<pg_sys::ParamListInfoData>,
         query_env: PgBox<pg_sys::QueryEnvironment>,
@@ -343,6 +348,62 @@ unsafe extern "C" fn pgx_process_utility(
     hook.process_utility_hook(
         PgBox::from_pg(pstmt),
         std::ffi::CStr::from_ptr(query_string),
+        None,
+        context,
+        PgBox::from_pg(params),
+        PgBox::from_pg(query_env),
+        PgBox::from_pg(dest),
+        completion_tag,
+        prev,
+    )
+    .inner
+}
+#[cfg(feature = "pg14")]
+#[pg_guard]
+unsafe extern "C" fn pgx_process_utility(
+    pstmt: *mut pg_sys::PlannedStmt,
+    query_string: *const ::std::os::raw::c_char,
+    read_only_tree: bool,
+    context: pg_sys::ProcessUtilityContext,
+    params: pg_sys::ParamListInfo,
+    query_env: *mut pg_sys::QueryEnvironment,
+    dest: *mut pg_sys::DestReceiver,
+    completion_tag: *mut pg_sys::QueryCompletion,
+) {
+    fn prev(
+        pstmt: PgBox<pg_sys::PlannedStmt>,
+        query_string: &std::ffi::CStr,
+        read_only_tree: Option<bool>,
+        context: pg_sys::ProcessUtilityContext,
+        params: PgBox<pg_sys::ParamListInfoData>,
+        query_env: PgBox<pg_sys::QueryEnvironment>,
+        dest: PgBox<pg_sys::DestReceiver>,
+        completion_tag: *mut pg_sys::QueryCompletion,
+    ) -> HookResult<()> {
+        HookResult::new(unsafe {
+            (HOOKS
+                .as_mut()
+                .unwrap()
+                .prev_process_utility_hook
+                .as_ref()
+                .unwrap())(
+                pstmt.into_pg(),
+                query_string.as_ptr(),
+                read_only_tree.unwrap(),
+                context,
+                params.into_pg(),
+                query_env.into_pg(),
+                dest.into_pg(),
+                completion_tag,
+            )
+        })
+    }
+
+    let hook = &mut HOOKS.as_mut().unwrap().current_hook;
+    hook.process_utility_hook(
+        PgBox::from_pg(pstmt),
+        std::ffi::CStr::from_ptr(query_string),
+        Some(read_only_tree),
         context,
         PgBox::from_pg(params),
         PgBox::from_pg(query_env),
@@ -353,7 +414,7 @@ unsafe extern "C" fn pgx_process_utility(
     .inner
 }
 
-#[cfg(not(feature = "pg13"))]
+#[cfg(any(feature = "pg10", feature = "pg11", feature = "pg12"))]
 #[pg_guard]
 unsafe extern "C" fn pgx_planner(
     parse: *mut pg_sys::Query,
@@ -363,7 +424,7 @@ unsafe extern "C" fn pgx_planner(
     pgx_planner_impl(parse, std::ptr::null(), cursor_options, bound_params)
 }
 
-#[cfg(feature = "pg13")]
+#[cfg(any(feature = "pg13", feature = "pg14"))]
 #[pg_guard]
 unsafe extern "C" fn pgx_planner(
     parse: *mut pg_sys::Query,
@@ -388,7 +449,7 @@ unsafe extern "C" fn pgx_planner_impl(
         bound_params: PgBox<pg_sys::ParamListInfoData>,
     ) -> HookResult<*mut pg_sys::PlannedStmt> {
         HookResult::new(unsafe {
-            #[cfg(not(feature = "pg13"))]
+            #[cfg(any(feature = "pg10", feature = "pg11", feature = "pg12"))]
             {
                 (HOOKS.as_mut().unwrap().prev_planner_hook.as_ref().unwrap())(
                     parse.into_pg(),
@@ -397,7 +458,7 @@ unsafe extern "C" fn pgx_planner_impl(
                 )
             }
 
-            #[cfg(feature = "pg13")]
+            #[cfg(any(feature = "pg13", feature = "pg14"))]
             {
                 (HOOKS.as_mut().unwrap().prev_planner_hook.as_ref().unwrap())(
                     parse.into_pg(),
@@ -455,6 +516,7 @@ unsafe extern "C" fn pgx_standard_executor_check_perms_wrapper(
     true
 }
 
+#[cfg(any(feature = "pg10", feature = "pg11", feature = "pg12", feature = "pg13"))]
 #[pg_guard]
 unsafe extern "C" fn pgx_standard_process_utility_wrapper(
     pstmt: *mut pg_sys::PlannedStmt,
@@ -476,7 +538,31 @@ unsafe extern "C" fn pgx_standard_process_utility_wrapper(
     )
 }
 
-#[cfg(not(feature = "pg13"))]
+#[cfg(feature = "pg14")]
+#[pg_guard]
+unsafe extern "C" fn pgx_standard_process_utility_wrapper(
+    pstmt: *mut pg_sys::PlannedStmt,
+    query_string: *const ::std::os::raw::c_char,
+    read_only_tree: bool,
+    context: pg_sys::ProcessUtilityContext,
+    params: pg_sys::ParamListInfo,
+    query_env: *mut pg_sys::QueryEnvironment,
+    dest: *mut pg_sys::DestReceiver,
+    completion_tag: *mut pg_sys::QueryCompletion,
+) {
+    pg_sys::standard_ProcessUtility(
+        pstmt,
+        query_string,
+        read_only_tree,
+        context,
+        params,
+        query_env,
+        dest,
+        completion_tag,
+    )
+}
+
+#[cfg(any(feature = "pg10", feature = "pg11", feature = "pg12"))]
 #[pg_guard]
 unsafe extern "C" fn pgx_standard_planner_wrapper(
     parse: *mut pg_sys::Query,
@@ -486,7 +572,7 @@ unsafe extern "C" fn pgx_standard_planner_wrapper(
     pg_sys::standard_planner(parse, cursor_options, bound_params)
 }
 
-#[cfg(feature = "pg13")]
+#[cfg(any(feature = "pg13", feature = "pg14"))]
 #[pg_guard]
 unsafe extern "C" fn pgx_standard_planner_wrapper(
     parse: *mut pg_sys::Query,

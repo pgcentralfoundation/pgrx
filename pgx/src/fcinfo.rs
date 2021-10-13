@@ -124,8 +124,8 @@ mod pg_10_11 {
     }
 }
 
-#[cfg(any(feature = "pg12", feature = "pg13"))]
-mod pg_12_13 {
+#[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14"))]
+mod pg_12_13_14 {
     use crate::{pg_sys, FromDatum};
 
     #[inline]
@@ -185,8 +185,8 @@ mod pg_12_13 {
 #[cfg(any(feature = "pg10", feature = "pg11"))]
 pub use pg_10_11::*;
 
-#[cfg(any(feature = "pg12", feature = "pg13"))]
-pub use pg_12_13::*;
+#[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14"))]
+pub use pg_12_13_14::*;
 use std::ops::DerefMut;
 
 #[inline]
@@ -198,7 +198,7 @@ pub fn pg_getarg_pointer<T>(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> Opt
 }
 
 /// # Safety
-/// 
+///
 /// The provided `fcinfo` must be valid otherwise this function results in undefined behavior due
 /// to an out of bounds read.
 #[inline]
@@ -275,7 +275,7 @@ pub unsafe fn pg_func_extra<ReturnType, DefaultValue: FnOnce() -> ReturnType>(
 /// }
 /// ```
 pub unsafe fn direct_function_call<R: FromDatum>(
-    func: unsafe fn(pg_sys::FunctionCallInfo) -> pg_sys::Datum,
+    func: unsafe extern "C" fn(pg_sys::FunctionCallInfo) -> pg_sys::Datum,
     args: Vec<Option<pg_sys::Datum>>,
 ) -> Option<R> {
     let datum = direct_function_call_as_datum(func, args);
@@ -288,7 +288,7 @@ pub unsafe fn direct_function_call<R: FromDatum>(
 /// Same as [direct_function_call] but instead returns the direct `Option<pg_sys::Datum>` instead
 /// of converting it to a value
 pub fn direct_function_call_as_datum(
-    func: unsafe fn(pg_sys::FunctionCallInfo) -> pg_sys::Datum,
+    func: unsafe extern "C" fn(pg_sys::FunctionCallInfo) -> pg_sys::Datum,
     args: Vec<Option<pg_sys::Datum>>,
 ) -> Option<pg_sys::Datum> {
     let mut null_array = [false; 100usize];
@@ -335,7 +335,7 @@ fn make_function_call_info(
     fcinfo_boxed
 }
 
-#[cfg(any(feature = "pg12", feature = "pg13"))]
+#[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14"))]
 fn make_function_call_info(
     nargs: usize,
     arg_array: [usize; 100],

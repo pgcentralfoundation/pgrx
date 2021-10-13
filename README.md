@@ -14,7 +14,7 @@
 
 `pgx` is a framework for developing PostgreSQL extensions in Rust and strives to be as idiomatic and safe as possible.
 
-`pgx` supports Postgres v10, v11, v12, and v13.
+`pgx` supports Postgres v10-v14.
 
 **Feel free to join our [Discord Server](https://discord.gg/hPb93Y9).**
 
@@ -29,7 +29,7 @@
     - Create installation packages for your extension via `cargo pgx package`
 
 #### Target Multiple Postgres Versions
- - Support Postgres v10, v11, v12, and v13 from the same codebase
+ - Support Postgres v10-v14 from the same codebase
     - Postgres Rust bindings are organized into `pgXX.rs` modules
  - Use Rust feature gating to use version-specific APIs
  - Seamlessly test against all versions

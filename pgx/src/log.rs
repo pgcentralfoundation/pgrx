@@ -530,7 +530,7 @@ pub fn ereport(
 /// This macro accepts arguments like the [`println`](std::println) and [`format`](std::format) macros.
 /// See [`fmt`](std::fmt) for information about options.
 ///
-/// The output these logs goes to the PostgreSQL log file at `DEBUG5` level, depending on how the 
+/// The output these logs goes to the PostgreSQL log file at `DEBUG5` level, depending on how the
 /// [PostgreSQL settings](https://www.postgresql.org/docs/current/runtime-config-logging.html) are configured.
 #[macro_export]
 macro_rules! debug5 {
@@ -544,7 +544,7 @@ macro_rules! debug5 {
 /// This macro accepts arguments like the [`println`](std::println) and [`format`](std::format) macros.
 /// See [`fmt`](std::fmt) for information about options.
 ///
-/// The output these logs goes to the PostgreSQL log file at `DEBUG4` level, depending on how the 
+/// The output these logs goes to the PostgreSQL log file at `DEBUG4` level, depending on how the
 /// [PostgreSQL settings](https://www.postgresql.org/docs/current/runtime-config-logging.html) are configured.
 #[macro_export]
 macro_rules! debug4 {
@@ -558,7 +558,7 @@ macro_rules! debug4 {
 /// This macro accepts arguments like the [`println`](std::println) and [`format`](std::format) macros.
 /// See [`fmt`](std::fmt) for information about options.
 ///
-/// The output these logs goes to the PostgreSQL log file at `DEBUG3` level, depending on how the 
+/// The output these logs goes to the PostgreSQL log file at `DEBUG3` level, depending on how the
 /// [PostgreSQL settings](https://www.postgresql.org/docs/current/runtime-config-logging.html) are configured.
 #[macro_export]
 macro_rules! debug3 {
@@ -572,7 +572,7 @@ macro_rules! debug3 {
 /// This macro accepts arguments like the [`println`](std::println) and [`format`](std::format) macros.
 /// See [`fmt`](std::fmt) for information about options.
 ///
-/// The output these logs goes to the PostgreSQL log file at `DEBUG2` level, depending on how the 
+/// The output these logs goes to the PostgreSQL log file at `DEBUG2` level, depending on how the
 /// [PostgreSQL settings](https://www.postgresql.org/docs/current/runtime-config-logging.html) are configured.
 #[macro_export]
 macro_rules! debug2 {
@@ -586,7 +586,7 @@ macro_rules! debug2 {
 /// This macro accepts arguments like the [`println`](std::println) and [`format`](std::format) macros.
 /// See [`fmt`](std::fmt) for information about options.
 ///
-/// The output these logs goes to the PostgreSQL log file at `DEBUG1` level, depending on how the 
+/// The output these logs goes to the PostgreSQL log file at `DEBUG1` level, depending on how the
 /// [PostgreSQL settings](https://www.postgresql.org/docs/current/runtime-config-logging.html) are configured.
 #[macro_export]
 macro_rules! debug1 {
@@ -600,7 +600,7 @@ macro_rules! debug1 {
 /// This macro accepts arguments like the [`println`](std::println) and [`format`](std::format) macros.
 /// See [`fmt`](std::fmt) for information about options.
 ///
-/// The output these logs goes to the PostgreSQL log file at `LOG` level, depending on how the 
+/// The output these logs goes to the PostgreSQL log file at `LOG` level, depending on how the
 /// [PostgreSQL settings](https://www.postgresql.org/docs/current/runtime-config-logging.html) are configured.
 #[macro_export]
 macro_rules! log {
@@ -622,12 +622,12 @@ macro_rules! log {
 /// #[pg_extern]
 /// fn sum_array(input: Array<i32>) -> i64 {
 ///     let mut sum = 0 as i64;
-/// 
+///
 ///     for i in input {
 ///         pgx::info!("i={index:?}, sum={}", sum, index = i);
 ///         sum += i.unwrap_or(-1) as i64;
 ///     }
-/// 
+///
 ///     sum
 /// }
 /// ```
@@ -639,7 +639,7 @@ macro_rules! log {
 /// INFO:  i=Some(1), sum=0
 /// INFO:  i=Some(2), sum=1
 /// INFO:  i=Some(3), sum=3
-///  sum_array 
+///  sum_array
 /// -----------
 ///          6
 /// (1 row)
@@ -664,12 +664,12 @@ macro_rules! info {
 /// #[pg_extern]
 /// fn sum_array(input: Array<i32>) -> i64 {
 ///     let mut sum = 0 as i64;
-/// 
+///
 ///     for i in input {
 ///         pgx::notice!("i={index:?}, sum={}", sum, index = i);
 ///         sum += i.unwrap_or(-1) as i64;
 ///     }
-/// 
+///
 ///     sum
 /// }
 /// ```
@@ -681,7 +681,7 @@ macro_rules! info {
 /// NOTICE:  i=Some(1), sum=0
 /// NOTICE:  i=Some(2), sum=1
 /// NOTICE:  i=Some(3), sum=3
-///  sum_array 
+///  sum_array
 /// -----------
 ///          6
 /// (1 row)
@@ -706,12 +706,12 @@ macro_rules! notice {
 /// #[pg_extern]
 /// fn sum_array(input: Array<i32>) -> i64 {
 ///     let mut sum = 0 as i64;
-/// 
+///
 ///     for i in input {
 ///         pgx::warning!("i={index:?}, sum={}", sum, index = i);
 ///         sum += i.unwrap_or(-1) as i64;
 ///     }
-/// 
+///
 ///     sum
 /// }
 /// ```
@@ -723,7 +723,7 @@ macro_rules! notice {
 /// WARNING:  i=Some(1), sum=0
 /// WARNING:  i=Some(2), sum=1
 /// WARNING:  i=Some(3), sum=3
-///  sum_array 
+///  sum_array
 /// -----------
 ///          6
 /// (1 row)
@@ -748,12 +748,12 @@ macro_rules! warning {
 /// #[pg_extern]
 /// fn sum_array(input: Array<i32>) -> i64 {
 ///     let mut sum = 0 as i64;
-/// 
+///
 ///     for i in input {
 ///         pgx::error!("i={index:?}, sum={}", sum, index = i);
 ///         sum += i.unwrap_or(-1) as i64;
 ///     }
-/// 
+///
 ///     sum
 /// }
 /// ```
@@ -788,12 +788,12 @@ macro_rules! error {
 /// #[pg_extern]
 /// fn sum_array(input: Array<i32>) -> i64 {
 ///     let mut sum = 0 as i64;
-/// 
+///
 ///     for i in input {
 ///         pgx::FATAL!("i={index:?}, sum={}", sum, index = i);
 ///         sum += i.unwrap_or(-1) as i64;
 ///     }
-/// 
+///
 ///     sum
 /// }
 /// ```
@@ -829,12 +829,12 @@ macro_rules! FATAL {
 /// #[pg_extern]
 /// fn sum_array(input: Array<i32>) -> i64 {
 ///     let mut sum = 0 as i64;
-/// 
+///
 ///     for i in input {
 ///         pgx::PANIC!("i={index:?}, sum={}", sum, index = i);
 ///         sum += i.unwrap_or(-1) as i64;
 ///     }
-/// 
+///
 ///     sum
 /// }
 /// ```
@@ -874,7 +874,7 @@ pub fn interrupt_pending() -> bool {
 }
 
 /// Is an interrupt pending?
-#[cfg(any(feature = "pg12", feature = "pg13"))]
+#[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14"))]
 #[inline]
 pub fn interrupt_pending() -> bool {
     unsafe { crate::pg_sys::InterruptPending != 0 }
@@ -893,7 +893,7 @@ macro_rules! check_for_interrupts {
             }
         }
 
-        #[cfg(feature = "pg12")]
+        #[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14"))]
         #[allow(unused_unsafe)]
         unsafe {
             if $crate::pg_sys::InterruptPending != 0 {

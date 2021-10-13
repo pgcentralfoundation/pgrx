@@ -2,13 +2,13 @@
   description = "Postgres extensions in Rust.";
 
   inputs = {
-    naersk.url = "github:nmattia/naersk";
+    naersk.url = "github:nix-community/naersk";
     nixpkgs.url = "github:NixOS/nixpkgs";
   };
 
   outputs = { self, nixpkgs, naersk }:
     let
-      supportedSystems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" ];
+      supportedSystems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
       forAllSystems = f: nixpkgs.lib.genAttrs supportedSystems (system: f system);
     in
     {

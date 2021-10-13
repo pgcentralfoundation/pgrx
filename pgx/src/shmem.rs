@@ -45,10 +45,10 @@ macro_rules! pg_shmem_init {
         unsafe {
             static mut PREV_SHMEM_STARTUP_HOOK: Option<unsafe extern "C" fn()> = None;
             PREV_SHMEM_STARTUP_HOOK = pg_sys::shmem_startup_hook;
-            pg_sys::shmem_startup_hook = Some(shmem_hook);
+            pg_sys::shmem_startup_hook = Some(__pgx_private_shmem_hook);
 
             #[pg_guard]
-            extern "C" fn shmem_hook() {
+            extern "C" fn __pgx_private_shmem_hook() {
                 unsafe {
                     if let Some(i) = PREV_SHMEM_STARTUP_HOOK {
                         i();
