@@ -5,7 +5,7 @@ extern crate proc_macro;
 
 use pgx_utils::{categorize_return_type, CategorizedType};
 use proc_macro2::{Ident, Span};
-use quote::{quote, quote_spanned};
+use quote::{quote, quote_spanned, ToTokens};
 use std::ops::Deref;
 use std::str::FromStr;
 use syn::spanned::Spanned;

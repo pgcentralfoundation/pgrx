@@ -45,42 +45,42 @@ impl Aggregate for IntegerAvgState {
     fn state(&self, _: Self::Args) -> Self { todo!() }
 
     // You can skip all these:
-    // type Finalize = i32;
-    // type OrderBy = i32;
-    // type MovingState = i32;
+    type Finalize = i32;
+    type OrderBy = i32;
+    type MovingState = i32;
 
-    // const PARALLEL: Option<ParallelOption> = Some(ParallelOption::Unsafe);
-    // const FINALIZE_MODIFY: Option<FinalizeModify> = Some(FinalizeModify::ReadWrite);
-    // const MOVING_FINALIZE_MODIFY: Option<FinalizeModify> = Some(FinalizeModify::ReadWrite);
-    // const INITIAL_CONDITION: Option<&'static str> = Some("0,0");
-    // const SORT_OPERATOR: Option<&'static str> = Some("sortop");
-    // const MOVING_INITIAL_CONDITION: Option<&'static str> = Some("1,1");
-    // const HYPOTHETICAL: bool = true;
+    const PARALLEL: Option<ParallelOption> = Some(ParallelOption::Unsafe);
+    const FINALIZE_MODIFY: Option<FinalizeModify> = Some(FinalizeModify::ReadWrite);
+    const MOVING_FINALIZE_MODIFY: Option<FinalizeModify> = Some(FinalizeModify::ReadWrite);
+    const INITIAL_CONDITION: Option<&'static str> = Some("0,0");
+    const SORT_OPERATOR: Option<&'static str> = Some("sortop");
+    const MOVING_INITIAL_CONDITION: Option<&'static str> = Some("1,1");
+    const HYPOTHETICAL: bool = true;
 
-    // // You can skip all these:
-    // fn finalize(&self) -> Self::Finalize {
-    //     unimplemented!("pgx stub, define in impls")
-    // }
+    // You can skip all these:
+    fn finalize(&self) -> Self::Finalize {
+        unimplemented!("pgx stub, define in impls")
+    }
 
-    // fn combine(&self, _other: Self) -> Self {
-    //     unimplemented!("pgx stub, define in impls")
-    // }
+    fn combine(&self, _other: Self) -> Self {
+        unimplemented!("pgx stub, define in impls")
+    }
     
-    // fn serial(&self) -> Vec<u8> {
-    //     unimplemented!("pgx stub, define in impls")
-    // }
+    fn serial(&self) -> Vec<u8> {
+        unimplemented!("pgx stub, define in impls")
+    }
 
-    // fn deserial(&self, _buf: Vec<u8>, _internal: PgBox<Self>) -> PgBox<Self> {
-    //     unimplemented!("pgx stub, define in impls")
-    // }
+    fn deserial(&self, _buf: Vec<u8>, _internal: PgBox<Self>) -> PgBox<Self> {
+        unimplemented!("pgx stub, define in impls")
+    }
 
-    // fn moving_state(_mstate: Self::MovingState, _v: Self::Args) -> Self::MovingState {
-    //     unimplemented!("pgx stub, define in impls")
-    // }
+    fn moving_state(_mstate: Self::MovingState, _v: Self::Args) -> Self::MovingState {
+        unimplemented!("pgx stub, define in impls")
+    }
 
-    // fn moving_finalize(_mstate: Self::MovingState) -> Self::Finalize {
-    //     unimplemented!("pgx stub, define in impls")
-    // } 
+    fn moving_finalize(_mstate: Self::MovingState) -> Self::Finalize {
+        unimplemented!("pgx stub, define in impls")
+    } 
 }
 
 impl Default for IntegerAvgState {
