@@ -4,7 +4,12 @@ use std::{any::TypeId, collections::HashMap, fmt::Debug};
 use petgraph::{dot::Dot, graph::NodeIndex, stable_graph::StableGraph};
 use tracing::instrument;
 
-use super::{ControlFile, ExtensionSqlEntity, PgExternEntity, PgExternReturnEntity, PositioningRef, PostgresEnumEntity, PostgresHashEntity, PostgresOrdEntity, PostgresTypeEntity, RustSourceOnlySqlMapping, RustSqlMapping, SchemaEntity, SqlDeclaredEntity, SqlGraphEntity, SqlGraphIdentifier, ToSql, aggregate::PgAggregateEntity};
+use super::{
+    aggregate::PgAggregateEntity, ControlFile, ExtensionSqlEntity, PgExternEntity,
+    PgExternReturnEntity, PositioningRef, PostgresEnumEntity, PostgresHashEntity,
+    PostgresOrdEntity, PostgresTypeEntity, RustSourceOnlySqlMapping, RustSqlMapping, SchemaEntity,
+    SqlDeclaredEntity, SqlGraphEntity, SqlGraphIdentifier, ToSql,
+};
 use pgx_utils::sql_entity_graph::SqlDeclared;
 
 /// A generator for SQL.
@@ -129,7 +134,16 @@ impl PgxSql {
         )?;
         let mapped_ords = initialize_ords(&mut graph, root, bootstrap, finalize, ords)?;
         let mapped_hashes = initialize_hashes(&mut graph, root, bootstrap, finalize, hashes)?;
-        let mapped_aggregates = initialize_aggregates(&mut graph, root, bootstrap, finalize, aggregates, &mut mapped_builtin_types, &mapped_enums, &mapped_types)?;
+        let mapped_aggregates = initialize_aggregates(
+            &mut graph,
+            root,
+            bootstrap,
+            finalize,
+            aggregates,
+            &mut mapped_builtin_types,
+            &mapped_enums,
+            &mapped_types,
+        )?;
 
         // Now we can circle back and build up the edge sets.
         connect_schemas(&mut graph, &mapped_schemas, root);
@@ -375,17 +389,21 @@ impl PgxSql {
     }
 
     pub fn rust_to_sql(&self, ty_id: TypeId, ty_source: &str, full_path: &str) -> Option<String> {
-        self.source_only_to_sql_type(ty_source).or_else(|| {
-            self.type_id_to_sql_type(ty_id)
-        }).or_else(|| {
-            if let Some(found) = self.has_sql_declared_entity(&SqlDeclared::Type(full_path.to_string())) {
-                Some(found.sql())
-            }  else if let Some(found) = self.has_sql_declared_entity(&SqlDeclared::Enum(full_path.to_string())) {
-                Some(found.sql())
-            } else {
-                None
-            }
-        })
+        self.source_only_to_sql_type(ty_source)
+            .or_else(|| self.type_id_to_sql_type(ty_id))
+            .or_else(|| {
+                if let Some(found) =
+                    self.has_sql_declared_entity(&SqlDeclared::Type(full_path.to_string()))
+                {
+                    Some(found.sql())
+                } else if let Some(found) =
+                    self.has_sql_declared_entity(&SqlDeclared::Enum(full_path.to_string()))
+                {
+                    Some(found.sql())
+                } else {
+                    None
+                }
+            })
     }
 
     pub fn type_id_to_sql_type(&self, id: TypeId) -> Option<String> {
@@ -540,7 +558,14 @@ fn connect_extension_sqls(
     externs: &HashMap<PgExternEntity, NodeIndex>,
 ) -> eyre::Result<()> {
     for (item, &index) in extension_sqls {
-        make_schema_connection(graph, "Extension SQL",  index, &item.rust_identifier(), item.module_path, schemas);
+        make_schema_connection(
+            graph,
+            "Extension SQL",
+            index,
+            &item.rust_identifier(),
+            item.module_path,
+            schemas,
+        );
 
         for requires in &item.requires {
             if let Some(target) = find_positioning_ref_target(
@@ -627,7 +652,14 @@ fn connect_enums(
     schemas: &HashMap<SchemaEntity, NodeIndex>,
 ) {
     for (item, &index) in enums {
-        make_schema_connection(graph, "Enum",  index, &item.rust_identifier(), item.module_path, schemas);
+        make_schema_connection(
+            graph,
+            "Enum",
+            index,
+            &item.rust_identifier(),
+            item.module_path,
+            schemas,
+        );
     }
 }
 
@@ -654,7 +686,14 @@ fn connect_types(
     schemas: &HashMap<SchemaEntity, NodeIndex>,
 ) {
     for (item, &index) in types {
-        make_schema_connection(graph, "Type",  index, &item.rust_identifier(), item.module_path, schemas);
+        make_schema_connection(
+            graph,
+            "Type",
+            index,
+            &item.rust_identifier(),
+            item.module_path,
+            schemas,
+        );
     }
 }
 
@@ -767,7 +806,14 @@ fn connect_externs(
     extension_sqls: &HashMap<ExtensionSqlEntity, NodeIndex>,
 ) -> eyre::Result<()> {
     for (item, &index) in externs {
-        make_schema_connection(graph, "Extern",  index, &item.rust_identifier(), item.module_path, schemas);
+        make_schema_connection(
+            graph,
+            "Extern",
+            index,
+            &item.rust_identifier(),
+            item.module_path,
+            schemas,
+        );
 
         for extern_attr in &item.extern_attrs {
             match extern_attr {
@@ -982,9 +1028,24 @@ fn connect_ords(
     enums: &HashMap<PostgresEnumEntity, NodeIndex>,
 ) {
     for (item, &index) in ords {
-        make_schema_connection(graph, "Ord", index, &item.rust_identifier(), item.module_path, schemas);
+        make_schema_connection(
+            graph,
+            "Ord",
+            index,
+            &item.rust_identifier(),
+            item.module_path,
+            schemas,
+        );
 
-        make_type_or_enum_connection(graph, "Ord", index, &item.rust_identifier(), &item.id, types, enums);
+        make_type_or_enum_connection(
+            graph,
+            "Ord",
+            index,
+            &item.rust_identifier(),
+            &item.id,
+            types,
+            enums,
+        );
     }
 }
 
@@ -1013,12 +1074,26 @@ fn connect_hashes(
     enums: &HashMap<PostgresEnumEntity, NodeIndex>,
 ) {
     for (item, &index) in hashes {
-        make_schema_connection(graph, "Hash", index, &item.rust_identifier(), item.module_path, schemas);
+        make_schema_connection(
+            graph,
+            "Hash",
+            index,
+            &item.rust_identifier(),
+            item.module_path,
+            schemas,
+        );
 
-        make_type_or_enum_connection(graph, "Hash", index, &item.rust_identifier(), &item.id, types, enums);
+        make_type_or_enum_connection(
+            graph,
+            "Hash",
+            index,
+            &item.rust_identifier(),
+            &item.id,
+            types,
+            enums,
+        );
     }
 }
-
 
 fn initialize_aggregates(
     graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
@@ -1053,11 +1128,13 @@ fn initialize_aggregates(
                 mapped_builtin_types
                     .entry(arg.agg_ty.full_path.to_string())
                     .or_insert_with(|| {
-                        graph.add_node(SqlGraphEntity::BuiltinType(arg.agg_ty.full_path.to_string()))
+                        graph.add_node(SqlGraphEntity::BuiltinType(
+                            arg.agg_ty.full_path.to_string(),
+                        ))
                     });
             }
         }
-        
+
         mapped_aggregates.insert(item, index);
         build_base_edges(graph, index, root, bootstrap, finalize);
     }
@@ -1074,23 +1151,55 @@ fn connect_aggregates(
     externs: &HashMap<PgExternEntity, NodeIndex>,
 ) {
     for (item, &index) in aggregates {
-        make_schema_connection(graph, "Aggregate",  index, &item.rust_identifier(), item.module_path, schemas);
+        make_schema_connection(
+            graph,
+            "Aggregate",
+            index,
+            &item.rust_identifier(),
+            item.module_path,
+            schemas,
+        );
 
-        make_type_or_enum_connection(graph, "Aggregate", index, &item.rust_identifier(), &item.ty_id, types, enums);
+        make_type_or_enum_connection(
+            graph,
+            "Aggregate",
+            index,
+            &item.rust_identifier(),
+            &item.ty_id,
+            types,
+            enums,
+        );
 
         for arg in &item.args {
-            let found = make_type_or_enum_connection(graph, "Aggregate", index, &item.rust_identifier(), &arg.agg_ty.ty_id, types, enums);
+            let found = make_type_or_enum_connection(
+                graph,
+                "Aggregate",
+                index,
+                &item.rust_identifier(),
+                &arg.agg_ty.ty_id,
+                types,
+                enums,
+            );
             if !found {
-                let builtin_index = builtin_types
-                    .get(arg.agg_ty.full_path)
-                    .expect(&format!("Could not fetch Builtin Type {}.", arg.agg_ty.full_path));
+                let builtin_index = builtin_types.get(arg.agg_ty.full_path).expect(&format!(
+                    "Could not fetch Builtin Type {}.",
+                    arg.agg_ty.full_path
+                ));
                 tracing::debug!(from = %item.rust_identifier(), to = %arg.agg_ty.full_path, "Adding Aggregate after BuiltIn Type edge");
                 graph.add_edge(*builtin_index, index, SqlGraphRelationship::RequiredByArg);
             }
         }
 
         for arg in item.order_by.as_ref().unwrap_or(&vec![]) {
-            let found = make_type_or_enum_connection(graph, "Aggregate", index, &item.rust_identifier(), &arg.ty_id, types, enums);
+            let found = make_type_or_enum_connection(
+                graph,
+                "Aggregate",
+                index,
+                &item.rust_identifier(),
+                &arg.ty_id,
+                types,
+                enums,
+            );
             if !found {
                 let builtin_index = builtin_types
                     .get(arg.full_path)
@@ -1101,7 +1210,15 @@ fn connect_aggregates(
         }
 
         if let Some(arg) = &item.mstype {
-            let found = make_type_or_enum_connection(graph, "Aggregate", index, &item.rust_identifier(), &arg.ty_id, types, enums);
+            let found = make_type_or_enum_connection(
+                graph,
+                "Aggregate",
+                index,
+                &item.rust_identifier(),
+                &arg.ty_id,
+                types,
+                enums,
+            );
             if !found {
                 let builtin_index = builtin_types
                     .get(arg.full_path)
@@ -1111,36 +1228,113 @@ fn connect_aggregates(
             }
         }
 
-        make_extern_connection(graph, "Aggregate", index, &item.rust_identifier(), &(item.module_path.to_string() + "::" + item.sfunc), externs);
+        make_extern_connection(
+            graph,
+            "Aggregate",
+            index,
+            &item.rust_identifier(),
+            &(item.module_path.to_string() + "::" + item.sfunc),
+            externs,
+        );
         if let Some(value) = item.finalfunc {
-            make_extern_connection(graph, "Aggregate", index, &item.rust_identifier(), &(item.module_path.to_string() + "::" + value), externs);
+            make_extern_connection(
+                graph,
+                "Aggregate",
+                index,
+                &item.rust_identifier(),
+                &(item.module_path.to_string() + "::" + value),
+                externs,
+            );
         }
         if let Some(value) = item.combinefunc {
-            make_extern_connection(graph, "Aggregate", index, &item.rust_identifier(), &(item.module_path.to_string() + "::" + value), externs);
+            make_extern_connection(
+                graph,
+                "Aggregate",
+                index,
+                &item.rust_identifier(),
+                &(item.module_path.to_string() + "::" + value),
+                externs,
+            );
         }
         if let Some(value) = item.serialfunc {
-            make_extern_connection(graph, "Aggregate", index, &item.rust_identifier(), &(item.module_path.to_string() + "::" + value), externs);
+            make_extern_connection(
+                graph,
+                "Aggregate",
+                index,
+                &item.rust_identifier(),
+                &(item.module_path.to_string() + "::" + value),
+                externs,
+            );
         }
         if let Some(value) = item.deserialfunc {
-            make_extern_connection(graph, "Aggregate", index, &item.rust_identifier(), &(item.module_path.to_string() + "::" + value), externs);
+            make_extern_connection(
+                graph,
+                "Aggregate",
+                index,
+                &item.rust_identifier(),
+                &(item.module_path.to_string() + "::" + value),
+                externs,
+            );
         }
         if let Some(value) = item.initcond {
-            make_extern_connection(graph, "Aggregate", index, &item.rust_identifier(), &(item.module_path.to_string() + "::" + value), externs);
+            make_extern_connection(
+                graph,
+                "Aggregate",
+                index,
+                &item.rust_identifier(),
+                &(item.module_path.to_string() + "::" + value),
+                externs,
+            );
         }
         if let Some(value) = item.msfunc {
-            make_extern_connection(graph, "Aggregate", index, &item.rust_identifier(), &(item.module_path.to_string() + "::" + value), externs);
+            make_extern_connection(
+                graph,
+                "Aggregate",
+                index,
+                &item.rust_identifier(),
+                &(item.module_path.to_string() + "::" + value),
+                externs,
+            );
         }
         if let Some(value) = item.minvfunc {
-            make_extern_connection(graph, "Aggregate", index, &item.rust_identifier(), &(item.module_path.to_string() + "::" + value), externs);
+            make_extern_connection(
+                graph,
+                "Aggregate",
+                index,
+                &item.rust_identifier(),
+                &(item.module_path.to_string() + "::" + value),
+                externs,
+            );
         }
         if let Some(value) = item.mfinalfunc {
-            make_extern_connection(graph, "Aggregate", index, &item.rust_identifier(), &(item.module_path.to_string() + "::" + value), externs);
+            make_extern_connection(
+                graph,
+                "Aggregate",
+                index,
+                &item.rust_identifier(),
+                &(item.module_path.to_string() + "::" + value),
+                externs,
+            );
         }
         if let Some(value) = item.minitcond {
-            make_extern_connection(graph, "Aggregate", index, &item.rust_identifier(), &(item.module_path.to_string() + "::" + value), externs);
+            make_extern_connection(
+                graph,
+                "Aggregate",
+                index,
+                &item.rust_identifier(),
+                &(item.module_path.to_string() + "::" + value),
+                externs,
+            );
         }
         if let Some(value) = item.sortop {
-            make_extern_connection(graph, "Aggregate", index, &item.rust_identifier(), &(item.module_path.to_string() + "::" + value), externs);
+            make_extern_connection(
+                graph,
+                "Aggregate",
+                index,
+                &item.rust_identifier(),
+                &(item.module_path.to_string() + "::" + value),
+                externs,
+            );
         }
     }
 }

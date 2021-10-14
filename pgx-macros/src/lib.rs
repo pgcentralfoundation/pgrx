@@ -14,7 +14,7 @@ use quote::{quote, quote_spanned, ToTokens};
 use rewriter::*;
 use std::collections::HashSet;
 use syn::spanned::Spanned;
-use syn::{Attribute, Data, DeriveInput, Item, ItemFn, ItemImpl, parse_macro_input};
+use syn::{parse_macro_input, Attribute, Data, DeriveInput, Item, ItemFn, ItemImpl};
 
 /// Declare a function as `#[pg_guard]` to indicate that it is called from a Postgres `extern "C"`
 /// function so that Rust `panic!()`s (and Postgres `elog(ERROR)`s) will be properly handled by `pgx`

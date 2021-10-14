@@ -1,10 +1,7 @@
+use pgx::datum::sql_entity_graph::aggregate::{FinalizeModify, ParallelOption};
 use pgx::*;
-use pgx::datum::sql_entity_graph::aggregate::{ParallelOption, FinalizeModify};
-use std::{
-    str::FromStr,
-    ffi::CStr,
-};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
+use std::{ffi::CStr, str::FromStr};
 
 pg_module_magic!();
 
@@ -20,12 +17,18 @@ impl PgVarlenaInOutFuncs for IntegerAvgState {
         let mut result = PgVarlena::<Self>::new();
 
         let mut split = input.to_bytes().split(|b| *b == b',');
-        let sum = split.next().map(|value| 
-            i32::from_str(unsafe { std::str::from_utf8_unchecked(value) }).expect("invalid i32")
-        ).expect("expected sum");
-        let n = split.next().map(|value| 
-            i32::from_str(unsafe { std::str::from_utf8_unchecked(value) }).expect("invalid i32")
-        ).expect("expected n");
+        let sum = split
+            .next()
+            .map(|value| {
+                i32::from_str(unsafe { std::str::from_utf8_unchecked(value) }).expect("invalid i32")
+            })
+            .expect("expected sum");
+        let n = split
+            .next()
+            .map(|value| {
+                i32::from_str(unsafe { std::str::from_utf8_unchecked(value) }).expect("invalid i32")
+            })
+            .expect("expected n");
 
         result.sum = sum;
         result.n = n;
@@ -51,12 +54,12 @@ impl Aggregate for IntegerAvgState {
     }
 
     // You can skip all these:
-    // type Finalize = i32;
+    type Finalize = i32;
     // type OrderBy = i32;
     // type MovingState = i32;
 
-    // const PARALLEL: Option<ParallelOption> = Some(ParallelOption::Unsafe);
-    // const FINALIZE_MODIFY: Option<FinalizeModify> = Some(FinalizeModify::ReadWrite);
+    const PARALLEL: Option<ParallelOption> = Some(ParallelOption::Safe);
+    const FINALIZE_MODIFY: Option<FinalizeModify> = Some(FinalizeModify::ReadWrite);
     // const MOVING_FINALIZE_MODIFY: Option<FinalizeModify> = Some(FinalizeModify::ReadWrite);
     const INITIAL_CONDITION: Option<&'static str> = Some("0,0");
     // const SORT_OPERATOR: Option<&'static str> = Some("sortop");
@@ -64,9 +67,9 @@ impl Aggregate for IntegerAvgState {
     // const HYPOTHETICAL: bool = true;
 
     // // You can skip all these:
-    // fn finalize(&self) -> Self::Finalize {
-    //     unimplemented!("pgx stub, define in impls")
-    // }
+    fn finalize(&self) -> Self::Finalize {
+        self.sum / self.n
+    }
 
     // fn combine(&self, _other: Self) -> Self {
     //     unimplemented!("pgx stub, define in impls")
@@ -82,7 +85,7 @@ impl Aggregate for IntegerAvgState {
 
     // fn moving_finalize(_mstate: Self::MovingState) -> Self::Finalize {
     //     unimplemented!("pgx stub, define in impls")
-    // } 
+    // }
 }
 
 impl Default for IntegerAvgState {
@@ -94,14 +97,18 @@ impl Default for IntegerAvgState {
 #[cfg(any(test, feature = "pg_test"))]
 #[pg_schema]
 mod tests {
-    use pgx::*;
     use crate::IntegerAvgState;
+    use pgx::*;
 
     #[pg_test]
     fn test_integer_avg_state() {
         assert_eq!(
             2,
-            IntegerAvgState::default().state(1).state(2).state(3).finalize()
+            IntegerAvgState::default()
+                .state(1)
+                .state(2)
+                .state(3)
+                .finalize()
         );
     }
 
@@ -109,9 +116,8 @@ mod tests {
     fn test_integer_avg_state_sql() {
         Spi::run("CREATE TABLE demo_table (value INTEGER);");
         Spi::run("INSERT INTO demo_table (value) VALUES (1), (2), (3);");
-        let retval =
-            Spi::get_one::<i32>("SELECT DEMOAVG(value) FROM demo_table;")
-                .expect("SQL select failed");
+        let retval = Spi::get_one::<i32>("SELECT DEMOAVG(value) FROM demo_table;")
+            .expect("SQL select failed");
         assert_eq!(retval, 2);
     }
 }

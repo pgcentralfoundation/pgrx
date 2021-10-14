@@ -1,4 +1,5 @@
 mod extension_sql;
+mod pg_aggregate;
 mod pg_extern;
 mod pg_schema;
 mod positioning_ref;
@@ -6,10 +7,10 @@ mod postgres_enum;
 mod postgres_hash;
 mod postgres_ord;
 mod postgres_type;
-mod pg_aggregate;
 
 pub use super::ExternArgs;
 pub use extension_sql::{ExtensionSql, ExtensionSqlFile, SqlDeclared};
+pub use pg_aggregate::PgAggregate;
 pub use pg_extern::{Argument, PgExtern, PgOperator};
 pub use pg_schema::Schema;
 pub use positioning_ref::PositioningRef;
@@ -17,7 +18,6 @@ pub use postgres_enum::PostgresEnum;
 pub use postgres_hash::PostgresHash;
 pub use postgres_ord::PostgresOrd;
 pub use postgres_type::PostgresType;
-pub use pg_aggregate::PgAggregate;
 
 /// Reexports for the pgx SQL generator binaries.
 #[doc(hidden)]

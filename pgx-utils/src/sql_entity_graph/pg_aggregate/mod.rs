@@ -1,8 +1,19 @@
+mod maybe_variadic_type;
+mod attrs;
+mod aggregate_type;
+
+use maybe_variadic_type::{MaybeVariadicTypeList};
+use attrs::{PgAggregateAttrs};
+use aggregate_type::{AggregateTypeList};
+use convert_case::{Case, Casing};
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
-use syn::{Expr, ImplItemConst, ImplItemMethod, ImplItemType, ItemFn, ItemImpl, Type, parse::{Parse, ParseStream}, parse_quote, spanned::Spanned};
-use syn::{punctuated::Punctuated, Token};
-use convert_case::{Case, Casing};
+use syn::{
+    parse::{Parse, ParseStream},
+    parse_quote,
+    spanned::Spanned,
+    ImplItemConst, ImplItemMethod, ImplItemType, ItemFn, ItemImpl,
+};
 
 // We support only 32 tuples...
 const ARG_NAMES: [&str; 32] = [
@@ -40,69 +51,6 @@ const ARG_NAMES: [&str; 32] = [
     "arg_thirty_two",
 ];
 
-#[derive(Debug, Clone, Hash, Eq, PartialEq)]
-pub struct PgAggregateAttrs {
-    attrs: Punctuated<PgAggregateAttr, Token![,]>
-}
-
-impl Parse for PgAggregateAttrs {
-    fn parse(input: ParseStream) -> Result<Self, syn::Error> {
-        Ok(Self {
-            attrs: input.parse_terminated(PgAggregateAttr::parse)?,
-        })
-    }
-}
-
-impl ToTokens for PgAggregateAttrs {
-    fn to_tokens(&self, tokens: &mut TokenStream2) {
-        let attrs = &self.attrs;
-        let quoted = quote! {
-            #attrs
-        };
-        tokens.append_all(quoted);
-    }
-}
-
-#[derive(Debug, Clone, Hash, Eq, PartialEq)]
-pub enum PgAggregateAttr {
-    Parallel(syn::TypePath),
-    InitialCondition(syn::LitStr),
-    MovingInitialCondition(syn::LitStr),
-    Hypothetical,
-}
-
-impl Parse for PgAggregateAttr {
-    fn parse(input: ParseStream) -> Result<Self, syn::Error> {
-        let ident: syn::Ident = input.parse()?;
-        let found = match ident.to_string().as_str() {
-            "hypothetical" => Self::Hypothetical,
-            "initial_condition" => {
-                let condition = input.parse()?;
-                Self::InitialCondition(condition)
-            },
-            "moving_initial_condition" => {
-                let condition = input.parse()?;
-                Self::MovingInitialCondition(condition)
-            },
-            "parallel" => {
-                let _eq: Token![=] = input.parse()?;
-                let literal: syn::TypePath = input.parse()?;
-                Self::Parallel(literal)
-            },
-            _ => return Err(syn::Error::new(input.span(), "Recieved unknown `pg_aggregate` attr.")),
-        };
-        Ok(found)
-    }
-}
-
-impl ToTokens for PgAggregateAttr {
-    fn to_tokens(&self, tokens: &mut TokenStream2) {
-        let quoted = quote! {
-            #self
-        };
-        tokens.append_all(quoted);
-    }
-}
 
 /** A parsed `#[pg_aggregate]` item.
 */
@@ -135,21 +83,25 @@ pub struct PgAggregate {
 }
 
 impl PgAggregate {
-    pub fn new(
-        mut item_impl: ItemImpl,
-    ) -> Result<Self, syn::Error> {
+    pub fn new(mut item_impl: ItemImpl) -> Result<Self, syn::Error> {
         let target_ident = get_target_ident(&item_impl)?;
-        let snake_case_target_ident = Ident::new(&target_ident.to_string().to_case(Case::Snake), target_ident.span());
-        let mut pg_externs = Vec::default(); 
+        let snake_case_target_ident = Ident::new(
+            &target_ident.to_string().to_case(Case::Snake),
+            target_ident.span(),
+        );
+        let mut pg_externs = Vec::default();
         // We want to avoid having multiple borrows, so we take a snapshot to scan from,
         // and mutate the actual one.
         let item_impl_snapshot = item_impl.clone();
-        
+
         if let Some((_, ref path, _)) = item_impl.trait_ {
             // TODO: Consider checking the path if there is more than one segment to make sure it's pgx.
             if let Some(last) = path.segments.last() {
                 if last.ident.to_string() != "Aggregate" {
-                    return Err(syn::Error::new(last.ident.span(), "`#[pg_aggregate]` only works with the `Aggregate` trait."))
+                    return Err(syn::Error::new(
+                        last.ident.span(),
+                        "`#[pg_aggregate]` only works with the `Aggregate` trait.",
+                    ));
                 }
             }
         }
@@ -177,7 +129,8 @@ impl PgAggregate {
 
         // `OrderBy` is an optional value, we default to nothing.
         let type_order_by = get_impl_type_by_name(&item_impl_snapshot, "OrderBy");
-        let type_order_by_value = type_order_by.map(|v| AggregateTypeList::new(v.ty.clone()))
+        let type_order_by_value = type_order_by
+            .map(|v| AggregateTypeList::new(v.ty.clone()))
             .transpose()?;
         if type_order_by.is_none() {
             item_impl.items.push(parse_quote! {
@@ -186,9 +139,12 @@ impl PgAggregate {
         }
 
         // `Args` is an optional value, we default to nothing.
-        let type_args = get_impl_type_by_name(&item_impl_snapshot, "Args").ok_or_else(||
-            syn::Error::new(item_impl_snapshot.span(), "`#[pg_aggregate]` requires the `Args` type defined.")
-        )?;
+        let type_args = get_impl_type_by_name(&item_impl_snapshot, "Args").ok_or_else(|| {
+            syn::Error::new(
+                item_impl_snapshot.span(),
+                "`#[pg_aggregate]` requires the `Args` type defined.",
+            )
+        })?;
         let type_args_value = MaybeVariadicTypeList::new(type_args.ty.clone())?;
 
         // `Finalize` is an optional value, we default to nothing.
@@ -202,15 +158,24 @@ impl PgAggregate {
 
         let fn_state = get_impl_func_by_name(&item_impl_snapshot, "state");
         let fn_state_name = if let Some(found) = fn_state {
-            let fn_name = Ident::new(&format!("{}_state", snake_case_target_ident), found.sig.ident.span());
-            let args = type_args_value.found.iter().map(|x| x.variadic_ty.clone().unwrap_or(x.ty.clone())).collect::<Vec<_>>();
+            let fn_name = Ident::new(
+                &format!("{}_state", snake_case_target_ident),
+                found.sig.ident.span(),
+            );
+            let args = type_args_value
+                .found
+                .iter()
+                .map(|x| x.variadic_ty.clone().unwrap_or(x.ty.clone()))
+                .collect::<Vec<_>>();
             let args_with_names = args.iter().zip(ARG_NAMES.iter()).map(|(arg, name)| {
                 let name_ident = Ident::new(name, Span::call_site());
                 quote! {
                     #name_ident: #arg
                 }
             });
-            let arg_names = ARG_NAMES[0..args.len()].iter().map(|name| Ident::new(name, fn_state.span()));
+            let arg_names = ARG_NAMES[0..args.len()]
+                .iter()
+                .map(|name| Ident::new(name, fn_state.span()));
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case)]
                 #[pg_extern]
@@ -220,12 +185,18 @@ impl PgAggregate {
             });
             fn_name
         } else {
-            return Err(syn::Error::new(item_impl.span(), "Aggregate implementation must include state function."))
+            return Err(syn::Error::new(
+                item_impl.span(),
+                "Aggregate implementation must include state function.",
+            ));
         };
 
         let fn_combine = get_impl_func_by_name(&item_impl_snapshot, "combine");
         let fn_combine_name = if let Some(found) = fn_combine {
-            let fn_name = Ident::new(&format!("{}_combine", snake_case_target_ident), found.sig.ident.span());
+            let fn_name = Ident::new(
+                &format!("{}_combine", snake_case_target_ident),
+                found.sig.ident.span(),
+            );
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case)]
                 #[pg_extern]
@@ -245,7 +216,10 @@ impl PgAggregate {
 
         let fn_finalize = get_impl_func_by_name(&item_impl_snapshot, "finalize");
         let fn_finalize_name = if let Some(found) = fn_finalize {
-            let fn_name = Ident::new(&format!("{}_finalize", snake_case_target_ident), found.sig.ident.span());
+            let fn_name = Ident::new(
+                &format!("{}_finalize", snake_case_target_ident),
+                found.sig.ident.span(),
+            );
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case)]
                 #[pg_extern]
@@ -265,7 +239,10 @@ impl PgAggregate {
 
         let fn_serial = get_impl_func_by_name(&item_impl_snapshot, "serial");
         let fn_serial_name = if let Some(found) = fn_serial {
-            let fn_name = Ident::new(&format!("{}_serial", snake_case_target_ident), found.sig.ident.span());
+            let fn_name = Ident::new(
+                &format!("{}_serial", snake_case_target_ident),
+                found.sig.ident.span(),
+            );
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case)]
                 #[pg_extern]
@@ -285,7 +262,10 @@ impl PgAggregate {
 
         let fn_deserial = get_impl_func_by_name(&item_impl_snapshot, "deserial");
         let fn_deserial_name = if let Some(found) = fn_deserial {
-            let fn_name = Ident::new(&format!("{}_deserial", snake_case_target_ident), found.sig.ident.span());
+            let fn_name = Ident::new(
+                &format!("{}_deserial", snake_case_target_ident),
+                found.sig.ident.span(),
+            );
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case)]
                 #[pg_extern]
@@ -305,15 +285,24 @@ impl PgAggregate {
 
         let fn_moving_state = get_impl_func_by_name(&item_impl_snapshot, "moving_state");
         let fn_moving_state_name = if let Some(found) = fn_moving_state {
-            let fn_name = Ident::new(&format!("{}_moving_state", snake_case_target_ident), found.sig.ident.span());
-            let args = type_args_value.found.iter().map(|x| x.variadic_ty.clone().unwrap_or(x.ty.clone())).collect::<Vec<_>>();
+            let fn_name = Ident::new(
+                &format!("{}_moving_state", snake_case_target_ident),
+                found.sig.ident.span(),
+            );
+            let args = type_args_value
+                .found
+                .iter()
+                .map(|x| x.variadic_ty.clone().unwrap_or(x.ty.clone()))
+                .collect::<Vec<_>>();
             let args_with_names = args.iter().zip(ARG_NAMES.iter()).map(|(arg, name)| {
                 let name_ident = Ident::new(name, Span::call_site());
                 quote! {
                     #name_ident: #arg
                 }
             });
-            let arg_names = ARG_NAMES[0..args.len()].iter().map(|name| Ident::new(name, fn_state.span()));
+            let arg_names = ARG_NAMES[0..args.len()]
+                .iter()
+                .map(|name| Ident::new(name, fn_state.span()));
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case)]
                 #[pg_extern]
@@ -337,9 +326,13 @@ impl PgAggregate {
             None
         };
 
-        let fn_moving_state_inverse = get_impl_func_by_name(&item_impl_snapshot, "moving_state_inverse");
+        let fn_moving_state_inverse =
+            get_impl_func_by_name(&item_impl_snapshot, "moving_state_inverse");
         let fn_moving_state_inverse_name = if let Some(found) = fn_moving_state_inverse {
-            let fn_name = Ident::new(&format!("{}_moving_state_inverse", snake_case_target_ident), found.sig.ident.span());
+            let fn_name = Ident::new(
+                &format!("{}_moving_state_inverse", snake_case_target_ident),
+                found.sig.ident.span(),
+            );
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case)]
                 #[pg_extern]
@@ -365,7 +358,10 @@ impl PgAggregate {
 
         let fn_moving_finalize = get_impl_func_by_name(&item_impl_snapshot, "moving_finalize");
         let fn_moving_finalize_name = if let Some(found) = fn_moving_finalize {
-            let fn_name = Ident::new(&format!("{}_moving_finalize", snake_case_target_ident), found.sig.ident.span());
+            let fn_name = Ident::new(
+                &format!("{}_moving_finalize", snake_case_target_ident),
+                found.sig.ident.span(),
+            );
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case)]
                 #[pg_extern]
@@ -391,12 +387,27 @@ impl PgAggregate {
             type_order_by: type_order_by_value,
             type_finalize: type_finalize_value,
             type_moving_state: type_moving_state_value,
-            const_parallel: get_impl_const_by_name(&item_impl_snapshot, "PARALLEL").map(|x| x.expr.clone()),
-            const_finalize_modify: get_impl_const_by_name(&item_impl_snapshot, "FINALIZE_MODIFY").map(|x| x.expr.clone()),
-            const_moving_finalize_modify: get_impl_const_by_name(&item_impl_snapshot, "MOVING_FINALIZE_MODIFY").map(|x| x.expr.clone()),
-            const_initial_condition: get_impl_const_by_name(&item_impl_snapshot, "INITIAL_CONDITION").and_then(get_const_litstr),
-            const_sort_operator: get_impl_const_by_name(&item_impl_snapshot, "SORT_OPERATOR").and_then(get_const_litstr),
-            const_moving_intial_condition: get_impl_const_by_name(&item_impl_snapshot, "MOVING_INITIAL_CONDITION").and_then(get_const_litstr),
+            const_parallel: get_impl_const_by_name(&item_impl_snapshot, "PARALLEL")
+                .map(|x| x.expr.clone()),
+            const_finalize_modify: get_impl_const_by_name(&item_impl_snapshot, "FINALIZE_MODIFY")
+                .map(|x| x.expr.clone()),
+            const_moving_finalize_modify: get_impl_const_by_name(
+                &item_impl_snapshot,
+                "MOVING_FINALIZE_MODIFY",
+            )
+            .map(|x| x.expr.clone()),
+            const_initial_condition: get_impl_const_by_name(
+                &item_impl_snapshot,
+                "INITIAL_CONDITION",
+            )
+            .and_then(get_const_litstr),
+            const_sort_operator: get_impl_const_by_name(&item_impl_snapshot, "SORT_OPERATOR")
+                .and_then(get_const_litstr),
+            const_moving_intial_condition: get_impl_const_by_name(
+                &item_impl_snapshot,
+                "MOVING_INITIAL_CONDITION",
+            )
+            .and_then(get_const_litstr),
             fn_state: fn_state_name,
             fn_finalize: fn_finalize_name,
             fn_combine: fn_combine_name,
@@ -405,7 +416,9 @@ impl PgAggregate {
             fn_moving_state: fn_moving_state_name,
             fn_moving_state_inverse: fn_moving_state_inverse_name,
             fn_moving_finalize: fn_moving_finalize_name,
-            hypothetical: if let Some(value) = get_impl_const_by_name(&item_impl_snapshot, "HYPOTHETICAL") {
+            hypothetical: if let Some(value) =
+                get_impl_const_by_name(&item_impl_snapshot, "HYPOTHETICAL")
+            {
                 match &value.expr {
                     syn::Expr::Lit(expr_lit) => match &expr_lit.lit {
                         syn::Lit::Bool(lit) => lit.value,
@@ -413,14 +426,19 @@ impl PgAggregate {
                     },
                     _ => return Err(syn::Error::new(value.span(), "`#[pg_aggregate]` required the `HYPOTHETICAL` value to be a literal boolean.")),
                 }
-            } else { false },
+            } else {
+                false
+            },
         })
     }
 
     fn entity_tokens(&self) -> ItemFn {
         let target_ident = get_target_ident(&self.item_impl)
             .expect("Expected constructed PgAggregate to have target ident.");
-        let snake_case_target_ident = Ident::new(&target_ident.to_string().to_case(Case::Snake), target_ident.span());
+        let snake_case_target_ident = Ident::new(
+            &target_ident.to_string().to_case(Case::Snake),
+            target_ident.span(),
+        );
         let sql_graph_entity_fn_name = syn::Ident::new(
             &format!("__pgx_internals_aggregate_{}", snake_case_target_ident),
             target_ident.span(),
@@ -428,14 +446,19 @@ impl PgAggregate {
 
         let name = match get_impl_const_by_name(&self.item_impl, "NAME")
             .expect("`NAME` is a required const for Aggregate implementations.")
-            .expr {
-                syn::Expr::Lit(ref expr) => if let syn::Lit::Str(ref litstr) = expr.lit {
+            .expr
+        {
+            syn::Expr::Lit(ref expr) => {
+                if let syn::Lit::Str(ref litstr) = expr.lit {
                     litstr.clone()
                 } else {
-                    panic!("`NAME: &'static str` is a required const for Aggregate implementations.")
-                },
-                _ => panic!("`NAME: &'static str` is a required const for Aggregate implementations."),
-            };
+                    panic!(
+                        "`NAME: &'static str` is a required const for Aggregate implementations."
+                    )
+                }
+            }
+            _ => panic!("`NAME: &'static str` is a required const for Aggregate implementations."),
+        };
 
         let type_args_iter = &self.type_args.entity_tokens();
         let type_order_by_iter = self.type_order_by.iter().map(|x| x.entity_tokens());
@@ -464,7 +487,7 @@ impl PgAggregate {
                     module_path: module_path!(),
                     file: file!(),
                     line: line!(),
-                    name: stringify!(#name),
+                    name: #name,
                     ty_id: core::any::TypeId::of::<#target_ident>(),
                     args: #type_args_iter,
                     order_by: None#( .unwrap_or(Some(#type_order_by_iter)) )*,
@@ -497,26 +520,11 @@ impl PgAggregate {
     }
 }
 
-fn get_target_ident(item_impl: &ItemImpl) -> Result<Ident, syn::Error> {
-    let target_ident = match &*item_impl.self_ty {
-        syn::Type::Path(ref type_path) => {
-            // TODO: Consider checking the path if there is more than one segment to make sure it's pgx.
-            let last_segment = type_path.path.segments.last().ok_or_else(|| 
-                syn::Error::new(type_path.span(), "`#[pg_aggregate]` only works with types whose path have a final segment.")
-            )?;
-            last_segment.ident.clone()
-        },
-        something_else => return Err(syn::Error::new(something_else.span(), "`#[pg_aggregate]` only works with types."))
-    };
-    Ok(target_ident)
-}
-
 impl Parse for PgAggregate {
     fn parse(input: ParseStream) -> Result<Self, syn::Error> {
         Self::new(input.parse()?)
     }
 }
-
 
 impl ToTokens for PgAggregate {
     fn to_tokens(&self, tokens: &mut TokenStream2) {
@@ -534,6 +542,29 @@ impl ToTokens for PgAggregate {
     }
 }
 
+fn get_target_ident(item_impl: &ItemImpl) -> Result<Ident, syn::Error> {
+    let target_ident = match &*item_impl.self_ty {
+        syn::Type::Path(ref type_path) => {
+            // TODO: Consider checking the path if there is more than one segment to make sure it's pgx.
+            let last_segment = type_path.path.segments.last().ok_or_else(|| {
+                syn::Error::new(
+                    type_path.span(),
+                    "`#[pg_aggregate]` only works with types whose path have a final segment.",
+                )
+            })?;
+            last_segment.ident.clone()
+        }
+        something_else => {
+            return Err(syn::Error::new(
+                something_else.span(),
+                "`#[pg_aggregate]` only works with types.",
+            ))
+        }
+    };
+    Ok(target_ident)
+}
+
+
 fn get_impl_type_by_name<'a>(item_impl: &'a ItemImpl, name: &str) -> Option<&'a ImplItemType> {
     let mut needle = None;
     for impl_item in item_impl.items.iter() {
@@ -543,7 +574,7 @@ fn get_impl_type_by_name<'a>(item_impl: &'a ItemImpl, name: &str) -> Option<&'a 
                 if ident_string == name {
                     needle = Some(impl_item_type);
                 }
-            },
+            }
             _ => (),
         }
     }
@@ -559,7 +590,7 @@ fn get_impl_func_by_name<'a>(item_impl: &'a ItemImpl, name: &str) -> Option<&'a 
                 if ident_string == name {
                     needle = Some(impl_item_method);
                 }
-            },
+            }
             _ => (),
         }
     }
@@ -575,7 +606,7 @@ fn get_impl_const_by_name<'a>(item_impl: &'a ItemImpl, name: &str) -> Option<&'a
                 if ident_string == name {
                     needle = Some(impl_item_const);
                 }
-            },
+            }
             _ => (),
         }
     }
@@ -588,221 +619,24 @@ fn get_const_litstr<'a>(item: &'a ImplItemConst) -> Option<String> {
             syn::Lit::Str(lit) => Some(lit.value()),
             _ => None,
         },
-        syn::Expr::Call(expr_call) => {
-            match &*expr_call.func {
-                syn::Expr::Path(expr_path) => {
-                    if expr_path.path.segments.last()?.ident.to_string() == "Some" {
-                        match expr_call.args.first()? {
-                            syn::Expr::Lit(expr_lit) => match &expr_lit.lit {
-                                syn::Lit::Str(lit) => Some(lit.value()),
-                                _ => None,
-                            },
+        syn::Expr::Call(expr_call) => match &*expr_call.func {
+            syn::Expr::Path(expr_path) => {
+                if expr_path.path.segments.last()?.ident.to_string() == "Some" {
+                    match expr_call.args.first()? {
+                        syn::Expr::Lit(expr_lit) => match &expr_lit.lit {
+                            syn::Lit::Str(lit) => Some(lit.value()),
                             _ => None,
-                        }
-                    } else {
-                        None
+                        },
+                        _ => None,
                     }
-                },
-                _ => None,
-            }
-        },
-        _ => panic!("Got {:?}", item.expr),
-    }
-}
-
-#[derive(Debug, Clone)]
-struct MaybeVariadicTypeList {
-    found: Vec<MaybeVariadicType>,
-    original: syn::Type,
-}
-
-impl MaybeVariadicTypeList {
-    fn new(maybe_type_list: syn::Type) -> Result<Self, syn::Error> {
-        match &maybe_type_list {
-            Type::Tuple(tuple) => {
-                let mut coll = Vec::new();
-                for elem in &tuple.elems {
-                    let parsed_elem = MaybeVariadicType::new(elem.clone())?;
-                    coll.push(parsed_elem);
-                }
-                Ok(Self {
-                    found: coll,
-                    original: maybe_type_list,
-                })
-            },
-            ty => Ok(Self {
-                found: vec![ MaybeVariadicType::new(ty.clone())?, ],
-                original: maybe_type_list,
-            })
-        }
-    }
-
-    fn entity_tokens(&self) -> Expr {
-        let found = self.found.iter().map(|x| x.entity_tokens());
-        parse_quote! {
-            vec![#(#found),*]
-        }
-    }
-}
-
-impl Parse for MaybeVariadicTypeList {
-    fn parse(input: ParseStream) -> Result<Self, syn::Error> {
-        Self::new(input.parse()?)
-    }
-}
-
-impl ToTokens for MaybeVariadicTypeList {
-    fn to_tokens(&self, tokens: &mut TokenStream2) {
-        self.original.to_tokens(tokens)
-    }
-}
-
-#[derive(Debug, Clone)]
-struct MaybeVariadicType {
-    ty: Type,
-    /// The inner of a variadic, if it exists.
-    variadic_ty: Option<Type>,
-}
-
-impl MaybeVariadicType {
-    fn new(ty: syn::Type) -> Result<Self, syn::Error> {
-        let variadic_ty = match &ty {
-            syn::Type::Macro(ty_macro) => {
-                let mut found_pgx = false;
-                let mut found_variadic = false;
-                // We don't actually have type resolution here, this is a "Best guess".
-                for (idx, segment) in ty_macro.mac.path.segments.iter().enumerate() {
-                    match segment.ident.to_string().as_str() {
-                        "pgx" if idx == 1 => found_pgx = true,
-                        "variadic" => found_variadic = true,
-                        _ => (),
-                    }
-                }
-                if (ty_macro.mac.path.segments.len() == 1 && found_variadic) || (found_pgx && found_variadic) {
-                    let ty: syn::Type = syn::parse2(ty_macro.mac.tokens.clone())?;
-                    Some(ty)
                 } else {
                     None
                 }
             }
             _ => None,
-        };
-        let retval = Self {
-            ty,
-            variadic_ty,
-        };
-        Ok(retval)
-    }
-
-    fn entity_tokens(&self) -> Expr {
-        let ty = self.variadic_ty.as_ref().unwrap_or(&self.ty);
-        let variadic = self.variadic_ty.is_some();
-        parse_quote! {
-            pgx::datum::sql_entity_graph::aggregate::MaybeVariadicAggregateType {
-                agg_ty: pgx::datum::sql_entity_graph::aggregate::AggregateType {
-                    ty_source: stringify!(#ty),
-                    ty_id: core::any::TypeId::of::<#ty>(),
-                    full_path: core::any::type_name::<#ty>(),
-                },
-                variadic: #variadic,
-            }
-        }
-    }
-}
-
-impl ToTokens for MaybeVariadicType {
-    fn to_tokens(&self, tokens: &mut TokenStream2) {
-        self.ty.to_tokens(tokens)
-    }
-}
-
-impl Parse for MaybeVariadicType {
-    fn parse(input: ParseStream) -> Result<Self, syn::Error> {
-        Self::new(input.parse()?)
+        },
+        _ => panic!("Got {:?}", item.expr),
     }
 }
 
 
-#[derive(Debug, Clone)]
-struct AggregateTypeList {
-    found: Vec<AggregateType>,
-    original: syn::Type,
-}
-
-impl AggregateTypeList {
-    fn new(maybe_type_list: syn::Type) -> Result<Self, syn::Error> {
-        match &maybe_type_list {
-            Type::Tuple(tuple) => {
-                let mut coll = Vec::new();
-                for elem in &tuple.elems {
-                    let parsed_elem = AggregateType::new(elem.clone())?;
-                    coll.push(parsed_elem);
-                }
-                Ok(Self {
-                    found: coll,
-                    original: maybe_type_list,
-                })
-            },
-            ty => Ok(Self {
-                found: vec![ AggregateType::new(ty.clone())?, ],
-                original: maybe_type_list,
-            })
-        }
-    }
-
-    fn entity_tokens(&self) -> Expr {
-        let found = self.found.iter().map(|x| x.entity_tokens());
-        parse_quote! {
-            vec![#(#found),*]
-        }
-    }
-}
-
-impl Parse for AggregateTypeList {
-    fn parse(input: ParseStream) -> Result<Self, syn::Error> {
-        Self::new(input.parse()?)
-    }
-}
-
-impl ToTokens for AggregateTypeList {
-    fn to_tokens(&self, tokens: &mut TokenStream2) {
-        self.original.to_tokens(tokens)
-    }
-}
-
-#[derive(Debug, Clone)]
-struct AggregateType {
-    ty: Type,
-}
-
-impl AggregateType {
-    fn new(ty: syn::Type) -> Result<Self, syn::Error> {
-        let retval = Self {
-            ty,
-        };
-        Ok(retval)
-    }
-
-    fn entity_tokens(&self) -> Expr {
-        let ty = &self.ty;
-        parse_quote! {
-            pgx::datum::sql_entity_graph::aggregate::AggregateType {
-                ty_source: stringify!(#ty),
-                ty_id: core::any::TypeId::of::<#ty>(),
-                full_path: core::any::type_name::<#ty>(),
-            }
-        }
-    }
-}
-
-impl ToTokens for AggregateType {
-    fn to_tokens(&self, tokens: &mut TokenStream2) {
-        self.ty.to_tokens(tokens)
-    }
-}
-
-impl Parse for AggregateType {
-    fn parse(input: ParseStream) -> Result<Self, syn::Error> {
-        Self::new(input.parse()?)
-    }
-}
