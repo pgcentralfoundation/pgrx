@@ -112,3 +112,79 @@ impl Parse for MaybeVariadicType {
         Self::new(input.parse()?)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::{MaybeVariadicTypeList};
+    use eyre::{Result, eyre as eyre_err};
+    use syn::parse_quote;
+
+    #[test]
+    fn solo() -> Result<()> {
+        let tokens: syn::Type = parse_quote! {
+            i32
+        };
+        // It should not error, as it's valid.
+        let list = MaybeVariadicTypeList::new(tokens);
+        assert!(list.is_ok());
+        let list = list.unwrap();
+        let found = &list.found[0];
+        let found_string = match &found.ty {
+            syn::Type::Path(ty_path) => ty_path.path.segments.last().unwrap().ident.to_string(),
+            _ => return Err(eyre_err!("Wrong found.ty")),
+        };
+        assert_eq!(found_string, "i32");
+        Ok(())
+    }
+
+    
+    #[test]
+    fn list() -> Result<()> {
+        let tokens: syn::Type = parse_quote! {
+            (i32, i8)
+        };
+        // It should not error, as it's valid.
+        let list = MaybeVariadicTypeList::new(tokens);
+        assert!(list.is_ok());
+        let list = list.unwrap();
+        let first = &list.found[0];
+        let first_string = match &first.ty {
+            syn::Type::Path(ty_path) => ty_path.path.segments.last().unwrap().ident.to_string(),
+            _ => return Err(eyre_err!("Wrong found.ty")),
+        };
+        assert_eq!(first_string, "i32");
+
+        let second = &list.found[0];
+        let second_string = match &second.ty {
+            syn::Type::Path(ty_path) => ty_path.path.segments.last().unwrap().ident.to_string(),
+            _ => return Err(eyre_err!("Wrong found.ty")),
+        };
+        assert_eq!(second_string, "i8");
+        Ok(())
+    }
+
+    #[test]
+    fn list_variadic() -> Result<()> {
+        let tokens: syn::Type = parse_quote! {
+            (i32, pgx::variadic!(i8))
+        };
+        // It should not error, as it's valid.
+        let list = MaybeVariadicTypeList::new(tokens);
+        assert!(list.is_ok());
+        let list = list.unwrap();
+        let first = &list.found[0];
+        let first_string = match &first.ty {
+            syn::Type::Path(ty_path) => ty_path.path.segments.last().unwrap().ident.to_string(),
+            _ => return Err(eyre_err!("Wrong first.ty")),
+        };
+        assert_eq!(first_string, "i32");
+
+        let second = &list.found[0];
+        let second_string = match &second.variadic_ty {
+            Some(syn::Type::Path(ty_path)) => ty_path.path.segments.last().unwrap().ident.to_string(),
+            _ => return Err(eyre_err!("Wrong second.variadic_ty")),
+        };
+        assert_eq!(second_string, "i8");
+        Ok(())
+    }
+}

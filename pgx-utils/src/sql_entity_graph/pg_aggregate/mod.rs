@@ -702,7 +702,7 @@ mod tests {
     use syn::{ItemImpl, parse_quote};
 
     #[test]
-    fn test_agg_required_only() -> Result<()> {
+    fn agg_required_only() -> Result<()> {
         let tokens: ItemImpl = parse_quote! {
             #[pg_aggregate]
             impl Aggregate for DemoAgg {
@@ -730,7 +730,7 @@ mod tests {
     }
 
     #[test]
-    fn test_agg_all_options() -> Result<()> {
+    fn agg_all_options() -> Result<()> {
         let tokens: ItemImpl = parse_quote! {
             #[pg_aggregate]
             impl Aggregate for DemoAgg {
@@ -796,7 +796,7 @@ mod tests {
     }
 
     #[test]
-    fn test_agg_missing_required() -> Result<()> {
+    fn agg_missing_required() -> Result<()> {
         // This is not valid as it is missing required types/consts.
         let tokens: ItemImpl = parse_quote! {
             #[pg_aggregate]
