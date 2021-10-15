@@ -58,8 +58,8 @@ impl Aggregate for IntegerAvgState {
     // type OrderBy = i32;
     // type MovingState = i32;
 
-    const PARALLEL: Option<ParallelOption> = Some(ParallelOption::Safe);
-    const FINALIZE_MODIFY: Option<FinalizeModify> = Some(FinalizeModify::ReadWrite);
+    // const PARALLEL: Option<ParallelOption> = Some(ParallelOption::Safe);
+    // const FINALIZE_MODIFY: Option<FinalizeModify> = Some(FinalizeModify::ReadWrite);
     // const MOVING_FINALIZE_MODIFY: Option<FinalizeModify> = Some(FinalizeModify::ReadWrite);
     const INITIAL_CONDITION: Option<&'static str> = Some("0,0");
     // const SORT_OPERATOR: Option<&'static str> = Some("sortop");

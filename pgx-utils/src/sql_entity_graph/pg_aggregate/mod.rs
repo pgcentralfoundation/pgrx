@@ -8,12 +8,7 @@ use aggregate_type::{AggregateTypeList};
 use convert_case::{Case, Casing};
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
-use syn::{
-    parse::{Parse, ParseStream},
-    parse_quote,
-    spanned::Spanned,
-    ImplItemConst, ImplItemMethod, ImplItemType, ItemFn, ItemImpl,
-};
+use syn::{ImplItemConst, ImplItemMethod, ImplItemType, ItemFn, ItemImpl, Path, Type, parse::{Parse, ParseStream}, parse_quote, spanned::Spanned};
 
 // We support only 32 tuples...
 const ARG_NAMES: [&str; 32] = [
@@ -543,16 +538,48 @@ impl ToTokens for PgAggregate {
 }
 
 fn get_target_ident(item_impl: &ItemImpl) -> Result<Ident, syn::Error> {
+    let path = get_target_path(item_impl)?;
+    let last = path.segments.last().ok_or_else(|| {
+        syn::Error::new(
+            item_impl.span(),
+            "`#[pg_aggregate]` only works with types whose path have a final segment.",
+        )
+    })?;
+    Ok(last.ident.clone())
+}
+
+fn get_target_path(item_impl: &ItemImpl) -> Result<Path, syn::Error> {
     let target_ident = match &*item_impl.self_ty {
         syn::Type::Path(ref type_path) => {
-            // TODO: Consider checking the path if there is more than one segment to make sure it's pgx.
             let last_segment = type_path.path.segments.last().ok_or_else(|| {
                 syn::Error::new(
                     type_path.span(),
                     "`#[pg_aggregate]` only works with types whose path have a final segment.",
                 )
             })?;
-            last_segment.ident.clone()
+            if last_segment.ident.to_string() == "PgVarlena" {
+                match &last_segment.arguments {
+                    syn::PathArguments::AngleBracketed(angled) => {
+                        let first = angled.args.first().ok_or_else(|| syn::Error::new(
+                            type_path.span(),
+                            "`#[pg_aggregate]` only works with `PgVarlena` declarations if they have a type contained.",
+                        ))?;
+                        match &first {
+                            syn::GenericArgument::Type(Type::Path(ty_path)) => ty_path.path.clone(),
+                            _ => return Err(syn::Error::new(
+                                type_path.span(),
+                                "`#[pg_aggregate]` only works with `PgVarlena` declarations if they have a type path contained.",
+                            )),
+                        }
+                    },
+                    _ => return Err(syn::Error::new(
+                        type_path.span(),
+                        "`#[pg_aggregate]` only works with `PgVarlena` declarations if they have a type contained.",
+                    )),
+                }
+            } else {
+                type_path.path.clone()
+            }
         }
         something_else => {
             return Err(syn::Error::new(
