@@ -695,4 +695,116 @@ fn get_const_litstr<'a>(item: &'a ImplItemConst) -> Option<String> {
     }
 }
 
+#[cfg(test)]
+mod tests {
+    use eyre::Result;
+    use super::PgAggregate;
+    use syn::{ItemImpl, parse_quote};
 
+    #[test]
+    fn test_agg_required_only() -> Result<()> {
+        let tokens: ItemImpl = parse_quote! {
+            #[pg_aggregate]
+            impl Aggregate for DemoAgg {
+                type State = PgVarlena<Self>;
+                type Args = i32;
+                const NAME: &'static str = "DEMO";
+
+                fn state(mut current: Self::State, arg: Self::Args) -> Self::State {
+                    todo!()
+                }
+            }
+        };
+        // It should not error, as it's valid.
+        let agg = PgAggregate::new(tokens);
+        assert!(agg.is_ok());
+        // It should create 1 extern, the state.
+        let agg = agg.unwrap();
+        assert_eq!(agg.pg_externs.len(), 1);
+        // That extern should be named specifically:
+        let extern_fn = &agg.pg_externs[0];
+        assert_eq!(extern_fn.sig.ident.to_string(), "demo_agg_state");
+        // It should be possible to generate entity tokens.
+        let _ = agg.entity_tokens();
+        Ok(())
+    }
+
+    #[test]
+    fn test_agg_all_options() -> Result<()> {
+        let tokens: ItemImpl = parse_quote! {
+            #[pg_aggregate]
+            impl Aggregate for DemoAgg {
+                type State = PgVarlena<Self>;
+                type Args = i32;
+                type OrderBy = i32;
+                type MovingState = i32;
+
+                const NAME: &'static str = "DEMO";
+
+                const PARALLEL: Option<ParallelOption> = Some(ParallelOption::Safe);
+                const FINALIZE_MODIFY: Option<FinalizeModify> = Some(FinalizeModify::ReadWrite);
+                const MOVING_FINALIZE_MODIFY: Option<FinalizeModify> = Some(FinalizeModify::ReadWrite);
+                const SORT_OPERATOR: Option<&'static str> = Some("sortop");
+                const MOVING_INITIAL_CONDITION: Option<&'static str> = Some("1,1");
+                const HYPOTHETICAL: bool = true;
+
+                fn state(current: Self::State, v: Self::Args) -> Self::State {
+                    todo!()
+                }
+
+                fn finalize(current: Self::State) -> Self::Finalize {
+                    todo!()
+                }
+
+                fn combine(current: Self::State, _other: Self::State) -> Self::State {
+                    todo!()
+                }
+
+                fn serial(current: Self::State) -> Vec<u8> {
+                    todo!()
+                }
+
+                fn deserial(current: Self::State, _buf: Vec<u8>, _internal: PgBox<Self>) -> PgBox<Self> {
+                    todo!()
+                }
+
+                fn moving_state(_mstate: Self::MovingState, _v: Self::Args) -> Self::MovingState {
+                    todo!()
+                }
+
+                fn moving_state_inverse(_mstate: Self::MovingState, _v: Self::Args) -> Self::MovingState {
+                    todo!()
+                }
+
+                fn moving_finalize(_mstate: Self::MovingState) -> Self::Finalize {
+                    todo!()
+                }
+            }
+        };
+        // It should not error, as it's valid.
+        let agg = PgAggregate::new(tokens);
+        assert!(agg.is_ok());
+        // It should create 8 externs!
+        let agg = agg.unwrap();
+        assert_eq!(agg.pg_externs.len(), 8);
+        // That extern should be named specifically:
+        let extern_fn = &agg.pg_externs[0];
+        assert_eq!(extern_fn.sig.ident.to_string(), "demo_agg_state");
+        // It should be possible to generate entity tokens.
+        let _ = agg.entity_tokens();
+        Ok(())
+    }
+
+    #[test]
+    fn test_agg_missing_required() -> Result<()> {
+        // This is not valid as it is missing required types/consts.
+        let tokens: ItemImpl = parse_quote! {
+            #[pg_aggregate]
+            impl Aggregate for IntegerAvgState {
+            }
+        };
+        let agg = PgAggregate::new(tokens);
+        assert!(agg.is_err());
+        Ok(())
+    }
+}
