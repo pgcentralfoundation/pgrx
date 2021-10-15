@@ -16,6 +16,17 @@ pub trait Aggregate
 where
     Self: Sized,
 {
+    /// The type of the return value on `state` and `combine` functions.
+    ///
+    /// For an aggregate type which does not have a `PgVarlenaInOutFuncs` implementation,
+    /// this can be left out, or set to it's default, `Self`.
+    /// 
+    /// For an aggregate type which **does** have a `PgVarlenaInOutFuncs` implementation,
+    /// this should be set to `PgVarlena<Self>`.
+    /// 
+    /// Other types are not supported.
+    type State;
+
     /// The type of the argument(s).
     ///
     /// For a single argument, provide the type directly.
@@ -70,19 +81,19 @@ where
     /// **Optional:** The `#[pg_aggregate]` macro will populate these if not provided.
     const HYPOTHETICAL: bool = false;
 
-    fn state(&self, v: Self::Args) -> Self;
+    fn state(current: Self::State, v: Self::Args) -> Self::State;
 
     /// **Optional:** The `#[pg_aggregate]` macro will populate these if not provided.
-    fn finalize(&self) -> Self::Finalize;
+    fn finalize(current: Self::State) -> Self::Finalize;
 
     /// **Optional:** The `#[pg_aggregate]` macro will populate these if not provided.
-    fn combine(&self, _other: Self) -> Self;
+    fn combine(current: Self::State, _other: Self::State) -> Self::State;
 
     /// **Optional:** The `#[pg_aggregate]` macro will populate these if not provided.
-    fn serial(&self) -> Vec<u8>;
+    fn serial(current: Self::State) -> Vec<u8>;
 
     /// **Optional:** The `#[pg_aggregate]` macro will populate these if not provided.
-    fn deserial(&self, _buf: Vec<u8>, _internal: PgBox<Self>) -> PgBox<Self>;
+    fn deserial(current: Self::State, _buf: Vec<u8>, _internal: PgBox<Self>) -> PgBox<Self>;
 
     /// **Optional:** The `#[pg_aggregate]` macro will populate these if not provided.
     fn moving_state(_mstate: Self::MovingState, _v: Self::Args) -> Self::MovingState;

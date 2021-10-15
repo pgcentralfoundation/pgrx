@@ -79,7 +79,8 @@ pub struct PgAggregate {
 
 impl PgAggregate {
     pub fn new(mut item_impl: ItemImpl) -> Result<Self, syn::Error> {
-        let target_ident = get_target_ident(&item_impl)?;
+        let target_path = get_target_path(&item_impl)?;
+        let target_ident = get_target_ident(&target_path)?;
         let snake_case_target_ident = Ident::new(
             &target_ident.to_string().to_case(Case::Snake),
             target_ident.span(),
@@ -111,6 +112,27 @@ impl PgAggregate {
                     aggregate_attrs = Some(parsed);
                 }
             }
+        }
+
+        // `MovingState` is an optional value, we default to nothing.
+        let type_state = get_impl_type_by_name(&item_impl_snapshot, "State");
+        let _type_state_value = type_state.map(|v| v.ty.clone());
+        let type_state_is_pgvarlena = if let Some(impl_item_ty) = type_state {
+            match &impl_item_ty.ty {
+                Type::Path(ty_path) => if let Some(last) = ty_path.path.segments.last() {
+                    last.ident.to_string() == "PgVarlena"
+                } else {
+                    false
+                },
+                _ => false,
+            }
+        } else {
+            false
+        };
+        if type_state.is_none() {
+            item_impl.items.push(parse_quote! {
+                type ReturnType = Self;
+            })
         }
 
         // `MovingState` is an optional value, we default to nothing.
@@ -151,6 +173,12 @@ impl PgAggregate {
             })
         }
 
+        let maybe_varlena_target_path: Type = if type_state_is_pgvarlena {
+            parse_quote!(pgx::PgVarlena<#target_path>)
+        } else {
+            parse_quote!(#target_path)
+        };
+
         let fn_state = get_impl_func_by_name(&item_impl_snapshot, "state");
         let fn_state_name = if let Some(found) = fn_state {
             let fn_name = Ident::new(
@@ -171,11 +199,12 @@ impl PgAggregate {
             let arg_names = ARG_NAMES[0..args.len()]
                 .iter()
                 .map(|name| Ident::new(name, fn_state.span()));
+
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case)]
                 #[pg_extern]
-                fn #fn_name(this: #target_ident, #(#args_with_names),*) -> #target_ident {
-                    this.state((#(#arg_names),*))
+                fn #fn_name(this: #maybe_varlena_target_path, #(#args_with_names),*) -> #maybe_varlena_target_path {
+                    <#target_path as pgx::Aggregate>::state(this, #(#arg_names),*)
                 }
             });
             fn_name
@@ -195,14 +224,14 @@ impl PgAggregate {
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case)]
                 #[pg_extern]
-                fn #fn_name(this: #target_ident, v: #target_ident) -> #target_ident {
-                    this.combine(v)
+                fn #fn_name(this: #maybe_varlena_target_path, v: #maybe_varlena_target_path) -> #maybe_varlena_target_path {
+                    <#target_path as pgx::Aggregate>::combine(this, v)
                 }
             });
             Some(fn_name)
         } else {
             item_impl.items.push(parse_quote! {
-                fn combine(&self, _other: Self) -> Self {
+                fn combine(current: #maybe_varlena_target_path, _other: #maybe_varlena_target_path) -> #maybe_varlena_target_path {
                     unimplemented!("Call to combine on an aggregate which does not support it.")
                 }
             });
@@ -218,14 +247,14 @@ impl PgAggregate {
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case)]
                 #[pg_extern]
-                fn #fn_name(this: #target_ident) -> <#target_ident as pgx::Aggregate>::Finalize {
-                    this.finalize()
+                fn #fn_name(this: #maybe_varlena_target_path) -> <#target_path as pgx::Aggregate>::Finalize {
+                    <#target_path as pgx::Aggregate>::finalize(this)
                 }
             });
             Some(fn_name)
         } else {
             item_impl.items.push(parse_quote! {
-                fn finalize(&self) -> Self::Finalize {
+                fn finalize(current: #maybe_varlena_target_path) -> Self::Finalize {
                     unimplemented!("Call to finalize on an aggregate which does not support it.")
                 }
             });
@@ -241,14 +270,14 @@ impl PgAggregate {
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case)]
                 #[pg_extern]
-                fn #fn_name(this: #target_ident) -> Vec<u8> {
+                fn #fn_name(this: #target_path) -> Vec<u8> {
                     this.serial()
                 }
             });
             Some(fn_name)
         } else {
             item_impl.items.push(parse_quote! {
-                fn serial(&self) -> Vec<u8> {
+                fn serial(current: #maybe_varlena_target_path) -> Vec<u8> {
                     unimplemented!("Call to serial on an aggregate which does not support it.")
                 }
             });
@@ -264,14 +293,14 @@ impl PgAggregate {
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case)]
                 #[pg_extern]
-                fn #fn_name(this: #target_ident, buf: Vec<u8>, internal: pgx::PgBox<#target_ident>) -> pgx::PgBox<#target_ident> {
+                fn #fn_name(this: #maybe_varlena_target_path, buf: Vec<u8>, internal: pgx::PgBox<#maybe_varlena_target_path>) -> pgx::PgBox<#maybe_varlena_target_path> {
                     this.deserial(buf, internal)
                 }
             });
             Some(fn_name)
         } else {
             item_impl.items.push(parse_quote! {
-                fn deserial(&self, _buf: Vec<u8>, _internal: pgx::PgBox<Self>) -> pgx::PgBox<Self> {
+                fn deserial(current: #maybe_varlena_target_path, _buf: Vec<u8>, _internal: pgx::PgBox<Self>) -> pgx::PgBox<Self> {
                     unimplemented!("Call to deserial on an aggregate which does not support it.")
                 }
             });
@@ -302,19 +331,19 @@ impl PgAggregate {
                 #[allow(non_snake_case)]
                 #[pg_extern]
                 fn #fn_name(
-                    mstate: <#target_ident as pgx::Aggregate>::MovingState,
+                    mstate: <#target_path as pgx::Aggregate>::MovingState,
                     #(#args_with_names),*
-                ) -> <#target_ident as pgx::Aggregate>::MovingState {
-                    <#target_ident as pgx::Aggregate>::moving_state(mstate, (#(#arg_names),*))
+                ) -> <#target_path as pgx::Aggregate>::MovingState {
+                    <#target_path as pgx::Aggregate>::moving_state(mstate, (#(#arg_names),*))
                 }
             });
             Some(fn_name)
         } else {
             item_impl.items.push(parse_quote! {
                 fn moving_state(
-                    _mstate: <#target_ident as pgx::Aggregate>::MovingState,
+                    _mstate: <#target_path as pgx::Aggregate>::MovingState,
                     _v: Self::Args
-                ) -> <#target_ident as pgx::Aggregate>::MovingState {
+                ) -> <#target_path as pgx::Aggregate>::MovingState {
                     unimplemented!("Call to moving_state on an aggregate which does not support it.")
                 }
             });
@@ -332,19 +361,19 @@ impl PgAggregate {
                 #[allow(non_snake_case)]
                 #[pg_extern]
                 fn #fn_name(
-                    mstate: <#target_ident as pgx::Aggregate>::MovingState,
-                    v: <#target_ident as pgx::Aggregate>::Args,
-                ) -> <#target_ident as pgx::Aggregate>::MovingState {
-                    <#target_ident as pgx::Aggregate>::moving_state(mstate, v)
+                    mstate: <#target_path as pgx::Aggregate>::MovingState,
+                    v: <#target_path as pgx::Aggregate>::Args,
+                ) -> <#target_path as pgx::Aggregate>::MovingState {
+                    <#target_path as pgx::Aggregate>::moving_state(mstate, v)
                 }
             });
             Some(fn_name)
         } else {
             item_impl.items.push(parse_quote! {
                 fn moving_state_inverse(
-                    _mstate: <#target_ident as pgx::Aggregate>::MovingState,
+                    _mstate: <#target_path as pgx::Aggregate>::MovingState,
                     _v: Self::Args,
-                ) -> <#target_ident as pgx::Aggregate>::MovingState {
+                ) -> <#target_path as pgx::Aggregate>::MovingState {
                     unimplemented!("Call to moving_state on an aggregate which does not support it.")
                 }
             });
@@ -360,8 +389,8 @@ impl PgAggregate {
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case)]
                 #[pg_extern]
-                fn #fn_name(mstate: <#target_ident as pgx::Aggregate>::MovingState) -> <#target_ident as pgx::Aggregate>::Finalize {
-                    <#target_ident as pgx::Aggregate>::moving_finalize(mstate)
+                fn #fn_name(mstate: <#target_path as pgx::Aggregate>::MovingState) -> <#target_path as pgx::Aggregate>::Finalize {
+                    <#target_path as pgx::Aggregate>::moving_finalize(mstate)
                 }
             });
             Some(fn_name)
@@ -428,7 +457,8 @@ impl PgAggregate {
     }
 
     fn entity_tokens(&self) -> ItemFn {
-        let target_ident = get_target_ident(&self.item_impl)
+        let target_path = get_target_path(&self.item_impl).expect("Expected constructed PgAggregate to have target path.");
+        let target_ident = get_target_ident(&target_path)
             .expect("Expected constructed PgAggregate to have target ident.");
         let snake_case_target_ident = Ident::new(
             &target_ident.to_string().to_case(Case::Snake),
@@ -537,11 +567,10 @@ impl ToTokens for PgAggregate {
     }
 }
 
-fn get_target_ident(item_impl: &ItemImpl) -> Result<Ident, syn::Error> {
-    let path = get_target_path(item_impl)?;
+fn get_target_ident(path: &Path) -> Result<Ident, syn::Error> {
     let last = path.segments.last().ok_or_else(|| {
         syn::Error::new(
-            item_impl.span(),
+            path.span(),
             "`#[pg_aggregate]` only works with types whose path have a final segment.",
         )
     })?;

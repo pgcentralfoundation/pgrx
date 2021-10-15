@@ -42,36 +42,37 @@ impl PgVarlenaInOutFuncs for IntegerAvgState {
 
 #[pg_aggregate]
 impl Aggregate for IntegerAvgState {
+    type State = PgVarlena<Self>;
     type Args = i32;
     const NAME: &'static str = "DEMOAVG";
 
-    fn state(&self, args: Self::Args) -> Self {
-        let new = Self {
-            sum: self.sum + args,
-            n: self.n + 1,
-        };
-        new
+    const INITIAL_CONDITION: Option<&'static str> = Some("0,0");
+
+    fn state(mut current: Self::State, arg: Self::Args) -> Self::State {
+        current.sum += arg;
+        current.n += 1;
+        current
     }
 
     // You can skip all these:
     type Finalize = i32;
-    // type OrderBy = i32;
-    // type MovingState = i32;
+    type OrderBy = i32;
+    type MovingState = i32;
 
     // const PARALLEL: Option<ParallelOption> = Some(ParallelOption::Safe);
     // const FINALIZE_MODIFY: Option<FinalizeModify> = Some(FinalizeModify::ReadWrite);
     // const MOVING_FINALIZE_MODIFY: Option<FinalizeModify> = Some(FinalizeModify::ReadWrite);
-    const INITIAL_CONDITION: Option<&'static str> = Some("0,0");
+
     // const SORT_OPERATOR: Option<&'static str> = Some("sortop");
     // const MOVING_INITIAL_CONDITION: Option<&'static str> = Some("1,1");
     // const HYPOTHETICAL: bool = true;
 
     // // You can skip all these:
-    fn finalize(&self) -> Self::Finalize {
-        self.sum / self.n
-    }
+    // fn finalize(current: Self::State) -> Self::Finalize {
+    //     current.sum / current.n
+    // }
 
-    // fn combine(&self, _other: Self) -> Self {
+    // fn combine(current: Self::State, _other: Self::State) -> Self::State {
     //     unimplemented!("pgx stub, define in impls")
     // }
 
@@ -102,13 +103,13 @@ mod tests {
 
     #[pg_test]
     fn test_integer_avg_state() {
+        let avg_state = PgVarlena::<IntegerAvgState>::default();
+        let avg_state = IntegerAvgState::state(avg_state, 1);
+        let avg_state = IntegerAvgState::state(avg_state, 2);
+        let avg_state = IntegerAvgState::state(avg_state, 3);
         assert_eq!(
             2,
-            IntegerAvgState::default()
-                .state(1)
-                .state(2)
-                .state(3)
-                .finalize()
+            IntegerAvgState::finalize(avg_state)
         );
     }
 

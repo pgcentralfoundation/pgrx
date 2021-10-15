@@ -240,6 +240,17 @@ where
     }
 }
 
+impl<T> Default for PgVarlena<T>
+where
+    T: Default + Copy,
+{
+    fn default() -> Self {
+        let mut ptr = Self::new();
+        *ptr = T::default();
+        ptr
+    }
+}
+
 /// Does a copy-on-write if the backing varlena pointer is borrowed
 impl<T> AsMut<T> for PgVarlena<T>
 where
