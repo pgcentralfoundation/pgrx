@@ -56,8 +56,8 @@ impl Aggregate for IntegerAvgState {
 
     // You can skip all these:
     type Finalize = i32;
-    type OrderBy = i32;
-    type MovingState = i32;
+    // type OrderBy = i32;
+    // type MovingState = i32;
 
     // const PARALLEL: Option<ParallelOption> = Some(ParallelOption::Safe);
     // const FINALIZE_MODIFY: Option<FinalizeModify> = Some(FinalizeModify::ReadWrite);
@@ -67,10 +67,10 @@ impl Aggregate for IntegerAvgState {
     // const MOVING_INITIAL_CONDITION: Option<&'static str> = Some("1,1");
     // const HYPOTHETICAL: bool = true;
 
-    // // You can skip all these:
-    // fn finalize(current: Self::State) -> Self::Finalize {
-    //     current.sum / current.n
-    // }
+    // You can skip all these:
+    fn finalize(current: Self::State) -> Self::Finalize {
+        current.sum / current.n
+    }
 
     // fn combine(current: Self::State, _other: Self::State) -> Self::State {
     //     unimplemented!("pgx stub, define in impls")
