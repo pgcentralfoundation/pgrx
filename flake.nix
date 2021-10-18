@@ -2,11 +2,14 @@
   description = "Postgres extensions in Rust.";
 
   inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    rust-overlay.url = "github:oxalica/rust-overlay";
+    rust-overlay.inputs.nixpkgs.follows = "nixpkgs";
     naersk.url = "github:nix-community/naersk";
-    nixpkgs.url = "github:NixOS/nixpkgs";
+    naersk.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, naersk }:
+  outputs = { self, nixpkgs, rust-overlay, naersk }:
     let
       supportedSystems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
       forAllSystems = f: nixpkgs.lib.genAttrs supportedSystems (system: f system);
@@ -14,14 +17,32 @@
     {
       defaultPackage = forAllSystems (system: (import nixpkgs {
         inherit system;
-        overlays = [ self.overlay ];
+        overlays = [
+          self.overlay
+          rust-overlay.overlay
+          (self: super:
+            {
+              rustc = self.rust-bin.stable.latest.rustc;
+              cargo = self.rust-bin.stable.latest.cargo;
+            }
+          )
+        ];
       }).cargo-pgx);
 
       packages = forAllSystems (system:
         let
           pkgs = import nixpkgs {
             inherit system;
-            overlays = [ self.overlay ];
+                        overlays = [
+              self.overlay
+              rust-overlay.overlay
+              (self: super:
+                {
+                  rustc = self.rust-bin.stable.latest.rustc;
+                  cargo = self.rust-bin.stable.latest.cargo;
+                }
+              )
+            ];
           };
         in
         {
@@ -36,7 +57,16 @@
         let
           pkgs = import nixpkgs {
             inherit system;
-            overlays = [ self.overlay ];
+            overlays = [
+              self.overlay
+              rust-overlay.overlay
+              (self: super:
+                {
+                  rustc = self.rust-bin.stable.latest.rustc;
+                  cargo = self.rust-bin.stable.latest.cargo;
+                }
+              )
+            ];
           };
         in
         pkgs.mkShell {
@@ -50,7 +80,12 @@
             rustfmt
             nixpkgs-fmt
             cargo-pgx
+            rust-bin.stable.latest.minimal
+            rust-bin.stable.latest.rustfmt
+            rust-bin.stable.latest.clippy
             postgresql
+            libiconv
+            pkg-config
           ];
           LIBCLANG_PATH = "${pkgs.llvmPackages.libclang.lib}/lib";
           PGX_PG_SYS_SKIP_BINDING_REWRITE = "1";
@@ -60,7 +95,16 @@
         let
           pkgs = import nixpkgs {
             inherit system;
-            overlays = [ self.overlay ];
+            overlays = [
+              self.overlay
+              rust-overlay.overlay
+              (self: super:
+                {
+                  rustc = self.rust-bin.stable.latest.rustc;
+                  cargo = self.rust-bin.stable.latest.cargo;
+                }
+              )
+            ];
           };
         in
         {
