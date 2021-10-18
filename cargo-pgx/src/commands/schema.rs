@@ -69,10 +69,7 @@ pub(crate) fn generate_schema(
             expected_linker_script.to_string(),
             force_default,
         )?;
-        check_permissions(".cargo/pgx-linker-script.sh",
-            0o755,
-            force_default,
-        )?;
+        check_permissions(".cargo/pgx-linker-script.sh", 0o755, force_default)?;
         let expected_cargo_config = include_str!("../templates/cargo_config");
         check_templated_file(
             ".cargo/config",
@@ -244,10 +241,7 @@ pub(crate) fn generate_schema(
 
     let command = command.stdout(Stdio::inherit()).stderr(Stdio::inherit());
     let command_str = format!("{:?}", command);
-    println!(
-        "running SQL generator\n{}",
-        command_str
-    );
+    println!("running SQL generator\n{}", command_str);
     let status = handle_result!(
         command.status(),
         format!("failed to spawn sql-generator: {}", command_str)
@@ -333,10 +327,7 @@ fn check_permissions(
     if metadata.mode() == expected_mode {
         Ok(false)
     } else if overwrite {
-        std::fs::set_permissions(
-            &path,
-            std::fs::Permissions::from_mode(expected_mode),
-        )?;
+        std::fs::set_permissions(&path, std::fs::Permissions::from_mode(expected_mode))?;
         Ok(true)
     } else {
         Ok(false)

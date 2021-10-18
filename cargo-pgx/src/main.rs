@@ -278,7 +278,8 @@ fn do_it() -> std::result::Result<(), std::io::Error> {
                 let skip_build = schema.is_present("skip-build");
 
                 schema::generate_schema(
-                    &pg_config, is_release, &features, &out, dot, log_level, default, manual, skip_build,
+                    &pg_config, is_release, &features, &out, dot, log_level, default, manual,
+                    skip_build,
                 )
             }
             ("get", Some(get)) => {
