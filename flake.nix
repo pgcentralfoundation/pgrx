@@ -33,7 +33,7 @@
         let
           pkgs = import nixpkgs {
             inherit system;
-                        overlays = [
+            overlays = [
               self.overlay
               rust-overlay.overlay
               (self: super:
@@ -75,6 +75,7 @@
             postgresql_11
             postgresql_12
             postgresql_13
+            postgresql_14
           ];
           buildInputs = with pkgs; [
             rustfmt
