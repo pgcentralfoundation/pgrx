@@ -16,13 +16,14 @@ pg14 = ["pgx/pg14", "pgx-tests/pg14" ]
 pg_test = []
 
 [dependencies]
-pgx = "0.1.22"
-pgx-macros = "0.1.22"
+pgx = { git = "https://github.com/zombodb/pgx", branch = "use-oxalica-rust", version = "0.2.0-beta.1" }
+pgx-macros = { git = "https://github.com/zombodb/pgx", branch = "use-oxalica-rust", version = "0.2.0-beta.1" }
+pgx-utils = { git = "https://github.com/zombodb/pgx", branch = "use-oxalica-rust", version = "0.2.0-beta.1" }
 
 [dev-dependencies]
-pgx-tests = "0.1.22"
+pgx-tests = { git = "https://github.com/zombodb/pgx", branch = "use-oxalica-rust", version = "0.2.0-beta.1" }
 tempdir = "0.3.7"
-once_cell = "1.7.2"
+once_cell = "1.8.0"
 
 [profile.dev]
 panic = "unwind"

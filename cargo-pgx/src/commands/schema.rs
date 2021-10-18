@@ -5,6 +5,7 @@ use pgx_utils::pg_config::PgConfig;
 use pgx_utils::{exit_with_error, handle_result};
 use std::collections::HashSet;
 use std::fs::File;
+use std::os::unix::prelude::MetadataExt;
 use std::os::unix::prelude::PermissionsExt;
 use std::{
     io::{Read, Write},
@@ -25,6 +26,7 @@ pub(crate) fn generate_schema(
     log_level: Option<String>,
     force_default: bool,
     manual: bool,
+    skip_build: bool,
 ) -> Result<(), std::io::Error> {
     let (control_file, _extname) = find_control_file();
     let major_version = pg_config.major_version()?;
@@ -67,11 +69,10 @@ pub(crate) fn generate_schema(
             expected_linker_script.to_string(),
             force_default,
         )?;
-        std::fs::set_permissions(
-            ".cargo/pgx-linker-script.sh",
-            std::fs::Permissions::from_mode(0o755),
-        )
-        .unwrap();
+        check_permissions(".cargo/pgx-linker-script.sh",
+            0o755,
+            force_default,
+        )?;
         let expected_cargo_config = include_str!("../templates/cargo_config");
         check_templated_file(
             ".cargo/config",
@@ -97,41 +98,43 @@ pub(crate) fn generate_schema(
         features = additional_features
     }
 
-    // First, build the SQL generator so we can get a look at the symbol table
-    let mut command = Command::new("cargo");
-    command.args(&["build", "--bin", "sql-generator"]);
-    if is_release {
-        command.arg("--release");
-    }
+    if !skip_build {
+        // First, build the SQL generator so we can get a look at the symbol table
+        let mut command = Command::new("cargo");
+        command.args(&["build", "--bin", "sql-generator"]);
+        if is_release {
+            command.arg("--release");
+        }
 
-    if let Some(log_level) = &log_level {
-        command.env("RUST_LOG", log_level);
-    }
+        if let Some(log_level) = &log_level {
+            command.env("RUST_LOG", log_level);
+        }
 
-    if !features.trim().is_empty() {
-        command.arg("--features");
-        command.arg(&features);
-        command.arg("--no-default-features");
-    }
+        if !features.trim().is_empty() {
+            command.arg("--features");
+            command.arg(&features);
+            command.arg("--no-default-features");
+        }
 
-    for arg in flags.split_ascii_whitespace() {
-        command.arg(arg);
-    }
+        for arg in flags.split_ascii_whitespace() {
+            command.arg(arg);
+        }
 
-    let command = command.stdout(Stdio::inherit()).stderr(Stdio::inherit());
-    let command_str = format!("{:?}", command);
-    println!(
-        "{} SQL generator with features `{}`\n{}",
-        "    Building".bold().green(),
-        features,
-        command_str
-    );
-    let status = handle_result!(
-        command.status(),
-        format!("failed to spawn cargo: {}", command_str)
-    );
-    if !status.success() {
-        exit_with_error!("failed to build SQL generator");
+        let command = command.stdout(Stdio::inherit()).stderr(Stdio::inherit());
+        let command_str = format!("{:?}", command);
+        println!(
+            "{} SQL generator with features `{}`\n{}",
+            "    Building".bold().green(),
+            features,
+            command_str
+        );
+        let status = handle_result!(
+            command.status(),
+            format!("failed to spawn cargo: {}", command_str)
+        );
+        if !status.success() {
+            exit_with_error!("failed to build SQL generator");
+        }
     }
 
     // Inspect the symbol table for a list of `__pgx_internals` we should have the generator call
@@ -219,29 +222,11 @@ pub(crate) fn generate_schema(
     );
 
     // Now run the generator with the correct symbol table
-    let mut command = Command::new("cargo");
-    command.args(&["run", "--bin", "sql-generator"]);
-    if is_release {
-        command.arg("--release");
-    }
-
-    if let Some(log_level) = &log_level {
-        command.env("RUST_LOG", log_level);
-    }
-
-    if !features.trim().is_empty() {
-        command.arg("--features");
-        command.arg(&features);
-        command.arg("--no-default-features");
-    }
-
-    for arg in flags.split_ascii_whitespace() {
-        command.arg(arg);
-    }
+    let mut command = Command::new(sql_gen_path);
 
     let path = path.as_ref();
     let _ = path.parent().map(|p| std::fs::create_dir_all(&p).unwrap());
-    command.arg("--");
+
     command.arg("--sql");
     command.arg(path);
     if let Some(dot) = dot {
@@ -260,12 +245,12 @@ pub(crate) fn generate_schema(
     let command = command.stdout(Stdio::inherit()).stderr(Stdio::inherit());
     let command_str = format!("{:?}", command);
     println!(
-        "running SQL generator with features `{}`\n{}",
-        features, command_str
+        "running SQL generator\n{}",
+        command_str
     );
     let status = handle_result!(
         command.status(),
-        format!("failed to spawn cargo: {}", command_str)
+        format!("failed to spawn sql-generator: {}", command_str)
     );
     if !status.success() {
         exit_with_error!("failed to run SQL generator");
@@ -334,5 +319,26 @@ fn check_templated_file(
             fd.write_all(expected_content.as_bytes())?;
             Ok(true)
         }
+    }
+}
+
+/// Returns Ok(true) if permissions where changed.
+fn check_permissions(
+    path: impl AsRef<Path>,
+    expected_mode: u32,
+    overwrite: bool,
+) -> Result<bool, std::io::Error> {
+    let file = File::open(&path)?;
+    let metadata = file.metadata()?;
+    if metadata.mode() == expected_mode {
+        Ok(false)
+    } else if overwrite {
+        std::fs::set_permissions(
+            &path,
+            std::fs::Permissions::from_mode(expected_mode),
+        )?;
+        Ok(true)
+    } else {
+        Ok(false)
     }
 }

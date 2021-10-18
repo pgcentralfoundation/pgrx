@@ -10,6 +10,7 @@
 , postgresql_11
 , postgresql_12
 , postgresql_13
+, postgresql_14
 , pkg-config
 , openssl
 , libiconv
@@ -26,6 +27,7 @@ let
     else if (pgxPostgresVersion == 11) then postgresql_11
     else if (pgxPostgresVersion == 12) then postgresql_12
     else if (pgxPostgresVersion == 13) then postgresql_13
+    else if (pgxPostgresVersion == 14) then postgresql_14
     else null;
   pgxPostgresVersionString = builtins.toString pgxPostgresVersion;
   cargoToml = (builtins.fromTOML (builtins.readFile ./Cargo.toml));
@@ -39,7 +41,7 @@ naersk.lib."${targetPlatform.system}".buildPackage rec {
 
   inputsFrom = [ postgresql_10 postgresql_11 postgresql_12 postgresql_13 cargo-pgx ];
 
-  LIBCLANG_PATH = "${llvmPackages.libclang}/lib";
+  LIBCLANG_PATH = "${llvmPackages.libclang.lib}/lib";
   buildInputs = [
     rustfmt
     cargo-pgx
@@ -47,32 +49,41 @@ naersk.lib."${targetPlatform.system}".buildPackage rec {
     cargo
     rustc
     libiconv
+    pgxPostgresPkg
   ];
   checkInputs = [ cargo-pgx cargo rustc ];
   doCheck = true;
 
   preConfigure = ''
-    mkdir -p $out/.pgx/{10,11,12,13}
+    mkdir -p $out/.pgx/{10,11,12,13,14}
     export PGX_HOME=$out/.pgx
 
     cp -r -L ${postgresql_10}/. $out/.pgx/10/
     chmod -R ugo+w $out/.pgx/10
     cp -r -L ${postgresql_10.lib}/lib/. $out/.pgx/10/lib/
+    
     cp -r -L ${postgresql_11}/. $out/.pgx/11/
     chmod -R ugo+w $out/.pgx/11
     cp -r -L ${postgresql_11.lib}/lib/. $out/.pgx/11/lib/
+    
     cp -r -L ${postgresql_12}/. $out/.pgx/12/
     chmod -R ugo+w $out/.pgx/12
     cp -r -L ${postgresql_12.lib}/lib/. $out/.pgx/12/lib/
+    
     cp -r -L ${postgresql_13}/. $out/.pgx/13/
     chmod -R ugo+w $out/.pgx/13
     cp -r -L ${postgresql_13.lib}/lib/. $out/.pgx/13/lib/
+
+    cp -r -L ${postgresql_14}/. $out/.pgx/14/
+    chmod -R ugo+w $out/.pgx/14
+    cp -r -L ${postgresql_14.lib}/lib/. $out/.pgx/14/lib/
 
     ${cargo-pgx}/bin/cargo-pgx pgx init \
       --pg10 $out/.pgx/10/bin/pg_config \
       --pg11 $out/.pgx/11/bin/pg_config \
       --pg12 $out/.pgx/12/bin/pg_config \
-      --pg13 $out/.pgx/13/bin/pg_config
+      --pg13 $out/.pgx/13/bin/pg_config \
+      --pg14 $out/.pgx/14/bin/pg_config
     
     # This is primarily for Mac or other Nix systems that don't use the nixbld user.
     export USER=$(whoami)
@@ -99,10 +110,9 @@ naersk.lib."${targetPlatform.system}".buildPackage rec {
     export PGX_HOME=$out/.pgx
     export NIX_PGLIBDIR=$out/.pgx/${pgxPostgresVersionString}/lib
   '';
-  preBuild = ''
+  postBuild = ''
     export PGX_HOME=$out/.pgx
-    ${cargo-pgx}/bin/cargo-pgx pgx schema
-    ls -lah ./sql
+    ${cargo-pgx}/bin/cargo-pgx pgx schema --skip-build
     cp -v ./sql/* $out/
     rm -v $out/load-order.txt
     cp -v ./${cargoToml.package.name}.control $out/${cargoToml.package.name}.control

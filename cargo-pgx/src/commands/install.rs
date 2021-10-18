@@ -147,6 +147,7 @@ fn copy_sql_files(
         None,
         false,
         true,
+        true,
     )?;
     let written = std::fs::read_to_string(&dest).unwrap();
     let written = filter_contents(written);

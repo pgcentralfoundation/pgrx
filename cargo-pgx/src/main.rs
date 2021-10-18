@@ -275,9 +275,10 @@ fn do_it() -> std::result::Result<(), std::io::Error> {
 
                 let default = schema.is_present("force-default");
                 let manual = schema.is_present("manual");
+                let skip_build = schema.is_present("skip-build");
 
                 schema::generate_schema(
-                    &pg_config, is_release, &features, &out, dot, log_level, default, manual,
+                    &pg_config, is_release, &features, &out, dot, log_level, default, manual, skip_build,
                 )
             }
             ("get", Some(get)) => {

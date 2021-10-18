@@ -123,6 +123,9 @@ subcommands:
                     short: m
                     long: manual
                     help: Skip checking for required files
+                - skip-build:
+                    long: skip-build
+                    help: Skip building the `sql-generator`, use an existing build.
                 - force-default:
                     short: f
                     long: force-default
