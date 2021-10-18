@@ -24,6 +24,7 @@
             {
               rustc = self.rust-bin.stable.latest.rustc;
               cargo = self.rust-bin.stable.latest.cargo;
+              rustdoc = self.rust-bin.stable.latest.rustdoc;
             }
           )
         ];
@@ -40,6 +41,7 @@
                 {
                   rustc = self.rust-bin.stable.latest.rustc;
                   cargo = self.rust-bin.stable.latest.cargo;
+                  rustdoc = self.rust-bin.stable.latest.rustdoc;
                 }
               )
             ];
@@ -64,6 +66,7 @@
                 {
                   rustc = self.rust-bin.stable.latest.rustc;
                   cargo = self.rust-bin.stable.latest.cargo;
+                  rustdoc = self.rust-bin.stable.latest.rustdoc;
                 }
               )
             ];
@@ -103,6 +106,7 @@
                 {
                   rustc = self.rust-bin.stable.latest.rustc;
                   cargo = self.rust-bin.stable.latest.cargo;
+                  rustdoc = self.rust-bin.stable.latest.rustdoc;
                 }
               )
             ];

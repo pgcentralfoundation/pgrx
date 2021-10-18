@@ -56,6 +56,7 @@
             cp -r ${pkgs."${cargoToml.package.name}_11"} $out/${cargoToml.package.name}_11
             cp -r ${pkgs."${cargoToml.package.name}_12"} $out/${cargoToml.package.name}_12
             cp -r ${pkgs."${cargoToml.package.name}_13"} $out/${cargoToml.package.name}_13
+            cp -r ${pkgs."${cargoToml.package.name}_14"} $out/${cargoToml.package.name}_14
           '';
         });
 

@@ -44,16 +44,17 @@ naersk.lib."${targetPlatform.system}".buildPackage rec {
   LIBCLANG_PATH = "${llvmPackages.libclang.lib}/lib";
   buildInputs = [
     rustfmt
-    cargo-pgx
-    pkg-config
     cargo
     rustc
+    cargo-pgx
+    pkg-config
     libiconv
     pgxPostgresPkg
   ];
   checkInputs = [ cargo-pgx cargo rustc ];
   doCheck = true;
 
+  postPatch = "patchShebangs .";
   preConfigure = ''
     mkdir -p $out/.pgx/{10,11,12,13,14}
     export PGX_HOME=$out/.pgx
@@ -112,7 +113,7 @@ naersk.lib."${targetPlatform.system}".buildPackage rec {
   '';
   postBuild = ''
     export PGX_HOME=$out/.pgx
-    ${cargo-pgx}/bin/cargo-pgx pgx schema --skip-build
+    ${cargo-pgx}/bin/cargo-pgx pgx schema --skip-build --release
     cp -v ./sql/* $out/
     rm -v $out/load-order.txt
     cp -v ./${cargoToml.package.name}.control $out/${cargoToml.package.name}.control
@@ -129,7 +130,8 @@ naersk.lib."${targetPlatform.system}".buildPackage rec {
   singleStep = true;
 
   cargoBuildOptions = default: default ++ [ "--no-default-features" "--features \"pg${pgxPostgresVersionString}\"" ];
-  cargoTestOptions = default: default ++ [ "--no-default-features" "--features \"pg_test pg${pgxPostgresVersionString}\"" ];
+  cargoTestOptions = default: default ++ [ "--no-default-features" "--features \"pg_test pg${pgxPostgresVersionString}\" --lib" ];
+  doDoc = false;
   copyLibs = true;
 
   meta = with lib; {
