@@ -438,7 +438,7 @@ macro_rules! pg_binary_magic {
                 for symbol_to_call in symbols_to_call {
                     let symbol: libloading::os::unix::Symbol<
                         unsafe extern fn() -> SqlGraphEntity
-                    > = lib.get(symbol_to_call.as_bytes()).expect(&format!("Couldn't call {:?}", symbol_to_call));
+                    > = lib.get(symbol_to_call.as_bytes()).expect(&format!("Couldn't call {:#?}", symbol_to_call));
                     let entity = symbol();
                     entities.push(entity);
                 }
