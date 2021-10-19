@@ -222,19 +222,9 @@ pub fn pg_func_extra<ReturnType, DefaultValue: FnOnce() -> ReturnType>(
     PgBox::from_pg(flinfo.fn_extra as *mut ReturnType)
 }
 
-/// As `#[pg_extern]` functions are wrapped with a different signature, this
-/// allows you to directly call them.
-///
 /// This mimics the functionality of Postgres' `DirectFunctionCall` macros, allowing you to call
-/// Rust-defined functions.  Unlike Postgres' macros, the directly called function is allowed to
-/// return a NULL datum.
-///
-/// You'll just need to account for that when using `.try_into()` to convert the datum into a rust
-/// type.
-///
-/// ## Note
-///
-/// You must suffix the function name with `_wrapper`, as shown in the example below.
+/// internal Postgres functions using its "V1" calling convention.  Unlike the Postgres' C macros,
+/// the function is allowed to return a NULL datum.
 ///
 /// ## Safety
 ///
@@ -243,20 +233,21 @@ pub fn pg_func_extra<ReturnType, DefaultValue: FnOnce() -> ReturnType>(
 /// ## Examples
 /// ```rust,no_run
 /// use pgx::*;
-///
-/// #[pg_extern]
-/// fn add_two_numbers(a: i32, b: i32) -> i32 {
-///    a + b
-/// }
+/// use std::ffi::CString;
 ///
 /// fn some_func() {
-///     let result = unsafe { direct_function_call::<i32>(add_two_numbers_wrapper, vec!(2.into_datum(), 3.into_datum())) };
-///     let sum = result.expect("function returned null");
-///     assert_eq!(sum, 5);
+///     let result = unsafe {
+///         direct_function_call::<pg_sys::Oid>(
+///             pg_sys::regclassin,
+///             vec![ CString::new("pg_class").unwrap().as_c_str().into_datum()]
+///         )
+///     };
+///     let oid = result.expect("failed to lookup oid for pg_class");
+///     assert_eq!(oid, 1259);  // your value could be different, maybe
 /// }
 /// ```
 pub unsafe fn direct_function_call<R: FromDatum>(
-    func: unsafe extern "C" fn(pg_sys::FunctionCallInfo) -> pg_sys::Datum,
+    func: unsafe fn(pg_sys::FunctionCallInfo) -> pg_sys::Datum,
     args: Vec<Option<pg_sys::Datum>>,
 ) -> Option<R> {
     let datum = direct_function_call_as_datum(func, args);
@@ -266,9 +257,88 @@ pub unsafe fn direct_function_call<R: FromDatum>(
     }
 }
 
+/// Akin to [direct_function_call], but specifically for calling those functions declared with the
+/// `#[pg_extern]` attribute.
+///
+/// When using this, you'll want to suffix the function you want to call with `_wrapper`.
+///
+/// ## Example
+///
+/// ```rust,no_run
+/// use pgx::*;
+///
+/// #[pg_extern]
+/// fn add_numbers(a: i32, b: i32) -> i32 {
+///     a + b
+/// }
+///
+/// /* NOTE:  _wrapper suffix! */
+/// let result = unsafe {
+///     direct_pg_extern_function_call::<i32>(add_numbers_wrapper, vec![1_i32.into_datum(), 2_i32.into_datum()])
+/// };
+/// let sum = result.expect("add_numbers_wrapper returned NULL");
+/// assert_eq!(3, sum);
+/// ```
+///
+/// ## Safety
+///
+/// This function is unsafe as the function you're calling is also unsafe
+pub unsafe fn direct_pg_extern_function_call<R: FromDatum>(
+    func: unsafe extern "C" fn(pg_sys::FunctionCallInfo) -> pg_sys::Datum,
+    args: Vec<Option<pg_sys::Datum>>,
+) -> Option<R> {
+    let datum = direct_pg_extern_function_call_as_datum(func, args);
+    match datum {
+        Some(datum) => R::from_datum(datum, false, pg_sys::InvalidOid),
+        None => None,
+    }
+}
+
 /// Same as [direct_function_call] but instead returns the direct `Option<pg_sys::Datum>` instead
 /// of converting it to a value
-pub fn direct_function_call_as_datum(
+///
+/// ## Safety
+///
+/// This function is unsafe as the function you're calling is also unsafe
+pub unsafe fn direct_function_call_as_datum(
+    func: unsafe fn(pg_sys::FunctionCallInfo) -> pg_sys::Datum,
+    args: Vec<Option<pg_sys::Datum>>,
+) -> Option<pg_sys::Datum> {
+    let mut null_array = [false; 100usize];
+    let mut arg_array = [0 as pg_sys::Datum; 100usize];
+    let nargs = args.len();
+
+    for (i, datum) in args.into_iter().enumerate() {
+        match datum {
+            Some(datum) => {
+                null_array[i] = false;
+                arg_array[i] = datum;
+            }
+
+            None => {
+                null_array[i] = true;
+                arg_array[i] = 0;
+            }
+        }
+    }
+
+    let mut fcid = make_function_call_info(nargs, arg_array, null_array);
+    let datum = func(fcid.deref_mut());
+
+    if fcid.isnull {
+        None
+    } else {
+        Some(datum)
+    }
+}
+
+/// Same as [direct_pg_extern_function_call] but instead returns the direct `Option<pg_sys::Datum>` instead
+/// of converting it to a value
+///
+/// ## Safety
+///
+/// This function is unsafe as the function you're calling is also unsafe
+pub unsafe fn direct_pg_extern_function_call_as_datum(
     func: unsafe extern "C" fn(pg_sys::FunctionCallInfo) -> pg_sys::Datum,
     args: Vec<Option<pg_sys::Datum>>,
 ) -> Option<pg_sys::Datum> {
@@ -291,7 +361,7 @@ pub fn direct_function_call_as_datum(
     }
 
     let mut fcid = make_function_call_info(nargs, arg_array, null_array);
-    let datum = unsafe { func(fcid.deref_mut()) };
+    let datum = func(fcid.deref_mut());
 
     if fcid.isnull {
         None

@@ -166,14 +166,17 @@ impl IntoDatum for Numeric {
         let cstring =
             std::ffi::CString::new(self.0).expect("failed to convert numeric string into CString");
         let cstr = cstring.as_c_str();
-        direct_function_call_as_datum(
-            pg_sys::numeric_in,
-            vec![
-                cstr.into_datum(),
-                pg_sys::InvalidOid.into_datum(),
-                0i32.into_datum(),
-            ],
-        )
+
+        unsafe {
+            direct_function_call_as_datum(
+                pg_sys::numeric_in,
+                vec![
+                    cstr.into_datum(),
+                    pg_sys::InvalidOid.into_datum(),
+                    0i32.into_datum(),
+                ],
+            )
+        }
     }
 
     fn type_oid() -> u32 {
