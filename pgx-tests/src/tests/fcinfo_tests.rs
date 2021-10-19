@@ -118,8 +118,10 @@ mod tests {
     #[pg_test]
     unsafe fn test_takes_i16() {
         let input = 42i16;
-        let result =
-            direct_function_call::<i16>(super::takes_i16_wrapper, vec![input.into_datum()]);
+        let result = direct_pg_extern_function_call::<i16>(
+            super::takes_i16_wrapper,
+            vec![input.into_datum()],
+        );
         let result = result.expect("result is NULL");
         assert_eq!(result, input);
     }
@@ -127,8 +129,10 @@ mod tests {
     #[pg_test]
     unsafe fn test_takes_i32() {
         let input = 42i32;
-        let result =
-            direct_function_call::<i32>(super::takes_i32_wrapper, vec![input.into_datum()]);
+        let result = direct_pg_extern_function_call::<i32>(
+            super::takes_i32_wrapper,
+            vec![input.into_datum()],
+        );
         let result = result.expect("result is NULL");
         assert_eq!(result, input);
     }
@@ -136,8 +140,10 @@ mod tests {
     #[pg_test]
     unsafe fn test_takes_i64() {
         let input = 42i64;
-        let result =
-            direct_function_call::<i64>(super::takes_i64_wrapper, vec![input.into_datum()]);
+        let result = direct_pg_extern_function_call::<i64>(
+            super::takes_i64_wrapper,
+            vec![input.into_datum()],
+        );
         let result = result.expect("result is NULL");
         assert_eq!(result, input);
     }
@@ -145,8 +151,10 @@ mod tests {
     #[pg_test]
     unsafe fn test_takes_bool() {
         let input = true;
-        let result =
-            direct_function_call::<bool>(super::takes_bool_wrapper, vec![input.into_datum()]);
+        let result = direct_pg_extern_function_call::<bool>(
+            super::takes_bool_wrapper,
+            vec![input.into_datum()],
+        );
         let result = result.expect("result is NULL");
         assert_eq!(result, input);
     }
@@ -154,8 +162,10 @@ mod tests {
     #[pg_test]
     unsafe fn test_takes_f32() {
         let input = 42.424_244;
-        let result =
-            direct_function_call::<f32>(super::takes_f32_wrapper, vec![input.into_datum()]);
+        let result = direct_pg_extern_function_call::<f32>(
+            super::takes_f32_wrapper,
+            vec![input.into_datum()],
+        );
         let result = result.expect("result is NULL");
         assert!(result.eq(&input));
     }
@@ -163,8 +173,10 @@ mod tests {
     #[pg_test]
     unsafe fn test_takes_f64() {
         let input = 42.424_242_424_242f64;
-        let result =
-            direct_function_call::<f64>(super::takes_f64_wrapper, vec![input.into_datum()]);
+        let result = direct_pg_extern_function_call::<f64>(
+            super::takes_f64_wrapper,
+            vec![input.into_datum()],
+        );
         let result = result.expect("result is NULL");
         assert!(result.eq(&input));
     }
@@ -183,15 +195,17 @@ mod tests {
 
     #[pg_test]
     unsafe fn test_takes_option_with_null_arg() {
-        let result = direct_function_call::<i32>(super::takes_option_wrapper, vec![None]);
+        let result = direct_pg_extern_function_call::<i32>(super::takes_option_wrapper, vec![None]);
         assert_eq!(-1, result.expect("result is NULL"))
     }
 
     #[pg_test]
     unsafe fn test_takes_option_with_non_null_arg() {
         let input = 42i32;
-        let result =
-            direct_function_call::<i32>(super::takes_option_wrapper, vec![input.into_datum()]);
+        let result = direct_pg_extern_function_call::<i32>(
+            super::takes_option_wrapper,
+            vec![input.into_datum()],
+        );
         let result = result.expect("result is NULL");
         assert_eq!(result, input);
     }
@@ -199,8 +213,10 @@ mod tests {
     #[pg_test]
     unsafe fn test_takes_str() {
         let input = "this is a test";
-        let result =
-            direct_function_call::<&str>(super::takes_str_wrapper, vec![input.into_datum()]);
+        let result = direct_pg_extern_function_call::<&str>(
+            super::takes_str_wrapper,
+            vec![input.into_datum()],
+        );
         let result = result.expect("result is NULL");
         assert_eq!(result, input);
     }
@@ -208,7 +224,7 @@ mod tests {
     #[pg_test]
     unsafe fn test_takes_string() {
         let input = "this is a test".to_string();
-        let result = direct_function_call::<String>(
+        let result = direct_pg_extern_function_call::<String>(
             super::takes_str_wrapper,
             vec![input.clone().into_datum()],
         );
@@ -218,13 +234,13 @@ mod tests {
 
     #[pg_test]
     unsafe fn test_returns_some() {
-        let result = direct_function_call::<i32>(super::returns_some_wrapper, vec![]);
+        let result = direct_pg_extern_function_call::<i32>(super::returns_some_wrapper, vec![]);
         assert!(result.is_some());
     }
 
     #[pg_test]
     unsafe fn test_returns_none() {
-        let result = direct_function_call::<i32>(super::returns_none_wrapper, vec![]);
+        let result = direct_pg_extern_function_call::<i32>(super::returns_none_wrapper, vec![]);
         assert!(result.is_none())
     }
 
