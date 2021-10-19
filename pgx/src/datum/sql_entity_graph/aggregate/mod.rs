@@ -6,11 +6,8 @@ pub use entity::PgAggregateEntity;
 pub use finalize_modify::FinalizeModify;
 pub use parallel_option::ParallelOption;
 
-use crate::{
-    sql_entity_graph::PgxSql,
-    PgBox,
-};
-use std::{any::TypeId};
+use crate::{sql_entity_graph::PgxSql, PgBox};
+use std::any::TypeId;
 
 pub trait Aggregate
 where
@@ -20,10 +17,10 @@ where
     ///
     /// For an aggregate type which does not have a `PgVarlenaInOutFuncs` implementation,
     /// this can be left out, or set to it's default, `Self`.
-    /// 
+    ///
     /// For an aggregate type which **does** have a `PgVarlenaInOutFuncs` implementation,
     /// this should be set to `PgVarlena<Self>`.
-    /// 
+    ///
     /// Other types are not supported.
     type State;
 

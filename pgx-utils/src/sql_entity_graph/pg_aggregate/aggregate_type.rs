@@ -1,7 +1,9 @@
 use proc_macro2::TokenStream as TokenStream2;
 use quote::ToTokens;
-use syn::{Expr, Type, parse::{Parse, ParseStream}, parse_quote};
-
+use syn::{
+    parse::{Parse, ParseStream},
+    parse_quote, Expr, Type,
+};
 
 #[derive(Debug, Clone)]
 pub(crate) struct AggregateTypeList {

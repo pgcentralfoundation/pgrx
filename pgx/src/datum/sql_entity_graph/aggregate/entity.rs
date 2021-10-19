@@ -1,6 +1,6 @@
-use crate::sql_entity_graph::{ToSql, SqlGraphIdentifier, SqlGraphEntity};
-use super::{AggregateType, FinalizeModify, ParallelOption, MaybeVariadicAggregateType};
-use core::{cmp::Ordering, any::TypeId};
+use super::{AggregateType, FinalizeModify, MaybeVariadicAggregateType, ParallelOption};
+use crate::sql_entity_graph::{SqlGraphEntity, SqlGraphIdentifier, ToSql};
+use core::{any::TypeId, cmp::Ordering};
 use eyre::eyre as eyre_err;
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]

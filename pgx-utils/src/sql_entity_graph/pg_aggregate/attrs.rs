@@ -1,7 +1,10 @@
 use proc_macro2::TokenStream as TokenStream2;
-use quote::{ToTokens, TokenStreamExt, quote};
-use syn::{Token, parse::{Parse, ParseStream}, punctuated::Punctuated};
-
+use quote::{quote, ToTokens, TokenStreamExt};
+use syn::{
+    parse::{Parse, ParseStream},
+    punctuated::Punctuated,
+    Token,
+};
 
 #[derive(Debug, Clone, Hash, Eq, PartialEq)]
 pub struct PgAggregateAttrs {

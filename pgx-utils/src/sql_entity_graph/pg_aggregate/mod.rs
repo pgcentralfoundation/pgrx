@@ -1,14 +1,19 @@
-mod maybe_variadic_type;
-mod attrs;
 mod aggregate_type;
+mod attrs;
+mod maybe_variadic_type;
 
-use maybe_variadic_type::{MaybeVariadicTypeList};
-use attrs::{PgAggregateAttrs};
-use aggregate_type::{AggregateTypeList};
+use aggregate_type::AggregateTypeList;
+use attrs::PgAggregateAttrs;
 use convert_case::{Case, Casing};
+use maybe_variadic_type::MaybeVariadicTypeList;
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
-use syn::{ImplItemConst, ImplItemMethod, ImplItemType, ItemFn, ItemImpl, Path, Type, parse::{Parse, ParseStream}, parse_quote, spanned::Spanned};
+use syn::{
+    parse::{Parse, ParseStream},
+    parse_quote,
+    spanned::Spanned,
+    ImplItemConst, ImplItemMethod, ImplItemType, ItemFn, ItemImpl, Path, Type,
+};
 
 // We support only 32 tuples...
 const ARG_NAMES: [&str; 32] = [
@@ -45,7 +50,6 @@ const ARG_NAMES: [&str; 32] = [
     "arg_thirty_one",
     "arg_thirty_two",
 ];
-
 
 /** A parsed `#[pg_aggregate]` item.
 */
@@ -119,11 +123,13 @@ impl PgAggregate {
         let _type_state_value = type_state.map(|v| v.ty.clone());
         let type_state_is_pgvarlena = if let Some(impl_item_ty) = type_state {
             match &impl_item_ty.ty {
-                Type::Path(ty_path) => if let Some(last) = ty_path.path.segments.last() {
-                    last.ident.to_string() == "PgVarlena"
-                } else {
-                    false
-                },
+                Type::Path(ty_path) => {
+                    if let Some(last) = ty_path.path.segments.last() {
+                        last.ident.to_string() == "PgVarlena"
+                    } else {
+                        false
+                    }
+                }
                 _ => false,
             }
         } else {
@@ -457,7 +463,8 @@ impl PgAggregate {
     }
 
     fn entity_tokens(&self) -> ItemFn {
-        let target_path = get_target_path(&self.item_impl).expect("Expected constructed PgAggregate to have target path.");
+        let target_path = get_target_path(&self.item_impl)
+            .expect("Expected constructed PgAggregate to have target path.");
         let target_ident = get_target_ident(&target_path)
             .expect("Expected constructed PgAggregate to have target ident.");
         let snake_case_target_ident = Ident::new(
@@ -620,7 +627,6 @@ fn get_target_path(item_impl: &ItemImpl) -> Result<Path, syn::Error> {
     Ok(target_ident)
 }
 
-
 fn get_impl_type_by_name<'a>(item_impl: &'a ItemImpl, name: &str) -> Option<&'a ImplItemType> {
     let mut needle = None;
     for impl_item in item_impl.items.iter() {
@@ -697,9 +703,9 @@ fn get_const_litstr<'a>(item: &'a ImplItemConst) -> Option<String> {
 
 #[cfg(test)]
 mod tests {
-    use eyre::Result;
     use super::PgAggregate;
-    use syn::{ItemImpl, parse_quote};
+    use eyre::Result;
+    use syn::{parse_quote, ItemImpl};
 
     #[test]
     fn agg_required_only() -> Result<()> {
