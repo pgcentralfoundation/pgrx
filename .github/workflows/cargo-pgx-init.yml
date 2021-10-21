@@ -58,9 +58,9 @@ jobs:
     - name: hack Cargo.toml
       run: |
        echo '[patch.crates-io]' >> /tmp/sample/Cargo.toml
-       echo 'pgx = { git = "https://github.com/zombodb/pgx", package = "pgx", rev = "${GITHUB_SHA}" }' >> /tmp/sample/Cargo.toml
-       echo 'pgx-macros = { git = "https://github.com/zombodb/pgx", package = "pgx-macros", rev = "${GITHUB_SHA}" }' >> /tmp/sample/Cargo.toml
-       echo 'pgx-tests = { git = "https://github.com/zombodb/pgx", package = "pgx-tests", rev = "${GITHUB_SHA}" }' >> /tmp/sample/Cargo.toml
+       echo pgx = '{' git = '"'https://github.com/zombodb/pgx'"', package = '"'pgx'"', rev = '"'${GITHUB_SHA}'"' '}' >> /tmp/sample/Cargo.toml
+       echo pgx-macros = '{' git = '"'https://github.com/zombodb/pgx'"', package = '"'pgx-macros'"', rev = '"'${GITHUB_SHA}'"' '}' >> /tmp/sample/Cargo.toml
+       echo pgx-tests = '{' git = '"'https://github.com/zombodb/pgx'"', package = '"'pgx-tests'"', rev = '"'${GITHUB_SHA}'"' '}' >> /tmp/sample/Cargo.toml
 
 # test that sample extension on all 4 Postgres'
     - name: test sample on pg10
