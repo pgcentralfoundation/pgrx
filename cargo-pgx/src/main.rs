@@ -27,7 +27,7 @@ use std::collections::HashMap;
 use std::path::PathBuf;
 use std::str::FromStr;
 
-const SUPPORTED_MAJOR_VERSIONS: &[u16] = &[10, 11, 12, 13];
+const SUPPORTED_MAJOR_VERSIONS: &[u16] = &[10, 11, 12, 13, 14];
 
 fn main() -> std::result::Result<(), std::io::Error> {
     handle_result!(do_it(), "");

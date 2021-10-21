@@ -38,8 +38,8 @@ jobs:
         sudo bash -c 'echo deb http://apt.postgresql.org/pub/repos/apt/ focal-pgdg main >> /etc/apt/sources.list.d/pgdg.list'
         sudo apt update
 
-    # Install Postgres
-    - name: install postgres
+    # Install Postgres build dependencies
+    - name: install postgres build dependencies
       run: sudo apt-get install -y clang-10 llvm-10 clang gcc make build-essential libz-dev zlib1g-dev strace libssl-dev pkg-config
 
     # install cargo-pgx
@@ -54,7 +54,15 @@ jobs:
     - name: create new sample extension
       run: cd /tmp/ && cargo pgx new sample
 
-    # test that sample extension on all 4 Postgres'
+    # hack Cargo.toml to use this version of pgx from github
+    - name: hack Cargo.toml
+      run: |
+       echo '[patch.crates-io]' >> /tmp/sample/Cargo.toml
+       echo pgx = '{' git = '"'https://github.com/zombodb/pgx'"', package = '"'pgx'"', rev = '"'${GITHUB_SHA}'"' '}' >> /tmp/sample/Cargo.toml
+       echo pgx-macros = '{' git = '"'https://github.com/zombodb/pgx'"', package = '"'pgx-macros'"', rev = '"'${GITHUB_SHA}'"' '}' >> /tmp/sample/Cargo.toml
+       echo pgx-tests = '{' git = '"'https://github.com/zombodb/pgx'"', package = '"'pgx-tests'"', rev = '"'${GITHUB_SHA}'"' '}' >> /tmp/sample/Cargo.toml
+
+# test that sample extension on all 4 Postgres'
     - name: test sample on pg10
       run: cd /tmp/sample && cargo pgx test pg10
     - name: test sample on pg11
@@ -63,4 +71,6 @@ jobs:
       run: cd /tmp/sample && cargo pgx test pg12
     - name: test sample on pg13
       run: cd /tmp/sample && cargo pgx test pg13
+    - name: test sample on pg14
+      run: cd /tmp/sample && cargo pgx test pg14
 

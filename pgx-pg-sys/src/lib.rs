@@ -15,9 +15,9 @@
 #[cfg(
     any(
         // no features at all will cause problems
-        not(any(feature = "pg10", feature = "pg11", feature = "pg12", feature = "pg13")),
+        not(any(feature = "pg10", feature = "pg11", feature = "pg12", feature = "pg13", feature = "pg14")),
   ))]
-std::compile_error!("exactly one one feature must be provided (pg10, pg11, or pg12)");
+std::compile_error!("exactly one one feature must be provided (pg10, pg11, pg12, pg13, pg14)");
 
 pub mod submodules;
 
@@ -57,6 +57,13 @@ mod pg13 {
 #[cfg(all(feature = "pg13", docsrs))]
 mod pg13;
 
+#[cfg(all(feature = "pg14", not(docsrs)))]
+mod pg14 {
+    include!(concat!(env!("OUT_DIR"), "/pg14.rs"));
+}
+#[cfg(all(feature = "pg14", docsrs))]
+mod pg14;
+
 // export each module publicly
 #[cfg(feature = "pg10")]
 pub use pg10::*;
@@ -66,6 +73,8 @@ pub use pg11::*;
 pub use pg12::*;
 #[cfg(feature = "pg13")]
 pub use pg13::*;
+#[cfg(feature = "pg14")]
+pub use pg14::*;
 
 // feature gate each pg-specific oid module
 #[cfg(feature = "pg10")]
@@ -76,6 +85,8 @@ mod pg11_oids;
 mod pg12_oids;
 #[cfg(feature = "pg13")]
 mod pg13_oids;
+#[cfg(feature = "pg14")]
+mod pg14_oids;
 
 // export that module publicly
 #[cfg(feature = "pg10")]
@@ -86,6 +97,8 @@ pub use pg11_oids::*;
 pub use pg12_oids::*;
 #[cfg(feature = "pg13")]
 pub use pg13_oids::*;
+#[cfg(feature = "pg14")]
+pub use pg14_oids::*;
 
 // expose things we want available for all versions
 pub use all_versions::*;
@@ -112,6 +125,9 @@ pub use internal::pg12::*;
 
 #[cfg(feature = "pg13")]
 pub use internal::pg13::*;
+
+#[cfg(feature = "pg14")]
+pub use internal::pg14::*;
 
 /// A trait applied to all of Postgres' `pg_sys::Node` types and its subtypes
 pub trait PgNode {
@@ -573,6 +589,42 @@ mod internal {
         pub use crate::pg13::AllocSetContextCreateInternal as AllocSetContextCreateExtended;
 
         pub const QTW_EXAMINE_RTES: u32 = crate::pg13::QTW_EXAMINE_RTES_BEFORE;
+
+        /// # Safety
+        ///
+        /// This function wraps Postgres' internal `IndexBuildHeapScan` method, and therefore, is
+        /// inherently unsafe
+        pub unsafe fn IndexBuildHeapScan<T>(
+            heap_relation: crate::Relation,
+            index_relation: crate::Relation,
+            index_info: *mut crate::IndexInfo,
+            build_callback: crate::IndexBuildCallback,
+            build_callback_state: *mut T,
+        ) {
+            let heap_relation_ref = heap_relation.as_ref().unwrap();
+            let table_am = heap_relation_ref.rd_tableam.as_ref().unwrap();
+
+            table_am.index_build_range_scan.unwrap()(
+                heap_relation,
+                index_relation,
+                index_info,
+                true,
+                false,
+                true,
+                0,
+                crate::InvalidBlockNumber,
+                build_callback,
+                build_callback_state as *mut std::os::raw::c_void,
+                std::ptr::null_mut(),
+            );
+        }
+    }
+
+    #[cfg(feature = "pg14")]
+    pub(crate) mod pg14 {
+        pub use crate::pg14::AllocSetContextCreateInternal as AllocSetContextCreateExtended;
+
+        pub const QTW_EXAMINE_RTES: u32 = crate::pg14::QTW_EXAMINE_RTES_BEFORE;
 
         /// # Safety
         ///

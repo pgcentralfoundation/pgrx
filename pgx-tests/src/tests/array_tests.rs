@@ -6,7 +6,19 @@ use serde_json::*;
 
 #[pg_extern(name = "sum_array")]
 fn sum_array_i32(values: Array<i32>) -> i32 {
-    values.iter().map(|v| v.unwrap_or(0i32)).sum()
+    // we implement it this way so we can trap an overflow (as we have a test for this) and
+    // catch it correctly in both --debug and --release modes
+    let mut sum = 0_i32;
+    for v in values {
+        let v = v.unwrap_or(0);
+        let tmp = sum.overflowing_add(v);
+        if tmp.1 {
+            panic!("attempt to add with overflow");
+        } else {
+            sum = tmp.0;
+        }
+    }
+    sum
 }
 
 #[pg_extern(name = "sum_array")]
@@ -199,5 +211,27 @@ mod tests {
         let rc = Spi::get_one::<bool>("SELECT ARRAY[]::integer[] = return_zero_length_vec();")
             .expect("failed to get SPI result");
         assert!(rc)
+    }
+
+    #[pg_test]
+    fn test_slice_to_array() {
+        let owned_vec = vec![Some(1), Some(2), Some(3), None, Some(4)];
+        let json = Spi::connect(|client| {
+            let json = client
+                .select(
+                    "SELECT serde_serialize_array_i32($1)",
+                    None,
+                    Some(vec![(
+                        PgBuiltInOids::INT4ARRAYOID.oid(),
+                        owned_vec.as_slice().into_datum(),
+                    )]),
+                )
+                .first()
+                .get_one::<Json>()
+                .expect("returned json was null");
+            Ok(Some(json))
+        })
+        .expect("Failed to return json even though it's right there ^^");
+        assert_eq!(json.0, json! {{"values": [1, 2, 3, null, 4]}});
     }
 }

@@ -5,7 +5,7 @@ extern crate proc_macro;
 
 use pgx_utils::{categorize_return_type, CategorizedType};
 use proc_macro2::{Ident, Span};
-use quote::{quote, quote_spanned, ToTokens};
+use quote::{quote, quote_spanned};
 use std::ops::Deref;
 use std::str::FromStr;
 use syn::spanned::Spanned;
@@ -200,7 +200,7 @@ impl PgGuardRewriter {
             #[allow(clippy::missing_safety_doc)]
             #[allow(clippy::redundant_closure)]
             #guard
-            #vis unsafe fn #func_name_wrapper #generics(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+            #vis unsafe extern "C" fn #func_name_wrapper #generics(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
 
                 #func_call
 
@@ -249,7 +249,7 @@ impl PgGuardRewriter {
                 let result = match pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).switch_to(|_| { #func_call result }) {
                     Some(result) => result,
                     None => {
-                        unsafe { pgx::srf_return_done(fcinfo, &mut funcctx); }
+                        pgx::srf_return_done(fcinfo, &mut funcctx);
                         return pgx::pg_return_null(fcinfo)
                     }
                 };
@@ -265,7 +265,7 @@ impl PgGuardRewriter {
         quote_spanned! {func_span=>
             #prolog
             #[pg_guard]
-            #vis fn #func_name_wrapper #generics(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+            #vis unsafe extern "C" fn #func_name_wrapper #generics(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
 
                 struct IteratorHolder<T> {
                     iter: *mut dyn Iterator<Item=T>,
@@ -274,28 +274,28 @@ impl PgGuardRewriter {
                 let mut funcctx: pgx::PgBox<pg_sys::FuncCallContext>;
                 let mut iterator_holder: pgx::PgBox<IteratorHolder<#generic_type>>;
 
-                if unsafe { srf_is_first_call(fcinfo) } {
-                    funcctx = unsafe { pgx::srf_first_call_init(fcinfo) };
+                if srf_is_first_call(fcinfo) {
+                    funcctx = pgx::srf_first_call_init(fcinfo);
                     funcctx.user_fctx = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).palloc_struct::<IteratorHolder<#generic_type>>() as void_mut_ptr;
 
-                    iterator_holder = unsafe { pgx::PgBox::from_pg(funcctx.user_fctx as *mut IteratorHolder<#generic_type>) };
+                    iterator_holder = pgx::PgBox::from_pg(funcctx.user_fctx as *mut IteratorHolder<#generic_type>);
 
                     #result_handler
 
                     iterator_holder.iter = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).leak_and_drop_on_delete(result);
                 }
 
-                funcctx = unsafe { pgx::srf_per_call_setup(fcinfo) };
-                iterator_holder = unsafe { pgx::PgBox::from_pg(funcctx.user_fctx as *mut IteratorHolder<#generic_type>) };
+                funcctx = pgx::srf_per_call_setup(fcinfo);
+                iterator_holder = pgx::PgBox::from_pg(funcctx.user_fctx as *mut IteratorHolder<#generic_type>);
 
-                let mut iter = unsafe { Box::from_raw(iterator_holder.iter) };
+                let mut iter = Box::from_raw(iterator_holder.iter);
                 match iter.next() {
                     Some(result) => {
                         // we need to leak the boxed iterator so that it's not freed by rust and we can
                         // continue to use it
                         Box::leak(iter);
 
-                        unsafe { pgx::srf_return_next(fcinfo, &mut funcctx) };
+                        pgx::srf_return_next(fcinfo, &mut funcctx);
                         match result.into_datum() {
                             Some(datum) => datum,
                             None => pgx::pg_return_null(fcinfo),
@@ -306,7 +306,7 @@ impl PgGuardRewriter {
                         // function is going to properly drop it for us
                         Box::leak(iter);
 
-                        unsafe { pgx::srf_return_done(fcinfo, &mut funcctx) };
+                        pgx::srf_return_done(fcinfo, &mut funcctx);
                         pgx::pg_return_null(fcinfo)
                     },
                 }
@@ -343,7 +343,7 @@ impl PgGuardRewriter {
                 }
             )*
 
-            let heap_tuple = unsafe { pgx::pg_sys::heap_form_tuple(funcctx.tuple_desc, datums.as_mut_ptr(), nulls.as_mut_ptr()) };
+            let heap_tuple = pgx::pg_sys::heap_form_tuple(funcctx.tuple_desc, datums.as_mut_ptr(), nulls.as_mut_ptr());
         };
 
         let composite_type = format!("({})", types.join(","));
@@ -354,7 +354,7 @@ impl PgGuardRewriter {
                 let result = match pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).switch_to(|_| { #func_call result }) {
                     Some(result) => result,
                     None => {
-                        unsafe { pgx::srf_return_done(fcinfo, &mut funcctx); }
+                        pgx::srf_return_done(fcinfo, &mut funcctx);
                         return pgx::pg_return_null(fcinfo)
                     }
                 };
@@ -369,7 +369,7 @@ impl PgGuardRewriter {
         quote_spanned! {func_span=>
             #prolog
             #[pg_guard]
-            #vis fn #func_name_wrapper #generics(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+            #vis unsafe extern "C" fn #func_name_wrapper #generics(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
 
                 struct IteratorHolder<T> {
                     iter: *mut dyn Iterator<Item=T>,
@@ -378,32 +378,30 @@ impl PgGuardRewriter {
                 let mut funcctx: pgx::PgBox<pg_sys::FuncCallContext>;
                 let mut iterator_holder: pgx::PgBox<IteratorHolder<#generic_type>>;
 
-                if unsafe { srf_is_first_call(fcinfo) } {
-                    funcctx = unsafe { pgx::srf_first_call_init(fcinfo) };
+                if srf_is_first_call(fcinfo) {
+                    funcctx = pgx::srf_first_call_init(fcinfo);
                     funcctx.user_fctx = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).palloc_struct::<IteratorHolder<#generic_type>>() as void_mut_ptr;
                     funcctx.tuple_desc = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).switch_to(|_| {
                         let mut tupdesc: *mut pgx::pg_sys::TupleDescData = std::ptr::null_mut();
 
-                        unsafe {
-                            /* Build a tuple descriptor for our result type */
-                            if pgx::pg_sys::get_call_result_type(fcinfo, std::ptr::null_mut(), &mut tupdesc) != pgx::pg_sys::TypeFuncClass_TYPEFUNC_COMPOSITE {
-                                pgx::error!("return type must be a row type");
-                            }
-
-                            pgx::pg_sys::BlessTupleDesc(tupdesc)
+                        /* Build a tuple descriptor for our result type */
+                        if pgx::pg_sys::get_call_result_type(fcinfo, std::ptr::null_mut(), &mut tupdesc) != pgx::pg_sys::TypeFuncClass_TYPEFUNC_COMPOSITE {
+                            pgx::error!("return type must be a row type");
                         }
+
+                        pgx::pg_sys::BlessTupleDesc(tupdesc)
                     });
-                    iterator_holder = unsafe { pgx::PgBox::from_pg(funcctx.user_fctx as *mut IteratorHolder<#generic_type>) };
+                    iterator_holder = pgx::PgBox::from_pg(funcctx.user_fctx as *mut IteratorHolder<#generic_type>);
 
                     #result_handler
 
                     iterator_holder.iter = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).leak_and_drop_on_delete(result);
                 }
 
-                funcctx = unsafe { pgx::srf_per_call_setup(fcinfo) };
-                iterator_holder = unsafe { pgx::PgBox::from_pg(funcctx.user_fctx as *mut IteratorHolder<#generic_type>) };
+                funcctx = pgx::srf_per_call_setup(fcinfo);
+                iterator_holder = pgx::PgBox::from_pg(funcctx.user_fctx as *mut IteratorHolder<#generic_type>);
 
-                let mut iter = unsafe { Box::from_raw(iterator_holder.iter) };
+                let mut iter = Box::from_raw(iterator_holder.iter);
                 match iter.next() {
                     Some(result) => {
                         // we need to leak the boxed iterator so that it's not freed by rust and we can
@@ -413,7 +411,7 @@ impl PgGuardRewriter {
                         #create_heap_tuple
 
                         let datum = pgx::heap_tuple_get_datum(heap_tuple);
-                        unsafe { pgx::srf_return_next(fcinfo, &mut funcctx); }
+                        pgx::srf_return_next(fcinfo, &mut funcctx);
                         datum as pgx::pg_sys::Datum
                     },
                     None => {
@@ -421,7 +419,7 @@ impl PgGuardRewriter {
                         // function is going to properly drop it for us
                         Box::leak(iter);
 
-                        unsafe { pgx::srf_return_done(fcinfo, &mut funcctx); }
+                        pgx::srf_return_done(fcinfo, &mut funcctx);
                         pgx::pg_return_null(fcinfo)
                     },
                 }
@@ -442,20 +440,6 @@ impl PgGuardRewriter {
         let input_func_name = func.sig.ident.to_string();
         let sig = func.sig.clone();
         let vis = func.vis.clone();
-        let is_extern_c = if let Some(abi) = func.sig.abi.as_ref() {
-            if let Some(name) = abi.name.as_ref() {
-                name.value() == "C"
-            } else {
-                false
-            }
-        } else {
-            false
-        };
-        let is_no_mangle = func
-            .attrs
-            .iter()
-            .find(|attr| (attr.path.clone().into_token_stream().to_string() == "no_mangle"))
-            .is_some();
 
         // but for the inner function (the one we're wrapping) we don't need any kind of
         // abi classification
@@ -478,21 +462,15 @@ impl PgGuardRewriter {
             quote! { pg_sys::guard::guard( || #func_name(#arg_list) ) }
         };
 
-        let prolog = if input_func_name == "_PG_init" || input_func_name == "_PG_fini" {
+        let prolog = if input_func_name == "__pgx_private_shmem_hook" {
+            // we do not want "no_mangle" on this function
+            quote! {}
+        } else if input_func_name == "_PG_init" || input_func_name == "_PG_fini" {
             quote! {
                 #[allow(non_snake_case)]
                 #[no_mangle]
             }
-        } else if is_extern_c {
-            if is_no_mangle {
-                quote! {
-                    #[no_mangle]
-                }
-            } else {
-                quote! {}
-            }
         } else {
-            // I feel like this is a) incorrect and b) never going to happen
             quote! {
                 #[no_mangle]
             }
@@ -534,6 +512,7 @@ impl PgGuardRewriter {
         quote! {
             #[allow(clippy::missing_safety_doc)]
             #[allow(clippy::redundant_closure)]
+            #[allow(improper_ctypes_definitions)] /* for i128 */
             pub unsafe fn #func_name ( #arg_list_with_types ) #return_type {
                 // as the panic message says, we can't call Postgres functions from threads
                 // the value of IS_MAIN_THREAD gets set through the pg_module_magic!() macro
