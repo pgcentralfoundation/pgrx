@@ -56,6 +56,8 @@ jobs:
 
     # hack Cargo.toml to use this version of pgx from github
     - name: hack Cargo.toml
+      env:
+        ACTIONS_ALLOW_UNSECURE_COMMANDS=: 'true'
       run: |
        echo "::set-env name=git_hash::$(git rev-parse --short $GITHUB_SHA)"
        echo "::set-env name=git_branch::${GITHUB_REF#refs/heads/}"
