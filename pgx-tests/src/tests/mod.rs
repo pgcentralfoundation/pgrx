@@ -14,6 +14,7 @@ mod guc_tests;
 mod hooks_tests;
 mod inet_tests;
 mod json_tests;
+mod lifetime_tests;
 mod log_tests;
 mod memcxt_tests;
 mod name_tests;
