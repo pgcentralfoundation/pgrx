@@ -261,7 +261,7 @@ dependencies = [
 
 [[package]]
 name = "cargo-pgx"
-version = "0.2.0-beta.3"
+version = "0.2.0-beta.4"
 dependencies = [
  "clap",
  "colored",
@@ -1225,9 +1225,9 @@ checksum = "624a8340c38c1b80fd549087862da4ba43e08858af025b236e509b6649fc13d5"
 
 [[package]]
 name = "openssl"
-version = "0.10.36"
+version = "0.10.37"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8d9facdb76fec0b73c406f125d44d86fdad818d66fef0531eec9233ca425ff4a"
+checksum = "2bc6b9e4403633698352880b22cbe2f0e45dd0177f6fabe4585536e56a3e4f75"
 dependencies = [
  "bitflags",
  "cfg-if",
@@ -1245,9 +1245,9 @@ checksum = "28988d872ab76095a6e6ac88d99b54fd267702734fd7ffe610ca27f533ddb95a"
 
 [[package]]
 name = "openssl-sys"
-version = "0.9.67"
+version = "0.9.68"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "69df2d8dfc6ce3aaf44b40dec6f487d5a886516cf6879c49e98e0710f310a058"
+checksum = "1c571f25d3f66dd427e417cebf73dbe2361d6125cf6e3a70d143fdf97c9f5150"
 dependencies = [
  "autocfg",
  "cc",
@@ -1331,7 +1331,7 @@ dependencies = [
 
 [[package]]
 name = "pgx"
-version = "0.2.0-beta.3"
+version = "0.2.0-beta.4"
 dependencies = [
  "atomic-traits",
  "bitflags",
@@ -1357,7 +1357,7 @@ dependencies = [
 
 [[package]]
 name = "pgx-macros"
-version = "0.2.0-beta.3"
+version = "0.2.0-beta.4"
 dependencies = [
  "pgx-utils",
  "proc-macro-crate",
@@ -1370,7 +1370,7 @@ dependencies = [
 
 [[package]]
 name = "pgx-parent"
-version = "0.2.0-beta.3"
+version = "0.2.0-beta.4"
 dependencies = [
  "cargo-pgx",
  "pgx",
@@ -1381,7 +1381,7 @@ dependencies = [
 
 [[package]]
 name = "pgx-pg-sys"
-version = "0.2.0-beta.3"
+version = "0.2.0-beta.4"
 dependencies = [
  "bindgen",
  "build-deps",
@@ -1399,7 +1399,7 @@ dependencies = [
 
 [[package]]
 name = "pgx-tests"
-version = "0.2.0-beta.3"
+version = "0.2.0-beta.4"
 dependencies = [
  "colored",
  "lazy_static",
@@ -1417,7 +1417,7 @@ dependencies = [
 
 [[package]]
 name = "pgx-utils"
-version = "0.2.0-beta.3"
+version = "0.2.0-beta.4"
 dependencies = [
  "clap",
  "color-eyre",
