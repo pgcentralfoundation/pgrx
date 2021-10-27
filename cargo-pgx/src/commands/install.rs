@@ -11,6 +11,7 @@ use std::process::{Command, Stdio};
 pub(crate) fn install_extension(
     pg_config: &PgConfig,
     is_release: bool,
+    no_schema: bool,
     base_directory: Option<PathBuf>,
     additional_features: Vec<&str>,
 ) -> Result<(), std::io::Error> {
@@ -47,13 +48,17 @@ pub(crate) fn install_extension(
         copy_file(shlibpath, dest, "shared library");
     }
 
-    copy_sql_files(
-        pg_config,
-        is_release,
-        additional_features,
-        &extdir,
-        &base_directory,
-    )?;
+    if !no_schema || !get_target_sql_file(&extdir, &base_directory).exists() {
+        copy_sql_files(
+            pg_config,
+            is_release,
+            additional_features,
+            &extdir,
+            &base_directory,
+        )?;
+    } else {
+        println!("{} schema generation", "    Skipping".bold().yellow());
+    }
 
     println!("{} installing {}", "    Finished".bold().green(), extname);
     Ok(())
@@ -124,6 +129,17 @@ pub(crate) fn build_extension(major_version: u16, is_release: bool, additional_f
     }
 }
 
+fn get_target_sql_file(extdir: &PathBuf, base_directory: &PathBuf) -> PathBuf {
+    let mut dest = base_directory.clone();
+    dest.push(extdir);
+
+    let (_, extname) = crate::commands::get::find_control_file();
+    let version = get_version();
+    dest.push(format!("{}--{}.sql", extname, version));
+
+    dest
+}
+
 fn copy_sql_files(
     pg_config: &PgConfig,
     is_release: bool,
@@ -131,12 +147,8 @@ fn copy_sql_files(
     extdir: &PathBuf,
     base_directory: &PathBuf,
 ) -> Result<(), std::io::Error> {
-    let mut dest = base_directory.clone();
-    dest.push(extdir);
-
+    let dest = get_target_sql_file(extdir, base_directory);
     let (_, extname) = crate::commands::get::find_control_file();
-    let version = get_version();
-    dest.push(format!("{}--{}.sql", extname, version));
 
     crate::schema::generate_schema(
         pg_config,
