@@ -243,6 +243,8 @@ impl PgGuardRewriter {
         optional: bool,
     ) -> proc_macro2::TokenStream {
         let generic_type = proc_macro2::TokenStream::from_str(types.first().unwrap()).unwrap();
+        let mut generic_type = syn::parse2::<syn::Type>(generic_type).unwrap();
+        pgx_utils::anonymonize_lifetimes(&mut generic_type);
 
         let result_handler = if optional {
             quote! {
@@ -348,6 +350,8 @@ impl PgGuardRewriter {
 
         let composite_type = format!("({})", types.join(","));
         let generic_type = proc_macro2::TokenStream::from_str(&composite_type).unwrap();
+        let mut generic_type = syn::parse2::<syn::Type>(generic_type).unwrap();
+        pgx_utils::anonymonize_lifetimes(&mut generic_type);
 
         let result_handler = if optional {
             quote! {
@@ -707,19 +711,22 @@ impl FunctionSignatureRewriter {
                 FnArg::Typed(ty) => match ty.pat.deref() {
                     Pat::Ident(ident) => {
                         let name = Ident::new(&format!("{}_", ident.ident), ident.span());
-                        let type_ = &ty.ty;
-                        let is_option = type_matches(type_, "Option");
+                        let mut type_ = ty.ty.clone();
+                        let is_option = type_matches(&type_, "Option");
 
                         if have_fcinfo {
                             panic!("When using `pg_sys::FunctionCallInfo` as an argument it must be the last argument")
                         }
 
                         let ts = if is_option {
-                            let option_type = extract_option_type(type_);
+                            let option_type = extract_option_type(&type_);
+                            let mut option_type = syn::parse2::<syn::Type>(option_type).unwrap();
+                            pgx_utils::anonymonize_lifetimes(&mut option_type);
+
                             quote_spanned! {ident.span()=>
                                 let #name = pgx::pg_getarg::<#option_type>(fcinfo, #i);
                             }
-                        } else if type_matches(type_, "pg_sys :: FunctionCallInfo") {
+                        } else if type_matches(&type_, "pg_sys :: FunctionCallInfo") {
                             have_fcinfo = true;
                             quote_spanned! {ident.span()=>
                                 let #name = fcinfo;
@@ -729,6 +736,7 @@ impl FunctionSignatureRewriter {
                                 let #name = pgx::pg_getarg_datum_raw(fcinfo, #i) as #type_;
                             }
                         } else {
+                            pgx_utils::anonymonize_lifetimes(&mut type_);
                             quote_spanned! {ident.span()=>
                                 let #name = pgx::pg_getarg::<#type_>(fcinfo, #i).unwrap_or_else(|| panic!("{} is null", stringify!{#ident}));
                             }

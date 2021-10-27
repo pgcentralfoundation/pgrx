@@ -488,6 +488,73 @@ pub fn categorize_trait_bound(bound: &TypeParamBound) -> CategorizedType {
     }
 }
 
+pub fn anonymonize_lifetimes_in_type_path(value: syn::TypePath) -> syn::TypePath {
+    let mut ty = syn::Type::Path(value);
+    anonymonize_lifetimes(&mut ty);
+    match ty {
+        syn::Type::Path(type_path) => type_path,
+
+        // shouldn't happen
+        _ => panic!("not a TypePath"),
+    }
+}
+
+pub fn anonymonize_lifetimes(value: &mut syn::Type) {
+    match value {
+        syn::Type::Path(type_path) => {
+            for segment in &mut type_path.path.segments {
+                match &mut segment.arguments {
+                    syn::PathArguments::AngleBracketed(bracketed) => {
+                        for arg in &mut bracketed.args {
+                            match arg {
+                                // rename lifetimes to the anonymous lifetime
+                                syn::GenericArgument::Lifetime(lifetime) => {
+                                    lifetime.ident = syn::Ident::new("_", lifetime.ident.span());
+                                }
+
+                                // recurse
+                                syn::GenericArgument::Type(ty) => anonymonize_lifetimes(ty),
+                                syn::GenericArgument::Binding(binding) => {
+                                    anonymonize_lifetimes(&mut binding.ty)
+                                }
+                                syn::GenericArgument::Constraint(constraint) => {
+                                    for bound in constraint.bounds.iter_mut() {
+                                        match bound {
+                                            syn::TypeParamBound::Lifetime(lifetime) => {
+                                                lifetime.ident =
+                                                    syn::Ident::new("_", lifetime.ident.span())
+                                            }
+                                            _ => {}
+                                        }
+                                    }
+                                }
+
+                                // nothing to do otherwise
+                                _ => {}
+                            }
+                        }
+                    }
+                    _ => {}
+                }
+            }
+        }
+
+        syn::Type::Reference(type_ref) => {
+            if let Some(lifetime) = type_ref.lifetime.as_mut() {
+                lifetime.ident = syn::Ident::new("_", lifetime.ident.span());
+            }
+        }
+
+        syn::Type::Tuple(type_tuple) => {
+            for elem in &mut type_tuple.elems {
+                anonymonize_lifetimes(elem);
+            }
+        }
+
+        _ => {}
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::{parse_extern_attributes, ExternArgs};
