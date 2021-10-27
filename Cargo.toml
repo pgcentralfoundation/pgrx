@@ -1,6 +1,6 @@
 [package]
 name = "pgx-parent"
-version = "0.2.0-beta.2"
+version = "0.2.0-beta.3"
 authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
 edition = "2018"
 license = "MIT"
@@ -50,8 +50,8 @@ no-default-features = true
 rustc-args = ["--cfg", "docsrs"]
 
 [dependencies]
-cargo-pgx = { path = "cargo-pgx", version = "0.2.0-beta.2" }
-pgx = { path = "pgx", version = "0.2.0-beta.2", default-features = false }
-pgx-macros = { path = "pgx-macros", version = "0.2.0-beta.2" }
-pgx-pg-sys = { path = "pgx-pg-sys", version = "0.2.0-beta.2", default-features = false }
-pgx-tests = { path = "pgx-tests", version = "0.2.0-beta.2", default-features = false }
+cargo-pgx = { path = "cargo-pgx", version = "0.2.0-beta.3" }
+pgx = { path = "pgx", version = "0.2.0-beta.3", default-features = false }
+pgx-macros = { path = "pgx-macros", version = "0.2.0-beta.3" }
+pgx-pg-sys = { path = "pgx-pg-sys", version = "0.2.0-beta.3", default-features = false }
+pgx-tests = { path = "pgx-tests", version = "0.2.0-beta.3", default-features = false }

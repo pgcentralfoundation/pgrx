@@ -1,6 +1,6 @@
 [package]
 name = "pgx"
-version = "0.2.0-beta.2"
+version = "0.2.0-beta.3"
 authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
 edition = "2018"
 license = "MIT"
@@ -33,13 +33,13 @@ rustc-args = ["--cfg", "docsrs"]
 enum-primitive-derive = "0.2.1"
 num-traits = "0.2.14"
 seahash = "4.1.0"
-pgx-macros = { path = "../pgx-macros/", version = "0.2.0-beta.2" }
-pgx-pg-sys = { path = "../pgx-pg-sys", version = "0.2.0-beta.2" }
-pgx-utils = { path = "../pgx-utils/", version = "0.2.0-beta.2" }
+pgx-macros = { path = "../pgx-macros/", version = "0.2.0-beta.3" }
+pgx-pg-sys = { path = "../pgx-pg-sys", version = "0.2.0-beta.3" }
+pgx-utils = { path = "../pgx-utils/", version = "0.2.0-beta.3" }
 serde = { version = "1.0.130", features = [ "derive" ] }
 serde_cbor = "0.11.2"
 serde_json = "1.0.68"
-time = { version = "0.3.3", features = ["formatting", "parsing", "alloc", "macros"] }
+time = { version = "0.3.4", features = ["formatting", "parsing", "alloc", "macros"] }
 atomic-traits = "0.3.0"
 heapless = "0.7.7"
 hash32 = "0.2.1"
@@ -49,4 +49,4 @@ bitflags = "1.3.2"
 petgraph = "0.6.0"
 eyre = "0.6.5"
 tracing = "0.1.29"
-tracing-error = "0.1.2"
+tracing-error = "0.2.0"

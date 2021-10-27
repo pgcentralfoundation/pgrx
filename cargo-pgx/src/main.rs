@@ -132,6 +132,7 @@ fn do_it() -> std::result::Result<(), std::io::Error> {
             }
             ("install", Some(install)) => {
                 let is_release = install.is_present("release");
+                let no_schema = install.is_present("no-schema");
                 let features = install
                     .values_of("features")
                     .map(|v| v.collect())
@@ -154,7 +155,7 @@ fn do_it() -> std::result::Result<(), std::io::Error> {
                     },
                 };
 
-                install_extension(&pg_config, is_release, None, features)
+                install_extension(&pg_config, is_release, no_schema, None, features)
             }
             ("package", Some(package)) => {
                 let is_debug = package.is_present("debug");
@@ -181,10 +182,12 @@ fn do_it() -> std::result::Result<(), std::io::Error> {
                     .map(|v| v.collect())
                     .unwrap_or(vec![]);
                 let is_release = run.is_present("release");
+                let no_schema = run.is_present("no-schema");
                 run_psql(
                     Pgx::from_config()?.get(pgver)?,
                     &dbname,
                     is_release,
+                    no_schema,
                     features,
                 )
             }
@@ -200,6 +203,7 @@ fn do_it() -> std::result::Result<(), std::io::Error> {
             }
             ("test", Some(test)) => {
                 let is_release = test.is_present("release");
+                let no_schema = test.is_present("no-schema");
                 let pgver = test.value_of("pg_version").unwrap_or("all");
                 let test_workspace = test.is_present("workspace");
                 let features = test
@@ -212,6 +216,7 @@ fn do_it() -> std::result::Result<(), std::io::Error> {
                     test_extension(
                         pg_config?,
                         is_release,
+                        no_schema,
                         test_workspace,
                         features.clone(),
                         testname,

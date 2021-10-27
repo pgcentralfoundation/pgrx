@@ -1,10 +1,10 @@
 use std::ops::Deref;
 
-use proc_macro2::{Span, TokenStream as TokenStream2};
+use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
 use syn::{
     parse::{Parse, ParseStream},
-    parse_quote, FnArg, Pat, Token,
+    parse_quote, FnArg, GenericArgument, Pat, Token,
 };
 
 /// A parsed `#[pg_extern]` argument.
@@ -27,6 +27,8 @@ impl Argument {
 
     pub fn build_from_pat_type(value: syn::PatType) -> Result<Option<Self>, syn::Error> {
         let mut true_ty = *value.ty.clone();
+        Self::anonymonize_lifetimes(&mut true_ty);
+
         let identifier = match *value.pat {
             Pat::Ident(ref p) => p.ident.clone(),
             Pat::Reference(ref p_ref) => match *p_ref.pat {
@@ -148,6 +150,38 @@ impl Argument {
             ty: true_ty,
             default,
         }))
+    }
+
+    fn anonymonize_lifetimes(value: &mut syn::Type) {
+        match value {
+            syn::Type::Path(type_path) => {
+                for segment in &mut type_path.path.segments {
+                    match &mut segment.arguments {
+                        syn::PathArguments::AngleBracketed(bracketed) => {
+                            for arg in &mut bracketed.args {
+                                match arg {
+                                    // rename lifetimes to the anonymous lifetime
+                                    GenericArgument::Lifetime(lifetime) => {
+                                        lifetime.ident = Ident::new("_", lifetime.ident.span());
+                                    }
+
+                                    // recurse
+                                    GenericArgument::Type(ty) => Self::anonymonize_lifetimes(ty),
+                                    _ => {}
+                                }
+                            }
+                        }
+                        _ => {}
+                    }
+                }
+            }
+            syn::Type::Reference(type_ref) => {
+                if let Some(lifetime) = type_ref.lifetime.as_mut() {
+                    lifetime.ident = Ident::new("_", lifetime.ident.span());
+                }
+            }
+            _ => {}
+        }
     }
 }
 

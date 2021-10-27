@@ -14,13 +14,14 @@ pub(crate) fn run_psql(
     pg_config: &PgConfig,
     dbname: &str,
     is_release: bool,
+    no_schema: bool,
     additional_features: Vec<&str>,
 ) -> Result<(), std::io::Error> {
     // stop postgres
     stop_postgres(pg_config)?;
 
     // install the extension
-    install_extension(pg_config, is_release, None, additional_features)?;
+    install_extension(pg_config, is_release, no_schema, None, additional_features)?;
 
     // restart postgres
     start_postgres(pg_config)?;
