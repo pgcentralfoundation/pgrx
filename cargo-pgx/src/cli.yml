@@ -83,6 +83,10 @@ subcommands:
                     short: r
                     long: release
                     help: compile for release mode (default is debug)
+                - no-schema:
+                    short: ns
+                    long: no-schema
+                    help: Don't regenerate the schema
                 - pg_config:
                     short: c
                     long: pg_config
@@ -178,6 +182,10 @@ subcommands:
                     short: r
                     long: release
                     help: compile for release mode (default is debug)
+                - no-schema:
+                    short: ns
+                    long: no-schema
+                    help: Don't regenerate the schema
                 - features:
                     long: features
                     help: additional cargo features to activate (default is '--no-default-features')
@@ -210,6 +218,10 @@ subcommands:
                     short: r
                     long: release
                     help: compile for release mode (default is debug)
+                - no-schema:
+                    short: ns
+                    long: no-schema
+                    help: Don't regenerate the schema
                 - workspace:
                     long: workspace
                     help: Test all packages in the workspace

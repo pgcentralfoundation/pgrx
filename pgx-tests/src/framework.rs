@@ -228,6 +228,7 @@ pub fn client() -> (postgres::Client, String) {
 fn install_extension() {
     eprintln!("installing extension");
     let is_release = std::env::var("PGX_BUILD_PROFILE").unwrap_or("debug".into()) == "release";
+    let no_schema = std::env::var("PGX_NO_SCHEMA").unwrap_or("false".into()) == "true";
 
     let mut command = Command::new("cargo");
     command
@@ -250,6 +251,9 @@ fn install_extension() {
 
     if is_release {
         command.arg("--release");
+    }
+    if no_schema {
+        command.arg("--no-schema");
     }
 
     let mut child = command.spawn().unwrap();
