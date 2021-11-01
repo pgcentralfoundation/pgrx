@@ -297,6 +297,20 @@ impl<T, AllocatedBy: WhoAllocated<T>> PgBox<T, AllocatedBy> {
         }
     }
 
+    /// Useful for returning the boxed pointer back to Postgres (as a return value, for example).
+    ///
+    /// The boxed pointer is **not** free'd by Rust
+    #[inline]
+    pub fn into_pg_boxed(mut self) -> PgBox<T, AllocatedByPostgres> {
+        // SAFETY:  we know our internal pointer is good so we can now make it owned by Postgres
+        unsafe {
+            PgBox::from_pg(match self.ptr.take() {
+                Some(ptr) => ptr.as_ptr(),
+                None => std::ptr::null_mut(),
+            })
+        }
+    }
+
     /// Execute a closure with a mutable, `PgBox`'d form of the specified `ptr`
     #[inline]
     pub unsafe fn with<F: FnOnce(&mut PgBox<T>)>(ptr: *mut T, func: F) {
