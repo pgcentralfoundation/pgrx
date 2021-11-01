@@ -2,7 +2,7 @@
 // governed by the MIT license that can be found in the LICENSE file.
 
 //! Provides a safe wrapper around Postgres' `pg_sys::TupleDescData` struct
-use crate::{pg_sys, void_mut_ptr, FromDatum, PgBox, PgRelation};
+use crate::{pg_sys, void_mut_ptr, AllocatedByRust, FromDatum, PgBox, PgRelation};
 
 use std::ops::Deref;
 
@@ -40,7 +40,7 @@ use std::ops::Deref;
 pub struct PgTupleDesc<'a> {
     tupdesc: PgBox<pg_sys::TupleDescData>,
     parent: Option<&'a PgRelation>,
-    data: Option<PgBox<pg_sys::HeapTupleData>>,
+    data: Option<PgBox<pg_sys::HeapTupleData, AllocatedByRust>>,
     need_release: bool,
     need_pfree: bool,
 }
