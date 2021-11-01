@@ -172,7 +172,7 @@ impl SqlDeclaredEntity {
         let retval = match variant.as_ref() {
             "Type" => Self::Type(data),
             "Enum" => Self::Enum(data),
-            "function" => Self::Function(data),
+            "Function" => Self::Function(data),
             _ => {
                 return Err(eyre::eyre!(
                     "Can only declare `Type(Ident)`, `Enum(Ident)` or `Function(Ident)`"
