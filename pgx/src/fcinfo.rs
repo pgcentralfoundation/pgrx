@@ -394,7 +394,7 @@ fn make_function_call_info(
     nargs: usize,
     arg_array: [usize; 100],
     null_array: [bool; 100],
-) -> PgBox<pg_sys::FunctionCallInfoData> {
+) -> PgBox<pg_sys::FunctionCallInfoData, AllocatedByRust> {
     let mut fcinfo_boxed = PgBox::<pg_sys::FunctionCallInfoData>::alloc0();
     let fcinfo = fcinfo_boxed.deref_mut();
 

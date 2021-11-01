@@ -17,8 +17,8 @@ use std::ptr::NonNull;
 /// Depending on its usage, it'll interoperate correctly with Rust's Drop semantics, such that the
 /// backing Postgres-allocated memory is `pfree()'d` when the `PgBox<T>` is dropped, but it is
 /// possible to effectively return management of the memory back to Postgres (to free on Transaction
-/// end, for example) by calling `::into_pg()`.  This is especially useful for returning values
-/// back to Postgres
+/// end, for example) by calling `::into_pg()` or ``::into_pg_boxed()`.  This is especially useful
+/// for returning values back to Postgres.
 ///
 /// ## Examples
 ///
@@ -69,7 +69,7 @@ use std::ptr::NonNull;
 ///     // open a relation and project it as a pg_sys::Relation
 ///     let relid: pg_sys::Oid = 42;
 ///     let lockmode = pg_sys::AccessShareLock as i32;
-///     let relation = unsafe { PgBox::from_pg(unsafe { pg_sys::relation_open(relid, lockmode) }) };
+///     let relation = unsafe { PgBox::from_pg(pg_sys::relation_open(relid, lockmode)) };
 ///
 ///     // do something with/to 'relation'
 ///     // ...
@@ -82,15 +82,6 @@ use std::ptr::NonNull;
 ///     // we can't free it
 /// }
 /// ```
-///
-///
-/// ## Safety
-///
-/// TODO:
-///  - Interatctions with Rust's panic!() macro
-///  - Interactions with Postgres' error!() macro
-///  - Boxing a null pointer -- it works ::from_pg(), ::into_pg(), and ::to_pg(), but will panic!() on all other uses
-///
 #[repr(transparent)]
 pub struct PgBox<T, AllocatedBy: WhoAllocated<T> = AllocatedByPostgres> {
     ptr: Option<NonNull<T>>,
