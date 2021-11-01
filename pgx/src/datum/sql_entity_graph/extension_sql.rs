@@ -167,7 +167,6 @@ impl Display for SqlDeclaredEntity {
 impl SqlDeclaredEntity {
     pub fn build(variant: impl AsRef<str>, name: impl AsRef<str>) -> eyre::Result<Self> {
         let name = name.as_ref();
-        eprintln!("retval={}", variant.as_ref());
         let retval = match variant.as_ref() {
             "Type" => Self::Type {
                 sql: name
