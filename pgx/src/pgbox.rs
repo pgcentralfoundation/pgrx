@@ -88,15 +88,20 @@ pub struct PgBox<T, AllocatedBy: WhoAllocated<T> = AllocatedByPostgres> {
     __marker: PhantomData<AllocatedBy>,
 }
 
+/// A trait to track if the contents of a [PgBox] were allocated by Rust or Postgres.
 pub trait WhoAllocated<T> {
     fn free(ptr: *mut T);
 }
+
+/// Indicates the [PgBox] contents were allocated by Postgres.  This is also PgBox' default
+/// understanding.
 pub struct AllocatedByPostgres;
+
+/// Indicates the [PgBox] contents were allocated by Rust.
 pub struct AllocatedByRust;
 
 impl<T> WhoAllocated<T> for AllocatedByPostgres {
     /// Doesn't do anything
-    #[inline]
     fn free(_ptr: *mut T) {}
 }
 impl<T> WhoAllocated<T> for AllocatedByRust {
