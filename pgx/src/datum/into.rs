@@ -6,7 +6,10 @@
 //! Primitive types can never be null, so we do a direct
 //! cast of the primitive type to pg_sys::Datum
 
-use crate::{pg_sys, rust_byte_slice_to_bytea, rust_regtypein, rust_str_to_text_p, PgBox, PgOid};
+use crate::{
+    pg_sys, rust_byte_slice_to_bytea, rust_regtypein, rust_str_to_text_p, PgBox, PgOid,
+    WhoAllocated,
+};
 
 /// Convert a Rust type into a `pg_sys::Datum`.
 ///
@@ -260,7 +263,7 @@ impl IntoDatum for () {
 }
 
 /// for user types
-impl<T> IntoDatum for PgBox<T> {
+impl<T, AllocatedBy: WhoAllocated<T>> IntoDatum for PgBox<T, AllocatedBy> {
     fn into_datum(self) -> Option<pg_sys::Datum> {
         if self.is_null() {
             None

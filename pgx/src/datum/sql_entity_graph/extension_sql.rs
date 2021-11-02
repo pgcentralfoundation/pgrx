@@ -118,7 +118,7 @@ pub enum SqlDeclaredEntity {
         array: String,
         option_array: String,
         varlena: String,
-        pg_box: String,
+        pg_box: Vec<String>,
     },
     Enum {
         sql: String,
@@ -131,7 +131,7 @@ pub enum SqlDeclaredEntity {
         array: String,
         option_array: String,
         varlena: String,
-        pg_box: String,
+        pg_box: Vec<String>,
     },
     Function {
         sql: String,
@@ -144,7 +144,7 @@ pub enum SqlDeclaredEntity {
         array: String,
         option_array: String,
         varlena: String,
-        pg_box: String,
+        pg_box: Vec<String>,
     },
 }
 
@@ -183,7 +183,14 @@ impl SqlDeclaredEntity {
                 array: format!("Array<{}>", name),
                 option_array: format!("Option<{}>", name),
                 varlena: format!("Varlena<{}>", name),
-                pg_box: format!("pgx::pgbox::PgBox<{}>", name),
+                pg_box: vec![
+                    format!("pgx::pgbox::PgBox<{}>", name),
+                    format!("pgx::pgbox::PgBox<{}, pgx::pgbox::AllocatedByRust>", name),
+                    format!(
+                        "pgx::pgbox::PgBox<{}, pgx::pgbox::AllocatedByPostgres>",
+                        name
+                    ),
+                ],
             },
             "Enum" => Self::Enum {
                 sql: name
@@ -200,7 +207,14 @@ impl SqlDeclaredEntity {
                 array: format!("Array<{}>", name),
                 option_array: format!("Option<{}>", name),
                 varlena: format!("Varlena<{}>", name),
-                pg_box: format!("pgx::pgbox::PgBox<{}>", name),
+                pg_box: vec![
+                    format!("pgx::pgbox::PgBox<{}>", name),
+                    format!("pgx::pgbox::PgBox<{}, pgx::pgbox::AllocatedByRust>", name),
+                    format!(
+                        "pgx::pgbox::PgBox<{}, pgx::pgbox::AllocatedByPostgres>",
+                        name
+                    ),
+                ],
             },
             "function" => Self::Function {
                 sql: name
@@ -217,7 +231,14 @@ impl SqlDeclaredEntity {
                 array: format!("Array<{}>", name),
                 option_array: format!("Option<{}>", name),
                 varlena: format!("Varlena<{}>", name),
-                pg_box: format!("pgx::pgbox::PgBox<{}>", name),
+                pg_box: vec![
+                    format!("pgx::pgbox::PgBox<{}>", name),
+                    format!("pgx::pgbox::PgBox<{}, pgx::pgbox::AllocatedByRust>", name),
+                    format!(
+                        "pgx::pgbox::PgBox<{}, pgx::pgbox::AllocatedByPostgres>",
+                        name
+                    ),
+                ],
             },
             _ => {
                 return Err(eyre::eyre!(
@@ -262,7 +283,7 @@ impl SqlDeclaredEntity {
                     || identifier_name == array
                     || identifier_name == option_array
                     || identifier_name == varlena
-                    || identifier_name == pg_box
+                    || pg_box.contains(&identifier_name)
             }
             (
                 SqlDeclared::Enum(identifier_name),
@@ -289,7 +310,7 @@ impl SqlDeclaredEntity {
                     || identifier_name == array
                     || identifier_name == option_array
                     || identifier_name == varlena
-                    || identifier_name == pg_box
+                    || pg_box.contains(&identifier_name)
             }
             (
                 SqlDeclared::Function(identifier_name),
@@ -316,7 +337,7 @@ impl SqlDeclaredEntity {
                     || identifier_name == array
                     || identifier_name == option_array
                     || identifier_name == varlena
-                    || identifier_name == pg_box
+                    || pg_box.contains(&identifier_name)
             }
             _ => false,
         }
