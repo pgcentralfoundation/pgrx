@@ -2,7 +2,6 @@
 // governed by the MIT license that can be found in the LICENSE file.
 
 use crate::{pg_sys, FromDatum, IntoDatum, PgMemoryContexts};
-use std::num::NonZeroUsize;
 
 /// Represents Postgres' `internal` data type, which is documented as:
 ///
@@ -15,30 +14,28 @@ use std::num::NonZeroUsize;
 ///
 /// ## Implementation Notes
 ///
-/// [Internal] is simply a wrapper around a [pg_sys::Datum], which when retreived via `::get/get_mut()`
-/// is simply cast to a pointer of `T`, returning the respective reference.
+/// [Internal] is a wrapper around an `Option<pg_sys::Datum>`, which when retreived via
+/// `::get/get_mut()` is cast to a pointer of `T`, returning the respective reference.
 ///
 /// ## Safety
 ///
-/// We make no guarantees about what the internal Datum actually points to in memory, so it is your
-/// responsibility to ensure that what you're casting it to is really what it is.
-#[repr(transparent)]
-pub struct Internal(Option<NonZeroUsize>);
+/// We make no guarantees about what the internal [pg_sys::Datum] actually points to in memory, so
+/// it is your responsibility to ensure that what you're casting it to is really what it is.
+pub struct Internal(Option<pg_sys::Datum>);
 
 impl Internal {
-    /// Construct a new Internal from any type.  The value will be dropped when the
-    /// [PgMemoryContexts::CurrentMemoryContext] is deleted
+    /// Construct a new Internal from any type.  
+    ///
+    /// The value will be dropped when the [PgMemoryContexts::CurrentMemoryContext] is deleted.
     #[inline]
     pub fn new<T>(t: T) -> Self {
-        Self(Some(unsafe {
-            // SAFETY: `leak_and_drop_on_delete()` will always give us a non-zero (non-null) pointer
-            NonZeroUsize::new_unchecked(
-                PgMemoryContexts::CurrentMemoryContext.leak_and_drop_on_delete(t) as usize,
-            )
-        }))
+        Self(Some(
+            PgMemoryContexts::CurrentMemoryContext.leak_and_drop_on_delete(t) as pg_sys::Datum,
+        ))
     }
 
-    /// Return a reference to the memory pointed to by this [Internal], cast as `T`.
+    /// Return a reference to the memory pointed to by this [Internal], as `Some(&T)`, unless the
+    /// backing datum is null, then `None`.
     ///
     /// ## Safety
     ///
@@ -46,13 +43,11 @@ impl Internal {
     /// your responsibility.
     #[inline]
     pub unsafe fn get<T>(&self) -> Option<&T> {
-        match self.0 {
-            None => None,
-            Some(datum) => (datum.get() as *const T).as_ref(),
-        }
+        self.0.map(|datum| (datum as *const T).as_ref()).flatten()
     }
 
-    /// Return a mutable reference to the memory pointed to by this [Internal], cast as `T`.
+    /// Return a reference to the memory pointed to by this [Internal], as `Some(&mut T)`, unless the
+    /// backing datum is null, then `None`.
     ///
     /// ## Safety
     ///
@@ -60,30 +55,34 @@ impl Internal {
     /// your responsibility.
     #[inline]
     pub unsafe fn get_mut<T>(&self) -> Option<&mut T> {
-        match self.0 {
-            None => None,
-            Some(datum) => (datum.get() as *mut T).as_mut(),
-        }
+        self.0.map(|datum| (datum as *mut T).as_mut()).flatten()
+    }
+
+    /// Returns the contained `Option<pg_sys::Datum>`
+    #[inline]
+    pub fn unwrap(self) -> Option<pg_sys::Datum> {
+        self.0
+    }
+}
+
+impl From<Option<pg_sys::Datum>> for Internal {
+    #[inline]
+    fn from(datum: Option<pg_sys::Datum>) -> Self {
+        Internal(datum)
     }
 }
 
 impl FromDatum for Internal {
     #[inline]
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<Internal> {
-        Some(Internal(if is_null {
-            None
-        } else {
-            // SAFETY:  Postgres shouldn't be sending us a zero-value Datum when is_null is true
-            assert!(datum != 0);
-            Some(NonZeroUsize::new_unchecked(datum))
-        }))
+        Some(Internal(if is_null { None } else { Some(datum) }))
     }
 }
 
 impl IntoDatum for Internal {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        self.0.map(|datum| datum.get() as pg_sys::Datum)
+        self.0
     }
 
     #[inline]
