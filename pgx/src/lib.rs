@@ -211,8 +211,7 @@ pub static DEFAULT_TYPEID_SQL_MAPPING: Lazy<HashSet<RustSqlMapping>> = Lazy::new
     map_type!(m, Timestamp, "timestamp");
     map_type!(m, TimestampWithTimeZone, "timestamp with time zone");
     map_type!(m, pgx_pg_sys::PlannerInfo, "internal");
-    map_type!(m, datum::Internal<pgx_pg_sys::PlannerInfo>, "internal");
-    map_type!(m, datum::Internal<pgx_pg_sys::List>, "internal");
+    map_type!(m, datum::Internal, "internal");
     map_type!(m, pgbox::PgBox<pgx_pg_sys::IndexAmRoutine>, "internal");
     map_type!(m, rel::PgRelation, "regclass");
     map_type!(m, datum::Numeric, "numeric");
