@@ -5,10 +5,12 @@
 
 use crate::{pg_sys, FromDatum, IntoDatum, Json, PgMemoryContexts, PgOid};
 use enum_primitive_derive::*;
+use make_tuple_traits::mark_tuples;
 use num_traits::FromPrimitive;
 use std::collections::HashMap;
 use std::fmt::Debug;
 use std::ops::{Index, IndexMut};
+use tuple_tricks::{NestTuple, PreviousTuple, UnnestTuple};
 
 #[derive(Debug, Primitive)]
 pub enum SpiOk {
@@ -458,6 +460,48 @@ impl SpiTupleTable {
     }
 }
 
+mark_tuples!(Marked);
+pub trait TupleDatum {
+    type OptionedTuple;
+    fn get_tuple(spi_heap_tuple_data: &SpiHeapTupleData) -> (Self::OptionedTuple, usize);
+}
+
+impl<A: FromDatum> TupleDatum for (A,) {
+    type OptionedTuple = (Option<A>,);
+    fn get_tuple(spi_heap_tuple_data: &SpiHeapTupleData) -> ((Option<A>,), usize) {
+        let opt_a = spi_heap_tuple_data
+            .by_ordinal(1)
+            .expect("Unable to get element 1 of heap tuple data")
+            .value::<A>();
+        ((opt_a,), 1)
+    }
+}
+impl<T, PrevTuple, Head, PrevOptionedTuple, PrevOptionedTupleNested> TupleDatum for T
+where
+    T: Marked + PreviousTuple<TailTuple = PrevTuple, Head = Head>,
+    Head: FromDatum,
+    PrevTuple: TupleDatum<OptionedTuple = PrevOptionedTuple>,
+    PrevOptionedTuple: NestTuple<Nested = PrevOptionedTupleNested>,
+    (PrevOptionedTupleNested, Option<Head>): UnnestTuple,
+{
+    type OptionedTuple = <(PrevOptionedTupleNested, Option<Head>) as UnnestTuple>::Unnested;
+    fn get_tuple(spi_heap_tuple_data: &SpiHeapTupleData) -> (Self::OptionedTuple, usize) {
+        let (prev_optioned_tupled, last_index) =
+            <PrevTuple as TupleDatum>::get_tuple(spi_heap_tuple_data);
+        let new_index = last_index + 1;
+        let prev_optioned_tupled_nested = prev_optioned_tupled.nest();
+        let new_datum = spi_heap_tuple_data
+            .by_ordinal(new_index)
+            .expect(&format!(
+                "Unnable to get element {} of heap tuple data",
+                new_index
+            ))
+            .value::<Head>();
+        let unnested_new = (prev_optioned_tupled_nested, new_datum).unnest();
+        (unnested_new, new_index)
+    }
+}
+
 impl SpiHeapTupleData {
     /// Create a new `SpiHeapTupleData` from its constituent parts
     pub unsafe fn new(tupdesc: pg_sys::TupleDesc, htup: *mut pg_sys::HeapTupleData) -> Self {
@@ -597,47 +641,13 @@ impl SpiHeapTupleData {
             }
         }
     }
-}
 
-mark_tuples!(Marked);
-pub trait TupleDatum {
-    type OptionedTuple;
-    fn get_tuple(spi_heap_tuple_data: &SpiHeapTupleData) -> (Self::OptionedTuple, usize);
-}
-
-impl<A: FromDatum> TupleDatum for (A,) {
-    type OptionedTuple = (Option<A>,);
-    fn get_tuple(spi_heap_tuple_data: &SpiHeapTupleData) -> ((Option<A>,), usize) {
-        let opt_a = spi_heap_tuple_data
-            .by_ordinal(1)
-            .expect("Unable to get element 1 of heap tuple data")
-            .value::<A>();
-        ((opt_a,), 1)
-    }
-}
-impl<T, PrevTuple, Head, PrevOptionedTuple, PrevOptionedTupleNested> TupleDatum for T
-where
-    T: Marked + PreviousTuple<TailTuple = PrevTuple, Head = Head>,
-    Head: FromDatum,
-    PrevTuple: TupleDatum<OptionedTuple = PrevOptionedTuple>,
-    PrevOptionedTuple: NestTuple<Nested = PrevOptionedTupleNested>,
-    (PrevOptionedTupleNested, Option<Head>): UnnestTuple,
-{
-    type OptionedTuple = <(PrevOptionedTupleNested, Option<Head>) as UnnestTuple>::Unnested;
-    fn get_tuple(spi_heap_tuple_data: &SpiHeapTupleData) -> (Self::OptionedTuple, usize) {
-        let (prev_optioned_tupled, last_index) =
-            <PrevTuple as TupleDatum>::get_tuple(spi_heap_tuple_data);
-        let new_index = last_index + 1;
-        let prev_optioned_tupled_nested = prev_optioned_tupled.nest();
-        let new_datum = spi_heap_tuple_data
-            .by_ordinal(new_index)
-            .expect(&format!(
-                "Unnable to get element {} of heap tuple data",
-                new_index
-            ))
-            .value::<Head>();
-        let unnested_new = (prev_optioned_tupled_nested, new_datum).unnest();
-        (unnested_new, new_index)
+    /// Get a tuple of options by specifying a tuple of inner types
+    /// If the type cannot be cast then returns None. If there aren't enough entries, then it will
+    /// fail
+    pub fn get_tuple<T: TupleDatum>(&self) -> <T as TupleDatum>::OptionedTuple {
+        let (tuple, _) = <T as TupleDatum>::get_tuple(self);
+        tuple
     }
 }
 
