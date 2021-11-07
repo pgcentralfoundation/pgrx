@@ -50,3 +50,5 @@ petgraph = "0.6.0"
 eyre = "0.6.5"
 tracing = "0.1.29"
 tracing-error = "0.2.0"
+tuple_tricks = { git = "https://github.com/jcrist1/tuple_tricks", branch = "main }
+make_tuple_traits = { git = "https://github.com/jcrist1/tuple_tricks", branch = "main }
