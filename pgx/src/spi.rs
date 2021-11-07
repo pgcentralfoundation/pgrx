@@ -460,12 +460,19 @@ impl SpiTupleTable {
     }
 }
 
+/// This adds generic typed tuple deserialisation for SpiHeapTupleData. First we implement a custom
+/// marker trait so we can safely derive the new trait for arbitrary tuples.
 mark_tuples!(Marked);
+
+/// Here we define the new trait, which has the type representing the tuple of options that we get
+/// from the spi heap tuple data, and a method for extracting such a tuple of options from the spi
+/// heap tuple data.
 pub trait TupleDatum {
     type OptionedTuple;
     fn get_tuple(spi_heap_tuple_data: &SpiHeapTupleData) -> (Self::OptionedTuple, usize);
 }
 
+/// We implement the trait inductively, so must start with a single tuple
 impl<A: FromDatum> TupleDatum for (A,) {
     type OptionedTuple = (Option<A>,);
     fn get_tuple(spi_heap_tuple_data: &SpiHeapTupleData) -> ((Option<A>,), usize) {
@@ -476,6 +483,9 @@ impl<A: FromDatum> TupleDatum for (A,) {
         ((opt_a,), 1)
     }
 }
+
+/// and here we apply the "inductive hypothesis" i.e. if we can implement this for a given tuple,
+/// then we can implement it for a tuple with one more element
 impl<T, PrevTuple, Head, PrevOptionedTuple, PrevOptionedTupleNested> TupleDatum for T
 where
     T: Marked + PreviousTuple<TailTuple = PrevTuple, Head = Head>,
