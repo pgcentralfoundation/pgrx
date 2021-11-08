@@ -333,7 +333,7 @@ pub const PG_KRB_SRVNAM: &'static [u8; 9usize] = b"postgres\0";
 pub const PG_MAJORVERSION: &'static [u8; 3usize] = b"11\0";
 pub const PG_VERSION: &'static [u8; 6usize] = b"11.13\0";
 pub const PG_VERSION_NUM: u32 = 110013;
-pub const PG_VERSION_STR : & 'static [u8 ; 114usize] = b"PostgreSQL 11.13 on x86_64-apple-darwin20.6.0, compiled by Apple clang version 13.0.0 (clang-1300.0.29.3), 64-bit\0" ;
+pub const PG_VERSION_STR : & 'static [u8 ; 114usize] = b"PostgreSQL 11.13 on x86_64-apple-darwin20.4.0, compiled by Apple clang version 13.0.0 (clang-1300.0.29.3), 64-bit\0" ;
 pub const RELSEG_SIZE: u32 = 131072;
 pub const SIZEOF_BOOL: u32 = 1;
 pub const SIZEOF_LONG: u32 = 8;
@@ -427,9 +427,6 @@ pub const __MAC_10_16: u32 = 101600;
 pub const __MAC_11_0: u32 = 110000;
 pub const __MAC_11_1: u32 = 110100;
 pub const __MAC_11_3: u32 = 110300;
-pub const __MAC_11_4: u32 = 110400;
-pub const __MAC_11_5: u32 = 110500;
-pub const __MAC_12_0: u32 = 120000;
 pub const __IPHONE_2_0: u32 = 20000;
 pub const __IPHONE_2_1: u32 = 20100;
 pub const __IPHONE_2_2: u32 = 20200;
@@ -482,10 +479,6 @@ pub const __IPHONE_14_1: u32 = 140100;
 pub const __IPHONE_14_2: u32 = 140200;
 pub const __IPHONE_14_3: u32 = 140300;
 pub const __IPHONE_14_5: u32 = 140500;
-pub const __IPHONE_14_6: u32 = 140600;
-pub const __IPHONE_14_7: u32 = 140700;
-pub const __IPHONE_14_8: u32 = 140800;
-pub const __IPHONE_15_0: u32 = 150000;
 pub const __TVOS_9_0: u32 = 90000;
 pub const __TVOS_9_1: u32 = 90100;
 pub const __TVOS_9_2: u32 = 90200;
@@ -512,9 +505,6 @@ pub const __TVOS_14_1: u32 = 140100;
 pub const __TVOS_14_2: u32 = 140200;
 pub const __TVOS_14_3: u32 = 140300;
 pub const __TVOS_14_5: u32 = 140500;
-pub const __TVOS_14_6: u32 = 140600;
-pub const __TVOS_14_7: u32 = 140700;
-pub const __TVOS_15_0: u32 = 150000;
 pub const __WATCHOS_1_0: u32 = 10000;
 pub const __WATCHOS_2_0: u32 = 20000;
 pub const __WATCHOS_2_1: u32 = 20100;
@@ -539,9 +529,6 @@ pub const __WATCHOS_7_1: u32 = 70100;
 pub const __WATCHOS_7_2: u32 = 70200;
 pub const __WATCHOS_7_3: u32 = 70300;
 pub const __WATCHOS_7_4: u32 = 70400;
-pub const __WATCHOS_7_5: u32 = 70500;
-pub const __WATCHOS_7_6: u32 = 70600;
-pub const __WATCHOS_8_0: u32 = 80000;
 pub const MAC_OS_X_VERSION_10_0: u32 = 1000;
 pub const MAC_OS_X_VERSION_10_1: u32 = 1010;
 pub const MAC_OS_X_VERSION_10_2: u32 = 1020;
@@ -575,11 +562,9 @@ pub const MAC_OS_X_VERSION_10_15: u32 = 101500;
 pub const MAC_OS_X_VERSION_10_15_1: u32 = 101501;
 pub const MAC_OS_X_VERSION_10_16: u32 = 101600;
 pub const MAC_OS_VERSION_11_0: u32 = 110000;
-pub const MAC_OS_VERSION_12_0: u32 = 120000;
 pub const __DRIVERKIT_19_0: u32 = 190000;
 pub const __DRIVERKIT_20_0: u32 = 200000;
-pub const __DRIVERKIT_21_0: u32 = 210000;
-pub const __MAC_OS_X_VERSION_MAX_ALLOWED: u32 = 120000;
+pub const __MAC_OS_X_VERSION_MAX_ALLOWED: u32 = 110300;
 pub const __ENABLE_LEGACY_MAC_AVAILABILITY: u32 = 1;
 pub const __PTHREAD_SIZE__: u32 = 8176;
 pub const __PTHREAD_ATTR_SIZE__: u32 = 56;
@@ -839,7 +824,6 @@ pub const IOPOL_TYPE_VFS_TRIGGER_RESOLVE: u32 = 5;
 pub const IOPOL_TYPE_VFS_IGNORE_CONTENT_PROTECTION: u32 = 6;
 pub const IOPOL_TYPE_VFS_IGNORE_PERMISSIONS: u32 = 7;
 pub const IOPOL_TYPE_VFS_SKIP_MTIME_UPDATE: u32 = 8;
-pub const IOPOL_TYPE_VFS_ALLOW_LOW_SPACE_WRITES: u32 = 9;
 pub const IOPOL_SCOPE_PROCESS: u32 = 0;
 pub const IOPOL_SCOPE_THREAD: u32 = 1;
 pub const IOPOL_SCOPE_DARWIN_BG: u32 = 2;
@@ -866,8 +850,6 @@ pub const IOPOL_VFS_IGNORE_PERMISSIONS_OFF: u32 = 0;
 pub const IOPOL_VFS_IGNORE_PERMISSIONS_ON: u32 = 1;
 pub const IOPOL_VFS_SKIP_MTIME_UPDATE_OFF: u32 = 0;
 pub const IOPOL_VFS_SKIP_MTIME_UPDATE_ON: u32 = 1;
-pub const IOPOL_VFS_ALLOW_LOW_SPACE_WRITES_OFF: u32 = 0;
-pub const IOPOL_VFS_ALLOW_LOW_SPACE_WRITES_ON: u32 = 1;
 pub const WNOHANG: u32 = 1;
 pub const WUNTRACED: u32 = 2;
 pub const WCOREFLAG: u32 = 128;
@@ -1099,7 +1081,7 @@ pub const KEV_DL_IFCAP_CHANGED: u32 = 19;
 pub const KEV_DL_LINK_QUALITY_METRIC_CHANGED: u32 = 20;
 pub const KEV_DL_NODE_PRESENCE: u32 = 21;
 pub const KEV_DL_NODE_ABSENCE: u32 = 22;
-pub const KEV_DL_PRIMARY_ELECTED: u32 = 23;
+pub const KEV_DL_MASTER_ELECTED: u32 = 23;
 pub const KEV_DL_ISSUES: u32 = 24;
 pub const KEV_DL_IFDELEGATE_CHANGED: u32 = 25;
 pub const KEV_DL_AWDL_RESTRICTED: u32 = 26;
@@ -1615,7 +1597,6 @@ pub const IPV6CTL_MAXIFPREFIXES: u32 = 47;
 pub const IPV6CTL_MAXIFDEFROUTERS: u32 = 48;
 pub const IPV6CTL_MAXDYNROUTES: u32 = 49;
 pub const ICMPV6CTL_ND6_ONLINKNSRFC4861: u32 = 50;
-pub const IPV6CTL_ULA_USETEMPADDR: u32 = 51;
 pub const IPV6CTL_MAXID: u32 = 51;
 pub const _PATH_HEQUIV: &'static [u8; 17usize] = b"/etc/hosts.equiv\0";
 pub const _PATH_HOSTS: &'static [u8; 11usize] = b"/etc/hosts\0";
@@ -4149,6 +4130,14 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
+    pub fn zopen(
+        arg1: *const ::std::os::raw::c_char,
+        arg2: *const ::std::os::raw::c_char,
+        arg3: ::std::os::raw::c_int,
+    ) -> *mut FILE;
+}
+#[pg_guard]
+extern "C" {
     pub fn funopen(
         arg1: *const ::std::os::raw::c_void,
         arg2: ::std::option::Option<
@@ -6193,7 +6182,10 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
-    pub fn aligned_alloc(__alignment: usize, __size: usize) -> *mut ::std::os::raw::c_void;
+    pub fn aligned_alloc(
+        __alignment: ::std::os::raw::c_ulong,
+        __size: ::std::os::raw::c_ulong,
+    ) -> *mut ::std::os::raw::c_void;
 }
 #[pg_guard]
 extern "C" {
@@ -8802,6 +8794,10 @@ extern "C" {
 #[pg_guard]
 extern "C" {
     pub fn uuid_generate_time(out: *mut ::std::os::raw::c_uchar);
+}
+#[pg_guard]
+extern "C" {
+    pub fn uuid_generate_early_random(out: *mut ::std::os::raw::c_uchar);
 }
 #[pg_guard]
 extern "C" {
