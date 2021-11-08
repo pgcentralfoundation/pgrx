@@ -80,8 +80,9 @@ impl ToSql for PgExternEntity {
     fn to_sql(&self, context: &super::PgxSql) -> eyre::Result<String> {
         let self_index = context.externs[self];
         let mut extern_attrs = self.extern_attrs.clone();
-        let mut strict_upgrade = true;
-        if !extern_attrs.iter().any(|i| i == &ExternArgs::Strict) {
+        // if we already have a STRICT marker we do not need to add it
+        let mut strict_upgrade = !extern_attrs.iter().any(|i| i == &ExternArgs::Strict);
+        if strict_upgrade {
             for arg in &self.fn_args {
                 if arg.is_optional {
                     strict_upgrade = false;

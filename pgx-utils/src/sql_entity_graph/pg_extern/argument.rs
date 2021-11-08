@@ -265,6 +265,7 @@ impl ToTokens for Argument {
                     match ident_string.as_str() {
                         "Option" => found_optional = true,
                         "VariadicArray" => found_variadic = true,
+                        "Internal" => found_optional = true,
                         _ => (),
                     }
                 }
