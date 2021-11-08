@@ -113,7 +113,10 @@ impl PgGuardRewriter {
                 true,
             ),
 
-            CategorizedType::Tuple(_types) => (PgGuardRewriter::impl_tuple_udf(func), false),
+            CategorizedType::Tuple(_types) => (
+                PgGuardRewriter::impl_tuple_udf(func, entity_submission.clone()),
+                false,
+            ),
 
             CategorizedType::Iterator(types) if types.len() == 1 => (
                 PgGuardRewriter::impl_setof_srf(
@@ -211,20 +214,29 @@ impl PgGuardRewriter {
         }
     }
 
-    fn impl_tuple_udf(mut func: ItemFn) -> proc_macro2::TokenStream {
+    fn impl_tuple_udf(
+        mut func: ItemFn,
+        entity_submission: Option<&pgx_utils::sql_entity_graph::PgExtern>,
+    ) -> proc_macro2::TokenStream {
         let func_span = func.span();
         let return_type = func.sig.output;
         let return_type = format!("{}", quote! {#return_type});
         let return_type =
             proc_macro2::TokenStream::from_str(return_type.trim_start_matches("->")).unwrap();
         let return_type = quote! {impl std::iter::Iterator<Item = #return_type>};
+        let attrs = entity_submission.unwrap().extern_attr_tokens();
 
         func.sig.output = ReturnType::Default;
         let sig = func.sig;
         let body = func.block;
+
         // We do **not** put an entity submission here as there still exists a `pg_extern` attribute.
+        //
+        // This is because we quietely rewrite the function signature to `Iterator<Item = T>` and
+        // rely on #[pg_extern] being called again during compilation.  It is important that we
+        // include the original #[pg_extern(<attributes>)] in the generated code.
         quote_spanned! {func_span=>
-            #[pg_extern]
+            #[pg_extern(#attrs)]
             #sig -> #return_type {
                 Some(#body).into_iter()
             }

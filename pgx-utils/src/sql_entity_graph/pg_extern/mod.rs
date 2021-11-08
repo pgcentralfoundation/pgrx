@@ -42,6 +42,7 @@ use syn::Meta;
 #[derive(Debug, Clone)]
 pub struct PgExtern {
     attrs: Option<PgxAttributes>,
+    attr_tokens: proc_macro2::TokenStream,
     func: syn::ItemFn,
 }
 
@@ -69,6 +70,10 @@ impl PgExtern {
 
     fn extern_attrs(&self) -> Option<&PgxAttributes> {
         self.attrs.as_ref()
+    }
+
+    pub fn extern_attr_tokens(&self) -> &proc_macro2::TokenStream {
+        &self.attr_tokens
     }
 
     fn overridden(&self) -> Option<String> {
@@ -185,9 +190,13 @@ impl PgExtern {
     }
 
     pub fn new(attr: TokenStream2, item: TokenStream2) -> Result<Self, syn::Error> {
-        let attrs = syn::parse2::<PgxAttributes>(attr).ok();
+        let attrs = syn::parse2::<PgxAttributes>(attr.clone()).ok();
         let func = syn::parse2::<syn::ItemFn>(item)?;
-        Ok(Self { attrs, func })
+        Ok(Self {
+            attrs: attrs,
+            attr_tokens: attr,
+            func: func,
+        })
     }
 }
 
@@ -245,6 +254,7 @@ impl Parse for PgExtern {
     fn parse(input: ParseStream) -> Result<Self, syn::Error> {
         Ok(Self {
             attrs: input.parse().ok(),
+            attr_tokens: input.parse().unwrap(),
             func: input.parse()?,
         })
     }
