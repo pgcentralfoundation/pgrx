@@ -47,6 +47,7 @@
 #include "nodes/nodes.h"
 #include "nodes/print.h"
 #include "nodes/replnodes.h"
+#include "nodes/supportnodes.h"
 #include "nodes/tidbitmap.h"
 #include "nodes/value.h"
 #include "optimizer/clauses.h"
