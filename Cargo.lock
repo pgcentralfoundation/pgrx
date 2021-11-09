@@ -261,7 +261,7 @@ dependencies = [
 
 [[package]]
 name = "cargo-pgx"
-version = "0.2.2"
+version = "0.2.3"
 dependencies = [
  "clap",
  "colored",
@@ -1337,7 +1337,7 @@ dependencies = [
 
 [[package]]
 name = "pgx"
-version = "0.2.2"
+version = "0.2.3"
 dependencies = [
  "atomic-traits",
  "bitflags",
@@ -1363,7 +1363,7 @@ dependencies = [
 
 [[package]]
 name = "pgx-macros"
-version = "0.2.2"
+version = "0.2.3"
 dependencies = [
  "pgx-utils",
  "proc-macro-crate",
@@ -1376,7 +1376,7 @@ dependencies = [
 
 [[package]]
 name = "pgx-parent"
-version = "0.2.2"
+version = "0.2.3"
 dependencies = [
  "cargo-pgx",
  "pgx",
@@ -1387,7 +1387,7 @@ dependencies = [
 
 [[package]]
 name = "pgx-pg-sys"
-version = "0.2.2"
+version = "0.2.3"
 dependencies = [
  "bindgen",
  "build-deps",
@@ -1405,7 +1405,7 @@ dependencies = [
 
 [[package]]
 name = "pgx-tests"
-version = "0.2.2"
+version = "0.2.3"
 dependencies = [
  "colored",
  "lazy_static",
@@ -1423,7 +1423,7 @@ dependencies = [
 
 [[package]]
 name = "pgx-utils"
-version = "0.2.2"
+version = "0.2.3"
 dependencies = [
  "clap",
  "color-eyre",
@@ -2271,9 +2271,9 @@ checksum = "25eb0ca3468fc0acc11828786797f6ef9aa1555e4a211a60d64cc8e4d1be47d6"
 
 [[package]]
 name = "tinyvec"
-version = "1.5.0"
+version = "1.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f83b2a3d4d9091d0abd7eba4dc2710b1718583bd4d8992e2190720ea38f391f7"
+checksum = "2c1c1d5a42b6245520c249549ec267180beaffcc0615401ac8e31853d4b6d8d2"
 dependencies = [
  "tinyvec_macros",
 ]
