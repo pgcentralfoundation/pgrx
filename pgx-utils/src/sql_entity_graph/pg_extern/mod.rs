@@ -252,10 +252,13 @@ impl ToTokens for PgExtern {
 
 impl Parse for PgExtern {
     fn parse(input: ParseStream) -> Result<Self, syn::Error> {
+        let attrs: Option<PgxAttributes> = input.parse().ok();
+        let func = input.parse()?;
+        let attr_tokens: proc_macro2::TokenStream = attrs.clone().into_token_stream();
         Ok(Self {
-            attrs: input.parse().ok(),
-            attr_tokens: input.parse().unwrap(),
-            func: input.parse()?,
+            attrs,
+            attr_tokens,
+            func,
         })
     }
 }
