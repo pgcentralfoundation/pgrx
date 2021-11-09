@@ -83,8 +83,9 @@ fn copy_file(src: PathBuf, dest: PathBuf, msg: &str) {
     );
 
     // we want to filter the contents of each sql file
-    let mut input = handle_result!(
-        std::fs::read_to_string($src), format!("failed to read `{}`", src.display())
+    let input = handle_result!(
+        std::fs::read_to_string(&src),
+        format!("failed to read `{}`", src.display())
     );
     let input = filter_contents(input);
 
