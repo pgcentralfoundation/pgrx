@@ -30,7 +30,8 @@ static PROCESS_ENV_DENYLIST: &'static [&'static str] = &[
     "LIBRARY_PATH", // see https://github.com/zombodb/pgx/issues/16
 ];
 
-pub(crate) fn init_pgx(pgx: &Pgx) -> std::result::Result<(), std::io::Error> {
+pub(crate) fn init_pgx(pgx: &Pgx, initialize_postgres: bool)
+-> std::result::Result<(), std::io::Error> {
     let dir = Pgx::home()?;
 
     let output_configs = Arc::new(Mutex::new(Vec::new()));
@@ -42,7 +43,9 @@ pub(crate) fn init_pgx(pgx: &Pgx) -> std::result::Result<(), std::io::Error> {
 
     pg_configs.into_par_iter().for_each(|pg_config| {
         let mut pg_config = pg_config.clone();
-        stop_postgres(&pg_config).ok(); // no need to fail on errors trying to stop postgres while initializing
+        if initialize_postgres {
+            stop_postgres(&pg_config).ok(); // no need to fail on errors trying to stop postgres while initializing
+        }
         if !pg_config.is_real() {
             pg_config = match download_postgres(&pg_config, &dir) {
                 Ok(pg_config) => pg_config,
@@ -74,7 +77,7 @@ pub(crate) fn init_pgx(pgx: &Pgx) -> std::result::Result<(), std::io::Error> {
 
         let datadir = pg_config.data_dir()?;
         let bindir = pg_config.bin_dir()?;
-        if !datadir.exists() {
+        if !datadir.exists() && initialize_postgres {
             initdb(&bindir, &datadir)?;
         }
     }

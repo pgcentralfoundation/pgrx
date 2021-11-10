@@ -55,7 +55,7 @@ fn do_it() -> std::result::Result<(), std::io::Error> {
 
                 if versions.is_empty() {
                     // no arguments specified, so we'll just install our defaults
-                    init_pgx(&Pgx::default(SUPPORTED_MAJOR_VERSIONS)?)
+                    init_pgx(&Pgx::default(SUPPORTED_MAJOR_VERSIONS)?, true)
                 } else {
                     // user specified arguments, so we'll only install those versions of Postgres
                     let mut default_pgx = None;
@@ -78,7 +78,9 @@ fn do_it() -> std::result::Result<(), std::io::Error> {
                         pgx.push(config);
                     }
 
-                    init_pgx(&pgx)
+                    let initialize_postgres = !init.is_present("no-restart");
+
+                    init_pgx(&pgx, initialize_postgres)
                 }
             }
             ("new", Some(new)) => {

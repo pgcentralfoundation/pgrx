@@ -41,6 +41,9 @@ subcommands:
                     takes_value: true
                     required: false
                     help: if installed locally, the path to PG14's 'pg_config' tool, or 'download' to have pgx download/compile/install it
+                - no-restart:
+                    long: no-restart
+                    help: do not stop and initialize the Postgres instance(s) that pgx will point at.
           - start:
               about: start a pgx-managed Postgres instance
               args:
@@ -120,7 +123,7 @@ subcommands:
                 REQUIREMENTS
                     The SQL generation process requires configuring a few settings in the crate. Normally 'cargo pgx schema --force-default'
                     can set these automatically.
-                    
+
                     They are documented in the README.md of cargo-pgx: https://github.com/zombodb/pgx/tree/master/cargo-pgx#Manual-SQL-Generation
               args:
                 - manual:
