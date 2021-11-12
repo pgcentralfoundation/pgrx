@@ -8,7 +8,7 @@ version = "0.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b9ecd88a8c8378ca913a680cd98f0f13ac67383d35993f86c90a70e3f137816b"
 dependencies = [
- "gimli 0.26.1",
+ "gimli",
 ]
 
 [[package]]
@@ -282,9 +282,9 @@ dependencies = [
 
 [[package]]
 name = "cc"
-version = "1.0.71"
+version = "1.0.72"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "79c2681d6594606957bbb8631c4b90a7fcaaa72cdb714743a437b156d6a7eedd"
+checksum = "22a9137b95ea06864e018375b72adfb7db6e6f68cfc8df5a04d00288050485ee"
 
 [[package]]
 name = "cexpr"
@@ -784,19 +784,13 @@ dependencies = [
 
 [[package]]
 name = "gimli"
-version = "0.25.0"
+version = "0.26.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f0a01e0497841a3b2db4f8afa483cce65f7e96a3498bd6c541734792aeac8fe7"
+checksum = "78cc372d058dcf6d5ecd98510e7fbc9e5aec4d21de70f65fea8fecebcd881bd4"
 dependencies = [
  "fallible-iterator",
  "stable_deref_trait",
 ]
-
-[[package]]
-name = "gimli"
-version = "0.26.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "78cc372d058dcf6d5ecd98510e7fbc9e5aec4d21de70f65fea8fecebcd881bd4"
 
 [[package]]
 name = "glob"
@@ -838,9 +832,9 @@ checksum = "ab5ef0d4909ef3724cc8cce6ccc8572c5c817592e9285f5464f8e86f8bd3726e"
 
 [[package]]
 name = "heapless"
-version = "0.7.7"
+version = "0.7.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fe65ef062f1af5b1b189842b0bc45bd671c38e1d22c6aa22e6ada03d01026d53"
+checksum = "9c1ad878e07405df82b695089e63d278244344f80e764074d0bdfe99b89460f3"
 dependencies = [
  "atomic-polyfill",
  "hash32",
@@ -1355,7 +1349,7 @@ dependencies = [
  "serde",
  "serde_cbor",
  "serde_json",
- "time 0.3.4",
+ "time 0.3.5",
  "tracing",
  "tracing-error 0.2.0",
  "uuid",
@@ -1418,7 +1412,7 @@ dependencies = [
  "serde",
  "serde_json",
  "shutdown_hooks",
- "time 0.3.4",
+ "time 0.3.5",
 ]
 
 [[package]]
@@ -2114,9 +2108,9 @@ checksum = "6bdef32e8150c2a081110b42772ffe7d7c9032b606bc226c8260fd97e0976601"
 
 [[package]]
 name = "symbolic"
-version = "8.3.2"
+version = "8.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6f1b42b1af77525b64049a54da4b7b66614081d4234e4529a48ba60a8ea25f6b"
+checksum = "cdee51d8cb63a5bed678d0a1dbb181fb19b8b1ee682ef239e2db1eb544c8c6f6"
 dependencies = [
  "symbolic-common",
  "symbolic-debuginfo",
@@ -2124,9 +2118,9 @@ dependencies = [
 
 [[package]]
 name = "symbolic-common"
-version = "8.3.2"
+version = "8.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a1c77c64c4a8138a8d26b6ab26b29fdbe4fae7f6537cf9bf30e51b282efa2361"
+checksum = "5f544125aace169c385db21fc22f38b77710138e90e3f57077c98344b38d5880"
 dependencies = [
  "debugid",
  "memmap",
@@ -2136,15 +2130,15 @@ dependencies = [
 
 [[package]]
 name = "symbolic-debuginfo"
-version = "8.3.2"
+version = "8.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "abfc979a6008ec9fd6baa8536d7918f4d557dc66af0f27d6ed8751ccb04180ac"
+checksum = "f13b81675345e73a24696e61752e2dc3bd5306684c4ca65795306676123dd409"
 dependencies = [
  "dmsort",
  "elementtree",
  "fallible-iterator",
  "flate2",
- "gimli 0.25.0",
+ "gimli",
  "goblin",
  "lazy_static",
  "lazycell",
@@ -2254,9 +2248,9 @@ dependencies = [
 
 [[package]]
 name = "time"
-version = "0.3.4"
+version = "0.3.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "99beeb0daeac2bd1e86ac2c21caddecb244b39a093594da1a661ec2060c7aedd"
+checksum = "41effe7cfa8af36f439fac33861b66b049edc6f9a32331e2312660529c1c24ad"
 dependencies = [
  "itoa",
  "libc",
