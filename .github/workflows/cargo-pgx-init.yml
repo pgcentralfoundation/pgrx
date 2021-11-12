@@ -63,8 +63,9 @@ jobs:
        echo pgx        = '{' git = '"'https://github.com/zombodb/pgx'"', package = '"'pgx'"',        branch = '"'${git_branch}'"', rev = '"'${git_hash}'"' '}' >> /tmp/sample/Cargo.toml
        echo pgx-macros = '{' git = '"'https://github.com/zombodb/pgx'"', package = '"'pgx-macros'"', branch = '"'${git_branch}'"', rev = '"'${git_hash}'"' '}' >> /tmp/sample/Cargo.toml
        echo pgx-tests  = '{' git = '"'https://github.com/zombodb/pgx'"', package = '"'pgx-tests'"',  branch = '"'${git_branch}'"', rev = '"'${git_hash}'"' '}' >> /tmp/sample/Cargo.toml
+       cat /tmp/sample/Cargo.toml
 
-# test that sample extension on all 4 Postgres'
+    # test that sample extension on all 4 Postgres'
     - name: test sample on pg10
       run: cd /tmp/sample && cargo pgx test pg10
     - name: test sample on pg11
