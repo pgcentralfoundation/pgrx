@@ -26,6 +26,7 @@ pub fn test_extension(
         .stdout(Stdio::inherit())
         .stderr(Stdio::inherit())
         .arg("test")
+        .arg("--lib")
         .arg("--features")
         .arg(features)
         .arg("--no-default-features")
