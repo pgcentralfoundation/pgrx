@@ -23,6 +23,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: ACTIONS_ALLOW_UNSECURE_COMMANDS
+      id: ACTIONS_ALLOW_UNSECURE_COMMANDS
+      run: echo 'ACTIONS_ALLOW_UNSECURE_COMMANDS=true' >> $GITHUB_ENV
+
     - name: cargo version
       run: cargo --version
 
@@ -56,8 +60,6 @@ jobs:
 
     # hack Cargo.toml to use this version of pgx from github
     - name: hack Cargo.toml
-      env:
-        ACTIONS_ALLOW_UNSECURE_COMMANDS=: 'true'
       run: |
        echo "::set-env name=git_hash::$(git rev-parse --short $GITHUB_SHA)"
        echo "::set-env name=git_branch::${GITHUB_REF#refs/heads/}"
