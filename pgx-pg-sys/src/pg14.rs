@@ -3241,6 +3241,62 @@ pub const GROUPING_CAN_USE_HASH: u32 = 2;
 pub const GROUPING_CAN_PARTIAL_AGG: u32 = 4;
 pub const FSV_MISSING_OK: u32 = 1;
 pub const FDW_MISSING_OK: u32 = 1;
+pub const MAX_MULTIBYTE_CHAR_LEN: u32 = 4;
+pub const SS2: u32 = 142;
+pub const SS3: u32 = 143;
+pub const LC_ISO8859_1: u32 = 129;
+pub const LC_ISO8859_2: u32 = 130;
+pub const LC_ISO8859_3: u32 = 131;
+pub const LC_ISO8859_4: u32 = 132;
+pub const LC_TIS620: u32 = 133;
+pub const LC_ISO8859_7: u32 = 134;
+pub const LC_ISO8859_6: u32 = 135;
+pub const LC_ISO8859_8: u32 = 136;
+pub const LC_JISX0201K: u32 = 137;
+pub const LC_JISX0201R: u32 = 138;
+pub const LC_KOI8_R: u32 = 139;
+pub const LC_ISO8859_5: u32 = 140;
+pub const LC_ISO8859_9: u32 = 141;
+pub const LC_ISO8859_15: u32 = 142;
+pub const LC_JISX0208_1978: u32 = 144;
+pub const LC_GB2312_80: u32 = 145;
+pub const LC_JISX0208: u32 = 146;
+pub const LC_KS5601: u32 = 147;
+pub const LC_JISX0212: u32 = 148;
+pub const LC_CNS11643_1: u32 = 149;
+pub const LC_CNS11643_2: u32 = 150;
+pub const LC_JISX0213_1: u32 = 151;
+pub const LC_BIG5_1: u32 = 152;
+pub const LC_BIG5_2: u32 = 153;
+pub const LCPRV1_A: u32 = 154;
+pub const LCPRV1_B: u32 = 155;
+pub const LCPRV2_A: u32 = 156;
+pub const LCPRV2_B: u32 = 157;
+pub const LC_SISHENG: u32 = 160;
+pub const LC_IPA: u32 = 161;
+pub const LC_VISCII_LOWER: u32 = 162;
+pub const LC_VISCII_UPPER: u32 = 163;
+pub const LC_ARABIC_DIGIT: u32 = 164;
+pub const LC_ARABIC_1_COLUMN: u32 = 165;
+pub const LC_ASCII_RIGHT_TO_LEFT: u32 = 166;
+pub const LC_LAO: u32 = 167;
+pub const LC_ARABIC_2_COLUMN: u32 = 168;
+pub const LC_INDIAN_1_COLUMN: u32 = 240;
+pub const LC_TIBETAN_1_COLUMN: u32 = 241;
+pub const LC_UNICODE_SUBSET_2: u32 = 242;
+pub const LC_UNICODE_SUBSET_3: u32 = 243;
+pub const LC_UNICODE_SUBSET: u32 = 244;
+pub const LC_ETHIOPIC: u32 = 245;
+pub const LC_CNS11643_3: u32 = 246;
+pub const LC_CNS11643_4: u32 = 247;
+pub const LC_CNS11643_5: u32 = 248;
+pub const LC_CNS11643_6: u32 = 249;
+pub const LC_CNS11643_7: u32 = 250;
+pub const LC_INDIAN_2_COLUMN: u32 = 251;
+pub const LC_TIBETAN: u32 = 252;
+pub const MAX_CONVERSION_GROWTH: u32 = 4;
+pub const MAX_CONVERSION_INPUT_LENGTH: u32 = 16;
+pub const MAX_UNICODE_EQUIVALENT_STRING: u32 = 16;
 pub const EXTNODENAME_MAX_LEN: u32 = 64;
 pub const CUSTOMPATH_SUPPORT_BACKWARD_SCAN: u32 = 1;
 pub const CUSTOMPATH_SUPPORT_MARK_RESTORE: u32 = 2;
@@ -3296,6 +3352,112 @@ pub const FORMAT_TYPE_ALLOW_INVALID: u32 = 2;
 pub const FORMAT_TYPE_FORCE_QUALIFY: u32 = 4;
 pub const FORMAT_TYPE_INVALID_AS_NULL: u32 = 8;
 pub const MAX_TIME_PRECISION: u32 = 6;
+pub const DAGO: &'static [u8; 4usize] = b"ago\0";
+pub const DCURRENT: &'static [u8; 8usize] = b"current\0";
+pub const EPOCH: &'static [u8; 6usize] = b"epoch\0";
+pub const INVALID: &'static [u8; 8usize] = b"invalid\0";
+pub const EARLY: &'static [u8; 10usize] = b"-infinity\0";
+pub const LATE: &'static [u8; 9usize] = b"infinity\0";
+pub const NOW: &'static [u8; 4usize] = b"now\0";
+pub const TODAY: &'static [u8; 6usize] = b"today\0";
+pub const TOMORROW: &'static [u8; 9usize] = b"tomorrow\0";
+pub const YESTERDAY: &'static [u8; 10usize] = b"yesterday\0";
+pub const ZULU: &'static [u8; 5usize] = b"zulu\0";
+pub const DMICROSEC: &'static [u8; 8usize] = b"usecond\0";
+pub const DMILLISEC: &'static [u8; 8usize] = b"msecond\0";
+pub const DSECOND: &'static [u8; 7usize] = b"second\0";
+pub const DMINUTE: &'static [u8; 7usize] = b"minute\0";
+pub const DHOUR: &'static [u8; 5usize] = b"hour\0";
+pub const DDAY: &'static [u8; 4usize] = b"day\0";
+pub const DWEEK: &'static [u8; 5usize] = b"week\0";
+pub const DMONTH: &'static [u8; 6usize] = b"month\0";
+pub const DQUARTER: &'static [u8; 8usize] = b"quarter\0";
+pub const DYEAR: &'static [u8; 5usize] = b"year\0";
+pub const DDECADE: &'static [u8; 7usize] = b"decade\0";
+pub const DCENTURY: &'static [u8; 8usize] = b"century\0";
+pub const DMILLENNIUM: &'static [u8; 11usize] = b"millennium\0";
+pub const DA_D: &'static [u8; 3usize] = b"ad\0";
+pub const DB_C: &'static [u8; 3usize] = b"bc\0";
+pub const DTIMEZONE: &'static [u8; 9usize] = b"timezone\0";
+pub const AM: u32 = 0;
+pub const PM: u32 = 1;
+pub const HR24: u32 = 2;
+pub const AD: u32 = 0;
+pub const BC: u32 = 1;
+pub const RESERV: u32 = 0;
+pub const MONTH: u32 = 1;
+pub const YEAR: u32 = 2;
+pub const DAY: u32 = 3;
+pub const JULIAN: u32 = 4;
+pub const TZ: u32 = 5;
+pub const DTZ: u32 = 6;
+pub const DYNTZ: u32 = 7;
+pub const IGNORE_DTF: u32 = 8;
+pub const AMPM: u32 = 9;
+pub const HOUR: u32 = 10;
+pub const MINUTE: u32 = 11;
+pub const SECOND: u32 = 12;
+pub const MILLISECOND: u32 = 13;
+pub const MICROSECOND: u32 = 14;
+pub const DOY: u32 = 15;
+pub const DOW: u32 = 16;
+pub const UNITS: u32 = 17;
+pub const ADBC: u32 = 18;
+pub const AGO: u32 = 19;
+pub const ABS_BEFORE: u32 = 20;
+pub const ABS_AFTER: u32 = 21;
+pub const ISODATE: u32 = 22;
+pub const ISOTIME: u32 = 23;
+pub const WEEK: u32 = 24;
+pub const DECADE: u32 = 25;
+pub const CENTURY: u32 = 26;
+pub const MILLENNIUM: u32 = 27;
+pub const DTZMOD: u32 = 28;
+pub const UNKNOWN_FIELD: u32 = 31;
+pub const DTK_NUMBER: u32 = 0;
+pub const DTK_STRING: u32 = 1;
+pub const DTK_DATE: u32 = 2;
+pub const DTK_TIME: u32 = 3;
+pub const DTK_TZ: u32 = 4;
+pub const DTK_AGO: u32 = 5;
+pub const DTK_SPECIAL: u32 = 6;
+pub const DTK_EARLY: u32 = 9;
+pub const DTK_LATE: u32 = 10;
+pub const DTK_EPOCH: u32 = 11;
+pub const DTK_NOW: u32 = 12;
+pub const DTK_YESTERDAY: u32 = 13;
+pub const DTK_TODAY: u32 = 14;
+pub const DTK_TOMORROW: u32 = 15;
+pub const DTK_ZULU: u32 = 16;
+pub const DTK_DELTA: u32 = 17;
+pub const DTK_SECOND: u32 = 18;
+pub const DTK_MINUTE: u32 = 19;
+pub const DTK_HOUR: u32 = 20;
+pub const DTK_DAY: u32 = 21;
+pub const DTK_WEEK: u32 = 22;
+pub const DTK_MONTH: u32 = 23;
+pub const DTK_QUARTER: u32 = 24;
+pub const DTK_YEAR: u32 = 25;
+pub const DTK_DECADE: u32 = 26;
+pub const DTK_CENTURY: u32 = 27;
+pub const DTK_MILLENNIUM: u32 = 28;
+pub const DTK_MILLISEC: u32 = 29;
+pub const DTK_MICROSEC: u32 = 30;
+pub const DTK_JULIAN: u32 = 31;
+pub const DTK_DOW: u32 = 32;
+pub const DTK_DOY: u32 = 33;
+pub const DTK_TZ_HOUR: u32 = 34;
+pub const DTK_TZ_MINUTE: u32 = 35;
+pub const DTK_ISOYEAR: u32 = 36;
+pub const DTK_ISODOW: u32 = 37;
+pub const MAXDATELEN: u32 = 128;
+pub const MAXDATEFIELDS: u32 = 25;
+pub const TOKMAXLEN: u32 = 10;
+pub const DTERR_BAD_FORMAT: i32 = -1;
+pub const DTERR_FIELD_OVERFLOW: i32 = -2;
+pub const DTERR_MD_FIELD_OVERFLOW: i32 = -3;
+pub const DTERR_INTERVAL_OVERFLOW: i32 = -4;
+pub const DTERR_TZDISP_OVERFLOW: i32 = -5;
 pub const RADIANS_PER_DEGREE: f64 = 0.017453292519943295;
 pub const NUMERIC_MAX_PRECISION: u32 = 1000;
 pub const NUMERIC_MAX_DISPLAY_SCALE: u32 = 1000;
@@ -42275,6 +42437,667 @@ extern "C" {
         missing_ok: bool,
     ) -> Oid;
 }
+pub type pg_wchar = ::std::os::raw::c_uint;
+pub const pg_enc_PG_SQL_ASCII: pg_enc = 0;
+pub const pg_enc_PG_EUC_JP: pg_enc = 1;
+pub const pg_enc_PG_EUC_CN: pg_enc = 2;
+pub const pg_enc_PG_EUC_KR: pg_enc = 3;
+pub const pg_enc_PG_EUC_TW: pg_enc = 4;
+pub const pg_enc_PG_EUC_JIS_2004: pg_enc = 5;
+pub const pg_enc_PG_UTF8: pg_enc = 6;
+pub const pg_enc_PG_MULE_INTERNAL: pg_enc = 7;
+pub const pg_enc_PG_LATIN1: pg_enc = 8;
+pub const pg_enc_PG_LATIN2: pg_enc = 9;
+pub const pg_enc_PG_LATIN3: pg_enc = 10;
+pub const pg_enc_PG_LATIN4: pg_enc = 11;
+pub const pg_enc_PG_LATIN5: pg_enc = 12;
+pub const pg_enc_PG_LATIN6: pg_enc = 13;
+pub const pg_enc_PG_LATIN7: pg_enc = 14;
+pub const pg_enc_PG_LATIN8: pg_enc = 15;
+pub const pg_enc_PG_LATIN9: pg_enc = 16;
+pub const pg_enc_PG_LATIN10: pg_enc = 17;
+pub const pg_enc_PG_WIN1256: pg_enc = 18;
+pub const pg_enc_PG_WIN1258: pg_enc = 19;
+pub const pg_enc_PG_WIN866: pg_enc = 20;
+pub const pg_enc_PG_WIN874: pg_enc = 21;
+pub const pg_enc_PG_KOI8R: pg_enc = 22;
+pub const pg_enc_PG_WIN1251: pg_enc = 23;
+pub const pg_enc_PG_WIN1252: pg_enc = 24;
+pub const pg_enc_PG_ISO_8859_5: pg_enc = 25;
+pub const pg_enc_PG_ISO_8859_6: pg_enc = 26;
+pub const pg_enc_PG_ISO_8859_7: pg_enc = 27;
+pub const pg_enc_PG_ISO_8859_8: pg_enc = 28;
+pub const pg_enc_PG_WIN1250: pg_enc = 29;
+pub const pg_enc_PG_WIN1253: pg_enc = 30;
+pub const pg_enc_PG_WIN1254: pg_enc = 31;
+pub const pg_enc_PG_WIN1255: pg_enc = 32;
+pub const pg_enc_PG_WIN1257: pg_enc = 33;
+pub const pg_enc_PG_KOI8U: pg_enc = 34;
+pub const pg_enc_PG_SJIS: pg_enc = 35;
+pub const pg_enc_PG_BIG5: pg_enc = 36;
+pub const pg_enc_PG_GBK: pg_enc = 37;
+pub const pg_enc_PG_UHC: pg_enc = 38;
+pub const pg_enc_PG_GB18030: pg_enc = 39;
+pub const pg_enc_PG_JOHAB: pg_enc = 40;
+pub const pg_enc_PG_SHIFT_JIS_2004: pg_enc = 41;
+pub const pg_enc__PG_LAST_ENCODING_: pg_enc = 42;
+pub type pg_enc = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct pg_enc2name {
+    pub name: *const ::std::os::raw::c_char,
+    pub encoding: pg_enc,
+}
+impl Default for pg_enc2name {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[pg_guard]
+extern "C" {
+    pub static mut pg_enc2name_tbl: [pg_enc2name; 0usize];
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct pg_enc2gettext {
+    pub encoding: pg_enc,
+    pub name: *const ::std::os::raw::c_char,
+}
+impl Default for pg_enc2gettext {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[pg_guard]
+extern "C" {
+    pub static mut pg_enc2gettext_tbl: [pg_enc2gettext; 0usize];
+}
+pub type mb2wchar_with_len_converter = ::std::option::Option<
+    unsafe extern "C" fn(
+        from: *const ::std::os::raw::c_uchar,
+        to: *mut pg_wchar,
+        len: ::std::os::raw::c_int,
+    ) -> ::std::os::raw::c_int,
+>;
+pub type wchar2mb_with_len_converter = ::std::option::Option<
+    unsafe extern "C" fn(
+        from: *const pg_wchar,
+        to: *mut ::std::os::raw::c_uchar,
+        len: ::std::os::raw::c_int,
+    ) -> ::std::os::raw::c_int,
+>;
+pub type mblen_converter = ::std::option::Option<
+    unsafe extern "C" fn(mbstr: *const ::std::os::raw::c_uchar) -> ::std::os::raw::c_int,
+>;
+pub type mbdisplaylen_converter = ::std::option::Option<
+    unsafe extern "C" fn(mbstr: *const ::std::os::raw::c_uchar) -> ::std::os::raw::c_int,
+>;
+pub type mbcharacter_incrementer = ::std::option::Option<
+    unsafe extern "C" fn(mbstr: *mut ::std::os::raw::c_uchar, len: ::std::os::raw::c_int) -> bool,
+>;
+pub type mbchar_verifier = ::std::option::Option<
+    unsafe extern "C" fn(
+        mbstr: *const ::std::os::raw::c_uchar,
+        len: ::std::os::raw::c_int,
+    ) -> ::std::os::raw::c_int,
+>;
+pub type mbstr_verifier = ::std::option::Option<
+    unsafe extern "C" fn(
+        mbstr: *const ::std::os::raw::c_uchar,
+        len: ::std::os::raw::c_int,
+    ) -> ::std::os::raw::c_int,
+>;
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct pg_wchar_tbl {
+    pub mb2wchar_with_len: mb2wchar_with_len_converter,
+    pub wchar2mb_with_len: wchar2mb_with_len_converter,
+    pub mblen: mblen_converter,
+    pub dsplen: mbdisplaylen_converter,
+    pub mbverifychar: mbchar_verifier,
+    pub mbverifystr: mbstr_verifier,
+    pub maxmblen: ::std::os::raw::c_int,
+}
+#[pg_guard]
+extern "C" {
+    pub static mut pg_wchar_table: [pg_wchar_tbl; 0usize];
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct pg_mb_radix_tree {
+    pub chars16: *const uint16,
+    pub chars32: *const uint32,
+    pub b1root: uint32,
+    pub b1_lower: uint8,
+    pub b1_upper: uint8,
+    pub b2root: uint32,
+    pub b2_1_lower: uint8,
+    pub b2_1_upper: uint8,
+    pub b2_2_lower: uint8,
+    pub b2_2_upper: uint8,
+    pub b3root: uint32,
+    pub b3_1_lower: uint8,
+    pub b3_1_upper: uint8,
+    pub b3_2_lower: uint8,
+    pub b3_2_upper: uint8,
+    pub b3_3_lower: uint8,
+    pub b3_3_upper: uint8,
+    pub b4root: uint32,
+    pub b4_1_lower: uint8,
+    pub b4_1_upper: uint8,
+    pub b4_2_lower: uint8,
+    pub b4_2_upper: uint8,
+    pub b4_3_lower: uint8,
+    pub b4_3_upper: uint8,
+    pub b4_4_lower: uint8,
+    pub b4_4_upper: uint8,
+}
+impl Default for pg_mb_radix_tree {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct pg_utf_to_local_combined {
+    pub utf1: uint32,
+    pub utf2: uint32,
+    pub code: uint32,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct pg_local_to_utf_combined {
+    pub code: uint32,
+    pub utf1: uint32,
+    pub utf2: uint32,
+}
+pub type utf_local_conversion_func =
+    ::std::option::Option<unsafe extern "C" fn(code: uint32) -> uint32>;
+#[pg_guard]
+extern "C" {
+    pub fn pg_char_to_encoding(name: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_encoding_to_char(encoding: ::std::os::raw::c_int) -> *const ::std::os::raw::c_char;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_valid_server_encoding_id(encoding: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_encoding_mblen(
+        encoding: ::std::os::raw::c_int,
+        mbstr: *const ::std::os::raw::c_char,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_encoding_mblen_bounded(
+        encoding: ::std::os::raw::c_int,
+        mbstr: *const ::std::os::raw::c_char,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_encoding_dsplen(
+        encoding: ::std::os::raw::c_int,
+        mbstr: *const ::std::os::raw::c_char,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_encoding_verifymbchar(
+        encoding: ::std::os::raw::c_int,
+        mbstr: *const ::std::os::raw::c_char,
+        len: ::std::os::raw::c_int,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_encoding_verifymbstr(
+        encoding: ::std::os::raw::c_int,
+        mbstr: *const ::std::os::raw::c_char,
+        len: ::std::os::raw::c_int,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_encoding_max_length(encoding: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_valid_client_encoding(name: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_valid_server_encoding(name: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn is_encoding_supported_by_icu(encoding: ::std::os::raw::c_int) -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn get_encoding_name_for_icu(
+        encoding: ::std::os::raw::c_int,
+    ) -> *const ::std::os::raw::c_char;
+}
+#[pg_guard]
+extern "C" {
+    pub fn unicode_to_utf8(
+        c: pg_wchar,
+        utf8string: *mut ::std::os::raw::c_uchar,
+    ) -> *mut ::std::os::raw::c_uchar;
+}
+#[pg_guard]
+extern "C" {
+    pub fn utf8_to_unicode(c: *const ::std::os::raw::c_uchar) -> pg_wchar;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_utf8_islegal(
+        source: *const ::std::os::raw::c_uchar,
+        length: ::std::os::raw::c_int,
+    ) -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_utf_mblen(s: *const ::std::os::raw::c_uchar) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_mule_mblen(s: *const ::std::os::raw::c_uchar) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_mb2wchar(
+        from: *const ::std::os::raw::c_char,
+        to: *mut pg_wchar,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_mb2wchar_with_len(
+        from: *const ::std::os::raw::c_char,
+        to: *mut pg_wchar,
+        len: ::std::os::raw::c_int,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_encoding_mb2wchar_with_len(
+        encoding: ::std::os::raw::c_int,
+        from: *const ::std::os::raw::c_char,
+        to: *mut pg_wchar,
+        len: ::std::os::raw::c_int,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_wchar2mb(
+        from: *const pg_wchar,
+        to: *mut ::std::os::raw::c_char,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_wchar2mb_with_len(
+        from: *const pg_wchar,
+        to: *mut ::std::os::raw::c_char,
+        len: ::std::os::raw::c_int,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_encoding_wchar2mb_with_len(
+        encoding: ::std::os::raw::c_int,
+        from: *const pg_wchar,
+        to: *mut ::std::os::raw::c_char,
+        len: ::std::os::raw::c_int,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_char_and_wchar_strcmp(
+        s1: *const ::std::os::raw::c_char,
+        s2: *const pg_wchar,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_wchar_strncmp(
+        s1: *const pg_wchar,
+        s2: *const pg_wchar,
+        n: usize,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_char_and_wchar_strncmp(
+        s1: *const ::std::os::raw::c_char,
+        s2: *const pg_wchar,
+        n: usize,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_wchar_strlen(wstr: *const pg_wchar) -> usize;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_mblen(mbstr: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_dsplen(mbstr: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_mbstrlen(mbstr: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_mbstrlen_with_len(
+        mbstr: *const ::std::os::raw::c_char,
+        len: ::std::os::raw::c_int,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_mbcliplen(
+        mbstr: *const ::std::os::raw::c_char,
+        len: ::std::os::raw::c_int,
+        limit: ::std::os::raw::c_int,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_encoding_mbcliplen(
+        encoding: ::std::os::raw::c_int,
+        mbstr: *const ::std::os::raw::c_char,
+        len: ::std::os::raw::c_int,
+        limit: ::std::os::raw::c_int,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_mbcharcliplen(
+        mbstr: *const ::std::os::raw::c_char,
+        len: ::std::os::raw::c_int,
+        limit: ::std::os::raw::c_int,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_database_encoding_max_length() -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_database_encoding_character_incrementer() -> mbcharacter_incrementer;
+}
+#[pg_guard]
+extern "C" {
+    pub fn PrepareClientEncoding(encoding: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn SetClientEncoding(encoding: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn InitializeClientEncoding();
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_get_client_encoding() -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_get_client_encoding_name() -> *const ::std::os::raw::c_char;
+}
+#[pg_guard]
+extern "C" {
+    pub fn SetDatabaseEncoding(encoding: ::std::os::raw::c_int);
+}
+#[pg_guard]
+extern "C" {
+    pub fn GetDatabaseEncoding() -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn GetDatabaseEncodingName() -> *const ::std::os::raw::c_char;
+}
+#[pg_guard]
+extern "C" {
+    pub fn SetMessageEncoding(encoding: ::std::os::raw::c_int);
+}
+#[pg_guard]
+extern "C" {
+    pub fn GetMessageEncoding() -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_do_encoding_conversion(
+        src: *mut ::std::os::raw::c_uchar,
+        len: ::std::os::raw::c_int,
+        src_encoding: ::std::os::raw::c_int,
+        dest_encoding: ::std::os::raw::c_int,
+    ) -> *mut ::std::os::raw::c_uchar;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_do_encoding_conversion_buf(
+        proc_: Oid,
+        src_encoding: ::std::os::raw::c_int,
+        dest_encoding: ::std::os::raw::c_int,
+        src: *mut ::std::os::raw::c_uchar,
+        srclen: ::std::os::raw::c_int,
+        dst: *mut ::std::os::raw::c_uchar,
+        dstlen: ::std::os::raw::c_int,
+        noError: bool,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_client_to_server(
+        s: *const ::std::os::raw::c_char,
+        len: ::std::os::raw::c_int,
+    ) -> *mut ::std::os::raw::c_char;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_server_to_client(
+        s: *const ::std::os::raw::c_char,
+        len: ::std::os::raw::c_int,
+    ) -> *mut ::std::os::raw::c_char;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_any_to_server(
+        s: *const ::std::os::raw::c_char,
+        len: ::std::os::raw::c_int,
+        encoding: ::std::os::raw::c_int,
+    ) -> *mut ::std::os::raw::c_char;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_server_to_any(
+        s: *const ::std::os::raw::c_char,
+        len: ::std::os::raw::c_int,
+        encoding: ::std::os::raw::c_int,
+    ) -> *mut ::std::os::raw::c_char;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_unicode_to_server(c: pg_wchar, s: *mut ::std::os::raw::c_uchar);
+}
+#[pg_guard]
+extern "C" {
+    pub fn BIG5toCNS(
+        big5: ::std::os::raw::c_ushort,
+        lc: *mut ::std::os::raw::c_uchar,
+    ) -> ::std::os::raw::c_ushort;
+}
+#[pg_guard]
+extern "C" {
+    pub fn CNStoBIG5(
+        cns: ::std::os::raw::c_ushort,
+        lc: ::std::os::raw::c_uchar,
+    ) -> ::std::os::raw::c_ushort;
+}
+#[pg_guard]
+extern "C" {
+    pub fn UtfToLocal(
+        utf: *const ::std::os::raw::c_uchar,
+        len: ::std::os::raw::c_int,
+        iso: *mut ::std::os::raw::c_uchar,
+        map: *const pg_mb_radix_tree,
+        cmap: *const pg_utf_to_local_combined,
+        cmapsize: ::std::os::raw::c_int,
+        conv_func: utf_local_conversion_func,
+        encoding: ::std::os::raw::c_int,
+        noError: bool,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn LocalToUtf(
+        iso: *const ::std::os::raw::c_uchar,
+        len: ::std::os::raw::c_int,
+        utf: *mut ::std::os::raw::c_uchar,
+        map: *const pg_mb_radix_tree,
+        cmap: *const pg_local_to_utf_combined,
+        cmapsize: ::std::os::raw::c_int,
+        conv_func: utf_local_conversion_func,
+        encoding: ::std::os::raw::c_int,
+        noError: bool,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_verifymbstr(
+        mbstr: *const ::std::os::raw::c_char,
+        len: ::std::os::raw::c_int,
+        noError: bool,
+    ) -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_verify_mbstr(
+        encoding: ::std::os::raw::c_int,
+        mbstr: *const ::std::os::raw::c_char,
+        len: ::std::os::raw::c_int,
+        noError: bool,
+    ) -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_verify_mbstr_len(
+        encoding: ::std::os::raw::c_int,
+        mbstr: *const ::std::os::raw::c_char,
+        len: ::std::os::raw::c_int,
+        noError: bool,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn check_encoding_conversion_args(
+        src_encoding: ::std::os::raw::c_int,
+        dest_encoding: ::std::os::raw::c_int,
+        len: ::std::os::raw::c_int,
+        expected_src_encoding: ::std::os::raw::c_int,
+        expected_dest_encoding: ::std::os::raw::c_int,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn report_invalid_encoding(
+        encoding: ::std::os::raw::c_int,
+        mbstr: *const ::std::os::raw::c_char,
+        len: ::std::os::raw::c_int,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn report_untranslatable_char(
+        src_encoding: ::std::os::raw::c_int,
+        dest_encoding: ::std::os::raw::c_int,
+        mbstr: *const ::std::os::raw::c_char,
+        len: ::std::os::raw::c_int,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn local2local(
+        l: *const ::std::os::raw::c_uchar,
+        p: *mut ::std::os::raw::c_uchar,
+        len: ::std::os::raw::c_int,
+        src_encoding: ::std::os::raw::c_int,
+        dest_encoding: ::std::os::raw::c_int,
+        tab: *const ::std::os::raw::c_uchar,
+        noError: bool,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn latin2mic(
+        l: *const ::std::os::raw::c_uchar,
+        p: *mut ::std::os::raw::c_uchar,
+        len: ::std::os::raw::c_int,
+        lc: ::std::os::raw::c_int,
+        encoding: ::std::os::raw::c_int,
+        noError: bool,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn mic2latin(
+        mic: *const ::std::os::raw::c_uchar,
+        p: *mut ::std::os::raw::c_uchar,
+        len: ::std::os::raw::c_int,
+        lc: ::std::os::raw::c_int,
+        encoding: ::std::os::raw::c_int,
+        noError: bool,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn latin2mic_with_table(
+        l: *const ::std::os::raw::c_uchar,
+        p: *mut ::std::os::raw::c_uchar,
+        len: ::std::os::raw::c_int,
+        lc: ::std::os::raw::c_int,
+        encoding: ::std::os::raw::c_int,
+        tab: *const ::std::os::raw::c_uchar,
+        noError: bool,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn mic2latin_with_table(
+        mic: *const ::std::os::raw::c_uchar,
+        p: *mut ::std::os::raw::c_uchar,
+        len: ::std::os::raw::c_int,
+        lc: ::std::os::raw::c_int,
+        encoding: ::std::os::raw::c_int,
+        tab: *const ::std::os::raw::c_uchar,
+        noError: bool,
+    ) -> ::std::os::raw::c_int;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct ExtensibleNode {
@@ -59535,6 +60358,284 @@ extern "C" {
 #[pg_guard]
 extern "C" {
     pub fn AdjustTimeForTypmod(time: *mut TimeADT, typmod: int32);
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct tzEntry {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct datetkn {
+    pub token: [::std::os::raw::c_char; 11usize],
+    pub type_: ::std::os::raw::c_char,
+    pub value: int32,
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct TimeZoneAbbrevTable {
+    pub tblsize: Size,
+    pub numabbrevs: ::std::os::raw::c_int,
+    pub abbrevs: __IncompleteArrayField<datetkn>,
+}
+#[repr(C)]
+#[derive(Debug)]
+pub struct DynamicZoneAbbrev {
+    pub tz: *mut pg_tz,
+    pub zone: __IncompleteArrayField<::std::os::raw::c_char>,
+}
+impl Default for DynamicZoneAbbrev {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[pg_guard]
+extern "C" {
+    pub static mut months: [*const ::std::os::raw::c_char; 0usize];
+}
+#[pg_guard]
+extern "C" {
+    pub static mut days: [*const ::std::os::raw::c_char; 0usize];
+}
+#[pg_guard]
+extern "C" {
+    pub static mut day_tab: [[::std::os::raw::c_int; 13usize]; 2usize];
+}
+#[pg_guard]
+extern "C" {
+    pub fn GetCurrentDateTime(tm: *mut pg_tm);
+}
+#[pg_guard]
+extern "C" {
+    pub fn GetCurrentTimeUsec(tm: *mut pg_tm, fsec: *mut fsec_t, tzp: *mut ::std::os::raw::c_int);
+}
+#[pg_guard]
+extern "C" {
+    pub fn j2date(
+        jd: ::std::os::raw::c_int,
+        year: *mut ::std::os::raw::c_int,
+        month: *mut ::std::os::raw::c_int,
+        day: *mut ::std::os::raw::c_int,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn date2j(
+        year: ::std::os::raw::c_int,
+        month: ::std::os::raw::c_int,
+        day: ::std::os::raw::c_int,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn ParseDateTime(
+        timestr: *const ::std::os::raw::c_char,
+        workbuf: *mut ::std::os::raw::c_char,
+        buflen: usize,
+        field: *mut *mut ::std::os::raw::c_char,
+        ftype: *mut ::std::os::raw::c_int,
+        maxfields: ::std::os::raw::c_int,
+        numfields: *mut ::std::os::raw::c_int,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn DecodeDateTime(
+        field: *mut *mut ::std::os::raw::c_char,
+        ftype: *mut ::std::os::raw::c_int,
+        nf: ::std::os::raw::c_int,
+        dtype: *mut ::std::os::raw::c_int,
+        tm: *mut pg_tm,
+        fsec: *mut fsec_t,
+        tzp: *mut ::std::os::raw::c_int,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn DecodeTimezone(
+        str_: *mut ::std::os::raw::c_char,
+        tzp: *mut ::std::os::raw::c_int,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn DecodeTimeOnly(
+        field: *mut *mut ::std::os::raw::c_char,
+        ftype: *mut ::std::os::raw::c_int,
+        nf: ::std::os::raw::c_int,
+        dtype: *mut ::std::os::raw::c_int,
+        tm: *mut pg_tm,
+        fsec: *mut fsec_t,
+        tzp: *mut ::std::os::raw::c_int,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn DecodeInterval(
+        field: *mut *mut ::std::os::raw::c_char,
+        ftype: *mut ::std::os::raw::c_int,
+        nf: ::std::os::raw::c_int,
+        range: ::std::os::raw::c_int,
+        dtype: *mut ::std::os::raw::c_int,
+        tm: *mut pg_tm,
+        fsec: *mut fsec_t,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn DecodeISO8601Interval(
+        str_: *mut ::std::os::raw::c_char,
+        dtype: *mut ::std::os::raw::c_int,
+        tm: *mut pg_tm,
+        fsec: *mut fsec_t,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn DateTimeParseError(
+        dterr: ::std::os::raw::c_int,
+        str_: *const ::std::os::raw::c_char,
+        datatype: *const ::std::os::raw::c_char,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn DetermineTimeZoneOffset(tm: *mut pg_tm, tzp: *mut pg_tz) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn DetermineTimeZoneAbbrevOffset(
+        tm: *mut pg_tm,
+        abbr: *const ::std::os::raw::c_char,
+        tzp: *mut pg_tz,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn DetermineTimeZoneAbbrevOffsetTS(
+        ts: TimestampTz,
+        abbr: *const ::std::os::raw::c_char,
+        tzp: *mut pg_tz,
+        isdst: *mut ::std::os::raw::c_int,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn EncodeDateOnly(
+        tm: *mut pg_tm,
+        style: ::std::os::raw::c_int,
+        str_: *mut ::std::os::raw::c_char,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn EncodeTimeOnly(
+        tm: *mut pg_tm,
+        fsec: fsec_t,
+        print_tz: bool,
+        tz: ::std::os::raw::c_int,
+        style: ::std::os::raw::c_int,
+        str_: *mut ::std::os::raw::c_char,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn EncodeDateTime(
+        tm: *mut pg_tm,
+        fsec: fsec_t,
+        print_tz: bool,
+        tz: ::std::os::raw::c_int,
+        tzn: *const ::std::os::raw::c_char,
+        style: ::std::os::raw::c_int,
+        str_: *mut ::std::os::raw::c_char,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn EncodeInterval(
+        tm: *mut pg_tm,
+        fsec: fsec_t,
+        style: ::std::os::raw::c_int,
+        str_: *mut ::std::os::raw::c_char,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn EncodeSpecialTimestamp(dt: Timestamp, str_: *mut ::std::os::raw::c_char);
+}
+#[pg_guard]
+extern "C" {
+    pub fn ValidateDate(
+        fmask: ::std::os::raw::c_int,
+        isjulian: bool,
+        is2digits: bool,
+        bc: bool,
+        tm: *mut pg_tm,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn DecodeTimezoneAbbrev(
+        field: ::std::os::raw::c_int,
+        lowtoken: *mut ::std::os::raw::c_char,
+        offset: *mut ::std::os::raw::c_int,
+        tz: *mut *mut pg_tz,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn DecodeSpecial(
+        field: ::std::os::raw::c_int,
+        lowtoken: *mut ::std::os::raw::c_char,
+        val: *mut ::std::os::raw::c_int,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn DecodeUnits(
+        field: ::std::os::raw::c_int,
+        lowtoken: *mut ::std::os::raw::c_char,
+        val: *mut ::std::os::raw::c_int,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn j2day(jd: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn TemporalSimplify(max_precis: int32, node: *mut Node) -> *mut Node;
+}
+#[pg_guard]
+extern "C" {
+    pub fn CheckDateTokenTables() -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn ConvertTimeZoneAbbrevs(
+        abbrevs: *mut tzEntry,
+        n: ::std::os::raw::c_int,
+    ) -> *mut TimeZoneAbbrevTable;
+}
+#[pg_guard]
+extern "C" {
+    pub fn InstallTimeZoneAbbrevs(tbl: *mut TimeZoneAbbrevTable);
+}
+#[pg_guard]
+extern "C" {
+    pub fn AdjustTimestampForTypmod(time: *mut Timestamp, typmod: int32);
+}
+#[pg_guard]
+extern "C" {
+    pub fn AdjustTimestampForTypmodError(
+        time: *mut Timestamp,
+        typmod: int32,
+        error: *mut bool,
+    ) -> bool;
 }
 #[pg_guard]
 extern "C" {

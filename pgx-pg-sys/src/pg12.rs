@@ -3295,6 +3295,60 @@ pub const GROUPING_CAN_USE_HASH: u32 = 2;
 pub const GROUPING_CAN_PARTIAL_AGG: u32 = 4;
 pub const FSV_MISSING_OK: u32 = 1;
 pub const FDW_MISSING_OK: u32 = 1;
+pub const MAX_MULTIBYTE_CHAR_LEN: u32 = 4;
+pub const SS2: u32 = 142;
+pub const SS3: u32 = 143;
+pub const LC_ISO8859_1: u32 = 129;
+pub const LC_ISO8859_2: u32 = 130;
+pub const LC_ISO8859_3: u32 = 131;
+pub const LC_ISO8859_4: u32 = 132;
+pub const LC_TIS620: u32 = 133;
+pub const LC_ISO8859_7: u32 = 134;
+pub const LC_ISO8859_6: u32 = 135;
+pub const LC_ISO8859_8: u32 = 136;
+pub const LC_JISX0201K: u32 = 137;
+pub const LC_JISX0201R: u32 = 138;
+pub const LC_KOI8_R: u32 = 139;
+pub const LC_ISO8859_5: u32 = 140;
+pub const LC_ISO8859_9: u32 = 141;
+pub const LC_ISO8859_15: u32 = 142;
+pub const LC_JISX0208_1978: u32 = 144;
+pub const LC_GB2312_80: u32 = 145;
+pub const LC_JISX0208: u32 = 146;
+pub const LC_KS5601: u32 = 147;
+pub const LC_JISX0212: u32 = 148;
+pub const LC_CNS11643_1: u32 = 149;
+pub const LC_CNS11643_2: u32 = 150;
+pub const LC_JISX0213_1: u32 = 151;
+pub const LC_BIG5_1: u32 = 152;
+pub const LC_BIG5_2: u32 = 153;
+pub const LCPRV1_A: u32 = 154;
+pub const LCPRV1_B: u32 = 155;
+pub const LCPRV2_A: u32 = 156;
+pub const LCPRV2_B: u32 = 157;
+pub const LC_SISHENG: u32 = 160;
+pub const LC_IPA: u32 = 161;
+pub const LC_VISCII_LOWER: u32 = 162;
+pub const LC_VISCII_UPPER: u32 = 163;
+pub const LC_ARABIC_DIGIT: u32 = 164;
+pub const LC_ARABIC_1_COLUMN: u32 = 165;
+pub const LC_ASCII_RIGHT_TO_LEFT: u32 = 166;
+pub const LC_LAO: u32 = 167;
+pub const LC_ARABIC_2_COLUMN: u32 = 168;
+pub const LC_INDIAN_1_COLUMN: u32 = 240;
+pub const LC_TIBETAN_1_COLUMN: u32 = 241;
+pub const LC_UNICODE_SUBSET_2: u32 = 242;
+pub const LC_UNICODE_SUBSET_3: u32 = 243;
+pub const LC_UNICODE_SUBSET: u32 = 244;
+pub const LC_ETHIOPIC: u32 = 245;
+pub const LC_CNS11643_3: u32 = 246;
+pub const LC_CNS11643_4: u32 = 247;
+pub const LC_CNS11643_5: u32 = 248;
+pub const LC_CNS11643_6: u32 = 249;
+pub const LC_CNS11643_7: u32 = 250;
+pub const LC_INDIAN_2_COLUMN: u32 = 251;
+pub const LC_TIBETAN: u32 = 252;
+pub const MAX_CONVERSION_GROWTH: u32 = 4;
 pub const EXTNODENAME_MAX_LEN: u32 = 64;
 pub const CUSTOMPATH_SUPPORT_BACKWARD_SCAN: u32 = 1;
 pub const CUSTOMPATH_SUPPORT_MARK_RESTORE: u32 = 2;
@@ -40563,6 +40617,641 @@ extern "C" {
         servername: *const ::std::os::raw::c_char,
         missing_ok: bool,
     ) -> Oid;
+}
+pub type pg_wchar = ::std::os::raw::c_uint;
+pub const pg_enc_PG_SQL_ASCII: pg_enc = 0;
+pub const pg_enc_PG_EUC_JP: pg_enc = 1;
+pub const pg_enc_PG_EUC_CN: pg_enc = 2;
+pub const pg_enc_PG_EUC_KR: pg_enc = 3;
+pub const pg_enc_PG_EUC_TW: pg_enc = 4;
+pub const pg_enc_PG_EUC_JIS_2004: pg_enc = 5;
+pub const pg_enc_PG_UTF8: pg_enc = 6;
+pub const pg_enc_PG_MULE_INTERNAL: pg_enc = 7;
+pub const pg_enc_PG_LATIN1: pg_enc = 8;
+pub const pg_enc_PG_LATIN2: pg_enc = 9;
+pub const pg_enc_PG_LATIN3: pg_enc = 10;
+pub const pg_enc_PG_LATIN4: pg_enc = 11;
+pub const pg_enc_PG_LATIN5: pg_enc = 12;
+pub const pg_enc_PG_LATIN6: pg_enc = 13;
+pub const pg_enc_PG_LATIN7: pg_enc = 14;
+pub const pg_enc_PG_LATIN8: pg_enc = 15;
+pub const pg_enc_PG_LATIN9: pg_enc = 16;
+pub const pg_enc_PG_LATIN10: pg_enc = 17;
+pub const pg_enc_PG_WIN1256: pg_enc = 18;
+pub const pg_enc_PG_WIN1258: pg_enc = 19;
+pub const pg_enc_PG_WIN866: pg_enc = 20;
+pub const pg_enc_PG_WIN874: pg_enc = 21;
+pub const pg_enc_PG_KOI8R: pg_enc = 22;
+pub const pg_enc_PG_WIN1251: pg_enc = 23;
+pub const pg_enc_PG_WIN1252: pg_enc = 24;
+pub const pg_enc_PG_ISO_8859_5: pg_enc = 25;
+pub const pg_enc_PG_ISO_8859_6: pg_enc = 26;
+pub const pg_enc_PG_ISO_8859_7: pg_enc = 27;
+pub const pg_enc_PG_ISO_8859_8: pg_enc = 28;
+pub const pg_enc_PG_WIN1250: pg_enc = 29;
+pub const pg_enc_PG_WIN1253: pg_enc = 30;
+pub const pg_enc_PG_WIN1254: pg_enc = 31;
+pub const pg_enc_PG_WIN1255: pg_enc = 32;
+pub const pg_enc_PG_WIN1257: pg_enc = 33;
+pub const pg_enc_PG_KOI8U: pg_enc = 34;
+pub const pg_enc_PG_SJIS: pg_enc = 35;
+pub const pg_enc_PG_BIG5: pg_enc = 36;
+pub const pg_enc_PG_GBK: pg_enc = 37;
+pub const pg_enc_PG_UHC: pg_enc = 38;
+pub const pg_enc_PG_GB18030: pg_enc = 39;
+pub const pg_enc_PG_JOHAB: pg_enc = 40;
+pub const pg_enc_PG_SHIFT_JIS_2004: pg_enc = 41;
+pub const pg_enc__PG_LAST_ENCODING_: pg_enc = 42;
+pub type pg_enc = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct pg_enc2name {
+    pub name: *const ::std::os::raw::c_char,
+    pub encoding: pg_enc,
+}
+impl Default for pg_enc2name {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[pg_guard]
+extern "C" {
+    pub static mut pg_enc2name_tbl: [pg_enc2name; 0usize];
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct pg_enc2gettext {
+    pub encoding: pg_enc,
+    pub name: *const ::std::os::raw::c_char,
+}
+impl Default for pg_enc2gettext {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[pg_guard]
+extern "C" {
+    pub static mut pg_enc2gettext_tbl: [pg_enc2gettext; 0usize];
+}
+#[pg_guard]
+extern "C" {
+    pub fn is_encoding_supported_by_icu(encoding: ::std::os::raw::c_int) -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn get_encoding_name_for_icu(
+        encoding: ::std::os::raw::c_int,
+    ) -> *const ::std::os::raw::c_char;
+}
+pub type mb2wchar_with_len_converter = ::std::option::Option<
+    unsafe extern "C" fn(
+        from: *const ::std::os::raw::c_uchar,
+        to: *mut pg_wchar,
+        len: ::std::os::raw::c_int,
+    ) -> ::std::os::raw::c_int,
+>;
+pub type wchar2mb_with_len_converter = ::std::option::Option<
+    unsafe extern "C" fn(
+        from: *const pg_wchar,
+        to: *mut ::std::os::raw::c_uchar,
+        len: ::std::os::raw::c_int,
+    ) -> ::std::os::raw::c_int,
+>;
+pub type mblen_converter = ::std::option::Option<
+    unsafe extern "C" fn(mbstr: *const ::std::os::raw::c_uchar) -> ::std::os::raw::c_int,
+>;
+pub type mbdisplaylen_converter = ::std::option::Option<
+    unsafe extern "C" fn(mbstr: *const ::std::os::raw::c_uchar) -> ::std::os::raw::c_int,
+>;
+pub type mbcharacter_incrementer = ::std::option::Option<
+    unsafe extern "C" fn(mbstr: *mut ::std::os::raw::c_uchar, len: ::std::os::raw::c_int) -> bool,
+>;
+pub type mbverifier = ::std::option::Option<
+    unsafe extern "C" fn(
+        mbstr: *const ::std::os::raw::c_uchar,
+        len: ::std::os::raw::c_int,
+    ) -> ::std::os::raw::c_int,
+>;
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct pg_wchar_tbl {
+    pub mb2wchar_with_len: mb2wchar_with_len_converter,
+    pub wchar2mb_with_len: wchar2mb_with_len_converter,
+    pub mblen: mblen_converter,
+    pub dsplen: mbdisplaylen_converter,
+    pub mbverify: mbverifier,
+    pub maxmblen: ::std::os::raw::c_int,
+}
+#[pg_guard]
+extern "C" {
+    pub static mut pg_wchar_table: [pg_wchar_tbl; 0usize];
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct pg_mb_radix_tree {
+    pub chars16: *const uint16,
+    pub chars32: *const uint32,
+    pub b1root: uint32,
+    pub b1_lower: uint8,
+    pub b1_upper: uint8,
+    pub b2root: uint32,
+    pub b2_1_lower: uint8,
+    pub b2_1_upper: uint8,
+    pub b2_2_lower: uint8,
+    pub b2_2_upper: uint8,
+    pub b3root: uint32,
+    pub b3_1_lower: uint8,
+    pub b3_1_upper: uint8,
+    pub b3_2_lower: uint8,
+    pub b3_2_upper: uint8,
+    pub b3_3_lower: uint8,
+    pub b3_3_upper: uint8,
+    pub b4root: uint32,
+    pub b4_1_lower: uint8,
+    pub b4_1_upper: uint8,
+    pub b4_2_lower: uint8,
+    pub b4_2_upper: uint8,
+    pub b4_3_lower: uint8,
+    pub b4_3_upper: uint8,
+    pub b4_4_lower: uint8,
+    pub b4_4_upper: uint8,
+}
+impl Default for pg_mb_radix_tree {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct pg_utf_to_local_combined {
+    pub utf1: uint32,
+    pub utf2: uint32,
+    pub code: uint32,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct pg_local_to_utf_combined {
+    pub code: uint32,
+    pub utf1: uint32,
+    pub utf2: uint32,
+}
+pub type utf_local_conversion_func =
+    ::std::option::Option<unsafe extern "C" fn(code: uint32) -> uint32>;
+#[pg_guard]
+extern "C" {
+    pub fn pg_char_to_encoding(name: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_encoding_to_char(encoding: ::std::os::raw::c_int) -> *const ::std::os::raw::c_char;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_valid_server_encoding_id(encoding: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_mb2wchar(
+        from: *const ::std::os::raw::c_char,
+        to: *mut pg_wchar,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_mb2wchar_with_len(
+        from: *const ::std::os::raw::c_char,
+        to: *mut pg_wchar,
+        len: ::std::os::raw::c_int,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_encoding_mb2wchar_with_len(
+        encoding: ::std::os::raw::c_int,
+        from: *const ::std::os::raw::c_char,
+        to: *mut pg_wchar,
+        len: ::std::os::raw::c_int,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_wchar2mb(
+        from: *const pg_wchar,
+        to: *mut ::std::os::raw::c_char,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_wchar2mb_with_len(
+        from: *const pg_wchar,
+        to: *mut ::std::os::raw::c_char,
+        len: ::std::os::raw::c_int,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_encoding_wchar2mb_with_len(
+        encoding: ::std::os::raw::c_int,
+        from: *const pg_wchar,
+        to: *mut ::std::os::raw::c_char,
+        len: ::std::os::raw::c_int,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_char_and_wchar_strcmp(
+        s1: *const ::std::os::raw::c_char,
+        s2: *const pg_wchar,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_wchar_strncmp(
+        s1: *const pg_wchar,
+        s2: *const pg_wchar,
+        n: usize,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_char_and_wchar_strncmp(
+        s1: *const ::std::os::raw::c_char,
+        s2: *const pg_wchar,
+        n: usize,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_wchar_strlen(wstr: *const pg_wchar) -> usize;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_mblen(mbstr: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_dsplen(mbstr: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_encoding_mblen(
+        encoding: ::std::os::raw::c_int,
+        mbstr: *const ::std::os::raw::c_char,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_encoding_dsplen(
+        encoding: ::std::os::raw::c_int,
+        mbstr: *const ::std::os::raw::c_char,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_encoding_verifymb(
+        encoding: ::std::os::raw::c_int,
+        mbstr: *const ::std::os::raw::c_char,
+        len: ::std::os::raw::c_int,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_mule_mblen(mbstr: *const ::std::os::raw::c_uchar) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_mic_mblen(mbstr: *const ::std::os::raw::c_uchar) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_mbstrlen(mbstr: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_mbstrlen_with_len(
+        mbstr: *const ::std::os::raw::c_char,
+        len: ::std::os::raw::c_int,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_mbcliplen(
+        mbstr: *const ::std::os::raw::c_char,
+        len: ::std::os::raw::c_int,
+        limit: ::std::os::raw::c_int,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_encoding_mbcliplen(
+        encoding: ::std::os::raw::c_int,
+        mbstr: *const ::std::os::raw::c_char,
+        len: ::std::os::raw::c_int,
+        limit: ::std::os::raw::c_int,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_mbcharcliplen(
+        mbstr: *const ::std::os::raw::c_char,
+        len: ::std::os::raw::c_int,
+        imit: ::std::os::raw::c_int,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_encoding_max_length(encoding: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_database_encoding_max_length() -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_database_encoding_character_incrementer() -> mbcharacter_incrementer;
+}
+#[pg_guard]
+extern "C" {
+    pub fn PrepareClientEncoding(encoding: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn SetClientEncoding(encoding: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn InitializeClientEncoding();
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_get_client_encoding() -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_get_client_encoding_name() -> *const ::std::os::raw::c_char;
+}
+#[pg_guard]
+extern "C" {
+    pub fn SetDatabaseEncoding(encoding: ::std::os::raw::c_int);
+}
+#[pg_guard]
+extern "C" {
+    pub fn GetDatabaseEncoding() -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn GetDatabaseEncodingName() -> *const ::std::os::raw::c_char;
+}
+#[pg_guard]
+extern "C" {
+    pub fn SetMessageEncoding(encoding: ::std::os::raw::c_int);
+}
+#[pg_guard]
+extern "C" {
+    pub fn GetMessageEncoding() -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_valid_client_encoding(name: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_valid_server_encoding(name: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn unicode_to_utf8(
+        c: pg_wchar,
+        utf8string: *mut ::std::os::raw::c_uchar,
+    ) -> *mut ::std::os::raw::c_uchar;
+}
+#[pg_guard]
+extern "C" {
+    pub fn utf8_to_unicode(c: *const ::std::os::raw::c_uchar) -> pg_wchar;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_utf_mblen(arg1: *const ::std::os::raw::c_uchar) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_do_encoding_conversion(
+        src: *mut ::std::os::raw::c_uchar,
+        len: ::std::os::raw::c_int,
+        src_encoding: ::std::os::raw::c_int,
+        dest_encoding: ::std::os::raw::c_int,
+    ) -> *mut ::std::os::raw::c_uchar;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_client_to_server(
+        s: *const ::std::os::raw::c_char,
+        len: ::std::os::raw::c_int,
+    ) -> *mut ::std::os::raw::c_char;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_server_to_client(
+        s: *const ::std::os::raw::c_char,
+        len: ::std::os::raw::c_int,
+    ) -> *mut ::std::os::raw::c_char;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_any_to_server(
+        s: *const ::std::os::raw::c_char,
+        len: ::std::os::raw::c_int,
+        encoding: ::std::os::raw::c_int,
+    ) -> *mut ::std::os::raw::c_char;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_server_to_any(
+        s: *const ::std::os::raw::c_char,
+        len: ::std::os::raw::c_int,
+        encoding: ::std::os::raw::c_int,
+    ) -> *mut ::std::os::raw::c_char;
+}
+#[pg_guard]
+extern "C" {
+    pub fn BIG5toCNS(
+        big5: ::std::os::raw::c_ushort,
+        lc: *mut ::std::os::raw::c_uchar,
+    ) -> ::std::os::raw::c_ushort;
+}
+#[pg_guard]
+extern "C" {
+    pub fn CNStoBIG5(
+        cns: ::std::os::raw::c_ushort,
+        lc: ::std::os::raw::c_uchar,
+    ) -> ::std::os::raw::c_ushort;
+}
+#[pg_guard]
+extern "C" {
+    pub fn UtfToLocal(
+        utf: *const ::std::os::raw::c_uchar,
+        len: ::std::os::raw::c_int,
+        iso: *mut ::std::os::raw::c_uchar,
+        map: *const pg_mb_radix_tree,
+        cmap: *const pg_utf_to_local_combined,
+        cmapsize: ::std::os::raw::c_int,
+        conv_func: utf_local_conversion_func,
+        encoding: ::std::os::raw::c_int,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn LocalToUtf(
+        iso: *const ::std::os::raw::c_uchar,
+        len: ::std::os::raw::c_int,
+        utf: *mut ::std::os::raw::c_uchar,
+        map: *const pg_mb_radix_tree,
+        cmap: *const pg_local_to_utf_combined,
+        cmapsize: ::std::os::raw::c_int,
+        conv_func: utf_local_conversion_func,
+        encoding: ::std::os::raw::c_int,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_verifymbstr(
+        mbstr: *const ::std::os::raw::c_char,
+        len: ::std::os::raw::c_int,
+        noError: bool,
+    ) -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_verify_mbstr(
+        encoding: ::std::os::raw::c_int,
+        mbstr: *const ::std::os::raw::c_char,
+        len: ::std::os::raw::c_int,
+        noError: bool,
+    ) -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_verify_mbstr_len(
+        encoding: ::std::os::raw::c_int,
+        mbstr: *const ::std::os::raw::c_char,
+        len: ::std::os::raw::c_int,
+        noError: bool,
+    ) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn check_encoding_conversion_args(
+        src_encoding: ::std::os::raw::c_int,
+        dest_encoding: ::std::os::raw::c_int,
+        len: ::std::os::raw::c_int,
+        expected_src_encoding: ::std::os::raw::c_int,
+        expected_dest_encoding: ::std::os::raw::c_int,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn report_invalid_encoding(
+        encoding: ::std::os::raw::c_int,
+        mbstr: *const ::std::os::raw::c_char,
+        len: ::std::os::raw::c_int,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn report_untranslatable_char(
+        src_encoding: ::std::os::raw::c_int,
+        dest_encoding: ::std::os::raw::c_int,
+        mbstr: *const ::std::os::raw::c_char,
+        len: ::std::os::raw::c_int,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn local2local(
+        l: *const ::std::os::raw::c_uchar,
+        p: *mut ::std::os::raw::c_uchar,
+        len: ::std::os::raw::c_int,
+        src_encoding: ::std::os::raw::c_int,
+        dest_encoding: ::std::os::raw::c_int,
+        tab: *const ::std::os::raw::c_uchar,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_ascii2mic(
+        l: *const ::std::os::raw::c_uchar,
+        p: *mut ::std::os::raw::c_uchar,
+        len: ::std::os::raw::c_int,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_mic2ascii(
+        mic: *const ::std::os::raw::c_uchar,
+        p: *mut ::std::os::raw::c_uchar,
+        len: ::std::os::raw::c_int,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn latin2mic(
+        l: *const ::std::os::raw::c_uchar,
+        p: *mut ::std::os::raw::c_uchar,
+        len: ::std::os::raw::c_int,
+        lc: ::std::os::raw::c_int,
+        encoding: ::std::os::raw::c_int,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn mic2latin(
+        mic: *const ::std::os::raw::c_uchar,
+        p: *mut ::std::os::raw::c_uchar,
+        len: ::std::os::raw::c_int,
+        lc: ::std::os::raw::c_int,
+        encoding: ::std::os::raw::c_int,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn latin2mic_with_table(
+        l: *const ::std::os::raw::c_uchar,
+        p: *mut ::std::os::raw::c_uchar,
+        len: ::std::os::raw::c_int,
+        lc: ::std::os::raw::c_int,
+        encoding: ::std::os::raw::c_int,
+        tab: *const ::std::os::raw::c_uchar,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn mic2latin_with_table(
+        mic: *const ::std::os::raw::c_uchar,
+        p: *mut ::std::os::raw::c_uchar,
+        len: ::std::os::raw::c_int,
+        lc: ::std::os::raw::c_int,
+        encoding: ::std::os::raw::c_int,
+        tab: *const ::std::os::raw::c_uchar,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn pg_utf8_islegal(
+        source: *const ::std::os::raw::c_uchar,
+        length: ::std::os::raw::c_int,
+    ) -> bool;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
