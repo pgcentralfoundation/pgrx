@@ -57,8 +57,8 @@ jobs:
     # hack Cargo.toml to use this version of pgx from github
     - name: hack Cargo.toml
       run: |
-       echo "git_hash=$(git rev-parse --short $GITHUB_SHA)" >> $GITHUB_ENV
-       echo "git_branch=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
+       export git_hash=$(git rev-parse --short $GITHUB_SHA)
+       export git_branch=${GITHUB_REF#refs/heads/}
        echo "[patch.crates-io]" >> /tmp/sample/Cargo.toml
        echo "pgx        = { git = \"https://github.com/zombodb/pgx\", package = \"pgx\",        branch = \"${git_branch}\", rev = \"${git_hash}\" }" >> /tmp/sample/Cargo.toml
        echo "pgx-macros = { git = \"https://github.com/zombodb/pgx\", package = \"pgx-macros\", branch = \"${git_branch}\", rev = \"${git_hash}\" }" >> /tmp/sample/Cargo.toml
