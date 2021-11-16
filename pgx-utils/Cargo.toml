@@ -31,5 +31,5 @@ color-eyre = "0.5.11"
 tracing = "0.1.29"
 tracing-error = "0.2.0"
 tracing-subscriber = { version = "0.3.1", features = [ "env-filter" ] }
-libloading = "0.7.1"
+libloading = "0.7.2"
 clap = { version = "2.33.3", default-features = false }
