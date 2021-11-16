@@ -58,11 +58,10 @@ jobs:
     - name: hack Cargo.toml
       run: |
        export git_hash=$(git rev-parse --short $GITHUB_SHA)
-       export git_branch=${GITHUB_REF#refs/heads/}
        echo "[patch.crates-io]" >> /tmp/sample/Cargo.toml
-       echo "pgx        = { git = \"https://github.com/zombodb/pgx\", package = \"pgx\",        branch = \"${git_branch}\", rev = \"${git_hash}\" }" >> /tmp/sample/Cargo.toml
-       echo "pgx-macros = { git = \"https://github.com/zombodb/pgx\", package = \"pgx-macros\", branch = \"${git_branch}\", rev = \"${git_hash}\" }" >> /tmp/sample/Cargo.toml
-       echo "pgx-tests  = { git = \"https://github.com/zombodb/pgx\", package = \"pgx-tests\",  branch = \"${git_branch}\", rev = \"${git_hash}\" }" >> /tmp/sample/Cargo.toml
+       echo "pgx        = { git = \"https://github.com/zombodb/pgx\", package = \"pgx\",        rev = \"${git_hash}\" }" >> /tmp/sample/Cargo.toml
+       echo "pgx-macros = { git = \"https://github.com/zombodb/pgx\", package = \"pgx-macros\", rev = \"${git_hash}\" }" >> /tmp/sample/Cargo.toml
+       echo "pgx-tests  = { git = \"https://github.com/zombodb/pgx\", package = \"pgx-tests\",  rev = \"${git_hash}\" }" >> /tmp/sample/Cargo.toml
        cat /tmp/sample/Cargo.toml
 
     # test that sample extension on all 4 Postgres'
