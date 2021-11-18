@@ -3,7 +3,7 @@ use quote::{quote, ToTokens, TokenStreamExt};
 use syn::{
     parse::{Parse, ParseStream},
     punctuated::Punctuated,
-    LitStr, Token,
+    Expr, LitStr, Token,
 };
 
 use crate::sql_entity_graph::PositioningRef;
@@ -134,7 +134,7 @@ impl ToTokens for ExtensionSqlFile {
 /// ```
 #[derive(Debug, Clone)]
 pub struct ExtensionSql {
-    pub sql: LitStr,
+    pub sql: Expr,
     pub name: LitStr,
     pub attrs: Punctuated<ExtensionSqlAttribute, Token![,]>,
 }
@@ -195,7 +195,7 @@ impl ToTokens for ExtensionSql {
             #[no_mangle]
             pub extern "C" fn  #sql_graph_entity_fn_name() -> pgx::datum::sql_entity_graph::SqlGraphEntity {
                 let submission = pgx::datum::sql_entity_graph::ExtensionSqlEntity {
-                    sql: #sql,
+                    sql: String::from(#sql),
                     module_path: module_path!(),
                     full_path: concat!(file!(), ':', line!()),
                     file: file!(),

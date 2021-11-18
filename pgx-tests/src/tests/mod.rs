@@ -9,6 +9,7 @@ mod datetime_tests;
 mod default_arg_value_tests;
 mod derive_pgtype_lifetimes;
 mod enum_type_tests;
+mod extension_sql_tests;
 mod fcinfo_tests;
 mod guc_tests;
 mod hooks_tests;

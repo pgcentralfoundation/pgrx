@@ -8,7 +8,7 @@ use pgx_utils::sql_entity_graph::SqlDeclared;
 pub struct ExtensionSqlEntity {
     pub module_path: &'static str,
     pub full_path: &'static str,
-    pub sql: &'static str,
+    pub sql: String,
     pub file: &'static str,
     pub line: u32,
     pub name: &'static str,
