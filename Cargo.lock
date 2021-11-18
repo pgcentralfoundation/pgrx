@@ -2108,9 +2108,9 @@ checksum = "6bdef32e8150c2a081110b42772ffe7d7c9032b606bc226c8260fd97e0976601"
 
 [[package]]
 name = "symbolic"
-version = "8.4.0"
+version = "8.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cdee51d8cb63a5bed678d0a1dbb181fb19b8b1ee682ef239e2db1eb544c8c6f6"
+checksum = "bf0b3be4c272aaef995fca595a89355caf49993b84a964013e4a94447f13c779"
 dependencies = [
  "symbolic-common",
  "symbolic-debuginfo",
@@ -2118,9 +2118,9 @@ dependencies = [
 
 [[package]]
 name = "symbolic-common"
-version = "8.4.0"
+version = "8.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5f544125aace169c385db21fc22f38b77710138e90e3f57077c98344b38d5880"
+checksum = "cfc8618f0f31ed048f8e66aa2caecedfbdbbca962ff9ad87107ba4171de0742b"
 dependencies = [
  "debugid",
  "memmap",
@@ -2130,9 +2130,9 @@ dependencies = [
 
 [[package]]
 name = "symbolic-debuginfo"
-version = "8.4.0"
+version = "8.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f13b81675345e73a24696e61752e2dc3bd5306684c4ca65795306676123dd409"
+checksum = "ac34b5f005e9c87aa9c60a712102f80dca51cd9edf1fa04d5c7392b936c45d06"
 dependencies = [
  "dmsort",
  "elementtree",
