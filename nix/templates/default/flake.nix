@@ -2,7 +2,7 @@
   description = "A PostgreSQL extension built by pgx.";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    nixpkgs.url = "nixpkgs/nixpkgs-unstable";
     naersk.url = "github:nmattia/naersk";
     pgx.url = "github:zombodb/pgx/develop";
     pgx.inputs.nixpkgs.follows = "nixpkgs";
