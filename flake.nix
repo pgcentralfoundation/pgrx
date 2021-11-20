@@ -3,7 +3,7 @@
 
   inputs = {
     naersk.url = "github:nix-community/naersk";
-    nixpkgs.url = "nixpkgs";
+    nixpkgs.url = "nixpkgs/nixpkgs-unstable";
   };
 
   outputs = { self, nixpkgs, naersk }:
