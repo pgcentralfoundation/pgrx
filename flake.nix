@@ -3,6 +3,7 @@
 
   inputs = {
     naersk.url = "github:nix-community/naersk";
+    naersk.inputs.nixpkgs.follows = "nixpkgs";
     nixpkgs.url = "nixpkgs/nixpkgs-unstable";
   };
 
