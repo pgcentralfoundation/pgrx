@@ -84,18 +84,20 @@ impl IntoDatum for TimestampWithTimeZone {
         let minute = self.minute() as i32;
         let second = self.second() as f64 + (self.microsecond() as f64 / USECS_PER_SEC as f64);
 
-        direct_function_call_as_datum(
-            pg_sys::make_timestamptz_at_timezone,
-            vec![
-                year.into_datum(),
-                month.into_datum(),
-                mday.into_datum(),
-                hour.into_datum(),
-                minute.into_datum(),
-                second.into_datum(),
-                "UTC".into_datum(),
-            ],
-        )
+        unsafe {
+            direct_function_call_as_datum(
+                pg_sys::make_timestamptz_at_timezone,
+                vec![
+                    year.into_datum(),
+                    month.into_datum(),
+                    mday.into_datum(),
+                    hour.into_datum(),
+                    minute.into_datum(),
+                    second.into_datum(),
+                    "UTC".into_datum(),
+                ],
+            )
+        }
     }
 
     fn type_oid() -> u32 {

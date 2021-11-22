@@ -1,7 +1,7 @@
 # Forging SQL from Rust
 <!-- Written 2021-09-20 -->
 
-PostgreSQL offers an extension interface, and it's my belief that Rust is a fantastic language to write extensions for it. [Eric Ridge](twitter.com/zombodb) thought so too, and started [`pgx`](https://github.com/zombodb/pgx) awhile back. I've been working with him to improve the toolkit, and wanted to share about one of our latest hacks: improving the generation of extension SQL code to interface with Rust.
+PostgreSQL offers an extension interface, and it's my belief that Rust is a fantastic language to write extensions for it. [Eric Ridge](https://twitter.com/zombodb) thought so too, and started [`pgx`](https://github.com/zombodb/pgx) awhile back. I've been working with him to improve the toolkit, and wanted to share about one of our latest hacks: improving the generation of extension SQL code to interface with Rust.
 
 This post is more on the advanced side, as it assumes knowledge of both Rust and PostgreSQL. We'll approach topics like foreign functions, dynamic linking, procedural macros, and linkers.
 
@@ -175,7 +175,7 @@ An earlier version of `cargo-pgx` had `cargo-pgx pgx schema` command that would 
 
 **This worked okay!** But gosh, it's not fun to do that, and there are a lot of complications such as trying to resolve types!
 
-*So, what's more fun than parsing Rust source code and generating SQL?* Parsing Rust code in procedural macros to inject metadata foreign functions, then later creating a binary which re-exports those functions via linker tricks, dynamically loads itself, and calls them all to collect metadata, then builds a depdency graph of them to drive the output!
+*So, what's more fun than parsing Rust source code and generating SQL?* Parsing Rust code in procedural macros to inject metadata foreign functions, then later creating a binary which re-exports those functions via linker tricks, dynamically loads itself, and calls them all to collect metadata, then builds a dependency graph of them to drive the output!
 
 > Wait... What, that was not your answer? Oh no... Well, bear with me because that's what we're doing.
 

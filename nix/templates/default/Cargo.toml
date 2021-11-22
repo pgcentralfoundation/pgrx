@@ -16,12 +16,12 @@ pg14 = ["pgx/pg14", "pgx-tests/pg14" ]
 pg_test = []
 
 [dependencies]
-pgx = { git = "https://github.com/zombodb/pgx", branch = "use-oxalica-rust", version = "0.2.0-beta.1" }
-pgx-macros = { git = "https://github.com/zombodb/pgx", branch = "use-oxalica-rust", version = "0.2.0-beta.1" }
-pgx-utils = { git = "https://github.com/zombodb/pgx", branch = "use-oxalica-rust", version = "0.2.0-beta.1" }
+pgx = { git = "https://github.com/zombodb/pgx", branch = "use-oxalica-rust", version = "0.2.5" }
+pgx-macros = { git = "https://github.com/zombodb/pgx", branch = "use-oxalica-rust", version = "0.2.5" }
+pgx-utils = { git = "https://github.com/zombodb/pgx", branch = "use-oxalica-rust", version = "0.2.5" }
 
 [dev-dependencies]
-pgx-tests = { git = "https://github.com/zombodb/pgx", branch = "use-oxalica-rust", version = "0.2.0-beta.1" }
+pgx-tests = { git = "https://github.com/zombodb/pgx", branch = "use-oxalica-rust", version = "0.2.5" }
 tempdir = "0.3.7"
 once_cell = "1.8.0"
 

@@ -25,11 +25,11 @@ unsafe fn trigger_example(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
         && trigger_fired_for_row(trigdata.tg_event)
     {
         let tupdesc = PgTupleDesc::from_pg_copy(trigdata.tg_relation.as_ref().unwrap().rd_att);
-        let tuple = PgBox::from_pg(trigdata.tg_trigtuple);
-        let id = heap_getattr::<i64>(&tuple, 1, &tupdesc);
-        let title = heap_getattr::<&str>(&tuple, 2, &tupdesc);
-        let description = heap_getattr::<&str>(&tuple, 3, &tupdesc);
-        let payload = heap_getattr::<JsonB>(&tuple, 4, &tupdesc);
+        let tuple = PgBox::<pg_sys::HeapTupleData>::from_pg(trigdata.tg_trigtuple);
+        let id = heap_getattr::<i64, AllocatedByPostgres>(&tuple, 1, &tupdesc);
+        let title = heap_getattr::<&str, AllocatedByPostgres>(&tuple, 2, &tupdesc);
+        let description = heap_getattr::<&str, AllocatedByPostgres>(&tuple, 3, &tupdesc);
+        let payload = heap_getattr::<JsonB, AllocatedByPostgres>(&tuple, 4, &tupdesc);
 
         warning!(
             "id={:?}, title={:?}, description={:?}, payload={:?}",
@@ -69,7 +69,9 @@ mod tests {
 
     #[pg_test]
     fn test_insert() {
-        Spi::run(r#"INSERT INTO test (title, description, payload) VALUES ('a different title', 'a different description', '{"key": "value"}')"#);
+        Spi::run(
+            r#"INSERT INTO test (title, description, payload) VALUES ('a different title', 'a different description', '{"key": "value"}')"#,
+        );
     }
 }
 

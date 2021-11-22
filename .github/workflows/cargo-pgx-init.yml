@@ -38,8 +38,8 @@ jobs:
         sudo bash -c 'echo deb http://apt.postgresql.org/pub/repos/apt/ focal-pgdg main >> /etc/apt/sources.list.d/pgdg.list'
         sudo apt update
 
-    # Install Postgres
-    - name: install postgres
+    # Install Postgres build dependencies
+    - name: install postgres build dependencies
       run: sudo apt-get install -y clang-10 llvm-10 clang gcc make build-essential libz-dev zlib1g-dev strace libssl-dev pkg-config
 
     # install cargo-pgx
@@ -53,6 +53,19 @@ jobs:
     # create new sample extension
     - name: create new sample extension
       run: cd /tmp/ && cargo pgx new sample
+
+    # hack Cargo.toml to use this version of pgx from github
+    - name: hack Cargo.toml
+      run: |
+       export git_hash=$(git rev-parse --short $GITHUB_SHA)
+       export git_url=$(git config --get remote.origin.url)
+       echo "[patch.crates-io]" >> /tmp/sample/Cargo.toml
+       echo "pgx        = { git = \"${git_url}\", package = \"pgx\",        rev = \"${git_hash}\" }" >> /tmp/sample/Cargo.toml
+       echo "pgx-macros = { git = \"${git_url}\", package = \"pgx-macros\", rev = \"${git_hash}\" }" >> /tmp/sample/Cargo.toml
+       echo "pgx-tests  = { git = \"${git_url}\", package = \"pgx-tests\",  rev = \"${git_hash}\" }" >> /tmp/sample/Cargo.toml
+
+    - name: show Cargo.toml
+      run: cat /tmp/sample/Cargo.toml
 
     # test that sample extension on all 4 Postgres'
     - name: test sample on pg10

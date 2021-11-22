@@ -3,7 +3,7 @@
 
 //! Helper functions for working with Postgres `ItemPointerData` (`tid`) type
 
-use crate::{pg_sys, PgBox};
+use crate::{pg_sys, AllocatedByRust, PgBox};
 
 /// ## Safety
 ///
@@ -115,7 +115,7 @@ pub unsafe fn item_pointer_is_valid(ctid: *const pg_sys::ItemPointerData) -> boo
 pub fn new_item_pointer(
     blockno: pg_sys::BlockNumber,
     offno: pg_sys::OffsetNumber,
-) -> PgBox<pg_sys::ItemPointerData> {
+) -> PgBox<pg_sys::ItemPointerData, AllocatedByRust> {
     let mut tid = PgBox::<pg_sys::ItemPointerData>::alloc();
     tid.ip_blkid.bi_hi = (blockno >> 16) as u16;
     tid.ip_blkid.bi_lo = (blockno & 0xffff) as u16;

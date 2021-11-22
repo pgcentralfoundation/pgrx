@@ -19,7 +19,7 @@ extension_sql!(
 );
 
 #[pg_extern(immutable)]
-fn complex_in(input: &std::ffi::CStr) -> PgBox<Complex> {
+fn complex_in(input: &std::ffi::CStr) -> PgBox<Complex, AllocatedByRust> {
     let input_as_str = input.to_str().unwrap();
     let re = regex::Regex::new(
         r#"(?P<x>[-+]?([0-9]*\.[0-9]+|[0-9]+)),\s*(?P<y>[-+]?([0-9]*\.[0-9]+|[0-9]+))"#,

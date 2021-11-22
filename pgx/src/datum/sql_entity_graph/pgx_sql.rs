@@ -306,7 +306,7 @@ impl PgxSql {
     pub fn to_sql(&self) -> eyre::Result<String> {
         let mut full_sql = String::new();
         for step_id in petgraph::algo::toposort(&self.graph, None)
-            .map_err(|e| eyre_err!("Failed to toposort SQL entities: {:?}", e))?
+            .map_err(|e| eyre_err!("Failed to toposort SQL entities, node with cycle: {:?}", self.graph[e.node_id()]))?
         {
             let step = &self.graph[step_id];
 
@@ -481,7 +481,7 @@ pub fn find_positioning_ref_target<'a>(
                 }
             }
             for (other, other_index) in externs {
-                if *last_segment == other.name && other.module_path.ends_with(&module_path) {
+                if *last_segment == other.unaliased_name && other.module_path.ends_with(&module_path) {
                     return Some(&other_index);
                 }
             }
