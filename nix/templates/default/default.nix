@@ -47,6 +47,7 @@ naersk.lib."${targetPlatform.system}".buildPackage rec {
     cargo
     rustc
     libiconv
+    postgresql_13
   ];
   checkInputs = [ cargo-pgx cargo rustc ];
   doCheck = true;
