@@ -18,6 +18,8 @@ pg_test = []
 [dependencies]
 pgx = "0.2"
 pgx-macros = "0.2"
+pgx-utils = "0.2"
+pgx-pg-sys = "0.2"
 
 [dev-dependencies]
 pgx-tests = "0.2"
