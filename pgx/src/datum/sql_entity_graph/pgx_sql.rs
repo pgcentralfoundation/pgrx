@@ -157,6 +157,7 @@ impl PgxSql {
             &mapped_schemas,
             &mapped_types,
             &mapped_enums,
+            &mapped_externs,
         );
         connect_hashes(
             &mut graph,
@@ -164,6 +165,7 @@ impl PgxSql {
             &mapped_schemas,
             &mapped_types,
             &mapped_enums,
+            &mapped_externs,
         );
 
         let mut this = Self {
@@ -305,9 +307,12 @@ impl PgxSql {
     #[instrument(level = "error", skip(self))]
     pub fn to_sql(&self) -> eyre::Result<String> {
         let mut full_sql = String::new();
-        for step_id in petgraph::algo::toposort(&self.graph, None)
-            .map_err(|e| eyre_err!("Failed to toposort SQL entities, node with cycle: {:?}", self.graph[e.node_id()]))?
-        {
+        for step_id in petgraph::algo::toposort(&self.graph, None).map_err(|e| {
+            eyre_err!(
+                "Failed to toposort SQL entities, node with cycle: {:?}",
+                self.graph[e.node_id()]
+            )
+        })? {
             let step = &self.graph[step_id];
 
             let sql = step.to_sql(self)?;
@@ -481,7 +486,9 @@ pub fn find_positioning_ref_target<'a>(
                 }
             }
             for (other, other_index) in externs {
-                if *last_segment == other.unaliased_name && other.module_path.ends_with(&module_path) {
+                if *last_segment == other.unaliased_name
+                    && other.module_path.ends_with(&module_path)
+                {
                     return Some(&other_index);
                 }
             }
@@ -974,6 +981,7 @@ fn connect_ords(
     schemas: &HashMap<SchemaEntity, NodeIndex>,
     types: &HashMap<PostgresTypeEntity, NodeIndex>,
     enums: &HashMap<PostgresEnumEntity, NodeIndex>,
+    externs: &HashMap<PgExternEntity, NodeIndex>,
 ) {
     for (item, &index) in ords {
         for (schema_item, &schema_index) in schemas {
@@ -995,6 +1003,13 @@ fn connect_ords(
                 tracing::debug!(from = ?item.full_path, to = ty_item.full_path, "Adding Ord after Enum edge.");
                 graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredBy);
                 break;
+            }
+        }
+        for (ty_item, &ty_index) in externs {
+            if ty_item.operator.is_some() {
+                tracing::debug!(from = ?item.full_path, to = ty_item.full_path, "Adding Hash after Operator edge.");
+                graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredBy);
+                // NB:  no break here.  We need to be dependent on all externs that are operators
             }
         }
     }
@@ -1023,6 +1038,7 @@ fn connect_hashes(
     schemas: &HashMap<SchemaEntity, NodeIndex>,
     types: &HashMap<PostgresTypeEntity, NodeIndex>,
     enums: &HashMap<PostgresEnumEntity, NodeIndex>,
+    externs: &HashMap<PgExternEntity, NodeIndex>,
 ) {
     for (item, &index) in hashes {
         for (schema_item, &schema_index) in schemas {
@@ -1044,6 +1060,13 @@ fn connect_hashes(
                 tracing::debug!(from = ?item.full_path, to = ty_item.full_path, "Adding Hash after Enum edge.");
                 graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredBy);
                 break;
+            }
+        }
+        for (ty_item, &ty_index) in externs {
+            if ty_item.operator.is_some() {
+                tracing::debug!(from = ?item.full_path, to = ty_item.full_path, "Adding Hash after Operator edge.");
+                graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredBy);
+                // NB:  no break here.  We need to be dependent on all externs that are operators
             }
         }
     }
