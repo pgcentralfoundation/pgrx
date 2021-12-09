@@ -18,10 +18,12 @@ pg_test = []
 [dependencies]
 pgx = "0.2"
 pgx-macros = "0.2"
+pgx-utils = "0.2"
+pgx-pg-sys = "0.2"
 
 [dev-dependencies]
 pgx-tests = "0.2"
-tempdir = "0.3.7"
+tempfile = "3.2.0"
 once_cell = "1.7.2"
 
 [profile.dev]
