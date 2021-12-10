@@ -192,6 +192,28 @@ fn handle_default(
                     let value = def.value();
                     Ok((true_ty, Some(value.to_string())))
                 }
+                syn::Expr::Unary(syn::ExprUnary {
+                    op: syn::UnOp::Neg(_),
+                    ref expr,
+                    ..
+                }) => match &**expr {
+                    syn::Expr::Lit(syn::ExprLit {
+                        lit: syn::Lit::Int(def),
+                        ..
+                    }) => {
+                        let value = def.base10_digits();
+                        Ok((true_ty, Some("-".to_owned() + value)))
+                    }
+                    _ => {
+                        return Err(syn::Error::new(
+                            Span::call_site(),
+                            format!(
+                                "Unrecognized UnaryExpr in `default!()` macro, got: {:?}",
+                                out.expr
+                            ),
+                        ))
+                    }
+                },
                 syn::Expr::Type(syn::ExprType { ref ty, .. }) => match ty.deref() {
                     syn::Type::Path(syn::TypePath {
                         path: syn::Path { segments, .. },
