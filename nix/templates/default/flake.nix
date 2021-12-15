@@ -9,6 +9,7 @@
     naersk.inputs.nixpkgs.follows = "nixpkgs";
     pgx.url = "github:zombodb/pgx/use-oxalica-rust";
     pgx.inputs.nixpkgs.follows = "nixpkgs";
+    pgx.inputs.naersk.follows = "naersk";
   };
 
   outputs = { self, nixpkgs, rust-overlay, naersk, pgx }:

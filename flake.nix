@@ -93,6 +93,10 @@
           ];
           LIBCLANG_PATH = "${pkgs.llvmPackages.libclang.lib}/lib";
           PGX_PG_SYS_SKIP_BINDING_REWRITE = "1";
+          BINDGEN_EXTRA_CLANG_ARGS = [
+            ''-I"${pkgs.llvmPackages.libclang.lib}/lib/clang/${pkgs.llvmPackages.libclang.version}/include"''
+            "-I ${pkgs.glibc.dev}/include"
+          ];
         });
 
       checks = forAllSystems (system:
