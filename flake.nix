@@ -95,8 +95,10 @@
           PGX_PG_SYS_SKIP_BINDING_REWRITE = "1";
           BINDGEN_EXTRA_CLANG_ARGS = [
             ''-I"${pkgs.llvmPackages.libclang.lib}/lib/clang/${pkgs.llvmPackages.libclang.version}/include"''
+          ] ++ (if pkgs.stdenv.isLinux then [
             "-I ${pkgs.glibc.dev}/include"
-          ];
+          ] else [ ]);
+
         });
 
       checks = forAllSystems (system:
