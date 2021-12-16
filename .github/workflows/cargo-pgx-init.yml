@@ -58,9 +58,9 @@ jobs:
     - name: hack Cargo.toml
       run: |
        echo "[patch.crates-io]" >> /tmp/sample/Cargo.toml
-       echo "pgx        = { path = \"${GITHUB_WORKSPACE}/pgx/pgx\"        }" >> /tmp/sample/Cargo.toml
-       echo "pgx-macros = { path = \"${GITHUB_WORKSPACE}/pgx/pgx-macros\" }" >> /tmp/sample/Cargo.toml
-       echo "pgx-tests  = { path = \"${GITHUB_WORKSPACE}/pgx/pgx-tests\"  }" >> /tmp/sample/Cargo.toml
+       echo "pgx        = { path = \"${GITHUB_WORKSPACE}/pgx\"        }" >> /tmp/sample/Cargo.toml
+       echo "pgx-macros = { path = \"${GITHUB_WORKSPACE}/pgx-macros\" }" >> /tmp/sample/Cargo.toml
+       echo "pgx-tests  = { path = \"${GITHUB_WORKSPACE}/pgx-tests\"  }" >> /tmp/sample/Cargo.toml
 
     - name: show Cargo.toml
       run: cat /tmp/sample/Cargo.toml
