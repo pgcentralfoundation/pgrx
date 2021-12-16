@@ -57,11 +57,10 @@ jobs:
     # hack Cargo.toml to use this version of pgx from github
     - name: hack Cargo.toml
       run: |
-       export git_url=$(git config --get remote.origin.url)
        echo "[patch.crates-io]" >> /tmp/sample/Cargo.toml
-       echo "pgx        = { git = \"${git_url}\", package = \"pgx\",        rev = \"${GITHUB_SHA}\" }" >> /tmp/sample/Cargo.toml
-       echo "pgx-macros = { git = \"${git_url}\", package = \"pgx-macros\", rev = \"${GITHUB_SHA}\" }" >> /tmp/sample/Cargo.toml
-       echo "pgx-tests  = { git = \"${git_url}\", package = \"pgx-tests\",  rev = \"${GITHUB_SHA}\" }" >> /tmp/sample/Cargo.toml
+       echo "pgx        = { path = \"${GITHUB_WORKSPACE}/pgx\", package = \"pgx\"        }" >> /tmp/sample/Cargo.toml
+       echo "pgx-macros = { path = \"${GITHUB_WORKSPACE}/pgx\", package = \"pgx-macros\" }" >> /tmp/sample/Cargo.toml
+       echo "pgx-tests  = { path = \"${GITHUB_WORKSPACE}/pgx\", package = \"pgx-tests\"  }" >> /tmp/sample/Cargo.toml
 
     - name: show Cargo.toml
       run: cat /tmp/sample/Cargo.toml
