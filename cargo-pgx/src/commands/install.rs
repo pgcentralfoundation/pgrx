@@ -45,6 +45,18 @@ pub(crate) fn install_extension(
         let mut dest = base_directory.clone();
         dest.push(&pkgdir);
         dest.push(format!("{}.so", extname));
+
+        if cfg!(target_os = "macos") {
+            // Remove the existing .so if present. This is a workaround for an
+            // issue highlighted by the following apple documentation:
+            // https://developer.apple.com/documentation/security/updating_mac_software
+            if dest.exists() {
+                handle_result!(
+                std::fs::remove_file(&dest),
+                format!("unable to remove existing file {}", dest.display())
+            )
+            }
+        }
         copy_file(&shlibpath, &dest, "shared library", false);
     }
 

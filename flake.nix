@@ -98,7 +98,6 @@
           ] ++ (if pkgs.stdenv.isLinux then [
             "-I ${pkgs.glibc.dev}/include"
           ] else [ ]);
-
         });
 
       checks = forAllSystems (system:
