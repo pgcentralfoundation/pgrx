@@ -35,7 +35,7 @@ pub(crate) fn init_pgx(pgx: &Pgx) -> std::result::Result<(), std::io::Error> {
 
     // We use a tempdir to build the postgres versions in case the user has an existing pgx home
     // this way, if they cancel the process (say it was an accident) we don't ruin their postgres builds.
-    let temp_dir = tempdir::TempDir::new("pgx-home-candidates")?;
+    let temp_dir = tempdir::TempDir::new_in(&pgx_dir, "candidates")?;
     let temp_dir_path = temp_dir.path().to_path_buf();
 
     let output_configs = Arc::new(Mutex::new(Vec::new()));
@@ -294,7 +294,9 @@ fn make_install_postgres(version: &PgConfig, pgdir: &PathBuf, pgx_dir: &PathBuf)
             &pgx_versioned_dir.display(),
             &pgdir.display(),
         );
-        std::fs::remove_dir_all(&pgx_versioned_dir)?;
+        if pgx_versioned_dir.exists() {
+            std::fs::remove_dir_all(&pgx_versioned_dir)?;
+        }
         std::fs::rename(pgdir, &pgx_versioned_dir)?;
 
         let mut pg_config = get_pg_installdir(&pgx_versioned_dir);
