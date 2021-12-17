@@ -1,4 +1,4 @@
-use pgx::datum::sql_entity_graph::aggregate::{FinalizeModify, ParallelOption};
+// use pgx::datum::sql_entity_graph::aggregate::{FinalizeModify, ParallelOption};
 use pgx::*;
 use serde::{Deserialize, Serialize};
 use std::{ffi::CStr, str::FromStr};
