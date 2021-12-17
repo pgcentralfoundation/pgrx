@@ -126,7 +126,6 @@ pub(crate) fn build_extension(major_version: u16, is_release: bool, additional_f
     }
     let mut command = Command::new("cargo");
     command.arg("build");
-    command.arg("--lib");
     if is_release {
         command.arg("--release");
     }
@@ -185,6 +184,7 @@ fn copy_sql_files(
         Option::<String>::None,
         None,
         false,
+        true,
         true,
     )?;
     copy_file(&dest, &dest, "extension schema file", true);
