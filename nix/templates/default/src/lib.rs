@@ -30,7 +30,7 @@ pub mod pg_test {
     });
     static PG_CONFIG: Lazy<String> = Lazy::new(|| {
         let pgx_config = Pgx::from_config().unwrap();
-        let version = format!("pg{}", pgx_pg_sys::get_pg_major_version_num());
+        let version = format!("pg{}", pgx::pg_sys::get_pg_major_version_num());
         let pg_config = pgx_config.get(&version).unwrap();
         let path = pg_config.path().unwrap();
         format!("plrust.pg_config='{}'", path.as_path().display())
