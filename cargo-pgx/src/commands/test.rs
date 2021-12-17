@@ -9,6 +9,7 @@ use std::process::{Command, Stdio};
 pub fn test_extension(
     pg_config: &PgConfig,
     is_release: bool,
+    no_schema: bool,
     test_workspace: bool,
     additional_features: Vec<&str>,
     testname: Option<&str>,
@@ -25,6 +26,7 @@ pub fn test_extension(
         .stdout(Stdio::inherit())
         .stderr(Stdio::inherit())
         .arg("test")
+        .arg("--lib")
         .arg("--features")
         .arg(features)
         .arg("--no-default-features")
@@ -32,7 +34,8 @@ pub fn test_extension(
         .env(
             "PGX_BUILD_PROFILE",
             if is_release { "release" } else { "debug" },
-        );
+        )
+        .env("PGX_NO_SCHEMA", if no_schema { "true" } else { "false" });
 
     if is_release {
         command.arg("--release");

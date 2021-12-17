@@ -150,4 +150,16 @@ mod tests {
     fn test_panic_via_spi() {
         Spi::run("SELECT tests.do_panic();");
     }
+
+    #[pg_test]
+    fn test_inserting_null() {
+        Spi::execute(|mut client| {
+            client.update("CREATE TABLE tests.null_test (id uuid)", None, None);
+        });
+        let result = Spi::get_one_with_args::<i32>(
+            "INSERT INTO tests.null_test VALUES ($1) RETURNING 1",
+            vec![(PgBuiltInOids::UUIDOID.oid(), None)],
+        );
+        assert_eq!(result, Some(1));
+    }
 }

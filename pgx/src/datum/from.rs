@@ -3,7 +3,10 @@
 
 //! for converting a pg_sys::Datum and a corresponding "is_null" bool into a typed Option
 
-use crate::{pg_sys, text_to_rust_str_unchecked, varlena_to_byte_slice, PgBox, PgMemoryContexts};
+use crate::{
+    pg_sys, text_to_rust_str_unchecked, varlena_to_byte_slice, AllocatedByPostgres, PgBox,
+    PgMemoryContexts,
+};
 use std::ffi::CStr;
 
 /// Convert a `(pg_sys::Datum, is_null:bool, type_oid:pg_sys::Oid)` tuple into a Rust type
@@ -342,10 +345,10 @@ impl FromDatum for () {
 }
 
 /// for user types
-impl<T> FromDatum for PgBox<T> {
+impl<T> FromDatum for PgBox<T, AllocatedByPostgres> {
     const NEEDS_TYPID: bool = false;
     #[inline]
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<PgBox<T>> {
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<Self> {
         if is_null {
             None
         } else if datum == 0 {

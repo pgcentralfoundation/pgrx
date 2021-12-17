@@ -211,8 +211,7 @@ pub static DEFAULT_TYPEID_SQL_MAPPING: Lazy<HashSet<RustSqlMapping>> = Lazy::new
     map_type!(m, Timestamp, "timestamp");
     map_type!(m, TimestampWithTimeZone, "timestamp with time zone");
     map_type!(m, pgx_pg_sys::PlannerInfo, "internal");
-    map_type!(m, datum::Internal<pgx_pg_sys::PlannerInfo>, "internal");
-    map_type!(m, datum::Internal<pgx_pg_sys::List>, "internal");
+    map_type!(m, datum::Internal, "internal");
     map_type!(m, pgbox::PgBox<pgx_pg_sys::IndexAmRoutine>, "internal");
     map_type!(m, rel::PgRelation, "regclass");
     map_type!(m, datum::Numeric, "numeric");
@@ -438,7 +437,7 @@ macro_rules! pg_binary_magic {
                 for symbol_to_call in symbols_to_call {
                     let symbol: libloading::os::unix::Symbol<
                         unsafe extern fn() -> SqlGraphEntity
-                    > = lib.get(symbol_to_call.as_bytes()).expect(&format!("Couldn't call {:?}", symbol_to_call));
+                    > = lib.get(symbol_to_call.as_bytes()).expect(&format!("Couldn't call {:#?}", symbol_to_call));
                     let entity = symbol();
                     entities.push(entity);
                 }

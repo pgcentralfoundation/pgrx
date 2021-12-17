@@ -1,5 +1,6 @@
 use std::ops::Deref;
 
+use crate::anonymonize_lifetimes;
 use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
 use syn::{
@@ -27,6 +28,8 @@ impl Argument {
 
     pub fn build_from_pat_type(value: syn::PatType) -> Result<Option<Self>, syn::Error> {
         let mut true_ty = *value.ty.clone();
+        anonymonize_lifetimes(&mut true_ty);
+
         let identifier = match *value.pat {
             Pat::Ident(ref p) => p.ident.clone(),
             Pat::Reference(ref p_ref) => match *p_ref.pat {
@@ -189,6 +192,28 @@ fn handle_default(
                     let value = def.value();
                     Ok((true_ty, Some(value.to_string())))
                 }
+                syn::Expr::Unary(syn::ExprUnary {
+                    op: syn::UnOp::Neg(_),
+                    ref expr,
+                    ..
+                }) => match &**expr {
+                    syn::Expr::Lit(syn::ExprLit {
+                        lit: syn::Lit::Int(def),
+                        ..
+                    }) => {
+                        let value = def.base10_digits();
+                        Ok((true_ty, Some("-".to_owned() + value)))
+                    }
+                    _ => {
+                        return Err(syn::Error::new(
+                            Span::call_site(),
+                            format!(
+                                "Unrecognized UnaryExpr in `default!()` macro, got: {:?}",
+                                out.expr
+                            ),
+                        ))
+                    }
+                },
                 syn::Expr::Type(syn::ExprType { ref ty, .. }) => match ty.deref() {
                     syn::Type::Path(syn::TypePath {
                         path: syn::Path { segments, .. },
@@ -247,12 +272,14 @@ fn handle_default(
 
 impl ToTokens for Argument {
     fn to_tokens(&self, tokens: &mut TokenStream2) {
-        let pat = &self.pat;
-        let ty = &self.ty;
-        let default = self.default.iter();
         let mut found_optional = false;
         let mut found_variadic = false;
-        match self.ty {
+        let pat = &self.pat;
+        let default = self.default.iter();
+        let mut ty = self.ty.clone();
+        anonymonize_lifetimes(&mut ty);
+
+        match ty {
             syn::Type::Path(ref type_path) => {
                 let path = &type_path.path;
                 for segment in &path.segments {
@@ -260,6 +287,7 @@ impl ToTokens for Argument {
                     match ident_string.as_str() {
                         "Option" => found_optional = true,
                         "VariadicArray" => found_variadic = true,
+                        "Internal" => found_optional = true,
                         _ => (),
                     }
                 }
@@ -276,7 +304,7 @@ impl ToTokens for Argument {
             }
             _ => (),
         };
-        let ty_string = self.ty.to_token_stream().to_string().replace(" ", "");
+        let ty_string = ty.to_token_stream().to_string().replace(" ", "");
 
         let quoted = quote! {
             pgx::datum::sql_entity_graph::PgExternArgumentEntity {

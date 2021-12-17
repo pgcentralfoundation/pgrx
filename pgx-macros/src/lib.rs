@@ -828,7 +828,7 @@ fn impl_guc_enum(ast: DeriveInput) -> proc_macro2::TokenStream {
         }
 
         build_array_body.extend(quote! {
-            pgx::PgBox::with(&mut slice[#idx], |v| {
+            pgx::PgBox::<_, pgx::AllocatedByPostgres>::with(&mut slice[#idx], |v| {
                 v.name = pgx::PgMemoryContexts::TopMemoryContext.pstrdup(#label);
                 v.val = #idx as i32;
                 v.hidden = #hidden;

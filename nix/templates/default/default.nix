@@ -39,7 +39,7 @@ naersk.lib."${targetPlatform.system}".buildPackage rec {
 
   inputsFrom = [ postgresql_10 postgresql_11 postgresql_12 postgresql_13 cargo-pgx ];
 
-  LIBCLANG_PATH = "${llvmPackages.libclang}/lib";
+  LIBCLANG_PATH = "${llvmPackages.libclang.lib}/lib";
   buildInputs = [
     rustfmt
     cargo-pgx
@@ -47,6 +47,7 @@ naersk.lib."${targetPlatform.system}".buildPackage rec {
     cargo
     rustc
     libiconv
+    postgresql_13
   ];
   checkInputs = [ cargo-pgx cargo rustc ];
   doCheck = true;
