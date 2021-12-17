@@ -138,6 +138,8 @@ OPTIONS:
                                    download/compile/install it
         --pg13 <PG13_PG_CONFIG>    if installed locally, the path to PG13's 'pg_config' tool, or 'download' to have pgx
                                    download/compile/install it
+        --pg14 <PG14_PG_CONFIG>    if installed locally, the path to PG14's 'pg_config' tool, or 'download' to have pgx
+                                   download/compile/install it
 ```
 
 ## Creating a new Extension
@@ -274,6 +276,7 @@ USAGE:
 FLAGS:
     -h, --help       Prints help information
     -r, --release    compile for release mode (default is debug)
+    -n, --no-schema    Don't regenerate the schema
     -V, --version    Prints version information
 
 OPTIONS:
@@ -366,6 +369,7 @@ USAGE:
 FLAGS:
     -h, --help       Prints help information
     -r, --release    compile for release mode (default is debug)
+    -n, --no-schema    Don't regenerate the schema
     -V, --version    Prints version information
 
 OPTIONS:
@@ -439,6 +443,7 @@ USAGE:
 FLAGS:
     -h, --help         Prints help information
     -r, --release      compile for release mode (default is debug)
+    -n, --no-schema    Don't regenerate the schema
     -V, --version      Prints version information
         --workspace    Test all packages in the workspace
 

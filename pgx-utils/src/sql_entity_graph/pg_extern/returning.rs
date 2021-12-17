@@ -1,7 +1,8 @@
+use crate::{anonymonize_lifetimes, anonymonize_lifetimes_in_type_path};
 use eyre::eyre as eyre_err;
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
-use std::{convert::TryFrom, ops::Deref};
+use std::convert::TryFrom;
 use syn::{
     parse::{Parse, ParseStream},
     Token,
@@ -18,16 +19,20 @@ pub enum Returning {
 }
 
 impl Returning {
-    fn parse_trait_bound(trait_bound: &syn::TraitBound) -> Returning {
-        let last_path_segment = trait_bound.path.segments.last().unwrap();
+    fn parse_trait_bound(trait_bound: &mut syn::TraitBound) -> Returning {
+        let last_path_segment = trait_bound.path.segments.last_mut().unwrap();
         match last_path_segment.ident.to_string().as_str() {
-            "Iterator" => match &last_path_segment.arguments {
-                syn::PathArguments::AngleBracketed(args) => match args.args.first().unwrap() {
-                    syn::GenericArgument::Binding(binding) => match &binding.ty {
+            "Iterator" => match &mut last_path_segment.arguments {
+                syn::PathArguments::AngleBracketed(args) => match args.args.first_mut().unwrap() {
+                    syn::GenericArgument::Binding(binding) => match &mut binding.ty {
                         syn::Type::Tuple(tuple_type) => Self::parse_type_tuple(tuple_type),
-                        syn::Type::Path(path) => Returning::SetOf(path.clone()),
+                        syn::Type::Path(path) => {
+                            Returning::SetOf(anonymonize_lifetimes_in_type_path(path.clone()))
+                        }
                         syn::Type::Reference(type_ref) => match &*type_ref.elem {
-                            syn::Type::Path(path) => Returning::SetOf(path.clone()),
+                            syn::Type::Path(path) => {
+                                Returning::SetOf(anonymonize_lifetimes_in_type_path(path.clone()))
+                            }
                             _ => unimplemented!("Expected path"),
                         },
                         ty => unimplemented!("Only iters with tuples, got {:?}.", ty),
@@ -40,37 +45,43 @@ impl Returning {
         }
     }
 
-    fn parse_type_tuple(type_tuple: &syn::TypeTuple) -> Returning {
+    fn parse_type_tuple(type_tuple: &mut syn::TypeTuple) -> Returning {
         let returns: Vec<(syn::Type, Option<_>)> = type_tuple
             .elems
-            .iter()
-            .flat_map(|elem| match elem {
-                syn::Type::Macro(macro_pat) => {
-                    let mac = &macro_pat.mac;
-                    let archetype = mac.path.segments.last().unwrap();
-                    match archetype.ident.to_string().as_str() {
-                        "name" => {
-                            let out: NameMacro = mac.parse_body().expect(&*format!("{:?}", mac));
-                            Some((out.ty, Some(out.ident)))
+            .iter_mut()
+            .flat_map(|elem| {
+                let mut elem = elem.clone();
+                anonymonize_lifetimes(&mut elem);
+
+                match elem {
+                    syn::Type::Macro(macro_pat) => {
+                        let mac = &macro_pat.mac;
+                        let archetype = mac.path.segments.last().unwrap();
+                        match archetype.ident.to_string().as_str() {
+                            "name" => {
+                                let out: NameMacro =
+                                    mac.parse_body().expect(&*format!("{:?}", mac));
+                                Some((out.ty, Some(out.ident)))
+                            }
+                            _ => unimplemented!("Don't support anything other than name."),
                         }
-                        _ => unimplemented!("Don't support anything other than name."),
                     }
+                    ty => Some((ty.clone(), None)),
                 }
-                ty => Some((ty.clone(), None)),
             })
             .collect();
         Returning::Iterated(returns)
     }
 
-    fn parse_impl_trait(impl_trait: &syn::TypeImplTrait) -> Returning {
-        match impl_trait.bounds.first().unwrap() {
+    fn parse_impl_trait(impl_trait: &mut syn::TypeImplTrait) -> Returning {
+        match impl_trait.bounds.first_mut().unwrap() {
             syn::TypeParamBound::Trait(trait_bound) => Self::parse_trait_bound(trait_bound),
             _ => Returning::None,
         }
     }
 
-    fn parse_dyn_trait(dyn_trait: &syn::TypeTraitObject) -> Returning {
-        match dyn_trait.bounds.first().unwrap() {
+    fn parse_dyn_trait(dyn_trait: &mut syn::TypeTraitObject) -> Returning {
+        match dyn_trait.bounds.first_mut().unwrap() {
             syn::TypeParamBound::Trait(trait_bound) => Self::parse_trait_bound(trait_bound),
             _ => Returning::None,
         }
@@ -83,96 +94,106 @@ impl TryFrom<&syn::ReturnType> for Returning {
     fn try_from(value: &syn::ReturnType) -> Result<Self, Self::Error> {
         Ok(match &value {
             syn::ReturnType::Default => Returning::None,
-            syn::ReturnType::Type(_, ty) => match *ty.clone() {
-                syn::Type::ImplTrait(impl_trait) => Returning::parse_impl_trait(&impl_trait),
-                syn::Type::TraitObject(dyn_trait) => Returning::parse_dyn_trait(&dyn_trait),
-                syn::Type::Path(typepath) => {
-                    let path = &typepath.path;
-                    let mut saw_pg_sys = false;
-                    let mut saw_datum = false;
-                    let mut saw_option_ident = false;
-                    let mut saw_box_ident = false;
-                    let mut maybe_inner_impl_trait = None;
+            syn::ReturnType::Type(_, ty) => {
+                let mut ty = *ty.clone();
+                anonymonize_lifetimes(&mut ty);
 
-                    for segment in &path.segments {
-                        let ident_string = segment.ident.to_string();
-                        match ident_string.as_str() {
-                            "pg_sys" => saw_pg_sys = true,
-                            "Datum" => saw_datum = true,
-                            "Option" => saw_option_ident = true,
-                            "Box" => saw_box_ident = true,
-                            _ => (),
-                        }
-                        if saw_option_ident || saw_box_ident {
-                            match &segment.arguments {
-                                syn::PathArguments::AngleBracketed(inside_brackets) => {
-                                    match inside_brackets.args.first() {
-                                        Some(syn::GenericArgument::Type(syn::Type::ImplTrait(
-                                            impl_trait,
-                                        ))) => {
-                                            maybe_inner_impl_trait =
-                                                Some(Returning::parse_impl_trait(&impl_trait));
-                                        }
-                                        Some(syn::GenericArgument::Type(
-                                            syn::Type::TraitObject(dyn_trait),
-                                        )) => {
-                                            maybe_inner_impl_trait =
-                                                Some(Returning::parse_dyn_trait(&dyn_trait))
-                                        }
-                                        _ => (),
-                                    }
-                                }
-                                syn::PathArguments::None | syn::PathArguments::Parenthesized(_) => {
-                                    ()
-                                }
-                            }
-                        }
+                match ty {
+                    syn::Type::ImplTrait(mut impl_trait) => {
+                        Returning::parse_impl_trait(&mut impl_trait)
                     }
-                    if (saw_datum && saw_pg_sys) || (saw_datum && path.segments.len() == 1) {
-                        Returning::Trigger
-                    } else if let Some(returning) = maybe_inner_impl_trait {
-                        returning
-                    } else {
-                        let mut static_ty = typepath.clone();
-                        for segment in &mut static_ty.path.segments {
-                            match &mut segment.arguments {
-                                syn::PathArguments::AngleBracketed(ref mut inside_brackets) => {
-                                    for mut arg in &mut inside_brackets.args {
-                                        match &mut arg {
-                                            syn::GenericArgument::Lifetime(ref mut lifetime) => {
-                                                lifetime.ident =
-                                                    Ident::new("static", Span::call_site())
+                    syn::Type::TraitObject(mut dyn_trait) => {
+                        Returning::parse_dyn_trait(&mut dyn_trait)
+                    }
+                    syn::Type::Path(mut typepath) => {
+                        let path = &mut typepath.path;
+                        let mut saw_pg_sys = false;
+                        let mut saw_datum = false;
+                        let mut saw_option_ident = false;
+                        let mut saw_box_ident = false;
+                        let mut maybe_inner_impl_trait = None;
+
+                        for segment in &mut path.segments {
+                            let ident_string = segment.ident.to_string();
+                            match ident_string.as_str() {
+                                "pg_sys" => saw_pg_sys = true,
+                                "Datum" => saw_datum = true,
+                                "Option" => saw_option_ident = true,
+                                "Box" => saw_box_ident = true,
+                                _ => (),
+                            }
+                            if saw_option_ident || saw_box_ident {
+                                match &mut segment.arguments {
+                                    syn::PathArguments::AngleBracketed(inside_brackets) => {
+                                        match inside_brackets.args.first_mut() {
+                                            Some(syn::GenericArgument::Type(
+                                                syn::Type::ImplTrait(impl_trait),
+                                            )) => {
+                                                maybe_inner_impl_trait =
+                                                    Some(Returning::parse_impl_trait(impl_trait));
+                                            }
+                                            Some(syn::GenericArgument::Type(
+                                                syn::Type::TraitObject(dyn_trait),
+                                            )) => {
+                                                maybe_inner_impl_trait =
+                                                    Some(Returning::parse_dyn_trait(dyn_trait))
                                             }
                                             _ => (),
                                         }
                                     }
+                                    syn::PathArguments::None
+                                    | syn::PathArguments::Parenthesized(_) => (),
                                 }
-                                _ => (),
                             }
                         }
-                        Returning::Type(syn::Type::Path(static_ty.clone()))
+                        if (saw_datum && saw_pg_sys) || (saw_datum && path.segments.len() == 1) {
+                            Returning::Trigger
+                        } else if let Some(returning) = maybe_inner_impl_trait {
+                            returning
+                        } else {
+                            let mut static_ty = typepath.clone();
+                            for segment in &mut static_ty.path.segments {
+                                match &mut segment.arguments {
+                                    syn::PathArguments::AngleBracketed(ref mut inside_brackets) => {
+                                        for mut arg in &mut inside_brackets.args {
+                                            match &mut arg {
+                                                syn::GenericArgument::Lifetime(
+                                                    ref mut lifetime,
+                                                ) => {
+                                                    lifetime.ident =
+                                                        Ident::new("static", Span::call_site())
+                                                }
+                                                _ => (),
+                                            }
+                                        }
+                                    }
+                                    _ => (),
+                                }
+                            }
+                            Returning::Type(syn::Type::Path(static_ty.clone()))
+                        }
+                    }
+                    syn::Type::Reference(mut ty_ref) => {
+                        if let Some(ref mut lifetime) = &mut ty_ref.lifetime {
+                            lifetime.ident = Ident::new("static", Span::call_site());
+                        }
+                        Returning::Type(syn::Type::Reference(ty_ref))
+                    }
+                    syn::Type::Tuple(ref mut tup) => {
+                        if tup.elems.is_empty() {
+                            Returning::Type(ty.clone())
+                        } else {
+                            Self::parse_type_tuple(tup)
+                        }
+                    }
+                    _ => {
+                        return Err(eyre_err!(
+                            "Got unknown return type: {}",
+                            &ty.to_token_stream()
+                        ))
                     }
                 }
-                syn::Type::Reference(mut ty_ref) => {
-                    if let Some(ref mut lifetime) = &mut ty_ref.lifetime {
-                        lifetime.ident = Ident::new("static", Span::call_site());
-                    }
-                    Returning::Type(syn::Type::Reference(ty_ref))
-                }
-                syn::Type::Tuple(tup) => {
-                    if tup.elems.is_empty() {
-                        Returning::Type(ty.deref().clone())
-                    } else {
-                        Self::parse_type_tuple(&tup)
-                    }
-                }
-                _ => {
-                    return Err(eyre_err!(
-                        "Got unknown return type: {}",
-                        &ty.to_token_stream()
-                    ))
-                }
-            },
+            }
         })
     }
 }

@@ -331,13 +331,15 @@ impl SpiClient {
 
                     match datum {
                         Some(datum) => {
+                            // ' ' here means that the datum is not null
                             datums.push(datum);
-                            nulls.push(0 as std::os::raw::c_char);
+                            nulls.push(' ' as std::os::raw::c_char);
                         }
 
                         None => {
+                            // 'n' here means that the datum is null
                             datums.push(0);
-                            nulls.push(1 as std::os::raw::c_char);
+                            nulls.push('n' as std::os::raw::c_char);
                         }
                     }
                 }
@@ -348,7 +350,7 @@ impl SpiClient {
                         nargs as i32,
                         argtypes.as_mut_ptr(),
                         datums.as_mut_ptr(),
-                        nulls.as_mut_ptr(),
+                        nulls.as_ptr(),
                         read_only,
                         limit.unwrap_or(0),
                     )

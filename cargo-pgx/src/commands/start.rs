@@ -40,7 +40,6 @@ pub(crate) fn start_postgres(pg_config: &PgConfig) -> Result<(), std::io::Error>
             .stdout(Stdio::piped())
             .stderr(Stdio::piped())
             .arg("start")
-            .arg("--options")
             .arg(format!(
                 "-o -i -p {} -c unix_socket_directories={}",
                 port,

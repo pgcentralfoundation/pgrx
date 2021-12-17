@@ -41,6 +41,7 @@
 #include "executor/spi.h"
 #include "foreign/fdwapi.h"
 #include "foreign/foreign.h"
+#include "mb/pg_wchar.h"
 
 #define ScanKey struct ScanKeyData *
 #include "nodes/execnodes.h"
@@ -79,6 +80,7 @@
 #include "tcop/utility.h"
 #include "utils/builtins.h"
 #include "utils/date.h"
+#include "utils/datetime.h"
 
 #define double float8
 #include "utils/geo_decls.h"

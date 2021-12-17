@@ -11,7 +11,9 @@ use crate::*;
 ///
 /// This function is safe, but if the provided `HeapTupleHeader` is null, it will `panic!()`
 #[inline]
-pub fn composite_row_type_make_tuple(row: pg_sys::Datum) -> PgBox<pg_sys::HeapTupleData> {
+pub fn composite_row_type_make_tuple(
+    row: pg_sys::Datum,
+) -> PgBox<pg_sys::HeapTupleData, AllocatedByRust> {
     let htup_header = unsafe { pg_sys::pg_detoast_datum_packed(row as *mut pg_sys::varlena) }
         as pg_sys::HeapTupleHeader;
     let mut tuple = PgBox::<pg_sys::HeapTupleData>::alloc0();
@@ -85,8 +87,11 @@ extern "C" {
 ///
 /// `attno` is 1-based
 #[inline]
-pub fn heap_getattr<T: FromDatum>(
-    tuple: &PgBox<pg_sys::HeapTupleData>,
+pub fn heap_getattr<
+    T: FromDatum,
+    AllocatedBy: WhoAllocated<T> + WhoAllocated<pg_sys::HeapTupleData>,
+>(
+    tuple: &PgBox<pg_sys::HeapTupleData, AllocatedBy>,
     attno: usize,
     tupdesc: &PgTupleDesc,
 ) -> Option<T> {

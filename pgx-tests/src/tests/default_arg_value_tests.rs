@@ -4,6 +4,11 @@
 use pgx::*;
 
 #[pg_extern]
+fn negative_default_argument(i: default!(i32, -1)) -> i32 {
+    i
+}
+
+#[pg_extern]
 fn default_argument(a: default!(i32, 99)) -> i32 {
     a
 }
@@ -26,6 +31,13 @@ mod tests {
 
     #[test]
     fn make_idea_happy() {}
+
+    #[pg_test]
+    fn test_negative_default_argument() {
+        let result = Spi::get_one::<i32>("SELECT negative_default_argument();")
+            .expect("didn't get SPI result");
+        assert_eq!(result, -1);
+    }
 
     #[pg_test]
     fn test_default_argument() {

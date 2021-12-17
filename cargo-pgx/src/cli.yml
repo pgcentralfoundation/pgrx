@@ -35,6 +35,12 @@ subcommands:
                     takes_value: true
                     required: false
                     help: if installed locally, the path to PG13's 'pg_config' tool, or 'download' to have pgx download/compile/install it
+                - pg14:
+                    long: pg14
+                    value_name: PG14_PG_CONFIG
+                    takes_value: true
+                    required: false
+                    help: if installed locally, the path to PG14's 'pg_config' tool, or 'download' to have pgx download/compile/install it
           - start:
               about: start a pgx-managed Postgres instance
               args:
@@ -42,7 +48,7 @@ subcommands:
                     value_name: PG_VERSION
                     takes_value: true
                     required: true
-                    help: the Postgres version to start ('pg10', 'pg11', 'pg12', 'pg13', or 'all')
+                    help: the Postgres version to start ('pg10', 'pg11', 'pg12', 'pg13', 'pg14', or 'all')
           - stop:
               about: stop a pgx-managed Postgres instance
               args:
@@ -50,7 +56,7 @@ subcommands:
                     value_name: PG_VERSION
                     takes_value: true
                     required: true
-                    help: the Postgres version to stop ('pg10', 'pg11', 'pg12', 'pg13', or 'all')
+                    help: the Postgres version to stop ('pg10', 'pg11', 'pg12', 'pg13', 'pg14', or 'all')
           - status:
               about: is a pgx-managed Postgres instance running?
               args:
@@ -77,6 +83,10 @@ subcommands:
                     short: r
                     long: release
                     help: compile for release mode (default is debug)
+                - no-schema:
+                    short: ns
+                    long: no-schema
+                    help: Don't regenerate the schema
                 - pg_config:
                     short: c
                     long: pg_config
@@ -117,6 +127,9 @@ subcommands:
                     short: m
                     long: manual
                     help: Skip checking for required files
+                - skip-build:
+                    long: skip-build
+                    help: Skip building the `sql-generator`, use an existing build.
                 - force-default:
                     short: f
                     long: force-default
@@ -125,7 +138,7 @@ subcommands:
                     value_name: PG_VERSION
                     takes_value: true
                     required: false
-                    help: Do you want to run against Postgres 'pg10', 'pg11', 'pg12', 'pg13'?
+                    help: Do you want to run against Postgres 'pg10', 'pg11', 'pg12', 'pg13', 'pg14'?
                 - release:
                     short: r
                     long: release
@@ -163,7 +176,7 @@ subcommands:
                     value_name: PG_VERSION
                     takes_value: true
                     required: true
-                    help: Do you want to run against Postgres 'pg10', 'pg11', 'pg12', 'pg13'?
+                    help: Do you want to run against Postgres 'pg10', 'pg11', 'pg12', 'pg13', 'pg14'?
                 - dbname:
                     value_name: DBNAME
                     takes_value: true
@@ -172,6 +185,10 @@ subcommands:
                     short: r
                     long: release
                     help: compile for release mode (default is debug)
+                - no-schema:
+                    short: ns
+                    long: no-schema
+                    help: Don't regenerate the schema
                 - features:
                     long: features
                     help: additional cargo features to activate (default is '--no-default-features')
@@ -184,7 +201,7 @@ subcommands:
                     value_name: PG_VERSION
                     takes_value: true
                     required: true
-                    help: Do you want to run against Postgres 'pg10', 'pg11', 'pg12', 'pg13'?
+                    help: Do you want to run against Postgres 'pg10', 'pg11', 'pg12', 'pg13', 'pg14'?
                 - dbname:
                     value_name: DBNAME
                     takes_value: true
@@ -195,7 +212,7 @@ subcommands:
                 - pg_version:
                     value_name: PG_VERSION
                     takes_value: true
-                    help: Do you want to test for Postgres 'pg10', 'pg11', 'pg12', 'pg13', or 'all' (default)?
+                    help: Do you want to test for Postgres 'pg10', 'pg11', 'pg12', 'pg13', 'pg14', or 'all' (default)?
                 - testname:
                     value_name: TESTNAME
                     takes_value: true
@@ -204,6 +221,10 @@ subcommands:
                     short: r
                     long: release
                     help: compile for release mode (default is debug)
+                - no-schema:
+                    short: ns
+                    long: no-schema
+                    help: Don't regenerate the schema
                 - workspace:
                     long: workspace
                     help: Test all packages in the workspace

@@ -2,16 +2,20 @@
   description = "A PostgreSQL extension built by pgx.";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    naersk.url = "github:nmattia/naersk";
-    pgx.url = "github:hoverbear/pgx/develop";
+    nixpkgs.url = "nixpkgs";
+    rust-overlay.url = "github:oxalica/rust-overlay";
+    rust-overlay.inputs.nixpkgs.follows = "nixpkgs";
+    naersk.url = "github:nix-community/naersk";
+    naersk.inputs.nixpkgs.follows = "nixpkgs";
+    pgx.url = "github:zombodb/pgx/develop";
     pgx.inputs.nixpkgs.follows = "nixpkgs";
+    pgx.inputs.naersk.follows = "naersk";
   };
 
-  outputs = { self, nixpkgs, pgx, naersk }:
+  outputs = { self, nixpkgs, rust-overlay, naersk, pgx }:
     let
       cargoToml = (builtins.fromTOML (builtins.readFile ./Cargo.toml));
-      supportedSystems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" ];
+      supportedSystems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
       forAllSystems = f: nixpkgs.lib.genAttrs supportedSystems (system: f system);
     in
     {
@@ -26,15 +30,26 @@
         let
           pkgs = import nixpkgs {
             inherit system;
-            overlays = [ pgx.overlay self.overlay ];
+            overlays = [
+              self.overlay
+              pgx.overlay
+              rust-overlay.overlay
+              (self: super:
+                {
+                  rustc = self.rust-bin.stable.latest.rustc;
+                  cargo = self.rust-bin.stable.latest.cargo;
+                }
+              )
+            ];
           };
         in
         {
           "${cargoToml.package.name}" = pkgs."${cargoToml.package.name}";
-          "${cargoToml.package.name}_10" = pkgs."${cargoToml.package.name}";
-          "${cargoToml.package.name}_11" = pkgs."${cargoToml.package.name}";
-          "${cargoToml.package.name}_12" = pkgs."${cargoToml.package.name}";
-          "${cargoToml.package.name}_13" = pkgs."${cargoToml.package.name}";
+          "${cargoToml.package.name}_10" = pkgs."${cargoToml.package.name}_10";
+          "${cargoToml.package.name}_11" = pkgs."${cargoToml.package.name}_11";
+          "${cargoToml.package.name}_12" = pkgs."${cargoToml.package.name}_12";
+          "${cargoToml.package.name}_13" = pkgs."${cargoToml.package.name}_13";
+          "${cargoToml.package.name}_14" = pkgs."${cargoToml.package.name}_14";
 
           "${cargoToml.package.name}_all" = pkgs.runCommandNoCC "allVersions" { } ''
             mkdir -p $out
@@ -42,6 +57,7 @@
             cp -r ${pkgs."${cargoToml.package.name}_11"} $out/${cargoToml.package.name}_11
             cp -r ${pkgs."${cargoToml.package.name}_12"} $out/${cargoToml.package.name}_12
             cp -r ${pkgs."${cargoToml.package.name}_13"} $out/${cargoToml.package.name}_13
+            cp -r ${pkgs."${cargoToml.package.name}_14"} $out/${cargoToml.package.name}_14
           '';
         });
 
@@ -51,6 +67,7 @@
         "${cargoToml.package.name}_11" = final.callPackage ./. { pgxPostgresVersion = 11; inherit naersk; };
         "${cargoToml.package.name}_12" = final.callPackage ./. { pgxPostgresVersion = 12; inherit naersk; };
         "${cargoToml.package.name}_13" = final.callPackage ./. { pgxPostgresVersion = 13; inherit naersk; };
+        "${cargoToml.package.name}_14" = final.callPackage ./. { pgxPostgresVersion = 14; inherit naersk; };
       };
 
       nixosModule = { config, pkgs, lib, ... }:
@@ -74,7 +91,17 @@
         let
           pkgs = import nixpkgs {
             inherit system;
-            overlays = [ pgx.overlay self.overlay ];
+            overlays = [
+              self.overlay
+              pgx.overlay
+              rust-overlay.overlay
+              (self: super:
+                {
+                  rustc = self.rust-bin.stable.latest.rustc;
+                  cargo = self.rust-bin.stable.latest.cargo;
+                }
+              )
+            ];
           };
         in
         {
@@ -96,6 +123,7 @@
           "${cargoToml.package.name}_11" = pkgs."${cargoToml.package.name}_11";
           "${cargoToml.package.name}_12" = pkgs."${cargoToml.package.name}_12";
           "${cargoToml.package.name}_13" = pkgs."${cargoToml.package.name}_13";
+          "${cargoToml.package.name}_14" = pkgs."${cargoToml.package.name}_14";
         });
     };
 }
