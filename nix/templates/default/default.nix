@@ -18,6 +18,7 @@
 , cargo
 , rustc
 , llvmPackages
+, gcc
 , pgxPostgresVersion ? 11
 }:
 
@@ -50,6 +51,7 @@ naersk.lib."${targetPlatform.system}".buildPackage rec {
     pkg-config
     libiconv
     pgxPostgresPkg
+    gcc
   ];
   checkInputs = [ cargo-pgx cargo rustc ];
   doCheck = true;
@@ -115,7 +117,6 @@ naersk.lib."${targetPlatform.system}".buildPackage rec {
     export PGX_HOME=$out/.pgx
     ${cargo-pgx}/bin/cargo-pgx pgx schema --skip-build --release
     cp -v ./sql/* $out/
-    rm -v $out/load-order.txt
     cp -v ./${cargoToml.package.name}.control $out/${cargoToml.package.name}.control
   '';
   preFixup = ''

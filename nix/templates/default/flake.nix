@@ -7,7 +7,7 @@
     rust-overlay.inputs.nixpkgs.follows = "nixpkgs";
     naersk.url = "github:nix-community/naersk";
     naersk.inputs.nixpkgs.follows = "nixpkgs";
-    pgx.url = "github:zombodb/pgx/use-oxalica-rust";
+    pgx.url = "github:zombodb/pgx/develop";
     pgx.inputs.nixpkgs.follows = "nixpkgs";
     pgx.inputs.naersk.follows = "naersk";
   };
