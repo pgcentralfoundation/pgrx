@@ -975,6 +975,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "make_tuple_traits"
+version = "0.2.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b55f3a204d4c484e52a9a0aad58d68a4ee6c9f7d19ed803cc7ca9d881c859142"
+
+[[package]]
+name = "mark_tuple_traits"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "64daeb31c6db30ffe10bfe16d07beb06587d9a11bffd17977c7fb89650cbb724"
+
+[[package]]
 name = "matchers"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1299,6 +1311,7 @@ dependencies = [
  "eyre",
  "hash32",
  "heapless",
+ "mark_tuple_traits",
  "num-traits",
  "once_cell",
  "petgraph",
@@ -1312,6 +1325,7 @@ dependencies = [
  "time 0.3.5",
  "tracing",
  "tracing-error 0.2.0",
+ "tuple_tricks",
  "uuid",
 ]
 
@@ -2374,6 +2388,15 @@ dependencies = [
  "tracing",
  "tracing-core",
  "tracing-log",
+]
+
+[[package]]
+name = "tuple_tricks"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8003bfc615c28edcfe013b66e4a55a07e2647e6201a6cb129f6ef7d509352c0e"
+dependencies = [
+ "make_tuple_traits",
 ]
 
 [[package]]

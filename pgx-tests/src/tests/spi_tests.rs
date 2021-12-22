@@ -72,6 +72,29 @@ mod tests {
     }
 
     #[pg_test]
+    fn test_get_tuple() {
+        Spi::execute(|client| {
+            let res = client
+                .select(
+                    "SELECT 42::bigint, 'hello', null, 23, 3.141::real",
+                    None,
+                    None,
+                )
+                .next()
+                .expect("Should be at least one entry but none returned!")
+                .get_tuple::<(i64, String, bool, i32, f32)>();
+            let (opt_i64, opt_string, opt_bool, opt_i32, opt_f32) = res;
+            assert_eq!(
+                (opt_i64, opt_string, opt_bool, opt_i32),
+                (Some(42), Some(String::from("hello")), None, Some(23))
+            );
+            assert!(
+                (opt_f32.expect("float entry should be some but wasn't!") - 3.141).abs() < 1.0e-7
+            );
+        });
+    }
+
+    #[pg_test]
     fn test_spi_get_one() {
         Spi::execute(|client| {
             let i = client
