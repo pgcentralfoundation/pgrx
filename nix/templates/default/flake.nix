@@ -17,6 +17,7 @@
       cargoToml = (builtins.fromTOML (builtins.readFile ./Cargo.toml));
       supportedSystems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
       forAllSystems = f: nixpkgs.lib.genAttrs supportedSystems (system: f system);
+      supportedPostgresVersions = [ 10 11 12 13 14 ];
     in
     {
       inherit (pgx) devShell;
@@ -46,17 +47,6 @@
         {
           "${cargoToml.package.name}" = pkgs."${cargoToml.package.name}";
           "${cargoToml.package.name}_debug" = pkgs."${cargoToml.package.name}_debug";
-          "${cargoToml.package.name}_10" = pkgs."${cargoToml.package.name}_10";
-          "${cargoToml.package.name}_10_debug" = pkgs."${cargoToml.package.name}_10_debug";
-          "${cargoToml.package.name}_11" = pkgs."${cargoToml.package.name}_11";
-          "${cargoToml.package.name}_11_debug" = pkgs."${cargoToml.package.name}_11_debug";
-          "${cargoToml.package.name}_12" = pkgs."${cargoToml.package.name}_12";
-          "${cargoToml.package.name}_12_debug" = pkgs."${cargoToml.package.name}_12_debug";
-          "${cargoToml.package.name}_13" = pkgs."${cargoToml.package.name}_13";
-          "${cargoToml.package.name}_13_debug" = pkgs."${cargoToml.package.name}_13_debug";
-          "${cargoToml.package.name}_14" = pkgs."${cargoToml.package.name}_14";
-          "${cargoToml.package.name}_14_debug" = pkgs."${cargoToml.package.name}_14_debug";
-
           "${cargoToml.package.name}_all" = pkgs.runCommandNoCC "allVersions" { } ''
             mkdir -p $out
             cp -r ${pkgs."${cargoToml.package.name}_10"} $out/${cargoToml.package.name}_10
@@ -73,22 +63,26 @@
             cp -r ${pkgs."${cargoToml.package.name}_13_debug"} $out/${cargoToml.package.name}_13
             cp -r ${pkgs."${cargoToml.package.name}_14_debug"} $out/${cargoToml.package.name}_14
           '';
-        });
+        } // (nixpkgs.lib.foldl'
+          (x: y: x // y)
+          { }
+          (map (version: let versionString = builtins.toString version; in {
+            "${cargoToml.package.name}_${versionString}" = pkgs."${cargoToml.package.name}_${versionString}";
+            "${cargoToml.package.name}_${versionString}_debug" = pkgs."${cargoToml.package.name}_${versionString}_debug";        
+          }) supportedPostgresVersions)
+        ));
 
       overlay = final: prev: {
         "${cargoToml.package.name}" = final.callPackage ./. { inherit naersk; };
         "${cargoToml.package.name}_debug" = final.callPackage ./. { release = false; inherit naersk; };
-        "${cargoToml.package.name}_10" = final.callPackage ./. { pgxPostgresVersion = 10; inherit naersk; };
-        "${cargoToml.package.name}_10_debug" = final.callPackage ./. { release = false; pgxPostgresVersion = 10; inherit naersk; };
-        "${cargoToml.package.name}_11" = final.callPackage ./. { pgxPostgresVersion = 11; inherit naersk; };
-        "${cargoToml.package.name}_11_debug" = final.callPackage ./. { release = false; pgxPostgresVersion = 11; inherit naersk; };
-        "${cargoToml.package.name}_12" = final.callPackage ./. { pgxPostgresVersion = 12; inherit naersk; };
-        "${cargoToml.package.name}_12_debug" = final.callPackage ./. { release = false; pgxPostgresVersion = 12; inherit naersk; };
-        "${cargoToml.package.name}_13" = final.callPackage ./. { pgxPostgresVersion = 13; inherit naersk; };
-        "${cargoToml.package.name}_13_debug" = final.callPackage ./. { release = false; pgxPostgresVersion = 13; inherit naersk; };
-        "${cargoToml.package.name}_14" = final.callPackage ./. { pgxPostgresVersion = 14; inherit naersk; };
-        "${cargoToml.package.name}_14_debug" = final.callPackage ./. { release = false; pgxPostgresVersion = 14; inherit naersk; };
-      };
+      }  // (nixpkgs.lib.foldl'
+        (x: y: x // y)
+        { }
+        (map (version: let versionString = builtins.toString version; in {
+          "${cargoToml.package.name}_${versionString}" = final.callPackage ./. { pgxPostgresVersion = version; inherit naersk; };
+          "${cargoToml.package.name}_${versionString}_debug" = final.callPackage ./. { release = false; pgxPostgresVersion = version; inherit naersk; };     
+        }) supportedPostgresVersions)
+      );
 
       nixosModule = { config, pkgs, lib, ... }:
         let

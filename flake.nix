@@ -53,6 +53,7 @@
 
       overlay = final: prev: {
         cargo-pgx = final.callPackage ./cargo-pgx { inherit naersk; };
+        cargo-pgx_debug = final.callPackage ./cargo-pgx { release = false; inherit naersk; };
       };
 
       devShell = forAllSystems (system:
@@ -126,7 +127,7 @@
             ${pkgs.nixpkgs-fmt}/bin/nixpkgs-fmt --check ${./.}
             touch $out # it worked!
           '';
-          pkgs-cargo-pgx = pkgs.cargo-pgx.out;
+          pkgs-cargo-pgx = pkgs.cargo-pgx_debug.out;
         });
 
       defaultTemplate = self.templates.default;
