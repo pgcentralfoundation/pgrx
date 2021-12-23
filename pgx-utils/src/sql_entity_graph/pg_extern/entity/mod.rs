@@ -105,16 +105,19 @@ impl ToSql for PgExternEntity {
             extern_attrs.push(ExternArgs::Strict);
         }
 
+        let module_pathname = &context.get_module_pathname();
+
         let fn_sql = format!("\
                                 CREATE OR REPLACE FUNCTION {schema}\"{name}\"({arguments}) {returns}\n\
                                 {extern_attrs}\
                                 {search_path}\
                                 LANGUAGE c /* Rust */\n\
-                                AS 'MODULE_PATHNAME', '{unaliased_name}_wrapper';\
+                                AS '{module_pathname}', '{unaliased_name}_wrapper';\
                             ",
                              schema = self.schema.map(|schema| format!("{}.", schema)).unwrap_or_else(|| context.schema_prefix_for(&self_index)),
                              name = self.name,
                              unaliased_name = self.unaliased_name,
+                             module_pathname = module_pathname,
                              arguments = if !self.fn_args.is_empty() {
                                  let mut args = Vec::new();
                                  for (idx, arg) in self.fn_args.iter().enumerate() {

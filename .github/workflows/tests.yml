@@ -180,6 +180,9 @@ jobs:
     - name: Run triggers example tests
       run: cargo test --package triggers --features "pg$PG_VER" --no-default-features
 
+    - name: Run versioned_so example tests
+      run: cargo test --package versioned_so --features "pg$PG_VER" --no-default-features
+
     # Attempt to make the cache payload slightly smaller.
     - name: Clean up built PGX files
       run: |

@@ -55,6 +55,10 @@ impl ToSqlConfigEntity {
         }
 
         if let Some(content) = self.content {
+            let module_pathname = context.get_module_pathname();
+
+            let content = content.replace("@MODULE_PATHNAME@", &module_pathname);
+
             return Some(Ok(format!(
                 "\n\
                 {sql_anchor_comment}\n\
@@ -70,14 +74,20 @@ impl ToSqlConfigEntity {
                 .map_err(|e| eyre!(e))
                 .wrap_err("Failed to run specified `#[pgx(sql = path)] function`");
             return match content {
-                Ok(content) => Some(Ok(format!(
-                    "\n\
+                Ok(content) => {
+                    let module_pathname = &context.get_module_pathname();
+
+                    let content = content.replace("@MODULE_PATHNAME@", &module_pathname);
+
+                    Some(Ok(format!(
+                        "\n\
                         {sql_anchor_comment}\n\
                         {content}\
                     ",
-                    content = content,
-                    sql_anchor_comment = entity.sql_anchor_comment(),
-                ))),
+                        content = content,
+                        sql_anchor_comment = entity.sql_anchor_comment(),
+                    )))
+                }
                 Err(e) => Some(Err(e)),
             };
         }
