@@ -2,6 +2,7 @@
 // governed by the MIT license that can be found in the LICENSE file.
 
 use crate::commands::get::{find_control_file, get_property};
+use cargo_metadata::MetadataCommand;
 use colored::Colorize;
 use pgx_utils::pg_config::PgConfig;
 use pgx_utils::{exit_with_error, get_target_dir, handle_result};
@@ -243,7 +244,16 @@ pub(crate) fn find_library_file(extname: &str, is_release: bool) -> PathBuf {
 
 pub(crate) fn get_version() -> String {
     match get_property("default_version") {
-        Some(v) => v,
+        Some(v) => {
+            if v == "@CARGO_VERSION@" {
+                let metadata = MetadataCommand::new()
+                    .exec()
+                    .expect("failed to parse Cargo.toml");
+                metadata.root_package().unwrap().version.to_string()
+            } else {
+                v
+            }
+        },
         None => exit_with_error!("cannot determine extension version number.  Is the `default_version` property declared in the control file?"),
     }
 }
@@ -285,7 +295,7 @@ fn filter_contents(mut input: String) -> String {
         input = input.replace("@GIT_HASH@", &get_git_hash());
     }
 
-    input = input.replace("@DEFAULT_VERSION@", &get_version());
+    input = input.replace("@CARGO_VERSION@", &get_version());
 
     input
 }
