@@ -565,6 +565,27 @@ pub fn anonymonize_lifetimes(value: &mut syn::Type) {
     }
 }
 
+pub fn find_control_file() -> Result<(PathBuf, String), std::io::Error> {
+    let dir = std::fs::read_dir(".")?;
+    for f in dir {
+        if f.is_ok() {
+            if let Ok(f) = f {
+                if f.file_name().to_string_lossy().ends_with(".control") {
+                    let filename = f.file_name().into_string().unwrap();
+                    let mut extname: Vec<&str> = filename.split('.').collect();
+                    extname.pop();
+                    let extname = extname.pop().unwrap();
+                    return Ok((filename.clone().into(), extname.to_string()));
+                }
+            }
+        }
+    }
+    Err(std::io::Error::new(
+        std::io::ErrorKind::NotFound,
+        "control file not found in current directory",
+    ))
+}
+
 #[cfg(test)]
 mod tests {
     use crate::{parse_extern_attributes, ExternArgs};

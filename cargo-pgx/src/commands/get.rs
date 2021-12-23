@@ -59,24 +59,7 @@ pub fn get_property(name: &str) -> Option<String> {
 }
 
 pub(crate) fn find_control_file() -> (PathBuf, String) {
-    for f in handle_result!(
-        std::fs::read_dir("."),
-        "cannot open current directory for reading"
-    ) {
-        if f.is_ok() {
-            if let Ok(f) = f {
-                if f.file_name().to_string_lossy().ends_with(".control") {
-                    let filename = f.file_name().into_string().unwrap();
-                    let mut extname: Vec<&str> = filename.split('.').collect();
-                    extname.pop();
-                    let extname = extname.pop().unwrap();
-                    return (filename.clone().into(), extname.to_string());
-                }
-            }
-        }
-    }
-
-    exit_with_error!("control file not found in current directory")
+    handle_result!(pgx_utils::find_control_file(), "cannot find control file")
 }
 
 fn determine_git_hash() -> Option<String> {

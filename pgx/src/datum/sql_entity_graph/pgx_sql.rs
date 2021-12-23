@@ -43,6 +43,7 @@ pub struct PgxSql {
     pub enums: HashMap<PostgresEnumEntity, NodeIndex>,
     pub ords: HashMap<PostgresOrdEntity, NodeIndex>,
     pub hashes: HashMap<PostgresHashEntity, NodeIndex>,
+    pub extension_name: String,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Eq, Ord)]
@@ -58,6 +59,7 @@ impl PgxSql {
         type_mappings: impl Iterator<Item = RustSqlMapping>,
         source_mappings: impl Iterator<Item = RustSourceOnlySqlMapping>,
         entities: impl Iterator<Item = SqlGraphEntity>,
+        extension_name: String,
     ) -> eyre::Result<Self> {
         let mut graph = StableGraph::new();
 
@@ -184,6 +186,7 @@ impl PgxSql {
             graph_root: root,
             graph_bootstrap: bootstrap,
             graph_finalize: finalize,
+            extension_name: extension_name,
         };
         this.register_types();
         Ok(this)

@@ -79,6 +79,7 @@ pub(crate) fn install_extension(
     let pkgdir = make_relative(pg_config.pkglibdir()?);
     let extdir = make_relative(pg_config.extension_dir()?);
     let shlibpath = find_library_file(&extname, is_release);
+    let extver = get_version();
 
     {
         let mut dest = base_directory.clone();
@@ -90,7 +91,7 @@ pub(crate) fn install_extension(
     {
         let mut dest = base_directory.clone();
         dest.push(&pkgdir);
-        dest.push(format!("{}.so", extname));
+        dest.push(format!("{}-{}.so", extname, extver));
 
         if cfg!(target_os = "macos") {
             // Remove the existing .so if present. This is a workaround for an

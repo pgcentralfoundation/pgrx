@@ -92,6 +92,8 @@ pub use pgx_pg_sys as pg_sys; // the module only, not its contents
 pub use pgx_pg_sys::submodules::*;
 pub use pgx_pg_sys::PgBuiltInOids; // reexport this so it looks like it comes from here
 
+pub use pgx_utils::find_control_file; // reexport so that we can use it from macros
+
 use core::any::TypeId;
 use once_cell::sync::Lazy;
 use std::collections::HashSet;
@@ -484,10 +486,13 @@ macro_rules! pg_binary_magic {
                 }
             };
 
+            let (_, extname) = pgx::find_control_file().expect("Couldn't read control file");
+
             let pgx_sql = PgxSql::build(
                 pgx::DEFAULT_TYPEID_SQL_MAPPING.clone().into_iter(),
                 pgx::DEFAULT_SOURCE_ONLY_SQL_MAPPING.clone().into_iter(),
-                entities.into_iter()).unwrap();
+                entities.into_iter(),
+                extname).unwrap();
 
             tracing::info!(path = %path.display(), "Writing SQL");
             pgx_sql.to_file(path)?;
