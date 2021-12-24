@@ -7,12 +7,14 @@
     rust-overlay.inputs.nixpkgs.follows = "nixpkgs";
     naersk.url = "github:nix-community/naersk";
     naersk.inputs.nixpkgs.follows = "nixpkgs";
+    gitignore.url = "github:hercules-ci/gitignore.nix";
+    gitignore.inputs.nixpkgs.follows = "nixpkgs";
     pgx.url = "github:zombodb/pgx/develop";
     pgx.inputs.nixpkgs.follows = "nixpkgs";
     pgx.inputs.naersk.follows = "naersk";
   };
 
-  outputs = { self, nixpkgs, rust-overlay, naersk, pgx }:
+  outputs = { self, nixpkgs, rust-overlay, naersk, gitignore, pgx }:
     let
       cargoToml = (builtins.fromTOML (builtins.readFile ./Cargo.toml));
       supportedSystems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
@@ -66,22 +68,46 @@
         } // (nixpkgs.lib.foldl'
           (x: y: x // y)
           { }
-          (map (version: let versionString = builtins.toString version; in {
-            "${cargoToml.package.name}_${versionString}" = pkgs."${cargoToml.package.name}_${versionString}";
-            "${cargoToml.package.name}_${versionString}_debug" = pkgs."${cargoToml.package.name}_${versionString}_debug";        
-          }) supportedPostgresVersions)
+          (map
+            (version:
+              let versionString = builtins.toString version; in
+              {
+                "${cargoToml.package.name}_${versionString}" = pkgs."${cargoToml.package.name}_${versionString}";
+                "${cargoToml.package.name}_${versionString}_debug" = pkgs."${cargoToml.package.name}_${versionString}_debug";
+              })
+            supportedPostgresVersions)
         ));
 
       overlay = final: prev: {
-        "${cargoToml.package.name}" = final.callPackage ./. { inherit naersk; };
-        "${cargoToml.package.name}_debug" = final.callPackage ./. { release = false; inherit naersk; };
-      }  // (nixpkgs.lib.foldl'
+        "${cargoToml.package.name}" = final.callPackage ./. {
+          inherit naersk;
+          gitignoreSource = gitignore.lib.gitignoreSource;
+        };
+        "${cargoToml.package.name}_debug" = final.callPackage ./. {
+          inherit naersk;
+          release = false;
+          gitignoreSource = gitignore.lib.gitignoreSource;
+        };
+      } // (nixpkgs.lib.foldl'
         (x: y: x // y)
         { }
-        (map (version: let versionString = builtins.toString version; in {
-          "${cargoToml.package.name}_${versionString}" = final.callPackage ./. { pgxPostgresVersion = version; inherit naersk; };
-          "${cargoToml.package.name}_${versionString}_debug" = final.callPackage ./. { release = false; pgxPostgresVersion = version; inherit naersk; };     
-        }) supportedPostgresVersions)
+        (map
+          (version:
+            let versionString = builtins.toString version; in
+            {
+              "${cargoToml.package.name}_${versionString}" = final.callPackage ./. {
+                inherit naersk;
+                pgxPostgresVersion = version;
+                gitignoreSource = gitignore.lib.gitignoreSource;
+              };
+              "${cargoToml.package.name}_${versionString}_debug" = final.callPackage ./. {
+                inherit naersk;
+                release = false;
+                pgxPostgresVersion = version;
+                gitignoreSource = gitignore.lib.gitignoreSource;
+              };
+            })
+          supportedPostgresVersions)
       );
 
       nixosModule = { config, pkgs, lib, ... }:

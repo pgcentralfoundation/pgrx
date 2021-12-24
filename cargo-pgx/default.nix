@@ -11,8 +11,10 @@
 , rustfmt
 , libiconv
 , llvmPackages
+, gitignoreSource
 , release ? true
-, }:
+,
+}:
 
 let
   cargoToml = (builtins.fromTOML (builtins.readFile ./Cargo.toml));
@@ -22,7 +24,7 @@ naersk.lib."${hostPlatform.system}".buildPackage rec {
   name = cargoToml.package.name;
   version = cargoToml.package.version;
 
-  src = ../.;
+  src = gitignoreSource ../.;
   inherit release;
 
   cargoBuildOptions = final: final ++ [ "--package" "cargo-pgx" ];

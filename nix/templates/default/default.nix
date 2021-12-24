@@ -19,6 +19,7 @@
 , rustc
 , llvmPackages
 , gcc
+, gitignoreSource
 , pgxPostgresVersion ? 11
 , release ? true
 }:
@@ -41,7 +42,7 @@ naersk.lib."${targetPlatform.system}".buildPackage rec {
   name = "${cargoToml.package.name}-pg${pgxPostgresVersionString}";
   version = cargoToml.package.version;
 
-  src = ./.;
+  src = gitignoreSource ./.;
 
   inputsFrom = [ postgresql_10 postgresql_11 postgresql_12 postgresql_13 cargo-pgx ];
 

@@ -7,9 +7,11 @@
     rust-overlay.inputs.nixpkgs.follows = "nixpkgs";
     naersk.url = "github:nix-community/naersk";
     naersk.inputs.nixpkgs.follows = "nixpkgs";
+    gitignore.url = "github:hercules-ci/gitignore.nix";
+    gitignore.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, rust-overlay, naersk }:
+  outputs = { self, nixpkgs, rust-overlay, naersk, gitignore }:
     let
       supportedSystems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
       forAllSystems = f: nixpkgs.lib.genAttrs supportedSystems (system: f system);
@@ -52,8 +54,15 @@
         });
 
       overlay = final: prev: {
-        cargo-pgx = final.callPackage ./cargo-pgx { inherit naersk; };
-        cargo-pgx_debug = final.callPackage ./cargo-pgx { release = false; inherit naersk; };
+        cargo-pgx = final.callPackage ./cargo-pgx {
+          inherit naersk;
+          gitignoreSource = gitignore.lib.gitignoreSource;
+        };
+        cargo-pgx_debug = final.callPackage ./cargo-pgx {
+          inherit naersk;
+          release = false;
+          gitignoreSource = gitignore.lib.gitignoreSource;
+        };
       };
 
       devShell = forAllSystems (system:
