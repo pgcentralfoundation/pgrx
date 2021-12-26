@@ -7,16 +7,19 @@
     rust-overlay.inputs.nixpkgs.follows = "nixpkgs";
     naersk.url = "github:nix-community/naersk";
     naersk.inputs.nixpkgs.follows = "nixpkgs";
+    gitignore.url = "github:hercules-ci/gitignore.nix";
+    gitignore.inputs.nixpkgs.follows = "nixpkgs";
     pgx.url = "github:zombodb/pgx/develop";
     pgx.inputs.nixpkgs.follows = "nixpkgs";
     pgx.inputs.naersk.follows = "naersk";
   };
 
-  outputs = { self, nixpkgs, rust-overlay, naersk, pgx }:
+  outputs = { self, nixpkgs, rust-overlay, naersk, gitignore, pgx }:
     let
       cargoToml = (builtins.fromTOML (builtins.readFile ./Cargo.toml));
       supportedSystems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
       forAllSystems = f: nixpkgs.lib.genAttrs supportedSystems (system: f system);
+      supportedPostgresVersions = [ 10 11 12 13 14 ];
     in
     {
       inherit (pgx) devShell;
@@ -45,12 +48,7 @@
         in
         {
           "${cargoToml.package.name}" = pkgs."${cargoToml.package.name}";
-          "${cargoToml.package.name}_10" = pkgs."${cargoToml.package.name}_10";
-          "${cargoToml.package.name}_11" = pkgs."${cargoToml.package.name}_11";
-          "${cargoToml.package.name}_12" = pkgs."${cargoToml.package.name}_12";
-          "${cargoToml.package.name}_13" = pkgs."${cargoToml.package.name}_13";
-          "${cargoToml.package.name}_14" = pkgs."${cargoToml.package.name}_14";
-
+          "${cargoToml.package.name}_debug" = pkgs."${cargoToml.package.name}_debug";
           "${cargoToml.package.name}_all" = pkgs.runCommandNoCC "allVersions" { } ''
             mkdir -p $out
             cp -r ${pkgs."${cargoToml.package.name}_10"} $out/${cargoToml.package.name}_10
@@ -59,16 +57,58 @@
             cp -r ${pkgs."${cargoToml.package.name}_13"} $out/${cargoToml.package.name}_13
             cp -r ${pkgs."${cargoToml.package.name}_14"} $out/${cargoToml.package.name}_14
           '';
-        });
+          "${cargoToml.package.name}_all_debug" = pkgs.runCommandNoCC "allVersions" { } ''
+            mkdir -p $out
+            cp -r ${pkgs."${cargoToml.package.name}_10_debug"} $out/${cargoToml.package.name}_10
+            cp -r ${pkgs."${cargoToml.package.name}_11_debug"} $out/${cargoToml.package.name}_11
+            cp -r ${pkgs."${cargoToml.package.name}_12_debug"} $out/${cargoToml.package.name}_12
+            cp -r ${pkgs."${cargoToml.package.name}_13_debug"} $out/${cargoToml.package.name}_13
+            cp -r ${pkgs."${cargoToml.package.name}_14_debug"} $out/${cargoToml.package.name}_14
+          '';
+        } // (nixpkgs.lib.foldl'
+          (x: y: x // y)
+          { }
+          (map
+            (version:
+              let versionString = builtins.toString version; in
+              {
+                "${cargoToml.package.name}_${versionString}" = pkgs."${cargoToml.package.name}_${versionString}";
+                "${cargoToml.package.name}_${versionString}_debug" = pkgs."${cargoToml.package.name}_${versionString}_debug";
+              })
+            supportedPostgresVersions)
+        ));
 
       overlay = final: prev: {
-        "${cargoToml.package.name}" = final.callPackage ./. { inherit naersk; };
-        "${cargoToml.package.name}_10" = final.callPackage ./. { pgxPostgresVersion = 10; inherit naersk; };
-        "${cargoToml.package.name}_11" = final.callPackage ./. { pgxPostgresVersion = 11; inherit naersk; };
-        "${cargoToml.package.name}_12" = final.callPackage ./. { pgxPostgresVersion = 12; inherit naersk; };
-        "${cargoToml.package.name}_13" = final.callPackage ./. { pgxPostgresVersion = 13; inherit naersk; };
-        "${cargoToml.package.name}_14" = final.callPackage ./. { pgxPostgresVersion = 14; inherit naersk; };
-      };
+        "${cargoToml.package.name}" = final.callPackage ./. {
+          inherit naersk;
+          gitignoreSource = gitignore.lib.gitignoreSource;
+        };
+        "${cargoToml.package.name}_debug" = final.callPackage ./. {
+          inherit naersk;
+          release = false;
+          gitignoreSource = gitignore.lib.gitignoreSource;
+        };
+      } // (nixpkgs.lib.foldl'
+        (x: y: x // y)
+        { }
+        (map
+          (version:
+            let versionString = builtins.toString version; in
+            {
+              "${cargoToml.package.name}_${versionString}" = final.callPackage ./. {
+                inherit naersk;
+                pgxPostgresVersion = version;
+                gitignoreSource = gitignore.lib.gitignoreSource;
+              };
+              "${cargoToml.package.name}_${versionString}_debug" = final.callPackage ./. {
+                inherit naersk;
+                release = false;
+                pgxPostgresVersion = version;
+                gitignoreSource = gitignore.lib.gitignoreSource;
+              };
+            })
+          supportedPostgresVersions)
+      );
 
       nixosModule = { config, pkgs, lib, ... }:
         let
@@ -118,12 +158,12 @@
           #   ${pkgs.cargo-audit}/bin/cargo-audit audit --no-fetch
           #   # it worked!
           # '';
-          "${cargoToml.package.name}" = pkgs."${cargoToml.package.name}";
-          "${cargoToml.package.name}_10" = pkgs."${cargoToml.package.name}_10";
-          "${cargoToml.package.name}_11" = pkgs."${cargoToml.package.name}_11";
-          "${cargoToml.package.name}_12" = pkgs."${cargoToml.package.name}_12";
-          "${cargoToml.package.name}_13" = pkgs."${cargoToml.package.name}_13";
-          "${cargoToml.package.name}_14" = pkgs."${cargoToml.package.name}_14";
+          "${cargoToml.package.name}_debug" = pkgs."${cargoToml.package.name}_debug";
+          "${cargoToml.package.name}_10_debug" = pkgs."${cargoToml.package.name}_10_debug";
+          "${cargoToml.package.name}_11_debug" = pkgs."${cargoToml.package.name}_11_debug";
+          "${cargoToml.package.name}_12_debug" = pkgs."${cargoToml.package.name}_12_debug";
+          "${cargoToml.package.name}_13_debug" = pkgs."${cargoToml.package.name}_13_debug";
+          "${cargoToml.package.name}_14_debug" = pkgs."${cargoToml.package.name}_14_debug";
         });
     };
 }

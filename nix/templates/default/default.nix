@@ -19,7 +19,9 @@
 , rustc
 , llvmPackages
 , gcc
+, gitignoreSource
 , pgxPostgresVersion ? 11
+, release ? true
 }:
 
 let
@@ -30,15 +32,17 @@ let
     else if (pgxPostgresVersion == 13) then postgresql_13
     else if (pgxPostgresVersion == 14) then postgresql_14
     else null;
+  maybeReleaseFlag = if release == true then "--release" else "";
   pgxPostgresVersionString = builtins.toString pgxPostgresVersion;
   cargoToml = (builtins.fromTOML (builtins.readFile ./Cargo.toml));
 in
 
 naersk.lib."${targetPlatform.system}".buildPackage rec {
+  inherit release;
   name = "${cargoToml.package.name}-pg${pgxPostgresVersionString}";
   version = cargoToml.package.version;
 
-  src = ./.;
+  src = gitignoreSource ./.;
 
   inputsFrom = [ postgresql_10 postgresql_11 postgresql_12 postgresql_13 cargo-pgx ];
 
@@ -115,7 +119,7 @@ naersk.lib."${targetPlatform.system}".buildPackage rec {
   '';
   postBuild = ''
     export PGX_HOME=$out/.pgx
-    ${cargo-pgx}/bin/cargo-pgx pgx schema --skip-build --release
+    ${cargo-pgx}/bin/cargo-pgx pgx schema --skip-build ${maybeReleaseFlag}
     cp -v ./sql/* $out/
     cp -v ./${cargoToml.package.name}.control $out/${cargoToml.package.name}.control
   '';
