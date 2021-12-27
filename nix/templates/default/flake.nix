@@ -17,34 +17,19 @@
   outputs = { self, nixpkgs, rust-overlay, naersk, gitignore, pgx }:
     let
       cargoToml = (builtins.fromTOML (builtins.readFile ./Cargo.toml));
-      supportedSystems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
-      forAllSystems = f: nixpkgs.lib.genAttrs supportedSystems (system: f system);
       supportedPostgresVersions = [ 10 11 12 13 14 ];
     in
     {
       inherit (pgx) devShell;
 
-      defaultPackage = forAllSystems (system: (import nixpkgs {
+      defaultPackage = pgx.lib.forAllSystems (system: (import nixpkgs {
         inherit system;
         overlays = [ pgx.overlay self.overlay ];
       })."${cargoToml.package.name}");
 
-      packages = forAllSystems (system:
+      packages = pgx.lib.forAllSystems (system:
         let
-          pkgs = import nixpkgs {
-            inherit system;
-            overlays = [
-              self.overlay
-              pgx.overlay
-              rust-overlay.overlay
-              (self: super:
-                {
-                  rustc = self.rust-bin.stable.latest.rustc;
-                  cargo = self.rust-bin.stable.latest.cargo;
-                }
-              )
-            ];
-          };
+          pkgs = nixpkgsWithOverlays system nixpkgs;
         in
         {
           "${cargoToml.package.name}" = pkgs."${cargoToml.package.name}";

@@ -22,6 +22,8 @@
 , gitignoreSource
 , pgxPostgresVersion ? 11
 , release ? true
+, source ? ./.
+, runCommand
 }:
 
 let
@@ -34,7 +36,7 @@ let
     else null;
   maybeReleaseFlag = if release == true then "--release" else "";
   pgxPostgresVersionString = builtins.toString pgxPostgresVersion;
-  cargoToml = (builtins.fromTOML (builtins.readFile ./Cargo.toml));
+  cargoToml = (builtins.fromTOML (builtins.readFile "${source}/Cargo.toml"));
 in
 
 naersk.lib."${targetPlatform.system}".buildPackage rec {
@@ -42,7 +44,7 @@ naersk.lib."${targetPlatform.system}".buildPackage rec {
   name = "${cargoToml.package.name}-pg${pgxPostgresVersionString}";
   version = cargoToml.package.version;
 
-  src = gitignoreSource ./.;
+  src = gitignoreSource source;
 
   inputsFrom = [ postgresql_10 postgresql_11 postgresql_12 postgresql_13 cargo-pgx ];
 

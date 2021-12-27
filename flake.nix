@@ -15,9 +15,8 @@
     let
       supportedSystems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
       forAllSystems = f: nixpkgs.lib.genAttrs supportedSystems (system: f system);
-    in
-    {
-      defaultPackage = forAllSystems (system: (import nixpkgs {
+      supportedPostgresVersions = [ 10 11 12 13 14 ];
+      nixpkgsWithOverlays = system: nixpkgs: (import nixpkgs {
         inherit system;
         overlays = [
           self.overlay
@@ -30,28 +29,54 @@
             }
           )
         ];
-      }).cargo-pgx);
+      });
+      releaseAndDebug = attr: call: args: {
+        "${attr}" = call args;
+        "${attr}_debug" = call (args // { release = false; });
+      };
+      exampleList = [
+        "aggregate"
+        "arrays"
+        "bad_ideas"
+        "bgworker"
+        "bytea"
+        "custom_sql"
+        "custom_types"
+        "errors"
+        "operators"
+        "schemas"
+        "shmem"
+        "spi"
+        "srf"
+        "strings"
+        "triggers"
+      ];
+      example = name: pkgs: releaseAndDebug "example-${name}" self.lib.buildPgxExtension {
+        inherit pkgs;
+        source = ./pgx-examples + "/${name}";
+        pgxPostgresVersion = 11;
+      };
+    in
+    {
+      lib = {
+        inherit supportedSystems forAllSystems nixpkgsWithOverlays;
+        buildPgxExtension = { pkgs, source, pgxPostgresVersion, release ? true }: pkgs.callPackage ./nix/extension.nix {
+          inherit source pgxPostgresVersion release naersk;
+          inherit (gitignore.lib) gitignoreSource;
+        };
+      };
+      defaultPackage = forAllSystems (system: (nixpkgsWithOverlays system nixpkgs).cargo-pgx);
 
       packages = forAllSystems (system:
         let
-          pkgs = import nixpkgs {
-            inherit system;
-            overlays = [
-              self.overlay
-              rust-overlay.overlay
-              (self: super:
-                {
-                  rustc = self.rust-bin.stable.latest.rustc;
-                  cargo = self.rust-bin.stable.latest.cargo;
-                  rustdoc = self.rust-bin.stable.latest.rustdoc;
-                }
-              )
-            ];
-          };
+          pkgs = nixpkgsWithOverlays system nixpkgs;
         in
         {
           inherit (pkgs) cargo-pgx;
-        });
+        } // (builtins.foldl' (set: name: set // {
+          "example-${name}" = pkgs."example-${name}";
+          "example-${name}_debug" = pkgs."example-${name}_debug";
+        }) { } exampleList));
 
       overlay = final: prev: {
         cargo-pgx = final.callPackage ./cargo-pgx {
@@ -63,24 +88,11 @@
           release = false;
           gitignoreSource = gitignore.lib.gitignoreSource;
         };
-      };
+      } // (builtins.foldl' (set: name: set // (example name final)) { } exampleList);
 
       devShell = forAllSystems (system:
         let
-          pkgs = import nixpkgs {
-            inherit system;
-            overlays = [
-              self.overlay
-              rust-overlay.overlay
-              (self: super:
-                {
-                  rustc = self.rust-bin.stable.latest.rustc;
-                  cargo = self.rust-bin.stable.latest.cargo;
-                  rustdoc = self.rust-bin.stable.latest.rustdoc;
-                }
-              )
-            ];
-          };
+          pkgs = nixpkgsWithOverlays system nixpkgs;
         in
         pkgs.mkShell {
           inputsFrom = with pkgs; [
@@ -112,20 +124,7 @@
 
       checks = forAllSystems (system:
         let
-          pkgs = import nixpkgs {
-            inherit system;
-            overlays = [
-              self.overlay
-              rust-overlay.overlay
-              (self: super:
-                {
-                  rustc = self.rust-bin.stable.latest.rustc;
-                  cargo = self.rust-bin.stable.latest.cargo;
-                  rustdoc = self.rust-bin.stable.latest.rustdoc;
-                }
-              )
-            ];
-          };
+          pkgs = nixpkgsWithOverlays system nixpkgs;
         in
         {
           format = pkgs.runCommand "check-format"
@@ -137,7 +136,9 @@
             touch $out # it worked!
           '';
           pkgs-cargo-pgx = pkgs.cargo-pgx_debug.out;
-        });
+        } // (builtins.foldl' (set: name: set // {
+          "example-${name}_debug" = pkgs."example-${name}_debug";
+        }) { } exampleList));
 
       defaultTemplate = self.templates.default;
       templates = {
