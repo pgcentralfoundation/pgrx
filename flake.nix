@@ -31,7 +31,7 @@
     in
     {
       lib = {
-        inherit supportedSystems forAllSystems nixpkgsWithOverlays;
+        inherit supportedSystems supportedPostgresVersions forAllSystems nixpkgsWithOverlays;
         buildPgxExtension = { pkgs, source, pgxPostgresVersion, release ? true }: pkgs.callPackage ./nix/extension.nix {
           inherit source pgxPostgresVersion release naersk;
           inherit (gitignore.lib) gitignoreSource;

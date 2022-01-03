@@ -37,7 +37,7 @@
                 "${cargoToml.package.name}_${versionString}" = pkgs."${cargoToml.package.name}_${versionString}";
                 "${cargoToml.package.name}_${versionString}_debug" = pkgs."${cargoToml.package.name}_${versionString}_debug";
               })
-            supportedPostgresVersions)
+            pgx.lib.supportedPostgresVersions)
         ));
 
       overlay = final: prev: {
@@ -71,7 +71,7 @@
                 release = false;
               };
             })
-          supportedPostgresVersions)
+          pgx.lib.supportedPostgresVersions)
       );
 
       nixosModule = { config, pkgs, lib, ... }:
@@ -91,7 +91,7 @@
           };
         };
 
-      checks = forAllSystems (system:
+      checks = pgx.lib.forAllSystems (system:
         let
           pkgs = pgx.lib.nixpkgsWithOverlays { inherit system nixpkgs; };
         in
