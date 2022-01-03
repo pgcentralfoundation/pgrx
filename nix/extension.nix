@@ -123,12 +123,13 @@ naersk.lib."${targetPlatform.system}".buildPackage rec {
   postBuild = ''
     export PGX_HOME=$out/.pgx
     ${cargo-pgx}/bin/cargo-pgx pgx schema --skip-build ${maybeReleaseFlag}
-    cp -v ./sql/* $out/
-    cp -v ./${cargoToml.package.name}.control $out/${cargoToml.package.name}.control
+    mkdir -p $out/share/postgresql/extension/
+    cp -v ./sql/* $out/share/postgresql/extension/
+    cp -v ./${cargoToml.package.name}.control $out/share/postgresql/extension/${cargoToml.package.name}.control
   '';
   preFixup = ''
     rm -r $out/.pgx
-    mv $out/lib/* $out/
+    mv $out/lib/* $out/share/postgresql/extension/
     rm -r $out/lib $out/bin
   '';
   PGX_PG_SYS_SKIP_BINDING_REWRITE = "1";
