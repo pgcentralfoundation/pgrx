@@ -32,6 +32,10 @@ static PROCESS_ENV_DENYLIST: &'static [&'static str] = &[
 
 pub(crate) fn init_pgx(pgx: &Pgx) -> std::result::Result<(), std::io::Error> {
     let pgx_dir = Pgx::home()?;
+    
+    for pg_config in pgx.iter(PgConfigSelector::new("all")) {
+        stop_postgres(pg_config?)?;
+    }
 
     // We use a tempdir to build the postgres versions in case the user has an existing pgx home
     // this way, if they cancel the process (say it was an accident) we don't ruin their postgres builds.
