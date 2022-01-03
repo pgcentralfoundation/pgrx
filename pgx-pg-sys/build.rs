@@ -559,8 +559,9 @@ fn build_shim_for_version(
         .unwrap();
     }
 
+    let make = env!("MAKE").unwrap_or("make".to_string());
     let rc = run_command(
-        Command::new("make")
+        Command::new(make)
             .arg("clean")
             .arg(&format!("libpgx-cshim-{}.a", major_version))
             .env("PG_TARGET_VERSION", format!("{}", major_version))
