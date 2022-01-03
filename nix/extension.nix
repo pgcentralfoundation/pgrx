@@ -20,10 +20,11 @@
 , llvmPackages
 , gcc
 , gitignoreSource
+, runCommand
 , pgxPostgresVersion ? 11
 , release ? true
 , source ? ./.
-, runCommand
+, additionalFeatures
 }:
 
 let
@@ -136,8 +137,8 @@ naersk.lib."${targetPlatform.system}".buildPackage rec {
   # This is required to have access to the `sql/*.sql` files.
   singleStep = true;
 
-  cargoBuildOptions = default: default ++ [ "--no-default-features" "--features \"pg${pgxPostgresVersionString}\"" ];
-  cargoTestOptions = default: default ++ [ "--no-default-features" "--features \"pg_test pg${pgxPostgresVersionString}\" --lib" ];
+  cargoBuildOptions = default: default ++ [ "--no-default-features" "--features \"pg${pgxPostgresVersionString} ${additionalFeatures}\"" ];
+  cargoTestOptions = default: default ++ [ "--no-default-features" "--features \"pg_test pg${pgxPostgresVersionString} ${additionalFeatures}\" --lib" ];
   doDoc = false;
   copyLibs = true;
 
