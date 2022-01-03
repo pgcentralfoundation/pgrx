@@ -32,10 +32,16 @@
     {
       lib = {
         inherit supportedSystems supportedPostgresVersions forAllSystems nixpkgsWithOverlays;
-        buildPgxExtension = { pkgs, source, pgxPostgresVersion, release ? true }: pkgs.callPackage ./nix/extension.nix {
-          inherit source pgxPostgresVersion release naersk;
-          inherit (gitignore.lib) gitignoreSource;
-        };
+        buildPgxExtension =
+          { pkgs
+          , source
+          , pgxPostgresVersion
+          , additionalFeatures ? [ ]
+          , release ? true
+          }: pkgs.callPackage ./nix/extension.nix {
+            inherit source pgxPostgresVersion release naersk additionalFeatures;
+            inherit (gitignore.lib) gitignoreSource;
+          };
       };
       defaultPackage = forAllSystems (system: (nixpkgsWithOverlays { inherit system nixpkgs; }).cargo-pgx);
 
