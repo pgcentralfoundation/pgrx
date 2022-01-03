@@ -21,11 +21,15 @@
     {
       inherit (pgx) devShell;
 
-      defaultPackage = pgx.lib.forAllSystems (system: pgx.lib.nixpkgsWithOverlays { inherit system nixpkgs; }) ".${cargoToml.package.name}";
+      defaultPackage = pgx.lib.forAllSystems (system:
+        let
+          pkgs = pgx.lib.nixpkgsWithOverlays { inherit system nixpkgs; extraOverlays = [ self.overlay ]; };
+        in
+        pkgs."${cargoToml.package.name}");
 
       packages = pgx.lib.forAllSystems (system:
         let
-          pkgs = pgx.lib.nixpkgsWithOverlays { inherit system nixpkgs; };
+          pkgs = pgx.lib.nixpkgsWithOverlays { inherit system nixpkgs; extraOverlays = [ self.overlay ]; };
         in
         (nixpkgs.lib.foldl'
           (x: y: x // y)
@@ -46,7 +50,7 @@
           source = ./.;
           pgxPostgresVersion = 11;
         };
-        "${cargoToml.package.name}_debug" = final.callPackage ./. {
+        "${cargoToml.package.name}_debug" = pgx.lib.buildPgxExtension {
           pkgs = final;
           source = ./.;
           pgxPostgresVersion = 11;
@@ -93,7 +97,7 @@
 
       checks = pgx.lib.forAllSystems (system:
         let
-          pkgs = pgx.lib.nixpkgsWithOverlays { inherit system nixpkgs; };
+          pkgs = pgx.lib.nixpkgsWithOverlays { inherit system nixpkgs; extraOverlays = [ self.overlay ]; };
         in
         {
           format = pkgs.runCommand "check-format"
