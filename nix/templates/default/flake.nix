@@ -9,7 +9,7 @@
     naersk.inputs.nixpkgs.follows = "nixpkgs";
     gitignore.url = "github:hercules-ci/gitignore.nix";
     gitignore.inputs.nixpkgs.follows = "nixpkgs";
-    pgx.url = "github:zombodb/pgx/develop";
+    pgx.url = "github:zombodb/pgx";
     pgx.inputs.nixpkgs.follows = "nixpkgs";
     pgx.inputs.naersk.follows = "naersk";
   };
@@ -17,55 +17,21 @@
   outputs = { self, nixpkgs, rust-overlay, naersk, gitignore, pgx }:
     let
       cargoToml = (builtins.fromTOML (builtins.readFile ./Cargo.toml));
-      supportedSystems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
-      forAllSystems = f: nixpkgs.lib.genAttrs supportedSystems (system: f system);
-      supportedPostgresVersions = [ 10 11 12 13 14 ];
     in
     {
       inherit (pgx) devShell;
 
-      defaultPackage = forAllSystems (system: (import nixpkgs {
-        inherit system;
-        overlays = [ pgx.overlay self.overlay ];
-      })."${cargoToml.package.name}");
-
-      packages = forAllSystems (system:
+      defaultPackage = pgx.lib.forAllSystems (system:
         let
-          pkgs = import nixpkgs {
-            inherit system;
-            overlays = [
-              self.overlay
-              pgx.overlay
-              rust-overlay.overlay
-              (self: super:
-                {
-                  rustc = self.rust-bin.stable.latest.rustc;
-                  cargo = self.rust-bin.stable.latest.cargo;
-                }
-              )
-            ];
-          };
+          pkgs = pgx.lib.nixpkgsWithOverlays { inherit system nixpkgs; extraOverlays = [ self.overlay ]; };
         in
-        {
-          "${cargoToml.package.name}" = pkgs."${cargoToml.package.name}";
-          "${cargoToml.package.name}_debug" = pkgs."${cargoToml.package.name}_debug";
-          "${cargoToml.package.name}_all" = pkgs.runCommandNoCC "allVersions" { } ''
-            mkdir -p $out
-            cp -r ${pkgs."${cargoToml.package.name}_10"} $out/${cargoToml.package.name}_10
-            cp -r ${pkgs."${cargoToml.package.name}_11"} $out/${cargoToml.package.name}_11
-            cp -r ${pkgs."${cargoToml.package.name}_12"} $out/${cargoToml.package.name}_12
-            cp -r ${pkgs."${cargoToml.package.name}_13"} $out/${cargoToml.package.name}_13
-            cp -r ${pkgs."${cargoToml.package.name}_14"} $out/${cargoToml.package.name}_14
-          '';
-          "${cargoToml.package.name}_all_debug" = pkgs.runCommandNoCC "allVersions" { } ''
-            mkdir -p $out
-            cp -r ${pkgs."${cargoToml.package.name}_10_debug"} $out/${cargoToml.package.name}_10
-            cp -r ${pkgs."${cargoToml.package.name}_11_debug"} $out/${cargoToml.package.name}_11
-            cp -r ${pkgs."${cargoToml.package.name}_12_debug"} $out/${cargoToml.package.name}_12
-            cp -r ${pkgs."${cargoToml.package.name}_13_debug"} $out/${cargoToml.package.name}_13
-            cp -r ${pkgs."${cargoToml.package.name}_14_debug"} $out/${cargoToml.package.name}_14
-          '';
-        } // (nixpkgs.lib.foldl'
+        pkgs."${cargoToml.package.name}");
+
+      packages = pgx.lib.forAllSystems (system:
+        let
+          pkgs = pgx.lib.nixpkgsWithOverlays { inherit system nixpkgs; extraOverlays = [ self.overlay ]; };
+        in
+        (nixpkgs.lib.foldl'
           (x: y: x // y)
           { }
           (map
@@ -75,18 +41,20 @@
                 "${cargoToml.package.name}_${versionString}" = pkgs."${cargoToml.package.name}_${versionString}";
                 "${cargoToml.package.name}_${versionString}_debug" = pkgs."${cargoToml.package.name}_${versionString}_debug";
               })
-            supportedPostgresVersions)
+            pgx.lib.supportedPostgresVersions)
         ));
 
       overlay = final: prev: {
-        "${cargoToml.package.name}" = final.callPackage ./. {
-          inherit naersk;
-          gitignoreSource = gitignore.lib.gitignoreSource;
+        "${cargoToml.package.name}" = pgx.lib.buildPgxExtension {
+          pkgs = final;
+          source = ./.;
+          pgxPostgresVersion = 11;
         };
-        "${cargoToml.package.name}_debug" = final.callPackage ./. {
-          inherit naersk;
+        "${cargoToml.package.name}_debug" = pgx.lib.buildPgxExtension {
+          pkgs = final;
+          source = ./.;
+          pgxPostgresVersion = 11;
           release = false;
-          gitignoreSource = gitignore.lib.gitignoreSource;
         };
       } // (nixpkgs.lib.foldl'
         (x: y: x // y)
@@ -95,19 +63,19 @@
           (version:
             let versionString = builtins.toString version; in
             {
-              "${cargoToml.package.name}_${versionString}" = final.callPackage ./. {
-                inherit naersk;
+              "${cargoToml.package.name}_${versionString}" = pgx.lib.buildPgxExtension {
+                pkgs = final;
+                source = ./.;
                 pgxPostgresVersion = version;
-                gitignoreSource = gitignore.lib.gitignoreSource;
               };
-              "${cargoToml.package.name}_${versionString}_debug" = final.callPackage ./. {
-                inherit naersk;
-                release = false;
+              "${cargoToml.package.name}_${versionString}_debug" = pgx.lib.buildPgxExtension {
+                pkgs = final;
+                source = ./.;
                 pgxPostgresVersion = version;
-                gitignoreSource = gitignore.lib.gitignoreSource;
+                release = false;
               };
             })
-          supportedPostgresVersions)
+          pgx.lib.supportedPostgresVersions)
       );
 
       nixosModule = { config, pkgs, lib, ... }:
@@ -127,22 +95,9 @@
           };
         };
 
-      checks = forAllSystems (system:
+      checks = pgx.lib.forAllSystems (system:
         let
-          pkgs = import nixpkgs {
-            inherit system;
-            overlays = [
-              self.overlay
-              pgx.overlay
-              rust-overlay.overlay
-              (self: super:
-                {
-                  rustc = self.rust-bin.stable.latest.rustc;
-                  cargo = self.rust-bin.stable.latest.cargo;
-                }
-              )
-            ];
-          };
+          pkgs = pgx.lib.nixpkgsWithOverlays { inherit system nixpkgs; extraOverlays = [ self.overlay ]; };
         in
         {
           format = pkgs.runCommand "check-format"
