@@ -231,7 +231,7 @@ fn do_it() -> std::result::Result<(), std::io::Error> {
                     .map(|x| x.to_string())
                     .unwrap_or_else(|| {
                         format!(
-                            "sql/{}--{}.sql",
+                            "sql/{}-{}.sql",
                             extname,
                             crate::commands::install::get_version()
                         )
