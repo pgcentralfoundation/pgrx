@@ -138,8 +138,8 @@ naersk.lib."${targetPlatform.system}".buildPackage rec {
   # This is required to have access to the `sql/*.sql` files.
   singleStep = true;
 
-  cargoBuildOptions = default: default ++ [ "--no-default-features" "--features \"pg${pgxPostgresVersionString} ${builtins.toString additionalFeatures}\"" ];
-  cargoTestOptions = default: default ++ [ "--no-default-features" "--features \"pg_test pg${pgxPostgresVersionString} ${builtins.toString additionalFeatures}\" --lib" ];
+  cargoBuildOptions = default: default ++ [ "--no-default-features" "--features \"pg${pgxPostgresVersionString} ${builtins.toString additionalFeatures}\" --bin --lib" ];
+  cargoTestOptions = default: default ++ [ "--no-default-features" "--features \"pg_test pg${pgxPostgresVersionString} ${builtins.toString additionalFeatures}\" --bin --lib" ];
   doDoc = false;
   copyLibs = true;
 
