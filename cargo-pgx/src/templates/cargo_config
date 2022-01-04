@@ -6,6 +6,12 @@ linker = ".cargo/pgx-linker-script.sh"
 [target.aarch64-unknown-linux-gnu]
 linker = ".cargo/pgx-linker-script.sh"
 
+[target.x86_64-unknown-linux-musl]
+linker = ".cargo/pgx-linker-script.sh"
+
+[target.aarch64-unknown-linux-musl]
+linker = ".cargo/pgx-linker-script.sh"
+
 [target.x86_64-apple-darwin]
 linker = ".cargo/pgx-linker-script.sh"
 
