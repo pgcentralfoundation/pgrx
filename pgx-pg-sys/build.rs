@@ -559,7 +559,7 @@ fn build_shim_for_version(
         .unwrap();
     }
 
-    let make = env!("MAKE").unwrap_or("make".to_string());
+    let make = option_env!("MAKE").unwrap_or("make").to_string();
     let rc = run_command(
         Command::new(make)
             .arg("clean")
