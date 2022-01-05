@@ -210,7 +210,7 @@ impl PgAggregate {
                 #[allow(non_snake_case)]
                 #[pg_extern]
                 fn #fn_name(this: #maybe_varlena_target_path, #(#args_with_names),*) -> #maybe_varlena_target_path {
-                    <#target_path as pgx::Aggregate>::state(this, #(#arg_names),*)
+                    <#target_path as pgx::Aggregate>::state(this, (#(#arg_names),*))
                 }
             });
             fn_name
