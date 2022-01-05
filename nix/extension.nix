@@ -19,7 +19,12 @@
 , rustc
 , llvmPackages
 , gcc
+, gitignoreSource
+, runCommand
 , pgxPostgresVersion ? 11
+, release ? true
+, source ? ./.
+, additionalFeatures
 }:
 
 let
@@ -30,15 +35,17 @@ let
     else if (pgxPostgresVersion == 13) then postgresql_13
     else if (pgxPostgresVersion == 14) then postgresql_14
     else null;
+  maybeReleaseFlag = if release == true then "--release" else "";
   pgxPostgresVersionString = builtins.toString pgxPostgresVersion;
-  cargoToml = (builtins.fromTOML (builtins.readFile ./Cargo.toml));
+  cargoToml = (builtins.fromTOML (builtins.readFile "${source}/Cargo.toml"));
 in
 
 naersk.lib."${targetPlatform.system}".buildPackage rec {
+  inherit release;
   name = "${cargoToml.package.name}-pg${pgxPostgresVersionString}";
   version = cargoToml.package.version;
 
-  src = ./.;
+  src = gitignoreSource source;
 
   inputsFrom = [ postgresql_10 postgresql_11 postgresql_12 postgresql_13 cargo-pgx ];
 
@@ -115,13 +122,14 @@ naersk.lib."${targetPlatform.system}".buildPackage rec {
   '';
   postBuild = ''
     export PGX_HOME=$out/.pgx
-    ${cargo-pgx}/bin/cargo-pgx pgx schema --skip-build --release
-    cp -v ./sql/* $out/
-    cp -v ./${cargoToml.package.name}.control $out/${cargoToml.package.name}.control
+    ${cargo-pgx}/bin/cargo-pgx pgx schema --skip-build ${maybeReleaseFlag}
+    mkdir -p $out/share/postgresql/extension/
+    cp -v ./sql/* $out/share/postgresql/extension/
+    cp -v ./${cargoToml.package.name}.control $out/share/postgresql/extension/${cargoToml.package.name}.control
   '';
   preFixup = ''
     rm -r $out/.pgx
-    mv $out/lib/* $out/
+    mv $out/lib/* $out/share/postgresql/extension/
     rm -r $out/lib $out/bin
   '';
   PGX_PG_SYS_SKIP_BINDING_REWRITE = "1";
@@ -130,8 +138,8 @@ naersk.lib."${targetPlatform.system}".buildPackage rec {
   # This is required to have access to the `sql/*.sql` files.
   singleStep = true;
 
-  cargoBuildOptions = default: default ++ [ "--no-default-features" "--features \"pg${pgxPostgresVersionString}\"" ];
-  cargoTestOptions = default: default ++ [ "--no-default-features" "--features \"pg_test pg${pgxPostgresVersionString}\" --lib" ];
+  cargoBuildOptions = default: default ++ [ "--no-default-features" "--features \"pg${pgxPostgresVersionString} ${builtins.toString additionalFeatures}\" --bin sql-generator --lib" ];
+  cargoTestOptions = default: default ++ [ "--no-default-features" "--features \"pg_test pg${pgxPostgresVersionString} ${builtins.toString additionalFeatures}\" --bin sql-generator --lib" ];
   doDoc = false;
   copyLibs = true;
 
