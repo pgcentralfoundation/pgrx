@@ -15,6 +15,7 @@ exclude = [ "*.png" ]
 
 
 [dependencies]
+cargo_metadata = "0.14.1"
 clap = { version = "2.34.0", features = [ "yaml" ] }
 colored = "2.0.0"
 env_proxy = "0.4.1"
