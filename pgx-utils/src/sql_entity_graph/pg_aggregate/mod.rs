@@ -118,7 +118,7 @@ impl PgAggregate {
             }
         }
 
-        // `MovingState` is an optional value, we default to nothing.
+        // `State` is an optional value, we default to `Self`.
         let type_state = get_impl_type_by_name(&item_impl_snapshot, "State");
         let _type_state_value = type_state.map(|v| v.ty.clone());
         let type_state_is_pgvarlena = if let Some(impl_item_ty) = type_state {
@@ -135,11 +135,17 @@ impl PgAggregate {
         } else {
             false
         };
-        if type_state.is_none() {
+        let type_state = if let Some(inner) = type_state {
+            inner.ty.clone()
+        } else {
+            item_impl.items.push(parse_quote! {
+                type State = Self;
+            });
             item_impl.items.push(parse_quote! {
                 type ReturnType = Self;
-            })
-        }
+            });
+            parse_quote!(Self)
+        };
 
         // `MovingState` is an optional value, we default to nothing.
         let type_moving_state = get_impl_type_by_name(&item_impl_snapshot, "MovingState");
@@ -209,7 +215,7 @@ impl PgAggregate {
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case)]
                 #[pg_extern]
-                fn #fn_name(this: #maybe_varlena_target_path, #(#args_with_names),*) -> #maybe_varlena_target_path {
+                fn #fn_name(this: #type_state, #(#args_with_names),*) -> #type_state {
                     <#target_path as pgx::Aggregate>::state(this, (#(#arg_names),*))
                 }
             });
@@ -230,14 +236,14 @@ impl PgAggregate {
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case)]
                 #[pg_extern]
-                fn #fn_name(this: #maybe_varlena_target_path, v: #maybe_varlena_target_path) -> #maybe_varlena_target_path {
+                fn #fn_name(this: #type_state, v: #type_state) -> #type_state {
                     <#target_path as pgx::Aggregate>::combine(this, v)
                 }
             });
             Some(fn_name)
         } else {
             item_impl.items.push(parse_quote! {
-                fn combine(current: #maybe_varlena_target_path, _other: #maybe_varlena_target_path) -> #maybe_varlena_target_path {
+                fn combine(current: #type_state, _other: #type_state) -> #type_state {
                     unimplemented!("Call to combine on an aggregate which does not support it.")
                 }
             });
@@ -253,14 +259,14 @@ impl PgAggregate {
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case)]
                 #[pg_extern]
-                fn #fn_name(this: #maybe_varlena_target_path) -> <#target_path as pgx::Aggregate>::Finalize {
+                fn #fn_name(this: #type_state) -> <#target_path as pgx::Aggregate>::Finalize {
                     <#target_path as pgx::Aggregate>::finalize(this)
                 }
             });
             Some(fn_name)
         } else {
             item_impl.items.push(parse_quote! {
-                fn finalize(current: #maybe_varlena_target_path) -> Self::Finalize {
+                fn finalize(current: #type_state) -> Self::Finalize {
                     unimplemented!("Call to finalize on an aggregate which does not support it.")
                 }
             });
@@ -283,7 +289,7 @@ impl PgAggregate {
             Some(fn_name)
         } else {
             item_impl.items.push(parse_quote! {
-                fn serial(current: #maybe_varlena_target_path) -> Vec<u8> {
+                fn serial(current: #type_state) -> Vec<u8> {
                     unimplemented!("Call to serial on an aggregate which does not support it.")
                 }
             });
@@ -299,14 +305,14 @@ impl PgAggregate {
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case)]
                 #[pg_extern]
-                fn #fn_name(this: #maybe_varlena_target_path, buf: Vec<u8>, internal: pgx::PgBox<#maybe_varlena_target_path>) -> pgx::PgBox<#maybe_varlena_target_path> {
+                fn #fn_name(this: #type_state, buf: Vec<u8>, internal: pgx::PgBox<#type_state>) -> pgx::PgBox<#type_state> {
                     this.deserial(buf, internal)
                 }
             });
             Some(fn_name)
         } else {
             item_impl.items.push(parse_quote! {
-                fn deserial(current: #maybe_varlena_target_path, _buf: Vec<u8>, _internal: pgx::PgBox<Self>) -> pgx::PgBox<Self> {
+                fn deserial(current: #type_state, _buf: Vec<u8>, _internal: pgx::PgBox<Self>) -> pgx::PgBox<Self> {
                     unimplemented!("Call to deserial on an aggregate which does not support it.")
                 }
             });
