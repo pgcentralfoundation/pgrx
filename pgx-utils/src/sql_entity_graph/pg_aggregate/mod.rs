@@ -1,9 +1,7 @@
 mod aggregate_type;
-mod attrs;
 mod maybe_variadic_type;
 
 use aggregate_type::AggregateTypeList;
-use attrs::PgAggregateAttrs;
 use convert_case::{Case, Casing};
 use maybe_variadic_type::MaybeVariadicTypeList;
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
@@ -55,14 +53,11 @@ const ARG_NAMES: [&str; 32] = [
 */
 #[derive(Debug, Clone)]
 pub struct PgAggregate {
-    // Options relevant to the aggregate's final implementation or SQL generation.
-    aggregate_attrs: Option<PgAggregateAttrs>,
     item_impl: ItemImpl,
     pg_externs: Vec<ItemFn>,
     // Note these should not be considered *writable*, they're snapshots from construction.
     type_args: MaybeVariadicTypeList,
     type_order_by: Option<AggregateTypeList>,
-    type_finalize: Option<syn::Type>,
     type_moving_state: Option<syn::Type>,
     const_parallel: Option<syn::Expr>,
     const_finalize_modify: Option<syn::Expr>,
@@ -106,37 +101,14 @@ impl PgAggregate {
             }
         }
 
-        let mut aggregate_attrs = None;
-        for attr in item_impl.attrs.clone() {
-            // TODO: Consider checking the path if there is more than one segment to make sure it's pgx.
-            let attr_path = attr.path.segments.last();
-            if let Some(candidate_path) = attr_path {
-                if candidate_path.ident.to_string() == "pg_aggregate" {
-                    let parsed: PgAggregateAttrs = syn::parse2(attr.tokens)?;
-                    aggregate_attrs = Some(parsed);
-                }
-            }
-        }
-
         // `State` is an optional value, we default to `Self`.
         let type_state = get_impl_type_by_name(&item_impl_snapshot, "State");
         let _type_state_value = type_state.map(|v| v.ty.clone());
-        let type_state_is_pgvarlena = if let Some(impl_item_ty) = type_state {
-            match &impl_item_ty.ty {
-                Type::Path(ty_path) => {
-                    if let Some(last) = ty_path.path.segments.last() {
-                        last.ident.to_string() == "PgVarlena"
-                    } else {
-                        false
-                    }
-                }
-                _ => false,
-            }
-        } else {
-            false
-        };
-        let type_state = if let Some(inner) = type_state {
-            inner.ty.clone()
+        
+        let type_state_without_self = if let Some(inner) = type_state {
+            let mut remapped = inner.ty.clone();
+            remap_self_to_target(&mut remapped, &target_ident);
+            remapped
         } else {
             item_impl.items.push(parse_quote! {
                 type State = Self;
@@ -178,18 +150,11 @@ impl PgAggregate {
 
         // `Finalize` is an optional value, we default to nothing.
         let type_finalize = get_impl_type_by_name(&item_impl_snapshot, "Finalize");
-        let type_finalize_value = type_finalize.map(|v| v.ty.clone());
         if type_finalize.is_none() {
             item_impl.items.push(parse_quote! {
                 type Finalize = ();
             })
         }
-
-        let maybe_varlena_target_path: Type = if type_state_is_pgvarlena {
-            parse_quote!(pgx::PgVarlena<#target_path>)
-        } else {
-            parse_quote!(#target_path)
-        };
 
         let fn_state = get_impl_func_by_name(&item_impl_snapshot, "state");
         let fn_state_name = if let Some(found) = fn_state {
@@ -215,7 +180,7 @@ impl PgAggregate {
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case)]
                 #[pg_extern]
-                fn #fn_name(this: #type_state, #(#args_with_names),*) -> #type_state {
+                fn #fn_name(this: #type_state_without_self, #(#args_with_names),*) -> #type_state_without_self {
                     <#target_path as pgx::Aggregate>::state(this, (#(#arg_names),*))
                 }
             });
@@ -236,14 +201,14 @@ impl PgAggregate {
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case)]
                 #[pg_extern]
-                fn #fn_name(this: #type_state, v: #type_state) -> #type_state {
+                fn #fn_name(this: #type_state_without_self, v: #type_state_without_self) -> #type_state_without_self {
                     <#target_path as pgx::Aggregate>::combine(this, v)
                 }
             });
             Some(fn_name)
         } else {
             item_impl.items.push(parse_quote! {
-                fn combine(current: #type_state, _other: #type_state) -> #type_state {
+                fn combine(current: #type_state_without_self, _other: #type_state_without_self) -> #type_state_without_self {
                     unimplemented!("Call to combine on an aggregate which does not support it.")
                 }
             });
@@ -259,14 +224,14 @@ impl PgAggregate {
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case)]
                 #[pg_extern]
-                fn #fn_name(this: #type_state) -> <#target_path as pgx::Aggregate>::Finalize {
+                fn #fn_name(this: #type_state_without_self) -> <#target_path as pgx::Aggregate>::Finalize {
                     <#target_path as pgx::Aggregate>::finalize(this)
                 }
             });
             Some(fn_name)
         } else {
             item_impl.items.push(parse_quote! {
-                fn finalize(current: #type_state) -> Self::Finalize {
+                fn finalize(current: #type_state_without_self) -> Self::Finalize {
                     unimplemented!("Call to finalize on an aggregate which does not support it.")
                 }
             });
@@ -289,7 +254,7 @@ impl PgAggregate {
             Some(fn_name)
         } else {
             item_impl.items.push(parse_quote! {
-                fn serial(current: #type_state) -> Vec<u8> {
+                fn serial(current: #type_state_without_self) -> Vec<u8> {
                     unimplemented!("Call to serial on an aggregate which does not support it.")
                 }
             });
@@ -305,14 +270,14 @@ impl PgAggregate {
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case)]
                 #[pg_extern]
-                fn #fn_name(this: #type_state, buf: Vec<u8>, internal: pgx::PgBox<#type_state>) -> pgx::PgBox<#type_state> {
+                fn #fn_name(this: #type_state_without_self, buf: Vec<u8>, internal: pgx::PgBox<#type_state_without_self>) -> pgx::PgBox<#type_state_without_self> {
                     this.deserial(buf, internal)
                 }
             });
             Some(fn_name)
         } else {
             item_impl.items.push(parse_quote! {
-                fn deserial(current: #type_state, _buf: Vec<u8>, _internal: pgx::PgBox<Self>) -> pgx::PgBox<Self> {
+                fn deserial(current: #type_state_without_self, _buf: Vec<u8>, _internal: pgx::PgBox<Self>) -> pgx::PgBox<Self> {
                     unimplemented!("Call to deserial on an aggregate which does not support it.")
                 }
             });
@@ -416,12 +381,10 @@ impl PgAggregate {
         };
 
         Ok(Self {
-            aggregate_attrs,
             item_impl,
             pg_externs,
             type_args: type_args_value,
             type_order_by: type_order_by_value,
-            type_finalize: type_finalize_value,
             type_moving_state: type_moving_state_value,
             const_parallel: get_impl_const_by_name(&item_impl_snapshot, "PARALLEL")
                 .map(|x| x.expr.clone()),
@@ -704,6 +667,32 @@ fn get_const_litstr<'a>(item: &'a ImplItemConst) -> Option<String> {
             _ => None,
         },
         _ => panic!("Got {:?}", item.expr),
+    }
+}
+
+fn remap_self_to_target(ty: &mut syn::Type, target: &syn::Ident) {
+    match ty {
+        Type::Path(ref mut ty_path) => {
+            for segment in ty_path.path.segments.iter_mut() {
+                if segment.ident.to_string() == "Self" {
+                    segment.ident = target.clone()
+                }
+                use syn::{PathArguments, GenericArgument};
+                match segment.arguments {
+                    PathArguments::AngleBracketed(ref mut angle_args) => {
+                        for arg in angle_args.args.iter_mut() {
+                            match arg {
+                                GenericArgument::Type(inner_ty) => remap_self_to_target(inner_ty, target),
+                                _ => (),
+                            }
+                        }
+                    },
+                    PathArguments::Parenthesized(_) => (),
+                    PathArguments::None => (),
+                }
+            }  
+        }
+        _ => (),
     }
 }
 
