@@ -34,7 +34,14 @@ pub(crate) fn init_pgx(pgx: &Pgx) -> std::result::Result<(), std::io::Error> {
     let pgx_dir = Pgx::home()?;
     
     for pg_config in pgx.iter(PgConfigSelector::new("all")) {
-        stop_postgres(pg_config?)?;
+        // We'll get a not found error here if the user hasn't done `cargo pgx init` yet.
+        match stop_postgres(pg_config?) {
+            Ok(_) => (),
+            Err(err) => match err.kind() {
+                std::io::ErrorKind::NotFound => (),
+                _ => return Err(err),
+            }
+        }
     }
 
     // We use a tempdir to build the postgres versions in case the user has an existing pgx home
