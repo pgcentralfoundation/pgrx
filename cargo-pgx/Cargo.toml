@@ -19,7 +19,7 @@ cargo_metadata = "0.14.1"
 clap = { version = "2.34.0", features = [ "yaml" ] }
 colored = "2.0.0"
 env_proxy = "0.4.1"
-num_cpus = "1.13.0"
+num_cpus = "1.13.1"
 pgx-utils = { path = "../pgx-utils", version = "0.2.6" }
 proc-macro2 = { version = "1.0.34", features = [ "span-locations" ] }
 quote = "1.0.10"
