@@ -31,23 +31,7 @@ static PROCESS_ENV_DENYLIST: &'static [&'static str] = &[
 ];
 
 pub(crate) fn init_pgx(pgx: &Pgx) -> std::result::Result<(), std::io::Error> {
-    let pgx_dir = Pgx::home()?;
-    
-    for pg_config in pgx.iter(PgConfigSelector::new("all")) {
-        // We'll get a not found error here if the user hasn't done `cargo pgx init` yet.
-        match stop_postgres(pg_config?) {
-            Ok(_) => (),
-            Err(err) => match err.kind() {
-                std::io::ErrorKind::NotFound => (),
-                _ => return Err(err),
-            }
-        }
-    }
-
-    // We use a tempdir to build the postgres versions in case the user has an existing pgx home
-    // this way, if they cancel the process (say it was an accident) we don't ruin their postgres builds.
-    let temp_dir = tempdir::TempDir::new_in(&pgx_dir, "candidates")?;
-    let temp_dir_path = temp_dir.path().to_path_buf();
+    let dir = Pgx::home()?;
 
     let output_configs = Arc::new(Mutex::new(Vec::new()));
 
@@ -60,7 +44,7 @@ pub(crate) fn init_pgx(pgx: &Pgx) -> std::result::Result<(), std::io::Error> {
         let mut pg_config = pg_config.clone();
         stop_postgres(&pg_config).ok(); // no need to fail on errors trying to stop postgres while initializing
         if !pg_config.is_real() {
-            pg_config = match download_postgres(&pg_config, &temp_dir_path, &pgx_dir) {
+            pg_config = match download_postgres(&pg_config, &dir) {
                 Ok(pg_config) => pg_config,
                 Err(e) => exit_with_error!(e),
             }
@@ -99,7 +83,7 @@ pub(crate) fn init_pgx(pgx: &Pgx) -> std::result::Result<(), std::io::Error> {
     Ok(())
 }
 
-fn download_postgres(pg_config: &PgConfig, temp_dir: &PathBuf, pgx_dir: &PathBuf) -> Result<PgConfig, std::io::Error> {
+fn download_postgres(pg_config: &PgConfig, pgxdir: &PathBuf) -> Result<PgConfig, std::io::Error> {
     println!(
         "{} Postgres v{}.{} from {}",
         "  Downloading".bold().green(),
@@ -128,10 +112,10 @@ fn download_postgres(pg_config: &PgConfig, temp_dir: &PathBuf, pgx_dir: &PathBuf
             ),
         ));
     }
-    let pgdir = untar(http_response.body().binary(), temp_dir, pg_config)?;
+    let pgdir = untar(http_response.body().binary(), pgxdir, pg_config)?;
     configure_postgres(pg_config, &pgdir)?;
     make_postgres(pg_config, &pgdir)?;
-    make_install_postgres(pg_config, &pgdir, pgx_dir) // returns a new PgConfig object
+    make_install_postgres(pg_config, &pgdir) // returns a new PgConfig object
 }
 
 fn untar(bytes: &[u8], pgxdir: &PathBuf, pg_config: &PgConfig) -> Result<PathBuf, std::io::Error> {
@@ -266,7 +250,7 @@ fn make_postgres(pg_config: &PgConfig, pgdir: &PathBuf) -> Result<(), std::io::E
     }
 }
 
-fn make_install_postgres(version: &PgConfig, pgdir: &PathBuf, pgx_dir: &PathBuf) -> Result<PgConfig, std::io::Error> {
+fn make_install_postgres(version: &PgConfig, pgdir: &PathBuf) -> Result<PgConfig, std::io::Error> {
     println!(
         "{} Postgres v{}.{} to {}",
         "   Installing".bold().green(),
@@ -291,26 +275,7 @@ fn make_install_postgres(version: &PgConfig, pgdir: &PathBuf, pgx_dir: &PathBuf)
     let output = child.wait_with_output()?;
 
     if output.status.success() {
-        let mut pgx_versioned_dir = pgx_dir.clone();
-        let versioned_dir = format!(
-            "{}.{}",
-            version.major_version()?,
-            version.minor_version()?
-        );
-        pgx_versioned_dir.push(&versioned_dir);
-        // The longest part is over, move the folder into position.
-        println!(
-            "{} {} with {}",
-            "   Replacing".bold().green(),
-            &pgx_versioned_dir.display(),
-            &pgdir.display(),
-        );
-        if pgx_versioned_dir.exists() {
-            std::fs::remove_dir_all(&pgx_versioned_dir)?;
-        }
-        std::fs::rename(pgdir, &pgx_versioned_dir)?;
-
-        let mut pg_config = get_pg_installdir(&pgx_versioned_dir);
+        let mut pg_config = get_pg_installdir(pgdir);
         pg_config.push("bin");
         pg_config.push("pg_config");
         Ok(PgConfig::new(pg_config))
