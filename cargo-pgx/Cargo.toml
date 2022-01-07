@@ -26,7 +26,7 @@ quote = "1.0.10"
 rayon = "1.5.1"
 regex = "1.5.4"
 rttp_client = { version = "0.1.0", features = ["tls-native"] }
-syn = { version = "1.0.82", features = [ "extra-traits", "full", "fold", "parsing" ] }
+syn = { version = "1.0.85", features = [ "extra-traits", "full", "fold", "parsing" ] }
 unescape = "0.1.0"
 fork = "0.1.18"
 libloading = "0.7.2"
