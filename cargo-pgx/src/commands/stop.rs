@@ -1,11 +1,35 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-use crate::commands::status::status_postgres;
+use crate::{commands::status::status_postgres, PgxCommand};
 use colored::Colorize;
-use pgx_utils::pg_config::{PgConfig, Pgx};
+use pgx_utils::pg_config::{PgConfig, Pgx, PgConfigSelector};
 
 use std::process::Stdio;
+
+#[derive(Args, Debug)]
+#[clap(about = "stop a pgx-managed Postgres instance")]
+pub(crate) struct Stop {
+    #[clap(
+        env = "PG_VERSION",
+        long,
+        help = "the Postgres version to stop ('pg10', 'pg11', 'pg12', 'pg13', 'pg14', or 'all')",
+    )]
+    pg_version: String,
+}
+
+impl PgxCommand for Stop {
+    fn execute(self) -> std::result::Result<(), std::io::Error> {
+        let pgver = self.pg_version;
+        let pgx = Pgx::from_config()?;
+
+        for pg_config in pgx.iter(PgConfigSelector::new(&pgver)) {
+            stop_postgres(pg_config?)?
+        }
+        
+        Ok(())
+    }
+}
 
 pub(crate) fn stop_postgres(pg_config: &PgConfig) -> Result<(), std::io::Error> {
     Pgx::home()?;

@@ -1,13 +1,16 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
+use crate::{PgxCommand, SUPPORTED_MAJOR_VERSIONS};
 use crate::commands::stop::stop_postgres;
 use colored::Colorize;
 use pgx_utils::pg_config::{PgConfig, PgConfigSelector, Pgx};
 use pgx_utils::{exit_with_error, handle_result, prefix_path};
 use rayon::prelude::*;
 use rttp_client::{types::Proxy, HttpClient};
+use clap::Parser;
 
+use std::collections::HashMap;
 use std::fs::File;
 use std::io::Write;
 use std::path::PathBuf;
@@ -29,6 +32,91 @@ static PROCESS_ENV_DENYLIST: &'static [&'static str] = &[
     "NUM_JOBS",
     "LIBRARY_PATH", // see https://github.com/zombodb/pgx/issues/16
 ];
+
+#[derive(Args, Debug)]
+#[clap(about = "initize pgx development environment for the first time")]
+pub(crate) struct Init {
+    #[clap(
+        env = "PG10_PG_CONFIG",
+        long,
+        help = "if installed locally, the path to PG10's 'pgconfig' tool, or 'downoad' to have pgx download/compile/install it",
+    )]
+    pg10: Option<String>,
+    #[clap(
+        env = "PG11_PG_CONFIG",
+        long,
+        help = "if installed locally, the path to PG11's 'pgconfig' tool, or 'downoad' to have pgx download/compile/install it",
+    )]
+    pg11: Option<String>,
+    #[clap(
+        env = "PG12_PG_CONFIG",
+        long,
+        help = "if installed locally, the path to PG12's 'pgconfig' tool, or 'downoad' to have pgx download/compile/install it",
+    )]
+    pg12: Option<String>,
+    #[clap(
+        env = "PG13_PG_CONFIG",
+        long,
+        help = "if installed locally, the path to PG13's 'pgconfig' tool, or 'downoad' to have pgx download/compile/install it",
+    )]
+    pg13: Option<String>,
+    #[clap(
+        env = "PG14_PG_CONFIG",
+        long,
+        help = "if installed locally, the path to PG14's 'pgconfig' tool, or 'downoad' to have pgx download/compile/install it",
+    )]
+    pg14: Option<String>,
+}
+
+impl PgxCommand for Init {
+    fn execute(self) -> std::result::Result<(), std::io::Error> {
+        let mut versions = HashMap::new();
+
+        if let Some(version) = self.pg10 {
+            versions.insert("pg10", version.clone());
+        }
+        if let Some(version) = self.pg11 {
+            versions.insert("pg11", version.clone());
+        }
+        if let Some(version) = self.pg12 {
+            versions.insert("pg12", version.clone());
+        }
+        if let Some(version) = self.pg13 {
+            versions.insert("pg13", version.clone());
+        }
+        if let Some(version) = self.pg14 {
+            versions.insert("pg14", version.clone());
+        }
+
+        if versions.is_empty() {
+            // no arguments specified, so we'll just install our defaults
+            init_pgx(&Pgx::default(SUPPORTED_MAJOR_VERSIONS)?)
+        } else {
+            // user specified arguments, so we'll only install those versions of Postgres
+            let mut default_pgx = None;
+            let mut pgx = Pgx::new();
+
+            for (pgver, pg_config_path) in versions {
+                let config = if pg_config_path == "download" {
+                    if default_pgx.is_none() {
+                        default_pgx = Some(Pgx::default(SUPPORTED_MAJOR_VERSIONS)?);
+                    }
+                    default_pgx
+                        .as_ref()
+                        .unwrap() // We just set this
+                        .get(&pgver)
+                        .expect(&format!("{} is not a known Postgres version", pgver))
+                        .clone()
+                } else {
+                    PgConfig::new(pg_config_path.into())
+                };
+                pgx.push(config);
+            }
+
+            init_pgx(&pgx)
+        }
+    }
+}
 
 pub(crate) fn init_pgx(pgx: &Pgx) -> std::result::Result<(), std::io::Error> {
     let dir = Pgx::home()?;

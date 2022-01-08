@@ -7,6 +7,27 @@ use std::io::{BufRead, BufReader};
 use std::path::PathBuf;
 use std::process::Command;
 
+use crate::PgxCommand;
+
+
+#[derive(Args, Debug)]
+#[clap(about = "get a property from the extension control file")]
+pub(crate) struct Get {
+    #[clap(
+        help = "one of the properties from extension.control",
+    )]
+    name: String,
+}
+
+impl PgxCommand for Get {
+    fn execute(self) -> std::result::Result<(), std::io::Error> {
+        if let Some(value) = get_property(&self.name) {
+            println!("{}", value);
+        }
+        Ok(())
+    }
+}
+
 pub fn get_property(name: &str) -> Option<String> {
     let (control_file, extname) = find_control_file();
 

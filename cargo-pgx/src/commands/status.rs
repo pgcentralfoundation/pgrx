@@ -2,8 +2,48 @@
 // governed by the MIT license that can be found in the LICENSE file.
 
 use pgx_utils::exit_with_error;
-use pgx_utils::pg_config::PgConfig;
+use pgx_utils::pg_config::{PgConfig, Pgx, PgConfigSelector};
 use std::process::Stdio;
+use colored::Colorize;
+
+use crate::PgxCommand;
+
+#[derive(Args, Debug)]
+#[clap(about = "is a pgx-managed Postgres instance running?")]
+pub(crate) struct Status {
+    #[clap(
+        env = "PG_VERSION",
+        long,
+        help = "the Postgres version",
+    )]
+    pg_version: String,
+}
+
+impl PgxCommand for Status {
+    fn execute(self) -> std::result::Result<(), std::io::Error> {
+        let pgver = self.pg_version;
+        let pgx = Pgx::from_config()?;
+
+        for pg_config in pgx.iter(PgConfigSelector::new(&pgver)) {
+            let pg_config = pg_config?;
+            if status_postgres(pg_config)? {
+                println!(
+                    "Postgres v{} is {}",
+                    pg_config.major_version()?,
+                    "running".bold().green()
+                )
+            } else {
+                println!(
+                    "Postgres v{} is {}",
+                    pg_config.major_version()?,
+                    "stopped".bold().red()
+                )
+            }
+        }
+
+        Ok(())
+    }
+}
 
 pub(crate) fn status_postgres(pg_config: &PgConfig) -> Result<bool, std::io::Error> {
     let datadir = pg_config.data_dir()?;

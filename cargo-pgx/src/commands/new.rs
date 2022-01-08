@@ -1,7 +1,43 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-use std::{io::Write, os::unix::fs::PermissionsExt, path::PathBuf};
+use std::{io::Write, os::unix::fs::PermissionsExt, path::PathBuf, str::FromStr};
+
+use pgx_utils::{sql_entity_graph::reexports::color_eyre::owo_colors::OwoColorize, exit_with_error};
+
+use crate::PgxCommand;
+
+
+#[derive(Args, Debug)]
+#[clap(about = "create a new extension crate")]
+pub(crate) struct New {
+    #[clap(
+        help = "the name of the extension",
+    )]
+    name: String,
+    #[clap(
+        long,
+        short,
+        help = "create a background worker template",
+    )]
+    bgworker: bool,
+}
+
+impl PgxCommand for New {
+    fn execute(self) -> std::result::Result<(), std::io::Error> {
+        validate_extension_name(&self.name);
+        let path = PathBuf::from_str(&format!("{}/", self.name)).unwrap();
+        create_crate_template(path, &self.name, self.bgworker)
+    }
+}
+
+fn validate_extension_name(extname: &str) {
+    for c in extname.chars() {
+        if !c.is_alphanumeric() && c != '_' && !c.is_lowercase() {
+            exit_with_error!("Extension name must be in the set of [a-z0-9_]")
+        }
+    }
+}
 
 pub(crate) fn create_crate_template(
     path: PathBuf,

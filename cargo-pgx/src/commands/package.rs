@@ -1,16 +1,54 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
+use crate::PgxCommand;
 use crate::commands::get::get_property;
 use crate::commands::install::install_extension;
+use colored::Colorize;
 use pgx_utils::get_target_dir;
-use pgx_utils::pg_config::PgConfig;
+use pgx_utils::pg_config::{PgConfig, PgConfigSelector, Pgx};
 use std::path::PathBuf;
+
+use super::status::status_postgres;
+
+#[derive(Args, Debug)]
+#[clap(about = "create an installation package directory (in ./target/[debug|release]/extname-pgXX/).")]
+pub(crate) struct Package {
+    #[clap(
+        env = "PROFILE",
+        long,
+        short,
+        help = "compile for debug mode (default is release)",
+    )]
+    debug: bool,
+    #[clap(
+        long,
+        short = 'c',
+        help = "the `pg_config` path (default is first in $PATH)",
+        parse(from_os_str),
+    )]
+    pg_config: Option<PathBuf>,
+    #[clap(
+        long,
+        help = "additional cargo features to activate (default is '--no-default-features')",
+    )]
+    features: Vec<String>,
+}
+
+impl PgxCommand for Package {
+    fn execute(self) -> std::result::Result<(), std::io::Error> {
+        let pg_config = match self.pg_config {
+            None => PgConfig::from_path(),
+            Some(config) => PgConfig::new(PathBuf::from(config)),
+        };
+        package_extension(&pg_config, self.debug, &self.features)
+    }
+}
 
 pub(crate) fn package_extension(
     pg_config: &PgConfig,
     is_debug: bool,
-    additional_features: Vec<&str>,
+    additional_features: &Vec<impl AsRef<str>>,
 ) -> Result<(), std::io::Error> {
     let base_path = build_base_path(pg_config, is_debug)?;
 

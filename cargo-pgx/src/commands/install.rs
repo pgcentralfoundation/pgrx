@@ -1,20 +1,77 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
+use crate::PgxCommand;
 use crate::commands::get::{find_control_file, get_property};
 use cargo_metadata::MetadataCommand;
 use colored::Colorize;
-use pgx_utils::pg_config::PgConfig;
+use pgx_utils::pg_config::{PgConfig, Pgx};
 use pgx_utils::{exit_with_error, get_target_dir, handle_result};
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
+
+
+#[derive(Args, Debug)]
+#[clap(about = "stop a pgx-managed Postgres instance")]
+pub(crate) struct Install {
+    #[clap(
+        env = "PROFILE",
+        long,
+        short,
+        help = "compile for release mode (default is debug)",
+    )]
+    release: bool,
+    #[clap(
+        long,
+        help = "Don't regenerate the schema",
+    )]
+    no_schema: bool,
+    #[clap(
+        long,
+        short = 'c',
+        help = "the `pg_config` path (default is first in $PATH)",
+    )]
+    pg_config: Option<String>,
+    #[clap(
+        long,
+        short,
+        help = "additional cargo features to activate (default is '--no-default-features')",
+    )]
+    features: Option<Vec<String>>,
+}
+
+impl PgxCommand for Install {
+    fn execute(self) -> std::result::Result<(), std::io::Error> {
+        let no_schema = self.no_schema;
+        let features = self.features.unwrap_or(vec![]);
+        let pg_config = match std::env::var("PGX_TEST_MODE_VERSION") {
+            // for test mode, we want the pg_config specified in PGX_TEST_MODE_VERSION
+            Ok(pgver) => match Pgx::from_config()?.get(&pgver) {
+                Ok(pg_config) => pg_config.clone(),
+                Err(_) => {
+                    return Err(std::io::Error::new(std::io::ErrorKind::InvalidInput,
+                                                    "PGX_TEST_MODE_VERSION does not contain a valid postgres version number"
+                        ));
+                }
+            },
+
+            // otherwise, the user just ran "cargo pgx install", and we use whatever "pg_config" is configured
+            Err(_) => match self.pg_config {
+                None => PgConfig::from_path(),
+                Some(config) => PgConfig::new(PathBuf::from(config)),
+            },
+        };
+
+        install_extension(&pg_config, self.release, self.no_schema, None, &features)
+    }
+}
 
 pub(crate) fn install_extension(
     pg_config: &PgConfig,
     is_release: bool,
     no_schema: bool,
     base_directory: Option<PathBuf>,
-    additional_features: Vec<&str>,
+    additional_features: &Vec<impl AsRef<str>>,
 ) -> Result<(), std::io::Error> {
     let base_directory = base_directory.unwrap_or("/".into());
     let (control_file, extname) = find_control_file();
@@ -115,7 +172,8 @@ fn copy_file(src: &PathBuf, dest: &PathBuf, msg: &str, do_filter: bool) {
     }
 }
 
-pub(crate) fn build_extension(major_version: u16, is_release: bool, additional_features: &[&str]) {
+pub(crate) fn build_extension(major_version: u16, is_release: bool, additional_features: &Vec<impl AsRef<str>>) {
+    let additional_features = additional_features.iter().map(AsRef::as_ref).collect::<Vec<_>>();
     let mut features =
         std::env::var("PGX_BUILD_FEATURES").unwrap_or(format!("pg{}", major_version));
     let flags = std::env::var("PGX_BUILD_FLAGS").unwrap_or_default();
@@ -170,17 +228,17 @@ fn get_target_sql_file(extdir: &PathBuf, base_directory: &PathBuf) -> PathBuf {
 fn copy_sql_files(
     pg_config: &PgConfig,
     is_release: bool,
-    additional_features: Vec<&str>,
+    additional_features: &Vec<impl AsRef<str>>,
     extdir: &PathBuf,
     base_directory: &PathBuf,
 ) -> Result<(), std::io::Error> {
     let dest = get_target_sql_file(extdir, base_directory);
     let (_, extname) = crate::commands::get::find_control_file();
 
-    crate::schema::generate_schema(
+    crate::commands::schema::generate_schema(
         pg_config,
         is_release,
-        &*additional_features,
+        additional_features,
         &dest,
         Option::<String>::None,
         None,

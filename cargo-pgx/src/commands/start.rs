@@ -1,13 +1,38 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
+use crate::PgxCommand;
 use crate::commands::init::initdb;
 use crate::commands::status::status_postgres;
 use colored::Colorize;
 use pgx_utils::exit_with_error;
-use pgx_utils::pg_config::{PgConfig, Pgx};
+use pgx_utils::pg_config::{PgConfig, Pgx, PgConfigSelector};
 use std::os::unix::process::CommandExt;
 use std::process::Stdio;
+
+#[derive(Args, Debug)]
+#[clap(about = "start a pgx-managed Postgres instance")]
+pub(crate) struct Start {
+    #[clap(
+        env = "PG_VERSION",
+        long,
+        help = "the Postgres version to start ('pg10', 'pg11', 'pg12', 'pg13', 'pg14', or 'all')",
+    )]
+    pg_version: String,
+}
+
+impl PgxCommand for Start {
+    fn execute(self) -> std::result::Result<(), std::io::Error> {
+        let pgver = self.pg_version;
+        let pgx = Pgx::from_config()?;
+
+        for pg_config in pgx.iter(PgConfigSelector::new(&pgver)) {
+            start_postgres(pg_config?)?
+        }
+        
+        Ok(())
+    }
+}
 
 pub(crate) fn start_postgres(pg_config: &PgConfig) -> Result<(), std::io::Error> {
     let datadir = pg_config.data_dir()?;
