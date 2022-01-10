@@ -8,13 +8,14 @@ use colored::Colorize;
 
 use crate::PgxCommand;
 
+/// is a pgx-managed Postgres instance running?
 #[derive(Args, Debug)]
-#[clap(about = "is a pgx-managed Postgres instance running?")]
+#[clap(author)]
 pub(crate) struct Status {
+    /// the Postgres version
     #[clap(
         env = "PG_VERSION",
         long,
-        help = "the Postgres version",
     )]
     pg_version: String,
 }

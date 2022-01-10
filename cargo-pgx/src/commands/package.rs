@@ -4,33 +4,31 @@
 use crate::PgxCommand;
 use crate::commands::get::get_property;
 use crate::commands::install::install_extension;
-use colored::Colorize;
 use pgx_utils::get_target_dir;
-use pgx_utils::pg_config::{PgConfig, PgConfigSelector, Pgx};
+use pgx_utils::pg_config::PgConfig;
 use std::path::PathBuf;
 
-use super::status::status_postgres;
-
+/// create an installation package directory (in `./target/[debug|release]/extname-pgXX/`).
 #[derive(Args, Debug)]
-#[clap(about = "create an installation package directory (in ./target/[debug|release]/extname-pgXX/).")]
+#[clap(author)]
 pub(crate) struct Package {
+    /// compile for debug mode (default is release)
     #[clap(
         env = "PROFILE",
         long,
         short,
-        help = "compile for debug mode (default is release)",
     )]
     debug: bool,
+    /// the `pg_config` path (default is first in $PATH)
     #[clap(
         long,
         short = 'c',
-        help = "the `pg_config` path (default is first in $PATH)",
         parse(from_os_str),
     )]
     pg_config: Option<PathBuf>,
+    /// additional cargo features to activate (default is '--no-default-features')
     #[clap(
         long,
-        help = "additional cargo features to activate (default is '--no-default-features')",
     )]
     features: Vec<String>,
 }

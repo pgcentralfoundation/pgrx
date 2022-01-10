@@ -20,71 +20,75 @@ use symbolic::{
     debuginfo::{Archive, SymbolIterator},
 };
 
-
+/// generate extension schema files
+/// 
+/// The SQL generation process requires configuring a few settings in the crate.
+/// Normally `cargo pgx schema --force-default` can set these automatically.
 #[derive(Args, Debug)]
-#[clap(about = "generate extension schema files")]
+#[clap(author)]
 pub(crate) struct Schema {
+    /// skip checking for required files
     #[clap(
         long,
         short,
-        help = "",
     )]
     manual: bool,
+    /// skip building the `sql-generator`, use an existing build
     #[clap(
         long,
         short,
-        help = "Skip building the `sql-generator`, use an existing build",
     )]
     skip_build: bool,
+    /// force the generation of default required files
     #[clap(
         long,
         short,
-        help = "Force the generation of default required files",
     )]
     force_default: bool,
+    /// do you want to run against Postgres `pg10`, `pg11`, `pg12`, `pg13`, `pg14`?
     #[clap(
         long,
         short,
-        help = "Do you want to run against Postgres 'pg10', 'pg11', 'pg12', 'pg13', 'pg14'?",
     )]
     pg_version: Option<String>,
+    /// compile for release mode (default is debug)
     #[clap(
         env = "PROFILE",
         long,
         short,
-        help = "compile for release mode (default is debug)",
+
     )]
     release: bool,
+    /// the `pg_config` path (default is first in $PATH)
     #[clap(
         long,
         short = 'c',
-        help = "the `pg_config` path (default is first in $PATH)",
         parse(from_os_str),
     )]
     pg_config: Option<PathBuf>,
+    /// additional cargo features to activate (default is `--no-default-features`)
     #[clap(
         long,
-        help = "additional cargo features to activate (default is '--no-default-features')",
     )]
     features: Vec<String>,
+    /// a path to output a produced SQL file (default is `sql/$EXTNAME-$VERSION.sql`)
     #[clap(
         long,
         short,
-        help = "A path to output a produced SQL file (default is `sql/$EXTNAME-$VERSION.sql`)",
         parse(from_os_str),
     )]
     out: Option<PathBuf>,
+    /// a path to output a produced GraphViz DOT file
     #[clap(
         long,
         short,
-        help = "A path to output a produced GraphViz DOT file",
         parse(from_os_str),
     )]
     dot: Option<PathBuf>,
+    /// enable debug logging (`-vv` for trace)
     #[clap(
         long,
         short = 'v',
-        help = "Enable debug logging (-vv for trace)",
         parse(from_occurrences),
     )]
     verbose: usize,

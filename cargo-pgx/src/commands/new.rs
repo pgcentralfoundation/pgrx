@@ -3,22 +3,20 @@
 
 use std::{io::Write, os::unix::fs::PermissionsExt, path::PathBuf, str::FromStr};
 
-use pgx_utils::{sql_entity_graph::reexports::color_eyre::owo_colors::OwoColorize, exit_with_error};
+use pgx_utils::exit_with_error;
 
 use crate::PgxCommand;
 
-
+/// create a new extension crate
 #[derive(Args, Debug)]
-#[clap(about = "create a new extension crate")]
+#[clap(author)]
 pub(crate) struct New {
-    #[clap(
-        help = "the name of the extension",
-    )]
+    /// the name of the extension
     name: String,
+    /// create a background worker template
     #[clap(
         long,
         short,
-        help = "create a background worker template",
     )]
     bgworker: bool,
 }

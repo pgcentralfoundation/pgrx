@@ -6,33 +6,82 @@ extern crate clap;
 
 mod commands;
 
-use clap::{Parser, SubCommand, AppSettings};
-use colored::Colorize;
+use clap::{Parser};
 use pgx_utils::handle_result;
-use pgx_utils::pg_config::{PgConfig, PgConfigSelector, Pgx};
-use pgx_utils::{exit, exit_with_error};
-use std::collections::HashMap;
-use std::path::PathBuf;
-use std::str::FromStr;
-
+use pgx_utils::{exit_with_error};
 const SUPPORTED_MAJOR_VERSIONS: &[u16] = &[10, 11, 12, 13, 14];
 
-fn main() -> std::result::Result<(), std::io::Error> {
-    handle_result!(do_it(), "");
-    Ok(())
+trait PgxCommand {
+    fn execute(self) -> std::result::Result<(), std::io::Error>;
 }
 
-#[derive(Parser, Debug)]
-#[clap(about, version, author)]
-struct CargoPgx {
+/// `cargo` stub for `cargo-pgx` (you probably meant to run `cargo pgx`)
+#[derive(clap::Parser, Debug)]
+#[clap(
+    name = "cargo",
+    bin_name = "cargo",
+    version,
+    global_setting(clap::AppSettings::PropagateVersion),
+)]
+struct CargoCommand {
     #[clap(subcommand)]
-    command: CargoPgxCommand,
+    subcommand: CargoSubcommands,
 }
 
-impl PgxCommand for CargoPgx {
+impl PgxCommand for CargoCommand {
     fn execute(self) -> std::result::Result<(), std::io::Error> {
-        use CargoPgxCommand::*;
-        match self.command {
+        self.subcommand.execute()
+    }
+}
+
+#[derive(clap::Subcommand, Debug)]
+enum CargoSubcommands {
+    Pgx(CargoPgxCommand),
+}
+
+impl PgxCommand for CargoSubcommands {
+    fn execute(self) -> std::result::Result<(), std::io::Error> {
+        use CargoSubcommands::*;
+        match self {
+            Pgx(c) => c.execute(),
+        }
+    }
+}
+
+/// cargo subcommand for 'pgx' to make Postgres extension development easy
+#[derive(clap::Args, Debug)]
+#[clap(about, author)]
+struct CargoPgxCommand {
+    #[clap(subcommand)]
+    subcommand: CargoPgxSubCommands,
+}
+
+impl PgxCommand for CargoPgxCommand {
+    fn execute(self) -> std::result::Result<(), std::io::Error> {
+        self.subcommand.execute()
+    }
+}
+
+#[derive(clap::Subcommand, Debug)]
+enum CargoPgxSubCommands {
+    Init(commands::init::Init),
+    Start(commands::start::Start),
+    Stop(commands::stop::Stop),
+    Status(commands::status::Status),
+    New(commands::new::New),
+    Install(commands::install::Install),
+    Package(commands::package::Package),
+    Schema(commands::schema::Schema),
+    Run(commands::run::Run),
+    Connect(commands::connect::Connect),
+    Test(commands::test::Test),
+    Get(commands::get::Get),
+}
+
+impl PgxCommand for CargoPgxSubCommands {
+    fn execute(self) -> std::result::Result<(), std::io::Error> {
+        use CargoPgxSubCommands::*;
+        match self {
             Init(c) => c.execute(),
             Start(c) => c.execute(),
             Stop(c) => c.execute(),
@@ -49,27 +98,13 @@ impl PgxCommand for CargoPgx {
     }
 }
 
-#[derive(Subcommand, Debug)]
-enum CargoPgxCommand {
-    Init(commands::init::Init),
-    Start(commands::start::Start),
-    Stop(commands::stop::Stop),
-    Status(commands::status::Status),
-    New(commands::new::New),
-    Install(commands::install::Install),
-    Package(commands::package::Package),
-    Schema(commands::schema::Schema),
-    Run(commands::run::Run),
-    Connect(commands::connect::Connect),
-    Test(commands::test::Test),
-    Get(commands::get::Get),
-}
 
-trait PgxCommand {
-    fn execute(self) -> std::result::Result<(), std::io::Error>;
+fn main() -> std::result::Result<(), std::io::Error> {
+    handle_result!(do_it(), "");
+    Ok(())
 }
 
 fn do_it() -> std::result::Result<(), std::io::Error> {
-    let cargo_pgx = CargoPgx::parse();
+    let cargo_pgx = CargoCommand::parse();
     cargo_pgx.execute()
 }

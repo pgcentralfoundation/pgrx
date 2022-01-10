@@ -8,7 +8,6 @@ use pgx_utils::pg_config::{PgConfig, PgConfigSelector, Pgx};
 use pgx_utils::{exit_with_error, handle_result, prefix_path};
 use rayon::prelude::*;
 use rttp_client::{types::Proxy, HttpClient};
-use clap::Parser;
 
 use std::collections::HashMap;
 use std::fs::File;
@@ -33,37 +32,39 @@ static PROCESS_ENV_DENYLIST: &'static [&'static str] = &[
     "LIBRARY_PATH", // see https://github.com/zombodb/pgx/issues/16
 ];
 
+/// initize pgx development environment for the first time
 #[derive(Args, Debug)]
-#[clap(about = "initize pgx development environment for the first time")]
+#[clap(author)]
 pub(crate) struct Init {
+    /// if installed locally, the path to PG10's `pgconfig` tool, or `downLoad` to have pgx download/compile/install it
     #[clap(
         env = "PG10_PG_CONFIG",
         long,
-        help = "if installed locally, the path to PG10's 'pgconfig' tool, or 'downoad' to have pgx download/compile/install it",
+        help = "",
     )]
     pg10: Option<String>,
+    /// if installed locally, the path to PG11's `pgconfig` tool, or `downLoad` to have pgx download/compile/install it
     #[clap(
         env = "PG11_PG_CONFIG",
         long,
-        help = "if installed locally, the path to PG11's 'pgconfig' tool, or 'downoad' to have pgx download/compile/install it",
     )]
     pg11: Option<String>,
+    /// if installed locally, the path to PG12's `pgconfig` tool, or `downLoad` to have pgx download/compile/install it
     #[clap(
         env = "PG12_PG_CONFIG",
         long,
-        help = "if installed locally, the path to PG12's 'pgconfig' tool, or 'downoad' to have pgx download/compile/install it",
     )]
     pg12: Option<String>,
+    /// if installed locally, the path to PG13's `pgconfig` tool, or `downLoad` to have pgx download/compile/install it
     #[clap(
         env = "PG13_PG_CONFIG",
         long,
-        help = "if installed locally, the path to PG13's 'pgconfig' tool, or 'downoad' to have pgx download/compile/install it",
     )]
     pg13: Option<String>,
+    /// if installed locally, the path to PG14's `pgconfig` tool, or `downLoad` to have pgx download/compile/install it
     #[clap(
         env = "PG14_PG_CONFIG",
         long,
-        help = "if installed locally, the path to PG14's 'pgconfig' tool, or 'downoad' to have pgx download/compile/install it",
     )]
     pg14: Option<String>,
 }

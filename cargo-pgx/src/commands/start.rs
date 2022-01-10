@@ -10,13 +10,14 @@ use pgx_utils::pg_config::{PgConfig, Pgx, PgConfigSelector};
 use std::os::unix::process::CommandExt;
 use std::process::Stdio;
 
+/// start a pgx-managed Postgres instance
 #[derive(Args, Debug)]
-#[clap(about = "start a pgx-managed Postgres instance")]
+#[clap(author)]
 pub(crate) struct Start {
+    /// the Postgres version to start (`pg10`, `pg11`, `pg12`, `pg13`, `pg14`, or `all`)
     #[clap(
         env = "PG_VERSION",
         long,
-        help = "the Postgres version to start ('pg10', 'pg11', 'pg12', 'pg13', 'pg14', or 'all')",
     )]
     pg_version: String,
 }

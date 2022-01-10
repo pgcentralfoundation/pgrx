@@ -10,39 +10,38 @@ use pgx_utils::{exit_with_error, get_target_dir, handle_result};
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
 
-
+/// install the extension from the current crate to the Postgres specified by whatever `pg_config` is currently on your $PATH
 #[derive(Args, Debug)]
-#[clap(about = "stop a pgx-managed Postgres instance")]
+#[clap(author)]
 pub(crate) struct Install {
+    /// compile for release mode (default is debug)
     #[clap(
         env = "PROFILE",
         long,
         short,
-        help = "compile for release mode (default is debug)",
     )]
     release: bool,
+    /// don't regenerate the schema
     #[clap(
         long,
-        help = "Don't regenerate the schema",
     )]
+    /// the `pg_config` path (default is first in $PATH)
     no_schema: bool,
     #[clap(
         long,
         short = 'c',
-        help = "the `pg_config` path (default is first in $PATH)",
     )]
     pg_config: Option<String>,
+    /// additional cargo features to activate (default is '--no-default-features')
     #[clap(
         long,
         short,
-        help = "additional cargo features to activate (default is '--no-default-features')",
     )]
     features: Option<Vec<String>>,
 }
 
 impl PgxCommand for Install {
     fn execute(self) -> std::result::Result<(), std::io::Error> {
-        let no_schema = self.no_schema;
         let features = self.features.unwrap_or(vec![]);
         let pg_config = match std::env::var("PGX_TEST_MODE_VERSION") {
             // for test mode, we want the pg_config specified in PGX_TEST_MODE_VERSION

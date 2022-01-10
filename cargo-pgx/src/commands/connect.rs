@@ -10,19 +10,19 @@ use pgx_utils::pg_config::{PgConfig, Pgx};
 
 use super::get::get_property;
 
-
+/// connect, via psql, to a Postgres instance
 #[derive(Args, Debug)]
-#[clap(about = "connect, via psql, to a Postgres instance")]
+#[clap(author)]
 pub(crate) struct Connect {
+    /// do you want to run against Postgres `pg10`, `pg11`, `pg12`, `pg13`, `pg14`?
     #[clap(
         env = "PG_VERSION",
         long,
-        help = "Do you want to run against Postgres 'pg10', 'pg11', 'pg12', 'pg13', 'pg14'?",
     )]
     pg_version: String,
+    /// the database to connect to (and create if the first time).  Defaults to a database with the same name as the current extension name
     #[clap(
         long,
-        help = "The database to connect to (and create if the first time).  Defaults to a database with the same name as the current extension name",
     )]
     dbname: Option<String>,
 }

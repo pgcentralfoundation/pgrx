@@ -8,39 +8,38 @@ use std::process::{Command, Stdio};
 
 use crate::PgxCommand;
 
+/// run the test suite for this crate
 #[derive(Args, Debug)]
-#[clap(about = "run the test suite for this crate")]
+#[clap(author)]
 pub(crate) struct Test {
+    /// Do you want to run against Postgres `pg10`, `pg11`, `pg12`, `pg13`, `pg14`, or `all`?
     #[clap(
         env = "PG_VERSION",
-        help = "Do you want to run against Postgres 'pg10', 'pg11', 'pg12', 'pg13', 'pg14'?",
         default_value = "all",
     )]
     pg_version: String,
-    #[clap(
-        help = "If specified, only run tests containing this string in their names",
-    )]
+    /// if specified, only run tests containing this string in their names
     testname: Option<String>,
+    /// compile for release mode (default is debug)
     #[clap(
         env = "PROFILE",
         long,
         short,
-        help = "compile for release mode (default is debug)",
     )]
     release: bool,
+    /// don't regenerate the schema
     #[clap(
         long,
-        help = "Don't regenerate the schema",
     )]
     no_schema: bool,
+    /// test all packages in the workspace
     #[clap(
         long,
-        help = "Test all packages in the workspace",
     )]
     workspace: bool,
+    /// additional cargo features to activate (default is `--no-default-features`)
     #[clap(
         long,
-        help = "additional cargo features to activate (default is '--no-default-features')",
     )]
     features: Vec<String>,
 }

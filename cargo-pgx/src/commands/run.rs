@@ -13,35 +13,35 @@ use std::process::Command;
 
 use super::get::get_property;
 
-
+/// compile/install extension to a pgx-managed Postgres instance and start psql
 #[derive(Args, Debug)]
-#[clap(about = "compile/install extension to a pgx-managed Postgres instance and start psql")]
+#[clap(author)]
 pub(crate) struct Run {
+    /// Do you want to run against Postgres `pg10`, `pg11`, `pg12`, `pg13`, `pg14`?
     #[clap(
         env = "PG_VERSION",
-        help = "Do you want to run against Postgres 'pg10', 'pg11', 'pg12', 'pg13', 'pg14'?",
     )]
     pg_version: String,
+    /// The database to connect to (and create if the first time).  Defaults to a database with the same name as the current extension name
     #[clap(
         long,
-        help = "The database to connect to (and create if the first time).  Defaults to a database with the same name as the current extension name",
     )]
     dbname: Option<String>,
+    /// compile for release mode (default is debug)
     #[clap(
         env = "PROFILE",
         long,
         short,
-        help = "compile for release mode (default is debug)",
     )]
     release: bool,
+    /// don't regenerate the schema
     #[clap(
         long,
-        help = "Don't regenerate the schema",
     )]
     no_schema: bool,
+    /// additional cargo features to activate (default is '--no-default-features')
     #[clap(
         long,
-        help = "additional cargo features to activate (default is '--no-default-features')",
     )]
     features: Vec<String>,
 }
