@@ -76,7 +76,7 @@ impl ToTokens for Attribute {
                 quote! { pgx::datum::sql_entity_graph::ExternArgs::Name(String::from(#s)) }
             }
             Attribute::Cost(s) => {
-                quote! { pgx::datum::sql_entity_graph::ExternArgs::Cost(String::from(#s)) }
+                quote! { pgx::datum::sql_entity_graph::ExternArgs::Cost(format!("{}", #s)) }
             }
             Attribute::Requires(items) => {
                 let items_iter = items
