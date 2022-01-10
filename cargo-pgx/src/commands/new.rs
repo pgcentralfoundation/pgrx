@@ -8,7 +8,7 @@ use pgx_utils::exit_with_error;
 use crate::CommandExecute;
 
 /// Create a new extension crate
-#[derive(Args, Debug)]
+#[derive(clap::Args, Debug)]
 #[clap(author)]
 pub(crate) struct New {
     /// The name of the extension

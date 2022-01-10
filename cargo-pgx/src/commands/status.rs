@@ -9,7 +9,7 @@ use std::process::Stdio;
 use crate::CommandExecute;
 
 /// Is a pgx-managed Postgres instance running?
-#[derive(Args, Debug)]
+#[derive(clap::Args, Debug)]
 #[clap(author)]
 pub(crate) struct Status {
     /// The Postgres version

@@ -9,7 +9,7 @@ use pgx_utils::pg_config::PgConfig;
 use std::path::PathBuf;
 
 /// Create an installation package directory (in `./target/[debug|release]/extname-pgXX/`).
-#[derive(Args, Debug)]
+#[derive(clap::Args, Debug)]
 #[clap(author)]
 pub(crate) struct Package {
     /// Compile for debug mode (default is release)

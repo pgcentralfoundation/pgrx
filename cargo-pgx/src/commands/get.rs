@@ -10,7 +10,7 @@ use std::process::Command;
 use crate::CommandExecute;
 
 /// Get a property from the extension control file
-#[derive(Args, Debug)]
+#[derive(clap::Args, Debug)]
 #[clap(author)]
 pub(crate) struct Get {
     /// One of the properties from `$EXTENSION.control`

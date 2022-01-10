@@ -11,7 +11,7 @@ use pgx_utils::pg_config::{PgConfig, Pgx};
 use super::get::get_property;
 
 /// Connect, via psql, to a Postgres instance
-#[derive(Args, Debug)]
+#[derive(clap::Args, Debug)]
 #[clap(author)]
 pub(crate) struct Connect {
     /// Do you want to run against Postgres `pg10`, `pg11`, `pg12`, `pg13`, `pg14`?

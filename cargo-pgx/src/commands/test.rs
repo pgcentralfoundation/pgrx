@@ -9,7 +9,7 @@ use std::process::{Command, Stdio};
 use crate::CommandExecute;
 
 /// Run the test suite for this crate
-#[derive(Args, Debug)]
+#[derive(clap::Args, Debug)]
 #[clap(author)]
 pub(crate) struct Test {
     /// Do you want to run against Postgres `pg10`, `pg11`, `pg12`, `pg13`, `pg14`, or `all`?

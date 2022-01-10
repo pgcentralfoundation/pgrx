@@ -24,7 +24,7 @@ use symbolic::{
 ///
 /// The SQL generation process requires configuring a few settings in the crate.
 /// Normally `cargo pgx schema --force-default` can set these automatically.
-#[derive(Args, Debug)]
+#[derive(clap::Args, Debug)]
 #[clap(author)]
 pub(crate) struct Schema {
     /// Skip checking for required files

@@ -14,7 +14,7 @@ use std::process::Command;
 use super::get::get_property;
 
 /// Compile/install extension to a pgx-managed Postgres instance and start psql
-#[derive(Args, Debug)]
+#[derive(clap::Args, Debug)]
 #[clap(author)]
 pub(crate) struct Run {
     /// Do you want to run against Postgres `pg10`, `pg11`, `pg12`, `pg13`, `pg14`?

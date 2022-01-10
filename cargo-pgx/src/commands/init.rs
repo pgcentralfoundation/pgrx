@@ -33,7 +33,7 @@ static PROCESS_ENV_DENYLIST: &'static [&'static str] = &[
 ];
 
 /// Initize pgx development environment for the first time
-#[derive(Args, Debug)]
+#[derive(clap::Args, Debug)]
 #[clap(author)]
 pub(crate) struct Init {
     /// If installed locally, the path to PG10's `pgconfig` tool, or `downLoad` to have pgx download/compile/install it

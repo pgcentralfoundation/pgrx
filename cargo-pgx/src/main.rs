@@ -1,9 +1,6 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-#[macro_use]
-extern crate clap;
-
 mod commands;
 
 use clap::Parser;

@@ -8,7 +8,7 @@ use pgx_utils::pg_config::{PgConfig, PgConfigSelector, Pgx};
 use std::process::Stdio;
 
 /// Stop a pgx-managed Postgres instance
-#[derive(Args, Debug)]
+#[derive(clap::Args, Debug)]
 #[clap(author)]
 pub(crate) struct Stop {
     /// The Postgres version to stop (`pg10`, `pg11`, `pg12`, `pg13`, `pg14`, or `all`)

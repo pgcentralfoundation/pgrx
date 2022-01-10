@@ -11,7 +11,7 @@ use std::path::PathBuf;
 use std::process::{Command, Stdio};
 
 /// Install the extension from the current crate to the Postgres specified by whatever `pg_config` is currently on your $PATH
-#[derive(Args, Debug)]
+#[derive(clap::Args, Debug)]
 #[clap(author)]
 pub(crate) struct Install {
     /// Compile for release mode (default is debug)
