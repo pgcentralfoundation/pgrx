@@ -13,7 +13,7 @@ use std::process::Command;
 
 use super::get::get_property;
 
-/// compile/install extension to a pgx-managed Postgres instance and start psql
+/// Compile/install extension to a pgx-managed Postgres instance and start psql
 #[derive(Args, Debug)]
 #[clap(author)]
 pub(crate) struct Run {
@@ -24,20 +24,20 @@ pub(crate) struct Run {
     pg_version: String,
     /// The database to connect to (and create if the first time).  Defaults to a database with the same name as the current extension name
     dbname: Option<String>,
-    /// compile for release mode (default is debug)
+    /// Compile for release mode (default is debug)
     #[clap(
         env = "PROFILE",
         long,
         short,
     )]
     release: bool,
-    /// don't regenerate the schema
+    /// Don't regenerate the schema
     #[clap(
         long,
         short,
     )]
     no_schema: bool,
-    /// additional cargo features to activate (default is '--no-default-features')
+    /// Additional cargo features to activate (default is '--no-default-features')
     #[clap(
         long,
     )]

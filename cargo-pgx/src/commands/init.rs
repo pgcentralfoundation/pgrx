@@ -32,36 +32,36 @@ static PROCESS_ENV_DENYLIST: &'static [&'static str] = &[
     "LIBRARY_PATH", // see https://github.com/zombodb/pgx/issues/16
 ];
 
-/// initize pgx development environment for the first time
+/// Initize pgx development environment for the first time
 #[derive(Args, Debug)]
 #[clap(author)]
 pub(crate) struct Init {
-    /// if installed locally, the path to PG10's `pgconfig` tool, or `downLoad` to have pgx download/compile/install it
+    /// If installed locally, the path to PG10's `pgconfig` tool, or `downLoad` to have pgx download/compile/install it
     #[clap(
         env = "PG10_PG_CONFIG",
         long,
         help = "",
     )]
     pg10: Option<String>,
-    /// if installed locally, the path to PG11's `pgconfig` tool, or `downLoad` to have pgx download/compile/install it
+    /// If installed locally, the path to PG11's `pgconfig` tool, or `downLoad` to have pgx download/compile/install it
     #[clap(
         env = "PG11_PG_CONFIG",
         long,
     )]
     pg11: Option<String>,
-    /// if installed locally, the path to PG12's `pgconfig` tool, or `downLoad` to have pgx download/compile/install it
+    /// If installed locally, the path to PG12's `pgconfig` tool, or `downLoad` to have pgx download/compile/install it
     #[clap(
         env = "PG12_PG_CONFIG",
         long,
     )]
     pg12: Option<String>,
-    /// if installed locally, the path to PG13's `pgconfig` tool, or `downLoad` to have pgx download/compile/install it
+    /// If installed locally, the path to PG13's `pgconfig` tool, or `downLoad` to have pgx download/compile/install it
     #[clap(
         env = "PG13_PG_CONFIG",
         long,
     )]
     pg13: Option<String>,
-    /// if installed locally, the path to PG14's `pgconfig` tool, or `downLoad` to have pgx download/compile/install it
+    /// If installed locally, the path to PG14's `pgconfig` tool, or `downLoad` to have pgx download/compile/install it
     #[clap(
         env = "PG14_PG_CONFIG",
         long,

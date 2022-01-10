@@ -8,25 +8,25 @@ use pgx_utils::get_target_dir;
 use pgx_utils::pg_config::PgConfig;
 use std::path::PathBuf;
 
-/// create an installation package directory (in `./target/[debug|release]/extname-pgXX/`).
+/// Create an installation package directory (in `./target/[debug|release]/extname-pgXX/`).
 #[derive(Args, Debug)]
 #[clap(author)]
 pub(crate) struct Package {
-    /// compile for debug mode (default is release)
+    /// Compile for debug mode (default is release)
     #[clap(
         env = "PROFILE",
         long,
         short,
     )]
     debug: bool,
-    /// the `pg_config` path (default is first in $PATH)
+    /// The `pg_config` path (default is first in $PATH)
     #[clap(
         long,
         short = 'c',
         parse(from_os_str),
     )]
     pg_config: Option<PathBuf>,
-    /// additional cargo features to activate (default is '--no-default-features')
+    /// Additional cargo features to activate (default is '--no-default-features')
     #[clap(
         long,
     )]

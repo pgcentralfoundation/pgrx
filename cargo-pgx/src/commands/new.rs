@@ -7,13 +7,13 @@ use pgx_utils::exit_with_error;
 
 use crate::PgxCommand;
 
-/// create a new extension crate
+/// Create a new extension crate
 #[derive(Args, Debug)]
 #[clap(author)]
 pub(crate) struct New {
-    /// the name of the extension
+    /// The name of the extension
     name: String,
-    /// create a background worker template
+    /// Create a background worker template
     #[clap(
         long,
         short,

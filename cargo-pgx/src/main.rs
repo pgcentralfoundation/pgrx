@@ -48,7 +48,6 @@ impl PgxCommand for CargoSubcommands {
     }
 }
 
-/// cargo subcommand for 'pgx' to make Postgres extension development easy
 #[derive(clap::Args, Debug)]
 #[clap(about, author)]
 struct CargoPgxCommand {

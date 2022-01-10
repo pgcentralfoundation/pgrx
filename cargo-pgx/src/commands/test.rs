@@ -8,7 +8,7 @@ use std::process::{Command, Stdio};
 
 use crate::PgxCommand;
 
-/// run the test suite for this crate
+/// Run the test suite for this crate
 #[derive(Args, Debug)]
 #[clap(author)]
 pub(crate) struct Test {
@@ -18,7 +18,7 @@ pub(crate) struct Test {
         default_value = "all",
     )]
     pg_version: String,
-    /// if specified, only run tests containing this string in their names
+    /// If specified, only run tests containing this string in their names
     testname: Option<String>,
     /// compile for release mode (default is debug)
     #[clap(
@@ -27,18 +27,18 @@ pub(crate) struct Test {
         short,
     )]
     release: bool,
-    /// don't regenerate the schema
+    /// Don't regenerate the schema
     #[clap(
         long,
         short,
     )]
     no_schema: bool,
-    /// test all packages in the workspace
+    /// Test all packages in the workspace
     #[clap(
         long,
     )]
     workspace: bool,
-    /// additional cargo features to activate (default is `--no-default-features`)
+    /// Additional cargo features to activate (default is `--no-default-features`)
     #[clap(
         long,
     )]

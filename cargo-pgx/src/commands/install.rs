@@ -10,29 +10,29 @@ use pgx_utils::{exit_with_error, get_target_dir, handle_result};
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
 
-/// install the extension from the current crate to the Postgres specified by whatever `pg_config` is currently on your $PATH
+/// Install the extension from the current crate to the Postgres specified by whatever `pg_config` is currently on your $PATH
 #[derive(Args, Debug)]
 #[clap(author)]
 pub(crate) struct Install {
-    /// compile for release mode (default is debug)
+    /// Compile for release mode (default is debug)
     #[clap(
         env = "PROFILE",
         long,
         short,
     )]
     release: bool,
-    /// don't regenerate the schema
+    /// Don't regenerate the schema
     #[clap(
         long,
     )]
     no_schema: bool,
-    /// the `pg_config` path (default is first in $PATH)
+    /// The `pg_config` path (default is first in $PATH)
     #[clap(
         long,
         short = 'c',
     )]
     pg_config: Option<String>,
-    /// additional cargo features to activate (default is '--no-default-features')
+    /// Additional cargo features to activate (default is '--no-default-features')
     #[clap(
         long,
         short,

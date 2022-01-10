@@ -9,11 +9,11 @@ use std::process::Command;
 
 use crate::PgxCommand;
 
-/// get a property from the extension control file
+/// Get a property from the extension control file
 #[derive(Args, Debug)]
 #[clap(author)]
 pub(crate) struct Get {
-    /// one of the properties from `$EXTENSION.control`
+    /// One of the properties from `$EXTENSION.control`
     name: String,
 }
 
