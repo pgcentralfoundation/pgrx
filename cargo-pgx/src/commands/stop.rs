@@ -1,7 +1,7 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-use crate::{commands::status::status_postgres, PgxCommand};
+use crate::{commands::status::status_postgres, CommandExecute};
 use colored::Colorize;
 use pgx_utils::pg_config::{PgConfig, Pgx, PgConfigSelector};
 
@@ -18,7 +18,7 @@ pub(crate) struct Stop {
     pg_version: String,
 }
 
-impl PgxCommand for Stop {
+impl CommandExecute for Stop {
     fn execute(self) -> std::result::Result<(), std::io::Error> {
         let pgver = self.pg_version;
         let pgx = Pgx::from_config()?;

@@ -1,7 +1,7 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-use crate::PgxCommand;
+use crate::CommandExecute;
 use crate::commands::get::{find_control_file, get_property};
 use cargo_metadata::MetadataCommand;
 use colored::Colorize;
@@ -40,7 +40,7 @@ pub(crate) struct Install {
     features: Option<Vec<String>>,
 }
 
-impl PgxCommand for Install {
+impl CommandExecute for Install {
     fn execute(self) -> std::result::Result<(), std::io::Error> {
         let features = self.features.unwrap_or(vec![]);
         let pg_config = match std::env::var("PGX_TEST_MODE_VERSION") {

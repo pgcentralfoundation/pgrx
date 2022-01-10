@@ -1,7 +1,7 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-use crate::PgxCommand;
+use crate::CommandExecute;
 use crate::commands::run::exec_psql;
 use crate::commands::start::start_postgres;
 use colored::Colorize;
@@ -26,7 +26,7 @@ pub(crate) struct Connect {
     dbname: Option<String>,
 }
 
-impl PgxCommand for Connect {
+impl CommandExecute for Connect {
     fn execute(self) -> std::result::Result<(), std::io::Error> {
         let dbname = self.dbname.map_or_else(
             || get_property("extname").expect("could not determine extension name"),

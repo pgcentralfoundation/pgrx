@@ -1,7 +1,7 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-use crate::{PgxCommand, SUPPORTED_MAJOR_VERSIONS};
+use crate::{CommandExecute, SUPPORTED_MAJOR_VERSIONS};
 use crate::commands::stop::stop_postgres;
 use colored::Colorize;
 use pgx_utils::pg_config::{PgConfig, PgConfigSelector, Pgx};
@@ -69,7 +69,7 @@ pub(crate) struct Init {
     pg14: Option<String>,
 }
 
-impl PgxCommand for Init {
+impl CommandExecute for Init {
     fn execute(self) -> std::result::Result<(), std::io::Error> {
         let mut versions = HashMap::new();
 

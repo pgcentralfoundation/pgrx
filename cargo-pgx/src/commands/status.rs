@@ -6,7 +6,7 @@ use pgx_utils::pg_config::{PgConfig, Pgx, PgConfigSelector};
 use std::process::Stdio;
 use colored::Colorize;
 
-use crate::PgxCommand;
+use crate::CommandExecute;
 
 /// Is a pgx-managed Postgres instance running?
 #[derive(Args, Debug)]
@@ -19,7 +19,7 @@ pub(crate) struct Status {
     pg_version: String,
 }
 
-impl PgxCommand for Status {
+impl CommandExecute for Status {
     fn execute(self) -> std::result::Result<(), std::io::Error> {
         let pgver = self.pg_version;
         let pgx = Pgx::from_config()?;

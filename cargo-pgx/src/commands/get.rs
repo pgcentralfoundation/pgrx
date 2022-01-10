@@ -7,7 +7,7 @@ use std::io::{BufRead, BufReader};
 use std::path::PathBuf;
 use std::process::Command;
 
-use crate::PgxCommand;
+use crate::CommandExecute;
 
 /// Get a property from the extension control file
 #[derive(Args, Debug)]
@@ -17,7 +17,7 @@ pub(crate) struct Get {
     name: String,
 }
 
-impl PgxCommand for Get {
+impl CommandExecute for Get {
     fn execute(self) -> std::result::Result<(), std::io::Error> {
         if let Some(value) = get_property(&self.name) {
             println!("{}", value);

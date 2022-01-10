@@ -11,7 +11,7 @@ use pgx_utils::handle_result;
 use pgx_utils::{exit_with_error};
 const SUPPORTED_MAJOR_VERSIONS: &[u16] = &[10, 11, 12, 13, 14];
 
-trait PgxCommand {
+trait CommandExecute {
     fn execute(self) -> std::result::Result<(), std::io::Error>;
 }
 
@@ -28,7 +28,7 @@ struct CargoCommand {
     subcommand: CargoSubcommands,
 }
 
-impl PgxCommand for CargoCommand {
+impl CommandExecute for CargoCommand {
     fn execute(self) -> std::result::Result<(), std::io::Error> {
         self.subcommand.execute()
     }
@@ -39,7 +39,7 @@ enum CargoSubcommands {
     Pgx(CargoPgxCommand),
 }
 
-impl PgxCommand for CargoSubcommands {
+impl CommandExecute for CargoSubcommands {
     fn execute(self) -> std::result::Result<(), std::io::Error> {
         use CargoSubcommands::*;
         match self {
@@ -55,7 +55,7 @@ struct CargoPgxCommand {
     subcommand: CargoPgxSubCommands,
 }
 
-impl PgxCommand for CargoPgxCommand {
+impl CommandExecute for CargoPgxCommand {
     fn execute(self) -> std::result::Result<(), std::io::Error> {
         self.subcommand.execute()
     }
@@ -77,7 +77,7 @@ enum CargoPgxSubCommands {
     Get(commands::get::Get),
 }
 
-impl PgxCommand for CargoPgxSubCommands {
+impl CommandExecute for CargoPgxSubCommands {
     fn execute(self) -> std::result::Result<(), std::io::Error> {
         use CargoPgxSubCommands::*;
         match self {
@@ -104,6 +104,6 @@ fn main() -> std::result::Result<(), std::io::Error> {
 }
 
 fn do_it() -> std::result::Result<(), std::io::Error> {
-    let cargo_pgx = CargoCommand::parse();
-    cargo_pgx.execute()
+    let cargo_cli = CargoCommand::parse();
+    cargo_cli.execute()
 }

@@ -5,7 +5,7 @@ use std::{io::Write, os::unix::fs::PermissionsExt, path::PathBuf, str::FromStr};
 
 use pgx_utils::exit_with_error;
 
-use crate::PgxCommand;
+use crate::CommandExecute;
 
 /// Create a new extension crate
 #[derive(Args, Debug)]
@@ -21,7 +21,7 @@ pub(crate) struct New {
     bgworker: bool,
 }
 
-impl PgxCommand for New {
+impl CommandExecute for New {
     fn execute(self) -> std::result::Result<(), std::io::Error> {
         validate_extension_name(&self.name);
         let path = PathBuf::from_str(&format!("{}/", self.name)).unwrap();

@@ -1,4 +1,4 @@
-use crate::PgxCommand;
+use crate::CommandExecute;
 use crate::commands::get::find_control_file;
 use crate::commands::get::get_property;
 use colored::Colorize;
@@ -90,7 +90,7 @@ pub(crate) struct Schema {
     verbose: usize,
 }
 
-impl PgxCommand for Schema {
+impl CommandExecute for Schema {
     fn execute(self) -> std::result::Result<(), std::io::Error> {
         let (_, extname) = crate::commands::get::find_control_file();
         let out = self.out

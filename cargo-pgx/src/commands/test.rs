@@ -6,7 +6,7 @@ use pgx_utils::{exit_with_error, get_target_dir, handle_result};
 use std::fmt::Write;
 use std::process::{Command, Stdio};
 
-use crate::PgxCommand;
+use crate::CommandExecute;
 
 /// Run the test suite for this crate
 #[derive(Args, Debug)]
@@ -45,7 +45,7 @@ pub(crate) struct Test {
     features: Vec<String>,
 }
 
-impl PgxCommand for Test {
+impl CommandExecute for Test {
     fn execute(self) -> std::result::Result<(), std::io::Error> {
         let pgx = Pgx::from_config()?;
         for pg_config in pgx.iter(PgConfigSelector::new(&self.pg_version)) {
