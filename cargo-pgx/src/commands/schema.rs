@@ -360,7 +360,7 @@ pub(crate) fn generate_schema(
             .iter()
             .map(|f| f.to_string())
             .collect::<Vec<_>>()
-            .join(","),
+            .join(" "),
     );
 
     let command = command.stdout(Stdio::inherit()).stderr(Stdio::inherit());
