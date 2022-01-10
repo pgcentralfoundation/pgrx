@@ -420,7 +420,7 @@ macro_rules! pg_binary_magic {
                     env = "PGX_SQL_ENTITY_SYMBOLS",
                 )]
                 symbols: Vec<String>,
-            }    
+            }
 
             let sql_generator_cli = SqlGenerator::parse();
 

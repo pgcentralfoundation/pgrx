@@ -14,10 +14,7 @@ pub(crate) struct New {
     /// The name of the extension
     name: String,
     /// Create a background worker template
-    #[clap(
-        long,
-        short,
-    )]
+    #[clap(long, short)]
     bgworker: bool,
 }
 

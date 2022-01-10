@@ -1,6 +1,6 @@
-use crate::CommandExecute;
 use crate::commands::get::find_control_file;
 use crate::commands::get::get_property;
+use crate::CommandExecute;
 use colored::Colorize;
 use pgx_utils::pg_config::PgConfig;
 use pgx_utils::pg_config::Pgx;
@@ -21,86 +21,54 @@ use symbolic::{
 };
 
 /// Generate extension schema files
-/// 
+///
 /// The SQL generation process requires configuring a few settings in the crate.
 /// Normally `cargo pgx schema --force-default` can set these automatically.
 #[derive(Args, Debug)]
 #[clap(author)]
 pub(crate) struct Schema {
     /// Skip checking for required files
-    #[clap(
-        long,
-        short,
-    )]
+    #[clap(long, short)]
     manual: bool,
     /// Skip building the `sql-generator`, use an existing build
-    #[clap(
-        long,
-        short,
-    )]
+    #[clap(long, short)]
     skip_build: bool,
     /// Force the generation of default required files
-    #[clap(
-        long,
-        short,
-    )]
+    #[clap(long, short)]
     force_default: bool,
     /// Do you want to run against Postgres `pg10`, `pg11`, `pg12`, `pg13`, `pg14`?
     pg_version: Option<String>,
     /// Compile for release mode (default is debug)
-    #[clap(
-        env = "PROFILE",
-        long,
-        short,
-
-    )]
+    #[clap(env = "PROFILE", long, short)]
     release: bool,
     /// The `pg_config` path (default is first in $PATH)
-    #[clap(
-        long,
-        short = 'c',
-        parse(from_os_str),
-    )]
+    #[clap(long, short = 'c', parse(from_os_str))]
     pg_config: Option<PathBuf>,
     /// Additional cargo features to activate (default is `--no-default-features`)
-    #[clap(
-        long,
-    )]
+    #[clap(long)]
     features: Vec<String>,
     /// A path to output a produced SQL file (default is `sql/$EXTNAME-$VERSION.sql`)
-    #[clap(
-        long,
-        short,
-        parse(from_os_str),
-    )]
+    #[clap(long, short, parse(from_os_str))]
     out: Option<PathBuf>,
     /// A path to output a produced GraphViz DOT file
-    #[clap(
-        long,
-        short,
-        parse(from_os_str),
-    )]
+    #[clap(long, short, parse(from_os_str))]
     dot: Option<PathBuf>,
     /// Enable debug logging (`-vv` for trace)
-    #[clap(
-        long,
-        short = 'v',
-        parse(from_occurrences),
-    )]
+    #[clap(long, short = 'v', parse(from_occurrences))]
     verbose: usize,
 }
 
 impl CommandExecute for Schema {
     fn execute(self) -> std::result::Result<(), std::io::Error> {
         let (_, extname) = crate::commands::get::find_control_file();
-        let out = self.out
-            .unwrap_or_else(|| {
-                format!(
-                    "sql/{}-{}.sql",
-                    extname,
-                    crate::commands::install::get_version()
-                ).into()
-            });
+        let out = self.out.unwrap_or_else(|| {
+            format!(
+                "sql/{}-{}.sql",
+                extname,
+                crate::commands::install::get_version()
+            )
+            .into()
+        });
 
         let log_level = if let Ok(log_level) = std::env::var("RUST_LOG") {
             Some(log_level)
@@ -117,8 +85,9 @@ impl CommandExecute for Schema {
             Ok(pgver) => match Pgx::from_config()?.get(&pgver) {
                 Ok(pg_config) => pg_config.clone(),
                 Err(_) => {
-                    return Err(std::io::Error::new(std::io::ErrorKind::InvalidInput,
-                                                    "PGX_TEST_MODE_VERSION does not contain a valid postgres version number"
+                    return Err(std::io::Error::new(
+                        std::io::ErrorKind::InvalidInput,
+                        "PGX_TEST_MODE_VERSION does not contain a valid postgres version number",
                     ));
                 }
             },
@@ -134,11 +103,18 @@ impl CommandExecute for Schema {
         };
 
         generate_schema(
-            &pg_config, self.release, &self.features, &out, self.dot, log_level, self.force_default, self.manual, self.skip_build
+            &pg_config,
+            self.release,
+            &self.features,
+            &out,
+            self.dot,
+            log_level,
+            self.force_default,
+            self.manual,
+            self.skip_build,
         )
     }
 }
-
 
 pub(crate) fn generate_schema(
     pg_config: &PgConfig,
@@ -151,7 +127,10 @@ pub(crate) fn generate_schema(
     manual: bool,
     skip_build: bool,
 ) -> Result<(), std::io::Error> {
-    let additional_features = additional_features.iter().map(AsRef::as_ref).collect::<Vec<_>>();
+    let additional_features = additional_features
+        .iter()
+        .map(AsRef::as_ref)
+        .collect::<Vec<_>>();
     let (control_file, _extname) = find_control_file();
     let major_version = pg_config.major_version()?;
 

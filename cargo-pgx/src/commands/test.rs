@@ -13,35 +13,21 @@ use crate::CommandExecute;
 #[clap(author)]
 pub(crate) struct Test {
     /// Do you want to run against Postgres `pg10`, `pg11`, `pg12`, `pg13`, `pg14`, or `all`?
-    #[clap(
-        env = "PG_VERSION",
-        default_value = "all",
-    )]
+    #[clap(env = "PG_VERSION", default_value = "all")]
     pg_version: String,
     /// If specified, only run tests containing this string in their names
     testname: Option<String>,
     /// compile for release mode (default is debug)
-    #[clap(
-        env = "PROFILE",
-        long,
-        short,
-    )]
+    #[clap(env = "PROFILE", long, short)]
     release: bool,
     /// Don't regenerate the schema
-    #[clap(
-        long,
-        short,
-    )]
+    #[clap(long, short)]
     no_schema: bool,
     /// Test all packages in the workspace
-    #[clap(
-        long,
-    )]
+    #[clap(long)]
     workspace: bool,
     /// Additional cargo features to activate (default is `--no-default-features`)
-    #[clap(
-        long,
-    )]
+    #[clap(long)]
     features: Vec<String>,
 }
 
@@ -70,7 +56,10 @@ pub fn test_extension(
     additional_features: &Vec<impl AsRef<str>>,
     testname: Option<impl AsRef<str>>,
 ) -> Result<(), std::io::Error> {
-    let additional_features = additional_features.iter().map(AsRef::as_ref).collect::<Vec<_>>();
+    let additional_features = additional_features
+        .iter()
+        .map(AsRef::as_ref)
+        .collect::<Vec<_>>();
     let major_version = pg_config.major_version()?;
     let target_dir = get_target_dir();
 

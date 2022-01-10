@@ -1,10 +1,10 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-use pgx_utils::exit_with_error;
-use pgx_utils::pg_config::{PgConfig, Pgx, PgConfigSelector};
-use std::process::Stdio;
 use colored::Colorize;
+use pgx_utils::exit_with_error;
+use pgx_utils::pg_config::{PgConfig, PgConfigSelector, Pgx};
+use std::process::Stdio;
 
 use crate::CommandExecute;
 
@@ -13,9 +13,7 @@ use crate::CommandExecute;
 #[clap(author)]
 pub(crate) struct Status {
     /// The Postgres version
-    #[clap(
-        env = "PG_VERSION",
-    )]
+    #[clap(env = "PG_VERSION")]
     pg_version: String,
 }
 

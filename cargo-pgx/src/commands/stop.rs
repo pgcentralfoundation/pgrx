@@ -3,7 +3,7 @@
 
 use crate::{commands::status::status_postgres, CommandExecute};
 use colored::Colorize;
-use pgx_utils::pg_config::{PgConfig, Pgx, PgConfigSelector};
+use pgx_utils::pg_config::{PgConfig, PgConfigSelector, Pgx};
 
 use std::process::Stdio;
 
@@ -12,9 +12,7 @@ use std::process::Stdio;
 #[clap(author)]
 pub(crate) struct Stop {
     /// The Postgres version to stop (`pg10`, `pg11`, `pg12`, `pg13`, `pg14`, or `all`)
-    #[clap(
-        env = "PG_VERSION",
-    )]
+    #[clap(env = "PG_VERSION")]
     pg_version: String,
 }
 
@@ -26,7 +24,7 @@ impl CommandExecute for Stop {
         for pg_config in pgx.iter(PgConfigSelector::new(&pgver)) {
             stop_postgres(pg_config?)?
         }
-        
+
         Ok(())
     }
 }

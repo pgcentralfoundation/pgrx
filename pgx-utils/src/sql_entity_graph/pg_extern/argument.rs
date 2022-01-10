@@ -338,9 +338,6 @@ impl Parse for DefaultMacro {
         let ty = input.parse()?;
         let _comma: Token![,] = input.parse()?;
         let expr = input.parse()?;
-        Ok(Self {
-            ty,
-            expr,
-        })
+        Ok(Self { ty, expr })
     }
 }

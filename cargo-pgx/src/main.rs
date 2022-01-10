@@ -6,9 +6,9 @@ extern crate clap;
 
 mod commands;
 
-use clap::{Parser};
+use clap::Parser;
+use pgx_utils::exit_with_error;
 use pgx_utils::handle_result;
-use pgx_utils::{exit_with_error};
 const SUPPORTED_MAJOR_VERSIONS: &[u16] = &[10, 11, 12, 13, 14];
 
 trait CommandExecute {
@@ -21,7 +21,7 @@ trait CommandExecute {
     name = "cargo",
     bin_name = "cargo",
     version,
-    global_setting(clap::AppSettings::PropagateVersion),
+    global_setting(clap::AppSettings::PropagateVersion)
 )]
 struct CargoCommand {
     #[clap(subcommand)]
@@ -96,7 +96,6 @@ impl CommandExecute for CargoPgxSubCommands {
         }
     }
 }
-
 
 fn main() -> std::result::Result<(), std::io::Error> {
     handle_result!(do_it(), "");

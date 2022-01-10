@@ -1,9 +1,9 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-use crate::CommandExecute;
 use crate::commands::get::get_property;
 use crate::commands::install::install_extension;
+use crate::CommandExecute;
 use pgx_utils::get_target_dir;
 use pgx_utils::pg_config::PgConfig;
 use std::path::PathBuf;
@@ -13,23 +13,13 @@ use std::path::PathBuf;
 #[clap(author)]
 pub(crate) struct Package {
     /// Compile for debug mode (default is release)
-    #[clap(
-        env = "PROFILE",
-        long,
-        short,
-    )]
+    #[clap(env = "PROFILE", long, short)]
     debug: bool,
     /// The `pg_config` path (default is first in $PATH)
-    #[clap(
-        long,
-        short = 'c',
-        parse(from_os_str),
-    )]
+    #[clap(long, short = 'c', parse(from_os_str))]
     pg_config: Option<PathBuf>,
     /// Additional cargo features to activate (default is '--no-default-features')
-    #[clap(
-        long,
-    )]
+    #[clap(long)]
     features: Vec<String>,
 }
 

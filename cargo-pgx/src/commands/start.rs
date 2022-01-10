@@ -1,12 +1,12 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-use crate::CommandExecute;
 use crate::commands::init::initdb;
 use crate::commands::status::status_postgres;
+use crate::CommandExecute;
 use colored::Colorize;
 use pgx_utils::exit_with_error;
-use pgx_utils::pg_config::{PgConfig, Pgx, PgConfigSelector};
+use pgx_utils::pg_config::{PgConfig, PgConfigSelector, Pgx};
 use std::os::unix::process::CommandExt;
 use std::process::Stdio;
 
@@ -15,9 +15,7 @@ use std::process::Stdio;
 #[clap(author)]
 pub(crate) struct Start {
     /// The Postgres version to start (`pg10`, `pg11`, `pg12`, `pg13`, `pg14`, or `all`)
-    #[clap(
-        env = "PG_VERSION",
-    )]
+    #[clap(env = "PG_VERSION")]
     pg_version: String,
 }
 
@@ -29,7 +27,7 @@ impl CommandExecute for Start {
         for pg_config in pgx.iter(PgConfigSelector::new(&pgver)) {
             start_postgres(pg_config?)?
         }
-        
+
         Ok(())
     }
 }

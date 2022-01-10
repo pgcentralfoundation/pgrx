@@ -1,8 +1,8 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-use crate::CommandExecute;
 use crate::commands::get::{find_control_file, get_property};
+use crate::CommandExecute;
 use cargo_metadata::MetadataCommand;
 use colored::Colorize;
 use pgx_utils::pg_config::{PgConfig, Pgx};
@@ -15,28 +15,16 @@ use std::process::{Command, Stdio};
 #[clap(author)]
 pub(crate) struct Install {
     /// Compile for release mode (default is debug)
-    #[clap(
-        env = "PROFILE",
-        long,
-        short,
-    )]
+    #[clap(env = "PROFILE", long, short)]
     release: bool,
     /// Don't regenerate the schema
-    #[clap(
-        long,
-    )]
+    #[clap(long)]
     no_schema: bool,
     /// The `pg_config` path (default is first in $PATH)
-    #[clap(
-        long,
-        short = 'c',
-    )]
+    #[clap(long, short = 'c')]
     pg_config: Option<String>,
     /// Additional cargo features to activate (default is '--no-default-features')
-    #[clap(
-        long,
-        short,
-    )]
+    #[clap(long, short)]
     features: Option<Vec<String>>,
 }
 
@@ -48,9 +36,10 @@ impl CommandExecute for Install {
             Ok(pgver) => match Pgx::from_config()?.get(&pgver) {
                 Ok(pg_config) => pg_config.clone(),
                 Err(_) => {
-                    return Err(std::io::Error::new(std::io::ErrorKind::InvalidInput,
-                                                    "PGX_TEST_MODE_VERSION does not contain a valid postgres version number"
-                        ));
+                    return Err(std::io::Error::new(
+                        std::io::ErrorKind::InvalidInput,
+                        "PGX_TEST_MODE_VERSION does not contain a valid postgres version number",
+                    ));
                 }
             },
 
@@ -109,9 +98,9 @@ pub(crate) fn install_extension(
             // https://developer.apple.com/documentation/security/updating_mac_software
             if dest.exists() {
                 handle_result!(
-                std::fs::remove_file(&dest),
-                format!("unable to remove existing file {}", dest.display())
-            )
+                    std::fs::remove_file(&dest),
+                    format!("unable to remove existing file {}", dest.display())
+                )
             }
         }
         copy_file(&shlibpath, &dest, "shared library", false);
@@ -171,8 +160,15 @@ fn copy_file(src: &PathBuf, dest: &PathBuf, msg: &str, do_filter: bool) {
     }
 }
 
-pub(crate) fn build_extension(major_version: u16, is_release: bool, additional_features: &Vec<impl AsRef<str>>) {
-    let additional_features = additional_features.iter().map(AsRef::as_ref).collect::<Vec<_>>();
+pub(crate) fn build_extension(
+    major_version: u16,
+    is_release: bool,
+    additional_features: &Vec<impl AsRef<str>>,
+) {
+    let additional_features = additional_features
+        .iter()
+        .map(AsRef::as_ref)
+        .collect::<Vec<_>>();
     let mut features =
         std::env::var("PGX_BUILD_FEATURES").unwrap_or(format!("pg{}", major_version));
     let flags = std::env::var("PGX_BUILD_FLAGS").unwrap_or_default();

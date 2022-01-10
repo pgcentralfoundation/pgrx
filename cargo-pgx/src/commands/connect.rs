@@ -1,9 +1,9 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-use crate::CommandExecute;
 use crate::commands::run::exec_psql;
 use crate::commands::start::start_postgres;
+use crate::CommandExecute;
 use colored::Colorize;
 use pgx_utils::createdb;
 use pgx_utils::pg_config::{PgConfig, Pgx};
@@ -15,14 +15,10 @@ use super::get::get_property;
 #[clap(author)]
 pub(crate) struct Connect {
     /// Do you want to run against Postgres `pg10`, `pg11`, `pg12`, `pg13`, `pg14`?
-    #[clap(
-        env = "PG_VERSION",
-    )]
+    #[clap(env = "PG_VERSION")]
     pg_version: String,
     /// The database to connect to (and create if the first time).  Defaults to a database with the same name as the current extension name
-    #[clap(
-        env = "DBNAME",
-    )]
+    #[clap(env = "DBNAME")]
     dbname: Option<String>,
 }
 
