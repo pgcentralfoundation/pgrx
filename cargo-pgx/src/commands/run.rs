@@ -23,9 +23,6 @@ pub(crate) struct Run {
     )]
     pg_version: String,
     /// The database to connect to (and create if the first time).  Defaults to a database with the same name as the current extension name
-    #[clap(
-        long,
-    )]
     dbname: Option<String>,
     /// compile for release mode (default is debug)
     #[clap(
@@ -37,6 +34,7 @@ pub(crate) struct Run {
     /// don't regenerate the schema
     #[clap(
         long,
+        short,
     )]
     no_schema: bool,
     /// additional cargo features to activate (default is '--no-default-features')

@@ -46,10 +46,6 @@ pub(crate) struct Schema {
     )]
     force_default: bool,
     /// do you want to run against Postgres `pg10`, `pg11`, `pg12`, `pg13`, `pg14`?
-    #[clap(
-        long,
-        short,
-    )]
     pg_version: Option<String>,
     /// compile for release mode (default is debug)
     #[clap(

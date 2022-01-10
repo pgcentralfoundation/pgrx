@@ -17,7 +17,6 @@ pub(crate) struct Start {
     /// the Postgres version to start (`pg10`, `pg11`, `pg12`, `pg13`, `pg14`, or `all`)
     #[clap(
         env = "PG_VERSION",
-        long,
     )]
     pg_version: String,
 }

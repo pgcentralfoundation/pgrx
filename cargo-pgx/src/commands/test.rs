@@ -30,6 +30,7 @@ pub(crate) struct Test {
     /// don't regenerate the schema
     #[clap(
         long,
+        short,
     )]
     no_schema: bool,
     /// test all packages in the workspace

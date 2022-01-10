@@ -25,8 +25,8 @@ pub(crate) struct Install {
     #[clap(
         long,
     )]
-    /// the `pg_config` path (default is first in $PATH)
     no_schema: bool,
+    /// the `pg_config` path (default is first in $PATH)
     #[clap(
         long,
         short = 'c',

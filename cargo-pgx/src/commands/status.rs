@@ -15,7 +15,6 @@ pub(crate) struct Status {
     /// the Postgres version
     #[clap(
         env = "PG_VERSION",
-        long,
     )]
     pg_version: String,
 }

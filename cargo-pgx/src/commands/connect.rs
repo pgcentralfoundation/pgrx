@@ -17,12 +17,11 @@ pub(crate) struct Connect {
     /// do you want to run against Postgres `pg10`, `pg11`, `pg12`, `pg13`, `pg14`?
     #[clap(
         env = "PG_VERSION",
-        long,
     )]
     pg_version: String,
     /// the database to connect to (and create if the first time).  Defaults to a database with the same name as the current extension name
     #[clap(
-        long,
+        env = "DBNAME",
     )]
     dbname: Option<String>,
 }
