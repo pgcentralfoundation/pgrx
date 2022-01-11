@@ -18,7 +18,7 @@ pub(crate) struct Status {
 }
 
 impl CommandExecute for Status {
-    fn execute(self) -> std::result::Result<(), std::io::Error> {
+    fn execute(self) -> eyre::Result<()> {
         let pgver = self.pg_version;
         let pgx = Pgx::from_config()?;
 

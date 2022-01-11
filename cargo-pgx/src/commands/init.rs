@@ -5,7 +5,8 @@ use crate::commands::stop::stop_postgres;
 use crate::{CommandExecute, SUPPORTED_MAJOR_VERSIONS};
 use colored::Colorize;
 use pgx_utils::pg_config::{PgConfig, PgConfigSelector, Pgx};
-use pgx_utils::{exit_with_error, handle_result, prefix_path};
+use pgx_utils::{exit_with_error, prefix_path};
+use eyre::eyre as eyre_err;
 use rayon::prelude::*;
 use rttp_client::{types::Proxy, HttpClient};
 
@@ -54,7 +55,7 @@ pub(crate) struct Init {
 }
 
 impl CommandExecute for Init {
-    fn execute(self) -> std::result::Result<(), std::io::Error> {
+    fn execute(self) -> eyre::Result<()> {
         let mut versions = HashMap::new();
 
         if let Some(version) = self.pg10 {
@@ -103,7 +104,7 @@ impl CommandExecute for Init {
     }
 }
 
-pub(crate) fn init_pgx(pgx: &Pgx) -> std::result::Result<(), std::io::Error> {
+pub(crate) fn init_pgx(pgx: &Pgx) -> eyre::Result<()> {
     let dir = Pgx::home()?;
 
     let output_configs = Arc::new(Mutex::new(Vec::new()));
@@ -156,7 +157,7 @@ pub(crate) fn init_pgx(pgx: &Pgx) -> std::result::Result<(), std::io::Error> {
     Ok(())
 }
 
-fn download_postgres(pg_config: &PgConfig, pgxdir: &PathBuf) -> Result<PgConfig, std::io::Error> {
+fn download_postgres(pg_config: &PgConfig, pgxdir: &PathBuf) -> eyre::Result<PgConfig> {
     println!(
         "{} Postgres v{}.{} from {}",
         "  Downloading".bold().green(),
@@ -173,16 +174,13 @@ fn download_postgres(pg_config: &PgConfig, pgxdir: &PathBuf) -> Result<PgConfig,
     {
         http_client.proxy(Proxy::https(host, port as u32));
     }
-    let http_response = handle_result!(http_client.emit(), "");
+    let http_response = http_client.emit()?;
     if http_response.code() != 200 {
-        return Err(std::io::Error::new(
-            std::io::ErrorKind::InvalidInput,
-            format!(
-                "Problem downloading {}:\ncode={}\n{}",
-                pg_config.url().unwrap().to_string().yellow().bold(),
-                http_response.code(),
-                http_response.body().to_string()
-            ),
+        return Err(eyre_err!(
+            "Problem downloading {}:\ncode={}\n{}",
+            pg_config.url().unwrap().to_string().yellow().bold(),
+            http_response.code(),
+            http_response.body().to_string()
         ));
     }
     let pgdir = untar(http_response.body().binary(), pgxdir, pg_config)?;
@@ -323,7 +321,7 @@ fn make_postgres(pg_config: &PgConfig, pgdir: &PathBuf) -> Result<(), std::io::E
     }
 }
 
-fn make_install_postgres(version: &PgConfig, pgdir: &PathBuf) -> Result<PgConfig, std::io::Error> {
+fn make_install_postgres(version: &PgConfig, pgdir: &PathBuf) -> eyre::Result<PgConfig> {
     println!(
         "{} Postgres v{}.{} to {}",
         "   Installing".bold().green(),
@@ -353,14 +351,11 @@ fn make_install_postgres(version: &PgConfig, pgdir: &PathBuf) -> Result<PgConfig
         pg_config.push("pg_config");
         Ok(PgConfig::new(pg_config))
     } else {
-        Err(std::io::Error::new(
-            std::io::ErrorKind::Other,
-            format!(
-                "{}\n{}{}",
-                command_str,
-                String::from_utf8(output.stdout).unwrap(),
-                String::from_utf8(output.stderr).unwrap()
-            ),
+        Err(eyre_err!(
+            "{}\n{}{}",
+            command_str,
+            String::from_utf8(output.stdout).unwrap(),
+            String::from_utf8(output.stderr).unwrap()
         ))
     }
 }

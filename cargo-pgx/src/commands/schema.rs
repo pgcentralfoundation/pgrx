@@ -1,24 +1,29 @@
-use crate::commands::get::find_control_file;
-use crate::commands::get::get_property;
-use crate::CommandExecute;
+use crate::{
+    commands::get::{find_control_file, get_property},
+    CommandExecute,
+};
 use colored::Colorize;
-use pgx_utils::pg_config::PgConfig;
-use pgx_utils::pg_config::Pgx;
-use pgx_utils::{exit_with_error, handle_result};
-use std::collections::HashSet;
-use std::fs::File;
-use std::os::unix::prelude::MetadataExt;
-use std::os::unix::prelude::PermissionsExt;
-use std::path::PathBuf;
+use pgx_utils::{
+    pg_config::{
+        PgConfig,
+        Pgx,
+    },
+    exit_with_error,
+};
 use std::{
+    collections::HashSet,
     io::{Read, Write},
     path::Path,
     process::{Command, Stdio},
+    fs::File,
+    path::PathBuf,
+    os::unix::prelude::{MetadataExt, PermissionsExt},
 };
 use symbolic::{
     common::{ByteView, DSymPathExt},
     debuginfo::{Archive, SymbolIterator},
 };
+use eyre::{WrapErr, eyre as eyre_err};
 
 /// Generate extension schema files
 ///
@@ -59,16 +64,16 @@ pub(crate) struct Schema {
 }
 
 impl CommandExecute for Schema {
-    fn execute(self) -> std::result::Result<(), std::io::Error> {
-        let (_, extname) = crate::commands::get::find_control_file();
-        let out = self.out.unwrap_or_else(|| {
-            format!(
+    fn execute(self) -> eyre::Result<()> {
+        let (_, extname) = crate::commands::get::find_control_file()?;
+        let out = match self.out {
+            Some(out) => out,
+            None => format!(
                 "sql/{}-{}.sql",
                 extname,
-                crate::commands::install::get_version()
-            )
-            .into()
-        });
+                crate::commands::install::get_version()?,
+            ).into(),
+        };
 
         let log_level = if let Ok(log_level) = std::env::var("RUST_LOG") {
             Some(log_level)
@@ -84,12 +89,7 @@ impl CommandExecute for Schema {
             // for test mode, we want the pg_config specified in PGX_TEST_MODE_VERSION
             Ok(pgver) => match Pgx::from_config()?.get(&pgver) {
                 Ok(pg_config) => pg_config.clone(),
-                Err(_) => {
-                    return Err(std::io::Error::new(
-                        std::io::ErrorKind::InvalidInput,
-                        "PGX_TEST_MODE_VERSION does not contain a valid postgres version number",
-                    ));
-                }
+                Err(e) => return Err(e).wrap_err("PGX_TEST_MODE_VERSION does not contain a valid postgres version number"),
             },
 
             // otherwise, the user just ran "cargo pgx install", and we use whatever "pg_config" is configured
@@ -126,12 +126,12 @@ pub(crate) fn generate_schema(
     force_default: bool,
     manual: bool,
     skip_build: bool,
-) -> Result<(), std::io::Error> {
+) -> eyre::Result<()> {
     let additional_features = additional_features
         .iter()
         .map(AsRef::as_ref)
         .collect::<Vec<_>>();
-    let (control_file, _extname) = find_control_file();
+    let (control_file, _extname) = find_control_file()?;
     let major_version = pg_config.major_version()?;
 
     // If not manual, we should ensure a few files exist and are what is expected.
@@ -181,7 +181,7 @@ pub(crate) fn generate_schema(
         )?;
     }
 
-    if get_property("relocatable") != Some("false".into()) {
+    if get_property("relocatable")? != Some("false".into()) {
         exit_with_error!(
             "{}:  The `relocatable` property MUST be `false`.  Please update your .control file.",
             control_file.display()
@@ -228,12 +228,11 @@ pub(crate) fn generate_schema(
             features,
             command_str
         );
-        let status = handle_result!(
-            command.status(),
+        let status = command.status().wrap_err_with(||
             format!("failed to spawn cargo: {}", command_str)
-        );
+        )?;
         if !status.success() {
-            exit_with_error!("failed to build SQL generator");
+            return Err(eyre_err!("failed to build SQL generator"));
         }
     }
 
@@ -345,12 +344,11 @@ pub(crate) fn generate_schema(
     let command = command.stdout(Stdio::inherit()).stderr(Stdio::inherit());
     let command_str = format!("{:?}", command);
     println!("running SQL generator\n{}", command_str);
-    let status = handle_result!(
-        command.status(),
+    let status = command.status().wrap_err_with(||
         format!("failed to spawn sql-generator: {}", command_str)
-    );
+    )?;
     if !status.success() {
-        exit_with_error!("failed to run SQL generator");
+        return Err(eyre_err!("failed to run SQL generator"));
     }
     Ok(())
 }

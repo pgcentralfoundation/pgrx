@@ -1,15 +1,24 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-use crate::commands::install::install_extension;
-use crate::commands::start::start_postgres;
-use crate::commands::stop::stop_postgres;
-use crate::CommandExecute;
+use crate::{
+    commands::{
+        install::install_extension,
+        start::start_postgres,
+        stop::stop_postgres
+    },
+    CommandExecute
+};
 use colored::Colorize;
-use pgx_utils::createdb;
-use pgx_utils::pg_config::{PgConfig, Pgx};
-use std::os::unix::process::CommandExt;
-use std::process::Command;
+use pgx_utils::{
+    createdb,
+    pg_config::{PgConfig, Pgx},
+};
+use std::{
+    os::unix::process::CommandExt,
+    process::Command,
+};
+use eyre::eyre as eyre_err;
 
 use super::get::get_property;
 
@@ -34,11 +43,12 @@ pub(crate) struct Run {
 }
 
 impl CommandExecute for Run {
-    fn execute(self) -> std::result::Result<(), std::io::Error> {
-        let dbname = self.dbname.map_or_else(
-            || get_property("extname").expect("could not determine extension name"),
-            |v| v.to_string(),
-        );
+    fn execute(self) -> eyre::Result<()> {
+        let dbname = match self.dbname {
+            Some(dbname) => dbname,
+            None => get_property("extname")?
+                .ok_or(eyre_err!("could not determine extension name"))?
+        };
 
         run_psql(
             Pgx::from_config()?.get(&self.pg_version)?,
@@ -56,7 +66,7 @@ pub(crate) fn run_psql(
     is_release: bool,
     no_schema: bool,
     additional_features: &Vec<impl AsRef<str>>,
-) -> Result<(), std::io::Error> {
+) -> eyre::Result<()> {
     // stop postgres
     stop_postgres(pg_config)?;
 
@@ -79,7 +89,7 @@ pub(crate) fn run_psql(
     exec_psql(pg_config, dbname)
 }
 
-pub(crate) fn exec_psql(pg_config: &PgConfig, dbname: &str) -> Result<(), std::io::Error> {
+pub(crate) fn exec_psql(pg_config: &PgConfig, dbname: &str) -> eyre::Result<()> {
     let mut command = Command::new(pg_config.psql_path()?);
     command
         .env_remove("PGDATABASE")

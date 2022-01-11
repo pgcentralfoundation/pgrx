@@ -19,7 +19,7 @@ pub(crate) struct New {
 }
 
 impl CommandExecute for New {
-    fn execute(self) -> std::result::Result<(), std::io::Error> {
+    fn execute(self) -> eyre::Result<()> {
         validate_extension_name(&self.name);
         let path = PathBuf::from_str(&format!("{}/", self.name)).unwrap();
         create_crate_template(path, &self.name, self.bgworker)
@@ -38,7 +38,7 @@ pub(crate) fn create_crate_template(
     path: PathBuf,
     name: &str,
     is_bgworker: bool,
-) -> Result<(), std::io::Error> {
+) -> eyre::Result<()> {
     create_directory_structure(&path)?;
     create_control_file(&path, name)?;
     create_cargo_toml(&path, name)?;

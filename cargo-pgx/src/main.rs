@@ -4,12 +4,12 @@
 mod commands;
 
 use clap::Parser;
-use pgx_utils::exit_with_error;
-use pgx_utils::handle_result;
+use tracing_error::ErrorLayer;
+use tracing_subscriber::{EnvFilter, util::SubscriberInitExt, layer::SubscriberExt};
 const SUPPORTED_MAJOR_VERSIONS: &[u16] = &[10, 11, 12, 13, 14];
 
 trait CommandExecute {
-    fn execute(self) -> std::result::Result<(), std::io::Error>;
+    fn execute(self) -> eyre::Result<()>;
 }
 
 /// `cargo` stub for `cargo-pgx` (you probably meant to run `cargo pgx`)
@@ -26,7 +26,7 @@ struct CargoCommand {
 }
 
 impl CommandExecute for CargoCommand {
-    fn execute(self) -> std::result::Result<(), std::io::Error> {
+    fn execute(self) -> eyre::Result<()> {
         self.subcommand.execute()
     }
 }
@@ -37,7 +37,7 @@ enum CargoSubcommands {
 }
 
 impl CommandExecute for CargoSubcommands {
-    fn execute(self) -> std::result::Result<(), std::io::Error> {
+    fn execute(self) -> eyre::Result<()> {
         use CargoSubcommands::*;
         match self {
             Pgx(c) => c.execute(),
@@ -53,7 +53,7 @@ struct CargoPgxCommand {
 }
 
 impl CommandExecute for CargoPgxCommand {
-    fn execute(self) -> std::result::Result<(), std::io::Error> {
+    fn execute(self) -> eyre::Result<()> {
         self.subcommand.execute()
     }
 }
@@ -75,7 +75,7 @@ enum CargoPgxSubCommands {
 }
 
 impl CommandExecute for CargoPgxSubCommands {
-    fn execute(self) -> std::result::Result<(), std::io::Error> {
+    fn execute(self) -> eyre::Result<()> {
         use CargoPgxSubCommands::*;
         match self {
             Init(c) => c.execute(),
@@ -94,12 +94,27 @@ impl CommandExecute for CargoPgxSubCommands {
     }
 }
 
-fn main() -> std::result::Result<(), std::io::Error> {
-    handle_result!(do_it(), "");
-    Ok(())
+fn main() -> color_eyre::Result<()> {
+    // Initialize tracing with tracing-error, and eyre
+    let fmt_layer = tracing_subscriber::fmt::Layer::new()
+        .without_time()
+        .pretty();
+    // Unless the user opts in specifically we don't want to impact `cargo-pgx schema` output.
+    let filter_layer = EnvFilter::try_from_default_env()
+        .or_else(|_| EnvFilter::try_new("warn"))
+        .unwrap();
+    tracing_subscriber::registry()
+        .with(filter_layer)
+        .with(fmt_layer)
+        .with(ErrorLayer::default())
+        .init();
+
+    color_eyre::install()?;
+
+    do_it()
 }
 
-fn do_it() -> std::result::Result<(), std::io::Error> {
+fn do_it() -> eyre::Result<()> {
     let cargo_cli = CargoCommand::parse();
     cargo_cli.execute()
 }

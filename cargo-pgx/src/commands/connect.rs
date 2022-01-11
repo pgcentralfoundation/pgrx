@@ -1,12 +1,17 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-use crate::commands::run::exec_psql;
-use crate::commands::start::start_postgres;
-use crate::CommandExecute;
+use crate::{
+    commands::{
+        run::exec_psql,
+        start::start_postgres
+    },
+    CommandExecute,
+};
 use colored::Colorize;
 use pgx_utils::createdb;
 use pgx_utils::pg_config::{PgConfig, Pgx};
+use eyre::{WrapErr, eyre as eyre_err};
 
 use super::get::get_property;
 
@@ -23,16 +28,17 @@ pub(crate) struct Connect {
 }
 
 impl CommandExecute for Connect {
-    fn execute(self) -> std::result::Result<(), std::io::Error> {
-        let dbname = self.dbname.map_or_else(
-            || get_property("extname").expect("could not determine extension name"),
-            |v| v.to_string(),
-        );
+    fn execute(self) -> eyre::Result<()> {
+        let dbname = match self.dbname {
+            Some(dbname) => dbname,
+            None => get_property("extname").wrap_err("could not determine extension name")?
+                .ok_or(eyre_err!("extname not found in control file"))?,
+        };
         connect_psql(Pgx::from_config()?.get(&self.pg_version)?, &dbname)
     }
 }
 
-pub(crate) fn connect_psql(pg_config: &PgConfig, dbname: &str) -> Result<(), std::io::Error> {
+pub(crate) fn connect_psql(pg_config: &PgConfig, dbname: &str) -> eyre::Result<()> {
     // restart postgres
     start_postgres(pg_config)?;
 

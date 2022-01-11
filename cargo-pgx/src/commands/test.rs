@@ -1,10 +1,13 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-use pgx_utils::pg_config::{PgConfig, PgConfigSelector, Pgx};
-use pgx_utils::{exit_with_error, get_target_dir, handle_result};
+use pgx_utils::{
+    exit_with_error, get_target_dir,
+    pg_config::{PgConfig, PgConfigSelector, Pgx}
+};
 use std::fmt::Write;
 use std::process::{Command, Stdio};
+use eyre::WrapErr;
 
 use crate::CommandExecute;
 
@@ -32,7 +35,7 @@ pub(crate) struct Test {
 }
 
 impl CommandExecute for Test {
-    fn execute(self) -> std::result::Result<(), std::io::Error> {
+    fn execute(self) -> eyre::Result<()> {
         let pgx = Pgx::from_config()?;
         for pg_config in pgx.iter(PgConfigSelector::new(&self.pg_version)) {
             test_extension(
@@ -55,7 +58,7 @@ pub fn test_extension(
     test_workspace: bool,
     additional_features: &Vec<impl AsRef<str>>,
     testname: Option<impl AsRef<str>>,
-) -> Result<(), std::io::Error> {
+) -> eyre::Result<()> {
     let additional_features = additional_features
         .iter()
         .map(AsRef::as_ref)
@@ -96,7 +99,7 @@ pub fn test_extension(
     }
 
     eprintln!("{:?}", command);
-    let status = handle_result!(command.status(), "failed to run cargo test");
+    let status = command.status().wrap_err("failed to run cargo test")?;
     if !status.success() {
         exit_with_error!("cargo pgx test failed with status = {:?}", status.code())
     }
