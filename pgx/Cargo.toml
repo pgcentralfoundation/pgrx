@@ -36,9 +36,9 @@ seahash = "4.1.0"
 pgx-macros = { path = "../pgx-macros/", version = "0.2.6" }
 pgx-pg-sys = { path = "../pgx-pg-sys", version = "0.2.6" }
 pgx-utils = { path = "../pgx-utils/", version = "0.2.6" }
-serde = { version = "1.0.132", features = [ "derive" ] }
+serde = { version = "1.0.133", features = [ "derive" ] }
 serde_cbor = "0.11.2"
-serde_json = "1.0.73"
+serde_json = "1.0.74"
 time = { version = "0.3.5", features = ["formatting", "parsing", "alloc", "macros"] }
 atomic-traits = "0.3.0"
 heapless = "0.7.9"

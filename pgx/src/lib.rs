@@ -383,21 +383,46 @@ macro_rules! pg_binary_magic {
                     tracing,
                     tracing_subscriber::{self, util::SubscriberInitExt, layer::SubscriberExt, EnvFilter},
                     color_eyre,
-                    eyre::{self, eyre as eyre_err},
                     libloading,
                     clap,
                 },
                 PgxSql, SqlGraphEntity,
             };
             pub use $($prelude :: )*__pgx_marker;
-            use std::env;
+            use std::path::PathBuf;
+            use clap::Parser;
 
-            let matches = clap::App::new("sql-generator")
-                .arg(clap::Arg::with_name("sql").long("sql").value_name("FILE").takes_value(true))
-                .arg(clap::Arg::with_name("dot").long("dot").value_name("FILE").takes_value(true))
-                // The `cargo-pgx` tool passes via env.
-                .arg(clap::Arg::with_name("symbols").value_name("SYMBOL").env("PGX_SQL_ENTITY_SYMBOLS").use_delimiter(true).multiple(true).takes_value(true))
-                .get_matches();
+            #[derive(clap::Parser, Debug)]
+            #[clap(
+                version,
+                author,
+                about,
+            )]
+            struct SqlGenerator {
+                /// A path to output a produced SQL file (default is `sql/$EXTNAME-$VERSION.sql`)
+                #[clap(
+                    long,
+                    short,
+                    parse(from_os_str),
+                    env = "PGX_SQL_SQL",
+                )]
+                sql: Option<PathBuf>,
+                /// A path to output a produced GraphViz DOT file
+                #[clap(
+                    long,
+                    short,
+                    parse(from_os_str),
+                    env = "PGX_SQL_DOT",
+                )]
+                dot: Option<PathBuf>,
+                /// A path to output a produced GraphViz DOT file
+                #[clap(
+                    env = "PGX_SQL_ENTITY_SYMBOLS",
+                )]
+                symbols: Vec<String>,
+            }
+
+            let sql_generator_cli = SqlGenerator::parse();
 
             // Initialize tracing with tracing-error, and eyre
             let fmt_layer = tracing_subscriber::fmt::Layer::new()
@@ -414,21 +439,37 @@ macro_rules! pg_binary_magic {
                 .init();
             color_eyre::install()?;
 
-            let path = matches.value_of("sql").unwrap_or(concat!(
+            // Prior to 0.2.7 the `cargo-pgx pgx schema` command would pass symbols in comma-separated.
+            // This catches that, warns, and handles it.
+            let sql_generator_cli = if sql_generator_cli.symbols.len() == 1 && sql_generator_cli.symbols[0].contains(",") {
+                tracing::warn!("`pgx` 0.2.7 changed how schema arguments are passed to the `sql-generator`. You are using a post-0.2.7 `pgx` with a 0.2.6 (or earlier) `cargo-pgx`. Please update `cargo-pgx`.");
+                let mut sql_generator_cli = sql_generator_cli;
+                sql_generator_cli.symbols = sql_generator_cli.symbols[0].split(',').map(String::from).collect();
+                sql_generator_cli
+            } else if sql_generator_cli.symbols.len() == 1 && sql_generator_cli.symbols[0].contains(" ") {
+                // The symbols were passed via env var. (clap 3's API doesn't let us do this automatically it seems?)
+                let mut sql_generator_cli = sql_generator_cli;
+                sql_generator_cli.symbols = sql_generator_cli.symbols[0].split(' ').map(String::from).collect();
+                sql_generator_cli
+            } else { sql_generator_cli };
+
+            let path = sql_generator_cli.sql.unwrap_or(concat!(
                 "./sql/",
                 core::env!("CARGO_PKG_NAME"),
                 "--",
                 core::env!("CARGO_PKG_VERSION"),
                 ".sql"
             ).into());
-            let dot = matches.value_of("dot");
-            let symbols_to_call: Vec<_> = if let Some(symbols) = matches.values_of("symbols") {
-                symbols.flat_map(|x| if x.is_empty() { None } else { Some(x.to_string()) }).collect()
-            } else {
-                Default::default()
-            };
+            let dot = sql_generator_cli.dot;
 
-            tracing::info!(path = %path, "Collecting {} SQL entities", symbols_to_call.len());
+            let symbols_to_call: Vec<_> = sql_generator_cli.symbols.iter()
+                .flat_map(|x| if x.is_empty() {
+                    None
+                } else {
+                    Some(x.to_string())
+                }).collect();
+
+            tracing::info!(path = %path.display(), "Collecting {} SQL entities", symbols_to_call.len());
             let mut entities = Vec::default();
             let control_file = __pgx_marker()?; // We *must* use this or the extension might not link in.
             entities.push(SqlGraphEntity::ExtensionRoot(control_file));
@@ -443,12 +484,15 @@ macro_rules! pg_binary_magic {
                 }
             };
 
-            let pgx_sql = PgxSql::build(pgx::DEFAULT_TYPEID_SQL_MAPPING.clone().into_iter(), pgx::DEFAULT_SOURCE_ONLY_SQL_MAPPING.clone().into_iter(), entities.into_iter()).unwrap();
+            let pgx_sql = PgxSql::build(
+                pgx::DEFAULT_TYPEID_SQL_MAPPING.clone().into_iter(),
+                pgx::DEFAULT_SOURCE_ONLY_SQL_MAPPING.clone().into_iter(),
+                entities.into_iter()).unwrap();
 
-            tracing::info!(path = %path, "Writing SQL");
+            tracing::info!(path = %path.display(), "Writing SQL");
             pgx_sql.to_file(path)?;
             if let Some(dot_path) = dot {
-                tracing::info!(dot = %dot_path, "Writing Graphviz DOT");
+                tracing::info!(dot = %dot_path.display(), "Writing Graphviz DOT");
                 pgx_sql.to_dot(dot_path)?;
             }
             Ok(())

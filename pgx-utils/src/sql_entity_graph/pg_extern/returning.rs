@@ -281,44 +281,41 @@ pub(crate) struct NameMacro {
 impl Parse for NameMacro {
     fn parse(input: ParseStream) -> Result<Self, syn::Error> {
         let ident = input
-        .parse::<syn::Ident>()
-        .map(|v| v.to_string())
-        // Avoid making folks unable to use rust keywords.
-        .or_else(|_| {
-            input
-                .parse::<syn::Token![type]>()
-                .map(|_| String::from("type"))
-        })
-        .or_else(|_| {
-            input
-                .parse::<syn::Token![mod]>()
-                .map(|_| String::from("mod"))
-        })
-        .or_else(|_| {
-            input
-                .parse::<syn::Token![extern]>()
-                .map(|_| String::from("extern"))
-        })
-        .or_else(|_| {
-            input
-                .parse::<syn::Token![async]>()
-                .map(|_| String::from("async"))
-        })
-        .or_else(|_| {
-            input
-                .parse::<syn::Token![crate]>()
-                .map(|_| String::from("crate"))
-        })
-        .or_else(|_| {
-            input
-                .parse::<syn::Token![use]>()
-                .map(|_| String::from("use"))
-        })?;
+            .parse::<syn::Ident>()
+            .map(|v| v.to_string())
+            // Avoid making folks unable to use rust keywords.
+            .or_else(|_| {
+                input
+                    .parse::<syn::Token![type]>()
+                    .map(|_| String::from("type"))
+            })
+            .or_else(|_| {
+                input
+                    .parse::<syn::Token![mod]>()
+                    .map(|_| String::from("mod"))
+            })
+            .or_else(|_| {
+                input
+                    .parse::<syn::Token![extern]>()
+                    .map(|_| String::from("extern"))
+            })
+            .or_else(|_| {
+                input
+                    .parse::<syn::Token![async]>()
+                    .map(|_| String::from("async"))
+            })
+            .or_else(|_| {
+                input
+                    .parse::<syn::Token![crate]>()
+                    .map(|_| String::from("crate"))
+            })
+            .or_else(|_| {
+                input
+                    .parse::<syn::Token![use]>()
+                    .map(|_| String::from("use"))
+            })?;
         let _comma: Token![,] = input.parse()?;
         let ty = input.parse()?;
-        Ok(Self {
-            ident,
-            ty,
-        })
+        Ok(Self { ident, ty })
     }
 }

@@ -1,5 +1,5 @@
 use eyre::eyre as eyre_err;
-use std::{any::TypeId, collections::HashMap, fmt::Debug};
+use std::{any::TypeId, collections::HashMap, fmt::Debug, path::Path};
 
 use petgraph::{dot::Dot, graph::NodeIndex, stable_graph::StableGraph};
 use tracing::instrument;
@@ -190,7 +190,7 @@ impl PgxSql {
     }
 
     #[instrument(level = "error", skip(self))]
-    pub fn to_file(&self, file: impl AsRef<str> + Debug) -> eyre::Result<()> {
+    pub fn to_file(&self, file: impl AsRef<Path> + Debug) -> eyre::Result<()> {
         use std::{
             fs::{create_dir_all, File},
             io::Write,
@@ -209,7 +209,7 @@ impl PgxSql {
     }
 
     #[instrument(level = "error", err, skip(self))]
-    pub fn to_dot(&self, file: impl AsRef<str> + Debug) -> eyre::Result<()> {
+    pub fn to_dot(&self, file: impl AsRef<Path> + Debug) -> eyre::Result<()> {
         use std::{
             fs::{create_dir_all, File},
             io::Write,

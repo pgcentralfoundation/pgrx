@@ -1,9 +1,47 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
+use colored::Colorize;
 use pgx_utils::exit_with_error;
-use pgx_utils::pg_config::PgConfig;
+use pgx_utils::pg_config::{PgConfig, PgConfigSelector, Pgx};
 use std::process::Stdio;
+
+use crate::CommandExecute;
+
+/// Is a pgx-managed Postgres instance running?
+#[derive(clap::Args, Debug)]
+#[clap(author)]
+pub(crate) struct Status {
+    /// The Postgres version
+    #[clap(env = "PG_VERSION")]
+    pg_version: String,
+}
+
+impl CommandExecute for Status {
+    fn execute(self) -> std::result::Result<(), std::io::Error> {
+        let pgver = self.pg_version;
+        let pgx = Pgx::from_config()?;
+
+        for pg_config in pgx.iter(PgConfigSelector::new(&pgver)) {
+            let pg_config = pg_config?;
+            if status_postgres(pg_config)? {
+                println!(
+                    "Postgres v{} is {}",
+                    pg_config.major_version()?,
+                    "running".bold().green()
+                )
+            } else {
+                println!(
+                    "Postgres v{} is {}",
+                    pg_config.major_version()?,
+                    "stopped".bold().red()
+                )
+            }
+        }
+
+        Ok(())
+    }
+}
 
 pub(crate) fn status_postgres(pg_config: &PgConfig) -> Result<bool, std::io::Error> {
     let datadir = pg_config.data_dir()?;
