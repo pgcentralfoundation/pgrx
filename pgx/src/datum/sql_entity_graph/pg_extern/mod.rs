@@ -302,7 +302,7 @@ impl ToSql for PgExternEntity {
                 .map(|f| String::from("\n") + f + "\n")
                 .unwrap_or_default(),
         );
-        tracing::debug!(sql = %ext_sql);
+        tracing::trace!(sql = %ext_sql);
 
         let rendered = match (self.overridden, &self.operator) {
             (None, Some(op)) => {
@@ -374,7 +374,7 @@ impl ToSql for PgExternEntity {
                                            maybe_comma = if optionals.len() >= 1 { "," } else { "" },
                                            optionals = if !optionals.is_empty() { optionals.join(",\n") + "\n" } else { "".to_string() },
                 );
-                tracing::debug!(sql = %operator_sql);
+                tracing::trace!(sql = %operator_sql);
                 ext_sql + &operator_sql
             }
             (None, None) | (Some(_), Some(_)) | (Some(_), None) => ext_sql,

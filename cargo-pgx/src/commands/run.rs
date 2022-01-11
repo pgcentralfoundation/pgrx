@@ -2,23 +2,16 @@
 // governed by the MIT license that can be found in the LICENSE file.
 
 use crate::{
-    commands::{
-        install::install_extension,
-        start::start_postgres,
-        stop::stop_postgres
-    },
-    CommandExecute
+    commands::{install::install_extension, start::start_postgres, stop::stop_postgres},
+    CommandExecute,
 };
 use colored::Colorize;
+use eyre::eyre as eyre_err;
 use pgx_utils::{
     createdb,
     pg_config::{PgConfig, Pgx},
 };
-use std::{
-    os::unix::process::CommandExt,
-    process::Command,
-};
-use eyre::eyre as eyre_err;
+use std::{os::unix::process::CommandExt, process::Command};
 
 use super::get::get_property;
 
@@ -48,8 +41,9 @@ impl CommandExecute for Run {
     fn execute(self) -> eyre::Result<()> {
         let dbname = match self.dbname {
             Some(dbname) => dbname,
-            None => get_property("extname")?
-                .ok_or(eyre_err!("could not determine extension name"))?
+            None => {
+                get_property("extname")?.ok_or(eyre_err!("could not determine extension name"))?
+            }
         };
 
         run_psql(

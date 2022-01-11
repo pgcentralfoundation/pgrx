@@ -4,9 +4,9 @@
 use crate::commands::stop::stop_postgres;
 use crate::{CommandExecute, SUPPORTED_MAJOR_VERSIONS};
 use colored::Colorize;
-use pgx_utils::pg_config::{PgConfig, PgConfigSelector, Pgx};
-use pgx_utils::{exit_with_error, prefix_path};
 use eyre::eyre as eyre_err;
+use pgx_utils::pg_config::{PgConfig, PgConfigSelector, Pgx};
+use pgx_utils::prefix_path;
 use rayon::prelude::*;
 use rttp_client::{types::Proxy, HttpClient};
 
@@ -116,23 +116,26 @@ pub(crate) fn init_pgx(pgx: &Pgx) -> eyre::Result<()> {
         pg_configs.push(pg_config?);
     }
 
-    pg_configs.into_par_iter().for_each(|pg_config| {
+    pg_configs.into_par_iter().map(|pg_config| {
         let mut pg_config = pg_config.clone();
         stop_postgres(&pg_config).ok(); // no need to fail on errors trying to stop postgres while initializing
         if !pg_config.is_real() {
             pg_config = match download_postgres(&pg_config, &dir) {
                 Ok(pg_config) => pg_config,
-                Err(e) => exit_with_error!(e),
+                Err(e) => return Err(eyre_err!(e)),
             }
         }
 
         let mut mutex = output_configs.lock();
+        // PoisonError doesn't implement std::error::Error, can't `?` it.
         let output_configs = mutex.as_mut().expect("failed to get output_configs lock");
 
         output_configs.push(pg_config);
-    });
+        Ok(())
+    }).collect::<eyre::Result<()>>()?;
 
     let mut mutex = output_configs.lock();
+    // PoisonError doesn't implement std::error::Error, can't `?` it.
     let output_configs = mutex.as_mut().unwrap();
 
     output_configs.sort_by(|a, b| {
@@ -398,7 +401,7 @@ fn get_pg_installdir(pgdir: &PathBuf) -> PathBuf {
     dir
 }
 
-pub(crate) fn initdb(bindir: &PathBuf, datadir: &PathBuf) -> Result<(), std::io::Error> {
+pub(crate) fn initdb(bindir: &PathBuf, datadir: &PathBuf) -> eyre::Result<()> {
     println!(
         " {} data directory at {}",
         "Initializing".bold().green(),
@@ -415,11 +418,11 @@ pub(crate) fn initdb(bindir: &PathBuf, datadir: &PathBuf) -> Result<(), std::io:
     let output = command.output()?;
 
     if !output.status.success() {
-        exit_with_error!(
+        return Err(eyre_err!(
             "problem running initdb: {}\n{}",
             command_str,
             String::from_utf8(output.stderr).unwrap()
-        )
+        ))
     }
 
     Ok(())

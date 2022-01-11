@@ -420,17 +420,24 @@ macro_rules! pg_binary_magic {
                     env = "PGX_SQL_ENTITY_SYMBOLS",
                 )]
                 symbols: Vec<String>,
+                /// Enable info logs, -vv for debug, -vvv for trace
+                #[clap(short = 'v', long, parse(from_occurrences), global = true)]
+                verbose: usize,
             }
 
             let sql_generator_cli = SqlGenerator::parse();
 
             // Initialize tracing with tracing-error, and eyre
             let fmt_layer = tracing_subscriber::fmt::Layer::new()
-                .without_time()
                 .pretty();
             // Unless the user opts in specifically we don't want to impact `cargo-pgx schema` output.
             let filter_layer = EnvFilter::try_from_default_env()
-                .or_else(|_| EnvFilter::try_new("warn"))
+                .or_else(|_| match sql_generator_cli.verbose {
+                    0 => EnvFilter::try_new("warn"),
+                    1 => EnvFilter::try_new("info"),
+                    2 => EnvFilter::try_new("debug"),
+                    _ => EnvFilter::try_new("trace"),
+                })
                 .unwrap();
             tracing_subscriber::registry()
                 .with(filter_layer)

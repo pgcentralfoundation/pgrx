@@ -1,13 +1,13 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
+use eyre::WrapErr;
 use pgx_utils::{
     exit_with_error, get_target_dir,
-    pg_config::{PgConfig, PgConfigSelector, Pgx}
+    pg_config::{PgConfig, PgConfigSelector, Pgx},
 };
 use std::fmt::Write;
 use std::process::{Command, Stdio};
-use eyre::WrapErr;
 
 use crate::CommandExecute;
 

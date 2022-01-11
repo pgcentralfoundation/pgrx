@@ -2,14 +2,14 @@
 // governed by the MIT license that can be found in the LICENSE file.
 
 use crate::{
+    commands::get::{find_control_file, get_property},
     CommandExecute,
-    commands::get::{find_control_file, get_property}
 };
-use eyre::{WrapErr, eyre as eyre_err};
 use cargo_metadata::MetadataCommand;
 use colored::Colorize;
+use eyre::{eyre as eyre_err, WrapErr};
 use pgx_utils::pg_config::{PgConfig, Pgx};
-use pgx_utils::{exit_with_error, get_target_dir};
+use pgx_utils::get_target_dir;
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
 
@@ -36,19 +36,22 @@ pub(crate) struct Install {
 impl CommandExecute for Install {
     fn execute(self) -> eyre::Result<()> {
         let features = self.features.unwrap_or(vec![]);
-        let pg_config = match std::env::var("PGX_TEST_MODE_VERSION") {
-            // for test mode, we want the pg_config specified in PGX_TEST_MODE_VERSION
-            Ok(pgver) => match Pgx::from_config()?.get(&pgver) {
-                Ok(pg_config) => pg_config.clone(),
-                Err(e) => return Err(e).wrap_err("PGX_TEST_MODE_VERSION does not contain a valid postgres version number"),
-            },
+        let pg_config =
+            match std::env::var("PGX_TEST_MODE_VERSION") {
+                // for test mode, we want the pg_config specified in PGX_TEST_MODE_VERSION
+                Ok(pgver) => match Pgx::from_config()?.get(&pgver) {
+                    Ok(pg_config) => pg_config.clone(),
+                    Err(e) => return Err(e).wrap_err(
+                        "PGX_TEST_MODE_VERSION does not contain a valid postgres version number",
+                    ),
+                },
 
-            // otherwise, the user just ran "cargo pgx install", and we use whatever "pg_config" is configured
-            Err(_) => match self.pg_config {
-                None => PgConfig::from_path(),
-                Some(config) => PgConfig::new(PathBuf::from(config)),
-            },
-        };
+                // otherwise, the user just ran "cargo pgx install", and we use whatever "pg_config" is configured
+                Err(_) => match self.pg_config {
+                    None => PgConfig::from_path(),
+                    Some(config) => PgConfig::new(PathBuf::from(config)),
+                },
+            };
 
         install_extension(&pg_config, self.release, self.no_schema, None, &features)
     }
@@ -66,10 +69,10 @@ pub(crate) fn install_extension(
     let major_version = pg_config.major_version()?;
 
     if get_property("relocatable")? != Some("false".into()) {
-        exit_with_error!(
+        return Err(eyre_err!(
             "{}:  The `relocatable` property MUST be `false`.  Please update your .control file.",
             control_file.display()
-        )
+        ))
     }
 
     build_extension(major_version, is_release, &*additional_features)?;
@@ -97,9 +100,9 @@ pub(crate) fn install_extension(
             // issue highlighted by the following apple documentation:
             // https://developer.apple.com/documentation/security/updating_mac_software
             if dest.exists() {
-                return std::fs::remove_file(&dest).wrap_err_with(||
+                return std::fs::remove_file(&dest).wrap_err_with(|| {
                     format!("unable to remove existing file {}", dest.display())
-                );
+                });
             }
         }
         copy_file(&shlibpath, &dest, "shared library", false)?;
@@ -123,12 +126,12 @@ pub(crate) fn install_extension(
 
 fn copy_file(src: &PathBuf, dest: &PathBuf, msg: &str, do_filter: bool) -> eyre::Result<()> {
     if !dest.parent().unwrap().exists() {
-        return std::fs::create_dir_all(dest.parent().unwrap()).wrap_err_with(||
+        return std::fs::create_dir_all(dest.parent().unwrap()).wrap_err_with(|| {
             format!(
                 "failed to create destination directory {}",
                 dest.parent().unwrap().display()
             )
-        );
+        });
     }
 
     println!(
@@ -140,18 +143,17 @@ fn copy_file(src: &PathBuf, dest: &PathBuf, msg: &str, do_filter: bool) -> eyre:
 
     if do_filter {
         // we want to filter the contents of the file we're to copy
-        let input = std::fs::read_to_string(&src).wrap_err_with(||
-            format!("failed to read `{}`", src.display())
-        )?;
+        let input = std::fs::read_to_string(&src)
+            .wrap_err_with(|| format!("failed to read `{}`", src.display()))?;
         let input = filter_contents(input)?;
 
-        std::fs::write(&dest, &input).wrap_err_with(||
+        std::fs::write(&dest, &input).wrap_err_with(|| {
             format!("failed writing `{}` to `{}`", src.display(), dest.display())
-        )?;
+        })?;
     } else {
-        std::fs::copy(&src, &dest).wrap_err_with(||
+        std::fs::copy(&src, &dest).wrap_err_with(|| {
             format!("failed copying `{}` to `{}`", src.display(), dest.display())
-        )?;
+        })?;
     }
 
     Ok(())
@@ -197,9 +199,9 @@ pub(crate) fn build_extension(
         "building extension with features `{}`\n{}",
         features, command_str
     );
-    let status = command.status().wrap_err_with(||
-        format!("failed to spawn cargo: {}", command_str)
-    )?;
+    let status = command
+        .status()
+        .wrap_err_with(|| format!("failed to spawn cargo: {}", command_str))?;
     if !status.success() {
         Err(eyre_err!("failed to build extension"))
     } else {
@@ -265,12 +267,12 @@ pub(crate) fn find_library_file(extname: &str, is_release: bool) -> eyre::Result
     target_dir.push(if is_release { "release" } else { "debug" });
 
     if !target_dir.exists() {
-        exit_with_error!("target directory does not exist: {}", target_dir.display());
+        return Err(eyre_err!("target directory does not exist: {}", target_dir.display()));
     }
 
-    for f in std::fs::read_dir(&target_dir).wrap_err_with(||
-        format!("Unable to read {}", target_dir.display())
-    )? {
+    for f in std::fs::read_dir(&target_dir)
+        .wrap_err_with(|| format!("Unable to read {}", target_dir.display()))?
+    {
         if let Ok(f) = f {
             let filename = f.file_name().into_string().unwrap();
 
@@ -292,7 +294,10 @@ pub(crate) fn find_library_file(extname: &str, is_release: bool) -> eyre::Result
             extname
         ))
     } else {
-        Err(eyre_err!("library file not found in: `{}`", target_dir.display()))
+        Err(eyre_err!(
+            "library file not found in: `{}`",
+            target_dir.display()
+        ))
     }
 }
 

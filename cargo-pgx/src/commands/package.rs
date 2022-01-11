@@ -2,15 +2,12 @@
 // governed by the MIT license that can be found in the LICENSE file.
 
 use crate::{
-    commands::{
-        get::get_property,
-        install::install_extension,
-    },
+    commands::{get::get_property, install::install_extension},
     CommandExecute,
 };
+use eyre::eyre as eyre_err;
 use pgx_utils::{get_target_dir, pg_config::PgConfig};
 use std::path::PathBuf;
-use eyre::eyre as eyre_err;
 
 /// Create an installation package directory (in `./target/[debug|release]/extname-pgXX/`).
 #[derive(clap::Args, Debug)]
@@ -65,7 +62,8 @@ pub(crate) fn package_extension(
 fn build_base_path(pg_config: &PgConfig, is_debug: bool) -> eyre::Result<PathBuf> {
     let mut target_dir = get_target_dir();
     let pgver = pg_config.major_version()?;
-    let extname = get_property("extname")?.ok_or(eyre_err!("could not determine extension name"))?;
+    let extname =
+        get_property("extname")?.ok_or(eyre_err!("could not determine extension name"))?;
     target_dir.push(if is_debug { "debug" } else { "release" });
     target_dir.push(format!("{}-pg{}", extname, pgver));
     Ok(target_dir)

@@ -3,27 +3,24 @@ use crate::{
     CommandExecute,
 };
 use colored::Colorize;
+use eyre::{eyre as eyre_err, WrapErr};
 use pgx_utils::{
-    pg_config::{
-        PgConfig,
-        Pgx,
-    },
     exit_with_error,
+    pg_config::{PgConfig, Pgx},
 };
 use std::{
     collections::HashSet,
-    io::{Read, Write},
-    path::Path,
-    process::{Command, Stdio},
     fs::File,
-    path::PathBuf,
+    io::{Read, Write},
     os::unix::prelude::{MetadataExt, PermissionsExt},
+    path::Path,
+    path::PathBuf,
+    process::{Command, Stdio},
 };
 use symbolic::{
     common::{ByteView, DSymPathExt},
     debuginfo::{Archive, SymbolIterator},
 };
-use eyre::{WrapErr, eyre as eyre_err};
 
 /// Generate extension schema files
 ///
@@ -71,35 +68,40 @@ impl CommandExecute for Schema {
                 "sql/{}-{}.sql",
                 extname,
                 crate::commands::install::get_version()?,
-            ).into(),
+            )
+            .into(),
         };
 
         let log_level = if let Ok(log_level) = std::env::var("RUST_LOG") {
             Some(log_level)
         } else {
             match self.verbose {
-                0 => None,
-                1 => Some("debug".to_string()),
-                _ => Some("trace".to_string()),
+                0 => Some("warn".into()),
+                1 => Some("info".into()),
+                2 => Some("debug".into()),
+                _ => Some("trace".into()),
             }
         };
 
-        let pg_config = match std::env::var("PGX_TEST_MODE_VERSION") {
-            // for test mode, we want the pg_config specified in PGX_TEST_MODE_VERSION
-            Ok(pgver) => match Pgx::from_config()?.get(&pgver) {
-                Ok(pg_config) => pg_config.clone(),
-                Err(e) => return Err(e).wrap_err("PGX_TEST_MODE_VERSION does not contain a valid postgres version number"),
-            },
-
-            // otherwise, the user just ran "cargo pgx install", and we use whatever "pg_config" is configured
-            Err(_) => match self.pg_config {
-                None => match self.pg_version {
-                    None => PgConfig::from_path(),
-                    Some(pgver) => Pgx::from_config()?.get(&pgver)?.clone(),
+        let pg_config =
+            match std::env::var("PGX_TEST_MODE_VERSION") {
+                // for test mode, we want the pg_config specified in PGX_TEST_MODE_VERSION
+                Ok(pgver) => match Pgx::from_config()?.get(&pgver) {
+                    Ok(pg_config) => pg_config.clone(),
+                    Err(e) => return Err(e).wrap_err(
+                        "PGX_TEST_MODE_VERSION does not contain a valid postgres version number",
+                    ),
                 },
-                Some(config) => PgConfig::new(PathBuf::from(config)),
-            },
-        };
+
+                // otherwise, the user just ran "cargo pgx install", and we use whatever "pg_config" is configured
+                Err(_) => match self.pg_config {
+                    None => match self.pg_version {
+                        None => PgConfig::from_path(),
+                        Some(pgver) => Pgx::from_config()?.get(&pgver)?.clone(),
+                    },
+                    Some(config) => PgConfig::new(PathBuf::from(config)),
+                },
+            };
 
         generate_schema(
             &pg_config,
@@ -227,9 +229,9 @@ pub(crate) fn generate_schema(
             features,
             command_str
         );
-        let status = command.status().wrap_err_with(||
-            format!("failed to spawn cargo: {}", command_str)
-        )?;
+        let status = command
+            .status()
+            .wrap_err_with(|| format!("failed to spawn cargo: {}", command_str))?;
         if !status.success() {
             return Err(eyre_err!("failed to build SQL generator"));
         }
@@ -339,13 +341,16 @@ pub(crate) fn generate_schema(
             .collect::<Vec<_>>()
             .join(" "),
     );
+    if let Some(log_level) = &log_level {
+        command.env("RUST_LOG", log_level);
+    }
 
     let command = command.stdout(Stdio::inherit()).stderr(Stdio::inherit());
     let command_str = format!("{:?}", command);
     println!("running SQL generator\n{}", command_str);
-    let status = command.status().wrap_err_with(||
-        format!("failed to spawn sql-generator: {}", command_str)
-    )?;
+    let status = command
+        .status()
+        .wrap_err_with(|| format!("failed to spawn sql-generator: {}", command_str))?;
     if !status.success() {
         return Err(eyre_err!("failed to run SQL generator"));
     }

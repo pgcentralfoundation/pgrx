@@ -1,9 +1,11 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-use std::{io::Write, os::unix::fs::PermissionsExt, path::PathBuf, str::FromStr};
-
-use pgx_utils::exit_with_error;
+use std::{
+    io::Write, os::unix::fs::PermissionsExt,
+    path::PathBuf, str::FromStr
+};
+use eyre::eyre as eyre_err;
 
 use crate::CommandExecute;
 
@@ -22,18 +24,19 @@ pub(crate) struct New {
 
 impl CommandExecute for New {
     fn execute(self) -> eyre::Result<()> {
-        validate_extension_name(&self.name);
+        validate_extension_name(&self.name)?;
         let path = PathBuf::from_str(&format!("{}/", self.name)).unwrap();
         create_crate_template(path, &self.name, self.bgworker)
     }
 }
 
-fn validate_extension_name(extname: &str) {
+fn validate_extension_name(extname: &str) -> eyre::Result<()>{
     for c in extname.chars() {
         if !c.is_alphanumeric() && c != '_' && !c.is_lowercase() {
-            exit_with_error!("Extension name must be in the set of [a-z0-9_]")
+            return Err(eyre_err!("Extension name must be in the set of [a-z0-9_]"))
         }
     }
+    Ok(())
 }
 
 pub(crate) fn create_crate_template(

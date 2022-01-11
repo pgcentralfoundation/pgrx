@@ -2,9 +2,9 @@
 // governed by the MIT license that can be found in the LICENSE file.
 
 use colored::Colorize;
-use pgx_utils::exit_with_error;
 use pgx_utils::pg_config::{PgConfig, PgConfigSelector, Pgx};
 use std::process::Stdio;
+use eyre::eyre as eyre_err;
 
 use crate::CommandExecute;
 
@@ -45,7 +45,7 @@ impl CommandExecute for Status {
     }
 }
 
-pub(crate) fn status_postgres(pg_config: &PgConfig) -> Result<bool, std::io::Error> {
+pub(crate) fn status_postgres(pg_config: &PgConfig) -> eyre::Result<bool> {
     let datadir = pg_config.data_dir()?;
     let bindir = pg_config.bin_dir()?;
 
@@ -69,11 +69,11 @@ pub(crate) fn status_postgres(pg_config: &PgConfig) -> Result<bool, std::io::Err
     let is_stopped = code == 3; // not running
 
     if !is_running && !is_stopped {
-        exit_with_error!(
+        return Err(eyre_err!(
             "problem running pg_ctl: {}\n\n{}",
             command_str,
             String::from_utf8(output.stderr).unwrap()
-        )
+        ))
     }
 
     // a status code of zero means it's running

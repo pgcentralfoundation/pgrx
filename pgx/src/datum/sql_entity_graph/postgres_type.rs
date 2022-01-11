@@ -142,7 +142,6 @@ impl ToSql for PostgresTypeEntity {
             .externs
             .iter()
             .find(|(k, _v)| {
-                tracing::trace!(%k.full_path, %out_fn_path, "Checked");
                 (**k).full_path == out_fn_path.as_str()
             })
             .ok_or_else(|| eyre::eyre!("Did not find `out_fn: {}`.", out_fn_path))?;
@@ -172,7 +171,7 @@ impl ToSql for PostgresTypeEntity {
             line = item.line,
             name = item.name,
         );
-        tracing::debug!(sql = %shell_type);
+        tracing::trace!(sql = %shell_type);
 
         let materialized_type = format!("\n\
                                 -- {file}:{line}\n\
@@ -196,7 +195,7 @@ impl ToSql for PostgresTypeEntity {
                                         out_fn = item.out_fn,
                                         out_fn_path = out_fn_path,
         );
-        tracing::debug!(sql = %materialized_type);
+        tracing::trace!(sql = %materialized_type);
 
         Ok(shell_type + "\n" + &in_fn_sql + "\n" + &out_fn_sql + "\n" + &materialized_type)
     }

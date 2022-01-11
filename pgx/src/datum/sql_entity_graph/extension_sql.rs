@@ -100,7 +100,7 @@ impl ToSql for ExtensionSqlEntity {
             finalize = if self.finalize { "-- finalize\n" } else { "" },
             sql = self.sql,
         );
-        tracing::debug!(%sql);
+        tracing::trace!(%sql);
         Ok(sql)
     }
 }

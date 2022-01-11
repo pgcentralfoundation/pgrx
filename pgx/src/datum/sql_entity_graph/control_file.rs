@@ -142,7 +142,7 @@ impl ToSql for ControlFile {
             */\
         "
         );
-        tracing::debug!(%sql);
+        tracing::trace!(%sql);
         Ok(sql)
     }
 }

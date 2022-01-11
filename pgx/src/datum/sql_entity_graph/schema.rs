@@ -60,7 +60,7 @@ impl ToSql for SchemaEntity {
             line = self.line,
             module_path = self.module_path,
         );
-        tracing::debug!(%sql);
+        tracing::trace!(%sql);
         Ok(sql)
     }
 }

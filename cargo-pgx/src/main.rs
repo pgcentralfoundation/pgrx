@@ -5,7 +5,7 @@ mod commands;
 
 use clap::Parser;
 use tracing_error::ErrorLayer;
-use tracing_subscriber::{EnvFilter, util::SubscriberInitExt, layer::SubscriberExt};
+use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
 const SUPPORTED_MAJOR_VERSIONS: &[u16] = &[10, 11, 12, 13, 14];
 
 trait CommandExecute {
@@ -23,13 +23,8 @@ trait CommandExecute {
 struct CargoCommand {
     #[clap(subcommand)]
     subcommand: CargoSubcommands,
-    /// Verbose debug logs, -vv for trace
-    #[clap(
-        short = 'v',
-        long,
-        parse(from_occurrences),
-        global = true,
-    )]
+    /// Enable info logs, -vv for debug, -vvv for trace
+    #[clap(short = 'v', long, parse(from_occurrences), global = true)]
     verbose: usize,
 }
 
@@ -109,13 +104,14 @@ fn main() -> color_eyre::Result<()> {
 
     // Initialize tracing with tracing-error, and eyre
     let fmt_layer = tracing_subscriber::fmt::Layer::new()
-        .without_time()
         .pretty();
+
     // Unless the user opts in specifically we don't want to impact `cargo-pgx schema` output.
     let filter_layer = EnvFilter::try_from_default_env()
         .or_else(|_| match cargo_cli.verbose {
-            0 => EnvFilter::try_new("info"),
-            1 => EnvFilter::try_new("debug"),
+            0 => EnvFilter::try_new("warn"),
+            1 => EnvFilter::try_new("info"),
+            2 => EnvFilter::try_new("debug"),
             _ => EnvFilter::try_new("trace"),
         })
         .unwrap();
@@ -126,6 +122,11 @@ fn main() -> color_eyre::Result<()> {
         .init();
 
     color_eyre::install()?;
+
+    tracing::warn!("AT WARN");
+    tracing::info!("AT INFO");
+    tracing::debug!("AT debug");
+    tracing::trace!("AT trace");
 
     cargo_cli.execute()
 }
