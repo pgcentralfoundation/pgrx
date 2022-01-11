@@ -25,6 +25,8 @@ pub(crate) struct Connect {
     /// The database to connect to (and create if the first time).  Defaults to a database with the same name as the current extension name
     #[clap(env = "DBNAME")]
     dbname: Option<String>,
+    #[clap(from_global, parse(from_occurrences))]
+    verbose: usize,
 }
 
 impl CommandExecute for Connect {

@@ -25,6 +25,8 @@ pub(crate) struct Package {
     /// Additional cargo features to activate (default is '--no-default-features')
     #[clap(long)]
     features: Vec<String>,
+    #[clap(from_global, parse(from_occurrences))]
+    verbose: usize,
 }
 
 impl CommandExecute for Package {

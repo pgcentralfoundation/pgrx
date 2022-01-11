@@ -16,6 +16,8 @@ pub(crate) struct New {
     /// Create a background worker template
     #[clap(long, short)]
     bgworker: bool,
+    #[clap(from_global, parse(from_occurrences))]
+    verbose: usize,
 }
 
 impl CommandExecute for New {

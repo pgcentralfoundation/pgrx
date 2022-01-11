@@ -15,6 +15,8 @@ pub(crate) struct Status {
     /// The Postgres version
     #[clap(env = "PG_VERSION")]
     pg_version: String,
+    #[clap(from_global, parse(from_occurrences))]
+    verbose: usize,
 }
 
 impl CommandExecute for Status {

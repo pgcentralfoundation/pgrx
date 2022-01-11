@@ -23,6 +23,14 @@ trait CommandExecute {
 struct CargoCommand {
     #[clap(subcommand)]
     subcommand: CargoSubcommands,
+    /// Verbose debug logs, -vv for trace
+    #[clap(
+        short = 'v',
+        long,
+        parse(from_occurrences),
+        global = true,
+    )]
+    verbose: usize,
 }
 
 impl CommandExecute for CargoCommand {
@@ -50,6 +58,8 @@ impl CommandExecute for CargoSubcommands {
 struct CargoPgxCommand {
     #[clap(subcommand)]
     subcommand: CargoPgxSubCommands,
+    #[clap(from_global, parse(from_occurrences))]
+    verbose: usize,
 }
 
 impl CommandExecute for CargoPgxCommand {
@@ -95,13 +105,19 @@ impl CommandExecute for CargoPgxSubCommands {
 }
 
 fn main() -> color_eyre::Result<()> {
+    let cargo_cli = CargoCommand::parse();
+
     // Initialize tracing with tracing-error, and eyre
     let fmt_layer = tracing_subscriber::fmt::Layer::new()
         .without_time()
         .pretty();
     // Unless the user opts in specifically we don't want to impact `cargo-pgx schema` output.
     let filter_layer = EnvFilter::try_from_default_env()
-        .or_else(|_| EnvFilter::try_new("warn"))
+        .or_else(|_| match cargo_cli.verbose {
+            0 => EnvFilter::try_new("info"),
+            1 => EnvFilter::try_new("debug"),
+            _ => EnvFilter::try_new("trace"),
+        })
         .unwrap();
     tracing_subscriber::registry()
         .with(filter_layer)
@@ -111,10 +127,5 @@ fn main() -> color_eyre::Result<()> {
 
     color_eyre::install()?;
 
-    do_it()
-}
-
-fn do_it() -> eyre::Result<()> {
-    let cargo_cli = CargoCommand::parse();
     cargo_cli.execute()
 }

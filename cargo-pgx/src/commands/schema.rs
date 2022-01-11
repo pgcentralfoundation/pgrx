@@ -58,8 +58,7 @@ pub(crate) struct Schema {
     /// A path to output a produced GraphViz DOT file
     #[clap(long, short, parse(from_os_str))]
     dot: Option<PathBuf>,
-    /// Enable debug logging (`-vv` for trace)
-    #[clap(long, short = 'v', parse(from_occurrences))]
+    #[clap(from_global, parse(from_occurrences))]
     verbose: usize,
 }
 

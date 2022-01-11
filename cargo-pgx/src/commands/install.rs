@@ -29,6 +29,8 @@ pub(crate) struct Install {
     /// Additional cargo features to activate (default is '--no-default-features')
     #[clap(long, short)]
     features: Option<Vec<String>>,
+    #[clap(from_global, parse(from_occurrences))]
+    verbose: usize,
 }
 
 impl CommandExecute for Install {

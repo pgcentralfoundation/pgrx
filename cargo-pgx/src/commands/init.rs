@@ -52,6 +52,8 @@ pub(crate) struct Init {
     /// If installed locally, the path to PG14's `pgconfig` tool, or `downLoad` to have pgx download/compile/install it
     #[clap(env = "PG14_PG_CONFIG", long)]
     pg14: Option<String>,
+    #[clap(from_global, parse(from_occurrences))]
+    verbose: usize,
 }
 
 impl CommandExecute for Init {

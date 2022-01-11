@@ -15,6 +15,8 @@ use crate::CommandExecute;
 pub(crate) struct Get {
     /// One of the properties from `$EXTENSION.control`
     name: String,
+    #[clap(from_global, parse(from_occurrences))]
+    verbose: usize,
 }
 
 impl CommandExecute for Get {
