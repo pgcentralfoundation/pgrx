@@ -20,6 +20,7 @@ pub(crate) struct Status {
 }
 
 impl CommandExecute for Status {
+    #[tracing::instrument(level = "info", skip(self))]
     fn execute(self) -> eyre::Result<()> {
         let pgver = self.pg_version;
         let pgx = Pgx::from_config()?;
@@ -63,8 +64,10 @@ pub(crate) fn status_postgres(pg_config: &PgConfig) -> eyre::Result<bool> {
         .arg("-D")
         .arg(&datadir);
     let command_str = format!("{:?}", command);
+    tracing::debug!(command = %command_str, "Running");
     let output = command.output()?;
     let code = output.status.code().unwrap();
+    tracing::trace!(exit_code = %code, command = %command_str, "Finished");
     let is_running = code == 0; // running
     let is_stopped = code == 3; // not running
 

@@ -2,15 +2,13 @@
 // governed by the MIT license that can be found in the LICENSE file.
 
 use crate::{
-    commands::{run::exec_psql, start::start_postgres},
+    command::{run::exec_psql, start::start_postgres, get::get_property},
     CommandExecute,
 };
 use colored::Colorize;
 use eyre::{eyre as eyre_err, WrapErr};
 use pgx_utils::createdb;
 use pgx_utils::pg_config::{PgConfig, Pgx};
-
-use super::get::get_property;
 
 /// Connect, via psql, to a Postgres instance
 #[derive(clap::Args, Debug)]
@@ -27,6 +25,7 @@ pub(crate) struct Connect {
 }
 
 impl CommandExecute for Connect {
+    #[tracing::instrument(level = "info", skip(self))]
     fn execute(self) -> eyre::Result<()> {
         let dbname = match self.dbname {
             Some(dbname) => dbname,

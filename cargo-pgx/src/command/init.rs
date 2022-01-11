@@ -1,7 +1,7 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-use crate::commands::stop::stop_postgres;
+use crate::command::stop::stop_postgres;
 use crate::{CommandExecute, SUPPORTED_MAJOR_VERSIONS};
 use colored::Colorize;
 use eyre::eyre as eyre_err;
@@ -57,6 +57,7 @@ pub(crate) struct Init {
 }
 
 impl CommandExecute for Init {
+    #[tracing::instrument(level = "info", skip(self))]
     fn execute(self) -> eyre::Result<()> {
         let mut versions = HashMap::new();
 

@@ -1,8 +1,8 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-use crate::commands::init::initdb;
-use crate::commands::status::status_postgres;
+use crate::command::init::initdb;
+use crate::command::status::status_postgres;
 use crate::CommandExecute;
 use colored::Colorize;
 use pgx_utils::pg_config::{PgConfig, PgConfigSelector, Pgx};
@@ -22,6 +22,7 @@ pub(crate) struct Start {
 }
 
 impl CommandExecute for Start {
+    #[tracing::instrument(level = "info", skip(self))]
     fn execute(self) -> eyre::Result<()> {
         let pgver = self.pg_version;
         let pgx = Pgx::from_config()?;

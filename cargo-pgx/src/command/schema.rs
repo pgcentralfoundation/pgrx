@@ -1,5 +1,5 @@
 use crate::{
-    commands::get::{find_control_file, get_property},
+    command::get::{find_control_file, get_property},
     CommandExecute,
 };
 use colored::Colorize;
@@ -60,14 +60,15 @@ pub(crate) struct Schema {
 }
 
 impl CommandExecute for Schema {
+    #[tracing::instrument(level = "info", skip(self))]
     fn execute(self) -> eyre::Result<()> {
-        let (_, extname) = crate::commands::get::find_control_file()?;
+        let (_, extname) = crate::command::get::find_control_file()?;
         let out = match self.out {
             Some(out) => out,
             None => format!(
                 "sql/{}-{}.sql",
                 extname,
-                crate::commands::install::get_version()?,
+                crate::command::install::get_version()?,
             )
             .into(),
         };

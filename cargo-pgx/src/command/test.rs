@@ -37,6 +37,7 @@ pub(crate) struct Test {
 }
 
 impl CommandExecute for Test {
+    #[tracing::instrument(level = "info", skip(self))]
     fn execute(self) -> eyre::Result<()> {
         let pgx = Pgx::from_config()?;
         for pg_config in pgx.iter(PgConfigSelector::new(&self.pg_version)) {

@@ -2,7 +2,7 @@
 // governed by the MIT license that can be found in the LICENSE file.
 
 use crate::{
-    commands::{get::get_property, install::install_extension},
+    command::{get::get_property, install::install_extension},
     CommandExecute,
 };
 use eyre::eyre as eyre_err;
@@ -27,6 +27,7 @@ pub(crate) struct Package {
 }
 
 impl CommandExecute for Package {
+    #[tracing::instrument(level = "info", skip(self))]
     fn execute(self) -> eyre::Result<()> {
         let pg_config = match self.pg_config {
             None => PgConfig::from_path(),

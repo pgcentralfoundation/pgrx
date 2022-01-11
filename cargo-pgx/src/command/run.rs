@@ -2,7 +2,7 @@
 // governed by the MIT license that can be found in the LICENSE file.
 
 use crate::{
-    commands::{install::install_extension, start::start_postgres, stop::stop_postgres},
+    command::{install::install_extension, start::start_postgres, stop::stop_postgres, get::get_property},
     CommandExecute,
 };
 use colored::Colorize;
@@ -12,9 +12,6 @@ use pgx_utils::{
     pg_config::{PgConfig, Pgx},
 };
 use std::{os::unix::process::CommandExt, process::Command};
-
-use super::get::get_property;
-
 /// Compile/install extension to a pgx-managed Postgres instance and start psql
 #[derive(clap::Args, Debug)]
 #[clap(author)]
@@ -38,6 +35,7 @@ pub(crate) struct Run {
 }
 
 impl CommandExecute for Run {
+    #[tracing::instrument(level = "info", skip(self))]
     fn execute(self) -> eyre::Result<()> {
         let dbname = match self.dbname {
             Some(dbname) => dbname,

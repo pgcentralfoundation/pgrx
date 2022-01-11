@@ -2,7 +2,7 @@
 // governed by the MIT license that can be found in the LICENSE file.
 
 use crate::{
-    commands::get::{find_control_file, get_property},
+    command::get::{find_control_file, get_property},
     CommandExecute,
 };
 use cargo_metadata::MetadataCommand;
@@ -34,6 +34,7 @@ pub(crate) struct Install {
 }
 
 impl CommandExecute for Install {
+    #[tracing::instrument(level = "info", skip(self))]
     fn execute(self) -> eyre::Result<()> {
         let features = self.features.unwrap_or(vec![]);
         let pg_config =
@@ -213,7 +214,7 @@ fn get_target_sql_file(extdir: &PathBuf, base_directory: &PathBuf) -> eyre::Resu
     let mut dest = base_directory.clone();
     dest.push(extdir);
 
-    let (_, extname) = crate::commands::get::find_control_file()?;
+    let (_, extname) = crate::command::get::find_control_file()?;
     let version = get_version()?;
     dest.push(format!("{}--{}.sql", extname, version));
 
@@ -228,9 +229,9 @@ fn copy_sql_files(
     base_directory: &PathBuf,
 ) -> eyre::Result<()> {
     let dest = get_target_sql_file(extdir, base_directory)?;
-    let (_, extname) = crate::commands::get::find_control_file()?;
+    let (_, extname) = crate::command::get::find_control_file()?;
 
-    crate::commands::schema::generate_schema(
+    crate::command::schema::generate_schema(
         pg_config,
         is_release,
         additional_features,
