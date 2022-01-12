@@ -20,7 +20,7 @@ pub(crate) struct Status {
 }
 
 impl CommandExecute for Status {
-    #[tracing::instrument(level = "info", skip(self))]
+    #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
         let pgver = self.pg_version;
         let pgx = Pgx::from_config()?;
@@ -46,7 +46,7 @@ impl CommandExecute for Status {
     }
 }
 
-#[tracing::instrument(level = "info", skip_all, fields(pg_version = %pg_config.version()?))]
+#[tracing::instrument(level = "error", skip_all, fields(pg_version = %pg_config.version()?))]
 pub(crate) fn status_postgres(pg_config: &PgConfig) -> eyre::Result<bool> {
     let datadir = pg_config.data_dir()?;
     let bindir = pg_config.bin_dir()?;

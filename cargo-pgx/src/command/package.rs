@@ -27,7 +27,7 @@ pub(crate) struct Package {
 }
 
 impl CommandExecute for Package {
-    #[tracing::instrument(level = "info", skip(self))]
+    #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
         let pg_config = match self.pg_config {
             None => PgConfig::from_path(),
@@ -37,7 +37,7 @@ impl CommandExecute for Package {
     }
 }
 
-#[tracing::instrument(level = "info", skip_all, fields(
+#[tracing::instrument(level = "error", skip_all, fields(
     pg_version = %pg_config.version()?,
     release = !is_debug,
 ))]

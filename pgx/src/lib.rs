@@ -431,14 +431,25 @@ macro_rules! pg_binary_magic {
             let fmt_layer = tracing_subscriber::fmt::Layer::new()
                 .pretty();
             // Unless the user opts in specifically we don't want to impact `cargo-pgx schema` output.
-            let filter_layer = EnvFilter::try_from_default_env()
-                .or_else(|_| match sql_generator_cli.verbose {
-                    0 => EnvFilter::try_new("warn"),
-                    1 => EnvFilter::try_new("info"),
-                    2 => EnvFilter::try_new("debug"),
-                    _ => EnvFilter::try_new("trace"),
-                })
-                .unwrap();
+            let filter_layer = match EnvFilter::try_from_default_env() {
+                Ok(filter_layer) => filter_layer,
+                Err(_) => {
+                    let log_level = match cargo_cli.verbose {
+                        0 => "info",
+                        1 => "warn",
+                        2 => "trace",
+                    };
+                    let filter_layer = EnvFilter::new("warn");
+                    let filter_layer = filter_layer.add_directive(format!("cargo_pgx={}", log_level).parse()?);
+                    let filter_layer = filter_layer.add_directive(format!("pgx={}", log_level).parse()?);
+                    let filter_layer = filter_layer.add_directive(format!("pgx_macros={}", log_level).parse()?);
+                    let filter_layer = filter_layer.add_directive(format!("pgx_tests={}", log_level).parse()?);
+                    let filter_layer = filter_layer.add_directive(format!("pgx_pg_sys={}", log_level).parse()?);
+                    let filter_layer = filter_layer.add_directive(format!("pgx_utils={}", log_level).parse()?);
+                    filter_layer
+                }
+            };
+
             tracing_subscriber::registry()
                 .with(filter_layer)
                 .with(fmt_layer)

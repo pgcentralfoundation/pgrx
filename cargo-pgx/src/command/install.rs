@@ -34,7 +34,7 @@ pub(crate) struct Install {
 }
 
 impl CommandExecute for Install {
-    #[tracing::instrument(level = "info", skip(self))]
+    #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
         let features = self.features.unwrap_or(vec![]);
         let pg_config =

@@ -35,7 +35,7 @@ pub(crate) struct Run {
 }
 
 impl CommandExecute for Run {
-    #[tracing::instrument(level = "info", skip(self))]
+    #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
         let dbname = match self.dbname {
             Some(dbname) => dbname,
@@ -54,7 +54,7 @@ impl CommandExecute for Run {
     }
 }
 
-#[tracing::instrument(level = "info", skip_all, fields(
+#[tracing::instrument(level = "error", skip_all, fields(
     pg_version = %pg_config.version()?,
     dbname,
     release = is_release,

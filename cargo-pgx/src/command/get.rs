@@ -20,7 +20,7 @@ pub(crate) struct Get {
 }
 
 impl CommandExecute for Get {
-    #[tracing::instrument(level = "info", skip(self))]
+    #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
         if let Some(value) = get_property(&self.name)? {
             println!("{}", value);
@@ -29,7 +29,7 @@ impl CommandExecute for Get {
     }
 }
 
-#[tracing::instrument(level = "info")]
+#[tracing::instrument(level = "error")]
 pub fn get_property(name: &str) -> eyre::Result<Option<String>> {
     let (control_file, extname) = find_control_file()?;
 

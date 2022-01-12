@@ -57,7 +57,7 @@ pub(crate) struct Init {
 }
 
 impl CommandExecute for Init {
-    #[tracing::instrument(level = "info", skip(self))]
+    #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
         let mut versions = HashMap::new();
 
@@ -166,7 +166,7 @@ pub(crate) fn init_pgx(pgx: &Pgx) -> eyre::Result<()> {
     Ok(())
 }
 
-#[tracing::instrument(level = "info", skip_all, fields(pg_version = %pg_config.version()?, pgx_home))]
+#[tracing::instrument(level = "error", skip_all, fields(pg_version = %pg_config.version()?, pgx_home))]
 fn download_postgres(pg_config: &PgConfig, pgx_home: &PathBuf) -> eyre::Result<PgConfig> {
     println!(
         "{} Postgres v{}.{} from {}",

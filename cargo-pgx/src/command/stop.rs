@@ -20,7 +20,7 @@ pub(crate) struct Stop {
 }
 
 impl CommandExecute for Stop {
-    #[tracing::instrument(level = "info", skip(self))]
+    #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
         let pgver = self.pg_version;
         let pgx = Pgx::from_config()?;
@@ -34,7 +34,7 @@ impl CommandExecute for Stop {
     }
 }
 
-#[tracing::instrument(level = "info", skip_all, fields(pg_version = %pg_config.version()?))]
+#[tracing::instrument(level = "error", skip_all, fields(pg_version = %pg_config.version()?))]
 pub(crate) fn stop_postgres(pg_config: &PgConfig) -> eyre::Result<()> {
     Pgx::home()?;
     let datadir = pg_config.data_dir()?;

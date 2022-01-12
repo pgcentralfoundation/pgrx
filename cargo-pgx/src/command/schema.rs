@@ -60,7 +60,7 @@ pub(crate) struct Schema {
 }
 
 impl CommandExecute for Schema {
-    #[tracing::instrument(level = "info", skip(self))]
+    #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
         let (_, extname) = crate::command::get::find_control_file()?;
         let out = match self.out {
@@ -120,7 +120,7 @@ impl CommandExecute for Schema {
     }
 }
 
-#[tracing::instrument(level = "info", skip_all, fields(
+#[tracing::instrument(level = "error", skip_all, fields(
     pg_version = %pg_config.version()?,
     release = is_release,
     path,

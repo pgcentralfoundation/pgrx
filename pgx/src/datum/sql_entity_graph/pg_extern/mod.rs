@@ -73,7 +73,7 @@ impl SqlGraphIdentifier for PgExternEntity {
 
 impl ToSql for PgExternEntity {
     #[tracing::instrument(
-        level = "info",
+        level = "error",
         skip(self, context),
         fields(identifier = %self.rust_identifier()),
     )]

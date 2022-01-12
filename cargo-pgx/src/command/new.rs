@@ -23,7 +23,7 @@ pub(crate) struct New {
 }
 
 impl CommandExecute for New {
-    #[tracing::instrument(level = "info", skip(self))]
+    #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
         validate_extension_name(&self.name)?;
         let path = PathBuf::from_str(&format!("{}/", self.name)).unwrap();

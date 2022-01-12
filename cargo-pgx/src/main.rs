@@ -55,15 +55,13 @@ fn main() -> color_eyre::Result<()> {
     let fmt_layer = tracing_subscriber::fmt::Layer::new()
         .pretty();
 
-    // Unless the user opts in specifically we don't want to impact `cargo-pgx schema` output.
     let filter_layer = match EnvFilter::try_from_default_env() {
         Ok(filter_layer) => filter_layer,
         Err(_) => {
             let log_level = match cargo_cli.verbose {
-                0 => "warn",
-                1 => "info",
-                2 => "debug",
-                _ => "trace",
+                0 => "info",
+                1 => "warn",
+                2 => "trace",
             };
             let filter_layer = EnvFilter::new("warn");
             let filter_layer = filter_layer.add_directive(format!("cargo_pgx={}", log_level).parse()?);

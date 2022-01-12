@@ -35,7 +35,7 @@ impl ControlFile {
     /// # Ok(())
     /// # }
     /// ```
-    #[tracing::instrument(level = "info")]
+    #[tracing::instrument(level = "error")]
     pub fn from_str(input: &str) -> Result<Self, ControlFileError> {
         let mut temp = HashMap::new();
         for line in input.lines() {

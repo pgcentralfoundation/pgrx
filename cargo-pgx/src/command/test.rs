@@ -37,7 +37,7 @@ pub(crate) struct Test {
 }
 
 impl CommandExecute for Test {
-    #[tracing::instrument(level = "info", skip(self))]
+    #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
         let pgx = Pgx::from_config()?;
         for pg_config in pgx.iter(PgConfigSelector::new(&self.pg_version)) {
@@ -115,7 +115,7 @@ pub fn test_extension(
 
     tracing::debug!(command = ?command, "Running");
     let status = command.status().wrap_err("failed to run cargo test")?;
-    tracing::debug!(status_code = %status, command = ?command, "Finished");
+    tracing::trace!(status_code = %status, command = ?command, "Finished");
     if !status.success() {
         return Err(eyre!("cargo pgx test failed with status = {:?}", status.code()));
     }
