@@ -6,7 +6,7 @@ use colored::Colorize;
 use pgx_utils::pg_config::{PgConfig, PgConfigSelector, Pgx};
 
 use std::process::Stdio;
-use eyre::eyre as eyre_err;
+use eyre::eyre;
 
 /// Stop a pgx-managed Postgres instance
 #[derive(clap::Args, Debug)]
@@ -65,7 +65,7 @@ pub(crate) fn stop_postgres(pg_config: &PgConfig) -> eyre::Result<()> {
     let output = command.output()?;
 
     if !output.status.success() {
-        Err(eyre_err!("{}",
+        Err(eyre!("{}",
             String::from_utf8(output.stderr)?,
         ))
     } else {

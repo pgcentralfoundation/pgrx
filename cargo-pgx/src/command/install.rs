@@ -7,7 +7,7 @@ use crate::{
 };
 use cargo_metadata::MetadataCommand;
 use colored::Colorize;
-use eyre::{eyre as eyre_err, WrapErr};
+use eyre::{eyre, WrapErr};
 use pgx_utils::pg_config::{PgConfig, Pgx};
 use pgx_utils::get_target_dir;
 use std::path::PathBuf;
@@ -77,7 +77,7 @@ pub(crate) fn install_extension(
     let major_version = pg_config.major_version()?;
 
     if get_property("relocatable")? != Some("false".into()) {
-        return Err(eyre_err!(
+        return Err(eyre!(
             "{}:  The `relocatable` property MUST be `false`.  Please update your .control file.",
             control_file.display()
         ))
@@ -211,7 +211,7 @@ pub(crate) fn build_extension(
         .status()
         .wrap_err_with(|| format!("failed to spawn cargo: {}", command_str))?;
     if !status.success() {
-        Err(eyre_err!("failed to build extension"))
+        Err(eyre!("failed to build extension"))
     } else {
         Ok(())
     }
@@ -275,7 +275,7 @@ pub(crate) fn find_library_file(extname: &str, is_release: bool) -> eyre::Result
     target_dir.push(if is_release { "release" } else { "debug" });
 
     if !target_dir.exists() {
-        return Err(eyre_err!("target directory does not exist: {}", target_dir.display()));
+        return Err(eyre!("target directory does not exist: {}", target_dir.display()));
     }
 
     for f in std::fs::read_dir(&target_dir)
@@ -296,13 +296,13 @@ pub(crate) fn find_library_file(extname: &str, is_release: bool) -> eyre::Result
     }
 
     if extname.contains('-') {
-        Err(eyre_err!("
+        Err(eyre!("
             library file not found in: `{}`.  It looks like your extension/crate name contains a dash (`-`).  The allowed set of characters is `{}`. Try renaming things, including your `{}.control` file",
             target_dir.display(), "[a-z0-9_]".green(),
             extname
         ))
     } else {
-        Err(eyre_err!(
+        Err(eyre!(
             "library file not found in: `{}`",
             target_dir.display()
         ))
@@ -321,14 +321,14 @@ pub(crate) fn get_version() -> eyre::Result<String> {
                 Ok(v)
             }
         },
-        None => Err(eyre_err!("cannot determine extension version number.  Is the `default_version` property declared in the control file?")),
+        None => Err(eyre!("cannot determine extension version number.  Is the `default_version` property declared in the control file?")),
     }
 }
 
 fn get_git_hash() -> eyre::Result<String> {
     match get_property("git_hash")? {
         Some(hash) => Ok(hash),
-        None => Err(eyre_err!(
+        None => Err(eyre!(
             "unable to determine git hash.  Is git installed and is this project a git repository?"
         )),
     }

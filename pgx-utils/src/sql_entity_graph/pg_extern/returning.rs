@@ -1,5 +1,5 @@
 use crate::{anonymonize_lifetimes, anonymonize_lifetimes_in_type_path};
-use eyre::eyre as eyre_err;
+use eyre::eyre;
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
 use std::convert::TryFrom;
@@ -187,7 +187,7 @@ impl TryFrom<&syn::ReturnType> for Returning {
                         }
                     }
                     _ => {
-                        return Err(eyre_err!(
+                        return Err(eyre!(
                             "Got unknown return type: {}",
                             &ty.to_token_stream()
                         ))

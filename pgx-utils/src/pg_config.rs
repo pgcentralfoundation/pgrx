@@ -8,7 +8,7 @@ use std::{
     str::FromStr,
 };
 use url::Url;
-use eyre::{WrapErr, eyre as eyre_err};
+use eyre::{WrapErr, eyre};
 
 #[derive(Clone)]
 pub struct PgVersion {
@@ -91,13 +91,13 @@ impl PgConfig {
                 let version = match version_parts.get(1) {
                     Some(v) => v,
                     None => {
-                        return Err(eyre_err!("invalid version string: {}", version_string));
+                        return Err(eyre!("invalid version string: {}", version_string));
                     }
                 };
                 let version = match f64::from_str(version) {
                     Ok(f) => f,
                     Err(e) => {
-                        return Err(eyre_err!("invalid major version number `{}`: {:?}", version, e));
+                        return Err(eyre!("invalid major version number `{}`: {:?}", version, e));
                     }
                 };
                 Ok(version.floor() as u16)
@@ -114,13 +114,13 @@ impl PgConfig {
                 let version = match version_parts.get(1) {
                     Some(v) => v.split('.').next().unwrap(),
                     None => {
-                        return Err(eyre_err!("invalid version string: {}", version_string));
+                        return Err(eyre!("invalid version string: {}", version_string));
                     }
                 };
                 let version = match u16::from_str(version) {
                     Ok(u) => u,
                     Err(e) => {
-                        return Err(eyre_err!("invalid minor version number `{}`: {:?}", version, e));
+                        return Err(eyre!("invalid minor version number `{}`: {:?}", version, e));
                     }
                 };
                 Ok(version)
@@ -293,7 +293,7 @@ impl Pgx {
                 // we'll get what we need from cargo-pgx' config.toml file
                 let path = Pgx::config_toml()?;
                 if !path.exists() {
-                    return Err(eyre_err!(
+                    return Err(eyre!(
                         "{} not found.  Have you run `{}` yet?",
                         path.display(),
                         "cargo pgx init".bold().yellow()
@@ -349,7 +349,7 @@ impl Pgx {
                 return Ok(pg_config);
             }
         }
-        Err(eyre_err!("Postgres `{}` is not managed by pgx", label))
+        Err(eyre!("Postgres `{}` is not managed by pgx", label))
     }
 
     pub fn home() -> Result<PathBuf, std::io::Error> {

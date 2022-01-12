@@ -4,7 +4,7 @@
 use crate::command::stop::stop_postgres;
 use crate::{CommandExecute, SUPPORTED_MAJOR_VERSIONS};
 use colored::Colorize;
-use eyre::{eyre as eyre_err, WrapErr};
+use eyre::{eyre, WrapErr};
 use pgx_utils::pg_config::{PgConfig, PgConfigSelector, Pgx};
 use pgx_utils::prefix_path;
 use rayon::prelude::*;
@@ -126,7 +126,7 @@ pub(crate) fn init_pgx(pgx: &Pgx) -> eyre::Result<()> {
         if !pg_config.is_real() {
             pg_config = match download_postgres(&pg_config, &dir) {
                 Ok(pg_config) => pg_config,
-                Err(e) => return Err(eyre_err!(e)),
+                Err(e) => return Err(eyre!(e)),
             }
         }
 
@@ -189,7 +189,7 @@ fn download_postgres(pg_config: &PgConfig, pgx_home: &PathBuf) -> eyre::Result<P
     let http_response = http_client.emit()?;
     tracing::trace!(status_code = %http_response.code(), url = %url, "Fetched");
     if http_response.code() != 200 {
-        return Err(eyre_err!(
+        return Err(eyre!(
             "Problem downloading {}:\ncode={}\n{}",
             pg_config.url().unwrap().to_string().yellow().bold(),
             http_response.code(),
@@ -242,7 +242,7 @@ fn untar(bytes: &[u8], pgxdir: &PathBuf, pg_config: &PgConfig) -> eyre::Result<P
     if output.status.success() {
         Ok(pgdir)
     } else {
-        Err(eyre_err!("Command error: {}", String::from_utf8(output.stderr)?))
+        Err(eyre!("Command error: {}", String::from_utf8(output.stderr)?))
     }
 }
 
@@ -323,7 +323,7 @@ fn make_postgres(pg_config: &PgConfig, pgdir: &PathBuf) -> eyre::Result<()> {
     if output.status.success() {
         Ok(())
     } else {
-        Err(eyre_err!(
+        Err(eyre!(
             "{}\n{}{}",
             command_str,
             String::from_utf8(output.stdout)?,
@@ -364,7 +364,7 @@ fn make_install_postgres(version: &PgConfig, pgdir: &PathBuf) -> eyre::Result<Pg
         pg_config.push("pg_config");
         Ok(PgConfig::new(pg_config))
     } else {
-        Err(eyre_err!(
+        Err(eyre!(
             "{}\n{}{}",
             command_str,
             String::from_utf8(output.stdout).unwrap(),
@@ -394,7 +394,7 @@ fn write_config(pg_configs: &Vec<PgConfig>) -> eyre::Result<()> {
             format!(
                 "{}=\"{}\"\n",
                 pg_config.label()?,
-                pg_config.path().ok_or(eyre_err!("no path for pg_config"))?.display()
+                pg_config.path().ok_or(eyre!("no path for pg_config"))?.display()
             )
             .as_bytes(),
         )?;
@@ -429,7 +429,7 @@ pub(crate) fn initdb(bindir: &PathBuf, datadir: &PathBuf) -> eyre::Result<()> {
     tracing::trace!(command = %command_str, status_code = %output.status, "Finished");
 
     if !output.status.success() {
-        return Err(eyre_err!(
+        return Err(eyre!(
             "problem running initdb: {}\n{}",
             command_str,
             String::from_utf8(output.stderr).unwrap()

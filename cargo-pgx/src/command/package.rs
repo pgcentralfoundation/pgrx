@@ -5,7 +5,7 @@ use crate::{
     command::{get::get_property, install::install_extension},
     CommandExecute,
 };
-use eyre::eyre as eyre_err;
+use eyre::eyre;
 use pgx_utils::{get_target_dir, pg_config::PgConfig};
 use std::path::PathBuf;
 
@@ -68,7 +68,7 @@ fn build_base_path(pg_config: &PgConfig, is_debug: bool) -> eyre::Result<PathBuf
     let mut target_dir = get_target_dir();
     let pgver = pg_config.major_version()?;
     let extname =
-        get_property("extname")?.ok_or(eyre_err!("could not determine extension name"))?;
+        get_property("extname")?.ok_or(eyre!("could not determine extension name"))?;
     target_dir.push(if is_debug { "debug" } else { "release" });
     target_dir.push(format!("{}-pg{}", extname, pgver));
     Ok(target_dir)

@@ -8,7 +8,7 @@ use colored::Colorize;
 use pgx_utils::pg_config::{PgConfig, PgConfigSelector, Pgx};
 use std::os::unix::process::CommandExt;
 use std::process::Stdio;
-use eyre::eyre as eyre_err;
+use eyre::eyre;
 
 /// Start a pgx-managed Postgres instance
 #[derive(clap::Args, Debug)]
@@ -88,7 +88,7 @@ pub(crate) fn start_postgres(pg_config: &PgConfig) -> eyre::Result<()> {
     let output = command.output()?;
 
     if !output.status.success() {
-        return Err(eyre_err!(
+        return Err(eyre!(
             "problem running pg_ctl: {}\n\n{}",
             command_str,
             String::from_utf8(output.stderr).unwrap()

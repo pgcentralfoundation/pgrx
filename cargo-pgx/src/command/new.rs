@@ -5,7 +5,7 @@ use std::{
     io::Write, os::unix::fs::PermissionsExt,
     path::PathBuf, str::FromStr
 };
-use eyre::eyre as eyre_err;
+use eyre::eyre;
 
 use crate::CommandExecute;
 
@@ -34,7 +34,7 @@ impl CommandExecute for New {
 fn validate_extension_name(extname: &str) -> eyre::Result<()>{
     for c in extname.chars() {
         if !c.is_alphanumeric() && c != '_' && !c.is_lowercase() {
-            return Err(eyre_err!("Extension name must be in the set of [a-z0-9_]"))
+            return Err(eyre!("Extension name must be in the set of [a-z0-9_]"))
         }
     }
     Ok(())

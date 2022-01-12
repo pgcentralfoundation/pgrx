@@ -1,7 +1,7 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-use eyre::{eyre as eyre_err, WrapErr};
+use eyre::{eyre, WrapErr};
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::path::PathBuf;
@@ -77,7 +77,7 @@ pub(crate) fn find_control_file() -> eyre::Result<(PathBuf, String)> {
         }
     }
 
-    Err(eyre_err!("control file not found in current directory"))
+    Err(eyre!("control file not found in current directory"))
 }
 
 fn determine_git_hash() -> eyre::Result<Option<String>> {
@@ -86,7 +86,7 @@ fn determine_git_hash() -> eyre::Result<Option<String>> {
             if !output.status.success() {
                 let stderr = String::from_utf8(output.stderr)
                     .expect("`git rev-parse head` did not return valid utf8");
-                return Err(eyre_err!(
+                return Err(eyre!(
                     "problem running `git` to determine the current revision hash: {}",
                     stderr
                 ));

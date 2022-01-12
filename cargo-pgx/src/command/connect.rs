@@ -6,7 +6,7 @@ use crate::{
     CommandExecute,
 };
 use colored::Colorize;
-use eyre::{eyre as eyre_err, WrapErr};
+use eyre::{eyre, WrapErr};
 use pgx_utils::createdb;
 use pgx_utils::pg_config::{PgConfig, Pgx};
 
@@ -31,7 +31,7 @@ impl CommandExecute for Connect {
             Some(dbname) => dbname,
             None => get_property("extname")
                 .wrap_err("could not determine extension name")?
-                .ok_or(eyre_err!("extname not found in control file"))?,
+                .ok_or(eyre!("extname not found in control file"))?,
         };
         connect_psql(Pgx::from_config()?.get(&self.pg_version)?, &dbname)
     }

@@ -1,7 +1,7 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-use eyre::{eyre as eyre_err, WrapErr};
+use eyre::{eyre, WrapErr};
 use pgx_utils::{
     get_target_dir,
     pg_config::{PgConfig, PgConfigSelector, Pgx},
@@ -117,7 +117,7 @@ pub fn test_extension(
     let status = command.status().wrap_err("failed to run cargo test")?;
     tracing::debug!(status_code = %status, command = ?command, "Finished");
     if !status.success() {
-        return Err(eyre_err!("cargo pgx test failed with status = {:?}", status.code()));
+        return Err(eyre!("cargo pgx test failed with status = {:?}", status.code()));
     }
 
     Ok(())

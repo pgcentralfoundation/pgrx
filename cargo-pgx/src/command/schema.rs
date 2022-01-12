@@ -3,7 +3,7 @@ use crate::{
     CommandExecute,
 };
 use colored::Colorize;
-use eyre::{eyre as eyre_err, WrapErr};
+use eyre::{eyre, WrapErr};
 use pgx_utils::{
     exit_with_error,
     pg_config::{PgConfig, Pgx},
@@ -242,7 +242,7 @@ pub(crate) fn generate_schema(
             .status()
             .wrap_err_with(|| format!("failed to spawn cargo: {}", command_str))?;
         if !status.success() {
-            return Err(eyre_err!("failed to build SQL generator"));
+            return Err(eyre!("failed to build SQL generator"));
         }
     }
 
@@ -361,7 +361,7 @@ pub(crate) fn generate_schema(
         .status()
         .wrap_err_with(|| format!("failed to spawn sql-generator: {}", command_str))?;
     if !status.success() {
-        return Err(eyre_err!("failed to run SQL generator"));
+        return Err(eyre!("failed to run SQL generator"));
     }
     Ok(())
 }

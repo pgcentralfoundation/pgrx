@@ -6,7 +6,7 @@ use crate::{
     CommandExecute,
 };
 use colored::Colorize;
-use eyre::eyre as eyre_err;
+use eyre::eyre;
 use pgx_utils::{
     createdb,
     pg_config::{PgConfig, Pgx},
@@ -40,7 +40,7 @@ impl CommandExecute for Run {
         let dbname = match self.dbname {
             Some(dbname) => dbname,
             None => {
-                get_property("extname")?.ok_or(eyre_err!("could not determine extension name"))?
+                get_property("extname")?.ok_or(eyre!("could not determine extension name"))?
             }
         };
 

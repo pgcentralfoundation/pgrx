@@ -4,7 +4,7 @@
 use colored::Colorize;
 use pgx_utils::pg_config::{PgConfig, PgConfigSelector, Pgx};
 use std::process::Stdio;
-use eyre::eyre as eyre_err;
+use eyre::eyre;
 
 use crate::CommandExecute;
 
@@ -75,7 +75,7 @@ pub(crate) fn status_postgres(pg_config: &PgConfig) -> eyre::Result<bool> {
     let is_stopped = code == 3; // not running
 
     if !is_running && !is_stopped {
-        return Err(eyre_err!(
+        return Err(eyre!(
             "problem running pg_ctl: {}\n\n{}",
             command_str,
             String::from_utf8(output.stderr).unwrap()
