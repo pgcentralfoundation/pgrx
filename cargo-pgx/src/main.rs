@@ -65,7 +65,13 @@ fn main() -> color_eyre::Result<()> {
                 2 => "debug",
                 _ => "trace",
             };
-            let filter_layer = EnvFilter::new(format!("cargo_pgx,pgx_macros,pgx_tests,pgx_utils,pgx_pg_sys={},warn", log_level));
+            let filter_layer = EnvFilter::new("warn");
+            let filter_layer = filter_layer.add_directive(format!("cargo_pgx={}", log_level).parse()?);
+            let filter_layer = filter_layer.add_directive(format!("pgx={}", log_level).parse()?);
+            let filter_layer = filter_layer.add_directive(format!("pgx_macros={}", log_level).parse()?);
+            let filter_layer = filter_layer.add_directive(format!("pgx_tests={}", log_level).parse()?);
+            let filter_layer = filter_layer.add_directive(format!("pgx_pg_sys={}", log_level).parse()?);
+            let filter_layer = filter_layer.add_directive(format!("pgx_utils={}", log_level).parse()?);
             filter_layer
         }
     };
