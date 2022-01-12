@@ -58,6 +58,11 @@ impl CommandExecute for Install {
     }
 }
 
+#[tracing::instrument(skip_all, fields(
+    pg_version = %pg_config.version()?,
+    release = is_release,
+    base_directory = tracing::field::Empty,
+))]
 pub(crate) fn install_extension(
     pg_config: &PgConfig,
     is_release: bool,
@@ -66,6 +71,8 @@ pub(crate) fn install_extension(
     additional_features: &Vec<impl AsRef<str>>,
 ) -> eyre::Result<()> {
     let base_directory = base_directory.unwrap_or("/".into());
+    tracing::Span::current().record("base_directory", &tracing::field::display(&base_directory.display()));
+
     let (control_file, extname) = find_control_file()?;
     let major_version = pg_config.major_version()?;
 

@@ -1,9 +1,9 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-use eyre::WrapErr;
+use eyre::{eyre as eyre_err, WrapErr};
 use pgx_utils::{
-    exit_with_error, get_target_dir,
+    get_target_dir,
     pg_config::{PgConfig, PgConfigSelector, Pgx},
 };
 use std::fmt::Write;
@@ -41,8 +41,9 @@ impl CommandExecute for Test {
     fn execute(self) -> eyre::Result<()> {
         let pgx = Pgx::from_config()?;
         for pg_config in pgx.iter(PgConfigSelector::new(&self.pg_version)) {
+            let pg_config = pg_config?;
             test_extension(
-                pg_config?,
+                pg_config,
                 self.release,
                 self.no_schema,
                 self.workspace,
@@ -54,6 +55,11 @@ impl CommandExecute for Test {
     }
 }
 
+#[tracing::instrument(skip_all, fields(
+    pg_version = %pg_config.version()?,
+    testname =  tracing::field::Empty,
+    release = is_release,
+))]
 pub fn test_extension(
     pg_config: &PgConfig,
     is_release: bool,
@@ -62,6 +68,10 @@ pub fn test_extension(
     additional_features: &Vec<impl AsRef<str>>,
     testname: Option<impl AsRef<str>>,
 ) -> eyre::Result<()> {
+    if let Some(ref testname) = testname {
+        tracing::Span::current().record("testname", &tracing::field::display(&testname.as_ref()));
+    }
+    
     let additional_features = additional_features
         .iter()
         .map(AsRef::as_ref)
@@ -102,9 +112,12 @@ pub fn test_extension(
     }
 
     eprintln!("{:?}", command);
+
+    tracing::debug!(command = ?command, "Running");
     let status = command.status().wrap_err("failed to run cargo test")?;
+    tracing::debug!(status_code = %status, command = ?command, "Finished");
     if !status.success() {
-        exit_with_error!("cargo pgx test failed with status = {:?}", status.code())
+        return Err(eyre_err!("cargo pgx test failed with status = {:?}", status.code()));
     }
 
     Ok(())

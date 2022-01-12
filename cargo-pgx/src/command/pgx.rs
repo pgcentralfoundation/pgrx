@@ -11,7 +11,6 @@ pub(crate) struct Pgx {
 }
 
 impl CommandExecute for Pgx {
-    #[tracing::instrument(level = "info", skip(self))]
     fn execute(self) -> eyre::Result<()> {
         self.subcommand.execute()
     }

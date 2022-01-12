@@ -104,6 +104,8 @@ impl CommandExecute for Schema {
                 },
             };
 
+        let _span = tracing::info_span!("version", pg_version = %pg_config.version()?).entered();
+
         generate_schema(
             &pg_config,
             self.release,
@@ -118,6 +120,12 @@ impl CommandExecute for Schema {
     }
 }
 
+#[tracing::instrument(level = "info", skip_all, fields(
+    pg_version = %pg_config.version()?,
+    release = is_release,
+    path,
+    dot
+))]
 pub(crate) fn generate_schema(
     pg_config: &PgConfig,
     is_release: bool,

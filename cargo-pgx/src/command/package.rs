@@ -37,6 +37,10 @@ impl CommandExecute for Package {
     }
 }
 
+#[tracing::instrument(level = "info", skip_all, fields(
+    pg_version = %pg_config.version()?,
+    release = !is_debug,
+))]
 pub(crate) fn package_extension(
     pg_config: &PgConfig,
     is_debug: bool,

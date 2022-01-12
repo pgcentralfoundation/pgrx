@@ -56,14 +56,20 @@ fn main() -> color_eyre::Result<()> {
         .pretty();
 
     // Unless the user opts in specifically we don't want to impact `cargo-pgx schema` output.
-    let filter_layer = EnvFilter::try_from_default_env()
-        .or_else(|_| match cargo_cli.verbose {
-            0 => EnvFilter::try_new("warn"),
-            1 => EnvFilter::try_new("info"),
-            2 => EnvFilter::try_new("debug"),
-            _ => EnvFilter::try_new("trace"),
-        })
-        .unwrap();
+    let filter_layer = match EnvFilter::try_from_default_env() {
+        Ok(filter_layer) => filter_layer,
+        Err(_) => {
+            let log_level = match cargo_cli.verbose {
+                0 => "warn",
+                1 => "info",
+                2 => "debug",
+                _ => "trace",
+            };
+            let filter_layer = EnvFilter::new(format!("cargo_pgx,pgx_macros,pgx_tests,pgx_utils,pgx_pg_sys={},warn", log_level));
+            filter_layer
+        }
+    };
+
     tracing_subscriber::registry()
         .with(filter_layer)
         .with(fmt_layer)

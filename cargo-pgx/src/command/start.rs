@@ -28,13 +28,15 @@ impl CommandExecute for Start {
         let pgx = Pgx::from_config()?;
 
         for pg_config in pgx.iter(PgConfigSelector::new(&pgver)) {
-            start_postgres(pg_config?)?
+            let pg_config = pg_config?;
+            start_postgres(pg_config)?
         }
 
         Ok(())
     }
 }
 
+#[tracing::instrument(level = "info", skip_all, fields(pg_version = %pg_config.version()?))]
 pub(crate) fn start_postgres(pg_config: &PgConfig) -> eyre::Result<()> {
     let datadir = pg_config.data_dir()?;
     let logfile = pg_config.log_file()?;
@@ -46,6 +48,7 @@ pub(crate) fn start_postgres(pg_config: &PgConfig) -> eyre::Result<()> {
     }
 
     if status_postgres(pg_config)? {
+        tracing::debug!("Already started");
         return Ok(());
     }
 

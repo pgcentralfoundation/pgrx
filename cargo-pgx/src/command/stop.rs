@@ -26,13 +26,15 @@ impl CommandExecute for Stop {
         let pgx = Pgx::from_config()?;
 
         for pg_config in pgx.iter(PgConfigSelector::new(&pgver)) {
-            stop_postgres(pg_config?)?
+            let pg_config = pg_config?;
+            stop_postgres(pg_config)?
         }
 
         Ok(())
     }
 }
 
+#[tracing::instrument(level = "info", skip_all, fields(pg_version = %pg_config.version()?))]
 pub(crate) fn stop_postgres(pg_config: &PgConfig) -> eyre::Result<()> {
     Pgx::home()?;
     let datadir = pg_config.data_dir()?;
@@ -40,6 +42,7 @@ pub(crate) fn stop_postgres(pg_config: &PgConfig) -> eyre::Result<()> {
 
     if status_postgres(pg_config)? == false {
         // it's not running, no need to stop it
+        tracing::debug!("Already stopped");
         return Ok(());
     }
 

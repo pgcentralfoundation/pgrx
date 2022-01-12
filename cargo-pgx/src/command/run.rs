@@ -54,6 +54,11 @@ impl CommandExecute for Run {
     }
 }
 
+#[tracing::instrument(level = "info", skip_all, fields(
+    pg_version = %pg_config.version()?,
+    dbname,
+    release = is_release,
+))]
 pub(crate) fn run_psql(
     pg_config: &PgConfig,
     dbname: &str,

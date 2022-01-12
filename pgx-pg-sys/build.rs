@@ -509,7 +509,7 @@ fn build_shim(
     shim_src: &PathBuf,
     shim_dst: &PathBuf,
     pg_config: &PgConfig,
-) -> Result<(), std::io::Error> {
+) -> Result<(), Box<dyn Error + Send + Sync>> {
     let major_version = pg_config.major_version()?;
     let mut libpgx_cshim: PathBuf = shim_dst.clone();
 
@@ -533,7 +533,7 @@ fn build_shim_for_version(
     shim_src: &PathBuf,
     shim_dst: &PathBuf,
     pg_config: &PgConfig,
-) -> Result<(), std::io::Error> {
+) -> Result<(), Box<dyn Error + Send + Sync>> {
     let path_env = prefix_path(pg_config.parent_path());
     let major_version = pg_config.major_version()?;
 

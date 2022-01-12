@@ -40,6 +40,7 @@ fn validate_extension_name(extname: &str) -> eyre::Result<()>{
     Ok(())
 }
 
+#[tracing::instrument(skip_all, fields(path, name))]
 pub(crate) fn create_crate_template(
     path: PathBuf,
     name: &str,

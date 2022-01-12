@@ -98,7 +98,7 @@ pub fn createdb(
     dbname: &str,
     is_test: bool,
     if_not_exists: bool,
-) -> Result<bool, std::io::Error> {
+) -> eyre::Result<bool> {
     if if_not_exists && does_db_exist(pg_config, dbname)? {
         return Ok(false);
     }
@@ -137,7 +137,7 @@ pub fn createdb(
     Ok(true)
 }
 
-fn does_db_exist(pg_config: &PgConfig, dbname: &str) -> Result<bool, std::io::Error> {
+fn does_db_exist(pg_config: &PgConfig, dbname: &str) -> eyre::Result<bool> {
     let mut command = Command::new(pg_config.psql_path()?);
     command
         .arg("-XqAt")

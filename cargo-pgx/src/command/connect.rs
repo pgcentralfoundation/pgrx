@@ -37,6 +37,10 @@ impl CommandExecute for Connect {
     }
 }
 
+#[tracing::instrument(level = "info", skip_all, fields(
+    pg_version = %pg_config.version()?,
+    dbname,
+))]
 pub(crate) fn connect_psql(pg_config: &PgConfig, dbname: &str) -> eyre::Result<()> {
     // restart postgres
     start_postgres(pg_config)?;
