@@ -252,7 +252,7 @@ name = "cargo-pgx"
 version = "0.2.6"
 dependencies = [
  "cargo_metadata",
- "clap 3.0.6",
+ "clap 3.0.7",
  "color-eyre",
  "colored",
  "env_proxy",
@@ -345,9 +345,9 @@ dependencies = [
 
 [[package]]
 name = "clap"
-version = "3.0.6"
+version = "3.0.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1957aa4a5fb388f0a0a73ce7556c5b42025b874e5cdc2c670775e346e97adec0"
+checksum = "12e8611f9ae4e068fa3e56931fded356ff745e70987ff76924a6e0ab1c8ef2e3"
 dependencies = [
  "atty",
  "bitflags",
@@ -362,9 +362,9 @@ dependencies = [
 
 [[package]]
 name = "clap_derive"
-version = "3.0.6"
+version = "3.0.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "517358c28fcef6607bf6f76108e02afad7e82297d132a6b846dcc1fc3efcd153"
+checksum = "41a0645a430ec9136d2d701e54a95d557de12649a9dd7109ced3187e648ac824"
 dependencies = [
  "heck 0.4.0",
  "proc-macro-error",
@@ -1464,7 +1464,7 @@ dependencies = [
 name = "pgx-utils"
 version = "0.2.6"
 dependencies = [
- "clap 3.0.6",
+ "clap 3.0.7",
  "color-eyre",
  "colored",
  "dirs",
