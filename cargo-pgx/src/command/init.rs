@@ -119,24 +119,27 @@ pub(crate) fn init_pgx(pgx: &Pgx) -> eyre::Result<()> {
     }
 
     let span = tracing::Span::current();
-    pg_configs.into_par_iter().map(|pg_config| {
-        let _span = span.clone().entered();
-        let mut pg_config = pg_config.clone();
-        stop_postgres(&pg_config).ok(); // no need to fail on errors trying to stop postgres while initializing
-        if !pg_config.is_real() {
-            pg_config = match download_postgres(&pg_config, &dir) {
-                Ok(pg_config) => pg_config,
-                Err(e) => return Err(eyre!(e)),
+    pg_configs
+        .into_par_iter()
+        .map(|pg_config| {
+            let _span = span.clone().entered();
+            let mut pg_config = pg_config.clone();
+            stop_postgres(&pg_config).ok(); // no need to fail on errors trying to stop postgres while initializing
+            if !pg_config.is_real() {
+                pg_config = match download_postgres(&pg_config, &dir) {
+                    Ok(pg_config) => pg_config,
+                    Err(e) => return Err(eyre!(e)),
+                }
             }
-        }
 
-        let mut mutex = output_configs.lock();
-        // PoisonError doesn't implement std::error::Error, can't `?` it.
-        let output_configs = mutex.as_mut().expect("failed to get output_configs lock");
+            let mut mutex = output_configs.lock();
+            // PoisonError doesn't implement std::error::Error, can't `?` it.
+            let output_configs = mutex.as_mut().expect("failed to get output_configs lock");
 
-        output_configs.push(pg_config);
-        Ok(())
-    }).collect::<eyre::Result<()>>()?;
+            output_configs.push(pg_config);
+            Ok(())
+        })
+        .collect::<eyre::Result<()>>()?;
 
     let mut mutex = output_configs.lock();
     // PoisonError doesn't implement std::error::Error, can't `?` it.
@@ -178,9 +181,7 @@ fn download_postgres(pg_config: &PgConfig, pgx_home: &PathBuf) -> eyre::Result<P
     let url = pg_config.url().expect("no url for pg_config").as_str();
     tracing::debug!(url = %url, "Fetching");
     let mut http_client = HttpClient::new();
-    http_client
-        .get()
-        .url(url);
+    http_client.get().url(url);
     if let Some((host, port)) =
         env_proxy::for_url_str(pg_config.url().expect("no url for pg_config")).host_port()
     {
@@ -242,7 +243,10 @@ fn untar(bytes: &[u8], pgxdir: &PathBuf, pg_config: &PgConfig) -> eyre::Result<P
     if output.status.success() {
         Ok(pgdir)
     } else {
-        Err(eyre!("Command error: {}", String::from_utf8(output.stderr)?))
+        Err(eyre!(
+            "Command error: {}",
+            String::from_utf8(output.stderr)?
+        ))
     }
 }
 
@@ -394,7 +398,10 @@ fn write_config(pg_configs: &Vec<PgConfig>) -> eyre::Result<()> {
             format!(
                 "{}=\"{}\"\n",
                 pg_config.label()?,
-                pg_config.path().ok_or(eyre!("no path for pg_config"))?.display()
+                pg_config
+                    .path()
+                    .ok_or(eyre!("no path for pg_config"))?
+                    .display()
             )
             .as_bytes(),
         )?;
@@ -433,7 +440,7 @@ pub(crate) fn initdb(bindir: &PathBuf, datadir: &PathBuf) -> eyre::Result<()> {
             "problem running initdb: {}\n{}",
             command_str,
             String::from_utf8(output.stderr).unwrap()
-        ))
+        ));
     }
 
     Ok(())

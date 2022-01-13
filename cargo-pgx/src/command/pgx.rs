@@ -1,6 +1,5 @@
 use crate::CommandExecute;
 
-
 #[derive(clap::Args, Debug)]
 #[clap(about, author)]
 pub(crate) struct Pgx {

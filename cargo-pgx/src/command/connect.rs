@@ -2,7 +2,7 @@
 // governed by the MIT license that can be found in the LICENSE file.
 
 use crate::{
-    command::{run::exec_psql, start::start_postgres, get::get_property},
+    command::{get::get_property, run::exec_psql, start::start_postgres},
     CommandExecute,
 };
 use colored::Colorize;

@@ -8,6 +8,7 @@ use std::sync::{Arc, Mutex};
 
 use colored::*;
 use pgx::*;
+use eyre::{eyre, WrapErr};
 use pgx_utils::pg_config::{PgConfig, Pgx};
 use pgx_utils::{createdb, get_named_capture, get_target_dir};
 use postgres::error::DbError;
@@ -53,8 +54,8 @@ pub fn run_test(
     sql_funcname: &str,
     expected_error: Option<&str>,
     postgresql_conf: Vec<&'static str>,
-) {
-    let (loglines, system_session_id) = initialize_test_framework(postgresql_conf);
+) -> eyre::Result<()> {
+    let (loglines, system_session_id) = initialize_test_framework(postgresql_conf)?;
 
     let (mut client, session_id) = client();
 
@@ -86,7 +87,8 @@ pub fn run_test(
 
                 if let Some(expected_error_message) = expected_error {
                     // and we expected an error, so assert what we got is what we expect
-                    assert_eq!(received_error_message, expected_error_message)
+                    assert_eq!(received_error_message, expected_error_message);
+                    Ok(())
                 } else {
                     // we weren't expecting an error
                     //
@@ -132,8 +134,8 @@ pub fn run_test(
         }
     } else if let Some(expected_error_message) = expected_error {
         // we expected an ERROR, but didn't get one
-        panic!("Expected error: {}", expected_error_message);
-    }
+        return Err(eyre!("Expected error: {}", expected_error_message));
+    } else { Ok(()) }
 }
 
 fn format_loglines(session_id: &str, loglines: &LogLines) -> String {
@@ -153,7 +155,7 @@ fn format_loglines(session_id: &str, loglines: &LogLines) -> String {
     result
 }
 
-fn initialize_test_framework(postgresql_conf: Vec<&'static str>) -> (LogLines, String) {
+fn initialize_test_framework(postgresql_conf: Vec<&'static str>) -> eyre::Result<(LogLines, String)> {
     let mut state = TEST_MUTEX.lock().unwrap_or_else(|_| {
         // if we can't get the lock, that means it was poisoned,
         // so we just abruptly exit, which cuts down on test failure spam
@@ -163,10 +165,10 @@ fn initialize_test_framework(postgresql_conf: Vec<&'static str>) -> (LogLines, S
     if !state.installed {
         register_shutdown_hook();
 
-        install_extension();
-        initdb(postgresql_conf);
+        install_extension()?;
+        initdb(postgresql_conf)?;
 
-        let system_session_id = start_pg(state.loglines.clone());
+        let system_session_id = start_pg(state.loglines.clone())?;
         let pg_config = get_pg_config();
         dropdb();
         createdb(&pg_config, get_pg_dbname(), true, false).expect("failed to create test database");
@@ -176,7 +178,7 @@ fn initialize_test_framework(postgresql_conf: Vec<&'static str>) -> (LogLines, S
         state.system_session_id = system_session_id;
     }
 
-    (state.loglines.clone(), state.system_session_id.clone())
+    Ok((state.loglines.clone(), state.system_session_id.clone()))
 }
 
 fn get_pg_config() -> PgConfig {
@@ -225,7 +227,7 @@ pub fn client() -> (postgres::Client, String) {
     (client, session_id)
 }
 
-fn install_extension() {
+fn install_extension() -> eyre::Result<()> {
     eprintln!("installing extension");
     let is_release = std::env::var("PGX_BUILD_PROFILE").unwrap_or("debug".into()) == "release";
     let no_schema = std::env::var("PGX_NO_SCHEMA").unwrap_or("false".into()) == "true";
@@ -240,7 +242,7 @@ fn install_extension() {
             "PGX_TEST_MODE_VERSION",
             format!("pg{}", pg_sys::get_pg_major_version_string()),
         )
-        .env("CARGO_TARGET_DIR", get_target_dir())
+        .env("CARGO_TARGET_DIR", get_target_dir()?)
         .env(
             "PGX_BUILD_FEATURES",
             format!(
@@ -259,19 +261,20 @@ fn install_extension() {
     let mut child = command.spawn().unwrap();
     let status = child.wait().unwrap();
     if !status.success() {
-        panic!("failed to install extension");
+        return Err(eyre!("failed to install extension"));
     }
+    Ok(())
 }
 
-fn initdb(postgresql_conf: Vec<&'static str>) {
+fn initdb(postgresql_conf: Vec<&'static str>) -> eyre::Result<()> {
     let pg_config = get_pg_config();
-    let pgdata = get_pgdata_path();
+    let pgdata = get_pgdata_path()?;
 
     if !pgdata.is_dir() {
         let status = Command::new(
             pg_config
                 .initdb_path()
-                .expect("unable to determine initdb path"),
+                .wrap_err("unable to determine initdb path")?,
         )
         .arg("-D")
         .arg(pgdata.to_str().unwrap())
@@ -281,27 +284,27 @@ fn initdb(postgresql_conf: Vec<&'static str>) {
         .unwrap();
 
         if !status.success() {
-            panic!("initdb failed");
+            return Err(eyre!("initdb failed"));
         }
     }
 
-    modify_postgresql_conf(pgdata, postgresql_conf);
+    modify_postgresql_conf(pgdata, postgresql_conf)
 }
 
-fn modify_postgresql_conf(pgdata: PathBuf, postgresql_conf: Vec<&'static str>) {
+fn modify_postgresql_conf(pgdata: PathBuf, postgresql_conf: Vec<&'static str>) -> eyre::Result<()> {
     let mut postgresql_conf_file = std::fs::OpenOptions::new()
         .write(true)
         .truncate(true)
         .open(format!("{}/postgresql.auto.conf", pgdata.display()))
-        .expect("couldn't open postgresql.auto.conf");
+        .wrap_err("couldn't open postgresql.auto.conf")?;
     postgresql_conf_file
         .write_all("log_line_prefix='[%m] [%p] [%c]: '\n".as_bytes())
-        .expect("couldn't append log_line_prefix");
+        .wrap_err("couldn't append log_line_prefix")?;
 
     for setting in postgresql_conf {
         postgresql_conf_file
             .write_all(format!("{}\n", setting).as_bytes())
-            .expect("couldn't append custom setting to postgresql.conf");
+            .wrap_err("couldn't append custom setting to postgresql.conf")?;
     }
 
     postgresql_conf_file
@@ -312,19 +315,20 @@ fn modify_postgresql_conf(pgdata: PathBuf, postgresql_conf: Vec<&'static str>) {
             )
             .as_bytes(),
         )
-        .expect("couldn't append `unix_socket_directories` setting to postgresql.conf");
+        .wrap_err("couldn't append `unix_socket_directories` setting to postgresql.conf")?;
+    Ok(())
 }
 
-fn start_pg(loglines: LogLines) -> String {
+fn start_pg(loglines: LogLines) -> eyre::Result<String> {
     let pg_config = get_pg_config();
     let mut command = Command::new(
         pg_config
             .postmaster_path()
-            .expect("unable to determine postmaster path"),
+            .wrap_err("unable to determine postmaster path")?,
     );
     command
         .arg("-D")
-        .arg(get_pgdata_path().to_str().unwrap())
+        .arg(get_pgdata_path()?.to_str().unwrap())
         .arg("-h")
         .arg(pg_config.host())
         .arg("-p")
@@ -351,7 +355,7 @@ fn start_pg(loglines: LogLines) -> String {
         libc::kill(pgpid as libc::pid_t, libc::SIGTERM);
     });
 
-    session_id
+    Ok(session_id)
 }
 
 fn monitor_pg(mut command: Command, cmd_string: String, loglines: LogLines) -> (u32, String) {
@@ -492,13 +496,13 @@ fn get_extension_name() -> String {
         .replace("-", "_")
 }
 
-fn get_pgdata_path() -> PathBuf {
-    let mut target_dir = get_target_dir();
+fn get_pgdata_path() -> eyre::Result<PathBuf> {
+    let mut target_dir = get_target_dir()?;
     target_dir.push(&format!(
         "pgx-test-data-{}",
         pg_sys::get_pg_major_version_num()
     ));
-    target_dir
+    Ok(target_dir)
 }
 
 fn get_pg_dbname() -> &'static str {

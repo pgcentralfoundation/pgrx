@@ -1,5 +1,6 @@
 //! Wrapper around Postgres' `pg_config` command-line tool
 use colored::Colorize;
+use eyre::{eyre, WrapErr};
 use std::{
     collections::HashMap,
     io::ErrorKind,
@@ -8,7 +9,6 @@ use std::{
     str::FromStr,
 };
 use url::Url;
-use eyre::{WrapErr, eyre};
 
 #[derive(Clone)]
 pub struct PgVersion {
@@ -228,7 +228,9 @@ impl PgConfig {
         match Command::new(&pg_config).arg(arg).output() {
             Ok(output) => Ok(String::from_utf8(output.stdout).unwrap().trim().to_string()),
             Err(e) => match e.kind() {
-                ErrorKind::NotFound => Err(e).wrap_err_with(|| format!("Unable to find `{}`", "pg_config".yellow())),
+                ErrorKind::NotFound => {
+                    Err(e).wrap_err_with(|| format!("Unable to find `{}`", "pg_config".yellow()))
+                }
                 _ => Err(e.into()),
             },
         }
@@ -309,7 +311,9 @@ impl Pgx {
                         }
                         Ok(pgx)
                     }
-                    Err(e) => Err(e).wrap_err_with(|| format!("Could not read `{}`", path.display())),
+                    Err(e) => {
+                        Err(e).wrap_err_with(|| format!("Could not read `{}`", path.display()))
+                    }
                 }
             }
         }
@@ -388,9 +392,9 @@ impl Pgx {
 }
 
 mod rss {
-    use crate::handle_result;
     use crate::pg_config::PgVersion;
     use colored::Colorize;
+    use eyre::WrapErr;
     use rttp_client::{types::Proxy, HttpClient};
     use serde_derive::Deserialize;
     use url::Url;
@@ -398,9 +402,7 @@ mod rss {
     pub(super) struct PostgreSQLVersionRss;
 
     impl PostgreSQLVersionRss {
-        pub(super) fn new(
-            supported_major_versions: &[u16],
-        ) -> Result<Vec<PgVersion>, std::io::Error> {
+        pub(super) fn new(supported_major_versions: &[u16]) -> eyre::Result<Vec<PgVersion>> {
             static VERSIONS_RSS_URL: &str = "https://www.postgresql.org/versions.rss";
 
             let mut http_client = HttpClient::new();
@@ -409,18 +411,13 @@ mod rss {
                 http_client.proxy(Proxy::https(host, port as u32));
             }
 
-            let response = handle_result!(
-                http_client.emit(),
-                &format!("unable to retrieve {}", VERSIONS_RSS_URL)
-            );
+            let response = http_client
+                .emit()
+                .wrap_err_with(|| format!("unable to retrieve {}", VERSIONS_RSS_URL))?;
+
             let rss: Rss = match serde_xml_rs::from_str(&response.body().to_string()) {
                 Ok(rss) => rss,
-                Err(e) => {
-                    return Err(std::io::Error::new(
-                        std::io::ErrorKind::InvalidInput,
-                        format!("{:?}", e),
-                    ))
-                }
+                Err(e) => return Err(e.into()),
             };
 
             let mut versions = Vec::new();

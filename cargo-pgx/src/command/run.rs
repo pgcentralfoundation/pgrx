@@ -2,7 +2,9 @@
 // governed by the MIT license that can be found in the LICENSE file.
 
 use crate::{
-    command::{install::install_extension, start::start_postgres, stop::stop_postgres, get::get_property},
+    command::{
+        get::get_property, install::install_extension, start::start_postgres, stop::stop_postgres,
+    },
     CommandExecute,
 };
 use colored::Colorize;
@@ -39,9 +41,7 @@ impl CommandExecute for Run {
     fn execute(self) -> eyre::Result<()> {
         let dbname = match self.dbname {
             Some(dbname) => dbname,
-            None => {
-                get_property("extname")?.ok_or(eyre!("could not determine extension name"))?
-            }
+            None => get_property("extname")?.ok_or(eyre!("could not determine extension name"))?,
         };
 
         run_psql(

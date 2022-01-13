@@ -52,8 +52,7 @@ fn main() -> color_eyre::Result<()> {
     let cargo_cli = CargoCommand::parse();
 
     // Initialize tracing with tracing-error, and eyre
-    let fmt_layer = tracing_subscriber::fmt::Layer::new()
-        .pretty();
+    let fmt_layer = tracing_subscriber::fmt::Layer::new().pretty();
 
     let filter_layer = match EnvFilter::try_from_default_env() {
         Ok(filter_layer) => filter_layer,
@@ -64,12 +63,17 @@ fn main() -> color_eyre::Result<()> {
                 _ => "trace",
             };
             let filter_layer = EnvFilter::new("warn");
-            let filter_layer = filter_layer.add_directive(format!("cargo_pgx={}", log_level).parse()?);
+            let filter_layer =
+                filter_layer.add_directive(format!("cargo_pgx={}", log_level).parse()?);
             let filter_layer = filter_layer.add_directive(format!("pgx={}", log_level).parse()?);
-            let filter_layer = filter_layer.add_directive(format!("pgx_macros={}", log_level).parse()?);
-            let filter_layer = filter_layer.add_directive(format!("pgx_tests={}", log_level).parse()?);
-            let filter_layer = filter_layer.add_directive(format!("pgx_pg_sys={}", log_level).parse()?);
-            let filter_layer = filter_layer.add_directive(format!("pgx_utils={}", log_level).parse()?);
+            let filter_layer =
+                filter_layer.add_directive(format!("pgx_macros={}", log_level).parse()?);
+            let filter_layer =
+                filter_layer.add_directive(format!("pgx_tests={}", log_level).parse()?);
+            let filter_layer =
+                filter_layer.add_directive(format!("pgx_pg_sys={}", log_level).parse()?);
+            let filter_layer =
+                filter_layer.add_directive(format!("pgx_utils={}", log_level).parse()?);
             filter_layer
         }
     };

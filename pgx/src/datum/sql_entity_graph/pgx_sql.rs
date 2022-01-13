@@ -785,10 +785,7 @@ fn connect_externs(
                             tracing::debug!(from = %item.rust_identifier(), to = %graph[*target].rust_identifier(), "Adding Extern after positioning ref target");
                             graph.add_edge(*target, index, SqlGraphRelationship::RequiredBy);
                         } else {
-                            return Err(eyre!(
-                                "Could not find `requires` target: {:?}",
-                                requires
-                            ));
+                            return Err(eyre!("Could not find `requires` target: {:?}", requires));
                         }
                     }
                 }

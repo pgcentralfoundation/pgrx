@@ -5,10 +5,10 @@ use crate::command::init::initdb;
 use crate::command::status::status_postgres;
 use crate::CommandExecute;
 use colored::Colorize;
+use eyre::eyre;
 use pgx_utils::pg_config::{PgConfig, PgConfigSelector, Pgx};
 use std::os::unix::process::CommandExt;
 use std::process::Stdio;
-use eyre::eyre;
 
 /// Start a pgx-managed Postgres instance
 #[derive(clap::Args, Debug)]
@@ -92,7 +92,7 @@ pub(crate) fn start_postgres(pg_config: &PgConfig) -> eyre::Result<()> {
             "problem running pg_ctl: {}\n\n{}",
             command_str,
             String::from_utf8(output.stderr).unwrap()
-        ))
+        ));
     }
 
     Ok(())

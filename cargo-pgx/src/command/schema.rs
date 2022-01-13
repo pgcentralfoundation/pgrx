@@ -5,7 +5,6 @@ use crate::{
 use colored::Colorize;
 use eyre::{eyre, WrapErr};
 use pgx_utils::{
-    exit_with_error,
     pg_config::{PgConfig, Pgx},
 };
 use std::{
@@ -192,10 +191,10 @@ pub(crate) fn generate_schema(
     }
 
     if get_property("relocatable")? != Some("false".into()) {
-        exit_with_error!(
+        return Err(eyre!(
             "{}:  The `relocatable` property MUST be `false`.  Please update your .control file.",
             control_file.display()
-        )
+        ))
     }
 
     let mut features =
@@ -247,7 +246,7 @@ pub(crate) fn generate_schema(
     }
 
     // Inspect the symbol table for a list of `__pgx_internals` we should have the generator call
-    let mut sql_gen_path = pgx_utils::get_target_dir();
+    let mut sql_gen_path = pgx_utils::get_target_dir()?;
     sql_gen_path.push(if is_release { "release" } else { "debug" });
     sql_gen_path.push("sql-generator");
     println!("{} SQL entities", " Discovering".bold().green(),);

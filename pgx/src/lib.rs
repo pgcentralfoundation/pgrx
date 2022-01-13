@@ -434,7 +434,7 @@ macro_rules! pg_binary_magic {
             let filter_layer = match EnvFilter::try_from_default_env() {
                 Ok(filter_layer) => filter_layer,
                 Err(_) => {
-                    let log_level = match cargo_cli.verbose {
+                    let log_level = match sql_generator_cli.verbose {
                         0 => "info",
                         1 => "warn",
                         _ => "trace",

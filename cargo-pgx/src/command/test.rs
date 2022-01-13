@@ -71,13 +71,13 @@ pub fn test_extension(
     if let Some(ref testname) = testname {
         tracing::Span::current().record("testname", &tracing::field::display(&testname.as_ref()));
     }
-    
+
     let additional_features = additional_features
         .iter()
         .map(AsRef::as_ref)
         .collect::<Vec<_>>();
     let major_version = pg_config.major_version()?;
-    let target_dir = get_target_dir();
+    let target_dir = get_target_dir()?;
 
     let mut command = Command::new("cargo");
 
@@ -117,7 +117,10 @@ pub fn test_extension(
     let status = command.status().wrap_err("failed to run cargo test")?;
     tracing::trace!(status_code = %status, command = ?command, "Finished");
     if !status.success() {
-        return Err(eyre!("cargo pgx test failed with status = {:?}", status.code()));
+        return Err(eyre!(
+            "cargo pgx test failed with status = {:?}",
+            status.code()
+        ));
     }
 
     Ok(())

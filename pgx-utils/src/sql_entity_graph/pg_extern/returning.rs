@@ -186,12 +186,7 @@ impl TryFrom<&syn::ReturnType> for Returning {
                             Self::parse_type_tuple(tup)
                         }
                     }
-                    _ => {
-                        return Err(eyre!(
-                            "Got unknown return type: {}",
-                            &ty.to_token_stream()
-                        ))
-                    }
+                    _ => return Err(eyre!("Got unknown return type: {}", &ty.to_token_stream())),
                 }
             }
         })

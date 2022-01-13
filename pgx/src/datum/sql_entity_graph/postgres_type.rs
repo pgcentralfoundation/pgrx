@@ -141,9 +141,7 @@ impl ToSql for PostgresTypeEntity {
         let (_, _index) = context
             .externs
             .iter()
-            .find(|(k, _v)| {
-                (**k).full_path == out_fn_path.as_str()
-            })
+            .find(|(k, _v)| (**k).full_path == out_fn_path.as_str())
             .ok_or_else(|| eyre::eyre!("Did not find `out_fn: {}`.", out_fn_path))?;
         let (out_fn_graph_index, out_fn) = context
             .graph

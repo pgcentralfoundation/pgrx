@@ -8,8 +8,8 @@ use crate::{
 use cargo_metadata::MetadataCommand;
 use colored::Colorize;
 use eyre::{eyre, WrapErr};
-use pgx_utils::pg_config::{PgConfig, Pgx};
 use pgx_utils::get_target_dir;
+use pgx_utils::pg_config::{PgConfig, Pgx};
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
 
@@ -71,7 +71,10 @@ pub(crate) fn install_extension(
     additional_features: &Vec<impl AsRef<str>>,
 ) -> eyre::Result<()> {
     let base_directory = base_directory.unwrap_or("/".into());
-    tracing::Span::current().record("base_directory", &tracing::field::display(&base_directory.display()));
+    tracing::Span::current().record(
+        "base_directory",
+        &tracing::field::display(&base_directory.display()),
+    );
 
     let (control_file, extname) = find_control_file()?;
     let major_version = pg_config.major_version()?;
@@ -80,7 +83,7 @@ pub(crate) fn install_extension(
         return Err(eyre!(
             "{}:  The `relocatable` property MUST be `false`.  Please update your .control file.",
             control_file.display()
-        ))
+        ));
     }
 
     build_extension(major_version, is_release, &*additional_features)?;
@@ -146,7 +149,7 @@ fn copy_file(src: &PathBuf, dest: &PathBuf, msg: &str, do_filter: bool) -> eyre:
         "{} {} to `{}`",
         "     Copying".bold().green(),
         msg,
-        format_display_path(&dest)
+        format_display_path(&dest)?
     );
 
     if do_filter {
@@ -271,11 +274,14 @@ fn copy_sql_files(
 }
 
 pub(crate) fn find_library_file(extname: &str, is_release: bool) -> eyre::Result<PathBuf> {
-    let mut target_dir = get_target_dir();
+    let mut target_dir = get_target_dir()?;
     target_dir.push(if is_release { "release" } else { "debug" });
 
     if !target_dir.exists() {
-        return Err(eyre!("target directory does not exist: {}", target_dir.display()));
+        return Err(eyre!(
+            "target directory does not exist: {}",
+            target_dir.display()
+        ));
     }
 
     for f in std::fs::read_dir(&target_dir)
@@ -347,11 +353,12 @@ fn make_relative(path: PathBuf) -> PathBuf {
     relative
 }
 
-fn format_display_path(path: &PathBuf) -> String {
-    path.strip_prefix(get_target_dir().parent().unwrap())
+fn format_display_path(path: &PathBuf) -> eyre::Result<String> {
+    let out = path.strip_prefix(get_target_dir()?.parent().unwrap())
         .unwrap_or(&path)
         .display()
-        .to_string()
+        .to_string();
+    Ok(out)
 }
 
 fn filter_contents(mut input: String) -> eyre::Result<String> {

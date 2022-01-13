@@ -65,10 +65,9 @@ pub(crate) fn package_extension(
 }
 
 fn build_base_path(pg_config: &PgConfig, is_debug: bool) -> eyre::Result<PathBuf> {
-    let mut target_dir = get_target_dir();
+    let mut target_dir = get_target_dir()?;
     let pgver = pg_config.major_version()?;
-    let extname =
-        get_property("extname")?.ok_or(eyre!("could not determine extension name"))?;
+    let extname = get_property("extname")?.ok_or(eyre!("could not determine extension name"))?;
     target_dir.push(if is_debug { "debug" } else { "release" });
     target_dir.push(format!("{}-pg{}", extname, pgver));
     Ok(target_dir)
