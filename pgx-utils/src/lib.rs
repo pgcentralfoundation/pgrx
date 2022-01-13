@@ -197,6 +197,7 @@ pub enum ExternArgs {
     Error(String),
     Schema(String),
     Name(String),
+    Cost(String),
     Requires(Vec<PositioningRef>),
 }
 
@@ -215,6 +216,7 @@ impl core::fmt::Display for ExternArgs {
             ExternArgs::NoGuard => Ok(()),
             ExternArgs::Schema(_) => Ok(()),
             ExternArgs::Name(_) => Ok(()),
+            ExternArgs::Cost(cost) => write!(f, "COST {}", cost),
             ExternArgs::Requires(_) => Ok(()),
         }
     }
@@ -252,6 +254,14 @@ impl ToTokens for ExternArgs {
                 tokens.append_all(
                     quote! {
                         Name(String::from("#_s"))
+                    }
+                    .to_token_stream(),
+                );
+            }
+            ExternArgs::Cost(_s) => {
+                tokens.append_all(
+                    quote! {
+                        Cost(String::from("#_s"))
                     }
                     .to_token_stream(),
                 );
