@@ -32,7 +32,7 @@ fork = "0.1.18"
 libloading = "0.7.2"
 symbolic = "8.5.0"
 eyre = "0.6.5"
-color-eyre = "0.5.11"
+color-eyre = "0.6.0"
 tracing = "0.1.29"
 tracing-error = "0.2.0"
 tracing-subscriber = { version = "0.3.5", features = [ "env-filter" ] }
