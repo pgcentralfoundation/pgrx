@@ -61,7 +61,7 @@ fn main() -> color_eyre::Result<()> {
             let log_level = match cargo_cli.verbose {
                 0 => "info",
                 1 => "warn",
-                2 => "trace",
+                _ => "trace",
             };
             let filter_layer = EnvFilter::new("warn");
             let filter_layer = filter_layer.add_directive(format!("cargo_pgx={}", log_level).parse()?);
