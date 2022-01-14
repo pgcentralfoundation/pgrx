@@ -1,7 +1,7 @@
 mod aggregate_type;
 mod maybe_variadic_type;
 
-use aggregate_type::AggregateTypeList;
+use aggregate_type::{AggregateTypeList, AggregateType};
 use convert_case::{Case, Casing};
 use maybe_variadic_type::MaybeVariadicTypeList;
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
@@ -59,6 +59,7 @@ pub struct PgAggregate {
     type_args: MaybeVariadicTypeList,
     type_order_by: Option<AggregateTypeList>,
     type_moving_state: Option<syn::Type>,
+    type_stype: AggregateType,
     const_parallel: Option<syn::Expr>,
     const_finalize_modify: Option<syn::Expr>,
     const_moving_finalize_modify: Option<syn::Expr>,
@@ -118,6 +119,7 @@ impl PgAggregate {
             });
             parse_quote!(Self)
         };
+        let type_stype = AggregateType { ty: type_state_without_self.clone(), };
 
         // `MovingState` is an optional value, we default to nothing.
         let type_moving_state = get_impl_type_by_name(&item_impl_snapshot, "MovingState");
@@ -386,6 +388,7 @@ impl PgAggregate {
             type_args: type_args_value,
             type_order_by: type_order_by_value,
             type_moving_state: type_moving_state_value,
+            type_stype: type_stype,
             const_parallel: get_impl_const_by_name(&item_impl_snapshot, "PARALLEL")
                 .map(|x| x.expr.clone()),
             const_finalize_modify: get_impl_const_by_name(&item_impl_snapshot, "FINALIZE_MODIFY")
@@ -464,6 +467,7 @@ impl PgAggregate {
         let type_args_iter = &self.type_args.entity_tokens();
         let type_order_by_iter = self.type_order_by.iter().map(|x| x.entity_tokens());
         let type_moving_state_iter = self.type_moving_state.iter();
+        let type_stype = self.type_stype.entity_tokens();
         let const_parallel_iter = self.const_parallel.iter();
         let const_finalize_modify_iter = self.const_finalize_modify.iter();
         let const_moving_finalize_modify_iter = self.const_moving_finalize_modify.iter();
@@ -492,7 +496,7 @@ impl PgAggregate {
                     ty_id: core::any::TypeId::of::<#target_ident>(),
                     args: #type_args_iter,
                     order_by: None#( .unwrap_or(Some(#type_order_by_iter)) )*,
-                    stype: stringify!(#target_ident),
+                    stype: #type_stype,
                     sfunc: stringify!(#fn_state),
                     combinefunc: None#( .unwrap_or(Some(stringify!(#fn_combine_iter))) )*,
                     finalfunc: None#( .unwrap_or(Some(stringify!(#fn_finalize_iter))) )*,

@@ -26,7 +26,7 @@ pub struct PgAggregateEntity {
     /// The `STYPE` and `name` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
     /// The implementor of an [`Aggregate`].
-    pub stype: &'static str,
+    pub stype: AggregateType,
 
     /// The `SFUNC` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
@@ -197,15 +197,26 @@ impl ToSql for PgAggregateEntity {
         if self.hypothetical {
             optional_attributes.push(String::from("\tHYPOTHETICAL"))
         }
+
+        let stype_sql = context
+            .rust_to_sql(self.stype.ty_id, self.stype.ty_source, self.stype.full_path)
+            .ok_or_else(|| {
+                eyre_err!(
+                    "Failed to map moving state type `{}` to SQL type while building aggregate `{}`.",
+                    self.stype.full_path,
+                    self.name
+                )
+            })?;
+
         if let Some(value) = &self.mstype {
             let sql = context
                 .rust_to_sql(value.ty_id, value.ty_source, value.full_path)
                 .ok_or_else(|| {
                     eyre_err!(
-                "Failed to map moving state type `{}` to SQL type while building aggregate `{}`.",
-                value.full_path,
-                self.name
-            )
+                        "Failed to map moving state type `{}` to SQL type while building aggregate `{}`.",
+                        value.full_path,
+                        self.name
+                    )
                 })?;
             optional_attributes.push(format!("\tMSTYPE = {} /* {} */", sql, value.full_path));
         }
@@ -217,7 +228,7 @@ impl ToSql for PgAggregateEntity {
                 CREATE AGGREGATE {schema}{name} ({args}{maybe_order_by})\n\
                 (\n\
                     \tSFUNC = {schema}\"{sfunc}\",\n\
-                    \tSTYPE = {schema}{stype}{maybe_comma_after_stype}\
+                    \tSTYPE = {schema}{stype}{maybe_comma_after_stype} --{stype_full_path}\
                     {optional_attributes}\
                 );\
             ",
@@ -227,7 +238,8 @@ impl ToSql for PgAggregateEntity {
             file = self.file,
             line = self.line,
             sfunc = self.sfunc,
-            stype = self.stype,
+            stype = stype_sql,
+            stype_full_path = self.stype.full_path,
             maybe_comma_after_stype = if optional_attributes.len() == 0 {
                 ""
             } else {
