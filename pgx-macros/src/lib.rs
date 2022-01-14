@@ -961,8 +961,7 @@ pub fn postgres_hash(input: TokenStream) -> TokenStream {
 }
 
 /**
-Declare a type as a `#[pg_aggregate]` to indicate that it can be used by Postgres as an aggregate.
-
+Declare a `pgx::Aggregate` implentation on a type as able to used by Postgres as an aggregate.
 
 */
 #[proc_macro_attribute]

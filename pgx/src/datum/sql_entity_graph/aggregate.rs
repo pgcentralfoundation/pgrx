@@ -1,7 +1,22 @@
-use super::{AggregateType, FinalizeModify, MaybeVariadicAggregateType, ParallelOption};
-use crate::sql_entity_graph::{SqlGraphEntity, SqlGraphIdentifier, ToSql};
+use crate::{
+    aggregate::{FinalizeModify, ParallelOption},
+    datum::sql_entity_graph::{SqlGraphEntity, SqlGraphIdentifier, ToSql},
+};
 use core::{any::TypeId, cmp::Ordering};
 use eyre::eyre as eyre_err;
+
+#[derive(Debug, Clone, Hash, PartialEq, Eq)]
+pub struct AggregateType {
+    pub ty_source: &'static str,
+    pub ty_id: TypeId,
+    pub full_path: &'static str,
+}
+
+#[derive(Debug, Clone, Hash, PartialEq, Eq)]
+pub struct MaybeVariadicAggregateType {
+    pub agg_ty: AggregateType,
+    pub variadic: bool,
+}
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub struct PgAggregateEntity {
@@ -15,67 +30,67 @@ pub struct PgAggregateEntity {
 
     /// The `arg_data_type` list.
     ///
-    /// Corresponds to `Args` in [`Aggregate`].
+    /// Corresponds to `Args` in [`crate::aggregate::Aggregate`].
     pub args: Vec<MaybeVariadicAggregateType>,
 
     /// The `ORDER BY arg_data_type` list.
     ///
-    /// Corresponds to `OrderBy` in [`Aggregate`].
+    /// Corresponds to `OrderBy` in [`crate::aggregate::Aggregate`].
     pub order_by: Option<Vec<AggregateType>>,
 
     /// The `STYPE` and `name` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
-    /// The implementor of an [`Aggregate`].
+    /// The implementor of an [`crate::aggregate::Aggregate`].
     pub stype: AggregateType,
 
     /// The `SFUNC` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
-    /// Corresponds to `state` in [`Aggregate`].
+    /// Corresponds to `state` in [`crate::aggregate::Aggregate`].
     pub sfunc: &'static str,
 
     /// The `FINALFUNC` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
-    /// Corresponds to `final` in [`Aggregate`].
+    /// Corresponds to `final` in [`crate::aggregate::Aggregate`].
     pub finalfunc: Option<&'static str>,
 
     /// The `FINALFUNC_MODIFY` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
-    /// Corresponds to `FINALIZE_MODIFY` in [`Aggregate`].
+    /// Corresponds to `FINALIZE_MODIFY` in [`crate::aggregate::Aggregate`].
     pub finalfunc_modify: Option<FinalizeModify>,
 
     /// The `COMBINEFUNC` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
-    /// Corresponds to `combine` in [`Aggregate`].
+    /// Corresponds to `combine` in [`crate::aggregate::Aggregate`].
     pub combinefunc: Option<&'static str>,
 
     /// The `SERIALFUNC` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
-    /// Corresponds to `serial` in [`Aggregate`].
+    /// Corresponds to `serial` in [`crate::aggregate::Aggregate`].
     pub serialfunc: Option<&'static str>,
 
     /// The `DESERIALFUNC` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
-    /// Corresponds to `deserial` in [`Aggregate`].
+    /// Corresponds to `deserial` in [`crate::aggregate::Aggregate`].
     pub deserialfunc: Option<&'static str>,
 
     /// The `INITCOND` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
-    /// Corresponds to `INITIAL_CONDITION` in [`Aggregate`].
+    /// Corresponds to `INITIAL_CONDITION` in [`crate::aggregate::Aggregate`].
     pub initcond: Option<&'static str>,
 
     /// The `MSFUNC` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
-    /// Corresponds to `moving_state` in [`Aggregate`].
+    /// Corresponds to `moving_state` in [`crate::aggregate::Aggregate`].
     pub msfunc: Option<&'static str>,
 
     /// The `MINVFUNC` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
-    /// Corresponds to `moving_state_inverse` in [`Aggregate`].
+    /// Corresponds to `moving_state_inverse` in [`crate::aggregate::Aggregate`].
     pub minvfunc: Option<&'static str>,
 
     /// The `MSTYPE` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
-    /// Corresponds to `MovingState` in [`Aggregate`].
+    /// Corresponds to `MovingState` in [`crate::aggregate::Aggregate`].
     pub mstype: Option<AggregateType>,
 
     // The `MSSPACE` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
@@ -84,32 +99,32 @@ pub struct PgAggregateEntity {
     // pub msspace: &'static str,
     /// The `MFINALFUNC` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
-    /// Corresponds to `moving_state_finalize` in [`Aggregate`].
+    /// Corresponds to `moving_state_finalize` in [`crate::aggregate::Aggregate`].
     pub mfinalfunc: Option<&'static str>,
 
     /// The `MFINALFUNC_MODIFY` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
-    /// Corresponds to `MOVING_FINALIZE_MODIFY` in [`Aggregate`].
+    /// Corresponds to `MOVING_FINALIZE_MODIFY` in [`crate::aggregate::Aggregate`].
     pub mfinalfunc_modify: Option<FinalizeModify>,
 
     /// The `MINITCOND` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
-    /// Corresponds to `MOVING_INITIAL_CONDITION` in [`Aggregate`].
+    /// Corresponds to `MOVING_INITIAL_CONDITION` in [`crate::aggregate::Aggregate`].
     pub minitcond: Option<&'static str>,
 
     /// The `SORTOP` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
-    /// Corresponds to `SORT_OPERATOR` in [`Aggregate`].
+    /// Corresponds to `SORT_OPERATOR` in [`crate::aggregate::Aggregate`].
     pub sortop: Option<&'static str>,
 
     /// The `PARALLEL` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
-    /// Corresponds to `PARALLEL` in [`Aggregate`].
+    /// Corresponds to `PARALLEL` in [`crate::aggregate::Aggregate`].
     pub parallel: Option<ParallelOption>,
 
     /// The `HYPOTHETICAL` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
-    /// Corresponds to `hypothetical` in [`Aggregate`].
+    /// Corresponds to `hypothetical` in [`crate::aggregate::Aggregate`].
     pub hypothetical: bool,
 }
 
@@ -171,7 +186,7 @@ impl ToSql for PgAggregateEntity {
             optional_attributes.push(format!("\tDESERIALFUNC ={} \"{}\"", schema, value));
         }
         if let Some(value) = self.initcond {
-            optional_attributes.push(format!("\tINITCOND = \"{}\"", value));
+            optional_attributes.push(format!("\tINITCOND = '{}'", value));
         }
         if let Some(value) = self.msfunc {
             optional_attributes.push(format!("\tMSFUNC = {}\"{}\"", schema, value));
@@ -186,7 +201,7 @@ impl ToSql for PgAggregateEntity {
             optional_attributes.push(format!("\tMFINALFUNC_MODIFY = {}", value.to_sql(context)?));
         }
         if let Some(value) = self.minitcond {
-            optional_attributes.push(format!("\tMINITCOND = \"{}\"", value));
+            optional_attributes.push(format!("\tMINITCOND = '{}'", value));
         }
         if let Some(value) = self.sortop {
             optional_attributes.push(format!("\tSORTOP = \"{}\"", value));
@@ -228,7 +243,7 @@ impl ToSql for PgAggregateEntity {
                 CREATE AGGREGATE {schema}{name} ({args}{maybe_order_by})\n\
                 (\n\
                     \tSFUNC = {schema}\"{sfunc}\",\n\
-                    \tSTYPE = {schema}{stype}{maybe_comma_after_stype} --{stype_full_path}\
+                    \tSTYPE = {schema}{stype}{maybe_comma_after_stype} /* {stype_full_path} */\
                     {optional_attributes}\
                 );\
             ",

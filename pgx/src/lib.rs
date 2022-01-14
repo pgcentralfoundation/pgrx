@@ -27,6 +27,7 @@ extern crate bitflags;
 // expose our various derive macros
 pub use pgx_macros::*;
 
+pub mod aggregate;
 pub mod callbacks;
 pub mod datum;
 pub mod enum_helper;
@@ -60,6 +61,7 @@ pub mod xid;
 #[doc(hidden)]
 pub use once_cell;
 
+pub use aggregate::*;
 pub use atomics::*;
 pub use callbacks::*;
 use datum::sql_entity_graph::{RustSourceOnlySqlMapping, RustSqlMapping};

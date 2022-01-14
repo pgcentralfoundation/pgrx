@@ -106,7 +106,7 @@ impl PgAggregate {
 
         let name = match get_impl_const_by_name(&item_impl_snapshot, "NAME") {
             Some(item_const) => match item_const.expr {
-                syn::Expr::Lit(ref expr) => if let syn::Lit::Str(ref litstr) = expr.lit {
+                syn::Expr::Lit(ref expr) => if let syn::Lit::Str(_) = expr.lit {
                     item_const.expr.clone()
                 } else {
                     panic!(
@@ -137,10 +137,9 @@ impl PgAggregate {
             item_impl.items.push(parse_quote! {
                 type State = Self;
             });
-            item_impl.items.push(parse_quote! {
-                type ReturnType = Self;
-            });
-            parse_quote!(Self)
+            let mut remapped = parse_quote!(Self);
+            remap_self_to_target(&mut remapped, &target_ident);
+            remapped
         };
         let type_stype = AggregateType { ty: type_state_without_self.clone(), };
 

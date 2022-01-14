@@ -224,9 +224,9 @@ pub fn pg_return_void() -> pg_sys::Datum {
     0 as pg_sys::Datum
 }
 
-/// Retrieve the `.flinfo.fn_extra` pointer (as a PgBox'd type) from [pg_sys::FunctionCallInfo].
+/// Retrieve the `.flinfo.fn_extra` pointer (as a PgBox'd type) from [`pg_sys::FunctionCallInfo`].
 ///
-/// This function is unsafe as we cannot guarantee the provided [fcinfo] pointer is valid
+/// This function is unsafe as we cannot guarantee the provided [`pg_sys::FunctionCallInfo`] pointer is valid
 pub unsafe fn pg_func_extra<ReturnType, DefaultValue: FnOnce() -> ReturnType>(
     fcinfo: pg_sys::FunctionCallInfo,
     default: DefaultValue,

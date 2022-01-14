@@ -2,7 +2,6 @@ mod pgx_sql;
 pub use pgx_sql::PgxSql;
 
 pub mod aggregate;
-pub use aggregate::Aggregate;
 
 mod control_file;
 pub use control_file::ControlFile;
