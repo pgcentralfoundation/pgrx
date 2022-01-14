@@ -11,6 +11,7 @@ use syn::{
     parse_quote,
     spanned::Spanned,
     ImplItemConst, ImplItemMethod, ImplItemType, ItemFn, ItemImpl, Path, Type,
+    Expr,
 };
 
 // We support only 32 tuples...
@@ -54,6 +55,7 @@ const ARG_NAMES: [&str; 32] = [
 #[derive(Debug, Clone)]
 pub struct PgAggregate {
     item_impl: ItemImpl,
+    name: Expr,
     pg_externs: Vec<ItemFn>,
     // Note these should not be considered *writable*, they're snapshots from construction.
     type_args: MaybeVariadicTypeList,
@@ -101,6 +103,27 @@ impl PgAggregate {
                 }
             }
         }
+
+        let name = match get_impl_const_by_name(&item_impl_snapshot, "NAME") {
+            Some(item_const) => match item_const.expr {
+                syn::Expr::Lit(ref expr) => if let syn::Lit::Str(ref litstr) = expr.lit {
+                    item_const.expr.clone()
+                } else {
+                    panic!(
+                        "`NAME` must be a `&'static str` for Aggregate implementations."
+                    )
+                },
+                _ => panic!("`NAME` must be a `&'static str` for Aggregate implementations.")
+            }
+            None => {
+                item_impl.items.push(parse_quote! {
+                    const NAME: &'static str = stringify!(Self);
+                });
+                parse_quote! {
+                    stringify!(#target_ident)
+                }
+            },
+        };
 
         // `State` is an optional value, we default to `Self`.
         let type_state = get_impl_type_by_name(&item_impl_snapshot, "State");
@@ -385,6 +408,7 @@ impl PgAggregate {
         Ok(Self {
             item_impl,
             pg_externs,
+            name,
             type_args: type_args_value,
             type_order_by: type_order_by_value,
             type_moving_state: type_moving_state_value,
@@ -448,22 +472,8 @@ impl PgAggregate {
             target_ident.span(),
         );
 
-        let name = match get_impl_const_by_name(&self.item_impl, "NAME")
-            .expect("`NAME` is a required const for Aggregate implementations.")
-            .expr
-        {
-            syn::Expr::Lit(ref expr) => {
-                if let syn::Lit::Str(ref litstr) = expr.lit {
-                    litstr.clone()
-                } else {
-                    panic!(
-                        "`NAME: &'static str` is a required const for Aggregate implementations."
-                    )
-                }
-            }
-            _ => panic!("`NAME: &'static str` is a required const for Aggregate implementations."),
-        };
 
+        let name = &self.name;
         let type_args_iter = &self.type_args.entity_tokens();
         let type_order_by_iter = self.type_order_by.iter().map(|x| x.entity_tokens());
         let type_moving_state_iter = self.type_moving_state.iter();
