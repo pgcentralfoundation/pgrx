@@ -376,6 +376,9 @@ macro_rules! pg_sql_graph_magic {
 #[macro_export]
 macro_rules! pg_binary_magic {
     ($($prelude:ident)::*) => {
+        pgx::pg_binary_magic!($($prelude)*, |_| pgx::datum::sql_entity_graph::reexports::eyre::Result::<()>::Ok(()));
+    };
+    ($($prelude:ident)::*, $hook:expr) => {
         fn main() -> pgx::datum::sql_entity_graph::reexports::color_eyre::Result<()> {
             use pgx::datum::sql_entity_graph::{
                 reexports::{
@@ -383,6 +386,7 @@ macro_rules! pg_binary_magic {
                     tracing,
                     tracing_subscriber::{self, util::SubscriberInitExt, layer::SubscriberExt, EnvFilter},
                     color_eyre,
+                    eyre,
                     libloading,
                     clap,
                 },
@@ -484,10 +488,17 @@ macro_rules! pg_binary_magic {
                 }
             };
 
-            let pgx_sql = PgxSql::build(
+            let mut pgx_sql = PgxSql::build(
                 pgx::DEFAULT_TYPEID_SQL_MAPPING.clone().into_iter(),
                 pgx::DEFAULT_SOURCE_ONLY_SQL_MAPPING.clone().into_iter(),
                 entities.into_iter()).unwrap();
+
+            // Ensure the user gets a decent error message.
+            fn hook_wrapper(pgx_sql: &mut PgxSql) -> eyre::Result<()> {
+                $hook(pgx_sql)?;
+                Ok(())
+            }
+            hook_wrapper(&mut pgx_sql)?;
 
             tracing::info!(path = %path.display(), "Writing SQL");
             pgx_sql.to_file(path)?;
