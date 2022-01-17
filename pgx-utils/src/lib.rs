@@ -141,7 +141,7 @@ fn does_db_exist(pg_config: &PgConfig, dbname: &str) -> Result<bool, std::io::Er
     let mut command = Command::new(pg_config.psql_path()?);
     command
         .arg("-XqAt")
-        .arg("-U postgres")
+        .env_remove("PGUSER")
         .arg("-h")
         .arg(pg_config.host())
         .arg("-p")
