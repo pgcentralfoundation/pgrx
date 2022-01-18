@@ -3,6 +3,7 @@ updates:
   - package-ecosystem: "cargo"
     directory: "/"
     schedule:
-      interval: "daily"
-      time: "12:00"
+      interval: "weekly"
+#      interval: "daily"
+#      time: "12:00"
     target-branch: "develop"
