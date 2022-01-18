@@ -1,8 +1,6 @@
+use pgx::cstr_core::CStr;
 use pgx::*;
-use std::{
-    str::FromStr,
-    ffi::CStr,
-};
+use std::str::FromStr;
 
 pg_module_magic!();
 
