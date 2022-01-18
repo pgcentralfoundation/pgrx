@@ -87,6 +87,9 @@ impl ToTokens for PostgresEnum {
         let inv = quote! {
             #[no_mangle]
             pub extern "C" fn  #sql_graph_entity_fn_name() -> pgx::datum::sql_entity_graph::SqlGraphEntity {
+                extern crate alloc;
+                use alloc::vec::Vec;
+                use alloc::vec;
                 let mut mappings = Default::default();
                 <#name #ty_generics as pgx::datum::WithTypeIds>::register_with_refs(&mut mappings, stringify!(#name).to_string());
                 pgx::datum::WithSizedTypeIds::<#name #ty_generics>::register_sized_with_refs(&mut mappings, stringify!(#name).to_string());

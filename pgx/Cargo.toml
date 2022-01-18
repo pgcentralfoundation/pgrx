@@ -30,6 +30,7 @@ no-default-features = true
 rustc-args = ["--cfg", "docsrs"]
 
 [dependencies]
+cstr_core = "0.2.5"
 enum-primitive-derive = "0.2.2"
 num-traits = "0.2.14"
 seahash = "4.1.0"
