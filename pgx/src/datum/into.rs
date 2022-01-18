@@ -220,6 +220,17 @@ impl<'a> IntoDatum for &'a std::ffi::CStr {
     }
 }
 
+impl<'a> IntoDatum for &'a crate::cstr_core::CStr {
+    #[inline]
+    fn into_datum(self) -> Option<pg_sys::Datum> {
+        Some(self.as_ptr() as pg_sys::Datum)
+    }
+
+    fn type_oid() -> u32 {
+        pg_sys::CSTRINGOID
+    }
+}
+
 /// for bytea
 impl<'a> IntoDatum for &'a [u8] {
     #[inline]

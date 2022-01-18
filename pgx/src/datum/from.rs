@@ -270,6 +270,26 @@ impl<'a> FromDatum for &'a std::ffi::CStr {
     }
 }
 
+impl<'a> FromDatum for &'a crate::cstr_core::CStr {
+    const NEEDS_TYPID: bool = false;
+    #[inline]
+    unsafe fn from_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _: pg_sys::Oid,
+    ) -> Option<&'a crate::cstr_core::CStr> {
+        if is_null {
+            None
+        } else if datum == 0 {
+            panic!("a cstring Datum was flagged as non-null but the datum is zero");
+        } else {
+            Some(crate::cstr_core::CStr::from_ptr(
+                datum as *const std::os::raw::c_char,
+            ))
+        }
+    }
+}
+
 /// for bytea
 impl<'a> FromDatum for &'a [u8] {
     const NEEDS_TYPID: bool = false;
