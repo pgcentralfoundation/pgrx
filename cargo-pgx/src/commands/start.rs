@@ -3,11 +3,34 @@
 
 use crate::commands::init::initdb;
 use crate::commands::status::status_postgres;
+use crate::CommandExecute;
 use colored::Colorize;
 use pgx_utils::exit_with_error;
-use pgx_utils::pg_config::{PgConfig, Pgx};
+use pgx_utils::pg_config::{PgConfig, PgConfigSelector, Pgx};
 use std::os::unix::process::CommandExt;
 use std::process::Stdio;
+
+/// Start a pgx-managed Postgres instance
+#[derive(clap::Args, Debug)]
+#[clap(author)]
+pub(crate) struct Start {
+    /// The Postgres version to start (`pg10`, `pg11`, `pg12`, `pg13`, `pg14`, or `all`)
+    #[clap(env = "PG_VERSION")]
+    pg_version: String,
+}
+
+impl CommandExecute for Start {
+    fn execute(self) -> std::result::Result<(), std::io::Error> {
+        let pgver = self.pg_version;
+        let pgx = Pgx::from_config()?;
+
+        for pg_config in pgx.iter(PgConfigSelector::new(&pgver)) {
+            start_postgres(pg_config?)?
+        }
+
+        Ok(())
+    }
+}
 
 pub(crate) fn start_postgres(pg_config: &PgConfig) -> Result<(), std::io::Error> {
     let datadir = pg_config.data_dir()?;

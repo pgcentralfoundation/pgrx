@@ -330,16 +330,14 @@ impl ToTokens for Argument {
 #[derive(Debug, Clone)]
 pub(crate) struct DefaultMacro {
     ty: syn::Type,
-    comma: Token![,],
     pub(crate) expr: syn::Expr,
 }
 
 impl Parse for DefaultMacro {
     fn parse(input: ParseStream) -> Result<Self, syn::Error> {
-        Ok(Self {
-            ty: input.parse()?,
-            comma: input.parse()?,
-            expr: input.parse()?,
-        })
+        let ty = input.parse()?;
+        let _comma: Token![,] = input.parse()?;
+        let expr = input.parse()?;
+        Ok(Self { ty, expr })
     }
 }

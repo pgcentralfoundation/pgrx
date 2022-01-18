@@ -4,7 +4,7 @@ version = "0.2.6"
 authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
 edition = "2018"
 license = "MIT"
-description = "cargo subcommand for 'pgx' to make Postgres extension development easy"
+description = "Cargo subcommand for 'pgx' to make Postgres extension development easy"
 homepage = "https://github.com/zombodb/pgx/cargo-pgx"
 repository = "https://github.com/zombodb/pgx/cargo-pgx"
 documentation = "https://docs.rs/cargo-pgx"
@@ -15,17 +15,18 @@ exclude = [ "*.png" ]
 
 
 [dependencies]
-clap = { version = "2.34.0", features = [ "yaml" ] }
+cargo_metadata = "0.14.1"
+clap = { version = "3.0.5", features = [ "env", "suggestions", "cargo", "derive" ] }
 colored = "2.0.0"
 env_proxy = "0.4.1"
-num_cpus = "1.13.0"
+num_cpus = "1.13.1"
 pgx-utils = { path = "../pgx-utils", version = "0.2.6" }
-proc-macro2 = { version = "1.0.33", features = [ "span-locations" ] }
-quote = "1.0.10"
+proc-macro2 = { version = "1.0.36", features = [ "span-locations" ] }
+quote = "1.0.14"
 rayon = "1.5.1"
 regex = "1.5.4"
 rttp_client = { version = "0.1.0", features = ["tls-native"] }
-syn = { version = "1.0.82", features = [ "extra-traits", "full", "fold", "parsing" ] }
+syn = { version = "1.0.85", features = [ "extra-traits", "full", "fold", "parsing" ] }
 unescape = "0.1.0"
 fork = "0.1.18"
 libloading = "0.7.2"

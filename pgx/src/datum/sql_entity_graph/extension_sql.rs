@@ -194,17 +194,19 @@ impl SqlDeclaredEntity {
             (SqlDeclared::Type(identifier_name), &SqlDeclaredEntity::Type(data))
             | (SqlDeclared::Enum(identifier_name), &SqlDeclaredEntity::Enum(data))
             | (SqlDeclared::Function(identifier_name), &SqlDeclaredEntity::Function(data)) => {
-                let matches = |identifier_name: &str| identifier_name == &data.name
-                    || identifier_name == &data.option
-                    || identifier_name == &data.vec
-                    || identifier_name == &data.vec_option
-                    || identifier_name == &data.option_vec
-                    || identifier_name == &data.option_vec_option
-                    || identifier_name == &data.array
-                    || identifier_name == &data.option_array
-                    || identifier_name == &data.varlena;
+                let matches = |identifier_name: &str| {
+                    identifier_name == &data.name
+                        || identifier_name == &data.option
+                        || identifier_name == &data.vec
+                        || identifier_name == &data.vec_option
+                        || identifier_name == &data.option_vec
+                        || identifier_name == &data.option_vec_option
+                        || identifier_name == &data.array
+                        || identifier_name == &data.option_array
+                        || identifier_name == &data.varlena
+                };
                 if matches(&*identifier_name) || data.pg_box.contains(&identifier_name) {
-                    return true
+                    return true;
                 }
                 // there are cases where the identifier is
                 // `core::option::Option<Foo>` while the data stores
@@ -217,7 +219,7 @@ impl SqlDeclaredEntity {
                     None => return false,
                     Some(idx) => idx,
                 };
-                matches(&identifier_name[qualification_end+2..])
+                matches(&identifier_name[qualification_end + 2..])
             }
             _ => false,
         }

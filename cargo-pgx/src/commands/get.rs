@@ -7,6 +7,25 @@ use std::io::{BufRead, BufReader};
 use std::path::PathBuf;
 use std::process::Command;
 
+use crate::CommandExecute;
+
+/// Get a property from the extension control file
+#[derive(clap::Args, Debug)]
+#[clap(author)]
+pub(crate) struct Get {
+    /// One of the properties from `$EXTENSION.control`
+    name: String,
+}
+
+impl CommandExecute for Get {
+    fn execute(self) -> std::result::Result<(), std::io::Error> {
+        if let Some(value) = get_property(&self.name) {
+            println!("{}", value);
+        }
+        Ok(())
+    }
+}
+
 pub fn get_property(name: &str) -> Option<String> {
     let (control_file, extname) = find_control_file();
 

@@ -1,4 +1,20 @@
-{ lib, naersk, hostPlatform, fetchFromGitHub, postgresql_10, postgresql_11, postgresql_12, postgresql_13, pkg-config, openssl, rustfmt, libiconv, llvmPackages, }:
+{ lib
+, naersk
+, hostPlatform
+, fetchFromGitHub
+, postgresql_10
+, postgresql_11
+, postgresql_12
+, postgresql_13
+, pkg-config
+, openssl
+, rustfmt
+, libiconv
+, llvmPackages
+, gitignoreSource
+, release ? true
+,
+}:
 
 let
   cargoToml = (builtins.fromTOML (builtins.readFile ./Cargo.toml));
@@ -8,7 +24,8 @@ naersk.lib."${hostPlatform.system}".buildPackage rec {
   name = cargoToml.package.name;
   version = cargoToml.package.version;
 
-  src = ../.;
+  src = gitignoreSource ../.;
+  inherit release;
 
   cargoBuildOptions = final: final ++ [ "--package" "cargo-pgx" ];
   cargoTestOptions = final: final ++ [ "--package" "cargo-pgx" ];
