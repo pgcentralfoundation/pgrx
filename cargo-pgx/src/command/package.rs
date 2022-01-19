@@ -54,13 +54,7 @@ pub(crate) fn package_extension(
     if !base_path.exists() {
         std::fs::create_dir_all(&base_path)?;
     }
-    install_extension(
-        pg_config,
-        !is_debug,
-        false,
-        Some(base_path),
-        features,
-    )
+    install_extension(pg_config, !is_debug, false, Some(base_path), features)
 }
 
 fn build_base_path(pg_config: &PgConfig, is_debug: bool) -> eyre::Result<PathBuf> {

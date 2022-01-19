@@ -4,9 +4,7 @@ use crate::{
 };
 use colored::Colorize;
 use eyre::{eyre, WrapErr};
-use pgx_utils::{
-    pg_config::{PgConfig, Pgx},
-};
+use pgx_utils::pg_config::{PgConfig, Pgx};
 use std::{
     collections::HashSet,
     fs::File,
@@ -189,7 +187,7 @@ pub(crate) fn generate_schema(
         return Err(eyre!(
             "{}:  The `relocatable` property MUST be `false`.  Please update your .control file.",
             control_file.display()
-        ))
+        ));
     }
 
     let pgx_build_features =
@@ -202,7 +200,7 @@ pub(crate) fn generate_schema(
     } else {
         pgx_build_features
     };
-    
+
     let flags = std::env::var("PGX_BUILD_FLAGS").unwrap_or_default();
 
     if !skip_build {
@@ -231,7 +229,6 @@ pub(crate) fn generate_schema(
         if features.all_features {
             command.arg("--all-features");
         }
-
 
         for arg in flags.split_ascii_whitespace() {
             command.arg(arg);

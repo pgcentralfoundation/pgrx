@@ -10,10 +10,12 @@ pub fn validate(features: &clap_cargo::Features) -> eyre::Result<()> {
     let cargo_pgx_version = env!("CARGO_PKG_VERSION");
     let cargo_pgx_version_req = VersionReq::parse(&format!("^{}", cargo_pgx_version))?;
 
-    let pgx_packages = metadata.packages.iter().filter(|package| 
-        package.name == "pgx" || package.name == "pgx-utils" ||
-        package.name == "pgx-macros" || package.name == "pgx-tests"
-    );
+    let pgx_packages = metadata.packages.iter().filter(|package| {
+        package.name == "pgx"
+            || package.name == "pgx-utils"
+            || package.name == "pgx-macros"
+            || package.name == "pgx-tests"
+    });
 
     for package in pgx_packages {
         let package_semver = metadata_version_to_semver(package.version.clone());
@@ -42,8 +44,8 @@ fn metadata_version_to_semver(metadata_version: cargo_metadata::Version) -> semv
     Version {
         major: metadata_version.major,
         minor: metadata_version.minor,
-        patch:  metadata_version.patch,
-        pre:  metadata_version.pre,
+        patch: metadata_version.patch,
+        pre: metadata_version.pre,
         build: metadata_version.build,
     }
 }

@@ -52,7 +52,13 @@ impl CommandExecute for Install {
                 },
             };
 
-        install_extension(&pg_config, self.release, self.no_schema, None, &self.features)
+        install_extension(
+            &pg_config,
+            self.release,
+            self.no_schema,
+            None,
+            &self.features,
+        )
     }
 }
 
@@ -118,13 +124,7 @@ pub(crate) fn install_extension(
     }
 
     if !no_schema || !get_target_sql_file(&extdir, &base_directory)?.exists() {
-        copy_sql_files(
-            pg_config,
-            is_release,
-            features,
-            &extdir,
-            &base_directory,
-        )?;
+        copy_sql_files(pg_config, is_release, features, &extdir, &base_directory)?;
     } else {
         println!("{} schema generation", "    Skipping".bold().yellow());
     }
@@ -176,13 +176,15 @@ pub(crate) fn build_extension(
     let pgx_build_features =
         std::env::var("PGX_BUILD_FEATURES").unwrap_or(format!("pg{}", major_version));
     let flags = std::env::var("PGX_BUILD_FLAGS").unwrap_or_default();
-    
+
     let features_arg = if !features.features.is_empty() {
         use std::fmt::Write;
         let mut additional_features = features.features.join(" ");
         let _ = write!(&mut additional_features, " {}", pgx_build_features);
         additional_features
-    } else { pgx_build_features };
+    } else {
+        pgx_build_features
+    };
 
     let mut command = Command::new("cargo");
     command.arg("build");
@@ -359,7 +361,8 @@ fn make_relative(path: PathBuf) -> PathBuf {
 }
 
 fn format_display_path(path: &PathBuf) -> eyre::Result<String> {
-    let out = path.strip_prefix(get_target_dir()?.parent().unwrap())
+    let out = path
+        .strip_prefix(get_target_dir()?.parent().unwrap())
         .unwrap_or(&path)
         .display()
         .to_string();
