@@ -1,18 +1,19 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-use crate::commands::install::install_extension;
-use crate::commands::start::start_postgres;
-use crate::commands::stop::stop_postgres;
-use crate::CommandExecute;
+use crate::{
+    command::{
+        get::get_property, install::install_extension, start::start_postgres, stop::stop_postgres,
+    },
+    CommandExecute,
+};
 use colored::Colorize;
-use pgx_utils::createdb;
-use pgx_utils::pg_config::{PgConfig, Pgx};
-use std::os::unix::process::CommandExt;
-use std::process::Command;
-
-use super::get::get_property;
-
+use eyre::eyre;
+use pgx_utils::{
+    createdb,
+    pg_config::{PgConfig, Pgx},
+};
+use std::{os::unix::process::CommandExt, process::Command};
 /// Compile/install extension to a pgx-managed Postgres instance and start psql
 #[derive(clap::Args, Debug)]
 #[clap(author)]
@@ -31,14 +32,17 @@ pub(crate) struct Run {
     /// Additional cargo features to activate (default is '--no-default-features')
     #[clap(long)]
     features: Vec<String>,
+    #[clap(from_global, parse(from_occurrences))]
+    verbose: usize,
 }
 
 impl CommandExecute for Run {
-    fn execute(self) -> std::result::Result<(), std::io::Error> {
-        let dbname = self.dbname.map_or_else(
-            || get_property("extname").expect("could not determine extension name"),
-            |v| v.to_string(),
-        );
+    #[tracing::instrument(level = "error", skip(self))]
+    fn execute(self) -> eyre::Result<()> {
+        let dbname = match self.dbname {
+            Some(dbname) => dbname,
+            None => get_property("extname")?.ok_or(eyre!("could not determine extension name"))?,
+        };
 
         run_psql(
             Pgx::from_config()?.get(&self.pg_version)?,
@@ -50,13 +54,18 @@ impl CommandExecute for Run {
     }
 }
 
+#[tracing::instrument(level = "error", skip_all, fields(
+    pg_version = %pg_config.version()?,
+    dbname,
+    release = is_release,
+))]
 pub(crate) fn run_psql(
     pg_config: &PgConfig,
     dbname: &str,
     is_release: bool,
     no_schema: bool,
     additional_features: &Vec<impl AsRef<str>>,
-) -> Result<(), std::io::Error> {
+) -> eyre::Result<()> {
     // stop postgres
     stop_postgres(pg_config)?;
 
@@ -79,7 +88,7 @@ pub(crate) fn run_psql(
     exec_psql(pg_config, dbname)
 }
 
-pub(crate) fn exec_psql(pg_config: &PgConfig, dbname: &str) -> Result<(), std::io::Error> {
+pub(crate) fn exec_psql(pg_config: &PgConfig, dbname: &str) -> eyre::Result<()> {
     let mut command = Command::new(pg_config.psql_path()?);
     command
         .env_remove("PGDATABASE")

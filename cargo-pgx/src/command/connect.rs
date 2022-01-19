@@ -1,14 +1,14 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-use crate::commands::run::exec_psql;
-use crate::commands::start::start_postgres;
-use crate::CommandExecute;
+use crate::{
+    command::{get::get_property, run::exec_psql, start::start_postgres},
+    CommandExecute,
+};
 use colored::Colorize;
+use eyre::{eyre, WrapErr};
 use pgx_utils::createdb;
 use pgx_utils::pg_config::{PgConfig, Pgx};
-
-use super::get::get_property;
 
 /// Connect, via psql, to a Postgres instance
 #[derive(clap::Args, Debug)]
@@ -20,19 +20,28 @@ pub(crate) struct Connect {
     /// The database to connect to (and create if the first time).  Defaults to a database with the same name as the current extension name
     #[clap(env = "DBNAME")]
     dbname: Option<String>,
+    #[clap(from_global, parse(from_occurrences))]
+    verbose: usize,
 }
 
 impl CommandExecute for Connect {
-    fn execute(self) -> std::result::Result<(), std::io::Error> {
-        let dbname = self.dbname.map_or_else(
-            || get_property("extname").expect("could not determine extension name"),
-            |v| v.to_string(),
-        );
+    #[tracing::instrument(level = "error", skip(self))]
+    fn execute(self) -> eyre::Result<()> {
+        let dbname = match self.dbname {
+            Some(dbname) => dbname,
+            None => get_property("extname")
+                .wrap_err("could not determine extension name")?
+                .ok_or(eyre!("extname not found in control file"))?,
+        };
         connect_psql(Pgx::from_config()?.get(&self.pg_version)?, &dbname)
     }
 }
 
-pub(crate) fn connect_psql(pg_config: &PgConfig, dbname: &str) -> Result<(), std::io::Error> {
+#[tracing::instrument(level = "error", skip_all, fields(
+    pg_version = %pg_config.version()?,
+    dbname,
+))]
+pub(crate) fn connect_psql(pg_config: &PgConfig, dbname: &str) -> eyre::Result<()> {
     // restart postgres
     start_postgres(pg_config)?;
 

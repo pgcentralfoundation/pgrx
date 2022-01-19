@@ -3,14 +3,16 @@
 
 use crate::{pg_config::PgConfig, sql_entity_graph::PositioningRef};
 use colored::Colorize;
-use proc_macro2::TokenStream;
-use proc_macro2::TokenTree;
+use eyre::{eyre, WrapErr};
+use proc_macro2::{TokenStream, TokenTree};
 use quote::{format_ident, quote, ToTokens, TokenStreamExt};
 use serde_json::value::Value as JsonValue;
-use std::collections::HashSet;
-use std::path::PathBuf;
-use std::process::{Command, Stdio};
-use std::str::FromStr;
+use std::{
+    collections::HashSet,
+    path::PathBuf,
+    process::{Command, Stdio},
+    str::FromStr,
+};
 use syn::{GenericArgument, ItemFn, PathArguments, ReturnType, Type, TypeParamBound};
 
 pub mod operator_common;
@@ -20,65 +22,31 @@ pub mod sql_entity_graph;
 pub static BASE_POSTGRES_PORT_NO: u16 = 28800;
 pub static BASE_POSTGRES_TESTING_PORT_NO: u16 = 32200;
 
-#[macro_export]
-macro_rules! exit_with_error {
-    () => ({ exit_with_error!("explicit panic") });
-    ($msg:expr) => ({ exit_with_error!("{}", $msg) });
-    ($msg:expr,) => ({ exit_with_error!($msg) });
-    ($fmt:expr, $($arg:tt)+) => ({
-        use colored::Colorize;
-        eprint!("{} ", "      [error]".bold().red());
-        eprintln!($fmt, $($arg)+);
-        std::process::exit(1);
-    });
-}
-
-#[macro_export]
-macro_rules! exit {
-    () => ({ exit!("explicit panic") });
-    ($msg:expr) => ({ exit!("{}", $msg) });
-    ($msg:expr,) => ({ exit!($msg) });
-    ($fmt:expr, $($arg:tt)+) => ({
-        eprintln!($fmt, $($arg)+);
-        std::process::exit(1);
-    });
-}
-
-#[macro_export]
-macro_rules! handle_result {
-    ($expr:expr, $message:expr) => {{
-        match $expr {
-            Ok(result) => result,
-            Err(e) => crate::exit_with_error!("{}: {}", $message, e),
-        }
-    }};
-}
-
-pub fn get_target_dir() -> PathBuf {
+pub fn get_target_dir() -> eyre::Result<PathBuf> {
     let mut command = Command::new("cargo");
     command
         .arg("metadata")
         .arg("--format-version=1")
         .arg("--no-deps");
-    let output = handle_result!(
-        command.output(),
-        "Unable to get target directory from 'cargo metadata'"
-    );
+    let output = command
+        .output()
+        .wrap_err("Unable to get target directory from `cargo metadata`")?;
     if !output.status.success() {
-        exit_with_error!("'cargo metadata' failed with exit code: {}", output.status);
+        return Err(eyre!(
+            "'cargo metadata' failed with exit code: {}",
+            output.status
+        ));
     }
 
-    let json: JsonValue = handle_result!(
-        serde_json::from_slice(&output.stdout),
-        "Invalid 'cargo metada' response"
-    );
+    let json: JsonValue =
+        serde_json::from_slice(&output.stdout).wrap_err("Invalid `cargo metada` response")?;
     let target_dir = json.get("target_directory");
     match target_dir {
-        Some(JsonValue::String(target_dir)) => target_dir.into(),
-        v => crate::exit_with_error!(
-            "could not read target dir from 'cargo metadata got: {:?}",
+        Some(JsonValue::String(target_dir)) => Ok(target_dir.into()),
+        v => Err(eyre!(
+            "could not read target dir from `cargo metadata` got: {:?}",
             v,
-        ),
+        )),
     }
 }
 
@@ -98,7 +66,7 @@ pub fn createdb(
     dbname: &str,
     is_test: bool,
     if_not_exists: bool,
-) -> Result<bool, std::io::Error> {
+) -> eyre::Result<bool> {
     if if_not_exists && does_db_exist(pg_config, dbname)? {
         return Ok(false);
     }
@@ -126,18 +94,18 @@ pub fn createdb(
     let output = command.output()?;
 
     if !output.status.success() {
-        exit_with_error!(
+        return Err(eyre!(
             "problem running createdb: {}\n\n{}{}",
             command_str,
             String::from_utf8(output.stdout).unwrap(),
             String::from_utf8(output.stderr).unwrap()
-        )
+        ));
     }
 
     Ok(true)
 }
 
-fn does_db_exist(pg_config: &PgConfig, dbname: &str) -> Result<bool, std::io::Error> {
+fn does_db_exist(pg_config: &PgConfig, dbname: &str) -> eyre::Result<bool> {
     let mut command = Command::new(pg_config.psql_path()?);
     command
         .arg("-XqAt")
@@ -158,16 +126,16 @@ fn does_db_exist(pg_config: &PgConfig, dbname: &str) -> Result<bool, std::io::Er
     let output = command.output()?;
 
     if !output.status.success() {
-        exit_with_error!(
+        return Err(eyre!(
             "problem checking if database '{}' exists: {}\n\n{}{}",
             dbname,
             command_str,
             String::from_utf8(output.stdout).unwrap(),
             String::from_utf8(output.stderr).unwrap()
-        )
+        ));
     } else {
         let count = i32::from_str(&String::from_utf8(output.stdout).unwrap().trim())
-            .expect("result is not a number");
+            .wrap_err("result is not a number")?;
         Ok(count > 0)
     }
 }

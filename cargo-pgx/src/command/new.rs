@@ -1,9 +1,8 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
+use eyre::eyre;
 use std::{io::Write, os::unix::fs::PermissionsExt, path::PathBuf, str::FromStr};
-
-use pgx_utils::exit_with_error;
 
 use crate::CommandExecute;
 
@@ -16,29 +15,34 @@ pub(crate) struct New {
     /// Create a background worker template
     #[clap(long, short)]
     bgworker: bool,
+    #[clap(from_global, parse(from_occurrences))]
+    verbose: usize,
 }
 
 impl CommandExecute for New {
-    fn execute(self) -> std::result::Result<(), std::io::Error> {
-        validate_extension_name(&self.name);
+    #[tracing::instrument(level = "error", skip(self))]
+    fn execute(self) -> eyre::Result<()> {
+        validate_extension_name(&self.name)?;
         let path = PathBuf::from_str(&format!("{}/", self.name)).unwrap();
         create_crate_template(path, &self.name, self.bgworker)
     }
 }
 
-fn validate_extension_name(extname: &str) {
+fn validate_extension_name(extname: &str) -> eyre::Result<()> {
     for c in extname.chars() {
         if !c.is_alphanumeric() && c != '_' && !c.is_lowercase() {
-            exit_with_error!("Extension name must be in the set of [a-z0-9_]")
+            return Err(eyre!("Extension name must be in the set of [a-z0-9_]"));
         }
     }
+    Ok(())
 }
 
+#[tracing::instrument(skip_all, fields(path, name))]
 pub(crate) fn create_crate_template(
     path: PathBuf,
     name: &str,
     is_bgworker: bool,
-) -> Result<(), std::io::Error> {
+) -> eyre::Result<()> {
     create_directory_structure(&path)?;
     create_control_file(&path, name)?;
     create_cargo_toml(&path, name)?;

@@ -1,11 +1,12 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-use crate::commands::stop::stop_postgres;
+use crate::command::stop::stop_postgres;
 use crate::{CommandExecute, SUPPORTED_MAJOR_VERSIONS};
 use colored::Colorize;
+use eyre::{eyre, WrapErr};
 use pgx_utils::pg_config::{PgConfig, PgConfigSelector, Pgx};
-use pgx_utils::{exit_with_error, handle_result, prefix_path};
+use pgx_utils::prefix_path;
 use rayon::prelude::*;
 use rttp_client::{types::Proxy, HttpClient};
 
@@ -51,10 +52,13 @@ pub(crate) struct Init {
     /// If installed locally, the path to PG14's `pgconfig` tool, or `downLoad` to have pgx download/compile/install it
     #[clap(env = "PG14_PG_CONFIG", long)]
     pg14: Option<String>,
+    #[clap(from_global, parse(from_occurrences))]
+    verbose: usize,
 }
 
 impl CommandExecute for Init {
-    fn execute(self) -> std::result::Result<(), std::io::Error> {
+    #[tracing::instrument(level = "error", skip(self))]
+    fn execute(self) -> eyre::Result<()> {
         let mut versions = HashMap::new();
 
         if let Some(version) = self.pg10 {
@@ -90,7 +94,7 @@ impl CommandExecute for Init {
                         .as_ref()
                         .unwrap() // We just set this
                         .get(&pgver)
-                        .expect(&format!("{} is not a known Postgres version", pgver))
+                        .wrap_err_with(|| format!("{} is not a known Postgres version", pgver))?
                         .clone()
                 } else {
                     PgConfig::new(pg_config_path.into())
@@ -103,7 +107,8 @@ impl CommandExecute for Init {
     }
 }
 
-pub(crate) fn init_pgx(pgx: &Pgx) -> std::result::Result<(), std::io::Error> {
+#[tracing::instrument(skip_all, fields(pgx_home = %Pgx::home()?.display()))]
+pub(crate) fn init_pgx(pgx: &Pgx) -> eyre::Result<()> {
     let dir = Pgx::home()?;
 
     let output_configs = Arc::new(Mutex::new(Vec::new()));
@@ -113,23 +118,31 @@ pub(crate) fn init_pgx(pgx: &Pgx) -> std::result::Result<(), std::io::Error> {
         pg_configs.push(pg_config?);
     }
 
-    pg_configs.into_par_iter().for_each(|pg_config| {
-        let mut pg_config = pg_config.clone();
-        stop_postgres(&pg_config).ok(); // no need to fail on errors trying to stop postgres while initializing
-        if !pg_config.is_real() {
-            pg_config = match download_postgres(&pg_config, &dir) {
-                Ok(pg_config) => pg_config,
-                Err(e) => exit_with_error!(e),
+    let span = tracing::Span::current();
+    pg_configs
+        .into_par_iter()
+        .map(|pg_config| {
+            let _span = span.clone().entered();
+            let mut pg_config = pg_config.clone();
+            stop_postgres(&pg_config).ok(); // no need to fail on errors trying to stop postgres while initializing
+            if !pg_config.is_real() {
+                pg_config = match download_postgres(&pg_config, &dir) {
+                    Ok(pg_config) => pg_config,
+                    Err(e) => return Err(eyre!(e)),
+                }
             }
-        }
 
-        let mut mutex = output_configs.lock();
-        let output_configs = mutex.as_mut().expect("failed to get output_configs lock");
+            let mut mutex = output_configs.lock();
+            // PoisonError doesn't implement std::error::Error, can't `?` it.
+            let output_configs = mutex.as_mut().expect("failed to get output_configs lock");
 
-        output_configs.push(pg_config);
-    });
+            output_configs.push(pg_config);
+            Ok(())
+        })
+        .collect::<eyre::Result<()>>()?;
 
     let mut mutex = output_configs.lock();
+    // PoisonError doesn't implement std::error::Error, can't `?` it.
     let output_configs = mutex.as_mut().unwrap();
 
     output_configs.sort_by(|a, b| {
@@ -156,7 +169,8 @@ pub(crate) fn init_pgx(pgx: &Pgx) -> std::result::Result<(), std::io::Error> {
     Ok(())
 }
 
-fn download_postgres(pg_config: &PgConfig, pgxdir: &PathBuf) -> Result<PgConfig, std::io::Error> {
+#[tracing::instrument(level = "error", skip_all, fields(pg_version = %pg_config.version()?, pgx_home))]
+fn download_postgres(pg_config: &PgConfig, pgx_home: &PathBuf) -> eyre::Result<PgConfig> {
     println!(
         "{} Postgres v{}.{} from {}",
         "  Downloading".bold().green(),
@@ -164,34 +178,32 @@ fn download_postgres(pg_config: &PgConfig, pgxdir: &PathBuf) -> Result<PgConfig,
         pg_config.minor_version()?,
         pg_config.url().expect("no url"),
     );
+    let url = pg_config.url().expect("no url for pg_config").as_str();
+    tracing::debug!(url = %url, "Fetching");
     let mut http_client = HttpClient::new();
-    http_client
-        .get()
-        .url(pg_config.url().expect("no url for pg_config").as_str());
+    http_client.get().url(url);
     if let Some((host, port)) =
         env_proxy::for_url_str(pg_config.url().expect("no url for pg_config")).host_port()
     {
         http_client.proxy(Proxy::https(host, port as u32));
     }
-    let http_response = handle_result!(http_client.emit(), "");
+    let http_response = http_client.emit()?;
+    tracing::trace!(status_code = %http_response.code(), url = %url, "Fetched");
     if http_response.code() != 200 {
-        return Err(std::io::Error::new(
-            std::io::ErrorKind::InvalidInput,
-            format!(
-                "Problem downloading {}:\ncode={}\n{}",
-                pg_config.url().unwrap().to_string().yellow().bold(),
-                http_response.code(),
-                http_response.body().to_string()
-            ),
+        return Err(eyre!(
+            "Problem downloading {}:\ncode={}\n{}",
+            pg_config.url().unwrap().to_string().yellow().bold(),
+            http_response.code(),
+            http_response.body().to_string()
         ));
     }
-    let pgdir = untar(http_response.body().binary(), pgxdir, pg_config)?;
+    let pgdir = untar(http_response.body().binary(), pgx_home, pg_config)?;
     configure_postgres(pg_config, &pgdir)?;
     make_postgres(pg_config, &pgdir)?;
     make_install_postgres(pg_config, &pgdir) // returns a new PgConfig object
 }
 
-fn untar(bytes: &[u8], pgxdir: &PathBuf, pg_config: &PgConfig) -> Result<PathBuf, std::io::Error> {
+fn untar(bytes: &[u8], pgxdir: &PathBuf, pg_config: &PgConfig) -> eyre::Result<PathBuf> {
     let mut pgdir = pgxdir.clone();
     pgdir.push(format!(
         "{}.{}",
@@ -231,14 +243,14 @@ fn untar(bytes: &[u8], pgxdir: &PathBuf, pg_config: &PgConfig) -> Result<PathBuf
     if output.status.success() {
         Ok(pgdir)
     } else {
-        Err(std::io::Error::new(
-            std::io::ErrorKind::Other,
-            String::from_utf8(output.stderr).unwrap(),
+        Err(eyre!(
+            "Command error: {}",
+            String::from_utf8(output.stderr)?
         ))
     }
 }
 
-fn configure_postgres(pg_config: &PgConfig, pgdir: &PathBuf) -> Result<(), std::io::Error> {
+fn configure_postgres(pg_config: &PgConfig, pgdir: &PathBuf) -> eyre::Result<()> {
     println!(
         "{} Postgres v{}.{}",
         "  Configuring".bold().green(),
@@ -264,8 +276,10 @@ fn configure_postgres(pg_config: &PgConfig, pgdir: &PathBuf) -> Result<(), std::
     }
 
     let command_str = format!("{:?}", command);
+    tracing::debug!(command = %command_str, "Running");
     let child = command.spawn()?;
     let output = child.wait_with_output()?;
+    tracing::trace!(status_code = %output.status, command = %command_str, "Finished");
 
     if output.status.success() {
         Ok(())
@@ -282,7 +296,7 @@ fn configure_postgres(pg_config: &PgConfig, pgdir: &PathBuf) -> Result<(), std::
     }
 }
 
-fn make_postgres(pg_config: &PgConfig, pgdir: &PathBuf) -> Result<(), std::io::Error> {
+fn make_postgres(pg_config: &PgConfig, pgdir: &PathBuf) -> eyre::Result<()> {
     let num_cpus = 1.max(num_cpus::get() / 3);
     println!(
         "{} Postgres v{}.{}",
@@ -305,25 +319,24 @@ fn make_postgres(pg_config: &PgConfig, pgdir: &PathBuf) -> Result<(), std::io::E
     }
 
     let command_str = format!("{:?}", command);
+    tracing::debug!(command = %command_str, "Running");
     let child = command.spawn()?;
     let output = child.wait_with_output()?;
+    tracing::trace!(status_code = %output.status, command = %command_str, "Finished");
 
     if output.status.success() {
         Ok(())
     } else {
-        Err(std::io::Error::new(
-            std::io::ErrorKind::Other,
-            format!(
-                "{}\n{}{}",
-                command_str,
-                String::from_utf8(output.stdout).unwrap(),
-                String::from_utf8(output.stderr).unwrap()
-            ),
+        Err(eyre!(
+            "{}\n{}{}",
+            command_str,
+            String::from_utf8(output.stdout)?,
+            String::from_utf8(output.stderr)?
         ))
     }
 }
 
-fn make_install_postgres(version: &PgConfig, pgdir: &PathBuf) -> Result<PgConfig, std::io::Error> {
+fn make_install_postgres(version: &PgConfig, pgdir: &PathBuf) -> eyre::Result<PgConfig> {
     println!(
         "{} Postgres v{}.{} to {}",
         "   Installing".bold().green(),
@@ -344,8 +357,10 @@ fn make_install_postgres(version: &PgConfig, pgdir: &PathBuf) -> Result<PgConfig
     }
 
     let command_str = format!("{:?}", command);
+    tracing::debug!(command = %command_str, "Running");
     let child = command.spawn()?;
     let output = child.wait_with_output()?;
+    tracing::trace!(status_code = %output.status, command = %command_str, "Finished");
 
     if output.status.success() {
         let mut pg_config = get_pg_installdir(pgdir);
@@ -353,19 +368,16 @@ fn make_install_postgres(version: &PgConfig, pgdir: &PathBuf) -> Result<PgConfig
         pg_config.push("pg_config");
         Ok(PgConfig::new(pg_config))
     } else {
-        Err(std::io::Error::new(
-            std::io::ErrorKind::Other,
-            format!(
-                "{}\n{}{}",
-                command_str,
-                String::from_utf8(output.stdout).unwrap(),
-                String::from_utf8(output.stderr).unwrap()
-            ),
+        Err(eyre!(
+            "{}\n{}{}",
+            command_str,
+            String::from_utf8(output.stdout).unwrap(),
+            String::from_utf8(output.stderr).unwrap()
         ))
     }
 }
 
-fn validate_pg_config(pg_config: &PgConfig) -> Result<(), std::io::Error> {
+fn validate_pg_config(pg_config: &PgConfig) -> eyre::Result<()> {
     println!(
         "{} {}",
         "   Validating".bold().green(),
@@ -377,7 +389,7 @@ fn validate_pg_config(pg_config: &PgConfig) -> Result<(), std::io::Error> {
     Ok(())
 }
 
-fn write_config(pg_configs: &Vec<PgConfig>) -> Result<(), std::io::Error> {
+fn write_config(pg_configs: &Vec<PgConfig>) -> eyre::Result<()> {
     let config_path = Pgx::config_toml()?;
     let mut file = File::create(&config_path)?;
     file.write_all(b"[configs]\n")?;
@@ -386,7 +398,10 @@ fn write_config(pg_configs: &Vec<PgConfig>) -> Result<(), std::io::Error> {
             format!(
                 "{}=\"{}\"\n",
                 pg_config.label()?,
-                pg_config.path().expect("no path for pg_config").display()
+                pg_config
+                    .path()
+                    .ok_or(eyre!("no path for pg_config"))?
+                    .display()
             )
             .as_bytes(),
         )?;
@@ -401,7 +416,7 @@ fn get_pg_installdir(pgdir: &PathBuf) -> PathBuf {
     dir
 }
 
-pub(crate) fn initdb(bindir: &PathBuf, datadir: &PathBuf) -> Result<(), std::io::Error> {
+pub(crate) fn initdb(bindir: &PathBuf, datadir: &PathBuf) -> eyre::Result<()> {
     println!(
         " {} data directory at {}",
         "Initializing".bold().green(),
@@ -415,14 +430,17 @@ pub(crate) fn initdb(bindir: &PathBuf, datadir: &PathBuf) -> Result<(), std::io:
         .arg(&datadir);
 
     let command_str = format!("{:?}", command);
+    tracing::debug!(command = %command_str, "Running");
+
     let output = command.output()?;
+    tracing::trace!(command = %command_str, status_code = %output.status, "Finished");
 
     if !output.status.success() {
-        exit_with_error!(
+        return Err(eyre!(
             "problem running initdb: {}\n{}",
             command_str,
             String::from_utf8(output.stderr).unwrap()
-        )
+        ));
     }
 
     Ok(())

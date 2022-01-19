@@ -65,7 +65,7 @@ impl ToSql for PostgresHashEntity {
                           file = self.file,
                           line = self.line,
         );
-        tracing::debug!(%sql);
+        tracing::trace!(%sql);
         Ok(sql)
     }
 }

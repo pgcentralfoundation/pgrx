@@ -1,11 +1,11 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-use crate::commands::init::initdb;
-use crate::commands::status::status_postgres;
+use crate::command::init::initdb;
+use crate::command::status::status_postgres;
 use crate::CommandExecute;
 use colored::Colorize;
-use pgx_utils::exit_with_error;
+use eyre::eyre;
 use pgx_utils::pg_config::{PgConfig, PgConfigSelector, Pgx};
 use std::os::unix::process::CommandExt;
 use std::process::Stdio;
@@ -17,22 +17,27 @@ pub(crate) struct Start {
     /// The Postgres version to start (`pg10`, `pg11`, `pg12`, `pg13`, `pg14`, or `all`)
     #[clap(env = "PG_VERSION")]
     pg_version: String,
+    #[clap(from_global, parse(from_occurrences))]
+    verbose: usize,
 }
 
 impl CommandExecute for Start {
-    fn execute(self) -> std::result::Result<(), std::io::Error> {
+    #[tracing::instrument(level = "error", skip(self))]
+    fn execute(self) -> eyre::Result<()> {
         let pgver = self.pg_version;
         let pgx = Pgx::from_config()?;
 
         for pg_config in pgx.iter(PgConfigSelector::new(&pgver)) {
-            start_postgres(pg_config?)?
+            let pg_config = pg_config?;
+            start_postgres(pg_config)?
         }
 
         Ok(())
     }
 }
 
-pub(crate) fn start_postgres(pg_config: &PgConfig) -> Result<(), std::io::Error> {
+#[tracing::instrument(level = "error", skip_all, fields(pg_version = %pg_config.version()?))]
+pub(crate) fn start_postgres(pg_config: &PgConfig) -> eyre::Result<()> {
     let datadir = pg_config.data_dir()?;
     let logfile = pg_config.log_file()?;
     let bindir = pg_config.bin_dir()?;
@@ -43,6 +48,7 @@ pub(crate) fn start_postgres(pg_config: &PgConfig) -> Result<(), std::io::Error>
     }
 
     if status_postgres(pg_config)? {
+        tracing::debug!("Already started");
         return Ok(());
     }
 
@@ -82,11 +88,11 @@ pub(crate) fn start_postgres(pg_config: &PgConfig) -> Result<(), std::io::Error>
     let output = command.output()?;
 
     if !output.status.success() {
-        exit_with_error!(
+        return Err(eyre!(
             "problem running pg_ctl: {}\n\n{}",
             command_str,
             String::from_utf8(output.stderr).unwrap()
-        )
+        ));
     }
 
     Ok(())

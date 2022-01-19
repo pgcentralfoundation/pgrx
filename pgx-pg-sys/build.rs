@@ -4,14 +4,16 @@
 extern crate build_deps;
 
 use bindgen::callbacks::MacroParsingBehavior;
+use eyre::{eyre, WrapErr};
 use pgx_utils::pg_config::{PgConfig, PgConfigSelector, Pgx};
-use pgx_utils::{exit_with_error, handle_result, prefix_path};
+use pgx_utils::prefix_path;
 use quote::quote;
 use rayon::prelude::*;
-use std::collections::{HashMap, HashSet};
-use std::error::Error;
-use std::path::PathBuf;
-use std::process::{Command, Output};
+use std::{
+    collections::{HashMap, HashSet},
+    path::PathBuf,
+    process::{Command, Output},
+};
 use syn::Item;
 
 #[derive(Debug)]
@@ -46,7 +48,7 @@ impl bindgen::callbacks::ParseCallbacks for IgnoredMacros {
     }
 }
 
-fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+fn main() -> color_eyre::Result<()> {
     if std::env::var("DOCS_RS").unwrap_or("false".into()) == "1" {
         return Ok(());
     }
@@ -84,40 +86,35 @@ fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
         .iter(PgConfigSelector::All)
         .map(|v| v.expect("invalid pg_config"))
         .collect::<Vec<_>>();
-    pg_configs.par_iter().for_each(|pg_config| {
-        let major_version = handle_result!(
-            pg_config.major_version(),
-            "could not determine major version"
-        );
-        let mut include_h = manifest_dir.clone();
-        include_h.push("include");
-        include_h.push(format!("pg{}.h", major_version));
+    pg_configs
+        .par_iter()
+        .map(|pg_config| {
+            let major_version = pg_config
+                .major_version()
+                .wrap_err("could not determine major version")?;
+            let mut include_h = manifest_dir.clone();
+            include_h.push("include");
+            include_h.push(format!("pg{}.h", major_version));
 
-        let bindgen_output = handle_result!(
-            run_bindgen(&pg_config, &include_h),
-            format!("bindgen failed for pg{}", major_version)
-        );
+            let bindgen_output = run_bindgen(&pg_config, &include_h)
+                .wrap_err_with(|| format!("bindgen failed for pg{}", major_version))?;
 
-        let rewritten_items = handle_result!(
-            rewrite_items(&bindgen_output),
-            format!("failed to rewrite items for pg{}", major_version)
-        );
+            let rewritten_items = rewrite_items(&bindgen_output)
+                .wrap_err_with(|| format!("failed to rewrite items for pg{}", major_version))?;
 
-        let oids = handle_result!(
-            extract_oids(&bindgen_output),
-            format!("unable to generate oids for pg{}", major_version)
-        );
+            let oids = extract_oids(&bindgen_output);
 
-        let dest_dirs =
-            if std::env::var("PGX_PG_SYS_SKIP_BINDING_REWRITE").unwrap_or("false".into()) != "1" {
+            let dest_dirs = if std::env::var("PGX_PG_SYS_SKIP_BINDING_REWRITE")
+                .unwrap_or("false".into())
+                != "1"
+            {
                 vec![out_dir.clone(), src_dir.clone()]
             } else {
                 vec![out_dir.clone()]
             };
-        for dest_dir in dest_dirs {
-            let mut bindings_file = dest_dir.clone();
-            bindings_file.push(&format!("pg{}.rs", major_version));
-            handle_result!(
+            for dest_dir in dest_dirs {
+                let mut bindings_file = dest_dir.clone();
+                bindings_file.push(&format!("pg{}.rs", major_version));
                 write_rs_file(
                     rewritten_items.clone(),
                     &bindings_file,
@@ -125,27 +122,29 @@ fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
                         use crate as pg_sys;
                         use pgx_macros::*;
                         use crate::PgNode;
-                    }
-                ),
-                format!(
-                    "Unable to write bindings file for pg{} to `{}`",
-                    major_version,
-                    bindings_file.display()
+                    },
                 )
-            );
+                .wrap_err_with(|| {
+                    format!(
+                        "Unable to write bindings file for pg{} to `{}`",
+                        major_version,
+                        bindings_file.display()
+                    )
+                })?;
 
-            let mut oids_file = dest_dir.clone();
-            oids_file.push(&format!("pg{}_oids.rs", major_version));
-            handle_result!(
-                write_rs_file(oids.clone(), &oids_file, quote! {}),
-                format!(
-                    "Unable to write oids file for pg{} to `{}`",
-                    major_version,
-                    oids_file.display()
-                )
-            );
-        }
-    });
+                let mut oids_file = dest_dir.clone();
+                oids_file.push(&format!("pg{}_oids.rs", major_version));
+                write_rs_file(oids.clone(), &oids_file, quote! {}).wrap_err_with(|| {
+                    format!(
+                        "Unable to write oids file for pg{} to `{}`",
+                        major_version,
+                        oids_file.display()
+                    )
+                })?;
+            }
+            Ok(())
+        })
+        .collect::<eyre::Result<Vec<_>>>()?;
 
     // compile the cshim for each binding
     for pg_config in pg_configs {
@@ -159,7 +158,7 @@ fn write_rs_file(
     code: proc_macro2::TokenStream,
     file: &PathBuf,
     header: proc_macro2::TokenStream,
-) -> Result<(), std::io::Error> {
+) -> eyre::Result<()> {
     let contents = quote! {
         #header
         #code
@@ -171,9 +170,7 @@ fn write_rs_file(
 
 /// Given a token stream representing a file, apply a series of transformations to munge
 /// the bindgen generated code with some postgres specific enhancements
-fn rewrite_items(
-    file: &syn::File,
-) -> Result<proc_macro2::TokenStream, Box<dyn Error + Send + Sync>> {
+fn rewrite_items(file: &syn::File) -> eyre::Result<proc_macro2::TokenStream> {
     let items = apply_pg_guard(&file.items)?;
     let pgnode_impls = impl_pg_node(&items)?;
 
@@ -188,7 +185,7 @@ fn rewrite_items(
 /// Find all the constants that represent Postgres type OID values.
 ///
 /// These are constants of type `u32` whose name ends in the string "OID"
-fn extract_oids(code: &syn::File) -> Result<proc_macro2::TokenStream, Box<dyn Error>> {
+fn extract_oids(code: &syn::File) -> proc_macro2::TokenStream {
     let mut enum_variants = proc_macro2::TokenStream::new();
     let mut from_impl = proc_macro2::TokenStream::new();
     for item in &code.items {
@@ -208,7 +205,7 @@ fn extract_oids(code: &syn::File) -> Result<proc_macro2::TokenStream, Box<dyn Er
         }
     }
 
-    Ok(quote! {
+    quote! {
         #[derive(Copy, Clone, Eq, PartialEq, Hash, Ord, PartialOrd, Debug)]
         pub enum PgBuiltInOids {
             #enum_variants
@@ -222,11 +219,11 @@ fn extract_oids(code: &syn::File) -> Result<proc_macro2::TokenStream, Box<dyn Er
                 }
             }
         }
-    })
+    }
 }
 
 /// Implement our `PgNode` marker trait for `pg_sys::Node` and its "subclasses"
-fn impl_pg_node(items: &Vec<syn::Item>) -> Result<Vec<syn::Item>, Box<dyn Error + Send + Sync>> {
+fn impl_pg_node(items: &Vec<syn::Item>) -> eyre::Result<Vec<syn::Item>> {
     let mut pgnode_impls = Vec::new();
 
     // we scope must of the computation so we can borrow `items` and then
@@ -466,10 +463,7 @@ struct StructDescriptor<'a> {
 
 /// Given a specific postgres version, `run_bindgen` generates bindings for the given
 /// postgres version and returns them as a token stream.
-fn run_bindgen(
-    pg_config: &PgConfig,
-    include_h: &PathBuf,
-) -> Result<syn::File, Box<dyn Error + Send + Sync>> {
+fn run_bindgen(pg_config: &PgConfig, include_h: &PathBuf) -> eyre::Result<syn::File> {
     let major_version = pg_config.major_version()?;
     eprintln!("Generating bindings for pg{}", major_version);
     let includedir_server = pg_config.includedir_server()?;
@@ -505,11 +499,7 @@ fn run_bindgen(
     syn::parse_file(bindings.to_string().as_str()).map_err(|e| From::from(e))
 }
 
-fn build_shim(
-    shim_src: &PathBuf,
-    shim_dst: &PathBuf,
-    pg_config: &PgConfig,
-) -> Result<(), std::io::Error> {
+fn build_shim(shim_src: &PathBuf, shim_dst: &PathBuf, pg_config: &PgConfig) -> eyre::Result<()> {
     let major_version = pg_config.major_version()?;
     let mut libpgx_cshim: PathBuf = shim_dst.clone();
 
@@ -533,7 +523,7 @@ fn build_shim_for_version(
     shim_src: &PathBuf,
     shim_dst: &PathBuf,
     pg_config: &PgConfig,
-) -> Result<(), std::io::Error> {
+) -> eyre::Result<()> {
     let path_env = prefix_path(pg_config.parent_path());
     let major_version = pg_config.major_version()?;
 
@@ -570,13 +560,13 @@ fn build_shim_for_version(
     )?;
 
     if rc.status.code().unwrap() != 0 {
-        panic!("failed to make pgx-cshim for v{}", major_version);
+        return Err(eyre!("failed to make pgx-cshim for v{}", major_version));
     }
 
     Ok(())
 }
 
-fn run_command(mut command: &mut Command, version: &str) -> Result<Output, std::io::Error> {
+fn run_command(mut command: &mut Command, version: &str) -> eyre::Result<Output> {
     let mut dbg = String::new();
 
     command = command
@@ -622,7 +612,7 @@ fn run_command(mut command: &mut Command, version: &str) -> Result<Output, std::
     Ok(rc)
 }
 
-fn apply_pg_guard(items: &Vec<syn::Item>) -> Result<Vec<syn::Item>, Box<dyn Error + Send + Sync>> {
+fn apply_pg_guard(items: &Vec<syn::Item>) -> eyre::Result<Vec<syn::Item>> {
     let mut out = Vec::with_capacity(items.len());
     for item in items.into_iter() {
         match item {
@@ -641,20 +631,21 @@ fn apply_pg_guard(items: &Vec<syn::Item>) -> Result<Vec<syn::Item>, Box<dyn Erro
     Ok(out)
 }
 
-fn rust_fmt(path: &PathBuf) -> Result<(), std::io::Error> {
-    run_command(
+fn rust_fmt(path: &PathBuf) -> eyre::Result<()> {
+    let out = run_command(
         Command::new("rustfmt").arg(path).current_dir("."),
         "[bindings_diff]",
-    )
-    .map_err(|e| {
-        if e.kind() == std::io::ErrorKind::NotFound {
-            std::io::Error::new(
-                std::io::ErrorKind::Other,
-                "Failed to run `rustfmt`, is it installed?",
-            )
-        } else {
-            e
+    );
+    match out {
+        Ok(_) => Ok(()),
+        Err(e)
+            if e.downcast_ref::<std::io::Error>()
+                .ok_or(eyre!("Couldn't downcast error ref"))?
+                .kind()
+                == std::io::ErrorKind::NotFound =>
+        {
+            Err(e).wrap_err("Failed to run `rustfmt`, is it installed?")
         }
-    })?;
-    Ok(())
+        Err(e) => Err(e.into()),
+    }
 }

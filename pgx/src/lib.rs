@@ -420,18 +420,36 @@ macro_rules! pg_binary_magic {
                     env = "PGX_SQL_ENTITY_SYMBOLS",
                 )]
                 symbols: Vec<String>,
+                /// Enable info logs, -vv for debug, -vvv for trace
+                #[clap(short = 'v', long, parse(from_occurrences), global = true)]
+                verbose: usize,
             }
 
             let sql_generator_cli = SqlGenerator::parse();
 
             // Initialize tracing with tracing-error, and eyre
             let fmt_layer = tracing_subscriber::fmt::Layer::new()
-                .without_time()
                 .pretty();
             // Unless the user opts in specifically we don't want to impact `cargo-pgx schema` output.
-            let filter_layer = EnvFilter::try_from_default_env()
-                .or_else(|_| EnvFilter::try_new("warn"))
-                .unwrap();
+            let filter_layer = match EnvFilter::try_from_default_env() {
+                Ok(filter_layer) => filter_layer,
+                Err(_) => {
+                    let log_level = match sql_generator_cli.verbose {
+                        0 => "info",
+                        1 => "warn",
+                        _ => "trace",
+                    };
+                    let filter_layer = EnvFilter::new("warn");
+                    let filter_layer = filter_layer.add_directive(format!("cargo_pgx={}", log_level).parse()?);
+                    let filter_layer = filter_layer.add_directive(format!("pgx={}", log_level).parse()?);
+                    let filter_layer = filter_layer.add_directive(format!("pgx_macros={}", log_level).parse()?);
+                    let filter_layer = filter_layer.add_directive(format!("pgx_tests={}", log_level).parse()?);
+                    let filter_layer = filter_layer.add_directive(format!("pgx_pg_sys={}", log_level).parse()?);
+                    let filter_layer = filter_layer.add_directive(format!("pgx_utils={}", log_level).parse()?);
+                    filter_layer
+                }
+            };
+
             tracing_subscriber::registry()
                 .with(filter_layer)
                 .with(fmt_layer)

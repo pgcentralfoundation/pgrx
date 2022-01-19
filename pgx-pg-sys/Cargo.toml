@@ -41,3 +41,5 @@ proc-macro2 = "1.0.36"
 quote = "1.0.14"
 rayon = "1.5.1"
 syn = { version = "1.0.85", features = [ "extra-traits", "full", "fold", "parsing" ] }
+eyre = "0.6.5"
+color-eyre = "0.6.0"

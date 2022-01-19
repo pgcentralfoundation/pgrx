@@ -1,5 +1,5 @@
 use super::RustSqlMapping;
-use eyre::eyre as eyre_err;
+use eyre::eyre;
 use std::{
     cmp::Ordering,
     hash::{Hash, Hasher},
@@ -80,7 +80,7 @@ impl ToSql for PostgresTypeEntity {
         let item_node = &context.graph[self_index];
         let item = match item_node {
             SqlGraphEntity::Type(item) => item,
-            _ => return Err(eyre_err!("Was not called on a Type. Got: {:?}", item_node)),
+            _ => return Err(eyre!("Was not called on a Type. Got: {:?}", item_node)),
         };
 
         // The `in_fn`/`out_fn` need to be present in a certain order:
@@ -118,7 +118,7 @@ impl ToSql for PostgresTypeEntity {
                 }
                 _ => None,
             })
-            .ok_or_else(|| eyre_err!("Could not find in_fn graph entity."))?;
+            .ok_or_else(|| eyre!("Could not find in_fn graph entity."))?;
         tracing::trace!(in_fn = ?in_fn_path, "Found matching `in_fn`");
         let in_fn_sql = in_fn.to_sql(context)?;
         tracing::trace!(%in_fn_sql);
@@ -141,10 +141,7 @@ impl ToSql for PostgresTypeEntity {
         let (_, _index) = context
             .externs
             .iter()
-            .find(|(k, _v)| {
-                tracing::trace!(%k.full_path, %out_fn_path, "Checked");
-                (**k).full_path == out_fn_path.as_str()
-            })
+            .find(|(k, _v)| (**k).full_path == out_fn_path.as_str())
             .ok_or_else(|| eyre::eyre!("Did not find `out_fn: {}`.", out_fn_path))?;
         let (out_fn_graph_index, out_fn) = context
             .graph
@@ -155,7 +152,7 @@ impl ToSql for PostgresTypeEntity {
                 }
                 _ => None,
             })
-            .ok_or_else(|| eyre_err!("Could not find out_fn graph entity."))?;
+            .ok_or_else(|| eyre!("Could not find out_fn graph entity."))?;
         tracing::trace!(out_fn = ?out_fn_path, "Found matching `out_fn`");
         let out_fn_sql = out_fn.to_sql(context)?;
         tracing::trace!(%out_fn_sql);
@@ -172,7 +169,7 @@ impl ToSql for PostgresTypeEntity {
             line = item.line,
             name = item.name,
         );
-        tracing::debug!(sql = %shell_type);
+        tracing::trace!(sql = %shell_type);
 
         let materialized_type = format!("\n\
                                 -- {file}:{line}\n\
@@ -196,7 +193,7 @@ impl ToSql for PostgresTypeEntity {
                                         out_fn = item.out_fn,
                                         out_fn_path = out_fn_path,
         );
-        tracing::debug!(sql = %materialized_type);
+        tracing::trace!(sql = %materialized_type);
 
         Ok(shell_type + "\n" + &in_fn_sql + "\n" + &out_fn_sql + "\n" + &materialized_type)
     }

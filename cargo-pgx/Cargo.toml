@@ -16,7 +16,7 @@ exclude = [ "*.png" ]
 
 [dependencies]
 cargo_metadata = "0.14.1"
-clap = { version = "3.0.5", features = [ "env", "suggestions", "cargo", "derive" ] }
+clap = { version = "3.0.10", features = [ "env", "suggestions", "cargo", "derive" ] }
 colored = "2.0.0"
 env_proxy = "0.4.1"
 num_cpus = "1.13.1"
@@ -29,5 +29,10 @@ rttp_client = { version = "0.1.0", features = ["tls-native"] }
 syn = { version = "1.0.85", features = [ "extra-traits", "full", "fold", "parsing" ] }
 unescape = "0.1.0"
 fork = "0.1.18"
-libloading = "0.7.2"
+libloading = "0.7.3"
 symbolic = "8.5.0"
+eyre = "0.6.5"
+color-eyre = "0.6.0"
+tracing = "0.1.29"
+tracing-error = "0.2.0"
+tracing-subscriber = { version = "0.3.6", features = [ "env-filter" ] }

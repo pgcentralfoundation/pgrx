@@ -1,11 +1,12 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-use crate::commands::get::get_property;
-use crate::commands::install::install_extension;
-use crate::CommandExecute;
-use pgx_utils::get_target_dir;
-use pgx_utils::pg_config::PgConfig;
+use crate::{
+    command::{get::get_property, install::install_extension},
+    CommandExecute,
+};
+use eyre::eyre;
+use pgx_utils::{get_target_dir, pg_config::PgConfig};
 use std::path::PathBuf;
 
 /// Create an installation package directory (in `./target/[debug|release]/extname-pgXX/`).
@@ -21,10 +22,13 @@ pub(crate) struct Package {
     /// Additional cargo features to activate (default is '--no-default-features')
     #[clap(long)]
     features: Vec<String>,
+    #[clap(from_global, parse(from_occurrences))]
+    verbose: usize,
 }
 
 impl CommandExecute for Package {
-    fn execute(self) -> std::result::Result<(), std::io::Error> {
+    #[tracing::instrument(level = "error", skip(self))]
+    fn execute(self) -> eyre::Result<()> {
         let pg_config = match self.pg_config {
             None => PgConfig::from_path(),
             Some(config) => PgConfig::new(PathBuf::from(config)),
@@ -33,11 +37,15 @@ impl CommandExecute for Package {
     }
 }
 
+#[tracing::instrument(level = "error", skip_all, fields(
+    pg_version = %pg_config.version()?,
+    release = !is_debug,
+))]
 pub(crate) fn package_extension(
     pg_config: &PgConfig,
     is_debug: bool,
     additional_features: &Vec<impl AsRef<str>>,
-) -> Result<(), std::io::Error> {
+) -> eyre::Result<()> {
     let base_path = build_base_path(pg_config, is_debug)?;
 
     if base_path.exists() {
@@ -56,10 +64,10 @@ pub(crate) fn package_extension(
     )
 }
 
-fn build_base_path(pg_config: &PgConfig, is_debug: bool) -> Result<PathBuf, std::io::Error> {
-    let mut target_dir = get_target_dir();
+fn build_base_path(pg_config: &PgConfig, is_debug: bool) -> eyre::Result<PathBuf> {
+    let mut target_dir = get_target_dir()?;
     let pgver = pg_config.major_version()?;
-    let extname = get_property("extname").expect("could not determine extension name");
+    let extname = get_property("extname")?.ok_or(eyre!("could not determine extension name"))?;
     target_dir.push(if is_debug { "debug" } else { "release" });
     target_dir.push(format!("{}-pg{}", extname, pgver));
     Ok(target_dir)
