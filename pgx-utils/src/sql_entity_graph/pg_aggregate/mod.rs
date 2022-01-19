@@ -271,7 +271,7 @@ impl PgAggregate {
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case)]
                 #[pg_extern]
-                fn #fn_name(this: #target_path) -> Vec<u8> {
+                fn #fn_name(this: #type_state_without_self) -> Vec<u8> {
                     this.serial()
                 }
             });
@@ -295,13 +295,13 @@ impl PgAggregate {
                 #[allow(non_snake_case)]
                 #[pg_extern]
                 fn #fn_name(this: #type_state_without_self, buf: Vec<u8>, internal: pgx::PgBox<#type_state_without_self>) -> pgx::PgBox<#type_state_without_self> {
-                    this.deserial(buf, internal)
+                    <#target_path as pgx::Aggregate>::deserial(this, buf, internal)
                 }
             });
             Some(fn_name)
         } else {
             item_impl.items.push(parse_quote! {
-                fn deserial(current: #type_state_without_self, _buf: Vec<u8>, _internal: pgx::PgBox<Self>) -> pgx::PgBox<Self> {
+                fn deserial(current: #type_state_without_self, _buf: Vec<u8>, _internal: pgx::PgBox<#type_state_without_self>) -> pgx::PgBox<#type_state_without_self> {
                     unimplemented!("Call to deserial on an aggregate which does not support it.")
                 }
             });

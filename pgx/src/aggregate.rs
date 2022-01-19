@@ -157,7 +157,7 @@ where
     fn serial(current: Self::State) -> Vec<u8>;
 
     /// **Optional:** This function can be skipped, `#[pg_aggregate]` will create a stub.
-    fn deserial(current: Self::State, _buf: Vec<u8>, _internal: PgBox<Self>) -> PgBox<Self>;
+    fn deserial(current: Self::State, _buf: Vec<u8>, _internal: PgBox<Self::State>) -> PgBox<Self::State>;
 
     /// **Optional:** This function can be skipped, `#[pg_aggregate]` will create a stub.
     fn moving_state(_mstate: Self::MovingState, _v: Self::Args) -> Self::MovingState;
