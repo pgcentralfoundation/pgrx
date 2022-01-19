@@ -253,6 +253,7 @@ version = "0.2.6"
 dependencies = [
  "cargo_metadata",
  "clap 3.0.10",
+ "clap-cargo",
  "color-eyre",
  "colored",
  "env_proxy",
@@ -266,6 +267,7 @@ dependencies = [
  "rayon",
  "regex",
  "rttp_client",
+ "semver 1.0.4",
  "symbolic",
  "syn",
  "tracing",
@@ -358,6 +360,17 @@ dependencies = [
  "strsim 0.10.0",
  "termcolor",
  "textwrap 0.14.2",
+]
+
+[[package]]
+name = "clap-cargo"
+version = "0.8.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "551b6aa534ced210e29bc4ea2016bc11c74770f0a2b94b29dfc1a92ab6fc28d4"
+dependencies = [
+ "cargo_metadata",
+ "clap 3.0.10",
+ "doc-comment",
 ]
 
 [[package]]
@@ -568,6 +581,12 @@ name = "dmsort"
 version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d4699f5cb7678f099b747ffdc1e6ce6cdc42579e29d28315aa715b9fd10324fc"
+
+[[package]]
+name = "doc-comment"
+version = "0.3.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fea41bba32d969b513997752735605054bc0dfa92b4c56bf1189f2e174be7a10"
 
 [[package]]
 name = "either"
