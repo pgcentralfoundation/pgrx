@@ -272,7 +272,7 @@ impl PgAggregate {
                 #[allow(non_snake_case)]
                 #[pg_extern]
                 fn #fn_name(this: #type_state_without_self) -> Vec<u8> {
-                    this.serial()
+                    <#target_path as pgx::Aggregate>::serial(this)
                 }
             });
             Some(fn_name)
