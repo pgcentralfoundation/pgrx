@@ -1,15 +1,19 @@
-use crate::commands::get::find_control_file;
-use crate::commands::get::get_property;
+use crate::{
+    command::get::{find_control_file, get_property},
+    CommandExecute,
+};
 use colored::Colorize;
-use pgx_utils::pg_config::PgConfig;
-use pgx_utils::{exit_with_error, handle_result};
-use std::collections::HashSet;
-use std::fs::File;
-use std::os::unix::prelude::MetadataExt;
-use std::os::unix::prelude::PermissionsExt;
+use eyre::{eyre, WrapErr};
+use pgx_utils::{
+    pg_config::{PgConfig, Pgx},
+};
 use std::{
+    collections::HashSet,
+    fs::File,
     io::{Read, Write},
+    os::unix::prelude::{MetadataExt, PermissionsExt},
     path::Path,
+    path::PathBuf,
     process::{Command, Stdio},
 };
 use symbolic::{
@@ -17,18 +21,126 @@ use symbolic::{
     debuginfo::{Archive, SymbolIterator},
 };
 
+/// Generate extension schema files
+///
+/// The SQL generation process requires configuring a few settings in the crate.
+/// Normally `cargo pgx schema --force-default` can set these automatically.
+#[derive(clap::Args, Debug)]
+#[clap(author)]
+pub(crate) struct Schema {
+    /// Skip checking for required files
+    #[clap(long, short)]
+    manual: bool,
+    /// Skip building the `sql-generator`, use an existing build
+    #[clap(long, short)]
+    skip_build: bool,
+    /// Force the generation of default required files
+    #[clap(long, short)]
+    force_default: bool,
+    /// Do you want to run against Postgres `pg10`, `pg11`, `pg12`, `pg13`, `pg14`?
+    pg_version: Option<String>,
+    /// Compile for release mode (default is debug)
+    #[clap(env = "PROFILE", long, short)]
+    release: bool,
+    /// The `pg_config` path (default is first in $PATH)
+    #[clap(long, short = 'c', parse(from_os_str))]
+    pg_config: Option<PathBuf>,
+    /// Additional cargo features to activate (default is `--no-default-features`)
+    #[clap(long)]
+    features: Vec<String>,
+    /// A path to output a produced SQL file (default is `sql/$EXTNAME-$VERSION.sql`)
+    #[clap(long, short, parse(from_os_str))]
+    out: Option<PathBuf>,
+    /// A path to output a produced GraphViz DOT file
+    #[clap(long, short, parse(from_os_str))]
+    dot: Option<PathBuf>,
+    #[clap(from_global, parse(from_occurrences))]
+    verbose: usize,
+}
+
+impl CommandExecute for Schema {
+    #[tracing::instrument(level = "error", skip(self))]
+    fn execute(self) -> eyre::Result<()> {
+        let (_, extname) = crate::command::get::find_control_file()?;
+        let out = match self.out {
+            Some(out) => out,
+            None => format!(
+                "sql/{}-{}.sql",
+                extname,
+                crate::command::install::get_version()?,
+            )
+            .into(),
+        };
+
+        let log_level = if let Ok(log_level) = std::env::var("RUST_LOG") {
+            Some(log_level)
+        } else {
+            match self.verbose {
+                0 => Some("warn".into()),
+                1 => Some("info".into()),
+                2 => Some("debug".into()),
+                _ => Some("trace".into()),
+            }
+        };
+
+        let pg_config =
+            match std::env::var("PGX_TEST_MODE_VERSION") {
+                // for test mode, we want the pg_config specified in PGX_TEST_MODE_VERSION
+                Ok(pgver) => match Pgx::from_config()?.get(&pgver) {
+                    Ok(pg_config) => pg_config.clone(),
+                    Err(e) => return Err(e).wrap_err(
+                        "PGX_TEST_MODE_VERSION does not contain a valid postgres version number",
+                    ),
+                },
+
+                // otherwise, the user just ran "cargo pgx install", and we use whatever "pg_config" is configured
+                Err(_) => match self.pg_config {
+                    None => match self.pg_version {
+                        None => PgConfig::from_path(),
+                        Some(pgver) => Pgx::from_config()?.get(&pgver)?.clone(),
+                    },
+                    Some(config) => PgConfig::new(PathBuf::from(config)),
+                },
+            };
+
+        let _span = tracing::info_span!("version", pg_version = %pg_config.version()?).entered();
+
+        generate_schema(
+            &pg_config,
+            self.release,
+            &self.features,
+            &out,
+            self.dot,
+            log_level,
+            self.force_default,
+            self.manual,
+            self.skip_build,
+        )
+    }
+}
+
+#[tracing::instrument(level = "error", skip_all, fields(
+    pg_version = %pg_config.version()?,
+    release = is_release,
+    path,
+    dot
+))]
 pub(crate) fn generate_schema(
     pg_config: &PgConfig,
     is_release: bool,
-    additional_features: &[&str],
+    additional_features: &Vec<impl AsRef<str>>,
     path: impl AsRef<std::path::Path>,
     dot: Option<impl AsRef<std::path::Path>>,
     log_level: Option<String>,
     force_default: bool,
     manual: bool,
     skip_build: bool,
-) -> Result<(), std::io::Error> {
-    let (control_file, _extname) = find_control_file();
+) -> eyre::Result<()> {
+    let additional_features = additional_features
+        .iter()
+        .map(AsRef::as_ref)
+        .collect::<Vec<_>>();
+    let (control_file, _extname) = find_control_file()?;
     let major_version = pg_config.major_version()?;
 
     // If not manual, we should ensure a few files exist and are what is expected.
@@ -78,11 +190,11 @@ pub(crate) fn generate_schema(
         )?;
     }
 
-    if get_property("relocatable") != Some("false".into()) {
-        exit_with_error!(
+    if get_property("relocatable")? != Some("false".into()) {
+        return Err(eyre!(
             "{}:  The `relocatable` property MUST be `false`.  Please update your .control file.",
             control_file.display()
-        )
+        ))
     }
 
     let mut features =
@@ -125,17 +237,16 @@ pub(crate) fn generate_schema(
             features,
             command_str
         );
-        let status = handle_result!(
-            command.status(),
-            format!("failed to spawn cargo: {}", command_str)
-        );
+        let status = command
+            .status()
+            .wrap_err_with(|| format!("failed to spawn cargo: {}", command_str))?;
         if !status.success() {
-            exit_with_error!("failed to build SQL generator");
+            return Err(eyre!("failed to build SQL generator"));
         }
     }
 
     // Inspect the symbol table for a list of `__pgx_internals` we should have the generator call
-    let mut sql_gen_path = pgx_utils::get_target_dir();
+    let mut sql_gen_path = pgx_utils::get_target_dir()?;
     sql_gen_path.push(if is_release { "release" } else { "debug" });
     sql_gen_path.push("sql-generator");
     println!("{} SQL entities", " Discovering".bold().green(),);
@@ -240,18 +351,20 @@ pub(crate) fn generate_schema(
             .iter()
             .map(|f| f.to_string())
             .collect::<Vec<_>>()
-            .join(","),
+            .join(" "),
     );
+    if let Some(log_level) = &log_level {
+        command.env("RUST_LOG", log_level);
+    }
 
     let command = command.stdout(Stdio::inherit()).stderr(Stdio::inherit());
     let command_str = format!("{:?}", command);
     println!("running SQL generator\n{}", command_str);
-    let status = handle_result!(
-        command.status(),
-        format!("failed to spawn sql-generator: {}", command_str)
-    );
+    let status = command
+        .status()
+        .wrap_err_with(|| format!("failed to spawn sql-generator: {}", command_str))?;
     if !status.success() {
-        exit_with_error!("failed to run SQL generator");
+        return Err(eyre!("failed to run SQL generator"));
     }
     Ok(())
 }

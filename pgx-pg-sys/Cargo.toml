@@ -24,6 +24,7 @@ no-default-features = true
 targets = ["x86_64-unknown-linux-gnu"]
 # Enable `#[cfg(docsrs)]` (https://docs.rs/about/builds#cross-compiling)
 rustc-args = ["--cfg", "docsrs"]
+rustdoc-args = ["--cfg", "docsrs"]
 
 [dependencies]
 memoffset = "0.6.5"
@@ -34,9 +35,11 @@ pgx-macros = { path = "../pgx-macros/", version = "0.2.6" }
 bindgen = "0.59.2"
 build-deps = "0.1.4"
 colored = "2.0.0"
-num_cpus = "1.13.0"
+num_cpus = "1.13.1"
 pgx-utils = { path = "../pgx-utils/", version = "0.2.6" }
-proc-macro2 = "1.0.34"
-quote = "1.0.10"
+proc-macro2 = "1.0.36"
+quote = "1.0.14"
 rayon = "1.5.1"
-syn = { version = "1.0.82", features = [ "extra-traits", "full", "fold", "parsing" ] }
+syn = { version = "1.0.85", features = [ "extra-traits", "full", "fold", "parsing" ] }
+eyre = "0.6.5"
+color-eyre = "0.6.0"

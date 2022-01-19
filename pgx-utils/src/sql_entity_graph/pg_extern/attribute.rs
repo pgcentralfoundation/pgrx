@@ -44,6 +44,7 @@ pub enum Attribute {
     Error(syn::LitStr),
     Schema(syn::LitStr),
     Name(syn::LitStr),
+    Cost(syn::Expr),
     Requires(Punctuated<PositioningRef, Token![,]>),
 }
 
@@ -73,6 +74,9 @@ impl ToTokens for Attribute {
             }
             Attribute::Name(s) => {
                 quote! { pgx::datum::sql_entity_graph::ExternArgs::Name(String::from(#s)) }
+            }
+            Attribute::Cost(s) => {
+                quote! { pgx::datum::sql_entity_graph::ExternArgs::Cost(format!("{}", #s)) }
             }
             Attribute::Requires(items) => {
                 let items_iter = items
@@ -113,6 +117,11 @@ impl Parse for Attribute {
                 let _eq: Token![=] = input.parse()?;
                 let literal: syn::LitStr = input.parse()?;
                 Self::Name(literal)
+            }
+            "cost" => {
+                let _eq: Token![=] = input.parse()?;
+                let literal: syn::Expr = input.parse()?;
+                Self::Cost(literal)
             }
             "requires" => {
                 let _eq: syn::token::Eq = input.parse()?;

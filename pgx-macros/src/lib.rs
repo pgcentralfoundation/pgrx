@@ -88,7 +88,11 @@ pub fn pg_test(attr: TokenStream, item: TokenStream) -> TokenStream {
                     #att_stream
 
                     crate::pg_test::setup(options);
-                    pgx_tests::run_test(#sql_funcname, #expected_error, crate::pg_test::postgresql_conf_options())
+                    let res = pgx_tests::run_test(#sql_funcname, #expected_error, crate::pg_test::postgresql_conf_options());
+                    match res {
+                        Ok(()) => (),
+                        Err(e) => panic!("{:?}", e)
+                    }
                 }
             });
         }

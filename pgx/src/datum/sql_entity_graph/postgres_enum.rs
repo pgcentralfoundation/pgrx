@@ -91,7 +91,7 @@ impl ToSql for PostgresEnumEntity {
                 .join(",\n")
                 + "\n",
         );
-        tracing::debug!(%sql);
+        tracing::trace!(%sql);
         Ok(sql)
     }
 }

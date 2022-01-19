@@ -121,7 +121,9 @@ custom types.
  - `libclang.so`
    - Ubuntu: `libclang-dev` or `clang`
    - RHEL: `clang`
- - [build dependencies for PostgreSQL](https://wiki.postgresql.org/wiki/Compile_and_Install_from_source_code)
+ - A relatively recent GCC which supports `-dynamic-list` (Linux) or `-exported_symbols_list` (Mac).
+   - CentOS 7's GCC 4 is known to not work. Use GCC 7: `scl enable devtoolset-7`
+ - [Build dependencies for PostgreSQL](https://wiki.postgresql.org/wiki/Compile_and_Install_from_source_code)
 
 Note that a local Postgres installation is not required. `pgx` will download and compile Postgres itself.
 

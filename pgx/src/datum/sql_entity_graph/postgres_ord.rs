@@ -69,7 +69,7 @@ impl ToSql for PostgresOrdEntity {
                           file = self.file,
                           line = self.line,
         );
-        tracing::debug!(%sql);
+        tracing::trace!(%sql);
         Ok(sql)
     }
 }

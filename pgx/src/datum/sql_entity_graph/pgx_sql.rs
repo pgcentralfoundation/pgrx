@@ -1,5 +1,5 @@
-use eyre::eyre as eyre_err;
-use std::{any::TypeId, collections::HashMap, fmt::Debug};
+use eyre::eyre;
+use std::{any::TypeId, collections::HashMap, fmt::Debug, path::Path};
 
 use petgraph::{dot::Dot, graph::NodeIndex, stable_graph::StableGraph};
 use tracing::instrument;
@@ -215,7 +215,7 @@ impl PgxSql {
     }
 
     #[instrument(level = "error", skip(self))]
-    pub fn to_file(&self, file: impl AsRef<str> + Debug) -> eyre::Result<()> {
+    pub fn to_file(&self, file: impl AsRef<Path> + Debug) -> eyre::Result<()> {
         use std::{
             fs::{create_dir_all, File},
             io::Write,
@@ -234,7 +234,7 @@ impl PgxSql {
     }
 
     #[instrument(level = "error", err, skip(self))]
-    pub fn to_dot(&self, file: impl AsRef<str> + Debug) -> eyre::Result<()> {
+    pub fn to_dot(&self, file: impl AsRef<Path> + Debug) -> eyre::Result<()> {
         use std::{
             fs::{create_dir_all, File},
             io::Write,
@@ -337,7 +337,7 @@ impl PgxSql {
     pub fn to_sql(&self) -> eyre::Result<String> {
         let mut full_sql = String::new();
         for step_id in petgraph::algo::toposort(&self.graph, None).map_err(|e| {
-            eyre_err!(
+            eyre!(
                 "Failed to toposort SQL entities, node with cycle: {:?}",
                 self.graph[e.node_id()]
             )
@@ -469,7 +469,7 @@ fn initialize_extension_sqls<'a>(
         if item.bootstrap {
             if let Some(exiting_index) = bootstrap {
                 let existing: &SqlGraphEntity = &graph[exiting_index];
-                return Err(eyre_err!(
+                return Err(eyre!(
                     "Cannot have multiple `extension_sql!()` with `bootstrap` positioning, found `{}`, other was `{}`",
                     item.rust_identifier(),
                     existing.rust_identifier(),
@@ -480,7 +480,7 @@ fn initialize_extension_sqls<'a>(
         if item.finalize {
             if let Some(exiting_index) = finalize {
                 let existing: &SqlGraphEntity = &graph[exiting_index];
-                return Err(eyre_err!(
+                return Err(eyre!(
                     "Cannot have multiple `extension_sql!()` with `finalize` positioning, found `{}`, other was `{}`",
                     item.rust_identifier(),
                     existing.rust_identifier(),
@@ -586,7 +586,7 @@ fn connect_extension_sqls(
                 tracing::debug!(from = %item.rust_identifier(), to = ?graph[*target].rust_identifier(), "Adding ExtensionSQL after positioning ref target");
                 graph.add_edge(*target, index, SqlGraphRelationship::RequiredBy);
             } else {
-                return Err(eyre_err!(
+                return Err(eyre!(
                     "Could not find `requires` target of `{}`{}: {}",
                     item.rust_identifier(),
                     if let (Some(file), Some(line)) = (item.file(), item.line()) {
@@ -837,10 +837,7 @@ fn connect_externs(
                             tracing::debug!(from = %item.rust_identifier(), to = %graph[*target].rust_identifier(), "Adding Extern after positioning ref target");
                             graph.add_edge(*target, index, SqlGraphRelationship::RequiredBy);
                         } else {
-                            return Err(eyre_err!(
-                                "Could not find `requires` target: {:?}",
-                                requires
-                            ));
+                            return Err(eyre!("Could not find `requires` target: {:?}", requires));
                         }
                     }
                 }
