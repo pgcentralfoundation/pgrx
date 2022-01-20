@@ -118,7 +118,8 @@ impl CommandExecute for Schema {
     pg_version = %pg_config.version()?,
     release = is_release,
     path,
-    dot
+    dot,
+    features = ?features.features,
 ))]
 pub(crate) fn generate_schema(
     pg_config: &PgConfig,
