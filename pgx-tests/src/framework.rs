@@ -7,8 +7,8 @@ use lazy_static::*;
 use std::sync::{Arc, Mutex};
 
 use colored::*;
-use pgx::*;
 use eyre::{eyre, WrapErr};
+use pgx::*;
 use pgx_utils::pg_config::{PgConfig, Pgx};
 use pgx_utils::{createdb, get_named_capture, get_target_dir};
 use postgres::error::DbError;
@@ -135,7 +135,9 @@ pub fn run_test(
     } else if let Some(expected_error_message) = expected_error {
         // we expected an ERROR, but didn't get one
         return Err(eyre!("Expected error: {}", expected_error_message));
-    } else { Ok(()) }
+    } else {
+        Ok(())
+    }
 }
 
 fn format_loglines(session_id: &str, loglines: &LogLines) -> String {
@@ -155,7 +157,9 @@ fn format_loglines(session_id: &str, loglines: &LogLines) -> String {
     result
 }
 
-fn initialize_test_framework(postgresql_conf: Vec<&'static str>) -> eyre::Result<(LogLines, String)> {
+fn initialize_test_framework(
+    postgresql_conf: Vec<&'static str>,
+) -> eyre::Result<(LogLines, String)> {
     let mut state = TEST_MUTEX.lock().unwrap_or_else(|_| {
         // if we can't get the lock, that means it was poisoned,
         // so we just abruptly exit, which cuts down on test failure spam

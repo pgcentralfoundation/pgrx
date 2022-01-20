@@ -26,9 +26,8 @@ pub(crate) struct Install {
     /// The `pg_config` path (default is first in $PATH)
     #[clap(long, short = 'c')]
     pg_config: Option<String>,
-    /// Additional cargo features to activate (default is '--no-default-features')
-    #[clap(long, short)]
-    features: Option<Vec<String>>,
+    #[clap(flatten)]
+    features: clap_cargo::Features,
     #[clap(from_global, parse(from_occurrences))]
     verbose: usize,
 }
@@ -36,7 +35,6 @@ pub(crate) struct Install {
 impl CommandExecute for Install {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
-        let features = self.features.unwrap_or(vec![]);
         let pg_config =
             match std::env::var("PGX_TEST_MODE_VERSION") {
                 // for test mode, we want the pg_config specified in PGX_TEST_MODE_VERSION
@@ -54,7 +52,13 @@ impl CommandExecute for Install {
                 },
             };
 
-        install_extension(&pg_config, self.release, self.no_schema, None, &features)
+        install_extension(
+            &pg_config,
+            self.release,
+            self.no_schema,
+            None,
+            &self.features,
+        )
     }
 }
 
@@ -68,7 +72,7 @@ pub(crate) fn install_extension(
     is_release: bool,
     no_schema: bool,
     base_directory: Option<PathBuf>,
-    additional_features: &Vec<impl AsRef<str>>,
+    features: &clap_cargo::Features,
 ) -> eyre::Result<()> {
     let base_directory = base_directory.unwrap_or("/".into());
     tracing::Span::current().record(
@@ -86,7 +90,7 @@ pub(crate) fn install_extension(
         ));
     }
 
-    build_extension(major_version, is_release, &*additional_features)?;
+    build_extension(major_version, is_release, &features)?;
 
     println!();
     println!("installing extension");
@@ -120,13 +124,7 @@ pub(crate) fn install_extension(
     }
 
     if !no_schema || !get_target_sql_file(&extdir, &base_directory)?.exists() {
-        copy_sql_files(
-            pg_config,
-            is_release,
-            additional_features,
-            &extdir,
-            &base_directory,
-        )?;
+        copy_sql_files(pg_config, is_release, features, &extdir, &base_directory)?;
     } else {
         println!("{} schema generation", "    Skipping".bold().yellow());
     }
@@ -173,31 +171,40 @@ fn copy_file(src: &PathBuf, dest: &PathBuf, msg: &str, do_filter: bool) -> eyre:
 pub(crate) fn build_extension(
     major_version: u16,
     is_release: bool,
-    additional_features: &Vec<impl AsRef<str>>,
+    features: &clap_cargo::Features,
 ) -> eyre::Result<()> {
-    let additional_features = additional_features
-        .iter()
-        .map(AsRef::as_ref)
-        .collect::<Vec<_>>();
-    let mut features =
+    let pgx_build_features =
         std::env::var("PGX_BUILD_FEATURES").unwrap_or(format!("pg{}", major_version));
     let flags = std::env::var("PGX_BUILD_FLAGS").unwrap_or_default();
-    if !additional_features.is_empty() {
+
+    let features_arg = if !features.features.is_empty() {
         use std::fmt::Write;
-        let mut additional_features = additional_features.join(" ");
-        let _ = write!(&mut additional_features, " {}", features);
-        features = additional_features
-    }
+        let mut additional_features = features.features.join(" ");
+        let _ = write!(&mut additional_features, " {}", pgx_build_features);
+        additional_features
+    } else {
+        pgx_build_features
+    };
+
     let mut command = Command::new("cargo");
     command.arg("build");
     if is_release {
         command.arg("--release");
     }
 
-    if !features.trim().is_empty() {
+    if !features_arg.trim().is_empty() {
         command.arg("--features");
-        command.arg(&features);
+        command.arg(&features_arg);
+        // While this is not 'correct' `cargo` does not let us negate features.
         command.arg("--no-default-features");
+    }
+
+    if features.no_default_features && features_arg.trim().is_empty() {
+        command.arg("--no-default-features");
+    }
+
+    if features.all_features {
+        command.arg("--all-features");
     }
 
     for arg in flags.split_ascii_whitespace() {
@@ -208,7 +215,7 @@ pub(crate) fn build_extension(
     let command_str = format!("{:?}", command);
     println!(
         "building extension with features `{}`\n{}",
-        features, command_str
+        features_arg, command_str
     );
     let status = command
         .status()
@@ -234,7 +241,7 @@ fn get_target_sql_file(extdir: &PathBuf, base_directory: &PathBuf) -> eyre::Resu
 fn copy_sql_files(
     pg_config: &PgConfig,
     is_release: bool,
-    additional_features: &Vec<impl AsRef<str>>,
+    features: &clap_cargo::Features,
     extdir: &PathBuf,
     base_directory: &PathBuf,
 ) -> eyre::Result<()> {
@@ -244,7 +251,7 @@ fn copy_sql_files(
     crate::command::schema::generate_schema(
         pg_config,
         is_release,
-        additional_features,
+        features,
         &dest,
         Option::<String>::None,
         None,
@@ -354,7 +361,8 @@ fn make_relative(path: PathBuf) -> PathBuf {
 }
 
 fn format_display_path(path: &PathBuf) -> eyre::Result<String> {
-    let out = path.strip_prefix(get_target_dir()?.parent().unwrap())
+    let out = path
+        .strip_prefix(get_target_dir()?.parent().unwrap())
         .unwrap_or(&path)
         .display()
         .to_string();

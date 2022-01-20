@@ -19,9 +19,8 @@ pub(crate) struct Package {
     /// The `pg_config` path (default is first in $PATH)
     #[clap(long, short = 'c', parse(from_os_str))]
     pg_config: Option<PathBuf>,
-    /// Additional cargo features to activate (default is '--no-default-features')
-    #[clap(long)]
-    features: Vec<String>,
+    #[clap(flatten)]
+    features: clap_cargo::Features,
     #[clap(from_global, parse(from_occurrences))]
     verbose: usize,
 }
@@ -44,7 +43,7 @@ impl CommandExecute for Package {
 pub(crate) fn package_extension(
     pg_config: &PgConfig,
     is_debug: bool,
-    additional_features: &Vec<impl AsRef<str>>,
+    features: &clap_cargo::Features,
 ) -> eyre::Result<()> {
     let base_path = build_base_path(pg_config, is_debug)?;
 
@@ -55,13 +54,7 @@ pub(crate) fn package_extension(
     if !base_path.exists() {
         std::fs::create_dir_all(&base_path)?;
     }
-    install_extension(
-        pg_config,
-        !is_debug,
-        false,
-        Some(base_path),
-        additional_features,
-    )
+    install_extension(pg_config, !is_debug, false, Some(base_path), features)
 }
 
 fn build_base_path(pg_config: &PgConfig, is_debug: bool) -> eyre::Result<PathBuf> {

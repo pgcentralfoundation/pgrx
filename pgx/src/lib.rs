@@ -457,7 +457,7 @@ macro_rules! pg_binary_magic {
                 .init();
             color_eyre::install()?;
 
-            // Prior to 0.2.7 the `cargo-pgx pgx schema` command would pass symbols in comma-separated.
+            // After 0.2.6 the `cargo-pgx pgx schema` command would pass symbols in comma-separated.
             // This catches that, warns, and handles it.
             let sql_generator_cli = if sql_generator_cli.symbols.len() == 1 && sql_generator_cli.symbols[0].contains(",") {
                 tracing::warn!("`pgx` 0.2.7 changed how schema arguments are passed to the `sql-generator`. You are using a post-0.2.7 `pgx` with a 0.2.6 (or earlier) `cargo-pgx`. Please update `cargo-pgx`.");

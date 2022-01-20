@@ -29,9 +29,8 @@ pub(crate) struct Run {
     /// Don't regenerate the schema
     #[clap(long, short)]
     no_schema: bool,
-    /// Additional cargo features to activate (default is '--no-default-features')
-    #[clap(long)]
-    features: Vec<String>,
+    #[clap(flatten)]
+    features: clap_cargo::Features,
     #[clap(from_global, parse(from_occurrences))]
     verbose: usize,
 }
@@ -64,13 +63,13 @@ pub(crate) fn run_psql(
     dbname: &str,
     is_release: bool,
     no_schema: bool,
-    additional_features: &Vec<impl AsRef<str>>,
+    features: &clap_cargo::Features,
 ) -> eyre::Result<()> {
     // stop postgres
     stop_postgres(pg_config)?;
 
     // install the extension
-    install_extension(pg_config, is_release, no_schema, None, additional_features)?;
+    install_extension(pg_config, is_release, no_schema, None, features)?;
 
     // restart postgres
     start_postgres(pg_config)?;

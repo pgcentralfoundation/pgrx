@@ -4,9 +4,7 @@ use crate::{
 };
 use colored::Colorize;
 use eyre::{eyre, WrapErr};
-use pgx_utils::{
-    pg_config::{PgConfig, Pgx},
-};
+use pgx_utils::pg_config::{PgConfig, Pgx};
 use std::{
     collections::HashSet,
     fs::File,
@@ -45,9 +43,8 @@ pub(crate) struct Schema {
     /// The `pg_config` path (default is first in $PATH)
     #[clap(long, short = 'c', parse(from_os_str))]
     pg_config: Option<PathBuf>,
-    /// Additional cargo features to activate (default is `--no-default-features`)
-    #[clap(long)]
-    features: Vec<String>,
+    #[clap(flatten)]
+    features: clap_cargo::Features,
     /// A path to output a produced SQL file (default is `sql/$EXTNAME-$VERSION.sql`)
     #[clap(long, short, parse(from_os_str))]
     out: Option<PathBuf>,
@@ -103,8 +100,6 @@ impl CommandExecute for Schema {
                 },
             };
 
-        let _span = tracing::info_span!("version", pg_version = %pg_config.version()?).entered();
-
         generate_schema(
             &pg_config,
             self.release,
@@ -123,12 +118,13 @@ impl CommandExecute for Schema {
     pg_version = %pg_config.version()?,
     release = is_release,
     path,
-    dot
+    dot,
+    features = ?features.features,
 ))]
 pub(crate) fn generate_schema(
     pg_config: &PgConfig,
     is_release: bool,
-    additional_features: &Vec<impl AsRef<str>>,
+    features: &clap_cargo::Features,
     path: impl AsRef<std::path::Path>,
     dot: Option<impl AsRef<std::path::Path>>,
     log_level: Option<String>,
@@ -136,10 +132,8 @@ pub(crate) fn generate_schema(
     manual: bool,
     skip_build: bool,
 ) -> eyre::Result<()> {
-    let additional_features = additional_features
-        .iter()
-        .map(AsRef::as_ref)
-        .collect::<Vec<_>>();
+    crate::validate::validate(&features)?;
+
     let (control_file, _extname) = find_control_file()?;
     let major_version = pg_config.major_version()?;
 
@@ -194,18 +188,21 @@ pub(crate) fn generate_schema(
         return Err(eyre!(
             "{}:  The `relocatable` property MUST be `false`.  Please update your .control file.",
             control_file.display()
-        ))
+        ));
     }
 
-    let mut features =
+    let pgx_build_features =
         std::env::var("PGX_BUILD_FEATURES").unwrap_or(format!("pg{}", major_version));
-    let flags = std::env::var("PGX_BUILD_FLAGS").unwrap_or_default();
-    if !additional_features.is_empty() {
+    let features_arg = if !features.features.is_empty() {
         use std::fmt::Write;
-        let mut additional_features = additional_features.join(" ");
-        let _ = write!(&mut additional_features, " {}", features);
-        features = additional_features
-    }
+        let mut additional_features = features.features.join(" ");
+        let _ = write!(&mut additional_features, " {}", pgx_build_features);
+        additional_features
+    } else {
+        pgx_build_features
+    };
+
+    let flags = std::env::var("PGX_BUILD_FLAGS").unwrap_or_default();
 
     if !skip_build {
         // First, build the SQL generator so we can get a look at the symbol table
@@ -219,10 +216,19 @@ pub(crate) fn generate_schema(
             command.env("RUST_LOG", log_level);
         }
 
-        if !features.trim().is_empty() {
+        if !features_arg.trim().is_empty() {
             command.arg("--features");
-            command.arg(&features);
+            command.arg(&features_arg);
+            // While this is not 'correct' `cargo` does not let us negate features.
             command.arg("--no-default-features");
+        }
+
+        if features.no_default_features && features_arg.trim().is_empty() {
+            command.arg("--no-default-features");
+        }
+
+        if features.all_features {
+            command.arg("--all-features");
         }
 
         for arg in flags.split_ascii_whitespace() {
@@ -234,7 +240,7 @@ pub(crate) fn generate_schema(
         println!(
             "{} SQL generator with features `{}`\n{}",
             "    Building".bold().green(),
-            features,
+            features_arg,
             command_str
         );
         let status = command
