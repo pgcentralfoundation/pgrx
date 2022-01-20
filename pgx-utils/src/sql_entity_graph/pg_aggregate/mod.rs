@@ -205,7 +205,10 @@ impl PgAggregate {
                 #[allow(non_snake_case)]
                 #[pg_extern]
                 fn #fn_name(this: #type_state_without_self, #(#args_with_names),*, fcinfo: pgx::pg_sys::FunctionCallInfo) -> #type_state_without_self {
-                    <#target_path as pgx::Aggregate>::state(this, (#(#arg_names),*), fcinfo)
+                    <#target_path as pgx::Aggregate>::in_memory_context(
+                        fcinfo,
+                        move |_context| <#target_path as pgx::Aggregate>::state(this, (#(#arg_names),*), fcinfo)
+                    )
                 }
             });
             fn_name
@@ -226,7 +229,10 @@ impl PgAggregate {
                 #[allow(non_snake_case)]
                 #[pg_extern]
                 fn #fn_name(this: #type_state_without_self, v: #type_state_without_self, fcinfo: pgx::pg_sys::FunctionCallInfo) -> #type_state_without_self {
-                    <#target_path as pgx::Aggregate>::combine(this, v, fcinfo)
+                    <#target_path as pgx::Aggregate>::in_memory_context(
+                        fcinfo,
+                        move |_context| <#target_path as pgx::Aggregate>::combine(this, v, fcinfo)
+                    )
                 }
             });
             Some(fn_name)
@@ -249,7 +255,10 @@ impl PgAggregate {
                 #[allow(non_snake_case)]
                 #[pg_extern]
                 fn #fn_name(this: #type_state_without_self, fcinfo: pgx::pg_sys::FunctionCallInfo) -> <#target_path as pgx::Aggregate>::Finalize {
-                    <#target_path as pgx::Aggregate>::finalize(this, fcinfo)
+                    <#target_path as pgx::Aggregate>::in_memory_context(
+                        fcinfo,
+                        move |_context| <#target_path as pgx::Aggregate>::finalize(this, fcinfo)
+                    )
                 }
             });
             Some(fn_name)
@@ -272,7 +281,10 @@ impl PgAggregate {
                 #[allow(non_snake_case)]
                 #[pg_extern]
                 fn #fn_name(this: #type_state_without_self, fcinfo: pgx::pg_sys::FunctionCallInfo) -> Vec<u8> {
-                    <#target_path as pgx::Aggregate>::serial(this, fcinfo)
+                    <#target_path as pgx::Aggregate>::in_memory_context(
+                        fcinfo,
+                        move |_context| <#target_path as pgx::Aggregate>::serial(this, fcinfo)
+                    )
                 }
             });
             Some(fn_name)
@@ -295,7 +307,10 @@ impl PgAggregate {
                 #[allow(non_snake_case)]
                 #[pg_extern]
                 fn #fn_name(this: #type_state_without_self, buf: Vec<u8>, internal: pgx::PgBox<#type_state_without_self>, fcinfo: pgx::pg_sys::FunctionCallInfo) -> pgx::PgBox<#type_state_without_self> {
-                    <#target_path as pgx::Aggregate>::deserial(this, buf, internal, fcinfo)
+                    <#target_path as pgx::Aggregate>::in_memory_context(
+                        fcinfo,
+                        move |_context| <#target_path as pgx::Aggregate>::deserial(this, buf, internal, fcinfo)
+                    )
                 }
             });
             Some(fn_name)
@@ -336,7 +351,10 @@ impl PgAggregate {
                     #(#args_with_names),*,
                     fcinfo: pgx::pg_sys::FunctionCallInfo,
                 ) -> <#target_path as pgx::Aggregate>::MovingState {
-                    <#target_path as pgx::Aggregate>::moving_state(mstate, (#(#arg_names),*), fcinfo)
+                    <#target_path as pgx::Aggregate>::in_memory_context(
+                        fcinfo,
+                        move |_context| <#target_path as pgx::Aggregate>::moving_state(mstate, (#(#arg_names),*), fcinfo)
+                    )
                 }
             });
             Some(fn_name)
@@ -368,7 +386,10 @@ impl PgAggregate {
                     v: <#target_path as pgx::Aggregate>::Args,
                     fcinfo: pgx::pg_sys::FunctionCallInfo,
                 ) -> <#target_path as pgx::Aggregate>::MovingState {
-                    <#target_path as pgx::Aggregate>::moving_state(mstate, v, fcinfo)
+                    <#target_path as pgx::Aggregate>::in_memory_context(
+                        fcinfo,
+                        move |_context| <#target_path as pgx::Aggregate>::moving_state(mstate, v, fcinfo)
+                    )
                 }
             });
             Some(fn_name)
@@ -395,7 +416,11 @@ impl PgAggregate {
                 #[allow(non_snake_case)]
                 #[pg_extern]
                 fn #fn_name(mstate: <#target_path as pgx::Aggregate>::MovingState, fcinfo: pgx::pg_sys::FunctionCallInfo) -> <#target_path as pgx::Aggregate>::Finalize {
-                    <#target_path as pgx::Aggregate>::moving_finalize(mstate, fcinfo)
+                    <#target_path as pgx::Aggregate>::in_memory_context(
+                        fcinfo,
+                        move |_context| <#target_path as pgx::Aggregate>::moving_finalize(mstate, fcinfo)
+                    )
+                    
                 }
             });
             Some(fn_name)

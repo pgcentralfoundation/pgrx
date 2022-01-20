@@ -64,8 +64,11 @@ aggregate=# SELECT DemoSum(value) FROM demo_table;
 */
 
 use crate::{
+    error,
     datum::sql_entity_graph::{PgxSql, ToSql},
     pgbox::PgBox,
+    memcxt::PgMemoryContexts,
+    pg_sys::{CurrentMemoryContext, MemoryContext, AggCheckCallContext, FunctionCallInfo},
 };
 
 /// Aggregate implementation trait.
@@ -145,28 +148,52 @@ where
     /// **Optional:** This function can be skipped, `#[pg_aggregate]` will create a stub.
     const HYPOTHETICAL: bool = false;
 
-    fn state(current: Self::State, v: Self::Args, fcinfo: pgx_pg_sys::FunctionCallInfo) -> Self::State;
+    fn state(current: Self::State, v: Self::Args, fcinfo: FunctionCallInfo) -> Self::State;
 
     /// **Optional:** This function can be skipped, `#[pg_aggregate]` will create a stub.
-    fn finalize(current: Self::State, fcinfo: pgx_pg_sys::FunctionCallInfo) -> Self::Finalize;
+    fn finalize(current: Self::State, fcinfo: FunctionCallInfo) -> Self::Finalize;
 
     /// **Optional:** This function can be skipped, `#[pg_aggregate]` will create a stub.
-    fn combine(current: Self::State, _other: Self::State, fcinfo: pgx_pg_sys::FunctionCallInfo) -> Self::State;
+    fn combine(current: Self::State, _other: Self::State, fcinfo: FunctionCallInfo) -> Self::State;
 
     /// **Optional:** This function can be skipped, `#[pg_aggregate]` will create a stub.
-    fn serial(current: Self::State, fcinfo: pgx_pg_sys::FunctionCallInfo) -> Vec<u8>;
+    fn serial(current: Self::State, fcinfo: FunctionCallInfo) -> Vec<u8>;
 
     /// **Optional:** This function can be skipped, `#[pg_aggregate]` will create a stub.
-    fn deserial(current: Self::State, _buf: Vec<u8>, _internal: PgBox<Self::State>, fcinfo: pgx_pg_sys::FunctionCallInfo) -> PgBox<Self::State>;
+    fn deserial(current: Self::State, _buf: Vec<u8>, _internal: PgBox<Self::State>, fcinfo: FunctionCallInfo) -> PgBox<Self::State>;
 
     /// **Optional:** This function can be skipped, `#[pg_aggregate]` will create a stub.
-    fn moving_state(_mstate: Self::MovingState, _v: Self::Args, fcinfo: pgx_pg_sys::FunctionCallInfo) -> Self::MovingState;
+    fn moving_state(_mstate: Self::MovingState, _v: Self::Args, fcinfo: FunctionCallInfo) -> Self::MovingState;
 
     /// **Optional:** This function can be skipped, `#[pg_aggregate]` will create a stub.
-    fn moving_state_inverse(_mstate: Self::MovingState, _v: Self::Args, fcinfo: pgx_pg_sys::FunctionCallInfo) -> Self::MovingState;
+    fn moving_state_inverse(_mstate: Self::MovingState, _v: Self::Args, fcinfo: FunctionCallInfo) -> Self::MovingState;
 
     /// **Optional:** This function can be skipped, `#[pg_aggregate]` will create a stub.
-    fn moving_finalize(_mstate: Self::MovingState, fcinfo: pgx_pg_sys::FunctionCallInfo) -> Self::Finalize;
+    fn moving_finalize(_mstate: Self::MovingState, fcinfo: FunctionCallInfo) -> Self::Finalize;
+
+    unsafe fn memory_context(fcinfo: FunctionCallInfo) -> Option<MemoryContext> {
+        if fcinfo.is_null() {
+            return Some(CurrentMemoryContext)
+        }
+        let mut memory_context = std::ptr::null_mut();
+        let is_aggregate = AggCheckCallContext(fcinfo, &mut memory_context);
+        if is_aggregate == 0 {
+            None
+        } else {
+            debug_assert!(!memory_context.is_null());
+            Some(memory_context)
+        }
+    }
+
+    fn in_memory_context<
+        R,
+        F: FnOnce(&mut PgMemoryContexts) -> R + std::panic::UnwindSafe + std::panic::RefUnwindSafe
+    >(fcinfo: FunctionCallInfo, f: F) -> R {
+        let aggregate_memory_context = unsafe {
+            Self::memory_context(fcinfo)
+        }.unwrap_or_else(|| error!("Cannot access Aggregate memory contexts when not an aggregate."));
+        PgMemoryContexts::For(aggregate_memory_context).switch_to(f)
+    } 
 }
 
 /// Corresponds to the `PARALLEL` and `MFINALFUNC_MODIFY` in [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html).
