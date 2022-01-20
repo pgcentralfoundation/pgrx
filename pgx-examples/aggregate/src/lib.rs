@@ -107,17 +107,17 @@ impl Default for IntegerAvgState {
 #[pg_schema]
 mod tests {
     use crate::IntegerAvgState;
-    use pgx::*;
+    use pgx::{*, pg_sys::FunctionCallInfoBaseData};
 
     #[pg_test]
     fn test_integer_avg_state() {
         let avg_state = PgVarlena::<IntegerAvgState>::default();
-        let avg_state = IntegerAvgState::state(avg_state, 1);
-        let avg_state = IntegerAvgState::state(avg_state, 2);
-        let avg_state = IntegerAvgState::state(avg_state, 3);
+        let avg_state = IntegerAvgState::state(avg_state, 1, &mut FunctionCallInfoBaseData::default() as *mut _);
+        let avg_state = IntegerAvgState::state(avg_state, 2, &mut FunctionCallInfoBaseData::default() as *mut _);
+        let avg_state = IntegerAvgState::state(avg_state, 3, &mut FunctionCallInfoBaseData::default() as *mut _);
         assert_eq!(
             2,
-            IntegerAvgState::finalize(avg_state)
+            IntegerAvgState::finalize(avg_state, &mut FunctionCallInfoBaseData::default() as *mut _),
         );
     }
 
