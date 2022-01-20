@@ -45,4 +45,7 @@ fn hello_nostd() -> &'static str {
     "Hello, nostd"
 }
 
-
+#[pg_extern]
+fn echo(input: String) -> String {
+    input
+}
