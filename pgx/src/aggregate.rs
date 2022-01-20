@@ -145,28 +145,28 @@ where
     /// **Optional:** This function can be skipped, `#[pg_aggregate]` will create a stub.
     const HYPOTHETICAL: bool = false;
 
-    fn state(current: Self::State, v: Self::Args) -> Self::State;
+    fn state(current: Self::State, v: Self::Args, fcinfo: pgx_pg_sys::FunctionCallInfo) -> Self::State;
 
     /// **Optional:** This function can be skipped, `#[pg_aggregate]` will create a stub.
-    fn finalize(current: Self::State) -> Self::Finalize;
+    fn finalize(current: Self::State, fcinfo: pgx_pg_sys::FunctionCallInfo) -> Self::Finalize;
 
     /// **Optional:** This function can be skipped, `#[pg_aggregate]` will create a stub.
-    fn combine(current: Self::State, _other: Self::State) -> Self::State;
+    fn combine(current: Self::State, _other: Self::State, fcinfo: pgx_pg_sys::FunctionCallInfo) -> Self::State;
 
     /// **Optional:** This function can be skipped, `#[pg_aggregate]` will create a stub.
-    fn serial(current: Self::State) -> Vec<u8>;
+    fn serial(current: Self::State, fcinfo: pgx_pg_sys::FunctionCallInfo) -> Vec<u8>;
 
     /// **Optional:** This function can be skipped, `#[pg_aggregate]` will create a stub.
-    fn deserial(current: Self::State, _buf: Vec<u8>, _internal: PgBox<Self::State>) -> PgBox<Self::State>;
+    fn deserial(current: Self::State, _buf: Vec<u8>, _internal: PgBox<Self::State>, fcinfo: pgx_pg_sys::FunctionCallInfo) -> PgBox<Self::State>;
 
     /// **Optional:** This function can be skipped, `#[pg_aggregate]` will create a stub.
-    fn moving_state(_mstate: Self::MovingState, _v: Self::Args) -> Self::MovingState;
+    fn moving_state(_mstate: Self::MovingState, _v: Self::Args, fcinfo: pgx_pg_sys::FunctionCallInfo) -> Self::MovingState;
 
     /// **Optional:** This function can be skipped, `#[pg_aggregate]` will create a stub.
-    fn moving_state_inverse(_mstate: Self::MovingState, _v: Self::Args) -> Self::MovingState;
+    fn moving_state_inverse(_mstate: Self::MovingState, _v: Self::Args, fcinfo: pgx_pg_sys::FunctionCallInfo) -> Self::MovingState;
 
     /// **Optional:** This function can be skipped, `#[pg_aggregate]` will create a stub.
-    fn moving_finalize(_mstate: Self::MovingState) -> Self::Finalize;
+    fn moving_finalize(_mstate: Self::MovingState, fcinfo: pgx_pg_sys::FunctionCallInfo) -> Self::Finalize;
 }
 
 /// Corresponds to the `PARALLEL` and `MFINALFUNC_MODIFY` in [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html).

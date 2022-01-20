@@ -47,6 +47,8 @@ pub use time_with_timezone::*;
 pub use tuples::*;
 pub use varlena::*;
 
+use crate::PgBox;
+
 /// A tagging trait to indicate a user type is also meant to be used by Postgres
 /// Implemented automatically by `#[derive(PostgresType)]`
 pub trait PostgresType {}
@@ -203,9 +205,9 @@ impl<T: 'static + ?Sized> WithTypeIds for T {
 pub struct WithSizedTypeIds<T>(pub core::marker::PhantomData<T>);
 
 impl<T: 'static> WithSizedTypeIds<T> {
-    pub const PG_BOX_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(TypeId::of::<crate::PgBox<T>>()));
-    pub const PG_BOX_OPTION_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(TypeId::of::<crate::PgBox<Option<T>>>()));
-    pub const PG_BOX_VEC_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(TypeId::of::<crate::PgBox<Vec<T>>>()));
+    pub const PG_BOX_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(TypeId::of::<PgBox<T>>()));
+    pub const PG_BOX_OPTION_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(TypeId::of::<PgBox<Option<T>>>()));
+    pub const PG_BOX_VEC_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(TypeId::of::<PgBox<Vec<T>>>()));
     pub const OPTION_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(TypeId::of::<Option<T>>()));
     pub const VEC_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(TypeId::of::<Vec<T>>()));
     pub const VEC_OPTION_ID: Lazy<Option<TypeId>> =
@@ -448,6 +450,7 @@ pub struct WithVarlenaTypeIds<T>(pub core::marker::PhantomData<T>);
 
 impl<T: Copy + 'static> WithVarlenaTypeIds<T> {
     pub const VARLENA_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(TypeId::of::<PgVarlena<T>>()));
+    pub const PG_BOX_VARLENA_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(TypeId::of::<PgBox<PgVarlena<T>>>()));
 
     pub fn register_varlena_with_refs(
         map: &mut std::collections::HashSet<RustSqlMapping>,
@@ -466,6 +469,20 @@ impl<T: Copy + 'static> WithVarlenaTypeIds<T> {
     ) {
         if let Some(id) = *WithVarlenaTypeIds::<T>::VARLENA_ID {
             let rust = core::any::type_name::<PgVarlena<T>>();
+            assert_eq!(
+                map.insert(RustSqlMapping {
+                    sql: single_sql.clone(),
+                    rust: rust.to_string(),
+                    id: id,
+                }),
+                true,
+                "Cannot map `{}` twice.",
+                rust,
+            );
+        }
+
+        if let Some(id) = *WithVarlenaTypeIds::<T>::PG_BOX_VARLENA_ID {
+            let rust = core::any::type_name::<PgBox<PgVarlena<T>>>().to_string();
             assert_eq!(
                 map.insert(RustSqlMapping {
                     sql: single_sql.clone(),

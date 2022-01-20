@@ -48,7 +48,7 @@ impl Aggregate for IntegerAvgState {
 
     const INITIAL_CONDITION: Option<&'static str> = Some("0,0");
 
-    fn state(mut current: Self::State, arg: Self::Args) -> Self::State {
+    fn state(mut current: Self::State, arg: Self::Args, _fcinfo: pg_sys::FunctionCallInfo) -> Self::State {
         current.sum += arg;
         current.n += 1;
         current
@@ -68,24 +68,32 @@ impl Aggregate for IntegerAvgState {
     // const HYPOTHETICAL: bool = true;
 
     // You can skip all these:
-    fn finalize(current: Self::State) -> Self::Finalize {
+    fn finalize(current: Self::State, _fcinfo: pgx::pg_sys::FunctionCallInfo) -> Self::Finalize {
         current.sum / current.n
     }
 
-    // fn combine(current: Self::State, _other: Self::State) -> Self::State {
-    //     unimplemented!("pgx stub, define in impls")
+    // fn combine(current: Self::State, _other: Self::State, _fcinfo: pgx::pg_sys::FunctionCallInfo) -> Self::State {
+    //     unimplemented!()
     // }
 
-    // fn moving_state(_mstate: Self::MovingState, _v: Self::Args) -> Self::MovingState {
-    //     unimplemented!("pgx stub, define in impls")
+    // fn serial(current: Self::State, _fcinfo: pgx::pg_sys::FunctionCallInfo) -> Vec<u8> {
+    //     unimplemented!()
     // }
 
-    // fn moving_state_inverse(_mstate: Self::MovingState, _v: Self::Args) -> Self::MovingState {
-    //     unimplemented!("pgx stub, define in impls")
+    // fn deserial(current: Self::State, _buf: Vec<u8>, _internal: PgBox<Self::State>, _fcinfo: pgx::pg_sys::FunctionCallInfo) -> PgBox<Self::State> {
+    //     unimplemented!()
     // }
 
-    // fn moving_finalize(_mstate: Self::MovingState) -> Self::Finalize {
-    //     unimplemented!("pgx stub, define in impls")
+    // fn moving_state(_mstate: Self::MovingState, _v: Self::Args, _fcinfo: pgx::pg_sys::FunctionCallInfo) -> Self::MovingState {
+    //     unimplemented!()
+    // }
+
+    // fn moving_state_inverse(_mstate: Self::MovingState, _v: Self::Args, _fcinfo: pgx::pg_sys::FunctionCallInfo) -> Self::MovingState {
+    //     unimplemented!()
+    // }
+
+    // fn moving_finalize(_mstate: Self::MovingState, _fcinfo: pgx::pg_sys::FunctionCallInfo) -> Self::Finalize {
+    //     unimplemented!()
     // }
 }
 

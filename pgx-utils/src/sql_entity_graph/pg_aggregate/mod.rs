@@ -204,8 +204,8 @@ impl PgAggregate {
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case)]
                 #[pg_extern]
-                fn #fn_name(this: #type_state_without_self, #(#args_with_names),*) -> #type_state_without_self {
-                    <#target_path as pgx::Aggregate>::state(this, (#(#arg_names),*))
+                fn #fn_name(this: #type_state_without_self, #(#args_with_names),*, fcinfo: pgx::pg_sys::FunctionCallInfo) -> #type_state_without_self {
+                    <#target_path as pgx::Aggregate>::state(this, (#(#arg_names),*), fcinfo)
                 }
             });
             fn_name
@@ -225,14 +225,14 @@ impl PgAggregate {
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case)]
                 #[pg_extern]
-                fn #fn_name(this: #type_state_without_self, v: #type_state_without_self) -> #type_state_without_self {
-                    <#target_path as pgx::Aggregate>::combine(this, v)
+                fn #fn_name(this: #type_state_without_self, v: #type_state_without_self, fcinfo: pgx::pg_sys::FunctionCallInfo) -> #type_state_without_self {
+                    <#target_path as pgx::Aggregate>::combine(this, v, fcinfo)
                 }
             });
             Some(fn_name)
         } else {
             item_impl.items.push(parse_quote! {
-                fn combine(current: #type_state_without_self, _other: #type_state_without_self) -> #type_state_without_self {
+                fn combine(current: #type_state_without_self, _other: #type_state_without_self, _fcinfo: pgx::pg_sys::FunctionCallInfo) -> #type_state_without_self {
                     unimplemented!("Call to combine on an aggregate which does not support it.")
                 }
             });
@@ -248,14 +248,14 @@ impl PgAggregate {
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case)]
                 #[pg_extern]
-                fn #fn_name(this: #type_state_without_self) -> <#target_path as pgx::Aggregate>::Finalize {
-                    <#target_path as pgx::Aggregate>::finalize(this)
+                fn #fn_name(this: #type_state_without_self, fcinfo: pgx::pg_sys::FunctionCallInfo) -> <#target_path as pgx::Aggregate>::Finalize {
+                    <#target_path as pgx::Aggregate>::finalize(this, fcinfo)
                 }
             });
             Some(fn_name)
         } else {
             item_impl.items.push(parse_quote! {
-                fn finalize(current: #type_state_without_self) -> Self::Finalize {
+                fn finalize(current: #type_state_without_self, _fcinfo: pgx::pg_sys::FunctionCallInfo) -> Self::Finalize {
                     unimplemented!("Call to finalize on an aggregate which does not support it.")
                 }
             });
@@ -271,14 +271,14 @@ impl PgAggregate {
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case)]
                 #[pg_extern]
-                fn #fn_name(this: #type_state_without_self) -> Vec<u8> {
-                    <#target_path as pgx::Aggregate>::serial(this)
+                fn #fn_name(this: #type_state_without_self, fcinfo: pgx::pg_sys::FunctionCallInfo) -> Vec<u8> {
+                    <#target_path as pgx::Aggregate>::serial(this, fcinfo)
                 }
             });
             Some(fn_name)
         } else {
             item_impl.items.push(parse_quote! {
-                fn serial(current: #type_state_without_self) -> Vec<u8> {
+                fn serial(current: #type_state_without_self, _fcinfo: pgx::pg_sys::FunctionCallInfo) -> Vec<u8> {
                     unimplemented!("Call to serial on an aggregate which does not support it.")
                 }
             });
@@ -294,14 +294,14 @@ impl PgAggregate {
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case)]
                 #[pg_extern]
-                fn #fn_name(this: #type_state_without_self, buf: Vec<u8>, internal: pgx::PgBox<#type_state_without_self>) -> pgx::PgBox<#type_state_without_self> {
-                    <#target_path as pgx::Aggregate>::deserial(this, buf, internal)
+                fn #fn_name(this: #type_state_without_self, buf: Vec<u8>, internal: pgx::PgBox<#type_state_without_self>, fcinfo: pgx::pg_sys::FunctionCallInfo) -> pgx::PgBox<#type_state_without_self> {
+                    <#target_path as pgx::Aggregate>::deserial(this, buf, internal, fcinfo)
                 }
             });
             Some(fn_name)
         } else {
             item_impl.items.push(parse_quote! {
-                fn deserial(current: #type_state_without_self, _buf: Vec<u8>, _internal: pgx::PgBox<#type_state_without_self>) -> pgx::PgBox<#type_state_without_self> {
+                fn deserial(current: #type_state_without_self, _buf: Vec<u8>, _internal: pgx::PgBox<#type_state_without_self>, _fcinfo: pgx::pg_sys::FunctionCallInfo) -> pgx::PgBox<#type_state_without_self> {
                     unimplemented!("Call to deserial on an aggregate which does not support it.")
                 }
             });
@@ -333,9 +333,10 @@ impl PgAggregate {
                 #[pg_extern]
                 fn #fn_name(
                     mstate: <#target_path as pgx::Aggregate>::MovingState,
-                    #(#args_with_names),*
+                    #(#args_with_names),*,
+                    fcinfo: pgx::pg_sys::FunctionCallInfo,
                 ) -> <#target_path as pgx::Aggregate>::MovingState {
-                    <#target_path as pgx::Aggregate>::moving_state(mstate, (#(#arg_names),*))
+                    <#target_path as pgx::Aggregate>::moving_state(mstate, (#(#arg_names),*), fcinfo)
                 }
             });
             Some(fn_name)
@@ -343,7 +344,8 @@ impl PgAggregate {
             item_impl.items.push(parse_quote! {
                 fn moving_state(
                     _mstate: <#target_path as pgx::Aggregate>::MovingState,
-                    _v: Self::Args
+                    _v: Self::Args,
+                    _fcinfo: pgx::pg_sys::FunctionCallInfo,
                 ) -> <#target_path as pgx::Aggregate>::MovingState {
                     unimplemented!("Call to moving_state on an aggregate which does not support it.")
                 }
@@ -364,8 +366,9 @@ impl PgAggregate {
                 fn #fn_name(
                     mstate: <#target_path as pgx::Aggregate>::MovingState,
                     v: <#target_path as pgx::Aggregate>::Args,
+                    fcinfo: pgx::pg_sys::FunctionCallInfo,
                 ) -> <#target_path as pgx::Aggregate>::MovingState {
-                    <#target_path as pgx::Aggregate>::moving_state(mstate, v)
+                    <#target_path as pgx::Aggregate>::moving_state(mstate, v, fcinfo)
                 }
             });
             Some(fn_name)
@@ -374,6 +377,7 @@ impl PgAggregate {
                 fn moving_state_inverse(
                     _mstate: <#target_path as pgx::Aggregate>::MovingState,
                     _v: Self::Args,
+                    _fcinfo: pgx::pg_sys::FunctionCallInfo,
                 ) -> <#target_path as pgx::Aggregate>::MovingState {
                     unimplemented!("Call to moving_state on an aggregate which does not support it.")
                 }
@@ -390,14 +394,14 @@ impl PgAggregate {
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case)]
                 #[pg_extern]
-                fn #fn_name(mstate: <#target_path as pgx::Aggregate>::MovingState) -> <#target_path as pgx::Aggregate>::Finalize {
-                    <#target_path as pgx::Aggregate>::moving_finalize(mstate)
+                fn #fn_name(mstate: <#target_path as pgx::Aggregate>::MovingState, fcinfo: pgx::pg_sys::FunctionCallInfo) -> <#target_path as pgx::Aggregate>::Finalize {
+                    <#target_path as pgx::Aggregate>::moving_finalize(mstate, fcinfo)
                 }
             });
             Some(fn_name)
         } else {
             item_impl.items.push(parse_quote! {
-                fn moving_finalize(_mstate: Self::MovingState) -> Self::Finalize {
+                fn moving_finalize(_mstate: Self::MovingState, _fcinfo: pgx::pg_sys::FunctionCallInfo) -> Self::Finalize {
                     unimplemented!("Call to moving_finalize on an aggregate which does not support it.")
                 }
             });
