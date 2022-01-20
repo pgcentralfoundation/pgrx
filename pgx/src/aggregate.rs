@@ -25,7 +25,7 @@ pub struct DemoSum {
 impl Aggregate for DemoSum {
     const INITIAL_CONDITION: Option<&'static str> = Some(r#"{ "count": 0 }"#);
     type Args = i32;
-    fn state(mut current: Self::State, arg: Self::Args) -> Self::State {
+    fn state(mut current: Self::State, arg: Self::Args, _fcinfo: pg_sys::FunctionCallInfo) -> Self::State {
         current.count += arg;
         current
     }
