@@ -181,11 +181,13 @@ impl PgAggregate {
         }
 
         let fn_state = get_impl_func_by_name(&item_impl_snapshot, "state");
+        
         let fn_state_name = if let Some(found) = fn_state {
             let fn_name = Ident::new(
                 &format!("{}_state", snake_case_target_ident),
                 found.sig.ident.span(),
             );
+            let pg_extern_attr = pg_extern_attr(found);
             let args = type_args_value
                 .found
                 .iter()
@@ -203,7 +205,7 @@ impl PgAggregate {
 
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case, clippy::too_many_arguments)]
-                #[pg_extern]
+                #pg_extern_attr
                 fn #fn_name(this: #type_state_without_self, #(#args_with_names),*, fcinfo: pgx::pg_sys::FunctionCallInfo) -> #type_state_without_self {
                     <#target_path as pgx::Aggregate>::in_memory_context(
                         fcinfo,
@@ -225,9 +227,10 @@ impl PgAggregate {
                 &format!("{}_combine", snake_case_target_ident),
                 found.sig.ident.span(),
             );
+            let pg_extern_attr = pg_extern_attr(found);
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case, clippy::too_many_arguments)]
-                #[pg_extern]
+                #pg_extern_attr
                 fn #fn_name(this: #type_state_without_self, v: #type_state_without_self, fcinfo: pgx::pg_sys::FunctionCallInfo) -> #type_state_without_self {
                     <#target_path as pgx::Aggregate>::in_memory_context(
                         fcinfo,
@@ -251,9 +254,10 @@ impl PgAggregate {
                 &format!("{}_finalize", snake_case_target_ident),
                 found.sig.ident.span(),
             );
+            let pg_extern_attr = pg_extern_attr(found);
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case, clippy::too_many_arguments)]
-                #[pg_extern]
+                #pg_extern_attr
                 fn #fn_name(this: #type_state_without_self, fcinfo: pgx::pg_sys::FunctionCallInfo) -> <#target_path as pgx::Aggregate>::Finalize {
                     <#target_path as pgx::Aggregate>::in_memory_context(
                         fcinfo,
@@ -277,9 +281,10 @@ impl PgAggregate {
                 &format!("{}_serial", snake_case_target_ident),
                 found.sig.ident.span(),
             );
+            let pg_extern_attr = pg_extern_attr(found);
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case, clippy::too_many_arguments)]
-                #[pg_extern]
+                #pg_extern_attr
                 fn #fn_name(this: #type_state_without_self, fcinfo: pgx::pg_sys::FunctionCallInfo) -> Vec<u8> {
                     <#target_path as pgx::Aggregate>::in_memory_context(
                         fcinfo,
@@ -303,9 +308,10 @@ impl PgAggregate {
                 &format!("{}_deserial", snake_case_target_ident),
                 found.sig.ident.span(),
             );
+            let pg_extern_attr = pg_extern_attr(found);
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case, clippy::too_many_arguments)]
-                #[pg_extern]
+                #pg_extern_attr
                 fn #fn_name(this: #type_state_without_self, buf: Vec<u8>, internal: pgx::PgBox<#type_state_without_self>, fcinfo: pgx::pg_sys::FunctionCallInfo) -> pgx::PgBox<#type_state_without_self> {
                     <#target_path as pgx::Aggregate>::in_memory_context(
                         fcinfo,
@@ -329,6 +335,7 @@ impl PgAggregate {
                 &format!("{}_moving_state", snake_case_target_ident),
                 found.sig.ident.span(),
             );
+            let pg_extern_attr = pg_extern_attr(found);
             let args = type_args_value
                 .found
                 .iter()
@@ -345,7 +352,7 @@ impl PgAggregate {
                 .map(|name| Ident::new(name, fn_state.span()));
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case, clippy::too_many_arguments)]
-                #[pg_extern]
+                #pg_extern_attr
                 fn #fn_name(
                     mstate: <#target_path as pgx::Aggregate>::MovingState,
                     #(#args_with_names),*,
@@ -378,9 +385,10 @@ impl PgAggregate {
                 &format!("{}_moving_state_inverse", snake_case_target_ident),
                 found.sig.ident.span(),
             );
+            let pg_extern_attr = pg_extern_attr(found);
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case, clippy::too_many_arguments)]
-                #[pg_extern]
+                #pg_extern_attr
                 fn #fn_name(
                     mstate: <#target_path as pgx::Aggregate>::MovingState,
                     v: <#target_path as pgx::Aggregate>::Args,
@@ -412,9 +420,10 @@ impl PgAggregate {
                 &format!("{}_moving_finalize", snake_case_target_ident),
                 found.sig.ident.span(),
             );
+            let pg_extern_attr = pg_extern_attr(found);
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case, clippy::too_many_arguments)]
-                #[pg_extern]
+                #pg_extern_attr
                 fn #fn_name(mstate: <#target_path as pgx::Aggregate>::MovingState, fcinfo: pgx::pg_sys::FunctionCallInfo) -> <#target_path as pgx::Aggregate>::Finalize {
                     <#target_path as pgx::Aggregate>::in_memory_context(
                         fcinfo,
@@ -636,6 +645,27 @@ fn get_target_path(item_impl: &ItemImpl) -> Result<Path, syn::Error> {
         }
     };
     Ok(target_ident)
+}
+
+fn pg_extern_attr(item: &ImplItemMethod) -> syn::Attribute {
+    let mut found = None;
+    for attr in item.attrs.iter() {
+        match attr.path.segments.last() {
+            Some(segment) if segment.ident.to_string() == "pgx" => {
+                found = Some(attr.tokens.clone());
+                break;
+            },
+            _ => (),
+        };
+    };
+    match found {
+        Some(args) => parse_quote! {
+            #[pg_extern #args]
+        },
+        None => parse_quote! {
+            #[pg_extern]
+        },
+    }
 }
 
 fn get_impl_type_by_name<'a>(item_impl: &'a ItemImpl, name: &str) -> Option<&'a ImplItemType> {

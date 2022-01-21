@@ -967,6 +967,7 @@ pub fn postgres_hash(input: TokenStream) -> TokenStream {
 /**
 Declare a `pgx::Aggregate` implentation on a type as able to used by Postgres as an aggregate.
 
+Functions inside the `impl` may use the [`#[pgx]`](macro@pgx) attribute.
 */
 #[proc_macro_attribute]
 pub fn pg_aggregate(_attr: TokenStream, item: TokenStream) -> TokenStream {
@@ -988,3 +989,17 @@ pub fn pg_aggregate(_attr: TokenStream, item: TokenStream) -> TokenStream {
         }
     }
 }
+
+/**
+An inner attribute for [`#[pg_aggregate]`](pg_aggregate).
+
+It can be decorated on functions inside a [`#[pg_aggregate]`](pg_aggregate) implementation.
+In this position, it takes the same args as [`#[pg_extern]`](pg_extern), and those args have the same effect.
+
+Used outside of a [`#[pg_aggregate]`](pg_aggregate), this does nothing.
+*/
+#[proc_macro_attribute]
+pub fn pgx(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    item
+}
+
