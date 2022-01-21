@@ -257,7 +257,7 @@ impl PgMemoryContexts {
     /// ```
     pub fn switch_to<
         R,
-        F: Fn(&mut PgMemoryContexts) -> R + std::panic::UnwindSafe + std::panic::RefUnwindSafe,
+        F: FnOnce(&mut PgMemoryContexts) -> R + std::panic::UnwindSafe + std::panic::RefUnwindSafe,
     >(
         &mut self,
         f: F,
@@ -371,7 +371,7 @@ impl PgMemoryContexts {
     /// helper function
     fn exec_in_context<
         R,
-        F: Fn(&mut PgMemoryContexts) -> R + std::panic::UnwindSafe + std::panic::RefUnwindSafe,
+        F: FnOnce(&mut PgMemoryContexts) -> R + std::panic::UnwindSafe + std::panic::RefUnwindSafe,
     >(
         context: pg_sys::MemoryContext,
         f: F,
