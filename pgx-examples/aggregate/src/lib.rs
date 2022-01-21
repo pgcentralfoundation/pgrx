@@ -59,11 +59,12 @@ impl PgVarlenaInOutFuncs for IntegerAvgState {
 #[pg_aggregate]
 impl Aggregate for IntegerAvgState {
     type State = PgVarlena<Self>;
-    type Args = i32;
+    type Args = pgx::name!(value, i32);
     const NAME: &'static str = "DEMOAVG";
 
     const INITIAL_CONDITION: Option<&'static str> = Some("0,0");
 
+    #[pgx(parallel_safe, immutable)]
     fn state(current: Self::State, arg: Self::Args, _fcinfo: pg_sys::FunctionCallInfo) -> Self::State {
         Self::state(current, arg)
     }

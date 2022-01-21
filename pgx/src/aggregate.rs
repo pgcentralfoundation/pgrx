@@ -8,6 +8,8 @@ Aggregates are created by implementing [`Aggregate`] for a type and decorating t
 Definition of the aggregate is done via settings in the type's [`Aggregate`] implementation. While
 the trait itself several items, only a few are required, the macro will fill in the others with unused stubs.
 
+Functions inside the `impl` may use the [`#[pgx]`](macro@pgx) attribute.
+
 Here's a fairly minimal aggregate:
 
 ```rust
@@ -100,9 +102,10 @@ where
     ///
     /// For multiple arguments, provide a tuple.
     ///
-    /// `pgx` does not support `argname` as it is only used for documentation purposes.
+    /// Use [`pgx::name!()`](pgx::name) to set the SQL name of the argument.
     ///
-    /// If the final argument is to be variadic, use `pgx::Variadic`.
+    /// If the final argument is to be variadic, use [`pgx::variadic`](pgx::variadic). When used
+    /// with [`pgx::name!()`](pgx::name), it must be used **inside** the [`pgx::name!()`](pgx::name) macro.
     type Args;
 
     /// The types of the order argument(s).

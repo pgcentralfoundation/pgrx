@@ -3,7 +3,7 @@ mod maybe_variadic_type;
 
 use aggregate_type::{AggregateTypeList, AggregateType};
 use convert_case::{Case, Casing};
-use maybe_variadic_type::MaybeVariadicTypeList;
+use maybe_variadic_type::MaybeNamedVariadicTypeList;
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
 use syn::{
@@ -58,7 +58,7 @@ pub struct PgAggregate {
     name: Expr,
     pg_externs: Vec<ItemFn>,
     // Note these should not be considered *writable*, they're snapshots from construction.
-    type_args: MaybeVariadicTypeList,
+    type_args: MaybeNamedVariadicTypeList,
     type_order_by: Option<AggregateTypeList>,
     type_moving_state: Option<syn::Type>,
     type_stype: AggregateType,
@@ -170,7 +170,7 @@ impl PgAggregate {
                 "`#[pg_aggregate]` requires the `Args` type defined.",
             )
         })?;
-        let type_args_value = MaybeVariadicTypeList::new(type_args.ty.clone())?;
+        let type_args_value = MaybeNamedVariadicTypeList::new(type_args.ty.clone())?;
 
         // `Finalize` is an optional value, we default to nothing.
         let type_finalize = get_impl_type_by_name(&item_impl_snapshot, "Finalize");
@@ -191,17 +191,20 @@ impl PgAggregate {
             let args = type_args_value
                 .found
                 .iter()
-                .map(|x| x.variadic_ty.clone().unwrap_or(x.ty.clone()))
+                .map(|x| (x.name.clone(), x.ty.clone()))
                 .collect::<Vec<_>>();
-            let args_with_names = args.iter().zip(ARG_NAMES.iter()).map(|(arg, name)| {
-                let name_ident = Ident::new(name, Span::call_site());
-                quote! {
-                    #name_ident: #arg
-                }
-            });
             let arg_names = ARG_NAMES[0..args.len()]
                 .iter()
-                .map(|name| Ident::new(name, fn_state.span()));
+                .zip(args.iter())
+                .map(|(default_name, (custom_name, _ty))| 
+                    Ident::new(&custom_name.clone().unwrap_or_else(|| default_name.to_string()), fn_state.span())
+                ).collect::<Vec<_>>();
+            let args_with_names = args.iter().zip(arg_names.iter()).map(|(arg, name)| {
+                let arg_ty = &arg.1;
+                quote! {
+                    #name: #arg_ty
+                }
+            });
 
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case, clippy::too_many_arguments)]

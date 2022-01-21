@@ -6,18 +6,18 @@ use syn::{
 };
 
 #[derive(Debug, Clone)]
-pub(crate) struct MaybeVariadicTypeList {
-    pub(crate) found: Vec<MaybeVariadicType>,
+pub(crate) struct MaybeNamedVariadicTypeList {
+    pub(crate) found: Vec<MaybeNamedVariadicType>,
     pub(crate) original: syn::Type,
 }
 
-impl MaybeVariadicTypeList {
+impl MaybeNamedVariadicTypeList {
     pub(crate) fn new(maybe_type_list: syn::Type) -> Result<Self, syn::Error> {
         match &maybe_type_list {
             Type::Tuple(tuple) => {
                 let mut coll = Vec::new();
                 for elem in &tuple.elems {
-                    let parsed_elem = MaybeVariadicType::new(elem.clone())?;
+                    let parsed_elem = MaybeNamedVariadicType::new(elem.clone())?;
                     coll.push(parsed_elem);
                 }
                 Ok(Self {
@@ -26,7 +26,7 @@ impl MaybeVariadicTypeList {
                 })
             }
             ty => Ok(Self {
-                found: vec![MaybeVariadicType::new(ty.clone())?],
+                found: vec![MaybeNamedVariadicType::new(ty.clone())?],
                 original: maybe_type_list,
             }),
         }
@@ -40,51 +40,51 @@ impl MaybeVariadicTypeList {
     }
 }
 
-impl Parse for MaybeVariadicTypeList {
+impl Parse for MaybeNamedVariadicTypeList {
     fn parse(input: ParseStream) -> Result<Self, syn::Error> {
         Self::new(input.parse()?)
     }
 }
 
-impl ToTokens for MaybeVariadicTypeList {
+impl ToTokens for MaybeNamedVariadicTypeList {
     fn to_tokens(&self, tokens: &mut TokenStream2) {
         self.original.to_tokens(tokens)
     }
 }
 
 #[derive(Debug, Clone)]
-pub(crate) struct MaybeVariadicType {
+pub(crate) struct MaybeNamedVariadicType {
     pub(crate) ty: Type,
+    /// The name, if it exists.
+    pub(crate) name: Option<String>,
     /// The inner of a variadic, if it exists.
     pub(crate) variadic_ty: Option<Type>,
 }
 
-impl MaybeVariadicType {
+impl MaybeNamedVariadicType {
     pub(crate) fn new(ty: syn::Type) -> Result<Self, syn::Error> {
-        let variadic_ty = match &ty {
-            syn::Type::Macro(ty_macro) => {
-                let mut found_pgx = false;
-                let mut found_variadic = false;
-                // We don't actually have type resolution here, this is a "Best guess".
-                for (idx, segment) in ty_macro.mac.path.segments.iter().enumerate() {
-                    match segment.ident.to_string().as_str() {
-                        "pgx" if idx == 0 => found_pgx = true,
-                        "variadic" => found_variadic = true,
-                        _ => (),
-                    }
-                }
-                if (ty_macro.mac.path.segments.len() == 1 && found_variadic)
-                    || (found_pgx && found_variadic)
-                {
-                    let ty: syn::Type = syn::parse2(ty_macro.mac.tokens.clone())?;
-                    Some(ty)
-                } else {
-                    None
-                }
+        let name_inner =  get_pgx_attr_macro("name", &ty);
+        
+        let (name, variadic_ty, ty) = match name_inner {
+            Some(name_inner) => {
+                let name_macro: crate::sql_entity_graph::pg_extern::NameMacro = syn::parse2(name_inner)
+                    .expect("Could not parse `name!()` macro");
+                let variadic = get_pgx_attr_macro("variadic", &name_macro.ty);
+                // Since `pg_extern` doesn't take `name!()` we unwrap it.
+                (Some(name_macro.ident), variadic, name_macro.ty)
+            },
+            None => {
+                (None, get_pgx_attr_macro("variadic", &ty), ty)
             }
-            _ => None,
         };
-        let retval = Self { ty, variadic_ty };
+
+        let variadic_ty = if let Some(variadic_ty) = variadic_ty {
+            Some(syn::parse2(variadic_ty).expect("Could not parse `variadic!()` macro"))
+        } else {
+            None
+        };
+
+        let retval = Self { ty, variadic_ty, name };
         Ok(retval)
     }
 
@@ -104,21 +104,47 @@ impl MaybeVariadicType {
     }
 }
 
-impl ToTokens for MaybeVariadicType {
+impl ToTokens for MaybeNamedVariadicType {
     fn to_tokens(&self, tokens: &mut TokenStream2) {
         self.ty.to_tokens(tokens)
     }
 }
 
-impl Parse for MaybeVariadicType {
+impl Parse for MaybeNamedVariadicType {
     fn parse(input: ParseStream) -> Result<Self, syn::Error> {
         Self::new(input.parse()?)
     }
 }
 
+
+fn get_pgx_attr_macro(attr_name: impl AsRef<str>, ty: &syn::Type) -> Option<TokenStream2> {
+    match &ty {
+        syn::Type::Macro(ty_macro) => {
+            let mut found_pgx = false;
+            let mut found_attr = false;
+            // We don't actually have type resolution here, this is a "Best guess".
+            for (idx, segment) in ty_macro.mac.path.segments.iter().enumerate() {
+                match segment.ident.to_string().as_str() {
+                    "pgx" if idx == 0 => found_pgx = true,
+                    attr if attr == attr_name.as_ref() => found_attr = true,
+                    _ => (),
+                }
+            }
+            if (ty_macro.mac.path.segments.len() == 1 && found_attr)
+                || (found_pgx && found_attr)
+            {
+                Some(ty_macro.mac.tokens.clone())
+            } else {
+                None
+            }
+        }
+        _ => None,
+    }
+}
+
 #[cfg(test)]
 mod tests {
-    use super::MaybeVariadicTypeList;
+    use super::MaybeNamedVariadicTypeList;
     use eyre::{eyre as eyre_err, Result};
     use syn::parse_quote;
 
@@ -128,7 +154,7 @@ mod tests {
             i32
         };
         // It should not error, as it's valid.
-        let list = MaybeVariadicTypeList::new(tokens);
+        let list = MaybeNamedVariadicTypeList::new(tokens);
         assert!(list.is_ok());
         let list = list.unwrap();
         let found = &list.found[0];
@@ -146,7 +172,7 @@ mod tests {
             (i32, i8)
         };
         // It should not error, as it's valid.
-        let list = MaybeVariadicTypeList::new(tokens);
+        let list = MaybeNamedVariadicTypeList::new(tokens);
         assert!(list.is_ok());
         let list = list.unwrap();
         let first = &list.found[0];
@@ -171,7 +197,7 @@ mod tests {
             (i32, pgx::variadic!(i8))
         };
         // It should not error, as it's valid.
-        let list = MaybeVariadicTypeList::new(tokens);
+        let list = MaybeNamedVariadicTypeList::new(tokens);
         assert!(list.is_ok());
         let list = list.unwrap();
         let first = &list.found[0];
@@ -198,7 +224,7 @@ mod tests {
             (i32, variadic!(i8))
         };
         // It should not error, as it's valid.
-        let list = MaybeVariadicTypeList::new(tokens);
+        let list = MaybeNamedVariadicTypeList::new(tokens);
         assert!(list.is_ok());
         let list = list.unwrap();
         let first = &list.found[0];
