@@ -12,6 +12,20 @@ pub struct IntegerAvgState {
     n: i32,
 }
 
+impl IntegerAvgState {
+    #[inline(always)]
+    fn state(mut current: <Self as Aggregate>::State, arg: <Self as Aggregate>::Args) -> <Self as Aggregate>::State {
+        current.sum += arg;
+        current.n += 1;
+        current
+    }
+
+    #[inline(always)]
+    fn finalize(current: <Self as Aggregate>::State) -> <Self as Aggregate>::Finalize {
+        current.sum / current.n
+    }
+}
+
 impl PgVarlenaInOutFuncs for IntegerAvgState {
     fn input(input: &CStr) -> PgVarlena<Self> {
         let mut result = PgVarlena::<Self>::new();
@@ -40,6 +54,8 @@ impl PgVarlenaInOutFuncs for IntegerAvgState {
     }
 }
 
+// In order to improve the testability of your code, it's encouraged to make this implementation
+// call to your own functions which don't require a PostgreSQL made [`pgx::pg_sys::FunctionCallInfo`].
 #[pg_aggregate]
 impl Aggregate for IntegerAvgState {
     type State = PgVarlena<Self>;
@@ -48,10 +64,8 @@ impl Aggregate for IntegerAvgState {
 
     const INITIAL_CONDITION: Option<&'static str> = Some("0,0");
 
-    fn state(mut current: Self::State, arg: Self::Args, _fcinfo: pg_sys::FunctionCallInfo) -> Self::State {
-        current.sum += arg;
-        current.n += 1;
-        current
+    fn state(current: Self::State, arg: Self::Args, _fcinfo: pg_sys::FunctionCallInfo) -> Self::State {
+        Self::state(current, arg)
     }
 
     // You can skip all these:
@@ -69,7 +83,7 @@ impl Aggregate for IntegerAvgState {
 
     // You can skip all these:
     fn finalize(current: Self::State, _fcinfo: pgx::pg_sys::FunctionCallInfo) -> Self::Finalize {
-        current.sum / current.n
+        Self::finalize(current)
     }
 
     // fn combine(current: Self::State, _other: Self::State, _fcinfo: pgx::pg_sys::FunctionCallInfo) -> Self::State {
@@ -107,17 +121,17 @@ impl Default for IntegerAvgState {
 #[pg_schema]
 mod tests {
     use crate::IntegerAvgState;
-    use pgx::{*, pg_sys::FunctionCallInfoBaseData};
+    use pgx::*;
 
     #[pg_test]
     fn test_integer_avg_state() {
         let avg_state = PgVarlena::<IntegerAvgState>::default();
-        let avg_state = IntegerAvgState::state(avg_state, 1, &mut FunctionCallInfoBaseData::default() as *mut _);
-        let avg_state = IntegerAvgState::state(avg_state, 2, &mut FunctionCallInfoBaseData::default() as *mut _);
-        let avg_state = IntegerAvgState::state(avg_state, 3, &mut FunctionCallInfoBaseData::default() as *mut _);
+        let avg_state = IntegerAvgState::state(avg_state, 1);
+        let avg_state = IntegerAvgState::state(avg_state, 2);
+        let avg_state = IntegerAvgState::state(avg_state, 3);
         assert_eq!(
             2,
-            IntegerAvgState::finalize(avg_state, &mut FunctionCallInfoBaseData::default() as *mut _),
+            IntegerAvgState::finalize(avg_state),
         );
     }
 

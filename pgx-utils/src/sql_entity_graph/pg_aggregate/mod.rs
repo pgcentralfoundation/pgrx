@@ -202,7 +202,7 @@ impl PgAggregate {
                 .map(|name| Ident::new(name, fn_state.span()));
 
             pg_externs.push(parse_quote! {
-                #[allow(non_snake_case)]
+                #[allow(non_snake_case, clippy::too_many_arguments)]
                 #[pg_extern]
                 fn #fn_name(this: #type_state_without_self, #(#args_with_names),*, fcinfo: pgx::pg_sys::FunctionCallInfo) -> #type_state_without_self {
                     <#target_path as pgx::Aggregate>::in_memory_context(
@@ -226,7 +226,7 @@ impl PgAggregate {
                 found.sig.ident.span(),
             );
             pg_externs.push(parse_quote! {
-                #[allow(non_snake_case)]
+                #[allow(non_snake_case, clippy::too_many_arguments)]
                 #[pg_extern]
                 fn #fn_name(this: #type_state_without_self, v: #type_state_without_self, fcinfo: pgx::pg_sys::FunctionCallInfo) -> #type_state_without_self {
                     <#target_path as pgx::Aggregate>::in_memory_context(
@@ -252,7 +252,7 @@ impl PgAggregate {
                 found.sig.ident.span(),
             );
             pg_externs.push(parse_quote! {
-                #[allow(non_snake_case)]
+                #[allow(non_snake_case, clippy::too_many_arguments)]
                 #[pg_extern]
                 fn #fn_name(this: #type_state_without_self, fcinfo: pgx::pg_sys::FunctionCallInfo) -> <#target_path as pgx::Aggregate>::Finalize {
                     <#target_path as pgx::Aggregate>::in_memory_context(
@@ -278,7 +278,7 @@ impl PgAggregate {
                 found.sig.ident.span(),
             );
             pg_externs.push(parse_quote! {
-                #[allow(non_snake_case)]
+                #[allow(non_snake_case, clippy::too_many_arguments)]
                 #[pg_extern]
                 fn #fn_name(this: #type_state_without_self, fcinfo: pgx::pg_sys::FunctionCallInfo) -> Vec<u8> {
                     <#target_path as pgx::Aggregate>::in_memory_context(
@@ -304,7 +304,7 @@ impl PgAggregate {
                 found.sig.ident.span(),
             );
             pg_externs.push(parse_quote! {
-                #[allow(non_snake_case)]
+                #[allow(non_snake_case, clippy::too_many_arguments)]
                 #[pg_extern]
                 fn #fn_name(this: #type_state_without_self, buf: Vec<u8>, internal: pgx::PgBox<#type_state_without_self>, fcinfo: pgx::pg_sys::FunctionCallInfo) -> pgx::PgBox<#type_state_without_self> {
                     <#target_path as pgx::Aggregate>::in_memory_context(
@@ -344,7 +344,7 @@ impl PgAggregate {
                 .iter()
                 .map(|name| Ident::new(name, fn_state.span()));
             pg_externs.push(parse_quote! {
-                #[allow(non_snake_case)]
+                #[allow(non_snake_case, clippy::too_many_arguments)]
                 #[pg_extern]
                 fn #fn_name(
                     mstate: <#target_path as pgx::Aggregate>::MovingState,
@@ -379,7 +379,7 @@ impl PgAggregate {
                 found.sig.ident.span(),
             );
             pg_externs.push(parse_quote! {
-                #[allow(non_snake_case)]
+                #[allow(non_snake_case, clippy::too_many_arguments)]
                 #[pg_extern]
                 fn #fn_name(
                     mstate: <#target_path as pgx::Aggregate>::MovingState,
@@ -413,7 +413,7 @@ impl PgAggregate {
                 found.sig.ident.span(),
             );
             pg_externs.push(parse_quote! {
-                #[allow(non_snake_case)]
+                #[allow(non_snake_case, clippy::too_many_arguments)]
                 #[pg_extern]
                 fn #fn_name(mstate: <#target_path as pgx::Aggregate>::MovingState, fcinfo: pgx::pg_sys::FunctionCallInfo) -> <#target_path as pgx::Aggregate>::Finalize {
                     <#target_path as pgx::Aggregate>::in_memory_context(
