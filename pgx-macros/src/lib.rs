@@ -338,7 +338,7 @@ pub fn extension_sql(input: TokenStream) -> TokenStream {
 /**
 Declare SQL (from a file) to be included in generated extension script.
 
-Accepts the same options as [`macro@extension_sql`]. `name` is automatically set to the file name (not the full path).
+Accepts the same options as [`macro@extension_sql`].
 
 You can declare some SQL without any positioning information, meaning it can end up anywhere in the generated SQL:
 
@@ -346,17 +346,7 @@ You can declare some SQL without any positioning information, meaning it can end
 use pgx_macros::extension_sql_file;
 extension_sql_file!(
     "../static/demo.sql",
-);
-```
-
-To override the default name:
-
-```rust,ignore
-use pgx_macros::extension_sql_file;
-
-extension_sql_file!(
-    "../static/demo.sql",
-    name = "singlular",
+    name = "demo"
 );
 ```
 

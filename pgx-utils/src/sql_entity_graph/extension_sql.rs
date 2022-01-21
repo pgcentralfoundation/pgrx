@@ -33,7 +33,8 @@ use crate::sql_entity_graph::PositioningRef;
 /// ```
 #[derive(Debug, Clone)]
 pub struct ExtensionSqlFile {
-    pub path: LitStr,
+    pub path: Expr,
+    pub name: LitStr,
     pub attrs: Punctuated<ExtensionSqlAttribute, Token![,]>,
 }
 
@@ -42,14 +43,28 @@ impl Parse for ExtensionSqlFile {
         let path = input.parse()?;
         let _after_sql_comma: Option<Token![,]> = input.parse()?;
         let attrs = input.parse_terminated(ExtensionSqlAttribute::parse)?;
-        Ok(Self { path, attrs })
+        let name =
+            extract_name(&attrs).ok_or_else(|| syn::Error::new(input.span(), "expected `name` to be set"))?;
+        Ok(Self { path, name, attrs })
     }
+}
+
+fn extract_name(attrs: &Punctuated<ExtensionSqlAttribute, Token![,]>) -> Option<LitStr> {
+    let mut name = None;
+    for attr in attrs {
+        match attr {
+            ExtensionSqlAttribute::Name(found_name) => {
+                name = Some(found_name.clone());
+            }
+            _ => (),
+        }
+    }
+    name
 }
 
 impl ToTokens for ExtensionSqlFile {
     fn to_tokens(&self, tokens: &mut TokenStream2) {
         let path = &self.path;
-        let mut name = None;
         let mut bootstrap = false;
         let mut finalize = false;
         let mut requires = vec![];
@@ -68,30 +83,21 @@ impl ToTokens for ExtensionSqlFile {
                 ExtensionSqlAttribute::Finalize => {
                     finalize = true;
                 }
-                ExtensionSqlAttribute::Name(found_name) => {
-                    name = Some(found_name.value());
-                }
+                ExtensionSqlAttribute::Name(_found_name) => () // Already done
             }
         }
-        let name = name.unwrap_or(
-            std::path::PathBuf::from(path.value())
-                .file_stem()
-                .expect("No file name for extension_sql_file!()")
-                .to_str()
-                .expect("No UTF-8 file name for extension_sql_file!()")
-                .to_string(),
-        );
+        let name = &self.name;
         let requires_iter = requires.iter();
         let creates_iter = creates.iter();
         let sql_graph_entity_fn_name = syn::Ident::new(
-            &format!("__pgx_internals_sql_{}", name.clone()),
+            &format!("__pgx_internals_sql_{}", name.value()),
             Span::call_site(),
         );
         let inv = quote! {
             #[no_mangle]
             pub extern "C" fn  #sql_graph_entity_fn_name() -> pgx::datum::sql_entity_graph::SqlGraphEntity {
                 let submission = pgx::datum::sql_entity_graph::ExtensionSqlEntity {
-                    sql: include_str!(#path),
+                    sql: String::from(include_str!(#path)),
                     module_path: module_path!(),
                     full_path: concat!(file!(), ':', line!()),
                     file: file!(),
@@ -144,17 +150,8 @@ impl Parse for ExtensionSql {
         let sql = input.parse()?;
         let _after_sql_comma: Option<Token![,]> = input.parse()?;
         let attrs = input.parse_terminated(ExtensionSqlAttribute::parse)?;
-        let mut name = None;
-        for attr in &attrs {
-            match attr {
-                ExtensionSqlAttribute::Name(found_name) => {
-                    name = Some(found_name.clone());
-                }
-                _ => (),
-            }
-        }
         let name =
-            name.ok_or_else(|| syn::Error::new(input.span(), "expected `name` to be set"))?;
+            extract_name(&attrs).ok_or_else(|| syn::Error::new(input.span(), "expected `name` to be set"))?;
         Ok(Self { sql, attrs, name })
     }
 }
