@@ -16,7 +16,7 @@ exclude = [ "*.png" ]
 
 [dependencies]
 cargo_metadata = "0.14.1"
-clap = { version = "3.0.10", features = [ "env", "suggestions", "cargo", "derive" ] }
+clap = { version = "3.0.12", features = [ "env", "suggestions", "cargo", "derive" ] }
 clap-cargo = { version = "0.8", features = [ "cargo_metadata" ] }
 semver = "1"
 colored = "2.0.0"
