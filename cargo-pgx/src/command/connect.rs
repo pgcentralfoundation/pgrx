@@ -31,7 +31,7 @@ impl CommandExecute for Connect {
             Some(s) => s,
             None => {
                 let metadata = crate::metadata::metadata(&Default::default())?;
-                crate::metadata::validate(&metadata)?; 
+                crate::metadata::validate(&metadata)?;
                 let manifest = crate::manifest::manifest(&metadata)?;
                 crate::manifest::default_pg_version(&manifest)
                     .ok_or(eyre!("No provided `pg$VERSION` flag."))?

@@ -39,15 +39,13 @@ impl CommandExecute for Run {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
         let metadata = crate::metadata::metadata(&self.features)?;
-        crate::metadata::validate(&metadata)?; 
+        crate::metadata::validate(&metadata)?;
         let manifest = crate::manifest::manifest(&metadata)?;
 
         let pg_version = match self.pg_version {
             Some(s) => s,
-            None => {
-                crate::manifest::default_pg_version(&manifest)
-                    .ok_or(eyre!("No provided `pg$VERSION` flag."))?
-            }
+            None => crate::manifest::default_pg_version(&manifest)
+                .ok_or(eyre!("No provided `pg$VERSION` flag."))?,
         };
         let features = crate::manifest::features_for_version(self.features, &manifest, &pg_version);
 

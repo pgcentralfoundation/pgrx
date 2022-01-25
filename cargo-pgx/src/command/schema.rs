@@ -60,7 +60,7 @@ impl CommandExecute for Schema {
     fn execute(self) -> eyre::Result<()> {
         let (_, extname) = crate::command::get::find_control_file()?;
         let metadata = crate::metadata::metadata(&Default::default())?;
-        crate::metadata::validate(&metadata)?; 
+        crate::metadata::validate(&metadata)?;
         let manifest = crate::manifest::manifest(&metadata)?;
 
         let out = match self.out {
@@ -89,20 +89,18 @@ impl CommandExecute for Schema {
                 None => {
                     let pg_version = match self.pg_version {
                         Some(s) => s,
-                        None => {
-                            crate::manifest::default_pg_version(&manifest)
-                                .ok_or(eyre!("No provided `pg$VERSION` flag."))?
-                        }
+                        None => crate::manifest::default_pg_version(&manifest)
+                            .ok_or(eyre!("No provided `pg$VERSION` flag."))?,
                     };
                     (Pgx::from_config()?.get(&pg_version)?.clone(), pg_version)
-                },
+                }
                 Some(pgver) => (Pgx::from_config()?.get(&pgver)?.clone(), pgver),
             },
             Some(config) => {
                 let pg_config = PgConfig::new(PathBuf::from(config));
                 let pg_version = format!("pg{}", pg_config.major_version()?);
                 (pg_config, pg_version)
-            },
+            }
         };
 
         let features = crate::manifest::features_for_version(self.features, &manifest, &pg_version);

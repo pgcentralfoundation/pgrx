@@ -247,7 +247,10 @@ fn install_extension() -> eyre::Result<()> {
         .arg("--pg-config")
         .arg(pg_config.path().ok_or(eyre!("No pg_config found"))?)
         .arg("--features")
-        .arg(format!("pg{} pg_test", pg_sys::get_pg_major_version_string()))
+        .arg(format!(
+            "pg{} pg_test",
+            pg_sys::get_pg_major_version_string()
+        ))
         .stdout(Stdio::inherit())
         .stderr(Stdio::inherit())
         .env("CARGO_TARGET_DIR", get_target_dir()?);

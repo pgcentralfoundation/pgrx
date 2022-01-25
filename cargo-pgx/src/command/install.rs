@@ -9,7 +9,7 @@ use cargo_metadata::MetadataCommand;
 use colored::Colorize;
 use eyre::{eyre, WrapErr};
 use pgx_utils::get_target_dir;
-use pgx_utils::pg_config::{PgConfig};
+use pgx_utils::pg_config::PgConfig;
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
 
@@ -36,7 +36,7 @@ impl CommandExecute for Install {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
         let metadata = crate::metadata::metadata(&self.features)?;
-        crate::metadata::validate(&metadata)?; 
+        crate::metadata::validate(&metadata)?;
         let manifest = crate::manifest::manifest(&metadata)?;
 
         let pg_config = match self.pg_config {
@@ -46,13 +46,7 @@ impl CommandExecute for Install {
         let pg_version = format!("pg{}", pg_config.major_version()?);
         let features = crate::manifest::features_for_version(self.features, &manifest, &pg_version);
 
-        install_extension(
-            &pg_config,
-            self.release,
-            self.no_schema,
-            None,
-            &features,
-        )
+        install_extension(&pg_config, self.release, self.no_schema, None, &features)
     }
 }
 

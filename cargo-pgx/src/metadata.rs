@@ -1,7 +1,6 @@
-use cargo_metadata::{MetadataCommand, Metadata};
-use semver::{Version, VersionReq};
+use cargo_metadata::{Metadata, MetadataCommand};
 use eyre::eyre;
-
+use semver::{Version, VersionReq};
 
 pub fn metadata(features: &clap_cargo::Features) -> eyre::Result<Metadata> {
     let mut metadata_command = MetadataCommand::new();
