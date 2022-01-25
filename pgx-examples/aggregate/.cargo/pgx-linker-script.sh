@@ -4,7 +4,7 @@
 if [[ $CARGO_BIN_NAME == "sql-generator" ]]; then
     UNAME=$(uname)
     if [[ $UNAME == "Darwin" ]]; then
-	TEMP=$(mktemp pgx-XXX)
+        TEMP=$(mktemp pgx-XXX)
         echo "*_pgx_internals_*" > ${TEMP}
         gcc -exported_symbols_list ${TEMP} $@
         rm -rf ${TEMP}

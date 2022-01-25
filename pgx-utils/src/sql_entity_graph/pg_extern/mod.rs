@@ -9,6 +9,7 @@ use attribute::{Attribute, PgxAttributes};
 pub use operator::PgOperator;
 use operator::{PgxOperatorAttributeWithIdent, PgxOperatorOpName};
 use returning::Returning;
+pub(crate) use returning::NameMacro;
 use search_path::SearchPathList;
 
 use eyre::WrapErr;

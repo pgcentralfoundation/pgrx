@@ -298,6 +298,7 @@ pub(crate) fn generate_schema(
     let mut num_sqls = 0;
     let mut num_ords = 0;
     let mut num_hashes = 0;
+    let mut num_aggregates = 0;
     for func in &fns_to_call {
         if func.starts_with("__pgx_internals_schema_") {
             let schema = func
@@ -318,11 +319,13 @@ pub(crate) fn generate_schema(
             num_ords += 1;
         } else if func.starts_with("__pgx_internals_hash_") {
             num_hashes += 1;
+        } else if func.starts_with("__pgx_internals_aggregate_") {
+            num_aggregates += 1;
         }
     }
 
     println!(
-        "{} {} SQL entities: {} schemas ({} unique), {} functions, {} types, {} enums, {} sqls, {} ords, {} hashes",
+        "{} {} SQL entities: {} schemas ({} unique), {} functions, {} types, {} enums, {} sqls, {} ords, {} hashes, {} aggregates",
         "  Discovered".bold().green(),
         fns_to_call.len().to_string().bold().cyan(),
         seen_schemas.iter().count().to_string().bold().cyan(),
@@ -333,6 +336,7 @@ pub(crate) fn generate_schema(
         num_sqls.to_string().bold().cyan(),
         num_ords.to_string().bold().cyan(),
         num_hashes.to_string().bold().cyan(),
+        num_aggregates.to_string().bold().cyan(),
     );
 
     // Now run the generator with the correct symbol table

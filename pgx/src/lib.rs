@@ -27,6 +27,7 @@ extern crate bitflags;
 // expose our various derive macros
 pub use pgx_macros::*;
 
+pub mod aggregate;
 pub mod callbacks;
 pub mod datum;
 pub mod enum_helper;
@@ -60,6 +61,7 @@ pub mod xid;
 #[doc(hidden)]
 pub use once_cell;
 
+pub use aggregate::*;
 pub use atomics::*;
 pub use callbacks::*;
 use datum::sql_entity_graph::{RustSourceOnlySqlMapping, RustSqlMapping};
@@ -143,6 +145,7 @@ pub static DEFAULT_SOURCE_ONLY_SQL_MAPPING: Lazy<HashSet<RustSourceOnlySqlMappin
         let mut m = HashSet::new();
 
         map_source_only!(m, pg_sys::Oid, "Oid");
+        map_source_only!(m, pg_sys::TimestampTz, "timestamp with time zone");
 
         m
     });

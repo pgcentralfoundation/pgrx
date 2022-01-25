@@ -1,6 +1,7 @@
 use super::{
-    ControlFile, ExtensionSqlEntity, PgExternEntity, PostgresEnumEntity, PostgresHashEntity,
-    PostgresOrdEntity, PostgresTypeEntity, SchemaEntity, SqlGraphIdentifier, ToSql,
+    aggregate::PgAggregateEntity, ControlFile, ExtensionSqlEntity, PgExternEntity,
+    PostgresEnumEntity, PostgresHashEntity, PostgresOrdEntity, PostgresTypeEntity, SchemaEntity,
+    SqlGraphIdentifier, ToSql,
 };
 
 /// An entity corresponding to some SQL required by the extension.
@@ -15,6 +16,7 @@ pub enum SqlGraphEntity {
     Enum(PostgresEnumEntity),
     Ord(PostgresOrdEntity),
     Hash(PostgresHashEntity),
+    Aggregate(PgAggregateEntity),
 }
 
 impl SqlGraphEntity {}
@@ -30,6 +32,7 @@ impl SqlGraphIdentifier for SqlGraphEntity {
             SqlGraphEntity::Enum(item) => item.dot_identifier(),
             SqlGraphEntity::Ord(item) => item.dot_identifier(),
             SqlGraphEntity::Hash(item) => item.dot_identifier(),
+            SqlGraphEntity::Aggregate(item) => item.dot_identifier(),
             SqlGraphEntity::ExtensionRoot(item) => item.dot_identifier(),
         }
     }
@@ -43,6 +46,7 @@ impl SqlGraphIdentifier for SqlGraphEntity {
             SqlGraphEntity::Enum(item) => item.rust_identifier(),
             SqlGraphEntity::Ord(item) => item.rust_identifier(),
             SqlGraphEntity::Hash(item) => item.rust_identifier(),
+            SqlGraphEntity::Aggregate(item) => item.rust_identifier(),
             SqlGraphEntity::ExtensionRoot(item) => item.rust_identifier(),
         }
     }
@@ -57,6 +61,7 @@ impl SqlGraphIdentifier for SqlGraphEntity {
             SqlGraphEntity::Enum(item) => item.file(),
             SqlGraphEntity::Ord(item) => item.file(),
             SqlGraphEntity::Hash(item) => item.file(),
+            SqlGraphEntity::Aggregate(item) => item.file(),
             SqlGraphEntity::ExtensionRoot(item) => item.file(),
         }
     }
@@ -71,6 +76,7 @@ impl SqlGraphIdentifier for SqlGraphEntity {
             SqlGraphEntity::Enum(item) => item.line(),
             SqlGraphEntity::Ord(item) => item.line(),
             SqlGraphEntity::Hash(item) => item.line(),
+            SqlGraphEntity::Aggregate(item) => item.line(),
             SqlGraphEntity::ExtensionRoot(item) => item.line(),
         }
     }
@@ -110,6 +116,7 @@ impl ToSql for SqlGraphEntity {
             SqlGraphEntity::Enum(item) => item.to_sql(context),
             SqlGraphEntity::Ord(item) => item.to_sql(context),
             SqlGraphEntity::Hash(item) => item.to_sql(context),
+            SqlGraphEntity::Aggregate(item) => item.to_sql(context),
             SqlGraphEntity::ExtensionRoot(item) => item.to_sql(context),
         }
     }
