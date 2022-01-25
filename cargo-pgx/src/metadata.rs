@@ -1,13 +1,17 @@
-use cargo_metadata::MetadataCommand;
+use cargo_metadata::{MetadataCommand, Metadata};
 use semver::{Version, VersionReq};
 use eyre::eyre;
 
-#[tracing::instrument(level = "error", fields(features = ?features.features))]
-pub fn validate(features: &clap_cargo::Features) -> eyre::Result<()> {
+
+pub fn metadata(features: &clap_cargo::Features) -> eyre::Result<Metadata> {
     let mut metadata_command = MetadataCommand::new();
     features.forward_metadata(&mut metadata_command);
     let metadata = metadata_command.exec()?;
+    Ok(metadata)
+}
 
+#[tracing::instrument(level = "error", skip_all)]
+pub fn validate(metadata: &Metadata) -> eyre::Result<()> {
     let cargo_pgx_version = env!("CARGO_PKG_VERSION");
     let cargo_pgx_version_req = VersionReq::parse(&format!("~{}", cargo_pgx_version))?;
 

@@ -20,7 +20,7 @@ use std::{os::unix::process::CommandExt, process::Command};
 pub(crate) struct Run {
     /// Do you want to run against Postgres `pg10`, `pg11`, `pg12`, `pg13`, `pg14`?
     #[clap(env = "PG_VERSION")]
-    pg_version: String,
+    pg_version: Option<String>,
     /// The database to connect to (and create if the first time).  Defaults to a database with the same name as the current extension name
     dbname: Option<String>,
     /// Compile for release mode (default is debug)
@@ -38,17 +38,30 @@ pub(crate) struct Run {
 impl CommandExecute for Run {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
+        let metadata = crate::metadata::metadata(&self.features)?;
+        crate::metadata::validate(&metadata)?; 
+        let manifest = crate::manifest::manifest(&metadata)?;
+
+        let pg_version = match self.pg_version {
+            Some(s) => s,
+            None => {
+                crate::manifest::default_pg_version(&manifest)
+                    .ok_or(eyre!("No provided `pg$VERSION` flag."))?
+            }
+        };
+        let features = crate::manifest::features_for_version(self.features, &manifest, &pg_version);
+
         let dbname = match self.dbname {
             Some(dbname) => dbname,
             None => get_property("extname")?.ok_or(eyre!("could not determine extension name"))?,
         };
 
         run_psql(
-            Pgx::from_config()?.get(&self.pg_version)?,
+            Pgx::from_config()?.get(&pg_version)?,
             &dbname,
             self.release,
             self.no_schema,
-            &self.features,
+            &features,
         )
     }
 }

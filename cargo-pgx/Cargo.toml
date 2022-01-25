@@ -13,9 +13,9 @@ keywords = ["database", "postgres", "postgresql", "extension"]
 readme = "README.md"
 exclude = [ "*.png" ]
 
-
 [dependencies]
-cargo_metadata = "0.14.1"
+cargo_metadata = "0.14"
+cargo_toml = "0.10"
 clap = { version = "3.0.10", features = [ "env", "suggestions", "cargo", "derive" ] }
 clap-cargo = { version = "0.8", features = [ "cargo_metadata" ] }
 semver = "1"

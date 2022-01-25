@@ -16,7 +16,7 @@ use pgx_utils::pg_config::{PgConfig, Pgx};
 pub(crate) struct Connect {
     /// Do you want to run against Postgres `pg10`, `pg11`, `pg12`, `pg13`, `pg14`?
     #[clap(env = "PG_VERSION")]
-    pg_version: String,
+    pg_version: Option<String>,
     /// The database to connect to (and create if the first time).  Defaults to a database with the same name as the current extension name
     #[clap(env = "DBNAME")]
     dbname: Option<String>,
@@ -27,13 +27,25 @@ pub(crate) struct Connect {
 impl CommandExecute for Connect {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
+        let pg_version = match self.pg_version {
+            Some(s) => s,
+            None => {
+                let metadata = crate::metadata::metadata(&Default::default())?;
+                crate::metadata::validate(&metadata)?; 
+                let manifest = crate::manifest::manifest(&metadata)?;
+                crate::manifest::default_pg_version(&manifest)
+                    .ok_or(eyre!("No provided `pg$VERSION` flag."))?
+            }
+        };
+
         let dbname = match self.dbname {
             Some(dbname) => dbname,
             None => get_property("extname")
                 .wrap_err("could not determine extension name")?
                 .ok_or(eyre!("extname not found in control file"))?,
         };
-        connect_psql(Pgx::from_config()?.get(&self.pg_version)?, &dbname)
+
+        connect_psql(Pgx::from_config()?.get(&pg_version)?, &dbname)
     }
 }
 

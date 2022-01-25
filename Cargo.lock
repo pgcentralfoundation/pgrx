@@ -252,6 +252,7 @@ name = "cargo-pgx"
 version = "0.2.6"
 dependencies = [
  "cargo_metadata",
+ "cargo_toml",
  "clap 3.0.10",
  "clap-cargo",
  "color-eyre",
@@ -296,6 +297,17 @@ dependencies = [
  "semver 1.0.4",
  "serde",
  "serde_json",
+]
+
+[[package]]
+name = "cargo_toml"
+version = "0.10.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "363c7cfaa15f101415c4ac9e68706ca4a2277773932828b33f96e59d28c68e62"
+dependencies = [
+ "serde",
+ "serde_derive",
+ "toml",
 ]
 
 [[package]]

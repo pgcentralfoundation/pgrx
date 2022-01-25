@@ -2,7 +2,8 @@
 // governed by the MIT license that can be found in the LICENSE file.
 
 mod command;
-mod validate;
+mod metadata;
+mod manifest;
 
 use clap::Parser;
 use tracing_error::ErrorLayer;
