@@ -1,4 +1,5 @@
 mod extension_sql;
+mod pg_aggregate;
 mod pg_extern;
 mod pg_schema;
 mod positioning_ref;
@@ -9,6 +10,7 @@ mod postgres_type;
 
 pub use super::ExternArgs;
 pub use extension_sql::{ExtensionSql, ExtensionSqlFile, SqlDeclared};
+pub use pg_aggregate::PgAggregate;
 pub use pg_extern::{Argument, PgExtern, PgOperator};
 pub use pg_schema::Schema;
 pub use positioning_ref::PositioningRef;

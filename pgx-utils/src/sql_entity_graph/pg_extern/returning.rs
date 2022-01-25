@@ -60,7 +60,7 @@ impl Returning {
                         match archetype.ident.to_string().as_str() {
                             "name" => {
                                 let out: NameMacro =
-                                    mac.parse_body().expect(&*format!("{:?}", mac));
+                                    mac.parse_body().expect(&*format!("Failed to parse named!(): {:?}", mac));
                                 Some((out.ty, Some(out.ident)))
                             }
                             _ => unimplemented!("Don't support anything other than name."),

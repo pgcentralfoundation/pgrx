@@ -14,7 +14,7 @@ use quote::{quote, quote_spanned, ToTokens};
 use rewriter::*;
 use std::collections::HashSet;
 use syn::spanned::Spanned;
-use syn::{parse_macro_input, Attribute, Data, DeriveInput, Item, ItemFn};
+use syn::{parse_macro_input, Attribute, Data, DeriveInput, Item, ItemFn, ItemImpl};
 
 /// Declare a function as `#[pg_guard]` to indicate that it is called from a Postgres `extern "C"`
 /// function so that Rust `panic!()`s (and Postgres `elog(ERROR)`s) will be properly handled by `pgx`
@@ -963,3 +963,43 @@ pub fn postgres_hash(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
     impl_postgres_hash(ast).into()
 }
+
+/**
+Declare a `pgx::Aggregate` implentation on a type as able to used by Postgres as an aggregate.
+
+Functions inside the `impl` may use the [`#[pgx]`](macro@pgx) attribute.
+*/
+#[proc_macro_attribute]
+pub fn pg_aggregate(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    // We don't care about `_attr` as we can find it in the `ItemMod`.
+    fn wrapped(item_impl: ItemImpl) -> Result<TokenStream, syn::Error> {
+        let sql_graph_entity_item = sql_entity_graph::PgAggregate::new(item_impl.into())?;
+
+        Ok(sql_graph_entity_item.to_token_stream().into())
+    }
+
+    let parsed_base = parse_macro_input!(item as syn::ItemImpl);
+    match wrapped(parsed_base) {
+        Ok(tokens) => tokens,
+        Err(e) => {
+            let msg = e.to_string();
+            TokenStream::from(quote! {
+              compile_error!(#msg);
+            })
+        }
+    }
+}
+
+/**
+An inner attribute for [`#[pg_aggregate]`](pg_aggregate).
+
+It can be decorated on functions inside a [`#[pg_aggregate]`](pg_aggregate) implementation.
+In this position, it takes the same args as [`#[pg_extern]`](pg_extern), and those args have the same effect.
+
+Used outside of a [`#[pg_aggregate]`](pg_aggregate), this does nothing.
+*/
+#[proc_macro_attribute]
+pub fn pgx(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    item
+}
+
