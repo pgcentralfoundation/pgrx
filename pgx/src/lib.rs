@@ -143,6 +143,7 @@ pub static DEFAULT_SOURCE_ONLY_SQL_MAPPING: Lazy<HashSet<RustSourceOnlySqlMappin
         let mut m = HashSet::new();
 
         map_source_only!(m, pg_sys::Oid, "Oid");
+        map_source_only!(m, pg_sys::TimestampTz, "timestamp with time zone");
 
         m
     });
