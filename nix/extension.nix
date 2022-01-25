@@ -25,6 +25,7 @@
 , release ? true
 , source ? ./.
 , additionalFeatures
+, doCheck ? true
 }:
 
 let
@@ -41,7 +42,7 @@ let
 in
 
 naersk.lib."${targetPlatform.system}".buildPackage rec {
-  inherit release;
+  inherit release doCheck;
   name = "${cargoToml.package.name}-pg${pgxPostgresVersionString}";
   version = cargoToml.package.version;
 
@@ -61,7 +62,6 @@ naersk.lib."${targetPlatform.system}".buildPackage rec {
     gcc
   ];
   checkInputs = [ cargo-pgx cargo rustc ];
-  doCheck = true;
 
   postPatch = "patchShebangs .";
   preConfigure = ''
