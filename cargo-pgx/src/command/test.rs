@@ -52,8 +52,9 @@ impl CommandExecute for Test {
         
         for pg_config in pgx.iter(PgConfigSelector::new(&pg_version)) {
             let pg_config = pg_config?;
+            let pg_version = format!("pg{}", pg_config.major_version()?);
 
-            let features = crate::manifest::features_for_version(self.features.clone(), &manifest, &format!("pg{}", pg_config.major_version()?));
+            let features = crate::manifest::features_for_version(self.features.clone(), &manifest, &pg_version);
             test_extension(
                 pg_config,
                 self.release,
