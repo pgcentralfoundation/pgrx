@@ -10,6 +10,7 @@ pub struct AggregateType {
     pub ty_source: &'static str,
     pub ty_id: TypeId,
     pub full_path: &'static str,
+    pub name: Option<&'static str>,
 }
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
@@ -339,7 +340,7 @@ impl ToSql for PgAggregateEntity {
                         })?;
                     let needs_comma = idx < (self.args.len() - 1);
                     let buf = format!("\
-                           \t{variadic}{schema_prefix}{sql_type}{maybe_comma}/* {full_path} */\
+                           \t{name}{variadic}{schema_prefix}{sql_type}{maybe_comma}/* {full_path} */\
                        ",
                            schema_prefix = context.schema_prefix_for(&graph_index),
                            // First try to match on [`TypeId`] since it's most reliable.
@@ -351,6 +352,9 @@ impl ToSql for PgAggregateEntity {
                            variadic = if arg.variadic { "VARIADIC " } else { "" },
                            maybe_comma = if needs_comma { ", " } else { " " },
                            full_path = arg.agg_ty.full_path,
+                           name = if let Some(name) = arg.agg_ty.name {
+                               format!(r#""{}" "#, name)
+                           } else { "".to_string() },
                     );
                     args.push(buf);
                 }

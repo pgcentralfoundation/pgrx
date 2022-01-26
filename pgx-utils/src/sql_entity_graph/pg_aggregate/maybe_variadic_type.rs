@@ -91,12 +91,14 @@ impl MaybeNamedVariadicType {
     fn entity_tokens(&self) -> Expr {
         let ty = self.variadic_ty.as_ref().unwrap_or(&self.ty);
         let variadic = self.variadic_ty.is_some();
+        let name = self.name.iter();
         parse_quote! {
             pgx::datum::sql_entity_graph::aggregate::MaybeVariadicAggregateType {
                 agg_ty: pgx::datum::sql_entity_graph::aggregate::AggregateType {
                     ty_source: stringify!(#ty),
                     ty_id: core::any::TypeId::of::<#ty>(),
                     full_path: core::any::type_name::<#ty>(),
+                    name: None#( .unwrap_or(Some(#name)) )*,
                 },
                 variadic: #variadic,
             }
