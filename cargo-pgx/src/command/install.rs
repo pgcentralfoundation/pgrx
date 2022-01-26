@@ -54,6 +54,7 @@ impl CommandExecute for Install {
     pg_version = %pg_config.version()?,
     release = is_release,
     base_directory = tracing::field::Empty,
+    features = ?features.features,
 ))]
 pub(crate) fn install_extension(
     pg_config: &PgConfig,
@@ -171,8 +172,6 @@ pub(crate) fn build_extension(
     if !features_arg.trim().is_empty() {
         command.arg("--features");
         command.arg(&features_arg);
-        // While this is not 'correct' `cargo` does not let us negate features.
-        command.arg("--no-default-features");
     }
 
     if features.no_default_features && features_arg.trim().is_empty() {
