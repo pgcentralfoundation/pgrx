@@ -2,15 +2,16 @@
 
 [Aggregate](https://www.postgresql.org/docs/current/xaggr.html) support.
 
+Most items of this trait map directly to a [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
+functionality.
+
 Aggregates are created by implementing [`Aggregate`] for a type and decorating the implementation with
 [`#[pg_aggregate]`](pgx_macros::pg_aggregate).
 
 Definition of the aggregate is done via settings in the type's [`Aggregate`] implementation. While
-the trait itself several items, only a few are required, the macro will fill in the others with unused stubs.
+the trait itself has several items, only a few are required, the macro will fill in the others with unused stubs.
 
-Functions inside the `impl` may use the [`#[pgx]`](macro@pgx) attribute.
-
-Here's a fairly minimal aggregate:
+# Minimal Example
 
 ```rust
 use pgx::*;
@@ -27,7 +28,11 @@ pub struct DemoSum {
 impl Aggregate for DemoSum {
     const INITIAL_CONDITION: Option<&'static str> = Some(r#"{ "count": 0 }"#);
     type Args = i32;
-    fn state(mut current: Self::State, arg: Self::Args, _fcinfo: pg_sys::FunctionCallInfo) -> Self::State {
+    fn state(
+        mut current: Self::State,
+        arg: Self::Args,
+        _fcinfo: pg_sys::FunctionCallInfo
+    ) -> Self::State {
         current.count += arg;
         current
     }
@@ -37,16 +42,15 @@ impl Aggregate for DemoSum {
 This creates SQL like so:
 
 ```sql
--- src/lib.rs:10
+-- src/lib.rs:11
 -- aggregate::DemoSum
 CREATE AGGREGATE DemoSum (
 	integer /* i32 */
 )
 (
-	SFUNC = "demo_sum_state",
+	SFUNC = "demo_sum_state", /* aggregate::DemoSum::state */
 	STYPE = DemoSum, /* aggregate::DemoSum */
-
-	INITCOND = '{ "count": 0 }'
+	INITCOND = '{ "count": 0 }' /* aggregate::DemoSum::INITIAL_CONDITION */
 );
 ```
 
@@ -63,6 +67,197 @@ aggregate=# SELECT DemoSum(value) FROM demo_table;
  {"count":6}
 (1 row)
 ```
+
+## Multiple Arguments
+
+Sometimes aggregates need to handle multiple arguments. The
+[`Aggregate::Args`](Aggregate::Args) associated type can be a tuple:
+
+```rust
+# use pgx::*;
+# use serde::{Serialize, Deserialize};
+# 
+# #[derive(Copy, Clone, Default, PostgresType, Serialize, Deserialize)]
+# pub struct DemoSum {
+#     count: i32,
+# }
+#
+#[pg_aggregate]
+impl Aggregate for DemoSum {
+    const INITIAL_CONDITION: Option<&'static str> = Some(r#"{ "count": 0 }"#);
+    type Args = (i32, i32);
+    fn state(
+        mut current: Self::State,
+        (arg1, arg2): Self::Args,
+        _fcinfo: pg_sys::FunctionCallInfo
+    ) -> Self::State {
+        current.count += arg1;
+        current.count += arg2;
+        current
+    }
+}
+```
+
+Creates:
+
+```sql
+-- src/lib.rs:11
+-- aggregate::DemoSum
+CREATE AGGREGATE DemoSum (
+	integer, /* i32 */
+	integer /* i32 */
+)
+(
+	SFUNC = "demo_sum_state", /* aggregate::DemoSum::state */
+	STYPE = DemoSum, /* aggregate::DemoSum */
+	INITCOND = '{ "count": 0 }' /* aggregate::DemoSum::INITIAL_CONDITION */
+);
+```
+
+## Named Arguments
+
+The [`name!(ident, Type)`][macro@crate::name] macro can be used to set the name of an argument:
+
+```rust
+# use pgx::*;
+# use serde::{Serialize, Deserialize};
+# 
+# #[derive(Copy, Clone, Default, PostgresType, Serialize, Deserialize)]
+# pub struct DemoSum {
+#     count: i32,
+# }
+# 
+# #[pg_aggregate]
+impl Aggregate for DemoSum {
+    const INITIAL_CONDITION: Option<&'static str> = Some(r#"{ "count": 0 }"#);
+    type Args = (
+        i32,
+        name!(extra, i32),
+    );
+    fn state(
+        mut current: Self::State,
+        (arg1, extra): Self::Args,
+        _fcinfo: pg_sys::FunctionCallInfo
+    ) -> Self::State {
+        todo!()
+    }
+}
+```
+
+Creates:
+
+```sql
+-- src/lib.rs:11
+-- aggregate::DemoSum
+CREATE AGGREGATE DemoSum (
+	integer, /* i32 */
+	"extra" integer /* i32 */
+)
+(
+	SFUNC = "demo_sum_state", /* aggregate::DemoSum::state */
+	STYPE = DemoSum, /* aggregate::DemoSum */
+	INITCOND = '{ "count": 0 }' /* aggregate::DemoSum::INITIAL_CONDITION */
+);
+```
+
+## Function attributes
+
+Functions inside the `impl` may use the [`#[pgx]`](macro@crate::pgx) attribute. It
+accepts the same parameters as [`#[pg_extern]`][macro@pgx-macros::pg_extern].
+
+```rust
+# use pgx::*;
+# use serde::{Serialize, Deserialize};
+# 
+# #[derive(Copy, Clone, Default, PostgresType, Serialize, Deserialize)]
+# pub struct DemoSum {
+#     count: i32,
+# }
+#
+#[pg_aggregate]
+impl Aggregate for DemoSum {
+    const INITIAL_CONDITION: Option<&'static str> = Some(r#"{ "count": 0 }"#);
+    type Args = i32;
+    #[pgx(parallel_safe, immutable)]
+    fn state(
+        mut current: Self::State,
+        arg: Self::Args,
+        _fcinfo: pg_sys::FunctionCallInfo
+    ) -> Self::State {
+        todo!()
+    }
+}
+```
+
+Generates:
+
+```sql
+-- src/lib.rs:11
+-- aggregate::demo_sum_state
+CREATE OR REPLACE FUNCTION "demo_sum_state"(
+	"this" DemoSum, /* aggregate::DemoSum */
+	"arg_one" integer /* i32 */
+) RETURNS DemoSum /* aggregate::DemoSum */
+PARALLEL SAFE IMMUTABLE STRICT
+LANGUAGE c /* Rust */
+AS 'MODULE_PATHNAME', 'demo_sum_state_wrapper';
+```
+
+## Non-`Self` State
+
+Sometimes it's useful to have aggregates share state, or use some other type for state.
+
+```rust
+# use pgx::*;
+# use serde::{Serialize, Deserialize};
+# 
+#[derive(Copy, Clone, Default, PostgresType, Serialize, Deserialize)]
+pub struct DemoSumState {
+    count: i32,
+}
+
+pub struct DemoSum;
+
+#[pg_aggregate]
+impl Aggregate for DemoSum {
+    const INITIAL_CONDITION: Option<&'static str> = Some(r#"{ "count": 0 }"#);
+    type Args = i32;
+    type State = DemoSumState;
+    fn state(
+        mut current: Self::State,
+        arg: Self::Args,
+        _fcinfo: pg_sys::FunctionCallInfo
+    ) -> Self::State {
+        todo!()
+    }
+}
+```
+
+Creates:
+
+```sql
+-- src/lib.rs:13
+-- aggregate::demo_sum_state
+CREATE OR REPLACE FUNCTION "demo_sum_state"(
+	"this" DemoSumState, /* aggregate::DemoSumState */
+	"arg_one" integer /* i32 */
+) RETURNS DemoSumState /* aggregate::DemoSumState */
+STRICT
+LANGUAGE c /* Rust */
+AS 'MODULE_PATHNAME', 'demo_sum_state_wrapper';
+
+-- src/lib.rs:13
+-- aggregate::DemoSum
+CREATE AGGREGATE DemoSum (
+	integer /* i32 */
+)
+(
+	SFUNC = "demo_sum_state", /* aggregate::DemoSum::state */
+	STYPE = DemoSumState, /* aggregate::DemoSumState */
+	INITCOND = '{ "count": 0 }' /* aggregate::DemoSum::INITIAL_CONDITION */
+);
+```
+
 */
 
 use crate::{
@@ -102,10 +297,10 @@ where
     ///
     /// For multiple arguments, provide a tuple.
     ///
-    /// Use [`pgx::name!()`](pgx::name) to set the SQL name of the argument.
+    /// Use [`pgx::name!()`](crate::name) to set the SQL name of the argument.
     ///
-    /// If the final argument is to be variadic, use [`pgx::variadic`](pgx::variadic). When used
-    /// with [`pgx::name!()`](pgx::name), it must be used **inside** the [`pgx::name!()`](pgx::name) macro.
+    /// If the final argument is to be variadic, use [`pgx::variadic`](crate::variadic). When used
+    /// with [`pgx::name!()`](crate::name), it must be used **inside** the [`pgx::name!()`](crate::name) macro.
     type Args;
 
     /// The types of the order argument(s).

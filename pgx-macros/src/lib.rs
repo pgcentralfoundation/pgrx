@@ -991,12 +991,12 @@ pub fn pg_aggregate(_attr: TokenStream, item: TokenStream) -> TokenStream {
 }
 
 /**
-An inner attribute for [`#[pg_aggregate]`](pg_aggregate).
+An inner attribute for [`#[pg_aggregate]`](macro@pg_aggregate).
 
-It can be decorated on functions inside a [`#[pg_aggregate]`](pg_aggregate) implementation.
-In this position, it takes the same args as [`#[pg_extern]`](pg_extern), and those args have the same effect.
+It can be decorated on functions inside a [`#[pg_aggregate]`](macro@pg_aggregate) implementation.
+In this position, it takes the same args as [`#[pg_extern]`](macro@pg_extern), and those args have the same effect.
 
-Used outside of a [`#[pg_aggregate]`](pg_aggregate), this does nothing.
+Used outside of a [`#[pg_aggregate]`](macro@pg_aggregate), this does nothing.
 */
 #[proc_macro_attribute]
 pub fn pgx(_attr: TokenStream, item: TokenStream) -> TokenStream {
