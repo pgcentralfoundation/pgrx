@@ -335,8 +335,10 @@ fn dfs_find_nodes<'graph>(
 ///       it stores into the underlying items struct are always correct.
 #[derive(Clone, Debug)]
 struct StructGraph<'a> {
+    #[allow(dead_code)]
     /// A table mapping struct names to their offset in the descriptor table
     name_tab: HashMap<String, usize>,
+    #[allow(dead_code)]
     /// A table mapping offsets into the underlying items table to offsets in the descriptor table
     item_offset_tab: Vec<Option<usize>>,
     /// A table of struct descriptors
