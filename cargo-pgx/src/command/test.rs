@@ -90,28 +90,41 @@ pub fn test_extension(
 
     let mut command = Command::new("cargo");
 
+    let mut no_default_features_arg = features.no_default_features;
+    let mut features_arg = features.features.join(" ");
+    if features.features.iter().all(|f| f != "pg_test") {
+        features_arg += " pg_test";
+        no_default_features_arg = true;
+    }
+
     command
         .stdout(Stdio::inherit())
         .stderr(Stdio::inherit())
         .arg("test")
-        .arg("--lib")
         .env("CARGO_TARGET_DIR", &target_dir)
+        .env(
+            "PGX_FEATURES",
+            features_arg.clone(),
+        )
+        .env(
+            "PGX_NO_DEFAULT_FEATURES",
+            if no_default_features_arg { "true" } else { "false" },
+        ).env(
+            "PGX_ALL_FEATURES",
+            if features.all_features { "true" } else { "false" },
+        )
         .env(
             "PGX_BUILD_PROFILE",
             if is_release { "release" } else { "debug" },
         )
         .env("PGX_NO_SCHEMA", if no_schema { "true" } else { "false" });
 
-    if !features.features.is_empty() {
+    if !features_arg.trim().is_empty() {
         command.arg("--features");
-        let mut features_arg = features.features.join(" ");
-        if features.features.iter().all(|f| f != "pg_test") {
-            features_arg += " pg_test";
-        }
         command.arg(&features_arg);
     }
 
-    if features.no_default_features {
+    if no_default_features_arg {
         command.arg("--no-default-features");
     }
 

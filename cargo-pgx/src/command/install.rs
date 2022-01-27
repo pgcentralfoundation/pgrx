@@ -174,7 +174,7 @@ pub(crate) fn build_extension(
         command.arg(&features_arg);
     }
 
-    if features.no_default_features && features_arg.trim().is_empty() {
+    if features.no_default_features {
         command.arg("--no-default-features");
     }
 

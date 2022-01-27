@@ -235,6 +235,9 @@ fn install_extension() -> eyre::Result<()> {
     eprintln!("installing extension");
     let is_release = std::env::var("PGX_BUILD_PROFILE").unwrap_or("debug".into()) == "release";
     let no_schema = std::env::var("PGX_NO_SCHEMA").unwrap_or("false".into()) == "true";
+    let features = std::env::var("PGX_FEATURES").unwrap_or("".to_string());
+    let no_default_features = std::env::var("PGX_NO_DEFAULT_FEATURES").unwrap_or("false".to_string()) == "true";
+    let all_features = std::env::var("PGX_ALL_FEATURES").unwrap_or("false".to_string()) == "true";
 
     let pg_version = format!("pg{}", pg_sys::get_pg_major_version_string());
     let pgx = Pgx::from_config()?;
@@ -246,14 +249,23 @@ fn install_extension() -> eyre::Result<()> {
         .arg("install")
         .arg("--pg-config")
         .arg(pg_config.path().ok_or(eyre!("No pg_config found"))?)
-        .arg("--features")
-        .arg(format!(
-            "pg{} pg_test",
-            pg_sys::get_pg_major_version_string()
-        ))
         .stdout(Stdio::inherit())
         .stderr(Stdio::inherit())
         .env("CARGO_TARGET_DIR", get_target_dir()?);
+
+    if !features.trim().is_empty() {
+        command.arg("--features");
+        command.arg(features);
+    }
+
+    if no_default_features {
+        command.arg("--no-default-features");
+    }
+
+    if all_features {
+        command.arg("--all-features");
+    }
+    
     if is_release {
         command.arg("--release");
     }
