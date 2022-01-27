@@ -49,7 +49,22 @@ impl CommandExecute for Test {
         };
 
         for pg_config in pgx.iter(PgConfigSelector::new(&pg_version)) {
-            let pg_config = pg_config?;
+            let mut testname = self.testname.clone();
+            let pg_config = match pg_config {
+                Err(error) => {
+                    tracing::debug!(
+                        invalid_pg_version = %pg_version,
+                        error = %error,
+                        "Got invalid `pg$VERSION` flag, assuming it is a testname"
+                    );
+                    testname = Some(pg_version.clone());
+                    pgx.get(
+                        &crate::manifest::default_pg_version(&manifest)
+                            .ok_or(eyre!("No provided `pg$VERSION` flag."))?
+                    )?
+                },
+                Ok(config) => config,   
+            };
             let pg_version = format!("pg{}", pg_config.major_version()?);
 
             let features = crate::manifest::features_for_version(
@@ -63,7 +78,7 @@ impl CommandExecute for Test {
                 self.no_schema,
                 self.workspace,
                 &features,
-                self.testname.clone(),
+                testname.clone(),
             )?
         }
         Ok(())
@@ -90,7 +105,7 @@ pub fn test_extension(
 
     let mut command = Command::new("cargo");
 
-    let mut no_default_features_arg = features.no_default_features;
+    let no_default_features_arg = features.no_default_features;
     let mut features_arg = features.features.join(" ");
     if features.features.iter().all(|f| f != "pg_test") {
         features_arg += " pg_test";

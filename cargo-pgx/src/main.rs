@@ -52,6 +52,8 @@ impl CommandExecute for CargoSubcommands {
 }
 
 fn main() -> color_eyre::Result<()> {
+    color_eyre::install()?;
+
     let cargo_cli = CargoCommand::parse();
 
     // Initialize tracing with tracing-error, and eyre
@@ -62,7 +64,7 @@ fn main() -> color_eyre::Result<()> {
         Err(_) => {
             let log_level = match cargo_cli.verbose {
                 0 => "info",
-                1 => "warn",
+                1 => "debug",
                 _ => "trace",
             };
             let filter_layer = EnvFilter::new("warn");
@@ -86,8 +88,6 @@ fn main() -> color_eyre::Result<()> {
         .with(fmt_layer)
         .with(ErrorLayer::default())
         .init();
-
-    color_eyre::install()?;
 
     cargo_cli.execute()
 }
