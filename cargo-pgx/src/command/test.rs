@@ -94,7 +94,6 @@ pub fn test_extension(
     let mut features_arg = features.features.join(" ");
     if features.features.iter().all(|f| f != "pg_test") {
         features_arg += " pg_test";
-        no_default_features_arg = true;
     }
 
     command
