@@ -110,6 +110,7 @@ pub fn test_extension(
     if features.features.iter().all(|f| f != "pg_test") {
         features_arg += " pg_test";
     }
+    panic!("arg {}", features_arg);
 
     command
         .stdout(Stdio::inherit())

@@ -235,7 +235,10 @@ fn install_extension() -> eyre::Result<()> {
     eprintln!("installing extension");
     let is_release = std::env::var("PGX_BUILD_PROFILE").unwrap_or("debug".into()) == "release";
     let no_schema = std::env::var("PGX_NO_SCHEMA").unwrap_or("false".into()) == "true";
-    let features = std::env::var("PGX_FEATURES").unwrap_or("".to_string());
+    let mut features = std::env::var("PGX_FEATURES").unwrap_or("".to_string());
+    if !features.contains("pg_test") {
+        features += " pg_test";
+    }
     let no_default_features = std::env::var("PGX_NO_DEFAULT_FEATURES").unwrap_or("false".to_string()) == "true";
     let all_features = std::env::var("PGX_ALL_FEATURES").unwrap_or("false".to_string()) == "true";
 
