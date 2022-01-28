@@ -561,6 +561,7 @@ impl PgAggregate {
                         ty_source: #type_moving_state_string,
                         ty_id: core::any::TypeId::of::<#type_moving_state_iter>(),
                         full_path: core::any::type_name::<#type_moving_state_iter>(),
+                        name: None
                     })) )*,
                     mfinalfunc: None#( .unwrap_or(Some(stringify!(#fn_moving_finalize_iter))) )*,
                     mfinalfunc_modify: None#( .unwrap_or(#const_moving_finalize_modify_iter) )*,
