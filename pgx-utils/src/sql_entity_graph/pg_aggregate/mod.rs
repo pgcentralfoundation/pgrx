@@ -517,6 +517,7 @@ impl PgAggregate {
         let type_args_iter = &self.type_args.entity_tokens();
         let type_order_by_iter = self.type_order_by.iter().map(|x| x.entity_tokens());
         let type_moving_state_iter = self.type_moving_state.iter();
+        let type_moving_state_string = self.type_moving_state.as_ref().map(|t| { t.to_token_stream().to_string().replace(" ", "") });
         let type_stype = self.type_stype.entity_tokens();
         let const_parallel_iter = self.const_parallel.iter();
         let const_finalize_modify_iter = self.const_finalize_modify.iter();
@@ -557,9 +558,10 @@ impl PgAggregate {
                     msfunc: None#( .unwrap_or(Some(stringify!(#fn_moving_state_iter))) )*,
                     minvfunc: None#( .unwrap_or(Some(stringify!(#fn_moving_state_inverse_iter))) )*,
                     mstype: None#( .unwrap_or(Some(pgx::datum::sql_entity_graph::aggregate::AggregateType {
-                        ty_source: stringify!(#type_moving_state_iter),
+                        ty_source: #type_moving_state_string,
                         ty_id: core::any::TypeId::of::<#type_moving_state_iter>(),
                         full_path: core::any::type_name::<#type_moving_state_iter>(),
+                        name: None
                     })) )*,
                     mfinalfunc: None#( .unwrap_or(Some(stringify!(#fn_moving_finalize_iter))) )*,
                     mfinalfunc_modify: None#( .unwrap_or(#const_moving_finalize_modify_iter) )*,

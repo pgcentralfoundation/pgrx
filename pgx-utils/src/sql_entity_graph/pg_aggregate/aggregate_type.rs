@@ -65,9 +65,10 @@ impl AggregateType {
 
     pub(crate) fn entity_tokens(&self) -> Expr {
         let ty = &self.ty;
+        let ty_string = ty.to_token_stream().to_string().replace(" ", "");
         parse_quote! {
             pgx::datum::sql_entity_graph::aggregate::AggregateType {
-                ty_source: stringify!(#ty),
+                ty_source: #ty_string,
                 ty_id: core::any::TypeId::of::<#ty>(),
                 full_path: core::any::type_name::<#ty>(),
                 name: None,
