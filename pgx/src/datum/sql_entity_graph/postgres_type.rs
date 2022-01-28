@@ -5,7 +5,7 @@ use std::{
     hash::{Hash, Hasher},
 };
 
-use super::{SqlGraphEntity, SqlGraphIdentifier, ToSql};
+use super::{SqlGraphEntity, SqlGraphIdentifier, ToSql, ToSqlConfigEntity};
 
 /// The output of a [`PostgresType`](crate::datum::sql_entity_graph::PostgresType) from `quote::ToTokens::to_tokens`.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -20,6 +20,7 @@ pub struct PostgresTypeEntity {
     pub in_fn_module_path: String,
     pub out_fn: &'static str,
     pub out_fn_module_path: String,
+    pub to_sql_config: ToSqlConfigEntity,
 }
 
 impl Hash for PostgresTypeEntity {

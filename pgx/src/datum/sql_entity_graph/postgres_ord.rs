@@ -1,4 +1,4 @@
-use super::{SqlGraphEntity, SqlGraphIdentifier, ToSql};
+use super::{SqlGraphEntity, SqlGraphIdentifier, ToSql, ToSqlConfigEntity};
 use std::cmp::Ordering;
 
 /// The output of a [`PostgresOrd`](crate::datum::sql_entity_graph::PostgresOrd) from `quote::ToTokens::to_tokens`.
@@ -10,6 +10,7 @@ pub struct PostgresOrdEntity {
     pub full_path: &'static str,
     pub module_path: &'static str,
     pub id: core::any::TypeId,
+    pub to_sql_config: ToSqlConfigEntity,
 }
 
 impl PostgresOrdEntity {
