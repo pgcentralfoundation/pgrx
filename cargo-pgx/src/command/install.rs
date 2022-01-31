@@ -326,10 +326,9 @@ pub(crate) fn get_version() -> eyre::Result<String> {
     match get_property("default_version")? {
         Some(v) => {
             if v == "@CARGO_VERSION@" {
-                let metadata = MetadataCommand::new()
-                    .exec()
-                    .wrap_err("failed to parse Cargo.toml")?;
-                Ok(metadata.root_package().unwrap().version.to_string())
+                let metadata = MetadataCommand::new().exec()?;
+                let root_package = metadata.root_package().ok_or(eyre!("no root package found"))?;
+                Ok(root_package.version.to_string())
             } else {
                 Ok(v)
             }

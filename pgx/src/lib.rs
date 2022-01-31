@@ -338,14 +338,17 @@ macro_rules! pg_sql_graph_magic {
         > {
             use pgx::datum::sql_entity_graph::reexports::eyre::WrapErr;
             use std::convert::TryFrom;
+            let package_version = env!("CARGO_PKG_VERSION");
             let context = include_str!(concat!(
                 env!("CARGO_MANIFEST_DIR"),
                 "/",
                 env!("CARGO_CRATE_NAME"),
                 ".control"
-            ));
-            let control_file = pgx::datum::sql_entity_graph::ControlFile::try_from(context)
-                .wrap_err_with(|| "Could not parse control file, is it valid?")?;
+            ))
+            .replace("@CARGO_VERSION@", package_version);
+            let control_file =
+                pgx::datum::sql_entity_graph::ControlFile::try_from(context.as_str())
+                    .wrap_err_with(|| "Could not parse control file, is it valid?")?;
             Ok(control_file)
         }
     };
