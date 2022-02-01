@@ -1,5 +1,6 @@
 use pgx::cstr_core::CStr;
 use pgx::*;
+use serde::{Deserialize, Serialize};
 use std::str::FromStr;
 
 pg_module_magic!();
