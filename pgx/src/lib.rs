@@ -340,7 +340,6 @@ macro_rules! pg_sql_graph_magic {
         > {
             use core::convert::TryFrom;
             use pgx::datum::sql_entity_graph::reexports::eyre::WrapErr;
-            use std::convert::TryFrom;
             let package_version = env!("CARGO_PKG_VERSION");
             let context = include_str!(concat!(
                 env!("CARGO_MANIFEST_DIR"),
