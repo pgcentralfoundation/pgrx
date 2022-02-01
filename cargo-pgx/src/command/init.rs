@@ -33,7 +33,7 @@ static PROCESS_ENV_DENYLIST: &'static [&'static str] = &[
     "LIBRARY_PATH", // see https://github.com/zombodb/pgx/issues/16
 ];
 
-/// Initize pgx development environment for the first time
+/// Initialize pgx development environment for the first time
 #[derive(clap::Args, Debug)]
 #[clap(author)]
 pub(crate) struct Init {
