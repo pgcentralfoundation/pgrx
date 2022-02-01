@@ -38,8 +38,8 @@ colored = "2.0.0"
 num_cpus = "1.13.1"
 pgx-utils = { path = "../pgx-utils/", version = "0.2.6" }
 proc-macro2 = "1.0.36"
-quote = "1.0.14"
+quote = "1.0.15"
 rayon = "1.5.1"
-syn = { version = "1.0.85", features = [ "extra-traits", "full", "fold", "parsing" ] }
-eyre = "0.6.5"
+syn = { version = "1.0.86", features = [ "extra-traits", "full", "fold", "parsing" ] }
+eyre = "0.6.6"
 color-eyre = "0.6.0"
