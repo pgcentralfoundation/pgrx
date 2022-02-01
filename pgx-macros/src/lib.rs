@@ -294,12 +294,12 @@ extension_sql!(r#"\
 );
 
 #[pg_extern(immutable)]
-fn complex_in(input: &std::ffi::CStr) -> PgBox<Complex> {
+fn complex_in(input: &pgx::cstr_core::CStr) -> PgBox<Complex> {
     todo!()
 }
 
 #[pg_extern(immutable)]
-fn complex_out(complex: PgBox<Complex>) -> &'static std::ffi::CStr {
+fn complex_out(complex: PgBox<Complex>) -> &'static pgx::cstr_core::CStr {
     todo!()
 }
 
@@ -735,12 +735,12 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
             impl #generics JsonInOutFuncs #inout_generics for #name #generics {}
 
             #[pg_extern(immutable,parallel_safe)]
-            pub fn #funcname_in #generics(input: &#lifetime std::ffi::CStr) -> #name #generics {
+            pub fn #funcname_in #generics(input: &#lifetime pgx::cstr_core::CStr) -> #name #generics {
                 #name::input(input)
             }
 
             #[pg_extern(immutable,parallel_safe)]
-            pub fn #funcname_out #generics(input: #name #generics) -> &#lifetime std::ffi::CStr {
+            pub fn #funcname_out #generics(input: #name #generics) -> &#lifetime pgx::cstr_core::CStr {
                 let mut buffer = StringInfo::new();
                 input.output(&mut buffer);
                 buffer.into()
@@ -751,12 +751,12 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
         // otherwise if it's InOutFuncs our _in/_out functions use an owned type instance
         stream.extend(quote! {
             #[pg_extern(immutable,parallel_safe)]
-            pub fn #funcname_in #generics(input: &#lifetime std::ffi::CStr) -> #name #generics {
+            pub fn #funcname_in #generics(input: &#lifetime pgx::cstr_core::CStr) -> #name #generics {
                 #name::input(input)
             }
 
             #[pg_extern(immutable,parallel_safe)]
-            pub fn #funcname_out #generics(input: #name #generics) -> &#lifetime std::ffi::CStr {
+            pub fn #funcname_out #generics(input: #name #generics) -> &#lifetime pgx::cstr_core::CStr {
                 let mut buffer = StringInfo::new();
                 input.output(&mut buffer);
                 buffer.into()
@@ -766,12 +766,12 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
         // otherwise if it's PgVarlenaInOutFuncs our _in/_out functions use a PgVarlena
         stream.extend(quote! {
             #[pg_extern(immutable,parallel_safe)]
-            pub fn #funcname_in #generics(input: &#lifetime std::ffi::CStr) -> pgx::PgVarlena<#name #generics> {
+            pub fn #funcname_in #generics(input: &#lifetime pgx::cstr_core::CStr) -> pgx::PgVarlena<#name #generics> {
                 #name::input(input)
             }
 
             #[pg_extern(immutable,parallel_safe)]
-            pub fn #funcname_out #generics(input: pgx::PgVarlena<#name #generics>) -> &#lifetime std::ffi::CStr {
+            pub fn #funcname_out #generics(input: pgx::PgVarlena<#name #generics>) -> &#lifetime pgx::cstr_core::CStr {
                 let mut buffer = StringInfo::new();
                 input.output(&mut buffer);
                 buffer.into()

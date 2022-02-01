@@ -94,6 +94,8 @@ pub use pgx_pg_sys as pg_sys; // the module only, not its contents
 pub use pgx_pg_sys::submodules::*;
 pub use pgx_pg_sys::PgBuiltInOids; // reexport this so it looks like it comes from here
 
+pub use cstr_core;
+
 use core::any::TypeId;
 use once_cell::sync::Lazy;
 use std::collections::HashSet;
@@ -194,6 +196,7 @@ pub static DEFAULT_TYPEID_SQL_MAPPING: Lazy<HashSet<RustSqlMapping>> = Lazy::new
 
     map_type!(m, String, "text");
     map_type!(m, &std::ffi::CStr, "cstring");
+    map_type!(m, &crate::cstr_core::CStr, "cstring");
     map_type!(m, (), "void");
     map_type!(m, i8, "\"char\"");
     map_type!(m, i16, "smallint");
@@ -284,29 +287,28 @@ macro_rules! pg_magic_func {
         #[allow(unused)]
         #[link_name = "Pg_magic_func"]
         pub extern "C" fn Pg_magic_func() -> &'static pgx::pg_sys::Pg_magic_struct {
+            use core::mem::size_of;
             use pgx;
-            use std::mem::size_of;
-            use std::os::raw::c_int;
 
             #[cfg(any(feature = "pg10", feature = "pg11", feature = "pg12"))]
             const MY_MAGIC: pgx::pg_sys::Pg_magic_struct = pgx::pg_sys::Pg_magic_struct {
-                len: size_of::<pgx::pg_sys::Pg_magic_struct>() as c_int,
-                version: pgx::pg_sys::PG_VERSION_NUM as c_int / 100,
-                funcmaxargs: pgx::pg_sys::FUNC_MAX_ARGS as c_int,
-                indexmaxkeys: pgx::pg_sys::INDEX_MAX_KEYS as c_int,
-                namedatalen: pgx::pg_sys::NAMEDATALEN as c_int,
-                float4byval: pgx::pg_sys::USE_FLOAT4_BYVAL as c_int,
-                float8byval: pgx::pg_sys::USE_FLOAT8_BYVAL as c_int,
+                len: size_of::<pgx::pg_sys::Pg_magic_struct>() as i32,
+                version: pgx::pg_sys::PG_VERSION_NUM as i32 / 100,
+                funcmaxargs: pgx::pg_sys::FUNC_MAX_ARGS as i32,
+                indexmaxkeys: pgx::pg_sys::INDEX_MAX_KEYS as i32,
+                namedatalen: pgx::pg_sys::NAMEDATALEN as i32,
+                float4byval: pgx::pg_sys::USE_FLOAT4_BYVAL as i32,
+                float8byval: pgx::pg_sys::USE_FLOAT8_BYVAL as i32,
             };
 
             #[cfg(any(feature = "pg13", feature = "pg14"))]
             const MY_MAGIC: pgx::pg_sys::Pg_magic_struct = pgx::pg_sys::Pg_magic_struct {
-                len: size_of::<pgx::pg_sys::Pg_magic_struct>() as c_int,
-                version: pgx::pg_sys::PG_VERSION_NUM as c_int / 100,
-                funcmaxargs: pgx::pg_sys::FUNC_MAX_ARGS as c_int,
-                indexmaxkeys: pgx::pg_sys::INDEX_MAX_KEYS as c_int,
-                namedatalen: pgx::pg_sys::NAMEDATALEN as c_int,
-                float8byval: pgx::pg_sys::USE_FLOAT8_BYVAL as c_int,
+                len: size_of::<pgx::pg_sys::Pg_magic_struct>() as i32,
+                version: pgx::pg_sys::PG_VERSION_NUM as i32 / 100,
+                funcmaxargs: pgx::pg_sys::FUNC_MAX_ARGS as i32,
+                indexmaxkeys: pgx::pg_sys::INDEX_MAX_KEYS as i32,
+                namedatalen: pgx::pg_sys::NAMEDATALEN as i32,
+                float8byval: pgx::pg_sys::USE_FLOAT8_BYVAL as i32,
             };
 
             // go ahead and register our panic handler since Postgres
@@ -336,8 +338,8 @@ macro_rules! pg_sql_graph_magic {
         pub extern "C" fn __pgx_marker() -> pgx::datum::sql_entity_graph::reexports::eyre::Result<
             pgx::datum::sql_entity_graph::ControlFile,
         > {
+            use core::convert::TryFrom;
             use pgx::datum::sql_entity_graph::reexports::eyre::WrapErr;
-            use std::convert::TryFrom;
             let package_version = env!("CARGO_PKG_VERSION");
             let context = include_str!(concat!(
                 env!("CARGO_MANIFEST_DIR"),

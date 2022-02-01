@@ -229,6 +229,9 @@ impl ToTokens for PgExtern {
             #[no_mangle]
             pub extern "C" fn  #sql_graph_entity_fn_name() -> pgx::datum::sql_entity_graph::SqlGraphEntity {
                 use core::any::TypeId;
+                extern crate alloc;
+                use alloc::vec::Vec;
+                use alloc::vec;
                 let submission = pgx::datum::sql_entity_graph::PgExternEntity {
                     name: #name,
                     unaliased_name: stringify!(#ident),

@@ -26,6 +26,8 @@ exclude = [
     "pgx-examples/custom_types",
     "pgx-examples/custom_sql",
     "pgx-examples/errors",
+    "pgx-examples/nostd",
+    "pgx-examples/operators",
     "pgx-examples/schemas",
     "pgx-examples/shmem",
     "pgx-examples/spi",

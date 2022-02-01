@@ -1,7 +1,7 @@
-// use pgx::datum::sql_entity_graph::aggregate::{FinalizeModify, ParallelOption};
+use pgx::cstr_core::CStr;
 use pgx::*;
 use serde::{Deserialize, Serialize};
-use std::{ffi::CStr, str::FromStr};
+use std::str::FromStr;
 
 pg_module_magic!();
 
@@ -14,7 +14,10 @@ pub struct IntegerAvgState {
 
 impl IntegerAvgState {
     #[inline(always)]
-    fn state(mut current: <Self as Aggregate>::State, arg: <Self as Aggregate>::Args) -> <Self as Aggregate>::State {
+    fn state(
+        mut current: <Self as Aggregate>::State,
+        arg: <Self as Aggregate>::Args,
+    ) -> <Self as Aggregate>::State {
         current.sum += arg;
         current.n += 1;
         current
@@ -65,7 +68,11 @@ impl Aggregate for IntegerAvgState {
     const INITIAL_CONDITION: Option<&'static str> = Some("0,0");
 
     #[pgx(parallel_safe, immutable)]
-    fn state(current: Self::State, arg: Self::Args, _fcinfo: pg_sys::FunctionCallInfo) -> Self::State {
+    fn state(
+        current: Self::State,
+        arg: Self::Args,
+        _fcinfo: pg_sys::FunctionCallInfo,
+    ) -> Self::State {
         Self::state(current, arg)
     }
 
@@ -130,10 +137,7 @@ mod tests {
         let avg_state = IntegerAvgState::state(avg_state, 1);
         let avg_state = IntegerAvgState::state(avg_state, 2);
         let avg_state = IntegerAvgState::state(avg_state, 3);
-        assert_eq!(
-            2,
-            IntegerAvgState::finalize(avg_state),
-        );
+        assert_eq!(2, IntegerAvgState::finalize(avg_state),);
     }
 
     #[pg_test]
