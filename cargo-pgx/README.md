@@ -514,21 +514,22 @@ distobutions or MacOS Postgres installations.
 
 ```shell script
 $ cargo pgx package --help
- cargo-pgx-package
- create an installation package directory (in ./target/[debug|release]/extname-pgXX/) for the Postgres installation
- specified by whatever "pg_config" is currently on your $PATH
+cargo-pgx-package 0.2.6
+ZomboDB, LLC <zombodb@gmail.com>
+Create an installation package directory (in `./target/[debug|release]/extname-pgXX/`)
 
- USAGE:
-     cargo-pgx pgx package [FLAGS]
-
- FLAGS:
-     -d, --debug      compile for debug mode (default is release)
-     -h, --help       Prints help information
-     -V, --version    Prints version information
+USAGE:
+    cargo pgx package [OPTIONS]
 
 OPTIONS:
-        --features <features>...        additional cargo features to activate (default is '--no-default-features')
-        -c, --pg_config <pg_config>     the `pg_config` path (default is first in $PATH)
+        --all-features             Activate all available features
+    -c, --pg-config <PG_CONFIG>    The `pg_config` path (default is first in $PATH)
+    -d, --debug                    Compile for debug mode (default is release) [env: PROFILE=]
+        --features <FEATURES>      Space-separated list of features to activate
+    -h, --help                     Print help information
+        --no-default-features      Do not activate the `default` feature
+    -v, --verbose                  Enable info logs, -vv for debug, -vvv for trace
+    -V, --version                  Print version information
 ```
 
 ## Inspect you Extension Schema
@@ -538,35 +539,61 @@ If you just want to look at the full extension schema that pgx will generate, us
 
 ```shell script
 $ cargo pgx schema --help
-cargo-pgx-schema 0.1.22
-generate extension schema files
+cargo-pgx-schema 0.2.6
+ZomboDB, LLC <zombodb@gmail.com>
+Generate extension schema files
+
+The SQL generation process requires configuring a few settings in the crate. Normally `cargo pgx
+schema --force-default` can set these automatically.
 
 USAGE:
-    cargo pgx schema [FLAGS] [OPTIONS] [--] [PG_VERSION]
-
-FLAGS:
-    -f, --force-default    Force the generation of default required files
-    -h, --help             Prints help information
-    -m, --manual           Skip checking for required files
-    -r, --release          Compile for release mode (default is debug)
-    -V, --version          Prints version information
-    -v, --verbose          Enable debug logging (-vv for trace)
-
-OPTIONS:
-    -d, --dot <dot>                 A path to output a produced GraphViz DOT file [default: extension.dot]
-        --features <features>...    additional cargo features to activate (default is none)
-    -o, --out <out>                 A path to output a produced SQL file (default is `sql/$EXTNAME-$VERSION.sql`)
-    -c, --pg_config <pg_config>     the `pg_config` path (default is first in $PATH)
+    cargo pgx schema [OPTIONS] [PG_VERSION]
 
 ARGS:
-    <PG_VERSION>    Do you want to run against Postgres 'pg10', 'pg11', 'pg12', 'pg13'?
+    <PG_VERSION>
+            Do you want to run against Postgres `pg10`, `pg11`, `pg12`, `pg13`, `pg14`?
 
-REQUIREMENTS
-    The SQL generation process requires configuring a few settings in the crate. Normally 'cargo pgx schema --force-
-default'
-    can set these automatically.
-    
-    They are documented in the README.md of cargo-pgx: https://github.com/zombodb/pgx/tree/master/cargo-pgx#Manual-SQL-Generation
+OPTIONS:
+        --all-features
+            Activate all available features
+
+    -c, --pg-config <PG_CONFIG>
+            The `pg_config` path (default is first in $PATH)
+
+    -d, --dot <DOT>
+            A path to output a produced GraphViz DOT file
+
+    -f, --force-default
+            Force the generation of default required files
+
+        --features <FEATURES>
+            Space-separated list of features to activate
+
+    -h, --help
+            Print help information
+
+    -m, --manual
+            Skip checking for required files
+
+        --no-default-features
+            Do not activate the `default` feature
+
+    -o, --out <OUT>
+            A path to output a produced SQL file (default is `sql/$EXTNAME-$VERSION.sql`)
+
+    -r, --release
+            Compile for release mode (default is debug)
+            
+            [env: PROFILE=]
+
+    -s, --skip-build
+            Skip building the `sql-generator`, use an existing build
+
+    -v, --verbose
+            Enable info logs, -vv for debug, -vvv for trace
+
+    -V, --version
+            Print version information
 ```
 
 ### Manual SQL Generation
@@ -586,7 +613,7 @@ The flags are typically set by a linker script:
 if [[ $CARGO_BIN_NAME == "sql-generator" ]]; then
     UNAME=$(uname)
     if [[ $UNAME == "Darwin" ]]; then
-        TEMP=$(mktemp pgx-XXX)
+	TEMP=$(mktemp pgx-XXX)
         echo "*_pgx_internals_*" > ${TEMP}
         gcc -exported_symbols_list ${TEMP} $@
         rm -rf ${TEMP}
