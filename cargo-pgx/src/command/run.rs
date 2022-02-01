@@ -37,15 +37,34 @@ pub(crate) struct Run {
 
 impl CommandExecute for Run {
     #[tracing::instrument(level = "error", skip(self))]
-    fn execute(self) -> eyre::Result<()> {
+    fn execute(mut self) -> eyre::Result<()> {
         let metadata = crate::metadata::metadata(&self.features)?;
         crate::metadata::validate(&metadata)?;
         let manifest = crate::manifest::manifest(&metadata)?;
-
-        let pg_version = match self.pg_version {
-            Some(s) => s,
-            None => crate::manifest::default_pg_version(&manifest)
-                .ok_or(eyre!("No provided `pg$VERSION` flag."))?,
+        let pgx = Pgx::from_config()?;
+        
+        let (pg_config, pg_version) = match self.pg_version {
+            Some(pg_version) => {
+                match pgx.get(&pg_version) {
+                    Ok(pg_config) => (pg_config, pg_version),
+                    Err(err) => {
+                        if self.dbname.is_some() {
+                            return Err(err);
+                        }
+                        // It's actually the dbname! We should infer from the manifest.
+                        self.dbname = Some(pg_version);
+                        let default_pg_version = crate::manifest::default_pg_version(&manifest)
+                            .ok_or(eyre!("No provided `pg$VERSION` flag."))?;
+                        (pgx.get(&default_pg_version)?, default_pg_version)
+                    },
+                }
+            },
+            None => {
+                // We should infer from the manifest.
+                let default_pg_version = crate::manifest::default_pg_version(&manifest)
+                    .ok_or(eyre!("No provided `pg$VERSION` flag."))?;
+                (pgx.get(&default_pg_version)?, default_pg_version)
+            },
         };
         let features = crate::manifest::features_for_version(self.features, &manifest, &pg_version);
 
@@ -53,9 +72,9 @@ impl CommandExecute for Run {
             Some(dbname) => dbname,
             None => get_property("extname")?.ok_or(eyre!("could not determine extension name"))?,
         };
-
+        
         run_psql(
-            Pgx::from_config()?.get(&pg_version)?,
+            pg_config,
             &dbname,
             self.release,
             self.no_schema,

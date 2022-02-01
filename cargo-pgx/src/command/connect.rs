@@ -26,15 +26,31 @@ pub(crate) struct Connect {
 
 impl CommandExecute for Connect {
     #[tracing::instrument(level = "error", skip(self))]
-    fn execute(self) -> eyre::Result<()> {
+    fn execute(mut self) -> eyre::Result<()> {
+        let metadata = crate::metadata::metadata(&Default::default())?;
+        crate::metadata::validate(&metadata)?;
+        let manifest = crate::manifest::manifest(&metadata)?;
+        let pgx = Pgx::from_config()?;
+
         let pg_version = match self.pg_version {
-            Some(s) => s,
+            Some(pg_version) => match pgx.get(&pg_version) {
+                Ok(_) => pg_version,
+                Err(err) => {
+                    if self.dbname.is_some() {
+                        return Err(err);
+                    }
+                    // It's actually the dbname! We should infer from the manifest.
+                    self.dbname = Some(pg_version);
+                    let default_pg_version = crate::manifest::default_pg_version(&manifest)
+                        .ok_or(eyre!("No provided `pg$VERSION` flag."))?;
+                    default_pg_version
+                },
+            },
             None => {
-                let metadata = crate::metadata::metadata(&Default::default())?;
-                crate::metadata::validate(&metadata)?;
-                let manifest = crate::manifest::manifest(&metadata)?;
-                crate::manifest::default_pg_version(&manifest)
-                    .ok_or(eyre!("No provided `pg$VERSION` flag."))?
+                // We should infer from the manifest.
+                let default_pg_version = crate::manifest::default_pg_version(&manifest)
+                    .ok_or(eyre!("No provided `pg$VERSION` flag."))?;
+                default_pg_version
             }
         };
 
