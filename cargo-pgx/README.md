@@ -2,9 +2,9 @@
 
 `cargo-pgx` is a Cargo subcommand for managing `pgx`-based Postgres extensions.
 
-You'll want to use `cargo pgx` during your extension development process.  It automates the process of creating new Rust crate projects, auto-generating the SQL schema for your extension, installing your extension locally for testing with Postgres, and running your test suite against one or more versions of Postgres.
+You'll want to use `cargo pgx` during your extension development process. It automates the process of creating new Rust crate projects, auto-generating the SQL schema for your extension, installing your extension locally for testing with Postgres, and running your test suite against one or more versions of Postgres.
 
-A video walkthrough of its abilities can be found here:  https://www.twitch.tv/videos/684087991
+A video walkthrough of its abilities can be found here: https://www.twitch.tv/videos/684087991
 
 ## Installing
 
@@ -33,7 +33,7 @@ SUBCOMMANDS:
     connect        connect, via psql, to a Postgres instance
     get            get a property from the extension control file
     help           Prints this message or the help of the given subcommand(s)
-    init           initize pgx development environment for the first time
+    init           initialize pgx development environment for the first time
     install        install the extension from the current crate to the Postgres specified by whatever "pg_config" is
                    currently on your $PATH
     new            create a new extension crate
@@ -48,10 +48,10 @@ SUBCOMMANDS:
 
 ## Environment Variables
 
- - `PGX_HOME` - If set, overrides `pgx`'s default directory of `~/.pgx/`
- - `PGX_BUILD_FLAGS` - If set during `cargo pgx run/test/install`, these additional flags are passed to `cargo build` while building the extension
- - `PGX_BUILD_VERBOSE` - Set to true to enable verbose "build.rs" output -- useful for debugging build issues
- - `HTTPS_PROXY` - If set during `cargo pgx init`, it will download the Postgres sources using these proxy settings. For more details refer to the [env_proxy crate documentation](https://docs.rs/env_proxy/*/env_proxy/fn.for_url.html).
+- `PGX_HOME` - If set, overrides `pgx`'s default directory of `~/.pgx/`
+- `PGX_BUILD_FLAGS` - If set during `cargo pgx run/test/install`, these additional flags are passed to `cargo build` while building the extension
+- `PGX_BUILD_VERBOSE` - Set to true to enable verbose "build.rs" output -- useful for debugging build issues
+- `HTTPS_PROXY` - If set during `cargo pgx init`, it will download the Postgres sources using these proxy settings. For more details refer to the [env_proxy crate documentation](https://docs.rs/env_proxy/*/env_proxy/fn.for_url.html).
 
 ## First Time Initialization
 
@@ -87,19 +87,19 @@ $ cargo pgx init
 
 `cargo pgx init` is required to be run once to properly configure the `pgx` development environment.
 
-As shown by the screenshot above, it downloads the latest versions of Postgres v10, v11, v12, v13, configures them, compiles them, and installs them to `~/.pgx/`.  Other `pgx` commands such as `run` and `test` will fully manage and otherwise use these Postgres installations for you.
+As shown by the screenshot above, it downloads the latest versions of Postgres v10, v11, v12, v13, configures them, compiles them, and installs them to `~/.pgx/`. Other `pgx` commands such as `run` and `test` will fully manage and otherwise use these Postgres installations for you.
 
-`pgx` is designed to support multiple Postgres versions in such a way that during development, you'll know if you're trying to use a Postgres API that isn't common across all three versions.  It's also designed to make testing your extension against these versions easy.  This is why it requires you have three fully compiled and installed versions of Postgres during development.
+`pgx` is designed to support multiple Postgres versions in such a way that during development, you'll know if you're trying to use a Postgres API that isn't common across all three versions. It's also designed to make testing your extension against these versions easy. This is why it requires you to have three fully compiled and installed versions of Postgres during development.
 
 If you want to use your operating system's package manager to install Postgres, `cargo pgx init` has optional arguments that allow you to specify where they're installed (see below).
 
 What you're telling `cargo pgx init` is the full path to `pg_config` for each version.
 
-For any version you specify, `cargo pgx init` will forego downloading/compiling/installing it.  `pgx` will then use that locally-installed version just as it uses any version it downloads/compiles/installs itself.
+For any version you specify, `cargo pgx init` will forego downloading/compiling/installing it. `pgx` will then use that locally-installed version just as it uses any version it downloads/compiles/installs itself.
 
-However, if the unless the "path to pg_config" is the literal string `download`, the `pgx` will download and compile that version of Postgres for you.
+However, if the "path to pg_config" is the literal string `download`, then `pgx` will download and compile that version of Postgres for you.
 
-When the various `--pgXX` options are specified, these are they **only** versions of Postgres that `pgx` will manage for you.
+When the various `--pgXX` options are specified, these are the **only** versions of Postgres that `pgx` will manage for you.
 
 You'll also want to make sure you have the "postgresql-server-dev" package installed for each version you want to manage yourself.
 
@@ -110,7 +110,7 @@ If a new minor Postgres version is released in the future you can simply run `ca
 ```shell script
 $ cargo pgx init --help
 cargo-pgx-pgx-init
-initize pgx development environment for the first time
+initialize pgx development environment for the first time
 
 USAGE:
     cargo-pgx pgx init [OPTIONS]
@@ -144,9 +144,9 @@ OPTIONS:
 
 ## Creating a new Extension
 
- ![new](https://raw.githubusercontent.com/zombodb/pgx/master/cargo-pgx/new.png)
+![new](https://raw.githubusercontent.com/zombodb/pgx/master/cargo-pgx/new.png)
 
-`cargo pgx new <extname>` is an easy way to get started creating a new extension.  It's similar to `cargo new <name>`, but does the additional things necessary to support building a Rust Postgres extension.
+`cargo pgx new <extname>` is an easy way to get started creating a new extension. It's similar to `cargo new <name>`, but does the additional things necessary to support building a Rust Postgres extension.
 
 If you'd like to create a "background worker" instead, specify the `--bgworker` argument.
 
@@ -169,10 +169,8 @@ ARGS:
     <NAME>    the name of the extension
 ```
 
-
-
 ## Managing Your Postgres Installations
-  
+
 ```shell script
 $ cargo pgx status
 Postgres v10 is stopped
@@ -201,14 +199,14 @@ Postgres v11 is running
 Postgres v12 is running
 Postgres v13 is running
 ```
-  
-`cargo pgx` has three commands for managing each Postgres installation:  `start`, `stop`, and `status`.  Additionally, `cargo pgx run` (see below) will automatically start its target Postgres instance if not already running.
 
-When starting a Postgres instance, `pgx` starts it on port `28800 + PG_MAJOR_VERSION`, so Postgres 10 runs on `28810`, 11 on `28811`, etc.  Additionally, the first time any of these are started, it'll automaticaly initialize a `PGDATA` directory in `~/.pgx/data-[10 | 11 | 12]`.  Doing so allows `pgx` to manage either Postgres versions it installed or ones already on your computer, and to make sure that in the latter case, `pgx` managed versions don't interfere with what might already be running.
+`cargo pgx` has three commands for managing each Postgres installation: `start`, `stop`, and `status`. Additionally, `cargo pgx run` (see below) will automatically start its target Postgres instance if not already running.
 
-`pgx` doesn't tear down these instances.  While they're stored in a hidden directory in your home directory, `pgx` considers these important and permanent database installations.
+When starting a Postgres instance, `pgx` starts it on port `28800 + PG_MAJOR_VERSION`, so Postgres 10 runs on `28810`, 11 on `28811`, etc. Additionally, the first time any of these are started, it'll automaticaly initialize a `PGDATA` directory in `~/.pgx/data-[10 | 11 | 12]`. Doing so allows `pgx` to manage either Postgres versions it installed or ones already on your computer, and to make sure that in the latter case, `pgx` managed versions don't interfere with what might already be running.
 
-Once started, you can connect to them using `psql` (if you have it on your $PATH) like so:  `psql -p 28812`.  However, you probably just want the `cargo pgx run` command.
+`pgx` doesn't tear down these instances. While they're stored in a hidden directory in your home directory, `pgx` considers these important and permanent database installations.
+
+Once started, you can connect to them using `psql` (if you have it on your $PATH) like so: `psql -p 28812`. However, you probably just want the `cargo pgx run` command.
 
 ## Compiling and Running Your Extension
 
@@ -236,7 +234,7 @@ strings=# CREATE EXTENSION strings;
 CREATE EXTENSION
 strings=# \df strings.*
                                       List of functions
- Schema  |     Name      | Result data type |           Argument data types            | Type 
+ Schema  |     Name      | Result data type |           Argument data types            | Type
 ---------+---------------+------------------+------------------------------------------+------
  strings | append        | text             | input text, extra text                   | func
  strings | return_static | text             |                                          | func
@@ -247,7 +245,7 @@ strings=# \df strings.*
 (6 rows)
 
 strings=# select strings.to_lowercase('PGX');
- to_lowercase 
+ to_lowercase
 --------------
  pgx
 (1 row)
@@ -255,15 +253,15 @@ strings=# select strings.to_lowercase('PGX');
 
 `cargo pgx run <pg10 | pg11 | pg12 | pg13>` is the primary interface into compiling and interactively testing/using your extension during development.
 
-The very first time you execute `cargo pgx run pgXX`, it needs to compile not only your extension, but pgx itself, along with all its dependencies.  Depending on your computer, this could take a bit of time (`pgx` is nearly 200k lines of Rust when counting the generated bindings for Postgres).  Afterwards, however (as seen in the above screenshot), it's fairly fast.
+The very first time you execute `cargo pgx run pgXX`, it needs to compile not only your extension, but pgx itself, along with all its dependencies. Depending on your computer, this could take a bit of time (`pgx` is nearly 200k lines of Rust when counting the generated bindings for Postgres). Afterwards, however (as seen in the above screenshot), it's fairly fast.
 
-`cargo pgx run` compiles your extension, installs it to the specified Postgres installation as described by its `pg_config` tool, starts that Postgres instance using the same process as `cargo pgx start pgXX`, and drops you into a `psql` shell connected to a database, by default, named after your extension.  From there, it's up to you to create your extension and use it.
+`cargo pgx run` compiles your extension, installs it to the specified Postgres installation as described by its `pg_config` tool, starts that Postgres instance using the same process as `cargo pgx start pgXX`, and drops you into a `psql` shell connected to a database, by default, named after your extension. From there, it's up to you to create your extension and use it.
 
-This is also the stage where `pgx` automatically generates the SQL schema for your extension.  It places individual `modname.generated.sql` files into `./sql/`, and then combines those together by the order defined in `./sql/load-order.txt`.
+This is also the stage where `pgx` automatically generates the SQL schema for your extension. It places individual `modname.generated.sql` files into `./sql/`, and then combines those together by the order defined in `./sql/load-order.txt`.
 
 When you exit `psql`, the Postgres instance continues to run in the background.
 
-For Postgres installations which are already on your computer, `cargo pgx run` will need write permissions to the directories described by `pg_config --pkglibdir` and `pg_config --sharedir`.  It's up to you to decide how to make that happen.  While a single Postgres installation can be started multiple times on different ports and different data directories, it does not support multiple "extension library directories".
+For Postgres installations which are already on your computer, `cargo pgx run` will need write permissions to the directories described by `pg_config --pkglibdir` and `pg_config --sharedir`. It's up to you to decide how to make that happen. While a single Postgres installation can be started multiple times on different ports and different data directories, it does not support multiple "extension library directories".
 
 ```shell script
 $ cargo pgx run --help
@@ -297,7 +295,7 @@ psql (13.3)
 Type "help" for help.
 
 strings=# select strings.to_lowercase('PGX');
- to_lowercase 
+ to_lowercase
 --------------
  pgx
 (1 row)
@@ -309,7 +307,7 @@ your extension, use `cargo pgx connect <pg10 | pg11 | pg12 | pg13>`.
 This command will use the default database named for your extension, or you can specify another
 database name as the final argument.
 
-If the specified database doesn't exist, `cargo pgx connect` will create it.  Similarly, if
+If the specified database doesn't exist, `cargo pgx connect` will create it. Similarly, if
 the specified version of Postgres isn't running, it'll be automatically started.
 
 ```shell script
@@ -355,7 +353,7 @@ to the Postgres installation described by the `pg_config` tool currently on your
 
 You'll need write permissions to the directories described by `pg_config --pkglibdir` and `pg_config --sharedir`.
 
-By default, `cargo pgx install` builds your extension in debug mode.  Specifying `--release` changes that.
+By default, `cargo pgx install` builds your extension in debug mode. Specifying `--release` changes that.
 
 ```shell script
 $ cargo pgx install --help
@@ -423,13 +421,13 @@ test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fini
 
 `cargo pgx test [pg10 | pg11 | pg12 | pg13]` runs your `#[test]` and `#[pg_test]` annotated functions using cargo's test system.
 
-During the testing process, `pgx` starts a tempory instance of Postgres with its `PGDATA` directory in `./target/pgx-test-data-PGVER/`.  This Postgres instance is stopped as soon as the test framework has finished.
+During the testing process, `pgx` starts a tempory instance of Postgres with its `PGDATA` directory in `./target/pgx-test-data-PGVER/`. This Postgres instance is stopped as soon as the test framework has finished.
 
-The output is standard "cargo test" output along with some Postgres log output.  In the case of test failures, the failure report will include any Postgres log messages generated by that particular test.
+The output is standard "cargo test" output along with some Postgres log output. In the case of test failures, the failure report will include any Postgres log messages generated by that particular test.
 
-Rust `#[test]` functions behave normally, while `#[pg_test]` functions are run **inside** the Postgres instance and have full access to all of Postgres internals.  All tests are run in parallel, regardless of their type.
+Rust `#[test]` functions behave normally, while `#[pg_test]` functions are run **inside** the Postgres instance and have full access to all of Postgres internals. All tests are run in parallel, regardless of their type.
 
-Additionally, a `#[pg_test]` function runs in a transaction that is aborted when the test is finished.  As such, any changes it might
+Additionally, a `#[pg_test]` function runs in a transaction that is aborted when the test is finished. As such, any changes it might
 make to the database are not preserved.
 
 ```shell script
@@ -546,7 +544,7 @@ REQUIREMENTS
     The SQL generation process requires configuring a few settings in the crate. Normally 'cargo pgx schema --force-
 default'
     can set these automatically.
-    
+
     They are documented in the README.md of cargo-pgx: https://github.com/zombodb/pgx/tree/master/cargo-pgx#Manual-SQL-Generation
 ```
 
@@ -554,13 +552,13 @@ default'
 
 > **This section is for users with custom `.cargo/config` settings or advanced requirements.**
 >
-> If you are not using `cargo pgx init` to generate your extension, or you're upgrading your extension from `pgx` 0.1.21 or earlier, you can usually have `cargo-pgx` provision it's base requirements with `cargo pgx schema --force-default`. 
+> If you are not using `cargo pgx init` to generate your extension, or you're upgrading your extension from `pgx` 0.1.21 or earlier, you can usually have `cargo-pgx` provision it's base requirements with `cargo pgx schema --force-default`.
 
 SQL generation requires some linker flags, as well as a binary.
-    
+
 The flags are typically set by a linker script:
 
-```bash  
+```bash
 #! /usr/bin/env bash
 # Auto-generated by pgx. You may edit this, or delete it to have a new one created.
 
@@ -597,7 +595,7 @@ pgx::pg_binary_magic!(extension_name);
 
 If `cargo pgx schema` does not detect these, it will create them automatically with defaults.
 To skip writing defaults, use `-m`, to overwrite exiting files with these defaults, use `-f`.
-    
+
 Finally, `lib.crate-type` should be set in `Cargo.toml`:
 
 ```toml
