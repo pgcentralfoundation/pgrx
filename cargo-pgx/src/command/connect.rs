@@ -27,9 +27,6 @@ pub(crate) struct Connect {
 impl CommandExecute for Connect {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(mut self) -> eyre::Result<()> {
-        let metadata = crate::metadata::metadata(&Default::default())?;
-        crate::metadata::validate(&metadata)?;
-        let manifest = crate::manifest::manifest(&metadata)?;
         let pgx = Pgx::from_config()?;
 
         let pg_version = match self.pg_version {
@@ -41,6 +38,11 @@ impl CommandExecute for Connect {
                     }
                     // It's actually the dbname! We should infer from the manifest.
                     self.dbname = Some(pg_version);
+
+                    let metadata = crate::metadata::metadata(&Default::default())?;
+                    crate::metadata::validate(&metadata)?;
+                    let manifest = crate::manifest::manifest(&metadata)?;
+                    
                     let default_pg_version = crate::manifest::default_pg_version(&manifest)
                         .ok_or(eyre!("No provided `pg$VERSION` flag."))?;
                     default_pg_version
@@ -48,6 +50,10 @@ impl CommandExecute for Connect {
             },
             None => {
                 // We should infer from the manifest.
+                let metadata = crate::metadata::metadata(&Default::default())?;
+                crate::metadata::validate(&metadata)?;
+                let manifest = crate::manifest::manifest(&metadata)?;
+
                 let default_pg_version = crate::manifest::default_pg_version(&manifest)
                     .ok_or(eyre!("No provided `pg$VERSION` flag."))?;
                 default_pg_version
