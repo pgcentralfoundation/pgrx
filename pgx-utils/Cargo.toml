@@ -12,25 +12,25 @@ readme = "README.md"
 
 [dependencies]
 colored = "2.0.0"
-convert_case = "0.4.0"
+convert_case = "0.5.0"
 dirs = "4.0.0"
 env_proxy = "0.4.1"
 proc-macro2 = { version = "1.0.36", features = [ "span-locations" ] }
-quote = "1.0.14"
+quote = "1.0.15"
 regex = "1.5.4"
 rttp_client = "0.1.0"
-serde = "1.0.133"
-serde_derive = "1.0.133"
+serde = "1.0.136"
+serde_derive = "1.0.136"
 serde-xml-rs = "0.5.1"
-serde_json = "1.0.75"
-syn = { version = "1.0.85", features = [ "extra-traits", "full", "fold", "parsing" ] }
+serde_json = "1.0.78"
+syn = { version = "1.0.86", features = [ "extra-traits", "full", "fold", "parsing" ] }
 toml = "0.5.8"
 unescape = "0.1.0"
 url = "2.2.2"
-eyre = "0.6.5"
+eyre = "0.6.6"
 color-eyre = "0.6.0"
 tracing = "0.1.29"
 tracing-error = "0.2.0"
-tracing-subscriber = { version = "0.3.6", features = [ "env-filter" ] }
+tracing-subscriber = { version = "0.3.7", features = [ "env-filter" ] }
 libloading = "0.7.3"
-clap = { version = "3.0.10", features = [ "env", "suggestions", "cargo", "derive" ] }
+clap = { version = "3.0.13", features = [ "env", "suggestions", "cargo", "derive" ] }
