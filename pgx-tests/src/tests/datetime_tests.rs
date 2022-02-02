@@ -45,6 +45,11 @@ fn return_3pm_mountain_time() -> TimestampWithTimeZone {
     three_pm
 }
 
+#[pg_extern]
+fn timestamptz_to_i64(tstz: pg_sys::TimestampTz) -> i64 {
+    tstz
+}
+
 #[cfg(test)]
 #[pgx::pg_schema]
 mod serialization_tests {
@@ -129,6 +134,8 @@ mod tests {
     use crate as pgx_tests;
 
     use pgx::*;
+
+    use std::time::Duration;
 
     #[pg_test]
     fn test_accept_date_now() {
@@ -250,5 +257,15 @@ mod tests {
             .expect("failed to get SPI result");
 
         assert_eq!(ts.hour(), 14);
+    }
+
+    #[pg_test]
+    fn test_timestamptz() {
+        let result = Spi::get_one::<i64>(
+            "SELECT timestamptz_to_i64('2000-01-01 00:01:00.0000000+00'::timestamptz)",
+        )
+        .expect("failed to get SPI result");
+
+        assert_eq!(result, Duration::from_secs(60).as_micros() as i64);
     }
 }

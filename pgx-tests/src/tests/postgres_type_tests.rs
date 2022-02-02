@@ -1,6 +1,6 @@
+use pgx::cstr_core::CStr;
 use pgx::*;
 use serde::{Deserialize, Serialize};
-use std::ffi::CStr;
 use std::str::FromStr;
 
 #[derive(Copy, Clone, PostgresType)]

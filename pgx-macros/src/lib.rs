@@ -14,7 +14,7 @@ use quote::{quote, quote_spanned, ToTokens};
 use rewriter::*;
 use std::collections::HashSet;
 use syn::spanned::Spanned;
-use syn::{parse_macro_input, Attribute, Data, DeriveInput, Item, ItemFn};
+use syn::{parse_macro_input, Attribute, Data, DeriveInput, Item, ItemFn, ItemImpl};
 
 /// Declare a function as `#[pg_guard]` to indicate that it is called from a Postgres `extern "C"`
 /// function so that Rust `panic!()`s (and Postgres `elog(ERROR)`s) will be properly handled by `pgx`
@@ -294,12 +294,12 @@ extension_sql!(r#"\
 );
 
 #[pg_extern(immutable)]
-fn complex_in(input: &std::ffi::CStr) -> PgBox<Complex> {
+fn complex_in(input: &pgx::cstr_core::CStr) -> PgBox<Complex> {
     todo!()
 }
 
 #[pg_extern(immutable)]
-fn complex_out(complex: PgBox<Complex>) -> &'static std::ffi::CStr {
+fn complex_out(complex: PgBox<Complex>) -> &'static pgx::cstr_core::CStr {
     todo!()
 }
 
@@ -735,12 +735,12 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
             impl #generics JsonInOutFuncs #inout_generics for #name #generics {}
 
             #[pg_extern(immutable,parallel_safe)]
-            pub fn #funcname_in #generics(input: &#lifetime std::ffi::CStr) -> #name #generics {
+            pub fn #funcname_in #generics(input: &#lifetime pgx::cstr_core::CStr) -> #name #generics {
                 #name::input(input)
             }
 
             #[pg_extern(immutable,parallel_safe)]
-            pub fn #funcname_out #generics(input: #name #generics) -> &#lifetime std::ffi::CStr {
+            pub fn #funcname_out #generics(input: #name #generics) -> &#lifetime pgx::cstr_core::CStr {
                 let mut buffer = StringInfo::new();
                 input.output(&mut buffer);
                 buffer.into()
@@ -751,12 +751,12 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
         // otherwise if it's InOutFuncs our _in/_out functions use an owned type instance
         stream.extend(quote! {
             #[pg_extern(immutable,parallel_safe)]
-            pub fn #funcname_in #generics(input: &#lifetime std::ffi::CStr) -> #name #generics {
+            pub fn #funcname_in #generics(input: &#lifetime pgx::cstr_core::CStr) -> #name #generics {
                 #name::input(input)
             }
 
             #[pg_extern(immutable,parallel_safe)]
-            pub fn #funcname_out #generics(input: #name #generics) -> &#lifetime std::ffi::CStr {
+            pub fn #funcname_out #generics(input: #name #generics) -> &#lifetime pgx::cstr_core::CStr {
                 let mut buffer = StringInfo::new();
                 input.output(&mut buffer);
                 buffer.into()
@@ -766,12 +766,12 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
         // otherwise if it's PgVarlenaInOutFuncs our _in/_out functions use a PgVarlena
         stream.extend(quote! {
             #[pg_extern(immutable,parallel_safe)]
-            pub fn #funcname_in #generics(input: &#lifetime std::ffi::CStr) -> pgx::PgVarlena<#name #generics> {
+            pub fn #funcname_in #generics(input: &#lifetime pgx::cstr_core::CStr) -> pgx::PgVarlena<#name #generics> {
                 #name::input(input)
             }
 
             #[pg_extern(immutable,parallel_safe)]
-            pub fn #funcname_out #generics(input: pgx::PgVarlena<#name #generics>) -> &#lifetime std::ffi::CStr {
+            pub fn #funcname_out #generics(input: pgx::PgVarlena<#name #generics>) -> &#lifetime pgx::cstr_core::CStr {
                 let mut buffer = StringInfo::new();
                 input.output(&mut buffer);
                 buffer.into()
@@ -963,3 +963,43 @@ pub fn postgres_hash(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
     impl_postgres_hash(ast).into()
 }
+
+/**
+Declare a `pgx::Aggregate` implentation on a type as able to used by Postgres as an aggregate.
+
+Functions inside the `impl` may use the [`#[pgx]`](macro@pgx) attribute.
+*/
+#[proc_macro_attribute]
+pub fn pg_aggregate(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    // We don't care about `_attr` as we can find it in the `ItemMod`.
+    fn wrapped(item_impl: ItemImpl) -> Result<TokenStream, syn::Error> {
+        let sql_graph_entity_item = sql_entity_graph::PgAggregate::new(item_impl.into())?;
+
+        Ok(sql_graph_entity_item.to_token_stream().into())
+    }
+
+    let parsed_base = parse_macro_input!(item as syn::ItemImpl);
+    match wrapped(parsed_base) {
+        Ok(tokens) => tokens,
+        Err(e) => {
+            let msg = e.to_string();
+            TokenStream::from(quote! {
+              compile_error!(#msg);
+            })
+        }
+    }
+}
+
+/**
+An inner attribute for [`#[pg_aggregate]`](macro@pg_aggregate).
+
+It can be decorated on functions inside a [`#[pg_aggregate]`](macro@pg_aggregate) implementation.
+In this position, it takes the same args as [`#[pg_extern]`](macro@pg_extern), and those args have the same effect.
+
+Used outside of a [`#[pg_aggregate]`](macro@pg_aggregate), this does nothing.
+*/
+#[proc_macro_attribute]
+pub fn pgx(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    item
+}
+

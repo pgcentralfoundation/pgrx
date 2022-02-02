@@ -43,7 +43,6 @@ impl Clone for PallocdVarlena {
 /// ## Example
 ///
 /// ```rust
-/// use std::ffi::CStr;
 /// use std::str::FromStr;
 ///
 /// use crate::pgx::*;
@@ -57,7 +56,7 @@ impl Clone for PallocdVarlena {
 /// }
 ///
 /// impl PgVarlenaInOutFuncs for MyType {
-///     fn input(input: &std::ffi::CStr) -> PgVarlena<Self> {
+///     fn input(input: &pgx::cstr_core::CStr) -> PgVarlena<Self> {
 ///         let mut iter = input.to_str().unwrap().split(',');
 ///         let (a, b, c) = (iter.next(), iter.next(), iter.next());
 ///
@@ -237,6 +236,17 @@ where
             let ptr = vardata_any(self.varlena.ptr) as *const T;
             ptr.as_ref().unwrap()
         }
+    }
+}
+
+impl<T> Default for PgVarlena<T>
+where
+    T: Default + Copy,
+{
+    fn default() -> Self {
+        let mut ptr = Self::new();
+        *ptr = T::default();
+        ptr
     }
 }
 
