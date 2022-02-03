@@ -33,7 +33,7 @@ static PROCESS_ENV_DENYLIST: &'static [&'static str] = &[
     "LIBRARY_PATH", // see https://github.com/zombodb/pgx/issues/16
 ];
 
-/// Initize pgx development environment for the first time
+/// Initialize pgx development environment for the first time
 #[derive(clap::Args, Debug)]
 #[clap(author)]
 pub(crate) struct Init {
@@ -238,6 +238,7 @@ fn untar(bytes: &[u8], pgxdir: &PathBuf, pg_config: &PgConfig) -> eyre::Result<P
 
     let stdin = child.stdin.as_mut().expect("failed to get `tar`'s stdin");
     stdin.write_all(bytes)?;
+    stdin.flush()?;
     let output = child.wait_with_output()?;
 
     if output.status.success() {
