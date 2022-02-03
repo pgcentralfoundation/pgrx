@@ -14,7 +14,7 @@ use crate::CommandExecute;
 pub(crate) struct Status {
     /// The Postgres version
     #[clap(env = "PG_VERSION")]
-    pg_version: String,
+    pg_version: Option<String>,
     #[clap(from_global, parse(from_occurrences))]
     verbose: usize,
 }
@@ -22,10 +22,20 @@ pub(crate) struct Status {
 impl CommandExecute for Status {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
-        let pgver = self.pg_version;
         let pgx = Pgx::from_config()?;
 
-        for pg_config in pgx.iter(PgConfigSelector::new(&pgver)) {
+        let pg_version = match self.pg_version {
+            Some(s) => s,
+            None => {
+                let metadata = crate::metadata::metadata(&Default::default())?;
+                crate::metadata::validate(&metadata)?;
+                let manifest = crate::manifest::manifest(&metadata)?;
+                crate::manifest::default_pg_version(&manifest)
+                    .ok_or(eyre!("No provided `pg$VERSION` flag."))?
+            }
+        };
+
+        for pg_config in pgx.iter(PgConfigSelector::new(&pg_version)) {
             let pg_config = pg_config?;
             if status_postgres(pg_config)? {
                 println!(

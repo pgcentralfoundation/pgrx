@@ -13,7 +13,6 @@ keywords = ["database", "postgres", "postgresql", "extension"]
 readme = "README.md"
 exclude = [ "*.png" ]
 
-
 [dependencies]
 cargo_metadata = "0.14.1"
 cargo_toml = "0.11.3"

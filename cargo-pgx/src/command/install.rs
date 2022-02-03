@@ -9,7 +9,7 @@ use cargo_metadata::MetadataCommand;
 use colored::Colorize;
 use eyre::{eyre, WrapErr};
 use pgx_utils::get_target_dir;
-use pgx_utils::pg_config::{PgConfig, Pgx};
+use pgx_utils::pg_config::PgConfig;
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
 
@@ -35,30 +35,18 @@ pub(crate) struct Install {
 impl CommandExecute for Install {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
-        let pg_config =
-            match std::env::var("PGX_TEST_MODE_VERSION") {
-                // for test mode, we want the pg_config specified in PGX_TEST_MODE_VERSION
-                Ok(pgver) => match Pgx::from_config()?.get(&pgver) {
-                    Ok(pg_config) => pg_config.clone(),
-                    Err(e) => return Err(e).wrap_err(
-                        "PGX_TEST_MODE_VERSION does not contain a valid postgres version number",
-                    ),
-                },
+        let metadata = crate::metadata::metadata(&self.features)?;
+        crate::metadata::validate(&metadata)?;
+        let manifest = crate::manifest::manifest(&metadata)?;
 
-                // otherwise, the user just ran "cargo pgx install", and we use whatever "pg_config" is configured
-                Err(_) => match self.pg_config {
-                    None => PgConfig::from_path(),
-                    Some(config) => PgConfig::new(PathBuf::from(config)),
-                },
-            };
+        let pg_config = match self.pg_config {
+            None => PgConfig::from_path(),
+            Some(config) => PgConfig::new(PathBuf::from(config)),
+        };
+        let pg_version = format!("pg{}", pg_config.major_version()?);
+        let features = crate::manifest::features_for_version(self.features, &manifest, &pg_version);
 
-        install_extension(
-            &pg_config,
-            self.release,
-            self.no_schema,
-            None,
-            &self.features,
-        )
+        install_extension(&pg_config, self.release, self.no_schema, None, &features)
     }
 }
 
@@ -66,6 +54,7 @@ impl CommandExecute for Install {
     pg_version = %pg_config.version()?,
     release = is_release,
     base_directory = tracing::field::Empty,
+    features = ?features.features,
 ))]
 pub(crate) fn install_extension(
     pg_config: &PgConfig,
@@ -81,7 +70,6 @@ pub(crate) fn install_extension(
     );
 
     let (control_file, extname) = find_control_file()?;
-    let major_version = pg_config.major_version()?;
 
     if get_property("relocatable")? != Some("false".into()) {
         return Err(eyre!(
@@ -90,7 +78,7 @@ pub(crate) fn install_extension(
         ));
     }
 
-    build_extension(major_version, is_release, &features)?;
+    build_extension(is_release, &features)?;
 
     println!();
     println!("installing extension");
@@ -169,22 +157,10 @@ fn copy_file(src: &PathBuf, dest: &PathBuf, msg: &str, do_filter: bool) -> eyre:
 }
 
 pub(crate) fn build_extension(
-    major_version: u16,
     is_release: bool,
     features: &clap_cargo::Features,
 ) -> eyre::Result<()> {
-    let pgx_build_features =
-        std::env::var("PGX_BUILD_FEATURES").unwrap_or(format!("pg{}", major_version));
     let flags = std::env::var("PGX_BUILD_FLAGS").unwrap_or_default();
-
-    let features_arg = if !features.features.is_empty() {
-        use std::fmt::Write;
-        let mut additional_features = features.features.join(" ");
-        let _ = write!(&mut additional_features, " {}", pgx_build_features);
-        additional_features
-    } else {
-        pgx_build_features
-    };
 
     let mut command = Command::new("cargo");
     command.arg("build");
@@ -192,14 +168,13 @@ pub(crate) fn build_extension(
         command.arg("--release");
     }
 
+    let features_arg = features.features.join(" ");
     if !features_arg.trim().is_empty() {
         command.arg("--features");
         command.arg(&features_arg);
-        // While this is not 'correct' `cargo` does not let us negate features.
-        command.arg("--no-default-features");
     }
 
-    if features.no_default_features && features_arg.trim().is_empty() {
+    if features.no_default_features {
         command.arg("--no-default-features");
     }
 

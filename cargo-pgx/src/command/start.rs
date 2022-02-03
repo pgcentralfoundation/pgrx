@@ -16,7 +16,7 @@ use std::process::Stdio;
 pub(crate) struct Start {
     /// The Postgres version to start (`pg10`, `pg11`, `pg12`, `pg13`, `pg14`, or `all`)
     #[clap(env = "PG_VERSION")]
-    pg_version: String,
+    pg_version: Option<String>,
     #[clap(from_global, parse(from_occurrences))]
     verbose: usize,
 }
@@ -24,10 +24,20 @@ pub(crate) struct Start {
 impl CommandExecute for Start {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
-        let pgver = self.pg_version;
         let pgx = Pgx::from_config()?;
 
-        for pg_config in pgx.iter(PgConfigSelector::new(&pgver)) {
+        let pg_version = match self.pg_version {
+            Some(s) => s,
+            None => {
+                let metadata = crate::metadata::metadata(&Default::default())?;
+                crate::metadata::validate(&metadata)?;
+                let manifest = crate::manifest::manifest(&metadata)?;
+                crate::manifest::default_pg_version(&manifest)
+                    .ok_or(eyre!("No provided `pg$VERSION` flag."))?
+            }
+        };
+
+        for pg_config in pgx.iter(PgConfigSelector::new(&pg_version)) {
             let pg_config = pg_config?;
             start_postgres(pg_config)?
         }

@@ -59,6 +59,10 @@ impl CommandExecute for Schema {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
         let (_, extname) = crate::command::get::find_control_file()?;
+        let metadata = crate::metadata::metadata(&Default::default())?;
+        crate::metadata::validate(&metadata)?;
+        let manifest = crate::manifest::manifest(&metadata)?;
+
         let out = match self.out {
             Some(out) => out,
             None => format!(
@@ -80,30 +84,31 @@ impl CommandExecute for Schema {
             }
         };
 
-        let pg_config =
-            match std::env::var("PGX_TEST_MODE_VERSION") {
-                // for test mode, we want the pg_config specified in PGX_TEST_MODE_VERSION
-                Ok(pgver) => match Pgx::from_config()?.get(&pgver) {
-                    Ok(pg_config) => pg_config.clone(),
-                    Err(e) => return Err(e).wrap_err(
-                        "PGX_TEST_MODE_VERSION does not contain a valid postgres version number",
-                    ),
-                },
+        let (pg_config, pg_version) = match self.pg_config {
+            None => match self.pg_version {
+                None => {
+                    let pg_version = match self.pg_version {
+                        Some(s) => s,
+                        None => crate::manifest::default_pg_version(&manifest)
+                            .ok_or(eyre!("No provided `pg$VERSION` flag."))?,
+                    };
+                    (Pgx::from_config()?.get(&pg_version)?.clone(), pg_version)
+                }
+                Some(pgver) => (Pgx::from_config()?.get(&pgver)?.clone(), pgver),
+            },
+            Some(config) => {
+                let pg_config = PgConfig::new(PathBuf::from(config));
+                let pg_version = format!("pg{}", pg_config.major_version()?);
+                (pg_config, pg_version)
+            }
+        };
 
-                // otherwise, the user just ran "cargo pgx install", and we use whatever "pg_config" is configured
-                Err(_) => match self.pg_config {
-                    None => match self.pg_version {
-                        None => PgConfig::from_path(),
-                        Some(pgver) => Pgx::from_config()?.get(&pgver)?.clone(),
-                    },
-                    Some(config) => PgConfig::new(PathBuf::from(config)),
-                },
-            };
+        let features = crate::manifest::features_for_version(self.features, &manifest, &pg_version);
 
         generate_schema(
             &pg_config,
             self.release,
-            &self.features,
+            &features,
             &out,
             self.dot,
             log_level,
@@ -132,10 +137,7 @@ pub(crate) fn generate_schema(
     manual: bool,
     skip_build: bool,
 ) -> eyre::Result<()> {
-    crate::validate::validate(&features)?;
-
     let (control_file, _extname) = find_control_file()?;
-    let major_version = pg_config.major_version()?;
 
     // If not manual, we should ensure a few files exist and are what is expected.
     if !manual {
@@ -191,17 +193,6 @@ pub(crate) fn generate_schema(
         ));
     }
 
-    let pgx_build_features =
-        std::env::var("PGX_BUILD_FEATURES").unwrap_or(format!("pg{}", major_version));
-    let features_arg = if !features.features.is_empty() {
-        use std::fmt::Write;
-        let mut additional_features = features.features.join(" ");
-        let _ = write!(&mut additional_features, " {}", pgx_build_features);
-        additional_features
-    } else {
-        pgx_build_features
-    };
-
     let flags = std::env::var("PGX_BUILD_FLAGS").unwrap_or_default();
 
     if !skip_build {
@@ -216,14 +207,13 @@ pub(crate) fn generate_schema(
             command.env("RUST_LOG", log_level);
         }
 
+        let features_arg = features.features.join(" ");
         if !features_arg.trim().is_empty() {
             command.arg("--features");
             command.arg(&features_arg);
-            // While this is not 'correct' `cargo` does not let us negate features.
-            command.arg("--no-default-features");
         }
 
-        if features.no_default_features && features_arg.trim().is_empty() {
+        if features.no_default_features {
             command.arg("--no-default-features");
         }
 
