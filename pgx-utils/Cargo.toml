@@ -33,4 +33,4 @@ tracing = "0.1.29"
 tracing-error = "0.2.0"
 tracing-subscriber = { version = "0.3.7", features = [ "env-filter" ] }
 libloading = "0.7.3"
-clap = { version = "3.0.13", features = [ "env", "suggestions", "cargo", "derive" ] }
+clap = { version = "3.0.14", features = [ "env", "suggestions", "cargo", "derive" ] }
