@@ -128,13 +128,70 @@ impl<T> PgBox<T, AllocatedByPostgres> {
     }
 }
 
-impl<T, AllocatedBy: WhoAllocated<T>> PgBox<T, AllocatedBy> {
+impl<T> PgBox<T, AllocatedByRust> {
+    /** 
+    Allocates memory in PostgreSQL and then places `val` into it.
+    
+    This value is managed by Rust, so gets dropped via normal [`Drop`][std::ops::Drop]
+    semantics.
+    
+    If you need to give the boxed pointer to Postgres, call [`.into_pg()`][PgBox::into_pg].
+    
+    ```rust,no_run
+    use pgx::PgBox;
+
+    let ptr: PgBox<i32, AllocatedByRust> = PgBox::new(5);
+    assert_eq!(*ptr, 5);
+
+    let mut ptr: PgBox<Vec<i32>, AllocatedByRust> = PgBox::new(vec![]);
+    assert_eq!(*ptr, Vec::<i32>::default());
+
+    ptr.push(1);
+    assert_eq!(*ptr, vec![1]);
+    
+    ptr.push(2);
+    assert_eq!(*ptr, vec![1, 2]);
+
+    ptr.push(3);
+    assert_eq!(*ptr, vec![1, 2, 3]);
+
+    let drained = ptr.drain(..).collect::<Vec<_>>();
+    assert_eq!(drained, vec![1, 2, 3])
+    ```
+    */ 
+    pub fn new(val: T) -> PgBox<T, AllocatedByRust> {
+        let mut ptr = Self::alloc0();
+        *ptr = val;
+        ptr
+    }
+
+    /** 
+    Allocates memory in PostgreSQL and then places `val` into it.
+    
+    This value is managed by Rust, so gets dropped via normal [`Drop`][std::ops::Drop]
+    semantics.
+    
+    If you need to give the boxed pointer to Postgres, call [`.into_pg()`][PgBox::into_pg].
+
+    ```rust,no_run
+    use pgx::PgBox;
+
+    let ptr: PgBox<i32, AllocatedByRust> = PgBox::new(5);
+    assert_eq!(*ptr, 5);
+    ```
+    */
+    pub fn new_in_context(val: T, memory_context: PgMemoryContexts) -> PgBox<T, AllocatedByRust> {
+        let mut ptr = Self::alloc0_in_context(memory_context);
+        *ptr = val;
+        ptr
+    }
+
     /// Box a pointer that was allocated within Rust
     ///
     /// When this `PgBox<T>` is dropped, the boxed memory is freed.  Since Rust
     /// allocated it, Rust is responsible for freeing it.
     ///
-    /// If you need to give the boxed pointer to Postgres, call `.into_pg()`
+    /// If you need to give the boxed pointer to Postgres, call [`.into_pg()`][PgBox::into_pg]
     #[inline]
     pub unsafe fn from_rust(ptr: *mut T) -> PgBox<T, AllocatedByRust> {
         PgBox::<T, AllocatedByRust> {
@@ -142,7 +199,9 @@ impl<T, AllocatedBy: WhoAllocated<T>> PgBox<T, AllocatedBy> {
             __marker: PhantomData,
         }
     }
+}
 
+impl<T, AllocatedBy: WhoAllocated<T>> PgBox<T, AllocatedBy> {
     /// Allocate enough memory for the type'd struct, within Postgres' `CurrentMemoryContext`  The
     /// allocated memory is uninitialized.
     ///
