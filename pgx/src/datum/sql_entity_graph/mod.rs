@@ -116,19 +116,34 @@ impl ToSqlConfigEntity {
         use eyre::{eyre, WrapErr};
 
         if !self.enabled {
-            return Some(Ok(String::default()));
+            return Some(Ok(format!("\n\
+                {sql_anchor_comment}\n\
+                -- Skipped due to `#[pgx(sql = false)]`\n",
+                sql_anchor_comment = entity.sql_anchor_comment(),
+            )));
         }
 
         if let Some(content) = self.content {
-            return Some(Ok("\n".to_owned() + content));
+            return Some(Ok(format!("\n\
+                {sql_anchor_comment}\n\
+                {content}\n\
+            ", content = content, sql_anchor_comment = entity.sql_anchor_comment())));
         }
 
         if let Some(callback) = self.callback {
-            return Some(
-                callback(entity, context)
-                    .map_err(|e| eyre!(e))
-                    .wrap_err("Failed to run specified `#[pgx(sql = path)] function`"),
-            );
+            let content = callback(entity, context)
+                .map_err(|e| eyre!(e))
+                .wrap_err("Failed to run specified `#[pgx(sql = path)] function`");
+            return match content {
+                Ok(content) => Some(Ok(format!("\n\
+                        {sql_anchor_comment}\n\
+                        {content}\
+                    ",
+                    content = content,
+                    sql_anchor_comment = entity.sql_anchor_comment(),
+                ))),
+                Err(e) => Some(Err(e)),
+            };
         }
 
         None

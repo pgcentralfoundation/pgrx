@@ -19,7 +19,22 @@ pub enum SqlGraphEntity {
     Aggregate(PgAggregateEntity),
 }
 
-impl SqlGraphEntity {}
+impl SqlGraphEntity {
+    pub fn sql_anchor_comment(&self) -> String {
+        let maybe_file_and_line = if let (Some(file), Some(line)) = (self.file(), self.line()) {
+            format!("-- {file}:{line}\n", file = file, line = line)
+        } else {
+            String::default()
+        };
+        format!("\
+            {maybe_file_and_line}\
+            -- {rust_identifier}\
+        ",
+            maybe_file_and_line = maybe_file_and_line,
+            rust_identifier = self.rust_identifier(),
+        )
+    }
+}
 
 impl SqlGraphIdentifier for SqlGraphEntity {
     fn dot_identifier(&self) -> String {
@@ -36,6 +51,7 @@ impl SqlGraphIdentifier for SqlGraphEntity {
             SqlGraphEntity::ExtensionRoot(item) => item.dot_identifier(),
         }
     }
+
     fn rust_identifier(&self) -> String {
         match self {
             SqlGraphEntity::Schema(item) => item.rust_identifier(),
