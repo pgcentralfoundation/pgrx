@@ -35,7 +35,7 @@ impl Internal {
         ))
     }
 
-    /// Returns if the internal value is initialized. If false, this is a null pointer.
+    /// Returns true if the internal value is initialized. If false, this is a null pointer.
     #[inline]
     pub fn initialized(&self) -> bool {
         self.0.is_some()
