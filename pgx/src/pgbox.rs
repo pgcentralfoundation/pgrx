@@ -185,7 +185,9 @@ impl<T> PgBox<T, AllocatedByRust> {
         *ptr = val;
         ptr
     }
+}
 
+impl<T, AllocatedBy: WhoAllocated<T>> PgBox<T, AllocatedBy> {
     /// Box a pointer that was allocated within Rust
     ///
     /// When this `PgBox<T>` is dropped, the boxed memory is freed.  Since Rust
@@ -199,9 +201,7 @@ impl<T> PgBox<T, AllocatedByRust> {
             __marker: PhantomData,
         }
     }
-}
 
-impl<T, AllocatedBy: WhoAllocated<T>> PgBox<T, AllocatedBy> {
     /// Allocate enough memory for the type'd struct, within Postgres' `CurrentMemoryContext`  The
     /// allocated memory is uninitialized.
     ///
