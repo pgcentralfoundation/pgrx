@@ -103,9 +103,9 @@ pub(crate) fn install_extension(
             // issue highlighted by the following apple documentation:
             // https://developer.apple.com/documentation/security/updating_mac_software
             if dest.exists() {
-                return std::fs::remove_file(&dest).wrap_err_with(|| {
+                std::fs::remove_file(&dest).wrap_err_with(|| {
                     format!("unable to remove existing file {}", dest.display())
-                });
+                })?;
             }
         }
         copy_file(&shlibpath, &dest, "shared library", false)?;
@@ -123,12 +123,12 @@ pub(crate) fn install_extension(
 
 fn copy_file(src: &PathBuf, dest: &PathBuf, msg: &str, do_filter: bool) -> eyre::Result<()> {
     if !dest.parent().unwrap().exists() {
-        return std::fs::create_dir_all(dest.parent().unwrap()).wrap_err_with(|| {
+        std::fs::create_dir_all(dest.parent().unwrap()).wrap_err_with(|| {
             format!(
                 "failed to create destination directory {}",
                 dest.parent().unwrap().display()
             )
-        });
+        })?;
     }
 
     println!(
