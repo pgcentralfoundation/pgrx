@@ -109,6 +109,7 @@ fn does_db_exist(pg_config: &PgConfig, dbname: &str) -> eyre::Result<bool> {
     let mut command = Command::new(pg_config.psql_path()?);
     command
         .arg("-XqAt")
+        .env_remove("PGUSER")
         .arg("-h")
         .arg(pg_config.host())
         .arg("-p")
