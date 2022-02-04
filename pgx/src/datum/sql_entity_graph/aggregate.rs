@@ -398,7 +398,7 @@ impl ToSql for PgAggregateEntity {
                 String::default()
             },
             optional_attributes = if optional_attributes.len() == 0 {
-                String::from("")
+                String::from("\n")
             } else {
                 String::from("\n")
             } + &optional_attributes_string
