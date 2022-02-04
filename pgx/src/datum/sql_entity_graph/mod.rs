@@ -64,6 +64,111 @@ pub trait ToSql {
     fn to_sql(&self, context: &PgxSql) -> eyre::Result<String>;
 }
 
+/// The signature of a function that can transform a SqlGraphEntity to a SQL string
+///
+/// This is used to provide a facility for overriding the default SQL generator behavior using
+/// the `#[to_sql(path::to::function)]` attribute in circumstances where the default behavior is
+/// not desirable.
+///
+/// Implementations can invoke `ToSql::to_sql(entity, context)` on the unwrapped SqlGraphEntity
+/// type should they wish to delegate to the default behavior for any reason.
+pub type ToSqlFn =
+    fn(
+        &SqlGraphEntity,
+        &PgxSql,
+    ) -> std::result::Result<String, Box<dyn std::error::Error + Send + Sync + 'static>>;
+
+/// Represents configuration options for tuning the SQL generator.
+///
+/// When an item that can be rendered to SQL has these options at hand, they should be
+/// respected. If an item does not have them, then it is not expected that the SQL generation
+/// for those items can be modified.
+///
+/// The default configuration has `enabled` set to `true`, and `callback` to `None`, which indicates
+/// that the default SQL generation behavior will be used. These are intended to be mutually exclusive
+/// options, so `callback` should only be set if generation is enabled.
+///
+/// When `enabled` is false, no SQL is generated for the item being configured.
+///
+/// When `callback` has a value, the corresponding `ToSql` implementation should invoke the
+/// callback instead of performing their default behavior.
+#[derive(Default, Clone)]
+pub struct ToSqlConfigEntity {
+    pub enabled: bool,
+    pub callback: Option<ToSqlFn>,
+    pub content: Option<&'static str>,
+}
+impl ToSqlConfigEntity {
+    /// Given a SqlGraphEntity, this function converts it to SQL based on the current configuration.
+    ///
+    /// If the config overrides the default behavior (i.e. using the `ToSql` trait), then `Some(eyre::Result)`
+    /// is returned. If the config does not override the default behavior, then `None` is returned. This can
+    /// be used to dispatch SQL generation in a single line, e.g.:
+    ///
+    /// ```rust,ignore
+    /// config.to_sql(entity, context).unwrap_or_else(|| entity.to_sql(context))?
+    /// ```
+    pub fn to_sql(
+        &self,
+        entity: &SqlGraphEntity,
+        context: &PgxSql,
+    ) -> Option<eyre::Result<String>> {
+        use eyre::{eyre, WrapErr};
+
+        if !self.enabled {
+            return Some(Ok(String::default()));
+        }
+
+        if let Some(content) = self.content {
+            return Some(Ok("\n".to_owned() + content));
+        }
+
+        if let Some(callback) = self.callback {
+            return Some(
+                callback(entity, context)
+                    .map_err(|e| eyre!(e))
+                    .wrap_err("Failed to run specified `#[pgx(sql = path)] function`"),
+            );
+        }
+
+        None
+    }
+}
+impl std::cmp::PartialEq for ToSqlConfigEntity {
+    fn eq(&self, other: &Self) -> bool {
+        if self.enabled != other.enabled {
+            return false;
+        }
+        match (self.callback, other.callback) {
+            (None, None) => match (self.content, other.content) {
+                (None, None) => true,
+                (Some(a), Some(b)) => a == b,
+                _ => false,
+            },
+            (Some(a), Some(b)) => std::ptr::eq(std::ptr::addr_of!(a), std::ptr::addr_of!(b)),
+            _ => false,
+        }
+    }
+}
+impl std::cmp::Eq for ToSqlConfigEntity {}
+impl std::hash::Hash for ToSqlConfigEntity {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.enabled.hash(state);
+        self.callback.map(|cb| std::ptr::addr_of!(cb)).hash(state);
+        self.content.hash(state);
+    }
+}
+impl std::fmt::Debug for ToSqlConfigEntity {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        let callback = self.callback.map(|cb| std::ptr::addr_of!(cb));
+        f.debug_struct("ToSqlConfigEntity")
+            .field("enabled", &self.enabled)
+            .field("callback", &format_args!("{:?}", &callback))
+            .field("content", &self.content)
+            .finish()
+    }
+}
+
 /// A mapping from a Rust type to a SQL type, with a `TypeId`.
 ///
 /// ```rust

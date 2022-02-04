@@ -311,6 +311,12 @@ pub fn parse_extern_attributes(attr: TokenStream) -> HashSet<ExternArgs> {
                         let name = name[1..name.len() - 1].to_string();
                         args.insert(ExternArgs::Name(name.to_string()))
                     }
+                    // Recognized, but not handled as an extern argument
+                    "sql" => {
+                        let _punc = itr.next().unwrap();
+                        let _value = itr.next().unwrap();
+                        false
+                    }
                     _ => false,
                 };
             }

@@ -402,6 +402,7 @@ Optionally accepts the following attributes:
 * `parallel_unsafe`: Corresponds to [`PARALLEL UNSAFE`](https://www.postgresql.org/docs/current/sql-createfunction.html).
 * `parallel_restricted`: Corresponds to [`PARALLEL RESTRICTED`](https://www.postgresql.org/docs/current/sql-createfunction.html).
 * `no_guard`: Do not use `#[pg_guard]` with the function.
+* `sql`: Same arguments as [`#[pgx(sql = ..)]`](macro@pgx).
 
 Functions can accept and return any type which `pgx` supports. `pgx` supports many PostgreSQL types by default.
 New types can be defined via [`macro@PostgresType`] or [`macro@PostgresEnum`].
@@ -597,7 +598,7 @@ enum DogNames {
 ```
 
 */
-#[proc_macro_derive(PostgresEnum, attributes(requires))]
+#[proc_macro_derive(PostgresEnum, attributes(requires, pgx))]
 pub fn postgres_enum(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
 
@@ -683,9 +684,12 @@ Optionally accepts the following attributes:
 
 * `inoutfuncs(some_in_fn, some_out_fn)`: Define custom in/out functions for the type.
 * `pgvarlena_inoutfuncs(some_in_fn, some_out_fn)`: Define custom in/out functions for the `PgVarlena` of this type.
-
+* `sql`: Same arguments as [`#[pgx(sql = ..)]`](macro@pgx).
 */
-#[proc_macro_derive(PostgresType, attributes(inoutfuncs, pgvarlena_inoutfuncs, requires))]
+#[proc_macro_derive(
+    PostgresType,
+    attributes(inoutfuncs, pgvarlena_inoutfuncs, requires, pgx)
+)]
 pub fn postgres_type(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
 
@@ -911,12 +915,16 @@ enum DogNames {
     Brandy,
 }
 ```
+Optionally accepts the following attributes:
 
+* `sql`: Same arguments as [`#[pgx(sql = ..)]`](macro@pgx).
 */
-#[proc_macro_derive(PostgresEq)]
+#[proc_macro_derive(PostgresEq, attributes(pgx))]
 pub fn postgres_eq(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
-    impl_postgres_eq(ast).into()
+    impl_postgres_eq(ast)
+        .unwrap_or_else(syn::Error::into_compile_error)
+        .into()
 }
 
 /**
@@ -935,12 +943,16 @@ enum DogNames {
     Brandy,
 }
 ```
+Optionally accepts the following attributes:
 
+* `sql`: Same arguments as [`#[pgx(sql = ..)]`](macro@pgx).
 */
-#[proc_macro_derive(PostgresOrd)]
+#[proc_macro_derive(PostgresOrd, attributes(pgx))]
 pub fn postgres_ord(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
-    impl_postgres_ord(ast).into()
+    impl_postgres_ord(ast)
+        .unwrap_or_else(syn::Error::into_compile_error)
+        .into()
 }
 
 /**
@@ -956,12 +968,16 @@ enum DogNames {
     Brandy,
 }
 ```
+Optionally accepts the following attributes:
 
+* `sql`: Same arguments as [`#[pgx(sql = ..)]`](macro@pgx).
 */
-#[proc_macro_derive(PostgresHash)]
+#[proc_macro_derive(PostgresHash, attributes(pgx))]
 pub fn postgres_hash(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
-    impl_postgres_hash(ast).into()
+    impl_postgres_hash(ast)
+        .unwrap_or_else(syn::Error::into_compile_error)
+        .into()
 }
 
 /**
@@ -991,15 +1007,26 @@ pub fn pg_aggregate(_attr: TokenStream, item: TokenStream) -> TokenStream {
 }
 
 /**
-An inner attribute for [`#[pg_aggregate]`](macro@pg_aggregate).
+A helper attribute for various contexts.
+
+## Usage with [`#[pg_aggregate]`](macro@pg_aggregate).
 
 It can be decorated on functions inside a [`#[pg_aggregate]`](macro@pg_aggregate) implementation.
 In this position, it takes the same args as [`#[pg_extern]`](macro@pg_extern), and those args have the same effect.
 
-Used outside of a [`#[pg_aggregate]`](macro@pg_aggregate), this does nothing.
+## Usage for configuring SQL generation
+
+This attribute can be used to control the behavior of the SQL generator on a decorated item,
+e.g. `#[pgx(sql = false)]`
+
+Currently `sql` can be provided one of the following:
+
+* Disable SQL generation with `#[pgx(sql = false)]`
+* Call custom SQL generator function with `#[pgx(sql = path::to_function)]`
+* Render a specific fragment of SQL with a string `#[pgx(sql = "CREATE OR REPLACE FUNCTION ...")]`
+
 */
 #[proc_macro_attribute]
 pub fn pgx(_attr: TokenStream, item: TokenStream) -> TokenStream {
     item
 }
-

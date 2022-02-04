@@ -14,6 +14,8 @@ use syn::{
     Expr,
 };
 
+use super::ToSqlConfig;
+
 // We support only 32 tuples...
 const ARG_NAMES: [&str; 32] = [
     "arg_one",
@@ -77,10 +79,12 @@ pub struct PgAggregate {
     fn_moving_state_inverse: Option<Ident>,
     fn_moving_finalize: Option<Ident>,
     hypothetical: bool,
+    to_sql_config: ToSqlConfig,
 }
 
 impl PgAggregate {
     pub fn new(mut item_impl: ItemImpl) -> Result<Self, syn::Error> {
+        let to_sql_config = ToSqlConfig::from_attributes(item_impl.attrs.as_slice())?.unwrap_or_default();
         let target_path = get_target_path(&item_impl)?;
         let target_ident = get_target_ident(&target_path)?;
         let snake_case_target_ident = Ident::new(
@@ -495,6 +499,7 @@ impl PgAggregate {
             } else {
                 false
             },
+            to_sql_config,
         })
     }
 
@@ -534,6 +539,7 @@ impl PgAggregate {
         let fn_moving_state_iter = self.fn_moving_state.iter();
         let fn_moving_state_inverse_iter = self.fn_moving_state_inverse.iter();
         let fn_moving_finalize_iter = self.fn_moving_finalize.iter();
+        let to_sql_config = &self.to_sql_config;
 
         let entity_item_fn: ItemFn = parse_quote! {
             #[no_mangle]
@@ -569,6 +575,7 @@ impl PgAggregate {
                     sortop: None#( .unwrap_or(Some(#const_sort_operator_iter)) )*,
                     parallel: None#( .unwrap_or(#const_parallel_iter) )*,
                     hypothetical: #hypothetical,
+                    to_sql_config: #to_sql_config,
                 };
                 pgx::datum::sql_entity_graph::SqlGraphEntity::Aggregate(submission)
             }

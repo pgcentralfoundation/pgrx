@@ -1,6 +1,6 @@
 use crate::{
     aggregate::{FinalizeModify, ParallelOption},
-    datum::sql_entity_graph::{SqlGraphEntity, SqlGraphIdentifier, ToSql},
+    datum::sql_entity_graph::{SqlGraphEntity, SqlGraphIdentifier, ToSql, ToSqlConfigEntity},
 };
 use core::{any::TypeId, cmp::Ordering};
 use eyre::eyre as eyre_err;
@@ -127,6 +127,7 @@ pub struct PgAggregateEntity {
     ///
     /// Corresponds to `hypothetical` in [`crate::aggregate::Aggregate`].
     pub hypothetical: bool,
+    pub to_sql_config: ToSqlConfigEntity,
 }
 
 impl Ord for PgAggregateEntity {
@@ -278,21 +279,29 @@ impl ToSql for PgAggregateEntity {
                 })?;
             optional_attributes.push((
                 format!("\tMSTYPE = {}", sql),
-                format!("/* {}::MovingState = {} */", self.full_path, value.full_path),
+                format!(
+                    "/* {}::MovingState = {} */",
+                    self.full_path, value.full_path
+                ),
             ));
         }
 
         let mut optional_attributes_string = String::new();
         for (index, (optional_attribute, comment)) in optional_attributes.iter().enumerate() {
-            let optional_attribute_string = format!("{optional_attribute}{maybe_comma} {comment}{maybe_newline}",
+            let optional_attribute_string = format!(
+                "{optional_attribute}{maybe_comma} {comment}{maybe_newline}",
                 optional_attribute = optional_attribute,
-                maybe_comma = if index == optional_attributes.len() -1 {
+                maybe_comma = if index == optional_attributes.len() - 1 {
                     ""
-                } else { "," },
+                } else {
+                    ","
+                },
                 comment = comment,
-                maybe_newline = if index == optional_attributes.len() -1 {
+                maybe_newline = if index == optional_attributes.len() - 1 {
                     ""
-                } else { "\n" }
+                } else {
+                    "\n"
+                }
             );
             optional_attributes_string += &optional_attribute_string;
         }

@@ -9,6 +9,8 @@ use syn::{
     DeriveInput, Generics, ItemStruct,
 };
 
+use super::ToSqlConfig;
+
 /// A parsed `#[derive(PostgresType)]` item.
 ///
 /// It should be used with [`syn::parse::Parse`] functions.
@@ -37,15 +39,23 @@ pub struct PostgresType {
     generics: Generics,
     in_fn: Ident,
     out_fn: Ident,
+    to_sql_config: ToSqlConfig,
 }
 
 impl PostgresType {
-    pub fn new(name: Ident, generics: Generics, in_fn: Ident, out_fn: Ident) -> Self {
+    pub fn new(
+        name: Ident,
+        generics: Generics,
+        in_fn: Ident,
+        out_fn: Ident,
+        to_sql_config: ToSqlConfig,
+    ) -> Self {
         Self {
             generics,
             name,
             in_fn,
             out_fn,
+            to_sql_config,
         }
     }
 
@@ -59,6 +69,8 @@ impl PostgresType {
                 ))
             }
         };
+        let to_sql_config =
+            ToSqlConfig::from_attributes(derive_input.attrs.as_slice())?.unwrap_or_default();
         let funcname_in = Ident::new(
             &format!("{}_in", derive_input.ident).to_lowercase(),
             derive_input.ident.span(),
@@ -72,6 +84,7 @@ impl PostgresType {
             derive_input.generics,
             funcname_in,
             funcname_out,
+            to_sql_config,
         ))
     }
 
@@ -93,6 +106,8 @@ impl PostgresType {
 impl Parse for PostgresType {
     fn parse(input: ParseStream) -> Result<Self, syn::Error> {
         let parsed: ItemStruct = input.parse()?;
+        let to_sql_config =
+            ToSqlConfig::from_attributes(parsed.attrs.as_slice())?.unwrap_or_default();
         let funcname_in = Ident::new(
             &format!("{}_in", parsed.ident).to_lowercase(),
             parsed.ident.span(),
@@ -106,6 +121,7 @@ impl Parse for PostgresType {
             parsed.generics,
             funcname_in,
             funcname_out,
+            to_sql_config,
         ))
     }
 }
@@ -126,6 +142,8 @@ impl ToTokens for PostgresType {
             &format!("__pgx_internals_type_{}", self.name),
             Span::call_site(),
         );
+
+        let to_sql_config = &self.to_sql_config;
 
         let inv = quote! {
             #[no_mangle]
@@ -172,7 +190,8 @@ impl ToTokens for PostgresType {
                         let mut path_items: Vec<_> = out_fn.split("::").collect();
                         let _ = path_items.pop(); // Drop the one we don't want.
                         path_items.join("::")
-                    }
+                    },
+                    to_sql_config: #to_sql_config,
                 };
                 pgx::datum::sql_entity_graph::SqlGraphEntity::Type(submission)
             }

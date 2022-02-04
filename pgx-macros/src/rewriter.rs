@@ -8,10 +8,11 @@ use proc_macro2::{Ident, Span};
 use quote::{quote, quote_spanned, ToTokens};
 use std::ops::Deref;
 use std::str::FromStr;
+use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
 use syn::{
     FnArg, ForeignItem, ForeignItemFn, Generics, ItemFn, ItemForeignMod, Pat, ReturnType,
-    Signature, Type, Visibility,
+    Signature, Token, Type, Visibility,
 };
 
 pub struct PgGuardRewriter();
@@ -224,7 +225,11 @@ impl PgGuardRewriter {
         let return_type =
             proc_macro2::TokenStream::from_str(return_type.trim_start_matches("->")).unwrap();
         let return_type = quote! {impl std::iter::Iterator<Item = #return_type>};
-        let attrs = entity_submission.unwrap().extern_attr_tokens();
+        let attrs = entity_submission
+            .unwrap()
+            .extern_attrs()
+            .iter()
+            .collect::<Punctuated<_, Token![,]>>();
 
         func.sig.output = ReturnType::Default;
         let sig = func.sig;
@@ -708,7 +713,9 @@ impl FunctionSignatureRewriter {
     fn args(&self, is_raw: bool) -> proc_macro2::TokenStream {
         if self.func.sig.inputs.len() == 1 && self.return_type_is_datum() {
             if let FnArg::Typed(ty) = self.func.sig.inputs.first().unwrap() {
-                if type_matches(&ty.ty, "pg_sys :: FunctionCallInfo") || type_matches(&ty.ty, "pgx :: pg_sys :: FunctionCallInfo") {
+                if type_matches(&ty.ty, "pg_sys :: FunctionCallInfo")
+                    || type_matches(&ty.ty, "pgx :: pg_sys :: FunctionCallInfo")
+                {
                     return proc_macro2::TokenStream::new();
                 }
             }
@@ -738,7 +745,9 @@ impl FunctionSignatureRewriter {
                             quote_spanned! {ident.span()=>
                                 let #name = pgx::pg_getarg::<#option_type>(fcinfo, #i);
                             }
-                        } else if type_matches(&type_, "pg_sys :: FunctionCallInfo") || type_matches(&type_, "pgx :: pg_sys :: FunctionCallInfo") {
+                        } else if type_matches(&type_, "pg_sys :: FunctionCallInfo")
+                            || type_matches(&type_, "pgx :: pg_sys :: FunctionCallInfo")
+                        {
                             have_fcinfo = true;
                             quote_spanned! {ident.span()=>
                                 let #name = fcinfo;

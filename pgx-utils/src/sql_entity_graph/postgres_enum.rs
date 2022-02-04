@@ -6,6 +6,8 @@ use syn::{
 };
 use syn::{punctuated::Punctuated, Ident, Token};
 
+use super::ToSqlConfig;
+
 /// A parsed `#[derive(PostgresEnum)]` item.
 ///
 /// It should be used with [`syn::parse::Parse`] functions.
@@ -33,6 +35,7 @@ pub struct PostgresEnum {
     name: Ident,
     generics: Generics,
     variants: Punctuated<syn::Variant, Token![,]>,
+    to_sql_config: ToSqlConfig,
 }
 
 impl PostgresEnum {
@@ -40,15 +43,19 @@ impl PostgresEnum {
         name: Ident,
         generics: Generics,
         variants: Punctuated<syn::Variant, Token![,]>,
+        to_sql_config: ToSqlConfig,
     ) -> Self {
         Self {
             name,
             generics,
             variants,
+            to_sql_config,
         }
     }
 
     pub fn from_derive_input(derive_input: DeriveInput) -> Result<Self, syn::Error> {
+        let to_sql_config =
+            ToSqlConfig::from_attributes(derive_input.attrs.as_slice())?.unwrap_or_default();
         let data_enum = match derive_input.data {
             syn::Data::Enum(data_enum) => data_enum,
             syn::Data::Union(_) | syn::Data::Struct(_) => {
@@ -59,6 +66,7 @@ impl PostgresEnum {
             derive_input.ident,
             derive_input.generics,
             data_enum.variants,
+            to_sql_config,
         ))
     }
 }
@@ -66,7 +74,14 @@ impl PostgresEnum {
 impl Parse for PostgresEnum {
     fn parse(input: ParseStream) -> Result<Self, syn::Error> {
         let parsed: ItemEnum = input.parse()?;
-        Ok(Self::new(parsed.ident, parsed.generics, parsed.variants))
+        let to_sql_config =
+            ToSqlConfig::from_attributes(parsed.attrs.as_slice())?.unwrap_or_default();
+        Ok(Self::new(
+            parsed.ident,
+            parsed.generics,
+            parsed.variants,
+            to_sql_config,
+        ))
     }
 }
 
@@ -83,6 +98,8 @@ impl ToTokens for PostgresEnum {
         let variants = self.variants.iter();
         let sql_graph_entity_fn_name =
             syn::Ident::new(&format!("__pgx_internals_enum_{}", name), Span::call_site());
+
+        let to_sql_config = &self.to_sql_config;
 
         let inv = quote! {
             #[no_mangle]
@@ -104,6 +121,7 @@ impl ToTokens for PostgresEnum {
                     full_path: core::any::type_name::<#name #ty_generics>(),
                     mappings,
                     variants: vec![ #(  stringify!(#variants)  ),* ],
+                    to_sql_config: #to_sql_config,
                 };
                 pgx::datum::sql_entity_graph::SqlGraphEntity::Enum(submission)
             }

@@ -5,19 +5,22 @@ mod returning;
 mod search_path;
 
 pub use argument::Argument;
-use attribute::{Attribute, PgxAttributes};
+use attribute::Attribute;
 pub use operator::PgOperator;
 use operator::{PgxOperatorAttributeWithIdent, PgxOperatorOpName};
-use returning::Returning;
 pub(crate) use returning::NameMacro;
+use returning::Returning;
 use search_path::SearchPathList;
 
 use eyre::WrapErr;
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
 use std::convert::TryFrom;
-use syn::parse::{Parse, ParseStream};
-use syn::Meta;
+use syn::parse::{Parse, ParseStream, Parser};
+use syn::punctuated::Punctuated;
+use syn::{Meta, Token};
+
+use crate::sql_entity_graph::ToSqlConfig;
 
 /// A parsed `#[pg_extern]` item.
 ///
@@ -42,42 +45,35 @@ use syn::Meta;
 /// ```
 #[derive(Debug, Clone)]
 pub struct PgExtern {
-    attrs: Option<PgxAttributes>,
-    attr_tokens: proc_macro2::TokenStream,
+    attrs: Vec<Attribute>,
     func: syn::ItemFn,
+    to_sql_config: ToSqlConfig,
 }
 
 impl PgExtern {
     fn name(&self) -> String {
         self.attrs
-            .as_ref()
-            .and_then(|a| {
-                a.attrs.iter().find_map(|candidate| match candidate {
-                    Attribute::Name(name) => Some(name.value()),
-                    _ => None,
-                })
+            .iter()
+            .find_map(|a| match a {
+                Attribute::Name(name) => Some(name.value()),
+                _ => None,
             })
             .unwrap_or_else(|| self.func.sig.ident.to_string())
     }
 
     fn schema(&self) -> Option<String> {
-        self.attrs.as_ref().and_then(|a| {
-            a.attrs.iter().find_map(|candidate| match candidate {
-                Attribute::Schema(name) => Some(name.value()),
-                _ => None,
-            })
+        self.attrs.iter().find_map(|a| match a {
+            Attribute::Schema(name) => Some(name.value()),
+            _ => None,
         })
     }
 
-    fn extern_attrs(&self) -> Option<&PgxAttributes> {
-        self.attrs.as_ref()
+    pub fn extern_attrs(&self) -> &[Attribute] {
+        self.attrs.as_slice()
     }
 
-    pub fn extern_attr_tokens(&self) -> &proc_macro2::TokenStream {
-        &self.attr_tokens
-    }
-
-    fn overridden(&self) -> Option<String> {
+    fn overridden(&self) -> Option<syn::LitStr> {
+        let mut span = None;
         let mut retval = None;
         let mut in_commented_sql_block = false;
         for attr in &self.func.attrs {
@@ -88,7 +84,8 @@ impl PgExtern {
                         Meta::Path(_) | Meta::List(_) => continue,
                         Meta::NameValue(mnv) => mnv,
                     };
-                    if let syn::Lit::Str(inner) = content.lit {
+                    if let syn::Lit::Str(ref inner) = content.lit {
+                        span.get_or_insert(content.lit.span());
                         if !in_commented_sql_block && inner.value().trim() == "```pgxsql" {
                             in_commented_sql_block = true;
                         } else if in_commented_sql_block && inner.value().trim() == "```" {
@@ -105,7 +102,7 @@ impl PgExtern {
                 }
             }
         }
-        retval
+        retval.map(|s| syn::LitStr::new(s.as_ref(), span.unwrap()))
     }
 
     fn operator(&self) -> Option<PgOperator> {
@@ -191,12 +188,27 @@ impl PgExtern {
     }
 
     pub fn new(attr: TokenStream2, item: TokenStream2) -> Result<Self, syn::Error> {
-        let attrs = syn::parse2::<PgxAttributes>(attr.clone()).ok();
+        let mut attrs = Vec::new();
+        let mut to_sql_config: Option<ToSqlConfig> = None;
+
+        let parser = Punctuated::<Attribute, Token![,]>::parse_terminated;
+        let punctuated_attrs = parser.parse2(attr)?;
+        for pair in punctuated_attrs.into_pairs() {
+            match pair.into_value() {
+                Attribute::Sql(config) => {
+                    to_sql_config.get_or_insert(config);
+                }
+                attr => {
+                    attrs.push(attr);
+                }
+            }
+        }
+
         let func = syn::parse2::<syn::ItemFn>(item)?;
         Ok(Self {
-            attrs: attrs,
-            attr_tokens: attr,
-            func: func,
+            attrs,
+            func,
+            to_sql_config: to_sql_config.unwrap_or_default(),
         })
     }
 }
@@ -207,7 +219,7 @@ impl ToTokens for PgExtern {
         let name = self.name();
         let schema = self.schema();
         let schema_iter = schema.iter();
-        let extern_attrs = self.extern_attrs();
+        let extern_attrs = self.attrs.iter().collect::<Punctuated<_, Token![,]>>();
         let search_path = self.search_path().into_iter();
         let inputs = self.inputs().unwrap();
         let returns = match self.returns() {
@@ -221,7 +233,14 @@ impl ToTokens for PgExtern {
             }
         };
         let operator = self.operator().into_iter();
-        let overridden = self.overridden().into_iter();
+        let to_sql_config = match self.overridden() {
+            None => self.to_sql_config.clone(),
+            Some(content) => {
+                let mut config = self.to_sql_config.clone();
+                config.content = Some(content);
+                config
+            }
+        };
 
         let sql_graph_entity_fn_name =
             syn::Ident::new(&format!("__pgx_internals_fn_{}", ident), Span::call_site());
@@ -240,12 +259,12 @@ impl ToTokens for PgExtern {
                     line: line!(),
                     module_path: core::module_path!(),
                     full_path: concat!(core::module_path!(), "::", stringify!(#ident)),
-                    extern_attrs: #extern_attrs,
+                    extern_attrs: vec![#extern_attrs],
                     search_path: None#( .unwrap_or(Some(vec![#search_path])) )*,
                     fn_args: vec![#(#inputs),*],
                     fn_return: #returns,
                     operator: None#( .unwrap_or(Some(#operator)) )*,
-                    overridden: None#( .unwrap_or(Some(#overridden)) )*,
+                    to_sql_config: #to_sql_config,
                 };
                 pgx::datum::sql_entity_graph::SqlGraphEntity::Function(submission)
             }
@@ -256,13 +275,27 @@ impl ToTokens for PgExtern {
 
 impl Parse for PgExtern {
     fn parse(input: ParseStream) -> Result<Self, syn::Error> {
-        let attrs: Option<PgxAttributes> = input.parse().ok();
-        let func = input.parse()?;
-        let attr_tokens: proc_macro2::TokenStream = attrs.clone().into_token_stream();
+        let mut attrs = Vec::new();
+        let mut to_sql_config: Option<ToSqlConfig> = None;
+
+        let parser = Punctuated::<Attribute, Token![,]>::parse_terminated;
+        let punctuated_attrs = input.call(parser).ok().unwrap_or_default();
+        for pair in punctuated_attrs.into_pairs() {
+            match pair.into_value() {
+                Attribute::Sql(config) => {
+                    to_sql_config.get_or_insert(config);
+                }
+                attr => {
+                    attrs.push(attr);
+                }
+            }
+        }
+
+        let func: syn::ItemFn = input.parse()?;
         Ok(Self {
             attrs,
-            attr_tokens,
             func,
+            to_sql_config: to_sql_config.unwrap_or_default(),
         })
     }
 }

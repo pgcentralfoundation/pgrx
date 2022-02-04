@@ -1,0 +1,148 @@
+use std::hash::Hash;
+
+use proc_macro2::TokenStream as TokenStream2;
+use quote::{quote, ToTokens, TokenStreamExt};
+use syn::spanned::Spanned;
+use syn::{AttrStyle, Attribute, Lit};
+
+use super::{ArgValue, PgxArg, PgxAttribute};
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ToSqlConfig {
+    pub enabled: bool,
+    pub callback: Option<syn::Path>,
+    pub content: Option<syn::LitStr>,
+}
+impl From<bool> for ToSqlConfig {
+    fn from(enabled: bool) -> Self {
+        Self {
+            enabled,
+            callback: None,
+            content: None,
+        }
+    }
+}
+impl From<syn::Path> for ToSqlConfig {
+    fn from(path: syn::Path) -> Self {
+        Self {
+            enabled: true,
+            callback: Some(path),
+            content: None,
+        }
+    }
+}
+impl From<syn::LitStr> for ToSqlConfig {
+    fn from(content: syn::LitStr) -> Self {
+        Self {
+            enabled: true,
+            callback: None,
+            content: Some(content),
+        }
+    }
+}
+impl Default for ToSqlConfig {
+    fn default() -> Self {
+        Self {
+            enabled: true,
+            callback: None,
+            content: None,
+        }
+    }
+}
+
+const INVALID_ATTR_CONTENT: &str =
+    "expected `#[pgx(sql = content)]`, where `content` is a boolean, string, or path to a function";
+
+impl ToSqlConfig {
+    /// Used for general purpose parsing from an attribute
+    pub fn from_attribute(attr: &Attribute) -> Result<Option<Self>, syn::Error> {
+        if attr.style != AttrStyle::Outer {
+            return Err(syn::Error::new(
+                attr.span(),
+                "#[pgx(sql = ..)] is only valid in an outer context",
+            ));
+        }
+
+        let attr = attr.parse_args::<PgxAttribute>()?;
+        for arg in attr.args.iter() {
+            if let PgxArg::NameValue(ref nv) = arg {
+                if !nv.path.is_ident("sql") {
+                    continue;
+                }
+
+                match nv.value {
+                    ArgValue::Path(ref callback_path) => {
+                        return Ok(Some(Self {
+                            enabled: true,
+                            callback: Some(callback_path.clone()),
+                            content: None,
+                        }));
+                    }
+                    ArgValue::Lit(Lit::Bool(ref b)) => {
+                        return Ok(Some(Self {
+                            enabled: b.value,
+                            callback: None,
+                            content: None,
+                        }));
+                    }
+                    ArgValue::Lit(Lit::Str(ref s)) => {
+                        return Ok(Some(Self {
+                            enabled: true,
+                            callback: None,
+                            content: Some(s.clone()),
+                        }));
+                    }
+                    ArgValue::Lit(ref other) => {
+                        return Err(syn::Error::new(other.span(), INVALID_ATTR_CONTENT));
+                    }
+                }
+            }
+        }
+
+        Ok(None)
+    }
+
+    /// Used to parse a generator config from a set of item attributes
+    pub fn from_attributes(attrs: &[Attribute]) -> Result<Option<Self>, syn::Error> {
+        if let Some(attr) = attrs.iter().find(|attr| attr.path.is_ident("pgx")) {
+            Self::from_attribute(attr)
+        } else {
+            Ok(None)
+        }
+    }
+}
+
+impl ToTokens for ToSqlConfig {
+    fn to_tokens(&self, tokens: &mut TokenStream2) {
+        let enabled = self.enabled;
+        let callback = &self.callback;
+        let content = &self.content;
+        if let Some(callback_path) = callback {
+            tokens.append_all(quote! {
+                ::pgx::datum::sql_entity_graph::ToSqlConfigEntity {
+                    enabled: #enabled,
+                    callback: Some(#callback_path),
+                    content: None,
+                }
+            });
+            return;
+        }
+        if let Some(sql) = content {
+            tokens.append_all(quote! {
+                ::pgx::datum::sql_entity_graph::ToSqlConfigEntity {
+                    enabled: #enabled,
+                    callback: None,
+                    content: Some(#sql),
+                }
+            });
+            return;
+        }
+        tokens.append_all(quote! {
+            ::pgx::datum::sql_entity_graph::ToSqlConfigEntity {
+                enabled: #enabled,
+                callback: None,
+                content: None,
+            }
+        });
+    }
+}
