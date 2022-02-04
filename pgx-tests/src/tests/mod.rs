@@ -13,6 +13,7 @@ mod fcinfo_tests;
 mod guc_tests;
 mod hooks_tests;
 mod inet_tests;
+mod internal_tests;
 mod json_tests;
 mod lifetime_tests;
 mod log_tests;
