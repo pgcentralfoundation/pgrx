@@ -37,4 +37,4 @@ eyre = "0.6.6"
 color-eyre = "0.6.0"
 tracing = "0.1.29"
 tracing-error = "0.2.0"
-tracing-subscriber = { version = "0.3.7", features = [ "env-filter" ] }
+tracing-subscriber = { version = "0.3.8", features = [ "env-filter" ] }
