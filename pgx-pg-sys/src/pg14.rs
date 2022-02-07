@@ -178,7 +178,7 @@ pub const ALIGNOF_LONG: u32 = 8;
 pub const ALIGNOF_PG_INT128_TYPE: u32 = 16;
 pub const ALIGNOF_SHORT: u32 = 2;
 pub const BLCKSZ: u32 = 8192;
-pub const CONFIGURE_ARGS : & [u8 ; 107usize] = b" '--prefix=/Users/e_ridge/.pgx/14.0/pgx-install' '--with-pgport=28814' '--enable-debug' '--enable-cassert'\0" ;
+pub const CONFIGURE_ARGS : & [u8 ; 112usize] = b" '--prefix=/Users/sachaarbonel/.pgx/14.1/pgx-install' '--with-pgport=28814' '--enable-debug' '--enable-cassert'\0" ;
 pub const DEF_PGPORT: u32 = 28814;
 pub const DEF_PGPORT_STR: &[u8; 6usize] = b"28814\0";
 pub const ENABLE_THREAD_SAFETY: u32 = 1;
@@ -327,18 +327,18 @@ pub const MAXIMUM_ALIGNOF: u32 = 8;
 pub const MEMSET_LOOP_LIMIT: u32 = 1024;
 pub const PACKAGE_BUGREPORT: &[u8; 32usize] = b"pgsql-bugs@lists.postgresql.org\0";
 pub const PACKAGE_NAME: &[u8; 11usize] = b"PostgreSQL\0";
-pub const PACKAGE_STRING: &[u8; 16usize] = b"PostgreSQL 14.0\0";
+pub const PACKAGE_STRING: &[u8; 16usize] = b"PostgreSQL 14.1\0";
 pub const PACKAGE_TARNAME: &[u8; 11usize] = b"postgresql\0";
 pub const PACKAGE_URL: &[u8; 28usize] = b"https://www.postgresql.org/\0";
-pub const PACKAGE_VERSION: &[u8; 5usize] = b"14.0\0";
+pub const PACKAGE_VERSION: &[u8; 5usize] = b"14.1\0";
 pub const PG_KRB_SRVNAM: &[u8; 9usize] = b"postgres\0";
 pub const PG_MAJORVERSION: &[u8; 3usize] = b"14\0";
 pub const PG_MAJORVERSION_NUM: u32 = 14;
-pub const PG_MINORVERSION_NUM: u32 = 0;
+pub const PG_MINORVERSION_NUM: u32 = 1;
 pub const PG_USE_STDBOOL: u32 = 1;
-pub const PG_VERSION: &[u8; 5usize] = b"14.0\0";
-pub const PG_VERSION_NUM: u32 = 140000;
-pub const PG_VERSION_STR : & [u8 ; 113usize] = b"PostgreSQL 14.0 on x86_64-apple-darwin20.4.0, compiled by Apple clang version 13.0.0 (clang-1300.0.29.3), 64-bit\0" ;
+pub const PG_VERSION: &[u8; 5usize] = b"14.1\0";
+pub const PG_VERSION_NUM: u32 = 140001;
+pub const PG_VERSION_STR : & [u8 ; 113usize] = b"PostgreSQL 14.1 on x86_64-apple-darwin21.1.0, compiled by Apple clang version 13.0.0 (clang-1300.0.29.3), 64-bit\0" ;
 pub const RELSEG_SIZE: u32 = 131072;
 pub const SIZEOF_BOOL: u32 = 1;
 pub const SIZEOF_LONG: u32 = 8;
@@ -430,6 +430,9 @@ pub const __MAC_10_16: u32 = 101600;
 pub const __MAC_11_0: u32 = 110000;
 pub const __MAC_11_1: u32 = 110100;
 pub const __MAC_11_3: u32 = 110300;
+pub const __MAC_11_4: u32 = 110400;
+pub const __MAC_11_5: u32 = 110500;
+pub const __MAC_12_0: u32 = 120000;
 pub const __IPHONE_2_0: u32 = 20000;
 pub const __IPHONE_2_1: u32 = 20100;
 pub const __IPHONE_2_2: u32 = 20200;
@@ -482,6 +485,10 @@ pub const __IPHONE_14_1: u32 = 140100;
 pub const __IPHONE_14_2: u32 = 140200;
 pub const __IPHONE_14_3: u32 = 140300;
 pub const __IPHONE_14_5: u32 = 140500;
+pub const __IPHONE_14_6: u32 = 140600;
+pub const __IPHONE_14_7: u32 = 140700;
+pub const __IPHONE_14_8: u32 = 140800;
+pub const __IPHONE_15_0: u32 = 150000;
 pub const __TVOS_9_0: u32 = 90000;
 pub const __TVOS_9_1: u32 = 90100;
 pub const __TVOS_9_2: u32 = 90200;
@@ -508,6 +515,9 @@ pub const __TVOS_14_1: u32 = 140100;
 pub const __TVOS_14_2: u32 = 140200;
 pub const __TVOS_14_3: u32 = 140300;
 pub const __TVOS_14_5: u32 = 140500;
+pub const __TVOS_14_6: u32 = 140600;
+pub const __TVOS_14_7: u32 = 140700;
+pub const __TVOS_15_0: u32 = 150000;
 pub const __WATCHOS_1_0: u32 = 10000;
 pub const __WATCHOS_2_0: u32 = 20000;
 pub const __WATCHOS_2_1: u32 = 20100;
@@ -532,6 +542,9 @@ pub const __WATCHOS_7_1: u32 = 70100;
 pub const __WATCHOS_7_2: u32 = 70200;
 pub const __WATCHOS_7_3: u32 = 70300;
 pub const __WATCHOS_7_4: u32 = 70400;
+pub const __WATCHOS_7_5: u32 = 70500;
+pub const __WATCHOS_7_6: u32 = 70600;
+pub const __WATCHOS_8_0: u32 = 80000;
 pub const MAC_OS_X_VERSION_10_0: u32 = 1000;
 pub const MAC_OS_X_VERSION_10_1: u32 = 1010;
 pub const MAC_OS_X_VERSION_10_2: u32 = 1020;
@@ -565,9 +578,11 @@ pub const MAC_OS_X_VERSION_10_15: u32 = 101500;
 pub const MAC_OS_X_VERSION_10_15_1: u32 = 101501;
 pub const MAC_OS_X_VERSION_10_16: u32 = 101600;
 pub const MAC_OS_VERSION_11_0: u32 = 110000;
+pub const MAC_OS_VERSION_12_0: u32 = 120000;
 pub const __DRIVERKIT_19_0: u32 = 190000;
 pub const __DRIVERKIT_20_0: u32 = 200000;
-pub const __MAC_OS_X_VERSION_MAX_ALLOWED: u32 = 110300;
+pub const __DRIVERKIT_21_0: u32 = 210000;
+pub const __MAC_OS_X_VERSION_MAX_ALLOWED: u32 = 120000;
 pub const __ENABLE_LEGACY_MAC_AVAILABILITY: u32 = 1;
 pub const __PTHREAD_SIZE__: u32 = 8176;
 pub const __PTHREAD_ATTR_SIZE__: u32 = 56;
@@ -827,6 +842,7 @@ pub const IOPOL_TYPE_VFS_TRIGGER_RESOLVE: u32 = 5;
 pub const IOPOL_TYPE_VFS_IGNORE_CONTENT_PROTECTION: u32 = 6;
 pub const IOPOL_TYPE_VFS_IGNORE_PERMISSIONS: u32 = 7;
 pub const IOPOL_TYPE_VFS_SKIP_MTIME_UPDATE: u32 = 8;
+pub const IOPOL_TYPE_VFS_ALLOW_LOW_SPACE_WRITES: u32 = 9;
 pub const IOPOL_SCOPE_PROCESS: u32 = 0;
 pub const IOPOL_SCOPE_THREAD: u32 = 1;
 pub const IOPOL_SCOPE_DARWIN_BG: u32 = 2;
@@ -853,6 +869,8 @@ pub const IOPOL_VFS_IGNORE_PERMISSIONS_OFF: u32 = 0;
 pub const IOPOL_VFS_IGNORE_PERMISSIONS_ON: u32 = 1;
 pub const IOPOL_VFS_SKIP_MTIME_UPDATE_OFF: u32 = 0;
 pub const IOPOL_VFS_SKIP_MTIME_UPDATE_ON: u32 = 1;
+pub const IOPOL_VFS_ALLOW_LOW_SPACE_WRITES_OFF: u32 = 0;
+pub const IOPOL_VFS_ALLOW_LOW_SPACE_WRITES_ON: u32 = 1;
 pub const WNOHANG: u32 = 1;
 pub const WUNTRACED: u32 = 2;
 pub const WCOREFLAG: u32 = 128;
@@ -1082,7 +1100,7 @@ pub const KEV_DL_IFCAP_CHANGED: u32 = 19;
 pub const KEV_DL_LINK_QUALITY_METRIC_CHANGED: u32 = 20;
 pub const KEV_DL_NODE_PRESENCE: u32 = 21;
 pub const KEV_DL_NODE_ABSENCE: u32 = 22;
-pub const KEV_DL_MASTER_ELECTED: u32 = 23;
+pub const KEV_DL_PRIMARY_ELECTED: u32 = 23;
 pub const KEV_DL_ISSUES: u32 = 24;
 pub const KEV_DL_IFDELEGATE_CHANGED: u32 = 25;
 pub const KEV_DL_AWDL_RESTRICTED: u32 = 26;
@@ -1598,6 +1616,7 @@ pub const IPV6CTL_MAXIFPREFIXES: u32 = 47;
 pub const IPV6CTL_MAXIFDEFROUTERS: u32 = 48;
 pub const IPV6CTL_MAXDYNROUTES: u32 = 49;
 pub const ICMPV6CTL_ND6_ONLINKNSRFC4861: u32 = 50;
+pub const IPV6CTL_ULA_USETEMPADDR: u32 = 51;
 pub const IPV6CTL_MAXID: u32 = 51;
 pub const _PATH_HEQUIV: &[u8; 17usize] = b"/etc/hosts.equiv\0";
 pub const _PATH_HOSTS: &[u8; 11usize] = b"/etc/hosts\0";
@@ -1669,7 +1688,7 @@ pub const _PASSWORD_NOEXP: u32 = 8;
 pub const _PASSWORD_WARNDAYS: u32 = 14;
 pub const _PASSWORD_CHGNOW: i32 = -1;
 pub const PGINVALID_SOCKET: i32 = -1;
-pub const PG_BACKEND_VERSIONSTR: &[u8; 28usize] = b"postgres (PostgreSQL) 14.0\n\0";
+pub const PG_BACKEND_VERSIONSTR: &[u8; 28usize] = b"postgres (PostgreSQL) 14.1\n\0";
 pub const EXE: &[u8; 1usize] = b"\0";
 pub const DEVNULL: &[u8; 10usize] = b"/dev/null\0";
 pub const USE_REPL_SNPRINTF: u32 = 1;
@@ -3346,6 +3365,34 @@ pub const COMMAND_OK_IN_PARALLEL_MODE: u32 = 2;
 pub const COMMAND_OK_IN_RECOVERY: u32 = 4;
 pub const COMMAND_IS_STRICTLY_READ_ONLY: u32 = 7;
 pub const COMMAND_IS_NOT_READ_ONLY: u32 = 0;
+pub const MAXSTRLEN: u32 = 2047;
+pub const MAXSTRPOS: u32 = 1048575;
+pub const MAXENTRYPOS: u32 = 16384;
+pub const MAXNUMPOS: u32 = 256;
+pub const QI_VAL: u32 = 1;
+pub const QI_OPR: u32 = 2;
+pub const QI_VALSTOP: u32 = 3;
+pub const OP_NOT: u32 = 1;
+pub const OP_AND: u32 = 2;
+pub const OP_OR: u32 = 3;
+pub const OP_PHRASE: u32 = 4;
+pub const OP_COUNT: u32 = 4;
+pub const TSL_ADDPOS: u32 = 1;
+pub const TSL_PREFIX: u32 = 2;
+pub const TSL_FILTER: u32 = 4;
+pub const P_TSV_OPR_IS_DELIM: u32 = 1;
+pub const P_TSV_IS_TSQUERY: u32 = 2;
+pub const P_TSV_IS_WEB: u32 = 4;
+pub const P_TSQ_PLAIN: u32 = 1;
+pub const P_TSQ_WEB: u32 = 2;
+pub const TS_EXEC_EMPTY: u32 = 0;
+pub const TS_EXEC_SKIP_NOT: u32 = 1;
+pub const TS_EXEC_PHRASE_NO_POS: u32 = 2;
+pub const TSearchStrategyNumber: u32 = 1;
+pub const TSearchWithClassStrategyNumber: u32 = 2;
+pub const QTN_NEEDFREE: u32 = 1;
+pub const QTN_NOCHANGE: u32 = 2;
+pub const QTN_WORDFREE: u32 = 4;
 pub const MAXINT8LEN: u32 = 20;
 pub const FORMAT_TYPE_TYPEMOD_GIVEN: u32 = 1;
 pub const FORMAT_TYPE_ALLOW_INVALID: u32 = 2;
@@ -4298,14 +4345,6 @@ extern "C" {
         arg2: *const ::std::os::raw::c_char,
         arg3: *mut __va_list_tag,
     ) -> ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
-    pub fn zopen(
-        arg1: *const ::std::os::raw::c_char,
-        arg2: *const ::std::os::raw::c_char,
-        arg3: ::std::os::raw::c_int,
-    ) -> *mut FILE;
 }
 #[pg_guard]
 extern "C" {
@@ -6353,10 +6392,7 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
-    pub fn aligned_alloc(
-        __alignment: ::std::os::raw::c_ulong,
-        __size: ::std::os::raw::c_ulong,
-    ) -> *mut ::std::os::raw::c_void;
+    pub fn aligned_alloc(__alignment: usize, __size: usize) -> *mut ::std::os::raw::c_void;
 }
 #[pg_guard]
 extern "C" {
@@ -8961,10 +8997,6 @@ extern "C" {
 #[pg_guard]
 extern "C" {
     pub fn uuid_generate_time(out: *mut ::std::os::raw::c_uchar);
-}
-#[pg_guard]
-extern "C" {
-    pub fn uuid_generate_early_random(out: *mut ::std::os::raw::c_uchar);
 }
 #[pg_guard]
 extern "C" {
@@ -11770,6 +11802,10 @@ extern "C" {
 #[pg_guard]
 extern "C" {
     pub fn list_delete_last(list: *mut List) -> *mut List;
+}
+#[pg_guard]
+extern "C" {
+    pub fn list_delete_first_n(list: *mut List, n: ::std::os::raw::c_int) -> *mut List;
 }
 #[pg_guard]
 extern "C" {
@@ -18490,7 +18526,7 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
-    pub fn RelationCacheInvalidate();
+    pub fn RelationCacheInvalidate(debug_discard: bool);
 }
 #[pg_guard]
 extern "C" {
@@ -29696,6 +29732,9 @@ pub struct XLogReaderState {
     pub readRecordBuf: *mut ::std::os::raw::c_char,
     pub readRecordBufSize: uint32,
     pub errormsg_buf: *mut ::std::os::raw::c_char,
+    pub abortedRecPtr: XLogRecPtr,
+    pub missingContrecPtr: XLogRecPtr,
+    pub overwrittenRecPtr: XLogRecPtr,
 }
 impl Default for XLogReaderState {
     fn default() -> Self {
@@ -39060,6 +39099,7 @@ pub struct PortalData {
     pub portalPos: uint64,
     pub creation_time: TimestampTz,
     pub visible: bool,
+    pub createLevel: ::std::os::raw::c_int,
 }
 impl Default for PortalData {
     fn default() -> Self {
@@ -39095,6 +39135,7 @@ extern "C" {
     pub fn AtSubCommit_Portals(
         mySubid: SubTransactionId,
         parentSubid: SubTransactionId,
+        parentLevel: ::std::os::raw::c_int,
         parentXactOwner: ResourceOwner,
     );
 }
@@ -39229,6 +39270,7 @@ pub struct SPIExecuteOptions {
     pub params: ParamListInfo,
     pub read_only: bool,
     pub allow_nonatomic: bool,
+    pub must_return_tuples: bool,
     pub tcount: uint64,
     pub dest: *mut DestReceiver,
     pub owner: ResourceOwner,
@@ -47666,6 +47708,10 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
+    pub fn PushActiveSnapshotWithLevel(snapshot: Snapshot, snap_level: ::std::os::raw::c_int);
+}
+#[pg_guard]
+extern "C" {
     pub fn PushCopiedSnapshot(snapshot: Snapshot);
 }
 #[pg_guard]
@@ -48922,6 +48968,739 @@ extern "C" {
 #[pg_guard]
 extern "C" {
     pub fn CommandIsReadOnly(pstmt: *mut PlannedStmt) -> bool;
+}
+#[repr(C)]
+#[repr(align(4))]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct WordEntry {
+    pub _bitfield_align_1: [u32; 0],
+    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 4usize]>,
+}
+impl WordEntry {
+    #[inline]
+    pub fn haspos(&self) -> uint32 {
+        unsafe { ::std::mem::transmute(self._bitfield_1.get(0usize, 1u8) as u32) }
+    }
+    #[inline]
+    pub fn set_haspos(&mut self, val: uint32) {
+        unsafe {
+            let val: u32 = ::std::mem::transmute(val);
+            self._bitfield_1.set(0usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn len(&self) -> uint32 {
+        unsafe { ::std::mem::transmute(self._bitfield_1.get(1usize, 11u8) as u32) }
+    }
+    #[inline]
+    pub fn set_len(&mut self, val: uint32) {
+        unsafe {
+            let val: u32 = ::std::mem::transmute(val);
+            self._bitfield_1.set(1usize, 11u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn pos(&self) -> uint32 {
+        unsafe { ::std::mem::transmute(self._bitfield_1.get(12usize, 20u8) as u32) }
+    }
+    #[inline]
+    pub fn set_pos(&mut self, val: uint32) {
+        unsafe {
+            let val: u32 = ::std::mem::transmute(val);
+            self._bitfield_1.set(12usize, 20u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn new_bitfield_1(
+        haspos: uint32,
+        len: uint32,
+        pos: uint32,
+    ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
+        __bindgen_bitfield_unit.set(0usize, 1u8, {
+            let haspos: u32 = unsafe { ::std::mem::transmute(haspos) };
+            haspos as u64
+        });
+        __bindgen_bitfield_unit.set(1usize, 11u8, {
+            let len: u32 = unsafe { ::std::mem::transmute(len) };
+            len as u64
+        });
+        __bindgen_bitfield_unit.set(12usize, 20u8, {
+            let pos: u32 = unsafe { ::std::mem::transmute(pos) };
+            pos as u64
+        });
+        __bindgen_bitfield_unit
+    }
+}
+#[pg_guard]
+extern "C" {
+    pub fn compareWordEntryPos(
+        a: *const ::std::os::raw::c_void,
+        b: *const ::std::os::raw::c_void,
+    ) -> ::std::os::raw::c_int;
+}
+pub type WordEntryPos = uint16;
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct WordEntryPosVector {
+    pub npos: uint16,
+    pub pos: __IncompleteArrayField<WordEntryPos>,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct WordEntryPosVector1 {
+    pub npos: uint16,
+    pub pos: [WordEntryPos; 1usize],
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct TSVectorData {
+    pub vl_len_: int32,
+    pub size: int32,
+    pub entries: __IncompleteArrayField<WordEntry>,
+}
+pub type TSVector = *mut TSVectorData;
+pub type QueryItemType = int8;
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct QueryOperand {
+    pub type_: QueryItemType,
+    pub weight: uint8,
+    pub prefix: bool,
+    pub valcrc: int32,
+    pub _bitfield_align_1: [u32; 0],
+    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 4usize]>,
+}
+impl QueryOperand {
+    #[inline]
+    pub fn length(&self) -> uint32 {
+        unsafe { ::std::mem::transmute(self._bitfield_1.get(0usize, 12u8) as u32) }
+    }
+    #[inline]
+    pub fn set_length(&mut self, val: uint32) {
+        unsafe {
+            let val: u32 = ::std::mem::transmute(val);
+            self._bitfield_1.set(0usize, 12u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn distance(&self) -> uint32 {
+        unsafe { ::std::mem::transmute(self._bitfield_1.get(12usize, 20u8) as u32) }
+    }
+    #[inline]
+    pub fn set_distance(&mut self, val: uint32) {
+        unsafe {
+            let val: u32 = ::std::mem::transmute(val);
+            self._bitfield_1.set(12usize, 20u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn new_bitfield_1(length: uint32, distance: uint32) -> __BindgenBitfieldUnit<[u8; 4usize]> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
+        __bindgen_bitfield_unit.set(0usize, 12u8, {
+            let length: u32 = unsafe { ::std::mem::transmute(length) };
+            length as u64
+        });
+        __bindgen_bitfield_unit.set(12usize, 20u8, {
+            let distance: u32 = unsafe { ::std::mem::transmute(distance) };
+            distance as u64
+        });
+        __bindgen_bitfield_unit
+    }
+}
+#[pg_guard]
+extern "C" {
+    pub static tsearch_op_priority: [::std::os::raw::c_int; 4usize];
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct QueryOperator {
+    pub type_: QueryItemType,
+    pub oper: int8,
+    pub distance: int16,
+    pub left: uint32,
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub union QueryItem {
+    pub type_: QueryItemType,
+    pub qoperator: QueryOperator,
+    pub qoperand: QueryOperand,
+}
+impl Default for QueryItem {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct TSQueryData {
+    pub vl_len_: int32,
+    pub size: int32,
+    pub data: __IncompleteArrayField<::std::os::raw::c_char>,
+}
+pub type TSQuery = *mut TSQueryData;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct LexDescr {
+    pub lexid: ::std::os::raw::c_int,
+    pub alias: *mut ::std::os::raw::c_char,
+    pub descr: *mut ::std::os::raw::c_char,
+}
+impl Default for LexDescr {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct HeadlineWordEntry {
+    pub _bitfield_align_1: [u16; 0],
+    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 4usize]>,
+    pub pos: WordEntryPos,
+    pub word: *mut ::std::os::raw::c_char,
+    pub item: *mut QueryOperand,
+}
+impl Default for HeadlineWordEntry {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+impl HeadlineWordEntry {
+    #[inline]
+    pub fn selected(&self) -> uint32 {
+        unsafe { ::std::mem::transmute(self._bitfield_1.get(0usize, 1u8) as u32) }
+    }
+    #[inline]
+    pub fn set_selected(&mut self, val: uint32) {
+        unsafe {
+            let val: u32 = ::std::mem::transmute(val);
+            self._bitfield_1.set(0usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn in_(&self) -> uint32 {
+        unsafe { ::std::mem::transmute(self._bitfield_1.get(1usize, 1u8) as u32) }
+    }
+    #[inline]
+    pub fn set_in(&mut self, val: uint32) {
+        unsafe {
+            let val: u32 = ::std::mem::transmute(val);
+            self._bitfield_1.set(1usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn replace(&self) -> uint32 {
+        unsafe { ::std::mem::transmute(self._bitfield_1.get(2usize, 1u8) as u32) }
+    }
+    #[inline]
+    pub fn set_replace(&mut self, val: uint32) {
+        unsafe {
+            let val: u32 = ::std::mem::transmute(val);
+            self._bitfield_1.set(2usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn repeated(&self) -> uint32 {
+        unsafe { ::std::mem::transmute(self._bitfield_1.get(3usize, 1u8) as u32) }
+    }
+    #[inline]
+    pub fn set_repeated(&mut self, val: uint32) {
+        unsafe {
+            let val: u32 = ::std::mem::transmute(val);
+            self._bitfield_1.set(3usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn skip(&self) -> uint32 {
+        unsafe { ::std::mem::transmute(self._bitfield_1.get(4usize, 1u8) as u32) }
+    }
+    #[inline]
+    pub fn set_skip(&mut self, val: uint32) {
+        unsafe {
+            let val: u32 = ::std::mem::transmute(val);
+            self._bitfield_1.set(4usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn unused(&self) -> uint32 {
+        unsafe { ::std::mem::transmute(self._bitfield_1.get(5usize, 3u8) as u32) }
+    }
+    #[inline]
+    pub fn set_unused(&mut self, val: uint32) {
+        unsafe {
+            let val: u32 = ::std::mem::transmute(val);
+            self._bitfield_1.set(5usize, 3u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn type_(&self) -> uint32 {
+        unsafe { ::std::mem::transmute(self._bitfield_1.get(8usize, 8u8) as u32) }
+    }
+    #[inline]
+    pub fn set_type(&mut self, val: uint32) {
+        unsafe {
+            let val: u32 = ::std::mem::transmute(val);
+            self._bitfield_1.set(8usize, 8u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn len(&self) -> uint32 {
+        unsafe { ::std::mem::transmute(self._bitfield_1.get(16usize, 16u8) as u32) }
+    }
+    #[inline]
+    pub fn set_len(&mut self, val: uint32) {
+        unsafe {
+            let val: u32 = ::std::mem::transmute(val);
+            self._bitfield_1.set(16usize, 16u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn new_bitfield_1(
+        selected: uint32,
+        in_: uint32,
+        replace: uint32,
+        repeated: uint32,
+        skip: uint32,
+        unused: uint32,
+        type_: uint32,
+        len: uint32,
+    ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
+        __bindgen_bitfield_unit.set(0usize, 1u8, {
+            let selected: u32 = unsafe { ::std::mem::transmute(selected) };
+            selected as u64
+        });
+        __bindgen_bitfield_unit.set(1usize, 1u8, {
+            let in_: u32 = unsafe { ::std::mem::transmute(in_) };
+            in_ as u64
+        });
+        __bindgen_bitfield_unit.set(2usize, 1u8, {
+            let replace: u32 = unsafe { ::std::mem::transmute(replace) };
+            replace as u64
+        });
+        __bindgen_bitfield_unit.set(3usize, 1u8, {
+            let repeated: u32 = unsafe { ::std::mem::transmute(repeated) };
+            repeated as u64
+        });
+        __bindgen_bitfield_unit.set(4usize, 1u8, {
+            let skip: u32 = unsafe { ::std::mem::transmute(skip) };
+            skip as u64
+        });
+        __bindgen_bitfield_unit.set(5usize, 3u8, {
+            let unused: u32 = unsafe { ::std::mem::transmute(unused) };
+            unused as u64
+        });
+        __bindgen_bitfield_unit.set(8usize, 8u8, {
+            let type_: u32 = unsafe { ::std::mem::transmute(type_) };
+            type_ as u64
+        });
+        __bindgen_bitfield_unit.set(16usize, 16u8, {
+            let len: u32 = unsafe { ::std::mem::transmute(len) };
+            len as u64
+        });
+        __bindgen_bitfield_unit
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct HeadlineParsedText {
+    pub words: *mut HeadlineWordEntry,
+    pub lenwords: int32,
+    pub curwords: int32,
+    pub vectorpos: int32,
+    pub startsel: *mut ::std::os::raw::c_char,
+    pub stopsel: *mut ::std::os::raw::c_char,
+    pub fragdelim: *mut ::std::os::raw::c_char,
+    pub startsellen: int16,
+    pub stopsellen: int16,
+    pub fragdelimlen: int16,
+}
+impl Default for HeadlineParsedText {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[pg_guard]
+extern "C" {
+    pub fn get_tsearch_config_filename(
+        basename: *const ::std::os::raw::c_char,
+        extension: *const ::std::os::raw::c_char,
+    ) -> *mut ::std::os::raw::c_char;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct StopList {
+    pub len: ::std::os::raw::c_int,
+    pub stop: *mut *mut ::std::os::raw::c_char,
+}
+impl Default for StopList {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[pg_guard]
+extern "C" {
+    pub fn readstoplist(
+        fname: *const ::std::os::raw::c_char,
+        s: *mut StopList,
+        wordop: ::std::option::Option<
+            unsafe extern "C" fn(
+                arg1: *const ::std::os::raw::c_char,
+            ) -> *mut ::std::os::raw::c_char,
+        >,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn searchstoplist(s: *mut StopList, key: *mut ::std::os::raw::c_char) -> bool;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct TSLexeme {
+    pub nvariant: uint16,
+    pub flags: uint16,
+    pub lexeme: *mut ::std::os::raw::c_char,
+}
+impl Default for TSLexeme {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct DictSubState {
+    pub isend: bool,
+    pub getnext: bool,
+    pub private_state: *mut ::std::os::raw::c_void,
+}
+impl Default for DictSubState {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct TSVectorParseStateData {
+    _unused: [u8; 0],
+}
+pub type TSVectorParseState = *mut TSVectorParseStateData;
+#[pg_guard]
+extern "C" {
+    pub fn init_tsvector_parser(
+        input: *mut ::std::os::raw::c_char,
+        flags: ::std::os::raw::c_int,
+    ) -> TSVectorParseState;
+}
+#[pg_guard]
+extern "C" {
+    pub fn reset_tsvector_parser(state: TSVectorParseState, input: *mut ::std::os::raw::c_char);
+}
+#[pg_guard]
+extern "C" {
+    pub fn gettoken_tsvector(
+        state: TSVectorParseState,
+        token: *mut *mut ::std::os::raw::c_char,
+        len: *mut ::std::os::raw::c_int,
+        pos: *mut *mut WordEntryPos,
+        poslen: *mut ::std::os::raw::c_int,
+        endptr: *mut *mut ::std::os::raw::c_char,
+    ) -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn close_tsvector_parser(state: TSVectorParseState);
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct TSQueryParserStateData {
+    _unused: [u8; 0],
+}
+pub type TSQueryParserState = *mut TSQueryParserStateData;
+pub type PushFunction = ::std::option::Option<
+    unsafe extern "C" fn(
+        opaque: Datum,
+        state: TSQueryParserState,
+        token: *mut ::std::os::raw::c_char,
+        tokenlen: ::std::os::raw::c_int,
+        tokenweights: int16,
+        prefix: bool,
+    ),
+>;
+#[pg_guard]
+extern "C" {
+    pub fn parse_tsquery(
+        buf: *mut ::std::os::raw::c_char,
+        pushval: PushFunction,
+        opaque: Datum,
+        flags: ::std::os::raw::c_int,
+    ) -> TSQuery;
+}
+#[pg_guard]
+extern "C" {
+    pub fn pushValue(
+        state: TSQueryParserState,
+        strval: *mut ::std::os::raw::c_char,
+        lenval: ::std::os::raw::c_int,
+        weight: int16,
+        prefix: bool,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn pushStop(state: TSQueryParserState);
+}
+#[pg_guard]
+extern "C" {
+    pub fn pushOperator(state: TSQueryParserState, oper: int8, distance: int16);
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct ParsedWord {
+    pub len: uint16,
+    pub nvariant: uint16,
+    pub pos: ParsedWord__bindgen_ty_1,
+    pub flags: uint16,
+    pub word: *mut ::std::os::raw::c_char,
+    pub alen: uint32,
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub union ParsedWord__bindgen_ty_1 {
+    pub pos: uint16,
+    pub apos: *mut uint16,
+}
+impl Default for ParsedWord__bindgen_ty_1 {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+impl Default for ParsedWord {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ParsedText {
+    pub words: *mut ParsedWord,
+    pub lenwords: int32,
+    pub curwords: int32,
+    pub pos: int32,
+}
+impl Default for ParsedText {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[pg_guard]
+extern "C" {
+    pub fn parsetext(
+        cfgId: Oid,
+        prs: *mut ParsedText,
+        buf: *mut ::std::os::raw::c_char,
+        buflen: int32,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn hlparsetext(
+        cfgId: Oid,
+        prs: *mut HeadlineParsedText,
+        query: TSQuery,
+        buf: *mut ::std::os::raw::c_char,
+        buflen: int32,
+    );
+}
+#[pg_guard]
+extern "C" {
+    pub fn generateHeadline(prs: *mut HeadlineParsedText) -> *mut text;
+}
+pub const TSTernaryValue_TS_NO: TSTernaryValue = 0;
+pub const TSTernaryValue_TS_YES: TSTernaryValue = 1;
+pub const TSTernaryValue_TS_MAYBE: TSTernaryValue = 2;
+pub type TSTernaryValue = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ExecPhraseData {
+    pub npos: ::std::os::raw::c_int,
+    pub allocated: bool,
+    pub negate: bool,
+    pub pos: *mut WordEntryPos,
+    pub width: ::std::os::raw::c_int,
+}
+impl Default for ExecPhraseData {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type TSExecuteCallback = ::std::option::Option<
+    unsafe extern "C" fn(
+        arg: *mut ::std::os::raw::c_void,
+        val: *mut QueryOperand,
+        data: *mut ExecPhraseData,
+    ) -> TSTernaryValue,
+>;
+#[pg_guard]
+extern "C" {
+    pub fn TS_execute(
+        curitem: *mut QueryItem,
+        arg: *mut ::std::os::raw::c_void,
+        flags: uint32,
+        chkcond: TSExecuteCallback,
+    ) -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn TS_execute_ternary(
+        curitem: *mut QueryItem,
+        arg: *mut ::std::os::raw::c_void,
+        flags: uint32,
+        chkcond: TSExecuteCallback,
+    ) -> TSTernaryValue;
+}
+#[pg_guard]
+extern "C" {
+    pub fn tsquery_requires_match(curitem: *mut QueryItem) -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn make_tsvector(prs: *mut ParsedText) -> TSVector;
+}
+#[pg_guard]
+extern "C" {
+    pub fn tsCompareString(
+        a: *mut ::std::os::raw::c_char,
+        lena: ::std::os::raw::c_int,
+        b: *mut ::std::os::raw::c_char,
+        lenb: ::std::os::raw::c_int,
+        prefix: bool,
+    ) -> int32;
+}
+#[pg_guard]
+extern "C" {
+    pub fn clean_NOT(ptr: *mut QueryItem, len: *mut int32) -> *mut QueryItem;
+}
+#[pg_guard]
+extern "C" {
+    pub fn cleanup_tsquery_stopwords(in_: TSQuery) -> TSQuery;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct QTNode {
+    pub valnode: *mut QueryItem,
+    pub flags: uint32,
+    pub nchild: int32,
+    pub word: *mut ::std::os::raw::c_char,
+    pub sign: uint32,
+    pub child: *mut *mut QTNode,
+}
+impl Default for QTNode {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type TSQuerySign = uint64;
+#[pg_guard]
+extern "C" {
+    pub fn QT2QTN(in_: *mut QueryItem, operand: *mut ::std::os::raw::c_char) -> *mut QTNode;
+}
+#[pg_guard]
+extern "C" {
+    pub fn QTN2QT(in_: *mut QTNode) -> TSQuery;
+}
+#[pg_guard]
+extern "C" {
+    pub fn QTNFree(in_: *mut QTNode);
+}
+#[pg_guard]
+extern "C" {
+    pub fn QTNSort(in_: *mut QTNode);
+}
+#[pg_guard]
+extern "C" {
+    pub fn QTNTernary(in_: *mut QTNode);
+}
+#[pg_guard]
+extern "C" {
+    pub fn QTNBinary(in_: *mut QTNode);
+}
+#[pg_guard]
+extern "C" {
+    pub fn QTNodeCompare(an: *mut QTNode, bn: *mut QTNode) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
+    pub fn QTNCopy(in_: *mut QTNode) -> *mut QTNode;
+}
+#[pg_guard]
+extern "C" {
+    pub fn QTNClearFlags(in_: *mut QTNode, flags: uint32);
+}
+#[pg_guard]
+extern "C" {
+    pub fn QTNEq(a: *mut QTNode, b: *mut QTNode) -> bool;
+}
+#[pg_guard]
+extern "C" {
+    pub fn makeTSQuerySign(a: TSQuery) -> TSQuerySign;
+}
+#[pg_guard]
+extern "C" {
+    pub fn findsubquery(
+        root: *mut QTNode,
+        ex: *mut QTNode,
+        subs: *mut QTNode,
+        isfind: *mut bool,
+    ) -> *mut QTNode;
 }
 #[pg_guard]
 extern "C" {
