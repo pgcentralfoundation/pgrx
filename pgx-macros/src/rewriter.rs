@@ -727,7 +727,7 @@ impl FunctionSignatureRewriter {
 
         // Get the fcinfo ident, if it exists.
         // We do this because we need to get the **right** ident, if it exists, so Rustc
-        // doesn't think we're pointing at the fcinfo path.
+        // doesn't think we're pointing at the fcinfo module path.
         for arg in &self.func.sig.inputs {
             match arg {
                 FnArg::Typed(ty) => match ty.pat.deref() {

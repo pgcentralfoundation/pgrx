@@ -149,23 +149,14 @@ mod tests {
         assert_eq!(retval, 4);
 
         // Moving-aggregate mode
-        let retval = Spi::get_one::<i32>("
-            SELECT demo_sum(x) OVER (
-                ORDER BY n ROWS BETWEEN CURRENT ROW AND 1 FOLLOWING
-            ) FROM (
-                VALUES (1, 1), (2, 2)
-            ) AS v (n,x);
-        ").expect("SQL select failed");
-        assert_eq!(retval, 3);
-
         let retval = Spi::get_one::<Vec<i32>>("
             SELECT array_agg(calculated) FROM (
                 SELECT demo_sum(value) OVER (
-                    ROWS BETWEEN CURRENT ROW AND 1 FOLLOWING
-                ) AS calculated FROM UNNEST(ARRAY [1, 20, 300, 4000]) as value
+                    ROWS BETWEEN 1 PRECEDING AND CURRENT ROW
+                ) as calculated FROM UNNEST(ARRAY [1, 20, 300, 4000]) as value
             ) as results;
         ").expect("SQL select failed");
-        assert_eq!(retval, vec![21, 322, 4342, 4642]);
+        assert_eq!(retval, vec![1, 21, 320, 4300]);
     }
 
     #[pg_test]
