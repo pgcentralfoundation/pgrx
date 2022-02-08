@@ -440,7 +440,7 @@ impl PgAggregate {
                 ) -> <#target_path as pgx::Aggregate>::MovingState {
                     <#target_path as pgx::Aggregate>::in_memory_context(
                         fcinfo,
-                        move |_context| <#target_path as pgx::Aggregate>::moving_state(mstate, v, fcinfo)
+                        move |_context| <#target_path as pgx::Aggregate>::moving_state_inverse(mstate, v, fcinfo)
                     )
                 }
             });
