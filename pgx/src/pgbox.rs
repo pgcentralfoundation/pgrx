@@ -160,8 +160,8 @@ impl<T> PgBox<T, AllocatedByRust> {
     ```
     */ 
     pub fn new(val: T) -> PgBox<T, AllocatedByRust> {
-        let mut ptr = Self::alloc0();
-        *ptr = val;
+        let ptr = Self::alloc0();
+        unsafe { core::ptr::write(ptr.as_ptr(), val) };
         ptr
     }
 
@@ -181,8 +181,8 @@ impl<T> PgBox<T, AllocatedByRust> {
     ```
     */
     pub fn new_in_context(val: T, memory_context: PgMemoryContexts) -> PgBox<T, AllocatedByRust> {
-        let mut ptr = Self::alloc0_in_context(memory_context);
-        *ptr = val;
+        let ptr = Self::alloc0_in_context(memory_context);
+        unsafe { core::ptr::write(ptr.as_ptr(), val) };
         ptr
     }
 }
