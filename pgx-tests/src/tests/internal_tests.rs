@@ -6,7 +6,7 @@ mod tests {
     use pgx::*;
 
     #[pg_test]
-    fn insert() {
+    fn internal_insert() {
         let mut val = Internal::default();
         assert_eq!(val.initialized(), false);
 
@@ -22,7 +22,7 @@ mod tests {
     }
 
     #[pg_test]
-    fn get_or_insert_default() {
+    fn internal_get_or_insert_default() {
         let mut val = Internal::default();
         assert_eq!(val.initialized(), false);
 
@@ -33,7 +33,7 @@ mod tests {
     }
 
     #[pg_test]
-    fn get_or_insert() {
+    fn internal_get_or_insert() {
         let mut val = Internal::default();
         assert_eq!(val.initialized(), false);
 
@@ -44,7 +44,7 @@ mod tests {
     }
 
     #[pg_test]
-    fn get_or_insert_with() {
+    fn internal_get_or_insert_with() {
         let mut val = Internal::default();
         assert_eq!(val.initialized(), false);
 

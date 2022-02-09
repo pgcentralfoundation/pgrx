@@ -23,6 +23,7 @@ mod name_tests;
 mod numeric_tests;
 mod pg_extern_args_tests;
 mod pg_try_tests;
+mod pgbox_tests;
 mod postgres_type_tests;
 mod schema_tests;
 mod spi_tests;
