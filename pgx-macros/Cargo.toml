@@ -1,6 +1,6 @@
 [package]
 name = "pgx-macros"
-version = "0.2.6"
+version = "0.3.0"
 authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
 edition = "2018"
 license = "MIT"
@@ -18,7 +18,7 @@ proc-macro = true
 rustc-args = ["--cfg", "docsrs"]
 
 [dependencies]
-pgx-utils = { path = "../pgx-utils", version = "0.2.6" }
+pgx-utils = { path = "../pgx-utils", version = "0.3.0" }
 proc-macro2 = "1.0.36"
 quote = "1.0.15"
 syn = { version = "1.0.86", features = [ "extra-traits", "full", "fold", "parsing" ] }
