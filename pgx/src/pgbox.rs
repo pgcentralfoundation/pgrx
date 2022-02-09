@@ -174,9 +174,9 @@ impl<T> PgBox<T, AllocatedByRust> {
     If you need to give the boxed pointer to Postgres, call [`.into_pg()`][PgBox::into_pg].
 
     ```rust,no_run
-    use pgx::{PgBox, AllocatedByRust};
+    use pgx::{PgBox, PgMemoryContexts, AllocatedByRust};
 
-    let ptr: PgBox<i32, AllocatedByRust> = PgBox::new(5);
+    let ptr: PgBox<i32, AllocatedByRust> = PgBox::new_in_context(5, PgMemoryContexts::CurrentMemoryContext);
     assert_eq!(*ptr, 5);
     ```
     */
