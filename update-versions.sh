@@ -18,6 +18,7 @@ git reset HEAD || exit 1
 sed -i '' -e "s/^pgx = .*$/pgx = \"${VERSION}\"/" ./cargo-pgx/src/templates/cargo_toml || exit 1
 sed -i '' -e "s/^pgx-macros = .*$/pgx-macros = \"${VERSION}\"/" ./cargo-pgx/src/templates/cargo_toml || exit 1
 sed -i '' -e "s/^pgx-tests = .*$/pgx-tests = \"${VERSION}\"/" ./cargo-pgx/src/templates/cargo_toml || exit 1
-sed -i '' -e "s/version: .*$/version: \"${VERSION}\"/" ./cargo-pgx/src/cli.yml || exit 1
 
-
+sed -i '' -e "s/^pgx = .*$/pgx = \"${VERSION}\"/" ./nix/templates/default/Cargo.toml || exit 1
+sed -i '' -e "s/^pgx-macros = .*$/pgx-macros = \"${VERSION}\"/" ./nix/templates/default/Cargo.toml || exit 1
+sed -i '' -e "s/^pgx-tests = .*$/pgx-tests = \"${VERSION}\"/" ./nix/templates/default/Cargo.toml || exit 1
