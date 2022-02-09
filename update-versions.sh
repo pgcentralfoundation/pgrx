@@ -12,6 +12,16 @@ set -ex
 HEAD=$(git rev-parse HEAD)
 VERSION=$1
 
+CARGO_TOMLS_TO_BUMP=(
+    ./Cargo.toml
+    ./pgx/Cargo.toml
+    ./pgx-utils/Cargo.toml
+    ./pgx-macros/Cargo.toml
+    ./pgx-tests/Cargo.toml
+    ./cargo-pgx/Cargo.toml
+    ./pgx-pg-sys/Cargo.toml
+)
+
 CARGO_TOMLS_TO_SED=(
     ./cargo-pgx/src/templates/cargo_toml
     ./nix/templates/default/Cargo.toml
@@ -22,6 +32,7 @@ CARGO_TOMLS_TO_SED=(
     ./cargo-pgx/Cargo.toml
     ./pgx-pg-sys/Cargo.toml
     ./pgx-examples/*/Cargo.toml
+    ./Cargo.toml
 )
 
 DEPENDENCIES_TO_UPDATE=(
@@ -30,6 +41,7 @@ DEPENDENCIES_TO_UPDATE=(
     "pgx-macros"
     "pgx-pgx-sys"
     "pgx-utils"
+    "cargo-pgx"
 )
 
 for cargo_toml in ${CARGO_TOMLS_TO_SED[@]}; do
@@ -37,3 +49,9 @@ for cargo_toml in ${CARGO_TOMLS_TO_SED[@]}; do
         sed -i'' -E "s/(^${dependency}.*\")[0-9]+\.[0-9]+\.[0-9]+(\".*$)/\1${VERSION}\2/" ${cargo_toml}
     done
 done
+
+for cargo_toml in ${CARGO_TOMLS_TO_BUMP[@]}; do
+    sed -i'' -E "s/(^version = \")[0-9]+\.[0-9]+\.[0-9]+(\"$)/\1${VERSION}\2/" ${cargo_toml}
+done
+
+cargo generate-lockfile
