@@ -15,9 +15,6 @@ VERSION=$1
 CARGO_TOMLS_TO_SED=(
     ./cargo-pgx/src/templates/cargo_toml
     ./nix/templates/default/Cargo.toml
-)
-
-CRATES_TO_UPDATE=(
     ./pgx/Cargo.toml
     ./pgx-utils/Cargo.toml
     ./pgx-macros/Cargo.toml
@@ -35,10 +32,8 @@ DEPENDENCIES_TO_UPDATE=(
     "pgx-utils"
 )
 
-cargo release --workspace --no-publish --no-tag --no-push --no-dev-version --execute 0.3.0
-
 for cargo_toml in ${CARGO_TOMLS_TO_SED[@]}; do
     for dependency in ${DEPENDENCIES_TO_UPDATE[@]}; do
-        sed -i'' -e "s/^${dependency} = .*$/${dependency} = \"${VERSION}\"/" ${cargo_toml}
+        sed -i'' -E "s/(^${dependency}.*\")[0-9]+\.[0-9]+\.[0-9]+(\".*$)/\1${VERSION}\2/" ${cargo_toml}
     done
 done
