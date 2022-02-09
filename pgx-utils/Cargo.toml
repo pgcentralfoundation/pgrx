@@ -1,6 +1,6 @@
 [package]
 name = "pgx-utils"
-version = "0.2.6"
+version = "0.3.0"
 authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
 edition = "2018"
 license = "MIT"
@@ -29,8 +29,8 @@ unescape = "0.1.0"
 url = "2.2.2"
 eyre = "0.6.6"
 color-eyre = "0.6.0"
-tracing = "0.1.29"
+tracing = "0.1.30"
 tracing-error = "0.2.0"
-tracing-subscriber = { version = "0.3.7", features = [ "env-filter" ] }
+tracing-subscriber = { version = "0.3.8", features = [ "env-filter" ] }
 libloading = "0.7.3"
-clap = { version = "3.0.13", features = [ "env", "suggestions", "cargo", "derive" ] }
+clap = { version = "3.0.14", features = [ "env", "suggestions", "cargo", "derive" ] }
