@@ -303,18 +303,22 @@ where
     /// with [`pgx::name!()`](crate::name), it must be used **inside** the [`pgx::name!()`](crate::name) macro.
     type Args;
 
-    /// The types of the order argument(s).
+    /// The types of the direct argument(s) to an ordered-set aggregate's `finalize`.
+    /// 
+    /// **Only effective if `ORDERED_SET` is `true`.**
     ///
     /// For a single argument, provide the type directly.
     ///
     /// For multiple arguments, provide a tuple.
+    /// 
+    /// For no arguments, don't set this, or set it to `()` (the default).
     ///
     /// `pgx` does not support `argname` as it is only used for documentation purposes.
     ///
     /// If the final argument is to be variadic, use `pgx::Variadic`.
     ///
     /// **Optional:** This function can be skipped, `#[pg_aggregate]` will create a stub.
-    type OrderBy;
+    type OrderedSetArgs;
 
     /// **Optional:** This function can be skipped, `#[pg_aggregate]` will create a stub.
     type Finalize;
@@ -325,31 +329,44 @@ where
     /// The name of the aggregate. (eg. What you'd pass to `SELECT agg(col) FROM tab`.)
     const NAME: &'static str;
 
-    /// **Optional:** This function can be skipped, `#[pg_aggregate]` will create a stub.
+    /// Set to true if this is an ordered set aggregate.
+    /// 
+    /// If set, the `OrderedSetArgs` associated type becomes effective, this allows for
+    /// direct arguments to the `finalize` function.
+    /// 
+    /// See https://www.postgresql.org/docs/current/xaggr.html#XAGGR-ORDERED-SET-AGGREGATES
+    /// for more information.
+    /// 
+    /// **Optional:** This const can be skipped, `#[pg_aggregate]` will create a stub.
+    const ORDERED_SET: bool = false;
+
+    /// **Optional:** This const can be skipped, `#[pg_aggregate]` will create a stub.
     const PARALLEL: Option<ParallelOption> = None;
 
-    /// **Optional:** This function can be skipped, `#[pg_aggregate]` will create a stub.
+    /// **Optional:** This const can be skipped, `#[pg_aggregate]` will create a stub.
     const FINALIZE_MODIFY: Option<FinalizeModify> = None;
 
-    /// **Optional:** This function can be skipped, `#[pg_aggregate]` will create a stub.
+    /// **Optional:** This const can be skipped, `#[pg_aggregate]` will create a stub.
     const MOVING_FINALIZE_MODIFY: Option<FinalizeModify> = None;
 
-    /// **Optional:** This function can be skipped, `#[pg_aggregate]` will create a stub.
+    /// **Optional:** This const can be skipped, `#[pg_aggregate]` will create a stub.
     const INITIAL_CONDITION: Option<&'static str> = None;
 
-    /// **Optional:** This function can be skipped, `#[pg_aggregate]` will create a stub.
+    /// **Optional:** This const can be skipped, `#[pg_aggregate]` will create a stub.
     const SORT_OPERATOR: Option<&'static str> = None;
 
-    /// **Optional:** This function can be skipped, `#[pg_aggregate]` will create a stub.
+    /// **Optional:** This const can be skipped, `#[pg_aggregate]` will create a stub.
     const MOVING_INITIAL_CONDITION: Option<&'static str> = None;
 
-    /// **Optional:** This function can be skipped, `#[pg_aggregate]` will create a stub.
+    /// **Optional:** This const can be skipped, `#[pg_aggregate]` will create a stub.
     const HYPOTHETICAL: bool = false;
 
     fn state(current: Self::State, v: Self::Args, fcinfo: FunctionCallInfo) -> Self::State;
 
+    /// The `OrderedSetArgs` is `()` unless `ORDERED_SET` is `true` and `OrderedSetArgs` is configured.
+    /// 
     /// **Optional:** This function can be skipped, `#[pg_aggregate]` will create a stub.
-    fn finalize(current: Self::State, fcinfo: FunctionCallInfo) -> Self::Finalize;
+    fn finalize(current: Self::State, direct_args: Self::OrderedSetArgs, fcinfo: FunctionCallInfo) -> Self::Finalize;
 
     /// **Optional:** This function can be skipped, `#[pg_aggregate]` will create a stub.
     fn combine(current: Self::State, _other: Self::State, fcinfo: FunctionCallInfo) -> Self::State;
@@ -366,8 +383,10 @@ where
     /// **Optional:** This function can be skipped, `#[pg_aggregate]` will create a stub.
     fn moving_state_inverse(_mstate: Self::MovingState, _v: Self::Args, fcinfo: FunctionCallInfo) -> Self::MovingState;
 
+    /// The `OrderedSetArgs` is `()` unless `ORDERED_SET` is `true` and `OrderedSetArgs` is configured.
+    /// 
     /// **Optional:** This function can be skipped, `#[pg_aggregate]` will create a stub.
-    fn moving_finalize(_mstate: Self::MovingState, fcinfo: FunctionCallInfo) -> Self::Finalize;
+    fn moving_finalize(_mstate: Self::MovingState, direct_args: Self::OrderedSetArgs, fcinfo: FunctionCallInfo) -> Self::Finalize;
 
     unsafe fn memory_context(fcinfo: FunctionCallInfo) -> Option<MemoryContext> {
         if fcinfo.is_null() {

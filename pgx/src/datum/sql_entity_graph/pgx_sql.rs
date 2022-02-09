@@ -1236,7 +1236,7 @@ fn connect_aggregates(
             }
         }
 
-        for arg in item.order_by.as_ref().unwrap_or(&vec![]) {
+        for arg in item.direct_args.as_ref().unwrap_or(&vec![]) {
             let found = make_type_or_enum_connection(
                 graph,
                 "Aggregate",

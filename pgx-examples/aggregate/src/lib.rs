@@ -90,7 +90,7 @@ impl Aggregate for IntegerAvgState {
     // const HYPOTHETICAL: bool = true;
 
     // You can skip all these:
-    fn finalize(current: Self::State, _fcinfo: pgx::pg_sys::FunctionCallInfo) -> Self::Finalize {
+    fn finalize(current: Self::State, _direct_args: Self::OrderedSetArgs, _fcinfo: pgx::pg_sys::FunctionCallInfo) -> Self::Finalize {
         Self::finalize(current)
     }
 

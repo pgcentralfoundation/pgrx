@@ -4,6 +4,7 @@ use syn::{
     parse::{Parse, ParseStream},
     parse_quote, Expr, Type,
 };
+use super::get_pgx_attr_macro;
 
 #[derive(Debug, Clone)]
 pub(crate) struct MaybeNamedVariadicTypeList {
@@ -116,32 +117,6 @@ impl ToTokens for MaybeNamedVariadicType {
 impl Parse for MaybeNamedVariadicType {
     fn parse(input: ParseStream) -> Result<Self, syn::Error> {
         Self::new(input.parse()?)
-    }
-}
-
-
-fn get_pgx_attr_macro(attr_name: impl AsRef<str>, ty: &syn::Type) -> Option<TokenStream2> {
-    match &ty {
-        syn::Type::Macro(ty_macro) => {
-            let mut found_pgx = false;
-            let mut found_attr = false;
-            // We don't actually have type resolution here, this is a "Best guess".
-            for (idx, segment) in ty_macro.mac.path.segments.iter().enumerate() {
-                match segment.ident.to_string().as_str() {
-                    "pgx" if idx == 0 => found_pgx = true,
-                    attr if attr == attr_name.as_ref() => found_attr = true,
-                    _ => (),
-                }
-            }
-            if (ty_macro.mac.path.segments.len() == 1 && found_attr)
-                || (found_pgx && found_attr)
-            {
-                Some(ty_macro.mac.tokens.clone())
-            } else {
-                None
-            }
-        }
-        _ => None,
     }
 }
 

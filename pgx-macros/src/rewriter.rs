@@ -723,7 +723,31 @@ impl FunctionSignatureRewriter {
 
         let mut stream = proc_macro2::TokenStream::new();
         let mut i = 0usize;
-        let mut have_fcinfo = false;
+        let mut fcinfo_ident = None;
+
+        // Get the fcinfo ident, if it exists.
+        // We do this because we need to get the **right** ident, if it exists, so Rustc
+        // doesn't think we're pointing at the fcinfo module path.
+        for arg in &self.func.sig.inputs {
+            match arg {
+                FnArg::Typed(ty) => match ty.pat.deref() {
+                    Pat::Ident(ident) => {
+                        if type_matches(&ty.ty, "pg_sys :: FunctionCallInfo")
+                            || type_matches(&ty.ty, "pgx :: pg_sys :: FunctionCallInfo")
+                        {
+                            if fcinfo_ident.is_some() {
+                                panic!("When using `pg_sys::FunctionCallInfo` as an argument it must be the last argument");
+                            }
+                            fcinfo_ident = Some(ident.ident.clone());
+                        }
+                    },
+                    _ => (),
+                },
+                _ => ()
+            }
+        }
+        let fcinfo_ident = fcinfo_ident.unwrap_or(syn::Ident::new("fcinfo", Span::call_site()));
+
         for arg in &self.func.sig.inputs {
             match arg {
                 FnArg::Receiver(_) => panic!("Functions that take self are not supported"),
@@ -733,33 +757,28 @@ impl FunctionSignatureRewriter {
                         let mut type_ = ty.ty.clone();
                         let is_option = type_matches(&type_, "Option");
 
-                        if have_fcinfo {
-                            panic!("When using `pg_sys::FunctionCallInfo` as an argument it must be the last argument")
-                        }
-
                         let ts = if is_option {
                             let option_type = extract_option_type(&type_);
                             let mut option_type = syn::parse2::<syn::Type>(option_type).unwrap();
                             pgx_utils::anonymonize_lifetimes(&mut option_type);
 
                             quote_spanned! {ident.span()=>
-                                let #name = pgx::pg_getarg::<#option_type>(fcinfo, #i);
+                                let #name = pgx::pg_getarg::<#option_type>(#fcinfo_ident, #i);
                             }
                         } else if type_matches(&type_, "pg_sys :: FunctionCallInfo")
                             || type_matches(&type_, "pgx :: pg_sys :: FunctionCallInfo")
                         {
-                            have_fcinfo = true;
                             quote_spanned! {ident.span()=>
-                                let #name = fcinfo;
+                                let #name = #fcinfo_ident;
                             }
                         } else if is_raw {
                             quote_spanned! {ident.span()=>
-                                let #name = pgx::pg_getarg_datum_raw(fcinfo, #i) as #type_;
+                                let #name = pgx::pg_getarg_datum_raw(#fcinfo_ident, #i) as #type_;
                             }
                         } else {
                             pgx_utils::anonymonize_lifetimes(&mut type_);
                             quote_spanned! {ident.span()=>
-                                let #name = pgx::pg_getarg::<#type_>(fcinfo, #i).unwrap_or_else(|| panic!("{} is null", stringify!{#ident}));
+                                let #name = pgx::pg_getarg::<#type_>(#fcinfo_ident, #i).unwrap_or_else(|| panic!("{} is null", stringify!{#ident}));
                             }
                         };
 

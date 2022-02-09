@@ -29,15 +29,20 @@ pub struct PgAggregateEntity {
 
     pub name: &'static str,
 
+    /// If the aggregate is an ordered set aggregate.
+    /// 
+    /// See [the PostgreSQL ordered set docs](https://www.postgresql.org/docs/current/xaggr.html#XAGGR-ORDERED-SET-AGGREGATES).
+    pub ordered_set: bool,
+
     /// The `arg_data_type` list.
     ///
     /// Corresponds to `Args` in [`crate::aggregate::Aggregate`].
     pub args: Vec<MaybeVariadicAggregateType>,
 
-    /// The `ORDER BY arg_data_type` list.
+    /// The direct argument list, appearing before `ORDER BY` in ordered set aggregates.
     ///
     /// Corresponds to `OrderBy` in [`crate::aggregate::Aggregate`].
-    pub order_by: Option<Vec<AggregateType>>,
+    pub direct_args: Option<Vec<AggregateType>>,
 
     /// The `STYPE` and `name` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
@@ -310,7 +315,7 @@ impl ToSql for PgAggregateEntity {
             "\n\
                 -- {file}:{line}\n\
                 -- {full_path}\n\
-                CREATE AGGREGATE {schema}{name} ({args}{maybe_order_by})\n\
+                CREATE AGGREGATE {schema}{name} ({direct_args}{maybe_order_by}{args})\n\
                 (\n\
                     \tSFUNC = {schema}\"{sfunc}\", /* {full_path}::state */\n\
                     \tSTYPE = {schema}{stype}{maybe_comma_after_stype} /* {stype_full_path} */\
@@ -367,13 +372,11 @@ impl ToSql for PgAggregateEntity {
                     );
                     args.push(buf);
                 }
-                String::from("\n")
-                    + &args.join("\n")
-                    + if self.order_by.is_none() { "\n" } else { "" }
+                "\n".to_string() + &args.join("\n") + "\n"
             },
-            maybe_order_by = if let Some(order_by) = &self.order_by {
+            direct_args = if let Some(direct_args) = &self.direct_args {
                 let mut args = Vec::new();
-                for (idx, arg) in order_by.iter().enumerate() {
+                for (idx, arg) in direct_args.iter().enumerate() {
                     let graph_index = context
                         .graph
                         .neighbors_undirected(self_index)
@@ -386,9 +389,9 @@ impl ToSql for PgAggregateEntity {
                         .ok_or_else(|| {
                             eyre_err!("Could not find arg type in graph. Got: {:?}", arg)
                         })?;
-                    let needs_comma = idx < (order_by.len() - 1);
+                    let needs_comma = idx < (direct_args.len() - 1);
                     let buf = format!("\
-                           {schema_prefix}{sql_type}{maybe_comma}/* {full_path} */\
+                        \t{maybe_name}{schema_prefix}{sql_type}{maybe_comma}/* {full_path} */\
                        ",
                            schema_prefix = context.schema_prefix_for(&graph_index),
                            // First try to match on [`TypeId`] since it's most reliable.
@@ -397,14 +400,22 @@ impl ToSql for PgAggregateEntity {
                                arg.full_path,
                                self.name
                            ))?,
+                           maybe_name = if let Some(name) = arg.name {
+                                "\"".to_string() + name + "\" "
+                           } else { "".to_string() },
                            maybe_comma = if needs_comma { ", " } else { " " },
                            full_path = arg.full_path,
                     );
                     args.push(buf);
                 }
-                String::from("\n\tORDER BY ") + &args.join("\n,") + "\n"
+                "\n".to_string() + &args.join("\n,") + "\n"
             } else {
                 String::default()
+            },
+            maybe_order_by = if self.ordered_set {
+                "\tORDER BY"
+            } else {
+                ""
             },
             optional_attributes = if optional_attributes.len() == 0 {
                 String::from("\n")

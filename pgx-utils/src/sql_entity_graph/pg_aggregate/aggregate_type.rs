@@ -4,6 +4,7 @@ use syn::{
     parse::{Parse, ParseStream},
     parse_quote, Expr, Type,
 };
+use super::get_pgx_attr_macro;
 
 #[derive(Debug, Clone)]
 pub(crate) struct AggregateTypeList {
@@ -55,23 +56,38 @@ impl ToTokens for AggregateTypeList {
 #[derive(Debug, Clone)]
 pub(crate) struct AggregateType {
     pub(crate) ty: Type,
+    /// The name, if it exists.
+    pub(crate) name: Option<String>,
 }
 
 impl AggregateType {
     pub(crate) fn new(ty: syn::Type) -> Result<Self, syn::Error> {
-        let retval = Self { ty };
+        let name_tokens =  get_pgx_attr_macro("name", &ty);
+        let name = match name_tokens {
+            Some(tokens) => {
+                let name_macro = syn::parse2::<crate::sql_entity_graph::pg_extern::NameMacro>(tokens)
+                    .expect("Could not parse `name!()` macro");
+                Some(name_macro.ident)
+            },
+            None => None,
+        };
+        let retval = Self {
+            name,
+            ty,
+        };
         Ok(retval)
     }
 
     pub(crate) fn entity_tokens(&self) -> Expr {
         let ty = &self.ty;
         let ty_string = ty.to_token_stream().to_string().replace(" ", "");
+        let name = self.name.iter();
         parse_quote! {
             pgx::datum::sql_entity_graph::aggregate::AggregateType {
                 ty_source: #ty_string,
                 ty_id: core::any::TypeId::of::<#ty>(),
                 full_path: core::any::type_name::<#ty>(),
-                name: None,
+                name: None#( .unwrap_or(Some(#name)) )*,
             }
         }
     }
