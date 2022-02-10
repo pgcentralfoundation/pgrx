@@ -96,6 +96,12 @@ fn same_name(same_name: &str) -> &str {
     same_name
 }
 
+// Tests for regression of https://github.com/zombodb/pgx/issues/432
+#[pg_extern]
+fn bar_func(_x: PgBox<pg_sys::IndexAmRoutine>, _fcinfo: pg_sys::FunctionCallInfo) -> PgBox<pg_sys::IndexAmRoutine> {
+    todo!()
+}
+
 #[cfg(any(test, feature = "pg_test"))]
 #[pgx::pg_schema]
 mod tests {
