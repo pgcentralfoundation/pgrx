@@ -55,3 +55,9 @@ for cargo_toml in ${CARGO_TOMLS_TO_BUMP[@]}; do
 done
 
 cargo generate-lockfile
+
+for example in ./pgx-examples/*/; do
+    pushd ${example}
+    cargo generate-lockfile
+    popd
+done
