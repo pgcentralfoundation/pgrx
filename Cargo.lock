@@ -234,7 +234,7 @@ dependencies = [
 
 [[package]]
 name = "cargo-pgx"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "cargo_metadata",
  "cargo_toml",
@@ -531,9 +531,9 @@ dependencies = [
 
 [[package]]
 name = "crypto-common"
-version = "0.1.1"
+version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "683d6b536309245c849479fba3da410962a43ed8e51c26b729208ec0ac2798d0"
+checksum = "a4600d695eb3f6ce1cd44e6e291adceb2cc3ab12f20a33777ecd0bf6eba34e06"
 dependencies = [
  "generic-array",
 ]
@@ -565,13 +565,12 @@ dependencies = [
 
 [[package]]
 name = "digest"
-version = "0.10.1"
+version = "0.10.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b697d66081d42af4fba142d56918a3cb21dc8eb63372c6b85d14f44fb9c5979b"
+checksum = "8cb780dce4f9a8f5c087362b3a4595936b2019e7c8b30f2c3e9a7e94e6ae9837"
 dependencies = [
  "block-buffer",
  "crypto-common",
- "generic-array",
  "subtle",
 ]
 
@@ -625,9 +624,9 @@ dependencies = [
 
 [[package]]
 name = "embedded-hal"
-version = "0.2.6"
+version = "0.2.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e36cfb62ff156596c892272f3015ef952fe1525e85261fa3a7f327bd6b384ab9"
+checksum = "35949884794ad573cf46071e41c9b60efb0cb311e3ca01f7af807af1debc66ff"
 dependencies = [
  "nb 0.1.3",
  "void",
@@ -1099,9 +1098,9 @@ checksum = "308cc39be01b73d0d18f82a0e7b2a3df85245f84af96fdddc5d202d27e47b86a"
 
 [[package]]
 name = "memmap2"
-version = "0.5.2"
+version = "0.5.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fe3179b85e1fd8b14447cbebadb75e45a1002f541b925f0bfec366d56a81c56d"
+checksum = "057a3db23999c867821a7a59feb06a578fcb03685e983dff90daf9e7d24ac08f"
 dependencies = [
  "libc",
 ]
@@ -1234,9 +1233,9 @@ dependencies = [
 
 [[package]]
 name = "ntapi"
-version = "0.3.6"
+version = "0.3.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3f6bb902e437b6d86e03cce10a7e2af662292c5dfef23b65899ea3ac9354ad44"
+checksum = "c28774a7fd2fbb4f0babd8237ce554b73af68021b5f695a3cebd6c59bac0980f"
 dependencies = [
  "winapi 0.3.9",
 ]
@@ -1401,7 +1400,7 @@ dependencies = [
 
 [[package]]
 name = "pgx"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "atomic-traits",
  "bitflags",
@@ -1429,7 +1428,7 @@ dependencies = [
 
 [[package]]
 name = "pgx-macros"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "pgx-utils",
  "proc-macro-crate",
@@ -1442,7 +1441,7 @@ dependencies = [
 
 [[package]]
 name = "pgx-parent"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "cargo-pgx",
  "pgx",
@@ -1453,7 +1452,7 @@ dependencies = [
 
 [[package]]
 name = "pgx-pg-sys"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "bindgen",
  "build-deps",
@@ -1473,7 +1472,7 @@ dependencies = [
 
 [[package]]
 name = "pgx-tests"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "colored",
  "eyre",
@@ -1492,7 +1491,7 @@ dependencies = [
 
 [[package]]
 name = "pgx-utils"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "clap 3.0.14",
  "color-eyre",
