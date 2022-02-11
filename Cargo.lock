@@ -1426,8 +1426,8 @@ name = "pgx-tests"
 version = "0.3.0"
 dependencies = [
  "eyre",
- "lazy_static",
  "libc",
+ "once_cell",
  "owo-colors",
  "pgx",
  "pgx-macros",

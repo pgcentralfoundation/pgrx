@@ -3,7 +3,7 @@
 
 use std::process::{Command, Stdio};
 
-use lazy_static::*;
+use once_cell::sync::Lazy;
 use std::sync::{Arc, Mutex};
 
 use owo_colors::OwoColorize;
@@ -25,14 +25,12 @@ struct SetupState {
     system_session_id: String,
 }
 
-lazy_static! {
-    static ref TEST_MUTEX: Mutex<SetupState> = Mutex::new(SetupState {
-        installed: false,
-        loglines: Arc::new(Mutex::new(HashMap::new())),
-        system_session_id: "NONE".to_string(),
-    });
-    static ref SHUTDOWN_HOOKS: Mutex<Vec<Box<dyn Fn() + Send>>> = Mutex::new(Vec::new());
-}
+static TEST_MUTEX: Lazy<Mutex<SetupState>> = Lazy::new(|| Mutex::new(SetupState {
+    installed: false,
+    loglines: Arc::new(Mutex::new(HashMap::new())),
+    system_session_id: "NONE".to_string(),
+}));
+static SHUTDOWN_HOOKS: Lazy<Mutex<Vec<Box<dyn Fn() + Send>>>> = Lazy::new(|| Mutex::new(Vec::new()));
 
 fn register_shutdown_hook() {
     extern "C" fn run_shutdown_hooks() {
