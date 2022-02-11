@@ -723,30 +723,7 @@ impl FunctionSignatureRewriter {
 
         let mut stream = proc_macro2::TokenStream::new();
         let mut i = 0usize;
-        let mut fcinfo_ident = None;
-
-        // Get the fcinfo ident, if it exists.
-        // We do this because we need to get the **right** ident, if it exists, so Rustc
-        // doesn't think we're pointing at the fcinfo module path.
-        for arg in &self.func.sig.inputs {
-            match arg {
-                FnArg::Typed(ty) => match ty.pat.deref() {
-                    Pat::Ident(ident) => {
-                        if type_matches(&ty.ty, "pg_sys :: FunctionCallInfo")
-                            || type_matches(&ty.ty, "pgx :: pg_sys :: FunctionCallInfo")
-                        {
-                            if fcinfo_ident.is_some() {
-                                panic!("When using `pg_sys::FunctionCallInfo` as an argument it must be the last argument");
-                            }
-                            fcinfo_ident = Some(ident.ident.clone());
-                        }
-                    },
-                    _ => (),
-                },
-                _ => ()
-            }
-        }
-        let fcinfo_ident = fcinfo_ident.unwrap_or(syn::Ident::new("fcinfo", Span::call_site()));
+        let fcinfo_ident: syn::Ident = syn::parse_quote! { fcinfo };
 
         for arg in &self.func.sig.inputs {
             match arg {
