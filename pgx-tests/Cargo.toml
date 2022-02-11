@@ -27,7 +27,7 @@ features = ["pg14"]
 no-default-features = true
 
 [dependencies]
-colored = "2.0.0"
+owo-colors = "3.2.0"
 lazy_static = "1.4.0"
 libc = "0.2.117"
 pgx = { path = "../pgx", default-features = false, version= "0.3.0" }

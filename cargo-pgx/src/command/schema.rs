@@ -2,7 +2,7 @@ use crate::{
     command::get::{find_control_file, get_property},
     CommandExecute,
 };
-use colored::Colorize;
+use owo_colors::OwoColorize;
 use eyre::{eyre, WrapErr};
 use pgx_utils::pg_config::{PgConfig, Pgx};
 use std::{

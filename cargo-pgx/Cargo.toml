@@ -19,7 +19,7 @@ cargo_toml = "0.11.4"
 clap = { version = "3.0.14", features = [ "env", "suggestions", "cargo", "derive" ] }
 clap-cargo = { version = "0.8.0", features = [ "cargo_metadata" ] }
 semver = "1.0.5"
-colored = "2.0.0"
+owo-colors = "3.2.0"
 env_proxy = "0.4.1"
 num_cpus = "1.13.1"
 pgx-utils = { path = "../pgx-utils", version = "0.3.0" }

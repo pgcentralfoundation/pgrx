@@ -2,7 +2,7 @@
 // governed by the MIT license that can be found in the LICENSE file.
 
 use crate::{command::status::status_postgres, CommandExecute};
-use colored::Colorize;
+use owo_colors::OwoColorize;
 use pgx_utils::pg_config::{PgConfig, PgConfigSelector, Pgx};
 
 use eyre::eyre;

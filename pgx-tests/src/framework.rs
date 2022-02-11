@@ -6,7 +6,7 @@ use std::process::{Command, Stdio};
 use lazy_static::*;
 use std::sync::{Arc, Mutex};
 
-use colored::*;
+use owo_colors::OwoColorize;
 use eyre::{eyre, WrapErr};
 use pgx::*;
 use pgx_utils::pg_config::{PgConfig, Pgx};
