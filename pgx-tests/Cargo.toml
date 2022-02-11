@@ -5,8 +5,8 @@ authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
 edition = "2018"
 license = "MIT"
 description = "Test framework for 'pgx'-based Postgres extensions"
-homepage = "https://github.com/zombodb/pgx/pg-tests"
-repository = "https://github.com/zombodb/pgx/pg-tests"
+homepage = "https://github.com/zombodb/pgx"
+repository = "https://github.com/zombodb/pgx"
 documentation = "https://docs.rs/pgx-tests"
 readme = "README.md"
 

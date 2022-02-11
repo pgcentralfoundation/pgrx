@@ -5,8 +5,8 @@ authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
 edition = "2018"
 license = "MIT"
 description = "Proc Macros for 'pgx'"
-homepage = "https://github.com/zombodb/pgx/pg-macros"
-repository = "https://github.com/zombodb/pgx/pg-macros"
+homepage = "https://github.com/zombodb/pgx"
+repository = "https://github.com/zombodb/pgx"
 documentation = "https://docs.rs/pgx-macros"
 readme = "README.md"
 
