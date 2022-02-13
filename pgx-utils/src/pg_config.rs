@@ -1,10 +1,13 @@
 //! Wrapper around Postgres' `pg_config` command-line tool
 use colored::Colorize;
-use std::collections::HashMap;
-use std::io::ErrorKind;
-use std::path::{Path, PathBuf};
-use std::process::Command;
-use std::str::FromStr;
+use eyre::{eyre, WrapErr};
+use std::{
+    collections::HashMap,
+    io::ErrorKind,
+    path::{Path, PathBuf},
+    process::Command,
+    str::FromStr,
+};
 use url::Url;
 
 #[derive(Clone)]
@@ -67,7 +70,7 @@ impl PgConfig {
         self.pg_config.is_some()
     }
 
-    pub fn label(&self) -> Result<String, std::io::Error> {
+    pub fn label(&self) -> eyre::Result<String> {
         Ok(format!("pg{}", self.major_version()?))
     }
 
@@ -79,7 +82,7 @@ impl PgConfig {
         self.path().unwrap().parent().unwrap().to_path_buf()
     }
 
-    pub fn major_version(&self) -> Result<u16, std::io::Error> {
+    pub fn major_version(&self) -> eyre::Result<u16> {
         match &self.version {
             Some(version) => Ok(version.major_version),
             None => {
@@ -88,19 +91,13 @@ impl PgConfig {
                 let version = match version_parts.get(1) {
                     Some(v) => v,
                     None => {
-                        return Err(std::io::Error::new(
-                            ErrorKind::InvalidInput,
-                            format!("invalid version string: {}", version_string),
-                        ));
+                        return Err(eyre!("invalid version string: {}", version_string));
                     }
                 };
                 let version = match f64::from_str(version) {
                     Ok(f) => f,
                     Err(e) => {
-                        return Err(std::io::Error::new(
-                            ErrorKind::InvalidInput,
-                            format!("invalid major version number `{}`: {:?}", version, e),
-                        ));
+                        return Err(eyre!("invalid major version number `{}`: {:?}", version, e));
                     }
                 };
                 Ok(version.floor() as u16)
@@ -108,7 +105,7 @@ impl PgConfig {
         }
     }
 
-    pub fn minor_version(&self) -> Result<u16, std::io::Error> {
+    pub fn minor_version(&self) -> eyre::Result<u16> {
         match &self.version {
             Some(version) => Ok(version.minor_version),
             None => {
@@ -117,24 +114,25 @@ impl PgConfig {
                 let version = match version_parts.get(1) {
                     Some(v) => v.split('.').next().unwrap(),
                     None => {
-                        return Err(std::io::Error::new(
-                            ErrorKind::InvalidInput,
-                            format!("invalid version string: {}", version_string),
-                        ));
+                        return Err(eyre!("invalid version string: {}", version_string));
                     }
                 };
                 let version = match u16::from_str(version) {
                     Ok(u) => u,
                     Err(e) => {
-                        return Err(std::io::Error::new(
-                            ErrorKind::InvalidInput,
-                            format!("invalid minor version number `{}`: {:?}", version, e),
-                        ));
+                        return Err(eyre!("invalid minor version number `{}`: {:?}", version, e));
                     }
                 };
                 Ok(version)
             }
         }
+    }
+
+    pub fn version(&self) -> eyre::Result<String> {
+        let major = self.major_version()?;
+        let minor = self.minor_version()?;
+        let version = format!("{}.{}", major, minor);
+        Ok(version)
     }
 
     pub fn url(&self) -> Option<&Url> {
@@ -144,11 +142,11 @@ impl PgConfig {
         }
     }
 
-    pub fn port(&self) -> Result<u16, std::io::Error> {
+    pub fn port(&self) -> eyre::Result<u16> {
         Ok(BASE_POSTGRES_PORT_NO + self.major_version()?)
     }
 
-    pub fn test_port(&self) -> Result<u16, std::io::Error> {
+    pub fn test_port(&self) -> eyre::Result<u16> {
         Ok(BASE_POSTGRES_TESTING_PORT_NO + self.major_version()?)
     }
 
@@ -156,71 +154,71 @@ impl PgConfig {
         "localhost"
     }
 
-    pub fn bin_dir(&self) -> Result<PathBuf, std::io::Error> {
+    pub fn bin_dir(&self) -> eyre::Result<PathBuf> {
         Ok(Path::new(&self.run("--bindir")?).to_path_buf())
     }
 
-    pub fn postmaster_path(&self) -> Result<PathBuf, std::io::Error> {
+    pub fn postmaster_path(&self) -> eyre::Result<PathBuf> {
         let mut path = self.bin_dir()?;
         path.push("postmaster");
         Ok(path)
     }
 
-    pub fn initdb_path(&self) -> Result<PathBuf, std::io::Error> {
+    pub fn initdb_path(&self) -> eyre::Result<PathBuf> {
         let mut path = self.bin_dir()?;
         path.push("initdb");
         Ok(path)
     }
 
-    pub fn createdb_path(&self) -> Result<PathBuf, std::io::Error> {
+    pub fn createdb_path(&self) -> eyre::Result<PathBuf> {
         let mut path = self.bin_dir()?;
         path.push("createdb");
         Ok(path)
     }
 
-    pub fn dropdb_path(&self) -> Result<PathBuf, std::io::Error> {
+    pub fn dropdb_path(&self) -> eyre::Result<PathBuf> {
         let mut path = self.bin_dir()?;
         path.push("dropdb");
         Ok(path)
     }
 
-    pub fn psql_path(&self) -> Result<PathBuf, std::io::Error> {
+    pub fn psql_path(&self) -> eyre::Result<PathBuf> {
         let mut path = self.bin_dir()?;
         path.push("psql");
         Ok(path)
     }
 
-    pub fn data_dir(&self) -> Result<PathBuf, std::io::Error> {
+    pub fn data_dir(&self) -> eyre::Result<PathBuf> {
         let mut path = Pgx::home()?;
         path.push(format!("data-{}", self.major_version()?));
         Ok(path)
     }
 
-    pub fn log_file(&self) -> Result<PathBuf, std::io::Error> {
+    pub fn log_file(&self) -> eyre::Result<PathBuf> {
         let mut path = Pgx::home()?;
         path.push(format!("{}.log", self.major_version()?));
         Ok(path)
     }
 
-    pub fn includedir_server(&self) -> Result<PathBuf, std::io::Error> {
+    pub fn includedir_server(&self) -> eyre::Result<PathBuf> {
         Ok(self.run("--includedir-server")?.into())
     }
 
-    pub fn pkglibdir(&self) -> Result<PathBuf, std::io::Error> {
+    pub fn pkglibdir(&self) -> eyre::Result<PathBuf> {
         Ok(self.run("--pkglibdir")?.into())
     }
 
-    pub fn sharedir(&self) -> Result<PathBuf, std::io::Error> {
+    pub fn sharedir(&self) -> eyre::Result<PathBuf> {
         Ok(self.run("--sharedir")?.into())
     }
 
-    pub fn extension_dir(&self) -> Result<PathBuf, std::io::Error> {
+    pub fn extension_dir(&self) -> eyre::Result<PathBuf> {
         let mut path = self.sharedir()?;
         path.push("extension");
         Ok(path)
     }
 
-    fn run(&self, arg: &str) -> Result<String, std::io::Error> {
+    fn run(&self, arg: &str) -> eyre::Result<String> {
         let pg_config = self.pg_config.clone().unwrap_or_else(|| {
             std::env::var("PG_CONFIG")
                 .unwrap_or_else(|_| "pg_config".to_string())
@@ -230,11 +228,10 @@ impl PgConfig {
         match Command::new(&pg_config).arg(arg).output() {
             Ok(output) => Ok(String::from_utf8(output.stdout).unwrap().trim().to_string()),
             Err(e) => match e.kind() {
-                ErrorKind::NotFound => Err(std::io::Error::new(
-                    ErrorKind::NotFound,
-                    format!("Unable to find `{}`: {:?}", "pg_config".yellow(), e),
-                )),
-                _ => Err(e),
+                ErrorKind::NotFound => {
+                    Err(e).wrap_err_with(|| format!("Unable to find `{}`", "pg_config".yellow()))
+                }
+                _ => Err(e.into()),
             },
         }
     }
@@ -273,8 +270,8 @@ impl Pgx {
         Pgx { pg_configs: vec![] }
     }
 
-    pub fn default(supported_major_versions: &[u16]) -> Result<Self, std::io::Error> {
-        Ok(Pgx {
+    pub fn default(supported_major_versions: &[u16]) -> eyre::Result<Self> {
+        let pgx = Self {
             pg_configs: rss::PostgreSQLVersionRss::new(supported_major_versions)?
                 .into_iter()
                 .map(|version| PgConfig {
@@ -282,10 +279,11 @@ impl Pgx {
                     pg_config: None,
                 })
                 .collect(),
-        })
+        };
+        Ok(pgx)
     }
 
-    pub fn from_config() -> Result<Self, std::io::Error> {
+    pub fn from_config() -> eyre::Result<Self> {
         match std::env::var("PGX_PG_CONFIG_PATH") {
             Ok(pg_config) => {
                 // we have an environment variable that tells us the pg_config to use
@@ -297,17 +295,14 @@ impl Pgx {
                 // we'll get what we need from cargo-pgx' config.toml file
                 let path = Pgx::config_toml()?;
                 if !path.exists() {
-                    return Err(std::io::Error::new(
-                        ErrorKind::NotFound,
-                        format!(
-                            "{} not found.  Have you run `{}` yet?",
-                            path.display(),
-                            "cargo pgx init".bold().yellow()
-                        ),
+                    return Err(eyre!(
+                        "{} not found.  Have you run `{}` yet?",
+                        path.display(),
+                        "cargo pgx init".bold().yellow()
                     ));
                 }
 
-                match toml::from_str::<ConfigToml>(&std::fs::read_to_string(path)?) {
+                match toml::from_str::<ConfigToml>(&std::fs::read_to_string(&path)?) {
                     Ok(configs) => {
                         let mut pgx = Pgx::new();
 
@@ -316,7 +311,9 @@ impl Pgx {
                         }
                         Ok(pgx)
                     }
-                    Err(e) => Err(std::io::Error::new(ErrorKind::InvalidInput, e)),
+                    Err(e) => {
+                        Err(e).wrap_err_with(|| format!("Could not read `{}`", path.display()))
+                    }
                 }
             }
         }
@@ -329,7 +326,7 @@ impl Pgx {
     pub fn iter(
         &self,
         which: PgConfigSelector,
-    ) -> impl std::iter::Iterator<Item = Result<&PgConfig, std::io::Error>> {
+    ) -> impl std::iter::Iterator<Item = eyre::Result<&PgConfig>> {
         match which {
             PgConfigSelector::All => {
                 let mut configs = self.pg_configs.iter().collect::<Vec<_>>();
@@ -349,16 +346,14 @@ impl Pgx {
         }
     }
 
-    pub fn get(&self, label: &str) -> Result<&PgConfig, std::io::Error> {
+    #[tracing::instrument(level = "error", skip(self))]
+    pub fn get(&self, label: &str) -> eyre::Result<&PgConfig> {
         for pg_config in self.pg_configs.iter() {
             if pg_config.label()? == label {
                 return Ok(pg_config);
             }
         }
-        Err(std::io::Error::new(
-            ErrorKind::InvalidInput,
-            format!("Postgres '{}' is not managed by pgx", label),
-        ))
+        Err(eyre!("Postgres `{}` is not managed by pgx", label))
     }
 
     pub fn home() -> Result<PathBuf, std::io::Error> {
@@ -397,9 +392,9 @@ impl Pgx {
 }
 
 mod rss {
-    use crate::handle_result;
     use crate::pg_config::PgVersion;
     use colored::Colorize;
+    use eyre::WrapErr;
     use rttp_client::{types::Proxy, HttpClient};
     use serde_derive::Deserialize;
     use url::Url;
@@ -407,9 +402,7 @@ mod rss {
     pub(super) struct PostgreSQLVersionRss;
 
     impl PostgreSQLVersionRss {
-        pub(super) fn new(
-            supported_major_versions: &[u16],
-        ) -> Result<Vec<PgVersion>, std::io::Error> {
+        pub(super) fn new(supported_major_versions: &[u16]) -> eyre::Result<Vec<PgVersion>> {
             static VERSIONS_RSS_URL: &str = "https://www.postgresql.org/versions.rss";
 
             let mut http_client = HttpClient::new();
@@ -418,18 +411,13 @@ mod rss {
                 http_client.proxy(Proxy::https(host, port as u32));
             }
 
-            let response = handle_result!(
-                http_client.emit(),
-                &format!("unable to retrieve {}", VERSIONS_RSS_URL)
-            );
+            let response = http_client
+                .emit()
+                .wrap_err_with(|| format!("unable to retrieve {}", VERSIONS_RSS_URL))?;
+
             let rss: Rss = match serde_xml_rs::from_str(&response.body().to_string()) {
                 Ok(rss) => rss,
-                Err(e) => {
-                    return Err(std::io::Error::new(
-                        std::io::ErrorKind::InvalidInput,
-                        format!("{:?}", e),
-                    ))
-                }
+                Err(e) => return Err(e.into()),
             };
 
             let mut versions = Vec::new();

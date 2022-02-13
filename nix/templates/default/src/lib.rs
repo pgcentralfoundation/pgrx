@@ -8,6 +8,7 @@ fn hello() -> &'static str {
 }
 
 #[cfg(any(test, feature = "pg_test"))]
+#[pg_schema]
 mod tests {
     use pgx::*;
 
@@ -21,15 +22,15 @@ mod tests {
 pub mod pg_test {
     use once_cell::sync::Lazy;
     use pgx_utils::pg_config::Pgx;
-    use tempdir::TempDir;
+    use tempfile::tempdir;
 
     static WORK_DIR: Lazy<String> = Lazy::new(|| {
-        let work_dir = TempDir::new("plrust-tests").expect("Couldn't create tempdir");
+        let work_dir = tempdir().expect("Couldn't create tempdir");
         format!("plrust.work_dir='{}'", work_dir.path().display())
     });
     static PG_CONFIG: Lazy<String> = Lazy::new(|| {
         let pgx_config = Pgx::from_config().unwrap();
-        let version = format!("pg{}", pgx_pg_sys::get_pg_major_version_num());
+        let version = format!("pg{}", pgx::pg_sys::get_pg_major_version_num());
         let pg_config = pgx_config.get(&version).unwrap();
         let path = pg_config.path().unwrap();
         format!("plrust.pg_config='{}'", path.as_path().display())

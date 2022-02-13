@@ -2,7 +2,7 @@ mod argument;
 mod operator;
 mod returning;
 
-use eyre::eyre as eyre_err;
+use eyre::eyre;
 
 pub use argument::PgExternArgumentEntity;
 pub use operator::PgOperatorEntity;
@@ -10,7 +10,7 @@ pub use returning::PgExternReturnEntity;
 
 use pgx_utils::ExternArgs;
 
-use super::{SqlGraphEntity, SqlGraphIdentifier, ToSql};
+use super::{SqlGraphEntity, SqlGraphIdentifier, ToSql, ToSqlConfigEntity};
 use pgx_utils::sql_entity_graph::SqlDeclared;
 use std::cmp::Ordering;
 
@@ -29,7 +29,7 @@ pub struct PgExternEntity {
     pub fn_args: Vec<PgExternArgumentEntity>,
     pub fn_return: PgExternReturnEntity,
     pub operator: Option<PgOperatorEntity>,
-    pub overridden: Option<&'static str>,
+    pub to_sql_config: ToSqlConfigEntity,
 }
 
 impl Ord for PgExternEntity {
@@ -45,8 +45,6 @@ impl PartialOrd for PgExternEntity {
         Some(self.cmp(other))
     }
 }
-
-impl crate::PostgresType for PgExternEntity {}
 
 impl Into<SqlGraphEntity> for PgExternEntity {
     fn into(self) -> SqlGraphEntity {
@@ -73,7 +71,7 @@ impl SqlGraphIdentifier for PgExternEntity {
 
 impl ToSql for PgExternEntity {
     #[tracing::instrument(
-        level = "info",
+        level = "error",
         skip(self, context),
         fields(identifier = %self.rust_identifier()),
     )]
@@ -112,7 +110,7 @@ impl ToSql for PgExternEntity {
                                          SqlGraphEntity::Enum(en) => en.id_matches(&arg.ty_id),
                                          SqlGraphEntity::BuiltinType(defined) => defined == &arg.full_path,
                                          _ => false,
-                                     }).ok_or_else(|| eyre_err!("Could not find arg type in graph. Got: {:?}", arg))?;
+                                     }).ok_or_else(|| eyre!("Could not find arg type in graph. Got: {:?}", arg))?;
                                      let needs_comma = idx < (self.fn_args.len() - 1);
                                      let buf = format!("\
                                             \t\"{pattern}\" {variadic}{schema_prefix}{sql_type}{default}{maybe_comma}/* {full_path} */\
@@ -120,19 +118,7 @@ impl ToSql for PgExternEntity {
                                             pattern = arg.pattern,
                                             schema_prefix = context.schema_prefix_for(&graph_index),
                                             // First try to match on [`TypeId`] since it's most reliable.
-                                            sql_type = context.source_only_to_sql_type(arg.ty_source).or_else(|| {
-                                                context.type_id_to_sql_type(arg.ty_id)
-                                            }).or_else(|| {
-                                                // Fall back to fuzzy matching.
-                                                let path = arg.full_path.to_string();
-                                                if let Some(found) = context.has_sql_declared_entity(&SqlDeclared::Type(path.clone())) {
-                                                    Some(found.sql())
-                                                }  else if let Some(found) = context.has_sql_declared_entity(&SqlDeclared::Enum(path.clone())) {
-                                                    Some(found.sql())
-                                                } else {
-                                                    None
-                                                }
-                                            }).ok_or_else(|| eyre_err!(
+                                            sql_type = context.rust_to_sql(arg.ty_id, arg.ty_source, arg.full_path).ok_or_else(|| eyre!(
                                                 "Failed to map argument `{}` type `{}` to SQL type while building function `{}`.",
                                                 arg.pattern,
                                                 arg.full_path,
@@ -155,7 +141,7 @@ impl ToSql for PgExternEntity {
                                          SqlGraphEntity::Enum(en) => en.id_matches(&id),
                                          SqlGraphEntity::BuiltinType(defined) => &*defined == full_path,
                                          _ => false,
-                                     }).ok_or_else(|| eyre_err!("Could not find return type in graph."))?;
+                                     }).ok_or_else(|| eyre!("Could not find return type in graph."))?;
                                      format!("RETURNS {schema_prefix}{sql_type} /* {full_path} */",
                                              sql_type = context.source_only_to_sql_type(source).or_else(|| {
                                                  context.type_id_to_sql_type(*id)
@@ -168,7 +154,7 @@ impl ToSql for PgExternEntity {
                                                     } else {
                                                         None
                                                     }
-                                                }).ok_or_else(|| eyre_err!("Failed to map return type `{}` to SQL type while building function `{}`.", full_path, self.full_path))?,
+                                                }).ok_or_else(|| eyre!("Failed to map return type `{}` to SQL type while building function `{}`.", full_path, self.full_path))?,
                                              schema_prefix = context.schema_prefix_for(&graph_index),
                                              full_path = full_path
                                      )
@@ -179,7 +165,7 @@ impl ToSql for PgExternEntity {
                                          SqlGraphEntity::Enum(en) => en.id_matches(&id),
                                          SqlGraphEntity::BuiltinType(defined) => defined == full_path,
                                          _ => false,
-                                     }).ok_or_else(|| eyre_err!("Could not find return type in graph."))?;
+                                     }).ok_or_else(|| eyre!("Could not find return type in graph."))?;
                                      format!("RETURNS SETOF {schema_prefix}{sql_type} /* {full_path} */",
                                              sql_type = context.source_only_to_sql_type(source).or_else(|| {
                                                  context.type_id_to_sql_type(*id)
@@ -192,7 +178,7 @@ impl ToSql for PgExternEntity {
                                                     } else {
                                                         None
                                                     }
-                                                }).ok_or_else(|| eyre_err!("Failed to map return type `{}` to SQL type while building function `{}`.", full_path, self.full_path))?,
+                                                }).ok_or_else(|| eyre!("Failed to map return type `{}` to SQL type while building function `{}`.", full_path, self.full_path))?,
                                              schema_prefix = context.schema_prefix_for(&graph_index),
                                              full_path = full_path
                                      )
@@ -223,7 +209,7 @@ impl ToSql for PgExternEntity {
                                                                 } else {
                                                                     None
                                                                 }
-                                                            }).ok_or_else(|| eyre_err!("Failed to map return type `{}` to SQL type while building function `{}`.", ty_name, self.name))?,
+                                                            }).ok_or_else(|| eyre!("Failed to map return type `{}` to SQL type while building function `{}`.", ty_name, self.name))?,
                                                             needs_comma = if needs_comma { ", " } else { " " },
                                                             ty_name = ty_name
                                          );
@@ -252,25 +238,12 @@ impl ToSql for PgExternEntity {
                                 -- {module_path}::{name}\n\
                                 {requires}\
                                 {fn_sql}\
-                                {overridden}\
                             ",
             name = self.name,
             module_path = self.module_path,
             file = self.file,
             line = self.line,
-            fn_sql = if self.overridden.is_some() {
-                let mut inner = fn_sql
-                    .lines()
-                    .map(|f| format!("-- {}", f))
-                    .collect::<Vec<_>>()
-                    .join("\n");
-                inner.push_str(
-                    "\n--\n-- Overridden as (due to a `///` comment with a `pgxsql` code block):",
-                );
-                inner
-            } else {
-                fn_sql
-            },
+            fn_sql = fn_sql,
             requires = {
                 let requires_attrs = self
                     .extern_attrs
@@ -297,59 +270,56 @@ impl ToSql for PgExternEntity {
                     "".to_string()
                 }
             },
-            overridden = self
-                .overridden
-                .map(|f| String::from("\n") + f + "\n")
-                .unwrap_or_default(),
         );
-        tracing::debug!(sql = %ext_sql);
+        tracing::trace!(sql = %ext_sql);
 
-        let rendered = match (self.overridden, &self.operator) {
-            (None, Some(op)) => {
-                let mut optionals = vec![];
-                if let Some(it) = op.commutator {
-                    optionals.push(format!("\tCOMMUTATOR = {}", it));
-                };
-                if let Some(it) = op.negator {
-                    optionals.push(format!("\tNEGATOR = {}", it));
-                };
-                if let Some(it) = op.restrict {
-                    optionals.push(format!("\tRESTRICT = {}", it));
-                };
-                if let Some(it) = op.join {
-                    optionals.push(format!("\tJOIN = {}", it));
-                };
-                if op.hashes {
-                    optionals.push(String::from("\tHASHES"));
-                };
-                if op.merges {
-                    optionals.push(String::from("\tMERGES"));
-                };
+        let rendered = if let Some(op) = &self.operator {
+            let mut optionals = vec![];
+            if let Some(it) = op.commutator {
+                optionals.push(format!("\tCOMMUTATOR = {}", it));
+            };
+            if let Some(it) = op.negator {
+                optionals.push(format!("\tNEGATOR = {}", it));
+            };
+            if let Some(it) = op.restrict {
+                optionals.push(format!("\tRESTRICT = {}", it));
+            };
+            if let Some(it) = op.join {
+                optionals.push(format!("\tJOIN = {}", it));
+            };
+            if op.hashes {
+                optionals.push(String::from("\tHASHES"));
+            };
+            if op.merges {
+                optionals.push(String::from("\tMERGES"));
+            };
 
-                let left_arg = self.fn_args.get(0).ok_or_else(|| {
-                    eyre_err!("Did not find `left_arg` for operator `{}`.", self.name)
-                })?;
-                let left_arg_graph_index = context
-                    .graph
-                    .neighbors_undirected(self_index)
-                    .find(|neighbor| match &context.graph[*neighbor] {
-                        SqlGraphEntity::Type(ty) => ty.id_matches(&left_arg.ty_id),
-                        _ => false,
-                    })
-                    .ok_or_else(|| eyre_err!("Could not find left arg function in graph."))?;
-                let right_arg = self.fn_args.get(1).ok_or_else(|| {
-                    eyre_err!("Did not find `left_arg` for operator `{}`.", self.name)
-                })?;
-                let right_arg_graph_index = context
-                    .graph
-                    .neighbors_undirected(self_index)
-                    .find(|neighbor| match &context.graph[*neighbor] {
-                        SqlGraphEntity::Type(ty) => ty.id_matches(&right_arg.ty_id),
-                        _ => false,
-                    })
-                    .ok_or_else(|| eyre_err!("Could not find right arg function in graph."))?;
+            let left_arg = self
+                .fn_args
+                .get(0)
+                .ok_or_else(|| eyre!("Did not find `left_arg` for operator `{}`.", self.name))?;
+            let left_arg_graph_index = context
+                .graph
+                .neighbors_undirected(self_index)
+                .find(|neighbor| match &context.graph[*neighbor] {
+                    SqlGraphEntity::Type(ty) => ty.id_matches(&left_arg.ty_id),
+                    _ => false,
+                })
+                .ok_or_else(|| eyre!("Could not find left arg function in graph."))?;
+            let right_arg = self
+                .fn_args
+                .get(1)
+                .ok_or_else(|| eyre!("Did not find `left_arg` for operator `{}`.", self.name))?;
+            let right_arg_graph_index = context
+                .graph
+                .neighbors_undirected(self_index)
+                .find(|neighbor| match &context.graph[*neighbor] {
+                    SqlGraphEntity::Type(ty) => ty.id_matches(&right_arg.ty_id),
+                    _ => false,
+                })
+                .ok_or_else(|| eyre!("Could not find right arg function in graph."))?;
 
-                let operator_sql = format!("\n\n\
+            let operator_sql = format!("\n\n\
                                         -- {file}:{line}\n\
                                         -- {module_path}::{unaliased_name}\n\
                                         CREATE OPERATOR {opname} (\n\
@@ -358,26 +328,26 @@ impl ToSql for PgExternEntity {
                                             \tRIGHTARG={schema_prefix_right}{right_arg}{maybe_comma} /* {right_name} */\n\
                                             {optionals}\
                                         );\
-                                    ",
-                                           opname = op.opname.unwrap(),
-                                           file = self.file,
-                                           line = self.line,
-                                           name = self.name,
-                                           unaliased_name = self.unaliased_name,
-                                           module_path = self.module_path,
-                                           left_name = left_arg.full_path,
-                                           right_name = right_arg.full_path,
-                                           schema_prefix_left = context.schema_prefix_for(&left_arg_graph_index),
-                                           left_arg = context.type_id_to_sql_type(left_arg.ty_id).ok_or_else(|| eyre_err!("Failed to map argument `{}` type `{}` to SQL type while building operator `{}`.", left_arg.pattern, left_arg.full_path, self.name))?,
-                                           schema_prefix_right = context.schema_prefix_for(&right_arg_graph_index),
-                                           right_arg = context.type_id_to_sql_type(right_arg.ty_id).ok_or_else(|| eyre_err!("Failed to map argument `{}` type `{}` to SQL type while building operator `{}`.", right_arg.pattern, right_arg.full_path, self.name))?,
-                                           maybe_comma = if optionals.len() >= 1 { "," } else { "" },
-                                           optionals = if !optionals.is_empty() { optionals.join(",\n") + "\n" } else { "".to_string() },
-                );
-                tracing::debug!(sql = %operator_sql);
-                ext_sql + &operator_sql
-            }
-            (None, None) | (Some(_), Some(_)) | (Some(_), None) => ext_sql,
+                                        ",
+                                        opname = op.opname.unwrap(),
+                                        file = self.file,
+                                        line = self.line,
+                                        name = self.name,
+                                        unaliased_name = self.unaliased_name,
+                                        module_path = self.module_path,
+                                        left_name = left_arg.full_path,
+                                        right_name = right_arg.full_path,
+                                        schema_prefix_left = context.schema_prefix_for(&left_arg_graph_index),
+                                        left_arg = context.type_id_to_sql_type(left_arg.ty_id).ok_or_else(|| eyre!("Failed to map argument `{}` type `{}` to SQL type while building operator `{}`.", left_arg.pattern, left_arg.full_path, self.name))?,
+                                        schema_prefix_right = context.schema_prefix_for(&right_arg_graph_index),
+                                        right_arg = context.type_id_to_sql_type(right_arg.ty_id).ok_or_else(|| eyre!("Failed to map argument `{}` type `{}` to SQL type while building operator `{}`.", right_arg.pattern, right_arg.full_path, self.name))?,
+                                        maybe_comma = if optionals.len() >= 1 { "," } else { "" },
+                                        optionals = if !optionals.is_empty() { optionals.join(",\n") + "\n" } else { "".to_string() },
+                                );
+            tracing::trace!(sql = %operator_sql);
+            ext_sql + &operator_sql
+        } else {
+            ext_sql
         };
         Ok(rendered)
     }

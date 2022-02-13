@@ -2,58 +2,81 @@
   description = "A PostgreSQL extension built by pgx.";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    nixpkgs.url = "nixpkgs";
+    rust-overlay.url = "github:oxalica/rust-overlay";
+    rust-overlay.inputs.nixpkgs.follows = "nixpkgs";
     naersk.url = "github:nix-community/naersk";
     naersk.inputs.nixpkgs.follows = "nixpkgs";
-    pgx.url = "github:zombodb/pgx/develop";
+    gitignore.url = "github:hercules-ci/gitignore.nix";
+    gitignore.inputs.nixpkgs.follows = "nixpkgs";
+    pgx.url = "github:zombodb/pgx";
     pgx.inputs.nixpkgs.follows = "nixpkgs";
     pgx.inputs.naersk.follows = "naersk";
   };
 
-  outputs = { self, nixpkgs, pgx, naersk }:
+  outputs = { self, nixpkgs, rust-overlay, naersk, gitignore, pgx }:
     let
       cargoToml = (builtins.fromTOML (builtins.readFile ./Cargo.toml));
-      supportedSystems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" ];
-      forAllSystems = f: nixpkgs.lib.genAttrs supportedSystems (system: f system);
     in
     {
       inherit (pgx) devShell;
 
-      defaultPackage = forAllSystems (system: (import nixpkgs {
-        inherit system;
-        overlays = [ pgx.overlay self.overlay ];
-      })."${cargoToml.package.name}");
-
-      packages = forAllSystems (system:
+      defaultPackage = pgx.lib.forAllSystems (system:
         let
-          pkgs = import nixpkgs {
-            inherit system;
-            overlays = [ pgx.overlay self.overlay ];
-          };
+          pkgs = pgx.lib.nixpkgsWithOverlays { inherit system nixpkgs; extraOverlays = [ self.overlay ]; };
         in
-        {
-          "${cargoToml.package.name}" = pkgs."${cargoToml.package.name}";
-          "${cargoToml.package.name}_10" = pkgs."${cargoToml.package.name}";
-          "${cargoToml.package.name}_11" = pkgs."${cargoToml.package.name}";
-          "${cargoToml.package.name}_12" = pkgs."${cargoToml.package.name}";
-          "${cargoToml.package.name}_13" = pkgs."${cargoToml.package.name}";
+        pkgs."${cargoToml.package.name}");
 
-          "${cargoToml.package.name}_all" = pkgs.runCommandNoCC "allVersions" { } ''
-            mkdir -p $out
-            cp -r ${pkgs."${cargoToml.package.name}_10"} $out/${cargoToml.package.name}_10
-            cp -r ${pkgs."${cargoToml.package.name}_11"} $out/${cargoToml.package.name}_11
-            cp -r ${pkgs."${cargoToml.package.name}_12"} $out/${cargoToml.package.name}_12
-            cp -r ${pkgs."${cargoToml.package.name}_13"} $out/${cargoToml.package.name}_13
-          '';
-        });
+      packages = pgx.lib.forAllSystems (system:
+        let
+          pkgs = pgx.lib.nixpkgsWithOverlays { inherit system nixpkgs; extraOverlays = [ self.overlay ]; };
+        in
+        (nixpkgs.lib.foldl'
+          (x: y: x // y)
+          { }
+          (map
+            (version:
+              let versionString = builtins.toString version; in
+              {
+                "${cargoToml.package.name}_${versionString}" = pkgs."${cargoToml.package.name}_${versionString}";
+                "${cargoToml.package.name}_${versionString}_debug" = pkgs."${cargoToml.package.name}_${versionString}_debug";
+              })
+            pgx.lib.supportedPostgresVersions)
+        ));
 
       overlay = final: prev: {
-        "${cargoToml.package.name}" = final.callPackage ./. { inherit naersk; };
-        "${cargoToml.package.name}_10" = final.callPackage ./. { pgxPostgresVersion = 10; inherit naersk; };
-        "${cargoToml.package.name}_11" = final.callPackage ./. { pgxPostgresVersion = 11; inherit naersk; };
-        "${cargoToml.package.name}_12" = final.callPackage ./. { pgxPostgresVersion = 12; inherit naersk; };
-        "${cargoToml.package.name}_13" = final.callPackage ./. { pgxPostgresVersion = 13; inherit naersk; };
-      };
+        "${cargoToml.package.name}" = pgx.lib.buildPgxExtension {
+          pkgs = final;
+          source = ./.;
+          pgxPostgresVersion = 11;
+        };
+        "${cargoToml.package.name}_debug" = pgx.lib.buildPgxExtension {
+          pkgs = final;
+          source = ./.;
+          pgxPostgresVersion = 11;
+          release = false;
+        };
+      } // (nixpkgs.lib.foldl'
+        (x: y: x // y)
+        { }
+        (map
+          (version:
+            let versionString = builtins.toString version; in
+            {
+              "${cargoToml.package.name}_${versionString}" = pgx.lib.buildPgxExtension {
+                pkgs = final;
+                source = ./.;
+                pgxPostgresVersion = version;
+              };
+              "${cargoToml.package.name}_${versionString}_debug" = pgx.lib.buildPgxExtension {
+                pkgs = final;
+                source = ./.;
+                pgxPostgresVersion = version;
+                release = false;
+              };
+            })
+          pgx.lib.supportedPostgresVersions)
+      );
 
       nixosModule = { config, pkgs, lib, ... }:
         let
@@ -72,12 +95,9 @@
           };
         };
 
-      checks = forAllSystems (system:
+      checks = pgx.lib.forAllSystems (system:
         let
-          pkgs = import nixpkgs {
-            inherit system;
-            overlays = [ pgx.overlay self.overlay ];
-          };
+          pkgs = pgx.lib.nixpkgsWithOverlays { inherit system nixpkgs; extraOverlays = [ self.overlay ]; };
         in
         {
           format = pkgs.runCommand "check-format"
@@ -93,11 +113,12 @@
           #   ${pkgs.cargo-audit}/bin/cargo-audit audit --no-fetch
           #   # it worked!
           # '';
-          "${cargoToml.package.name}" = pkgs."${cargoToml.package.name}";
-          "${cargoToml.package.name}_10" = pkgs."${cargoToml.package.name}_10";
-          "${cargoToml.package.name}_11" = pkgs."${cargoToml.package.name}_11";
-          "${cargoToml.package.name}_12" = pkgs."${cargoToml.package.name}_12";
-          "${cargoToml.package.name}_13" = pkgs."${cargoToml.package.name}_13";
+          "${cargoToml.package.name}_debug" = pkgs."${cargoToml.package.name}_debug";
+          "${cargoToml.package.name}_10_debug" = pkgs."${cargoToml.package.name}_10_debug";
+          "${cargoToml.package.name}_11_debug" = pkgs."${cargoToml.package.name}_11_debug";
+          "${cargoToml.package.name}_12_debug" = pkgs."${cargoToml.package.name}_12_debug";
+          "${cargoToml.package.name}_13_debug" = pkgs."${cargoToml.package.name}_13_debug";
+          "${cargoToml.package.name}_14_debug" = pkgs."${cargoToml.package.name}_14_debug";
         });
     };
 }

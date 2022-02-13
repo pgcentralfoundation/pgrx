@@ -1,4 +1,4 @@
-use super::{SqlGraphEntity, SqlGraphIdentifier, ToSql};
+use super::{SqlGraphEntity, SqlGraphIdentifier, ToSql, ToSqlConfigEntity};
 use std::cmp::Ordering;
 
 /// The output of a [`PostgresHash`](crate::datum::sql_entity_graph::PostgresHash) from `quote::ToTokens::to_tokens`.
@@ -10,6 +10,13 @@ pub struct PostgresHashEntity {
     pub full_path: &'static str,
     pub module_path: &'static str,
     pub id: core::any::TypeId,
+    pub to_sql_config: ToSqlConfigEntity,
+}
+
+impl PostgresHashEntity {
+    pub(crate) fn fn_name(&self) -> String {
+        format!("{}_hash", self.name.to_lowercase())
+    }
 }
 
 impl Ord for PostgresHashEntity {
@@ -58,14 +65,15 @@ impl ToSql for PostgresHashEntity {
                             CREATE OPERATOR FAMILY {name}_hash_ops USING hash;\n\
                             CREATE OPERATOR CLASS {name}_hash_ops DEFAULT FOR TYPE {name} USING hash FAMILY {name}_hash_ops AS\n\
                                 \tOPERATOR    1   =  ({name}, {name}),\n\
-                                \tFUNCTION    1   {name}_hash({name});\
+                                \tFUNCTION    1   {fn_name}({name});\
                             ",
                           name = self.name,
                           full_path = self.full_path,
                           file = self.file,
                           line = self.line,
+                          fn_name = self.fn_name(),
         );
-        tracing::debug!(%sql);
+        tracing::trace!(%sql);
         Ok(sql)
     }
 }

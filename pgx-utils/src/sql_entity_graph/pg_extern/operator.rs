@@ -5,7 +5,7 @@ use syn::{parenthesized, token::Paren};
 
 /// A parsed `#[pg_operator]` operator.
 ///
-/// It is created during [`PgExtern`](pgx_utils::sql_entity_graph::PgExtern) parsing.
+/// It is created during [`PgExtern`](crate::sql_entity_graph::PgExtern) parsing.
 #[derive(Debug, Default, Clone)]
 pub struct PgOperator {
     pub opname: Option<PgxOperatorOpName>,

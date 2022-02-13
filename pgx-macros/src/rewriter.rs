@@ -5,13 +5,14 @@ extern crate proc_macro;
 
 use pgx_utils::{categorize_return_type, CategorizedType};
 use proc_macro2::{Ident, Span};
-use quote::{quote, quote_spanned};
+use quote::{quote, quote_spanned, ToTokens};
 use std::ops::Deref;
 use std::str::FromStr;
+use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
 use syn::{
     FnArg, ForeignItem, ForeignItemFn, Generics, ItemFn, ItemForeignMod, Pat, ReturnType,
-    Signature, Type, Visibility,
+    Signature, Token, Type, Visibility,
 };
 
 pub struct PgGuardRewriter();
@@ -224,7 +225,11 @@ impl PgGuardRewriter {
         let return_type =
             proc_macro2::TokenStream::from_str(return_type.trim_start_matches("->")).unwrap();
         let return_type = quote! {impl std::iter::Iterator<Item = #return_type>};
-        let attrs = entity_submission.unwrap().extern_attr_tokens();
+        let attrs = entity_submission
+            .unwrap()
+            .extern_attrs()
+            .iter()
+            .collect::<Punctuated<_, Token![,]>>();
 
         func.sig.output = ReturnType::Default;
         let sig = func.sig;
@@ -708,7 +713,9 @@ impl FunctionSignatureRewriter {
     fn args(&self, is_raw: bool) -> proc_macro2::TokenStream {
         if self.func.sig.inputs.len() == 1 && self.return_type_is_datum() {
             if let FnArg::Typed(ty) = self.func.sig.inputs.first().unwrap() {
-                if type_matches(&ty.ty, "pg_sys :: FunctionCallInfo") {
+                if type_matches(&ty.ty, "pg_sys :: FunctionCallInfo")
+                    || type_matches(&ty.ty, "pgx :: pg_sys :: FunctionCallInfo")
+                {
                     return proc_macro2::TokenStream::new();
                 }
             }
@@ -716,7 +723,8 @@ impl FunctionSignatureRewriter {
 
         let mut stream = proc_macro2::TokenStream::new();
         let mut i = 0usize;
-        let mut have_fcinfo = false;
+        let fcinfo_ident: syn::Ident = syn::parse_quote! { fcinfo };
+
         for arg in &self.func.sig.inputs {
             match arg {
                 FnArg::Receiver(_) => panic!("Functions that take self are not supported"),
@@ -726,31 +734,28 @@ impl FunctionSignatureRewriter {
                         let mut type_ = ty.ty.clone();
                         let is_option = type_matches(&type_, "Option");
 
-                        if have_fcinfo {
-                            panic!("When using `pg_sys::FunctionCallInfo` as an argument it must be the last argument")
-                        }
-
                         let ts = if is_option {
                             let option_type = extract_option_type(&type_);
                             let mut option_type = syn::parse2::<syn::Type>(option_type).unwrap();
                             pgx_utils::anonymonize_lifetimes(&mut option_type);
 
                             quote_spanned! {ident.span()=>
-                                let #name = pgx::pg_getarg::<#option_type>(fcinfo, #i);
+                                let #name = pgx::pg_getarg::<#option_type>(#fcinfo_ident, #i);
                             }
-                        } else if type_matches(&type_, "pg_sys :: FunctionCallInfo") {
-                            have_fcinfo = true;
+                        } else if type_matches(&type_, "pg_sys :: FunctionCallInfo")
+                            || type_matches(&type_, "pgx :: pg_sys :: FunctionCallInfo")
+                        {
                             quote_spanned! {ident.span()=>
-                                let #name = fcinfo;
+                                let #name = #fcinfo_ident;
                             }
                         } else if is_raw {
                             quote_spanned! {ident.span()=>
-                                let #name = pgx::pg_getarg_datum_raw(fcinfo, #i) as #type_;
+                                let #name = pgx::pg_getarg_datum_raw(#fcinfo_ident, #i) as #type_;
                             }
                         } else {
                             pgx_utils::anonymonize_lifetimes(&mut type_);
                             quote_spanned! {ident.span()=>
-                                let #name = pgx::pg_getarg::<#type_>(fcinfo, #i).unwrap_or_else(|| panic!("{} is null", stringify!{#ident}));
+                                let #name = pgx::pg_getarg::<#type_>(#fcinfo_ident, #i).unwrap_or_else(|| panic!("{} is null", stringify!{#ident}));
                             }
                         };
 
@@ -758,7 +763,10 @@ impl FunctionSignatureRewriter {
 
                         i += 1;
                     }
-                    _ => panic!("Unrecognized function arg type"),
+                    _ => panic!(
+                        "Unrecognized function arg type: {}",
+                        arg.to_token_stream().to_string()
+                    ),
                 },
             }
         }

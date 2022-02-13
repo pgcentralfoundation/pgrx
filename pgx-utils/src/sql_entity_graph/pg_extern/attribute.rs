@@ -1,4 +1,4 @@
-use crate::sql_entity_graph::PositioningRef;
+use crate::sql_entity_graph::{PositioningRef, ToSqlConfig};
 use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
 use syn::{
@@ -6,29 +6,6 @@ use syn::{
     punctuated::Punctuated,
     Token,
 };
-
-#[derive(Debug, Clone)]
-pub struct PgxAttributes {
-    pub attrs: Punctuated<Attribute, Token![,]>,
-}
-
-impl Parse for PgxAttributes {
-    fn parse(input: ParseStream) -> Result<Self, syn::Error> {
-        Ok(Self {
-            attrs: input.parse_terminated(Attribute::parse)?,
-        })
-    }
-}
-
-impl ToTokens for PgxAttributes {
-    fn to_tokens(&self, tokens: &mut TokenStream2) {
-        let attrs = &self.attrs;
-        let quoted = quote! {
-            vec![#attrs]
-        };
-        tokens.append_all(quoted);
-    }
-}
 
 #[derive(Debug, Clone, Hash, Eq, PartialEq)]
 pub enum Attribute {
@@ -44,7 +21,9 @@ pub enum Attribute {
     Error(syn::LitStr),
     Schema(syn::LitStr),
     Name(syn::LitStr),
+    Cost(syn::Expr),
     Requires(Punctuated<PositioningRef, Token![,]>),
+    Sql(ToSqlConfig),
 }
 
 impl ToTokens for Attribute {
@@ -74,12 +53,19 @@ impl ToTokens for Attribute {
             Attribute::Name(s) => {
                 quote! { pgx::datum::sql_entity_graph::ExternArgs::Name(String::from(#s)) }
             }
+            Attribute::Cost(s) => {
+                quote! { pgx::datum::sql_entity_graph::ExternArgs::Cost(format!("{}", #s)) }
+            }
             Attribute::Requires(items) => {
                 let items_iter = items
                     .iter()
                     .map(|x| x.to_token_stream())
                     .collect::<Vec<_>>();
                 quote! { pgx::datum::sql_entity_graph::ExternArgs::Requires(vec![#(#items_iter),*],) }
+            }
+            // This attribute is handled separately
+            Attribute::Sql(_) => {
+                return;
             }
         };
         tokens.append_all(quoted);
@@ -114,11 +100,33 @@ impl Parse for Attribute {
                 let literal: syn::LitStr = input.parse()?;
                 Self::Name(literal)
             }
+            "cost" => {
+                let _eq: Token![=] = input.parse()?;
+                let literal: syn::Expr = input.parse()?;
+                Self::Cost(literal)
+            }
             "requires" => {
                 let _eq: syn::token::Eq = input.parse()?;
                 let content;
                 let _bracket = syn::bracketed!(content in input);
                 Self::Requires(content.parse_terminated(PositioningRef::parse)?)
+            }
+            "sql" => {
+                use crate::sql_entity_graph::ArgValue;
+                use syn::Lit;
+
+                let _eq: Token![=] = input.parse()?;
+                match input.parse::<ArgValue>()? {
+                    ArgValue::Path(p) => Self::Sql(ToSqlConfig::from(p)),
+                    ArgValue::Lit(Lit::Bool(b)) => Self::Sql(ToSqlConfig::from(b.value)),
+                    ArgValue::Lit(Lit::Str(s)) => Self::Sql(ToSqlConfig::from(s)),
+                    ArgValue::Lit(other) => {
+                        return Err(syn::Error::new(
+                            other.span(),
+                            "expected boolean, path, or string literal",
+                        ))
+                    }
+                }
             }
             _ => return Err(syn::Error::new(Span::call_site(), "Invalid option")),
         };

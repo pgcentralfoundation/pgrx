@@ -10,7 +10,7 @@ use syn::{
 
 /// A parsed `#[pg_extern]` argument.
 ///
-/// It is created during [`PgExtern`](pgx_utils::sql_entity_graph::PgExtern) parsing.
+/// It is created during [`PgExtern`](crate::sql_entity_graph::PgExtern) parsing.
 #[derive(Debug, Clone)]
 pub struct Argument {
     pat: syn::Ident,
@@ -192,6 +192,28 @@ fn handle_default(
                     let value = def.value();
                     Ok((true_ty, Some(value.to_string())))
                 }
+                syn::Expr::Unary(syn::ExprUnary {
+                    op: syn::UnOp::Neg(_),
+                    ref expr,
+                    ..
+                }) => match &**expr {
+                    syn::Expr::Lit(syn::ExprLit {
+                        lit: syn::Lit::Int(def),
+                        ..
+                    }) => {
+                        let value = def.base10_digits();
+                        Ok((true_ty, Some("-".to_owned() + value)))
+                    }
+                    _ => {
+                        return Err(syn::Error::new(
+                            Span::call_site(),
+                            format!(
+                                "Unrecognized UnaryExpr in `default!()` macro, got: {:?}",
+                                out.expr
+                            ),
+                        ))
+                    }
+                },
                 syn::Expr::Type(syn::ExprType { ref ty, .. }) => match ty.deref() {
                     syn::Type::Path(syn::TypePath {
                         path: syn::Path { segments, .. },
@@ -308,16 +330,14 @@ impl ToTokens for Argument {
 #[derive(Debug, Clone)]
 pub(crate) struct DefaultMacro {
     ty: syn::Type,
-    comma: Token![,],
     pub(crate) expr: syn::Expr,
 }
 
 impl Parse for DefaultMacro {
     fn parse(input: ParseStream) -> Result<Self, syn::Error> {
-        Ok(Self {
-            ty: input.parse()?,
-            comma: input.parse()?,
-            expr: input.parse()?,
-        })
+        let ty = input.parse()?;
+        let _comma: Token![,] = input.parse()?;
+        let expr = input.parse()?;
+        Ok(Self { ty, expr })
     }
 }

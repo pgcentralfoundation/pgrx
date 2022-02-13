@@ -19,9 +19,9 @@ pg14 = ["pgx/pg14", "pgx-tests/pg14" ]
 pg_test = []
 
 [dependencies]
-heapless = "0.7.5"
+heapless = "0.7.10"
 pgx = { path = "../../../pgx/pgx/", default-features = false }
-serde = { version = "1.0.114", features = [ "derive" ] }
+serde = { version = "1.0.136", features = [ "derive" ] }
 
 [dev-dependencies]
 pgx-tests = { path = "../../../pgx/pgx-tests" }

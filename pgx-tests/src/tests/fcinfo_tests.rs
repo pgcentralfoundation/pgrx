@@ -96,6 +96,29 @@ fn same_name(same_name: &str) -> &str {
     same_name
 }
 
+// Tests for regression of https://github.com/zombodb/pgx/issues/432
+#[pg_extern]
+fn fcinfo_renamed_one_arg(_x: PgBox<pg_sys::IndexAmRoutine>, _fcinfo: pg_sys::FunctionCallInfo) -> PgBox<pg_sys::IndexAmRoutine> {
+    todo!()
+}
+
+#[pg_extern]
+fn fcinfo_renamed_no_arg(_fcinfo: pg_sys::FunctionCallInfo) -> i32 {
+    todo!()
+}
+
+#[pg_extern]
+fn fcinfo_not_named_one_arg(_x: PgBox<pg_sys::IndexAmRoutine>, fcinfo: pg_sys::FunctionCallInfo) -> PgBox<pg_sys::IndexAmRoutine> {
+    let _fcinfo = fcinfo;
+    todo!()
+}
+
+#[pg_extern]
+fn fcinfo_not_named_no_arg(fcinfo: pg_sys::FunctionCallInfo) -> i32 {
+    let _fcinfo = fcinfo;
+    todo!()
+}
+
 #[cfg(any(test, feature = "pg_test"))]
 #[pgx::pg_schema]
 mod tests {

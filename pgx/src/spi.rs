@@ -58,6 +58,7 @@ pub struct SpiClient;
 
 #[derive(Debug)]
 pub struct SpiTupleTable {
+    #[allow(dead_code)]
     status_code: SpiOk,
     table: *mut pg_sys::SPITupleTable,
     size: usize,

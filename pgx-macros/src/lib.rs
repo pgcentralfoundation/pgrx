@@ -14,7 +14,7 @@ use quote::{quote, quote_spanned, ToTokens};
 use rewriter::*;
 use std::collections::HashSet;
 use syn::spanned::Spanned;
-use syn::{parse_macro_input, Attribute, Data, DeriveInput, Item, ItemFn};
+use syn::{parse_macro_input, Attribute, Data, DeriveInput, Item, ItemFn, ItemImpl};
 
 /// Declare a function as `#[pg_guard]` to indicate that it is called from a Postgres `extern "C"`
 /// function so that Rust `panic!()`s (and Postgres `elog(ERROR)`s) will be properly handled by `pgx`
@@ -88,7 +88,11 @@ pub fn pg_test(attr: TokenStream, item: TokenStream) -> TokenStream {
                     #att_stream
 
                     crate::pg_test::setup(options);
-                    pgx_tests::run_test(#sql_funcname, #expected_error, crate::pg_test::postgresql_conf_options())
+                    let res = pgx_tests::run_test(#sql_funcname, #expected_error, crate::pg_test::postgresql_conf_options());
+                    match res {
+                        Ok(()) => (),
+                        Err(e) => panic!("{:?}", e)
+                    }
                 }
             });
         }
@@ -290,12 +294,12 @@ extension_sql!(r#"\
 );
 
 #[pg_extern(immutable)]
-fn complex_in(input: &std::ffi::CStr) -> PgBox<Complex> {
+fn complex_in(input: &pgx::cstr_core::CStr) -> PgBox<Complex> {
     todo!()
 }
 
 #[pg_extern(immutable)]
-fn complex_out(complex: PgBox<Complex>) -> &'static std::ffi::CStr {
+fn complex_out(complex: PgBox<Complex>) -> &'static pgx::cstr_core::CStr {
     todo!()
 }
 
@@ -398,6 +402,7 @@ Optionally accepts the following attributes:
 * `parallel_unsafe`: Corresponds to [`PARALLEL UNSAFE`](https://www.postgresql.org/docs/current/sql-createfunction.html).
 * `parallel_restricted`: Corresponds to [`PARALLEL RESTRICTED`](https://www.postgresql.org/docs/current/sql-createfunction.html).
 * `no_guard`: Do not use `#[pg_guard]` with the function.
+* `sql`: Same arguments as [`#[pgx(sql = ..)]`](macro@pgx).
 
 Functions can accept and return any type which `pgx` supports. `pgx` supports many PostgreSQL types by default.
 New types can be defined via [`macro@PostgresType`] or [`macro@PostgresEnum`].
@@ -593,7 +598,7 @@ enum DogNames {
 ```
 
 */
-#[proc_macro_derive(PostgresEnum, attributes(requires))]
+#[proc_macro_derive(PostgresEnum, attributes(requires, pgx))]
 pub fn postgres_enum(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
 
@@ -679,9 +684,12 @@ Optionally accepts the following attributes:
 
 * `inoutfuncs(some_in_fn, some_out_fn)`: Define custom in/out functions for the type.
 * `pgvarlena_inoutfuncs(some_in_fn, some_out_fn)`: Define custom in/out functions for the `PgVarlena` of this type.
-
+* `sql`: Same arguments as [`#[pgx(sql = ..)]`](macro@pgx).
 */
-#[proc_macro_derive(PostgresType, attributes(inoutfuncs, pgvarlena_inoutfuncs, requires))]
+#[proc_macro_derive(
+    PostgresType,
+    attributes(inoutfuncs, pgvarlena_inoutfuncs, requires, pgx)
+)]
 pub fn postgres_type(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
 
@@ -731,12 +739,12 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
             impl #generics JsonInOutFuncs #inout_generics for #name #generics {}
 
             #[pg_extern(immutable,parallel_safe)]
-            pub fn #funcname_in #generics(input: &#lifetime std::ffi::CStr) -> #name #generics {
+            pub fn #funcname_in #generics(input: &#lifetime pgx::cstr_core::CStr) -> #name #generics {
                 #name::input(input)
             }
 
             #[pg_extern(immutable,parallel_safe)]
-            pub fn #funcname_out #generics(input: #name #generics) -> &#lifetime std::ffi::CStr {
+            pub fn #funcname_out #generics(input: #name #generics) -> &#lifetime pgx::cstr_core::CStr {
                 let mut buffer = StringInfo::new();
                 input.output(&mut buffer);
                 buffer.into()
@@ -747,12 +755,12 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
         // otherwise if it's InOutFuncs our _in/_out functions use an owned type instance
         stream.extend(quote! {
             #[pg_extern(immutable,parallel_safe)]
-            pub fn #funcname_in #generics(input: &#lifetime std::ffi::CStr) -> #name #generics {
+            pub fn #funcname_in #generics(input: &#lifetime pgx::cstr_core::CStr) -> #name #generics {
                 #name::input(input)
             }
 
             #[pg_extern(immutable,parallel_safe)]
-            pub fn #funcname_out #generics(input: #name #generics) -> &#lifetime std::ffi::CStr {
+            pub fn #funcname_out #generics(input: #name #generics) -> &#lifetime pgx::cstr_core::CStr {
                 let mut buffer = StringInfo::new();
                 input.output(&mut buffer);
                 buffer.into()
@@ -762,12 +770,12 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
         // otherwise if it's PgVarlenaInOutFuncs our _in/_out functions use a PgVarlena
         stream.extend(quote! {
             #[pg_extern(immutable,parallel_safe)]
-            pub fn #funcname_in #generics(input: &#lifetime std::ffi::CStr) -> pgx::PgVarlena<#name #generics> {
+            pub fn #funcname_in #generics(input: &#lifetime pgx::cstr_core::CStr) -> pgx::PgVarlena<#name #generics> {
                 #name::input(input)
             }
 
             #[pg_extern(immutable,parallel_safe)]
-            pub fn #funcname_out #generics(input: pgx::PgVarlena<#name #generics>) -> &#lifetime std::ffi::CStr {
+            pub fn #funcname_out #generics(input: pgx::PgVarlena<#name #generics>) -> &#lifetime pgx::cstr_core::CStr {
                 let mut buffer = StringInfo::new();
                 input.output(&mut buffer);
                 buffer.into()
@@ -907,12 +915,16 @@ enum DogNames {
     Brandy,
 }
 ```
+Optionally accepts the following attributes:
 
+* `sql`: Same arguments as [`#[pgx(sql = ..)]`](macro@pgx).
 */
-#[proc_macro_derive(PostgresEq)]
+#[proc_macro_derive(PostgresEq, attributes(pgx))]
 pub fn postgres_eq(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
-    impl_postgres_eq(ast).into()
+    impl_postgres_eq(ast)
+        .unwrap_or_else(syn::Error::into_compile_error)
+        .into()
 }
 
 /**
@@ -931,12 +943,16 @@ enum DogNames {
     Brandy,
 }
 ```
+Optionally accepts the following attributes:
 
+* `sql`: Same arguments as [`#[pgx(sql = ..)]`](macro@pgx).
 */
-#[proc_macro_derive(PostgresOrd)]
+#[proc_macro_derive(PostgresOrd, attributes(pgx))]
 pub fn postgres_ord(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
-    impl_postgres_ord(ast).into()
+    impl_postgres_ord(ast)
+        .unwrap_or_else(syn::Error::into_compile_error)
+        .into()
 }
 
 /**
@@ -952,10 +968,65 @@ enum DogNames {
     Brandy,
 }
 ```
+Optionally accepts the following attributes:
 
+* `sql`: Same arguments as [`#[pgx(sql = ..)]`](macro@pgx).
 */
-#[proc_macro_derive(PostgresHash)]
+#[proc_macro_derive(PostgresHash, attributes(pgx))]
 pub fn postgres_hash(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
-    impl_postgres_hash(ast).into()
+    impl_postgres_hash(ast)
+        .unwrap_or_else(syn::Error::into_compile_error)
+        .into()
+}
+
+/**
+Declare a `pgx::Aggregate` implentation on a type as able to used by Postgres as an aggregate.
+
+Functions inside the `impl` may use the [`#[pgx]`](macro@pgx) attribute.
+*/
+#[proc_macro_attribute]
+pub fn pg_aggregate(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    // We don't care about `_attr` as we can find it in the `ItemMod`.
+    fn wrapped(item_impl: ItemImpl) -> Result<TokenStream, syn::Error> {
+        let sql_graph_entity_item = sql_entity_graph::PgAggregate::new(item_impl.into())?;
+
+        Ok(sql_graph_entity_item.to_token_stream().into())
+    }
+
+    let parsed_base = parse_macro_input!(item as syn::ItemImpl);
+    match wrapped(parsed_base) {
+        Ok(tokens) => tokens,
+        Err(e) => {
+            let msg = e.to_string();
+            TokenStream::from(quote! {
+              compile_error!(#msg);
+            })
+        }
+    }
+}
+
+/**
+A helper attribute for various contexts.
+
+## Usage with [`#[pg_aggregate]`](macro@pg_aggregate).
+
+It can be decorated on functions inside a [`#[pg_aggregate]`](macro@pg_aggregate) implementation.
+In this position, it takes the same args as [`#[pg_extern]`](macro@pg_extern), and those args have the same effect.
+
+## Usage for configuring SQL generation
+
+This attribute can be used to control the behavior of the SQL generator on a decorated item,
+e.g. `#[pgx(sql = false)]`
+
+Currently `sql` can be provided one of the following:
+
+* Disable SQL generation with `#[pgx(sql = false)]`
+* Call custom SQL generator function with `#[pgx(sql = path::to_function)]`
+* Render a specific fragment of SQL with a string `#[pgx(sql = "CREATE OR REPLACE FUNCTION ...")]`
+
+*/
+#[proc_macro_attribute]
+pub fn pgx(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    item
 }

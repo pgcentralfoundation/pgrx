@@ -3,7 +3,7 @@ use std::{
     hash::{Hash, Hasher},
 };
 
-use super::{SqlGraphEntity, SqlGraphIdentifier, ToSql};
+use super::{SqlGraphEntity, SqlGraphIdentifier, ToSql, ToSqlConfigEntity};
 
 /// The output of a [`PostgresEnum`](crate::datum::sql_entity_graph::PostgresEnum) from `quote::ToTokens::to_tokens`.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -15,9 +15,8 @@ pub struct PostgresEnumEntity {
     pub module_path: &'static str,
     pub mappings: std::collections::HashSet<super::RustSqlMapping>,
     pub variants: Vec<&'static str>,
+    pub to_sql_config: ToSqlConfigEntity,
 }
-
-impl crate::PostgresType for PostgresEnumEntity {}
 
 impl Hash for PostgresEnumEntity {
     fn hash<H: Hasher>(&self, state: &mut H) {
@@ -93,7 +92,7 @@ impl ToSql for PostgresEnumEntity {
                 .join(",\n")
                 + "\n",
         );
-        tracing::debug!(%sql);
+        tracing::trace!(%sql);
         Ok(sql)
     }
 }

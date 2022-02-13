@@ -1,4 +1,4 @@
-use super::{SqlGraphEntity, SqlGraphIdentifier, ToSql};
+use super::{SqlGraphEntity, SqlGraphIdentifier, ToSql, ToSqlConfigEntity};
 use std::cmp::Ordering;
 
 /// The output of a [`PostgresOrd`](crate::datum::sql_entity_graph::PostgresOrd) from `quote::ToTokens::to_tokens`.
@@ -10,6 +10,33 @@ pub struct PostgresOrdEntity {
     pub full_path: &'static str,
     pub module_path: &'static str,
     pub id: core::any::TypeId,
+    pub to_sql_config: ToSqlConfigEntity,
+}
+
+impl PostgresOrdEntity {
+    pub(crate) fn cmp_fn_name(&self) -> String {
+        format!("{}_cmp", self.name.to_lowercase())
+    }
+
+    pub(crate) fn lt_fn_name(&self) -> String {
+        format!("{}_lt", self.name.to_lowercase())
+    }
+
+    pub(crate) fn le_fn_name(&self) -> String {
+        format!("{}_le", self.name.to_lowercase())
+    }
+
+    pub(crate) fn eq_fn_name(&self) -> String {
+        format!("{}_eq", self.name.to_lowercase())
+    }
+
+    pub(crate) fn gt_fn_name(&self) -> String {
+        format!("{}_gt", self.name.to_lowercase())
+    }
+
+    pub(crate) fn ge_fn_name(&self) -> String {
+        format!("{}_ge", self.name.to_lowercase())
+    }
 }
 
 impl Ord for PostgresOrdEntity {
@@ -62,14 +89,15 @@ impl ToSql for PostgresOrdEntity {
                                   \tOPERATOR 3 =,\n\
                                   \tOPERATOR 4 >=,\n\
                                   \tOPERATOR 5 >,\n\
-                                  \tFUNCTION 1 {name}_cmp({name}, {name});\
+                                  \tFUNCTION 1 {cmp_fn_name}({name}, {name});\
                             ",
                           name = self.name,
                           full_path = self.full_path,
                           file = self.file,
                           line = self.line,
+                          cmp_fn_name = self.cmp_fn_name(),
         );
-        tracing::debug!(%sql);
+        tracing::trace!(%sql);
         Ok(sql)
     }
 }

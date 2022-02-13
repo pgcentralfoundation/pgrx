@@ -1,32 +1,40 @@
 [package]
 name = "cargo-pgx"
-version = "0.2.6"
+version = "0.3.1"
 authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
 edition = "2018"
 license = "MIT"
-description = "cargo subcommand for 'pgx' to make Postgres extension development easy"
-homepage = "https://github.com/zombodb/pgx/cargo-pgx"
-repository = "https://github.com/zombodb/pgx/cargo-pgx"
+description = "Cargo subcommand for 'pgx' to make Postgres extension development easy"
+homepage = "https://github.com/zombodb/pgx"
+repository = "https://github.com/zombodb/pgx"
 documentation = "https://docs.rs/cargo-pgx"
 categories = ["development-tools::cargo-plugins", "command-line-utilities", "database"]
 keywords = ["database", "postgres", "postgresql", "extension"]
 readme = "README.md"
 exclude = [ "*.png" ]
 
-
 [dependencies]
-clap = { version = "2.34.0", features = [ "yaml" ] }
+cargo_metadata = "0.14.1"
+cargo_toml = "0.11.4"
+clap = { version = "3.0.14", features = [ "env", "suggestions", "cargo", "derive" ] }
+clap-cargo = { version = "0.8.0", features = [ "cargo_metadata" ] }
+semver = "1.0.5"
 colored = "2.0.0"
 env_proxy = "0.4.1"
-num_cpus = "1.13.0"
-pgx-utils = { path = "../pgx-utils", version = "0.2.6" }
-proc-macro2 = { version = "1.0.33", features = [ "span-locations" ] }
-quote = "1.0.10"
+num_cpus = "1.13.1"
+pgx-utils = { path = "../pgx-utils", version = "0.3.1" }
+proc-macro2 = { version = "1.0.36", features = [ "span-locations" ] }
+quote = "1.0.15"
 rayon = "1.5.1"
 regex = "1.5.4"
 rttp_client = { version = "0.1.0", features = ["tls-native"] }
-syn = { version = "1.0.82", features = [ "extra-traits", "full", "fold", "parsing" ] }
+syn = { version = "1.0.86", features = [ "extra-traits", "full", "fold", "parsing" ] }
 unescape = "0.1.0"
 fork = "0.1.18"
-libloading = "0.7.2"
-symbolic = "8.5.0"
+libloading = "0.7.3"
+symbolic = "8.6.0"
+eyre = "0.6.6"
+color-eyre = "0.6.0"
+tracing = "0.1.30"
+tracing-error = "0.2.0"
+tracing-subscriber = { version = "0.3.8", features = [ "env-filter" ] }
