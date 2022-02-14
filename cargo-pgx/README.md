@@ -577,7 +577,7 @@ OPTIONS:
             Do not activate the `default` feature
 
     -o, --out <OUT>
-            A path to output a produced SQL file (default is `sql/$EXTNAME-$VERSION.sql`)
+            A path to output a produced SQL file (default is `sql/$EXTNAME--$VERSION.sql`)
 
     -r, --release
             Compile for release mode (default is debug)

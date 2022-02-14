@@ -407,7 +407,7 @@ macro_rules! pg_binary_magic {
                 about,
             )]
             struct SqlGenerator {
-                /// A path to output a produced SQL file (default is `sql/$EXTNAME-$VERSION.sql`)
+                /// A path to output a produced SQL file (default is `sql/$EXTNAME--$VERSION.sql`)
                 #[clap(
                     long,
                     short,
