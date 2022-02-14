@@ -6,6 +6,18 @@ use serde::*;
 
 pg_module_magic!();
 
+#[no_mangle]
+pub extern "C" fn accumArrayResult(
+    astate: *mut pgx::pg_sys::ArrayBuildState,
+    dvalue: pgx::pg_sys::Datum,
+    disnull: bool,
+    element_type: pgx::pg_sys::Oid,
+    rcontext: pgx::pg_sys::MemoryContext,
+) -> *mut pgx::pg_sys::ArrayBuildState {
+    unimplemented!();
+}
+
+
 #[pg_extern]
 fn sq_euclid_pgx(a: Array<f32>, b: Array<f32>) -> f32 {
     a.as_slice()

@@ -15,7 +15,6 @@ mod into;
 mod item_pointer_data;
 mod json;
 mod numeric;
-pub mod sql_entity_graph;
 mod time;
 mod time_stamp;
 mod time_stamp_with_timezone;
@@ -39,15 +38,16 @@ pub use item_pointer_data::*;
 pub use json::*;
 pub use numeric::*;
 use once_cell::sync::Lazy;
-pub use sql_entity_graph::RustSqlMapping;
 use std::any::TypeId;
 pub use time_stamp::*;
 pub use time_stamp_with_timezone::*;
 pub use time_with_timezone::*;
 pub use tuples::*;
 pub use varlena::*;
+pub use pgx_utils::sql_entity_graph;
 
 use crate::PgBox;
+use pgx_utils::sql_entity_graph::RustSqlMapping;
 
 /// A tagging trait to indicate a user type is also meant to be used by Postgres
 /// Implemented automatically by `#[derive(PostgresType)]`

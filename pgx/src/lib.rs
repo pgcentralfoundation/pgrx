@@ -64,7 +64,6 @@ pub use once_cell;
 pub use aggregate::*;
 pub use atomics::*;
 pub use callbacks::*;
-use datum::sql_entity_graph::{RustSourceOnlySqlMapping, RustSqlMapping};
 pub use datum::*;
 pub use enum_helper::*;
 pub use fcinfo::*;
@@ -99,6 +98,8 @@ pub use cstr_core;
 use core::any::TypeId;
 use once_cell::sync::Lazy;
 use std::collections::HashSet;
+
+use pgx_utils::sql_entity_graph::{RustSourceOnlySqlMapping, RustSqlMapping};
 
 macro_rules! map_source_only {
     ($map:ident, $rust:ty, $sql:expr) => {{

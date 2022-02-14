@@ -1,118 +1,79 @@
-use proc_macro2::{Span, TokenStream as TokenStream2};
-use quote::{quote, ToTokens, TokenStreamExt};
-use syn::{
-    parse::{Parse, ParseStream},
-    DeriveInput, Ident,
-};
+use super::{SqlGraphEntity, SqlGraphIdentifier, ToSql, ToSqlConfigEntity};
+use std::cmp::Ordering;
 
-use super::ToSqlConfig;
-
-/// A parsed `#[derive(PostgresHash)]` item.
-///
-/// It should be used with [`syn::parse::Parse`] functions.
-///
-/// Using [`quote::ToTokens`] will output the declaration for a `pgx::datum::sql_entity_graph::InventoryPostgresHash`.
-///
-/// On structs:
-///
-/// ```rust
-/// use syn::{Macro, parse::Parse, parse_quote, parse};
-/// use quote::{quote, ToTokens};
-/// use pgx_utils::sql_entity_graph::PostgresHash;
-///
-/// # fn main() -> eyre::Result<()> {
-/// let parsed: PostgresHash = parse_quote! {
-///     #[derive(PostgresHash)]
-///     struct Example<'a> {
-///         demo: &'a str,
-///     }
-/// };
-/// let sql_graph_entity_tokens = parsed.to_token_stream();
-/// # Ok(())
-/// # }
-/// ```
-///
-/// On enums:
-///
-/// ```rust
-/// use syn::{Macro, parse::Parse, parse_quote, parse};
-/// use quote::{quote, ToTokens};
-/// use pgx_utils::sql_entity_graph::PostgresHash;
-///
-/// # fn main() -> eyre::Result<()> {
-/// let parsed: PostgresHash = parse_quote! {
-///     #[derive(PostgresHash)]
-///     enum Demo {
-///         Example,
-///     }
-/// };
-/// let sql_graph_entity_tokens = parsed.to_token_stream();
-/// # Ok(())
-/// # }
-/// ```
-#[derive(Debug, Clone)]
-pub struct PostgresHash {
-    pub name: Ident,
-    pub to_sql_config: ToSqlConfig,
+/// The output of a [`PostgresHash`](crate::datum::sql_entity_graph::PostgresHash) from `quote::ToTokens::to_tokens`.
+#[derive(Debug, Clone, Hash, PartialEq, Eq)]
+pub struct PostgresHashEntity {
+    pub name: &'static str,
+    pub file: &'static str,
+    pub line: u32,
+    pub full_path: &'static str,
+    pub module_path: &'static str,
+    pub id: core::any::TypeId,
+    pub to_sql_config: ToSqlConfigEntity,
 }
 
-impl PostgresHash {
-    pub fn new(name: Ident, to_sql_config: ToSqlConfig) -> Self {
-        Self {
-            name,
-            to_sql_config,
-        }
-    }
-
-    pub fn from_derive_input(derive_input: DeriveInput) -> Result<Self, syn::Error> {
-        let to_sql_config =
-            ToSqlConfig::from_attributes(derive_input.attrs.as_slice())?.unwrap_or_default();
-        Ok(Self::new(derive_input.ident, to_sql_config))
+impl PostgresHashEntity {
+    pub(crate) fn fn_name(&self) -> String {
+        format!("{}_hash", self.name.to_lowercase())
     }
 }
 
-impl Parse for PostgresHash {
-    fn parse(input: ParseStream) -> Result<Self, syn::Error> {
-        use syn::Item;
-
-        let parsed = input.parse()?;
-        let (ident, attrs) = match &parsed {
-            Item::Enum(item) => (item.ident.clone(), item.attrs.as_slice()),
-            Item::Struct(item) => (item.ident.clone(), item.attrs.as_slice()),
-            _ => return Err(syn::Error::new(input.span(), "expected enum or struct")),
-        };
-        let to_sql_config = ToSqlConfig::from_attributes(attrs)?.unwrap_or_default();
-        Ok(Self::new(ident, to_sql_config))
+impl Ord for PostgresHashEntity {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.file
+            .cmp(other.file)
+            .then_with(|| self.file.cmp(other.file))
     }
 }
 
-impl ToTokens for PostgresHash {
-    fn to_tokens(&self, tokens: &mut TokenStream2) {
-        let name = &self.name;
-        let sql_graph_entity_fn_name = syn::Ident::new(
-            &format!("__pgx_internals_hash_{}", self.name),
-            Span::call_site(),
+impl PartialOrd for PostgresHashEntity {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Into<SqlGraphEntity> for PostgresHashEntity {
+    fn into(self) -> SqlGraphEntity {
+        SqlGraphEntity::Hash(self)
+    }
+}
+
+impl SqlGraphIdentifier for PostgresHashEntity {
+    fn dot_identifier(&self) -> String {
+        format!("hash {}", self.full_path)
+    }
+    fn rust_identifier(&self) -> String {
+        self.full_path.to_string()
+    }
+
+    fn file(&self) -> Option<&'static str> {
+        Some(self.file)
+    }
+
+    fn line(&self) -> Option<u32> {
+        Some(self.line)
+    }
+}
+
+impl ToSql for PostgresHashEntity {
+    #[tracing::instrument(level = "debug", err, skip(self, _context), fields(identifier = %self.rust_identifier()))]
+    fn to_sql(&self, _context: &super::PgxSql) -> eyre::Result<String> {
+        let sql = format!("\n\
+                            -- {file}:{line}\n\
+                            -- {full_path}\n\
+                            CREATE OPERATOR FAMILY {name}_hash_ops USING hash;\n\
+                            CREATE OPERATOR CLASS {name}_hash_ops DEFAULT FOR TYPE {name} USING hash FAMILY {name}_hash_ops AS\n\
+                                \tOPERATOR    1   =  ({name}, {name}),\n\
+                                \tFUNCTION    1   {fn_name}({name});\
+                            ",
+                          name = self.name,
+                          full_path = self.full_path,
+                          file = self.file,
+                          line = self.line,
+                          fn_name = self.fn_name(),
         );
-        let to_sql_config = &self.to_sql_config;
-        let inv = quote! {
-            #[no_mangle]
-            pub extern "C" fn  #sql_graph_entity_fn_name() -> pgx::datum::sql_entity_graph::SqlGraphEntity {
-                use core::any::TypeId;
-                extern crate alloc;
-                use alloc::vec::Vec;
-                use alloc::vec;
-                let submission = pgx::datum::sql_entity_graph::PostgresHashEntity {
-                    name: stringify!(#name),
-                    file: file!(),
-                    line: line!(),
-                    full_path: core::any::type_name::<#name>(),
-                    module_path: module_path!(),
-                    id: TypeId::of::<#name>(),
-                    to_sql_config: #to_sql_config,
-                };
-                pgx::datum::sql_entity_graph::SqlGraphEntity::Hash(submission)
-            }
-        };
-        tokens.append_all(inv);
+        tracing::trace!(%sql);
+        Ok(sql)
     }
 }

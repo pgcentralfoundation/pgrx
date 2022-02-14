@@ -1,118 +1,103 @@
-use proc_macro2::{Span, TokenStream as TokenStream2};
-use quote::{quote, ToTokens, TokenStreamExt};
-use syn::{
-    parse::{Parse, ParseStream},
-    DeriveInput, Ident,
-};
+use super::{SqlGraphEntity, SqlGraphIdentifier, ToSql, ToSqlConfigEntity};
+use std::cmp::Ordering;
 
-use super::ToSqlConfig;
-
-/// A parsed `#[derive(PostgresOrd)]` item.
-///
-/// It should be used with [`syn::parse::Parse`] functions.
-///
-/// Using [`quote::ToTokens`] will output the declaration for a `pgx::datum::sql_entity_graph::InventoryPostgresOrd`.
-///
-/// On structs:
-///
-/// ```rust
-/// use syn::{Macro, parse::Parse, parse_quote, parse};
-/// use quote::{quote, ToTokens};
-/// use pgx_utils::sql_entity_graph::PostgresOrd;
-///
-/// # fn main() -> eyre::Result<()> {
-/// let parsed: PostgresOrd = parse_quote! {
-///     #[derive(PostgresOrd)]
-///     struct Example<'a> {
-///         demo: &'a str,
-///     }
-/// };
-/// let sql_graph_entity_tokens = parsed.to_token_stream();
-/// # Ok(())
-/// # }
-/// ```
-///
-/// On enums:
-///
-/// ```rust
-/// use syn::{Macro, parse::Parse, parse_quote, parse};
-/// use quote::{quote, ToTokens};
-/// use pgx_utils::sql_entity_graph::PostgresOrd;
-///
-/// # fn main() -> eyre::Result<()> {
-/// let parsed: PostgresOrd = parse_quote! {
-///     #[derive(PostgresOrd)]
-///     enum Demo {
-///         Example,
-///     }
-/// };
-/// let sql_graph_entity_tokens = parsed.to_token_stream();
-/// # Ok(())
-/// # }
-/// ```
-#[derive(Debug, Clone)]
-pub struct PostgresOrd {
-    pub name: Ident,
-    pub to_sql_config: ToSqlConfig,
+/// The output of a [`PostgresOrd`](crate::datum::sql_entity_graph::PostgresOrd) from `quote::ToTokens::to_tokens`.
+#[derive(Debug, Clone, Hash, PartialEq, Eq)]
+pub struct PostgresOrdEntity {
+    pub name: &'static str,
+    pub file: &'static str,
+    pub line: u32,
+    pub full_path: &'static str,
+    pub module_path: &'static str,
+    pub id: core::any::TypeId,
+    pub to_sql_config: ToSqlConfigEntity,
 }
 
-impl PostgresOrd {
-    pub fn new(name: Ident, to_sql_config: ToSqlConfig) -> Self {
-        Self {
-            name,
-            to_sql_config,
-        }
+impl PostgresOrdEntity {
+    pub(crate) fn cmp_fn_name(&self) -> String {
+        format!("{}_cmp", self.name.to_lowercase())
     }
 
-    pub fn from_derive_input(derive_input: DeriveInput) -> Result<Self, syn::Error> {
-        let to_sql_config =
-            ToSqlConfig::from_attributes(derive_input.attrs.as_slice())?.unwrap_or_default();
-        Ok(Self::new(derive_input.ident, to_sql_config))
+    pub(crate) fn lt_fn_name(&self) -> String {
+        format!("{}_lt", self.name.to_lowercase())
+    }
+
+    pub(crate) fn le_fn_name(&self) -> String {
+        format!("{}_le", self.name.to_lowercase())
+    }
+
+    pub(crate) fn eq_fn_name(&self) -> String {
+        format!("{}_eq", self.name.to_lowercase())
+    }
+
+    pub(crate) fn gt_fn_name(&self) -> String {
+        format!("{}_gt", self.name.to_lowercase())
+    }
+
+    pub(crate) fn ge_fn_name(&self) -> String {
+        format!("{}_ge", self.name.to_lowercase())
     }
 }
 
-impl Parse for PostgresOrd {
-    fn parse(input: ParseStream) -> Result<Self, syn::Error> {
-        use syn::Item;
-
-        let parsed = input.parse()?;
-        let (ident, attrs) = match &parsed {
-            Item::Enum(item) => (item.ident.clone(), item.attrs.as_slice()),
-            Item::Struct(item) => (item.ident.clone(), item.attrs.as_slice()),
-            _ => return Err(syn::Error::new(input.span(), "expected enum or struct")),
-        };
-        let to_sql_config = ToSqlConfig::from_attributes(attrs)?.unwrap_or_default();
-        Ok(Self::new(ident, to_sql_config))
+impl Ord for PostgresOrdEntity {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.file
+            .cmp(other.file)
+            .then_with(|| self.file.cmp(other.file))
     }
 }
 
-impl ToTokens for PostgresOrd {
-    fn to_tokens(&self, tokens: &mut TokenStream2) {
-        let name = &self.name;
-        let sql_graph_entity_fn_name = syn::Ident::new(
-            &format!("__pgx_internals_ord_{}", self.name),
-            Span::call_site(),
+impl PartialOrd for PostgresOrdEntity {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Into<SqlGraphEntity> for PostgresOrdEntity {
+    fn into(self) -> SqlGraphEntity {
+        SqlGraphEntity::Ord(self)
+    }
+}
+
+impl SqlGraphIdentifier for PostgresOrdEntity {
+    fn dot_identifier(&self) -> String {
+        format!("ord {}", self.full_path)
+    }
+    fn rust_identifier(&self) -> String {
+        self.full_path.to_string()
+    }
+
+    fn file(&self) -> Option<&'static str> {
+        Some(self.file)
+    }
+
+    fn line(&self) -> Option<u32> {
+        Some(self.line)
+    }
+}
+
+impl ToSql for PostgresOrdEntity {
+    #[tracing::instrument(level = "debug", err, skip(self, _context), fields(identifier = %self.rust_identifier()))]
+    fn to_sql(&self, _context: &super::PgxSql) -> eyre::Result<String> {
+        let sql = format!("\n\
+                            -- {file}:{line}\n\
+                            -- {full_path}\n\
+                            CREATE OPERATOR FAMILY {name}_btree_ops USING btree;\n\
+                            CREATE OPERATOR CLASS {name}_btree_ops DEFAULT FOR TYPE {name} USING btree FAMILY {name}_btree_ops AS\n\
+                                  \tOPERATOR 1 <,\n\
+                                  \tOPERATOR 2 <=,\n\
+                                  \tOPERATOR 3 =,\n\
+                                  \tOPERATOR 4 >=,\n\
+                                  \tOPERATOR 5 >,\n\
+                                  \tFUNCTION 1 {cmp_fn_name}({name}, {name});\
+                            ",
+                          name = self.name,
+                          full_path = self.full_path,
+                          file = self.file,
+                          line = self.line,
+                          cmp_fn_name = self.cmp_fn_name(),
         );
-        let to_sql_config = &self.to_sql_config;
-        let inv = quote! {
-            #[no_mangle]
-            pub extern "C" fn  #sql_graph_entity_fn_name() -> pgx::datum::sql_entity_graph::SqlGraphEntity {
-                use core::any::TypeId;
-                extern crate alloc;
-                use alloc::vec::Vec;
-                use alloc::vec;
-                let submission = pgx::datum::sql_entity_graph::PostgresOrdEntity {
-                    name: stringify!(#name),
-                    file: file!(),
-                    line: line!(),
-                    full_path: core::any::type_name::<#name>(),
-                    module_path: module_path!(),
-                    id: TypeId::of::<#name>(),
-                    to_sql_config: #to_sql_config,
-                };
-                pgx::datum::sql_entity_graph::SqlGraphEntity::Ord(submission)
-            }
-        };
-        tokens.append_all(inv);
+        tracing::trace!(%sql);
+        Ok(sql)
     }
 }

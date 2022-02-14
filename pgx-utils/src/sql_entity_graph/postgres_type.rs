@@ -1,201 +1,199 @@
-use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
-use quote::{quote, ToTokens, TokenStreamExt};
+use super::RustSqlMapping;
+use eyre::eyre;
 use std::{
-    fs::{create_dir_all, File},
-    io::Write,
-};
-use syn::{
-    parse::{Parse, ParseStream},
-    DeriveInput, Generics, ItemStruct,
+    cmp::Ordering,
+    hash::{Hash, Hasher},
 };
 
-use super::ToSqlConfig;
+use super::{SqlGraphEntity, SqlGraphIdentifier, ToSql, ToSqlConfigEntity};
 
-/// A parsed `#[derive(PostgresType)]` item.
-///
-/// It should be used with [`syn::parse::Parse`] functions.
-///
-/// Using [`quote::ToTokens`] will output the declaration for a `pgx::datum::sql_entity_graph::PostgresTypeEntity`.
-///
-/// ```rust
-/// use syn::{Macro, parse::Parse, parse_quote, parse};
-/// use quote::{quote, ToTokens};
-/// use pgx_utils::sql_entity_graph::PostgresType;
-///
-/// # fn main() -> eyre::Result<()> {
-/// let parsed: PostgresType = parse_quote! {
-///     #[derive(PostgresType)]
-///     struct Example<'a> {
-///         demo: &'a str,
-///     }
-/// };
-/// let sql_graph_entity_tokens = parsed.to_token_stream();
-/// # Ok(())
-/// # }
-/// ```
-#[derive(Debug, Clone)]
-pub struct PostgresType {
-    name: Ident,
-    generics: Generics,
-    in_fn: Ident,
-    out_fn: Ident,
-    to_sql_config: ToSqlConfig,
+/// The output of a [`PostgresType`](crate::datum::sql_entity_graph::PostgresType) from `quote::ToTokens::to_tokens`.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PostgresTypeEntity {
+    pub name: &'static str,
+    pub file: &'static str,
+    pub line: u32,
+    pub full_path: &'static str,
+    pub module_path: &'static str,
+    pub mappings: std::collections::HashSet<RustSqlMapping>,
+    pub in_fn: &'static str,
+    pub in_fn_module_path: String,
+    pub out_fn: &'static str,
+    pub out_fn_module_path: String,
+    pub to_sql_config: ToSqlConfigEntity,
 }
 
-impl PostgresType {
-    pub fn new(
-        name: Ident,
-        generics: Generics,
-        in_fn: Ident,
-        out_fn: Ident,
-        to_sql_config: ToSqlConfig,
-    ) -> Self {
-        Self {
-            generics,
-            name,
-            in_fn,
-            out_fn,
-            to_sql_config,
-        }
+impl Hash for PostgresTypeEntity {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.full_path.hash(state);
+    }
+}
+
+impl Ord for PostgresTypeEntity {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.file
+            .cmp(other.file)
+            .then_with(|| self.file.cmp(other.file))
+    }
+}
+
+impl PartialOrd for PostgresTypeEntity {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl PostgresTypeEntity {
+    pub fn id_matches(&self, candidate: &core::any::TypeId) -> bool {
+        self.mappings.iter().any(|tester| *candidate == tester.id)
+    }
+}
+
+impl Into<SqlGraphEntity> for PostgresTypeEntity {
+    fn into(self) -> SqlGraphEntity {
+        SqlGraphEntity::Type(self)
+    }
+}
+
+impl SqlGraphIdentifier for PostgresTypeEntity {
+    fn dot_identifier(&self) -> String {
+        format!("type {}", self.full_path)
+    }
+    fn rust_identifier(&self) -> String {
+        self.full_path.to_string()
     }
 
-    pub fn from_derive_input(derive_input: DeriveInput) -> Result<Self, syn::Error> {
-        let _data_struct = match derive_input.data {
-            syn::Data::Struct(data_struct) => data_struct,
-            syn::Data::Union(_) | syn::Data::Enum(_) => {
-                return Err(syn::Error::new(
-                    derive_input.ident.span(),
-                    "expected struct",
-                ))
-            }
+    fn file(&self) -> Option<&'static str> {
+        Some(self.file)
+    }
+
+    fn line(&self) -> Option<u32> {
+        Some(self.line)
+    }
+}
+
+impl ToSql for PostgresTypeEntity {
+    #[tracing::instrument(level = "debug", err, skip(self, context), fields(identifier = %self.rust_identifier()))]
+    fn to_sql(&self, context: &super::PgxSql) -> eyre::Result<String> {
+        let self_index = context.types[self];
+        let item_node = &context.graph[self_index];
+        let item = match item_node {
+            SqlGraphEntity::Type(item) => item,
+            _ => return Err(eyre!("Was not called on a Type. Got: {:?}", item_node)),
         };
-        let to_sql_config =
-            ToSqlConfig::from_attributes(derive_input.attrs.as_slice())?.unwrap_or_default();
-        let funcname_in = Ident::new(
-            &format!("{}_in", derive_input.ident).to_lowercase(),
-            derive_input.ident.span(),
-        );
-        let funcname_out = Ident::new(
-            &format!("{}_out", derive_input.ident).to_lowercase(),
-            derive_input.ident.span(),
-        );
-        Ok(Self::new(
-            derive_input.ident,
-            derive_input.generics,
-            funcname_in,
-            funcname_out,
-            to_sql_config,
-        ))
-    }
 
-    pub fn inventory_fn_name(&self) -> String {
-        "__inventory_type_".to_string() + &self.name.to_string()
-    }
+        // The `in_fn`/`out_fn` need to be present in a certain order:
+        // - CREATE TYPE;
+        // - CREATE FUNCTION _in;
+        // - CREATE FUNCTION _out;
+        // - CREATE TYPE (...);
 
-    pub fn inventory(&self, inventory_dir: String) {
-        create_dir_all(&inventory_dir).expect("Couldn't create inventory dir.");
-        let mut fd =
-            File::create(inventory_dir.to_string() + "/" + &self.inventory_fn_name() + ".json")
-                .expect("Couldn't create inventory file");
-        let sql_graph_entity_fn_json = serde_json::to_string(&self.inventory_fn_name())
-            .expect("Could not serialize inventory item.");
-        write!(fd, "{}", sql_graph_entity_fn_json).expect("Couldn't write to inventory file");
-    }
-}
-
-impl Parse for PostgresType {
-    fn parse(input: ParseStream) -> Result<Self, syn::Error> {
-        let parsed: ItemStruct = input.parse()?;
-        let to_sql_config =
-            ToSqlConfig::from_attributes(parsed.attrs.as_slice())?.unwrap_or_default();
-        let funcname_in = Ident::new(
-            &format!("{}_in", parsed.ident).to_lowercase(),
-            parsed.ident.span(),
-        );
-        let funcname_out = Ident::new(
-            &format!("{}_out", parsed.ident).to_lowercase(),
-            parsed.ident.span(),
-        );
-        Ok(Self::new(
-            parsed.ident,
-            parsed.generics,
-            funcname_in,
-            funcname_out,
-            to_sql_config,
-        ))
-    }
-}
-
-impl ToTokens for PostgresType {
-    fn to_tokens(&self, tokens: &mut TokenStream2) {
-        let name = &self.name;
-        let mut static_generics = self.generics.clone();
-        for lifetime in static_generics.lifetimes_mut() {
-            lifetime.lifetime.ident = Ident::new("static", Span::call_site());
-        }
-        let (_impl_generics, ty_generics, _where_clauses) = static_generics.split_for_impl();
-
-        let in_fn = &self.in_fn;
-        let out_fn = &self.out_fn;
-
-        let sql_graph_entity_fn_name = syn::Ident::new(
-            &format!("__pgx_internals_type_{}", self.name),
-            Span::call_site(),
-        );
-
-        let to_sql_config = &self.to_sql_config;
-
-        let inv = quote! {
-            #[no_mangle]
-            pub extern "C" fn  #sql_graph_entity_fn_name() -> pgx::datum::sql_entity_graph::SqlGraphEntity {
-                extern crate alloc;
-                use alloc::vec::Vec;
-                use alloc::vec;
-                use alloc::string::{String, ToString};
-
-                let mut mappings = Default::default();
-                <#name #ty_generics as pgx::datum::WithTypeIds>::register_with_refs(
-                    &mut mappings,
-                    stringify!(#name).to_string()
-                );
-                pgx::datum::WithSizedTypeIds::<#name #ty_generics>::register_sized_with_refs(
-                    &mut mappings,
-                    stringify!(#name).to_string()
-                );
-                pgx::datum::WithArrayTypeIds::<#name #ty_generics>::register_array_with_refs(
-                    &mut mappings,
-                    stringify!(#name).to_string()
-                );
-                pgx::datum::WithVarlenaTypeIds::<#name #ty_generics>::register_varlena_with_refs(
-                    &mut mappings,
-                    stringify!(#name).to_string()
-                );
-                let submission = pgx::datum::sql_entity_graph::PostgresTypeEntity {
-                    name: stringify!(#name),
-                    file: file!(),
-                    line: line!(),
-                    module_path: module_path!(),
-                    full_path: core::any::type_name::<#name #ty_generics>(),
-                    mappings,
-                    in_fn: stringify!(#in_fn),
-                    in_fn_module_path: {
-                        let in_fn = stringify!(#in_fn);
-                        let mut path_items: Vec<_> = in_fn.split("::").collect();
-                        let _ = path_items.pop(); // Drop the one we don't want.
-                        path_items.join("::")
-                    },
-                    out_fn: stringify!(#out_fn),
-                    out_fn_module_path: {
-                        let out_fn = stringify!(#out_fn);
-                        let mut path_items: Vec<_> = out_fn.split("::").collect();
-                        let _ = path_items.pop(); // Drop the one we don't want.
-                        path_items.join("::")
-                    },
-                    to_sql_config: #to_sql_config,
-                };
-                pgx::datum::sql_entity_graph::SqlGraphEntity::Type(submission)
-            }
+        let in_fn_module_path = if !item.in_fn_module_path.is_empty() {
+            item.in_fn_module_path.clone()
+        } else {
+            item.module_path.to_string() // Presume a local
         };
-        tokens.append_all(inv);
+        let in_fn_path = format!(
+            "{module_path}{maybe_colons}{in_fn}",
+            module_path = in_fn_module_path,
+            maybe_colons = if !in_fn_module_path.is_empty() {
+                "::"
+            } else {
+                ""
+            },
+            in_fn = item.in_fn,
+        );
+        let (_, _index) = context
+            .externs
+            .iter()
+            .find(|(k, _v)| (**k).full_path == in_fn_path.as_str())
+            .ok_or_else(|| eyre::eyre!("Did not find `in_fn: {}`.", in_fn_path))?;
+        let (in_fn_graph_index, in_fn) = context
+            .graph
+            .neighbors_undirected(self_index)
+            .find_map(|neighbor| match &context.graph[neighbor] {
+                SqlGraphEntity::Function(func) if func.full_path == in_fn_path => {
+                    Some((neighbor, func))
+                }
+                _ => None,
+            })
+            .ok_or_else(|| eyre!("Could not find in_fn graph entity."))?;
+        tracing::trace!(in_fn = ?in_fn_path, "Found matching `in_fn`");
+        let in_fn_sql = in_fn.to_sql(context)?;
+        tracing::trace!(%in_fn_sql);
+
+        let out_fn_module_path = if !item.out_fn_module_path.is_empty() {
+            item.out_fn_module_path.clone()
+        } else {
+            item.module_path.to_string() // Presume a local
+        };
+        let out_fn_path = format!(
+            "{module_path}{maybe_colons}{out_fn}",
+            module_path = out_fn_module_path,
+            maybe_colons = if !out_fn_module_path.is_empty() {
+                "::"
+            } else {
+                ""
+            },
+            out_fn = item.out_fn,
+        );
+        let (_, _index) = context
+            .externs
+            .iter()
+            .find(|(k, _v)| (**k).full_path == out_fn_path.as_str())
+            .ok_or_else(|| eyre::eyre!("Did not find `out_fn: {}`.", out_fn_path))?;
+        let (out_fn_graph_index, out_fn) = context
+            .graph
+            .neighbors_undirected(self_index)
+            .find_map(|neighbor| match &context.graph[neighbor] {
+                SqlGraphEntity::Function(func) if func.full_path == out_fn_path => {
+                    Some((neighbor, func))
+                }
+                _ => None,
+            })
+            .ok_or_else(|| eyre!("Could not find out_fn graph entity."))?;
+        tracing::trace!(out_fn = ?out_fn_path, "Found matching `out_fn`");
+        let out_fn_sql = out_fn.to_sql(context)?;
+        tracing::trace!(%out_fn_sql);
+
+        let shell_type = format!(
+            "\n\
+                                -- {file}:{line}\n\
+                                -- {full_path}\n\
+                                CREATE TYPE {schema}{name};\
+                            ",
+            schema = context.schema_prefix_for(&self_index),
+            full_path = item.full_path,
+            file = item.file,
+            line = item.line,
+            name = item.name,
+        );
+        tracing::trace!(sql = %shell_type);
+
+        let materialized_type = format!("\n\
+                                -- {file}:{line}\n\
+                                -- {full_path}\n\
+                                CREATE TYPE {schema}{name} (\n\
+                                    \tINTERNALLENGTH = variable,\n\
+                                    \tINPUT = {schema_prefix_in_fn}{in_fn}, /* {in_fn_path} */\n\
+                                    \tOUTPUT = {schema_prefix_out_fn}{out_fn}, /* {out_fn_path} */\n\
+                                    \tSTORAGE = extended\n\
+                                );\
+                            ",
+                                        full_path = item.full_path,
+                                        file = item.file,
+                                        line = item.line,
+                                        schema = context.schema_prefix_for(&self_index),
+                                        name = item.name,
+                                        schema_prefix_in_fn = context.schema_prefix_for(&in_fn_graph_index),
+                                        in_fn = item.in_fn,
+                                        in_fn_path = in_fn_path,
+                                        schema_prefix_out_fn = context.schema_prefix_for(&out_fn_graph_index),
+                                        out_fn = item.out_fn,
+                                        out_fn_path = out_fn_path,
+        );
+        tracing::trace!(sql = %materialized_type);
+
+        Ok(shell_type + "\n" + &in_fn_sql + "\n" + &out_fn_sql + "\n" + &materialized_type)
     }
 }
