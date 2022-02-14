@@ -320,6 +320,7 @@ checksum = "4cc00842eed744b858222c4c9faf7243aafc6d33f92f96935263ef4d8a41ce21"
 dependencies = [
  "glob",
  "libc",
+ "libloading",
 ]
 
 [[package]]
