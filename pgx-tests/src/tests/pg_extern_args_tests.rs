@@ -1,6 +1,16 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
+use pgx::*;
+
+#[pg_extern(immutable)]
+fn returns_tuple_with_attributes() -> (
+    name!(arg, String),
+    name!(arg2, String),
+) {
+   ("hi".to_string(), "bye".to_string())
+}
+
 #[cfg(any(test, feature = "pg_test"))]
 #[pgx::pg_schema]
 mod tests {

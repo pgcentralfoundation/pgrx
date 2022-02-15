@@ -219,7 +219,9 @@ impl ToTokens for PgExtern {
         let name = self.name();
         let schema = self.schema();
         let schema_iter = schema.iter();
-        let extern_attrs = self.attrs.iter().collect::<Punctuated<_, Token![,]>>();
+        let extern_attrs = self.attrs.iter()
+            .map(|attr| attr.to_sql_entity_graph_tokens())
+            .collect::<Punctuated<_, Token![,]>>();
         let search_path = self.search_path().into_iter();
         let inputs = self.inputs().unwrap();
         let returns = match self.returns() {
