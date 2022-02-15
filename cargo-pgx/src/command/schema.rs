@@ -7,6 +7,7 @@ use eyre::{eyre, WrapErr};
 use pgx_utils::{
     pg_config::{PgConfig, Pgx},
     sql_entity_graph::{SqlGraphEntity},
+    pgx_pg_sys_stub::PgxPgSysStub,
 };
 use std::{
     collections::HashSet,
@@ -185,6 +186,41 @@ pub(crate) fn generate_schema(
 
     let flags = std::env::var("PGX_BUILD_FLAGS").unwrap_or_default();
 
+    
+    let mut target_dir_with_profile = pgx_utils::get_target_dir()?;
+    target_dir_with_profile.push(if is_release { "release" } else { "debug" });
+    
+    // Get the build plan so we can determine the correct `pgx_pg_sys` `OUT_DIR` to create a stub from.
+    let command_build_plan = Command::new("cargo")
+        .env("RUSTC_BOOTSTRAP", "1")
+        .args(["build", "-Z", "unstable-options", "--build-plan" ]).output()?;
+    let build_plan_bytes = command_build_plan.stdout;
+    let build_plan: serde_json::Value = serde_json::from_slice(&build_plan_bytes)
+        .wrap_err("Could not parse build plan.")?;
+    let build_plan_invocations = build_plan.get("invocations")
+        .ok_or_else(|| eyre!("Could not find `invocations` key in build plan."))?
+        .as_array()
+        .ok_or_else(|| eyre!("Could not parse `invocations` key in build plan as array."))?;
+    let pgx_pg_sys_build_plan = build_plan_invocations.iter()
+        .find(|invocation| {
+            let package_name = invocation.get("package_name");
+            let compile_mode = invocation.get("compile_mode");
+            if let (Some(package_name), Some(compile_mode)) = (package_name, compile_mode) {
+                package_name == "pgx-pg-sys" && compile_mode == "run-custom-build"
+            } else {
+                false
+            }
+        }).ok_or_else(|| eyre!("Could not find `pgx-pg-sys` in build plan."))?;
+    let build_plan_out_dir_env = pgx_pg_sys_build_plan.get("env")
+        .ok_or_else(|| eyre!("Could not find `env` key in `pgx_pg_sys` build plan."))?
+        .as_object()
+        .ok_or_else(|| eyre!("Could not parse `env` key in `pgx_pg_sys` build plan as object."))?;
+    let pgx_pg_sys_out_dir = build_plan_out_dir_env.get("OUT_DIR")
+        .ok_or_else(|| eyre!("Could not find `env` key in `pgx_pg_sys` build plan."))?
+        .as_str()
+        .ok_or_else(|| eyre!("Could not parse `env.OUT_DIR` key in `pgx_pg_sys` build plan as string."))?;
+    let mut pgx_pg_sys_out_dir = PathBuf::from(pgx_pg_sys_out_dir);
+
     if !skip_build {
         // First, build the SQL generator so we can get a look at the symbol table
         let mut command = Command::new("cargo");
@@ -231,9 +267,32 @@ pub(crate) fn generate_schema(
         }
     }
 
+    let pg_version = pg_config.major_version()?;
+    let pg_version_file_name = format!("pg{}.rs", pg_version);
+    // Create stubbed `pgx_pg_sys` bindings for the generator to link with.
+    let mut pgx_pg_sys_stub_file = target_dir_with_profile.clone();
+    pgx_pg_sys_stub_file.push("pg_sys_stub");
+    pgx_pg_sys_stub_file.push(&pg_version_file_name);
+    
+    let mut pgx_pg_sys_file = PathBuf::from(pgx_pg_sys_out_dir);
+    pgx_pg_sys_file.push(&pg_version_file_name);
+
+    PgxPgSysStub::from_file(&pgx_pg_sys_file)?
+        .write_to_file(&pgx_pg_sys_stub_file)?;
+    
+    let mut pgx_pg_sys_stub_built = target_dir_with_profile.clone();
+    pgx_pg_sys_stub_built.push("pg_sys_stub");
+    pgx_pg_sys_stub_built.push("pgx_pg_sys_stub.rlib");
+    
+    Command::new("rustc")
+        .args([
+            "--crate-type", "cdylib",
+            "-o", pgx_pg_sys_stub_built.to_str().unwrap(),
+            pgx_pg_sys_stub_file.to_str().unwrap(),
+        ]).output()?;
+
     // Inspect the symbol table for a list of `__pgx_internals` we should have the generator call
-    let mut lib_so = pgx_utils::get_target_dir()?;
-    lib_so.push(if is_release { "release" } else { "debug" });
+    let mut lib_so = target_dir_with_profile.clone();
     lib_so.push("libarrays.so");
     println!("{} SQL entities", " Discovering".bold().green(),);
     let dsym_path = lib_so.resolve_dsym();
@@ -272,13 +331,13 @@ pub(crate) fn generate_schema(
         }
     }
     let mut seen_schemas = Vec::new();
-    let mut num_funcs = 0;
-    let mut num_types = 0;
-    let mut num_enums = 0;
-    let mut num_sqls = 0;
-    let mut num_ords = 0;
-    let mut num_hashes = 0;
-    let mut num_aggregates = 0;
+    let mut num_funcs = 0_usize;
+    let mut num_types = 0_usize;
+    let mut num_enums = 0_usize;
+    let mut num_sqls = 0_usize;
+    let mut num_ords = 0_usize;
+    let mut num_hashes = 0_usize;
+    let mut num_aggregates = 0_usize;
     for func in &fns_to_call {
         if func.starts_with("__pgx_internals_schema_") {
             let schema = func
@@ -326,6 +385,11 @@ pub(crate) fn generate_schema(
     let mut entities = Vec::default();
 
     unsafe {
+        let pgx_pg_sys = libloading::os::unix::Library::open(
+            Some(&pgx_pg_sys_stub_built),
+            libloading::os::unix::RTLD_LAZY,
+        ).expect(&format!("Couldn't libload {}", pgx_pg_sys_stub_built.display()));
+
         let lib = libloading::os::unix::Library::open(
             Some(&lib_so),
             libloading::os::unix::RTLD_LAZY,

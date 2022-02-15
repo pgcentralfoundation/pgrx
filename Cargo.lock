@@ -254,6 +254,7 @@ dependencies = [
  "regex",
  "rttp_client",
  "semver 1.0.5",
+ "serde_json",
  "symbolic",
  "syn",
  "tracing",
@@ -1501,6 +1502,7 @@ dependencies = [
  "eyre",
  "libloading",
  "petgraph",
+ "prettyplease",
  "proc-macro2",
  "quote",
  "regex",
@@ -1614,6 +1616,16 @@ name = "precomputed-hash"
 version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "925383efa346730478fb4838dbe9137d2a47675ad789c546d150a6e1dd4ab31c"
+
+[[package]]
+name = "prettyplease"
+version = "0.1.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "53748b0c63a6a276a2c8b591de5b117d7590f1b41e34062efeadd222f841d1a3"
+dependencies = [
+ "proc-macro2",
+ "syn",
+]
 
 [[package]]
 name = "proc-macro-crate"
@@ -2059,9 +2071,9 @@ dependencies = [
 
 [[package]]
 name = "serde_json"
-version = "1.0.78"
+version = "1.0.79"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d23c1ba4cf0efd44be32017709280b32d1cea5c3f1275c3b6d9e8bc54f758085"
+checksum = "8e8d9fa5c3b304765ce1fd9c4c8a3de2c8db365a5b91be52f186efc675681d95"
 dependencies = [
  "itoa",
  "ryu",

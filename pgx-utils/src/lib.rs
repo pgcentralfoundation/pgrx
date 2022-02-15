@@ -20,6 +20,7 @@ pub mod pg_config;
 pub mod sql_entity_graph_generators;
 pub mod sql_entity_graph;
 pub mod aggregate_options;
+pub mod pgx_pg_sys_stub;
 
 pub static BASE_POSTGRES_PORT_NO: u16 = 28800;
 pub static BASE_POSTGRES_TESTING_PORT_NO: u16 = 32200;
