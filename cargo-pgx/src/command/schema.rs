@@ -6,7 +6,7 @@ use colored::Colorize;
 use eyre::{eyre, WrapErr};
 use pgx_utils::{
     pg_config::{PgConfig, Pgx},
-    sql_entity_graph::{SqlGraphEntity},
+    sql_entity_graph::{SqlGraphEntity, PgxSql},
     pgx_pg_sys_stub::PgxPgSysStub,
 };
 use std::{
@@ -282,7 +282,7 @@ pub(crate) fn generate_schema(
     
     let mut pgx_pg_sys_stub_built = target_dir_with_profile.clone();
     pgx_pg_sys_stub_built.push("pg_sys_stub");
-    pgx_pg_sys_stub_built.push("pgx_pg_sys_stub.rlib");
+    pgx_pg_sys_stub_built.push("pgx_pg_sys_stub.so");
     
     Command::new("rustc")
         .args([
@@ -383,17 +383,28 @@ pub(crate) fn generate_schema(
 
     tracing::info!(path = %path.display(), "Collecting {} SQL entities", fns_to_call.len());
     let mut entities = Vec::default();
+    let typeid_sql_mapping;
+    let source_only_sql_mapping;
 
     unsafe {
         let pgx_pg_sys = libloading::os::unix::Library::open(
             Some(&pgx_pg_sys_stub_built),
-            libloading::os::unix::RTLD_LAZY,
+            libloading::os::unix::RTLD_NOW | libloading::os::unix::RTLD_GLOBAL,
         ).expect(&format!("Couldn't libload {}", pgx_pg_sys_stub_built.display()));
 
         let lib = libloading::os::unix::Library::open(
             Some(&lib_so),
             libloading::os::unix::RTLD_LAZY,
         ).expect(&format!("Couldn't libload {}", lib_so.display()));
+
+        let typeid_sql_mappings_symbol: libloading::os::unix::Symbol<
+            unsafe extern fn() -> std::collections::HashSet<pgx_utils::sql_entity_graph::RustSqlMapping>
+        > = lib.get("__pgx_typeid_sql_mappings".as_bytes()).expect(&format!("Couldn't call __pgx_typeid_sql_mappings"));
+        typeid_sql_mapping = typeid_sql_mappings_symbol();
+        let source_only_sql_mapping_symbol: libloading::os::unix::Symbol<
+            unsafe extern fn() -> std::collections::HashSet<pgx_utils::sql_entity_graph::RustSourceOnlySqlMapping>
+        > = lib.get("__pgx_source_only_sql_mappings".as_bytes()).expect(&format!("Couldn't call __pgx_source_only_sql_mappings"));
+        source_only_sql_mapping = source_only_sql_mapping_symbol();
 
         let symbol: libloading::os::unix::Symbol<
             unsafe extern fn() -> SqlGraphEntity
@@ -412,17 +423,20 @@ pub(crate) fn generate_schema(
         }
     };
 
-    // let pgx_sql = PgxSql::build(
-    //     pgx::DEFAULT_TYPEID_SQL_MAPPING.clone().into_iter(),
-    //     pgx::DEFAULT_SOURCE_ONLY_SQL_MAPPING.clone().into_iter(),
-    //     entities.into_iter()).unwrap();
+    let pgx_sql = PgxSql::build(
+        typeid_sql_mapping.clone().into_iter(),
+        source_only_sql_mapping.clone().into_iter(),
+        entities.into_iter()
+    ).unwrap();
 
-    // tracing::info!(path = %path.display(), "Writing SQL");
-    // pgx_sql.to_file(path)?;
-    // if let Some(dot_path) = dot {
-    //     tracing::info!(dot = %dot_path.display(), "Writing Graphviz DOT");
-    //     pgx_sql.to_dot(dot_path)?;
-    // }
+    tracing::info!(path = %path.display(), "Writing SQL");
+    pgx_sql.to_file(path)?;
+
+    if let Some(dot_path) = dot {
+        let dot_path = dot_path.as_ref();
+        tracing::info!(dot = %dot_path.display(), "Writing Graphviz DOT");
+        pgx_sql.to_dot(dot_path)?;
+    }
     Ok(())
 }
 

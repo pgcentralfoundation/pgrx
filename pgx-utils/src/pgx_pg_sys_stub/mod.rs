@@ -4,7 +4,7 @@ use std::{
     fs::{read_dir, File}, sync::WaitTimeoutResult,
 };
 use quote::ToTokens;
-use syn::{parse_quote, parse_file, Item, ForeignItem, ForeignItemFn};
+use syn::{parse_quote, parse_file, Item, ForeignItem, ForeignItemStatic, ForeignItemFn};
 use eyre::WrapErr;
 
 pub struct PgxPgSysStub {
@@ -37,7 +37,11 @@ impl PgxPgSysStub {
                     for inner_item in item_foreign_mod.items.iter_mut() {
                         match inner_item {
                             ForeignItem::Fn(foreign_item_fn) => {
-                                let stub = stub_for(&foreign_item_fn);
+                                let stub = stub_for_fn(&foreign_item_fn);
+                                items_with_stubs.push(stub);
+                            },
+                            ForeignItem::Static(foreign_item_static) => {
+                                let stub = stub_for_static(&foreign_item_static);
                                 items_with_stubs.push(stub);
                             },
                             _ => items_without_foreign_fns.push(inner_item.clone()),
@@ -49,6 +53,14 @@ impl PgxPgSysStub {
             }
             // items_with_stubs.push(item);
         }
+
+        items_with_stubs.push(parse_quote! {
+            #[no_mangle]
+            pub extern "C" fn pg_re_throw() {
+                unimplemented!()
+            }
+        });
+
         working_state.items = items_with_stubs;
 
         Ok(Self {
@@ -69,7 +81,7 @@ impl PgxPgSysStub {
     }
 }
 
-fn stub_for(foreign_item_fn: &ForeignItemFn) -> Item {
+fn stub_for_fn(foreign_item_fn: &ForeignItemFn) -> Item {
     let mut attrs = foreign_item_fn.attrs.iter().cloned().filter(|attr| {
         if let Some(ident) = attr.path.get_ident() {
             ident.to_string() != "pg_guard" && ident.to_string() != "link_name"
@@ -88,5 +100,29 @@ fn stub_for(foreign_item_fn: &ForeignItemFn) -> Item {
         #(#attrs)* #vis #sig {
             unimplemented!()
         }
+    }
+}
+
+
+fn stub_for_static(foreign_item_static: &ForeignItemStatic) -> Item {
+    let mut attrs = foreign_item_static.attrs.iter().cloned().filter(|attr| {
+        if let Some(ident) = attr.path.get_ident() {
+            ident.to_string() != "pg_guard" && ident.to_string() != "link_name"
+        } else {
+            true
+        }
+    }).collect::<Vec<_>>();
+    attrs.push(parse_quote! { #[no_mangle] });
+
+    let vis = &foreign_item_static.vis;
+    let static_token = &foreign_item_static.static_token;
+    let mutability = &foreign_item_static.mutability;
+    let ident = &foreign_item_static.ident;
+    let colon_token = &foreign_item_static.colon_token;
+    let ty = &foreign_item_static.ty;
+    let semi_token = &foreign_item_static.semi_token;
+
+    parse_quote!{ 
+        #(#attrs)* #vis #static_token #mutability #ident #colon_token () = () #semi_token
     }
 }
