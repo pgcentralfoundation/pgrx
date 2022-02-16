@@ -30,15 +30,9 @@ use symbolic::{
 #[derive(clap::Args, Debug)]
 #[clap(author)]
 pub(crate) struct Schema {
-    /// Skip checking for required files
-    #[clap(long, short)]
-    manual: bool,
     /// Skip building the `sql-generator`, use an existing build
     #[clap(long, short)]
     skip_build: bool,
-    /// Force the generation of default required files
-    #[clap(long, short)]
-    force_default: bool,
     /// Do you want to run against Postgres `pg10`, `pg11`, `pg12`, `pg13`, `pg14`?
     pg_version: Option<String>,
     /// Compile for release mode (default is debug)
@@ -117,8 +111,6 @@ impl CommandExecute for Schema {
             &out,
             self.dot,
             log_level,
-            self.force_default,
-            self.manual,
             self.skip_build,
         )
     }
@@ -139,8 +131,6 @@ pub(crate) fn generate_schema(
     path: impl AsRef<std::path::Path>,
     dot: Option<impl AsRef<std::path::Path>>,
     log_level: Option<String>,
-    force_default: bool,
-    manual: bool,
     skip_build: bool,
 ) -> eyre::Result<()> {
     let (control_file, _extname) = find_control_file()?;
@@ -163,10 +153,27 @@ pub(crate) fn generate_schema(
     target_dir_with_profile.push(if is_release { "release" } else { "debug" });
     
     // Get the build plan so we can determine the correct `pgx_pg_sys` `OUT_DIR` to create a stub from.
-    let command_build_plan = Command::new("cargo")
-        .env("RUSTC_BOOTSTRAP", "1")
-        .args(["build", "-Z", "unstable-options", "--build-plan" ]).output()?;
-    let build_plan_bytes = command_build_plan.stdout;
+    let mut command_build_plan = Command::new("cargo");
+    command_build_plan.env("RUSTC_BOOTSTRAP", "1");
+    command_build_plan.args(["build", "-Z", "unstable-options", "--build-plan" ]);
+    if is_release {
+        command_build_plan.arg("--release");
+    }
+    let features_arg = features.features.join(" ");
+    if !features_arg.trim().is_empty() {
+        command_build_plan.arg("--features");
+        command_build_plan.arg(&features_arg);
+    }
+
+    if features.no_default_features {
+        command_build_plan.arg("--no-default-features");
+    }
+    if features.all_features {
+        command_build_plan.arg("--all-features");
+    }
+    let build_plan_output = command_build_plan.output()?;
+
+    let build_plan_bytes = build_plan_output.stdout;
     let build_plan: serde_json::Value = serde_json::from_slice(&build_plan_bytes)
         .wrap_err("Could not parse build plan.")?;
     let build_plan_invocations = build_plan.get("invocations")
@@ -226,7 +233,7 @@ pub(crate) fn generate_schema(
         let command = command.stdout(Stdio::inherit()).stderr(Stdio::inherit());
         let command_str = format!("{:?}", command);
         println!(
-            "{} SQL generator with features `{}`\n{}",
+            "{} for SQL generation with features `{}`\n{}",
             "    Building".bold().green(),
             features_arg,
             command_str
@@ -273,7 +280,7 @@ pub(crate) fn generate_schema(
     #[cfg(not(target_os = "macos"))]
     let so_extension = "so";
 
-    lib_so.push(&format!("lib{}.{}", package_name, so_extension));
+    lib_so.push(&format!("lib{}.{}", package_name.replace("-", "_"), so_extension));
 
     println!("{} SQL entities", " Discovering".bold().green(),);
     let dsym_path = lib_so.resolve_dsym();
@@ -371,7 +378,7 @@ pub(crate) fn generate_schema(
     let source_only_sql_mapping;
 
     unsafe {
-        let pgx_pg_sys = libloading::os::unix::Library::open(
+        let _pgx_pg_sys = libloading::os::unix::Library::open(
             Some(&pgx_pg_sys_stub_built),
             libloading::os::unix::RTLD_NOW | libloading::os::unix::RTLD_GLOBAL,
         ).expect(&format!("Couldn't libload {}", pgx_pg_sys_stub_built.display()));
@@ -423,86 +430,4 @@ pub(crate) fn generate_schema(
         pgx_sql.to_dot(dot_path)?;
     }
     Ok(())
-}
-
-/// Returns Ok(true) if something was created.
-fn check_templated_file(
-    path: impl AsRef<Path>,
-    expected_content: String,
-    overwrite: bool,
-) -> Result<bool, std::io::Error> {
-    let path = path.as_ref();
-    let existing_contents = match File::open(&path) {
-        Ok(mut file) => Some({
-            let mut buf = String::default();
-            file.read_to_string(&mut buf)?;
-            Some(buf)
-        }),
-        Err(err) => {
-            if err.kind() == std::io::ErrorKind::NotFound {
-                None
-            } else {
-                return Err(err);
-            }
-        }
-    };
-
-    match existing_contents {
-        Some(contents) if contents == Some(expected_content.clone()) => Ok(false),
-        Some(_content) => {
-            if overwrite {
-                println!(
-                    "{} custom `{}` file due to `--force-default`",
-                    " Overwriting".bold().yellow(),
-                    path.display().to_string().bold().cyan()
-                );
-                if let Some(parent) = path.parent() {
-                    std::fs::create_dir_all(parent)?;
-                };
-                let mut fd = File::create(path)?;
-                fd.write_all(expected_content.as_bytes())?;
-                Ok(true)
-            } else {
-                // Extension has a customized file, we shouldn't touch it or fail, but we should notify.
-                println!(
-                    "{} custom `{}` file (having trouble? `cargo pgx schema --help` details settings needed)",
-                    "   Detecting".bold().green(),
-                    path.display().to_string().bold().cyan()
-                );
-                Ok(false)
-            }
-        }
-        None => {
-            // The extension doesn't have the file! We'll create it with the expected content.
-            println!(
-                "{} required file `{}` for SQL bindings",
-                "    Creating".bold().green(),
-                path.display().to_string().bold().cyan()
-            );
-            if let Some(parent) = path.parent() {
-                std::fs::create_dir_all(parent)?;
-            };
-            let mut fd = File::create(path)?;
-            fd.write_all(expected_content.as_bytes())?;
-            Ok(true)
-        }
-    }
-}
-
-/// Returns Ok(true) if permissions where changed.
-fn check_permissions(
-    path: impl AsRef<Path>,
-    expected_mode: u32,
-    overwrite: bool,
-) -> Result<bool, std::io::Error> {
-    let file = File::open(&path)?;
-    let metadata = file.metadata()?;
-    if metadata.mode() == expected_mode {
-        Ok(false)
-    } else if overwrite {
-        std::fs::set_permissions(&path, std::fs::Permissions::from_mode(expected_mode))?;
-        Ok(true)
-    } else {
-        Ok(false)
-    }
 }

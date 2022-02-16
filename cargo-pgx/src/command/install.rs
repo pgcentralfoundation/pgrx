@@ -233,8 +233,6 @@ fn copy_sql_files(
         &dest,
         Option::<String>::None,
         None,
-        false,
-        true,
         true,
     )?;
     copy_file(&dest, &dest, "extension schema file", true)?;

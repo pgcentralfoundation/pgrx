@@ -2,7 +2,7 @@
 // governed by the MIT license that can be found in the LICENSE file.
 
 use eyre::eyre;
-use std::{io::Write, os::unix::fs::PermissionsExt, path::PathBuf, str::FromStr};
+use std::{io::Write, path::PathBuf, str::FromStr};
 
 use crate::CommandExecute;
 
