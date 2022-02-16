@@ -267,7 +267,7 @@ use crate::{
     pg_sys::{CurrentMemoryContext, MemoryContext, AggCheckCallContext, FunctionCallInfo},
 };
 
-use pgx_utils::{
+pub use pgx_utils::{
     aggregate_options::{FinalizeModify, ParallelOption}
 };
 
