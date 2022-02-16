@@ -21,7 +21,7 @@ trait CommandExecute {
     name = "cargo",
     bin_name = "cargo",
     version,
-    global_setting(clap::AppSettings::PropagateVersion)
+    propagate_version = true,
 )]
 struct CargoCommand {
     #[clap(subcommand)]
