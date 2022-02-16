@@ -110,6 +110,7 @@ impl CommandExecute for Schema {
         let features = crate::manifest::features_for_version(self.features, &manifest, &pg_version);
 
         generate_schema(
+            &manifest,
             &pg_config,
             self.release,
             &features,
@@ -131,6 +132,7 @@ impl CommandExecute for Schema {
     features = ?features.features,
 ))]
 pub(crate) fn generate_schema(
+    manifest: &cargo_toml::Manifest,
     pg_config: &PgConfig,
     is_release: bool,
     features: &clap_cargo::Features,
@@ -142,6 +144,10 @@ pub(crate) fn generate_schema(
     skip_build: bool,
 ) -> eyre::Result<()> {
     let (control_file, _extname) = find_control_file()?;
+    let package_name = &manifest.package
+        .as_ref()
+        .ok_or_else(|| eyre!("Could not find crate name in Cargo.toml."))?
+        .name;
 
     if get_property("relocatable")? != Some("false".into()) {
         return Err(eyre!(
@@ -185,7 +191,7 @@ pub(crate) fn generate_schema(
         .ok_or_else(|| eyre!("Could not find `env` key in `pgx_pg_sys` build plan."))?
         .as_str()
         .ok_or_else(|| eyre!("Could not parse `env.OUT_DIR` key in `pgx_pg_sys` build plan as string."))?;
-    let mut pgx_pg_sys_out_dir = PathBuf::from(pgx_pg_sys_out_dir);
+    let pgx_pg_sys_out_dir = PathBuf::from(pgx_pg_sys_out_dir);
 
     if !skip_build {
         // First, build the SQL generator so we can get a look at the symbol table
@@ -255,14 +261,26 @@ pub(crate) fn generate_schema(
             "--crate-type", "cdylib",
             "-o", pgx_pg_sys_stub_built.to_str().unwrap(),
             pgx_pg_sys_stub_file.to_str().unwrap(),
-        ]).output()?;
+        ]).output()
+        .wrap_err_with(||
+            eyre!("Could not invoke `rustc` on {}", &pgx_pg_sys_stub_file.display())
+        )?;
 
     // Inspect the symbol table for a list of `__pgx_internals` we should have the generator call
     let mut lib_so = target_dir_with_profile.clone();
-    lib_so.push("libarrays.so");
+    #[cfg(target_os = "macos")]
+    let so_extension = "dylib";
+    #[cfg(not(target_os = "macos"))]
+    let so_extension = "so";
+
+    lib_so.push(&format!("lib{}.{}", package_name, so_extension));
+
     println!("{} SQL entities", " Discovering".bold().green(),);
     let dsym_path = lib_so.resolve_dsym();
-    let buffer = ByteView::open(dsym_path.as_deref().unwrap_or(&lib_so))?;
+    let buffer = ByteView::open(dsym_path.as_deref().unwrap_or(&lib_so))
+        .wrap_err_with(||
+            eyre!("Could not get byte view into {}", &dsym_path.as_deref().unwrap_or(&lib_so).display())
+        )?;
     let archive = Archive::parse(&buffer).expect("Could not parse archive");
 
     // Some users reported experiencing duplicate entries if we don't ensure `fns_to_call`
@@ -396,7 +414,8 @@ pub(crate) fn generate_schema(
     ).unwrap();
 
     tracing::info!(path = %path.display(), "Writing SQL");
-    pgx_sql.to_file(path)?;
+    pgx_sql.to_file(path)
+        .wrap_err_with(|| eyre!("Could not write SQL to {}", path.display()))?;
 
     if let Some(dot_path) = dot {
         let dot_path = dot_path.as_ref();

@@ -74,6 +74,7 @@ impl CommandExecute for Run {
         };
         
         run_psql(
+            &manifest,
             pg_config,
             &dbname,
             self.release,
@@ -89,6 +90,7 @@ impl CommandExecute for Run {
     release = is_release,
 ))]
 pub(crate) fn run_psql(
+    manifest: &cargo_toml::Manifest,
     pg_config: &PgConfig,
     dbname: &str,
     is_release: bool,
@@ -99,7 +101,7 @@ pub(crate) fn run_psql(
     stop_postgres(pg_config)?;
 
     // install the extension
-    install_extension(pg_config, is_release, no_schema, None, features)?;
+    install_extension(manifest, pg_config, is_release, no_schema, None, features)?;
 
     // restart postgres
     start_postgres(pg_config)?;

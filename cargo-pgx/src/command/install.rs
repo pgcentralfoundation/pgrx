@@ -46,7 +46,7 @@ impl CommandExecute for Install {
         let pg_version = format!("pg{}", pg_config.major_version()?);
         let features = crate::manifest::features_for_version(self.features, &manifest, &pg_version);
 
-        install_extension(&pg_config, self.release, self.no_schema, None, &features)
+        install_extension(&manifest, &pg_config, self.release, self.no_schema, None, &features)
     }
 }
 
@@ -57,6 +57,7 @@ impl CommandExecute for Install {
     features = ?features.features,
 ))]
 pub(crate) fn install_extension(
+    manifest: &cargo_toml::Manifest,
     pg_config: &PgConfig,
     is_release: bool,
     no_schema: bool,
@@ -112,7 +113,7 @@ pub(crate) fn install_extension(
     }
 
     if !no_schema || !get_target_sql_file(&extdir, &base_directory)?.exists() {
-        copy_sql_files(pg_config, is_release, features, &extdir, &base_directory)?;
+        copy_sql_files(manifest, pg_config, is_release, features, &extdir, &base_directory)?;
     } else {
         println!("{} schema generation", "    Skipping".bold().yellow());
     }
@@ -214,6 +215,7 @@ fn get_target_sql_file(extdir: &PathBuf, base_directory: &PathBuf) -> eyre::Resu
 }
 
 fn copy_sql_files(
+    manifest: &cargo_toml::Manifest,
     pg_config: &PgConfig,
     is_release: bool,
     features: &clap_cargo::Features,
@@ -224,6 +226,7 @@ fn copy_sql_files(
     let (_, extname) = crate::command::get::find_control_file()?;
 
     crate::command::schema::generate_schema(
+        manifest,
         pg_config,
         is_release,
         features,
