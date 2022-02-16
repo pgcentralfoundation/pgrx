@@ -238,7 +238,7 @@ version = "0.3.2"
 dependencies = [
  "cargo_metadata",
  "cargo_toml",
- "clap 3.0.14",
+ "clap 3.1.0",
  "clap-cargo",
  "color-eyre",
  "colored",
@@ -344,9 +344,9 @@ dependencies = [
 
 [[package]]
 name = "clap"
-version = "3.0.14"
+version = "3.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b63edc3f163b3c71ec8aa23f9bd6070f77edbf3d1d198b164afa90ff00e4ec62"
+checksum = "e5f1fea81f183005ced9e59cdb01737ef2423956dac5a6d731b06b2ecfaa3467"
 dependencies = [
  "atty",
  "bitflags",
@@ -366,15 +366,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "551b6aa534ced210e29bc4ea2016bc11c74770f0a2b94b29dfc1a92ab6fc28d4"
 dependencies = [
  "cargo_metadata",
- "clap 3.0.14",
+ "clap 3.1.0",
  "doc-comment",
 ]
 
 [[package]]
 name = "clap_derive"
-version = "3.0.14"
+version = "3.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9a1132dc3944b31c20dd8b906b3a9f0a5d0243e092d59171414969657ac6aa85"
+checksum = "5fd1122e63869df2cb309f449da1ad54a7c6dfeb7c7e6ccd8e0825d9eb93bb72"
 dependencies = [
  "heck",
  "proc-macro-error",
@@ -1494,7 +1494,7 @@ dependencies = [
 name = "pgx-utils"
 version = "0.3.2"
 dependencies = [
- "clap 3.0.14",
+ "clap 3.1.0",
  "color-eyre",
  "colored",
  "convert_case",
