@@ -250,7 +250,6 @@ fn install_extension() -> eyre::Result<()> {
     command
         .arg("pgx")
         .arg("install")
-        .arg("--test")
         .arg("--pg-config")
         .arg(pg_config.path().ok_or(eyre!("No pg_config found"))?)
         .stdout(Stdio::inherit())
