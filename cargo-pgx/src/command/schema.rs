@@ -11,10 +11,6 @@ use pgx_utils::{
 };
 use std::{
     collections::HashSet,
-    fs::File,
-    io::{Read, Write},
-    os::unix::prelude::{MetadataExt, PermissionsExt},
-    path::Path,
     path::PathBuf,
     process::{Command, Stdio},
 };
@@ -33,6 +29,9 @@ pub(crate) struct Schema {
     /// Skip building the `sql-generator`, use an existing build
     #[clap(long, short)]
     skip_build: bool,
+    /// Build in test mode (for `cargo pgx test`)
+    #[clap(long)]
+    test: bool,
     /// Do you want to run against Postgres `pg10`, `pg11`, `pg12`, `pg13`, `pg14`?
     pg_version: Option<String>,
     /// Compile for release mode (default is debug)
@@ -107,6 +106,7 @@ impl CommandExecute for Schema {
             &manifest,
             &pg_config,
             self.release,
+            self.test,
             &features,
             &out,
             self.dot,
@@ -119,6 +119,7 @@ impl CommandExecute for Schema {
 #[tracing::instrument(level = "error", skip_all, fields(
     pg_version = %pg_config.version()?,
     release = is_release,
+    test = is_test,
     path,
     dot,
     features = ?features.features,
@@ -127,6 +128,7 @@ pub(crate) fn generate_schema(
     manifest: &cargo_toml::Manifest,
     pg_config: &PgConfig,
     is_release: bool,
+    is_test: bool,
     features: &clap_cargo::Features,
     path: impl AsRef<std::path::Path>,
     dot: Option<impl AsRef<std::path::Path>>,
@@ -155,7 +157,8 @@ pub(crate) fn generate_schema(
     // Get the build plan so we can determine the correct `pgx_pg_sys` `OUT_DIR` to create a stub from.
     let mut command_build_plan = Command::new("cargo");
     command_build_plan.env("RUSTC_BOOTSTRAP", "1");
-    command_build_plan.args(["build", "-Z", "unstable-options", "--build-plan" ]);
+    command_build_plan.arg("build");
+    command_build_plan.args(["-Z", "unstable-options", "--build-plan" ]);
     if is_release {
         command_build_plan.arg("--release");
     }
@@ -203,7 +206,12 @@ pub(crate) fn generate_schema(
     if !skip_build {
         // First, build the SQL generator so we can get a look at the symbol table
         let mut command = Command::new("cargo");
-        command.args(&["build"]);
+        if is_test {
+            command.arg("test");
+            command.arg("--no-run");
+        } else {
+            command.arg("build");
+        }
         if is_release {
             command.arg("--release");
         }
