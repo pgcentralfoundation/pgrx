@@ -30,4 +30,25 @@ mod tests {
         .expect("failed to get SPI result");
         assert!(result)
     }
+
+    
+    // Ensures `@FUNCTION_NAME@` is handled.
+    #[pg_extern(sql = r#"
+        CREATE OR REPLACE FUNCTION tests."test_overriden_sql_with_fn_name"() RETURNS void
+        STRICT
+        LANGUAGE c /* Rust */
+        AS 'MODULE_PATHNAME', '@FUNCTION_NAME@';
+    "#)]
+    fn overriden_sql_with_fn_name() -> bool {
+        true
+    }
+
+    #[pg_test]
+    fn test_overriden_sql_with_fn_name() {
+        let result = Spi::get_one::<bool>(
+            "SELECT tests.overriden_sql_with_fn_name()",
+        )
+        .expect("failed to get SPI result");
+        assert!(result)
+    }
 }
