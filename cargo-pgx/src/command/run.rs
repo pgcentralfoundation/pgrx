@@ -101,7 +101,7 @@ pub(crate) fn run_psql(
     stop_postgres(pg_config)?;
 
     // install the extension
-    install_extension(manifest, pg_config, is_release, false, no_schema, None, features)?;
+    install_extension(manifest, pg_config, is_release, no_schema, None, features)?;
 
     // restart postgres
     start_postgres(pg_config)?;

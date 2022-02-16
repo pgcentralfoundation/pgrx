@@ -20,9 +20,6 @@ pub(crate) struct Install {
     /// Compile for release mode (default is debug)
     #[clap(env = "PROFILE", long, short)]
     release: bool,
-    /// Build in test mode (for `cargo pgx test`)
-    #[clap(long)]
-    test: bool,
     /// Don't regenerate the schema
     #[clap(long)]
     no_schema: bool,
@@ -49,14 +46,13 @@ impl CommandExecute for Install {
         let pg_version = format!("pg{}", pg_config.major_version()?);
         let features = crate::manifest::features_for_version(self.features, &manifest, &pg_version);
 
-        install_extension(&manifest, &pg_config, self.release, self.test, self.no_schema, None, &features)
+        install_extension(&manifest, &pg_config, self.release, self.no_schema, None, &features)
     }
 }
 
 #[tracing::instrument(skip_all, fields(
     pg_version = %pg_config.version()?,
     release = is_release,
-    test = is_test,
     base_directory = tracing::field::Empty,
     features = ?features.features,
 ))]
@@ -64,7 +60,6 @@ pub(crate) fn install_extension(
     manifest: &cargo_toml::Manifest,
     pg_config: &PgConfig,
     is_release: bool,
-    is_test: bool,
     no_schema: bool,
     base_directory: Option<PathBuf>,
     features: &clap_cargo::Features,
@@ -84,7 +79,7 @@ pub(crate) fn install_extension(
         ));
     }
 
-    build_extension(is_release, is_test, &features)?;
+    build_extension(is_release, &features)?;
 
     println!();
     println!("installing extension");
@@ -118,7 +113,7 @@ pub(crate) fn install_extension(
     }
 
     if !no_schema || !get_target_sql_file(&extdir, &base_directory)?.exists() {
-        copy_sql_files(manifest, pg_config, is_release, is_test, features, &extdir, &base_directory)?;
+        copy_sql_files(manifest, pg_config, is_release, features, &extdir, &base_directory)?;
     } else {
         println!("{} schema generation", "    Skipping".bold().yellow());
     }
@@ -164,18 +159,13 @@ fn copy_file(src: &PathBuf, dest: &PathBuf, msg: &str, do_filter: bool) -> eyre:
 
 pub(crate) fn build_extension(
     is_release: bool,
-    is_test: bool,
     features: &clap_cargo::Features,
 ) -> eyre::Result<()> {
     let flags = std::env::var("PGX_BUILD_FLAGS").unwrap_or_default();
 
     let mut command = Command::new("cargo");
-    if is_test {
-        command.arg("test");
-        command.arg("--no-run");
-    } else {
-        command.arg("build");
-    }
+    command.arg("build");
+
     if is_release {
         command.arg("--release");
     }
@@ -229,7 +219,6 @@ fn copy_sql_files(
     manifest: &cargo_toml::Manifest,
     pg_config: &PgConfig,
     is_release: bool,
-    is_test: bool,
     features: &clap_cargo::Features,
     extdir: &PathBuf,
     base_directory: &PathBuf,
@@ -241,7 +230,6 @@ fn copy_sql_files(
         manifest,
         pg_config,
         is_release,
-        is_test,
         features,
         &dest,
         Option::<String>::None,

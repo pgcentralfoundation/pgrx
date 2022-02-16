@@ -29,9 +29,6 @@ pub(crate) struct Schema {
     /// Skip building the `sql-generator`, use an existing build
     #[clap(long, short)]
     skip_build: bool,
-    /// Build in test mode (for `cargo pgx test`)
-    #[clap(long)]
-    test: bool,
     /// Do you want to run against Postgres `pg10`, `pg11`, `pg12`, `pg13`, `pg14`?
     pg_version: Option<String>,
     /// Compile for release mode (default is debug)
@@ -106,7 +103,6 @@ impl CommandExecute for Schema {
             &manifest,
             &pg_config,
             self.release,
-            self.test,
             &features,
             &out,
             self.dot,
@@ -119,7 +115,6 @@ impl CommandExecute for Schema {
 #[tracing::instrument(level = "error", skip_all, fields(
     pg_version = %pg_config.version()?,
     release = is_release,
-    test = is_test,
     path,
     dot,
     features = ?features.features,
@@ -128,7 +123,6 @@ pub(crate) fn generate_schema(
     manifest: &cargo_toml::Manifest,
     pg_config: &PgConfig,
     is_release: bool,
-    is_test: bool,
     features: &clap_cargo::Features,
     path: impl AsRef<std::path::Path>,
     dot: Option<impl AsRef<std::path::Path>>,
@@ -206,12 +200,8 @@ pub(crate) fn generate_schema(
     if !skip_build {
         // First, build the SQL generator so we can get a look at the symbol table
         let mut command = Command::new("cargo");
-        if is_test {
-            command.arg("test");
-            command.arg("--no-run");
-        } else {
-            command.arg("build");
-        }
+        command.arg("build");
+        
         if is_release {
             command.arg("--release");
         }
