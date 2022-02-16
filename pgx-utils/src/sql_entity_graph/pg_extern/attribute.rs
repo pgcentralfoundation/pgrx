@@ -26,9 +26,9 @@ pub enum Attribute {
     Sql(ToSqlConfig),
 }
 
-impl ToTokens for Attribute {
-    fn to_tokens(&self, tokens: &mut TokenStream2) {
-        let quoted = match self {
+impl Attribute {
+    pub(crate) fn to_sql_entity_graph_tokens(&self) -> TokenStream2 {
+        match self {
             Attribute::Immutable => quote! { pgx::datum::sql_entity_graph::ExternArgs::Immutable },
             Attribute::Strict => quote! { pgx::datum::sql_entity_graph::ExternArgs::Strict },
             Attribute::Stable => quote! { pgx::datum::sql_entity_graph::ExternArgs::Stable },
@@ -65,7 +65,52 @@ impl ToTokens for Attribute {
             }
             // This attribute is handled separately
             Attribute::Sql(_) => {
-                return;
+                quote! { }
+            }
+        }
+    }
+}
+
+impl ToTokens for Attribute {
+    fn to_tokens(&self, tokens: &mut TokenStream2) {
+        let quoted = match self {
+            Attribute::Immutable => quote! { immutable },
+            Attribute::Strict => quote! { strict },
+            Attribute::Stable => quote! { stable },
+            Attribute::Volatile => quote! { volatile },
+            Attribute::Raw => quote! { raw },
+            Attribute::NoGuard => quote! { no_guard },
+            Attribute::ParallelSafe => {
+                quote! { parallel_safe }
+            }
+            Attribute::ParallelUnsafe => {
+                quote! { parallel_unsafe }
+            }
+            Attribute::ParallelRestricted => {
+                quote! { parallel_restricted }
+            }
+            Attribute::Error(s) => {
+                quote! { error = #s }
+            }
+            Attribute::Schema(s) => {
+                quote! { schema = #s }
+            }
+            Attribute::Name(s) => {
+                quote! { name = #s }
+            }
+            Attribute::Cost(s) => {
+                quote! { cost = #s }
+            }
+            Attribute::Requires(items) => {
+                let items_iter = items
+                    .iter()
+                    .map(|x| x.to_token_stream())
+                    .collect::<Vec<_>>();
+                quote! { requires = [#(#items_iter),*] }
+            }
+            // This attribute is handled separately
+            Attribute::Sql(to_sql_config) => {
+                quote! { sql = #to_sql_config }
             }
         };
         tokens.append_all(quoted);
@@ -128,7 +173,7 @@ impl Parse for Attribute {
                     }
                 }
             }
-            _ => return Err(syn::Error::new(Span::call_site(), "Invalid option")),
+            e => return Err(syn::Error::new(Span::call_site(), format!("Invalid option `{}` inside `{} {}`", e, ident.to_string(), input.to_string()))),
         };
         Ok(found)
     }
