@@ -268,7 +268,6 @@ use crate::{
 };
 
 use pgx_utils::{
-    sql_entity_graph::{PgxSql, ToSql},
     aggregate_options::{FinalizeModify, ParallelOption}
 };
 

@@ -1,10 +1,9 @@
 use std::{
     path::Path,
     io::{Read, Write},
-    fs::{read_dir, File}, sync::WaitTimeoutResult,
+    fs::File,
 };
-use quote::ToTokens;
-use syn::{parse_quote, parse_file, Item, ForeignItem, ForeignItemStatic, ForeignItemFn};
+use syn::{parse_quote, Item, ForeignItem, ForeignItemStatic, ForeignItemFn};
 use eyre::WrapErr;
 
 pub struct PgxPgSysStub {
@@ -119,7 +118,6 @@ fn stub_for_static(foreign_item_static: &ForeignItemStatic) -> Item {
     let mutability = &foreign_item_static.mutability;
     let ident = &foreign_item_static.ident;
     let colon_token = &foreign_item_static.colon_token;
-    let ty = &foreign_item_static.ty;
     let semi_token = &foreign_item_static.semi_token;
 
     parse_quote!{ 
