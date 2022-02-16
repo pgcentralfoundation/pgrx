@@ -143,40 +143,6 @@ pub(crate) fn generate_schema(
 ) -> eyre::Result<()> {
     let (control_file, _extname) = find_control_file()?;
 
-    // If not manual, we should ensure a few files exist and are what is expected.
-    if !manual {
-        let cargo_toml = {
-            let mut buf = String::default();
-            let mut cargo_file =
-                std::fs::File::open("Cargo.toml").expect(&format!("Could not open Cargo.toml"));
-            cargo_file
-                .read_to_string(&mut buf)
-                .expect(&format!("Could not read Cargo.toml"));
-            buf
-        };
-        let crate_name = cargo_toml
-            .lines()
-            .find(|line| line.starts_with("name"))
-            .and_then(|line| line.split(" = ").last())
-            .map(|line| line.trim_matches('\"').to_string())
-            .map(|item| item.replace("-", "_"))
-            .expect("Expected crate name");
-
-        let expected_linker_script = include_str!("../templates/pgx-linker-script.sh");
-        check_templated_file(
-            ".cargo/pgx-linker-script.sh",
-            expected_linker_script.to_string(),
-            force_default,
-        )?;
-        check_permissions(".cargo/pgx-linker-script.sh", 0o755, force_default)?;
-        let expected_cargo_config = include_str!("../templates/cargo_config");
-        check_templated_file(
-            ".cargo/config",
-            expected_cargo_config.to_string(),
-            force_default,
-        )?;
-    }
-
     if get_property("relocatable")? != Some("false".into()) {
         return Err(eyre!(
             "{}:  The `relocatable` property MUST be `false`.  Please update your .control file.",
