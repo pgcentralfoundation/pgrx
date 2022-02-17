@@ -1,6 +1,6 @@
 [package]
 name = "pgx-utils"
-version = "0.3.2"
+version = "0.3.3"
 authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
 edition = "2018"
 license = "MIT"
