@@ -84,13 +84,13 @@ pub(crate) fn install_extension(
         ));
     }
 
-    let build_command_output = build_extension(is_release, is_test, &features)?;
+    let build_command_output = build_extension(is_release, &features)?;
 
     println!();
     println!("installing extension");
     let pkgdir = make_relative(pg_config.pkglibdir()?);
     let extdir = make_relative(pg_config.extension_dir()?);
-    let shlibpath = find_library_file(manifest, &extname, build_command_output)?;
+    let shlibpath = find_library_file(manifest, build_command_output)?;
 
     {
         let mut dest = base_directory.clone();
@@ -164,18 +164,13 @@ fn copy_file(src: &PathBuf, dest: &PathBuf, msg: &str, do_filter: bool) -> eyre:
 
 pub(crate) fn build_extension(
     is_release: bool,
-    is_test: bool,
     features: &clap_cargo::Features,
 ) -> eyre::Result<std::process::Output> {
     let flags = std::env::var("PGX_BUILD_FLAGS").unwrap_or_default();
 
     let mut command = Command::new("cargo");
-    if is_test {
-        command.arg("test");
-        command.arg("--no-run");
-    } else {
-        command.arg("build");
-    }
+    command.arg("build");
+
     if is_release {
         command.arg("--release");
     }
@@ -270,7 +265,8 @@ fn copy_sql_files(
     Ok(())
 }
 
-pub(crate) fn find_library_file(manifest: &cargo_toml::Manifest, extname: &str, build_command_output: std::process::Output) -> eyre::Result<PathBuf> {
+#[tracing::instrument(level = "error", skip_all)]
+pub(crate) fn find_library_file(manifest: &cargo_toml::Manifest, build_command_output: std::process::Output) -> eyre::Result<PathBuf> {
     let crate_name = if let Some(ref package) = manifest.package {
         &package.name
     } else {
@@ -302,7 +298,7 @@ pub(crate) fn find_library_file(manifest: &cargo_toml::Manifest, extname: &str, 
             }
         }
     }
-    let library_file = library_file.ok_or(eyre!("Could not get `pgx-pg-sys` `out_dir` from Cargo output."))?;
+    let library_file = library_file.ok_or(eyre!("Could not get shared object file from Cargo output."))?;
     let library_file_path = PathBuf::from(library_file);
 
     Ok(library_file_path)
