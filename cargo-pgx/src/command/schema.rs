@@ -116,7 +116,7 @@ impl CommandExecute for Schema {
     pg_version = %pg_config.version()?,
     release = is_release,
     test = is_test,
-    path,
+    path = %path.as_ref().display(),
     dot,
     features = ?features.features,
 ))]
@@ -200,6 +200,7 @@ pub(crate) fn generate_schema(
         return Err(eyre!("failed to build SQL generator"));
     }
 
+    println!("{} `pgx-pg-sys` stubs to `dlopen` for schema generation", "    Creating".bold().green());
     let cargo_stdout_bytes = cargo_output.stdout;
     let cargo_stdout_stream = serde_json::Deserializer::from_slice(&cargo_stdout_bytes).into_iter::<serde_json::Value>();
 
@@ -243,15 +244,22 @@ pub(crate) fn generate_schema(
     pgx_pg_sys_stub_built.push("pg_sys_stub");
     pgx_pg_sys_stub_built.push("pgx_pg_sys_stub.so");
     
-    Command::new("rustc")
-        .args([
+    let mut so_rustc_invocation = Command::new("rustc");
+    so_rustc_invocation.args([
             "--crate-type", "cdylib",
             "-o", pgx_pg_sys_stub_built.to_str().unwrap(),
             pgx_pg_sys_stub_file.to_str().unwrap(),
-        ]).output()
+        ]);
+    
+    let so_rustc_invocation_str = format!("{:?}", so_rustc_invocation);
+    tracing::debug!(command = %so_rustc_invocation_str, "Running");
+    let output = so_rustc_invocation.output()
         .wrap_err_with(||
             eyre!("Could not invoke `rustc` on {}", &pgx_pg_sys_stub_file.display())
         )?;
+
+    let code = output.status.code().unwrap();
+    tracing::trace!(status_code = %code, command = %so_rustc_invocation_str, "Finished");
 
     // Inspect the symbol table for a list of `__pgx_internals` we should have the generator call
     let mut lib_so = target_dir_with_profile.clone();
@@ -354,7 +362,7 @@ pub(crate) fn generate_schema(
     let path = path.as_ref();
     let _ = path.parent().map(|p| std::fs::create_dir_all(&p).unwrap());
 
-    tracing::info!(path = %path.display(), "Collecting {} SQL entities", fns_to_call.len());
+    tracing::debug!("Collecting {} SQL entities", fns_to_call.len());
     let mut entities = Vec::default();
     let typeid_sql_mapping;
     let source_only_sql_mapping;
@@ -402,7 +410,7 @@ pub(crate) fn generate_schema(
         entities.into_iter()
     ).unwrap();
 
-    tracing::info!(path = %path.display(), "Writing SQL");
+    tracing::debug!("Writing SQL");
     pgx_sql.to_file(path)
         .wrap_err_with(|| eyre!("Could not write SQL to {}", path.display()))?;
 

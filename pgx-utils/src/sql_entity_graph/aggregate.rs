@@ -428,7 +428,7 @@ impl ToSql for PgAggregateEntity {
                     "\n"
                 },
         );
-        tracing::debug!(%sql);
+        tracing::trace!(%sql);
         Ok(sql)
     }
 }

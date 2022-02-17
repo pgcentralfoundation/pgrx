@@ -244,7 +244,6 @@ fn copy_sql_files(
         Option::<String>::None,
         None,
     )?;
-    copy_file(&dest, &dest, "extension schema file", true)?;
 
     // now copy all the version upgrade files too
     if let Ok(dir) = std::fs::read_dir("sql/") {
