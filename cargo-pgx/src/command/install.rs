@@ -20,6 +20,9 @@ pub(crate) struct Install {
     /// Compile for release mode (default is debug)
     #[clap(env = "PROFILE", long, short)]
     release: bool,
+    /// Build in test mode (for `cargo pgx test`)
+    #[clap(long)]
+    test: bool,
     /// Don't regenerate the schema
     #[clap(long)]
     no_schema: bool,
@@ -46,13 +49,14 @@ impl CommandExecute for Install {
         let pg_version = format!("pg{}", pg_config.major_version()?);
         let features = crate::manifest::features_for_version(self.features, &manifest, &pg_version);
 
-        install_extension(&manifest, &pg_config, self.release, self.no_schema, None, &features)
+        install_extension(&manifest, &pg_config, self.release, self.test, self.no_schema, None, &features)
     }
 }
 
 #[tracing::instrument(skip_all, fields(
     pg_version = %pg_config.version()?,
     release = is_release,
+    test = is_test,
     base_directory = tracing::field::Empty,
     features = ?features.features,
 ))]
@@ -60,6 +64,7 @@ pub(crate) fn install_extension(
     manifest: &cargo_toml::Manifest,
     pg_config: &PgConfig,
     is_release: bool,
+    is_test: bool,
     no_schema: bool,
     base_directory: Option<PathBuf>,
     features: &clap_cargo::Features,
@@ -79,13 +84,14 @@ pub(crate) fn install_extension(
         ));
     }
 
-    build_extension(is_release, &features)?;
+    build_extension(is_release, is_test, &features)?;
 
     println!();
     println!("installing extension");
     let pkgdir = make_relative(pg_config.pkglibdir()?);
     let extdir = make_relative(pg_config.extension_dir()?);
-    let shlibpath = find_library_file(&extname, is_release)?;
+    let build_plan = crate::build_plan::build_plan(features, is_release)?;
+    let shlibpath = find_library_file(manifest, &build_plan, &extname, is_release)?;
 
     {
         let mut dest = base_directory.clone();
@@ -113,7 +119,7 @@ pub(crate) fn install_extension(
     }
 
     if !no_schema || !get_target_sql_file(&extdir, &base_directory)?.exists() {
-        copy_sql_files(manifest, pg_config, is_release, features, &extdir, &base_directory)?;
+        copy_sql_files(manifest, pg_config, is_release, is_test, features, &extdir, &base_directory)?;
     } else {
         println!("{} schema generation", "    Skipping".bold().yellow());
     }
@@ -159,13 +165,18 @@ fn copy_file(src: &PathBuf, dest: &PathBuf, msg: &str, do_filter: bool) -> eyre:
 
 pub(crate) fn build_extension(
     is_release: bool,
+    is_test: bool,
     features: &clap_cargo::Features,
 ) -> eyre::Result<()> {
     let flags = std::env::var("PGX_BUILD_FLAGS").unwrap_or_default();
 
     let mut command = Command::new("cargo");
-    command.arg("build");
-
+    if is_test {
+        command.arg("test");
+        command.arg("--no-run");
+    } else {
+        command.arg("build");
+    }
     if is_release {
         command.arg("--release");
     }
@@ -219,6 +230,7 @@ fn copy_sql_files(
     manifest: &cargo_toml::Manifest,
     pg_config: &PgConfig,
     is_release: bool,
+    is_test: bool,
     features: &clap_cargo::Features,
     extdir: &PathBuf,
     base_directory: &PathBuf,
@@ -230,6 +242,7 @@ fn copy_sql_files(
         manifest,
         pg_config,
         is_release,
+        is_test,
         features,
         &dest,
         Option::<String>::None,
@@ -257,46 +270,51 @@ fn copy_sql_files(
     Ok(())
 }
 
-pub(crate) fn find_library_file(extname: &str, is_release: bool) -> eyre::Result<PathBuf> {
-    let mut target_dir = get_target_dir()?;
-    target_dir.push(if is_release { "release" } else { "debug" });
-
-    if !target_dir.exists() {
-        return Err(eyre!(
-            "target directory does not exist: {}",
-            target_dir.display()
-        ));
-    }
-
-    for f in std::fs::read_dir(&target_dir)
-        .wrap_err_with(|| format!("Unable to read {}", target_dir.display()))?
-    {
-        if let Ok(f) = f {
-            let filename = f.file_name().into_string().unwrap();
-
-            if filename.contains(extname)
-                && filename.starts_with("lib")
-                && (filename.ends_with(".so")
-                    || filename.ends_with(".dylib")
-                    || filename.ends_with(".dll"))
-            {
-                return Ok(f.path());
-            }
-        }
-    }
-
-    if extname.contains('-') {
-        Err(eyre!("
-            library file not found in: `{}`.  It looks like your extension/crate name contains a dash (`-`).  The allowed set of characters is `{}`. Try renaming things, including your `{}.control` file",
-            target_dir.display(), "[a-z0-9_]".green(),
-            extname
-        ))
+pub(crate) fn find_library_file(manifest: &cargo_toml::Manifest, build_plan: &serde_json::Value, extname: &str, is_release: bool) -> eyre::Result<PathBuf> {
+    let crate_name = if let Some(ref package) = manifest.package {
+        &package.name
     } else {
-        Err(eyre!(
-            "library file not found in: `{}`",
-            target_dir.display()
-        ))
-    }
+        return Err(eyre!("Could not get crate name from manifest."));
+    };
+
+    let build_plan_invocations = build_plan.get("invocations")
+        .ok_or_else(|| eyre!("Could not find `invocations` key in build plan."))?
+        .as_array()
+        .ok_or_else(|| eyre!("Could not parse `invocations` key in build plan as array."))?;
+    let crate_build_plan = build_plan_invocations.iter()
+        .find(|invocation| {
+            let package_name = invocation.get("package_name");
+            if let Some(package_name) = invocation.get("package_name") {
+                package_name.as_str() == Some(&crate_name)
+            } else {
+                false
+            }
+        }).ok_or_else(|| eyre!("Could not find `{}` in build plan.", crate_name))?;
+    let crate_outputs = crate_build_plan.get("outputs")
+        .ok_or_else(|| eyre!("Could not find `outputs` key in `{}` build plan.", crate_name))?
+        .as_array()
+        .ok_or_else(|| eyre!("Could not parse `outputs` key in `{}` build plan as array.", crate_name))?;
+    let crate_shared_object = crate_outputs.iter().find_map(|output| {
+        if let Some(output_str) = output.as_str() {
+            if cfg!(target_os = "macos") {
+                if output_str.ends_with(".dylib") {
+                    Some(output_str)
+                } else {
+                    None
+                }
+            } else {
+                if output_str.ends_with(".so") {
+                    Some(output_str)
+                } else {
+                    None
+                }
+            }
+        } else {
+            None
+        }
+    }).ok_or_else(|| eyre!("Could not find shared object output for `{}`", crate_name))?;
+
+    Ok(PathBuf::from(crate_shared_object))
 }
 
 pub(crate) fn get_version() -> eyre::Result<String> {

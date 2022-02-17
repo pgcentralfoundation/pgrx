@@ -4,6 +4,7 @@
 mod command;
 mod manifest;
 mod metadata;
+mod build_plan;
 
 use clap::Parser;
 use tracing_error::ErrorLayer;
