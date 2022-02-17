@@ -289,7 +289,12 @@ pub(crate) fn find_library_file(manifest: &cargo_toml::Manifest, build_command_o
             if let Some(filenames) = stdout_stream_object.get("filenames").and_then(serde_json::Value::as_array) {
                 for filename in filenames {
                     if let Some(filename) = filename.as_str() {
-                        if filename.ends_with(".so") {
+                        let so_extension = if cfg!(target_os = "macos") {
+                            ".dylib"
+                        } else {
+                            ".so"
+                        };
+                        if filename.ends_with(so_extension) {
                             library_file = Some(filename.to_string());      
                             break;
                         }

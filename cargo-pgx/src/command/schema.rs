@@ -255,12 +255,14 @@ pub(crate) fn generate_schema(
 
     // Inspect the symbol table for a list of `__pgx_internals` we should have the generator call
     let mut lib_so = target_dir_with_profile.clone();
-    #[cfg(target_os = "macos")]
-    let so_extension = "dylib";
-    #[cfg(not(target_os = "macos"))]
-    let so_extension = "so";
 
-    lib_so.push(&format!("lib{}.{}", package_name.replace("-", "_"), so_extension));
+    let so_extension = if cfg!(target_os = "macos") {
+        ".dylib"
+    } else {
+        ".so"
+    };
+
+    lib_so.push(&format!("lib{}{}", package_name.replace("-", "_"), so_extension));
 
     println!("{} SQL entities", " Discovering".bold().green(),);
     let dsym_path = lib_so.resolve_dsym();
