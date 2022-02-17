@@ -84,14 +84,13 @@ pub(crate) fn install_extension(
         ));
     }
 
-    build_extension(is_release, is_test, &features)?;
+    let build_command_output = build_extension(is_release, is_test, &features)?;
 
     println!();
     println!("installing extension");
     let pkgdir = make_relative(pg_config.pkglibdir()?);
     let extdir = make_relative(pg_config.extension_dir()?);
-    let build_plan = crate::build_plan::build_plan(features, is_release)?;
-    let shlibpath = find_library_file(manifest, &build_plan, &extname, is_release)?;
+    let shlibpath = find_library_file(manifest, &extname, build_command_output)?;
 
     {
         let mut dest = base_directory.clone();
@@ -167,7 +166,7 @@ pub(crate) fn build_extension(
     is_release: bool,
     is_test: bool,
     features: &clap_cargo::Features,
-) -> eyre::Result<()> {
+) -> eyre::Result<std::process::Output> {
     let flags = std::env::var("PGX_BUILD_FLAGS").unwrap_or_default();
 
     let mut command = Command::new("cargo");
@@ -194,24 +193,26 @@ pub(crate) fn build_extension(
     if features.all_features {
         command.arg("--all-features");
     }
+    
+    command.arg("--message-format=json");
 
     for arg in flags.split_ascii_whitespace() {
         command.arg(arg);
     }
 
-    let command = command.stdout(Stdio::inherit()).stderr(Stdio::inherit());
+    let command = command.stderr(Stdio::inherit());
     let command_str = format!("{:?}", command);
     println!(
         "building extension with features `{}`\n{}",
         features_arg, command_str
     );
-    let status = command
-        .status()
+    let cargo_output = command
+        .output()
         .wrap_err_with(|| format!("failed to spawn cargo: {}", command_str))?;
-    if !status.success() {
+    if !cargo_output.status.success() {
         Err(eyre!("failed to build extension"))
     } else {
-        Ok(())
+        Ok(cargo_output)
     }
 }
 
@@ -247,7 +248,6 @@ fn copy_sql_files(
         &dest,
         Option::<String>::None,
         None,
-        true,
     )?;
     copy_file(&dest, &dest, "extension schema file", true)?;
 
@@ -270,51 +270,42 @@ fn copy_sql_files(
     Ok(())
 }
 
-pub(crate) fn find_library_file(manifest: &cargo_toml::Manifest, build_plan: &serde_json::Value, extname: &str, is_release: bool) -> eyre::Result<PathBuf> {
+pub(crate) fn find_library_file(manifest: &cargo_toml::Manifest, extname: &str, build_command_output: std::process::Output) -> eyre::Result<PathBuf> {
     let crate_name = if let Some(ref package) = manifest.package {
         &package.name
     } else {
         return Err(eyre!("Could not get crate name from manifest."));
     };
 
-    let build_plan_invocations = build_plan.get("invocations")
-        .ok_or_else(|| eyre!("Could not find `invocations` key in build plan."))?
-        .as_array()
-        .ok_or_else(|| eyre!("Could not parse `invocations` key in build plan as array."))?;
-    let crate_build_plan = build_plan_invocations.iter()
-        .find(|invocation| {
-            let package_name = invocation.get("package_name");
-            if let Some(package_name) = invocation.get("package_name") {
-                package_name.as_str() == Some(&crate_name)
-            } else {
-                false
-            }
-        }).ok_or_else(|| eyre!("Could not find `{}` in build plan.", crate_name))?;
-    let crate_outputs = crate_build_plan.get("outputs")
-        .ok_or_else(|| eyre!("Could not find `outputs` key in `{}` build plan.", crate_name))?
-        .as_array()
-        .ok_or_else(|| eyre!("Could not parse `outputs` key in `{}` build plan as array.", crate_name))?;
-    let crate_shared_object = crate_outputs.iter().find_map(|output| {
-        if let Some(output_str) = output.as_str() {
-            if cfg!(target_os = "macos") {
-                if output_str.ends_with(".dylib") {
-                    Some(output_str)
-                } else {
-                    None
-                }
-            } else {
-                if output_str.ends_with(".so") {
-                    Some(output_str)
-                } else {
-                    None
-                }
-            }
-        } else {
-            None
-        }
-    }).ok_or_else(|| eyre!("Could not find shared object output for `{}`", crate_name))?;
+    let build_command_bytes = build_command_output.stdout;
+    let build_command_stream = serde_json::Deserializer::from_slice(&build_command_bytes).into_iter::<serde_json::Value>();
 
-    Ok(PathBuf::from(crate_shared_object))
+
+    let mut library_file = None;
+    for stdout_stream_item in build_command_stream {
+        let stdout_stream_item = stdout_stream_item?;
+        if let Some(stdout_stream_object) = stdout_stream_item.as_object() {
+            if let Some(package_id) = stdout_stream_object.get("package_id").and_then(serde_json::Value::as_str) {
+                if !package_id.starts_with(&(crate_name.to_owned() + " ")) {
+                    continue
+                }
+            }
+            if let Some(filenames) = stdout_stream_object.get("filenames").and_then(serde_json::Value::as_array) {
+                for filename in filenames {
+                    if let Some(filename) = filename.as_str() {
+                        if filename.ends_with(".so") {
+                            library_file = Some(filename.to_string());      
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    let library_file = library_file.ok_or(eyre!("Could not get `pgx-pg-sys` `out_dir` from Cargo output."))?;
+    let library_file_path = PathBuf::from(library_file);
+
+    Ok(library_file_path)
 }
 
 pub(crate) fn get_version() -> eyre::Result<String> {

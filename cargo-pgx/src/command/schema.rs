@@ -26,9 +26,6 @@ use symbolic::{
 #[derive(clap::Args, Debug)]
 #[clap(author)]
 pub(crate) struct Schema {
-    /// Skip building the `sql-generator`, use an existing build
-    #[clap(long, short)]
-    skip_build: bool,
     /// Build in test mode (for `cargo pgx test`)
     #[clap(long)]
     test: bool,
@@ -111,7 +108,6 @@ impl CommandExecute for Schema {
             &out,
             self.dot,
             log_level,
-            self.skip_build,
         )
     }
 }
@@ -133,7 +129,6 @@ pub(crate) fn generate_schema(
     path: impl AsRef<std::path::Path>,
     dot: Option<impl AsRef<std::path::Path>>,
     log_level: Option<String>,
-    skip_build: bool,
 ) -> eyre::Result<()> {
     let (control_file, _extname) = find_control_file()?;
     let package_name = &manifest.package
@@ -153,84 +148,83 @@ pub(crate) fn generate_schema(
     
     let mut target_dir_with_profile = pgx_utils::get_target_dir()?;
     target_dir_with_profile.push(if is_release { "release" } else { "debug" });
-    
-    // Get the build plan so we can determine the correct `pgx_pg_sys` `OUT_DIR` to create a stub from.
-    let build_plan = crate::build_plan::build_plan(features, is_release)?;
 
-    let build_plan_invocations = build_plan.get("invocations")
-        .ok_or_else(|| eyre!("Could not find `invocations` key in build plan."))?
-        .as_array()
-        .ok_or_else(|| eyre!("Could not parse `invocations` key in build plan as array."))?;
-    let pgx_pg_sys_build_plan = build_plan_invocations.iter()
-        .find(|invocation| {
-            let package_name = invocation.get("package_name");
-            let compile_mode = invocation.get("compile_mode");
-            if let (Some(package_name), Some(compile_mode)) = (package_name, compile_mode) {
-                package_name == "pgx-pg-sys" && compile_mode == "run-custom-build"
-            } else {
-                false
+    // First, build the SQL generator so we can get a look at the symbol table
+    let mut command = Command::new("cargo");
+    if is_test {
+        command.arg("test");
+        command.arg("--no-run");
+    } else {
+        command.arg("build");
+    }
+    if is_release {
+        command.arg("--release");
+    }
+
+    if let Some(log_level) = &log_level {
+        command.env("RUST_LOG", log_level);
+    }
+
+    let features_arg = features.features.join(" ");
+    if !features_arg.trim().is_empty() {
+        command.arg("--features");
+        command.arg(&features_arg);
+    }
+
+    if features.no_default_features {
+        command.arg("--no-default-features");
+    }
+
+    if features.all_features {
+        command.arg("--all-features");
+    }
+
+    command.arg("--message-format=json");
+
+    for arg in flags.split_ascii_whitespace() {
+        command.arg(arg);
+    }
+
+    let command = command.stderr(Stdio::inherit());
+    let command_str = format!("{:?}", command);
+    println!(
+        "{} for SQL generation with features `{}`\n{}",
+        "    Building".bold().green(),
+        features_arg,
+        command_str
+    );
+    let cargo_output = command
+        .output()
+        .wrap_err_with(|| format!("failed to spawn cargo: {}", command_str))?;
+    if !cargo_output.status.success() {
+        return Err(eyre!("failed to build SQL generator"));
+    }
+
+    let cargo_stdout_bytes = cargo_output.stdout;
+    let cargo_stdout_stream = serde_json::Deserializer::from_slice(&cargo_stdout_bytes).into_iter::<serde_json::Value>();
+
+    let mut pgx_pg_sys_out_dir = None;
+    for stdout_stream_item in cargo_stdout_stream {
+        let stdout_stream_item = stdout_stream_item?;
+        if let Some(stdout_stream_object) = stdout_stream_item.as_object() {
+            if let Some(reason) = stdout_stream_object.get("reason").and_then(serde_json::Value::as_str) {
+                if reason != "build-script-executed" {
+                    continue
+                }
             }
-        }).ok_or_else(|| eyre!("Could not find `pgx-pg-sys` in build plan."))?;
-    let build_plan_out_dir_env = pgx_pg_sys_build_plan.get("env")
-        .ok_or_else(|| eyre!("Could not find `env` key in `pgx_pg_sys` build plan."))?
-        .as_object()
-        .ok_or_else(|| eyre!("Could not parse `env` key in `pgx_pg_sys` build plan as object."))?;
-    let pgx_pg_sys_out_dir = build_plan_out_dir_env.get("OUT_DIR")
-        .ok_or_else(|| eyre!("Could not find `env` key in `pgx_pg_sys` build plan."))?
-        .as_str()
-        .ok_or_else(|| eyre!("Could not parse `env.OUT_DIR` key in `pgx_pg_sys` build plan as string."))?;
-    let pgx_pg_sys_out_dir = PathBuf::from(pgx_pg_sys_out_dir);
-
-    if !skip_build {
-        // First, build the SQL generator so we can get a look at the symbol table
-        let mut command = Command::new("cargo");
-        if is_test {
-            command.arg("test");
-            command.arg("--no-run");
-        } else {
-            command.arg("build");
-        }
-        if is_release {
-            command.arg("--release");
-        }
-
-        if let Some(log_level) = &log_level {
-            command.env("RUST_LOG", log_level);
-        }
-
-        let features_arg = features.features.join(" ");
-        if !features_arg.trim().is_empty() {
-            command.arg("--features");
-            command.arg(&features_arg);
-        }
-
-        if features.no_default_features {
-            command.arg("--no-default-features");
-        }
-
-        if features.all_features {
-            command.arg("--all-features");
-        }
-
-        for arg in flags.split_ascii_whitespace() {
-            command.arg(arg);
-        }
-
-        let command = command.stdout(Stdio::inherit()).stderr(Stdio::inherit());
-        let command_str = format!("{:?}", command);
-        println!(
-            "{} for SQL generation with features `{}`\n{}",
-            "    Building".bold().green(),
-            features_arg,
-            command_str
-        );
-        let status = command
-            .status()
-            .wrap_err_with(|| format!("failed to spawn cargo: {}", command_str))?;
-        if !status.success() {
-            return Err(eyre!("failed to build SQL generator"));
+            if let Some(package_id) = stdout_stream_object.get("package_id").and_then(serde_json::Value::as_str) {
+                if !package_id.starts_with("pgx-pg-sys") {
+                    continue
+                }
+            }
+            if let Some(out_dir) = stdout_stream_object.get("out_dir").and_then(serde_json::Value::as_str) {
+                pgx_pg_sys_out_dir = Some(out_dir.to_string());
+                break;
+            }
         }
     }
+    let pgx_pg_sys_out_dir = pgx_pg_sys_out_dir.ok_or(eyre!("Could not get `pgx-pg-sys` `out_dir` from Cargo output."))?;
+    let pgx_pg_sys_out_dir = PathBuf::from(pgx_pg_sys_out_dir);
 
     let pg_version = pg_config.major_version()?;
     let pg_version_file_name = format!("pg{}.rs", pg_version);
