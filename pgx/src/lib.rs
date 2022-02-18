@@ -335,14 +335,14 @@ macro_rules! pg_magic_func {
 macro_rules! pg_sql_graph_magic {
     () => {
         #[no_mangle]
-        pub extern "C" fn __pgx_typeid_sql_mappings() -> std::collections::HashSet<pgx::RustSqlMapping> {
-            pgx::DEFAULT_TYPEID_SQL_MAPPING.clone()
+        pub extern "C" fn __pgx_typeid_sql_mappings() -> alloc::vec::Vec<pgx::RustSqlMapping> {
+            pgx::DEFAULT_TYPEID_SQL_MAPPING.iter().cloned().collect()
         }
 
         
         #[no_mangle]
-        pub extern "C" fn __pgx_source_only_sql_mappings() -> std::collections::HashSet<pgx::RustSourceOnlySqlMapping> {
-            pgx::DEFAULT_SOURCE_ONLY_SQL_MAPPING.clone()
+        pub extern "C" fn __pgx_source_only_sql_mappings() -> alloc::vec::Vec<pgx::RustSourceOnlySqlMapping> {
+            pgx::DEFAULT_SOURCE_ONLY_SQL_MAPPING.iter().cloned().collect()
         }
 
         // A marker which must exist in the root of the extension.
