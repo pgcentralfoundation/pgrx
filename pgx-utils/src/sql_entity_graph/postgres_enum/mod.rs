@@ -1,3 +1,5 @@
+pub mod entity;
+
 use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
 use syn::{
@@ -5,8 +7,7 @@ use syn::{
     DeriveInput, Generics, ItemEnum,
 };
 use syn::{punctuated::Punctuated, Ident, Token};
-
-use super::ToSqlConfig;
+use crate::sql_entity_graph::to_sql::ToSqlConfig;
 
 /// A parsed `#[derive(PostgresEnum)]` item.
 ///
@@ -103,17 +104,17 @@ impl ToTokens for PostgresEnum {
 
         let inv = quote! {
             #[no_mangle]
-            pub extern "C" fn  #sql_graph_entity_fn_name() -> pgx::datum::sql_entity_graph::SqlGraphEntity {
+            pub extern "C" fn  #sql_graph_entity_fn_name() -> ::pgx::utils::sql_entity_graph::SqlGraphEntity {
                 extern crate alloc;
                 use alloc::vec::Vec;
                 use alloc::vec;
                 let mut mappings = Default::default();
-                <#name #ty_generics as pgx::datum::WithTypeIds>::register_with_refs(&mut mappings, stringify!(#name).to_string());
-                pgx::datum::WithSizedTypeIds::<#name #ty_generics>::register_sized_with_refs(&mut mappings, stringify!(#name).to_string());
-                pgx::datum::WithArrayTypeIds::<#name #ty_generics>::register_array_with_refs(&mut mappings, stringify!(#name).to_string());
-                pgx::datum::WithVarlenaTypeIds::<#name #ty_generics>::register_varlena_with_refs(&mut mappings, stringify!(#name).to_string());
+                <#name #ty_generics as ::pgx::datum::WithTypeIds>::register_with_refs(&mut mappings, stringify!(#name).to_string());
+                ::pgx::datum::WithSizedTypeIds::<#name #ty_generics>::register_sized_with_refs(&mut mappings, stringify!(#name).to_string());
+                ::pgx::datum::WithArrayTypeIds::<#name #ty_generics>::register_array_with_refs(&mut mappings, stringify!(#name).to_string());
+                ::pgx::datum::WithVarlenaTypeIds::<#name #ty_generics>::register_varlena_with_refs(&mut mappings, stringify!(#name).to_string());
 
-                let submission = pgx::datum::sql_entity_graph::PostgresEnumEntity {
+                let submission = ::pgx::utils::sql_entity_graph::postgres_enum::entity::PostgresEnumEntity {
                     name: stringify!(#name),
                     file: file!(),
                     line: line!(),
@@ -123,7 +124,7 @@ impl ToTokens for PostgresEnum {
                     variants: vec![ #(  stringify!(#variants)  ),* ],
                     to_sql_config: #to_sql_config,
                 };
-                pgx::datum::sql_entity_graph::SqlGraphEntity::Enum(submission)
+                ::pgx::utils::sql_entity_graph::SqlGraphEntity::Enum(submission)
             }
         };
         tokens.append_all(inv);

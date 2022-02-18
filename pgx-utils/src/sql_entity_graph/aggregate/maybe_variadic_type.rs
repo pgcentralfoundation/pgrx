@@ -1,20 +1,21 @@
+use crate::sql_entity_graph::pg_extern::NameMacro;
+use super::get_pgx_attr_macro;
+
 use proc_macro2::TokenStream as TokenStream2;
 use quote::ToTokens;
 use syn::{
     parse::{Parse, ParseStream},
     parse_quote, Expr, Type,
 };
-use super::get_pgx_attr_macro;
-use crate::sql_entity_graph_generators::pg_extern::NameMacro;
 
 #[derive(Debug, Clone)]
-pub(crate) struct MaybeNamedVariadicTypeList {
-    pub(crate) found: Vec<MaybeNamedVariadicType>,
-    pub(crate) original: syn::Type,
+pub struct MaybeNamedVariadicTypeList {
+    pub found: Vec<MaybeNamedVariadicType>,
+    pub original: syn::Type,
 }
 
 impl MaybeNamedVariadicTypeList {
-    pub(crate) fn new(maybe_type_list: syn::Type) -> Result<Self, syn::Error> {
+    pub fn new(maybe_type_list: syn::Type) -> Result<Self, syn::Error> {
         match &maybe_type_list {
             Type::Tuple(tuple) => {
                 let mut coll = Vec::new();
@@ -34,7 +35,7 @@ impl MaybeNamedVariadicTypeList {
         }
     }
 
-    pub(crate) fn entity_tokens(&self) -> Expr {
+    pub fn entity_tokens(&self) -> Expr {
         let found = self.found.iter().map(|x| x.entity_tokens());
         parse_quote! {
             vec![#(#found),*]
@@ -55,16 +56,16 @@ impl ToTokens for MaybeNamedVariadicTypeList {
 }
 
 #[derive(Debug, Clone)]
-pub(crate) struct MaybeNamedVariadicType {
-    pub(crate) ty: Type,
+pub struct MaybeNamedVariadicType {
+    pub ty: Type,
     /// The name, if it exists.
-    pub(crate) name: Option<String>,
+    pub name: Option<String>,
     /// The inner of a variadic, if it exists.
-    pub(crate) variadic_ty: Option<Type>,
+    pub variadic_ty: Option<Type>,
 }
 
 impl MaybeNamedVariadicType {
-    pub(crate) fn new(ty: syn::Type) -> Result<Self, syn::Error> {
+    pub fn new(ty: syn::Type) -> Result<Self, syn::Error> {
         let name_inner =  get_pgx_attr_macro("name", &ty);
         
         let (name, variadic_ty, ty) = match name_inner {
@@ -96,8 +97,8 @@ impl MaybeNamedVariadicType {
         let variadic = self.variadic_ty.is_some();
         let name = self.name.iter();
         parse_quote! {
-            pgx::datum::sql_entity_graph::aggregate::MaybeVariadicAggregateType {
-                agg_ty: pgx::datum::sql_entity_graph::aggregate::AggregateType {
+            ::pgx::utils::sql_entity_graph::aggregate::entity::MaybeVariadicAggregateType {
+                agg_ty: ::pgx::utils::sql_entity_graph::aggregate::entity::AggregateType {
                     ty_source: #ty_string,
                     ty_id: core::any::TypeId::of::<#ty>(),
                     full_path: core::any::type_name::<#ty>(),

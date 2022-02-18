@@ -1,7 +1,7 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-use crate::{pg_config::PgConfig, sql_entity_graph_generators::PositioningRef};
+use crate::{pg_config::PgConfig, sql_entity_graph::positioning_ref::PositioningRef};
 use colored::Colorize;
 use eyre::{eyre, WrapErr};
 use proc_macro2::{TokenStream, TokenTree};
@@ -17,10 +17,19 @@ use syn::{GenericArgument, ItemFn, PathArguments, ReturnType, Type, TypeParamBou
 
 pub mod operator_common;
 pub mod pg_config;
-pub mod sql_entity_graph_generators;
 pub mod sql_entity_graph;
-pub mod aggregate_options;
 pub mod pgx_pg_sys_stub;
+
+#[doc(hidden)]
+pub mod __reexports {
+    pub use eyre;
+    // For `#[no_std]` based `pgx` extensions we use `HashSet` for type mappings.
+    pub mod std {
+        pub mod collections {
+            pub use std::collections::HashSet;
+        }
+    }
+}
 
 pub static BASE_POSTGRES_PORT_NO: u16 = 28800;
 pub static BASE_POSTGRES_TESTING_PORT_NO: u16 = 32200;

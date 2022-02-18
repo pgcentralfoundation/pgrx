@@ -1,62 +1,31 @@
-mod pgx_sql;
-pub use pgx_sql::PgxSql;
-
+pub mod pgx_sql;
 pub mod aggregate;
+pub mod control_file;
+pub mod schema;
+pub mod pg_extern;
+pub mod extension_sql;
+pub mod postgres_enum;
+pub mod postgres_type;
+pub mod postgres_ord;
+pub mod postgres_hash;
+pub mod pgx_attribute;
+pub mod positioning_ref;
+pub mod mapping;
+pub mod to_sql;
 
-mod control_file;
-pub use control_file::ControlFile;
-
-mod schema;
-pub use schema::SchemaEntity;
-
-mod pg_extern;
-pub use pg_extern::{
-    PgExternArgumentEntity, PgExternEntity, PgExternReturnEntity, PgOperatorEntity,
-};
-
-mod extension_sql;
-pub use extension_sql::{ExtensionSqlEntity, SqlDeclaredEntity};
-
-mod postgres_enum;
-pub use postgres_enum::PostgresEnumEntity;
-
-mod postgres_type;
-pub use postgres_type::PostgresTypeEntity;
-
-mod postgres_ord;
-pub use postgres_ord::PostgresOrdEntity;
-
-mod postgres_hash;
-pub use postgres_hash::PostgresHashEntity;
-
-mod sql_graph_entity;
-pub use sql_graph_entity::SqlGraphEntity;
-
-use core::any::TypeId;
+use pgx_sql::PgxSql;
+use control_file::ControlFile;
+use postgres_enum::entity::PostgresEnumEntity;
+use postgres_type::entity::PostgresTypeEntity;
+use pg_extern::entity::PgExternEntity;
+use postgres_hash::entity::PostgresHashEntity;
+use postgres_ord::entity::PostgresOrdEntity;
+use aggregate::entity::PgAggregateEntity;
+use schema::entity::SchemaEntity;
+use extension_sql::entity::ExtensionSqlEntity;
+use to_sql::ToSql;
 
 pub use crate::ExternArgs;
-pub use crate::sql_entity_graph_generators::PositioningRef;
-
-/// Reexports for the pgx SQL generator binaries.
-#[doc(hidden)]
-pub mod reexports {
-    #[doc(hidden)]
-    pub use clap;
-    #[doc(hidden)]
-    pub use color_eyre;
-    #[doc(hidden)]
-    pub use eyre;
-    #[doc(hidden)]
-    pub use libloading;
-    #[doc(hidden)]
-    pub use tracing;
-    #[doc(hidden)]
-    pub use tracing_error;
-    #[doc(hidden)]
-    pub use tracing_subscriber;
-}
-
-
 /// Able to produce a GraphViz DOT format identifier.
 pub trait SqlGraphIdentifier {
     /// A dot style identifier for the entity.
@@ -77,190 +46,161 @@ pub trait SqlGraphIdentifier {
     fn line(&self) -> Option<u32>;
 }
 
-/// Able to be transformed into to SQL.
-pub trait ToSql {
-    /// Attempt to transform this type into SQL.
-    ///
-    /// Some entities require additional context from a [`PgxSql`], such as
-    /// `#[derive(PostgresType)]` which must include it's relevant in/out functions.
-    fn to_sql(&self, context: &PgxSql) -> eyre::Result<String>;
-}
 
-/// The signature of a function that can transform a SqlGraphEntity to a SQL string
-///
-/// This is used to provide a facility for overriding the default SQL generator behavior using
-/// the `#[to_sql(path::to::function)]` attribute in circumstances where the default behavior is
-/// not desirable.
-///
-/// Implementations can invoke `ToSql::to_sql(entity, context)` on the unwrapped SqlGraphEntity
-/// type should they wish to delegate to the default behavior for any reason.
-pub type ToSqlFn =
-    fn(
-        &SqlGraphEntity,
-        &PgxSql,
-    ) -> std::result::Result<String, Box<dyn std::error::Error + Send + Sync + 'static>>;
-
-/// Represents configuration options for tuning the SQL generator.
-///
-/// When an item that can be rendered to SQL has these options at hand, they should be
-/// respected. If an item does not have them, then it is not expected that the SQL generation
-/// for those items can be modified.
-///
-/// The default configuration has `enabled` set to `true`, and `callback` to `None`, which indicates
-/// that the default SQL generation behavior will be used. These are intended to be mutually exclusive
-/// options, so `callback` should only be set if generation is enabled.
-///
-/// When `enabled` is false, no SQL is generated for the item being configured.
-///
-/// When `callback` has a value, the corresponding `ToSql` implementation should invoke the
-/// callback instead of performing their default behavior.
-#[derive(Default, Clone)]
-pub struct ToSqlConfigEntity {
-    pub enabled: bool,
-    pub callback: Option<ToSqlFn>,
-    pub content: Option<&'static str>,
-}
-impl ToSqlConfigEntity {
-    /// Given a SqlGraphEntity, this function converts it to SQL based on the current configuration.
-    ///
-    /// If the config overrides the default behavior (i.e. using the `ToSql` trait), then `Some(eyre::Result)`
-    /// is returned. If the config does not override the default behavior, then `None` is returned. This can
-    /// be used to dispatch SQL generation in a single line, e.g.:
-    ///
-    /// ```rust,ignore
-    /// config.to_sql(entity, context).unwrap_or_else(|| entity.to_sql(context))?
-    /// ```
-    pub fn to_sql(
-        &self,
-        entity: &SqlGraphEntity,
-        context: &PgxSql,
-    ) -> Option<eyre::Result<String>> {
-        use eyre::{eyre, WrapErr};
-
-        if !self.enabled {
-            return Some(Ok(format!("\n\
-                {sql_anchor_comment}\n\
-                -- Skipped due to `#[pgx(sql = false)]`\n",
-                sql_anchor_comment = entity.sql_anchor_comment(),
-            )));
-        }
-
-        if let Some(content) = self.content {
-            return Some(Ok(format!("\n\
-                {sql_anchor_comment}\n\
-                {content}\n\
-            ", content = content, sql_anchor_comment = entity.sql_anchor_comment())));
-        }
-
-        if let Some(callback) = self.callback {
-            let content = callback(entity, context)
-                .map_err(|e| eyre!(e))
-                .wrap_err("Failed to run specified `#[pgx(sql = path)] function`");
-            return match content {
-                Ok(content) => Some(Ok(format!("\n\
-                        {sql_anchor_comment}\n\
-                        {content}\
-                    ",
-                    content = content,
-                    sql_anchor_comment = entity.sql_anchor_comment(),
-                ))),
-                Err(e) => Some(Err(e)),
-            };
-        }
-
-        None
-    }
-}
-impl std::cmp::PartialEq for ToSqlConfigEntity {
-    fn eq(&self, other: &Self) -> bool {
-        if self.enabled != other.enabled {
-            return false;
-        }
-        match (self.callback, other.callback) {
-            (None, None) => match (self.content, other.content) {
-                (None, None) => true,
-                (Some(a), Some(b)) => a == b,
-                _ => false,
-            },
-            (Some(a), Some(b)) => std::ptr::eq(std::ptr::addr_of!(a), std::ptr::addr_of!(b)),
-            _ => false,
-        }
-    }
-}
-impl std::cmp::Eq for ToSqlConfigEntity {}
-impl std::hash::Hash for ToSqlConfigEntity {
-    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        self.enabled.hash(state);
-        self.callback.map(|cb| std::ptr::addr_of!(cb)).hash(state);
-        self.content.hash(state);
-    }
-}
-impl std::fmt::Debug for ToSqlConfigEntity {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        let callback = self.callback.map(|cb| std::ptr::addr_of!(cb));
-        f.debug_struct("ToSqlConfigEntity")
-            .field("enabled", &self.enabled)
-            .field("callback", &format_args!("{:?}", &callback))
-            .field("content", &self.content)
-            .finish()
-    }
-}
-
-/// A mapping from a Rust type to a SQL type, with a `TypeId`.
-///
-/// ```rust
-/// use pgx::datum::sql_entity_graph::RustSqlMapping;
-///
-/// let constructed = RustSqlMapping::of::<i32>(String::from("int"));
-/// let raw = RustSqlMapping {
-///     rust: core::any::type_name::<i32>().to_string(),
-///     sql: String::from("int"),
-///     id: core::any::TypeId::of::<i32>(),
-/// };
-///
-/// assert_eq!(constructed, raw);
-/// ```
+/// An entity corresponding to some SQL required by the extension.
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub struct RustSqlMapping {
-    // This is the **resolved** type, not the raw source. This means a Type Aliase of `type Foo = u32` would appear as `u32`.
-    pub rust: String,
-    pub sql: String,
-    pub id: TypeId,
+pub enum SqlGraphEntity {
+    ExtensionRoot(ControlFile),
+    Schema(SchemaEntity),
+    CustomSql(ExtensionSqlEntity),
+    Function(PgExternEntity),
+    Type(PostgresTypeEntity),
+    BuiltinType(String),
+    Enum(PostgresEnumEntity),
+    Ord(PostgresOrdEntity),
+    Hash(PostgresHashEntity),
+    Aggregate(PgAggregateEntity),
 }
 
-impl RustSqlMapping {
-    pub fn of<T: 'static>(sql: String) -> Self {
-        Self {
-            rust: core::any::type_name::<T>().to_string(),
-            sql: sql.to_string(),
-            id: core::any::TypeId::of::<T>(),
+impl SqlGraphEntity {
+    pub fn sql_anchor_comment(&self) -> String {
+        let maybe_file_and_line = if let (Some(file), Some(line)) = (self.file(), self.line()) {
+            format!("-- {file}:{line}\n", file = file, line = line)
+        } else {
+            String::default()
+        };
+        format!("\
+            {maybe_file_and_line}\
+            -- {rust_identifier}\
+        ",
+            maybe_file_and_line = maybe_file_and_line,
+            rust_identifier = self.rust_identifier(),
+        )
+    }
+}
+
+impl SqlGraphIdentifier for SqlGraphEntity {
+    fn dot_identifier(&self) -> String {
+        match self {
+            SqlGraphEntity::Schema(item) => item.dot_identifier(),
+            SqlGraphEntity::CustomSql(item) => item.dot_identifier(),
+            SqlGraphEntity::Function(item) => item.dot_identifier(),
+            SqlGraphEntity::Type(item) => item.dot_identifier(),
+            SqlGraphEntity::BuiltinType(item) => format!("preexisting type {}", item),
+            SqlGraphEntity::Enum(item) => item.dot_identifier(),
+            SqlGraphEntity::Ord(item) => item.dot_identifier(),
+            SqlGraphEntity::Hash(item) => item.dot_identifier(),
+            SqlGraphEntity::Aggregate(item) => item.dot_identifier(),
+            SqlGraphEntity::ExtensionRoot(item) => item.dot_identifier(),
+        }
+    }
+
+    fn rust_identifier(&self) -> String {
+        match self {
+            SqlGraphEntity::Schema(item) => item.rust_identifier(),
+            SqlGraphEntity::CustomSql(item) => item.rust_identifier(),
+            SqlGraphEntity::Function(item) => item.rust_identifier(),
+            SqlGraphEntity::Type(item) => item.rust_identifier(),
+            SqlGraphEntity::BuiltinType(item) => item.to_string(),
+            SqlGraphEntity::Enum(item) => item.rust_identifier(),
+            SqlGraphEntity::Ord(item) => item.rust_identifier(),
+            SqlGraphEntity::Hash(item) => item.rust_identifier(),
+            SqlGraphEntity::Aggregate(item) => item.rust_identifier(),
+            SqlGraphEntity::ExtensionRoot(item) => item.rust_identifier(),
+        }
+    }
+
+    fn file(&self) -> Option<&'static str> {
+        match self {
+            SqlGraphEntity::Schema(item) => item.file(),
+            SqlGraphEntity::CustomSql(item) => item.file(),
+            SqlGraphEntity::Function(item) => item.file(),
+            SqlGraphEntity::Type(item) => item.file(),
+            SqlGraphEntity::BuiltinType(_item) => None,
+            SqlGraphEntity::Enum(item) => item.file(),
+            SqlGraphEntity::Ord(item) => item.file(),
+            SqlGraphEntity::Hash(item) => item.file(),
+            SqlGraphEntity::Aggregate(item) => item.file(),
+            SqlGraphEntity::ExtensionRoot(item) => item.file(),
+        }
+    }
+
+    fn line(&self) -> Option<u32> {
+        match self {
+            SqlGraphEntity::Schema(item) => item.line(),
+            SqlGraphEntity::CustomSql(item) => item.line(),
+            SqlGraphEntity::Function(item) => item.line(),
+            SqlGraphEntity::Type(item) => item.line(),
+            SqlGraphEntity::BuiltinType(_item) => None,
+            SqlGraphEntity::Enum(item) => item.line(),
+            SqlGraphEntity::Ord(item) => item.line(),
+            SqlGraphEntity::Hash(item) => item.line(),
+            SqlGraphEntity::Aggregate(item) => item.line(),
+            SqlGraphEntity::ExtensionRoot(item) => item.line(),
         }
     }
 }
 
-/// A mapping from a Rust source fragment to a SQL type, typically for type aliases.
-///
-/// In general, this can only offer a fuzzy matching, as it does not use [`core::any::TypeId`].
-///
-/// ```rust
-/// use pgx::datum::sql_entity_graph::RustSourceOnlySqlMapping;
-///
-/// let constructed = RustSourceOnlySqlMapping::new(
-///     String::from("Oid"),
-///     String::from("int"),
-/// );
-/// ```
-#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub struct RustSourceOnlySqlMapping {
-    pub rust: String,
-    pub sql: String,
-}
-
-impl RustSourceOnlySqlMapping {
-    pub fn new(rust: String, sql: String) -> Self {
-        Self {
-            rust: rust.to_string(),
-            sql: sql.to_string(),
+impl ToSql for SqlGraphEntity {
+    #[tracing::instrument(level = "debug", skip(self, context), fields(identifier = %self.rust_identifier()))]
+    fn to_sql(&self, context: &PgxSql) -> eyre::Result<String> {
+        match self {
+            SqlGraphEntity::Schema(item) => {
+                if item.name != "public" && item.name != "pg_catalog" {
+                    item.to_sql(context)
+                } else {
+                    Ok(String::default())
+                }
+            }
+            SqlGraphEntity::CustomSql(item) => item.to_sql(context),
+            SqlGraphEntity::Function(item) => {
+                if let Some(result) = item.to_sql_config.to_sql(self, context) {
+                    return result;
+                }
+                if context.graph.neighbors_undirected(context.externs.get(item).unwrap().clone()).any(|neighbor| {
+                    let neighbor_item = &context.graph[neighbor];
+                    match neighbor_item {
+                        SqlGraphEntity::Type(PostgresTypeEntity { in_fn, in_fn_module_path, out_fn, out_fn_module_path, .. }) => {
+                            let is_in_fn = item.full_path.starts_with(in_fn_module_path) && item.full_path.ends_with(in_fn);
+                            if is_in_fn {
+                                tracing::trace!(r#type = %neighbor_item.dot_identifier(), "Skipping, is an in_fn.");
+                            }
+                            let is_out_fn = item.full_path.starts_with(out_fn_module_path) && item.full_path.ends_with(out_fn);
+                            if is_out_fn {
+                                tracing::trace!(r#type = %neighbor_item.dot_identifier(), "Skipping, is an out_fn.");
+                            }
+                            is_in_fn || is_out_fn
+                        },
+                        _ => false,
+                    }
+                }) {
+                    Ok(String::default())
+                } else {
+                    item.to_sql(context)
+                }
+            }
+            SqlGraphEntity::Type(item) => item
+                .to_sql_config
+                .to_sql(self, context)
+                .unwrap_or_else(|| item.to_sql(context)),
+            SqlGraphEntity::BuiltinType(_) => Ok(String::default()),
+            SqlGraphEntity::Enum(item) => item
+                .to_sql_config
+                .to_sql(self, context)
+                .unwrap_or_else(|| item.to_sql(context)),
+            SqlGraphEntity::Ord(item) => item
+                .to_sql_config
+                .to_sql(self, context)
+                .unwrap_or_else(|| item.to_sql(context)),
+            SqlGraphEntity::Hash(item) => item
+                .to_sql_config
+                .to_sql(self, context)
+                .unwrap_or_else(|| item.to_sql(context)),
+            SqlGraphEntity::Aggregate(item) => item
+                .to_sql_config
+                .to_sql(self, context)
+                .unwrap_or_else(|| item.to_sql(context)),
+            SqlGraphEntity::ExtensionRoot(item) => item.to_sql(context),
         }
     }
 }

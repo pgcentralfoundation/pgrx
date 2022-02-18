@@ -1,3 +1,5 @@
+pub mod entity;
+
 use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
 use syn::{
@@ -5,24 +7,24 @@ use syn::{
     DeriveInput, Ident,
 };
 
-use super::ToSqlConfig;
+use crate::sql_entity_graph::to_sql::ToSqlConfig;
 
-/// A parsed `#[derive(PostgresOrd)]` item.
+/// A parsed `#[derive(PostgresHash)]` item.
 ///
 /// It should be used with [`syn::parse::Parse`] functions.
 ///
-/// Using [`quote::ToTokens`] will output the declaration for a `pgx::datum::sql_entity_graph::InventoryPostgresOrd`.
+/// Using [`quote::ToTokens`] will output the declaration for a `pgx::datum::sql_entity_graph::InventoryPostgresHash`.
 ///
 /// On structs:
 ///
 /// ```rust
 /// use syn::{Macro, parse::Parse, parse_quote, parse};
 /// use quote::{quote, ToTokens};
-/// use pgx_utils::sql_entity_graph::PostgresOrd;
+/// use pgx_utils::sql_entity_graph::PostgresHash;
 ///
 /// # fn main() -> eyre::Result<()> {
-/// let parsed: PostgresOrd = parse_quote! {
-///     #[derive(PostgresOrd)]
+/// let parsed: PostgresHash = parse_quote! {
+///     #[derive(PostgresHash)]
 ///     struct Example<'a> {
 ///         demo: &'a str,
 ///     }
@@ -37,11 +39,11 @@ use super::ToSqlConfig;
 /// ```rust
 /// use syn::{Macro, parse::Parse, parse_quote, parse};
 /// use quote::{quote, ToTokens};
-/// use pgx_utils::sql_entity_graph::PostgresOrd;
+/// use pgx_utils::sql_entity_graph::PostgresHash;
 ///
 /// # fn main() -> eyre::Result<()> {
-/// let parsed: PostgresOrd = parse_quote! {
-///     #[derive(PostgresOrd)]
+/// let parsed: PostgresHash = parse_quote! {
+///     #[derive(PostgresHash)]
 ///     enum Demo {
 ///         Example,
 ///     }
@@ -51,12 +53,12 @@ use super::ToSqlConfig;
 /// # }
 /// ```
 #[derive(Debug, Clone)]
-pub struct PostgresOrd {
+pub struct PostgresHash {
     pub name: Ident,
     pub to_sql_config: ToSqlConfig,
 }
 
-impl PostgresOrd {
+impl PostgresHash {
     pub fn new(name: Ident, to_sql_config: ToSqlConfig) -> Self {
         Self {
             name,
@@ -71,7 +73,7 @@ impl PostgresOrd {
     }
 }
 
-impl Parse for PostgresOrd {
+impl Parse for PostgresHash {
     fn parse(input: ParseStream) -> Result<Self, syn::Error> {
         use syn::Item;
 
@@ -86,22 +88,22 @@ impl Parse for PostgresOrd {
     }
 }
 
-impl ToTokens for PostgresOrd {
+impl ToTokens for PostgresHash {
     fn to_tokens(&self, tokens: &mut TokenStream2) {
         let name = &self.name;
         let sql_graph_entity_fn_name = syn::Ident::new(
-            &format!("__pgx_internals_ord_{}", self.name),
+            &format!("__pgx_internals_hash_{}", self.name),
             Span::call_site(),
         );
         let to_sql_config = &self.to_sql_config;
         let inv = quote! {
             #[no_mangle]
-            pub extern "C" fn  #sql_graph_entity_fn_name() -> pgx::datum::sql_entity_graph::SqlGraphEntity {
+            pub extern "C" fn  #sql_graph_entity_fn_name() -> ::pgx::utils::sql_entity_graph::SqlGraphEntity {
                 use core::any::TypeId;
                 extern crate alloc;
                 use alloc::vec::Vec;
                 use alloc::vec;
-                let submission = pgx::datum::sql_entity_graph::PostgresOrdEntity {
+                let submission = ::pgx::utils::sql_entity_graph::postgres_hash::entity::PostgresHashEntity {
                     name: stringify!(#name),
                     file: file!(),
                     line: line!(),
@@ -110,7 +112,7 @@ impl ToTokens for PostgresOrd {
                     id: TypeId::of::<#name>(),
                     to_sql_config: #to_sql_config,
                 };
-                pgx::datum::sql_entity_graph::SqlGraphEntity::Ord(submission)
+                ::pgx::utils::sql_entity_graph::SqlGraphEntity::Hash(submission)
             }
         };
         tokens.append_all(inv);

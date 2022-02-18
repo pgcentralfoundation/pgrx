@@ -6,7 +6,7 @@ use tracing_error::SpanTrace;
 /// The parsed contents of a `.control` file.
 ///
 /// ```rust
-/// use pgx::datum::sql_entity_graph::ControlFile;
+/// use pgx::utils::sql_entity_graph::ControlFile;
 /// use std::convert::TryFrom;
 /// # fn main() -> eyre::Result<()> {
 /// let context = include_str!("../../../../pgx-examples/custom_types/custom_types.control");
@@ -28,7 +28,7 @@ impl ControlFile {
     /// Parse a `.control` file.
     ///
     /// ```rust
-    /// use pgx::datum::sql_entity_graph::ControlFile;
+    /// use pgx::utils::sql_entity_graph::ControlFile;
     /// # fn main() -> eyre::Result<()> {
     /// let context = include_str!("../../../../pgx-examples/custom_types/custom_types.control");
     /// let _control_file = ControlFile::from_str(context)?;

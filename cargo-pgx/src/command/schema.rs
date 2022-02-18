@@ -6,7 +6,11 @@ use colored::Colorize;
 use eyre::{eyre, WrapErr};
 use pgx_utils::{
     pg_config::{PgConfig, Pgx},
-    sql_entity_graph::{SqlGraphEntity, PgxSql},
+    sql_entity_graph::{
+        SqlGraphEntity,
+        pgx_sql::PgxSql,
+        mapping::{RustSourceOnlySqlMapping, RustSqlMapping}
+    },
     pgx_pg_sys_stub::PgxPgSysStub,
 };
 use std::{
@@ -382,11 +386,11 @@ pub(crate) fn generate_schema(
         ).expect(&format!("Couldn't libload {}", lib_so.display()));
 
         let typeid_sql_mappings_symbol: libloading::os::unix::Symbol<
-            unsafe extern fn() -> alloc::vec::Vec<pgx_utils::sql_entity_graph::RustSqlMapping>
+            unsafe extern fn() -> &'static std::collections::HashSet<RustSqlMapping>
         > = lib.get("__pgx_typeid_sql_mappings".as_bytes()).expect(&format!("Couldn't call __pgx_typeid_sql_mappings"));
         typeid_sql_mapping = typeid_sql_mappings_symbol();
         let source_only_sql_mapping_symbol: libloading::os::unix::Symbol<
-            unsafe extern fn() -> alloc::vec::Vec<pgx_utils::sql_entity_graph::RustSourceOnlySqlMapping>
+            unsafe extern fn() -> &'static std::collections::HashSet<RustSourceOnlySqlMapping>
         > = lib.get("__pgx_source_only_sql_mappings".as_bytes()).expect(&format!("Couldn't call __pgx_source_only_sql_mappings"));
         source_only_sql_mapping = source_only_sql_mapping_symbol();
 

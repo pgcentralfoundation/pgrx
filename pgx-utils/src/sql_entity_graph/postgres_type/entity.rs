@@ -1,11 +1,16 @@
-use super::RustSqlMapping;
+use crate::sql_entity_graph::{
+    SqlGraphEntity, SqlGraphIdentifier,
+    to_sql::{ToSql, entity::ToSqlConfigEntity},
+    mapping::RustSqlMapping,
+    pgx_sql::PgxSql,
+};
+
 use eyre::eyre;
 use std::{
     cmp::Ordering,
     hash::{Hash, Hasher},
 };
 
-use super::{SqlGraphEntity, SqlGraphIdentifier, ToSql, ToSqlConfigEntity};
 
 /// The output of a [`PostgresType`](crate::datum::sql_entity_graph::PostgresType) from `quote::ToTokens::to_tokens`.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -74,7 +79,7 @@ impl SqlGraphIdentifier for PostgresTypeEntity {
 
 impl ToSql for PostgresTypeEntity {
     #[tracing::instrument(level = "debug", err, skip(self, context), fields(identifier = %self.rust_identifier()))]
-    fn to_sql(&self, context: &super::PgxSql) -> eyre::Result<String> {
+    fn to_sql(&self, context: &PgxSql) -> eyre::Result<String> {
         let self_index = context.types[self];
         let item_node = &context.graph[self_index];
         let item = match item_node {

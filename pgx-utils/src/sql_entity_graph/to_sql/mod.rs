@@ -1,3 +1,5 @@
+pub mod entity;
+
 use std::hash::Hash;
 
 use proc_macro2::TokenStream as TokenStream2;
@@ -5,7 +7,39 @@ use quote::{quote, ToTokens, TokenStreamExt};
 use syn::spanned::Spanned;
 use syn::{AttrStyle, Attribute, Lit};
 
-use super::{ArgValue, PgxArg, PgxAttribute};
+use crate::sql_entity_graph::{
+    SqlGraphEntity,
+    pgx_attribute::{
+        ArgValue,
+        PgxArg,
+        PgxAttribute
+    },
+    pgx_sql::PgxSql,
+};
+
+/// Able to be transformed into to SQL.
+pub trait ToSql {
+    /// Attempt to transform this type into SQL.
+    ///
+    /// Some entities require additional context from a [`PgxSql`], such as
+    /// `#[derive(PostgresType)]` which must include it's relevant in/out functions.
+    fn to_sql(&self, context: &PgxSql) -> eyre::Result<String>;
+}
+
+/// The signature of a function that can transform a SqlGraphEntity to a SQL string
+///
+/// This is used to provide a facility for overriding the default SQL generator behavior using
+/// the `#[to_sql(path::to::function)]` attribute in circumstances where the default behavior is
+/// not desirable.
+///
+/// Implementations can invoke `ToSql::to_sql(entity, context)` on the unwrapped SqlGraphEntity
+/// type should they wish to delegate to the default behavior for any reason.
+pub type ToSqlFn =
+    fn(
+        &SqlGraphEntity,
+        &PgxSql,
+    ) -> std::result::Result<String, Box<dyn std::error::Error + Send + Sync + 'static>>;
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ToSqlConfig {
@@ -119,7 +153,7 @@ impl ToTokens for ToSqlConfig {
         let content = &self.content;
         if let Some(callback_path) = callback {
             tokens.append_all(quote! {
-                ::pgx::datum::sql_entity_graph::ToSqlConfigEntity {
+                ::pgx::utils::sql_entity_graph::to_sql::entity::ToSqlConfigEntity {
                     enabled: #enabled,
                     callback: Some(#callback_path),
                     content: None,
@@ -129,7 +163,7 @@ impl ToTokens for ToSqlConfig {
         }
         if let Some(sql) = content {
             tokens.append_all(quote! {
-                ::pgx::datum::sql_entity_graph::ToSqlConfigEntity {
+                ::pgx::utils::sql_entity_graph::to_sql::entity::ToSqlConfigEntity {
                     enabled: #enabled,
                     callback: None,
                     content: Some(#sql),
@@ -138,7 +172,7 @@ impl ToTokens for ToSqlConfig {
             return;
         }
         tokens.append_all(quote! {
-            ::pgx::datum::sql_entity_graph::ToSqlConfigEntity {
+            ::pgx::utils::sql_entity_graph::to_sql::entity::ToSqlConfigEntity {
                 enabled: #enabled,
                 callback: None,
                 content: None,

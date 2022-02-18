@@ -1,12 +1,15 @@
-use std::fmt::Display;
-
-use crate::{
-    sql_entity_graph_generators::{SqlDeclared, PositioningRef},
-    sql_entity_graph::{SqlGraphEntity, SqlGraphIdentifier, ToSql},
+use crate::sql_entity_graph::{
+    extension_sql::SqlDeclared,
+    positioning_ref::PositioningRef,
+    SqlGraphEntity, SqlGraphIdentifier,
+    to_sql::ToSql,
+    pgx_sql::PgxSql,
 };
 
+use std::fmt::Display;
 
-/// The output of a [`ExtensionSql`](crate::datum::sql_entity_graph::ExtensionSql) from `quote::ToTokens::to_tokens`.
+
+/// The output of a [`ExtensionSql`](crate::utils::sql_entity_graph::extension_sql::ExtensionSql) from `quote::ToTokens::to_tokens`.
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct ExtensionSqlEntity {
     pub module_path: &'static str,
@@ -57,7 +60,7 @@ impl SqlGraphIdentifier for ExtensionSqlEntity {
 
 impl ToSql for ExtensionSqlEntity {
     #[tracing::instrument(level = "debug", skip(self, _context), fields(identifier = self.full_path))]
-    fn to_sql(&self, _context: &super::PgxSql) -> eyre::Result<String> {
+    fn to_sql(&self, _context: &PgxSql) -> eyre::Result<String> {
         let sql = format!(
             "\n\
                 -- {file}:{line}\n\

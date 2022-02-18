@@ -1,9 +1,12 @@
 mod aggregate_type;
 mod maybe_variadic_type;
+pub mod options;
+pub mod entity;
 
-use aggregate_type::{AggregateTypeList, AggregateType};
+pub use aggregate_type::{AggregateType, AggregateTypeList};
+pub use maybe_variadic_type::{MaybeNamedVariadicType, MaybeNamedVariadicTypeList};
+
 use convert_case::{Case, Casing};
-use maybe_variadic_type::MaybeNamedVariadicTypeList;
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
 use syn::{
@@ -14,7 +17,7 @@ use syn::{
     Expr,
 };
 
-use super::ToSqlConfig;
+use crate::sql_entity_graph::to_sql::ToSqlConfig;
 
 // We support only 32 tuples...
 const ARG_NAMES: [&str; 32] = [
@@ -589,15 +592,15 @@ impl PgAggregate {
 
         let entity_item_fn: ItemFn = parse_quote! {
             #[no_mangle]
-            pub extern "C" fn #sql_graph_entity_fn_name() -> pgx::datum::sql_entity_graph::SqlGraphEntity {
-                let submission = pgx::datum::sql_entity_graph::aggregate::PgAggregateEntity {
-                    full_path: core::any::type_name::<#target_ident>(),
+            pub extern "C" fn #sql_graph_entity_fn_name() -> ::pgx::utils::sql_entity_graph::SqlGraphEntity {
+                let submission = ::pgx::utils::sql_entity_graph::aggregate::entity::PgAggregateEntity {
+                    full_path: ::core::any::type_name::<#target_ident>(),
                     module_path: module_path!(),
                     file: file!(),
                     line: line!(),
                     name: #name,
                     ordered_set: #const_ordered_set,
-                    ty_id: core::any::TypeId::of::<#target_ident>(),
+                    ty_id: ::core::any::TypeId::of::<#target_ident>(),
                     args: #type_args_iter,
                     direct_args: None#( .unwrap_or(Some(#type_order_by_args_iter)) )*,
                     stype: #type_stype,
@@ -610,10 +613,10 @@ impl PgAggregate {
                     deserialfunc: None#( .unwrap_or(Some(stringify!(#fn_deserial_iter))) )*,
                     msfunc: None#( .unwrap_or(Some(stringify!(#fn_moving_state_iter))) )*,
                     minvfunc: None#( .unwrap_or(Some(stringify!(#fn_moving_state_inverse_iter))) )*,
-                    mstype: None#( .unwrap_or(Some(pgx::datum::sql_entity_graph::aggregate::AggregateType {
+                    mstype: None#( .unwrap_or(Some(::pgx::utils::sql_entity_graph::aggregate::entity::AggregateType {
                         ty_source: #type_moving_state_string,
-                        ty_id: core::any::TypeId::of::<#type_moving_state_iter>(),
-                        full_path: core::any::type_name::<#type_moving_state_iter>(),
+                        ty_id: ::core::any::TypeId::of::<#type_moving_state_iter>(),
+                        full_path: ::core::any::type_name::<#type_moving_state_iter>(),
                         name: None
                     })) )*,
                     mfinalfunc: None#( .unwrap_or(Some(stringify!(#fn_moving_finalize_iter))) )*,
@@ -624,7 +627,7 @@ impl PgAggregate {
                     hypothetical: #hypothetical,
                     to_sql_config: #to_sql_config,
                 };
-                pgx::datum::sql_entity_graph::SqlGraphEntity::Aggregate(submission)
+                ::pgx::utils::sql_entity_graph::SqlGraphEntity::Aggregate(submission)
             }
         };
         entity_item_fn

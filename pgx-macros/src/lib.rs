@@ -7,7 +7,17 @@ mod operators;
 mod rewriter;
 use operators::{impl_postgres_eq, impl_postgres_hash, impl_postgres_ord};
 
-use pgx_utils::*;
+use pgx_utils::{
+    *,
+    sql_entity_graph::{
+        postgres_type::PostgresType,
+        postgres_enum::PostgresEnum,
+        extension_sql::{ExtensionSqlFile, ExtensionSql},
+        aggregate::PgAggregate,
+        pg_extern::PgExtern,
+        schema::Schema,
+    },
+};
 use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span};
 use quote::{quote, quote_spanned, ToTokens};
@@ -188,7 +198,7 @@ File modules (like `mod name;`) aren't able to be supported due to [`rust/#54725
 */
 #[proc_macro_attribute]
 pub fn pg_schema(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    let pgx_schema = parse_macro_input!(item as sql_entity_graph_generators::Schema);
+    let pgx_schema = parse_macro_input!(item as Schema);
     pgx_schema.to_token_stream().into()
 }
 
@@ -320,7 +330,7 @@ extension_sql!(r#"\
 #[proc_macro]
 pub fn extension_sql(input: TokenStream) -> TokenStream {
     fn wrapped(input: TokenStream) -> Result<TokenStream, syn::Error> {
-        let ext_sql: sql_entity_graph_generators::ExtensionSql = syn::parse(input)?;
+        let ext_sql: ExtensionSql = syn::parse(input)?;
         Ok(ext_sql.to_token_stream().into())
     }
 
@@ -365,7 +375,7 @@ For all other options, and examples of them, see [`macro@extension_sql`].
 #[proc_macro]
 pub fn extension_sql_file(input: TokenStream) -> TokenStream {
     fn wrapped(input: TokenStream) -> Result<TokenStream, syn::Error> {
-        let ext_sql: sql_entity_graph_generators::ExtensionSqlFile = syn::parse(input)?;
+        let ext_sql: ExtensionSqlFile = syn::parse(input)?;
         Ok(ext_sql.to_token_stream().into())
     }
 
@@ -526,8 +536,7 @@ fn example_return() -> pg_sys::Oid {
 pub fn pg_extern(attr: TokenStream, item: TokenStream) -> TokenStream {
     let args = parse_extern_attributes(proc_macro2::TokenStream::from(attr.clone()));
 
-    let sql_graph_entity_item =
-        sql_entity_graph_generators::PgExtern::new(attr.clone().into(), item.clone().into()).unwrap();
+    let sql_graph_entity_item = PgExtern::new(attr.clone().into(), item.clone().into()).unwrap();
 
     let ast = parse_macro_input!(item as syn::Item);
     match ast {
@@ -539,7 +548,7 @@ pub fn pg_extern(attr: TokenStream, item: TokenStream) -> TokenStream {
 fn rewrite_item_fn(
     mut func: ItemFn,
     extern_args: HashSet<ExternArgs>,
-    sql_graph_entity_submission: &sql_entity_graph_generators::PgExtern,
+    sql_graph_entity_submission: &PgExtern,
 ) -> proc_macro2::TokenStream {
     let is_raw = extern_args.contains(&ExternArgs::Raw);
     let no_guard = extern_args.contains(&ExternArgs::NoGuard);
@@ -659,8 +668,7 @@ fn impl_postgres_enum(ast: DeriveInput) -> proc_macro2::TokenStream {
         }
     });
 
-    let sql_graph_entity_item =
-        sql_entity_graph_generators::PostgresEnum::from_derive_input(sql_graph_entity_ast).unwrap();
+    let sql_graph_entity_item = PostgresEnum::from_derive_input(sql_graph_entity_ast).unwrap();
     sql_graph_entity_item.to_tokens(&mut stream);
 
     stream
@@ -783,7 +791,7 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
         });
     }
 
-    let sql_graph_entity_item = sql_entity_graph_generators::PostgresType::from_derive_input(ast).unwrap();
+    let sql_graph_entity_item = PostgresType::from_derive_input(ast).unwrap();
     sql_graph_entity_item.to_tokens(&mut stream);
 
     stream
@@ -989,7 +997,7 @@ Functions inside the `impl` may use the [`#[pgx]`](macro@pgx) attribute.
 pub fn pg_aggregate(_attr: TokenStream, item: TokenStream) -> TokenStream {
     // We don't care about `_attr` as we can find it in the `ItemMod`.
     fn wrapped(item_impl: ItemImpl) -> Result<TokenStream, syn::Error> {
-        let sql_graph_entity_item = sql_entity_graph_generators::PgAggregate::new(item_impl.into())?;
+        let sql_graph_entity_item = PgAggregate::new(item_impl.into())?;
 
         Ok(sql_graph_entity_item.to_token_stream().into())
     }

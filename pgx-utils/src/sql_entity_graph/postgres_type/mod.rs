@@ -1,3 +1,5 @@
+pub mod entity;
+
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
 use std::{
@@ -9,13 +11,13 @@ use syn::{
     DeriveInput, Generics, ItemStruct,
 };
 
-use super::ToSqlConfig;
+use crate::sql_entity_graph::to_sql::ToSqlConfig;
 
 /// A parsed `#[derive(PostgresType)]` item.
 ///
 /// It should be used with [`syn::parse::Parse`] functions.
 ///
-/// Using [`quote::ToTokens`] will output the declaration for a `pgx::datum::sql_entity_graph::PostgresTypeEntity`.
+/// Using [`quote::ToTokens`] will output the declaration for a [`PostgresTypeEntity`][sql_entity_graph::postgres_type::entity::PostgresTypeEntity].
 ///
 /// ```rust
 /// use syn::{Macro, parse::Parse, parse_quote, parse};
@@ -147,7 +149,7 @@ impl ToTokens for PostgresType {
 
         let inv = quote! {
             #[no_mangle]
-            pub extern "C" fn  #sql_graph_entity_fn_name() -> pgx::datum::sql_entity_graph::SqlGraphEntity {
+            pub extern "C" fn  #sql_graph_entity_fn_name() -> ::pgx::utils::sql_entity_graph::SqlGraphEntity {
                 extern crate alloc;
                 use alloc::vec::Vec;
                 use alloc::vec;
@@ -170,7 +172,7 @@ impl ToTokens for PostgresType {
                     &mut mappings,
                     stringify!(#name).to_string()
                 );
-                let submission = pgx::datum::sql_entity_graph::PostgresTypeEntity {
+                let submission = ::pgx::utils::sql_entity_graph::postgres_type::entity::PostgresTypeEntity {
                     name: stringify!(#name),
                     file: file!(),
                     line: line!(),
@@ -193,7 +195,7 @@ impl ToTokens for PostgresType {
                     },
                     to_sql_config: #to_sql_config,
                 };
-                pgx::datum::sql_entity_graph::SqlGraphEntity::Type(submission)
+                ::pgx::utils::sql_entity_graph::SqlGraphEntity::Type(submission)
             }
         };
         tokens.append_all(inv);

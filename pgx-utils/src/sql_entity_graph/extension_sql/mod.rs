@@ -1,3 +1,7 @@
+pub mod entity;
+
+use crate::sql_entity_graph::positioning_ref::PositioningRef;
+
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
 use syn::{
@@ -6,13 +10,11 @@ use syn::{
     LitStr, Token,
 };
 
-use crate::sql_entity_graph_generators::PositioningRef;
-
 /// A parsed `extension_sql_file!()` item.
 ///
 /// It should be used with [`syn::parse::Parse`] functions.
 ///
-/// Using [`quote::ToTokens`] will output the declaration for a `pgx::datum::sql_entity_graph::ExtensionSqlEntity`.
+/// Using [`quote::ToTokens`] will output the declaration for a [`ExtensionSqlEntity`][sql_entity_graph::extension_sql::entity::ExtensionSqlEntity].
 ///
 /// ```rust
 /// use syn::{Macro, parse::Parse, parse_quote, parse};
@@ -89,11 +91,11 @@ impl ToTokens for ExtensionSqlFile {
         );
         let inv = quote! {
             #[no_mangle]
-            pub extern "C" fn  #sql_graph_entity_fn_name() -> pgx::datum::sql_entity_graph::SqlGraphEntity {
+            pub extern "C" fn  #sql_graph_entity_fn_name() -> ::pgx::utils::sql_entity_graph::SqlGraphEntity {
                 extern crate alloc;
                 use alloc::vec::Vec;
                 use alloc::vec;
-                let submission = pgx::datum::sql_entity_graph::ExtensionSqlEntity {
+                let submission = ::pgx::utils::sql_entity_graph::extension_sql::entity::ExtensionSqlEntity {
                     sql: include_str!(#path),
                     module_path: module_path!(),
                     full_path: concat!(file!(), ':', line!()),
@@ -105,7 +107,7 @@ impl ToTokens for ExtensionSqlFile {
                     requires: vec![#(#requires_iter),*],
                     creates: vec![#(#creates_iter),*],
                 };
-                pgx::datum::sql_entity_graph::SqlGraphEntity::CustomSql(submission)
+                ::pgx::utils::sql_entity_graph::SqlGraphEntity::CustomSql(submission)
             }
         };
         tokens.append_all(inv);
@@ -116,7 +118,7 @@ impl ToTokens for ExtensionSqlFile {
 ///
 /// It should be used with [`syn::parse::Parse`] functions.
 ///
-/// Using [`quote::ToTokens`] will output the declaration for a `pgx::datum::sql_entity_graph::ExtensionSqlEntity`.
+/// Using [`quote::ToTokens`] will output the declaration for a `pgx::utils::sql_entity_graph::extension_sql::ExtensionSqlEntity`.
 ///
 /// ```rust
 /// use syn::{Macro, parse::Parse, parse_quote, parse};
@@ -196,11 +198,11 @@ impl ToTokens for ExtensionSql {
         );
         let inv = quote! {
             #[no_mangle]
-            pub extern "C" fn  #sql_graph_entity_fn_name() -> pgx::datum::sql_entity_graph::SqlGraphEntity {
+            pub extern "C" fn  #sql_graph_entity_fn_name() -> ::pgx::utils::sql_entity_graph::SqlGraphEntity {
                 extern crate alloc;
                 use alloc::vec::Vec;
                 use alloc::vec;
-                let submission = pgx::datum::sql_entity_graph::ExtensionSqlEntity {
+                let submission = ::pgx::utils::sql_entity_graph::extension_sql::entity::ExtensionSqlEntity {
                     sql: #sql,
                     module_path: module_path!(),
                     full_path: concat!(file!(), ':', line!()),
@@ -212,7 +214,7 @@ impl ToTokens for ExtensionSql {
                     requires: vec![#(#requires_iter),*],
                     creates: vec![#(#creates_iter),*],
                 };
-                pgx::datum::sql_entity_graph::SqlGraphEntity::CustomSql(submission)
+                ::pgx::utils::sql_entity_graph::SqlGraphEntity::CustomSql(submission)
             }
         };
         tokens.append_all(inv);
@@ -312,7 +314,7 @@ impl ToTokens for SqlDeclared {
             quote! { stringify!(#identifier) }
         };
         let inv = quote! {
-            pgx::datum::sql_entity_graph::SqlDeclaredEntity::build(#variant, #identifier).unwrap()
+            ::pgx::utils::sql_entity_graph::extension_sql::entity::SqlDeclaredEntity::build(#variant, #identifier).unwrap()
         };
         tokens.append_all(inv);
     }

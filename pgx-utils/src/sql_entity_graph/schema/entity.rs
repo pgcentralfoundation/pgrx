@@ -1,4 +1,10 @@
-use super::{SqlGraphEntity, SqlGraphIdentifier, ToSql};
+use crate::sql_entity_graph::{
+    SqlGraphEntity,
+    SqlGraphIdentifier,
+    to_sql::ToSql,
+    pgx_sql::PgxSql,
+};
+
 use std::cmp::Ordering;
 
 /// The output of a [`Schema`](crate::datum::sql_entity_graph::Schema) from `quote::ToTokens::to_tokens`.
@@ -49,7 +55,7 @@ impl SqlGraphIdentifier for SchemaEntity {
 
 impl ToSql for SchemaEntity {
     #[tracing::instrument(level = "debug", err, skip(self, _context), fields(identifier = %self.rust_identifier()))]
-    fn to_sql(&self, _context: &super::PgxSql) -> eyre::Result<String> {
+    fn to_sql(&self, _context: &PgxSql) -> eyre::Result<String> {
         let sql = format!(
             "\n\
                     -- {file}:{line}\n\

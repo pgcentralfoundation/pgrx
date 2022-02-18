@@ -44,10 +44,9 @@ pub use time_stamp_with_timezone::*;
 pub use time_with_timezone::*;
 pub use tuples::*;
 pub use varlena::*;
-pub use pgx_utils::sql_entity_graph;
 
 use crate::PgBox;
-use pgx_utils::sql_entity_graph::RustSqlMapping;
+use pgx_utils::sql_entity_graph::mapping::RustSqlMapping;
 
 /// A tagging trait to indicate a user type is also meant to be used by Postgres
 /// Implemented automatically by `#[derive(PostgresType)]`

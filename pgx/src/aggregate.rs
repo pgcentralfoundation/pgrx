@@ -267,9 +267,7 @@ use crate::{
     pg_sys::{CurrentMemoryContext, MemoryContext, AggCheckCallContext, FunctionCallInfo},
 };
 
-pub use pgx_utils::{
-    aggregate_options::{FinalizeModify, ParallelOption}
-};
+pub use pgx_utils::sql_entity_graph::aggregate::options::{FinalizeModify, ParallelOption};
 
 /// Aggregate implementation trait.
 /// 

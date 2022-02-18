@@ -1494,14 +1494,11 @@ dependencies = [
 name = "pgx-utils"
 version = "0.3.3"
 dependencies = [
- "clap 3.1.0",
- "color-eyre",
  "colored",
  "convert_case",
  "dirs",
  "env_proxy",
  "eyre",
- "libloading",
  "petgraph",
  "prettyplease",
  "proc-macro2",

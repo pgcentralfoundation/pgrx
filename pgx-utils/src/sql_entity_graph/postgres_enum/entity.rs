@@ -1,9 +1,15 @@
+use crate::sql_entity_graph::{
+    SqlGraphEntity,
+    SqlGraphIdentifier,
+    to_sql::{ToSql, entity::ToSqlConfigEntity},
+    mapping::RustSqlMapping,
+    pgx_sql::PgxSql,
+};
+
 use std::{
     cmp::Ordering,
     hash::{Hash, Hasher},
 };
-
-use super::{SqlGraphEntity, SqlGraphIdentifier, ToSql, ToSqlConfigEntity};
 
 /// The output of a [`PostgresEnum`](crate::datum::sql_entity_graph::PostgresEnum) from `quote::ToTokens::to_tokens`.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -13,7 +19,7 @@ pub struct PostgresEnumEntity {
     pub line: u32,
     pub full_path: &'static str,
     pub module_path: &'static str,
-    pub mappings: std::collections::HashSet<super::RustSqlMapping>,
+    pub mappings: std::collections::HashSet<RustSqlMapping>,
     pub variants: Vec<&'static str>,
     pub to_sql_config: ToSqlConfigEntity,
 }
@@ -69,7 +75,7 @@ impl SqlGraphIdentifier for PostgresEnumEntity {
 
 impl ToSql for PostgresEnumEntity {
     #[tracing::instrument(level = "debug", err, skip(self, context), fields(identifier = %self.rust_identifier()))]
-    fn to_sql(&self, context: &super::PgxSql) -> eyre::Result<String> {
+    fn to_sql(&self, context: &PgxSql) -> eyre::Result<String> {
         let self_index = context.enums[self];
         let sql = format!(
             "\n\

@@ -1,20 +1,21 @@
+use crate::sql_entity_graph::pg_extern::NameMacro;
+use super::get_pgx_attr_macro;
+
 use proc_macro2::TokenStream as TokenStream2;
 use quote::ToTokens;
 use syn::{
     parse::{Parse, ParseStream},
     parse_quote, Expr, Type,
 };
-use super::get_pgx_attr_macro;
-use crate::sql_entity_graph_generators::pg_extern::NameMacro;
 
 #[derive(Debug, Clone)]
-pub(crate) struct AggregateTypeList {
-    pub(crate) found: Vec<AggregateType>,
-    pub(crate) original: syn::Type,
+pub struct AggregateTypeList {
+    pub found: Vec<AggregateType>,
+    pub original: syn::Type,
 }
 
 impl AggregateTypeList {
-    pub(crate) fn new(maybe_type_list: syn::Type) -> Result<Self, syn::Error> {
+    pub fn new(maybe_type_list: syn::Type) -> Result<Self, syn::Error> {
         match &maybe_type_list {
             Type::Tuple(tuple) => {
                 let mut coll = Vec::new();
@@ -34,7 +35,7 @@ impl AggregateTypeList {
         }
     }
 
-    pub(crate) fn entity_tokens(&self) -> Expr {
+    pub fn entity_tokens(&self) -> Expr {
         let found = self.found.iter().map(|x| x.entity_tokens());
         parse_quote! {
             vec![#(#found),*]
@@ -55,14 +56,14 @@ impl ToTokens for AggregateTypeList {
 }
 
 #[derive(Debug, Clone)]
-pub(crate) struct AggregateType {
-    pub(crate) ty: Type,
+pub struct AggregateType {
+    pub ty: Type,
     /// The name, if it exists.
-    pub(crate) name: Option<String>,
+    pub name: Option<String>,
 }
 
 impl AggregateType {
-    pub(crate) fn new(ty: syn::Type) -> Result<Self, syn::Error> {
+    pub fn new(ty: syn::Type) -> Result<Self, syn::Error> {
         let name_tokens =  get_pgx_attr_macro("name", &ty);
         let name = match name_tokens {
             Some(tokens) => {
@@ -79,12 +80,12 @@ impl AggregateType {
         Ok(retval)
     }
 
-    pub(crate) fn entity_tokens(&self) -> Expr {
+    pub fn entity_tokens(&self) -> Expr {
         let ty = &self.ty;
         let ty_string = ty.to_token_stream().to_string().replace(" ", "");
         let name = self.name.iter();
         parse_quote! {
-            pgx::datum::sql_entity_graph::aggregate::AggregateType {
+            ::pgx::utils::sql_entity_graph::aggregate::entity::AggregateType {
                 ty_source: #ty_string,
                 ty_id: core::any::TypeId::of::<#ty>(),
                 full_path: core::any::type_name::<#ty>(),

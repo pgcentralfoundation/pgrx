@@ -1,4 +1,8 @@
-use super::{SqlGraphEntity, SqlGraphIdentifier, ToSql, ToSqlConfigEntity};
+use crate::sql_entity_graph::{
+    SqlGraphEntity, SqlGraphIdentifier,
+    to_sql::{ToSql, entity::ToSqlConfigEntity},
+    pgx_sql::PgxSql,
+};
 use std::cmp::Ordering;
 
 /// The output of a [`PostgresHash`](crate::datum::sql_entity_graph::PostgresHash) from `quote::ToTokens::to_tokens`.
@@ -58,7 +62,7 @@ impl SqlGraphIdentifier for PostgresHashEntity {
 
 impl ToSql for PostgresHashEntity {
     #[tracing::instrument(level = "debug", err, skip(self, _context), fields(identifier = %self.rust_identifier()))]
-    fn to_sql(&self, _context: &super::PgxSql) -> eyre::Result<String> {
+    fn to_sql(&self, _context: &PgxSql) -> eyre::Result<String> {
         let sql = format!("\n\
                             -- {file}:{line}\n\
                             -- {full_path}\n\

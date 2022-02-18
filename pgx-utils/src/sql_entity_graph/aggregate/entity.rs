@@ -1,6 +1,9 @@
-use crate::{
-    aggregate_options::{FinalizeModify, ParallelOption},
-    sql_entity_graph::{SqlGraphEntity, SqlGraphIdentifier, ToSql, ToSqlConfigEntity},
+use crate::sql_entity_graph::{
+    aggregate::options::{FinalizeModify, ParallelOption},
+    SqlGraphEntity,
+    SqlGraphIdentifier,
+    pgx_sql::PgxSql,
+    to_sql::{ToSql, entity::ToSqlConfigEntity},
 };
 use core::{any::TypeId, cmp::Ordering};
 use eyre::eyre as eyre_err;
@@ -172,7 +175,7 @@ impl SqlGraphIdentifier for PgAggregateEntity {
 
 impl ToSql for PgAggregateEntity {
     #[tracing::instrument(level = "debug", err, skip(self, context), fields(identifier = %self.rust_identifier()))]
-    fn to_sql(&self, context: &super::PgxSql) -> eyre::Result<String> {
+    fn to_sql(&self, context: &PgxSql) -> eyre::Result<String> {
         let self_index = context.aggregates[self];
         let mut optional_attributes = Vec::new();
         let schema = context.schema_prefix_for(&self_index);

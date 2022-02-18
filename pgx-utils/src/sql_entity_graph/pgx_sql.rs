@@ -4,15 +4,24 @@ use std::{any::TypeId, collections::HashMap, fmt::Debug, path::Path};
 use petgraph::{dot::Dot, graph::NodeIndex, stable_graph::StableGraph};
 use tracing::instrument;
 
-use super::{
-    aggregate::PgAggregateEntity, ControlFile, ExtensionSqlEntity, PgExternEntity,
-    PgExternReturnEntity, PostgresEnumEntity, PostgresHashEntity,
-    PostgresOrdEntity, PostgresTypeEntity, RustSourceOnlySqlMapping, RustSqlMapping, SchemaEntity,
-    SqlDeclaredEntity, SqlGraphEntity, SqlGraphIdentifier, ToSql,
-};
-use crate::sql_entity_graph_generators::{
-    PositioningRef,
-    SqlDeclared,
+use crate::sql_entity_graph::{
+    aggregate::entity::PgAggregateEntity,
+    control_file::ControlFile,
+    extension_sql::{
+        entity::{ExtensionSqlEntity, SqlDeclaredEntity},
+        SqlDeclared,
+    },
+    pg_extern::entity::{PgExternEntity, PgExternReturnEntity},
+    postgres_enum::entity::PostgresEnumEntity,
+    postgres_type::entity::PostgresTypeEntity,
+    postgres_hash::entity::PostgresHashEntity,
+    postgres_ord::entity::PostgresOrdEntity,
+    schema::entity::SchemaEntity,
+    mapping::{RustSourceOnlySqlMapping, RustSqlMapping},
+    SqlGraphEntity,
+    SqlGraphIdentifier,
+    to_sql::ToSql,
+    positioning_ref::PositioningRef,
 };
 
 /// A generator for SQL.
