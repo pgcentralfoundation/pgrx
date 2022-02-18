@@ -1,6 +1,6 @@
 use crate::sql_entity_graph::SqlGraphIdentifier;
 
-/// The output of a [`Argument`](crate::sql_entity_graph::pg_extern::Argument) from `quote::ToTokens::to_tokens`.
+/// The output of a [`PgExternArgument`](crate::sql_entity_graph::PgExternArgument) from `quote::ToTokens::to_tokens`.
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct PgExternArgumentEntity {
     pub pattern: &'static str,

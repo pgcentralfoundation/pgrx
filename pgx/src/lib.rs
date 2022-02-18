@@ -100,7 +100,7 @@ use core::any::TypeId;
 use once_cell::sync::Lazy;
 use std::collections::HashSet;
 
-use pgx_utils::sql_entity_graph::mapping::{RustSqlMapping, RustSourceOnlySqlMapping};
+use pgx_utils::sql_entity_graph::{RustSqlMapping, RustSourceOnlySqlMapping};
 
 macro_rules! map_source_only {
     ($map:ident, $rust:ty, $sql:expr) => {{
@@ -336,19 +336,19 @@ macro_rules! pg_magic_func {
 macro_rules! pg_sql_graph_magic {
     () => {
         #[no_mangle]
-        pub extern "C" fn __pgx_typeid_sql_mappings() -> &'static ::pgx::utils::__reexports::std::collections::HashSet<::pgx::utils::sql_entity_graph::mapping::RustSqlMapping> {
+        pub extern "C" fn __pgx_typeid_sql_mappings() -> &'static ::pgx::utils::__reexports::std::collections::HashSet<::pgx::utils::sql_entity_graph::RustSqlMapping> {
             &::pgx::DEFAULT_TYPEID_SQL_MAPPING
         }
 
         #[no_mangle]
-        pub extern "C" fn __pgx_source_only_sql_mappings() -> &'static ::pgx::utils::__reexports::std::collections::HashSet<::pgx::utils::sql_entity_graph::mapping::RustSourceOnlySqlMapping> {
+        pub extern "C" fn __pgx_source_only_sql_mappings() -> &'static ::pgx::utils::__reexports::std::collections::HashSet<::pgx::utils::sql_entity_graph::RustSourceOnlySqlMapping> {
             &::pgx::DEFAULT_SOURCE_ONLY_SQL_MAPPING
         }
 
         // A marker which must exist in the root of the extension.
         #[no_mangle]
         pub extern "C" fn __pgx_marker() -> ::pgx::utils::__reexports::eyre::Result<
-            ::pgx::utils::sql_entity_graph::control_file::ControlFile,
+            ::pgx::utils::sql_entity_graph::ControlFile,
         > {
             use ::core::convert::TryFrom;
             use ::pgx::utils::__reexports::eyre::WrapErr;
@@ -362,7 +362,7 @@ macro_rules! pg_sql_graph_magic {
             .replace("@CARGO_VERSION@", package_version);
 
             let control_file =
-                ::pgx::utils::sql_entity_graph::control_file::ControlFile::try_from(context.as_str())
+                ::pgx::utils::sql_entity_graph::ControlFile::try_from(context.as_str())
                     .wrap_err_with(|| "Could not parse control file, is it valid?")?;
             Ok(control_file)
         }

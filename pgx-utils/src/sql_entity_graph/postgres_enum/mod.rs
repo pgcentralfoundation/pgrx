@@ -7,7 +7,7 @@ use syn::{
     DeriveInput, Generics, ItemEnum,
 };
 use syn::{punctuated::Punctuated, Ident, Token};
-use crate::sql_entity_graph::to_sql::ToSqlConfig;
+use crate::sql_entity_graph::ToSqlConfig;
 
 /// A parsed `#[derive(PostgresEnum)]` item.
 ///
@@ -18,7 +18,7 @@ use crate::sql_entity_graph::to_sql::ToSqlConfig;
 /// ```rust
 /// use syn::{Macro, parse::Parse, parse_quote, parse};
 /// use quote::{quote, ToTokens};
-/// use pgx_utils::sql_entity_graph::postgres_enum::PostgresEnum;
+/// use pgx_utils::sql_entity_graph::PostgresEnum;
 ///
 /// # fn main() -> eyre::Result<()> {
 /// let parsed: PostgresEnum = parse_quote! {
@@ -114,7 +114,7 @@ impl ToTokens for PostgresEnum {
                 ::pgx::datum::WithArrayTypeIds::<#name #ty_generics>::register_array_with_refs(&mut mappings, stringify!(#name).to_string());
                 ::pgx::datum::WithVarlenaTypeIds::<#name #ty_generics>::register_varlena_with_refs(&mut mappings, stringify!(#name).to_string());
 
-                let submission = ::pgx::utils::sql_entity_graph::postgres_enum::entity::PostgresEnumEntity {
+                let submission = ::pgx::utils::sql_entity_graph::PostgresEnumEntity {
                     name: stringify!(#name),
                     file: file!(),
                     line: line!(),

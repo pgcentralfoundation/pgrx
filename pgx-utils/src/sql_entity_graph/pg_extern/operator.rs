@@ -5,7 +5,7 @@ use syn::{parenthesized, token::Paren};
 
 /// A parsed `#[pg_operator]` operator.
 ///
-/// It is created during [`PgExtern`](crate::sql_entity_graph::pg_extern::PgExtern) parsing.
+/// It is created during [`PgExtern`](crate::sql_entity_graph::PgExtern) parsing.
 #[derive(Debug, Default, Clone)]
 pub struct PgOperator {
     pub opname: Option<PgxOperatorOpName>,
@@ -27,7 +27,7 @@ impl ToTokens for PgOperator {
         let hashes = self.hashes;
         let merges = self.merges;
         let quoted = quote! {
-            ::pgx::utils::sql_entity_graph::pg_extern::entity::PgOperatorEntity {
+            ::pgx::utils::sql_entity_graph::PgOperatorEntity {
                 opname: None#( .unwrap_or(Some(#opname)) )*,
                 commutator: None#( .unwrap_or(Some(#commutator)) )*,
                 negator: None#( .unwrap_or(Some(#negator)) )*,

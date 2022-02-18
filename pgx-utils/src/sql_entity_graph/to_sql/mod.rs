@@ -153,7 +153,7 @@ impl ToTokens for ToSqlConfig {
         let content = &self.content;
         if let Some(callback_path) = callback {
             tokens.append_all(quote! {
-                ::pgx::utils::sql_entity_graph::to_sql::entity::ToSqlConfigEntity {
+                ::pgx::utils::sql_entity_graph::ToSqlConfigEntity {
                     enabled: #enabled,
                     callback: Some(#callback_path),
                     content: None,
@@ -163,7 +163,7 @@ impl ToTokens for ToSqlConfig {
         }
         if let Some(sql) = content {
             tokens.append_all(quote! {
-                ::pgx::utils::sql_entity_graph::to_sql::entity::ToSqlConfigEntity {
+                ::pgx::utils::sql_entity_graph::ToSqlConfigEntity {
                     enabled: #enabled,
                     callback: None,
                     content: Some(#sql),
@@ -172,7 +172,7 @@ impl ToTokens for ToSqlConfig {
             return;
         }
         tokens.append_all(quote! {
-            ::pgx::utils::sql_entity_graph::to_sql::entity::ToSqlConfigEntity {
+            ::pgx::utils::sql_entity_graph::ToSqlConfigEntity {
                 enabled: #enabled,
                 callback: None,
                 content: None,

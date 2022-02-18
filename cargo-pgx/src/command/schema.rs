@@ -8,8 +8,9 @@ use pgx_utils::{
     pg_config::{PgConfig, Pgx},
     sql_entity_graph::{
         SqlGraphEntity,
-        pgx_sql::PgxSql,
-        mapping::{RustSourceOnlySqlMapping, RustSqlMapping}
+        PgxSql,
+        RustSourceOnlySqlMapping,
+        RustSqlMapping,
     },
     pgx_pg_sys_stub::PgxPgSysStub,
 };

@@ -1,8 +1,9 @@
 mod aggregate_type;
 mod maybe_variadic_type;
-pub mod options;
-pub mod entity;
+mod options;
+pub(crate) mod entity;
 
+pub use options::{FinalizeModify, ParallelOption};
 pub use aggregate_type::{AggregateType, AggregateTypeList};
 pub use maybe_variadic_type::{MaybeNamedVariadicType, MaybeNamedVariadicTypeList};
 
@@ -17,7 +18,7 @@ use syn::{
     Expr,
 };
 
-use crate::sql_entity_graph::to_sql::ToSqlConfig;
+use crate::sql_entity_graph::ToSqlConfig;
 
 // We support only 32 tuples...
 const ARG_NAMES: [&str; 32] = [
@@ -593,7 +594,7 @@ impl PgAggregate {
         let entity_item_fn: ItemFn = parse_quote! {
             #[no_mangle]
             pub extern "C" fn #sql_graph_entity_fn_name() -> ::pgx::utils::sql_entity_graph::SqlGraphEntity {
-                let submission = ::pgx::utils::sql_entity_graph::aggregate::entity::PgAggregateEntity {
+                let submission = ::pgx::utils::sql_entity_graph::PgAggregateEntity {
                     full_path: ::core::any::type_name::<#target_ident>(),
                     module_path: module_path!(),
                     file: file!(),
@@ -613,7 +614,7 @@ impl PgAggregate {
                     deserialfunc: None#( .unwrap_or(Some(stringify!(#fn_deserial_iter))) )*,
                     msfunc: None#( .unwrap_or(Some(stringify!(#fn_moving_state_iter))) )*,
                     minvfunc: None#( .unwrap_or(Some(stringify!(#fn_moving_state_inverse_iter))) )*,
-                    mstype: None#( .unwrap_or(Some(::pgx::utils::sql_entity_graph::aggregate::entity::AggregateType {
+                    mstype: None#( .unwrap_or(Some(::pgx::utils::sql_entity_graph::AggregateTypeEntity {
                         ty_source: #type_moving_state_string,
                         ty_id: ::core::any::TypeId::of::<#type_moving_state_iter>(),
                         full_path: ::core::any::type_name::<#type_moving_state_iter>(),

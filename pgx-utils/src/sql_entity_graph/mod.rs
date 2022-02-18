@@ -1,31 +1,77 @@
-pub mod pgx_sql;
-pub mod aggregate;
-pub mod control_file;
-pub mod schema;
-pub mod pg_extern;
-pub mod extension_sql;
-pub mod postgres_enum;
-pub mod postgres_type;
-pub mod postgres_ord;
-pub mod postgres_hash;
-pub mod pgx_attribute;
-pub mod positioning_ref;
-pub mod mapping;
-pub mod to_sql;
+pub(crate) mod pgx_sql;
+pub(crate) mod aggregate;
+pub(crate) mod control_file;
+pub(crate) mod schema;
+pub(crate) mod pg_extern;
+pub(crate) mod extension_sql;
+pub(crate) mod postgres_enum;
+pub(crate) mod postgres_type;
+pub(crate) mod postgres_ord;
+pub(crate) mod postgres_hash;
+pub(crate) mod pgx_attribute;
+pub(crate) mod positioning_ref;
+pub(crate) mod mapping;
+pub(crate) mod to_sql;
 
-use pgx_sql::PgxSql;
-use control_file::ControlFile;
-use postgres_enum::entity::PostgresEnumEntity;
-use postgres_type::entity::PostgresTypeEntity;
-use pg_extern::entity::PgExternEntity;
-use postgres_hash::entity::PostgresHashEntity;
-use postgres_ord::entity::PostgresOrdEntity;
-use aggregate::entity::PgAggregateEntity;
-use schema::entity::SchemaEntity;
-use extension_sql::entity::ExtensionSqlEntity;
-use to_sql::ToSql;
+pub use pgx_sql::PgxSql;
+pub use aggregate::{
+    PgAggregate,
+    AggregateType,
+    AggregateTypeList,
+    FinalizeModify,
+    ParallelOption,
+    entity::{
+        PgAggregateEntity,
+        AggregateTypeEntity,
+        MaybeVariadicAggregateTypeEntity,
+    },
+};
+pub use control_file::ControlFile;
+pub use postgres_enum::{
+    PostgresEnum,
+    entity::PostgresEnumEntity,
+};
+pub use postgres_type::{
+    PostgresType,
+    entity::PostgresTypeEntity,
+};
+pub use pg_extern::{
+    PgExtern,
+    NameMacro,
+    PgExternArgument,
+    entity::{PgExternEntity, PgExternArgumentEntity, PgExternReturnEntity},
+};
+pub use postgres_hash::{
+    PostgresHash,
+    entity::PostgresHashEntity,
+};
+pub use postgres_ord::{
+    PostgresOrd,
+    entity::PostgresOrdEntity,
+};
+pub use schema::{
+    Schema,
+    entity::SchemaEntity,
+};
+pub use extension_sql::{
+    ExtensionSql,
+    ExtensionSqlFile,
+    SqlDeclared,
+    entity::{ExtensionSqlEntity, SqlDeclaredEntity},
+};
+pub use to_sql::{
+    ToSql,
+    ToSqlConfig,
+    entity::ToSqlConfigEntity,
+};
+pub use mapping::{
+    RustSourceOnlySqlMapping,
+    RustSqlMapping,
+};
+pub use positioning_ref::PositioningRef;
 
 pub use crate::ExternArgs;
+
 /// Able to produce a GraphViz DOT format identifier.
 pub trait SqlGraphIdentifier {
     /// A dot style identifier for the entity.

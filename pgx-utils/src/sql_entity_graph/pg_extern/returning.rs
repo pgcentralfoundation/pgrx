@@ -197,12 +197,12 @@ impl ToTokens for Returning {
     fn to_tokens(&self, tokens: &mut TokenStream2) {
         let quoted = match self {
             Returning::None => quote! {
-                ::pgx::utils::sql_entity_graph::pg_extern::entity::PgExternReturnEntity::None
+                ::pgx::utils::sql_entity_graph::PgExternReturnEntity::None
             },
             Returning::Type(ty) => {
                 let ty_string = ty.to_token_stream().to_string().replace(" ", "");
                 quote! {
-                    ::pgx::utils::sql_entity_graph::pg_extern::entity::PgExternReturnEntity::Type {
+                    ::pgx::utils::sql_entity_graph::PgExternReturnEntity::Type {
                         id: TypeId::of::<#ty>(),
                         source: #ty_string,
                         full_path: core::any::type_name::<#ty>(),
@@ -218,7 +218,7 @@ impl ToTokens for Returning {
             Returning::SetOf(ty) => {
                 let ty_string = ty.to_token_stream().to_string().replace(" ", "");
                 quote! {
-                    ::pgx::utils::sql_entity_graph::pg_extern::entity::PgExternReturnEntity::SetOf {
+                    ::pgx::utils::sql_entity_graph::PgExternReturnEntity::SetOf {
                         id: TypeId::of::<#ty>(),
                         source: #ty_string,
                         full_path: core::any::type_name::<#ty>(),
@@ -254,13 +254,13 @@ impl ToTokens for Returning {
                     })
                     .collect::<Vec<_>>();
                 quote! {
-                    ::pgx::utils::sql_entity_graph::pg_extern::entity::PgExternReturnEntity::Iterated(vec![
+                    ::pgx::utils::sql_entity_graph::PgExternReturnEntity::Iterated(vec![
                         #(#quoted_items),*
                     ])
                 }
             }
             Returning::Trigger => quote! {
-                ::pgx::utils::sql_entity_graph::pg_extern::entity::PgExternReturnEntity::Trigger
+                ::pgx::utils::sql_entity_graph::PgExternReturnEntity::Trigger
             },
         };
         tokens.append_all(quoted);
@@ -268,7 +268,7 @@ impl ToTokens for Returning {
 }
 
 #[derive(Debug, Clone)]
-pub(crate) struct NameMacro {
+pub struct NameMacro {
     pub(crate) ident: String,
     pub(crate) ty: syn::Type,
 }

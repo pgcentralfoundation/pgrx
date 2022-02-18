@@ -9,7 +9,7 @@ use crate::sql_entity_graph::{
 use std::fmt::Display;
 
 
-/// The output of a [`ExtensionSql`](crate::sql_entity_graph::extension_sql::ExtensionSql) from `quote::ToTokens::to_tokens`.
+/// The output of a [`ExtensionSql`](crate::sql_entity_graph::ExtensionSql) from `quote::ToTokens::to_tokens`.
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct ExtensionSqlEntity {
     pub module_path: &'static str,

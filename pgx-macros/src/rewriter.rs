@@ -6,7 +6,7 @@ extern crate proc_macro;
 use pgx_utils::{
     categorize_return_type,
     CategorizedType,
-    sql_entity_graph::pg_extern::PgExtern,
+    sql_entity_graph::PgExtern,
 };
 use proc_macro2::{Ident, Span};
 use quote::{quote, quote_spanned, ToTokens};

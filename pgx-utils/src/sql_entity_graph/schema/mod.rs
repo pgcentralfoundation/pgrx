@@ -17,7 +17,7 @@ use syn::{
 /// ```rust
 /// use syn::{Macro, parse::Parse, parse_quote, parse};
 /// use quote::{quote, ToTokens};
-/// use pgx_utils::sql_entity_graph::schema::Schema;
+/// use pgx_utils::sql_entity_graph::Schema;
 ///
 /// # fn main() -> eyre::Result<()> {
 /// let parsed: Schema = parse_quote! {
@@ -69,7 +69,7 @@ impl ToTokens for Schema {
                 extern crate alloc;
                 use alloc::vec::Vec;
                 use alloc::vec;
-                let submission = pgx::utils::sql_entity_graph::schema::entity::SchemaEntity {
+                let submission = pgx::utils::sql_entity_graph::SchemaEntity {
                         module_path: module_path!(),
                         name: stringify!(#ident),
                         file: file!(),

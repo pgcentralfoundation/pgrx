@@ -1,7 +1,7 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-use crate::{pg_config::PgConfig, sql_entity_graph::positioning_ref::PositioningRef};
+use crate::{pg_config::PgConfig, sql_entity_graph::PositioningRef};
 use colored::Colorize;
 use eyre::{eyre, WrapErr};
 use proc_macro2::{TokenStream, TokenTree};

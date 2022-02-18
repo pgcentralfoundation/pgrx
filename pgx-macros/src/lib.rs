@@ -10,12 +10,13 @@ use operators::{impl_postgres_eq, impl_postgres_hash, impl_postgres_ord};
 use pgx_utils::{
     *,
     sql_entity_graph::{
-        postgres_type::PostgresType,
-        postgres_enum::PostgresEnum,
-        extension_sql::{ExtensionSqlFile, ExtensionSql},
-        aggregate::PgAggregate,
-        pg_extern::PgExtern,
-        schema::Schema,
+        PostgresType,
+        PostgresEnum,
+        ExtensionSqlFile,
+        ExtensionSql,
+        PgAggregate,
+        PgExtern,
+        Schema,
     },
 };
 use proc_macro::TokenStream;

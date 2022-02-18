@@ -1,4 +1,4 @@
-use crate::sql_entity_graph::pg_extern::NameMacro;
+use crate::sql_entity_graph::NameMacro;
 use super::get_pgx_attr_macro;
 
 use proc_macro2::TokenStream as TokenStream2;
@@ -85,7 +85,7 @@ impl AggregateType {
         let ty_string = ty.to_token_stream().to_string().replace(" ", "");
         let name = self.name.iter();
         parse_quote! {
-            ::pgx::utils::sql_entity_graph::aggregate::entity::AggregateType {
+            ::pgx::utils::sql_entity_graph::AggregateTypeEntity {
                 ty_source: #ty_string,
                 ty_id: core::any::TypeId::of::<#ty>(),
                 full_path: core::any::type_name::<#ty>(),

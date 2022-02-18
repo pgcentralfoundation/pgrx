@@ -97,8 +97,8 @@ impl MaybeNamedVariadicType {
         let variadic = self.variadic_ty.is_some();
         let name = self.name.iter();
         parse_quote! {
-            ::pgx::utils::sql_entity_graph::aggregate::entity::MaybeVariadicAggregateType {
-                agg_ty: ::pgx::utils::sql_entity_graph::aggregate::entity::AggregateType {
+            ::pgx::utils::sql_entity_graph::MaybeVariadicAggregateTypeEntity {
+                agg_ty: ::pgx::utils::sql_entity_graph::AggregateTypeEntity {
                     ty_source: #ty_string,
                     ty_id: core::any::TypeId::of::<#ty>(),
                     full_path: core::any::type_name::<#ty>(),

@@ -11,18 +11,18 @@ use syn::{
     DeriveInput, Generics, ItemStruct,
 };
 
-use crate::sql_entity_graph::to_sql::ToSqlConfig;
+use crate::sql_entity_graph::ToSqlConfig;
 
 /// A parsed `#[derive(PostgresType)]` item.
 ///
 /// It should be used with [`syn::parse::Parse`] functions.
 ///
-/// Using [`quote::ToTokens`] will output the declaration for a [`PostgresTypeEntity`][crate::sql_entity_graph::postgres_type::entity::PostgresTypeEntity].
+/// Using [`quote::ToTokens`] will output the declaration for a [`PostgresTypeEntity`][crate::sql_entity_graph::PostgresTypeEntity].
 ///
 /// ```rust
 /// use syn::{Macro, parse::Parse, parse_quote, parse};
 /// use quote::{quote, ToTokens};
-/// use pgx_utils::sql_entity_graph::postgres_type::PostgresType;
+/// use pgx_utils::sql_entity_graph::PostgresType;
 ///
 /// # fn main() -> eyre::Result<()> {
 /// let parsed: PostgresType = parse_quote! {
@@ -172,7 +172,7 @@ impl ToTokens for PostgresType {
                     &mut mappings,
                     stringify!(#name).to_string()
                 );
-                let submission = ::pgx::utils::sql_entity_graph::postgres_type::entity::PostgresTypeEntity {
+                let submission = ::pgx::utils::sql_entity_graph::PostgresTypeEntity {
                     name: stringify!(#name),
                     file: file!(),
                     line: line!(),

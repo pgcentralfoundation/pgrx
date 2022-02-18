@@ -7,7 +7,7 @@ use syn::{
     DeriveInput, Ident,
 };
 
-use crate::sql_entity_graph::to_sql::ToSqlConfig;
+use crate::sql_entity_graph::ToSqlConfig;
 
 /// A parsed `#[derive(PostgresHash)]` item.
 ///
@@ -20,7 +20,7 @@ use crate::sql_entity_graph::to_sql::ToSqlConfig;
 /// ```rust
 /// use syn::{Macro, parse::Parse, parse_quote, parse};
 /// use quote::{quote, ToTokens};
-/// use pgx_utils::sql_entity_graph::postgres_hash::PostgresHash;
+/// use pgx_utils::sql_entity_graph::PostgresHash;
 ///
 /// # fn main() -> eyre::Result<()> {
 /// let parsed: PostgresHash = parse_quote! {
@@ -39,7 +39,7 @@ use crate::sql_entity_graph::to_sql::ToSqlConfig;
 /// ```rust
 /// use syn::{Macro, parse::Parse, parse_quote, parse};
 /// use quote::{quote, ToTokens};
-/// use pgx_utils::sql_entity_graph::postgres_hash::PostgresHash;
+/// use pgx_utils::sql_entity_graph::PostgresHash;
 ///
 /// # fn main() -> eyre::Result<()> {
 /// let parsed: PostgresHash = parse_quote! {
@@ -103,7 +103,7 @@ impl ToTokens for PostgresHash {
                 extern crate alloc;
                 use alloc::vec::Vec;
                 use alloc::vec;
-                let submission = ::pgx::utils::sql_entity_graph::postgres_hash::entity::PostgresHashEntity {
+                let submission = ::pgx::utils::sql_entity_graph::PostgresHashEntity {
                     name: stringify!(#name),
                     file: file!(),
                     line: line!(),

@@ -9,7 +9,7 @@ use core::{any::TypeId, cmp::Ordering};
 use eyre::eyre as eyre_err;
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
-pub struct AggregateType {
+pub struct AggregateTypeEntity {
     pub ty_source: &'static str,
     pub ty_id: TypeId,
     pub full_path: &'static str,
@@ -17,8 +17,8 @@ pub struct AggregateType {
 }
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
-pub struct MaybeVariadicAggregateType {
-    pub agg_ty: AggregateType,
+pub struct MaybeVariadicAggregateTypeEntity {
+    pub agg_ty: AggregateTypeEntity,
     pub variadic: bool,
 }
 
@@ -40,17 +40,17 @@ pub struct PgAggregateEntity {
     /// The `arg_data_type` list.
     ///
     /// Corresponds to `Args` in [`pgx::aggregate::Aggregate`].
-    pub args: Vec<MaybeVariadicAggregateType>,
+    pub args: Vec<MaybeVariadicAggregateTypeEntity>,
 
     /// The direct argument list, appearing before `ORDER BY` in ordered set aggregates.
     ///
     /// Corresponds to `OrderBy` in [`pgx::aggregate::Aggregate`].
-    pub direct_args: Option<Vec<AggregateType>>,
+    pub direct_args: Option<Vec<AggregateTypeEntity>>,
 
     /// The `STYPE` and `name` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
     /// The implementor of an [`pgx::aggregate::Aggregate`].
-    pub stype: AggregateType,
+    pub stype: AggregateTypeEntity,
 
     /// The `SFUNC` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
@@ -100,7 +100,7 @@ pub struct PgAggregateEntity {
     /// The `MSTYPE` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
     /// Corresponds to `MovingState` in [`pgx::aggregate::Aggregate`].
-    pub mstype: Option<AggregateType>,
+    pub mstype: Option<AggregateTypeEntity>,
 
     // The `MSSPACE` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     //

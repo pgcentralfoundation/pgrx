@@ -6,11 +6,10 @@ mod returning;
 mod search_path;
 
 pub use operator::PgOperator;
-pub use argument::Argument;
+pub use argument::PgExternArgument;
+pub use returning::NameMacro;
 
-pub(crate) use returning::NameMacro;
-
-use crate::sql_entity_graph::to_sql::ToSqlConfig;
+use crate::sql_entity_graph::ToSqlConfig;
 use operator::{PgxOperatorAttributeWithIdent, PgxOperatorOpName};
 use returning::Returning;
 use search_path::SearchPathList;
@@ -31,12 +30,12 @@ use syn::{
 ///
 /// It should be used with [`syn::parse::Parse`] functions.
 ///
-/// Using [`quote::ToTokens`] will output the declaration for a [`PgExternEntity`][crate::sql_entity_graph::pg_extern::entity::PgExternEntity].
+/// Using [`quote::ToTokens`] will output the declaration for a [`PgExternEntity`][crate::sql_entity_graph::PgExternEntity].
 ///
 /// ```rust
 /// use syn::{Macro, parse::Parse, parse_quote, parse};
 /// use quote::{quote, ToTokens};
-/// use pgx_utils::sql_entity_graph::pg_extern::PgExtern;
+/// use pgx_utils::sql_entity_graph::PgExtern;
 ///
 /// # fn main() -> eyre::Result<()> {
 /// let parsed: PgExtern = parse_quote! {
@@ -176,10 +175,10 @@ impl PgExtern {
             .and_then(|attr| Some(attr.parse_args::<SearchPathList>().unwrap()))
     }
 
-    fn inputs(&self) -> eyre::Result<Vec<Argument>> {
+    fn inputs(&self) -> eyre::Result<Vec<PgExternArgument>> {
         let mut args = Vec::default();
         for input in &self.func.sig.inputs {
-            let arg = Argument::build(input.clone())
+            let arg = PgExternArgument::build(input.clone())
                 .wrap_err_with(|| format!("Could not map {:?}", input))?;
             if let Some(arg) = arg {
                 args.push(arg);
@@ -270,7 +269,7 @@ impl ToTokens for PgExtern {
                 extern crate alloc;
                 use alloc::vec::Vec;
                 use alloc::vec;
-                let submission = ::pgx::utils::sql_entity_graph::pg_extern::entity::PgExternEntity {
+                let submission = ::pgx::utils::sql_entity_graph::PgExternEntity {
                     name: #name,
                     unaliased_name: stringify!(#ident),
                     schema: None#( .unwrap_or(Some(#schema_iter)) )*,

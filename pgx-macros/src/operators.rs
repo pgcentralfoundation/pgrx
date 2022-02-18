@@ -1,8 +1,8 @@
 use pgx_utils::{
     operator_common::*,
     sql_entity_graph::{
-        postgres_ord::PostgresOrd,
-        postgres_hash::PostgresHash,
+        PostgresOrd,
+        PostgresHash,
     },
 };
 

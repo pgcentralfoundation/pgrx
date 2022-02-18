@@ -14,12 +14,12 @@ use syn::{
 ///
 /// It should be used with [`syn::parse::Parse`] functions.
 ///
-/// Using [`quote::ToTokens`] will output the declaration for a [`ExtensionSqlEntity`][crate::sql_entity_graph::extension_sql::entity::ExtensionSqlEntity].
+/// Using [`quote::ToTokens`] will output the declaration for a [`ExtensionSqlEntity`][crate::sql_entity_graph::ExtensionSqlEntity].
 ///
 /// ```rust
 /// use syn::{Macro, parse::Parse, parse_quote, parse};
 /// use quote::{quote, ToTokens};
-/// use pgx_utils::sql_entity_graph::extension_sql::ExtensionSqlFile;
+/// use pgx_utils::sql_entity_graph::ExtensionSqlFile;
 ///
 /// # fn main() -> eyre::Result<()> {
 /// let parsed: Macro = parse_quote! {
@@ -95,7 +95,7 @@ impl ToTokens for ExtensionSqlFile {
                 extern crate alloc;
                 use alloc::vec::Vec;
                 use alloc::vec;
-                let submission = ::pgx::utils::sql_entity_graph::extension_sql::entity::ExtensionSqlEntity {
+                let submission = ::pgx::utils::sql_entity_graph::ExtensionSqlEntity {
                     sql: include_str!(#path),
                     module_path: module_path!(),
                     full_path: concat!(file!(), ':', line!()),
@@ -118,12 +118,12 @@ impl ToTokens for ExtensionSqlFile {
 ///
 /// It should be used with [`syn::parse::Parse`] functions.
 ///
-/// Using [`quote::ToTokens`] will output the declaration for a `pgx::utils::sql_entity_graph::extension_sql::ExtensionSqlEntity`.
+/// Using [`quote::ToTokens`] will output the declaration for a `pgx::utils::sql_entity_graph::ExtensionSqlEntity`.
 ///
 /// ```rust
 /// use syn::{Macro, parse::Parse, parse_quote, parse};
 /// use quote::{quote, ToTokens};
-/// use pgx_utils::sql_entity_graph::extension_sql::ExtensionSql;
+/// use pgx_utils::sql_entity_graph::ExtensionSql;
 ///
 /// # fn main() -> eyre::Result<()> {
 /// let parsed: Macro = parse_quote! {
@@ -202,7 +202,7 @@ impl ToTokens for ExtensionSql {
                 extern crate alloc;
                 use alloc::vec::Vec;
                 use alloc::vec;
-                let submission = ::pgx::utils::sql_entity_graph::extension_sql::entity::ExtensionSqlEntity {
+                let submission = ::pgx::utils::sql_entity_graph::ExtensionSqlEntity {
                     sql: #sql,
                     module_path: module_path!(),
                     full_path: concat!(file!(), ':', line!()),
@@ -314,7 +314,7 @@ impl ToTokens for SqlDeclared {
             quote! { stringify!(#identifier) }
         };
         let inv = quote! {
-            ::pgx::utils::sql_entity_graph::extension_sql::entity::SqlDeclaredEntity::build(#variant, #identifier).unwrap()
+            ::pgx::utils::sql_entity_graph::SqlDeclaredEntity::build(#variant, #identifier).unwrap()
         };
         tokens.append_all(inv);
     }
