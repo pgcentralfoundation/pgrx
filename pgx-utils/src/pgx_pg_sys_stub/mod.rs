@@ -6,6 +6,15 @@ use std::{
 use syn::{parse_quote, Item, ForeignItem, ForeignItemStatic, ForeignItemFn};
 use eyre::WrapErr;
 
+const ADDITIONAL_FUNCTIONS_TO_STUB: [&'static str; 6] = [
+    "varsize_any",
+    "query_tree_walker",
+    "expression_tree_walker",
+    "sigsetjmp",
+    "siglongjmp",
+    "pg_re_throw",
+];
+
 pub struct PgxPgSysStub {
     rewritten: syn::File,
 }
@@ -53,12 +62,15 @@ impl PgxPgSysStub {
             // items_with_stubs.push(item);
         }
 
-        items_with_stubs.push(parse_quote! {
-            #[no_mangle]
-            pub extern "C" fn pg_re_throw() {
-                unimplemented!()
-            }
-        });
+        for additional_function in ADDITIONAL_FUNCTIONS_TO_STUB {
+            let additional_ident = syn::Ident::new(additional_function, proc_macro2::Span::call_site());
+            items_with_stubs.push(parse_quote! {
+                #[no_mangle]
+                pub extern "C" fn #additional_ident() {
+                    unimplemented!(concat!(stringify!(#additional_ident), " is stubbed and cannot be used"));
+                }
+            });
+        }
 
         working_state.items = items_with_stubs;
 
@@ -95,9 +107,10 @@ fn stub_for_fn(foreign_item_fn: &ForeignItemFn) -> Item {
     sig.output = syn::ReturnType::Default;
     sig.abi = Some(parse_quote!{ extern "C" });
     sig.variadic = None;
+    let fn_ident = &sig.ident;
     parse_quote!{ 
         #(#attrs)* #vis #sig {
-            unimplemented!()
+            unimplemented!(concat!(stringify!(#fn_ident), " is stubbed and cannot be used"));
         }
     }
 }

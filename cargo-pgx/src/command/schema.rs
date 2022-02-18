@@ -200,7 +200,7 @@ pub(crate) fn generate_schema(
         return Err(eyre!("failed to build SQL generator"));
     }
 
-    println!("{} `pgx-pg-sys` stubs to `dlopen` for schema generation", "    Creating".bold().green());
+    println!("{} `pgx-pg-sys` stubs to `dlopen` during SQL entity discovery", "    Creating".bold().green());
     let cargo_stdout_bytes = cargo_output.stdout;
     let cargo_stdout_stream = serde_json::Deserializer::from_slice(&cargo_stdout_bytes).into_iter::<serde_json::Value>();
 
