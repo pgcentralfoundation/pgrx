@@ -6,10 +6,10 @@ use tracing_error::SpanTrace;
 /// The parsed contents of a `.control` file.
 ///
 /// ```rust
-/// use pgx::utils::sql_entity_graph::ControlFile;
+/// use pgx_utils::sql_entity_graph::control_file::ControlFile;
 /// use std::convert::TryFrom;
 /// # fn main() -> eyre::Result<()> {
-/// let context = include_str!("../../../../pgx-examples/custom_types/custom_types.control");
+/// let context = include_str!("../../../pgx-examples/custom_types/custom_types.control");
 /// let _control_file = ControlFile::try_from(context)?;
 /// # Ok(())
 /// # }
@@ -28,9 +28,9 @@ impl ControlFile {
     /// Parse a `.control` file.
     ///
     /// ```rust
-    /// use pgx::utils::sql_entity_graph::ControlFile;
+    /// use pgx_utils::sql_entity_graph::control_file::ControlFile;
     /// # fn main() -> eyre::Result<()> {
-    /// let context = include_str!("../../../../pgx-examples/custom_types/custom_types.control");
+    /// let context = include_str!("../../../pgx-examples/custom_types/custom_types.control");
     /// let _control_file = ControlFile::from_str(context)?;
     /// # Ok(())
     /// # }

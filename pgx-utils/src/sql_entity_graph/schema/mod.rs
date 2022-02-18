@@ -17,7 +17,7 @@ use syn::{
 /// ```rust
 /// use syn::{Macro, parse::Parse, parse_quote, parse};
 /// use quote::{quote, ToTokens};
-/// use pgx_utils::sql_entity_graph::Schema;
+/// use pgx_utils::sql_entity_graph::schema::Schema;
 ///
 /// # fn main() -> eyre::Result<()> {
 /// let parsed: Schema = parse_quote! {

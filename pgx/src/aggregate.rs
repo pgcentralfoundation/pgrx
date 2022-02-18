@@ -335,7 +335,7 @@ where
     /// If set, the `OrderedSetArgs` associated type becomes effective, this allows for
     /// direct arguments to the `finalize` function.
     /// 
-    /// See https://www.postgresql.org/docs/current/xaggr.html#XAGGR-ORDERED-SET-AGGREGATES
+    /// See <https://www.postgresql.org/docs/current/xaggr.html#XAGGR-ORDERED-SET-AGGREGATES>
     /// for more information.
     /// 
     /// **Optional:** This const can be skipped, `#[pg_aggregate]` will create a stub.

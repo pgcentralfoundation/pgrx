@@ -6,7 +6,7 @@ use crate::sql_entity_graph::{
 };
 use std::cmp::Ordering;
 
-/// The output of a [`PostgresOrd`](crate::datum::sql_entity_graph::PostgresOrd) from `quote::ToTokens::to_tokens`.
+/// The output of a [`PostgresOrd`](crate::sql_entity_graph::postgres_ord::PostgresOrd) from `quote::ToTokens::to_tokens`.
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub struct PostgresOrdEntity {
     pub name: &'static str,

@@ -20,7 +20,7 @@ use crate::sql_entity_graph::to_sql::ToSqlConfig;
 /// ```rust
 /// use syn::{Macro, parse::Parse, parse_quote, parse};
 /// use quote::{quote, ToTokens};
-/// use pgx_utils::sql_entity_graph::PostgresHash;
+/// use pgx_utils::sql_entity_graph::postgres_hash::PostgresHash;
 ///
 /// # fn main() -> eyre::Result<()> {
 /// let parsed: PostgresHash = parse_quote! {
@@ -39,7 +39,7 @@ use crate::sql_entity_graph::to_sql::ToSqlConfig;
 /// ```rust
 /// use syn::{Macro, parse::Parse, parse_quote, parse};
 /// use quote::{quote, ToTokens};
-/// use pgx_utils::sql_entity_graph::PostgresHash;
+/// use pgx_utils::sql_entity_graph::postgres_hash::PostgresHash;
 ///
 /// # fn main() -> eyre::Result<()> {
 /// let parsed: PostgresHash = parse_quote! {

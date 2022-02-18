@@ -14,12 +14,12 @@ use syn::{
 ///
 /// It should be used with [`syn::parse::Parse`] functions.
 ///
-/// Using [`quote::ToTokens`] will output the declaration for a [`ExtensionSqlEntity`][sql_entity_graph::extension_sql::entity::ExtensionSqlEntity].
+/// Using [`quote::ToTokens`] will output the declaration for a [`ExtensionSqlEntity`][crate::sql_entity_graph::extension_sql::entity::ExtensionSqlEntity].
 ///
 /// ```rust
 /// use syn::{Macro, parse::Parse, parse_quote, parse};
 /// use quote::{quote, ToTokens};
-/// use pgx_utils::sql_entity_graph::ExtensionSqlFile;
+/// use pgx_utils::sql_entity_graph::extension_sql::ExtensionSqlFile;
 ///
 /// # fn main() -> eyre::Result<()> {
 /// let parsed: Macro = parse_quote! {
@@ -123,7 +123,7 @@ impl ToTokens for ExtensionSqlFile {
 /// ```rust
 /// use syn::{Macro, parse::Parse, parse_quote, parse};
 /// use quote::{quote, ToTokens};
-/// use pgx_utils::sql_entity_graph::ExtensionSql;
+/// use pgx_utils::sql_entity_graph::extension_sql::ExtensionSql;
 ///
 /// # fn main() -> eyre::Result<()> {
 /// let parsed: Macro = parse_quote! {

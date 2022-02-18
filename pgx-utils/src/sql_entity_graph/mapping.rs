@@ -3,7 +3,7 @@ use core::any::TypeId;
 /// A mapping from a Rust type to a SQL type, with a `TypeId`.
 ///
 /// ```rust
-/// use pgx::utils::sql_entity_graph::mapping::RustSqlMapping;
+/// use pgx_utils::sql_entity_graph::mapping::RustSqlMapping;
 ///
 /// let constructed = RustSqlMapping::of::<i32>(String::from("int"));
 /// let raw = RustSqlMapping {
@@ -37,7 +37,7 @@ impl RustSqlMapping {
 /// In general, this can only offer a fuzzy matching, as it does not use [`core::any::TypeId`].
 ///
 /// ```rust
-/// use pgx::utils::sql_entity_graph::mapping::RustSourceOnlySqlMapping;
+/// use pgx_utils::sql_entity_graph::mapping::RustSourceOnlySqlMapping;
 ///
 /// let constructed = RustSourceOnlySqlMapping::new(
 ///     String::from("Oid"),

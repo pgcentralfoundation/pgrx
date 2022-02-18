@@ -7,7 +7,7 @@ use crate::sql_entity_graph::{
 
 use std::cmp::Ordering;
 
-/// The output of a [`Schema`](crate::datum::sql_entity_graph::Schema) from `quote::ToTokens::to_tokens`.
+/// The output of a [`Schema`](crate::sql_entity_graph::schema::Schema) from `quote::ToTokens::to_tokens`.
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub struct SchemaEntity {
     pub module_path: &'static str,

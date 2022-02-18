@@ -31,12 +31,12 @@ use syn::{
 ///
 /// It should be used with [`syn::parse::Parse`] functions.
 ///
-/// Using [`quote::ToTokens`] will output the declaration for a [`PgExternEntity`][pgx::datum::sql_entity_graph::pg_extern::entity::PgExternEntity].
+/// Using [`quote::ToTokens`] will output the declaration for a [`PgExternEntity`][crate::sql_entity_graph::pg_extern::entity::PgExternEntity].
 ///
 /// ```rust
 /// use syn::{Macro, parse::Parse, parse_quote, parse};
 /// use quote::{quote, ToTokens};
-/// use pgx_utils::sql_entity_graph::PgExtern;
+/// use pgx_utils::sql_entity_graph::pg_extern::PgExtern;
 ///
 /// # fn main() -> eyre::Result<()> {
 /// let parsed: PgExtern = parse_quote! {

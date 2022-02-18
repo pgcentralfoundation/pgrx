@@ -12,7 +12,7 @@ use std::{
 };
 
 
-/// The output of a [`PostgresType`](crate::datum::sql_entity_graph::PostgresType) from `quote::ToTokens::to_tokens`.
+/// The output of a [`PostgresType`](crate::sql_entity_graph::postgres_type::PostgresType) from `quote::ToTokens::to_tokens`.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PostgresTypeEntity {
     pub name: &'static str,

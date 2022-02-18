@@ -17,12 +17,12 @@ use crate::sql_entity_graph::to_sql::ToSqlConfig;
 ///
 /// It should be used with [`syn::parse::Parse`] functions.
 ///
-/// Using [`quote::ToTokens`] will output the declaration for a [`PostgresTypeEntity`][sql_entity_graph::postgres_type::entity::PostgresTypeEntity].
+/// Using [`quote::ToTokens`] will output the declaration for a [`PostgresTypeEntity`][crate::sql_entity_graph::postgres_type::entity::PostgresTypeEntity].
 ///
 /// ```rust
 /// use syn::{Macro, parse::Parse, parse_quote, parse};
 /// use quote::{quote, ToTokens};
-/// use pgx_utils::sql_entity_graph::PostgresType;
+/// use pgx_utils::sql_entity_graph::postgres_type::PostgresType;
 ///
 /// # fn main() -> eyre::Result<()> {
 /// let parsed: PostgresType = parse_quote! {

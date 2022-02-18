@@ -18,7 +18,7 @@ use crate::sql_entity_graph::to_sql::ToSqlConfig;
 /// ```rust
 /// use syn::{Macro, parse::Parse, parse_quote, parse};
 /// use quote::{quote, ToTokens};
-/// use pgx_utils::sql_entity_graph::PostgresEnum;
+/// use pgx_utils::sql_entity_graph::postgres_enum::PostgresEnum;
 ///
 /// # fn main() -> eyre::Result<()> {
 /// let parsed: PostgresEnum = parse_quote! {

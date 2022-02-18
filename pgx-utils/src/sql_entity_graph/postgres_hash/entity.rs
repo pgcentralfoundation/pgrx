@@ -5,7 +5,7 @@ use crate::sql_entity_graph::{
 };
 use std::cmp::Ordering;
 
-/// The output of a [`PostgresHash`](crate::datum::sql_entity_graph::PostgresHash) from `quote::ToTokens::to_tokens`.
+/// The output of a [`PostgresHash`](crate::sql_entity_graph::postgres_hash::PostgresHash) from `quote::ToTokens::to_tokens`.
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub struct PostgresHashEntity {
     pub name: &'static str,

@@ -11,7 +11,7 @@ use std::{
     hash::{Hash, Hasher},
 };
 
-/// The output of a [`PostgresEnum`](crate::datum::sql_entity_graph::PostgresEnum) from `quote::ToTokens::to_tokens`.
+/// The output of a [`PostgresEnum`](crate::sql_entity_graph::postgres_enum::PostgresEnum) from `quote::ToTokens::to_tokens`.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PostgresEnumEntity {
     pub name: &'static str,
