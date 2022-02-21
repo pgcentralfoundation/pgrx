@@ -238,7 +238,7 @@ version = "0.3.3"
 dependencies = [
  "cargo_metadata",
  "cargo_toml",
- "clap 3.1.0",
+ "clap 3.1.1",
  "clap-cargo",
  "color-eyre",
  "colored",
@@ -344,9 +344,9 @@ dependencies = [
 
 [[package]]
 name = "clap"
-version = "3.1.0"
+version = "3.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e5f1fea81f183005ced9e59cdb01737ef2423956dac5a6d731b06b2ecfaa3467"
+checksum = "6d76c22c9b9b215eeb8d016ad3a90417bd13cb24cf8142756e6472445876cab7"
 dependencies = [
  "atty",
  "bitflags",
@@ -366,7 +366,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "551b6aa534ced210e29bc4ea2016bc11c74770f0a2b94b29dfc1a92ab6fc28d4"
 dependencies = [
  "cargo_metadata",
- "clap 3.1.0",
+ "clap 3.1.1",
  "doc-comment",
 ]
 
@@ -1494,7 +1494,7 @@ dependencies = [
 name = "pgx-utils"
 version = "0.3.3"
 dependencies = [
- "clap 3.1.0",
+ "clap 3.1.1",
  "color-eyre",
  "colored",
  "convert_case",
