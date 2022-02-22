@@ -1,8 +1,4 @@
-use crate::sql_entity_graph::{
-    pgx_sql::PgxSql,
-    SqlGraphEntity,
-    to_sql::ToSqlFn,
-};
+use crate::sql_entity_graph::{pgx_sql::PgxSql, to_sql::ToSqlFn, SqlGraphEntity};
 
 /// Represents configuration options for tuning the SQL generator.
 ///
@@ -42,7 +38,8 @@ impl ToSqlConfigEntity {
         use eyre::{eyre, WrapErr};
 
         if !self.enabled {
-            return Some(Ok(format!("\n\
+            return Some(Ok(format!(
+                "\n\
                 {sql_anchor_comment}\n\
                 -- Skipped due to `#[pgx(sql = false)]`\n",
                 sql_anchor_comment = entity.sql_anchor_comment(),
@@ -50,10 +47,14 @@ impl ToSqlConfigEntity {
         }
 
         if let Some(content) = self.content {
-            return Some(Ok(format!("\n\
+            return Some(Ok(format!(
+                "\n\
                 {sql_anchor_comment}\n\
                 {content}\n\
-            ", content = content, sql_anchor_comment = entity.sql_anchor_comment())));
+            ",
+                content = content,
+                sql_anchor_comment = entity.sql_anchor_comment()
+            )));
         }
 
         if let Some(callback) = self.callback {
@@ -61,7 +62,8 @@ impl ToSqlConfigEntity {
                 .map_err(|e| eyre!(e))
                 .wrap_err("Failed to run specified `#[pgx(sql = path)] function`");
             return match content {
-                Ok(content) => Some(Ok(format!("\n\
+                Ok(content) => Some(Ok(format!(
+                    "\n\
                         {sql_anchor_comment}\n\
                         {content}\
                     ",

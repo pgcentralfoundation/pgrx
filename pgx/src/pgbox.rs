@@ -129,14 +129,14 @@ impl<T> PgBox<T, AllocatedByPostgres> {
 }
 
 impl<T> PgBox<T, AllocatedByRust> {
-    /** 
+    /**
     Allocates memory in PostgreSQL and then places `val` into it.
-    
+
     This value is managed by Rust, so gets dropped via normal [`Drop`][std::ops::Drop]
     semantics.
-    
+
     If you need to give the boxed pointer to Postgres, call [`.into_pg()`][PgBox::into_pg].
-    
+
     ```rust,no_run
     use pgx::{PgBox, AllocatedByRust};
 
@@ -148,7 +148,7 @@ impl<T> PgBox<T, AllocatedByRust> {
 
     ptr.push(1);
     assert_eq!(*ptr, vec![1]);
-    
+
     ptr.push(2);
     assert_eq!(*ptr, vec![1, 2]);
 
@@ -158,19 +158,19 @@ impl<T> PgBox<T, AllocatedByRust> {
     let drained = ptr.drain(..).collect::<Vec<_>>();
     assert_eq!(drained, vec![1, 2, 3])
     ```
-    */ 
+    */
     pub fn new(val: T) -> PgBox<T, AllocatedByRust> {
         let ptr = Self::alloc0();
         unsafe { core::ptr::write(ptr.as_ptr(), val) };
         ptr
     }
 
-    /** 
+    /**
     Allocates memory in PostgreSQL and then places `val` into it.
-    
+
     This value is managed by Rust, so gets dropped via normal [`Drop`][std::ops::Drop]
     semantics.
-    
+
     If you need to give the boxed pointer to Postgres, call [`.into_pg()`][PgBox::into_pg].
 
     ```rust,no_run

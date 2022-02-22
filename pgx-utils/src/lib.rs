@@ -17,8 +17,8 @@ use syn::{GenericArgument, ItemFn, PathArguments, ReturnType, Type, TypeParamBou
 
 pub mod operator_common;
 pub mod pg_config;
-pub mod sql_entity_graph;
 mod pgx_pg_sys_stub;
+pub mod sql_entity_graph;
 pub use pgx_pg_sys_stub::PgxPgSysStub;
 
 #[doc(hidden)]

@@ -8,16 +8,10 @@ mod rewriter;
 use operators::{impl_postgres_eq, impl_postgres_hash, impl_postgres_ord};
 
 use pgx_utils::{
-    *,
     sql_entity_graph::{
-        PostgresType,
-        PostgresEnum,
-        ExtensionSqlFile,
-        ExtensionSql,
-        PgAggregate,
-        PgExtern,
-        Schema,
+        ExtensionSql, ExtensionSqlFile, PgAggregate, PgExtern, PostgresEnum, PostgresType, Schema,
     },
+    *,
 };
 use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span};

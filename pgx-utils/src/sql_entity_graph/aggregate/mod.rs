@@ -1,11 +1,11 @@
 mod aggregate_type;
+pub(crate) mod entity;
 mod maybe_variadic_type;
 mod options;
-pub(crate) mod entity;
 
-pub use options::{FinalizeModify, ParallelOption};
 pub use aggregate_type::{AggregateType, AggregateTypeList};
 pub use maybe_variadic_type::{MaybeNamedVariadicType, MaybeNamedVariadicTypeList};
+pub use options::{FinalizeModify, ParallelOption};
 
 use convert_case::{Case, Casing};
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
@@ -14,8 +14,7 @@ use syn::{
     parse::{Parse, ParseStream},
     parse_quote,
     spanned::Spanned,
-    ImplItemConst, ImplItemMethod, ImplItemType, ItemFn, ItemImpl, Path, Type,
-    Expr,
+    Expr, ImplItemConst, ImplItemMethod, ImplItemType, ItemFn, ItemImpl, Path, Type,
 };
 
 use crate::sql_entity_graph::ToSqlConfig;
@@ -89,7 +88,8 @@ pub struct PgAggregate {
 
 impl PgAggregate {
     pub fn new(mut item_impl: ItemImpl) -> Result<Self, syn::Error> {
-        let to_sql_config = ToSqlConfig::from_attributes(item_impl.attrs.as_slice())?.unwrap_or_default();
+        let to_sql_config =
+            ToSqlConfig::from_attributes(item_impl.attrs.as_slice())?.unwrap_or_default();
         let target_path = get_target_path(&item_impl)?;
         let target_ident = get_target_ident(&target_path)?;
         let snake_case_target_ident = Ident::new(
@@ -115,15 +115,15 @@ impl PgAggregate {
 
         let name = match get_impl_const_by_name(&item_impl_snapshot, "NAME") {
             Some(item_const) => match item_const.expr {
-                syn::Expr::Lit(ref expr) => if let syn::Lit::Str(_) = expr.lit {
-                    item_const.expr.clone()
-                } else {
-                    panic!(
-                        "`NAME` must be a `&'static str` for Aggregate implementations."
-                    )
-                },
-                _ => panic!("`NAME` must be a `&'static str` for Aggregate implementations.")
-            }
+                syn::Expr::Lit(ref expr) => {
+                    if let syn::Lit::Str(_) = expr.lit {
+                        item_const.expr.clone()
+                    } else {
+                        panic!("`NAME` must be a `&'static str` for Aggregate implementations.")
+                    }
+                }
+                _ => panic!("`NAME` must be a `&'static str` for Aggregate implementations."),
+            },
             None => {
                 item_impl.items.push(parse_quote! {
                     const NAME: &'static str = stringify!(Self);
@@ -131,13 +131,13 @@ impl PgAggregate {
                 parse_quote! {
                     stringify!(#target_ident)
                 }
-            },
+            }
         };
 
         // `State` is an optional value, we default to `Self`.
         let type_state = get_impl_type_by_name(&item_impl_snapshot, "State");
         let _type_state_value = type_state.map(|v| v.ty.clone());
-        
+
         let type_state_without_self = if let Some(inner) = type_state {
             let mut remapped = inner.ty.clone();
             remap_self_to_target(&mut remapped, &target_ident);
@@ -150,7 +150,10 @@ impl PgAggregate {
             remap_self_to_target(&mut remapped, &target_ident);
             remapped
         };
-        let type_stype = AggregateType { ty: type_state_without_self.clone(), name: Some("state".into()), };
+        let type_stype = AggregateType {
+            ty: type_state_without_self.clone(),
+            name: Some("state".into()),
+        };
 
         // `MovingState` is an optional value, we default to nothing.
         let type_moving_state = get_impl_type_by_name(&item_impl_snapshot, "MovingState");
@@ -171,28 +174,39 @@ impl PgAggregate {
                 type OrderedSetArgs = ();
             })
         }
-        let (direct_args_with_names, direct_arg_names) = if let Some(ref order_by_direct_args) = type_ordered_set_args_value {
-            let direct_args = order_by_direct_args
-                .found
-                .iter()
-                .map(|x| (x.name.clone(), x.ty.clone()))
-                .collect::<Vec<_>>();
-            let direct_arg_names = ARG_NAMES[0..direct_args.len()]
-                .iter()
-                .zip(direct_args.iter())
-                .map(|(default_name, (custom_name, _ty))| 
-                    Ident::new(&custom_name.clone().unwrap_or_else(|| default_name.to_string()), Span::mixed_site())
-                ).collect::<Vec<_>>();
-            let direct_args_with_names = direct_args.iter().zip(direct_arg_names.iter()).map(|(arg, name)| {
-                let arg_ty = &arg.1;
-                parse_quote! {
-                    #name: #arg_ty
-                }
-            }).collect::<Vec<syn::FnArg>>();
-            (direct_args_with_names, direct_arg_names)
-        } else {
-            (Vec::default(), Vec::default())
-        };
+        let (direct_args_with_names, direct_arg_names) =
+            if let Some(ref order_by_direct_args) = type_ordered_set_args_value {
+                let direct_args = order_by_direct_args
+                    .found
+                    .iter()
+                    .map(|x| (x.name.clone(), x.ty.clone()))
+                    .collect::<Vec<_>>();
+                let direct_arg_names = ARG_NAMES[0..direct_args.len()]
+                    .iter()
+                    .zip(direct_args.iter())
+                    .map(|(default_name, (custom_name, _ty))| {
+                        Ident::new(
+                            &custom_name
+                                .clone()
+                                .unwrap_or_else(|| default_name.to_string()),
+                            Span::mixed_site(),
+                        )
+                    })
+                    .collect::<Vec<_>>();
+                let direct_args_with_names = direct_args
+                    .iter()
+                    .zip(direct_arg_names.iter())
+                    .map(|(arg, name)| {
+                        let arg_ty = &arg.1;
+                        parse_quote! {
+                            #name: #arg_ty
+                        }
+                    })
+                    .collect::<Vec<syn::FnArg>>();
+                (direct_args_with_names, direct_arg_names)
+            } else {
+                (Vec::default(), Vec::default())
+            };
 
         // `Args` is an optional value, we default to nothing.
         let type_args = get_impl_type_by_name(&item_impl_snapshot, "Args").ok_or_else(|| {
@@ -212,7 +226,7 @@ impl PgAggregate {
         }
 
         let fn_state = get_impl_func_by_name(&item_impl_snapshot, "state");
-        
+
         let fn_state_name = if let Some(found) = fn_state {
             let fn_name = Ident::new(
                 &format!("{}_state", snake_case_target_ident),
@@ -227,9 +241,15 @@ impl PgAggregate {
             let arg_names = ARG_NAMES[0..args.len()]
                 .iter()
                 .zip(args.iter())
-                .map(|(default_name, (custom_name, _ty))| 
-                    Ident::new(&custom_name.clone().unwrap_or_else(|| default_name.to_string()), fn_state.span())
-                ).collect::<Vec<_>>();
+                .map(|(default_name, (custom_name, _ty))| {
+                    Ident::new(
+                        &custom_name
+                            .clone()
+                            .unwrap_or_else(|| default_name.to_string()),
+                        fn_state.span(),
+                    )
+                })
+                .collect::<Vec<_>>();
             let args_with_names = args.iter().zip(arg_names.iter()).map(|(arg, name)| {
                 let arg_ty = &arg.1;
                 quote! {
@@ -483,7 +503,6 @@ impl PgAggregate {
                         fcinfo,
                         move |_context| <#target_path as pgx::Aggregate>::moving_finalize(mstate, (#(#direct_arg_names),*), fcinfo)
                     )
-                    
                 }
             });
             Some(fn_name)
@@ -519,7 +538,8 @@ impl PgAggregate {
             )
             .and_then(get_const_litstr),
             const_ordered_set: get_impl_const_by_name(&item_impl_snapshot, "ORDERED_SET")
-                .and_then(get_const_litbool).unwrap_or(false),
+                .and_then(get_const_litbool)
+                .unwrap_or(false),
             const_sort_operator: get_impl_const_by_name(&item_impl_snapshot, "SORT_OPERATOR")
                 .and_then(get_const_litstr),
             const_moving_intial_condition: get_impl_const_by_name(
@@ -566,12 +586,14 @@ impl PgAggregate {
             target_ident.span(),
         );
 
-
         let name = &self.name;
         let type_args_iter = &self.type_args.entity_tokens();
         let type_order_by_args_iter = self.type_ordered_set_args.iter().map(|x| x.entity_tokens());
         let type_moving_state_iter = self.type_moving_state.iter();
-        let type_moving_state_string = self.type_moving_state.as_ref().map(|t| { t.to_token_stream().to_string().replace(" ", "") });
+        let type_moving_state_string = self
+            .type_moving_state
+            .as_ref()
+            .map(|t| t.to_token_stream().to_string().replace(" ", ""));
         let type_stype = self.type_stype.entity_tokens();
         let const_ordered_set = self.const_ordered_set;
         let const_parallel_iter = self.const_parallel.iter();
@@ -718,10 +740,10 @@ fn pg_extern_attr(item: &ImplItemMethod) -> syn::Attribute {
             Some(segment) if segment.ident.to_string() == "pgx" => {
                 found = Some(attr.tokens.clone());
                 break;
-            },
+            }
             _ => (),
         };
-    };
+    }
     match found {
         Some(args) => parse_quote! {
             #[pg_extern #args]
@@ -823,20 +845,22 @@ fn remap_self_to_target(ty: &mut syn::Type, target: &syn::Ident) {
                 if segment.ident.to_string() == "Self" {
                     segment.ident = target.clone()
                 }
-                use syn::{PathArguments, GenericArgument};
+                use syn::{GenericArgument, PathArguments};
                 match segment.arguments {
                     PathArguments::AngleBracketed(ref mut angle_args) => {
                         for arg in angle_args.args.iter_mut() {
                             match arg {
-                                GenericArgument::Type(inner_ty) => remap_self_to_target(inner_ty, target),
+                                GenericArgument::Type(inner_ty) => {
+                                    remap_self_to_target(inner_ty, target)
+                                }
                                 _ => (),
                             }
                         }
-                    },
+                    }
                     PathArguments::Parenthesized(_) => (),
                     PathArguments::None => (),
                 }
-            }  
+            }
         }
         _ => (),
     }
@@ -855,9 +879,7 @@ fn get_pgx_attr_macro(attr_name: impl AsRef<str>, ty: &syn::Type) -> Option<Toke
                     _ => (),
                 }
             }
-            if (ty_macro.mac.path.segments.len() == 1 && found_attr)
-                || (found_pgx && found_attr)
-            {
+            if (ty_macro.mac.path.segments.len() == 1 && found_attr) || (found_pgx && found_attr) {
                 Some(ty_macro.mac.tokens.clone())
             } else {
                 None

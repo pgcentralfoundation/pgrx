@@ -3,11 +3,7 @@
 
 extern crate proc_macro;
 
-use pgx_utils::{
-    categorize_return_type,
-    CategorizedType,
-    sql_entity_graph::PgExtern,
-};
+use pgx_utils::{categorize_return_type, sql_entity_graph::PgExtern, CategorizedType};
 use proc_macro2::{Ident, Span};
 use quote::{quote, quote_spanned, ToTokens};
 use std::ops::Deref;

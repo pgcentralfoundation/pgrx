@@ -1,5 +1,5 @@
 use pgx::*;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 
 #[derive(Copy, Clone, Default, Debug, PostgresType, Serialize, Deserialize)]
@@ -77,7 +77,7 @@ impl Aggregate for DemoUnique {
     fn combine(
         mut first: Self::State,
         mut second: Self::State,
-        _fcinfo: pg_sys::FunctionCallInfo
+        _fcinfo: pg_sys::FunctionCallInfo,
     ) -> Self::State {
         let first_inner = unsafe { first.get_or_insert_default::<HashSet<String>>() };
         let second_inner = unsafe { second.get_or_insert_default::<HashSet<String>>() };
@@ -89,7 +89,7 @@ impl Aggregate for DemoUnique {
     fn finalize(
         mut current: Self::State,
         _direct_args: Self::OrderedSetArgs,
-        _fcinfo: pg_sys::FunctionCallInfo
+        _fcinfo: pg_sys::FunctionCallInfo,
     ) -> Self::Finalize {
         let inner = unsafe { current.get_or_insert_default::<HashSet<String>>() };
 
@@ -140,30 +140,33 @@ mod tests {
     use crate as pgx_tests;
     use pgx::*;
 
-    
     #[pg_test]
     fn aggregate_demo_sum() {
-        let retval = Spi::get_one::<i32>(
-            "SELECT demo_sum(value) FROM UNNEST(ARRAY [1, 1, 2]) as value;"
-        ).expect("SQL select failed");
+        let retval =
+            Spi::get_one::<i32>("SELECT demo_sum(value) FROM UNNEST(ARRAY [1, 1, 2]) as value;")
+                .expect("SQL select failed");
         assert_eq!(retval, 4);
 
         // Moving-aggregate mode
-        let retval = Spi::get_one::<Vec<i32>>("
+        let retval = Spi::get_one::<Vec<i32>>(
+            "
             SELECT array_agg(calculated) FROM (
                 SELECT demo_sum(value) OVER (
                     ROWS BETWEEN 1 PRECEDING AND CURRENT ROW
                 ) as calculated FROM UNNEST(ARRAY [1, 20, 300, 4000]) as value
             ) as results;
-        ").expect("SQL select failed");
+        ",
+        )
+        .expect("SQL select failed");
         assert_eq!(retval, vec![1, 21, 320, 4300]);
     }
 
     #[pg_test]
     fn aggregate_demo_unique() {
         let retval = Spi::get_one::<i32>(
-            "SELECT DemoUnique(value) FROM UNNEST(ARRAY ['a', 'a', 'b']) as value;"
-        ).expect("SQL select failed");
+            "SELECT DemoUnique(value) FROM UNNEST(ARRAY ['a', 'a', 'b']) as value;",
+        )
+        .expect("SQL select failed");
         assert_eq!(retval, 2);
     }
 

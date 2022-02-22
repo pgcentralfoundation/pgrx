@@ -1,4 +1,4 @@
-use crate::sql_entity_graph::{ToSql, PgxSql};
+use crate::sql_entity_graph::{PgxSql, ToSql};
 
 /// Corresponds to the `PARALLEL` and `MFINALFUNC_MODIFY` in [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html).
 #[derive(Debug, Clone, Copy, Hash, PartialEq, Eq, PartialOrd, Ord)]

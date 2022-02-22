@@ -205,8 +205,10 @@ pub struct WithSizedTypeIds<T>(pub core::marker::PhantomData<T>);
 
 impl<T: 'static> WithSizedTypeIds<T> {
     pub const PG_BOX_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(TypeId::of::<PgBox<T>>()));
-    pub const PG_BOX_OPTION_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(TypeId::of::<PgBox<Option<T>>>()));
-    pub const PG_BOX_VEC_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(TypeId::of::<PgBox<Vec<T>>>()));
+    pub const PG_BOX_OPTION_ID: Lazy<Option<TypeId>> =
+        Lazy::new(|| Some(TypeId::of::<PgBox<Option<T>>>()));
+    pub const PG_BOX_VEC_ID: Lazy<Option<TypeId>> =
+        Lazy::new(|| Some(TypeId::of::<PgBox<Vec<T>>>()));
     pub const OPTION_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(TypeId::of::<Option<T>>()));
     pub const VEC_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(TypeId::of::<Vec<T>>()));
     pub const VEC_OPTION_ID: Lazy<Option<TypeId>> =
@@ -449,7 +451,8 @@ pub struct WithVarlenaTypeIds<T>(pub core::marker::PhantomData<T>);
 
 impl<T: Copy + 'static> WithVarlenaTypeIds<T> {
     pub const VARLENA_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(TypeId::of::<PgVarlena<T>>()));
-    pub const PG_BOX_VARLENA_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(TypeId::of::<PgBox<PgVarlena<T>>>()));
+    pub const PG_BOX_VARLENA_ID: Lazy<Option<TypeId>> =
+        Lazy::new(|| Some(TypeId::of::<PgBox<PgVarlena<T>>>()));
 
     pub fn register_varlena_with_refs(
         map: &mut std::collections::HashSet<RustSqlMapping>,

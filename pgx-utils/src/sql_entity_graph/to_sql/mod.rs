@@ -8,13 +8,9 @@ use syn::spanned::Spanned;
 use syn::{AttrStyle, Attribute, Lit};
 
 use crate::sql_entity_graph::{
-    SqlGraphEntity,
-    pgx_attribute::{
-        ArgValue,
-        PgxArg,
-        PgxAttribute
-    },
+    pgx_attribute::{ArgValue, PgxArg, PgxAttribute},
     pgx_sql::PgxSql,
+    SqlGraphEntity,
 };
 
 /// Able to be transformed into to SQL.
@@ -39,7 +35,6 @@ pub type ToSqlFn =
         &SqlGraphEntity,
         &PgxSql,
     ) -> std::result::Result<String, Box<dyn std::error::Error + Send + Sync + 'static>>;
-
 
 /// A parsed `sql` option from a `pgx` related procedural macro.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

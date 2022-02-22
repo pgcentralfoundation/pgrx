@@ -1,13 +1,9 @@
 use crate::sql_entity_graph::{
-    extension_sql::SqlDeclared,
-    positioning_ref::PositioningRef,
+    extension_sql::SqlDeclared, pgx_sql::PgxSql, positioning_ref::PositioningRef, to_sql::ToSql,
     SqlGraphEntity, SqlGraphIdentifier,
-    to_sql::ToSql,
-    pgx_sql::PgxSql,
 };
 
 use std::fmt::Display;
-
 
 /// The output of a [`ExtensionSql`](crate::sql_entity_graph::ExtensionSql) from `quote::ToTokens::to_tokens`.
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
@@ -25,10 +21,7 @@ pub struct ExtensionSqlEntity {
 }
 
 impl ExtensionSqlEntity {
-    pub fn has_sql_declared_entity(
-        &self,
-        identifier: &SqlDeclared,
-    ) -> Option<&SqlDeclaredEntity> {
+    pub fn has_sql_declared_entity(&self, identifier: &SqlDeclared) -> Option<&SqlDeclaredEntity> {
         self.creates
             .iter()
             .find(|created| created.has_sql_declared_entity(identifier))

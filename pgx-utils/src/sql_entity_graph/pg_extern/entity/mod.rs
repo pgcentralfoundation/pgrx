@@ -7,17 +7,13 @@ pub use operator::PgOperatorEntity;
 pub use returning::PgExternReturnEntity;
 
 use crate::{
-    ExternArgs,
     sql_entity_graph::{
-        pgx_sql::PgxSql,
         extension_sql::SqlDeclared,
-        SqlGraphEntity,
-        SqlGraphIdentifier,
-        to_sql::{
-            ToSql,
-            entity::ToSqlConfigEntity,
-        },
+        pgx_sql::PgxSql,
+        to_sql::{entity::ToSqlConfigEntity, ToSql},
+        SqlGraphEntity, SqlGraphIdentifier,
     },
+    ExternArgs,
 };
 
 use eyre::eyre;

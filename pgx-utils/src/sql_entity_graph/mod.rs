@@ -1,80 +1,40 @@
-pub(crate) mod pgx_sql;
 pub(crate) mod aggregate;
 pub(crate) mod control_file;
-pub(crate) mod schema;
-pub(crate) mod pg_extern;
 pub(crate) mod extension_sql;
-pub(crate) mod postgres_enum;
-pub(crate) mod postgres_type;
-pub(crate) mod postgres_ord;
-pub(crate) mod postgres_hash;
-pub(crate) mod pgx_attribute;
-pub(crate) mod positioning_ref;
 pub(crate) mod mapping;
+pub(crate) mod pg_extern;
+pub(crate) mod pgx_attribute;
+pub(crate) mod pgx_sql;
+pub(crate) mod positioning_ref;
+pub(crate) mod postgres_enum;
+pub(crate) mod postgres_hash;
+pub(crate) mod postgres_ord;
+pub(crate) mod postgres_type;
+pub(crate) mod schema;
 pub(crate) mod to_sql;
 
-pub use pgx_sql::PgxSql;
 pub use aggregate::{
-    PgAggregate,
-    AggregateType,
-    AggregateTypeList,
-    FinalizeModify,
-    ParallelOption,
-    entity::{
-        PgAggregateEntity,
-        AggregateTypeEntity,
-        MaybeVariadicAggregateTypeEntity,
-    },
+    entity::{AggregateTypeEntity, MaybeVariadicAggregateTypeEntity, PgAggregateEntity},
+    AggregateType, AggregateTypeList, FinalizeModify, ParallelOption, PgAggregate,
 };
 pub use control_file::ControlFile;
-pub use postgres_enum::{
-    PostgresEnum,
-    entity::PostgresEnumEntity,
-};
-pub use postgres_type::{
-    PostgresType,
-    entity::PostgresTypeEntity,
-};
-pub use pg_extern::{
-    PgExtern,
-    PgOperator,
-    NameMacro,
-    PgExternArgument,
-    entity::{
-        PgExternEntity,
-        PgExternArgumentEntity,
-        PgExternReturnEntity,
-        PgOperatorEntity
-    },
-};
-pub use postgres_hash::{
-    PostgresHash,
-    entity::PostgresHashEntity,
-};
-pub use postgres_ord::{
-    PostgresOrd,
-    entity::PostgresOrdEntity,
-};
-pub use schema::{
-    Schema,
-    entity::SchemaEntity,
-};
 pub use extension_sql::{
-    ExtensionSql,
-    ExtensionSqlFile,
-    SqlDeclared,
     entity::{ExtensionSqlEntity, SqlDeclaredEntity},
+    ExtensionSql, ExtensionSqlFile, SqlDeclared,
 };
-pub use to_sql::{
-    ToSql,
-    ToSqlConfig,
-    entity::ToSqlConfigEntity,
+pub use mapping::{RustSourceOnlySqlMapping, RustSqlMapping};
+pub use pg_extern::{
+    entity::{PgExternArgumentEntity, PgExternEntity, PgExternReturnEntity, PgOperatorEntity},
+    NameMacro, PgExtern, PgExternArgument, PgOperator,
 };
-pub use mapping::{
-    RustSourceOnlySqlMapping,
-    RustSqlMapping,
-};
+pub use pgx_sql::PgxSql;
 pub use positioning_ref::PositioningRef;
+pub use postgres_enum::{entity::PostgresEnumEntity, PostgresEnum};
+pub use postgres_hash::{entity::PostgresHashEntity, PostgresHash};
+pub use postgres_ord::{entity::PostgresOrdEntity, PostgresOrd};
+pub use postgres_type::{entity::PostgresTypeEntity, PostgresType};
+pub use schema::{entity::SchemaEntity, Schema};
+pub use to_sql::{entity::ToSqlConfigEntity, ToSql, ToSqlConfig};
 
 pub use crate::ExternArgs;
 
@@ -98,7 +58,6 @@ pub trait SqlGraphIdentifier {
     fn line(&self) -> Option<u32>;
 }
 
-
 /// An entity corresponding to some SQL required by the extension.
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub enum SqlGraphEntity {
@@ -121,7 +80,8 @@ impl SqlGraphEntity {
         } else {
             String::default()
         };
-        format!("\
+        format!(
+            "\
             {maybe_file_and_line}\
             -- {rust_identifier}\
         ",

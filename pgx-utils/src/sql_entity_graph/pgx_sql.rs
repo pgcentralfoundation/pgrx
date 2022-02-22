@@ -11,17 +11,16 @@ use crate::sql_entity_graph::{
         entity::{ExtensionSqlEntity, SqlDeclaredEntity},
         SqlDeclared,
     },
+    mapping::{RustSourceOnlySqlMapping, RustSqlMapping},
     pg_extern::entity::{PgExternEntity, PgExternReturnEntity},
+    positioning_ref::PositioningRef,
     postgres_enum::entity::PostgresEnumEntity,
-    postgres_type::entity::PostgresTypeEntity,
     postgres_hash::entity::PostgresHashEntity,
     postgres_ord::entity::PostgresOrdEntity,
+    postgres_type::entity::PostgresTypeEntity,
     schema::entity::SchemaEntity,
-    mapping::{RustSourceOnlySqlMapping, RustSqlMapping},
-    SqlGraphEntity,
-    SqlGraphIdentifier,
     to_sql::ToSql,
-    positioning_ref::PositioningRef,
+    SqlGraphEntity, SqlGraphIdentifier,
 };
 
 /// A generator for SQL.
@@ -1078,14 +1077,22 @@ fn connect_ords(
         );
 
         for (extern_item, &extern_index) in externs {
-            let fn_matches = |fn_name| item.module_path == extern_item.module_path && extern_item.name == fn_name;
+            let fn_matches = |fn_name| {
+                item.module_path == extern_item.module_path && extern_item.name == fn_name
+            };
             let cmp_fn_matches = fn_matches(item.cmp_fn_name());
             let lt_fn_matches = fn_matches(item.lt_fn_name());
             let lte_fn_matches = fn_matches(item.le_fn_name());
             let eq_fn_matches = fn_matches(item.eq_fn_name());
             let gt_fn_matches = fn_matches(item.gt_fn_name());
             let gte_fn_matches = fn_matches(item.ge_fn_name());
-            if cmp_fn_matches || lt_fn_matches || lte_fn_matches || eq_fn_matches || gt_fn_matches || gte_fn_matches {
+            if cmp_fn_matches
+                || lt_fn_matches
+                || lte_fn_matches
+                || eq_fn_matches
+                || gt_fn_matches
+                || gte_fn_matches
+            {
                 tracing::debug!(from = ?item.full_path, to = extern_item.full_path, "Adding Ord after Extern edge");
                 graph.add_edge(extern_index, index, SqlGraphRelationship::RequiredBy);
             }
@@ -1139,10 +1146,11 @@ fn connect_hashes(
             types,
             enums,
         );
-        
+
         for (extern_item, &extern_index) in externs {
             let hash_fn_name = item.fn_name();
-            let hash_fn_matches = item.module_path == extern_item.module_path && extern_item.name == hash_fn_name;
+            let hash_fn_matches =
+                item.module_path == extern_item.module_path && extern_item.name == hash_fn_name;
 
             if hash_fn_matches {
                 tracing::debug!(from = ?item.full_path, to = extern_item.full_path, "Adding Hash after Extern edge");

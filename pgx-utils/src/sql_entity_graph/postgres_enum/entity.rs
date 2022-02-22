@@ -1,9 +1,8 @@
 use crate::sql_entity_graph::{
-    SqlGraphEntity,
-    SqlGraphIdentifier,
-    to_sql::{ToSql, entity::ToSqlConfigEntity},
     mapping::RustSqlMapping,
     pgx_sql::PgxSql,
+    to_sql::{entity::ToSqlConfigEntity, ToSql},
+    SqlGraphEntity, SqlGraphIdentifier,
 };
 
 use std::{

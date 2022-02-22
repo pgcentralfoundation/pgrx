@@ -1,5 +1,5 @@
-use crate::sql_entity_graph::NameMacro;
 use super::get_pgx_attr_macro;
+use crate::sql_entity_graph::NameMacro;
 
 use proc_macro2::TokenStream as TokenStream2;
 use quote::ToTokens;
@@ -64,19 +64,16 @@ pub struct AggregateType {
 
 impl AggregateType {
     pub fn new(ty: syn::Type) -> Result<Self, syn::Error> {
-        let name_tokens =  get_pgx_attr_macro("name", &ty);
+        let name_tokens = get_pgx_attr_macro("name", &ty);
         let name = match name_tokens {
             Some(tokens) => {
-                let name_macro = syn::parse2::<NameMacro>(tokens)
-                    .expect("Could not parse `name!()` macro");
+                let name_macro =
+                    syn::parse2::<NameMacro>(tokens).expect("Could not parse `name!()` macro");
                 Some(name_macro.ident)
-            },
+            }
             None => None,
         };
-        let retval = Self {
-            name,
-            ty,
-        };
+        let retval = Self { name, ty };
         Ok(retval)
     }
 

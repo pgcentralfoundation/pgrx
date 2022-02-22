@@ -1,9 +1,8 @@
 use crate::sql_entity_graph::{
     aggregate::options::{FinalizeModify, ParallelOption},
-    SqlGraphEntity,
-    SqlGraphIdentifier,
     pgx_sql::PgxSql,
-    to_sql::{ToSql, entity::ToSqlConfigEntity},
+    to_sql::{entity::ToSqlConfigEntity, ToSql},
+    SqlGraphEntity, SqlGraphIdentifier,
 };
 use core::{any::TypeId, cmp::Ordering};
 use eyre::eyre as eyre_err;
@@ -33,7 +32,7 @@ pub struct PgAggregateEntity {
     pub name: &'static str,
 
     /// If the aggregate is an ordered set aggregate.
-    /// 
+    ///
     /// See [the PostgreSQL ordered set docs](https://www.postgresql.org/docs/current/xaggr.html#XAGGR-ORDERED-SET-AGGREGATES).
     pub ordered_set: bool,
 
@@ -415,11 +414,7 @@ impl ToSql for PgAggregateEntity {
             } else {
                 String::default()
             },
-            maybe_order_by = if self.ordered_set {
-                "\tORDER BY"
-            } else {
-                ""
-            },
+            maybe_order_by = if self.ordered_set { "\tORDER BY" } else { "" },
             optional_attributes = if optional_attributes.len() == 0 {
                 String::from("\n")
             } else {

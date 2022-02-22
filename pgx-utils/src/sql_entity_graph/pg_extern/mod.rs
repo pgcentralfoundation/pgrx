@@ -1,19 +1,19 @@
-pub mod entity;
 mod argument;
 mod attribute;
+pub mod entity;
 mod operator;
 mod returning;
 mod search_path;
 
-pub use operator::PgOperator;
 pub use argument::PgExternArgument;
+pub use operator::PgOperator;
 pub use returning::NameMacro;
 
 use crate::sql_entity_graph::ToSqlConfig;
+use attribute::Attribute;
 use operator::{PgxOperatorAttributeWithIdent, PgxOperatorOpName};
 use returning::Returning;
 use search_path::SearchPathList;
-use attribute::Attribute;
 
 use eyre::WrapErr;
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
@@ -22,8 +22,7 @@ use std::convert::TryFrom;
 use syn::{
     parse::{Parse, ParseStream, Parser},
     punctuated::Punctuated,
-    Meta,
-    Token,
+    Meta, Token,
 };
 
 /// A parsed `#[pg_extern]` item.
@@ -209,7 +208,7 @@ impl PgExtern {
         }
 
         let func = syn::parse2::<syn::ItemFn>(item)?;
-        
+
         if let Some(ref mut to_sql_config) = to_sql_config {
             if let Some(ref mut content) = to_sql_config.content {
                 let value = content.value();
@@ -235,7 +234,9 @@ impl ToTokens for PgExtern {
         let name = self.name();
         let schema = self.schema();
         let schema_iter = schema.iter();
-        let extern_attrs = self.attrs.iter()
+        let extern_attrs = self
+            .attrs
+            .iter()
             .map(|attr| attr.to_sql_entity_graph_tokens())
             .collect::<Punctuated<_, Token![,]>>();
         let search_path = self.search_path().into_iter();

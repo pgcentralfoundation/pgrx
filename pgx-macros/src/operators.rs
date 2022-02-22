@@ -1,9 +1,6 @@
 use pgx_utils::{
     operator_common::*,
-    sql_entity_graph::{
-        PostgresOrd,
-        PostgresHash,
-    },
+    sql_entity_graph::{PostgresHash, PostgresOrd},
 };
 
 use quote::ToTokens;

@@ -49,7 +49,15 @@ impl CommandExecute for Install {
         let pg_version = format!("pg{}", pg_config.major_version()?);
         let features = crate::manifest::features_for_version(self.features, &manifest, &pg_version);
 
-        install_extension(&manifest, &pg_config, self.release, self.test, self.no_schema, None, &features)
+        install_extension(
+            &manifest,
+            &pg_config,
+            self.release,
+            self.test,
+            self.no_schema,
+            None,
+            &features,
+        )
     }
 }
 
@@ -118,7 +126,15 @@ pub(crate) fn install_extension(
     }
 
     if !no_schema || !get_target_sql_file(&extdir, &base_directory)?.exists() {
-        copy_sql_files(manifest, pg_config, is_release, is_test, features, &extdir, &base_directory)?;
+        copy_sql_files(
+            manifest,
+            pg_config,
+            is_release,
+            is_test,
+            features,
+            &extdir,
+            &base_directory,
+        )?;
     } else {
         println!("{} schema generation", "    Skipping".bold().yellow());
     }
@@ -188,7 +204,7 @@ pub(crate) fn build_extension(
     if features.all_features {
         command.arg("--all-features");
     }
-    
+
     command.arg("--message-format=json");
 
     for arg in flags.split_ascii_whitespace() {
@@ -265,7 +281,10 @@ fn copy_sql_files(
 }
 
 #[tracing::instrument(level = "error", skip_all)]
-pub(crate) fn find_library_file(manifest: &cargo_toml::Manifest, build_command_output: std::process::Output) -> eyre::Result<PathBuf> {
+pub(crate) fn find_library_file(
+    manifest: &cargo_toml::Manifest,
+    build_command_output: std::process::Output,
+) -> eyre::Result<PathBuf> {
     let crate_name = if let Some(ref package) = manifest.package {
         &package.name
     } else {
@@ -273,19 +292,25 @@ pub(crate) fn find_library_file(manifest: &cargo_toml::Manifest, build_command_o
     };
 
     let build_command_bytes = build_command_output.stdout;
-    let build_command_stream = serde_json::Deserializer::from_slice(&build_command_bytes).into_iter::<serde_json::Value>();
-
+    let build_command_stream =
+        serde_json::Deserializer::from_slice(&build_command_bytes).into_iter::<serde_json::Value>();
 
     let mut library_file = None;
     for stdout_stream_item in build_command_stream {
         let stdout_stream_item = stdout_stream_item?;
         if let Some(stdout_stream_object) = stdout_stream_item.as_object() {
-            if let Some(package_id) = stdout_stream_object.get("package_id").and_then(serde_json::Value::as_str) {
+            if let Some(package_id) = stdout_stream_object
+                .get("package_id")
+                .and_then(serde_json::Value::as_str)
+            {
                 if !package_id.starts_with(&(crate_name.to_owned() + " ")) {
-                    continue
+                    continue;
                 }
             }
-            if let Some(filenames) = stdout_stream_object.get("filenames").and_then(serde_json::Value::as_array) {
+            if let Some(filenames) = stdout_stream_object
+                .get("filenames")
+                .and_then(serde_json::Value::as_array)
+            {
                 for filename in filenames {
                     if let Some(filename) = filename.as_str() {
                         let so_extension = if cfg!(target_os = "macos") {
@@ -294,7 +319,7 @@ pub(crate) fn find_library_file(manifest: &cargo_toml::Manifest, build_command_o
                             ".so"
                         };
                         if filename.ends_with(so_extension) {
-                            library_file = Some(filename.to_string());      
+                            library_file = Some(filename.to_string());
                             break;
                         }
                     }
@@ -302,7 +327,8 @@ pub(crate) fn find_library_file(manifest: &cargo_toml::Manifest, build_command_o
             }
         }
     }
-    let library_file = library_file.ok_or(eyre!("Could not get shared object file from Cargo output."))?;
+    let library_file =
+        library_file.ok_or(eyre!("Could not get shared object file from Cargo output."))?;
     let library_file_path = PathBuf::from(library_file);
 
     Ok(library_file_path)

@@ -1,9 +1,4 @@
-use crate::sql_entity_graph::{
-    SqlGraphEntity,
-    SqlGraphIdentifier,
-    to_sql::ToSql,
-    pgx_sql::PgxSql,
-};
+use crate::sql_entity_graph::{pgx_sql::PgxSql, to_sql::ToSql, SqlGraphEntity, SqlGraphIdentifier};
 
 use std::cmp::Ordering;
 

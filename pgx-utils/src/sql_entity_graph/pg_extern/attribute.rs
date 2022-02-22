@@ -1,7 +1,4 @@
-use crate::sql_entity_graph::{
-    positioning_ref::PositioningRef,
-    to_sql::ToSqlConfig,
-};
+use crate::sql_entity_graph::{positioning_ref::PositioningRef, to_sql::ToSqlConfig};
 use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
 use syn::{
@@ -68,7 +65,7 @@ impl Attribute {
             }
             // This attribute is handled separately
             Attribute::Sql(_) => {
-                quote! { }
+                quote! {}
             }
         }
     }
@@ -176,7 +173,17 @@ impl Parse for Attribute {
                     }
                 }
             }
-            e => return Err(syn::Error::new(Span::call_site(), format!("Invalid option `{}` inside `{} {}`", e, ident.to_string(), input.to_string()))),
+            e => {
+                return Err(syn::Error::new(
+                    Span::call_site(),
+                    format!(
+                        "Invalid option `{}` inside `{} {}`",
+                        e,
+                        ident.to_string(),
+                        input.to_string()
+                    ),
+                ))
+            }
         };
         Ok(found)
     }

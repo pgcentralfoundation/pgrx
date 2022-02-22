@@ -1,5 +1,6 @@
 pub mod entity;
 
+use crate::sql_entity_graph::ToSqlConfig;
 use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
 use syn::{
@@ -7,7 +8,6 @@ use syn::{
     DeriveInput, Generics, ItemEnum,
 };
 use syn::{punctuated::Punctuated, Ident, Token};
-use crate::sql_entity_graph::ToSqlConfig;
 
 /// A parsed `#[derive(PostgresEnum)]` item.
 ///

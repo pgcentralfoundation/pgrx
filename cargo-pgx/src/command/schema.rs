@@ -6,12 +6,7 @@ use colored::Colorize;
 use eyre::{eyre, WrapErr};
 use pgx_utils::{
     pg_config::{PgConfig, Pgx},
-    sql_entity_graph::{
-        SqlGraphEntity,
-        PgxSql,
-        RustSourceOnlySqlMapping,
-        RustSqlMapping,
-    },
+    sql_entity_graph::{PgxSql, RustSourceOnlySqlMapping, RustSqlMapping, SqlGraphEntity},
     PgxPgSysStub,
 };
 use std::{
@@ -139,7 +134,8 @@ pub(crate) fn generate_schema(
     log_level: Option<String>,
 ) -> eyre::Result<()> {
     let (control_file, _extname) = find_control_file()?;
-    let package_name = &manifest.package
+    let package_name = &manifest
+        .package
         .as_ref()
         .ok_or_else(|| eyre!("Could not find crate name in Cargo.toml."))?
         .name;
@@ -153,7 +149,6 @@ pub(crate) fn generate_schema(
 
     let flags = std::env::var("PGX_BUILD_FLAGS").unwrap_or_default();
 
-    
     let mut target_dir_with_profile = pgx_utils::get_target_dir()?;
     target_dir_with_profile.push(if is_release { "release" } else { "debug" });
 
@@ -209,29 +204,41 @@ pub(crate) fn generate_schema(
     }
 
     let cargo_stdout_bytes = cargo_output.stdout;
-    let cargo_stdout_stream = serde_json::Deserializer::from_slice(&cargo_stdout_bytes).into_iter::<serde_json::Value>();
+    let cargo_stdout_stream =
+        serde_json::Deserializer::from_slice(&cargo_stdout_bytes).into_iter::<serde_json::Value>();
 
     let mut pgx_pg_sys_out_dir = None;
     for stdout_stream_item in cargo_stdout_stream {
         let stdout_stream_item = stdout_stream_item?;
         if let Some(stdout_stream_object) = stdout_stream_item.as_object() {
-            if let Some(reason) = stdout_stream_object.get("reason").and_then(serde_json::Value::as_str) {
+            if let Some(reason) = stdout_stream_object
+                .get("reason")
+                .and_then(serde_json::Value::as_str)
+            {
                 if reason != "build-script-executed" {
-                    continue
+                    continue;
                 }
             }
-            if let Some(package_id) = stdout_stream_object.get("package_id").and_then(serde_json::Value::as_str) {
+            if let Some(package_id) = stdout_stream_object
+                .get("package_id")
+                .and_then(serde_json::Value::as_str)
+            {
                 if !package_id.starts_with("pgx-pg-sys") {
-                    continue
+                    continue;
                 }
             }
-            if let Some(out_dir) = stdout_stream_object.get("out_dir").and_then(serde_json::Value::as_str) {
+            if let Some(out_dir) = stdout_stream_object
+                .get("out_dir")
+                .and_then(serde_json::Value::as_str)
+            {
                 pgx_pg_sys_out_dir = Some(out_dir.to_string());
                 break;
             }
         }
     }
-    let pgx_pg_sys_out_dir = pgx_pg_sys_out_dir.ok_or(eyre!("Could not get `pgx-pg-sys` `out_dir` from Cargo output."))?;
+    let pgx_pg_sys_out_dir = pgx_pg_sys_out_dir.ok_or(eyre!(
+        "Could not get `pgx-pg-sys` `out_dir` from Cargo output."
+    ))?;
     let pgx_pg_sys_out_dir = PathBuf::from(pgx_pg_sys_out_dir);
 
     let pg_version = pg_config.major_version()?;
@@ -239,7 +246,7 @@ pub(crate) fn generate_schema(
     let mut pgx_pg_sys_stub_file = pgx_pg_sys_out_dir.clone();
     pgx_pg_sys_stub_file.push("stubs");
     pgx_pg_sys_stub_file.push(&format!("pg{}_stub.rs", pg_version));
-    
+
     let mut pgx_pg_sys_file = PathBuf::from(&pgx_pg_sys_out_dir);
     pgx_pg_sys_file.push(&format!("pg{}.rs", pg_version));
 
@@ -249,28 +256,31 @@ pub(crate) fn generate_schema(
             output = %pgx_pg_sys_stub_file.display(),
             "Creating stub of appropriate PostgreSQL symbols"
         );
-        PgxPgSysStub::from_file(&pgx_pg_sys_file)?
-            .write_to_file(&pgx_pg_sys_stub_file)?;
+        PgxPgSysStub::from_file(&pgx_pg_sys_file)?.write_to_file(&pgx_pg_sys_stub_file)?;
     }
-    
+
     let mut pgx_pg_sys_stub_built = pgx_pg_sys_out_dir.clone();
     pgx_pg_sys_stub_built.push("stubs");
     pgx_pg_sys_stub_built.push(format!("pg{}_stub.so", pg_version));
-    
+
     if !pgx_pg_sys_stub_built.exists() {
         let mut so_rustc_invocation = Command::new("rustc");
         so_rustc_invocation.args([
-                "--crate-type", "cdylib",
-                "-o", pgx_pg_sys_stub_built.to_str().unwrap(),
-                pgx_pg_sys_stub_file.to_str().unwrap(),
-            ]);
+            "--crate-type",
+            "cdylib",
+            "-o",
+            pgx_pg_sys_stub_built.to_str().unwrap(),
+            pgx_pg_sys_stub_file.to_str().unwrap(),
+        ]);
         let so_rustc_invocation_str = format!("{:?}", so_rustc_invocation);
         tracing::debug!(command = %so_rustc_invocation_str, "Running");
-        let output = so_rustc_invocation.output()
-            .wrap_err_with(||
-                eyre!("Could not invoke `rustc` on {}", &pgx_pg_sys_stub_file.display())
-            )?;
-    
+        let output = so_rustc_invocation.output().wrap_err_with(|| {
+            eyre!(
+                "Could not invoke `rustc` on {}",
+                &pgx_pg_sys_stub_file.display()
+            )
+        })?;
+
         let code = output.status.code().unwrap();
         tracing::trace!(status_code = %code, command = %so_rustc_invocation_str, "Finished");
     }
@@ -284,14 +294,20 @@ pub(crate) fn generate_schema(
         ".so"
     };
 
-    lib_so.push(&format!("lib{}{}", package_name.replace("-", "_"), so_extension));
+    lib_so.push(&format!(
+        "lib{}{}",
+        package_name.replace("-", "_"),
+        so_extension
+    ));
 
     println!("{} SQL entities", " Discovering".bold().green(),);
     let dsym_path = lib_so.resolve_dsym();
-    let buffer = ByteView::open(dsym_path.as_deref().unwrap_or(&lib_so))
-        .wrap_err_with(||
-            eyre!("Could not get byte view into {}", &dsym_path.as_deref().unwrap_or(&lib_so).display())
-        )?;
+    let buffer = ByteView::open(dsym_path.as_deref().unwrap_or(&lib_so)).wrap_err_with(|| {
+        eyre!(
+            "Could not get byte view into {}",
+            &dsym_path.as_deref().unwrap_or(&lib_so).display()
+        )
+    })?;
     let archive = Archive::parse(&buffer).expect("Could not parse archive");
 
     // Some users reported experiencing duplicate entries if we don't ensure `fns_to_call`
@@ -385,34 +401,39 @@ pub(crate) fn generate_schema(
         let _pgx_pg_sys = libloading::os::unix::Library::open(
             Some(&pgx_pg_sys_stub_built),
             libloading::os::unix::RTLD_NOW | libloading::os::unix::RTLD_GLOBAL,
-        ).expect(&format!("Couldn't libload {}", pgx_pg_sys_stub_built.display()));
+        )
+        .expect(&format!(
+            "Couldn't libload {}",
+            pgx_pg_sys_stub_built.display()
+        ));
 
-        let lib = libloading::os::unix::Library::open(
-            Some(&lib_so),
-            libloading::os::unix::RTLD_LAZY,
-        ).expect(&format!("Couldn't libload {}", lib_so.display()));
+        let lib =
+            libloading::os::unix::Library::open(Some(&lib_so), libloading::os::unix::RTLD_LAZY)
+                .expect(&format!("Couldn't libload {}", lib_so.display()));
 
         let typeid_sql_mappings_symbol: libloading::os::unix::Symbol<
-            unsafe extern fn() -> &'static std::collections::HashSet<RustSqlMapping>
-        > = lib.get("__pgx_typeid_sql_mappings".as_bytes()).expect(&format!("Couldn't call __pgx_typeid_sql_mappings"));
+            unsafe extern "C" fn() -> &'static std::collections::HashSet<RustSqlMapping>,
+        > = lib
+            .get("__pgx_typeid_sql_mappings".as_bytes())
+            .expect(&format!("Couldn't call __pgx_typeid_sql_mappings"));
         typeid_sql_mapping = typeid_sql_mappings_symbol();
         let source_only_sql_mapping_symbol: libloading::os::unix::Symbol<
-            unsafe extern fn() -> &'static std::collections::HashSet<RustSourceOnlySqlMapping>
-        > = lib.get("__pgx_source_only_sql_mappings".as_bytes()).expect(&format!("Couldn't call __pgx_source_only_sql_mappings"));
+            unsafe extern "C" fn() -> &'static std::collections::HashSet<RustSourceOnlySqlMapping>,
+        > = lib
+            .get("__pgx_source_only_sql_mappings".as_bytes())
+            .expect(&format!("Couldn't call __pgx_source_only_sql_mappings"));
         source_only_sql_mapping = source_only_sql_mapping_symbol();
 
-        let symbol: libloading::os::unix::Symbol<
-            unsafe extern fn() -> SqlGraphEntity
-        > = lib.get("__pgx_marker".as_bytes()).expect(&format!("Couldn't call __pgx_marker"));
+        let symbol: libloading::os::unix::Symbol<unsafe extern "C" fn() -> SqlGraphEntity> = lib
+            .get("__pgx_marker".as_bytes())
+            .expect(&format!("Couldn't call __pgx_marker"));
         let control_file_entity = symbol();
-        entities.push(
-            control_file_entity
-        );
+        entities.push(control_file_entity);
 
         for symbol_to_call in fns_to_call {
-            let symbol: libloading::os::unix::Symbol<
-                unsafe extern fn() -> SqlGraphEntity
-            > = lib.get(symbol_to_call.as_bytes()).expect(&format!("Couldn't call {:#?}", symbol_to_call));
+            let symbol: libloading::os::unix::Symbol<unsafe extern "C" fn() -> SqlGraphEntity> =
+                lib.get(symbol_to_call.as_bytes())
+                    .expect(&format!("Couldn't call {:#?}", symbol_to_call));
             let entity = symbol();
             entities.push(entity);
         }
@@ -421,11 +442,13 @@ pub(crate) fn generate_schema(
     let pgx_sql = PgxSql::build(
         typeid_sql_mapping.clone().into_iter(),
         source_only_sql_mapping.clone().into_iter(),
-        entities.into_iter()
-    ).unwrap();
+        entities.into_iter(),
+    )
+    .unwrap();
 
     tracing::debug!("Writing SQL");
-    pgx_sql.to_file(path)
+    pgx_sql
+        .to_file(path)
         .wrap_err_with(|| eyre!("Could not write SQL to {}", path.display()))?;
 
     if let Some(dot_path) = dot {

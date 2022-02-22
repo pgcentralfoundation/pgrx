@@ -1,8 +1,8 @@
 use crate::sql_entity_graph::{
-    SqlGraphEntity, SqlGraphIdentifier,
-    to_sql::{ToSql, entity::ToSqlConfigEntity},
     mapping::RustSqlMapping,
     pgx_sql::PgxSql,
+    to_sql::{entity::ToSqlConfigEntity, ToSql},
+    SqlGraphEntity, SqlGraphIdentifier,
 };
 
 use eyre::eyre;
@@ -10,7 +10,6 @@ use std::{
     cmp::Ordering,
     hash::{Hash, Hasher},
 };
-
 
 /// The output of a [`PostgresType`](crate::sql_entity_graph::postgres_type::PostgresType) from `quote::ToTokens::to_tokens`.
 #[derive(Debug, Clone, PartialEq, Eq)]

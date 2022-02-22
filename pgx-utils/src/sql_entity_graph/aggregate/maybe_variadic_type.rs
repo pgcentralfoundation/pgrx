@@ -1,5 +1,5 @@
-use crate::sql_entity_graph::pg_extern::NameMacro;
 use super::get_pgx_attr_macro;
+use crate::sql_entity_graph::pg_extern::NameMacro;
 
 use proc_macro2::TokenStream as TokenStream2;
 use quote::ToTokens;
@@ -66,19 +66,17 @@ pub struct MaybeNamedVariadicType {
 
 impl MaybeNamedVariadicType {
     pub fn new(ty: syn::Type) -> Result<Self, syn::Error> {
-        let name_inner =  get_pgx_attr_macro("name", &ty);
-        
+        let name_inner = get_pgx_attr_macro("name", &ty);
+
         let (name, variadic_ty, ty) = match name_inner {
             Some(name_inner) => {
-                let name_macro: NameMacro = syn::parse2(name_inner)
-                    .expect("Could not parse `name!()` macro");
+                let name_macro: NameMacro =
+                    syn::parse2(name_inner).expect("Could not parse `name!()` macro");
                 let variadic = get_pgx_attr_macro("variadic", &name_macro.ty);
                 // Since `pg_extern` doesn't take `name!()` we unwrap it.
                 (Some(name_macro.ident), variadic, name_macro.ty)
-            },
-            None => {
-                (None, get_pgx_attr_macro("variadic", &ty), ty)
             }
+            None => (None, get_pgx_attr_macro("variadic", &ty), ty),
         };
 
         let variadic_ty = if let Some(variadic_ty) = variadic_ty {
@@ -87,7 +85,11 @@ impl MaybeNamedVariadicType {
             None
         };
 
-        let retval = Self { ty, variadic_ty, name };
+        let retval = Self {
+            ty,
+            variadic_ty,
+            name,
+        };
         Ok(retval)
     }
 
