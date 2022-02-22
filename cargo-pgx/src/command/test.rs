@@ -133,6 +133,10 @@ pub fn test_extension(
         )
         .env("PGX_NO_SCHEMA", if no_schema { "true" } else { "false" });
 
+    if let Ok(rust_log) = std::env::var("RUST_LOG") {
+        command.env("RUST_LOG", rust_log);
+    }
+
     if !features_arg.trim().is_empty() {
         command.arg("--features");
         command.arg(&features_arg);

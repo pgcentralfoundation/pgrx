@@ -208,7 +208,6 @@ pub(crate) fn generate_schema(
         return Err(eyre!("failed to build SQL generator"));
     }
 
-    println!("{} `pgx-pg-sys` stubs to `dlopen` during SQL entity discovery", "    Creating".bold().green());
     let cargo_stdout_bytes = cargo_output.stdout;
     let cargo_stdout_stream = serde_json::Deserializer::from_slice(&cargo_stdout_bytes).into_iter::<serde_json::Value>();
 
@@ -236,38 +235,45 @@ pub(crate) fn generate_schema(
     let pgx_pg_sys_out_dir = PathBuf::from(pgx_pg_sys_out_dir);
 
     let pg_version = pg_config.major_version()?;
-    let pg_version_file_name = format!("pg{}.rs", pg_version);
     // Create stubbed `pgx_pg_sys` bindings for the generator to link with.
-    let mut pgx_pg_sys_stub_file = target_dir_with_profile.clone();
-    pgx_pg_sys_stub_file.push("pg_sys_stub");
-    pgx_pg_sys_stub_file.push(&pg_version_file_name);
+    let mut pgx_pg_sys_stub_file = pgx_pg_sys_out_dir.clone();
+    pgx_pg_sys_stub_file.push("stubs");
+    pgx_pg_sys_stub_file.push(&format!("pg{}_stub.rs", pg_version));
     
-    let mut pgx_pg_sys_file = PathBuf::from(pgx_pg_sys_out_dir);
-    pgx_pg_sys_file.push(&pg_version_file_name);
+    let mut pgx_pg_sys_file = PathBuf::from(&pgx_pg_sys_out_dir);
+    pgx_pg_sys_file.push(&format!("pg{}.rs", pg_version));
 
-    PgxPgSysStub::from_file(&pgx_pg_sys_file)?
-        .write_to_file(&pgx_pg_sys_stub_file)?;
+    if !pgx_pg_sys_stub_file.exists() {
+        tracing::debug!(
+            input = %pgx_pg_sys_file.display(),
+            output = %pgx_pg_sys_stub_file.display(),
+            "Creating stub of appropriate PostgreSQL symbols"
+        );
+        PgxPgSysStub::from_file(&pgx_pg_sys_file)?
+            .write_to_file(&pgx_pg_sys_stub_file)?;
+    }
     
-    let mut pgx_pg_sys_stub_built = target_dir_with_profile.clone();
-    pgx_pg_sys_stub_built.push("pg_sys_stub");
-    pgx_pg_sys_stub_built.push("pgx_pg_sys_stub.so");
+    let mut pgx_pg_sys_stub_built = pgx_pg_sys_out_dir.clone();
+    pgx_pg_sys_stub_built.push("stubs");
+    pgx_pg_sys_stub_built.push(format!("pg{}_stub.so", pg_version));
     
-    let mut so_rustc_invocation = Command::new("rustc");
-    so_rustc_invocation.args([
-            "--crate-type", "cdylib",
-            "-o", pgx_pg_sys_stub_built.to_str().unwrap(),
-            pgx_pg_sys_stub_file.to_str().unwrap(),
-        ]);
+    if !pgx_pg_sys_stub_built.exists() {
+        let mut so_rustc_invocation = Command::new("rustc");
+        so_rustc_invocation.args([
+                "--crate-type", "cdylib",
+                "-o", pgx_pg_sys_stub_built.to_str().unwrap(),
+                pgx_pg_sys_stub_file.to_str().unwrap(),
+            ]);
+        let so_rustc_invocation_str = format!("{:?}", so_rustc_invocation);
+        tracing::debug!(command = %so_rustc_invocation_str, "Running");
+        let output = so_rustc_invocation.output()
+            .wrap_err_with(||
+                eyre!("Could not invoke `rustc` on {}", &pgx_pg_sys_stub_file.display())
+            )?;
     
-    let so_rustc_invocation_str = format!("{:?}", so_rustc_invocation);
-    tracing::debug!(command = %so_rustc_invocation_str, "Running");
-    let output = so_rustc_invocation.output()
-        .wrap_err_with(||
-            eyre!("Could not invoke `rustc` on {}", &pgx_pg_sys_stub_file.display())
-        )?;
-
-    let code = output.status.code().unwrap();
-    tracing::trace!(status_code = %code, command = %so_rustc_invocation_str, "Finished");
+        let code = output.status.code().unwrap();
+        tracing::trace!(status_code = %code, command = %so_rustc_invocation_str, "Finished");
+    }
 
     // Inspect the symbol table for a list of `__pgx_internals` we should have the generator call
     let mut lib_so = target_dir_with_profile.clone();

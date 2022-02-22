@@ -257,6 +257,10 @@ fn install_extension() -> eyre::Result<()> {
         .stderr(Stdio::inherit())
         .env("CARGO_TARGET_DIR", get_target_dir()?);
 
+    if let Ok(rust_log) = std::env::var("RUST_LOG") {
+        command.env("RUST_LOG", rust_log);
+    }
+
     if !features.trim().is_empty() {
         command.arg("--features");
         command.arg(features);
