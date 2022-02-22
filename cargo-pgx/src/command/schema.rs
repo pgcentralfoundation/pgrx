@@ -1,6 +1,10 @@
 use crate::{
-    command::get::{find_control_file, get_property},
+    command::{
+        get::{find_control_file, get_property},
+        install::format_display_path,
+    },
     CommandExecute,
+    
 };
 use colored::Colorize;
 use eyre::{eyre, WrapErr};
@@ -191,14 +195,17 @@ pub(crate) fn generate_schema(
     let command = command.stderr(Stdio::inherit());
     let command_str = format!("{:?}", command);
     println!(
-        "{} for SQL generation with features `{}`\n{}",
+        "{} for SQL generation with features `{}`",
         "    Building".bold().green(),
         features_arg,
-        command_str
     );
+
+    tracing::debug!(command = %command_str, "Running");
     let cargo_output = command
         .output()
         .wrap_err_with(|| format!("failed to spawn cargo: {}", command_str))?;
+    tracing::trace!(status_code = %cargo_output.status, command = %command_str, "Finished");
+
     if !cargo_output.status.success() {
         return Err(eyre!("failed to build SQL generator"));
     }
@@ -252,11 +259,13 @@ pub(crate) fn generate_schema(
 
     if !pgx_pg_sys_stub_file.exists() {
         tracing::debug!(
-            input = %pgx_pg_sys_file.display(),
-            output = %pgx_pg_sys_stub_file.display(),
+            source = %format_display_path(&pgx_pg_sys_file)?,
+            stub = %format_display_path(&pgx_pg_sys_stub_file)?,
             "Creating stub of appropriate PostgreSQL symbols"
         );
         PgxPgSysStub::from_file(&pgx_pg_sys_file)?.write_to_file(&pgx_pg_sys_stub_file)?;
+    } else {
+        tracing::debug!(stub = %format_display_path(&pgx_pg_sys_stub_file)?, "Found existing stub file")
     }
 
     let mut pgx_pg_sys_stub_built = pgx_pg_sys_out_dir.clone();
@@ -283,6 +292,8 @@ pub(crate) fn generate_schema(
 
         let code = output.status.code().unwrap();
         tracing::trace!(status_code = %code, command = %so_rustc_invocation_str, "Finished");
+    } else {
+        tracing::debug!(shared_object = %format_display_path(&pgx_pg_sys_stub_built)?, "Found existing stub shared object")
     }
 
     // Inspect the symbol table for a list of `__pgx_internals` we should have the generator call
@@ -446,7 +457,11 @@ pub(crate) fn generate_schema(
     )
     .unwrap();
 
-    tracing::debug!("Writing SQL");
+    println!(
+        "{} SQL entities to {}",
+        "     Writing".bold().green(),
+        format_display_path(path)?.cyan()
+    );
     pgx_sql
         .to_file(path)
         .wrap_err_with(|| eyre!("Could not write SQL to {}", path.display()))?;

@@ -10,7 +10,7 @@ use colored::Colorize;
 use eyre::{eyre, WrapErr};
 use pgx_utils::get_target_dir;
 use pgx_utils::pg_config::PgConfig;
-use std::path::PathBuf;
+use std::path::{PathBuf, Path};
 use std::process::{Command, Stdio};
 
 /// Install the extension from the current crate to the Postgres specified by whatever `pg_config` is currently on your $PATH
@@ -154,10 +154,10 @@ fn copy_file(src: &PathBuf, dest: &PathBuf, msg: &str, do_filter: bool) -> eyre:
     }
 
     println!(
-        "{} {} to `{}`",
+        "{} {} to {}",
         "     Copying".bold().green(),
         msg,
-        format_display_path(&dest)?
+        format_display_path(&dest)?.cyan()
     );
 
     if do_filter {
@@ -371,7 +371,8 @@ fn make_relative(path: PathBuf) -> PathBuf {
     relative
 }
 
-fn format_display_path(path: &PathBuf) -> eyre::Result<String> {
+pub(crate) fn format_display_path(path: impl AsRef<Path>) -> eyre::Result<String> {
+    let path = path.as_ref();
     let out = path
         .strip_prefix(get_target_dir()?.parent().unwrap())
         .unwrap_or(&path)
