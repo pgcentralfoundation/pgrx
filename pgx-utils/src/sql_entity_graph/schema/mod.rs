@@ -65,6 +65,7 @@ impl ToTokens for Schema {
         );
         updated_content.push(syn::parse_quote! {
                 #[no_mangle]
+                #[doc(hidden)]
                 pub extern "C" fn  #sql_graph_entity_fn_name() -> ::pgx::utils::sql_entity_graph::SqlGraphEntity {
                 extern crate alloc;
                 use alloc::vec::Vec;

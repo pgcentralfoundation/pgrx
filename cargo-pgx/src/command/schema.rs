@@ -12,7 +12,7 @@ use pgx_utils::{
         RustSourceOnlySqlMapping,
         RustSqlMapping,
     },
-    pgx_pg_sys_stub::PgxPgSysStub,
+    PgxPgSysStub,
 };
 use std::{
     collections::HashSet,

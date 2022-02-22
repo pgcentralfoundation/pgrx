@@ -91,6 +91,7 @@ impl ToTokens for ExtensionSqlFile {
         );
         let inv = quote! {
             #[no_mangle]
+            #[doc(hidden)]
             pub extern "C" fn  #sql_graph_entity_fn_name() -> ::pgx::utils::sql_entity_graph::SqlGraphEntity {
                 extern crate alloc;
                 use alloc::vec::Vec;

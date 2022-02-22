@@ -100,6 +100,7 @@ impl PgGuardRewriter {
         let prolog = quote! {
             #func
 
+            #[doc(hidden)]
             #[allow(unused_variables)]
         };
         match categorize_return_type(&func) {
@@ -204,7 +205,6 @@ impl PgGuardRewriter {
         let sql_graph_entity_submission = sql_graph_entity_submission.cloned().into_iter();
         quote_spanned! {func_span=>
             #prolog
-
             #[allow(clippy::missing_safety_doc)]
             #[allow(clippy::redundant_closure)]
             #guard
@@ -505,6 +505,7 @@ impl PgGuardRewriter {
 
         quote_spanned! {func.span()=>
             #prolog
+            #[doc(hidden)]
             #vis #sig {
                 #[allow(non_snake_case)]
                 #func
@@ -535,6 +536,7 @@ impl PgGuardRewriter {
         let return_type = PgGuardRewriter::get_return_type(&func.sig);
 
         quote! {
+            #[doc(hidden)]
             #[allow(clippy::missing_safety_doc)]
             #[allow(clippy::redundant_closure)]
             #[allow(improper_ctypes_definitions)] /* for i128 */

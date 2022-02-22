@@ -288,6 +288,7 @@ macro_rules! pg_magic_func {
         #[allow(non_snake_case)]
         #[allow(unused)]
         #[link_name = "Pg_magic_func"]
+        #[doc(hidden)]
         pub extern "C" fn Pg_magic_func() -> &'static pgx::pg_sys::Pg_magic_struct {
             use core::mem::size_of;
             use pgx;
@@ -336,17 +337,20 @@ macro_rules! pg_magic_func {
 macro_rules! pg_sql_graph_magic {
     () => {
         #[no_mangle]
+        #[doc(hidden)]
         pub extern "C" fn __pgx_typeid_sql_mappings() -> &'static ::pgx::utils::__reexports::std::collections::HashSet<::pgx::utils::sql_entity_graph::RustSqlMapping> {
             &::pgx::DEFAULT_TYPEID_SQL_MAPPING
         }
 
         #[no_mangle]
+        #[doc(hidden)]
         pub extern "C" fn __pgx_source_only_sql_mappings() -> &'static ::pgx::utils::__reexports::std::collections::HashSet<::pgx::utils::sql_entity_graph::RustSourceOnlySqlMapping> {
             &::pgx::DEFAULT_SOURCE_ONLY_SQL_MAPPING
         }
 
         // A marker which must exist in the root of the extension.
         #[no_mangle]
+        #[doc(hidden)]
         pub extern "C" fn __pgx_marker() -> ::pgx::utils::__reexports::eyre::Result<
             ::pgx::utils::sql_entity_graph::ControlFile,
         > {

@@ -37,6 +37,7 @@ pub use postgres_type::{
 };
 pub use pg_extern::{
     PgExtern,
+    PgOperator,
     NameMacro,
     PgExternArgument,
     entity::{

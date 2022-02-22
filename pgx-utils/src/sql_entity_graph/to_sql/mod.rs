@@ -41,6 +41,7 @@ pub type ToSqlFn =
     ) -> std::result::Result<String, Box<dyn std::error::Error + Send + Sync + 'static>>;
 
 
+/// A parsed `sql` option from a `pgx` related procedural macro.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ToSqlConfig {
     pub enabled: bool,

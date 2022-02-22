@@ -264,6 +264,7 @@ impl ToTokens for PgExtern {
             syn::Ident::new(&format!("__pgx_internals_fn_{}", ident), Span::call_site());
         let inv = quote! {
             #[no_mangle]
+            #[doc(hidden)]
             pub extern "C" fn  #sql_graph_entity_fn_name() -> ::pgx::utils::sql_entity_graph::SqlGraphEntity {
                 use core::any::TypeId;
                 extern crate alloc;
