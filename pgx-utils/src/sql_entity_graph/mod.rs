@@ -39,7 +39,12 @@ pub use pg_extern::{
     PgExtern,
     NameMacro,
     PgExternArgument,
-    entity::{PgExternEntity, PgExternArgumentEntity, PgExternReturnEntity},
+    entity::{
+        PgExternEntity,
+        PgExternArgumentEntity,
+        PgExternReturnEntity,
+        PgOperatorEntity
+    },
 };
 pub use postgres_hash::{
     PostgresHash,
