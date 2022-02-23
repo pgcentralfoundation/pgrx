@@ -302,21 +302,20 @@ pub(crate) fn find_library_file(
     for stdout_stream_item in build_command_stream {
         match stdout_stream_item.wrap_err("Invalid cargo json message")? {
             cargo_metadata::Message::CompilerArtifact(artifact) => {
-                if !artifact.package_id.repr.starts_with(&(crate_name.to_owned() + " ")) {
+                if artifact.target.name != *crate_name {
                     continue;
                 }
                 for filename in artifact.filenames {
                     let so_extension = if cfg!(target_os = "macos") {
-                        ".dylib"
+                        "dylib"
                     } else {
-                        ".so"
+                        "so"
                     };
-                    if filename.ends_with(so_extension) {
+                    if filename.extension() == Some(so_extension) {
                         library_file = Some(filename.to_string());
                         break;
                     }
                 }
-                break;
             },
             cargo_metadata::Message::CompilerMessage(_)
             | cargo_metadata::Message::BuildScriptExecuted(_)
