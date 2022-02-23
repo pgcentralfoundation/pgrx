@@ -10,8 +10,11 @@ use colored::Colorize;
 use eyre::{eyre, WrapErr};
 use pgx_utils::get_target_dir;
 use pgx_utils::pg_config::PgConfig;
-use std::path::{PathBuf, Path};
-use std::process::{Command, Stdio};
+use std::{
+    path::{PathBuf, Path},
+    process::{Command, Stdio},
+    io::BufReader,
+};
 
 /// Install the extension from the current crate to the Postgres specified by whatever `pg_config` is currently on your $PATH
 #[derive(clap::Args, Debug)]
@@ -205,7 +208,7 @@ pub(crate) fn build_extension(
         command.arg("--all-features");
     }
 
-    command.arg("--message-format=json");
+    command.arg("--message-format=json-render-diagnostics");
 
     for arg in flags.split_ascii_whitespace() {
         command.arg(arg);
@@ -292,39 +295,33 @@ pub(crate) fn find_library_file(
     };
 
     let build_command_bytes = build_command_output.stdout;
-    let build_command_stream =
-        serde_json::Deserializer::from_slice(&build_command_bytes).into_iter::<serde_json::Value>();
+    let build_command_reader = BufReader::new(&*build_command_bytes);
+    let build_command_stream = cargo_metadata::Message::parse_stream(build_command_reader);
 
     let mut library_file = None;
     for stdout_stream_item in build_command_stream {
-        let stdout_stream_item = stdout_stream_item?;
-        if let Some(stdout_stream_object) = stdout_stream_item.as_object() {
-            if let Some(package_id) = stdout_stream_object
-                .get("package_id")
-                .and_then(serde_json::Value::as_str)
-            {
-                if !package_id.starts_with(&(crate_name.to_owned() + " ")) {
+        match stdout_stream_item.wrap_err("Invalid cargo json message")? {
+            cargo_metadata::Message::CompilerArtifact(artifact) => {
+                if !artifact.package_id.repr.starts_with(&(crate_name.to_owned() + " ")) {
                     continue;
                 }
-            }
-            if let Some(filenames) = stdout_stream_object
-                .get("filenames")
-                .and_then(serde_json::Value::as_array)
-            {
-                for filename in filenames {
-                    if let Some(filename) = filename.as_str() {
-                        let so_extension = if cfg!(target_os = "macos") {
-                            ".dylib"
-                        } else {
-                            ".so"
-                        };
-                        if filename.ends_with(so_extension) {
-                            library_file = Some(filename.to_string());
-                            break;
-                        }
+                for filename in artifact.filenames {
+                    let so_extension = if cfg!(target_os = "macos") {
+                        ".dylib"
+                    } else {
+                        ".so"
+                    };
+                    if filename.ends_with(so_extension) {
+                        library_file = Some(filename.to_string());
+                        break;
                     }
                 }
-            }
+                break;
+            },
+            cargo_metadata::Message::CompilerMessage(_)
+            | cargo_metadata::Message::BuildScriptExecuted(_)
+            | cargo_metadata::Message::BuildFinished(_)
+            | _ => (),
         }
     }
     let library_file =

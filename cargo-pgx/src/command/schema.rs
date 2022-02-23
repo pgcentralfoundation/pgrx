@@ -17,6 +17,7 @@ use std::{
     collections::HashSet,
     path::PathBuf,
     process::{Command, Stdio},
+    io::BufReader,
 };
 use symbolic::{
     common::{ByteView, DSymPathExt},
@@ -186,7 +187,7 @@ pub(crate) fn generate_schema(
         command.arg("--all-features");
     }
 
-    command.arg("--message-format=json");
+    command.arg("--message-format=json-render-diagnostics");
 
     for arg in flags.split_ascii_whitespace() {
         command.arg(arg);
@@ -206,43 +207,28 @@ pub(crate) fn generate_schema(
         .wrap_err_with(|| format!("failed to spawn cargo: {}", command_str))?;
     tracing::trace!(status_code = %cargo_output.status, command = %command_str, "Finished");
 
+    let cargo_stdout_bytes = cargo_output.stdout;
+    let cargo_stdout_reader = BufReader::new(&*cargo_stdout_bytes);
+    let cargo_stdout_stream = cargo_metadata::Message::parse_stream(cargo_stdout_reader);
+
+    let mut pgx_pg_sys_out_dir = None;
+    for stdout_stream_item in cargo_stdout_stream {
+        match stdout_stream_item.wrap_err("Invalid cargo json message")? {
+            cargo_metadata::Message::BuildScriptExecuted(script) => {
+                if !script.package_id.repr.starts_with("pgx-pg-sys") {
+                    continue;
+                }
+                pgx_pg_sys_out_dir = Some(script.out_dir);
+                break;
+            },
+            cargo_metadata::Message::CompilerMessage(_) | cargo_metadata::Message::CompilerArtifact(_) | cargo_metadata::Message::BuildFinished(_) | _ => (),
+        }
+    }
+
     if !cargo_output.status.success() {
         return Err(eyre!("failed to build SQL generator"));
     }
 
-    let cargo_stdout_bytes = cargo_output.stdout;
-    let cargo_stdout_stream =
-        serde_json::Deserializer::from_slice(&cargo_stdout_bytes).into_iter::<serde_json::Value>();
-
-    let mut pgx_pg_sys_out_dir = None;
-    for stdout_stream_item in cargo_stdout_stream {
-        let stdout_stream_item = stdout_stream_item?;
-        if let Some(stdout_stream_object) = stdout_stream_item.as_object() {
-            if let Some(reason) = stdout_stream_object
-                .get("reason")
-                .and_then(serde_json::Value::as_str)
-            {
-                if reason != "build-script-executed" {
-                    continue;
-                }
-            }
-            if let Some(package_id) = stdout_stream_object
-                .get("package_id")
-                .and_then(serde_json::Value::as_str)
-            {
-                if !package_id.starts_with("pgx-pg-sys") {
-                    continue;
-                }
-            }
-            if let Some(out_dir) = stdout_stream_object
-                .get("out_dir")
-                .and_then(serde_json::Value::as_str)
-            {
-                pgx_pg_sys_out_dir = Some(out_dir.to_string());
-                break;
-            }
-        }
-    }
     let pgx_pg_sys_out_dir = pgx_pg_sys_out_dir.ok_or(eyre!(
         "Could not get `pgx-pg-sys` `out_dir` from Cargo output."
     ))?;
