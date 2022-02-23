@@ -17,7 +17,6 @@ pg_test = []
 
 [dependencies]
 pgx = "0.3.3"
-pgx-macros = "0.3.3"
 
 [dev-dependencies]
 pgx-tests = "0.3.3"
