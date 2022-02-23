@@ -43,7 +43,8 @@ impl PgxPgSysStub {
         let mut working_state = syn::parse_file(buf.as_ref())
             .wrap_err("Could not parse `pgx_pg_sys` generated bindings.")?;
 
-        let mut items_with_stubs = Vec::default();
+        let mut items_with_stubs: Vec<syn::Item> = Vec::default();
+
         for mut item in working_state.items.drain(..) {
             match item {
                 Item::ForeignMod(ref mut item_foreign_mod) => {
@@ -78,7 +79,7 @@ impl PgxPgSysStub {
                 }
             });
         }
-
+        
         working_state.items = items_with_stubs;
 
         Ok(Self {

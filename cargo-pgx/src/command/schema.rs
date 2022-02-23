@@ -159,6 +159,7 @@ pub(crate) fn generate_schema(
 
     // First, build the SQL generator so we can get a look at the symbol table
     let mut command = Command::new("cargo");
+    command.stderr(Stdio::inherit());
     if is_test {
         command.arg("test");
         command.arg("--no-run");
@@ -212,6 +213,7 @@ pub(crate) fn generate_schema(
     let cargo_stdout_stream = cargo_metadata::Message::parse_stream(cargo_stdout_reader);
 
     let mut pgx_pg_sys_out_dir = None;
+
     for stdout_stream_item in cargo_stdout_stream {
         match stdout_stream_item.wrap_err("Invalid cargo json message")? {
             cargo_metadata::Message::BuildScriptExecuted(script) => {
@@ -221,7 +223,10 @@ pub(crate) fn generate_schema(
                 pgx_pg_sys_out_dir = Some(script.out_dir);
                 break;
             },
-            cargo_metadata::Message::CompilerMessage(_) | cargo_metadata::Message::CompilerArtifact(_) | cargo_metadata::Message::BuildFinished(_) | _ => (),
+            cargo_metadata::Message::CompilerMessage(_)
+            | cargo_metadata::Message::CompilerArtifact(_)
+            | cargo_metadata::Message::BuildFinished(_)
+            | _ => (),
         }
     }
 
@@ -260,6 +265,7 @@ pub(crate) fn generate_schema(
 
     if !pgx_pg_sys_stub_built.exists() {
         let mut so_rustc_invocation = Command::new("rustc");
+        so_rustc_invocation.stderr(Stdio::inherit());
         so_rustc_invocation.args([
             "--crate-type",
             "cdylib",
@@ -278,6 +284,9 @@ pub(crate) fn generate_schema(
 
         let code = output.status.code().unwrap();
         tracing::trace!(status_code = %code, command = %so_rustc_invocation_str, "Finished");
+        if code != 0 {
+            return Err(eyre!("rustc exited with code {}", code));
+        }
     } else {
         tracing::debug!(shared_object = %format_display_path(&pgx_pg_sys_stub_built)?, "Found existing stub shared object")
     }
