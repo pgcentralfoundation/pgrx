@@ -254,7 +254,6 @@ dependencies = [
  "regex",
  "rttp_client",
  "semver 1.0.5",
- "serde_json",
  "symbolic",
  "syn",
  "tracing",
