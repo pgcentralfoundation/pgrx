@@ -325,7 +325,7 @@ pub(crate) fn generate_schema(
                 SymbolIterator::Elf(iter) => {
                     for symbol in iter {
                         if let Some(name) = symbol.name {
-                            if name.starts_with("__pgx_internals") || name.starts_with("__pgx_marker") {
+                            if name.starts_with("__pgx_internals") {
                                 fns_to_call.insert(name);
                             }
                         }
@@ -334,7 +334,7 @@ pub(crate) fn generate_schema(
                 SymbolIterator::MachO(iter) => {
                     for symbol in iter {
                         if let Some(name) = symbol.name {
-                            if name.starts_with("__pgx_internals") || name.starts_with("__pgx_marker") {
+                            if name.starts_with("__pgx_internals") {
                                 fns_to_call.insert(name);
                             }
                         }
