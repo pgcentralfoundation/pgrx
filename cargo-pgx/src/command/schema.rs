@@ -360,7 +360,9 @@ pub(crate) fn generate_schema(
     );
 
     let path = path.as_ref();
-    let _ = path.parent().map(|p| std::fs::create_dir_all(&p).unwrap());
+    if let Some(parent) = path.parent() {
+        std::fs::create_dir_all(parent).wrap_err("Could not create parent directory")?
+    }
 
     tracing::debug!("Collecting {} SQL entities", fns_to_call.len());
     let mut entities = Vec::default();
@@ -413,8 +415,7 @@ pub(crate) fn generate_schema(
         typeid_sql_mapping.clone().into_iter(),
         source_only_sql_mapping.clone().into_iter(),
         entities.into_iter(),
-    )
-    .unwrap();
+    ).wrap_err("SQL generation error")?;
 
     println!(
         "{} SQL entities to {}",
@@ -459,8 +460,8 @@ fn create_stub(source: impl AsRef<Path>, rs_dest: impl AsRef<Path>, so_dest: imp
             "--crate-type",
             "cdylib",
             "-o",
-            so_dest.to_str().unwrap(),
-            rs_dest.to_str().unwrap(),
+            so_dest.to_str().ok_or(eyre!("Could not call so_dest.to_str()"))?,
+            rs_dest.to_str().ok_or(eyre!("Could not call rs_dest.to_str()"))?,
         ]);
         let so_rustc_invocation_str = format!("{:?}", so_rustc_invocation);
         tracing::debug!(command = %so_rustc_invocation_str, "Running");
@@ -471,7 +472,7 @@ fn create_stub(source: impl AsRef<Path>, rs_dest: impl AsRef<Path>, so_dest: imp
             )
         })?;
 
-        let code = output.status.code().unwrap();
+        let code = output.status.code().ok_or(eyre!("Could not get status code of build"))?;
         tracing::trace!(status_code = %code, command = %so_rustc_invocation_str, "Finished");
         if code != 0 {
             return Err(eyre!("rustc exited with code {}", code));
