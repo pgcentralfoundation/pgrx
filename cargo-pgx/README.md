@@ -20,7 +20,7 @@ As new versions of `pgx` are released, you'll want to make sure you run this com
 
 ```shell script
 $ cargo pgx --help
-cargo-pgx 0.2.6
+cargo-pgx 0.3.3
 ZomboDB, LLC <zombodb@gmail.com>
 Cargo subcommand for 'pgx' to make Postgres extension development easy
 
@@ -36,7 +36,7 @@ SUBCOMMANDS:
     connect    Connect, via psql, to a Postgres instance
     get        Get a property from the extension control file
     help       Print this message or the help of the given subcommand(s)
-    init       Initize pgx development environment for the first time
+    init       Initialize pgx development environment for the first time
     install    Install the extension from the current crate to the Postgres specified by
                whatever `pg_config` is currently on your $PATH
     new        Create a new extension crate
@@ -123,9 +123,9 @@ If a new minor Postgres version is released in the future you can simply run `ca
 
 ```shell script
 $ cargo pgx init --help
-cargo-pgx-init 0.2.6
+cargo-pgx-init 0.3.3
 ZomboDB, LLC <zombodb@gmail.com>
-initialize pgx development environment for the first time
+Initialize pgx development environment for the first time
 
 USAGE:
     cargo pgx init [OPTIONS]
@@ -161,7 +161,7 @@ If you'd like to create a "background worker" instead, specify the `--bgworker` 
 
 ```shell script
 $ cargo pgx new --help
-cargo-pgx-new 0.2.6
+cargo-pgx-new 0.3.3
 ZomboDB, LLC <zombodb@gmail.com>
 Create a new extension crate
 
@@ -223,24 +223,20 @@ Once started, you can connect to them using `psql` (if you have it on your $PATH
 ```shell script
 $ cargo pgx run pg13
 building extension with features ``
-"cargo" "build"
-   Compiling pgx-utils v0.2.6 (/home/yourself/git/zombodb/pgx/pgx-utils)
-   Compiling pgx-pg-sys v0.2.6 (/home/yourself/git/zombodb/pgx/pgx-pg-sys)
-   Compiling pgx-macros v0.2.6 (/home/yourself/git/zombodb/pgx/pgx-macros)
-   Compiling strings v0.1.0 (/home/yourself/git/zombodb/pgx/pgx-examples/strings)
-    Finished dev [unoptimized + debuginfo] target(s) in 1m 32s
+"cargo" "build" "--message-format=json-render-diagnostics"
+    Finished dev [unoptimized + debuginfo] target(s) in 0.06s
 
 installing extension
-     Copying control file to `/home/yourself/.pgx/13.5/pgx-install/share/postgresql/extension/strings.control`
-     Copying shared library to `/home/yourself/.pgx/13.5/pgx-install/lib/postgresql/strings.so`
+     Copying control file to /home/ana/.pgx/13.5/pgx-install/share/postgresql/extension/strings.control
+     Copying shared library to /home/ana/.pgx/13.5/pgx-install/lib/postgresql/strings.so
+    Building for SQL generation with features ``
+    Finished dev [unoptimized + debuginfo] target(s) in 0.07s
  Discovering SQL entities
-  Discovered 6 SQL entities: 0 schemas (0 unique), 6 functions, 0 types, 0 enums, 0 sqls, 0 ords, 0 hashes
-running SQL generator
-"/home/yourself/git/zombodb/pgx/pgx-examples/strings/target/debug/sql-generator" "--sql" "/home/yourself/.pgx/13.5/pgx-install/share/postgresql/extension/strings--0.1.0.sql"
-     Copying extension schema file to `/home/yourself/.pgx/13.5/pgx-install/share/postgresql/extension/strings--0.1.0.sql`
+  Discovered 6 SQL entities: 0 schemas (0 unique), 6 functions, 0 types, 0 enums, 0 sqls, 0 ords, 0 hashes, 0 aggregates
+     Writing SQL entities to /home/ana/.pgx/13.5/pgx-install/share/postgresql/extension/strings--0.1.0.sql
     Finished installing strings
     Starting Postgres v13 on port 28813
-     Creating database strings
+    Re-using existing database strings
 psql (13.5)
 Type "help" for help.
 
@@ -281,7 +277,7 @@ For Postgres installations which are already on your computer, `cargo pgx run` w
 
 ```shell script
 $ cargo pgx run --help
-cargo-pgx-run 0.2.6
+cargo-pgx-run 0.3.3
 ZomboDB, LLC <zombodb@gmail.com>
 Compile/install extension to a pgx-managed Postgres instance and start psql
 
@@ -333,7 +329,7 @@ the specified version of Postgres isn't running, it'll be automatically started.
 
 ```shell script
 $ cargo pgx connect --help
-cargo-pgx-connect 0.2.6
+cargo-pgx-connect 0.3.3
 ZomboDB, LLC <zombodb@gmail.com>
 Connect, via psql, to a Postgres instance
 
@@ -355,18 +351,19 @@ OPTIONS:
 ## Installing Your Extension Locally
 
 ```shell script
-$ cargo pgx installbuilding extension with features ``
-"cargo" "build"
+$ cargo pgx install
+building extension with features ``
+"cargo" "build" "--message-format=json-render-diagnostics"
     Finished dev [unoptimized + debuginfo] target(s) in 0.06s
 
 installing extension
-     Copying control file to `/usr/share/postgresql/13/extension/strings.control`
-     Copying shared library to `/usr/lib/postgresql/13/lib/strings.so`
+     Copying control file to /usr/share/postgresql/13/extension/strings.control
+     Copying shared library to /usr/lib/postgresql/13/lib/strings.so
+    Building for SQL generation with features ``
+    Finished dev [unoptimized + debuginfo] target(s) in 0.06s
  Discovering SQL entities
-  Discovered 6 SQL entities: 0 schemas (0 unique), 6 functions, 0 types, 0 enums, 0 sqls, 0 ords, 0 hashes
-running SQL generator
-"/home/yourself/git/zombodb/pgx/pgx-examples/strings/target/debug/sql-generator" "--sql" "/usr/share/postgresql/13/extension/strings--0.1.0.sql"
-     Copying extension schema file to `/usr/share/postgresql/13/extension/strings--0.1.0.sql`
+  Discovered 6 SQL entities: 0 schemas (0 unique), 6 functions, 0 types, 0 enums, 0 sqls, 0 ords, 0 hashes, 0 aggregates
+     Writing SQL entities to /usr/share/postgresql/13/extension/strings--0.1.0.sql
     Finished installing strings
 ```
 
@@ -379,7 +376,7 @@ By default, `cargo pgx install` builds your extension in debug mode. Specifying 
 
 ```shell script
 $ cargo pgx install --help
-cargo-pgx-install 0.2.6
+cargo-pgx-install 0.3.3
 ZomboDB, LLC <zombodb@gmail.com>
 Install the extension from the current crate to the Postgres specified by whatever `pg_config` is
 currently on your $PATH
@@ -395,6 +392,7 @@ OPTIONS:
         --no-default-features      Do not activate the `default` feature
         --no-schema                Don't regenerate the schema
     -r, --release                  Compile for release mode (default is debug) [env: PROFILE=]
+        --test                     Build in test mode (for `cargo pgx test`)
     -v, --verbose                  Enable info logs, -vv for debug, -vvv for trace
     -V, --version                  Print version information
 ```
@@ -405,40 +403,28 @@ OPTIONS:
 $ cargo pgx test
 "cargo" "test" "--features" " pg_test"
     Finished test [unoptimized + debuginfo] target(s) in 0.07s
-     Running unittests (target/debug/deps/spi-6bcc12df19bb6b9f)
+     Running unittests (target/debug/deps/spi-312296af509607bc)
 
 running 2 tests
 building extension with features ` pg_test`
-"cargo" "build" "--features" " pg_test"
+"cargo" "build" "--features" " pg_test" "--message-format=json-render-diagnostics"
     Finished dev [unoptimized + debuginfo] target(s) in 0.06s
 
 installing extension
-     Copying control file to `/home/ana/.pgx/13.5/pgx-install/share/postgresql/extension/spi.control`
-     Copying shared library to `/home/ana/.pgx/13.5/pgx-install/lib/postgresql/spi.so`
+     Copying control file to /home/ana/.pgx/13.5/pgx-install/share/postgresql/extension/spi.control
+     Copying shared library to /home/ana/.pgx/13.5/pgx-install/lib/postgresql/spi.so
+    Building for SQL generation with features ` pg_test`
+    Finished test [unoptimized + debuginfo] target(s) in 0.07s
  Discovering SQL entities
-  Discovered 11 SQL entities: 1 schemas (1 unique), 8 functions, 0 types, 0 enums, 2 sqls, 0 ords, 0 hashes
-running SQL generator
-"/home/ana/git/zombodb/pgx/pgx-examples/spi/target/debug/sql-generator" "--sql" "/home/ana/.pgx/13.5/pgx-install/share/postgresql/extension/spi--0.0.0.sql"
-     Copying extension schema file to `/home/ana/.pgx/13.5/pgx-install/share/postgresql/extension/spi--0.0.0.sql`
+  Discovered 11 SQL entities: 1 schemas (1 unique), 8 functions, 0 types, 0 enums, 2 sqls, 0 ords, 0 hashes, 0 aggregates
+     Writing SQL entities to /home/ana/.pgx/13.5/pgx-install/share/postgresql/extension/spi--0.0.0.sql
     Finished installing spi
-test tests::pg_test_spi_query_by_id_via_spi ... ok
 test tests::pg_test_spi_query_by_id_direct ... ok
+test tests::pg_test_spi_query_by_id_via_spi ... ok
 
-test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.40s
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.61s
 
 Stopping Postgres
-
-     Running unittests (target/debug/deps/sql_generator-f6f1bc1775229242)
-
-running 0 tests
-
-test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
-
-   Doc-tests spi
-
-running 0 tests
-
-test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
 ```
 
 `cargo pgx test [pg10 | pg11 | pg12 | pg13]` runs your `#[test]` and `#[pg_test]` annotated functions using cargo's test system.
@@ -454,7 +440,7 @@ make to the database are not preserved.
 
 ```shell script
 $ cargo pgx test --help
-cargo-pgx-test 0.2.6
+cargo-pgx-test 0.3.3
 ZomboDB, LLC <zombodb@gmail.com>
 Run the test suite for this crate
 
@@ -483,15 +469,17 @@ OPTIONS:
 ```shell script
 $ cargo pgx package
 building extension with features ``
-"cargo" "build" "--release"
+"cargo" "build" "--release" "--message-format=json-render-diagnostics"
     Finished release [optimized] target(s) in 0.07s
 
 installing extension
+     Copying control file to target/release/spi-pg13/usr/share/postgresql/13/extension/spi.control
+     Copying shared library to target/release/spi-pg13/usr/lib/postgresql/13/lib/spi.so
+    Building for SQL generation with features ``
+    Finished release [optimized] target(s) in 0.07s
  Discovering SQL entities
-  Discovered 8 SQL entities: 0 schemas (0 unique), 6 functions, 0 types, 0 enums, 2 sqls, 0 ords, 0 hashes
-running SQL generator
-"/home/yourself/git/zombodb/pgx/pgx-examples/spi/target/release/sql-generator" "--sql" "/home/yourself/git/zombodb/pgx/pgx-examples/spi/target/release/spi-pg13/usr/share/postgresql/13/extension/spi--0.0.0.sql"
-     Copying extension schema file to `target/release/spi-pg13/usr/share/postgresql/13/extension/spi--0.0.0.sql`
+  Discovered 8 SQL entities: 0 schemas (0 unique), 6 functions, 0 types, 0 enums, 2 sqls, 0 ords, 0 hashes, 0 aggregates
+     Writing SQL entities to target/release/spi-pg13/usr/share/postgresql/13/extension/spi--0.0.0.sql
     Finished installing spi
 ```
 
@@ -512,7 +500,7 @@ distobutions or MacOS Postgres installations.
 
 ```shell script
 $ cargo pgx package --help
-cargo-pgx-package 0.2.6
+cargo-pgx-package 0.3.3
 ZomboDB, LLC <zombodb@gmail.com>
 Create an installation package directory (in `./target/[debug|release]/extname-pgXX/`)
 
@@ -526,6 +514,7 @@ OPTIONS:
         --features <FEATURES>      Space-separated list of features to activate
     -h, --help                     Print help information
         --no-default-features      Do not activate the `default` feature
+        --test                     Build in test mode (for `cargo pgx test`)
     -v, --verbose                  Enable info logs, -vv for debug, -vvv for trace
     -V, --version                  Print version information
 ```
@@ -533,120 +522,31 @@ OPTIONS:
 ## Inspect you Extension Schema
 
 If you just want to look at the full extension schema that pgx will generate, use
-`cargo pgx schema /dir/to/write/it/`.
+`cargo pgx schema -o /dir/to/write/it/`.
 
 ```shell script
 $ cargo pgx schema --help
-cargo-pgx-schema 0.2.6
+cargo-pgx-schema 0.3.3
 ZomboDB, LLC <zombodb@gmail.com>
 Generate extension schema files
-
-The SQL generation process requires configuring a few settings in the crate. Normally `cargo pgx
-schema --force-default` can set these automatically.
 
 USAGE:
     cargo pgx schema [OPTIONS] [PG_VERSION]
 
 ARGS:
-    <PG_VERSION>
-            Do you want to run against Postgres `pg10`, `pg11`, `pg12`, `pg13`, `pg14`?
+    <PG_VERSION>    Do you want to run against Postgres `pg10`, `pg11`, `pg12`, `pg13`, `pg14`?
 
 OPTIONS:
-        --all-features
-            Activate all available features
-
-    -c, --pg-config <PG_CONFIG>
-            The `pg_config` path (default is first in $PATH)
-
-    -d, --dot <DOT>
-            A path to output a produced GraphViz DOT file
-
-    -f, --force-default
-            Force the generation of default required files
-
-        --features <FEATURES>
-            Space-separated list of features to activate
-
-    -h, --help
-            Print help information
-
-    -m, --manual
-            Skip checking for required files
-
-        --no-default-features
-            Do not activate the `default` feature
-
-    -o, --out <OUT>
-            A path to output a produced SQL file (default is `sql/$EXTNAME-$VERSION.sql`)
-
-    -r, --release
-            Compile for release mode (default is debug)
-            
-            [env: PROFILE=]
-
-    -s, --skip-build
-            Skip building the `sql-generator`, use an existing build
-
-    -v, --verbose
-            Enable info logs, -vv for debug, -vvv for trace
-
-    -V, --version
-            Print version information
+        --all-features             Activate all available features
+    -c, --pg-config <PG_CONFIG>    The `pg_config` path (default is first in $PATH)
+    -d, --dot <DOT>                A path to output a produced GraphViz DOT file
+        --features <FEATURES>      Space-separated list of features to activate
+    -h, --help                     Print help information
+        --no-default-features      Do not activate the `default` feature
+    -o, --out <OUT>                A path to output a produced SQL file (default is
+                                   `sql/$EXTNAME-$VERSION.sql`)
+    -r, --release                  Compile for release mode (default is debug) [env: PROFILE=]
+        --test                     Build in test mode (for `cargo pgx test`)
+    -v, --verbose                  Enable info logs, -vv for debug, -vvv for trace
+    -V, --version                  Print version information
 ```
-
-### Manual SQL Generation
-
-> **This section is for users with custom `.cargo/config` settings or advanced requirements.**
->
-> If you are not using `cargo pgx init` to generate your extension, or you're upgrading your extension from `pgx` 0.1.21 or earlier, you can usually have `cargo-pgx` provision it's base requirements with `cargo pgx schema --force-default`.
-
-SQL generation requires some linker flags, as well as a binary.
-
-The flags are typically set by a linker script:
-
-```bash
-#! /usr/bin/env bash
-# Auto-generated by pgx. You may edit this, or delete it to have a new one created.
-
-if [[ $CARGO_BIN_NAME == "sql-generator" ]]; then
-    UNAME=$(uname)
-    if [[ $UNAME == "Darwin" ]]; then
-	TEMP=$(mktemp pgx-XXX)
-        echo "*_pgx_internals_*" > ${TEMP}
-        gcc -exported_symbols_list ${TEMP} $@
-        rm -rf ${TEMP}
-    else
-        TEMP=$(mktemp pgx-XXX)
-        echo "{ __pgx_internals_*; };" > ${TEMP}
-        gcc -Wl,-dynamic-list=${TEMP} $@
-        rm -rf ${TEMP}
-    fi
-else
-    gcc -Wl,-undefined,dynamic_lookup $@
-fi
-```
-
-Which would be configured in `.cargo/config` for supported targets:
-
-```toml
-[target.aarch64-unknown-linux-gnu]
-linker = "./.cargo/linker-script.sh"
-```
-
-Then, a `src/bin/sql-generator.rs` binary would exist with the following:
-
-```rust
-pgx::pg_binary_magic!(extension_name);
-```
-
-If `cargo pgx schema` does not detect these, it will create them automatically with defaults.
-To skip writing defaults, use `-m`, to overwrite exiting files with these defaults, use `-f`.
-
-Finally, `lib.crate-type` should be set in `Cargo.toml`:
-
-```toml
-[lib]
-crate-type = ["cdylib", "rlib"]
-```
-
-`cargo pgx schema --force-default` does not update your `Cargo.toml`, this must be manually set.

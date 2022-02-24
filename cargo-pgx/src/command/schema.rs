@@ -28,9 +28,6 @@ extern crate alloc;
 use alloc::vec::Vec;
 
 /// Generate extension schema files
-///
-/// The SQL generation process requires configuring a few settings in the crate.
-/// Normally `cargo pgx schema --force-default` can set these automatically.
 #[derive(clap::Args, Debug)]
 #[clap(author)]
 pub(crate) struct Schema {
@@ -253,6 +250,9 @@ pub(crate) fn generate_schema(
     pgx_pg_sys_stub_built.push("stubs");
     pgx_pg_sys_stub_built.push(format!("pg{}_stub.so", pg_version));
 
+    // The next action may take a few seconds, we'd like the user to know we're thinking.
+    println!("{} SQL entities", " Discovering".bold().green(),);
+
     create_stub(&pgx_pg_sys_file, &pgx_pg_sys_stub_file, &pgx_pg_sys_stub_built)?;
 
     // Inspect the symbol table for a list of `__pgx_internals` we should have the generator call
@@ -270,7 +270,6 @@ pub(crate) fn generate_schema(
         so_extension
     ));
 
-    println!("{} SQL entities", " Discovering".bold().green(),);
     let dsym_path = lib_so.resolve_dsym();
     let buffer = ByteView::open(dsym_path.as_deref().unwrap_or(&lib_so)).wrap_err_with(|| {
         eyre!(
