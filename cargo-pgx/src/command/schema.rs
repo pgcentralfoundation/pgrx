@@ -15,7 +15,7 @@ use pgx_utils::{
 };
 use std::{
     collections::HashSet,
-    path::PathBuf,
+    path::{PathBuf, Path},
     process::{Command, Stdio},
     io::BufReader,
 };
@@ -240,6 +240,7 @@ pub(crate) fn generate_schema(
     let pgx_pg_sys_out_dir = PathBuf::from(pgx_pg_sys_out_dir);
 
     let pg_version = pg_config.major_version()?;
+
     // Create stubbed `pgx_pg_sys` bindings for the generator to link with.
     let mut pgx_pg_sys_stub_file = pgx_pg_sys_out_dir.clone();
     pgx_pg_sys_stub_file.push("stubs");
@@ -248,48 +249,11 @@ pub(crate) fn generate_schema(
     let mut pgx_pg_sys_file = PathBuf::from(&pgx_pg_sys_out_dir);
     pgx_pg_sys_file.push(&format!("pg{}.rs", pg_version));
 
-    if !pgx_pg_sys_stub_file.exists() {
-        tracing::debug!(
-            source = %format_display_path(&pgx_pg_sys_file)?,
-            stub = %format_display_path(&pgx_pg_sys_stub_file)?,
-            "Creating stub of appropriate PostgreSQL symbols"
-        );
-        PgxPgSysStub::from_file(&pgx_pg_sys_file)?.write_to_file(&pgx_pg_sys_stub_file)?;
-    } else {
-        tracing::debug!(stub = %format_display_path(&pgx_pg_sys_stub_file)?, "Found existing stub file")
-    }
-
     let mut pgx_pg_sys_stub_built = pgx_pg_sys_out_dir.clone();
     pgx_pg_sys_stub_built.push("stubs");
     pgx_pg_sys_stub_built.push(format!("pg{}_stub.so", pg_version));
 
-    if !pgx_pg_sys_stub_built.exists() {
-        let mut so_rustc_invocation = Command::new("rustc");
-        so_rustc_invocation.stderr(Stdio::inherit());
-        so_rustc_invocation.args([
-            "--crate-type",
-            "cdylib",
-            "-o",
-            pgx_pg_sys_stub_built.to_str().unwrap(),
-            pgx_pg_sys_stub_file.to_str().unwrap(),
-        ]);
-        let so_rustc_invocation_str = format!("{:?}", so_rustc_invocation);
-        tracing::debug!(command = %so_rustc_invocation_str, "Running");
-        let output = so_rustc_invocation.output().wrap_err_with(|| {
-            eyre!(
-                "Could not invoke `rustc` on {}",
-                &pgx_pg_sys_stub_file.display()
-            )
-        })?;
-
-        let code = output.status.code().unwrap();
-        tracing::trace!(status_code = %code, command = %so_rustc_invocation_str, "Finished");
-        if code != 0 {
-            return Err(eyre!("rustc exited with code {}", code));
-        }
-    } else {
-        tracing::debug!(shared_object = %format_display_path(&pgx_pg_sys_stub_built)?, "Found existing stub shared object")
-    }
+    create_stub(&pgx_pg_sys_file, &pgx_pg_sys_stub_file, &pgx_pg_sys_stub_built)?;
 
     // Inspect the symbol table for a list of `__pgx_internals` we should have the generator call
     let mut lib_so = target_dir_with_profile.clone();
@@ -465,6 +429,55 @@ pub(crate) fn generate_schema(
         let dot_path = dot_path.as_ref();
         tracing::info!(dot = %dot_path.display(), "Writing Graphviz DOT");
         pgx_sql.to_dot(dot_path)?;
+    }
+    Ok(())
+}
+
+#[tracing::instrument(level = "error", skip_all, fields(
+    source = %format_display_path(source.as_ref())?,
+    rs_dest = %format_display_path(rs_dest.as_ref())?,
+    so_dest = %format_display_path(so_dest.as_ref())?,
+))]
+fn create_stub(source: impl AsRef<Path>, rs_dest: impl AsRef<Path>, so_dest: impl AsRef<Path>) -> eyre::Result<()> {
+    let source = source.as_ref();
+    let rs_dest = rs_dest.as_ref();
+    let so_dest = so_dest.as_ref();
+
+    if !rs_dest.exists() {
+        tracing::debug!(
+            "Creating stub of appropriate PostgreSQL symbols"
+        );
+        PgxPgSysStub::from_file(&source)?.write_to_file(&rs_dest)?;
+    } else {
+        tracing::debug!("Found existing stub file")
+    }
+
+    if !so_dest.exists() {
+        let mut so_rustc_invocation = Command::new("rustc");
+        so_rustc_invocation.stderr(Stdio::inherit());
+        so_rustc_invocation.args([
+            "--crate-type",
+            "cdylib",
+            "-o",
+            so_dest.to_str().unwrap(),
+            rs_dest.to_str().unwrap(),
+        ]);
+        let so_rustc_invocation_str = format!("{:?}", so_rustc_invocation);
+        tracing::debug!(command = %so_rustc_invocation_str, "Running");
+        let output = so_rustc_invocation.output().wrap_err_with(|| {
+            eyre!(
+                "Could not invoke `rustc` on {}",
+                &rs_dest.display()
+            )
+        })?;
+
+        let code = output.status.code().unwrap();
+        tracing::trace!(status_code = %code, command = %so_rustc_invocation_str, "Finished");
+        if code != 0 {
+            return Err(eyre!("rustc exited with code {}", code));
+        }
+    } else {
+        tracing::debug!("Found existing stub shared object")
     }
     Ok(())
 }
