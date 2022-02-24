@@ -229,7 +229,8 @@ pub(crate) fn generate_schema(
     }
 
     if !cargo_output.status.success() {
-        return Err(eyre!("failed to build SQL generator"));
+        // We explicitly do not want to return a spantraced error here.
+        std::process::exit(1)
     }
 
     let pgx_pg_sys_out_dir = pgx_pg_sys_out_dir.ok_or(eyre!(
@@ -486,6 +487,7 @@ fn create_stub(source: impl AsRef<Path>, rs_dest: impl AsRef<Path>, so_dest: imp
 /// A temporary check to help users from 0.2 or 0.3 know to take manual migration steps.
 fn check_for_sql_generator_binary() -> eyre::Result<()> {
     if Path::new("src/bin/sql-generator.rs").exists() {
+        // We explicitly do not want to return a spantraced error here.
         println!("\
             Found `pgx` 0.2-0.3 series SQL generation while using `cargo-pgx` 0.4 series.
             

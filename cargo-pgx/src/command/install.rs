@@ -224,7 +224,8 @@ pub(crate) fn build_extension(
         .output()
         .wrap_err_with(|| format!("failed to spawn cargo: {}", command_str))?;
     if !cargo_output.status.success() {
-        Err(eyre!("failed to build extension"))
+        // We explicitly do not want to return a spantraced error here.
+        std::process::exit(1)
     } else {
         Ok(cargo_output)
     }
