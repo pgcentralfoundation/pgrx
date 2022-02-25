@@ -9,6 +9,7 @@ members = [
     "pgx-examples/aggregate",
     "pgx-examples/arrays",
     "pgx-examples/bad_ideas",
+    "pgx-examples/bgworker",
     "pgx-examples/bytea",
     "pgx-examples/custom_types",
     "pgx-examples/custom_sql",
