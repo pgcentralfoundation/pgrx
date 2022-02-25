@@ -9,8 +9,6 @@ use clap::Parser;
 use tracing_error::ErrorLayer;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
 
-const SUPPORTED_MAJOR_VERSIONS: &[u16] = &[10, 11, 12, 13, 14];
-
 trait CommandExecute {
     fn execute(self) -> eyre::Result<()>;
 }

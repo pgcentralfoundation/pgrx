@@ -60,7 +60,7 @@ fn main() -> color_eyre::Result<()> {
         }
     }
 
-    println!("cargo:rerun-if-env-changed=PGX_PG_SYS_SKIP_BINDING_REWRITE");
+    println!("cargo:rerun-if-env-changed=PGX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE");
 
     let manifest_dir = PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").unwrap());
     let out_dir = PathBuf::from(std::env::var("OUT_DIR").unwrap());
@@ -82,10 +82,27 @@ fn main() -> color_eyre::Result<()> {
     build_deps::rerun_if_changed_paths("cshim/pgx-cshim.c").unwrap();
     build_deps::rerun_if_changed_paths("cshim/Makefile").unwrap();
 
-    let pg_configs = pgx
-        .iter(PgConfigSelector::All)
-        .map(|v| v.expect("invalid pg_config"))
-        .collect::<Vec<_>>();
+    let pg_configs = if std::env::var("PGX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE").unwrap_or("false".into()) == "1" {
+        pgx.iter(PgConfigSelector::All).map(|v| v.wrap_err("invalid pg_config")).collect::<eyre::Result<Vec<_>>>()?
+    } else {
+        let mut found = None;
+        for version in pgx_utils::SUPPORTED_MAJOR_VERSIONS {
+            if let Err(_) = std::env::var(&format!("CARGO_FEATURE_PG{}", version)) {
+                continue;
+            }
+            if found.is_some() {
+                return Err(eyre!("Multiple `pg$VERSION` features found, `--no-default-features` may be required."))
+            }
+            found = Some(format!("pg{}", version));
+        }
+        let found = found.ok_or_else(|| eyre!(
+            "Did not find `pg$VERSION` feature. `pgx-pg-sys` requires one of {} to be set",
+            pgx_utils::SUPPORTED_MAJOR_VERSIONS.iter().map(|x| format!("`pg{}`", x)).collect::<Vec<_>>().join(", ")
+        ))?;
+        let specific = pgx.get(&found)?;
+        vec![specific]
+    };
+
     pg_configs
         .par_iter()
         .map(|pg_config| {
@@ -104,9 +121,9 @@ fn main() -> color_eyre::Result<()> {
 
             let oids = extract_oids(&bindgen_output);
 
-            let dest_dirs = if std::env::var("PGX_PG_SYS_SKIP_BINDING_REWRITE")
+            let dest_dirs = if std::env::var("PGX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE")
                 .unwrap_or("false".into())
-                != "1"
+                == "1"
             {
                 vec![out_dir.clone(), src_dir.clone()]
             } else {

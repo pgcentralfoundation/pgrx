@@ -61,3 +61,5 @@ for example in ./pgx-examples/*/; do
     cargo generate-lockfile
     popd
 done
+
+PGX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE=1 cargo build --workspace --features "pg14 pg_test"
