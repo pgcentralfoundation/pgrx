@@ -28,7 +28,7 @@ toml = "0.5.8"
 unescape = "0.1.0"
 url = "2.2.2"
 eyre = "0.6.6"
-tracing = "0.1.30"
+tracing = "0.1.31"
 tracing-error = "0.2.0"
 tracing-subscriber = { version = "0.3.8", features = [ "env-filter" ] }
 petgraph = "0.6.0"
