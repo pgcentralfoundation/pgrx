@@ -62,4 +62,4 @@ for example in ./pgx-examples/*/; do
     popd
 done
 
-PGX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE=1 cargo build --workspace --features "pg14 pg_test"
+PGX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE=1 cargo test --no-run --workspace --features "pg14 pg_test"
