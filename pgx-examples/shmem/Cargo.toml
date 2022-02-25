@@ -6,9 +6,6 @@ edition = "2018"
 [lib]
 crate-type = ["cdylib"]
 
-# remove this empty 'workspace' declaration if compiling outside of 'pgx'
-[workspace]
-
 [features]
 default = ["pg13"]
 pg10 = ["pgx/pg10", "pgx-tests/pg10" ]
