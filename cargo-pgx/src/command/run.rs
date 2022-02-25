@@ -7,7 +7,7 @@ use crate::{
     },
     CommandExecute,
 };
-use colored::Colorize;
+use owo_colors::OwoColorize;
 use eyre::eyre;
 use pgx_utils::{
     createdb,

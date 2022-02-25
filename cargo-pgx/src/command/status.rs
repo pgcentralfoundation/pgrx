@@ -1,7 +1,7 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-use colored::Colorize;
+use owo_colors::OwoColorize;
 use eyre::eyre;
 use pgx_utils::pg_config::{PgConfig, PgConfigSelector, Pgx};
 use std::process::Stdio;
