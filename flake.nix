@@ -21,7 +21,7 @@
         overlays = [
           self.overlay
           rust-overlay.overlay
-          (self: super: { inherit (self.rust-bin.stable.latest) rustc cargo rustdoc; })
+          (self: super: { inherit (self.rust-bin.stable.latest) rustc cargo rustdoc rust-std; })
         ] ++ extraOverlays;
       });
       releaseAndDebug = attr: call: args: {

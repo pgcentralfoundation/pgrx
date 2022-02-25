@@ -14,9 +14,7 @@
 , pkg-config
 , openssl
 , libiconv
-, rustfmt
-, cargo
-, rustc
+, rust-bin
 , llvmPackages
 , gcc
 , gitignoreSource
@@ -52,16 +50,17 @@ naersk.lib."${targetPlatform.system}".buildPackage rec {
 
   LIBCLANG_PATH = "${llvmPackages.libclang.lib}/lib";
   buildInputs = [
-    rustfmt
-    cargo
-    rustc
+    rust-bin.stable.latest.default
     cargo-pgx
     pkg-config
     libiconv
     pgxPostgresPkg
     gcc
   ];
-  checkInputs = [ cargo-pgx cargo rustc ];
+  checkInputs = [
+    cargo-pgx
+    rust-bin.stable.latest.default
+  ];
 
   postPatch = "patchShebangs .";
   preConfigure = ''
@@ -122,7 +121,7 @@ naersk.lib."${targetPlatform.system}".buildPackage rec {
   '';
   postBuild = ''
     export PGX_HOME=$out/.pgx
-    ${cargo-pgx}/bin/cargo-pgx pgx schema --skip-build ${maybeReleaseFlag}
+    ${cargo-pgx}/bin/cargo-pgx pgx schema pg${pgxPostgresVersionString} ${maybeReleaseFlag} --features "${builtins.toString additionalFeatures}"
     mkdir -p $out/share/postgresql/extension/
     cp -v ./sql/* $out/share/postgresql/extension/
     cp -v ./${cargoToml.package.name}.control $out/share/postgresql/extension/${cargoToml.package.name}.control
@@ -138,8 +137,8 @@ naersk.lib."${targetPlatform.system}".buildPackage rec {
   # This is required to have access to the `sql/*.sql` files.
   singleStep = true;
 
-  cargoBuildOptions = default: default ++ [ "--no-default-features" "--features \"pg${pgxPostgresVersionString} ${builtins.toString additionalFeatures}\" --bin sql-generator --lib" ];
-  cargoTestOptions = default: default ++ [ "--no-default-features" "--features \"pg_test pg${pgxPostgresVersionString} ${builtins.toString additionalFeatures}\" --bin sql-generator --lib" ];
+  cargoBuildOptions = default: default ++ [ "--no-default-features" "--features \"pg${pgxPostgresVersionString} ${builtins.toString additionalFeatures}\"" ];
+  cargoTestOptions = default: default ++ [ "--no-default-features" "--features \"pg_test pg${pgxPostgresVersionString} ${builtins.toString additionalFeatures}\"" ];
   doDoc = false;
   copyLibs = true;
 

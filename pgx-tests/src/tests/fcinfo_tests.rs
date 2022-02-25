@@ -98,7 +98,10 @@ fn same_name(same_name: &str) -> &str {
 
 // Tests for regression of https://github.com/zombodb/pgx/issues/432
 #[pg_extern]
-fn fcinfo_renamed_one_arg(_x: PgBox<pg_sys::IndexAmRoutine>, _fcinfo: pg_sys::FunctionCallInfo) -> PgBox<pg_sys::IndexAmRoutine> {
+fn fcinfo_renamed_one_arg(
+    _x: PgBox<pg_sys::IndexAmRoutine>,
+    _fcinfo: pg_sys::FunctionCallInfo,
+) -> PgBox<pg_sys::IndexAmRoutine> {
     todo!()
 }
 
@@ -108,7 +111,10 @@ fn fcinfo_renamed_no_arg(_fcinfo: pg_sys::FunctionCallInfo) -> i32 {
 }
 
 #[pg_extern]
-fn fcinfo_not_named_one_arg(_x: PgBox<pg_sys::IndexAmRoutine>, fcinfo: pg_sys::FunctionCallInfo) -> PgBox<pg_sys::IndexAmRoutine> {
+fn fcinfo_not_named_one_arg(
+    _x: PgBox<pg_sys::IndexAmRoutine>,
+    fcinfo: pg_sys::FunctionCallInfo,
+) -> PgBox<pg_sys::IndexAmRoutine> {
     let _fcinfo = fcinfo;
     todo!()
 }

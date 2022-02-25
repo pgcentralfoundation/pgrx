@@ -17,12 +17,7 @@ trait CommandExecute {
 
 /// `cargo` stub for `cargo-pgx` (you probably meant to run `cargo pgx`)
 #[derive(clap::Parser, Debug)]
-#[clap(
-    name = "cargo",
-    bin_name = "cargo",
-    version,
-    global_setting(clap::AppSettings::PropagateVersion)
-)]
+#[clap(name = "cargo", bin_name = "cargo", version, propagate_version = true)]
 struct CargoCommand {
     #[clap(subcommand)]
     subcommand: CargoSubcommands,

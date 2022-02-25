@@ -16,6 +16,9 @@ pub(crate) struct Package {
     /// Compile for debug mode (default is release)
     #[clap(env = "PROFILE", long, short)]
     debug: bool,
+    /// Build in test mode (for `cargo pgx test`)
+    #[clap(long)]
+    test: bool,
     /// The `pg_config` path (default is first in $PATH)
     #[clap(long, short = 'c', parse(from_os_str))]
     pg_config: Option<PathBuf>,
@@ -39,17 +42,20 @@ impl CommandExecute for Package {
         let pg_version = format!("pg{}", pg_config.major_version()?);
         let features = crate::manifest::features_for_version(self.features, &manifest, &pg_version);
 
-        package_extension(&pg_config, self.debug, &features)
+        package_extension(&manifest, &pg_config, self.debug, self.test, &features)
     }
 }
 
 #[tracing::instrument(level = "error", skip_all, fields(
     pg_version = %pg_config.version()?,
     release = !is_debug,
+    test = is_test,
 ))]
 pub(crate) fn package_extension(
+    manifest: &cargo_toml::Manifest,
     pg_config: &PgConfig,
     is_debug: bool,
+    is_test: bool,
     features: &clap_cargo::Features,
 ) -> eyre::Result<()> {
     let base_path = build_base_path(pg_config, is_debug)?;
@@ -61,7 +67,15 @@ pub(crate) fn package_extension(
     if !base_path.exists() {
         std::fs::create_dir_all(&base_path)?;
     }
-    install_extension(pg_config, !is_debug, false, Some(base_path), features)
+    install_extension(
+        manifest,
+        pg_config,
+        !is_debug,
+        is_test,
+        false,
+        Some(base_path),
+        features,
+    )
 }
 
 fn build_base_path(pg_config: &PgConfig, is_debug: bool) -> eyre::Result<PathBuf> {

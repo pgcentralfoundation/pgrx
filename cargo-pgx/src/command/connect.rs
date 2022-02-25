@@ -42,11 +42,11 @@ impl CommandExecute for Connect {
                     let metadata = crate::metadata::metadata(&Default::default())?;
                     crate::metadata::validate(&metadata)?;
                     let manifest = crate::manifest::manifest(&metadata)?;
-                    
+
                     let default_pg_version = crate::manifest::default_pg_version(&manifest)
                         .ok_or(eyre!("No provided `pg$VERSION` flag."))?;
                     default_pg_version
-                },
+                }
             },
             None => {
                 // We should infer from the manifest.
