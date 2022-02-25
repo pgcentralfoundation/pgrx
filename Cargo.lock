@@ -385,9 +385,9 @@ dependencies = [
 
 [[package]]
 name = "color-eyre"
-version = "0.6.0"
+version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9d6ec7641ff3474b7593009c809db602c414cd97c7d47a78ed004162b74ff96c"
+checksum = "8ebf286c900a6d5867aeff75cfee3192857bb7f24b547d4f0df2ed6baa812c90"
 dependencies = [
  "backtrace",
  "color-spantrace",
@@ -669,9 +669,9 @@ dependencies = [
 
 [[package]]
 name = "eyre"
-version = "0.6.6"
+version = "0.6.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bc225d8f637923fe585089fcf03e705c222131232d2c1fb622e84ecf725d0eb8"
+checksum = "9289ed2c0440a6536e65119725cf91fc2c6b5e513bfd2e36e1134d7cca6ca12f"
 dependencies = [
  "indenter",
  "once_cell",
@@ -1412,7 +1412,6 @@ dependencies = [
  "heapless",
  "num-traits",
  "once_cell",
- "petgraph",
  "pgx-macros",
  "pgx-pg-sys",
  "pgx-utils",
@@ -1494,14 +1493,13 @@ dependencies = [
 name = "pgx-utils"
 version = "0.3.3"
 dependencies = [
- "clap 3.1.0",
- "color-eyre",
  "colored",
  "convert_case",
  "dirs",
  "env_proxy",
  "eyre",
- "libloading",
+ "petgraph",
+ "prettyplease",
  "proc-macro2",
  "quote",
  "regex",
@@ -1615,6 +1613,16 @@ name = "precomputed-hash"
 version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "925383efa346730478fb4838dbe9137d2a47675ad789c546d150a6e1dd4ab31c"
+
+[[package]]
+name = "prettyplease"
+version = "0.1.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "53748b0c63a6a276a2c8b591de5b117d7590f1b41e34062efeadd222f841d1a3"
+dependencies = [
+ "proc-macro2",
+ "syn",
+]
 
 [[package]]
 name = "proc-macro-crate"

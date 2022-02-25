@@ -42,7 +42,7 @@ impl CommandExecute for Run {
         crate::metadata::validate(&metadata)?;
         let manifest = crate::manifest::manifest(&metadata)?;
         let pgx = Pgx::from_config()?;
-        
+
         let (pg_config, pg_version) = match self.pg_version {
             Some(pg_version) => {
                 match pgx.get(&pg_version) {
@@ -56,15 +56,15 @@ impl CommandExecute for Run {
                         let default_pg_version = crate::manifest::default_pg_version(&manifest)
                             .ok_or(eyre!("No provided `pg$VERSION` flag."))?;
                         (pgx.get(&default_pg_version)?, default_pg_version)
-                    },
+                    }
                 }
-            },
+            }
             None => {
                 // We should infer from the manifest.
                 let default_pg_version = crate::manifest::default_pg_version(&manifest)
                     .ok_or(eyre!("No provided `pg$VERSION` flag."))?;
                 (pgx.get(&default_pg_version)?, default_pg_version)
-            },
+            }
         };
         let features = crate::manifest::features_for_version(self.features, &manifest, &pg_version);
 
@@ -72,8 +72,9 @@ impl CommandExecute for Run {
             Some(dbname) => dbname,
             None => get_property("extname")?.ok_or(eyre!("could not determine extension name"))?,
         };
-        
+
         run_psql(
+            &manifest,
             pg_config,
             &dbname,
             self.release,
@@ -89,6 +90,7 @@ impl CommandExecute for Run {
     release = is_release,
 ))]
 pub(crate) fn run_psql(
+    manifest: &cargo_toml::Manifest,
     pg_config: &PgConfig,
     dbname: &str,
     is_release: bool,
@@ -99,7 +101,9 @@ pub(crate) fn run_psql(
     stop_postgres(pg_config)?;
 
     // install the extension
-    install_extension(pg_config, is_release, no_schema, None, features)?;
+    install_extension(
+        manifest, pg_config, is_release, false, no_schema, None, features,
+    )?;
 
     // restart postgres
     start_postgres(pg_config)?;

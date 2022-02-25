@@ -239,7 +239,8 @@ fn install_extension() -> eyre::Result<()> {
     if !features.contains("pg_test") {
         features += " pg_test";
     }
-    let no_default_features = std::env::var("PGX_NO_DEFAULT_FEATURES").unwrap_or("false".to_string()) == "true";
+    let no_default_features =
+        std::env::var("PGX_NO_DEFAULT_FEATURES").unwrap_or("false".to_string()) == "true";
     let all_features = std::env::var("PGX_ALL_FEATURES").unwrap_or("false".to_string()) == "true";
 
     let pg_version = format!("pg{}", pg_sys::get_pg_major_version_string());
@@ -250,11 +251,16 @@ fn install_extension() -> eyre::Result<()> {
     command
         .arg("pgx")
         .arg("install")
+        .arg("--test")
         .arg("--pg-config")
         .arg(pg_config.path().ok_or(eyre!("No pg_config found"))?)
         .stdout(Stdio::inherit())
         .stderr(Stdio::inherit())
         .env("CARGO_TARGET_DIR", get_target_dir()?);
+
+    if let Ok(rust_log) = std::env::var("RUST_LOG") {
+        command.env("RUST_LOG", rust_log);
+    }
 
     if !features.trim().is_empty() {
         command.arg("--features");
@@ -268,7 +274,7 @@ fn install_extension() -> eyre::Result<()> {
     if all_features {
         command.arg("--all-features");
     }
-    
+
     if is_release {
         command.arg("--release");
     }

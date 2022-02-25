@@ -59,8 +59,9 @@ impl Returning {
                         let archetype = mac.path.segments.last().unwrap();
                         match archetype.ident.to_string().as_str() {
                             "name" => {
-                                let out: NameMacro =
-                                    mac.parse_body().expect(&*format!("Failed to parse named!(): {:?}", mac));
+                                let out: NameMacro = mac
+                                    .parse_body()
+                                    .expect(&*format!("Failed to parse named!(): {:?}", mac));
                                 Some((out.ty, Some(out.ident)))
                             }
                             _ => unimplemented!("Don't support anything other than name."),
@@ -197,12 +198,12 @@ impl ToTokens for Returning {
     fn to_tokens(&self, tokens: &mut TokenStream2) {
         let quoted = match self {
             Returning::None => quote! {
-                pgx::datum::sql_entity_graph::PgExternReturnEntity::None
+                ::pgx::utils::sql_entity_graph::PgExternReturnEntity::None
             },
             Returning::Type(ty) => {
                 let ty_string = ty.to_token_stream().to_string().replace(" ", "");
                 quote! {
-                    pgx::datum::sql_entity_graph::PgExternReturnEntity::Type {
+                    ::pgx::utils::sql_entity_graph::PgExternReturnEntity::Type {
                         id: TypeId::of::<#ty>(),
                         source: #ty_string,
                         full_path: core::any::type_name::<#ty>(),
@@ -218,7 +219,7 @@ impl ToTokens for Returning {
             Returning::SetOf(ty) => {
                 let ty_string = ty.to_token_stream().to_string().replace(" ", "");
                 quote! {
-                    pgx::datum::sql_entity_graph::PgExternReturnEntity::SetOf {
+                    ::pgx::utils::sql_entity_graph::PgExternReturnEntity::SetOf {
                         id: TypeId::of::<#ty>(),
                         source: #ty_string,
                         full_path: core::any::type_name::<#ty>(),
@@ -254,13 +255,13 @@ impl ToTokens for Returning {
                     })
                     .collect::<Vec<_>>();
                 quote! {
-                    pgx::datum::sql_entity_graph::PgExternReturnEntity::Iterated(vec![
+                    ::pgx::utils::sql_entity_graph::PgExternReturnEntity::Iterated(vec![
                         #(#quoted_items),*
                     ])
                 }
             }
             Returning::Trigger => quote! {
-                pgx::datum::sql_entity_graph::PgExternReturnEntity::Trigger
+                ::pgx::utils::sql_entity_graph::PgExternReturnEntity::Trigger
             },
         };
         tokens.append_all(quoted);
@@ -268,7 +269,7 @@ impl ToTokens for Returning {
 }
 
 #[derive(Debug, Clone)]
-pub(crate) struct NameMacro {
+pub struct NameMacro {
     pub(crate) ident: String,
     pub(crate) ty: syn::Type,
 }

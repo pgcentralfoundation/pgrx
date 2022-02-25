@@ -10,8 +10,11 @@ use colored::Colorize;
 use eyre::{eyre, WrapErr};
 use pgx_utils::get_target_dir;
 use pgx_utils::pg_config::PgConfig;
-use std::path::PathBuf;
-use std::process::{Command, Stdio};
+use std::{
+    path::{PathBuf, Path},
+    process::{Command, Stdio},
+    io::BufReader,
+};
 
 /// Install the extension from the current crate to the Postgres specified by whatever `pg_config` is currently on your $PATH
 #[derive(clap::Args, Debug)]
@@ -20,6 +23,9 @@ pub(crate) struct Install {
     /// Compile for release mode (default is debug)
     #[clap(env = "PROFILE", long, short)]
     release: bool,
+    /// Build in test mode (for `cargo pgx test`)
+    #[clap(long)]
+    test: bool,
     /// Don't regenerate the schema
     #[clap(long)]
     no_schema: bool,
@@ -46,19 +52,30 @@ impl CommandExecute for Install {
         let pg_version = format!("pg{}", pg_config.major_version()?);
         let features = crate::manifest::features_for_version(self.features, &manifest, &pg_version);
 
-        install_extension(&pg_config, self.release, self.no_schema, None, &features)
+        install_extension(
+            &manifest,
+            &pg_config,
+            self.release,
+            self.test,
+            self.no_schema,
+            None,
+            &features,
+        )
     }
 }
 
 #[tracing::instrument(skip_all, fields(
     pg_version = %pg_config.version()?,
     release = is_release,
+    test = is_test,
     base_directory = tracing::field::Empty,
     features = ?features.features,
 ))]
 pub(crate) fn install_extension(
+    manifest: &cargo_toml::Manifest,
     pg_config: &PgConfig,
     is_release: bool,
+    is_test: bool,
     no_schema: bool,
     base_directory: Option<PathBuf>,
     features: &clap_cargo::Features,
@@ -78,13 +95,13 @@ pub(crate) fn install_extension(
         ));
     }
 
-    build_extension(is_release, &features)?;
+    let build_command_output = build_extension(is_release, &features)?;
 
     println!();
     println!("installing extension");
     let pkgdir = make_relative(pg_config.pkglibdir()?);
     let extdir = make_relative(pg_config.extension_dir()?);
-    let shlibpath = find_library_file(&extname, is_release)?;
+    let shlibpath = find_library_file(manifest, build_command_output)?;
 
     {
         let mut dest = base_directory.clone();
@@ -112,7 +129,15 @@ pub(crate) fn install_extension(
     }
 
     if !no_schema || !get_target_sql_file(&extdir, &base_directory)?.exists() {
-        copy_sql_files(pg_config, is_release, features, &extdir, &base_directory)?;
+        copy_sql_files(
+            manifest,
+            pg_config,
+            is_release,
+            is_test,
+            features,
+            &extdir,
+            &base_directory,
+        )?;
     } else {
         println!("{} schema generation", "    Skipping".bold().yellow());
     }
@@ -132,10 +157,10 @@ fn copy_file(src: &PathBuf, dest: &PathBuf, msg: &str, do_filter: bool) -> eyre:
     }
 
     println!(
-        "{} {} to `{}`",
+        "{} {} to {}",
         "     Copying".bold().green(),
         msg,
-        format_display_path(&dest)?
+        format_display_path(&dest)?.cyan()
     );
 
     if do_filter {
@@ -159,11 +184,12 @@ fn copy_file(src: &PathBuf, dest: &PathBuf, msg: &str, do_filter: bool) -> eyre:
 pub(crate) fn build_extension(
     is_release: bool,
     features: &clap_cargo::Features,
-) -> eyre::Result<()> {
+) -> eyre::Result<std::process::Output> {
     let flags = std::env::var("PGX_BUILD_FLAGS").unwrap_or_default();
 
     let mut command = Command::new("cargo");
     command.arg("build");
+
     if is_release {
         command.arg("--release");
     }
@@ -182,23 +208,26 @@ pub(crate) fn build_extension(
         command.arg("--all-features");
     }
 
+    command.arg("--message-format=json-render-diagnostics");
+
     for arg in flags.split_ascii_whitespace() {
         command.arg(arg);
     }
 
-    let command = command.stdout(Stdio::inherit()).stderr(Stdio::inherit());
+    let command = command.stderr(Stdio::inherit());
     let command_str = format!("{:?}", command);
     println!(
         "building extension with features `{}`\n{}",
         features_arg, command_str
     );
-    let status = command
-        .status()
+    let cargo_output = command
+        .output()
         .wrap_err_with(|| format!("failed to spawn cargo: {}", command_str))?;
-    if !status.success() {
-        Err(eyre!("failed to build extension"))
+    if !cargo_output.status.success() {
+        // We explicitly do not want to return a spantraced error here.
+        std::process::exit(1)
     } else {
-        Ok(())
+        Ok(cargo_output)
     }
 }
 
@@ -214,8 +243,10 @@ fn get_target_sql_file(extdir: &PathBuf, base_directory: &PathBuf) -> eyre::Resu
 }
 
 fn copy_sql_files(
+    manifest: &cargo_toml::Manifest,
     pg_config: &PgConfig,
     is_release: bool,
+    is_test: bool,
     features: &clap_cargo::Features,
     extdir: &PathBuf,
     base_directory: &PathBuf,
@@ -224,17 +255,15 @@ fn copy_sql_files(
     let (_, extname) = crate::command::get::find_control_file()?;
 
     crate::command::schema::generate_schema(
+        manifest,
         pg_config,
         is_release,
+        is_test,
         features,
         &dest,
         Option::<String>::None,
         None,
-        false,
-        true,
-        true,
     )?;
-    copy_file(&dest, &dest, "extension schema file", true)?;
 
     // now copy all the version upgrade files too
     if let Ok(dir) = std::fs::read_dir("sql/") {
@@ -255,46 +284,51 @@ fn copy_sql_files(
     Ok(())
 }
 
-pub(crate) fn find_library_file(extname: &str, is_release: bool) -> eyre::Result<PathBuf> {
-    let mut target_dir = get_target_dir()?;
-    target_dir.push(if is_release { "release" } else { "debug" });
+#[tracing::instrument(level = "error", skip_all)]
+pub(crate) fn find_library_file(
+    manifest: &cargo_toml::Manifest,
+    build_command_output: std::process::Output,
+) -> eyre::Result<PathBuf> {
+    let crate_name = if let Some(ref package) = manifest.package {
+        &package.name
+    } else {
+        return Err(eyre!("Could not get crate name from manifest."));
+    };
 
-    if !target_dir.exists() {
-        return Err(eyre!(
-            "target directory does not exist: {}",
-            target_dir.display()
-        ));
-    }
+    let build_command_bytes = build_command_output.stdout;
+    let build_command_reader = BufReader::new(&*build_command_bytes);
+    let build_command_stream = cargo_metadata::Message::parse_stream(build_command_reader);
 
-    for f in std::fs::read_dir(&target_dir)
-        .wrap_err_with(|| format!("Unable to read {}", target_dir.display()))?
-    {
-        if let Ok(f) = f {
-            let filename = f.file_name().into_string().unwrap();
-
-            if filename.contains(extname)
-                && filename.starts_with("lib")
-                && (filename.ends_with(".so")
-                    || filename.ends_with(".dylib")
-                    || filename.ends_with(".dll"))
-            {
-                return Ok(f.path());
-            }
+    let mut library_file = None;
+    for stdout_stream_item in build_command_stream {
+        match stdout_stream_item.wrap_err("Invalid cargo json message")? {
+            cargo_metadata::Message::CompilerArtifact(artifact) => {
+                if artifact.target.name != *crate_name {
+                    continue;
+                }
+                for filename in artifact.filenames {
+                    let so_extension = if cfg!(target_os = "macos") {
+                        "dylib"
+                    } else {
+                        "so"
+                    };
+                    if filename.extension() == Some(so_extension) {
+                        library_file = Some(filename.to_string());
+                        break;
+                    }
+                }
+            },
+            cargo_metadata::Message::CompilerMessage(_)
+            | cargo_metadata::Message::BuildScriptExecuted(_)
+            | cargo_metadata::Message::BuildFinished(_)
+            | _ => (),
         }
     }
+    let library_file =
+        library_file.ok_or(eyre!("Could not get shared object file from Cargo output."))?;
+    let library_file_path = PathBuf::from(library_file);
 
-    if extname.contains('-') {
-        Err(eyre!("
-            library file not found in: `{}`.  It looks like your extension/crate name contains a dash (`-`).  The allowed set of characters is `{}`. Try renaming things, including your `{}.control` file",
-            target_dir.display(), "[a-z0-9_]".green(),
-            extname
-        ))
-    } else {
-        Err(eyre!(
-            "library file not found in: `{}`",
-            target_dir.display()
-        ))
-    }
+    Ok(library_file_path)
 }
 
 pub(crate) fn get_version() -> eyre::Result<String> {
@@ -334,7 +368,8 @@ fn make_relative(path: PathBuf) -> PathBuf {
     relative
 }
 
-fn format_display_path(path: &PathBuf) -> eyre::Result<String> {
+pub(crate) fn format_display_path(path: impl AsRef<Path>) -> eyre::Result<String> {
+    let path = path.as_ref();
     let out = path
         .strip_prefix(get_target_dir()?.parent().unwrap())
         .unwrap_or(&path)

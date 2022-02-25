@@ -64,7 +64,6 @@ pub use once_cell;
 pub use aggregate::*;
 pub use atomics::*;
 pub use callbacks::*;
-use datum::sql_entity_graph::{RustSourceOnlySqlMapping, RustSqlMapping};
 pub use datum::*;
 pub use enum_helper::*;
 pub use fcinfo::*;
@@ -95,10 +94,13 @@ pub use pgx_pg_sys::submodules::*;
 pub use pgx_pg_sys::PgBuiltInOids; // reexport this so it looks like it comes from here
 
 pub use cstr_core;
+pub use pgx_utils as utils;
 
 use core::any::TypeId;
 use once_cell::sync::Lazy;
 use std::collections::HashSet;
+
+use pgx_utils::sql_entity_graph::{RustSourceOnlySqlMapping, RustSqlMapping};
 
 macro_rules! map_source_only {
     ($map:ident, $rust:ty, $sql:expr) => {{
@@ -286,6 +288,7 @@ macro_rules! pg_magic_func {
         #[allow(non_snake_case)]
         #[allow(unused)]
         #[link_name = "Pg_magic_func"]
+        #[doc(hidden)]
         pub extern "C" fn Pg_magic_func() -> &'static pgx::pg_sys::Pg_magic_struct {
             use core::mem::size_of;
             use pgx;
@@ -333,13 +336,31 @@ macro_rules! pg_magic_func {
 #[macro_export]
 macro_rules! pg_sql_graph_magic {
     () => {
+        #[no_mangle]
+        #[doc(hidden)]
+        pub extern "C" fn __pgx_typeid_sql_mappings(
+        ) -> &'static ::pgx::utils::__reexports::std::collections::HashSet<
+            ::pgx::utils::sql_entity_graph::RustSqlMapping,
+        > {
+            &::pgx::DEFAULT_TYPEID_SQL_MAPPING
+        }
+
+        #[no_mangle]
+        #[doc(hidden)]
+        pub extern "C" fn __pgx_source_only_sql_mappings(
+        ) -> &'static ::pgx::utils::__reexports::std::collections::HashSet<
+            ::pgx::utils::sql_entity_graph::RustSourceOnlySqlMapping,
+        > {
+            &::pgx::DEFAULT_SOURCE_ONLY_SQL_MAPPING
+        }
+
         // A marker which must exist in the root of the extension.
         #[no_mangle]
-        pub extern "C" fn __pgx_marker() -> pgx::datum::sql_entity_graph::reexports::eyre::Result<
-            pgx::datum::sql_entity_graph::ControlFile,
-        > {
-            use core::convert::TryFrom;
-            use pgx::datum::sql_entity_graph::reexports::eyre::WrapErr;
+        #[doc(hidden)]
+        pub extern "C" fn __pgx_marker(
+        ) -> ::pgx::utils::__reexports::eyre::Result<::pgx::utils::sql_entity_graph::ControlFile> {
+            use ::core::convert::TryFrom;
+            use ::pgx::utils::__reexports::eyre::WrapErr;
             let package_version = env!("CARGO_PKG_VERSION");
             let context = include_str!(concat!(
                 env!("CARGO_MANIFEST_DIR"),
@@ -348,180 +369,11 @@ macro_rules! pg_sql_graph_magic {
                 ".control"
             ))
             .replace("@CARGO_VERSION@", package_version);
+
             let control_file =
-                pgx::datum::sql_entity_graph::ControlFile::try_from(context.as_str())
+                ::pgx::utils::sql_entity_graph::ControlFile::try_from(context.as_str())
                     .wrap_err_with(|| "Could not parse control file, is it valid?")?;
             Ok(control_file)
-        }
-    };
-}
-
-/// Create the default SQL generator code.
-///
-/// Accepts a single argument, which should be the crate name.
-///
-/// ```ignore
-/// // src/bin/sql-generator.rs
-/// pg_binary_magic!(crate_name);
-/// ```
-///
-/// This creates a binary that:
-///  * Has [`tracing`](pgx_utils::sql_entity_graph::reexports::tracing) and [`color_eyre`](`pgx_utils::sql_entity_graph::reexports::color_eyre`) set up.
-///  * Supports [`EnvFilter`](pgx_utils::sql_entity_graph::reexports::tracing_subscriber::EnvFilter) log level configuration.
-///  * Accepts `--sql path` and `--dot path` args, as well as a list of symbols.
-///    These symbols are the `__pgx_internals` prefixed ones which `cargo pgx schema` detects.
-///
-/// Using different SQL generator code should be considered an advanced use case, and not
-/// recommended.
-///
-/// <div class="example-wrap" style="display:inline-block">
-/// <pre class="ignore" style="white-space:normal;font:inherit;">
-///
-/// **Note**: `cargo pgx schema` or similar commands will automatically scaffold your
-/// `src/bin/sql-generator.rs` with this if it's not already present.
-///
-/// </pre></div>
-#[macro_export]
-macro_rules! pg_binary_magic {
-    ($($prelude:ident)::*) => {
-        fn main() -> pgx::datum::sql_entity_graph::reexports::color_eyre::Result<()> {
-            use pgx::datum::sql_entity_graph::{
-                reexports::{
-                    tracing_error::ErrorLayer,
-                    tracing,
-                    tracing_subscriber::{self, util::SubscriberInitExt, layer::SubscriberExt, EnvFilter},
-                    color_eyre,
-                    libloading,
-                    clap,
-                },
-                PgxSql, SqlGraphEntity,
-            };
-            pub use $($prelude :: )*__pgx_marker;
-            use std::path::PathBuf;
-            use clap::Parser;
-
-            #[derive(clap::Parser, Debug)]
-            #[clap(
-                version,
-                author,
-                about,
-            )]
-            struct SqlGenerator {
-                /// A path to output a produced SQL file (default is `sql/$EXTNAME-$VERSION.sql`)
-                #[clap(
-                    long,
-                    short,
-                    parse(from_os_str),
-                    env = "PGX_SQL_SQL",
-                )]
-                sql: Option<PathBuf>,
-                /// A path to output a produced GraphViz DOT file
-                #[clap(
-                    long,
-                    short,
-                    parse(from_os_str),
-                    env = "PGX_SQL_DOT",
-                )]
-                dot: Option<PathBuf>,
-                /// A path to output a produced GraphViz DOT file
-                #[clap(
-                    env = "PGX_SQL_ENTITY_SYMBOLS",
-                )]
-                symbols: Vec<String>,
-                /// Enable info logs, -vv for debug, -vvv for trace
-                #[clap(short = 'v', long, parse(from_occurrences), global = true)]
-                verbose: usize,
-            }
-
-            let sql_generator_cli = SqlGenerator::parse();
-
-            // Initialize tracing with tracing-error, and eyre
-            let fmt_layer = tracing_subscriber::fmt::Layer::new()
-                .pretty();
-            // Unless the user opts in specifically we don't want to impact `cargo-pgx schema` output.
-            let filter_layer = match EnvFilter::try_from_default_env() {
-                Ok(filter_layer) => filter_layer,
-                Err(_) => {
-                    let log_level = match sql_generator_cli.verbose {
-                        0 => "info",
-                        1 => "warn",
-                        _ => "trace",
-                    };
-                    let filter_layer = EnvFilter::new("warn");
-                    let filter_layer = filter_layer.add_directive(format!("cargo_pgx={}", log_level).parse()?);
-                    let filter_layer = filter_layer.add_directive(format!("pgx={}", log_level).parse()?);
-                    let filter_layer = filter_layer.add_directive(format!("pgx_macros={}", log_level).parse()?);
-                    let filter_layer = filter_layer.add_directive(format!("pgx_tests={}", log_level).parse()?);
-                    let filter_layer = filter_layer.add_directive(format!("pgx_pg_sys={}", log_level).parse()?);
-                    let filter_layer = filter_layer.add_directive(format!("pgx_utils={}", log_level).parse()?);
-                    filter_layer
-                }
-            };
-
-            tracing_subscriber::registry()
-                .with(filter_layer)
-                .with(fmt_layer)
-                .with(ErrorLayer::default())
-                .init();
-            color_eyre::install()?;
-
-            // After 0.2.6 the `cargo-pgx pgx schema` command would pass symbols in comma-separated.
-            // This catches that, warns, and handles it.
-            let sql_generator_cli = if sql_generator_cli.symbols.len() == 1 && sql_generator_cli.symbols[0].contains(",") {
-                tracing::warn!("`pgx` 0.2.7 changed how schema arguments are passed to the `sql-generator`. You are using a post-0.2.7 `pgx` with a 0.2.6 (or earlier) `cargo-pgx`. Please update `cargo-pgx`.");
-                let mut sql_generator_cli = sql_generator_cli;
-                sql_generator_cli.symbols = sql_generator_cli.symbols[0].split(',').map(String::from).collect();
-                sql_generator_cli
-            } else if sql_generator_cli.symbols.len() == 1 && sql_generator_cli.symbols[0].contains(" ") {
-                // The symbols were passed via env var. (clap 3's API doesn't let us do this automatically it seems?)
-                let mut sql_generator_cli = sql_generator_cli;
-                sql_generator_cli.symbols = sql_generator_cli.symbols[0].split(' ').map(String::from).collect();
-                sql_generator_cli
-            } else { sql_generator_cli };
-
-            let path = sql_generator_cli.sql.unwrap_or(concat!(
-                "./sql/",
-                core::env!("CARGO_PKG_NAME"),
-                "--",
-                core::env!("CARGO_PKG_VERSION"),
-                ".sql"
-            ).into());
-            let dot = sql_generator_cli.dot;
-
-            let symbols_to_call: Vec<_> = sql_generator_cli.symbols.iter()
-                .flat_map(|x| if x.is_empty() {
-                    None
-                } else {
-                    Some(x.to_string())
-                }).collect();
-
-            tracing::info!(path = %path.display(), "Collecting {} SQL entities", symbols_to_call.len());
-            let mut entities = Vec::default();
-            let control_file = __pgx_marker()?; // We *must* use this or the extension might not link in.
-            entities.push(SqlGraphEntity::ExtensionRoot(control_file));
-            unsafe {
-                let lib = libloading::os::unix::Library::this();
-                for symbol_to_call in symbols_to_call {
-                    let symbol: libloading::os::unix::Symbol<
-                        unsafe extern fn() -> SqlGraphEntity
-                    > = lib.get(symbol_to_call.as_bytes()).expect(&format!("Couldn't call {:#?}", symbol_to_call));
-                    let entity = symbol();
-                    entities.push(entity);
-                }
-            };
-
-            let pgx_sql = PgxSql::build(
-                pgx::DEFAULT_TYPEID_SQL_MAPPING.clone().into_iter(),
-                pgx::DEFAULT_SOURCE_ONLY_SQL_MAPPING.clone().into_iter(),
-                entities.into_iter()).unwrap();
-
-            tracing::info!(path = %path.display(), "Writing SQL");
-            pgx_sql.to_file(path)?;
-            if let Some(dot_path) = dot {
-                tracing::info!(dot = %dot_path.display(), "Writing Graphviz DOT");
-                pgx_sql.to_dot(dot_path)?;
-            }
-            Ok(())
         }
     };
 }

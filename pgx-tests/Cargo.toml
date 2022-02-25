@@ -11,7 +11,7 @@ documentation = "https://docs.rs/pgx-tests"
 readme = "README.md"
 
 [lib]
-crate-type = [ "cdylib", "rlib" ]
+crate-type = [ "cdylib", "lib" ]
 
 [features]
 default = [ ]

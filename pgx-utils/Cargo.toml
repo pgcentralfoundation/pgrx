@@ -19,7 +19,7 @@ proc-macro2 = { version = "1.0.36", features = [ "span-locations" ] }
 quote = "1.0.15"
 regex = "1.5.4"
 rttp_client = "0.1.0"
-serde = "1.0.136"
+serde = { version = "1.0.136", features = [ "derive" ] }
 serde_derive = "1.0.136"
 serde-xml-rs = "0.5.1"
 serde_json = "1.0.78"
@@ -28,9 +28,8 @@ toml = "0.5.8"
 unescape = "0.1.0"
 url = "2.2.2"
 eyre = "0.6.6"
-color-eyre = "0.6.0"
 tracing = "0.1.30"
 tracing-error = "0.2.0"
 tracing-subscriber = { version = "0.3.8", features = [ "env-filter" ] }
-libloading = "0.7.3"
-clap = { version = "3.0.14", features = [ "env", "suggestions", "cargo", "derive" ] }
+petgraph = "0.6.0"
+prettyplease = "0.1.4"
