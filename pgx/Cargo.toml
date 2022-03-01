@@ -2,7 +2,6 @@
 name = "pgx"
 version = "0.3.3"
 authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
-edition = "2018"
 license = "MIT"
 description = "pgx:  A Rust framework for creating Postgres extensions"
 homepage = "https://github.com/zombodb/pgx"
@@ -11,6 +10,7 @@ documentation = "https://docs.rs/pgx"
 categories = ["database"]
 keywords = ["database", "postgres", "postgresql", "extension"]
 readme = "../README.md"
+edition = "2021"
 
 [lib]
 crate-type = [ "rlib" ]

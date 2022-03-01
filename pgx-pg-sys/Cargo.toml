@@ -2,13 +2,13 @@
 name = "pgx-pg-sys"
 version = "0.3.3"
 authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
-edition = "2018"
 license = "MIT"
 description = "Generated Rust bindings for Postgres internals, for use with 'pgx'"
 homepage = "https://github.com/zombodb/pgx"
 repository = "https://github.com/zombodb/pgx"
 documentation = "https://docs.rs/pgx-pg-sys"
 readme = "README.md"
+edition = "2021"
 
 [features]
 default = [ ]

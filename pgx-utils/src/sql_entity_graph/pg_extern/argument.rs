@@ -320,7 +320,7 @@ impl ToTokens for PgExternArgument {
                 },
                 is_optional: #found_optional,
                 is_variadic: #found_variadic,
-                default: None#( .unwrap_or(Some(#default)) )*,
+                default: None #( .unwrap_or(Some(#default)) )*,
             }
         };
         tokens.append_all(quoted);

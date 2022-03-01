@@ -104,7 +104,7 @@ impl MaybeNamedVariadicType {
                     ty_source: #ty_string,
                     ty_id: core::any::TypeId::of::<#ty>(),
                     full_path: core::any::type_name::<#ty>(),
-                    name: None#( .unwrap_or(Some(#name)) )*,
+                    name: None #( .unwrap_or(Some(#name)) )*,
                 },
                 variadic: #variadic,
             }

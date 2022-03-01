@@ -249,7 +249,7 @@ impl ToTokens for Returning {
                                     let _ = path_items.pop(); // Drop the one we don't want.
                                     path_items.join("::")
                                 },
-                                None#( .unwrap_or(Some(stringify!(#name_iter))) )*,
+                                None #( .unwrap_or(Some(stringify!(#name_iter))) )*,
                             )
                         }
                     })

@@ -2,13 +2,13 @@
 name = "pgx-tests"
 version = "0.3.3"
 authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
-edition = "2018"
 license = "MIT"
 description = "Test framework for 'pgx'-based Postgres extensions"
 homepage = "https://github.com/zombodb/pgx"
 repository = "https://github.com/zombodb/pgx"
 documentation = "https://docs.rs/pgx-tests"
 readme = "README.md"
+edition = "2021"
 
 [lib]
 crate-type = [ "cdylib", "lib" ]
