@@ -5,7 +5,7 @@ use crate::{
     command::{get::get_property, run::exec_psql, start::start_postgres},
     CommandExecute,
 };
-use colored::Colorize;
+use owo_colors::OwoColorize;
 use eyre::{eyre, WrapErr};
 use pgx_utils::createdb;
 use pgx_utils::pg_config::{PgConfig, Pgx};

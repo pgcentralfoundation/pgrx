@@ -6,7 +6,7 @@ use crate::{
     CommandExecute,
 };
 use cargo_metadata::MetadataCommand;
-use colored::Colorize;
+use owo_colors::OwoColorize;
 use eyre::{eyre, WrapErr};
 use pgx_utils::get_target_dir;
 use pgx_utils::pg_config::PgConfig;

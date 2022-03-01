@@ -1,5 +1,5 @@
 //! Wrapper around Postgres' `pg_config` command-line tool
-use colored::Colorize;
+use owo_colors::OwoColorize;
 use eyre::{eyre, WrapErr};
 use std::{
     collections::HashMap,
@@ -393,7 +393,7 @@ impl Pgx {
 
 mod rss {
     use crate::pg_config::PgVersion;
-    use colored::Colorize;
+    use owo_colors::OwoColorize;
     use eyre::WrapErr;
     use rttp_client::{types::Proxy, HttpClient};
     use serde_derive::Deserialize;

@@ -3,7 +3,7 @@
 
 use crate::command::stop::stop_postgres;
 use crate::{CommandExecute, SUPPORTED_MAJOR_VERSIONS};
-use colored::Colorize;
+use owo_colors::OwoColorize;
 use eyre::{eyre, WrapErr};
 use pgx_utils::pg_config::{PgConfig, PgConfigSelector, Pgx};
 use pgx_utils::prefix_path;
