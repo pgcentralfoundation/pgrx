@@ -1,6 +1,7 @@
 use cargo_metadata::Metadata;
 use cargo_toml::Manifest;
 use eyre::eyre;
+use pgx_utils::SUPPORTED_MAJOR_VERSIONS;
 
 pub(crate) fn manifest(metadata: &Metadata) -> eyre::Result<Manifest> {
     let root = metadata
@@ -13,7 +14,7 @@ pub(crate) fn manifest(metadata: &Metadata) -> eyre::Result<Manifest> {
 pub(crate) fn default_pg_version(manifest: &Manifest) -> Option<String> {
     let default_features = manifest.features.get("default")?;
     for default_feature in default_features {
-        for major_version in crate::SUPPORTED_MAJOR_VERSIONS {
+        for major_version in SUPPORTED_MAJOR_VERSIONS {
             let potential_feature = format!("pg{}", major_version);
             if *default_feature == format!("pg{}", major_version) {
                 return Some(potential_feature);
@@ -38,7 +39,7 @@ pub(crate) fn features_for_version(
             let default_features = default_features
                 .iter()
                 .filter(|default_feature| {
-                    for supported_major in crate::SUPPORTED_MAJOR_VERSIONS {
+                    for supported_major in SUPPORTED_MAJOR_VERSIONS {
                         if **default_feature == format!("pg{}", supported_major) {
                             return false;
                         }
