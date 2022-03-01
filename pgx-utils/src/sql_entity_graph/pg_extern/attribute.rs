@@ -1,4 +1,4 @@
-use crate::sql_entity_graph::{PositioningRef, ToSqlConfig};
+use crate::sql_entity_graph::{positioning_ref::PositioningRef, to_sql::ToSqlConfig};
 use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
 use syn::{
@@ -29,43 +29,43 @@ pub enum Attribute {
 impl Attribute {
     pub(crate) fn to_sql_entity_graph_tokens(&self) -> TokenStream2 {
         match self {
-            Attribute::Immutable => quote! { pgx::datum::sql_entity_graph::ExternArgs::Immutable },
-            Attribute::Strict => quote! { pgx::datum::sql_entity_graph::ExternArgs::Strict },
-            Attribute::Stable => quote! { pgx::datum::sql_entity_graph::ExternArgs::Stable },
-            Attribute::Volatile => quote! { pgx::datum::sql_entity_graph::ExternArgs::Volatile },
-            Attribute::Raw => quote! { pgx::datum::sql_entity_graph::ExternArgs::Raw },
-            Attribute::NoGuard => quote! { pgx::datum::sql_entity_graph::ExternArgs::NoGuard },
+            Attribute::Immutable => quote! { ::pgx::utils::ExternArgs::Immutable },
+            Attribute::Strict => quote! { ::pgx::utils::ExternArgs::Strict },
+            Attribute::Stable => quote! { ::pgx::utils::ExternArgs::Stable },
+            Attribute::Volatile => quote! { ::pgx::utils::ExternArgs::Volatile },
+            Attribute::Raw => quote! { ::pgx::utils::ExternArgs::Raw },
+            Attribute::NoGuard => quote! { ::pgx::utils::ExternArgs::NoGuard },
             Attribute::ParallelSafe => {
-                quote! { pgx::datum::sql_entity_graph::ExternArgs::ParallelSafe }
+                quote! { ::pgx::utils::ExternArgs::ParallelSafe }
             }
             Attribute::ParallelUnsafe => {
-                quote! { pgx::datum::sql_entity_graph::ExternArgs::ParallelUnsafe }
+                quote! { ::pgx::utils::ExternArgs::ParallelUnsafe }
             }
             Attribute::ParallelRestricted => {
-                quote! { pgx::datum::sql_entity_graph::ExternArgs::ParallelRestricted }
+                quote! { ::pgx::utils::ExternArgs::ParallelRestricted }
             }
             Attribute::Error(s) => {
-                quote! { pgx::datum::sql_entity_graph::ExternArgs::Error(String::from(#s)) }
+                quote! { ::pgx::utils::ExternArgs::Error(String::from(#s)) }
             }
             Attribute::Schema(s) => {
-                quote! { pgx::datum::sql_entity_graph::ExternArgs::Schema(String::from(#s)) }
+                quote! { ::pgx::utils::ExternArgs::Schema(String::from(#s)) }
             }
             Attribute::Name(s) => {
-                quote! { pgx::datum::sql_entity_graph::ExternArgs::Name(String::from(#s)) }
+                quote! { ::pgx::utils::ExternArgs::Name(String::from(#s)) }
             }
             Attribute::Cost(s) => {
-                quote! { pgx::datum::sql_entity_graph::ExternArgs::Cost(format!("{}", #s)) }
+                quote! { ::pgx::utils::ExternArgs::Cost(format!("{}", #s)) }
             }
             Attribute::Requires(items) => {
                 let items_iter = items
                     .iter()
                     .map(|x| x.to_token_stream())
                     .collect::<Vec<_>>();
-                quote! { pgx::datum::sql_entity_graph::ExternArgs::Requires(vec![#(#items_iter),*],) }
+                quote! { ::pgx::utils::ExternArgs::Requires(vec![#(#items_iter),*],) }
             }
             // This attribute is handled separately
             Attribute::Sql(_) => {
-                quote! { }
+                quote! {}
             }
         }
     }
@@ -157,7 +157,7 @@ impl Parse for Attribute {
                 Self::Requires(content.parse_terminated(PositioningRef::parse)?)
             }
             "sql" => {
-                use crate::sql_entity_graph::ArgValue;
+                use crate::sql_entity_graph::pgx_attribute::ArgValue;
                 use syn::Lit;
 
                 let _eq: Token![=] = input.parse()?;
@@ -173,7 +173,17 @@ impl Parse for Attribute {
                     }
                 }
             }
-            e => return Err(syn::Error::new(Span::call_site(), format!("Invalid option `{}` inside `{} {}`", e, ident.to_string(), input.to_string()))),
+            e => {
+                return Err(syn::Error::new(
+                    Span::call_site(),
+                    format!(
+                        "Invalid option `{}` inside `{} {}`",
+                        e,
+                        ident.to_string(),
+                        input.to_string()
+                    ),
+                ))
+            }
         };
         Ok(found)
     }

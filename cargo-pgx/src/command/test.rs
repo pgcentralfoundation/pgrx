@@ -60,10 +60,10 @@ impl CommandExecute for Test {
                     testname = Some(pg_version.clone());
                     pgx.get(
                         &crate::manifest::default_pg_version(&manifest)
-                            .ok_or(eyre!("No provided `pg$VERSION` flag."))?
+                            .ok_or(eyre!("No provided `pg$VERSION` flag."))?,
                     )?
-                },
-                Ok(config) => config,   
+                }
+                Ok(config) => config,
             };
             let pg_version = format!("pg{}", pg_config.major_version()?);
 
@@ -116,22 +116,32 @@ pub fn test_extension(
         .stderr(Stdio::inherit())
         .arg("test")
         .env("CARGO_TARGET_DIR", &target_dir)
-        .env(
-            "PGX_FEATURES",
-            features_arg.clone(),
-        )
+        .env("PGX_FEATURES", features_arg.clone())
         .env(
             "PGX_NO_DEFAULT_FEATURES",
-            if no_default_features_arg { "true" } else { "false" },
-        ).env(
+            if no_default_features_arg {
+                "true"
+            } else {
+                "false"
+            },
+        )
+        .env(
             "PGX_ALL_FEATURES",
-            if features.all_features { "true" } else { "false" },
+            if features.all_features {
+                "true"
+            } else {
+                "false"
+            },
         )
         .env(
             "PGX_BUILD_PROFILE",
             if is_release { "release" } else { "debug" },
         )
         .env("PGX_NO_SCHEMA", if no_schema { "true" } else { "false" });
+
+    if let Ok(rust_log) = std::env::var("RUST_LOG") {
+        command.env("RUST_LOG", rust_log);
+    }
 
     if !features_arg.trim().is_empty() {
         command.arg("--features");

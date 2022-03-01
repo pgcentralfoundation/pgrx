@@ -2,8 +2,8 @@
 // governed by the MIT license that can be found in the LICENSE file.
 
 use crate::command::stop::stop_postgres;
-use crate::CommandExecute;
-use colored::Colorize;
+use crate::{CommandExecute, SUPPORTED_MAJOR_VERSIONS};
+use owo_colors::OwoColorize;
 use eyre::{eyre, WrapErr};
 use pgx_utils::{
     prefix_path,

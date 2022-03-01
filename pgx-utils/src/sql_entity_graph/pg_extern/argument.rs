@@ -12,13 +12,13 @@ use syn::{
 ///
 /// It is created during [`PgExtern`](crate::sql_entity_graph::PgExtern) parsing.
 #[derive(Debug, Clone)]
-pub struct Argument {
+pub struct PgExternArgument {
     pat: syn::Ident,
     ty: syn::Type,
     default: Option<String>,
 }
 
-impl Argument {
+impl PgExternArgument {
     pub fn build(value: FnArg) -> Result<Option<Self>, syn::Error> {
         match value {
             syn::FnArg::Typed(pat) => Self::build_from_pat_type(pat),
@@ -146,7 +146,7 @@ impl Argument {
             _ => (),
         };
 
-        Ok(Some(Argument {
+        Ok(Some(PgExternArgument {
             pat: identifier,
             ty: true_ty,
             default,
@@ -270,7 +270,7 @@ fn handle_default(
     }
 }
 
-impl ToTokens for Argument {
+impl ToTokens for PgExternArgument {
     fn to_tokens(&self, tokens: &mut TokenStream2) {
         let mut found_optional = false;
         let mut found_variadic = false;
@@ -307,7 +307,7 @@ impl ToTokens for Argument {
         let ty_string = ty.to_token_stream().to_string().replace(" ", "");
 
         let quoted = quote! {
-            pgx::datum::sql_entity_graph::PgExternArgumentEntity {
+            ::pgx::utils::sql_entity_graph::PgExternArgumentEntity {
                 pattern: stringify!(#pat),
                 ty_source: #ty_string,
                 ty_id: TypeId::of::<#ty>(),

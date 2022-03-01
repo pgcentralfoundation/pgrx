@@ -3,7 +3,7 @@
 
 extern crate proc_macro;
 
-use pgx_utils::{categorize_return_type, CategorizedType};
+use pgx_utils::{categorize_return_type, sql_entity_graph::PgExtern, CategorizedType};
 use proc_macro2::{Ident, Span};
 use quote::{quote, quote_spanned, ToTokens};
 use std::ops::Deref;
@@ -35,7 +35,7 @@ impl PgGuardRewriter {
     pub fn item_fn(
         &self,
         func: ItemFn,
-        entity_submission: Option<&pgx_utils::sql_entity_graph::PgExtern>,
+        entity_submission: Option<&PgExtern>,
         rewrite_args: bool,
         is_raw: bool,
         no_guard: bool,
@@ -53,7 +53,7 @@ impl PgGuardRewriter {
     fn item_fn_with_rewrite(
         &self,
         mut func: ItemFn,
-        entity_submission: Option<&pgx_utils::sql_entity_graph::PgExtern>,
+        entity_submission: Option<&PgExtern>,
         is_raw: bool,
         no_guard: bool,
     ) -> (proc_macro2::TokenStream, bool) {
@@ -96,6 +96,7 @@ impl PgGuardRewriter {
         let prolog = quote! {
             #func
 
+            #[doc(hidden)]
             #[allow(unused_variables)]
         };
         match categorize_return_type(&func) {
@@ -189,7 +190,7 @@ impl PgGuardRewriter {
         generics: &Generics,
         func_call: proc_macro2::TokenStream,
         rewritten_return_type: proc_macro2::TokenStream,
-        sql_graph_entity_submission: Option<&pgx_utils::sql_entity_graph::PgExtern>,
+        sql_graph_entity_submission: Option<&PgExtern>,
         no_guard: bool,
     ) -> proc_macro2::TokenStream {
         let guard = if no_guard {
@@ -200,7 +201,6 @@ impl PgGuardRewriter {
         let sql_graph_entity_submission = sql_graph_entity_submission.cloned().into_iter();
         quote_spanned! {func_span=>
             #prolog
-
             #[allow(clippy::missing_safety_doc)]
             #[allow(clippy::redundant_closure)]
             #guard
@@ -217,7 +217,7 @@ impl PgGuardRewriter {
 
     fn impl_tuple_udf(
         mut func: ItemFn,
-        entity_submission: Option<&pgx_utils::sql_entity_graph::PgExtern>,
+        entity_submission: Option<&PgExtern>,
     ) -> proc_macro2::TokenStream {
         let func_span = func.span();
         let return_type = func.sig.output;
@@ -256,7 +256,7 @@ impl PgGuardRewriter {
         func_name_wrapper: Ident,
         generics: &Generics,
         func_call: proc_macro2::TokenStream,
-        sql_graph_entity_submission: Option<&pgx_utils::sql_entity_graph::PgExtern>,
+        sql_graph_entity_submission: Option<&PgExtern>,
         optional: bool,
     ) -> proc_macro2::TokenStream {
         let generic_type = proc_macro2::TokenStream::from_str(types.first().unwrap()).unwrap();
@@ -343,7 +343,7 @@ impl PgGuardRewriter {
         func_name_wrapper: Ident,
         generics: &Generics,
         func_call: proc_macro2::TokenStream,
-        entity_submission: Option<&pgx_utils::sql_entity_graph::PgExtern>,
+        entity_submission: Option<&PgExtern>,
         optional: bool,
     ) -> proc_macro2::TokenStream {
         let numtypes = types.len();
@@ -453,7 +453,7 @@ impl PgGuardRewriter {
     fn item_fn_without_rewrite(
         &self,
         mut func: ItemFn,
-        entity_submission: Option<&pgx_utils::sql_entity_graph::PgExtern>,
+        entity_submission: Option<&PgExtern>,
         no_guard: bool,
     ) -> proc_macro2::TokenStream {
         // remember the original visibility and signature classifications as we want
@@ -501,6 +501,7 @@ impl PgGuardRewriter {
 
         quote_spanned! {func.span()=>
             #prolog
+            #[doc(hidden)]
             #vis #sig {
                 #[allow(non_snake_case)]
                 #func
@@ -531,6 +532,7 @@ impl PgGuardRewriter {
         let return_type = PgGuardRewriter::get_return_type(&func.sig);
 
         quote! {
+            #[doc(hidden)]
             #[allow(clippy::missing_safety_doc)]
             #[allow(clippy::redundant_closure)]
             #[allow(improper_ctypes_definitions)] /* for i128 */

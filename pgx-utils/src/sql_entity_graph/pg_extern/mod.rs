@@ -1,14 +1,17 @@
 mod argument;
 mod attribute;
+pub mod entity;
 mod operator;
 mod returning;
 mod search_path;
 
-pub use argument::Argument;
-use attribute::Attribute;
+pub use argument::PgExternArgument;
 pub use operator::PgOperator;
+pub use returning::NameMacro;
+
+use crate::sql_entity_graph::ToSqlConfig;
+use attribute::Attribute;
 use operator::{PgxOperatorAttributeWithIdent, PgxOperatorOpName};
-pub(crate) use returning::NameMacro;
 use returning::Returning;
 use search_path::SearchPathList;
 
@@ -16,17 +19,17 @@ use eyre::WrapErr;
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
 use std::convert::TryFrom;
-use syn::parse::{Parse, ParseStream, Parser};
-use syn::punctuated::Punctuated;
-use syn::{Meta, Token};
-
-use crate::sql_entity_graph::ToSqlConfig;
+use syn::{
+    parse::{Parse, ParseStream, Parser},
+    punctuated::Punctuated,
+    Meta, Token,
+};
 
 /// A parsed `#[pg_extern]` item.
 ///
 /// It should be used with [`syn::parse::Parse`] functions.
 ///
-/// Using [`quote::ToTokens`] will output the declaration for a `pgx::datum::sql_entity_graph::InventoryPgExtern`.
+/// Using [`quote::ToTokens`] will output the declaration for a [`PgExternEntity`][crate::sql_entity_graph::PgExternEntity].
 ///
 /// ```rust
 /// use syn::{Macro, parse::Parse, parse_quote, parse};
@@ -171,10 +174,10 @@ impl PgExtern {
             .and_then(|attr| Some(attr.parse_args::<SearchPathList>().unwrap()))
     }
 
-    fn inputs(&self) -> eyre::Result<Vec<Argument>> {
+    fn inputs(&self) -> eyre::Result<Vec<PgExternArgument>> {
         let mut args = Vec::default();
         for input in &self.func.sig.inputs {
-            let arg = Argument::build(input.clone())
+            let arg = PgExternArgument::build(input.clone())
                 .wrap_err_with(|| format!("Could not map {:?}", input))?;
             if let Some(arg) = arg {
                 args.push(arg);
@@ -205,7 +208,7 @@ impl PgExtern {
         }
 
         let func = syn::parse2::<syn::ItemFn>(item)?;
-        
+
         if let Some(ref mut to_sql_config) = to_sql_config {
             if let Some(ref mut content) = to_sql_config.content {
                 let value = content.value();
@@ -231,7 +234,9 @@ impl ToTokens for PgExtern {
         let name = self.name();
         let schema = self.schema();
         let schema_iter = schema.iter();
-        let extern_attrs = self.attrs.iter()
+        let extern_attrs = self
+            .attrs
+            .iter()
             .map(|attr| attr.to_sql_entity_graph_tokens())
             .collect::<Punctuated<_, Token![,]>>();
         let search_path = self.search_path().into_iter();
@@ -260,12 +265,13 @@ impl ToTokens for PgExtern {
             syn::Ident::new(&format!("__pgx_internals_fn_{}", ident), Span::call_site());
         let inv = quote! {
             #[no_mangle]
-            pub extern "C" fn  #sql_graph_entity_fn_name() -> pgx::datum::sql_entity_graph::SqlGraphEntity {
+            #[doc(hidden)]
+            pub extern "C" fn  #sql_graph_entity_fn_name() -> ::pgx::utils::sql_entity_graph::SqlGraphEntity {
                 use core::any::TypeId;
                 extern crate alloc;
                 use alloc::vec::Vec;
                 use alloc::vec;
-                let submission = pgx::datum::sql_entity_graph::PgExternEntity {
+                let submission = ::pgx::utils::sql_entity_graph::PgExternEntity {
                     name: #name,
                     unaliased_name: stringify!(#ident),
                     schema: None#( .unwrap_or(Some(#schema_iter)) )*,
@@ -280,7 +286,7 @@ impl ToTokens for PgExtern {
                     operator: None#( .unwrap_or(Some(#operator)) )*,
                     to_sql_config: #to_sql_config,
                 };
-                pgx::datum::sql_entity_graph::SqlGraphEntity::Function(submission)
+                ::pgx::utils::sql_entity_graph::SqlGraphEntity::Function(submission)
             }
         };
         tokens.append_all(inv);

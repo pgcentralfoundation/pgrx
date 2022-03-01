@@ -3,7 +3,7 @@
 mod tests {
     #[allow(unused_imports)]
     use crate as pgx_tests;
-    use pgx::{*, AllocatedByRust};
+    use pgx::{AllocatedByRust, *};
 
     #[pg_test]
     fn pgbox_alloc() {
@@ -35,7 +35,7 @@ mod tests {
 
         ptr.push(1);
         assert_eq!(*ptr, vec![1]);
-        
+
         ptr.push(2);
         assert_eq!(*ptr, vec![1, 2]);
 
@@ -48,21 +48,17 @@ mod tests {
 
     #[pg_test]
     fn pgbox_new_in_context() {
-        let ptr: PgBox<i32, AllocatedByRust> = PgBox::new_in_context(
-            5,
-            PgMemoryContexts::CurrentMemoryContext,
-        );
+        let ptr: PgBox<i32, AllocatedByRust> =
+            PgBox::new_in_context(5, PgMemoryContexts::CurrentMemoryContext);
         assert_eq!(*ptr, 5);
 
-        let mut ptr: PgBox<Vec<i32>, AllocatedByRust> = PgBox::new_in_context(
-            vec![],
-            PgMemoryContexts::CurrentMemoryContext,
-        );
+        let mut ptr: PgBox<Vec<i32>, AllocatedByRust> =
+            PgBox::new_in_context(vec![], PgMemoryContexts::CurrentMemoryContext);
         assert_eq!(*ptr, Vec::<i32>::default());
 
         ptr.push(1);
         assert_eq!(*ptr, vec![1]);
-        
+
         ptr.push(2);
         assert_eq!(*ptr, vec![1, 2]);
 
