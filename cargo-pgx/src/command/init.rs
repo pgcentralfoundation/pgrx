@@ -2,11 +2,14 @@
 // governed by the MIT license that can be found in the LICENSE file.
 
 use crate::command::stop::stop_postgres;
-use crate::{CommandExecute, SUPPORTED_MAJOR_VERSIONS};
+use crate::CommandExecute;
 use owo_colors::OwoColorize;
 use eyre::{eyre, WrapErr};
-use pgx_utils::pg_config::{PgConfig, PgConfigSelector, Pgx};
-use pgx_utils::prefix_path;
+use pgx_utils::{
+    prefix_path,
+    SUPPORTED_MAJOR_VERSIONS,
+    pg_config::{PgConfig, PgConfigSelector, Pgx},
+};
 use rayon::prelude::*;
 use rttp_client::{types::Proxy, HttpClient};
 
