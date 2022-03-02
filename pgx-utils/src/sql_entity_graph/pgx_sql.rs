@@ -244,6 +244,14 @@ impl PgxSql {
         Ok(())
     }
 
+
+    #[instrument(level = "error", skip_all)]
+    pub fn write(&self, out: &mut impl std::io::Write) -> eyre::Result<()> {  
+        let generated = self.to_sql()?;
+        write!(*out, "{}", generated)?;
+        Ok(())
+    }
+
     #[instrument(level = "error", err, skip(self))]
     pub fn to_dot(&self, file: impl AsRef<Path> + Debug) -> eyre::Result<()> {
         use std::{

@@ -5,6 +5,7 @@ mod command;
 mod manifest;
 mod metadata;
 
+use atty::Stream;
 use clap::Parser;
 use tracing_error::ErrorLayer;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
@@ -45,12 +46,19 @@ impl CommandExecute for CargoSubcommands {
 }
 
 fn main() -> color_eyre::Result<()> {
-    color_eyre::install()?;
+    color_eyre::config::HookBuilder::default().theme(if !atty::is(Stream::Stderr) {
+        color_eyre::config::Theme::new()
+    } else {
+        color_eyre::config::Theme::default()
+    }).install()?;
 
     let cargo_cli = CargoCommand::parse();
 
     // Initialize tracing with tracing-error, and eyre
-    let fmt_layer = tracing_subscriber::fmt::Layer::new().pretty();
+    let fmt_layer = tracing_subscriber::fmt::Layer::new()
+        .with_ansi(atty::is(Stream::Stderr))
+        .with_writer(std::io::stderr)
+        .pretty();
 
     let filter_layer = match EnvFilter::try_from_default_env() {
         Ok(filter_layer) => filter_layer,

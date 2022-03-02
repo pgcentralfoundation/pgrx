@@ -260,7 +260,7 @@ fn copy_sql_files(
         is_release,
         is_test,
         features,
-        &dest,
+        Some(&dest),
         Option::<String>::None,
         None,
     )?;
