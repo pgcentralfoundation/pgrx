@@ -21,7 +21,7 @@
 ## Key Features
 
 #### A Managed Development Environment
- - A cargo sub-command (`cargo-pgx`) for managing the `pgx` development environment
+ - A cargo sub-command ([`cargo-pgx`](./cargo-pgx/README.md) for managing the `pgx` development environment
     - Quickly create a new extension template crate via `cargo pgx new`
     - Install, configure, compile, and privately install all required Postgres versions via `cargo pgx init`
     - Run your extension and interactively test with `psql` via `cargo pgx run`
@@ -201,7 +201,8 @@ my_extension=# SELECT hello_my_extension();
 ```
 
 ### 5. Detailed cargo pgx usage
-For more details on how to manage pgx extensions see [Managing pgx extensions](https://github.com/zombodb/pgx/tree/master/cargo-pgx#readme)
+
+For more details on how to manage pgx extensions see [Managing pgx extensions](./cargo-pgx/README.md.)
 
 ## Upgrading
 
