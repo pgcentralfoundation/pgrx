@@ -1,6 +1,7 @@
 #! /usr/bin/env bash
 
-# requires: https://github.com/sunng87/cargo-release
+# requires:
+# * ripgrep
 
 if [ "x$1" == "x" ]; then
     echo "usage:  ./update-verions.sh <VERSION>"
@@ -44,14 +45,18 @@ DEPENDENCIES_TO_UPDATE=(
     "cargo-pgx"
 )
 
+SEMVER_REGEX="(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?"
+
 for cargo_toml in ${CARGO_TOMLS_TO_SED[@]}; do
     for dependency in ${DEPENDENCIES_TO_UPDATE[@]}; do
-        sed -i'' -E "s/(^${dependency}.*\")[0-9]+\.[0-9]+\.[0-9]+(\".*$)/\1${VERSION}\2/" ${cargo_toml}
+        rg --passthru -N "(?P<prefix>^${dependency}.*\")${SEMVER_REGEX}(?P<postfix>\".*$)" -r "\${prefix}${VERSION}\${postfix}" ${cargo_toml} > ${cargo_toml}.tmp || true
+        mv ${cargo_toml}.tmp ${cargo_toml}
     done
 done
 
 for cargo_toml in ${CARGO_TOMLS_TO_BUMP[@]}; do
-    sed -i'' -E "s/(^version = \")[0-9]+\.[0-9]+\.[0-9]+(\"$)/\1${VERSION}\2/" ${cargo_toml}
+    rg --passthru -N "(?P<prefix>^version = \")${SEMVER_REGEX}(?P<postfix>\"$)" -r "\${prefix}${VERSION}\${postfix}" ${cargo_toml} > ${cargo_toml}.tmp || true
+    mv ${cargo_toml}.tmp ${cargo_toml}
 done
 
 cargo generate-lockfile
@@ -62,4 +67,4 @@ for example in ./pgx-examples/*/; do
     popd
 done
 
-PGX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE=1 cargo test --no-run --workspace --features "pg14 pg_test"
+PGX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE=1 cargo test --no-run --workspace --no-default-features --features "pg14"
