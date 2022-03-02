@@ -78,6 +78,8 @@
 #include "storage/procarray.h"
 #include "tcop/tcopprot.h"
 #include "tcop/utility.h"
+#include "tsearch/ts_public.h"
+#include "tsearch/ts_utils.h"
 #include "utils/builtins.h"
 #include "utils/date.h"
 #include "utils/datetime.h"

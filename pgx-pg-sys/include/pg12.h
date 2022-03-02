@@ -73,6 +73,8 @@
 #include "storage/itemptr.h"
 #include "storage/lwlock.h"
 #include "storage/procarray.h"
+#include "tsearch/ts_public.h"
+#include "tsearch/ts_utils.h"
 #include "tcop/tcopprot.h"
 #include "tcop/utility.h"
 #include "utils/builtins.h"
