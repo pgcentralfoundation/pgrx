@@ -274,16 +274,16 @@ impl ToTokens for PgExtern {
                 let submission = ::pgx::utils::sql_entity_graph::PgExternEntity {
                     name: #name,
                     unaliased_name: stringify!(#ident),
-                    schema: None#( .unwrap_or(Some(#schema_iter)) )*,
+                    schema: None #( .unwrap_or(Some(#schema_iter)) )*,
                     file: file!(),
                     line: line!(),
                     module_path: core::module_path!(),
                     full_path: concat!(core::module_path!(), "::", stringify!(#ident)),
                     extern_attrs: vec![#extern_attrs],
-                    search_path: None#( .unwrap_or(Some(vec![#search_path])) )*,
+                    search_path: None #( .unwrap_or(Some(vec![#search_path])) )*,
                     fn_args: vec![#(#inputs),*],
                     fn_return: #returns,
-                    operator: None#( .unwrap_or(Some(#operator)) )*,
+                    operator: None #( .unwrap_or(Some(#operator)) )*,
                     to_sql_config: #to_sql_config,
                 };
                 ::pgx::utils::sql_entity_graph::SqlGraphEntity::Function(submission)

@@ -28,11 +28,11 @@ impl ToTokens for PgOperator {
         let merges = self.merges;
         let quoted = quote! {
             ::pgx::utils::sql_entity_graph::PgOperatorEntity {
-                opname: None#( .unwrap_or(Some(#opname)) )*,
-                commutator: None#( .unwrap_or(Some(#commutator)) )*,
-                negator: None#( .unwrap_or(Some(#negator)) )*,
-                restrict: None#( .unwrap_or(Some(#restrict)) )*,
-                join: None#( .unwrap_or(Some(#join)) )*,
+                opname: None #( .unwrap_or(Some(#opname)) )*,
+                commutator: None #( .unwrap_or(Some(#commutator)) )*,
+                negator: None #( .unwrap_or(Some(#negator)) )*,
+                restrict: None #( .unwrap_or(Some(#restrict)) )*,
+                join: None #( .unwrap_or(Some(#join)) )*,
                 hashes: #hashes,
                 merges: #merges,
             }

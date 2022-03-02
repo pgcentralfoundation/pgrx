@@ -2,7 +2,6 @@
 name = "cargo-pgx"
 version = "0.3.3"
 authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
-edition = "2018"
 license = "MIT"
 description = "Cargo subcommand for 'pgx' to make Postgres extension development easy"
 homepage = "https://github.com/zombodb/pgx"
@@ -12,6 +11,7 @@ categories = ["development-tools::cargo-plugins", "command-line-utilities", "dat
 keywords = ["database", "postgres", "postgresql", "extension"]
 readme = "README.md"
 exclude = [ "*.png" ]
+edition = "2021"
 
 [dependencies]
 cargo_metadata = "0.14.2"

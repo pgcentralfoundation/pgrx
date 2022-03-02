@@ -55,4 +55,4 @@ jobs:
 
     # test our code
     - name: cargo test
-      run: RUST_BACKTRACE=1 cargo test --all --features "pg${{ matrix.version }} pg_test" --no-default-features
+      run: RUST_BACKTRACE=1 cargo test --all --features "pg${{ matrix.version }}" --no-default-features

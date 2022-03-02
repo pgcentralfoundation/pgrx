@@ -1,13 +1,10 @@
 [package]
 name = "schemas"
 version = "0.0.0"
-edition = "2018"
+edition = "2021"
 
 [lib]
 crate-type = ["cdylib"]
-
-# remove this empty 'workspace' declaration if compiling outside of 'pgx'
-[workspace]
 
 [features]
 default = ["pg13"]

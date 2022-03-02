@@ -1,27 +1,16 @@
-[package]
-name = "pgx-parent"
-version = "0.3.3"
-authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
-edition = "2018"
-license = "MIT"
-description = "Top-level repo for 'pgx' (not on crates.io)"
-homepage = "https://github.com/zombodb/pgx/"
-repository = "https://github.com/zombodb/pgx/"
-
 [workspace]
+resolver = "2"
 members = [
-    ".",
     "cargo-pgx",
     "pgx",
     "pgx-macros",
     "pgx-pg-sys",
     "pgx-tests",
     "pgx-utils",
-]
-exclude = [
     "pgx-examples/aggregate",
     "pgx-examples/arrays",
     "pgx-examples/bad_ideas",
+    "pgx-examples/bgworker",
     "pgx-examples/bytea",
     "pgx-examples/custom_types",
     "pgx-examples/custom_sql",
@@ -35,25 +24,3 @@ exclude = [
     "pgx-examples/strings",
     "pgx-examples/triggers",
 ]
-
-[features]
-default = [ ]
-pg10 = [ "pgx/pg10", "pgx-pg-sys/pg10", "pgx-tests/pg10" ]
-pg11 = [ "pgx/pg11", "pgx-pg-sys/pg11", "pgx-tests/pg11" ]
-pg12 = [ "pgx/pg12", "pgx-pg-sys/pg12", "pgx-tests/pg12" ]
-pg13 = [ "pgx/pg13", "pgx-pg-sys/pg13", "pgx-tests/pg13" ]
-pg14 = [ "pgx/pg14", "pgx-pg-sys/pg14", "pgx-tests/pg14" ]
-pg_test = [ "pgx-tests/pg_test" ]
-
-[package.metadata.docs.rs]
-features = ["pg14"]
-no-default-features = true
-# Enable `#[cfg(docsrs)]` (https://docs.rs/about/builds#cross-compiling)
-rustc-args = ["--cfg", "docsrs"]
-
-[dependencies]
-cargo-pgx = { path = "cargo-pgx", version = "0.3.3" }
-pgx = { path = "pgx", version = "0.3.3", default-features = false }
-pgx-macros = { path = "pgx-macros", version = "0.3.3" }
-pgx-pg-sys = { path = "pgx-pg-sys", version = "0.3.3", default-features = false }
-pgx-tests = { path = "pgx-tests", version = "0.3.3", default-features = false }
