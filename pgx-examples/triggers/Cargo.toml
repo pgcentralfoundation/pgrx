@@ -1,12 +1,10 @@
 [package]
 name = "triggers"
 version = "0.0.0"
-edition = "2018"
+edition = "2021"
 
 [lib]
-crate-type = ["cdylib", "rlib"]
-
-[workspace]
+crate-type = ["cdylib"]
 
 [features]
 default = ["pg13"]

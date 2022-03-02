@@ -9,20 +9,13 @@ use clap::Parser;
 use tracing_error::ErrorLayer;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
 
-const SUPPORTED_MAJOR_VERSIONS: &[u16] = &[10, 11, 12, 13, 14];
-
 trait CommandExecute {
     fn execute(self) -> eyre::Result<()>;
 }
 
 /// `cargo` stub for `cargo-pgx` (you probably meant to run `cargo pgx`)
 #[derive(clap::Parser, Debug)]
-#[clap(
-    name = "cargo",
-    bin_name = "cargo",
-    version,
-    global_setting(clap::AppSettings::PropagateVersion)
-)]
+#[clap(name = "cargo", bin_name = "cargo", version, propagate_version = true)]
 struct CargoCommand {
     #[clap(subcommand)]
     subcommand: CargoSubcommands,

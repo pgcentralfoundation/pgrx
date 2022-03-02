@@ -45,12 +45,12 @@ This creates SQL like so:
 -- src/lib.rs:11
 -- aggregate::DemoSum
 CREATE AGGREGATE DemoSum (
-	integer /* i32 */
+    integer /* i32 */
 )
 (
-	SFUNC = "demo_sum_state", /* aggregate::DemoSum::state */
-	STYPE = DemoSum, /* aggregate::DemoSum */
-	INITCOND = '{ "count": 0 }' /* aggregate::DemoSum::INITIAL_CONDITION */
+    SFUNC = "demo_sum_state", /* aggregate::DemoSum::state */
+    STYPE = DemoSum, /* aggregate::DemoSum */
+    INITCOND = '{ "count": 0 }' /* aggregate::DemoSum::INITIAL_CONDITION */
 );
 ```
 
@@ -62,7 +62,7 @@ CREATE TABLE
 aggregate=# INSERT INTO demo_table (value) VALUES (1), (2), (3);
 INSERT 0 3
 aggregate=# SELECT DemoSum(value) FROM demo_table;
-    demosum    
+    demosum
 -------------
  {"count":6}
 (1 row)
@@ -76,7 +76,7 @@ Sometimes aggregates need to handle multiple arguments. The
 ```rust
 # use pgx::*;
 # use serde::{Serialize, Deserialize};
-# 
+#
 # #[derive(Copy, Clone, Default, PostgresType, Serialize, Deserialize)]
 # pub struct DemoSum {
 #     count: i32,
@@ -104,13 +104,13 @@ Creates:
 -- src/lib.rs:11
 -- aggregate::DemoSum
 CREATE AGGREGATE DemoSum (
-	integer, /* i32 */
-	integer /* i32 */
+    integer, /* i32 */
+    integer /* i32 */
 )
 (
-	SFUNC = "demo_sum_state", /* aggregate::DemoSum::state */
-	STYPE = DemoSum, /* aggregate::DemoSum */
-	INITCOND = '{ "count": 0 }' /* aggregate::DemoSum::INITIAL_CONDITION */
+    SFUNC = "demo_sum_state", /* aggregate::DemoSum::state */
+    STYPE = DemoSum, /* aggregate::DemoSum */
+    INITCOND = '{ "count": 0 }' /* aggregate::DemoSum::INITIAL_CONDITION */
 );
 ```
 
@@ -121,12 +121,12 @@ The [`name!(ident, Type)`][macro@crate::name] macro can be used to set the name 
 ```rust
 # use pgx::*;
 # use serde::{Serialize, Deserialize};
-# 
+#
 # #[derive(Copy, Clone, Default, PostgresType, Serialize, Deserialize)]
 # pub struct DemoSum {
 #     count: i32,
 # }
-# 
+#
 # #[pg_aggregate]
 impl Aggregate for DemoSum {
     const INITIAL_CONDITION: Option<&'static str> = Some(r#"{ "count": 0 }"#);
@@ -150,13 +150,13 @@ Creates:
 -- src/lib.rs:11
 -- aggregate::DemoSum
 CREATE AGGREGATE DemoSum (
-	integer, /* i32 */
-	"extra" integer /* i32 */
+    integer, /* i32 */
+    "extra" integer /* i32 */
 )
 (
-	SFUNC = "demo_sum_state", /* aggregate::DemoSum::state */
-	STYPE = DemoSum, /* aggregate::DemoSum */
-	INITCOND = '{ "count": 0 }' /* aggregate::DemoSum::INITIAL_CONDITION */
+    SFUNC = "demo_sum_state", /* aggregate::DemoSum::state */
+    STYPE = DemoSum, /* aggregate::DemoSum */
+    INITCOND = '{ "count": 0 }' /* aggregate::DemoSum::INITIAL_CONDITION */
 );
 ```
 
@@ -168,7 +168,7 @@ accepts the same parameters as [`#[pg_extern]`][macro@pgx-macros::pg_extern].
 ```rust
 # use pgx::*;
 # use serde::{Serialize, Deserialize};
-# 
+#
 # #[derive(Copy, Clone, Default, PostgresType, Serialize, Deserialize)]
 # pub struct DemoSum {
 #     count: i32,
@@ -195,8 +195,8 @@ Generates:
 -- src/lib.rs:11
 -- aggregate::demo_sum_state
 CREATE OR REPLACE FUNCTION "demo_sum_state"(
-	"this" DemoSum, /* aggregate::DemoSum */
-	"arg_one" integer /* i32 */
+    "this" DemoSum, /* aggregate::DemoSum */
+    "arg_one" integer /* i32 */
 ) RETURNS DemoSum /* aggregate::DemoSum */
 PARALLEL SAFE IMMUTABLE STRICT
 LANGUAGE c /* Rust */
@@ -210,7 +210,7 @@ Sometimes it's useful to have aggregates share state, or use some other type for
 ```rust
 # use pgx::*;
 # use serde::{Serialize, Deserialize};
-# 
+#
 #[derive(Copy, Clone, Default, PostgresType, Serialize, Deserialize)]
 pub struct DemoSumState {
     count: i32,
@@ -239,8 +239,8 @@ Creates:
 -- src/lib.rs:13
 -- aggregate::demo_sum_state
 CREATE OR REPLACE FUNCTION "demo_sum_state"(
-	"this" DemoSumState, /* aggregate::DemoSumState */
-	"arg_one" integer /* i32 */
+    "this" DemoSumState, /* aggregate::DemoSumState */
+    "arg_one" integer /* i32 */
 ) RETURNS DemoSumState /* aggregate::DemoSumState */
 STRICT
 LANGUAGE c /* Rust */
@@ -249,12 +249,12 @@ AS 'MODULE_PATHNAME', 'demo_sum_state_wrapper';
 -- src/lib.rs:13
 -- aggregate::DemoSum
 CREATE AGGREGATE DemoSum (
-	integer /* i32 */
+    integer /* i32 */
 )
 (
-	SFUNC = "demo_sum_state", /* aggregate::DemoSum::state */
-	STYPE = DemoSumState, /* aggregate::DemoSumState */
-	INITCOND = '{ "count": 0 }' /* aggregate::DemoSum::INITIAL_CONDITION */
+    SFUNC = "demo_sum_state", /* aggregate::DemoSum::state */
+    STYPE = DemoSumState, /* aggregate::DemoSumState */
+    INITCOND = '{ "count": 0 }' /* aggregate::DemoSum::INITIAL_CONDITION */
 );
 ```
 
@@ -262,18 +262,19 @@ CREATE AGGREGATE DemoSum (
 
 use crate::{
     error,
-    datum::sql_entity_graph::{PgxSql, ToSql},
-    pgbox::PgBox,
     memcxt::PgMemoryContexts,
-    pg_sys::{CurrentMemoryContext, MemoryContext, AggCheckCallContext, FunctionCallInfo},
+    pg_sys::{AggCheckCallContext, CurrentMemoryContext, FunctionCallInfo, MemoryContext},
+    pgbox::PgBox,
 };
 
+pub use pgx_utils::sql_entity_graph::{FinalizeModify, ParallelOption};
+
 /// Aggregate implementation trait.
-/// 
+///
 /// When decorated with [`#[pgx_macros::pg_aggregate]`](pgx_macros::pg_aggregate), enables the
 /// generation of [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
 /// SQL.
-/// 
+///
 /// The [`#[pgx_macros::pg_aggregate]`](pgx_macros::pg_aggregate) will automatically fill fields
 /// marked optional with stubs.
 pub trait Aggregate
@@ -304,13 +305,13 @@ where
     type Args;
 
     /// The types of the direct argument(s) to an ordered-set aggregate's `finalize`.
-    /// 
+    ///
     /// **Only effective if `ORDERED_SET` is `true`.**
     ///
     /// For a single argument, provide the type directly.
     ///
     /// For multiple arguments, provide a tuple.
-    /// 
+    ///
     /// For no arguments, don't set this, or set it to `()` (the default).
     ///
     /// `pgx` does not support `argname` as it is only used for documentation purposes.
@@ -330,13 +331,13 @@ where
     const NAME: &'static str;
 
     /// Set to true if this is an ordered set aggregate.
-    /// 
+    ///
     /// If set, the `OrderedSetArgs` associated type becomes effective, this allows for
     /// direct arguments to the `finalize` function.
-    /// 
-    /// See https://www.postgresql.org/docs/current/xaggr.html#XAGGR-ORDERED-SET-AGGREGATES
+    ///
+    /// See <https://www.postgresql.org/docs/current/xaggr.html#XAGGR-ORDERED-SET-AGGREGATES>
     /// for more information.
-    /// 
+    ///
     /// **Optional:** This const can be skipped, `#[pg_aggregate]` will create a stub.
     const ORDERED_SET: bool = false;
 
@@ -364,9 +365,13 @@ where
     fn state(current: Self::State, v: Self::Args, fcinfo: FunctionCallInfo) -> Self::State;
 
     /// The `OrderedSetArgs` is `()` unless `ORDERED_SET` is `true` and `OrderedSetArgs` is configured.
-    /// 
+    ///
     /// **Optional:** This function can be skipped, `#[pg_aggregate]` will create a stub.
-    fn finalize(current: Self::State, direct_args: Self::OrderedSetArgs, fcinfo: FunctionCallInfo) -> Self::Finalize;
+    fn finalize(
+        current: Self::State,
+        direct_args: Self::OrderedSetArgs,
+        fcinfo: FunctionCallInfo,
+    ) -> Self::Finalize;
 
     /// **Optional:** This function can be skipped, `#[pg_aggregate]` will create a stub.
     fn combine(current: Self::State, _other: Self::State, fcinfo: FunctionCallInfo) -> Self::State;
@@ -375,22 +380,39 @@ where
     fn serial(current: Self::State, fcinfo: FunctionCallInfo) -> Vec<u8>;
 
     /// **Optional:** This function can be skipped, `#[pg_aggregate]` will create a stub.
-    fn deserial(current: Self::State, _buf: Vec<u8>, _internal: PgBox<Self::State>, fcinfo: FunctionCallInfo) -> PgBox<Self::State>;
+    fn deserial(
+        current: Self::State,
+        _buf: Vec<u8>,
+        _internal: PgBox<Self::State>,
+        fcinfo: FunctionCallInfo,
+    ) -> PgBox<Self::State>;
 
     /// **Optional:** This function can be skipped, `#[pg_aggregate]` will create a stub.
-    fn moving_state(_mstate: Self::MovingState, _v: Self::Args, fcinfo: FunctionCallInfo) -> Self::MovingState;
+    fn moving_state(
+        _mstate: Self::MovingState,
+        _v: Self::Args,
+        fcinfo: FunctionCallInfo,
+    ) -> Self::MovingState;
 
     /// **Optional:** This function can be skipped, `#[pg_aggregate]` will create a stub.
-    fn moving_state_inverse(_mstate: Self::MovingState, _v: Self::Args, fcinfo: FunctionCallInfo) -> Self::MovingState;
+    fn moving_state_inverse(
+        _mstate: Self::MovingState,
+        _v: Self::Args,
+        fcinfo: FunctionCallInfo,
+    ) -> Self::MovingState;
 
     /// The `OrderedSetArgs` is `()` unless `ORDERED_SET` is `true` and `OrderedSetArgs` is configured.
-    /// 
+    ///
     /// **Optional:** This function can be skipped, `#[pg_aggregate]` will create a stub.
-    fn moving_finalize(_mstate: Self::MovingState, direct_args: Self::OrderedSetArgs, fcinfo: FunctionCallInfo) -> Self::Finalize;
+    fn moving_finalize(
+        _mstate: Self::MovingState,
+        direct_args: Self::OrderedSetArgs,
+        fcinfo: FunctionCallInfo,
+    ) -> Self::Finalize;
 
     unsafe fn memory_context(fcinfo: FunctionCallInfo) -> Option<MemoryContext> {
         if fcinfo.is_null() {
-            return Some(CurrentMemoryContext)
+            return Some(CurrentMemoryContext);
         }
         let mut memory_context = std::ptr::null_mut();
         let is_aggregate = AggCheckCallContext(fcinfo, &mut memory_context);
@@ -404,49 +426,15 @@ where
 
     fn in_memory_context<
         R,
-        F: FnOnce(&mut PgMemoryContexts) -> R + std::panic::UnwindSafe + std::panic::RefUnwindSafe
-    >(fcinfo: FunctionCallInfo, f: F) -> R {
-        let aggregate_memory_context = unsafe {
-            Self::memory_context(fcinfo)
-        }.unwrap_or_else(|| error!("Cannot access Aggregate memory contexts when not an aggregate."));
+        F: FnOnce(&mut PgMemoryContexts) -> R + std::panic::UnwindSafe + std::panic::RefUnwindSafe,
+    >(
+        fcinfo: FunctionCallInfo,
+        f: F,
+    ) -> R {
+        let aggregate_memory_context =
+            unsafe { Self::memory_context(fcinfo) }.unwrap_or_else(|| {
+                error!("Cannot access Aggregate memory contexts when not an aggregate.")
+            });
         PgMemoryContexts::For(aggregate_memory_context).switch_to(f)
-    } 
-}
-
-/// Corresponds to the `PARALLEL` and `MFINALFUNC_MODIFY` in [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html).
-#[derive(Debug, Clone, Copy, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub enum ParallelOption {
-    Safe,
-    Restricted,
-    Unsafe,
-}
-
-impl ToSql for ParallelOption {
-    fn to_sql(&self, _context: &PgxSql) -> eyre::Result<String> {
-        let value = match self {
-            ParallelOption::Safe => String::from("SAFE"),
-            ParallelOption::Restricted => String::from("RESTRICTED"),
-            ParallelOption::Unsafe => String::from("UNSAFE"),
-        };
-        Ok(value)
-    }
-}
-
-/// Corresponds to the `FINALFUNC_MODIFY` and `MFINALFUNC_MODIFY` in [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html).
-#[derive(Debug, Clone, Copy, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub enum FinalizeModify {
-    ReadOnly,
-    Shareable,
-    ReadWrite,
-}
-
-impl ToSql for FinalizeModify {
-    fn to_sql(&self, _context: &PgxSql) -> eyre::Result<String> {
-        let value = match self {
-            FinalizeModify::ReadOnly => String::from("READ_ONLY"),
-            FinalizeModify::Shareable => String::from("SHAREABLE"),
-            FinalizeModify::ReadWrite => String::from("READ_WRITE"),
-        };
-        Ok(value)
     }
 }

@@ -4,7 +4,7 @@ use pgx::*;
 
 #[pgx::pg_schema]
 mod test_schema {
-    use pgx::datum::sql_entity_graph::{PgxSql, SqlGraphEntity};
+    use pgx::utils::sql_entity_graph::{PgxSql, SqlGraphEntity};
     use pgx::*;
     use serde::{Deserialize, Serialize};
 

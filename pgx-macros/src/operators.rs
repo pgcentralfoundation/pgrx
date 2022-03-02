@@ -1,4 +1,7 @@
-use pgx_utils::{operator_common::*, sql_entity_graph};
+use pgx_utils::{
+    operator_common::*,
+    sql_entity_graph::{PostgresHash, PostgresOrd},
+};
 
 use quote::ToTokens;
 use syn::DeriveInput;
@@ -21,7 +24,7 @@ pub(crate) fn impl_postgres_ord(ast: DeriveInput) -> syn::Result<proc_macro2::To
     stream.extend(ge(&ast.ident));
     stream.extend(cmp(&ast.ident));
 
-    let sql_graph_entity_item = sql_entity_graph::PostgresOrd::from_derive_input(ast)?;
+    let sql_graph_entity_item = PostgresOrd::from_derive_input(ast)?;
     sql_graph_entity_item.to_tokens(&mut stream);
 
     Ok(stream)
@@ -32,7 +35,7 @@ pub(crate) fn impl_postgres_hash(ast: DeriveInput) -> syn::Result<proc_macro2::T
 
     stream.extend(hash(&ast.ident));
 
-    let sql_graph_entity_item = sql_entity_graph::PostgresHash::from_derive_input(ast)?;
+    let sql_graph_entity_item = PostgresHash::from_derive_input(ast)?;
     sql_graph_entity_item.to_tokens(&mut stream);
 
     Ok(stream)

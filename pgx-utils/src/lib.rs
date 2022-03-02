@@ -2,7 +2,7 @@
 // governed by the MIT license that can be found in the LICENSE file.
 
 use crate::{pg_config::PgConfig, sql_entity_graph::PositioningRef};
-use colored::Colorize;
+use owo_colors::OwoColorize;
 use eyre::{eyre, WrapErr};
 use proc_macro2::{TokenStream, TokenTree};
 use quote::{format_ident, quote, ToTokens, TokenStreamExt};
@@ -17,8 +17,22 @@ use syn::{GenericArgument, ItemFn, PathArguments, ReturnType, Type, TypeParamBou
 
 pub mod operator_common;
 pub mod pg_config;
+mod pgx_pg_sys_stub;
 pub mod sql_entity_graph;
+pub use pgx_pg_sys_stub::PgxPgSysStub;
 
+#[doc(hidden)]
+pub mod __reexports {
+    pub use eyre;
+    // For `#[no_std]` based `pgx` extensions we use `HashSet` for type mappings.
+    pub mod std {
+        pub mod collections {
+            pub use std::collections::HashSet;
+        }
+    }
+}
+
+pub const SUPPORTED_MAJOR_VERSIONS: &[u16] = &[10, 11, 12, 13, 14];
 pub static BASE_POSTGRES_PORT_NO: u16 = 28800;
 pub static BASE_POSTGRES_TESTING_PORT_NO: u16 = 32200;
 

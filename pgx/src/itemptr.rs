@@ -70,7 +70,6 @@ pub fn item_pointer_set_all(
     blockno: pg_sys::BlockNumber,
     offno: pg_sys::OffsetNumber,
 ) {
-    use std::convert::TryInto;
     tid.ip_posid = offno;
     tid.ip_blkid.bi_hi = (blockno >> 16).try_into().unwrap();
     tid.ip_blkid.bi_lo = (blockno & 0xffff).try_into().unwrap();

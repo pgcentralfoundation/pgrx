@@ -200,6 +200,8 @@ my_extension=# SELECT hello_my_extension();
 (1 row)
 ```
 
+### 5. Detailed cargo pgx usage
+For more details on how to manage pgx extensions see [Managing pgx extensions](https://github.com/zombodb/pgx/tree/master/cargo-pgx#readme)
 
 ## Upgrading
 
