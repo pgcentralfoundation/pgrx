@@ -56,20 +56,9 @@ pub(crate) struct Schema {
 impl CommandExecute for Schema {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
-        let (_, extname) = crate::command::get::find_control_file()?;
         let metadata = crate::metadata::metadata(&Default::default())?;
         crate::metadata::validate(&metadata)?;
         let manifest = crate::manifest::manifest(&metadata)?;
-
-        let out = match self.out {
-            Some(out) => out,
-            None => format!(
-                "sql/{}-{}.sql",
-                extname,
-                crate::command::install::get_version()?,
-            )
-            .into(),
-        };
 
         let log_level = if let Ok(log_level) = std::env::var("RUST_LOG") {
             Some(log_level)
@@ -109,7 +98,7 @@ impl CommandExecute for Schema {
             self.release,
             self.test,
             &features,
-            &out,
+            self.out.as_ref(),
             self.dot,
             log_level,
             None,
@@ -121,7 +110,7 @@ impl CommandExecute for Schema {
     pg_version = %pg_config.version()?,
     release = is_release,
     test = is_test,
-    path = %path.as_ref().display(),
+    path = path.as_ref().map(|path| tracing::field::display(path.as_ref().display())),
     dot,
     features = ?features.features,
 ))]
@@ -131,7 +120,7 @@ pub(crate) fn generate_schema(
     is_release: bool,
     is_test: bool,
     features: &clap_cargo::Features,
-    path: impl AsRef<std::path::Path>,
+    path: Option<impl AsRef<std::path::Path>>,
     dot: Option<impl AsRef<std::path::Path>>,
     log_level: Option<String>,
     existing_build_output: Option<Vec<cargo_metadata::Message>>,
@@ -197,7 +186,7 @@ pub(crate) fn generate_schema(
 
         let command = command.stderr(Stdio::inherit());
         let command_str = format!("{:?}", command);
-        println!(
+        eprintln!(
             "{} for SQL generation with features `{}`",
             "    Building".bold().green(),
             features_arg,
@@ -258,7 +247,7 @@ pub(crate) fn generate_schema(
     pgx_pg_sys_stub_built.push(format!("pg{}_stub.so", pg_version));
 
     // The next action may take a few seconds, we'd like the user to know we're thinking.
-    println!("{} SQL entities", " Discovering".bold().green(),);
+    eprintln!("{} SQL entities", " Discovering".bold().green(),);
 
     create_stub(
         &pgx_pg_sys_file,
@@ -354,7 +343,7 @@ pub(crate) fn generate_schema(
         }
     }
 
-    println!(
+    eprintln!(
         "{} {} SQL entities: {} schemas ({} unique), {} functions, {} types, {} enums, {} sqls, {} ords, {} hashes, {} aggregates",
         "  Discovered".bold().green(),
         fns_to_call.len().to_string().bold().cyan(),
@@ -368,11 +357,6 @@ pub(crate) fn generate_schema(
         num_hashes.to_string().bold().cyan(),
         num_aggregates.to_string().bold().cyan(),
     );
-
-    let path = path.as_ref();
-    if let Some(parent) = path.parent() {
-        std::fs::create_dir_all(parent).wrap_err("Could not create parent directory")?
-    }
 
     tracing::debug!("Collecting {} SQL entities", fns_to_call.len());
     let mut entities = Vec::default();
@@ -428,14 +412,31 @@ pub(crate) fn generate_schema(
     )
     .wrap_err("SQL generation error")?;
 
-    println!(
-        "{} SQL entities to {}",
-        "     Writing".bold().green(),
-        format_display_path(path)?.cyan()
-    );
-    pgx_sql
-        .to_file(path)
-        .wrap_err_with(|| eyre!("Could not write SQL to {}", path.display()))?;
+    if let Some(out_path) = path {
+        let out_path = out_path.as_ref();
+
+        eprintln!(
+            "{} SQL entities to {}",
+            "     Writing".bold().green(),
+            format_display_path(out_path)?.cyan()
+        );
+
+        if let Some(parent) = out_path.parent() {
+            std::fs::create_dir_all(parent).wrap_err("Could not create parent directory")?
+        }
+        pgx_sql
+            .to_file(out_path)
+            .wrap_err_with(|| eyre!("Could not write SQL to {}", out_path.display()))?;
+    } else {
+        eprintln!(
+            "{} SQL entities to {}",
+            "     Writing".bold().green(),
+            "/dev/stdout".cyan(),
+        );
+        pgx_sql
+            .write(&mut std::io::stdout())
+            .wrap_err_with(|| eyre!("Could not write SQL to stdout"))?;
+    }
 
     if let Some(dot_path) = dot {
         let dot_path = dot_path.as_ref();
