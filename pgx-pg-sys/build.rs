@@ -82,8 +82,13 @@ fn main() -> color_eyre::Result<()> {
     build_deps::rerun_if_changed_paths("cshim/pgx-cshim.c").unwrap();
     build_deps::rerun_if_changed_paths("cshim/Makefile").unwrap();
 
-    let pg_configs = if std::env::var("PGX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE").unwrap_or("false".into()) == "1" {
-        pgx.iter(PgConfigSelector::All).map(|v| v.wrap_err("invalid pg_config")).collect::<eyre::Result<Vec<_>>>()?
+    let pg_configs = if std::env::var("PGX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE")
+        .unwrap_or("false".into())
+        == "1"
+    {
+        pgx.iter(PgConfigSelector::All)
+            .map(|v| v.wrap_err("invalid pg_config"))
+            .collect::<eyre::Result<Vec<_>>>()?
     } else {
         let mut found = None;
         for version in pgx_utils::SUPPORTED_MAJOR_VERSIONS {
@@ -91,14 +96,20 @@ fn main() -> color_eyre::Result<()> {
                 continue;
             }
             if found.is_some() {
-                return Err(eyre!("Multiple `pg$VERSION` features found, `--no-default-features` may be required."))
+                return Err(eyre!("Multiple `pg$VERSION` features found, `--no-default-features` may be required."));
             }
             found = Some(format!("pg{}", version));
         }
-        let found = found.ok_or_else(|| eyre!(
-            "Did not find `pg$VERSION` feature. `pgx-pg-sys` requires one of {} to be set",
-            pgx_utils::SUPPORTED_MAJOR_VERSIONS.iter().map(|x| format!("`pg{}`", x)).collect::<Vec<_>>().join(", ")
-        ))?;
+        let found = found.ok_or_else(|| {
+            eyre!(
+                "Did not find `pg$VERSION` feature. `pgx-pg-sys` requires one of {} to be set",
+                pgx_utils::SUPPORTED_MAJOR_VERSIONS
+                    .iter()
+                    .map(|x| format!("`pg{}`", x))
+                    .collect::<Vec<_>>()
+                    .join(", ")
+            )
+        })?;
         let specific = pgx.get(&found)?;
         vec![specific]
     };

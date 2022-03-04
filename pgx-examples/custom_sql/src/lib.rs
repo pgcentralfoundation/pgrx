@@ -13,14 +13,13 @@ mod home {
     #[pg_schema]
     pub mod dogs {
         use super::*;
-        
+
         #[derive(PostgresEnum, Serialize, Deserialize)]
         pub enum Dog {
             Brandy,
             Nami,
         }
     }
-
 
     #[derive(PostgresType, Serialize, Deserialize)]
     pub struct Ball {
@@ -84,21 +83,23 @@ mod tests {
         let buf = Spi::connect(|client| {
             let buf = client
                 .select("SELECT * FROM extension_sql", None, None)
-                .flat_map(|tup| tup.by_ordinal(1).ok()
-                    .and_then(|ord| ord.value::<String>()))
+                .flat_map(|tup| tup.by_ordinal(1).ok().and_then(|ord| ord.value::<String>()))
                 .collect::<Vec<String>>();
 
             Ok(Some(buf))
         });
 
-        assert_eq!(buf.unwrap(), vec![
-            String::from("bootstrap"),
-            String::from("single_raw"),
-            String::from("single"),
-            String::from("multiple_raw"),
-            String::from("multiple"),
-            String::from("finalizer")
-        ])
+        assert_eq!(
+            buf.unwrap(),
+            vec![
+                String::from("bootstrap"),
+                String::from("single_raw"),
+                String::from("single"),
+                String::from("multiple_raw"),
+                String::from("multiple"),
+                String::from("finalizer")
+            ]
+        )
     }
 }
 
@@ -112,6 +113,4 @@ pub mod pg_test {
         // return any postgresql.conf settings that are required for your tests
         vec![]
     }
-
-
 }
