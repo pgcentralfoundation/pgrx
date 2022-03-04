@@ -113,6 +113,7 @@ impl CommandExecute for Schema {
             &out,
             self.dot,
             log_level,
+            None,
         )
     }
 }
@@ -134,6 +135,7 @@ pub(crate) fn generate_schema(
     path: impl AsRef<std::path::Path>,
     dot: Option<impl AsRef<std::path::Path>>,
     log_level: Option<String>,
+    existing_build_output: Option<Vec<cargo_metadata::Message>>,
 ) -> eyre::Result<()> {
     check_for_sql_generator_binary()?;
     let (control_file, _extname) = find_control_file()?;
@@ -156,64 +158,74 @@ pub(crate) fn generate_schema(
     target_dir_with_profile.push(if is_release { "release" } else { "debug" });
 
     // First, build the SQL generator so we can get a look at the symbol table
-    let mut command = Command::new("cargo");
-    command.stderr(Stdio::inherit());
-    if is_test {
-        command.arg("test");
-        command.arg("--no-run");
+    let cargo_output = if let Some(output) = existing_build_output {
+        output
     } else {
-        command.arg("build");
-    }
-    if is_release {
-        command.arg("--release");
-    }
+        let mut command = Command::new("cargo");
+        command.stderr(Stdio::inherit());
+        if is_test {
+            command.arg("test");
+            command.arg("--no-run");
+        } else {
+            command.arg("build");
+        }
+        if is_release {
+            command.arg("--release");
+        }
 
-    if let Some(log_level) = &log_level {
-        command.env("RUST_LOG", log_level);
-    }
+        if let Some(log_level) = &log_level {
+            command.env("RUST_LOG", log_level);
+        }
 
-    let features_arg = features.features.join(" ");
-    if !features_arg.trim().is_empty() {
-        command.arg("--features");
-        command.arg(&features_arg);
-    }
+        let features_arg = features.features.join(" ");
+        if !features_arg.trim().is_empty() {
+            command.arg("--features");
+            command.arg(&features_arg);
+        }
 
-    if features.no_default_features {
-        command.arg("--no-default-features");
-    }
+        if features.no_default_features {
+            command.arg("--no-default-features");
+        }
 
-    if features.all_features {
-        command.arg("--all-features");
-    }
+        if features.all_features {
+            command.arg("--all-features");
+        }
 
-    command.arg("--message-format=json-render-diagnostics");
+        command.arg("--message-format=json-render-diagnostics");
 
-    for arg in flags.split_ascii_whitespace() {
-        command.arg(arg);
-    }
+        for arg in flags.split_ascii_whitespace() {
+            command.arg(arg);
+        }
 
-    let command = command.stderr(Stdio::inherit());
-    let command_str = format!("{:?}", command);
-    println!(
-        "{} for SQL generation with features `{}`",
-        "    Building".bold().green(),
-        features_arg,
-    );
+        let command = command.stderr(Stdio::inherit());
+        let command_str = format!("{:?}", command);
+        println!(
+            "{} for SQL generation with features `{}`",
+            "    Building".bold().green(),
+            features_arg,
+        );
 
-    tracing::debug!(command = %command_str, "Running");
-    let cargo_output = command
-        .output()
-        .wrap_err_with(|| format!("failed to spawn cargo: {}", command_str))?;
-    tracing::trace!(status_code = %cargo_output.status, command = %command_str, "Finished");
+        tracing::debug!(command = %command_str, "Running");
+        let cargo_output = command
+            .output()
+            .wrap_err_with(|| format!("failed to spawn cargo: {}", command_str))?;
+        tracing::trace!(status_code = %cargo_output.status, command = %command_str, "Finished");
 
-    let cargo_stdout_bytes = cargo_output.stdout;
-    let cargo_stdout_reader = BufReader::new(&*cargo_stdout_bytes);
-    let cargo_stdout_stream = cargo_metadata::Message::parse_stream(cargo_stdout_reader);
+        if !cargo_output.status.success() {
+            // We explicitly do not want to return a spantraced error here.
+            std::process::exit(1)
+        }
+
+        let cargo_stdout_bytes = cargo_output.stdout;
+        let cargo_stdout_reader = BufReader::new(cargo_stdout_bytes.as_slice());
+        let cargo_stdout_stream = cargo_metadata::Message::parse_stream(cargo_stdout_reader);
+        cargo_stdout_stream.collect::<Result<Vec<_>, std::io::Error>>()?
+    };
 
     let mut pgx_pg_sys_out_dir = None;
 
-    for stdout_stream_item in cargo_stdout_stream {
-        match stdout_stream_item.wrap_err("Invalid cargo json message")? {
+    for message in cargo_output {
+        match message {
             cargo_metadata::Message::BuildScriptExecuted(script) => {
                 if !script.package_id.repr.starts_with("pgx-pg-sys") {
                     continue;
@@ -226,11 +238,6 @@ pub(crate) fn generate_schema(
             | cargo_metadata::Message::BuildFinished(_)
             | _ => (),
         }
-    }
-
-    if !cargo_output.status.success() {
-        // We explicitly do not want to return a spantraced error here.
-        std::process::exit(1)
     }
 
     let pgx_pg_sys_out_dir = pgx_pg_sys_out_dir.ok_or(eyre!(

@@ -96,12 +96,16 @@ pub(crate) fn install_extension(
     }
 
     let build_command_output = build_extension(is_release, &features)?;
+    let build_command_bytes = build_command_output.stdout;
+    let build_command_reader = BufReader::new(build_command_bytes.as_slice());
+    let build_command_stream = cargo_metadata::Message::parse_stream(build_command_reader);
+    let build_command_messages = build_command_stream.collect::<Result<Vec<_>, std::io::Error>>()?;
 
     println!();
     println!("installing extension");
     let pkgdir = make_relative(pg_config.pkglibdir()?);
     let extdir = make_relative(pg_config.extension_dir()?);
-    let shlibpath = find_library_file(manifest, build_command_output)?;
+    let shlibpath = find_library_file(manifest, &build_command_messages)?;
 
     {
         let mut dest = base_directory.clone();
@@ -137,6 +141,7 @@ pub(crate) fn install_extension(
             features,
             &extdir,
             &base_directory,
+            build_command_messages,
         )?;
     } else {
         println!("{} schema generation", "    Skipping".bold().yellow());
@@ -250,6 +255,7 @@ fn copy_sql_files(
     features: &clap_cargo::Features,
     extdir: &PathBuf,
     base_directory: &PathBuf,
+    build_command_output: Vec<cargo_metadata::Message>,
 ) -> eyre::Result<()> {
     let dest = get_target_sql_file(extdir, base_directory)?;
     let (_, extname) = crate::command::get::find_control_file()?;
@@ -263,6 +269,7 @@ fn copy_sql_files(
         &dest,
         Option::<String>::None,
         None,
+        Some(build_command_output),
     )?;
 
     // now copy all the version upgrade files too
@@ -287,7 +294,7 @@ fn copy_sql_files(
 #[tracing::instrument(level = "error", skip_all)]
 pub(crate) fn find_library_file(
     manifest: &cargo_toml::Manifest,
-    build_command_output: std::process::Output,
+    build_command_messages: &Vec<cargo_metadata::Message>,
 ) -> eyre::Result<PathBuf> {
     let crate_name = if let Some(ref package) = manifest.package {
         &package.name
@@ -295,18 +302,14 @@ pub(crate) fn find_library_file(
         return Err(eyre!("Could not get crate name from manifest."));
     };
 
-    let build_command_bytes = build_command_output.stdout;
-    let build_command_reader = BufReader::new(&*build_command_bytes);
-    let build_command_stream = cargo_metadata::Message::parse_stream(build_command_reader);
-
     let mut library_file = None;
-    for stdout_stream_item in build_command_stream {
-        match stdout_stream_item.wrap_err("Invalid cargo json message")? {
+    for message in build_command_messages {
+        match message {
             cargo_metadata::Message::CompilerArtifact(artifact) => {
                 if artifact.target.name != *crate_name {
                     continue;
                 }
-                for filename in artifact.filenames {
+                for filename in &artifact.filenames {
                     let so_extension = if cfg!(target_os = "macos") {
                         "dylib"
                     } else {
