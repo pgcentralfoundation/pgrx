@@ -3,12 +3,11 @@
 
 use crate::command::stop::stop_postgres;
 use crate::CommandExecute;
-use owo_colors::OwoColorize;
 use eyre::{eyre, WrapErr};
+use owo_colors::OwoColorize;
 use pgx_utils::{
-    prefix_path,
-    SUPPORTED_MAJOR_VERSIONS,
     pg_config::{PgConfig, PgConfigSelector, Pgx},
+    prefix_path, SUPPORTED_MAJOR_VERSIONS,
 };
 use rayon::prelude::*;
 use rttp_client::{types::Proxy, HttpClient};

@@ -7,8 +7,8 @@ use crate::{
     },
     CommandExecute,
 };
-use owo_colors::OwoColorize;
 use eyre::eyre;
+use owo_colors::OwoColorize;
 use pgx_utils::{
     createdb,
     pg_config::{PgConfig, Pgx},
