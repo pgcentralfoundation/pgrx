@@ -136,7 +136,6 @@ pub(crate) fn generate_schema(
     log_level: Option<String>,
     existing_build_output: Option<Vec<cargo_metadata::Message>>,
 ) -> eyre::Result<()> {
-    check_for_sql_generator_binary()?;
     let (control_file, _extname) = find_control_file()?;
     let package_name = &manifest
         .package
@@ -499,21 +498,4 @@ fn create_stub(
         tracing::debug!("Found existing stub shared object")
     }
     Ok(())
-}
-
-/// A temporary check to help users from 0.2 or 0.3 know to take manual migration steps.
-fn check_for_sql_generator_binary() -> eyre::Result<()> {
-    if Path::new("src/bin/sql-generator.rs").exists() {
-        // We explicitly do not want to return a spantraced error here.
-        println!("{}", "\
-            Found `pgx` 0.2-0.3 series SQL generation while using `cargo-pgx` 0.4 series.
-            
-We've updated our SQL generation method, it's much faster! Please follow the upgrading steps listed in https://github.com/zombodb/pgx/releases/tag/v0.4.0.
-
-Already done that? You didn't delete `src/bin/sql-generator.rs` yet, so you're still seeing this message.\
-        ".red().bold());
-        std::process::exit(1)
-    } else {
-        Ok(())
-    }
 }
