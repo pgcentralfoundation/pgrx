@@ -4,8 +4,8 @@
 use crate::command::init::initdb;
 use crate::command::status::status_postgres;
 use crate::CommandExecute;
-use owo_colors::OwoColorize;
 use eyre::eyre;
+use owo_colors::OwoColorize;
 use pgx_utils::pg_config::{PgConfig, PgConfigSelector, Pgx};
 use std::os::unix::process::CommandExt;
 use std::process::Stdio;

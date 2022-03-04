@@ -6,8 +6,8 @@ use std::process::{Command, Stdio};
 use once_cell::sync::Lazy;
 use std::sync::{Arc, Mutex};
 
-use owo_colors::OwoColorize;
 use eyre::{eyre, WrapErr};
+use owo_colors::OwoColorize;
 use pgx::*;
 use pgx_utils::pg_config::{PgConfig, Pgx};
 use pgx_utils::{createdb, get_named_capture, get_target_dir};
@@ -25,12 +25,15 @@ struct SetupState {
     system_session_id: String,
 }
 
-static TEST_MUTEX: Lazy<Mutex<SetupState>> = Lazy::new(|| Mutex::new(SetupState {
-    installed: false,
-    loglines: Arc::new(Mutex::new(HashMap::new())),
-    system_session_id: "NONE".to_string(),
-}));
-static SHUTDOWN_HOOKS: Lazy<Mutex<Vec<Box<dyn Fn() + Send>>>> = Lazy::new(|| Mutex::new(Vec::new()));
+static TEST_MUTEX: Lazy<Mutex<SetupState>> = Lazy::new(|| {
+    Mutex::new(SetupState {
+        installed: false,
+        loglines: Arc::new(Mutex::new(HashMap::new())),
+        system_session_id: "NONE".to_string(),
+    })
+});
+static SHUTDOWN_HOOKS: Lazy<Mutex<Vec<Box<dyn Fn() + Send>>>> =
+    Lazy::new(|| Mutex::new(Vec::new()));
 
 fn register_shutdown_hook() {
     extern "C" fn run_shutdown_hooks() {

@@ -4,10 +4,9 @@ use crate::{
         install::format_display_path,
     },
     CommandExecute,
-    
 };
-use owo_colors::OwoColorize;
 use eyre::{eyre, WrapErr};
+use owo_colors::OwoColorize;
 use pgx_utils::{
     pg_config::{PgConfig, Pgx},
     sql_entity_graph::{PgxSql, RustSourceOnlySqlMapping, RustSqlMapping, SqlGraphEntity},
@@ -15,9 +14,9 @@ use pgx_utils::{
 };
 use std::{
     collections::HashSet,
-    path::{PathBuf, Path},
-    process::{Command, Stdio},
     io::BufReader,
+    path::{Path, PathBuf},
+    process::{Command, Stdio},
 };
 use symbolic::{
     common::{ByteView, DSymPathExt},
@@ -232,7 +231,7 @@ pub(crate) fn generate_schema(
                 }
                 pgx_pg_sys_out_dir = Some(script.out_dir);
                 break;
-            },
+            }
             cargo_metadata::Message::CompilerMessage(_)
             | cargo_metadata::Message::CompilerArtifact(_)
             | cargo_metadata::Message::BuildFinished(_)
@@ -262,7 +261,11 @@ pub(crate) fn generate_schema(
     // The next action may take a few seconds, we'd like the user to know we're thinking.
     println!("{} SQL entities", " Discovering".bold().green(),);
 
-    create_stub(&pgx_pg_sys_file, &pgx_pg_sys_stub_file, &pgx_pg_sys_stub_built)?;
+    create_stub(
+        &pgx_pg_sys_file,
+        &pgx_pg_sys_stub_file,
+        &pgx_pg_sys_stub_built,
+    )?;
 
     // Inspect the symbol table for a list of `__pgx_internals` we should have the generator call
     let mut lib_so = target_dir_with_profile.clone();
@@ -423,7 +426,8 @@ pub(crate) fn generate_schema(
         typeid_sql_mapping.clone().into_iter(),
         source_only_sql_mapping.clone().into_iter(),
         entities.into_iter(),
-    ).wrap_err("SQL generation error")?;
+    )
+    .wrap_err("SQL generation error")?;
 
     println!(
         "{} SQL entities to {}",
@@ -447,15 +451,17 @@ pub(crate) fn generate_schema(
     rs_dest = %format_display_path(rs_dest.as_ref())?,
     so_dest = %format_display_path(so_dest.as_ref())?,
 ))]
-fn create_stub(source: impl AsRef<Path>, rs_dest: impl AsRef<Path>, so_dest: impl AsRef<Path>) -> eyre::Result<()> {
+fn create_stub(
+    source: impl AsRef<Path>,
+    rs_dest: impl AsRef<Path>,
+    so_dest: impl AsRef<Path>,
+) -> eyre::Result<()> {
     let source = source.as_ref();
     let rs_dest = rs_dest.as_ref();
     let so_dest = so_dest.as_ref();
 
     if !rs_dest.exists() {
-        tracing::debug!(
-            "Creating stub of appropriate PostgreSQL symbols"
-        );
+        tracing::debug!("Creating stub of appropriate PostgreSQL symbols");
         PgxPgSysStub::from_file(&source)?.write_to_file(&rs_dest)?;
     } else {
         tracing::debug!("Found existing stub file")
@@ -468,19 +474,23 @@ fn create_stub(source: impl AsRef<Path>, rs_dest: impl AsRef<Path>, so_dest: imp
             "--crate-type",
             "cdylib",
             "-o",
-            so_dest.to_str().ok_or(eyre!("Could not call so_dest.to_str()"))?,
-            rs_dest.to_str().ok_or(eyre!("Could not call rs_dest.to_str()"))?,
+            so_dest
+                .to_str()
+                .ok_or(eyre!("Could not call so_dest.to_str()"))?,
+            rs_dest
+                .to_str()
+                .ok_or(eyre!("Could not call rs_dest.to_str()"))?,
         ]);
         let so_rustc_invocation_str = format!("{:?}", so_rustc_invocation);
         tracing::debug!(command = %so_rustc_invocation_str, "Running");
-        let output = so_rustc_invocation.output().wrap_err_with(|| {
-            eyre!(
-                "Could not invoke `rustc` on {}",
-                &rs_dest.display()
-            )
-        })?;
+        let output = so_rustc_invocation
+            .output()
+            .wrap_err_with(|| eyre!("Could not invoke `rustc` on {}", &rs_dest.display()))?;
 
-        let code = output.status.code().ok_or(eyre!("Could not get status code of build"))?;
+        let code = output
+            .status
+            .code()
+            .ok_or(eyre!("Could not get status code of build"))?;
         tracing::trace!(status_code = %code, command = %so_rustc_invocation_str, "Finished");
         if code != 0 {
             return Err(eyre!("rustc exited with code {}", code));

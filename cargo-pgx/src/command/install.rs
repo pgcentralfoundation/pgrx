@@ -6,14 +6,14 @@ use crate::{
     CommandExecute,
 };
 use cargo_metadata::MetadataCommand;
-use owo_colors::OwoColorize;
 use eyre::{eyre, WrapErr};
+use owo_colors::OwoColorize;
 use pgx_utils::get_target_dir;
 use pgx_utils::pg_config::PgConfig;
 use std::{
-    path::{PathBuf, Path},
-    process::{Command, Stdio},
     io::BufReader,
+    path::{Path, PathBuf},
+    process::{Command, Stdio},
 };
 
 /// Install the extension from the current crate to the Postgres specified by whatever `pg_config` is currently on your $PATH
@@ -99,7 +99,8 @@ pub(crate) fn install_extension(
     let build_command_bytes = build_command_output.stdout;
     let build_command_reader = BufReader::new(build_command_bytes.as_slice());
     let build_command_stream = cargo_metadata::Message::parse_stream(build_command_reader);
-    let build_command_messages = build_command_stream.collect::<Result<Vec<_>, std::io::Error>>()?;
+    let build_command_messages =
+        build_command_stream.collect::<Result<Vec<_>, std::io::Error>>()?;
 
     println!();
     println!("installing extension");
@@ -320,7 +321,7 @@ pub(crate) fn find_library_file(
                         break;
                     }
                 }
-            },
+            }
             cargo_metadata::Message::CompilerMessage(_)
             | cargo_metadata::Message::BuildScriptExecuted(_)
             | cargo_metadata::Message::BuildFinished(_)
