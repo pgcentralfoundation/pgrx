@@ -79,7 +79,7 @@ impl PgxPgSysStub {
                 }
             });
         }
-        
+
         working_state.items = items_with_stubs;
 
         Ok(Self {
