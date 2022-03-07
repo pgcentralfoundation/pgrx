@@ -124,7 +124,7 @@ naersk.lib."${targetPlatform.system}".buildPackage rec {
       export PGX_HOME=$out/.pgx
       ${cargo-pgx}/bin/cargo-pgx pgx schema pg${pgxPostgresVersionString} ${maybeReleaseFlag} --features "${builtins.toString additionalFeatures}" --out $out/share/postgresql/extension/${cargoToml.package.name}--${cargoToml.package.version}.sql
       mkdir -p $out/share/postgresql/extension/
-      cp -v ${source}/sql/* $out/share/postgresql/extension/
+      cp -v ${source}/sql/* $out/share/postgresql/extension/ || true
       cp -v ${source}/${cargoToml.package.name}.control $out/share/postgresql/extension/${cargoToml.package.name}.control
       rm -r $out/.pgx
       mv $out/lib/* $out/share/postgresql/extension/
