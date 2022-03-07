@@ -35,6 +35,7 @@ let
     else if (pgxPostgresVersion == 14) then postgresql_14
     else null;
   maybeReleaseFlag = if release == true then "--release" else "";
+  maybeDebugFlag = if release == true then "" else "--debug";
   pgxPostgresVersionString = builtins.toString pgxPostgresVersion;
   cargoToml = (builtins.fromTOML (builtins.readFile "${source}/Cargo.toml"));
 in
@@ -122,7 +123,7 @@ naersk.lib."${targetPlatform.system}".buildPackage rec {
   postBuild = ''
     if [ -f "${cargoToml.package.name}.control" ]; then
       export PGX_HOME=$out/.pgx
-      ${cargo-pgx}/bin/cargo-pgx pgx schema pg${pgxPostgresVersionString} ${maybeReleaseFlag} --features "${builtins.toString additionalFeatures}" --out $out/share/postgresql/extension/${cargoToml.package.name}--${cargoToml.package.version}.sql
+      ${cargo-pgx}/bin/cargo-pgx pgx package --pg-config ${pgxPostgresPkg}/bin/pg_config ${maybeDebugFlag} --features "${builtins.toString additionalFeatures}" --out-dir $out
       mkdir -p $out/share/postgresql/extension/
       cp -v ${source}/sql/* $out/share/postgresql/extension/ || true
       cp -v ${source}/${cargoToml.package.name}.control $out/share/postgresql/extension/${cargoToml.package.name}.control
