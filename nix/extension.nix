@@ -101,7 +101,7 @@ naersk.lib."${targetPlatform.system}".buildPackage rec {
     ${pgxPostgresPkg}/bin/pg_ctl start
     ${pgxPostgresPkg}/bin/createuser -h localhost --superuser --createdb $USER || true
     ${pgxPostgresPkg}/bin/pg_ctl stop
-    
+
     # Set C flags for Rust's bindgen program. Unlike ordinary C
     # compilation, bindgen does not invoke $CC directly. Instead it
     # uses LLVM's libclang. To make sure all necessary flags are
@@ -120,7 +120,7 @@ naersk.lib."${targetPlatform.system}".buildPackage rec {
     export NIX_PGLIBDIR=$out/.pgx/${pgxPostgresVersionString}/lib
   '';
   postBuild = ''
-    if compgen -G "*.control" > /dev/null; then
+    if [ -f "${cargoToml.package.name}.control" ]; then
       export PGX_HOME=$out/.pgx
       ${cargo-pgx}/bin/cargo-pgx pgx schema pg${pgxPostgresVersionString} ${maybeReleaseFlag} --features "${builtins.toString additionalFeatures}" --out $out/share/postgresql/extension/${cargoToml.package.name}--${cargoToml.package.version}.sql
       mkdir -p $out/share/postgresql/extension/
