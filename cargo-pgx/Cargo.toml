@@ -17,7 +17,7 @@ edition = "2021"
 atty = "0.2"
 cargo_metadata = "0.14.2"
 cargo_toml = "0.11.4"
-clap = { version = "3.1.2", features = [ "env", "suggestions", "cargo", "derive" ] }
+clap = { version = "3.1.6", features = [ "env", "suggestions", "cargo", "derive" ] }
 clap-cargo = { version = "0.8.0", features = [ "cargo_metadata" ] }
 semver = "1.0.6"
 owo-colors = { version = "3.2.0", features = [ "supports-colors" ] }
