@@ -102,20 +102,19 @@ naersk.lib."${targetPlatform.system}".buildPackage rec {
       ${pgxPostgresPkg}/bin/pg_ctl start
       ${pgxPostgresPkg}/bin/createuser -h localhost --superuser --createdb $USER || true
       ${pgxPostgresPkg}/bin/pg_ctl stop
-
-      # Set C flags for Rust's bindgen program. Unlike ordinary C
-      # compilation, bindgen does not invoke $CC directly. Instead it
-      # uses LLVM's libclang. To make sure all necessary flags are
-      # included we need to look in a few places.
-      # TODO: generalize this process for other use-cases.
-      export BINDGEN_EXTRA_CLANG_ARGS="$(< ${stdenv.cc}/nix-support/libc-crt1-cflags) \
-        $(< ${stdenv.cc}/nix-support/libc-cflags) \
-        $(< ${stdenv.cc}/nix-support/cc-cflags) \
-        $(< ${stdenv.cc}/nix-support/libcxx-cxxflags) \
-        ${lib.optionalString stdenv.cc.isClang "-idirafter ${stdenv.cc.cc}/lib/clang/${lib.getVersion stdenv.cc.cc}/include"} \
-        ${lib.optionalString stdenv.cc.isGNU "-isystem ${stdenv.cc.cc}/include/c++/${lib.getVersion stdenv.cc.cc} -isystem ${stdenv.cc.cc}/include/c++/${lib.getVersion stdenv.cc.cc}/${stdenv.hostPlatform.config} -idirafter ${stdenv.cc.cc}/lib/gcc/${stdenv.hostPlatform.config}/${lib.getVersion stdenv.cc.cc}/include"}
-      "
     fi
+    # Set C flags for Rust's bindgen program. Unlike ordinary C
+    # compilation, bindgen does not invoke $CC directly. Instead it
+    # uses LLVM's libclang. To make sure all necessary flags are
+    # included we need to look in a few places.
+    # TODO: generalize this process for other use-cases.
+    export BINDGEN_EXTRA_CLANG_ARGS="$(< ${stdenv.cc}/nix-support/libc-crt1-cflags) \
+      $(< ${stdenv.cc}/nix-support/libc-cflags) \
+      $(< ${stdenv.cc}/nix-support/cc-cflags) \
+      $(< ${stdenv.cc}/nix-support/libcxx-cxxflags) \
+      ${lib.optionalString stdenv.cc.isClang "-idirafter ${stdenv.cc.cc}/lib/clang/${lib.getVersion stdenv.cc.cc}/include"} \
+      ${lib.optionalString stdenv.cc.isGNU "-isystem ${stdenv.cc.cc}/include/c++/${lib.getVersion stdenv.cc.cc} -isystem ${stdenv.cc.cc}/include/c++/${lib.getVersion stdenv.cc.cc}/${stdenv.hostPlatform.config} -idirafter ${stdenv.cc.cc}/lib/gcc/${stdenv.hostPlatform.config}/${lib.getVersion stdenv.cc.cc}/include"}
+    "
   '';
   preCheck = ''
     export PGX_HOME=$out/.pgx
