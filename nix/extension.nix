@@ -93,16 +93,15 @@ naersk.lib."${targetPlatform.system}".buildPackage rec {
       --pg12 $out/.pgx/12/bin/pg_config \
       --pg13 $out/.pgx/13/bin/pg_config \
       --pg14 $out/.pgx/14/bin/pg_config
+
+    # This is primarily for Mac or other Nix systems that don't use the nixbld user.
+    export USER=$(whoami)
+    export PGDATA=$out/.pgx/data-${pgxPostgresVersionString}/
+    echo "unix_socket_directories = '$out/.pgx'" > $PGDATA/postgresql.conf 
+    ${pgxPostgresPkg}/bin/pg_ctl start
+    ${pgxPostgresPkg}/bin/createuser -h localhost --superuser --createdb $USER || true
+    ${pgxPostgresPkg}/bin/pg_ctl stop
     
-    if compgen -G "*.control" > /dev/null; then
-      # This is primarily for Mac or other Nix systems that don't use the nixbld user.
-      export USER=$(whoami)
-      export PGDATA=$out/.pgx/data-${pgxPostgresVersionString}/
-      echo "unix_socket_directories = '$out/.pgx'" > $PGDATA/postgresql.conf 
-      ${pgxPostgresPkg}/bin/pg_ctl start
-      ${pgxPostgresPkg}/bin/createuser -h localhost --superuser --createdb $USER || true
-      ${pgxPostgresPkg}/bin/pg_ctl stop
-    fi
     # Set C flags for Rust's bindgen program. Unlike ordinary C
     # compilation, bindgen does not invoke $CC directly. Instead it
     # uses LLVM's libclang. To make sure all necessary flags are
