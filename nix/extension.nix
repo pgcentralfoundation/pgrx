@@ -124,7 +124,6 @@ naersk.lib."${targetPlatform.system}".buildPackage rec {
     if [ -f "${cargoToml.package.name}.control" ]; then
       export PGX_HOME=$out/.pgx
       ${cargo-pgx}/bin/cargo-pgx pgx package --pg-config ${pgxPostgresPkg}/bin/pg_config ${maybeDebugFlag} --features "${builtins.toString additionalFeatures}" --out-dir $out
-      rm -r $out/.pgx
     fi
   '';
   PGX_PG_SYS_SKIP_BINDING_REWRITE = "1";
