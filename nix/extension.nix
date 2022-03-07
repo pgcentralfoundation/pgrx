@@ -94,48 +94,48 @@ naersk.lib."${targetPlatform.system}".buildPackage rec {
       --pg13 $out/.pgx/13/bin/pg_config \
       --pg14 $out/.pgx/14/bin/pg_config
     
-    # This is primarily for Mac or other Nix systems that don't use the nixbld user.
-    export USER=$(whoami)
-    export PGDATA=$out/.pgx/data-${pgxPostgresVersionString}/
-    echo "unix_socket_directories = '$out/.pgx'" > $PGDATA/postgresql.conf 
-    ${pgxPostgresPkg}/bin/pg_ctl start
-    ${pgxPostgresPkg}/bin/createuser -h localhost --superuser --createdb $USER || true
-    ${pgxPostgresPkg}/bin/pg_ctl stop
+    if compgen -G "*.control" > /dev/null; then
+      # This is primarily for Mac or other Nix systems that don't use the nixbld user.
+      export USER=$(whoami)
+      export PGDATA=$out/.pgx/data-${pgxPostgresVersionString}/
+      echo "unix_socket_directories = '$out/.pgx'" > $PGDATA/postgresql.conf 
+      ${pgxPostgresPkg}/bin/pg_ctl start
+      ${pgxPostgresPkg}/bin/createuser -h localhost --superuser --createdb $USER || true
+      ${pgxPostgresPkg}/bin/pg_ctl stop
 
-    # Set C flags for Rust's bindgen program. Unlike ordinary C
-    # compilation, bindgen does not invoke $CC directly. Instead it
-    # uses LLVM's libclang. To make sure all necessary flags are
-    # included we need to look in a few places.
-    # TODO: generalize this process for other use-cases.
-    export BINDGEN_EXTRA_CLANG_ARGS="$(< ${stdenv.cc}/nix-support/libc-crt1-cflags) \
-      $(< ${stdenv.cc}/nix-support/libc-cflags) \
-      $(< ${stdenv.cc}/nix-support/cc-cflags) \
-      $(< ${stdenv.cc}/nix-support/libcxx-cxxflags) \
-      ${lib.optionalString stdenv.cc.isClang "-idirafter ${stdenv.cc.cc}/lib/clang/${lib.getVersion stdenv.cc.cc}/include"} \
-      ${lib.optionalString stdenv.cc.isGNU "-isystem ${stdenv.cc.cc}/include/c++/${lib.getVersion stdenv.cc.cc} -isystem ${stdenv.cc.cc}/include/c++/${lib.getVersion stdenv.cc.cc}/${stdenv.hostPlatform.config} -idirafter ${stdenv.cc.cc}/lib/gcc/${stdenv.hostPlatform.config}/${lib.getVersion stdenv.cc.cc}/include"}
-    "
+      # Set C flags for Rust's bindgen program. Unlike ordinary C
+      # compilation, bindgen does not invoke $CC directly. Instead it
+      # uses LLVM's libclang. To make sure all necessary flags are
+      # included we need to look in a few places.
+      # TODO: generalize this process for other use-cases.
+      export BINDGEN_EXTRA_CLANG_ARGS="$(< ${stdenv.cc}/nix-support/libc-crt1-cflags) \
+        $(< ${stdenv.cc}/nix-support/libc-cflags) \
+        $(< ${stdenv.cc}/nix-support/cc-cflags) \
+        $(< ${stdenv.cc}/nix-support/libcxx-cxxflags) \
+        ${lib.optionalString stdenv.cc.isClang "-idirafter ${stdenv.cc.cc}/lib/clang/${lib.getVersion stdenv.cc.cc}/include"} \
+        ${lib.optionalString stdenv.cc.isGNU "-isystem ${stdenv.cc.cc}/include/c++/${lib.getVersion stdenv.cc.cc} -isystem ${stdenv.cc.cc}/include/c++/${lib.getVersion stdenv.cc.cc}/${stdenv.hostPlatform.config} -idirafter ${stdenv.cc.cc}/lib/gcc/${stdenv.hostPlatform.config}/${lib.getVersion stdenv.cc.cc}/include"}
+      "
+    fi
   '';
   preCheck = ''
     export PGX_HOME=$out/.pgx
     export NIX_PGLIBDIR=$out/.pgx/${pgxPostgresVersionString}/lib
   '';
   postBuild = ''
-    export PGX_HOME=$out/.pgx
-    ${cargo-pgx}/bin/cargo-pgx pgx schema pg${pgxPostgresVersionString} ${maybeReleaseFlag} --features "${builtins.toString additionalFeatures}"
-    mkdir -p $out/share/postgresql/extension/
-    cp -v ./sql/* $out/share/postgresql/extension/
-    cp -v ./${cargoToml.package.name}.control $out/share/postgresql/extension/${cargoToml.package.name}.control
-  '';
-  preFixup = ''
-    rm -r $out/.pgx
-    mv $out/lib/* $out/share/postgresql/extension/
-    rm -r $out/lib $out/bin
+    if compgen -G "*.control" > /dev/null; then
+      export PGX_HOME=$out/.pgx
+      ${cargo-pgx}/bin/cargo-pgx pgx schema pg${pgxPostgresVersionString} ${maybeReleaseFlag} --features "${builtins.toString additionalFeatures}" --out $out/share/postgresql/extension/${cargoToml.package.name}--${cargoToml.package.version}.sql
+      mkdir -p $out/share/postgresql/extension/
+      cp -v ${source}/sql/* $out/share/postgresql/extension/
+      cp -v ${source}/${cargoToml.package.name}.control $out/share/postgresql/extension/${cargoToml.package.name}.control
+      rm -r $out/.pgx
+      mv $out/lib/* $out/share/postgresql/extension/
+      rm -r $out/lib $out/bin
+    fi
   '';
   PGX_PG_SYS_SKIP_BINDING_REWRITE = "1";
   CARGO_BUILD_INCREMENTAL = "false";
   RUST_BACKTRACE = "full";
-  # This is required to have access to the `sql/*.sql` files.
-  singleStep = true;
 
   cargoBuildOptions = default: default ++ [ "--no-default-features" "--features \"pg${pgxPostgresVersionString} ${builtins.toString additionalFeatures}\"" ];
   cargoTestOptions = default: default ++ [ "--no-default-features" "--features \"pg_test pg${pgxPostgresVersionString} ${builtins.toString additionalFeatures}\"" ];
