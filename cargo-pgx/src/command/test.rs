@@ -12,7 +12,7 @@ use std::{
     path::Path,
 };
 
-use crate::CommandExecute;
+use crate::{CommandExecute, metadata::get_valid_extensions};
 
 /// Run the test suite for this crate
 #[derive(clap::Args, Debug)]
@@ -47,48 +47,54 @@ impl CommandExecute for Test {
         let pgx = Pgx::from_config()?;
         let metadata = crate::metadata::metadata(&self.features)?;
         crate::metadata::validate(&metadata)?;
-        let manifest_path = crate::manifest::manifest_path(&metadata, self.package)?;
-        let manifest = Manifest::from_path(&manifest_path)?;
 
-        let pg_version = match self.pg_version {
-            Some(s) => s,
-            None => crate::manifest::default_pg_version(&manifest)
-                .ok_or(eyre!("No provided `pg$VERSION` flag."))?,
+        let manifest_paths = if self.workspace {
+            get_valid_extensions(&metadata)
+        } else {
+            vec![crate::manifest::manifest_path(&metadata, self.package)?]
         };
+        for manifest_path in manifest_paths.iter() {
+            let manifest = Manifest::from_path(&manifest_path)?;
 
-        for pg_config in pgx.iter(PgConfigSelector::new(&pg_version)) {
-            let mut testname = self.testname.clone();
-            let pg_config = match pg_config {
-                Err(error) => {
-                    tracing::debug!(
-                        invalid_pg_version = %pg_version,
-                        error = %error,
-                        "Got invalid `pg$VERSION` flag, assuming it is a testname"
-                    );
-                    testname = Some(pg_version.clone());
-                    pgx.get(
-                        &crate::manifest::default_pg_version(&manifest)
-                            .ok_or(eyre!("No provided `pg$VERSION` flag."))?,
-                    )?
-                }
-                Ok(config) => config,
+            let pg_version = match self.pg_version {
+                Some(ref s) => s.clone,
+                None => crate::manifest::default_pg_version(&manifest)
+                    .ok_or(eyre!("No provided `pg$VERSION` flag."))?,
             };
-            let pg_version = format!("pg{}", pg_config.major_version()?);
-
-            let features = crate::manifest::features_for_version(
-                self.features.clone(),
-                &manifest,
-                &pg_version,
-            );
-            test_extension(
-                pg_config,
-                &manifest_path,
-                self.release,
-                self.no_schema,
-                self.workspace,
-                &features,
-                testname.clone(),
-            )?
+    
+            for pg_config in pgx.iter(PgConfigSelector::new(&pg_version)) {
+                let mut testname = self.testname.clone();
+                let pg_config = match pg_config {
+                    Err(error) => {
+                        tracing::debug!(
+                            invalid_pg_version = %pg_version,
+                            error = %error,
+                            "Got invalid `pg$VERSION` flag, assuming it is a testname"
+                        );
+                        testname = Some(pg_version.clone());
+                        pgx.get(
+                            &crate::manifest::default_pg_version(&manifest)
+                                .ok_or(eyre!("No provided `pg$VERSION` flag."))?,
+                        )?
+                    }
+                    Ok(config) => config,
+                };
+                let pg_version = format!("pg{}", pg_config.major_version()?);
+    
+                let features = crate::manifest::features_for_version(
+                    self.features.clone(),
+                    &manifest,
+                    &pg_version,
+                );
+                test_extension(
+                    pg_config,
+                    &manifest_path,
+                    self.release,
+                    self.no_schema,
+                    &features,
+                    testname.clone(),
+                )?
+            }
         }
         Ok(())
     }
@@ -104,7 +110,6 @@ pub fn test_extension(
     manifest_path: &Path,
     is_release: bool,
     no_schema: bool,
-    test_workspace: bool,
     features: &clap_cargo::Features,
     testname: Option<impl AsRef<str>>,
 ) -> eyre::Result<()> {
@@ -171,10 +176,6 @@ pub fn test_extension(
 
     if is_release {
         command.arg("--release");
-    }
-
-    if test_workspace {
-        command.arg("--all");
     }
 
     if let Some(testname) = testname {
