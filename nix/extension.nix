@@ -93,6 +93,12 @@ naersk.lib."${targetPlatform.system}".buildPackage rec {
       ${cargo-pgx}/bin/cargo-pgx pgx package --pg-config ${targetPostgres}/bin/pg_config ${maybeDebugFlag} --features "${builtins.toString additionalFeatures}" --out-dir $out
     fi
   '';
+  postFixup = ''
+    if [ -f "${cargoToml.package.name}.control" ]; then
+      rm -rfv $out/.pgx || true
+    fi
+  '';
+
   PGX_PG_SYS_SKIP_BINDING_REWRITE = "1";
   CARGO_BUILD_INCREMENTAL = "false";
   RUST_BACKTRACE = "full";
