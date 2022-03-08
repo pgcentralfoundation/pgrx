@@ -38,33 +38,7 @@ let
   maybeDebugFlag = if release == true then "" else "--debug";
   pgxPostgresVersionString = builtins.toString pgxPostgresVersion;
   cargoToml = (builtins.fromTOML (builtins.readFile "${source}/Cargo.toml"));
-in
-
-naersk.lib."${targetPlatform.system}".buildPackage rec {
-  inherit release doCheck;
-  name = "${cargoToml.package.name}-pg${pgxPostgresVersionString}";
-  version = cargoToml.package.version;
-
-  src = gitignoreSource source;
-
-  inputsFrom = [ postgresql_10 postgresql_11 postgresql_12 postgresql_13 cargo-pgx ];
-
-  LIBCLANG_PATH = "${llvmPackages.libclang.lib}/lib";
-  buildInputs = [
-    rust-bin.stable.latest.default
-    cargo-pgx
-    pkg-config
-    libiconv
-    pgxPostgresPkg
-    gcc
-  ];
-  checkInputs = [
-    cargo-pgx
-    rust-bin.stable.latest.default
-  ];
-
-  postPatch = "patchShebangs .";
-  preConfigure = ''
+  preBuildAndTest = ''
     mkdir -p $out/.pgx/{10,11,12,13,14}
     export PGX_HOME=$out/.pgx
 
@@ -98,6 +72,8 @@ naersk.lib."${targetPlatform.system}".buildPackage rec {
     # This is primarily for Mac or other Nix systems that don't use the nixbld user.
     export USER=$(whoami)
     export PGDATA=$out/.pgx/data-${pgxPostgresVersionString}/
+    export NIX_PGLIBDIR=$out/.pgx/${pgxPostgresVersionString}/lib
+
     echo "unix_socket_directories = '$out/.pgx'" > $PGDATA/postgresql.conf 
     ${pgxPostgresPkg}/bin/pg_ctl start
     ${pgxPostgresPkg}/bin/createuser -h localhost --superuser --createdb $USER || true
@@ -116,10 +92,34 @@ naersk.lib."${targetPlatform.system}".buildPackage rec {
       ${lib.optionalString stdenv.cc.isGNU "-isystem ${stdenv.cc.cc}/include/c++/${lib.getVersion stdenv.cc.cc} -isystem ${stdenv.cc.cc}/include/c++/${lib.getVersion stdenv.cc.cc}/${stdenv.hostPlatform.config} -idirafter ${stdenv.cc.cc}/lib/gcc/${stdenv.hostPlatform.config}/${lib.getVersion stdenv.cc.cc}/include"}
     "
   '';
-  preCheck = ''
-    export PGX_HOME=$out/.pgx
-    export NIX_PGLIBDIR=$out/.pgx/${pgxPostgresVersionString}/lib
-  '';
+in
+
+naersk.lib."${targetPlatform.system}".buildPackage rec {
+  inherit release doCheck;
+  name = "${cargoToml.package.name}-pg${pgxPostgresVersionString}";
+  version = cargoToml.package.version;
+
+  src = gitignoreSource source;
+
+  inputsFrom = [ postgresql_10 postgresql_11 postgresql_12 postgresql_13 cargo-pgx ];
+
+  LIBCLANG_PATH = "${llvmPackages.libclang.lib}/lib";
+  buildInputs = [
+    rust-bin.stable.latest.default
+    cargo-pgx
+    pkg-config
+    libiconv
+    pgxPostgresPkg
+    gcc
+  ];
+  checkInputs = [
+    cargo-pgx
+    rust-bin.stable.latest.default
+  ];
+
+  postPatch = "patchShebangs .";
+  preBuild = preBuildAndTest;
+  preCheck = preBuildAndTest;
   postBuild = ''
     if [ -f "${cargoToml.package.name}.control" ]; then
       export PGX_HOME=$out/.pgx
@@ -133,7 +133,8 @@ naersk.lib."${targetPlatform.system}".buildPackage rec {
   cargoBuildOptions = default: default ++ [ "--no-default-features" "--features \"pg${pgxPostgresVersionString} ${builtins.toString additionalFeatures}\"" ];
   cargoTestOptions = default: default ++ [ "--no-default-features" "--features \"pg_test pg${pgxPostgresVersionString} ${builtins.toString additionalFeatures}\"" ];
   doDoc = false;
-  copyLibs = true;
+  copyLibs = false;
+  copyBins = false;
 
   meta = with lib; {
     description = cargoToml.package.description;
