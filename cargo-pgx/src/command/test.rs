@@ -6,7 +6,11 @@ use pgx_utils::{
     get_target_dir,
     pg_config::{PgConfig, PgConfigSelector, Pgx},
 };
-use std::process::{Command, Stdio};
+use cargo_toml::Manifest;
+use std::{
+    process::{Command, Stdio},
+    path::Path,
+};
 
 use crate::CommandExecute;
 
@@ -19,6 +23,9 @@ pub(crate) struct Test {
     pg_version: Option<String>,
     /// If specified, only run tests containing this string in their names
     testname: Option<String>,
+    /// Package to build (see `cargo help pkgid`)
+    #[clap(long, short)]
+    package: Option<String>,
     /// compile for release mode (default is debug)
     #[clap(env = "PROFILE", long, short)]
     release: bool,
@@ -40,7 +47,8 @@ impl CommandExecute for Test {
         let pgx = Pgx::from_config()?;
         let metadata = crate::metadata::metadata(&self.features)?;
         crate::metadata::validate(&metadata)?;
-        let manifest = crate::manifest::manifest(&metadata)?;
+        let manifest_path = crate::manifest::manifest_path(&metadata, self.package)?;
+        let manifest = Manifest::from_path(&manifest_path)?;
 
         let pg_version = match self.pg_version {
             Some(s) => s,
@@ -74,6 +82,7 @@ impl CommandExecute for Test {
             );
             test_extension(
                 pg_config,
+                &manifest_path,
                 self.release,
                 self.no_schema,
                 self.workspace,
@@ -92,6 +101,7 @@ impl CommandExecute for Test {
 ))]
 pub fn test_extension(
     pg_config: &PgConfig,
+    manifest_path: &Path,
     is_release: bool,
     no_schema: bool,
     test_workspace: bool,
@@ -115,6 +125,8 @@ pub fn test_extension(
         .stdout(Stdio::inherit())
         .stderr(Stdio::inherit())
         .arg("test")
+        .arg("--manifest-path")
+        .arg(manifest_path)
         .env("CARGO_TARGET_DIR", &target_dir)
         .env("PGX_FEATURES", features_arg.clone())
         .env(
@@ -125,6 +137,7 @@ pub fn test_extension(
                 "false"
             },
         )
+        .env("PGX_MANIFEST_PATH", manifest_path)
         .env(
             "PGX_ALL_FEATURES",
             if features.all_features {

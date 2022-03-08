@@ -22,6 +22,7 @@ use symbolic::{
     common::{ByteView, DSymPathExt},
     debuginfo::{Archive, SymbolIterator},
 };
+use cargo_toml::Manifest;
 // Since we support extensions with `#[no_std]`
 extern crate alloc;
 use alloc::vec::Vec;
@@ -30,6 +31,9 @@ use alloc::vec::Vec;
 #[derive(clap::Args, Debug)]
 #[clap(author)]
 pub(crate) struct Schema {
+    /// Package to build (see `cargo help pkgid`)
+    #[clap(long, short)]
+    package: Option<String>,
     /// Build in test mode (for `cargo pgx test`)
     #[clap(long)]
     test: bool,
@@ -58,7 +62,11 @@ impl CommandExecute for Schema {
     fn execute(self) -> eyre::Result<()> {
         let metadata = crate::metadata::metadata(&Default::default())?;
         crate::metadata::validate(&metadata)?;
-        let manifest = crate::manifest::manifest(&metadata)?;
+        let manifest_path = crate::manifest::manifest_path(
+            &metadata,
+            self.package
+        )?;
+        let manifest = Manifest::from_path(&manifest_path)?;
 
         let log_level = if let Ok(log_level) = std::env::var("RUST_LOG") {
             Some(log_level)
@@ -93,7 +101,7 @@ impl CommandExecute for Schema {
         let features = crate::manifest::features_for_version(self.features, &manifest, &pg_version);
 
         generate_schema(
-            &manifest,
+            &manifest_path,
             &pg_config,
             self.release,
             self.test,
@@ -115,7 +123,7 @@ impl CommandExecute for Schema {
     features = ?features.features,
 ))]
 pub(crate) fn generate_schema(
-    manifest: &cargo_toml::Manifest,
+    manifest_path: &Path,
     pg_config: &PgConfig,
     is_release: bool,
     is_test: bool,
@@ -125,14 +133,15 @@ pub(crate) fn generate_schema(
     log_level: Option<String>,
     existing_build_output: Option<Vec<cargo_metadata::Message>>,
 ) -> eyre::Result<()> {
-    let (control_file, _extname) = find_control_file()?;
+    let manifest = Manifest::from_path(&manifest_path)?;
+    let (control_file, _extname) = find_control_file(manifest_path)?;
     let package_name = &manifest
         .package
         .as_ref()
         .ok_or_else(|| eyre!("Could not find crate name in Cargo.toml."))?
         .name;
 
-    if get_property("relocatable")? != Some("false".into()) {
+    if get_property(manifest_path, "relocatable")? != Some("false".into()) {
         return Err(eyre!(
             "{}:  The `relocatable` property MUST be `false`.  Please update your .control file.",
             control_file.display()
@@ -156,6 +165,8 @@ pub(crate) fn generate_schema(
         } else {
             command.arg("build");
         }
+        command.arg("--manifest-path");
+        command.arg(manifest_path);
         if is_release {
             command.arg("--release");
         }

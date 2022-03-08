@@ -6,13 +6,17 @@ use crate::{
     CommandExecute,
 };
 use eyre::eyre;
+use cargo_toml::Manifest;
 use pgx_utils::{get_target_dir, pg_config::PgConfig};
-use std::path::PathBuf;
+use std::path::{PathBuf, Path};
 
 /// Create an installation package directory (in `./target/[debug|release]/extname-pgXX/`).
 #[derive(clap::Args, Debug)]
 #[clap(author)]
 pub(crate) struct Package {
+    /// Package to build (see `cargo help pkgid`)
+    #[clap(long, short)]
+    package: Option<String>,
     /// Compile for debug mode (default is release)
     #[clap(env = "PROFILE", long, short)]
     debug: bool,
@@ -33,7 +37,11 @@ impl CommandExecute for Package {
     fn execute(self) -> eyre::Result<()> {
         let metadata = crate::metadata::metadata(&self.features)?;
         crate::metadata::validate(&metadata)?;
-        let manifest = crate::manifest::manifest(&metadata)?;
+        let manifest_path = crate::manifest::manifest_path(
+            &metadata,
+            self.package,
+        )?;
+        let manifest = Manifest::from_path(&manifest_path)?;
 
         let pg_config = match self.pg_config {
             None => PgConfig::from_path(),
@@ -42,7 +50,7 @@ impl CommandExecute for Package {
         let pg_version = format!("pg{}", pg_config.major_version()?);
         let features = crate::manifest::features_for_version(self.features, &manifest, &pg_version);
 
-        package_extension(&manifest, &pg_config, self.debug, self.test, &features)
+        package_extension(&manifest_path, &pg_config, self.debug, self.test, &features)
     }
 }
 
@@ -52,13 +60,13 @@ impl CommandExecute for Package {
     test = is_test,
 ))]
 pub(crate) fn package_extension(
-    manifest: &cargo_toml::Manifest,
+    manifest_path: &Path,
     pg_config: &PgConfig,
     is_debug: bool,
     is_test: bool,
     features: &clap_cargo::Features,
 ) -> eyre::Result<()> {
-    let base_path = build_base_path(pg_config, is_debug)?;
+    let base_path = build_base_path(pg_config, manifest_path, is_debug)?;
 
     if base_path.exists() {
         std::fs::remove_dir_all(&base_path)?;
@@ -68,20 +76,19 @@ pub(crate) fn package_extension(
         std::fs::create_dir_all(&base_path)?;
     }
     install_extension(
-        manifest,
+        manifest_path,
         pg_config,
         !is_debug,
         is_test,
-        false,
         Some(base_path),
         features,
     )
 }
 
-fn build_base_path(pg_config: &PgConfig, is_debug: bool) -> eyre::Result<PathBuf> {
+fn build_base_path(pg_config: &PgConfig, manifest_path: &Path, is_debug: bool) -> eyre::Result<PathBuf> {
     let mut target_dir = get_target_dir()?;
     let pgver = pg_config.major_version()?;
-    let extname = get_property("extname")?.ok_or(eyre!("could not determine extension name"))?;
+    let extname = get_property(manifest_path, "extname")?.ok_or(eyre!("could not determine extension name"))?;
     target_dir.push(if is_debug { "debug" } else { "release" });
     target_dir.push(format!("{}-pg{}", extname, pgver));
     Ok(target_dir)

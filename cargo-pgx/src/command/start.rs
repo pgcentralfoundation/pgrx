@@ -9,6 +9,7 @@ use owo_colors::OwoColorize;
 use pgx_utils::pg_config::{PgConfig, PgConfigSelector, Pgx};
 use std::os::unix::process::CommandExt;
 use std::process::Stdio;
+use cargo_toml::Manifest;
 
 /// Start a pgx-managed Postgres instance
 #[derive(clap::Args, Debug)]
@@ -31,7 +32,8 @@ impl CommandExecute for Start {
             None => {
                 let metadata = crate::metadata::metadata(&Default::default())?;
                 crate::metadata::validate(&metadata)?;
-                let manifest = crate::manifest::manifest(&metadata)?;
+                let manifest_path = crate::manifest::manifest_path(&metadata, None)?;
+                let manifest = Manifest::from_path(&manifest_path)?;
                 crate::manifest::default_pg_version(&manifest)
                     .ok_or(eyre!("No provided `pg$VERSION` flag."))?
             }

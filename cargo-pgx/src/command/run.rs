@@ -13,7 +13,8 @@ use pgx_utils::{
     createdb,
     pg_config::{PgConfig, Pgx},
 };
-use std::{os::unix::process::CommandExt, process::Command};
+use cargo_toml::Manifest;
+use std::{path::Path, os::unix::process::CommandExt, process::Command};
 /// Compile/install extension to a pgx-managed Postgres instance and start psql
 #[derive(clap::Args, Debug)]
 #[clap(author)]
@@ -23,12 +24,12 @@ pub(crate) struct Run {
     pg_version: Option<String>,
     /// The database to connect to (and create if the first time).  Defaults to a database with the same name as the current extension name
     dbname: Option<String>,
+    /// Package to build (see `cargo help pkgid`)
+    #[clap(long, short)]
+    package: Option<String>,
     /// Compile for release mode (default is debug)
     #[clap(env = "PROFILE", long, short)]
     release: bool,
-    /// Don't regenerate the schema
-    #[clap(long, short)]
-    no_schema: bool,
     #[clap(flatten)]
     features: clap_cargo::Features,
     #[clap(from_global, parse(from_occurrences))]
@@ -40,7 +41,12 @@ impl CommandExecute for Run {
     fn execute(mut self) -> eyre::Result<()> {
         let metadata = crate::metadata::metadata(&self.features)?;
         crate::metadata::validate(&metadata)?;
-        let manifest = crate::manifest::manifest(&metadata)?;
+        let manifest_path = crate::manifest::manifest_path(
+            &metadata,
+            self.package
+        )?;
+        let manifest = Manifest::from_path(&manifest_path)?;
+
         let pgx = Pgx::from_config()?;
 
         let (pg_config, pg_version) = match self.pg_version {
@@ -70,15 +76,14 @@ impl CommandExecute for Run {
 
         let dbname = match self.dbname {
             Some(dbname) => dbname,
-            None => get_property("extname")?.ok_or(eyre!("could not determine extension name"))?,
+            None => get_property(&manifest_path, "extname")?.ok_or(eyre!("could not determine extension name"))?,
         };
 
         run_psql(
-            &manifest,
+            &manifest_path,
             pg_config,
             &dbname,
             self.release,
-            self.no_schema,
             &features,
         )
     }
@@ -90,11 +95,10 @@ impl CommandExecute for Run {
     release = is_release,
 ))]
 pub(crate) fn run_psql(
-    manifest: &cargo_toml::Manifest,
+    manifest_path: &Path,
     pg_config: &PgConfig,
     dbname: &str,
     is_release: bool,
-    no_schema: bool,
     features: &clap_cargo::Features,
 ) -> eyre::Result<()> {
     // stop postgres
@@ -102,7 +106,7 @@ pub(crate) fn run_psql(
 
     // install the extension
     install_extension(
-        manifest, pg_config, is_release, false, no_schema, None, features,
+        manifest_path, pg_config, is_release, false, None, features,
     )?;
 
     // restart postgres

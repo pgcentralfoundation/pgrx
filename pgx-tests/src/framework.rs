@@ -258,6 +258,11 @@ fn install_extension() -> eyre::Result<()> {
         .stdout(Stdio::inherit())
         .stderr(Stdio::inherit())
         .env("CARGO_TARGET_DIR", get_target_dir()?);
+    
+    if let Ok(manifest_path) = std::env::var("PGX_MANIFEST_PATH") {
+        command.arg("--manifest-path");
+        command.arg(manifest_path);
+    }
 
     if let Ok(rust_log) = std::env::var("RUST_LOG") {
         command.env("RUST_LOG", rust_log);

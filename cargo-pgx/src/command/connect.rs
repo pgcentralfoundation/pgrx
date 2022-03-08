@@ -5,6 +5,7 @@ use crate::{
     command::{get::get_property, run::exec_psql, start::start_postgres},
     CommandExecute,
 };
+use cargo_toml::Manifest;
 use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
 use pgx_utils::createdb;
@@ -41,7 +42,8 @@ impl CommandExecute for Connect {
 
                     let metadata = crate::metadata::metadata(&Default::default())?;
                     crate::metadata::validate(&metadata)?;
-                    let manifest = crate::manifest::manifest(&metadata)?;
+                    let manifest_path = crate::manifest::manifest_path(&metadata, None)?;
+                    let manifest = Manifest::from_path(&manifest_path)?;
 
                     let default_pg_version = crate::manifest::default_pg_version(&manifest)
                         .ok_or(eyre!("No provided `pg$VERSION` flag."))?;
@@ -52,7 +54,8 @@ impl CommandExecute for Connect {
                 // We should infer from the manifest.
                 let metadata = crate::metadata::metadata(&Default::default())?;
                 crate::metadata::validate(&metadata)?;
-                let manifest = crate::manifest::manifest(&metadata)?;
+                let manifest_path = crate::manifest::manifest_path(&metadata, None)?;
+                let manifest = Manifest::from_path(&manifest_path)?;
 
                 let default_pg_version = crate::manifest::default_pg_version(&manifest)
                     .ok_or(eyre!("No provided `pg$VERSION` flag."))?;
@@ -62,9 +65,15 @@ impl CommandExecute for Connect {
 
         let dbname = match self.dbname {
             Some(dbname) => dbname,
-            None => get_property("extname")
-                .wrap_err("could not determine extension name")?
-                .ok_or(eyre!("extname not found in control file"))?,
+            None => {
+                let metadata = crate::metadata::metadata(&Default::default())?;
+                crate::metadata::validate(&metadata)?;
+                let manifest_path = crate::manifest::manifest_path(&metadata, None)?;
+
+                get_property(&manifest_path, "extname")
+                    .wrap_err("could not determine extension name")?
+                    .ok_or(eyre!("extname not found in control file"))?
+            },
         };
 
         connect_psql(Pgx::from_config()?.get(&pg_version)?, &dbname)
