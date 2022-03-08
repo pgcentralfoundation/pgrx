@@ -102,7 +102,7 @@ naersk.lib."${targetPlatform.system}".buildPackage rec {
   # Turns out Macs don't really shut down PostgreSQL and get rid of the sockets when they say they do. We wait on them a second to give it time.
   postFixup = ''
     if [ -f "${cargoToml.package.name}.control" ]; then
-      ${if stdenv.isDarwin then "sleep 2" else ""}
+      ${if stdenv.isDarwin then "until [ ! -f $out/.pgx/.s.PGSQL.* ] do sleep 1 done" else ""}
       rm -rfv $out/.pgx || true
     fi
   '';
