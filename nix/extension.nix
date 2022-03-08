@@ -10,7 +10,6 @@
 , libiconv
 , rust-bin
 , llvmPackages
-, gcc
 , gitignoreSource
 , runCommand
 , targetPostgres
@@ -77,7 +76,6 @@ naersk.lib."${targetPlatform.system}".buildPackage rec {
     pkg-config
     libiconv
     targetPostgres
-    gcc
   ];
   checkInputs = [
     cargo-pgx
