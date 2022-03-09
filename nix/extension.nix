@@ -93,16 +93,14 @@ naersk.lib."${targetPlatform.system}".buildPackage rec {
       export NIX_PGLIBDIR=$out/.pgx/${pgxPostgresMajor}/lib
     fi
   '';
+  # Turns out Macs don't really shut down PostgreSQL and get rid of the sockets when they say they do. We wait on them a second to give it time.
   preFixup = ''
     if [ -f "${cargoToml.package.name}.control" ]; then
       mv -v $out/${targetPostgres.out}/* $out
       rm -rfv $out/nix
-    fi
-  '';
-  # Turns out Macs don't really shut down PostgreSQL and get rid of the sockets when they say they do. We wait on them a second to give it time.
-  postFixup = ''
-    if [ -f "${cargoToml.package.name}.control" ]; then
-      ${if stdenv.isDarwin then "until [ ! -f $out/.pgx/.s.PGSQL.* ] do sleep 1 done" else ""}
+      
+      ${cargo-pgx}/bin/cargo-pgx pgx stop all
+
       rm -rfv $out/.pgx || true
     fi
   '';
