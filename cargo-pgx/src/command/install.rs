@@ -144,20 +144,16 @@ pub(crate) fn install_extension(
         copy_file(&shlibpath, &dest, "shared library", false, manifest_path)?;
     }
 
-    if !get_target_sql_file(&manifest_path, &extdir, &base_directory)?.exists() {
-        copy_sql_files(
-            manifest_path,
-            pg_config,
-            is_release,
-            is_test,
-            features,
-            &extdir,
-            &base_directory,
-            build_command_messages,
-        )?;
-    } else {
-        println!("{} schema generation", "    Skipping".bold().yellow());
-    }
+    copy_sql_files(
+        manifest_path,
+        pg_config,
+        is_release,
+        is_test,
+        features,
+        &extdir,
+        &base_directory,
+        build_command_messages,
+    )?;
 
     println!("{} installing {}", "    Finished".bold().green(), extname);
     Ok(())

@@ -57,7 +57,7 @@ impl CommandExecute for Test {
             let manifest = Manifest::from_path(&manifest_path)?;
 
             let pg_version = match self.pg_version {
-                Some(ref s) => s.clone,
+                Some(ref s) => s.clone(),
                 None => crate::manifest::default_pg_version(&manifest)
                     .ok_or(eyre!("No provided `pg$VERSION` flag."))?,
             };
