@@ -3,7 +3,6 @@ use std::{
     io::{Write},
     path::Path,
     collections::HashSet,
-    borrow::Cow,
 };
 use syn::{Ident, parse_quote, Item};
 

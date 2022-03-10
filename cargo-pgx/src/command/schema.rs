@@ -17,13 +17,8 @@ use std::{
     io::BufReader,
     path::{Path, PathBuf},
     process::{Command, Stdio},
-    borrow::Cow,
 };
-use symbolic::{
-    common::{ByteView, DSymPathExt},
-    debuginfo::{Archive, SymbolIterator},
-};
-use object::{Object, ObjectSymbol};
+use object::{Object};
 // Since we support extensions with `#[no_std]`
 extern crate alloc;
 use alloc::vec::Vec;
@@ -252,12 +247,16 @@ pub(crate) fn generate_schema(
     eprintln!("{} SQL entities", " Discovering".bold().green(),);
 
     let postmaster_path = pg_config.postmaster_path()
-        .wrap_err("Could not get postmaster path")?;
-    let postmaster_bin_data = std::fs::read(postmaster_path)?;
-    let postmaster_obj_file = object::File::parse(&*postmaster_bin_data)?;
+        .wrap_err("could not get postmaster path")?;
+    let postmaster_bin_data = std::fs::read(postmaster_path)
+        .wrap_err("couldn't read postmaster")?;
+    let postmaster_obj_file = object::File::parse(&*postmaster_bin_data)
+        .wrap_err("couldn't parse postmaster")?;
+    let postmaster_exports = postmaster_obj_file.exports()
+        .wrap_err("couldn't get exports from extension shared object")?;
 
     let mut symbols_to_stub = HashSet::new();
-    for export in postmaster_obj_file.exports()? {
+    for export in postmaster_exports {
         let name = std::str::from_utf8(export.name())?;
         symbols_to_stub.insert(name);
     }
@@ -283,44 +282,20 @@ pub(crate) fn generate_schema(
         so_extension
     ));
 
-    let dsym_path = lib_so.resolve_dsym();
-    let buffer = ByteView::open(dsym_path.as_deref().unwrap_or(&lib_so)).wrap_err_with(|| {
-        eyre!(
-            "Could not get byte view into {}",
-            &dsym_path.as_deref().unwrap_or(&lib_so).display()
-        )
-    })?;
-    let archive = Archive::parse(&buffer).expect("Could not parse archive");
+    let lib_so_data = std::fs::read(&lib_so)
+        .wrap_err("couldn't read extension shared object")?;
+    let lib_so_obj_file = object::File::parse(&*lib_so_data)
+        .wrap_err("couldn't parse extension shared object")?;
+    let lib_so_exports = lib_so_obj_file.exports()
+        .wrap_err("couldn't get exports from extension shared object")?;
 
     // Some users reported experiencing duplicate entries if we don't ensure `fns_to_call`
     // has unique entries.
     let mut fns_to_call = HashSet::new();
-    for object in archive.objects() {
-        match object {
-            Ok(object) => match object.symbols() {
-                SymbolIterator::Elf(iter) => {
-                    for symbol in iter {
-                        if let Some(name) = symbol.name {
-                            if name.starts_with("__pgx_internals") {
-                                fns_to_call.insert(name);
-                            }
-                        }
-                    }
-                }
-                SymbolIterator::MachO(iter) => {
-                    for symbol in iter {
-                        if let Some(name) = symbol.name {
-                            if name.starts_with("__pgx_internals") {
-                                fns_to_call.insert(name);
-                            }
-                        }
-                    }
-                }
-                _ => panic!("Unable to parse non-ELF or Mach0 symbols. (Please report this, we can  probably fix this!)"),
-            },
-            Err(e) => {
-                panic!("Got error inspecting objects: {}", e);
-            }
+    for export in lib_so_exports {
+        let name = std::str::from_utf8(export.name())?;
+        if name.starts_with("__pgx_internals") {
+            fns_to_call.insert(name);
         }
     }
     let mut seen_schemas = Vec::new();
