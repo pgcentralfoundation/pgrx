@@ -23,6 +23,7 @@ use symbolic::{
     common::{ByteView, DSymPathExt},
     debuginfo::{Archive, SymbolIterator},
 };
+use object::{Object, ObjectSymbol};
 // Since we support extensions with `#[no_std]`
 extern crate alloc;
 use alloc::vec::Vec;
@@ -252,39 +253,13 @@ pub(crate) fn generate_schema(
 
     let postmaster_path = pg_config.postmaster_path()
         .wrap_err("Could not get postmaster path")?;
-    let postmaster_dsym_path = postmaster_path.resolve_dsym();
-    let postmaster_buffer = ByteView::open(postmaster_dsym_path.as_deref().unwrap_or(&postmaster_path)).wrap_err_with(|| {
-        eyre!(
-            "Could not get byte view into {}",
-            &postmaster_dsym_path.as_deref().unwrap_or(&postmaster_path).display()
-        )
-    })?;
-    let postmaster_archive = Archive::parse(&postmaster_buffer).expect("Could not parse archive");
-    
+    let postmaster_bin_data = std::fs::read(postmaster_path)?;
+    let postmaster_obj_file = object::File::parse(&*postmaster_bin_data)?;
+
     let mut symbols_to_stub = HashSet::new();
-    for object in postmaster_archive.objects() {
-        match object {
-            Ok(object) => match object.symbols() {
-                SymbolIterator::Elf(iter) => {
-                    for symbol in iter {
-                        if let Some(name) = symbol.name {
-                            symbols_to_stub.insert(name);
-                        }
-                    }
-                }
-                SymbolIterator::MachO(iter) => {
-                    for symbol in iter {
-                        if let Some(name) = symbol.name {
-                            symbols_to_stub.insert(name);
-                        }
-                    }
-                }
-                _ => panic!("Unable to parse non-ELF or Mach0 symbols. (Please report this, we can probably fix this!)"),
-            },
-            Err(e) => {
-                panic!("Got error inspecting objects: {}", e);
-            }
-        }
+    for export in postmaster_obj_file.exports()? {
+        let name = std::str::from_utf8(export.name())?;
+        symbols_to_stub.insert(name);
     }
 
     create_stub(
@@ -490,7 +465,7 @@ pub(crate) fn generate_schema(
     so_dest = %format_display_path(so_dest.as_ref())?,
 ))]
 fn create_stub(
-    symbols: &HashSet<Cow<str>>,
+    symbols: &HashSet<&str>,
     rs_dest: impl AsRef<Path>,
     so_dest: impl AsRef<Path>,
 ) -> eyre::Result<()> {

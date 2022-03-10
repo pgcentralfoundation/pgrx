@@ -23,7 +23,7 @@ const SYMBOL_SKIP_LIST: [&str; 2] = [
 
 impl PgxPgSysStub {
     #[tracing::instrument(level = "error", skip_all, fields(symbols = %symbols.len()))]
-    pub fn from_symbols(symbols: &HashSet<Cow<str>>) -> eyre::Result<Self> {
+    pub fn from_symbols(symbols: &HashSet<&str>) -> eyre::Result<Self> {
         let mut items = Vec::with_capacity(symbols.len());
         for symbol in symbols.iter().filter(|v| !SYMBOL_SKIP_LIST.contains(&v.as_ref())) {
             match stub_for_symbol(symbol) {
