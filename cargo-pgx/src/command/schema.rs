@@ -17,6 +17,7 @@ use std::{
     io::BufReader,
     path::{Path, PathBuf},
     process::{Command, Stdio},
+    borrow::Cow,
 };
 use symbolic::{
     common::{ByteView, DSymPathExt},
@@ -249,8 +250,45 @@ pub(crate) fn generate_schema(
     // The next action may take a few seconds, we'd like the user to know we're thinking.
     eprintln!("{} SQL entities", " Discovering".bold().green(),);
 
+    let postmaster_path = pg_config.postmaster_path()
+        .wrap_err("Could not get postmaster path")?;
+    let postmaster_dsym_path = postmaster_path.resolve_dsym();
+    let postmaster_buffer = ByteView::open(postmaster_dsym_path.as_deref().unwrap_or(&postmaster_path)).wrap_err_with(|| {
+        eyre!(
+            "Could not get byte view into {}",
+            &postmaster_dsym_path.as_deref().unwrap_or(&postmaster_path).display()
+        )
+    })?;
+    let postmaster_archive = Archive::parse(&postmaster_buffer).expect("Could not parse archive");
+    
+    let mut symbols_to_stub = HashSet::new();
+    for object in postmaster_archive.objects() {
+        match object {
+            Ok(object) => match object.symbols() {
+                SymbolIterator::Elf(iter) => {
+                    for symbol in iter {
+                        if let Some(name) = symbol.name {
+                            symbols_to_stub.insert(name);
+                        }
+                    }
+                }
+                SymbolIterator::MachO(iter) => {
+                    for symbol in iter {
+                        if let Some(name) = symbol.name {
+                            symbols_to_stub.insert(name);
+                        }
+                    }
+                }
+                _ => panic!("Unable to parse non-ELF or Mach0 symbols. (Please report this, we can probably fix this!)"),
+            },
+            Err(e) => {
+                panic!("Got error inspecting objects: {}", e);
+            }
+        }
+    }
+
     create_stub(
-        &pgx_pg_sys_file,
+        &symbols_to_stub,
         &pgx_pg_sys_stub_file,
         &pgx_pg_sys_stub_built,
     )?;
@@ -447,22 +485,21 @@ pub(crate) fn generate_schema(
 }
 
 #[tracing::instrument(level = "error", skip_all, fields(
-    source = %format_display_path(source.as_ref())?,
+    symbols = %symbols.len(),
     rs_dest = %format_display_path(rs_dest.as_ref())?,
     so_dest = %format_display_path(so_dest.as_ref())?,
 ))]
 fn create_stub(
-    source: impl AsRef<Path>,
+    symbols: &HashSet<Cow<str>>,
     rs_dest: impl AsRef<Path>,
     so_dest: impl AsRef<Path>,
 ) -> eyre::Result<()> {
-    let source = source.as_ref();
     let rs_dest = rs_dest.as_ref();
     let so_dest = so_dest.as_ref();
 
     if !rs_dest.exists() {
         tracing::debug!("Creating stub of appropriate PostgreSQL symbols");
-        PgxPgSysStub::from_file(&source)?.write_to_file(&rs_dest)?;
+        PgxPgSysStub::from_symbols(symbols)?.write_to_file(&rs_dest)?;
     } else {
         tracing::debug!("Found existing stub file")
     }
