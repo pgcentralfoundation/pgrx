@@ -69,6 +69,7 @@
 #include "rewrite/rewriteHandler.h"
 #include "storage/block.h"
 #include "storage/bufmgr.h"
+#include "storage/buffile.h"
 #include "storage/ipc.h"
 #include "storage/itemptr.h"
 #include "storage/lwlock.h"
