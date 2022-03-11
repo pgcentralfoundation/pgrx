@@ -26,9 +26,6 @@ pub(crate) struct Run {
     /// Compile for release mode (default is debug)
     #[clap(env = "PROFILE", long, short)]
     release: bool,
-    /// Don't regenerate the schema
-    #[clap(long, short)]
-    no_schema: bool,
     #[clap(flatten)]
     features: clap_cargo::Features,
     #[clap(from_global, parse(from_occurrences))]
@@ -73,14 +70,7 @@ impl CommandExecute for Run {
             None => get_property("extname")?.ok_or(eyre!("could not determine extension name"))?,
         };
 
-        run_psql(
-            &manifest,
-            pg_config,
-            &dbname,
-            self.release,
-            self.no_schema,
-            &features,
-        )
+        run_psql(&manifest, pg_config, &dbname, self.release, &features)
     }
 }
 
@@ -94,16 +84,13 @@ pub(crate) fn run_psql(
     pg_config: &PgConfig,
     dbname: &str,
     is_release: bool,
-    no_schema: bool,
     features: &clap_cargo::Features,
 ) -> eyre::Result<()> {
     // stop postgres
     stop_postgres(pg_config)?;
 
     // install the extension
-    install_extension(
-        manifest, pg_config, is_release, false, no_schema, None, features,
-    )?;
+    install_extension(manifest, pg_config, is_release, false, None, features)?;
 
     // restart postgres
     start_postgres(pg_config)?;
