@@ -14,7 +14,6 @@ use pgx_utils::{
 };
 use std::{
     collections::HashSet,
-    io::BufReader,
     path::{Path, PathBuf},
     process::{Command, Stdio},
 };
@@ -48,6 +47,9 @@ pub(crate) struct Schema {
     dot: Option<PathBuf>,
     #[clap(from_global, parse(from_occurrences))]
     verbose: usize,
+    /// Skip building a fresh extension shared object.
+    #[clap(long)]
+    skip_build: bool,
 }
 
 impl CommandExecute for Schema {
@@ -98,7 +100,7 @@ impl CommandExecute for Schema {
             self.out.as_ref(),
             self.dot,
             log_level,
-            None,
+            self.skip_build,
         )
     }
 }
@@ -120,7 +122,7 @@ pub(crate) fn generate_schema(
     path: Option<impl AsRef<std::path::Path>>,
     dot: Option<impl AsRef<std::path::Path>>,
     log_level: Option<String>,
-    existing_build_output: Option<Vec<cargo_metadata::Message>>,
+    skip_build: bool,
 ) -> eyre::Result<()> {
     let (control_file, _extname) = find_control_file()?;
     let package_name = &manifest
@@ -142,11 +144,10 @@ pub(crate) fn generate_schema(
     target_dir_with_profile.push(if is_release { "release" } else { "debug" });
 
     // First, build the SQL generator so we can get a look at the symbol table
-    let cargo_output = if let Some(output) = existing_build_output {
-        output
-    } else {
+    if !skip_build {
         let mut command = Command::new("cargo");
         command.stderr(Stdio::inherit());
+        command.stdout(Stdio::inherit());
         if is_test {
             command.arg("test");
             command.arg("--no-run");
@@ -175,8 +176,6 @@ pub(crate) fn generate_schema(
             command.arg("--all-features");
         }
 
-        command.arg("--message-format=json-render-diagnostics");
-
         for arg in flags.split_ascii_whitespace() {
             command.arg(arg);
         }
@@ -199,49 +198,24 @@ pub(crate) fn generate_schema(
             // We explicitly do not want to return a spantraced error here.
             std::process::exit(1)
         }
-
-        let cargo_stdout_bytes = cargo_output.stdout;
-        let cargo_stdout_reader = BufReader::new(cargo_stdout_bytes.as_slice());
-        let cargo_stdout_stream = cargo_metadata::Message::parse_stream(cargo_stdout_reader);
-        cargo_stdout_stream.collect::<Result<Vec<_>, std::io::Error>>()?
     };
 
-    let mut pgx_pg_sys_out_dir = None;
-
-    for message in cargo_output {
-        match message {
-            cargo_metadata::Message::BuildScriptExecuted(script) => {
-                if !script.package_id.repr.starts_with("pgx-pg-sys") {
-                    continue;
-                }
-                pgx_pg_sys_out_dir = Some(script.out_dir);
-                break;
-            }
-            cargo_metadata::Message::CompilerMessage(_)
-            | cargo_metadata::Message::CompilerArtifact(_)
-            | cargo_metadata::Message::BuildFinished(_)
-            | _ => (),
-        }
-    }
-
-    let pgx_pg_sys_out_dir = pgx_pg_sys_out_dir.ok_or(eyre!(
-        "Could not get `pgx-pg-sys` `out_dir` from Cargo output."
-    ))?;
-    let pgx_pg_sys_out_dir = PathBuf::from(pgx_pg_sys_out_dir);
-
-    let pg_version = pg_config.major_version()?;
-
     // Create stubbed `pgx_pg_sys` bindings for the generator to link with.
-    let mut pgx_pg_sys_stub_file = pgx_pg_sys_out_dir.clone();
-    pgx_pg_sys_stub_file.push("stubs");
-    pgx_pg_sys_stub_file.push(&format!("pg{}_stub.rs", pg_version));
+    let mut postmaster_stub_dir = Pgx::postmaster_stub_dir()
+        .wrap_err("couldn't get postmaster stub dir env")?;
+    postmaster_stub_dir.push(
+        pg_config.postmaster_path()
+            .wrap_err("couldn't get postmaster path")?
+            .strip_prefix("/")
+            .wrap_err("couldn't make postmaster path relative")?
+            .parent()
+            .ok_or(eyre!("couldn't get postmaster parent dir"))?
+    );
+    let mut postmaster_stub_file = postmaster_stub_dir.clone();
+    postmaster_stub_file.push("postmaster_stub.rs");
 
-    let mut pgx_pg_sys_file = PathBuf::from(&pgx_pg_sys_out_dir);
-    pgx_pg_sys_file.push(&format!("pg{}.rs", pg_version));
-
-    let mut pgx_pg_sys_stub_built = pgx_pg_sys_out_dir.clone();
-    pgx_pg_sys_stub_built.push("stubs");
-    pgx_pg_sys_stub_built.push(format!("pg{}_stub.so", pg_version));
+    let mut postmaster_stub_built = postmaster_stub_dir.clone();
+    postmaster_stub_built.push("postmaster_stub.so");
 
     // The next action may take a few seconds, we'd like the user to know we're thinking.
     eprintln!("{} SQL entities", " Discovering".bold().green(),);
@@ -263,8 +237,8 @@ pub(crate) fn generate_schema(
 
     create_stub(
         &symbols_to_stub,
-        &pgx_pg_sys_stub_file,
-        &pgx_pg_sys_stub_built,
+        &postmaster_stub_file,
+        &postmaster_stub_built,
     )?;
 
     // Inspect the symbol table for a list of `__pgx_internals` we should have the generator call
@@ -352,13 +326,13 @@ pub(crate) fn generate_schema(
     let source_only_sql_mapping;
 
     unsafe {
-        let _pgx_pg_sys = libloading::os::unix::Library::open(
-            Some(&pgx_pg_sys_stub_built),
+        let _postmaster = libloading::os::unix::Library::open(
+            Some(&postmaster_stub_built),
             libloading::os::unix::RTLD_NOW | libloading::os::unix::RTLD_GLOBAL,
         )
         .expect(&format!(
             "Couldn't libload {}",
-            pgx_pg_sys_stub_built.display()
+            postmaster_stub_built.display()
         ));
 
         let lib =
