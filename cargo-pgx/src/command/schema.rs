@@ -6,6 +6,7 @@ use crate::{
     CommandExecute,
 };
 use eyre::{eyre, WrapErr};
+use object::Object;
 use owo_colors::OwoColorize;
 use pgx_utils::{
     pg_config::{PgConfig, Pgx},
@@ -17,7 +18,6 @@ use std::{
     path::{Path, PathBuf},
     process::{Command, Stdio},
 };
-use object::{Object};
 // Since we support extensions with `#[no_std]`
 extern crate alloc;
 use alloc::vec::Vec;
@@ -201,15 +201,16 @@ pub(crate) fn generate_schema(
     };
 
     // Create stubbed `pgx_pg_sys` bindings for the generator to link with.
-    let mut postmaster_stub_dir = Pgx::postmaster_stub_dir()
-        .wrap_err("couldn't get postmaster stub dir env")?;
+    let mut postmaster_stub_dir =
+        Pgx::postmaster_stub_dir().wrap_err("couldn't get postmaster stub dir env")?;
     postmaster_stub_dir.push(
-        pg_config.postmaster_path()
+        pg_config
+            .postmaster_path()
             .wrap_err("couldn't get postmaster path")?
             .strip_prefix("/")
             .wrap_err("couldn't make postmaster path relative")?
             .parent()
-            .ok_or(eyre!("couldn't get postmaster parent dir"))?
+            .ok_or(eyre!("couldn't get postmaster parent dir"))?,
     );
     let mut postmaster_stub_file = postmaster_stub_dir.clone();
     postmaster_stub_file.push("postmaster_stub.rs");
@@ -220,19 +221,20 @@ pub(crate) fn generate_schema(
     // The next action may take a few seconds, we'd like the user to know we're thinking.
     eprintln!("{} SQL entities", " Discovering".bold().green(),);
 
-    let postmaster_path = pg_config.postmaster_path()
+    let postmaster_path = pg_config
+        .postmaster_path()
         .wrap_err("could not get postmaster path")?;
-    let postmaster_bin_data = std::fs::read(postmaster_path)
-        .wrap_err("couldn't read postmaster")?;
-    let postmaster_obj_file = object::File::parse(&*postmaster_bin_data)
-        .wrap_err("couldn't parse postmaster")?;
-    let postmaster_exports = postmaster_obj_file.exports()
+    let postmaster_bin_data =
+        std::fs::read(postmaster_path).wrap_err("couldn't read postmaster")?;
+    let postmaster_obj_file =
+        object::File::parse(&*postmaster_bin_data).wrap_err("couldn't parse postmaster")?;
+    let postmaster_exports = postmaster_obj_file
+        .exports()
         .wrap_err("couldn't get exports from extension shared object")?;
 
     let mut symbols_to_stub = HashSet::new();
     for export in postmaster_exports {
-        let name = std::str::from_utf8(export.name())?
-            .to_string();
+        let name = std::str::from_utf8(export.name())?.to_string();
         #[cfg(target_os = "macos")]
         let name = {
             // Mac will prefix symbols with `_` automatically, so we remove it to avoid getting
@@ -266,11 +268,11 @@ pub(crate) fn generate_schema(
         so_extension
     ));
 
-    let lib_so_data = std::fs::read(&lib_so)
-        .wrap_err("couldn't read extension shared object")?;
-    let lib_so_obj_file = object::File::parse(&*lib_so_data)
-        .wrap_err("couldn't parse extension shared object")?;
-    let lib_so_exports = lib_so_obj_file.exports()
+    let lib_so_data = std::fs::read(&lib_so).wrap_err("couldn't read extension shared object")?;
+    let lib_so_obj_file =
+        object::File::parse(&*lib_so_data).wrap_err("couldn't parse extension shared object")?;
+    let lib_so_exports = lib_so_obj_file
+        .exports()
         .wrap_err("couldn't get exports from extension shared object")?;
 
     // Some users reported experiencing duplicate entries if we don't ensure `fns_to_call`

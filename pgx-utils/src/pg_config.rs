@@ -385,7 +385,7 @@ impl Pgx {
     }
 
     /// Get the postmaster stub directory
-    /// 
+    ///
     /// We isolate postmaster stubs to an independent directory instead of alongside the postmaster
     /// because in the case of `cargo pgx install` the `pg_config` may not necessarily be one managed
     /// by pgx.

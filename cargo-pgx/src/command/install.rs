@@ -26,9 +26,6 @@ pub(crate) struct Install {
     /// Build in test mode (for `cargo pgx test`)
     #[clap(long)]
     test: bool,
-    /// Don't regenerate the schema
-    #[clap(long)]
-    no_schema: bool,
     /// The `pg_config` path (default is first in $PATH)
     #[clap(long, short = 'c')]
     pg_config: Option<String>,
@@ -57,7 +54,6 @@ impl CommandExecute for Install {
             &pg_config,
             self.release,
             self.test,
-            self.no_schema,
             None,
             &features,
         )
@@ -76,7 +72,6 @@ pub(crate) fn install_extension(
     pg_config: &PgConfig,
     is_release: bool,
     is_test: bool,
-    no_schema: bool,
     base_directory: Option<PathBuf>,
     features: &clap_cargo::Features,
 ) -> eyre::Result<()> {
@@ -133,20 +128,16 @@ pub(crate) fn install_extension(
         copy_file(&shlibpath, &dest, "shared library", false)?;
     }
 
-    if !no_schema || !get_target_sql_file(&extdir, &base_directory)?.exists() {
-        copy_sql_files(
-            manifest,
-            pg_config,
-            is_release,
-            is_test,
-            features,
-            &extdir,
-            &base_directory,
-            true,
-        )?;
-    } else {
-        println!("{} schema generation", "    Skipping".bold().yellow());
-    }
+    copy_sql_files(
+        manifest,
+        pg_config,
+        is_release,
+        is_test,
+        features,
+        &extdir,
+        &base_directory,
+        true,
+    )?;
 
     println!("{} installing {}", "    Finished".bold().green(), extname);
     Ok(())
