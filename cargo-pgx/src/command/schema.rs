@@ -231,7 +231,17 @@ pub(crate) fn generate_schema(
 
     let mut symbols_to_stub = HashSet::new();
     for export in postmaster_exports {
-        let name = std::str::from_utf8(export.name())?;
+        let name = std::str::from_utf8(export.name())?
+            .to_string();
+        #[cfg(target_os = "macos")]
+        let name = {
+            // Mac will prefix symbols with `_` automatically, so we remove it to avoid getting
+            // two.
+            let mut name = name;
+            let rename = name.split_off(1);
+            assert_eq!(name, "_");
+            rename
+        };
         symbols_to_stub.insert(name);
     }
 
@@ -267,7 +277,17 @@ pub(crate) fn generate_schema(
     // has unique entries.
     let mut fns_to_call = HashSet::new();
     for export in lib_so_exports {
-        let name = std::str::from_utf8(export.name())?;
+        let name = std::str::from_utf8(export.name())?.to_string();
+        #[cfg(target_os = "macos")]
+        let name = {
+            // Mac will prefix symbols with `_` automatically, so we remove it to avoid getting
+            // two.
+            let mut name = name;
+            let rename = name.split_off(1);
+            assert_eq!(name, "_");
+            rename
+        };
+
         if name.starts_with("__pgx_internals") {
             fns_to_call.insert(name);
         }
@@ -414,7 +434,7 @@ pub(crate) fn generate_schema(
     so_dest = %format_display_path(so_dest.as_ref())?,
 ))]
 fn create_stub(
-    symbols: &HashSet<&str>,
+    symbols: &HashSet<String>,
     rs_dest: impl AsRef<Path>,
     so_dest: impl AsRef<Path>,
 ) -> eyre::Result<()> {
