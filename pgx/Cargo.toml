@@ -45,7 +45,7 @@ atomic-traits = "0.3.0"
 heapless = "0.7.10"
 hash32 = "0.2.1"
 uuid = { version = "0.8.2", features = [ "v4" ] } 
-once_cell = "1.9.0"
+once_cell = "1.10.0"
 bitflags = "1.3.2"
 eyre = "0.6.7"
 tracing = "0.1.31"

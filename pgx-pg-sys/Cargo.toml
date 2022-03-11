@@ -28,7 +28,7 @@ rustdoc-args = ["--cfg", "docsrs"]
 
 [dependencies]
 memoffset = "0.6.5"
-once_cell = "1.9.0"
+once_cell = "1.10.0"
 pgx-macros = { path = "../pgx-macros/", version = "0.4.0-beta.0" }
 
 [build-dependencies]
