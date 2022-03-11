@@ -1,10 +1,13 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-use eyre::eyre;
+use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
 use pgx_utils::pg_config::{PgConfig, PgConfigSelector, Pgx};
-use std::process::Stdio;
+use std::{
+    process::Stdio,
+    path::PathBuf,
+};
 use cargo_toml::Manifest;
 
 use crate::CommandExecute;
@@ -18,6 +21,12 @@ pub(crate) struct Status {
     pg_version: Option<String>,
     #[clap(from_global, parse(from_occurrences))]
     verbose: usize,
+    /// Package to determine default `pg_version` with (see `cargo help pkgid`)
+    #[clap(long, short)]
+    package: Option<String>,
+    /// Path to Cargo.toml
+    #[clap(long, parse(from_os_str))]
+    manifest_path: Option<PathBuf>,
 }
 
 impl CommandExecute for Status {
@@ -28,12 +37,16 @@ impl CommandExecute for Status {
         let pg_version = match self.pg_version {
             Some(s) => s,
             None => {
-                let metadata = crate::metadata::metadata(&Default::default())?;
+                let metadata = crate::metadata::metadata(&Default::default(), self.manifest_path)
+                    .wrap_err("couldn't get cargo metadata")?;
                 crate::metadata::validate(&metadata)?;
-                let manifest_path = crate::manifest::manifest_path(&metadata, None)?;
-                let manifest = Manifest::from_path(&manifest_path)?;
+                let manifest_path = crate::manifest::manifest_path(&metadata, self.package.as_ref())
+                    .wrap_err_with(|| eyre!("couldn't get manifest path"))?;
+                let manifest = Manifest::from_path(&manifest_path)
+                    .wrap_err("couldn't parse manifest")?;
+                
                 crate::manifest::default_pg_version(&manifest)
-                    .ok_or(eyre!("No provided `pg$VERSION` flag."))?
+                    .ok_or(eyre!("no provided `pg$VERSION` flag."))?
             }
         };
 

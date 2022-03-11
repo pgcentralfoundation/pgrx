@@ -9,10 +9,10 @@ use pgx_utils::{
 use cargo_toml::Manifest;
 use std::{
     process::{Command, Stdio},
-    path::Path,
+    path::{Path, PathBuf},
 };
 
-use crate::{CommandExecute, metadata::get_valid_extensions};
+use crate::CommandExecute;
 
 /// Run the test suite for this crate
 #[derive(clap::Args, Debug)]
@@ -26,15 +26,18 @@ pub(crate) struct Test {
     /// Package to build (see `cargo help pkgid`)
     #[clap(long, short)]
     package: Option<String>,
+    /// Path to Cargo.toml
+    #[clap(long, parse(from_os_str))]
+    manifest_path: Option<PathBuf>,
+    /// Test all packages in the workspace
+    #[clap(long)]
+    workspace: bool,
     /// compile for release mode (default is debug)
     #[clap(env = "PROFILE", long, short)]
     release: bool,
     /// Don't regenerate the schema
     #[clap(long, short)]
     no_schema: bool,
-    /// Test all packages in the workspace
-    #[clap(long)]
-    workspace: bool,
     #[clap(flatten)]
     features: clap_cargo::Features,
     #[clap(from_global, parse(from_occurrences))]
@@ -45,57 +48,52 @@ impl CommandExecute for Test {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
         let pgx = Pgx::from_config()?;
-        let metadata = crate::metadata::metadata(&self.features)?;
+        let metadata = crate::metadata::metadata(&self.features, self.manifest_path.as_ref())
+            .wrap_err("couldn't get cargo metadata")?;
         crate::metadata::validate(&metadata)?;
+        let manifest_path = crate::manifest::manifest_path(&metadata, self.package.as_ref())
+            .wrap_err("couldn't get manifest path")?;
+        let manifest = Manifest::from_path(&manifest_path)
+            .wrap_err("Couldn't parse manifest")?;
 
-        let manifest_paths = if self.workspace {
-            get_valid_extensions(&metadata)
-        } else {
-            vec![crate::manifest::manifest_path(&metadata, self.package)?]
+        let pg_version = match self.pg_version {
+            Some(ref s) => s.clone(),
+            None => crate::manifest::default_pg_version(&manifest)
+                .ok_or(eyre!("No provided `pg$VERSION` flag."))?,
         };
-        for manifest_path in manifest_paths.iter() {
-            let manifest = Manifest::from_path(&manifest_path)?;
 
-            let pg_version = match self.pg_version {
-                Some(ref s) => s.clone(),
-                None => crate::manifest::default_pg_version(&manifest)
-                    .ok_or(eyre!("No provided `pg$VERSION` flag."))?,
+        for pg_config in pgx.iter(PgConfigSelector::new(&pg_version)) {
+            let mut testname = self.testname.clone();
+            let pg_config = match pg_config {
+                Err(error) => {
+                    tracing::debug!(
+                        invalid_pg_version = %pg_version,
+                        error = %error,
+                        "Got invalid `pg$VERSION` flag, assuming it is a testname"
+                    );
+                    testname = Some(pg_version.clone());
+                    pgx.get(
+                        &crate::manifest::default_pg_version(&manifest)
+                            .ok_or(eyre!("No provided `pg$VERSION` flag."))?,
+                    )?
+                }
+                Ok(config) => config,
             };
-    
-            for pg_config in pgx.iter(PgConfigSelector::new(&pg_version)) {
-                let mut testname = self.testname.clone();
-                let pg_config = match pg_config {
-                    Err(error) => {
-                        tracing::debug!(
-                            invalid_pg_version = %pg_version,
-                            error = %error,
-                            "Got invalid `pg$VERSION` flag, assuming it is a testname"
-                        );
-                        testname = Some(pg_version.clone());
-                        pgx.get(
-                            &crate::manifest::default_pg_version(&manifest)
-                                .ok_or(eyre!("No provided `pg$VERSION` flag."))?,
-                        )?
-                    }
-                    Ok(config) => config,
-                };
-                let pg_version = format!("pg{}", pg_config.major_version()?);
-    
-                let features = crate::manifest::features_for_version(
-                    self.features.clone(),
-                    &manifest,
-                    &pg_version,
-                );
-                test_extension(
-                    pg_config,
-                    &manifest_path,
-                    self.release,
-                    self.no_schema,
-                    &features,
-                    testname.clone(),
-                )?
-            }
+            let pg_version = format!("pg{}", pg_config.major_version()?);
+
+            let features = crate::manifest::features_for_version(self.features.clone(), &manifest, &pg_version);
+
+            test_extension(
+                pg_config,
+                self.manifest_path.as_ref(),
+                self.package.as_ref(),
+                self.release,
+                self.no_schema,
+                &features,
+                testname.clone(),
+            )?
         }
+
         Ok(())
     }
 }
@@ -107,12 +105,14 @@ impl CommandExecute for Test {
 ))]
 pub fn test_extension(
     pg_config: &PgConfig,
-    manifest_path: &Path,
+    manifest_path: Option<&PathBuf>,
+    package: Option<&String>,
     is_release: bool,
     no_schema: bool,
     features: &clap_cargo::Features,
     testname: Option<impl AsRef<str>>,
 ) -> eyre::Result<()> {
+    let manifest_path = manifest_path.as_ref();
     if let Some(ref testname) = testname {
         tracing::Span::current().record("testname", &tracing::field::display(&testname.as_ref()));
     }
@@ -130,8 +130,6 @@ pub fn test_extension(
         .stdout(Stdio::inherit())
         .stderr(Stdio::inherit())
         .arg("test")
-        .arg("--manifest-path")
-        .arg(manifest_path)
         .env("CARGO_TARGET_DIR", &target_dir)
         .env("PGX_FEATURES", features_arg.clone())
         .env(
@@ -142,7 +140,6 @@ pub fn test_extension(
                 "false"
             },
         )
-        .env("PGX_MANIFEST_PATH", manifest_path)
         .env(
             "PGX_ALL_FEATURES",
             if features.all_features {
@@ -176,6 +173,16 @@ pub fn test_extension(
 
     if is_release {
         command.arg("--release");
+    }
+
+    if let Some(manifest_path) = manifest_path {
+        command.arg("--manifest-path");
+        command.arg(manifest_path);
+    }
+
+    if let Some(package) = package {
+        command.arg("--package");
+        command.arg(package);
     }
 
     if let Some(testname) = testname {

@@ -5,10 +5,10 @@ use std::path::PathBuf;
 use pgx_utils::SUPPORTED_MAJOR_VERSIONS;
 
 #[tracing::instrument(skip_all)]
-pub(crate) fn manifest_path(metadata: &Metadata, package_name: Option<String>) -> eyre::Result<PathBuf> {
+pub(crate) fn manifest_path(metadata: &Metadata, package_name: Option<&String>) -> eyre::Result<PathBuf> {
     let manifest_path = if let Some(package_name) = package_name {
         let found = metadata.packages.iter()
-            .find(|v| v.name == package_name)
+            .find(|v| v.name == *package_name)
             .ok_or_else(|| eyre!("Could not find package `{}`", package_name))?;
         tracing::debug!(manifest_path = %found.manifest_path, "Found workspace package");
         found.manifest_path.clone().into_std_path_buf()

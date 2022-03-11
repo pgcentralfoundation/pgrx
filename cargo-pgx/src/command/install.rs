@@ -23,15 +23,15 @@ pub(crate) struct Install {
     /// Package to build (see `cargo help pkgid`)
     #[clap(long, short)]
     package: Option<String>,
+    /// Path to Cargo.toml
+    #[clap(long, parse(from_os_str))]
+    manifest_path: Option<PathBuf>,
     /// Compile for release mode (default is debug)
     #[clap(env = "PROFILE", long, short)]
     release: bool,
     /// Build in test mode (for `cargo pgx test`)
     #[clap(long)]
     test: bool,
-    /// Path to Cargo.toml
-    #[clap(long, short, parse(from_os_str))]
-    manifest_path: Option<PathBuf>,
     /// The `pg_config` path (default is first in $PATH)
     #[clap(long, short = 'c')]
     pg_config: Option<String>,
@@ -44,28 +44,25 @@ pub(crate) struct Install {
 impl CommandExecute for Install {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
-        let metadata = crate::metadata::metadata(&self.features)?;
+        let metadata = crate::metadata::metadata(&self.features, self.manifest_path)
+            .wrap_err("couldn't get cargo metadata")?;
         crate::metadata::validate(&metadata)?;
-        let manifest_path = if let Some(manifest_path) = self.manifest_path {
-            manifest_path
-        } else {
-            crate::manifest::manifest_path(
-                &metadata,
-                self.package,
-            )?
-        };
-
-        let manifest = Manifest::from_path(&manifest_path)?;
+        let manifest_path = crate::manifest::manifest_path(&metadata, self.package.as_ref())
+            .wrap_err("Couldn't get manifest path")?;
+        let manifest = Manifest::from_path(&manifest_path)
+            .wrap_err("Couldn't parse manifest")?;
 
         let pg_config = match self.pg_config {
             None => PgConfig::from_path(),
             Some(config) => PgConfig::new(PathBuf::from(config)),
         };
         let pg_version = format!("pg{}", pg_config.major_version()?);
+
         let features = crate::manifest::features_for_version(self.features, &manifest, &pg_version);
 
         install_extension(
-            &manifest_path,
+            &self.manifest_path,
+            self.package.as_ref(),
             &pg_config,
             self.release,
             self.test,
@@ -84,6 +81,7 @@ impl CommandExecute for Install {
 ))]
 pub(crate) fn install_extension(
     manifest_path: &Path,
+    package: Option<&String>,
     pg_config: &PgConfig,
     is_release: bool,
     is_test: bool,
@@ -146,6 +144,7 @@ pub(crate) fn install_extension(
 
     copy_sql_files(
         manifest_path,
+        package,
         pg_config,
         is_release,
         is_test,
@@ -260,6 +259,7 @@ fn get_target_sql_file(manifest_path: &Path, extdir: &PathBuf, base_directory: &
 
 fn copy_sql_files(
     manifest_path: &Path,
+    package: Option<&String>,
     pg_config: &PgConfig,
     is_release: bool,
     is_test: bool,
@@ -272,8 +272,9 @@ fn copy_sql_files(
     let (_, extname) = crate::command::get::find_control_file(manifest_path)?;
 
     crate::command::schema::generate_schema(
-        manifest_path,
         pg_config,
+        manifest_path,
+        package,
         is_release,
         is_test,
         features,
@@ -349,9 +350,13 @@ pub(crate) fn get_version(manifest_path: &Path) -> eyre::Result<String> {
     match get_property(manifest_path, "default_version")? {
         Some(v) => {
             if v == "@CARGO_VERSION@" {
-                let metadata = crate::metadata::metadata(&Default::default())?;
+                let metadata = crate::metadata::metadata(&Default::default(), Some(manifest_path))
+                    .wrap_err("couldn't get cargo metadata")?;
                 crate::metadata::validate(&metadata)?;
-                let manifest = Manifest::from_path(&manifest_path)?;
+                let manifest_path = crate::manifest::manifest_path(&metadata, None)
+                    .wrap_err("Couldn't get manifest path")?;
+                let manifest = Manifest::from_path(&manifest_path)
+                    .wrap_err("Couldn't parse manifest")?;
 
                 let version = manifest.package.ok_or(eyre!("no `[package]` section found"))?.version;
                 Ok(version.to_string())

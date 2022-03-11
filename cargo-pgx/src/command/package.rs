@@ -5,7 +5,7 @@ use crate::{
     command::{get::get_property, install::install_extension},
     CommandExecute,
 };
-use eyre::eyre;
+use eyre::{eyre, WrapErr};
 use cargo_toml::Manifest;
 use pgx_utils::{get_target_dir, pg_config::PgConfig};
 use std::path::{PathBuf, Path};
@@ -17,6 +17,9 @@ pub(crate) struct Package {
     /// Package to build (see `cargo help pkgid`)
     #[clap(long, short)]
     package: Option<String>,
+    /// Path to Cargo.toml
+    #[clap(long, parse(from_os_str))]
+    manifest_path: Option<PathBuf>,
     /// Compile for debug mode (default is release)
     #[clap(env = "PROFILE", long, short)]
     debug: bool,
@@ -35,22 +38,23 @@ pub(crate) struct Package {
 impl CommandExecute for Package {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
-        let metadata = crate::metadata::metadata(&self.features)?;
+        let metadata = crate::metadata::metadata(&self.features, self.manifest_path)
+            .wrap_err("couldn't get cargo metadata")?;
         crate::metadata::validate(&metadata)?;
-        let manifest_path = crate::manifest::manifest_path(
-            &metadata,
-            self.package,
-        )?;
-        let manifest = Manifest::from_path(&manifest_path)?;
+        let manifest_path = crate::manifest::manifest_path(&metadata, self.package.as_ref())
+            .wrap_err("Couldn't get manifest path")?;
+        let manifest = Manifest::from_path(&manifest_path)
+            .wrap_err("Couldn't parse manifest")?;
 
         let pg_config = match self.pg_config {
             None => PgConfig::from_path(),
             Some(config) => PgConfig::new(PathBuf::from(config)),
         };
         let pg_version = format!("pg{}", pg_config.major_version()?);
+
         let features = crate::manifest::features_for_version(self.features, &manifest, &pg_version);
 
-        package_extension(&manifest_path, &pg_config, self.debug, self.test, &features)
+        package_extension(self.manifest_path.as_ref(), self.package.as_ref(), &pg_config, self.debug, self.test, &features)
     }
 }
 
@@ -60,7 +64,8 @@ impl CommandExecute for Package {
     test = is_test,
 ))]
 pub(crate) fn package_extension(
-    manifest_path: &Path,
+    manifest_path: Option<&Path>,
+    package: Option<&String>,
     pg_config: &PgConfig,
     is_debug: bool,
     is_test: bool,
@@ -77,6 +82,7 @@ pub(crate) fn package_extension(
     }
     install_extension(
         manifest_path,
+        package,
         pg_config,
         !is_debug,
         is_test,

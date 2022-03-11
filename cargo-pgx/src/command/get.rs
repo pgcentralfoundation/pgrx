@@ -16,22 +16,24 @@ use crate::CommandExecute;
 pub(crate) struct Get {
     /// One of the properties from `$EXTENSION.control`
     name: String,
-    /// Package to build (see `cargo help pkgid`)
-    #[clap(long, short)]
-    package: Option<String>,
     #[clap(from_global, parse(from_occurrences))]
     verbose: usize,
+    /// Package to determine default `pg_version` with (see `cargo help pkgid`)
+    #[clap(long, short)]
+    package: Option<String>,
+    /// Path to Cargo.toml
+    #[clap(long, parse(from_os_str))]
+    manifest_path: Option<PathBuf>,
 }
 
 impl CommandExecute for Get {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
-        let metadata = crate::metadata::metadata(&Default::default())?;
+        let metadata = crate::metadata::metadata(&Default::default(), self.manifest_path)
+            .wrap_err("couldn't get cargo metadata")?;
         crate::metadata::validate(&metadata)?;
-        let manifest_path = crate::manifest::manifest_path(
-            &metadata,
-            self.package,
-        )?;
+        let manifest_path = crate::manifest::manifest_path(&metadata, self.package.as_ref())
+            .wrap_err("couldn't get manifest path")?;
 
         if let Some(value) = get_property(&manifest_path, &self.name)? {
             println!("{}", value);

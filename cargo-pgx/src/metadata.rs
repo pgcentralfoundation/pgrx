@@ -2,10 +2,13 @@ use cargo_metadata::{Metadata, MetadataCommand};
 use eyre::eyre;
 use semver::{Version, VersionReq};
 use crate::command::get::find_control_file;
-use std::path::PathBuf;
+use std::path::{PathBuf, Path};
 
-pub fn metadata(features: &clap_cargo::Features) -> eyre::Result<Metadata> {
+pub fn metadata(features: &clap_cargo::Features, manifest_path: Option<impl AsRef<Path>>) -> eyre::Result<Metadata> {
     let mut metadata_command = MetadataCommand::new();
+    if let Some(manifest_path) = manifest_path {
+        metadata_command.manifest_path(manifest_path.as_ref().to_owned());
+    }
     features.forward_metadata(&mut metadata_command);
     let metadata = metadata_command.exec()?;
     Ok(metadata)
@@ -55,15 +58,4 @@ fn metadata_version_to_semver(metadata_version: cargo_metadata::Version) -> semv
         pre: metadata_version.pre,
         build: metadata_version.build,
     }
-}
-
-pub(crate) fn get_valid_extensions(metadata: &Metadata) -> Vec<PathBuf> {
-    let mut found = vec![];
-    for potential_extension in metadata.packages.iter() {
-        let control_file = find_control_file(&potential_extension.manifest_path).ok();
-        if control_file.is_some() {
-            found.push(potential_extension.manifest_path.to_path_buf().into_std_path_buf());
-        }
-    }
-    found
 }

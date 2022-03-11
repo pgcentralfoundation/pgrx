@@ -7,7 +7,7 @@ use crate::{
     },
     CommandExecute,
 };
-use eyre::eyre;
+use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
 use pgx_utils::{
     createdb,
@@ -27,6 +27,9 @@ pub(crate) struct Run {
     /// Package to build (see `cargo help pkgid`)
     #[clap(long, short)]
     package: Option<String>,
+    /// Path to Cargo.toml
+    #[clap(long)]
+    manifest_path: Option<String>,
     /// Compile for release mode (default is debug)
     #[clap(env = "PROFILE", long, short)]
     release: bool,
@@ -39,13 +42,13 @@ pub(crate) struct Run {
 impl CommandExecute for Run {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(mut self) -> eyre::Result<()> {
-        let metadata = crate::metadata::metadata(&self.features)?;
+        let metadata = crate::metadata::metadata(&Default::default(), self.manifest_path)
+            .wrap_err("couldn't get cargo metadata")?;
         crate::metadata::validate(&metadata)?;
-        let manifest_path = crate::manifest::manifest_path(
-            &metadata,
-            self.package
-        )?;
-        let manifest = Manifest::from_path(&manifest_path)?;
+        let manifest_path = crate::manifest::manifest_path(&metadata, self.package.as_ref())
+            .wrap_err("Couldn't get manifest path")?;
+        let manifest = Manifest::from_path(&manifest_path)
+            .wrap_err("Couldn't parse manifest")?;
 
         let pgx = Pgx::from_config()?;
 
@@ -72,6 +75,7 @@ impl CommandExecute for Run {
                 (pgx.get(&default_pg_version)?, default_pg_version)
             }
         };
+
         let features = crate::manifest::features_for_version(self.features, &manifest, &pg_version);
 
         let dbname = match self.dbname {
@@ -80,8 +84,9 @@ impl CommandExecute for Run {
         };
 
         run_psql(
-            &manifest_path,
             pg_config,
+            manifest_path,
+            self.package.as_ref(),
             &dbname,
             self.release,
             &features,
@@ -95,18 +100,21 @@ impl CommandExecute for Run {
     release = is_release,
 ))]
 pub(crate) fn run_psql(
-    manifest_path: &Path,
     pg_config: &PgConfig,
+    manifest_path: impl AsRef<Path>,
+    package: Option< &String>,
     dbname: &str,
     is_release: bool,
     features: &clap_cargo::Features,
 ) -> eyre::Result<()> {
+    let manifest_path = manifest_path.as_ref();
+
     // stop postgres
     stop_postgres(pg_config)?;
 
     // install the extension
     install_extension(
-        manifest_path, pg_config, is_release, false, None, features,
+        manifest_path, package, pg_config, is_release, false, None, features,
     )?;
 
     // restart postgres

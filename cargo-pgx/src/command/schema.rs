@@ -34,6 +34,9 @@ pub(crate) struct Schema {
     /// Package to build (see `cargo help pkgid`)
     #[clap(long, short)]
     package: Option<String>,
+    /// Path to Cargo.toml
+    #[clap(long, parse(from_os_str))]
+    manifest_path: Option<PathBuf>,
     /// Build in test mode (for `cargo pgx test`)
     #[clap(long)]
     test: bool,
@@ -60,13 +63,13 @@ pub(crate) struct Schema {
 impl CommandExecute for Schema {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
-        let metadata = crate::metadata::metadata(&Default::default())?;
+        let metadata = crate::metadata::metadata(&self.features, self.manifest_path)
+            .wrap_err("couldn't get cargo metadata")?;
         crate::metadata::validate(&metadata)?;
-        let manifest_path = crate::manifest::manifest_path(
-            &metadata,
-            self.package
-        )?;
-        let manifest = Manifest::from_path(&manifest_path)?;
+        let manifest_path = crate::manifest::manifest_path(&metadata, self.package.as_ref())
+            .wrap_err("Couldn't get manifest path")?;
+        let manifest = Manifest::from_path(&manifest_path)
+            .wrap_err("Couldn't parse manifest")?;
 
         let log_level = if let Ok(log_level) = std::env::var("RUST_LOG") {
             Some(log_level)
@@ -101,8 +104,9 @@ impl CommandExecute for Schema {
         let features = crate::manifest::features_for_version(self.features, &manifest, &pg_version);
 
         generate_schema(
-            &manifest_path,
             &pg_config,
+            self.manifest_path.as_ref(),
+            self.package.as_ref(),
             self.release,
             self.test,
             &features,
@@ -123,8 +127,9 @@ impl CommandExecute for Schema {
     features = ?features.features,
 ))]
 pub(crate) fn generate_schema(
-    manifest_path: &Path,
     pg_config: &PgConfig,
+    manifest_path: Option<&Path>,
+    package: Option<&String>,
     is_release: bool,
     is_test: bool,
     features: &clap_cargo::Features,
@@ -133,6 +138,7 @@ pub(crate) fn generate_schema(
     log_level: Option<String>,
     existing_build_output: Option<Vec<cargo_metadata::Message>>,
 ) -> eyre::Result<()> {
+    let manifest_path = manifest_path.as_ref();
     let manifest = Manifest::from_path(&manifest_path)?;
     let (control_file, _extname) = find_control_file(manifest_path)?;
     let package_name = &manifest
