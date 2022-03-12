@@ -101,7 +101,7 @@ naersk.lib."${targetPlatform.system}".buildPackage rec {
       
       ${cargo-pgx}/bin/cargo-pgx pgx stop all
 
-      rm -rfv $out/.pgx || true
+      mv -v $out/.pgx .pgx
     fi
   '';
 
