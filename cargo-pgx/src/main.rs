@@ -46,11 +46,13 @@ impl CommandExecute for CargoSubcommands {
 }
 
 fn main() -> color_eyre::Result<()> {
-    color_eyre::config::HookBuilder::default().theme(if !atty::is(Stream::Stderr) {
-        color_eyre::config::Theme::new()
-    } else {
-        color_eyre::config::Theme::default()
-    }).install()?;
+    color_eyre::config::HookBuilder::default()
+        .theme(if !atty::is(Stream::Stderr) {
+            color_eyre::config::Theme::new()
+        } else {
+            color_eyre::config::Theme::default()
+        })
+        .install()?;
 
     let cargo_cli = CargoCommand::parse();
 

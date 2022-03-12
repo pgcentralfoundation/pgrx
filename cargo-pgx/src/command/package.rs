@@ -79,7 +79,6 @@ pub(crate) fn package_extension(
         pg_config,
         !is_debug,
         is_test,
-        false,
         Some(out_dir),
         features,
     )

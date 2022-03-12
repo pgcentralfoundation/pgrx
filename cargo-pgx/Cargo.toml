@@ -33,7 +33,7 @@ syn = { version = "1.0.86", features = [ "extra-traits", "full", "fold", "parsin
 unescape = "0.1.0"
 fork = "0.1.18"
 libloading = "0.7.3"
-symbolic = "8.6.1"
+object = "0.28"
 eyre = "0.6.7"
 color-eyre = "0.6.1"
 tracing = "0.1.31"
