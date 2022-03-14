@@ -101,11 +101,11 @@ naersk.lib."${targetPlatform.system}".buildPackage rec {
       mv -v $out/${targetPostgres.out}/* $out
       rm -rfv $out/nix
 
-      until [ ! -f $out/.pgx/.s.PGSQL.* ] do;
-        sleep 3;
+      until ! compgen -G "$out/.pgx/.s.PGSQL.*" > /dev/null; do
+        sleep 3
         echo "Waiting for PostgreSQL socket to close..."
       done
-      
+
       rm -rfv $out/.pgx
     fi
   '';
