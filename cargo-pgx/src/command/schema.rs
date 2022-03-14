@@ -15,6 +15,7 @@ use pgx_utils::{
 };
 use std::{
     collections::HashSet,
+    hash::{Hash, Hasher},
     path::{Path, PathBuf},
     process::{Command, Stdio},
 };
@@ -203,6 +204,7 @@ pub(crate) fn generate_schema(
     // Create stubbed `pgx_pg_sys` bindings for the generator to link with.
     let mut postmaster_stub_dir =
         Pgx::postmaster_stub_dir().wrap_err("couldn't get postmaster stub dir env")?;
+
     postmaster_stub_dir.push(
         pg_config
             .postmaster_path()
@@ -212,46 +214,15 @@ pub(crate) fn generate_schema(
             .parent()
             .ok_or(eyre!("couldn't get postmaster parent dir"))?,
     );
-    let mut postmaster_stub_file = postmaster_stub_dir.clone();
-    postmaster_stub_file.push("postmaster_stub.rs");
-
-    let mut postmaster_stub_built = postmaster_stub_dir.clone();
-    postmaster_stub_built.push("postmaster_stub.so");
-
-    // The next action may take a few seconds, we'd like the user to know we're thinking.
-    eprintln!("{} SQL entities", " Discovering".bold().green(),);
 
     let postmaster_path = pg_config
         .postmaster_path()
         .wrap_err("could not get postmaster path")?;
-    let postmaster_bin_data =
-        std::fs::read(postmaster_path).wrap_err("couldn't read postmaster")?;
-    let postmaster_obj_file =
-        object::File::parse(&*postmaster_bin_data).wrap_err("couldn't parse postmaster")?;
-    let postmaster_exports = postmaster_obj_file
-        .exports()
-        .wrap_err("couldn't get exports from extension shared object")?;
 
-    let mut symbols_to_stub = HashSet::new();
-    for export in postmaster_exports {
-        let name = std::str::from_utf8(export.name())?.to_string();
-        #[cfg(target_os = "macos")]
-        let name = {
-            // Mac will prefix symbols with `_` automatically, so we remove it to avoid getting
-            // two.
-            let mut name = name;
-            let rename = name.split_off(1);
-            assert_eq!(name, "_");
-            rename
-        };
-        symbols_to_stub.insert(name);
-    }
+    // The next action may take a few seconds, we'd like the user to know we're thinking.
+    eprintln!("{} SQL entities", " Discovering".bold().green(),);
 
-    create_stub(
-        &symbols_to_stub,
-        &postmaster_stub_file,
-        &postmaster_stub_built,
-    )?;
+    let postmaster_stub_built = create_stub(&postmaster_path, &postmaster_stub_dir)?;
 
     // Inspect the symbol table for a list of `__pgx_internals` we should have the generator call
     let mut lib_so = target_dir_with_profile.clone();
@@ -431,55 +402,100 @@ pub(crate) fn generate_schema(
 }
 
 #[tracing::instrument(level = "error", skip_all, fields(
-    symbols = %symbols.len(),
-    rs_dest = %format_display_path(rs_dest.as_ref())?,
-    so_dest = %format_display_path(so_dest.as_ref())?,
+    postmaster_path = %format_display_path(postmaster_path.as_ref())?,
+    postmaster_stub_dir = %format_display_path(postmaster_stub_dir.as_ref())?,
 ))]
 fn create_stub(
-    symbols: &HashSet<String>,
-    rs_dest: impl AsRef<Path>,
-    so_dest: impl AsRef<Path>,
-) -> eyre::Result<()> {
-    let rs_dest = rs_dest.as_ref();
-    let so_dest = so_dest.as_ref();
+    postmaster_path: impl AsRef<Path>,
+    postmaster_stub_dir: impl AsRef<Path>,
+) -> eyre::Result<PathBuf> {
+    let postmaster_path = postmaster_path.as_ref();
+    let postmaster_stub_dir = postmaster_stub_dir.as_ref();
 
-    if !rs_dest.exists() {
-        tracing::debug!("Creating stub of appropriate PostgreSQL symbols");
-        PgxPgSysStub::from_symbols(symbols)?.write_to_file(&rs_dest)?;
-    } else {
-        tracing::debug!("Found existing stub file")
-    }
+    let mut postmaster_stub_file = postmaster_stub_dir.to_path_buf();
+    postmaster_stub_file.push("postmaster_stub.rs");
 
-    if !so_dest.exists() {
-        let mut so_rustc_invocation = Command::new("rustc");
-        so_rustc_invocation.stderr(Stdio::inherit());
-        so_rustc_invocation.args([
-            "--crate-type",
-            "cdylib",
-            "-o",
-            so_dest
-                .to_str()
-                .ok_or(eyre!("Could not call so_dest.to_str()"))?,
-            rs_dest
-                .to_str()
-                .ok_or(eyre!("Could not call rs_dest.to_str()"))?,
-        ]);
-        let so_rustc_invocation_str = format!("{:?}", so_rustc_invocation);
-        tracing::debug!(command = %so_rustc_invocation_str, "Running");
-        let output = so_rustc_invocation
-            .output()
-            .wrap_err_with(|| eyre!("Could not invoke `rustc` on {}", &rs_dest.display()))?;
+    let mut postmaster_hash_file = postmaster_stub_dir.to_path_buf();
+    postmaster_hash_file.push("postmaster.hash");
 
-        let code = output
-            .status
-            .code()
-            .ok_or(eyre!("Could not get status code of build"))?;
-        tracing::trace!(status_code = %code, command = %so_rustc_invocation_str, "Finished");
-        if code != 0 {
-            return Err(eyre!("rustc exited with code {}", code));
+    let mut postmaster_stub_built = postmaster_stub_dir.to_path_buf();
+    postmaster_stub_built.push("postmaster_stub.so");
+
+    let postmaster_bin_data =
+        std::fs::read(postmaster_path).wrap_err("couldn't read postmaster")?;
+
+    let mut hasher = std::collections::hash_map::DefaultHasher::new();
+    postmaster_bin_data.hash(&mut hasher);
+    let postmaster_bin_hash = hasher.finish().to_string().into_bytes();
+
+    let postmaster_hash_data = std::fs::read(&postmaster_hash_file).ok();
+
+    // Determine if we already built this stub.
+    if let Some(postmaster_hash_data) = postmaster_hash_data {
+        if postmaster_hash_data == postmaster_bin_hash && postmaster_stub_built.exists() {
+            // We already built this and it's up to date.
+            tracing::debug!(stub = %postmaster_stub_built.display(), "Existing stub for postmaster");
+            return Ok(postmaster_stub_built);
         }
-    } else {
-        tracing::debug!("Found existing stub shared object")
     }
-    Ok(())
+
+    let postmaster_obj_file =
+        object::File::parse(&*postmaster_bin_data).wrap_err("couldn't parse postmaster")?;
+    let postmaster_exports = postmaster_obj_file
+        .exports()
+        .wrap_err("couldn't get exports from extension shared object")?;
+
+    let mut symbols_to_stub = HashSet::new();
+    for export in postmaster_exports {
+        let name = std::str::from_utf8(export.name())?.to_string();
+        #[cfg(target_os = "macos")]
+        let name = {
+            // Mac will prefix symbols with `_` automatically, so we remove it to avoid getting
+            // two.
+            let mut name = name;
+            let rename = name.split_off(1);
+            assert_eq!(name, "_");
+            rename
+        };
+        symbols_to_stub.insert(name);
+    }
+
+    tracing::debug!("Creating stub of appropriate PostgreSQL symbols");
+    PgxPgSysStub::from_symbols(&symbols_to_stub)?.write_to_file(&postmaster_stub_file)?;
+
+    let mut so_rustc_invocation = Command::new("rustc");
+    so_rustc_invocation.stderr(Stdio::inherit());
+    so_rustc_invocation.args([
+        "--crate-type",
+        "cdylib",
+        "-o",
+        postmaster_stub_built
+            .to_str()
+            .ok_or(eyre!("could not call postmaster_stub_built.to_str()"))?,
+        postmaster_stub_file
+            .to_str()
+            .ok_or(eyre!("could not call postmaster_stub_file.to_str()"))?,
+    ]);
+    let so_rustc_invocation_str = format!("{:?}", so_rustc_invocation);
+    tracing::debug!(command = %so_rustc_invocation_str, "Running");
+    let output = so_rustc_invocation.output().wrap_err_with(|| {
+        eyre!(
+            "could not invoke `rustc` on {}",
+            &postmaster_stub_file.display()
+        )
+    })?;
+
+    let code = output
+        .status
+        .code()
+        .ok_or(eyre!("could not get status code of build"))?;
+    tracing::trace!(status_code = %code, command = %so_rustc_invocation_str, "Finished");
+    if code != 0 {
+        return Err(eyre!("rustc exited with code {}", code));
+    }
+
+    std::fs::write(&postmaster_hash_file, postmaster_bin_hash)
+        .wrap_err("could not write postmaster stub hash")?;
+
+    Ok(postmaster_stub_built)
 }
