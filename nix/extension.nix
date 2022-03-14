@@ -40,7 +40,7 @@ let
     export PGDATA=$out/.pgx/data-${pgxPostgresMajor}/
     export NIX_PGLIBDIR=$out/.pgx/${pgxPostgresMajor}/lib
 
-    echo "unix_socket_directories = '$out/.pgx'" > $PGDATA/postgresql.conf 
+    echo "unix_socket_directories = '$(mktemp -d)'" > $PGDATA/postgresql.conf 
     ${targetPostgres}/bin/pg_ctl start
     ${targetPostgres}/bin/createuser -h localhost --superuser --createdb $USER || true
     ${targetPostgres}/bin/pg_ctl stop
@@ -97,11 +97,10 @@ naersk.lib."${targetPlatform.system}".buildPackage rec {
   preFixup = ''
     if [ -f "${cargoToml.package.name}.control" ]; then
       ${cargo-pgx}/bin/cargo-pgx pgx stop all
-      
+
       mv -v $out/${targetPostgres.out}/* $out
       rm -rfv $out/nix
 
-      sleep 3
       rm -rfv $out/.pgx
     fi
   '';
