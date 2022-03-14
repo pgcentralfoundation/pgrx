@@ -105,6 +105,7 @@ naersk.lib."${targetPlatform.system}".buildPackage rec {
         sleep 3;
         echo "Waiting for PostgreSQL socket to close..."
       done
+      
       rm -rfv $out/.pgx
     fi
   '';
