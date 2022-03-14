@@ -6,6 +6,7 @@ use crate::{
     CommandExecute,
 };
 use eyre::{eyre, WrapErr};
+use object::Object;
 use owo_colors::OwoColorize;
 use pgx_utils::{
     pg_config::{PgConfig, Pgx},
@@ -14,7 +15,7 @@ use pgx_utils::{
 };
 use std::{
     collections::HashSet,
-    io::BufReader,
+    hash::{Hash, Hasher},
     path::{Path, PathBuf},
     process::{Command, Stdio},
 };
@@ -58,6 +59,9 @@ pub(crate) struct Schema {
     dot: Option<PathBuf>,
     #[clap(from_global, parse(from_occurrences))]
     verbose: usize,
+    /// Skip building a fresh extension shared object.
+    #[clap(long)]
+    skip_build: bool,
 }
 
 impl CommandExecute for Schema {
@@ -113,7 +117,7 @@ impl CommandExecute for Schema {
             self.out.as_ref(),
             self.dot,
             log_level,
-            None,
+            self.skip_build,
         )
     }
 }
@@ -136,7 +140,7 @@ pub(crate) fn generate_schema(
     path: Option<impl AsRef<std::path::Path>>,
     dot: Option<impl AsRef<std::path::Path>>,
     log_level: Option<String>,
-    existing_build_output: Option<Vec<cargo_metadata::Message>>,
+    skip_build: bool,
 ) -> eyre::Result<()> {
     let manifest_path = manifest_path.as_ref();
     let manifest = Manifest::from_path(&manifest_path)?;
@@ -160,11 +164,10 @@ pub(crate) fn generate_schema(
     target_dir_with_profile.push(if is_release { "release" } else { "debug" });
 
     // First, build the SQL generator so we can get a look at the symbol table
-    let cargo_output = if let Some(output) = existing_build_output {
-        output
-    } else {
+    if !skip_build {
         let mut command = Command::new("cargo");
         command.stderr(Stdio::inherit());
+        command.stdout(Stdio::inherit());
         if is_test {
             command.arg("test");
             command.arg("--no-run");
@@ -195,8 +198,6 @@ pub(crate) fn generate_schema(
             command.arg("--all-features");
         }
 
-        command.arg("--message-format=json-render-diagnostics");
-
         for arg in flags.split_ascii_whitespace() {
             command.arg(arg);
         }
@@ -219,58 +220,30 @@ pub(crate) fn generate_schema(
             // We explicitly do not want to return a spantraced error here.
             std::process::exit(1)
         }
-
-        let cargo_stdout_bytes = cargo_output.stdout;
-        let cargo_stdout_reader = BufReader::new(cargo_stdout_bytes.as_slice());
-        let cargo_stdout_stream = cargo_metadata::Message::parse_stream(cargo_stdout_reader);
-        cargo_stdout_stream.collect::<Result<Vec<_>, std::io::Error>>()?
     };
 
-    let mut pgx_pg_sys_out_dir = None;
-
-    for message in cargo_output {
-        match message {
-            cargo_metadata::Message::BuildScriptExecuted(script) => {
-                if !script.package_id.repr.starts_with("pgx-pg-sys") {
-                    continue;
-                }
-                pgx_pg_sys_out_dir = Some(script.out_dir);
-                break;
-            }
-            cargo_metadata::Message::CompilerMessage(_)
-            | cargo_metadata::Message::CompilerArtifact(_)
-            | cargo_metadata::Message::BuildFinished(_)
-            | _ => (),
-        }
-    }
-
-    let pgx_pg_sys_out_dir = pgx_pg_sys_out_dir.ok_or(eyre!(
-        "Could not get `pgx-pg-sys` `out_dir` from Cargo output."
-    ))?;
-    let pgx_pg_sys_out_dir = PathBuf::from(pgx_pg_sys_out_dir);
-
-    let pg_version = pg_config.major_version()?;
-
     // Create stubbed `pgx_pg_sys` bindings for the generator to link with.
-    let mut pgx_pg_sys_stub_file = pgx_pg_sys_out_dir.clone();
-    pgx_pg_sys_stub_file.push("stubs");
-    pgx_pg_sys_stub_file.push(&format!("pg{}_stub.rs", pg_version));
+    let mut postmaster_stub_dir =
+        Pgx::postmaster_stub_dir().wrap_err("couldn't get postmaster stub dir env")?;
 
-    let mut pgx_pg_sys_file = PathBuf::from(&pgx_pg_sys_out_dir);
-    pgx_pg_sys_file.push(&format!("pg{}.rs", pg_version));
+    postmaster_stub_dir.push(
+        pg_config
+            .postmaster_path()
+            .wrap_err("couldn't get postmaster path")?
+            .strip_prefix("/")
+            .wrap_err("couldn't make postmaster path relative")?
+            .parent()
+            .ok_or(eyre!("couldn't get postmaster parent dir"))?,
+    );
 
-    let mut pgx_pg_sys_stub_built = pgx_pg_sys_out_dir.clone();
-    pgx_pg_sys_stub_built.push("stubs");
-    pgx_pg_sys_stub_built.push(format!("pg{}_stub.so", pg_version));
+    let postmaster_path = pg_config
+        .postmaster_path()
+        .wrap_err("could not get postmaster path")?;
 
     // The next action may take a few seconds, we'd like the user to know we're thinking.
     eprintln!("{} SQL entities", " Discovering".bold().green(),);
 
-    create_stub(
-        &pgx_pg_sys_file,
-        &pgx_pg_sys_stub_file,
-        &pgx_pg_sys_stub_built,
-    )?;
+    let postmaster_stub_built = create_stub(&postmaster_path, &postmaster_stub_dir)?;
 
     // Inspect the symbol table for a list of `__pgx_internals` we should have the generator call
     let mut lib_so = target_dir_with_profile.clone();
@@ -287,44 +260,30 @@ pub(crate) fn generate_schema(
         so_extension
     ));
 
-    let dsym_path = lib_so.resolve_dsym();
-    let buffer = ByteView::open(dsym_path.as_deref().unwrap_or(&lib_so)).wrap_err_with(|| {
-        eyre!(
-            "Could not get byte view into {}",
-            &dsym_path.as_deref().unwrap_or(&lib_so).display()
-        )
-    })?;
-    let archive = Archive::parse(&buffer).expect("Could not parse archive");
+    let lib_so_data = std::fs::read(&lib_so).wrap_err("couldn't read extension shared object")?;
+    let lib_so_obj_file =
+        object::File::parse(&*lib_so_data).wrap_err("couldn't parse extension shared object")?;
+    let lib_so_exports = lib_so_obj_file
+        .exports()
+        .wrap_err("couldn't get exports from extension shared object")?;
 
     // Some users reported experiencing duplicate entries if we don't ensure `fns_to_call`
     // has unique entries.
     let mut fns_to_call = HashSet::new();
-    for object in archive.objects() {
-        match object {
-            Ok(object) => match object.symbols() {
-                SymbolIterator::Elf(iter) => {
-                    for symbol in iter {
-                        if let Some(name) = symbol.name {
-                            if name.starts_with("__pgx_internals") {
-                                fns_to_call.insert(name);
-                            }
-                        }
-                    }
-                }
-                SymbolIterator::MachO(iter) => {
-                    for symbol in iter {
-                        if let Some(name) = symbol.name {
-                            if name.starts_with("__pgx_internals") {
-                                fns_to_call.insert(name);
-                            }
-                        }
-                    }
-                }
-                _ => panic!("Unable to parse non-ELF or Mach0 symbols. (Please report this, we can  probably fix this!)"),
-            },
-            Err(e) => {
-                panic!("Got error inspecting objects: {}", e);
-            }
+    for export in lib_so_exports {
+        let name = std::str::from_utf8(export.name())?.to_string();
+        #[cfg(target_os = "macos")]
+        let name = {
+            // Mac will prefix symbols with `_` automatically, so we remove it to avoid getting
+            // two.
+            let mut name = name;
+            let rename = name.split_off(1);
+            assert_eq!(name, "_");
+            rename
+        };
+
+        if name.starts_with("__pgx_internals") {
+            fns_to_call.insert(name);
         }
     }
     let mut seen_schemas = Vec::new();
@@ -381,13 +340,13 @@ pub(crate) fn generate_schema(
     let source_only_sql_mapping;
 
     unsafe {
-        let _pgx_pg_sys = libloading::os::unix::Library::open(
-            Some(&pgx_pg_sys_stub_built),
+        let _postmaster = libloading::os::unix::Library::open(
+            Some(&postmaster_stub_built),
             libloading::os::unix::RTLD_NOW | libloading::os::unix::RTLD_GLOBAL,
         )
         .expect(&format!(
             "Couldn't libload {}",
-            pgx_pg_sys_stub_built.display()
+            postmaster_stub_built.display()
         ));
 
         let lib =
@@ -464,56 +423,100 @@ pub(crate) fn generate_schema(
 }
 
 #[tracing::instrument(level = "error", skip_all, fields(
-    source = %format_display_path(source.as_ref())?,
-    rs_dest = %format_display_path(rs_dest.as_ref())?,
-    so_dest = %format_display_path(so_dest.as_ref())?,
+    postmaster_path = %format_display_path(postmaster_path.as_ref())?,
+    postmaster_stub_dir = %format_display_path(postmaster_stub_dir.as_ref())?,
 ))]
 fn create_stub(
-    source: impl AsRef<Path>,
-    rs_dest: impl AsRef<Path>,
-    so_dest: impl AsRef<Path>,
-) -> eyre::Result<()> {
-    let source = source.as_ref();
-    let rs_dest = rs_dest.as_ref();
-    let so_dest = so_dest.as_ref();
+    postmaster_path: impl AsRef<Path>,
+    postmaster_stub_dir: impl AsRef<Path>,
+) -> eyre::Result<PathBuf> {
+    let postmaster_path = postmaster_path.as_ref();
+    let postmaster_stub_dir = postmaster_stub_dir.as_ref();
 
-    if !rs_dest.exists() {
-        tracing::debug!("Creating stub of appropriate PostgreSQL symbols");
-        PgxPgSysStub::from_file(&source)?.write_to_file(&rs_dest)?;
-    } else {
-        tracing::debug!("Found existing stub file")
-    }
+    let mut postmaster_stub_file = postmaster_stub_dir.to_path_buf();
+    postmaster_stub_file.push("postmaster_stub.rs");
 
-    if !so_dest.exists() {
-        let mut so_rustc_invocation = Command::new("rustc");
-        so_rustc_invocation.stderr(Stdio::inherit());
-        so_rustc_invocation.args([
-            "--crate-type",
-            "cdylib",
-            "-o",
-            so_dest
-                .to_str()
-                .ok_or(eyre!("Could not call so_dest.to_str()"))?,
-            rs_dest
-                .to_str()
-                .ok_or(eyre!("Could not call rs_dest.to_str()"))?,
-        ]);
-        let so_rustc_invocation_str = format!("{:?}", so_rustc_invocation);
-        tracing::debug!(command = %so_rustc_invocation_str, "Running");
-        let output = so_rustc_invocation
-            .output()
-            .wrap_err_with(|| eyre!("Could not invoke `rustc` on {}", &rs_dest.display()))?;
+    let mut postmaster_hash_file = postmaster_stub_dir.to_path_buf();
+    postmaster_hash_file.push("postmaster.hash");
 
-        let code = output
-            .status
-            .code()
-            .ok_or(eyre!("Could not get status code of build"))?;
-        tracing::trace!(status_code = %code, command = %so_rustc_invocation_str, "Finished");
-        if code != 0 {
-            return Err(eyre!("rustc exited with code {}", code));
+    let mut postmaster_stub_built = postmaster_stub_dir.to_path_buf();
+    postmaster_stub_built.push("postmaster_stub.so");
+
+    let postmaster_bin_data =
+        std::fs::read(postmaster_path).wrap_err("couldn't read postmaster")?;
+
+    let mut hasher = std::collections::hash_map::DefaultHasher::new();
+    postmaster_bin_data.hash(&mut hasher);
+    let postmaster_bin_hash = hasher.finish().to_string().into_bytes();
+
+    let postmaster_hash_data = std::fs::read(&postmaster_hash_file).ok();
+
+    // Determine if we already built this stub.
+    if let Some(postmaster_hash_data) = postmaster_hash_data {
+        if postmaster_hash_data == postmaster_bin_hash && postmaster_stub_built.exists() {
+            // We already built this and it's up to date.
+            tracing::debug!(stub = %postmaster_stub_built.display(), "Existing stub for postmaster");
+            return Ok(postmaster_stub_built);
         }
-    } else {
-        tracing::debug!("Found existing stub shared object")
     }
-    Ok(())
+
+    let postmaster_obj_file =
+        object::File::parse(&*postmaster_bin_data).wrap_err("couldn't parse postmaster")?;
+    let postmaster_exports = postmaster_obj_file
+        .exports()
+        .wrap_err("couldn't get exports from extension shared object")?;
+
+    let mut symbols_to_stub = HashSet::new();
+    for export in postmaster_exports {
+        let name = std::str::from_utf8(export.name())?.to_string();
+        #[cfg(target_os = "macos")]
+        let name = {
+            // Mac will prefix symbols with `_` automatically, so we remove it to avoid getting
+            // two.
+            let mut name = name;
+            let rename = name.split_off(1);
+            assert_eq!(name, "_");
+            rename
+        };
+        symbols_to_stub.insert(name);
+    }
+
+    tracing::debug!("Creating stub of appropriate PostgreSQL symbols");
+    PgxPgSysStub::from_symbols(&symbols_to_stub)?.write_to_file(&postmaster_stub_file)?;
+
+    let mut so_rustc_invocation = Command::new("rustc");
+    so_rustc_invocation.stderr(Stdio::inherit());
+    so_rustc_invocation.args([
+        "--crate-type",
+        "cdylib",
+        "-o",
+        postmaster_stub_built
+            .to_str()
+            .ok_or(eyre!("could not call postmaster_stub_built.to_str()"))?,
+        postmaster_stub_file
+            .to_str()
+            .ok_or(eyre!("could not call postmaster_stub_file.to_str()"))?,
+    ]);
+    let so_rustc_invocation_str = format!("{:?}", so_rustc_invocation);
+    tracing::debug!(command = %so_rustc_invocation_str, "Running");
+    let output = so_rustc_invocation.output().wrap_err_with(|| {
+        eyre!(
+            "could not invoke `rustc` on {}",
+            &postmaster_stub_file.display()
+        )
+    })?;
+
+    let code = output
+        .status
+        .code()
+        .ok_or(eyre!("could not get status code of build"))?;
+    tracing::trace!(status_code = %code, command = %so_rustc_invocation_str, "Finished");
+    if code != 0 {
+        return Err(eyre!("rustc exited with code {}", code));
+    }
+
+    std::fs::write(&postmaster_hash_file, postmaster_bin_hash)
+        .wrap_err("could not write postmaster stub hash")?;
+
+    Ok(postmaster_stub_built)
 }

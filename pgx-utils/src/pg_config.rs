@@ -384,6 +384,17 @@ impl Pgx {
         )
     }
 
+    /// Get the postmaster stub directory
+    ///
+    /// We isolate postmaster stubs to an independent directory instead of alongside the postmaster
+    /// because in the case of `cargo pgx install` the `pg_config` may not necessarily be one managed
+    /// by pgx.
+    pub fn postmaster_stub_dir() -> Result<PathBuf, std::io::Error> {
+        let mut stub_dir = Self::home()?;
+        stub_dir.push("postmaster_stubs");
+        Ok(stub_dir)
+    }
+
     pub fn config_toml() -> Result<PathBuf, std::io::Error> {
         let mut path = Pgx::home()?;
         path.push("config.toml");

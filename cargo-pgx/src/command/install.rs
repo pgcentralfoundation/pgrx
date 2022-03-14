@@ -151,7 +151,7 @@ pub(crate) fn install_extension(
         features,
         &extdir,
         &base_directory,
-        build_command_messages,
+        true,
     )?;
 
     println!("{} installing {}", "    Finished".bold().green(), extname);
@@ -266,7 +266,7 @@ fn copy_sql_files(
     features: &clap_cargo::Features,
     extdir: &PathBuf,
     base_directory: &PathBuf,
-    build_command_output: Vec<cargo_metadata::Message>,
+    skip_build: bool,
 ) -> eyre::Result<()> {
     let dest = get_target_sql_file(&manifest_path, extdir, base_directory)?;
     let (_, extname) = crate::command::get::find_control_file(manifest_path)?;
@@ -281,7 +281,7 @@ fn copy_sql_files(
         Some(&dest),
         Option::<String>::None,
         None,
-        Some(build_command_output),
+        skip_build,
     )?;
 
     // now copy all the version upgrade files too

@@ -244,26 +244,26 @@ impl PgxSql {
         Ok(())
     }
 
-
     #[instrument(level = "error", skip_all)]
-    pub fn write(&self, out: &mut impl std::io::Write) -> eyre::Result<()> {  
+    pub fn write(&self, out: &mut impl std::io::Write) -> eyre::Result<()> {
         let generated = self.to_sql()?;
 
         if atty::is(atty::Stream::Stdout) {
             use syntect::{
                 easy::HighlightLines,
+                highlighting::{Style, ThemeSet},
                 parsing::SyntaxSet,
-                highlighting::{ThemeSet, Style},
                 util::{as_24_bit_terminal_escaped, LinesWithEndings},
             };
             let ps = SyntaxSet::load_defaults_newlines();
             let ts = ThemeSet::load_defaults();
-            let theme = if &std::env::var("PGX_TERMINAL_THEME").unwrap_or("dark".to_string()) == "light" {
-                &ts.themes["base16-ocean.light"]
-            } else {
-                &ts.themes["base16-ocean.dark"]
-            };
-                
+            let theme =
+                if &std::env::var("PGX_TERMINAL_THEME").unwrap_or("dark".to_string()) == "light" {
+                    &ts.themes["base16-ocean.light"]
+                } else {
+                    &ts.themes["base16-ocean.dark"]
+                };
+
             if let Some(syntax) = ps.find_syntax_by_extension("sql") {
                 let mut h = HighlightLines::new(syntax, &theme);
                 for line in LinesWithEndings::from(&generated) {
@@ -277,7 +277,7 @@ impl PgxSql {
         } else {
             write!(*out, "{}", generated)?;
         }
-        
+
         Ok(())
     }
 
