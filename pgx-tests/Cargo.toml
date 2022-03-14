@@ -38,7 +38,7 @@ pgx = { path = "../pgx", default-features = false, version= "0.4.0-beta.0" }
 pgx-macros = { path = "../pgx-macros", version= "0.4.0-beta.0" }
 pgx-utils = { path = "../pgx-utils", version= "0.4.0-beta.0" }
 postgres = "0.19.2"
-regex = "1.5.4"
+regex = "1.5.5"
 serde = "1.0.136"
 serde_json = "1.0.79"
 shutdown_hooks = "0.1.0"
