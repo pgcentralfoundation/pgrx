@@ -93,15 +93,16 @@ naersk.lib."${targetPlatform.system}".buildPackage rec {
       export NIX_PGLIBDIR=$out/.pgx/${pgxPostgresMajor}/lib
     fi
   '';
-  # Turns out Macs don't really shut down PostgreSQL and get rid of the sockets when they say they do. We wait on them a second to give it time.
+  # Certain extremely slow machines (Github actions...) don't clean up their socket properly.
   preFixup = ''
     if [ -f "${cargoToml.package.name}.control" ]; then
+      ${cargo-pgx}/bin/cargo-pgx pgx stop all
+      
       mv -v $out/${targetPostgres.out}/* $out
       rm -rfv $out/nix
-      
-      ${cargo-pgx}/bin/cargo-pgx pgx stop all
 
-      mv -v $out/.pgx .pgx
+      sleep 3
+      rm -rfv $out/.pgx
     fi
   '';
 
