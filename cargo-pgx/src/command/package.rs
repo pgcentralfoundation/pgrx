@@ -38,12 +38,12 @@ pub(crate) struct Package {
 impl CommandExecute for Package {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
-        let metadata = crate::metadata::metadata(&self.features, self.manifest_path)
+        let metadata = crate::metadata::metadata(&self.features, self.manifest_path.as_ref())
             .wrap_err("couldn't get cargo metadata")?;
         crate::metadata::validate(&metadata)?;
-        let manifest_path = crate::manifest::manifest_path(&metadata, self.package.as_ref())
+        let package_manifest_path = crate::manifest::manifest_path(&metadata, self.package.as_ref())
             .wrap_err("Couldn't get manifest path")?;
-        let manifest = Manifest::from_path(&manifest_path)
+        let package_manifest = Manifest::from_path(&package_manifest_path)
             .wrap_err("Couldn't parse manifest")?;
 
         let pg_config = match self.pg_config {
@@ -52,9 +52,9 @@ impl CommandExecute for Package {
         };
         let pg_version = format!("pg{}", pg_config.major_version()?);
 
-        let features = crate::manifest::features_for_version(self.features, &manifest, &pg_version);
+        let features = crate::manifest::features_for_version(self.features, &package_manifest, &pg_version);
 
-        package_extension(self.manifest_path.as_ref(), self.package.as_ref(), &pg_config, self.debug, self.test, &features)
+        package_extension(self.manifest_path.as_ref(), self.package.as_ref(), package_manifest_path, &pg_config, self.debug, self.test, &features)
     }
 }
 
@@ -64,14 +64,15 @@ impl CommandExecute for Package {
     test = is_test,
 ))]
 pub(crate) fn package_extension(
-    manifest_path: Option<&Path>,
-    package: Option<&String>,
+    user_manifest_path: Option<impl AsRef<Path>>,
+    user_package: Option<&String>,
+    package_manifest_path: impl AsRef<Path>,
     pg_config: &PgConfig,
     is_debug: bool,
     is_test: bool,
     features: &clap_cargo::Features,
 ) -> eyre::Result<()> {
-    let base_path = build_base_path(pg_config, manifest_path, is_debug)?;
+    let base_path = build_base_path(pg_config, &package_manifest_path, is_debug)?;
 
     if base_path.exists() {
         std::fs::remove_dir_all(&base_path)?;
@@ -81,8 +82,9 @@ pub(crate) fn package_extension(
         std::fs::create_dir_all(&base_path)?;
     }
     install_extension(
-        manifest_path,
-        package,
+        user_manifest_path,
+        user_package,
+        &package_manifest_path,
         pg_config,
         !is_debug,
         is_test,
@@ -91,7 +93,7 @@ pub(crate) fn package_extension(
     )
 }
 
-fn build_base_path(pg_config: &PgConfig, manifest_path: &Path, is_debug: bool) -> eyre::Result<PathBuf> {
+fn build_base_path(pg_config: &PgConfig, manifest_path: impl AsRef<Path>, is_debug: bool) -> eyre::Result<PathBuf> {
     let mut target_dir = get_target_dir()?;
     let pgver = pg_config.major_version()?;
     let extname = get_property(manifest_path, "extname")?.ok_or(eyre!("could not determine extension name"))?;

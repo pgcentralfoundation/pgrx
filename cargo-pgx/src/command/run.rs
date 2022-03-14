@@ -42,12 +42,12 @@ pub(crate) struct Run {
 impl CommandExecute for Run {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(mut self) -> eyre::Result<()> {
-        let metadata = crate::metadata::metadata(&Default::default(), self.manifest_path)
+        let metadata = crate::metadata::metadata(&self.features, self.manifest_path.as_ref())
             .wrap_err("couldn't get cargo metadata")?;
         crate::metadata::validate(&metadata)?;
-        let manifest_path = crate::manifest::manifest_path(&metadata, self.package.as_ref())
+        let package_manifest_path = crate::manifest::manifest_path(&metadata, self.package.as_ref())
             .wrap_err("Couldn't get manifest path")?;
-        let manifest = Manifest::from_path(&manifest_path)
+        let package_manifest = Manifest::from_path(&package_manifest_path)
             .wrap_err("Couldn't parse manifest")?;
 
         let pgx = Pgx::from_config()?;
@@ -62,7 +62,7 @@ impl CommandExecute for Run {
                         }
                         // It's actually the dbname! We should infer from the manifest.
                         self.dbname = Some(pg_version);
-                        let default_pg_version = crate::manifest::default_pg_version(&manifest)
+                        let default_pg_version = crate::manifest::default_pg_version(&package_manifest)
                             .ok_or(eyre!("No provided `pg$VERSION` flag."))?;
                         (pgx.get(&default_pg_version)?, default_pg_version)
                     }
@@ -70,23 +70,24 @@ impl CommandExecute for Run {
             }
             None => {
                 // We should infer from the manifest.
-                let default_pg_version = crate::manifest::default_pg_version(&manifest)
+                let default_pg_version = crate::manifest::default_pg_version(&package_manifest)
                     .ok_or(eyre!("No provided `pg$VERSION` flag."))?;
                 (pgx.get(&default_pg_version)?, default_pg_version)
             }
         };
 
-        let features = crate::manifest::features_for_version(self.features, &manifest, &pg_version);
+        let features = crate::manifest::features_for_version(self.features, &package_manifest, &pg_version);
 
         let dbname = match self.dbname {
             Some(dbname) => dbname,
-            None => get_property(&manifest_path, "extname")?.ok_or(eyre!("could not determine extension name"))?,
+            None => get_property(&package_manifest_path, "extname")?.ok_or(eyre!("could not determine extension name"))?,
         };
 
         run_psql(
             pg_config,
-            manifest_path,
+            self.manifest_path.as_ref(),
             self.package.as_ref(),
+            package_manifest_path,
             &dbname,
             self.release,
             &features,
@@ -101,20 +102,19 @@ impl CommandExecute for Run {
 ))]
 pub(crate) fn run_psql(
     pg_config: &PgConfig,
-    manifest_path: impl AsRef<Path>,
-    package: Option< &String>,
+    user_manifest_path: Option<impl AsRef<Path>>,
+    user_package: Option< &String>,
+    package_manifest_path: impl AsRef<Path>,
     dbname: &str,
     is_release: bool,
     features: &clap_cargo::Features,
 ) -> eyre::Result<()> {
-    let manifest_path = manifest_path.as_ref();
-
     // stop postgres
     stop_postgres(pg_config)?;
 
     // install the extension
     install_extension(
-        manifest_path, package, pg_config, is_release, false, None, features,
+        user_manifest_path, user_package, package_manifest_path, pg_config, is_release, false, None, features,
     )?;
 
     // restart postgres

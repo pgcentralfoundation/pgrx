@@ -19,10 +19,6 @@ use std::{
     path::{Path, PathBuf},
     process::{Command, Stdio},
 };
-use symbolic::{
-    common::{ByteView, DSymPathExt},
-    debuginfo::{Archive, SymbolIterator},
-};
 use cargo_toml::Manifest;
 // Since we support extensions with `#[no_std]`
 extern crate alloc;
@@ -67,12 +63,12 @@ pub(crate) struct Schema {
 impl CommandExecute for Schema {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
-        let metadata = crate::metadata::metadata(&self.features, self.manifest_path)
+        let metadata = crate::metadata::metadata(&self.features, self.manifest_path.as_ref())
             .wrap_err("couldn't get cargo metadata")?;
         crate::metadata::validate(&metadata)?;
-        let manifest_path = crate::manifest::manifest_path(&metadata, self.package.as_ref())
+        let package_manifest_path = crate::manifest::manifest_path(&metadata, self.package.as_ref())
             .wrap_err("Couldn't get manifest path")?;
-        let manifest = Manifest::from_path(&manifest_path)
+        let package_manifest = Manifest::from_path(&package_manifest_path)
             .wrap_err("Couldn't parse manifest")?;
 
         let log_level = if let Ok(log_level) = std::env::var("RUST_LOG") {
@@ -91,7 +87,7 @@ impl CommandExecute for Schema {
                 None => {
                     let pg_version = match self.pg_version {
                         Some(s) => s,
-                        None => crate::manifest::default_pg_version(&manifest)
+                        None => crate::manifest::default_pg_version(&package_manifest)
                             .ok_or(eyre!("No provided `pg$VERSION` flag."))?,
                     };
                     (Pgx::from_config()?.get(&pg_version)?.clone(), pg_version)
@@ -105,12 +101,13 @@ impl CommandExecute for Schema {
             }
         };
 
-        let features = crate::manifest::features_for_version(self.features, &manifest, &pg_version);
+        let features = crate::manifest::features_for_version(self.features, &package_manifest, &pg_version);
 
         generate_schema(
             &pg_config,
             self.manifest_path.as_ref(),
             self.package.as_ref(),
+            package_manifest_path,
             self.release,
             self.test,
             &features,
@@ -132,8 +129,9 @@ impl CommandExecute for Schema {
 ))]
 pub(crate) fn generate_schema(
     pg_config: &PgConfig,
-    manifest_path: Option<&Path>,
-    package: Option<&String>,
+    user_manifest_path: Option<impl AsRef<Path>>,
+    user_package: Option<&String>,
+    package_manifest_path: impl AsRef<Path>,
     is_release: bool,
     is_test: bool,
     features: &clap_cargo::Features,
@@ -142,16 +140,15 @@ pub(crate) fn generate_schema(
     log_level: Option<String>,
     skip_build: bool,
 ) -> eyre::Result<()> {
-    let manifest_path = manifest_path.as_ref();
-    let manifest = Manifest::from_path(&manifest_path)?;
-    let (control_file, _extname) = find_control_file(manifest_path)?;
+    let manifest = Manifest::from_path(&package_manifest_path)?;
+    let (control_file, _extname) = find_control_file(&package_manifest_path)?;
     let package_name = &manifest
         .package
         .as_ref()
         .ok_or_else(|| eyre!("Could not find crate name in Cargo.toml."))?
         .name;
 
-    if get_property(manifest_path, "relocatable")? != Some("false".into()) {
+    if get_property(&package_manifest_path, "relocatable")? != Some("false".into()) {
         return Err(eyre!(
             "{}:  The `relocatable` property MUST be `false`.  Please update your .control file.",
             control_file.display()
@@ -174,8 +171,17 @@ pub(crate) fn generate_schema(
         } else {
             command.arg("build");
         }
-        command.arg("--manifest-path");
-        command.arg(manifest_path);
+
+        if let Some(user_package) = user_package {
+            command.arg("--package");
+            command.arg(user_package);
+        }
+
+        if let Some(user_manifest_path) = user_manifest_path {
+            command.arg("--manifest-path");
+            command.arg(user_manifest_path.as_ref());
+        }
+        
         if is_release {
             command.arg("--release");
         }

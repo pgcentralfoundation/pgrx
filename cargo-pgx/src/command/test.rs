@@ -9,7 +9,7 @@ use pgx_utils::{
 use cargo_toml::Manifest;
 use std::{
     process::{Command, Stdio},
-    path::{Path, PathBuf},
+    path::{PathBuf, Path},
 };
 
 use crate::CommandExecute;
@@ -48,19 +48,21 @@ impl CommandExecute for Test {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
         let pgx = Pgx::from_config()?;
+        
         let metadata = crate::metadata::metadata(&self.features, self.manifest_path.as_ref())
             .wrap_err("couldn't get cargo metadata")?;
         crate::metadata::validate(&metadata)?;
-        let manifest_path = crate::manifest::manifest_path(&metadata, self.package.as_ref())
-            .wrap_err("couldn't get manifest path")?;
-        let manifest = Manifest::from_path(&manifest_path)
+        let package_manifest_path = crate::manifest::manifest_path(&metadata, self.package.as_ref())
+            .wrap_err("Couldn't get manifest path")?;
+        let package_manifest = Manifest::from_path(&package_manifest_path)
             .wrap_err("Couldn't parse manifest")?;
 
         let pg_version = match self.pg_version {
             Some(ref s) => s.clone(),
-            None => crate::manifest::default_pg_version(&manifest)
+            None => crate::manifest::default_pg_version(&package_manifest)
                 .ok_or(eyre!("No provided `pg$VERSION` flag."))?,
         };
+
 
         for pg_config in pgx.iter(PgConfigSelector::new(&pg_version)) {
             let mut testname = self.testname.clone();
@@ -73,7 +75,7 @@ impl CommandExecute for Test {
                     );
                     testname = Some(pg_version.clone());
                     pgx.get(
-                        &crate::manifest::default_pg_version(&manifest)
+                        &crate::manifest::default_pg_version(&package_manifest)
                             .ok_or(eyre!("No provided `pg$VERSION` flag."))?,
                     )?
                 }
@@ -81,7 +83,7 @@ impl CommandExecute for Test {
             };
             let pg_version = format!("pg{}", pg_config.major_version()?);
 
-            let features = crate::manifest::features_for_version(self.features.clone(), &manifest, &pg_version);
+            let features = crate::manifest::features_for_version(self.features.clone(), &package_manifest, &pg_version);
 
             test_extension(
                 pg_config,
@@ -105,14 +107,13 @@ impl CommandExecute for Test {
 ))]
 pub fn test_extension(
     pg_config: &PgConfig,
-    manifest_path: Option<&PathBuf>,
-    package: Option<&String>,
+    user_manifest_path: Option<impl AsRef<Path>>,
+    user_package: Option<&String>,
     is_release: bool,
     no_schema: bool,
     features: &clap_cargo::Features,
     testname: Option<impl AsRef<str>>,
 ) -> eyre::Result<()> {
-    let manifest_path = manifest_path.as_ref();
     if let Some(ref testname) = testname {
         tracing::Span::current().record("testname", &tracing::field::display(&testname.as_ref()));
     }
@@ -175,14 +176,14 @@ pub fn test_extension(
         command.arg("--release");
     }
 
-    if let Some(manifest_path) = manifest_path {
+    if let Some(user_manifest_path) = user_manifest_path {
         command.arg("--manifest-path");
-        command.arg(manifest_path);
+        command.arg(user_manifest_path.as_ref());
     }
 
-    if let Some(package) = package {
+    if let Some(user_package) = user_package {
         command.arg("--package");
-        command.arg(package);
+        command.arg(user_package);
     }
 
     if let Some(testname) = testname {

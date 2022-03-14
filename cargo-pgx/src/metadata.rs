@@ -1,8 +1,7 @@
 use cargo_metadata::{Metadata, MetadataCommand};
 use eyre::eyre;
 use semver::{Version, VersionReq};
-use crate::command::get::find_control_file;
-use std::path::{PathBuf, Path};
+use std::path::Path;
 
 pub fn metadata(features: &clap_cargo::Features, manifest_path: Option<impl AsRef<Path>>) -> eyre::Result<Metadata> {
     let mut metadata_command = MetadataCommand::new();

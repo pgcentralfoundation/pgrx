@@ -44,12 +44,12 @@ pub(crate) struct Install {
 impl CommandExecute for Install {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
-        let metadata = crate::metadata::metadata(&self.features, self.manifest_path)
+        let metadata = crate::metadata::metadata(&self.features, self.manifest_path.as_ref())
             .wrap_err("couldn't get cargo metadata")?;
         crate::metadata::validate(&metadata)?;
-        let manifest_path = crate::manifest::manifest_path(&metadata, self.package.as_ref())
+        let package_manifest_path = crate::manifest::manifest_path(&metadata, self.package.as_ref())
             .wrap_err("Couldn't get manifest path")?;
-        let manifest = Manifest::from_path(&manifest_path)
+        let package_manifest = Manifest::from_path(&package_manifest_path)
             .wrap_err("Couldn't parse manifest")?;
 
         let pg_config = match self.pg_config {
@@ -58,11 +58,12 @@ impl CommandExecute for Install {
         };
         let pg_version = format!("pg{}", pg_config.major_version()?);
 
-        let features = crate::manifest::features_for_version(self.features, &manifest, &pg_version);
+        let features = crate::manifest::features_for_version(self.features, &package_manifest, &pg_version);
 
         install_extension(
-            &self.manifest_path,
+            self.manifest_path.as_ref(),
             self.package.as_ref(),
+            package_manifest_path,
             &pg_config,
             self.release,
             self.test,
@@ -80,8 +81,9 @@ impl CommandExecute for Install {
     features = ?features.features,
 ))]
 pub(crate) fn install_extension(
-    manifest_path: &Path,
-    package: Option<&String>,
+    user_manifest_path: Option<impl AsRef<Path>>,
+    user_package: Option<&String>,
+    package_manifest_path: impl AsRef<Path>,
     pg_config: &PgConfig,
     is_release: bool,
     is_test: bool,
@@ -94,17 +96,17 @@ pub(crate) fn install_extension(
         &tracing::field::display(&base_directory.display()),
     );
 
-    let manifest = Manifest::from_path(&manifest_path)?;
-    let (control_file, extname) = find_control_file(manifest_path)?;
+    let manifest = Manifest::from_path(&package_manifest_path)?;
+    let (control_file, extname) = find_control_file(&package_manifest_path)?;
 
-    if get_property(manifest_path, "relocatable")? != Some("false".into()) {
+    if get_property(&package_manifest_path, "relocatable")? != Some("false".into()) {
         return Err(eyre!(
             "{}:  The `relocatable` property MUST be `false`.  Please update your .control file.",
             control_file.display()
         ));
     }
 
-    let build_command_output = build_extension(&manifest_path, is_release, &features)?;
+    let build_command_output = build_extension(user_manifest_path.as_ref(), user_package, is_release, &features)?;
     let build_command_bytes = build_command_output.stdout;
     let build_command_reader = BufReader::new(build_command_bytes.as_slice());
     let build_command_stream = cargo_metadata::Message::parse_stream(build_command_reader);
@@ -121,7 +123,7 @@ pub(crate) fn install_extension(
         let mut dest = base_directory.clone();
         dest.push(&extdir);
         dest.push(&control_file.file_name().ok_or_else(|| eyre!("Could not get filename for `{}`", control_file.display()))?);
-        copy_file(&control_file, &dest, "control file", true, manifest_path)?;
+        copy_file(&control_file, &dest, "control file", true, &package_manifest_path)?;
     }
 
     {
@@ -139,12 +141,13 @@ pub(crate) fn install_extension(
                 })?;
             }
         }
-        copy_file(&shlibpath, &dest, "shared library", false, manifest_path)?;
+        copy_file(&shlibpath, &dest, "shared library", false, &package_manifest_path)?;
     }
 
     copy_sql_files(
-        manifest_path,
-        package,
+        user_manifest_path,
+        user_package,
+        &package_manifest_path,
         pg_config,
         is_release,
         is_test,
@@ -158,7 +161,7 @@ pub(crate) fn install_extension(
     Ok(())
 }
 
-fn copy_file(src: &PathBuf, dest: &PathBuf, msg: &str, do_filter: bool, manifest_path: &Path) -> eyre::Result<()> {
+fn copy_file(src: &PathBuf, dest: &PathBuf, msg: &str, do_filter: bool, package_manifest_path: impl AsRef<Path>) -> eyre::Result<()> {
     if !dest.parent().unwrap().exists() {
         std::fs::create_dir_all(dest.parent().unwrap()).wrap_err_with(|| {
             format!(
@@ -179,7 +182,7 @@ fn copy_file(src: &PathBuf, dest: &PathBuf, msg: &str, do_filter: bool, manifest
         // we want to filter the contents of the file we're to copy
         let input = std::fs::read_to_string(&src)
             .wrap_err_with(|| format!("failed to read `{}`", src.display()))?;
-        let input = filter_contents(manifest_path, input)?;
+        let input = filter_contents(package_manifest_path, input)?;
 
         std::fs::write(&dest, &input).wrap_err_with(|| {
             format!("failed writing `{}` to `{}`", src.display(), dest.display())
@@ -194,7 +197,8 @@ fn copy_file(src: &PathBuf, dest: &PathBuf, msg: &str, do_filter: bool, manifest
 }
 
 pub(crate) fn build_extension(
-    manifest_path: &Path,
+    user_manifest_path: Option<impl AsRef<Path>>,
+    user_package: Option<&String>,
     is_release: bool,
     features: &clap_cargo::Features,
 ) -> eyre::Result<std::process::Output> {
@@ -202,9 +206,17 @@ pub(crate) fn build_extension(
 
     let mut command = Command::new("cargo");
     command.arg("build");
-    command.arg("--manifest-path");
-    command.arg(manifest_path);
 
+    if let Some(user_manifest_path) = user_manifest_path {
+        command.arg("--manifest-path");
+        command.arg(user_manifest_path.as_ref());
+    }
+
+    if let Some(user_package) = user_package {
+        command.arg("--package");
+        command.arg(user_package);
+    }
+    
     if is_release {
         command.arg("--release");
     }
@@ -246,20 +258,21 @@ pub(crate) fn build_extension(
     }
 }
 
-fn get_target_sql_file(manifest_path: &Path, extdir: &PathBuf, base_directory: &PathBuf) -> eyre::Result<PathBuf> {
+fn get_target_sql_file(manifest_path: impl AsRef<Path>, extdir: &PathBuf, base_directory: &PathBuf) -> eyre::Result<PathBuf> {
     let mut dest = base_directory.clone();
     dest.push(extdir);
 
-    let (_, extname) = crate::command::get::find_control_file(manifest_path)?;
-    let version = get_version(manifest_path)?;
+    let (_, extname) = crate::command::get::find_control_file(&manifest_path)?;
+    let version = get_version(&manifest_path)?;
     dest.push(format!("{}--{}.sql", extname, version));
 
     Ok(dest)
 }
 
 fn copy_sql_files(
-    manifest_path: &Path,
-    package: Option<&String>,
+    user_manifest_path: Option<impl AsRef<Path>>,
+    user_package: Option<&String>,
+    package_manifest_path: impl AsRef<Path>,
     pg_config: &PgConfig,
     is_release: bool,
     is_test: bool,
@@ -268,13 +281,14 @@ fn copy_sql_files(
     base_directory: &PathBuf,
     skip_build: bool,
 ) -> eyre::Result<()> {
-    let dest = get_target_sql_file(&manifest_path, extdir, base_directory)?;
-    let (_, extname) = crate::command::get::find_control_file(manifest_path)?;
+    let dest = get_target_sql_file(&package_manifest_path, extdir, base_directory)?;
+    let (_, extname) = crate::command::get::find_control_file(&package_manifest_path)?;
 
     crate::command::schema::generate_schema(
         pg_config,
-        manifest_path,
-        package,
+        user_manifest_path,
+        user_package,
+        &package_manifest_path,
         is_release,
         is_test,
         features,
@@ -295,7 +309,7 @@ fn copy_sql_files(
                     dest.push(extdir);
                     dest.push(filename);
 
-                    copy_file(&sql.path(), &dest, "extension schema upgrade file", true, manifest_path)?;
+                    copy_file(&sql.path(), &dest, "extension schema upgrade file", true, &package_manifest_path)?;
                 }
             }
         }
@@ -346,11 +360,11 @@ pub(crate) fn find_library_file(
     Ok(library_file_path)
 }
 
-pub(crate) fn get_version(manifest_path: &Path) -> eyre::Result<String> {
-    match get_property(manifest_path, "default_version")? {
+pub(crate) fn get_version(manifest_path: impl AsRef<Path>) -> eyre::Result<String> {
+    match get_property(&manifest_path, "default_version")? {
         Some(v) => {
             if v == "@CARGO_VERSION@" {
-                let metadata = crate::metadata::metadata(&Default::default(), Some(manifest_path))
+                let metadata = crate::metadata::metadata(&Default::default(), Some(&manifest_path))
                     .wrap_err("couldn't get cargo metadata")?;
                 crate::metadata::validate(&metadata)?;
                 let manifest_path = crate::manifest::manifest_path(&metadata, None)
@@ -368,7 +382,7 @@ pub(crate) fn get_version(manifest_path: &Path) -> eyre::Result<String> {
     }
 }
 
-fn get_git_hash(manifest_path: &Path) -> eyre::Result<String> {
+fn get_git_hash(manifest_path: impl AsRef<Path>) -> eyre::Result<String> {
     match get_property(manifest_path, "git_hash")? {
         Some(hash) => Ok(hash),
         None => Err(eyre!(
@@ -400,15 +414,15 @@ pub(crate) fn format_display_path(path: impl AsRef<Path>) -> eyre::Result<String
     Ok(out)
 }
 
-fn filter_contents(manifest_path: &Path, mut input: String) -> eyre::Result<String> {
+fn filter_contents(manifest_path: impl AsRef<Path>, mut input: String) -> eyre::Result<String> {
     if input.contains("@GIT_HASH@") {
         // avoid doing this if we don't actually have the token
         // the project might not be a git repo so running `git`
         // would fail
-        input = input.replace("@GIT_HASH@", &get_git_hash(manifest_path)?);
+        input = input.replace("@GIT_HASH@", &get_git_hash(&manifest_path)?);
     }
 
-    input = input.replace("@CARGO_VERSION@", &get_version(manifest_path)?);
+    input = input.replace("@CARGO_VERSION@", &get_version(&manifest_path)?);
 
     Ok(input)
 }

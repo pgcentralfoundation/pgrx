@@ -42,8 +42,11 @@ impl CommandExecute for Get {
     }
 }
 
-#[tracing::instrument(level = "error")]
-pub fn get_property(manifest_path: &Path, name: &str) -> eyre::Result<Option<String>> {
+#[tracing::instrument(level = "error", skip_all, fields(
+    %name,
+    manifest_path = %manifest_path.as_ref().display(),
+))]
+pub fn get_property(manifest_path: impl AsRef<Path>, name: &str) -> eyre::Result<Option<String>> {
     let (control_file, extname) = find_control_file(manifest_path)?;
 
     if name == "extname" {
