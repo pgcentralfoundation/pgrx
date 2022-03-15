@@ -29,13 +29,13 @@ pub(crate) struct Get {
 impl CommandExecute for Get {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
-        let metadata = crate::metadata::metadata(&Default::default(), self.manifest_path)
+        let metadata = crate::metadata::metadata(&Default::default(), self.manifest_path.as_ref())
             .wrap_err("couldn't get cargo metadata")?;
         crate::metadata::validate(&metadata)?;
-        let manifest_path = crate::manifest::manifest_path(&metadata, self.package.as_ref())
-            .wrap_err("couldn't get manifest path")?;
+        let package_manifest_path = crate::manifest::manifest_path(&metadata, self.package.as_ref())
+            .wrap_err("Couldn't get manifest path")?;
 
-        if let Some(value) = get_property(&manifest_path, &self.name)? {
+        if let Some(value) = get_property(&package_manifest_path, &self.name)? {
             println!("{}", value);
         }
         Ok(())

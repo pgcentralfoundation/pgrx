@@ -36,15 +36,15 @@ impl CommandExecute for Stop {
         let pg_version = match self.pg_version {
             Some(s) => s,
             None => {
-                let metadata = crate::metadata::metadata(&Default::default(), self.manifest_path)
+                let metadata = crate::metadata::metadata(&Default::default(), self.manifest_path.as_ref())
                     .wrap_err("couldn't get cargo metadata")?;
                 crate::metadata::validate(&metadata)?;
-                let manifest_path = crate::manifest::manifest_path(&metadata, self.package.as_ref())
+                let package_manifest_path = crate::manifest::manifest_path(&metadata, self.package.as_ref())
                     .wrap_err("Couldn't get manifest path")?;
-                let manifest = Manifest::from_path(&manifest_path)
+                let package_manifest = Manifest::from_path(&package_manifest_path)
                     .wrap_err("Couldn't parse manifest")?;
 
-                crate::manifest::default_pg_version(&manifest)
+                crate::manifest::default_pg_version(&package_manifest)
                     .ok_or(eyre!("no provided `pg$VERSION` flag."))?
             }
         };
