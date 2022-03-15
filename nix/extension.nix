@@ -99,8 +99,6 @@ naersk.lib."${targetPlatform.system}".buildPackage rec {
 
       mv -v $out/${targetPostgres.out}/* $out
       rm -rfv $out/nix
-
-      rm -rfv $PGX_HOME
     fi
   '';
 
