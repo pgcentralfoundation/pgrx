@@ -10,7 +10,7 @@ use cargo_toml::Manifest;
 use pgx_utils::{get_target_dir, pg_config::PgConfig};
 use std::path::{PathBuf, Path};
 
-/// Create an installation package directory (in `./target/[debug|release]/extname-pgXX/`).
+/// Create an installation package directory.
 #[derive(clap::Args, Debug)]
 #[clap(author)]
 pub(crate) struct Package {
@@ -29,6 +29,9 @@ pub(crate) struct Package {
     /// The `pg_config` path (default is first in $PATH)
     #[clap(long, short = 'c', parse(from_os_str))]
     pg_config: Option<PathBuf>,
+    /// The directory to output the package (default is `./target/[debug|release]/extname-pgXX/`)
+    #[clap(long, parse(from_os_str))]
+    out_dir: Option<PathBuf>,
     #[clap(flatten)]
     features: clap_cargo::Features,
     #[clap(from_global, parse(from_occurrences))]
@@ -53,8 +56,13 @@ impl CommandExecute for Package {
         let pg_version = format!("pg{}", pg_config.major_version()?);
 
         let features = crate::manifest::features_for_version(self.features, &package_manifest, &pg_version);
-
-        package_extension(self.manifest_path.as_ref(), self.package.as_ref(), package_manifest_path, &pg_config, self.debug, self.test, &features)
+        
+        let out_dir = if let Some(out_dir) = self.out_dir {
+            out_dir
+        } else {
+            build_base_path(&pg_config, &package_manifest_path, self.debug)?
+        };
+        package_extension(self.manifest_path.as_ref(), self.package.as_ref(), &package_manifest_path, &pg_config, out_dir, self.debug, self.test, &features)
     }
 }
 
@@ -68,19 +76,15 @@ pub(crate) fn package_extension(
     user_package: Option<&String>,
     package_manifest_path: impl AsRef<Path>,
     pg_config: &PgConfig,
+    out_dir: PathBuf,
     is_debug: bool,
     is_test: bool,
     features: &clap_cargo::Features,
 ) -> eyre::Result<()> {
-    let base_path = build_base_path(pg_config, &package_manifest_path, is_debug)?;
-
-    if base_path.exists() {
-        std::fs::remove_dir_all(&base_path)?;
+    if !out_dir.exists() {
+        std::fs::create_dir_all(&out_dir)?;
     }
 
-    if !base_path.exists() {
-        std::fs::create_dir_all(&base_path)?;
-    }
     install_extension(
         user_manifest_path,
         user_package,
@@ -88,7 +92,7 @@ pub(crate) fn package_extension(
         pg_config,
         !is_debug,
         is_test,
-        Some(base_path),
+        Some(out_dir),
         features,
     )
 }
