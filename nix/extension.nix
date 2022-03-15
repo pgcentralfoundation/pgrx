@@ -97,14 +97,15 @@ naersk.lib."${targetPlatform.system}".buildPackage rec {
   preFixup = ''
     if [ -f "${cargoToml.package.name}.control" ]; then
       ${cargo-pgx}/bin/cargo-pgx pgx stop all
+      
+      until ! ls $out/.pgx/.s.PGSQL &> /dev/null; do
+        echo "Waiting for PostgreSQL socket to close..."
+        ${cargo-pgx}/bin/cargo-pgx pgx stop all
+        sleep 3
+      done
 
       mv -v $out/${targetPostgres.out}/* $out
       rm -rfv $out/nix
-
-      until ! compgen -G "$out/.pgx/.s.PGSQL.*" > /dev/null; do
-        sleep 3
-        echo "Waiting for PostgreSQL socket to close..."
-      done
 
       rm -rfv $out/.pgx
     fi
