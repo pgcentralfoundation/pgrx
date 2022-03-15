@@ -25,20 +25,20 @@ let
   pgxPostgresMajor = builtins.head (lib.splitString "." targetPostgres.version);
   cargoToml = (builtins.fromTOML (builtins.readFile "${source}/Cargo.toml"));
   preBuildAndTest = ''
-    mkdir -p $out/.pgx/${pgxPostgresMajor}
-    export PGX_HOME=$out/.pgx
+    export PGX_HOME=$(mktemp -d)
+    mkdir -p $PGX_HOME/${pgxPostgresMajor}
 
-    cp -r -L ${targetPostgres}/. $out/.pgx/${pgxPostgresMajor}/
-    chmod -R ugo+w $out/.pgx/${pgxPostgresMajor}
-    cp -r -L ${targetPostgres.lib}/lib/. $out/.pgx/${pgxPostgresMajor}/lib/
+    cp -r -L ${targetPostgres}/. $PGX_HOME/${pgxPostgresMajor}/
+    chmod -R ugo+w $PGX_HOME/${pgxPostgresMajor}
+    cp -r -L ${targetPostgres.lib}/lib/. $PGX_HOME/${pgxPostgresMajor}/lib/
 
     ${cargo-pgx}/bin/cargo-pgx pgx init \
-      --pg${pgxPostgresMajor} $out/.pgx/${pgxPostgresMajor}/bin/pg_config \
+      --pg${pgxPostgresMajor} $PGX_HOME/${pgxPostgresMajor}/bin/pg_config \
 
     # This is primarily for Mac or other Nix systems that don't use the nixbld user.
     export USER=$(whoami)
-    export PGDATA=$out/.pgx/data-${pgxPostgresMajor}/
-    export NIX_PGLIBDIR=$out/.pgx/${pgxPostgresMajor}/lib
+    export PGDATA=$PGX_HOME/data-${pgxPostgresMajor}/
+    export NIX_PGLIBDIR=$PGX_HOME/${pgxPostgresMajor}/lib
 
     echo "unix_socket_directories = '$(mktemp -d)'" > $PGDATA/postgresql.conf 
     ${targetPostgres}/bin/pg_ctl start
@@ -87,27 +87,20 @@ naersk.lib."${targetPlatform.system}".buildPackage rec {
   preCheck = preBuildAndTest;
   postBuild = ''
     if [ -f "${cargoToml.package.name}.control" ]; then
-      export PGX_HOME=$out/.pgx
       export NIX_PGLIBDIR=${targetPostgres.out}/share/postgresql/extension/
       ${cargo-pgx}/bin/cargo-pgx pgx package --pg-config ${targetPostgres}/bin/pg_config ${maybeDebugFlag} --features "${builtins.toString additionalFeatures}" --out-dir $out
-      export NIX_PGLIBDIR=$out/.pgx/${pgxPostgresMajor}/lib
+      export NIX_PGLIBDIR=$PGX_HOME/${pgxPostgresMajor}/lib
     fi
   '';
   # Certain extremely slow machines (Github actions...) don't clean up their socket properly.
   preFixup = ''
     if [ -f "${cargoToml.package.name}.control" ]; then
       ${cargo-pgx}/bin/cargo-pgx pgx stop all
-      
-      until ! ls $out/.pgx/.s.PGSQL &> /dev/null; do
-        echo "Waiting for PostgreSQL socket to close..."
-        ${cargo-pgx}/bin/cargo-pgx pgx stop all
-        sleep 3
-      done
 
       mv -v $out/${targetPostgres.out}/* $out
       rm -rfv $out/nix
 
-      rm -rfv $out/.pgx
+      rm -rfv $PGX_HOME
     fi
   '';
 
