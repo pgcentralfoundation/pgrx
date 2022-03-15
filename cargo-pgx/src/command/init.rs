@@ -236,7 +236,7 @@ fn untar(bytes: &[u8], pgxdir: &PathBuf, pg_config: &PgConfig) -> eyre::Result<P
         .stderr(std::process::Stdio::piped())
         .stdin(std::process::Stdio::piped())
         .spawn()
-        .expect("failed to spawn `tar`");
+        .wrap_err("failed to spawn `tar`")?;
 
     let stdin = child.stdin.as_mut().expect("failed to get `tar`'s stdin");
     stdin.write_all(bytes)?;
@@ -435,7 +435,8 @@ pub(crate) fn initdb(bindir: &PathBuf, datadir: &PathBuf) -> eyre::Result<()> {
     let command_str = format!("{:?}", command);
     tracing::debug!(command = %command_str, "Running");
 
-    let output = command.output()?;
+    let output = command.output()
+        .wrap_err_with(|| eyre!("unable to execute: {}", command_str))?;
     tracing::trace!(command = %command_str, status_code = %output.status, "Finished");
 
     if !output.status.success() {
