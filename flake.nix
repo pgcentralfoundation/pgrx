@@ -15,7 +15,6 @@
     let
       supportedSystems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
       forAllSystems = f: nixpkgs.lib.genAttrs supportedSystems (system: f system);
-      supportedPostgresVersions = [ 10 11 12 13 14 ];
       nixpkgsWithOverlays = { system, nixpkgs, extraOverlays ? [ ] }: (import nixpkgs {
         inherit system;
         overlays = [
@@ -31,15 +30,15 @@
     in
     {
       lib = {
-        inherit supportedSystems supportedPostgresVersions forAllSystems nixpkgsWithOverlays;
+        inherit supportedSystems forAllSystems nixpkgsWithOverlays;
         buildPgxExtension =
           { pkgs
           , source
-          , pgxPostgresVersion
+          , targetPostgres
           , additionalFeatures ? [ ]
           , release ? true
           }: pkgs.callPackage ./nix/extension.nix {
-            inherit source pgxPostgresVersion release naersk additionalFeatures;
+            inherit source targetPostgres release naersk additionalFeatures;
             inherit (gitignore.lib) gitignoreSource;
           };
       };

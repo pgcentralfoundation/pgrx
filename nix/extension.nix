@@ -5,21 +5,14 @@
 , cargo-pgx
 , hostPlatform
 , targetPlatform
-, postgresql
-, postgresql_10
-, postgresql_11
-, postgresql_12
-, postgresql_13
-, postgresql_14
 , pkg-config
 , openssl
 , libiconv
 , rust-bin
 , llvmPackages
-, gcc
 , gitignoreSource
 , runCommand
-, pgxPostgresVersion ? 11
+, targetPostgres
 , release ? true
 , source ? ./.
 , additionalFeatures
@@ -27,80 +20,30 @@
 }:
 
 let
-  pgxPostgresPkg =
-    if (pgxPostgresVersion == 10) then postgresql_10
-    else if (pgxPostgresVersion == 11) then postgresql_11
-    else if (pgxPostgresVersion == 12) then postgresql_12
-    else if (pgxPostgresVersion == 13) then postgresql_13
-    else if (pgxPostgresVersion == 14) then postgresql_14
-    else null;
   maybeReleaseFlag = if release == true then "--release" else "";
-  pgxPostgresVersionString = builtins.toString pgxPostgresVersion;
+  maybeDebugFlag = if release == true then "" else "--debug";
+  pgxPostgresMajor = builtins.head (lib.splitString "." targetPostgres.version);
   cargoToml = (builtins.fromTOML (builtins.readFile "${source}/Cargo.toml"));
-in
+  preBuildAndTest = ''
+    export PGX_HOME=$(mktemp -d)
+    mkdir -p $PGX_HOME/${pgxPostgresMajor}
 
-naersk.lib."${targetPlatform.system}".buildPackage rec {
-  inherit release doCheck;
-  name = "${cargoToml.package.name}-pg${pgxPostgresVersionString}";
-  version = cargoToml.package.version;
-
-  src = gitignoreSource source;
-
-  inputsFrom = [ postgresql_10 postgresql_11 postgresql_12 postgresql_13 cargo-pgx ];
-
-  LIBCLANG_PATH = "${llvmPackages.libclang.lib}/lib";
-  buildInputs = [
-    rust-bin.stable.latest.default
-    cargo-pgx
-    pkg-config
-    libiconv
-    pgxPostgresPkg
-    gcc
-  ];
-  checkInputs = [
-    cargo-pgx
-    rust-bin.stable.latest.default
-  ];
-
-  postPatch = "patchShebangs .";
-  preConfigure = ''
-    mkdir -p $out/.pgx/{10,11,12,13,14}
-    export PGX_HOME=$out/.pgx
-
-    cp -r -L ${postgresql_10}/. $out/.pgx/10/
-    chmod -R ugo+w $out/.pgx/10
-    cp -r -L ${postgresql_10.lib}/lib/. $out/.pgx/10/lib/
-    
-    cp -r -L ${postgresql_11}/. $out/.pgx/11/
-    chmod -R ugo+w $out/.pgx/11
-    cp -r -L ${postgresql_11.lib}/lib/. $out/.pgx/11/lib/
-    
-    cp -r -L ${postgresql_12}/. $out/.pgx/12/
-    chmod -R ugo+w $out/.pgx/12
-    cp -r -L ${postgresql_12.lib}/lib/. $out/.pgx/12/lib/
-    
-    cp -r -L ${postgresql_13}/. $out/.pgx/13/
-    chmod -R ugo+w $out/.pgx/13
-    cp -r -L ${postgresql_13.lib}/lib/. $out/.pgx/13/lib/
-
-    cp -r -L ${postgresql_14}/. $out/.pgx/14/
-    chmod -R ugo+w $out/.pgx/14
-    cp -r -L ${postgresql_14.lib}/lib/. $out/.pgx/14/lib/
+    cp -r -L ${targetPostgres}/. $PGX_HOME/${pgxPostgresMajor}/
+    chmod -R ugo+w $PGX_HOME/${pgxPostgresMajor}
+    cp -r -L ${targetPostgres.lib}/lib/. $PGX_HOME/${pgxPostgresMajor}/lib/
 
     ${cargo-pgx}/bin/cargo-pgx pgx init \
-      --pg10 $out/.pgx/10/bin/pg_config \
-      --pg11 $out/.pgx/11/bin/pg_config \
-      --pg12 $out/.pgx/12/bin/pg_config \
-      --pg13 $out/.pgx/13/bin/pg_config \
-      --pg14 $out/.pgx/14/bin/pg_config
-    
+      --pg${pgxPostgresMajor} $PGX_HOME/${pgxPostgresMajor}/bin/pg_config \
+
     # This is primarily for Mac or other Nix systems that don't use the nixbld user.
     export USER=$(whoami)
-    export PGDATA=$out/.pgx/data-${pgxPostgresVersionString}/
-    echo "unix_socket_directories = '$out/.pgx'" > $PGDATA/postgresql.conf 
-    ${pgxPostgresPkg}/bin/pg_ctl start
-    ${pgxPostgresPkg}/bin/createuser -h localhost --superuser --createdb $USER || true
-    ${pgxPostgresPkg}/bin/pg_ctl stop
+    export PGDATA=$PGX_HOME/data-${pgxPostgresMajor}/
+    export NIX_PGLIBDIR=$PGX_HOME/${pgxPostgresMajor}/lib
+
+    echo "unix_socket_directories = '$(mktemp -d)'" > $PGDATA/postgresql.conf 
+    ${targetPostgres}/bin/pg_ctl start
+    ${targetPostgres}/bin/createuser -h localhost --superuser --createdb $USER || true
+    ${targetPostgres}/bin/pg_ctl stop
 
     # Set C flags for Rust's bindgen program. Unlike ordinary C
     # compilation, bindgen does not invoke $CC directly. Instead it
@@ -115,32 +58,59 @@ naersk.lib."${targetPlatform.system}".buildPackage rec {
       ${lib.optionalString stdenv.cc.isGNU "-isystem ${stdenv.cc.cc}/include/c++/${lib.getVersion stdenv.cc.cc} -isystem ${stdenv.cc.cc}/include/c++/${lib.getVersion stdenv.cc.cc}/${stdenv.hostPlatform.config} -idirafter ${stdenv.cc.cc}/lib/gcc/${stdenv.hostPlatform.config}/${lib.getVersion stdenv.cc.cc}/include"}
     "
   '';
-  preCheck = ''
-    export PGX_HOME=$out/.pgx
-    export NIX_PGLIBDIR=$out/.pgx/${pgxPostgresVersionString}/lib
-  '';
+in
+
+naersk.lib."${targetPlatform.system}".buildPackage rec {
+  inherit release doCheck;
+  name = "${cargoToml.package.name}-pg${pgxPostgresMajor}";
+  version = cargoToml.package.version;
+
+  src = gitignoreSource source;
+
+  inputsFrom = [ targetPostgres cargo-pgx ];
+
+  LIBCLANG_PATH = "${llvmPackages.libclang.lib}/lib";
+  buildInputs = [
+    rust-bin.stable.latest.default
+    cargo-pgx
+    pkg-config
+    libiconv
+    targetPostgres
+  ];
+  checkInputs = [
+    cargo-pgx
+    rust-bin.stable.latest.default
+  ];
+
+  postPatch = "patchShebangs .";
+  preBuild = preBuildAndTest;
+  preCheck = preBuildAndTest;
   postBuild = ''
-    export PGX_HOME=$out/.pgx
-    ${cargo-pgx}/bin/cargo-pgx pgx schema pg${pgxPostgresVersionString} ${maybeReleaseFlag} --features "${builtins.toString additionalFeatures}"
-    mkdir -p $out/share/postgresql/extension/
-    cp -v ./sql/* $out/share/postgresql/extension/
-    cp -v ./${cargoToml.package.name}.control $out/share/postgresql/extension/${cargoToml.package.name}.control
+    if [ -f "${cargoToml.package.name}.control" ]; then
+      export NIX_PGLIBDIR=${targetPostgres.out}/share/postgresql/extension/
+      ${cargo-pgx}/bin/cargo-pgx pgx package --pg-config ${targetPostgres}/bin/pg_config ${maybeDebugFlag} --features "${builtins.toString additionalFeatures}" --out-dir $out
+      export NIX_PGLIBDIR=$PGX_HOME/${pgxPostgresMajor}/lib
+    fi
   '';
+  # Certain extremely slow machines (Github actions...) don't clean up their socket properly.
   preFixup = ''
-    rm -r $out/.pgx
-    mv $out/lib/* $out/share/postgresql/extension/
-    rm -r $out/lib $out/bin
+    if [ -f "${cargoToml.package.name}.control" ]; then
+      ${cargo-pgx}/bin/cargo-pgx pgx stop all
+
+      mv -v $out/${targetPostgres.out}/* $out
+      rm -rfv $out/nix
+    fi
   '';
+
   PGX_PG_SYS_SKIP_BINDING_REWRITE = "1";
   CARGO_BUILD_INCREMENTAL = "false";
   RUST_BACKTRACE = "full";
-  # This is required to have access to the `sql/*.sql` files.
-  singleStep = true;
 
-  cargoBuildOptions = default: default ++ [ "--no-default-features" "--features \"pg${pgxPostgresVersionString} ${builtins.toString additionalFeatures}\"" ];
-  cargoTestOptions = default: default ++ [ "--no-default-features" "--features \"pg_test pg${pgxPostgresVersionString} ${builtins.toString additionalFeatures}\"" ];
+  cargoBuildOptions = default: default ++ [ "--no-default-features" "--features \"pg${pgxPostgresMajor} ${builtins.toString additionalFeatures}\"" ];
+  cargoTestOptions = default: default ++ [ "--no-default-features" "--features \"pg_test pg${pgxPostgresMajor} ${builtins.toString additionalFeatures}\"" ];
   doDoc = false;
-  copyLibs = true;
+  copyLibs = false;
+  copyBins = false;
 
   meta = with lib; {
     description = cargoToml.package.description;
