@@ -51,6 +51,7 @@
 #include "nodes/supportnodes.h"
 #include "nodes/tidbitmap.h"
 #include "nodes/value.h"
+#include "optimizer/appendinfo.h"
 #include "optimizer/clauses.h"
 #include "optimizer/cost.h"
 #include "optimizer/optimizer.h"
