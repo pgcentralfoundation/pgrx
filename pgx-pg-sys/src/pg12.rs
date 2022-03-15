@@ -41233,6 +41233,58 @@ impl Default for SupportRequestIndexCondition {
         }
     }
 }
+#[pg_guard]
+extern "C" {
+    pub fn make_append_rel_info(
+        parentrel: Relation,
+        childrel: Relation,
+        parentRTindex: Index,
+        childRTindex: Index,
+    ) -> *mut AppendRelInfo;
+}
+#[pg_guard]
+extern "C" {
+    pub fn adjust_appendrel_attrs(
+        root: *mut PlannerInfo,
+        node: *mut Node,
+        nappinfos: ::std::os::raw::c_int,
+        appinfos: *mut *mut AppendRelInfo,
+    ) -> *mut Node;
+}
+#[pg_guard]
+extern "C" {
+    pub fn adjust_appendrel_attrs_multilevel(
+        root: *mut PlannerInfo,
+        node: *mut Node,
+        child_relids: Relids,
+        top_parent_relids: Relids,
+    ) -> *mut Node;
+}
+#[pg_guard]
+extern "C" {
+    pub fn adjust_child_relids(
+        relids: Relids,
+        nappinfos: ::std::os::raw::c_int,
+        appinfos: *mut *mut AppendRelInfo,
+    ) -> Relids;
+}
+#[pg_guard]
+extern "C" {
+    pub fn adjust_child_relids_multilevel(
+        root: *mut PlannerInfo,
+        relids: Relids,
+        child_relids: Relids,
+        top_parent_relids: Relids,
+    ) -> Relids;
+}
+#[pg_guard]
+extern "C" {
+    pub fn find_appinfos_by_relids(
+        root: *mut PlannerInfo,
+        relids: Relids,
+        nappinfos: *mut ::std::os::raw::c_int,
+    ) -> *mut *mut AppendRelInfo;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct WindowFuncLists {
