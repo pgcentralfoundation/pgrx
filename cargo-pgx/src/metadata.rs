@@ -1,9 +1,13 @@
 use cargo_metadata::{Metadata, MetadataCommand};
 use eyre::eyre;
 use semver::{Version, VersionReq};
+use std::path::Path;
 
-pub fn metadata(features: &clap_cargo::Features) -> eyre::Result<Metadata> {
+pub fn metadata(features: &clap_cargo::Features, manifest_path: Option<impl AsRef<Path>>) -> eyre::Result<Metadata> {
     let mut metadata_command = MetadataCommand::new();
+    if let Some(manifest_path) = manifest_path {
+        metadata_command.manifest_path(manifest_path.as_ref().to_owned());
+    }
     features.forward_metadata(&mut metadata_command);
     let metadata = metadata_command.exec()?;
     Ok(metadata)

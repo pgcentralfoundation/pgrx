@@ -2,11 +2,12 @@
 // governed by the MIT license that can be found in the LICENSE file.
 
 use eyre::{eyre, WrapErr};
-use std::fs::File;
-use std::io::{BufRead, BufReader};
-use std::path::PathBuf;
-use std::process::Command;
-
+use std::{
+    fs::File,
+    io::{BufRead, BufReader},
+    path::{Path, PathBuf},
+    process::Command,
+};
 use crate::CommandExecute;
 
 /// Get a property from the extension control file
@@ -17,21 +18,36 @@ pub(crate) struct Get {
     name: String,
     #[clap(from_global, parse(from_occurrences))]
     verbose: usize,
+    /// Package to determine default `pg_version` with (see `cargo help pkgid`)
+    #[clap(long, short)]
+    package: Option<String>,
+    /// Path to Cargo.toml
+    #[clap(long, parse(from_os_str))]
+    manifest_path: Option<PathBuf>,
 }
 
 impl CommandExecute for Get {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
-        if let Some(value) = get_property(&self.name)? {
+        let metadata = crate::metadata::metadata(&Default::default(), self.manifest_path.as_ref())
+            .wrap_err("couldn't get cargo metadata")?;
+        crate::metadata::validate(&metadata)?;
+        let package_manifest_path = crate::manifest::manifest_path(&metadata, self.package.as_ref())
+            .wrap_err("Couldn't get manifest path")?;
+
+        if let Some(value) = get_property(&package_manifest_path, &self.name)? {
             println!("{}", value);
         }
         Ok(())
     }
 }
 
-#[tracing::instrument(level = "error")]
-pub fn get_property(name: &str) -> eyre::Result<Option<String>> {
-    let (control_file, extname) = find_control_file()?;
+#[tracing::instrument(level = "error", skip_all, fields(
+    %name,
+    manifest_path = %manifest_path.as_ref().display(),
+))]
+pub fn get_property(manifest_path: impl AsRef<Path>, name: &str) -> eyre::Result<Option<String>> {
+    let (control_file, extname) = find_control_file(manifest_path)?;
 
     if name == "extname" {
         return Ok(Some(extname));
@@ -39,7 +55,8 @@ pub fn get_property(name: &str) -> eyre::Result<Option<String>> {
         return determine_git_hash();
     }
 
-    let control_file = File::open(control_file).unwrap();
+    let control_file = File::open(&control_file)
+        .wrap_err_with(|| eyre!("could not find control file `{}`", control_file.display()))?;
     let reader = BufReader::new(control_file);
 
     for line in reader.lines() {
@@ -62,22 +79,30 @@ pub fn get_property(name: &str) -> eyre::Result<Option<String>> {
     Ok(None)
 }
 
-pub(crate) fn find_control_file() -> eyre::Result<(PathBuf, String)> {
-    for f in std::fs::read_dir(".").wrap_err("cannot open current directory for reading")? {
+pub(crate) fn find_control_file(manifest_path: impl AsRef<Path>) -> eyre::Result<(PathBuf, String)> {
+    let parent = manifest_path
+        .as_ref()
+        .parent()
+        .ok_or_else(|| eyre!("could not get parent of `{}`", manifest_path.as_ref().display()))?;
+    
+    for f in std::fs::read_dir(parent)
+        .wrap_err_with(|| eyre!("cannot open current directory `{}` for reading", parent.display()))? {
         if f.is_ok() {
             if let Ok(f) = f {
-                if f.file_name().to_string_lossy().ends_with(".control") {
-                    let filename = f.file_name().into_string().unwrap();
-                    let mut extname: Vec<&str> = filename.split('.').collect();
-                    extname.pop();
-                    let extname = extname.pop().unwrap();
-                    return Ok((filename.clone().into(), extname.to_string()));
+                let f_path = f.path();
+                if f_path.extension() == Some("control".as_ref()) {
+                    let file_stem = f_path.file_stem()
+                        .ok_or_else(|| eyre!("could not get file stem of `{}`", f_path.display()))?;
+                    let file_stem = file_stem.to_str()
+                        .ok_or_else(|| eyre!("could not get file stem as String from `{}`", f_path.display()))?
+                        .to_string();
+                    return Ok((f_path, file_stem));
                 }
             }
         }
     }
 
-    Err(eyre!("control file not found in current directory"))
+    Err(eyre!("control file not found in `{}`", manifest_path.as_ref().display()))
 }
 
 fn determine_git_hash() -> eyre::Result<Option<String>> {

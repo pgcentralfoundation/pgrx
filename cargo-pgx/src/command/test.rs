@@ -6,7 +6,11 @@ use pgx_utils::{
     get_target_dir,
     pg_config::{PgConfig, PgConfigSelector, Pgx},
 };
-use std::process::{Command, Stdio};
+use cargo_toml::Manifest;
+use std::{
+    process::{Command, Stdio},
+    path::{PathBuf, Path},
+};
 
 use crate::CommandExecute;
 
@@ -19,15 +23,21 @@ pub(crate) struct Test {
     pg_version: Option<String>,
     /// If specified, only run tests containing this string in their names
     testname: Option<String>,
+    /// Package to build (see `cargo help pkgid`)
+    #[clap(long, short)]
+    package: Option<String>,
+    /// Path to Cargo.toml
+    #[clap(long, parse(from_os_str))]
+    manifest_path: Option<PathBuf>,
+    /// Test all packages in the workspace
+    #[clap(long)]
+    workspace: bool,
     /// compile for release mode (default is debug)
     #[clap(env = "PROFILE", long, short)]
     release: bool,
     /// Don't regenerate the schema
     #[clap(long, short)]
     no_schema: bool,
-    /// Test all packages in the workspace
-    #[clap(long)]
-    workspace: bool,
     #[clap(flatten)]
     features: clap_cargo::Features,
     #[clap(from_global, parse(from_occurrences))]
@@ -38,15 +48,21 @@ impl CommandExecute for Test {
     #[tracing::instrument(level = "error", skip(self))]
     fn execute(self) -> eyre::Result<()> {
         let pgx = Pgx::from_config()?;
-        let metadata = crate::metadata::metadata(&self.features)?;
+        
+        let metadata = crate::metadata::metadata(&self.features, self.manifest_path.as_ref())
+            .wrap_err("couldn't get cargo metadata")?;
         crate::metadata::validate(&metadata)?;
-        let manifest = crate::manifest::manifest(&metadata)?;
+        let package_manifest_path = crate::manifest::manifest_path(&metadata, self.package.as_ref())
+            .wrap_err("Couldn't get manifest path")?;
+        let package_manifest = Manifest::from_path(&package_manifest_path)
+            .wrap_err("Couldn't parse manifest")?;
 
         let pg_version = match self.pg_version {
-            Some(s) => s,
-            None => crate::manifest::default_pg_version(&manifest)
+            Some(ref s) => s.clone(),
+            None => crate::manifest::default_pg_version(&package_manifest)
                 .ok_or(eyre!("No provided `pg$VERSION` flag."))?,
         };
+
 
         for pg_config in pgx.iter(PgConfigSelector::new(&pg_version)) {
             let mut testname = self.testname.clone();
@@ -59,7 +75,7 @@ impl CommandExecute for Test {
                     );
                     testname = Some(pg_version.clone());
                     pgx.get(
-                        &crate::manifest::default_pg_version(&manifest)
+                        &crate::manifest::default_pg_version(&package_manifest)
                             .ok_or(eyre!("No provided `pg$VERSION` flag."))?,
                     )?
                 }
@@ -67,20 +83,19 @@ impl CommandExecute for Test {
             };
             let pg_version = format!("pg{}", pg_config.major_version()?);
 
-            let features = crate::manifest::features_for_version(
-                self.features.clone(),
-                &manifest,
-                &pg_version,
-            );
+            let features = crate::manifest::features_for_version(self.features.clone(), &package_manifest, &pg_version);
+
             test_extension(
                 pg_config,
+                self.manifest_path.as_ref(),
+                self.package.as_ref(),
                 self.release,
                 self.no_schema,
-                self.workspace,
                 &features,
                 testname.clone(),
             )?
         }
+
         Ok(())
     }
 }
@@ -92,9 +107,10 @@ impl CommandExecute for Test {
 ))]
 pub fn test_extension(
     pg_config: &PgConfig,
+    user_manifest_path: Option<impl AsRef<Path>>,
+    user_package: Option<&String>,
     is_release: bool,
     no_schema: bool,
-    test_workspace: bool,
     features: &clap_cargo::Features,
     testname: Option<impl AsRef<str>>,
 ) -> eyre::Result<()> {
@@ -160,8 +176,14 @@ pub fn test_extension(
         command.arg("--release");
     }
 
-    if test_workspace {
-        command.arg("--all");
+    if let Some(user_manifest_path) = user_manifest_path {
+        command.arg("--manifest-path");
+        command.arg(user_manifest_path.as_ref());
+    }
+
+    if let Some(user_package) = user_package {
+        command.arg("--package");
+        command.arg(user_package);
     }
 
     if let Some(testname) = testname {

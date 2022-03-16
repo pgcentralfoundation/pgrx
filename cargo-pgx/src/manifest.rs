@@ -1,14 +1,25 @@
 use cargo_metadata::Metadata;
 use cargo_toml::Manifest;
 use eyre::eyre;
+use std::path::PathBuf;
 use pgx_utils::SUPPORTED_MAJOR_VERSIONS;
 
-pub(crate) fn manifest(metadata: &Metadata) -> eyre::Result<Manifest> {
-    let root = metadata
-        .root_package()
-        .ok_or(eyre!("`pgx` requires a root package."))?;
-    let manifest = Manifest::from_path(&root.manifest_path)?;
-    Ok(manifest)
+#[tracing::instrument(skip_all)]
+pub(crate) fn manifest_path(metadata: &Metadata, package_name: Option<&String>) -> eyre::Result<PathBuf> {
+    let manifest_path = if let Some(package_name) = package_name {
+        let found = metadata.packages.iter()
+            .find(|v| v.name == *package_name)
+            .ok_or_else(|| eyre!("Could not find package `{}`", package_name))?;
+        tracing::debug!(manifest_path = %found.manifest_path, "Found workspace package");
+        found.manifest_path.clone().into_std_path_buf()
+    } else {
+        let root = metadata
+            .root_package()
+            .ok_or(eyre!("`pgx` requires a root package in a workspace when `--package` is not specified."))?;
+        tracing::debug!(manifest_path = %root.manifest_path, "Found root package");
+        root.manifest_path.clone().into_std_path_buf()
+    };
+    Ok(manifest_path)
 }
 
 pub(crate) fn default_pg_version(manifest: &Manifest) -> Option<String> {
