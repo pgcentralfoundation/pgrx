@@ -1,71 +1,73 @@
 on: [push]
 
 jobs:
-  check:
-    strategy:
-      matrix:
-        target:
-          - os: ubuntu-latest
-            target: x86_64-linux
-    runs-on: ${{ matrix.target.os }}
-    steps:
-      - uses: actions/checkout@v2
-      - run: |
-          sh <(curl -L https://nixos.org/nix/install) --darwin-use-unencrypted-nix-store-volume
-          . ~/.nix-profile/etc/profile.d/nix.sh
-          nix-env -iA nixpkgs.nixUnstable
-          mkdir -p ~/.config/nix/
-          echo "experimental-features = nix-command flakes" >> ~/.config/nix/nix.conf
-          nix flake show
-          nix flake check --print-build-logs --no-build --verbose
-          
   build:
-    needs: check
     strategy:
+      fail-fast: false
       matrix:
         pg_version:
           - 10
           - 11
           - 12
           - 13
+          - 14
         target:
           - os: ubuntu-latest
             platform: x86_64-linux
           - os: macos-latest
             platform: x86_64-darwin
-          - os: ubuntu-latest
-            platform: aarch64-linux
     runs-on: ${{ matrix.target.os }}
     steps:
-      - uses: actions/checkout@v2
-      - if: ${{ matrix.target.platform == 'aarch64-linux' }} 
-        uses: docker/setup-qemu-action@v1
-        with:
-          image: tonistiigi/binfmt:latest
-          platforms: arm64
-      - run: |
-          sh <(curl -L https://nixos.org/nix/install) --darwin-use-unencrypted-nix-store-volume
-          . ~/.nix-profile/etc/profile.d/nix.sh
-          nix-env -iA nixpkgs.nixUnstable
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install Nix
+        run: |
+          sh <(curl -L https://nixos.org/nix/install) --daemon
+
           mkdir -p ~/.config/nix/
           echo "experimental-features = nix-command flakes" >> ~/.config/nix/nix.conf
+
           mkdir -p ~/.config/nixpkgs/
           echo "{ allowUnsupportedSystem = true; }" > ~/.config/nixpkgs/config.nix
-          export NIXPKGS_ALLOW_UNSUPPORTED_SYSTEM=1
-          
+      - name: Fetch nix store cache
+        id: nix-store-cache
+        if: ${{ matrix.target.os == 'ubuntu-latest' }} 
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/nix-store-cache
+            ~/.config/nix
+            ~/.config/nixpkgs
+          key: ${{ matrix.target.platform }}-${{ matrix.pg_version }}-nix-store-${{ hashfiles('flake.lock') }}-v0
+      - name: Get extension name
+        run: |
           export EXTENSION=$(grep 'name = ".*"' Cargo.toml | sed 's/name = "\(.*\)"$/\1/')
           echo "EXTENSION=${EXTENSION}" >> $GITHUB_ENV
+      - name: Build extension
+        run: |
+          . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+          export NIXPKGS_ALLOW_UNSUPPORTED_SYSTEM=1
 
+          nix flake show
           nix build \
+            ${{ matrix.target.os == 'ubuntu-latest' && '--eval-store local?root=$HOME/nix-store-cache' || '' }} \
+            ${{ matrix.target.os == 'ubuntu-latest' && '--store local?root=$HOME/nix-store-cache' || '' }} \
             --option system ${{ matrix.target.platform }} \
-            .#${EXTENSION}_${{ matrix.pg_version }} \
-            --out-link out-${{ matrix.target.platform }}.${EXTENSION}_${{ matrix.pg_version }} \
+            --out-link out-${{ matrix.target.platform }}.${EXTENSION}_${{ matrix.pg_version }}_debug \
             --print-build-logs \
-            --verbose
+            --verbose \
+            -j2 \
+            .#${EXTENSION}_${{ matrix.pg_version }}_debug
           
-          mkdir -p ${{ matrix.target.platform }}.${EXTENSION}_${{ matrix.pg_version }}
-          cp -L out-${{ matrix.target.platform }}.${EXTENSION}_${{ matrix.pg_version }}/* ${{ matrix.target.platform }}.${EXTENSION}_${{ matrix.pg_version }}/
+          EXTENSION_OUT_DIR=$(readlink out-${{ matrix.target.platform }}.${EXTENSION}_${{ matrix.pg_version }}_debug)
+          mkdir -v -p ${{ matrix.target.platform }}.${EXTENSION}_${{ matrix.pg_version }}_debug
+          sudo rsync -v -L -a \
+            ${{ matrix.target.os == 'ubuntu-latest' && '$HOME/nix-store-cache' || '' }}$EXTENSION_OUT_DIR/* \
+            ${{ matrix.target.platform }}.${EXTENSION}_${{ matrix.pg_version }}_debug
+
+          ${{ matrix.target.os == 'ubuntu-latest' && steps.nix-store-cache.outputs.cache-hit != 'true' && 'nix store optimise --store local?root=$HOME/nix-store-cache' || '' }} \
       - uses: actions/upload-artifact@v2
+        name: Upload artifact
         with:
-          name: ${{ matrix.target.platform }}.${{ env.EXTENSION }}_${{ matrix.pg_version }}
-          path: ${{ matrix.target.platform }}.${{ env.EXTENSION }}_${{ matrix.pg_version }}
+          name: ${{ matrix.target.platform }}.${{ env.EXTENSION }}_${{ matrix.pg_version }}_debug
+          path: ${{ matrix.target.platform }}.${{ env.EXTENSION }}_${{ matrix.pg_version }}_debug
