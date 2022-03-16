@@ -178,7 +178,7 @@ pub const ALIGNOF_LONG: u32 = 8;
 pub const ALIGNOF_PG_INT128_TYPE: u32 = 16;
 pub const ALIGNOF_SHORT: u32 = 2;
 pub const BLCKSZ: u32 = 8192;
-pub const CONFIGURE_ARGS : & [u8 ; 104usize] = b" '--prefix=/home/einar/.pgx/14.2/pgx-install' '--with-pgport=28814' '--enable-debug' '--enable-cassert'\0" ;
+pub const CONFIGURE_ARGS : & [u8 ; 102usize] = b" '--prefix=/home/ana/.pgx/14.2/pgx-install' '--with-pgport=28814' '--enable-debug' '--enable-cassert'\0" ;
 pub const DEF_PGPORT: u32 = 28814;
 pub const DEF_PGPORT_STR: &[u8; 6usize] = b"28814\0";
 pub const ENABLE_THREAD_SAFETY: u32 = 1;
@@ -335,7 +335,7 @@ pub const PG_MINORVERSION_NUM: u32 = 2;
 pub const PG_USE_STDBOOL: u32 = 1;
 pub const PG_VERSION: &[u8; 5usize] = b"14.2\0";
 pub const PG_VERSION_NUM: u32 = 140002;
-pub const PG_VERSION_STR : & [u8 ; 101usize] = b"PostgreSQL 14.2 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 9.3.0-17ubuntu1~20.04) 9.3.0, 64-bit\0" ;
+pub const PG_VERSION_STR : & [u8 ; 96usize] = b"PostgreSQL 14.2 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 11.2.0-7ubuntu2) 11.2.0, 64-bit\0" ;
 pub const RELSEG_SIZE: u32 = 131072;
 pub const SIZEOF_BOOL: u32 = 1;
 pub const SIZEOF_LONG: u32 = 8;
@@ -386,6 +386,10 @@ pub const __USE_POSIX199506: u32 = 1;
 pub const __USE_XOPEN2K: u32 = 1;
 pub const __USE_XOPEN2K8: u32 = 1;
 pub const _ATFILE_SOURCE: u32 = 1;
+pub const __WORDSIZE: u32 = 64;
+pub const __WORDSIZE_TIME64_COMPAT32: u32 = 1;
+pub const __SYSCALL_WORDSIZE: u32 = 64;
+pub const __TIMESIZE: u32 = 64;
 pub const __USE_MISC: u32 = 1;
 pub const __USE_ATFILE: u32 = 1;
 pub const __USE_FORTIFY_LEVEL: u32 = 0;
@@ -397,28 +401,26 @@ pub const __STDC_IEC_559_COMPLEX__: u32 = 1;
 pub const __STDC_ISO_10646__: u32 = 201706;
 pub const __GNU_LIBRARY__: u32 = 6;
 pub const __GLIBC__: u32 = 2;
-pub const __GLIBC_MINOR__: u32 = 31;
+pub const __GLIBC_MINOR__: u32 = 34;
 pub const _SYS_CDEFS_H: u32 = 1;
 pub const __glibc_c99_flexarr_available: u32 = 1;
-pub const __WORDSIZE: u32 = 64;
-pub const __WORDSIZE_TIME64_COMPAT32: u32 = 1;
-pub const __SYSCALL_WORDSIZE: u32 = 64;
-pub const __LONG_DOUBLE_USES_FLOAT128: u32 = 0;
+pub const __LDOUBLE_REDIRECTS_TO_FLOAT128_ABI: u32 = 0;
 pub const __HAVE_GENERIC_SELECTION: u32 = 1;
 pub const __GLIBC_USE_LIB_EXT2: u32 = 0;
 pub const __GLIBC_USE_IEC_60559_BFP_EXT: u32 = 0;
 pub const __GLIBC_USE_IEC_60559_BFP_EXT_C2X: u32 = 0;
+pub const __GLIBC_USE_IEC_60559_EXT: u32 = 0;
 pub const __GLIBC_USE_IEC_60559_FUNCS_EXT: u32 = 0;
 pub const __GLIBC_USE_IEC_60559_FUNCS_EXT_C2X: u32 = 0;
 pub const __GLIBC_USE_IEC_60559_TYPES_EXT: u32 = 0;
 pub const __GNUC_VA_LIST: u32 = 1;
 pub const _BITS_TYPES_H: u32 = 1;
-pub const __TIMESIZE: u32 = 64;
 pub const _BITS_TYPESIZES_H: u32 = 1;
 pub const __OFF_T_MATCHES_OFF64_T: u32 = 1;
 pub const __INO_T_MATCHES_INO64_T: u32 = 1;
 pub const __RLIM_T_MATCHES_RLIM64_T: u32 = 1;
 pub const __STATFS_MATCHES_STATFS64: u32 = 1;
+pub const __KERNEL_OLD_TIMEVAL_MATCHES_TIMEVAL64: u32 = 1;
 pub const __FD_SETSIZE: u32 = 1024;
 pub const _BITS_TIME64_H: u32 = 1;
 pub const _____fpos_t_defined: u32 = 1;
@@ -445,19 +447,6 @@ pub const TMP_MAX: u32 = 238328;
 pub const FILENAME_MAX: u32 = 4096;
 pub const L_ctermid: u32 = 9;
 pub const FOPEN_MAX: u32 = 16;
-pub const _STDLIB_H: u32 = 1;
-pub const WNOHANG: u32 = 1;
-pub const WUNTRACED: u32 = 2;
-pub const WSTOPPED: u32 = 2;
-pub const WEXITED: u32 = 4;
-pub const WCONTINUED: u32 = 8;
-pub const WNOWAIT: u32 = 16777216;
-pub const __WNOTHREAD: u32 = 536870912;
-pub const __WALL: u32 = 1073741824;
-pub const __WCLONE: u32 = 2147483648;
-pub const __ENUM_IDTYPE_T: u32 = 1;
-pub const __W_CONTINUED: u32 = 65535;
-pub const __WCOREFLAG: u32 = 128;
 pub const __HAVE_FLOAT128: u32 = 0;
 pub const __HAVE_DISTINCT_FLOAT128: u32 = 0;
 pub const __HAVE_FLOAT64X: u32 = 1;
@@ -474,6 +463,18 @@ pub const __HAVE_DISTINCT_FLOAT32X: u32 = 0;
 pub const __HAVE_DISTINCT_FLOAT64X: u32 = 0;
 pub const __HAVE_DISTINCT_FLOAT128X: u32 = 0;
 pub const __HAVE_FLOATN_NOT_TYPEDEF: u32 = 0;
+pub const _STDLIB_H: u32 = 1;
+pub const WNOHANG: u32 = 1;
+pub const WUNTRACED: u32 = 2;
+pub const WSTOPPED: u32 = 2;
+pub const WEXITED: u32 = 4;
+pub const WCONTINUED: u32 = 8;
+pub const WNOWAIT: u32 = 16777216;
+pub const __WNOTHREAD: u32 = 536870912;
+pub const __WALL: u32 = 1073741824;
+pub const __WCLONE: u32 = 2147483648;
+pub const __W_CONTINUED: u32 = 65535;
+pub const __WCOREFLAG: u32 = 128;
 pub const __ldiv_t_defined: u32 = 1;
 pub const __lldiv_t_defined: u32 = 1;
 pub const RAND_MAX: u32 = 2147483647;
@@ -501,7 +502,6 @@ pub const BYTE_ORDER: u32 = 1234;
 pub const _BITS_BYTESWAP_H: u32 = 1;
 pub const _BITS_UINTN_IDENTITY_H: u32 = 1;
 pub const _SYS_SELECT_H: u32 = 1;
-pub const __FD_ZERO_STOS: &[u8; 6usize] = b"stosq\0";
 pub const __sigset_t_defined: u32 = 1;
 pub const __timeval_defined: u32 = 1;
 pub const _STRUCT_TIMESPEC: u32 = 1;
@@ -981,6 +981,9 @@ pub const SO_TIMESTAMPING_NEW: u32 = 65;
 pub const SO_RCVTIMEO_NEW: u32 = 66;
 pub const SO_SNDTIMEO_NEW: u32 = 67;
 pub const SO_DETACH_REUSEPORT_BPF: u32 = 68;
+pub const SO_PREFER_BUSY_POLL: u32 = 69;
+pub const SO_BUSY_POLL_BUDGET: u32 = 70;
+pub const SO_NETNS_COOKIE: u32 = 71;
 pub const SO_TIMESTAMP: u32 = 29;
 pub const SO_TIMESTAMPNS: u32 = 35;
 pub const SO_TIMESTAMPING: u32 = 37;
@@ -1039,6 +1042,7 @@ pub const IP_NODEFRAG: u32 = 22;
 pub const IP_CHECKSUM: u32 = 23;
 pub const IP_BIND_ADDRESS_NO_PORT: u32 = 24;
 pub const IP_RECVFRAGSIZE: u32 = 25;
+pub const IP_RECVERR_RFC4884: u32 = 26;
 pub const IP_PMTUDISC_DONT: u32 = 0;
 pub const IP_PMTUDISC_WANT: u32 = 1;
 pub const IP_PMTUDISC_DO: u32 = 2;
@@ -1074,6 +1078,7 @@ pub const IPV6_JOIN_ANYCAST: u32 = 27;
 pub const IPV6_LEAVE_ANYCAST: u32 = 28;
 pub const IPV6_MULTICAST_ALL: u32 = 29;
 pub const IPV6_ROUTER_ALERT_ISOLATE: u32 = 30;
+pub const IPV6_RECVERR_RFC4884: u32 = 31;
 pub const IPV6_IPSEC_POLICY: u32 = 34;
 pub const IPV6_XFRM_POLICY: u32 = 35;
 pub const IPV6_HDRINCL: u32 = 36;
@@ -1205,6 +1210,7 @@ pub const M_SQRT2: f64 = 1.4142135623730951;
 pub const M_SQRT1_2: f64 = 0.7071067811865476;
 pub const _SETJMP_H: u32 = 1;
 pub const _BITS_SETJMP_H: u32 = 1;
+pub const __jmp_buf_tag_defined: u32 = 1;
 pub const DEBUG5: u32 = 10;
 pub const DEBUG4: u32 = 11;
 pub const DEBUG3: u32 = 12;
@@ -1360,10 +1366,7 @@ pub const AT_REMOVEDIR: u32 = 512;
 pub const AT_SYMLINK_FOLLOW: u32 = 1024;
 pub const AT_EACCESS: u32 = 512;
 pub const _BITS_STAT_H: u32 = 1;
-pub const _STAT_VER_KERNEL: u32 = 0;
-pub const _STAT_VER_LINUX: u32 = 1;
-pub const _MKNOD_VER_LINUX: u32 = 0;
-pub const _STAT_VER: u32 = 1;
+pub const _BITS_STRUCT_STAT_H: u32 = 1;
 pub const __S_IFMT: u32 = 61440;
 pub const __S_IFDIR: u32 = 16384;
 pub const __S_IFCHR: u32 = 8192;
@@ -2050,7 +2053,6 @@ pub const EXEC_FLAG_BACKWARD: u32 = 4;
 pub const EXEC_FLAG_MARK: u32 = 8;
 pub const EXEC_FLAG_SKIP_TRIGGERS: u32 = 16;
 pub const EXEC_FLAG_WITH_NO_DATA: u32 = 32;
-pub const _BITS_SIGNUM_H: u32 = 1;
 pub const _BITS_SIGNUM_GENERIC_H: u32 = 1;
 pub const SIGINT: u32 = 2;
 pub const SIGILL: u32 = 4;
@@ -2062,33 +2064,34 @@ pub const SIGHUP: u32 = 1;
 pub const SIGQUIT: u32 = 3;
 pub const SIGTRAP: u32 = 5;
 pub const SIGKILL: u32 = 9;
-pub const SIGBUS: u32 = 10;
-pub const SIGSYS: u32 = 12;
 pub const SIGPIPE: u32 = 13;
 pub const SIGALRM: u32 = 14;
-pub const SIGURG: u32 = 16;
-pub const SIGSTOP: u32 = 17;
-pub const SIGTSTP: u32 = 18;
-pub const SIGCONT: u32 = 19;
-pub const SIGCHLD: u32 = 20;
-pub const SIGTTIN: u32 = 21;
-pub const SIGTTOU: u32 = 22;
-pub const SIGPOLL: u32 = 23;
-pub const SIGXCPU: u32 = 24;
-pub const SIGXFSZ: u32 = 25;
-pub const SIGVTALRM: u32 = 26;
-pub const SIGPROF: u32 = 27;
-pub const SIGUSR1: u32 = 30;
-pub const SIGUSR2: u32 = 31;
-pub const SIGWINCH: u32 = 28;
-pub const SIGIO: u32 = 23;
 pub const SIGIOT: u32 = 6;
-pub const SIGCLD: u32 = 20;
-pub const __SIGRTMIN: u32 = 32;
-pub const __SIGRTMAX: u32 = 32;
-pub const _NSIG: u32 = 33;
+pub const _BITS_SIGNUM_ARCH_H: u32 = 1;
 pub const SIGSTKFLT: u32 = 16;
 pub const SIGPWR: u32 = 30;
+pub const SIGBUS: u32 = 7;
+pub const SIGSYS: u32 = 31;
+pub const SIGURG: u32 = 23;
+pub const SIGSTOP: u32 = 19;
+pub const SIGTSTP: u32 = 20;
+pub const SIGCONT: u32 = 18;
+pub const SIGCHLD: u32 = 17;
+pub const SIGTTIN: u32 = 21;
+pub const SIGTTOU: u32 = 22;
+pub const SIGPOLL: u32 = 29;
+pub const SIGXFSZ: u32 = 25;
+pub const SIGXCPU: u32 = 24;
+pub const SIGVTALRM: u32 = 26;
+pub const SIGPROF: u32 = 27;
+pub const SIGUSR1: u32 = 10;
+pub const SIGUSR2: u32 = 12;
+pub const SIGWINCH: u32 = 28;
+pub const SIGIO: u32 = 29;
+pub const SIGCLD: u32 = 17;
+pub const __SIGRTMIN: u32 = 32;
+pub const __SIGRTMAX: u32 = 64;
+pub const _NSIG: u32 = 65;
 pub const __sig_atomic_t_defined: u32 = 1;
 pub const __siginfo_t_defined: u32 = 1;
 pub const __SI_MAX_SIZE: u32 = 128;
@@ -2100,7 +2103,7 @@ pub const __SI_ASYNCIO_AFTER_SIGIO: u32 = 1;
 pub const __sigevent_t_defined: u32 = 1;
 pub const __SIGEV_MAX_SIZE: u32 = 64;
 pub const _BITS_SIGEVENT_CONSTS_H: u32 = 1;
-pub const NSIG: u32 = 33;
+pub const NSIG: u32 = 65;
 pub const _BITS_SIGACTION_H: u32 = 1;
 pub const SA_NOCLDSTOP: u32 = 1;
 pub const SA_NOCLDWAIT: u32 = 2;
@@ -3124,6 +3127,7 @@ pub type __id_t = ::std::os::raw::c_uint;
 pub type __time_t = ::std::os::raw::c_long;
 pub type __useconds_t = ::std::os::raw::c_uint;
 pub type __suseconds_t = ::std::os::raw::c_long;
+pub type __suseconds64_t = ::std::os::raw::c_long;
 pub type __daddr_t = ::std::os::raw::c_int;
 pub type __key_t = ::std::os::raw::c_int;
 pub type __clockid_t = ::std::os::raw::c_int;
@@ -3302,11 +3306,15 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
+    pub fn fclose(__stream: *mut FILE) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
     pub fn tmpfile() -> *mut FILE;
 }
 #[pg_guard]
 extern "C" {
-    pub fn tmpnam(__s: *mut ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
+    pub fn tmpnam(arg1: *mut ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
 }
 #[pg_guard]
 extern "C" {
@@ -3318,10 +3326,6 @@ extern "C" {
         __dir: *const ::std::os::raw::c_char,
         __pfx: *const ::std::os::raw::c_char,
     ) -> *mut ::std::os::raw::c_char;
-}
-#[pg_guard]
-extern "C" {
-    pub fn fclose(__stream: *mut FILE) -> ::std::os::raw::c_int;
 }
 #[pg_guard]
 extern "C" {
@@ -3484,6 +3488,10 @@ extern "C" {
         ...
     ) -> ::std::os::raw::c_int;
 }
+pub type _Float32 = f32;
+pub type _Float64 = f64;
+pub type _Float32x = f64;
+pub type _Float64x = u128;
 #[pg_guard]
 extern "C" {
     #[link_name = "\u{1}__isoc99_fscanf"]
@@ -3761,14 +3769,6 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
-    pub static mut sys_nerr: ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
-    pub static mut sys_errlist: [*const ::std::os::raw::c_char; 0usize];
-}
-#[pg_guard]
-extern "C" {
     pub fn fileno(__stream: *mut FILE) -> ::std::os::raw::c_int;
 }
 #[pg_guard]
@@ -3777,14 +3777,14 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
+    pub fn pclose(__stream: *mut FILE) -> ::std::os::raw::c_int;
+}
+#[pg_guard]
+extern "C" {
     pub fn popen(
         __command: *const ::std::os::raw::c_char,
         __modes: *const ::std::os::raw::c_char,
     ) -> *mut FILE;
-}
-#[pg_guard]
-extern "C" {
-    pub fn pclose(__stream: *mut FILE) -> ::std::os::raw::c_int;
 }
 #[pg_guard]
 extern "C" {
@@ -3811,14 +3811,6 @@ extern "C" {
     pub fn __overflow(arg1: *mut FILE, arg2: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
 }
 pub type wchar_t = ::std::os::raw::c_int;
-pub const idtype_t_P_ALL: idtype_t = 0;
-pub const idtype_t_P_PID: idtype_t = 1;
-pub const idtype_t_P_PGID: idtype_t = 2;
-pub type idtype_t = ::std::os::raw::c_uint;
-pub type _Float32 = f32;
-pub type _Float64 = f64;
-pub type _Float32x = f64;
-pub type _Float64x = u128;
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct div_t {
@@ -4145,6 +4137,13 @@ impl Default for __pthread_cond_s {
             s.assume_init()
         }
     }
+}
+pub type __tss_t = ::std::os::raw::c_uint;
+pub type __thrd_t = ::std::os::raw::c_ulong;
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct __once_flag {
+    pub __data: ::std::os::raw::c_int,
 }
 pub type pthread_t = ::std::os::raw::c_ulong;
 #[repr(C)]
@@ -4495,15 +4494,15 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
+    pub fn free(__ptr: *mut ::std::os::raw::c_void);
+}
+#[pg_guard]
+extern "C" {
     pub fn reallocarray(
         __ptr: *mut ::std::os::raw::c_void,
         __nmemb: usize,
         __size: usize,
     ) -> *mut ::std::os::raw::c_void;
-}
-#[pg_guard]
-extern "C" {
-    pub fn free(__ptr: *mut ::std::os::raw::c_void);
 }
 #[pg_guard]
 extern "C" {
@@ -4523,7 +4522,10 @@ extern "C" {
 }
 #[pg_guard]
 extern "C" {
-    pub fn aligned_alloc(__alignment: usize, __size: usize) -> *mut ::std::os::raw::c_void;
+    pub fn aligned_alloc(
+        __alignment: ::std::os::raw::c_ulong,
+        __size: ::std::os::raw::c_ulong,
+    ) -> *mut ::std::os::raw::c_void;
 }
 #[pg_guard]
 extern "C" {
@@ -5694,6 +5696,7 @@ pub struct __kernel_fsid_t {
 }
 pub type __kernel_off_t = __kernel_long_t;
 pub type __kernel_loff_t = ::std::os::raw::c_longlong;
+pub type __kernel_old_time_t = __kernel_long_t;
 pub type __kernel_time_t = __kernel_long_t;
 pub type __kernel_time64_t = ::std::os::raw::c_longlong;
 pub type __kernel_clock_t = __kernel_long_t;
@@ -5933,8 +5936,10 @@ pub const IPPROTO_COMP: ::std::os::raw::c_uint = 108;
 pub const IPPROTO_SCTP: ::std::os::raw::c_uint = 132;
 pub const IPPROTO_UDPLITE: ::std::os::raw::c_uint = 136;
 pub const IPPROTO_MPLS: ::std::os::raw::c_uint = 137;
+pub const IPPROTO_ETHERNET: ::std::os::raw::c_uint = 143;
 pub const IPPROTO_RAW: ::std::os::raw::c_uint = 255;
-pub const IPPROTO_MAX: ::std::os::raw::c_uint = 256;
+pub const IPPROTO_MPTCP: ::std::os::raw::c_uint = 262;
+pub const IPPROTO_MAX: ::std::os::raw::c_uint = 263;
 pub type _bindgen_ty_5 = ::std::os::raw::c_uint;
 pub const IPPROTO_HOPOPTS: ::std::os::raw::c_uint = 0;
 pub const IPPROTO_ROUTING: ::std::os::raw::c_uint = 43;
@@ -25219,6 +25224,8 @@ pub const SEGV_PKUERR: ::std::os::raw::c_uint = 4;
 pub const SEGV_ACCADI: ::std::os::raw::c_uint = 5;
 pub const SEGV_ADIDERR: ::std::os::raw::c_uint = 6;
 pub const SEGV_ADIPERR: ::std::os::raw::c_uint = 7;
+pub const SEGV_MTEAERR: ::std::os::raw::c_uint = 8;
+pub const SEGV_MTESERR: ::std::os::raw::c_uint = 9;
 pub type _bindgen_ty_13 = ::std::os::raw::c_uint;
 pub const BUS_ADRALN: ::std::os::raw::c_uint = 1;
 pub const BUS_ADRERR: ::std::os::raw::c_uint = 2;
@@ -25459,14 +25466,6 @@ extern "C" {
         __sig: ::std::os::raw::c_int,
         __val: sigval,
     ) -> ::std::os::raw::c_int;
-}
-#[pg_guard]
-extern "C" {
-    pub static _sys_siglist: [*const ::std::os::raw::c_char; 65usize];
-}
-#[pg_guard]
-extern "C" {
-    pub static sys_siglist: [*const ::std::os::raw::c_char; 65usize];
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
