@@ -28,7 +28,7 @@ impl Internal {
     /// Construct a new Internal from any type.  
     ///
     /// The value will be dropped when the [PgMemoryContexts::CurrentMemoryContext] is deleted.
-    #[inline]
+    #[inline(always)]
     pub fn new<T>(t: T) -> Self {
         Self(Some(
             PgMemoryContexts::CurrentMemoryContext.leak_and_drop_on_delete(t) as pg_sys::Datum,
@@ -36,7 +36,7 @@ impl Internal {
     }
 
     /// Returns true if the internal value is initialized. If false, this is a null pointer.
-    #[inline]
+    #[inline(always)]
     pub fn initialized(&self) -> bool {
         self.0.is_some()
     }
@@ -48,7 +48,7 @@ impl Internal {
     ///
     /// We cannot guarantee that the contained datum points to memory that is really `T`.  This is
     /// your responsibility.
-    #[inline]
+    #[inline(always)]
     pub unsafe fn get<T>(&self) -> Option<&T> {
         self.0.and_then(|datum| (datum as *const T).as_ref())
     }
@@ -63,7 +63,7 @@ impl Internal {
     ///
     /// We cannot guarantee that the contained datum points to memory that is really `T`.  This is
     /// your responsibility.
-    #[inline]
+    #[inline(always)]
     pub unsafe fn insert<T>(&mut self, value: T) -> &mut T {
         let datum =
             PgMemoryContexts::CurrentMemoryContext.leak_and_drop_on_delete(value) as pg_sys::Datum;
@@ -78,7 +78,7 @@ impl Internal {
     ///
     /// We cannot guarantee that the contained datum points to memory that is really `T`.  This is
     /// your responsibility.
-    #[inline]
+    #[inline(always)]
     pub unsafe fn get_mut<T>(&self) -> Option<&mut T> {
         self.0.and_then(|datum| (datum as *mut T).as_mut())
     }
@@ -92,13 +92,9 @@ impl Internal {
     ///
     /// We cannot guarantee that the contained datum points to memory that is really `T`.  This is
     /// your responsibility.
+    #[inline(always)]
     pub unsafe fn get_or_insert<T>(&mut self, value: T) -> &mut T {
-        let ptr = self.0.get_or_insert({
-            let datum = PgMemoryContexts::CurrentMemoryContext.leak_and_drop_on_delete(value)
-                as pg_sys::Datum;
-            datum
-        });
-        &mut *(*ptr as *mut T)
+        self.get_or_insert_with(|| value)
     }
 
     /// Initializes the internal with a default if it is not initialized, then returns a mutable reference
@@ -110,17 +106,12 @@ impl Internal {
     ///
     /// We cannot guarantee that the contained datum points to memory that is really `T`.  This is
     /// your responsibility.
+    #[inline(always)]
     pub unsafe fn get_or_insert_default<T>(&mut self) -> &mut T
     where
         T: Default,
     {
-        let ptr = self.0.get_or_insert({
-            let default = T::default();
-            let datum = PgMemoryContexts::CurrentMemoryContext.leak_and_drop_on_delete(default)
-                as pg_sys::Datum;
-            datum
-        });
-        &mut *(*ptr as *mut T)
+        self.get_or_insert_with(|| T::default())
     }
 
     /// Inserts a value computed from `f` into the internal if it is `None`, then returns a mutable reference
@@ -130,6 +121,7 @@ impl Internal {
     ///
     /// We cannot guarantee that the contained datum points to memory that is really `T`.  This is
     /// your responsibility.
+    #[inline(always)]
     pub unsafe fn get_or_insert_with<F, T>(&mut self, f: F) -> &mut T
     where
         F: FnOnce() -> T,
@@ -144,7 +136,7 @@ impl Internal {
     }
 
     /// Returns the contained `Option<pg_sys::Datum>`
-    #[inline]
+    #[inline(always)]
     pub fn unwrap(self) -> Option<pg_sys::Datum> {
         self.0
     }
