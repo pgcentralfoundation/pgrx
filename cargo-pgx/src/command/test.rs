@@ -196,10 +196,10 @@ pub fn test_extension(
     let status = command.status().wrap_err("failed to run cargo test")?;
     tracing::trace!(status_code = %status, command = ?command, "Finished");
     if !status.success() {
-        return Err(eyre!(
-            "cargo pgx test failed with status = {:?}",
-            status.code()
-        ));
+        if !status.success() {
+            // We explicitly do not want to return a spantraced error here.
+            std::process::exit(1)
+        }
     }
 
     Ok(())
