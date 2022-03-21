@@ -1,41 +1,74 @@
 [package]
-name = "cargo-pgx"
-version = "0.4.0-beta.0"
 authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
-license = "MIT"
-description = "Cargo subcommand for 'pgx' to make Postgres extension development easy"
-homepage = "https://github.com/zombodb/pgx"
-repository = "https://github.com/zombodb/pgx"
-documentation = "https://docs.rs/cargo-pgx"
 categories = ["development-tools::cargo-plugins", "command-line-utilities", "database"]
-keywords = ["database", "postgres", "postgresql", "extension"]
-readme = "README.md"
-exclude = [ "*.png" ]
+description = "Cargo subcommand for 'pgx' to make Postgres extension development easy"
+documentation = "https://docs.rs/cargo-pgx"
 edition = "2021"
-
+exclude = ["*.png"]
+homepage = "https://github.com/zombodb/pgx"
+keywords = ["database", "postgres", "postgresql", "extension"]
+license = "MIT"
+name = "cargo-pgx"
+readme = "README.md"
+repository = "https://github.com/zombodb/pgx"
+version = "0.4.0-beta.0"
 [dependencies]
 atty = "0.2"
 cargo_metadata = "0.14.2"
 cargo_toml = "0.11.4"
-clap = { version = "3.1.2", features = [ "env", "suggestions", "cargo", "derive" ] }
-clap-cargo = { version = "0.8.0", features = [ "cargo_metadata" ] }
-semver = "1.0.6"
-owo-colors = { version = "3.2.0", features = [ "supports-colors" ] }
+color-eyre = "0.6.1"
+convert_case = "*"
 env_proxy = "0.4.1"
+eyre = "0.6.7"
+fork = "0.1.18"
+handlebars = "4.2.2"
+libloading = "0.7.3"
 num_cpus = "1.13.1"
-pgx-utils = { path = "../pgx-utils", version = "0.4.0-beta.0" }
-proc-macro2 = { version = "1.0.36", features = [ "span-locations" ] }
 quote = "1.0.15"
 rayon = "1.5.1"
 regex = "1.5.4"
-rttp_client = { version = "0.1.0", features = ["tls-native"] }
-syn = { version = "1.0.86", features = [ "extra-traits", "full", "fold", "parsing" ] }
-unescape = "0.1.0"
-fork = "0.1.18"
-libloading = "0.7.3"
+semver = "1.0.6"
+serde = "1.0.136"
+serde_json = "1.0.59"
+structmap = "0.1.5"
+structmap-derive = "*"
 symbolic = "8.6.1"
-eyre = "0.6.7"
-color-eyre = "0.6.1"
 tracing = "0.1.31"
 tracing-error = "0.2.0"
-tracing-subscriber = { version = "0.3.9", features = [ "env-filter" ] }
+unescape = "0.1.0"
+
+[dependencies.clap]
+features = ["env", "suggestions", "cargo", "derive"]
+version = "3.1.2"
+
+[dependencies.clap-cargo]
+features = ["cargo_metadata"]
+version = "0.8.0"
+
+[dependencies.include_dir]
+features = ["glob"]
+version = "0.7.2"
+
+[dependencies.owo-colors]
+features = ["supports-colors"]
+version = "3.2.0"
+
+[dependencies.pgx-utils]
+path = "../pgx-utils"
+version = "0.4.0-beta.0"
+
+[dependencies.proc-macro2]
+features = ["span-locations"]
+version = "1.0.36"
+
+[dependencies.rttp_client]
+features = ["tls-native"]
+version = "0.1.0"
+
+[dependencies.syn]
+features = ["extra-traits", "full", "fold", "parsing"]
+version = "1.0.86"
+
+[dependencies.tracing-subscriber]
+features = ["env-filter"]
+version = "0.3.9"

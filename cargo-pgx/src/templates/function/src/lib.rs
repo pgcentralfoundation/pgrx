@@ -3,30 +3,30 @@ use pgx::*;
 pg_module_magic!();
 
 #[pg_extern]
-fn hello_{name}() -> &'static str {{
-    "Hello, {name}"
-}}
+fn hello_{{ name }}() -> &'static str {
+    "Hello, {{ name }}"
+}
 
 #[cfg(any(test, feature = "pg_test"))]
 #[pg_schema]
-mod tests {{
+mod tests {
     use pgx::*;
 
     #[pg_test]
-    fn test_hello_{name}() {{
-        assert_eq!("Hello, {name}", crate::hello_{name}());
-    }}
+    fn test_hello_{{ name }}() {
+        assert_eq!("Hello, {{ name }}", crate::hello_{{ name }}());
+    }
 
-}}
+}
 
 #[cfg(test)]
-pub mod pg_test {{
-    pub fn setup(_options: Vec<&str>) {{
+pub mod pg_test {
+    pub fn setup(_options: Vec<&str>) {
         // perform one-off initialization when the pg_test framework starts
-    }}
+    }
 
-    pub fn postgresql_conf_options() -> Vec<&'static str> {{
+    pub fn postgresql_conf_options() -> Vec<&'static str> {
         // return any postgresql.conf settings that are required for your tests
         vec![]
-    }}
-}}
+    }
+}

@@ -21,19 +21,19 @@ pg_module_magic!();
 
 #[allow(non_snake_case)]
 #[pg_guard]
-pub extern "C" fn _PG_init() {{
-    BackgroundWorkerBuilder::new("{name}")
+pub extern "C" fn _PG_init() {
+    BackgroundWorkerBuilder::new("{{ name }}")
         .set_function("background_worker_main")
-        .set_library("{name}")
+        .set_library("{{ name }}")
         .set_argument(42i32.into_datum())
         .enable_spi_access()
         .load();
-}}
+}
 
 #[pg_guard]
 #[no_mangle]
-pub extern "C" fn background_worker_main(arg: pg_sys::Datum) {{
-    let arg = unsafe {{ i32::from_datum(arg, false, pg_sys::INT4OID) }};
+pub extern "C" fn background_worker_main(arg: pg_sys::Datum) {
+    let arg = unsafe { i32::from_datum(arg, false, pg_sys::INT4OID) };
 
     // these are the signals we want to receive.  If we don't attach the SIGTERM handler, then
     // we'll never be able to exit via an external notification
@@ -43,37 +43,37 @@ pub extern "C" fn background_worker_main(arg: pg_sys::Datum) {{
     BackgroundWorker::connect_worker_to_spi(Some("postgres"), None);
 
     log!(
-        "Background Worker '{{}}' is starting.  Argument={{}}",
+        "Background Worker '{}' is starting.  Argument={}",
         BackgroundWorker::get_name(),
         arg.unwrap()
     );
 
     // wake up every 10s or if we received a SIGTERM
-    while BackgroundWorker::wait_latch(Some(Duration::from_secs(10))) {{
-        if BackgroundWorker::sighup_received() {{
+    while BackgroundWorker::wait_latch(Some(Duration::from_secs(10))) {
+        if BackgroundWorker::sighup_received() {
             // on SIGHUP, you might want to reload some external configuration or something
-        }}
+        }
 
         // within a transaction, execute an SQL statement, and log its results
-        BackgroundWorker::transaction(|| {{
-            Spi::execute(|client| {{
+        BackgroundWorker::transaction(|| {
+            Spi::execute(|client| {
                 let tuple_table = client.select(
                     "SELECT 'Hi', id, ''||a FROM (SELECT id, 42 from generate_series(1,10) id) a ",
                     None,
                     None,
                 );
-                tuple_table.for_each(|tuple| {{
+                tuple_table.for_each(|tuple| {
                     let a = tuple.by_ordinal(1).unwrap().value::<String>().unwrap();
                     let b = tuple.by_ordinal(2).unwrap().value::<i32>().unwrap();
                     let c = tuple.by_ordinal(3).unwrap().value::<String>().unwrap();
-                    log!("from bgworker: ({{}}, {{}}, {{}})", a, b, c);
-                }});
-            }});
-        }});
-    }}
+                    log!("from bgworker: ({}, {}, {})", a, b, c);
+                });
+            });
+        });
+    }
 
     log!(
-        "Background Worker '{{}}' is exiting",
+        "Background Worker '{}' is exiting",
         BackgroundWorker::get_name()
     );
-}}
+}
