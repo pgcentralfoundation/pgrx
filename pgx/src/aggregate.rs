@@ -410,6 +410,7 @@ where
         fcinfo: FunctionCallInfo,
     ) -> Self::Finalize;
 
+    #[inline(always)]
     unsafe fn memory_context(fcinfo: FunctionCallInfo) -> Option<MemoryContext> {
         if fcinfo.is_null() {
             return Some(CurrentMemoryContext);
@@ -424,6 +425,7 @@ where
         }
     }
 
+    #[inline(always)]
     fn in_memory_context<
         R,
         F: FnOnce(&mut PgMemoryContexts) -> R + std::panic::UnwindSafe + std::panic::RefUnwindSafe,
