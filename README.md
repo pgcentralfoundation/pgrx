@@ -8,6 +8,10 @@
 
 ![Logo](logo.png)
 
+# 🚨 NOTICE 🚨
+
+This repo has relocated from `https://github.com/zombodb/pgx` to this location (`https://github.com/tcdi/pgx`).  You may need to update your remote in `.git/config` to reflect this change.
+
 # pgx
 
 ###### Build Postgres Extensions with Rust!
