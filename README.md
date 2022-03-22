@@ -70,7 +70,7 @@ Postgres Type | Rust Type (as `Option<T>`)
 `double precision` | `f64`
 `bool` | `bool`
 `json` | `pgx::Json(serde_json::Value)`
-`jsonb` | `pgx::Json(serde_json::Value)`
+`jsonb` | `pgx::JsonB(serde_json::Value)`
 `date` | `pgx::Date`
 `time` | `pgx::Time`
 `timestamp` | `pgx::Timestamp`
@@ -145,7 +145,7 @@ Next, `pgx` needs to be initialized.  You only need to do this once.
 $ cargo pgx init
 ```
 
-The `init` command downloads Postgres versions v10, v11, v12, v13, compiles them to `~/.pgx/`, and runs `initdb`.
+The `init` command downloads Postgres versions v10, v11, v12, v13, v14 compiles them to `~/.pgx/`, and runs `initdb`.
 These installations are needed by `pgx` not only for auto-generating Rust bindings from each version's header files,
 but also for `pgx`'s test framework.
 
@@ -177,7 +177,7 @@ The new extension includes an example, so you can go ahead and run it right away
 ### 4. Run your extension
 
 ```shell script
-$ cargo pgx run pg13  # or pg10 or pg11 or pg12
+$ cargo pgx run pg13  # or pg10 or pg11 or pg12 or pg14
 ```
 
 This compiles the extension to a shared library, copies it to the specified Postgres installation (in `~/.pgx/`),
