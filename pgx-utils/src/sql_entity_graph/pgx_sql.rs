@@ -254,13 +254,13 @@ impl PgxSql {
                 easy::HighlightLines,
                 highlighting::{Style, ThemeSet},
                 parsing::SyntaxSet,
-                util::{as_24_bit_terminal_escaped, LinesWithEndings},
+                util::LinesWithEndings,
             };
             let ps = SyntaxSet::load_defaults_newlines();
             let theme_bytes = include_str!("../../assets/ansi.tmTheme").as_bytes();
             let mut theme_reader = std::io::Cursor::new(theme_bytes);
             let theme = ThemeSet::load_from_reader(&mut theme_reader)
-                .wrap_err("Couldn't parse theme for SQL.")?;
+                .wrap_err("Couldn't parse theme for SQL highlighting, try piping to a file")?;
 
             if let Some(syntax) = ps.find_syntax_by_extension("sql") {
                 let mut h = HighlightLines::new(syntax, &theme);
