@@ -261,7 +261,7 @@ impl PgxSql {
                 if &std::env::var("PGX_TERMINAL_THEME").unwrap_or("dark".to_string()) == "light" {
                     &ts.themes["base16-ocean.light"]
                 } else {
-                    &ts.themes["base16-ocean.dark"]
+                    &ts.themes["base16-eighties.dark"]
                 };
 
             if let Some(syntax) = ps.find_syntax_by_extension("sql") {
