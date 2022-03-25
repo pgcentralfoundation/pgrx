@@ -61,10 +61,4 @@ done
 
 cargo generate-lockfile
 
-for example in ./pgx-examples/*/; do
-    pushd ${example}
-    cargo generate-lockfile
-    popd
-done
-
 PGX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE=1 cargo test --no-run --workspace --no-default-features --features "pg14"
