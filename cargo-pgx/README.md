@@ -528,8 +528,6 @@ OPTIONS:
 If you just want to look at the full extension schema that pgx will generate, use
 `cargo pgx schema`.
 
-If you're a light terminal user, you can set `PGX_TERMINAL_THEME="light"` to have `cargo pgx schema` output a light colored them instead of a dark theme to `stdout`.
-
 ```shell script
 $ cargo pgx schema --help
 cargo-pgx-schema 0.3.3
