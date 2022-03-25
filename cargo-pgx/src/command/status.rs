@@ -1,7 +1,7 @@
 // Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
 // governed by the MIT license that can be found in the LICENSE file.
 
-use eyre::{eyre};
+use eyre::eyre;
 use owo_colors::OwoColorize;
 use pgx_utils::pg_config::{PgConfig, PgConfigSelector, Pgx};
 use std::{
@@ -33,7 +33,12 @@ impl CommandExecute for Status {
     fn execute(self) -> eyre::Result<()> {
         let pgx = Pgx::from_config()?;
 
-        for pg_config in pgx.iter(PgConfigSelector::All) {
+        let pg_version = match self.pg_version {
+            Some(s) => s,
+            None => "all".to_string(),
+        };
+
+        for pg_config in pgx.iter(PgConfigSelector::new(&pg_version)) {
             let pg_config = pg_config?;
             if status_postgres(pg_config)? {
                 println!(
