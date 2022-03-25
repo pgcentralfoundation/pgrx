@@ -1,8 +1,9 @@
-use eyre::eyre;
+use eyre::{eyre, WrapErr};
 use std::{any::TypeId, collections::HashMap, fmt::Debug, path::Path};
 
 use petgraph::{dot::Dot, graph::NodeIndex, stable_graph::StableGraph};
 use tracing::instrument;
+use owo_colors::{OwoColorize, XtermColors};
 
 use crate::sql_entity_graph::{
     aggregate::entity::PgAggregateEntity,
@@ -253,23 +254,27 @@ impl PgxSql {
                 easy::HighlightLines,
                 highlighting::{Style, ThemeSet},
                 parsing::SyntaxSet,
-                util::{as_24_bit_terminal_escaped, LinesWithEndings},
+                util::LinesWithEndings,
             };
             let ps = SyntaxSet::load_defaults_newlines();
-            let ts = ThemeSet::load_defaults();
-            let theme =
-                if &std::env::var("PGX_TERMINAL_THEME").unwrap_or("dark".to_string()) == "light" {
-                    &ts.themes["base16-ocean.light"]
-                } else {
-                    &ts.themes["base16-ocean.dark"]
-                };
+            let theme_bytes = include_str!("../../assets/ansi.tmTheme").as_bytes();
+            let mut theme_reader = std::io::Cursor::new(theme_bytes);
+            let theme = ThemeSet::load_from_reader(&mut theme_reader)
+                .wrap_err("Couldn't parse theme for SQL highlighting, try piping to a file")?;
 
             if let Some(syntax) = ps.find_syntax_by_extension("sql") {
                 let mut h = HighlightLines::new(syntax, &theme);
                 for line in LinesWithEndings::from(&generated) {
                     let ranges: Vec<(Style, &str)> = h.highlight(line, &ps);
-                    let escaped = as_24_bit_terminal_escaped(&ranges[..], false);
-                    write!(*out, "{}\x1b[0m", escaped)?;
+                    // Concept from https://github.com/sharkdp/bat/blob/1b030dc03b906aa345f44b8266bffeea77d763fe/src/terminal.rs#L6
+                    for (style, content) in ranges {
+                        if style.foreground.a == 0x01 {
+                            write!(*out, "{}", content)?;
+                        } else {
+                            write!(*out, "{}", content.color(XtermColors::from(style.foreground.r)))?;
+                        }
+                    }
+                    write!(*out, "\x1b[0m")?;
                 }
             } else {
                 write!(*out, "{}", generated)?;
