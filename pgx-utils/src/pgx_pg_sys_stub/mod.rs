@@ -1,3 +1,6 @@
+// Copyright 2019-2022 ZomboDB, LLC and Technology Concepts & Design, Inc.
+// <support@tcdi.com>. All rights reserved.  Use of this source code is governed
+// by the MIT license that can be found in the LICENSE file.
 use std::{collections::HashSet, fs::File, io::Write, path::Path};
 use syn::{parse_quote, Ident, Item};
 

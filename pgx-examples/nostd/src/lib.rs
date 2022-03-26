@@ -1,3 +1,6 @@
+// Copyright 2019-2022 ZomboDB, LLC and Technology Concepts & Design, Inc.
+// <support@tcdi.com>. All rights reserved.  Use of this source code is governed
+// by the MIT license that can be found in the LICENSE file.
 //! This exists just to make sure we can compile various things under `#![no_std]`
 
 #![no_std]

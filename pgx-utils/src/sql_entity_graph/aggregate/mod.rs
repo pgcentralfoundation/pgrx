@@ -1,3 +1,6 @@
+// Copyright 2019-2022 ZomboDB, LLC and Technology Concepts & Design, Inc.
+// <support@tcdi.com>. All rights reserved.  Use of this source code is governed
+// by the MIT license that can be found in the LICENSE file.
 mod aggregate_type;
 pub(crate) mod entity;
 mod maybe_variadic_type;

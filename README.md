@@ -273,6 +273,6 @@ time goes on.  Your feedback about what you'd like to be able to do with `pgx` i
 ## License
 
 ```
-Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved.
+Copyright 2019-2022 ZomboDB, LLC and Technology Concepts & Design, Inc. <support@tcdi.com>. All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 ```
