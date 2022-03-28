@@ -1,5 +1,11 @@
-// Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
-// governed by the MIT license that can be found in the LICENSE file.
+/*
+Portions Copyright 2019-2021 ZomboDB, LLC.
+Portions Copyright 2021-2022 Technology Concepts & Design, Inc. <support@tcdi.com>
+
+All rights reserved.
+
+Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+*/
 
 use crate::{
     command::{get::get_property, run::exec_psql, start::start_postgres},
@@ -47,11 +53,13 @@ impl CommandExecute for Connect {
                     // It's actually the dbname! We should infer from the manifest.
                     self.dbname = Some(pg_version);
 
-                    let metadata = crate::metadata::metadata(&Default::default(), self.manifest_path.as_ref())
-                        .wrap_err("couldn't get cargo metadata")?;
+                    let metadata =
+                        crate::metadata::metadata(&Default::default(), self.manifest_path.as_ref())
+                            .wrap_err("couldn't get cargo metadata")?;
                     crate::metadata::validate(&metadata)?;
-                    let package_manifest_path = crate::manifest::manifest_path(&metadata, self.package.as_ref())
-                        .wrap_err("Couldn't get manifest path")?;
+                    let package_manifest_path =
+                        crate::manifest::manifest_path(&metadata, self.package.as_ref())
+                            .wrap_err("Couldn't get manifest path")?;
                     let package_manifest = Manifest::from_path(&package_manifest_path)
                         .wrap_err("Couldn't parse manifest")?;
 
@@ -62,11 +70,13 @@ impl CommandExecute for Connect {
             },
             None => {
                 // We should infer from the manifest.
-                let metadata = crate::metadata::metadata(&Default::default(), self.manifest_path.as_ref())
-                    .wrap_err("couldn't get cargo metadata")?;
+                let metadata =
+                    crate::metadata::metadata(&Default::default(), self.manifest_path.as_ref())
+                        .wrap_err("couldn't get cargo metadata")?;
                 crate::metadata::validate(&metadata)?;
-                let package_manifest_path = crate::manifest::manifest_path(&metadata, self.package.as_ref())
-                    .wrap_err("Couldn't get manifest path")?;
+                let package_manifest_path =
+                    crate::manifest::manifest_path(&metadata, self.package.as_ref())
+                        .wrap_err("Couldn't get manifest path")?;
                 let package_manifest = Manifest::from_path(&package_manifest_path)
                     .wrap_err("Couldn't parse manifest")?;
 
@@ -80,16 +90,18 @@ impl CommandExecute for Connect {
             Some(dbname) => dbname,
             None => {
                 // We should infer from package
-                let metadata = crate::metadata::metadata(&Default::default(), self.manifest_path.as_ref())
-                    .wrap_err("couldn't get cargo metadata")?;
+                let metadata =
+                    crate::metadata::metadata(&Default::default(), self.manifest_path.as_ref())
+                        .wrap_err("couldn't get cargo metadata")?;
                 crate::metadata::validate(&metadata)?;
-                let package_manifest_path = crate::manifest::manifest_path(&metadata, self.package.as_ref())
-                    .wrap_err("Couldn't get manifest path")?;
+                let package_manifest_path =
+                    crate::manifest::manifest_path(&metadata, self.package.as_ref())
+                        .wrap_err("Couldn't get manifest path")?;
 
                 get_property(&package_manifest_path, "extname")
                     .wrap_err("could not determine extension name")?
                     .ok_or(eyre!("extname not found in control file"))?
-            },
+            }
         };
 
         connect_psql(Pgx::from_config()?.get(&pg_version)?, &dbname)

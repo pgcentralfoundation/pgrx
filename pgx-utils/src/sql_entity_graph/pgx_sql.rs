@@ -1,9 +1,17 @@
+/*
+Portions Copyright 2019-2021 ZomboDB, LLC.
+Portions Copyright 2021-2022 Technology Concepts & Design, Inc. <support@tcdi.com>
+
+All rights reserved.
+
+Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+*/
 use eyre::{eyre, WrapErr};
 use std::{any::TypeId, collections::HashMap, fmt::Debug, path::Path};
 
+use owo_colors::{OwoColorize, XtermColors};
 use petgraph::{dot::Dot, graph::NodeIndex, stable_graph::StableGraph};
 use tracing::instrument;
-use owo_colors::{OwoColorize, XtermColors};
 
 use crate::sql_entity_graph::{
     aggregate::entity::PgAggregateEntity,
@@ -271,7 +279,11 @@ impl PgxSql {
                         if style.foreground.a == 0x01 {
                             write!(*out, "{}", content)?;
                         } else {
-                            write!(*out, "{}", content.color(XtermColors::from(style.foreground.r)))?;
+                            write!(
+                                *out,
+                                "{}",
+                                content.color(XtermColors::from(style.foreground.r))
+                            )?;
                         }
                     }
                     write!(*out, "\x1b[0m")?;

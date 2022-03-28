@@ -1,14 +1,57 @@
-author: ZomboDB, LLC
-ident: MIT
-email: zombodb@gmail.com
+change_in_place: true
 excludes:
   - Cargo.toml
-  - ".*\\.h"
-  - "\\.cargo/config"
+  - Cargo.lock
+  - LICENSE
+  - pgx-utils/assets/ansi.tmTheme
+  - ".envrc"
+  - ".gitignore"
+  - "flake\\..*"
+  - "logo.*"
+  - ".github/**/*"
+  - ".cargo/config"
   - "cargo-pgx/src/templates/*"
-  - ".github/workflows/*"
   - ".*\\.control"
   - ".*\\.md"
+  - ".*\\.nix"
   - ".*\\.yml"
-  - ".*\\.sh"
-  - load-order.txt
+licenses:
+  - files: any
+    ident: MIT
+    authors:
+      - name: Technology Concepts & Design, Inc.
+        email: support@tcdi.com
+    template: |
+      Portions Copyright 2019-2021 ZomboDB, LLC.
+      
+      Portions Copyright 2021-[year] [name of author]
+      
+      
+      All rights reserved.
+      
+      
+      Use of this source code is governed by the [ident] license that can be found in the LICENSE file.
+comments:
+  - columns: 120
+    extensions:
+      - rs
+      - c
+      - h
+      - sql
+    commenter:
+      type: block
+      start_block_char: "/*\n"
+      end_block_char: "\n*/\n"
+  - columns: 120
+    extension: html
+    commenter:
+      type: block
+      start_block_char: "<!--\n"
+      end_block_char: "-->"
+  - columns: 80
+    extension: any
+    commenter:
+      type: line
+      comment_char: "#"
+      trailing_lines: 0
+    

@@ -1,5 +1,11 @@
-// Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
-// governed by the MIT license that can be found in the LICENSE file.
+/*
+Portions Copyright 2019-2021 ZomboDB, LLC.
+Portions Copyright 2021-2022 Technology Concepts & Design, Inc. <support@tcdi.com>
+
+All rights reserved.
+
+Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+*/
 
 use crate::{
     command::get::{find_control_file, get_property},
@@ -47,10 +53,11 @@ impl CommandExecute for Install {
         let metadata = crate::metadata::metadata(&self.features, self.manifest_path.as_ref())
             .wrap_err("couldn't get cargo metadata")?;
         crate::metadata::validate(&metadata)?;
-        let package_manifest_path = crate::manifest::manifest_path(&metadata, self.package.as_ref())
-            .wrap_err("Couldn't get manifest path")?;
-        let package_manifest = Manifest::from_path(&package_manifest_path)
-            .wrap_err("Couldn't parse manifest")?;
+        let package_manifest_path =
+            crate::manifest::manifest_path(&metadata, self.package.as_ref())
+                .wrap_err("Couldn't get manifest path")?;
+        let package_manifest =
+            Manifest::from_path(&package_manifest_path).wrap_err("Couldn't parse manifest")?;
 
         let pg_config = match self.pg_config {
             None => PgConfig::from_path(),
@@ -58,7 +65,8 @@ impl CommandExecute for Install {
         };
         let pg_version = format!("pg{}", pg_config.major_version()?);
 
-        let features = crate::manifest::features_for_version(self.features, &package_manifest, &pg_version);
+        let features =
+            crate::manifest::features_for_version(self.features, &package_manifest, &pg_version);
 
         install_extension(
             self.manifest_path.as_ref(),
@@ -106,7 +114,12 @@ pub(crate) fn install_extension(
         ));
     }
 
-    let build_command_output = build_extension(user_manifest_path.as_ref(), user_package, is_release, &features)?;
+    let build_command_output = build_extension(
+        user_manifest_path.as_ref(),
+        user_package,
+        is_release,
+        &features,
+    )?;
     let build_command_bytes = build_command_output.stdout;
     let build_command_reader = BufReader::new(build_command_bytes.as_slice());
     let build_command_stream = cargo_metadata::Message::parse_stream(build_command_reader);
@@ -122,8 +135,18 @@ pub(crate) fn install_extension(
     {
         let mut dest = base_directory.clone();
         dest.push(&extdir);
-        dest.push(&control_file.file_name().ok_or_else(|| eyre!("Could not get filename for `{}`", control_file.display()))?);
-        copy_file(&control_file, &dest, "control file", true, &package_manifest_path)?;
+        dest.push(
+            &control_file
+                .file_name()
+                .ok_or_else(|| eyre!("Could not get filename for `{}`", control_file.display()))?,
+        );
+        copy_file(
+            &control_file,
+            &dest,
+            "control file",
+            true,
+            &package_manifest_path,
+        )?;
     }
 
     {
@@ -141,7 +164,13 @@ pub(crate) fn install_extension(
                 })?;
             }
         }
-        copy_file(&shlibpath, &dest, "shared library", false, &package_manifest_path)?;
+        copy_file(
+            &shlibpath,
+            &dest,
+            "shared library",
+            false,
+            &package_manifest_path,
+        )?;
     }
 
     copy_sql_files(
@@ -161,7 +190,13 @@ pub(crate) fn install_extension(
     Ok(())
 }
 
-fn copy_file(src: &PathBuf, dest: &PathBuf, msg: &str, do_filter: bool, package_manifest_path: impl AsRef<Path>) -> eyre::Result<()> {
+fn copy_file(
+    src: &PathBuf,
+    dest: &PathBuf,
+    msg: &str,
+    do_filter: bool,
+    package_manifest_path: impl AsRef<Path>,
+) -> eyre::Result<()> {
     if !dest.parent().unwrap().exists() {
         std::fs::create_dir_all(dest.parent().unwrap()).wrap_err_with(|| {
             format!(
@@ -216,7 +251,7 @@ pub(crate) fn build_extension(
         command.arg("--package");
         command.arg(user_package);
     }
-    
+
     if is_release {
         command.arg("--release");
     }
@@ -258,7 +293,11 @@ pub(crate) fn build_extension(
     }
 }
 
-fn get_target_sql_file(manifest_path: impl AsRef<Path>, extdir: &PathBuf, base_directory: &PathBuf) -> eyre::Result<PathBuf> {
+fn get_target_sql_file(
+    manifest_path: impl AsRef<Path>,
+    extdir: &PathBuf,
+    base_directory: &PathBuf,
+) -> eyre::Result<PathBuf> {
     let mut dest = base_directory.clone();
     dest.push(extdir);
 
@@ -309,7 +348,13 @@ fn copy_sql_files(
                     dest.push(extdir);
                     dest.push(filename);
 
-                    copy_file(&sql.path(), &dest, "extension schema upgrade file", true, &package_manifest_path)?;
+                    copy_file(
+                        &sql.path(),
+                        &dest,
+                        "extension schema upgrade file",
+                        true,
+                        &package_manifest_path,
+                    )?;
                 }
             }
         }

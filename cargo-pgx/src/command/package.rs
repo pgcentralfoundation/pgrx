@@ -1,14 +1,20 @@
-// Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
-// governed by the MIT license that can be found in the LICENSE file.
+/*
+Portions Copyright 2019-2021 ZomboDB, LLC.
+Portions Copyright 2021-2022 Technology Concepts & Design, Inc. <support@tcdi.com>
+
+All rights reserved.
+
+Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+*/
 
 use crate::{
     command::{get::get_property, install::install_extension},
     CommandExecute,
 };
-use eyre::{eyre, WrapErr};
 use cargo_toml::Manifest;
+use eyre::{eyre, WrapErr};
 use pgx_utils::{get_target_dir, pg_config::PgConfig};
-use std::path::{PathBuf, Path};
+use std::path::{Path, PathBuf};
 
 /// Create an installation package directory.
 #[derive(clap::Args, Debug)]
@@ -44,10 +50,11 @@ impl CommandExecute for Package {
         let metadata = crate::metadata::metadata(&self.features, self.manifest_path.as_ref())
             .wrap_err("couldn't get cargo metadata")?;
         crate::metadata::validate(&metadata)?;
-        let package_manifest_path = crate::manifest::manifest_path(&metadata, self.package.as_ref())
-            .wrap_err("Couldn't get manifest path")?;
-        let package_manifest = Manifest::from_path(&package_manifest_path)
-            .wrap_err("Couldn't parse manifest")?;
+        let package_manifest_path =
+            crate::manifest::manifest_path(&metadata, self.package.as_ref())
+                .wrap_err("Couldn't get manifest path")?;
+        let package_manifest =
+            Manifest::from_path(&package_manifest_path).wrap_err("Couldn't parse manifest")?;
 
         let pg_config = match self.pg_config {
             None => PgConfig::from_path(),
@@ -55,14 +62,24 @@ impl CommandExecute for Package {
         };
         let pg_version = format!("pg{}", pg_config.major_version()?);
 
-        let features = crate::manifest::features_for_version(self.features, &package_manifest, &pg_version);
-        
+        let features =
+            crate::manifest::features_for_version(self.features, &package_manifest, &pg_version);
+
         let out_dir = if let Some(out_dir) = self.out_dir {
             out_dir
         } else {
             build_base_path(&pg_config, &package_manifest_path, self.debug)?
         };
-        package_extension(self.manifest_path.as_ref(), self.package.as_ref(), &package_manifest_path, &pg_config, out_dir, self.debug, self.test, &features)
+        package_extension(
+            self.manifest_path.as_ref(),
+            self.package.as_ref(),
+            &package_manifest_path,
+            &pg_config,
+            out_dir,
+            self.debug,
+            self.test,
+            &features,
+        )
     }
 }
 
@@ -97,10 +114,15 @@ pub(crate) fn package_extension(
     )
 }
 
-fn build_base_path(pg_config: &PgConfig, manifest_path: impl AsRef<Path>, is_debug: bool) -> eyre::Result<PathBuf> {
+fn build_base_path(
+    pg_config: &PgConfig,
+    manifest_path: impl AsRef<Path>,
+    is_debug: bool,
+) -> eyre::Result<PathBuf> {
     let mut target_dir = get_target_dir()?;
     let pgver = pg_config.major_version()?;
-    let extname = get_property(manifest_path, "extname")?.ok_or(eyre!("could not determine extension name"))?;
+    let extname = get_property(manifest_path, "extname")?
+        .ok_or(eyre!("could not determine extension name"))?;
     target_dir.push(if is_debug { "debug" } else { "release" });
     target_dir.push(format!("{}-pg{}", extname, pgver));
     Ok(target_dir)

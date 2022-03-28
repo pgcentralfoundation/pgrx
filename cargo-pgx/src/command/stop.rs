@@ -1,15 +1,18 @@
-// Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
-// governed by the MIT license that can be found in the LICENSE file.
+/*
+Portions Copyright 2019-2021 ZomboDB, LLC.
+Portions Copyright 2021-2022 Technology Concepts & Design, Inc. <support@tcdi.com>
+
+All rights reserved.
+
+Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+*/
 
 use crate::{command::status::status_postgres, CommandExecute};
-use owo_colors::OwoColorize;
-use pgx_utils::pg_config::{PgConfig, PgConfigSelector, Pgx};
 use cargo_toml::Manifest;
 use eyre::{eyre, WrapErr};
-use std::{
-    path::PathBuf,
-    process::Stdio
-};
+use owo_colors::OwoColorize;
+use pgx_utils::pg_config::{PgConfig, PgConfigSelector, Pgx};
+use std::{path::PathBuf, process::Stdio};
 
 /// Stop a pgx-managed Postgres instance
 #[derive(clap::Args, Debug)]
@@ -36,11 +39,13 @@ impl CommandExecute for Stop {
         let pg_version = match self.pg_version {
             Some(s) => s,
             None => {
-                let metadata = crate::metadata::metadata(&Default::default(), self.manifest_path.as_ref())
-                    .wrap_err("couldn't get cargo metadata")?;
+                let metadata =
+                    crate::metadata::metadata(&Default::default(), self.manifest_path.as_ref())
+                        .wrap_err("couldn't get cargo metadata")?;
                 crate::metadata::validate(&metadata)?;
-                let package_manifest_path = crate::manifest::manifest_path(&metadata, self.package.as_ref())
-                    .wrap_err("Couldn't get manifest path")?;
+                let package_manifest_path =
+                    crate::manifest::manifest_path(&metadata, self.package.as_ref())
+                        .wrap_err("Couldn't get manifest path")?;
                 let package_manifest = Manifest::from_path(&package_manifest_path)
                     .wrap_err("Couldn't parse manifest")?;
 
