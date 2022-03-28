@@ -40,7 +40,7 @@ pgx-utils = { path = "../pgx-utils/", version = "0.4.1" }
 serde = { version = "1.0.136", features = [ "derive" ] }
 serde_cbor = "0.11.2"
 serde_json = "1.0.79"
-time = { version = "0.3.7", features = ["formatting", "parsing", "alloc", "macros"] }
+time = { version = "0.3.9", features = ["formatting", "parsing", "alloc", "macros"] }
 atomic-traits = "0.3.0"
 heapless = "0.7.10"
 hash32 = "0.2.1"
