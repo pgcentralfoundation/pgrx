@@ -19,25 +19,25 @@ licenses:
   - files: any
     ident: MIT
     authors:
-      - name: ZomboDB, LLC and Technology Concepts & Design, Inc.
+      - name: Technology Concepts & Design, Inc.
         email: support@tcdi.com
     template: |
-      Portions Copyright 2019-2021 ZomboDB, LLC. 
-      Portions Copyright 2021-[year] Technology Concepts & Design, Inc. <support@tcdi.com>.
-      All rights reserved. 
+      Portions Copyright 2019-2021 ZomboDB, LLC.
+      
+      Portions Copyright 2021-[year] [name of author]
+      
+      
+      All rights reserved.
+      
+      
       Use of this source code is governed by the [ident] license that can be found in the LICENSE file.
 comments:
-  - columns: 80
+  - columns: 120
     extensions:
       - rs
       - c
       - h
-    commenter:
-      type: line
-      comment_char: "//"
-      trailing_lines: 0
-  - columns: 120
-    extension: sql
+      - sql
     commenter:
       type: block
       start_block_char: "/*\n"
