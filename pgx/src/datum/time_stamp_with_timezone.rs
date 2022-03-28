@@ -15,7 +15,7 @@ use std::{
 };
 use time::{format_description::FormatItem, UtcOffset};
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub struct TimestampWithTimeZone(time::OffsetDateTime);
 
 impl FromDatum for TimestampWithTimeZone {

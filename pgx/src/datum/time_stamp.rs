@@ -12,7 +12,7 @@ use crate::{direct_function_call_as_datum, pg_sys, FromDatum, IntoDatum, Timesta
 use std::ops::{Deref, DerefMut};
 use time::{format_description::FormatItem, PrimitiveDateTime};
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub struct Timestamp(time::PrimitiveDateTime);
 impl FromDatum for Timestamp {
     #[inline]
