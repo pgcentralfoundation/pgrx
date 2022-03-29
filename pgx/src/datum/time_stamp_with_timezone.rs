@@ -18,6 +18,13 @@ use time::{format_description::FormatItem, UtcOffset};
 #[derive(Debug, Copy, Clone)]
 pub struct TimestampWithTimeZone(time::OffsetDateTime);
 
+impl From<pg_sys::TimestampTz> for TimestampWithTimeZone {
+    fn from(item: pg_sys::TimestampTz) -> Self {
+        unsafe { TimestampWithTimeZone::from_datum(item as usize, false, pg_sys::TIMESTAMPTZOID).unwrap() }
+    }
+}
+
+
 impl FromDatum for TimestampWithTimeZone {
     #[inline]
     unsafe fn from_datum(
