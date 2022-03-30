@@ -313,8 +313,6 @@ where
     ) -> Option<Self> {
         if is_null {
             None
-        } else if datum == 0 {
-            panic!("a varlena Datum was flagged as non-null but the datum is zero");
         } else {
             memory_context.switch_to(|_| {
                 // this gets the varlena Datum copied into this memory context

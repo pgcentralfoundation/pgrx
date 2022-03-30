@@ -16,8 +16,6 @@ impl FromDatum for pg_sys::BOX {
     {
         if is_null {
             None
-        } else if datum == 0 {
-            panic!("BOX datum declared not null, but datum is zero")
         } else {
             let the_box = datum as *mut pg_sys::BOX;
             Some(the_box.read())
@@ -48,8 +46,6 @@ impl FromDatum for pg_sys::Point {
     {
         if is_null {
             None
-        } else if datum == 0 {
-            panic!("Point datum declared not null, but datum is zero")
         } else {
             let point = datum as *mut pg_sys::Point;
             Some(point.read())

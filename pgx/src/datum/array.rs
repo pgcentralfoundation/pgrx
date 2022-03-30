@@ -276,8 +276,6 @@ impl<'a, T: FromDatum> FromDatum for Array<'a, T> {
     unsafe fn from_datum(datum: usize, is_null: bool) -> Option<Array<'a, T>> {
         if is_null {
             None
-        } else if datum == 0 {
-            panic!("array was flagged not null but datum is zero");
         } else {
             let ptr = datum as *mut pg_sys::varlena;
             let array =
@@ -322,8 +320,6 @@ impl<T: FromDatum> FromDatum for Vec<T> {
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Vec<T>> {
         if is_null {
             None
-        } else if datum == 0 {
-            panic!("array was flagged not null but datum is zero");
         } else {
             let array = Array::<T>::from_datum(datum, is_null).unwrap();
             let mut v = Vec::with_capacity(array.len());
@@ -341,8 +337,6 @@ impl<T: FromDatum> FromDatum for Vec<Option<T>> {
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Vec<Option<T>>> {
         if is_null {
             None
-        } else if datum == 0 {
-            panic!("array was flagged not null but datum is zero");
         } else {
             let array = Array::<T>::from_datum(datum, is_null).unwrap();
             let mut v = Vec::with_capacity(array.len());
