@@ -389,11 +389,16 @@ where
     fn type_oid() -> u32 {
         unsafe { pg_sys::get_array_type(T::type_oid()) }
     }
+
+    #[inline]
+    fn is_compatible_with(other: pg_sys::Oid) -> bool {
+        Self::type_oid() == other || other == unsafe { pg_sys::get_array_type(T::type_oid()) }
+    }
 }
 
 impl<'a, T> IntoDatum for &'a [T]
 where
-    T: IntoDatum + Copy,
+    T: IntoDatum + Copy + 'a,
 {
     fn into_datum(self) -> Option<pg_sys::Datum> {
         let mut state = unsafe {
@@ -430,5 +435,10 @@ where
 
     fn type_oid() -> u32 {
         unsafe { pg_sys::get_array_type(T::type_oid()) }
+    }
+
+    #[inline]
+    fn is_compatible_with(other: pg_sys::Oid) -> bool {
+        Self::type_oid() == other || other == unsafe { pg_sys::get_array_type(T::type_oid()) }
     }
 }

@@ -10,12 +10,25 @@ Use of this source code is governed by the MIT license that can be found in the 
 //! for converting a pg_sys::Datum and a corresponding "is_null" bool into a typed Option
 
 use crate::{
-    pg_sys, text_to_rust_str_unchecked, varlena_to_byte_slice, AllocatedByPostgres, PgBox,
-    PgMemoryContexts,
+    pg_sys, text_to_rust_str_unchecked, varlena_to_byte_slice, AllocatedByPostgres, IntoDatum,
+    PgBox, PgMemoryContexts,
 };
 use std::ffi::CStr;
 
-/// Convert a `(pg_sys::Datum, is_null:bool, type_oid:pg_sys::Oid)` tuple into a Rust type
+/// If converting a Datum to a Rust type fails, this is the set of possible reasons why.
+pub enum TryFromDatumError {
+    /// The specified type of the Datum is not compatible with the desired Rust type.
+    IncompatibleTypes,
+
+    /// We were asked to convert a Datum that is NULL (but flagged as "not null")
+    NullDatumPointer,
+}
+
+/// A [Result] type that is used to indicate whether a conversion from a Datum to a Rust type
+/// succeeded or failed.
+pub type FromDatumResult<T> = std::result::Result<Option<T>, TryFromDatumError>;
+
+/// Convert a `(pg_sys::Datum, is_null:bool` pair into a Rust type
 ///
 /// Default implementations are provided for the common Rust types.
 ///
@@ -28,7 +41,7 @@ pub trait FromDatum {
     /// memory address in the case of pass-by-reference Datums.  Referencing that memory address
     /// can cause Postgres to crash if it's invalid.
     ///
-    /// If the `(datum, is_null)` tuple comes from Postgres, it's generally okay to consider this
+    /// If the `(datum, is_null)` pair comes from Postgres, it's generally okay to consider this
     /// a safe call (ie, wrap it in `unsafe {}`) and move on with life.
     ///
     /// If, however, you're providing an arbitrary datum value, it needs to be considered unsafe
@@ -38,7 +51,7 @@ pub trait FromDatum {
         Self: Sized;
 
     /// Default implementation switched to the specified memory context and then simply calls
-    /// `From::from_datum(...)` from within that context.
+    /// `FromDatum::from_datum(...)` from within that context.
     ///
     /// For certain Datums (such as `&str`), this is likely not enough and this function
     /// should be overridden in the type's trait implementation.
@@ -49,7 +62,7 @@ pub trait FromDatum {
     ///
     /// ## Safety
     ///
-    /// Same caveats as `From::from_datum(...)`
+    /// Same caveats as `FromDatum::from_datum(...)`
     unsafe fn from_datum_in_memory_context(
         mut memory_context: PgMemoryContexts,
         datum: pg_sys::Datum,
@@ -59,6 +72,31 @@ pub trait FromDatum {
         Self: Sized,
     {
         memory_context.switch_to(|_| FromDatum::from_datum(datum, is_null))
+    }
+
+    /// `try_from_datum` is a convenience wrapper around `FromDatum::from_datum` that returns a
+    /// a [FromDatumResult] instead of an `Option`.  It's intended to be used in situations where
+    /// the caller needs to know whether the type conversion succeeded or failed.
+    ///
+    /// ## Safety
+    ///
+    /// Same caveats as `FromDatum::from_datum(...)`
+    #[inline]
+    unsafe fn try_from_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        type_oid: pg_sys::Oid,
+    ) -> FromDatumResult<Self>
+    where
+        Self: Sized + IntoDatum,
+    {
+        if !Self::is_compatible_with(type_oid) {
+            Err(TryFromDatumError::IncompatibleTypes)
+        } else if !is_null && datum == 0 {
+            Err(TryFromDatumError::NullDatumPointer)
+        } else {
+            Ok(FromDatum::from_datum(datum, is_null))
+        }
     }
 }
 

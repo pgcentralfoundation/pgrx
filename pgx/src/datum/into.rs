@@ -16,6 +16,7 @@ use crate::{
     pg_sys, rust_byte_slice_to_bytea, rust_regtypein, rust_str_to_text_p, PgBox, PgOid,
     WhoAllocated,
 };
+use pgx_pg_sys::Oid;
 
 /// Convert a Rust type into a `pg_sys::Datum`.
 ///
@@ -31,6 +32,27 @@ pub trait IntoDatum {
     fn type_oid() -> pg_sys::Oid;
     fn array_type_oid() -> pg_sys::Oid {
         unsafe { pg_sys::get_array_type(Self::type_oid()) }
+    }
+
+    /// Is a Datum of this type compatible with another Postgres type?
+    ///
+    /// An example of this are the Postgres `text` and `varchar` types, which are both
+    /// technically compatible from a Rust type perspective.  They're both represented in Rust as
+    /// `String` (or `&str`), but the underlying Postgres types are different.
+    ///
+    /// If implementing this yourself, you likely want to follow a pattern like this:
+    ///
+    /// ```text
+    ///  fn is_compatible_with(other: pg_sys::Oid) -> bool {
+    ///     // first, if our type is the other type, then we're compatible
+    ///     Self::type_oid() == other
+    ///
+    ///     // and here's the other type we're compatible with
+    ///     || other == pg_sys::TEXTOID
+    ///  }
+    /// ```
+    fn is_compatible_with(other: pg_sys::Oid) -> bool {
+        Self::type_oid() == other
     }
 }
 
@@ -175,6 +197,11 @@ impl<'a> IntoDatum for &'a str {
     fn type_oid() -> u32 {
         pg_sys::TEXTOID
     }
+
+    #[inline]
+    fn is_compatible_with(other: Oid) -> bool {
+        Self::type_oid() == other || other == pg_sys::VARCHAROID
+    }
 }
 
 impl IntoDatum for String {
@@ -185,6 +212,11 @@ impl IntoDatum for String {
 
     fn type_oid() -> u32 {
         pg_sys::TEXTOID
+    }
+
+    #[inline]
+    fn is_compatible_with(other: Oid) -> bool {
+        Self::type_oid() == other || other == pg_sys::VARCHAROID
     }
 }
 
@@ -197,6 +229,11 @@ impl IntoDatum for &String {
     fn type_oid() -> u32 {
         pg_sys::TEXTOID
     }
+
+    #[inline]
+    fn is_compatible_with(other: Oid) -> bool {
+        Self::type_oid() == other || other == pg_sys::VARCHAROID
+    }
 }
 
 impl IntoDatum for char {
@@ -207,6 +244,11 @@ impl IntoDatum for char {
 
     fn type_oid() -> u32 {
         pg_sys::VARCHAROID
+    }
+
+    #[inline]
+    fn is_compatible_with(other: Oid) -> bool {
+        Self::type_oid() == other || other == pg_sys::VARCHAROID
     }
 }
 
