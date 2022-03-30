@@ -1,9 +1,20 @@
+/*
+Portions Copyright 2019-2021 ZomboDB, LLC.
+Portions Copyright 2021-2022 Technology Concepts & Design, Inc. <support@tcdi.com>
+
+All rights reserved.
+
+Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+*/
 use cargo_metadata::{Metadata, MetadataCommand};
 use eyre::eyre;
 use semver::{Version, VersionReq};
 use std::path::Path;
 
-pub fn metadata(features: &clap_cargo::Features, manifest_path: Option<impl AsRef<Path>>) -> eyre::Result<Metadata> {
+pub fn metadata(
+    features: &clap_cargo::Features,
+    manifest_path: Option<impl AsRef<Path>>,
+) -> eyre::Result<Metadata> {
     let mut metadata_command = MetadataCommand::new();
     if let Some(manifest_path) = manifest_path {
         metadata_command.manifest_path(manifest_path.as_ref().to_owned());

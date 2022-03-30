@@ -1,5 +1,11 @@
-// Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
-// governed by the MIT license that can be found in the LICENSE file.
+/*
+Portions Copyright 2019-2021 ZomboDB, LLC.
+Portions Copyright 2021-2022 Technology Concepts & Design, Inc. <support@tcdi.com>
+
+All rights reserved.
+
+Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+*/
 
 use crate::datum::time::USECS_PER_SEC;
 use crate::{direct_function_call_as_datum, pg_sys, FromDatum, IntoDatum};
@@ -9,8 +15,15 @@ use std::{
 };
 use time::{format_description::FormatItem, UtcOffset};
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub struct TimestampWithTimeZone(time::OffsetDateTime);
+
+impl From<pg_sys::TimestampTz> for TimestampWithTimeZone {
+    fn from(item: pg_sys::TimestampTz) -> Self {
+        unsafe { TimestampWithTimeZone::from_datum(item as usize, false, pg_sys::TIMESTAMPTZOID).unwrap() }
+    }
+}
+
 
 impl FromDatum for TimestampWithTimeZone {
     #[inline]

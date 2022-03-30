@@ -1,3 +1,11 @@
+/*
+Portions Copyright 2019-2021 ZomboDB, LLC.
+Portions Copyright 2021-2022 Technology Concepts & Design, Inc. <support@tcdi.com>
+
+All rights reserved.
+
+Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+*/
 #include <stdbool.h>
 #define USE_STDBOOL 1
 
@@ -25,6 +33,7 @@
 #include "catalog/objectaddress.h"
 #include "catalog/pg_class.h"
 #include "catalog/pg_enum.h"
+#include "catalog/pg_operator.h"
 #include "catalog/pg_proc.h"
 #include "catalog/pg_trigger.h"
 #include "catalog/pg_type.h"

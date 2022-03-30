@@ -1,18 +1,20 @@
-// Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
-// governed by the MIT license that can be found in the LICENSE file.
+/*
+Portions Copyright 2019-2021 ZomboDB, LLC.
+Portions Copyright 2021-2022 Technology Concepts & Design, Inc. <support@tcdi.com>
+
+All rights reserved.
+
+Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+*/
 
 use crate::command::init::initdb;
 use crate::command::status::status_postgres;
 use crate::CommandExecute;
+use cargo_toml::Manifest;
 use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
 use pgx_utils::pg_config::{PgConfig, PgConfigSelector, Pgx};
-use std::{
-    os::unix::process::CommandExt,
-    process::Stdio,
-    path::PathBuf,
-};
-use cargo_toml::Manifest;
+use std::{os::unix::process::CommandExt, path::PathBuf, process::Stdio};
 
 /// Start a pgx-managed Postgres instance
 #[derive(clap::Args, Debug)]
@@ -39,14 +41,16 @@ impl CommandExecute for Start {
         let pg_version = match self.pg_version {
             Some(s) => s,
             None => {
-                let metadata = crate::metadata::metadata(&Default::default(), self.manifest_path.as_ref())
-                    .wrap_err("couldn't get cargo metadata")?;
+                let metadata =
+                    crate::metadata::metadata(&Default::default(), self.manifest_path.as_ref())
+                        .wrap_err("couldn't get cargo metadata")?;
                 crate::metadata::validate(&metadata)?;
-                let package_manifest_path = crate::manifest::manifest_path(&metadata, self.package.as_ref())
-                    .wrap_err("Couldn't get manifest path")?;
+                let package_manifest_path =
+                    crate::manifest::manifest_path(&metadata, self.package.as_ref())
+                        .wrap_err("Couldn't get manifest path")?;
                 let package_manifest = Manifest::from_path(&package_manifest_path)
                     .wrap_err("Couldn't parse manifest")?;
-                
+
                 crate::manifest::default_pg_version(&package_manifest)
                     .ok_or(eyre!("no provided `pg$VERSION` flag."))?
             }

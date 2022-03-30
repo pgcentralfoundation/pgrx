@@ -1,3 +1,11 @@
+/*
+Portions Copyright 2019-2021 ZomboDB, LLC.
+Portions Copyright 2021-2022 Technology Concepts & Design, Inc. <support@tcdi.com>
+
+All rights reserved.
+
+Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+*/
 use crate::{
     command::{
         get::{find_control_file, get_property},
@@ -5,6 +13,7 @@ use crate::{
     },
     CommandExecute,
 };
+use cargo_toml::Manifest;
 use eyre::{eyre, WrapErr};
 use object::Object;
 use owo_colors::OwoColorize;
@@ -19,7 +28,6 @@ use std::{
     path::{Path, PathBuf},
     process::{Command, Stdio},
 };
-use cargo_toml::Manifest;
 // Since we support extensions with `#[no_std]`
 extern crate alloc;
 use alloc::vec::Vec;
@@ -66,10 +74,11 @@ impl CommandExecute for Schema {
         let metadata = crate::metadata::metadata(&self.features, self.manifest_path.as_ref())
             .wrap_err("couldn't get cargo metadata")?;
         crate::metadata::validate(&metadata)?;
-        let package_manifest_path = crate::manifest::manifest_path(&metadata, self.package.as_ref())
-            .wrap_err("Couldn't get manifest path")?;
-        let package_manifest = Manifest::from_path(&package_manifest_path)
-            .wrap_err("Couldn't parse manifest")?;
+        let package_manifest_path =
+            crate::manifest::manifest_path(&metadata, self.package.as_ref())
+                .wrap_err("Couldn't get manifest path")?;
+        let package_manifest =
+            Manifest::from_path(&package_manifest_path).wrap_err("Couldn't parse manifest")?;
 
         let log_level = if let Ok(log_level) = std::env::var("RUST_LOG") {
             Some(log_level)
@@ -101,7 +110,8 @@ impl CommandExecute for Schema {
             }
         };
 
-        let features = crate::manifest::features_for_version(self.features, &package_manifest, &pg_version);
+        let features =
+            crate::manifest::features_for_version(self.features, &package_manifest, &pg_version);
 
         generate_schema(
             &pg_config,
@@ -181,7 +191,7 @@ pub(crate) fn generate_schema(
             command.arg("--manifest-path");
             command.arg(user_manifest_path.as_ref());
         }
-        
+
         if is_release {
             command.arg("--release");
         }
@@ -492,6 +502,14 @@ fn create_stub(
 
     let mut so_rustc_invocation = Command::new("rustc");
     so_rustc_invocation.stderr(Stdio::inherit());
+
+    if let Some(rustc_flags_str) = std::env::var("RUSTFLAGS").ok() {
+        let rustc_flags = rustc_flags_str
+            .split(" ")
+            .collect::<Vec<_>>();
+        so_rustc_invocation.args(rustc_flags);
+    }
+
     so_rustc_invocation.args([
         "--crate-type",
         "cdylib",
@@ -503,6 +521,7 @@ fn create_stub(
             .to_str()
             .ok_or(eyre!("could not call postmaster_stub_file.to_str()"))?,
     ]);
+
     let so_rustc_invocation_str = format!("{:?}", so_rustc_invocation);
     tracing::debug!(command = %so_rustc_invocation_str, "Running");
     let output = so_rustc_invocation.output().wrap_err_with(|| {

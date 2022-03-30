@@ -1,5 +1,11 @@
-// Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
-// governed by the MIT license that can be found in the LICENSE file.
+/*
+Portions Copyright 2019-2021 ZomboDB, LLC.
+Portions Copyright 2021-2022 Technology Concepts & Design, Inc. <support@tcdi.com>
+
+All rights reserved.
+
+Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+*/
 
 use crate::{
     command::{
@@ -7,14 +13,14 @@ use crate::{
     },
     CommandExecute,
 };
+use cargo_toml::Manifest;
 use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
 use pgx_utils::{
     createdb,
     pg_config::{PgConfig, Pgx},
 };
-use cargo_toml::Manifest;
-use std::{path::Path, os::unix::process::CommandExt, process::Command};
+use std::{os::unix::process::CommandExt, path::Path, process::Command};
 /// Compile/install extension to a pgx-managed Postgres instance and start psql
 #[derive(clap::Args, Debug)]
 #[clap(author)]
@@ -45,10 +51,11 @@ impl CommandExecute for Run {
         let metadata = crate::metadata::metadata(&self.features, self.manifest_path.as_ref())
             .wrap_err("couldn't get cargo metadata")?;
         crate::metadata::validate(&metadata)?;
-        let package_manifest_path = crate::manifest::manifest_path(&metadata, self.package.as_ref())
-            .wrap_err("Couldn't get manifest path")?;
-        let package_manifest = Manifest::from_path(&package_manifest_path)
-            .wrap_err("Couldn't parse manifest")?;
+        let package_manifest_path =
+            crate::manifest::manifest_path(&metadata, self.package.as_ref())
+                .wrap_err("Couldn't get manifest path")?;
+        let package_manifest =
+            Manifest::from_path(&package_manifest_path).wrap_err("Couldn't parse manifest")?;
 
         let pgx = Pgx::from_config()?;
 
@@ -62,8 +69,9 @@ impl CommandExecute for Run {
                         }
                         // It's actually the dbname! We should infer from the manifest.
                         self.dbname = Some(pg_version);
-                        let default_pg_version = crate::manifest::default_pg_version(&package_manifest)
-                            .ok_or(eyre!("No provided `pg$VERSION` flag."))?;
+                        let default_pg_version =
+                            crate::manifest::default_pg_version(&package_manifest)
+                                .ok_or(eyre!("No provided `pg$VERSION` flag."))?;
                         (pgx.get(&default_pg_version)?, default_pg_version)
                     }
                 }
@@ -76,11 +84,13 @@ impl CommandExecute for Run {
             }
         };
 
-        let features = crate::manifest::features_for_version(self.features, &package_manifest, &pg_version);
+        let features =
+            crate::manifest::features_for_version(self.features, &package_manifest, &pg_version);
 
         let dbname = match self.dbname {
             Some(dbname) => dbname,
-            None => get_property(&package_manifest_path, "extname")?.ok_or(eyre!("could not determine extension name"))?,
+            None => get_property(&package_manifest_path, "extname")?
+                .ok_or(eyre!("could not determine extension name"))?,
         };
 
         run_psql(
@@ -103,7 +113,7 @@ impl CommandExecute for Run {
 pub(crate) fn run_psql(
     pg_config: &PgConfig,
     user_manifest_path: Option<impl AsRef<Path>>,
-    user_package: Option< &String>,
+    user_package: Option<&String>,
     package_manifest_path: impl AsRef<Path>,
     dbname: &str,
     is_release: bool,
@@ -114,7 +124,14 @@ pub(crate) fn run_psql(
 
     // install the extension
     install_extension(
-        user_manifest_path, user_package, package_manifest_path, pg_config, is_release, false, None, features,
+        user_manifest_path,
+        user_package,
+        package_manifest_path,
+        pg_config,
+        is_release,
+        false,
+        None,
+        features,
     )?;
 
     // restart postgres

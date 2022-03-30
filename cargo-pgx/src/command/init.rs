@@ -1,5 +1,11 @@
-// Copyright 2020 ZomboDB, LLC <zombodb@gmail.com>. All rights reserved. Use of this source code is
-// governed by the MIT license that can be found in the LICENSE file.
+/*
+Portions Copyright 2019-2021 ZomboDB, LLC.
+Portions Copyright 2021-2022 Technology Concepts & Design, Inc. <support@tcdi.com>
+
+All rights reserved.
+
+Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+*/
 
 use crate::command::stop::stop_postgres;
 use crate::CommandExecute;
@@ -435,7 +441,8 @@ pub(crate) fn initdb(bindir: &PathBuf, datadir: &PathBuf) -> eyre::Result<()> {
     let command_str = format!("{:?}", command);
     tracing::debug!(command = %command_str, "Running");
 
-    let output = command.output()
+    let output = command
+        .output()
         .wrap_err_with(|| eyre!("unable to execute: {}", command_str))?;
     tracing::trace!(command = %command_str, status_code = %output.status, "Finished");
 
