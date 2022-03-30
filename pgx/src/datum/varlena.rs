@@ -298,7 +298,6 @@ impl<T> FromDatum for PgVarlena<T>
 where
     T: Copy + Sized,
 {
-    const NEEDS_TYPID: bool = false;
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _typoid: u32) -> Option<Self> {
         if is_null {
             None

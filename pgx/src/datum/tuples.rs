@@ -49,7 +49,6 @@ where
     A: FromDatum + IntoDatum,
     B: FromDatum + IntoDatum,
 {
-    const NEEDS_TYPID: bool = A::NEEDS_TYPID || B::NEEDS_TYPID;
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, typoid: pg_sys::Oid) -> Option<Self>
     where
         Self: Sized,
@@ -80,7 +79,6 @@ where
     B: FromDatum + IntoDatum,
     C: FromDatum + IntoDatum,
 {
-    const NEEDS_TYPID: bool = A::NEEDS_TYPID || B::NEEDS_TYPID || C::NEEDS_TYPID;
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, typoid: pg_sys::Oid) -> Option<Self>
     where
         Self: Sized,
