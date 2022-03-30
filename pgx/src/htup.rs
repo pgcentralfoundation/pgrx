@@ -101,15 +101,11 @@ pub fn heap_getattr<
     attno: usize,
     tupdesc: &PgTupleDesc,
 ) -> Option<T> {
-    let mut is_null = false;
-    let datum =
-        unsafe { pgx_heap_getattr(tuple.as_ptr(), attno as u32, tupdesc.as_ptr(), &mut is_null) };
-    let typoid = tupdesc.get(attno - 1).expect("no attribute").type_oid();
+    unsafe {
+        let mut is_null = false;
+        let datum = pgx_heap_getattr(tuple.as_ptr(), attno as u32, tupdesc.as_ptr(), &mut is_null);
 
-    if is_null {
-        None
-    } else {
-        unsafe { T::from_datum(datum, false, typoid.value()) }
+        T::from_datum(datum, is_null)
     }
 }
 
@@ -156,7 +152,7 @@ pub struct DatumWithTypeInfo {
 impl DatumWithTypeInfo {
     #[inline]
     pub fn into_value<T: FromDatum>(self) -> T {
-        unsafe { T::from_datum(self.datum, self.is_null, self.typoid.value()).unwrap() }
+        unsafe { T::from_datum(self.datum, self.is_null).unwrap() }
     }
 }
 

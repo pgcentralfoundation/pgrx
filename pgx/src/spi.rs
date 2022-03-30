@@ -75,6 +75,7 @@ pub struct SpiTupleTable {
 /// Represents a single `pg_sys::Datum` inside a `SpiHeapTupleData`
 pub struct SpiHeapTupleDataEntry {
     datum: Option<pg_sys::Datum>,
+    #[allow(dead_code)]
     type_oid: pg_sys::Oid,
 }
 
@@ -250,7 +251,6 @@ impl Spi {
                                     outer_memory_context,
                                     as_datum.expect("SPI result datum was NULL"),
                                     false,
-                                    pg_sys::InvalidOid,
                                 )
                             }
                         }
@@ -458,7 +458,7 @@ impl SpiTupleTable {
                         let datum =
                             pg_sys::SPI_getbinval(heap_tuple, tupdesc, ordinal, &mut is_null);
 
-                        T::from_datum(datum, is_null, pg_sys::SPI_gettypeid(tupdesc, ordinal))
+                        T::from_datum(datum, is_null)
                     }
                 },
                 None => panic!("TupDesc is NULL"),
@@ -620,7 +620,7 @@ impl<Datum: IntoDatum + FromDatum> From<Datum> for SpiHeapTupleDataEntry {
 impl SpiHeapTupleDataEntry {
     pub fn value<T: FromDatum>(&self) -> Option<T> {
         match self.datum.as_ref() {
-            Some(datum) => unsafe { T::from_datum(*datum, false, self.type_oid) },
+            Some(datum) => unsafe { T::from_datum(*datum, false) },
             None => None,
         }
     }
