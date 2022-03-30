@@ -35,9 +35,6 @@ pub(crate) struct Test {
     /// Path to Cargo.toml
     #[clap(long, parse(from_os_str))]
     manifest_path: Option<PathBuf>,
-    /// Test all packages in the workspace
-    #[clap(long)]
-    workspace: bool,
     /// compile for release mode (default is debug)
     #[clap(env = "PROFILE", long, short)]
     release: bool,
