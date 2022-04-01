@@ -96,11 +96,11 @@ pub trait FromDatum {
         type_oid: pg_sys::Oid,
     ) -> FromDatumResult<Self>
     where
-        Self: Sized + IntoDatum,
+        Self: Sized + IntoDatum + 'static,
     {
         if !Self::is_compatible_with(type_oid) {
             Err(TryFromDatumError::IncompatibleTypes)
-        } else if !is_null && datum == 0 {
+        } else if !is_null && datum == 0 && !Self::is_pass_by_value() {
             Err(TryFromDatumError::NullDatumPointer)
         } else {
             Ok(FromDatum::from_datum(datum, is_null))
