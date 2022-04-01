@@ -502,6 +502,14 @@ fn create_stub(
 
     let mut so_rustc_invocation = Command::new("rustc");
     so_rustc_invocation.stderr(Stdio::inherit());
+
+    if let Some(rustc_flags_str) = std::env::var("RUSTFLAGS").ok() {
+        let rustc_flags = rustc_flags_str
+            .split(" ")
+            .collect::<Vec<_>>();
+        so_rustc_invocation.args(rustc_flags);
+    }
+
     so_rustc_invocation.args([
         "--crate-type",
         "cdylib",
@@ -513,6 +521,7 @@ fn create_stub(
             .to_str()
             .ok_or(eyre!("could not call postmaster_stub_file.to_str()"))?,
     ]);
+
     let so_rustc_invocation_str = format!("{:?}", so_rustc_invocation);
     tracing::debug!(command = %so_rustc_invocation_str, "Running");
     let output = so_rustc_invocation.output().wrap_err_with(|| {
