@@ -23,21 +23,28 @@ unsafe fn trigger_example(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
         panic!("not called by trigger manager");
     }
 
-    let trigdata: PgBox<pg_sys::TriggerData> = PgBox::from_pg(
-        fcinfo.as_ref().expect("fcinfo is NULL").context as *mut pg_sys::TriggerData,
-    );
+    let trigdata = (fcinfo.as_ref().expect("fcinfo is NULL").context as *mut pg_sys::TriggerData)
+        .as_ref()
+        .unwrap();
 
     // and for this example, we're only going to operate as an ON BEFORE INSERT FOR EACH ROW trigger
     if trigger_fired_before(trigdata.tg_event)
         && trigger_fired_by_insert(trigdata.tg_event)
         && trigger_fired_for_row(trigdata.tg_event)
     {
-        let tupdesc = PgTupleDesc::from_pg_copy(trigdata.tg_relation.as_ref().unwrap().rd_att);
-        let tuple = PgBox::<pg_sys::HeapTupleData>::from_pg(trigdata.tg_trigtuple);
-        let id = heap_getattr::<i64, AllocatedByPostgres>(&tuple, 1, &tupdesc);
-        let title = heap_getattr::<&str, AllocatedByPostgres>(&tuple, 2, &tupdesc);
-        let description = heap_getattr::<&str, AllocatedByPostgres>(&tuple, 3, &tupdesc);
-        let payload = heap_getattr::<JsonB, AllocatedByPostgres>(&tuple, 4, &tupdesc);
+        let tuple = PgHeapTuple::from_trigger_data(trigdata, TriggerTuple::OLD);
+        let id = tuple
+            .get_indexed::<i64>(1.try_into().unwrap())
+            .expect("could not get id");
+        let title = tuple
+            .get_indexed::<String>(2.try_into().unwrap())
+            .expect("could not get title");
+        let description = tuple
+            .get_indexed::<String>(3.try_into().unwrap())
+            .expect("could not get description");
+        let payload = tuple
+            .get_indexed::<JsonB>(4.try_into().unwrap())
+            .expect("could not get payload");
 
         warning!(
             "id={:?}, title={:?}, description={:?}, payload={:?}",

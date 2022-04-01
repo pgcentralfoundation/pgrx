@@ -14,14 +14,22 @@ use crate::{
     PgBox, PgMemoryContexts,
 };
 use std::ffi::CStr;
+use std::num::NonZeroUsize;
 
 /// If converting a Datum to a Rust type fails, this is the set of possible reasons why.
+#[derive(Debug)]
 pub enum TryFromDatumError {
     /// The specified type of the Datum is not compatible with the desired Rust type.
     IncompatibleTypes,
 
     /// We were asked to convert a Datum that is NULL (but flagged as "not null")
     NullDatumPointer,
+
+    /// The specified attribute number is invalid
+    NoSuchAttributeNumber(NonZeroUsize),
+
+    /// The specified attribute name is invalid
+    NoSuchAttributeName(String),
 }
 
 /// A [Result] type that is used to indicate whether a conversion from a Datum to a Rust type
