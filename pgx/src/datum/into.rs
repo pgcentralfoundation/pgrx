@@ -74,11 +74,17 @@ pub trait IntoDatum {
             || my_type == std::any::TypeId::of::<u16>()
             || my_type == std::any::TypeId::of::<u32>()
             || my_type == std::any::TypeId::of::<u64>()
+            || my_type == std::any::TypeId::of::<f32>()
+            || my_type == std::any::TypeId::of::<f64>()
+            || my_type == std::any::TypeId::of::<bool>()
+            || my_type == std::any::TypeId::of::<()>()
             || my_type == std::any::TypeId::of::<crate::Time>()
             || my_type == std::any::TypeId::of::<crate::TimeWithTimeZone>()
             || my_type == std::any::TypeId::of::<crate::Timestamp>()
             || my_type == std::any::TypeId::of::<crate::TimestampWithTimeZone>()
             || my_type == std::any::TypeId::of::<crate::Date>()
+            || my_type == std::any::TypeId::of::<PgOid>()
+            || my_type == std::any::TypeId::of::<pg_sys::Datum>()
             || my_type == std::any::TypeId::of::<Option<pg_sys::Datum>>()
     }
 }
