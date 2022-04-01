@@ -86,7 +86,7 @@ impl<'a> PgHeapTuple<'a, AllocatedByRust> {
 }
 
 impl<'a, AllocatedBy: WhoAllocated<pg_sys::HeapTupleData>> PgHeapTuple<'a, AllocatedBy> {
-    pub fn get_named<T: FromDatum + IntoDatum, A: AsRef<str>>(
+    pub fn get_named<T: FromDatum + IntoDatum + 'static, A: AsRef<str>>(
         &self,
         attname: A,
     ) -> FromDatumResult<T> {
@@ -104,7 +104,10 @@ impl<'a, AllocatedBy: WhoAllocated<pg_sys::HeapTupleData>> PgHeapTuple<'a, Alloc
         ))
     }
 
-    pub fn get_indexed<T: FromDatum + IntoDatum>(&self, attno: NonZeroUsize) -> FromDatumResult<T> {
+    pub fn get_indexed<T: FromDatum + IntoDatum + 'static>(
+        &self,
+        attno: NonZeroUsize,
+    ) -> FromDatumResult<T> {
         unsafe {
             // tuple descriptor attribute numbers are zero-based
             match self.tupdesc.get(attno.get() - 1) {
