@@ -543,35 +543,12 @@ impl PgGuardRewriter {
             #[allow(clippy::redundant_closure)]
             #[allow(improper_ctypes_definitions)] /* for i128 */
             pub unsafe fn #func_name ( #arg_list_with_types ) #return_type {
-                // as the panic message says, we can't call Postgres functions from threads
-                // the value of IS_MAIN_THREAD gets set through the pg_module_magic!() macro
-                #[cfg(debug_assertions)]
-                if crate::submodules::guard::IS_MAIN_THREAD.with(|v| v.get().is_none()) {
-                    panic!("functions under #[pg_guard] cannot be called from threads");
-                };
-
-                extern "C" {
-                    pub fn #func_name( #arg_list_with_types ) #return_type ;
-                }
-
-                let prev_exception_stack = pg_sys::PG_exception_stack;
-                let prev_error_context_stack = pg_sys::error_context_stack;
-                let mut jmp_buff = std::mem::MaybeUninit::uninit();
-                let jump_value = pg_sys::sigsetjmp(jmp_buff.as_mut_ptr(), 0);
-
-                let result = if jump_value == 0 {
-                    pg_sys::PG_exception_stack = jmp_buff.as_mut_ptr();
+                crate::submodules::setjmp::postgres_function_guard(move || {
+                    extern "C" {
+                        fn #func_name( #arg_list_with_types ) #return_type ;
+                    }
                     #func_name(#arg_list)
-                } else {
-                    pg_sys::PG_exception_stack = prev_exception_stack;
-                    pg_sys::error_context_stack = prev_error_context_stack;
-                    std::panic::panic_any(pg_sys::JumpContext { });
-                };
-
-                pg_sys::PG_exception_stack = prev_exception_stack;
-                pg_sys::error_context_stack = prev_error_context_stack;
-
-                result
+                })
             }
         }
     }
