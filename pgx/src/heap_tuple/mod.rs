@@ -80,28 +80,87 @@ impl<'a> PgHeapTuple<'a, AllocatedByRust> {
 
         Self {
             tuple: data,
-            tupdesc: PgTupleDesc::from_pg_is_copy(tupdesc),
+            tupdesc: PgTupleDesc::from_pg(tupdesc),
+        }
+    }
+
+    pub fn set_named<T: IntoDatum>(&mut self, attname: &str, value: T) -> FromDatumResult<()> {
+        let mut attnum: Option<NonZeroUsize> = None;
+        for att in self.tupdesc.iter() {
+            if att.name() == attname {
+                // we found the named attribute
+                attnum = Some(NonZeroUsize::new(att.attnum as usize).unwrap());
+                break;
+            }
+        }
+
+        match attnum {
+            Some(attnum) => {
+                self.set_indexed(attnum, value);
+                Ok(Some(()))
+            }
+            None => Err(TryFromDatumError::NoSuchAttributeName(attname.to_owned())),
+        }
+    }
+
+    pub fn set_indexed<T: IntoDatum>(&mut self, attno: NonZeroUsize, value: T) {
+        unsafe {
+            let mut datums = (0..self.tupdesc.len()).collect::<Vec<_>>();
+            let mut nulls = (0..self.tupdesc.len()).map(|_| false).collect::<Vec<_>>();
+            let mut do_replace = (0..self.tupdesc.len()).map(|_| false).collect::<Vec<_>>();
+
+            let datum = value.into_datum();
+            let attno = attno.get() - 1;
+
+            nulls[attno] = datum.is_none();
+            datums[attno] = datum.unwrap_or(0);
+            do_replace[attno] = true;
+
+            let new_tuple = PgBox::<pg_sys::HeapTupleData, AllocatedByRust>::from_rust(
+                pg_sys::heap_modify_tuple(
+                    self.tuple.as_ptr(),
+                    self.tupdesc.as_ptr(),
+                    datums.as_mut_ptr(),
+                    nulls.as_mut_ptr(),
+                    do_replace.as_mut_ptr(),
+                ),
+            );
+            let old_tuple = std::mem::replace(&mut self.tuple, new_tuple);
+            drop(old_tuple);
         }
     }
 }
 
 impl<'a, AllocatedBy: WhoAllocated<pg_sys::HeapTupleData>> PgHeapTuple<'a, AllocatedBy> {
-    pub fn get_named<T: FromDatum + IntoDatum + 'static, A: AsRef<str>>(
+    #[inline]
+    pub fn into_datum(self) -> Option<pg_sys::Datum> {
+        self.tuple.into_datum()
+    }
+
+    #[inline]
+    pub fn into_composite_datum(self) -> Option<pg_sys::Datum> {
+        unsafe {
+            Some(pg_sys::heap_copy_tuple_as_datum(
+                self.tuple.as_ptr(),
+                self.tupdesc.as_ptr(),
+            ))
+        }
+    }
+
+    pub fn get_named<T: FromDatum + IntoDatum + 'static>(
         &self,
-        attname: A,
+        attname: &str,
     ) -> FromDatumResult<T> {
         // find the attribute number by name
         for att in self.tupdesc.iter() {
-            if att.name() == attname.as_ref() {
+            if att.name() == attname {
                 // we found the named attribute, so go get it from the HeapTuple
-                return self.get_indexed(NonZeroUsize::new(att.attnum as usize + 1).unwrap());
+                return self.get_indexed(NonZeroUsize::new(att.attnum as usize).unwrap());
             }
         }
 
         // no attribute with the specified name
-        Err(TryFromDatumError::NoSuchAttributeName(
-            attname.as_ref().to_owned(),
-        ))
+        Err(TryFromDatumError::NoSuchAttributeName(attname.to_owned()))
     }
 
     pub fn get_indexed<T: FromDatum + IntoDatum + 'static>(
