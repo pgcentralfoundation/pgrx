@@ -642,8 +642,7 @@ impl SpiHeapTupleData {
                 Some(tupdesc) => unsafe {
                      colname = String::new(pg_sys::SPI_fname(tupdesc, ordinal));
                 },
-                None => {
-                   panic!("TupDesc is NULL");
+                None => panic!("TupDesc is NULL");
          };
          colname;
     } 
