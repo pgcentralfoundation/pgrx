@@ -526,13 +526,13 @@ impl PgGuardRewriter {
                     return quote! { extern "C" { #func } };
                 }
 
-                self.foreign_item_fn(func)
+                self.foreign_item_fn(&func)
             }
             _ => quote! { extern "C" { #item } },
         }
     }
 
-    pub fn foreign_item_fn(&self, func: ForeignItemFn) -> proc_macro2::TokenStream {
+    pub fn foreign_item_fn(&self, func: &ForeignItemFn) -> proc_macro2::TokenStream {
         let func_name = PgGuardRewriter::build_func_name(&func.sig);
         let arg_list = PgGuardRewriter::rename_arg_list(&func.sig);
         let arg_list_with_types = PgGuardRewriter::rename_arg_list_with_types(&func.sig);
