@@ -9,7 +9,8 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 extern crate proc_macro;
 
-use pgx_utils::{categorize_return_type, sql_entity_graph::PgExtern, CategorizedType};
+use crate::sql_entity_graph::PgExtern;
+use crate::{categorize_return_type, CategorizedType};
 use proc_macro2::{Ident, Span};
 use quote::{quote, quote_spanned, ToTokens};
 use std::ops::Deref;
@@ -267,7 +268,7 @@ impl PgGuardRewriter {
     ) -> proc_macro2::TokenStream {
         let generic_type = proc_macro2::TokenStream::from_str(types.first().unwrap()).unwrap();
         let mut generic_type = syn::parse2::<syn::Type>(generic_type).unwrap();
-        pgx_utils::anonymonize_lifetimes(&mut generic_type);
+        crate::anonymonize_lifetimes(&mut generic_type);
 
         let result_handler = if optional {
             quote! {
@@ -374,7 +375,7 @@ impl PgGuardRewriter {
         let composite_type = format!("({})", types.join(","));
         let generic_type = proc_macro2::TokenStream::from_str(&composite_type).unwrap();
         let mut generic_type = syn::parse2::<syn::Type>(generic_type).unwrap();
-        pgx_utils::anonymonize_lifetimes(&mut generic_type);
+        crate::anonymonize_lifetimes(&mut generic_type);
 
         let result_handler = if optional {
             quote! {
@@ -538,10 +539,6 @@ impl PgGuardRewriter {
         let return_type = PgGuardRewriter::get_return_type(&func.sig);
 
         quote! {
-            #[doc(hidden)]
-            #[allow(clippy::missing_safety_doc)]
-            #[allow(clippy::redundant_closure)]
-            #[allow(improper_ctypes_definitions)] /* for i128 */
             pub unsafe fn #func_name ( #arg_list_with_types ) #return_type {
                 crate::submodules::setjmp::postgres_function_guard(move || {
                     extern "C" {
@@ -722,7 +719,7 @@ impl FunctionSignatureRewriter {
                         let ts = if is_option {
                             let option_type = extract_option_type(&type_);
                             let mut option_type = syn::parse2::<syn::Type>(option_type).unwrap();
-                            pgx_utils::anonymonize_lifetimes(&mut option_type);
+                            crate::anonymonize_lifetimes(&mut option_type);
 
                             quote_spanned! {ident.span()=>
                                 let #name = pgx::pg_getarg::<#option_type>(#fcinfo_ident, #i);
@@ -738,7 +735,7 @@ impl FunctionSignatureRewriter {
                                 let #name = pgx::pg_getarg_datum_raw(#fcinfo_ident, #i) as #type_;
                             }
                         } else {
-                            pgx_utils::anonymonize_lifetimes(&mut type_);
+                            crate::anonymonize_lifetimes(&mut type_);
                             quote_spanned! {ident.span()=>
                                 let #name = pgx::pg_getarg::<#type_>(#fcinfo_ident, #i).unwrap_or_else(|| panic!("{} is null", stringify!{#ident}));
                             }

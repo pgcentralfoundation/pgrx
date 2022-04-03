@@ -13,6 +13,7 @@ use bindgen::callbacks::MacroParsingBehavior;
 use eyre::{eyre, WrapErr};
 use pgx_utils::pg_config::{PgConfig, PgConfigSelector, Pgx};
 use pgx_utils::prefix_path;
+use pgx_utils::rewriter::PgGuardRewriter;
 use quote::quote;
 use rayon::prelude::*;
 use std::{
@@ -20,7 +21,7 @@ use std::{
     path::PathBuf,
     process::{Command, Output},
 };
-use syn::Item;
+use syn::{ForeignItem, Item};
 
 #[derive(Debug)]
 struct IgnoredMacros(HashSet<String>);
@@ -133,10 +134,9 @@ fn main() -> color_eyre::Result<()> {
             let bindgen_output = run_bindgen(&pg_config, &include_h)
                 .wrap_err_with(|| format!("bindgen failed for pg{}", major_version))?;
 
-            let rewritten_items = rewrite_items(&bindgen_output)
-                .wrap_err_with(|| format!("failed to rewrite items for pg{}", major_version))?;
-
             let oids = extract_oids(&bindgen_output);
+            let rewritten_items = rewrite_items(bindgen_output)
+                .wrap_err_with(|| format!("failed to rewrite items for pg{}", major_version))?;
 
             let dest_dirs = if std::env::var("PGX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE")
                 .unwrap_or("false".into())
@@ -154,7 +154,6 @@ fn main() -> color_eyre::Result<()> {
                     &bindings_file,
                     quote! {
                         use crate as pg_sys;
-                        use pgx_macros::*;
                         use crate::PgNode;
                     },
                 )
@@ -204,8 +203,8 @@ fn write_rs_file(
 
 /// Given a token stream representing a file, apply a series of transformations to munge
 /// the bindgen generated code with some postgres specific enhancements
-fn rewrite_items(file: &syn::File) -> eyre::Result<proc_macro2::TokenStream> {
-    let items = apply_pg_guard(&file.items)?;
+fn rewrite_items(file: syn::File) -> eyre::Result<proc_macro2::TokenStream> {
+    let items = apply_pg_guard(file.items)?;
     let pgnode_impls = impl_pg_node(&items)?;
 
     let mut stream = proc_macro2::TokenStream::new();
@@ -648,18 +647,22 @@ fn run_command(mut command: &mut Command, version: &str) -> eyre::Result<Output>
     Ok(rc)
 }
 
-fn apply_pg_guard(items: &Vec<syn::Item>) -> eyre::Result<Vec<syn::Item>> {
+fn apply_pg_guard(items: Vec<syn::Item>) -> eyre::Result<Vec<syn::Item>> {
     let mut out = Vec::with_capacity(items.len());
-    for item in items.into_iter() {
+    for item in items {
         match item {
             Item::ForeignMod(block) => {
-                out.push(syn::parse2(quote! {
-                    #[pg_guard]
-                    #block
-                })?);
+                for item in block.items {
+                    match item {
+                        ForeignItem::Fn(func) => out.push(syn::parse2(
+                            PgGuardRewriter::new().foreign_item_fn(func.clone()),
+                        )?),
+                        other => out.push(syn::parse2(quote! { extern "C" { #other } })?),
+                    }
+                }
             }
             _ => {
-                out.push(item.clone());
+                out.push(item);
             }
         }
     }
