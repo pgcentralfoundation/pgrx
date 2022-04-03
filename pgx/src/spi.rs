@@ -640,11 +640,11 @@ impl SpiHeapTupleData {
          let colname;
          match self.tupdesc {
                 Some(tupdesc) => unsafe {
-                     colname = String::new(pg_sys::SPI_fname(tupdesc, ordinal));
+                     colname = pg_sys::SPI_fname(tupdesc, ordinal).to_string();
                 },
                 None => panic!("TupDesc is NULL");
          };
-         colname;
+         colname
     } 
 }
 
