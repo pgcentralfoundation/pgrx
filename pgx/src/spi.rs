@@ -465,6 +465,26 @@ impl SpiTupleTable {
             }
         }
     }
+    pub fn get_nattrs(&self) -> i32 {
+        let natts;
+        match self.tupdesc {
+                Some(tupdesc) => unsafe {
+                    natts = (*tupdesc).natts;
+                    natts
+                },
+                None => panic!("TupDesc is NULL"),
+         }
+    }
+    pub fn fname(&self, ordinal: i32) -> String {
+         let colname;
+         match self.tupdesc {
+                Some(tupdesc) => unsafe {
+                     colname = pg_sys::SPI_fname(tupdesc, ordinal);
+                     colname;
+                },
+                None => panic!("TupDesc is NULL"),
+         }
+    } 
 }
 
 impl SpiHeapTupleData {
@@ -606,6 +626,26 @@ impl SpiHeapTupleData {
             }
         }
     }
+    pub fn get_nattrs(&self) -> i32 {
+        let natts;
+        match self.tupdesc {
+                Some(tupdesc) => unsafe {
+                    natts = (*tupdesc).natts;
+                    natts
+                },
+                None => panic!("TupDesc is NULL"),
+         }
+    }
+    pub fn fname(&self, ordinal: i32) -> String {
+         let colname;
+         match self.tupdesc {
+                Some(tupdesc) => unsafe {
+                     colname = pg_sys::SPI_fname(tupdesc, ordinal);
+                     colname;
+                },
+                None => panic!("TupDesc is NULL"),
+         }
+    } 
 }
 
 impl<Datum: IntoDatum + FromDatum> From<Datum> for SpiHeapTupleDataEntry {
