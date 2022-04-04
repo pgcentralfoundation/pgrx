@@ -1,5 +1,14 @@
+/// Given a closure that is assumed to be a wrapped Postgres `extern "C"` function, [pg_guard_ffi_boundary]
+/// will setup intermediate `sigsetjmp` barrier to enable Rust to catch any `elog(ERROR)` Postgres
+/// might raise while running the supplied closure.  
+///
+/// This caught error is then converted into a Rust `panic!()` and propagated up the stack, ultimately
+/// being converted into a transaction-aborting Postgres `ERROR` by pgx.
+///
+/// Currently, this function is only used by pgx' generated Postgres bindings.  It is not (yet)
+/// intended (or even necessary) for normal user code.
 #[inline(always)]
-pub unsafe fn postgres_function_guard<T, F: FnOnce() -> T>(f: F) -> T {
+pub(crate) unsafe fn pg_guard_ffi_boundary<T, F: FnOnce() -> T>(f: F) -> T {
     use crate as pg_sys;
 
     // as the panic message says, we can't call Postgres functions from threads

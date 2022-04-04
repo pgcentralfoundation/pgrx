@@ -67,6 +67,8 @@ fn main() -> color_eyre::Result<()> {
         }
     }
 
+    let is_for_release =
+        std::env::var("PGX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE").unwrap_or("0".to_string()) == "1";
     println!("cargo:rerun-if-env-changed=PGX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE");
 
     let manifest_dir = PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").unwrap());
@@ -135,7 +137,7 @@ fn main() -> color_eyre::Result<()> {
                 .wrap_err_with(|| format!("bindgen failed for pg{}", major_version))?;
 
             let oids = extract_oids(&bindgen_output);
-            let rewritten_items = rewrite_items(&bindgen_output)
+            let rewritten_items = rewrite_items(&bindgen_output, is_for_release)
                 .wrap_err_with(|| format!("failed to rewrite items for pg{}", major_version))?;
 
             let dest_dirs = if std::env::var("PGX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE")
@@ -201,9 +203,9 @@ fn write_rs_file(
 
 /// Given a token stream representing a file, apply a series of transformations to munge
 /// the bindgen generated code with some postgres specific enhancements
-fn rewrite_items(file: &syn::File) -> eyre::Result<proc_macro2::TokenStream> {
+fn rewrite_items(file: &syn::File, is_for_release: bool) -> eyre::Result<proc_macro2::TokenStream> {
     let mut items = apply_pg_guard(&file.items)?;
-    let pgnode_impls = impl_pg_node(&file.items)?;
+    let pgnode_impls = impl_pg_node(&file.items, is_for_release)?;
 
     // append the pgnodes to the set of items
     items.extend(pgnode_impls);
@@ -252,7 +254,10 @@ fn extract_oids(code: &syn::File) -> proc_macro2::TokenStream {
 }
 
 /// Implement our `PgNode` marker trait for `pg_sys::Node` and its "subclasses"
-fn impl_pg_node(items: &Vec<syn::Item>) -> eyre::Result<proc_macro2::TokenStream> {
+fn impl_pg_node(
+    items: &Vec<syn::Item>,
+    is_for_release: bool,
+) -> eyre::Result<proc_macro2::TokenStream> {
     let mut pgnode_impls = proc_macro2::TokenStream::new();
 
     // we scope must of the computation so we can borrow `items` and then
@@ -307,8 +312,18 @@ fn impl_pg_node(items: &Vec<syn::Item>) -> eyre::Result<proc_macro2::TokenStream
         dfs_find_nodes(root, &struct_graph, &mut node_set);
     }
 
+    let nodes: Box<dyn std::iter::Iterator<Item = StructDescriptor>> = if is_for_release {
+        // if it's for release we want to sort by struct name to avoid diff churn
+        let mut set = node_set.into_iter().collect::<Vec<_>>();
+        set.sort_by(|a, b| a.struct_.ident.cmp(&b.struct_.ident));
+        Box::new(set.into_iter())
+    } else {
+        // otherwise we don't care and want to avoid the CPU overhead of sorting
+        Box::new(node_set.into_iter())
+    };
+
     // now we can finally iterate the Nodes and emit out Display impl
-    for node_struct in node_set.into_iter() {
+    for node_struct in nodes {
         let struct_name = &node_struct.struct_.ident;
 
         // impl the PgNode trait for all nodes
