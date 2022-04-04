@@ -478,7 +478,7 @@ impl SpiTupleTable {
          }
     }
     pub fn fname(&self, ordinal: i32) -> String {
-         CStr::from_ptr(pg_sys::SPI_fname(tupdesc.unwrap(), ordinal)).to_str().unwrap().to_owned()
+         CStr::from_ptr(pg_sys::SPI_fname(self.tupdesc.unwrap(), ordinal)).to_str().unwrap().to_owned()
     } 
 }
 
