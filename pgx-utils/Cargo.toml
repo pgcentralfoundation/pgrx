@@ -32,6 +32,6 @@ url = "2.2.2"
 eyre = "0.6.7"
 tracing = "0.1.32"
 tracing-error = "0.2.0"
-tracing-subscriber = { version = "0.3.9", features = [ "env-filter" ] }
+tracing-subscriber = { version = "0.3.10", features = [ "env-filter" ] }
 petgraph = "0.6.0"
 prettyplease = "0.1.9"
