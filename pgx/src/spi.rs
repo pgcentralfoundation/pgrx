@@ -629,7 +629,7 @@ impl SpiHeapTupleData {
         }
     }
     pub fn get_nattrs(&self) -> i32 {
-        self.(*tupdesc).natts;
+        (*self.tupdesc).natts
     }
     pub fn fname(&self, ordinal: i32) -> String {
          CStr::from_ptr(pg_sys::SPI_fname(self.tupdesc, ordinal)).to_str().unwrap().to_owned()
