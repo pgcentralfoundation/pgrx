@@ -624,7 +624,9 @@ impl SpiHeapTupleData {
         }
     }
     pub fn get_nattrs(&self) -> i32 {
-        (*self.tupdesc).natts
+        unsafe {
+            (*self.tupdesc).natts
+        }
     }
     pub fn fname(&self, ordinal: i32) -> String {
          unsafe {
