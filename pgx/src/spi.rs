@@ -639,14 +639,7 @@ impl SpiHeapTupleData {
          }
     }
     pub fn fname(&self, ordinal: i32) -> String {
-         let colname;
-         match self.tupdesc {
-                Some(tupdesc) => unsafe {
-                     colname = CStr::from_ptr(pg_sys::SPI_fname(tupdesc, ordinal)).to_str().unwrap().to_owned();
-                },
-                None => panic!("TupDesc is NULL");
-         };
-         colname
+         CStr::from_ptr(pg_sys::SPI_fname(self.tupdesc.expect("TupDesc is Null"), ordinal)).to_str().unwrap().to_owned();
     } 
 }
 
