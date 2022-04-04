@@ -540,7 +540,7 @@ impl PgGuardRewriter {
 
         quote! {
             pub unsafe fn #func_name ( #arg_list_with_types ) #return_type {
-                crate::submodules::setjmp::postgres_function_guard(move || {
+                crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
                     extern "C" {
                         fn #func_name( #arg_list_with_types ) #return_type ;
                     }
