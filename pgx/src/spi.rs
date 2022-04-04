@@ -478,14 +478,7 @@ impl SpiTupleTable {
          }
     }
     pub fn fname(&self, ordinal: i32) -> String {
-         let colname;
-         match self.tupdesc {
-                Some(tupdesc) => unsafe {
-                     colname = pg_sys::SPI_fname(tupdesc, ordinal);
-                     colname;
-                },
-                None => panic!("TupDesc is NULL"),
-         }
+         CStr::from_ptr(pg_sys::SPI_fname(tupdesc.unwrap(), ordinal)).to_str().unwrap().to_owned()
     } 
 }
 
