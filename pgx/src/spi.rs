@@ -629,14 +629,7 @@ impl SpiHeapTupleData {
         }
     }
     pub fn get_nattrs(&self) -> i32 {
-        let natts;
-        match self.tupdesc {
-                Some(tupdesc) => unsafe {
-                    natts = (*tupdesc).natts;
-                    natts
-                },
-                None => panic!("TupDesc is NULL"),
-         }
+        self.(*tupdesc).natts;
     }
     pub fn fname(&self, ordinal: i32) -> String {
          CStr::from_ptr(pg_sys::SPI_fname(self.tupdesc, ordinal)).to_str().unwrap().to_owned()
