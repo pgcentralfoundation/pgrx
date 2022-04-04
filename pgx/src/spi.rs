@@ -15,6 +15,8 @@ use num_traits::FromPrimitive;
 use std::collections::HashMap;
 use std::fmt::Debug;
 use std::ops::{Index, IndexMut};
+use std::ffi::CStr;
+use std::str;
 
 #[derive(Debug, Primitive)]
 pub enum SpiOk {
@@ -640,7 +642,7 @@ impl SpiHeapTupleData {
          let colname;
          match self.tupdesc {
                 Some(tupdesc) => unsafe {
-                     colname = pg_sys::SPI_fname(tupdesc, ordinal).to_string();
+                     colname = CStr::from_ptr(pg_sys::SPI_fname(tupdesc, ordinal)).to_str().unwrap().to_owned();
                 },
                 None => panic!("TupDesc is NULL");
          };
