@@ -483,7 +483,9 @@ impl SpiTupleTable {
         }
     } 
     pub fn get_typeid(&self, ordinal: i32) -> PgOid {
-        PgOid::from(pg_sys::SPI_gettypeid(self.tupdesc.unwrap(), ordinal))
+        unsafe {
+             PgOid::from(pg_sys::SPI_gettypeid(self.tupdesc.unwrap(), ordinal))
+        }
     }
 }
 
@@ -637,7 +639,9 @@ impl SpiHeapTupleData {
          }
     } 
     pub fn get_typeid(&self, ordinal: i32) -> PgOid {
-        PgOid::from(pg_sys::SPI_gettypeid(self.tupdesc, ordinal))
+        unsafe {
+             PgOid::from(pg_sys::SPI_gettypeid(self.tupdesc, ordinal))
+        }
     }
 }
 
