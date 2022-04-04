@@ -627,7 +627,7 @@ impl SpiHeapTupleData {
         (*self.tupdesc).natts
     }
     pub fn fname(&self, ordinal: i32) -> String {
-         uname {
+         unsafe {
              CStr::from_ptr(pg_sys::SPI_fname(self.tupdesc, ordinal)).to_str().unwrap().to_owned()
          }
     } 
