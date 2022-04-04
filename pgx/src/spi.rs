@@ -477,8 +477,8 @@ impl SpiTupleTable {
                 None => panic!("TupDesc is NULL"),
          }
     }
-    pub fn fname(&self, ordinal: i32) -> String {
-         unsafe CStr::from_ptr(pg_sys::SPI_fname(self.tupdesc.unwrap(), ordinal)).to_str().unwrap().to_owned()
+    pub fn fname(&self, ordinal: i32) -> String unsafe {
+        CStr::from_ptr(pg_sys::SPI_fname(self.tupdesc.unwrap(), ordinal)).to_str().unwrap().to_owned()
     } 
 }
 
@@ -624,7 +624,7 @@ impl SpiHeapTupleData {
     pub fn get_nattrs(&self) -> i32 {
         (*self.tupdesc).natts
     }
-    pub fn fname(&self, ordinal: i32) -> String {
+    pub fn fname(&self, ordinal: i32) -> String unsafe {
          CStr::from_ptr(pg_sys::SPI_fname(self.tupdesc, ordinal)).to_str().unwrap().to_owned()
     } 
 }
