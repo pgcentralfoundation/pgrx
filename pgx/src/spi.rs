@@ -639,7 +639,7 @@ impl SpiHeapTupleData {
          }
     }
     pub fn fname(&self, ordinal: i32) -> String {
-         CStr::from_ptr(pg_sys::SPI_fname(self.tupdesc.expect("TupDesc is Null"), ordinal)).to_str().unwrap().to_owned();
+         CStr::from_ptr(pg_sys::SPI_fname(self.tupdesc.expect("TupDesc is Null"), ordinal)).to_str().unwrap().to_owned()
     } 
 }
 
