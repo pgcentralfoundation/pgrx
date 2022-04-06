@@ -53,25 +53,28 @@ impl<'a> PgHeapTuple<'a, AllocatedByPostgres> {
     ///
     /// ## Errors
     /// - [PgHeapTupleCreationError::NullTuple] if the specified `TriggerTuple` is `null`
-    pub fn from_trigger_data(
+    ///
+    /// ## Safety
+    ///
+    /// This function is unsafe as we cannot guarantee that any pointers in the `trigger_data`
+    /// argument are valid.
+    pub unsafe fn from_trigger_data(
         trigger_data: &'a pg_sys::TriggerData,
         which_tuple: TriggerTuple,
     ) -> PgHeapTupleCreationResult<'a, AllocatedByPostgres> {
-        unsafe {
-            let tupdesc =
-                PgTupleDesc::from_pg_unchecked(trigger_data.tg_relation.as_ref().unwrap().rd_att);
+        let tupdesc =
+            PgTupleDesc::from_pg_unchecked(trigger_data.tg_relation.as_ref().unwrap().rd_att);
 
-            let tuple = match which_tuple {
-                TriggerTuple::Current => trigger_data.tg_trigtuple,
-                TriggerTuple::New => trigger_data.tg_newtuple,
-            };
+        let tuple = match which_tuple {
+            TriggerTuple::Current => trigger_data.tg_trigtuple,
+            TriggerTuple::New => trigger_data.tg_newtuple,
+        };
 
-            if tuple.is_null() {
-                return Err(PgHeapTupleCreationError::NullTuple);
-            }
-
-            Ok(PgHeapTuple::from_heap_tuple(tupdesc, tuple))
+        if tuple.is_null() {
+            return Err(PgHeapTupleCreationError::NullTuple);
         }
+
+        Ok(PgHeapTuple::from_heap_tuple(tupdesc, tuple))
     }
 
     /// Consumes a `[PgHeapTuple]` considered to be allocated by Postgres and transforms it into one
