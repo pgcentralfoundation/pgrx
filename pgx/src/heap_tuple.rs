@@ -120,7 +120,7 @@ impl<'a> PgHeapTuple<'a, AllocatedByRust> {
         }
     }
 
-    /// Creates a new [PgHeapTuple] from an opaque Datum that is should be a "composite" type.
+    /// Creates a new [PgHeapTuple] from an opaque Datum that should be a "composite" type.
     ///
     /// The Datum should be a pointer to a [pg_sys::HeapTupleHeader].  Typically, this will be used
     /// in situations when working with SQL `ROW(...)` constructors, or a composite SQL type such as
