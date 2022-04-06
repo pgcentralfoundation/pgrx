@@ -3,6 +3,8 @@ use crate::{
     heap_getattr_raw, pg_sys, AllocatedByPostgres, AllocatedByRust, FromDatum, FromDatumResult,
     IntoDatum, PgBox, PgTupleDesc, TriggerTuple, TryFromDatumError, WhoAllocated,
 };
+use std::error::Error;
+use std::fmt::{Display, Formatter};
 use std::num::NonZeroUsize;
 
 /// Describes errors that can occur when trying to create a new [PgHeapTuple].
@@ -11,6 +13,19 @@ pub enum PgHeapTupleCreationError {
     NullTuple,
     IncorrectAttributeCount,
 }
+
+impl Display for PgHeapTupleCreationError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match self {
+            PgHeapTupleCreationError::NullTuple => write!(f, "Null tuple"),
+            PgHeapTupleCreationError::IncorrectAttributeCount => {
+                write!(f, "Incorrect attribute count")
+            }
+        }
+    }
+}
+
+impl Error for PgHeapTupleCreationError {}
 
 pub type PgHeapTupleCreationResult<'a, AllocatedBy> =
     Result<PgHeapTuple<'a, AllocatedBy>, PgHeapTupleCreationError>;
@@ -236,13 +251,13 @@ impl<'a, AllocatedBy: WhoAllocated<pg_sys::HeapTupleData>> PgHeapTuple<'a, Alloc
         }
     }
 
-    /// How many attributes does this [PgHeapTuple] have?
+    /// Returns the number of attributes in this [PgHeapTuple].
     #[inline]
     pub fn len(&self) -> usize {
         self.tupdesc.len()
     }
 
-    /// What are the attributes for this [PgHeapTuple]?
+    /// Returns an iterator over the attributes in this [PgHeapTuple].
     ///
     /// The return value is `(attribute_number: NonZeroUsize, attribute_info: &pg_sys::FormData_pg_attribute)`.
     pub fn attributes(

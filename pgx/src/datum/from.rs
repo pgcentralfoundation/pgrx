@@ -13,7 +13,9 @@ use crate::{
     pg_sys, text_to_rust_str_unchecked, varlena_to_byte_slice, AllocatedByPostgres, IntoDatum,
     PgBox, PgMemoryContexts,
 };
+use std::error::Error;
 use std::ffi::CStr;
+use std::fmt::{Display, Formatter};
 use std::num::NonZeroUsize;
 
 /// If converting a Datum to a Rust type fails, this is the set of possible reasons why.
@@ -31,6 +33,19 @@ pub enum TryFromDatumError {
     /// The specified attribute name is invalid
     NoSuchAttributeName(String),
 }
+
+impl Display for TryFromDatumError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match self {
+            TryFromDatumError::IncompatibleTypes => f.write_str("Incompatible types"),
+            TryFromDatumError::NullDatumPointer => f.write_str("Null Datum pointer"),
+            TryFromDatumError::NoSuchAttributeNumber(_) => f.write_str("No such attribute number"),
+            TryFromDatumError::NoSuchAttributeName(_) => f.write_str("No such attribute name"),
+        }
+    }
+}
+
+impl Error for TryFromDatumError {}
 
 /// A [Result] type that is used to indicate whether a conversion from a Datum to a Rust type
 /// succeeded or failed.
