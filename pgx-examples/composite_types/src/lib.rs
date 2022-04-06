@@ -20,10 +20,10 @@ impl FromDatum for MyType {
             let tuple = PgHeapTuple::from_composite_datum(composite);
             Some(Self {
                 name: tuple
-                    .get_named::<String>("name")
+                    .get_by_name::<String>("name")
                     .expect("failed to get attribute: name"),
                 age: tuple
-                    .get_named::<i32>("age")
+                    .get_by_name::<i32>("age")
                     .expect("failed to get attribute: age"),
             })
         }
@@ -38,9 +38,11 @@ unsafe fn debug_my_type(
     let composite = pg_getarg_datum(fcinfo, 0).unwrap();
     let mut composite = PgHeapTuple::from_composite_datum(composite);
 
-    composite.set_named("age", 100).expect("no such attribute");
     composite
-        .set_named("name", "Someone Else")
+        .set_by_name("age", 100)
+        .expect("no such attribute");
+    composite
+        .set_by_name("name", "Someone Else")
         .expect("no such attribute");
 
     let composite = composite.into_composite_datum().unwrap();
