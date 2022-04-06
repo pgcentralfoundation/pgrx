@@ -11,7 +11,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 use crate::{is_a, pg_sys};
 
-/// Indicates which trigger tuple to convert into a [PgHeapTuple].
+/// Indicates which trigger tuple to convert into a [crate::PgHeapTuple].
 #[derive(Debug, Copy, Clone)]
 pub enum TriggerTuple {
     /// The row for which the trigger was fired. This is the row being inserted, updated, or deleted.

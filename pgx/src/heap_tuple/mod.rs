@@ -15,16 +15,16 @@ pub enum PgHeapTupleCreationError {
 pub type PgHeapTupleCreationResult<'a, AllocatedBy> =
     Result<PgHeapTuple<'a, AllocatedBy>, PgHeapTupleCreationError>;
 
-/// A [PgHepTuple] is a lightweight wrapper around Postgres' [pg_sys::HeapTuple] object and a [PgTupleDesc].
+/// A [PgHeapTuple] is a lightweight wrapper around Postgres' [pg_sys::HeapTuple] object and a [PgTupleDesc].
 ///
 /// In order to access the attributes within a [pg_sys::HeapTuple], the [PgTupleDesc] is required
 /// to describe its structure.
 ///
-/// [PgHeapTuple]s can be created from existing (Postgres-provided) [pg_sys:HeapTuple] pointers, from
+/// [PgHeapTuple]s can be created from existing (Postgres-provided) [pg_sys::HeapTuple] pointers, from
 /// [pg_sys::TriggerData] pointers, from a composite datum, or created from scratch using raw Datums.
 ///
 /// A [PgHeapTuple] can either be considered to be allocated by Postgres or by the Rust runtime. If
-/// allocated by Postgres, it is not mutable until [::into_owned()] is called.
+/// allocated by Postgres, it is not mutable until [PgHeapTuple::into_owned] is called.
 pub struct PgHeapTuple<'a, AllocatedBy: WhoAllocated<pg_sys::HeapTupleData>> {
     tuple: PgBox<pg_sys::HeapTupleData, AllocatedBy>,
     tupdesc: PgTupleDesc<'a>,
@@ -33,7 +33,7 @@ pub struct PgHeapTuple<'a, AllocatedBy: WhoAllocated<pg_sys::HeapTupleData>> {
 impl<'a> PgHeapTuple<'a, AllocatedByPostgres> {
     /// Creates a new [PgHeapTuple] from a [PgTupleDesc] and a [pg_sys::HeapTuple] pointer.  The
     /// returned [PgHeapTuple] will be considered by have been allocated by Postgres and is not mutable
-    /// until [::into_owned()] is called.
+    /// until [PgHeapTuple::into_owned] is called.
     ///
     /// ## Safety
     ///
@@ -49,7 +49,7 @@ impl<'a> PgHeapTuple<'a, AllocatedByPostgres> {
 
     /// Creates a new [PgHeapTuple] from one of the two (`Current` or `New`) trigger tuples.  The returned
     /// [PgHeapTuple] will be considered by have been allocated by Postgres and is not mutable until
-    /// [::into_owned()] is called.  
+    /// [PgHeapTuple::into_owned] is called.  
     ///
     /// ## Errors
     /// - [PgHeapTupleCreationError::NullTuple] if the specified `TriggerTuple` is `null`
@@ -169,7 +169,7 @@ impl<'a> PgHeapTuple<'a, AllocatedByRust> {
     /// Attribute numbers start at 1, not 0.
     ///
     /// ## Errors
-    /// - return [TryFromDatumError::NoSuchAttributeIndex] if the attribute does not exist
+    /// - return [TryFromDatumError::NoSuchAttributeNumber] if the attribute does not exist
     /// - return [TryFromDatumError::IncompatibleTypes] if the Rust type of the `value` is not
     /// compatible with the attribute's Postgres type
     pub fn set_by_index<T: IntoDatum>(

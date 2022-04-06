@@ -42,14 +42,27 @@ pub trait IntoDatum {
     ///
     /// If implementing this yourself, you likely want to follow a pattern like this:
     ///
-    /// ```text
-    ///  fn is_compatible_with(other: pg_sys::Oid) -> bool {
-    ///     // first, if our type is the other type, then we're compatible
-    ///     Self::type_oid() == other
+    /// ```rust,no_run
+    /// # use pgx::*;
+    /// # #[repr(transparent)]
+    /// # struct FooType(String);
+    /// # impl pgx::IntoDatum for FooType {      
+    ///     fn is_compatible_with(other: pg_sys::Oid) -> bool {
+    ///         // first, if our type is the other type, then we're compatible
+    ///         Self::type_oid() == other
     ///
-    ///     // and here's the other type we're compatible with
-    ///     || other == pg_sys::TEXTOID
-    ///  }
+    ///         // and here's the other type we're compatible with
+    ///         || other == pg_sys::VARCHAROID
+    ///     }
+    ///
+    /// #    fn into_datum(self) -> Option<pg_sys::Datum> {
+    /// #        todo!()
+    /// #    }
+    /// #
+    /// #    fn type_oid() -> pg_sys::Oid {
+    /// #        pg_sys::TEXTOID
+    /// #    }
+    /// # }
     /// ```
     #[inline]
     fn is_compatible_with(other: pg_sys::Oid) -> bool {
