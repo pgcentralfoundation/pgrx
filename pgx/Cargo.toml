@@ -51,3 +51,5 @@ eyre = "0.6.7"
 tracing = "0.1.32"
 tracing-error = "0.2.0"
 quote = "1.0.17"
+# polyfill until `#![feature(strict_provenance)] stabilizes
+sptr = "0.3"

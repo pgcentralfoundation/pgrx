@@ -345,7 +345,7 @@ impl SpiClient {
 
                         None => {
                             // 'n' here means that the datum is null
-                            datums.push(0);
+                            datums.push(pg_sys::Datum::from(0usize));
                             nulls.push('n' as std::os::raw::c_char);
                         }
                     }

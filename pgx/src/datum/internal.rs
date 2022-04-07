@@ -37,7 +37,7 @@ impl Internal {
     #[inline(always)]
     pub fn new<T>(t: T) -> Self {
         Self(Some(
-            PgMemoryContexts::CurrentMemoryContext.leak_and_drop_on_delete(t) as pg_sys::Datum,
+            pg_sys::Datum::from(PgMemoryContexts::CurrentMemoryContext.leak_and_drop_on_delete(t)),
         ))
     }
 
@@ -56,7 +56,7 @@ impl Internal {
     /// your responsibility.
     #[inline(always)]
     pub unsafe fn get<T>(&self) -> Option<&T> {
-        self.0.and_then(|datum| (datum as *const T).as_ref())
+        self.0.and_then(|datum| (datum.into_void() as *const T).as_ref())
     }
 
     /// Initializes the internal with `value`, then returns a mutable reference to it.
@@ -72,9 +72,9 @@ impl Internal {
     #[inline(always)]
     pub unsafe fn insert<T>(&mut self, value: T) -> &mut T {
         let datum =
-            PgMemoryContexts::CurrentMemoryContext.leak_and_drop_on_delete(value) as pg_sys::Datum;
+            pg_sys::Datum::from(PgMemoryContexts::CurrentMemoryContext.leak_and_drop_on_delete(value));
         let ptr = self.0.insert(datum);
-        &mut *(*ptr as *mut T)
+        &mut *(ptr.into_void() as *mut T)
     }
 
     /// Return a reference to the memory pointed to by this [`Internal`], as `Some(&mut T)`, unless the
@@ -86,7 +86,7 @@ impl Internal {
     /// your responsibility.
     #[inline(always)]
     pub unsafe fn get_mut<T>(&self) -> Option<&mut T> {
-        self.0.and_then(|datum| (datum as *mut T).as_mut())
+        self.0.and_then(|datum| (datum.into_void() as *mut T).as_mut())
     }
 
     /// Initializes the internal with `value` if it is not initialized, then returns a mutable reference to
@@ -135,10 +135,10 @@ impl Internal {
         let ptr = self.0.get_or_insert_with(|| {
             let result = f();
             let datum = PgMemoryContexts::CurrentMemoryContext.leak_and_drop_on_delete(result)
-                as pg_sys::Datum;
+               .into();
             datum
         });
-        &mut *(*ptr as *mut T)
+        &mut *(ptr.into_void() as *mut T)
     }
 
     /// Returns the contained `Option<pg_sys::Datum>`

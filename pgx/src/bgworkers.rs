@@ -247,7 +247,7 @@ impl BackgroundWorkerBuilder {
             bgw_restart_time: None,
             bgw_library_name: name.to_string(),
             bgw_function_name: name.to_string(),
-            bgw_main_arg: 0,
+            bgw_main_arg: pg_sys::Datum::from(0),
             bgw_extra: "".to_string(),
             bgw_notify_pid: 0,
             shared_memory_startup_fn: None,
@@ -354,7 +354,7 @@ impl BackgroundWorkerBuilder {
     ///     .load();
     /// ```
     pub fn set_argument(mut self: Self, input: Option<pg_sys::Datum>) -> Self {
-        self.bgw_main_arg = input.unwrap_or(0);
+        self.bgw_main_arg = pg_sys::Datum::from(input.unwrap_or(0.into()));
         self
     }
 

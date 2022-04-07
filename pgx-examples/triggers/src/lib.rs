@@ -48,7 +48,7 @@ unsafe fn trigger_example(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
         );
 
         // return the inserting tuple, unchanged
-        trigdata.tg_trigtuple as pg_sys::Datum
+        trigdata.tg_trigtuple.into()
     } else {
         panic!("not fired in the ON BEFORE INSERT context");
     }

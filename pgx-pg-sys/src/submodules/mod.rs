@@ -8,10 +8,12 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 pub mod guard;
+mod datum;
 mod oids;
 mod tupdesc;
 mod utils;
 
+pub use datum::{Datum, DatumBlob, NullableDatum};
 pub use guard::*;
 pub use oids::*;
 pub use tupdesc::*;

@@ -363,7 +363,7 @@ impl PgGuardRewriter {
             #(
                 let datum = result.#i.into_datum();
                 match datum {
-                    Some(datum) => { datums[#i] = datum as usize; },
+                    Some(datum) => { datums[#i] = datum.into(); },
                     None => { nulls[#i] = true; }
                 }
             )*

@@ -25,7 +25,7 @@ impl FromDatum for Time {
         if is_null {
             None
         } else {
-            let mut time = datum as i64;
+            let mut time = datum.into_value() as i64;
 
             let hour = time / USECS_PER_HOUR;
             time -= hour * USECS_PER_HOUR;
@@ -54,7 +54,7 @@ impl IntoDatum for Time {
             * USECS_PER_SEC)
             + self.microsecond() as i64;
 
-        Some(datum as pg_sys::Datum)
+        Some(datum.into())
     }
 
     fn type_oid() -> u32 {

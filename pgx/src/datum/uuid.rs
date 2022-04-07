@@ -24,7 +24,7 @@ impl IntoDatum for Uuid {
         let ptr = PgMemoryContexts::CurrentMemoryContext.palloc_slice::<u8>(UUID_BYTES_LEN);
         ptr.clone_from_slice(&self.0);
 
-        Some(ptr.as_ptr() as pg_sys::Datum)
+        Some(ptr.as_ptr().into())
     }
 
     #[inline]
@@ -35,13 +35,13 @@ impl IntoDatum for Uuid {
 
 impl FromDatum for Uuid {
     #[inline]
-    unsafe fn from_datum(datum: usize, is_null: bool, _typoid: pg_sys::Oid) -> Option<Uuid> {
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _typoid: pg_sys::Oid) -> Option<Uuid> {
         if is_null {
             None
-        } else if datum == 0 {
+        } else if datum.into_void() == core::ptr::null_mut() {
             panic!("a uuid Datum as flagged as non-null but the datum is zero");
         } else {
-            let bytes = std::slice::from_raw_parts(datum as *const u8, UUID_BYTES_LEN);
+            let bytes = std::slice::from_raw_parts(datum.into_void() as *const u8, UUID_BYTES_LEN);
             if let Ok(uuid) = Uuid::from_slice(bytes) {
                 Some(uuid)
             } else {

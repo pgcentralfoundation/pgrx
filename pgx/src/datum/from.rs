@@ -14,6 +14,7 @@ use crate::{
     PgMemoryContexts,
 };
 use std::ffi::CStr;
+use sptr::Strict;
 
 /// Convert a `(pg_sys::Datum, is_null:bool, type_oid:pg_sys::Oid)` tuple into a Rust type
 ///
@@ -89,7 +90,7 @@ impl FromDatum for bool {
         if is_null {
             None
         } else {
-            Some(datum != 0)
+            Some(datum.into_void().addr() != 0)
         }
     }
 }
@@ -102,7 +103,7 @@ impl FromDatum for i8 {
         if is_null {
             None
         } else {
-            Some(datum as i8)
+            Some(datum.into_void().addr() as _)
         }
     }
 }
@@ -115,7 +116,7 @@ impl FromDatum for i16 {
         if is_null {
             None
         } else {
-            Some(datum as i16)
+            Some(datum.into_void().addr() as _)
         }
     }
 }
@@ -128,7 +129,7 @@ impl FromDatum for i32 {
         if is_null {
             None
         } else {
-            Some(datum as i32)
+            Some(datum.into_void().addr() as _)
         }
     }
 }
@@ -141,7 +142,7 @@ impl FromDatum for u32 {
         if is_null {
             None
         } else {
-            Some(datum as u32)
+            Some(datum.into_void().addr() as _)
         }
     }
 }
@@ -154,7 +155,7 @@ impl FromDatum for i64 {
         if is_null {
             None
         } else {
-            Some(datum as i64)
+            Some(datum.into_void().addr() as _)
         }
     }
 }
@@ -167,7 +168,7 @@ impl FromDatum for f32 {
         if is_null {
             None
         } else {
-            Some(f32::from_bits(datum as u32))
+            Some(f32::from_bits(datum.into_void().addr() as _))
         }
     }
 }
@@ -180,7 +181,7 @@ impl FromDatum for f64 {
         if is_null {
             None
         } else {
-            Some(f64::from_bits(datum as u64))
+            Some(f64::from_bits(datum.into_void().addr() as _))
         }
     }
 }
@@ -192,17 +193,17 @@ impl<'a> FromDatum for &'a str {
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<&'a str> {
         if is_null {
             None
-        } else if datum == 0 {
+        } else if datum.into_void().is_null() {
             panic!("a varlena Datum was flagged as non-null but the datum is zero");
         } else {
-            let varlena = pg_sys::pg_detoast_datum_packed(datum as *mut pg_sys::varlena);
+            let varlena = pg_sys::pg_detoast_datum_packed(datum.into_void() as *mut pg_sys::varlena);
             Some(text_to_rust_str_unchecked(varlena))
         }
     }
 
     unsafe fn from_datum_in_memory_context(
         mut memory_context: PgMemoryContexts,
-        datum: usize,
+        datum: pg_sys::Datum,
         is_null: bool,
         _typoid: u32,
     ) -> Option<Self>
@@ -211,12 +212,12 @@ impl<'a> FromDatum for &'a str {
     {
         if is_null {
             None
-        } else if datum == 0 {
+        } else if datum.into_void().is_null() {
             panic!("a varlena Datum was flagged as non-null but the datum is zero");
         } else {
             memory_context.switch_to(|_| {
                 // this gets the varlena Datum copied into this memory context
-                let detoasted = pg_sys::pg_detoast_datum_copy(datum as *mut pg_sys::varlena);
+                let detoasted = pg_sys::pg_detoast_datum_copy(datum.into_void() as *mut pg_sys::varlena);
 
                 // and we need to unpack it (if necessary), which will decompress it too
                 let varlena = pg_sys::pg_detoast_datum_packed(detoasted);
@@ -266,11 +267,11 @@ impl<'a> FromDatum for &'a std::ffi::CStr {
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<&'a CStr> {
         if is_null {
             None
-        } else if datum == 0 {
+        } else if datum.into_void().is_null() {
             panic!("a cstring Datum was flagged as non-null but the datum is zero");
         } else {
             Some(std::ffi::CStr::from_ptr(
-                datum as *const std::os::raw::c_char,
+                datum.into_void() as *const std::os::raw::c_char,
             ))
         }
     }
@@ -286,11 +287,11 @@ impl<'a> FromDatum for &'a crate::cstr_core::CStr {
     ) -> Option<&'a crate::cstr_core::CStr> {
         if is_null {
             None
-        } else if datum == 0 {
+        } else if datum.into_void().is_null() {
             panic!("a cstring Datum was flagged as non-null but the datum is zero");
         } else {
             Some(crate::cstr_core::CStr::from_ptr(
-                datum as *const std::os::raw::c_char,
+                datum.into_void() as *const std::os::raw::c_char,
             ))
         }
     }
@@ -300,20 +301,20 @@ impl<'a> FromDatum for &'a crate::cstr_core::CStr {
 impl<'a> FromDatum for &'a [u8] {
     const NEEDS_TYPID: bool = false;
     #[inline]
-    unsafe fn from_datum(datum: usize, is_null: bool, _typoid: u32) -> Option<&'a [u8]> {
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _typoid: u32) -> Option<&'a [u8]> {
         if is_null {
             None
-        } else if datum == 0 {
+        } else if datum.into_void().is_null() {
             panic!("a bytea Datum was flagged as non-null but the datum is zero");
         } else {
-            let varlena = pg_sys::pg_detoast_datum_packed(datum as *mut pg_sys::varlena);
+            let varlena = pg_sys::pg_detoast_datum_packed(datum.into_void() as *mut pg_sys::varlena);
             Some(varlena_to_byte_slice(varlena))
         }
     }
 
     unsafe fn from_datum_in_memory_context(
         mut memory_context: PgMemoryContexts,
-        datum: usize,
+        datum: pg_sys::Datum,
         is_null: bool,
         _typoid: u32,
     ) -> Option<Self>
@@ -322,12 +323,12 @@ impl<'a> FromDatum for &'a [u8] {
     {
         if is_null {
             None
-        } else if datum == 0 {
+        } else if datum.into_void().is_null() {
             panic!("a bytea Datum was flagged as non-null but the datum is zero");
         } else {
             memory_context.switch_to(|_| {
                 // this gets the varlena Datum copied into this memory context
-                let detoasted = pg_sys::pg_detoast_datum_copy(datum as *mut pg_sys::varlena);
+                let detoasted = pg_sys::pg_detoast_datum_copy(datum.into_void() as *mut pg_sys::varlena);
 
                 // and we need to unpack it (if necessary), which will decompress it too
                 let varlena = pg_sys::pg_detoast_datum_packed(detoasted);
@@ -342,10 +343,10 @@ impl<'a> FromDatum for &'a [u8] {
 impl FromDatum for Vec<u8> {
     const NEEDS_TYPID: bool = false;
     #[inline]
-    unsafe fn from_datum(datum: usize, is_null: bool, typoid: u32) -> Option<Vec<u8>> {
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, typoid: u32) -> Option<Vec<u8>> {
         if is_null {
             None
-        } else if datum == 0 {
+        } else if datum.into_void().is_null() {
             panic!("a bytea Datum as flagged as non-null but the datum is zero");
         } else {
             // Vec<u8> conversion is initially the same as for &[u8]
@@ -377,19 +378,19 @@ impl<T> FromDatum for PgBox<T, AllocatedByPostgres> {
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<Self> {
         if is_null {
             None
-        } else if datum == 0 {
+        } else if datum.into_void().is_null() {
             panic!(
                 "user type {} Datum was flagged as non-null but the datum is zero",
                 std::any::type_name::<T>()
             );
         } else {
-            Some(PgBox::<T>::from_pg(datum as *mut T))
+            Some(PgBox::<T>::from_pg(datum.into_void().cast()))
         }
     }
 
     unsafe fn from_datum_in_memory_context(
         mut memory_context: PgMemoryContexts,
-        datum: usize,
+        datum: pg_sys::Datum,
         is_null: bool,
         _typoid: u32,
     ) -> Option<Self>
@@ -399,13 +400,13 @@ impl<T> FromDatum for PgBox<T, AllocatedByPostgres> {
         memory_context.switch_to(|context| {
             if is_null {
                 None
-            } else if datum == 0 {
+            } else if datum.into_void().is_null() {
                 panic!(
                     "user type {} Datum was flagged as non-null but the datum is zero",
                     std::any::type_name::<T>()
                 );
             } else {
-                let copied = context.copy_ptr_into(datum as *mut T, std::mem::size_of::<T>());
+                let copied = context.copy_ptr_into(datum.into_void().cast(), std::mem::size_of::<T>());
                 Some(PgBox::<T>::from_pg(copied))
             }
         })

@@ -21,7 +21,7 @@ impl FromDatum for Date {
             None
         } else {
             Some(Date(
-                time::Date::from_julian_day(datum as i32 + pg_sys::POSTGRES_EPOCH_JDATE as i32)
+                time::Date::from_julian_day(datum.into_value() as i32 + pg_sys::POSTGRES_EPOCH_JDATE as i32)
                     .expect("Unexpected error getting the Julian day in Date::from_datum"),
             ))
         }
@@ -30,7 +30,7 @@ impl FromDatum for Date {
 impl IntoDatum for Date {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        Some((self.to_julian_day() as i32 - pg_sys::POSTGRES_EPOCH_JDATE as i32) as pg_sys::Datum)
+        Some((self.to_julian_day() as i32 - pg_sys::POSTGRES_EPOCH_JDATE as i32).into())
     }
 
     fn type_oid() -> u32 {

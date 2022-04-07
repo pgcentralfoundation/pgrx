@@ -20,7 +20,7 @@ use crate::*;
 pub fn composite_row_type_make_tuple(
     row: pg_sys::Datum,
 ) -> PgBox<pg_sys::HeapTupleData, AllocatedByRust> {
-    let htup_header = unsafe { pg_sys::pg_detoast_datum_packed(row as *mut pg_sys::varlena) }
+    let htup_header = unsafe { pg_sys::pg_detoast_datum_packed(row.into_void() as *mut pg_sys::varlena) }
         as pg_sys::HeapTupleHeader;
     let mut tuple = PgBox::<pg_sys::HeapTupleData>::alloc0();
 

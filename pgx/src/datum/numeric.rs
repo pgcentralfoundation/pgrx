@@ -77,7 +77,7 @@ impl<'de> Deserialize<'de> for Numeric {
                         let datum = Numeric(v.clone()).into_datum().unwrap();
 
                         // and don't leak the NumericData datum Postgres created
-                        pg_sys::pfree(datum as void_mut_ptr);
+                        pg_sys::pfree(datum.into_void());
 
                         // we have it as a valid String
                         Ok(Numeric(v.clone()))
@@ -152,7 +152,7 @@ impl Into<Numeric> for f64 {
 }
 
 impl FromDatum for Numeric {
-    unsafe fn from_datum(datum: usize, is_null: bool, _typoid: u32) -> Option<Self>
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _typoid: u32) -> Option<Self>
     where
         Self: Sized,
     {

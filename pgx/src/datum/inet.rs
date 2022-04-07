@@ -69,7 +69,7 @@ impl<'de> Deserialize<'de> for Inet {
                         let datum = Inet(v.clone()).into_datum().unwrap();
 
                         // and don't leak the 'inet' datum Postgres created
-                        pg_sys::pfree(datum as void_mut_ptr);
+                        pg_sys::pfree(datum.into_void());
 
                         // we have it as a valid String
                         Ok(Inet(v.clone()))
@@ -87,7 +87,7 @@ impl FromDatum for Inet {
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _typoid: u32) -> Option<Inet> {
         if is_null {
             None
-        } else if datum == 0 {
+        } else if datum.into_void().is_null() {
             panic!("inet datum is declared non-null but Datum is zero");
         } else {
             let cstr = direct_function_call::<&CStr>(pg_sys::inet_out, vec![Some(datum)]);

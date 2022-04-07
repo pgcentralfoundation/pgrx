@@ -277,15 +277,15 @@ impl<'a, T: FromDatum> Drop for Array<'a, T> {
 
 impl<'a, T: FromDatum> FromDatum for Array<'a, T> {
     #[inline]
-    unsafe fn from_datum(datum: usize, is_null: bool, typoid: u32) -> Option<Array<'a, T>> {
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, typoid: u32) -> Option<Array<'a, T>> {
         if is_null {
             None
-        } else if datum == 0 {
+        } else if datum.into_void().is_null() {
             panic!("array was flagged not null but datum is zero");
         } else {
-            let ptr = datum as *mut pg_sys::varlena;
+            let ptr = datum.into_void() as *mut pg_sys::varlena;
             let array =
-                pg_sys::pg_detoast_datum(datum as *mut pg_sys::varlena) as *mut pg_sys::ArrayType;
+                pg_sys::pg_detoast_datum(datum.into_void() as *mut pg_sys::varlena) as *mut pg_sys::ArrayType;
             let array_ref = array.as_ref().expect("ArrayType * was NULL");
 
             // outvals for get_typlenbyvalalign()
@@ -337,7 +337,7 @@ impl<T: FromDatum> FromDatum for Vec<T> {
     ) -> Option<Vec<T>> {
         if is_null {
             None
-        } else if datum == 0 {
+        } else if datum.into_void().is_null() {
             panic!("array was flagged not null but datum is zero");
         } else {
             let array = Array::<T>::from_datum(datum, is_null, typoid).unwrap();
@@ -360,7 +360,7 @@ impl<T: FromDatum> FromDatum for Vec<Option<T>> {
     ) -> Option<Vec<Option<T>>> {
         if is_null {
             None
-        } else if datum == 0 {
+        } else if datum.into_void().is_null() {
             panic!("array was flagged not null but datum is zero");
         } else {
             let array = Array::<T>::from_datum(datum, is_null, typoid).unwrap();
@@ -393,7 +393,7 @@ where
             unsafe {
                 state = pg_sys::accumArrayResult(
                     state,
-                    datum.unwrap_or(0usize),
+                    datum.unwrap_or(0.into()),
                     isnull,
                     T::type_oid(),
                     PgMemoryContexts::CurrentMemoryContext.value(),
@@ -435,7 +435,7 @@ where
             unsafe {
                 state = pg_sys::accumArrayResult(
                     state,
-                    datum.unwrap_or(0usize),
+                    datum.unwrap_or(0.into()),
                     isnull,
                     T::type_oid(),
                     PgMemoryContexts::CurrentMemoryContext.value(),

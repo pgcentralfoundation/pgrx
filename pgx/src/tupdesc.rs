@@ -146,7 +146,7 @@ impl<'a> PgTupleDesc<'a> {
     /// points to a composite type
     pub unsafe fn from_composite(composite: pg_sys::Datum) -> Self {
         let htup_header =
-            pg_sys::pg_detoast_datum(composite as *mut pg_sys::varlena) as pg_sys::HeapTupleHeader;
+            pg_sys::pg_detoast_datum(composite.into_void().cast()) as pg_sys::HeapTupleHeader;
         let tup_type = crate::heap_tuple_header_get_type_id(htup_header);
         let tup_typmod = crate::heap_tuple_header_get_typmod(htup_header);
         let tupdesc = pg_sys::lookup_rowtype_tupdesc(tup_type, tup_typmod);

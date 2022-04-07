@@ -314,7 +314,7 @@ impl FromDatum for PgRelation {
             None
         } else {
             Some(PgRelation::with_lock(
-                datum as pg_sys::Oid,
+                datum.into_value() as _,
                 pg_sys::AccessShareLock as pg_sys::LOCKMODE,
             ))
         }
@@ -323,7 +323,7 @@ impl FromDatum for PgRelation {
 
 impl IntoDatum for PgRelation {
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        Some(self.oid() as pg_sys::Datum)
+        Some(pg_sys::Datum::from(self.oid()))
     }
 
     fn type_oid() -> u32 {
