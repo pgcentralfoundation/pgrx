@@ -31,6 +31,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 #include "catalog/index.h"
 #include "catalog/namespace.h"
 #include "catalog/objectaddress.h"
+#include "catalog/pg_authid.h"
 #include "catalog/pg_class.h"
 #include "catalog/pg_enum.h"
 #include "catalog/pg_operator.h"
