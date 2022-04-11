@@ -20,10 +20,11 @@ pub struct TimestampWithTimeZone(time::OffsetDateTime);
 
 impl From<pg_sys::TimestampTz> for TimestampWithTimeZone {
     fn from(item: pg_sys::TimestampTz) -> Self {
-        unsafe { TimestampWithTimeZone::from_datum(item as usize, false, pg_sys::TIMESTAMPTZOID).unwrap() }
+        unsafe {
+            TimestampWithTimeZone::from_datum(item as usize, false, pg_sys::TIMESTAMPTZOID).unwrap()
+        }
     }
 }
-
 
 impl FromDatum for TimestampWithTimeZone {
     #[inline]

@@ -504,9 +504,7 @@ fn create_stub(
     so_rustc_invocation.stderr(Stdio::inherit());
 
     if let Some(rustc_flags_str) = std::env::var("RUSTFLAGS").ok() {
-        let rustc_flags = rustc_flags_str
-            .split(" ")
-            .collect::<Vec<_>>();
+        let rustc_flags = rustc_flags_str.split(" ").collect::<Vec<_>>();
         so_rustc_invocation.args(rustc_flags);
     }
 
