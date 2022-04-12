@@ -354,8 +354,9 @@ impl PgGuardRewriter {
     ) -> proc_macro2::TokenStream {
         let numtypes = types.len();
         let i = (0..numtypes).map(syn::Index::from);
+        // GREPME: expected struct Datum found
         let create_heap_tuple = quote! {
-            let mut datums: [usize; #numtypes] = [0; #numtypes];
+            let mut datums: [Datum; #numtypes] = [Datum::from(0); #numtypes];
             let mut nulls: [bool; #numtypes] = [false; #numtypes];
 
             // TODO:  how to detect that 'result.i' is an Option, and if it's none
@@ -439,7 +440,7 @@ impl PgGuardRewriter {
 
                         let datum = pgx::heap_tuple_get_datum(heap_tuple);
                         pgx::srf_return_next(fcinfo, &mut funcctx);
-                        datum as pgx::pg_sys::Datum
+                        pgx::pg_sys::Datum::from(datum)
                     },
                     None => {
                         // leak the iterator here too, even tho we're done, b/c our MemoryContextCallback
