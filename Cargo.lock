@@ -1448,6 +1448,7 @@ dependencies = [
  "serde",
  "serde_cbor",
  "serde_json",
+ "sptr",
  "time",
  "tracing",
  "tracing-error",
@@ -1484,6 +1485,7 @@ dependencies = [
  "proc-macro2",
  "quote",
  "rayon",
+ "sptr",
  "syn",
 ]
 
@@ -2190,6 +2192,12 @@ checksum = "511254be0c5bcf062b019a6c89c01a664aa359ded62f78aa72c6fc137c0590e5"
 dependencies = [
  "lock_api",
 ]
+
+[[package]]
+name = "sptr"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1e0d4365121b91e8522958da77ce29c004333daeaf0711225c4727c8c5f49941"
 
 [[package]]
 name = "srf"

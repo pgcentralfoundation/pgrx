@@ -1,19 +1,27 @@
-// Postgres defines the "Datum" type as uintptr_t, so bindgen decides it is usize.
-// Normally, this would be fine, except Postgres uses it more like void*:
-// A pointer to anything that could mean anything, check your assumptions before using.
+// Polyfill while #![feature(strict_provenance)] is unstable
+use sptr::Strict;
 
-// Accordingly, the "Datum" type as defined by bindgen is actually incorrect, as Rust's usize
-// may match the size of uintptr_t but it is improper to use it in the ways C considers idiomatic.
-// The compiler would rather be aware of which integers are integers and which are pointers.
-// This struct expresses Rust's own "opaque FFI type" idiom while `extern type` remains unstable.
-// As a result, we instead handle `*mut Datum` or `*const Datum` as appropriate.
+/// Postgres defines the "Datum" type as uintptr_t, so bindgen decides it is usize.
+/// Normally, this would be fine, except Postgres uses it more like void*:
+/// A pointer to anything that could mean anything, check your assumptions before using.
+///
+///
+/// Accordingly, the "Datum" type from bindgen is not entirely correct, as
+/// Rust's `usize` may match the size of `uintptr_t` but it is not quite the same.
+/// The compiler would rather know which integers are integers and which are pointers.
+/// As a result, Datum is now a wrapper around `*mut DatumBlob`.
+// This struct uses a Rust idiom invented before `extern type` was designed,
+// but should probably be replaced when #![feature(extern_type)] stabilizes
 #[repr(C)]
 pub struct DatumBlob {
     _data: [u8; 0],
-    _marker:
-        core::marker::PhantomData<(*mut u8, core::marker::PhantomPinned)>,
+    _marker: core::marker::PhantomData<(*mut u8, core::marker::PhantomPinned)>,
 }
 
+/// Datum is an abstract value that is effectively a union of all scalar types
+/// and all possible pointers in a Postgres context. That is, it is either
+/// "pass-by-value" (if the value fits into the platform's `uintptr_t`) or
+/// "pass-by-reference" (if it does not).
 #[repr(transparent)]
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Datum(*mut DatumBlob);
@@ -21,7 +29,7 @@ pub struct Datum(*mut DatumBlob);
 impl Datum {
     /// Implies that the datum is actually a value
     pub fn into_value(self) -> u64 {
-        self.0 as usize as u64
+        self.0.addr() as u64
     }
 
     // Implies that the datum is actually a pointer
@@ -58,7 +66,6 @@ impl From<u16> for Datum {
         Datum(val as *mut DatumBlob)
     }
 }
-
 
 impl From<u32> for Datum {
     fn from(val: u32) -> Datum {
@@ -119,7 +126,6 @@ impl<T> PartialEq<Datum> for *mut T {
         self == &other.0.cast()
     }
 }
-
 
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
