@@ -44,10 +44,6 @@ impl IgnoredMacros {
     }
 }
 
-
-// pub fn blocklist_type<T: AsRef<str>>(self, arg: T) -> Builder
-// bindgen.blocklist_type("Datum")
-
 impl bindgen::callbacks::ParseCallbacks for IgnoredMacros {
     fn will_parse_macro(&self, name: &str) -> MacroParsingBehavior {
         if self.0.contains(name) {

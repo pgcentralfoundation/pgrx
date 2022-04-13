@@ -132,10 +132,7 @@ impl IntoDatum for JsonB {
             std::ffi::CString::new(string).expect("string version of jsonb is not valid UTF8");
 
         unsafe {
-            direct_function_call_as_datum(
-                pg_sys::jsonb_in,
-                vec![Some(cstring.as_ptr().into())],
-            )
+            direct_function_call_as_datum(pg_sys::jsonb_in, vec![Some(cstring.as_ptr().into())])
         }
     }
 

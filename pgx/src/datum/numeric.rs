@@ -7,9 +7,7 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use crate::{
-    direct_function_call, direct_function_call_as_datum, pg_sys, void_mut_ptr, FromDatum, IntoDatum,
-};
+use crate::{direct_function_call, direct_function_call_as_datum, pg_sys, FromDatum, IntoDatum};
 use pgx_pg_sys::pg_try;
 use serde::de::{Error, Visitor};
 use serde::{de, Deserialize, Deserializer, Serialize};

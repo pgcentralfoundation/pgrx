@@ -16,7 +16,11 @@ use time::format_description::FormatItem;
 pub struct TimeWithTimeZone(Time);
 impl FromDatum for TimeWithTimeZone {
     #[inline]
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, typoid: u32) -> Option<TimeWithTimeZone> {
+    unsafe fn from_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        typoid: u32,
+    ) -> Option<TimeWithTimeZone> {
         if is_null {
             None
         } else {
@@ -39,7 +43,8 @@ impl IntoDatum for TimeWithTimeZone {
         timetz.time = self
             .0
             .into_datum()
-            .expect("failed to convert timetz into datum").into_value() as i64;
+            .expect("failed to convert timetz into datum")
+            .into_value() as i64;
 
         Some(timetz.into_pg().into())
     }

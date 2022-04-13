@@ -36,9 +36,9 @@ impl Internal {
     /// The value will be dropped when the [PgMemoryContexts::CurrentMemoryContext] is deleted.
     #[inline(always)]
     pub fn new<T>(t: T) -> Self {
-        Self(Some(
-            pg_sys::Datum::from(PgMemoryContexts::CurrentMemoryContext.leak_and_drop_on_delete(t)),
-        ))
+        Self(Some(pg_sys::Datum::from(
+            PgMemoryContexts::CurrentMemoryContext.leak_and_drop_on_delete(t),
+        )))
     }
 
     /// Returns true if the internal value is initialized. If false, this is a null pointer.
@@ -56,7 +56,8 @@ impl Internal {
     /// your responsibility.
     #[inline(always)]
     pub unsafe fn get<T>(&self) -> Option<&T> {
-        self.0.and_then(|datum| (datum.into_void() as *const T).as_ref())
+        self.0
+            .and_then(|datum| (datum.into_void() as *const T).as_ref())
     }
 
     /// Initializes the internal with `value`, then returns a mutable reference to it.
@@ -71,8 +72,9 @@ impl Internal {
     /// your responsibility.
     #[inline(always)]
     pub unsafe fn insert<T>(&mut self, value: T) -> &mut T {
-        let datum =
-            pg_sys::Datum::from(PgMemoryContexts::CurrentMemoryContext.leak_and_drop_on_delete(value));
+        let datum = pg_sys::Datum::from(
+            PgMemoryContexts::CurrentMemoryContext.leak_and_drop_on_delete(value),
+        );
         let ptr = self.0.insert(datum);
         &mut *(ptr.into_void() as *mut T)
     }
@@ -86,7 +88,8 @@ impl Internal {
     /// your responsibility.
     #[inline(always)]
     pub unsafe fn get_mut<T>(&self) -> Option<&mut T> {
-        self.0.and_then(|datum| (datum.into_void() as *mut T).as_mut())
+        self.0
+            .and_then(|datum| (datum.into_void() as *mut T).as_mut())
     }
 
     /// Initializes the internal with `value` if it is not initialized, then returns a mutable reference to
@@ -134,8 +137,9 @@ impl Internal {
     {
         let ptr = self.0.get_or_insert_with(|| {
             let result = f();
-            let datum = PgMemoryContexts::CurrentMemoryContext.leak_and_drop_on_delete(result)
-               .into();
+            let datum = PgMemoryContexts::CurrentMemoryContext
+                .leak_and_drop_on_delete(result)
+                .into();
             datum
         });
         &mut *(ptr.into_void() as *mut T)

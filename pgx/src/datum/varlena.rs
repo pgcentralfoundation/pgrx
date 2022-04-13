@@ -320,7 +320,8 @@ where
         } else {
             memory_context.switch_to(|_| {
                 // this gets the varlena Datum copied into this memory context
-                let detoasted = pg_sys::pg_detoast_datum_copy(datum.into_void() as *mut pg_sys::varlena);
+                let detoasted =
+                    pg_sys::pg_detoast_datum_copy(datum.into_void() as *mut pg_sys::varlena);
 
                 // and we need to unpack it (if necessary), which will decompress it too
                 let varlena = pg_sys::pg_detoast_datum_packed(detoasted);

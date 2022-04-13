@@ -21,8 +21,10 @@ impl FromDatum for Date {
             None
         } else {
             Some(Date(
-                time::Date::from_julian_day(datum.into_value() as i32 + pg_sys::POSTGRES_EPOCH_JDATE as i32)
-                    .expect("Unexpected error getting the Julian day in Date::from_datum"),
+                time::Date::from_julian_day(
+                    datum.into_value() as i32 + pg_sys::POSTGRES_EPOCH_JDATE as i32,
+                )
+                .expect("Unexpected error getting the Julian day in Date::from_datum"),
             ))
         }
     }

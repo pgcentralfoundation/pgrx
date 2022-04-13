@@ -13,8 +13,8 @@ use crate::{
     pg_sys, text_to_rust_str_unchecked, varlena_to_byte_slice, AllocatedByPostgres, PgBox,
     PgMemoryContexts,
 };
-use std::ffi::CStr;
 use sptr::Strict;
+use std::ffi::CStr;
 
 /// Convert a `(pg_sys::Datum, is_null:bool, type_oid:pg_sys::Oid)` tuple into a Rust type
 ///
@@ -196,7 +196,8 @@ impl<'a> FromDatum for &'a str {
         } else if datum.into_void().is_null() {
             panic!("a varlena Datum was flagged as non-null but the datum is zero");
         } else {
-            let varlena = pg_sys::pg_detoast_datum_packed(datum.into_void() as *mut pg_sys::varlena);
+            let varlena =
+                pg_sys::pg_detoast_datum_packed(datum.into_void() as *mut pg_sys::varlena);
             Some(text_to_rust_str_unchecked(varlena))
         }
     }
@@ -217,7 +218,8 @@ impl<'a> FromDatum for &'a str {
         } else {
             memory_context.switch_to(|_| {
                 // this gets the varlena Datum copied into this memory context
-                let detoasted = pg_sys::pg_detoast_datum_copy(datum.into_void() as *mut pg_sys::varlena);
+                let detoasted =
+                    pg_sys::pg_detoast_datum_copy(datum.into_void() as *mut pg_sys::varlena);
 
                 // and we need to unpack it (if necessary), which will decompress it too
                 let varlena = pg_sys::pg_detoast_datum_packed(detoasted);
@@ -271,7 +273,7 @@ impl<'a> FromDatum for &'a std::ffi::CStr {
             panic!("a cstring Datum was flagged as non-null but the datum is zero");
         } else {
             Some(std::ffi::CStr::from_ptr(
-                datum.into_void() as *const std::os::raw::c_char,
+                datum.into_void() as *const std::os::raw::c_char
             ))
         }
     }
@@ -291,7 +293,7 @@ impl<'a> FromDatum for &'a crate::cstr_core::CStr {
             panic!("a cstring Datum was flagged as non-null but the datum is zero");
         } else {
             Some(crate::cstr_core::CStr::from_ptr(
-                datum.into_void() as *const std::os::raw::c_char,
+                datum.into_void() as *const std::os::raw::c_char
             ))
         }
     }
@@ -307,7 +309,8 @@ impl<'a> FromDatum for &'a [u8] {
         } else if datum.into_void().is_null() {
             panic!("a bytea Datum was flagged as non-null but the datum is zero");
         } else {
-            let varlena = pg_sys::pg_detoast_datum_packed(datum.into_void() as *mut pg_sys::varlena);
+            let varlena =
+                pg_sys::pg_detoast_datum_packed(datum.into_void() as *mut pg_sys::varlena);
             Some(varlena_to_byte_slice(varlena))
         }
     }
@@ -328,7 +331,8 @@ impl<'a> FromDatum for &'a [u8] {
         } else {
             memory_context.switch_to(|_| {
                 // this gets the varlena Datum copied into this memory context
-                let detoasted = pg_sys::pg_detoast_datum_copy(datum.into_void() as *mut pg_sys::varlena);
+                let detoasted =
+                    pg_sys::pg_detoast_datum_copy(datum.into_void() as *mut pg_sys::varlena);
 
                 // and we need to unpack it (if necessary), which will decompress it too
                 let varlena = pg_sys::pg_detoast_datum_packed(detoasted);
@@ -406,7 +410,8 @@ impl<T> FromDatum for PgBox<T, AllocatedByPostgres> {
                     std::any::type_name::<T>()
                 );
             } else {
-                let copied = context.copy_ptr_into(datum.into_void().cast(), std::mem::size_of::<T>());
+                let copied =
+                    context.copy_ptr_into(datum.into_void().cast(), std::mem::size_of::<T>());
                 Some(PgBox::<T>::from_pg(copied))
             }
         })
