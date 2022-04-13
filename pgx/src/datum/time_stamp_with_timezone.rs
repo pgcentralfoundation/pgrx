@@ -24,6 +24,12 @@ impl From<pg_sys::TimestampTz> for TimestampWithTimeZone {
     }
 }
 
+impl From<time::OffsetDateTime> for TimestampWithTimeZone {
+    fn from(time: time::OffsetDateTime) -> Self {
+        TimestampWithTimeZone(time)
+    }
+}
+
 
 impl FromDatum for TimestampWithTimeZone {
     #[inline]
