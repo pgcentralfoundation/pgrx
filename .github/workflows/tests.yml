@@ -194,6 +194,7 @@ jobs:
     - name: Clean up built PGX files
       run: |
         set -x
+        cd target/debug/deps/
         for built_file in $(find * -type f -executable -print | grep -v "\.so$"); do
           base_name=$(echo $built_file | cut -d- -f1);
           for basefile in "$base_name".*; do
