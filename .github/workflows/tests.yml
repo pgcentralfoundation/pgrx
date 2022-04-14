@@ -358,6 +358,8 @@ jobs:
     name: Run build and tests on MacOS 11
     runs-on: ${{ matrix.os }}
     if: "!contains(github.event.head_commit.message, 'nogha')"
+    env:
+      RUSTC_WRAPPER: sccache
 
     strategy:
       matrix:
