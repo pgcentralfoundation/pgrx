@@ -27,288 +27,256 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions/57969570#57969570
     - name: Set dynamic variables
-      # run: echo "GITHUB_SHA_SHORT=$(echo $GITHUB_SHA | cut -c 1-6)" >> $GITHUB_ENV
       run: |
         echo "PG_VER=$(echo ${{ matrix.version }} | cut -d '-' -f2)" >> $GITHUB_ENV
 
-    # TEMPORARY
-    # TEMPORARY
-    # TEMPORARY
-    # TEMPORARY
-    # TEMPORARY
-    # TEMPORARY
     - name: Print env
       run: env
-    # TEMPORARY
-    # TEMPORARY
-    # TEMPORARY
-    # TEMPORARY
-    # TEMPORARY
-    # TEMPORARY
 
-  #   - name: Get cargo version
-  #     run: cargo --version
+    - name: Get cargo version
+      run: cargo --version
 
-  #   # Ubuntu system dependencies for Postgres
-  #   - name: Remove old postgres
-  #     run: sudo apt remove -y postgres*
+    - name: Remove old postgres
+      run: sudo apt remove -y postgres*
 
-  #   - name: Set up PostgreSQL Apt Repository
-  #     run: |
-  #       set -x
-  #       sudo apt-get install -y wget gnupg
-  #       sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
-  #       wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
-  #       sudo apt-get update -y -qq --fix-missing
+    - name: Set up PostgreSQL Apt Repository
+      run: |
+        set -x
+        sudo apt-get install -y wget gnupg
+        sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+        wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+        sudo apt-get update -y -qq --fix-missing
 
-  #   - name: Install system dependencies and all PostgreSQL versions
-  #     run: |
-  #       set -x
-  #       pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
-  #       echo "Installing Postgres version $pg_ver from apt"
+    - name: Install system dependencies and all PostgreSQL versions
+      run: |
+        set -x
+        echo "Installing Postgres version $PG_VER from apt"
 
-  #       sudo apt-get install -y \
-  #         clang-10 \
-  #         llvm-10 \
-  #         clang \
-  #         gcc \
-  #         make \
-  #         build-essential \
-  #         libz-dev \
-  #         zlib1g-dev \
-  #         strace \
-  #         libssl-dev \
-  #         pkg-config \
-  #         postgresql-$pg_ver \
-  #         postgresql-server-dev-$pg_ver
+        sudo apt-get install -y \
+          clang-10 \
+          llvm-10 \
+          clang \
+          gcc \
+          make \
+          build-essential \
+          libz-dev \
+          zlib1g-dev \
+          strace \
+          libssl-dev \
+          pkg-config \
+          postgresql-$PG_VER \
+          postgresql-server-dev-$PG_VER
 
-  #   - name: Set up Postgres permissions
-  #     run: |
-  #       set -x
-  #       pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+    - name: Set up Postgres permissions
+      run: |
+        set -x
+        sudo chmod a+rwx `/usr/lib/postgresql/$PG_VER/bin/pg_config --pkglibdir` `/usr/lib/postgresql/$PG_VER/bin/pg_config --sharedir`/extension /var/run/postgresql/
 
-  #       sudo chmod a+rwx `/usr/lib/postgresql/$pg_ver/bin/pg_config --pkglibdir` `/usr/lib/postgresql/$pg_ver/bin/pg_config --sharedir`/extension /var/run/postgresql/
+    - name: Install cargo-pgx
+      run: cargo install --path cargo-pgx/ --debug
 
-  #   - name: Install cargo-pgx
-  #     run: cargo install --path cargo-pgx/ --debug
+    - name: Run 'cargo pgx init' against system-level ${{ matrix.version }}
+      run: |
+        set -x
+        cargo pgx init --pg$PG_VER /usr/lib/postgresql/$PG_VER/bin/pg_config
 
-  #   - name: Run 'cargo pgx init' against system-level ${{ matrix.version }}
-  #     run: |
-  #       set -x
-  #       pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
-  #       cargo pgx init --pg$pg_ver /usr/lib/postgresql/$pg_ver/bin/pg_config
+    - name: Run base-level tests
+      run: |
+        set -x
+        exclude_params=""
+        for package in $(find pgx-examples -mindepth 1 -maxdepth 1 -type d -printf '%f\n'); do
+          exclude_params+="--exclude $package "
+        done
 
-  #   - name: Run base-level tests
-  #     run: |
-  #       set -x
-  #       pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
-  #       exclude_params=""
-  #       for package in $(find pgx-examples -mindepth 1 -maxdepth 1 -type d -printf '%f\n'); do
-  #         exclude_params+="--exclude $package "
-  #       done
+        cargo test --all --features "pg$PG_VER" --no-default-features $exclude_params
 
-  #       cargo test --all --features "pg$pg_ver" --no-default-features $exclude_params
+    - name: Run aggregate example tests
+      run: |
+        set -x
 
-  #   - name: Run aggregate example tests
-  #     run: |
-  #       set -x
-  #       pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+        cd pgx-examples/aggregate/
+        cargo test --features "pg$PG_VER" --no-default-features
 
-  #       cd pgx-examples/aggregate/
-  #       cargo test --features "pg$pg_ver" --no-default-features
+    - name: Run arrays example tests
+      run: |
+        set -x
 
-  #   - name: Run arrays example tests
-  #     run: |
-  #       set -x
-  #       pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+        cd pgx-examples/arrays/
+        cargo test --features "pg$PG_VER" --no-default-features
 
-  #       cd pgx-examples/arrays/
-  #       cargo test --features "pg$pg_ver" --no-default-features
+    - name: Run bad_ideas example tests
+      run: |
+        set -x
 
-  #   - name: Run bad_ideas example tests
-  #     run: |
-  #       set -x
-  #       pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+        cd pgx-examples/bad_ideas/
+        cargo test --features "pg$PG_VER" --no-default-features
 
-  #       cd pgx-examples/bad_ideas/
-  #       cargo test --features "pg$pg_ver" --no-default-features
+    - name: Run bgworker example tests
+      run: |
+        set -x
 
-  #   - name: Run bgworker example tests
-  #     run: |
-  #       set -x
-  #       pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+        cd pgx-examples/bgworker/
+        cargo test --features "pg$PG_VER" --no-default-features
 
-  #       cd pgx-examples/bgworker/
-  #       cargo test --features "pg$pg_ver" --no-default-features
+    - name: Run bytea example tests
+      run: |
+        set -x
 
-  #   - name: Run bytea example tests
-  #     run: |
-  #       set -x
-  #       pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+        cd pgx-examples/bytea/
+        cargo test --features "pg$PG_VER" --no-default-features
 
-  #       cd pgx-examples/bytea/
-  #       cargo test --features "pg$pg_ver" --no-default-features
+    - name: Run custom_types example tests
+      run: |
+        set -x
 
-  #   - name: Run custom_types example tests
-  #     run: |
-  #       set -x
-  #       pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+        cd pgx-examples/custom_types/
+        cargo test --features "pg$PG_VER" --no-default-features
 
-  #       cd pgx-examples/custom_types/
-  #       cargo test --features "pg$pg_ver" --no-default-features
+    - name: Run custom_sql example tests
+      run: |
+        set -x
 
-  #   - name: Run custom_sql example tests
-  #     run: |
-  #       set -x
-  #       pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+        cd pgx-examples/custom_sql/
+        cargo test --features "pg$PG_VER" --no-default-features
 
-  #       cd pgx-examples/custom_sql/
-  #       cargo test --features "pg$pg_ver" --no-default-features
+    - name: Run errors example tests
+      run: |
+        set -x
 
-  #   - name: Run errors example tests
-  #     run: |
-  #       set -x
-  #       pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+        cd pgx-examples/errors/
+        cargo test --features "pg$PG_VER" --no-default-features
 
-  #       cd pgx-examples/errors/
-  #       cargo test --features "pg$pg_ver" --no-default-features
+    - name: Run nostd example tests
+      run: |
+        set -x
 
-  #   - name: Run nostd example tests
-  #     run: |
-  #       set -x
-  #       pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+        cd pgx-examples/nostd/
+        cargo test --features "pg$PG_VER" --no-default-features
 
-  #       cd pgx-examples/nostd/
-  #       cargo test --features "pg$pg_ver" --no-default-features
+    - name: Run operators example tests
+      run: |
+        set -x
 
-  #   - name: Run operators example tests
-  #     run: |
-  #       set -x
-  #       pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+        cd pgx-examples/operators/
+        cargo test --features "pg$PG_VER" --no-default-features
 
-  #       cd pgx-examples/operators/
-  #       cargo test --features "pg$pg_ver" --no-default-features
+    - name: Run schemas example tests
+      run: |
+        set -x
 
-  #   - name: Run schemas example tests
-  #     run: |
-  #       set -x
-  #       pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+        cd pgx-examples/schemas/
+        cargo test --features "pg$PG_VER" --no-default-features
 
-  #       cd pgx-examples/schemas/
-  #       cargo test --features "pg$pg_ver" --no-default-features
+    - name: Run shmem example tests
+      run: |
+        set -x
 
-  #   - name: Run shmem example tests
-  #     run: |
-  #       set -x
-  #       pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+        cd pgx-examples/shmem/
+        cargo test --features "pg$PG_VER" --no-default-features
 
-  #       cd pgx-examples/shmem/
-  #       cargo test --features "pg$pg_ver" --no-default-features
+    - name: Run spi example tests
+      run: |
+        set -x
 
-  #   - name: Run spi example tests
-  #     run: |
-  #       set -x
-  #       pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+        cd pgx-examples/spi/
+        cargo test --features "pg$PG_VER" --no-default-features
 
-  #       cd pgx-examples/spi/
-  #       cargo test --features "pg$pg_ver" --no-default-features
+    - name: Run srf example tests
+      run: |
+        set -x
 
-  #   - name: Run srf example tests
-  #     run: |
-  #       set -x
-  #       pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+        cd pgx-examples/srf/
+        cargo test --features "pg$PG_VER" --no-default-features
 
-  #       cd pgx-examples/srf/
-  #       cargo test --features "pg$pg_ver" --no-default-features
+    - name: Run strings example tests
+      run: |
+        set -x
 
-  #   - name: Run strings example tests
-  #     run: |
-  #       set -x
-  #       pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+        cd pgx-examples/strings/
+        cargo test --features "pg$PG_VER" --no-default-features
 
-  #       cd pgx-examples/strings/
-  #       cargo test --features "pg$pg_ver" --no-default-features
+    - name: Run triggers example tests
+      run: |
+        set -x
 
-  #   - name: Run triggers example tests
-  #     run: |
-  #       set -x
-  #       pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+        cd pgx-examples/triggers/
+        cargo test --features "pg$PG_VER" --no-default-features
 
-  #       cd pgx-examples/triggers/
-  #       cargo test --features "pg$pg_ver" --no-default-features
+  cargo_pgx_init:
+    runs-on: ${{ matrix.os }}
+    if: "!contains(github.event.head_commit.message, 'nogha')"
 
-  # cargo_pgx_init:
-  #   runs-on: ${{ matrix.os }}
-  #   if: "!contains(github.event.head_commit.message, 'nogha')"
+    strategy:
+      matrix:
+        version: ["postgres-10", "postgres-11", "postgres-12", "postgres-13", "postgres-14"]
+        os: ["ubuntu-latest"]
 
-  #   strategy:
-  #     matrix:
-  #       version: ["postgres-10", "postgres-11", "postgres-12", "postgres-13", "postgres-14"]
-  #       os: ["ubuntu-latest"]
+    steps:
+    - uses: actions/checkout@v2
 
-  #   steps:
-  #   - uses: actions/checkout@v2
+    # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions/57969570#57969570
+    - name: Set dynamic variables
+      run: |
+        echo "PG_VER=$(echo ${{ matrix.version }} | cut -d '-' -f2)" >> $GITHUB_ENV
 
-  #   - name: Get cargo version
-  #     run: cargo --version
+    - name: Get cargo version
+      run: cargo --version
 
-  #   # Ubuntu system dependencies for Postgres
-  #   - name: Remove old postgres
-  #     run: sudo apt remove -y postgres*
+    # Ubuntu system dependencies for Postgres
+    - name: Remove old postgres
+      run: sudo apt remove -y postgres*
 
-  #   - name: Set up PostgreSQL Apt Repository
-  #     run: |
-  #       set -x
-  #       sudo apt-get install -y wget gnupg
-  #       sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
-  #       wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
-  #       sudo apt-get update -y -qq --fix-missing
+    - name: Set up PostgreSQL Apt Repository
+      run: |
+        set -x
+        sudo apt-get install -y wget gnupg
+        sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+        wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+        sudo apt-get update -y -qq --fix-missing
 
-  #   - name: Install system dependencies and all PostgreSQL versions
-  #     run: |
-  #       set -x
-  #       pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
-  #       echo "Installing Postgres version $pg_ver from apt"
+    - name: Install system dependencies and all PostgreSQL versions
+      run: |
+        set -x
+        echo "Installing Postgres version $PG_VER from apt"
 
-  #       sudo apt-get install -y \
-  #         clang-10 \
-  #         llvm-10 \
-  #         clang \
-  #         gcc \
-  #         make \
-  #         build-essential \
-  #         libz-dev \
-  #         zlib1g-dev \
-  #         strace \
-  #         libssl-dev \
-  #         pkg-config
+        sudo apt-get install -y \
+          clang-10 \
+          llvm-10 \
+          clang \
+          gcc \
+          make \
+          build-essential \
+          libz-dev \
+          zlib1g-dev \
+          strace \
+          libssl-dev \
+          pkg-config
 
-  #   - name: Install cargo-pgx
-  #     run: cargo install --path cargo-pgx/ --debug
+    - name: Install cargo-pgx
+      run: cargo install --path cargo-pgx/ --debug
 
-  #   - name: Run 'cargo pgx init' for ${{ matrix.version }}
-  #     run: |
-  #       set -x
-  #       pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
-  #       cargo pgx init --pg$pg_ver download
+    - name: Run 'cargo pgx init' for ${{ matrix.version }}
+      run: |
+        set -x
+        cargo pgx init --pg$PG_VER download
 
-  #   - name: create new sample extension
-  #     run: cd /tmp/ && cargo pgx new sample
+    - name: create new sample extension
+      run: cd /tmp/ && cargo pgx new sample
 
-  #   # hack Cargo.toml to use this version of pgx from github
-  #   - name: hack Cargo.toml
-  #     run: |
-  #      echo "[patch.crates-io]" >> /tmp/sample/Cargo.toml
-  #      echo "pgx        = { path = \"${GITHUB_WORKSPACE}/pgx\"        }" >> /tmp/sample/Cargo.toml
-  #      echo "pgx-macros = { path = \"${GITHUB_WORKSPACE}/pgx-macros\" }" >> /tmp/sample/Cargo.toml
-  #      echo "pgx-tests  = { path = \"${GITHUB_WORKSPACE}/pgx-tests\"  }" >> /tmp/sample/Cargo.toml
+    # hack Cargo.toml to use this version of pgx from github
+    - name: hack Cargo.toml
+      run: |
+       echo "[patch.crates-io]" >> /tmp/sample/Cargo.toml
+       echo "pgx        = { path = \"${GITHUB_WORKSPACE}/pgx\"        }" >> /tmp/sample/Cargo.toml
+       echo "pgx-macros = { path = \"${GITHUB_WORKSPACE}/pgx-macros\" }" >> /tmp/sample/Cargo.toml
+       echo "pgx-tests  = { path = \"${GITHUB_WORKSPACE}/pgx-tests\"  }" >> /tmp/sample/Cargo.toml
 
-  #   - name: show Cargo.toml
-  #     run: cat /tmp/sample/Cargo.toml
+    - name: show Cargo.toml
+      run: cat /tmp/sample/Cargo.toml
 
-  #   - name: test sample for ${{ matrix.version }}
-  #     run: |
-  #       set -x
-  #       pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
-  #       cd /tmp/sample && cargo pgx test pg$pg_ver
+    - name: test sample for ${{ matrix.version }}
+      run: |
+        set -x
+        cd /tmp/sample && cargo pgx test pg$PG_VER
