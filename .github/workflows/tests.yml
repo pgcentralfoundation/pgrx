@@ -263,16 +263,6 @@ jobs:
         # restore-keys: |
         #   ${{ runner.os }}-cargo-
 
-    - name: Save sccache
-      uses: actions/cache@v2
-      continue-on-error: false
-      with:
-        path: /home/runner/.cache/sccache
-        # key: ${{ runner.os }}-sccache-${{ hashFiles('**/Cargo.lock') }}
-        key: pgx-cargo_init_tests-sccache-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
-        # restore-keys: |
-        #   ${{ runner.os }}-sccache-
-
     - name: Install sccache
       # env:
       #   LINK: https://github.com/mozilla/sccache/releases/download
@@ -288,6 +278,16 @@ jobs:
 
     - name: Start sccache server
       run: sccache --start-server
+
+    - name: Cache sccache directory
+      uses: actions/cache@v2
+      continue-on-error: false
+      with:
+        path: /home/runner/.cache/sccache
+        # key: ${{ runner.os }}-sccache-${{ hashFiles('**/Cargo.lock') }}
+        key: pgx-cargo_init_tests-sccache-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
+        # restore-keys: |
+        #   ${{ runner.os }}-sccache-
 
     - name: Set up prerequisites and environment
       run: |
