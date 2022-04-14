@@ -429,9 +429,6 @@ jobs:
     - name: Install cargo-pgx
       run: cargo install --path cargo-pgx/ --debug --force
 
-    - name: Debug
-      uses: mxschmitt/action-tmate@v3
-
     - name: Run 'cargo pgx init'
       run: |
         set -x
@@ -442,7 +439,6 @@ jobs:
         set -x
         cargo test \
           --features "pg$PG_VER" --no-default-features \
-          --verbose \
           --package cargo-pgx \
           --package pgx \
           --package pgx-macros \
