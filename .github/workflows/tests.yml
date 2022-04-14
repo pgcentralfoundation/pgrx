@@ -103,7 +103,10 @@ jobs:
             popd
           fi
         done
-        find "$CARGO_DIR/registry/src" -exec touch -cfht 197001010000 {} +
+
+        if [ -d "$CARGO_DIR/registry/src" ]; then
+          find "$CARGO_DIR/registry/src" -exec touch -cfht 197001010000 {} +
+        fi
 
     - name: Install cargo-pgx
       run: cargo install --path cargo-pgx/ --debug --force
