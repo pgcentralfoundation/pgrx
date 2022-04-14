@@ -1,4 +1,4 @@
-name: Run tests
+name: Run PGX tests
 
 on:
   push:
@@ -11,7 +11,7 @@ on:
       - develop
 
 jobs:
-  test:
+  pgx_tests:
     runs-on: ${{ matrix.os }}
     if: "!contains(github.event.head_commit.message, 'nogha')"
 
@@ -23,9 +23,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: cargo version
+    - name: Get cargo version
       run: cargo --version
 
     # Ubuntu system dependencies for Postgres
-    - name: remove old postgres
+    - name: Remove old postgres
       run: sudo apt remove -y postgres*
