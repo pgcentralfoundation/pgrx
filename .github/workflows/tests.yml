@@ -85,6 +85,26 @@ jobs:
         set -x
         sudo chmod a+rwx `/usr/lib/postgresql/$PG_VER/bin/pg_config --pkglibdir` `/usr/lib/postgresql/$PG_VER/bin/pg_config --sharedir`/extension /var/run/postgresql/
 
+    - name: Adjust mtimes on existing crates to prevent rebuilds
+      run: |
+        set -euxo pipefail
+        CARGO_DIR="${CARGO_HOME:-$HOME/.cargo}"
+        for source in "$CARGO_DIR"/registry/cache/*/; do
+          if [ -d "$source" ]; then
+            pushd "$source"
+            source=$(basename -- "$PWD")
+            mkdir -p "$CARGO_DIR/registry/src/$source"
+            for crate in *.crate; do
+              crate=${crate%.crate}
+              mkdir "$CARGO_DIR/registry/src/$source/$crate" || continue
+              tar --strip-components=1 -xzf "$crate.crate" -C "$CARGO_DIR/registry/src/$source/$crate"
+              echo -n ok > "$CARGO_DIR/registry/src/$source/$crate/.cargo-ok"
+            done
+            popd
+          fi
+        done
+        find "$CARGO_DIR/registry/src" -exec touch -cfht 197001010000 {} +
+
     - name: Install cargo-pgx
       run: cargo install --path cargo-pgx/ --debug --force
 
