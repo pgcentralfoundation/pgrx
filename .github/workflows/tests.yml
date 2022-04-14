@@ -252,6 +252,27 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: Cache cargo registry
+      uses: actions/cache@v2
+      continue-on-error: false
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+        key: pgx-cargo_init_tests-cargo-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
+        # restore-keys: |
+        #   ${{ runner.os }}-cargo-
+
+    - name: Save sccache
+      uses: actions/cache@v2
+      continue-on-error: false
+      with:
+        path: /home/runner/.cache/sccache
+        # key: ${{ runner.os }}-sccache-${{ hashFiles('**/Cargo.lock') }}
+        key: pgx-cargo_init_tests-sccache-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
+        # restore-keys: |
+        #   ${{ runner.os }}-sccache-
+
     - name: Install sccache
       # env:
       #   LINK: https://github.com/mozilla/sccache/releases/download
@@ -268,56 +289,60 @@ jobs:
     - name: Start sccache server
       run: sccache --start-server
 
-    # - name: ${{ matrix.make.name }}
-    #   run: make ${{ matrix.make.task }}
+    - name: Set up prerequisites and environment
+      run: |
+        echo ""
+        # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions/57969570#57969570
 
-    - name: Print sccache stats
+        echo "----- Set up MAKEFLAGS -----"
+        echo "MAKEFLAGS=$MAKEFLAGS -j $(grep -c ^processor /proc/cpuinfo)" >> $GITHUB_ENV
+        cat $GITHUB_ENV
+        echo ""
+
+        echo "----- Set up PG_VER variable -----"
+        echo "PG_VER=$(echo ${{ matrix.version }} | cut -d '-' -f2)" >> $GITHUB_ENV
+        cat $GITHUB_ENV
+        echo ""
+
+        echo "----- Remove existing installations of postgres -----"
+        sudo apt remove -y postgres*
+        echo ""
+
+        echo "----- Install system dependencies -----"
+        sudo apt-get install -y \
+          clang-10 \
+          llvm-10 \
+          clang \
+          gcc \
+          make \
+          build-essential \
+          libz-dev \
+          zlib1g-dev \
+          strace \
+          libssl-dev \
+          pkg-config
+        echo ""
+
+        echo "----- Output Cargo version -----"
+        cargo --version
+        echo ""
+
+        echo "----- Outputting env -----"
+        env
+        echo ""
+
+    - name: Print sccache stats (before)
+      run: sccache --show-stats
+
+    - name: Install cargo-pgx
+      run: cargo install --path cargo-pgx/ --debug --force
+
+    - name: Print sccache stats (after)
       run: sccache --show-stats
 
     - name: Stop sccache server
       run: sccache --stop-server || true
 
-    # - name: Set up prerequisites and environment
-    #   run: |
-    #     echo ""
-    #     # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions/57969570#57969570
-
-    #     echo "----- Set up MAKEFLAGS -----"
-    #     echo "MAKEFLAGS=$MAKEFLAGS -j $(grep -c ^processor /proc/cpuinfo)" >> $GITHUB_ENV
-    #     cat $GITHUB_ENV
-    #     echo ""
-
-    #     echo "----- Set up PG_VER variable -----"
-    #     echo "PG_VER=$(echo ${{ matrix.version }} | cut -d '-' -f2)" >> $GITHUB_ENV
-    #     cat $GITHUB_ENV
-    #     echo ""
-
-    #     echo "----- Remove existing installations of postgres -----"
-    #     sudo apt remove -y postgres*
-    #     echo ""
-
-    #     echo "----- Install system dependencies -----"
-    #     sudo apt-get install -y \
-    #       clang-10 \
-    #       llvm-10 \
-    #       clang \
-    #       gcc \
-    #       make \
-    #       build-essential \
-    #       libz-dev \
-    #       zlib1g-dev \
-    #       strace \
-    #       libssl-dev \
-    #       pkg-config
-    #     echo ""
-
-    #     echo "----- Output Cargo version -----"
-    #     cargo --version
-    #     echo ""
-
-    #     echo "----- Outputting env -----"
-    #     env
-    #     echo ""
 
 
 
