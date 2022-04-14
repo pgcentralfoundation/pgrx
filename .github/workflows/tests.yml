@@ -1,0 +1,30 @@
+name: Run tests
+
+on:
+  push:
+    branches:
+      - master
+      - develop
+  pull_request:
+    branches:
+      - master
+      - develop
+
+jobs:
+    runs-on: ${{ matrix.os }}
+    if: "!contains(github.event.head_commit.message, 'nogha')"
+
+    strategy:
+      matrix:
+        version: [10, 11, 12, 13, 14]
+        os: ["ubuntu-latest"]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: cargo version
+      run: cargo --version
+
+    # Ubuntu system dependencies for Postgres
+    - name: remove old postgres
+      run: sudo apt remove -y postgres*
