@@ -312,7 +312,7 @@ jobs:
       run: |
         echo ""
         echo "----- Getting pre-installed Postgres major version -----"
-        PG_VER=pg_config --version | awk '{split($2,a,"."); print a[1]}'
+        PG_VER=$(pg_config --version | awk '{split($2,a,"."); print a[1]}')
         echo "PG_VER=$PG_VER" >> $GITHUB_ENV
         cat $GITHUB_ENV
 
