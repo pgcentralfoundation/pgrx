@@ -360,7 +360,8 @@ jobs:
       run: |
         set -x
         #export RUSTFLAGS=$(echo "$RUSTFLAGS $(tomlq --raw-output '.build.rustflags | join(" ")' .cargo/config)")
-        export RUSTFLAGS=$(tomlq '.build.rustflags | join(" ")' .cargo/config)
+        #export RUSTFLAGS=$(tomlq '.build.rustflags | join(" ")' .cargo/config)
+        echo "RUSTFLAGS=$(tomlq '.build.rustflags | join(" ")' .cargo/config)" >> $GITHUB_ENV
         env | grep RUSTFLAGS
 
     - name: Run base-level tests
