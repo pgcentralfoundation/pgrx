@@ -27,8 +27,7 @@ jobs:
 
     strategy:
       matrix:
-        # version: ["postgres-10", "postgres-11", "postgres-12", "postgres-13", "postgres-14"]
-        version: ["postgres-10"]
+        version: ["postgres-10", "postgres-11", "postgres-12", "postgres-13", "postgres-14"]
         os: ["ubuntu-20.04"]
 
     steps:
@@ -83,6 +82,10 @@ jobs:
           postgresql-server-dev-$PG_VER
         echo ""
 
+        echo "----- Set up Postgres permissions -----"
+        sudo chmod a+rwx `/usr/lib/postgresql/$PG_VER/bin/pg_config --pkglibdir` `/usr/lib/postgresql/$PG_VER/bin/pg_config --sharedir`/extension /var/run/postgresql/
+        echo ""
+
         echo "----- Print env -----"
         env
         echo ""
@@ -100,16 +103,6 @@ jobs:
           ~/.cargo/git
         key: pgx-tests-cargo-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
 
-    # - name: Install sccache
-    #   run: |
-    #     mkdir -p $HOME/.local/bin
-    #     curl -L https://github.com/mozilla/sccache/releases/download/v0.2.15/sccache-v0.2.15-x86_64-unknown-linux-musl.tar.gz | tar xz
-    #     mv -f sccache-v0.2.15-x86_64-unknown-linux-musl/sccache $HOME/.local/bin/sccache
-    #     chmod +x $HOME/.local/bin/sccache
-    #     echo "$HOME/.local/bin" >> $GITHUB_PATH
-    #     echo 'SCCACHE_CACHE_SIZE="20G"' >> $GITHUB_ENV
-    #     mkdir -p /home/runner/.cache/sccache
-
     - name: Cache sccache directory
       uses: actions/cache@v2
       continue-on-error: false
@@ -123,66 +116,14 @@ jobs:
     - name: Print sccache stats (before run)
       run: sccache --show-stats
 
-    # # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions/57969570#57969570
-    # - name: Set dynamic variables
-    #   run: |
-    #     echo "PG_VER=$(echo ${{ matrix.version }} | cut -d '-' -f2)" >> $GITHUB_ENV
-    #     echo "MAKEFLAGS=$MAKEFLAGS -j $(grep -c ^processor /proc/cpuinfo)" >> $GITHUB_ENV
-    #     cat $GITHUB_ENV
-
-    # - name: Print env
-    #   run: env
-
-    # - name: Get cargo version
-    #   run: cargo --version
-
-    # - name: Remove old postgres
-    #   run: sudo apt remove -y postgres*
-
-    # - name: Set up PostgreSQL Apt Repository
-    #   run: |
-    #     set -x
-    #     sudo apt-get install -y wget gnupg
-    #     sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
-    #     wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
-    #     sudo apt-get update -y -qq --fix-missing
-
-    # - name: Install system dependencies and all PostgreSQL versions
-    #   run: |
-    #     set -x
-    #     echo "Installing Postgres version $PG_VER from apt"
-
-    #     sudo apt-get install -y \
-    #       clang-10 \
-    #       llvm-10 \
-    #       clang \
-    #       gcc \
-    #       make \
-    #       build-essential \
-    #       libz-dev \
-    #       zlib1g-dev \
-    #       strace \
-    #       libssl-dev \
-    #       pkg-config \
-    #       postgresql-$PG_VER \
-    #       postgresql-server-dev-$PG_VER
-
-    - name: Set up Postgres permissions
-      run: |
-        set -x
-        sudo chmod a+rwx `/usr/lib/postgresql/$PG_VER/bin/pg_config --pkglibdir` `/usr/lib/postgresql/$PG_VER/bin/pg_config --sharedir`/extension /var/run/postgresql/
-
     - name: Install cargo-pgx
       run: cargo install --path cargo-pgx/ --debug --force
 
     - name: Run 'cargo pgx init' against system-level ${{ matrix.version }}
-      run: |
-        set -x
-        cargo pgx init --pg$PG_VER /usr/lib/postgresql/$PG_VER/bin/pg_config
+      run: cargo pgx init --pg$PG_VER /usr/lib/postgresql/$PG_VER/bin/pg_config
 
     - name: Run base-level tests
       run: |
-        set -x
         cargo test \
           --features "pg$PG_VER" --no-default-features \
           --package cargo-pgx \
@@ -243,7 +184,6 @@ jobs:
     # Attempt to make the cache payload slightly smaller.
     - name: Clean up built PGX files
       run: |
-        set -x
         cd target/debug/deps/
         for built_file in $(find * -type f -executable -print | grep -v "\.so$"); do
           base_name=$(echo $built_file | cut -d- -f1);
