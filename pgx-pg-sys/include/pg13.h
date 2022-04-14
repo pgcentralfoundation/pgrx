@@ -25,6 +25,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 #include "access/skey.h"
 #include "access/sysattr.h"
 #include "access/table.h"
+#include "access/tableam.h"
 #include "access/xact.h"
 #include "catalog/dependency.h"
 #include "catalog/index.h"
