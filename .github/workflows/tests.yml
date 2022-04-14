@@ -87,10 +87,44 @@ jobs:
 
         RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --all --features "pg$pg_ver" --no-default-features $exclude_params
 
+#  examples: ["aggregate", "arrays", "bad_ideas", "bgworker", "bytea", "custom_types",  "custom_sql", "errors", "nostd", "operators", "schemas", "shmem", "spi", "srf", "strings", "triggers"]
+
     - name: Run aggregate example tests
       run: |
         set -x
         pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
 
         cd pgx-examples/aggregate/
+        RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --features "pg$pg_ver" --no-default-features
+
+    - name: Run arrays example tests
+      run: |
+        set -x
+        pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+
+        cd pgx-examples/arrays/
+        RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --features "pg$pg_ver" --no-default-features
+
+    - name: Run bad_ideas example tests
+      run: |
+        set -x
+        pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+
+        cd pgx-examples/bad_ideas/
+        RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --features "pg$pg_ver" --no-default-features
+
+    - name: Run bgworker example tests
+      run: |
+        set -x
+        pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+
+        cd pgx-examples/bg_worker/
+        RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --features "pg$pg_ver" --no-default-features
+
+    - name: Run bytea example tests
+      run: |
+        set -x
+        pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+
+        cd pgx-examples/bytea/
         RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --features "pg$pg_ver" --no-default-features
