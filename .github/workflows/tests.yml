@@ -235,116 +235,63 @@ jobs:
   #       set -x
   #       du -sh target/debug/*
 
-  cargo_pgx_init:
+
+
+  test_sccache:
     runs-on: ${{ matrix.os }}
     if: "!contains(github.event.head_commit.message, 'nogha')"
 
     strategy:
       matrix:
-        version: ["postgres-10", "postgres-11", "postgres-12", "postgres-13", "postgres-14"]
+        version: ["postgres-14"]
         os: ["ubuntu-20.04"]
 
     steps:
     - uses: actions/checkout@v2
-    - uses: actions/cache@v3
-      with:
-        path: |
-          ~/.cargo/bin/
-          ~/.cargo/registry/index/
-          ~/.cargo/registry/cache/
-          ~/.cargo/git/db/
-          target/
-        key: pgx-cargo_init_tests-${{ runner.os }}-tests-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
 
-    - name: Set up prerequisites and environment
+    - name: Install sccache
+      env:
+        LINK: https://github.com/mozilla/sccache/releases/download
+        SCCACHE_VERSION: 0.2.15
       run: |
-        echo ""
-        # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions/57969570#57969570
+        SCCACHE_FILE=sccache-$SCCACHE_VERSION-x86_64-unknown-linux-musl
+        mkdir -p $HOME/.local/bin
+        curl -L "$LINK/$SCCACHE_VERSION/$SCCACHE_FILE.tar.gz" | tar xz
+        mv -f $SCCACHE_FILE/sccache $HOME/.local/bin/sccache
+        echo "$HOME/.local/bin" >> $GITHUB_PATH
 
-        echo "----- Set up MAKEFLAGS -----"
-        echo "MAKEFLAGS=$MAKEFLAGS -j $(grep -c ^processor /proc/cpuinfo)" >> $GITHUB_ENV
-        cat $GITHUB_ENV
-        echo ""
+    - name: Start sccache server
+      run: sccache --start-server
 
-        echo "----- Set up PG_VER variable -----"
-        echo "PG_VER=$(echo ${{ matrix.version }} | cut -d '-' -f2)" >> $GITHUB_ENV
-        cat $GITHUB_ENV
-        echo ""
+    # - name: ${{ matrix.make.name }}
+    #   run: make ${{ matrix.make.task }}
 
-        echo "----- Remove existing installations of postgres -----"
-        sudo apt remove -y postgres*
-        echo ""
+    - name: Print sccache stats
+      run: sccache --show-stats
 
-        echo "----- Install system dependencies -----"
-        sudo apt-get install -y \
-          clang-10 \
-          llvm-10 \
-          clang \
-          gcc \
-          make \
-          build-essential \
-          libz-dev \
-          zlib1g-dev \
-          strace \
-          libssl-dev \
-          pkg-config
-        echo ""
+    - name: Stop sccache server
+      run: sccache --stop-server || true
 
-        echo "----- Output Cargo version -----"
-        cargo --version
-        echo ""
-
-        echo "----- Outputting env -----"
-        env
-        echo ""
-
-    - name: Adjust mtimes on existing crates to prevent rebuilds
-      run: |
-        set -euxo pipefail
-        CARGO_DIR="${CARGO_HOME:-$HOME/.cargo}"
-        for source in "$CARGO_DIR"/registry/cache/*/; do
-          if [ -d "$source" ]; then
-            pushd "$source"
-            source=$(basename -- "$PWD")
-            mkdir -p "$CARGO_DIR/registry/src/$source"
-            for crate in *.crate; do
-              crate=${crate%.crate}
-              mkdir "$CARGO_DIR/registry/src/$source/$crate" || continue
-              tar --strip-components=1 -xzf "$crate.crate" -C "$CARGO_DIR/registry/src/$source/$crate"
-              echo -n ok > "$CARGO_DIR/registry/src/$source/$crate/.cargo-ok"
-            done
-            popd
-          fi
-        done
-
-        if [ -d "$CARGO_DIR/registry/src" ]; then
-          find "$CARGO_DIR/registry/src" -exec touch -cfht 197001010000 {} +
-        fi
-
-    # - name: Set dynamic variables
+    # - name: Set up prerequisites and environment
     #   run: |
+    #     echo ""
+    #     # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions/57969570#57969570
+
+    #     echo "----- Set up MAKEFLAGS -----"
+    #     echo "MAKEFLAGS=$MAKEFLAGS -j $(grep -c ^processor /proc/cpuinfo)" >> $GITHUB_ENV
+    #     cat $GITHUB_ENV
+    #     echo ""
+
+    #     echo "----- Set up PG_VER variable -----"
     #     echo "PG_VER=$(echo ${{ matrix.version }} | cut -d '-' -f2)" >> $GITHUB_ENV
+    #     cat $GITHUB_ENV
+    #     echo ""
 
-    # - name: Get cargo version
-    #   run: cargo --version
+    #     echo "----- Remove existing installations of postgres -----"
+    #     sudo apt remove -y postgres*
+    #     echo ""
 
-    # # Ubuntu system dependencies for Postgres
-    # - name: Remove old postgres
-    #   run: sudo apt remove -y postgres*
-
-    # - name: Set up PostgreSQL Apt Repository
-    #   run: |
-    #     set -x
-    #     sudo apt-get install -y wget gnupg
-    #     sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
-    #     wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
-    #     sudo apt-get update -y -qq --fix-missing
-
-    # - name: Install system dependencies and all PostgreSQL versions
-    #   run: |
-    #     set -x
-    #     echo "Installing Postgres version $PG_VER from apt"
-
+    #     echo "----- Install system dependencies -----"
     #     sudo apt-get install -y \
     #       clang-10 \
     #       llvm-10 \
@@ -357,33 +304,171 @@ jobs:
     #       strace \
     #       libssl-dev \
     #       pkg-config
+    #     echo ""
 
-    - name: Install cargo-pgx
-      run: cargo install --path cargo-pgx/ --debug --force
+    #     echo "----- Output Cargo version -----"
+    #     cargo --version
+    #     echo ""
 
-    - name: Run 'cargo pgx init' for ${{ matrix.version }}
-      run: |
-        set -x
-        cargo pgx init --pg$PG_VER download
+    #     echo "----- Outputting env -----"
+    #     env
+    #     echo ""
 
-    - name: create new sample extension
-      run: cd /tmp/ && cargo pgx new sample
 
-    # hack Cargo.toml to use this version of pgx from github
-    - name: hack Cargo.toml
-      run: |
-       echo "[patch.crates-io]" >> /tmp/sample/Cargo.toml
-       echo "pgx        = { path = \"${GITHUB_WORKSPACE}/pgx\"        }" >> /tmp/sample/Cargo.toml
-       echo "pgx-macros = { path = \"${GITHUB_WORKSPACE}/pgx-macros\" }" >> /tmp/sample/Cargo.toml
-       echo "pgx-tests  = { path = \"${GITHUB_WORKSPACE}/pgx-tests\"  }" >> /tmp/sample/Cargo.toml
 
-    - name: show Cargo.toml
-      run: cat /tmp/sample/Cargo.toml
 
-    - name: test sample for ${{ matrix.version }}
-      run: |
-        set -x
-        cd /tmp/sample && cargo pgx test pg$PG_VER
+
+
+
+  # cargo_pgx_init:
+  #   runs-on: ${{ matrix.os }}
+  #   if: "!contains(github.event.head_commit.message, 'nogha')"
+
+  #   strategy:
+  #     matrix:
+  #       version: ["postgres-10", "postgres-11", "postgres-12", "postgres-13", "postgres-14"]
+  #       os: ["ubuntu-20.04"]
+
+  #   steps:
+  #   - uses: actions/checkout@v2
+  #   - uses: actions/cache@v3
+  #     with:
+  #       path: |
+  #         ~/.cargo/bin/
+  #         ~/.cargo/registry/index/
+  #         ~/.cargo/registry/cache/
+  #         ~/.cargo/git/db/
+  #         target/
+  #       key: pgx-cargo_init_tests-${{ runner.os }}-tests-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
+
+  #   - name: Set up prerequisites and environment
+  #     run: |
+  #       echo ""
+  #       # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions/57969570#57969570
+
+  #       echo "----- Set up MAKEFLAGS -----"
+  #       echo "MAKEFLAGS=$MAKEFLAGS -j $(grep -c ^processor /proc/cpuinfo)" >> $GITHUB_ENV
+  #       cat $GITHUB_ENV
+  #       echo ""
+
+  #       echo "----- Set up PG_VER variable -----"
+  #       echo "PG_VER=$(echo ${{ matrix.version }} | cut -d '-' -f2)" >> $GITHUB_ENV
+  #       cat $GITHUB_ENV
+  #       echo ""
+
+  #       echo "----- Remove existing installations of postgres -----"
+  #       sudo apt remove -y postgres*
+  #       echo ""
+
+  #       echo "----- Install system dependencies -----"
+  #       sudo apt-get install -y \
+  #         clang-10 \
+  #         llvm-10 \
+  #         clang \
+  #         gcc \
+  #         make \
+  #         build-essential \
+  #         libz-dev \
+  #         zlib1g-dev \
+  #         strace \
+  #         libssl-dev \
+  #         pkg-config
+  #       echo ""
+
+  #       echo "----- Output Cargo version -----"
+  #       cargo --version
+  #       echo ""
+
+  #       echo "----- Outputting env -----"
+  #       env
+  #       echo ""
+
+  #   - name: Adjust mtimes on existing crates to prevent rebuilds
+  #     run: |
+  #       set -euxo pipefail
+  #       CARGO_DIR="${CARGO_HOME:-$HOME/.cargo}"
+  #       for source in "$CARGO_DIR"/registry/cache/*/; do
+  #         if [ -d "$source" ]; then
+  #           pushd "$source"
+  #           source=$(basename -- "$PWD")
+  #           mkdir -p "$CARGO_DIR/registry/src/$source"
+  #           for crate in *.crate; do
+  #             crate=${crate%.crate}
+  #             mkdir "$CARGO_DIR/registry/src/$source/$crate" || continue
+  #             tar --strip-components=1 -xzf "$crate.crate" -C "$CARGO_DIR/registry/src/$source/$crate"
+  #             echo -n ok > "$CARGO_DIR/registry/src/$source/$crate/.cargo-ok"
+  #           done
+  #           popd
+  #         fi
+  #       done
+
+  #       if [ -d "$CARGO_DIR/registry/src" ]; then
+  #         find "$CARGO_DIR/registry/src" -exec touch -cfht 197001010000 {} +
+  #       fi
+
+  #   # - name: Set dynamic variables
+  #   #   run: |
+  #   #     echo "PG_VER=$(echo ${{ matrix.version }} | cut -d '-' -f2)" >> $GITHUB_ENV
+
+  #   # - name: Get cargo version
+  #   #   run: cargo --version
+
+  #   # # Ubuntu system dependencies for Postgres
+  #   # - name: Remove old postgres
+  #   #   run: sudo apt remove -y postgres*
+
+  #   # - name: Set up PostgreSQL Apt Repository
+  #   #   run: |
+  #   #     set -x
+  #   #     sudo apt-get install -y wget gnupg
+  #   #     sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+  #   #     wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+  #   #     sudo apt-get update -y -qq --fix-missing
+
+  #   # - name: Install system dependencies and all PostgreSQL versions
+  #   #   run: |
+  #   #     set -x
+  #   #     echo "Installing Postgres version $PG_VER from apt"
+
+  #   #     sudo apt-get install -y \
+  #   #       clang-10 \
+  #   #       llvm-10 \
+  #   #       clang \
+  #   #       gcc \
+  #   #       make \
+  #   #       build-essential \
+  #   #       libz-dev \
+  #   #       zlib1g-dev \
+  #   #       strace \
+  #   #       libssl-dev \
+  #   #       pkg-config
+
+  #   - name: Install cargo-pgx
+  #     run: cargo install --path cargo-pgx/ --debug --force
+
+  #   - name: Run 'cargo pgx init' for ${{ matrix.version }}
+  #     run: |
+  #       set -x
+  #       cargo pgx init --pg$PG_VER download
+
+  #   - name: create new sample extension
+  #     run: cd /tmp/ && cargo pgx new sample
+
+  #   # hack Cargo.toml to use this version of pgx from github
+  #   - name: hack Cargo.toml
+  #     run: |
+  #      echo "[patch.crates-io]" >> /tmp/sample/Cargo.toml
+  #      echo "pgx        = { path = \"${GITHUB_WORKSPACE}/pgx\"        }" >> /tmp/sample/Cargo.toml
+  #      echo "pgx-macros = { path = \"${GITHUB_WORKSPACE}/pgx-macros\" }" >> /tmp/sample/Cargo.toml
+  #      echo "pgx-tests  = { path = \"${GITHUB_WORKSPACE}/pgx-tests\"  }" >> /tmp/sample/Cargo.toml
+
+  #   - name: show Cargo.toml
+  #     run: cat /tmp/sample/Cargo.toml
+
+  #   - name: test sample for ${{ matrix.version }}
+  #     run: |
+  #       set -x
+  #       cd /tmp/sample && cargo pgx test pg$PG_VER
 
   # build_mac:
   #   runs-on: ${{ matrix.os }}
