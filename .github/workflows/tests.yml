@@ -85,7 +85,7 @@ jobs:
         sudo chmod a+rwx `/usr/lib/postgresql/$PG_VER/bin/pg_config --pkglibdir` `/usr/lib/postgresql/$PG_VER/bin/pg_config --sharedir`/extension /var/run/postgresql/
 
     - name: Install cargo-pgx
-      run: cargo install --path cargo-pgx/ --debug
+      run: cargo install --path cargo-pgx/ --debug --force
 
     - name: Run 'cargo pgx init' against system-level ${{ matrix.version }}
       run: |
@@ -241,7 +241,7 @@ jobs:
           pkg-config
 
     - name: Install cargo-pgx
-      run: cargo install --path cargo-pgx/ --debug
+      run: cargo install --path cargo-pgx/ --debug --force
 
     - name: Run 'cargo pgx init' for ${{ matrix.version }}
       run: |
