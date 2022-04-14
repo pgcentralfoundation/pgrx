@@ -309,18 +309,28 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Install yq command so we can parse out Toml files
+    - name: Set up prerequisites and environment
       run: |
         set -x
+
+        echo "----- Installing yq so .toml files can be parsed and queried -----"
         pip3 install yq
 
-    - name: Set up .cargo/config RUSTFLAGS
-      run: |
-        set -x
-        #export RUSTFLAGS=$(echo "$RUSTFLAGS $(tomlq --raw-output '.build.rustflags | join(" ")' .cargo/config)")
-        #export RUSTFLAGS=$(tomlq '.build.rustflags | join(" ")' .cargo/config)
+        echo "----- Setting up RUSTFLAGS found in .cargo/config -----"
         echo "RUSTFLAGS=$RUSTFLAGS $(tomlq --raw-output '.build.rustflags | join(" ")' .cargo/config)" >> $GITHUB_ENV
-        echo $GITHUB_ENV
+
+        # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions/57969570#57969570
+        echo "----- Set up dynamic variables into $GITHUB_ENV -----"
+        echo "PG_VER=$(echo ${{ matrix.version }} | cut -d '-' -f2)" >> $GITHUB_ENV
+
+        echo "----- Set up Postgres permissions -----"
+        sudo chmod a+rwx `$(which pg_config) --pkglibdir` `$(which pg_config) --sharedir`/extension
+
+        echo "----- Output Cargo version -----"
+        cargo --version
+
+        echo "----- Outputting env -----"
+        env
 
     - uses: actions/cache@v3
       with:
@@ -332,34 +342,6 @@ jobs:
           target/
         key: ${{ runner.os }}-mac-build-tests-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
 
-    # - name: Setup tmate session just after cache pull
-    #   uses: mxschmitt/action-tmate@v3
-
-    # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions/57969570#57969570
-    - name: Set dynamic variables
-      run: |
-        echo "PG_VER=$(echo ${{ matrix.version }} | cut -d '-' -f2)" >> $GITHUB_ENV
-
-    - name: Print env
-      run: env
-
-    - name: Get cargo version
-      run: cargo --version
-
-    # - name: Remove old postgres
-    #   run: |
-    #     set -x
-    #     brew uninstall postgres
-    #     rm -rf /usr/local/var/postgres
-    #     rm /usr/local/var/log/postgres.log
-    #     rm -f ~/.psqlrc ~/.psql_history
-
-    - name: Set up Postgres permissions
-      run: |
-        set -x
-        sudo chmod a+rwx `$(which pg_config) --pkglibdir` `$(which pg_config) --sharedir`/extension
-# sudo chmod a+rwx `$(which pg_config) --pkglibdir` `$(which pg_config) --sharedir`/extension /var/run/postgresql/
-
     - name: Install cargo-pgx
       run: cargo install --path cargo-pgx/ --debug --force
 
@@ -367,7 +349,6 @@ jobs:
       run: |
         set -x
         cargo pgx init --pg$PG_VER $(which pg_config)
-
 
     - name: Run base-level tests
       run: |
@@ -381,16 +362,3 @@ jobs:
           --package pgx-pg-sys \
           --package pgx-tests \
           --package pgx-utils
-
-    # - name: Setup tmate session just after everything tests
-    #   uses: mxschmitt/action-tmate@v3
-
-    # - name: Setup tmate session
-    #   if: ${{ failure() }}
-    #   uses: mxschmitt/action-tmate@v3
-
-  # #   # TEMPORARY?
-  #   - name: Get size of target directory before cleanup
-  #     run: |
-  #       set -x
-  #       du -sh target/debug/*
