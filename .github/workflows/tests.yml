@@ -36,7 +36,6 @@ jobs:
     - name: Set up prerequisites and environment
       run: |
         echo ""
-
         echo "----- Install sccache -----"
         mkdir -p $HOME/.local/bin
         curl -L https://github.com/mozilla/sccache/releases/download/v0.2.15/sccache-v0.2.15-x86_64-unknown-linux-musl.tar.gz | tar xz
