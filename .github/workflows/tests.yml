@@ -308,6 +308,20 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+
+    - name: Install yq command so we can parse out Toml files
+      run: |
+        set -x
+        pip3 install yq
+
+    - name: Set up .cargo/config RUSTFLAGS
+      run: |
+        set -x
+        #export RUSTFLAGS=$(echo "$RUSTFLAGS $(tomlq --raw-output '.build.rustflags | join(" ")' .cargo/config)")
+        #export RUSTFLAGS=$(tomlq '.build.rustflags | join(" ")' .cargo/config)
+        echo "RUSTFLAGS=$RUSTFLAGS $(tomlq --raw-output '.build.rustflags | join(" ")' .cargo/config)" >> $GITHUB_ENV
+        echo $GITHUB_ENV
+
     - uses: actions/cache@v3
       with:
         path: |
@@ -317,14 +331,6 @@ jobs:
           ~/.cargo/git/db/
           target/
         key: ${{ runner.os }}-mac-build-tests-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
-
-    - name: Set up .cargo/config RUSTFLAGS
-      run: |
-        set -x
-        #export RUSTFLAGS=$(echo "$RUSTFLAGS $(tomlq --raw-output '.build.rustflags | join(" ")' .cargo/config)")
-        #export RUSTFLAGS=$(tomlq '.build.rustflags | join(" ")' .cargo/config)
-        echo "RUSTFLAGS=$RUSTFLAGS $(tomlq --raw-output '.build.rustflags | join(" ")' .cargo/config)" >> $GITHUB_ENV
-        echo $GITHUB_ENV
 
     - name: Setup tmate session just after cache pull
       uses: mxschmitt/action-tmate@v3
@@ -353,11 +359,6 @@ jobs:
         set -x
         sudo chmod a+rwx `$(which pg_config) --pkglibdir` `$(which pg_config) --sharedir`/extension
 # sudo chmod a+rwx `$(which pg_config) --pkglibdir` `$(which pg_config) --sharedir`/extension /var/run/postgresql/
-
-    - name: Install yq command so we can parse out Toml files
-      run: |
-        set -x
-        pip3 install yq
 
     - name: Install cargo-pgx
       run: cargo install --path cargo-pgx/ --debug --force
