@@ -281,7 +281,7 @@ jobs:
       run: |
         set -x
         pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
-        RUSTFLAGS="-Copt-level=0" cargo pgx init --pg$pg_ver
+        RUSTFLAGS="-Copt-level=0" cargo pgx init --pg$pg_ver download
 
     - name: create new sample extension
       run: cd /tmp/ && cargo pgx new sample
