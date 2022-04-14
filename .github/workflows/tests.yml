@@ -340,7 +340,8 @@ jobs:
     - name: Set up Postgres permissions
       run: |
         set -x
-        sudo chmod a+rwx `$(which pg_config) --pkglibdir` `$(which pg_config) --sharedir`/extension /var/run/postgresql/
+        sudo chmod a+rwx `$(which pg_config) --pkglibdir` `$(which pg_config) --sharedir`/extension
+# sudo chmod a+rwx `$(which pg_config) --pkglibdir` `$(which pg_config) --sharedir`/extension /var/run/postgresql/
 
     - name: Install yq command so we can parse out Toml files
       run: |
