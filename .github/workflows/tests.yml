@@ -427,6 +427,9 @@ jobs:
     - name: Install cargo-pgx
       run: cargo install --path cargo-pgx/ --debug --force
 
+    - name: Debug
+      uses: mxschmitt/action-tmate@v3
+
     - name: Run 'cargo pgx init'
       run: |
         set -x
