@@ -366,6 +366,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: Debug
+      uses: mxschmitt/action-tmate@v3
+
     - name: Set up prerequisites and environment
       run: |
         echo ""
