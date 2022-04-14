@@ -329,13 +329,13 @@ jobs:
     - name: Get cargo version
       run: cargo --version
 
-    - name: Remove old postgres
-      run: |
-        set -x
-        brew uninstall postgres
-        rm -rf /usr/local/var/postgres
-        rm /usr/local/var/log/postgres.log
-        rm -f ~/.psqlrc ~/.psql_history
+    # - name: Remove old postgres
+    #   run: |
+    #     set -x
+    #     brew uninstall postgres
+    #     rm -rf /usr/local/var/postgres
+    #     rm /usr/local/var/log/postgres.log
+    #     rm -f ~/.psqlrc ~/.psql_history
 
     - name: Install cargo-pgx
       run: cargo install --path cargo-pgx/ --debug --force
@@ -343,22 +343,22 @@ jobs:
     - name: Run 'cargo pgx init' for ${{ matrix.version }}
       run: |
         set -x
-        cargo pgx init --pg$PG_VER download
+        cargo pgx init --pg$PG_VER $(which pg_config)
 
-    - name: Run base-level tests
-      run: |
-        set -x
-        cargo test \
-          --features "pg$PG_VER" --no-default-features \
-          --package cargo-pgx \
-          --package pgx \
-          --package pgx-macros \
-          --package pgx-pg-sys \
-          --package pgx-tests \
-          --package pgx-utils
+  #   - name: Run base-level tests
+  #     run: |
+  #       set -x
+  #       cargo test \
+  #         --features "pg$PG_VER" --no-default-features \
+  #         --package cargo-pgx \
+  #         --package pgx \
+  #         --package pgx-macros \
+  #         --package pgx-pg-sys \
+  #         --package pgx-tests \
+  #         --package pgx-utils
 
-  #   # TEMPORARY?
-    - name: Get size of target directory before cleanup
-      run: |
-        set -x
-        du -sh target/debug/*
+  # #   # TEMPORARY?
+  #   - name: Get size of target directory before cleanup
+  #     run: |
+  #       set -x
+  #       du -sh target/debug/*
