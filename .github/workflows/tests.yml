@@ -275,9 +275,7 @@ jobs:
         chmod +x $HOME/.local/bin/sccache
         echo "$HOME/.local/bin" >> $GITHUB_PATH
         echo 'SCCACHE_CACHE_SIZE="20G"' >> $GITHUB_ENV
-
-    - name: Start sccache server
-      run: sccache --start-server
+        mkdir -p /home/runner/.cache/sccache
 
     - name: Cache sccache directory
       uses: actions/cache@v2
@@ -288,6 +286,12 @@ jobs:
         key: pgx-cargo_init_tests-sccache-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
         # restore-keys: |
         #   ${{ runner.os }}-sccache-
+
+    - name: Start sccache server
+      run: sccache --start-server
+
+    - name: Print sccache stats (before)
+      run: sccache --show-stats
 
     - name: Set up prerequisites and environment
       run: |
@@ -330,9 +334,6 @@ jobs:
         echo "----- Outputting env -----"
         env
         echo ""
-
-    - name: Print sccache stats (before)
-      run: sccache --show-stats
 
     - name: Install cargo-pgx
       run: cargo install --path cargo-pgx/ --debug --force
