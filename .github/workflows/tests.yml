@@ -14,6 +14,7 @@ env:
   RUSTFLAGS: -Copt-level=0
   RUST_BACKTRACE: 1
   CARGO_INCREMENTAL: "false"
+  CARGO_LOG: cargo::core::compiler::fingerprint=info
 
 jobs:
   pgx_tests:
