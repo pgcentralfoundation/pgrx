@@ -311,7 +311,6 @@ jobs:
 
     - name: Set up prerequisites and environment
       run: |
-        set -x
         source .github/workflows/gha-echo-and-run.sh
 
         echo_and_run \
