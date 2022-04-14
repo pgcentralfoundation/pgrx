@@ -87,7 +87,6 @@ jobs:
 
         RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --all --features "pg$pg_ver" --no-default-features $exclude_params
 
-#  examples: ["aggregate", "arrays", "bad_ideas", "bgworker", "bytea", "custom_types",  "custom_sql", "errors", "nostd", "operators", "schemas", "shmem", "spi", "srf", "strings", "triggers"]
 
     - name: Run aggregate example tests
       run: |
@@ -118,7 +117,7 @@ jobs:
         set -x
         pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
 
-        cd pgx-examples/bg_worker/
+        cd pgx-examples/bgworker/
         RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --features "pg$pg_ver" --no-default-features
 
     - name: Run bytea example tests
@@ -128,3 +127,94 @@ jobs:
 
         cd pgx-examples/bytea/
         RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --features "pg$pg_ver" --no-default-features
+
+    - name: Run custom_types example tests
+      run: |
+        set -x
+        pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+
+        cd pgx-examples/custom_types/
+        RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --features "pg$pg_ver" --no-default-features
+
+    - name: Run custom_sql example tests
+      run: |
+        set -x
+        pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+
+        cd pgx-examples/custom_sql/
+        RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --features "pg$pg_ver" --no-default-features
+
+    - name: Run errors example tests
+      run: |
+        set -x
+        pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+
+        cd pgx-examples/errors/
+        RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --features "pg$pg_ver" --no-default-features
+
+    - name: Run nostd example tests
+      run: |
+        set -x
+        pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+
+        cd pgx-examples/nostd/
+        RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --features "pg$pg_ver" --no-default-features
+
+    - name: Run operators example tests
+      run: |
+        set -x
+        pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+
+        cd pgx-examples/operators/
+        RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --features "pg$pg_ver" --no-default-features
+
+    - name: Run schemas example tests
+      run: |
+        set -x
+        pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+
+        cd pgx-examples/schemas/
+        RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --features "pg$pg_ver" --no-default-features
+
+    - name: Run shmem example tests
+      run: |
+        set -x
+        pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+
+        cd pgx-examples/shmem/
+        RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --features "pg$pg_ver" --no-default-features
+
+    - name: Run spi example tests
+      run: |
+        set -x
+        pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+
+        cd pgx-examples/spi/
+        RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --features "pg$pg_ver" --no-default-features
+
+    - name: Run srf example tests
+      run: |
+        set -x
+        pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+
+        cd pgx-examples/srf/
+        RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --features "pg$pg_ver" --no-default-features
+
+    - name: Run strings example tests
+      run: |
+        set -x
+        pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+
+        cd pgx-examples/strings/
+        RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --features "pg$pg_ver" --no-default-features
+
+    - name: Run triggers example tests
+      run: |
+        set -x
+        pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+
+        cd pgx-examples/triggers/
+        RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --features "pg$pg_ver" --no-default-features
+
+#  examples: ["aggregate", "arrays", "bad_ideas", "bgworker", "bytea", "custom_types",  "custom_sql", "errors", "nostd", "operators", "schemas",
+#  "shmem", "spi", "srf", "strings", "triggers"]
