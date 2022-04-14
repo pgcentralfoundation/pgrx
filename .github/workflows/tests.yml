@@ -318,6 +318,14 @@ jobs:
           target/
         key: ${{ runner.os }}-mac-build-tests-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
 
+    - name: Set up .cargo/config RUSTFLAGS
+      run: |
+        set -x
+        #export RUSTFLAGS=$(echo "$RUSTFLAGS $(tomlq --raw-output '.build.rustflags | join(" ")' .cargo/config)")
+        #export RUSTFLAGS=$(tomlq '.build.rustflags | join(" ")' .cargo/config)
+        echo "RUSTFLAGS=$RUSTFLAGS $(tomlq --raw-output '.build.rustflags | join(" ")' .cargo/config)" >> $GITHUB_ENV
+        echo $GITHUB_ENV
+
     - name: Setup tmate session just after cache pull
       uses: mxschmitt/action-tmate@v3
 
@@ -359,13 +367,6 @@ jobs:
         set -x
         cargo pgx init --pg$PG_VER $(which pg_config)
 
-    - name: Set up .cargo/config RUSTFLAGS
-      run: |
-        set -x
-        #export RUSTFLAGS=$(echo "$RUSTFLAGS $(tomlq --raw-output '.build.rustflags | join(" ")' .cargo/config)")
-        #export RUSTFLAGS=$(tomlq '.build.rustflags | join(" ")' .cargo/config)
-        echo "RUSTFLAGS=$RUSTFLAGS $(tomlq --raw-output '.build.rustflags | join(" ")' .cargo/config)" >> $GITHUB_ENV
-        echo $GITHUB_ENV
 
     - name: Run base-level tests
       run: |
