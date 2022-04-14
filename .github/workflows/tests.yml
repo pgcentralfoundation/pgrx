@@ -41,7 +41,7 @@ jobs:
 
     - name: Install system dependencies and all PostgreSQL versions
       run: |
-        pg_ver=$("postgres-12" | cut -d '-' -f2)
+        pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
         echo "Installing Postgres version $pg_ver from apt"
 
         sudo apt-get install -y \
