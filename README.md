@@ -119,7 +119,7 @@ custom types.
 
 ## System Requirements
 
-- `rustc` (minimum version 1.52) and `cargo` 
+- `rustc` (minimum version 1.52) and `cargo`
 - `cargo install rustfmt`
  - `git`
  - `libclang.so`
@@ -273,8 +273,9 @@ time goes on.  Your feedback about what you'd like to be able to do with `pgx` i
 ## License
 
 ```
-Portions Copyright 2019-2021 ZomboDB, LLC.  
-Portions Copyright 2021-2022 Technology Concepts & Design, Inc. <support@tcdi.com>. 
+Portions Copyright 2019-2021 ZomboDB, LLC.
+Portions Copyright 2021-2022 Technology Concepts & Design, Inc. <support@tcdi.com>.
 All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 ```
+
