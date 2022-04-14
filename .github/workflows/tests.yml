@@ -319,7 +319,7 @@ jobs:
 
         echo_and_run \
           "Setting up RUSTFLAGS found in .cargo/config" \
-          'RUSTFLAGS=$RUSTFLAGS $(tomlq --raw-output '.build.rustflags | join(" ")' .cargo/config)" >> $GITHUB_ENV'
+          'RUSTFLAGS=$RUSTFLAGS $(tomlq --raw-output \'.build.rustflags | join(" ")\' .cargo/config)" >> $GITHUB_ENV'
 
         # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions/57969570#57969570
         echo_and_run \
