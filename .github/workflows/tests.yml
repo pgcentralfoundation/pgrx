@@ -311,6 +311,7 @@ jobs:
 
     - name: Set up prerequisites and environment
       run: |
+        echo ""
         echo "----- Installing yq so .toml files can be parsed and queried -----"
         pip3 install yq
         echo ""
@@ -328,6 +329,7 @@ jobs:
 
         echo "----- Set up Postgres permissions -----"
         sudo chmod a+rwx `$(which pg_config) --pkglibdir` `$(which pg_config) --sharedir`/extension
+        ls -lath `$(which pg_config) --pkglibdir` `$(which pg_config) --sharedir`/extension
         echo ""
 
         echo "----- Output Cargo version -----"
@@ -346,7 +348,7 @@ jobs:
           ~/.cargo/registry/cache/
           ~/.cargo/git/db/
           target/
-        key: ${{ runner.os }}-mac-build-tests-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
+        key: pgx-${{ runner.os }}-tests-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
 
     - name: Install cargo-pgx
       run: cargo install --path cargo-pgx/ --debug --force
