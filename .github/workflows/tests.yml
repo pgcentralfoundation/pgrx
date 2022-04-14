@@ -41,6 +41,7 @@ jobs:
 
     - name: Install system dependencies and all PostgreSQL versions
       run: |
+        set -x
         pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
         echo "Installing Postgres version $pg_ver from apt"
 
@@ -58,3 +59,19 @@ jobs:
           pkg-config \
           postgresql-$pg_ver \
           postgresql-server-dev-$pg_ver
+
+    - name: Set up Postgres permissions
+      run: |
+        set -x
+        pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+
+        sudo chmod a+rwx `/usr/lib/postgresql/$pg_ver/bin/pg_config --pkglibdir` `/usr/lib/postgresql/$pg_ver/bin/pg_config --sharedir`/extension /var/run/postgresql/
+
+    - name: Install cargo-pgx
+      run: RUSTFLAGS="-Copt-level=0" cargo install --path cargo-pgx/ --debug
+
+    - name: cargo pgx init
+      run: |
+        set -x
+        pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+        RUSTFLAGS="-Copt-level=0" cargo pgx init --pg$pg_ver /usr/lib/postgresql/$pg_ver/bin/pg_config
