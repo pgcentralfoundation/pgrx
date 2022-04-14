@@ -230,7 +230,7 @@ jobs:
           ~/.cargo/registry/cache/
           ~/.cargo/git/db/
           target/
-        key: ${{ runner.os }}-pgx-tests-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
+        key: ${{ runner.os }}-pgx-tests-init-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
 
     # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions/57969570#57969570
     - name: Set dynamic variables
