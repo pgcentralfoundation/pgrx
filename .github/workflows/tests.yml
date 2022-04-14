@@ -311,6 +311,7 @@ jobs:
     - name: Set up prerequisites and environment
       run: |
         echo ""
+        # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions/57969570#57969570
         echo "----- Getting pre-installed Postgres major version -----"
         PG_VER=$(pg_config --version | awk '{split($2,a,"."); print a[1]}')
         echo "PG_VER=$PG_VER" >> $GITHUB_ENV
@@ -322,12 +323,6 @@ jobs:
 
         echo "----- Setting up RUSTFLAGS found in .cargo/config -----"
         echo "RUSTFLAGS=$RUSTFLAGS $(tomlq --raw-output '.build.rustflags | join(" ")' .cargo/config)" >> $GITHUB_ENV
-        cat $GITHUB_ENV
-        echo ""
-
-        # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions/57969570#57969570
-        echo "----- Set up dynamic variables into $GITHUB_ENV -----"
-        echo "PG_VER=$(echo ${{ matrix.version }} | cut -d '-' -f2)" >> $GITHUB_ENV
         cat $GITHUB_ENV
         echo ""
 
