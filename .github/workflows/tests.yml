@@ -250,6 +250,11 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - uses: actions-rs/install@v0.1
+      with:
+        crate: cargo-pgx
+        version: latest
+        use-tool-cache: true
 
     - name: Get cargo version
       run: cargo --version
