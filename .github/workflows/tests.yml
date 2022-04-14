@@ -17,7 +17,225 @@ env:
   CARGO_LOG: cargo::core::compiler::fingerprint=info
 
 jobs:
-  pgx_tests:
+  # pgx_tests:
+  #   runs-on: ${{ matrix.os }}
+  #   if: "!contains(github.event.head_commit.message, 'nogha')"
+
+  #   strategy:
+  #     matrix:
+  #       version: ["postgres-10", "postgres-11", "postgres-12", "postgres-13", "postgres-14"]
+  #       os: ["ubuntu-20.04"]
+
+  #   steps:
+  #   - uses: actions/checkout@v2
+  #   - uses: actions/cache@v3
+  #     with:
+  #       path: |
+  #         ~/.cargo/bin/
+  #         ~/.cargo/registry/index/
+  #         ~/.cargo/registry/cache/
+  #         ~/.cargo/git/db/
+  #         target/
+  #       key: pgx-tests-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
+
+  #   # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions/57969570#57969570
+  #   - name: Set dynamic variables
+  #     run: |
+  #       echo "PG_VER=$(echo ${{ matrix.version }} | cut -d '-' -f2)" >> $GITHUB_ENV
+
+  #   - name: Print env
+  #     run: env
+
+  #   - name: Get cargo version
+  #     run: cargo --version
+
+  #   - name: Remove old postgres
+  #     run: sudo apt remove -y postgres*
+
+  #   - name: Set up PostgreSQL Apt Repository
+  #     run: |
+  #       set -x
+  #       sudo apt-get install -y wget gnupg
+  #       sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+  #       wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+  #       sudo apt-get update -y -qq --fix-missing
+
+  #   - name: Install system dependencies and all PostgreSQL versions
+  #     run: |
+  #       set -x
+  #       echo "Installing Postgres version $PG_VER from apt"
+
+  #       sudo apt-get install -y \
+  #         clang-10 \
+  #         llvm-10 \
+  #         clang \
+  #         gcc \
+  #         make \
+  #         build-essential \
+  #         libz-dev \
+  #         zlib1g-dev \
+  #         strace \
+  #         libssl-dev \
+  #         pkg-config \
+  #         postgresql-$PG_VER \
+  #         postgresql-server-dev-$PG_VER
+
+  #   - name: Set up Postgres permissions
+  #     run: |
+  #       set -x
+  #       sudo chmod a+rwx `/usr/lib/postgresql/$PG_VER/bin/pg_config --pkglibdir` `/usr/lib/postgresql/$PG_VER/bin/pg_config --sharedir`/extension /var/run/postgresql/
+
+  #   - name: Adjust mtimes on existing crates to prevent rebuilds
+  #     run: |
+  #       set -euxo pipefail
+  #       CARGO_DIR="${CARGO_HOME:-$HOME/.cargo}"
+  #       for source in "$CARGO_DIR"/registry/cache/*/; do
+  #         if [ -d "$source" ]; then
+  #           pushd "$source"
+  #           source=$(basename -- "$PWD")
+  #           mkdir -p "$CARGO_DIR/registry/src/$source"
+  #           for crate in *.crate; do
+  #             crate=${crate%.crate}
+  #             mkdir "$CARGO_DIR/registry/src/$source/$crate" || continue
+  #             tar --strip-components=1 -xzf "$crate.crate" -C "$CARGO_DIR/registry/src/$source/$crate"
+  #             echo -n ok > "$CARGO_DIR/registry/src/$source/$crate/.cargo-ok"
+  #           done
+  #           popd
+  #         fi
+  #       done
+
+  #       if [ -d "$CARGO_DIR/registry/src" ]; then
+  #         find "$CARGO_DIR/registry/src" -exec touch -cfht 197001010000 {} +
+  #       fi
+
+  #   - name: Install cargo-pgx
+  #     run: cargo install --path cargo-pgx/ --debug --force
+
+  #   - name: Run 'cargo pgx init' against system-level ${{ matrix.version }}
+  #     run: |
+  #       set -x
+  #       cargo pgx init --pg$PG_VER /usr/lib/postgresql/$PG_VER/bin/pg_config
+
+  #   - name: Run base-level tests
+  #     run: |
+  #       set -x
+  #       cargo test \
+  #         --features "pg$PG_VER" --no-default-features \
+  #         --package cargo-pgx \
+  #         --package pgx \
+  #         --package pgx-macros \
+  #         --package pgx-pg-sys \
+  #         --package pgx-tests \
+  #         --package pgx-utils
+
+  #   - name: Run aggregate example tests
+  #     run: |
+  #       set -x
+  #       cargo test --package aggregate --features "pg$PG_VER" --no-default-features
+
+  #   - name: Run arrays example tests
+  #     run: |
+  #       set -x
+  #       cargo test --package arrays --features "pg$PG_VER" --no-default-features
+
+  #   - name: Run bad_ideas example tests
+  #     run: |
+  #       set -x
+  #       cargo test --package bad_ideas --features "pg$PG_VER" --no-default-features
+
+  #   - name: Run bgworker example tests
+  #     run: |
+  #       set -x
+  #       cargo test --package bgworker --features "pg$PG_VER" --no-default-features
+
+  #   - name: Run bytea example tests
+  #     run: |
+  #       set -x
+  #       cargo test --package bytea --features "pg$PG_VER" --no-default-features
+
+  #   - name: Run custom_types example tests
+  #     run: |
+  #       set -x
+  #       cargo test --package custom_types --features "pg$PG_VER" --no-default-features
+
+  #   - name: Run custom_sql example tests
+  #     run: |
+  #       set -x
+  #       cargo test --package custom_sql --features "pg$PG_VER" --no-default-features
+
+  #   - name: Run errors example tests
+  #     run: |
+  #       set -x
+  #       cargo test --package errors --features "pg$PG_VER" --no-default-features
+
+  #   - name: Run nostd example tests
+  #     run: |
+  #       set -x
+  #       cargo test --package nostd --features "pg$PG_VER" --no-default-features
+
+  #   - name: Run operators example tests
+  #     run: |
+  #       set -x
+  #       cargo test --package operators --features "pg$PG_VER" --no-default-features
+
+  #   - name: Run schemas example tests
+  #     run: |
+  #       set -x
+  #       cargo test --package schemas --features "pg$PG_VER" --no-default-features
+
+  #   - name: Run shmem example tests
+  #     run: |
+  #       set -x
+  #       cargo test --package shmem --features "pg$PG_VER" --no-default-features
+
+  #   - name: Run spi example tests
+  #     run: |
+  #       set -x
+  #       cargo test --package spi --features "pg$PG_VER" --no-default-features
+
+  #   - name: Run srf example tests
+  #     run: |
+  #       set -x
+  #       cargo test --package srf --features "pg$PG_VER" --no-default-features
+
+  #   - name: Run strings example tests
+  #     run: |
+  #       set -x
+  #       cargo test --package strings --features "pg$PG_VER" --no-default-features
+
+  #   - name: Run triggers example tests
+  #     run: |
+  #       set -x
+  #       cargo test --package triggers --features "pg$PG_VER" --no-default-features
+
+  #   # TEMPORARY?
+  #   - name: Get size of target directory before cleanup
+  #     run: |
+  #       set -x
+  #       du -sh target/debug/*
+
+  #   # Attempt to make the cache payload slightly smaller.
+  #   - name: Clean up built PGX files
+  #     run: |
+  #       set -x
+  #       cd target/debug/deps/
+  #       for built_file in $(find * -type f -executable -print | grep -v "\.so$"); do
+  #         base_name=$(echo $built_file | cut -d- -f1);
+  #         for basefile in "$base_name".*; do
+  #           [ -f "$basefile" ] || continue;
+  #           echo "Removing $basefile"
+  #           rm $basefile
+  #         done;
+  #         echo "Removing $built_file"
+  #         rm $built_file
+  #       done
+
+  #   - name: Get size of target directory after cleanup
+  #     run: |
+  #       set -x
+  #       du -sh target/debug/*
+
+  cargo_pgx_init:
     runs-on: ${{ matrix.os }}
     if: "!contains(github.event.head_commit.message, 'nogha')"
 
@@ -36,35 +254,28 @@ jobs:
           ~/.cargo/registry/cache/
           ~/.cargo/git/db/
           target/
-        key: pgx-tests-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
+        key: pgx-cargo_init_tests-${{ runner.os }}-tests-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
 
-    # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions/57969570#57969570
-    - name: Set dynamic variables
+    - name: Set up prerequisites and environment
       run: |
+        echo ""
+        # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions/57969570#57969570
+
+        echo "----- Set up MAKEFLAGS -----"
+        echo "MAKEFLAGS=$MAKEFLAGS -j $(grep -c ^processor /proc/cpuinfo)" >> $GITHUB_ENV
+        cat $GITHUB_ENV
+        echo ""
+
+        echo "----- Set up PG_VER variable -----"
         echo "PG_VER=$(echo ${{ matrix.version }} | cut -d '-' -f2)" >> $GITHUB_ENV
+        cat $GITHUB_ENV
+        echo ""
 
-    - name: Print env
-      run: env
+        echo "----- Remove existing installations of postgres -----"
+        sudo apt remove -y postgres*
+        echo ""
 
-    - name: Get cargo version
-      run: cargo --version
-
-    - name: Remove old postgres
-      run: sudo apt remove -y postgres*
-
-    - name: Set up PostgreSQL Apt Repository
-      run: |
-        set -x
-        sudo apt-get install -y wget gnupg
-        sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
-        wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
-        sudo apt-get update -y -qq --fix-missing
-
-    - name: Install system dependencies and all PostgreSQL versions
-      run: |
-        set -x
-        echo "Installing Postgres version $PG_VER from apt"
-
+        echo "----- Install system dependencies -----"
         sudo apt-get install -y \
           clang-10 \
           llvm-10 \
@@ -76,14 +287,16 @@ jobs:
           zlib1g-dev \
           strace \
           libssl-dev \
-          pkg-config \
-          postgresql-$PG_VER \
-          postgresql-server-dev-$PG_VER
+          pkg-config
+        echo ""
 
-    - name: Set up Postgres permissions
-      run: |
-        set -x
-        sudo chmod a+rwx `/usr/lib/postgresql/$PG_VER/bin/pg_config --pkglibdir` `/usr/lib/postgresql/$PG_VER/bin/pg_config --sharedir`/extension /var/run/postgresql/
+        echo "----- Output Cargo version -----"
+        cargo --version
+        echo ""
+
+        echo "----- Outputting env -----"
+        env
+        echo ""
 
     - name: Adjust mtimes on existing crates to prevent rebuilds
       run: |
@@ -108,191 +321,42 @@ jobs:
           find "$CARGO_DIR/registry/src" -exec touch -cfht 197001010000 {} +
         fi
 
-    - name: Install cargo-pgx
-      run: cargo install --path cargo-pgx/ --debug --force
+    # - name: Set dynamic variables
+    #   run: |
+    #     echo "PG_VER=$(echo ${{ matrix.version }} | cut -d '-' -f2)" >> $GITHUB_ENV
 
-    - name: Run 'cargo pgx init' against system-level ${{ matrix.version }}
-      run: |
-        set -x
-        cargo pgx init --pg$PG_VER /usr/lib/postgresql/$PG_VER/bin/pg_config
+    # - name: Get cargo version
+    #   run: cargo --version
 
-    - name: Run base-level tests
-      run: |
-        set -x
-        cargo test \
-          --features "pg$PG_VER" --no-default-features \
-          --package cargo-pgx \
-          --package pgx \
-          --package pgx-macros \
-          --package pgx-pg-sys \
-          --package pgx-tests \
-          --package pgx-utils
+    # # Ubuntu system dependencies for Postgres
+    # - name: Remove old postgres
+    #   run: sudo apt remove -y postgres*
 
-    - name: Run aggregate example tests
-      run: |
-        set -x
-        cargo test --package aggregate --features "pg$PG_VER" --no-default-features
+    # - name: Set up PostgreSQL Apt Repository
+    #   run: |
+    #     set -x
+    #     sudo apt-get install -y wget gnupg
+    #     sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+    #     wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+    #     sudo apt-get update -y -qq --fix-missing
 
-    - name: Run arrays example tests
-      run: |
-        set -x
-        cargo test --package arrays --features "pg$PG_VER" --no-default-features
+    # - name: Install system dependencies and all PostgreSQL versions
+    #   run: |
+    #     set -x
+    #     echo "Installing Postgres version $PG_VER from apt"
 
-    - name: Run bad_ideas example tests
-      run: |
-        set -x
-        cargo test --package bad_ideas --features "pg$PG_VER" --no-default-features
-
-    - name: Run bgworker example tests
-      run: |
-        set -x
-        cargo test --package bgworker --features "pg$PG_VER" --no-default-features
-
-    - name: Run bytea example tests
-      run: |
-        set -x
-        cargo test --package bytea --features "pg$PG_VER" --no-default-features
-
-    - name: Run custom_types example tests
-      run: |
-        set -x
-        cargo test --package custom_types --features "pg$PG_VER" --no-default-features
-
-    - name: Run custom_sql example tests
-      run: |
-        set -x
-        cargo test --package custom_sql --features "pg$PG_VER" --no-default-features
-
-    - name: Run errors example tests
-      run: |
-        set -x
-        cargo test --package errors --features "pg$PG_VER" --no-default-features
-
-    - name: Run nostd example tests
-      run: |
-        set -x
-        cargo test --package nostd --features "pg$PG_VER" --no-default-features
-
-    - name: Run operators example tests
-      run: |
-        set -x
-        cargo test --package operators --features "pg$PG_VER" --no-default-features
-
-    - name: Run schemas example tests
-      run: |
-        set -x
-        cargo test --package schemas --features "pg$PG_VER" --no-default-features
-
-    - name: Run shmem example tests
-      run: |
-        set -x
-        cargo test --package shmem --features "pg$PG_VER" --no-default-features
-
-    - name: Run spi example tests
-      run: |
-        set -x
-        cargo test --package spi --features "pg$PG_VER" --no-default-features
-
-    - name: Run srf example tests
-      run: |
-        set -x
-        cargo test --package srf --features "pg$PG_VER" --no-default-features
-
-    - name: Run strings example tests
-      run: |
-        set -x
-        cargo test --package strings --features "pg$PG_VER" --no-default-features
-
-    - name: Run triggers example tests
-      run: |
-        set -x
-        cargo test --package triggers --features "pg$PG_VER" --no-default-features
-
-    # TEMPORARY?
-    - name: Get size of target directory before cleanup
-      run: |
-        set -x
-        du -sh target/debug/*
-
-    # Attempt to make the cache payload slightly smaller.
-    - name: Clean up built PGX files
-      run: |
-        set -x
-        cd target/debug/deps/
-        for built_file in $(find * -type f -executable -print | grep -v "\.so$"); do
-          base_name=$(echo $built_file | cut -d- -f1);
-          for basefile in "$base_name".*; do
-            [ -f "$basefile" ] || continue;
-            echo "Removing $basefile"
-            rm $basefile
-          done;
-          echo "Removing $built_file"
-          rm $built_file
-        done
-
-    - name: Get size of target directory after cleanup
-      run: |
-        set -x
-        du -sh target/debug/*
-
-  cargo_pgx_init:
-    runs-on: ${{ matrix.os }}
-    if: "!contains(github.event.head_commit.message, 'nogha')"
-
-    strategy:
-      matrix:
-        version: ["postgres-10", "postgres-11", "postgres-12", "postgres-13", "postgres-14"]
-        os: ["ubuntu-20.04"]
-
-    steps:
-    - uses: actions/checkout@v2
-    - uses: actions/cache@v3
-      with:
-        path: |
-          ~/.cargo/bin/
-          ~/.cargo/registry/index/
-          ~/.cargo/registry/cache/
-          ~/.cargo/git/db/
-          target/
-        key: pgx-cargo_init_tests-${{ runner.os }}-tests-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
-
-    # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions/57969570#57969570
-    - name: Set dynamic variables
-      run: |
-        echo "PG_VER=$(echo ${{ matrix.version }} | cut -d '-' -f2)" >> $GITHUB_ENV
-
-    - name: Get cargo version
-      run: cargo --version
-
-    # Ubuntu system dependencies for Postgres
-    - name: Remove old postgres
-      run: sudo apt remove -y postgres*
-
-    - name: Set up PostgreSQL Apt Repository
-      run: |
-        set -x
-        sudo apt-get install -y wget gnupg
-        sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
-        wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
-        sudo apt-get update -y -qq --fix-missing
-
-    - name: Install system dependencies and all PostgreSQL versions
-      run: |
-        set -x
-        echo "Installing Postgres version $PG_VER from apt"
-
-        sudo apt-get install -y \
-          clang-10 \
-          llvm-10 \
-          clang \
-          gcc \
-          make \
-          build-essential \
-          libz-dev \
-          zlib1g-dev \
-          strace \
-          libssl-dev \
-          pkg-config
+    #     sudo apt-get install -y \
+    #       clang-10 \
+    #       llvm-10 \
+    #       clang \
+    #       gcc \
+    #       make \
+    #       build-essential \
+    #       libz-dev \
+    #       zlib1g-dev \
+    #       strace \
+    #       libssl-dev \
+    #       pkg-config
 
     - name: Install cargo-pgx
       run: cargo install --path cargo-pgx/ --debug --force
@@ -321,75 +385,75 @@ jobs:
         set -x
         cd /tmp/sample && cargo pgx test pg$PG_VER
 
-  build_mac:
-    runs-on: ${{ matrix.os }}
-    if: "!contains(github.event.head_commit.message, 'nogha')"
+  # build_mac:
+  #   runs-on: ${{ matrix.os }}
+  #   if: "!contains(github.event.head_commit.message, 'nogha')"
 
-    strategy:
-      matrix:
-        os: ["macos-11"]
+  #   strategy:
+  #     matrix:
+  #       os: ["macos-11"]
 
-    steps:
-    - uses: actions/checkout@v2
+  #   steps:
+  #   - uses: actions/checkout@v2
 
-    - name: Set up prerequisites and environment
-      run: |
-        echo ""
-        # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions/57969570#57969570
-        echo "----- Getting pre-installed Postgres major version -----"
-        PG_VER=$(pg_config --version | awk '{split($2,a,"."); print a[1]}')
-        echo "PG_VER=$PG_VER" >> $GITHUB_ENV
-        cat $GITHUB_ENV
+  #   - name: Set up prerequisites and environment
+  #     run: |
+  #       echo ""
+  #       # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions/57969570#57969570
+  #       echo "----- Getting pre-installed Postgres major version -----"
+  #       PG_VER=$(pg_config --version | awk '{split($2,a,"."); print a[1]}')
+  #       echo "PG_VER=$PG_VER" >> $GITHUB_ENV
+  #       cat $GITHUB_ENV
 
-        echo "----- Installing yq so .toml files can be parsed and queried -----"
-        pip3 install yq
-        echo ""
+  #       echo "----- Installing yq so .toml files can be parsed and queried -----"
+  #       pip3 install yq
+  #       echo ""
 
-        echo "----- Setting up RUSTFLAGS found in .cargo/config -----"
-        echo "RUSTFLAGS=$RUSTFLAGS $(tomlq --raw-output '.build.rustflags | join(" ")' .cargo/config)" >> $GITHUB_ENV
-        cat $GITHUB_ENV
-        echo ""
+  #       echo "----- Setting up RUSTFLAGS found in .cargo/config -----"
+  #       echo "RUSTFLAGS=$RUSTFLAGS $(tomlq --raw-output '.build.rustflags | join(" ")' .cargo/config)" >> $GITHUB_ENV
+  #       cat $GITHUB_ENV
+  #       echo ""
 
-        echo "----- Set up Postgres permissions -----"
-        sudo chmod a+rwx `$(which pg_config) --pkglibdir` `$(which pg_config) --sharedir`/extension
-        ls -lath `$(which pg_config) --pkglibdir` `$(which pg_config) --sharedir`/extension
-        echo ""
+  #       echo "----- Set up Postgres permissions -----"
+  #       sudo chmod a+rwx `$(which pg_config) --pkglibdir` `$(which pg_config) --sharedir`/extension
+  #       ls -lath `$(which pg_config) --pkglibdir` `$(which pg_config) --sharedir`/extension
+  #       echo ""
 
-        echo "----- Output Cargo version -----"
-        cargo --version
-        echo ""
+  #       echo "----- Output Cargo version -----"
+  #       cargo --version
+  #       echo ""
 
-        echo "----- Outputting env -----"
-        env
-        echo ""
+  #       echo "----- Outputting env -----"
+  #       env
+  #       echo ""
 
-    - uses: actions/cache@v3
-      with:
-        path: |
-          ~/.cargo/bin/
-          ~/.cargo/registry/index/
-          ~/.cargo/registry/cache/
-          ~/.cargo/git/db/
-          target/
-        key: pgx-${{ runner.os }}-tests-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
+  #   - uses: actions/cache@v3
+  #     with:
+  #       path: |
+  #         ~/.cargo/bin/
+  #         ~/.cargo/registry/index/
+  #         ~/.cargo/registry/cache/
+  #         ~/.cargo/git/db/
+  #         target/
+  #       key: pgx-${{ runner.os }}-tests-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
 
-    - name: Install cargo-pgx
-      run: cargo install --path cargo-pgx/ --debug --force
+  #   - name: Install cargo-pgx
+  #     run: cargo install --path cargo-pgx/ --debug --force
 
-    - name: Run 'cargo pgx init'
-      run: |
-        set -x
-        cargo pgx init --pg$PG_VER $(which pg_config)
+  #   - name: Run 'cargo pgx init'
+  #     run: |
+  #       set -x
+  #       cargo pgx init --pg$PG_VER $(which pg_config)
 
-    - name: Run base-level tests
-      run: |
-        set -x
-        cargo test \
-          --features "pg$PG_VER" --no-default-features \
-          --verbose \
-          --package cargo-pgx \
-          --package pgx \
-          --package pgx-macros \
-          --package pgx-pg-sys \
-          --package pgx-tests \
-          --package pgx-utils
+  #   - name: Run base-level tests
+  #     run: |
+  #       set -x
+  #       cargo test \
+  #         --features "pg$PG_VER" --no-default-features \
+  #         --verbose \
+  #         --package cargo-pgx \
+  #         --package pgx \
+  #         --package pgx-macros \
+  #         --package pgx-pg-sys \
+  #         --package pgx-tests \
+  #         --package pgx-utils
