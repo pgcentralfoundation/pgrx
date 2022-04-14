@@ -70,8 +70,19 @@ jobs:
     - name: Install cargo-pgx
       run: RUSTFLAGS="-Copt-level=0" cargo install --path cargo-pgx/ --debug
 
-    - name: cargo pgx init
+    - name: Run 'cargo pgx init' against system-level ${{ matrix.version }}
       run: |
         set -x
         pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
         RUSTFLAGS="-Copt-level=0" cargo pgx init --pg$pg_ver /usr/lib/postgresql/$pg_ver/bin/pg_config
+
+    - name: Run base-level tests
+      run: |
+        set -x
+        pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+        exclude_params=""
+        for package in $(find pgx-examples -mindepth 1 -maxdepth 1 -type d -printf '%f\n'); do
+          exclude_params+="--exclude $package "
+        done
+
+        RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --all --features "pg$pg_ver" --no-default-features $exclude_params
