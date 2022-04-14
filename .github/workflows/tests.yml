@@ -308,15 +308,15 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    # - uses: actions/cache@v3
-    #   with:
-    #     path: |
-    #       ~/.cargo/bin/
-    #       ~/.cargo/registry/index/
-    #       ~/.cargo/registry/cache/
-    #       ~/.cargo/git/db/
-    #       target/
-    #     key: ${{ runner.os }}-pgx-tests-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
+    - uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          target/
+        key: ${{ runner.os }}-mac-build-tests-${{ hashFiles('**/Cargo.lock', '.github/workflows/tests.yml') }}
 
     # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions/57969570#57969570
     - name: Set dynamic variables
@@ -344,3 +344,21 @@ jobs:
       run: |
         set -x
         cargo pgx init --pg$PG_VER download
+
+    - name: Run base-level tests
+      run: |
+        set -x
+        cargo test \
+          --features "pg$PG_VER" --no-default-features \
+          --package cargo-pgx \
+          --package pgx \
+          --package pgx-macros \
+          --package pgx-pg-sys \
+          --package pgx-tests \
+          --package pgx-utils
+
+  #   # TEMPORARY?
+    - name: Get size of target directory before cleanup
+      run: |
+        set -x
+        du -sh target/debug/*
