@@ -86,3 +86,11 @@ jobs:
         done
 
         RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --all --features "pg$pg_ver" --no-default-features $exclude_params
+
+    - name: Run aggregate example tests
+      run: |
+        set -x
+        pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+
+        cd pgx-examples/aggregate/
+        RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --features "pg$pg_ver" --no-default-features
