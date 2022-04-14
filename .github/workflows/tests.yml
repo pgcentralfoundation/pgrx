@@ -11,7 +11,216 @@ on:
       - develop
 
 jobs:
-  pgx_tests:
+  # pgx_tests:
+  #   runs-on: ${{ matrix.os }}
+  #   if: "!contains(github.event.head_commit.message, 'nogha')"
+
+  #   strategy:
+  #     matrix:
+  #       version: ["postgres-10", "postgres-11", "postgres-12", "postgres-13", "postgres-14"]
+  #       os: ["ubuntu-latest"]
+
+  #   steps:
+  #   - uses: actions/checkout@v2
+
+  #   - name: Get cargo version
+  #     run: cargo --version
+
+  #   # Ubuntu system dependencies for Postgres
+  #   - name: Remove old postgres
+  #     run: sudo apt remove -y postgres*
+
+  #   - name: Set up PostgreSQL Apt Repository
+  #     run: |
+  #       set -x
+  #       sudo apt-get update -y -qq --fix-missing
+  #       sudo apt-get install -y wget gnupg
+  #       sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+  #       wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+  #       sudo apt-get update
+
+  #   - name: Install system dependencies and all PostgreSQL versions
+  #     run: |
+  #       set -x
+  #       pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+  #       echo "Installing Postgres version $pg_ver from apt"
+
+  #       sudo apt-get install -y \
+  #         clang-10 \
+  #         llvm-10 \
+  #         clang \
+  #         gcc \
+  #         make \
+  #         build-essential \
+  #         libz-dev \
+  #         zlib1g-dev \
+  #         strace \
+  #         libssl-dev \
+  #         pkg-config \
+  #         postgresql-$pg_ver \
+  #         postgresql-server-dev-$pg_ver
+
+  #   - name: Set up Postgres permissions
+  #     run: |
+  #       set -x
+  #       pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+
+  #       sudo chmod a+rwx `/usr/lib/postgresql/$pg_ver/bin/pg_config --pkglibdir` `/usr/lib/postgresql/$pg_ver/bin/pg_config --sharedir`/extension /var/run/postgresql/
+
+  #   - name: Install cargo-pgx
+  #     run: RUSTFLAGS="-Copt-level=0" cargo install --path cargo-pgx/ --debug
+
+  #   - name: Run 'cargo pgx init' against system-level ${{ matrix.version }}
+  #     run: |
+  #       set -x
+  #       pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+  #       RUSTFLAGS="-Copt-level=0" cargo pgx init --pg$pg_ver /usr/lib/postgresql/$pg_ver/bin/pg_config
+
+  #   - name: Run base-level tests
+  #     run: |
+  #       set -x
+  #       pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+  #       exclude_params=""
+  #       for package in $(find pgx-examples -mindepth 1 -maxdepth 1 -type d -printf '%f\n'); do
+  #         exclude_params+="--exclude $package "
+  #       done
+
+  #       RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --all --features "pg$pg_ver" --no-default-features $exclude_params
+
+  #   - name: Run aggregate example tests
+  #     run: |
+  #       set -x
+  #       pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+
+  #       cd pgx-examples/aggregate/
+  #       RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --features "pg$pg_ver" --no-default-features
+
+  #   - name: Run arrays example tests
+  #     run: |
+  #       set -x
+  #       pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+
+  #       cd pgx-examples/arrays/
+  #       RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --features "pg$pg_ver" --no-default-features
+
+  #   - name: Run bad_ideas example tests
+  #     run: |
+  #       set -x
+  #       pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+
+  #       cd pgx-examples/bad_ideas/
+  #       RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --features "pg$pg_ver" --no-default-features
+
+  #   - name: Run bgworker example tests
+  #     run: |
+  #       set -x
+  #       pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+
+  #       cd pgx-examples/bgworker/
+  #       RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --features "pg$pg_ver" --no-default-features
+
+  #   - name: Run bytea example tests
+  #     run: |
+  #       set -x
+  #       pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+
+  #       cd pgx-examples/bytea/
+  #       RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --features "pg$pg_ver" --no-default-features
+
+  #   - name: Run custom_types example tests
+  #     run: |
+  #       set -x
+  #       pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+
+  #       cd pgx-examples/custom_types/
+  #       RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --features "pg$pg_ver" --no-default-features
+
+  #   - name: Run custom_sql example tests
+  #     run: |
+  #       set -x
+  #       pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+
+  #       cd pgx-examples/custom_sql/
+  #       RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --features "pg$pg_ver" --no-default-features
+
+  #   - name: Run errors example tests
+  #     run: |
+  #       set -x
+  #       pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+
+  #       cd pgx-examples/errors/
+  #       RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --features "pg$pg_ver" --no-default-features
+
+  #   - name: Run nostd example tests
+  #     run: |
+  #       set -x
+  #       pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+
+  #       cd pgx-examples/nostd/
+  #       RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --features "pg$pg_ver" --no-default-features
+
+  #   - name: Run operators example tests
+  #     run: |
+  #       set -x
+  #       pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+
+  #       cd pgx-examples/operators/
+  #       RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --features "pg$pg_ver" --no-default-features
+
+  #   - name: Run schemas example tests
+  #     run: |
+  #       set -x
+  #       pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+
+  #       cd pgx-examples/schemas/
+  #       RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --features "pg$pg_ver" --no-default-features
+
+  #   - name: Run shmem example tests
+  #     run: |
+  #       set -x
+  #       pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+
+  #       cd pgx-examples/shmem/
+  #       RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --features "pg$pg_ver" --no-default-features
+
+  #   - name: Run spi example tests
+  #     run: |
+  #       set -x
+  #       pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+
+  #       cd pgx-examples/spi/
+  #       RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --features "pg$pg_ver" --no-default-features
+
+  #   - name: Run srf example tests
+  #     run: |
+  #       set -x
+  #       pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+
+  #       cd pgx-examples/srf/
+  #       RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --features "pg$pg_ver" --no-default-features
+
+  #   - name: Run strings example tests
+  #     run: |
+  #       set -x
+  #       pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+
+  #       cd pgx-examples/strings/
+  #       RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --features "pg$pg_ver" --no-default-features
+
+  #   - name: Run triggers example tests
+  #     run: |
+  #       set -x
+  #       pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+
+  #       cd pgx-examples/triggers/
+  #       RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --features "pg$pg_ver" --no-default-features
+
+
+
+
+
+
+  cargo_pgx_init:
     runs-on: ${{ matrix.os }}
     if: "!contains(github.event.head_commit.message, 'nogha')"
 
@@ -56,165 +265,53 @@ jobs:
           zlib1g-dev \
           strace \
           libssl-dev \
-          pkg-config \
-          postgresql-$pg_ver \
-          postgresql-server-dev-$pg_ver
+          pkg-config
 
-    - name: Set up Postgres permissions
-      run: |
-        set -x
-        pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+    # - name: Set up Postgres permissions
+    #   run: |
+    #     set -x
+    #     pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
 
-        sudo chmod a+rwx `/usr/lib/postgresql/$pg_ver/bin/pg_config --pkglibdir` `/usr/lib/postgresql/$pg_ver/bin/pg_config --sharedir`/extension /var/run/postgresql/
+    #     sudo chmod a+rwx `/usr/lib/postgresql/$pg_ver/bin/pg_config --pkglibdir` `/usr/lib/postgresql/$pg_ver/bin/pg_config --sharedir`/extension /var/run/postgresql/
 
     - name: Install cargo-pgx
       run: RUSTFLAGS="-Copt-level=0" cargo install --path cargo-pgx/ --debug
 
-    - name: Run 'cargo pgx init' against system-level ${{ matrix.version }}
+    - name: Run 'cargo pgx init' for ${{ matrix.version }}
       run: |
         set -x
         pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
-        RUSTFLAGS="-Copt-level=0" cargo pgx init --pg$pg_ver /usr/lib/postgresql/$pg_ver/bin/pg_config
+        RUSTFLAGS="-Copt-level=0" cargo pgx init --pg$pg_ver
 
-    - name: Run base-level tests
+    - name: create new sample extension
+      run: cd /tmp/ && cargo pgx new sample
+
+    # hack Cargo.toml to use this version of pgx from github
+    - name: hack Cargo.toml
+      run: |
+       echo "[patch.crates-io]" >> /tmp/sample/Cargo.toml
+       echo "pgx        = { path = \"${GITHUB_WORKSPACE}/pgx\"        }" >> /tmp/sample/Cargo.toml
+       echo "pgx-macros = { path = \"${GITHUB_WORKSPACE}/pgx-macros\" }" >> /tmp/sample/Cargo.toml
+       echo "pgx-tests  = { path = \"${GITHUB_WORKSPACE}/pgx-tests\"  }" >> /tmp/sample/Cargo.toml
+
+    - name: show Cargo.toml
+      run: cat /tmp/sample/Cargo.toml
+
+    - name: test sample for ${{ matrix.version }}
       run: |
         set -x
         pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
-        exclude_params=""
-        for package in $(find pgx-examples -mindepth 1 -maxdepth 1 -type d -printf '%f\n'); do
-          exclude_params+="--exclude $package "
-        done
+        cd /tmp/sample && cargo pgx test pg$pg_ver
 
-        RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --all --features "pg$pg_ver" --no-default-features $exclude_params
+      # run: cd /tmp/sample && cargo pgx test pg10
 
+    # - name: Run base-level tests
+    #   run: |
+    #     set -x
+    #     pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+    #     exclude_params=""
+    #     for package in $(find pgx-examples -mindepth 1 -maxdepth 1 -type d -printf '%f\n'); do
+    #       exclude_params+="--exclude $package "
+    #     done
 
-    - name: Run aggregate example tests
-      run: |
-        set -x
-        pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
-
-        cd pgx-examples/aggregate/
-        RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --features "pg$pg_ver" --no-default-features
-
-    - name: Run arrays example tests
-      run: |
-        set -x
-        pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
-
-        cd pgx-examples/arrays/
-        RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --features "pg$pg_ver" --no-default-features
-
-    - name: Run bad_ideas example tests
-      run: |
-        set -x
-        pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
-
-        cd pgx-examples/bad_ideas/
-        RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --features "pg$pg_ver" --no-default-features
-
-    - name: Run bgworker example tests
-      run: |
-        set -x
-        pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
-
-        cd pgx-examples/bgworker/
-        RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --features "pg$pg_ver" --no-default-features
-
-    - name: Run bytea example tests
-      run: |
-        set -x
-        pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
-
-        cd pgx-examples/bytea/
-        RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --features "pg$pg_ver" --no-default-features
-
-    - name: Run custom_types example tests
-      run: |
-        set -x
-        pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
-
-        cd pgx-examples/custom_types/
-        RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --features "pg$pg_ver" --no-default-features
-
-    - name: Run custom_sql example tests
-      run: |
-        set -x
-        pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
-
-        cd pgx-examples/custom_sql/
-        RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --features "pg$pg_ver" --no-default-features
-
-    - name: Run errors example tests
-      run: |
-        set -x
-        pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
-
-        cd pgx-examples/errors/
-        RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --features "pg$pg_ver" --no-default-features
-
-    - name: Run nostd example tests
-      run: |
-        set -x
-        pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
-
-        cd pgx-examples/nostd/
-        RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --features "pg$pg_ver" --no-default-features
-
-    - name: Run operators example tests
-      run: |
-        set -x
-        pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
-
-        cd pgx-examples/operators/
-        RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --features "pg$pg_ver" --no-default-features
-
-    - name: Run schemas example tests
-      run: |
-        set -x
-        pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
-
-        cd pgx-examples/schemas/
-        RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --features "pg$pg_ver" --no-default-features
-
-    - name: Run shmem example tests
-      run: |
-        set -x
-        pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
-
-        cd pgx-examples/shmem/
-        RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --features "pg$pg_ver" --no-default-features
-
-    - name: Run spi example tests
-      run: |
-        set -x
-        pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
-
-        cd pgx-examples/spi/
-        RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --features "pg$pg_ver" --no-default-features
-
-    - name: Run srf example tests
-      run: |
-        set -x
-        pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
-
-        cd pgx-examples/srf/
-        RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --features "pg$pg_ver" --no-default-features
-
-    - name: Run strings example tests
-      run: |
-        set -x
-        pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
-
-        cd pgx-examples/strings/
-        RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --features "pg$pg_ver" --no-default-features
-
-    - name: Run triggers example tests
-      run: |
-        set -x
-        pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
-
-        cd pgx-examples/triggers/
-        RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --features "pg$pg_ver" --no-default-features
-
-#  examples: ["aggregate", "arrays", "bad_ideas", "bgworker", "bytea", "custom_types",  "custom_sql", "errors", "nostd", "operators", "schemas",
-#  "shmem", "spi", "srf", "strings", "triggers"]
+    #     RUSTFLAGS="-Copt-level=0" RUST_BACKTRACE=1 cargo test --all --features "pg$pg_ver" --no-default-features $exclude_params
