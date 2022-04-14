@@ -26,11 +26,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - uses: actions-rs/install@v0.1
-      with:
-        crate: cargo-pgx
-        version: latest
-        use-tool-cache: true
 
     # TEMPORARY
     # TEMPORARY
@@ -94,150 +89,150 @@ jobs:
     - name: Install cargo-pgx
       run: cargo install --path cargo-pgx/ --debug
 
-    # - name: Run 'cargo pgx init' against system-level ${{ matrix.version }}
-    #   run: |
-    #     set -x
-    #     pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
-    #     cargo pgx init --pg$pg_ver /usr/lib/postgresql/$pg_ver/bin/pg_config
+    - name: Run 'cargo pgx init' against system-level ${{ matrix.version }}
+      run: |
+        set -x
+        pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+        cargo pgx init --pg$pg_ver /usr/lib/postgresql/$pg_ver/bin/pg_config
 
-    # - name: Run base-level tests
-    #   run: |
-    #     set -x
-    #     pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
-    #     exclude_params=""
-    #     for package in $(find pgx-examples -mindepth 1 -maxdepth 1 -type d -printf '%f\n'); do
-    #       exclude_params+="--exclude $package "
-    #     done
+    - name: Run base-level tests
+      run: |
+        set -x
+        pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+        exclude_params=""
+        for package in $(find pgx-examples -mindepth 1 -maxdepth 1 -type d -printf '%f\n'); do
+          exclude_params+="--exclude $package "
+        done
 
-    #     cargo test --all --features "pg$pg_ver" --no-default-features $exclude_params
+        cargo test --all --features "pg$pg_ver" --no-default-features $exclude_params
 
-    # - name: Run aggregate example tests
-    #   run: |
-    #     set -x
-    #     pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+    - name: Run aggregate example tests
+      run: |
+        set -x
+        pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
 
-    #     cd pgx-examples/aggregate/
-    #     cargo test --features "pg$pg_ver" --no-default-features
+        cd pgx-examples/aggregate/
+        cargo test --features "pg$pg_ver" --no-default-features
 
-    # - name: Run arrays example tests
-    #   run: |
-    #     set -x
-    #     pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+    - name: Run arrays example tests
+      run: |
+        set -x
+        pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
 
-    #     cd pgx-examples/arrays/
-    #     cargo test --features "pg$pg_ver" --no-default-features
+        cd pgx-examples/arrays/
+        cargo test --features "pg$pg_ver" --no-default-features
 
-    # - name: Run bad_ideas example tests
-    #   run: |
-    #     set -x
-    #     pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+    - name: Run bad_ideas example tests
+      run: |
+        set -x
+        pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
 
-    #     cd pgx-examples/bad_ideas/
-    #     cargo test --features "pg$pg_ver" --no-default-features
+        cd pgx-examples/bad_ideas/
+        cargo test --features "pg$pg_ver" --no-default-features
 
-    # - name: Run bgworker example tests
-    #   run: |
-    #     set -x
-    #     pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+    - name: Run bgworker example tests
+      run: |
+        set -x
+        pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
 
-    #     cd pgx-examples/bgworker/
-    #     cargo test --features "pg$pg_ver" --no-default-features
+        cd pgx-examples/bgworker/
+        cargo test --features "pg$pg_ver" --no-default-features
 
-    # - name: Run bytea example tests
-    #   run: |
-    #     set -x
-    #     pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+    - name: Run bytea example tests
+      run: |
+        set -x
+        pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
 
-    #     cd pgx-examples/bytea/
-    #     cargo test --features "pg$pg_ver" --no-default-features
+        cd pgx-examples/bytea/
+        cargo test --features "pg$pg_ver" --no-default-features
 
-    # - name: Run custom_types example tests
-    #   run: |
-    #     set -x
-    #     pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+    - name: Run custom_types example tests
+      run: |
+        set -x
+        pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
 
-    #     cd pgx-examples/custom_types/
-    #     cargo test --features "pg$pg_ver" --no-default-features
+        cd pgx-examples/custom_types/
+        cargo test --features "pg$pg_ver" --no-default-features
 
-    # - name: Run custom_sql example tests
-    #   run: |
-    #     set -x
-    #     pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+    - name: Run custom_sql example tests
+      run: |
+        set -x
+        pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
 
-    #     cd pgx-examples/custom_sql/
-    #     cargo test --features "pg$pg_ver" --no-default-features
+        cd pgx-examples/custom_sql/
+        cargo test --features "pg$pg_ver" --no-default-features
 
-    # - name: Run errors example tests
-    #   run: |
-    #     set -x
-    #     pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+    - name: Run errors example tests
+      run: |
+        set -x
+        pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
 
-    #     cd pgx-examples/errors/
-    #     cargo test --features "pg$pg_ver" --no-default-features
+        cd pgx-examples/errors/
+        cargo test --features "pg$pg_ver" --no-default-features
 
-    # - name: Run nostd example tests
-    #   run: |
-    #     set -x
-    #     pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+    - name: Run nostd example tests
+      run: |
+        set -x
+        pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
 
-    #     cd pgx-examples/nostd/
-    #     cargo test --features "pg$pg_ver" --no-default-features
+        cd pgx-examples/nostd/
+        cargo test --features "pg$pg_ver" --no-default-features
 
-    # - name: Run operators example tests
-    #   run: |
-    #     set -x
-    #     pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+    - name: Run operators example tests
+      run: |
+        set -x
+        pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
 
-    #     cd pgx-examples/operators/
-    #     cargo test --features "pg$pg_ver" --no-default-features
+        cd pgx-examples/operators/
+        cargo test --features "pg$pg_ver" --no-default-features
 
-    # - name: Run schemas example tests
-    #   run: |
-    #     set -x
-    #     pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+    - name: Run schemas example tests
+      run: |
+        set -x
+        pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
 
-    #     cd pgx-examples/schemas/
-    #     cargo test --features "pg$pg_ver" --no-default-features
+        cd pgx-examples/schemas/
+        cargo test --features "pg$pg_ver" --no-default-features
 
-    # - name: Run shmem example tests
-    #   run: |
-    #     set -x
-    #     pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+    - name: Run shmem example tests
+      run: |
+        set -x
+        pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
 
-    #     cd pgx-examples/shmem/
-    #     cargo test --features "pg$pg_ver" --no-default-features
+        cd pgx-examples/shmem/
+        cargo test --features "pg$pg_ver" --no-default-features
 
-    # - name: Run spi example tests
-    #   run: |
-    #     set -x
-    #     pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+    - name: Run spi example tests
+      run: |
+        set -x
+        pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
 
-    #     cd pgx-examples/spi/
-    #     cargo test --features "pg$pg_ver" --no-default-features
+        cd pgx-examples/spi/
+        cargo test --features "pg$pg_ver" --no-default-features
 
-    # - name: Run srf example tests
-    #   run: |
-    #     set -x
-    #     pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+    - name: Run srf example tests
+      run: |
+        set -x
+        pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
 
-    #     cd pgx-examples/srf/
-    #     cargo test --features "pg$pg_ver" --no-default-features
+        cd pgx-examples/srf/
+        cargo test --features "pg$pg_ver" --no-default-features
 
-    # - name: Run strings example tests
-    #   run: |
-    #     set -x
-    #     pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+    - name: Run strings example tests
+      run: |
+        set -x
+        pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
 
-    #     cd pgx-examples/strings/
-    #     cargo test --features "pg$pg_ver" --no-default-features
+        cd pgx-examples/strings/
+        cargo test --features "pg$pg_ver" --no-default-features
 
-    # - name: Run triggers example tests
-    #   run: |
-    #     set -x
-    #     pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+    - name: Run triggers example tests
+      run: |
+        set -x
+        pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
 
-    #     cd pgx-examples/triggers/
-    #     cargo test --features "pg$pg_ver" --no-default-features
+        cd pgx-examples/triggers/
+        cargo test --features "pg$pg_ver" --no-default-features
 
   cargo_pgx_init:
     runs-on: ${{ matrix.os }}
@@ -250,11 +245,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - uses: actions-rs/install@v0.1
-      with:
-        crate: cargo-pgx
-        version: latest
-        use-tool-cache: true
 
     - name: Get cargo version
       run: cargo --version
@@ -294,28 +284,28 @@ jobs:
     - name: Install cargo-pgx
       run: cargo install --path cargo-pgx/ --debug
 
-    # - name: Run 'cargo pgx init' for ${{ matrix.version }}
-    #   run: |
-    #     set -x
-    #     pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
-    #     cargo pgx init --pg$pg_ver download
+    - name: Run 'cargo pgx init' for ${{ matrix.version }}
+      run: |
+        set -x
+        pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+        cargo pgx init --pg$pg_ver download
 
-    # - name: create new sample extension
-    #   run: cd /tmp/ && cargo pgx new sample
+    - name: create new sample extension
+      run: cd /tmp/ && cargo pgx new sample
 
-    # # hack Cargo.toml to use this version of pgx from github
-    # - name: hack Cargo.toml
-    #   run: |
-    #    echo "[patch.crates-io]" >> /tmp/sample/Cargo.toml
-    #    echo "pgx        = { path = \"${GITHUB_WORKSPACE}/pgx\"        }" >> /tmp/sample/Cargo.toml
-    #    echo "pgx-macros = { path = \"${GITHUB_WORKSPACE}/pgx-macros\" }" >> /tmp/sample/Cargo.toml
-    #    echo "pgx-tests  = { path = \"${GITHUB_WORKSPACE}/pgx-tests\"  }" >> /tmp/sample/Cargo.toml
+    # hack Cargo.toml to use this version of pgx from github
+    - name: hack Cargo.toml
+      run: |
+       echo "[patch.crates-io]" >> /tmp/sample/Cargo.toml
+       echo "pgx        = { path = \"${GITHUB_WORKSPACE}/pgx\"        }" >> /tmp/sample/Cargo.toml
+       echo "pgx-macros = { path = \"${GITHUB_WORKSPACE}/pgx-macros\" }" >> /tmp/sample/Cargo.toml
+       echo "pgx-tests  = { path = \"${GITHUB_WORKSPACE}/pgx-tests\"  }" >> /tmp/sample/Cargo.toml
 
-    # - name: show Cargo.toml
-    #   run: cat /tmp/sample/Cargo.toml
+    - name: show Cargo.toml
+      run: cat /tmp/sample/Cargo.toml
 
-    # - name: test sample for ${{ matrix.version }}
-    #   run: |
-    #     set -x
-    #     pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
-    #     cd /tmp/sample && cargo pgx test pg$pg_ver
+    - name: test sample for ${{ matrix.version }}
+      run: |
+        set -x
+        pg_ver=$(echo ${{ matrix.version }} | cut -d '-' -f2)
+        cd /tmp/sample && cargo pgx test pg$pg_ver
