@@ -13,6 +13,7 @@ on:
 env:
   RUSTFLAGS: -Copt-level=0
   RUST_BACKTRACE: 1
+  CARGO_INCREMENTAL: "false"
 
 jobs:
   pgx_tests:
@@ -85,124 +86,100 @@ jobs:
     - name: Run base-level tests
       run: |
         set -x
-        exclude_params=""
-        for package in $(find pgx-examples -mindepth 1 -maxdepth 1 -type d -printf '%f\n'); do
-          exclude_params+="--exclude $package "
-        done
-
-        cargo test --all --features "pg$PG_VER" --no-default-features $exclude_params
+        cargo test \
+          --features "pg$PG_VER" --no-default-features \
+          --package cargo-pgx \
+          --package pgx \
+          --package pgx-macros \
+          --package pgx-pg-sys \
+          --package pgx-tests \
+          --package pgx-utils
 
     - name: Run aggregate example tests
       run: |
         set -x
-
-        cd pgx-examples/aggregate/
-        cargo test --features "pg$PG_VER" --no-default-features
+        cargo test --package aggregate --features "pg$PG_VER" --no-default-features
 
     - name: Run arrays example tests
       run: |
         set -x
-
-        cd pgx-examples/arrays/
-        cargo test --features "pg$PG_VER" --no-default-features
+        cargo test --package arrays --features "pg$PG_VER" --no-default-features
 
     - name: Run bad_ideas example tests
       run: |
         set -x
-
-        cd pgx-examples/bad_ideas/
-        cargo test --features "pg$PG_VER" --no-default-features
+        cargo test --package bad_ideas --features "pg$PG_VER" --no-default-features
 
     - name: Run bgworker example tests
       run: |
         set -x
-
-        cd pgx-examples/bgworker/
-        cargo test --features "pg$PG_VER" --no-default-features
+        cargo test --package bgworker --features "pg$PG_VER" --no-default-features
 
     - name: Run bytea example tests
       run: |
         set -x
-
-        cd pgx-examples/bytea/
-        cargo test --features "pg$PG_VER" --no-default-features
+        cargo test --package bytea --features "pg$PG_VER" --no-default-features
 
     - name: Run custom_types example tests
       run: |
         set -x
-
-        cd pgx-examples/custom_types/
-        cargo test --features "pg$PG_VER" --no-default-features
+        cargo test --package custom_types --features "pg$PG_VER" --no-default-features
 
     - name: Run custom_sql example tests
       run: |
         set -x
-
-        cd pgx-examples/custom_sql/
-        cargo test --features "pg$PG_VER" --no-default-features
+        cargo test --package custom_sql --features "pg$PG_VER" --no-default-features
 
     - name: Run errors example tests
       run: |
         set -x
-
-        cd pgx-examples/errors/
-        cargo test --features "pg$PG_VER" --no-default-features
+        cargo test --package errors --features "pg$PG_VER" --no-default-features
 
     - name: Run nostd example tests
       run: |
         set -x
-
-        cd pgx-examples/nostd/
-        cargo test --features "pg$PG_VER" --no-default-features
+        cargo test --package nostd --features "pg$PG_VER" --no-default-features
 
     - name: Run operators example tests
       run: |
         set -x
-
-        cd pgx-examples/operators/
-        cargo test --features "pg$PG_VER" --no-default-features
+        cargo test --package operators --features "pg$PG_VER" --no-default-features
 
     - name: Run schemas example tests
       run: |
         set -x
-
-        cd pgx-examples/schemas/
-        cargo test --features "pg$PG_VER" --no-default-features
+        cargo test --package schemas --features "pg$PG_VER" --no-default-features
 
     - name: Run shmem example tests
       run: |
         set -x
-
-        cd pgx-examples/shmem/
-        cargo test --features "pg$PG_VER" --no-default-features
+        cargo test --package shmem --features "pg$PG_VER" --no-default-features
 
     - name: Run spi example tests
       run: |
         set -x
-
-        cd pgx-examples/spi/
-        cargo test --features "pg$PG_VER" --no-default-features
+        cargo test --package spi --features "pg$PG_VER" --no-default-features
 
     - name: Run srf example tests
       run: |
         set -x
-
-        cd pgx-examples/srf/
-        cargo test --features "pg$PG_VER" --no-default-features
+        cargo test --package srf --features "pg$PG_VER" --no-default-features
 
     - name: Run strings example tests
       run: |
         set -x
-
-        cd pgx-examples/strings/
-        cargo test --features "pg$PG_VER" --no-default-features
+        cargo test --package strings --features "pg$PG_VER" --no-default-features
 
     - name: Run triggers example tests
       run: |
         set -x
+        cargo test --package triggers --features "pg$PG_VER" --no-default-features
 
-        cd pgx-examples/triggers/
-        cargo test --features "pg$PG_VER" --no-default-features
+    # TEMPORARY?
+    - name: Get size of target directory
+      run: |
+        set -x
+        du -sh target/debug/*
 
   cargo_pgx_init:
     runs-on: ${{ matrix.os }}
