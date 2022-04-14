@@ -309,9 +309,6 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Setup tmate session
-      uses: mxschmitt/action-tmate@v3
-
     - name: Set up prerequisites and environment
       run: |
         echo "----- Installing yq so .toml files can be parsed and queried -----"
