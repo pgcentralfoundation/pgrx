@@ -331,7 +331,13 @@ jobs:
 
     - name: Remove old postgres
       run: |
+        set -x
         brew uninstall postgres
         rm -rf /usr/local/var/postgres
         rm /usr/local/var/log/postgres.log
         rm -f ~/.psqlrc ~/.psql_history
+
+    - name: Run 'cargo pgx init' for ${{ matrix.version }}
+      run: |
+        set -x
+        cargo pgx init --pg$PG_VER download
