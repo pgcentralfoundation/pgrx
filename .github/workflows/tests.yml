@@ -17,7 +17,7 @@ jobs:
 
     strategy:
       matrix:
-        version: [10, 11, 12, 13, 14]
+        version: ["postgres-10", "postgres-11", "postgres-12", "postgres-13", "postgres-14"]
         os: ["ubuntu-latest"]
 
     steps:
