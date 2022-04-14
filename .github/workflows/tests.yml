@@ -338,6 +338,30 @@ jobs:
     - name: Install cargo-pgx
       run: cargo install --path cargo-pgx/ --debug --force
 
+    - name: Run 'cargo pgx init' for ${{ matrix.version }}
+      run: |
+        set -x
+        cargo pgx init --pg$PG_VER download
+
+    - name: create new sample extension
+      run: cd /tmp/ && cargo pgx new sample
+
+    # hack Cargo.toml to use this version of pgx from github
+    - name: hack Cargo.toml
+      run: |
+       echo "[patch.crates-io]" >> /tmp/sample/Cargo.toml
+       echo "pgx        = { path = \"${GITHUB_WORKSPACE}/pgx\"        }" >> /tmp/sample/Cargo.toml
+       echo "pgx-macros = { path = \"${GITHUB_WORKSPACE}/pgx-macros\" }" >> /tmp/sample/Cargo.toml
+       echo "pgx-tests  = { path = \"${GITHUB_WORKSPACE}/pgx-tests\"  }" >> /tmp/sample/Cargo.toml
+
+    - name: show Cargo.toml
+      run: cat /tmp/sample/Cargo.toml
+
+    - name: test sample for ${{ matrix.version }}
+      run: |
+        set -x
+        cd /tmp/sample && cargo pgx test pg$PG_VER
+
     - name: Print sccache stats (after)
       run: sccache --show-stats
 
