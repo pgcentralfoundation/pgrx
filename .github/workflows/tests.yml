@@ -323,7 +323,7 @@ jobs:
 
         # https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions/57969570#57969570
         echo_and_run \
-          "Set up dynamic variables into $GITHUB_ENV" \
+          'Set up dynamic variables into $GITHUB_ENV' \
           '"PG_VER=$(echo ${{ matrix.version }} | cut -d '-' -f2)" >> $GITHUB_ENV'
 
         echo_and_run \

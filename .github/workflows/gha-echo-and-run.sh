@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
 echo_and_run() {
-  echo $1
+  echo $1; shift;
   echo "--------------------"
   echo "* Command to run:"
-  echo "  \$ $2"
+  echo "  \$ $@"
   echo ""
 
-  eval "$2"
+  eval "$@"
 
   echo ""
   echo ""
