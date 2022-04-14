@@ -91,7 +91,7 @@ pub fn createdb(
         return Ok(false);
     }
 
-    println!("{} database {}", "     Creating".bold().green(), dbname);
+    println!("{} database {}", "     Creatingggggggggggggggggggggggggggggg".bold().green(), dbname);
     let mut command = Command::new(pg_config.createdb_path()?);
     command
         .env_remove("PGDATABASE")
