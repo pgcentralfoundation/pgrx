@@ -43366,6 +43366,28 @@ pub type planner_hook_type = ::std::option::Option<
 extern "C" {
     pub static mut planner_hook: planner_hook_type;
 }
+// pub type post_parse_analyze_hook_type = ::std::option::Option<
+//     unsafe extern "C" fn(pstate: *mut ParseState, query: *mut Query),
+// >;
+// #[pg_guard]
+// extern "C" {
+//     pub static mut post_parse_analyze_hook: post_parse_analyze_hook_type;
+// }
+
+pub type post_parse_analyze_hook_type = ::std::option::Option<
+    unsafe extern "C" fn(pstate: *mut ParseState, query: *mut Query),
+>;
+#[pg_guard]
+extern "C" {
+    pub static mut post_parse_analyze_hook: post_parse_analyze_hook_type;
+}
+pub type post_parse_analyze_hook_type = ::std::option::Option<
+    unsafe extern "C" fn(
+        pstate: *mut ParseState,
+        query: *mut Query,
+    ),
+>;
+
 pub type create_upper_paths_hook_type = ::std::option::Option<
     unsafe extern "C" fn(
         root: *mut PlannerInfo,
@@ -43386,6 +43408,10 @@ extern "C" {
         cursorOptions: ::std::os::raw::c_int,
         boundParams: ParamListInfo,
     ) -> *mut PlannedStmt;
+}
+#[pg_guard]
+extern "C" {
+    pub fn standard_post_parse_analyze(pstate: *mut ParseState, query: *mut Query);
 }
 #[pg_guard]
 extern "C" {

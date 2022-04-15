@@ -89,6 +89,16 @@ mod tests {
                 self.events += 1;
                 prev_hook(parse, query_string, cursor_options, bound_params)
             }
+
+            fn post_parse_analyze(
+                &mut self,
+                pstate: PgBox<ParseState>,
+                query: PgBox<Query>,
+                prev_hook: fn(PgBox<ParseState>, PgBox<Query>) -> HookResult<()>,
+            ) -> HookResult<()> {
+                self.events += 1;
+                prev_hook(pstate, query)
+            }
         }
 
         static mut HOOK: TestHook = TestHook { events: 0 };

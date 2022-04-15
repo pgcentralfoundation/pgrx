@@ -144,6 +144,16 @@ pub trait PgHooks {
 
     /// Called when the transaction commits
     fn commit(&mut self) {}
+
+    /// Hook for plugins to get control in post_parse_analyze
+    fn post_parse_analyze(
+        &mut self,
+        pstate: PgBox<pg_sys::ParseState>,
+        query: PgBox<pg_sys::Query>,
+        prev_hook: fn(pstate: PgBox<pg_sys::ParseState>, query: PgBox<pg_sys::Query>) -> HookResult<()>,
+    ) -> HookResult<()> {
+        prev_hook(pstate, query)
+    }
 }
 
 struct Hooks {
@@ -155,6 +165,7 @@ struct Hooks {
     prev_executor_check_perms_hook: pg_sys::ExecutorCheckPerms_hook_type,
     prev_process_utility_hook: pg_sys::ProcessUtility_hook_type,
     prev_planner_hook: pg_sys::planner_hook_type,
+    prev_post_parse_analyze_hook: pg_sys::post_parse_analyze_hook_type,
 }
 
 static mut HOOKS: Option<Hooks> = None;
@@ -187,7 +198,11 @@ pub unsafe fn register_hook(hook: &'static mut (dyn PgHooks)) {
         prev_planner_hook: pg_sys::planner_hook
             .replace(pgx_planner)
             .or(Some(pgx_standard_planner_wrapper)),
+        prev_post_parse_analyze_hook: pg_sys::post_parse_analyze_hook
+            .replace(pgx_post_parse_analyze)
+            .or(Some(pgx_standard_post_parse_analyze_wrapper)),
     });
+
 
     unsafe extern "C" fn xact_callback(event: pg_sys::XactEvent, _: void_mut_ptr) {
         match event {
@@ -487,6 +502,23 @@ unsafe extern "C" fn pgx_planner_impl(
 }
 
 #[pg_guard]
+unsafe extern "C" fn pgx_post_parse_analyze(pstate: *mut pg_sys::ParseState, query: *mut pg_sys::Query) {
+    fn prev(pstate: PgBox<pg_sys::ParseState>, query: PgBox<pg_sys::Query>) -> HookResult<()> {
+        unsafe {
+            (HOOKS
+                .as_mut()
+                .unwrap()
+                .prev_post_parse_analyze_hook
+                .as_ref()
+                .unwrap())(pstate.into_pg(), query.into_pg())
+        }
+        HookResult::new(())
+    }
+    let hook = &mut HOOKS.as_mut().unwrap().current_hook;
+    hook.post_parse_analyze(PgBox::from_pg(pstate), PgBox::from_pg(query), prev);
+}
+
+#[pg_guard]
 unsafe extern "C" fn pgx_standard_executor_start_wrapper(
     query_desc: *mut pg_sys::QueryDesc,
     eflags: i32,
@@ -587,4 +619,13 @@ unsafe extern "C" fn pgx_standard_planner_wrapper(
     bound_params: pg_sys::ParamListInfo,
 ) -> *mut pg_sys::PlannedStmt {
     pg_sys::standard_planner(parse, query_string, cursor_options, bound_params)
+}
+
+#[cfg(any(feature = "pg10", feature = "pg11", feature = "pg12", feature = "pg13", feature = "pg14"))]
+#[pg_guard]
+unsafe extern "C" fn pgx_standard_post_parse_analyze_wrapper(
+    pstate: *mut pg_sys::ParseState,
+    query: *mut pg_sys::Query,
+) {
+    pg_sys::standard_post_parse_analyze(pstate, query)
 }
