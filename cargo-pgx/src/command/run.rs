@@ -43,7 +43,7 @@ pub(crate) struct Run {
     features: clap_cargo::Features,
     #[clap(from_global, parse(from_occurrences))]
     verbose: usize,
-    // Use an existing `pgcli` on the $PATH.
+    /// Use an existing `pgcli` on the $PATH.
     #[clap(env = "PGX_PGCLI", long)]
     pgcli: bool,
 }

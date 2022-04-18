@@ -36,7 +36,7 @@ pub(crate) struct Connect {
     /// Path to Cargo.toml
     #[clap(long, parse(from_os_str))]
     manifest_path: Option<PathBuf>,
-    // Use an existing `pgcli` on the $PATH.
+    /// Use an existing `pgcli` on the $PATH.
     #[clap(env = "PGX_PGCLI", long)]
     pgcli: bool,
 }

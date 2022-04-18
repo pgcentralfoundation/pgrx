@@ -55,7 +55,7 @@ pub(crate) struct Schema {
     pg_config: Option<PathBuf>,
     #[clap(flatten)]
     features: clap_cargo::Features,
-    /// A path to output a produced SQL file (default is `sql/$EXTNAME-$VERSION.sql`)
+    /// A path to output a produced SQL file (default is `stdout`)
     #[clap(long, short, parse(from_os_str))]
     out: Option<PathBuf>,
     /// A path to output a produced GraphViz DOT file
