@@ -208,7 +208,7 @@ jobs:
 
     strategy:
       matrix:
-        version: [""postgres-14"]
+        version: ["postgres-14"]
         os: ["ubuntu-20.04"]
 
     steps:
