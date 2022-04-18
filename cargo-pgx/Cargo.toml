@@ -25,7 +25,7 @@ env_proxy = "0.4.1"
 num_cpus = "1.13.1"
 pgx-utils = { path = "../pgx-utils", version = "0.4.2" }
 proc-macro2 = { version = "1.0.36", features = [ "span-locations" ] }
-quote = "1.0.17"
+quote = "1.0.18"
 rayon = "1.5.1"
 regex = "1.5.5"
 rttp_client = { version = "0.1.0", features = ["tls-native"] }
