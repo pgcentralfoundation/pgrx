@@ -18,7 +18,7 @@ env:
 
 jobs:
   pgx_tests:
-    name: Run PGX tests
+    name: pgx-tests & examples
     runs-on: ${{ matrix.os }}
     if: "!contains(github.event.head_commit.message, 'nogha')"
     env:
@@ -199,7 +199,7 @@ jobs:
       run: sccache --stop-server || true
 
   cargo_pgx_init:
-    name: Run 'cargo pgx init' and test
+    name: cargo pgx init
     runs-on: ${{ matrix.os }}
     if: "!contains(github.event.head_commit.message, 'nogha')"
     env:
@@ -208,7 +208,7 @@ jobs:
 
     strategy:
       matrix:
-        version: ["postgres-10", "postgres-11", "postgres-12", "postgres-13", "postgres-14"]
+        version: [""postgres-14"]
         os: ["ubuntu-20.04"]
 
     steps:
@@ -316,7 +316,7 @@ jobs:
       run: sccache --stop-server || true
 
   build_mac:
-    name: Run build and tests on MacOS 11
+    name: MacOS build & test
     runs-on: ${{ matrix.os }}
     if: "!contains(github.event.head_commit.message, 'nogha')"
     env:
