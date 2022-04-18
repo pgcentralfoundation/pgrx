@@ -24,7 +24,7 @@ owo-colors = { version = "3.3.0", features = [ "supports-colors" ] }
 env_proxy = "0.4.1"
 num_cpus = "1.13.1"
 pgx-utils = { path = "../pgx-utils", version = "0.4.2" }
-proc-macro2 = { version = "1.0.36", features = [ "span-locations" ] }
+proc-macro2 = { version = "1.0.37", features = [ "span-locations" ] }
 quote = "1.0.17"
 rayon = "1.5.1"
 regex = "1.5.5"

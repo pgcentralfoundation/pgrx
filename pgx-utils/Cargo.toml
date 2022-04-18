@@ -16,7 +16,7 @@ owo-colors = "3.3.0"
 convert_case = "0.5.0"
 dirs = "4.0.0"
 env_proxy = "0.4.1"
-proc-macro2 = { version = "1.0.36", features = [ "span-locations" ] }
+proc-macro2 = { version = "1.0.37", features = [ "span-locations" ] }
 quote = "1.0.17"
 regex = "1.5.5"
 rttp_client = "0.1.0"

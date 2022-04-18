@@ -19,7 +19,7 @@ rustc-args = ["--cfg", "docsrs"]
 
 [dependencies]
 pgx-utils = { path = "../pgx-utils", version = "0.4.2" }
-proc-macro2 = "1.0.36"
+proc-macro2 = "1.0.37"
 quote = "1.0.17"
 syn = { version = "1.0.90", features = [ "extra-traits", "full", "fold", "parsing" ] }
 unescape = "0.1.0"
