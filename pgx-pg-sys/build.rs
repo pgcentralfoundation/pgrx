@@ -13,14 +13,15 @@ use bindgen::callbacks::MacroParsingBehavior;
 use eyre::{eyre, WrapErr};
 use pgx_utils::pg_config::{PgConfig, PgConfigSelector, Pgx};
 use pgx_utils::prefix_path;
-use quote::quote;
+use pgx_utils::rewriter::PgGuardRewriter;
+use quote::{quote, ToTokens};
 use rayon::prelude::*;
 use std::{
     collections::{HashMap, HashSet},
     path::PathBuf,
     process::{Command, Output},
 };
-use syn::Item;
+use syn::{ForeignItem, Item};
 
 #[derive(Debug)]
 struct IgnoredMacros(HashSet<String>);
@@ -66,6 +67,8 @@ fn main() -> color_eyre::Result<()> {
         }
     }
 
+    let is_for_release =
+        std::env::var("PGX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE").unwrap_or("0".to_string()) == "1";
     println!("cargo:rerun-if-env-changed=PGX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE");
 
     let manifest_dir = PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").unwrap());
@@ -133,10 +136,9 @@ fn main() -> color_eyre::Result<()> {
             let bindgen_output = run_bindgen(&pg_config, &include_h)
                 .wrap_err_with(|| format!("bindgen failed for pg{}", major_version))?;
 
-            let rewritten_items = rewrite_items(&bindgen_output)
-                .wrap_err_with(|| format!("failed to rewrite items for pg{}", major_version))?;
-
             let oids = extract_oids(&bindgen_output);
+            let rewritten_items = rewrite_items(&bindgen_output, is_for_release)
+                .wrap_err_with(|| format!("failed to rewrite items for pg{}", major_version))?;
 
             let dest_dirs = if std::env::var("PGX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE")
                 .unwrap_or("false".into())
@@ -154,7 +156,6 @@ fn main() -> color_eyre::Result<()> {
                     &bindings_file,
                     quote! {
                         use crate as pg_sys;
-                        use pgx_macros::*;
                         use crate::PgNode;
                     },
                 )
@@ -193,10 +194,8 @@ fn write_rs_file(
     file: &PathBuf,
     header: proc_macro2::TokenStream,
 ) -> eyre::Result<()> {
-    let contents = quote! {
-        #header
-        #code
-    };
+    let mut contents = header;
+    contents.extend(code);
 
     std::fs::write(&file, contents.to_string())?;
     rust_fmt(&file)
@@ -204,16 +203,14 @@ fn write_rs_file(
 
 /// Given a token stream representing a file, apply a series of transformations to munge
 /// the bindgen generated code with some postgres specific enhancements
-fn rewrite_items(file: &syn::File) -> eyre::Result<proc_macro2::TokenStream> {
-    let items = apply_pg_guard(&file.items)?;
-    let pgnode_impls = impl_pg_node(&items)?;
+fn rewrite_items(file: &syn::File, is_for_release: bool) -> eyre::Result<proc_macro2::TokenStream> {
+    let mut items = apply_pg_guard(&file.items)?;
+    let pgnode_impls = impl_pg_node(&file.items, is_for_release)?;
 
-    let mut stream = proc_macro2::TokenStream::new();
-    for item in items.into_iter().chain(pgnode_impls.into_iter()) {
-        stream.extend(quote! { #item });
-    }
+    // append the pgnodes to the set of items
+    items.extend(pgnode_impls);
 
-    Ok(stream)
+    Ok(items)
 }
 
 /// Find all the constants that represent Postgres type OID values.
@@ -257,8 +254,11 @@ fn extract_oids(code: &syn::File) -> proc_macro2::TokenStream {
 }
 
 /// Implement our `PgNode` marker trait for `pg_sys::Node` and its "subclasses"
-fn impl_pg_node(items: &Vec<syn::Item>) -> eyre::Result<Vec<syn::Item>> {
-    let mut pgnode_impls = Vec::new();
+fn impl_pg_node(
+    items: &Vec<syn::Item>,
+    is_for_release: bool,
+) -> eyre::Result<proc_macro2::TokenStream> {
+    let mut pgnode_impls = proc_macro2::TokenStream::new();
 
     // we scope must of the computation so we can borrow `items` and then
     // extend it at the very end.
@@ -312,38 +312,39 @@ fn impl_pg_node(items: &Vec<syn::Item>) -> eyre::Result<Vec<syn::Item>> {
         dfs_find_nodes(root, &struct_graph, &mut node_set);
     }
 
+    let nodes: Box<dyn std::iter::Iterator<Item = StructDescriptor>> = if is_for_release {
+        // if it's for release we want to sort by struct name to avoid diff churn
+        let mut set = node_set.into_iter().collect::<Vec<_>>();
+        set.sort_by(|a, b| a.struct_.ident.cmp(&b.struct_.ident));
+        Box::new(set.into_iter())
+    } else {
+        // otherwise we don't care and want to avoid the CPU overhead of sorting
+        Box::new(node_set.into_iter())
+    };
+
     // now we can finally iterate the Nodes and emit out Display impl
-    for node_struct in node_set.into_iter() {
+    for node_struct in nodes {
         let struct_name = &node_struct.struct_.ident;
 
         // impl the PgNode trait for all nodes
-        pgnode_impls.push((
-            struct_name.to_string(),
-            syn::parse2(quote! {
-                impl pg_sys::PgNode for #struct_name {
-                    type NodeType = #struct_name;
-                }
-            })?,
-        ));
+        pgnode_impls.extend(quote! {
+            impl pg_sys::PgNode for #struct_name {
+                type NodeType = #struct_name;
+            }
+        });
 
         // impl Rust's Display trait for all nodes
-        pgnode_impls.push((
-            struct_name.to_string(),
-            syn::parse2(quote! {
+        pgnode_impls.extend(
+            quote! {
                 impl std::fmt::Display for #struct_name {
                     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
                         write!(f, "{}", crate::node_to_string_for_display(self.as_node_ptr() as *mut crate::Node))
                     }
                 }
-            })?,
-        ));
+            });
     }
 
-    // sort the pgnode impls by their struct name so that we have a consistent ordering in our bindings output
-    pgnode_impls.sort_by(|(a_name, _), (b_name, _)| a_name.cmp(b_name));
-
-    // pluck out the syn::Item field and return as a Vec
-    Ok(pgnode_impls.into_iter().map(|(_, item)| item).collect())
+    Ok(pgnode_impls)
 }
 
 /// Given a root node, dfs_find_nodes adds all its children nodes to `node_set`.
@@ -648,18 +649,22 @@ fn run_command(mut command: &mut Command, version: &str) -> eyre::Result<Output>
     Ok(rc)
 }
 
-fn apply_pg_guard(items: &Vec<syn::Item>) -> eyre::Result<Vec<syn::Item>> {
-    let mut out = Vec::with_capacity(items.len());
-    for item in items.into_iter() {
+fn apply_pg_guard(items: &Vec<syn::Item>) -> eyre::Result<proc_macro2::TokenStream> {
+    let mut out = proc_macro2::TokenStream::new();
+    for item in items {
         match item {
             Item::ForeignMod(block) => {
-                out.push(syn::parse2(quote! {
-                    #[pg_guard]
-                    #block
-                })?);
+                for item in &block.items {
+                    match item {
+                        ForeignItem::Fn(func) => {
+                            out.extend(PgGuardRewriter::new().foreign_item_fn(func))
+                        }
+                        other => out.extend(quote! { extern "C" { #other } }),
+                    }
+                }
             }
             _ => {
-                out.push(item.clone());
+                out.extend(item.into_token_stream());
             }
         }
     }

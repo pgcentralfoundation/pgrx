@@ -9,7 +9,8 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 extern crate proc_macro;
 
-use pgx_utils::{categorize_return_type, sql_entity_graph::PgExtern, CategorizedType};
+use crate::sql_entity_graph::PgExtern;
+use crate::{categorize_return_type, CategorizedType};
 use proc_macro2::{Ident, Span};
 use quote::{quote, quote_spanned, ToTokens};
 use std::ops::Deref;
@@ -267,7 +268,7 @@ impl PgGuardRewriter {
     ) -> proc_macro2::TokenStream {
         let generic_type = proc_macro2::TokenStream::from_str(types.first().unwrap()).unwrap();
         let mut generic_type = syn::parse2::<syn::Type>(generic_type).unwrap();
-        pgx_utils::anonymonize_lifetimes(&mut generic_type);
+        crate::anonymonize_lifetimes(&mut generic_type);
 
         let result_handler = if optional {
             quote! {
@@ -374,7 +375,7 @@ impl PgGuardRewriter {
         let composite_type = format!("({})", types.join(","));
         let generic_type = proc_macro2::TokenStream::from_str(&composite_type).unwrap();
         let mut generic_type = syn::parse2::<syn::Type>(generic_type).unwrap();
-        pgx_utils::anonymonize_lifetimes(&mut generic_type);
+        crate::anonymonize_lifetimes(&mut generic_type);
 
         let result_handler = if optional {
             quote! {
@@ -525,53 +526,26 @@ impl PgGuardRewriter {
                     return quote! { extern "C" { #func } };
                 }
 
-                self.foreign_item_fn(func)
+                self.foreign_item_fn(&func)
             }
             _ => quote! { extern "C" { #item } },
         }
     }
 
-    pub fn foreign_item_fn(&self, func: ForeignItemFn) -> proc_macro2::TokenStream {
+    pub fn foreign_item_fn(&self, func: &ForeignItemFn) -> proc_macro2::TokenStream {
         let func_name = PgGuardRewriter::build_func_name(&func.sig);
         let arg_list = PgGuardRewriter::rename_arg_list(&func.sig);
         let arg_list_with_types = PgGuardRewriter::rename_arg_list_with_types(&func.sig);
         let return_type = PgGuardRewriter::get_return_type(&func.sig);
 
         quote! {
-            #[doc(hidden)]
-            #[allow(clippy::missing_safety_doc)]
-            #[allow(clippy::redundant_closure)]
-            #[allow(improper_ctypes_definitions)] /* for i128 */
             pub unsafe fn #func_name ( #arg_list_with_types ) #return_type {
-                // as the panic message says, we can't call Postgres functions from threads
-                // the value of IS_MAIN_THREAD gets set through the pg_module_magic!() macro
-                #[cfg(debug_assertions)]
-                if crate::submodules::guard::IS_MAIN_THREAD.with(|v| v.get().is_none()) {
-                    panic!("functions under #[pg_guard] cannot be called from threads");
-                };
-
-                extern "C" {
-                    pub fn #func_name( #arg_list_with_types ) #return_type ;
-                }
-
-                let prev_exception_stack = pg_sys::PG_exception_stack;
-                let prev_error_context_stack = pg_sys::error_context_stack;
-                let mut jmp_buff = std::mem::MaybeUninit::uninit();
-                let jump_value = pg_sys::sigsetjmp(jmp_buff.as_mut_ptr(), 0);
-
-                let result = if jump_value == 0 {
-                    pg_sys::PG_exception_stack = jmp_buff.as_mut_ptr();
+                crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+                    extern "C" {
+                        fn #func_name( #arg_list_with_types ) #return_type ;
+                    }
                     #func_name(#arg_list)
-                } else {
-                    pg_sys::PG_exception_stack = prev_exception_stack;
-                    pg_sys::error_context_stack = prev_error_context_stack;
-                    std::panic::panic_any(pg_sys::JumpContext { });
-                };
-
-                pg_sys::PG_exception_stack = prev_exception_stack;
-                pg_sys::error_context_stack = prev_error_context_stack;
-
-                result
+                })
             }
         }
     }
@@ -745,7 +719,7 @@ impl FunctionSignatureRewriter {
                         let ts = if is_option {
                             let option_type = extract_option_type(&type_);
                             let mut option_type = syn::parse2::<syn::Type>(option_type).unwrap();
-                            pgx_utils::anonymonize_lifetimes(&mut option_type);
+                            crate::anonymonize_lifetimes(&mut option_type);
 
                             quote_spanned! {ident.span()=>
                                 let #name = pgx::pg_getarg::<#option_type>(#fcinfo_ident, #i);
@@ -761,7 +735,7 @@ impl FunctionSignatureRewriter {
                                 let #name = pgx::pg_getarg_datum_raw(#fcinfo_ident, #i) as #type_;
                             }
                         } else {
-                            pgx_utils::anonymonize_lifetimes(&mut type_);
+                            crate::anonymonize_lifetimes(&mut type_);
                             quote_spanned! {ident.span()=>
                                 let #name = pgx::pg_getarg::<#type_>(#fcinfo_ident, #i).unwrap_or_else(|| panic!("{} is null", stringify!{#ident}));
                             }

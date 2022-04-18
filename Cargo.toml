@@ -24,3 +24,6 @@ members = [
     "pgx-examples/strings",
     "pgx-examples/triggers",
 ]
+
+[profile.dev.build-override]
+opt-level = 3

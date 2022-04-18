@@ -10,9 +10,9 @@ Use of this source code is governed by the MIT license that can be found in the 
 extern crate proc_macro;
 
 mod operators;
-mod rewriter;
 use operators::{impl_postgres_eq, impl_postgres_hash, impl_postgres_ord};
 
+use pgx_utils::rewriter::*;
 use pgx_utils::{
     sql_entity_graph::{
         ExtensionSql, ExtensionSqlFile, PgAggregate, PgExtern, PostgresEnum, PostgresType, Schema,
@@ -22,7 +22,6 @@ use pgx_utils::{
 use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span};
 use quote::{quote, quote_spanned, ToTokens};
-use rewriter::*;
 use std::collections::HashSet;
 use syn::spanned::Spanned;
 use syn::{parse_macro_input, Attribute, Data, DeriveInput, Item, ItemFn, ItemImpl};

@@ -9,6 +9,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 pub mod guard;
 mod oids;
+pub mod setjmp;
 mod tupdesc;
 mod utils;
 
