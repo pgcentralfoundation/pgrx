@@ -55,7 +55,7 @@ pub(crate) struct Schema {
     pg_config: Option<PathBuf>,
     #[clap(flatten)]
     features: clap_cargo::Features,
-    /// A path to output a produced SQL file (default is `sql/$EXTNAME-$VERSION.sql`)
+    /// A path to output a produced SQL file (default is `stdout`)
     #[clap(long, short, parse(from_os_str))]
     out: Option<PathBuf>,
     /// A path to output a produced GraphViz DOT file
@@ -504,9 +504,7 @@ fn create_stub(
     so_rustc_invocation.stderr(Stdio::inherit());
 
     if let Some(rustc_flags_str) = std::env::var("RUSTFLAGS").ok() {
-        let rustc_flags = rustc_flags_str
-            .split(" ")
-            .collect::<Vec<_>>();
+        let rustc_flags = rustc_flags_str.split(" ").collect::<Vec<_>>();
         so_rustc_invocation.args(rustc_flags);
     }
 

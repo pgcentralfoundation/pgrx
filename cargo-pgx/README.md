@@ -8,7 +8,7 @@ A video walkthrough of its abilities can be found here: https://www.twitch.tv/vi
 
 ## Installing
 
-Installing via crates.io is really easy.
+Install via crates.io:
 
 ```shell script
 $ cargo install cargo-pgx
@@ -20,7 +20,7 @@ As new versions of `pgx` are released, you'll want to make sure you run this com
 
 ```shell script
 $ cargo pgx --help
-cargo-pgx 0.3.3
+cargo-pgx 0.4.2
 ZomboDB, LLC <zombodb@gmail.com>
 Cargo subcommand for 'pgx' to make Postgres extension development easy
 
@@ -38,10 +38,9 @@ SUBCOMMANDS:
     help       Print this message or the help of the given subcommand(s)
     init       Initialize pgx development environment for the first time
     install    Install the extension from the current crate to the Postgres specified by
-               whatever `pg_config` is currently on your $PATH
+                   whatever `pg_config` is currently on your $PATH
     new        Create a new extension crate
-    package    Create an installation package directory (in `./target/[debug|release]/extname-
-               pgXX/`)
+    package    Create an installation package directory
     run        Compile/install extension to a pgx-managed Postgres instance and start psql
     schema     Generate extension schema files
     start      Start a pgx-managed Postgres instance
@@ -123,7 +122,7 @@ If a new minor Postgres version is released in the future you can simply run `ca
 
 ```shell script
 $ cargo pgx init --help
-cargo-pgx-init 0.3.3
+cargo-pgx-init 0.4.2
 ZomboDB, LLC <zombodb@gmail.com>
 Initialize pgx development environment for the first time
 
@@ -165,7 +164,7 @@ If you'd like to create a "background worker" instead, specify the `--bgworker` 
 
 ```shell script
 $ cargo pgx new --help
-cargo-pgx-new 0.3.3
+cargo-pgx-new 0.4.2
 ZomboDB, LLC <zombodb@gmail.com>
 Create a new extension crate
 
@@ -281,7 +280,7 @@ For Postgres installations which are already on your computer, `cargo pgx run` w
 
 ```shell script
 $ cargo pgx run --help
-cargo-pgx-run 0.3.3
+cargo-pgx-run 0.4.2
 ZomboDB, LLC <zombodb@gmail.com>
 Compile/install extension to a pgx-managed Postgres instance and start psql
 
@@ -295,14 +294,35 @@ ARGS:
                     database with the same name as the current extension name
 
 OPTIONS:
-        --all-features           Activate all available features
-        --features <FEATURES>    Space-separated list of features to activate
-    -h, --help                   Print help information
-    -n, --no-schema              Don't regenerate the schema
-        --no-default-features    Do not activate the `default` feature
-    -r, --release                Compile for release mode (default is debug) [env: PROFILE=]
-    -v, --verbose                Enable info logs, -vv for debug, -vvv for trace
-    -V, --version                Print version information
+        --all-features
+            Activate all available features
+
+        --features <FEATURES>
+            Space-separated list of features to activate
+
+    -h, --help
+            Print help information
+
+        --manifest-path <MANIFEST_PATH>
+            Path to Cargo.toml
+
+        --no-default-features
+            Do not activate the `default` feature
+
+    -p, --package <PACKAGE>
+            Package to build (see `cargo help pkgid`)
+
+        --pgcli
+            Use an existing `pgcli` on the $PATH [env: PGX_PGCLI=]
+
+    -r, --release
+            Compile for release mode (default is debug) [env: PROFILE=]
+
+    -v, --verbose
+            Enable info logs, -vv for debug, -vvv for trace
+
+    -V, --version
+            Print version information
 ```
 
 ## Connect to a Database
@@ -333,7 +353,7 @@ the specified version of Postgres isn't running, it'll be automatically started.
 
 ```shell script
 $ cargo pgx connect --help
-cargo-pgx-connect 0.3.3
+cargo-pgx-connect 0.4.2
 ZomboDB, LLC <zombodb@gmail.com>
 Connect, via psql, to a Postgres instance
 
@@ -347,9 +367,23 @@ ARGS:
                     database with the same name as the current extension name [env: DBNAME=]
 
 OPTIONS:
-    -h, --help       Print help information
-    -v, --verbose    Enable info logs, -vv for debug, -vvv for trace
-    -V, --version    Print version information
+    -h, --help
+            Print help information
+
+        --manifest-path <MANIFEST_PATH>
+            Path to Cargo.toml
+
+    -p, --package <PACKAGE>
+            Package to determine default `pg_version` with (see `cargo help pkgid`)
+
+        --pgcli
+            Use an existing `pgcli` on the $PATH [env: PGX_PGCLI=]
+
+    -v, --verbose
+            Enable info logs, -vv for debug, -vvv for trace
+
+    -V, --version
+            Print version information
 ```
 
 ## Installing Your Extension Locally
@@ -380,7 +414,7 @@ By default, `cargo pgx install` builds your extension in debug mode. Specifying 
 
 ```shell script
 $ cargo pgx install --help
-cargo-pgx-install 0.3.3
+cargo-pgx-install 0.4.2
 ZomboDB, LLC <zombodb@gmail.com>
 Install the extension from the current crate to the Postgres specified by whatever `pg_config` is
 currently on your $PATH
@@ -389,16 +423,38 @@ USAGE:
     cargo pgx install [OPTIONS]
 
 OPTIONS:
-        --all-features             Activate all available features
-    -c, --pg-config <PG_CONFIG>    The `pg_config` path (default is first in $PATH)
-        --features <FEATURES>      Space-separated list of features to activate
-    -h, --help                     Print help information
-        --no-default-features      Do not activate the `default` feature
-        --no-schema                Don't regenerate the schema
-    -r, --release                  Compile for release mode (default is debug) [env: PROFILE=]
-        --test                     Build in test mode (for `cargo pgx test`)
-    -v, --verbose                  Enable info logs, -vv for debug, -vvv for trace
-    -V, --version                  Print version information
+        --all-features
+            Activate all available features
+
+    -c, --pg-config <PG_CONFIG>
+            The `pg_config` path (default is first in $PATH)
+
+        --features <FEATURES>
+            Space-separated list of features to activate
+
+    -h, --help
+            Print help information
+
+        --manifest-path <MANIFEST_PATH>
+            Path to Cargo.toml
+
+        --no-default-features
+            Do not activate the `default` feature
+
+    -p, --package <PACKAGE>
+            Package to build (see `cargo help pkgid`)
+
+    -r, --release
+            Compile for release mode (default is debug) [env: PROFILE=]
+
+        --test
+            Build in test mode (for `cargo pgx test`)
+
+    -v, --verbose
+            Enable info logs, -vv for debug, -vvv for trace
+
+    -V, --version
+            Print version information
 ```
 
 ## Testing Your Extension
@@ -444,7 +500,7 @@ make to the database are not preserved.
 
 ```shell script
 $ cargo pgx test --help
-cargo-pgx-test 0.3.3
+cargo-pgx-test 0.4.2
 ZomboDB, LLC <zombodb@gmail.com>
 Run the test suite for this crate
 
@@ -457,15 +513,35 @@ ARGS:
     <TESTNAME>      If specified, only run tests containing this string in their names
 
 OPTIONS:
-        --all-features           Activate all available features
-        --features <FEATURES>    Space-separated list of features to activate
-    -h, --help                   Print help information
-    -n, --no-schema              Don't regenerate the schema
-        --no-default-features    Do not activate the `default` feature
-    -r, --release                compile for release mode (default is debug) [env: PROFILE=]
-    -v, --verbose                Enable info logs, -vv for debug, -vvv for trace
-    -V, --version                Print version information
-        --workspace              Test all packages in the workspace
+        --all-features
+            Activate all available features
+
+        --features <FEATURES>
+            Space-separated list of features to activate
+
+    -h, --help
+            Print help information
+
+        --manifest-path <MANIFEST_PATH>
+            Path to Cargo.toml
+
+    -n, --no-schema
+            Don't regenerate the schema
+
+        --no-default-features
+            Do not activate the `default` feature
+
+    -p, --package <PACKAGE>
+            Package to build (see `cargo help pkgid`)
+
+    -r, --release
+            compile for release mode (default is debug) [env: PROFILE=]
+
+    -v, --verbose
+            Enable info logs, -vv for debug, -vvv for trace
+
+    -V, --version
+            Print version information
 ```
 
 ## Building an Installation Package
@@ -504,23 +580,50 @@ distobutions or MacOS Postgres installations.
 
 ```shell script
 $ cargo pgx package --help
-cargo-pgx-package 0.3.3
+cargo-pgx-package 0.4.2
 ZomboDB, LLC <zombodb@gmail.com>
-Create an installation package directory (in `./target/[debug|release]/extname-pgXX/`)
+Create an installation package directory
 
 USAGE:
     cargo pgx package [OPTIONS]
 
 OPTIONS:
-        --all-features             Activate all available features
-    -c, --pg-config <PG_CONFIG>    The `pg_config` path (default is first in $PATH)
-    -d, --debug                    Compile for debug mode (default is release) [env: PROFILE=]
-        --features <FEATURES>      Space-separated list of features to activate
-    -h, --help                     Print help information
-        --no-default-features      Do not activate the `default` feature
-        --test                     Build in test mode (for `cargo pgx test`)
-    -v, --verbose                  Enable info logs, -vv for debug, -vvv for trace
-    -V, --version                  Print version information
+        --all-features
+            Activate all available features
+
+    -c, --pg-config <PG_CONFIG>
+            The `pg_config` path (default is first in $PATH)
+
+    -d, --debug
+            Compile for debug mode (default is release) [env: PROFILE=]
+
+        --features <FEATURES>
+            Space-separated list of features to activate
+
+    -h, --help
+            Print help information
+
+        --manifest-path <MANIFEST_PATH>
+            Path to Cargo.toml
+
+        --no-default-features
+            Do not activate the `default` feature
+
+        --out-dir <OUT_DIR>
+            The directory to output the package (default is `./target/[debug|release]/extname-
+            pgXX/`)
+
+    -p, --package <PACKAGE>
+            Package to build (see `cargo help pkgid`)
+
+        --test
+            Build in test mode (for `cargo pgx test`)
+
+    -v, --verbose
+            Enable info logs, -vv for debug, -vvv for trace
+
+    -V, --version
+            Print version information
 ```
 
 ## Inspect you Extension Schema
@@ -530,7 +633,7 @@ If you just want to look at the full extension schema that pgx will generate, us
 
 ```shell script
 $ cargo pgx schema --help
-cargo-pgx-schema 0.3.3
+cargo-pgx-schema 0.4.2
 ZomboDB, LLC <zombodb@gmail.com>
 Generate extension schema files
 
@@ -541,16 +644,45 @@ ARGS:
     <PG_VERSION>    Do you want to run against Postgres `pg10`, `pg11`, `pg12`, `pg13`, `pg14`?
 
 OPTIONS:
-        --all-features             Activate all available features
-    -c, --pg-config <PG_CONFIG>    The `pg_config` path (default is first in $PATH)
-    -d, --dot <DOT>                A path to output a produced GraphViz DOT file
-        --features <FEATURES>      Space-separated list of features to activate
-    -h, --help                     Print help information
-        --no-default-features      Do not activate the `default` feature
-    -o, --out <OUT>                A path to output a produced SQL file (default is
-                                   `sql/$EXTNAME-$VERSION.sql`)
-    -r, --release                  Compile for release mode (default is debug) [env: PROFILE=]
-        --test                     Build in test mode (for `cargo pgx test`)
-    -v, --verbose                  Enable info logs, -vv for debug, -vvv for trace
-    -V, --version                  Print version information
+        --all-features
+            Activate all available features
+
+    -c, --pg-config <PG_CONFIG>
+            The `pg_config` path (default is first in $PATH)
+
+    -d, --dot <DOT>
+            A path to output a produced GraphViz DOT file
+
+        --features <FEATURES>
+            Space-separated list of features to activate
+
+    -h, --help
+            Print help information
+
+        --manifest-path <MANIFEST_PATH>
+            Path to Cargo.toml
+
+        --no-default-features
+            Do not activate the `default` feature
+
+    -o, --out <OUT>
+            A path to output a produced SQL file (default is `stdout`)
+
+    -p, --package <PACKAGE>
+            Package to build (see `cargo help pkgid`)
+
+    -r, --release
+            Compile for release mode (default is debug) [env: PROFILE=]
+
+        --skip-build
+            Skip building a fresh extension shared object
+
+        --test
+            Build in test mode (for `cargo pgx test`)
+
+    -v, --verbose
+            Enable info logs, -vv for debug, -vvv for trace
+
+    -V, --version
+            Print version information
 ```
