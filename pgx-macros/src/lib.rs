@@ -10,9 +10,9 @@ Use of this source code is governed by the MIT license that can be found in the 
 extern crate proc_macro;
 
 mod operators;
-mod rewriter;
 use operators::{impl_postgres_eq, impl_postgres_hash, impl_postgres_ord};
 
+use pgx_utils::rewriter::*;
 use pgx_utils::{
     sql_entity_graph::{
         ExtensionSql, ExtensionSqlFile, PgAggregate, PgExtern, PostgresEnum, PostgresType, Schema,
@@ -22,7 +22,6 @@ use pgx_utils::{
 use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span};
 use quote::{quote, quote_spanned, ToTokens};
-use rewriter::*;
 use std::collections::HashSet;
 use syn::spanned::Spanned;
 use syn::{parse_macro_input, Attribute, Data, DeriveInput, Item, ItemFn, ItemImpl};
@@ -642,7 +641,7 @@ fn impl_postgres_enum(ast: DeriveInput) -> proc_macro2::TokenStream {
     stream.extend(quote! {
         impl pgx::FromDatum for #enum_ident {
             #[inline]
-            unsafe fn from_datum(datum: pgx::pg_sys::Datum, is_null: bool, typeoid: pgx::pg_sys::Oid) -> Option<#enum_ident> {
+            unsafe fn from_datum(datum: pgx::pg_sys::Datum, is_null: bool) -> Option<#enum_ident> {
                 if is_null {
                     None
                 } else {

@@ -18,7 +18,6 @@ pub struct Array<'a, T: FromDatum> {
     array_type: *mut pg_sys::ArrayType,
     elements: *mut pg_sys::Datum,
     nulls: *mut bool,
-    typoid: pg_sys::Oid,
     nelems: usize,
     elem_slice: &'a [pg_sys::Datum],
     null_slice: &'a [bool],
@@ -63,7 +62,6 @@ impl<'a, T: FromDatum> Array<'a, T> {
             array_type: std::ptr::null_mut(),
             elements,
             nulls,
-            typoid: pg_sys::InvalidOid,
             nelems,
             elem_slice: std::slice::from_raw_parts(elements, nelems),
             null_slice: std::slice::from_raw_parts(nulls, nelems),
@@ -76,7 +74,6 @@ impl<'a, T: FromDatum> Array<'a, T> {
         array_type: *mut pg_sys::ArrayType,
         elements: *mut pg_sys::Datum,
         nulls: *mut bool,
-        typoid: pg_sys::Oid,
         nelems: usize,
     ) -> Self {
         Array::<T> {
@@ -84,7 +81,6 @@ impl<'a, T: FromDatum> Array<'a, T> {
             array_type,
             elements,
             nulls,
-            typoid,
             nelems,
             elem_slice: std::slice::from_raw_parts(elements, nelems),
             null_slice: std::slice::from_raw_parts(nulls, nelems),
@@ -153,7 +149,7 @@ impl<'a, T: FromDatum> Array<'a, T> {
         if i >= self.nelems {
             None
         } else {
-            Some(unsafe { T::from_datum(self.elem_slice[i], self.null_slice[i], self.typoid) })
+            Some(unsafe { T::from_datum(self.elem_slice[i], self.null_slice[i]) })
         }
     }
 }
@@ -277,11 +273,9 @@ impl<'a, T: FromDatum> Drop for Array<'a, T> {
 
 impl<'a, T: FromDatum> FromDatum for Array<'a, T> {
     #[inline]
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, typoid: u32) -> Option<Array<'a, T>> {
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Array<'a, T>> {
         if is_null {
             None
-        } else if datum.into_void().is_null() {
-            panic!("array was flagged not null but datum is zero");
         } else {
             let ptr = datum.into_void() as *mut pg_sys::varlena;
             let array = pg_sys::pg_detoast_datum(datum.into_void() as *mut pg_sys::varlena)
@@ -316,31 +310,18 @@ impl<'a, T: FromDatum> FromDatum for Array<'a, T> {
                 &mut nelems,
             );
 
-            Some(Array::from_pg(
-                ptr,
-                array,
-                elements,
-                nulls,
-                typoid,
-                nelems as usize,
-            ))
+            Some(Array::from_pg(ptr, array, elements, nulls, nelems as usize))
         }
     }
 }
 
 impl<T: FromDatum> FromDatum for Vec<T> {
     #[inline]
-    unsafe fn from_datum(
-        datum: pg_sys::Datum,
-        is_null: bool,
-        typoid: pg_sys::Oid,
-    ) -> Option<Vec<T>> {
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Vec<T>> {
         if is_null {
             None
-        } else if datum.into_void().is_null() {
-            panic!("array was flagged not null but datum is zero");
         } else {
-            let array = Array::<T>::from_datum(datum, is_null, typoid).unwrap();
+            let array = Array::<T>::from_datum(datum, is_null).unwrap();
             let mut v = Vec::with_capacity(array.len());
 
             for element in array.iter() {
@@ -353,17 +334,11 @@ impl<T: FromDatum> FromDatum for Vec<T> {
 
 impl<T: FromDatum> FromDatum for Vec<Option<T>> {
     #[inline]
-    unsafe fn from_datum(
-        datum: pg_sys::Datum,
-        is_null: bool,
-        typoid: pg_sys::Oid,
-    ) -> Option<Vec<Option<T>>> {
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Vec<Option<T>>> {
         if is_null {
             None
-        } else if datum.into_void().is_null() {
-            panic!("array was flagged not null but datum is zero");
         } else {
-            let array = Array::<T>::from_datum(datum, is_null, typoid).unwrap();
+            let array = Array::<T>::from_datum(datum, is_null).unwrap();
             let mut v = Vec::with_capacity(array.len());
 
             for element in array.iter() {
@@ -414,11 +389,16 @@ where
     fn type_oid() -> u32 {
         unsafe { pg_sys::get_array_type(T::type_oid()) }
     }
+
+    #[inline]
+    fn is_compatible_with(other: pg_sys::Oid) -> bool {
+        Self::type_oid() == other || other == unsafe { pg_sys::get_array_type(T::type_oid()) }
+    }
 }
 
 impl<'a, T> IntoDatum for &'a [T]
 where
-    T: IntoDatum + Copy,
+    T: IntoDatum + Copy + 'a,
 {
     fn into_datum(self) -> Option<pg_sys::Datum> {
         let mut state = unsafe {
@@ -455,5 +435,10 @@ where
 
     fn type_oid() -> u32 {
         unsafe { pg_sys::get_array_type(T::type_oid()) }
+    }
+
+    #[inline]
+    fn is_compatible_with(other: pg_sys::Oid) -> bool {
+        Self::type_oid() == other || other == unsafe { pg_sys::get_array_type(T::type_oid()) }
     }
 }

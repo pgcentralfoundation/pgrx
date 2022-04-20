@@ -10,6 +10,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 mod datum;
 pub mod guard;
 mod oids;
+pub mod setjmp;
 mod tupdesc;
 mod utils;
 
@@ -28,7 +29,7 @@ extern "C" {
     ) -> std::os::raw::c_int;
 }
 
-#[cfg(any(target_os = "macos", target_os = "freebsd"))]
+#[cfg(any(target_os = "macos", target_os = "freebsd", target_os = "openbsd"))]
 extern "C" {
     pub(crate) fn sigsetjmp(
         env: *mut crate::sigjmp_buf,

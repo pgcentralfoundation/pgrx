@@ -12,7 +12,6 @@ use crate::{pg_sys, FromDatum, IntoDatum};
 #[derive(Debug, Clone, Copy)]
 pub struct AnyElement {
     datum: pg_sys::Datum,
-    typoid: pg_sys::Oid,
 }
 
 impl AnyElement {
@@ -20,27 +19,19 @@ impl AnyElement {
         self.datum
     }
 
-    pub fn oid(&self) -> pg_sys::Oid {
-        self.typoid
-    }
-
     #[inline]
     pub fn into<T: FromDatum>(&self) -> Option<T> {
-        unsafe { T::from_datum(self.datum(), false, self.oid()) }
+        unsafe { T::from_datum(self.datum(), false) }
     }
 }
 
 impl FromDatum for AnyElement {
     #[inline]
-    unsafe fn from_datum(
-        datum: pg_sys::Datum,
-        is_null: bool,
-        typoid: pg_sys::Oid,
-    ) -> Option<AnyElement> {
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<AnyElement> {
         if is_null {
             None
         } else {
-            Some(AnyElement { datum, typoid })
+            Some(AnyElement { datum })
         }
     }
 }

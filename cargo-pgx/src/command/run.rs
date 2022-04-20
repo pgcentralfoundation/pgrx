@@ -43,6 +43,9 @@ pub(crate) struct Run {
     features: clap_cargo::Features,
     #[clap(from_global, parse(from_occurrences))]
     verbose: usize,
+    /// Use an existing `pgcli` on the $PATH.
+    #[clap(env = "PGX_PGCLI", long)]
+    pgcli: bool,
 }
 
 impl CommandExecute for Run {
@@ -93,13 +96,14 @@ impl CommandExecute for Run {
                 .ok_or(eyre!("could not determine extension name"))?,
         };
 
-        run_psql(
+        run(
             pg_config,
             self.manifest_path.as_ref(),
             self.package.as_ref(),
             package_manifest_path,
             &dbname,
             self.release,
+            self.pgcli,
             &features,
         )
     }
@@ -110,13 +114,14 @@ impl CommandExecute for Run {
     dbname,
     release = is_release,
 ))]
-pub(crate) fn run_psql(
+pub(crate) fn run(
     pg_config: &PgConfig,
     user_manifest_path: Option<impl AsRef<Path>>,
     user_package: Option<&String>,
     package_manifest_path: impl AsRef<Path>,
     dbname: &str,
     is_release: bool,
+    pgcli: bool,
     features: &clap_cargo::Features,
 ) -> eyre::Result<()> {
     // stop postgres
@@ -147,11 +152,14 @@ pub(crate) fn run_psql(
     }
 
     // run psql
-    exec_psql(pg_config, dbname)
+    exec_psql(pg_config, dbname, pgcli)
 }
 
-pub(crate) fn exec_psql(pg_config: &PgConfig, dbname: &str) -> eyre::Result<()> {
-    let mut command = Command::new(pg_config.psql_path()?);
+pub(crate) fn exec_psql(pg_config: &PgConfig, dbname: &str, pgcli: bool) -> eyre::Result<()> {
+    let mut command = Command::new(match pgcli {
+        false => pg_config.psql_path()?.into_os_string(),
+        true => "pgcli".to_string().into(),
+    });
     command
         .env_remove("PGDATABASE")
         .env_remove("PGHOST")

@@ -49,23 +49,22 @@ where
     A: FromDatum + IntoDatum,
     B: FromDatum + IntoDatum,
 {
-    const NEEDS_TYPID: bool = A::NEEDS_TYPID || B::NEEDS_TYPID;
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, typoid: pg_sys::Oid) -> Option<Self>
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Self>
     where
         Self: Sized,
     {
-        let mut vec = Vec::<Option<pg_sys::Datum>>::from_datum(datum, is_null, typoid).unwrap();
+        let mut vec = Vec::<Option<pg_sys::Datum>>::from_datum(datum, is_null).unwrap();
         let b = vec.pop().unwrap();
         let a = vec.pop().unwrap();
 
         let a_datum = if a.is_some() {
-            A::from_datum(a.unwrap(), false, A::type_oid())
+            A::from_datum(a.unwrap(), false)
         } else {
             None
         };
 
         let b_datum = if b.is_some() {
-            B::from_datum(b.unwrap(), false, B::type_oid())
+            B::from_datum(b.unwrap(), false)
         } else {
             None
         };
@@ -80,30 +79,29 @@ where
     B: FromDatum + IntoDatum,
     C: FromDatum + IntoDatum,
 {
-    const NEEDS_TYPID: bool = A::NEEDS_TYPID || B::NEEDS_TYPID || C::NEEDS_TYPID;
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, typoid: pg_sys::Oid) -> Option<Self>
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Self>
     where
         Self: Sized,
     {
-        let mut vec = Vec::<Option<pg_sys::Datum>>::from_datum(datum, is_null, typoid).unwrap();
+        let mut vec = Vec::<Option<pg_sys::Datum>>::from_datum(datum, is_null).unwrap();
         let c = vec.pop().unwrap();
         let b = vec.pop().unwrap();
         let a = vec.pop().unwrap();
 
         let a_datum = if a.is_some() {
-            A::from_datum(a.unwrap(), false, A::type_oid())
+            A::from_datum(a.unwrap(), false)
         } else {
             None
         };
 
         let b_datum = if b.is_some() {
-            B::from_datum(b.unwrap(), false, B::type_oid())
+            B::from_datum(b.unwrap(), false)
         } else {
             None
         };
 
         let c_datum = if c.is_some() {
-            C::from_datum(c.unwrap(), false, C::type_oid())
+            C::from_datum(c.unwrap(), false)
         } else {
             None
         };
