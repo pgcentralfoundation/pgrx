@@ -23,21 +23,29 @@ unsafe fn trigger_example(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
         panic!("not called by trigger manager");
     }
 
-    let trigdata: PgBox<pg_sys::TriggerData> = PgBox::from_pg(
-        fcinfo.as_ref().expect("fcinfo is NULL").context as *mut pg_sys::TriggerData,
-    );
+    let trigdata = (fcinfo.as_ref().expect("fcinfo is NULL").context as *mut pg_sys::TriggerData)
+        .as_ref()
+        .unwrap();
 
     // and for this example, we're only going to operate as an ON BEFORE INSERT FOR EACH ROW trigger
     if trigger_fired_before(trigdata.tg_event)
         && trigger_fired_by_insert(trigdata.tg_event)
         && trigger_fired_for_row(trigdata.tg_event)
     {
-        let tupdesc = PgTupleDesc::from_pg_copy(trigdata.tg_relation.as_ref().unwrap().rd_att);
-        let tuple = PgBox::<pg_sys::HeapTupleData>::from_pg(trigdata.tg_trigtuple);
-        let id = heap_getattr::<i64, AllocatedByPostgres>(&tuple, 1, &tupdesc);
-        let title = heap_getattr::<&str, AllocatedByPostgres>(&tuple, 2, &tupdesc);
-        let description = heap_getattr::<&str, AllocatedByPostgres>(&tuple, 3, &tupdesc);
-        let payload = heap_getattr::<JsonB, AllocatedByPostgres>(&tuple, 4, &tupdesc);
+        let tuple =
+            PgHeapTuple::from_trigger_data(trigdata, TriggerTuple::Current).expect("tuple is NULL");
+        let id = tuple
+            .get_by_index::<i64>(1.try_into().unwrap())
+            .expect("could not get id");
+        let title = tuple
+            .get_by_index::<String>(2.try_into().unwrap())
+            .expect("could not get title");
+        let description = tuple
+            .get_by_index::<String>(3.try_into().unwrap())
+            .expect("could not get description");
+        let payload = tuple
+            .get_by_index::<JsonB>(4.try_into().unwrap())
+            .expect("could not get payload");
 
         warning!(
             "id={:?}, title={:?}, description={:?}, payload={:?}",
@@ -47,8 +55,21 @@ unsafe fn trigger_example(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
             payload
         );
 
-        // return the inserting tuple, unchanged
-        trigdata.tg_trigtuple as pg_sys::Datum
+        // change the title
+        let mut tuple = tuple.into_owned();
+        tuple
+            .set_by_name("title", "a new title")
+            .expect("failed to change the title");
+        assert_eq!(
+            tuple.get_by_name::<&str>("title").unwrap().unwrap(),
+            "a new title"
+        );
+
+        // return the inserting tuple, which includes the changed title
+        match tuple.into_datum() {
+            Some(datum) => datum,
+            None => return pg_return_null(fcinfo),
+        }
     } else {
         panic!("not fired in the ON BEFORE INSERT context");
     }

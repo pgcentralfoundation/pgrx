@@ -298,8 +298,7 @@ impl<T> FromDatum for PgVarlena<T>
 where
     T: Copy + Sized,
 {
-    const NEEDS_TYPID: bool = false;
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _typoid: u32) -> Option<Self> {
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Self> {
         if is_null {
             None
         } else {
@@ -311,12 +310,9 @@ where
         mut memory_context: PgMemoryContexts,
         datum: usize,
         is_null: bool,
-        _typoid: u32,
     ) -> Option<Self> {
         if is_null {
             None
-        } else if datum == 0 {
-            panic!("a varlena Datum was flagged as non-null but the datum is zero");
         } else {
             memory_context.switch_to(|_| {
                 // this gets the varlena Datum copied into this memory context
@@ -349,7 +345,7 @@ impl<'de, T> FromDatum for T
 where
     T: PostgresType + Deserialize<'de>,
 {
-    unsafe fn from_datum(datum: usize, is_null: bool, _typoid: u32) -> Option<Self> {
+    unsafe fn from_datum(datum: usize, is_null: bool) -> Option<Self> {
         if is_null {
             None
         } else {
@@ -361,7 +357,6 @@ where
         memory_context: PgMemoryContexts,
         datum: usize,
         is_null: bool,
-        _typoid: u32,
     ) -> Option<Self> {
         if is_null {
             None

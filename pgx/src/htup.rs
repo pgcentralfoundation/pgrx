@@ -9,6 +9,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 //! Utility functions for working with `pg_sys::HeapTuple` and `pg_sys::HeapTupleHeader` structs
 use crate::*;
+use std::num::NonZeroUsize;
 
 /// Given a `pg_sys::Datum` representing a composite row type, return a boxed `HeapTupleData`,
 /// which can be used by the various `heap_getattr` methods
@@ -98,18 +99,19 @@ pub fn heap_getattr<
     AllocatedBy: WhoAllocated<T> + WhoAllocated<pg_sys::HeapTupleData>,
 >(
     tuple: &PgBox<pg_sys::HeapTupleData, AllocatedBy>,
-    attno: usize,
+    attno: NonZeroUsize,
     tupdesc: &PgTupleDesc,
 ) -> Option<T> {
-    let mut is_null = false;
-    let datum =
-        unsafe { pgx_heap_getattr(tuple.as_ptr(), attno as u32, tupdesc.as_ptr(), &mut is_null) };
-    let typoid = tupdesc.get(attno - 1).expect("no attribute").type_oid();
+    unsafe {
+        let mut is_null = false;
+        let datum = pgx_heap_getattr(
+            tuple.as_ptr(),
+            attno.get() as u32,
+            tupdesc.as_ptr(),
+            &mut is_null,
+        );
 
-    if is_null {
-        None
-    } else {
-        unsafe { T::from_datum(datum, false, typoid.value()) }
+        T::from_datum(datum, is_null)
     }
 }
 
@@ -132,11 +134,11 @@ pub fn heap_getattr<
 #[inline]
 pub unsafe fn heap_getattr_raw(
     tuple: *const pg_sys::HeapTupleData,
-    attno: usize,
+    attno: NonZeroUsize,
     tupdesc: pg_sys::TupleDesc,
 ) -> Option<pg_sys::Datum> {
     let mut is_null = false;
-    let datum = pgx_heap_getattr(tuple, attno as u32, tupdesc, &mut is_null);
+    let datum = pgx_heap_getattr(tuple, attno.get() as u32, tupdesc, &mut is_null);
     if is_null {
         None
     } else {
@@ -156,7 +158,7 @@ pub struct DatumWithTypeInfo {
 impl DatumWithTypeInfo {
     #[inline]
     pub fn into_value<T: FromDatum>(self) -> T {
-        unsafe { T::from_datum(self.datum, self.is_null, self.typoid.value()).unwrap() }
+        unsafe { T::from_datum(self.datum, self.is_null).unwrap() }
     }
 }
 

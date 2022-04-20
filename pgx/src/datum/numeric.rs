@@ -152,7 +152,7 @@ impl Into<Numeric> for f64 {
 }
 
 impl FromDatum for Numeric {
-    unsafe fn from_datum(datum: usize, is_null: bool, _typoid: u32) -> Option<Self>
+    unsafe fn from_datum(datum: usize, is_null: bool) -> Option<Self>
     where
         Self: Sized,
     {

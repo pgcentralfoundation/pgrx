@@ -35,11 +35,9 @@ impl IntoDatum for Uuid {
 
 impl FromDatum for Uuid {
     #[inline]
-    unsafe fn from_datum(datum: usize, is_null: bool, _typoid: pg_sys::Oid) -> Option<Uuid> {
+    unsafe fn from_datum(datum: usize, is_null: bool) -> Option<Uuid> {
         if is_null {
             None
-        } else if datum == 0 {
-            panic!("a uuid Datum as flagged as non-null but the datum is zero");
         } else {
             let bytes = std::slice::from_raw_parts(datum as *const u8, UUID_BYTES_LEN);
             if let Ok(uuid) = Uuid::from_slice(bytes) {

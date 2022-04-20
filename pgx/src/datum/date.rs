@@ -14,9 +14,8 @@ use time::format_description::FormatItem;
 #[derive(Debug)]
 pub struct Date(time::Date);
 impl FromDatum for Date {
-    const NEEDS_TYPID: bool = false;
     #[inline]
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _typoid: u32) -> Option<Date> {
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Date> {
         if is_null {
             None
         } else {

@@ -26,11 +26,9 @@ pub struct JsonString(pub String);
 /// for json
 impl FromDatum for Json {
     #[inline]
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<Json> {
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Json> {
         if is_null {
             None
-        } else if datum == 0 {
-            panic!("a json Datum was flagged as non-null but the datum is zero");
         } else {
             let varlena = pg_sys::pg_detoast_datum(datum as *mut pg_sys::varlena);
             let len = varsize_any_exhdr(varlena);
@@ -44,11 +42,9 @@ impl FromDatum for Json {
 
 /// for jsonb
 impl FromDatum for JsonB {
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<JsonB> {
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<JsonB> {
         if is_null {
             None
-        } else if datum == 0 {
-            panic!("a jsonb Datum was flagged as non-null but the datum is zero")
         } else {
             let varlena = datum as *mut pg_sys::varlena;
             let detoasted = pg_sys::pg_detoast_datum_packed(varlena);
@@ -84,15 +80,9 @@ impl FromDatum for JsonB {
 /// This returns a **copy**, allocated and managed by Rust, of the underlying `varlena` Datum
 impl FromDatum for JsonString {
     #[inline]
-    unsafe fn from_datum(
-        datum: pg_sys::Datum,
-        is_null: bool,
-        _: pg_sys::Oid,
-    ) -> Option<JsonString> {
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<JsonString> {
         if is_null {
             None
-        } else if datum == 0 {
-            panic!("a varlena Datum was flagged as non-null but the datum is zero");
         } else {
             let varlena = datum as *mut pg_sys::varlena;
             let detoasted = pg_sys::pg_detoast_datum_packed(varlena);
