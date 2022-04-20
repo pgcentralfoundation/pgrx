@@ -142,7 +142,7 @@ impl FromDatum for bool {
         if is_null {
             None
         } else {
-            Some(datum.into_value() != 0)
+            Some(datum.value() != 0)
         }
     }
 }
@@ -154,7 +154,7 @@ impl FromDatum for i8 {
         if is_null {
             None
         } else {
-            Some(datum.into_value() as _)
+            Some(datum.value() as _)
         }
     }
 }
@@ -166,7 +166,7 @@ impl FromDatum for i16 {
         if is_null {
             None
         } else {
-            Some(datum.into_value() as _)
+            Some(datum.value() as _)
         }
     }
 }
@@ -178,7 +178,7 @@ impl FromDatum for i32 {
         if is_null {
             None
         } else {
-            Some(datum.into_value() as _)
+            Some(datum.value() as _)
         }
     }
 }
@@ -190,7 +190,7 @@ impl FromDatum for u32 {
         if is_null {
             None
         } else {
-            Some(datum.into_value() as _)
+            Some(datum.value() as _)
         }
     }
 }
@@ -202,7 +202,7 @@ impl FromDatum for i64 {
         if is_null {
             None
         } else {
-            Some(datum.into_value() as _)
+            Some(datum.value() as _)
         }
     }
 }
@@ -214,7 +214,7 @@ impl FromDatum for f32 {
         if is_null {
             None
         } else {
-            Some(f32::from_bits(datum.into_value() as _))
+            Some(f32::from_bits(datum.value() as _))
         }
     }
 }
@@ -226,7 +226,7 @@ impl FromDatum for f64 {
         if is_null {
             None
         } else {
-            Some(f64::from_bits(datum.into_value() as _))
+            Some(f64::from_bits(datum.value() as _))
         }
     }
 }

@@ -25,7 +25,7 @@ impl FromDatum for Time {
         if is_null {
             None
         } else {
-            let mut time = datum.into_value() as i64;
+            let mut time = datum.value() as i64;
 
             let hour = time / USECS_PER_HOUR;
             time -= hour * USECS_PER_HOUR;

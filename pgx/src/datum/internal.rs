@@ -57,7 +57,7 @@ impl Internal {
     #[inline(always)]
     pub unsafe fn get<T>(&self) -> Option<&T> {
         self.0
-            .and_then(|datum| (datum.into_void() as *const T).as_ref())
+            .and_then(|datum| (datum.to_void() as *const T).as_ref())
     }
 
     /// Initializes the internal with `value`, then returns a mutable reference to it.

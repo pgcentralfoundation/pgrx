@@ -28,12 +28,12 @@ pub struct Datum(*mut DatumBlob);
 
 impl Datum {
     /// Implies that the datum is actually a value
-    pub fn into_value(self) -> u64 {
-        self.0.addr() as u64
+    pub fn value(self) -> usize {
+        self.0.addr()
     }
 
     // Implies that the datum is actually a pointer
-    pub fn into_void(self) -> *mut core::ffi::c_void {
+    pub fn to_void(self) -> *mut core::ffi::c_void {
         self.0.cast()
     }
 

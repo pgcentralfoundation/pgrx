@@ -40,7 +40,7 @@ impl IntoDatum for TimeWithTimeZone {
             .0
             .into_datum()
             .expect("failed to convert timetz into datum")
-            .into_value() as i64;
+            .value() as i64;
 
         Some(timetz.into_pg().into())
     }

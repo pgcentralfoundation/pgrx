@@ -313,7 +313,7 @@ impl FromDatum for PgRelation {
             None
         } else {
             Some(PgRelation::with_lock(
-                datum.into_value() as _,
+                datum.value() as _,
                 pg_sys::AccessShareLock as pg_sys::LOCKMODE,
             ))
         }
