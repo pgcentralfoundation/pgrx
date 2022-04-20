@@ -1,9 +1,0 @@
-version: 2
-updates:
-  - package-ecosystem: "cargo"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-#      interval: "daily"
-#      time: "12:00"
-    target-branch: "develop"

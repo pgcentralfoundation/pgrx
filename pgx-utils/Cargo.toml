@@ -1,6 +1,6 @@
 [package]
 name = "pgx-utils"
-version = "0.4.2"
+version = "0.4.3"
 authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
 license = "MIT"
 description = "Utility functions for 'pgx'"
@@ -16,22 +16,22 @@ owo-colors = "3.3.0"
 convert_case = "0.5.0"
 dirs = "4.0.0"
 env_proxy = "0.4.1"
-proc-macro2 = { version = "1.0.36", features = [ "span-locations" ] }
-quote = "1.0.17"
+proc-macro2 = { version = "1.0.37", features = [ "span-locations" ] }
+quote = "1.0.18"
 regex = "1.5.5"
 rttp_client = "0.1.0"
 serde = { version = "1.0.136", features = [ "derive" ] }
 serde_derive = "1.0.136"
 serde-xml-rs = "0.5.1"
 serde_json = "1.0.79"
-syn = { version = "1.0.90", features = [ "extra-traits", "full", "fold", "parsing" ] }
+syn = { version = "1.0.91", features = [ "extra-traits", "full", "fold", "parsing" ] }
 syntect = { version = "4.6.0", default-features = false, features = ["default-fancy"] }
-toml = "0.5.8"
+toml = "0.5.9"
 unescape = "0.1.0"
 url = "2.2.2"
-eyre = "0.6.7"
-tracing = "0.1.32"
+eyre = "0.6.8"
+tracing = "0.1.34"
 tracing-error = "0.2.0"
-tracing-subscriber = { version = "0.3.9", features = [ "env-filter" ] }
+tracing-subscriber = { version = "0.3.11", features = [ "env-filter" ] }
 petgraph = "0.6.0"
 prettyplease = "0.1.9"

@@ -36,6 +36,9 @@ pub(crate) struct Connect {
     /// Path to Cargo.toml
     #[clap(long, parse(from_os_str))]
     manifest_path: Option<PathBuf>,
+    /// Use an existing `pgcli` on the $PATH.
+    #[clap(env = "PGX_PGCLI", long)]
+    pgcli: bool,
 }
 
 impl CommandExecute for Connect {
@@ -104,7 +107,7 @@ impl CommandExecute for Connect {
             }
         };
 
-        connect_psql(Pgx::from_config()?.get(&pg_version)?, &dbname)
+        connect_psql(Pgx::from_config()?.get(&pg_version)?, &dbname, self.pgcli)
     }
 }
 
@@ -112,7 +115,7 @@ impl CommandExecute for Connect {
     pg_version = %pg_config.version()?,
     dbname,
 ))]
-pub(crate) fn connect_psql(pg_config: &PgConfig, dbname: &str) -> eyre::Result<()> {
+pub(crate) fn connect_psql(pg_config: &PgConfig, dbname: &str, pgcli: bool) -> eyre::Result<()> {
     // restart postgres
     start_postgres(pg_config)?;
 
@@ -126,5 +129,5 @@ pub(crate) fn connect_psql(pg_config: &PgConfig, dbname: &str) -> eyre::Result<(
     }
 
     // run psql
-    exec_psql(pg_config, dbname)
+    exec_psql(&pg_config, dbname, pgcli)
 }

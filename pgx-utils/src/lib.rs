@@ -21,10 +21,13 @@ use std::{
 };
 use syn::{GenericArgument, ItemFn, PathArguments, ReturnType, Type, TypeParamBound};
 
+mod pgx_pg_sys_stub;
+
 pub mod operator_common;
 pub mod pg_config;
-mod pgx_pg_sys_stub;
+pub mod rewriter;
 pub mod sql_entity_graph;
+
 pub use pgx_pg_sys_stub::PgxPgSysStub;
 
 #[doc(hidden)]
