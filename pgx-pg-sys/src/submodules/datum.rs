@@ -1,5 +1,6 @@
 // Polyfill while #![feature(strict_provenance)] is unstable
 use sptr::Strict;
+use std::ptr::NonNull;
 
 /// Postgres defines the "Datum" type as uintptr_t, so bindgen decides it is usize.
 /// Normally, this would be fine, except Postgres uses it more like void*:
@@ -51,61 +52,67 @@ impl Datum {
 
 impl From<usize> for Datum {
     fn from(val: usize) -> Datum {
-        Datum(val as *mut DatumBlob)
+        Datum(NonNull::<DatumBlob>::dangling().as_ptr().with_addr(val))
     }
 }
 
 impl From<Datum> for usize {
     fn from(val: Datum) -> usize {
-        val.0 as usize
+        val.0.addr()
+    }
+}
+
+impl From<isize> for Datum {
+    fn from(val: isize) -> Datum {
+        Datum::from(val as usize)
     }
 }
 
 impl From<u8> for Datum {
     fn from(val: u8) -> Datum {
-        Datum(val as *mut DatumBlob)
+        Datum::from(usize::from(val))
     }
 }
 
 impl From<u16> for Datum {
     fn from(val: u16) -> Datum {
-        Datum(val as *mut DatumBlob)
+        Datum::from(usize::from(val))
     }
 }
 
 impl From<u32> for Datum {
     fn from(val: u32) -> Datum {
-        Datum(val as *mut DatumBlob)
+        Datum::from(val as usize)
     }
 }
 
 impl From<u64> for Datum {
     fn from(val: u64) -> Datum {
-        Datum(val as *mut DatumBlob)
+        Datum::from(val as usize)
     }
 }
 
 impl From<i8> for Datum {
     fn from(val: i8) -> Datum {
-        Datum(val as *mut DatumBlob)
+        Datum::from(isize::from(val))
     }
 }
 
 impl From<i16> for Datum {
     fn from(val: i16) -> Datum {
-        Datum(val as *mut DatumBlob)
+        Datum::from(isize::from(val))
     }
 }
 
 impl From<i32> for Datum {
     fn from(val: i32) -> Datum {
-        Datum(val as *mut DatumBlob)
+        Datum::from(val as usize)
     }
 }
 
 impl From<i64> for Datum {
     fn from(val: i64) -> Datum {
-        Datum(val as *mut DatumBlob)
+        Datum::from(val as usize)
     }
 }
 
