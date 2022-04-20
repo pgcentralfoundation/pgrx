@@ -27,22 +27,23 @@ pub struct DatumBlob {
 pub struct Datum(*mut DatumBlob);
 
 impl Datum {
-    /// Implies that the datum is actually a value
+    /// Assume the datum is a value and extract the bits from
+    /// the memory address, interpreting them as an integer.
     pub fn value(self) -> usize {
         self.0.addr()
     }
 
-    // Implies that the datum is actually a pointer
+    /// Assume the datum is a pointer and treat it as void*.
     pub fn to_void(self) -> *mut core::ffi::c_void {
         self.0.cast()
     }
 
-    // Implies that the datum is actually a pointer
+    /// True if the datum is equal to the null pointer.
     pub fn is_null(self) -> bool {
         self.0.is_null()
     }
 
-    // Implies that the datum is actually a pointer
+    /// Assume the datum is a pointer and cast it to point to T.
     pub fn ptr_cast<T>(self) -> *mut T {
         self.0.cast()
     }
