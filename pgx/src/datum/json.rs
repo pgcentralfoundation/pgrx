@@ -30,7 +30,7 @@ impl FromDatum for Json {
         if is_null {
             None
         } else {
-            let varlena = pg_sys::pg_detoast_datum(datum.into_void() as *mut pg_sys::varlena);
+            let varlena = pg_sys::pg_detoast_datum(datum.ptr_cast());
             let len = varsize_any_exhdr(varlena);
             let data = vardata_any(varlena);
             let slice = std::slice::from_raw_parts(data as *const u8, len);
@@ -46,7 +46,7 @@ impl FromDatum for JsonB {
         if is_null {
             None
         } else {
-            let varlena = datum.into_void() as *mut pg_sys::varlena;
+            let varlena = datum.ptr_cast();
             let detoasted = pg_sys::pg_detoast_datum_packed(varlena);
 
             let cstr = direct_function_call::<&std::ffi::CStr>(
@@ -84,7 +84,7 @@ impl FromDatum for JsonString {
         if is_null {
             None
         } else {
-            let varlena = datum.into_void().cast();
+            let varlena = datum.ptr_cast();
             let detoasted = pg_sys::pg_detoast_datum_packed(varlena);
             let len = varsize_any_exhdr(detoasted);
             let data = vardata_any(detoasted);

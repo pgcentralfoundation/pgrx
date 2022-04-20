@@ -76,7 +76,7 @@ impl Internal {
             PgMemoryContexts::CurrentMemoryContext.leak_and_drop_on_delete(value),
         );
         let ptr = self.0.insert(datum);
-        &mut *(ptr.into_void() as *mut T)
+        &mut *(ptr.ptr_cast::<T>())
     }
 
     /// Return a reference to the memory pointed to by this [`Internal`], as `Some(&mut T)`, unless the
@@ -88,8 +88,7 @@ impl Internal {
     /// your responsibility.
     #[inline(always)]
     pub unsafe fn get_mut<T>(&self) -> Option<&mut T> {
-        self.0
-            .and_then(|datum| (datum.into_void() as *mut T).as_mut())
+        self.0.and_then(|datum| (datum.ptr_cast::<T>()).as_mut())
     }
 
     /// Initializes the internal with `value` if it is not initialized, then returns a mutable reference to
@@ -142,7 +141,7 @@ impl Internal {
                 .into();
             datum
         });
-        &mut *(ptr.into_void() as *mut T)
+        &mut *(ptr.ptr_cast::<T>())
     }
 
     /// Returns the contained `Option<pg_sys::Datum>`

@@ -41,6 +41,11 @@ impl Datum {
     pub fn is_null(self) -> bool {
         self.0.is_null()
     }
+
+    // Implies that the datum is actually a pointer
+    pub fn ptr_cast<T>(self) -> *mut T {
+        self.0.cast()
+    }
 }
 
 impl From<usize> for Datum {

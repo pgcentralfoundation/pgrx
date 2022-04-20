@@ -149,8 +149,7 @@ impl<'a> PgHeapTuple<'a, AllocatedByRust> {
     /// This function is unsafe as we cannot guarantee that the provided Datum is a valid [pg_sys::HeapTupleHeader]
     /// pointer.
     pub unsafe fn from_composite_datum(composite: pg_sys::Datum) -> Self {
-        let htup_header =
-            pg_sys::pg_detoast_datum(composite.into_void().cast::<pg_sys::varlena>()) as pg_sys::HeapTupleHeader;
+        let htup_header = pg_sys::pg_detoast_datum(composite.ptr_cast()) as pg_sys::HeapTupleHeader;
         let tup_type = crate::heap_tuple_header_get_type_id(htup_header);
         let tup_typmod = crate::heap_tuple_header_get_typmod(htup_header);
         let tupdesc = pg_sys::lookup_rowtype_tupdesc(tup_type, tup_typmod);
@@ -205,7 +204,9 @@ impl<'a> PgHeapTuple<'a, AllocatedByRust> {
                 }
             }
 
-            let mut datums = (0..self.tupdesc.len()).map(|i| pg_sys::Datum::from(i)).collect::<Vec<_>>();
+            let mut datums = (0..self.tupdesc.len())
+                .map(|i| pg_sys::Datum::from(i))
+                .collect::<Vec<_>>();
             let mut nulls = (0..self.tupdesc.len()).map(|_| false).collect::<Vec<_>>();
             let mut do_replace = (0..self.tupdesc.len()).map(|_| false).collect::<Vec<_>>();
 

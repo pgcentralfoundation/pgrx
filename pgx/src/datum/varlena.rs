@@ -161,10 +161,10 @@ where
     /// This function is considered unsafe as it cannot guarantee the provided `pg_sys::Datum` is a
     /// valid `*mut pg_sys::varlena`.
     pub unsafe fn from_datum(datum: pg_sys::Datum) -> Self {
-        let ptr = pg_sys::pg_detoast_datum(datum.into_void().cast());
+        let ptr = pg_sys::pg_detoast_datum(datum.ptr_cast());
         let len = varsize_any(ptr);
 
-        if ptr == datum.into_void().cast() {
+        if ptr == datum.ptr_cast() {
             // no detoasting happened so we're using borrowed memory
             let leaked = Box::leak(Box::new(PallocdVarlena { ptr, len }));
             PgVarlena {
@@ -316,8 +316,7 @@ where
         } else {
             memory_context.switch_to(|_| {
                 // this gets the varlena Datum copied into this memory context
-                let detoasted =
-                    pg_sys::pg_detoast_datum_copy(datum.into_void() as *mut pg_sys::varlena);
+                let detoasted = pg_sys::pg_detoast_datum_copy(datum.ptr_cast());
 
                 // and we need to unpack it (if necessary), which will decompress it too
                 let varlena = pg_sys::pg_detoast_datum_packed(detoasted);
@@ -350,7 +349,7 @@ where
         if is_null {
             None
         } else {
-            cbor_decode(datum.into_void().cast())
+            cbor_decode(datum.ptr_cast())
         }
     }
 
@@ -362,7 +361,7 @@ where
         if is_null {
             None
         } else {
-            cbor_decode_into_context(memory_context, datum.into_void().cast())
+            cbor_decode_into_context(memory_context, datum.ptr_cast())
         }
     }
 }

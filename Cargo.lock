@@ -1444,7 +1444,6 @@ dependencies = [
  "serde",
  "serde_cbor",
  "serde_json",
- "sptr",
  "time",
  "tracing",
  "tracing-error",

@@ -17,7 +17,7 @@ impl FromDatum for pg_sys::BOX {
         if is_null {
             None
         } else {
-            let the_box = datum.into_void() as *mut pg_sys::BOX;
+            let the_box = datum.ptr_cast::<pg_sys::BOX>();
             Some(the_box.read())
         }
     }
@@ -47,7 +47,7 @@ impl FromDatum for pg_sys::Point {
         if is_null {
             None
         } else {
-            let point: *mut Self = datum.into_void().cast();
+            let point: *mut Self = datum.ptr_cast();
             Some(point.read())
         }
     }

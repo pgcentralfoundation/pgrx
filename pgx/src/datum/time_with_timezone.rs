@@ -20,7 +20,7 @@ impl FromDatum for TimeWithTimeZone {
         if is_null {
             None
         } else {
-            let timetz = PgBox::from_pg(datum.into_void().cast::<pg_sys::TimeTzADT>());
+            let timetz = PgBox::from_pg(datum.ptr_cast::<pg_sys::TimeTzADT>());
 
             let mut time = Time::from_datum(pg_sys::Datum::from(timetz.time), false)
                 .expect("failed to convert TimeWithTimeZone");
