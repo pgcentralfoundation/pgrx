@@ -626,7 +626,7 @@ OPTIONS:
             Print version information
 ```
 
-## Inspect you Extension Schema
+## Inspect your Extension Schema
 
 If you just want to look at the full extension schema that pgx will generate, use
 `cargo pgx schema`.
