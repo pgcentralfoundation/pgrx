@@ -14,7 +14,11 @@ pub mod setjmp;
 mod tupdesc;
 mod utils;
 
-pub use datum::{Datum, DatumBlob, NullableDatum};
+pub use datum::Datum;
+// OnDrop(feature = "pg11"): remove this cfg if all supported versions of Postgres
+// now include NullableDatum.
+#[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14"))]
+pub use datum::NullableDatum;
 pub use guard::*;
 pub use oids::*;
 pub use tupdesc::*;

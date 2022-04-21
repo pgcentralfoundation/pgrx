@@ -11,10 +11,11 @@ use std::ptr::NonNull;
 /// Rust's `usize` may match the size of `uintptr_t` but it is not quite the same.
 /// The compiler would rather know which integers are integers and which are pointers.
 /// As a result, Datum is now a wrapper around `*mut DatumBlob`.
+/// This type need not be exported unless the details of the type idiom become important.
 // This struct uses a Rust idiom invented before `extern type` was designed,
 // but should probably be replaced when #![feature(extern_type)] stabilizes
 #[repr(C)]
-pub struct DatumBlob {
+struct DatumBlob {
     _data: [u8; 0],
     _marker: core::marker::PhantomData<(*mut u8, core::marker::PhantomPinned)>,
 }
