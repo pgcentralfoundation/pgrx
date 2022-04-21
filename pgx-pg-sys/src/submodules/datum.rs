@@ -24,6 +24,17 @@ struct DatumBlob {
 /// and all possible pointers in a Postgres context. That is, it is either
 /// "pass-by-value" (if the value fits into the platform's `uintptr_t`) or
 /// "pass-by-reference" (if it does not).
+///
+/// In Rust, it is best to treat this largely as a pointer while passing it around
+/// for code that doesn't care about what the Datum "truly is".
+/// If for some reason it is important to manipulate the address/value
+/// without "knowing the type" of the Datum, cast to a pointer and use pointer methods.
+///
+/// Only create Datums from non-pointers when you know you want to pass a value, as
+/// it is erroneous for `unsafe` code to dereference the address of "only a value" as a pointer.
+/// It is still a "safe" operation to create such pointers: validity is asserted by dereferencing.
+/// For all intents and purposes, however, Postgres counts as `unsafe` code that may be relying
+/// on you communicating pointers correctly to it. Do not play games with your database.
 #[repr(transparent)]
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Datum(*mut DatumBlob);
@@ -141,6 +152,9 @@ impl<T> PartialEq<Datum> for *mut T {
     }
 }
 
+/// This struct consists of a Datum and a bool, matching Postgres's definition
+/// as of Postgres 12. This isn't efficient in terms of storage size, due to padding,
+/// but sometimes it's more cache-friendly, so sometimes it is the preferred type.
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct NullableDatum {
