@@ -165,6 +165,8 @@ pub(crate) fn generate_schema(
         ));
     }
 
+    let versioned_so = get_property(&package_manifest_path, "module_pathname")?.is_none();
+
     let flags = std::env::var("PGX_BUILD_FLAGS").unwrap_or_default();
 
     let mut target_dir_with_profile = pgx_utils::get_target_dir()?;
@@ -401,6 +403,8 @@ pub(crate) fn generate_schema(
         typeid_sql_mapping.clone().into_iter(),
         source_only_sql_mapping.clone().into_iter(),
         entities.into_iter(),
+        package_name.to_string(),
+        versioned_so,
     )
     .wrap_err("SQL generation error")?;
 

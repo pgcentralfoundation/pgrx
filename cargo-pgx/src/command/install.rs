@@ -14,8 +14,8 @@ use crate::{
 use cargo_toml::Manifest;
 use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
-use pgx_utils::get_target_dir;
 use pgx_utils::pg_config::PgConfig;
+use pgx_utils::{get_target_dir, versioned_so_name};
 use std::{
     io::BufReader,
     path::{Path, PathBuf},
@@ -114,6 +114,8 @@ pub(crate) fn install_extension(
         ));
     }
 
+    let versioned_so = get_property(&package_manifest_path, "module_pathname")?.is_none();
+
     let build_command_output = build_extension(
         user_manifest_path.as_ref(),
         user_package,
@@ -152,7 +154,13 @@ pub(crate) fn install_extension(
     {
         let mut dest = base_directory.clone();
         dest.push(&pkgdir);
-        dest.push(format!("{}.so", extname));
+        let so_name = if versioned_so {
+            let extver = get_version(&package_manifest_path)?;
+            versioned_so_name(&extname, &extver)
+        } else {
+            extname.clone()
+        };
+        dest.push(format!("{}.so", so_name));
 
         if cfg!(target_os = "macos") {
             // Remove the existing .so if present. This is a workaround for an
@@ -301,7 +309,7 @@ fn get_target_sql_file(
     let mut dest = base_directory.clone();
     dest.push(extdir);
 
-    let (_, extname) = crate::command::get::find_control_file(&manifest_path)?;
+    let (_, extname) = find_control_file(&manifest_path)?;
     let version = get_version(&manifest_path)?;
     dest.push(format!("{}--{}.sql", extname, version));
 
@@ -321,7 +329,7 @@ fn copy_sql_files(
     skip_build: bool,
 ) -> eyre::Result<()> {
     let dest = get_target_sql_file(&package_manifest_path, extdir, base_directory)?;
-    let (_, extname) = crate::command::get::find_control_file(&package_manifest_path)?;
+    let (_, extname) = find_control_file(&package_manifest_path)?;
 
     crate::command::schema::generate_schema(
         pg_config,
