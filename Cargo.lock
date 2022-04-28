@@ -1479,6 +1479,7 @@ dependencies = [
  "proc-macro2",
  "quote",
  "rayon",
+ "sptr",
  "syn",
 ]
 
@@ -2174,6 +2175,12 @@ checksum = "c530c2b0d0bf8b69304b39fe2001993e267461948b890cd037d8ad4293fa1a0d"
 dependencies = [
  "lock_api",
 ]
+
+[[package]]
+name = "sptr"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1e0d4365121b91e8522958da77ce29c004333daeaf0711225c4727c8c5f49941"
 
 [[package]]
 name = "srf"

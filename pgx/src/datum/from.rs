@@ -115,7 +115,7 @@ pub trait FromDatum {
     {
         if !Self::is_compatible_with(type_oid) {
             Err(TryFromDatumError::IncompatibleTypes)
-        } else if !is_null && datum == 0 && !Self::is_pass_by_value() {
+        } else if !is_null && datum.is_null() && !Self::is_pass_by_value() {
             Err(TryFromDatumError::NullDatumPointer)
         } else {
             Ok(FromDatum::from_datum(datum, is_null))
@@ -142,7 +142,7 @@ impl FromDatum for bool {
         if is_null {
             None
         } else {
-            Some(datum != 0)
+            Some(datum.value() != 0)
         }
     }
 }
@@ -154,7 +154,7 @@ impl FromDatum for i8 {
         if is_null {
             None
         } else {
-            Some(datum as i8)
+            Some(datum.value() as _)
         }
     }
 }
@@ -166,7 +166,7 @@ impl FromDatum for i16 {
         if is_null {
             None
         } else {
-            Some(datum as i16)
+            Some(datum.value() as _)
         }
     }
 }
@@ -178,7 +178,7 @@ impl FromDatum for i32 {
         if is_null {
             None
         } else {
-            Some(datum as i32)
+            Some(datum.value() as _)
         }
     }
 }
@@ -190,7 +190,7 @@ impl FromDatum for u32 {
         if is_null {
             None
         } else {
-            Some(datum as u32)
+            Some(datum.value() as _)
         }
     }
 }
@@ -202,7 +202,7 @@ impl FromDatum for i64 {
         if is_null {
             None
         } else {
-            Some(datum as i64)
+            Some(datum.value() as _)
         }
     }
 }
@@ -214,7 +214,7 @@ impl FromDatum for f32 {
         if is_null {
             None
         } else {
-            Some(f32::from_bits(datum as u32))
+            Some(f32::from_bits(datum.value() as _))
         }
     }
 }
@@ -226,7 +226,7 @@ impl FromDatum for f64 {
         if is_null {
             None
         } else {
-            Some(f64::from_bits(datum as u64))
+            Some(f64::from_bits(datum.value() as _))
         }
     }
 }
@@ -238,14 +238,14 @@ impl<'a> FromDatum for &'a str {
         if is_null {
             None
         } else {
-            let varlena = pg_sys::pg_detoast_datum_packed(datum as *mut pg_sys::varlena);
+            let varlena = pg_sys::pg_detoast_datum_packed(datum.ptr_cast());
             Some(text_to_rust_str_unchecked(varlena))
         }
     }
 
     unsafe fn from_datum_in_memory_context(
         mut memory_context: PgMemoryContexts,
-        datum: usize,
+        datum: pg_sys::Datum,
         is_null: bool,
     ) -> Option<Self>
     where
@@ -256,7 +256,7 @@ impl<'a> FromDatum for &'a str {
         } else {
             memory_context.switch_to(|_| {
                 // this gets the varlena Datum copied into this memory context
-                let detoasted = pg_sys::pg_detoast_datum_copy(datum as *mut pg_sys::varlena);
+                let detoasted = pg_sys::pg_detoast_datum_copy(datum.ptr_cast());
 
                 // and we need to unpack it (if necessary), which will decompress it too
                 let varlena = pg_sys::pg_detoast_datum_packed(detoasted);
@@ -300,9 +300,7 @@ impl<'a> FromDatum for &'a std::ffi::CStr {
         if is_null {
             None
         } else {
-            Some(std::ffi::CStr::from_ptr(
-                datum as *const std::os::raw::c_char,
-            ))
+            Some(std::ffi::CStr::from_ptr(datum.ptr_cast()))
         }
     }
 }
@@ -316,9 +314,7 @@ impl<'a> FromDatum for &'a crate::cstr_core::CStr {
         if is_null {
             None
         } else {
-            Some(crate::cstr_core::CStr::from_ptr(
-                datum as *const std::os::raw::c_char,
-            ))
+            Some(crate::cstr_core::CStr::from_ptr(datum.ptr_cast()))
         }
     }
 }
@@ -326,18 +322,18 @@ impl<'a> FromDatum for &'a crate::cstr_core::CStr {
 /// for bytea
 impl<'a> FromDatum for &'a [u8] {
     #[inline]
-    unsafe fn from_datum(datum: usize, is_null: bool) -> Option<&'a [u8]> {
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<&'a [u8]> {
         if is_null {
             None
         } else {
-            let varlena = pg_sys::pg_detoast_datum_packed(datum as *mut pg_sys::varlena);
+            let varlena = pg_sys::pg_detoast_datum_packed(datum.ptr_cast());
             Some(varlena_to_byte_slice(varlena))
         }
     }
 
     unsafe fn from_datum_in_memory_context(
         mut memory_context: PgMemoryContexts,
-        datum: usize,
+        datum: pg_sys::Datum,
         is_null: bool,
     ) -> Option<Self>
     where
@@ -348,7 +344,7 @@ impl<'a> FromDatum for &'a [u8] {
         } else {
             memory_context.switch_to(|_| {
                 // this gets the varlena Datum copied into this memory context
-                let detoasted = pg_sys::pg_detoast_datum_copy(datum as *mut pg_sys::varlena);
+                let detoasted = pg_sys::pg_detoast_datum_copy(datum.ptr_cast());
 
                 // and we need to unpack it (if necessary), which will decompress it too
                 let varlena = pg_sys::pg_detoast_datum_packed(detoasted);
@@ -362,7 +358,7 @@ impl<'a> FromDatum for &'a [u8] {
 
 impl FromDatum for Vec<u8> {
     #[inline]
-    unsafe fn from_datum(datum: usize, is_null: bool) -> Option<Vec<u8>> {
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Vec<u8>> {
         if is_null {
             None
         } else {
@@ -394,13 +390,13 @@ impl<T> FromDatum for PgBox<T, AllocatedByPostgres> {
         if is_null {
             None
         } else {
-            Some(PgBox::<T>::from_pg(datum as *mut T))
+            Some(PgBox::<T>::from_pg(datum.ptr_cast()))
         }
     }
 
     unsafe fn from_datum_in_memory_context(
         mut memory_context: PgMemoryContexts,
-        datum: usize,
+        datum: pg_sys::Datum,
         is_null: bool,
     ) -> Option<Self>
     where
@@ -410,7 +406,7 @@ impl<T> FromDatum for PgBox<T, AllocatedByPostgres> {
             if is_null {
                 None
             } else {
-                let copied = context.copy_ptr_into(datum as *mut T, std::mem::size_of::<T>());
+                let copied = context.copy_ptr_into(datum.ptr_cast(), std::mem::size_of::<T>());
                 Some(PgBox::<T>::from_pg(copied))
             }
         })

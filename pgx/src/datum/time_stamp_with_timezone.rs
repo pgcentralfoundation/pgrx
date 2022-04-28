@@ -20,7 +20,7 @@ pub struct TimestampWithTimeZone(time::OffsetDateTime);
 
 impl From<pg_sys::TimestampTz> for TimestampWithTimeZone {
     fn from(item: pg_sys::TimestampTz) -> Self {
-        unsafe { TimestampWithTimeZone::from_datum(item as usize, false).unwrap() }
+        unsafe { TimestampWithTimeZone::from_datum(item.into(), false).unwrap() }
     }
 }
 
@@ -53,7 +53,7 @@ impl FromDatum for TimestampWithTimeZone {
             let mut fsec = 0 as pg_sys::fsec_t;
             let mut tzn = std::ptr::null::<std::os::raw::c_char>();
             pg_sys::timestamp2tm(
-                datum as i64,
+                datum.value() as i64,
                 &mut tz,
                 &mut tm,
                 &mut fsec,

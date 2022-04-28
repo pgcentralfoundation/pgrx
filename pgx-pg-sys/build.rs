@@ -156,6 +156,7 @@ fn main() -> color_eyre::Result<()> {
                     &bindings_file,
                     quote! {
                         use crate as pg_sys;
+                        use crate::{Datum, NullableDatum};
                         use crate::PgNode;
                     },
                 )
@@ -508,6 +509,8 @@ fn run_bindgen(pg_config: &PgConfig, include_h: &PathBuf) -> eyre::Result<syn::F
         .header(include_h.display().to_string())
         .clang_arg(&format!("-I{}", includedir_server.display()))
         .parse_callbacks(Box::new(IgnoredMacros::default()))
+        .blocklist_type("Datum") // manually wrapping datum types for correctness
+        .blocklist_type("NullableDatum")
         .blocklist_function("varsize_any") // pgx converts the VARSIZE_ANY macro, so we don't want to also have this function, which is in heaptuple.c
         .blocklist_function("query_tree_walker")
         .blocklist_function("expression_tree_walker")

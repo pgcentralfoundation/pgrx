@@ -17,7 +17,7 @@ impl FromDatum for pg_sys::BOX {
         if is_null {
             None
         } else {
-            let the_box = datum as *mut pg_sys::BOX;
+            let the_box = datum.ptr_cast::<pg_sys::BOX>();
             Some(the_box.read())
         }
     }
@@ -29,7 +29,7 @@ impl IntoDatum for pg_sys::BOX {
         unsafe {
             direct_function_call_as_datum(
                 pg_sys::box_out,
-                vec![Some(the_box as *mut pg_sys::BOX as pg_sys::Datum)],
+                vec![Some(pg_sys::Datum::from(the_box as *mut pg_sys::BOX))],
             )
         }
     }
@@ -47,19 +47,19 @@ impl FromDatum for pg_sys::Point {
         if is_null {
             None
         } else {
-            let point = datum as *mut pg_sys::Point;
+            let point: *mut Self = datum.ptr_cast();
             Some(point.read())
         }
     }
 }
 
 impl IntoDatum for pg_sys::Point {
-    fn into_datum(mut self) -> Option<usize> {
+    fn into_datum(mut self) -> Option<pg_sys::Datum> {
         let point = &mut self;
         unsafe {
             direct_function_call_as_datum(
                 pg_sys::point_out,
-                vec![Some(point as *mut pg_sys::Point as pg_sys::Datum)],
+                vec![Some(pg_sys::Datum::from(point as *mut _))],
             )
         }
     }

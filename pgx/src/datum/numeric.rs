@@ -7,9 +7,7 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use crate::{
-    direct_function_call, direct_function_call_as_datum, pg_sys, void_mut_ptr, FromDatum, IntoDatum,
-};
+use crate::{direct_function_call, direct_function_call_as_datum, pg_sys, FromDatum, IntoDatum};
 use pgx_pg_sys::pg_try;
 use serde::de::{Error, Visitor};
 use serde::{de, Deserialize, Deserializer, Serialize};
@@ -77,7 +75,7 @@ impl<'de> Deserialize<'de> for Numeric {
                         let datum = Numeric(v.clone()).into_datum().unwrap();
 
                         // and don't leak the NumericData datum Postgres created
-                        pg_sys::pfree(datum as void_mut_ptr);
+                        pg_sys::pfree(datum.to_void());
 
                         // we have it as a valid String
                         Ok(Numeric(v.clone()))
@@ -152,7 +150,7 @@ impl Into<Numeric> for f64 {
 }
 
 impl FromDatum for Numeric {
-    unsafe fn from_datum(datum: usize, is_null: bool) -> Option<Self>
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Self>
     where
         Self: Sized,
     {

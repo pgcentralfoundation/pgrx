@@ -17,7 +17,7 @@ pub struct Timestamp(time::PrimitiveDateTime);
 
 impl From<pg_sys::Timestamp> for Timestamp {
     fn from(item: pg_sys::Timestamp) -> Self {
-        unsafe { Timestamp::from_datum(item as usize, false).unwrap() }
+        unsafe { Timestamp::from_datum(item.into(), false).unwrap() }
     }
 }
 

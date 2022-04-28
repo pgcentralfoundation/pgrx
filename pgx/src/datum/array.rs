@@ -273,13 +273,12 @@ impl<'a, T: FromDatum> Drop for Array<'a, T> {
 
 impl<'a, T: FromDatum> FromDatum for Array<'a, T> {
     #[inline]
-    unsafe fn from_datum(datum: usize, is_null: bool) -> Option<Array<'a, T>> {
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Array<'a, T>> {
         if is_null {
             None
         } else {
-            let ptr = datum as *mut pg_sys::varlena;
-            let array =
-                pg_sys::pg_detoast_datum(datum as *mut pg_sys::varlena) as *mut pg_sys::ArrayType;
+            let ptr = datum.ptr_cast();
+            let array = pg_sys::pg_detoast_datum(datum.ptr_cast()) as *mut pg_sys::ArrayType;
             let array_ref = array.as_ref().expect("ArrayType * was NULL");
 
             // outvals for get_typlenbyvalalign()
@@ -368,7 +367,7 @@ where
             unsafe {
                 state = pg_sys::accumArrayResult(
                     state,
-                    datum.unwrap_or(0usize),
+                    datum.unwrap_or(0.into()),
                     isnull,
                     T::type_oid(),
                     PgMemoryContexts::CurrentMemoryContext.value(),
@@ -415,7 +414,7 @@ where
             unsafe {
                 state = pg_sys::accumArrayResult(
                     state,
-                    datum.unwrap_or(0usize),
+                    datum.unwrap_or(0.into()),
                     isnull,
                     T::type_oid(),
                     PgMemoryContexts::CurrentMemoryContext.value(),

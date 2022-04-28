@@ -8,8 +8,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use crate::{
-    direct_function_call, direct_function_call_as_datum, pg_sys, pg_try, void_mut_ptr, FromDatum,
-    IntoDatum,
+    direct_function_call, direct_function_call_as_datum, pg_sys, pg_try, FromDatum, IntoDatum,
 };
 use serde::de::{Error, Visitor};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
@@ -69,7 +68,7 @@ impl<'de> Deserialize<'de> for Inet {
                         let datum = Inet(v.clone()).into_datum().unwrap();
 
                         // and don't leak the 'inet' datum Postgres created
-                        pg_sys::pfree(datum as void_mut_ptr);
+                        pg_sys::pfree(datum.to_void());
 
                         // we have it as a valid String
                         Ok(Inet(v.clone()))

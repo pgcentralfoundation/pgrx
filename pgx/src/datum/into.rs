@@ -123,7 +123,7 @@ where
 impl IntoDatum for bool {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        Some((if self { 1 } else { 0 }) as pg_sys::Datum)
+        Some(pg_sys::Datum::from(if self { 1 } else { 0 }))
     }
 
     fn type_oid() -> u32 {
@@ -134,7 +134,7 @@ impl IntoDatum for bool {
 /// for "char"
 impl IntoDatum for i8 {
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        Some(self as pg_sys::Datum)
+        Some(pg_sys::Datum::from(self))
     }
 
     fn type_oid() -> u32 {
@@ -146,7 +146,7 @@ impl IntoDatum for i8 {
 impl IntoDatum for i16 {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        Some(self as pg_sys::Datum)
+        Some(pg_sys::Datum::from(self))
     }
 
     fn type_oid() -> u32 {
@@ -158,7 +158,7 @@ impl IntoDatum for i16 {
 impl IntoDatum for i32 {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        Some(self as pg_sys::Datum)
+        Some(pg_sys::Datum::from(self))
     }
 
     fn type_oid() -> u32 {
@@ -170,7 +170,7 @@ impl IntoDatum for i32 {
 impl IntoDatum for u32 {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        Some(self as pg_sys::Datum)
+        Some(pg_sys::Datum::from(self))
     }
 
     fn type_oid() -> u32 {
@@ -182,7 +182,7 @@ impl IntoDatum for u32 {
 impl IntoDatum for i64 {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        Some(self as pg_sys::Datum)
+        Some(pg_sys::Datum::from(self))
     }
 
     fn type_oid() -> u32 {
@@ -194,7 +194,7 @@ impl IntoDatum for i64 {
 impl IntoDatum for f32 {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        Some(self.to_bits() as pg_sys::Datum)
+        Some(self.to_bits().into())
     }
 
     fn type_oid() -> u32 {
@@ -206,7 +206,7 @@ impl IntoDatum for f32 {
 impl IntoDatum for f64 {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        Some(self.to_bits() as pg_sys::Datum)
+        Some(self.to_bits().into())
     }
 
     fn type_oid() -> u32 {
@@ -219,7 +219,7 @@ impl IntoDatum for PgOid {
     fn into_datum(self) -> Option<pg_sys::Datum> {
         match self {
             PgOid::InvalidOid => None,
-            oid => Some(oid.value() as pg_sys::Datum),
+            oid => Some(oid.value().into()),
         }
     }
 
@@ -236,7 +236,7 @@ impl<'a> IntoDatum for &'a str {
         if varlena.is_null() {
             None
         } else {
-            Some(varlena.into_pg() as pg_sys::Datum)
+            Some(varlena.into_pg().into())
         }
     }
 
@@ -306,7 +306,7 @@ impl IntoDatum for char {
 impl<'a> IntoDatum for &'a std::ffi::CStr {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        Some(self.as_ptr() as pg_sys::Datum)
+        Some(self.as_ptr().into())
     }
 
     fn type_oid() -> u32 {
@@ -317,7 +317,7 @@ impl<'a> IntoDatum for &'a std::ffi::CStr {
 impl<'a> IntoDatum for &'a crate::cstr_core::CStr {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        Some(self.as_ptr() as pg_sys::Datum)
+        Some(self.as_ptr().into())
     }
 
     fn type_oid() -> u32 {
@@ -333,7 +333,7 @@ impl<'a> IntoDatum for &'a [u8] {
         if varlena.is_null() {
             None
         } else {
-            Some(varlena.into_pg() as pg_sys::Datum)
+            Some(varlena.into_pg().into())
         }
     }
 
@@ -374,7 +374,7 @@ impl<T, AllocatedBy: WhoAllocated<T>> IntoDatum for PgBox<T, AllocatedBy> {
         if self.is_null() {
             None
         } else {
-            Some(self.into_pg() as pg_sys::Datum)
+            Some(self.into_pg().into())
         }
     }
 
