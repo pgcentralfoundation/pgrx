@@ -9,6 +9,8 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 //! A helper struct for creating a Postgres `List` of `String`s to qualify an object name
 
+use pgx_pg_sys::AsPgCStr;
+
 use crate::list::PgList;
 use crate::pg_sys;
 
@@ -33,9 +35,7 @@ impl PgQualifiedNameBuilder {
     pub fn push(mut self, value: &str) -> PgQualifiedNameBuilder {
         unsafe {
             // SAFETY:  the result of pg_sys::makeString is always a valid pointer
-            self.list.push(pg_sys::makeString(
-                std::ffi::CString::new(value).unwrap().into_raw(),
-            ));
+            self.list.push(pg_sys::makeString(value.as_pg_cstr()));
         }
         self
     }
