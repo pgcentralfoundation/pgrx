@@ -563,6 +563,10 @@ pub fn anonymonize_lifetimes(value: &mut syn::Type) {
     }
 }
 
+pub fn versioned_so_name(extension_name: &str, extension_version: &str) -> String {
+    format!("{}-{}", extension_name, extension_version)
+}
+
 #[cfg(test)]
 mod tests {
     use crate::{parse_extern_attributes, ExternArgs};

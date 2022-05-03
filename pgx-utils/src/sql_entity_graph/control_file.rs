@@ -26,7 +26,7 @@ use tracing_error::SpanTrace;
 pub struct ControlFile {
     pub comment: String,
     pub default_version: String,
-    pub module_pathname: String,
+    pub module_pathname: Option<String>,
     pub relocatable: bool,
     pub superuser: bool,
     pub schema: Option<String>,
@@ -75,13 +75,7 @@ impl ControlFile {
                     context: SpanTrace::capture(),
                 })?
                 .to_string(),
-            module_pathname: temp
-                .get("module_pathname")
-                .ok_or(ControlFileError::MissingField {
-                    field: "module_pathname",
-                    context: SpanTrace::capture(),
-                })?
-                .to_string(),
+            module_pathname: temp.get("module_pathname").map(|v| v.to_string()),
             relocatable: temp
                 .get("relocatable")
                 .ok_or(ControlFileError::MissingField {
