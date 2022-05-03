@@ -8,6 +8,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 use crate::lwlock::*;
 use crate::{pg_sys, PgAtomic};
+use std::hash::Hash;
 use uuid::Uuid;
 
 /// Custom types that want to participate in shared memory must implement this marker trait
@@ -217,7 +218,7 @@ where
 {
 }
 unsafe impl<T, const N: usize> PGXSharedMemory for heapless::Vec<T, N> {}
-unsafe impl<K: Eq + hash32::Hash, V: Default, S, const N: usize> PGXSharedMemory
+unsafe impl<K: Eq + Hash, V: Default, S, const N: usize> PGXSharedMemory
     for heapless::IndexMap<K, V, S, N>
 {
 }
