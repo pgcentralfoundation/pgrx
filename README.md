@@ -206,7 +206,7 @@ my_extension=# SELECT hello_my_extension();
 
 ### 5. Detailed cargo pgx usage
 
-For more details on how to manage pgx extensions see [Managing pgx extensions](./cargo-pgx/README.md.)
+For more details on how to manage pgx extensions see [Managing pgx extensions](./cargo-pgx/README.md).
 
 ## Upgrading
 

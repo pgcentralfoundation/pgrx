@@ -626,7 +626,7 @@ OPTIONS:
             Print version information
 ```
 
-## Inspect you Extension Schema
+## Inspect your Extension Schema
 
 If you just want to look at the full extension schema that pgx will generate, use
 `cargo pgx schema`.
@@ -686,3 +686,94 @@ OPTIONS:
     -V, --version
             Print version information
 ```
+
+## EXPERIMENTAL: Versioned shared-object support
+
+`pgx` experimentally supports the option to produce a versioned shared library. This allows multiple versions of the
+extension to be installed side-by-side, and can enable the deprecation (and removal) of functions between extension
+versions. There are some caveats which must be observed when using this functionality. For this reason it is currently
+experimental.
+
+### Activation
+
+Versioned shared-object support is enabled by removing the `module_pathname` configuration value in the extension's
+`.control` file.
+
+### Concepts
+
+Postgres has the implicit requirement that C extensions maintain ABI compatibility between versions. The idea behind
+this feature is to allow interoperability between two versions of an extension when the new version is not ABI
+compatible with the old version.
+
+The mechanism of operation is to version the name of the shared library file, and to hard-code function definitions to
+point to the versioned shared library file. Without versioned shared-object support, the SQL definition of a C function
+would look as follows:
+
+```SQL
+CREATE OR REPLACE FUNCTION "hello_extension"() RETURNS text /* &str */
+STRICT
+LANGUAGE c /* Rust */
+AS 'MODULE_PATHNAME', 'hello_extension_wrapper';
+```
+
+`MODULE_PATHNAME` is replaced by Postgres with the configured value in the `.control` file. For pgx-based extensions,
+this is  usually set to `$libdir/<extension-name>`.
+
+When using versioned shared-object support, the same SQL would look as follows:
+
+```SQL
+CREATE OR REPLACE FUNCTION "hello_extension"() RETURNS text /* &str */
+STRICT
+LANGUAGE c /* Rust */
+AS '$libdir/extension-0.0.0', 'hello_extension_wrapper';
+```
+
+Note that the versioned shared library is hard-coded in the function definition. This corresponds to the
+`extension-0.0.0.so` file which `pgx` generates.
+
+It is important to note that the emitted SQL is version-dependent. This means that all previously-defined C functions
+must be redefined to point to the current versioned-so in the version upgrade script. As an example, when updating the
+extension version to 0.1.0, the shared object will be named `<extension-name>-0.1.0.so`, and `cargo pgx schema` will
+produce the following SQL for the above function:
+
+```SQL
+CREATE OR REPLACE FUNCTION "hello_extension"() RETURNS text /* &str */
+STRICT
+LANGUAGE c /* Rust */
+AS '$libdir/extension-0.1.0', 'hello_extension_wrapper';
+```
+
+This SQL must be used in the upgrade script from `0.0.0` to `0.1.0` in order to point the `hello_extension` function to
+the new shared object. `pgx` _does not_ do any magic to determine in which version a function was introduced or modified
+and only place it in the corresponding versioned so file. By extension, you can always expect that the shared library
+will contain _all_ functions which are still defined in the extension's source code.
+
+This feature is not designed to assist in the backwards compatibility of data types.
+
+### `@MODULE_PATHNAME@` Templating
+
+In case you are already providing custom SQL definitions for Rust functions, you can use the `@MODULE_PATHNAME@`
+template in your custom SQL. This value will be replaced with the path to the actual shared object. 
+
+The following example illustrates how this works:
+
+```rust
+#[pg_extern(sql = r#"
+    CREATE OR REPLACE FUNCTION tests."overridden_sql_with_fn_name"() RETURNS void
+    STRICT
+    LANGUAGE c /* Rust */
+    AS '@MODULE_PATHNAME@', '@FUNCTION_NAME@';
+"#)]
+fn overridden_sql_with_fn_name() -> bool {
+    true
+}
+```
+
+### Caveats
+
+There are some scenarios which are entirely incompatible with this feature, because they rely on some global state in
+Postgres, so loading two versions of the shared library will cause trouble.
+
+These scenarios are:
+- when using shared memory
+- when using query planner hooks
