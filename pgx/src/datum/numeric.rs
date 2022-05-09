@@ -14,7 +14,7 @@ use serde::{de, Deserialize, Deserializer, Serialize};
 use serde_json::Number;
 use std::fmt;
 
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 pub struct Numeric(pub String);
 
 impl<'de> Deserialize<'de> for Numeric {

@@ -19,6 +19,7 @@ pub(crate) mod postgres_hash;
 pub(crate) mod postgres_ord;
 pub(crate) mod postgres_type;
 pub(crate) mod schema;
+pub(crate) mod pg_trigger;
 pub(crate) mod to_sql;
 
 pub use aggregate::{
@@ -42,6 +43,7 @@ pub use postgres_hash::{entity::PostgresHashEntity, PostgresHash};
 pub use postgres_ord::{entity::PostgresOrdEntity, PostgresOrd};
 pub use postgres_type::{entity::PostgresTypeEntity, PostgresType};
 pub use schema::{entity::SchemaEntity, Schema};
+pub use pg_trigger::{PgTrigger, entity::PgTriggerEntity};
 pub use to_sql::{entity::ToSqlConfigEntity, ToSql, ToSqlConfig};
 
 pub use crate::ExternArgs;
@@ -79,6 +81,7 @@ pub enum SqlGraphEntity {
     Ord(PostgresOrdEntity),
     Hash(PostgresHashEntity),
     Aggregate(PgAggregateEntity),
+    Trigger(PgTriggerEntity),
 }
 
 impl SqlGraphEntity {
@@ -111,6 +114,7 @@ impl SqlGraphIdentifier for SqlGraphEntity {
             SqlGraphEntity::Ord(item) => item.dot_identifier(),
             SqlGraphEntity::Hash(item) => item.dot_identifier(),
             SqlGraphEntity::Aggregate(item) => item.dot_identifier(),
+            SqlGraphEntity::Trigger(item) => item.dot_identifier(),
             SqlGraphEntity::ExtensionRoot(item) => item.dot_identifier(),
         }
     }
@@ -126,6 +130,7 @@ impl SqlGraphIdentifier for SqlGraphEntity {
             SqlGraphEntity::Ord(item) => item.rust_identifier(),
             SqlGraphEntity::Hash(item) => item.rust_identifier(),
             SqlGraphEntity::Aggregate(item) => item.rust_identifier(),
+            SqlGraphEntity::Trigger(item) => item.rust_identifier(),
             SqlGraphEntity::ExtensionRoot(item) => item.rust_identifier(),
         }
     }
@@ -141,6 +146,7 @@ impl SqlGraphIdentifier for SqlGraphEntity {
             SqlGraphEntity::Ord(item) => item.file(),
             SqlGraphEntity::Hash(item) => item.file(),
             SqlGraphEntity::Aggregate(item) => item.file(),
+            SqlGraphEntity::Trigger(item) => item.file(),
             SqlGraphEntity::ExtensionRoot(item) => item.file(),
         }
     }
@@ -156,6 +162,7 @@ impl SqlGraphIdentifier for SqlGraphEntity {
             SqlGraphEntity::Ord(item) => item.line(),
             SqlGraphEntity::Hash(item) => item.line(),
             SqlGraphEntity::Aggregate(item) => item.line(),
+            SqlGraphEntity::Trigger(item) => item.line(),
             SqlGraphEntity::ExtensionRoot(item) => item.line(),
         }
     }
@@ -217,6 +224,10 @@ impl ToSql for SqlGraphEntity {
                 .to_sql(self, context)
                 .unwrap_or_else(|| item.to_sql(context)),
             SqlGraphEntity::Aggregate(item) => item
+                .to_sql_config
+                .to_sql(self, context)
+                .unwrap_or_else(|| item.to_sql(context)),
+            SqlGraphEntity::Trigger(item) => item
                 .to_sql_config
                 .to_sql(self, context)
                 .unwrap_or_else(|| item.to_sql(context)),

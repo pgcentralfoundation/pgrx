@@ -8,27 +8,11 @@ use std::fmt::{Display, Formatter};
 use std::num::NonZeroUsize;
 
 /// Describes errors that can occur when trying to create a new [PgHeapTuple].
-#[derive(Debug, Copy, Clone)]
-pub enum PgHeapTupleCreationError {
-    NullTuple,
-    IncorrectAttributeCount,
+#[derive(thiserror::Error, Debug, Clone, Copy)]
+pub enum PgHeapTupleError {
+    #[error("Incorrect attribute count, found {0}, descriptor had {1}")]
+    IncorrectAttributeCount(usize, usize),
 }
-
-impl Display for PgHeapTupleCreationError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        match self {
-            PgHeapTupleCreationError::NullTuple => write!(f, "Null tuple"),
-            PgHeapTupleCreationError::IncorrectAttributeCount => {
-                write!(f, "Incorrect attribute count")
-            }
-        }
-    }
-}
-
-impl Error for PgHeapTupleCreationError {}
-
-pub type PgHeapTupleCreationResult<'a, AllocatedBy> =
-    Result<PgHeapTuple<'a, AllocatedBy>, PgHeapTupleCreationError>;
 
 /// A [PgHeapTuple] is a lightweight wrapper around Postgres' [pg_sys::HeapTuple] object and a [PgTupleDesc].
 ///
@@ -76,20 +60,20 @@ impl<'a> PgHeapTuple<'a, AllocatedByPostgres> {
     pub unsafe fn from_trigger_data(
         trigger_data: &'a pg_sys::TriggerData,
         which_tuple: TriggerTuple,
-    ) -> PgHeapTupleCreationResult<'a, AllocatedByPostgres> {
+    ) -> Result<Option<PgHeapTuple<'a, AllocatedByPostgres>>, PgHeapTupleError> {
         let tupdesc =
             PgTupleDesc::from_pg_unchecked(trigger_data.tg_relation.as_ref().unwrap().rd_att);
-
+        
         let tuple = match which_tuple {
             TriggerTuple::Current => trigger_data.tg_trigtuple,
             TriggerTuple::New => trigger_data.tg_newtuple,
         };
 
         if tuple.is_null() {
-            return Err(PgHeapTupleCreationError::NullTuple);
+            return Ok(None)
         }
 
-        Ok(PgHeapTuple::from_heap_tuple(tupdesc, tuple))
+        Ok(Some(PgHeapTuple::from_heap_tuple(tupdesc, tuple)))
     }
 
     /// Consumes a `[PgHeapTuple]` considered to be allocated by Postgres and transforms it into one
@@ -112,7 +96,7 @@ impl<'a> PgHeapTuple<'a, AllocatedByRust> {
     pub fn from_datums<I: IntoIterator<Item = Option<pg_sys::Datum>>>(
         tupdesc: PgTupleDesc<'a>,
         datums: I,
-    ) -> PgHeapTupleCreationResult<'a, AllocatedByRust> {
+    ) -> Result<PgHeapTuple<'a, AllocatedByRust>, PgHeapTupleError> {
         let iter = datums.into_iter();
         let mut datums = Vec::<pg_sys::Datum>::with_capacity(iter.size_hint().1.unwrap_or(1));
         let mut nulls = Vec::<bool>::with_capacity(iter.size_hint().1.unwrap_or(1));
@@ -121,7 +105,7 @@ impl<'a> PgHeapTuple<'a, AllocatedByRust> {
             datums.push(datum.unwrap_or(0.into()));
         });
         if datums.len() != tupdesc.len() {
-            return Err(PgHeapTupleCreationError::IncorrectAttributeCount);
+            return Err(PgHeapTupleError::IncorrectAttributeCount(datums.len(), tupdesc.len()));
         }
 
         unsafe {
@@ -230,6 +214,16 @@ impl<'a> PgHeapTuple<'a, AllocatedByRust> {
             drop(old_tuple);
             Ok(Some(()))
         }
+    }
+}
+
+impl<'a, AllocatedBy: WhoAllocated<pg_sys::HeapTupleData>> IntoDatum for PgHeapTuple<'a, AllocatedBy> {
+    fn into_datum(self) -> Option<pg_sys::Datum> {
+        self.into_datum()
+    }
+
+    fn type_oid() -> pg_sys::Oid {
+        crate::pg_sys::BOXOID
     }
 }
 

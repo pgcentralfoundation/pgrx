@@ -1046,3 +1046,24 @@ Currently `sql` can be provided one of the following:
 pub fn pgx(_attr: TokenStream, item: TokenStream) -> TokenStream {
     item
 }
+
+#[proc_macro_attribute]
+pub fn pg_trigger(_attr: TokenStream, input: TokenStream) -> TokenStream {
+    fn wrapped(input: TokenStream) -> Result<TokenStream, syn::Error> {
+        let trigger_item: pgx_utils::sql_entity_graph::PgTrigger = syn::parse(input)?;
+        
+        let trigger_tokens = trigger_item.to_token_stream();
+
+        Ok(trigger_tokens.into())
+    }
+
+    match wrapped(input) {
+        Ok(tokens) => tokens,
+        Err(e) => {
+            let msg = e.to_string();
+            TokenStream::from(quote! {
+              compile_error!(#msg);
+            })
+        }
+    }
+}

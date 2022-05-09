@@ -35,3 +35,4 @@ tracing-error = "0.2.0"
 tracing-subscriber = { version = "0.3.11", features = [ "env-filter" ] }
 petgraph = "0.6.0"
 prettyplease = "0.1.9"
+dyn-clone = "1"
