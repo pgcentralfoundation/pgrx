@@ -18,6 +18,8 @@ mod tests {
     enum TriggerError {
         #[error("Null OLD found")]
         NullOld,
+        #[error("Null NEW found")]
+        NullNew,
         #[error("PgHeapTuple: {0}")]
         PgHeapTuple(#[from] pgx::heap_tuple::PgHeapTupleError),
         #[error("TryFromDatumError: {0}")]
@@ -110,5 +112,57 @@ mod tests {
             "SELECT booper FROM tests.before_insert_add_field;",
         ).expect("SQL select failed");
         assert_eq!(retval, "Swooper");
+    }
+
+    #[pg_trigger]
+    fn intercept_bears<'a>(trigger: &'a pgx::PgTrigger<'a>) -> Result<
+        Option<PgHeapTuple<'a, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>>,
+        TriggerError
+    > {
+        let new = unsafe {
+            trigger.new()?
+        }.ok_or(TriggerError::NullNew)?;
+
+        for index in 1..(new.len() + 1) {
+            if let Some(val) = new.get_by_index::<&str>(index.try_into()?)? {
+                if val == "Bear" {
+                    // We intercepted a bear! Avoid this update, return `OLD` instead.
+                    let old = unsafe {
+                        trigger.old()?
+                    }.ok_or(TriggerError::NullOld)?;
+                    return Ok(Some(old));
+                }
+            }
+        }
+
+        Ok(Some(new))
+    }
+
+    #[pg_test]
+    fn before_update_skip() {
+        Spi::run(r#"
+            CREATE TABLE tests.before_update_skip (title TEXT)
+        "#);
+
+        Spi::run(r#"
+            CREATE TRIGGER add_field
+                BEFORE UPDATE ON tests.before_update_skip
+                FOR EACH ROW
+                EXECUTE PROCEDURE tests.intercept_bears()
+        "#);
+
+        Spi::run(r#"
+            INSERT INTO tests.before_update_skip (title)
+                VALUES ('Fox')
+        "#);
+        Spi::run(r#"
+            UPDATE tests.before_update_skip SET title = 'Bear'
+                WHERE title = 'Fox'
+        "#);
+
+        let retval = Spi::get_one::<&str>(
+            "SELECT title FROM tests.before_update_skip;",
+        ).expect("SQL select failed");
+        assert_eq!(retval, "Fox");
     }
 }
