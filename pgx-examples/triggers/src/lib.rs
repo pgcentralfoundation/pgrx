@@ -7,7 +7,6 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 use pgx::*;
-use std::error::Error;
 
 pg_module_magic!();
 
@@ -24,7 +23,10 @@ enum TriggerError {
 }
 
 #[pg_trigger]
-fn trigger_example<'a>(trigger: &'a pgx::PgTrigger<'a>) -> Result<Option<PgHeapTuple<'a, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>>, TriggerError> {
+fn trigger_example<'a>(trigger: &'a pgx::PgTrigger<'a>) -> Result<
+    Option<PgHeapTuple<'a, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>>,
+    TriggerError
+> {
     let old = unsafe {
         trigger.old()?
     }.ok_or(TriggerError::NullOld)?;
@@ -39,7 +41,7 @@ fn trigger_example<'a>(trigger: &'a pgx::PgTrigger<'a>) -> Result<Option<PgHeapT
     Ok(Some(current))
 }
 
-/*
+
 extension_sql!(r#"
 CREATE TABLE test (
     id serial8 NOT NULL PRIMARY KEY,
@@ -53,7 +55,7 @@ INSERT INTO test (title, description, payload) VALUES ('the title', 'a descripti
 "#,
     name = "create_trigger",
 );
-*/
+
 
 #[cfg(any(test, feature = "pg_test"))]
 #[pg_schema]

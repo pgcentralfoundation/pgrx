@@ -1,7 +1,7 @@
 pub mod entity;
 
 use quote::{quote, TokenStreamExt};
-use syn::{parse_quote, ItemFn, parse::{ParseStream, Parse}};
+use syn::{ItemFn, parse::{ParseStream, Parse}};
 use proc_macro2::TokenStream as TokenStream2;
 use quote::ToTokens;
 use crate::sql_entity_graph::ToSqlConfig;

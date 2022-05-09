@@ -9,13 +9,14 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 //! Helper functions for working with custom Rust trigger functions
 
-use crate::{is_a, pg_sys, FromDatum, heap_tuple::{PgHeapTuple, PgHeapTupleError}, pgbox::{PgBox, AllocatedByPostgres}, PostgresType, AllocatedByRust};
+use crate::{is_a, pg_sys, heap_tuple::{PgHeapTuple, PgHeapTupleError}, pgbox::{PgBox, AllocatedByPostgres}};
 
 /// The datatype accepted by a trigger
 /// 
 /// A safe structure providing the an API similar to the constants provided in a PL/pgSQL function. The unsafe [`pgx::pg_sys::TriggerData`] (and it's contained [`pgx::pg_sys::Trigger`]) is available in the `trigger_data` field.
 pub struct PgTrigger<'a> {
     trigger_data: PgBox<pgx_pg_sys::TriggerData>,
+    #[allow(dead_code)]
     fcinfo: &'a pg_sys::FunctionCallInfo,
 }
 

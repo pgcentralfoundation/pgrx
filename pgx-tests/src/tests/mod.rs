@@ -36,6 +36,7 @@ mod spi_tests;
 mod srf_tests;
 mod string_tests;
 mod struct_type_tests;
+mod trigger_tests;
 mod uuid_tests;
 mod variadic_tests;
 mod xact_callback_tests;

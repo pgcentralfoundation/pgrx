@@ -1,4 +1,4 @@
-use crate::sql_entity_graph::{SqlGraphEntity, ToSql, PgxSql, PgAggregateEntity, SqlGraphIdentifier, PgExternEntity, ToSqlConfigEntity};
+use crate::sql_entity_graph::{SqlGraphEntity, ToSql, PgxSql, SqlGraphIdentifier, ToSqlConfigEntity};
 use core::{cmp::{Eq, PartialEq, Ord, PartialOrd, Ordering}, hash::Hash, fmt::Debug};
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
@@ -45,15 +45,17 @@ impl ToSql for PgTriggerEntity {
     )]
     fn to_sql(&self, context: &PgxSql) -> eyre::Result<String> {
         let self_index = context.triggers[self];
+        let schema = context.schema_prefix_for(&self_index);
 
-        let sql = format!("\
+        let sql = format!("\n\
             -- {file}:{line}\n\
             -- {full_path}\n\
-            CREATE FUNCTION {function_name}()\n\
+            CREATE FUNCTION {schema}\"{function_name}\"()\n\
                 \tRETURNS TRIGGER\n\
                 \tLANGUAGE c\n\
                 \tAS 'MODULE_PATHNAME', '{wrapper_function_name}';\
         ",
+            schema = schema,
             file = self.file,
             line = self.line,
             full_path = self.full_path,
