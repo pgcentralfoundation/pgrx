@@ -1,6 +1,6 @@
 //! Provides a safe interface to Postgres `HeapTuple` objects.
 use crate::{
-    heap_getattr_raw, pg_sys, AllocatedByPostgres, AllocatedByRust, FromDatum, FromDatumResult,
+    heap_getattr_raw, pg_sys, AllocatedByPostgres, AllocatedByRust, FromDatum,
     IntoDatum, PgBox, PgTupleDesc, TriggerTuple, TryFromDatumError, WhoAllocated,
 };
 use std::num::NonZeroUsize;
@@ -156,7 +156,7 @@ impl<'a> PgHeapTuple<'a, AllocatedByRust> {
     /// - return [TryFromDatumError::NoSuchAttributeName] if the attribute does not exist
     /// - return [TryFromDatumError::IncompatibleTypes] if the Rust type of the `value` is not
     /// compatible with the attribute's Postgres type
-    pub fn set_by_name<T: IntoDatum>(&mut self, attname: &str, value: T) -> FromDatumResult<()> {
+    pub fn set_by_name<T: IntoDatum>(&mut self, attname: &str, value: T) -> Result<(), TryFromDatumError> {
         match self.get_attribute_by_name(attname) {
             None => Err(TryFromDatumError::NoSuchAttributeName(attname.to_string())),
             Some((attnum, _)) => self.set_by_index(attnum, value),
@@ -175,7 +175,7 @@ impl<'a> PgHeapTuple<'a, AllocatedByRust> {
         &mut self,
         attno: NonZeroUsize,
         value: T,
-    ) -> FromDatumResult<()> {
+    ) -> Result<(), TryFromDatumError> {
         unsafe {
             match self.get_attribute_by_index(attno) {
                 None => return Err(TryFromDatumError::NoSuchAttributeNumber(attno)),
@@ -210,7 +210,7 @@ impl<'a> PgHeapTuple<'a, AllocatedByRust> {
             );
             let old_tuple = std::mem::replace(&mut self.tuple, new_tuple);
             drop(old_tuple);
-            Ok(Some(()))
+            Ok(())
         }
     }
 }
@@ -302,7 +302,7 @@ impl<'a, AllocatedBy: WhoAllocated<pg_sys::HeapTupleData>> PgHeapTuple<'a, Alloc
     pub fn get_by_name<T: FromDatum + IntoDatum + 'static>(
         &self,
         attname: &str,
-    ) -> FromDatumResult<T> {
+    ) -> Result<Option<T>, TryFromDatumError> {
         // find the attribute number by name
         for att in self.tupdesc.iter() {
             if att.name() == attname {
@@ -326,7 +326,7 @@ impl<'a, AllocatedBy: WhoAllocated<pg_sys::HeapTupleData>> PgHeapTuple<'a, Alloc
     pub fn get_by_index<T: FromDatum + IntoDatum + 'static>(
         &self,
         attno: NonZeroUsize,
-    ) -> FromDatumResult<T> {
+    ) -> Result<Option<T>, TryFromDatumError> {
         unsafe {
             // tuple descriptor attribute numbers are zero-based
             match self.tupdesc.get(attno.get() - 1) {
