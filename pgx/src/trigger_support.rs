@@ -9,6 +9,8 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 //! Helper functions for working with custom Rust trigger functions
 
+use cstr_core::c_char;
+
 use crate::{is_a, pg_sys, heap_tuple::{PgHeapTuple, PgHeapTupleError}, pgbox::{PgBox, AllocatedByPostgres}};
 
 /// The datatype accepted by a trigger
@@ -48,8 +50,13 @@ impl<'a> PgTrigger<'a> {
         PgHeapTuple::from_trigger_data(&*self.trigger_data, TriggerTuple::Current)
     }
     /// Variable that contains the name of the trigger actually fired
-    pub fn name(&self) -> pg_sys::Name {
-        unimplemented!() // TODO
+    /// 
+    // TODO: This maybe should be `unsafe`...
+    pub unsafe fn name(&self) -> Result<&str, PgTriggerError> {
+        let name_ptr = (*self.trigger_data.tg_trigger).tgname as *mut c_char;
+        let name_cstr = cstr_core::CStr::from_ptr(name_ptr);
+        let name_str = name_cstr.to_str()?;
+        Ok(name_str)
     }
     /// When the trigger was triggered (`BEFORE`, `AFTER`, `INSTEAD OF`)
     // Derived from `pgx_pg_sys::TriggerData.tg_event`
@@ -67,9 +74,9 @@ impl<'a> PgTrigger<'a> {
         PgTriggerOperation::try_from(TriggerEvent(self.trigger_data.tg_event))
     }
     /// the object ID of the table that caused the trigger invocation
-    // Derived from `pgx_pg_sys::TriggerData.pg_relation.rd_oid`
-    pub fn relid(&self) -> pg_sys::Oid {
-        unimplemented!() // TODO
+    // Derived from `pgx_pg_sys::TriggerData.tg_relation.rd_id`
+    pub unsafe fn relid(&self) -> pg_sys::Oid {
+        (*self.trigger_data.tg_relation).rd_id
     }
     // #[deprecated = "The name of the table that caused the trigger invocation. This is now deprecated, and could disappear in a future release. Use TG_TABLE_NAME instead."]
     // tg_relname: &'a str,
@@ -124,6 +131,16 @@ impl TryFrom<TriggerEvent> for PgTriggerWhen {
     }
 }
 
+impl ToString for PgTriggerWhen {
+    fn to_string(&self) -> String {
+        match self {
+            PgTriggerWhen::Before => "BEFORE",
+            PgTriggerWhen::After => "AFTER",
+            PgTriggerWhen::InsteadOf => "INSTEAD OF",
+        }.to_string()
+    }
+}
+
 /// The level of a trigger
 /// 
 /// Maps from a `TEXT` of `ROW` or `STATEMENT`.
@@ -144,6 +161,15 @@ impl From<TriggerEvent> for PgTriggerLevel {
             0 => PgTriggerLevel::Statement,
             _ => PgTriggerLevel::Row,
         }
+    }
+}
+
+impl ToString for PgTriggerLevel {
+    fn to_string(&self) -> String {
+        match self {
+            PgTriggerLevel::Statement => "STATEMENT",
+            PgTriggerLevel::Row => "ROW",
+        }.to_string() 
     }
 }
 
@@ -178,6 +204,17 @@ impl TryFrom<TriggerEvent> for PgTriggerOperation {
     }
 }
 
+impl ToString for PgTriggerOperation {
+    fn to_string(&self) -> String {
+        match self {
+            PgTriggerOperation::Insert => "INSERT",
+            PgTriggerOperation::Update => "UPDATE",
+            PgTriggerOperation::Delete => "DELETE",
+            PgTriggerOperation::Truncate => "TRUNCATE",
+        }.to_string() 
+    }
+}
+
 #[derive(thiserror::Error, Debug, Clone, Copy)]
 pub enum PgTriggerError {
     #[error("`PgTrigger`s can only be built from `FunctionCallInfo` instances which `pgx::pg_sys::called_as_trigger(fcinfo)` returns `true`")]
@@ -188,6 +225,8 @@ pub enum PgTriggerError {
     InvalidPgTriggerWhen(u32),
     #[error("`InvalidPgTriggerOperation` cannot be built from `event & TRIGGER_EVENT_OPMASK` of `{0}")]
     InvalidPgTriggerOperation(u32),
+    #[error("Utf8Error: {0}")]
+    Utf8(#[from] core::str::Utf8Error),
 }
 
 /// Indicates which trigger tuple to convert into a [crate::PgHeapTuple].
