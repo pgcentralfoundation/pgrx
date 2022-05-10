@@ -26,6 +26,8 @@ mod tests {
         TryFromDatum(#[from] pgx::datum::TryFromDatumError),
         #[error("TryFromIntError: {0}")]
         TryFromInt(#[from] std::num::TryFromIntError),
+        #[error("PgTrigger error: {0}")]
+        PgTrigger(#[from] pgx::trigger_support::PgTriggerError),
     }
 
     #[pg_trigger]
@@ -164,5 +166,106 @@ mod tests {
             "SELECT title FROM tests.before_update_skip;",
         ).expect("SQL select failed");
         assert_eq!(retval, "Fox");
+    }
+
+
+
+    #[pg_trigger]
+    fn inserts_trigger_metadata<'a>(trigger: &'a pgx::PgTrigger<'a>) -> Result<
+        Option<PgHeapTuple<'a, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>>,
+        TriggerError
+    > {
+        let new = unsafe {
+            trigger.new()?
+        };
+        let current = if let Some(new) = unsafe { trigger.new()? } {
+            new
+        } else {
+            unsafe { trigger.old()? }.ok_or(TriggerError::NullOld)?
+        };
+        let mut current = current.into_owned();
+
+        let trigger_name = unsafe { trigger.name()? };
+        pgx::log!("trigger_name: {:?}", trigger_name);
+        current.set_by_name("trigger_name", trigger_name)?;
+
+        let trigger_when = trigger.when()?.to_string();
+        pgx::log!("trigger_when: {:?}", trigger_when);
+        current.set_by_name("trigger_when", trigger_when)?;
+
+        let trigger_level = trigger.level().to_string();
+        pgx::log!("trigger_level: {:?}", trigger_level);
+        current.set_by_name("trigger_level", trigger_level)?;
+
+        let trigger_op = trigger.op()?.to_string();
+        pgx::log!("trigger_op: {:?}", trigger_op);
+        current.set_by_name("trigger_op", trigger_op)?;
+
+        let trigger_relid = unsafe { trigger.relid() };
+        pgx::log!("trigger_relid: {:?}", trigger_relid);
+        current.set_by_name("trigger_relid", trigger_relid)?;
+
+        // let trigger_table_name = trigger.table_name();
+        // pgx::log!("trigger_table_name: {:?}", trigger_table_name);
+        // current.set_by_name("trigger_table_name", trigger_table_name)?;
+
+        // let trigger_table_schema = trigger.table_schema();
+        // pgx::log!("trigger_table_schema: {:?}", trigger_table_schema);
+        // current.set_by_name("trigger_table_schema", trigger_table_schema)?;
+
+        // let trigger_extra_args = trigger.extra_args();
+        // pgx::log!("trigger_extra_args: {:?}", trigger_extra_args);
+        // current.set_by_name("trigger_extra_args", trigger_extra_args)?;
+        
+        Ok(Some(current))
+    }
+
+    #[pg_test]
+    fn before_insert_metadata() {
+        Spi::run(r#"
+            CREATE TABLE tests.before_insert_trigger_metadata (
+                marker TEXT,
+                trigger_name TEXT,
+                trigger_when TEXT,
+                trigger_level TEXT,
+                trigger_op TEXT,
+                trigger_relid OID,
+                trigger_table_name TEXT,
+                trigger_table_schema TEXT,
+                trigger_extra_args TEXT[]
+            )
+        "#);
+
+        Spi::run(r#"
+            CREATE TRIGGER insert_trigger_metadata
+                BEFORE INSERT ON tests.before_insert_trigger_metadata
+                FOR EACH ROW
+                EXECUTE PROCEDURE tests.inserts_trigger_metadata()
+        "#);
+
+        Spi::run(r#"
+            INSERT INTO tests.before_insert_trigger_metadata (marker)
+                VALUES ('Fox')
+        "#);
+
+        let marker = Spi::get_one::<&str>("SELECT marker FROM tests.before_insert_trigger_metadata;");
+        let trigger_name = Spi::get_one::<&str>("SELECT trigger_name FROM tests.before_insert_trigger_metadata;");
+        let trigger_when = Spi::get_one::<&str>("SELECT trigger_when FROM tests.before_insert_trigger_metadata;");
+        let trigger_level = Spi::get_one::<&str>("SELECT trigger_level FROM tests.before_insert_trigger_metadata;");
+        let trigger_op = Spi::get_one::<&str>("SELECT trigger_op FROM tests.before_insert_trigger_metadata;");
+        let trigger_relid = Spi::get_one::<pg_sys::Oid>("SELECT trigger_relid FROM tests.before_insert_trigger_metadata;");
+        let trigger_table_name = Spi::get_one::<&str>("SELECT trigger_table_name FROM tests.before_insert_trigger_metadata;");
+        let trigger_table_schema = Spi::get_one::<&str>("SELECT trigger_table_schema FROM tests.before_insert_trigger_metadata;");
+        let trigger_extra_args = Spi::get_one::<&str>("SELECT trigger_extra_args FROM tests.before_insert_trigger_metadata;");
+        
+        assert_eq!(marker, Some("Fox"));
+        assert_eq!(trigger_name, Some("insert_trigger_metadata"));
+        assert_eq!(trigger_when, Some("BEFORE"));
+        assert_eq!(trigger_level, Some("ROW"));
+        assert_eq!(trigger_op, Some("INSERT"));
+        assert!(trigger_relid.is_some());
+        assert_eq!(trigger_table_name, Some("Fox"));
+        assert_eq!(trigger_table_schema, Some("Fox"));
+        assert_eq!(trigger_extra_args, Some("Fox"));
     }
 }
