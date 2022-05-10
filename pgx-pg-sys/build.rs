@@ -156,8 +156,9 @@ fn main() -> color_eyre::Result<()> {
                     &bindings_file,
                     quote! {
                         use crate as pg_sys;
-                        use crate::{Datum, NullableDatum};
-                        use crate::PgNode;
+                        #[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14"))]
+                        use crate::NullableDatum;
+                        use crate::{PgNode, Datum};
                     },
                 )
                 .wrap_err_with(|| {
