@@ -43,7 +43,7 @@ pub use postgres_hash::{entity::PostgresHashEntity, PostgresHash};
 pub use postgres_ord::{entity::PostgresOrdEntity, PostgresOrd};
 pub use postgres_type::{entity::PostgresTypeEntity, PostgresType};
 pub use schema::{entity::SchemaEntity, Schema};
-pub use pg_trigger::{PgTrigger, entity::PgTriggerEntity};
+pub use pg_trigger::{PgTrigger, entity::PgTriggerEntity, attribute::PgTriggerAttribute};
 pub use to_sql::{entity::ToSqlConfigEntity, ToSql, ToSqlConfig};
 
 pub use crate::ExternArgs;

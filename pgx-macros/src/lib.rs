@@ -1048,16 +1048,18 @@ pub fn pgx(_attr: TokenStream, item: TokenStream) -> TokenStream {
 }
 
 #[proc_macro_attribute]
-pub fn pg_trigger(_attr: TokenStream, input: TokenStream) -> TokenStream {
-    fn wrapped(input: TokenStream) -> Result<TokenStream, syn::Error> {
-        let trigger_item: pgx_utils::sql_entity_graph::PgTrigger = syn::parse(input)?;
-        
+pub fn pg_trigger(attrs: TokenStream, input: TokenStream) -> TokenStream {
+    fn wrapped(attrs: TokenStream, input: TokenStream) -> Result<TokenStream, syn::Error> {
+        use syn::{Token, punctuated::Punctuated, parse::Parser};
+        let attributes = Punctuated::<pgx_utils::sql_entity_graph::PgTriggerAttribute, Token![,]>::parse_terminated.parse(attrs)?;
+        let item_fn: syn::ItemFn = syn::parse(input)?;
+        let trigger_item = pgx_utils::sql_entity_graph::PgTrigger::new(item_fn, attributes)?;
         let trigger_tokens = trigger_item.to_token_stream();
 
         Ok(trigger_tokens.into())
     }
 
-    match wrapped(input) {
+    match wrapped(attrs, input) {
         Ok(tokens) => tokens,
         Err(e) => {
             let msg = e.to_string();

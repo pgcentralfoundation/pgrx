@@ -1,26 +1,49 @@
 pub mod entity;
+pub mod attribute;
 
 use quote::{quote, TokenStreamExt};
-use syn::{ItemFn, parse::{ParseStream, Parse}};
-use proc_macro2::TokenStream as TokenStream2;
+use syn::{ItemFn, Token};
+use proc_macro2::{TokenStream as TokenStream2, Span};
 use quote::ToTokens;
+use attribute::PgTriggerAttribute;
 use crate::sql_entity_graph::ToSqlConfig;
 
 #[derive(Debug, Clone)]
 pub struct PgTrigger {
     func: syn::ItemFn,
-    to_sql_config: ToSqlConfig,
+    attributes: syn::punctuated::Punctuated<PgTriggerAttribute, Token![,]>,
 }
 
 impl PgTrigger {
-    pub fn new(func: ItemFn) -> Result<Self, syn::Error> {
-        let to_sql_config =
-            ToSqlConfig::from_attributes(func.attrs.as_slice())?.unwrap_or_default();
-        
+    pub fn new(func: ItemFn, attributes: syn::punctuated::Punctuated<PgTriggerAttribute, Token![,]>) -> Result<Self, syn::Error> {        
         Ok(Self {
             func,
-            to_sql_config
+            attributes
         })
+    }
+
+    pub fn to_sql_config(&self) -> Result<Option<ToSqlConfig>, syn::Error> {
+        let mut found = None;
+        for attribute in self.attributes.iter() {
+            match attribute {
+                &PgTriggerAttribute::Sql(ref to_sql_config) if found.is_none() => found = Some(to_sql_config.clone()),
+                &PgTriggerAttribute::Sql(_) if found.is_some() => return Err(syn::Error::new(Span::call_site(), "Multiple `sql` arguments found, it must be unique")),
+                _ => (),
+            }
+        }
+
+        if let Some(ref mut found) = found {
+            if let Some(ref mut content) = found.content {
+                let value = content.value();
+                let updated_value = value.replace(
+                    "@FUNCTION_NAME@",
+                    &*(self.func.sig.ident.to_string() + "_wrapper"),
+                ) + "\n";
+                *content = syn::LitStr::new(&updated_value, Span::call_site());
+            }
+        }
+
+        Ok(found)
     }
 
     pub fn entity_tokens(&self) -> Result<ItemFn, syn::Error> {
@@ -30,7 +53,7 @@ impl PgTrigger {
         );
         let func_sig_ident = &self.func.sig.ident;
         let function_name = func_sig_ident.to_string();
-        let to_sql_config = &self.to_sql_config;
+        let to_sql_config = self.to_sql_config()?.unwrap_or_default();
 
         let tokens = quote! {
             #[no_mangle]
@@ -67,13 +90,12 @@ impl PgTrigger {
                 let maybe_pg_trigger = unsafe { ::pgx::trigger_support::PgTrigger::from_fcinfo(fcinfo) };
                 let pg_trigger = maybe_pg_trigger.expect("PgTrigger::from_fcinfo failed");
                 let trigger_fn_result: Result<
-                    Option<::pgx::PgHeapTuple<'_, _>>,
+                    ::pgx::PgHeapTuple<'_, _>,
                     _,
                 > = #function_ident(&pg_trigger);
             
                 let trigger_retval = trigger_fn_result.expect("Trigger function panic");
                 let retval_datum = trigger_retval.into_datum();
-
                 retval_datum.expect("Failed to turn trigger function return value into Datum")
             }
             
@@ -95,12 +117,6 @@ impl PgTrigger {
             }
         };
         syn::parse2(tokens)
-    }
-}
-
-impl Parse for PgTrigger {
-    fn parse(input: ParseStream) -> Result<Self, syn::Error> {
-        Self::new(input.parse()?)
     }
 }
 

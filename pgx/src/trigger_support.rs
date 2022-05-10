@@ -12,6 +12,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 use cstr_core::c_char;
 
 use crate::{PgRelation, is_a, pg_sys, heap_tuple::{PgHeapTuple, PgHeapTupleError}, pgbox::{PgBox, AllocatedByPostgres}};
+use std::borrow::Borrow;
 
 /// The datatype accepted by a trigger
 /// 
@@ -45,14 +46,24 @@ impl PgTrigger {
         })
     }
 
-    /// Variable holding the new database row for INSERT/UPDATE operations in row-level triggers. This variable is `None` in statement-level triggers and for DELETE operations
+    /// A reference to the underlaying trigger data
+    pub fn trigger_data(&self) -> &pgx_pg_sys::TriggerData {
+        self.trigger_data.borrow()
+    }
+
+    /// A reference to the underlaying fcinfo
+    pub fn fcinfo(&self) -> &pg_sys::FunctionCallInfo {
+        self.fcinfo.borrow()
+    }
+
+    /// The new HeapTuple
     // Derived from `pgx_pg_sys::TriggerData.tg_newtuple` and `pgx_pg_sys::TriggerData.tg_newslot.tts_tupleDescriptor`
     pub unsafe fn new(&self) -> Result<Option<PgHeapTuple<'_, AllocatedByPostgres>>, PgHeapTupleError> {
         PgHeapTuple::from_trigger_data(&*self.trigger_data, TriggerTuple::New)
     }
-    /// Variable holding the old database row for UPDATE/DELETE operations in row-level triggers. This variable is `None` in statement-level triggers and for INSERT operations
+    /// The current HeapTuple
     // Derived from `pgx_pg_sys::TriggerData.tg_trigtuple` and `pgx_pg_sys::TriggerData.tg_trigslot.tts_tupleDescriptor`
-    pub unsafe fn old(&self) -> Result<Option<PgHeapTuple<'_, AllocatedByPostgres>>, PgHeapTupleError> {
+    pub unsafe fn current(&self) -> Result<Option<PgHeapTuple<'_, AllocatedByPostgres>>, PgHeapTupleError> {
         PgHeapTuple::from_trigger_data(&*self.trigger_data, TriggerTuple::Current)
     }
     /// Variable that contains the name of the trigger actually fired
@@ -84,15 +95,20 @@ impl PgTrigger {
     }
     /// the object ID of the table that caused the trigger invocation
     // Derived from `pgx_pg_sys::TriggerData.tg_relation.rd_id`
-    pub unsafe fn relid(&self) -> pg_sys::Oid {
-        (*self.trigger_data.tg_relation).rd_id
+    pub unsafe fn relid(&self) -> Result<pg_sys::Oid, PgTriggerError> {
+        let relation_data_ptr = self.trigger_data.tg_relation;
+        if relation_data_ptr.is_null() {
+            return Err(PgTriggerError::NullRelation);
+        }
+        let relation_data = *relation_data_ptr;
+        Ok(relation_data.rd_id)
     }
     // #[deprecated = "The name of the table that caused the trigger invocation. This is now deprecated, and could disappear in a future release. Use TG_TABLE_NAME instead."]
     // tg_relname: &'a str,
 
     /// The name of the old transition table of this trigger invocation
     // Derived from `pgx_pg_sys::TriggerData.trigger.tgoldtable`
-    pub unsafe fn old_transition_table_name(&self) -> Result<Option<String>, PgTriggerError>  {
+    pub unsafe fn old_transition_table_name(&self) -> Result<Option<&str>, PgTriggerError>  {
         let trigger_ptr = self.trigger_data.tg_trigger;
         if trigger_ptr.is_null() {
             return Err(PgTriggerError::NullTrigger);
@@ -102,14 +118,14 @@ impl PgTrigger {
         if !tgoldtable.is_null() {
             let table_name_cstr = cstr_core::CStr::from_ptr(tgoldtable);
             let table_name_str = table_name_cstr.to_str()?;
-            Ok(Some(table_name_str.to_string()))
+            Ok(Some(table_name_str))
         } else {
             Ok(None)
         }
     }
     /// The name of the new transition table of this trigger invocation
     // Derived from `pgx_pg_sys::TriggerData.trigger.tgoldtable`
-    pub unsafe fn new_transition_table_name(&self) -> Result<Option<String>, PgTriggerError>  {
+    pub unsafe fn new_transition_table_name(&self) -> Result<Option<&str>, PgTriggerError>  {
         let trigger_ptr = self.trigger_data.tg_trigger;
         if trigger_ptr.is_null() {
             return Err(PgTriggerError::NullTrigger);
@@ -119,7 +135,7 @@ impl PgTrigger {
         if !tgnewtable.is_null() {
             let table_name_cstr = cstr_core::CStr::from_ptr(tgnewtable);
             let table_name_str = table_name_cstr.to_str()?;
-            Ok(Some(table_name_str.to_string()))
+            Ok(Some(table_name_str))
         } else {
             Ok(None)
         }

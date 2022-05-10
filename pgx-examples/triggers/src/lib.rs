@@ -24,11 +24,11 @@ enum TriggerError {
 
 #[pg_trigger]
 fn trigger_example(trigger: &pgx::PgTrigger) -> Result<
-    Option<PgHeapTuple<'_, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>>,
+    PgHeapTuple<'_, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>,
     TriggerError
 > {
     let old = unsafe {
-        trigger.old()?
+        trigger.current()?
     }.ok_or(TriggerError::NullOld)?;
 
     let mut current = old.into_owned();
@@ -38,7 +38,7 @@ fn trigger_example(trigger: &pgx::PgTrigger) -> Result<
         current.set_by_index(index, "Bear")?;
     }
 
-    Ok(Some(current))
+    Ok(current)
 }
 
 

@@ -14,10 +14,77 @@ mod tests {
     use crate as pgx_tests;
     use pgx::*;
 
+    /// Test some various formats of trigger signature we expect to support
+    /// 
+    /// These tests don't run, but they get built to SQL and compile checked.
+    #[pgx::pg_schema]
+    mod trigger_signature_compile_tests {
+        use pgx::{AllocatedByPostgres, AllocatedByRust};
+
+        use super::*;
+
+        #[pg_trigger]
+        fn signature_standard(trigger: &pgx::PgTrigger) -> Result<
+            PgHeapTuple<'_, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>,
+            pgx::PgHeapTupleError,
+        > {
+            Ok(unsafe { trigger.current() }?.unwrap().into_owned())
+        }
+
+        #[pg_trigger]
+        fn signature_explicit_lifetimes<'a>(trigger: &'a pgx::PgTrigger) -> Result<
+            PgHeapTuple<'a, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>,
+            pgx::PgHeapTupleError,
+        > {
+            Ok(unsafe { trigger.current() }?.unwrap().into_owned())
+        }
+
+        #[pg_trigger]
+        fn signature_alloc_by_postgres(trigger: &pgx::PgTrigger) -> Result<
+            PgHeapTuple<'_, AllocatedByPostgres>,
+            pgx::PgHeapTupleError,
+        > {
+            Ok(unsafe { trigger.current() }?.unwrap())
+        }
+
+        #[pg_trigger]
+        fn signature_alloc_by_rust(trigger: &pgx::PgTrigger) -> Result<
+            PgHeapTuple<'_, AllocatedByRust>,
+            pgx::PgHeapTupleError,
+        > {
+            Ok(unsafe { trigger.current() }?.unwrap().into_owned())
+        }
+
+
+        // Check type aliases
+        type AliasedBorrowedPgTrigger<'a> = &'a pgx::PgTrigger;
+
+        #[pg_trigger]
+        fn signature_aliased_argument<'a>(trigger: AliasedBorrowedPgTrigger<'a>) -> Result<
+            PgHeapTuple<'a, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>,
+            core::str::Utf8Error,
+        > {
+            Ok(unsafe { trigger.current() }.unwrap().unwrap().into_owned())
+        }
+
+
+        type AliasedTriggerResult<'a> = Result<
+            PgHeapTuple<'a, AllocatedByRust>,
+            TriggerError
+        >;
+
+        #[pg_trigger]
+        fn signature_aliased_return(_trigger: &pgx::PgTrigger) -> AliasedTriggerResult<'_> { unimplemented!("Only testing signature compiles") } 
+
+        #[pg_trigger]
+        fn signature_aliased_both(_trigger: AliasedBorrowedPgTrigger) -> AliasedTriggerResult<'_> { unimplemented!("Only testing signature compiles") } 
+    }
+    
+
     #[derive(thiserror::Error, Debug)]
     enum TriggerError {
         #[error("Null OLD found")]
-        NullOld,
+        NullCurrent,
         #[error("Null NEW found")]
         NullNew,
         #[error("PgHeapTuple: {0}")]
@@ -32,21 +99,19 @@ mod tests {
 
     #[pg_trigger]
     fn field_species_fox_to_bear(trigger: &pgx::PgTrigger) -> Result<
-        Option<PgHeapTuple<'_, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>>,
+        PgHeapTuple<'_, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>,
         TriggerError
     > {
-        let old = unsafe {
-            trigger.old()?
-        }.ok_or(TriggerError::NullOld)?;
+        let current = unsafe { trigger.current()? }.ok_or(TriggerError::NullCurrent)?;
+        let mut current = current.into_owned();
 
-        let mut current = old.into_owned();
         let field = "species";
 
         if current.get_by_name(field)? == Some("Fox") {
             current.set_by_name(field, "Bear")?;
         }
 
-        Ok(Some(current))
+        Ok(current)
     }
 
     #[pg_test]
@@ -75,21 +140,19 @@ mod tests {
 
     #[pg_trigger]
     fn add_field_boopers(trigger: &pgx::PgTrigger) -> Result<
-        Option<PgHeapTuple<'_, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>>,
+        PgHeapTuple<'_, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>,
         TriggerError
     > {
-        let old = unsafe {
-            trigger.old()?
-        }.ok_or(TriggerError::NullOld)?;
+        let current = unsafe { trigger.current()? }.ok_or(TriggerError::NullCurrent)?;
+        let mut current = current.into_owned();
 
-        let mut current = old.into_owned();
         let field = "booper";
 
         if current.get_by_name(field)? == Option::<&str>::None {
             current.set_by_name(field, "Swooper")?;
         }
 
-        Ok(Some(current))
+        Ok(current)
     }
 
     #[pg_test]
@@ -118,26 +181,24 @@ mod tests {
 
     #[pg_trigger]
     fn intercept_bears(trigger: &pgx::PgTrigger) -> Result<
-        Option<PgHeapTuple<'_, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>>,
+        PgHeapTuple<'_, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>,
         TriggerError
     > {
-        let new = unsafe {
-            trigger.new()?
-        }.ok_or(TriggerError::NullNew)?;
+        let new = unsafe { trigger.new()? }.ok_or(TriggerError::NullCurrent)?;
 
         for index in 1..(new.len() + 1) {
             if let Some(val) = new.get_by_index::<&str>(index.try_into()?)? {
                 if val == "Bear" {
-                    // We intercepted a bear! Avoid this update, return `OLD` instead.
+                    // We intercepted a bear! Avoid this update, return `current` instead.
                     let old = unsafe {
-                        trigger.old()?
-                    }.ok_or(TriggerError::NullOld)?;
-                    return Ok(Some(old));
+                        trigger.current()?
+                    }.ok_or(TriggerError::NullCurrent)?;
+                    return Ok(old);
                 }
             }
         }
 
-        Ok(Some(new))
+        Ok(new)
     }
 
     #[pg_test]
@@ -172,17 +233,10 @@ mod tests {
 
     #[pg_trigger]
     fn inserts_trigger_metadata(trigger: &pgx::PgTrigger) -> Result<
-        Option<PgHeapTuple<'_, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>>,
+        PgHeapTuple<'_, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>,
         TriggerError
     > {
-        let new = unsafe {
-            trigger.new()?
-        };
-        let current = if let Some(new) = unsafe { trigger.new()? } {
-            new
-        } else {
-            unsafe { trigger.old()? }.ok_or(TriggerError::NullOld)?
-        };
+        let current = unsafe { trigger.current()? }.ok_or(TriggerError::NullCurrent)?;
         let mut current = current.into_owned();
 
         let trigger_name = unsafe { trigger.name()? };
@@ -197,7 +251,7 @@ mod tests {
         let trigger_op = trigger.op()?.to_string();
         current.set_by_name("trigger_op", trigger_op)?;
 
-        let trigger_relid = unsafe { trigger.relid() };
+        let trigger_relid = unsafe { trigger.relid()? };
         current.set_by_name("trigger_relid", trigger_relid)?;
 
         let trigger_old_transition_table_name = unsafe { trigger.old_transition_table_name()? };
@@ -215,7 +269,7 @@ mod tests {
         let trigger_extra_args = unsafe { trigger.extra_args()? };
         current.set_by_name("trigger_extra_args", trigger_extra_args)?;
         
-        Ok(Some(current))
+        Ok(current)
     }
 
     #[pg_test]
@@ -271,5 +325,109 @@ mod tests {
         assert_eq!(trigger_table_name, Some("before_insert_trigger_metadata"));
         assert_eq!(trigger_table_schema, Some("tests"));
         assert_eq!(trigger_extra_args, Some(vec!["Bears".to_string(), "Dogs".to_string()]));
+    }
+
+    #[pg_trigger(sql = r#"
+        CREATE FUNCTION tests."has_sql_option_set_and_respects_it"()
+        RETURNS TRIGGER
+        LANGUAGE c
+        AS 'MODULE_PATHNAME', '@FUNCTION_NAME@';
+    "#)]
+    fn has_sql_option_set(trigger: &pgx::PgTrigger) -> Result<
+        PgHeapTuple<'_, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>,
+        TriggerError
+    > {
+        let current = unsafe { trigger.current()? }.ok_or(TriggerError::NullCurrent)?;
+        let current = current.into_owned();
+
+        Ok(current)
+    }
+
+    #[pg_test]
+    fn before_insert_has_sql_option_set() {
+        Spi::run(r#"
+            CREATE TABLE tests.has_sql_option_set (species TEXT)
+        "#);
+
+        Spi::run(r#"
+            CREATE TRIGGER has_sql_option_set
+                BEFORE INSERT ON tests.has_sql_option_set
+                FOR EACH ROW
+                EXECUTE PROCEDURE tests.has_sql_option_set_and_respects_it()
+        "#);
+
+        Spi::run(r#"
+            INSERT INTO tests.has_sql_option_set (species)
+                VALUES ('Fox')
+        "#);
+
+        let retval = Spi::get_one::<&str>(
+            "SELECT species FROM tests.has_sql_option_set;",
+        ).expect("SQL select failed");
+        assert_eq!(retval, "Fox");
+    }
+
+    #[pg_trigger]
+    fn noop_postgres(trigger: &pgx::PgTrigger) -> Result<
+        PgHeapTuple<'_, AllocatedByPostgres>,
+        TriggerError
+    > {
+        Ok(unsafe { trigger.current() }?.unwrap())
+    }
+
+    #[pg_test]
+    fn before_insert_noop_postgres() {
+        Spi::run(r#"
+            CREATE TABLE tests.has_noop_postgres (species TEXT)
+        "#);
+
+        Spi::run(r#"
+            CREATE TRIGGER noop_postgres
+                BEFORE INSERT ON tests.has_noop_postgres
+                FOR EACH ROW
+                EXECUTE PROCEDURE tests.noop_postgres()
+        "#);
+
+        Spi::run(r#"
+            INSERT INTO tests.has_noop_postgres (species)
+                VALUES ('Fox')
+        "#);
+
+        let retval = Spi::get_one::<&str>(
+            "SELECT species FROM tests.has_noop_postgres;",
+        ).expect("SQL select failed");
+        assert_eq!(retval, "Fox");
+    }
+
+    #[pg_trigger]
+    fn noop_rust(trigger: &pgx::PgTrigger) -> Result<
+        PgHeapTuple<'_, AllocatedByRust>,
+        TriggerError
+    > {
+        Ok(unsafe { trigger.current() }?.unwrap().into_owned())
+    }
+
+    #[pg_test]
+    fn before_insert_noop_rust() {
+        Spi::run(r#"
+            CREATE TABLE tests.has_noop_rust (species TEXT)
+        "#);
+
+        Spi::run(r#"
+            CREATE TRIGGER noop_postgres
+                BEFORE INSERT ON tests.has_noop_rust
+                FOR EACH ROW
+                EXECUTE PROCEDURE tests.noop_rust()
+        "#);
+
+        Spi::run(r#"
+            INSERT INTO tests.has_noop_rust (species)
+                VALUES ('Fox')
+        "#);
+
+        let retval = Spi::get_one::<&str>(
+            "SELECT species FROM tests.has_noop_rust;",
+        ).expect("SQL select failed");
+        assert_eq!(retval, "Fox");
     }
 }
