@@ -23,7 +23,7 @@ semver = "1.0.9"
 owo-colors = { version = "3.4.0", features = [ "supports-colors" ] }
 env_proxy = "0.4.1"
 num_cpus = "1.13.1"
-pgx-utils = { path = "../pgx-utils", version = "0.4.4" }
+pgx-utils = { path = "../pgx-utils", version = "=0.4.4" }
 proc-macro2 = { version = "1.0.37", features = [ "span-locations" ] }
 quote = "1.0.18"
 rayon = "1.5.2"
