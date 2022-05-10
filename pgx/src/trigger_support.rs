@@ -11,26 +11,32 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 use cstr_core::c_char;
 
-use crate::{is_a, pg_sys, heap_tuple::{PgHeapTuple, PgHeapTupleError}, pgbox::{PgBox, AllocatedByPostgres}};
+use crate::{PgRelation, is_a, pg_sys, heap_tuple::{PgHeapTuple, PgHeapTupleError}, pgbox::{PgBox, AllocatedByPostgres}};
 
 /// The datatype accepted by a trigger
 /// 
 /// A safe structure providing the an API similar to the constants provided in a PL/pgSQL function. The unsafe [`pgx::pg_sys::TriggerData`] (and it's contained [`pgx::pg_sys::Trigger`]) is available in the `trigger_data` field.
-pub struct PgTrigger<'a> {
+pub struct PgTrigger {
     trigger_data: PgBox<pgx_pg_sys::TriggerData>,
     #[allow(dead_code)]
-    fcinfo: &'a pg_sys::FunctionCallInfo,
+    fcinfo: pg_sys::FunctionCallInfo,
 }
 
-impl<'a> PgTrigger<'a> {
-    pub unsafe fn from_fcinfo(fcinfo: &'a pg_sys::FunctionCallInfo) -> Result<Self, PgTriggerError> {
-        if !called_as_trigger(*fcinfo) {
+impl PgTrigger {
+    pub unsafe fn from_fcinfo(fcinfo: pg_sys::FunctionCallInfo) -> Result<Self, PgTriggerError> {
+        if fcinfo.is_null() {
+            return Err(PgTriggerError::NullFunctionCallInfo);
+        }
+        if !called_as_trigger(fcinfo) {
             return Err(PgTriggerError::NotTrigger)
         }
-        let fcinfo_ref = (*fcinfo).as_ref().ok_or(PgTriggerError::NullFunctionCallInfo)?;
+        let fcinfo_data = &*fcinfo;
 
+        if fcinfo_data.context.is_null() {
+            return Err(PgTriggerError::NullTriggerData);
+        }
         let trigger_data: PgBox<pg_sys::TriggerData> = PgBox::from_pg(
-            fcinfo_ref.context as *mut pg_sys::TriggerData,
+            fcinfo_data.context as *mut pg_sys::TriggerData,
         );
 
         Ok(Self {
@@ -41,19 +47,22 @@ impl<'a> PgTrigger<'a> {
 
     /// Variable holding the new database row for INSERT/UPDATE operations in row-level triggers. This variable is `None` in statement-level triggers and for DELETE operations
     // Derived from `pgx_pg_sys::TriggerData.tg_newtuple` and `pgx_pg_sys::TriggerData.tg_newslot.tts_tupleDescriptor`
-    pub unsafe fn new(&'a self) -> Result<Option<PgHeapTuple<'a, AllocatedByPostgres>>, PgHeapTupleError> {
+    pub unsafe fn new(&self) -> Result<Option<PgHeapTuple<'_, AllocatedByPostgres>>, PgHeapTupleError> {
         PgHeapTuple::from_trigger_data(&*self.trigger_data, TriggerTuple::New)
     }
     /// Variable holding the old database row for UPDATE/DELETE operations in row-level triggers. This variable is `None` in statement-level triggers and for INSERT operations
     // Derived from `pgx_pg_sys::TriggerData.tg_trigtuple` and `pgx_pg_sys::TriggerData.tg_trigslot.tts_tupleDescriptor`
-    pub unsafe fn old(&'a self) -> Result<Option<PgHeapTuple<'a, AllocatedByPostgres>>, PgHeapTupleError> {
+    pub unsafe fn old(&self) -> Result<Option<PgHeapTuple<'_, AllocatedByPostgres>>, PgHeapTupleError> {
         PgHeapTuple::from_trigger_data(&*self.trigger_data, TriggerTuple::Current)
     }
     /// Variable that contains the name of the trigger actually fired
-    /// 
-    // TODO: This maybe should be `unsafe`...
     pub unsafe fn name(&self) -> Result<&str, PgTriggerError> {
-        let name_ptr = (*self.trigger_data.tg_trigger).tgname as *mut c_char;
+        let trigger_ptr = self.trigger_data.tg_trigger;
+        if trigger_ptr.is_null() {
+            return Err(PgTriggerError::NullTrigger);
+        }
+        let trigger = *trigger_ptr;
+        let name_ptr = trigger.tgname as *mut c_char;
         let name_cstr = cstr_core::CStr::from_ptr(name_ptr);
         let name_str = name_cstr.to_str()?;
         Ok(name_str)
@@ -80,23 +89,76 @@ impl<'a> PgTrigger<'a> {
     }
     // #[deprecated = "The name of the table that caused the trigger invocation. This is now deprecated, and could disappear in a future release. Use TG_TABLE_NAME instead."]
     // tg_relname: &'a str,
-    /// The name of the table that caused the trigger invocation
+
+    /// The name of the old transition table of this trigger invocation
     // Derived from `pgx_pg_sys::TriggerData.trigger.tgoldtable`
-    pub fn table_name(&self) -> &str {
-        unimplemented!() // TODO
+    pub unsafe fn old_transition_table_name(&self) -> Result<Option<String>, PgTriggerError>  {
+        let trigger_ptr = self.trigger_data.tg_trigger;
+        if trigger_ptr.is_null() {
+            return Err(PgTriggerError::NullTrigger);
+        }
+        let trigger = *trigger_ptr;
+        let tgoldtable = trigger.tgoldtable;
+        if !tgoldtable.is_null() {
+            let table_name_cstr = cstr_core::CStr::from_ptr(tgoldtable);
+            let table_name_str = table_name_cstr.to_str()?;
+            Ok(Some(table_name_str.to_string()))
+        } else {
+            Ok(None)
+        }
+    }
+    /// The name of the new transition table of this trigger invocation
+    // Derived from `pgx_pg_sys::TriggerData.trigger.tgoldtable`
+    pub unsafe fn new_transition_table_name(&self) -> Result<Option<String>, PgTriggerError>  {
+        let trigger_ptr = self.trigger_data.tg_trigger;
+        if trigger_ptr.is_null() {
+            return Err(PgTriggerError::NullTrigger);
+        }
+        let trigger = *trigger_ptr;
+        let tgnewtable = trigger.tgnewtable;
+        if !tgnewtable.is_null() {
+            let table_name_cstr = cstr_core::CStr::from_ptr(tgnewtable);
+            let table_name_str = table_name_cstr.to_str()?;
+            Ok(Some(table_name_str.to_string()))
+        } else {
+            Ok(None)
+        }
+    }
+    /// The `PgRelation` corresponding to the trigger.
+    pub unsafe fn relation(&self) -> Result<crate::PgRelation, PgTriggerError> {
+        let relation_data_ptr = self.trigger_data.tg_relation;
+        if relation_data_ptr.is_null() {
+            return Err(PgTriggerError::NullRelation);
+        }
+        let relation_data = *relation_data_ptr;
+        Ok(PgRelation::open(relation_data.rd_id))
     }
     /// The name of the schema of the table that caused the trigger invocation
-    // TODO: Derived from ????
-    pub fn table_schema(&self) -> &str {
-        unimplemented!() // TODO
+    pub unsafe fn table_name(&self) -> Result<String, PgTriggerError> {
+        let relation = self.relation()?;
+        Ok(relation.name().to_string())
+    }
+    /// The name of the schema of the table that caused the trigger invocation
+    pub unsafe fn table_schema(&self) -> Result<String, PgTriggerError> {
+        let relation = self.relation()?;
+        Ok(relation.namespace().to_string())
     }
     /// The arguments from the CREATE TRIGGER statement
     // Derived from `pgx_pg_sys::TriggerData.trigger.tgargs`
-    pub fn extra_args(&self) -> &[&str] {
-        unimplemented!() // TODO
+    pub unsafe fn extra_args(&self) -> Result<Vec<String>, PgTriggerError> {
+        let trigger_ptr = self.trigger_data.tg_trigger;
+        if trigger_ptr.is_null() {
+            return Err(PgTriggerError::NullTrigger);
+        }
+        let trigger = *trigger_ptr;
+        let tgargs = trigger.tgargs;
+        let tgnargs = trigger.tgnargs;
+        let slice: &[*mut c_char] = core::slice::from_raw_parts(tgargs, tgnargs.try_into()?);
+        let args = slice.into_iter()
+            .map(|v| cstr_core::CStr::from_ptr(*v).to_str().map(ToString::to_string))
+            .collect::<Result<_, core::str::Utf8Error>>()?;
+        Ok(args)
     }
-
-    // TODO: What about `pgx_pg_sys::TriggerData.trigger.tgnewtable`?!
 }
 
 /// A newtype'd wrapper around a `pg_sys::TriggerData.tg_event` to prevent accidental misuse
@@ -225,8 +287,16 @@ pub enum PgTriggerError {
     InvalidPgTriggerWhen(u32),
     #[error("`InvalidPgTriggerOperation` cannot be built from `event & TRIGGER_EVENT_OPMASK` of `{0}")]
     InvalidPgTriggerOperation(u32),
-    #[error("Utf8Error: {0}")]
-    Utf8(#[from] core::str::Utf8Error),
+    #[error("core::str::Utf8Error: {0}")]
+    CoreUtf8(#[from] core::str::Utf8Error),
+    #[error("TryFromIntError: {0}")]
+    TryFromInt(#[from] core::num::TryFromIntError),
+    #[error("The `pgx::pg_sys::TriggerData`'s `tg_trigger` field was a NULL pointer")]
+    NullTrigger,
+    #[error("The `pgx::pg_sys::FunctionCallInfo`'s `context` field was a NULL pointer")]
+    NullTriggerData,
+    #[error("The `pgx::pg_sys::TriggerData`'s `tg_relation` field was a NULL pointer")]
+    NullRelation,
 }
 
 /// Indicates which trigger tuple to convert into a [crate::PgHeapTuple].

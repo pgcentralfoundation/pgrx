@@ -31,8 +31,8 @@ mod tests {
     }
 
     #[pg_trigger]
-    fn field_species_fox_to_bear<'a>(trigger: &'a pgx::PgTrigger<'a>) -> Result<
-        Option<PgHeapTuple<'a, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>>,
+    fn field_species_fox_to_bear(trigger: &pgx::PgTrigger) -> Result<
+        Option<PgHeapTuple<'_, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>>,
         TriggerError
     > {
         let old = unsafe {
@@ -74,8 +74,8 @@ mod tests {
     }
 
     #[pg_trigger]
-    fn add_field_boopers<'a>(trigger: &'a pgx::PgTrigger<'a>) -> Result<
-        Option<PgHeapTuple<'a, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>>,
+    fn add_field_boopers(trigger: &pgx::PgTrigger) -> Result<
+        Option<PgHeapTuple<'_, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>>,
         TriggerError
     > {
         let old = unsafe {
@@ -117,8 +117,8 @@ mod tests {
     }
 
     #[pg_trigger]
-    fn intercept_bears<'a>(trigger: &'a pgx::PgTrigger<'a>) -> Result<
-        Option<PgHeapTuple<'a, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>>,
+    fn intercept_bears(trigger: &pgx::PgTrigger) -> Result<
+        Option<PgHeapTuple<'_, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>>,
         TriggerError
     > {
         let new = unsafe {
@@ -171,8 +171,8 @@ mod tests {
 
 
     #[pg_trigger]
-    fn inserts_trigger_metadata<'a>(trigger: &'a pgx::PgTrigger<'a>) -> Result<
-        Option<PgHeapTuple<'a, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>>,
+    fn inserts_trigger_metadata(trigger: &pgx::PgTrigger) -> Result<
+        Option<PgHeapTuple<'_, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>>,
         TriggerError
     > {
         let new = unsafe {
@@ -186,36 +186,34 @@ mod tests {
         let mut current = current.into_owned();
 
         let trigger_name = unsafe { trigger.name()? };
-        pgx::log!("trigger_name: {:?}", trigger_name);
         current.set_by_name("trigger_name", trigger_name)?;
 
         let trigger_when = trigger.when()?.to_string();
-        pgx::log!("trigger_when: {:?}", trigger_when);
         current.set_by_name("trigger_when", trigger_when)?;
 
         let trigger_level = trigger.level().to_string();
-        pgx::log!("trigger_level: {:?}", trigger_level);
         current.set_by_name("trigger_level", trigger_level)?;
 
         let trigger_op = trigger.op()?.to_string();
-        pgx::log!("trigger_op: {:?}", trigger_op);
         current.set_by_name("trigger_op", trigger_op)?;
 
         let trigger_relid = unsafe { trigger.relid() };
-        pgx::log!("trigger_relid: {:?}", trigger_relid);
         current.set_by_name("trigger_relid", trigger_relid)?;
 
-        // let trigger_table_name = trigger.table_name();
-        // pgx::log!("trigger_table_name: {:?}", trigger_table_name);
-        // current.set_by_name("trigger_table_name", trigger_table_name)?;
+        let trigger_old_transition_table_name = unsafe { trigger.old_transition_table_name()? };
+        current.set_by_name("trigger_old_transition_table_name", trigger_old_transition_table_name)?;
 
-        // let trigger_table_schema = trigger.table_schema();
-        // pgx::log!("trigger_table_schema: {:?}", trigger_table_schema);
-        // current.set_by_name("trigger_table_schema", trigger_table_schema)?;
+        let trigger_new_transition_table_name = unsafe { trigger.new_transition_table_name()? };
+        current.set_by_name("trigger_new_transition_table_name", trigger_new_transition_table_name)?;
 
-        // let trigger_extra_args = trigger.extra_args();
-        // pgx::log!("trigger_extra_args: {:?}", trigger_extra_args);
-        // current.set_by_name("trigger_extra_args", trigger_extra_args)?;
+        let trigger_table_name = unsafe { trigger.table_name()? };
+        current.set_by_name("trigger_table_name", trigger_table_name)?;
+
+        let trigger_table_schema = unsafe { trigger.table_schema()? };
+        current.set_by_name("trigger_table_schema", trigger_table_schema)?;
+
+        let trigger_extra_args = unsafe { trigger.extra_args()? };
+        current.set_by_name("trigger_extra_args", trigger_extra_args)?;
         
         Ok(Some(current))
     }
@@ -230,6 +228,8 @@ mod tests {
                 trigger_level TEXT,
                 trigger_op TEXT,
                 trigger_relid OID,
+                trigger_old_transition_table_name TEXT,
+                trigger_new_transition_table_name TEXT,
                 trigger_table_name TEXT,
                 trigger_table_schema TEXT,
                 trigger_extra_args TEXT[]
@@ -240,7 +240,7 @@ mod tests {
             CREATE TRIGGER insert_trigger_metadata
                 BEFORE INSERT ON tests.before_insert_trigger_metadata
                 FOR EACH ROW
-                EXECUTE PROCEDURE tests.inserts_trigger_metadata()
+                EXECUTE PROCEDURE tests.inserts_trigger_metadata('Bears', 'Dogs')
         "#);
 
         Spi::run(r#"
@@ -254,9 +254,11 @@ mod tests {
         let trigger_level = Spi::get_one::<&str>("SELECT trigger_level FROM tests.before_insert_trigger_metadata;");
         let trigger_op = Spi::get_one::<&str>("SELECT trigger_op FROM tests.before_insert_trigger_metadata;");
         let trigger_relid = Spi::get_one::<pg_sys::Oid>("SELECT trigger_relid FROM tests.before_insert_trigger_metadata;");
+        let trigger_old_transition_table_name = Spi::get_one::<&str>("SELECT trigger_old_transition_table_name FROM tests.before_insert_trigger_metadata;");
+        let trigger_new_transition_table_name = Spi::get_one::<&str>("SELECT trigger_new_transition_table_name FROM tests.before_insert_trigger_metadata;");
         let trigger_table_name = Spi::get_one::<&str>("SELECT trigger_table_name FROM tests.before_insert_trigger_metadata;");
         let trigger_table_schema = Spi::get_one::<&str>("SELECT trigger_table_schema FROM tests.before_insert_trigger_metadata;");
-        let trigger_extra_args = Spi::get_one::<&str>("SELECT trigger_extra_args FROM tests.before_insert_trigger_metadata;");
+        let trigger_extra_args = Spi::get_one::<Vec<String>>("SELECT trigger_extra_args FROM tests.before_insert_trigger_metadata;");
         
         assert_eq!(marker, Some("Fox"));
         assert_eq!(trigger_name, Some("insert_trigger_metadata"));
@@ -264,8 +266,10 @@ mod tests {
         assert_eq!(trigger_level, Some("ROW"));
         assert_eq!(trigger_op, Some("INSERT"));
         assert!(trigger_relid.is_some());
-        assert_eq!(trigger_table_name, Some("Fox"));
-        assert_eq!(trigger_table_schema, Some("Fox"));
-        assert_eq!(trigger_extra_args, Some("Fox"));
+        assert_eq!(trigger_old_transition_table_name, None);
+        assert_eq!(trigger_new_transition_table_name, None);
+        assert_eq!(trigger_table_name, Some("before_insert_trigger_metadata"));
+        assert_eq!(trigger_table_schema, Some("tests"));
+        assert_eq!(trigger_extra_args, Some(vec!["Bears".to_string(), "Dogs".to_string()]));
     }
 }

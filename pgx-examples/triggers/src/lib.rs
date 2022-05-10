@@ -23,8 +23,8 @@ enum TriggerError {
 }
 
 #[pg_trigger]
-fn trigger_example<'a>(trigger: &'a pgx::PgTrigger<'a>) -> Result<
-    Option<PgHeapTuple<'a, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>>,
+fn trigger_example(trigger: &pgx::PgTrigger) -> Result<
+    Option<PgHeapTuple<'_, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>>,
     TriggerError
 > {
     let old = unsafe {

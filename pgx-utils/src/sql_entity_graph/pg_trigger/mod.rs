@@ -64,21 +64,16 @@ impl PgTrigger {
             #[no_mangle]
             #[pg_guard]
             extern "C" fn #extern_func_ident(fcinfo: ::pgx::pg_sys::FunctionCallInfo) -> ::pgx::pg_sys::Datum {
-                ::pgx::log!("Pre-PgTrigger from");
-                let maybe_pg_trigger = unsafe { ::pgx::trigger_support::PgTrigger::from_fcinfo(&fcinfo) };
-                ::pgx::log!("Post-PgTrigger from, pre-expect");
+                let maybe_pg_trigger = unsafe { ::pgx::trigger_support::PgTrigger::from_fcinfo(fcinfo) };
                 let pg_trigger = maybe_pg_trigger.expect("PgTrigger::from_fcinfo failed");
-                ::pgx::log!("Post-PgTrigger Expect, pre-call");
                 let trigger_fn_result: Result<
                     Option<::pgx::PgHeapTuple<'_, _>>,
                     _,
                 > = #function_ident(&pg_trigger);
-                ::pgx::log!("Post-call, pre-expect");
             
                 let trigger_retval = trigger_fn_result.expect("Trigger function panic");
-                ::pgx::log!("Post-expect, pre-datum");
                 let retval_datum = trigger_retval.into_datum();
-                ::pgx::log!("Post-datum");
+
                 retval_datum.expect("Failed to turn trigger function return value into Datum")
             }
             
