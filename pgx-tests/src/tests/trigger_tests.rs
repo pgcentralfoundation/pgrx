@@ -28,7 +28,7 @@ mod tests {
             PgHeapTuple<'_, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>,
             pgx::PgHeapTupleError,
         > {
-            Ok(unsafe { trigger.current() }?.unwrap().into_owned())
+            Ok(unsafe { trigger.current() }.unwrap().into_owned())
         }
 
         #[pg_trigger]
@@ -36,7 +36,7 @@ mod tests {
             PgHeapTuple<'a, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>,
             pgx::PgHeapTupleError,
         > {
-            Ok(unsafe { trigger.current() }?.unwrap().into_owned())
+            Ok(unsafe { trigger.current() }.unwrap().into_owned())
         }
 
         #[pg_trigger]
@@ -44,7 +44,7 @@ mod tests {
             PgHeapTuple<'_, AllocatedByPostgres>,
             pgx::PgHeapTupleError,
         > {
-            Ok(unsafe { trigger.current() }?.unwrap())
+            Ok(unsafe { trigger.current() }.unwrap())
         }
 
         #[pg_trigger]
@@ -52,7 +52,7 @@ mod tests {
             PgHeapTuple<'_, AllocatedByRust>,
             pgx::PgHeapTupleError,
         > {
-            Ok(unsafe { trigger.current() }?.unwrap().into_owned())
+            Ok(unsafe { trigger.current() }.unwrap().into_owned())
         }
 
 
@@ -64,7 +64,7 @@ mod tests {
             PgHeapTuple<'a, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>,
             core::str::Utf8Error,
         > {
-            Ok(unsafe { trigger.current() }.unwrap().unwrap().into_owned())
+            Ok(unsafe { trigger.current() }.unwrap().into_owned())
         }
 
 
@@ -102,7 +102,7 @@ mod tests {
         PgHeapTuple<'_, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>,
         TriggerError
     > {
-        let current = unsafe { trigger.current()? }.ok_or(TriggerError::NullCurrent)?;
+        let current = unsafe { trigger.current() }.ok_or(TriggerError::NullCurrent)?;
         let mut current = current.into_owned();
 
         let field = "species";
@@ -143,7 +143,7 @@ mod tests {
         PgHeapTuple<'_, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>,
         TriggerError
     > {
-        let current = unsafe { trigger.current()? }.ok_or(TriggerError::NullCurrent)?;
+        let current = unsafe { trigger.current() }.ok_or(TriggerError::NullCurrent)?;
         let mut current = current.into_owned();
 
         let field = "booper";
@@ -184,16 +184,16 @@ mod tests {
         PgHeapTuple<'_, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>,
         TriggerError
     > {
-        let new = unsafe { trigger.new()? }.ok_or(TriggerError::NullCurrent)?;
+        let new = unsafe { trigger.new() }.ok_or(TriggerError::NullCurrent)?;
 
         for index in 1..(new.len() + 1) {
             if let Some(val) = new.get_by_index::<&str>(index.try_into()?)? {
                 if val == "Bear" {
                     // We intercepted a bear! Avoid this update, return `current` instead.
-                    let old = unsafe {
-                        trigger.current()?
+                    let current = unsafe {
+                        trigger.current()
                     }.ok_or(TriggerError::NullCurrent)?;
-                    return Ok(old);
+                    return Ok(current);
                 }
             }
         }
@@ -236,7 +236,7 @@ mod tests {
         PgHeapTuple<'_, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>,
         TriggerError
     > {
-        let current = unsafe { trigger.current()? }.ok_or(TriggerError::NullCurrent)?;
+        let current = unsafe { trigger.current() }.ok_or(TriggerError::NullCurrent)?;
         let mut current = current.into_owned();
 
         let trigger_name = unsafe { trigger.name()? };
@@ -337,7 +337,7 @@ mod tests {
         PgHeapTuple<'_, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>,
         TriggerError
     > {
-        let current = unsafe { trigger.current()? }.ok_or(TriggerError::NullCurrent)?;
+        let current = unsafe { trigger.current() }.ok_or(TriggerError::NullCurrent)?;
         let current = current.into_owned();
 
         Ok(current)
@@ -372,7 +372,7 @@ mod tests {
         PgHeapTuple<'_, AllocatedByPostgres>,
         TriggerError
     > {
-        Ok(unsafe { trigger.current() }?.unwrap())
+        Ok(unsafe { trigger.current() }.unwrap())
     }
 
     #[pg_test]
@@ -404,7 +404,7 @@ mod tests {
         PgHeapTuple<'_, AllocatedByRust>,
         TriggerError
     > {
-        Ok(unsafe { trigger.current() }?.unwrap().into_owned())
+        Ok(unsafe { trigger.current() }.unwrap().into_owned())
     }
 
     #[pg_test]

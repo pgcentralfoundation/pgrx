@@ -48,9 +48,6 @@ impl<'a> PgHeapTuple<'a, AllocatedByPostgres> {
     /// [PgHeapTuple] will be considered by have been allocated by Postgres and is not mutable until
     /// [PgHeapTuple::into_owned] is called.  
     ///
-    /// ## Errors
-    /// - [PgHeapTupleCreationError::NullTuple] if the specified `TriggerTuple` is `null`
-    ///
     /// ## Safety
     ///
     /// This function is unsafe as we cannot guarantee that any pointers in the `trigger_data`
@@ -58,7 +55,7 @@ impl<'a> PgHeapTuple<'a, AllocatedByPostgres> {
     pub unsafe fn from_trigger_data(
         trigger_data: &'a pg_sys::TriggerData,
         which_tuple: TriggerTuple,
-    ) -> Result<Option<PgHeapTuple<'a, AllocatedByPostgres>>, PgHeapTupleError> {
+    ) -> Option<PgHeapTuple<'a, AllocatedByPostgres>> {
         let tupdesc =
             PgTupleDesc::from_pg_unchecked(trigger_data.tg_relation.as_ref().unwrap().rd_att);
         
@@ -68,10 +65,10 @@ impl<'a> PgHeapTuple<'a, AllocatedByPostgres> {
         };
 
         if tuple.is_null() {
-            return Ok(None)
+            return None
         }
 
-        Ok(Some(PgHeapTuple::from_heap_tuple(tupdesc, tuple)))
+        Some(PgHeapTuple::from_heap_tuple(tupdesc, tuple))
     }
 
     /// Consumes a `[PgHeapTuple]` considered to be allocated by Postgres and transforms it into one
@@ -89,7 +86,7 @@ impl<'a> PgHeapTuple<'a, AllocatedByRust> {
     /// Create a new [PgHeapTuple] from a [PgTupleDesc] from an iterator of Datums.
     ///
     /// ## Errors
-    /// - [PgHeapTupleCreationError::IncorrectAttributeCount] if the number of items in the iterator
+    /// - [PgHeapTupleError::IncorrectAttributeCount] if the number of items in the iterator
     /// does not match the number of attributes in the [PgTupleDesc].
     pub fn from_datums<I: IntoIterator<Item = Option<pg_sys::Datum>>>(
         tupdesc: PgTupleDesc<'a>,

@@ -94,7 +94,7 @@ pub trait FromDatum {
     }
 
     /// `try_from_datum` is a convenience wrapper around `FromDatum::from_datum` that returns a
-    /// a [FromDatumResult] instead of an `Option`.  It's intended to be used in situations where
+    /// a `Result` instead of an `Option`.  It's intended to be used in situations where
     /// the caller needs to know whether the type conversion succeeded or failed.
     ///
     /// ## Safety

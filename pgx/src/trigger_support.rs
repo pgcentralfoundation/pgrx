@@ -11,12 +11,13 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 use cstr_core::c_char;
 
-use crate::{PgRelation, is_a, pg_sys, heap_tuple::{PgHeapTuple, PgHeapTupleError}, pgbox::{PgBox, AllocatedByPostgres}};
+use crate::{PgRelation, is_a, pg_sys, heap_tuple::PgHeapTuple, pgbox::{PgBox, AllocatedByPostgres}};
 use std::borrow::Borrow;
 
 /// The datatype accepted by a trigger
 /// 
-/// A safe structure providing the an API similar to the constants provided in a PL/pgSQL function. The unsafe [`pgx::pg_sys::TriggerData`] (and it's contained [`pgx::pg_sys::Trigger`]) is available in the `trigger_data` field.
+/// A safe structure providing the an API similar to the constants provided in a PL/pgSQL function. The unsafe [`pgx::pg_sys::TriggerData`][crate::pg_sys::TriggerData]
+/// (and its contained [`pgx::pg_sys::Trigger`][crate::pg_sys::Trigger]) is available in the `trigger_data` field.
 pub struct PgTrigger {
     trigger_data: PgBox<pgx_pg_sys::TriggerData>,
     #[allow(dead_code)]
@@ -58,12 +59,12 @@ impl PgTrigger {
 
     /// The new HeapTuple
     // Derived from `pgx_pg_sys::TriggerData.tg_newtuple` and `pgx_pg_sys::TriggerData.tg_newslot.tts_tupleDescriptor`
-    pub unsafe fn new(&self) -> Result<Option<PgHeapTuple<'_, AllocatedByPostgres>>, PgHeapTupleError> {
+    pub unsafe fn new(&self) -> Option<PgHeapTuple<'_, AllocatedByPostgres>> {
         PgHeapTuple::from_trigger_data(&*self.trigger_data, TriggerTuple::New)
     }
     /// The current HeapTuple
     // Derived from `pgx_pg_sys::TriggerData.tg_trigtuple` and `pgx_pg_sys::TriggerData.tg_trigslot.tts_tupleDescriptor`
-    pub unsafe fn current(&self) -> Result<Option<PgHeapTuple<'_, AllocatedByPostgres>>, PgHeapTupleError> {
+    pub unsafe fn current(&self) -> Option<PgHeapTuple<'_, AllocatedByPostgres>> {
         PgHeapTuple::from_trigger_data(&*self.trigger_data, TriggerTuple::Current)
     }
     /// Variable that contains the name of the trigger actually fired

@@ -28,7 +28,7 @@ fn trigger_example(trigger: &pgx::PgTrigger) -> Result<
     TriggerError
 > {
     let old = unsafe {
-        trigger.current()?
+        trigger.current()
     }.ok_or(TriggerError::NullOld)?;
 
     let mut current = old.into_owned();
