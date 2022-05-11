@@ -1056,10 +1056,11 @@ Review the `pgx::trigger_support::PgTrigger` documentation for use.
 #[proc_macro_attribute]
 pub fn pg_trigger(attrs: TokenStream, input: TokenStream) -> TokenStream {
     fn wrapped(attrs: TokenStream, input: TokenStream) -> Result<TokenStream, syn::Error> {
-        use syn::{Token, punctuated::Punctuated, parse::Parser};
-        use pgx_utils::sql_entity_graph::{PgTriggerAttribute, PgTrigger};
+        use pgx_utils::sql_entity_graph::{PgTrigger, PgTriggerAttribute};
+        use syn::{parse::Parser, punctuated::Punctuated, Token};
 
-        let attributes = Punctuated::<PgTriggerAttribute, Token![,]>::parse_terminated.parse(attrs)?;
+        let attributes =
+            Punctuated::<PgTriggerAttribute, Token![,]>::parse_terminated.parse(attrs)?;
         let item_fn: syn::ItemFn = syn::parse(input)?;
         let trigger_item = PgTrigger::new(item_fn, attributes)?;
         let trigger_tokens = trigger_item.to_token_stream();

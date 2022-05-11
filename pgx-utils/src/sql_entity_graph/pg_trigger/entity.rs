@@ -1,5 +1,11 @@
-use crate::sql_entity_graph::{SqlGraphEntity, ToSql, PgxSql, SqlGraphIdentifier, ToSqlConfigEntity};
-use core::{cmp::{Eq, PartialEq, Ord, PartialOrd, Ordering}, hash::Hash, fmt::Debug};
+use crate::sql_entity_graph::{
+    PgxSql, SqlGraphEntity, SqlGraphIdentifier, ToSql, ToSqlConfigEntity,
+};
+use core::{
+    cmp::{Eq, Ord, Ordering, PartialEq, PartialOrd},
+    fmt::Debug,
+    hash::Hash,
+};
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub struct PgTriggerEntity {
@@ -19,8 +25,7 @@ impl PgTriggerEntity {
 
 impl Ord for PgTriggerEntity {
     fn cmp(&self, other: &Self) -> Ordering {
-        self.full_path
-            .cmp(other.full_path)
+        self.full_path.cmp(other.full_path)
     }
 }
 
@@ -36,7 +41,6 @@ impl Into<SqlGraphEntity> for PgTriggerEntity {
     }
 }
 
-
 impl ToSql for PgTriggerEntity {
     #[tracing::instrument(
         level = "error",
@@ -47,7 +51,8 @@ impl ToSql for PgTriggerEntity {
         let self_index = context.triggers[self];
         let schema = context.schema_prefix_for(&self_index);
 
-        let sql = format!("\n\
+        let sql = format!(
+            "\n\
             -- {file}:{line}\n\
             -- {full_path}\n\
             CREATE FUNCTION {schema}\"{function_name}\"()\n\

@@ -1,7 +1,7 @@
 //! Provides a safe interface to Postgres `HeapTuple` objects.
 use crate::{
-    heap_getattr_raw, pg_sys, AllocatedByPostgres, AllocatedByRust, FromDatum,
-    IntoDatum, PgBox, PgTupleDesc, TriggerTuple, TryFromDatumError, WhoAllocated,
+    heap_getattr_raw, pg_sys, AllocatedByPostgres, AllocatedByRust, FromDatum, IntoDatum, PgBox,
+    PgTupleDesc, TriggerTuple, TryFromDatumError, WhoAllocated,
 };
 use std::num::NonZeroUsize;
 
@@ -58,14 +58,14 @@ impl<'a> PgHeapTuple<'a, AllocatedByPostgres> {
     ) -> Option<PgHeapTuple<'a, AllocatedByPostgres>> {
         let tupdesc =
             PgTupleDesc::from_pg_unchecked(trigger_data.tg_relation.as_ref().unwrap().rd_att);
-        
+
         let tuple = match which_tuple {
             TriggerTuple::Current => trigger_data.tg_trigtuple,
             TriggerTuple::New => trigger_data.tg_newtuple,
         };
 
         if tuple.is_null() {
-            return None
+            return None;
         }
 
         Some(PgHeapTuple::from_heap_tuple(tupdesc, tuple))
@@ -100,7 +100,10 @@ impl<'a> PgHeapTuple<'a, AllocatedByRust> {
             datums.push(datum.unwrap_or(0.into()));
         });
         if datums.len() != tupdesc.len() {
-            return Err(PgHeapTupleError::IncorrectAttributeCount(datums.len(), tupdesc.len()));
+            return Err(PgHeapTupleError::IncorrectAttributeCount(
+                datums.len(),
+                tupdesc.len(),
+            ));
         }
 
         unsafe {
@@ -153,7 +156,11 @@ impl<'a> PgHeapTuple<'a, AllocatedByRust> {
     /// - return [TryFromDatumError::NoSuchAttributeName] if the attribute does not exist
     /// - return [TryFromDatumError::IncompatibleTypes] if the Rust type of the `value` is not
     /// compatible with the attribute's Postgres type
-    pub fn set_by_name<T: IntoDatum>(&mut self, attname: &str, value: T) -> Result<(), TryFromDatumError> {
+    pub fn set_by_name<T: IntoDatum>(
+        &mut self,
+        attname: &str,
+        value: T,
+    ) -> Result<(), TryFromDatumError> {
         match self.get_attribute_by_name(attname) {
             None => Err(TryFromDatumError::NoSuchAttributeName(attname.to_string())),
             Some((attnum, _)) => self.set_by_index(attnum, value),
@@ -212,7 +219,9 @@ impl<'a> PgHeapTuple<'a, AllocatedByRust> {
     }
 }
 
-impl<'a, AllocatedBy: WhoAllocated<pg_sys::HeapTupleData>> IntoDatum for PgHeapTuple<'a, AllocatedBy> {
+impl<'a, AllocatedBy: WhoAllocated<pg_sys::HeapTupleData>> IntoDatum
+    for PgHeapTuple<'a, AllocatedBy>
+{
     fn into_datum(self) -> Option<pg_sys::Datum> {
         self.into_datum()
     }

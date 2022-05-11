@@ -1,6 +1,9 @@
 use crate::sql_entity_graph::ToSqlConfig;
 use proc_macro2::Span;
-use syn::{Token, parse::{ParseStream, Parse}};
+use syn::{
+    parse::{Parse, ParseStream},
+    Token,
+};
 
 #[derive(Debug, Clone, Hash, Eq, PartialEq)]
 pub enum PgTriggerAttribute {

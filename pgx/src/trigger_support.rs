@@ -11,7 +11,12 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 use cstr_core::c_char;
 
-use crate::{PgRelation, is_a, pg_sys, heap_tuple::PgHeapTuple, pgbox::{PgBox, AllocatedByPostgres}};
+use crate::{
+    heap_tuple::PgHeapTuple,
+    is_a, pg_sys,
+    pgbox::{AllocatedByPostgres, PgBox},
+    PgRelation,
+};
 use std::borrow::Borrow;
 
 /**
@@ -26,7 +31,7 @@ panicking (into a PostgreSQL error) if it doesn't exist:
 use pgx::{pg_trigger, pg_sys, PgHeapTuple, WhoAllocated, PgHeapTupleError, PgTrigger};
 
 #[pg_trigger]
-fn example_trigger(trigger: &PgTrigger) -> Result<
+fn trigger_example(trigger: &PgTrigger) -> Result<
     PgHeapTuple<'_, impl WhoAllocated<pg_sys::HeapTupleData>>,
     PgHeapTupleError,
 > {
@@ -34,8 +39,60 @@ fn example_trigger(trigger: &PgTrigger) -> Result<
 }
 ```
 
-Trigger functions only accept one argument, a [`PgTrigger`], and they return a [`Result`][std::result::Result] containing 
+Trigger functions only accept one argument, a [`PgTrigger`], and they return a [`Result`][std::result::Result] containing
 either a [`PgHeapTuple`][crate::PgHeapTuple] or any error that implements [`impl std::error::Error`][std::error::Error].
+
+## Use from SQL
+
+The `trigger_example` example above would generate something like the following SQL:
+
+```sql
+-- pgx-examples/triggers/src/lib.rs:25
+-- triggers::trigger_example
+CREATE FUNCTION "trigger_example"()
+    RETURNS TRIGGER
+    LANGUAGE c
+    AS 'MODULE_PATHNAME', 'trigger_example_wrapper';
+```
+
+Users could then use it like so:
+
+```sql
+CREATE TABLE test (
+    id serial8 NOT NULL PRIMARY KEY,
+    title varchar(50),
+    description text,
+    payload jsonb
+);
+
+CREATE TRIGGER test_trigger
+    BEFORE INSERT ON test
+    FOR EACH ROW
+    EXECUTE PROCEDURE trigger_example();
+
+INSERT INTO test (title, description, payload)
+    VALUES ('Fox', 'a description', '{"key": "value"}');
+```
+
+This can also be done via the [`extension_sql`][crate::extension_sql] attribute:
+
+```rust,no_run
+extension_sql!(
+    r#"
+CREATE TABLE test (
+    id serial8 NOT NULL PRIMARY KEY,
+    title varchar(50),
+    description text,
+    payload jsonb
+);
+
+CREATE TRIGGER test_trigger BEFORE INSERT ON test FOR EACH ROW EXECUTE PROCEDURE trigger_example();
+INSERT INTO test (title, description, payload) VALUES ('Fox', 'a description', '{"key": "value"}');
+"#,
+    name = "create_trigger",
+    requires = [ trigger_example ]
+);
+```
 
 ## Working with [WhoAllocated][crate::WhoAllocated]
 
@@ -85,7 +142,7 @@ enum CustomTriggerError {
 }
 
 #[pg_trigger]
-fn example_trigger(trigger: &PgTrigger) -> Result<
+fn example_custom_error(trigger: &PgTrigger) -> Result<
     PgHeapTuple<'_, impl WhoAllocated<pg_sys::HeapTupleData>>,
     CustomTriggerError,
 > {
@@ -111,7 +168,7 @@ enum CustomTriggerError<'a> {
 }
 
 #[pg_trigger]
-fn example_trigger<'a, 'b>(trigger: &'a PgTrigger) -> Result<
+fn example_lifetimes<'a, 'b>(trigger: &'a PgTrigger) -> Result<
     PgHeapTuple<'a, AllocatedByRust>,
     CustomTriggerError<'b>,
 > {
@@ -119,11 +176,20 @@ fn example_trigger<'a, 'b>(trigger: &'a PgTrigger) -> Result<
 }
 ```
 
-## Unsafe escape hatches
+## Escape hatches
 
 Unsafe [`pgx::pg_sys::FunctionCallInfo`][crate::pg_sys::FunctionCallInfo] and
 [`pgx::pg_sys::TriggerData`][crate::pg_sys::TriggerData] (include its contained
 [`pgx::pg_sys::Trigger`][crate::pg_sys::Trigger]) accessors are available..
+
+
+## Getting safe data all at once
+
+Many [`PgTrigger`][PgTrigger] functions are `unsafe` as they dereference pointers inside the
+[`TriggerData`][pgx::pg_sys::TriggerData] contained by the [`PgTrigger`][PgTrigger].
+
+In cases where a safe API is desired, the [`PgTriggerSafe`] structure can be retrieved
+from [`PgTrigger::to_safe`].
 
 */
 pub struct PgTrigger {
@@ -138,16 +204,15 @@ impl PgTrigger {
             return Err(PgTriggerError::NullFunctionCallInfo);
         }
         if !called_as_trigger(fcinfo) {
-            return Err(PgTriggerError::NotTrigger)
+            return Err(PgTriggerError::NotTrigger);
         }
         let fcinfo_data = &*fcinfo;
 
         if fcinfo_data.context.is_null() {
             return Err(PgTriggerError::NullTriggerData);
         }
-        let trigger_data: PgBox<pg_sys::TriggerData> = PgBox::from_pg(
-            fcinfo_data.context as *mut pg_sys::TriggerData,
-        );
+        let trigger_data: PgBox<pg_sys::TriggerData> =
+            PgBox::from_pg(fcinfo_data.context as *mut pg_sys::TriggerData);
 
         Ok(Self {
             trigger_data,
@@ -187,6 +252,10 @@ impl PgTrigger {
         let name_str = name_cstr.to_str()?;
         Ok(name_str)
     }
+    /// The trigger event
+    pub fn event(&self) -> TriggerEvent {
+        TriggerEvent(self.trigger_data.tg_event)
+    }
     /// When the trigger was triggered (`BEFORE`, `AFTER`, `INSTEAD OF`)
     // Derived from `pgx_pg_sys::TriggerData.tg_event`
     pub fn when(&self) -> Result<PgTriggerWhen, PgTriggerError> {
@@ -217,7 +286,7 @@ impl PgTrigger {
 
     /// The name of the old transition table of this trigger invocation
     // Derived from `pgx_pg_sys::TriggerData.trigger.tgoldtable`
-    pub unsafe fn old_transition_table_name(&self) -> Result<Option<&str>, PgTriggerError>  {
+    pub unsafe fn old_transition_table_name(&self) -> Result<Option<&str>, PgTriggerError> {
         let trigger_ptr = self.trigger_data.tg_trigger;
         if trigger_ptr.is_null() {
             return Err(PgTriggerError::NullTrigger);
@@ -234,7 +303,7 @@ impl PgTrigger {
     }
     /// The name of the new transition table of this trigger invocation
     // Derived from `pgx_pg_sys::TriggerData.trigger.tgoldtable`
-    pub unsafe fn new_transition_table_name(&self) -> Result<Option<&str>, PgTriggerError>  {
+    pub unsafe fn new_transition_table_name(&self) -> Result<Option<&str>, PgTriggerError> {
         let trigger_ptr = self.trigger_data.tg_trigger;
         if trigger_ptr.is_null() {
             return Err(PgTriggerError::NullTrigger);
@@ -279,11 +348,54 @@ impl PgTrigger {
         let tgargs = trigger.tgargs;
         let tgnargs = trigger.tgnargs;
         let slice: &[*mut c_char] = core::slice::from_raw_parts(tgargs, tgnargs.try_into()?);
-        let args = slice.into_iter()
-            .map(|v| cstr_core::CStr::from_ptr(*v).to_str().map(ToString::to_string))
+        let args = slice
+            .into_iter()
+            .map(|v| {
+                cstr_core::CStr::from_ptr(*v)
+                    .to_str()
+                    .map(ToString::to_string)
+            })
             .collect::<Result<_, core::str::Utf8Error>>()?;
         Ok(args)
     }
+
+    pub unsafe fn to_safe(&self) -> Result<PgTriggerSafe, PgTriggerError> {
+        let trigger_safe = PgTriggerSafe {
+            name: self.name()?,
+            new: self.new(),
+            current: self.current(),
+            event: self.event(),
+            when: self.when()?,
+            level: self.level(),
+            op: self.op()?,
+            relid: self.relid()?,
+            old_transition_table_name: self.old_transition_table_name()?,
+            new_transition_table_name: self.new_transition_table_name()?,
+            relation: self.relation()?,
+            table_name: self.table_name()?,
+            table_schema: self.table_schema()?,
+            extra_args: self.extra_args()?,
+        };
+
+        Ok(trigger_safe)
+    }
+}
+
+pub struct PgTriggerSafe<'a> {
+    pub name: &'a str,
+    pub new: Option<PgHeapTuple<'a, AllocatedByPostgres>>,
+    pub current: Option<PgHeapTuple<'a, AllocatedByPostgres>>,
+    pub event: TriggerEvent,
+    pub when: PgTriggerWhen,
+    pub level: PgTriggerLevel,
+    pub op: PgTriggerOperation,
+    pub relid: pg_sys::Oid,
+    pub old_transition_table_name: Option<&'a str>,
+    pub new_transition_table_name: Option<&'a str>,
+    pub relation: crate::PgRelation,
+    pub table_name: String,
+    pub table_schema: String,
+    pub extra_args: Vec<String>,
 }
 
 /// A newtype'd wrapper around a `pg_sys::TriggerData.tg_event` to prevent accidental misuse
@@ -291,9 +403,9 @@ impl PgTrigger {
 pub struct TriggerEvent(u32);
 
 /// When a trigger happened
-/// 
+///
 /// Maps from a `TEXT` of `BEFORE`, `AFTER`, or `INSTEAD OF`.
-/// 
+///
 /// Can be calculated from a `pgx_pg_sys::TriggerEvent`.
 // Postgres constants: https://cs.github.com/postgres/postgres/blob/36d4efe779bfc7190ea1c1cf8deb0d945b726663/src/include/commands/trigger.h?q=TRIGGER_FIRED_BEFORE#L100-L102
 // Postgres defines: https://cs.github.com/postgres/postgres/blob/36d4efe779bfc7190ea1c1cf8deb0d945b726663/src/include/commands/trigger.h?q=TRIGGER_FIRED_BEFORE#L128-L135
@@ -313,7 +425,7 @@ impl TryFrom<TriggerEvent> for PgTriggerWhen {
             pg_sys::TRIGGER_EVENT_BEFORE => Ok(Self::Before),
             pg_sys::TRIGGER_EVENT_AFTER => Ok(Self::After),
             pg_sys::TRIGGER_EVENT_INSTEAD => Ok(Self::InsteadOf),
-            v => Err(PgTriggerError::InvalidPgTriggerWhen(v))
+            v => Err(PgTriggerError::InvalidPgTriggerWhen(v)),
         }
     }
 }
@@ -324,14 +436,15 @@ impl ToString for PgTriggerWhen {
             PgTriggerWhen::Before => "BEFORE",
             PgTriggerWhen::After => "AFTER",
             PgTriggerWhen::InsteadOf => "INSTEAD OF",
-        }.to_string()
+        }
+        .to_string()
     }
 }
 
 /// The level of a trigger
-/// 
+///
 /// Maps from a `TEXT` of `ROW` or `STATEMENT`.
-/// 
+///
 /// Can be calculated from a `pgx_pg_sys::TriggerEvent`.
 // Postgres constants: https://cs.github.com/postgres/postgres/blob/36d4efe779bfc7190ea1c1cf8deb0d945b726663/src/include/commands/trigger.h?q=TRIGGER_FIRED_BEFORE#L98
 // Postgres defines: https://cs.github.com/postgres/postgres/blob/36d4efe779bfc7190ea1c1cf8deb0d945b726663/src/include/commands/trigger.h?q=TRIGGER_FIRED_BEFORE#L122-L126
@@ -356,12 +469,13 @@ impl ToString for PgTriggerLevel {
         match self {
             PgTriggerLevel::Statement => "STATEMENT",
             PgTriggerLevel::Row => "ROW",
-        }.to_string() 
+        }
+        .to_string()
     }
 }
 
 /// The operation for which the trigger was fired
-/// 
+///
 /// Maps from a `TEXT` of `INSERT`, `UPDATE`, `DELETE`, or `TRUNCATE`.
 ///
 /// Can be calculated from a `pgx_pg_sys::TriggerEvent`.
@@ -386,7 +500,7 @@ impl TryFrom<TriggerEvent> for PgTriggerOperation {
             pg_sys::TRIGGER_EVENT_DELETE => Ok(Self::Delete),
             pg_sys::TRIGGER_EVENT_UPDATE => Ok(Self::Update),
             pg_sys::TRIGGER_EVENT_TRUNCATE => Ok(Self::Truncate),
-            v => Err(PgTriggerError::InvalidPgTriggerOperation(v))
+            v => Err(PgTriggerError::InvalidPgTriggerOperation(v)),
         }
     }
 }
@@ -398,7 +512,8 @@ impl ToString for PgTriggerOperation {
             PgTriggerOperation::Update => "UPDATE",
             PgTriggerOperation::Delete => "DELETE",
             PgTriggerOperation::Truncate => "TRUNCATE",
-        }.to_string() 
+        }
+        .to_string()
     }
 }
 
@@ -408,9 +523,13 @@ pub enum PgTriggerError {
     NotTrigger,
     #[error("`PgTrigger`s cannot be built from `NULL` `pgx::pg_sys::FunctionCallInfo`s")]
     NullFunctionCallInfo,
-    #[error("`InvalidPgTriggerWhen` cannot be built from `event & TRIGGER_EVENT_TIMINGMASK` of `{0}")]
+    #[error(
+        "`InvalidPgTriggerWhen` cannot be built from `event & TRIGGER_EVENT_TIMINGMASK` of `{0}"
+    )]
     InvalidPgTriggerWhen(u32),
-    #[error("`InvalidPgTriggerOperation` cannot be built from `event & TRIGGER_EVENT_OPMASK` of `{0}")]
+    #[error(
+        "`InvalidPgTriggerOperation` cannot be built from `event & TRIGGER_EVENT_OPMASK` of `{0}"
+    )]
     InvalidPgTriggerOperation(u32),
     #[error("core::str::Utf8Error: {0}")]
     CoreUtf8(#[from] core::str::Utf8Error),

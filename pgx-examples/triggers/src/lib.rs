@@ -23,26 +23,23 @@ enum TriggerError {
 }
 
 #[pg_trigger]
-fn trigger_example(trigger: &pgx::PgTrigger) -> Result<
-    PgHeapTuple<'_, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>,
-    TriggerError
-> {
-    let old = unsafe {
-        trigger.current()
-    }.ok_or(TriggerError::NullOld)?;
+fn trigger_example(
+    trigger: &pgx::PgTrigger,
+) -> Result<PgHeapTuple<'_, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>, TriggerError> {
+    let old = unsafe { trigger.current() }.ok_or(TriggerError::NullOld)?;
 
     let mut current = old.into_owned();
-    let index = 2.try_into()?;
+    let col_name = "title";
 
-    if current.get_by_index(index)? == Some("Fox") {
-        current.set_by_index(index, "Bear")?;
+    if current.get_by_name(col_name)? == Some("Fox") {
+        current.set_by_name(col_name, "Bear")?;
     }
 
     Ok(current)
 }
 
-
-extension_sql!(r#"
+extension_sql!(
+    r#"
 CREATE TABLE test (
     id serial8 NOT NULL PRIMARY KEY,
     title varchar(50),
@@ -51,11 +48,11 @@ CREATE TABLE test (
 );
 
 CREATE TRIGGER test_trigger BEFORE INSERT ON test FOR EACH ROW EXECUTE PROCEDURE trigger_example();
-INSERT INTO test (title, description, payload) VALUES ('the title', 'a description', '{"key": "value"}');
+INSERT INTO test (title, description, payload) VALUES ('Fox', 'a description', '{"key": "value"}');
 "#,
     name = "create_trigger",
+    requires = [trigger_example]
 );
-
 
 #[cfg(any(test, feature = "pg_test"))]
 #[pg_schema]

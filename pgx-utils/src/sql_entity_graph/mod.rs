@@ -11,6 +11,7 @@ pub(crate) mod control_file;
 pub(crate) mod extension_sql;
 pub(crate) mod mapping;
 pub(crate) mod pg_extern;
+pub(crate) mod pg_trigger;
 pub(crate) mod pgx_attribute;
 pub(crate) mod pgx_sql;
 pub(crate) mod positioning_ref;
@@ -19,7 +20,6 @@ pub(crate) mod postgres_hash;
 pub(crate) mod postgres_ord;
 pub(crate) mod postgres_type;
 pub(crate) mod schema;
-pub(crate) mod pg_trigger;
 pub(crate) mod to_sql;
 
 pub use aggregate::{
@@ -36,6 +36,7 @@ pub use pg_extern::{
     entity::{PgExternArgumentEntity, PgExternEntity, PgExternReturnEntity, PgOperatorEntity},
     NameMacro, PgExtern, PgExternArgument, PgOperator,
 };
+pub use pg_trigger::{attribute::PgTriggerAttribute, entity::PgTriggerEntity, PgTrigger};
 pub use pgx_sql::PgxSql;
 pub use positioning_ref::PositioningRef;
 pub use postgres_enum::{entity::PostgresEnumEntity, PostgresEnum};
@@ -43,7 +44,6 @@ pub use postgres_hash::{entity::PostgresHashEntity, PostgresHash};
 pub use postgres_ord::{entity::PostgresOrdEntity, PostgresOrd};
 pub use postgres_type::{entity::PostgresTypeEntity, PostgresType};
 pub use schema::{entity::SchemaEntity, Schema};
-pub use pg_trigger::{PgTrigger, entity::PgTriggerEntity, attribute::PgTriggerAttribute};
 pub use to_sql::{entity::ToSqlConfigEntity, ToSql, ToSqlConfig};
 
 pub use crate::ExternArgs;

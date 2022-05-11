@@ -22,13 +22,13 @@ use crate::sql_entity_graph::{
     },
     mapping::{RustSourceOnlySqlMapping, RustSqlMapping},
     pg_extern::entity::{PgExternEntity, PgExternReturnEntity},
+    pg_trigger::entity::PgTriggerEntity,
     positioning_ref::PositioningRef,
     postgres_enum::entity::PostgresEnumEntity,
     postgres_hash::entity::PostgresHashEntity,
     postgres_ord::entity::PostgresOrdEntity,
     postgres_type::entity::PostgresTypeEntity,
     schema::entity::SchemaEntity,
-    pg_trigger::entity::PgTriggerEntity,
     to_sql::ToSql,
     SqlGraphEntity, SqlGraphIdentifier,
 };
@@ -181,6 +181,7 @@ impl PgxSql {
             &mapped_types,
             &mapped_enums,
             &mapped_externs,
+            &mapped_triggers,
         )?;
         connect_enums(&mut graph, &mapped_enums, &mapped_schemas);
         connect_types(&mut graph, &mapped_types, &mapped_schemas);
@@ -192,6 +193,7 @@ impl PgxSql {
             &mapped_enums,
             &mapped_builtin_types,
             &mapped_extension_sqls,
+            &mapped_triggers,
         )?;
         connect_ords(
             &mut graph,
@@ -218,11 +220,7 @@ impl PgxSql {
             &mapped_builtin_types,
             &mapped_externs,
         );
-        connect_triggers(
-            &mut graph,
-            &mapped_triggers,
-            &mapped_schemas,
-        );
+        connect_triggers(&mut graph, &mapped_triggers, &mapped_schemas);
 
         let mut this = Self {
             type_mappings: type_mappings.map(|x| (x.id.clone(), x)).collect(),
@@ -597,6 +595,7 @@ pub fn find_positioning_ref_target<'a>(
     externs: &'a HashMap<PgExternEntity, NodeIndex>,
     schemas: &'a HashMap<SchemaEntity, NodeIndex>,
     extension_sqls: &'a HashMap<ExtensionSqlEntity, NodeIndex>,
+    triggers: &'a HashMap<PgTriggerEntity, NodeIndex>,
 ) -> Option<&'a NodeIndex> {
     match positioning_ref {
         PositioningRef::FullPath(path) => {
@@ -628,6 +627,13 @@ pub fn find_positioning_ref_target<'a>(
                     return Some(&other_index);
                 }
             }
+
+            for (other, other_index) in triggers {
+                if last_segment == &other.function_name && other.module_path.ends_with(&module_path)
+                {
+                    return Some(&other_index);
+                }
+            }
         }
         PositioningRef::Name(name) => {
             for (other, other_index) in extension_sqls {
@@ -648,6 +654,7 @@ fn connect_extension_sqls(
     types: &HashMap<PostgresTypeEntity, NodeIndex>,
     enums: &HashMap<PostgresEnumEntity, NodeIndex>,
     externs: &HashMap<PgExternEntity, NodeIndex>,
+    triggers: &HashMap<PgTriggerEntity, NodeIndex>,
 ) -> eyre::Result<()> {
     for (item, &index) in extension_sqls {
         make_schema_connection(
@@ -667,6 +674,7 @@ fn connect_extension_sqls(
                 externs,
                 schemas,
                 extension_sqls,
+                triggers,
             ) {
                 tracing::debug!(from = %item.rust_identifier(), to = ?graph[*target].rust_identifier(), "Adding ExtensionSQL after positioning ref target");
                 graph.add_edge(*target, index, SqlGraphRelationship::RequiredBy);
@@ -904,6 +912,7 @@ fn connect_externs(
     enums: &HashMap<PostgresEnumEntity, NodeIndex>,
     builtin_types: &HashMap<String, NodeIndex>,
     extension_sqls: &HashMap<ExtensionSqlEntity, NodeIndex>,
+    triggers: &HashMap<PgTriggerEntity, NodeIndex>,
 ) -> eyre::Result<()> {
     for (item, &index) in externs {
         make_schema_connection(
@@ -926,6 +935,7 @@ fn connect_externs(
                             externs,
                             schemas,
                             extension_sqls,
+                            triggers,
                         ) {
                             tracing::debug!(from = %item.rust_identifier(), to = %graph[*target].rust_identifier(), "Adding Extern after positioning ref target");
                             graph.add_edge(*target, index, SqlGraphRelationship::RequiredBy);
@@ -1475,7 +1485,6 @@ fn connect_aggregates(
         }
     }
 }
-
 
 fn initialize_triggers(
     graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
