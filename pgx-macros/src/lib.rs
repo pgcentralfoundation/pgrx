@@ -1047,13 +1047,21 @@ pub fn pgx(_attr: TokenStream, item: TokenStream) -> TokenStream {
     item
 }
 
+/**
+Create a [PostgreSQL trigger function](https://www.postgresql.org/docs/current/plpgsql-trigger.html)
+
+Review the `pgx::trigger_support::PgTrigger` documentation for use.
+
+ */
 #[proc_macro_attribute]
 pub fn pg_trigger(attrs: TokenStream, input: TokenStream) -> TokenStream {
     fn wrapped(attrs: TokenStream, input: TokenStream) -> Result<TokenStream, syn::Error> {
         use syn::{Token, punctuated::Punctuated, parse::Parser};
-        let attributes = Punctuated::<pgx_utils::sql_entity_graph::PgTriggerAttribute, Token![,]>::parse_terminated.parse(attrs)?;
+        use pgx_utils::sql_entity_graph::{PgTriggerAttribute, PgTrigger};
+
+        let attributes = Punctuated::<PgTriggerAttribute, Token![,]>::parse_terminated.parse(attrs)?;
         let item_fn: syn::ItemFn = syn::parse(input)?;
-        let trigger_item = pgx_utils::sql_entity_graph::PgTrigger::new(item_fn, attributes)?;
+        let trigger_item = PgTrigger::new(item_fn, attributes)?;
         let trigger_tokens = trigger_item.to_token_stream();
 
         Ok(trigger_tokens.into())

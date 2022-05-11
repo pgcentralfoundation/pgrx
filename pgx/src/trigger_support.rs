@@ -14,10 +14,118 @@ use cstr_core::c_char;
 use crate::{PgRelation, is_a, pg_sys, heap_tuple::PgHeapTuple, pgbox::{PgBox, AllocatedByPostgres}};
 use std::borrow::Borrow;
 
-/// The datatype accepted by a trigger
-/// 
-/// A safe structure providing the an API similar to the constants provided in a PL/pgSQL function. The unsafe [`pgx::pg_sys::TriggerData`][crate::pg_sys::TriggerData]
-/// (and its contained [`pgx::pg_sys::Trigger`][crate::pg_sys::Trigger]) is available in the `trigger_data` field.
+/**
+The datatype accepted by a trigger
+
+A safe structure providing the an API similar to the constants provided in a PL/pgSQL function.
+
+A "no-op" trigger that gets the current [`PgHeapTuple`][crate::PgHeapTuple],
+panicking (into a PostgreSQL error) if it doesn't exist:
+
+```rust,no_run
+use pgx::{pg_trigger, pg_sys, PgHeapTuple, WhoAllocated, PgHeapTupleError, PgTrigger};
+
+#[pg_trigger]
+fn example_trigger(trigger: &PgTrigger) -> Result<
+    PgHeapTuple<'_, impl WhoAllocated<pg_sys::HeapTupleData>>,
+    PgHeapTupleError,
+> {
+    Ok(unsafe { trigger.current() }.expect("No current HeapTuple"))
+}
+```
+
+Trigger functions only accept one argument, a [`PgTrigger`], and they return a [`Result`][std::result::Result] containing 
+either a [`PgHeapTuple`][crate::PgHeapTuple] or any error that implements [`impl std::error::Error`][std::error::Error].
+
+## Working with [WhoAllocated][crate::WhoAllocated]
+
+Trigger functions can return [`PgHeapTuple`][crate::PgHeapTuple]s which are [`AllocatedByRust`][crate::AllocatedByRust]
+or [`AllocatedByPostgres`][crate::AllocatedByPostgres]. In most cases, it can be inferred by the compiler using
+[`impl WhoAllocated<pg_sys::HeapTupleData>>`][crate::WhoAllocated].
+
+When it can't, the function definition permits for it to be specified:
+
+```rust,no_run
+use pgx::{pg_trigger, pg_sys, PgHeapTuple, AllocatedByRust, AllocatedByPostgres, PgHeapTupleError, PgTrigger};
+
+#[pg_trigger]
+fn example_allocated_by_rust(trigger: &PgTrigger) -> Result<
+    PgHeapTuple<'_, AllocatedByRust>,
+    PgHeapTupleError,
+> {
+    let current = unsafe { trigger.current() }.expect("No current HeapTuple");
+    Ok(current.into_owned())
+}
+
+#[pg_trigger]
+fn example_allocated_by_postgres(trigger: &PgTrigger) -> Result<
+    PgHeapTuple<'_, AllocatedByPostgres>,
+    PgHeapTupleError,
+> {
+    let current = unsafe { trigger.current() }.expect("No current HeapTuple");
+    Ok(current)
+}
+```
+
+## Error Handling
+
+Trigger functions can return any [`impl std::error::Error`][std::error::Error]. Returned errors
+become PostgreSQL errors.
+
+
+```rust,no_run
+use pgx::{pg_trigger, pg_sys, PgHeapTuple, WhoAllocated, PgHeapTupleError, PgTrigger};
+
+#[derive(thiserror::Error, Debug)]
+enum CustomTriggerError {
+    #[error("No current HeapTuple")]
+    NoCurrentHeapTuple,
+    #[error("pgx::PgHeapTupleError: {0}")]
+    PgHeapTuple(PgHeapTupleError),
+}
+
+#[pg_trigger]
+fn example_trigger(trigger: &PgTrigger) -> Result<
+    PgHeapTuple<'_, impl WhoAllocated<pg_sys::HeapTupleData>>,
+    CustomTriggerError,
+> {
+    unsafe { trigger.current() }.ok_or(CustomTriggerError::NoCurrentHeapTuple)
+}
+```
+
+## Lifetimes
+
+Triggers are free to use lifetimes to hone their code, the generated wrapper is as generous as possible.
+
+```rust,no_run
+use pgx::{pg_trigger, pg_sys, PgHeapTuple, AllocatedByRust, PgHeapTupleError, PgTrigger};
+
+#[derive(thiserror::Error, Debug)]
+enum CustomTriggerError<'a> {
+    #[error("No current HeapTuple")]
+    NoCurrentHeapTuple,
+    #[error("pgx::PgHeapTupleError: {0}")]
+    PgHeapTuple(PgHeapTupleError),
+    #[error("A borrowed error variant: {0}")]
+    SomeStr(&'a str),
+}
+
+#[pg_trigger]
+fn example_trigger<'a, 'b>(trigger: &'a PgTrigger) -> Result<
+    PgHeapTuple<'a, AllocatedByRust>,
+    CustomTriggerError<'b>,
+> {
+    return Err(CustomTriggerError::SomeStr("Oopsie"))
+}
+```
+
+## Unsafe escape hatches
+
+Unsafe [`pgx::pg_sys::FunctionCallInfo`][crate::pg_sys::FunctionCallInfo] and
+[`pgx::pg_sys::TriggerData`][crate::pg_sys::TriggerData] (include its contained
+[`pgx::pg_sys::Trigger`][crate::pg_sys::Trigger]) accessors are available..
+
+*/
 pub struct PgTrigger {
     trigger_data: PgBox<pgx_pg_sys::TriggerData>,
     #[allow(dead_code)]

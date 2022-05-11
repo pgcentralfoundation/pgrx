@@ -85,7 +85,7 @@ impl PgTrigger {
         );
         let tokens = quote! {
             #[no_mangle]
-            #[pg_guard]
+            #[pgx::pg_guard]
             extern "C" fn #extern_func_ident(fcinfo: ::pgx::pg_sys::FunctionCallInfo) -> ::pgx::pg_sys::Datum {
                 let maybe_pg_trigger = unsafe { ::pgx::trigger_support::PgTrigger::from_fcinfo(fcinfo) };
                 let pg_trigger = maybe_pg_trigger.expect("PgTrigger::from_fcinfo failed");
@@ -111,8 +111,8 @@ impl PgTrigger {
         let tokens = quote! {
             #[no_mangle]
             #[doc(hidden)]
-            pub extern "C" fn #finfo_name() -> &'static pg_sys::Pg_finfo_record {
-                const V1_API: pg_sys::Pg_finfo_record = pg_sys::Pg_finfo_record { api_version: 1 };
+            pub extern "C" fn #finfo_name() -> &'static ::pgx::pg_sys::Pg_finfo_record {
+                const V1_API: ::pgx::pg_sys::Pg_finfo_record = ::pgx::pg_sys::Pg_finfo_record { api_version: 1 };
                 &V1_API
             }
         };
