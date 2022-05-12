@@ -78,7 +78,7 @@ This can also be done via the [`extension_sql`][crate::extension_sql] attribute:
 
 ```rust,no_run
 # use pgx::{pg_trigger, pg_sys, PgHeapTuple, WhoAllocated, PgHeapTupleError, PgTrigger};
-# 
+#
 # #[pg_trigger]
 # fn trigger_example(trigger: &PgTrigger) -> Result<
 #    PgHeapTuple<'_, impl WhoAllocated<pg_sys::HeapTupleData>>,
@@ -86,7 +86,7 @@ This can also be done via the [`extension_sql`][crate::extension_sql] attribute:
 # > {
 #     Ok(unsafe { trigger.current() }.expect("No current HeapTuple"))
 # }
-# 
+#
 pgx::extension_sql!(
     r#"
 CREATE TABLE test (
