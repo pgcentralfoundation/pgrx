@@ -9,6 +9,7 @@ on:
     branches:
       - master
       - develop
+      - develop-v0.5.0
 
 env:
   RUSTFLAGS: -Copt-level=0
