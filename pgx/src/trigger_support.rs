@@ -77,7 +77,17 @@ INSERT INTO test (title, description, payload)
 This can also be done via the [`extension_sql`][crate::extension_sql] attribute:
 
 ```rust,no_run
-extension_sql!(
+# use pgx::{pg_trigger, pg_sys, PgHeapTuple, WhoAllocated, PgHeapTupleError, PgTrigger};
+# 
+# #[pg_trigger]
+# fn trigger_example(trigger: &PgTrigger) -> Result<
+#    PgHeapTuple<'_, impl WhoAllocated<pg_sys::HeapTupleData>>,
+#    PgHeapTupleError,
+# > {
+#     Ok(unsafe { trigger.current() }.expect("No current HeapTuple"))
+# }
+# 
+pgx::extension_sql!(
     r#"
 CREATE TABLE test (
     id serial8 NOT NULL PRIMARY KEY,
@@ -190,6 +200,19 @@ Many [`PgTrigger`][PgTrigger] functions are `unsafe` as they dereference pointer
 
 In cases where a safe API is desired, the [`PgTriggerSafe`] structure can be retrieved
 from [`PgTrigger::to_safe`].
+
+```rust,no_run
+use pgx::{pg_trigger, pg_sys, PgHeapTuple, WhoAllocated, PgHeapTupleError, PgTrigger};
+
+#[pg_trigger]
+fn trigger_safe(trigger: &PgTrigger) -> Result<
+    PgHeapTuple<'_, impl WhoAllocated<pg_sys::HeapTupleData>>,
+    PgTriggerError,
+> {
+    let trigger_safe = unsafe { trigger.to_safe() }?;
+    Ok(trigger_safe.current.expect("No current HeapTuple"))
+}
+```
 
 */
 pub struct PgTrigger {
@@ -359,6 +382,8 @@ impl PgTrigger {
         Ok(args)
     }
 
+    /// Eagerly evaluate the data in this `PgTrigger` and build a safely accessible structure
+    /// which mimics the data provided to a PL/pgSQL trigger.
     pub unsafe fn to_safe(&self) -> Result<PgTriggerSafe, PgTriggerError> {
         let trigger_safe = PgTriggerSafe {
             name: self.name()?,
