@@ -202,7 +202,7 @@ In cases where a safe API is desired, the [`PgTriggerSafe`] structure can be ret
 from [`PgTrigger::to_safe`].
 
 ```rust,no_run
-use pgx::{pg_trigger, pg_sys, PgHeapTuple, WhoAllocated, PgHeapTupleError, PgTrigger};
+use pgx::{pg_trigger, pg_sys, PgHeapTuple, WhoAllocated, PgHeapTupleError, PgTrigger, PgTriggerError};
 
 #[pg_trigger]
 fn trigger_safe(trigger: &PgTrigger) -> Result<

@@ -343,7 +343,6 @@ impl<T: FromDatum> FromDatum for Vec<Option<T>> {
             for element in array.iter() {
                 v.push(element)
             }
-            std::mem::forget(array);
             Some(v)
         }
     }

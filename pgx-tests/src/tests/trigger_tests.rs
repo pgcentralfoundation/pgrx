@@ -87,8 +87,6 @@ mod tests {
     enum TriggerError {
         #[error("Null OLD found")]
         NullCurrent,
-        #[error("Null NEW found")]
-        NullNew,
         #[error("PgHeapTuple: {0}")]
         PgHeapTuple(#[from] pgx::heap_tuple::PgHeapTupleError),
         #[error("TryFromDatumError: {0}")]
@@ -378,14 +376,14 @@ mod tests {
             name,
             new: _new,
             current,
-            event,
+            event: _event,
             when,
             level,
             op,
             relid,
             old_transition_table_name,
             new_transition_table_name,
-            relation,
+            relation: _relation,
             table_name,
             table_schema,
             extra_args,

@@ -51,7 +51,7 @@ CREATE TRIGGER test_trigger BEFORE INSERT ON test FOR EACH ROW EXECUTE PROCEDURE
 INSERT INTO test (title, description, payload) VALUES ('Fox', 'a description', '{"key": "value"}');
 "#,
     name = "create_trigger",
-    requires = [trigger_example]
+    requires = [ trigger_example ]
 );
 
 #[cfg(any(test, feature = "pg_test"))]
