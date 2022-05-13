@@ -20,6 +20,7 @@ use pgx_utils::{createdb, get_named_capture, get_target_dir};
 use postgres::error::DbError;
 use postgres::Client;
 use std::collections::HashMap;
+use std::fmt::Write as _;
 use std::io::{BufRead, BufReader, Write};
 use std::path::PathBuf;
 
@@ -102,27 +103,20 @@ pub fn run_test(
                     // wait a second for Postgres to get log messages written to stdoerr
                     std::thread::sleep(std::time::Duration::from_millis(1000));
 
-                    let mut pg_location = String::new();
-                    pg_location.push_str("Postgres location: ");
-                    if dberror.file().is_some() {
-                        pg_location.push_str(&dberror.file().unwrap());
+                    let mut pg_location = String::from("Postgres location: ");
+                    pg_location.push_str(match dberror.file() {
+                        Some(file) => file,
+                        None => "<unknown>",
+                    });
+                    if let Some(ln) = dberror.line() {
+                        let _ = write!(pg_location, ":{ln}");
+                    };
 
-                        if dberror.line().is_some() {
-                            pg_location.push(':');
-                            pg_location.push_str(&dberror.line().unwrap().to_string());
-                        }
-                    } else {
-                        pg_location.push_str("<unknown>");
-                    }
-
-                    let mut rust_location = String::new();
-                    rust_location.push_str("Rust location: ");
-                    if dberror.where_().is_some() {
-                        rust_location.push_str(&dberror.where_().unwrap());
-                    } else {
-                        rust_location.push_str("<unknown>");
-                    }
-
+                    let mut rust_location = String::from("Rust location: ");
+                    rust_location.push_str(match dberror.where_() {
+                        Some(place) => place,
+                        None => "<unknown>",
+                    });
                     // then we can panic with those messages plus those that belong to the system
                     panic!(
                         "\n{sys}...\n{sess}\n{e}\n{pg}\n{rs}\n\n",
