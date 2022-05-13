@@ -99,8 +99,7 @@ pub fn run_test(
                     Ok(())
                 } else {
                     // we weren't expecting an error
-                    //
-                    // wait a second for Postgres to get log messages written to stdoerr
+                    // wait a second for Postgres to get log messages written to stderr
                     std::thread::sleep(std::time::Duration::from_millis(1000));
 
                     let mut pg_location = String::from("Postgres location: ");
