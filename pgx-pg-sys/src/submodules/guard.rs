@@ -76,17 +76,6 @@ fn take_panic_location() -> PanicLocation {
 thread_local! { pub(crate) static IS_MAIN_THREAD: once_cell::sync::OnceCell<()> = once_cell::sync::OnceCell::new() }
 
 pub fn register_pg_guard_panic_handler() {
-    // first, lets ensure we're not calling ourselves twice
-    #[cfg(debug_assertions)]
-    {
-        if IS_MAIN_THREAD.with(|v| v.get().is_some()) {
-            panic!("IS_MAIN_THREAD has already been set")
-        }
-
-        // it's expected that this function will only ever be called by `pg_module_magic!()` by the main thread
-        IS_MAIN_THREAD.with(|v| v.set(()).expect("failed to set main thread sentinel"));
-    }
-
     std::panic::set_hook(Box::new(|info| {
         #[cfg(debug_assertions)]
         {
