@@ -30,7 +30,7 @@ mod tests {
             PgHeapTuple<'_, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>,
             pgx::PgHeapTupleError,
         > {
-            Ok(unsafe { trigger.current() }.unwrap().into_owned())
+            Ok(trigger.current().unwrap().into_owned())
         }
 
         #[pg_trigger]
@@ -40,21 +40,21 @@ mod tests {
             PgHeapTuple<'a, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>,
             pgx::PgHeapTupleError,
         > {
-            Ok(unsafe { trigger.current() }.unwrap().into_owned())
+            Ok(trigger.current().unwrap().into_owned())
         }
 
         #[pg_trigger]
         fn signature_alloc_by_postgres(
             trigger: &pgx::PgTrigger,
         ) -> Result<PgHeapTuple<'_, AllocatedByPostgres>, pgx::PgHeapTupleError> {
-            Ok(unsafe { trigger.current() }.unwrap())
+            Ok(trigger.current().unwrap())
         }
 
         #[pg_trigger]
         fn signature_alloc_by_rust(
             trigger: &pgx::PgTrigger,
         ) -> Result<PgHeapTuple<'_, AllocatedByRust>, pgx::PgHeapTupleError> {
-            Ok(unsafe { trigger.current() }.unwrap().into_owned())
+            Ok(trigger.current().unwrap().into_owned())
         }
 
         // Check type aliases
@@ -67,7 +67,7 @@ mod tests {
             PgHeapTuple<'a, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>,
             core::str::Utf8Error,
         > {
-            Ok(unsafe { trigger.current() }.unwrap().into_owned())
+            Ok(trigger.current().unwrap().into_owned())
         }
 
         type AliasedTriggerResult<'a> = Result<PgHeapTuple<'a, AllocatedByRust>, TriggerError>;
@@ -101,7 +101,7 @@ mod tests {
     fn field_species_fox_to_bear(
         trigger: &pgx::PgTrigger,
     ) -> Result<PgHeapTuple<'_, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>, TriggerError> {
-        let current = unsafe { trigger.current() }.ok_or(TriggerError::NullCurrent)?;
+        let current = trigger.current().ok_or(TriggerError::NullCurrent)?;
         let mut current = current.into_owned();
 
         let field = "species";
@@ -146,7 +146,7 @@ mod tests {
     fn add_field_boopers(
         trigger: &pgx::PgTrigger,
     ) -> Result<PgHeapTuple<'_, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>, TriggerError> {
-        let current = unsafe { trigger.current() }.ok_or(TriggerError::NullCurrent)?;
+        let current = trigger.current().ok_or(TriggerError::NullCurrent)?;
         let mut current = current.into_owned();
 
         let field = "booper";
@@ -191,13 +191,13 @@ mod tests {
     fn intercept_bears(
         trigger: &pgx::PgTrigger,
     ) -> Result<PgHeapTuple<'_, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>, TriggerError> {
-        let new = unsafe { trigger.new() }.ok_or(TriggerError::NullCurrent)?;
+        let new = trigger.new().ok_or(TriggerError::NullCurrent)?;
 
         for index in 1..(new.len() + 1) {
             if let Some(val) = new.get_by_index::<&str>(index.try_into()?)? {
                 if val == "Bear" {
                     // We intercepted a bear! Avoid this update, return `current` instead.
-                    let current = unsafe { trigger.current() }.ok_or(TriggerError::NullCurrent)?;
+                    let current = trigger.current().ok_or(TriggerError::NullCurrent)?;
                     return Ok(current);
                 }
             }
@@ -245,7 +245,7 @@ mod tests {
     fn inserts_trigger_metadata(
         trigger: &pgx::PgTrigger,
     ) -> Result<PgHeapTuple<'_, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>, TriggerError> {
-        let current = unsafe { trigger.current() }.ok_or(TriggerError::NullCurrent)?;
+        let current = trigger.current().ok_or(TriggerError::NullCurrent)?;
         let mut current = current.into_owned();
 
         let trigger_name = trigger.name()?;
@@ -508,7 +508,7 @@ mod tests {
     fn has_sql_option_set(
         trigger: &pgx::PgTrigger,
     ) -> Result<PgHeapTuple<'_, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>, TriggerError> {
-        let current = unsafe { trigger.current() }.ok_or(TriggerError::NullCurrent)?;
+        let current = trigger.current().ok_or(TriggerError::NullCurrent)?;
         let current = current.into_owned();
 
         Ok(current)
@@ -547,7 +547,7 @@ mod tests {
     fn noop_postgres(
         trigger: &pgx::PgTrigger,
     ) -> Result<PgHeapTuple<'_, AllocatedByPostgres>, TriggerError> {
-        Ok(unsafe { trigger.current() }.unwrap())
+        Ok(trigger.current().unwrap())
     }
 
     #[pg_test]
@@ -583,7 +583,7 @@ mod tests {
     fn noop_rust(
         trigger: &pgx::PgTrigger,
     ) -> Result<PgHeapTuple<'_, AllocatedByRust>, TriggerError> {
-        Ok(unsafe { trigger.current() }.unwrap().into_owned())
+        Ok(trigger.current().unwrap().into_owned())
     }
 
     #[pg_test]

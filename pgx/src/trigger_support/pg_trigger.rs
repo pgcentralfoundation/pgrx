@@ -27,6 +27,22 @@ pub struct PgTrigger {
 }
 
 impl PgTrigger {
+    /// Construct a new [`PgTrigger`] from a [`FunctionCallInfo`][pg_sys::FunctionCallInfo]
+    /// 
+    /// Generally this would be automatically done for the user in a [`#[pg_trigger]`][pgx::pg_trigger].
+    /// 
+    /// # Safety
+    /// 
+    /// This constructor attempts to do some checks for validity, but it is ultimately unsafe
+    /// because it must dereference several raw pointers.
+    /// 
+    /// Users should ensure the provided `fcinfo` is:
+    /// 
+    /// * one provided by PostgreSQL during a trigger invocation,
+    /// * unharmed (the user has not mutated it since PostgreSQL provided it),
+    /// 
+    /// If any of these conditions are untrue, this or any other function on this type is
+    /// undefined behavior, hopefully panicking.
     pub unsafe fn from_fcinfo(fcinfo: pg_sys::FunctionCallInfo) -> Result<Self, PgTriggerError> {
         if fcinfo.is_null() {
             return Err(PgTriggerError::NullFunctionCallInfo);
@@ -63,29 +79,34 @@ impl PgTrigger {
     }
 
     /// The new HeapTuple
-    ///
-    /// # Safety
-    /// 
-    /// This function is unsafe as we cannot guarantee that any pointers in the `trigger_data` argument are valid.
     // Derived from `pgx_pg_sys::TriggerData.tg_newtuple` and `pgx_pg_sys::TriggerData.tg_newslot.tts_tupleDescriptor`
-    pub unsafe fn new(&self) -> Option<PgHeapTuple<'_, AllocatedByPostgres>> {
-        PgHeapTuple::from_trigger_data(&*self.trigger_data, TriggerTuple::New)
+    pub fn new(&self) -> Option<PgHeapTuple<'_, AllocatedByPostgres>> {
+        // Safety: Given that we have a known good `FunctionCallInfo`, which PostgreSQL has checked is indeed a trigger,
+        // containing a known good `TriggerData` which also contains a known good `Trigger`... and the user aggreed to
+        // our `unsafe` constructor safety rules, we choose to trust this is indeed a valid pointer offered to us by
+        // PostgreSQL, and that it trusts it.
+        unsafe {
+            PgHeapTuple::from_trigger_data(&*self.trigger_data, TriggerTuple::New)
+        }
     }
     /// The current HeapTuple
-    ///
-    /// # Safety
-    /// 
-    /// This function is unsafe as we cannot guarantee that any pointers in the `trigger_data` argument are valid.
     // Derived from `pgx_pg_sys::TriggerData.tg_trigtuple` and `pgx_pg_sys::TriggerData.tg_trigslot.tts_tupleDescriptor`
-    pub unsafe fn current(&self) -> Option<PgHeapTuple<'_, AllocatedByPostgres>> {
-        PgHeapTuple::from_trigger_data(&*self.trigger_data, TriggerTuple::Current)
+    pub fn current(&self) -> Option<PgHeapTuple<'_, AllocatedByPostgres>> {
+        // Safety: Given that we have a known good `FunctionCallInfo`, which PostgreSQL has checked is indeed a trigger,
+        // containing a known good `TriggerData` which also contains a known good `Trigger`... and the user aggreed to
+        // our `unsafe` constructor safety rules, we choose to trust this is indeed a valid pointer offered to us by
+        // PostgreSQL, and that it trusts it.
+        unsafe {
+            PgHeapTuple::from_trigger_data(&*self.trigger_data, TriggerTuple::Current)
+        }
     }
     /// Variable that contains the name of the trigger actually fired
     pub fn name(&self) -> Result<&str, PgTriggerError> {
         let name_ptr = self.trigger.tgname as *mut c_char;
         // Safety: Given that we have a known good `FunctionCallInfo`, which PostgreSQL has checked is indeed a trigger,
-        // containing a known good `TriggerData` which also contains a known good `Trigger`, we choose to trust this
-        // is indeed a valid pointer offered to us by PostgreSQL, and that it trusts it.
+        // containing a known good `TriggerData` which also contains a known good `Trigger`... and the user aggreed to
+        // our `unsafe` constructor safety rules, we choose to trust this is indeed a valid pointer offered to us by
+        // PostgreSQL, and that it trusts it.
         let name_cstr = unsafe { cstr_core::CStr::from_ptr(name_ptr) };
         let name_str = name_cstr.to_str()?;
         Ok(name_str)
@@ -123,8 +144,9 @@ impl PgTrigger {
         let tgoldtable = self.trigger.tgoldtable;
         if !tgoldtable.is_null() {
             // Safety: Given that we have a known good `FunctionCallInfo`, which PostgreSQL has checked is indeed a trigger,
-            // containing a known good `TriggerData` which also contains a known good `Trigger`, we choose to trust this
-            // is indeed a valid pointer offered to us by PostgreSQL, and that it trusts it.
+            // containing a known good `TriggerData` which also contains a known good `Trigger`... and the user aggreed to
+            // our `unsafe` constructor safety rules, we choose to trust this is indeed a valid pointer offered to us by
+            // PostgreSQL, and that it trusts it.
             let table_name_cstr = unsafe {
                 cstr_core::CStr::from_ptr(tgoldtable)
             };
@@ -140,8 +162,9 @@ impl PgTrigger {
         let tgnewtable = self.trigger.tgnewtable;
         if !tgnewtable.is_null() {
             // Safety: Given that we have a known good `FunctionCallInfo`, which PostgreSQL has checked is indeed a trigger,
-            // containing a known good `TriggerData` which also contains a known good `Trigger`, we choose to trust this
-            // is indeed a valid pointer offered to us by PostgreSQL, and that it trusts it.
+            // containing a known good `TriggerData` which also contains a known good `Trigger`... and the user aggreed to
+            // our `unsafe` constructor safety rules, we choose to trust this is indeed a valid pointer offered to us by
+            // PostgreSQL, and that it trusts it.
             let table_name_cstr = unsafe {
                 cstr_core::CStr::from_ptr(tgnewtable)
             };
@@ -163,7 +186,8 @@ impl PgTrigger {
     /// 
     /// As such, this function is unsafe as we cannot guarantee that this requirement is true.
     pub unsafe fn relation(&self) -> Result<crate::PgRelation, PgTriggerError> {
-        Ok(PgRelation::open(self.relation_data.rd_id))
+        let relation = PgRelation::open(self.relation_data.rd_id);
+        Ok(relation)
     }
     /// The name of the schema of the table that caused the trigger invocation
     /// 
@@ -201,8 +225,9 @@ impl PgTrigger {
         let tgargs = self.trigger.tgargs;
         let tgnargs = self.trigger.tgnargs;
         // Safety: Given that we have a known good `FunctionCallInfo`, which PostgreSQL has checked is indeed a trigger,
-        // containing a known good `TriggerData` which also contains a known good `Trigger`, we choose to trust this
-        // is indeed a valid pointer offered to us by PostgreSQL, and that it trusts it.
+        // containing a known good `TriggerData` which also contains a known good `Trigger`... and the user aggreed to
+        // our `unsafe` constructor safety rules, we choose to trust this is indeed a valid pointer offered to us by
+        // PostgreSQL, and that it trusts it.
         let slice: &[*mut c_char] = unsafe {
             core::slice::from_raw_parts(tgargs, tgnargs.try_into()?)
         };
@@ -210,8 +235,9 @@ impl PgTrigger {
             .into_iter()
             .map(|v| {
                 // Safety: Given that we have a known good `FunctionCallInfo`, which PostgreSQL has checked is indeed a trigger,
-                // containing a known good `TriggerData` which also contains a known good `Trigger`, we choose to trust this
-                // is indeed a valid pointer offered to us by PostgreSQL, and that it trusts it.
+                // containing a known good `TriggerData` which also contains a known good `Trigger`... and the user aggreed to
+                // our `unsafe` constructor safety rules, we choose to trust this is indeed a valid pointer offered to us by
+                // PostgreSQL, and that it trusts it.
                 unsafe {
                     cstr_core::CStr::from_ptr(*v)
                 }.to_str().map(ToString::to_string)
