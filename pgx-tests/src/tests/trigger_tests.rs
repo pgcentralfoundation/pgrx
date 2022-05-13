@@ -248,7 +248,7 @@ mod tests {
         let current = unsafe { trigger.current() }.ok_or(TriggerError::NullCurrent)?;
         let mut current = current.into_owned();
 
-        let trigger_name = unsafe { trigger.name()? };
+        let trigger_name = trigger.name()?;
         current.set_by_name("trigger_name", trigger_name)?;
 
         let trigger_when = trigger.when()?.to_string();
@@ -260,16 +260,16 @@ mod tests {
         let trigger_op = trigger.op()?.to_string();
         current.set_by_name("trigger_op", trigger_op)?;
 
-        let trigger_relid = unsafe { trigger.relid()? };
+        let trigger_relid = trigger.relid()?;
         current.set_by_name("trigger_relid", trigger_relid)?;
 
-        let trigger_old_transition_table_name = unsafe { trigger.old_transition_table_name()? };
+        let trigger_old_transition_table_name = trigger.old_transition_table_name()?;
         current.set_by_name(
             "trigger_old_transition_table_name",
             trigger_old_transition_table_name,
         )?;
 
-        let trigger_new_transition_table_name = unsafe { trigger.new_transition_table_name()? };
+        let trigger_new_transition_table_name = trigger.new_transition_table_name()?;
         current.set_by_name(
             "trigger_new_transition_table_name",
             trigger_new_transition_table_name,
@@ -281,7 +281,7 @@ mod tests {
         let trigger_table_schema = unsafe { trigger.table_schema()? };
         current.set_by_name("trigger_table_schema", trigger_table_schema)?;
 
-        let trigger_extra_args = unsafe { trigger.extra_args()? };
+        let trigger_extra_args = trigger.extra_args()?;
         current.set_by_name("trigger_extra_args", trigger_extra_args)?;
 
         Ok(current)
