@@ -399,7 +399,7 @@ fn monitor_pg(mut command: Command, cmd_string: String, loglines: LogLines) -> (
         let pid = child.id();
 
         eprintln!(
-            "{cmd }\npid={p}",
+            "{cmd}\npid={p}",
             cmd = cmd_string.bold().blue(),
             p = pid.to_string().yellow()
         );
