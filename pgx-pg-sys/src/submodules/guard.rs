@@ -13,6 +13,7 @@ use crate::FlushErrorState;
 use std::any::Any;
 use std::cell::Cell;
 use std::panic::catch_unwind;
+use std::{mem, thread};
 
 extern "C" {
     fn pg_re_throw();
@@ -94,12 +95,10 @@ pub fn register_pg_guard_panic_handler() {
                 // a thread that isn't the main thread panic!()d
                 // we make a best effort to push a message to stderr, which hopefully
                 // Postgres is logging somewhere
-                eprintln!(
-                    "thread={:?}, id={:?}, {}",
-                    std::thread::current().name(),
-                    std::thread::current().id(),
-                    info
-                );
+                let thread = thread::current();
+                let name = thread.name().unwrap_or("<anon>");
+                let id = thread.id();
+                eprintln!("thread={name}, id={id:?}, error: {info}");
             }
         }
 
@@ -287,18 +286,22 @@ where
 
 /// convert types of `e` that we understand/expect into either a
 /// `Ok(String)` or a `Err<JumpContext>`
-fn downcast_err(e: Box<dyn Any + Send>) -> Result<String, JumpContext> {
+fn downcast_err(mut e: Box<dyn Any + Send>) -> Result<String, JumpContext> {
     if let Some(cxt) = e.downcast_ref::<JumpContext>() {
         Err(cxt.clone())
-    } else if let Some(s) = e.downcast_ref::<&str>() {
-        Ok((*s).to_string())
-    } else if let Some(s) = e.downcast_ref::<String>() {
-        Ok(s.to_string())
+    } else if let Some(&s) = e.downcast_ref::<&str>() {
+        Ok(s.to_owned())
+    } else if let Some(s) = e.downcast_mut::<String>() {
+        // Cloning is overhead, this box is owned, and ownership is theft.
+        Ok(mem::take(s))
     } else if let Some(s) = e.downcast_ref::<PgxPanic>() {
-        Ok(format!(
-            "{}: {}:{}:{}",
-            s.message, s.filename, s.lineno, s.colno
-        ))
+        let PgxPanic {
+            message,
+            filename,
+            lineno,
+            colno,
+        } = s;
+        Ok(format!("{message} at {filename}:{lineno}:{colno}"))
     } else {
         // not a type we understand, so use a generic string
         Ok("Box<Any>".to_string())
