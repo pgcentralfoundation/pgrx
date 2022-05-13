@@ -416,44 +416,40 @@ fn monitor_pg(mut command: Command, cmd_string: String, loglines: LogLines) -> (
 
         let regex = regex::Regex::new(r#"\[.*?\] \[.*?\] \[(?P<session_id>.*?)\]"#).unwrap();
         let mut is_started_yet = false;
-        for line in reader.lines() {
-            match line {
-                Ok(line) => {
-                    let session_id = match get_named_capture(&regex, "session_id", &line) {
-                        Some(sid) => sid,
-                        None => "NONE".to_string(),
-                    };
+        let mut lines = reader.lines();
+        while let Some(Ok(line)) = lines.next() {
+            let session_id = match get_named_capture(&regex, "session_id", &line) {
+                Some(sid) => sid,
+                None => "NONE".to_string(),
+            };
 
-                    if line.contains("database system is ready to accept connections") {
-                        // Postgres says it's ready to go
-                        sender.send((pid, session_id.clone())).unwrap();
-                        is_started_yet = true;
-                    }
-
-                    if !is_started_yet || line.contains("TMSG: ") {
-                        eprintln!("{}", line.cyan());
-                    }
-
-                    //                    if line.contains("INFO: ") {
-                    //                        eprintln!("{}", line.cyan());
-                    //                    } else if line.contains("WARNING: ") {
-                    //                        eprintln!("{}", line.bold().yellow());
-                    //                    } else if line.contains("ERROR: ") {
-                    //                        eprintln!("{}", line.bold().red());
-                    //                    } else if line.contains("statement: ") || line.contains("duration: ") {
-                    //                        eprintln!("{}", line.bold().blue());
-                    //                    } else if line.contains("LOG: ") {
-                    //                        eprintln!("{}", line.dimmed().white());
-                    //                    } else {
-                    //                        eprintln!("{}", line.bold().purple());
-                    //                    }
-
-                    let mut loglines = loglines.lock().unwrap();
-                    let session_lines = loglines.entry(session_id).or_insert_with(Vec::new);
-                    session_lines.push(line);
-                }
-                Err(e) => panic!("reading Postgres stderr is somehow itself erroneous:\n{e}"),
+            if line.contains("database system is ready to accept connections") {
+                // Postgres says it's ready to go
+                sender.send((pid, session_id.clone())).unwrap();
+                is_started_yet = true;
             }
+
+            if !is_started_yet || line.contains("TMSG: ") {
+                eprintln!("{}", line.cyan());
+            }
+
+            // if line.contains("INFO: ") {
+            //     eprintln!("{}", line.cyan());
+            // } else if line.contains("WARNING: ") {
+            //     eprintln!("{}", line.bold().yellow());
+            // } else if line.contains("ERROR: ") {
+            //     eprintln!("{}", line.bold().red());
+            // } else if line.contains("statement: ") || line.contains("duration: ") {
+            //     eprintln!("{}", line.bold().blue());
+            // } else if line.contains("LOG: ") {
+            //     eprintln!("{}", line.dimmed().white());
+            // } else {
+            //     eprintln!("{}", line.bold().purple());
+            // }
+
+            let mut loglines = loglines.lock().unwrap();
+            let session_lines = loglines.entry(session_id).or_insert_with(Vec::new);
+            session_lines.push(line);
         }
 
         // wait for Postgres to really finish
