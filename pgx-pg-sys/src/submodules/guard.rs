@@ -260,7 +260,7 @@ where
         // the panic!()
         Ok(message) => {
             let location = take_panic_location();
-            let c_message = std::ffi::CString::new(message.clone()).unwrap();
+            let c_message = std::ffi::CString::new(message).unwrap();
             let c_file = std::ffi::CString::new(location.file).unwrap();
 
             unsafe {
@@ -273,7 +273,7 @@ where
                     location.col as i32,
                 );
             }
-            unreachable!("ereport() failed at depth==0 with message: {}", message);
+            unreachable!("ereport() failed at depth==0");
         }
 
         // the error is a JumpContext, so we need to longjmp back into Postgres
