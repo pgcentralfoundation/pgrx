@@ -1,4 +1,5 @@
 // Polyfill while #![feature(strict_provenance)] is unstable
+#[cfg(not(nightly))]
 use sptr::Strict;
 use std::ptr::NonNull;
 

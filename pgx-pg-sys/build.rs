@@ -26,6 +26,11 @@ use syn::{ForeignItem, Item};
 #[derive(Debug)]
 struct IgnoredMacros(HashSet<String>);
 
+#[rustversion::nightly]
+const IS_NIGHTLY: bool = true;
+#[rustversion::not(nightly)]
+const IS_NIGHTLY: bool = false;
+
 impl IgnoredMacros {
     fn default() -> Self {
         // these cause duplicate definition problems on linux
@@ -70,6 +75,11 @@ fn main() -> color_eyre::Result<()> {
     let is_for_release =
         std::env::var("PGX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE").unwrap_or("0".to_string()) == "1";
     println!("cargo:rerun-if-env-changed=PGX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE");
+
+    // Do nightly detection to suppress silly warnings.
+    if IS_NIGHTLY {
+        println!("cargo:rustc-cfg=nightly")
+    };
 
     let manifest_dir = PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").unwrap());
     let out_dir = PathBuf::from(std::env::var("OUT_DIR").unwrap());

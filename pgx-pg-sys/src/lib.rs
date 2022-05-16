@@ -17,6 +17,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 #![allow(non_upper_case_globals)]
 #![allow(improper_ctypes)]
 #![allow(clippy::unneeded_field_pattern)]
+#![cfg_attr(nightly, feature(strict_provenance))]
 
 #[cfg(
     any(
