@@ -501,8 +501,8 @@ fn dropdb() {
         )) {
             // got some error we didn't expect
             let stdout = String::from_utf8_lossy(output.stdout.as_slice());
-            eprintln!("completely unexpected error? stdout:\n{stdout}");
-            eprintln!("completely unexpected error? stderr:\n{stderr}");
+            eprintln!("unexpected error (stdout):\n{stdout}");
+            eprintln!("unexpected error (stderr):\n{stderr}");
             panic!("failed to drop test database");
         }
     }
