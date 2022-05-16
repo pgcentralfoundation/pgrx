@@ -13,6 +13,7 @@ use crate::FlushErrorState;
 use std::any::Any;
 use std::cell::Cell;
 use std::panic::catch_unwind;
+use std::{mem, thread};
 
 extern "C" {
     fn pg_re_throw();
@@ -261,7 +262,7 @@ where
         // the panic!()
         Ok(message) => {
             let location = take_panic_location();
-            let c_message = std::ffi::CString::new(message.clone()).unwrap();
+            let c_message = std::ffi::CString::new(message).unwrap();
             let c_file = std::ffi::CString::new(location.file).unwrap();
 
             unsafe {
@@ -274,7 +275,7 @@ where
                     location.col as i32,
                 );
             }
-            unreachable!("ereport() failed at depth==0 with message: {}", message);
+            unreachable!("ereport() failed at depth==0");
         }
 
         // the error is a JumpContext, so we need to longjmp back into Postgres
@@ -287,18 +288,22 @@ where
 
 /// convert types of `e` that we understand/expect into either a
 /// `Ok(String)` or a `Err<JumpContext>`
-fn downcast_err(e: Box<dyn Any + Send>) -> Result<String, JumpContext> {
+fn downcast_err(mut e: Box<dyn Any + Send>) -> Result<String, JumpContext> {
     if let Some(cxt) = e.downcast_ref::<JumpContext>() {
         Err(cxt.clone())
-    } else if let Some(s) = e.downcast_ref::<&str>() {
-        Ok((*s).to_string())
-    } else if let Some(s) = e.downcast_ref::<String>() {
-        Ok(s.to_string())
+    } else if let Some(&s) = e.downcast_ref::<&str>() {
+        Ok(s.to_owned())
+    } else if let Some(s) = e.downcast_mut::<String>() {
+        // Cloning is overhead, this box is owned, and ownership is theft.
+        Ok(mem::take(s))
     } else if let Some(s) = e.downcast_ref::<PgxPanic>() {
-        Ok(format!(
-            "{}: {}:{}:{}",
-            s.message, s.filename, s.lineno, s.colno
-        ))
+        let PgxPanic {
+            message,
+            filename,
+            lineno,
+            colno,
+        } = s;
+        Ok(format!("{message} at {filename}:{lineno}:{colno}"))
     } else {
         // not a type we understand, so use a generic string
         Ok("Box<Any>".to_string())
