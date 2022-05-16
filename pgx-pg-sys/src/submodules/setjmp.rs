@@ -13,7 +13,7 @@
 pub(crate) unsafe fn pg_guard_ffi_boundary<T, F: FnOnce() -> T>(f: F) -> T {
     use crate as pg_sys;
 
-    // This should really, really not be done if IS_MAIN_THREAD is None.
+    // This should really, really not be done in a multithreaded context
     let prev_exception_stack = pg_sys::PG_exception_stack;
     let prev_error_context_stack = pg_sys::error_context_stack;
     let mut jump_buffer = std::mem::MaybeUninit::uninit();
