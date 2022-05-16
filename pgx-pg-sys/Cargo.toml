@@ -45,3 +45,4 @@ rayon = "1.5.2"
 syn = { version = "1.0.91", features = [ "extra-traits", "full", "fold", "parsing" ] }
 eyre = "0.6.8"
 color-eyre = "0.6.1"
+rustversion = "1.0"
