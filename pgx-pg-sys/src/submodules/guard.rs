@@ -95,10 +95,12 @@ pub fn register_pg_guard_panic_handler() {
                 // a thread that isn't the main thread panic!()d
                 // we make a best effort to push a message to stderr, which hopefully
                 // Postgres is logging somewhere
-                let thread = thread::current();
-                let name = thread.name().unwrap_or("<anon>");
-                let id = thread.id();
-                eprintln!("thread={name}, id={id:?}, error: {info}");
+                eprintln!(
+                    "thread={:?}, id={:?}, {}",
+                    std::thread::current().name(),
+                    std::thread::current().id(),
+                    info
+                );
             }
         }
 
