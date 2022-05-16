@@ -44,7 +44,7 @@ mod test_schema {
     ) -> Result<String, Box<dyn std::error::Error + Send + Sync + 'static>> {
         if let SqlGraphEntity::Function(ref func) = entity {
             Ok(format!("\
-                CREATE OR REPLACE FUNCTION test_schema.\"func_generated_with_custom_name\"() RETURNS void\n\
+                CREATE FUNCTION test_schema.\"func_generated_with_custom_name\"() RETURNS void\n\
                 LANGUAGE c /* Rust */\n\
                 AS 'MODULE_PATHNAME', '{unaliased_name}_wrapper';\
                 ",
