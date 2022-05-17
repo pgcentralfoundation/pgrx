@@ -13,7 +13,7 @@ use crate::FlushErrorState;
 use std::any::Any;
 use std::cell::Cell;
 use std::panic::catch_unwind;
-use std::{mem, thread};
+use std::mem;
 
 extern "C" {
     fn pg_re_throw();
