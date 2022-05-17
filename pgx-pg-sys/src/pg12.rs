@@ -180,26 +180,25 @@ pub const BLCKSZ: u32 = 8192;
 pub const DEF_PGPORT: u32 = 28812;
 pub const DEF_PGPORT_STR: &[u8; 6usize] = b"28812\0";
 pub const ENABLE_THREAD_SAFETY: u32 = 1;
+pub const HAVE_APPEND_HISTORY: u32 = 1;
 pub const HAVE_ATOMICS: u32 = 1;
 pub const HAVE_CBRT: u32 = 1;
 pub const HAVE_CLOCK_GETTIME: u32 = 1;
 pub const HAVE_COMPUTED_GOTO: u32 = 1;
-pub const HAVE_COPYFILE: u32 = 1;
-pub const HAVE_COPYFILE_H: u32 = 1;
 pub const HAVE_CRYPT: u32 = 1;
-pub const HAVE_DECL_FDATASYNC: u32 = 0;
-pub const HAVE_DECL_F_FULLFSYNC: u32 = 1;
-pub const HAVE_DECL_POSIX_FADVISE: u32 = 0;
+pub const HAVE_CRYPT_H: u32 = 1;
+pub const HAVE_DECL_FDATASYNC: u32 = 1;
+pub const HAVE_DECL_F_FULLFSYNC: u32 = 0;
+pub const HAVE_DECL_POSIX_FADVISE: u32 = 1;
 pub const HAVE_DECL_RTLD_GLOBAL: u32 = 1;
 pub const HAVE_DECL_RTLD_NOW: u32 = 1;
-pub const HAVE_DECL_STRLCAT: u32 = 1;
-pub const HAVE_DECL_STRLCPY: u32 = 1;
+pub const HAVE_DECL_STRLCAT: u32 = 0;
+pub const HAVE_DECL_STRLCPY: u32 = 0;
 pub const HAVE_DECL_STRNLEN: u32 = 1;
 pub const HAVE_DECL_STRTOLL: u32 = 1;
 pub const HAVE_DECL_STRTOULL: u32 = 1;
 pub const HAVE_DLOPEN: u32 = 1;
 pub const HAVE_FDATASYNC: u32 = 1;
-pub const HAVE_FLS: u32 = 1;
 pub const HAVE_FSEEKO: u32 = 1;
 pub const HAVE_FUNCNAME__FUNC: u32 = 1;
 pub const HAVE_GCC__ATOMIC_INT32_CAS: u32 = 1;
@@ -209,11 +208,11 @@ pub const HAVE_GCC__SYNC_INT32_CAS: u32 = 1;
 pub const HAVE_GCC__SYNC_INT32_TAS: u32 = 1;
 pub const HAVE_GCC__SYNC_INT64_CAS: u32 = 1;
 pub const HAVE_GETADDRINFO: u32 = 1;
+pub const HAVE_GETHOSTBYNAME_R: u32 = 1;
 pub const HAVE_GETIFADDRS: u32 = 1;
 pub const HAVE_GETOPT: u32 = 1;
 pub const HAVE_GETOPT_H: u32 = 1;
 pub const HAVE_GETOPT_LONG: u32 = 1;
-pub const HAVE_GETPEEREID: u32 = 1;
 pub const HAVE_GETPWUID_R: u32 = 1;
 pub const HAVE_GETRLIMIT: u32 = 1;
 pub const HAVE_GETRUSAGE: u32 = 1;
@@ -223,7 +222,6 @@ pub const HAVE_INET_ATON: u32 = 1;
 pub const HAVE_INTPTR_T: u32 = 1;
 pub const HAVE_INTTYPES_H: u32 = 1;
 pub const HAVE_INT_OPTERR: u32 = 1;
-pub const HAVE_INT_OPTRESET: u32 = 1;
 pub const HAVE_INT_TIMEZONE: u32 = 1;
 pub const HAVE_IPV6: u32 = 1;
 pub const HAVE_ISINF: u32 = 1;
@@ -234,7 +232,6 @@ pub const HAVE_LIBZ: u32 = 1;
 pub const HAVE_LOCALE_T: u32 = 1;
 pub const HAVE_LONG_INT_64: u32 = 1;
 pub const HAVE_LONG_LONG_INT: u32 = 1;
-pub const HAVE_MBSTOWCS_L: u32 = 1;
 pub const HAVE_MEMMOVE: u32 = 1;
 pub const HAVE_MEMORY_H: u32 = 1;
 pub const HAVE_MKDTEMP: u32 = 1;
@@ -242,9 +239,11 @@ pub const HAVE_NETINET_TCP_H: u32 = 1;
 pub const HAVE_NET_IF_H: u32 = 1;
 pub const HAVE_POLL: u32 = 1;
 pub const HAVE_POLL_H: u32 = 1;
+pub const HAVE_POSIX_FADVISE: u32 = 1;
+pub const HAVE_POSIX_FALLOCATE: u32 = 1;
+pub const HAVE_PPOLL: u32 = 1;
 pub const HAVE_PREAD: u32 = 1;
 pub const HAVE_PTHREAD: u32 = 1;
-pub const HAVE_PTHREAD_IS_THREADED_NP: u32 = 1;
 pub const HAVE_PTHREAD_PRIO_INHERIT: u32 = 1;
 pub const HAVE_PWRITE: u32 = 1;
 pub const HAVE_RANDOM: u32 = 1;
@@ -255,6 +254,7 @@ pub const HAVE_RINT: u32 = 1;
 pub const HAVE_RL_COMPLETION_APPEND_CHARACTER: u32 = 1;
 pub const HAVE_RL_COMPLETION_MATCHES: u32 = 1;
 pub const HAVE_RL_FILENAME_COMPLETION_FUNCTION: u32 = 1;
+pub const HAVE_RL_RESET_SCREEN_SIZE: u32 = 1;
 pub const HAVE_SETENV: u32 = 1;
 pub const HAVE_SETSID: u32 = 1;
 pub const HAVE_SHM_OPEN: u32 = 1;
@@ -263,11 +263,10 @@ pub const HAVE_SRANDOM: u32 = 1;
 pub const HAVE_STDBOOL_H: u32 = 1;
 pub const HAVE_STDINT_H: u32 = 1;
 pub const HAVE_STDLIB_H: u32 = 1;
+pub const HAVE_STRCHRNUL: u32 = 1;
 pub const HAVE_STRERROR_R: u32 = 1;
 pub const HAVE_STRINGS_H: u32 = 1;
 pub const HAVE_STRING_H: u32 = 1;
-pub const HAVE_STRLCAT: u32 = 1;
-pub const HAVE_STRLCPY: u32 = 1;
 pub const HAVE_STRNLEN: u32 = 1;
 pub const HAVE_STRSIGNAL: u32 = 1;
 pub const HAVE_STRTOF: u32 = 1;
@@ -275,29 +274,27 @@ pub const HAVE_STRTOLL: u32 = 1;
 pub const HAVE_STRTOULL: u32 = 1;
 pub const HAVE_STRUCT_ADDRINFO: u32 = 1;
 pub const HAVE_STRUCT_OPTION: u32 = 1;
-pub const HAVE_STRUCT_SOCKADDR_SA_LEN: u32 = 1;
 pub const HAVE_STRUCT_SOCKADDR_STORAGE: u32 = 1;
 pub const HAVE_STRUCT_SOCKADDR_STORAGE_SS_FAMILY: u32 = 1;
-pub const HAVE_STRUCT_SOCKADDR_STORAGE_SS_LEN: u32 = 1;
 pub const HAVE_STRUCT_TM_TM_ZONE: u32 = 1;
 pub const HAVE_SYMLINK: u32 = 1;
+pub const HAVE_SYNC_FILE_RANGE: u32 = 1;
 pub const HAVE_SYSLOG: u32 = 1;
+pub const HAVE_SYS_EPOLL_H: u32 = 1;
 pub const HAVE_SYS_IPC_H: u32 = 1;
+pub const HAVE_SYS_PRCTL_H: u32 = 1;
 pub const HAVE_SYS_RESOURCE_H: u32 = 1;
 pub const HAVE_SYS_SELECT_H: u32 = 1;
 pub const HAVE_SYS_SEM_H: u32 = 1;
 pub const HAVE_SYS_SHM_H: u32 = 1;
-pub const HAVE_SYS_SOCKIO_H: u32 = 1;
 pub const HAVE_SYS_STAT_H: u32 = 1;
 pub const HAVE_SYS_TYPES_H: u32 = 1;
-pub const HAVE_SYS_UCRED_H: u32 = 1;
 pub const HAVE_SYS_UN_H: u32 = 1;
 pub const HAVE_TERMIOS_H: u32 = 1;
 pub const HAVE_TM_ZONE: u32 = 1;
 pub const HAVE_TYPEOF: u32 = 1;
 pub const HAVE_TZNAME: u32 = 1;
 pub const HAVE_UINTPTR_T: u32 = 1;
-pub const HAVE_UNION_SEMUN: u32 = 1;
 pub const HAVE_UNISTD_H: u32 = 1;
 pub const HAVE_UNIX_SOCKETS: u32 = 1;
 pub const HAVE_UNSETENV: u32 = 1;
@@ -307,8 +304,8 @@ pub const HAVE_UTIME: u32 = 1;
 pub const HAVE_UTIMES: u32 = 1;
 pub const HAVE_UTIME_H: u32 = 1;
 pub const HAVE_WCHAR_H: u32 = 1;
-pub const HAVE_WCSTOMBS_L: u32 = 1;
 pub const HAVE_WCTYPE_H: u32 = 1;
+pub const HAVE_X86_64_POPCNTQ: u32 = 1;
 pub const HAVE__BOOL: u32 = 1;
 pub const HAVE__BUILTIN_BSWAP16: u32 = 1;
 pub const HAVE__BUILTIN_BSWAP32: u32 = 1;
@@ -320,22 +317,23 @@ pub const HAVE__BUILTIN_OP_OVERFLOW: u32 = 1;
 pub const HAVE__BUILTIN_POPCOUNT: u32 = 1;
 pub const HAVE__BUILTIN_TYPES_COMPATIBLE_P: u32 = 1;
 pub const HAVE__BUILTIN_UNREACHABLE: u32 = 1;
+pub const HAVE__GET_CPUID: u32 = 1;
 pub const HAVE__STATIC_ASSERT: u32 = 1;
 pub const INT64_MODIFIER: &[u8; 2usize] = b"l\0";
-pub const LOCALE_T_IN_XLOCALE: u32 = 1;
 pub const MAXIMUM_ALIGNOF: u32 = 8;
 pub const MEMSET_LOOP_LIMIT: u32 = 1024;
 pub const PACKAGE_BUGREPORT: &[u8; 32usize] = b"pgsql-bugs@lists.postgresql.org\0";
 pub const PACKAGE_NAME: &[u8; 11usize] = b"PostgreSQL\0";
-pub const PACKAGE_STRING: &[u8; 16usize] = b"PostgreSQL 12.9\0";
+pub const PACKAGE_STRING: &[u8; 17usize] = b"PostgreSQL 12.10\0";
 pub const PACKAGE_TARNAME: &[u8; 11usize] = b"postgresql\0";
 pub const PACKAGE_URL: &[u8; 1usize] = b"\0";
-pub const PACKAGE_VERSION: &[u8; 5usize] = b"12.9\0";
+pub const PACKAGE_VERSION: &[u8; 6usize] = b"12.10\0";
 pub const PG_KRB_SRVNAM: &[u8; 9usize] = b"postgres\0";
 pub const PG_MAJORVERSION: &[u8; 3usize] = b"12\0";
-pub const PG_VERSION: &[u8; 5usize] = b"12.9\0";
-pub const PG_VERSION_NUM: u32 = 120009;
-pub const PG_VERSION_STR : & [u8 ; 111usize] = b"PostgreSQL 12.9 on arm-apple-darwin21.3.0, compiled by Apple clang version 13.0.0 (clang-1300.0.29.30), 64-bit\0" ;
+pub const PG_VERSION: &[u8; 6usize] = b"12.10\0";
+pub const PG_VERSION_NUM: u32 = 120010;
+pub const PG_VERSION_STR: &[u8; 78usize] =
+    b"PostgreSQL 12.10 on x86_64-pc-linux-gnu, compiled by gcc (GCC) 11.2.0, 64-bit\0";
 pub const RELSEG_SIZE: u32 = 131072;
 pub const SIZEOF_BOOL: u32 = 1;
 pub const SIZEOF_LONG: u32 = 8;
@@ -343,15 +341,13 @@ pub const SIZEOF_OFF_T: u32 = 8;
 pub const SIZEOF_SIZE_T: u32 = 8;
 pub const SIZEOF_VOID_P: u32 = 8;
 pub const STDC_HEADERS: u32 = 1;
-pub const STRERROR_R_INT: u32 = 1;
-pub const USE_ARMV8_CRC32C: u32 = 1;
 pub const USE_ASSERT_CHECKING: u32 = 1;
 pub const USE_DEV_URANDOM: u32 = 1;
 pub const USE_FLOAT4_BYVAL: u32 = 1;
 pub const USE_FLOAT8_BYVAL: u32 = 1;
-pub const USE_SYSV_SEMAPHORES: u32 = 1;
+pub const USE_SSE42_CRC32C_WITH_RUNTIME_CHECK: u32 = 1;
 pub const USE_SYSV_SHARED_MEMORY: u32 = 1;
-pub const WCSTOMBS_L_IN_XLOCALE: u32 = 1;
+pub const USE_UNNAMED_POSIX_SEMAPHORES: u32 = 1;
 pub const XLOG_BLCKSZ: u32 = 8192;
 pub const DEFAULT_XLOG_SEG_SIZE: u32 = 16777216;
 pub const NAMEDATALEN: u32 = 64;
@@ -366,548 +362,214 @@ pub const BITS_PER_BYTE: u32 = 8;
 pub const ALIGNOF_BUFFER: u32 = 32;
 pub const HAVE_WORKING_LINK: u32 = 1;
 pub const DEFAULT_BACKEND_FLUSH_AFTER: u32 = 0;
-pub const DEFAULT_BGWRITER_FLUSH_AFTER: u32 = 0;
-pub const DEFAULT_CHECKPOINT_FLUSH_AFTER: u32 = 0;
+pub const DEFAULT_BGWRITER_FLUSH_AFTER: u32 = 64;
+pub const DEFAULT_CHECKPOINT_FLUSH_AFTER: u32 = 32;
 pub const WRITEBACK_MAX_PENDING_FLUSHES: u32 = 256;
 pub const DEFAULT_PGSOCKET_DIR: &[u8; 5usize] = b"/tmp\0";
 pub const DEFAULT_EVENT_SOURCE: &[u8; 11usize] = b"PostgreSQL\0";
 pub const PG_CACHE_LINE_SIZE: u32 = 128;
 pub const TRACE_SORT: u32 = 1;
-pub const __darwin__: u32 = 1;
-pub const __DARWIN_ONLY_64_BIT_INO_T: u32 = 1;
-pub const __DARWIN_ONLY_UNIX_CONFORMANCE: u32 = 1;
-pub const __DARWIN_ONLY_VERS_1050: u32 = 1;
-pub const __DARWIN_UNIX03: u32 = 1;
-pub const __DARWIN_64_BIT_INO_T: u32 = 1;
-pub const __DARWIN_VERS_1050: u32 = 1;
-pub const __DARWIN_NON_CANCELABLE: u32 = 0;
-pub const __DARWIN_SUF_EXTSN: &[u8; 14usize] = b"$DARWIN_EXTSN\0";
-pub const __DARWIN_C_ANSI: u32 = 4096;
-pub const __DARWIN_C_FULL: u32 = 900000;
-pub const __DARWIN_C_LEVEL: u32 = 900000;
-pub const __STDC_WANT_LIB_EXT1__: u32 = 1;
-pub const __DARWIN_NO_LONG_LONG: u32 = 0;
-pub const _DARWIN_FEATURE_64_BIT_INODE: u32 = 1;
-pub const _DARWIN_FEATURE_ONLY_64_BIT_INODE: u32 = 1;
-pub const _DARWIN_FEATURE_ONLY_VERS_1050: u32 = 1;
-pub const _DARWIN_FEATURE_ONLY_UNIX_CONFORMANCE: u32 = 1;
-pub const _DARWIN_FEATURE_UNIX_CONFORMANCE: u32 = 3;
-pub const __has_ptrcheck: u32 = 0;
-pub const __API_TO_BE_DEPRECATED: u32 = 100000;
-pub const __MAC_10_0: u32 = 1000;
-pub const __MAC_10_1: u32 = 1010;
-pub const __MAC_10_2: u32 = 1020;
-pub const __MAC_10_3: u32 = 1030;
-pub const __MAC_10_4: u32 = 1040;
-pub const __MAC_10_5: u32 = 1050;
-pub const __MAC_10_6: u32 = 1060;
-pub const __MAC_10_7: u32 = 1070;
-pub const __MAC_10_8: u32 = 1080;
-pub const __MAC_10_9: u32 = 1090;
-pub const __MAC_10_10: u32 = 101000;
-pub const __MAC_10_10_2: u32 = 101002;
-pub const __MAC_10_10_3: u32 = 101003;
-pub const __MAC_10_11: u32 = 101100;
-pub const __MAC_10_11_2: u32 = 101102;
-pub const __MAC_10_11_3: u32 = 101103;
-pub const __MAC_10_11_4: u32 = 101104;
-pub const __MAC_10_12: u32 = 101200;
-pub const __MAC_10_12_1: u32 = 101201;
-pub const __MAC_10_12_2: u32 = 101202;
-pub const __MAC_10_12_4: u32 = 101204;
-pub const __MAC_10_13: u32 = 101300;
-pub const __MAC_10_13_1: u32 = 101301;
-pub const __MAC_10_13_2: u32 = 101302;
-pub const __MAC_10_13_4: u32 = 101304;
-pub const __MAC_10_14: u32 = 101400;
-pub const __MAC_10_14_1: u32 = 101401;
-pub const __MAC_10_14_4: u32 = 101404;
-pub const __MAC_10_14_6: u32 = 101406;
-pub const __MAC_10_15: u32 = 101500;
-pub const __MAC_10_15_1: u32 = 101501;
-pub const __MAC_10_15_4: u32 = 101504;
-pub const __MAC_10_16: u32 = 101600;
-pub const __MAC_11_0: u32 = 110000;
-pub const __MAC_11_1: u32 = 110100;
-pub const __MAC_11_3: u32 = 110300;
-pub const __MAC_11_4: u32 = 110400;
-pub const __MAC_11_5: u32 = 110500;
-pub const __MAC_11_6: u32 = 110600;
-pub const __MAC_12_0: u32 = 120000;
-pub const __MAC_12_1: u32 = 120100;
-pub const __MAC_12_2: u32 = 120200;
-pub const __MAC_12_3: u32 = 120300;
-pub const __IPHONE_2_0: u32 = 20000;
-pub const __IPHONE_2_1: u32 = 20100;
-pub const __IPHONE_2_2: u32 = 20200;
-pub const __IPHONE_3_0: u32 = 30000;
-pub const __IPHONE_3_1: u32 = 30100;
-pub const __IPHONE_3_2: u32 = 30200;
-pub const __IPHONE_4_0: u32 = 40000;
-pub const __IPHONE_4_1: u32 = 40100;
-pub const __IPHONE_4_2: u32 = 40200;
-pub const __IPHONE_4_3: u32 = 40300;
-pub const __IPHONE_5_0: u32 = 50000;
-pub const __IPHONE_5_1: u32 = 50100;
-pub const __IPHONE_6_0: u32 = 60000;
-pub const __IPHONE_6_1: u32 = 60100;
-pub const __IPHONE_7_0: u32 = 70000;
-pub const __IPHONE_7_1: u32 = 70100;
-pub const __IPHONE_8_0: u32 = 80000;
-pub const __IPHONE_8_1: u32 = 80100;
-pub const __IPHONE_8_2: u32 = 80200;
-pub const __IPHONE_8_3: u32 = 80300;
-pub const __IPHONE_8_4: u32 = 80400;
-pub const __IPHONE_9_0: u32 = 90000;
-pub const __IPHONE_9_1: u32 = 90100;
-pub const __IPHONE_9_2: u32 = 90200;
-pub const __IPHONE_9_3: u32 = 90300;
-pub const __IPHONE_10_0: u32 = 100000;
-pub const __IPHONE_10_1: u32 = 100100;
-pub const __IPHONE_10_2: u32 = 100200;
-pub const __IPHONE_10_3: u32 = 100300;
-pub const __IPHONE_11_0: u32 = 110000;
-pub const __IPHONE_11_1: u32 = 110100;
-pub const __IPHONE_11_2: u32 = 110200;
-pub const __IPHONE_11_3: u32 = 110300;
-pub const __IPHONE_11_4: u32 = 110400;
-pub const __IPHONE_12_0: u32 = 120000;
-pub const __IPHONE_12_1: u32 = 120100;
-pub const __IPHONE_12_2: u32 = 120200;
-pub const __IPHONE_12_3: u32 = 120300;
-pub const __IPHONE_12_4: u32 = 120400;
-pub const __IPHONE_13_0: u32 = 130000;
-pub const __IPHONE_13_1: u32 = 130100;
-pub const __IPHONE_13_2: u32 = 130200;
-pub const __IPHONE_13_3: u32 = 130300;
-pub const __IPHONE_13_4: u32 = 130400;
-pub const __IPHONE_13_5: u32 = 130500;
-pub const __IPHONE_13_6: u32 = 130600;
-pub const __IPHONE_13_7: u32 = 130700;
-pub const __IPHONE_14_0: u32 = 140000;
-pub const __IPHONE_14_1: u32 = 140100;
-pub const __IPHONE_14_2: u32 = 140200;
-pub const __IPHONE_14_3: u32 = 140300;
-pub const __IPHONE_14_5: u32 = 140500;
-pub const __IPHONE_14_6: u32 = 140600;
-pub const __IPHONE_14_7: u32 = 140700;
-pub const __IPHONE_14_8: u32 = 140800;
-pub const __IPHONE_15_0: u32 = 150000;
-pub const __IPHONE_15_1: u32 = 150100;
-pub const __IPHONE_15_2: u32 = 150200;
-pub const __IPHONE_15_3: u32 = 150300;
-pub const __IPHONE_15_4: u32 = 150400;
-pub const __TVOS_9_0: u32 = 90000;
-pub const __TVOS_9_1: u32 = 90100;
-pub const __TVOS_9_2: u32 = 90200;
-pub const __TVOS_10_0: u32 = 100000;
-pub const __TVOS_10_0_1: u32 = 100001;
-pub const __TVOS_10_1: u32 = 100100;
-pub const __TVOS_10_2: u32 = 100200;
-pub const __TVOS_11_0: u32 = 110000;
-pub const __TVOS_11_1: u32 = 110100;
-pub const __TVOS_11_2: u32 = 110200;
-pub const __TVOS_11_3: u32 = 110300;
-pub const __TVOS_11_4: u32 = 110400;
-pub const __TVOS_12_0: u32 = 120000;
-pub const __TVOS_12_1: u32 = 120100;
-pub const __TVOS_12_2: u32 = 120200;
-pub const __TVOS_12_3: u32 = 120300;
-pub const __TVOS_12_4: u32 = 120400;
-pub const __TVOS_13_0: u32 = 130000;
-pub const __TVOS_13_2: u32 = 130200;
-pub const __TVOS_13_3: u32 = 130300;
-pub const __TVOS_13_4: u32 = 130400;
-pub const __TVOS_14_0: u32 = 140000;
-pub const __TVOS_14_1: u32 = 140100;
-pub const __TVOS_14_2: u32 = 140200;
-pub const __TVOS_14_3: u32 = 140300;
-pub const __TVOS_14_5: u32 = 140500;
-pub const __TVOS_14_6: u32 = 140600;
-pub const __TVOS_14_7: u32 = 140700;
-pub const __TVOS_15_0: u32 = 150000;
-pub const __TVOS_15_1: u32 = 150100;
-pub const __TVOS_15_2: u32 = 150200;
-pub const __TVOS_15_3: u32 = 150300;
-pub const __TVOS_15_4: u32 = 150400;
-pub const __WATCHOS_1_0: u32 = 10000;
-pub const __WATCHOS_2_0: u32 = 20000;
-pub const __WATCHOS_2_1: u32 = 20100;
-pub const __WATCHOS_2_2: u32 = 20200;
-pub const __WATCHOS_3_0: u32 = 30000;
-pub const __WATCHOS_3_1: u32 = 30100;
-pub const __WATCHOS_3_1_1: u32 = 30101;
-pub const __WATCHOS_3_2: u32 = 30200;
-pub const __WATCHOS_4_0: u32 = 40000;
-pub const __WATCHOS_4_1: u32 = 40100;
-pub const __WATCHOS_4_2: u32 = 40200;
-pub const __WATCHOS_4_3: u32 = 40300;
-pub const __WATCHOS_5_0: u32 = 50000;
-pub const __WATCHOS_5_1: u32 = 50100;
-pub const __WATCHOS_5_2: u32 = 50200;
-pub const __WATCHOS_5_3: u32 = 50300;
-pub const __WATCHOS_6_0: u32 = 60000;
-pub const __WATCHOS_6_1: u32 = 60100;
-pub const __WATCHOS_6_2: u32 = 60200;
-pub const __WATCHOS_7_0: u32 = 70000;
-pub const __WATCHOS_7_1: u32 = 70100;
-pub const __WATCHOS_7_2: u32 = 70200;
-pub const __WATCHOS_7_3: u32 = 70300;
-pub const __WATCHOS_7_4: u32 = 70400;
-pub const __WATCHOS_7_5: u32 = 70500;
-pub const __WATCHOS_7_6: u32 = 70600;
-pub const __WATCHOS_8_0: u32 = 80000;
-pub const __WATCHOS_8_1: u32 = 80100;
-pub const __WATCHOS_8_3: u32 = 80300;
-pub const __WATCHOS_8_4: u32 = 80400;
-pub const __WATCHOS_8_5: u32 = 80500;
-pub const MAC_OS_X_VERSION_10_0: u32 = 1000;
-pub const MAC_OS_X_VERSION_10_1: u32 = 1010;
-pub const MAC_OS_X_VERSION_10_2: u32 = 1020;
-pub const MAC_OS_X_VERSION_10_3: u32 = 1030;
-pub const MAC_OS_X_VERSION_10_4: u32 = 1040;
-pub const MAC_OS_X_VERSION_10_5: u32 = 1050;
-pub const MAC_OS_X_VERSION_10_6: u32 = 1060;
-pub const MAC_OS_X_VERSION_10_7: u32 = 1070;
-pub const MAC_OS_X_VERSION_10_8: u32 = 1080;
-pub const MAC_OS_X_VERSION_10_9: u32 = 1090;
-pub const MAC_OS_X_VERSION_10_10: u32 = 101000;
-pub const MAC_OS_X_VERSION_10_10_2: u32 = 101002;
-pub const MAC_OS_X_VERSION_10_10_3: u32 = 101003;
-pub const MAC_OS_X_VERSION_10_11: u32 = 101100;
-pub const MAC_OS_X_VERSION_10_11_2: u32 = 101102;
-pub const MAC_OS_X_VERSION_10_11_3: u32 = 101103;
-pub const MAC_OS_X_VERSION_10_11_4: u32 = 101104;
-pub const MAC_OS_X_VERSION_10_12: u32 = 101200;
-pub const MAC_OS_X_VERSION_10_12_1: u32 = 101201;
-pub const MAC_OS_X_VERSION_10_12_2: u32 = 101202;
-pub const MAC_OS_X_VERSION_10_12_4: u32 = 101204;
-pub const MAC_OS_X_VERSION_10_13: u32 = 101300;
-pub const MAC_OS_X_VERSION_10_13_1: u32 = 101301;
-pub const MAC_OS_X_VERSION_10_13_2: u32 = 101302;
-pub const MAC_OS_X_VERSION_10_13_4: u32 = 101304;
-pub const MAC_OS_X_VERSION_10_14: u32 = 101400;
-pub const MAC_OS_X_VERSION_10_14_1: u32 = 101401;
-pub const MAC_OS_X_VERSION_10_14_4: u32 = 101404;
-pub const MAC_OS_X_VERSION_10_14_6: u32 = 101406;
-pub const MAC_OS_X_VERSION_10_15: u32 = 101500;
-pub const MAC_OS_X_VERSION_10_15_1: u32 = 101501;
-pub const MAC_OS_X_VERSION_10_16: u32 = 101600;
-pub const MAC_OS_VERSION_11_0: u32 = 110000;
-pub const MAC_OS_VERSION_12_0: u32 = 120000;
-pub const __DRIVERKIT_19_0: u32 = 190000;
-pub const __DRIVERKIT_20_0: u32 = 200000;
-pub const __DRIVERKIT_21_0: u32 = 210000;
-pub const __MAC_OS_X_VERSION_MAX_ALLOWED: u32 = 120300;
-pub const __ENABLE_LEGACY_MAC_AVAILABILITY: u32 = 1;
-pub const __PTHREAD_SIZE__: u32 = 8176;
-pub const __PTHREAD_ATTR_SIZE__: u32 = 56;
-pub const __PTHREAD_MUTEXATTR_SIZE__: u32 = 8;
-pub const __PTHREAD_MUTEX_SIZE__: u32 = 56;
-pub const __PTHREAD_CONDATTR_SIZE__: u32 = 8;
-pub const __PTHREAD_COND_SIZE__: u32 = 40;
-pub const __PTHREAD_ONCE_SIZE__: u32 = 8;
-pub const __PTHREAD_RWLOCK_SIZE__: u32 = 192;
-pub const __PTHREAD_RWLOCKATTR_SIZE__: u32 = 16;
-pub const __DARWIN_WCHAR_MIN: i32 = -2147483648;
-pub const _FORTIFY_SOURCE: u32 = 2;
-pub const RENAME_SECLUDE: u32 = 1;
-pub const RENAME_SWAP: u32 = 2;
-pub const RENAME_EXCL: u32 = 4;
-pub const RENAME_RESERVED1: u32 = 8;
-pub const RENAME_NOFOLLOW_ANY: u32 = 16;
-pub const __SLBF: u32 = 1;
-pub const __SNBF: u32 = 2;
-pub const __SRD: u32 = 4;
-pub const __SWR: u32 = 8;
-pub const __SRW: u32 = 16;
-pub const __SEOF: u32 = 32;
-pub const __SERR: u32 = 64;
-pub const __SMBF: u32 = 128;
-pub const __SAPP: u32 = 256;
-pub const __SSTR: u32 = 512;
-pub const __SOPT: u32 = 1024;
-pub const __SNPT: u32 = 2048;
-pub const __SOFF: u32 = 4096;
-pub const __SMOD: u32 = 8192;
-pub const __SALC: u32 = 16384;
-pub const __SIGN: u32 = 32768;
+pub const _STDIO_H: u32 = 1;
+pub const _FEATURES_H: u32 = 1;
+pub const _DEFAULT_SOURCE: u32 = 1;
+pub const __GLIBC_USE_ISOC2X: u32 = 0;
+pub const __USE_ISOC11: u32 = 1;
+pub const __USE_ISOC99: u32 = 1;
+pub const __USE_ISOC95: u32 = 1;
+pub const __USE_POSIX_IMPLICITLY: u32 = 1;
+pub const _POSIX_SOURCE: u32 = 1;
+pub const _POSIX_C_SOURCE: u32 = 200809;
+pub const __USE_POSIX: u32 = 1;
+pub const __USE_POSIX2: u32 = 1;
+pub const __USE_POSIX199309: u32 = 1;
+pub const __USE_POSIX199506: u32 = 1;
+pub const __USE_XOPEN2K: u32 = 1;
+pub const __USE_XOPEN2K8: u32 = 1;
+pub const _ATFILE_SOURCE: u32 = 1;
+pub const __WORDSIZE: u32 = 64;
+pub const __WORDSIZE_TIME64_COMPAT32: u32 = 1;
+pub const __SYSCALL_WORDSIZE: u32 = 64;
+pub const __TIMESIZE: u32 = 64;
+pub const __USE_MISC: u32 = 1;
+pub const __USE_ATFILE: u32 = 1;
+pub const __USE_FORTIFY_LEVEL: u32 = 0;
+pub const __GLIBC_USE_DEPRECATED_GETS: u32 = 0;
+pub const __GLIBC_USE_DEPRECATED_SCANF: u32 = 0;
+pub const _STDC_PREDEF_H: u32 = 1;
+pub const __STDC_IEC_559__: u32 = 1;
+pub const __STDC_IEC_60559_BFP__: u32 = 201404;
+pub const __STDC_IEC_559_COMPLEX__: u32 = 1;
+pub const __STDC_IEC_60559_COMPLEX__: u32 = 201404;
+pub const __STDC_ISO_10646__: u32 = 201706;
+pub const __GNU_LIBRARY__: u32 = 6;
+pub const __GLIBC__: u32 = 2;
+pub const __GLIBC_MINOR__: u32 = 35;
+pub const _SYS_CDEFS_H: u32 = 1;
+pub const __glibc_c99_flexarr_available: u32 = 1;
+pub const __LDOUBLE_REDIRECTS_TO_FLOAT128_ABI: u32 = 0;
+pub const __HAVE_GENERIC_SELECTION: u32 = 1;
+pub const __GLIBC_USE_LIB_EXT2: u32 = 0;
+pub const __GLIBC_USE_IEC_60559_BFP_EXT: u32 = 0;
+pub const __GLIBC_USE_IEC_60559_BFP_EXT_C2X: u32 = 0;
+pub const __GLIBC_USE_IEC_60559_EXT: u32 = 0;
+pub const __GLIBC_USE_IEC_60559_FUNCS_EXT: u32 = 0;
+pub const __GLIBC_USE_IEC_60559_FUNCS_EXT_C2X: u32 = 0;
+pub const __GLIBC_USE_IEC_60559_TYPES_EXT: u32 = 0;
+pub const __GNUC_VA_LIST: u32 = 1;
+pub const _BITS_TYPES_H: u32 = 1;
+pub const _BITS_TYPESIZES_H: u32 = 1;
+pub const __OFF_T_MATCHES_OFF64_T: u32 = 1;
+pub const __INO_T_MATCHES_INO64_T: u32 = 1;
+pub const __RLIM_T_MATCHES_RLIM64_T: u32 = 1;
+pub const __STATFS_MATCHES_STATFS64: u32 = 1;
+pub const __KERNEL_OLD_TIMEVAL_MATCHES_TIMEVAL64: u32 = 1;
+pub const __FD_SETSIZE: u32 = 1024;
+pub const _BITS_TIME64_H: u32 = 1;
+pub const _____fpos_t_defined: u32 = 1;
+pub const ____mbstate_t_defined: u32 = 1;
+pub const _____fpos64_t_defined: u32 = 1;
+pub const ____FILE_defined: u32 = 1;
+pub const __FILE_defined: u32 = 1;
+pub const __struct_FILE_defined: u32 = 1;
+pub const _IO_EOF_SEEN: u32 = 16;
+pub const _IO_ERR_SEEN: u32 = 32;
+pub const _IO_USER_LOCK: u32 = 32768;
 pub const _IOFBF: u32 = 0;
 pub const _IOLBF: u32 = 1;
 pub const _IONBF: u32 = 2;
-pub const BUFSIZ: u32 = 1024;
+pub const BUFSIZ: u32 = 8192;
 pub const EOF: i32 = -1;
-pub const FOPEN_MAX: u32 = 20;
-pub const FILENAME_MAX: u32 = 1024;
-pub const P_tmpdir: &[u8; 10usize] = b"/var/tmp/\0";
-pub const L_tmpnam: u32 = 1024;
-pub const TMP_MAX: u32 = 308915776;
 pub const SEEK_SET: u32 = 0;
 pub const SEEK_CUR: u32 = 1;
 pub const SEEK_END: u32 = 2;
-pub const L_ctermid: u32 = 1024;
-pub const _USE_FORTIFY_LEVEL: u32 = 2;
-pub const __DARWIN_NSIG: u32 = 32;
-pub const NSIG: u32 = 32;
-pub const _ARM_SIGNAL_: u32 = 1;
-pub const SIGHUP: u32 = 1;
-pub const SIGINT: u32 = 2;
-pub const SIGQUIT: u32 = 3;
-pub const SIGILL: u32 = 4;
-pub const SIGTRAP: u32 = 5;
-pub const SIGABRT: u32 = 6;
-pub const SIGIOT: u32 = 6;
-pub const SIGEMT: u32 = 7;
-pub const SIGFPE: u32 = 8;
-pub const SIGKILL: u32 = 9;
-pub const SIGBUS: u32 = 10;
-pub const SIGSEGV: u32 = 11;
-pub const SIGSYS: u32 = 12;
-pub const SIGPIPE: u32 = 13;
-pub const SIGALRM: u32 = 14;
-pub const SIGTERM: u32 = 15;
-pub const SIGURG: u32 = 16;
-pub const SIGSTOP: u32 = 17;
-pub const SIGTSTP: u32 = 18;
-pub const SIGCONT: u32 = 19;
-pub const SIGCHLD: u32 = 20;
-pub const SIGTTIN: u32 = 21;
-pub const SIGTTOU: u32 = 22;
-pub const SIGIO: u32 = 23;
-pub const SIGXCPU: u32 = 24;
-pub const SIGXFSZ: u32 = 25;
-pub const SIGVTALRM: u32 = 26;
-pub const SIGPROF: u32 = 27;
-pub const SIGWINCH: u32 = 28;
-pub const SIGINFO: u32 = 29;
-pub const SIGUSR1: u32 = 30;
-pub const SIGUSR2: u32 = 31;
-pub const __DARWIN_OPAQUE_ARM_THREAD_STATE64: u32 = 0;
-pub const SIGEV_NONE: u32 = 0;
-pub const SIGEV_SIGNAL: u32 = 1;
-pub const SIGEV_THREAD: u32 = 3;
-pub const ILL_NOOP: u32 = 0;
-pub const ILL_ILLOPC: u32 = 1;
-pub const ILL_ILLTRP: u32 = 2;
-pub const ILL_PRVOPC: u32 = 3;
-pub const ILL_ILLOPN: u32 = 4;
-pub const ILL_ILLADR: u32 = 5;
-pub const ILL_PRVREG: u32 = 6;
-pub const ILL_COPROC: u32 = 7;
-pub const ILL_BADSTK: u32 = 8;
-pub const FPE_NOOP: u32 = 0;
-pub const FPE_FLTDIV: u32 = 1;
-pub const FPE_FLTOVF: u32 = 2;
-pub const FPE_FLTUND: u32 = 3;
-pub const FPE_FLTRES: u32 = 4;
-pub const FPE_FLTINV: u32 = 5;
-pub const FPE_FLTSUB: u32 = 6;
-pub const FPE_INTDIV: u32 = 7;
-pub const FPE_INTOVF: u32 = 8;
-pub const SEGV_NOOP: u32 = 0;
-pub const SEGV_MAPERR: u32 = 1;
-pub const SEGV_ACCERR: u32 = 2;
-pub const BUS_NOOP: u32 = 0;
-pub const BUS_ADRALN: u32 = 1;
-pub const BUS_ADRERR: u32 = 2;
-pub const BUS_OBJERR: u32 = 3;
-pub const TRAP_BRKPT: u32 = 1;
-pub const TRAP_TRACE: u32 = 2;
-pub const CLD_NOOP: u32 = 0;
-pub const CLD_EXITED: u32 = 1;
-pub const CLD_KILLED: u32 = 2;
-pub const CLD_DUMPED: u32 = 3;
-pub const CLD_TRAPPED: u32 = 4;
-pub const CLD_STOPPED: u32 = 5;
-pub const CLD_CONTINUED: u32 = 6;
-pub const POLL_IN: u32 = 1;
-pub const POLL_OUT: u32 = 2;
-pub const POLL_MSG: u32 = 3;
-pub const POLL_ERR: u32 = 4;
-pub const POLL_PRI: u32 = 5;
-pub const POLL_HUP: u32 = 6;
-pub const SA_ONSTACK: u32 = 1;
-pub const SA_RESTART: u32 = 2;
-pub const SA_RESETHAND: u32 = 4;
-pub const SA_NOCLDSTOP: u32 = 8;
-pub const SA_NODEFER: u32 = 16;
-pub const SA_NOCLDWAIT: u32 = 32;
-pub const SA_SIGINFO: u32 = 64;
-pub const SA_USERTRAMP: u32 = 256;
-pub const SA_64REGSET: u32 = 512;
-pub const SA_USERSPACE_MASK: u32 = 127;
-pub const SIG_BLOCK: u32 = 1;
-pub const SIG_UNBLOCK: u32 = 2;
-pub const SIG_SETMASK: u32 = 3;
-pub const SI_USER: u32 = 65537;
-pub const SI_QUEUE: u32 = 65538;
-pub const SI_TIMER: u32 = 65539;
-pub const SI_ASYNCIO: u32 = 65540;
-pub const SI_MESGQ: u32 = 65541;
-pub const SS_ONSTACK: u32 = 1;
-pub const SS_DISABLE: u32 = 4;
-pub const MINSIGSTKSZ: u32 = 32768;
-pub const SIGSTKSZ: u32 = 131072;
-pub const SV_ONSTACK: u32 = 1;
-pub const SV_INTERRUPT: u32 = 2;
-pub const SV_RESETHAND: u32 = 4;
-pub const SV_NODEFER: u32 = 16;
-pub const SV_NOCLDSTOP: u32 = 8;
-pub const SV_SIGINFO: u32 = 64;
-pub const __WORDSIZE: u32 = 64;
-pub const INT8_MAX: u32 = 127;
-pub const INT16_MAX: u32 = 32767;
-pub const INT32_MAX: u32 = 2147483647;
-pub const INT64_MAX: u64 = 9223372036854775807;
-pub const INT8_MIN: i32 = -128;
-pub const INT16_MIN: i32 = -32768;
-pub const INT32_MIN: i32 = -2147483648;
-pub const INT64_MIN: i64 = -9223372036854775808;
-pub const UINT8_MAX: u32 = 255;
-pub const UINT16_MAX: u32 = 65535;
-pub const UINT32_MAX: u32 = 4294967295;
-pub const UINT64_MAX: i32 = -1;
-pub const INT_LEAST8_MIN: i32 = -128;
-pub const INT_LEAST16_MIN: i32 = -32768;
-pub const INT_LEAST32_MIN: i32 = -2147483648;
-pub const INT_LEAST64_MIN: i64 = -9223372036854775808;
-pub const INT_LEAST8_MAX: u32 = 127;
-pub const INT_LEAST16_MAX: u32 = 32767;
-pub const INT_LEAST32_MAX: u32 = 2147483647;
-pub const INT_LEAST64_MAX: u64 = 9223372036854775807;
-pub const UINT_LEAST8_MAX: u32 = 255;
-pub const UINT_LEAST16_MAX: u32 = 65535;
-pub const UINT_LEAST32_MAX: u32 = 4294967295;
-pub const UINT_LEAST64_MAX: i32 = -1;
-pub const INT_FAST8_MIN: i32 = -128;
-pub const INT_FAST16_MIN: i32 = -32768;
-pub const INT_FAST32_MIN: i32 = -2147483648;
-pub const INT_FAST64_MIN: i64 = -9223372036854775808;
-pub const INT_FAST8_MAX: u32 = 127;
-pub const INT_FAST16_MAX: u32 = 32767;
-pub const INT_FAST32_MAX: u32 = 2147483647;
-pub const INT_FAST64_MAX: u64 = 9223372036854775807;
-pub const UINT_FAST8_MAX: u32 = 255;
-pub const UINT_FAST16_MAX: u32 = 65535;
-pub const UINT_FAST32_MAX: u32 = 4294967295;
-pub const UINT_FAST64_MAX: i32 = -1;
-pub const INTPTR_MAX: u64 = 9223372036854775807;
-pub const INTPTR_MIN: i64 = -9223372036854775808;
-pub const UINTPTR_MAX: i32 = -1;
-pub const SIZE_MAX: i32 = -1;
-pub const RSIZE_MAX: i32 = -1;
-pub const WINT_MIN: i32 = -2147483648;
-pub const WINT_MAX: u32 = 2147483647;
-pub const SIG_ATOMIC_MIN: i32 = -2147483648;
-pub const SIG_ATOMIC_MAX: u32 = 2147483647;
-pub const PRIO_PROCESS: u32 = 0;
-pub const PRIO_PGRP: u32 = 1;
-pub const PRIO_USER: u32 = 2;
-pub const PRIO_DARWIN_THREAD: u32 = 3;
-pub const PRIO_DARWIN_PROCESS: u32 = 4;
-pub const PRIO_MIN: i32 = -20;
-pub const PRIO_MAX: u32 = 20;
-pub const PRIO_DARWIN_BG: u32 = 4096;
-pub const PRIO_DARWIN_NONUI: u32 = 4097;
-pub const RUSAGE_SELF: u32 = 0;
-pub const RUSAGE_CHILDREN: i32 = -1;
-pub const RUSAGE_INFO_V0: u32 = 0;
-pub const RUSAGE_INFO_V1: u32 = 1;
-pub const RUSAGE_INFO_V2: u32 = 2;
-pub const RUSAGE_INFO_V3: u32 = 3;
-pub const RUSAGE_INFO_V4: u32 = 4;
-pub const RUSAGE_INFO_V5: u32 = 5;
-pub const RUSAGE_INFO_CURRENT: u32 = 5;
-pub const RU_PROC_RUNS_RESLIDE: u32 = 1;
-pub const RLIMIT_CPU: u32 = 0;
-pub const RLIMIT_FSIZE: u32 = 1;
-pub const RLIMIT_DATA: u32 = 2;
-pub const RLIMIT_STACK: u32 = 3;
-pub const RLIMIT_CORE: u32 = 4;
-pub const RLIMIT_AS: u32 = 5;
-pub const RLIMIT_RSS: u32 = 5;
-pub const RLIMIT_MEMLOCK: u32 = 6;
-pub const RLIMIT_NPROC: u32 = 7;
-pub const RLIMIT_NOFILE: u32 = 8;
-pub const RLIM_NLIMITS: u32 = 9;
-pub const _RLIMIT_POSIX_FLAG: u32 = 4096;
-pub const RLIMIT_WAKEUPS_MONITOR: u32 = 1;
-pub const RLIMIT_CPU_USAGE_MONITOR: u32 = 2;
-pub const RLIMIT_THREAD_CPULIMITS: u32 = 3;
-pub const RLIMIT_FOOTPRINT_INTERVAL: u32 = 4;
-pub const WAKEMON_ENABLE: u32 = 1;
-pub const WAKEMON_DISABLE: u32 = 2;
-pub const WAKEMON_GET_PARAMS: u32 = 4;
-pub const WAKEMON_SET_DEFAULTS: u32 = 8;
-pub const WAKEMON_MAKE_FATAL: u32 = 16;
-pub const CPUMON_MAKE_FATAL: u32 = 4096;
-pub const FOOTPRINT_INTERVAL_RESET: u32 = 1;
-pub const IOPOL_TYPE_DISK: u32 = 0;
-pub const IOPOL_TYPE_VFS_ATIME_UPDATES: u32 = 2;
-pub const IOPOL_TYPE_VFS_MATERIALIZE_DATALESS_FILES: u32 = 3;
-pub const IOPOL_TYPE_VFS_STATFS_NO_DATA_VOLUME: u32 = 4;
-pub const IOPOL_TYPE_VFS_TRIGGER_RESOLVE: u32 = 5;
-pub const IOPOL_TYPE_VFS_IGNORE_CONTENT_PROTECTION: u32 = 6;
-pub const IOPOL_TYPE_VFS_IGNORE_PERMISSIONS: u32 = 7;
-pub const IOPOL_TYPE_VFS_SKIP_MTIME_UPDATE: u32 = 8;
-pub const IOPOL_TYPE_VFS_ALLOW_LOW_SPACE_WRITES: u32 = 9;
-pub const IOPOL_SCOPE_PROCESS: u32 = 0;
-pub const IOPOL_SCOPE_THREAD: u32 = 1;
-pub const IOPOL_SCOPE_DARWIN_BG: u32 = 2;
-pub const IOPOL_DEFAULT: u32 = 0;
-pub const IOPOL_IMPORTANT: u32 = 1;
-pub const IOPOL_PASSIVE: u32 = 2;
-pub const IOPOL_THROTTLE: u32 = 3;
-pub const IOPOL_UTILITY: u32 = 4;
-pub const IOPOL_STANDARD: u32 = 5;
-pub const IOPOL_APPLICATION: u32 = 5;
-pub const IOPOL_NORMAL: u32 = 1;
-pub const IOPOL_ATIME_UPDATES_DEFAULT: u32 = 0;
-pub const IOPOL_ATIME_UPDATES_OFF: u32 = 1;
-pub const IOPOL_MATERIALIZE_DATALESS_FILES_DEFAULT: u32 = 0;
-pub const IOPOL_MATERIALIZE_DATALESS_FILES_OFF: u32 = 1;
-pub const IOPOL_MATERIALIZE_DATALESS_FILES_ON: u32 = 2;
-pub const IOPOL_VFS_STATFS_NO_DATA_VOLUME_DEFAULT: u32 = 0;
-pub const IOPOL_VFS_STATFS_FORCE_NO_DATA_VOLUME: u32 = 1;
-pub const IOPOL_VFS_TRIGGER_RESOLVE_DEFAULT: u32 = 0;
-pub const IOPOL_VFS_TRIGGER_RESOLVE_OFF: u32 = 1;
-pub const IOPOL_VFS_CONTENT_PROTECTION_DEFAULT: u32 = 0;
-pub const IOPOL_VFS_CONTENT_PROTECTION_IGNORE: u32 = 1;
-pub const IOPOL_VFS_IGNORE_PERMISSIONS_OFF: u32 = 0;
-pub const IOPOL_VFS_IGNORE_PERMISSIONS_ON: u32 = 1;
-pub const IOPOL_VFS_SKIP_MTIME_UPDATE_OFF: u32 = 0;
-pub const IOPOL_VFS_SKIP_MTIME_UPDATE_ON: u32 = 1;
-pub const IOPOL_VFS_ALLOW_LOW_SPACE_WRITES_OFF: u32 = 0;
-pub const IOPOL_VFS_ALLOW_LOW_SPACE_WRITES_ON: u32 = 1;
+pub const P_tmpdir: &[u8; 5usize] = b"/tmp\0";
+pub const _BITS_STDIO_LIM_H: u32 = 1;
+pub const L_tmpnam: u32 = 20;
+pub const TMP_MAX: u32 = 238328;
+pub const FILENAME_MAX: u32 = 4096;
+pub const L_ctermid: u32 = 9;
+pub const FOPEN_MAX: u32 = 16;
+pub const __HAVE_FLOAT128: u32 = 0;
+pub const __HAVE_DISTINCT_FLOAT128: u32 = 0;
+pub const __HAVE_FLOAT64X: u32 = 1;
+pub const __HAVE_FLOAT64X_LONG_DOUBLE: u32 = 1;
+pub const __HAVE_FLOAT16: u32 = 0;
+pub const __HAVE_FLOAT32: u32 = 1;
+pub const __HAVE_FLOAT64: u32 = 1;
+pub const __HAVE_FLOAT32X: u32 = 1;
+pub const __HAVE_FLOAT128X: u32 = 0;
+pub const __HAVE_DISTINCT_FLOAT16: u32 = 0;
+pub const __HAVE_DISTINCT_FLOAT32: u32 = 0;
+pub const __HAVE_DISTINCT_FLOAT64: u32 = 0;
+pub const __HAVE_DISTINCT_FLOAT32X: u32 = 0;
+pub const __HAVE_DISTINCT_FLOAT64X: u32 = 0;
+pub const __HAVE_DISTINCT_FLOAT128X: u32 = 0;
+pub const __HAVE_FLOATN_NOT_TYPEDEF: u32 = 0;
+pub const _STDLIB_H: u32 = 1;
 pub const WNOHANG: u32 = 1;
 pub const WUNTRACED: u32 = 2;
-pub const WCOREFLAG: u32 = 128;
-pub const _WSTOPPED: u32 = 127;
+pub const WSTOPPED: u32 = 2;
 pub const WEXITED: u32 = 4;
-pub const WSTOPPED: u32 = 8;
-pub const WCONTINUED: u32 = 16;
-pub const WNOWAIT: u32 = 32;
-pub const WAIT_ANY: i32 = -1;
-pub const WAIT_MYPGRP: u32 = 0;
-pub const _QUAD_HIGHWORD: u32 = 1;
-pub const _QUAD_LOWWORD: u32 = 0;
-pub const __DARWIN_LITTLE_ENDIAN: u32 = 1234;
-pub const __DARWIN_BIG_ENDIAN: u32 = 4321;
-pub const __DARWIN_PDP_ENDIAN: u32 = 3412;
-pub const __DARWIN_BYTE_ORDER: u32 = 1234;
+pub const WCONTINUED: u32 = 8;
+pub const WNOWAIT: u32 = 16777216;
+pub const __WNOTHREAD: u32 = 536870912;
+pub const __WALL: u32 = 1073741824;
+pub const __WCLONE: u32 = 2147483648;
+pub const __W_CONTINUED: u32 = 65535;
+pub const __WCOREFLAG: u32 = 128;
+pub const __ldiv_t_defined: u32 = 1;
+pub const __lldiv_t_defined: u32 = 1;
+pub const RAND_MAX: u32 = 2147483647;
+pub const EXIT_FAILURE: u32 = 1;
+pub const EXIT_SUCCESS: u32 = 0;
+pub const _SYS_TYPES_H: u32 = 1;
+pub const __clock_t_defined: u32 = 1;
+pub const __clockid_t_defined: u32 = 1;
+pub const __time_t_defined: u32 = 1;
+pub const __timer_t_defined: u32 = 1;
+pub const _BITS_STDINT_INTN_H: u32 = 1;
+pub const __BIT_TYPES_DEFINED__: u32 = 1;
+pub const _ENDIAN_H: u32 = 1;
+pub const _BITS_ENDIAN_H: u32 = 1;
+pub const __LITTLE_ENDIAN: u32 = 1234;
+pub const __BIG_ENDIAN: u32 = 4321;
+pub const __PDP_ENDIAN: u32 = 3412;
+pub const _BITS_ENDIANNESS_H: u32 = 1;
+pub const __BYTE_ORDER: u32 = 1234;
+pub const __FLOAT_WORD_ORDER: u32 = 1234;
 pub const LITTLE_ENDIAN: u32 = 1234;
 pub const BIG_ENDIAN: u32 = 4321;
 pub const PDP_ENDIAN: u32 = 3412;
 pub const BYTE_ORDER: u32 = 1234;
-pub const EXIT_FAILURE: u32 = 1;
-pub const EXIT_SUCCESS: u32 = 0;
-pub const RAND_MAX: u32 = 2147483647;
-pub const __HAS_FIXED_CHK_PROTOTYPES: u32 = 1;
-pub const __GNUC_VA_LIST: u32 = 1;
-pub const __DARWIN_FD_SETSIZE: u32 = 1024;
-pub const __DARWIN_NBBY: u32 = 8;
-pub const NBBY: u32 = 8;
+pub const _BITS_BYTESWAP_H: u32 = 1;
+pub const _BITS_UINTN_IDENTITY_H: u32 = 1;
+pub const _SYS_SELECT_H: u32 = 1;
+pub const __sigset_t_defined: u32 = 1;
+pub const __timeval_defined: u32 = 1;
+pub const _STRUCT_TIMESPEC: u32 = 1;
 pub const FD_SETSIZE: u32 = 1024;
+pub const _BITS_PTHREADTYPES_COMMON_H: u32 = 1;
+pub const _THREAD_SHARED_TYPES_H: u32 = 1;
+pub const _BITS_PTHREADTYPES_ARCH_H: u32 = 1;
+pub const __SIZEOF_PTHREAD_MUTEX_T: u32 = 40;
+pub const __SIZEOF_PTHREAD_ATTR_T: u32 = 56;
+pub const __SIZEOF_PTHREAD_RWLOCK_T: u32 = 56;
+pub const __SIZEOF_PTHREAD_BARRIER_T: u32 = 32;
+pub const __SIZEOF_PTHREAD_MUTEXATTR_T: u32 = 4;
+pub const __SIZEOF_PTHREAD_COND_T: u32 = 48;
+pub const __SIZEOF_PTHREAD_CONDATTR_T: u32 = 4;
+pub const __SIZEOF_PTHREAD_RWLOCKATTR_T: u32 = 8;
+pub const __SIZEOF_PTHREAD_BARRIERATTR_T: u32 = 4;
+pub const _THREAD_MUTEX_INTERNAL_H: u32 = 1;
+pub const __PTHREAD_MUTEX_HAVE_PREV: u32 = 1;
+pub const __have_pthread_attr_t: u32 = 1;
+pub const _ALLOCA_H: u32 = 1;
+pub const _STRING_H: u32 = 1;
+pub const _BITS_TYPES_LOCALE_T_H: u32 = 1;
+pub const _BITS_TYPES___LOCALE_T_H: u32 = 1;
+pub const _STRINGS_H: u32 = 1;
+pub const _STDINT_H: u32 = 1;
+pub const _BITS_WCHAR_H: u32 = 1;
+pub const _BITS_STDINT_UINTN_H: u32 = 1;
+pub const INT8_MIN: i32 = -128;
+pub const INT16_MIN: i32 = -32768;
+pub const INT32_MIN: i32 = -2147483648;
+pub const INT8_MAX: u32 = 127;
+pub const INT16_MAX: u32 = 32767;
+pub const INT32_MAX: u32 = 2147483647;
+pub const UINT8_MAX: u32 = 255;
+pub const UINT16_MAX: u32 = 65535;
+pub const UINT32_MAX: u32 = 4294967295;
+pub const INT_LEAST8_MIN: i32 = -128;
+pub const INT_LEAST16_MIN: i32 = -32768;
+pub const INT_LEAST32_MIN: i32 = -2147483648;
+pub const INT_LEAST8_MAX: u32 = 127;
+pub const INT_LEAST16_MAX: u32 = 32767;
+pub const INT_LEAST32_MAX: u32 = 2147483647;
+pub const UINT_LEAST8_MAX: u32 = 255;
+pub const UINT_LEAST16_MAX: u32 = 65535;
+pub const UINT_LEAST32_MAX: u32 = 4294967295;
+pub const INT_FAST8_MIN: i32 = -128;
+pub const INT_FAST16_MIN: i64 = -9223372036854775808;
+pub const INT_FAST32_MIN: i64 = -9223372036854775808;
+pub const INT_FAST8_MAX: u32 = 127;
+pub const INT_FAST16_MAX: u64 = 9223372036854775807;
+pub const INT_FAST32_MAX: u64 = 9223372036854775807;
+pub const UINT_FAST8_MAX: u32 = 255;
+pub const UINT_FAST16_MAX: i32 = -1;
+pub const UINT_FAST32_MAX: i32 = -1;
+pub const INTPTR_MIN: i64 = -9223372036854775808;
+pub const INTPTR_MAX: u64 = 9223372036854775807;
+pub const UINTPTR_MAX: i32 = -1;
+pub const PTRDIFF_MIN: i64 = -9223372036854775808;
+pub const PTRDIFF_MAX: u64 = 9223372036854775807;
+pub const SIG_ATOMIC_MIN: i32 = -2147483648;
+pub const SIG_ATOMIC_MAX: u32 = 2147483647;
+pub const SIZE_MAX: i32 = -1;
+pub const WINT_MIN: u32 = 0;
+pub const WINT_MAX: u32 = 4294967295;
+pub const _ERRNO_H: u32 = 1;
+pub const _BITS_ERRNO_H: u32 = 1;
 pub const EPERM: u32 = 1;
 pub const ENOENT: u32 = 2;
 pub const ESRCH: u32 = 3;
@@ -918,7 +580,7 @@ pub const E2BIG: u32 = 7;
 pub const ENOEXEC: u32 = 8;
 pub const EBADF: u32 = 9;
 pub const ECHILD: u32 = 10;
-pub const EDEADLK: u32 = 11;
+pub const EAGAIN: u32 = 11;
 pub const ENOMEM: u32 = 12;
 pub const EACCES: u32 = 13;
 pub const EFAULT: u32 = 14;
@@ -942,88 +604,147 @@ pub const EMLINK: u32 = 31;
 pub const EPIPE: u32 = 32;
 pub const EDOM: u32 = 33;
 pub const ERANGE: u32 = 34;
-pub const EAGAIN: u32 = 35;
-pub const EWOULDBLOCK: u32 = 35;
-pub const EINPROGRESS: u32 = 36;
-pub const EALREADY: u32 = 37;
-pub const ENOTSOCK: u32 = 38;
-pub const EDESTADDRREQ: u32 = 39;
-pub const EMSGSIZE: u32 = 40;
-pub const EPROTOTYPE: u32 = 41;
-pub const ENOPROTOOPT: u32 = 42;
-pub const EPROTONOSUPPORT: u32 = 43;
-pub const ESOCKTNOSUPPORT: u32 = 44;
-pub const ENOTSUP: u32 = 45;
-pub const EPFNOSUPPORT: u32 = 46;
-pub const EAFNOSUPPORT: u32 = 47;
-pub const EADDRINUSE: u32 = 48;
-pub const EADDRNOTAVAIL: u32 = 49;
-pub const ENETDOWN: u32 = 50;
-pub const ENETUNREACH: u32 = 51;
-pub const ENETRESET: u32 = 52;
-pub const ECONNABORTED: u32 = 53;
-pub const ECONNRESET: u32 = 54;
-pub const ENOBUFS: u32 = 55;
-pub const EISCONN: u32 = 56;
-pub const ENOTCONN: u32 = 57;
-pub const ESHUTDOWN: u32 = 58;
-pub const ETOOMANYREFS: u32 = 59;
-pub const ETIMEDOUT: u32 = 60;
-pub const ECONNREFUSED: u32 = 61;
-pub const ELOOP: u32 = 62;
-pub const ENAMETOOLONG: u32 = 63;
-pub const EHOSTDOWN: u32 = 64;
-pub const EHOSTUNREACH: u32 = 65;
-pub const ENOTEMPTY: u32 = 66;
-pub const EPROCLIM: u32 = 67;
-pub const EUSERS: u32 = 68;
-pub const EDQUOT: u32 = 69;
-pub const ESTALE: u32 = 70;
-pub const EREMOTE: u32 = 71;
-pub const EBADRPC: u32 = 72;
-pub const ERPCMISMATCH: u32 = 73;
-pub const EPROGUNAVAIL: u32 = 74;
-pub const EPROGMISMATCH: u32 = 75;
-pub const EPROCUNAVAIL: u32 = 76;
-pub const ENOLCK: u32 = 77;
-pub const ENOSYS: u32 = 78;
-pub const EFTYPE: u32 = 79;
-pub const EAUTH: u32 = 80;
-pub const ENEEDAUTH: u32 = 81;
-pub const EPWROFF: u32 = 82;
-pub const EDEVERR: u32 = 83;
-pub const EOVERFLOW: u32 = 84;
-pub const EBADEXEC: u32 = 85;
-pub const EBADARCH: u32 = 86;
-pub const ESHLIBVERS: u32 = 87;
-pub const EBADMACHO: u32 = 88;
-pub const ECANCELED: u32 = 89;
-pub const EIDRM: u32 = 90;
-pub const ENOMSG: u32 = 91;
-pub const EILSEQ: u32 = 92;
-pub const ENOATTR: u32 = 93;
-pub const EBADMSG: u32 = 94;
-pub const EMULTIHOP: u32 = 95;
-pub const ENODATA: u32 = 96;
-pub const ENOLINK: u32 = 97;
-pub const ENOSR: u32 = 98;
-pub const ENOSTR: u32 = 99;
-pub const EPROTO: u32 = 100;
-pub const ETIME: u32 = 101;
-pub const EOPNOTSUPP: u32 = 102;
-pub const ENOPOLICY: u32 = 103;
-pub const ENOTRECOVERABLE: u32 = 104;
-pub const EOWNERDEAD: u32 = 105;
-pub const EQFULL: u32 = 106;
-pub const ELAST: u32 = 106;
-pub const LC_ALL: u32 = 0;
-pub const LC_COLLATE: u32 = 1;
-pub const LC_CTYPE: u32 = 2;
-pub const LC_MONETARY: u32 = 3;
-pub const LC_NUMERIC: u32 = 4;
-pub const LC_TIME: u32 = 5;
-pub const LC_MESSAGES: u32 = 6;
-pub const _LC_LAST: u32 = 7;
+pub const EDEADLK: u32 = 35;
+pub const ENAMETOOLONG: u32 = 36;
+pub const ENOLCK: u32 = 37;
+pub const ENOSYS: u32 = 38;
+pub const ENOTEMPTY: u32 = 39;
+pub const ELOOP: u32 = 40;
+pub const EWOULDBLOCK: u32 = 11;
+pub const ENOMSG: u32 = 42;
+pub const EIDRM: u32 = 43;
+pub const ECHRNG: u32 = 44;
+pub const EL2NSYNC: u32 = 45;
+pub const EL3HLT: u32 = 46;
+pub const EL3RST: u32 = 47;
+pub const ELNRNG: u32 = 48;
+pub const EUNATCH: u32 = 49;
+pub const ENOCSI: u32 = 50;
+pub const EL2HLT: u32 = 51;
+pub const EBADE: u32 = 52;
+pub const EBADR: u32 = 53;
+pub const EXFULL: u32 = 54;
+pub const ENOANO: u32 = 55;
+pub const EBADRQC: u32 = 56;
+pub const EBADSLT: u32 = 57;
+pub const EDEADLOCK: u32 = 35;
+pub const EBFONT: u32 = 59;
+pub const ENOSTR: u32 = 60;
+pub const ENODATA: u32 = 61;
+pub const ETIME: u32 = 62;
+pub const ENOSR: u32 = 63;
+pub const ENONET: u32 = 64;
+pub const ENOPKG: u32 = 65;
+pub const EREMOTE: u32 = 66;
+pub const ENOLINK: u32 = 67;
+pub const EADV: u32 = 68;
+pub const ESRMNT: u32 = 69;
+pub const ECOMM: u32 = 70;
+pub const EPROTO: u32 = 71;
+pub const EMULTIHOP: u32 = 72;
+pub const EDOTDOT: u32 = 73;
+pub const EBADMSG: u32 = 74;
+pub const EOVERFLOW: u32 = 75;
+pub const ENOTUNIQ: u32 = 76;
+pub const EBADFD: u32 = 77;
+pub const EREMCHG: u32 = 78;
+pub const ELIBACC: u32 = 79;
+pub const ELIBBAD: u32 = 80;
+pub const ELIBSCN: u32 = 81;
+pub const ELIBMAX: u32 = 82;
+pub const ELIBEXEC: u32 = 83;
+pub const EILSEQ: u32 = 84;
+pub const ERESTART: u32 = 85;
+pub const ESTRPIPE: u32 = 86;
+pub const EUSERS: u32 = 87;
+pub const ENOTSOCK: u32 = 88;
+pub const EDESTADDRREQ: u32 = 89;
+pub const EMSGSIZE: u32 = 90;
+pub const EPROTOTYPE: u32 = 91;
+pub const ENOPROTOOPT: u32 = 92;
+pub const EPROTONOSUPPORT: u32 = 93;
+pub const ESOCKTNOSUPPORT: u32 = 94;
+pub const EOPNOTSUPP: u32 = 95;
+pub const EPFNOSUPPORT: u32 = 96;
+pub const EAFNOSUPPORT: u32 = 97;
+pub const EADDRINUSE: u32 = 98;
+pub const EADDRNOTAVAIL: u32 = 99;
+pub const ENETDOWN: u32 = 100;
+pub const ENETUNREACH: u32 = 101;
+pub const ENETRESET: u32 = 102;
+pub const ECONNABORTED: u32 = 103;
+pub const ECONNRESET: u32 = 104;
+pub const ENOBUFS: u32 = 105;
+pub const EISCONN: u32 = 106;
+pub const ENOTCONN: u32 = 107;
+pub const ESHUTDOWN: u32 = 108;
+pub const ETOOMANYREFS: u32 = 109;
+pub const ETIMEDOUT: u32 = 110;
+pub const ECONNREFUSED: u32 = 111;
+pub const EHOSTDOWN: u32 = 112;
+pub const EHOSTUNREACH: u32 = 113;
+pub const EALREADY: u32 = 114;
+pub const EINPROGRESS: u32 = 115;
+pub const ESTALE: u32 = 116;
+pub const EUCLEAN: u32 = 117;
+pub const ENOTNAM: u32 = 118;
+pub const ENAVAIL: u32 = 119;
+pub const EISNAM: u32 = 120;
+pub const EREMOTEIO: u32 = 121;
+pub const EDQUOT: u32 = 122;
+pub const ENOMEDIUM: u32 = 123;
+pub const EMEDIUMTYPE: u32 = 124;
+pub const ECANCELED: u32 = 125;
+pub const ENOKEY: u32 = 126;
+pub const EKEYEXPIRED: u32 = 127;
+pub const EKEYREVOKED: u32 = 128;
+pub const EKEYREJECTED: u32 = 129;
+pub const EOWNERDEAD: u32 = 130;
+pub const ENOTRECOVERABLE: u32 = 131;
+pub const ERFKILL: u32 = 132;
+pub const EHWPOISON: u32 = 133;
+pub const ENOTSUP: u32 = 95;
+pub const _LOCALE_H: u32 = 1;
+pub const _BITS_LOCALE_H: u32 = 1;
+pub const __LC_CTYPE: u32 = 0;
+pub const __LC_NUMERIC: u32 = 1;
+pub const __LC_TIME: u32 = 2;
+pub const __LC_COLLATE: u32 = 3;
+pub const __LC_MONETARY: u32 = 4;
+pub const __LC_MESSAGES: u32 = 5;
+pub const __LC_ALL: u32 = 6;
+pub const __LC_PAPER: u32 = 7;
+pub const __LC_NAME: u32 = 8;
+pub const __LC_ADDRESS: u32 = 9;
+pub const __LC_TELEPHONE: u32 = 10;
+pub const __LC_MEASUREMENT: u32 = 11;
+pub const __LC_IDENTIFICATION: u32 = 12;
+pub const LC_CTYPE: u32 = 0;
+pub const LC_NUMERIC: u32 = 1;
+pub const LC_TIME: u32 = 2;
+pub const LC_COLLATE: u32 = 3;
+pub const LC_MONETARY: u32 = 4;
+pub const LC_MESSAGES: u32 = 5;
+pub const LC_ALL: u32 = 6;
+pub const LC_PAPER: u32 = 7;
+pub const LC_NAME: u32 = 8;
+pub const LC_ADDRESS: u32 = 9;
+pub const LC_TELEPHONE: u32 = 10;
+pub const LC_MEASUREMENT: u32 = 11;
+pub const LC_IDENTIFICATION: u32 = 12;
+pub const LC_CTYPE_MASK: u32 = 1;
+pub const LC_NUMERIC_MASK: u32 = 2;
+pub const LC_TIME_MASK: u32 = 4;
+pub const LC_COLLATE_MASK: u32 = 8;
+pub const LC_MONETARY_MASK: u32 = 16;
+pub const LC_MESSAGES_MASK: u32 = 32;
+pub const LC_PAPER_MASK: u32 = 128;
+pub const LC_NAME_MASK: u32 = 256;
+pub const LC_ADDRESS_MASK: u32 = 512;
+pub const LC_TELEPHONE_MASK: u32 = 1024;
+pub const LC_MEASUREMENT_MASK: u32 = 2048;
+pub const LC_IDENTIFICATION_MASK: u32 = 4096;
+pub const LC_ALL_MASK: u32 = 8127;
 pub const HAVE_PG_ATTRIBUTE_NORETURN: u32 = 1;
 pub const true_: u32 = 1;
 pub const false_: u32 = 0;
@@ -1053,375 +774,362 @@ pub const PG_BINARY: u32 = 0;
 pub const PG_BINARY_A: &[u8; 2usize] = b"a\0";
 pub const PG_BINARY_R: &[u8; 2usize] = b"r\0";
 pub const PG_BINARY_W: &[u8; 2usize] = b"w\0";
-pub const _CACHED_RUNES: u32 = 256;
-pub const _CRMASK: i32 = -256;
-pub const _RUNE_MAGIC_A: &[u8; 9usize] = b"RuneMagA\0";
-pub const _CTYPE_A: u32 = 256;
-pub const _CTYPE_C: u32 = 512;
-pub const _CTYPE_D: u32 = 1024;
-pub const _CTYPE_G: u32 = 2048;
-pub const _CTYPE_L: u32 = 4096;
-pub const _CTYPE_P: u32 = 8192;
-pub const _CTYPE_S: u32 = 16384;
-pub const _CTYPE_U: u32 = 32768;
-pub const _CTYPE_X: u32 = 65536;
-pub const _CTYPE_B: u32 = 131072;
-pub const _CTYPE_R: u32 = 262144;
-pub const _CTYPE_I: u32 = 524288;
-pub const _CTYPE_T: u32 = 1048576;
-pub const _CTYPE_Q: u32 = 2097152;
-pub const _CTYPE_SW0: u32 = 536870912;
-pub const _CTYPE_SW1: u32 = 1073741824;
-pub const _CTYPE_SW2: u32 = 2147483648;
-pub const _CTYPE_SW3: u32 = 3221225472;
-pub const _CTYPE_SWM: u32 = 3758096384;
-pub const _CTYPE_SWS: u32 = 30;
-pub const KEV_INET_SUBCLASS: u32 = 1;
-pub const KEV_INET_NEW_ADDR: u32 = 1;
-pub const KEV_INET_CHANGED_ADDR: u32 = 2;
-pub const KEV_INET_ADDR_DELETED: u32 = 3;
-pub const KEV_INET_SIFDSTADDR: u32 = 4;
-pub const KEV_INET_SIFBRDADDR: u32 = 5;
-pub const KEV_INET_SIFNETMASK: u32 = 6;
-pub const KEV_INET_ARPCOLLISION: u32 = 7;
-pub const KEV_INET_PORTINUSE: u32 = 8;
-pub const KEV_INET_ARPRTRFAILURE: u32 = 9;
-pub const KEV_INET_ARPRTRALIVE: u32 = 10;
-pub const KEV_DL_SUBCLASS: u32 = 2;
-pub const KEV_DL_SIFFLAGS: u32 = 1;
-pub const KEV_DL_SIFMETRICS: u32 = 2;
-pub const KEV_DL_SIFMTU: u32 = 3;
-pub const KEV_DL_SIFPHYS: u32 = 4;
-pub const KEV_DL_SIFMEDIA: u32 = 5;
-pub const KEV_DL_SIFGENERIC: u32 = 6;
-pub const KEV_DL_ADDMULTI: u32 = 7;
-pub const KEV_DL_DELMULTI: u32 = 8;
-pub const KEV_DL_IF_ATTACHED: u32 = 9;
-pub const KEV_DL_IF_DETACHING: u32 = 10;
-pub const KEV_DL_IF_DETACHED: u32 = 11;
-pub const KEV_DL_LINK_OFF: u32 = 12;
-pub const KEV_DL_LINK_ON: u32 = 13;
-pub const KEV_DL_PROTO_ATTACHED: u32 = 14;
-pub const KEV_DL_PROTO_DETACHED: u32 = 15;
-pub const KEV_DL_LINK_ADDRESS_CHANGED: u32 = 16;
-pub const KEV_DL_WAKEFLAGS_CHANGED: u32 = 17;
-pub const KEV_DL_IF_IDLE_ROUTE_REFCNT: u32 = 18;
-pub const KEV_DL_IFCAP_CHANGED: u32 = 19;
-pub const KEV_DL_LINK_QUALITY_METRIC_CHANGED: u32 = 20;
-pub const KEV_DL_NODE_PRESENCE: u32 = 21;
-pub const KEV_DL_NODE_ABSENCE: u32 = 22;
-pub const KEV_DL_PRIMARY_ELECTED: u32 = 23;
-pub const KEV_DL_ISSUES: u32 = 24;
-pub const KEV_DL_IFDELEGATE_CHANGED: u32 = 25;
-pub const KEV_DL_AWDL_RESTRICTED: u32 = 26;
-pub const KEV_DL_AWDL_UNRESTRICTED: u32 = 27;
-pub const KEV_DL_RRC_STATE_CHANGED: u32 = 28;
-pub const KEV_DL_QOS_MODE_CHANGED: u32 = 29;
-pub const KEV_DL_LOW_POWER_MODE_CHANGED: u32 = 30;
-pub const KEV_INET6_SUBCLASS: u32 = 6;
-pub const KEV_INET6_NEW_USER_ADDR: u32 = 1;
-pub const KEV_INET6_CHANGED_ADDR: u32 = 2;
-pub const KEV_INET6_ADDR_DELETED: u32 = 3;
-pub const KEV_INET6_NEW_LL_ADDR: u32 = 4;
-pub const KEV_INET6_NEW_RTADV_ADDR: u32 = 5;
-pub const KEV_INET6_DEFROUTER: u32 = 6;
-pub const KEV_INET6_REQUEST_NAT64_PREFIX: u32 = 7;
-pub const SOCK_STREAM: u32 = 1;
-pub const SOCK_DGRAM: u32 = 2;
-pub const SOCK_RAW: u32 = 3;
-pub const SOCK_RDM: u32 = 4;
-pub const SOCK_SEQPACKET: u32 = 5;
-pub const SO_DEBUG: u32 = 1;
-pub const SO_ACCEPTCONN: u32 = 2;
-pub const SO_REUSEADDR: u32 = 4;
-pub const SO_KEEPALIVE: u32 = 8;
-pub const SO_DONTROUTE: u32 = 16;
-pub const SO_BROADCAST: u32 = 32;
-pub const SO_USELOOPBACK: u32 = 64;
-pub const SO_LINGER: u32 = 128;
-pub const SO_OOBINLINE: u32 = 256;
-pub const SO_REUSEPORT: u32 = 512;
-pub const SO_TIMESTAMP: u32 = 1024;
-pub const SO_TIMESTAMP_MONOTONIC: u32 = 2048;
-pub const SO_DONTTRUNC: u32 = 8192;
-pub const SO_WANTMORE: u32 = 16384;
-pub const SO_WANTOOBFLAG: u32 = 32768;
-pub const SO_SNDBUF: u32 = 4097;
-pub const SO_RCVBUF: u32 = 4098;
-pub const SO_SNDLOWAT: u32 = 4099;
-pub const SO_RCVLOWAT: u32 = 4100;
-pub const SO_SNDTIMEO: u32 = 4101;
-pub const SO_RCVTIMEO: u32 = 4102;
-pub const SO_ERROR: u32 = 4103;
-pub const SO_TYPE: u32 = 4104;
-pub const SO_LABEL: u32 = 4112;
-pub const SO_PEERLABEL: u32 = 4113;
-pub const SO_NREAD: u32 = 4128;
-pub const SO_NKE: u32 = 4129;
-pub const SO_NOSIGPIPE: u32 = 4130;
-pub const SO_NOADDRERR: u32 = 4131;
-pub const SO_NWRITE: u32 = 4132;
-pub const SO_REUSESHAREUID: u32 = 4133;
-pub const SO_NOTIFYCONFLICT: u32 = 4134;
-pub const SO_UPCALLCLOSEWAIT: u32 = 4135;
-pub const SO_LINGER_SEC: u32 = 4224;
-pub const SO_RANDOMPORT: u32 = 4226;
-pub const SO_NP_EXTENSIONS: u32 = 4227;
-pub const SO_NUMRCVPKT: u32 = 4370;
-pub const SO_NET_SERVICE_TYPE: u32 = 4374;
-pub const SO_NETSVC_MARKING_LEVEL: u32 = 4377;
-pub const NET_SERVICE_TYPE_BE: u32 = 0;
-pub const NET_SERVICE_TYPE_BK: u32 = 1;
-pub const NET_SERVICE_TYPE_SIG: u32 = 2;
-pub const NET_SERVICE_TYPE_VI: u32 = 3;
-pub const NET_SERVICE_TYPE_VO: u32 = 4;
-pub const NET_SERVICE_TYPE_RV: u32 = 5;
-pub const NET_SERVICE_TYPE_AV: u32 = 6;
-pub const NET_SERVICE_TYPE_OAM: u32 = 7;
-pub const NET_SERVICE_TYPE_RD: u32 = 8;
-pub const NETSVC_MRKNG_UNKNOWN: u32 = 0;
-pub const NETSVC_MRKNG_LVL_L2: u32 = 1;
-pub const NETSVC_MRKNG_LVL_L3L2_ALL: u32 = 2;
-pub const NETSVC_MRKNG_LVL_L3L2_BK: u32 = 3;
-pub const SAE_ASSOCID_ANY: u32 = 0;
-pub const SAE_CONNID_ANY: u32 = 0;
-pub const CONNECT_RESUME_ON_READ_WRITE: u32 = 1;
-pub const CONNECT_DATA_IDEMPOTENT: u32 = 2;
-pub const CONNECT_DATA_AUTHENTICATED: u32 = 4;
-pub const SONPX_SETOPTSHUT: u32 = 1;
-pub const SOL_SOCKET: u32 = 65535;
-pub const AF_UNSPEC: u32 = 0;
-pub const AF_UNIX: u32 = 1;
-pub const AF_LOCAL: u32 = 1;
-pub const AF_INET: u32 = 2;
-pub const AF_IMPLINK: u32 = 3;
-pub const AF_PUP: u32 = 4;
-pub const AF_CHAOS: u32 = 5;
-pub const AF_NS: u32 = 6;
-pub const AF_ISO: u32 = 7;
-pub const AF_OSI: u32 = 7;
-pub const AF_ECMA: u32 = 8;
-pub const AF_DATAKIT: u32 = 9;
-pub const AF_CCITT: u32 = 10;
-pub const AF_SNA: u32 = 11;
-pub const AF_DECnet: u32 = 12;
-pub const AF_DLI: u32 = 13;
-pub const AF_LAT: u32 = 14;
-pub const AF_HYLINK: u32 = 15;
-pub const AF_APPLETALK: u32 = 16;
-pub const AF_ROUTE: u32 = 17;
-pub const AF_LINK: u32 = 18;
-pub const pseudo_AF_XTP: u32 = 19;
-pub const AF_COIP: u32 = 20;
-pub const AF_CNT: u32 = 21;
-pub const pseudo_AF_RTIP: u32 = 22;
-pub const AF_IPX: u32 = 23;
-pub const AF_SIP: u32 = 24;
-pub const pseudo_AF_PIP: u32 = 25;
-pub const AF_NDRV: u32 = 27;
-pub const AF_ISDN: u32 = 28;
-pub const AF_E164: u32 = 28;
-pub const pseudo_AF_KEY: u32 = 29;
-pub const AF_INET6: u32 = 30;
-pub const AF_NATM: u32 = 31;
-pub const AF_SYSTEM: u32 = 32;
-pub const AF_NETBIOS: u32 = 33;
-pub const AF_PPP: u32 = 34;
-pub const pseudo_AF_HDRCMPLT: u32 = 35;
-pub const AF_RESERVED_36: u32 = 36;
-pub const AF_IEEE80211: u32 = 37;
-pub const AF_UTUN: u32 = 38;
-pub const AF_VSOCK: u32 = 40;
-pub const AF_MAX: u32 = 41;
-pub const SOCK_MAXADDRLEN: u32 = 255;
-pub const _SS_MAXSIZE: u32 = 128;
+pub const _CTYPE_H: u32 = 1;
+pub const _NETDB_H: u32 = 1;
+pub const _NETINET_IN_H: u32 = 1;
+pub const _SYS_SOCKET_H: u32 = 1;
+pub const __iovec_defined: u32 = 1;
 pub const PF_UNSPEC: u32 = 0;
 pub const PF_LOCAL: u32 = 1;
 pub const PF_UNIX: u32 = 1;
+pub const PF_FILE: u32 = 1;
 pub const PF_INET: u32 = 2;
-pub const PF_IMPLINK: u32 = 3;
-pub const PF_PUP: u32 = 4;
-pub const PF_CHAOS: u32 = 5;
-pub const PF_NS: u32 = 6;
-pub const PF_ISO: u32 = 7;
-pub const PF_OSI: u32 = 7;
-pub const PF_ECMA: u32 = 8;
-pub const PF_DATAKIT: u32 = 9;
-pub const PF_CCITT: u32 = 10;
-pub const PF_SNA: u32 = 11;
+pub const PF_AX25: u32 = 3;
+pub const PF_IPX: u32 = 4;
+pub const PF_APPLETALK: u32 = 5;
+pub const PF_NETROM: u32 = 6;
+pub const PF_BRIDGE: u32 = 7;
+pub const PF_ATMPVC: u32 = 8;
+pub const PF_X25: u32 = 9;
+pub const PF_INET6: u32 = 10;
+pub const PF_ROSE: u32 = 11;
 pub const PF_DECnet: u32 = 12;
-pub const PF_DLI: u32 = 13;
-pub const PF_LAT: u32 = 14;
-pub const PF_HYLINK: u32 = 15;
-pub const PF_APPLETALK: u32 = 16;
-pub const PF_ROUTE: u32 = 17;
-pub const PF_LINK: u32 = 18;
-pub const PF_XTP: u32 = 19;
-pub const PF_COIP: u32 = 20;
-pub const PF_CNT: u32 = 21;
-pub const PF_SIP: u32 = 24;
-pub const PF_IPX: u32 = 23;
-pub const PF_RTIP: u32 = 22;
-pub const PF_PIP: u32 = 25;
-pub const PF_NDRV: u32 = 27;
-pub const PF_ISDN: u32 = 28;
-pub const PF_KEY: u32 = 29;
-pub const PF_INET6: u32 = 30;
-pub const PF_NATM: u32 = 31;
-pub const PF_SYSTEM: u32 = 32;
-pub const PF_NETBIOS: u32 = 33;
-pub const PF_PPP: u32 = 34;
-pub const PF_RESERVED_36: u32 = 36;
-pub const PF_UTUN: u32 = 38;
+pub const PF_NETBEUI: u32 = 13;
+pub const PF_SECURITY: u32 = 14;
+pub const PF_KEY: u32 = 15;
+pub const PF_NETLINK: u32 = 16;
+pub const PF_ROUTE: u32 = 16;
+pub const PF_PACKET: u32 = 17;
+pub const PF_ASH: u32 = 18;
+pub const PF_ECONET: u32 = 19;
+pub const PF_ATMSVC: u32 = 20;
+pub const PF_RDS: u32 = 21;
+pub const PF_SNA: u32 = 22;
+pub const PF_IRDA: u32 = 23;
+pub const PF_PPPOX: u32 = 24;
+pub const PF_WANPIPE: u32 = 25;
+pub const PF_LLC: u32 = 26;
+pub const PF_IB: u32 = 27;
+pub const PF_MPLS: u32 = 28;
+pub const PF_CAN: u32 = 29;
+pub const PF_TIPC: u32 = 30;
+pub const PF_BLUETOOTH: u32 = 31;
+pub const PF_IUCV: u32 = 32;
+pub const PF_RXRPC: u32 = 33;
+pub const PF_ISDN: u32 = 34;
+pub const PF_PHONET: u32 = 35;
+pub const PF_IEEE802154: u32 = 36;
+pub const PF_CAIF: u32 = 37;
+pub const PF_ALG: u32 = 38;
+pub const PF_NFC: u32 = 39;
 pub const PF_VSOCK: u32 = 40;
-pub const PF_MAX: u32 = 41;
-pub const NET_MAXID: u32 = 41;
-pub const NET_RT_DUMP: u32 = 1;
-pub const NET_RT_FLAGS: u32 = 2;
-pub const NET_RT_IFLIST: u32 = 3;
-pub const NET_RT_STAT: u32 = 4;
-pub const NET_RT_TRASH: u32 = 5;
-pub const NET_RT_IFLIST2: u32 = 6;
-pub const NET_RT_DUMP2: u32 = 7;
-pub const NET_RT_FLAGS_PRIV: u32 = 10;
-pub const NET_RT_MAXID: u32 = 11;
-pub const SOMAXCONN: u32 = 128;
-pub const MSG_OOB: u32 = 1;
-pub const MSG_PEEK: u32 = 2;
-pub const MSG_DONTROUTE: u32 = 4;
-pub const MSG_EOR: u32 = 8;
-pub const MSG_TRUNC: u32 = 16;
-pub const MSG_CTRUNC: u32 = 32;
-pub const MSG_WAITALL: u32 = 64;
-pub const MSG_DONTWAIT: u32 = 128;
-pub const MSG_EOF: u32 = 256;
-pub const MSG_WAITSTREAM: u32 = 512;
-pub const MSG_FLUSH: u32 = 1024;
-pub const MSG_HOLD: u32 = 2048;
-pub const MSG_SEND: u32 = 4096;
-pub const MSG_HAVEMORE: u32 = 8192;
-pub const MSG_RCVMORE: u32 = 16384;
-pub const MSG_NEEDSA: u32 = 65536;
-pub const MSG_NOSIGNAL: u32 = 524288;
-pub const SCM_RIGHTS: u32 = 1;
-pub const SCM_TIMESTAMP: u32 = 2;
-pub const SCM_CREDS: u32 = 3;
-pub const SCM_TIMESTAMP_MONOTONIC: u32 = 4;
-pub const SHUT_RD: u32 = 0;
-pub const SHUT_WR: u32 = 1;
-pub const SHUT_RDWR: u32 = 2;
-pub const IPPROTO_IP: u32 = 0;
-pub const IPPROTO_HOPOPTS: u32 = 0;
-pub const IPPROTO_ICMP: u32 = 1;
-pub const IPPROTO_IGMP: u32 = 2;
-pub const IPPROTO_GGP: u32 = 3;
-pub const IPPROTO_IPV4: u32 = 4;
-pub const IPPROTO_IPIP: u32 = 4;
-pub const IPPROTO_TCP: u32 = 6;
-pub const IPPROTO_ST: u32 = 7;
-pub const IPPROTO_EGP: u32 = 8;
-pub const IPPROTO_PIGP: u32 = 9;
-pub const IPPROTO_RCCMON: u32 = 10;
-pub const IPPROTO_NVPII: u32 = 11;
-pub const IPPROTO_PUP: u32 = 12;
-pub const IPPROTO_ARGUS: u32 = 13;
-pub const IPPROTO_EMCON: u32 = 14;
-pub const IPPROTO_XNET: u32 = 15;
-pub const IPPROTO_CHAOS: u32 = 16;
-pub const IPPROTO_UDP: u32 = 17;
-pub const IPPROTO_MUX: u32 = 18;
-pub const IPPROTO_MEAS: u32 = 19;
-pub const IPPROTO_HMP: u32 = 20;
-pub const IPPROTO_PRM: u32 = 21;
-pub const IPPROTO_IDP: u32 = 22;
-pub const IPPROTO_TRUNK1: u32 = 23;
-pub const IPPROTO_TRUNK2: u32 = 24;
-pub const IPPROTO_LEAF1: u32 = 25;
-pub const IPPROTO_LEAF2: u32 = 26;
-pub const IPPROTO_RDP: u32 = 27;
-pub const IPPROTO_IRTP: u32 = 28;
-pub const IPPROTO_TP: u32 = 29;
-pub const IPPROTO_BLT: u32 = 30;
-pub const IPPROTO_NSP: u32 = 31;
-pub const IPPROTO_INP: u32 = 32;
-pub const IPPROTO_SEP: u32 = 33;
-pub const IPPROTO_3PC: u32 = 34;
-pub const IPPROTO_IDPR: u32 = 35;
-pub const IPPROTO_XTP: u32 = 36;
-pub const IPPROTO_DDP: u32 = 37;
-pub const IPPROTO_CMTP: u32 = 38;
-pub const IPPROTO_TPXX: u32 = 39;
-pub const IPPROTO_IL: u32 = 40;
-pub const IPPROTO_IPV6: u32 = 41;
-pub const IPPROTO_SDRP: u32 = 42;
-pub const IPPROTO_ROUTING: u32 = 43;
-pub const IPPROTO_FRAGMENT: u32 = 44;
-pub const IPPROTO_IDRP: u32 = 45;
-pub const IPPROTO_RSVP: u32 = 46;
-pub const IPPROTO_GRE: u32 = 47;
-pub const IPPROTO_MHRP: u32 = 48;
-pub const IPPROTO_BHA: u32 = 49;
-pub const IPPROTO_ESP: u32 = 50;
-pub const IPPROTO_AH: u32 = 51;
-pub const IPPROTO_INLSP: u32 = 52;
-pub const IPPROTO_SWIPE: u32 = 53;
-pub const IPPROTO_NHRP: u32 = 54;
-pub const IPPROTO_ICMPV6: u32 = 58;
-pub const IPPROTO_NONE: u32 = 59;
-pub const IPPROTO_DSTOPTS: u32 = 60;
-pub const IPPROTO_AHIP: u32 = 61;
-pub const IPPROTO_CFTP: u32 = 62;
-pub const IPPROTO_HELLO: u32 = 63;
-pub const IPPROTO_SATEXPAK: u32 = 64;
-pub const IPPROTO_KRYPTOLAN: u32 = 65;
-pub const IPPROTO_RVD: u32 = 66;
-pub const IPPROTO_IPPC: u32 = 67;
-pub const IPPROTO_ADFS: u32 = 68;
-pub const IPPROTO_SATMON: u32 = 69;
-pub const IPPROTO_VISA: u32 = 70;
-pub const IPPROTO_IPCV: u32 = 71;
-pub const IPPROTO_CPNX: u32 = 72;
-pub const IPPROTO_CPHB: u32 = 73;
-pub const IPPROTO_WSN: u32 = 74;
-pub const IPPROTO_PVP: u32 = 75;
-pub const IPPROTO_BRSATMON: u32 = 76;
-pub const IPPROTO_ND: u32 = 77;
-pub const IPPROTO_WBMON: u32 = 78;
-pub const IPPROTO_WBEXPAK: u32 = 79;
-pub const IPPROTO_EON: u32 = 80;
-pub const IPPROTO_VMTP: u32 = 81;
-pub const IPPROTO_SVMTP: u32 = 82;
-pub const IPPROTO_VINES: u32 = 83;
-pub const IPPROTO_TTP: u32 = 84;
-pub const IPPROTO_IGP: u32 = 85;
-pub const IPPROTO_DGP: u32 = 86;
-pub const IPPROTO_TCF: u32 = 87;
-pub const IPPROTO_IGRP: u32 = 88;
-pub const IPPROTO_OSPFIGP: u32 = 89;
-pub const IPPROTO_SRPC: u32 = 90;
-pub const IPPROTO_LARP: u32 = 91;
-pub const IPPROTO_MTP: u32 = 92;
-pub const IPPROTO_AX25: u32 = 93;
-pub const IPPROTO_IPEIP: u32 = 94;
-pub const IPPROTO_MICP: u32 = 95;
-pub const IPPROTO_SCCSP: u32 = 96;
-pub const IPPROTO_ETHERIP: u32 = 97;
-pub const IPPROTO_ENCAP: u32 = 98;
-pub const IPPROTO_APES: u32 = 99;
-pub const IPPROTO_GMTP: u32 = 100;
-pub const IPPROTO_PIM: u32 = 103;
-pub const IPPROTO_IPCOMP: u32 = 108;
-pub const IPPROTO_PGM: u32 = 113;
-pub const IPPROTO_SCTP: u32 = 132;
-pub const IPPROTO_DIVERT: u32 = 254;
-pub const IPPROTO_RAW: u32 = 255;
-pub const IPPROTO_MAX: u32 = 256;
-pub const IPPROTO_DONE: u32 = 257;
-pub const __DARWIN_IPPORT_RESERVED: u32 = 1024;
-pub const IPPORT_USERRESERVED: u32 = 5000;
-pub const IPPORT_HIFIRSTAUTO: u32 = 49152;
-pub const IPPORT_HILASTAUTO: u32 = 65535;
-pub const IPPORT_RESERVEDSTART: u32 = 600;
+pub const PF_KCM: u32 = 41;
+pub const PF_QIPCRTR: u32 = 42;
+pub const PF_SMC: u32 = 43;
+pub const PF_XDP: u32 = 44;
+pub const PF_MCTP: u32 = 45;
+pub const PF_MAX: u32 = 46;
+pub const AF_UNSPEC: u32 = 0;
+pub const AF_LOCAL: u32 = 1;
+pub const AF_UNIX: u32 = 1;
+pub const AF_FILE: u32 = 1;
+pub const AF_INET: u32 = 2;
+pub const AF_AX25: u32 = 3;
+pub const AF_IPX: u32 = 4;
+pub const AF_APPLETALK: u32 = 5;
+pub const AF_NETROM: u32 = 6;
+pub const AF_BRIDGE: u32 = 7;
+pub const AF_ATMPVC: u32 = 8;
+pub const AF_X25: u32 = 9;
+pub const AF_INET6: u32 = 10;
+pub const AF_ROSE: u32 = 11;
+pub const AF_DECnet: u32 = 12;
+pub const AF_NETBEUI: u32 = 13;
+pub const AF_SECURITY: u32 = 14;
+pub const AF_KEY: u32 = 15;
+pub const AF_NETLINK: u32 = 16;
+pub const AF_ROUTE: u32 = 16;
+pub const AF_PACKET: u32 = 17;
+pub const AF_ASH: u32 = 18;
+pub const AF_ECONET: u32 = 19;
+pub const AF_ATMSVC: u32 = 20;
+pub const AF_RDS: u32 = 21;
+pub const AF_SNA: u32 = 22;
+pub const AF_IRDA: u32 = 23;
+pub const AF_PPPOX: u32 = 24;
+pub const AF_WANPIPE: u32 = 25;
+pub const AF_LLC: u32 = 26;
+pub const AF_IB: u32 = 27;
+pub const AF_MPLS: u32 = 28;
+pub const AF_CAN: u32 = 29;
+pub const AF_TIPC: u32 = 30;
+pub const AF_BLUETOOTH: u32 = 31;
+pub const AF_IUCV: u32 = 32;
+pub const AF_RXRPC: u32 = 33;
+pub const AF_ISDN: u32 = 34;
+pub const AF_PHONET: u32 = 35;
+pub const AF_IEEE802154: u32 = 36;
+pub const AF_CAIF: u32 = 37;
+pub const AF_ALG: u32 = 38;
+pub const AF_NFC: u32 = 39;
+pub const AF_VSOCK: u32 = 40;
+pub const AF_KCM: u32 = 41;
+pub const AF_QIPCRTR: u32 = 42;
+pub const AF_SMC: u32 = 43;
+pub const AF_XDP: u32 = 44;
+pub const AF_MCTP: u32 = 45;
+pub const AF_MAX: u32 = 46;
+pub const SOL_RAW: u32 = 255;
+pub const SOL_DECNET: u32 = 261;
+pub const SOL_X25: u32 = 262;
+pub const SOL_PACKET: u32 = 263;
+pub const SOL_ATM: u32 = 264;
+pub const SOL_AAL: u32 = 265;
+pub const SOL_IRDA: u32 = 266;
+pub const SOL_NETBEUI: u32 = 267;
+pub const SOL_LLC: u32 = 268;
+pub const SOL_DCCP: u32 = 269;
+pub const SOL_NETLINK: u32 = 270;
+pub const SOL_TIPC: u32 = 271;
+pub const SOL_RXRPC: u32 = 272;
+pub const SOL_PPPOL2TP: u32 = 273;
+pub const SOL_BLUETOOTH: u32 = 274;
+pub const SOL_PNPIPE: u32 = 275;
+pub const SOL_RDS: u32 = 276;
+pub const SOL_IUCV: u32 = 277;
+pub const SOL_CAIF: u32 = 278;
+pub const SOL_ALG: u32 = 279;
+pub const SOL_NFC: u32 = 280;
+pub const SOL_KCM: u32 = 281;
+pub const SOL_TLS: u32 = 282;
+pub const SOL_XDP: u32 = 283;
+pub const SOMAXCONN: u32 = 4096;
+pub const _BITS_SOCKADDR_H: u32 = 1;
+pub const _SS_SIZE: u32 = 128;
+pub const __BITS_PER_LONG: u32 = 64;
+pub const FIOSETOWN: u32 = 35073;
+pub const SIOCSPGRP: u32 = 35074;
+pub const FIOGETOWN: u32 = 35075;
+pub const SIOCGPGRP: u32 = 35076;
+pub const SIOCATMARK: u32 = 35077;
+pub const SIOCGSTAMP_OLD: u32 = 35078;
+pub const SIOCGSTAMPNS_OLD: u32 = 35079;
+pub const SOL_SOCKET: u32 = 1;
+pub const SO_DEBUG: u32 = 1;
+pub const SO_REUSEADDR: u32 = 2;
+pub const SO_TYPE: u32 = 3;
+pub const SO_ERROR: u32 = 4;
+pub const SO_DONTROUTE: u32 = 5;
+pub const SO_BROADCAST: u32 = 6;
+pub const SO_SNDBUF: u32 = 7;
+pub const SO_RCVBUF: u32 = 8;
+pub const SO_SNDBUFFORCE: u32 = 32;
+pub const SO_RCVBUFFORCE: u32 = 33;
+pub const SO_KEEPALIVE: u32 = 9;
+pub const SO_OOBINLINE: u32 = 10;
+pub const SO_NO_CHECK: u32 = 11;
+pub const SO_PRIORITY: u32 = 12;
+pub const SO_LINGER: u32 = 13;
+pub const SO_BSDCOMPAT: u32 = 14;
+pub const SO_REUSEPORT: u32 = 15;
+pub const SO_PASSCRED: u32 = 16;
+pub const SO_PEERCRED: u32 = 17;
+pub const SO_RCVLOWAT: u32 = 18;
+pub const SO_SNDLOWAT: u32 = 19;
+pub const SO_RCVTIMEO_OLD: u32 = 20;
+pub const SO_SNDTIMEO_OLD: u32 = 21;
+pub const SO_SECURITY_AUTHENTICATION: u32 = 22;
+pub const SO_SECURITY_ENCRYPTION_TRANSPORT: u32 = 23;
+pub const SO_SECURITY_ENCRYPTION_NETWORK: u32 = 24;
+pub const SO_BINDTODEVICE: u32 = 25;
+pub const SO_ATTACH_FILTER: u32 = 26;
+pub const SO_DETACH_FILTER: u32 = 27;
+pub const SO_GET_FILTER: u32 = 26;
+pub const SO_PEERNAME: u32 = 28;
+pub const SO_ACCEPTCONN: u32 = 30;
+pub const SO_PEERSEC: u32 = 31;
+pub const SO_PASSSEC: u32 = 34;
+pub const SO_MARK: u32 = 36;
+pub const SO_PROTOCOL: u32 = 38;
+pub const SO_DOMAIN: u32 = 39;
+pub const SO_RXQ_OVFL: u32 = 40;
+pub const SO_WIFI_STATUS: u32 = 41;
+pub const SCM_WIFI_STATUS: u32 = 41;
+pub const SO_PEEK_OFF: u32 = 42;
+pub const SO_NOFCS: u32 = 43;
+pub const SO_LOCK_FILTER: u32 = 44;
+pub const SO_SELECT_ERR_QUEUE: u32 = 45;
+pub const SO_BUSY_POLL: u32 = 46;
+pub const SO_MAX_PACING_RATE: u32 = 47;
+pub const SO_BPF_EXTENSIONS: u32 = 48;
+pub const SO_INCOMING_CPU: u32 = 49;
+pub const SO_ATTACH_BPF: u32 = 50;
+pub const SO_DETACH_BPF: u32 = 27;
+pub const SO_ATTACH_REUSEPORT_CBPF: u32 = 51;
+pub const SO_ATTACH_REUSEPORT_EBPF: u32 = 52;
+pub const SO_CNX_ADVICE: u32 = 53;
+pub const SCM_TIMESTAMPING_OPT_STATS: u32 = 54;
+pub const SO_MEMINFO: u32 = 55;
+pub const SO_INCOMING_NAPI_ID: u32 = 56;
+pub const SO_COOKIE: u32 = 57;
+pub const SCM_TIMESTAMPING_PKTINFO: u32 = 58;
+pub const SO_PEERGROUPS: u32 = 59;
+pub const SO_ZEROCOPY: u32 = 60;
+pub const SO_TXTIME: u32 = 61;
+pub const SCM_TXTIME: u32 = 61;
+pub const SO_BINDTOIFINDEX: u32 = 62;
+pub const SO_TIMESTAMP_OLD: u32 = 29;
+pub const SO_TIMESTAMPNS_OLD: u32 = 35;
+pub const SO_TIMESTAMPING_OLD: u32 = 37;
+pub const SO_TIMESTAMP_NEW: u32 = 63;
+pub const SO_TIMESTAMPNS_NEW: u32 = 64;
+pub const SO_TIMESTAMPING_NEW: u32 = 65;
+pub const SO_RCVTIMEO_NEW: u32 = 66;
+pub const SO_SNDTIMEO_NEW: u32 = 67;
+pub const SO_DETACH_REUSEPORT_BPF: u32 = 68;
+pub const SO_PREFER_BUSY_POLL: u32 = 69;
+pub const SO_BUSY_POLL_BUDGET: u32 = 70;
+pub const SO_NETNS_COOKIE: u32 = 71;
+pub const SO_BUF_LOCK: u32 = 72;
+pub const SO_RESERVE_MEM: u32 = 73;
+pub const SO_TIMESTAMP: u32 = 29;
+pub const SO_TIMESTAMPNS: u32 = 35;
+pub const SO_TIMESTAMPING: u32 = 37;
+pub const SO_RCVTIMEO: u32 = 20;
+pub const SO_SNDTIMEO: u32 = 21;
+pub const SCM_TIMESTAMP: u32 = 29;
+pub const SCM_TIMESTAMPNS: u32 = 35;
+pub const SCM_TIMESTAMPING: u32 = 37;
+pub const __osockaddr_defined: u32 = 1;
+pub const __USE_KERNEL_IPV6_DEFS: u32 = 0;
+pub const IP_OPTIONS: u32 = 4;
+pub const IP_HDRINCL: u32 = 3;
+pub const IP_TOS: u32 = 1;
+pub const IP_TTL: u32 = 2;
+pub const IP_RECVOPTS: u32 = 6;
+pub const IP_RETOPTS: u32 = 7;
+pub const IP_MULTICAST_IF: u32 = 32;
+pub const IP_MULTICAST_TTL: u32 = 33;
+pub const IP_MULTICAST_LOOP: u32 = 34;
+pub const IP_ADD_MEMBERSHIP: u32 = 35;
+pub const IP_DROP_MEMBERSHIP: u32 = 36;
+pub const IP_UNBLOCK_SOURCE: u32 = 37;
+pub const IP_BLOCK_SOURCE: u32 = 38;
+pub const IP_ADD_SOURCE_MEMBERSHIP: u32 = 39;
+pub const IP_DROP_SOURCE_MEMBERSHIP: u32 = 40;
+pub const IP_MSFILTER: u32 = 41;
+pub const MCAST_JOIN_GROUP: u32 = 42;
+pub const MCAST_BLOCK_SOURCE: u32 = 43;
+pub const MCAST_UNBLOCK_SOURCE: u32 = 44;
+pub const MCAST_LEAVE_GROUP: u32 = 45;
+pub const MCAST_JOIN_SOURCE_GROUP: u32 = 46;
+pub const MCAST_LEAVE_SOURCE_GROUP: u32 = 47;
+pub const MCAST_MSFILTER: u32 = 48;
+pub const IP_MULTICAST_ALL: u32 = 49;
+pub const IP_UNICAST_IF: u32 = 50;
+pub const MCAST_EXCLUDE: u32 = 0;
+pub const MCAST_INCLUDE: u32 = 1;
+pub const IP_ROUTER_ALERT: u32 = 5;
+pub const IP_PKTINFO: u32 = 8;
+pub const IP_PKTOPTIONS: u32 = 9;
+pub const IP_PMTUDISC: u32 = 10;
+pub const IP_MTU_DISCOVER: u32 = 10;
+pub const IP_RECVERR: u32 = 11;
+pub const IP_RECVTTL: u32 = 12;
+pub const IP_RECVTOS: u32 = 13;
+pub const IP_MTU: u32 = 14;
+pub const IP_FREEBIND: u32 = 15;
+pub const IP_IPSEC_POLICY: u32 = 16;
+pub const IP_XFRM_POLICY: u32 = 17;
+pub const IP_PASSSEC: u32 = 18;
+pub const IP_TRANSPARENT: u32 = 19;
+pub const IP_ORIGDSTADDR: u32 = 20;
+pub const IP_RECVORIGDSTADDR: u32 = 20;
+pub const IP_MINTTL: u32 = 21;
+pub const IP_NODEFRAG: u32 = 22;
+pub const IP_CHECKSUM: u32 = 23;
+pub const IP_BIND_ADDRESS_NO_PORT: u32 = 24;
+pub const IP_RECVFRAGSIZE: u32 = 25;
+pub const IP_RECVERR_RFC4884: u32 = 26;
+pub const IP_PMTUDISC_DONT: u32 = 0;
+pub const IP_PMTUDISC_WANT: u32 = 1;
+pub const IP_PMTUDISC_DO: u32 = 2;
+pub const IP_PMTUDISC_PROBE: u32 = 3;
+pub const IP_PMTUDISC_INTERFACE: u32 = 4;
+pub const IP_PMTUDISC_OMIT: u32 = 5;
+pub const SOL_IP: u32 = 0;
+pub const IP_DEFAULT_MULTICAST_TTL: u32 = 1;
+pub const IP_DEFAULT_MULTICAST_LOOP: u32 = 1;
+pub const IP_MAX_MEMBERSHIPS: u32 = 20;
+pub const IPV6_ADDRFORM: u32 = 1;
+pub const IPV6_2292PKTINFO: u32 = 2;
+pub const IPV6_2292HOPOPTS: u32 = 3;
+pub const IPV6_2292DSTOPTS: u32 = 4;
+pub const IPV6_2292RTHDR: u32 = 5;
+pub const IPV6_2292PKTOPTIONS: u32 = 6;
+pub const IPV6_CHECKSUM: u32 = 7;
+pub const IPV6_2292HOPLIMIT: u32 = 8;
+pub const IPV6_NEXTHOP: u32 = 9;
+pub const IPV6_AUTHHDR: u32 = 10;
+pub const IPV6_UNICAST_HOPS: u32 = 16;
+pub const IPV6_MULTICAST_IF: u32 = 17;
+pub const IPV6_MULTICAST_HOPS: u32 = 18;
+pub const IPV6_MULTICAST_LOOP: u32 = 19;
+pub const IPV6_JOIN_GROUP: u32 = 20;
+pub const IPV6_LEAVE_GROUP: u32 = 21;
+pub const IPV6_ROUTER_ALERT: u32 = 22;
+pub const IPV6_MTU_DISCOVER: u32 = 23;
+pub const IPV6_MTU: u32 = 24;
+pub const IPV6_RECVERR: u32 = 25;
+pub const IPV6_V6ONLY: u32 = 26;
+pub const IPV6_JOIN_ANYCAST: u32 = 27;
+pub const IPV6_LEAVE_ANYCAST: u32 = 28;
+pub const IPV6_MULTICAST_ALL: u32 = 29;
+pub const IPV6_ROUTER_ALERT_ISOLATE: u32 = 30;
+pub const IPV6_RECVERR_RFC4884: u32 = 31;
+pub const IPV6_IPSEC_POLICY: u32 = 34;
+pub const IPV6_XFRM_POLICY: u32 = 35;
+pub const IPV6_HDRINCL: u32 = 36;
+pub const IPV6_RECVPKTINFO: u32 = 49;
+pub const IPV6_PKTINFO: u32 = 50;
+pub const IPV6_RECVHOPLIMIT: u32 = 51;
+pub const IPV6_HOPLIMIT: u32 = 52;
+pub const IPV6_RECVHOPOPTS: u32 = 53;
+pub const IPV6_HOPOPTS: u32 = 54;
+pub const IPV6_RTHDRDSTOPTS: u32 = 55;
+pub const IPV6_RECVRTHDR: u32 = 56;
+pub const IPV6_RTHDR: u32 = 57;
+pub const IPV6_RECVDSTOPTS: u32 = 58;
+pub const IPV6_DSTOPTS: u32 = 59;
+pub const IPV6_RECVPATHMTU: u32 = 60;
+pub const IPV6_PATHMTU: u32 = 61;
+pub const IPV6_DONTFRAG: u32 = 62;
+pub const IPV6_RECVTCLASS: u32 = 66;
+pub const IPV6_TCLASS: u32 = 67;
+pub const IPV6_AUTOFLOWLABEL: u32 = 70;
+pub const IPV6_ADDR_PREFERENCES: u32 = 72;
+pub const IPV6_MINHOPCOUNT: u32 = 73;
+pub const IPV6_ORIGDSTADDR: u32 = 74;
+pub const IPV6_RECVORIGDSTADDR: u32 = 74;
+pub const IPV6_TRANSPARENT: u32 = 75;
+pub const IPV6_UNICAST_IF: u32 = 76;
+pub const IPV6_RECVFRAGSIZE: u32 = 77;
+pub const IPV6_FREEBIND: u32 = 78;
+pub const IPV6_ADD_MEMBERSHIP: u32 = 20;
+pub const IPV6_DROP_MEMBERSHIP: u32 = 21;
+pub const IPV6_RXHOPOPTS: u32 = 54;
+pub const IPV6_RXDSTOPTS: u32 = 59;
+pub const IPV6_PMTUDISC_DONT: u32 = 0;
+pub const IPV6_PMTUDISC_WANT: u32 = 1;
+pub const IPV6_PMTUDISC_DO: u32 = 2;
+pub const IPV6_PMTUDISC_PROBE: u32 = 3;
+pub const IPV6_PMTUDISC_INTERFACE: u32 = 4;
+pub const IPV6_PMTUDISC_OMIT: u32 = 5;
+pub const SOL_IPV6: u32 = 41;
+pub const SOL_ICMPV6: u32 = 58;
+pub const IPV6_RTHDR_LOOSE: u32 = 0;
+pub const IPV6_RTHDR_STRICT: u32 = 1;
+pub const IPV6_RTHDR_TYPE_0: u32 = 0;
 pub const IN_CLASSA_NET: u32 = 4278190080;
 pub const IN_CLASSA_NSHIFT: u32 = 24;
 pub const IN_CLASSA_HOST: u32 = 16777215;
@@ -1433,285 +1141,68 @@ pub const IN_CLASSB_MAX: u32 = 65536;
 pub const IN_CLASSC_NET: u32 = 4294967040;
 pub const IN_CLASSC_NSHIFT: u32 = 8;
 pub const IN_CLASSC_HOST: u32 = 255;
-pub const IN_CLASSD_NET: u32 = 4026531840;
-pub const IN_CLASSD_NSHIFT: u32 = 28;
-pub const IN_CLASSD_HOST: u32 = 268435455;
-pub const INADDR_NONE: u32 = 4294967295;
 pub const IN_LOOPBACKNET: u32 = 127;
 pub const INET_ADDRSTRLEN: u32 = 16;
-pub const IP_OPTIONS: u32 = 1;
-pub const IP_HDRINCL: u32 = 2;
-pub const IP_TOS: u32 = 3;
-pub const IP_TTL: u32 = 4;
-pub const IP_RECVOPTS: u32 = 5;
-pub const IP_RECVRETOPTS: u32 = 6;
-pub const IP_RECVDSTADDR: u32 = 7;
-pub const IP_RETOPTS: u32 = 8;
-pub const IP_MULTICAST_IF: u32 = 9;
-pub const IP_MULTICAST_TTL: u32 = 10;
-pub const IP_MULTICAST_LOOP: u32 = 11;
-pub const IP_ADD_MEMBERSHIP: u32 = 12;
-pub const IP_DROP_MEMBERSHIP: u32 = 13;
-pub const IP_MULTICAST_VIF: u32 = 14;
-pub const IP_RSVP_ON: u32 = 15;
-pub const IP_RSVP_OFF: u32 = 16;
-pub const IP_RSVP_VIF_ON: u32 = 17;
-pub const IP_RSVP_VIF_OFF: u32 = 18;
-pub const IP_PORTRANGE: u32 = 19;
-pub const IP_RECVIF: u32 = 20;
-pub const IP_IPSEC_POLICY: u32 = 21;
-pub const IP_FAITH: u32 = 22;
-pub const IP_STRIPHDR: u32 = 23;
-pub const IP_RECVTTL: u32 = 24;
-pub const IP_BOUND_IF: u32 = 25;
-pub const IP_PKTINFO: u32 = 26;
-pub const IP_RECVPKTINFO: u32 = 26;
-pub const IP_RECVTOS: u32 = 27;
-pub const IP_DONTFRAG: u32 = 28;
-pub const IP_FW_ADD: u32 = 40;
-pub const IP_FW_DEL: u32 = 41;
-pub const IP_FW_FLUSH: u32 = 42;
-pub const IP_FW_ZERO: u32 = 43;
-pub const IP_FW_GET: u32 = 44;
-pub const IP_FW_RESETLOG: u32 = 45;
-pub const IP_OLD_FW_ADD: u32 = 50;
-pub const IP_OLD_FW_DEL: u32 = 51;
-pub const IP_OLD_FW_FLUSH: u32 = 52;
-pub const IP_OLD_FW_ZERO: u32 = 53;
-pub const IP_OLD_FW_GET: u32 = 54;
-pub const IP_NAT__XXX: u32 = 55;
-pub const IP_OLD_FW_RESETLOG: u32 = 56;
-pub const IP_DUMMYNET_CONFIGURE: u32 = 60;
-pub const IP_DUMMYNET_DEL: u32 = 61;
-pub const IP_DUMMYNET_FLUSH: u32 = 62;
-pub const IP_DUMMYNET_GET: u32 = 64;
-pub const IP_TRAFFIC_MGT_BACKGROUND: u32 = 65;
-pub const IP_MULTICAST_IFINDEX: u32 = 66;
-pub const IP_ADD_SOURCE_MEMBERSHIP: u32 = 70;
-pub const IP_DROP_SOURCE_MEMBERSHIP: u32 = 71;
-pub const IP_BLOCK_SOURCE: u32 = 72;
-pub const IP_UNBLOCK_SOURCE: u32 = 73;
-pub const IP_MSFILTER: u32 = 74;
-pub const MCAST_JOIN_GROUP: u32 = 80;
-pub const MCAST_LEAVE_GROUP: u32 = 81;
-pub const MCAST_JOIN_SOURCE_GROUP: u32 = 82;
-pub const MCAST_LEAVE_SOURCE_GROUP: u32 = 83;
-pub const MCAST_BLOCK_SOURCE: u32 = 84;
-pub const MCAST_UNBLOCK_SOURCE: u32 = 85;
-pub const IP_DEFAULT_MULTICAST_TTL: u32 = 1;
-pub const IP_DEFAULT_MULTICAST_LOOP: u32 = 1;
-pub const IP_MIN_MEMBERSHIPS: u32 = 31;
-pub const IP_MAX_MEMBERSHIPS: u32 = 4095;
-pub const IP_MAX_GROUP_SRC_FILTER: u32 = 512;
-pub const IP_MAX_SOCK_SRC_FILTER: u32 = 128;
-pub const IP_MAX_SOCK_MUTE_FILTER: u32 = 128;
-pub const MCAST_UNDEFINED: u32 = 0;
-pub const MCAST_INCLUDE: u32 = 1;
-pub const MCAST_EXCLUDE: u32 = 2;
-pub const IP_PORTRANGE_DEFAULT: u32 = 0;
-pub const IP_PORTRANGE_HIGH: u32 = 1;
-pub const IP_PORTRANGE_LOW: u32 = 2;
-pub const IPPROTO_MAXID: u32 = 52;
-pub const IPCTL_FORWARDING: u32 = 1;
-pub const IPCTL_SENDREDIRECTS: u32 = 2;
-pub const IPCTL_DEFTTL: u32 = 3;
-pub const IPCTL_RTEXPIRE: u32 = 5;
-pub const IPCTL_RTMINEXPIRE: u32 = 6;
-pub const IPCTL_RTMAXCACHE: u32 = 7;
-pub const IPCTL_SOURCEROUTE: u32 = 8;
-pub const IPCTL_DIRECTEDBROADCAST: u32 = 9;
-pub const IPCTL_INTRQMAXLEN: u32 = 10;
-pub const IPCTL_INTRQDROPS: u32 = 11;
-pub const IPCTL_STATS: u32 = 12;
-pub const IPCTL_ACCEPTSOURCEROUTE: u32 = 13;
-pub const IPCTL_FASTFORWARDING: u32 = 14;
-pub const IPCTL_KEEPFAITH: u32 = 15;
-pub const IPCTL_GIF_TTL: u32 = 16;
-pub const IPCTL_MAXID: u32 = 17;
-pub const __KAME_VERSION: &[u8; 18usize] = b"2009/apple-darwin\0";
-pub const IPV6PORT_RESERVED: u32 = 1024;
-pub const IPV6PORT_ANONMIN: u32 = 49152;
-pub const IPV6PORT_ANONMAX: u32 = 65535;
-pub const IPV6PORT_RESERVEDMIN: u32 = 600;
-pub const IPV6PORT_RESERVEDMAX: u32 = 1023;
 pub const INET6_ADDRSTRLEN: u32 = 46;
-pub const __IPV6_ADDR_SCOPE_NODELOCAL: u32 = 1;
-pub const __IPV6_ADDR_SCOPE_INTFACELOCAL: u32 = 1;
-pub const __IPV6_ADDR_SCOPE_LINKLOCAL: u32 = 2;
-pub const __IPV6_ADDR_SCOPE_SITELOCAL: u32 = 5;
-pub const __IPV6_ADDR_SCOPE_ORGLOCAL: u32 = 8;
-pub const __IPV6_ADDR_SCOPE_GLOBAL: u32 = 14;
-pub const IPV6_ADDR_MC_FLAGS_TRANSIENT: u32 = 16;
-pub const IPV6_ADDR_MC_FLAGS_PREFIX: u32 = 32;
-pub const IPV6_ADDR_MC_FLAGS_UNICAST_BASED: u32 = 48;
-pub const IPV6_SOCKOPT_RESERVED1: u32 = 3;
-pub const IPV6_UNICAST_HOPS: u32 = 4;
-pub const IPV6_MULTICAST_IF: u32 = 9;
-pub const IPV6_MULTICAST_HOPS: u32 = 10;
-pub const IPV6_MULTICAST_LOOP: u32 = 11;
-pub const IPV6_JOIN_GROUP: u32 = 12;
-pub const IPV6_LEAVE_GROUP: u32 = 13;
-pub const IPV6_PORTRANGE: u32 = 14;
-pub const ICMP6_FILTER: u32 = 18;
-pub const IPV6_2292PKTINFO: u32 = 19;
-pub const IPV6_2292HOPLIMIT: u32 = 20;
-pub const IPV6_2292NEXTHOP: u32 = 21;
-pub const IPV6_2292HOPOPTS: u32 = 22;
-pub const IPV6_2292DSTOPTS: u32 = 23;
-pub const IPV6_2292RTHDR: u32 = 24;
-pub const IPV6_2292PKTOPTIONS: u32 = 25;
-pub const IPV6_CHECKSUM: u32 = 26;
-pub const IPV6_V6ONLY: u32 = 27;
-pub const IPV6_BINDV6ONLY: u32 = 27;
-pub const IPV6_IPSEC_POLICY: u32 = 28;
-pub const IPV6_FAITH: u32 = 29;
-pub const IPV6_FW_ADD: u32 = 30;
-pub const IPV6_FW_DEL: u32 = 31;
-pub const IPV6_FW_FLUSH: u32 = 32;
-pub const IPV6_FW_ZERO: u32 = 33;
-pub const IPV6_FW_GET: u32 = 34;
-pub const IPV6_RECVTCLASS: u32 = 35;
-pub const IPV6_TCLASS: u32 = 36;
-pub const IPV6_BOUND_IF: u32 = 125;
-pub const IPV6_RTHDR_LOOSE: u32 = 0;
-pub const IPV6_RTHDR_STRICT: u32 = 1;
-pub const IPV6_RTHDR_TYPE_0: u32 = 0;
-pub const IPV6_DEFAULT_MULTICAST_HOPS: u32 = 1;
-pub const IPV6_DEFAULT_MULTICAST_LOOP: u32 = 1;
-pub const IPV6_MIN_MEMBERSHIPS: u32 = 31;
-pub const IPV6_MAX_MEMBERSHIPS: u32 = 4095;
-pub const IPV6_MAX_GROUP_SRC_FILTER: u32 = 512;
-pub const IPV6_MAX_SOCK_SRC_FILTER: u32 = 128;
-pub const IPV6_PORTRANGE_DEFAULT: u32 = 0;
-pub const IPV6_PORTRANGE_HIGH: u32 = 1;
-pub const IPV6_PORTRANGE_LOW: u32 = 2;
-pub const IPV6PROTO_MAXID: u32 = 104;
-pub const IPV6CTL_FORWARDING: u32 = 1;
-pub const IPV6CTL_SENDREDIRECTS: u32 = 2;
-pub const IPV6CTL_DEFHLIM: u32 = 3;
-pub const IPV6CTL_FORWSRCRT: u32 = 5;
-pub const IPV6CTL_STATS: u32 = 6;
-pub const IPV6CTL_MRTSTATS: u32 = 7;
-pub const IPV6CTL_MRTPROTO: u32 = 8;
-pub const IPV6CTL_MAXFRAGPACKETS: u32 = 9;
-pub const IPV6CTL_SOURCECHECK: u32 = 10;
-pub const IPV6CTL_SOURCECHECK_LOGINT: u32 = 11;
-pub const IPV6CTL_ACCEPT_RTADV: u32 = 12;
-pub const IPV6CTL_KEEPFAITH: u32 = 13;
-pub const IPV6CTL_LOG_INTERVAL: u32 = 14;
-pub const IPV6CTL_HDRNESTLIMIT: u32 = 15;
-pub const IPV6CTL_DAD_COUNT: u32 = 16;
-pub const IPV6CTL_AUTO_FLOWLABEL: u32 = 17;
-pub const IPV6CTL_DEFMCASTHLIM: u32 = 18;
-pub const IPV6CTL_GIF_HLIM: u32 = 19;
-pub const IPV6CTL_KAME_VERSION: u32 = 20;
-pub const IPV6CTL_USE_DEPRECATED: u32 = 21;
-pub const IPV6CTL_RR_PRUNE: u32 = 22;
-pub const IPV6CTL_V6ONLY: u32 = 24;
-pub const IPV6CTL_RTEXPIRE: u32 = 25;
-pub const IPV6CTL_RTMINEXPIRE: u32 = 26;
-pub const IPV6CTL_RTMAXCACHE: u32 = 27;
-pub const IPV6CTL_USETEMPADDR: u32 = 32;
-pub const IPV6CTL_TEMPPLTIME: u32 = 33;
-pub const IPV6CTL_TEMPVLTIME: u32 = 34;
-pub const IPV6CTL_AUTO_LINKLOCAL: u32 = 35;
-pub const IPV6CTL_RIP6STATS: u32 = 36;
-pub const IPV6CTL_PREFER_TEMPADDR: u32 = 37;
-pub const IPV6CTL_ADDRCTLPOLICY: u32 = 38;
-pub const IPV6CTL_USE_DEFAULTZONE: u32 = 39;
-pub const IPV6CTL_MAXFRAGS: u32 = 41;
-pub const IPV6CTL_MCAST_PMTU: u32 = 44;
-pub const IPV6CTL_NEIGHBORGCTHRESH: u32 = 46;
-pub const IPV6CTL_MAXIFPREFIXES: u32 = 47;
-pub const IPV6CTL_MAXIFDEFROUTERS: u32 = 48;
-pub const IPV6CTL_MAXDYNROUTES: u32 = 49;
-pub const ICMPV6CTL_ND6_ONLINKNSRFC4861: u32 = 50;
-pub const IPV6CTL_ULA_USETEMPADDR: u32 = 51;
-pub const IPV6CTL_MAXID: u32 = 51;
+pub const _RPC_NETDB_H: u32 = 1;
 pub const _PATH_HEQUIV: &[u8; 17usize] = b"/etc/hosts.equiv\0";
 pub const _PATH_HOSTS: &[u8; 11usize] = b"/etc/hosts\0";
 pub const _PATH_NETWORKS: &[u8; 14usize] = b"/etc/networks\0";
+pub const _PATH_NSSWITCH_CONF: &[u8; 19usize] = b"/etc/nsswitch.conf\0";
 pub const _PATH_PROTOCOLS: &[u8; 15usize] = b"/etc/protocols\0";
 pub const _PATH_SERVICES: &[u8; 14usize] = b"/etc/services\0";
-pub const NETDB_INTERNAL: i32 = -1;
-pub const NETDB_SUCCESS: u32 = 0;
 pub const HOST_NOT_FOUND: u32 = 1;
 pub const TRY_AGAIN: u32 = 2;
 pub const NO_RECOVERY: u32 = 3;
 pub const NO_DATA: u32 = 4;
+pub const NETDB_INTERNAL: i32 = -1;
+pub const NETDB_SUCCESS: u32 = 0;
 pub const NO_ADDRESS: u32 = 4;
-pub const EAI_ADDRFAMILY: u32 = 1;
-pub const EAI_AGAIN: u32 = 2;
-pub const EAI_BADFLAGS: u32 = 3;
-pub const EAI_FAIL: u32 = 4;
-pub const EAI_FAMILY: u32 = 5;
-pub const EAI_MEMORY: u32 = 6;
-pub const EAI_NODATA: u32 = 7;
-pub const EAI_NONAME: u32 = 8;
-pub const EAI_SERVICE: u32 = 9;
-pub const EAI_SOCKTYPE: u32 = 10;
-pub const EAI_SYSTEM: u32 = 11;
-pub const EAI_BADHINTS: u32 = 12;
-pub const EAI_PROTOCOL: u32 = 13;
-pub const EAI_OVERFLOW: u32 = 14;
-pub const EAI_MAX: u32 = 15;
 pub const AI_PASSIVE: u32 = 1;
 pub const AI_CANONNAME: u32 = 2;
 pub const AI_NUMERICHOST: u32 = 4;
-pub const AI_NUMERICSERV: u32 = 4096;
-pub const AI_ALL: u32 = 256;
-pub const AI_V4MAPPED_CFG: u32 = 512;
-pub const AI_ADDRCONFIG: u32 = 1024;
-pub const AI_V4MAPPED: u32 = 2048;
-pub const AI_DEFAULT: u32 = 1536;
-pub const AI_UNUSABLE: u32 = 268435456;
+pub const AI_V4MAPPED: u32 = 8;
+pub const AI_ALL: u32 = 16;
+pub const AI_ADDRCONFIG: u32 = 32;
+pub const AI_NUMERICSERV: u32 = 1024;
+pub const EAI_BADFLAGS: i32 = -1;
+pub const EAI_NONAME: i32 = -2;
+pub const EAI_AGAIN: i32 = -3;
+pub const EAI_FAIL: i32 = -4;
+pub const EAI_FAMILY: i32 = -6;
+pub const EAI_SOCKTYPE: i32 = -7;
+pub const EAI_SERVICE: i32 = -8;
+pub const EAI_MEMORY: i32 = -10;
+pub const EAI_SYSTEM: i32 = -11;
+pub const EAI_OVERFLOW: i32 = -12;
 pub const NI_MAXHOST: u32 = 1025;
 pub const NI_MAXSERV: u32 = 32;
-pub const NI_NOFQDN: u32 = 1;
-pub const NI_NUMERICHOST: u32 = 2;
-pub const NI_NAMEREQD: u32 = 4;
-pub const NI_NUMERICSERV: u32 = 8;
-pub const NI_NUMERICSCOPE: u32 = 256;
+pub const NI_NUMERICHOST: u32 = 1;
+pub const NI_NUMERICSERV: u32 = 2;
+pub const NI_NOFQDN: u32 = 4;
+pub const NI_NAMEREQD: u32 = 8;
 pub const NI_DGRAM: u32 = 16;
-pub const NI_WITHSCOPEID: u32 = 32;
-pub const SCOPE_DELIMITER: u8 = 37u8;
-pub const _PATH_PWD: &[u8; 5usize] = b"/etc\0";
-pub const _PATH_PASSWD: &[u8; 12usize] = b"/etc/passwd\0";
-pub const _PASSWD: &[u8; 7usize] = b"passwd\0";
-pub const _PATH_MASTERPASSWD: &[u8; 19usize] = b"/etc/master.passwd\0";
-pub const _PATH_MASTERPASSWD_LOCK: &[u8; 10usize] = b"/etc/ptmp\0";
-pub const _MASTERPASSWD: &[u8; 14usize] = b"master.passwd\0";
-pub const _PATH_MP_DB: &[u8; 12usize] = b"/etc/pwd.db\0";
-pub const _MP_DB: &[u8; 7usize] = b"pwd.db\0";
-pub const _PATH_SMP_DB: &[u8; 13usize] = b"/etc/spwd.db\0";
-pub const _SMP_DB: &[u8; 8usize] = b"spwd.db\0";
-pub const _PATH_PWD_MKDB: &[u8; 19usize] = b"/usr/sbin/pwd_mkdb\0";
-pub const _PW_KEYBYNAME: u8 = 49u8;
-pub const _PW_KEYBYNUM: u8 = 50u8;
-pub const _PW_KEYBYUID: u8 = 51u8;
-pub const _PASSWORD_EFMT1: u8 = 95u8;
-pub const _PASSWORD_LEN: u32 = 128;
-pub const _PASSWORD_NOUID: u32 = 1;
-pub const _PASSWORD_NOGID: u32 = 2;
-pub const _PASSWORD_NOCHG: u32 = 4;
-pub const _PASSWORD_NOEXP: u32 = 8;
-pub const _PASSWORD_WARNDAYS: u32 = 14;
-pub const _PASSWORD_CHGNOW: i32 = -1;
+pub const _PWD_H: u32 = 1;
+pub const NSS_BUFLEN_PASSWD: u32 = 1024;
 pub const PGINVALID_SOCKET: i32 = -1;
-pub const PG_BACKEND_VERSIONSTR: &[u8; 28usize] = b"postgres (PostgreSQL) 12.9\n\0";
+pub const PG_BACKEND_VERSIONSTR: &[u8; 29usize] = b"postgres (PostgreSQL) 12.10\n\0";
 pub const EXE: &[u8; 1usize] = b"\0";
 pub const DEVNULL: &[u8; 10usize] = b"/dev/null\0";
 pub const USE_REPL_SNPRINTF: u32 = 1;
 pub const PG_STRERROR_R_BUFLEN: u32 = 256;
 pub const PG_IOLBF: u32 = 1;
-pub const FP_SUPERNORMAL: u32 = 6;
-pub const FP_FAST_FMA: u32 = 1;
-pub const FP_FAST_FMAF: u32 = 1;
-pub const FP_FAST_FMAL: u32 = 1;
+pub const _MATH_H: u32 = 1;
+pub const _BITS_LIBM_SIMD_DECL_STUBS_H: u32 = 1;
+pub const __FP_LOGB0_IS_MIN: u32 = 1;
+pub const __FP_LOGBNAN_IS_MIN: u32 = 1;
 pub const FP_ILOGB0: i32 = -2147483648;
 pub const FP_ILOGBNAN: i32 = -2147483648;
+pub const __MATH_DECLARING_DOUBLE: u32 = 1;
+pub const __MATH_DECLARING_FLOATN: u32 = 0;
+pub const __MATH_DECLARE_LDOUBLE: u32 = 1;
 pub const MATH_ERRNO: u32 = 1;
 pub const MATH_ERREXCEPT: u32 = 2;
+pub const math_errhandling: u32 = 3;
 pub const M_E: f64 = 2.718281828459045;
 pub const M_LOG2E: f64 = 1.4426950408889634;
 pub const M_LOG10E: f64 = 0.4342944819032518;
@@ -1725,13 +1216,9 @@ pub const M_2_PI: f64 = 0.6366197723675814;
 pub const M_2_SQRTPI: f64 = 1.1283791670955126;
 pub const M_SQRT2: f64 = 1.4142135623730951;
 pub const M_SQRT1_2: f64 = 0.7071067811865476;
-pub const DOMAIN: u32 = 1;
-pub const SING: u32 = 2;
-pub const OVERFLOW: u32 = 3;
-pub const UNDERFLOW: u32 = 4;
-pub const TLOSS: u32 = 5;
-pub const PLOSS: u32 = 6;
-pub const _JBLEN: u32 = 48;
+pub const _SETJMP_H: u32 = 1;
+pub const _BITS_SETJMP_H: u32 = 1;
+pub const __jmp_buf_tag_defined: u32 = 1;
 pub const DEBUG5: u32 = 10;
 pub const DEBUG4: u32 = 11;
 pub const DEBUG3: u32 = 12;
@@ -1816,155 +1303,136 @@ pub const MaxTransactionIdAttributeNumber: i32 = -4;
 pub const MaxCommandIdAttributeNumber: i32 = -5;
 pub const TableOidAttributeNumber: i32 = -6;
 pub const FirstLowInvalidHeapAttributeNumber: i32 = -7;
+pub const _FCNTL_H: u32 = 1;
+pub const __O_LARGEFILE: u32 = 0;
+pub const F_GETLK64: u32 = 5;
+pub const F_SETLK64: u32 = 6;
+pub const F_SETLKW64: u32 = 7;
+pub const O_ACCMODE: u32 = 3;
 pub const O_RDONLY: u32 = 0;
 pub const O_WRONLY: u32 = 1;
 pub const O_RDWR: u32 = 2;
-pub const O_ACCMODE: u32 = 3;
-pub const FREAD: u32 = 1;
-pub const FWRITE: u32 = 2;
-pub const O_NONBLOCK: u32 = 4;
-pub const O_APPEND: u32 = 8;
-pub const O_SYNC: u32 = 128;
-pub const O_SHLOCK: u32 = 16;
-pub const O_EXLOCK: u32 = 32;
-pub const O_ASYNC: u32 = 64;
-pub const O_FSYNC: u32 = 128;
-pub const O_NOFOLLOW: u32 = 256;
-pub const O_CREAT: u32 = 512;
-pub const O_TRUNC: u32 = 1024;
-pub const O_EXCL: u32 = 2048;
-pub const O_EVTONLY: u32 = 32768;
-pub const O_NOCTTY: u32 = 131072;
-pub const O_DIRECTORY: u32 = 1048576;
-pub const O_SYMLINK: u32 = 2097152;
-pub const O_DSYNC: u32 = 4194304;
-pub const O_CLOEXEC: u32 = 16777216;
-pub const O_NOFOLLOW_ANY: u32 = 536870912;
-pub const AT_FDCWD: i32 = -2;
-pub const AT_EACCESS: u32 = 16;
-pub const AT_SYMLINK_NOFOLLOW: u32 = 32;
-pub const AT_SYMLINK_FOLLOW: u32 = 64;
-pub const AT_REMOVEDIR: u32 = 128;
-pub const AT_REALDEV: u32 = 512;
-pub const AT_FDONLY: u32 = 1024;
-pub const AT_SYMLINK_NOFOLLOW_ANY: u32 = 2048;
-pub const O_DP_GETRAWENCRYPTED: u32 = 1;
-pub const O_DP_GETRAWUNENCRYPTED: u32 = 2;
-pub const FAPPEND: u32 = 8;
-pub const FASYNC: u32 = 64;
-pub const FFSYNC: u32 = 128;
-pub const FFDSYNC: u32 = 4194304;
-pub const FNONBLOCK: u32 = 4;
-pub const FNDELAY: u32 = 4;
-pub const O_NDELAY: u32 = 4;
-pub const CPF_OVERWRITE: u32 = 1;
-pub const CPF_IGNORE_MODE: u32 = 2;
-pub const CPF_MASK: u32 = 3;
+pub const O_CREAT: u32 = 64;
+pub const O_EXCL: u32 = 128;
+pub const O_NOCTTY: u32 = 256;
+pub const O_TRUNC: u32 = 512;
+pub const O_APPEND: u32 = 1024;
+pub const O_NONBLOCK: u32 = 2048;
+pub const O_NDELAY: u32 = 2048;
+pub const O_SYNC: u32 = 1052672;
+pub const O_FSYNC: u32 = 1052672;
+pub const O_ASYNC: u32 = 8192;
+pub const __O_DIRECTORY: u32 = 65536;
+pub const __O_NOFOLLOW: u32 = 131072;
+pub const __O_CLOEXEC: u32 = 524288;
+pub const __O_DIRECT: u32 = 16384;
+pub const __O_NOATIME: u32 = 262144;
+pub const __O_PATH: u32 = 2097152;
+pub const __O_DSYNC: u32 = 4096;
+pub const __O_TMPFILE: u32 = 4259840;
+pub const F_GETLK: u32 = 5;
+pub const F_SETLK: u32 = 6;
+pub const F_SETLKW: u32 = 7;
+pub const O_DIRECTORY: u32 = 65536;
+pub const O_NOFOLLOW: u32 = 131072;
+pub const O_CLOEXEC: u32 = 524288;
+pub const O_DSYNC: u32 = 4096;
+pub const O_RSYNC: u32 = 1052672;
 pub const F_DUPFD: u32 = 0;
 pub const F_GETFD: u32 = 1;
 pub const F_SETFD: u32 = 2;
 pub const F_GETFL: u32 = 3;
 pub const F_SETFL: u32 = 4;
-pub const F_GETOWN: u32 = 5;
-pub const F_SETOWN: u32 = 6;
-pub const F_GETLK: u32 = 7;
-pub const F_SETLK: u32 = 8;
-pub const F_SETLKW: u32 = 9;
-pub const F_SETLKWTIMEOUT: u32 = 10;
-pub const F_FLUSH_DATA: u32 = 40;
-pub const F_CHKCLEAN: u32 = 41;
-pub const F_PREALLOCATE: u32 = 42;
-pub const F_SETSIZE: u32 = 43;
-pub const F_RDADVISE: u32 = 44;
-pub const F_RDAHEAD: u32 = 45;
-pub const F_NOCACHE: u32 = 48;
-pub const F_LOG2PHYS: u32 = 49;
-pub const F_GETPATH: u32 = 50;
-pub const F_FULLFSYNC: u32 = 51;
-pub const F_PATHPKG_CHECK: u32 = 52;
-pub const F_FREEZE_FS: u32 = 53;
-pub const F_THAW_FS: u32 = 54;
-pub const F_GLOBAL_NOCACHE: u32 = 55;
-pub const F_ADDSIGS: u32 = 59;
-pub const F_ADDFILESIGS: u32 = 61;
-pub const F_NODIRECT: u32 = 62;
-pub const F_GETPROTECTIONCLASS: u32 = 63;
-pub const F_SETPROTECTIONCLASS: u32 = 64;
-pub const F_LOG2PHYS_EXT: u32 = 65;
-pub const F_GETLKPID: u32 = 66;
-pub const F_SETBACKINGSTORE: u32 = 70;
-pub const F_GETPATH_MTMINFO: u32 = 71;
-pub const F_GETCODEDIR: u32 = 72;
-pub const F_SETNOSIGPIPE: u32 = 73;
-pub const F_GETNOSIGPIPE: u32 = 74;
-pub const F_TRANSCODEKEY: u32 = 75;
-pub const F_SINGLE_WRITER: u32 = 76;
-pub const F_GETPROTECTIONLEVEL: u32 = 77;
-pub const F_FINDSIGS: u32 = 78;
-pub const F_ADDFILESIGS_FOR_DYLD_SIM: u32 = 83;
-pub const F_BARRIERFSYNC: u32 = 85;
-pub const F_ADDFILESIGS_RETURN: u32 = 97;
-pub const F_CHECK_LV: u32 = 98;
-pub const F_PUNCHHOLE: u32 = 99;
-pub const F_TRIM_ACTIVE_FILE: u32 = 100;
-pub const F_SPECULATIVE_READ: u32 = 101;
-pub const F_GETPATH_NOFIRMLINK: u32 = 102;
-pub const F_ADDFILESIGS_INFO: u32 = 103;
-pub const F_ADDFILESUPPL: u32 = 104;
-pub const F_GETSIGSINFO: u32 = 105;
-pub const F_FSRESERVED: u32 = 106;
-pub const FCNTL_FS_SPECIFIC_BASE: u32 = 65536;
-pub const F_DUPFD_CLOEXEC: u32 = 67;
+pub const __F_SETOWN: u32 = 8;
+pub const __F_GETOWN: u32 = 9;
+pub const F_SETOWN: u32 = 8;
+pub const F_GETOWN: u32 = 9;
+pub const __F_SETSIG: u32 = 10;
+pub const __F_GETSIG: u32 = 11;
+pub const __F_SETOWN_EX: u32 = 15;
+pub const __F_GETOWN_EX: u32 = 16;
+pub const F_DUPFD_CLOEXEC: u32 = 1030;
 pub const FD_CLOEXEC: u32 = 1;
-pub const F_RDLCK: u32 = 1;
+pub const F_RDLCK: u32 = 0;
+pub const F_WRLCK: u32 = 1;
 pub const F_UNLCK: u32 = 2;
-pub const F_WRLCK: u32 = 3;
-pub const SEEK_HOLE: u32 = 3;
-pub const SEEK_DATA: u32 = 4;
-pub const S_IFMT: u32 = 61440;
-pub const S_IFIFO: u32 = 4096;
-pub const S_IFCHR: u32 = 8192;
-pub const S_IFDIR: u32 = 16384;
-pub const S_IFBLK: u32 = 24576;
-pub const S_IFREG: u32 = 32768;
-pub const S_IFLNK: u32 = 40960;
-pub const S_IFSOCK: u32 = 49152;
-pub const S_IFWHT: u32 = 57344;
-pub const S_IRWXU: u32 = 448;
-pub const S_IRUSR: u32 = 256;
-pub const S_IWUSR: u32 = 128;
-pub const S_IXUSR: u32 = 64;
-pub const S_IRWXG: u32 = 56;
-pub const S_IRGRP: u32 = 32;
-pub const S_IWGRP: u32 = 16;
-pub const S_IXGRP: u32 = 8;
-pub const S_IRWXO: u32 = 7;
-pub const S_IROTH: u32 = 4;
-pub const S_IWOTH: u32 = 2;
-pub const S_IXOTH: u32 = 1;
-pub const S_ISUID: u32 = 2048;
-pub const S_ISGID: u32 = 1024;
-pub const S_ISVTX: u32 = 512;
-pub const S_ISTXT: u32 = 512;
-pub const S_IREAD: u32 = 256;
-pub const S_IWRITE: u32 = 128;
-pub const S_IEXEC: u32 = 64;
-pub const F_ALLOCATECONTIG: u32 = 2;
-pub const F_ALLOCATEALL: u32 = 4;
-pub const F_PEOFPOSMODE: u32 = 3;
-pub const F_VOLPOSMODE: u32 = 4;
-pub const USER_FSIGNATURES_CDHASH_LEN: u32 = 20;
-pub const GETSIGSINFO_PLATFORM_BINARY: u32 = 1;
+pub const F_EXLCK: u32 = 4;
+pub const F_SHLCK: u32 = 8;
 pub const LOCK_SH: u32 = 1;
 pub const LOCK_EX: u32 = 2;
 pub const LOCK_NB: u32 = 4;
 pub const LOCK_UN: u32 = 8;
-pub const O_POPUP: u32 = 2147483648;
-pub const O_ALERT: u32 = 536870912;
+pub const FAPPEND: u32 = 1024;
+pub const FFSYNC: u32 = 1052672;
+pub const FASYNC: u32 = 8192;
+pub const FNONBLOCK: u32 = 2048;
+pub const FNDELAY: u32 = 2048;
+pub const __POSIX_FADV_DONTNEED: u32 = 4;
+pub const __POSIX_FADV_NOREUSE: u32 = 5;
+pub const POSIX_FADV_NORMAL: u32 = 0;
+pub const POSIX_FADV_RANDOM: u32 = 1;
+pub const POSIX_FADV_SEQUENTIAL: u32 = 2;
+pub const POSIX_FADV_WILLNEED: u32 = 3;
+pub const POSIX_FADV_DONTNEED: u32 = 4;
+pub const POSIX_FADV_NOREUSE: u32 = 5;
+pub const _BITS_STAT_H: u32 = 1;
+pub const _BITS_STRUCT_STAT_H: u32 = 1;
+pub const __S_IFMT: u32 = 61440;
+pub const __S_IFDIR: u32 = 16384;
+pub const __S_IFCHR: u32 = 8192;
+pub const __S_IFBLK: u32 = 24576;
+pub const __S_IFREG: u32 = 32768;
+pub const __S_IFIFO: u32 = 4096;
+pub const __S_IFLNK: u32 = 40960;
+pub const __S_IFSOCK: u32 = 49152;
+pub const __S_ISUID: u32 = 2048;
+pub const __S_ISGID: u32 = 1024;
+pub const __S_ISVTX: u32 = 512;
+pub const __S_IREAD: u32 = 256;
+pub const __S_IWRITE: u32 = 128;
+pub const __S_IEXEC: u32 = 64;
+pub const UTIME_NOW: u32 = 1073741823;
+pub const UTIME_OMIT: u32 = 1073741822;
+pub const S_IFMT: u32 = 61440;
+pub const S_IFDIR: u32 = 16384;
+pub const S_IFCHR: u32 = 8192;
+pub const S_IFBLK: u32 = 24576;
+pub const S_IFREG: u32 = 32768;
+pub const S_IFIFO: u32 = 4096;
+pub const S_IFLNK: u32 = 40960;
+pub const S_IFSOCK: u32 = 49152;
+pub const S_ISUID: u32 = 2048;
+pub const S_ISGID: u32 = 1024;
+pub const S_ISVTX: u32 = 512;
+pub const S_IRUSR: u32 = 256;
+pub const S_IWUSR: u32 = 128;
+pub const S_IXUSR: u32 = 64;
+pub const S_IRWXU: u32 = 448;
+pub const S_IRGRP: u32 = 32;
+pub const S_IWGRP: u32 = 16;
+pub const S_IXGRP: u32 = 8;
+pub const S_IRWXG: u32 = 56;
+pub const S_IROTH: u32 = 4;
+pub const S_IWOTH: u32 = 2;
+pub const S_IXOTH: u32 = 1;
+pub const S_IRWXO: u32 = 7;
+pub const R_OK: u32 = 4;
+pub const W_OK: u32 = 2;
+pub const X_OK: u32 = 1;
+pub const F_OK: u32 = 0;
+pub const AT_FDCWD: i32 = -100;
+pub const AT_SYMLINK_NOFOLLOW: u32 = 256;
+pub const AT_REMOVEDIR: u32 = 512;
+pub const AT_SYMLINK_FOLLOW: u32 = 1024;
+pub const AT_EACCESS: u32 = 512;
+pub const F_ULOCK: u32 = 0;
+pub const F_LOCK: u32 = 1;
+pub const F_TLOCK: u32 = 2;
+pub const F_TEST: u32 = 3;
 pub const InvalidXLogRecPtr: u32 = 0;
 pub const PG_O_DIRECT: u32 = 0;
-pub const OPEN_SYNC_FLAG: u32 = 128;
-pub const OPEN_DATASYNC_FLAG: u32 = 4194304;
+pub const OPEN_SYNC_FLAG: u32 = 1052672;
+pub const OPEN_DATASYNC_FLAG: u32 = 4096;
 pub const FirstGenbkiObjectId: u32 = 10000;
 pub const FirstBootstrapObjectId: u32 = 12000;
 pub const FirstNormalObjectId: u32 = 16384;
@@ -2028,7 +1496,24 @@ pub const FIELDNO_HEAPTUPLETABLESLOT_OFF: u32 = 2;
 pub const FIELDNO_MINIMALTUPLETABLESLOT_TUPLE: u32 = 1;
 pub const FIELDNO_MINIMALTUPLETABLESLOT_OFF: u32 = 4;
 pub const BITS_PER_BITMAPWORD: u32 = 64;
+pub const _TIME_H: u32 = 1;
+pub const _BITS_TIME_H: u32 = 1;
+pub const CLOCK_REALTIME: u32 = 0;
+pub const CLOCK_MONOTONIC: u32 = 1;
+pub const CLOCK_PROCESS_CPUTIME_ID: u32 = 2;
+pub const CLOCK_THREAD_CPUTIME_ID: u32 = 3;
+pub const CLOCK_MONOTONIC_RAW: u32 = 4;
+pub const CLOCK_REALTIME_COARSE: u32 = 5;
+pub const CLOCK_MONOTONIC_COARSE: u32 = 6;
+pub const CLOCK_BOOTTIME: u32 = 7;
+pub const CLOCK_REALTIME_ALARM: u32 = 8;
+pub const CLOCK_BOOTTIME_ALARM: u32 = 9;
+pub const CLOCK_TAI: u32 = 11;
+pub const TIMER_ABSTIME: u32 = 1;
+pub const __struct_tm_defined: u32 = 1;
+pub const __itimerspec_defined: u32 = 1;
 pub const TIME_UTC: u32 = 1;
+pub const PG_INSTR_CLOCK: u32 = 1;
 pub const PARAM_FLAG_CONST: u32 = 1;
 pub const BTLessStrategyNumber: u32 = 1;
 pub const BTLessEqualStrategyNumber: u32 = 2;
@@ -2087,25 +1572,66 @@ pub const HASH_SHARED_MEM: u32 = 2048;
 pub const HASH_ATTACH: u32 = 4096;
 pub const HASH_FIXED_SIZE: u32 = 8192;
 pub const NO_MAX_DSIZE: i32 = -1;
-pub const __DARWIN_MAXNAMLEN: u32 = 255;
-pub const __DARWIN_MAXPATHLEN: u32 = 1024;
+pub const _DIRENT_H: u32 = 1;
+pub const _DIRENT_MATCHES_DIRENT64: u32 = 1;
+pub const _BITS_POSIX1_LIM_H: u32 = 1;
+pub const _POSIX_AIO_LISTIO_MAX: u32 = 2;
+pub const _POSIX_AIO_MAX: u32 = 1;
+pub const _POSIX_ARG_MAX: u32 = 4096;
+pub const _POSIX_CHILD_MAX: u32 = 25;
+pub const _POSIX_DELAYTIMER_MAX: u32 = 32;
+pub const _POSIX_HOST_NAME_MAX: u32 = 255;
+pub const _POSIX_LINK_MAX: u32 = 8;
+pub const _POSIX_LOGIN_NAME_MAX: u32 = 9;
+pub const _POSIX_MAX_CANON: u32 = 255;
+pub const _POSIX_MAX_INPUT: u32 = 255;
+pub const _POSIX_MQ_OPEN_MAX: u32 = 8;
+pub const _POSIX_MQ_PRIO_MAX: u32 = 32;
+pub const _POSIX_NAME_MAX: u32 = 14;
+pub const _POSIX_NGROUPS_MAX: u32 = 8;
+pub const _POSIX_OPEN_MAX: u32 = 20;
+pub const _POSIX_PATH_MAX: u32 = 256;
+pub const _POSIX_PIPE_BUF: u32 = 512;
+pub const _POSIX_RE_DUP_MAX: u32 = 255;
+pub const _POSIX_RTSIG_MAX: u32 = 8;
+pub const _POSIX_SEM_NSEMS_MAX: u32 = 256;
+pub const _POSIX_SEM_VALUE_MAX: u32 = 32767;
+pub const _POSIX_SIGQUEUE_MAX: u32 = 32;
+pub const _POSIX_SSIZE_MAX: u32 = 32767;
+pub const _POSIX_STREAM_MAX: u32 = 8;
+pub const _POSIX_SYMLINK_MAX: u32 = 255;
+pub const _POSIX_SYMLOOP_MAX: u32 = 8;
+pub const _POSIX_TIMER_MAX: u32 = 32;
+pub const _POSIX_TTY_NAME_MAX: u32 = 9;
+pub const _POSIX_TZNAME_MAX: u32 = 6;
+pub const _POSIX_CLOCKRES_MIN: u32 = 20000000;
+pub const NR_OPEN: u32 = 1024;
+pub const NGROUPS_MAX: u32 = 65536;
+pub const ARG_MAX: u32 = 131072;
+pub const LINK_MAX: u32 = 127;
+pub const MAX_CANON: u32 = 255;
+pub const MAX_INPUT: u32 = 255;
+pub const NAME_MAX: u32 = 255;
+pub const PATH_MAX: u32 = 4096;
+pub const PIPE_BUF: u32 = 4096;
+pub const XATTR_NAME_MAX: u32 = 255;
+pub const XATTR_SIZE_MAX: u32 = 65536;
+pub const XATTR_LIST_MAX: u32 = 65536;
+pub const RTSIG_MAX: u32 = 32;
+pub const _POSIX_THREAD_KEYS_MAX: u32 = 128;
+pub const PTHREAD_KEYS_MAX: u32 = 1024;
+pub const _POSIX_THREAD_DESTRUCTOR_ITERATIONS: u32 = 4;
+pub const PTHREAD_DESTRUCTOR_ITERATIONS: u32 = 4;
+pub const _POSIX_THREAD_THREADS_MAX: u32 = 64;
+pub const AIO_PRIO_DELTA_MAX: u32 = 20;
+pub const PTHREAD_STACK_MIN: u32 = 16384;
+pub const DELAYTIMER_MAX: u32 = 2147483647;
+pub const TTY_NAME_MAX: u32 = 32;
+pub const LOGIN_NAME_MAX: u32 = 256;
+pub const HOST_NAME_MAX: u32 = 64;
+pub const MQ_PRIO_MAX: u32 = 32768;
+pub const SEM_VALUE_MAX: u32 = 2147483647;
 pub const MAXNAMLEN: u32 = 255;
-pub const DT_UNKNOWN: u32 = 0;
-pub const DT_FIFO: u32 = 1;
-pub const DT_CHR: u32 = 2;
-pub const DT_DIR: u32 = 4;
-pub const DT_BLK: u32 = 6;
-pub const DT_REG: u32 = 8;
-pub const DT_LNK: u32 = 10;
-pub const DT_SOCK: u32 = 12;
-pub const DT_WHT: u32 = 14;
-pub const DIRBLKSIZ: u32 = 1024;
-pub const DTF_HIDEW: u32 = 1;
-pub const DTF_NODUP: u32 = 2;
-pub const DTF_REWIND: u32 = 4;
-pub const __DTF_READALL: u32 = 8;
-pub const __DTF_SKIPREAD: u32 = 16;
-pub const __DTF_ATEND: u32 = 32;
 pub const PG_TEMP_FILES_DIR: &[u8; 10usize] = b"pgsql_tmp\0";
 pub const PG_TEMP_FILE_PREFIX: &[u8; 10usize] = b"pgsql_tmp\0";
 pub const DSM_IMPL_POSIX: u32 = 1;
@@ -2149,121 +1675,27 @@ pub const INDEX_SIZE_MASK: u32 = 8191;
 pub const INDEX_AM_RESERVED_BIT: u32 = 8192;
 pub const INDEX_VAR_MASK: u32 = 16384;
 pub const INDEX_NULL_MASK: u32 = 32768;
-pub const __DARWIN_CLK_TCK: u32 = 100;
-pub const CHAR_BIT: u32 = 8;
-pub const MB_LEN_MAX: u32 = 6;
-pub const CLK_TCK: u32 = 100;
-pub const SCHAR_MAX: u32 = 127;
-pub const SCHAR_MIN: i32 = -128;
-pub const UCHAR_MAX: u32 = 255;
-pub const CHAR_MAX: u32 = 127;
-pub const CHAR_MIN: i32 = -128;
-pub const USHRT_MAX: u32 = 65535;
-pub const SHRT_MAX: u32 = 32767;
-pub const SHRT_MIN: i32 = -32768;
-pub const UINT_MAX: u32 = 4294967295;
-pub const INT_MAX: u32 = 2147483647;
-pub const INT_MIN: i32 = -2147483648;
-pub const ULONG_MAX: i32 = -1;
-pub const LONG_MAX: u64 = 9223372036854775807;
-pub const LONG_MIN: i64 = -9223372036854775808;
-pub const ULLONG_MAX: i32 = -1;
-pub const LLONG_MAX: u64 = 9223372036854775807;
-pub const LLONG_MIN: i64 = -9223372036854775808;
-pub const LONG_BIT: u32 = 64;
-pub const SSIZE_MAX: u64 = 9223372036854775807;
-pub const WORD_BIT: u32 = 32;
-pub const SIZE_T_MAX: i32 = -1;
-pub const UQUAD_MAX: i32 = -1;
-pub const QUAD_MAX: u64 = 9223372036854775807;
-pub const QUAD_MIN: i64 = -9223372036854775808;
-pub const ARG_MAX: u32 = 1048576;
-pub const CHILD_MAX: u32 = 266;
-pub const GID_MAX: u32 = 2147483647;
-pub const LINK_MAX: u32 = 32767;
-pub const MAX_CANON: u32 = 1024;
-pub const MAX_INPUT: u32 = 1024;
-pub const NAME_MAX: u32 = 255;
-pub const NGROUPS_MAX: u32 = 16;
-pub const UID_MAX: u32 = 2147483647;
-pub const OPEN_MAX: u32 = 10240;
-pub const PATH_MAX: u32 = 1024;
-pub const PIPE_BUF: u32 = 512;
-pub const BC_BASE_MAX: u32 = 99;
-pub const BC_DIM_MAX: u32 = 2048;
-pub const BC_SCALE_MAX: u32 = 99;
-pub const BC_STRING_MAX: u32 = 1000;
-pub const CHARCLASS_NAME_MAX: u32 = 14;
-pub const COLL_WEIGHTS_MAX: u32 = 2;
-pub const EQUIV_CLASS_MAX: u32 = 2;
-pub const EXPR_NEST_MAX: u32 = 32;
-pub const LINE_MAX: u32 = 2048;
-pub const RE_DUP_MAX: u32 = 255;
-pub const NZERO: u32 = 20;
-pub const _POSIX_ARG_MAX: u32 = 4096;
-pub const _POSIX_CHILD_MAX: u32 = 25;
-pub const _POSIX_LINK_MAX: u32 = 8;
-pub const _POSIX_MAX_CANON: u32 = 255;
-pub const _POSIX_MAX_INPUT: u32 = 255;
-pub const _POSIX_NAME_MAX: u32 = 14;
-pub const _POSIX_NGROUPS_MAX: u32 = 8;
-pub const _POSIX_OPEN_MAX: u32 = 20;
-pub const _POSIX_PATH_MAX: u32 = 256;
-pub const _POSIX_PIPE_BUF: u32 = 512;
-pub const _POSIX_SSIZE_MAX: u32 = 32767;
-pub const _POSIX_STREAM_MAX: u32 = 8;
-pub const _POSIX_TZNAME_MAX: u32 = 6;
+pub const _LIBC_LIMITS_H_: u32 = 1;
+pub const MB_LEN_MAX: u32 = 16;
+pub const _BITS_POSIX2_LIM_H: u32 = 1;
 pub const _POSIX2_BC_BASE_MAX: u32 = 99;
 pub const _POSIX2_BC_DIM_MAX: u32 = 2048;
 pub const _POSIX2_BC_SCALE_MAX: u32 = 99;
 pub const _POSIX2_BC_STRING_MAX: u32 = 1000;
-pub const _POSIX2_EQUIV_CLASS_MAX: u32 = 2;
+pub const _POSIX2_COLL_WEIGHTS_MAX: u32 = 2;
 pub const _POSIX2_EXPR_NEST_MAX: u32 = 32;
 pub const _POSIX2_LINE_MAX: u32 = 2048;
 pub const _POSIX2_RE_DUP_MAX: u32 = 255;
-pub const _POSIX_AIO_LISTIO_MAX: u32 = 2;
-pub const _POSIX_AIO_MAX: u32 = 1;
-pub const _POSIX_DELAYTIMER_MAX: u32 = 32;
-pub const _POSIX_MQ_OPEN_MAX: u32 = 8;
-pub const _POSIX_MQ_PRIO_MAX: u32 = 32;
-pub const _POSIX_RTSIG_MAX: u32 = 8;
-pub const _POSIX_SEM_NSEMS_MAX: u32 = 256;
-pub const _POSIX_SEM_VALUE_MAX: u32 = 32767;
-pub const _POSIX_SIGQUEUE_MAX: u32 = 32;
-pub const _POSIX_TIMER_MAX: u32 = 32;
-pub const _POSIX_CLOCKRES_MIN: u32 = 20000000;
-pub const _POSIX_THREAD_DESTRUCTOR_ITERATIONS: u32 = 4;
-pub const _POSIX_THREAD_KEYS_MAX: u32 = 128;
-pub const _POSIX_THREAD_THREADS_MAX: u32 = 64;
-pub const PTHREAD_DESTRUCTOR_ITERATIONS: u32 = 4;
-pub const PTHREAD_KEYS_MAX: u32 = 512;
-pub const PTHREAD_STACK_MIN: u32 = 16384;
-pub const _POSIX_HOST_NAME_MAX: u32 = 255;
-pub const _POSIX_LOGIN_NAME_MAX: u32 = 9;
-pub const _POSIX_SS_REPL_MAX: u32 = 4;
-pub const _POSIX_SYMLINK_MAX: u32 = 255;
-pub const _POSIX_SYMLOOP_MAX: u32 = 8;
-pub const _POSIX_TRACE_EVENT_NAME_MAX: u32 = 30;
-pub const _POSIX_TRACE_NAME_MAX: u32 = 8;
-pub const _POSIX_TRACE_SYS_MAX: u32 = 8;
-pub const _POSIX_TRACE_USER_EVENT_MAX: u32 = 32;
-pub const _POSIX_TTY_NAME_MAX: u32 = 9;
 pub const _POSIX2_CHARCLASS_NAME_MAX: u32 = 14;
-pub const _POSIX2_COLL_WEIGHTS_MAX: u32 = 2;
-pub const _POSIX_RE_DUP_MAX: u32 = 255;
-pub const OFF_MIN: i64 = -9223372036854775808;
-pub const OFF_MAX: u64 = 9223372036854775807;
-pub const PASS_MAX: u32 = 128;
-pub const NL_ARGMAX: u32 = 9;
-pub const NL_LANGMAX: u32 = 14;
-pub const NL_MSGMAX: u32 = 32767;
-pub const NL_NMAX: u32 = 1;
-pub const NL_SETMAX: u32 = 255;
-pub const NL_TEXTMAX: u32 = 2048;
-pub const _XOPEN_IOV_MAX: u32 = 16;
-pub const IOV_MAX: u32 = 1024;
-pub const _XOPEN_NAME_MAX: u32 = 255;
-pub const _XOPEN_PATH_MAX: u32 = 1024;
+pub const BC_BASE_MAX: u32 = 99;
+pub const BC_DIM_MAX: u32 = 2048;
+pub const BC_SCALE_MAX: u32 = 99;
+pub const BC_STRING_MAX: u32 = 1000;
+pub const COLL_WEIGHTS_MAX: u32 = 255;
+pub const EXPR_NEST_MAX: u32 = 32;
+pub const LINE_MAX: u32 = 2048;
+pub const CHARCLASS_NAME_MAX: u32 = 2048;
+pub const RE_DUP_MAX: u32 = 32767;
 pub const SIZEOF_DSA_POINTER: u32 = 8;
 pub const DSA_POINTER_FORMAT: &[u8; 7usize] = b"%016lx\0";
 pub const DSA_ALLOC_HUGE: u32 = 1;
@@ -2347,7 +1779,6 @@ pub const CURSOR_OPT_FAST_PLAN: u32 = 32;
 pub const CURSOR_OPT_GENERIC_PLAN: u32 = 64;
 pub const CURSOR_OPT_CUSTOM_PLAN: u32 = 128;
 pub const CURSOR_OPT_PARALLEL_OK: u32 = 256;
-pub const FETCH_ALL: u64 = 9223372036854775807;
 pub const REINDEXOPT_VERBOSE: u32 = 1;
 pub const REINDEXOPT_REPORT_PROGRESS: u32 = 2;
 pub const MaxAllocHugeSize: u32 = 0;
@@ -2366,6 +1797,85 @@ pub const EXEC_FLAG_BACKWARD: u32 = 4;
 pub const EXEC_FLAG_MARK: u32 = 8;
 pub const EXEC_FLAG_SKIP_TRIGGERS: u32 = 16;
 pub const EXEC_FLAG_WITH_NO_DATA: u32 = 32;
+pub const _BITS_SIGNUM_GENERIC_H: u32 = 1;
+pub const SIGINT: u32 = 2;
+pub const SIGILL: u32 = 4;
+pub const SIGABRT: u32 = 6;
+pub const SIGFPE: u32 = 8;
+pub const SIGSEGV: u32 = 11;
+pub const SIGTERM: u32 = 15;
+pub const SIGHUP: u32 = 1;
+pub const SIGQUIT: u32 = 3;
+pub const SIGTRAP: u32 = 5;
+pub const SIGKILL: u32 = 9;
+pub const SIGPIPE: u32 = 13;
+pub const SIGALRM: u32 = 14;
+pub const SIGIOT: u32 = 6;
+pub const _BITS_SIGNUM_ARCH_H: u32 = 1;
+pub const SIGSTKFLT: u32 = 16;
+pub const SIGPWR: u32 = 30;
+pub const SIGBUS: u32 = 7;
+pub const SIGSYS: u32 = 31;
+pub const SIGURG: u32 = 23;
+pub const SIGSTOP: u32 = 19;
+pub const SIGTSTP: u32 = 20;
+pub const SIGCONT: u32 = 18;
+pub const SIGCHLD: u32 = 17;
+pub const SIGTTIN: u32 = 21;
+pub const SIGTTOU: u32 = 22;
+pub const SIGPOLL: u32 = 29;
+pub const SIGXFSZ: u32 = 25;
+pub const SIGXCPU: u32 = 24;
+pub const SIGVTALRM: u32 = 26;
+pub const SIGPROF: u32 = 27;
+pub const SIGUSR1: u32 = 10;
+pub const SIGUSR2: u32 = 12;
+pub const SIGWINCH: u32 = 28;
+pub const SIGIO: u32 = 29;
+pub const SIGCLD: u32 = 17;
+pub const __SIGRTMIN: u32 = 32;
+pub const __SIGRTMAX: u32 = 64;
+pub const _NSIG: u32 = 65;
+pub const __sig_atomic_t_defined: u32 = 1;
+pub const __siginfo_t_defined: u32 = 1;
+pub const __SI_MAX_SIZE: u32 = 128;
+pub const _BITS_SIGINFO_ARCH_H: u32 = 1;
+pub const __SI_ERRNO_THEN_CODE: u32 = 1;
+pub const __SI_HAVE_SIGSYS: u32 = 1;
+pub const _BITS_SIGINFO_CONSTS_H: u32 = 1;
+pub const __SI_ASYNCIO_AFTER_SIGIO: u32 = 1;
+pub const __sigevent_t_defined: u32 = 1;
+pub const __SIGEV_MAX_SIZE: u32 = 64;
+pub const _BITS_SIGEVENT_CONSTS_H: u32 = 1;
+pub const NSIG: u32 = 65;
+pub const _BITS_SIGACTION_H: u32 = 1;
+pub const SA_NOCLDSTOP: u32 = 1;
+pub const SA_NOCLDWAIT: u32 = 2;
+pub const SA_SIGINFO: u32 = 4;
+pub const SA_ONSTACK: u32 = 134217728;
+pub const SA_RESTART: u32 = 268435456;
+pub const SA_NODEFER: u32 = 1073741824;
+pub const SA_RESETHAND: u32 = 2147483648;
+pub const SA_INTERRUPT: u32 = 536870912;
+pub const SA_NOMASK: u32 = 1073741824;
+pub const SA_ONESHOT: u32 = 2147483648;
+pub const SA_STACK: u32 = 134217728;
+pub const SIG_BLOCK: u32 = 0;
+pub const SIG_UNBLOCK: u32 = 1;
+pub const SIG_SETMASK: u32 = 2;
+pub const _BITS_SIGCONTEXT_H: u32 = 1;
+pub const FP_XSTATE_MAGIC1: u32 = 1179670611;
+pub const FP_XSTATE_MAGIC2: u32 = 1179670597;
+pub const __stack_t_defined: u32 = 1;
+pub const _SYS_UCONTEXT_H: u32 = 1;
+pub const __NGREG: u32 = 23;
+pub const NGREG: u32 = 23;
+pub const _BITS_SIGSTACK_H: u32 = 1;
+pub const MINSIGSTKSZ: u32 = 2048;
+pub const SIGSTKSZ: u32 = 8192;
+pub const _BITS_SS_FLAGS_H: u32 = 1;
+pub const __sigstack_defined: u32 = 1;
+pub const _BITS_SIGTHREAD_H: u32 = 1;
 pub const TZ_STRLEN_MAX: u32 = 255;
 pub const InvalidPid: i32 = -1;
 pub const USE_POSTGRES_DATES: u32 = 0;
@@ -2384,13 +1894,7 @@ pub const MAXTZLEN: u32 = 10;
 pub const SECURITY_LOCAL_USERID_CHANGE: u32 = 1;
 pub const SECURITY_RESTRICTED_OPERATION: u32 = 2;
 pub const SECURITY_NOFORCE_RLS: u32 = 4;
-pub const SOL_LOCAL: u32 = 0;
-pub const LOCAL_PEERCRED: u32 = 1;
-pub const LOCAL_PEERPID: u32 = 2;
-pub const LOCAL_PEEREPID: u32 = 3;
-pub const LOCAL_PEERUUID: u32 = 4;
-pub const LOCAL_PEEREUUID: u32 = 5;
-pub const LOCAL_PEERTOKEN: u32 = 6;
+pub const _SYS_UN_H: u32 = 1;
 pub const SM_DATABASE: u32 = 64;
 pub const SM_USER: u32 = 32;
 pub const SM_DATABASE_USER: u32 = 97;
@@ -2575,7 +2079,6 @@ pub const F_HAS_GARBAGE: u32 = 16;
 pub const GIST_PAGE_ID: u32 = 65409;
 pub const EOH_HEADER_MAGIC: i32 = -1;
 pub const EA_MAGIC: u32 = 689375833;
-pub const MAX_KILOBYTES: u32 = 2147483647;
 pub const PG_AUTOCONF_FILENAME: &[u8; 21usize] = b"postgresql.auto.conf\0";
 pub const GUC_QUALIFIER_SEPARATOR: u8 = 46u8;
 pub const GUC_LIST_INPUT: u32 = 1;
@@ -3605,22 +3108,95 @@ pub const TYPECACHE_HASH_EXTENDED_PROC: u32 = 16384;
 pub const TYPECACHE_HASH_EXTENDED_PROC_FINFO: u32 = 32768;
 pub type Oid = ::std::os::raw::c_uint;
 pub type pg_int64 = ::std::os::raw::c_long;
+pub type va_list = __builtin_va_list;
+pub type __gnuc_va_list = __builtin_va_list;
+pub type __u_char = ::std::os::raw::c_uchar;
+pub type __u_short = ::std::os::raw::c_ushort;
+pub type __u_int = ::std::os::raw::c_uint;
+pub type __u_long = ::std::os::raw::c_ulong;
 pub type __int8_t = ::std::os::raw::c_schar;
 pub type __uint8_t = ::std::os::raw::c_uchar;
 pub type __int16_t = ::std::os::raw::c_short;
 pub type __uint16_t = ::std::os::raw::c_ushort;
 pub type __int32_t = ::std::os::raw::c_int;
 pub type __uint32_t = ::std::os::raw::c_uint;
-pub type __int64_t = ::std::os::raw::c_longlong;
-pub type __uint64_t = ::std::os::raw::c_ulonglong;
-pub type __darwin_intptr_t = ::std::os::raw::c_long;
-pub type __darwin_natural_t = ::std::os::raw::c_uint;
-pub type __darwin_ct_rune_t = ::std::os::raw::c_int;
+pub type __int64_t = ::std::os::raw::c_long;
+pub type __uint64_t = ::std::os::raw::c_ulong;
+pub type __int_least8_t = __int8_t;
+pub type __uint_least8_t = __uint8_t;
+pub type __int_least16_t = __int16_t;
+pub type __uint_least16_t = __uint16_t;
+pub type __int_least32_t = __int32_t;
+pub type __uint_least32_t = __uint32_t;
+pub type __int_least64_t = __int64_t;
+pub type __uint_least64_t = __uint64_t;
+pub type __quad_t = ::std::os::raw::c_long;
+pub type __u_quad_t = ::std::os::raw::c_ulong;
+pub type __intmax_t = ::std::os::raw::c_long;
+pub type __uintmax_t = ::std::os::raw::c_ulong;
+pub type __dev_t = ::std::os::raw::c_ulong;
+pub type __uid_t = ::std::os::raw::c_uint;
+pub type __gid_t = ::std::os::raw::c_uint;
+pub type __ino_t = ::std::os::raw::c_ulong;
+pub type __ino64_t = ::std::os::raw::c_ulong;
+pub type __mode_t = ::std::os::raw::c_uint;
+pub type __nlink_t = ::std::os::raw::c_ulong;
+pub type __off_t = ::std::os::raw::c_long;
+pub type __off64_t = ::std::os::raw::c_long;
+pub type __pid_t = ::std::os::raw::c_int;
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct __fsid_t {
+    pub __val: [::std::os::raw::c_int; 2usize],
+}
+pub type __clock_t = ::std::os::raw::c_long;
+pub type __rlim_t = ::std::os::raw::c_ulong;
+pub type __rlim64_t = ::std::os::raw::c_ulong;
+pub type __id_t = ::std::os::raw::c_uint;
+pub type __time_t = ::std::os::raw::c_long;
+pub type __useconds_t = ::std::os::raw::c_uint;
+pub type __suseconds_t = ::std::os::raw::c_long;
+pub type __suseconds64_t = ::std::os::raw::c_long;
+pub type __daddr_t = ::std::os::raw::c_int;
+pub type __key_t = ::std::os::raw::c_int;
+pub type __clockid_t = ::std::os::raw::c_int;
+pub type __timer_t = *mut ::std::os::raw::c_void;
+pub type __blksize_t = ::std::os::raw::c_long;
+pub type __blkcnt_t = ::std::os::raw::c_long;
+pub type __blkcnt64_t = ::std::os::raw::c_long;
+pub type __fsblkcnt_t = ::std::os::raw::c_ulong;
+pub type __fsblkcnt64_t = ::std::os::raw::c_ulong;
+pub type __fsfilcnt_t = ::std::os::raw::c_ulong;
+pub type __fsfilcnt64_t = ::std::os::raw::c_ulong;
+pub type __fsword_t = ::std::os::raw::c_long;
+pub type __ssize_t = ::std::os::raw::c_long;
+pub type __syscall_slong_t = ::std::os::raw::c_long;
+pub type __syscall_ulong_t = ::std::os::raw::c_ulong;
+pub type __loff_t = __off64_t;
+pub type __caddr_t = *mut ::std::os::raw::c_char;
+pub type __intptr_t = ::std::os::raw::c_long;
+pub type __socklen_t = ::std::os::raw::c_uint;
+pub type __sig_atomic_t = ::std::os::raw::c_int;
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub union __mbstate_t {
-    pub __mbstate8: [::std::os::raw::c_char; 128usize],
-    pub _mbstateL: ::std::os::raw::c_longlong,
+pub struct __mbstate_t {
+    pub __count: ::std::os::raw::c_int,
+    pub __value: __mbstate_t__bindgen_ty_1,
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub union __mbstate_t__bindgen_ty_1 {
+    pub __wch: ::std::os::raw::c_uint,
+    pub __wchb: [::std::os::raw::c_char; 4usize],
+}
+impl Default for __mbstate_t__bindgen_ty_1 {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
 }
 impl Default for __mbstate_t {
     fn default() -> Self {
@@ -3631,45 +3207,13 @@ impl Default for __mbstate_t {
         }
     }
 }
-pub type __darwin_mbstate_t = __mbstate_t;
-pub type __darwin_ptrdiff_t = ::std::os::raw::c_long;
-pub type __darwin_size_t = ::std::os::raw::c_ulong;
-pub type __darwin_va_list = __builtin_va_list;
-pub type __darwin_wchar_t = ::std::os::raw::c_int;
-pub type __darwin_rune_t = __darwin_wchar_t;
-pub type __darwin_wint_t = ::std::os::raw::c_int;
-pub type __darwin_clock_t = ::std::os::raw::c_ulong;
-pub type __darwin_socklen_t = __uint32_t;
-pub type __darwin_ssize_t = ::std::os::raw::c_long;
-pub type __darwin_time_t = ::std::os::raw::c_long;
-pub type __darwin_blkcnt_t = __int64_t;
-pub type __darwin_blksize_t = __int32_t;
-pub type __darwin_dev_t = __int32_t;
-pub type __darwin_fsblkcnt_t = ::std::os::raw::c_uint;
-pub type __darwin_fsfilcnt_t = ::std::os::raw::c_uint;
-pub type __darwin_gid_t = __uint32_t;
-pub type __darwin_id_t = __uint32_t;
-pub type __darwin_ino64_t = __uint64_t;
-pub type __darwin_ino_t = __darwin_ino64_t;
-pub type __darwin_mach_port_name_t = __darwin_natural_t;
-pub type __darwin_mach_port_t = __darwin_mach_port_name_t;
-pub type __darwin_mode_t = __uint16_t;
-pub type __darwin_off_t = __int64_t;
-pub type __darwin_pid_t = __int32_t;
-pub type __darwin_sigset_t = __uint32_t;
-pub type __darwin_suseconds_t = __int32_t;
-pub type __darwin_uid_t = __uint32_t;
-pub type __darwin_useconds_t = __uint32_t;
-pub type __darwin_uuid_t = [::std::os::raw::c_uchar; 16usize];
-pub type __darwin_uuid_string_t = [::std::os::raw::c_char; 37usize];
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct __darwin_pthread_handler_rec {
-    pub __routine: ::std::option::Option<unsafe extern "C" fn(arg1: *mut ::std::os::raw::c_void)>,
-    pub __arg: *mut ::std::os::raw::c_void,
-    pub __next: *mut __darwin_pthread_handler_rec,
+#[derive(Copy, Clone)]
+pub struct _G_fpos_t {
+    pub __pos: __off_t,
+    pub __state: __mbstate_t,
 }
-impl Default for __darwin_pthread_handler_rec {
+impl Default for _G_fpos_t {
     fn default() -> Self {
         let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
         unsafe {
@@ -3678,13 +3222,14 @@ impl Default for __darwin_pthread_handler_rec {
         }
     }
 }
+pub type __fpos_t = _G_fpos_t;
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct _opaque_pthread_attr_t {
-    pub __sig: ::std::os::raw::c_long,
-    pub __opaque: [::std::os::raw::c_char; 56usize],
+#[derive(Copy, Clone)]
+pub struct _G_fpos64_t {
+    pub __pos: __off64_t,
+    pub __state: __mbstate_t,
 }
-impl Default for _opaque_pthread_attr_t {
+impl Default for _G_fpos64_t {
     fn default() -> Self {
         let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
         unsafe {
@@ -3693,238 +3238,59 @@ impl Default for _opaque_pthread_attr_t {
         }
     }
 }
+pub type __fpos64_t = _G_fpos64_t;
+pub type __FILE = _IO_FILE;
+pub type FILE = _IO_FILE;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct _opaque_pthread_cond_t {
-    pub __sig: ::std::os::raw::c_long,
-    pub __opaque: [::std::os::raw::c_char; 40usize],
-}
-impl Default for _opaque_pthread_cond_t {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct _opaque_pthread_condattr_t {
-    pub __sig: ::std::os::raw::c_long,
-    pub __opaque: [::std::os::raw::c_char; 8usize],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct _opaque_pthread_mutex_t {
-    pub __sig: ::std::os::raw::c_long,
-    pub __opaque: [::std::os::raw::c_char; 56usize],
-}
-impl Default for _opaque_pthread_mutex_t {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct _opaque_pthread_mutexattr_t {
-    pub __sig: ::std::os::raw::c_long,
-    pub __opaque: [::std::os::raw::c_char; 8usize],
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct _opaque_pthread_once_t {
-    pub __sig: ::std::os::raw::c_long,
-    pub __opaque: [::std::os::raw::c_char; 8usize],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct _opaque_pthread_rwlock_t {
-    pub __sig: ::std::os::raw::c_long,
-    pub __opaque: [::std::os::raw::c_char; 192usize],
-}
-impl Default for _opaque_pthread_rwlock_t {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct _opaque_pthread_rwlockattr_t {
-    pub __sig: ::std::os::raw::c_long,
-    pub __opaque: [::std::os::raw::c_char; 16usize],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct _opaque_pthread_t {
-    pub __sig: ::std::os::raw::c_long,
-    pub __cleanup_stack: *mut __darwin_pthread_handler_rec,
-    pub __opaque: [::std::os::raw::c_char; 8176usize],
-}
-impl Default for _opaque_pthread_t {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub type __darwin_pthread_attr_t = _opaque_pthread_attr_t;
-pub type __darwin_pthread_cond_t = _opaque_pthread_cond_t;
-pub type __darwin_pthread_condattr_t = _opaque_pthread_condattr_t;
-pub type __darwin_pthread_key_t = ::std::os::raw::c_ulong;
-pub type __darwin_pthread_mutex_t = _opaque_pthread_mutex_t;
-pub type __darwin_pthread_mutexattr_t = _opaque_pthread_mutexattr_t;
-pub type __darwin_pthread_once_t = _opaque_pthread_once_t;
-pub type __darwin_pthread_rwlock_t = _opaque_pthread_rwlock_t;
-pub type __darwin_pthread_rwlockattr_t = _opaque_pthread_rwlockattr_t;
-pub type __darwin_pthread_t = *mut _opaque_pthread_t;
-pub type __darwin_nl_item = ::std::os::raw::c_int;
-pub type __darwin_wctrans_t = ::std::os::raw::c_int;
-pub type __darwin_wctype_t = __uint32_t;
-pub type u_int8_t = ::std::os::raw::c_uchar;
-pub type u_int16_t = ::std::os::raw::c_ushort;
-pub type u_int32_t = ::std::os::raw::c_uint;
-pub type u_int64_t = ::std::os::raw::c_ulonglong;
-pub type register_t = i64;
-pub type user_addr_t = u_int64_t;
-pub type user_size_t = u_int64_t;
-pub type user_ssize_t = i64;
-pub type user_long_t = i64;
-pub type user_ulong_t = u_int64_t;
-pub type user_time_t = i64;
-pub type user_off_t = i64;
-pub type syscall_arg_t = u_int64_t;
-pub type va_list = __darwin_va_list;
-pub unsafe fn renameat(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: *const ::std::os::raw::c_char,
-    arg_arg3: ::std::os::raw::c_int,
-    arg_arg4: *const ::std::os::raw::c_char,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn renameat(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: *const ::std::os::raw::c_char,
-                arg_arg3: ::std::os::raw::c_int,
-                arg_arg4: *const ::std::os::raw::c_char,
-            ) -> ::std::os::raw::c_int;
-        }
-        renameat(arg_arg1, arg_arg2, arg_arg3, arg_arg4)
-    })
-}
-pub unsafe fn renamex_np(
-    arg_arg1: *const ::std::os::raw::c_char,
-    arg_arg2: *const ::std::os::raw::c_char,
-    arg_arg3: ::std::os::raw::c_uint,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn renamex_np(
-                arg_arg1: *const ::std::os::raw::c_char,
-                arg_arg2: *const ::std::os::raw::c_char,
-                arg_arg3: ::std::os::raw::c_uint,
-            ) -> ::std::os::raw::c_int;
-        }
-        renamex_np(arg_arg1, arg_arg2, arg_arg3)
-    })
-}
-pub unsafe fn renameatx_np(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: *const ::std::os::raw::c_char,
-    arg_arg3: ::std::os::raw::c_int,
-    arg_arg4: *const ::std::os::raw::c_char,
-    arg_arg5: ::std::os::raw::c_uint,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn renameatx_np(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: *const ::std::os::raw::c_char,
-                arg_arg3: ::std::os::raw::c_int,
-                arg_arg4: *const ::std::os::raw::c_char,
-                arg_arg5: ::std::os::raw::c_uint,
-            ) -> ::std::os::raw::c_int;
-        }
-        renameatx_np(arg_arg1, arg_arg2, arg_arg3, arg_arg4, arg_arg5)
-    })
-}
-pub type fpos_t = __darwin_off_t;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct __sbuf {
-    pub _base: *mut ::std::os::raw::c_uchar,
-    pub _size: ::std::os::raw::c_int,
-}
-impl Default for __sbuf {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct __sFILEX {
+pub struct _IO_marker {
     _unused: [u8; 0],
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct __sFILE {
-    pub _p: *mut ::std::os::raw::c_uchar,
-    pub _r: ::std::os::raw::c_int,
-    pub _w: ::std::os::raw::c_int,
-    pub _flags: ::std::os::raw::c_short,
-    pub _file: ::std::os::raw::c_short,
-    pub _bf: __sbuf,
-    pub _lbfsize: ::std::os::raw::c_int,
-    pub _cookie: *mut ::std::os::raw::c_void,
-    pub _close: ::std::option::Option<
-        unsafe extern "C" fn(arg1: *mut ::std::os::raw::c_void) -> ::std::os::raw::c_int,
-    >,
-    pub _read: ::std::option::Option<
-        unsafe extern "C" fn(
-            arg1: *mut ::std::os::raw::c_void,
-            arg2: *mut ::std::os::raw::c_char,
-            arg3: ::std::os::raw::c_int,
-        ) -> ::std::os::raw::c_int,
-    >,
-    pub _seek: ::std::option::Option<
-        unsafe extern "C" fn(
-            arg1: *mut ::std::os::raw::c_void,
-            arg2: fpos_t,
-            arg3: ::std::os::raw::c_int,
-        ) -> fpos_t,
-    >,
-    pub _write: ::std::option::Option<
-        unsafe extern "C" fn(
-            arg1: *mut ::std::os::raw::c_void,
-            arg2: *const ::std::os::raw::c_char,
-            arg3: ::std::os::raw::c_int,
-        ) -> ::std::os::raw::c_int,
-    >,
-    pub _ub: __sbuf,
-    pub _extra: *mut __sFILEX,
-    pub _ur: ::std::os::raw::c_int,
-    pub _ubuf: [::std::os::raw::c_uchar; 3usize],
-    pub _nbuf: [::std::os::raw::c_uchar; 1usize],
-    pub _lb: __sbuf,
-    pub _blksize: ::std::os::raw::c_int,
-    pub _offset: fpos_t,
+pub struct _IO_codecvt {
+    _unused: [u8; 0],
 }
-impl Default for __sFILE {
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct _IO_wide_data {
+    _unused: [u8; 0],
+}
+pub type _IO_lock_t = ::std::os::raw::c_void;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct _IO_FILE {
+    pub _flags: ::std::os::raw::c_int,
+    pub _IO_read_ptr: *mut ::std::os::raw::c_char,
+    pub _IO_read_end: *mut ::std::os::raw::c_char,
+    pub _IO_read_base: *mut ::std::os::raw::c_char,
+    pub _IO_write_base: *mut ::std::os::raw::c_char,
+    pub _IO_write_ptr: *mut ::std::os::raw::c_char,
+    pub _IO_write_end: *mut ::std::os::raw::c_char,
+    pub _IO_buf_base: *mut ::std::os::raw::c_char,
+    pub _IO_buf_end: *mut ::std::os::raw::c_char,
+    pub _IO_save_base: *mut ::std::os::raw::c_char,
+    pub _IO_backup_base: *mut ::std::os::raw::c_char,
+    pub _IO_save_end: *mut ::std::os::raw::c_char,
+    pub _markers: *mut _IO_marker,
+    pub _chain: *mut _IO_FILE,
+    pub _fileno: ::std::os::raw::c_int,
+    pub _flags2: ::std::os::raw::c_int,
+    pub _old_offset: __off_t,
+    pub _cur_column: ::std::os::raw::c_ushort,
+    pub _vtable_offset: ::std::os::raw::c_schar,
+    pub _shortbuf: [::std::os::raw::c_char; 1usize],
+    pub _lock: *mut _IO_lock_t,
+    pub _offset: __off64_t,
+    pub _codecvt: *mut _IO_codecvt,
+    pub _wide_data: *mut _IO_wide_data,
+    pub _freeres_list: *mut _IO_FILE,
+    pub _freeres_buf: *mut ::std::os::raw::c_void,
+    pub __pad5: usize,
+    pub _mode: ::std::os::raw::c_int,
+    pub _unused2: [::std::os::raw::c_char; 20usize],
+}
+impl Default for _IO_FILE {
     fn default() -> Self {
         let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
         unsafe {
@@ -3933,307 +3299,23 @@ impl Default for __sFILE {
         }
     }
 }
-pub type FILE = __sFILE;
+pub type off_t = __off_t;
+pub type fpos_t = __fpos_t;
 extern "C" {
-    pub static mut __stdinp: *mut FILE;
-}
-extern "C" {
-    pub static mut __stdoutp: *mut FILE;
+    pub static mut stdin: *mut FILE;
 }
 extern "C" {
-    pub static mut __stderrp: *mut FILE;
+    pub static mut stdout: *mut FILE;
 }
-pub unsafe fn clearerr(arg_arg1: *mut FILE) {
+extern "C" {
+    pub static mut stderr: *mut FILE;
+}
+pub unsafe fn remove(arg___filename: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn clearerr(arg_arg1: *mut FILE);
+            fn remove(arg___filename: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
         }
-        clearerr(arg_arg1)
-    })
-}
-pub unsafe fn fclose(arg_arg1: *mut FILE) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn fclose(arg_arg1: *mut FILE) -> ::std::os::raw::c_int;
-        }
-        fclose(arg_arg1)
-    })
-}
-pub unsafe fn feof(arg_arg1: *mut FILE) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn feof(arg_arg1: *mut FILE) -> ::std::os::raw::c_int;
-        }
-        feof(arg_arg1)
-    })
-}
-pub unsafe fn ferror(arg_arg1: *mut FILE) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn ferror(arg_arg1: *mut FILE) -> ::std::os::raw::c_int;
-        }
-        ferror(arg_arg1)
-    })
-}
-pub unsafe fn fflush(arg_arg1: *mut FILE) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn fflush(arg_arg1: *mut FILE) -> ::std::os::raw::c_int;
-        }
-        fflush(arg_arg1)
-    })
-}
-pub unsafe fn fgetc(arg_arg1: *mut FILE) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn fgetc(arg_arg1: *mut FILE) -> ::std::os::raw::c_int;
-        }
-        fgetc(arg_arg1)
-    })
-}
-pub unsafe fn fgetpos(arg_arg1: *mut FILE, arg_arg2: *mut fpos_t) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn fgetpos(arg_arg1: *mut FILE, arg_arg2: *mut fpos_t) -> ::std::os::raw::c_int;
-        }
-        fgetpos(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn fgets(
-    arg_arg1: *mut ::std::os::raw::c_char,
-    arg_arg2: ::std::os::raw::c_int,
-    arg_arg3: *mut FILE,
-) -> *mut ::std::os::raw::c_char {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn fgets(
-                arg_arg1: *mut ::std::os::raw::c_char,
-                arg_arg2: ::std::os::raw::c_int,
-                arg_arg3: *mut FILE,
-            ) -> *mut ::std::os::raw::c_char;
-        }
-        fgets(arg_arg1, arg_arg2, arg_arg3)
-    })
-}
-pub unsafe fn fopen(
-    arg___filename: *const ::std::os::raw::c_char,
-    arg___mode: *const ::std::os::raw::c_char,
-) -> *mut FILE {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn fopen(
-                arg___filename: *const ::std::os::raw::c_char,
-                arg___mode: *const ::std::os::raw::c_char,
-            ) -> *mut FILE;
-        }
-        fopen(arg___filename, arg___mode)
-    })
-}
-pub unsafe fn fprintf(
-    arg_arg1: *mut FILE,
-    arg_arg2: *const ::std::os::raw::c_char,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn fprintf(
-                arg_arg1: *mut FILE,
-                arg_arg2: *const ::std::os::raw::c_char,
-            ) -> ::std::os::raw::c_int;
-        }
-        fprintf(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn fputc(arg_arg1: ::std::os::raw::c_int, arg_arg2: *mut FILE) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn fputc(arg_arg1: ::std::os::raw::c_int, arg_arg2: *mut FILE)
-                -> ::std::os::raw::c_int;
-        }
-        fputc(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn fputs(
-    arg_arg1: *const ::std::os::raw::c_char,
-    arg_arg2: *mut FILE,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn fputs(
-                arg_arg1: *const ::std::os::raw::c_char,
-                arg_arg2: *mut FILE,
-            ) -> ::std::os::raw::c_int;
-        }
-        fputs(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn fread(
-    arg___ptr: *mut ::std::os::raw::c_void,
-    arg___size: ::std::os::raw::c_ulong,
-    arg___nitems: ::std::os::raw::c_ulong,
-    arg___stream: *mut FILE,
-) -> ::std::os::raw::c_ulong {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn fread(
-                arg___ptr: *mut ::std::os::raw::c_void,
-                arg___size: ::std::os::raw::c_ulong,
-                arg___nitems: ::std::os::raw::c_ulong,
-                arg___stream: *mut FILE,
-            ) -> ::std::os::raw::c_ulong;
-        }
-        fread(arg___ptr, arg___size, arg___nitems, arg___stream)
-    })
-}
-pub unsafe fn freopen(
-    arg_arg1: *const ::std::os::raw::c_char,
-    arg_arg2: *const ::std::os::raw::c_char,
-    arg_arg3: *mut FILE,
-) -> *mut FILE {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn freopen(
-                arg_arg1: *const ::std::os::raw::c_char,
-                arg_arg2: *const ::std::os::raw::c_char,
-                arg_arg3: *mut FILE,
-            ) -> *mut FILE;
-        }
-        freopen(arg_arg1, arg_arg2, arg_arg3)
-    })
-}
-pub unsafe fn fscanf(
-    arg_arg1: *mut FILE,
-    arg_arg2: *const ::std::os::raw::c_char,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn fscanf(
-                arg_arg1: *mut FILE,
-                arg_arg2: *const ::std::os::raw::c_char,
-            ) -> ::std::os::raw::c_int;
-        }
-        fscanf(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn fseek(
-    arg_arg1: *mut FILE,
-    arg_arg2: ::std::os::raw::c_long,
-    arg_arg3: ::std::os::raw::c_int,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn fseek(
-                arg_arg1: *mut FILE,
-                arg_arg2: ::std::os::raw::c_long,
-                arg_arg3: ::std::os::raw::c_int,
-            ) -> ::std::os::raw::c_int;
-        }
-        fseek(arg_arg1, arg_arg2, arg_arg3)
-    })
-}
-pub unsafe fn fsetpos(arg_arg1: *mut FILE, arg_arg2: *const fpos_t) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn fsetpos(arg_arg1: *mut FILE, arg_arg2: *const fpos_t) -> ::std::os::raw::c_int;
-        }
-        fsetpos(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn ftell(arg_arg1: *mut FILE) -> ::std::os::raw::c_long {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn ftell(arg_arg1: *mut FILE) -> ::std::os::raw::c_long;
-        }
-        ftell(arg_arg1)
-    })
-}
-pub unsafe fn fwrite(
-    arg___ptr: *const ::std::os::raw::c_void,
-    arg___size: ::std::os::raw::c_ulong,
-    arg___nitems: ::std::os::raw::c_ulong,
-    arg___stream: *mut FILE,
-) -> ::std::os::raw::c_ulong {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn fwrite(
-                arg___ptr: *const ::std::os::raw::c_void,
-                arg___size: ::std::os::raw::c_ulong,
-                arg___nitems: ::std::os::raw::c_ulong,
-                arg___stream: *mut FILE,
-            ) -> ::std::os::raw::c_ulong;
-        }
-        fwrite(arg___ptr, arg___size, arg___nitems, arg___stream)
-    })
-}
-pub unsafe fn getc(arg_arg1: *mut FILE) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn getc(arg_arg1: *mut FILE) -> ::std::os::raw::c_int;
-        }
-        getc(arg_arg1)
-    })
-}
-pub unsafe fn getchar() -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn getchar() -> ::std::os::raw::c_int;
-        }
-        getchar()
-    })
-}
-pub unsafe fn gets(arg_arg1: *mut ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn gets(arg_arg1: *mut ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
-        }
-        gets(arg_arg1)
-    })
-}
-pub unsafe fn perror(arg_arg1: *const ::std::os::raw::c_char) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn perror(arg_arg1: *const ::std::os::raw::c_char);
-        }
-        perror(arg_arg1)
-    })
-}
-pub unsafe fn printf(arg_arg1: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn printf(arg_arg1: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
-        }
-        printf(arg_arg1)
-    })
-}
-pub unsafe fn putc(arg_arg1: ::std::os::raw::c_int, arg_arg2: *mut FILE) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn putc(arg_arg1: ::std::os::raw::c_int, arg_arg2: *mut FILE) -> ::std::os::raw::c_int;
-        }
-        putc(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn putchar(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn putchar(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
-        }
-        putchar(arg_arg1)
-    })
-}
-pub unsafe fn puts(arg_arg1: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn puts(arg_arg1: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
-        }
-        puts(arg_arg1)
-    })
-}
-pub unsafe fn remove(arg_arg1: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn remove(arg_arg1: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
-        }
-        remove(arg_arg1)
+        remove(arg___filename)
     })
 }
 pub unsafe fn rename(
@@ -4250,74 +3332,30 @@ pub unsafe fn rename(
         rename(arg___old, arg___new)
     })
 }
-pub unsafe fn rewind(arg_arg1: *mut FILE) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn rewind(arg_arg1: *mut FILE);
-        }
-        rewind(arg_arg1)
-    })
-}
-pub unsafe fn scanf(arg_arg1: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn scanf(arg_arg1: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
-        }
-        scanf(arg_arg1)
-    })
-}
-pub unsafe fn setbuf(arg_arg1: *mut FILE, arg_arg2: *mut ::std::os::raw::c_char) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn setbuf(arg_arg1: *mut FILE, arg_arg2: *mut ::std::os::raw::c_char);
-        }
-        setbuf(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn setvbuf(
-    arg_arg1: *mut FILE,
-    arg_arg2: *mut ::std::os::raw::c_char,
-    arg_arg3: ::std::os::raw::c_int,
-    arg_arg4: usize,
+pub unsafe fn renameat(
+    arg___oldfd: ::std::os::raw::c_int,
+    arg___old: *const ::std::os::raw::c_char,
+    arg___newfd: ::std::os::raw::c_int,
+    arg___new: *const ::std::os::raw::c_char,
 ) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn setvbuf(
-                arg_arg1: *mut FILE,
-                arg_arg2: *mut ::std::os::raw::c_char,
-                arg_arg3: ::std::os::raw::c_int,
-                arg_arg4: usize,
+            fn renameat(
+                arg___oldfd: ::std::os::raw::c_int,
+                arg___old: *const ::std::os::raw::c_char,
+                arg___newfd: ::std::os::raw::c_int,
+                arg___new: *const ::std::os::raw::c_char,
             ) -> ::std::os::raw::c_int;
         }
-        setvbuf(arg_arg1, arg_arg2, arg_arg3, arg_arg4)
+        renameat(arg___oldfd, arg___old, arg___newfd, arg___new)
     })
 }
-pub unsafe fn sprintf(
-    arg_arg1: *mut ::std::os::raw::c_char,
-    arg_arg2: *const ::std::os::raw::c_char,
-) -> ::std::os::raw::c_int {
+pub unsafe fn fclose(arg___stream: *mut FILE) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn sprintf(
-                arg_arg1: *mut ::std::os::raw::c_char,
-                arg_arg2: *const ::std::os::raw::c_char,
-            ) -> ::std::os::raw::c_int;
+            fn fclose(arg___stream: *mut FILE) -> ::std::os::raw::c_int;
         }
-        sprintf(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn sscanf(
-    arg_arg1: *const ::std::os::raw::c_char,
-    arg_arg2: *const ::std::os::raw::c_char,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn sscanf(
-                arg_arg1: *const ::std::os::raw::c_char,
-                arg_arg2: *const ::std::os::raw::c_char,
-            ) -> ::std::os::raw::c_int;
-        }
-        sscanf(arg_arg1, arg_arg2)
+        fclose(arg___stream)
     })
 }
 pub unsafe fn tmpfile() -> *mut FILE {
@@ -4336,186 +3374,512 @@ pub unsafe fn tmpnam(arg_arg1: *mut ::std::os::raw::c_char) -> *mut ::std::os::r
         tmpnam(arg_arg1)
     })
 }
-pub unsafe fn ungetc(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: *mut FILE,
-) -> ::std::os::raw::c_int {
+pub unsafe fn tmpnam_r(arg___s: *mut ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn ungetc(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: *mut FILE,
-            ) -> ::std::os::raw::c_int;
+            fn tmpnam_r(arg___s: *mut ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
         }
-        ungetc(arg_arg1, arg_arg2)
+        tmpnam_r(arg___s)
     })
 }
-pub unsafe fn vfprintf(
-    arg_arg1: *mut FILE,
-    arg_arg2: *const ::std::os::raw::c_char,
-    arg_arg3: __builtin_va_list,
-) -> ::std::os::raw::c_int {
+pub unsafe fn tempnam(
+    arg___dir: *const ::std::os::raw::c_char,
+    arg___pfx: *const ::std::os::raw::c_char,
+) -> *mut ::std::os::raw::c_char {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn vfprintf(
-                arg_arg1: *mut FILE,
-                arg_arg2: *const ::std::os::raw::c_char,
-                arg_arg3: __builtin_va_list,
-            ) -> ::std::os::raw::c_int;
+            fn tempnam(
+                arg___dir: *const ::std::os::raw::c_char,
+                arg___pfx: *const ::std::os::raw::c_char,
+            ) -> *mut ::std::os::raw::c_char;
         }
-        vfprintf(arg_arg1, arg_arg2, arg_arg3)
+        tempnam(arg___dir, arg___pfx)
     })
 }
-pub unsafe fn vprintf(
-    arg_arg1: *const ::std::os::raw::c_char,
-    arg_arg2: __builtin_va_list,
-) -> ::std::os::raw::c_int {
+pub unsafe fn fflush(arg___stream: *mut FILE) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn vprintf(
-                arg_arg1: *const ::std::os::raw::c_char,
-                arg_arg2: __builtin_va_list,
-            ) -> ::std::os::raw::c_int;
+            fn fflush(arg___stream: *mut FILE) -> ::std::os::raw::c_int;
         }
-        vprintf(arg_arg1, arg_arg2)
+        fflush(arg___stream)
     })
 }
-pub unsafe fn vsprintf(
-    arg_arg1: *mut ::std::os::raw::c_char,
-    arg_arg2: *const ::std::os::raw::c_char,
-    arg_arg3: __builtin_va_list,
-) -> ::std::os::raw::c_int {
+pub unsafe fn fflush_unlocked(arg___stream: *mut FILE) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn vsprintf(
-                arg_arg1: *mut ::std::os::raw::c_char,
-                arg_arg2: *const ::std::os::raw::c_char,
-                arg_arg3: __builtin_va_list,
-            ) -> ::std::os::raw::c_int;
+            fn fflush_unlocked(arg___stream: *mut FILE) -> ::std::os::raw::c_int;
         }
-        vsprintf(arg_arg1, arg_arg2, arg_arg3)
+        fflush_unlocked(arg___stream)
     })
 }
-pub unsafe fn ctermid(arg_arg1: *mut ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char {
+pub unsafe fn fopen(
+    arg___filename: *const ::std::os::raw::c_char,
+    arg___modes: *const ::std::os::raw::c_char,
+) -> *mut FILE {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn ctermid(arg_arg1: *mut ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
+            fn fopen(
+                arg___filename: *const ::std::os::raw::c_char,
+                arg___modes: *const ::std::os::raw::c_char,
+            ) -> *mut FILE;
         }
-        ctermid(arg_arg1)
+        fopen(arg___filename, arg___modes)
+    })
+}
+pub unsafe fn freopen(
+    arg___filename: *const ::std::os::raw::c_char,
+    arg___modes: *const ::std::os::raw::c_char,
+    arg___stream: *mut FILE,
+) -> *mut FILE {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn freopen(
+                arg___filename: *const ::std::os::raw::c_char,
+                arg___modes: *const ::std::os::raw::c_char,
+                arg___stream: *mut FILE,
+            ) -> *mut FILE;
+        }
+        freopen(arg___filename, arg___modes, arg___stream)
     })
 }
 pub unsafe fn fdopen(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: *const ::std::os::raw::c_char,
+    arg___fd: ::std::os::raw::c_int,
+    arg___modes: *const ::std::os::raw::c_char,
 ) -> *mut FILE {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
             fn fdopen(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: *const ::std::os::raw::c_char,
+                arg___fd: ::std::os::raw::c_int,
+                arg___modes: *const ::std::os::raw::c_char,
             ) -> *mut FILE;
         }
-        fdopen(arg_arg1, arg_arg2)
+        fdopen(arg___fd, arg___modes)
     })
 }
-pub unsafe fn fileno(arg_arg1: *mut FILE) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn fileno(arg_arg1: *mut FILE) -> ::std::os::raw::c_int;
-        }
-        fileno(arg_arg1)
-    })
-}
-pub unsafe fn pclose(arg_arg1: *mut FILE) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn pclose(arg_arg1: *mut FILE) -> ::std::os::raw::c_int;
-        }
-        pclose(arg_arg1)
-    })
-}
-pub unsafe fn popen(
-    arg_arg1: *const ::std::os::raw::c_char,
-    arg_arg2: *const ::std::os::raw::c_char,
+pub unsafe fn fmemopen(
+    arg___s: *mut ::std::os::raw::c_void,
+    arg___len: usize,
+    arg___modes: *const ::std::os::raw::c_char,
 ) -> *mut FILE {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn popen(
-                arg_arg1: *const ::std::os::raw::c_char,
-                arg_arg2: *const ::std::os::raw::c_char,
+            fn fmemopen(
+                arg___s: *mut ::std::os::raw::c_void,
+                arg___len: usize,
+                arg___modes: *const ::std::os::raw::c_char,
             ) -> *mut FILE;
         }
-        popen(arg_arg1, arg_arg2)
+        fmemopen(arg___s, arg___len, arg___modes)
     })
 }
-pub unsafe fn __srget(arg_arg1: *mut FILE) -> ::std::os::raw::c_int {
+pub unsafe fn open_memstream(
+    arg___bufloc: *mut *mut ::std::os::raw::c_char,
+    arg___sizeloc: *mut usize,
+) -> *mut FILE {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn __srget(arg_arg1: *mut FILE) -> ::std::os::raw::c_int;
+            fn open_memstream(
+                arg___bufloc: *mut *mut ::std::os::raw::c_char,
+                arg___sizeloc: *mut usize,
+            ) -> *mut FILE;
         }
-        __srget(arg_arg1)
+        open_memstream(arg___bufloc, arg___sizeloc)
     })
 }
-pub unsafe fn __svfscanf(
-    arg_arg1: *mut FILE,
-    arg_arg2: *const ::std::os::raw::c_char,
-    arg_arg3: va_list,
+pub unsafe fn setbuf(arg___stream: *mut FILE, arg___buf: *mut ::std::os::raw::c_char) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn setbuf(arg___stream: *mut FILE, arg___buf: *mut ::std::os::raw::c_char);
+        }
+        setbuf(arg___stream, arg___buf)
+    })
+}
+pub unsafe fn setvbuf(
+    arg___stream: *mut FILE,
+    arg___buf: *mut ::std::os::raw::c_char,
+    arg___modes: ::std::os::raw::c_int,
+    arg___n: usize,
 ) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn __svfscanf(
-                arg_arg1: *mut FILE,
-                arg_arg2: *const ::std::os::raw::c_char,
-                arg_arg3: va_list,
+            fn setvbuf(
+                arg___stream: *mut FILE,
+                arg___buf: *mut ::std::os::raw::c_char,
+                arg___modes: ::std::os::raw::c_int,
+                arg___n: usize,
             ) -> ::std::os::raw::c_int;
         }
-        __svfscanf(arg_arg1, arg_arg2, arg_arg3)
+        setvbuf(arg___stream, arg___buf, arg___modes, arg___n)
     })
 }
-pub unsafe fn __swbuf(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: *mut FILE,
+pub unsafe fn setbuffer(
+    arg___stream: *mut FILE,
+    arg___buf: *mut ::std::os::raw::c_char,
+    arg___size: usize,
+) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn setbuffer(
+                arg___stream: *mut FILE,
+                arg___buf: *mut ::std::os::raw::c_char,
+                arg___size: usize,
+            );
+        }
+        setbuffer(arg___stream, arg___buf, arg___size)
+    })
+}
+pub unsafe fn setlinebuf(arg___stream: *mut FILE) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn setlinebuf(arg___stream: *mut FILE);
+        }
+        setlinebuf(arg___stream)
+    })
+}
+pub unsafe fn fprintf(
+    arg___stream: *mut FILE,
+    arg___format: *const ::std::os::raw::c_char,
 ) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn __swbuf(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: *mut FILE,
+            fn fprintf(
+                arg___stream: *mut FILE,
+                arg___format: *const ::std::os::raw::c_char,
             ) -> ::std::os::raw::c_int;
         }
-        __swbuf(arg_arg1, arg_arg2)
+        fprintf(arg___stream, arg___format)
     })
 }
-pub unsafe fn flockfile(arg_arg1: *mut FILE) {
+pub unsafe fn printf(arg___format: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn flockfile(arg_arg1: *mut FILE);
+            fn printf(arg___format: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
         }
-        flockfile(arg_arg1)
+        printf(arg___format)
     })
 }
-pub unsafe fn ftrylockfile(arg_arg1: *mut FILE) -> ::std::os::raw::c_int {
+pub unsafe fn sprintf(
+    arg___s: *mut ::std::os::raw::c_char,
+    arg___format: *const ::std::os::raw::c_char,
+) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn ftrylockfile(arg_arg1: *mut FILE) -> ::std::os::raw::c_int;
+            fn sprintf(
+                arg___s: *mut ::std::os::raw::c_char,
+                arg___format: *const ::std::os::raw::c_char,
+            ) -> ::std::os::raw::c_int;
         }
-        ftrylockfile(arg_arg1)
+        sprintf(arg___s, arg___format)
     })
 }
-pub unsafe fn funlockfile(arg_arg1: *mut FILE) {
+pub unsafe fn vfprintf(
+    arg___s: *mut FILE,
+    arg___format: *const ::std::os::raw::c_char,
+    arg___arg: *mut __va_list_tag,
+) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn funlockfile(arg_arg1: *mut FILE);
+            fn vfprintf(
+                arg___s: *mut FILE,
+                arg___format: *const ::std::os::raw::c_char,
+                arg___arg: *mut __va_list_tag,
+            ) -> ::std::os::raw::c_int;
         }
-        funlockfile(arg_arg1)
+        vfprintf(arg___s, arg___format, arg___arg)
     })
 }
-pub unsafe fn getc_unlocked(arg_arg1: *mut FILE) -> ::std::os::raw::c_int {
+pub unsafe fn vprintf(
+    arg___format: *const ::std::os::raw::c_char,
+    arg___arg: *mut __va_list_tag,
+) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn getc_unlocked(arg_arg1: *mut FILE) -> ::std::os::raw::c_int;
+            fn vprintf(
+                arg___format: *const ::std::os::raw::c_char,
+                arg___arg: *mut __va_list_tag,
+            ) -> ::std::os::raw::c_int;
         }
-        getc_unlocked(arg_arg1)
+        vprintf(arg___format, arg___arg)
+    })
+}
+pub unsafe fn vsprintf(
+    arg___s: *mut ::std::os::raw::c_char,
+    arg___format: *const ::std::os::raw::c_char,
+    arg___arg: *mut __va_list_tag,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn vsprintf(
+                arg___s: *mut ::std::os::raw::c_char,
+                arg___format: *const ::std::os::raw::c_char,
+                arg___arg: *mut __va_list_tag,
+            ) -> ::std::os::raw::c_int;
+        }
+        vsprintf(arg___s, arg___format, arg___arg)
+    })
+}
+pub unsafe fn snprintf(
+    arg___s: *mut ::std::os::raw::c_char,
+    arg___maxlen: ::std::os::raw::c_ulong,
+    arg___format: *const ::std::os::raw::c_char,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn snprintf(
+                arg___s: *mut ::std::os::raw::c_char,
+                arg___maxlen: ::std::os::raw::c_ulong,
+                arg___format: *const ::std::os::raw::c_char,
+            ) -> ::std::os::raw::c_int;
+        }
+        snprintf(arg___s, arg___maxlen, arg___format)
+    })
+}
+pub unsafe fn vsnprintf(
+    arg___s: *mut ::std::os::raw::c_char,
+    arg___maxlen: ::std::os::raw::c_ulong,
+    arg___format: *const ::std::os::raw::c_char,
+    arg___arg: *mut __va_list_tag,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn vsnprintf(
+                arg___s: *mut ::std::os::raw::c_char,
+                arg___maxlen: ::std::os::raw::c_ulong,
+                arg___format: *const ::std::os::raw::c_char,
+                arg___arg: *mut __va_list_tag,
+            ) -> ::std::os::raw::c_int;
+        }
+        vsnprintf(arg___s, arg___maxlen, arg___format, arg___arg)
+    })
+}
+pub unsafe fn vdprintf(
+    arg___fd: ::std::os::raw::c_int,
+    arg___fmt: *const ::std::os::raw::c_char,
+    arg___arg: *mut __va_list_tag,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn vdprintf(
+                arg___fd: ::std::os::raw::c_int,
+                arg___fmt: *const ::std::os::raw::c_char,
+                arg___arg: *mut __va_list_tag,
+            ) -> ::std::os::raw::c_int;
+        }
+        vdprintf(arg___fd, arg___fmt, arg___arg)
+    })
+}
+pub unsafe fn dprintf(
+    arg___fd: ::std::os::raw::c_int,
+    arg___fmt: *const ::std::os::raw::c_char,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn dprintf(
+                arg___fd: ::std::os::raw::c_int,
+                arg___fmt: *const ::std::os::raw::c_char,
+            ) -> ::std::os::raw::c_int;
+        }
+        dprintf(arg___fd, arg___fmt)
+    })
+}
+pub unsafe fn fscanf(
+    arg___stream: *mut FILE,
+    arg___format: *const ::std::os::raw::c_char,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn fscanf(
+                arg___stream: *mut FILE,
+                arg___format: *const ::std::os::raw::c_char,
+            ) -> ::std::os::raw::c_int;
+        }
+        fscanf(arg___stream, arg___format)
+    })
+}
+pub unsafe fn scanf(arg___format: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn scanf(arg___format: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
+        }
+        scanf(arg___format)
+    })
+}
+pub unsafe fn sscanf(
+    arg___s: *const ::std::os::raw::c_char,
+    arg___format: *const ::std::os::raw::c_char,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn sscanf(
+                arg___s: *const ::std::os::raw::c_char,
+                arg___format: *const ::std::os::raw::c_char,
+            ) -> ::std::os::raw::c_int;
+        }
+        sscanf(arg___s, arg___format)
+    })
+}
+pub type _Float32 = f32;
+pub type _Float64 = f64;
+pub type _Float32x = f64;
+pub type _Float64x = u128;
+pub unsafe fn fscanf1(
+    arg___stream: *mut FILE,
+    arg___format: *const ::std::os::raw::c_char,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn fscanf1(
+                arg___stream: *mut FILE,
+                arg___format: *const ::std::os::raw::c_char,
+            ) -> ::std::os::raw::c_int;
+        }
+        fscanf1(arg___stream, arg___format)
+    })
+}
+pub unsafe fn scanf1(arg___format: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn scanf1(arg___format: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
+        }
+        scanf1(arg___format)
+    })
+}
+pub unsafe fn sscanf1(
+    arg___s: *const ::std::os::raw::c_char,
+    arg___format: *const ::std::os::raw::c_char,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn sscanf1(
+                arg___s: *const ::std::os::raw::c_char,
+                arg___format: *const ::std::os::raw::c_char,
+            ) -> ::std::os::raw::c_int;
+        }
+        sscanf1(arg___s, arg___format)
+    })
+}
+pub unsafe fn vfscanf(
+    arg___s: *mut FILE,
+    arg___format: *const ::std::os::raw::c_char,
+    arg___arg: *mut __va_list_tag,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn vfscanf(
+                arg___s: *mut FILE,
+                arg___format: *const ::std::os::raw::c_char,
+                arg___arg: *mut __va_list_tag,
+            ) -> ::std::os::raw::c_int;
+        }
+        vfscanf(arg___s, arg___format, arg___arg)
+    })
+}
+pub unsafe fn vscanf(
+    arg___format: *const ::std::os::raw::c_char,
+    arg___arg: *mut __va_list_tag,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn vscanf(
+                arg___format: *const ::std::os::raw::c_char,
+                arg___arg: *mut __va_list_tag,
+            ) -> ::std::os::raw::c_int;
+        }
+        vscanf(arg___format, arg___arg)
+    })
+}
+pub unsafe fn vsscanf(
+    arg___s: *const ::std::os::raw::c_char,
+    arg___format: *const ::std::os::raw::c_char,
+    arg___arg: *mut __va_list_tag,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn vsscanf(
+                arg___s: *const ::std::os::raw::c_char,
+                arg___format: *const ::std::os::raw::c_char,
+                arg___arg: *mut __va_list_tag,
+            ) -> ::std::os::raw::c_int;
+        }
+        vsscanf(arg___s, arg___format, arg___arg)
+    })
+}
+pub unsafe fn vfscanf1(
+    arg___s: *mut FILE,
+    arg___format: *const ::std::os::raw::c_char,
+    arg___arg: *mut __va_list_tag,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn vfscanf1(
+                arg___s: *mut FILE,
+                arg___format: *const ::std::os::raw::c_char,
+                arg___arg: *mut __va_list_tag,
+            ) -> ::std::os::raw::c_int;
+        }
+        vfscanf1(arg___s, arg___format, arg___arg)
+    })
+}
+pub unsafe fn vscanf1(
+    arg___format: *const ::std::os::raw::c_char,
+    arg___arg: *mut __va_list_tag,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn vscanf1(
+                arg___format: *const ::std::os::raw::c_char,
+                arg___arg: *mut __va_list_tag,
+            ) -> ::std::os::raw::c_int;
+        }
+        vscanf1(arg___format, arg___arg)
+    })
+}
+pub unsafe fn vsscanf1(
+    arg___s: *const ::std::os::raw::c_char,
+    arg___format: *const ::std::os::raw::c_char,
+    arg___arg: *mut __va_list_tag,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn vsscanf1(
+                arg___s: *const ::std::os::raw::c_char,
+                arg___format: *const ::std::os::raw::c_char,
+                arg___arg: *mut __va_list_tag,
+            ) -> ::std::os::raw::c_int;
+        }
+        vsscanf1(arg___s, arg___format, arg___arg)
+    })
+}
+pub unsafe fn fgetc(arg___stream: *mut FILE) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn fgetc(arg___stream: *mut FILE) -> ::std::os::raw::c_int;
+        }
+        fgetc(arg___stream)
+    })
+}
+pub unsafe fn getc(arg___stream: *mut FILE) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn getc(arg___stream: *mut FILE) -> ::std::os::raw::c_int;
+        }
+        getc(arg___stream)
+    })
+}
+pub unsafe fn getchar() -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn getchar() -> ::std::os::raw::c_int;
+        }
+        getchar()
+    })
+}
+pub unsafe fn getc_unlocked(arg___stream: *mut FILE) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn getc_unlocked(arg___stream: *mut FILE) -> ::std::os::raw::c_int;
+        }
+        getc_unlocked(arg___stream)
     })
 }
 pub unsafe fn getchar_unlocked() -> ::std::os::raw::c_int {
@@ -4526,1429 +3890,505 @@ pub unsafe fn getchar_unlocked() -> ::std::os::raw::c_int {
         getchar_unlocked()
     })
 }
+pub unsafe fn fgetc_unlocked(arg___stream: *mut FILE) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn fgetc_unlocked(arg___stream: *mut FILE) -> ::std::os::raw::c_int;
+        }
+        fgetc_unlocked(arg___stream)
+    })
+}
+pub unsafe fn fputc(
+    arg___c: ::std::os::raw::c_int,
+    arg___stream: *mut FILE,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn fputc(
+                arg___c: ::std::os::raw::c_int,
+                arg___stream: *mut FILE,
+            ) -> ::std::os::raw::c_int;
+        }
+        fputc(arg___c, arg___stream)
+    })
+}
+pub unsafe fn putc(
+    arg___c: ::std::os::raw::c_int,
+    arg___stream: *mut FILE,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn putc(
+                arg___c: ::std::os::raw::c_int,
+                arg___stream: *mut FILE,
+            ) -> ::std::os::raw::c_int;
+        }
+        putc(arg___c, arg___stream)
+    })
+}
+pub unsafe fn putchar(arg___c: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn putchar(arg___c: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+        }
+        putchar(arg___c)
+    })
+}
+pub unsafe fn fputc_unlocked(
+    arg___c: ::std::os::raw::c_int,
+    arg___stream: *mut FILE,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn fputc_unlocked(
+                arg___c: ::std::os::raw::c_int,
+                arg___stream: *mut FILE,
+            ) -> ::std::os::raw::c_int;
+        }
+        fputc_unlocked(arg___c, arg___stream)
+    })
+}
 pub unsafe fn putc_unlocked(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: *mut FILE,
+    arg___c: ::std::os::raw::c_int,
+    arg___stream: *mut FILE,
 ) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
             fn putc_unlocked(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: *mut FILE,
+                arg___c: ::std::os::raw::c_int,
+                arg___stream: *mut FILE,
             ) -> ::std::os::raw::c_int;
         }
-        putc_unlocked(arg_arg1, arg_arg2)
+        putc_unlocked(arg___c, arg___stream)
     })
 }
-pub unsafe fn putchar_unlocked(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
+pub unsafe fn putchar_unlocked(arg___c: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn putchar_unlocked(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+            fn putchar_unlocked(arg___c: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
         }
-        putchar_unlocked(arg_arg1)
+        putchar_unlocked(arg___c)
     })
 }
-pub unsafe fn getw(arg_arg1: *mut FILE) -> ::std::os::raw::c_int {
+pub unsafe fn getw(arg___stream: *mut FILE) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn getw(arg_arg1: *mut FILE) -> ::std::os::raw::c_int;
+            fn getw(arg___stream: *mut FILE) -> ::std::os::raw::c_int;
         }
-        getw(arg_arg1)
+        getw(arg___stream)
     })
 }
-pub unsafe fn putw(arg_arg1: ::std::os::raw::c_int, arg_arg2: *mut FILE) -> ::std::os::raw::c_int {
+pub unsafe fn putw(
+    arg___w: ::std::os::raw::c_int,
+    arg___stream: *mut FILE,
+) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn putw(arg_arg1: ::std::os::raw::c_int, arg_arg2: *mut FILE) -> ::std::os::raw::c_int;
+            fn putw(
+                arg___w: ::std::os::raw::c_int,
+                arg___stream: *mut FILE,
+            ) -> ::std::os::raw::c_int;
         }
-        putw(arg_arg1, arg_arg2)
+        putw(arg___w, arg___stream)
     })
 }
-pub unsafe fn tempnam(
-    arg___dir: *const ::std::os::raw::c_char,
-    arg___prefix: *const ::std::os::raw::c_char,
+pub unsafe fn fgets(
+    arg___s: *mut ::std::os::raw::c_char,
+    arg___n: ::std::os::raw::c_int,
+    arg___stream: *mut FILE,
 ) -> *mut ::std::os::raw::c_char {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn tempnam(
-                arg___dir: *const ::std::os::raw::c_char,
-                arg___prefix: *const ::std::os::raw::c_char,
+            fn fgets(
+                arg___s: *mut ::std::os::raw::c_char,
+                arg___n: ::std::os::raw::c_int,
+                arg___stream: *mut FILE,
             ) -> *mut ::std::os::raw::c_char;
         }
-        tempnam(arg___dir, arg___prefix)
+        fgets(arg___s, arg___n, arg___stream)
     })
 }
-pub type off_t = __darwin_off_t;
+pub unsafe fn __getdelim(
+    arg___lineptr: *mut *mut ::std::os::raw::c_char,
+    arg___n: *mut usize,
+    arg___delimiter: ::std::os::raw::c_int,
+    arg___stream: *mut FILE,
+) -> __ssize_t {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __getdelim(
+                arg___lineptr: *mut *mut ::std::os::raw::c_char,
+                arg___n: *mut usize,
+                arg___delimiter: ::std::os::raw::c_int,
+                arg___stream: *mut FILE,
+            ) -> __ssize_t;
+        }
+        __getdelim(arg___lineptr, arg___n, arg___delimiter, arg___stream)
+    })
+}
+pub unsafe fn getdelim(
+    arg___lineptr: *mut *mut ::std::os::raw::c_char,
+    arg___n: *mut usize,
+    arg___delimiter: ::std::os::raw::c_int,
+    arg___stream: *mut FILE,
+) -> __ssize_t {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn getdelim(
+                arg___lineptr: *mut *mut ::std::os::raw::c_char,
+                arg___n: *mut usize,
+                arg___delimiter: ::std::os::raw::c_int,
+                arg___stream: *mut FILE,
+            ) -> __ssize_t;
+        }
+        getdelim(arg___lineptr, arg___n, arg___delimiter, arg___stream)
+    })
+}
+pub unsafe fn getline(
+    arg___lineptr: *mut *mut ::std::os::raw::c_char,
+    arg___n: *mut usize,
+    arg___stream: *mut FILE,
+) -> __ssize_t {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn getline(
+                arg___lineptr: *mut *mut ::std::os::raw::c_char,
+                arg___n: *mut usize,
+                arg___stream: *mut FILE,
+            ) -> __ssize_t;
+        }
+        getline(arg___lineptr, arg___n, arg___stream)
+    })
+}
+pub unsafe fn fputs(
+    arg___s: *const ::std::os::raw::c_char,
+    arg___stream: *mut FILE,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn fputs(
+                arg___s: *const ::std::os::raw::c_char,
+                arg___stream: *mut FILE,
+            ) -> ::std::os::raw::c_int;
+        }
+        fputs(arg___s, arg___stream)
+    })
+}
+pub unsafe fn puts(arg___s: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn puts(arg___s: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
+        }
+        puts(arg___s)
+    })
+}
+pub unsafe fn ungetc(
+    arg___c: ::std::os::raw::c_int,
+    arg___stream: *mut FILE,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn ungetc(
+                arg___c: ::std::os::raw::c_int,
+                arg___stream: *mut FILE,
+            ) -> ::std::os::raw::c_int;
+        }
+        ungetc(arg___c, arg___stream)
+    })
+}
+pub unsafe fn fread(
+    arg___ptr: *mut ::std::os::raw::c_void,
+    arg___size: ::std::os::raw::c_ulong,
+    arg___n: ::std::os::raw::c_ulong,
+    arg___stream: *mut FILE,
+) -> ::std::os::raw::c_ulong {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn fread(
+                arg___ptr: *mut ::std::os::raw::c_void,
+                arg___size: ::std::os::raw::c_ulong,
+                arg___n: ::std::os::raw::c_ulong,
+                arg___stream: *mut FILE,
+            ) -> ::std::os::raw::c_ulong;
+        }
+        fread(arg___ptr, arg___size, arg___n, arg___stream)
+    })
+}
+pub unsafe fn fwrite(
+    arg___ptr: *const ::std::os::raw::c_void,
+    arg___size: ::std::os::raw::c_ulong,
+    arg___n: ::std::os::raw::c_ulong,
+    arg___s: *mut FILE,
+) -> ::std::os::raw::c_ulong {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn fwrite(
+                arg___ptr: *const ::std::os::raw::c_void,
+                arg___size: ::std::os::raw::c_ulong,
+                arg___n: ::std::os::raw::c_ulong,
+                arg___s: *mut FILE,
+            ) -> ::std::os::raw::c_ulong;
+        }
+        fwrite(arg___ptr, arg___size, arg___n, arg___s)
+    })
+}
+pub unsafe fn fread_unlocked(
+    arg___ptr: *mut ::std::os::raw::c_void,
+    arg___size: usize,
+    arg___n: usize,
+    arg___stream: *mut FILE,
+) -> usize {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn fread_unlocked(
+                arg___ptr: *mut ::std::os::raw::c_void,
+                arg___size: usize,
+                arg___n: usize,
+                arg___stream: *mut FILE,
+            ) -> usize;
+        }
+        fread_unlocked(arg___ptr, arg___size, arg___n, arg___stream)
+    })
+}
+pub unsafe fn fwrite_unlocked(
+    arg___ptr: *const ::std::os::raw::c_void,
+    arg___size: usize,
+    arg___n: usize,
+    arg___stream: *mut FILE,
+) -> usize {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn fwrite_unlocked(
+                arg___ptr: *const ::std::os::raw::c_void,
+                arg___size: usize,
+                arg___n: usize,
+                arg___stream: *mut FILE,
+            ) -> usize;
+        }
+        fwrite_unlocked(arg___ptr, arg___size, arg___n, arg___stream)
+    })
+}
+pub unsafe fn fseek(
+    arg___stream: *mut FILE,
+    arg___off: ::std::os::raw::c_long,
+    arg___whence: ::std::os::raw::c_int,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn fseek(
+                arg___stream: *mut FILE,
+                arg___off: ::std::os::raw::c_long,
+                arg___whence: ::std::os::raw::c_int,
+            ) -> ::std::os::raw::c_int;
+        }
+        fseek(arg___stream, arg___off, arg___whence)
+    })
+}
+pub unsafe fn ftell(arg___stream: *mut FILE) -> ::std::os::raw::c_long {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn ftell(arg___stream: *mut FILE) -> ::std::os::raw::c_long;
+        }
+        ftell(arg___stream)
+    })
+}
+pub unsafe fn rewind(arg___stream: *mut FILE) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn rewind(arg___stream: *mut FILE);
+        }
+        rewind(arg___stream)
+    })
+}
 pub unsafe fn fseeko(
     arg___stream: *mut FILE,
-    arg___offset: off_t,
+    arg___off: __off_t,
     arg___whence: ::std::os::raw::c_int,
 ) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
             fn fseeko(
                 arg___stream: *mut FILE,
-                arg___offset: off_t,
+                arg___off: __off_t,
                 arg___whence: ::std::os::raw::c_int,
             ) -> ::std::os::raw::c_int;
         }
-        fseeko(arg___stream, arg___offset, arg___whence)
+        fseeko(arg___stream, arg___off, arg___whence)
     })
 }
-pub unsafe fn ftello(arg___stream: *mut FILE) -> off_t {
+pub unsafe fn ftello(arg___stream: *mut FILE) -> __off_t {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn ftello(arg___stream: *mut FILE) -> off_t;
+            fn ftello(arg___stream: *mut FILE) -> __off_t;
         }
         ftello(arg___stream)
     })
 }
-pub unsafe fn snprintf(
-    arg___str: *mut ::std::os::raw::c_char,
-    arg___size: ::std::os::raw::c_ulong,
-    arg___format: *const ::std::os::raw::c_char,
-) -> ::std::os::raw::c_int {
+pub unsafe fn fgetpos(arg___stream: *mut FILE, arg___pos: *mut fpos_t) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn snprintf(
-                arg___str: *mut ::std::os::raw::c_char,
-                arg___size: ::std::os::raw::c_ulong,
-                arg___format: *const ::std::os::raw::c_char,
-            ) -> ::std::os::raw::c_int;
+            fn fgetpos(arg___stream: *mut FILE, arg___pos: *mut fpos_t) -> ::std::os::raw::c_int;
         }
-        snprintf(arg___str, arg___size, arg___format)
+        fgetpos(arg___stream, arg___pos)
     })
 }
-pub unsafe fn vfscanf(
-    arg___stream: *mut FILE,
-    arg___format: *const ::std::os::raw::c_char,
-    arg_arg1: __builtin_va_list,
-) -> ::std::os::raw::c_int {
+pub unsafe fn fsetpos(arg___stream: *mut FILE, arg___pos: *const fpos_t) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn vfscanf(
-                arg___stream: *mut FILE,
-                arg___format: *const ::std::os::raw::c_char,
-                arg_arg1: __builtin_va_list,
-            ) -> ::std::os::raw::c_int;
+            fn fsetpos(arg___stream: *mut FILE, arg___pos: *const fpos_t) -> ::std::os::raw::c_int;
         }
-        vfscanf(arg___stream, arg___format, arg_arg1)
+        fsetpos(arg___stream, arg___pos)
     })
 }
-pub unsafe fn vscanf(
-    arg___format: *const ::std::os::raw::c_char,
-    arg_arg1: __builtin_va_list,
-) -> ::std::os::raw::c_int {
+pub unsafe fn clearerr(arg___stream: *mut FILE) {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn vscanf(
-                arg___format: *const ::std::os::raw::c_char,
-                arg_arg1: __builtin_va_list,
-            ) -> ::std::os::raw::c_int;
+            fn clearerr(arg___stream: *mut FILE);
         }
-        vscanf(arg___format, arg_arg1)
+        clearerr(arg___stream)
     })
 }
-pub unsafe fn vsnprintf(
-    arg___str: *mut ::std::os::raw::c_char,
-    arg___size: ::std::os::raw::c_ulong,
-    arg___format: *const ::std::os::raw::c_char,
-    arg_arg1: __builtin_va_list,
-) -> ::std::os::raw::c_int {
+pub unsafe fn feof(arg___stream: *mut FILE) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn vsnprintf(
-                arg___str: *mut ::std::os::raw::c_char,
-                arg___size: ::std::os::raw::c_ulong,
-                arg___format: *const ::std::os::raw::c_char,
-                arg_arg1: __builtin_va_list,
-            ) -> ::std::os::raw::c_int;
+            fn feof(arg___stream: *mut FILE) -> ::std::os::raw::c_int;
         }
-        vsnprintf(arg___str, arg___size, arg___format, arg_arg1)
+        feof(arg___stream)
     })
 }
-pub unsafe fn vsscanf(
-    arg___str: *const ::std::os::raw::c_char,
-    arg___format: *const ::std::os::raw::c_char,
-    arg_arg1: __builtin_va_list,
-) -> ::std::os::raw::c_int {
+pub unsafe fn ferror(arg___stream: *mut FILE) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn vsscanf(
-                arg___str: *const ::std::os::raw::c_char,
-                arg___format: *const ::std::os::raw::c_char,
-                arg_arg1: __builtin_va_list,
-            ) -> ::std::os::raw::c_int;
+            fn ferror(arg___stream: *mut FILE) -> ::std::os::raw::c_int;
         }
-        vsscanf(arg___str, arg___format, arg_arg1)
+        ferror(arg___stream)
     })
 }
-pub unsafe fn dprintf(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: *const ::std::os::raw::c_char,
-) -> ::std::os::raw::c_int {
+pub unsafe fn clearerr_unlocked(arg___stream: *mut FILE) {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn dprintf(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: *const ::std::os::raw::c_char,
-            ) -> ::std::os::raw::c_int;
+            fn clearerr_unlocked(arg___stream: *mut FILE);
         }
-        dprintf(arg_arg1, arg_arg2)
+        clearerr_unlocked(arg___stream)
     })
 }
-pub unsafe fn vdprintf(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: *const ::std::os::raw::c_char,
-    arg_arg3: va_list,
-) -> ::std::os::raw::c_int {
+pub unsafe fn feof_unlocked(arg___stream: *mut FILE) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn vdprintf(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: *const ::std::os::raw::c_char,
-                arg_arg3: va_list,
-            ) -> ::std::os::raw::c_int;
+            fn feof_unlocked(arg___stream: *mut FILE) -> ::std::os::raw::c_int;
         }
-        vdprintf(arg_arg1, arg_arg2, arg_arg3)
+        feof_unlocked(arg___stream)
     })
 }
-pub unsafe fn getdelim(
-    arg___linep: *mut *mut ::std::os::raw::c_char,
-    arg___linecapp: *mut usize,
-    arg___delimiter: ::std::os::raw::c_int,
-    arg___stream: *mut FILE,
-) -> isize {
+pub unsafe fn ferror_unlocked(arg___stream: *mut FILE) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn getdelim(
-                arg___linep: *mut *mut ::std::os::raw::c_char,
-                arg___linecapp: *mut usize,
-                arg___delimiter: ::std::os::raw::c_int,
-                arg___stream: *mut FILE,
-            ) -> isize;
+            fn ferror_unlocked(arg___stream: *mut FILE) -> ::std::os::raw::c_int;
         }
-        getdelim(arg___linep, arg___linecapp, arg___delimiter, arg___stream)
+        ferror_unlocked(arg___stream)
     })
 }
-pub unsafe fn getline(
-    arg___linep: *mut *mut ::std::os::raw::c_char,
-    arg___linecapp: *mut usize,
-    arg___stream: *mut FILE,
-) -> isize {
+pub unsafe fn perror(arg___s: *const ::std::os::raw::c_char) {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn getline(
-                arg___linep: *mut *mut ::std::os::raw::c_char,
-                arg___linecapp: *mut usize,
-                arg___stream: *mut FILE,
-            ) -> isize;
+            fn perror(arg___s: *const ::std::os::raw::c_char);
         }
-        getline(arg___linep, arg___linecapp, arg___stream)
+        perror(arg___s)
     })
 }
-pub unsafe fn fmemopen(
-    arg___buf: *mut ::std::os::raw::c_void,
-    arg___size: usize,
-    arg___mode: *const ::std::os::raw::c_char,
+pub unsafe fn fileno(arg___stream: *mut FILE) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn fileno(arg___stream: *mut FILE) -> ::std::os::raw::c_int;
+        }
+        fileno(arg___stream)
+    })
+}
+pub unsafe fn fileno_unlocked(arg___stream: *mut FILE) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn fileno_unlocked(arg___stream: *mut FILE) -> ::std::os::raw::c_int;
+        }
+        fileno_unlocked(arg___stream)
+    })
+}
+pub unsafe fn pclose(arg___stream: *mut FILE) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn pclose(arg___stream: *mut FILE) -> ::std::os::raw::c_int;
+        }
+        pclose(arg___stream)
+    })
+}
+pub unsafe fn popen(
+    arg___command: *const ::std::os::raw::c_char,
+    arg___modes: *const ::std::os::raw::c_char,
 ) -> *mut FILE {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn fmemopen(
-                arg___buf: *mut ::std::os::raw::c_void,
-                arg___size: usize,
-                arg___mode: *const ::std::os::raw::c_char,
+            fn popen(
+                arg___command: *const ::std::os::raw::c_char,
+                arg___modes: *const ::std::os::raw::c_char,
             ) -> *mut FILE;
         }
-        fmemopen(arg___buf, arg___size, arg___mode)
+        popen(arg___command, arg___modes)
     })
 }
-pub unsafe fn open_memstream(
-    arg___bufp: *mut *mut ::std::os::raw::c_char,
-    arg___sizep: *mut usize,
-) -> *mut FILE {
+pub unsafe fn ctermid(arg___s: *mut ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn open_memstream(
-                arg___bufp: *mut *mut ::std::os::raw::c_char,
-                arg___sizep: *mut usize,
-            ) -> *mut FILE;
+            fn ctermid(arg___s: *mut ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
         }
-        open_memstream(arg___bufp, arg___sizep)
+        ctermid(arg___s)
     })
 }
-extern "C" {
-    pub static sys_nerr: ::std::os::raw::c_int;
-}
-extern "C" {
-    pub static mut sys_errlist: [*const ::std::os::raw::c_char; 0usize];
-}
-pub unsafe fn asprintf(
-    arg_arg1: *mut *mut ::std::os::raw::c_char,
-    arg_arg2: *const ::std::os::raw::c_char,
-) -> ::std::os::raw::c_int {
+pub unsafe fn flockfile(arg___stream: *mut FILE) {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn asprintf(
-                arg_arg1: *mut *mut ::std::os::raw::c_char,
-                arg_arg2: *const ::std::os::raw::c_char,
-            ) -> ::std::os::raw::c_int;
+            fn flockfile(arg___stream: *mut FILE);
         }
-        asprintf(arg_arg1, arg_arg2)
+        flockfile(arg___stream)
     })
 }
-pub unsafe fn ctermid_r(arg_arg1: *mut ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char {
+pub unsafe fn ftrylockfile(arg___stream: *mut FILE) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn ctermid_r(arg_arg1: *mut ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
+            fn ftrylockfile(arg___stream: *mut FILE) -> ::std::os::raw::c_int;
         }
-        ctermid_r(arg_arg1)
+        ftrylockfile(arg___stream)
     })
 }
-pub unsafe fn fgetln(arg_arg1: *mut FILE, arg_arg2: *mut usize) -> *mut ::std::os::raw::c_char {
+pub unsafe fn funlockfile(arg___stream: *mut FILE) {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn fgetln(arg_arg1: *mut FILE, arg_arg2: *mut usize) -> *mut ::std::os::raw::c_char;
+            fn funlockfile(arg___stream: *mut FILE);
         }
-        fgetln(arg_arg1, arg_arg2)
+        funlockfile(arg___stream)
     })
 }
-pub unsafe fn fmtcheck(
-    arg_arg1: *const ::std::os::raw::c_char,
-    arg_arg2: *const ::std::os::raw::c_char,
-) -> *const ::std::os::raw::c_char {
+pub unsafe fn __uflow(arg_arg1: *mut FILE) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn fmtcheck(
-                arg_arg1: *const ::std::os::raw::c_char,
-                arg_arg2: *const ::std::os::raw::c_char,
-            ) -> *const ::std::os::raw::c_char;
+            fn __uflow(arg_arg1: *mut FILE) -> ::std::os::raw::c_int;
         }
-        fmtcheck(arg_arg1, arg_arg2)
+        __uflow(arg_arg1)
     })
 }
-pub unsafe fn fpurge(arg_arg1: *mut FILE) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn fpurge(arg_arg1: *mut FILE) -> ::std::os::raw::c_int;
-        }
-        fpurge(arg_arg1)
-    })
-}
-pub unsafe fn setbuffer(
+pub unsafe fn __overflow(
     arg_arg1: *mut FILE,
-    arg_arg2: *mut ::std::os::raw::c_char,
-    arg_arg3: ::std::os::raw::c_int,
-) {
+    arg_arg2: ::std::os::raw::c_int,
+) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn setbuffer(
+            fn __overflow(
                 arg_arg1: *mut FILE,
-                arg_arg2: *mut ::std::os::raw::c_char,
-                arg_arg3: ::std::os::raw::c_int,
-            );
-        }
-        setbuffer(arg_arg1, arg_arg2, arg_arg3)
-    })
-}
-pub unsafe fn setlinebuf(arg_arg1: *mut FILE) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn setlinebuf(arg_arg1: *mut FILE) -> ::std::os::raw::c_int;
-        }
-        setlinebuf(arg_arg1)
-    })
-}
-pub unsafe fn vasprintf(
-    arg_arg1: *mut *mut ::std::os::raw::c_char,
-    arg_arg2: *const ::std::os::raw::c_char,
-    arg_arg3: va_list,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn vasprintf(
-                arg_arg1: *mut *mut ::std::os::raw::c_char,
-                arg_arg2: *const ::std::os::raw::c_char,
-                arg_arg3: va_list,
-            ) -> ::std::os::raw::c_int;
-        }
-        vasprintf(arg_arg1, arg_arg2, arg_arg3)
-    })
-}
-pub unsafe fn funopen(
-    arg_arg1: *const ::std::os::raw::c_void,
-    arg_arg2: ::std::option::Option<
-        unsafe extern "C" fn(
-            arg1: *mut ::std::os::raw::c_void,
-            arg2: *mut ::std::os::raw::c_char,
-            arg3: ::std::os::raw::c_int,
-        ) -> ::std::os::raw::c_int,
-    >,
-    arg_arg3: ::std::option::Option<
-        unsafe extern "C" fn(
-            arg1: *mut ::std::os::raw::c_void,
-            arg2: *const ::std::os::raw::c_char,
-            arg3: ::std::os::raw::c_int,
-        ) -> ::std::os::raw::c_int,
-    >,
-    arg_arg4: ::std::option::Option<
-        unsafe extern "C" fn(
-            arg1: *mut ::std::os::raw::c_void,
-            arg2: fpos_t,
-            arg3: ::std::os::raw::c_int,
-        ) -> fpos_t,
-    >,
-    arg_arg5: ::std::option::Option<
-        unsafe extern "C" fn(arg1: *mut ::std::os::raw::c_void) -> ::std::os::raw::c_int,
-    >,
-) -> *mut FILE {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn funopen(
-                arg_arg1: *const ::std::os::raw::c_void,
-                arg_arg2: ::std::option::Option<
-                    unsafe extern "C" fn(
-                        arg1: *mut ::std::os::raw::c_void,
-                        arg2: *mut ::std::os::raw::c_char,
-                        arg3: ::std::os::raw::c_int,
-                    ) -> ::std::os::raw::c_int,
-                >,
-                arg_arg3: ::std::option::Option<
-                    unsafe extern "C" fn(
-                        arg1: *mut ::std::os::raw::c_void,
-                        arg2: *const ::std::os::raw::c_char,
-                        arg3: ::std::os::raw::c_int,
-                    ) -> ::std::os::raw::c_int,
-                >,
-                arg_arg4: ::std::option::Option<
-                    unsafe extern "C" fn(
-                        arg1: *mut ::std::os::raw::c_void,
-                        arg2: fpos_t,
-                        arg3: ::std::os::raw::c_int,
-                    ) -> fpos_t,
-                >,
-                arg_arg5: ::std::option::Option<
-                    unsafe extern "C" fn(
-                        arg1: *mut ::std::os::raw::c_void,
-                    ) -> ::std::os::raw::c_int,
-                >,
-            ) -> *mut FILE;
-        }
-        funopen(arg_arg1, arg_arg2, arg_arg3, arg_arg4, arg_arg5)
-    })
-}
-pub unsafe fn __sprintf_chk(
-    arg_arg1: *mut ::std::os::raw::c_char,
-    arg_arg2: ::std::os::raw::c_int,
-    arg_arg3: usize,
-    arg_arg4: *const ::std::os::raw::c_char,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn __sprintf_chk(
-                arg_arg1: *mut ::std::os::raw::c_char,
-                arg_arg2: ::std::os::raw::c_int,
-                arg_arg3: usize,
-                arg_arg4: *const ::std::os::raw::c_char,
-            ) -> ::std::os::raw::c_int;
-        }
-        __sprintf_chk(arg_arg1, arg_arg2, arg_arg3, arg_arg4)
-    })
-}
-pub unsafe fn __snprintf_chk(
-    arg_arg1: *mut ::std::os::raw::c_char,
-    arg_arg2: usize,
-    arg_arg3: ::std::os::raw::c_int,
-    arg_arg4: usize,
-    arg_arg5: *const ::std::os::raw::c_char,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn __snprintf_chk(
-                arg_arg1: *mut ::std::os::raw::c_char,
-                arg_arg2: usize,
-                arg_arg3: ::std::os::raw::c_int,
-                arg_arg4: usize,
-                arg_arg5: *const ::std::os::raw::c_char,
-            ) -> ::std::os::raw::c_int;
-        }
-        __snprintf_chk(arg_arg1, arg_arg2, arg_arg3, arg_arg4, arg_arg5)
-    })
-}
-pub unsafe fn __vsprintf_chk(
-    arg_arg1: *mut ::std::os::raw::c_char,
-    arg_arg2: ::std::os::raw::c_int,
-    arg_arg3: usize,
-    arg_arg4: *const ::std::os::raw::c_char,
-    arg_arg5: va_list,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn __vsprintf_chk(
-                arg_arg1: *mut ::std::os::raw::c_char,
-                arg_arg2: ::std::os::raw::c_int,
-                arg_arg3: usize,
-                arg_arg4: *const ::std::os::raw::c_char,
-                arg_arg5: va_list,
-            ) -> ::std::os::raw::c_int;
-        }
-        __vsprintf_chk(arg_arg1, arg_arg2, arg_arg3, arg_arg4, arg_arg5)
-    })
-}
-pub unsafe fn __vsnprintf_chk(
-    arg_arg1: *mut ::std::os::raw::c_char,
-    arg_arg2: usize,
-    arg_arg3: ::std::os::raw::c_int,
-    arg_arg4: usize,
-    arg_arg5: *const ::std::os::raw::c_char,
-    arg_arg6: va_list,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn __vsnprintf_chk(
-                arg_arg1: *mut ::std::os::raw::c_char,
-                arg_arg2: usize,
-                arg_arg3: ::std::os::raw::c_int,
-                arg_arg4: usize,
-                arg_arg5: *const ::std::os::raw::c_char,
-                arg_arg6: va_list,
-            ) -> ::std::os::raw::c_int;
-        }
-        __vsnprintf_chk(arg_arg1, arg_arg2, arg_arg3, arg_arg4, arg_arg5, arg_arg6)
-    })
-}
-pub const idtype_t_P_ALL: idtype_t = 0;
-pub const idtype_t_P_PID: idtype_t = 1;
-pub const idtype_t_P_PGID: idtype_t = 2;
-pub type idtype_t = ::std::os::raw::c_uint;
-pub type pid_t = __darwin_pid_t;
-pub type id_t = __darwin_id_t;
-pub type sig_atomic_t = ::std::os::raw::c_int;
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct __darwin_arm_exception_state {
-    pub __exception: __uint32_t,
-    pub __fsr: __uint32_t,
-    pub __far: __uint32_t,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct __darwin_arm_exception_state64 {
-    pub __far: __uint64_t,
-    pub __esr: __uint32_t,
-    pub __exception: __uint32_t,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct __darwin_arm_thread_state {
-    pub __r: [__uint32_t; 13usize],
-    pub __sp: __uint32_t,
-    pub __lr: __uint32_t,
-    pub __pc: __uint32_t,
-    pub __cpsr: __uint32_t,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct __darwin_arm_thread_state64 {
-    pub __x: [__uint64_t; 29usize],
-    pub __fp: __uint64_t,
-    pub __lr: __uint64_t,
-    pub __sp: __uint64_t,
-    pub __pc: __uint64_t,
-    pub __cpsr: __uint32_t,
-    pub __pad: __uint32_t,
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct __darwin_arm_vfp_state {
-    pub __r: [__uint32_t; 64usize],
-    pub __fpscr: __uint32_t,
-}
-impl Default for __darwin_arm_vfp_state {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[repr(align(16))]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct __darwin_arm_neon_state64 {
-    pub __v: [__uint128_t; 32usize],
-    pub __fpsr: __uint32_t,
-    pub __fpcr: __uint32_t,
-}
-#[repr(C)]
-#[repr(align(16))]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct __darwin_arm_neon_state {
-    pub __v: [__uint128_t; 16usize],
-    pub __fpsr: __uint32_t,
-    pub __fpcr: __uint32_t,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct __arm_pagein_state {
-    pub __pagein_error: ::std::os::raw::c_int,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct __arm_legacy_debug_state {
-    pub __bvr: [__uint32_t; 16usize],
-    pub __bcr: [__uint32_t; 16usize],
-    pub __wvr: [__uint32_t; 16usize],
-    pub __wcr: [__uint32_t; 16usize],
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct __darwin_arm_debug_state32 {
-    pub __bvr: [__uint32_t; 16usize],
-    pub __bcr: [__uint32_t; 16usize],
-    pub __wvr: [__uint32_t; 16usize],
-    pub __wcr: [__uint32_t; 16usize],
-    pub __mdscr_el1: __uint64_t,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct __darwin_arm_debug_state64 {
-    pub __bvr: [__uint64_t; 16usize],
-    pub __bcr: [__uint64_t; 16usize],
-    pub __wvr: [__uint64_t; 16usize],
-    pub __wcr: [__uint64_t; 16usize],
-    pub __mdscr_el1: __uint64_t,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct __darwin_arm_cpmu_state64 {
-    pub __ctrs: [__uint64_t; 16usize],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct __darwin_mcontext32 {
-    pub __es: __darwin_arm_exception_state,
-    pub __ss: __darwin_arm_thread_state,
-    pub __fs: __darwin_arm_vfp_state,
-}
-impl Default for __darwin_mcontext32 {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[repr(align(16))]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct __darwin_mcontext64 {
-    pub __es: __darwin_arm_exception_state64,
-    pub __ss: __darwin_arm_thread_state64,
-    pub __ns: __darwin_arm_neon_state64,
-}
-pub type mcontext_t = *mut __darwin_mcontext64;
-pub type pthread_attr_t = __darwin_pthread_attr_t;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct __darwin_sigaltstack {
-    pub ss_sp: *mut ::std::os::raw::c_void,
-    pub ss_size: __darwin_size_t,
-    pub ss_flags: ::std::os::raw::c_int,
-}
-impl Default for __darwin_sigaltstack {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub type stack_t = __darwin_sigaltstack;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct __darwin_ucontext {
-    pub uc_onstack: ::std::os::raw::c_int,
-    pub uc_sigmask: __darwin_sigset_t,
-    pub uc_stack: __darwin_sigaltstack,
-    pub uc_link: *mut __darwin_ucontext,
-    pub uc_mcsize: __darwin_size_t,
-    pub uc_mcontext: *mut __darwin_mcontext64,
-}
-impl Default for __darwin_ucontext {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub type ucontext_t = __darwin_ucontext;
-pub type sigset_t = __darwin_sigset_t;
-pub type uid_t = __darwin_uid_t;
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub union sigval {
-    pub sival_int: ::std::os::raw::c_int,
-    pub sival_ptr: *mut ::std::os::raw::c_void,
-}
-impl Default for sigval {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub struct sigevent {
-    pub sigev_notify: ::std::os::raw::c_int,
-    pub sigev_signo: ::std::os::raw::c_int,
-    pub sigev_value: sigval,
-    pub sigev_notify_function: ::std::option::Option<unsafe extern "C" fn(arg1: sigval)>,
-    pub sigev_notify_attributes: *mut pthread_attr_t,
-}
-impl Default for sigevent {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub struct __siginfo {
-    pub si_signo: ::std::os::raw::c_int,
-    pub si_errno: ::std::os::raw::c_int,
-    pub si_code: ::std::os::raw::c_int,
-    pub si_pid: pid_t,
-    pub si_uid: uid_t,
-    pub si_status: ::std::os::raw::c_int,
-    pub si_addr: *mut ::std::os::raw::c_void,
-    pub si_value: sigval,
-    pub si_band: ::std::os::raw::c_long,
-    pub __pad: [::std::os::raw::c_ulong; 7usize],
-}
-impl Default for __siginfo {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub type siginfo_t = __siginfo;
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub union __sigaction_u {
-    pub __sa_handler: ::std::option::Option<unsafe extern "C" fn(arg1: ::std::os::raw::c_int)>,
-    pub __sa_sigaction: ::std::option::Option<
-        unsafe extern "C" fn(
-            arg1: ::std::os::raw::c_int,
-            arg2: *mut __siginfo,
-            arg3: *mut ::std::os::raw::c_void,
-        ),
-    >,
-}
-impl Default for __sigaction_u {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub struct __sigaction {
-    pub __sigaction_u: __sigaction_u,
-    pub sa_tramp: ::std::option::Option<
-        unsafe extern "C" fn(
-            arg1: *mut ::std::os::raw::c_void,
-            arg2: ::std::os::raw::c_int,
-            arg3: ::std::os::raw::c_int,
-            arg4: *mut siginfo_t,
-            arg5: *mut ::std::os::raw::c_void,
-        ),
-    >,
-    pub sa_mask: sigset_t,
-    pub sa_flags: ::std::os::raw::c_int,
-}
-impl Default for __sigaction {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub struct sigaction {
-    pub __sigaction_u: __sigaction_u,
-    pub sa_mask: sigset_t,
-    pub sa_flags: ::std::os::raw::c_int,
-}
-impl Default for sigaction {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub type sig_t = ::std::option::Option<unsafe extern "C" fn(arg1: ::std::os::raw::c_int)>;
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct sigvec {
-    pub sv_handler: ::std::option::Option<unsafe extern "C" fn(arg1: ::std::os::raw::c_int)>,
-    pub sv_mask: ::std::os::raw::c_int,
-    pub sv_flags: ::std::os::raw::c_int,
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct sigstack {
-    pub ss_sp: *mut ::std::os::raw::c_char,
-    pub ss_onstack: ::std::os::raw::c_int,
-}
-impl Default for sigstack {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub unsafe fn signal(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: ::std::option::Option<unsafe extern "C" fn(arg1: ::std::os::raw::c_int)>,
-) -> ::std::option::Option<
-    unsafe extern "C" fn(
-        arg1: ::std::os::raw::c_int,
-        arg2: ::std::option::Option<unsafe extern "C" fn(arg1: ::std::os::raw::c_int)>,
-    ),
-> {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn signal(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: ::std::option::Option<unsafe extern "C" fn(arg1: ::std::os::raw::c_int)>,
-            ) -> ::std::option::Option<
-                unsafe extern "C" fn(
-                    arg1: ::std::os::raw::c_int,
-                    arg2: ::std::option::Option<unsafe extern "C" fn(arg1: ::std::os::raw::c_int)>,
-                ),
-            >;
-        }
-        signal(arg_arg1, arg_arg2)
-    })
-}
-pub type int_least8_t = i8;
-pub type int_least16_t = i16;
-pub type int_least32_t = i32;
-pub type int_least64_t = i64;
-pub type uint_least8_t = u8;
-pub type uint_least16_t = u16;
-pub type uint_least32_t = u32;
-pub type uint_least64_t = u64;
-pub type int_fast8_t = i8;
-pub type int_fast16_t = i16;
-pub type int_fast32_t = i32;
-pub type int_fast64_t = i64;
-pub type uint_fast8_t = u8;
-pub type uint_fast16_t = u16;
-pub type uint_fast32_t = u32;
-pub type uint_fast64_t = u64;
-pub type intmax_t = ::std::os::raw::c_long;
-pub type uintmax_t = ::std::os::raw::c_ulong;
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct timeval {
-    pub tv_sec: __darwin_time_t,
-    pub tv_usec: __darwin_suseconds_t,
-}
-pub type rlim_t = __uint64_t;
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct rusage {
-    pub ru_utime: timeval,
-    pub ru_stime: timeval,
-    pub ru_maxrss: ::std::os::raw::c_long,
-    pub ru_ixrss: ::std::os::raw::c_long,
-    pub ru_idrss: ::std::os::raw::c_long,
-    pub ru_isrss: ::std::os::raw::c_long,
-    pub ru_minflt: ::std::os::raw::c_long,
-    pub ru_majflt: ::std::os::raw::c_long,
-    pub ru_nswap: ::std::os::raw::c_long,
-    pub ru_inblock: ::std::os::raw::c_long,
-    pub ru_oublock: ::std::os::raw::c_long,
-    pub ru_msgsnd: ::std::os::raw::c_long,
-    pub ru_msgrcv: ::std::os::raw::c_long,
-    pub ru_nsignals: ::std::os::raw::c_long,
-    pub ru_nvcsw: ::std::os::raw::c_long,
-    pub ru_nivcsw: ::std::os::raw::c_long,
-}
-pub type rusage_info_t = *mut ::std::os::raw::c_void;
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct rusage_info_v0 {
-    pub ri_uuid: [u8; 16usize],
-    pub ri_user_time: u64,
-    pub ri_system_time: u64,
-    pub ri_pkg_idle_wkups: u64,
-    pub ri_interrupt_wkups: u64,
-    pub ri_pageins: u64,
-    pub ri_wired_size: u64,
-    pub ri_resident_size: u64,
-    pub ri_phys_footprint: u64,
-    pub ri_proc_start_abstime: u64,
-    pub ri_proc_exit_abstime: u64,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct rusage_info_v1 {
-    pub ri_uuid: [u8; 16usize],
-    pub ri_user_time: u64,
-    pub ri_system_time: u64,
-    pub ri_pkg_idle_wkups: u64,
-    pub ri_interrupt_wkups: u64,
-    pub ri_pageins: u64,
-    pub ri_wired_size: u64,
-    pub ri_resident_size: u64,
-    pub ri_phys_footprint: u64,
-    pub ri_proc_start_abstime: u64,
-    pub ri_proc_exit_abstime: u64,
-    pub ri_child_user_time: u64,
-    pub ri_child_system_time: u64,
-    pub ri_child_pkg_idle_wkups: u64,
-    pub ri_child_interrupt_wkups: u64,
-    pub ri_child_pageins: u64,
-    pub ri_child_elapsed_abstime: u64,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct rusage_info_v2 {
-    pub ri_uuid: [u8; 16usize],
-    pub ri_user_time: u64,
-    pub ri_system_time: u64,
-    pub ri_pkg_idle_wkups: u64,
-    pub ri_interrupt_wkups: u64,
-    pub ri_pageins: u64,
-    pub ri_wired_size: u64,
-    pub ri_resident_size: u64,
-    pub ri_phys_footprint: u64,
-    pub ri_proc_start_abstime: u64,
-    pub ri_proc_exit_abstime: u64,
-    pub ri_child_user_time: u64,
-    pub ri_child_system_time: u64,
-    pub ri_child_pkg_idle_wkups: u64,
-    pub ri_child_interrupt_wkups: u64,
-    pub ri_child_pageins: u64,
-    pub ri_child_elapsed_abstime: u64,
-    pub ri_diskio_bytesread: u64,
-    pub ri_diskio_byteswritten: u64,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct rusage_info_v3 {
-    pub ri_uuid: [u8; 16usize],
-    pub ri_user_time: u64,
-    pub ri_system_time: u64,
-    pub ri_pkg_idle_wkups: u64,
-    pub ri_interrupt_wkups: u64,
-    pub ri_pageins: u64,
-    pub ri_wired_size: u64,
-    pub ri_resident_size: u64,
-    pub ri_phys_footprint: u64,
-    pub ri_proc_start_abstime: u64,
-    pub ri_proc_exit_abstime: u64,
-    pub ri_child_user_time: u64,
-    pub ri_child_system_time: u64,
-    pub ri_child_pkg_idle_wkups: u64,
-    pub ri_child_interrupt_wkups: u64,
-    pub ri_child_pageins: u64,
-    pub ri_child_elapsed_abstime: u64,
-    pub ri_diskio_bytesread: u64,
-    pub ri_diskio_byteswritten: u64,
-    pub ri_cpu_time_qos_default: u64,
-    pub ri_cpu_time_qos_maintenance: u64,
-    pub ri_cpu_time_qos_background: u64,
-    pub ri_cpu_time_qos_utility: u64,
-    pub ri_cpu_time_qos_legacy: u64,
-    pub ri_cpu_time_qos_user_initiated: u64,
-    pub ri_cpu_time_qos_user_interactive: u64,
-    pub ri_billed_system_time: u64,
-    pub ri_serviced_system_time: u64,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct rusage_info_v4 {
-    pub ri_uuid: [u8; 16usize],
-    pub ri_user_time: u64,
-    pub ri_system_time: u64,
-    pub ri_pkg_idle_wkups: u64,
-    pub ri_interrupt_wkups: u64,
-    pub ri_pageins: u64,
-    pub ri_wired_size: u64,
-    pub ri_resident_size: u64,
-    pub ri_phys_footprint: u64,
-    pub ri_proc_start_abstime: u64,
-    pub ri_proc_exit_abstime: u64,
-    pub ri_child_user_time: u64,
-    pub ri_child_system_time: u64,
-    pub ri_child_pkg_idle_wkups: u64,
-    pub ri_child_interrupt_wkups: u64,
-    pub ri_child_pageins: u64,
-    pub ri_child_elapsed_abstime: u64,
-    pub ri_diskio_bytesread: u64,
-    pub ri_diskio_byteswritten: u64,
-    pub ri_cpu_time_qos_default: u64,
-    pub ri_cpu_time_qos_maintenance: u64,
-    pub ri_cpu_time_qos_background: u64,
-    pub ri_cpu_time_qos_utility: u64,
-    pub ri_cpu_time_qos_legacy: u64,
-    pub ri_cpu_time_qos_user_initiated: u64,
-    pub ri_cpu_time_qos_user_interactive: u64,
-    pub ri_billed_system_time: u64,
-    pub ri_serviced_system_time: u64,
-    pub ri_logical_writes: u64,
-    pub ri_lifetime_max_phys_footprint: u64,
-    pub ri_instructions: u64,
-    pub ri_cycles: u64,
-    pub ri_billed_energy: u64,
-    pub ri_serviced_energy: u64,
-    pub ri_interval_max_phys_footprint: u64,
-    pub ri_runnable_time: u64,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct rusage_info_v5 {
-    pub ri_uuid: [u8; 16usize],
-    pub ri_user_time: u64,
-    pub ri_system_time: u64,
-    pub ri_pkg_idle_wkups: u64,
-    pub ri_interrupt_wkups: u64,
-    pub ri_pageins: u64,
-    pub ri_wired_size: u64,
-    pub ri_resident_size: u64,
-    pub ri_phys_footprint: u64,
-    pub ri_proc_start_abstime: u64,
-    pub ri_proc_exit_abstime: u64,
-    pub ri_child_user_time: u64,
-    pub ri_child_system_time: u64,
-    pub ri_child_pkg_idle_wkups: u64,
-    pub ri_child_interrupt_wkups: u64,
-    pub ri_child_pageins: u64,
-    pub ri_child_elapsed_abstime: u64,
-    pub ri_diskio_bytesread: u64,
-    pub ri_diskio_byteswritten: u64,
-    pub ri_cpu_time_qos_default: u64,
-    pub ri_cpu_time_qos_maintenance: u64,
-    pub ri_cpu_time_qos_background: u64,
-    pub ri_cpu_time_qos_utility: u64,
-    pub ri_cpu_time_qos_legacy: u64,
-    pub ri_cpu_time_qos_user_initiated: u64,
-    pub ri_cpu_time_qos_user_interactive: u64,
-    pub ri_billed_system_time: u64,
-    pub ri_serviced_system_time: u64,
-    pub ri_logical_writes: u64,
-    pub ri_lifetime_max_phys_footprint: u64,
-    pub ri_instructions: u64,
-    pub ri_cycles: u64,
-    pub ri_billed_energy: u64,
-    pub ri_serviced_energy: u64,
-    pub ri_interval_max_phys_footprint: u64,
-    pub ri_runnable_time: u64,
-    pub ri_flags: u64,
-}
-pub type rusage_info_current = rusage_info_v5;
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct rlimit {
-    pub rlim_cur: rlim_t,
-    pub rlim_max: rlim_t,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct proc_rlimit_control_wakeupmon {
-    pub wm_flags: u32,
-    pub wm_rate: i32,
-}
-pub unsafe fn getpriority(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: id_t,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn getpriority(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: id_t,
-            ) -> ::std::os::raw::c_int;
-        }
-        getpriority(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn getiopolicy_np(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: ::std::os::raw::c_int,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn getiopolicy_np(
-                arg_arg1: ::std::os::raw::c_int,
                 arg_arg2: ::std::os::raw::c_int,
             ) -> ::std::os::raw::c_int;
         }
-        getiopolicy_np(arg_arg1, arg_arg2)
+        __overflow(arg_arg1, arg_arg2)
     })
 }
-pub unsafe fn getrlimit(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: *mut rlimit,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn getrlimit(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: *mut rlimit,
-            ) -> ::std::os::raw::c_int;
-        }
-        getrlimit(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn getrusage(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: *mut rusage,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn getrusage(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: *mut rusage,
-            ) -> ::std::os::raw::c_int;
-        }
-        getrusage(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn setpriority(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: id_t,
-    arg_arg3: ::std::os::raw::c_int,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn setpriority(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: id_t,
-                arg_arg3: ::std::os::raw::c_int,
-            ) -> ::std::os::raw::c_int;
-        }
-        setpriority(arg_arg1, arg_arg2, arg_arg3)
-    })
-}
-pub unsafe fn setiopolicy_np(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: ::std::os::raw::c_int,
-    arg_arg3: ::std::os::raw::c_int,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn setiopolicy_np(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: ::std::os::raw::c_int,
-                arg_arg3: ::std::os::raw::c_int,
-            ) -> ::std::os::raw::c_int;
-        }
-        setiopolicy_np(arg_arg1, arg_arg2, arg_arg3)
-    })
-}
-pub unsafe fn setrlimit(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: *const rlimit,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn setrlimit(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: *const rlimit,
-            ) -> ::std::os::raw::c_int;
-        }
-        setrlimit(arg_arg1, arg_arg2)
-    })
-}
-#[repr(C, packed)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct _OSUnalignedU16 {
-    pub __val: u16,
-}
-#[repr(C, packed)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct _OSUnalignedU32 {
-    pub __val: u32,
-}
-#[repr(C, packed)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct _OSUnalignedU64 {
-    pub __val: u64,
-}
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub union wait {
-    pub w_status: ::std::os::raw::c_int,
-    pub w_T: wait__bindgen_ty_1,
-    pub w_S: wait__bindgen_ty_2,
-}
-#[repr(C)]
-#[repr(align(4))]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct wait__bindgen_ty_1 {
-    pub _bitfield_align_1: [u16; 0],
-    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 4usize]>,
-}
-impl wait__bindgen_ty_1 {
-    #[inline]
-    pub fn w_Termsig(&self) -> ::std::os::raw::c_uint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(0usize, 7u8) as u32) }
-    }
-    #[inline]
-    pub fn set_w_Termsig(&mut self, val: ::std::os::raw::c_uint) {
-        unsafe {
-            let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(0usize, 7u8, val as u64)
-        }
-    }
-    #[inline]
-    pub fn w_Coredump(&self) -> ::std::os::raw::c_uint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(7usize, 1u8) as u32) }
-    }
-    #[inline]
-    pub fn set_w_Coredump(&mut self, val: ::std::os::raw::c_uint) {
-        unsafe {
-            let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(7usize, 1u8, val as u64)
-        }
-    }
-    #[inline]
-    pub fn w_Retcode(&self) -> ::std::os::raw::c_uint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(8usize, 8u8) as u32) }
-    }
-    #[inline]
-    pub fn set_w_Retcode(&mut self, val: ::std::os::raw::c_uint) {
-        unsafe {
-            let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(8usize, 8u8, val as u64)
-        }
-    }
-    #[inline]
-    pub fn w_Filler(&self) -> ::std::os::raw::c_uint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(16usize, 16u8) as u32) }
-    }
-    #[inline]
-    pub fn set_w_Filler(&mut self, val: ::std::os::raw::c_uint) {
-        unsafe {
-            let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(16usize, 16u8, val as u64)
-        }
-    }
-    #[inline]
-    pub fn new_bitfield_1(
-        w_Termsig: ::std::os::raw::c_uint,
-        w_Coredump: ::std::os::raw::c_uint,
-        w_Retcode: ::std::os::raw::c_uint,
-        w_Filler: ::std::os::raw::c_uint,
-    ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
-        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
-        __bindgen_bitfield_unit.set(0usize, 7u8, {
-            let w_Termsig: u32 = unsafe { ::std::mem::transmute(w_Termsig) };
-            w_Termsig as u64
-        });
-        __bindgen_bitfield_unit.set(7usize, 1u8, {
-            let w_Coredump: u32 = unsafe { ::std::mem::transmute(w_Coredump) };
-            w_Coredump as u64
-        });
-        __bindgen_bitfield_unit.set(8usize, 8u8, {
-            let w_Retcode: u32 = unsafe { ::std::mem::transmute(w_Retcode) };
-            w_Retcode as u64
-        });
-        __bindgen_bitfield_unit.set(16usize, 16u8, {
-            let w_Filler: u32 = unsafe { ::std::mem::transmute(w_Filler) };
-            w_Filler as u64
-        });
-        __bindgen_bitfield_unit
-    }
-}
-#[repr(C)]
-#[repr(align(4))]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct wait__bindgen_ty_2 {
-    pub _bitfield_align_1: [u16; 0],
-    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 4usize]>,
-}
-impl wait__bindgen_ty_2 {
-    #[inline]
-    pub fn w_Stopval(&self) -> ::std::os::raw::c_uint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(0usize, 8u8) as u32) }
-    }
-    #[inline]
-    pub fn set_w_Stopval(&mut self, val: ::std::os::raw::c_uint) {
-        unsafe {
-            let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(0usize, 8u8, val as u64)
-        }
-    }
-    #[inline]
-    pub fn w_Stopsig(&self) -> ::std::os::raw::c_uint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(8usize, 8u8) as u32) }
-    }
-    #[inline]
-    pub fn set_w_Stopsig(&mut self, val: ::std::os::raw::c_uint) {
-        unsafe {
-            let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(8usize, 8u8, val as u64)
-        }
-    }
-    #[inline]
-    pub fn w_Filler(&self) -> ::std::os::raw::c_uint {
-        unsafe { ::std::mem::transmute(self._bitfield_1.get(16usize, 16u8) as u32) }
-    }
-    #[inline]
-    pub fn set_w_Filler(&mut self, val: ::std::os::raw::c_uint) {
-        unsafe {
-            let val: u32 = ::std::mem::transmute(val);
-            self._bitfield_1.set(16usize, 16u8, val as u64)
-        }
-    }
-    #[inline]
-    pub fn new_bitfield_1(
-        w_Stopval: ::std::os::raw::c_uint,
-        w_Stopsig: ::std::os::raw::c_uint,
-        w_Filler: ::std::os::raw::c_uint,
-    ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
-        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
-        __bindgen_bitfield_unit.set(0usize, 8u8, {
-            let w_Stopval: u32 = unsafe { ::std::mem::transmute(w_Stopval) };
-            w_Stopval as u64
-        });
-        __bindgen_bitfield_unit.set(8usize, 8u8, {
-            let w_Stopsig: u32 = unsafe { ::std::mem::transmute(w_Stopsig) };
-            w_Stopsig as u64
-        });
-        __bindgen_bitfield_unit.set(16usize, 16u8, {
-            let w_Filler: u32 = unsafe { ::std::mem::transmute(w_Filler) };
-            w_Filler as u64
-        });
-        __bindgen_bitfield_unit
-    }
-}
-impl Default for wait {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub unsafe fn wait(arg_arg1: *mut ::std::os::raw::c_int) -> pid_t {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn wait(arg_arg1: *mut ::std::os::raw::c_int) -> pid_t;
-        }
-        wait(arg_arg1)
-    })
-}
-pub unsafe fn waitpid(
-    arg_arg1: pid_t,
-    arg_arg2: *mut ::std::os::raw::c_int,
-    arg_arg3: ::std::os::raw::c_int,
-) -> pid_t {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn waitpid(
-                arg_arg1: pid_t,
-                arg_arg2: *mut ::std::os::raw::c_int,
-                arg_arg3: ::std::os::raw::c_int,
-            ) -> pid_t;
-        }
-        waitpid(arg_arg1, arg_arg2, arg_arg3)
-    })
-}
-pub unsafe fn waitid(
-    arg_arg1: idtype_t,
-    arg_arg2: id_t,
-    arg_arg3: *mut siginfo_t,
-    arg_arg4: ::std::os::raw::c_int,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn waitid(
-                arg_arg1: idtype_t,
-                arg_arg2: id_t,
-                arg_arg3: *mut siginfo_t,
-                arg_arg4: ::std::os::raw::c_int,
-            ) -> ::std::os::raw::c_int;
-        }
-        waitid(arg_arg1, arg_arg2, arg_arg3, arg_arg4)
-    })
-}
-pub unsafe fn wait3(
-    arg_arg1: *mut ::std::os::raw::c_int,
-    arg_arg2: ::std::os::raw::c_int,
-    arg_arg3: *mut rusage,
-) -> pid_t {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn wait3(
-                arg_arg1: *mut ::std::os::raw::c_int,
-                arg_arg2: ::std::os::raw::c_int,
-                arg_arg3: *mut rusage,
-            ) -> pid_t;
-        }
-        wait3(arg_arg1, arg_arg2, arg_arg3)
-    })
-}
-pub unsafe fn wait4(
-    arg_arg1: pid_t,
-    arg_arg2: *mut ::std::os::raw::c_int,
-    arg_arg3: ::std::os::raw::c_int,
-    arg_arg4: *mut rusage,
-) -> pid_t {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn wait4(
-                arg_arg1: pid_t,
-                arg_arg2: *mut ::std::os::raw::c_int,
-                arg_arg3: ::std::os::raw::c_int,
-                arg_arg4: *mut rusage,
-            ) -> pid_t;
-        }
-        wait4(arg_arg1, arg_arg2, arg_arg3, arg_arg4)
-    })
-}
-pub unsafe fn alloca(arg_arg1: ::std::os::raw::c_ulong) -> *mut ::std::os::raw::c_void {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn alloca(arg_arg1: ::std::os::raw::c_ulong) -> *mut ::std::os::raw::c_void;
-        }
-        alloca(arg_arg1)
-    })
-}
-pub type ct_rune_t = __darwin_ct_rune_t;
-pub type rune_t = __darwin_rune_t;
-pub type wchar_t = __darwin_wchar_t;
+pub type wchar_t = ::std::os::raw::c_int;
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct div_t {
@@ -5967,8 +4407,935 @@ pub struct lldiv_t {
     pub quot: ::std::os::raw::c_longlong,
     pub rem: ::std::os::raw::c_longlong,
 }
-extern "C" {
-    pub static mut __mb_cur_max: ::std::os::raw::c_int;
+pub unsafe fn __ctype_get_mb_cur_max() -> usize {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __ctype_get_mb_cur_max() -> usize;
+        }
+        __ctype_get_mb_cur_max()
+    })
+}
+pub unsafe fn atof(arg___nptr: *const ::std::os::raw::c_char) -> f64 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn atof(arg___nptr: *const ::std::os::raw::c_char) -> f64;
+        }
+        atof(arg___nptr)
+    })
+}
+pub unsafe fn atoi(arg___nptr: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn atoi(arg___nptr: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
+        }
+        atoi(arg___nptr)
+    })
+}
+pub unsafe fn atol(arg___nptr: *const ::std::os::raw::c_char) -> ::std::os::raw::c_long {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn atol(arg___nptr: *const ::std::os::raw::c_char) -> ::std::os::raw::c_long;
+        }
+        atol(arg___nptr)
+    })
+}
+pub unsafe fn atoll(arg___nptr: *const ::std::os::raw::c_char) -> ::std::os::raw::c_longlong {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn atoll(arg___nptr: *const ::std::os::raw::c_char) -> ::std::os::raw::c_longlong;
+        }
+        atoll(arg___nptr)
+    })
+}
+pub unsafe fn strtod(
+    arg___nptr: *const ::std::os::raw::c_char,
+    arg___endptr: *mut *mut ::std::os::raw::c_char,
+) -> f64 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn strtod(
+                arg___nptr: *const ::std::os::raw::c_char,
+                arg___endptr: *mut *mut ::std::os::raw::c_char,
+            ) -> f64;
+        }
+        strtod(arg___nptr, arg___endptr)
+    })
+}
+pub unsafe fn strtof(
+    arg___nptr: *const ::std::os::raw::c_char,
+    arg___endptr: *mut *mut ::std::os::raw::c_char,
+) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn strtof(
+                arg___nptr: *const ::std::os::raw::c_char,
+                arg___endptr: *mut *mut ::std::os::raw::c_char,
+            ) -> f32;
+        }
+        strtof(arg___nptr, arg___endptr)
+    })
+}
+pub unsafe fn strtold(
+    arg___nptr: *const ::std::os::raw::c_char,
+    arg___endptr: *mut *mut ::std::os::raw::c_char,
+) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn strtold(
+                arg___nptr: *const ::std::os::raw::c_char,
+                arg___endptr: *mut *mut ::std::os::raw::c_char,
+            ) -> u128;
+        }
+        strtold(arg___nptr, arg___endptr)
+    })
+}
+pub unsafe fn strtol(
+    arg___nptr: *const ::std::os::raw::c_char,
+    arg___endptr: *mut *mut ::std::os::raw::c_char,
+    arg___base: ::std::os::raw::c_int,
+) -> ::std::os::raw::c_long {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn strtol(
+                arg___nptr: *const ::std::os::raw::c_char,
+                arg___endptr: *mut *mut ::std::os::raw::c_char,
+                arg___base: ::std::os::raw::c_int,
+            ) -> ::std::os::raw::c_long;
+        }
+        strtol(arg___nptr, arg___endptr, arg___base)
+    })
+}
+pub unsafe fn strtoul(
+    arg___nptr: *const ::std::os::raw::c_char,
+    arg___endptr: *mut *mut ::std::os::raw::c_char,
+    arg___base: ::std::os::raw::c_int,
+) -> ::std::os::raw::c_ulong {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn strtoul(
+                arg___nptr: *const ::std::os::raw::c_char,
+                arg___endptr: *mut *mut ::std::os::raw::c_char,
+                arg___base: ::std::os::raw::c_int,
+            ) -> ::std::os::raw::c_ulong;
+        }
+        strtoul(arg___nptr, arg___endptr, arg___base)
+    })
+}
+pub unsafe fn strtoq(
+    arg___nptr: *const ::std::os::raw::c_char,
+    arg___endptr: *mut *mut ::std::os::raw::c_char,
+    arg___base: ::std::os::raw::c_int,
+) -> ::std::os::raw::c_longlong {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn strtoq(
+                arg___nptr: *const ::std::os::raw::c_char,
+                arg___endptr: *mut *mut ::std::os::raw::c_char,
+                arg___base: ::std::os::raw::c_int,
+            ) -> ::std::os::raw::c_longlong;
+        }
+        strtoq(arg___nptr, arg___endptr, arg___base)
+    })
+}
+pub unsafe fn strtouq(
+    arg___nptr: *const ::std::os::raw::c_char,
+    arg___endptr: *mut *mut ::std::os::raw::c_char,
+    arg___base: ::std::os::raw::c_int,
+) -> ::std::os::raw::c_ulonglong {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn strtouq(
+                arg___nptr: *const ::std::os::raw::c_char,
+                arg___endptr: *mut *mut ::std::os::raw::c_char,
+                arg___base: ::std::os::raw::c_int,
+            ) -> ::std::os::raw::c_ulonglong;
+        }
+        strtouq(arg___nptr, arg___endptr, arg___base)
+    })
+}
+pub unsafe fn strtoll(
+    arg___nptr: *const ::std::os::raw::c_char,
+    arg___endptr: *mut *mut ::std::os::raw::c_char,
+    arg___base: ::std::os::raw::c_int,
+) -> ::std::os::raw::c_longlong {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn strtoll(
+                arg___nptr: *const ::std::os::raw::c_char,
+                arg___endptr: *mut *mut ::std::os::raw::c_char,
+                arg___base: ::std::os::raw::c_int,
+            ) -> ::std::os::raw::c_longlong;
+        }
+        strtoll(arg___nptr, arg___endptr, arg___base)
+    })
+}
+pub unsafe fn strtoull(
+    arg___nptr: *const ::std::os::raw::c_char,
+    arg___endptr: *mut *mut ::std::os::raw::c_char,
+    arg___base: ::std::os::raw::c_int,
+) -> ::std::os::raw::c_ulonglong {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn strtoull(
+                arg___nptr: *const ::std::os::raw::c_char,
+                arg___endptr: *mut *mut ::std::os::raw::c_char,
+                arg___base: ::std::os::raw::c_int,
+            ) -> ::std::os::raw::c_ulonglong;
+        }
+        strtoull(arg___nptr, arg___endptr, arg___base)
+    })
+}
+pub unsafe fn l64a(arg___n: ::std::os::raw::c_long) -> *mut ::std::os::raw::c_char {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn l64a(arg___n: ::std::os::raw::c_long) -> *mut ::std::os::raw::c_char;
+        }
+        l64a(arg___n)
+    })
+}
+pub unsafe fn a64l(arg___s: *const ::std::os::raw::c_char) -> ::std::os::raw::c_long {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn a64l(arg___s: *const ::std::os::raw::c_char) -> ::std::os::raw::c_long;
+        }
+        a64l(arg___s)
+    })
+}
+pub type u_char = __u_char;
+pub type u_short = __u_short;
+pub type u_int = __u_int;
+pub type u_long = __u_long;
+pub type quad_t = __quad_t;
+pub type u_quad_t = __u_quad_t;
+pub type fsid_t = __fsid_t;
+pub type loff_t = __loff_t;
+pub type ino_t = __ino_t;
+pub type dev_t = __dev_t;
+pub type gid_t = __gid_t;
+pub type mode_t = __mode_t;
+pub type nlink_t = __nlink_t;
+pub type uid_t = __uid_t;
+pub type pid_t = __pid_t;
+pub type id_t = __id_t;
+pub type daddr_t = __daddr_t;
+pub type caddr_t = __caddr_t;
+pub type key_t = __key_t;
+pub type clock_t = __clock_t;
+pub type clockid_t = __clockid_t;
+pub type time_t = __time_t;
+pub type timer_t = __timer_t;
+pub type ulong = ::std::os::raw::c_ulong;
+pub type ushort = ::std::os::raw::c_ushort;
+pub type uint = ::std::os::raw::c_uint;
+pub type u_int8_t = __uint8_t;
+pub type u_int16_t = __uint16_t;
+pub type u_int32_t = __uint32_t;
+pub type u_int64_t = __uint64_t;
+pub type register_t = ::std::os::raw::c_long;
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct __sigset_t {
+    pub __val: [::std::os::raw::c_ulong; 16usize],
+}
+pub type sigset_t = __sigset_t;
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct timeval {
+    pub tv_sec: __time_t,
+    pub tv_usec: __suseconds_t,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct timespec {
+    pub tv_sec: __time_t,
+    pub tv_nsec: __syscall_slong_t,
+}
+pub type suseconds_t = __suseconds_t;
+pub type __fd_mask = ::std::os::raw::c_long;
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct fd_set {
+    pub __fds_bits: [__fd_mask; 16usize],
+}
+pub type fd_mask = __fd_mask;
+pub unsafe fn select(
+    arg___nfds: ::std::os::raw::c_int,
+    arg___readfds: *mut fd_set,
+    arg___writefds: *mut fd_set,
+    arg___exceptfds: *mut fd_set,
+    arg___timeout: *mut timeval,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn select(
+                arg___nfds: ::std::os::raw::c_int,
+                arg___readfds: *mut fd_set,
+                arg___writefds: *mut fd_set,
+                arg___exceptfds: *mut fd_set,
+                arg___timeout: *mut timeval,
+            ) -> ::std::os::raw::c_int;
+        }
+        select(
+            arg___nfds,
+            arg___readfds,
+            arg___writefds,
+            arg___exceptfds,
+            arg___timeout,
+        )
+    })
+}
+pub unsafe fn pselect(
+    arg___nfds: ::std::os::raw::c_int,
+    arg___readfds: *mut fd_set,
+    arg___writefds: *mut fd_set,
+    arg___exceptfds: *mut fd_set,
+    arg___timeout: *const timespec,
+    arg___sigmask: *const __sigset_t,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn pselect(
+                arg___nfds: ::std::os::raw::c_int,
+                arg___readfds: *mut fd_set,
+                arg___writefds: *mut fd_set,
+                arg___exceptfds: *mut fd_set,
+                arg___timeout: *const timespec,
+                arg___sigmask: *const __sigset_t,
+            ) -> ::std::os::raw::c_int;
+        }
+        pselect(
+            arg___nfds,
+            arg___readfds,
+            arg___writefds,
+            arg___exceptfds,
+            arg___timeout,
+            arg___sigmask,
+        )
+    })
+}
+pub type blksize_t = __blksize_t;
+pub type blkcnt_t = __blkcnt_t;
+pub type fsblkcnt_t = __fsblkcnt_t;
+pub type fsfilcnt_t = __fsfilcnt_t;
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub union __atomic_wide_counter {
+    pub __value64: ::std::os::raw::c_ulonglong,
+    pub __value32: __atomic_wide_counter__bindgen_ty_1,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct __atomic_wide_counter__bindgen_ty_1 {
+    pub __low: ::std::os::raw::c_uint,
+    pub __high: ::std::os::raw::c_uint,
+}
+impl Default for __atomic_wide_counter {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct __pthread_internal_list {
+    pub __prev: *mut __pthread_internal_list,
+    pub __next: *mut __pthread_internal_list,
+}
+impl Default for __pthread_internal_list {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type __pthread_list_t = __pthread_internal_list;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct __pthread_internal_slist {
+    pub __next: *mut __pthread_internal_slist,
+}
+impl Default for __pthread_internal_slist {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type __pthread_slist_t = __pthread_internal_slist;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct __pthread_mutex_s {
+    pub __lock: ::std::os::raw::c_int,
+    pub __count: ::std::os::raw::c_uint,
+    pub __owner: ::std::os::raw::c_int,
+    pub __nusers: ::std::os::raw::c_uint,
+    pub __kind: ::std::os::raw::c_int,
+    pub __spins: ::std::os::raw::c_short,
+    pub __elision: ::std::os::raw::c_short,
+    pub __list: __pthread_list_t,
+}
+impl Default for __pthread_mutex_s {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct __pthread_rwlock_arch_t {
+    pub __readers: ::std::os::raw::c_uint,
+    pub __writers: ::std::os::raw::c_uint,
+    pub __wrphase_futex: ::std::os::raw::c_uint,
+    pub __writers_futex: ::std::os::raw::c_uint,
+    pub __pad3: ::std::os::raw::c_uint,
+    pub __pad4: ::std::os::raw::c_uint,
+    pub __cur_writer: ::std::os::raw::c_int,
+    pub __shared: ::std::os::raw::c_int,
+    pub __rwelision: ::std::os::raw::c_schar,
+    pub __pad1: [::std::os::raw::c_uchar; 7usize],
+    pub __pad2: ::std::os::raw::c_ulong,
+    pub __flags: ::std::os::raw::c_uint,
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct __pthread_cond_s {
+    pub __wseq: __atomic_wide_counter,
+    pub __g1_start: __atomic_wide_counter,
+    pub __g_refs: [::std::os::raw::c_uint; 2usize],
+    pub __g_size: [::std::os::raw::c_uint; 2usize],
+    pub __g1_orig_size: ::std::os::raw::c_uint,
+    pub __wrefs: ::std::os::raw::c_uint,
+    pub __g_signals: [::std::os::raw::c_uint; 2usize],
+}
+impl Default for __pthread_cond_s {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type __tss_t = ::std::os::raw::c_uint;
+pub type __thrd_t = ::std::os::raw::c_ulong;
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct __once_flag {
+    pub __data: ::std::os::raw::c_int,
+}
+pub type pthread_t = ::std::os::raw::c_ulong;
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub union pthread_mutexattr_t {
+    pub __size: [::std::os::raw::c_char; 4usize],
+    pub __align: ::std::os::raw::c_int,
+}
+impl Default for pthread_mutexattr_t {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub union pthread_condattr_t {
+    pub __size: [::std::os::raw::c_char; 4usize],
+    pub __align: ::std::os::raw::c_int,
+}
+impl Default for pthread_condattr_t {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type pthread_key_t = ::std::os::raw::c_uint;
+pub type pthread_once_t = ::std::os::raw::c_int;
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub union pthread_attr_t {
+    pub __size: [::std::os::raw::c_char; 56usize],
+    pub __align: ::std::os::raw::c_long,
+}
+impl Default for pthread_attr_t {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub union pthread_mutex_t {
+    pub __data: __pthread_mutex_s,
+    pub __size: [::std::os::raw::c_char; 40usize],
+    pub __align: ::std::os::raw::c_long,
+}
+impl Default for pthread_mutex_t {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub union pthread_cond_t {
+    pub __data: __pthread_cond_s,
+    pub __size: [::std::os::raw::c_char; 48usize],
+    pub __align: ::std::os::raw::c_longlong,
+}
+impl Default for pthread_cond_t {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub union pthread_rwlock_t {
+    pub __data: __pthread_rwlock_arch_t,
+    pub __size: [::std::os::raw::c_char; 56usize],
+    pub __align: ::std::os::raw::c_long,
+}
+impl Default for pthread_rwlock_t {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub union pthread_rwlockattr_t {
+    pub __size: [::std::os::raw::c_char; 8usize],
+    pub __align: ::std::os::raw::c_long,
+}
+impl Default for pthread_rwlockattr_t {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type pthread_spinlock_t = ::std::os::raw::c_int;
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub union pthread_barrier_t {
+    pub __size: [::std::os::raw::c_char; 32usize],
+    pub __align: ::std::os::raw::c_long,
+}
+impl Default for pthread_barrier_t {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub union pthread_barrierattr_t {
+    pub __size: [::std::os::raw::c_char; 4usize],
+    pub __align: ::std::os::raw::c_int,
+}
+impl Default for pthread_barrierattr_t {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub unsafe fn random() -> ::std::os::raw::c_long {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn random() -> ::std::os::raw::c_long;
+        }
+        random()
+    })
+}
+pub unsafe fn srandom(arg___seed: ::std::os::raw::c_uint) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn srandom(arg___seed: ::std::os::raw::c_uint);
+        }
+        srandom(arg___seed)
+    })
+}
+pub unsafe fn initstate(
+    arg___seed: ::std::os::raw::c_uint,
+    arg___statebuf: *mut ::std::os::raw::c_char,
+    arg___statelen: usize,
+) -> *mut ::std::os::raw::c_char {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn initstate(
+                arg___seed: ::std::os::raw::c_uint,
+                arg___statebuf: *mut ::std::os::raw::c_char,
+                arg___statelen: usize,
+            ) -> *mut ::std::os::raw::c_char;
+        }
+        initstate(arg___seed, arg___statebuf, arg___statelen)
+    })
+}
+pub unsafe fn setstate(arg___statebuf: *mut ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn setstate(arg___statebuf: *mut ::std::os::raw::c_char)
+                -> *mut ::std::os::raw::c_char;
+        }
+        setstate(arg___statebuf)
+    })
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct random_data {
+    pub fptr: *mut i32,
+    pub rptr: *mut i32,
+    pub state: *mut i32,
+    pub rand_type: ::std::os::raw::c_int,
+    pub rand_deg: ::std::os::raw::c_int,
+    pub rand_sep: ::std::os::raw::c_int,
+    pub end_ptr: *mut i32,
+}
+impl Default for random_data {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub unsafe fn random_r(
+    arg___buf: *mut random_data,
+    arg___result: *mut i32,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn random_r(
+                arg___buf: *mut random_data,
+                arg___result: *mut i32,
+            ) -> ::std::os::raw::c_int;
+        }
+        random_r(arg___buf, arg___result)
+    })
+}
+pub unsafe fn srandom_r(
+    arg___seed: ::std::os::raw::c_uint,
+    arg___buf: *mut random_data,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn srandom_r(
+                arg___seed: ::std::os::raw::c_uint,
+                arg___buf: *mut random_data,
+            ) -> ::std::os::raw::c_int;
+        }
+        srandom_r(arg___seed, arg___buf)
+    })
+}
+pub unsafe fn initstate_r(
+    arg___seed: ::std::os::raw::c_uint,
+    arg___statebuf: *mut ::std::os::raw::c_char,
+    arg___statelen: usize,
+    arg___buf: *mut random_data,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn initstate_r(
+                arg___seed: ::std::os::raw::c_uint,
+                arg___statebuf: *mut ::std::os::raw::c_char,
+                arg___statelen: usize,
+                arg___buf: *mut random_data,
+            ) -> ::std::os::raw::c_int;
+        }
+        initstate_r(arg___seed, arg___statebuf, arg___statelen, arg___buf)
+    })
+}
+pub unsafe fn setstate_r(
+    arg___statebuf: *mut ::std::os::raw::c_char,
+    arg___buf: *mut random_data,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn setstate_r(
+                arg___statebuf: *mut ::std::os::raw::c_char,
+                arg___buf: *mut random_data,
+            ) -> ::std::os::raw::c_int;
+        }
+        setstate_r(arg___statebuf, arg___buf)
+    })
+}
+pub unsafe fn rand() -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn rand() -> ::std::os::raw::c_int;
+        }
+        rand()
+    })
+}
+pub unsafe fn srand(arg___seed: ::std::os::raw::c_uint) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn srand(arg___seed: ::std::os::raw::c_uint);
+        }
+        srand(arg___seed)
+    })
+}
+pub unsafe fn rand_r(arg___seed: *mut ::std::os::raw::c_uint) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn rand_r(arg___seed: *mut ::std::os::raw::c_uint) -> ::std::os::raw::c_int;
+        }
+        rand_r(arg___seed)
+    })
+}
+pub unsafe fn drand48() -> f64 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn drand48() -> f64;
+        }
+        drand48()
+    })
+}
+pub unsafe fn erand48(arg___xsubi: *mut ::std::os::raw::c_ushort) -> f64 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn erand48(arg___xsubi: *mut ::std::os::raw::c_ushort) -> f64;
+        }
+        erand48(arg___xsubi)
+    })
+}
+pub unsafe fn lrand48() -> ::std::os::raw::c_long {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn lrand48() -> ::std::os::raw::c_long;
+        }
+        lrand48()
+    })
+}
+pub unsafe fn nrand48(arg___xsubi: *mut ::std::os::raw::c_ushort) -> ::std::os::raw::c_long {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn nrand48(arg___xsubi: *mut ::std::os::raw::c_ushort) -> ::std::os::raw::c_long;
+        }
+        nrand48(arg___xsubi)
+    })
+}
+pub unsafe fn mrand48() -> ::std::os::raw::c_long {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn mrand48() -> ::std::os::raw::c_long;
+        }
+        mrand48()
+    })
+}
+pub unsafe fn jrand48(arg___xsubi: *mut ::std::os::raw::c_ushort) -> ::std::os::raw::c_long {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn jrand48(arg___xsubi: *mut ::std::os::raw::c_ushort) -> ::std::os::raw::c_long;
+        }
+        jrand48(arg___xsubi)
+    })
+}
+pub unsafe fn srand48(arg___seedval: ::std::os::raw::c_long) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn srand48(arg___seedval: ::std::os::raw::c_long);
+        }
+        srand48(arg___seedval)
+    })
+}
+pub unsafe fn seed48(
+    arg___seed16v: *mut ::std::os::raw::c_ushort,
+) -> *mut ::std::os::raw::c_ushort {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn seed48(
+                arg___seed16v: *mut ::std::os::raw::c_ushort,
+            ) -> *mut ::std::os::raw::c_ushort;
+        }
+        seed48(arg___seed16v)
+    })
+}
+pub unsafe fn lcong48(arg___param: *mut ::std::os::raw::c_ushort) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn lcong48(arg___param: *mut ::std::os::raw::c_ushort);
+        }
+        lcong48(arg___param)
+    })
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct drand48_data {
+    pub __x: [::std::os::raw::c_ushort; 3usize],
+    pub __old_x: [::std::os::raw::c_ushort; 3usize],
+    pub __c: ::std::os::raw::c_ushort,
+    pub __init: ::std::os::raw::c_ushort,
+    pub __a: ::std::os::raw::c_ulonglong,
+}
+pub unsafe fn drand48_r(
+    arg___buffer: *mut drand48_data,
+    arg___result: *mut f64,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn drand48_r(
+                arg___buffer: *mut drand48_data,
+                arg___result: *mut f64,
+            ) -> ::std::os::raw::c_int;
+        }
+        drand48_r(arg___buffer, arg___result)
+    })
+}
+pub unsafe fn erand48_r(
+    arg___xsubi: *mut ::std::os::raw::c_ushort,
+    arg___buffer: *mut drand48_data,
+    arg___result: *mut f64,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn erand48_r(
+                arg___xsubi: *mut ::std::os::raw::c_ushort,
+                arg___buffer: *mut drand48_data,
+                arg___result: *mut f64,
+            ) -> ::std::os::raw::c_int;
+        }
+        erand48_r(arg___xsubi, arg___buffer, arg___result)
+    })
+}
+pub unsafe fn lrand48_r(
+    arg___buffer: *mut drand48_data,
+    arg___result: *mut ::std::os::raw::c_long,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn lrand48_r(
+                arg___buffer: *mut drand48_data,
+                arg___result: *mut ::std::os::raw::c_long,
+            ) -> ::std::os::raw::c_int;
+        }
+        lrand48_r(arg___buffer, arg___result)
+    })
+}
+pub unsafe fn nrand48_r(
+    arg___xsubi: *mut ::std::os::raw::c_ushort,
+    arg___buffer: *mut drand48_data,
+    arg___result: *mut ::std::os::raw::c_long,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn nrand48_r(
+                arg___xsubi: *mut ::std::os::raw::c_ushort,
+                arg___buffer: *mut drand48_data,
+                arg___result: *mut ::std::os::raw::c_long,
+            ) -> ::std::os::raw::c_int;
+        }
+        nrand48_r(arg___xsubi, arg___buffer, arg___result)
+    })
+}
+pub unsafe fn mrand48_r(
+    arg___buffer: *mut drand48_data,
+    arg___result: *mut ::std::os::raw::c_long,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn mrand48_r(
+                arg___buffer: *mut drand48_data,
+                arg___result: *mut ::std::os::raw::c_long,
+            ) -> ::std::os::raw::c_int;
+        }
+        mrand48_r(arg___buffer, arg___result)
+    })
+}
+pub unsafe fn jrand48_r(
+    arg___xsubi: *mut ::std::os::raw::c_ushort,
+    arg___buffer: *mut drand48_data,
+    arg___result: *mut ::std::os::raw::c_long,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn jrand48_r(
+                arg___xsubi: *mut ::std::os::raw::c_ushort,
+                arg___buffer: *mut drand48_data,
+                arg___result: *mut ::std::os::raw::c_long,
+            ) -> ::std::os::raw::c_int;
+        }
+        jrand48_r(arg___xsubi, arg___buffer, arg___result)
+    })
+}
+pub unsafe fn srand48_r(
+    arg___seedval: ::std::os::raw::c_long,
+    arg___buffer: *mut drand48_data,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn srand48_r(
+                arg___seedval: ::std::os::raw::c_long,
+                arg___buffer: *mut drand48_data,
+            ) -> ::std::os::raw::c_int;
+        }
+        srand48_r(arg___seedval, arg___buffer)
+    })
+}
+pub unsafe fn seed48_r(
+    arg___seed16v: *mut ::std::os::raw::c_ushort,
+    arg___buffer: *mut drand48_data,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn seed48_r(
+                arg___seed16v: *mut ::std::os::raw::c_ushort,
+                arg___buffer: *mut drand48_data,
+            ) -> ::std::os::raw::c_int;
+        }
+        seed48_r(arg___seed16v, arg___buffer)
+    })
+}
+pub unsafe fn lcong48_r(
+    arg___param: *mut ::std::os::raw::c_ushort,
+    arg___buffer: *mut drand48_data,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn lcong48_r(
+                arg___param: *mut ::std::os::raw::c_ushort,
+                arg___buffer: *mut drand48_data,
+            ) -> ::std::os::raw::c_int;
+        }
+        lcong48_r(arg___param, arg___buffer)
+    })
 }
 pub unsafe fn malloc(arg___size: ::std::os::raw::c_ulong) -> *mut ::std::os::raw::c_void {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
@@ -5979,25 +5346,17 @@ pub unsafe fn malloc(arg___size: ::std::os::raw::c_ulong) -> *mut ::std::os::raw
     })
 }
 pub unsafe fn calloc(
-    arg___count: ::std::os::raw::c_ulong,
+    arg___nmemb: ::std::os::raw::c_ulong,
     arg___size: ::std::os::raw::c_ulong,
 ) -> *mut ::std::os::raw::c_void {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
             fn calloc(
-                arg___count: ::std::os::raw::c_ulong,
+                arg___nmemb: ::std::os::raw::c_ulong,
                 arg___size: ::std::os::raw::c_ulong,
             ) -> *mut ::std::os::raw::c_void;
         }
-        calloc(arg___count, arg___size)
-    })
-}
-pub unsafe fn free(arg_arg1: *mut ::std::os::raw::c_void) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn free(arg_arg1: *mut ::std::os::raw::c_void);
-        }
-        free(arg_arg1)
+        calloc(arg___nmemb, arg___size)
     })
 }
 pub unsafe fn realloc(
@@ -6014,26 +5373,44 @@ pub unsafe fn realloc(
         realloc(arg___ptr, arg___size)
     })
 }
-pub unsafe fn valloc(arg_arg1: usize) -> *mut ::std::os::raw::c_void {
+pub unsafe fn free(arg___ptr: *mut ::std::os::raw::c_void) {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn valloc(arg_arg1: usize) -> *mut ::std::os::raw::c_void;
+            fn free(arg___ptr: *mut ::std::os::raw::c_void);
         }
-        valloc(arg_arg1)
+        free(arg___ptr)
     })
 }
-pub unsafe fn aligned_alloc(
-    arg___alignment: ::std::os::raw::c_ulong,
-    arg___size: ::std::os::raw::c_ulong,
+pub unsafe fn reallocarray(
+    arg___ptr: *mut ::std::os::raw::c_void,
+    arg___nmemb: usize,
+    arg___size: usize,
 ) -> *mut ::std::os::raw::c_void {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn aligned_alloc(
-                arg___alignment: ::std::os::raw::c_ulong,
-                arg___size: ::std::os::raw::c_ulong,
+            fn reallocarray(
+                arg___ptr: *mut ::std::os::raw::c_void,
+                arg___nmemb: usize,
+                arg___size: usize,
             ) -> *mut ::std::os::raw::c_void;
         }
-        aligned_alloc(arg___alignment, arg___size)
+        reallocarray(arg___ptr, arg___nmemb, arg___size)
+    })
+}
+pub unsafe fn alloca(arg___size: ::std::os::raw::c_ulong) -> *mut ::std::os::raw::c_void {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn alloca(arg___size: ::std::os::raw::c_ulong) -> *mut ::std::os::raw::c_void;
+        }
+        alloca(arg___size)
+    })
+}
+pub unsafe fn valloc(arg___size: usize) -> *mut ::std::os::raw::c_void {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn valloc(arg___size: usize) -> *mut ::std::os::raw::c_void;
+        }
+        valloc(arg___size)
     })
 }
 pub unsafe fn posix_memalign(
@@ -6052,6 +5429,20 @@ pub unsafe fn posix_memalign(
         posix_memalign(arg___memptr, arg___alignment, arg___size)
     })
 }
+pub unsafe fn aligned_alloc(
+    arg___alignment: ::std::os::raw::c_ulong,
+    arg___size: ::std::os::raw::c_ulong,
+) -> *mut ::std::os::raw::c_void {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn aligned_alloc(
+                arg___alignment: ::std::os::raw::c_ulong,
+                arg___size: ::std::os::raw::c_ulong,
+            ) -> *mut ::std::os::raw::c_void;
+        }
+        aligned_alloc(arg___alignment, arg___size)
+    })
+}
 pub unsafe fn abort() {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
@@ -6060,148 +5451,506 @@ pub unsafe fn abort() {
         abort()
     })
 }
-pub unsafe fn abs(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn abs(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
-        }
-        abs(arg_arg1)
-    })
-}
 pub unsafe fn atexit(
-    arg_arg1: ::std::option::Option<unsafe extern "C" fn()>,
+    arg___func: ::std::option::Option<unsafe extern "C" fn()>,
 ) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
             fn atexit(
-                arg_arg1: ::std::option::Option<unsafe extern "C" fn()>,
+                arg___func: ::std::option::Option<unsafe extern "C" fn()>,
             ) -> ::std::os::raw::c_int;
         }
-        atexit(arg_arg1)
+        atexit(arg___func)
     })
 }
-pub unsafe fn atof(arg_arg1: *const ::std::os::raw::c_char) -> f64 {
+pub unsafe fn at_quick_exit(
+    arg___func: ::std::option::Option<unsafe extern "C" fn()>,
+) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn atof(arg_arg1: *const ::std::os::raw::c_char) -> f64;
+            fn at_quick_exit(
+                arg___func: ::std::option::Option<unsafe extern "C" fn()>,
+            ) -> ::std::os::raw::c_int;
         }
-        atof(arg_arg1)
+        at_quick_exit(arg___func)
     })
 }
-pub unsafe fn atoi(arg_arg1: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int {
+pub unsafe fn on_exit(
+    arg___func: ::std::option::Option<
+        unsafe extern "C" fn(__status: ::std::os::raw::c_int, __arg: *mut ::std::os::raw::c_void),
+    >,
+    arg___arg: *mut ::std::os::raw::c_void,
+) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn atoi(arg_arg1: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
+            fn on_exit(
+                arg___func: ::std::option::Option<
+                    unsafe extern "C" fn(
+                        __status: ::std::os::raw::c_int,
+                        __arg: *mut ::std::os::raw::c_void,
+                    ),
+                >,
+                arg___arg: *mut ::std::os::raw::c_void,
+            ) -> ::std::os::raw::c_int;
         }
-        atoi(arg_arg1)
+        on_exit(arg___func, arg___arg)
     })
 }
-pub unsafe fn atol(arg_arg1: *const ::std::os::raw::c_char) -> ::std::os::raw::c_long {
+pub unsafe fn exit(arg___status: ::std::os::raw::c_int) {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn atol(arg_arg1: *const ::std::os::raw::c_char) -> ::std::os::raw::c_long;
+            fn exit(arg___status: ::std::os::raw::c_int);
         }
-        atol(arg_arg1)
+        exit(arg___status)
     })
 }
-pub unsafe fn atoll(arg_arg1: *const ::std::os::raw::c_char) -> ::std::os::raw::c_longlong {
+pub unsafe fn quick_exit(arg___status: ::std::os::raw::c_int) {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn atoll(arg_arg1: *const ::std::os::raw::c_char) -> ::std::os::raw::c_longlong;
+            fn quick_exit(arg___status: ::std::os::raw::c_int);
         }
-        atoll(arg_arg1)
+        quick_exit(arg___status)
     })
 }
+pub unsafe fn _Exit(arg___status: ::std::os::raw::c_int) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn _Exit(arg___status: ::std::os::raw::c_int);
+        }
+        _Exit(arg___status)
+    })
+}
+pub unsafe fn getenv(arg___name: *const ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn getenv(arg___name: *const ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
+        }
+        getenv(arg___name)
+    })
+}
+pub unsafe fn putenv(arg___string: *mut ::std::os::raw::c_char) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn putenv(arg___string: *mut ::std::os::raw::c_char) -> ::std::os::raw::c_int;
+        }
+        putenv(arg___string)
+    })
+}
+pub unsafe fn setenv(
+    arg___name: *const ::std::os::raw::c_char,
+    arg___value: *const ::std::os::raw::c_char,
+    arg___replace: ::std::os::raw::c_int,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn setenv(
+                arg___name: *const ::std::os::raw::c_char,
+                arg___value: *const ::std::os::raw::c_char,
+                arg___replace: ::std::os::raw::c_int,
+            ) -> ::std::os::raw::c_int;
+        }
+        setenv(arg___name, arg___value, arg___replace)
+    })
+}
+pub unsafe fn unsetenv(arg___name: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn unsetenv(arg___name: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
+        }
+        unsetenv(arg___name)
+    })
+}
+pub unsafe fn clearenv() -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn clearenv() -> ::std::os::raw::c_int;
+        }
+        clearenv()
+    })
+}
+pub unsafe fn mktemp(arg___template: *mut ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn mktemp(arg___template: *mut ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
+        }
+        mktemp(arg___template)
+    })
+}
+pub unsafe fn mkstemp(arg___template: *mut ::std::os::raw::c_char) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn mkstemp(arg___template: *mut ::std::os::raw::c_char) -> ::std::os::raw::c_int;
+        }
+        mkstemp(arg___template)
+    })
+}
+pub unsafe fn mkstemps(
+    arg___template: *mut ::std::os::raw::c_char,
+    arg___suffixlen: ::std::os::raw::c_int,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn mkstemps(
+                arg___template: *mut ::std::os::raw::c_char,
+                arg___suffixlen: ::std::os::raw::c_int,
+            ) -> ::std::os::raw::c_int;
+        }
+        mkstemps(arg___template, arg___suffixlen)
+    })
+}
+pub unsafe fn mkdtemp(arg___template: *mut ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn mkdtemp(arg___template: *mut ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
+        }
+        mkdtemp(arg___template)
+    })
+}
+pub unsafe fn system(arg___command: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn system(arg___command: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
+        }
+        system(arg___command)
+    })
+}
+pub unsafe fn realpath(
+    arg___name: *const ::std::os::raw::c_char,
+    arg___resolved: *mut ::std::os::raw::c_char,
+) -> *mut ::std::os::raw::c_char {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn realpath(
+                arg___name: *const ::std::os::raw::c_char,
+                arg___resolved: *mut ::std::os::raw::c_char,
+            ) -> *mut ::std::os::raw::c_char;
+        }
+        realpath(arg___name, arg___resolved)
+    })
+}
+pub type __compar_fn_t = ::std::option::Option<
+    unsafe extern "C" fn(
+        arg1: *const ::std::os::raw::c_void,
+        arg2: *const ::std::os::raw::c_void,
+    ) -> ::std::os::raw::c_int,
+>;
 pub unsafe fn bsearch(
     arg___key: *const ::std::os::raw::c_void,
     arg___base: *const ::std::os::raw::c_void,
-    arg___nel: usize,
-    arg___width: usize,
-    arg___compar: ::std::option::Option<
-        unsafe extern "C" fn(
-            arg1: *const ::std::os::raw::c_void,
-            arg2: *const ::std::os::raw::c_void,
-        ) -> ::std::os::raw::c_int,
-    >,
+    arg___nmemb: usize,
+    arg___size: usize,
+    arg___compar: __compar_fn_t,
 ) -> *mut ::std::os::raw::c_void {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
             fn bsearch(
                 arg___key: *const ::std::os::raw::c_void,
                 arg___base: *const ::std::os::raw::c_void,
-                arg___nel: usize,
-                arg___width: usize,
-                arg___compar: ::std::option::Option<
-                    unsafe extern "C" fn(
-                        arg1: *const ::std::os::raw::c_void,
-                        arg2: *const ::std::os::raw::c_void,
-                    ) -> ::std::os::raw::c_int,
-                >,
+                arg___nmemb: usize,
+                arg___size: usize,
+                arg___compar: __compar_fn_t,
             ) -> *mut ::std::os::raw::c_void;
         }
-        bsearch(arg___key, arg___base, arg___nel, arg___width, arg___compar)
+        bsearch(arg___key, arg___base, arg___nmemb, arg___size, arg___compar)
     })
 }
-pub unsafe fn div(arg_arg1: ::std::os::raw::c_int, arg_arg2: ::std::os::raw::c_int) -> div_t {
+pub unsafe fn qsort(
+    arg___base: *mut ::std::os::raw::c_void,
+    arg___nmemb: usize,
+    arg___size: usize,
+    arg___compar: __compar_fn_t,
+) {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn div(arg_arg1: ::std::os::raw::c_int, arg_arg2: ::std::os::raw::c_int) -> div_t;
+            fn qsort(
+                arg___base: *mut ::std::os::raw::c_void,
+                arg___nmemb: usize,
+                arg___size: usize,
+                arg___compar: __compar_fn_t,
+            );
         }
-        div(arg_arg1, arg_arg2)
+        qsort(arg___base, arg___nmemb, arg___size, arg___compar)
     })
 }
-pub unsafe fn exit(arg_arg1: ::std::os::raw::c_int) {
+pub unsafe fn abs(arg___x: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn exit(arg_arg1: ::std::os::raw::c_int);
+            fn abs(arg___x: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
         }
-        exit(arg_arg1)
+        abs(arg___x)
     })
 }
-pub unsafe fn getenv(arg_arg1: *const ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char {
+pub unsafe fn labs(arg___x: ::std::os::raw::c_long) -> ::std::os::raw::c_long {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn getenv(arg_arg1: *const ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
+            fn labs(arg___x: ::std::os::raw::c_long) -> ::std::os::raw::c_long;
         }
-        getenv(arg_arg1)
+        labs(arg___x)
     })
 }
-pub unsafe fn labs(arg_arg1: ::std::os::raw::c_long) -> ::std::os::raw::c_long {
+pub unsafe fn llabs(arg___x: ::std::os::raw::c_longlong) -> ::std::os::raw::c_longlong {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn labs(arg_arg1: ::std::os::raw::c_long) -> ::std::os::raw::c_long;
+            fn llabs(arg___x: ::std::os::raw::c_longlong) -> ::std::os::raw::c_longlong;
         }
-        labs(arg_arg1)
+        llabs(arg___x)
     })
 }
-pub unsafe fn ldiv(arg_arg1: ::std::os::raw::c_long, arg_arg2: ::std::os::raw::c_long) -> ldiv_t {
+pub unsafe fn div(arg___numer: ::std::os::raw::c_int, arg___denom: ::std::os::raw::c_int) -> div_t {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn ldiv(arg_arg1: ::std::os::raw::c_long, arg_arg2: ::std::os::raw::c_long) -> ldiv_t;
+            fn div(arg___numer: ::std::os::raw::c_int, arg___denom: ::std::os::raw::c_int)
+                -> div_t;
         }
-        ldiv(arg_arg1, arg_arg2)
+        div(arg___numer, arg___denom)
     })
 }
-pub unsafe fn llabs(arg_arg1: ::std::os::raw::c_longlong) -> ::std::os::raw::c_longlong {
+pub unsafe fn ldiv(
+    arg___numer: ::std::os::raw::c_long,
+    arg___denom: ::std::os::raw::c_long,
+) -> ldiv_t {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn llabs(arg_arg1: ::std::os::raw::c_longlong) -> ::std::os::raw::c_longlong;
+            fn ldiv(
+                arg___numer: ::std::os::raw::c_long,
+                arg___denom: ::std::os::raw::c_long,
+            ) -> ldiv_t;
         }
-        llabs(arg_arg1)
+        ldiv(arg___numer, arg___denom)
     })
 }
 pub unsafe fn lldiv(
-    arg_arg1: ::std::os::raw::c_longlong,
-    arg_arg2: ::std::os::raw::c_longlong,
+    arg___numer: ::std::os::raw::c_longlong,
+    arg___denom: ::std::os::raw::c_longlong,
 ) -> lldiv_t {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
             fn lldiv(
-                arg_arg1: ::std::os::raw::c_longlong,
-                arg_arg2: ::std::os::raw::c_longlong,
+                arg___numer: ::std::os::raw::c_longlong,
+                arg___denom: ::std::os::raw::c_longlong,
             ) -> lldiv_t;
         }
-        lldiv(arg_arg1, arg_arg2)
+        lldiv(arg___numer, arg___denom)
+    })
+}
+pub unsafe fn ecvt(
+    arg___value: f64,
+    arg___ndigit: ::std::os::raw::c_int,
+    arg___decpt: *mut ::std::os::raw::c_int,
+    arg___sign: *mut ::std::os::raw::c_int,
+) -> *mut ::std::os::raw::c_char {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn ecvt(
+                arg___value: f64,
+                arg___ndigit: ::std::os::raw::c_int,
+                arg___decpt: *mut ::std::os::raw::c_int,
+                arg___sign: *mut ::std::os::raw::c_int,
+            ) -> *mut ::std::os::raw::c_char;
+        }
+        ecvt(arg___value, arg___ndigit, arg___decpt, arg___sign)
+    })
+}
+pub unsafe fn fcvt(
+    arg___value: f64,
+    arg___ndigit: ::std::os::raw::c_int,
+    arg___decpt: *mut ::std::os::raw::c_int,
+    arg___sign: *mut ::std::os::raw::c_int,
+) -> *mut ::std::os::raw::c_char {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn fcvt(
+                arg___value: f64,
+                arg___ndigit: ::std::os::raw::c_int,
+                arg___decpt: *mut ::std::os::raw::c_int,
+                arg___sign: *mut ::std::os::raw::c_int,
+            ) -> *mut ::std::os::raw::c_char;
+        }
+        fcvt(arg___value, arg___ndigit, arg___decpt, arg___sign)
+    })
+}
+pub unsafe fn gcvt(
+    arg___value: f64,
+    arg___ndigit: ::std::os::raw::c_int,
+    arg___buf: *mut ::std::os::raw::c_char,
+) -> *mut ::std::os::raw::c_char {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn gcvt(
+                arg___value: f64,
+                arg___ndigit: ::std::os::raw::c_int,
+                arg___buf: *mut ::std::os::raw::c_char,
+            ) -> *mut ::std::os::raw::c_char;
+        }
+        gcvt(arg___value, arg___ndigit, arg___buf)
+    })
+}
+pub unsafe fn qecvt(
+    arg___value: u128,
+    arg___ndigit: ::std::os::raw::c_int,
+    arg___decpt: *mut ::std::os::raw::c_int,
+    arg___sign: *mut ::std::os::raw::c_int,
+) -> *mut ::std::os::raw::c_char {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn qecvt(
+                arg___value: u128,
+                arg___ndigit: ::std::os::raw::c_int,
+                arg___decpt: *mut ::std::os::raw::c_int,
+                arg___sign: *mut ::std::os::raw::c_int,
+            ) -> *mut ::std::os::raw::c_char;
+        }
+        qecvt(arg___value, arg___ndigit, arg___decpt, arg___sign)
+    })
+}
+pub unsafe fn qfcvt(
+    arg___value: u128,
+    arg___ndigit: ::std::os::raw::c_int,
+    arg___decpt: *mut ::std::os::raw::c_int,
+    arg___sign: *mut ::std::os::raw::c_int,
+) -> *mut ::std::os::raw::c_char {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn qfcvt(
+                arg___value: u128,
+                arg___ndigit: ::std::os::raw::c_int,
+                arg___decpt: *mut ::std::os::raw::c_int,
+                arg___sign: *mut ::std::os::raw::c_int,
+            ) -> *mut ::std::os::raw::c_char;
+        }
+        qfcvt(arg___value, arg___ndigit, arg___decpt, arg___sign)
+    })
+}
+pub unsafe fn qgcvt(
+    arg___value: u128,
+    arg___ndigit: ::std::os::raw::c_int,
+    arg___buf: *mut ::std::os::raw::c_char,
+) -> *mut ::std::os::raw::c_char {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn qgcvt(
+                arg___value: u128,
+                arg___ndigit: ::std::os::raw::c_int,
+                arg___buf: *mut ::std::os::raw::c_char,
+            ) -> *mut ::std::os::raw::c_char;
+        }
+        qgcvt(arg___value, arg___ndigit, arg___buf)
+    })
+}
+pub unsafe fn ecvt_r(
+    arg___value: f64,
+    arg___ndigit: ::std::os::raw::c_int,
+    arg___decpt: *mut ::std::os::raw::c_int,
+    arg___sign: *mut ::std::os::raw::c_int,
+    arg___buf: *mut ::std::os::raw::c_char,
+    arg___len: usize,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn ecvt_r(
+                arg___value: f64,
+                arg___ndigit: ::std::os::raw::c_int,
+                arg___decpt: *mut ::std::os::raw::c_int,
+                arg___sign: *mut ::std::os::raw::c_int,
+                arg___buf: *mut ::std::os::raw::c_char,
+                arg___len: usize,
+            ) -> ::std::os::raw::c_int;
+        }
+        ecvt_r(
+            arg___value,
+            arg___ndigit,
+            arg___decpt,
+            arg___sign,
+            arg___buf,
+            arg___len,
+        )
+    })
+}
+pub unsafe fn fcvt_r(
+    arg___value: f64,
+    arg___ndigit: ::std::os::raw::c_int,
+    arg___decpt: *mut ::std::os::raw::c_int,
+    arg___sign: *mut ::std::os::raw::c_int,
+    arg___buf: *mut ::std::os::raw::c_char,
+    arg___len: usize,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn fcvt_r(
+                arg___value: f64,
+                arg___ndigit: ::std::os::raw::c_int,
+                arg___decpt: *mut ::std::os::raw::c_int,
+                arg___sign: *mut ::std::os::raw::c_int,
+                arg___buf: *mut ::std::os::raw::c_char,
+                arg___len: usize,
+            ) -> ::std::os::raw::c_int;
+        }
+        fcvt_r(
+            arg___value,
+            arg___ndigit,
+            arg___decpt,
+            arg___sign,
+            arg___buf,
+            arg___len,
+        )
+    })
+}
+pub unsafe fn qecvt_r(
+    arg___value: u128,
+    arg___ndigit: ::std::os::raw::c_int,
+    arg___decpt: *mut ::std::os::raw::c_int,
+    arg___sign: *mut ::std::os::raw::c_int,
+    arg___buf: *mut ::std::os::raw::c_char,
+    arg___len: usize,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn qecvt_r(
+                arg___value: u128,
+                arg___ndigit: ::std::os::raw::c_int,
+                arg___decpt: *mut ::std::os::raw::c_int,
+                arg___sign: *mut ::std::os::raw::c_int,
+                arg___buf: *mut ::std::os::raw::c_char,
+                arg___len: usize,
+            ) -> ::std::os::raw::c_int;
+        }
+        qecvt_r(
+            arg___value,
+            arg___ndigit,
+            arg___decpt,
+            arg___sign,
+            arg___buf,
+            arg___len,
+        )
+    })
+}
+pub unsafe fn qfcvt_r(
+    arg___value: u128,
+    arg___ndigit: ::std::os::raw::c_int,
+    arg___decpt: *mut ::std::os::raw::c_int,
+    arg___sign: *mut ::std::os::raw::c_int,
+    arg___buf: *mut ::std::os::raw::c_char,
+    arg___len: usize,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn qfcvt_r(
+                arg___value: u128,
+                arg___ndigit: ::std::os::raw::c_int,
+                arg___decpt: *mut ::std::os::raw::c_int,
+                arg___sign: *mut ::std::os::raw::c_int,
+                arg___buf: *mut ::std::os::raw::c_char,
+                arg___len: usize,
+            ) -> ::std::os::raw::c_int;
+        }
+        qfcvt_r(
+            arg___value,
+            arg___ndigit,
+            arg___decpt,
+            arg___sign,
+            arg___buf,
+            arg___len,
+        )
     })
 }
 pub unsafe fn mblen(
@@ -6218,1215 +5967,170 @@ pub unsafe fn mblen(
         mblen(arg___s, arg___n)
     })
 }
-pub unsafe fn mbstowcs(
-    arg_arg1: *mut wchar_t,
-    arg_arg2: *const ::std::os::raw::c_char,
-    arg_arg3: usize,
-) -> usize {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn mbstowcs(
-                arg_arg1: *mut wchar_t,
-                arg_arg2: *const ::std::os::raw::c_char,
-                arg_arg3: usize,
-            ) -> usize;
-        }
-        mbstowcs(arg_arg1, arg_arg2, arg_arg3)
-    })
-}
 pub unsafe fn mbtowc(
-    arg_arg1: *mut wchar_t,
-    arg_arg2: *const ::std::os::raw::c_char,
-    arg_arg3: usize,
+    arg___pwc: *mut wchar_t,
+    arg___s: *const ::std::os::raw::c_char,
+    arg___n: usize,
 ) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
             fn mbtowc(
-                arg_arg1: *mut wchar_t,
-                arg_arg2: *const ::std::os::raw::c_char,
-                arg_arg3: usize,
+                arg___pwc: *mut wchar_t,
+                arg___s: *const ::std::os::raw::c_char,
+                arg___n: usize,
             ) -> ::std::os::raw::c_int;
         }
-        mbtowc(arg_arg1, arg_arg2, arg_arg3)
-    })
-}
-pub unsafe fn qsort(
-    arg___base: *mut ::std::os::raw::c_void,
-    arg___nel: usize,
-    arg___width: usize,
-    arg___compar: ::std::option::Option<
-        unsafe extern "C" fn(
-            arg1: *const ::std::os::raw::c_void,
-            arg2: *const ::std::os::raw::c_void,
-        ) -> ::std::os::raw::c_int,
-    >,
-) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn qsort(
-                arg___base: *mut ::std::os::raw::c_void,
-                arg___nel: usize,
-                arg___width: usize,
-                arg___compar: ::std::option::Option<
-                    unsafe extern "C" fn(
-                        arg1: *const ::std::os::raw::c_void,
-                        arg2: *const ::std::os::raw::c_void,
-                    ) -> ::std::os::raw::c_int,
-                >,
-            );
-        }
-        qsort(arg___base, arg___nel, arg___width, arg___compar)
-    })
-}
-pub unsafe fn rand() -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn rand() -> ::std::os::raw::c_int;
-        }
-        rand()
-    })
-}
-pub unsafe fn srand(arg_arg1: ::std::os::raw::c_uint) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn srand(arg_arg1: ::std::os::raw::c_uint);
-        }
-        srand(arg_arg1)
-    })
-}
-pub unsafe fn strtod(
-    arg_arg1: *const ::std::os::raw::c_char,
-    arg_arg2: *mut *mut ::std::os::raw::c_char,
-) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn strtod(
-                arg_arg1: *const ::std::os::raw::c_char,
-                arg_arg2: *mut *mut ::std::os::raw::c_char,
-            ) -> f64;
-        }
-        strtod(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn strtof(
-    arg_arg1: *const ::std::os::raw::c_char,
-    arg_arg2: *mut *mut ::std::os::raw::c_char,
-) -> f32 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn strtof(
-                arg_arg1: *const ::std::os::raw::c_char,
-                arg_arg2: *mut *mut ::std::os::raw::c_char,
-            ) -> f32;
-        }
-        strtof(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn strtol(
-    arg___str: *const ::std::os::raw::c_char,
-    arg___endptr: *mut *mut ::std::os::raw::c_char,
-    arg___base: ::std::os::raw::c_int,
-) -> ::std::os::raw::c_long {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn strtol(
-                arg___str: *const ::std::os::raw::c_char,
-                arg___endptr: *mut *mut ::std::os::raw::c_char,
-                arg___base: ::std::os::raw::c_int,
-            ) -> ::std::os::raw::c_long;
-        }
-        strtol(arg___str, arg___endptr, arg___base)
-    })
-}
-pub unsafe fn strtold(
-    arg_arg1: *const ::std::os::raw::c_char,
-    arg_arg2: *mut *mut ::std::os::raw::c_char,
-) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn strtold(
-                arg_arg1: *const ::std::os::raw::c_char,
-                arg_arg2: *mut *mut ::std::os::raw::c_char,
-            ) -> f64;
-        }
-        strtold(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn strtoll(
-    arg___str: *const ::std::os::raw::c_char,
-    arg___endptr: *mut *mut ::std::os::raw::c_char,
-    arg___base: ::std::os::raw::c_int,
-) -> ::std::os::raw::c_longlong {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn strtoll(
-                arg___str: *const ::std::os::raw::c_char,
-                arg___endptr: *mut *mut ::std::os::raw::c_char,
-                arg___base: ::std::os::raw::c_int,
-            ) -> ::std::os::raw::c_longlong;
-        }
-        strtoll(arg___str, arg___endptr, arg___base)
-    })
-}
-pub unsafe fn strtoul(
-    arg___str: *const ::std::os::raw::c_char,
-    arg___endptr: *mut *mut ::std::os::raw::c_char,
-    arg___base: ::std::os::raw::c_int,
-) -> ::std::os::raw::c_ulong {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn strtoul(
-                arg___str: *const ::std::os::raw::c_char,
-                arg___endptr: *mut *mut ::std::os::raw::c_char,
-                arg___base: ::std::os::raw::c_int,
-            ) -> ::std::os::raw::c_ulong;
-        }
-        strtoul(arg___str, arg___endptr, arg___base)
-    })
-}
-pub unsafe fn strtoull(
-    arg___str: *const ::std::os::raw::c_char,
-    arg___endptr: *mut *mut ::std::os::raw::c_char,
-    arg___base: ::std::os::raw::c_int,
-) -> ::std::os::raw::c_ulonglong {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn strtoull(
-                arg___str: *const ::std::os::raw::c_char,
-                arg___endptr: *mut *mut ::std::os::raw::c_char,
-                arg___base: ::std::os::raw::c_int,
-            ) -> ::std::os::raw::c_ulonglong;
-        }
-        strtoull(arg___str, arg___endptr, arg___base)
-    })
-}
-pub unsafe fn system(arg_arg1: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn system(arg_arg1: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
-        }
-        system(arg_arg1)
-    })
-}
-pub unsafe fn wcstombs(
-    arg_arg1: *mut ::std::os::raw::c_char,
-    arg_arg2: *const wchar_t,
-    arg_arg3: usize,
-) -> usize {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn wcstombs(
-                arg_arg1: *mut ::std::os::raw::c_char,
-                arg_arg2: *const wchar_t,
-                arg_arg3: usize,
-            ) -> usize;
-        }
-        wcstombs(arg_arg1, arg_arg2, arg_arg3)
+        mbtowc(arg___pwc, arg___s, arg___n)
     })
 }
 pub unsafe fn wctomb(
-    arg_arg1: *mut ::std::os::raw::c_char,
-    arg_arg2: wchar_t,
+    arg___s: *mut ::std::os::raw::c_char,
+    arg___wchar: wchar_t,
 ) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
             fn wctomb(
-                arg_arg1: *mut ::std::os::raw::c_char,
-                arg_arg2: wchar_t,
+                arg___s: *mut ::std::os::raw::c_char,
+                arg___wchar: wchar_t,
             ) -> ::std::os::raw::c_int;
         }
-        wctomb(arg_arg1, arg_arg2)
+        wctomb(arg___s, arg___wchar)
     })
 }
-pub unsafe fn _Exit(arg_arg1: ::std::os::raw::c_int) {
+pub unsafe fn mbstowcs(
+    arg___pwcs: *mut wchar_t,
+    arg___s: *const ::std::os::raw::c_char,
+    arg___n: usize,
+) -> usize {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn _Exit(arg_arg1: ::std::os::raw::c_int);
+            fn mbstowcs(
+                arg___pwcs: *mut wchar_t,
+                arg___s: *const ::std::os::raw::c_char,
+                arg___n: usize,
+            ) -> usize;
         }
-        _Exit(arg_arg1)
+        mbstowcs(arg___pwcs, arg___s, arg___n)
     })
 }
-pub unsafe fn a64l(arg_arg1: *const ::std::os::raw::c_char) -> ::std::os::raw::c_long {
+pub unsafe fn wcstombs(
+    arg___s: *mut ::std::os::raw::c_char,
+    arg___pwcs: *const wchar_t,
+    arg___n: usize,
+) -> usize {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn a64l(arg_arg1: *const ::std::os::raw::c_char) -> ::std::os::raw::c_long;
+            fn wcstombs(
+                arg___s: *mut ::std::os::raw::c_char,
+                arg___pwcs: *const wchar_t,
+                arg___n: usize,
+            ) -> usize;
         }
-        a64l(arg_arg1)
+        wcstombs(arg___s, arg___pwcs, arg___n)
     })
 }
-pub unsafe fn drand48() -> f64 {
+pub unsafe fn rpmatch(arg___response: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn drand48() -> f64;
+            fn rpmatch(arg___response: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
         }
-        drand48()
-    })
-}
-pub unsafe fn ecvt(
-    arg_arg1: f64,
-    arg_arg2: ::std::os::raw::c_int,
-    arg_arg3: *mut ::std::os::raw::c_int,
-    arg_arg4: *mut ::std::os::raw::c_int,
-) -> *mut ::std::os::raw::c_char {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn ecvt(
-                arg_arg1: f64,
-                arg_arg2: ::std::os::raw::c_int,
-                arg_arg3: *mut ::std::os::raw::c_int,
-                arg_arg4: *mut ::std::os::raw::c_int,
-            ) -> *mut ::std::os::raw::c_char;
-        }
-        ecvt(arg_arg1, arg_arg2, arg_arg3, arg_arg4)
-    })
-}
-pub unsafe fn erand48(arg_arg1: *mut ::std::os::raw::c_ushort) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn erand48(arg_arg1: *mut ::std::os::raw::c_ushort) -> f64;
-        }
-        erand48(arg_arg1)
-    })
-}
-pub unsafe fn fcvt(
-    arg_arg1: f64,
-    arg_arg2: ::std::os::raw::c_int,
-    arg_arg3: *mut ::std::os::raw::c_int,
-    arg_arg4: *mut ::std::os::raw::c_int,
-) -> *mut ::std::os::raw::c_char {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn fcvt(
-                arg_arg1: f64,
-                arg_arg2: ::std::os::raw::c_int,
-                arg_arg3: *mut ::std::os::raw::c_int,
-                arg_arg4: *mut ::std::os::raw::c_int,
-            ) -> *mut ::std::os::raw::c_char;
-        }
-        fcvt(arg_arg1, arg_arg2, arg_arg3, arg_arg4)
-    })
-}
-pub unsafe fn gcvt(
-    arg_arg1: f64,
-    arg_arg2: ::std::os::raw::c_int,
-    arg_arg3: *mut ::std::os::raw::c_char,
-) -> *mut ::std::os::raw::c_char {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn gcvt(
-                arg_arg1: f64,
-                arg_arg2: ::std::os::raw::c_int,
-                arg_arg3: *mut ::std::os::raw::c_char,
-            ) -> *mut ::std::os::raw::c_char;
-        }
-        gcvt(arg_arg1, arg_arg2, arg_arg3)
+        rpmatch(arg___response)
     })
 }
 pub unsafe fn getsubopt(
-    arg_arg1: *mut *mut ::std::os::raw::c_char,
-    arg_arg2: *const *mut ::std::os::raw::c_char,
-    arg_arg3: *mut *mut ::std::os::raw::c_char,
+    arg___optionp: *mut *mut ::std::os::raw::c_char,
+    arg___tokens: *const *mut ::std::os::raw::c_char,
+    arg___valuep: *mut *mut ::std::os::raw::c_char,
 ) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
             fn getsubopt(
-                arg_arg1: *mut *mut ::std::os::raw::c_char,
-                arg_arg2: *const *mut ::std::os::raw::c_char,
-                arg_arg3: *mut *mut ::std::os::raw::c_char,
+                arg___optionp: *mut *mut ::std::os::raw::c_char,
+                arg___tokens: *const *mut ::std::os::raw::c_char,
+                arg___valuep: *mut *mut ::std::os::raw::c_char,
             ) -> ::std::os::raw::c_int;
         }
-        getsubopt(arg_arg1, arg_arg2, arg_arg3)
-    })
-}
-pub unsafe fn grantpt(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn grantpt(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
-        }
-        grantpt(arg_arg1)
-    })
-}
-pub unsafe fn initstate(
-    arg_arg1: ::std::os::raw::c_uint,
-    arg_arg2: *mut ::std::os::raw::c_char,
-    arg_arg3: usize,
-) -> *mut ::std::os::raw::c_char {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn initstate(
-                arg_arg1: ::std::os::raw::c_uint,
-                arg_arg2: *mut ::std::os::raw::c_char,
-                arg_arg3: usize,
-            ) -> *mut ::std::os::raw::c_char;
-        }
-        initstate(arg_arg1, arg_arg2, arg_arg3)
-    })
-}
-pub unsafe fn jrand48(arg_arg1: *mut ::std::os::raw::c_ushort) -> ::std::os::raw::c_long {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn jrand48(arg_arg1: *mut ::std::os::raw::c_ushort) -> ::std::os::raw::c_long;
-        }
-        jrand48(arg_arg1)
-    })
-}
-pub unsafe fn l64a(arg_arg1: ::std::os::raw::c_long) -> *mut ::std::os::raw::c_char {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn l64a(arg_arg1: ::std::os::raw::c_long) -> *mut ::std::os::raw::c_char;
-        }
-        l64a(arg_arg1)
-    })
-}
-pub unsafe fn lcong48(arg_arg1: *mut ::std::os::raw::c_ushort) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn lcong48(arg_arg1: *mut ::std::os::raw::c_ushort);
-        }
-        lcong48(arg_arg1)
-    })
-}
-pub unsafe fn lrand48() -> ::std::os::raw::c_long {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn lrand48() -> ::std::os::raw::c_long;
-        }
-        lrand48()
-    })
-}
-pub unsafe fn mktemp(arg_arg1: *mut ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn mktemp(arg_arg1: *mut ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
-        }
-        mktemp(arg_arg1)
-    })
-}
-pub unsafe fn mkstemp(arg_arg1: *mut ::std::os::raw::c_char) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn mkstemp(arg_arg1: *mut ::std::os::raw::c_char) -> ::std::os::raw::c_int;
-        }
-        mkstemp(arg_arg1)
-    })
-}
-pub unsafe fn mrand48() -> ::std::os::raw::c_long {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn mrand48() -> ::std::os::raw::c_long;
-        }
-        mrand48()
-    })
-}
-pub unsafe fn nrand48(arg_arg1: *mut ::std::os::raw::c_ushort) -> ::std::os::raw::c_long {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn nrand48(arg_arg1: *mut ::std::os::raw::c_ushort) -> ::std::os::raw::c_long;
-        }
-        nrand48(arg_arg1)
-    })
-}
-pub unsafe fn posix_openpt(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn posix_openpt(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
-        }
-        posix_openpt(arg_arg1)
-    })
-}
-pub unsafe fn ptsname(arg_arg1: ::std::os::raw::c_int) -> *mut ::std::os::raw::c_char {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn ptsname(arg_arg1: ::std::os::raw::c_int) -> *mut ::std::os::raw::c_char;
-        }
-        ptsname(arg_arg1)
-    })
-}
-pub unsafe fn ptsname_r(
-    arg_fildes: ::std::os::raw::c_int,
-    arg_buffer: *mut ::std::os::raw::c_char,
-    arg_buflen: usize,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn ptsname_r(
-                arg_fildes: ::std::os::raw::c_int,
-                arg_buffer: *mut ::std::os::raw::c_char,
-                arg_buflen: usize,
-            ) -> ::std::os::raw::c_int;
-        }
-        ptsname_r(arg_fildes, arg_buffer, arg_buflen)
-    })
-}
-pub unsafe fn putenv(arg_arg1: *mut ::std::os::raw::c_char) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn putenv(arg_arg1: *mut ::std::os::raw::c_char) -> ::std::os::raw::c_int;
-        }
-        putenv(arg_arg1)
-    })
-}
-pub unsafe fn random() -> ::std::os::raw::c_long {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn random() -> ::std::os::raw::c_long;
-        }
-        random()
-    })
-}
-pub unsafe fn rand_r(arg_arg1: *mut ::std::os::raw::c_uint) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn rand_r(arg_arg1: *mut ::std::os::raw::c_uint) -> ::std::os::raw::c_int;
-        }
-        rand_r(arg_arg1)
-    })
-}
-pub unsafe fn realpath(
-    arg_arg1: *const ::std::os::raw::c_char,
-    arg_arg2: *mut ::std::os::raw::c_char,
-) -> *mut ::std::os::raw::c_char {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn realpath(
-                arg_arg1: *const ::std::os::raw::c_char,
-                arg_arg2: *mut ::std::os::raw::c_char,
-            ) -> *mut ::std::os::raw::c_char;
-        }
-        realpath(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn seed48(arg_arg1: *mut ::std::os::raw::c_ushort) -> *mut ::std::os::raw::c_ushort {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn seed48(arg_arg1: *mut ::std::os::raw::c_ushort) -> *mut ::std::os::raw::c_ushort;
-        }
-        seed48(arg_arg1)
-    })
-}
-pub unsafe fn setenv(
-    arg___name: *const ::std::os::raw::c_char,
-    arg___value: *const ::std::os::raw::c_char,
-    arg___overwrite: ::std::os::raw::c_int,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn setenv(
-                arg___name: *const ::std::os::raw::c_char,
-                arg___value: *const ::std::os::raw::c_char,
-                arg___overwrite: ::std::os::raw::c_int,
-            ) -> ::std::os::raw::c_int;
-        }
-        setenv(arg___name, arg___value, arg___overwrite)
-    })
-}
-pub unsafe fn setkey(arg_arg1: *const ::std::os::raw::c_char) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn setkey(arg_arg1: *const ::std::os::raw::c_char);
-        }
-        setkey(arg_arg1)
-    })
-}
-pub unsafe fn setstate(arg_arg1: *const ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn setstate(arg_arg1: *const ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
-        }
-        setstate(arg_arg1)
-    })
-}
-pub unsafe fn srand48(arg_arg1: ::std::os::raw::c_long) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn srand48(arg_arg1: ::std::os::raw::c_long);
-        }
-        srand48(arg_arg1)
-    })
-}
-pub unsafe fn srandom(arg_arg1: ::std::os::raw::c_uint) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn srandom(arg_arg1: ::std::os::raw::c_uint);
-        }
-        srandom(arg_arg1)
-    })
-}
-pub unsafe fn unlockpt(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn unlockpt(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
-        }
-        unlockpt(arg_arg1)
-    })
-}
-pub unsafe fn unsetenv(arg_arg1: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn unsetenv(arg_arg1: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
-        }
-        unsetenv(arg_arg1)
-    })
-}
-pub type dev_t = __darwin_dev_t;
-pub type mode_t = __darwin_mode_t;
-pub unsafe fn arc4random() -> u32 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn arc4random() -> u32;
-        }
-        arc4random()
-    })
-}
-pub unsafe fn arc4random_addrandom(
-    arg_arg1: *mut ::std::os::raw::c_uchar,
-    arg_arg2: ::std::os::raw::c_int,
-) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn arc4random_addrandom(
-                arg_arg1: *mut ::std::os::raw::c_uchar,
-                arg_arg2: ::std::os::raw::c_int,
-            );
-        }
-        arc4random_addrandom(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn arc4random_buf(arg___buf: *mut ::std::os::raw::c_void, arg___nbytes: usize) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn arc4random_buf(arg___buf: *mut ::std::os::raw::c_void, arg___nbytes: usize);
-        }
-        arc4random_buf(arg___buf, arg___nbytes)
-    })
-}
-pub unsafe fn arc4random_stir() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn arc4random_stir();
-        }
-        arc4random_stir()
-    })
-}
-pub unsafe fn arc4random_uniform(arg___upper_bound: u32) -> u32 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn arc4random_uniform(arg___upper_bound: u32) -> u32;
-        }
-        arc4random_uniform(arg___upper_bound)
-    })
-}
-pub unsafe fn atexit_b(arg_arg1: *mut ::std::os::raw::c_void) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn atexit_b(arg_arg1: *mut ::std::os::raw::c_void) -> ::std::os::raw::c_int;
-        }
-        atexit_b(arg_arg1)
-    })
-}
-pub unsafe fn bsearch_b(
-    arg___key: *const ::std::os::raw::c_void,
-    arg___base: *const ::std::os::raw::c_void,
-    arg___nel: usize,
-    arg___width: usize,
-    arg___compar: *mut ::std::os::raw::c_void,
-) -> *mut ::std::os::raw::c_void {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn bsearch_b(
-                arg___key: *const ::std::os::raw::c_void,
-                arg___base: *const ::std::os::raw::c_void,
-                arg___nel: usize,
-                arg___width: usize,
-                arg___compar: *mut ::std::os::raw::c_void,
-            ) -> *mut ::std::os::raw::c_void;
-        }
-        bsearch_b(arg___key, arg___base, arg___nel, arg___width, arg___compar)
-    })
-}
-pub unsafe fn cgetcap(
-    arg_arg1: *mut ::std::os::raw::c_char,
-    arg_arg2: *const ::std::os::raw::c_char,
-    arg_arg3: ::std::os::raw::c_int,
-) -> *mut ::std::os::raw::c_char {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn cgetcap(
-                arg_arg1: *mut ::std::os::raw::c_char,
-                arg_arg2: *const ::std::os::raw::c_char,
-                arg_arg3: ::std::os::raw::c_int,
-            ) -> *mut ::std::os::raw::c_char;
-        }
-        cgetcap(arg_arg1, arg_arg2, arg_arg3)
-    })
-}
-pub unsafe fn cgetclose() -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn cgetclose() -> ::std::os::raw::c_int;
-        }
-        cgetclose()
-    })
-}
-pub unsafe fn cgetent(
-    arg_arg1: *mut *mut ::std::os::raw::c_char,
-    arg_arg2: *mut *mut ::std::os::raw::c_char,
-    arg_arg3: *const ::std::os::raw::c_char,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn cgetent(
-                arg_arg1: *mut *mut ::std::os::raw::c_char,
-                arg_arg2: *mut *mut ::std::os::raw::c_char,
-                arg_arg3: *const ::std::os::raw::c_char,
-            ) -> ::std::os::raw::c_int;
-        }
-        cgetent(arg_arg1, arg_arg2, arg_arg3)
-    })
-}
-pub unsafe fn cgetfirst(
-    arg_arg1: *mut *mut ::std::os::raw::c_char,
-    arg_arg2: *mut *mut ::std::os::raw::c_char,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn cgetfirst(
-                arg_arg1: *mut *mut ::std::os::raw::c_char,
-                arg_arg2: *mut *mut ::std::os::raw::c_char,
-            ) -> ::std::os::raw::c_int;
-        }
-        cgetfirst(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn cgetmatch(
-    arg_arg1: *const ::std::os::raw::c_char,
-    arg_arg2: *const ::std::os::raw::c_char,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn cgetmatch(
-                arg_arg1: *const ::std::os::raw::c_char,
-                arg_arg2: *const ::std::os::raw::c_char,
-            ) -> ::std::os::raw::c_int;
-        }
-        cgetmatch(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn cgetnext(
-    arg_arg1: *mut *mut ::std::os::raw::c_char,
-    arg_arg2: *mut *mut ::std::os::raw::c_char,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn cgetnext(
-                arg_arg1: *mut *mut ::std::os::raw::c_char,
-                arg_arg2: *mut *mut ::std::os::raw::c_char,
-            ) -> ::std::os::raw::c_int;
-        }
-        cgetnext(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn cgetnum(
-    arg_arg1: *mut ::std::os::raw::c_char,
-    arg_arg2: *const ::std::os::raw::c_char,
-    arg_arg3: *mut ::std::os::raw::c_long,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn cgetnum(
-                arg_arg1: *mut ::std::os::raw::c_char,
-                arg_arg2: *const ::std::os::raw::c_char,
-                arg_arg3: *mut ::std::os::raw::c_long,
-            ) -> ::std::os::raw::c_int;
-        }
-        cgetnum(arg_arg1, arg_arg2, arg_arg3)
-    })
-}
-pub unsafe fn cgetset(arg_arg1: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn cgetset(arg_arg1: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
-        }
-        cgetset(arg_arg1)
-    })
-}
-pub unsafe fn cgetstr(
-    arg_arg1: *mut ::std::os::raw::c_char,
-    arg_arg2: *const ::std::os::raw::c_char,
-    arg_arg3: *mut *mut ::std::os::raw::c_char,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn cgetstr(
-                arg_arg1: *mut ::std::os::raw::c_char,
-                arg_arg2: *const ::std::os::raw::c_char,
-                arg_arg3: *mut *mut ::std::os::raw::c_char,
-            ) -> ::std::os::raw::c_int;
-        }
-        cgetstr(arg_arg1, arg_arg2, arg_arg3)
-    })
-}
-pub unsafe fn cgetustr(
-    arg_arg1: *mut ::std::os::raw::c_char,
-    arg_arg2: *const ::std::os::raw::c_char,
-    arg_arg3: *mut *mut ::std::os::raw::c_char,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn cgetustr(
-                arg_arg1: *mut ::std::os::raw::c_char,
-                arg_arg2: *const ::std::os::raw::c_char,
-                arg_arg3: *mut *mut ::std::os::raw::c_char,
-            ) -> ::std::os::raw::c_int;
-        }
-        cgetustr(arg_arg1, arg_arg2, arg_arg3)
-    })
-}
-pub unsafe fn daemon(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: ::std::os::raw::c_int,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn daemon(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: ::std::os::raw::c_int,
-            ) -> ::std::os::raw::c_int;
-        }
-        daemon(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn devname(arg_arg1: dev_t, arg_arg2: mode_t) -> *mut ::std::os::raw::c_char {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn devname(arg_arg1: dev_t, arg_arg2: mode_t) -> *mut ::std::os::raw::c_char;
-        }
-        devname(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn devname_r(
-    arg_arg1: dev_t,
-    arg_arg2: mode_t,
-    arg_buf: *mut ::std::os::raw::c_char,
-    arg_len: ::std::os::raw::c_int,
-) -> *mut ::std::os::raw::c_char {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn devname_r(
-                arg_arg1: dev_t,
-                arg_arg2: mode_t,
-                arg_buf: *mut ::std::os::raw::c_char,
-                arg_len: ::std::os::raw::c_int,
-            ) -> *mut ::std::os::raw::c_char;
-        }
-        devname_r(arg_arg1, arg_arg2, arg_buf, arg_len)
-    })
-}
-pub unsafe fn getbsize(
-    arg_arg1: *mut ::std::os::raw::c_int,
-    arg_arg2: *mut ::std::os::raw::c_long,
-) -> *mut ::std::os::raw::c_char {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn getbsize(
-                arg_arg1: *mut ::std::os::raw::c_int,
-                arg_arg2: *mut ::std::os::raw::c_long,
-            ) -> *mut ::std::os::raw::c_char;
-        }
-        getbsize(arg_arg1, arg_arg2)
+        getsubopt(arg___optionp, arg___tokens, arg___valuep)
     })
 }
 pub unsafe fn getloadavg(
-    arg_arg1: *mut f64,
-    arg_arg2: ::std::os::raw::c_int,
+    arg___loadavg: *mut f64,
+    arg___nelem: ::std::os::raw::c_int,
 ) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
             fn getloadavg(
-                arg_arg1: *mut f64,
-                arg_arg2: ::std::os::raw::c_int,
+                arg___loadavg: *mut f64,
+                arg___nelem: ::std::os::raw::c_int,
             ) -> ::std::os::raw::c_int;
         }
-        getloadavg(arg_arg1, arg_arg2)
+        getloadavg(arg___loadavg, arg___nelem)
     })
 }
-pub unsafe fn getprogname() -> *const ::std::os::raw::c_char {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn getprogname() -> *const ::std::os::raw::c_char;
-        }
-        getprogname()
-    })
-}
-pub unsafe fn setprogname(arg_arg1: *const ::std::os::raw::c_char) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn setprogname(arg_arg1: *const ::std::os::raw::c_char);
-        }
-        setprogname(arg_arg1)
-    })
-}
-pub unsafe fn heapsort(
-    arg___base: *mut ::std::os::raw::c_void,
-    arg___nel: usize,
-    arg___width: usize,
-    arg___compar: ::std::option::Option<
-        unsafe extern "C" fn(
-            arg1: *const ::std::os::raw::c_void,
-            arg2: *const ::std::os::raw::c_void,
-        ) -> ::std::os::raw::c_int,
-    >,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn heapsort(
-                arg___base: *mut ::std::os::raw::c_void,
-                arg___nel: usize,
-                arg___width: usize,
-                arg___compar: ::std::option::Option<
-                    unsafe extern "C" fn(
-                        arg1: *const ::std::os::raw::c_void,
-                        arg2: *const ::std::os::raw::c_void,
-                    ) -> ::std::os::raw::c_int,
-                >,
-            ) -> ::std::os::raw::c_int;
-        }
-        heapsort(arg___base, arg___nel, arg___width, arg___compar)
-    })
-}
-pub unsafe fn heapsort_b(
-    arg___base: *mut ::std::os::raw::c_void,
-    arg___nel: usize,
-    arg___width: usize,
-    arg___compar: *mut ::std::os::raw::c_void,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn heapsort_b(
-                arg___base: *mut ::std::os::raw::c_void,
-                arg___nel: usize,
-                arg___width: usize,
-                arg___compar: *mut ::std::os::raw::c_void,
-            ) -> ::std::os::raw::c_int;
-        }
-        heapsort_b(arg___base, arg___nel, arg___width, arg___compar)
-    })
-}
-pub unsafe fn mergesort(
-    arg___base: *mut ::std::os::raw::c_void,
-    arg___nel: usize,
-    arg___width: usize,
-    arg___compar: ::std::option::Option<
-        unsafe extern "C" fn(
-            arg1: *const ::std::os::raw::c_void,
-            arg2: *const ::std::os::raw::c_void,
-        ) -> ::std::os::raw::c_int,
-    >,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn mergesort(
-                arg___base: *mut ::std::os::raw::c_void,
-                arg___nel: usize,
-                arg___width: usize,
-                arg___compar: ::std::option::Option<
-                    unsafe extern "C" fn(
-                        arg1: *const ::std::os::raw::c_void,
-                        arg2: *const ::std::os::raw::c_void,
-                    ) -> ::std::os::raw::c_int,
-                >,
-            ) -> ::std::os::raw::c_int;
-        }
-        mergesort(arg___base, arg___nel, arg___width, arg___compar)
-    })
-}
-pub unsafe fn mergesort_b(
-    arg___base: *mut ::std::os::raw::c_void,
-    arg___nel: usize,
-    arg___width: usize,
-    arg___compar: *mut ::std::os::raw::c_void,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn mergesort_b(
-                arg___base: *mut ::std::os::raw::c_void,
-                arg___nel: usize,
-                arg___width: usize,
-                arg___compar: *mut ::std::os::raw::c_void,
-            ) -> ::std::os::raw::c_int;
-        }
-        mergesort_b(arg___base, arg___nel, arg___width, arg___compar)
-    })
-}
-pub unsafe fn psort(
-    arg___base: *mut ::std::os::raw::c_void,
-    arg___nel: usize,
-    arg___width: usize,
-    arg___compar: ::std::option::Option<
-        unsafe extern "C" fn(
-            arg1: *const ::std::os::raw::c_void,
-            arg2: *const ::std::os::raw::c_void,
-        ) -> ::std::os::raw::c_int,
-    >,
-) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn psort(
-                arg___base: *mut ::std::os::raw::c_void,
-                arg___nel: usize,
-                arg___width: usize,
-                arg___compar: ::std::option::Option<
-                    unsafe extern "C" fn(
-                        arg1: *const ::std::os::raw::c_void,
-                        arg2: *const ::std::os::raw::c_void,
-                    ) -> ::std::os::raw::c_int,
-                >,
-            );
-        }
-        psort(arg___base, arg___nel, arg___width, arg___compar)
-    })
-}
-pub unsafe fn psort_b(
-    arg___base: *mut ::std::os::raw::c_void,
-    arg___nel: usize,
-    arg___width: usize,
-    arg___compar: *mut ::std::os::raw::c_void,
-) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn psort_b(
-                arg___base: *mut ::std::os::raw::c_void,
-                arg___nel: usize,
-                arg___width: usize,
-                arg___compar: *mut ::std::os::raw::c_void,
-            );
-        }
-        psort_b(arg___base, arg___nel, arg___width, arg___compar)
-    })
-}
-pub unsafe fn psort_r(
-    arg___base: *mut ::std::os::raw::c_void,
-    arg___nel: usize,
-    arg___width: usize,
-    arg_arg1: *mut ::std::os::raw::c_void,
-    arg___compar: ::std::option::Option<
-        unsafe extern "C" fn(
-            arg1: *mut ::std::os::raw::c_void,
-            arg2: *const ::std::os::raw::c_void,
-            arg3: *const ::std::os::raw::c_void,
-        ) -> ::std::os::raw::c_int,
-    >,
-) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn psort_r(
-                arg___base: *mut ::std::os::raw::c_void,
-                arg___nel: usize,
-                arg___width: usize,
-                arg_arg1: *mut ::std::os::raw::c_void,
-                arg___compar: ::std::option::Option<
-                    unsafe extern "C" fn(
-                        arg1: *mut ::std::os::raw::c_void,
-                        arg2: *const ::std::os::raw::c_void,
-                        arg3: *const ::std::os::raw::c_void,
-                    ) -> ::std::os::raw::c_int,
-                >,
-            );
-        }
-        psort_r(arg___base, arg___nel, arg___width, arg_arg1, arg___compar)
-    })
-}
-pub unsafe fn qsort_b(
-    arg___base: *mut ::std::os::raw::c_void,
-    arg___nel: usize,
-    arg___width: usize,
-    arg___compar: *mut ::std::os::raw::c_void,
-) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn qsort_b(
-                arg___base: *mut ::std::os::raw::c_void,
-                arg___nel: usize,
-                arg___width: usize,
-                arg___compar: *mut ::std::os::raw::c_void,
-            );
-        }
-        qsort_b(arg___base, arg___nel, arg___width, arg___compar)
-    })
-}
-pub unsafe fn qsort_r(
-    arg___base: *mut ::std::os::raw::c_void,
-    arg___nel: usize,
-    arg___width: usize,
-    arg_arg1: *mut ::std::os::raw::c_void,
-    arg___compar: ::std::option::Option<
-        unsafe extern "C" fn(
-            arg1: *mut ::std::os::raw::c_void,
-            arg2: *const ::std::os::raw::c_void,
-            arg3: *const ::std::os::raw::c_void,
-        ) -> ::std::os::raw::c_int,
-    >,
-) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn qsort_r(
-                arg___base: *mut ::std::os::raw::c_void,
-                arg___nel: usize,
-                arg___width: usize,
-                arg_arg1: *mut ::std::os::raw::c_void,
-                arg___compar: ::std::option::Option<
-                    unsafe extern "C" fn(
-                        arg1: *mut ::std::os::raw::c_void,
-                        arg2: *const ::std::os::raw::c_void,
-                        arg3: *const ::std::os::raw::c_void,
-                    ) -> ::std::os::raw::c_int,
-                >,
-            );
-        }
-        qsort_r(arg___base, arg___nel, arg___width, arg_arg1, arg___compar)
-    })
-}
-pub unsafe fn radixsort(
-    arg___base: *mut *const ::std::os::raw::c_uchar,
-    arg___nel: ::std::os::raw::c_int,
-    arg___table: *const ::std::os::raw::c_uchar,
-    arg___endbyte: ::std::os::raw::c_uint,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn radixsort(
-                arg___base: *mut *const ::std::os::raw::c_uchar,
-                arg___nel: ::std::os::raw::c_int,
-                arg___table: *const ::std::os::raw::c_uchar,
-                arg___endbyte: ::std::os::raw::c_uint,
-            ) -> ::std::os::raw::c_int;
-        }
-        radixsort(arg___base, arg___nel, arg___table, arg___endbyte)
-    })
-}
-pub unsafe fn rpmatch(arg_arg1: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn rpmatch(arg_arg1: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
-        }
-        rpmatch(arg_arg1)
-    })
-}
-pub unsafe fn sradixsort(
-    arg___base: *mut *const ::std::os::raw::c_uchar,
-    arg___nel: ::std::os::raw::c_int,
-    arg___table: *const ::std::os::raw::c_uchar,
-    arg___endbyte: ::std::os::raw::c_uint,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn sradixsort(
-                arg___base: *mut *const ::std::os::raw::c_uchar,
-                arg___nel: ::std::os::raw::c_int,
-                arg___table: *const ::std::os::raw::c_uchar,
-                arg___endbyte: ::std::os::raw::c_uint,
-            ) -> ::std::os::raw::c_int;
-        }
-        sradixsort(arg___base, arg___nel, arg___table, arg___endbyte)
-    })
-}
-pub unsafe fn sranddev() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn sranddev();
-        }
-        sranddev()
-    })
-}
-pub unsafe fn srandomdev() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn srandomdev();
-        }
-        srandomdev()
-    })
-}
-pub unsafe fn reallocf(
-    arg___ptr: *mut ::std::os::raw::c_void,
-    arg___size: usize,
+pub unsafe fn memcpy(
+    arg___dest: *mut ::std::os::raw::c_void,
+    arg___src: *const ::std::os::raw::c_void,
+    arg___n: ::std::os::raw::c_ulong,
 ) -> *mut ::std::os::raw::c_void {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn reallocf(
-                arg___ptr: *mut ::std::os::raw::c_void,
-                arg___size: usize,
+            fn memcpy(
+                arg___dest: *mut ::std::os::raw::c_void,
+                arg___src: *const ::std::os::raw::c_void,
+                arg___n: ::std::os::raw::c_ulong,
             ) -> *mut ::std::os::raw::c_void;
         }
-        reallocf(arg___ptr, arg___size)
+        memcpy(arg___dest, arg___src, arg___n)
     })
 }
-pub unsafe fn strtonum(
-    arg___numstr: *const ::std::os::raw::c_char,
-    arg___minval: ::std::os::raw::c_longlong,
-    arg___maxval: ::std::os::raw::c_longlong,
-    arg___errstrp: *mut *const ::std::os::raw::c_char,
-) -> ::std::os::raw::c_longlong {
+pub unsafe fn memmove(
+    arg___dest: *mut ::std::os::raw::c_void,
+    arg___src: *const ::std::os::raw::c_void,
+    arg___n: ::std::os::raw::c_ulong,
+) -> *mut ::std::os::raw::c_void {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn strtonum(
-                arg___numstr: *const ::std::os::raw::c_char,
-                arg___minval: ::std::os::raw::c_longlong,
-                arg___maxval: ::std::os::raw::c_longlong,
-                arg___errstrp: *mut *const ::std::os::raw::c_char,
-            ) -> ::std::os::raw::c_longlong;
+            fn memmove(
+                arg___dest: *mut ::std::os::raw::c_void,
+                arg___src: *const ::std::os::raw::c_void,
+                arg___n: ::std::os::raw::c_ulong,
+            ) -> *mut ::std::os::raw::c_void;
         }
-        strtonum(arg___numstr, arg___minval, arg___maxval, arg___errstrp)
+        memmove(arg___dest, arg___src, arg___n)
     })
 }
-pub unsafe fn strtoq(
-    arg___str: *const ::std::os::raw::c_char,
-    arg___endptr: *mut *mut ::std::os::raw::c_char,
-    arg___base: ::std::os::raw::c_int,
-) -> ::std::os::raw::c_longlong {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn strtoq(
-                arg___str: *const ::std::os::raw::c_char,
-                arg___endptr: *mut *mut ::std::os::raw::c_char,
-                arg___base: ::std::os::raw::c_int,
-            ) -> ::std::os::raw::c_longlong;
-        }
-        strtoq(arg___str, arg___endptr, arg___base)
-    })
-}
-pub unsafe fn strtouq(
-    arg___str: *const ::std::os::raw::c_char,
-    arg___endptr: *mut *mut ::std::os::raw::c_char,
-    arg___base: ::std::os::raw::c_int,
-) -> ::std::os::raw::c_ulonglong {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn strtouq(
-                arg___str: *const ::std::os::raw::c_char,
-                arg___endptr: *mut *mut ::std::os::raw::c_char,
-                arg___base: ::std::os::raw::c_int,
-            ) -> ::std::os::raw::c_ulonglong;
-        }
-        strtouq(arg___str, arg___endptr, arg___base)
-    })
-}
-extern "C" {
-    pub static mut suboptarg: *mut ::std::os::raw::c_char;
-}
-pub unsafe fn memchr(
-    arg___s: *const ::std::os::raw::c_void,
+pub unsafe fn memccpy(
+    arg___dest: *mut ::std::os::raw::c_void,
+    arg___src: *const ::std::os::raw::c_void,
     arg___c: ::std::os::raw::c_int,
     arg___n: ::std::os::raw::c_ulong,
 ) -> *mut ::std::os::raw::c_void {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn memchr(
-                arg___s: *const ::std::os::raw::c_void,
+            fn memccpy(
+                arg___dest: *mut ::std::os::raw::c_void,
+                arg___src: *const ::std::os::raw::c_void,
                 arg___c: ::std::os::raw::c_int,
                 arg___n: ::std::os::raw::c_ulong,
             ) -> *mut ::std::os::raw::c_void;
         }
-        memchr(arg___s, arg___c, arg___n)
+        memccpy(arg___dest, arg___src, arg___c, arg___n)
+    })
+}
+pub unsafe fn memset(
+    arg___s: *mut ::std::os::raw::c_void,
+    arg___c: ::std::os::raw::c_int,
+    arg___n: ::std::os::raw::c_ulong,
+) -> *mut ::std::os::raw::c_void {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn memset(
+                arg___s: *mut ::std::os::raw::c_void,
+                arg___c: ::std::os::raw::c_int,
+                arg___n: ::std::os::raw::c_ulong,
+            ) -> *mut ::std::os::raw::c_void;
+        }
+        memset(arg___s, arg___c, arg___n)
     })
 }
 pub unsafe fn memcmp(
@@ -7445,80 +6149,96 @@ pub unsafe fn memcmp(
         memcmp(arg___s1, arg___s2, arg___n)
     })
 }
-pub unsafe fn memcpy(
-    arg___dst: *mut ::std::os::raw::c_void,
-    arg___src: *const ::std::os::raw::c_void,
+pub unsafe fn __memcmpeq(
+    arg___s1: *const ::std::os::raw::c_void,
+    arg___s2: *const ::std::os::raw::c_void,
+    arg___n: usize,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __memcmpeq(
+                arg___s1: *const ::std::os::raw::c_void,
+                arg___s2: *const ::std::os::raw::c_void,
+                arg___n: usize,
+            ) -> ::std::os::raw::c_int;
+        }
+        __memcmpeq(arg___s1, arg___s2, arg___n)
+    })
+}
+pub unsafe fn memchr(
+    arg___s: *const ::std::os::raw::c_void,
+    arg___c: ::std::os::raw::c_int,
     arg___n: ::std::os::raw::c_ulong,
 ) -> *mut ::std::os::raw::c_void {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn memcpy(
-                arg___dst: *mut ::std::os::raw::c_void,
-                arg___src: *const ::std::os::raw::c_void,
+            fn memchr(
+                arg___s: *const ::std::os::raw::c_void,
+                arg___c: ::std::os::raw::c_int,
                 arg___n: ::std::os::raw::c_ulong,
             ) -> *mut ::std::os::raw::c_void;
         }
-        memcpy(arg___dst, arg___src, arg___n)
+        memchr(arg___s, arg___c, arg___n)
     })
 }
-pub unsafe fn memmove(
-    arg___dst: *mut ::std::os::raw::c_void,
-    arg___src: *const ::std::os::raw::c_void,
-    arg___len: ::std::os::raw::c_ulong,
-) -> *mut ::std::os::raw::c_void {
+pub unsafe fn strcpy(
+    arg___dest: *mut ::std::os::raw::c_char,
+    arg___src: *const ::std::os::raw::c_char,
+) -> *mut ::std::os::raw::c_char {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn memmove(
-                arg___dst: *mut ::std::os::raw::c_void,
-                arg___src: *const ::std::os::raw::c_void,
-                arg___len: ::std::os::raw::c_ulong,
-            ) -> *mut ::std::os::raw::c_void;
+            fn strcpy(
+                arg___dest: *mut ::std::os::raw::c_char,
+                arg___src: *const ::std::os::raw::c_char,
+            ) -> *mut ::std::os::raw::c_char;
         }
-        memmove(arg___dst, arg___src, arg___len)
+        strcpy(arg___dest, arg___src)
     })
 }
-pub unsafe fn memset(
-    arg___b: *mut ::std::os::raw::c_void,
-    arg___c: ::std::os::raw::c_int,
-    arg___len: ::std::os::raw::c_ulong,
-) -> *mut ::std::os::raw::c_void {
+pub unsafe fn strncpy(
+    arg___dest: *mut ::std::os::raw::c_char,
+    arg___src: *const ::std::os::raw::c_char,
+    arg___n: ::std::os::raw::c_ulong,
+) -> *mut ::std::os::raw::c_char {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn memset(
-                arg___b: *mut ::std::os::raw::c_void,
-                arg___c: ::std::os::raw::c_int,
-                arg___len: ::std::os::raw::c_ulong,
-            ) -> *mut ::std::os::raw::c_void;
+            fn strncpy(
+                arg___dest: *mut ::std::os::raw::c_char,
+                arg___src: *const ::std::os::raw::c_char,
+                arg___n: ::std::os::raw::c_ulong,
+            ) -> *mut ::std::os::raw::c_char;
         }
-        memset(arg___b, arg___c, arg___len)
+        strncpy(arg___dest, arg___src, arg___n)
     })
 }
 pub unsafe fn strcat(
-    arg___s1: *mut ::std::os::raw::c_char,
-    arg___s2: *const ::std::os::raw::c_char,
+    arg___dest: *mut ::std::os::raw::c_char,
+    arg___src: *const ::std::os::raw::c_char,
 ) -> *mut ::std::os::raw::c_char {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
             fn strcat(
-                arg___s1: *mut ::std::os::raw::c_char,
-                arg___s2: *const ::std::os::raw::c_char,
+                arg___dest: *mut ::std::os::raw::c_char,
+                arg___src: *const ::std::os::raw::c_char,
             ) -> *mut ::std::os::raw::c_char;
         }
-        strcat(arg___s1, arg___s2)
+        strcat(arg___dest, arg___src)
     })
 }
-pub unsafe fn strchr(
-    arg___s: *const ::std::os::raw::c_char,
-    arg___c: ::std::os::raw::c_int,
+pub unsafe fn strncat(
+    arg___dest: *mut ::std::os::raw::c_char,
+    arg___src: *const ::std::os::raw::c_char,
+    arg___n: ::std::os::raw::c_ulong,
 ) -> *mut ::std::os::raw::c_char {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn strchr(
-                arg___s: *const ::std::os::raw::c_char,
-                arg___c: ::std::os::raw::c_int,
+            fn strncat(
+                arg___dest: *mut ::std::os::raw::c_char,
+                arg___src: *const ::std::os::raw::c_char,
+                arg___n: ::std::os::raw::c_ulong,
             ) -> *mut ::std::os::raw::c_char;
         }
-        strchr(arg___s, arg___c)
+        strncat(arg___dest, arg___src, arg___n)
     })
 }
 pub unsafe fn strcmp(
@@ -7533,80 +6253,6 @@ pub unsafe fn strcmp(
             ) -> ::std::os::raw::c_int;
         }
         strcmp(arg___s1, arg___s2)
-    })
-}
-pub unsafe fn strcoll(
-    arg___s1: *const ::std::os::raw::c_char,
-    arg___s2: *const ::std::os::raw::c_char,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn strcoll(
-                arg___s1: *const ::std::os::raw::c_char,
-                arg___s2: *const ::std::os::raw::c_char,
-            ) -> ::std::os::raw::c_int;
-        }
-        strcoll(arg___s1, arg___s2)
-    })
-}
-pub unsafe fn strcpy(
-    arg___dst: *mut ::std::os::raw::c_char,
-    arg___src: *const ::std::os::raw::c_char,
-) -> *mut ::std::os::raw::c_char {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn strcpy(
-                arg___dst: *mut ::std::os::raw::c_char,
-                arg___src: *const ::std::os::raw::c_char,
-            ) -> *mut ::std::os::raw::c_char;
-        }
-        strcpy(arg___dst, arg___src)
-    })
-}
-pub unsafe fn strcspn(
-    arg___s: *const ::std::os::raw::c_char,
-    arg___charset: *const ::std::os::raw::c_char,
-) -> ::std::os::raw::c_ulong {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn strcspn(
-                arg___s: *const ::std::os::raw::c_char,
-                arg___charset: *const ::std::os::raw::c_char,
-            ) -> ::std::os::raw::c_ulong;
-        }
-        strcspn(arg___s, arg___charset)
-    })
-}
-pub unsafe fn strerror(arg___errnum: ::std::os::raw::c_int) -> *mut ::std::os::raw::c_char {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn strerror(arg___errnum: ::std::os::raw::c_int) -> *mut ::std::os::raw::c_char;
-        }
-        strerror(arg___errnum)
-    })
-}
-pub unsafe fn strlen(arg___s: *const ::std::os::raw::c_char) -> ::std::os::raw::c_ulong {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn strlen(arg___s: *const ::std::os::raw::c_char) -> ::std::os::raw::c_ulong;
-        }
-        strlen(arg___s)
-    })
-}
-pub unsafe fn strncat(
-    arg___s1: *mut ::std::os::raw::c_char,
-    arg___s2: *const ::std::os::raw::c_char,
-    arg___n: ::std::os::raw::c_ulong,
-) -> *mut ::std::os::raw::c_char {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn strncat(
-                arg___s1: *mut ::std::os::raw::c_char,
-                arg___s2: *const ::std::os::raw::c_char,
-                arg___n: ::std::os::raw::c_ulong,
-            ) -> *mut ::std::os::raw::c_char;
-        }
-        strncat(arg___s1, arg___s2, arg___n)
     })
 }
 pub unsafe fn strncmp(
@@ -7625,34 +6271,124 @@ pub unsafe fn strncmp(
         strncmp(arg___s1, arg___s2, arg___n)
     })
 }
-pub unsafe fn strncpy(
-    arg___dst: *mut ::std::os::raw::c_char,
+pub unsafe fn strcoll(
+    arg___s1: *const ::std::os::raw::c_char,
+    arg___s2: *const ::std::os::raw::c_char,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn strcoll(
+                arg___s1: *const ::std::os::raw::c_char,
+                arg___s2: *const ::std::os::raw::c_char,
+            ) -> ::std::os::raw::c_int;
+        }
+        strcoll(arg___s1, arg___s2)
+    })
+}
+pub unsafe fn strxfrm(
+    arg___dest: *mut ::std::os::raw::c_char,
     arg___src: *const ::std::os::raw::c_char,
+    arg___n: ::std::os::raw::c_ulong,
+) -> ::std::os::raw::c_ulong {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn strxfrm(
+                arg___dest: *mut ::std::os::raw::c_char,
+                arg___src: *const ::std::os::raw::c_char,
+                arg___n: ::std::os::raw::c_ulong,
+            ) -> ::std::os::raw::c_ulong;
+        }
+        strxfrm(arg___dest, arg___src, arg___n)
+    })
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct __locale_struct {
+    pub __locales: [*mut __locale_data; 13usize],
+    pub __ctype_b: *const ::std::os::raw::c_ushort,
+    pub __ctype_tolower: *const ::std::os::raw::c_int,
+    pub __ctype_toupper: *const ::std::os::raw::c_int,
+    pub __names: [*const ::std::os::raw::c_char; 13usize],
+}
+impl Default for __locale_struct {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type __locale_t = *mut __locale_struct;
+pub type locale_t = __locale_t;
+pub unsafe fn strcoll_l(
+    arg___s1: *const ::std::os::raw::c_char,
+    arg___s2: *const ::std::os::raw::c_char,
+    arg___l: locale_t,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn strcoll_l(
+                arg___s1: *const ::std::os::raw::c_char,
+                arg___s2: *const ::std::os::raw::c_char,
+                arg___l: locale_t,
+            ) -> ::std::os::raw::c_int;
+        }
+        strcoll_l(arg___s1, arg___s2, arg___l)
+    })
+}
+pub unsafe fn strxfrm_l(
+    arg___dest: *mut ::std::os::raw::c_char,
+    arg___src: *const ::std::os::raw::c_char,
+    arg___n: usize,
+    arg___l: locale_t,
+) -> usize {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn strxfrm_l(
+                arg___dest: *mut ::std::os::raw::c_char,
+                arg___src: *const ::std::os::raw::c_char,
+                arg___n: usize,
+                arg___l: locale_t,
+            ) -> usize;
+        }
+        strxfrm_l(arg___dest, arg___src, arg___n, arg___l)
+    })
+}
+pub unsafe fn strdup(arg___s: *const ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn strdup(arg___s: *const ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
+        }
+        strdup(arg___s)
+    })
+}
+pub unsafe fn strndup(
+    arg___string: *const ::std::os::raw::c_char,
     arg___n: ::std::os::raw::c_ulong,
 ) -> *mut ::std::os::raw::c_char {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn strncpy(
-                arg___dst: *mut ::std::os::raw::c_char,
-                arg___src: *const ::std::os::raw::c_char,
+            fn strndup(
+                arg___string: *const ::std::os::raw::c_char,
                 arg___n: ::std::os::raw::c_ulong,
             ) -> *mut ::std::os::raw::c_char;
         }
-        strncpy(arg___dst, arg___src, arg___n)
+        strndup(arg___string, arg___n)
     })
 }
-pub unsafe fn strpbrk(
+pub unsafe fn strchr(
     arg___s: *const ::std::os::raw::c_char,
-    arg___charset: *const ::std::os::raw::c_char,
+    arg___c: ::std::os::raw::c_int,
 ) -> *mut ::std::os::raw::c_char {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn strpbrk(
+            fn strchr(
                 arg___s: *const ::std::os::raw::c_char,
-                arg___charset: *const ::std::os::raw::c_char,
+                arg___c: ::std::os::raw::c_int,
             ) -> *mut ::std::os::raw::c_char;
         }
-        strpbrk(arg___s, arg___charset)
+        strchr(arg___s, arg___c)
     })
 }
 pub unsafe fn strrchr(
@@ -7669,336 +6405,324 @@ pub unsafe fn strrchr(
         strrchr(arg___s, arg___c)
     })
 }
+pub unsafe fn strcspn(
+    arg___s: *const ::std::os::raw::c_char,
+    arg___reject: *const ::std::os::raw::c_char,
+) -> ::std::os::raw::c_ulong {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn strcspn(
+                arg___s: *const ::std::os::raw::c_char,
+                arg___reject: *const ::std::os::raw::c_char,
+            ) -> ::std::os::raw::c_ulong;
+        }
+        strcspn(arg___s, arg___reject)
+    })
+}
 pub unsafe fn strspn(
     arg___s: *const ::std::os::raw::c_char,
-    arg___charset: *const ::std::os::raw::c_char,
+    arg___accept: *const ::std::os::raw::c_char,
 ) -> ::std::os::raw::c_ulong {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
             fn strspn(
                 arg___s: *const ::std::os::raw::c_char,
-                arg___charset: *const ::std::os::raw::c_char,
+                arg___accept: *const ::std::os::raw::c_char,
             ) -> ::std::os::raw::c_ulong;
         }
-        strspn(arg___s, arg___charset)
+        strspn(arg___s, arg___accept)
+    })
+}
+pub unsafe fn strpbrk(
+    arg___s: *const ::std::os::raw::c_char,
+    arg___accept: *const ::std::os::raw::c_char,
+) -> *mut ::std::os::raw::c_char {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn strpbrk(
+                arg___s: *const ::std::os::raw::c_char,
+                arg___accept: *const ::std::os::raw::c_char,
+            ) -> *mut ::std::os::raw::c_char;
+        }
+        strpbrk(arg___s, arg___accept)
     })
 }
 pub unsafe fn strstr(
-    arg___big: *const ::std::os::raw::c_char,
-    arg___little: *const ::std::os::raw::c_char,
+    arg___haystack: *const ::std::os::raw::c_char,
+    arg___needle: *const ::std::os::raw::c_char,
 ) -> *mut ::std::os::raw::c_char {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
             fn strstr(
-                arg___big: *const ::std::os::raw::c_char,
-                arg___little: *const ::std::os::raw::c_char,
+                arg___haystack: *const ::std::os::raw::c_char,
+                arg___needle: *const ::std::os::raw::c_char,
             ) -> *mut ::std::os::raw::c_char;
         }
-        strstr(arg___big, arg___little)
+        strstr(arg___haystack, arg___needle)
     })
 }
 pub unsafe fn strtok(
-    arg___str: *mut ::std::os::raw::c_char,
-    arg___sep: *const ::std::os::raw::c_char,
+    arg___s: *mut ::std::os::raw::c_char,
+    arg___delim: *const ::std::os::raw::c_char,
 ) -> *mut ::std::os::raw::c_char {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
             fn strtok(
-                arg___str: *mut ::std::os::raw::c_char,
-                arg___sep: *const ::std::os::raw::c_char,
+                arg___s: *mut ::std::os::raw::c_char,
+                arg___delim: *const ::std::os::raw::c_char,
             ) -> *mut ::std::os::raw::c_char;
         }
-        strtok(arg___str, arg___sep)
+        strtok(arg___s, arg___delim)
     })
 }
-pub unsafe fn strxfrm(
-    arg___s1: *mut ::std::os::raw::c_char,
-    arg___s2: *const ::std::os::raw::c_char,
-    arg___n: ::std::os::raw::c_ulong,
-) -> ::std::os::raw::c_ulong {
+pub unsafe fn __strtok_r(
+    arg___s: *mut ::std::os::raw::c_char,
+    arg___delim: *const ::std::os::raw::c_char,
+    arg___save_ptr: *mut *mut ::std::os::raw::c_char,
+) -> *mut ::std::os::raw::c_char {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn strxfrm(
-                arg___s1: *mut ::std::os::raw::c_char,
-                arg___s2: *const ::std::os::raw::c_char,
-                arg___n: ::std::os::raw::c_ulong,
-            ) -> ::std::os::raw::c_ulong;
+            fn __strtok_r(
+                arg___s: *mut ::std::os::raw::c_char,
+                arg___delim: *const ::std::os::raw::c_char,
+                arg___save_ptr: *mut *mut ::std::os::raw::c_char,
+            ) -> *mut ::std::os::raw::c_char;
         }
-        strxfrm(arg___s1, arg___s2, arg___n)
+        __strtok_r(arg___s, arg___delim, arg___save_ptr)
     })
 }
 pub unsafe fn strtok_r(
-    arg___str: *mut ::std::os::raw::c_char,
-    arg___sep: *const ::std::os::raw::c_char,
-    arg___lasts: *mut *mut ::std::os::raw::c_char,
+    arg___s: *mut ::std::os::raw::c_char,
+    arg___delim: *const ::std::os::raw::c_char,
+    arg___save_ptr: *mut *mut ::std::os::raw::c_char,
 ) -> *mut ::std::os::raw::c_char {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
             fn strtok_r(
-                arg___str: *mut ::std::os::raw::c_char,
-                arg___sep: *const ::std::os::raw::c_char,
-                arg___lasts: *mut *mut ::std::os::raw::c_char,
+                arg___s: *mut ::std::os::raw::c_char,
+                arg___delim: *const ::std::os::raw::c_char,
+                arg___save_ptr: *mut *mut ::std::os::raw::c_char,
             ) -> *mut ::std::os::raw::c_char;
         }
-        strtok_r(arg___str, arg___sep, arg___lasts)
+        strtok_r(arg___s, arg___delim, arg___save_ptr)
+    })
+}
+pub unsafe fn strlen(arg___s: *const ::std::os::raw::c_char) -> ::std::os::raw::c_ulong {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn strlen(arg___s: *const ::std::os::raw::c_char) -> ::std::os::raw::c_ulong;
+        }
+        strlen(arg___s)
+    })
+}
+pub unsafe fn strnlen(arg___string: *const ::std::os::raw::c_char, arg___maxlen: usize) -> usize {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn strnlen(arg___string: *const ::std::os::raw::c_char, arg___maxlen: usize) -> usize;
+        }
+        strnlen(arg___string, arg___maxlen)
+    })
+}
+pub unsafe fn strerror(arg___errnum: ::std::os::raw::c_int) -> *mut ::std::os::raw::c_char {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn strerror(arg___errnum: ::std::os::raw::c_int) -> *mut ::std::os::raw::c_char;
+        }
+        strerror(arg___errnum)
     })
 }
 pub unsafe fn strerror_r(
     arg___errnum: ::std::os::raw::c_int,
-    arg___strerrbuf: *mut ::std::os::raw::c_char,
+    arg___buf: *mut ::std::os::raw::c_char,
     arg___buflen: usize,
 ) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
             fn strerror_r(
                 arg___errnum: ::std::os::raw::c_int,
-                arg___strerrbuf: *mut ::std::os::raw::c_char,
+                arg___buf: *mut ::std::os::raw::c_char,
                 arg___buflen: usize,
             ) -> ::std::os::raw::c_int;
         }
-        strerror_r(arg___errnum, arg___strerrbuf, arg___buflen)
+        strerror_r(arg___errnum, arg___buf, arg___buflen)
     })
 }
-pub unsafe fn strdup(arg___s1: *const ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char {
+pub unsafe fn strerror_l(
+    arg___errnum: ::std::os::raw::c_int,
+    arg___l: locale_t,
+) -> *mut ::std::os::raw::c_char {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn strdup(arg___s1: *const ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
+            fn strerror_l(
+                arg___errnum: ::std::os::raw::c_int,
+                arg___l: locale_t,
+            ) -> *mut ::std::os::raw::c_char;
         }
-        strdup(arg___s1)
+        strerror_l(arg___errnum, arg___l)
     })
 }
-pub unsafe fn memccpy(
-    arg___dst: *mut ::std::os::raw::c_void,
+pub unsafe fn bcmp(
+    arg___s1: *const ::std::os::raw::c_void,
+    arg___s2: *const ::std::os::raw::c_void,
+    arg___n: ::std::os::raw::c_ulong,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn bcmp(
+                arg___s1: *const ::std::os::raw::c_void,
+                arg___s2: *const ::std::os::raw::c_void,
+                arg___n: ::std::os::raw::c_ulong,
+            ) -> ::std::os::raw::c_int;
+        }
+        bcmp(arg___s1, arg___s2, arg___n)
+    })
+}
+pub unsafe fn bcopy(
     arg___src: *const ::std::os::raw::c_void,
-    arg___c: ::std::os::raw::c_int,
-    arg___n: ::std::os::raw::c_ulong,
-) -> *mut ::std::os::raw::c_void {
+    arg___dest: *mut ::std::os::raw::c_void,
+    arg___n: usize,
+) {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn memccpy(
-                arg___dst: *mut ::std::os::raw::c_void,
+            fn bcopy(
                 arg___src: *const ::std::os::raw::c_void,
-                arg___c: ::std::os::raw::c_int,
-                arg___n: ::std::os::raw::c_ulong,
-            ) -> *mut ::std::os::raw::c_void;
+                arg___dest: *mut ::std::os::raw::c_void,
+                arg___n: usize,
+            );
         }
-        memccpy(arg___dst, arg___src, arg___c, arg___n)
+        bcopy(arg___src, arg___dest, arg___n)
     })
 }
-pub unsafe fn stpcpy(
-    arg___dst: *mut ::std::os::raw::c_char,
-    arg___src: *const ::std::os::raw::c_char,
-) -> *mut ::std::os::raw::c_char {
+pub unsafe fn bzero(arg___s: *mut ::std::os::raw::c_void, arg___n: ::std::os::raw::c_ulong) {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn stpcpy(
-                arg___dst: *mut ::std::os::raw::c_char,
-                arg___src: *const ::std::os::raw::c_char,
-            ) -> *mut ::std::os::raw::c_char;
+            fn bzero(arg___s: *mut ::std::os::raw::c_void, arg___n: ::std::os::raw::c_ulong);
         }
-        stpcpy(arg___dst, arg___src)
+        bzero(arg___s, arg___n)
     })
 }
-pub unsafe fn stpncpy(
-    arg___dst: *mut ::std::os::raw::c_char,
-    arg___src: *const ::std::os::raw::c_char,
-    arg___n: ::std::os::raw::c_ulong,
-) -> *mut ::std::os::raw::c_char {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn stpncpy(
-                arg___dst: *mut ::std::os::raw::c_char,
-                arg___src: *const ::std::os::raw::c_char,
-                arg___n: ::std::os::raw::c_ulong,
-            ) -> *mut ::std::os::raw::c_char;
-        }
-        stpncpy(arg___dst, arg___src, arg___n)
-    })
-}
-pub unsafe fn strndup(
-    arg___s1: *const ::std::os::raw::c_char,
-    arg___n: ::std::os::raw::c_ulong,
-) -> *mut ::std::os::raw::c_char {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn strndup(
-                arg___s1: *const ::std::os::raw::c_char,
-                arg___n: ::std::os::raw::c_ulong,
-            ) -> *mut ::std::os::raw::c_char;
-        }
-        strndup(arg___s1, arg___n)
-    })
-}
-pub unsafe fn strnlen(arg___s1: *const ::std::os::raw::c_char, arg___n: usize) -> usize {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn strnlen(arg___s1: *const ::std::os::raw::c_char, arg___n: usize) -> usize;
-        }
-        strnlen(arg___s1, arg___n)
-    })
-}
-pub unsafe fn strsignal(arg___sig: ::std::os::raw::c_int) -> *mut ::std::os::raw::c_char {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn strsignal(arg___sig: ::std::os::raw::c_int) -> *mut ::std::os::raw::c_char;
-        }
-        strsignal(arg___sig)
-    })
-}
-pub type rsize_t = __darwin_size_t;
-pub type errno_t = ::std::os::raw::c_int;
-pub unsafe fn memset_s(
-    arg___s: *mut ::std::os::raw::c_void,
-    arg___smax: rsize_t,
+pub unsafe fn index(
+    arg___s: *const ::std::os::raw::c_char,
     arg___c: ::std::os::raw::c_int,
-    arg___n: rsize_t,
-) -> errno_t {
+) -> *mut ::std::os::raw::c_char {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn memset_s(
-                arg___s: *mut ::std::os::raw::c_void,
-                arg___smax: rsize_t,
+            fn index(
+                arg___s: *const ::std::os::raw::c_char,
                 arg___c: ::std::os::raw::c_int,
-                arg___n: rsize_t,
-            ) -> errno_t;
+            ) -> *mut ::std::os::raw::c_char;
         }
-        memset_s(arg___s, arg___smax, arg___c, arg___n)
+        index(arg___s, arg___c)
     })
 }
-pub unsafe fn memmem(
-    arg___big: *const ::std::os::raw::c_void,
-    arg___big_len: usize,
-    arg___little: *const ::std::os::raw::c_void,
-    arg___little_len: usize,
-) -> *mut ::std::os::raw::c_void {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn memmem(
-                arg___big: *const ::std::os::raw::c_void,
-                arg___big_len: usize,
-                arg___little: *const ::std::os::raw::c_void,
-                arg___little_len: usize,
-            ) -> *mut ::std::os::raw::c_void;
-        }
-        memmem(arg___big, arg___big_len, arg___little, arg___little_len)
-    })
-}
-pub unsafe fn memset_pattern4(
-    arg___b: *mut ::std::os::raw::c_void,
-    arg___pattern4: *const ::std::os::raw::c_void,
-    arg___len: usize,
-) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn memset_pattern4(
-                arg___b: *mut ::std::os::raw::c_void,
-                arg___pattern4: *const ::std::os::raw::c_void,
-                arg___len: usize,
-            );
-        }
-        memset_pattern4(arg___b, arg___pattern4, arg___len)
-    })
-}
-pub unsafe fn memset_pattern8(
-    arg___b: *mut ::std::os::raw::c_void,
-    arg___pattern8: *const ::std::os::raw::c_void,
-    arg___len: usize,
-) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn memset_pattern8(
-                arg___b: *mut ::std::os::raw::c_void,
-                arg___pattern8: *const ::std::os::raw::c_void,
-                arg___len: usize,
-            );
-        }
-        memset_pattern8(arg___b, arg___pattern8, arg___len)
-    })
-}
-pub unsafe fn memset_pattern16(
-    arg___b: *mut ::std::os::raw::c_void,
-    arg___pattern16: *const ::std::os::raw::c_void,
-    arg___len: usize,
-) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn memset_pattern16(
-                arg___b: *mut ::std::os::raw::c_void,
-                arg___pattern16: *const ::std::os::raw::c_void,
-                arg___len: usize,
-            );
-        }
-        memset_pattern16(arg___b, arg___pattern16, arg___len)
-    })
-}
-pub unsafe fn strcasestr(
-    arg___big: *const ::std::os::raw::c_char,
-    arg___little: *const ::std::os::raw::c_char,
+pub unsafe fn rindex(
+    arg___s: *const ::std::os::raw::c_char,
+    arg___c: ::std::os::raw::c_int,
 ) -> *mut ::std::os::raw::c_char {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn strcasestr(
-                arg___big: *const ::std::os::raw::c_char,
-                arg___little: *const ::std::os::raw::c_char,
+            fn rindex(
+                arg___s: *const ::std::os::raw::c_char,
+                arg___c: ::std::os::raw::c_int,
             ) -> *mut ::std::os::raw::c_char;
         }
-        strcasestr(arg___big, arg___little)
+        rindex(arg___s, arg___c)
     })
 }
-pub unsafe fn strnstr(
-    arg___big: *const ::std::os::raw::c_char,
-    arg___little: *const ::std::os::raw::c_char,
-    arg___len: usize,
-) -> *mut ::std::os::raw::c_char {
+pub unsafe fn ffs(arg___i: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn strnstr(
-                arg___big: *const ::std::os::raw::c_char,
-                arg___little: *const ::std::os::raw::c_char,
-                arg___len: usize,
-            ) -> *mut ::std::os::raw::c_char;
+            fn ffs(arg___i: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
         }
-        strnstr(arg___big, arg___little, arg___len)
+        ffs(arg___i)
     })
 }
-pub unsafe fn strlcat(
-    arg___dst: *mut ::std::os::raw::c_char,
-    arg___source: *const ::std::os::raw::c_char,
-    arg___size: ::std::os::raw::c_ulong,
-) -> ::std::os::raw::c_ulong {
+pub unsafe fn ffsl(arg___l: ::std::os::raw::c_long) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn strlcat(
-                arg___dst: *mut ::std::os::raw::c_char,
-                arg___source: *const ::std::os::raw::c_char,
-                arg___size: ::std::os::raw::c_ulong,
-            ) -> ::std::os::raw::c_ulong;
+            fn ffsl(arg___l: ::std::os::raw::c_long) -> ::std::os::raw::c_int;
         }
-        strlcat(arg___dst, arg___source, arg___size)
+        ffsl(arg___l)
     })
 }
-pub unsafe fn strlcpy(
-    arg___dst: *mut ::std::os::raw::c_char,
-    arg___source: *const ::std::os::raw::c_char,
-    arg___size: ::std::os::raw::c_ulong,
-) -> ::std::os::raw::c_ulong {
+pub unsafe fn ffsll(arg___ll: ::std::os::raw::c_longlong) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn strlcpy(
-                arg___dst: *mut ::std::os::raw::c_char,
-                arg___source: *const ::std::os::raw::c_char,
-                arg___size: ::std::os::raw::c_ulong,
-            ) -> ::std::os::raw::c_ulong;
+            fn ffsll(arg___ll: ::std::os::raw::c_longlong) -> ::std::os::raw::c_int;
         }
-        strlcpy(arg___dst, arg___source, arg___size)
+        ffsll(arg___ll)
     })
 }
-pub unsafe fn strmode(arg___mode: ::std::os::raw::c_int, arg___bp: *mut ::std::os::raw::c_char) {
+pub unsafe fn strcasecmp(
+    arg___s1: *const ::std::os::raw::c_char,
+    arg___s2: *const ::std::os::raw::c_char,
+) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn strmode(arg___mode: ::std::os::raw::c_int, arg___bp: *mut ::std::os::raw::c_char);
+            fn strcasecmp(
+                arg___s1: *const ::std::os::raw::c_char,
+                arg___s2: *const ::std::os::raw::c_char,
+            ) -> ::std::os::raw::c_int;
         }
-        strmode(arg___mode, arg___bp)
+        strcasecmp(arg___s1, arg___s2)
+    })
+}
+pub unsafe fn strncasecmp(
+    arg___s1: *const ::std::os::raw::c_char,
+    arg___s2: *const ::std::os::raw::c_char,
+    arg___n: ::std::os::raw::c_ulong,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn strncasecmp(
+                arg___s1: *const ::std::os::raw::c_char,
+                arg___s2: *const ::std::os::raw::c_char,
+                arg___n: ::std::os::raw::c_ulong,
+            ) -> ::std::os::raw::c_int;
+        }
+        strncasecmp(arg___s1, arg___s2, arg___n)
+    })
+}
+pub unsafe fn strcasecmp_l(
+    arg___s1: *const ::std::os::raw::c_char,
+    arg___s2: *const ::std::os::raw::c_char,
+    arg___loc: locale_t,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn strcasecmp_l(
+                arg___s1: *const ::std::os::raw::c_char,
+                arg___s2: *const ::std::os::raw::c_char,
+                arg___loc: locale_t,
+            ) -> ::std::os::raw::c_int;
+        }
+        strcasecmp_l(arg___s1, arg___s2, arg___loc)
+    })
+}
+pub unsafe fn strncasecmp_l(
+    arg___s1: *const ::std::os::raw::c_char,
+    arg___s2: *const ::std::os::raw::c_char,
+    arg___n: usize,
+    arg___loc: locale_t,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn strncasecmp_l(
+                arg___s1: *const ::std::os::raw::c_char,
+                arg___s2: *const ::std::os::raw::c_char,
+                arg___n: usize,
+                arg___loc: locale_t,
+            ) -> ::std::os::raw::c_int;
+        }
+        strncasecmp_l(arg___s1, arg___s2, arg___n, arg___loc)
+    })
+}
+pub unsafe fn explicit_bzero(arg___s: *mut ::std::os::raw::c_void, arg___n: usize) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn explicit_bzero(arg___s: *mut ::std::os::raw::c_void, arg___n: usize);
+        }
+        explicit_bzero(arg___s, arg___n)
     })
 }
 pub unsafe fn strsep(
@@ -8015,268 +6739,106 @@ pub unsafe fn strsep(
         strsep(arg___stringp, arg___delim)
     })
 }
-pub unsafe fn swab(
-    arg_arg1: *const ::std::os::raw::c_void,
-    arg_arg2: *mut ::std::os::raw::c_void,
-    arg_arg3: isize,
-) {
+pub unsafe fn strsignal(arg___sig: ::std::os::raw::c_int) -> *mut ::std::os::raw::c_char {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn swab(
-                arg_arg1: *const ::std::os::raw::c_void,
-                arg_arg2: *mut ::std::os::raw::c_void,
-                arg_arg3: isize,
-            );
+            fn strsignal(arg___sig: ::std::os::raw::c_int) -> *mut ::std::os::raw::c_char;
         }
-        swab(arg_arg1, arg_arg2, arg_arg3)
+        strsignal(arg___sig)
     })
 }
-pub unsafe fn timingsafe_bcmp(
-    arg___b1: *const ::std::os::raw::c_void,
-    arg___b2: *const ::std::os::raw::c_void,
-    arg___len: usize,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn timingsafe_bcmp(
-                arg___b1: *const ::std::os::raw::c_void,
-                arg___b2: *const ::std::os::raw::c_void,
-                arg___len: usize,
-            ) -> ::std::os::raw::c_int;
-        }
-        timingsafe_bcmp(arg___b1, arg___b2, arg___len)
-    })
-}
-pub unsafe fn strsignal_r(
-    arg___sig: ::std::os::raw::c_int,
-    arg___strsignalbuf: *mut ::std::os::raw::c_char,
-    arg___buflen: usize,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn strsignal_r(
-                arg___sig: ::std::os::raw::c_int,
-                arg___strsignalbuf: *mut ::std::os::raw::c_char,
-                arg___buflen: usize,
-            ) -> ::std::os::raw::c_int;
-        }
-        strsignal_r(arg___sig, arg___strsignalbuf, arg___buflen)
-    })
-}
-pub unsafe fn bcmp(
-    arg_arg1: *const ::std::os::raw::c_void,
-    arg_arg2: *const ::std::os::raw::c_void,
-    arg_arg3: ::std::os::raw::c_ulong,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn bcmp(
-                arg_arg1: *const ::std::os::raw::c_void,
-                arg_arg2: *const ::std::os::raw::c_void,
-                arg_arg3: ::std::os::raw::c_ulong,
-            ) -> ::std::os::raw::c_int;
-        }
-        bcmp(arg_arg1, arg_arg2, arg_arg3)
-    })
-}
-pub unsafe fn bcopy(
-    arg_arg1: *const ::std::os::raw::c_void,
-    arg_arg2: *mut ::std::os::raw::c_void,
-    arg_arg3: usize,
-) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn bcopy(
-                arg_arg1: *const ::std::os::raw::c_void,
-                arg_arg2: *mut ::std::os::raw::c_void,
-                arg_arg3: usize,
-            );
-        }
-        bcopy(arg_arg1, arg_arg2, arg_arg3)
-    })
-}
-pub unsafe fn bzero(arg_arg1: *mut ::std::os::raw::c_void, arg_arg2: ::std::os::raw::c_ulong) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn bzero(arg_arg1: *mut ::std::os::raw::c_void, arg_arg2: ::std::os::raw::c_ulong);
-        }
-        bzero(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn index(
-    arg_arg1: *const ::std::os::raw::c_char,
-    arg_arg2: ::std::os::raw::c_int,
+pub unsafe fn __stpcpy(
+    arg___dest: *mut ::std::os::raw::c_char,
+    arg___src: *const ::std::os::raw::c_char,
 ) -> *mut ::std::os::raw::c_char {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn index(
-                arg_arg1: *const ::std::os::raw::c_char,
-                arg_arg2: ::std::os::raw::c_int,
+            fn __stpcpy(
+                arg___dest: *mut ::std::os::raw::c_char,
+                arg___src: *const ::std::os::raw::c_char,
             ) -> *mut ::std::os::raw::c_char;
         }
-        index(arg_arg1, arg_arg2)
+        __stpcpy(arg___dest, arg___src)
     })
 }
-pub unsafe fn rindex(
-    arg_arg1: *const ::std::os::raw::c_char,
-    arg_arg2: ::std::os::raw::c_int,
+pub unsafe fn stpcpy(
+    arg___dest: *mut ::std::os::raw::c_char,
+    arg___src: *const ::std::os::raw::c_char,
 ) -> *mut ::std::os::raw::c_char {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn rindex(
-                arg_arg1: *const ::std::os::raw::c_char,
-                arg_arg2: ::std::os::raw::c_int,
+            fn stpcpy(
+                arg___dest: *mut ::std::os::raw::c_char,
+                arg___src: *const ::std::os::raw::c_char,
             ) -> *mut ::std::os::raw::c_char;
         }
-        rindex(arg_arg1, arg_arg2)
+        stpcpy(arg___dest, arg___src)
     })
 }
-pub unsafe fn ffs(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
+pub unsafe fn __stpncpy(
+    arg___dest: *mut ::std::os::raw::c_char,
+    arg___src: *const ::std::os::raw::c_char,
+    arg___n: usize,
+) -> *mut ::std::os::raw::c_char {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn ffs(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+            fn __stpncpy(
+                arg___dest: *mut ::std::os::raw::c_char,
+                arg___src: *const ::std::os::raw::c_char,
+                arg___n: usize,
+            ) -> *mut ::std::os::raw::c_char;
         }
-        ffs(arg_arg1)
+        __stpncpy(arg___dest, arg___src, arg___n)
     })
 }
-pub unsafe fn strcasecmp(
-    arg_arg1: *const ::std::os::raw::c_char,
-    arg_arg2: *const ::std::os::raw::c_char,
-) -> ::std::os::raw::c_int {
+pub unsafe fn stpncpy(
+    arg___dest: *mut ::std::os::raw::c_char,
+    arg___src: *const ::std::os::raw::c_char,
+    arg___n: ::std::os::raw::c_ulong,
+) -> *mut ::std::os::raw::c_char {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn strcasecmp(
-                arg_arg1: *const ::std::os::raw::c_char,
-                arg_arg2: *const ::std::os::raw::c_char,
-            ) -> ::std::os::raw::c_int;
+            fn stpncpy(
+                arg___dest: *mut ::std::os::raw::c_char,
+                arg___src: *const ::std::os::raw::c_char,
+                arg___n: ::std::os::raw::c_ulong,
+            ) -> *mut ::std::os::raw::c_char;
         }
-        strcasecmp(arg_arg1, arg_arg2)
+        stpncpy(arg___dest, arg___src, arg___n)
     })
 }
-pub unsafe fn strncasecmp(
-    arg_arg1: *const ::std::os::raw::c_char,
-    arg_arg2: *const ::std::os::raw::c_char,
-    arg_arg3: ::std::os::raw::c_ulong,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn strncasecmp(
-                arg_arg1: *const ::std::os::raw::c_char,
-                arg_arg2: *const ::std::os::raw::c_char,
-                arg_arg3: ::std::os::raw::c_ulong,
-            ) -> ::std::os::raw::c_int;
-        }
-        strncasecmp(arg_arg1, arg_arg2, arg_arg3)
-    })
-}
-pub unsafe fn ffsl(arg_arg1: ::std::os::raw::c_long) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn ffsl(arg_arg1: ::std::os::raw::c_long) -> ::std::os::raw::c_int;
-        }
-        ffsl(arg_arg1)
-    })
-}
-pub unsafe fn ffsll(arg_arg1: ::std::os::raw::c_longlong) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn ffsll(arg_arg1: ::std::os::raw::c_longlong) -> ::std::os::raw::c_int;
-        }
-        ffsll(arg_arg1)
-    })
-}
-pub unsafe fn fls(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn fls(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
-        }
-        fls(arg_arg1)
-    })
-}
-pub unsafe fn flsl(arg_arg1: ::std::os::raw::c_long) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn flsl(arg_arg1: ::std::os::raw::c_long) -> ::std::os::raw::c_int;
-        }
-        flsl(arg_arg1)
-    })
-}
-pub unsafe fn flsll(arg_arg1: ::std::os::raw::c_longlong) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn flsll(arg_arg1: ::std::os::raw::c_longlong) -> ::std::os::raw::c_int;
-        }
-        flsll(arg_arg1)
-    })
-}
-pub type max_align_t = f64;
-pub type __gnuc_va_list = __builtin_va_list;
-pub type u_char = ::std::os::raw::c_uchar;
-pub type u_short = ::std::os::raw::c_ushort;
-pub type u_int = ::std::os::raw::c_uint;
-pub type u_long = ::std::os::raw::c_ulong;
-pub type ushort = ::std::os::raw::c_ushort;
-pub type uint = ::std::os::raw::c_uint;
-pub type u_quad_t = u_int64_t;
-pub type quad_t = i64;
-pub type qaddr_t = *mut quad_t;
-pub type caddr_t = *mut ::std::os::raw::c_char;
-pub type daddr_t = i32;
-pub type fixpt_t = u_int32_t;
-pub type blkcnt_t = __darwin_blkcnt_t;
-pub type blksize_t = __darwin_blksize_t;
-pub type gid_t = __darwin_gid_t;
-pub type in_addr_t = __uint32_t;
-pub type in_port_t = __uint16_t;
-pub type ino_t = __darwin_ino_t;
-pub type ino64_t = __darwin_ino64_t;
-pub type key_t = __int32_t;
-pub type nlink_t = __uint16_t;
-pub type segsz_t = i32;
-pub type swblk_t = i32;
-pub type clock_t = __darwin_clock_t;
-pub type time_t = __darwin_time_t;
-pub type useconds_t = __darwin_useconds_t;
-pub type suseconds_t = __darwin_suseconds_t;
 #[repr(C)]
+#[repr(align(16))]
 #[derive(Debug, Default, Copy, Clone)]
-pub struct fd_set {
-    pub fds_bits: [__int32_t; 32usize],
+pub struct max_align_t {
+    pub __clang_max_align_nonce1: ::std::os::raw::c_longlong,
+    pub __bindgen_padding_0: u64,
+    pub __clang_max_align_nonce2: u128,
 }
-pub unsafe fn __darwin_check_fd_set_overflow(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: *const ::std::os::raw::c_void,
-    arg_arg3: ::std::os::raw::c_int,
-) -> ::std::os::raw::c_int {
+pub type int_least8_t = __int_least8_t;
+pub type int_least16_t = __int_least16_t;
+pub type int_least32_t = __int_least32_t;
+pub type int_least64_t = __int_least64_t;
+pub type uint_least8_t = __uint_least8_t;
+pub type uint_least16_t = __uint_least16_t;
+pub type uint_least32_t = __uint_least32_t;
+pub type uint_least64_t = __uint_least64_t;
+pub type int_fast8_t = ::std::os::raw::c_schar;
+pub type int_fast16_t = ::std::os::raw::c_long;
+pub type int_fast32_t = ::std::os::raw::c_long;
+pub type int_fast64_t = ::std::os::raw::c_long;
+pub type uint_fast8_t = ::std::os::raw::c_uchar;
+pub type uint_fast16_t = ::std::os::raw::c_ulong;
+pub type uint_fast32_t = ::std::os::raw::c_ulong;
+pub type uint_fast64_t = ::std::os::raw::c_ulong;
+pub type intmax_t = __intmax_t;
+pub type uintmax_t = __uintmax_t;
+pub unsafe fn __errno_location() -> *mut ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn __darwin_check_fd_set_overflow(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: *const ::std::os::raw::c_void,
-                arg_arg3: ::std::os::raw::c_int,
-            ) -> ::std::os::raw::c_int;
+            fn __errno_location() -> *mut ::std::os::raw::c_int;
         }
-        __darwin_check_fd_set_overflow(arg_arg1, arg_arg2, arg_arg3)
-    })
-}
-pub type fd_mask = __int32_t;
-pub type pthread_cond_t = __darwin_pthread_cond_t;
-pub type pthread_condattr_t = __darwin_pthread_condattr_t;
-pub type pthread_mutex_t = __darwin_pthread_mutex_t;
-pub type pthread_mutexattr_t = __darwin_pthread_mutexattr_t;
-pub type pthread_once_t = __darwin_pthread_once_t;
-pub type pthread_rwlock_t = __darwin_pthread_rwlock_t;
-pub type pthread_rwlockattr_t = __darwin_pthread_rwlockattr_t;
-pub type pthread_t = __darwin_pthread_t;
-pub type pthread_key_t = __darwin_pthread_key_t;
-pub type fsblkcnt_t = __darwin_fsblkcnt_t;
-pub type fsfilcnt_t = __darwin_fsfilcnt_t;
-pub unsafe fn __error() -> *mut ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn __error() -> *mut ::std::os::raw::c_int;
-        }
-        __error()
+        __errno_location()
     })
 }
 #[repr(C)]
@@ -8301,8 +6863,8 @@ pub struct lconv {
     pub p_sign_posn: ::std::os::raw::c_char,
     pub n_sign_posn: ::std::os::raw::c_char,
     pub int_p_cs_precedes: ::std::os::raw::c_char,
-    pub int_n_cs_precedes: ::std::os::raw::c_char,
     pub int_p_sep_by_space: ::std::os::raw::c_char,
+    pub int_n_cs_precedes: ::std::os::raw::c_char,
     pub int_n_sep_by_space: ::std::os::raw::c_char,
     pub int_p_sign_posn: ::std::os::raw::c_char,
     pub int_n_sign_posn: ::std::os::raw::c_char,
@@ -8316,6 +6878,20 @@ impl Default for lconv {
         }
     }
 }
+pub unsafe fn setlocale(
+    arg___category: ::std::os::raw::c_int,
+    arg___locale: *const ::std::os::raw::c_char,
+) -> *mut ::std::os::raw::c_char {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn setlocale(
+                arg___category: ::std::os::raw::c_int,
+                arg___locale: *const ::std::os::raw::c_char,
+            ) -> *mut ::std::os::raw::c_char;
+        }
+        setlocale(arg___category, arg___locale)
+    })
+}
 pub unsafe fn localeconv() -> *mut lconv {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
@@ -8324,18 +6900,44 @@ pub unsafe fn localeconv() -> *mut lconv {
         localeconv()
     })
 }
-pub unsafe fn setlocale(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: *const ::std::os::raw::c_char,
-) -> *mut ::std::os::raw::c_char {
+pub unsafe fn newlocale(
+    arg___category_mask: ::std::os::raw::c_int,
+    arg___locale: *const ::std::os::raw::c_char,
+    arg___base: locale_t,
+) -> locale_t {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn setlocale(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: *const ::std::os::raw::c_char,
-            ) -> *mut ::std::os::raw::c_char;
+            fn newlocale(
+                arg___category_mask: ::std::os::raw::c_int,
+                arg___locale: *const ::std::os::raw::c_char,
+                arg___base: locale_t,
+            ) -> locale_t;
         }
-        setlocale(arg_arg1, arg_arg2)
+        newlocale(arg___category_mask, arg___locale, arg___base)
+    })
+}
+pub unsafe fn duplocale(arg___dataset: locale_t) -> locale_t {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn duplocale(arg___dataset: locale_t) -> locale_t;
+        }
+        duplocale(arg___dataset)
+    })
+}
+pub unsafe fn freelocale(arg___dataset: locale_t) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn freelocale(arg___dataset: locale_t);
+        }
+        freelocale(arg___dataset)
+    })
+}
+pub unsafe fn uselocale(arg___dataset: locale_t) -> locale_t {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn uselocale(arg___dataset: locale_t) -> locale_t;
+        }
+        uselocale(arg___dataset)
     })
 }
 pub type Pointer = *mut ::std::os::raw::c_char;
@@ -8473,156 +7075,411 @@ impl Default for PGAlignedXLogBlock {
         }
     }
 }
-pub unsafe fn fdatasync(arg_fildes: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
+pub const _ISupper: ::std::os::raw::c_uint = 256;
+pub const _ISlower: ::std::os::raw::c_uint = 512;
+pub const _ISalpha: ::std::os::raw::c_uint = 1024;
+pub const _ISdigit: ::std::os::raw::c_uint = 2048;
+pub const _ISxdigit: ::std::os::raw::c_uint = 4096;
+pub const _ISspace: ::std::os::raw::c_uint = 8192;
+pub const _ISprint: ::std::os::raw::c_uint = 16384;
+pub const _ISgraph: ::std::os::raw::c_uint = 32768;
+pub const _ISblank: ::std::os::raw::c_uint = 1;
+pub const _IScntrl: ::std::os::raw::c_uint = 2;
+pub const _ISpunct: ::std::os::raw::c_uint = 4;
+pub const _ISalnum: ::std::os::raw::c_uint = 8;
+pub type _bindgen_ty_1 = ::std::os::raw::c_uint;
+pub unsafe fn __ctype_b_loc() -> *mut *const ::std::os::raw::c_ushort {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn fdatasync(arg_fildes: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+            fn __ctype_b_loc() -> *mut *const ::std::os::raw::c_ushort;
         }
-        fdatasync(arg_fildes)
+        __ctype_b_loc()
     })
 }
-pub type wint_t = __darwin_wint_t;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct _RuneEntry {
-    pub __min: __darwin_rune_t,
-    pub __max: __darwin_rune_t,
-    pub __map: __darwin_rune_t,
-    pub __types: *mut __uint32_t,
-}
-impl Default for _RuneEntry {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct _RuneRange {
-    pub __nranges: ::std::os::raw::c_int,
-    pub __ranges: *mut _RuneEntry,
-}
-impl Default for _RuneRange {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct _RuneCharClass {
-    pub __name: [::std::os::raw::c_char; 14usize],
-    pub __mask: __uint32_t,
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct _RuneLocale {
-    pub __magic: [::std::os::raw::c_char; 8usize],
-    pub __encoding: [::std::os::raw::c_char; 32usize],
-    pub __sgetrune: ::std::option::Option<
-        unsafe extern "C" fn(
-            arg1: *const ::std::os::raw::c_char,
-            arg2: __darwin_size_t,
-            arg3: *mut *const ::std::os::raw::c_char,
-        ) -> __darwin_rune_t,
-    >,
-    pub __sputrune: ::std::option::Option<
-        unsafe extern "C" fn(
-            arg1: __darwin_rune_t,
-            arg2: *mut ::std::os::raw::c_char,
-            arg3: __darwin_size_t,
-            arg4: *mut *mut ::std::os::raw::c_char,
-        ) -> ::std::os::raw::c_int,
-    >,
-    pub __invalid_rune: __darwin_rune_t,
-    pub __runetype: [__uint32_t; 256usize],
-    pub __maplower: [__darwin_rune_t; 256usize],
-    pub __mapupper: [__darwin_rune_t; 256usize],
-    pub __runetype_ext: _RuneRange,
-    pub __maplower_ext: _RuneRange,
-    pub __mapupper_ext: _RuneRange,
-    pub __variable: *mut ::std::os::raw::c_void,
-    pub __variable_len: ::std::os::raw::c_int,
-    pub __ncharclasses: ::std::os::raw::c_int,
-    pub __charclasses: *mut _RuneCharClass,
-}
-impl Default for _RuneLocale {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-extern "C" {
-    pub static mut _DefaultRuneLocale: _RuneLocale;
-}
-extern "C" {
-    pub static mut _CurrentRuneLocale: *mut _RuneLocale;
-}
-pub unsafe fn ___runetype(arg_arg1: __darwin_ct_rune_t) -> ::std::os::raw::c_ulong {
+pub unsafe fn __ctype_tolower_loc() -> *mut *const __int32_t {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn ___runetype(arg_arg1: __darwin_ct_rune_t) -> ::std::os::raw::c_ulong;
+            fn __ctype_tolower_loc() -> *mut *const __int32_t;
         }
-        ___runetype(arg_arg1)
+        __ctype_tolower_loc()
     })
 }
-pub unsafe fn ___tolower(arg_arg1: __darwin_ct_rune_t) -> __darwin_ct_rune_t {
+pub unsafe fn __ctype_toupper_loc() -> *mut *const __int32_t {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn ___tolower(arg_arg1: __darwin_ct_rune_t) -> __darwin_ct_rune_t;
+            fn __ctype_toupper_loc() -> *mut *const __int32_t;
         }
-        ___tolower(arg_arg1)
+        __ctype_toupper_loc()
     })
 }
-pub unsafe fn ___toupper(arg_arg1: __darwin_ct_rune_t) -> __darwin_ct_rune_t {
+pub unsafe fn isalnum(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn ___toupper(arg_arg1: __darwin_ct_rune_t) -> __darwin_ct_rune_t;
+            fn isalnum(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
         }
-        ___toupper(arg_arg1)
+        isalnum(arg_arg1)
     })
 }
-pub unsafe fn __maskrune(
-    arg_arg1: __darwin_ct_rune_t,
-    arg_arg2: ::std::os::raw::c_ulong,
+pub unsafe fn isalpha(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn isalpha(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+        }
+        isalpha(arg_arg1)
+    })
+}
+pub unsafe fn iscntrl(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn iscntrl(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+        }
+        iscntrl(arg_arg1)
+    })
+}
+pub unsafe fn isdigit(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn isdigit(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+        }
+        isdigit(arg_arg1)
+    })
+}
+pub unsafe fn islower(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn islower(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+        }
+        islower(arg_arg1)
+    })
+}
+pub unsafe fn isgraph(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn isgraph(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+        }
+        isgraph(arg_arg1)
+    })
+}
+pub unsafe fn isprint(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn isprint(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+        }
+        isprint(arg_arg1)
+    })
+}
+pub unsafe fn ispunct(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn ispunct(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+        }
+        ispunct(arg_arg1)
+    })
+}
+pub unsafe fn isspace(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn isspace(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+        }
+        isspace(arg_arg1)
+    })
+}
+pub unsafe fn isupper(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn isupper(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+        }
+        isupper(arg_arg1)
+    })
+}
+pub unsafe fn isxdigit(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn isxdigit(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+        }
+        isxdigit(arg_arg1)
+    })
+}
+pub unsafe fn tolower(arg___c: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn tolower(arg___c: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+        }
+        tolower(arg___c)
+    })
+}
+pub unsafe fn toupper(arg___c: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn toupper(arg___c: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+        }
+        toupper(arg___c)
+    })
+}
+pub unsafe fn isblank(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn isblank(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+        }
+        isblank(arg_arg1)
+    })
+}
+pub unsafe fn isascii(arg___c: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn isascii(arg___c: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+        }
+        isascii(arg___c)
+    })
+}
+pub unsafe fn toascii(arg___c: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn toascii(arg___c: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+        }
+        toascii(arg___c)
+    })
+}
+pub unsafe fn _toupper(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn _toupper(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+        }
+        _toupper(arg_arg1)
+    })
+}
+pub unsafe fn _tolower(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn _tolower(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+        }
+        _tolower(arg_arg1)
+    })
+}
+pub unsafe fn isalnum_l(
+    arg_arg1: ::std::os::raw::c_int,
+    arg_arg2: locale_t,
 ) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn __maskrune(
-                arg_arg1: __darwin_ct_rune_t,
-                arg_arg2: ::std::os::raw::c_ulong,
+            fn isalnum_l(
+                arg_arg1: ::std::os::raw::c_int,
+                arg_arg2: locale_t,
             ) -> ::std::os::raw::c_int;
         }
-        __maskrune(arg_arg1, arg_arg2)
+        isalnum_l(arg_arg1, arg_arg2)
     })
 }
-pub unsafe fn __toupper(arg_arg1: __darwin_ct_rune_t) -> __darwin_ct_rune_t {
+pub unsafe fn isalpha_l(
+    arg_arg1: ::std::os::raw::c_int,
+    arg_arg2: locale_t,
+) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn __toupper(arg_arg1: __darwin_ct_rune_t) -> __darwin_ct_rune_t;
+            fn isalpha_l(
+                arg_arg1: ::std::os::raw::c_int,
+                arg_arg2: locale_t,
+            ) -> ::std::os::raw::c_int;
         }
-        __toupper(arg_arg1)
+        isalpha_l(arg_arg1, arg_arg2)
     })
 }
-pub unsafe fn __tolower(arg_arg1: __darwin_ct_rune_t) -> __darwin_ct_rune_t {
+pub unsafe fn iscntrl_l(
+    arg_arg1: ::std::os::raw::c_int,
+    arg_arg2: locale_t,
+) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn __tolower(arg_arg1: __darwin_ct_rune_t) -> __darwin_ct_rune_t;
+            fn iscntrl_l(
+                arg_arg1: ::std::os::raw::c_int,
+                arg_arg2: locale_t,
+            ) -> ::std::os::raw::c_int;
         }
-        __tolower(arg_arg1)
+        iscntrl_l(arg_arg1, arg_arg2)
     })
 }
-pub type socklen_t = __darwin_socklen_t;
-pub type sa_family_t = __uint8_t;
+pub unsafe fn isdigit_l(
+    arg_arg1: ::std::os::raw::c_int,
+    arg_arg2: locale_t,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn isdigit_l(
+                arg_arg1: ::std::os::raw::c_int,
+                arg_arg2: locale_t,
+            ) -> ::std::os::raw::c_int;
+        }
+        isdigit_l(arg_arg1, arg_arg2)
+    })
+}
+pub unsafe fn islower_l(
+    arg_arg1: ::std::os::raw::c_int,
+    arg_arg2: locale_t,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn islower_l(
+                arg_arg1: ::std::os::raw::c_int,
+                arg_arg2: locale_t,
+            ) -> ::std::os::raw::c_int;
+        }
+        islower_l(arg_arg1, arg_arg2)
+    })
+}
+pub unsafe fn isgraph_l(
+    arg_arg1: ::std::os::raw::c_int,
+    arg_arg2: locale_t,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn isgraph_l(
+                arg_arg1: ::std::os::raw::c_int,
+                arg_arg2: locale_t,
+            ) -> ::std::os::raw::c_int;
+        }
+        isgraph_l(arg_arg1, arg_arg2)
+    })
+}
+pub unsafe fn isprint_l(
+    arg_arg1: ::std::os::raw::c_int,
+    arg_arg2: locale_t,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn isprint_l(
+                arg_arg1: ::std::os::raw::c_int,
+                arg_arg2: locale_t,
+            ) -> ::std::os::raw::c_int;
+        }
+        isprint_l(arg_arg1, arg_arg2)
+    })
+}
+pub unsafe fn ispunct_l(
+    arg_arg1: ::std::os::raw::c_int,
+    arg_arg2: locale_t,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn ispunct_l(
+                arg_arg1: ::std::os::raw::c_int,
+                arg_arg2: locale_t,
+            ) -> ::std::os::raw::c_int;
+        }
+        ispunct_l(arg_arg1, arg_arg2)
+    })
+}
+pub unsafe fn isspace_l(
+    arg_arg1: ::std::os::raw::c_int,
+    arg_arg2: locale_t,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn isspace_l(
+                arg_arg1: ::std::os::raw::c_int,
+                arg_arg2: locale_t,
+            ) -> ::std::os::raw::c_int;
+        }
+        isspace_l(arg_arg1, arg_arg2)
+    })
+}
+pub unsafe fn isupper_l(
+    arg_arg1: ::std::os::raw::c_int,
+    arg_arg2: locale_t,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn isupper_l(
+                arg_arg1: ::std::os::raw::c_int,
+                arg_arg2: locale_t,
+            ) -> ::std::os::raw::c_int;
+        }
+        isupper_l(arg_arg1, arg_arg2)
+    })
+}
+pub unsafe fn isxdigit_l(
+    arg_arg1: ::std::os::raw::c_int,
+    arg_arg2: locale_t,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn isxdigit_l(
+                arg_arg1: ::std::os::raw::c_int,
+                arg_arg2: locale_t,
+            ) -> ::std::os::raw::c_int;
+        }
+        isxdigit_l(arg_arg1, arg_arg2)
+    })
+}
+pub unsafe fn isblank_l(
+    arg_arg1: ::std::os::raw::c_int,
+    arg_arg2: locale_t,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn isblank_l(
+                arg_arg1: ::std::os::raw::c_int,
+                arg_arg2: locale_t,
+            ) -> ::std::os::raw::c_int;
+        }
+        isblank_l(arg_arg1, arg_arg2)
+    })
+}
+pub unsafe fn __tolower_l(
+    arg___c: ::std::os::raw::c_int,
+    arg___l: locale_t,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __tolower_l(
+                arg___c: ::std::os::raw::c_int,
+                arg___l: locale_t,
+            ) -> ::std::os::raw::c_int;
+        }
+        __tolower_l(arg___c, arg___l)
+    })
+}
+pub unsafe fn tolower_l(
+    arg___c: ::std::os::raw::c_int,
+    arg___l: locale_t,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn tolower_l(
+                arg___c: ::std::os::raw::c_int,
+                arg___l: locale_t,
+            ) -> ::std::os::raw::c_int;
+        }
+        tolower_l(arg___c, arg___l)
+    })
+}
+pub unsafe fn __toupper_l(
+    arg___c: ::std::os::raw::c_int,
+    arg___l: locale_t,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __toupper_l(
+                arg___c: ::std::os::raw::c_int,
+                arg___l: locale_t,
+            ) -> ::std::os::raw::c_int;
+        }
+        __toupper_l(arg___c, arg___l)
+    })
+}
+pub unsafe fn toupper_l(
+    arg___c: ::std::os::raw::c_int,
+    arg___l: locale_t,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn toupper_l(
+                arg___c: ::std::os::raw::c_int,
+                arg___l: locale_t,
+            ) -> ::std::os::raw::c_int;
+        }
+        toupper_l(arg___c, arg___l)
+    })
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct iovec {
@@ -8638,60 +7495,30 @@ impl Default for iovec {
         }
     }
 }
-pub type sae_associd_t = __uint32_t;
-pub type sae_connid_t = __uint32_t;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct sa_endpoints {
-    pub sae_srcif: ::std::os::raw::c_uint,
-    pub sae_srcaddr: *const sockaddr,
-    pub sae_srcaddrlen: socklen_t,
-    pub sae_dstaddr: *const sockaddr,
-    pub sae_dstaddrlen: socklen_t,
-}
-impl Default for sa_endpoints {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub type sa_endpoints_t = sa_endpoints;
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct linger {
-    pub l_onoff: ::std::os::raw::c_int,
-    pub l_linger: ::std::os::raw::c_int,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct so_np_extensions {
-    pub npx_flags: u_int32_t,
-    pub npx_mask: u_int32_t,
-}
+pub type socklen_t = __socklen_t;
+pub const __socket_type_SOCK_STREAM: __socket_type = 1;
+pub const __socket_type_SOCK_DGRAM: __socket_type = 2;
+pub const __socket_type_SOCK_RAW: __socket_type = 3;
+pub const __socket_type_SOCK_RDM: __socket_type = 4;
+pub const __socket_type_SOCK_SEQPACKET: __socket_type = 5;
+pub const __socket_type_SOCK_DCCP: __socket_type = 6;
+pub const __socket_type_SOCK_PACKET: __socket_type = 10;
+pub const __socket_type_SOCK_CLOEXEC: __socket_type = 524288;
+pub const __socket_type_SOCK_NONBLOCK: __socket_type = 2048;
+pub type __socket_type = ::std::os::raw::c_uint;
+pub type sa_family_t = ::std::os::raw::c_ushort;
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct sockaddr {
-    pub sa_len: __uint8_t,
     pub sa_family: sa_family_t,
     pub sa_data: [::std::os::raw::c_char; 14usize],
 }
 #[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct sockproto {
-    pub sp_family: __uint16_t,
-    pub sp_protocol: __uint16_t,
-}
-#[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct sockaddr_storage {
-    pub ss_len: __uint8_t,
     pub ss_family: sa_family_t,
-    pub __ss_pad1: [::std::os::raw::c_char; 6usize],
-    pub __ss_align: __int64_t,
-    pub __ss_pad2: [::std::os::raw::c_char; 112usize],
+    pub __ss_padding: [::std::os::raw::c_char; 118usize],
+    pub __ss_align: ::std::os::raw::c_ulong,
 }
 impl Default for sockaddr_storage {
     fn default() -> Self {
@@ -8702,15 +7529,37 @@ impl Default for sockaddr_storage {
         }
     }
 }
+pub const MSG_OOB: ::std::os::raw::c_uint = 1;
+pub const MSG_PEEK: ::std::os::raw::c_uint = 2;
+pub const MSG_DONTROUTE: ::std::os::raw::c_uint = 4;
+pub const MSG_CTRUNC: ::std::os::raw::c_uint = 8;
+pub const MSG_PROXY: ::std::os::raw::c_uint = 16;
+pub const MSG_TRUNC: ::std::os::raw::c_uint = 32;
+pub const MSG_DONTWAIT: ::std::os::raw::c_uint = 64;
+pub const MSG_EOR: ::std::os::raw::c_uint = 128;
+pub const MSG_WAITALL: ::std::os::raw::c_uint = 256;
+pub const MSG_FIN: ::std::os::raw::c_uint = 512;
+pub const MSG_SYN: ::std::os::raw::c_uint = 1024;
+pub const MSG_CONFIRM: ::std::os::raw::c_uint = 2048;
+pub const MSG_RST: ::std::os::raw::c_uint = 4096;
+pub const MSG_ERRQUEUE: ::std::os::raw::c_uint = 8192;
+pub const MSG_NOSIGNAL: ::std::os::raw::c_uint = 16384;
+pub const MSG_MORE: ::std::os::raw::c_uint = 32768;
+pub const MSG_WAITFORONE: ::std::os::raw::c_uint = 65536;
+pub const MSG_BATCH: ::std::os::raw::c_uint = 262144;
+pub const MSG_ZEROCOPY: ::std::os::raw::c_uint = 67108864;
+pub const MSG_FASTOPEN: ::std::os::raw::c_uint = 536870912;
+pub const MSG_CMSG_CLOEXEC: ::std::os::raw::c_uint = 1073741824;
+pub type _bindgen_ty_2 = ::std::os::raw::c_uint;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct msghdr {
     pub msg_name: *mut ::std::os::raw::c_void,
     pub msg_namelen: socklen_t,
     pub msg_iov: *mut iovec,
-    pub msg_iovlen: ::std::os::raw::c_int,
+    pub msg_iovlen: usize,
     pub msg_control: *mut ::std::os::raw::c_void,
-    pub msg_controllen: socklen_t,
+    pub msg_controllen: usize,
     pub msg_flags: ::std::os::raw::c_int,
 }
 impl Default for msghdr {
@@ -8723,418 +7572,429 @@ impl Default for msghdr {
     }
 }
 #[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
+#[derive(Debug, Default)]
 pub struct cmsghdr {
-    pub cmsg_len: socklen_t,
+    pub cmsg_len: usize,
     pub cmsg_level: ::std::os::raw::c_int,
     pub cmsg_type: ::std::os::raw::c_int,
+    pub __cmsg_data: __IncompleteArrayField<::std::os::raw::c_uchar>,
+}
+pub unsafe fn __cmsg_nxthdr(arg___mhdr: *mut msghdr, arg___cmsg: *mut cmsghdr) -> *mut cmsghdr {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __cmsg_nxthdr(arg___mhdr: *mut msghdr, arg___cmsg: *mut cmsghdr) -> *mut cmsghdr;
+        }
+        __cmsg_nxthdr(arg___mhdr, arg___cmsg)
+    })
+}
+pub const SCM_RIGHTS: ::std::os::raw::c_uint = 1;
+pub type _bindgen_ty_3 = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct __kernel_fd_set {
+    pub fds_bits: [::std::os::raw::c_ulong; 16usize],
+}
+pub type __kernel_sighandler_t =
+    ::std::option::Option<unsafe extern "C" fn(arg1: ::std::os::raw::c_int)>;
+pub type __kernel_key_t = ::std::os::raw::c_int;
+pub type __kernel_mqd_t = ::std::os::raw::c_int;
+pub type __kernel_old_uid_t = ::std::os::raw::c_ushort;
+pub type __kernel_old_gid_t = ::std::os::raw::c_ushort;
+pub type __kernel_old_dev_t = ::std::os::raw::c_ulong;
+pub type __kernel_long_t = ::std::os::raw::c_long;
+pub type __kernel_ulong_t = ::std::os::raw::c_ulong;
+pub type __kernel_ino_t = __kernel_ulong_t;
+pub type __kernel_mode_t = ::std::os::raw::c_uint;
+pub type __kernel_pid_t = ::std::os::raw::c_int;
+pub type __kernel_ipc_pid_t = ::std::os::raw::c_int;
+pub type __kernel_uid_t = ::std::os::raw::c_uint;
+pub type __kernel_gid_t = ::std::os::raw::c_uint;
+pub type __kernel_suseconds_t = __kernel_long_t;
+pub type __kernel_daddr_t = ::std::os::raw::c_int;
+pub type __kernel_uid32_t = ::std::os::raw::c_uint;
+pub type __kernel_gid32_t = ::std::os::raw::c_uint;
+pub type __kernel_size_t = __kernel_ulong_t;
+pub type __kernel_ssize_t = __kernel_long_t;
+pub type __kernel_ptrdiff_t = __kernel_long_t;
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct __kernel_fsid_t {
+    pub val: [::std::os::raw::c_int; 2usize],
+}
+pub type __kernel_off_t = __kernel_long_t;
+pub type __kernel_loff_t = ::std::os::raw::c_longlong;
+pub type __kernel_old_time_t = __kernel_long_t;
+pub type __kernel_time_t = __kernel_long_t;
+pub type __kernel_time64_t = ::std::os::raw::c_longlong;
+pub type __kernel_clock_t = __kernel_long_t;
+pub type __kernel_timer_t = ::std::os::raw::c_int;
+pub type __kernel_clockid_t = ::std::os::raw::c_int;
+pub type __kernel_caddr_t = *mut ::std::os::raw::c_char;
+pub type __kernel_uid16_t = ::std::os::raw::c_ushort;
+pub type __kernel_gid16_t = ::std::os::raw::c_ushort;
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct linger {
+    pub l_onoff: ::std::os::raw::c_int,
+    pub l_linger: ::std::os::raw::c_int,
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct sf_hdtr {
-    pub headers: *mut iovec,
-    pub hdr_cnt: ::std::os::raw::c_int,
-    pub trailers: *mut iovec,
-    pub trl_cnt: ::std::os::raw::c_int,
+#[derive(Debug, Default, Copy, Clone)]
+pub struct osockaddr {
+    pub sa_family: ::std::os::raw::c_ushort,
+    pub sa_data: [::std::os::raw::c_uchar; 14usize],
 }
-impl Default for sf_hdtr {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub unsafe fn accept(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: *mut sockaddr,
-    arg_arg3: *mut socklen_t,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn accept(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: *mut sockaddr,
-                arg_arg3: *mut socklen_t,
-            ) -> ::std::os::raw::c_int;
-        }
-        accept(arg_arg1, arg_arg2, arg_arg3)
-    })
-}
-pub unsafe fn bind(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: *const sockaddr,
-    arg_arg3: socklen_t,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn bind(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: *const sockaddr,
-                arg_arg3: socklen_t,
-            ) -> ::std::os::raw::c_int;
-        }
-        bind(arg_arg1, arg_arg2, arg_arg3)
-    })
-}
-pub unsafe fn connect(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: *const sockaddr,
-    arg_arg3: socklen_t,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn connect(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: *const sockaddr,
-                arg_arg3: socklen_t,
-            ) -> ::std::os::raw::c_int;
-        }
-        connect(arg_arg1, arg_arg2, arg_arg3)
-    })
-}
-pub unsafe fn getpeername(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: *mut sockaddr,
-    arg_arg3: *mut socklen_t,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn getpeername(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: *mut sockaddr,
-                arg_arg3: *mut socklen_t,
-            ) -> ::std::os::raw::c_int;
-        }
-        getpeername(arg_arg1, arg_arg2, arg_arg3)
-    })
-}
-pub unsafe fn getsockname(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: *mut sockaddr,
-    arg_arg3: *mut socklen_t,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn getsockname(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: *mut sockaddr,
-                arg_arg3: *mut socklen_t,
-            ) -> ::std::os::raw::c_int;
-        }
-        getsockname(arg_arg1, arg_arg2, arg_arg3)
-    })
-}
-pub unsafe fn getsockopt(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: ::std::os::raw::c_int,
-    arg_arg3: ::std::os::raw::c_int,
-    arg_arg4: *mut ::std::os::raw::c_void,
-    arg_arg5: *mut socklen_t,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn getsockopt(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: ::std::os::raw::c_int,
-                arg_arg3: ::std::os::raw::c_int,
-                arg_arg4: *mut ::std::os::raw::c_void,
-                arg_arg5: *mut socklen_t,
-            ) -> ::std::os::raw::c_int;
-        }
-        getsockopt(arg_arg1, arg_arg2, arg_arg3, arg_arg4, arg_arg5)
-    })
-}
-pub unsafe fn listen(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: ::std::os::raw::c_int,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn listen(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: ::std::os::raw::c_int,
-            ) -> ::std::os::raw::c_int;
-        }
-        listen(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn recv(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: *mut ::std::os::raw::c_void,
-    arg_arg3: usize,
-    arg_arg4: ::std::os::raw::c_int,
-) -> isize {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn recv(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: *mut ::std::os::raw::c_void,
-                arg_arg3: usize,
-                arg_arg4: ::std::os::raw::c_int,
-            ) -> isize;
-        }
-        recv(arg_arg1, arg_arg2, arg_arg3, arg_arg4)
-    })
-}
-pub unsafe fn recvfrom(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: *mut ::std::os::raw::c_void,
-    arg_arg3: usize,
-    arg_arg4: ::std::os::raw::c_int,
-    arg_arg5: *mut sockaddr,
-    arg_arg6: *mut socklen_t,
-) -> isize {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn recvfrom(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: *mut ::std::os::raw::c_void,
-                arg_arg3: usize,
-                arg_arg4: ::std::os::raw::c_int,
-                arg_arg5: *mut sockaddr,
-                arg_arg6: *mut socklen_t,
-            ) -> isize;
-        }
-        recvfrom(arg_arg1, arg_arg2, arg_arg3, arg_arg4, arg_arg5, arg_arg6)
-    })
-}
-pub unsafe fn recvmsg(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: *mut msghdr,
-    arg_arg3: ::std::os::raw::c_int,
-) -> isize {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn recvmsg(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: *mut msghdr,
-                arg_arg3: ::std::os::raw::c_int,
-            ) -> isize;
-        }
-        recvmsg(arg_arg1, arg_arg2, arg_arg3)
-    })
-}
-pub unsafe fn send(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: *const ::std::os::raw::c_void,
-    arg_arg3: usize,
-    arg_arg4: ::std::os::raw::c_int,
-) -> isize {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn send(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: *const ::std::os::raw::c_void,
-                arg_arg3: usize,
-                arg_arg4: ::std::os::raw::c_int,
-            ) -> isize;
-        }
-        send(arg_arg1, arg_arg2, arg_arg3, arg_arg4)
-    })
-}
-pub unsafe fn sendmsg(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: *const msghdr,
-    arg_arg3: ::std::os::raw::c_int,
-) -> isize {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn sendmsg(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: *const msghdr,
-                arg_arg3: ::std::os::raw::c_int,
-            ) -> isize;
-        }
-        sendmsg(arg_arg1, arg_arg2, arg_arg3)
-    })
-}
-pub unsafe fn sendto(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: *const ::std::os::raw::c_void,
-    arg_arg3: usize,
-    arg_arg4: ::std::os::raw::c_int,
-    arg_arg5: *const sockaddr,
-    arg_arg6: socklen_t,
-) -> isize {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn sendto(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: *const ::std::os::raw::c_void,
-                arg_arg3: usize,
-                arg_arg4: ::std::os::raw::c_int,
-                arg_arg5: *const sockaddr,
-                arg_arg6: socklen_t,
-            ) -> isize;
-        }
-        sendto(arg_arg1, arg_arg2, arg_arg3, arg_arg4, arg_arg5, arg_arg6)
-    })
-}
-pub unsafe fn setsockopt(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: ::std::os::raw::c_int,
-    arg_arg3: ::std::os::raw::c_int,
-    arg_arg4: *const ::std::os::raw::c_void,
-    arg_arg5: socklen_t,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn setsockopt(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: ::std::os::raw::c_int,
-                arg_arg3: ::std::os::raw::c_int,
-                arg_arg4: *const ::std::os::raw::c_void,
-                arg_arg5: socklen_t,
-            ) -> ::std::os::raw::c_int;
-        }
-        setsockopt(arg_arg1, arg_arg2, arg_arg3, arg_arg4, arg_arg5)
-    })
-}
-pub unsafe fn shutdown(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: ::std::os::raw::c_int,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn shutdown(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: ::std::os::raw::c_int,
-            ) -> ::std::os::raw::c_int;
-        }
-        shutdown(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn sockatmark(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn sockatmark(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
-        }
-        sockatmark(arg_arg1)
-    })
-}
+pub const SHUT_RD: ::std::os::raw::c_uint = 0;
+pub const SHUT_WR: ::std::os::raw::c_uint = 1;
+pub const SHUT_RDWR: ::std::os::raw::c_uint = 2;
+pub type _bindgen_ty_4 = ::std::os::raw::c_uint;
 pub unsafe fn socket(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: ::std::os::raw::c_int,
-    arg_arg3: ::std::os::raw::c_int,
+    arg___domain: ::std::os::raw::c_int,
+    arg___type: ::std::os::raw::c_int,
+    arg___protocol: ::std::os::raw::c_int,
 ) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
             fn socket(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: ::std::os::raw::c_int,
-                arg_arg3: ::std::os::raw::c_int,
+                arg___domain: ::std::os::raw::c_int,
+                arg___type: ::std::os::raw::c_int,
+                arg___protocol: ::std::os::raw::c_int,
             ) -> ::std::os::raw::c_int;
         }
-        socket(arg_arg1, arg_arg2, arg_arg3)
+        socket(arg___domain, arg___type, arg___protocol)
     })
 }
 pub unsafe fn socketpair(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: ::std::os::raw::c_int,
-    arg_arg3: ::std::os::raw::c_int,
-    arg_arg4: *mut ::std::os::raw::c_int,
+    arg___domain: ::std::os::raw::c_int,
+    arg___type: ::std::os::raw::c_int,
+    arg___protocol: ::std::os::raw::c_int,
+    arg___fds: *mut ::std::os::raw::c_int,
 ) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
             fn socketpair(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: ::std::os::raw::c_int,
-                arg_arg3: ::std::os::raw::c_int,
-                arg_arg4: *mut ::std::os::raw::c_int,
+                arg___domain: ::std::os::raw::c_int,
+                arg___type: ::std::os::raw::c_int,
+                arg___protocol: ::std::os::raw::c_int,
+                arg___fds: *mut ::std::os::raw::c_int,
             ) -> ::std::os::raw::c_int;
         }
-        socketpair(arg_arg1, arg_arg2, arg_arg3, arg_arg4)
+        socketpair(arg___domain, arg___type, arg___protocol, arg___fds)
     })
 }
-pub unsafe fn sendfile(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: ::std::os::raw::c_int,
-    arg_arg3: off_t,
-    arg_arg4: *mut off_t,
-    arg_arg5: *mut sf_hdtr,
-    arg_arg6: ::std::os::raw::c_int,
+pub unsafe fn bind(
+    arg___fd: ::std::os::raw::c_int,
+    arg___addr: *const sockaddr,
+    arg___len: socklen_t,
 ) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn sendfile(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: ::std::os::raw::c_int,
-                arg_arg3: off_t,
-                arg_arg4: *mut off_t,
-                arg_arg5: *mut sf_hdtr,
-                arg_arg6: ::std::os::raw::c_int,
+            fn bind(
+                arg___fd: ::std::os::raw::c_int,
+                arg___addr: *const sockaddr,
+                arg___len: socklen_t,
             ) -> ::std::os::raw::c_int;
         }
-        sendfile(arg_arg1, arg_arg2, arg_arg3, arg_arg4, arg_arg5, arg_arg6)
+        bind(arg___fd, arg___addr, arg___len)
     })
 }
-pub unsafe fn pfctlinput(arg_arg1: ::std::os::raw::c_int, arg_arg2: *mut sockaddr) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn pfctlinput(arg_arg1: ::std::os::raw::c_int, arg_arg2: *mut sockaddr);
-        }
-        pfctlinput(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn connectx(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: *const sa_endpoints_t,
-    arg_arg3: sae_associd_t,
-    arg_arg4: ::std::os::raw::c_uint,
-    arg_arg5: *const iovec,
-    arg_arg6: ::std::os::raw::c_uint,
-    arg_arg7: *mut usize,
-    arg_arg8: *mut sae_connid_t,
+pub unsafe fn getsockname(
+    arg___fd: ::std::os::raw::c_int,
+    arg___addr: *mut sockaddr,
+    arg___len: *mut socklen_t,
 ) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn connectx(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: *const sa_endpoints_t,
-                arg_arg3: sae_associd_t,
-                arg_arg4: ::std::os::raw::c_uint,
-                arg_arg5: *const iovec,
-                arg_arg6: ::std::os::raw::c_uint,
-                arg_arg7: *mut usize,
-                arg_arg8: *mut sae_connid_t,
+            fn getsockname(
+                arg___fd: ::std::os::raw::c_int,
+                arg___addr: *mut sockaddr,
+                arg___len: *mut socklen_t,
             ) -> ::std::os::raw::c_int;
         }
-        connectx(
-            arg_arg1, arg_arg2, arg_arg3, arg_arg4, arg_arg5, arg_arg6, arg_arg7, arg_arg8,
+        getsockname(arg___fd, arg___addr, arg___len)
+    })
+}
+pub unsafe fn connect(
+    arg___fd: ::std::os::raw::c_int,
+    arg___addr: *const sockaddr,
+    arg___len: socklen_t,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn connect(
+                arg___fd: ::std::os::raw::c_int,
+                arg___addr: *const sockaddr,
+                arg___len: socklen_t,
+            ) -> ::std::os::raw::c_int;
+        }
+        connect(arg___fd, arg___addr, arg___len)
+    })
+}
+pub unsafe fn getpeername(
+    arg___fd: ::std::os::raw::c_int,
+    arg___addr: *mut sockaddr,
+    arg___len: *mut socklen_t,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn getpeername(
+                arg___fd: ::std::os::raw::c_int,
+                arg___addr: *mut sockaddr,
+                arg___len: *mut socklen_t,
+            ) -> ::std::os::raw::c_int;
+        }
+        getpeername(arg___fd, arg___addr, arg___len)
+    })
+}
+pub unsafe fn send(
+    arg___fd: ::std::os::raw::c_int,
+    arg___buf: *const ::std::os::raw::c_void,
+    arg___n: usize,
+    arg___flags: ::std::os::raw::c_int,
+) -> isize {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn send(
+                arg___fd: ::std::os::raw::c_int,
+                arg___buf: *const ::std::os::raw::c_void,
+                arg___n: usize,
+                arg___flags: ::std::os::raw::c_int,
+            ) -> isize;
+        }
+        send(arg___fd, arg___buf, arg___n, arg___flags)
+    })
+}
+pub unsafe fn recv(
+    arg___fd: ::std::os::raw::c_int,
+    arg___buf: *mut ::std::os::raw::c_void,
+    arg___n: usize,
+    arg___flags: ::std::os::raw::c_int,
+) -> isize {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn recv(
+                arg___fd: ::std::os::raw::c_int,
+                arg___buf: *mut ::std::os::raw::c_void,
+                arg___n: usize,
+                arg___flags: ::std::os::raw::c_int,
+            ) -> isize;
+        }
+        recv(arg___fd, arg___buf, arg___n, arg___flags)
+    })
+}
+pub unsafe fn sendto(
+    arg___fd: ::std::os::raw::c_int,
+    arg___buf: *const ::std::os::raw::c_void,
+    arg___n: usize,
+    arg___flags: ::std::os::raw::c_int,
+    arg___addr: *const sockaddr,
+    arg___addr_len: socklen_t,
+) -> isize {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn sendto(
+                arg___fd: ::std::os::raw::c_int,
+                arg___buf: *const ::std::os::raw::c_void,
+                arg___n: usize,
+                arg___flags: ::std::os::raw::c_int,
+                arg___addr: *const sockaddr,
+                arg___addr_len: socklen_t,
+            ) -> isize;
+        }
+        sendto(
+            arg___fd,
+            arg___buf,
+            arg___n,
+            arg___flags,
+            arg___addr,
+            arg___addr_len,
         )
     })
 }
-pub unsafe fn disconnectx(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: sae_associd_t,
-    arg_arg3: sae_connid_t,
+pub unsafe fn recvfrom(
+    arg___fd: ::std::os::raw::c_int,
+    arg___buf: *mut ::std::os::raw::c_void,
+    arg___n: usize,
+    arg___flags: ::std::os::raw::c_int,
+    arg___addr: *mut sockaddr,
+    arg___addr_len: *mut socklen_t,
+) -> isize {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn recvfrom(
+                arg___fd: ::std::os::raw::c_int,
+                arg___buf: *mut ::std::os::raw::c_void,
+                arg___n: usize,
+                arg___flags: ::std::os::raw::c_int,
+                arg___addr: *mut sockaddr,
+                arg___addr_len: *mut socklen_t,
+            ) -> isize;
+        }
+        recvfrom(
+            arg___fd,
+            arg___buf,
+            arg___n,
+            arg___flags,
+            arg___addr,
+            arg___addr_len,
+        )
+    })
+}
+pub unsafe fn sendmsg(
+    arg___fd: ::std::os::raw::c_int,
+    arg___message: *const msghdr,
+    arg___flags: ::std::os::raw::c_int,
+) -> isize {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn sendmsg(
+                arg___fd: ::std::os::raw::c_int,
+                arg___message: *const msghdr,
+                arg___flags: ::std::os::raw::c_int,
+            ) -> isize;
+        }
+        sendmsg(arg___fd, arg___message, arg___flags)
+    })
+}
+pub unsafe fn recvmsg(
+    arg___fd: ::std::os::raw::c_int,
+    arg___message: *mut msghdr,
+    arg___flags: ::std::os::raw::c_int,
+) -> isize {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn recvmsg(
+                arg___fd: ::std::os::raw::c_int,
+                arg___message: *mut msghdr,
+                arg___flags: ::std::os::raw::c_int,
+            ) -> isize;
+        }
+        recvmsg(arg___fd, arg___message, arg___flags)
+    })
+}
+pub unsafe fn getsockopt(
+    arg___fd: ::std::os::raw::c_int,
+    arg___level: ::std::os::raw::c_int,
+    arg___optname: ::std::os::raw::c_int,
+    arg___optval: *mut ::std::os::raw::c_void,
+    arg___optlen: *mut socklen_t,
 ) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn disconnectx(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: sae_associd_t,
-                arg_arg3: sae_connid_t,
+            fn getsockopt(
+                arg___fd: ::std::os::raw::c_int,
+                arg___level: ::std::os::raw::c_int,
+                arg___optname: ::std::os::raw::c_int,
+                arg___optval: *mut ::std::os::raw::c_void,
+                arg___optlen: *mut socklen_t,
             ) -> ::std::os::raw::c_int;
         }
-        disconnectx(arg_arg1, arg_arg2, arg_arg3)
+        getsockopt(
+            arg___fd,
+            arg___level,
+            arg___optname,
+            arg___optval,
+            arg___optlen,
+        )
     })
 }
+pub unsafe fn setsockopt(
+    arg___fd: ::std::os::raw::c_int,
+    arg___level: ::std::os::raw::c_int,
+    arg___optname: ::std::os::raw::c_int,
+    arg___optval: *const ::std::os::raw::c_void,
+    arg___optlen: socklen_t,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn setsockopt(
+                arg___fd: ::std::os::raw::c_int,
+                arg___level: ::std::os::raw::c_int,
+                arg___optname: ::std::os::raw::c_int,
+                arg___optval: *const ::std::os::raw::c_void,
+                arg___optlen: socklen_t,
+            ) -> ::std::os::raw::c_int;
+        }
+        setsockopt(
+            arg___fd,
+            arg___level,
+            arg___optname,
+            arg___optval,
+            arg___optlen,
+        )
+    })
+}
+pub unsafe fn listen(
+    arg___fd: ::std::os::raw::c_int,
+    arg___n: ::std::os::raw::c_int,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn listen(
+                arg___fd: ::std::os::raw::c_int,
+                arg___n: ::std::os::raw::c_int,
+            ) -> ::std::os::raw::c_int;
+        }
+        listen(arg___fd, arg___n)
+    })
+}
+pub unsafe fn accept(
+    arg___fd: ::std::os::raw::c_int,
+    arg___addr: *mut sockaddr,
+    arg___addr_len: *mut socklen_t,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn accept(
+                arg___fd: ::std::os::raw::c_int,
+                arg___addr: *mut sockaddr,
+                arg___addr_len: *mut socklen_t,
+            ) -> ::std::os::raw::c_int;
+        }
+        accept(arg___fd, arg___addr, arg___addr_len)
+    })
+}
+pub unsafe fn shutdown(
+    arg___fd: ::std::os::raw::c_int,
+    arg___how: ::std::os::raw::c_int,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn shutdown(
+                arg___fd: ::std::os::raw::c_int,
+                arg___how: ::std::os::raw::c_int,
+            ) -> ::std::os::raw::c_int;
+        }
+        shutdown(arg___fd, arg___how)
+    })
+}
+pub unsafe fn sockatmark(arg___fd: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn sockatmark(arg___fd: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+        }
+        sockatmark(arg___fd)
+    })
+}
+pub unsafe fn isfdtype(
+    arg___fd: ::std::os::raw::c_int,
+    arg___fdtype: ::std::os::raw::c_int,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn isfdtype(
+                arg___fd: ::std::os::raw::c_int,
+                arg___fdtype: ::std::os::raw::c_int,
+            ) -> ::std::os::raw::c_int;
+        }
+        isfdtype(arg___fd, arg___fdtype)
+    })
+}
+pub type in_addr_t = u32;
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct in_addr {
     pub s_addr: in_addr_t,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct sockaddr_in {
-    pub sin_len: __uint8_t,
-    pub sin_family: sa_family_t,
-    pub sin_port: in_port_t,
-    pub sin_addr: in_addr,
-    pub sin_zero: [::std::os::raw::c_char; 8usize],
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -9153,12 +8013,6 @@ impl Default for ip_opts {
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
-pub struct ip_mreq {
-    pub imr_multiaddr: in_addr,
-    pub imr_interface: in_addr,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
 pub struct ip_mreqn {
     pub imr_multiaddr: in_addr,
     pub imr_address: in_addr,
@@ -9166,175 +8020,87 @@ pub struct ip_mreqn {
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
-pub struct ip_mreq_source {
-    pub imr_multiaddr: in_addr,
-    pub imr_sourceaddr: in_addr,
-    pub imr_interface: in_addr,
-}
-#[repr(C, packed(4))]
-#[derive(Debug, Copy, Clone)]
-pub struct group_req {
-    pub gr_interface: u32,
-    pub gr_group: sockaddr_storage,
-}
-impl Default for group_req {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C, packed(4))]
-#[derive(Debug, Copy, Clone)]
-pub struct group_source_req {
-    pub gsr_interface: u32,
-    pub gsr_group: sockaddr_storage,
-    pub gsr_source: sockaddr_storage,
-}
-impl Default for group_source_req {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C, packed(4))]
-#[derive(Debug, Copy, Clone)]
-pub struct __msfilterreq {
-    pub msfr_ifindex: u32,
-    pub msfr_fmode: u32,
-    pub msfr_nsrcs: u32,
-    pub __msfr_align: u32,
-    pub msfr_group: sockaddr_storage,
-    pub msfr_srcs: *mut sockaddr_storage,
-}
-impl Default for __msfilterreq {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub unsafe fn setipv4sourcefilter(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: in_addr,
-    arg_arg3: in_addr,
-    arg_arg4: u32,
-    arg_arg5: u32,
-    arg_arg6: *mut in_addr,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn setipv4sourcefilter(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: in_addr,
-                arg_arg3: in_addr,
-                arg_arg4: u32,
-                arg_arg5: u32,
-                arg_arg6: *mut in_addr,
-            ) -> ::std::os::raw::c_int;
-        }
-        setipv4sourcefilter(arg_arg1, arg_arg2, arg_arg3, arg_arg4, arg_arg5, arg_arg6)
-    })
-}
-pub unsafe fn getipv4sourcefilter(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: in_addr,
-    arg_arg3: in_addr,
-    arg_arg4: *mut u32,
-    arg_arg5: *mut u32,
-    arg_arg6: *mut in_addr,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn getipv4sourcefilter(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: in_addr,
-                arg_arg3: in_addr,
-                arg_arg4: *mut u32,
-                arg_arg5: *mut u32,
-                arg_arg6: *mut in_addr,
-            ) -> ::std::os::raw::c_int;
-        }
-        getipv4sourcefilter(arg_arg1, arg_arg2, arg_arg3, arg_arg4, arg_arg5, arg_arg6)
-    })
-}
-pub unsafe fn setsourcefilter(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: u32,
-    arg_arg3: *mut sockaddr,
-    arg_arg4: socklen_t,
-    arg_arg5: u32,
-    arg_arg6: u32,
-    arg_arg7: *mut sockaddr_storage,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn setsourcefilter(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: u32,
-                arg_arg3: *mut sockaddr,
-                arg_arg4: socklen_t,
-                arg_arg5: u32,
-                arg_arg6: u32,
-                arg_arg7: *mut sockaddr_storage,
-            ) -> ::std::os::raw::c_int;
-        }
-        setsourcefilter(
-            arg_arg1, arg_arg2, arg_arg3, arg_arg4, arg_arg5, arg_arg6, arg_arg7,
-        )
-    })
-}
-pub unsafe fn getsourcefilter(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: u32,
-    arg_arg3: *mut sockaddr,
-    arg_arg4: socklen_t,
-    arg_arg5: *mut u32,
-    arg_arg6: *mut u32,
-    arg_arg7: *mut sockaddr_storage,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn getsourcefilter(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: u32,
-                arg_arg3: *mut sockaddr,
-                arg_arg4: socklen_t,
-                arg_arg5: *mut u32,
-                arg_arg6: *mut u32,
-                arg_arg7: *mut sockaddr_storage,
-            ) -> ::std::os::raw::c_int;
-        }
-        getsourcefilter(
-            arg_arg1, arg_arg2, arg_arg3, arg_arg4, arg_arg5, arg_arg6, arg_arg7,
-        )
-    })
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
 pub struct in_pktinfo {
-    pub ipi_ifindex: ::std::os::raw::c_uint,
+    pub ipi_ifindex: ::std::os::raw::c_int,
     pub ipi_spec_dst: in_addr,
     pub ipi_addr: in_addr,
 }
+pub const IPPROTO_IP: ::std::os::raw::c_uint = 0;
+pub const IPPROTO_ICMP: ::std::os::raw::c_uint = 1;
+pub const IPPROTO_IGMP: ::std::os::raw::c_uint = 2;
+pub const IPPROTO_IPIP: ::std::os::raw::c_uint = 4;
+pub const IPPROTO_TCP: ::std::os::raw::c_uint = 6;
+pub const IPPROTO_EGP: ::std::os::raw::c_uint = 8;
+pub const IPPROTO_PUP: ::std::os::raw::c_uint = 12;
+pub const IPPROTO_UDP: ::std::os::raw::c_uint = 17;
+pub const IPPROTO_IDP: ::std::os::raw::c_uint = 22;
+pub const IPPROTO_TP: ::std::os::raw::c_uint = 29;
+pub const IPPROTO_DCCP: ::std::os::raw::c_uint = 33;
+pub const IPPROTO_IPV6: ::std::os::raw::c_uint = 41;
+pub const IPPROTO_RSVP: ::std::os::raw::c_uint = 46;
+pub const IPPROTO_GRE: ::std::os::raw::c_uint = 47;
+pub const IPPROTO_ESP: ::std::os::raw::c_uint = 50;
+pub const IPPROTO_AH: ::std::os::raw::c_uint = 51;
+pub const IPPROTO_MTP: ::std::os::raw::c_uint = 92;
+pub const IPPROTO_BEETPH: ::std::os::raw::c_uint = 94;
+pub const IPPROTO_ENCAP: ::std::os::raw::c_uint = 98;
+pub const IPPROTO_PIM: ::std::os::raw::c_uint = 103;
+pub const IPPROTO_COMP: ::std::os::raw::c_uint = 108;
+pub const IPPROTO_SCTP: ::std::os::raw::c_uint = 132;
+pub const IPPROTO_UDPLITE: ::std::os::raw::c_uint = 136;
+pub const IPPROTO_MPLS: ::std::os::raw::c_uint = 137;
+pub const IPPROTO_ETHERNET: ::std::os::raw::c_uint = 143;
+pub const IPPROTO_RAW: ::std::os::raw::c_uint = 255;
+pub const IPPROTO_MPTCP: ::std::os::raw::c_uint = 262;
+pub const IPPROTO_MAX: ::std::os::raw::c_uint = 263;
+pub type _bindgen_ty_5 = ::std::os::raw::c_uint;
+pub const IPPROTO_HOPOPTS: ::std::os::raw::c_uint = 0;
+pub const IPPROTO_ROUTING: ::std::os::raw::c_uint = 43;
+pub const IPPROTO_FRAGMENT: ::std::os::raw::c_uint = 44;
+pub const IPPROTO_ICMPV6: ::std::os::raw::c_uint = 58;
+pub const IPPROTO_NONE: ::std::os::raw::c_uint = 59;
+pub const IPPROTO_DSTOPTS: ::std::os::raw::c_uint = 60;
+pub const IPPROTO_MH: ::std::os::raw::c_uint = 135;
+pub type _bindgen_ty_6 = ::std::os::raw::c_uint;
+pub type in_port_t = u16;
+pub const IPPORT_ECHO: ::std::os::raw::c_uint = 7;
+pub const IPPORT_DISCARD: ::std::os::raw::c_uint = 9;
+pub const IPPORT_SYSTAT: ::std::os::raw::c_uint = 11;
+pub const IPPORT_DAYTIME: ::std::os::raw::c_uint = 13;
+pub const IPPORT_NETSTAT: ::std::os::raw::c_uint = 15;
+pub const IPPORT_FTP: ::std::os::raw::c_uint = 21;
+pub const IPPORT_TELNET: ::std::os::raw::c_uint = 23;
+pub const IPPORT_SMTP: ::std::os::raw::c_uint = 25;
+pub const IPPORT_TIMESERVER: ::std::os::raw::c_uint = 37;
+pub const IPPORT_NAMESERVER: ::std::os::raw::c_uint = 42;
+pub const IPPORT_WHOIS: ::std::os::raw::c_uint = 43;
+pub const IPPORT_MTP: ::std::os::raw::c_uint = 57;
+pub const IPPORT_TFTP: ::std::os::raw::c_uint = 69;
+pub const IPPORT_RJE: ::std::os::raw::c_uint = 77;
+pub const IPPORT_FINGER: ::std::os::raw::c_uint = 79;
+pub const IPPORT_TTYLINK: ::std::os::raw::c_uint = 87;
+pub const IPPORT_SUPDUP: ::std::os::raw::c_uint = 95;
+pub const IPPORT_EXECSERVER: ::std::os::raw::c_uint = 512;
+pub const IPPORT_LOGINSERVER: ::std::os::raw::c_uint = 513;
+pub const IPPORT_CMDSERVER: ::std::os::raw::c_uint = 514;
+pub const IPPORT_EFSSERVER: ::std::os::raw::c_uint = 520;
+pub const IPPORT_BIFFUDP: ::std::os::raw::c_uint = 512;
+pub const IPPORT_WHOSERVER: ::std::os::raw::c_uint = 513;
+pub const IPPORT_ROUTESERVER: ::std::os::raw::c_uint = 520;
+pub const IPPORT_RESERVED: ::std::os::raw::c_uint = 1024;
+pub const IPPORT_USERRESERVED: ::std::os::raw::c_uint = 5000;
+pub type _bindgen_ty_7 = ::std::os::raw::c_uint;
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct in6_addr {
-    pub __u6_addr: in6_addr__bindgen_ty_1,
+    pub __in6_u: in6_addr__bindgen_ty_1,
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub union in6_addr__bindgen_ty_1 {
-    pub __u6_addr8: [__uint8_t; 16usize],
-    pub __u6_addr16: [__uint16_t; 8usize],
-    pub __u6_addr32: [__uint32_t; 4usize],
+    pub __u6_addr8: [u8; 16usize],
+    pub __u6_addr16: [u16; 8usize],
+    pub __u6_addr32: [u32; 4usize],
 }
 impl Default for in6_addr__bindgen_ty_1 {
     fn default() -> Self {
@@ -9354,16 +8120,28 @@ impl Default for in6_addr {
         }
     }
 }
-pub type in6_addr_t = in6_addr;
+extern "C" {
+    pub static in6addr_any: in6_addr;
+}
+extern "C" {
+    pub static in6addr_loopback: in6_addr;
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct sockaddr_in {
+    pub sin_family: sa_family_t,
+    pub sin_port: in_port_t,
+    pub sin_addr: in_addr,
+    pub sin_zero: [::std::os::raw::c_uchar; 8usize],
+}
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct sockaddr_in6 {
-    pub sin6_len: __uint8_t,
     pub sin6_family: sa_family_t,
     pub sin6_port: in_port_t,
-    pub sin6_flowinfo: __uint32_t,
+    pub sin6_flowinfo: u32,
     pub sin6_addr: in6_addr,
-    pub sin6_scope_id: __uint32_t,
+    pub sin6_scope_id: u32,
 }
 impl Default for sockaddr_in6 {
     fn default() -> Self {
@@ -9374,23 +8152,18 @@ impl Default for sockaddr_in6 {
         }
     }
 }
-extern "C" {
-    pub static in6addr_any: in6_addr;
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct ip_mreq {
+    pub imr_multiaddr: in_addr,
+    pub imr_interface: in_addr,
 }
-extern "C" {
-    pub static in6addr_loopback: in6_addr;
-}
-extern "C" {
-    pub static in6addr_nodelocal_allnodes: in6_addr;
-}
-extern "C" {
-    pub static in6addr_linklocal_allnodes: in6_addr;
-}
-extern "C" {
-    pub static in6addr_linklocal_allrouters: in6_addr;
-}
-extern "C" {
-    pub static in6addr_linklocal_allv2routers: in6_addr;
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct ip_mreq_source {
+    pub imr_multiaddr: in_addr,
+    pub imr_interface: in_addr,
+    pub imr_sourceaddr: in_addr,
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
@@ -9408,12 +8181,12 @@ impl Default for ipv6_mreq {
     }
 }
 #[repr(C)]
-#[derive(Copy, Clone)]
-pub struct in6_pktinfo {
-    pub ipi6_addr: in6_addr,
-    pub ipi6_ifindex: ::std::os::raw::c_uint,
+#[derive(Debug, Copy, Clone)]
+pub struct group_req {
+    pub gr_interface: u32,
+    pub gr_group: sockaddr_storage,
 }
-impl Default for in6_pktinfo {
+impl Default for group_req {
     fn default() -> Self {
         let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
         unsafe {
@@ -9423,12 +8196,13 @@ impl Default for in6_pktinfo {
     }
 }
 #[repr(C)]
-#[derive(Copy, Clone)]
-pub struct ip6_mtuinfo {
-    pub ip6m_addr: sockaddr_in6,
-    pub ip6m_mtu: u32,
+#[derive(Debug, Copy, Clone)]
+pub struct group_source_req {
+    pub gsr_interface: u32,
+    pub gsr_group: sockaddr_storage,
+    pub gsr_source: sockaddr_storage,
 }
-impl Default for ip6_mtuinfo {
+impl Default for group_source_req {
     fn default() -> Self {
         let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
         unsafe {
@@ -9437,439 +8211,259 @@ impl Default for ip6_mtuinfo {
         }
     }
 }
-pub unsafe fn inet6_option_space(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct ip_msfilter {
+    pub imsf_multiaddr: in_addr,
+    pub imsf_interface: in_addr,
+    pub imsf_fmode: u32,
+    pub imsf_numsrc: u32,
+    pub imsf_slist: [in_addr; 1usize],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct group_filter {
+    pub gf_interface: u32,
+    pub gf_group: sockaddr_storage,
+    pub gf_fmode: u32,
+    pub gf_numsrc: u32,
+    pub gf_slist: [sockaddr_storage; 1usize],
+}
+impl Default for group_filter {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub unsafe fn ntohl(arg___netlong: u32) -> u32 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn inet6_option_space(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+            fn ntohl(arg___netlong: u32) -> u32;
         }
-        inet6_option_space(arg_arg1)
+        ntohl(arg___netlong)
     })
 }
-pub unsafe fn inet6_option_init(
-    arg_arg1: *mut ::std::os::raw::c_void,
-    arg_arg2: *mut *mut cmsghdr,
-    arg_arg3: ::std::os::raw::c_int,
-) -> ::std::os::raw::c_int {
+pub unsafe fn ntohs(arg___netshort: u16) -> u16 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn inet6_option_init(
-                arg_arg1: *mut ::std::os::raw::c_void,
-                arg_arg2: *mut *mut cmsghdr,
-                arg_arg3: ::std::os::raw::c_int,
-            ) -> ::std::os::raw::c_int;
+            fn ntohs(arg___netshort: u16) -> u16;
         }
-        inet6_option_init(arg_arg1, arg_arg2, arg_arg3)
+        ntohs(arg___netshort)
     })
 }
-pub unsafe fn inet6_option_append(
-    arg_arg1: *mut cmsghdr,
-    arg_arg2: *const __uint8_t,
-    arg_arg3: ::std::os::raw::c_int,
-    arg_arg4: ::std::os::raw::c_int,
-) -> ::std::os::raw::c_int {
+pub unsafe fn htonl(arg___hostlong: u32) -> u32 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn inet6_option_append(
-                arg_arg1: *mut cmsghdr,
-                arg_arg2: *const __uint8_t,
-                arg_arg3: ::std::os::raw::c_int,
-                arg_arg4: ::std::os::raw::c_int,
-            ) -> ::std::os::raw::c_int;
+            fn htonl(arg___hostlong: u32) -> u32;
         }
-        inet6_option_append(arg_arg1, arg_arg2, arg_arg3, arg_arg4)
+        htonl(arg___hostlong)
     })
 }
-pub unsafe fn inet6_option_alloc(
-    arg_arg1: *mut cmsghdr,
-    arg_arg2: ::std::os::raw::c_int,
-    arg_arg3: ::std::os::raw::c_int,
-    arg_arg4: ::std::os::raw::c_int,
-) -> *mut __uint8_t {
+pub unsafe fn htons(arg___hostshort: u16) -> u16 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn inet6_option_alloc(
-                arg_arg1: *mut cmsghdr,
-                arg_arg2: ::std::os::raw::c_int,
-                arg_arg3: ::std::os::raw::c_int,
-                arg_arg4: ::std::os::raw::c_int,
-            ) -> *mut __uint8_t;
+            fn htons(arg___hostshort: u16) -> u16;
         }
-        inet6_option_alloc(arg_arg1, arg_arg2, arg_arg3, arg_arg4)
-    })
-}
-pub unsafe fn inet6_option_next(
-    arg_arg1: *const cmsghdr,
-    arg_arg2: *mut *mut __uint8_t,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn inet6_option_next(
-                arg_arg1: *const cmsghdr,
-                arg_arg2: *mut *mut __uint8_t,
-            ) -> ::std::os::raw::c_int;
-        }
-        inet6_option_next(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn inet6_option_find(
-    arg_arg1: *const cmsghdr,
-    arg_arg2: *mut *mut __uint8_t,
-    arg_arg3: ::std::os::raw::c_int,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn inet6_option_find(
-                arg_arg1: *const cmsghdr,
-                arg_arg2: *mut *mut __uint8_t,
-                arg_arg3: ::std::os::raw::c_int,
-            ) -> ::std::os::raw::c_int;
-        }
-        inet6_option_find(arg_arg1, arg_arg2, arg_arg3)
-    })
-}
-pub unsafe fn inet6_rthdr_space(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: ::std::os::raw::c_int,
-) -> usize {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn inet6_rthdr_space(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: ::std::os::raw::c_int,
-            ) -> usize;
-        }
-        inet6_rthdr_space(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn inet6_rthdr_init(
-    arg_arg1: *mut ::std::os::raw::c_void,
-    arg_arg2: ::std::os::raw::c_int,
-) -> *mut cmsghdr {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn inet6_rthdr_init(
-                arg_arg1: *mut ::std::os::raw::c_void,
-                arg_arg2: ::std::os::raw::c_int,
-            ) -> *mut cmsghdr;
-        }
-        inet6_rthdr_init(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn inet6_rthdr_add(
-    arg_arg1: *mut cmsghdr,
-    arg_arg2: *const in6_addr,
-    arg_arg3: ::std::os::raw::c_uint,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn inet6_rthdr_add(
-                arg_arg1: *mut cmsghdr,
-                arg_arg2: *const in6_addr,
-                arg_arg3: ::std::os::raw::c_uint,
-            ) -> ::std::os::raw::c_int;
-        }
-        inet6_rthdr_add(arg_arg1, arg_arg2, arg_arg3)
-    })
-}
-pub unsafe fn inet6_rthdr_lasthop(
-    arg_arg1: *mut cmsghdr,
-    arg_arg2: ::std::os::raw::c_uint,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn inet6_rthdr_lasthop(
-                arg_arg1: *mut cmsghdr,
-                arg_arg2: ::std::os::raw::c_uint,
-            ) -> ::std::os::raw::c_int;
-        }
-        inet6_rthdr_lasthop(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn inet6_rthdr_segments(arg_arg1: *const cmsghdr) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn inet6_rthdr_segments(arg_arg1: *const cmsghdr) -> ::std::os::raw::c_int;
-        }
-        inet6_rthdr_segments(arg_arg1)
-    })
-}
-pub unsafe fn inet6_rthdr_getaddr(
-    arg_arg1: *mut cmsghdr,
-    arg_arg2: ::std::os::raw::c_int,
-) -> *mut in6_addr {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn inet6_rthdr_getaddr(
-                arg_arg1: *mut cmsghdr,
-                arg_arg2: ::std::os::raw::c_int,
-            ) -> *mut in6_addr;
-        }
-        inet6_rthdr_getaddr(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn inet6_rthdr_getflags(
-    arg_arg1: *const cmsghdr,
-    arg_arg2: ::std::os::raw::c_int,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn inet6_rthdr_getflags(
-                arg_arg1: *const cmsghdr,
-                arg_arg2: ::std::os::raw::c_int,
-            ) -> ::std::os::raw::c_int;
-        }
-        inet6_rthdr_getflags(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn inet6_opt_init(
-    arg_arg1: *mut ::std::os::raw::c_void,
-    arg_arg2: socklen_t,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn inet6_opt_init(
-                arg_arg1: *mut ::std::os::raw::c_void,
-                arg_arg2: socklen_t,
-            ) -> ::std::os::raw::c_int;
-        }
-        inet6_opt_init(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn inet6_opt_append(
-    arg_arg1: *mut ::std::os::raw::c_void,
-    arg_arg2: socklen_t,
-    arg_arg3: ::std::os::raw::c_int,
-    arg_arg4: __uint8_t,
-    arg_arg5: socklen_t,
-    arg_arg6: __uint8_t,
-    arg_arg7: *mut *mut ::std::os::raw::c_void,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn inet6_opt_append(
-                arg_arg1: *mut ::std::os::raw::c_void,
-                arg_arg2: socklen_t,
-                arg_arg3: ::std::os::raw::c_int,
-                arg_arg4: __uint8_t,
-                arg_arg5: socklen_t,
-                arg_arg6: __uint8_t,
-                arg_arg7: *mut *mut ::std::os::raw::c_void,
-            ) -> ::std::os::raw::c_int;
-        }
-        inet6_opt_append(
-            arg_arg1, arg_arg2, arg_arg3, arg_arg4, arg_arg5, arg_arg6, arg_arg7,
-        )
-    })
-}
-pub unsafe fn inet6_opt_finish(
-    arg_arg1: *mut ::std::os::raw::c_void,
-    arg_arg2: socklen_t,
-    arg_arg3: ::std::os::raw::c_int,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn inet6_opt_finish(
-                arg_arg1: *mut ::std::os::raw::c_void,
-                arg_arg2: socklen_t,
-                arg_arg3: ::std::os::raw::c_int,
-            ) -> ::std::os::raw::c_int;
-        }
-        inet6_opt_finish(arg_arg1, arg_arg2, arg_arg3)
-    })
-}
-pub unsafe fn inet6_opt_set_val(
-    arg_arg1: *mut ::std::os::raw::c_void,
-    arg_arg2: ::std::os::raw::c_int,
-    arg_arg3: *mut ::std::os::raw::c_void,
-    arg_arg4: socklen_t,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn inet6_opt_set_val(
-                arg_arg1: *mut ::std::os::raw::c_void,
-                arg_arg2: ::std::os::raw::c_int,
-                arg_arg3: *mut ::std::os::raw::c_void,
-                arg_arg4: socklen_t,
-            ) -> ::std::os::raw::c_int;
-        }
-        inet6_opt_set_val(arg_arg1, arg_arg2, arg_arg3, arg_arg4)
-    })
-}
-pub unsafe fn inet6_opt_next(
-    arg_arg1: *mut ::std::os::raw::c_void,
-    arg_arg2: socklen_t,
-    arg_arg3: ::std::os::raw::c_int,
-    arg_arg4: *mut __uint8_t,
-    arg_arg5: *mut socklen_t,
-    arg_arg6: *mut *mut ::std::os::raw::c_void,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn inet6_opt_next(
-                arg_arg1: *mut ::std::os::raw::c_void,
-                arg_arg2: socklen_t,
-                arg_arg3: ::std::os::raw::c_int,
-                arg_arg4: *mut __uint8_t,
-                arg_arg5: *mut socklen_t,
-                arg_arg6: *mut *mut ::std::os::raw::c_void,
-            ) -> ::std::os::raw::c_int;
-        }
-        inet6_opt_next(arg_arg1, arg_arg2, arg_arg3, arg_arg4, arg_arg5, arg_arg6)
-    })
-}
-pub unsafe fn inet6_opt_find(
-    arg_arg1: *mut ::std::os::raw::c_void,
-    arg_arg2: socklen_t,
-    arg_arg3: ::std::os::raw::c_int,
-    arg_arg4: __uint8_t,
-    arg_arg5: *mut socklen_t,
-    arg_arg6: *mut *mut ::std::os::raw::c_void,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn inet6_opt_find(
-                arg_arg1: *mut ::std::os::raw::c_void,
-                arg_arg2: socklen_t,
-                arg_arg3: ::std::os::raw::c_int,
-                arg_arg4: __uint8_t,
-                arg_arg5: *mut socklen_t,
-                arg_arg6: *mut *mut ::std::os::raw::c_void,
-            ) -> ::std::os::raw::c_int;
-        }
-        inet6_opt_find(arg_arg1, arg_arg2, arg_arg3, arg_arg4, arg_arg5, arg_arg6)
-    })
-}
-pub unsafe fn inet6_opt_get_val(
-    arg_arg1: *mut ::std::os::raw::c_void,
-    arg_arg2: ::std::os::raw::c_int,
-    arg_arg3: *mut ::std::os::raw::c_void,
-    arg_arg4: socklen_t,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn inet6_opt_get_val(
-                arg_arg1: *mut ::std::os::raw::c_void,
-                arg_arg2: ::std::os::raw::c_int,
-                arg_arg3: *mut ::std::os::raw::c_void,
-                arg_arg4: socklen_t,
-            ) -> ::std::os::raw::c_int;
-        }
-        inet6_opt_get_val(arg_arg1, arg_arg2, arg_arg3, arg_arg4)
-    })
-}
-pub unsafe fn inet6_rth_space(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: ::std::os::raw::c_int,
-) -> socklen_t {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn inet6_rth_space(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: ::std::os::raw::c_int,
-            ) -> socklen_t;
-        }
-        inet6_rth_space(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn inet6_rth_init(
-    arg_arg1: *mut ::std::os::raw::c_void,
-    arg_arg2: socklen_t,
-    arg_arg3: ::std::os::raw::c_int,
-    arg_arg4: ::std::os::raw::c_int,
-) -> *mut ::std::os::raw::c_void {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn inet6_rth_init(
-                arg_arg1: *mut ::std::os::raw::c_void,
-                arg_arg2: socklen_t,
-                arg_arg3: ::std::os::raw::c_int,
-                arg_arg4: ::std::os::raw::c_int,
-            ) -> *mut ::std::os::raw::c_void;
-        }
-        inet6_rth_init(arg_arg1, arg_arg2, arg_arg3, arg_arg4)
-    })
-}
-pub unsafe fn inet6_rth_add(
-    arg_arg1: *mut ::std::os::raw::c_void,
-    arg_arg2: *const in6_addr,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn inet6_rth_add(
-                arg_arg1: *mut ::std::os::raw::c_void,
-                arg_arg2: *const in6_addr,
-            ) -> ::std::os::raw::c_int;
-        }
-        inet6_rth_add(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn inet6_rth_reverse(
-    arg_arg1: *const ::std::os::raw::c_void,
-    arg_arg2: *mut ::std::os::raw::c_void,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn inet6_rth_reverse(
-                arg_arg1: *const ::std::os::raw::c_void,
-                arg_arg2: *mut ::std::os::raw::c_void,
-            ) -> ::std::os::raw::c_int;
-        }
-        inet6_rth_reverse(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn inet6_rth_segments(arg_arg1: *const ::std::os::raw::c_void) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn inet6_rth_segments(arg_arg1: *const ::std::os::raw::c_void)
-                -> ::std::os::raw::c_int;
-        }
-        inet6_rth_segments(arg_arg1)
-    })
-}
-pub unsafe fn inet6_rth_getaddr(
-    arg_arg1: *const ::std::os::raw::c_void,
-    arg_arg2: ::std::os::raw::c_int,
-) -> *mut in6_addr {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn inet6_rth_getaddr(
-                arg_arg1: *const ::std::os::raw::c_void,
-                arg_arg2: ::std::os::raw::c_int,
-            ) -> *mut in6_addr;
-        }
-        inet6_rth_getaddr(arg_arg1, arg_arg2)
+        htons(arg___hostshort)
     })
 }
 pub unsafe fn bindresvport(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: *mut sockaddr_in,
+    arg___sockfd: ::std::os::raw::c_int,
+    arg___sock_in: *mut sockaddr_in,
 ) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
             fn bindresvport(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: *mut sockaddr_in,
+                arg___sockfd: ::std::os::raw::c_int,
+                arg___sock_in: *mut sockaddr_in,
             ) -> ::std::os::raw::c_int;
         }
-        bindresvport(arg_arg1, arg_arg2)
+        bindresvport(arg___sockfd, arg___sock_in)
     })
 }
-pub unsafe fn bindresvport_sa(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: *mut sockaddr,
+pub unsafe fn bindresvport6(
+    arg___sockfd: ::std::os::raw::c_int,
+    arg___sock_in: *mut sockaddr_in6,
 ) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn bindresvport_sa(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: *mut sockaddr,
+            fn bindresvport6(
+                arg___sockfd: ::std::os::raw::c_int,
+                arg___sock_in: *mut sockaddr_in6,
             ) -> ::std::os::raw::c_int;
         }
-        bindresvport_sa(arg_arg1, arg_arg2)
+        bindresvport6(arg___sockfd, arg___sock_in)
     })
 }
-extern "C" {
-    pub static mut h_errno: ::std::os::raw::c_int;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct rpcent {
+    pub r_name: *mut ::std::os::raw::c_char,
+    pub r_aliases: *mut *mut ::std::os::raw::c_char,
+    pub r_number: ::std::os::raw::c_int,
+}
+impl Default for rpcent {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub unsafe fn setrpcent(arg___stayopen: ::std::os::raw::c_int) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn setrpcent(arg___stayopen: ::std::os::raw::c_int);
+        }
+        setrpcent(arg___stayopen)
+    })
+}
+pub unsafe fn endrpcent() {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn endrpcent();
+        }
+        endrpcent()
+    })
+}
+pub unsafe fn getrpcbyname(arg___name: *const ::std::os::raw::c_char) -> *mut rpcent {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn getrpcbyname(arg___name: *const ::std::os::raw::c_char) -> *mut rpcent;
+        }
+        getrpcbyname(arg___name)
+    })
+}
+pub unsafe fn getrpcbynumber(arg___number: ::std::os::raw::c_int) -> *mut rpcent {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn getrpcbynumber(arg___number: ::std::os::raw::c_int) -> *mut rpcent;
+        }
+        getrpcbynumber(arg___number)
+    })
+}
+pub unsafe fn getrpcent() -> *mut rpcent {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn getrpcent() -> *mut rpcent;
+        }
+        getrpcent()
+    })
+}
+pub unsafe fn getrpcbyname_r(
+    arg___name: *const ::std::os::raw::c_char,
+    arg___result_buf: *mut rpcent,
+    arg___buffer: *mut ::std::os::raw::c_char,
+    arg___buflen: usize,
+    arg___result: *mut *mut rpcent,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn getrpcbyname_r(
+                arg___name: *const ::std::os::raw::c_char,
+                arg___result_buf: *mut rpcent,
+                arg___buffer: *mut ::std::os::raw::c_char,
+                arg___buflen: usize,
+                arg___result: *mut *mut rpcent,
+            ) -> ::std::os::raw::c_int;
+        }
+        getrpcbyname_r(
+            arg___name,
+            arg___result_buf,
+            arg___buffer,
+            arg___buflen,
+            arg___result,
+        )
+    })
+}
+pub unsafe fn getrpcbynumber_r(
+    arg___number: ::std::os::raw::c_int,
+    arg___result_buf: *mut rpcent,
+    arg___buffer: *mut ::std::os::raw::c_char,
+    arg___buflen: usize,
+    arg___result: *mut *mut rpcent,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn getrpcbynumber_r(
+                arg___number: ::std::os::raw::c_int,
+                arg___result_buf: *mut rpcent,
+                arg___buffer: *mut ::std::os::raw::c_char,
+                arg___buflen: usize,
+                arg___result: *mut *mut rpcent,
+            ) -> ::std::os::raw::c_int;
+        }
+        getrpcbynumber_r(
+            arg___number,
+            arg___result_buf,
+            arg___buffer,
+            arg___buflen,
+            arg___result,
+        )
+    })
+}
+pub unsafe fn getrpcent_r(
+    arg___result_buf: *mut rpcent,
+    arg___buffer: *mut ::std::os::raw::c_char,
+    arg___buflen: usize,
+    arg___result: *mut *mut rpcent,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn getrpcent_r(
+                arg___result_buf: *mut rpcent,
+                arg___buffer: *mut ::std::os::raw::c_char,
+                arg___buflen: usize,
+                arg___result: *mut *mut rpcent,
+            ) -> ::std::os::raw::c_int;
+        }
+        getrpcent_r(arg___result_buf, arg___buffer, arg___buflen, arg___result)
+    })
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct netent {
+    pub n_name: *mut ::std::os::raw::c_char,
+    pub n_aliases: *mut *mut ::std::os::raw::c_char,
+    pub n_addrtype: ::std::os::raw::c_int,
+    pub n_net: u32,
+}
+impl Default for netent {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub unsafe fn __h_errno_location() -> *mut ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __h_errno_location() -> *mut ::std::os::raw::c_int;
+        }
+        __h_errno_location()
+    })
+}
+pub unsafe fn herror(arg___str: *const ::std::os::raw::c_char) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn herror(arg___str: *const ::std::os::raw::c_char);
+        }
+        herror(arg___str)
+    })
+}
+pub unsafe fn hstrerror(arg___err_num: ::std::os::raw::c_int) -> *const ::std::os::raw::c_char {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn hstrerror(arg___err_num: ::std::os::raw::c_int) -> *const ::std::os::raw::c_char;
+        }
+        hstrerror(arg___err_num)
+    })
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -9889,22 +8483,316 @@ impl Default for hostent {
         }
     }
 }
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct netent {
-    pub n_name: *mut ::std::os::raw::c_char,
-    pub n_aliases: *mut *mut ::std::os::raw::c_char,
-    pub n_addrtype: ::std::os::raw::c_int,
-    pub n_net: u32,
-}
-impl Default for netent {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
+pub unsafe fn sethostent(arg___stay_open: ::std::os::raw::c_int) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn sethostent(arg___stay_open: ::std::os::raw::c_int);
         }
-    }
+        sethostent(arg___stay_open)
+    })
+}
+pub unsafe fn endhostent() {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn endhostent();
+        }
+        endhostent()
+    })
+}
+pub unsafe fn gethostent() -> *mut hostent {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn gethostent() -> *mut hostent;
+        }
+        gethostent()
+    })
+}
+pub unsafe fn gethostbyaddr(
+    arg___addr: *const ::std::os::raw::c_void,
+    arg___len: __socklen_t,
+    arg___type: ::std::os::raw::c_int,
+) -> *mut hostent {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn gethostbyaddr(
+                arg___addr: *const ::std::os::raw::c_void,
+                arg___len: __socklen_t,
+                arg___type: ::std::os::raw::c_int,
+            ) -> *mut hostent;
+        }
+        gethostbyaddr(arg___addr, arg___len, arg___type)
+    })
+}
+pub unsafe fn gethostbyname(arg___name: *const ::std::os::raw::c_char) -> *mut hostent {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn gethostbyname(arg___name: *const ::std::os::raw::c_char) -> *mut hostent;
+        }
+        gethostbyname(arg___name)
+    })
+}
+pub unsafe fn gethostbyname2(
+    arg___name: *const ::std::os::raw::c_char,
+    arg___af: ::std::os::raw::c_int,
+) -> *mut hostent {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn gethostbyname2(
+                arg___name: *const ::std::os::raw::c_char,
+                arg___af: ::std::os::raw::c_int,
+            ) -> *mut hostent;
+        }
+        gethostbyname2(arg___name, arg___af)
+    })
+}
+pub unsafe fn gethostent_r(
+    arg___result_buf: *mut hostent,
+    arg___buf: *mut ::std::os::raw::c_char,
+    arg___buflen: usize,
+    arg___result: *mut *mut hostent,
+    arg___h_errnop: *mut ::std::os::raw::c_int,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn gethostent_r(
+                arg___result_buf: *mut hostent,
+                arg___buf: *mut ::std::os::raw::c_char,
+                arg___buflen: usize,
+                arg___result: *mut *mut hostent,
+                arg___h_errnop: *mut ::std::os::raw::c_int,
+            ) -> ::std::os::raw::c_int;
+        }
+        gethostent_r(
+            arg___result_buf,
+            arg___buf,
+            arg___buflen,
+            arg___result,
+            arg___h_errnop,
+        )
+    })
+}
+pub unsafe fn gethostbyaddr_r(
+    arg___addr: *const ::std::os::raw::c_void,
+    arg___len: __socklen_t,
+    arg___type: ::std::os::raw::c_int,
+    arg___result_buf: *mut hostent,
+    arg___buf: *mut ::std::os::raw::c_char,
+    arg___buflen: usize,
+    arg___result: *mut *mut hostent,
+    arg___h_errnop: *mut ::std::os::raw::c_int,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn gethostbyaddr_r(
+                arg___addr: *const ::std::os::raw::c_void,
+                arg___len: __socklen_t,
+                arg___type: ::std::os::raw::c_int,
+                arg___result_buf: *mut hostent,
+                arg___buf: *mut ::std::os::raw::c_char,
+                arg___buflen: usize,
+                arg___result: *mut *mut hostent,
+                arg___h_errnop: *mut ::std::os::raw::c_int,
+            ) -> ::std::os::raw::c_int;
+        }
+        gethostbyaddr_r(
+            arg___addr,
+            arg___len,
+            arg___type,
+            arg___result_buf,
+            arg___buf,
+            arg___buflen,
+            arg___result,
+            arg___h_errnop,
+        )
+    })
+}
+pub unsafe fn gethostbyname_r(
+    arg___name: *const ::std::os::raw::c_char,
+    arg___result_buf: *mut hostent,
+    arg___buf: *mut ::std::os::raw::c_char,
+    arg___buflen: usize,
+    arg___result: *mut *mut hostent,
+    arg___h_errnop: *mut ::std::os::raw::c_int,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn gethostbyname_r(
+                arg___name: *const ::std::os::raw::c_char,
+                arg___result_buf: *mut hostent,
+                arg___buf: *mut ::std::os::raw::c_char,
+                arg___buflen: usize,
+                arg___result: *mut *mut hostent,
+                arg___h_errnop: *mut ::std::os::raw::c_int,
+            ) -> ::std::os::raw::c_int;
+        }
+        gethostbyname_r(
+            arg___name,
+            arg___result_buf,
+            arg___buf,
+            arg___buflen,
+            arg___result,
+            arg___h_errnop,
+        )
+    })
+}
+pub unsafe fn gethostbyname2_r(
+    arg___name: *const ::std::os::raw::c_char,
+    arg___af: ::std::os::raw::c_int,
+    arg___result_buf: *mut hostent,
+    arg___buf: *mut ::std::os::raw::c_char,
+    arg___buflen: usize,
+    arg___result: *mut *mut hostent,
+    arg___h_errnop: *mut ::std::os::raw::c_int,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn gethostbyname2_r(
+                arg___name: *const ::std::os::raw::c_char,
+                arg___af: ::std::os::raw::c_int,
+                arg___result_buf: *mut hostent,
+                arg___buf: *mut ::std::os::raw::c_char,
+                arg___buflen: usize,
+                arg___result: *mut *mut hostent,
+                arg___h_errnop: *mut ::std::os::raw::c_int,
+            ) -> ::std::os::raw::c_int;
+        }
+        gethostbyname2_r(
+            arg___name,
+            arg___af,
+            arg___result_buf,
+            arg___buf,
+            arg___buflen,
+            arg___result,
+            arg___h_errnop,
+        )
+    })
+}
+pub unsafe fn setnetent(arg___stay_open: ::std::os::raw::c_int) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn setnetent(arg___stay_open: ::std::os::raw::c_int);
+        }
+        setnetent(arg___stay_open)
+    })
+}
+pub unsafe fn endnetent() {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn endnetent();
+        }
+        endnetent()
+    })
+}
+pub unsafe fn getnetent() -> *mut netent {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn getnetent() -> *mut netent;
+        }
+        getnetent()
+    })
+}
+pub unsafe fn getnetbyaddr(arg___net: u32, arg___type: ::std::os::raw::c_int) -> *mut netent {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn getnetbyaddr(arg___net: u32, arg___type: ::std::os::raw::c_int) -> *mut netent;
+        }
+        getnetbyaddr(arg___net, arg___type)
+    })
+}
+pub unsafe fn getnetbyname(arg___name: *const ::std::os::raw::c_char) -> *mut netent {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn getnetbyname(arg___name: *const ::std::os::raw::c_char) -> *mut netent;
+        }
+        getnetbyname(arg___name)
+    })
+}
+pub unsafe fn getnetent_r(
+    arg___result_buf: *mut netent,
+    arg___buf: *mut ::std::os::raw::c_char,
+    arg___buflen: usize,
+    arg___result: *mut *mut netent,
+    arg___h_errnop: *mut ::std::os::raw::c_int,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn getnetent_r(
+                arg___result_buf: *mut netent,
+                arg___buf: *mut ::std::os::raw::c_char,
+                arg___buflen: usize,
+                arg___result: *mut *mut netent,
+                arg___h_errnop: *mut ::std::os::raw::c_int,
+            ) -> ::std::os::raw::c_int;
+        }
+        getnetent_r(
+            arg___result_buf,
+            arg___buf,
+            arg___buflen,
+            arg___result,
+            arg___h_errnop,
+        )
+    })
+}
+pub unsafe fn getnetbyaddr_r(
+    arg___net: u32,
+    arg___type: ::std::os::raw::c_int,
+    arg___result_buf: *mut netent,
+    arg___buf: *mut ::std::os::raw::c_char,
+    arg___buflen: usize,
+    arg___result: *mut *mut netent,
+    arg___h_errnop: *mut ::std::os::raw::c_int,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn getnetbyaddr_r(
+                arg___net: u32,
+                arg___type: ::std::os::raw::c_int,
+                arg___result_buf: *mut netent,
+                arg___buf: *mut ::std::os::raw::c_char,
+                arg___buflen: usize,
+                arg___result: *mut *mut netent,
+                arg___h_errnop: *mut ::std::os::raw::c_int,
+            ) -> ::std::os::raw::c_int;
+        }
+        getnetbyaddr_r(
+            arg___net,
+            arg___type,
+            arg___result_buf,
+            arg___buf,
+            arg___buflen,
+            arg___result,
+            arg___h_errnop,
+        )
+    })
+}
+pub unsafe fn getnetbyname_r(
+    arg___name: *const ::std::os::raw::c_char,
+    arg___result_buf: *mut netent,
+    arg___buf: *mut ::std::os::raw::c_char,
+    arg___buflen: usize,
+    arg___result: *mut *mut netent,
+    arg___h_errnop: *mut ::std::os::raw::c_int,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn getnetbyname_r(
+                arg___name: *const ::std::os::raw::c_char,
+                arg___result_buf: *mut netent,
+                arg___buf: *mut ::std::os::raw::c_char,
+                arg___buflen: usize,
+                arg___result: *mut *mut netent,
+                arg___h_errnop: *mut ::std::os::raw::c_int,
+            ) -> ::std::os::raw::c_int;
+        }
+        getnetbyname_r(
+            arg___name,
+            arg___result_buf,
+            arg___buf,
+            arg___buflen,
+            arg___result,
+            arg___h_errnop,
+        )
+    })
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -9923,6 +8811,134 @@ impl Default for servent {
         }
     }
 }
+pub unsafe fn setservent(arg___stay_open: ::std::os::raw::c_int) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn setservent(arg___stay_open: ::std::os::raw::c_int);
+        }
+        setservent(arg___stay_open)
+    })
+}
+pub unsafe fn endservent() {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn endservent();
+        }
+        endservent()
+    })
+}
+pub unsafe fn getservent() -> *mut servent {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn getservent() -> *mut servent;
+        }
+        getservent()
+    })
+}
+pub unsafe fn getservbyname(
+    arg___name: *const ::std::os::raw::c_char,
+    arg___proto: *const ::std::os::raw::c_char,
+) -> *mut servent {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn getservbyname(
+                arg___name: *const ::std::os::raw::c_char,
+                arg___proto: *const ::std::os::raw::c_char,
+            ) -> *mut servent;
+        }
+        getservbyname(arg___name, arg___proto)
+    })
+}
+pub unsafe fn getservbyport(
+    arg___port: ::std::os::raw::c_int,
+    arg___proto: *const ::std::os::raw::c_char,
+) -> *mut servent {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn getservbyport(
+                arg___port: ::std::os::raw::c_int,
+                arg___proto: *const ::std::os::raw::c_char,
+            ) -> *mut servent;
+        }
+        getservbyport(arg___port, arg___proto)
+    })
+}
+pub unsafe fn getservent_r(
+    arg___result_buf: *mut servent,
+    arg___buf: *mut ::std::os::raw::c_char,
+    arg___buflen: usize,
+    arg___result: *mut *mut servent,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn getservent_r(
+                arg___result_buf: *mut servent,
+                arg___buf: *mut ::std::os::raw::c_char,
+                arg___buflen: usize,
+                arg___result: *mut *mut servent,
+            ) -> ::std::os::raw::c_int;
+        }
+        getservent_r(arg___result_buf, arg___buf, arg___buflen, arg___result)
+    })
+}
+pub unsafe fn getservbyname_r(
+    arg___name: *const ::std::os::raw::c_char,
+    arg___proto: *const ::std::os::raw::c_char,
+    arg___result_buf: *mut servent,
+    arg___buf: *mut ::std::os::raw::c_char,
+    arg___buflen: usize,
+    arg___result: *mut *mut servent,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn getservbyname_r(
+                arg___name: *const ::std::os::raw::c_char,
+                arg___proto: *const ::std::os::raw::c_char,
+                arg___result_buf: *mut servent,
+                arg___buf: *mut ::std::os::raw::c_char,
+                arg___buflen: usize,
+                arg___result: *mut *mut servent,
+            ) -> ::std::os::raw::c_int;
+        }
+        getservbyname_r(
+            arg___name,
+            arg___proto,
+            arg___result_buf,
+            arg___buf,
+            arg___buflen,
+            arg___result,
+        )
+    })
+}
+pub unsafe fn getservbyport_r(
+    arg___port: ::std::os::raw::c_int,
+    arg___proto: *const ::std::os::raw::c_char,
+    arg___result_buf: *mut servent,
+    arg___buf: *mut ::std::os::raw::c_char,
+    arg___buflen: usize,
+    arg___result: *mut *mut servent,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn getservbyport_r(
+                arg___port: ::std::os::raw::c_int,
+                arg___proto: *const ::std::os::raw::c_char,
+                arg___result_buf: *mut servent,
+                arg___buf: *mut ::std::os::raw::c_char,
+                arg___buflen: usize,
+                arg___result: *mut *mut servent,
+            ) -> ::std::os::raw::c_int;
+        }
+        getservbyport_r(
+            arg___port,
+            arg___proto,
+            arg___result_buf,
+            arg___buf,
+            arg___buflen,
+            arg___result,
+        )
+    })
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct protoent {
@@ -9939,6 +8955,424 @@ impl Default for protoent {
         }
     }
 }
+pub unsafe fn setprotoent(arg___stay_open: ::std::os::raw::c_int) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn setprotoent(arg___stay_open: ::std::os::raw::c_int);
+        }
+        setprotoent(arg___stay_open)
+    })
+}
+pub unsafe fn endprotoent() {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn endprotoent();
+        }
+        endprotoent()
+    })
+}
+pub unsafe fn getprotoent() -> *mut protoent {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn getprotoent() -> *mut protoent;
+        }
+        getprotoent()
+    })
+}
+pub unsafe fn getprotobyname(arg___name: *const ::std::os::raw::c_char) -> *mut protoent {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn getprotobyname(arg___name: *const ::std::os::raw::c_char) -> *mut protoent;
+        }
+        getprotobyname(arg___name)
+    })
+}
+pub unsafe fn getprotobynumber(arg___proto: ::std::os::raw::c_int) -> *mut protoent {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn getprotobynumber(arg___proto: ::std::os::raw::c_int) -> *mut protoent;
+        }
+        getprotobynumber(arg___proto)
+    })
+}
+pub unsafe fn getprotoent_r(
+    arg___result_buf: *mut protoent,
+    arg___buf: *mut ::std::os::raw::c_char,
+    arg___buflen: usize,
+    arg___result: *mut *mut protoent,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn getprotoent_r(
+                arg___result_buf: *mut protoent,
+                arg___buf: *mut ::std::os::raw::c_char,
+                arg___buflen: usize,
+                arg___result: *mut *mut protoent,
+            ) -> ::std::os::raw::c_int;
+        }
+        getprotoent_r(arg___result_buf, arg___buf, arg___buflen, arg___result)
+    })
+}
+pub unsafe fn getprotobyname_r(
+    arg___name: *const ::std::os::raw::c_char,
+    arg___result_buf: *mut protoent,
+    arg___buf: *mut ::std::os::raw::c_char,
+    arg___buflen: usize,
+    arg___result: *mut *mut protoent,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn getprotobyname_r(
+                arg___name: *const ::std::os::raw::c_char,
+                arg___result_buf: *mut protoent,
+                arg___buf: *mut ::std::os::raw::c_char,
+                arg___buflen: usize,
+                arg___result: *mut *mut protoent,
+            ) -> ::std::os::raw::c_int;
+        }
+        getprotobyname_r(
+            arg___name,
+            arg___result_buf,
+            arg___buf,
+            arg___buflen,
+            arg___result,
+        )
+    })
+}
+pub unsafe fn getprotobynumber_r(
+    arg___proto: ::std::os::raw::c_int,
+    arg___result_buf: *mut protoent,
+    arg___buf: *mut ::std::os::raw::c_char,
+    arg___buflen: usize,
+    arg___result: *mut *mut protoent,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn getprotobynumber_r(
+                arg___proto: ::std::os::raw::c_int,
+                arg___result_buf: *mut protoent,
+                arg___buf: *mut ::std::os::raw::c_char,
+                arg___buflen: usize,
+                arg___result: *mut *mut protoent,
+            ) -> ::std::os::raw::c_int;
+        }
+        getprotobynumber_r(
+            arg___proto,
+            arg___result_buf,
+            arg___buf,
+            arg___buflen,
+            arg___result,
+        )
+    })
+}
+pub unsafe fn setnetgrent(arg___netgroup: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn setnetgrent(arg___netgroup: *const ::std::os::raw::c_char) -> ::std::os::raw::c_int;
+        }
+        setnetgrent(arg___netgroup)
+    })
+}
+pub unsafe fn endnetgrent() {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn endnetgrent();
+        }
+        endnetgrent()
+    })
+}
+pub unsafe fn getnetgrent(
+    arg___hostp: *mut *mut ::std::os::raw::c_char,
+    arg___userp: *mut *mut ::std::os::raw::c_char,
+    arg___domainp: *mut *mut ::std::os::raw::c_char,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn getnetgrent(
+                arg___hostp: *mut *mut ::std::os::raw::c_char,
+                arg___userp: *mut *mut ::std::os::raw::c_char,
+                arg___domainp: *mut *mut ::std::os::raw::c_char,
+            ) -> ::std::os::raw::c_int;
+        }
+        getnetgrent(arg___hostp, arg___userp, arg___domainp)
+    })
+}
+pub unsafe fn innetgr(
+    arg___netgroup: *const ::std::os::raw::c_char,
+    arg___host: *const ::std::os::raw::c_char,
+    arg___user: *const ::std::os::raw::c_char,
+    arg___domain: *const ::std::os::raw::c_char,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn innetgr(
+                arg___netgroup: *const ::std::os::raw::c_char,
+                arg___host: *const ::std::os::raw::c_char,
+                arg___user: *const ::std::os::raw::c_char,
+                arg___domain: *const ::std::os::raw::c_char,
+            ) -> ::std::os::raw::c_int;
+        }
+        innetgr(arg___netgroup, arg___host, arg___user, arg___domain)
+    })
+}
+pub unsafe fn getnetgrent_r(
+    arg___hostp: *mut *mut ::std::os::raw::c_char,
+    arg___userp: *mut *mut ::std::os::raw::c_char,
+    arg___domainp: *mut *mut ::std::os::raw::c_char,
+    arg___buffer: *mut ::std::os::raw::c_char,
+    arg___buflen: usize,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn getnetgrent_r(
+                arg___hostp: *mut *mut ::std::os::raw::c_char,
+                arg___userp: *mut *mut ::std::os::raw::c_char,
+                arg___domainp: *mut *mut ::std::os::raw::c_char,
+                arg___buffer: *mut ::std::os::raw::c_char,
+                arg___buflen: usize,
+            ) -> ::std::os::raw::c_int;
+        }
+        getnetgrent_r(
+            arg___hostp,
+            arg___userp,
+            arg___domainp,
+            arg___buffer,
+            arg___buflen,
+        )
+    })
+}
+pub unsafe fn rcmd(
+    arg___ahost: *mut *mut ::std::os::raw::c_char,
+    arg___rport: ::std::os::raw::c_ushort,
+    arg___locuser: *const ::std::os::raw::c_char,
+    arg___remuser: *const ::std::os::raw::c_char,
+    arg___cmd: *const ::std::os::raw::c_char,
+    arg___fd2p: *mut ::std::os::raw::c_int,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn rcmd(
+                arg___ahost: *mut *mut ::std::os::raw::c_char,
+                arg___rport: ::std::os::raw::c_ushort,
+                arg___locuser: *const ::std::os::raw::c_char,
+                arg___remuser: *const ::std::os::raw::c_char,
+                arg___cmd: *const ::std::os::raw::c_char,
+                arg___fd2p: *mut ::std::os::raw::c_int,
+            ) -> ::std::os::raw::c_int;
+        }
+        rcmd(
+            arg___ahost,
+            arg___rport,
+            arg___locuser,
+            arg___remuser,
+            arg___cmd,
+            arg___fd2p,
+        )
+    })
+}
+pub unsafe fn rcmd_af(
+    arg___ahost: *mut *mut ::std::os::raw::c_char,
+    arg___rport: ::std::os::raw::c_ushort,
+    arg___locuser: *const ::std::os::raw::c_char,
+    arg___remuser: *const ::std::os::raw::c_char,
+    arg___cmd: *const ::std::os::raw::c_char,
+    arg___fd2p: *mut ::std::os::raw::c_int,
+    arg___af: sa_family_t,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn rcmd_af(
+                arg___ahost: *mut *mut ::std::os::raw::c_char,
+                arg___rport: ::std::os::raw::c_ushort,
+                arg___locuser: *const ::std::os::raw::c_char,
+                arg___remuser: *const ::std::os::raw::c_char,
+                arg___cmd: *const ::std::os::raw::c_char,
+                arg___fd2p: *mut ::std::os::raw::c_int,
+                arg___af: sa_family_t,
+            ) -> ::std::os::raw::c_int;
+        }
+        rcmd_af(
+            arg___ahost,
+            arg___rport,
+            arg___locuser,
+            arg___remuser,
+            arg___cmd,
+            arg___fd2p,
+            arg___af,
+        )
+    })
+}
+pub unsafe fn rexec(
+    arg___ahost: *mut *mut ::std::os::raw::c_char,
+    arg___rport: ::std::os::raw::c_int,
+    arg___name: *const ::std::os::raw::c_char,
+    arg___pass: *const ::std::os::raw::c_char,
+    arg___cmd: *const ::std::os::raw::c_char,
+    arg___fd2p: *mut ::std::os::raw::c_int,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn rexec(
+                arg___ahost: *mut *mut ::std::os::raw::c_char,
+                arg___rport: ::std::os::raw::c_int,
+                arg___name: *const ::std::os::raw::c_char,
+                arg___pass: *const ::std::os::raw::c_char,
+                arg___cmd: *const ::std::os::raw::c_char,
+                arg___fd2p: *mut ::std::os::raw::c_int,
+            ) -> ::std::os::raw::c_int;
+        }
+        rexec(
+            arg___ahost,
+            arg___rport,
+            arg___name,
+            arg___pass,
+            arg___cmd,
+            arg___fd2p,
+        )
+    })
+}
+pub unsafe fn rexec_af(
+    arg___ahost: *mut *mut ::std::os::raw::c_char,
+    arg___rport: ::std::os::raw::c_int,
+    arg___name: *const ::std::os::raw::c_char,
+    arg___pass: *const ::std::os::raw::c_char,
+    arg___cmd: *const ::std::os::raw::c_char,
+    arg___fd2p: *mut ::std::os::raw::c_int,
+    arg___af: sa_family_t,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn rexec_af(
+                arg___ahost: *mut *mut ::std::os::raw::c_char,
+                arg___rport: ::std::os::raw::c_int,
+                arg___name: *const ::std::os::raw::c_char,
+                arg___pass: *const ::std::os::raw::c_char,
+                arg___cmd: *const ::std::os::raw::c_char,
+                arg___fd2p: *mut ::std::os::raw::c_int,
+                arg___af: sa_family_t,
+            ) -> ::std::os::raw::c_int;
+        }
+        rexec_af(
+            arg___ahost,
+            arg___rport,
+            arg___name,
+            arg___pass,
+            arg___cmd,
+            arg___fd2p,
+            arg___af,
+        )
+    })
+}
+pub unsafe fn ruserok(
+    arg___rhost: *const ::std::os::raw::c_char,
+    arg___suser: ::std::os::raw::c_int,
+    arg___remuser: *const ::std::os::raw::c_char,
+    arg___locuser: *const ::std::os::raw::c_char,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn ruserok(
+                arg___rhost: *const ::std::os::raw::c_char,
+                arg___suser: ::std::os::raw::c_int,
+                arg___remuser: *const ::std::os::raw::c_char,
+                arg___locuser: *const ::std::os::raw::c_char,
+            ) -> ::std::os::raw::c_int;
+        }
+        ruserok(arg___rhost, arg___suser, arg___remuser, arg___locuser)
+    })
+}
+pub unsafe fn ruserok_af(
+    arg___rhost: *const ::std::os::raw::c_char,
+    arg___suser: ::std::os::raw::c_int,
+    arg___remuser: *const ::std::os::raw::c_char,
+    arg___locuser: *const ::std::os::raw::c_char,
+    arg___af: sa_family_t,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn ruserok_af(
+                arg___rhost: *const ::std::os::raw::c_char,
+                arg___suser: ::std::os::raw::c_int,
+                arg___remuser: *const ::std::os::raw::c_char,
+                arg___locuser: *const ::std::os::raw::c_char,
+                arg___af: sa_family_t,
+            ) -> ::std::os::raw::c_int;
+        }
+        ruserok_af(
+            arg___rhost,
+            arg___suser,
+            arg___remuser,
+            arg___locuser,
+            arg___af,
+        )
+    })
+}
+pub unsafe fn iruserok(
+    arg___raddr: u32,
+    arg___suser: ::std::os::raw::c_int,
+    arg___remuser: *const ::std::os::raw::c_char,
+    arg___locuser: *const ::std::os::raw::c_char,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn iruserok(
+                arg___raddr: u32,
+                arg___suser: ::std::os::raw::c_int,
+                arg___remuser: *const ::std::os::raw::c_char,
+                arg___locuser: *const ::std::os::raw::c_char,
+            ) -> ::std::os::raw::c_int;
+        }
+        iruserok(arg___raddr, arg___suser, arg___remuser, arg___locuser)
+    })
+}
+pub unsafe fn iruserok_af(
+    arg___raddr: *const ::std::os::raw::c_void,
+    arg___suser: ::std::os::raw::c_int,
+    arg___remuser: *const ::std::os::raw::c_char,
+    arg___locuser: *const ::std::os::raw::c_char,
+    arg___af: sa_family_t,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn iruserok_af(
+                arg___raddr: *const ::std::os::raw::c_void,
+                arg___suser: ::std::os::raw::c_int,
+                arg___remuser: *const ::std::os::raw::c_char,
+                arg___locuser: *const ::std::os::raw::c_char,
+                arg___af: sa_family_t,
+            ) -> ::std::os::raw::c_int;
+        }
+        iruserok_af(
+            arg___raddr,
+            arg___suser,
+            arg___remuser,
+            arg___locuser,
+            arg___af,
+        )
+    })
+}
+pub unsafe fn rresvport(arg___alport: *mut ::std::os::raw::c_int) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn rresvport(arg___alport: *mut ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+        }
+        rresvport(arg___alport)
+    })
+}
+pub unsafe fn rresvport_af(
+    arg___alport: *mut ::std::os::raw::c_int,
+    arg___af: sa_family_t,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn rresvport_af(
+                arg___alport: *mut ::std::os::raw::c_int,
+                arg___af: sa_family_t,
+            ) -> ::std::os::raw::c_int;
+        }
+        rresvport_af(arg___alport, arg___af)
+    })
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct addrinfo {
@@ -9947,8 +9381,8 @@ pub struct addrinfo {
     pub ai_socktype: ::std::os::raw::c_int,
     pub ai_protocol: ::std::os::raw::c_int,
     pub ai_addrlen: socklen_t,
-    pub ai_canonname: *mut ::std::os::raw::c_char,
     pub ai_addr: *mut sockaddr,
+    pub ai_canonname: *mut ::std::os::raw::c_char,
     pub ai_next: *mut addrinfo,
 }
 impl Default for addrinfo {
@@ -9960,424 +9394,70 @@ impl Default for addrinfo {
         }
     }
 }
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct rpcent {
-    pub r_name: *mut ::std::os::raw::c_char,
-    pub r_aliases: *mut *mut ::std::os::raw::c_char,
-    pub r_number: ::std::os::raw::c_int,
-}
-impl Default for rpcent {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub unsafe fn endhostent() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn endhostent();
-        }
-        endhostent()
-    })
-}
-pub unsafe fn endnetent() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn endnetent();
-        }
-        endnetent()
-    })
-}
-pub unsafe fn endprotoent() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn endprotoent();
-        }
-        endprotoent()
-    })
-}
-pub unsafe fn endservent() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn endservent();
-        }
-        endservent()
-    })
-}
-pub unsafe fn freeaddrinfo(arg_arg1: *mut addrinfo) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn freeaddrinfo(arg_arg1: *mut addrinfo);
-        }
-        freeaddrinfo(arg_arg1)
-    })
-}
-pub unsafe fn gai_strerror(arg_arg1: ::std::os::raw::c_int) -> *const ::std::os::raw::c_char {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn gai_strerror(arg_arg1: ::std::os::raw::c_int) -> *const ::std::os::raw::c_char;
-        }
-        gai_strerror(arg_arg1)
-    })
-}
 pub unsafe fn getaddrinfo(
-    arg_arg1: *const ::std::os::raw::c_char,
-    arg_arg2: *const ::std::os::raw::c_char,
-    arg_arg3: *const addrinfo,
-    arg_arg4: *mut *mut addrinfo,
+    arg___name: *const ::std::os::raw::c_char,
+    arg___service: *const ::std::os::raw::c_char,
+    arg___req: *const addrinfo,
+    arg___pai: *mut *mut addrinfo,
 ) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
             fn getaddrinfo(
-                arg_arg1: *const ::std::os::raw::c_char,
-                arg_arg2: *const ::std::os::raw::c_char,
-                arg_arg3: *const addrinfo,
-                arg_arg4: *mut *mut addrinfo,
+                arg___name: *const ::std::os::raw::c_char,
+                arg___service: *const ::std::os::raw::c_char,
+                arg___req: *const addrinfo,
+                arg___pai: *mut *mut addrinfo,
             ) -> ::std::os::raw::c_int;
         }
-        getaddrinfo(arg_arg1, arg_arg2, arg_arg3, arg_arg4)
+        getaddrinfo(arg___name, arg___service, arg___req, arg___pai)
     })
 }
-pub unsafe fn gethostbyaddr(
-    arg_arg1: *const ::std::os::raw::c_void,
-    arg_arg2: socklen_t,
-    arg_arg3: ::std::os::raw::c_int,
-) -> *mut hostent {
+pub unsafe fn freeaddrinfo(arg___ai: *mut addrinfo) {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn gethostbyaddr(
-                arg_arg1: *const ::std::os::raw::c_void,
-                arg_arg2: socklen_t,
-                arg_arg3: ::std::os::raw::c_int,
-            ) -> *mut hostent;
+            fn freeaddrinfo(arg___ai: *mut addrinfo);
         }
-        gethostbyaddr(arg_arg1, arg_arg2, arg_arg3)
+        freeaddrinfo(arg___ai)
     })
 }
-pub unsafe fn gethostbyname(arg_arg1: *const ::std::os::raw::c_char) -> *mut hostent {
+pub unsafe fn gai_strerror(arg___ecode: ::std::os::raw::c_int) -> *const ::std::os::raw::c_char {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn gethostbyname(arg_arg1: *const ::std::os::raw::c_char) -> *mut hostent;
+            fn gai_strerror(arg___ecode: ::std::os::raw::c_int) -> *const ::std::os::raw::c_char;
         }
-        gethostbyname(arg_arg1)
-    })
-}
-pub unsafe fn gethostent() -> *mut hostent {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn gethostent() -> *mut hostent;
-        }
-        gethostent()
+        gai_strerror(arg___ecode)
     })
 }
 pub unsafe fn getnameinfo(
-    arg_arg1: *const sockaddr,
-    arg_arg2: socklen_t,
-    arg_arg3: *mut ::std::os::raw::c_char,
-    arg_arg4: socklen_t,
-    arg_arg5: *mut ::std::os::raw::c_char,
-    arg_arg6: socklen_t,
-    arg_arg7: ::std::os::raw::c_int,
+    arg___sa: *const sockaddr,
+    arg___salen: socklen_t,
+    arg___host: *mut ::std::os::raw::c_char,
+    arg___hostlen: socklen_t,
+    arg___serv: *mut ::std::os::raw::c_char,
+    arg___servlen: socklen_t,
+    arg___flags: ::std::os::raw::c_int,
 ) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
             fn getnameinfo(
-                arg_arg1: *const sockaddr,
-                arg_arg2: socklen_t,
-                arg_arg3: *mut ::std::os::raw::c_char,
-                arg_arg4: socklen_t,
-                arg_arg5: *mut ::std::os::raw::c_char,
-                arg_arg6: socklen_t,
-                arg_arg7: ::std::os::raw::c_int,
+                arg___sa: *const sockaddr,
+                arg___salen: socklen_t,
+                arg___host: *mut ::std::os::raw::c_char,
+                arg___hostlen: socklen_t,
+                arg___serv: *mut ::std::os::raw::c_char,
+                arg___servlen: socklen_t,
+                arg___flags: ::std::os::raw::c_int,
             ) -> ::std::os::raw::c_int;
         }
         getnameinfo(
-            arg_arg1, arg_arg2, arg_arg3, arg_arg4, arg_arg5, arg_arg6, arg_arg7,
+            arg___sa,
+            arg___salen,
+            arg___host,
+            arg___hostlen,
+            arg___serv,
+            arg___servlen,
+            arg___flags,
         )
-    })
-}
-pub unsafe fn getnetbyaddr(arg_arg1: u32, arg_arg2: ::std::os::raw::c_int) -> *mut netent {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn getnetbyaddr(arg_arg1: u32, arg_arg2: ::std::os::raw::c_int) -> *mut netent;
-        }
-        getnetbyaddr(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn getnetbyname(arg_arg1: *const ::std::os::raw::c_char) -> *mut netent {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn getnetbyname(arg_arg1: *const ::std::os::raw::c_char) -> *mut netent;
-        }
-        getnetbyname(arg_arg1)
-    })
-}
-pub unsafe fn getnetent() -> *mut netent {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn getnetent() -> *mut netent;
-        }
-        getnetent()
-    })
-}
-pub unsafe fn getprotobyname(arg_arg1: *const ::std::os::raw::c_char) -> *mut protoent {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn getprotobyname(arg_arg1: *const ::std::os::raw::c_char) -> *mut protoent;
-        }
-        getprotobyname(arg_arg1)
-    })
-}
-pub unsafe fn getprotobynumber(arg_arg1: ::std::os::raw::c_int) -> *mut protoent {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn getprotobynumber(arg_arg1: ::std::os::raw::c_int) -> *mut protoent;
-        }
-        getprotobynumber(arg_arg1)
-    })
-}
-pub unsafe fn getprotoent() -> *mut protoent {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn getprotoent() -> *mut protoent;
-        }
-        getprotoent()
-    })
-}
-pub unsafe fn getservbyname(
-    arg_arg1: *const ::std::os::raw::c_char,
-    arg_arg2: *const ::std::os::raw::c_char,
-) -> *mut servent {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn getservbyname(
-                arg_arg1: *const ::std::os::raw::c_char,
-                arg_arg2: *const ::std::os::raw::c_char,
-            ) -> *mut servent;
-        }
-        getservbyname(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn getservbyport(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: *const ::std::os::raw::c_char,
-) -> *mut servent {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn getservbyport(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: *const ::std::os::raw::c_char,
-            ) -> *mut servent;
-        }
-        getservbyport(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn getservent() -> *mut servent {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn getservent() -> *mut servent;
-        }
-        getservent()
-    })
-}
-pub unsafe fn sethostent(arg_arg1: ::std::os::raw::c_int) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn sethostent(arg_arg1: ::std::os::raw::c_int);
-        }
-        sethostent(arg_arg1)
-    })
-}
-pub unsafe fn setnetent(arg_arg1: ::std::os::raw::c_int) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn setnetent(arg_arg1: ::std::os::raw::c_int);
-        }
-        setnetent(arg_arg1)
-    })
-}
-pub unsafe fn setprotoent(arg_arg1: ::std::os::raw::c_int) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn setprotoent(arg_arg1: ::std::os::raw::c_int);
-        }
-        setprotoent(arg_arg1)
-    })
-}
-pub unsafe fn setservent(arg_arg1: ::std::os::raw::c_int) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn setservent(arg_arg1: ::std::os::raw::c_int);
-        }
-        setservent(arg_arg1)
-    })
-}
-pub unsafe fn freehostent(arg_arg1: *mut hostent) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn freehostent(arg_arg1: *mut hostent);
-        }
-        freehostent(arg_arg1)
-    })
-}
-pub unsafe fn gethostbyname2(
-    arg_arg1: *const ::std::os::raw::c_char,
-    arg_arg2: ::std::os::raw::c_int,
-) -> *mut hostent {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn gethostbyname2(
-                arg_arg1: *const ::std::os::raw::c_char,
-                arg_arg2: ::std::os::raw::c_int,
-            ) -> *mut hostent;
-        }
-        gethostbyname2(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn getipnodebyaddr(
-    arg_arg1: *const ::std::os::raw::c_void,
-    arg_arg2: usize,
-    arg_arg3: ::std::os::raw::c_int,
-    arg_arg4: *mut ::std::os::raw::c_int,
-) -> *mut hostent {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn getipnodebyaddr(
-                arg_arg1: *const ::std::os::raw::c_void,
-                arg_arg2: usize,
-                arg_arg3: ::std::os::raw::c_int,
-                arg_arg4: *mut ::std::os::raw::c_int,
-            ) -> *mut hostent;
-        }
-        getipnodebyaddr(arg_arg1, arg_arg2, arg_arg3, arg_arg4)
-    })
-}
-pub unsafe fn getipnodebyname(
-    arg_arg1: *const ::std::os::raw::c_char,
-    arg_arg2: ::std::os::raw::c_int,
-    arg_arg3: ::std::os::raw::c_int,
-    arg_arg4: *mut ::std::os::raw::c_int,
-) -> *mut hostent {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn getipnodebyname(
-                arg_arg1: *const ::std::os::raw::c_char,
-                arg_arg2: ::std::os::raw::c_int,
-                arg_arg3: ::std::os::raw::c_int,
-                arg_arg4: *mut ::std::os::raw::c_int,
-            ) -> *mut hostent;
-        }
-        getipnodebyname(arg_arg1, arg_arg2, arg_arg3, arg_arg4)
-    })
-}
-pub unsafe fn getrpcbyname(arg_name: *const ::std::os::raw::c_char) -> *mut rpcent {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn getrpcbyname(arg_name: *const ::std::os::raw::c_char) -> *mut rpcent;
-        }
-        getrpcbyname(arg_name)
-    })
-}
-pub unsafe fn getrpcbynumber(arg_number: ::std::os::raw::c_int) -> *mut rpcent {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn getrpcbynumber(arg_number: ::std::os::raw::c_int) -> *mut rpcent;
-        }
-        getrpcbynumber(arg_number)
-    })
-}
-pub unsafe fn getrpcent() -> *mut rpcent {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn getrpcent() -> *mut rpcent;
-        }
-        getrpcent()
-    })
-}
-pub unsafe fn setrpcent(arg_stayopen: ::std::os::raw::c_int) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn setrpcent(arg_stayopen: ::std::os::raw::c_int);
-        }
-        setrpcent(arg_stayopen)
-    })
-}
-pub unsafe fn endrpcent() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn endrpcent();
-        }
-        endrpcent()
-    })
-}
-pub unsafe fn herror(arg_arg1: *const ::std::os::raw::c_char) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn herror(arg_arg1: *const ::std::os::raw::c_char);
-        }
-        herror(arg_arg1)
-    })
-}
-pub unsafe fn hstrerror(arg_arg1: ::std::os::raw::c_int) -> *const ::std::os::raw::c_char {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn hstrerror(arg_arg1: ::std::os::raw::c_int) -> *const ::std::os::raw::c_char;
-        }
-        hstrerror(arg_arg1)
-    })
-}
-pub unsafe fn innetgr(
-    arg_arg1: *const ::std::os::raw::c_char,
-    arg_arg2: *const ::std::os::raw::c_char,
-    arg_arg3: *const ::std::os::raw::c_char,
-    arg_arg4: *const ::std::os::raw::c_char,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn innetgr(
-                arg_arg1: *const ::std::os::raw::c_char,
-                arg_arg2: *const ::std::os::raw::c_char,
-                arg_arg3: *const ::std::os::raw::c_char,
-                arg_arg4: *const ::std::os::raw::c_char,
-            ) -> ::std::os::raw::c_int;
-        }
-        innetgr(arg_arg1, arg_arg2, arg_arg3, arg_arg4)
-    })
-}
-pub unsafe fn getnetgrent(
-    arg_arg1: *mut *mut ::std::os::raw::c_char,
-    arg_arg2: *mut *mut ::std::os::raw::c_char,
-    arg_arg3: *mut *mut ::std::os::raw::c_char,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn getnetgrent(
-                arg_arg1: *mut *mut ::std::os::raw::c_char,
-                arg_arg2: *mut *mut ::std::os::raw::c_char,
-                arg_arg3: *mut *mut ::std::os::raw::c_char,
-            ) -> ::std::os::raw::c_int;
-        }
-        getnetgrent(arg_arg1, arg_arg2, arg_arg3)
-    })
-}
-pub unsafe fn endnetgrent() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn endnetgrent();
-        }
-        endnetgrent()
-    })
-}
-pub unsafe fn setnetgrent(arg_arg1: *const ::std::os::raw::c_char) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn setnetgrent(arg_arg1: *const ::std::os::raw::c_char);
-        }
-        setnetgrent(arg_arg1)
     })
 }
 #[repr(C)]
@@ -10385,14 +9465,11 @@ pub unsafe fn setnetgrent(arg_arg1: *const ::std::os::raw::c_char) {
 pub struct passwd {
     pub pw_name: *mut ::std::os::raw::c_char,
     pub pw_passwd: *mut ::std::os::raw::c_char,
-    pub pw_uid: uid_t,
-    pub pw_gid: gid_t,
-    pub pw_change: __darwin_time_t,
-    pub pw_class: *mut ::std::os::raw::c_char,
+    pub pw_uid: __uid_t,
+    pub pw_gid: __gid_t,
     pub pw_gecos: *mut ::std::os::raw::c_char,
     pub pw_dir: *mut ::std::os::raw::c_char,
     pub pw_shell: *mut ::std::os::raw::c_char,
-    pub pw_expire: __darwin_time_t,
 }
 impl Default for passwd {
     fn default() -> Self {
@@ -10402,70 +9479,6 @@ impl Default for passwd {
             s.assume_init()
         }
     }
-}
-pub unsafe fn getpwuid(arg_arg1: uid_t) -> *mut passwd {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn getpwuid(arg_arg1: uid_t) -> *mut passwd;
-        }
-        getpwuid(arg_arg1)
-    })
-}
-pub unsafe fn getpwnam(arg_arg1: *const ::std::os::raw::c_char) -> *mut passwd {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn getpwnam(arg_arg1: *const ::std::os::raw::c_char) -> *mut passwd;
-        }
-        getpwnam(arg_arg1)
-    })
-}
-pub unsafe fn getpwuid_r(
-    arg_arg1: uid_t,
-    arg_arg2: *mut passwd,
-    arg_arg3: *mut ::std::os::raw::c_char,
-    arg_arg4: usize,
-    arg_arg5: *mut *mut passwd,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn getpwuid_r(
-                arg_arg1: uid_t,
-                arg_arg2: *mut passwd,
-                arg_arg3: *mut ::std::os::raw::c_char,
-                arg_arg4: usize,
-                arg_arg5: *mut *mut passwd,
-            ) -> ::std::os::raw::c_int;
-        }
-        getpwuid_r(arg_arg1, arg_arg2, arg_arg3, arg_arg4, arg_arg5)
-    })
-}
-pub unsafe fn getpwnam_r(
-    arg_arg1: *const ::std::os::raw::c_char,
-    arg_arg2: *mut passwd,
-    arg_arg3: *mut ::std::os::raw::c_char,
-    arg_arg4: usize,
-    arg_arg5: *mut *mut passwd,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn getpwnam_r(
-                arg_arg1: *const ::std::os::raw::c_char,
-                arg_arg2: *mut passwd,
-                arg_arg3: *mut ::std::os::raw::c_char,
-                arg_arg4: usize,
-                arg_arg5: *mut *mut passwd,
-            ) -> ::std::os::raw::c_int;
-        }
-        getpwnam_r(arg_arg1, arg_arg2, arg_arg3, arg_arg4, arg_arg5)
-    })
-}
-pub unsafe fn getpwent() -> *mut passwd {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn getpwent() -> *mut passwd;
-        }
-        getpwent()
-    })
 }
 pub unsafe fn setpwent() {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
@@ -10483,183 +9496,140 @@ pub unsafe fn endpwent() {
         endpwent()
     })
 }
-pub type uuid_t = __darwin_uuid_t;
-pub type uuid_string_t = __darwin_uuid_string_t;
-extern "C" {
-    pub static UUID_NULL: uuid_t;
-}
-pub unsafe fn uuid_clear(arg_uu: *mut ::std::os::raw::c_uchar) {
+pub unsafe fn getpwent() -> *mut passwd {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn uuid_clear(arg_uu: *mut ::std::os::raw::c_uchar);
+            fn getpwent() -> *mut passwd;
         }
-        uuid_clear(arg_uu)
+        getpwent()
     })
 }
-pub unsafe fn uuid_compare(
-    arg_uu1: *mut ::std::os::raw::c_uchar,
-    arg_uu2: *mut ::std::os::raw::c_uchar,
+pub unsafe fn fgetpwent(arg___stream: *mut FILE) -> *mut passwd {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn fgetpwent(arg___stream: *mut FILE) -> *mut passwd;
+        }
+        fgetpwent(arg___stream)
+    })
+}
+pub unsafe fn putpwent(arg___p: *const passwd, arg___f: *mut FILE) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn putpwent(arg___p: *const passwd, arg___f: *mut FILE) -> ::std::os::raw::c_int;
+        }
+        putpwent(arg___p, arg___f)
+    })
+}
+pub unsafe fn getpwuid(arg___uid: __uid_t) -> *mut passwd {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn getpwuid(arg___uid: __uid_t) -> *mut passwd;
+        }
+        getpwuid(arg___uid)
+    })
+}
+pub unsafe fn getpwnam(arg___name: *const ::std::os::raw::c_char) -> *mut passwd {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn getpwnam(arg___name: *const ::std::os::raw::c_char) -> *mut passwd;
+        }
+        getpwnam(arg___name)
+    })
+}
+pub unsafe fn getpwent_r(
+    arg___resultbuf: *mut passwd,
+    arg___buffer: *mut ::std::os::raw::c_char,
+    arg___buflen: usize,
+    arg___result: *mut *mut passwd,
 ) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn uuid_compare(
-                arg_uu1: *mut ::std::os::raw::c_uchar,
-                arg_uu2: *mut ::std::os::raw::c_uchar,
+            fn getpwent_r(
+                arg___resultbuf: *mut passwd,
+                arg___buffer: *mut ::std::os::raw::c_char,
+                arg___buflen: usize,
+                arg___result: *mut *mut passwd,
             ) -> ::std::os::raw::c_int;
         }
-        uuid_compare(arg_uu1, arg_uu2)
+        getpwent_r(arg___resultbuf, arg___buffer, arg___buflen, arg___result)
     })
 }
-pub unsafe fn uuid_copy(
-    arg_dst: *mut ::std::os::raw::c_uchar,
-    arg_src: *mut ::std::os::raw::c_uchar,
-) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn uuid_copy(
-                arg_dst: *mut ::std::os::raw::c_uchar,
-                arg_src: *mut ::std::os::raw::c_uchar,
-            );
-        }
-        uuid_copy(arg_dst, arg_src)
-    })
-}
-pub unsafe fn uuid_generate(arg_out: *mut ::std::os::raw::c_uchar) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn uuid_generate(arg_out: *mut ::std::os::raw::c_uchar);
-        }
-        uuid_generate(arg_out)
-    })
-}
-pub unsafe fn uuid_generate_random(arg_out: *mut ::std::os::raw::c_uchar) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn uuid_generate_random(arg_out: *mut ::std::os::raw::c_uchar);
-        }
-        uuid_generate_random(arg_out)
-    })
-}
-pub unsafe fn uuid_generate_time(arg_out: *mut ::std::os::raw::c_uchar) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn uuid_generate_time(arg_out: *mut ::std::os::raw::c_uchar);
-        }
-        uuid_generate_time(arg_out)
-    })
-}
-pub unsafe fn uuid_is_null(arg_uu: *mut ::std::os::raw::c_uchar) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn uuid_is_null(arg_uu: *mut ::std::os::raw::c_uchar) -> ::std::os::raw::c_int;
-        }
-        uuid_is_null(arg_uu)
-    })
-}
-pub unsafe fn uuid_parse(
-    arg_in_: *mut ::std::os::raw::c_char,
-    arg_uu: *mut ::std::os::raw::c_uchar,
+pub unsafe fn getpwuid_r(
+    arg___uid: __uid_t,
+    arg___resultbuf: *mut passwd,
+    arg___buffer: *mut ::std::os::raw::c_char,
+    arg___buflen: usize,
+    arg___result: *mut *mut passwd,
 ) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn uuid_parse(
-                arg_in_: *mut ::std::os::raw::c_char,
-                arg_uu: *mut ::std::os::raw::c_uchar,
+            fn getpwuid_r(
+                arg___uid: __uid_t,
+                arg___resultbuf: *mut passwd,
+                arg___buffer: *mut ::std::os::raw::c_char,
+                arg___buflen: usize,
+                arg___result: *mut *mut passwd,
             ) -> ::std::os::raw::c_int;
         }
-        uuid_parse(arg_in_, arg_uu)
+        getpwuid_r(
+            arg___uid,
+            arg___resultbuf,
+            arg___buffer,
+            arg___buflen,
+            arg___result,
+        )
     })
 }
-pub unsafe fn uuid_unparse(
-    arg_uu: *mut ::std::os::raw::c_uchar,
-    arg_out: *mut ::std::os::raw::c_char,
-) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn uuid_unparse(
-                arg_uu: *mut ::std::os::raw::c_uchar,
-                arg_out: *mut ::std::os::raw::c_char,
-            );
-        }
-        uuid_unparse(arg_uu, arg_out)
-    })
-}
-pub unsafe fn uuid_unparse_lower(
-    arg_uu: *mut ::std::os::raw::c_uchar,
-    arg_out: *mut ::std::os::raw::c_char,
-) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn uuid_unparse_lower(
-                arg_uu: *mut ::std::os::raw::c_uchar,
-                arg_out: *mut ::std::os::raw::c_char,
-            );
-        }
-        uuid_unparse_lower(arg_uu, arg_out)
-    })
-}
-pub unsafe fn uuid_unparse_upper(
-    arg_uu: *mut ::std::os::raw::c_uchar,
-    arg_out: *mut ::std::os::raw::c_char,
-) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn uuid_unparse_upper(
-                arg_uu: *mut ::std::os::raw::c_uchar,
-                arg_out: *mut ::std::os::raw::c_char,
-            );
-        }
-        uuid_unparse_upper(arg_uu, arg_out)
-    })
-}
-pub unsafe fn setpassent(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn setpassent(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
-        }
-        setpassent(arg_arg1)
-    })
-}
-pub unsafe fn user_from_uid(
-    arg_arg1: uid_t,
-    arg_arg2: ::std::os::raw::c_int,
-) -> *mut ::std::os::raw::c_char {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn user_from_uid(
-                arg_arg1: uid_t,
-                arg_arg2: ::std::os::raw::c_int,
-            ) -> *mut ::std::os::raw::c_char;
-        }
-        user_from_uid(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn getpwuuid(arg_arg1: *mut ::std::os::raw::c_uchar) -> *mut passwd {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn getpwuuid(arg_arg1: *mut ::std::os::raw::c_uchar) -> *mut passwd;
-        }
-        getpwuuid(arg_arg1)
-    })
-}
-pub unsafe fn getpwuuid_r(
-    arg_arg1: *mut ::std::os::raw::c_uchar,
-    arg_arg2: *mut passwd,
-    arg_arg3: *mut ::std::os::raw::c_char,
-    arg_arg4: usize,
-    arg_arg5: *mut *mut passwd,
+pub unsafe fn getpwnam_r(
+    arg___name: *const ::std::os::raw::c_char,
+    arg___resultbuf: *mut passwd,
+    arg___buffer: *mut ::std::os::raw::c_char,
+    arg___buflen: usize,
+    arg___result: *mut *mut passwd,
 ) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn getpwuuid_r(
-                arg_arg1: *mut ::std::os::raw::c_uchar,
-                arg_arg2: *mut passwd,
-                arg_arg3: *mut ::std::os::raw::c_char,
-                arg_arg4: usize,
-                arg_arg5: *mut *mut passwd,
+            fn getpwnam_r(
+                arg___name: *const ::std::os::raw::c_char,
+                arg___resultbuf: *mut passwd,
+                arg___buffer: *mut ::std::os::raw::c_char,
+                arg___buflen: usize,
+                arg___result: *mut *mut passwd,
             ) -> ::std::os::raw::c_int;
         }
-        getpwuuid_r(arg_arg1, arg_arg2, arg_arg3, arg_arg4, arg_arg5)
+        getpwnam_r(
+            arg___name,
+            arg___resultbuf,
+            arg___buffer,
+            arg___buflen,
+            arg___result,
+        )
+    })
+}
+pub unsafe fn fgetpwent_r(
+    arg___stream: *mut FILE,
+    arg___resultbuf: *mut passwd,
+    arg___buffer: *mut ::std::os::raw::c_char,
+    arg___buflen: usize,
+    arg___result: *mut *mut passwd,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn fgetpwent_r(
+                arg___stream: *mut FILE,
+                arg___resultbuf: *mut passwd,
+                arg___buffer: *mut ::std::os::raw::c_char,
+                arg___buflen: usize,
+                arg___result: *mut *mut passwd,
+            ) -> ::std::os::raw::c_int;
+        }
+        fgetpwent_r(
+            arg___stream,
+            arg___resultbuf,
+            arg___buffer,
+            arg___buflen,
+            arg___result,
+        )
     })
 }
 pub type pgsocket = ::std::os::raw::c_int;
@@ -11127,7 +10097,7 @@ pub unsafe fn pg_vsnprintf(
     arg_str_: *mut ::std::os::raw::c_char,
     arg_count: usize,
     arg_fmt: *const ::std::os::raw::c_char,
-    arg_args: va_list,
+    arg_args: *mut __va_list_tag,
 ) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
@@ -11135,7 +10105,7 @@ pub unsafe fn pg_vsnprintf(
                 arg_str_: *mut ::std::os::raw::c_char,
                 arg_count: usize,
                 arg_fmt: *const ::std::os::raw::c_char,
-                arg_args: va_list,
+                arg_args: *mut __va_list_tag,
             ) -> ::std::os::raw::c_int;
         }
         pg_vsnprintf(arg_str_, arg_count, arg_fmt, arg_args)
@@ -11160,14 +10130,14 @@ pub unsafe fn pg_snprintf(
 pub unsafe fn pg_vsprintf(
     arg_str_: *mut ::std::os::raw::c_char,
     arg_fmt: *const ::std::os::raw::c_char,
-    arg_args: va_list,
+    arg_args: *mut __va_list_tag,
 ) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
             fn pg_vsprintf(
                 arg_str_: *mut ::std::os::raw::c_char,
                 arg_fmt: *const ::std::os::raw::c_char,
-                arg_args: va_list,
+                arg_args: *mut __va_list_tag,
             ) -> ::std::os::raw::c_int;
         }
         pg_vsprintf(arg_str_, arg_fmt, arg_args)
@@ -11190,14 +10160,14 @@ pub unsafe fn pg_sprintf(
 pub unsafe fn pg_vfprintf(
     arg_stream: *mut FILE,
     arg_fmt: *const ::std::os::raw::c_char,
-    arg_args: va_list,
+    arg_args: *mut __va_list_tag,
 ) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
             fn pg_vfprintf(
                 arg_stream: *mut FILE,
                 arg_fmt: *const ::std::os::raw::c_char,
-                arg_args: va_list,
+                arg_args: *mut __va_list_tag,
             ) -> ::std::os::raw::c_int;
         }
         pg_vfprintf(arg_stream, arg_fmt, arg_args)
@@ -11219,13 +10189,13 @@ pub unsafe fn pg_fprintf(
 }
 pub unsafe fn pg_vprintf(
     arg_fmt: *const ::std::os::raw::c_char,
-    arg_args: va_list,
+    arg_args: *mut __va_list_tag,
 ) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
             fn pg_vprintf(
                 arg_fmt: *const ::std::os::raw::c_char,
-                arg_args: va_list,
+                arg_args: *mut __va_list_tag,
             ) -> ::std::os::raw::c_int;
         }
         pg_vprintf(arg_fmt, arg_args)
@@ -11355,1514 +10325,686 @@ pub unsafe fn pg_srand48(arg_seed: ::std::os::raw::c_long) {
         pg_srand48(arg_seed)
     })
 }
+pub unsafe fn fls(arg_mask: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn fls(arg_mask: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+        }
+        fls(arg_mask)
+    })
+}
+pub unsafe fn getpeereid(
+    arg_sock: ::std::os::raw::c_int,
+    arg_uid: *mut uid_t,
+    arg_gid: *mut gid_t,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn getpeereid(
+                arg_sock: ::std::os::raw::c_int,
+                arg_uid: *mut uid_t,
+                arg_gid: *mut gid_t,
+            ) -> ::std::os::raw::c_int;
+        }
+        getpeereid(arg_sock, arg_uid, arg_gid)
+    })
+}
 pub type float_t = f32;
 pub type double_t = f64;
-pub unsafe fn __math_errhandling() -> ::std::os::raw::c_int {
+pub unsafe fn __fpclassify(arg___value: f64) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn __math_errhandling() -> ::std::os::raw::c_int;
+            fn __fpclassify(arg___value: f64) -> ::std::os::raw::c_int;
         }
-        __math_errhandling()
+        __fpclassify(arg___value)
     })
 }
-pub unsafe fn __fpclassifyf(arg_arg1: f32) -> ::std::os::raw::c_int {
+pub unsafe fn __signbit(arg___value: f64) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn __fpclassifyf(arg_arg1: f32) -> ::std::os::raw::c_int;
+            fn __signbit(arg___value: f64) -> ::std::os::raw::c_int;
         }
-        __fpclassifyf(arg_arg1)
+        __signbit(arg___value)
     })
 }
-pub unsafe fn __fpclassifyd(arg_arg1: f64) -> ::std::os::raw::c_int {
+pub unsafe fn __isinf(arg___value: f64) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn __fpclassifyd(arg_arg1: f64) -> ::std::os::raw::c_int;
+            fn __isinf(arg___value: f64) -> ::std::os::raw::c_int;
         }
-        __fpclassifyd(arg_arg1)
+        __isinf(arg___value)
     })
 }
-pub unsafe fn __fpclassifyl(arg_arg1: f64) -> ::std::os::raw::c_int {
+pub unsafe fn __finite(arg___value: f64) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn __fpclassifyl(arg_arg1: f64) -> ::std::os::raw::c_int;
+            fn __finite(arg___value: f64) -> ::std::os::raw::c_int;
         }
-        __fpclassifyl(arg_arg1)
+        __finite(arg___value)
     })
 }
-pub unsafe fn acosf(arg_arg1: f32) -> f32 {
+pub unsafe fn __isnan(arg___value: f64) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn acosf(arg_arg1: f32) -> f32;
+            fn __isnan(arg___value: f64) -> ::std::os::raw::c_int;
         }
-        acosf(arg_arg1)
+        __isnan(arg___value)
     })
 }
-pub unsafe fn acos(arg_arg1: f64) -> f64 {
+pub unsafe fn __iseqsig(arg___x: f64, arg___y: f64) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn acos(arg_arg1: f64) -> f64;
+            fn __iseqsig(arg___x: f64, arg___y: f64) -> ::std::os::raw::c_int;
         }
-        acos(arg_arg1)
+        __iseqsig(arg___x, arg___y)
     })
 }
-pub unsafe fn acosl(arg_arg1: f64) -> f64 {
+pub unsafe fn __issignaling(arg___value: f64) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn acosl(arg_arg1: f64) -> f64;
+            fn __issignaling(arg___value: f64) -> ::std::os::raw::c_int;
         }
-        acosl(arg_arg1)
+        __issignaling(arg___value)
     })
 }
-pub unsafe fn asinf(arg_arg1: f32) -> f32 {
+pub unsafe fn acos(arg___x: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn asinf(arg_arg1: f32) -> f32;
+            fn acos(arg___x: f64) -> f64;
         }
-        asinf(arg_arg1)
+        acos(arg___x)
     })
 }
-pub unsafe fn asin(arg_arg1: f64) -> f64 {
+pub unsafe fn __acos(arg___x: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn asin(arg_arg1: f64) -> f64;
+            fn __acos(arg___x: f64) -> f64;
         }
-        asin(arg_arg1)
+        __acos(arg___x)
     })
 }
-pub unsafe fn asinl(arg_arg1: f64) -> f64 {
+pub unsafe fn asin(arg___x: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn asinl(arg_arg1: f64) -> f64;
+            fn asin(arg___x: f64) -> f64;
         }
-        asinl(arg_arg1)
+        asin(arg___x)
     })
 }
-pub unsafe fn atanf(arg_arg1: f32) -> f32 {
+pub unsafe fn __asin(arg___x: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn atanf(arg_arg1: f32) -> f32;
+            fn __asin(arg___x: f64) -> f64;
         }
-        atanf(arg_arg1)
+        __asin(arg___x)
     })
 }
-pub unsafe fn atan(arg_arg1: f64) -> f64 {
+pub unsafe fn atan(arg___x: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn atan(arg_arg1: f64) -> f64;
+            fn atan(arg___x: f64) -> f64;
         }
-        atan(arg_arg1)
+        atan(arg___x)
     })
 }
-pub unsafe fn atanl(arg_arg1: f64) -> f64 {
+pub unsafe fn __atan(arg___x: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn atanl(arg_arg1: f64) -> f64;
+            fn __atan(arg___x: f64) -> f64;
         }
-        atanl(arg_arg1)
+        __atan(arg___x)
     })
 }
-pub unsafe fn atan2f(arg_arg1: f32, arg_arg2: f32) -> f32 {
+pub unsafe fn atan2(arg___y: f64, arg___x: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn atan2f(arg_arg1: f32, arg_arg2: f32) -> f32;
+            fn atan2(arg___y: f64, arg___x: f64) -> f64;
         }
-        atan2f(arg_arg1, arg_arg2)
+        atan2(arg___y, arg___x)
     })
 }
-pub unsafe fn atan2(arg_arg1: f64, arg_arg2: f64) -> f64 {
+pub unsafe fn __atan2(arg___y: f64, arg___x: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn atan2(arg_arg1: f64, arg_arg2: f64) -> f64;
+            fn __atan2(arg___y: f64, arg___x: f64) -> f64;
         }
-        atan2(arg_arg1, arg_arg2)
+        __atan2(arg___y, arg___x)
     })
 }
-pub unsafe fn atan2l(arg_arg1: f64, arg_arg2: f64) -> f64 {
+pub unsafe fn cos(arg___x: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn atan2l(arg_arg1: f64, arg_arg2: f64) -> f64;
+            fn cos(arg___x: f64) -> f64;
         }
-        atan2l(arg_arg1, arg_arg2)
+        cos(arg___x)
     })
 }
-pub unsafe fn cosf(arg_arg1: f32) -> f32 {
+pub unsafe fn __cos(arg___x: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn cosf(arg_arg1: f32) -> f32;
+            fn __cos(arg___x: f64) -> f64;
         }
-        cosf(arg_arg1)
+        __cos(arg___x)
     })
 }
-pub unsafe fn cos(arg_arg1: f64) -> f64 {
+pub unsafe fn sin(arg___x: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn cos(arg_arg1: f64) -> f64;
+            fn sin(arg___x: f64) -> f64;
         }
-        cos(arg_arg1)
+        sin(arg___x)
     })
 }
-pub unsafe fn cosl(arg_arg1: f64) -> f64 {
+pub unsafe fn __sin(arg___x: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn cosl(arg_arg1: f64) -> f64;
+            fn __sin(arg___x: f64) -> f64;
         }
-        cosl(arg_arg1)
+        __sin(arg___x)
     })
 }
-pub unsafe fn sinf(arg_arg1: f32) -> f32 {
+pub unsafe fn tan(arg___x: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn sinf(arg_arg1: f32) -> f32;
+            fn tan(arg___x: f64) -> f64;
         }
-        sinf(arg_arg1)
+        tan(arg___x)
     })
 }
-pub unsafe fn sin(arg_arg1: f64) -> f64 {
+pub unsafe fn __tan(arg___x: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn sin(arg_arg1: f64) -> f64;
+            fn __tan(arg___x: f64) -> f64;
         }
-        sin(arg_arg1)
+        __tan(arg___x)
     })
 }
-pub unsafe fn sinl(arg_arg1: f64) -> f64 {
+pub unsafe fn cosh(arg___x: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn sinl(arg_arg1: f64) -> f64;
+            fn cosh(arg___x: f64) -> f64;
         }
-        sinl(arg_arg1)
+        cosh(arg___x)
     })
 }
-pub unsafe fn tanf(arg_arg1: f32) -> f32 {
+pub unsafe fn __cosh(arg___x: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn tanf(arg_arg1: f32) -> f32;
+            fn __cosh(arg___x: f64) -> f64;
         }
-        tanf(arg_arg1)
+        __cosh(arg___x)
     })
 }
-pub unsafe fn tan(arg_arg1: f64) -> f64 {
+pub unsafe fn sinh(arg___x: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn tan(arg_arg1: f64) -> f64;
+            fn sinh(arg___x: f64) -> f64;
         }
-        tan(arg_arg1)
+        sinh(arg___x)
     })
 }
-pub unsafe fn tanl(arg_arg1: f64) -> f64 {
+pub unsafe fn __sinh(arg___x: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn tanl(arg_arg1: f64) -> f64;
+            fn __sinh(arg___x: f64) -> f64;
         }
-        tanl(arg_arg1)
+        __sinh(arg___x)
     })
 }
-pub unsafe fn acoshf(arg_arg1: f32) -> f32 {
+pub unsafe fn tanh(arg___x: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn acoshf(arg_arg1: f32) -> f32;
+            fn tanh(arg___x: f64) -> f64;
         }
-        acoshf(arg_arg1)
+        tanh(arg___x)
     })
 }
-pub unsafe fn acosh(arg_arg1: f64) -> f64 {
+pub unsafe fn __tanh(arg___x: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn acosh(arg_arg1: f64) -> f64;
+            fn __tanh(arg___x: f64) -> f64;
         }
-        acosh(arg_arg1)
+        __tanh(arg___x)
     })
 }
-pub unsafe fn acoshl(arg_arg1: f64) -> f64 {
+pub unsafe fn acosh(arg___x: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn acoshl(arg_arg1: f64) -> f64;
+            fn acosh(arg___x: f64) -> f64;
         }
-        acoshl(arg_arg1)
+        acosh(arg___x)
     })
 }
-pub unsafe fn asinhf(arg_arg1: f32) -> f32 {
+pub unsafe fn __acosh(arg___x: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn asinhf(arg_arg1: f32) -> f32;
+            fn __acosh(arg___x: f64) -> f64;
         }
-        asinhf(arg_arg1)
+        __acosh(arg___x)
     })
 }
-pub unsafe fn asinh(arg_arg1: f64) -> f64 {
+pub unsafe fn asinh(arg___x: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn asinh(arg_arg1: f64) -> f64;
+            fn asinh(arg___x: f64) -> f64;
         }
-        asinh(arg_arg1)
+        asinh(arg___x)
     })
 }
-pub unsafe fn asinhl(arg_arg1: f64) -> f64 {
+pub unsafe fn __asinh(arg___x: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn asinhl(arg_arg1: f64) -> f64;
+            fn __asinh(arg___x: f64) -> f64;
         }
-        asinhl(arg_arg1)
+        __asinh(arg___x)
     })
 }
-pub unsafe fn atanhf(arg_arg1: f32) -> f32 {
+pub unsafe fn atanh(arg___x: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn atanhf(arg_arg1: f32) -> f32;
+            fn atanh(arg___x: f64) -> f64;
         }
-        atanhf(arg_arg1)
+        atanh(arg___x)
     })
 }
-pub unsafe fn atanh(arg_arg1: f64) -> f64 {
+pub unsafe fn __atanh(arg___x: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn atanh(arg_arg1: f64) -> f64;
+            fn __atanh(arg___x: f64) -> f64;
         }
-        atanh(arg_arg1)
+        __atanh(arg___x)
     })
 }
-pub unsafe fn atanhl(arg_arg1: f64) -> f64 {
+pub unsafe fn exp(arg___x: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn atanhl(arg_arg1: f64) -> f64;
+            fn exp(arg___x: f64) -> f64;
         }
-        atanhl(arg_arg1)
+        exp(arg___x)
     })
 }
-pub unsafe fn coshf(arg_arg1: f32) -> f32 {
+pub unsafe fn __exp(arg___x: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn coshf(arg_arg1: f32) -> f32;
+            fn __exp(arg___x: f64) -> f64;
         }
-        coshf(arg_arg1)
+        __exp(arg___x)
     })
 }
-pub unsafe fn cosh(arg_arg1: f64) -> f64 {
+pub unsafe fn frexp(arg___x: f64, arg___exponent: *mut ::std::os::raw::c_int) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn cosh(arg_arg1: f64) -> f64;
+            fn frexp(arg___x: f64, arg___exponent: *mut ::std::os::raw::c_int) -> f64;
         }
-        cosh(arg_arg1)
+        frexp(arg___x, arg___exponent)
     })
 }
-pub unsafe fn coshl(arg_arg1: f64) -> f64 {
+pub unsafe fn __frexp(arg___x: f64, arg___exponent: *mut ::std::os::raw::c_int) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn coshl(arg_arg1: f64) -> f64;
+            fn __frexp(arg___x: f64, arg___exponent: *mut ::std::os::raw::c_int) -> f64;
         }
-        coshl(arg_arg1)
+        __frexp(arg___x, arg___exponent)
     })
 }
-pub unsafe fn sinhf(arg_arg1: f32) -> f32 {
+pub unsafe fn ldexp(arg___x: f64, arg___exponent: ::std::os::raw::c_int) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn sinhf(arg_arg1: f32) -> f32;
+            fn ldexp(arg___x: f64, arg___exponent: ::std::os::raw::c_int) -> f64;
         }
-        sinhf(arg_arg1)
+        ldexp(arg___x, arg___exponent)
     })
 }
-pub unsafe fn sinh(arg_arg1: f64) -> f64 {
+pub unsafe fn __ldexp(arg___x: f64, arg___exponent: ::std::os::raw::c_int) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn sinh(arg_arg1: f64) -> f64;
+            fn __ldexp(arg___x: f64, arg___exponent: ::std::os::raw::c_int) -> f64;
         }
-        sinh(arg_arg1)
+        __ldexp(arg___x, arg___exponent)
     })
 }
-pub unsafe fn sinhl(arg_arg1: f64) -> f64 {
+pub unsafe fn log(arg___x: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn sinhl(arg_arg1: f64) -> f64;
+            fn log(arg___x: f64) -> f64;
         }
-        sinhl(arg_arg1)
+        log(arg___x)
     })
 }
-pub unsafe fn tanhf(arg_arg1: f32) -> f32 {
+pub unsafe fn __log(arg___x: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn tanhf(arg_arg1: f32) -> f32;
+            fn __log(arg___x: f64) -> f64;
         }
-        tanhf(arg_arg1)
+        __log(arg___x)
     })
 }
-pub unsafe fn tanh(arg_arg1: f64) -> f64 {
+pub unsafe fn log10(arg___x: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn tanh(arg_arg1: f64) -> f64;
+            fn log10(arg___x: f64) -> f64;
         }
-        tanh(arg_arg1)
+        log10(arg___x)
     })
 }
-pub unsafe fn tanhl(arg_arg1: f64) -> f64 {
+pub unsafe fn __log10(arg___x: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn tanhl(arg_arg1: f64) -> f64;
+            fn __log10(arg___x: f64) -> f64;
         }
-        tanhl(arg_arg1)
+        __log10(arg___x)
     })
 }
-pub unsafe fn expf(arg_arg1: f32) -> f32 {
+pub unsafe fn modf(arg___x: f64, arg___iptr: *mut f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn expf(arg_arg1: f32) -> f32;
+            fn modf(arg___x: f64, arg___iptr: *mut f64) -> f64;
         }
-        expf(arg_arg1)
+        modf(arg___x, arg___iptr)
     })
 }
-pub unsafe fn exp(arg_arg1: f64) -> f64 {
+pub unsafe fn __modf(arg___x: f64, arg___iptr: *mut f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn exp(arg_arg1: f64) -> f64;
+            fn __modf(arg___x: f64, arg___iptr: *mut f64) -> f64;
         }
-        exp(arg_arg1)
+        __modf(arg___x, arg___iptr)
     })
 }
-pub unsafe fn expl(arg_arg1: f64) -> f64 {
+pub unsafe fn expm1(arg___x: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn expl(arg_arg1: f64) -> f64;
+            fn expm1(arg___x: f64) -> f64;
         }
-        expl(arg_arg1)
+        expm1(arg___x)
     })
 }
-pub unsafe fn exp2f(arg_arg1: f32) -> f32 {
+pub unsafe fn __expm1(arg___x: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn exp2f(arg_arg1: f32) -> f32;
+            fn __expm1(arg___x: f64) -> f64;
         }
-        exp2f(arg_arg1)
+        __expm1(arg___x)
     })
 }
-pub unsafe fn exp2(arg_arg1: f64) -> f64 {
+pub unsafe fn log1p(arg___x: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn exp2(arg_arg1: f64) -> f64;
+            fn log1p(arg___x: f64) -> f64;
         }
-        exp2(arg_arg1)
+        log1p(arg___x)
     })
 }
-pub unsafe fn exp2l(arg_arg1: f64) -> f64 {
+pub unsafe fn __log1p(arg___x: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn exp2l(arg_arg1: f64) -> f64;
+            fn __log1p(arg___x: f64) -> f64;
         }
-        exp2l(arg_arg1)
+        __log1p(arg___x)
     })
 }
-pub unsafe fn expm1f(arg_arg1: f32) -> f32 {
+pub unsafe fn logb(arg___x: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn expm1f(arg_arg1: f32) -> f32;
+            fn logb(arg___x: f64) -> f64;
         }
-        expm1f(arg_arg1)
+        logb(arg___x)
     })
 }
-pub unsafe fn expm1(arg_arg1: f64) -> f64 {
+pub unsafe fn __logb(arg___x: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn expm1(arg_arg1: f64) -> f64;
+            fn __logb(arg___x: f64) -> f64;
         }
-        expm1(arg_arg1)
+        __logb(arg___x)
     })
 }
-pub unsafe fn expm1l(arg_arg1: f64) -> f64 {
+pub unsafe fn exp2(arg___x: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn expm1l(arg_arg1: f64) -> f64;
+            fn exp2(arg___x: f64) -> f64;
         }
-        expm1l(arg_arg1)
+        exp2(arg___x)
     })
 }
-pub unsafe fn logf(arg_arg1: f32) -> f32 {
+pub unsafe fn __exp2(arg___x: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn logf(arg_arg1: f32) -> f32;
+            fn __exp2(arg___x: f64) -> f64;
         }
-        logf(arg_arg1)
+        __exp2(arg___x)
     })
 }
-pub unsafe fn log(arg_arg1: f64) -> f64 {
+pub unsafe fn log2(arg___x: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn log(arg_arg1: f64) -> f64;
+            fn log2(arg___x: f64) -> f64;
         }
-        log(arg_arg1)
+        log2(arg___x)
     })
 }
-pub unsafe fn logl(arg_arg1: f64) -> f64 {
+pub unsafe fn __log2(arg___x: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn logl(arg_arg1: f64) -> f64;
+            fn __log2(arg___x: f64) -> f64;
         }
-        logl(arg_arg1)
+        __log2(arg___x)
     })
 }
-pub unsafe fn log10f(arg_arg1: f32) -> f32 {
+pub unsafe fn pow(arg___x: f64, arg___y: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn log10f(arg_arg1: f32) -> f32;
+            fn pow(arg___x: f64, arg___y: f64) -> f64;
         }
-        log10f(arg_arg1)
+        pow(arg___x, arg___y)
     })
 }
-pub unsafe fn log10(arg_arg1: f64) -> f64 {
+pub unsafe fn __pow(arg___x: f64, arg___y: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn log10(arg_arg1: f64) -> f64;
+            fn __pow(arg___x: f64, arg___y: f64) -> f64;
         }
-        log10(arg_arg1)
+        __pow(arg___x, arg___y)
     })
 }
-pub unsafe fn log10l(arg_arg1: f64) -> f64 {
+pub unsafe fn sqrt(arg___x: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn log10l(arg_arg1: f64) -> f64;
+            fn sqrt(arg___x: f64) -> f64;
         }
-        log10l(arg_arg1)
+        sqrt(arg___x)
     })
 }
-pub unsafe fn log2f(arg_arg1: f32) -> f32 {
+pub unsafe fn __sqrt(arg___x: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn log2f(arg_arg1: f32) -> f32;
+            fn __sqrt(arg___x: f64) -> f64;
         }
-        log2f(arg_arg1)
+        __sqrt(arg___x)
     })
 }
-pub unsafe fn log2(arg_arg1: f64) -> f64 {
+pub unsafe fn hypot(arg___x: f64, arg___y: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn log2(arg_arg1: f64) -> f64;
+            fn hypot(arg___x: f64, arg___y: f64) -> f64;
         }
-        log2(arg_arg1)
+        hypot(arg___x, arg___y)
     })
 }
-pub unsafe fn log2l(arg_arg1: f64) -> f64 {
+pub unsafe fn __hypot(arg___x: f64, arg___y: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn log2l(arg_arg1: f64) -> f64;
+            fn __hypot(arg___x: f64, arg___y: f64) -> f64;
         }
-        log2l(arg_arg1)
+        __hypot(arg___x, arg___y)
     })
 }
-pub unsafe fn log1pf(arg_arg1: f32) -> f32 {
+pub unsafe fn cbrt(arg___x: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn log1pf(arg_arg1: f32) -> f32;
+            fn cbrt(arg___x: f64) -> f64;
         }
-        log1pf(arg_arg1)
+        cbrt(arg___x)
     })
 }
-pub unsafe fn log1p(arg_arg1: f64) -> f64 {
+pub unsafe fn __cbrt(arg___x: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn log1p(arg_arg1: f64) -> f64;
+            fn __cbrt(arg___x: f64) -> f64;
         }
-        log1p(arg_arg1)
+        __cbrt(arg___x)
     })
 }
-pub unsafe fn log1pl(arg_arg1: f64) -> f64 {
+pub unsafe fn ceil(arg___x: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn log1pl(arg_arg1: f64) -> f64;
+            fn ceil(arg___x: f64) -> f64;
         }
-        log1pl(arg_arg1)
+        ceil(arg___x)
     })
 }
-pub unsafe fn logbf(arg_arg1: f32) -> f32 {
+pub unsafe fn __ceil(arg___x: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn logbf(arg_arg1: f32) -> f32;
+            fn __ceil(arg___x: f64) -> f64;
         }
-        logbf(arg_arg1)
+        __ceil(arg___x)
     })
 }
-pub unsafe fn logb(arg_arg1: f64) -> f64 {
+pub unsafe fn fabs(arg___x: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn logb(arg_arg1: f64) -> f64;
+            fn fabs(arg___x: f64) -> f64;
         }
-        logb(arg_arg1)
+        fabs(arg___x)
     })
 }
-pub unsafe fn logbl(arg_arg1: f64) -> f64 {
+pub unsafe fn __fabs(arg___x: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn logbl(arg_arg1: f64) -> f64;
+            fn __fabs(arg___x: f64) -> f64;
         }
-        logbl(arg_arg1)
+        __fabs(arg___x)
     })
 }
-pub unsafe fn modff(arg_arg1: f32, arg_arg2: *mut f32) -> f32 {
+pub unsafe fn floor(arg___x: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn modff(arg_arg1: f32, arg_arg2: *mut f32) -> f32;
+            fn floor(arg___x: f64) -> f64;
         }
-        modff(arg_arg1, arg_arg2)
+        floor(arg___x)
     })
 }
-pub unsafe fn modf(arg_arg1: f64, arg_arg2: *mut f64) -> f64 {
+pub unsafe fn __floor(arg___x: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn modf(arg_arg1: f64, arg_arg2: *mut f64) -> f64;
+            fn __floor(arg___x: f64) -> f64;
         }
-        modf(arg_arg1, arg_arg2)
+        __floor(arg___x)
     })
 }
-pub unsafe fn modfl(arg_arg1: f64, arg_arg2: *mut f64) -> f64 {
+pub unsafe fn fmod(arg___x: f64, arg___y: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn modfl(arg_arg1: f64, arg_arg2: *mut f64) -> f64;
+            fn fmod(arg___x: f64, arg___y: f64) -> f64;
         }
-        modfl(arg_arg1, arg_arg2)
+        fmod(arg___x, arg___y)
     })
 }
-pub unsafe fn ldexpf(arg_arg1: f32, arg_arg2: ::std::os::raw::c_int) -> f32 {
+pub unsafe fn __fmod(arg___x: f64, arg___y: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn ldexpf(arg_arg1: f32, arg_arg2: ::std::os::raw::c_int) -> f32;
+            fn __fmod(arg___x: f64, arg___y: f64) -> f64;
         }
-        ldexpf(arg_arg1, arg_arg2)
+        __fmod(arg___x, arg___y)
     })
 }
-pub unsafe fn ldexp(arg_arg1: f64, arg_arg2: ::std::os::raw::c_int) -> f64 {
+pub unsafe fn isinf(arg___value: f64) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn ldexp(arg_arg1: f64, arg_arg2: ::std::os::raw::c_int) -> f64;
+            fn isinf(arg___value: f64) -> ::std::os::raw::c_int;
         }
-        ldexp(arg_arg1, arg_arg2)
+        isinf(arg___value)
     })
 }
-pub unsafe fn ldexpl(arg_arg1: f64, arg_arg2: ::std::os::raw::c_int) -> f64 {
+pub unsafe fn finite(arg___value: f64) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn ldexpl(arg_arg1: f64, arg_arg2: ::std::os::raw::c_int) -> f64;
+            fn finite(arg___value: f64) -> ::std::os::raw::c_int;
         }
-        ldexpl(arg_arg1, arg_arg2)
+        finite(arg___value)
     })
 }
-pub unsafe fn frexpf(arg_arg1: f32, arg_arg2: *mut ::std::os::raw::c_int) -> f32 {
+pub unsafe fn drem(arg___x: f64, arg___y: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn frexpf(arg_arg1: f32, arg_arg2: *mut ::std::os::raw::c_int) -> f32;
+            fn drem(arg___x: f64, arg___y: f64) -> f64;
         }
-        frexpf(arg_arg1, arg_arg2)
+        drem(arg___x, arg___y)
     })
 }
-pub unsafe fn frexp(arg_arg1: f64, arg_arg2: *mut ::std::os::raw::c_int) -> f64 {
+pub unsafe fn __drem(arg___x: f64, arg___y: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn frexp(arg_arg1: f64, arg_arg2: *mut ::std::os::raw::c_int) -> f64;
+            fn __drem(arg___x: f64, arg___y: f64) -> f64;
         }
-        frexp(arg_arg1, arg_arg2)
+        __drem(arg___x, arg___y)
     })
 }
-pub unsafe fn frexpl(arg_arg1: f64, arg_arg2: *mut ::std::os::raw::c_int) -> f64 {
+pub unsafe fn significand(arg___x: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn frexpl(arg_arg1: f64, arg_arg2: *mut ::std::os::raw::c_int) -> f64;
+            fn significand(arg___x: f64) -> f64;
         }
-        frexpl(arg_arg1, arg_arg2)
+        significand(arg___x)
     })
 }
-pub unsafe fn ilogbf(arg_arg1: f32) -> ::std::os::raw::c_int {
+pub unsafe fn __significand(arg___x: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn ilogbf(arg_arg1: f32) -> ::std::os::raw::c_int;
+            fn __significand(arg___x: f64) -> f64;
         }
-        ilogbf(arg_arg1)
+        __significand(arg___x)
     })
 }
-pub unsafe fn ilogb(arg_arg1: f64) -> ::std::os::raw::c_int {
+pub unsafe fn copysign(arg___x: f64, arg___y: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn ilogb(arg_arg1: f64) -> ::std::os::raw::c_int;
+            fn copysign(arg___x: f64, arg___y: f64) -> f64;
         }
-        ilogb(arg_arg1)
+        copysign(arg___x, arg___y)
     })
 }
-pub unsafe fn ilogbl(arg_arg1: f64) -> ::std::os::raw::c_int {
+pub unsafe fn __copysign(arg___x: f64, arg___y: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn ilogbl(arg_arg1: f64) -> ::std::os::raw::c_int;
+            fn __copysign(arg___x: f64, arg___y: f64) -> f64;
         }
-        ilogbl(arg_arg1)
+        __copysign(arg___x, arg___y)
     })
 }
-pub unsafe fn scalbnf(arg_arg1: f32, arg_arg2: ::std::os::raw::c_int) -> f32 {
+pub unsafe fn nan(arg___tagb: *const ::std::os::raw::c_char) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn scalbnf(arg_arg1: f32, arg_arg2: ::std::os::raw::c_int) -> f32;
+            fn nan(arg___tagb: *const ::std::os::raw::c_char) -> f64;
         }
-        scalbnf(arg_arg1, arg_arg2)
+        nan(arg___tagb)
     })
 }
-pub unsafe fn scalbn(arg_arg1: f64, arg_arg2: ::std::os::raw::c_int) -> f64 {
+pub unsafe fn __nan(arg___tagb: *const ::std::os::raw::c_char) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn scalbn(arg_arg1: f64, arg_arg2: ::std::os::raw::c_int) -> f64;
+            fn __nan(arg___tagb: *const ::std::os::raw::c_char) -> f64;
         }
-        scalbn(arg_arg1, arg_arg2)
+        __nan(arg___tagb)
     })
 }
-pub unsafe fn scalbnl(arg_arg1: f64, arg_arg2: ::std::os::raw::c_int) -> f64 {
+pub unsafe fn isnan(arg___value: f64) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn scalbnl(arg_arg1: f64, arg_arg2: ::std::os::raw::c_int) -> f64;
+            fn isnan(arg___value: f64) -> ::std::os::raw::c_int;
         }
-        scalbnl(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn scalblnf(arg_arg1: f32, arg_arg2: ::std::os::raw::c_long) -> f32 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn scalblnf(arg_arg1: f32, arg_arg2: ::std::os::raw::c_long) -> f32;
-        }
-        scalblnf(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn scalbln(arg_arg1: f64, arg_arg2: ::std::os::raw::c_long) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn scalbln(arg_arg1: f64, arg_arg2: ::std::os::raw::c_long) -> f64;
-        }
-        scalbln(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn scalblnl(arg_arg1: f64, arg_arg2: ::std::os::raw::c_long) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn scalblnl(arg_arg1: f64, arg_arg2: ::std::os::raw::c_long) -> f64;
-        }
-        scalblnl(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn fabsf(arg_arg1: f32) -> f32 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn fabsf(arg_arg1: f32) -> f32;
-        }
-        fabsf(arg_arg1)
-    })
-}
-pub unsafe fn fabs(arg_arg1: f64) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn fabs(arg_arg1: f64) -> f64;
-        }
-        fabs(arg_arg1)
-    })
-}
-pub unsafe fn fabsl(arg_arg1: f64) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn fabsl(arg_arg1: f64) -> f64;
-        }
-        fabsl(arg_arg1)
-    })
-}
-pub unsafe fn cbrtf(arg_arg1: f32) -> f32 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn cbrtf(arg_arg1: f32) -> f32;
-        }
-        cbrtf(arg_arg1)
-    })
-}
-pub unsafe fn cbrt(arg_arg1: f64) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn cbrt(arg_arg1: f64) -> f64;
-        }
-        cbrt(arg_arg1)
-    })
-}
-pub unsafe fn cbrtl(arg_arg1: f64) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn cbrtl(arg_arg1: f64) -> f64;
-        }
-        cbrtl(arg_arg1)
-    })
-}
-pub unsafe fn hypotf(arg_arg1: f32, arg_arg2: f32) -> f32 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn hypotf(arg_arg1: f32, arg_arg2: f32) -> f32;
-        }
-        hypotf(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn hypot(arg_arg1: f64, arg_arg2: f64) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn hypot(arg_arg1: f64, arg_arg2: f64) -> f64;
-        }
-        hypot(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn hypotl(arg_arg1: f64, arg_arg2: f64) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn hypotl(arg_arg1: f64, arg_arg2: f64) -> f64;
-        }
-        hypotl(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn powf(arg_arg1: f32, arg_arg2: f32) -> f32 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn powf(arg_arg1: f32, arg_arg2: f32) -> f32;
-        }
-        powf(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn pow(arg_arg1: f64, arg_arg2: f64) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn pow(arg_arg1: f64, arg_arg2: f64) -> f64;
-        }
-        pow(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn powl(arg_arg1: f64, arg_arg2: f64) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn powl(arg_arg1: f64, arg_arg2: f64) -> f64;
-        }
-        powl(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn sqrtf(arg_arg1: f32) -> f32 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn sqrtf(arg_arg1: f32) -> f32;
-        }
-        sqrtf(arg_arg1)
-    })
-}
-pub unsafe fn sqrt(arg_arg1: f64) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn sqrt(arg_arg1: f64) -> f64;
-        }
-        sqrt(arg_arg1)
-    })
-}
-pub unsafe fn sqrtl(arg_arg1: f64) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn sqrtl(arg_arg1: f64) -> f64;
-        }
-        sqrtl(arg_arg1)
-    })
-}
-pub unsafe fn erff(arg_arg1: f32) -> f32 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn erff(arg_arg1: f32) -> f32;
-        }
-        erff(arg_arg1)
-    })
-}
-pub unsafe fn erf(arg_arg1: f64) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn erf(arg_arg1: f64) -> f64;
-        }
-        erf(arg_arg1)
-    })
-}
-pub unsafe fn erfl(arg_arg1: f64) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn erfl(arg_arg1: f64) -> f64;
-        }
-        erfl(arg_arg1)
-    })
-}
-pub unsafe fn erfcf(arg_arg1: f32) -> f32 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn erfcf(arg_arg1: f32) -> f32;
-        }
-        erfcf(arg_arg1)
-    })
-}
-pub unsafe fn erfc(arg_arg1: f64) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn erfc(arg_arg1: f64) -> f64;
-        }
-        erfc(arg_arg1)
-    })
-}
-pub unsafe fn erfcl(arg_arg1: f64) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn erfcl(arg_arg1: f64) -> f64;
-        }
-        erfcl(arg_arg1)
-    })
-}
-pub unsafe fn lgammaf(arg_arg1: f32) -> f32 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn lgammaf(arg_arg1: f32) -> f32;
-        }
-        lgammaf(arg_arg1)
-    })
-}
-pub unsafe fn lgamma(arg_arg1: f64) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn lgamma(arg_arg1: f64) -> f64;
-        }
-        lgamma(arg_arg1)
-    })
-}
-pub unsafe fn lgammal(arg_arg1: f64) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn lgammal(arg_arg1: f64) -> f64;
-        }
-        lgammal(arg_arg1)
-    })
-}
-pub unsafe fn tgammaf(arg_arg1: f32) -> f32 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn tgammaf(arg_arg1: f32) -> f32;
-        }
-        tgammaf(arg_arg1)
-    })
-}
-pub unsafe fn tgamma(arg_arg1: f64) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn tgamma(arg_arg1: f64) -> f64;
-        }
-        tgamma(arg_arg1)
-    })
-}
-pub unsafe fn tgammal(arg_arg1: f64) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn tgammal(arg_arg1: f64) -> f64;
-        }
-        tgammal(arg_arg1)
-    })
-}
-pub unsafe fn ceilf(arg_arg1: f32) -> f32 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn ceilf(arg_arg1: f32) -> f32;
-        }
-        ceilf(arg_arg1)
-    })
-}
-pub unsafe fn ceil(arg_arg1: f64) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn ceil(arg_arg1: f64) -> f64;
-        }
-        ceil(arg_arg1)
-    })
-}
-pub unsafe fn ceill(arg_arg1: f64) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn ceill(arg_arg1: f64) -> f64;
-        }
-        ceill(arg_arg1)
-    })
-}
-pub unsafe fn floorf(arg_arg1: f32) -> f32 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn floorf(arg_arg1: f32) -> f32;
-        }
-        floorf(arg_arg1)
-    })
-}
-pub unsafe fn floor(arg_arg1: f64) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn floor(arg_arg1: f64) -> f64;
-        }
-        floor(arg_arg1)
-    })
-}
-pub unsafe fn floorl(arg_arg1: f64) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn floorl(arg_arg1: f64) -> f64;
-        }
-        floorl(arg_arg1)
-    })
-}
-pub unsafe fn nearbyintf(arg_arg1: f32) -> f32 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn nearbyintf(arg_arg1: f32) -> f32;
-        }
-        nearbyintf(arg_arg1)
-    })
-}
-pub unsafe fn nearbyint(arg_arg1: f64) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn nearbyint(arg_arg1: f64) -> f64;
-        }
-        nearbyint(arg_arg1)
-    })
-}
-pub unsafe fn nearbyintl(arg_arg1: f64) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn nearbyintl(arg_arg1: f64) -> f64;
-        }
-        nearbyintl(arg_arg1)
-    })
-}
-pub unsafe fn rintf(arg_arg1: f32) -> f32 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn rintf(arg_arg1: f32) -> f32;
-        }
-        rintf(arg_arg1)
-    })
-}
-pub unsafe fn rint(arg_arg1: f64) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn rint(arg_arg1: f64) -> f64;
-        }
-        rint(arg_arg1)
-    })
-}
-pub unsafe fn rintl(arg_arg1: f64) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn rintl(arg_arg1: f64) -> f64;
-        }
-        rintl(arg_arg1)
-    })
-}
-pub unsafe fn lrintf(arg_arg1: f32) -> ::std::os::raw::c_long {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn lrintf(arg_arg1: f32) -> ::std::os::raw::c_long;
-        }
-        lrintf(arg_arg1)
-    })
-}
-pub unsafe fn lrint(arg_arg1: f64) -> ::std::os::raw::c_long {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn lrint(arg_arg1: f64) -> ::std::os::raw::c_long;
-        }
-        lrint(arg_arg1)
-    })
-}
-pub unsafe fn lrintl(arg_arg1: f64) -> ::std::os::raw::c_long {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn lrintl(arg_arg1: f64) -> ::std::os::raw::c_long;
-        }
-        lrintl(arg_arg1)
-    })
-}
-pub unsafe fn roundf(arg_arg1: f32) -> f32 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn roundf(arg_arg1: f32) -> f32;
-        }
-        roundf(arg_arg1)
-    })
-}
-pub unsafe fn round(arg_arg1: f64) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn round(arg_arg1: f64) -> f64;
-        }
-        round(arg_arg1)
-    })
-}
-pub unsafe fn roundl(arg_arg1: f64) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn roundl(arg_arg1: f64) -> f64;
-        }
-        roundl(arg_arg1)
-    })
-}
-pub unsafe fn lroundf(arg_arg1: f32) -> ::std::os::raw::c_long {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn lroundf(arg_arg1: f32) -> ::std::os::raw::c_long;
-        }
-        lroundf(arg_arg1)
-    })
-}
-pub unsafe fn lround(arg_arg1: f64) -> ::std::os::raw::c_long {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn lround(arg_arg1: f64) -> ::std::os::raw::c_long;
-        }
-        lround(arg_arg1)
-    })
-}
-pub unsafe fn lroundl(arg_arg1: f64) -> ::std::os::raw::c_long {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn lroundl(arg_arg1: f64) -> ::std::os::raw::c_long;
-        }
-        lroundl(arg_arg1)
-    })
-}
-pub unsafe fn llrintf(arg_arg1: f32) -> ::std::os::raw::c_longlong {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn llrintf(arg_arg1: f32) -> ::std::os::raw::c_longlong;
-        }
-        llrintf(arg_arg1)
-    })
-}
-pub unsafe fn llrint(arg_arg1: f64) -> ::std::os::raw::c_longlong {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn llrint(arg_arg1: f64) -> ::std::os::raw::c_longlong;
-        }
-        llrint(arg_arg1)
-    })
-}
-pub unsafe fn llrintl(arg_arg1: f64) -> ::std::os::raw::c_longlong {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn llrintl(arg_arg1: f64) -> ::std::os::raw::c_longlong;
-        }
-        llrintl(arg_arg1)
-    })
-}
-pub unsafe fn llroundf(arg_arg1: f32) -> ::std::os::raw::c_longlong {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn llroundf(arg_arg1: f32) -> ::std::os::raw::c_longlong;
-        }
-        llroundf(arg_arg1)
-    })
-}
-pub unsafe fn llround(arg_arg1: f64) -> ::std::os::raw::c_longlong {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn llround(arg_arg1: f64) -> ::std::os::raw::c_longlong;
-        }
-        llround(arg_arg1)
-    })
-}
-pub unsafe fn llroundl(arg_arg1: f64) -> ::std::os::raw::c_longlong {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn llroundl(arg_arg1: f64) -> ::std::os::raw::c_longlong;
-        }
-        llroundl(arg_arg1)
-    })
-}
-pub unsafe fn truncf(arg_arg1: f32) -> f32 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn truncf(arg_arg1: f32) -> f32;
-        }
-        truncf(arg_arg1)
-    })
-}
-pub unsafe fn trunc(arg_arg1: f64) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn trunc(arg_arg1: f64) -> f64;
-        }
-        trunc(arg_arg1)
-    })
-}
-pub unsafe fn truncl(arg_arg1: f64) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn truncl(arg_arg1: f64) -> f64;
-        }
-        truncl(arg_arg1)
-    })
-}
-pub unsafe fn fmodf(arg_arg1: f32, arg_arg2: f32) -> f32 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn fmodf(arg_arg1: f32, arg_arg2: f32) -> f32;
-        }
-        fmodf(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn fmod(arg_arg1: f64, arg_arg2: f64) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn fmod(arg_arg1: f64, arg_arg2: f64) -> f64;
-        }
-        fmod(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn fmodl(arg_arg1: f64, arg_arg2: f64) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn fmodl(arg_arg1: f64, arg_arg2: f64) -> f64;
-        }
-        fmodl(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn remainderf(arg_arg1: f32, arg_arg2: f32) -> f32 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn remainderf(arg_arg1: f32, arg_arg2: f32) -> f32;
-        }
-        remainderf(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn remainder(arg_arg1: f64, arg_arg2: f64) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn remainder(arg_arg1: f64, arg_arg2: f64) -> f64;
-        }
-        remainder(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn remainderl(arg_arg1: f64, arg_arg2: f64) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn remainderl(arg_arg1: f64, arg_arg2: f64) -> f64;
-        }
-        remainderl(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn remquof(arg_arg1: f32, arg_arg2: f32, arg_arg3: *mut ::std::os::raw::c_int) -> f32 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn remquof(arg_arg1: f32, arg_arg2: f32, arg_arg3: *mut ::std::os::raw::c_int) -> f32;
-        }
-        remquof(arg_arg1, arg_arg2, arg_arg3)
-    })
-}
-pub unsafe fn remquo(arg_arg1: f64, arg_arg2: f64, arg_arg3: *mut ::std::os::raw::c_int) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn remquo(arg_arg1: f64, arg_arg2: f64, arg_arg3: *mut ::std::os::raw::c_int) -> f64;
-        }
-        remquo(arg_arg1, arg_arg2, arg_arg3)
-    })
-}
-pub unsafe fn remquol(arg_arg1: f64, arg_arg2: f64, arg_arg3: *mut ::std::os::raw::c_int) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn remquol(arg_arg1: f64, arg_arg2: f64, arg_arg3: *mut ::std::os::raw::c_int) -> f64;
-        }
-        remquol(arg_arg1, arg_arg2, arg_arg3)
-    })
-}
-pub unsafe fn copysignf(arg_arg1: f32, arg_arg2: f32) -> f32 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn copysignf(arg_arg1: f32, arg_arg2: f32) -> f32;
-        }
-        copysignf(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn copysign(arg_arg1: f64, arg_arg2: f64) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn copysign(arg_arg1: f64, arg_arg2: f64) -> f64;
-        }
-        copysign(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn copysignl(arg_arg1: f64, arg_arg2: f64) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn copysignl(arg_arg1: f64, arg_arg2: f64) -> f64;
-        }
-        copysignl(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn nanf(arg_arg1: *const ::std::os::raw::c_char) -> f32 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn nanf(arg_arg1: *const ::std::os::raw::c_char) -> f32;
-        }
-        nanf(arg_arg1)
-    })
-}
-pub unsafe fn nan(arg_arg1: *const ::std::os::raw::c_char) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn nan(arg_arg1: *const ::std::os::raw::c_char) -> f64;
-        }
-        nan(arg_arg1)
-    })
-}
-pub unsafe fn nanl(arg_arg1: *const ::std::os::raw::c_char) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn nanl(arg_arg1: *const ::std::os::raw::c_char) -> f64;
-        }
-        nanl(arg_arg1)
-    })
-}
-pub unsafe fn nextafterf(arg_arg1: f32, arg_arg2: f32) -> f32 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn nextafterf(arg_arg1: f32, arg_arg2: f32) -> f32;
-        }
-        nextafterf(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn nextafter(arg_arg1: f64, arg_arg2: f64) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn nextafter(arg_arg1: f64, arg_arg2: f64) -> f64;
-        }
-        nextafter(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn nextafterl(arg_arg1: f64, arg_arg2: f64) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn nextafterl(arg_arg1: f64, arg_arg2: f64) -> f64;
-        }
-        nextafterl(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn nexttoward(arg_arg1: f64, arg_arg2: f64) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn nexttoward(arg_arg1: f64, arg_arg2: f64) -> f64;
-        }
-        nexttoward(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn nexttowardf(arg_arg1: f32, arg_arg2: f64) -> f32 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn nexttowardf(arg_arg1: f32, arg_arg2: f64) -> f32;
-        }
-        nexttowardf(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn nexttowardl(arg_arg1: f64, arg_arg2: f64) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn nexttowardl(arg_arg1: f64, arg_arg2: f64) -> f64;
-        }
-        nexttowardl(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn fdimf(arg_arg1: f32, arg_arg2: f32) -> f32 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn fdimf(arg_arg1: f32, arg_arg2: f32) -> f32;
-        }
-        fdimf(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn fdim(arg_arg1: f64, arg_arg2: f64) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn fdim(arg_arg1: f64, arg_arg2: f64) -> f64;
-        }
-        fdim(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn fdiml(arg_arg1: f64, arg_arg2: f64) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn fdiml(arg_arg1: f64, arg_arg2: f64) -> f64;
-        }
-        fdiml(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn fmaxf(arg_arg1: f32, arg_arg2: f32) -> f32 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn fmaxf(arg_arg1: f32, arg_arg2: f32) -> f32;
-        }
-        fmaxf(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn fmax(arg_arg1: f64, arg_arg2: f64) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn fmax(arg_arg1: f64, arg_arg2: f64) -> f64;
-        }
-        fmax(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn fmaxl(arg_arg1: f64, arg_arg2: f64) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn fmaxl(arg_arg1: f64, arg_arg2: f64) -> f64;
-        }
-        fmaxl(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn fminf(arg_arg1: f32, arg_arg2: f32) -> f32 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn fminf(arg_arg1: f32, arg_arg2: f32) -> f32;
-        }
-        fminf(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn fmin(arg_arg1: f64, arg_arg2: f64) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn fmin(arg_arg1: f64, arg_arg2: f64) -> f64;
-        }
-        fmin(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn fminl(arg_arg1: f64, arg_arg2: f64) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn fminl(arg_arg1: f64, arg_arg2: f64) -> f64;
-        }
-        fminl(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn fmaf(arg_arg1: f32, arg_arg2: f32, arg_arg3: f32) -> f32 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn fmaf(arg_arg1: f32, arg_arg2: f32, arg_arg3: f32) -> f32;
-        }
-        fmaf(arg_arg1, arg_arg2, arg_arg3)
-    })
-}
-pub unsafe fn fma(arg_arg1: f64, arg_arg2: f64, arg_arg3: f64) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn fma(arg_arg1: f64, arg_arg2: f64, arg_arg3: f64) -> f64;
-        }
-        fma(arg_arg1, arg_arg2, arg_arg3)
-    })
-}
-pub unsafe fn fmal(arg_arg1: f64, arg_arg2: f64, arg_arg3: f64) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn fmal(arg_arg1: f64, arg_arg2: f64, arg_arg3: f64) -> f64;
-        }
-        fmal(arg_arg1, arg_arg2, arg_arg3)
-    })
-}
-pub unsafe fn __exp10f(arg_arg1: f32) -> f32 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn __exp10f(arg_arg1: f32) -> f32;
-        }
-        __exp10f(arg_arg1)
-    })
-}
-pub unsafe fn __exp10(arg_arg1: f64) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn __exp10(arg_arg1: f64) -> f64;
-        }
-        __exp10(arg_arg1)
-    })
-}
-pub unsafe fn __cospif(arg_arg1: f32) -> f32 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn __cospif(arg_arg1: f32) -> f32;
-        }
-        __cospif(arg_arg1)
-    })
-}
-pub unsafe fn __cospi(arg_arg1: f64) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn __cospi(arg_arg1: f64) -> f64;
-        }
-        __cospi(arg_arg1)
-    })
-}
-pub unsafe fn __sinpif(arg_arg1: f32) -> f32 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn __sinpif(arg_arg1: f32) -> f32;
-        }
-        __sinpif(arg_arg1)
-    })
-}
-pub unsafe fn __sinpi(arg_arg1: f64) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn __sinpi(arg_arg1: f64) -> f64;
-        }
-        __sinpi(arg_arg1)
-    })
-}
-pub unsafe fn __tanpif(arg_arg1: f32) -> f32 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn __tanpif(arg_arg1: f32) -> f32;
-        }
-        __tanpif(arg_arg1)
-    })
-}
-pub unsafe fn __tanpi(arg_arg1: f64) -> f64 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn __tanpi(arg_arg1: f64) -> f64;
-        }
-        __tanpi(arg_arg1)
-    })
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct __float2 {
-    pub __sinval: f32,
-    pub __cosval: f32,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct __double2 {
-    pub __sinval: f64,
-    pub __cosval: f64,
-}
-pub unsafe fn __sincosf_stret(arg_arg1: f32) -> __float2 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn __sincosf_stret(arg_arg1: f32) -> __float2;
-        }
-        __sincosf_stret(arg_arg1)
-    })
-}
-pub unsafe fn __sincos_stret(arg_arg1: f64) -> __double2 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn __sincos_stret(arg_arg1: f64) -> __double2;
-        }
-        __sincos_stret(arg_arg1)
-    })
-}
-pub unsafe fn __sincospif_stret(arg_arg1: f32) -> __float2 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn __sincospif_stret(arg_arg1: f32) -> __float2;
-        }
-        __sincospif_stret(arg_arg1)
-    })
-}
-pub unsafe fn __sincospi_stret(arg_arg1: f64) -> __double2 {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn __sincospi_stret(arg_arg1: f64) -> __double2;
-        }
-        __sincospi_stret(arg_arg1)
+        isnan(arg___value)
     })
 }
 pub unsafe fn j0(arg_arg1: f64) -> f64 {
@@ -12873,12 +11015,28 @@ pub unsafe fn j0(arg_arg1: f64) -> f64 {
         j0(arg_arg1)
     })
 }
+pub unsafe fn __j0(arg_arg1: f64) -> f64 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __j0(arg_arg1: f64) -> f64;
+        }
+        __j0(arg_arg1)
+    })
+}
 pub unsafe fn j1(arg_arg1: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
             fn j1(arg_arg1: f64) -> f64;
         }
         j1(arg_arg1)
+    })
+}
+pub unsafe fn __j1(arg_arg1: f64) -> f64 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __j1(arg_arg1: f64) -> f64;
+        }
+        __j1(arg_arg1)
     })
 }
 pub unsafe fn jn(arg_arg1: ::std::os::raw::c_int, arg_arg2: f64) -> f64 {
@@ -12889,12 +11047,28 @@ pub unsafe fn jn(arg_arg1: ::std::os::raw::c_int, arg_arg2: f64) -> f64 {
         jn(arg_arg1, arg_arg2)
     })
 }
+pub unsafe fn __jn(arg_arg1: ::std::os::raw::c_int, arg_arg2: f64) -> f64 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __jn(arg_arg1: ::std::os::raw::c_int, arg_arg2: f64) -> f64;
+        }
+        __jn(arg_arg1, arg_arg2)
+    })
+}
 pub unsafe fn y0(arg_arg1: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
             fn y0(arg_arg1: f64) -> f64;
         }
         y0(arg_arg1)
+    })
+}
+pub unsafe fn __y0(arg_arg1: f64) -> f64 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __y0(arg_arg1: f64) -> f64;
+        }
+        __y0(arg_arg1)
     })
 }
 pub unsafe fn y1(arg_arg1: f64) -> f64 {
@@ -12905,6 +11079,14 @@ pub unsafe fn y1(arg_arg1: f64) -> f64 {
         y1(arg_arg1)
     })
 }
+pub unsafe fn __y1(arg_arg1: f64) -> f64 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __y1(arg_arg1: f64) -> f64;
+        }
+        __y1(arg_arg1)
+    })
+}
 pub unsafe fn yn(arg_arg1: ::std::os::raw::c_int, arg_arg2: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
@@ -12913,34 +11095,2815 @@ pub unsafe fn yn(arg_arg1: ::std::os::raw::c_int, arg_arg2: f64) -> f64 {
         yn(arg_arg1, arg_arg2)
     })
 }
-pub unsafe fn scalb(arg_arg1: f64, arg_arg2: f64) -> f64 {
+pub unsafe fn __yn(arg_arg1: ::std::os::raw::c_int, arg_arg2: f64) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn scalb(arg_arg1: f64, arg_arg2: f64) -> f64;
+            fn __yn(arg_arg1: ::std::os::raw::c_int, arg_arg2: f64) -> f64;
         }
-        scalb(arg_arg1, arg_arg2)
+        __yn(arg_arg1, arg_arg2)
+    })
+}
+pub unsafe fn erf(arg_arg1: f64) -> f64 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn erf(arg_arg1: f64) -> f64;
+        }
+        erf(arg_arg1)
+    })
+}
+pub unsafe fn __erf(arg_arg1: f64) -> f64 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __erf(arg_arg1: f64) -> f64;
+        }
+        __erf(arg_arg1)
+    })
+}
+pub unsafe fn erfc(arg_arg1: f64) -> f64 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn erfc(arg_arg1: f64) -> f64;
+        }
+        erfc(arg_arg1)
+    })
+}
+pub unsafe fn __erfc(arg_arg1: f64) -> f64 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __erfc(arg_arg1: f64) -> f64;
+        }
+        __erfc(arg_arg1)
+    })
+}
+pub unsafe fn lgamma(arg_arg1: f64) -> f64 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn lgamma(arg_arg1: f64) -> f64;
+        }
+        lgamma(arg_arg1)
+    })
+}
+pub unsafe fn __lgamma(arg_arg1: f64) -> f64 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __lgamma(arg_arg1: f64) -> f64;
+        }
+        __lgamma(arg_arg1)
+    })
+}
+pub unsafe fn tgamma(arg_arg1: f64) -> f64 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn tgamma(arg_arg1: f64) -> f64;
+        }
+        tgamma(arg_arg1)
+    })
+}
+pub unsafe fn __tgamma(arg_arg1: f64) -> f64 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __tgamma(arg_arg1: f64) -> f64;
+        }
+        __tgamma(arg_arg1)
+    })
+}
+pub unsafe fn gamma(arg_arg1: f64) -> f64 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn gamma(arg_arg1: f64) -> f64;
+        }
+        gamma(arg_arg1)
+    })
+}
+pub unsafe fn __gamma(arg_arg1: f64) -> f64 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __gamma(arg_arg1: f64) -> f64;
+        }
+        __gamma(arg_arg1)
+    })
+}
+pub unsafe fn lgamma_r(arg_arg1: f64, arg___signgamp: *mut ::std::os::raw::c_int) -> f64 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn lgamma_r(arg_arg1: f64, arg___signgamp: *mut ::std::os::raw::c_int) -> f64;
+        }
+        lgamma_r(arg_arg1, arg___signgamp)
+    })
+}
+pub unsafe fn __lgamma_r(arg_arg1: f64, arg___signgamp: *mut ::std::os::raw::c_int) -> f64 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __lgamma_r(arg_arg1: f64, arg___signgamp: *mut ::std::os::raw::c_int) -> f64;
+        }
+        __lgamma_r(arg_arg1, arg___signgamp)
+    })
+}
+pub unsafe fn rint(arg___x: f64) -> f64 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn rint(arg___x: f64) -> f64;
+        }
+        rint(arg___x)
+    })
+}
+pub unsafe fn __rint(arg___x: f64) -> f64 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __rint(arg___x: f64) -> f64;
+        }
+        __rint(arg___x)
+    })
+}
+pub unsafe fn nextafter(arg___x: f64, arg___y: f64) -> f64 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn nextafter(arg___x: f64, arg___y: f64) -> f64;
+        }
+        nextafter(arg___x, arg___y)
+    })
+}
+pub unsafe fn __nextafter(arg___x: f64, arg___y: f64) -> f64 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __nextafter(arg___x: f64, arg___y: f64) -> f64;
+        }
+        __nextafter(arg___x, arg___y)
+    })
+}
+pub unsafe fn nexttoward(arg___x: f64, arg___y: u128) -> f64 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn nexttoward(arg___x: f64, arg___y: u128) -> f64;
+        }
+        nexttoward(arg___x, arg___y)
+    })
+}
+pub unsafe fn __nexttoward(arg___x: f64, arg___y: u128) -> f64 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __nexttoward(arg___x: f64, arg___y: u128) -> f64;
+        }
+        __nexttoward(arg___x, arg___y)
+    })
+}
+pub unsafe fn remainder(arg___x: f64, arg___y: f64) -> f64 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn remainder(arg___x: f64, arg___y: f64) -> f64;
+        }
+        remainder(arg___x, arg___y)
+    })
+}
+pub unsafe fn __remainder(arg___x: f64, arg___y: f64) -> f64 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __remainder(arg___x: f64, arg___y: f64) -> f64;
+        }
+        __remainder(arg___x, arg___y)
+    })
+}
+pub unsafe fn scalbn(arg___x: f64, arg___n: ::std::os::raw::c_int) -> f64 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn scalbn(arg___x: f64, arg___n: ::std::os::raw::c_int) -> f64;
+        }
+        scalbn(arg___x, arg___n)
+    })
+}
+pub unsafe fn __scalbn(arg___x: f64, arg___n: ::std::os::raw::c_int) -> f64 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __scalbn(arg___x: f64, arg___n: ::std::os::raw::c_int) -> f64;
+        }
+        __scalbn(arg___x, arg___n)
+    })
+}
+pub unsafe fn ilogb(arg___x: f64) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn ilogb(arg___x: f64) -> ::std::os::raw::c_int;
+        }
+        ilogb(arg___x)
+    })
+}
+pub unsafe fn __ilogb(arg___x: f64) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __ilogb(arg___x: f64) -> ::std::os::raw::c_int;
+        }
+        __ilogb(arg___x)
+    })
+}
+pub unsafe fn scalbln(arg___x: f64, arg___n: ::std::os::raw::c_long) -> f64 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn scalbln(arg___x: f64, arg___n: ::std::os::raw::c_long) -> f64;
+        }
+        scalbln(arg___x, arg___n)
+    })
+}
+pub unsafe fn __scalbln(arg___x: f64, arg___n: ::std::os::raw::c_long) -> f64 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __scalbln(arg___x: f64, arg___n: ::std::os::raw::c_long) -> f64;
+        }
+        __scalbln(arg___x, arg___n)
+    })
+}
+pub unsafe fn nearbyint(arg___x: f64) -> f64 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn nearbyint(arg___x: f64) -> f64;
+        }
+        nearbyint(arg___x)
+    })
+}
+pub unsafe fn __nearbyint(arg___x: f64) -> f64 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __nearbyint(arg___x: f64) -> f64;
+        }
+        __nearbyint(arg___x)
+    })
+}
+pub unsafe fn round(arg___x: f64) -> f64 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn round(arg___x: f64) -> f64;
+        }
+        round(arg___x)
+    })
+}
+pub unsafe fn __round(arg___x: f64) -> f64 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __round(arg___x: f64) -> f64;
+        }
+        __round(arg___x)
+    })
+}
+pub unsafe fn trunc(arg___x: f64) -> f64 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn trunc(arg___x: f64) -> f64;
+        }
+        trunc(arg___x)
+    })
+}
+pub unsafe fn __trunc(arg___x: f64) -> f64 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __trunc(arg___x: f64) -> f64;
+        }
+        __trunc(arg___x)
+    })
+}
+pub unsafe fn remquo(arg___x: f64, arg___y: f64, arg___quo: *mut ::std::os::raw::c_int) -> f64 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn remquo(arg___x: f64, arg___y: f64, arg___quo: *mut ::std::os::raw::c_int) -> f64;
+        }
+        remquo(arg___x, arg___y, arg___quo)
+    })
+}
+pub unsafe fn __remquo(arg___x: f64, arg___y: f64, arg___quo: *mut ::std::os::raw::c_int) -> f64 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __remquo(arg___x: f64, arg___y: f64, arg___quo: *mut ::std::os::raw::c_int) -> f64;
+        }
+        __remquo(arg___x, arg___y, arg___quo)
+    })
+}
+pub unsafe fn lrint(arg___x: f64) -> ::std::os::raw::c_long {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn lrint(arg___x: f64) -> ::std::os::raw::c_long;
+        }
+        lrint(arg___x)
+    })
+}
+pub unsafe fn __lrint(arg___x: f64) -> ::std::os::raw::c_long {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __lrint(arg___x: f64) -> ::std::os::raw::c_long;
+        }
+        __lrint(arg___x)
+    })
+}
+pub unsafe fn llrint(arg___x: f64) -> ::std::os::raw::c_longlong {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn llrint(arg___x: f64) -> ::std::os::raw::c_longlong;
+        }
+        llrint(arg___x)
+    })
+}
+pub unsafe fn __llrint(arg___x: f64) -> ::std::os::raw::c_longlong {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __llrint(arg___x: f64) -> ::std::os::raw::c_longlong;
+        }
+        __llrint(arg___x)
+    })
+}
+pub unsafe fn lround(arg___x: f64) -> ::std::os::raw::c_long {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn lround(arg___x: f64) -> ::std::os::raw::c_long;
+        }
+        lround(arg___x)
+    })
+}
+pub unsafe fn __lround(arg___x: f64) -> ::std::os::raw::c_long {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __lround(arg___x: f64) -> ::std::os::raw::c_long;
+        }
+        __lround(arg___x)
+    })
+}
+pub unsafe fn llround(arg___x: f64) -> ::std::os::raw::c_longlong {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn llround(arg___x: f64) -> ::std::os::raw::c_longlong;
+        }
+        llround(arg___x)
+    })
+}
+pub unsafe fn __llround(arg___x: f64) -> ::std::os::raw::c_longlong {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __llround(arg___x: f64) -> ::std::os::raw::c_longlong;
+        }
+        __llround(arg___x)
+    })
+}
+pub unsafe fn fdim(arg___x: f64, arg___y: f64) -> f64 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn fdim(arg___x: f64, arg___y: f64) -> f64;
+        }
+        fdim(arg___x, arg___y)
+    })
+}
+pub unsafe fn __fdim(arg___x: f64, arg___y: f64) -> f64 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __fdim(arg___x: f64, arg___y: f64) -> f64;
+        }
+        __fdim(arg___x, arg___y)
+    })
+}
+pub unsafe fn fmax(arg___x: f64, arg___y: f64) -> f64 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn fmax(arg___x: f64, arg___y: f64) -> f64;
+        }
+        fmax(arg___x, arg___y)
+    })
+}
+pub unsafe fn __fmax(arg___x: f64, arg___y: f64) -> f64 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __fmax(arg___x: f64, arg___y: f64) -> f64;
+        }
+        __fmax(arg___x, arg___y)
+    })
+}
+pub unsafe fn fmin(arg___x: f64, arg___y: f64) -> f64 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn fmin(arg___x: f64, arg___y: f64) -> f64;
+        }
+        fmin(arg___x, arg___y)
+    })
+}
+pub unsafe fn __fmin(arg___x: f64, arg___y: f64) -> f64 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __fmin(arg___x: f64, arg___y: f64) -> f64;
+        }
+        __fmin(arg___x, arg___y)
+    })
+}
+pub unsafe fn fma(arg___x: f64, arg___y: f64, arg___z: f64) -> f64 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn fma(arg___x: f64, arg___y: f64, arg___z: f64) -> f64;
+        }
+        fma(arg___x, arg___y, arg___z)
+    })
+}
+pub unsafe fn __fma(arg___x: f64, arg___y: f64, arg___z: f64) -> f64 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __fma(arg___x: f64, arg___y: f64, arg___z: f64) -> f64;
+        }
+        __fma(arg___x, arg___y, arg___z)
+    })
+}
+pub unsafe fn scalb(arg___x: f64, arg___n: f64) -> f64 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn scalb(arg___x: f64, arg___n: f64) -> f64;
+        }
+        scalb(arg___x, arg___n)
+    })
+}
+pub unsafe fn __scalb(arg___x: f64, arg___n: f64) -> f64 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __scalb(arg___x: f64, arg___n: f64) -> f64;
+        }
+        __scalb(arg___x, arg___n)
+    })
+}
+pub unsafe fn __fpclassifyf(arg___value: f32) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __fpclassifyf(arg___value: f32) -> ::std::os::raw::c_int;
+        }
+        __fpclassifyf(arg___value)
+    })
+}
+pub unsafe fn __signbitf(arg___value: f32) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __signbitf(arg___value: f32) -> ::std::os::raw::c_int;
+        }
+        __signbitf(arg___value)
+    })
+}
+pub unsafe fn __isinff(arg___value: f32) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __isinff(arg___value: f32) -> ::std::os::raw::c_int;
+        }
+        __isinff(arg___value)
+    })
+}
+pub unsafe fn __finitef(arg___value: f32) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __finitef(arg___value: f32) -> ::std::os::raw::c_int;
+        }
+        __finitef(arg___value)
+    })
+}
+pub unsafe fn __isnanf(arg___value: f32) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __isnanf(arg___value: f32) -> ::std::os::raw::c_int;
+        }
+        __isnanf(arg___value)
+    })
+}
+pub unsafe fn __iseqsigf(arg___x: f32, arg___y: f32) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __iseqsigf(arg___x: f32, arg___y: f32) -> ::std::os::raw::c_int;
+        }
+        __iseqsigf(arg___x, arg___y)
+    })
+}
+pub unsafe fn __issignalingf(arg___value: f32) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __issignalingf(arg___value: f32) -> ::std::os::raw::c_int;
+        }
+        __issignalingf(arg___value)
+    })
+}
+pub unsafe fn acosf(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn acosf(arg___x: f32) -> f32;
+        }
+        acosf(arg___x)
+    })
+}
+pub unsafe fn __acosf(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __acosf(arg___x: f32) -> f32;
+        }
+        __acosf(arg___x)
+    })
+}
+pub unsafe fn asinf(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn asinf(arg___x: f32) -> f32;
+        }
+        asinf(arg___x)
+    })
+}
+pub unsafe fn __asinf(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __asinf(arg___x: f32) -> f32;
+        }
+        __asinf(arg___x)
+    })
+}
+pub unsafe fn atanf(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn atanf(arg___x: f32) -> f32;
+        }
+        atanf(arg___x)
+    })
+}
+pub unsafe fn __atanf(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __atanf(arg___x: f32) -> f32;
+        }
+        __atanf(arg___x)
+    })
+}
+pub unsafe fn atan2f(arg___y: f32, arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn atan2f(arg___y: f32, arg___x: f32) -> f32;
+        }
+        atan2f(arg___y, arg___x)
+    })
+}
+pub unsafe fn __atan2f(arg___y: f32, arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __atan2f(arg___y: f32, arg___x: f32) -> f32;
+        }
+        __atan2f(arg___y, arg___x)
+    })
+}
+pub unsafe fn cosf(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn cosf(arg___x: f32) -> f32;
+        }
+        cosf(arg___x)
+    })
+}
+pub unsafe fn __cosf(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __cosf(arg___x: f32) -> f32;
+        }
+        __cosf(arg___x)
+    })
+}
+pub unsafe fn sinf(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn sinf(arg___x: f32) -> f32;
+        }
+        sinf(arg___x)
+    })
+}
+pub unsafe fn __sinf(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __sinf(arg___x: f32) -> f32;
+        }
+        __sinf(arg___x)
+    })
+}
+pub unsafe fn tanf(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn tanf(arg___x: f32) -> f32;
+        }
+        tanf(arg___x)
+    })
+}
+pub unsafe fn __tanf(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __tanf(arg___x: f32) -> f32;
+        }
+        __tanf(arg___x)
+    })
+}
+pub unsafe fn coshf(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn coshf(arg___x: f32) -> f32;
+        }
+        coshf(arg___x)
+    })
+}
+pub unsafe fn __coshf(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __coshf(arg___x: f32) -> f32;
+        }
+        __coshf(arg___x)
+    })
+}
+pub unsafe fn sinhf(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn sinhf(arg___x: f32) -> f32;
+        }
+        sinhf(arg___x)
+    })
+}
+pub unsafe fn __sinhf(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __sinhf(arg___x: f32) -> f32;
+        }
+        __sinhf(arg___x)
+    })
+}
+pub unsafe fn tanhf(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn tanhf(arg___x: f32) -> f32;
+        }
+        tanhf(arg___x)
+    })
+}
+pub unsafe fn __tanhf(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __tanhf(arg___x: f32) -> f32;
+        }
+        __tanhf(arg___x)
+    })
+}
+pub unsafe fn acoshf(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn acoshf(arg___x: f32) -> f32;
+        }
+        acoshf(arg___x)
+    })
+}
+pub unsafe fn __acoshf(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __acoshf(arg___x: f32) -> f32;
+        }
+        __acoshf(arg___x)
+    })
+}
+pub unsafe fn asinhf(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn asinhf(arg___x: f32) -> f32;
+        }
+        asinhf(arg___x)
+    })
+}
+pub unsafe fn __asinhf(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __asinhf(arg___x: f32) -> f32;
+        }
+        __asinhf(arg___x)
+    })
+}
+pub unsafe fn atanhf(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn atanhf(arg___x: f32) -> f32;
+        }
+        atanhf(arg___x)
+    })
+}
+pub unsafe fn __atanhf(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __atanhf(arg___x: f32) -> f32;
+        }
+        __atanhf(arg___x)
+    })
+}
+pub unsafe fn expf(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn expf(arg___x: f32) -> f32;
+        }
+        expf(arg___x)
+    })
+}
+pub unsafe fn __expf(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __expf(arg___x: f32) -> f32;
+        }
+        __expf(arg___x)
+    })
+}
+pub unsafe fn frexpf(arg___x: f32, arg___exponent: *mut ::std::os::raw::c_int) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn frexpf(arg___x: f32, arg___exponent: *mut ::std::os::raw::c_int) -> f32;
+        }
+        frexpf(arg___x, arg___exponent)
+    })
+}
+pub unsafe fn __frexpf(arg___x: f32, arg___exponent: *mut ::std::os::raw::c_int) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __frexpf(arg___x: f32, arg___exponent: *mut ::std::os::raw::c_int) -> f32;
+        }
+        __frexpf(arg___x, arg___exponent)
+    })
+}
+pub unsafe fn ldexpf(arg___x: f32, arg___exponent: ::std::os::raw::c_int) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn ldexpf(arg___x: f32, arg___exponent: ::std::os::raw::c_int) -> f32;
+        }
+        ldexpf(arg___x, arg___exponent)
+    })
+}
+pub unsafe fn __ldexpf(arg___x: f32, arg___exponent: ::std::os::raw::c_int) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __ldexpf(arg___x: f32, arg___exponent: ::std::os::raw::c_int) -> f32;
+        }
+        __ldexpf(arg___x, arg___exponent)
+    })
+}
+pub unsafe fn logf(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn logf(arg___x: f32) -> f32;
+        }
+        logf(arg___x)
+    })
+}
+pub unsafe fn __logf(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __logf(arg___x: f32) -> f32;
+        }
+        __logf(arg___x)
+    })
+}
+pub unsafe fn log10f(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn log10f(arg___x: f32) -> f32;
+        }
+        log10f(arg___x)
+    })
+}
+pub unsafe fn __log10f(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __log10f(arg___x: f32) -> f32;
+        }
+        __log10f(arg___x)
+    })
+}
+pub unsafe fn modff(arg___x: f32, arg___iptr: *mut f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn modff(arg___x: f32, arg___iptr: *mut f32) -> f32;
+        }
+        modff(arg___x, arg___iptr)
+    })
+}
+pub unsafe fn __modff(arg___x: f32, arg___iptr: *mut f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __modff(arg___x: f32, arg___iptr: *mut f32) -> f32;
+        }
+        __modff(arg___x, arg___iptr)
+    })
+}
+pub unsafe fn expm1f(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn expm1f(arg___x: f32) -> f32;
+        }
+        expm1f(arg___x)
+    })
+}
+pub unsafe fn __expm1f(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __expm1f(arg___x: f32) -> f32;
+        }
+        __expm1f(arg___x)
+    })
+}
+pub unsafe fn log1pf(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn log1pf(arg___x: f32) -> f32;
+        }
+        log1pf(arg___x)
+    })
+}
+pub unsafe fn __log1pf(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __log1pf(arg___x: f32) -> f32;
+        }
+        __log1pf(arg___x)
+    })
+}
+pub unsafe fn logbf(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn logbf(arg___x: f32) -> f32;
+        }
+        logbf(arg___x)
+    })
+}
+pub unsafe fn __logbf(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __logbf(arg___x: f32) -> f32;
+        }
+        __logbf(arg___x)
+    })
+}
+pub unsafe fn exp2f(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn exp2f(arg___x: f32) -> f32;
+        }
+        exp2f(arg___x)
+    })
+}
+pub unsafe fn __exp2f(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __exp2f(arg___x: f32) -> f32;
+        }
+        __exp2f(arg___x)
+    })
+}
+pub unsafe fn log2f(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn log2f(arg___x: f32) -> f32;
+        }
+        log2f(arg___x)
+    })
+}
+pub unsafe fn __log2f(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __log2f(arg___x: f32) -> f32;
+        }
+        __log2f(arg___x)
+    })
+}
+pub unsafe fn powf(arg___x: f32, arg___y: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn powf(arg___x: f32, arg___y: f32) -> f32;
+        }
+        powf(arg___x, arg___y)
+    })
+}
+pub unsafe fn __powf(arg___x: f32, arg___y: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __powf(arg___x: f32, arg___y: f32) -> f32;
+        }
+        __powf(arg___x, arg___y)
+    })
+}
+pub unsafe fn sqrtf(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn sqrtf(arg___x: f32) -> f32;
+        }
+        sqrtf(arg___x)
+    })
+}
+pub unsafe fn __sqrtf(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __sqrtf(arg___x: f32) -> f32;
+        }
+        __sqrtf(arg___x)
+    })
+}
+pub unsafe fn hypotf(arg___x: f32, arg___y: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn hypotf(arg___x: f32, arg___y: f32) -> f32;
+        }
+        hypotf(arg___x, arg___y)
+    })
+}
+pub unsafe fn __hypotf(arg___x: f32, arg___y: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __hypotf(arg___x: f32, arg___y: f32) -> f32;
+        }
+        __hypotf(arg___x, arg___y)
+    })
+}
+pub unsafe fn cbrtf(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn cbrtf(arg___x: f32) -> f32;
+        }
+        cbrtf(arg___x)
+    })
+}
+pub unsafe fn __cbrtf(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __cbrtf(arg___x: f32) -> f32;
+        }
+        __cbrtf(arg___x)
+    })
+}
+pub unsafe fn ceilf(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn ceilf(arg___x: f32) -> f32;
+        }
+        ceilf(arg___x)
+    })
+}
+pub unsafe fn __ceilf(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __ceilf(arg___x: f32) -> f32;
+        }
+        __ceilf(arg___x)
+    })
+}
+pub unsafe fn fabsf(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn fabsf(arg___x: f32) -> f32;
+        }
+        fabsf(arg___x)
+    })
+}
+pub unsafe fn __fabsf(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __fabsf(arg___x: f32) -> f32;
+        }
+        __fabsf(arg___x)
+    })
+}
+pub unsafe fn floorf(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn floorf(arg___x: f32) -> f32;
+        }
+        floorf(arg___x)
+    })
+}
+pub unsafe fn __floorf(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __floorf(arg___x: f32) -> f32;
+        }
+        __floorf(arg___x)
+    })
+}
+pub unsafe fn fmodf(arg___x: f32, arg___y: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn fmodf(arg___x: f32, arg___y: f32) -> f32;
+        }
+        fmodf(arg___x, arg___y)
+    })
+}
+pub unsafe fn __fmodf(arg___x: f32, arg___y: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __fmodf(arg___x: f32, arg___y: f32) -> f32;
+        }
+        __fmodf(arg___x, arg___y)
+    })
+}
+pub unsafe fn isinff(arg___value: f32) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn isinff(arg___value: f32) -> ::std::os::raw::c_int;
+        }
+        isinff(arg___value)
+    })
+}
+pub unsafe fn finitef(arg___value: f32) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn finitef(arg___value: f32) -> ::std::os::raw::c_int;
+        }
+        finitef(arg___value)
+    })
+}
+pub unsafe fn dremf(arg___x: f32, arg___y: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn dremf(arg___x: f32, arg___y: f32) -> f32;
+        }
+        dremf(arg___x, arg___y)
+    })
+}
+pub unsafe fn __dremf(arg___x: f32, arg___y: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __dremf(arg___x: f32, arg___y: f32) -> f32;
+        }
+        __dremf(arg___x, arg___y)
+    })
+}
+pub unsafe fn significandf(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn significandf(arg___x: f32) -> f32;
+        }
+        significandf(arg___x)
+    })
+}
+pub unsafe fn __significandf(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __significandf(arg___x: f32) -> f32;
+        }
+        __significandf(arg___x)
+    })
+}
+pub unsafe fn copysignf(arg___x: f32, arg___y: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn copysignf(arg___x: f32, arg___y: f32) -> f32;
+        }
+        copysignf(arg___x, arg___y)
+    })
+}
+pub unsafe fn __copysignf(arg___x: f32, arg___y: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __copysignf(arg___x: f32, arg___y: f32) -> f32;
+        }
+        __copysignf(arg___x, arg___y)
+    })
+}
+pub unsafe fn nanf(arg___tagb: *const ::std::os::raw::c_char) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn nanf(arg___tagb: *const ::std::os::raw::c_char) -> f32;
+        }
+        nanf(arg___tagb)
+    })
+}
+pub unsafe fn __nanf(arg___tagb: *const ::std::os::raw::c_char) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __nanf(arg___tagb: *const ::std::os::raw::c_char) -> f32;
+        }
+        __nanf(arg___tagb)
+    })
+}
+pub unsafe fn isnanf(arg___value: f32) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn isnanf(arg___value: f32) -> ::std::os::raw::c_int;
+        }
+        isnanf(arg___value)
+    })
+}
+pub unsafe fn j0f(arg_arg1: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn j0f(arg_arg1: f32) -> f32;
+        }
+        j0f(arg_arg1)
+    })
+}
+pub unsafe fn __j0f(arg_arg1: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __j0f(arg_arg1: f32) -> f32;
+        }
+        __j0f(arg_arg1)
+    })
+}
+pub unsafe fn j1f(arg_arg1: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn j1f(arg_arg1: f32) -> f32;
+        }
+        j1f(arg_arg1)
+    })
+}
+pub unsafe fn __j1f(arg_arg1: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __j1f(arg_arg1: f32) -> f32;
+        }
+        __j1f(arg_arg1)
+    })
+}
+pub unsafe fn jnf(arg_arg1: ::std::os::raw::c_int, arg_arg2: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn jnf(arg_arg1: ::std::os::raw::c_int, arg_arg2: f32) -> f32;
+        }
+        jnf(arg_arg1, arg_arg2)
+    })
+}
+pub unsafe fn __jnf(arg_arg1: ::std::os::raw::c_int, arg_arg2: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __jnf(arg_arg1: ::std::os::raw::c_int, arg_arg2: f32) -> f32;
+        }
+        __jnf(arg_arg1, arg_arg2)
+    })
+}
+pub unsafe fn y0f(arg_arg1: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn y0f(arg_arg1: f32) -> f32;
+        }
+        y0f(arg_arg1)
+    })
+}
+pub unsafe fn __y0f(arg_arg1: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __y0f(arg_arg1: f32) -> f32;
+        }
+        __y0f(arg_arg1)
+    })
+}
+pub unsafe fn y1f(arg_arg1: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn y1f(arg_arg1: f32) -> f32;
+        }
+        y1f(arg_arg1)
+    })
+}
+pub unsafe fn __y1f(arg_arg1: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __y1f(arg_arg1: f32) -> f32;
+        }
+        __y1f(arg_arg1)
+    })
+}
+pub unsafe fn ynf(arg_arg1: ::std::os::raw::c_int, arg_arg2: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn ynf(arg_arg1: ::std::os::raw::c_int, arg_arg2: f32) -> f32;
+        }
+        ynf(arg_arg1, arg_arg2)
+    })
+}
+pub unsafe fn __ynf(arg_arg1: ::std::os::raw::c_int, arg_arg2: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __ynf(arg_arg1: ::std::os::raw::c_int, arg_arg2: f32) -> f32;
+        }
+        __ynf(arg_arg1, arg_arg2)
+    })
+}
+pub unsafe fn erff(arg_arg1: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn erff(arg_arg1: f32) -> f32;
+        }
+        erff(arg_arg1)
+    })
+}
+pub unsafe fn __erff(arg_arg1: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __erff(arg_arg1: f32) -> f32;
+        }
+        __erff(arg_arg1)
+    })
+}
+pub unsafe fn erfcf(arg_arg1: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn erfcf(arg_arg1: f32) -> f32;
+        }
+        erfcf(arg_arg1)
+    })
+}
+pub unsafe fn __erfcf(arg_arg1: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __erfcf(arg_arg1: f32) -> f32;
+        }
+        __erfcf(arg_arg1)
+    })
+}
+pub unsafe fn lgammaf(arg_arg1: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn lgammaf(arg_arg1: f32) -> f32;
+        }
+        lgammaf(arg_arg1)
+    })
+}
+pub unsafe fn __lgammaf(arg_arg1: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __lgammaf(arg_arg1: f32) -> f32;
+        }
+        __lgammaf(arg_arg1)
+    })
+}
+pub unsafe fn tgammaf(arg_arg1: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn tgammaf(arg_arg1: f32) -> f32;
+        }
+        tgammaf(arg_arg1)
+    })
+}
+pub unsafe fn __tgammaf(arg_arg1: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __tgammaf(arg_arg1: f32) -> f32;
+        }
+        __tgammaf(arg_arg1)
+    })
+}
+pub unsafe fn gammaf(arg_arg1: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn gammaf(arg_arg1: f32) -> f32;
+        }
+        gammaf(arg_arg1)
+    })
+}
+pub unsafe fn __gammaf(arg_arg1: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __gammaf(arg_arg1: f32) -> f32;
+        }
+        __gammaf(arg_arg1)
+    })
+}
+pub unsafe fn lgammaf_r(arg_arg1: f32, arg___signgamp: *mut ::std::os::raw::c_int) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn lgammaf_r(arg_arg1: f32, arg___signgamp: *mut ::std::os::raw::c_int) -> f32;
+        }
+        lgammaf_r(arg_arg1, arg___signgamp)
+    })
+}
+pub unsafe fn __lgammaf_r(arg_arg1: f32, arg___signgamp: *mut ::std::os::raw::c_int) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __lgammaf_r(arg_arg1: f32, arg___signgamp: *mut ::std::os::raw::c_int) -> f32;
+        }
+        __lgammaf_r(arg_arg1, arg___signgamp)
+    })
+}
+pub unsafe fn rintf(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn rintf(arg___x: f32) -> f32;
+        }
+        rintf(arg___x)
+    })
+}
+pub unsafe fn __rintf(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __rintf(arg___x: f32) -> f32;
+        }
+        __rintf(arg___x)
+    })
+}
+pub unsafe fn nextafterf(arg___x: f32, arg___y: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn nextafterf(arg___x: f32, arg___y: f32) -> f32;
+        }
+        nextafterf(arg___x, arg___y)
+    })
+}
+pub unsafe fn __nextafterf(arg___x: f32, arg___y: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __nextafterf(arg___x: f32, arg___y: f32) -> f32;
+        }
+        __nextafterf(arg___x, arg___y)
+    })
+}
+pub unsafe fn nexttowardf(arg___x: f32, arg___y: u128) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn nexttowardf(arg___x: f32, arg___y: u128) -> f32;
+        }
+        nexttowardf(arg___x, arg___y)
+    })
+}
+pub unsafe fn __nexttowardf(arg___x: f32, arg___y: u128) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __nexttowardf(arg___x: f32, arg___y: u128) -> f32;
+        }
+        __nexttowardf(arg___x, arg___y)
+    })
+}
+pub unsafe fn remainderf(arg___x: f32, arg___y: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn remainderf(arg___x: f32, arg___y: f32) -> f32;
+        }
+        remainderf(arg___x, arg___y)
+    })
+}
+pub unsafe fn __remainderf(arg___x: f32, arg___y: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __remainderf(arg___x: f32, arg___y: f32) -> f32;
+        }
+        __remainderf(arg___x, arg___y)
+    })
+}
+pub unsafe fn scalbnf(arg___x: f32, arg___n: ::std::os::raw::c_int) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn scalbnf(arg___x: f32, arg___n: ::std::os::raw::c_int) -> f32;
+        }
+        scalbnf(arg___x, arg___n)
+    })
+}
+pub unsafe fn __scalbnf(arg___x: f32, arg___n: ::std::os::raw::c_int) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __scalbnf(arg___x: f32, arg___n: ::std::os::raw::c_int) -> f32;
+        }
+        __scalbnf(arg___x, arg___n)
+    })
+}
+pub unsafe fn ilogbf(arg___x: f32) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn ilogbf(arg___x: f32) -> ::std::os::raw::c_int;
+        }
+        ilogbf(arg___x)
+    })
+}
+pub unsafe fn __ilogbf(arg___x: f32) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __ilogbf(arg___x: f32) -> ::std::os::raw::c_int;
+        }
+        __ilogbf(arg___x)
+    })
+}
+pub unsafe fn scalblnf(arg___x: f32, arg___n: ::std::os::raw::c_long) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn scalblnf(arg___x: f32, arg___n: ::std::os::raw::c_long) -> f32;
+        }
+        scalblnf(arg___x, arg___n)
+    })
+}
+pub unsafe fn __scalblnf(arg___x: f32, arg___n: ::std::os::raw::c_long) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __scalblnf(arg___x: f32, arg___n: ::std::os::raw::c_long) -> f32;
+        }
+        __scalblnf(arg___x, arg___n)
+    })
+}
+pub unsafe fn nearbyintf(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn nearbyintf(arg___x: f32) -> f32;
+        }
+        nearbyintf(arg___x)
+    })
+}
+pub unsafe fn __nearbyintf(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __nearbyintf(arg___x: f32) -> f32;
+        }
+        __nearbyintf(arg___x)
+    })
+}
+pub unsafe fn roundf(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn roundf(arg___x: f32) -> f32;
+        }
+        roundf(arg___x)
+    })
+}
+pub unsafe fn __roundf(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __roundf(arg___x: f32) -> f32;
+        }
+        __roundf(arg___x)
+    })
+}
+pub unsafe fn truncf(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn truncf(arg___x: f32) -> f32;
+        }
+        truncf(arg___x)
+    })
+}
+pub unsafe fn __truncf(arg___x: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __truncf(arg___x: f32) -> f32;
+        }
+        __truncf(arg___x)
+    })
+}
+pub unsafe fn remquof(arg___x: f32, arg___y: f32, arg___quo: *mut ::std::os::raw::c_int) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn remquof(arg___x: f32, arg___y: f32, arg___quo: *mut ::std::os::raw::c_int) -> f32;
+        }
+        remquof(arg___x, arg___y, arg___quo)
+    })
+}
+pub unsafe fn __remquof(arg___x: f32, arg___y: f32, arg___quo: *mut ::std::os::raw::c_int) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __remquof(arg___x: f32, arg___y: f32, arg___quo: *mut ::std::os::raw::c_int) -> f32;
+        }
+        __remquof(arg___x, arg___y, arg___quo)
+    })
+}
+pub unsafe fn lrintf(arg___x: f32) -> ::std::os::raw::c_long {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn lrintf(arg___x: f32) -> ::std::os::raw::c_long;
+        }
+        lrintf(arg___x)
+    })
+}
+pub unsafe fn __lrintf(arg___x: f32) -> ::std::os::raw::c_long {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __lrintf(arg___x: f32) -> ::std::os::raw::c_long;
+        }
+        __lrintf(arg___x)
+    })
+}
+pub unsafe fn llrintf(arg___x: f32) -> ::std::os::raw::c_longlong {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn llrintf(arg___x: f32) -> ::std::os::raw::c_longlong;
+        }
+        llrintf(arg___x)
+    })
+}
+pub unsafe fn __llrintf(arg___x: f32) -> ::std::os::raw::c_longlong {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __llrintf(arg___x: f32) -> ::std::os::raw::c_longlong;
+        }
+        __llrintf(arg___x)
+    })
+}
+pub unsafe fn lroundf(arg___x: f32) -> ::std::os::raw::c_long {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn lroundf(arg___x: f32) -> ::std::os::raw::c_long;
+        }
+        lroundf(arg___x)
+    })
+}
+pub unsafe fn __lroundf(arg___x: f32) -> ::std::os::raw::c_long {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __lroundf(arg___x: f32) -> ::std::os::raw::c_long;
+        }
+        __lroundf(arg___x)
+    })
+}
+pub unsafe fn llroundf(arg___x: f32) -> ::std::os::raw::c_longlong {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn llroundf(arg___x: f32) -> ::std::os::raw::c_longlong;
+        }
+        llroundf(arg___x)
+    })
+}
+pub unsafe fn __llroundf(arg___x: f32) -> ::std::os::raw::c_longlong {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __llroundf(arg___x: f32) -> ::std::os::raw::c_longlong;
+        }
+        __llroundf(arg___x)
+    })
+}
+pub unsafe fn fdimf(arg___x: f32, arg___y: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn fdimf(arg___x: f32, arg___y: f32) -> f32;
+        }
+        fdimf(arg___x, arg___y)
+    })
+}
+pub unsafe fn __fdimf(arg___x: f32, arg___y: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __fdimf(arg___x: f32, arg___y: f32) -> f32;
+        }
+        __fdimf(arg___x, arg___y)
+    })
+}
+pub unsafe fn fmaxf(arg___x: f32, arg___y: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn fmaxf(arg___x: f32, arg___y: f32) -> f32;
+        }
+        fmaxf(arg___x, arg___y)
+    })
+}
+pub unsafe fn __fmaxf(arg___x: f32, arg___y: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __fmaxf(arg___x: f32, arg___y: f32) -> f32;
+        }
+        __fmaxf(arg___x, arg___y)
+    })
+}
+pub unsafe fn fminf(arg___x: f32, arg___y: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn fminf(arg___x: f32, arg___y: f32) -> f32;
+        }
+        fminf(arg___x, arg___y)
+    })
+}
+pub unsafe fn __fminf(arg___x: f32, arg___y: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __fminf(arg___x: f32, arg___y: f32) -> f32;
+        }
+        __fminf(arg___x, arg___y)
+    })
+}
+pub unsafe fn fmaf(arg___x: f32, arg___y: f32, arg___z: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn fmaf(arg___x: f32, arg___y: f32, arg___z: f32) -> f32;
+        }
+        fmaf(arg___x, arg___y, arg___z)
+    })
+}
+pub unsafe fn __fmaf(arg___x: f32, arg___y: f32, arg___z: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __fmaf(arg___x: f32, arg___y: f32, arg___z: f32) -> f32;
+        }
+        __fmaf(arg___x, arg___y, arg___z)
+    })
+}
+pub unsafe fn scalbf(arg___x: f32, arg___n: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn scalbf(arg___x: f32, arg___n: f32) -> f32;
+        }
+        scalbf(arg___x, arg___n)
+    })
+}
+pub unsafe fn __scalbf(arg___x: f32, arg___n: f32) -> f32 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __scalbf(arg___x: f32, arg___n: f32) -> f32;
+        }
+        __scalbf(arg___x, arg___n)
+    })
+}
+pub unsafe fn __fpclassifyl(arg___value: u128) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __fpclassifyl(arg___value: u128) -> ::std::os::raw::c_int;
+        }
+        __fpclassifyl(arg___value)
+    })
+}
+pub unsafe fn __signbitl(arg___value: u128) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __signbitl(arg___value: u128) -> ::std::os::raw::c_int;
+        }
+        __signbitl(arg___value)
+    })
+}
+pub unsafe fn __isinfl(arg___value: u128) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __isinfl(arg___value: u128) -> ::std::os::raw::c_int;
+        }
+        __isinfl(arg___value)
+    })
+}
+pub unsafe fn __finitel(arg___value: u128) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __finitel(arg___value: u128) -> ::std::os::raw::c_int;
+        }
+        __finitel(arg___value)
+    })
+}
+pub unsafe fn __isnanl(arg___value: u128) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __isnanl(arg___value: u128) -> ::std::os::raw::c_int;
+        }
+        __isnanl(arg___value)
+    })
+}
+pub unsafe fn __iseqsigl(arg___x: u128, arg___y: u128) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __iseqsigl(arg___x: u128, arg___y: u128) -> ::std::os::raw::c_int;
+        }
+        __iseqsigl(arg___x, arg___y)
+    })
+}
+pub unsafe fn __issignalingl(arg___value: u128) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __issignalingl(arg___value: u128) -> ::std::os::raw::c_int;
+        }
+        __issignalingl(arg___value)
+    })
+}
+pub unsafe fn acosl(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn acosl(arg___x: u128) -> u128;
+        }
+        acosl(arg___x)
+    })
+}
+pub unsafe fn __acosl(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __acosl(arg___x: u128) -> u128;
+        }
+        __acosl(arg___x)
+    })
+}
+pub unsafe fn asinl(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn asinl(arg___x: u128) -> u128;
+        }
+        asinl(arg___x)
+    })
+}
+pub unsafe fn __asinl(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __asinl(arg___x: u128) -> u128;
+        }
+        __asinl(arg___x)
+    })
+}
+pub unsafe fn atanl(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn atanl(arg___x: u128) -> u128;
+        }
+        atanl(arg___x)
+    })
+}
+pub unsafe fn __atanl(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __atanl(arg___x: u128) -> u128;
+        }
+        __atanl(arg___x)
+    })
+}
+pub unsafe fn atan2l(arg___y: u128, arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn atan2l(arg___y: u128, arg___x: u128) -> u128;
+        }
+        atan2l(arg___y, arg___x)
+    })
+}
+pub unsafe fn __atan2l(arg___y: u128, arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __atan2l(arg___y: u128, arg___x: u128) -> u128;
+        }
+        __atan2l(arg___y, arg___x)
+    })
+}
+pub unsafe fn cosl(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn cosl(arg___x: u128) -> u128;
+        }
+        cosl(arg___x)
+    })
+}
+pub unsafe fn __cosl(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __cosl(arg___x: u128) -> u128;
+        }
+        __cosl(arg___x)
+    })
+}
+pub unsafe fn sinl(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn sinl(arg___x: u128) -> u128;
+        }
+        sinl(arg___x)
+    })
+}
+pub unsafe fn __sinl(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __sinl(arg___x: u128) -> u128;
+        }
+        __sinl(arg___x)
+    })
+}
+pub unsafe fn tanl(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn tanl(arg___x: u128) -> u128;
+        }
+        tanl(arg___x)
+    })
+}
+pub unsafe fn __tanl(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __tanl(arg___x: u128) -> u128;
+        }
+        __tanl(arg___x)
+    })
+}
+pub unsafe fn coshl(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn coshl(arg___x: u128) -> u128;
+        }
+        coshl(arg___x)
+    })
+}
+pub unsafe fn __coshl(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __coshl(arg___x: u128) -> u128;
+        }
+        __coshl(arg___x)
+    })
+}
+pub unsafe fn sinhl(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn sinhl(arg___x: u128) -> u128;
+        }
+        sinhl(arg___x)
+    })
+}
+pub unsafe fn __sinhl(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __sinhl(arg___x: u128) -> u128;
+        }
+        __sinhl(arg___x)
+    })
+}
+pub unsafe fn tanhl(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn tanhl(arg___x: u128) -> u128;
+        }
+        tanhl(arg___x)
+    })
+}
+pub unsafe fn __tanhl(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __tanhl(arg___x: u128) -> u128;
+        }
+        __tanhl(arg___x)
+    })
+}
+pub unsafe fn acoshl(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn acoshl(arg___x: u128) -> u128;
+        }
+        acoshl(arg___x)
+    })
+}
+pub unsafe fn __acoshl(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __acoshl(arg___x: u128) -> u128;
+        }
+        __acoshl(arg___x)
+    })
+}
+pub unsafe fn asinhl(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn asinhl(arg___x: u128) -> u128;
+        }
+        asinhl(arg___x)
+    })
+}
+pub unsafe fn __asinhl(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __asinhl(arg___x: u128) -> u128;
+        }
+        __asinhl(arg___x)
+    })
+}
+pub unsafe fn atanhl(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn atanhl(arg___x: u128) -> u128;
+        }
+        atanhl(arg___x)
+    })
+}
+pub unsafe fn __atanhl(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __atanhl(arg___x: u128) -> u128;
+        }
+        __atanhl(arg___x)
+    })
+}
+pub unsafe fn expl(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn expl(arg___x: u128) -> u128;
+        }
+        expl(arg___x)
+    })
+}
+pub unsafe fn __expl(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __expl(arg___x: u128) -> u128;
+        }
+        __expl(arg___x)
+    })
+}
+pub unsafe fn frexpl(arg___x: u128, arg___exponent: *mut ::std::os::raw::c_int) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn frexpl(arg___x: u128, arg___exponent: *mut ::std::os::raw::c_int) -> u128;
+        }
+        frexpl(arg___x, arg___exponent)
+    })
+}
+pub unsafe fn __frexpl(arg___x: u128, arg___exponent: *mut ::std::os::raw::c_int) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __frexpl(arg___x: u128, arg___exponent: *mut ::std::os::raw::c_int) -> u128;
+        }
+        __frexpl(arg___x, arg___exponent)
+    })
+}
+pub unsafe fn ldexpl(arg___x: u128, arg___exponent: ::std::os::raw::c_int) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn ldexpl(arg___x: u128, arg___exponent: ::std::os::raw::c_int) -> u128;
+        }
+        ldexpl(arg___x, arg___exponent)
+    })
+}
+pub unsafe fn __ldexpl(arg___x: u128, arg___exponent: ::std::os::raw::c_int) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __ldexpl(arg___x: u128, arg___exponent: ::std::os::raw::c_int) -> u128;
+        }
+        __ldexpl(arg___x, arg___exponent)
+    })
+}
+pub unsafe fn logl(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn logl(arg___x: u128) -> u128;
+        }
+        logl(arg___x)
+    })
+}
+pub unsafe fn __logl(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __logl(arg___x: u128) -> u128;
+        }
+        __logl(arg___x)
+    })
+}
+pub unsafe fn log10l(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn log10l(arg___x: u128) -> u128;
+        }
+        log10l(arg___x)
+    })
+}
+pub unsafe fn __log10l(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __log10l(arg___x: u128) -> u128;
+        }
+        __log10l(arg___x)
+    })
+}
+pub unsafe fn modfl(arg___x: u128, arg___iptr: *mut u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn modfl(arg___x: u128, arg___iptr: *mut u128) -> u128;
+        }
+        modfl(arg___x, arg___iptr)
+    })
+}
+pub unsafe fn __modfl(arg___x: u128, arg___iptr: *mut u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __modfl(arg___x: u128, arg___iptr: *mut u128) -> u128;
+        }
+        __modfl(arg___x, arg___iptr)
+    })
+}
+pub unsafe fn expm1l(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn expm1l(arg___x: u128) -> u128;
+        }
+        expm1l(arg___x)
+    })
+}
+pub unsafe fn __expm1l(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __expm1l(arg___x: u128) -> u128;
+        }
+        __expm1l(arg___x)
+    })
+}
+pub unsafe fn log1pl(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn log1pl(arg___x: u128) -> u128;
+        }
+        log1pl(arg___x)
+    })
+}
+pub unsafe fn __log1pl(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __log1pl(arg___x: u128) -> u128;
+        }
+        __log1pl(arg___x)
+    })
+}
+pub unsafe fn logbl(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn logbl(arg___x: u128) -> u128;
+        }
+        logbl(arg___x)
+    })
+}
+pub unsafe fn __logbl(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __logbl(arg___x: u128) -> u128;
+        }
+        __logbl(arg___x)
+    })
+}
+pub unsafe fn exp2l(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn exp2l(arg___x: u128) -> u128;
+        }
+        exp2l(arg___x)
+    })
+}
+pub unsafe fn __exp2l(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __exp2l(arg___x: u128) -> u128;
+        }
+        __exp2l(arg___x)
+    })
+}
+pub unsafe fn log2l(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn log2l(arg___x: u128) -> u128;
+        }
+        log2l(arg___x)
+    })
+}
+pub unsafe fn __log2l(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __log2l(arg___x: u128) -> u128;
+        }
+        __log2l(arg___x)
+    })
+}
+pub unsafe fn powl(arg___x: u128, arg___y: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn powl(arg___x: u128, arg___y: u128) -> u128;
+        }
+        powl(arg___x, arg___y)
+    })
+}
+pub unsafe fn __powl(arg___x: u128, arg___y: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __powl(arg___x: u128, arg___y: u128) -> u128;
+        }
+        __powl(arg___x, arg___y)
+    })
+}
+pub unsafe fn sqrtl(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn sqrtl(arg___x: u128) -> u128;
+        }
+        sqrtl(arg___x)
+    })
+}
+pub unsafe fn __sqrtl(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __sqrtl(arg___x: u128) -> u128;
+        }
+        __sqrtl(arg___x)
+    })
+}
+pub unsafe fn hypotl(arg___x: u128, arg___y: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn hypotl(arg___x: u128, arg___y: u128) -> u128;
+        }
+        hypotl(arg___x, arg___y)
+    })
+}
+pub unsafe fn __hypotl(arg___x: u128, arg___y: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __hypotl(arg___x: u128, arg___y: u128) -> u128;
+        }
+        __hypotl(arg___x, arg___y)
+    })
+}
+pub unsafe fn cbrtl(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn cbrtl(arg___x: u128) -> u128;
+        }
+        cbrtl(arg___x)
+    })
+}
+pub unsafe fn __cbrtl(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __cbrtl(arg___x: u128) -> u128;
+        }
+        __cbrtl(arg___x)
+    })
+}
+pub unsafe fn ceill(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn ceill(arg___x: u128) -> u128;
+        }
+        ceill(arg___x)
+    })
+}
+pub unsafe fn __ceill(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __ceill(arg___x: u128) -> u128;
+        }
+        __ceill(arg___x)
+    })
+}
+pub unsafe fn fabsl(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn fabsl(arg___x: u128) -> u128;
+        }
+        fabsl(arg___x)
+    })
+}
+pub unsafe fn __fabsl(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __fabsl(arg___x: u128) -> u128;
+        }
+        __fabsl(arg___x)
+    })
+}
+pub unsafe fn floorl(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn floorl(arg___x: u128) -> u128;
+        }
+        floorl(arg___x)
+    })
+}
+pub unsafe fn __floorl(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __floorl(arg___x: u128) -> u128;
+        }
+        __floorl(arg___x)
+    })
+}
+pub unsafe fn fmodl(arg___x: u128, arg___y: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn fmodl(arg___x: u128, arg___y: u128) -> u128;
+        }
+        fmodl(arg___x, arg___y)
+    })
+}
+pub unsafe fn __fmodl(arg___x: u128, arg___y: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __fmodl(arg___x: u128, arg___y: u128) -> u128;
+        }
+        __fmodl(arg___x, arg___y)
+    })
+}
+pub unsafe fn isinfl(arg___value: u128) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn isinfl(arg___value: u128) -> ::std::os::raw::c_int;
+        }
+        isinfl(arg___value)
+    })
+}
+pub unsafe fn finitel(arg___value: u128) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn finitel(arg___value: u128) -> ::std::os::raw::c_int;
+        }
+        finitel(arg___value)
+    })
+}
+pub unsafe fn dreml(arg___x: u128, arg___y: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn dreml(arg___x: u128, arg___y: u128) -> u128;
+        }
+        dreml(arg___x, arg___y)
+    })
+}
+pub unsafe fn __dreml(arg___x: u128, arg___y: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __dreml(arg___x: u128, arg___y: u128) -> u128;
+        }
+        __dreml(arg___x, arg___y)
+    })
+}
+pub unsafe fn significandl(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn significandl(arg___x: u128) -> u128;
+        }
+        significandl(arg___x)
+    })
+}
+pub unsafe fn __significandl(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __significandl(arg___x: u128) -> u128;
+        }
+        __significandl(arg___x)
+    })
+}
+pub unsafe fn copysignl(arg___x: u128, arg___y: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn copysignl(arg___x: u128, arg___y: u128) -> u128;
+        }
+        copysignl(arg___x, arg___y)
+    })
+}
+pub unsafe fn __copysignl(arg___x: u128, arg___y: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __copysignl(arg___x: u128, arg___y: u128) -> u128;
+        }
+        __copysignl(arg___x, arg___y)
+    })
+}
+pub unsafe fn nanl(arg___tagb: *const ::std::os::raw::c_char) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn nanl(arg___tagb: *const ::std::os::raw::c_char) -> u128;
+        }
+        nanl(arg___tagb)
+    })
+}
+pub unsafe fn __nanl(arg___tagb: *const ::std::os::raw::c_char) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __nanl(arg___tagb: *const ::std::os::raw::c_char) -> u128;
+        }
+        __nanl(arg___tagb)
+    })
+}
+pub unsafe fn isnanl(arg___value: u128) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn isnanl(arg___value: u128) -> ::std::os::raw::c_int;
+        }
+        isnanl(arg___value)
+    })
+}
+pub unsafe fn j0l(arg_arg1: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn j0l(arg_arg1: u128) -> u128;
+        }
+        j0l(arg_arg1)
+    })
+}
+pub unsafe fn __j0l(arg_arg1: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __j0l(arg_arg1: u128) -> u128;
+        }
+        __j0l(arg_arg1)
+    })
+}
+pub unsafe fn j1l(arg_arg1: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn j1l(arg_arg1: u128) -> u128;
+        }
+        j1l(arg_arg1)
+    })
+}
+pub unsafe fn __j1l(arg_arg1: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __j1l(arg_arg1: u128) -> u128;
+        }
+        __j1l(arg_arg1)
+    })
+}
+pub unsafe fn jnl(arg_arg1: ::std::os::raw::c_int, arg_arg2: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn jnl(arg_arg1: ::std::os::raw::c_int, arg_arg2: u128) -> u128;
+        }
+        jnl(arg_arg1, arg_arg2)
+    })
+}
+pub unsafe fn __jnl(arg_arg1: ::std::os::raw::c_int, arg_arg2: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __jnl(arg_arg1: ::std::os::raw::c_int, arg_arg2: u128) -> u128;
+        }
+        __jnl(arg_arg1, arg_arg2)
+    })
+}
+pub unsafe fn y0l(arg_arg1: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn y0l(arg_arg1: u128) -> u128;
+        }
+        y0l(arg_arg1)
+    })
+}
+pub unsafe fn __y0l(arg_arg1: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __y0l(arg_arg1: u128) -> u128;
+        }
+        __y0l(arg_arg1)
+    })
+}
+pub unsafe fn y1l(arg_arg1: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn y1l(arg_arg1: u128) -> u128;
+        }
+        y1l(arg_arg1)
+    })
+}
+pub unsafe fn __y1l(arg_arg1: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __y1l(arg_arg1: u128) -> u128;
+        }
+        __y1l(arg_arg1)
+    })
+}
+pub unsafe fn ynl(arg_arg1: ::std::os::raw::c_int, arg_arg2: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn ynl(arg_arg1: ::std::os::raw::c_int, arg_arg2: u128) -> u128;
+        }
+        ynl(arg_arg1, arg_arg2)
+    })
+}
+pub unsafe fn __ynl(arg_arg1: ::std::os::raw::c_int, arg_arg2: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __ynl(arg_arg1: ::std::os::raw::c_int, arg_arg2: u128) -> u128;
+        }
+        __ynl(arg_arg1, arg_arg2)
+    })
+}
+pub unsafe fn erfl(arg_arg1: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn erfl(arg_arg1: u128) -> u128;
+        }
+        erfl(arg_arg1)
+    })
+}
+pub unsafe fn __erfl(arg_arg1: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __erfl(arg_arg1: u128) -> u128;
+        }
+        __erfl(arg_arg1)
+    })
+}
+pub unsafe fn erfcl(arg_arg1: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn erfcl(arg_arg1: u128) -> u128;
+        }
+        erfcl(arg_arg1)
+    })
+}
+pub unsafe fn __erfcl(arg_arg1: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __erfcl(arg_arg1: u128) -> u128;
+        }
+        __erfcl(arg_arg1)
+    })
+}
+pub unsafe fn lgammal(arg_arg1: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn lgammal(arg_arg1: u128) -> u128;
+        }
+        lgammal(arg_arg1)
+    })
+}
+pub unsafe fn __lgammal(arg_arg1: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __lgammal(arg_arg1: u128) -> u128;
+        }
+        __lgammal(arg_arg1)
+    })
+}
+pub unsafe fn tgammal(arg_arg1: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn tgammal(arg_arg1: u128) -> u128;
+        }
+        tgammal(arg_arg1)
+    })
+}
+pub unsafe fn __tgammal(arg_arg1: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __tgammal(arg_arg1: u128) -> u128;
+        }
+        __tgammal(arg_arg1)
+    })
+}
+pub unsafe fn gammal(arg_arg1: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn gammal(arg_arg1: u128) -> u128;
+        }
+        gammal(arg_arg1)
+    })
+}
+pub unsafe fn __gammal(arg_arg1: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __gammal(arg_arg1: u128) -> u128;
+        }
+        __gammal(arg_arg1)
+    })
+}
+pub unsafe fn lgammal_r(arg_arg1: u128, arg___signgamp: *mut ::std::os::raw::c_int) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn lgammal_r(arg_arg1: u128, arg___signgamp: *mut ::std::os::raw::c_int) -> u128;
+        }
+        lgammal_r(arg_arg1, arg___signgamp)
+    })
+}
+pub unsafe fn __lgammal_r(arg_arg1: u128, arg___signgamp: *mut ::std::os::raw::c_int) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __lgammal_r(arg_arg1: u128, arg___signgamp: *mut ::std::os::raw::c_int) -> u128;
+        }
+        __lgammal_r(arg_arg1, arg___signgamp)
+    })
+}
+pub unsafe fn rintl(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn rintl(arg___x: u128) -> u128;
+        }
+        rintl(arg___x)
+    })
+}
+pub unsafe fn __rintl(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __rintl(arg___x: u128) -> u128;
+        }
+        __rintl(arg___x)
+    })
+}
+pub unsafe fn nextafterl(arg___x: u128, arg___y: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn nextafterl(arg___x: u128, arg___y: u128) -> u128;
+        }
+        nextafterl(arg___x, arg___y)
+    })
+}
+pub unsafe fn __nextafterl(arg___x: u128, arg___y: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __nextafterl(arg___x: u128, arg___y: u128) -> u128;
+        }
+        __nextafterl(arg___x, arg___y)
+    })
+}
+pub unsafe fn nexttowardl(arg___x: u128, arg___y: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn nexttowardl(arg___x: u128, arg___y: u128) -> u128;
+        }
+        nexttowardl(arg___x, arg___y)
+    })
+}
+pub unsafe fn __nexttowardl(arg___x: u128, arg___y: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __nexttowardl(arg___x: u128, arg___y: u128) -> u128;
+        }
+        __nexttowardl(arg___x, arg___y)
+    })
+}
+pub unsafe fn remainderl(arg___x: u128, arg___y: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn remainderl(arg___x: u128, arg___y: u128) -> u128;
+        }
+        remainderl(arg___x, arg___y)
+    })
+}
+pub unsafe fn __remainderl(arg___x: u128, arg___y: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __remainderl(arg___x: u128, arg___y: u128) -> u128;
+        }
+        __remainderl(arg___x, arg___y)
+    })
+}
+pub unsafe fn scalbnl(arg___x: u128, arg___n: ::std::os::raw::c_int) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn scalbnl(arg___x: u128, arg___n: ::std::os::raw::c_int) -> u128;
+        }
+        scalbnl(arg___x, arg___n)
+    })
+}
+pub unsafe fn __scalbnl(arg___x: u128, arg___n: ::std::os::raw::c_int) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __scalbnl(arg___x: u128, arg___n: ::std::os::raw::c_int) -> u128;
+        }
+        __scalbnl(arg___x, arg___n)
+    })
+}
+pub unsafe fn ilogbl(arg___x: u128) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn ilogbl(arg___x: u128) -> ::std::os::raw::c_int;
+        }
+        ilogbl(arg___x)
+    })
+}
+pub unsafe fn __ilogbl(arg___x: u128) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __ilogbl(arg___x: u128) -> ::std::os::raw::c_int;
+        }
+        __ilogbl(arg___x)
+    })
+}
+pub unsafe fn scalblnl(arg___x: u128, arg___n: ::std::os::raw::c_long) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn scalblnl(arg___x: u128, arg___n: ::std::os::raw::c_long) -> u128;
+        }
+        scalblnl(arg___x, arg___n)
+    })
+}
+pub unsafe fn __scalblnl(arg___x: u128, arg___n: ::std::os::raw::c_long) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __scalblnl(arg___x: u128, arg___n: ::std::os::raw::c_long) -> u128;
+        }
+        __scalblnl(arg___x, arg___n)
+    })
+}
+pub unsafe fn nearbyintl(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn nearbyintl(arg___x: u128) -> u128;
+        }
+        nearbyintl(arg___x)
+    })
+}
+pub unsafe fn __nearbyintl(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __nearbyintl(arg___x: u128) -> u128;
+        }
+        __nearbyintl(arg___x)
+    })
+}
+pub unsafe fn roundl(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn roundl(arg___x: u128) -> u128;
+        }
+        roundl(arg___x)
+    })
+}
+pub unsafe fn __roundl(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __roundl(arg___x: u128) -> u128;
+        }
+        __roundl(arg___x)
+    })
+}
+pub unsafe fn truncl(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn truncl(arg___x: u128) -> u128;
+        }
+        truncl(arg___x)
+    })
+}
+pub unsafe fn __truncl(arg___x: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __truncl(arg___x: u128) -> u128;
+        }
+        __truncl(arg___x)
+    })
+}
+pub unsafe fn remquol(arg___x: u128, arg___y: u128, arg___quo: *mut ::std::os::raw::c_int) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn remquol(arg___x: u128, arg___y: u128, arg___quo: *mut ::std::os::raw::c_int)
+                -> u128;
+        }
+        remquol(arg___x, arg___y, arg___quo)
+    })
+}
+pub unsafe fn __remquol(
+    arg___x: u128,
+    arg___y: u128,
+    arg___quo: *mut ::std::os::raw::c_int,
+) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __remquol(
+                arg___x: u128,
+                arg___y: u128,
+                arg___quo: *mut ::std::os::raw::c_int,
+            ) -> u128;
+        }
+        __remquol(arg___x, arg___y, arg___quo)
+    })
+}
+pub unsafe fn lrintl(arg___x: u128) -> ::std::os::raw::c_long {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn lrintl(arg___x: u128) -> ::std::os::raw::c_long;
+        }
+        lrintl(arg___x)
+    })
+}
+pub unsafe fn __lrintl(arg___x: u128) -> ::std::os::raw::c_long {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __lrintl(arg___x: u128) -> ::std::os::raw::c_long;
+        }
+        __lrintl(arg___x)
+    })
+}
+pub unsafe fn llrintl(arg___x: u128) -> ::std::os::raw::c_longlong {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn llrintl(arg___x: u128) -> ::std::os::raw::c_longlong;
+        }
+        llrintl(arg___x)
+    })
+}
+pub unsafe fn __llrintl(arg___x: u128) -> ::std::os::raw::c_longlong {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __llrintl(arg___x: u128) -> ::std::os::raw::c_longlong;
+        }
+        __llrintl(arg___x)
+    })
+}
+pub unsafe fn lroundl(arg___x: u128) -> ::std::os::raw::c_long {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn lroundl(arg___x: u128) -> ::std::os::raw::c_long;
+        }
+        lroundl(arg___x)
+    })
+}
+pub unsafe fn __lroundl(arg___x: u128) -> ::std::os::raw::c_long {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __lroundl(arg___x: u128) -> ::std::os::raw::c_long;
+        }
+        __lroundl(arg___x)
+    })
+}
+pub unsafe fn llroundl(arg___x: u128) -> ::std::os::raw::c_longlong {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn llroundl(arg___x: u128) -> ::std::os::raw::c_longlong;
+        }
+        llroundl(arg___x)
+    })
+}
+pub unsafe fn __llroundl(arg___x: u128) -> ::std::os::raw::c_longlong {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __llroundl(arg___x: u128) -> ::std::os::raw::c_longlong;
+        }
+        __llroundl(arg___x)
+    })
+}
+pub unsafe fn fdiml(arg___x: u128, arg___y: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn fdiml(arg___x: u128, arg___y: u128) -> u128;
+        }
+        fdiml(arg___x, arg___y)
+    })
+}
+pub unsafe fn __fdiml(arg___x: u128, arg___y: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __fdiml(arg___x: u128, arg___y: u128) -> u128;
+        }
+        __fdiml(arg___x, arg___y)
+    })
+}
+pub unsafe fn fmaxl(arg___x: u128, arg___y: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn fmaxl(arg___x: u128, arg___y: u128) -> u128;
+        }
+        fmaxl(arg___x, arg___y)
+    })
+}
+pub unsafe fn __fmaxl(arg___x: u128, arg___y: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __fmaxl(arg___x: u128, arg___y: u128) -> u128;
+        }
+        __fmaxl(arg___x, arg___y)
+    })
+}
+pub unsafe fn fminl(arg___x: u128, arg___y: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn fminl(arg___x: u128, arg___y: u128) -> u128;
+        }
+        fminl(arg___x, arg___y)
+    })
+}
+pub unsafe fn __fminl(arg___x: u128, arg___y: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __fminl(arg___x: u128, arg___y: u128) -> u128;
+        }
+        __fminl(arg___x, arg___y)
+    })
+}
+pub unsafe fn fmal(arg___x: u128, arg___y: u128, arg___z: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn fmal(arg___x: u128, arg___y: u128, arg___z: u128) -> u128;
+        }
+        fmal(arg___x, arg___y, arg___z)
+    })
+}
+pub unsafe fn __fmal(arg___x: u128, arg___y: u128, arg___z: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __fmal(arg___x: u128, arg___y: u128, arg___z: u128) -> u128;
+        }
+        __fmal(arg___x, arg___y, arg___z)
+    })
+}
+pub unsafe fn scalbl(arg___x: u128, arg___n: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn scalbl(arg___x: u128, arg___n: u128) -> u128;
+        }
+        scalbl(arg___x, arg___n)
+    })
+}
+pub unsafe fn __scalbl(arg___x: u128, arg___n: u128) -> u128 {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __scalbl(arg___x: u128, arg___n: u128) -> u128;
+        }
+        __scalbl(arg___x, arg___n)
     })
 }
 extern "C" {
     pub static mut signgam: ::std::os::raw::c_int;
 }
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct exception {
-    pub type_: ::std::os::raw::c_int,
-    pub name: *mut ::std::os::raw::c_char,
-    pub arg1: f64,
-    pub arg2: f64,
-    pub retval: f64,
-}
-impl Default for exception {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
+pub const FP_NAN: ::std::os::raw::c_uint = 0;
+pub const FP_INFINITE: ::std::os::raw::c_uint = 1;
+pub const FP_ZERO: ::std::os::raw::c_uint = 2;
+pub const FP_SUBNORMAL: ::std::os::raw::c_uint = 3;
+pub const FP_NORMAL: ::std::os::raw::c_uint = 4;
+pub type _bindgen_ty_8 = ::std::os::raw::c_uint;
+pub unsafe fn strlcat(
+    arg_dst: *mut ::std::os::raw::c_char,
+    arg_src: *const ::std::os::raw::c_char,
+    arg_siz: ::std::os::raw::c_ulong,
+) -> ::std::os::raw::c_ulong {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn strlcat(
+                arg_dst: *mut ::std::os::raw::c_char,
+                arg_src: *const ::std::os::raw::c_char,
+                arg_siz: ::std::os::raw::c_ulong,
+            ) -> ::std::os::raw::c_ulong;
         }
-    }
+        strlcat(arg_dst, arg_src, arg_siz)
+    })
+}
+pub unsafe fn strlcpy(
+    arg_dst: *mut ::std::os::raw::c_char,
+    arg_src: *const ::std::os::raw::c_char,
+    arg_siz: ::std::os::raw::c_ulong,
+) -> ::std::os::raw::c_ulong {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn strlcpy(
+                arg_dst: *mut ::std::os::raw::c_char,
+                arg_src: *const ::std::os::raw::c_char,
+                arg_siz: ::std::os::raw::c_ulong,
+            ) -> ::std::os::raw::c_ulong;
+        }
+        strlcpy(arg_dst, arg_src, arg_siz)
+    })
 }
 pub unsafe fn pqGetpwuid(
     arg_uid: uid_t,
@@ -13185,48 +14148,62 @@ pub unsafe fn wait_result_is_any_signal(
         wait_result_is_any_signal(arg_exit_status, arg_include_command_not_found)
     })
 }
-pub type jmp_buf = [::std::os::raw::c_int; 48usize];
-pub type sigjmp_buf = [::std::os::raw::c_int; 49usize];
-pub unsafe fn setjmp(arg_arg1: *mut ::std::os::raw::c_int) -> ::std::os::raw::c_int {
+pub type __jmp_buf = [::std::os::raw::c_long; 8usize];
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct __jmp_buf_tag {
+    pub __jmpbuf: __jmp_buf,
+    pub __mask_was_saved: ::std::os::raw::c_int,
+    pub __saved_mask: __sigset_t,
+}
+pub type jmp_buf = [__jmp_buf_tag; 1usize];
+pub unsafe fn setjmp(arg___env: *mut __jmp_buf_tag) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn setjmp(arg_arg1: *mut ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+            fn setjmp(arg___env: *mut __jmp_buf_tag) -> ::std::os::raw::c_int;
         }
-        setjmp(arg_arg1)
+        setjmp(arg___env)
     })
 }
-pub unsafe fn longjmp(arg_arg1: *mut ::std::os::raw::c_int, arg_arg2: ::std::os::raw::c_int) {
+pub unsafe fn __sigsetjmp(
+    arg___env: *mut __jmp_buf_tag,
+    arg___savemask: ::std::os::raw::c_int,
+) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn longjmp(arg_arg1: *mut ::std::os::raw::c_int, arg_arg2: ::std::os::raw::c_int);
+            fn __sigsetjmp(
+                arg___env: *mut __jmp_buf_tag,
+                arg___savemask: ::std::os::raw::c_int,
+            ) -> ::std::os::raw::c_int;
         }
-        longjmp(arg_arg1, arg_arg2)
+        __sigsetjmp(arg___env, arg___savemask)
     })
 }
-pub unsafe fn _setjmp(arg_arg1: *mut ::std::os::raw::c_int) -> ::std::os::raw::c_int {
+pub unsafe fn _setjmp(arg___env: *mut __jmp_buf_tag) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn _setjmp(arg_arg1: *mut ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+            fn _setjmp(arg___env: *mut __jmp_buf_tag) -> ::std::os::raw::c_int;
         }
-        _setjmp(arg_arg1)
+        _setjmp(arg___env)
     })
 }
-pub unsafe fn _longjmp(arg_arg1: *mut ::std::os::raw::c_int, arg_arg2: ::std::os::raw::c_int) {
+pub unsafe fn longjmp(arg___env: *mut __jmp_buf_tag, arg___val: ::std::os::raw::c_int) {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn _longjmp(arg_arg1: *mut ::std::os::raw::c_int, arg_arg2: ::std::os::raw::c_int);
+            fn longjmp(arg___env: *mut __jmp_buf_tag, arg___val: ::std::os::raw::c_int);
         }
-        _longjmp(arg_arg1, arg_arg2)
+        longjmp(arg___env, arg___val)
     })
 }
-pub unsafe fn longjmperror() {
+pub unsafe fn _longjmp(arg___env: *mut __jmp_buf_tag, arg___val: ::std::os::raw::c_int) {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn longjmperror();
+            fn _longjmp(arg___env: *mut __jmp_buf_tag, arg___val: ::std::os::raw::c_int);
         }
-        longjmperror()
+        _longjmp(arg___env, arg___val)
     })
 }
+pub type sigjmp_buf = [__jmp_buf_tag; 1usize];
 pub unsafe fn errstart(
     arg_elevel: ::std::os::raw::c_int,
     arg_filename: *const ::std::os::raw::c_char,
@@ -13968,7 +14945,7 @@ pub unsafe fn pvsnprintf(
     arg_buf: *mut ::std::os::raw::c_char,
     arg_len: usize,
     arg_fmt: *const ::std::os::raw::c_char,
-    arg_args: va_list,
+    arg_args: *mut __va_list_tag,
 ) -> usize {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
@@ -13976,7 +14953,7 @@ pub unsafe fn pvsnprintf(
                 arg_buf: *mut ::std::os::raw::c_char,
                 arg_len: usize,
                 arg_fmt: *const ::std::os::raw::c_char,
-                arg_args: va_list,
+                arg_args: *mut __va_list_tag,
             ) -> usize;
         }
         pvsnprintf(arg_buf, arg_len, arg_fmt, arg_args)
@@ -17094,348 +18071,137 @@ pub unsafe fn HeapTupleGetUpdateXid(arg_tuple: HeapTupleHeader) -> TransactionId
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct flock {
-    pub l_start: off_t,
-    pub l_len: off_t,
-    pub l_pid: pid_t,
     pub l_type: ::std::os::raw::c_short,
     pub l_whence: ::std::os::raw::c_short,
+    pub l_start: __off_t,
+    pub l_len: __off_t,
+    pub l_pid: __pid_t,
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
-pub struct timespec {
-    pub tv_sec: __darwin_time_t,
-    pub tv_nsec: ::std::os::raw::c_long,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct flocktimeout {
-    pub fl: flock,
-    pub timeout: timespec,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct radvisory {
-    pub ra_offset: off_t,
-    pub ra_count: ::std::os::raw::c_int,
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct fsignatures {
-    pub fs_file_start: off_t,
-    pub fs_blob_start: *mut ::std::os::raw::c_void,
-    pub fs_blob_size: usize,
-    pub fs_fsignatures_size: usize,
-    pub fs_cdhash: [::std::os::raw::c_char; 20usize],
-    pub fs_hash_type: ::std::os::raw::c_int,
-}
-impl Default for fsignatures {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub type fsignatures_t = fsignatures;
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct fsupplement {
-    pub fs_file_start: off_t,
-    pub fs_blob_start: off_t,
-    pub fs_blob_size: usize,
-    pub fs_orig_fd: ::std::os::raw::c_int,
-}
-pub type fsupplement_t = fsupplement;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct fchecklv {
-    pub lv_file_start: off_t,
-    pub lv_error_message_size: usize,
-    pub lv_error_message: *mut ::std::os::raw::c_void,
-}
-impl Default for fchecklv {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub type fchecklv_t = fchecklv;
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct fgetsigsinfo {
-    pub fg_file_start: off_t,
-    pub fg_info_request: ::std::os::raw::c_int,
-    pub fg_sig_is_platform: ::std::os::raw::c_int,
-}
-pub type fgetsigsinfo_t = fgetsigsinfo;
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct fstore {
-    pub fst_flags: ::std::os::raw::c_uint,
-    pub fst_posmode: ::std::os::raw::c_int,
-    pub fst_offset: off_t,
-    pub fst_length: off_t,
-    pub fst_bytesalloc: off_t,
-}
-pub type fstore_t = fstore;
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct fpunchhole {
-    pub fp_flags: ::std::os::raw::c_uint,
-    pub reserved: ::std::os::raw::c_uint,
-    pub fp_offset: off_t,
-    pub fp_length: off_t,
-}
-pub type fpunchhole_t = fpunchhole;
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct ftrimactivefile {
-    pub fta_offset: off_t,
-    pub fta_length: off_t,
-}
-pub type ftrimactivefile_t = ftrimactivefile;
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct fspecread {
-    pub fsr_flags: ::std::os::raw::c_uint,
-    pub reserved: ::std::os::raw::c_uint,
-    pub fsr_offset: off_t,
-    pub fsr_length: off_t,
-}
-pub type fspecread_t = fspecread;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct fbootstraptransfer {
-    pub fbt_offset: off_t,
-    pub fbt_length: usize,
-    pub fbt_buffer: *mut ::std::os::raw::c_void,
-}
-impl Default for fbootstraptransfer {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub type fbootstraptransfer_t = fbootstraptransfer;
-#[repr(C, packed(4))]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct log2phys {
-    pub l2p_flags: ::std::os::raw::c_uint,
-    pub l2p_contigbytes: off_t,
-    pub l2p_devoffset: off_t,
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct _filesec {
-    _unused: [u8; 0],
-}
-pub type filesec_t = *mut _filesec;
-pub const filesec_property_t_FILESEC_OWNER: filesec_property_t = 1;
-pub const filesec_property_t_FILESEC_GROUP: filesec_property_t = 2;
-pub const filesec_property_t_FILESEC_UUID: filesec_property_t = 3;
-pub const filesec_property_t_FILESEC_MODE: filesec_property_t = 4;
-pub const filesec_property_t_FILESEC_ACL: filesec_property_t = 5;
-pub const filesec_property_t_FILESEC_GRPUUID: filesec_property_t = 6;
-pub const filesec_property_t_FILESEC_ACL_RAW: filesec_property_t = 100;
-pub const filesec_property_t_FILESEC_ACL_ALLOCSIZE: filesec_property_t = 101;
-pub type filesec_property_t = ::std::os::raw::c_uint;
-pub unsafe fn open(
-    arg_arg1: *const ::std::os::raw::c_char,
-    arg_arg2: ::std::os::raw::c_int,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn open(
-                arg_arg1: *const ::std::os::raw::c_char,
-                arg_arg2: ::std::os::raw::c_int,
-            ) -> ::std::os::raw::c_int;
-        }
-        open(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn openat(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: *const ::std::os::raw::c_char,
-    arg_arg3: ::std::os::raw::c_int,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn openat(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: *const ::std::os::raw::c_char,
-                arg_arg3: ::std::os::raw::c_int,
-            ) -> ::std::os::raw::c_int;
-        }
-        openat(arg_arg1, arg_arg2, arg_arg3)
-    })
-}
-pub unsafe fn creat(
-    arg_arg1: *const ::std::os::raw::c_char,
-    arg_arg2: mode_t,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn creat(
-                arg_arg1: *const ::std::os::raw::c_char,
-                arg_arg2: mode_t,
-            ) -> ::std::os::raw::c_int;
-        }
-        creat(arg_arg1, arg_arg2)
-    })
+pub struct stat {
+    pub st_dev: __dev_t,
+    pub st_ino: __ino_t,
+    pub st_nlink: __nlink_t,
+    pub st_mode: __mode_t,
+    pub st_uid: __uid_t,
+    pub st_gid: __gid_t,
+    pub __pad0: ::std::os::raw::c_int,
+    pub st_rdev: __dev_t,
+    pub st_size: __off_t,
+    pub st_blksize: __blksize_t,
+    pub st_blocks: __blkcnt_t,
+    pub st_atim: timespec,
+    pub st_mtim: timespec,
+    pub st_ctim: timespec,
+    pub __glibc_reserved: [__syscall_slong_t; 3usize],
 }
 pub unsafe fn fcntl(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: ::std::os::raw::c_int,
+    arg___fd: ::std::os::raw::c_int,
+    arg___cmd: ::std::os::raw::c_int,
 ) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
             fn fcntl(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: ::std::os::raw::c_int,
+                arg___fd: ::std::os::raw::c_int,
+                arg___cmd: ::std::os::raw::c_int,
             ) -> ::std::os::raw::c_int;
         }
-        fcntl(arg_arg1, arg_arg2)
+        fcntl(arg___fd, arg___cmd)
     })
 }
-pub unsafe fn openx_np(
-    arg_arg1: *const ::std::os::raw::c_char,
-    arg_arg2: ::std::os::raw::c_int,
-    arg_arg3: filesec_t,
+pub unsafe fn open(
+    arg___file: *const ::std::os::raw::c_char,
+    arg___oflag: ::std::os::raw::c_int,
 ) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn openx_np(
-                arg_arg1: *const ::std::os::raw::c_char,
-                arg_arg2: ::std::os::raw::c_int,
-                arg_arg3: filesec_t,
+            fn open(
+                arg___file: *const ::std::os::raw::c_char,
+                arg___oflag: ::std::os::raw::c_int,
             ) -> ::std::os::raw::c_int;
         }
-        openx_np(arg_arg1, arg_arg2, arg_arg3)
+        open(arg___file, arg___oflag)
     })
 }
-pub unsafe fn open_dprotected_np(
-    arg_arg1: *const ::std::os::raw::c_char,
-    arg_arg2: ::std::os::raw::c_int,
-    arg_arg3: ::std::os::raw::c_int,
-    arg_arg4: ::std::os::raw::c_int,
+pub unsafe fn openat(
+    arg___fd: ::std::os::raw::c_int,
+    arg___file: *const ::std::os::raw::c_char,
+    arg___oflag: ::std::os::raw::c_int,
 ) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn open_dprotected_np(
-                arg_arg1: *const ::std::os::raw::c_char,
-                arg_arg2: ::std::os::raw::c_int,
-                arg_arg3: ::std::os::raw::c_int,
-                arg_arg4: ::std::os::raw::c_int,
+            fn openat(
+                arg___fd: ::std::os::raw::c_int,
+                arg___file: *const ::std::os::raw::c_char,
+                arg___oflag: ::std::os::raw::c_int,
             ) -> ::std::os::raw::c_int;
         }
-        open_dprotected_np(arg_arg1, arg_arg2, arg_arg3, arg_arg4)
+        openat(arg___fd, arg___file, arg___oflag)
     })
 }
-pub unsafe fn flock(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: ::std::os::raw::c_int,
+pub unsafe fn creat(
+    arg___file: *const ::std::os::raw::c_char,
+    arg___mode: mode_t,
 ) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn flock(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: ::std::os::raw::c_int,
+            fn creat(
+                arg___file: *const ::std::os::raw::c_char,
+                arg___mode: mode_t,
             ) -> ::std::os::raw::c_int;
         }
-        flock(arg_arg1, arg_arg2)
+        creat(arg___file, arg___mode)
     })
 }
-pub unsafe fn filesec_init() -> filesec_t {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn filesec_init() -> filesec_t;
-        }
-        filesec_init()
-    })
-}
-pub unsafe fn filesec_dup(arg_arg1: filesec_t) -> filesec_t {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn filesec_dup(arg_arg1: filesec_t) -> filesec_t;
-        }
-        filesec_dup(arg_arg1)
-    })
-}
-pub unsafe fn filesec_free(arg_arg1: filesec_t) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn filesec_free(arg_arg1: filesec_t);
-        }
-        filesec_free(arg_arg1)
-    })
-}
-pub unsafe fn filesec_get_property(
-    arg_arg1: filesec_t,
-    arg_arg2: filesec_property_t,
-    arg_arg3: *mut ::std::os::raw::c_void,
+pub unsafe fn lockf(
+    arg___fd: ::std::os::raw::c_int,
+    arg___cmd: ::std::os::raw::c_int,
+    arg___len: off_t,
 ) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn filesec_get_property(
-                arg_arg1: filesec_t,
-                arg_arg2: filesec_property_t,
-                arg_arg3: *mut ::std::os::raw::c_void,
+            fn lockf(
+                arg___fd: ::std::os::raw::c_int,
+                arg___cmd: ::std::os::raw::c_int,
+                arg___len: off_t,
             ) -> ::std::os::raw::c_int;
         }
-        filesec_get_property(arg_arg1, arg_arg2, arg_arg3)
+        lockf(arg___fd, arg___cmd, arg___len)
     })
 }
-pub unsafe fn filesec_query_property(
-    arg_arg1: filesec_t,
-    arg_arg2: filesec_property_t,
-    arg_arg3: *mut ::std::os::raw::c_int,
+pub unsafe fn posix_fadvise(
+    arg___fd: ::std::os::raw::c_int,
+    arg___offset: off_t,
+    arg___len: off_t,
+    arg___advise: ::std::os::raw::c_int,
 ) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn filesec_query_property(
-                arg_arg1: filesec_t,
-                arg_arg2: filesec_property_t,
-                arg_arg3: *mut ::std::os::raw::c_int,
+            fn posix_fadvise(
+                arg___fd: ::std::os::raw::c_int,
+                arg___offset: off_t,
+                arg___len: off_t,
+                arg___advise: ::std::os::raw::c_int,
             ) -> ::std::os::raw::c_int;
         }
-        filesec_query_property(arg_arg1, arg_arg2, arg_arg3)
+        posix_fadvise(arg___fd, arg___offset, arg___len, arg___advise)
     })
 }
-pub unsafe fn filesec_set_property(
-    arg_arg1: filesec_t,
-    arg_arg2: filesec_property_t,
-    arg_arg3: *const ::std::os::raw::c_void,
+pub unsafe fn posix_fallocate(
+    arg___fd: ::std::os::raw::c_int,
+    arg___offset: off_t,
+    arg___len: off_t,
 ) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn filesec_set_property(
-                arg_arg1: filesec_t,
-                arg_arg2: filesec_property_t,
-                arg_arg3: *const ::std::os::raw::c_void,
+            fn posix_fallocate(
+                arg___fd: ::std::os::raw::c_int,
+                arg___offset: off_t,
+                arg___len: off_t,
             ) -> ::std::os::raw::c_int;
         }
-        filesec_set_property(arg_arg1, arg_arg2, arg_arg3)
-    })
-}
-pub unsafe fn filesec_unset_property(
-    arg_arg1: filesec_t,
-    arg_arg2: filesec_property_t,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn filesec_unset_property(
-                arg_arg1: filesec_t,
-                arg_arg2: filesec_property_t,
-            ) -> ::std::os::raw::c_int;
-        }
-        filesec_unset_property(arg_arg1, arg_arg2)
+        posix_fallocate(arg___fd, arg___offset, arg___len)
     })
 }
 pub type XLogRecPtr = uint64;
@@ -19158,7 +19924,7 @@ pub struct tm {
     pub tm_yday: ::std::os::raw::c_int,
     pub tm_isdst: ::std::os::raw::c_int,
     pub tm_gmtoff: ::std::os::raw::c_long,
-    pub tm_zone: *mut ::std::os::raw::c_char,
+    pub tm_zone: *const ::std::os::raw::c_char,
 }
 impl Default for tm {
     fn default() -> Self {
@@ -19169,25 +19935,11 @@ impl Default for tm {
         }
     }
 }
-extern "C" {
-    pub static mut tzname: [*mut ::std::os::raw::c_char; 0usize];
-}
-extern "C" {
-    pub static mut getdate_err: ::std::os::raw::c_int;
-}
-extern "C" {
-    pub static mut timezone: ::std::os::raw::c_long;
-}
-extern "C" {
-    pub static mut daylight: ::std::os::raw::c_int;
-}
-pub unsafe fn asctime(arg_arg1: *const tm) -> *mut ::std::os::raw::c_char {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn asctime(arg_arg1: *const tm) -> *mut ::std::os::raw::c_char;
-        }
-        asctime(arg_arg1)
-    })
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct itimerspec {
+    pub it_interval: timespec,
+    pub it_value: timespec,
 }
 pub unsafe fn clock() -> clock_t {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
@@ -19197,95 +19949,155 @@ pub unsafe fn clock() -> clock_t {
         clock()
     })
 }
-pub unsafe fn ctime(arg_arg1: *const time_t) -> *mut ::std::os::raw::c_char {
+pub unsafe fn time(arg___timer: *mut time_t) -> time_t {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn ctime(arg_arg1: *const time_t) -> *mut ::std::os::raw::c_char;
+            fn time(arg___timer: *mut time_t) -> time_t;
         }
-        ctime(arg_arg1)
+        time(arg___timer)
     })
 }
-pub unsafe fn difftime(arg_arg1: time_t, arg_arg2: time_t) -> f64 {
+pub unsafe fn difftime(arg___time1: time_t, arg___time0: time_t) -> f64 {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn difftime(arg_arg1: time_t, arg_arg2: time_t) -> f64;
+            fn difftime(arg___time1: time_t, arg___time0: time_t) -> f64;
         }
-        difftime(arg_arg1, arg_arg2)
+        difftime(arg___time1, arg___time0)
     })
 }
-pub unsafe fn getdate(arg_arg1: *const ::std::os::raw::c_char) -> *mut tm {
+pub unsafe fn mktime(arg___tp: *mut tm) -> time_t {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn getdate(arg_arg1: *const ::std::os::raw::c_char) -> *mut tm;
+            fn mktime(arg___tp: *mut tm) -> time_t;
         }
-        getdate(arg_arg1)
-    })
-}
-pub unsafe fn gmtime(arg_arg1: *const time_t) -> *mut tm {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn gmtime(arg_arg1: *const time_t) -> *mut tm;
-        }
-        gmtime(arg_arg1)
-    })
-}
-pub unsafe fn localtime(arg_arg1: *const time_t) -> *mut tm {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn localtime(arg_arg1: *const time_t) -> *mut tm;
-        }
-        localtime(arg_arg1)
-    })
-}
-pub unsafe fn mktime(arg_arg1: *mut tm) -> time_t {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn mktime(arg_arg1: *mut tm) -> time_t;
-        }
-        mktime(arg_arg1)
+        mktime(arg___tp)
     })
 }
 pub unsafe fn strftime(
-    arg_arg1: *mut ::std::os::raw::c_char,
-    arg_arg2: usize,
-    arg_arg3: *const ::std::os::raw::c_char,
-    arg_arg4: *const tm,
+    arg___s: *mut ::std::os::raw::c_char,
+    arg___maxsize: usize,
+    arg___format: *const ::std::os::raw::c_char,
+    arg___tp: *const tm,
 ) -> usize {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
             fn strftime(
-                arg_arg1: *mut ::std::os::raw::c_char,
-                arg_arg2: usize,
-                arg_arg3: *const ::std::os::raw::c_char,
-                arg_arg4: *const tm,
+                arg___s: *mut ::std::os::raw::c_char,
+                arg___maxsize: usize,
+                arg___format: *const ::std::os::raw::c_char,
+                arg___tp: *const tm,
             ) -> usize;
         }
-        strftime(arg_arg1, arg_arg2, arg_arg3, arg_arg4)
+        strftime(arg___s, arg___maxsize, arg___format, arg___tp)
     })
 }
-pub unsafe fn strptime(
-    arg_arg1: *const ::std::os::raw::c_char,
-    arg_arg2: *const ::std::os::raw::c_char,
-    arg_arg3: *mut tm,
+pub unsafe fn strftime_l(
+    arg___s: *mut ::std::os::raw::c_char,
+    arg___maxsize: usize,
+    arg___format: *const ::std::os::raw::c_char,
+    arg___tp: *const tm,
+    arg___loc: locale_t,
+) -> usize {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn strftime_l(
+                arg___s: *mut ::std::os::raw::c_char,
+                arg___maxsize: usize,
+                arg___format: *const ::std::os::raw::c_char,
+                arg___tp: *const tm,
+                arg___loc: locale_t,
+            ) -> usize;
+        }
+        strftime_l(arg___s, arg___maxsize, arg___format, arg___tp, arg___loc)
+    })
+}
+pub unsafe fn gmtime(arg___timer: *const time_t) -> *mut tm {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn gmtime(arg___timer: *const time_t) -> *mut tm;
+        }
+        gmtime(arg___timer)
+    })
+}
+pub unsafe fn localtime(arg___timer: *const time_t) -> *mut tm {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn localtime(arg___timer: *const time_t) -> *mut tm;
+        }
+        localtime(arg___timer)
+    })
+}
+pub unsafe fn gmtime_r(arg___timer: *const time_t, arg___tp: *mut tm) -> *mut tm {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn gmtime_r(arg___timer: *const time_t, arg___tp: *mut tm) -> *mut tm;
+        }
+        gmtime_r(arg___timer, arg___tp)
+    })
+}
+pub unsafe fn localtime_r(arg___timer: *const time_t, arg___tp: *mut tm) -> *mut tm {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn localtime_r(arg___timer: *const time_t, arg___tp: *mut tm) -> *mut tm;
+        }
+        localtime_r(arg___timer, arg___tp)
+    })
+}
+pub unsafe fn asctime(arg___tp: *const tm) -> *mut ::std::os::raw::c_char {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn asctime(arg___tp: *const tm) -> *mut ::std::os::raw::c_char;
+        }
+        asctime(arg___tp)
+    })
+}
+pub unsafe fn ctime(arg___timer: *const time_t) -> *mut ::std::os::raw::c_char {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn ctime(arg___timer: *const time_t) -> *mut ::std::os::raw::c_char;
+        }
+        ctime(arg___timer)
+    })
+}
+pub unsafe fn asctime_r(
+    arg___tp: *const tm,
+    arg___buf: *mut ::std::os::raw::c_char,
 ) -> *mut ::std::os::raw::c_char {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn strptime(
-                arg_arg1: *const ::std::os::raw::c_char,
-                arg_arg2: *const ::std::os::raw::c_char,
-                arg_arg3: *mut tm,
+            fn asctime_r(
+                arg___tp: *const tm,
+                arg___buf: *mut ::std::os::raw::c_char,
             ) -> *mut ::std::os::raw::c_char;
         }
-        strptime(arg_arg1, arg_arg2, arg_arg3)
+        asctime_r(arg___tp, arg___buf)
     })
 }
-pub unsafe fn time(arg_arg1: *mut time_t) -> time_t {
+pub unsafe fn ctime_r(
+    arg___timer: *const time_t,
+    arg___buf: *mut ::std::os::raw::c_char,
+) -> *mut ::std::os::raw::c_char {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn time(arg_arg1: *mut time_t) -> time_t;
+            fn ctime_r(
+                arg___timer: *const time_t,
+                arg___buf: *mut ::std::os::raw::c_char,
+            ) -> *mut ::std::os::raw::c_char;
         }
-        time(arg_arg1)
+        ctime_r(arg___timer, arg___buf)
     })
+}
+extern "C" {
+    pub static mut __tzname: [*mut ::std::os::raw::c_char; 2usize];
+}
+extern "C" {
+    pub static mut __daylight: ::std::os::raw::c_int;
+}
+extern "C" {
+    pub static mut __timezone: ::std::os::raw::c_long;
+}
+extern "C" {
+    pub static mut tzname: [*mut ::std::os::raw::c_char; 2usize];
 }
 pub unsafe fn tzset() {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
@@ -19295,113 +20107,50 @@ pub unsafe fn tzset() {
         tzset()
     })
 }
-pub unsafe fn asctime_r(
-    arg_arg1: *const tm,
-    arg_arg2: *mut ::std::os::raw::c_char,
-) -> *mut ::std::os::raw::c_char {
+extern "C" {
+    pub static mut daylight: ::std::os::raw::c_int;
+}
+extern "C" {
+    pub static mut timezone: ::std::os::raw::c_long;
+}
+pub unsafe fn timegm(arg___tp: *mut tm) -> time_t {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn asctime_r(
-                arg_arg1: *const tm,
-                arg_arg2: *mut ::std::os::raw::c_char,
-            ) -> *mut ::std::os::raw::c_char;
+            fn timegm(arg___tp: *mut tm) -> time_t;
         }
-        asctime_r(arg_arg1, arg_arg2)
+        timegm(arg___tp)
     })
 }
-pub unsafe fn ctime_r(
-    arg_arg1: *const time_t,
-    arg_arg2: *mut ::std::os::raw::c_char,
-) -> *mut ::std::os::raw::c_char {
+pub unsafe fn timelocal(arg___tp: *mut tm) -> time_t {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn ctime_r(
-                arg_arg1: *const time_t,
-                arg_arg2: *mut ::std::os::raw::c_char,
-            ) -> *mut ::std::os::raw::c_char;
+            fn timelocal(arg___tp: *mut tm) -> time_t;
         }
-        ctime_r(arg_arg1, arg_arg2)
+        timelocal(arg___tp)
     })
 }
-pub unsafe fn gmtime_r(arg_arg1: *const time_t, arg_arg2: *mut tm) -> *mut tm {
+pub unsafe fn dysize(arg___year: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn gmtime_r(arg_arg1: *const time_t, arg_arg2: *mut tm) -> *mut tm;
+            fn dysize(arg___year: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
         }
-        gmtime_r(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn localtime_r(arg_arg1: *const time_t, arg_arg2: *mut tm) -> *mut tm {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn localtime_r(arg_arg1: *const time_t, arg_arg2: *mut tm) -> *mut tm;
-        }
-        localtime_r(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn posix2time(arg_arg1: time_t) -> time_t {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn posix2time(arg_arg1: time_t) -> time_t;
-        }
-        posix2time(arg_arg1)
-    })
-}
-pub unsafe fn tzsetwall() {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn tzsetwall();
-        }
-        tzsetwall()
-    })
-}
-pub unsafe fn time2posix(arg_arg1: time_t) -> time_t {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn time2posix(arg_arg1: time_t) -> time_t;
-        }
-        time2posix(arg_arg1)
-    })
-}
-pub unsafe fn timelocal(arg_arg1: *mut tm) -> time_t {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn timelocal(arg_arg1: *mut tm) -> time_t;
-        }
-        timelocal(arg_arg1)
-    })
-}
-pub unsafe fn timegm(arg_arg1: *mut tm) -> time_t {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn timegm(arg_arg1: *mut tm) -> time_t;
-        }
-        timegm(arg_arg1)
+        dysize(arg___year)
     })
 }
 pub unsafe fn nanosleep(
-    arg___rqtp: *const timespec,
-    arg___rmtp: *mut timespec,
+    arg___requested_time: *const timespec,
+    arg___remaining: *mut timespec,
 ) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
             fn nanosleep(
-                arg___rqtp: *const timespec,
-                arg___rmtp: *mut timespec,
+                arg___requested_time: *const timespec,
+                arg___remaining: *mut timespec,
             ) -> ::std::os::raw::c_int;
         }
-        nanosleep(arg___rqtp, arg___rmtp)
+        nanosleep(arg___requested_time, arg___remaining)
     })
 }
-pub const clockid_t__CLOCK_REALTIME: clockid_t = 0;
-pub const clockid_t__CLOCK_MONOTONIC: clockid_t = 6;
-pub const clockid_t__CLOCK_MONOTONIC_RAW: clockid_t = 4;
-pub const clockid_t__CLOCK_MONOTONIC_RAW_APPROX: clockid_t = 5;
-pub const clockid_t__CLOCK_UPTIME_RAW: clockid_t = 8;
-pub const clockid_t__CLOCK_UPTIME_RAW_APPROX: clockid_t = 9;
-pub const clockid_t__CLOCK_PROCESS_CPUTIME_ID: clockid_t = 12;
-pub const clockid_t__CLOCK_THREAD_CPUTIME_ID: clockid_t = 16;
-pub type clockid_t = ::std::os::raw::c_uint;
 pub unsafe fn clock_getres(
     arg___clock_id: clockid_t,
     arg___res: *mut timespec,
@@ -19430,14 +20179,6 @@ pub unsafe fn clock_gettime(
         clock_gettime(arg___clock_id, arg___tp)
     })
 }
-pub unsafe fn clock_gettime_nsec_np(arg___clock_id: clockid_t) -> __uint64_t {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn clock_gettime_nsec_np(arg___clock_id: clockid_t) -> __uint64_t;
-        }
-        clock_gettime_nsec_np(arg___clock_id)
-    })
-}
 pub unsafe fn clock_settime(
     arg___clock_id: clockid_t,
     arg___tp: *const timespec,
@@ -19452,18 +20193,114 @@ pub unsafe fn clock_settime(
         clock_settime(arg___clock_id, arg___tp)
     })
 }
+pub unsafe fn clock_nanosleep(
+    arg___clock_id: clockid_t,
+    arg___flags: ::std::os::raw::c_int,
+    arg___req: *const timespec,
+    arg___rem: *mut timespec,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn clock_nanosleep(
+                arg___clock_id: clockid_t,
+                arg___flags: ::std::os::raw::c_int,
+                arg___req: *const timespec,
+                arg___rem: *mut timespec,
+            ) -> ::std::os::raw::c_int;
+        }
+        clock_nanosleep(arg___clock_id, arg___flags, arg___req, arg___rem)
+    })
+}
+pub unsafe fn clock_getcpuclockid(
+    arg___pid: pid_t,
+    arg___clock_id: *mut clockid_t,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn clock_getcpuclockid(
+                arg___pid: pid_t,
+                arg___clock_id: *mut clockid_t,
+            ) -> ::std::os::raw::c_int;
+        }
+        clock_getcpuclockid(arg___pid, arg___clock_id)
+    })
+}
+pub unsafe fn timer_create(
+    arg___clock_id: clockid_t,
+    arg___evp: *mut sigevent,
+    arg___timerid: *mut timer_t,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn timer_create(
+                arg___clock_id: clockid_t,
+                arg___evp: *mut sigevent,
+                arg___timerid: *mut timer_t,
+            ) -> ::std::os::raw::c_int;
+        }
+        timer_create(arg___clock_id, arg___evp, arg___timerid)
+    })
+}
+pub unsafe fn timer_delete(arg___timerid: timer_t) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn timer_delete(arg___timerid: timer_t) -> ::std::os::raw::c_int;
+        }
+        timer_delete(arg___timerid)
+    })
+}
+pub unsafe fn timer_settime(
+    arg___timerid: timer_t,
+    arg___flags: ::std::os::raw::c_int,
+    arg___value: *const itimerspec,
+    arg___ovalue: *mut itimerspec,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn timer_settime(
+                arg___timerid: timer_t,
+                arg___flags: ::std::os::raw::c_int,
+                arg___value: *const itimerspec,
+                arg___ovalue: *mut itimerspec,
+            ) -> ::std::os::raw::c_int;
+        }
+        timer_settime(arg___timerid, arg___flags, arg___value, arg___ovalue)
+    })
+}
+pub unsafe fn timer_gettime(
+    arg___timerid: timer_t,
+    arg___value: *mut itimerspec,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn timer_gettime(
+                arg___timerid: timer_t,
+                arg___value: *mut itimerspec,
+            ) -> ::std::os::raw::c_int;
+        }
+        timer_gettime(arg___timerid, arg___value)
+    })
+}
+pub unsafe fn timer_getoverrun(arg___timerid: timer_t) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn timer_getoverrun(arg___timerid: timer_t) -> ::std::os::raw::c_int;
+        }
+        timer_getoverrun(arg___timerid)
+    })
+}
 pub unsafe fn timespec_get(
-    arg_ts: *mut timespec,
-    arg_base: ::std::os::raw::c_int,
+    arg___ts: *mut timespec,
+    arg___base: ::std::os::raw::c_int,
 ) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
             fn timespec_get(
-                arg_ts: *mut timespec,
-                arg_base: ::std::os::raw::c_int,
+                arg___ts: *mut timespec,
+                arg___base: ::std::os::raw::c_int,
             ) -> ::std::os::raw::c_int;
         }
-        timespec_get(arg_ts, arg_base)
+        timespec_get(arg___ts, arg___base)
     })
 }
 pub type instr_time = timespec;
@@ -19654,14 +20491,14 @@ pub unsafe fn appendStringInfo(arg_str_: StringInfo, arg_fmt: *const ::std::os::
 pub unsafe fn appendStringInfoVA(
     arg_str_: StringInfo,
     arg_fmt: *const ::std::os::raw::c_char,
-    arg_args: va_list,
+    arg_args: *mut __va_list_tag,
 ) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
             fn appendStringInfoVA(
                 arg_str_: StringInfo,
                 arg_fmt: *const ::std::os::raw::c_char,
-                arg_args: va_list,
+                arg_args: *mut __va_list_tag,
             ) -> ::std::os::raw::c_int;
         }
         appendStringInfoVA(arg_str_, arg_fmt, arg_args)
@@ -21306,6 +22143,7 @@ pub struct IndexOnlyScan {
     pub indexorderby: *mut List,
     pub indextlist: *mut List,
     pub indexorderdir: ScanDirection,
+    pub recheckqual: *mut List,
 }
 impl Default for IndexOnlyScan {
     fn default() -> Self {
@@ -22520,12 +23358,11 @@ impl Default for TriggerDesc {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct dirent {
-    pub d_ino: __uint64_t,
-    pub d_seekoff: __uint64_t,
-    pub d_reclen: __uint16_t,
-    pub d_namlen: __uint16_t,
-    pub d_type: __uint8_t,
-    pub d_name: [::std::os::raw::c_char; 1024usize],
+    pub d_ino: __ino_t,
+    pub d_off: __off_t,
+    pub d_reclen: ::std::os::raw::c_ushort,
+    pub d_type: ::std::os::raw::c_uchar,
+    pub d_name: [::std::os::raw::c_char; 256usize],
 }
 impl Default for dirent {
     fn default() -> Self {
@@ -22536,135 +23373,109 @@ impl Default for dirent {
         }
     }
 }
+pub const DT_UNKNOWN: ::std::os::raw::c_uint = 0;
+pub const DT_FIFO: ::std::os::raw::c_uint = 1;
+pub const DT_CHR: ::std::os::raw::c_uint = 2;
+pub const DT_DIR: ::std::os::raw::c_uint = 4;
+pub const DT_BLK: ::std::os::raw::c_uint = 6;
+pub const DT_REG: ::std::os::raw::c_uint = 8;
+pub const DT_LNK: ::std::os::raw::c_uint = 10;
+pub const DT_SOCK: ::std::os::raw::c_uint = 12;
+pub const DT_WHT: ::std::os::raw::c_uint = 14;
+pub type _bindgen_ty_9 = ::std::os::raw::c_uint;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct _telldir {
+pub struct __dirstream {
     _unused: [u8; 0],
 }
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct DIR {
-    pub __dd_fd: ::std::os::raw::c_int,
-    pub __dd_loc: ::std::os::raw::c_long,
-    pub __dd_size: ::std::os::raw::c_long,
-    pub __dd_buf: *mut ::std::os::raw::c_char,
-    pub __dd_len: ::std::os::raw::c_int,
-    pub __dd_seek: ::std::os::raw::c_long,
-    pub __padding: ::std::os::raw::c_long,
-    pub __dd_flags: ::std::os::raw::c_int,
-    pub __dd_lock: __darwin_pthread_mutex_t,
-    pub __dd_td: *mut _telldir,
-}
-impl Default for DIR {
-    fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub unsafe fn closedir(arg_arg1: *mut DIR) -> ::std::os::raw::c_int {
+pub type DIR = __dirstream;
+pub unsafe fn opendir(arg___name: *const ::std::os::raw::c_char) -> *mut DIR {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn closedir(arg_arg1: *mut DIR) -> ::std::os::raw::c_int;
+            fn opendir(arg___name: *const ::std::os::raw::c_char) -> *mut DIR;
         }
-        closedir(arg_arg1)
+        opendir(arg___name)
     })
 }
-pub unsafe fn opendir(arg_arg1: *const ::std::os::raw::c_char) -> *mut DIR {
+pub unsafe fn fdopendir(arg___fd: ::std::os::raw::c_int) -> *mut DIR {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn opendir(arg_arg1: *const ::std::os::raw::c_char) -> *mut DIR;
+            fn fdopendir(arg___fd: ::std::os::raw::c_int) -> *mut DIR;
         }
-        opendir(arg_arg1)
+        fdopendir(arg___fd)
     })
 }
-pub unsafe fn readdir(arg_arg1: *mut DIR) -> *mut dirent {
+pub unsafe fn closedir(arg___dirp: *mut DIR) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn readdir(arg_arg1: *mut DIR) -> *mut dirent;
+            fn closedir(arg___dirp: *mut DIR) -> ::std::os::raw::c_int;
         }
-        readdir(arg_arg1)
+        closedir(arg___dirp)
+    })
+}
+pub unsafe fn readdir(arg___dirp: *mut DIR) -> *mut dirent {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn readdir(arg___dirp: *mut DIR) -> *mut dirent;
+        }
+        readdir(arg___dirp)
     })
 }
 pub unsafe fn readdir_r(
-    arg_arg1: *mut DIR,
-    arg_arg2: *mut dirent,
-    arg_arg3: *mut *mut dirent,
+    arg___dirp: *mut DIR,
+    arg___entry: *mut dirent,
+    arg___result: *mut *mut dirent,
 ) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
             fn readdir_r(
-                arg_arg1: *mut DIR,
-                arg_arg2: *mut dirent,
-                arg_arg3: *mut *mut dirent,
+                arg___dirp: *mut DIR,
+                arg___entry: *mut dirent,
+                arg___result: *mut *mut dirent,
             ) -> ::std::os::raw::c_int;
         }
-        readdir_r(arg_arg1, arg_arg2, arg_arg3)
+        readdir_r(arg___dirp, arg___entry, arg___result)
     })
 }
-pub unsafe fn rewinddir(arg_arg1: *mut DIR) {
+pub unsafe fn rewinddir(arg___dirp: *mut DIR) {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn rewinddir(arg_arg1: *mut DIR);
+            fn rewinddir(arg___dirp: *mut DIR);
         }
-        rewinddir(arg_arg1)
+        rewinddir(arg___dirp)
     })
 }
-pub unsafe fn seekdir(arg_arg1: *mut DIR, arg_arg2: ::std::os::raw::c_long) {
+pub unsafe fn seekdir(arg___dirp: *mut DIR, arg___pos: ::std::os::raw::c_long) {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn seekdir(arg_arg1: *mut DIR, arg_arg2: ::std::os::raw::c_long);
+            fn seekdir(arg___dirp: *mut DIR, arg___pos: ::std::os::raw::c_long);
         }
-        seekdir(arg_arg1, arg_arg2)
+        seekdir(arg___dirp, arg___pos)
     })
 }
-pub unsafe fn telldir(arg_arg1: *mut DIR) -> ::std::os::raw::c_long {
+pub unsafe fn telldir(arg___dirp: *mut DIR) -> ::std::os::raw::c_long {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn telldir(arg_arg1: *mut DIR) -> ::std::os::raw::c_long;
+            fn telldir(arg___dirp: *mut DIR) -> ::std::os::raw::c_long;
         }
-        telldir(arg_arg1)
+        telldir(arg___dirp)
     })
 }
-pub unsafe fn fdopendir(arg_arg1: ::std::os::raw::c_int) -> *mut DIR {
+pub unsafe fn dirfd(arg___dirp: *mut DIR) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn fdopendir(arg_arg1: ::std::os::raw::c_int) -> *mut DIR;
+            fn dirfd(arg___dirp: *mut DIR) -> ::std::os::raw::c_int;
         }
-        fdopendir(arg_arg1)
-    })
-}
-pub unsafe fn alphasort(
-    arg_arg1: *mut *const dirent,
-    arg_arg2: *mut *const dirent,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn alphasort(
-                arg_arg1: *mut *const dirent,
-                arg_arg2: *mut *const dirent,
-            ) -> ::std::os::raw::c_int;
-        }
-        alphasort(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn dirfd(arg_dirp: *mut DIR) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn dirfd(arg_dirp: *mut DIR) -> ::std::os::raw::c_int;
-        }
-        dirfd(arg_dirp)
+        dirfd(arg___dirp)
     })
 }
 pub unsafe fn scandir(
-    arg_arg1: *const ::std::os::raw::c_char,
-    arg_arg2: *mut *mut *mut dirent,
-    arg_arg3: ::std::option::Option<
+    arg___dir: *const ::std::os::raw::c_char,
+    arg___namelist: *mut *mut *mut dirent,
+    arg___selector: ::std::option::Option<
         unsafe extern "C" fn(arg1: *const dirent) -> ::std::os::raw::c_int,
     >,
-    arg_arg4: ::std::option::Option<
+    arg___cmp: ::std::option::Option<
         unsafe extern "C" fn(
             arg1: *mut *const dirent,
             arg2: *mut *const dirent,
@@ -22674,12 +23485,12 @@ pub unsafe fn scandir(
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
             fn scandir(
-                arg_arg1: *const ::std::os::raw::c_char,
-                arg_arg2: *mut *mut *mut dirent,
-                arg_arg3: ::std::option::Option<
+                arg___dir: *const ::std::os::raw::c_char,
+                arg___namelist: *mut *mut *mut dirent,
+                arg___selector: ::std::option::Option<
                     unsafe extern "C" fn(arg1: *const dirent) -> ::std::os::raw::c_int,
                 >,
-                arg_arg4: ::std::option::Option<
+                arg___cmp: ::std::option::Option<
                     unsafe extern "C" fn(
                         arg1: *mut *const dirent,
                         arg2: *mut *const dirent,
@@ -22687,57 +23498,39 @@ pub unsafe fn scandir(
                 >,
             ) -> ::std::os::raw::c_int;
         }
-        scandir(arg_arg1, arg_arg2, arg_arg3, arg_arg4)
+        scandir(arg___dir, arg___namelist, arg___selector, arg___cmp)
     })
 }
-pub unsafe fn scandir_b(
-    arg_arg1: *const ::std::os::raw::c_char,
-    arg_arg2: *mut *mut *mut dirent,
-    arg_arg3: *mut ::std::os::raw::c_void,
-    arg_arg4: *mut ::std::os::raw::c_void,
+pub unsafe fn alphasort(
+    arg___e1: *mut *const dirent,
+    arg___e2: *mut *const dirent,
 ) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn scandir_b(
-                arg_arg1: *const ::std::os::raw::c_char,
-                arg_arg2: *mut *mut *mut dirent,
-                arg_arg3: *mut ::std::os::raw::c_void,
-                arg_arg4: *mut ::std::os::raw::c_void,
+            fn alphasort(
+                arg___e1: *mut *const dirent,
+                arg___e2: *mut *const dirent,
             ) -> ::std::os::raw::c_int;
         }
-        scandir_b(arg_arg1, arg_arg2, arg_arg3, arg_arg4)
+        alphasort(arg___e1, arg___e2)
     })
 }
 pub unsafe fn getdirentries(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: *mut ::std::os::raw::c_char,
-    arg_arg3: ::std::os::raw::c_int,
-    arg_arg4: *mut ::std::os::raw::c_long,
-) -> ::std::os::raw::c_int {
+    arg___fd: ::std::os::raw::c_int,
+    arg___buf: *mut ::std::os::raw::c_char,
+    arg___nbytes: usize,
+    arg___basep: *mut __off_t,
+) -> __ssize_t {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
             fn getdirentries(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: *mut ::std::os::raw::c_char,
-                arg_arg3: ::std::os::raw::c_int,
-                arg_arg4: *mut ::std::os::raw::c_long,
-            ) -> ::std::os::raw::c_int;
+                arg___fd: ::std::os::raw::c_int,
+                arg___buf: *mut ::std::os::raw::c_char,
+                arg___nbytes: usize,
+                arg___basep: *mut __off_t,
+            ) -> __ssize_t;
         }
-        getdirentries(arg_arg1, arg_arg2, arg_arg3, arg_arg4)
-    })
-}
-pub unsafe fn __opendir2(
-    arg_arg1: *const ::std::os::raw::c_char,
-    arg_arg2: ::std::os::raw::c_int,
-) -> *mut DIR {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn __opendir2(
-                arg_arg1: *const ::std::os::raw::c_char,
-                arg_arg2: ::std::os::raw::c_int,
-            ) -> *mut DIR;
-        }
-        __opendir2(arg_arg1, arg_arg2)
+        getdirentries(arg___fd, arg___buf, arg___nbytes, arg___basep)
     })
 }
 pub type File = ::std::os::raw::c_int;
@@ -23639,7 +24432,7 @@ pub unsafe fn reset_on_dsm_detach() {
         reset_on_dsm_detach()
     })
 }
-pub type slock_t = ::std::os::raw::c_int;
+pub type slock_t = ::std::os::raw::c_uchar;
 extern "C" {
     pub static mut dummy_spinlock: slock_t;
 }
@@ -25196,7 +25989,7 @@ pub unsafe fn tuplesort_restorepos(arg_state: *mut Tuplesortstate) {
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct pg_atomic_flag {
-    pub value: ::std::os::raw::c_int,
+    pub value: ::std::os::raw::c_char,
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
@@ -26736,7 +27529,7 @@ impl Default for IndexScanState {
 #[derive(Debug, Copy, Clone)]
 pub struct IndexOnlyScanState {
     pub ss: ScanState,
-    pub indexqual: *mut ExprState,
+    pub recheckqual: *mut ExprState,
     pub ioss_ScanKeys: *mut ScanKeyData,
     pub ioss_NumScanKeys: ::std::os::raw::c_int,
     pub ioss_OrderByKeys: *mut ScanKeyData,
@@ -33807,332 +34600,944 @@ pub unsafe fn extract_variadic_args(
         )
     })
 }
-extern "C" {
-    pub static sys_signame: [*const ::std::os::raw::c_char; 32usize];
+pub type sig_atomic_t = __sig_atomic_t;
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub union sigval {
+    pub sival_int: ::std::os::raw::c_int,
+    pub sival_ptr: *mut ::std::os::raw::c_void,
 }
-extern "C" {
-    pub static sys_siglist: [*const ::std::os::raw::c_char; 32usize];
+impl Default for sigval {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
 }
-pub unsafe fn raise(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
+pub type __sigval_t = sigval;
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct siginfo_t {
+    pub si_signo: ::std::os::raw::c_int,
+    pub si_errno: ::std::os::raw::c_int,
+    pub si_code: ::std::os::raw::c_int,
+    pub __pad0: ::std::os::raw::c_int,
+    pub _sifields: siginfo_t__bindgen_ty_1,
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub union siginfo_t__bindgen_ty_1 {
+    pub _pad: [::std::os::raw::c_int; 28usize],
+    pub _kill: siginfo_t__bindgen_ty_1__bindgen_ty_1,
+    pub _timer: siginfo_t__bindgen_ty_1__bindgen_ty_2,
+    pub _rt: siginfo_t__bindgen_ty_1__bindgen_ty_3,
+    pub _sigchld: siginfo_t__bindgen_ty_1__bindgen_ty_4,
+    pub _sigfault: siginfo_t__bindgen_ty_1__bindgen_ty_5,
+    pub _sigpoll: siginfo_t__bindgen_ty_1__bindgen_ty_6,
+    pub _sigsys: siginfo_t__bindgen_ty_1__bindgen_ty_7,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct siginfo_t__bindgen_ty_1__bindgen_ty_1 {
+    pub si_pid: __pid_t,
+    pub si_uid: __uid_t,
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct siginfo_t__bindgen_ty_1__bindgen_ty_2 {
+    pub si_tid: ::std::os::raw::c_int,
+    pub si_overrun: ::std::os::raw::c_int,
+    pub si_sigval: __sigval_t,
+}
+impl Default for siginfo_t__bindgen_ty_1__bindgen_ty_2 {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct siginfo_t__bindgen_ty_1__bindgen_ty_3 {
+    pub si_pid: __pid_t,
+    pub si_uid: __uid_t,
+    pub si_sigval: __sigval_t,
+}
+impl Default for siginfo_t__bindgen_ty_1__bindgen_ty_3 {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct siginfo_t__bindgen_ty_1__bindgen_ty_4 {
+    pub si_pid: __pid_t,
+    pub si_uid: __uid_t,
+    pub si_status: ::std::os::raw::c_int,
+    pub si_utime: __clock_t,
+    pub si_stime: __clock_t,
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct siginfo_t__bindgen_ty_1__bindgen_ty_5 {
+    pub si_addr: *mut ::std::os::raw::c_void,
+    pub si_addr_lsb: ::std::os::raw::c_short,
+    pub _bounds: siginfo_t__bindgen_ty_1__bindgen_ty_5__bindgen_ty_1,
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub union siginfo_t__bindgen_ty_1__bindgen_ty_5__bindgen_ty_1 {
+    pub _addr_bnd: siginfo_t__bindgen_ty_1__bindgen_ty_5__bindgen_ty_1__bindgen_ty_1,
+    pub _pkey: __uint32_t,
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct siginfo_t__bindgen_ty_1__bindgen_ty_5__bindgen_ty_1__bindgen_ty_1 {
+    pub _lower: *mut ::std::os::raw::c_void,
+    pub _upper: *mut ::std::os::raw::c_void,
+}
+impl Default for siginfo_t__bindgen_ty_1__bindgen_ty_5__bindgen_ty_1__bindgen_ty_1 {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+impl Default for siginfo_t__bindgen_ty_1__bindgen_ty_5__bindgen_ty_1 {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+impl Default for siginfo_t__bindgen_ty_1__bindgen_ty_5 {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct siginfo_t__bindgen_ty_1__bindgen_ty_6 {
+    pub si_band: ::std::os::raw::c_long,
+    pub si_fd: ::std::os::raw::c_int,
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct siginfo_t__bindgen_ty_1__bindgen_ty_7 {
+    pub _call_addr: *mut ::std::os::raw::c_void,
+    pub _syscall: ::std::os::raw::c_int,
+    pub _arch: ::std::os::raw::c_uint,
+}
+impl Default for siginfo_t__bindgen_ty_1__bindgen_ty_7 {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+impl Default for siginfo_t__bindgen_ty_1 {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+impl Default for siginfo_t {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub const SI_ASYNCNL: ::std::os::raw::c_int = -60;
+pub const SI_DETHREAD: ::std::os::raw::c_int = -7;
+pub const SI_TKILL: ::std::os::raw::c_int = -6;
+pub const SI_SIGIO: ::std::os::raw::c_int = -5;
+pub const SI_ASYNCIO: ::std::os::raw::c_int = -4;
+pub const SI_MESGQ: ::std::os::raw::c_int = -3;
+pub const SI_TIMER: ::std::os::raw::c_int = -2;
+pub const SI_QUEUE: ::std::os::raw::c_int = -1;
+pub const SI_USER: ::std::os::raw::c_int = 0;
+pub const SI_KERNEL: ::std::os::raw::c_int = 128;
+pub type _bindgen_ty_10 = ::std::os::raw::c_int;
+pub const ILL_ILLOPC: ::std::os::raw::c_uint = 1;
+pub const ILL_ILLOPN: ::std::os::raw::c_uint = 2;
+pub const ILL_ILLADR: ::std::os::raw::c_uint = 3;
+pub const ILL_ILLTRP: ::std::os::raw::c_uint = 4;
+pub const ILL_PRVOPC: ::std::os::raw::c_uint = 5;
+pub const ILL_PRVREG: ::std::os::raw::c_uint = 6;
+pub const ILL_COPROC: ::std::os::raw::c_uint = 7;
+pub const ILL_BADSTK: ::std::os::raw::c_uint = 8;
+pub const ILL_BADIADDR: ::std::os::raw::c_uint = 9;
+pub type _bindgen_ty_11 = ::std::os::raw::c_uint;
+pub const FPE_INTDIV: ::std::os::raw::c_uint = 1;
+pub const FPE_INTOVF: ::std::os::raw::c_uint = 2;
+pub const FPE_FLTDIV: ::std::os::raw::c_uint = 3;
+pub const FPE_FLTOVF: ::std::os::raw::c_uint = 4;
+pub const FPE_FLTUND: ::std::os::raw::c_uint = 5;
+pub const FPE_FLTRES: ::std::os::raw::c_uint = 6;
+pub const FPE_FLTINV: ::std::os::raw::c_uint = 7;
+pub const FPE_FLTSUB: ::std::os::raw::c_uint = 8;
+pub const FPE_FLTUNK: ::std::os::raw::c_uint = 14;
+pub const FPE_CONDTRAP: ::std::os::raw::c_uint = 15;
+pub type _bindgen_ty_12 = ::std::os::raw::c_uint;
+pub const SEGV_MAPERR: ::std::os::raw::c_uint = 1;
+pub const SEGV_ACCERR: ::std::os::raw::c_uint = 2;
+pub const SEGV_BNDERR: ::std::os::raw::c_uint = 3;
+pub const SEGV_PKUERR: ::std::os::raw::c_uint = 4;
+pub const SEGV_ACCADI: ::std::os::raw::c_uint = 5;
+pub const SEGV_ADIDERR: ::std::os::raw::c_uint = 6;
+pub const SEGV_ADIPERR: ::std::os::raw::c_uint = 7;
+pub const SEGV_MTEAERR: ::std::os::raw::c_uint = 8;
+pub const SEGV_MTESERR: ::std::os::raw::c_uint = 9;
+pub type _bindgen_ty_13 = ::std::os::raw::c_uint;
+pub const BUS_ADRALN: ::std::os::raw::c_uint = 1;
+pub const BUS_ADRERR: ::std::os::raw::c_uint = 2;
+pub const BUS_OBJERR: ::std::os::raw::c_uint = 3;
+pub const BUS_MCEERR_AR: ::std::os::raw::c_uint = 4;
+pub const BUS_MCEERR_AO: ::std::os::raw::c_uint = 5;
+pub type _bindgen_ty_14 = ::std::os::raw::c_uint;
+pub const CLD_EXITED: ::std::os::raw::c_uint = 1;
+pub const CLD_KILLED: ::std::os::raw::c_uint = 2;
+pub const CLD_DUMPED: ::std::os::raw::c_uint = 3;
+pub const CLD_TRAPPED: ::std::os::raw::c_uint = 4;
+pub const CLD_STOPPED: ::std::os::raw::c_uint = 5;
+pub const CLD_CONTINUED: ::std::os::raw::c_uint = 6;
+pub type _bindgen_ty_15 = ::std::os::raw::c_uint;
+pub const POLL_IN: ::std::os::raw::c_uint = 1;
+pub const POLL_OUT: ::std::os::raw::c_uint = 2;
+pub const POLL_MSG: ::std::os::raw::c_uint = 3;
+pub const POLL_ERR: ::std::os::raw::c_uint = 4;
+pub const POLL_PRI: ::std::os::raw::c_uint = 5;
+pub const POLL_HUP: ::std::os::raw::c_uint = 6;
+pub type _bindgen_ty_16 = ::std::os::raw::c_uint;
+pub type sigval_t = __sigval_t;
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct sigevent {
+    pub sigev_value: __sigval_t,
+    pub sigev_signo: ::std::os::raw::c_int,
+    pub sigev_notify: ::std::os::raw::c_int,
+    pub _sigev_un: sigevent__bindgen_ty_1,
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub union sigevent__bindgen_ty_1 {
+    pub _pad: [::std::os::raw::c_int; 12usize],
+    pub _tid: __pid_t,
+    pub _sigev_thread: sigevent__bindgen_ty_1__bindgen_ty_1,
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct sigevent__bindgen_ty_1__bindgen_ty_1 {
+    pub _function: ::std::option::Option<unsafe extern "C" fn(arg1: __sigval_t)>,
+    pub _attribute: *mut pthread_attr_t,
+}
+impl Default for sigevent__bindgen_ty_1__bindgen_ty_1 {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+impl Default for sigevent__bindgen_ty_1 {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+impl Default for sigevent {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type sigevent_t = sigevent;
+pub const SIGEV_SIGNAL: ::std::os::raw::c_uint = 0;
+pub const SIGEV_NONE: ::std::os::raw::c_uint = 1;
+pub const SIGEV_THREAD: ::std::os::raw::c_uint = 2;
+pub const SIGEV_THREAD_ID: ::std::os::raw::c_uint = 4;
+pub type _bindgen_ty_17 = ::std::os::raw::c_uint;
+pub type __sighandler_t = ::std::option::Option<unsafe extern "C" fn(arg1: ::std::os::raw::c_int)>;
+pub unsafe fn __sysv_signal(
+    arg___sig: ::std::os::raw::c_int,
+    arg___handler: __sighandler_t,
+) -> __sighandler_t {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn raise(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+            fn __sysv_signal(
+                arg___sig: ::std::os::raw::c_int,
+                arg___handler: __sighandler_t,
+            ) -> __sighandler_t;
         }
-        raise(arg_arg1)
+        __sysv_signal(arg___sig, arg___handler)
     })
 }
-pub unsafe fn bsd_signal(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: ::std::option::Option<unsafe extern "C" fn(arg1: ::std::os::raw::c_int)>,
-) -> ::std::option::Option<
-    unsafe extern "C" fn(
-        arg1: ::std::os::raw::c_int,
-        arg2: ::std::option::Option<unsafe extern "C" fn(arg1: ::std::os::raw::c_int)>,
-    ),
-> {
+pub unsafe fn signal(
+    arg___sig: ::std::os::raw::c_int,
+    arg___handler: __sighandler_t,
+) -> __sighandler_t {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn bsd_signal(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: ::std::option::Option<unsafe extern "C" fn(arg1: ::std::os::raw::c_int)>,
-            ) -> ::std::option::Option<
-                unsafe extern "C" fn(
-                    arg1: ::std::os::raw::c_int,
-                    arg2: ::std::option::Option<unsafe extern "C" fn(arg1: ::std::os::raw::c_int)>,
-                ),
-            >;
+            fn signal(
+                arg___sig: ::std::os::raw::c_int,
+                arg___handler: __sighandler_t,
+            ) -> __sighandler_t;
         }
-        bsd_signal(arg_arg1, arg_arg2)
+        signal(arg___sig, arg___handler)
     })
 }
-pub unsafe fn kill(arg_arg1: pid_t, arg_arg2: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
+pub unsafe fn kill(arg___pid: __pid_t, arg___sig: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn kill(arg_arg1: pid_t, arg_arg2: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+            fn kill(arg___pid: __pid_t, arg___sig: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
         }
-        kill(arg_arg1, arg_arg2)
+        kill(arg___pid, arg___sig)
     })
 }
-pub unsafe fn killpg(arg_arg1: pid_t, arg_arg2: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn killpg(arg_arg1: pid_t, arg_arg2: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
-        }
-        killpg(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn pthread_kill(
-    arg_arg1: pthread_t,
-    arg_arg2: ::std::os::raw::c_int,
+pub unsafe fn killpg(
+    arg___pgrp: __pid_t,
+    arg___sig: ::std::os::raw::c_int,
 ) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn pthread_kill(
-                arg_arg1: pthread_t,
-                arg_arg2: ::std::os::raw::c_int,
+            fn killpg(
+                arg___pgrp: __pid_t,
+                arg___sig: ::std::os::raw::c_int,
             ) -> ::std::os::raw::c_int;
         }
-        pthread_kill(arg_arg1, arg_arg2)
+        killpg(arg___pgrp, arg___sig)
     })
 }
-pub unsafe fn pthread_sigmask(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: *const sigset_t,
-    arg_arg3: *mut sigset_t,
-) -> ::std::os::raw::c_int {
+pub unsafe fn raise(arg___sig: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn pthread_sigmask(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: *const sigset_t,
-                arg_arg3: *mut sigset_t,
-            ) -> ::std::os::raw::c_int;
+            fn raise(arg___sig: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
         }
-        pthread_sigmask(arg_arg1, arg_arg2, arg_arg3)
+        raise(arg___sig)
     })
 }
-pub unsafe fn sigaction(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: *const sigaction,
-    arg_arg3: *mut sigaction,
-) -> ::std::os::raw::c_int {
+pub unsafe fn ssignal(
+    arg___sig: ::std::os::raw::c_int,
+    arg___handler: __sighandler_t,
+) -> __sighandler_t {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn sigaction(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: *const sigaction,
-                arg_arg3: *mut sigaction,
-            ) -> ::std::os::raw::c_int;
+            fn ssignal(
+                arg___sig: ::std::os::raw::c_int,
+                arg___handler: __sighandler_t,
+            ) -> __sighandler_t;
         }
-        sigaction(arg_arg1, arg_arg2, arg_arg3)
+        ssignal(arg___sig, arg___handler)
+    })
+}
+pub unsafe fn gsignal(arg___sig: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn gsignal(arg___sig: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+        }
+        gsignal(arg___sig)
+    })
+}
+pub unsafe fn psignal(arg___sig: ::std::os::raw::c_int, arg___s: *const ::std::os::raw::c_char) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn psignal(arg___sig: ::std::os::raw::c_int, arg___s: *const ::std::os::raw::c_char);
+        }
+        psignal(arg___sig, arg___s)
+    })
+}
+pub unsafe fn psiginfo(arg___pinfo: *const siginfo_t, arg___s: *const ::std::os::raw::c_char) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn psiginfo(arg___pinfo: *const siginfo_t, arg___s: *const ::std::os::raw::c_char);
+        }
+        psiginfo(arg___pinfo, arg___s)
+    })
+}
+pub unsafe fn sigblock(arg___mask: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn sigblock(arg___mask: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+        }
+        sigblock(arg___mask)
+    })
+}
+pub unsafe fn sigsetmask(arg___mask: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn sigsetmask(arg___mask: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+        }
+        sigsetmask(arg___mask)
+    })
+}
+pub unsafe fn siggetmask() -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn siggetmask() -> ::std::os::raw::c_int;
+        }
+        siggetmask()
+    })
+}
+pub type sig_t = __sighandler_t;
+pub unsafe fn sigemptyset(arg___set: *mut sigset_t) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn sigemptyset(arg___set: *mut sigset_t) -> ::std::os::raw::c_int;
+        }
+        sigemptyset(arg___set)
+    })
+}
+pub unsafe fn sigfillset(arg___set: *mut sigset_t) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn sigfillset(arg___set: *mut sigset_t) -> ::std::os::raw::c_int;
+        }
+        sigfillset(arg___set)
     })
 }
 pub unsafe fn sigaddset(
-    arg_arg1: *mut sigset_t,
-    arg_arg2: ::std::os::raw::c_int,
+    arg___set: *mut sigset_t,
+    arg___signo: ::std::os::raw::c_int,
 ) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
             fn sigaddset(
-                arg_arg1: *mut sigset_t,
-                arg_arg2: ::std::os::raw::c_int,
+                arg___set: *mut sigset_t,
+                arg___signo: ::std::os::raw::c_int,
             ) -> ::std::os::raw::c_int;
         }
-        sigaddset(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn sigaltstack(
-    arg_arg1: *const stack_t,
-    arg_arg2: *mut stack_t,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn sigaltstack(
-                arg_arg1: *const stack_t,
-                arg_arg2: *mut stack_t,
-            ) -> ::std::os::raw::c_int;
-        }
-        sigaltstack(arg_arg1, arg_arg2)
+        sigaddset(arg___set, arg___signo)
     })
 }
 pub unsafe fn sigdelset(
-    arg_arg1: *mut sigset_t,
-    arg_arg2: ::std::os::raw::c_int,
+    arg___set: *mut sigset_t,
+    arg___signo: ::std::os::raw::c_int,
 ) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
             fn sigdelset(
-                arg_arg1: *mut sigset_t,
-                arg_arg2: ::std::os::raw::c_int,
+                arg___set: *mut sigset_t,
+                arg___signo: ::std::os::raw::c_int,
             ) -> ::std::os::raw::c_int;
         }
-        sigdelset(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn sigemptyset(arg_arg1: *mut sigset_t) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn sigemptyset(arg_arg1: *mut sigset_t) -> ::std::os::raw::c_int;
-        }
-        sigemptyset(arg_arg1)
-    })
-}
-pub unsafe fn sigfillset(arg_arg1: *mut sigset_t) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn sigfillset(arg_arg1: *mut sigset_t) -> ::std::os::raw::c_int;
-        }
-        sigfillset(arg_arg1)
-    })
-}
-pub unsafe fn sighold(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn sighold(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
-        }
-        sighold(arg_arg1)
-    })
-}
-pub unsafe fn sigignore(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn sigignore(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
-        }
-        sigignore(arg_arg1)
-    })
-}
-pub unsafe fn siginterrupt(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: ::std::os::raw::c_int,
-) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn siginterrupt(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: ::std::os::raw::c_int,
-            ) -> ::std::os::raw::c_int;
-        }
-        siginterrupt(arg_arg1, arg_arg2)
+        sigdelset(arg___set, arg___signo)
     })
 }
 pub unsafe fn sigismember(
-    arg_arg1: *const sigset_t,
-    arg_arg2: ::std::os::raw::c_int,
+    arg___set: *const sigset_t,
+    arg___signo: ::std::os::raw::c_int,
 ) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
             fn sigismember(
-                arg_arg1: *const sigset_t,
-                arg_arg2: ::std::os::raw::c_int,
+                arg___set: *const sigset_t,
+                arg___signo: ::std::os::raw::c_int,
             ) -> ::std::os::raw::c_int;
         }
-        sigismember(arg_arg1, arg_arg2)
+        sigismember(arg___set, arg___signo)
     })
 }
-pub unsafe fn sigpause(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn sigpause(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
-        }
-        sigpause(arg_arg1)
-    })
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct sigaction {
+    pub __sigaction_handler: sigaction__bindgen_ty_1,
+    pub sa_mask: __sigset_t,
+    pub sa_flags: ::std::os::raw::c_int,
+    pub sa_restorer: ::std::option::Option<unsafe extern "C" fn()>,
 }
-pub unsafe fn sigpending(arg_arg1: *mut sigset_t) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn sigpending(arg_arg1: *mut sigset_t) -> ::std::os::raw::c_int;
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub union sigaction__bindgen_ty_1 {
+    pub sa_handler: __sighandler_t,
+    pub sa_sigaction: ::std::option::Option<
+        unsafe extern "C" fn(
+            arg1: ::std::os::raw::c_int,
+            arg2: *mut siginfo_t,
+            arg3: *mut ::std::os::raw::c_void,
+        ),
+    >,
+}
+impl Default for sigaction__bindgen_ty_1 {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
         }
-        sigpending(arg_arg1)
-    })
+    }
+}
+impl Default for sigaction {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
 }
 pub unsafe fn sigprocmask(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: *const sigset_t,
-    arg_arg3: *mut sigset_t,
+    arg___how: ::std::os::raw::c_int,
+    arg___set: *const sigset_t,
+    arg___oset: *mut sigset_t,
 ) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
             fn sigprocmask(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: *const sigset_t,
-                arg_arg3: *mut sigset_t,
+                arg___how: ::std::os::raw::c_int,
+                arg___set: *const sigset_t,
+                arg___oset: *mut sigset_t,
             ) -> ::std::os::raw::c_int;
         }
-        sigprocmask(arg_arg1, arg_arg2, arg_arg3)
+        sigprocmask(arg___how, arg___set, arg___oset)
     })
 }
-pub unsafe fn sigrelse(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
+pub unsafe fn sigsuspend(arg___set: *const sigset_t) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn sigrelse(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
+            fn sigsuspend(arg___set: *const sigset_t) -> ::std::os::raw::c_int;
         }
-        sigrelse(arg_arg1)
+        sigsuspend(arg___set)
     })
 }
-pub unsafe fn sigset(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: ::std::option::Option<unsafe extern "C" fn(arg1: ::std::os::raw::c_int)>,
-) -> ::std::option::Option<
-    unsafe extern "C" fn(
-        arg1: ::std::os::raw::c_int,
-        arg2: ::std::option::Option<unsafe extern "C" fn(arg1: ::std::os::raw::c_int)>,
-    ),
-> {
+pub unsafe fn sigaction(
+    arg___sig: ::std::os::raw::c_int,
+    arg___act: *const sigaction,
+    arg___oact: *mut sigaction,
+) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn sigset(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: ::std::option::Option<unsafe extern "C" fn(arg1: ::std::os::raw::c_int)>,
-            ) -> ::std::option::Option<
-                unsafe extern "C" fn(
-                    arg1: ::std::os::raw::c_int,
-                    arg2: ::std::option::Option<unsafe extern "C" fn(arg1: ::std::os::raw::c_int)>,
-                ),
-            >;
+            fn sigaction(
+                arg___sig: ::std::os::raw::c_int,
+                arg___act: *const sigaction,
+                arg___oact: *mut sigaction,
+            ) -> ::std::os::raw::c_int;
         }
-        sigset(arg_arg1, arg_arg2)
+        sigaction(arg___sig, arg___act, arg___oact)
     })
 }
-pub unsafe fn sigsuspend(arg_arg1: *const sigset_t) -> ::std::os::raw::c_int {
+pub unsafe fn sigpending(arg___set: *mut sigset_t) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn sigsuspend(arg_arg1: *const sigset_t) -> ::std::os::raw::c_int;
+            fn sigpending(arg___set: *mut sigset_t) -> ::std::os::raw::c_int;
         }
-        sigsuspend(arg_arg1)
+        sigpending(arg___set)
     })
 }
 pub unsafe fn sigwait(
-    arg_arg1: *const sigset_t,
-    arg_arg2: *mut ::std::os::raw::c_int,
+    arg___set: *const sigset_t,
+    arg___sig: *mut ::std::os::raw::c_int,
 ) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
             fn sigwait(
-                arg_arg1: *const sigset_t,
-                arg_arg2: *mut ::std::os::raw::c_int,
+                arg___set: *const sigset_t,
+                arg___sig: *mut ::std::os::raw::c_int,
             ) -> ::std::os::raw::c_int;
         }
-        sigwait(arg_arg1, arg_arg2)
+        sigwait(arg___set, arg___sig)
     })
 }
-pub unsafe fn psignal(arg_arg1: ::std::os::raw::c_uint, arg_arg2: *const ::std::os::raw::c_char) {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn psignal(arg_arg1: ::std::os::raw::c_uint, arg_arg2: *const ::std::os::raw::c_char);
-        }
-        psignal(arg_arg1, arg_arg2)
-    })
-}
-pub unsafe fn sigblock(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn sigblock(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
-        }
-        sigblock(arg_arg1)
-    })
-}
-pub unsafe fn sigsetmask(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int {
-    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
-        extern "C" {
-            fn sigsetmask(arg_arg1: ::std::os::raw::c_int) -> ::std::os::raw::c_int;
-        }
-        sigsetmask(arg_arg1)
-    })
-}
-pub unsafe fn sigvec(
-    arg_arg1: ::std::os::raw::c_int,
-    arg_arg2: *mut sigvec,
-    arg_arg3: *mut sigvec,
+pub unsafe fn sigwaitinfo(
+    arg___set: *const sigset_t,
+    arg___info: *mut siginfo_t,
 ) -> ::std::os::raw::c_int {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn sigvec(
-                arg_arg1: ::std::os::raw::c_int,
-                arg_arg2: *mut sigvec,
-                arg_arg3: *mut sigvec,
+            fn sigwaitinfo(
+                arg___set: *const sigset_t,
+                arg___info: *mut siginfo_t,
             ) -> ::std::os::raw::c_int;
         }
-        sigvec(arg_arg1, arg_arg2, arg_arg3)
+        sigwaitinfo(arg___set, arg___info)
+    })
+}
+pub unsafe fn sigtimedwait(
+    arg___set: *const sigset_t,
+    arg___info: *mut siginfo_t,
+    arg___timeout: *const timespec,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn sigtimedwait(
+                arg___set: *const sigset_t,
+                arg___info: *mut siginfo_t,
+                arg___timeout: *const timespec,
+            ) -> ::std::os::raw::c_int;
+        }
+        sigtimedwait(arg___set, arg___info, arg___timeout)
+    })
+}
+pub unsafe fn sigqueue(
+    arg___pid: __pid_t,
+    arg___sig: ::std::os::raw::c_int,
+    arg___val: sigval,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn sigqueue(
+                arg___pid: __pid_t,
+                arg___sig: ::std::os::raw::c_int,
+                arg___val: sigval,
+            ) -> ::std::os::raw::c_int;
+        }
+        sigqueue(arg___pid, arg___sig, arg___val)
+    })
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct _fpx_sw_bytes {
+    pub magic1: __uint32_t,
+    pub extended_size: __uint32_t,
+    pub xstate_bv: __uint64_t,
+    pub xstate_size: __uint32_t,
+    pub __glibc_reserved1: [__uint32_t; 7usize],
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct _fpreg {
+    pub significand: [::std::os::raw::c_ushort; 4usize],
+    pub exponent: ::std::os::raw::c_ushort,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct _fpxreg {
+    pub significand: [::std::os::raw::c_ushort; 4usize],
+    pub exponent: ::std::os::raw::c_ushort,
+    pub __glibc_reserved1: [::std::os::raw::c_ushort; 3usize],
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct _xmmreg {
+    pub element: [__uint32_t; 4usize],
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct _fpstate {
+    pub cwd: __uint16_t,
+    pub swd: __uint16_t,
+    pub ftw: __uint16_t,
+    pub fop: __uint16_t,
+    pub rip: __uint64_t,
+    pub rdp: __uint64_t,
+    pub mxcsr: __uint32_t,
+    pub mxcr_mask: __uint32_t,
+    pub _st: [_fpxreg; 8usize],
+    pub _xmm: [_xmmreg; 16usize],
+    pub __glibc_reserved1: [__uint32_t; 24usize],
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct sigcontext {
+    pub r8: __uint64_t,
+    pub r9: __uint64_t,
+    pub r10: __uint64_t,
+    pub r11: __uint64_t,
+    pub r12: __uint64_t,
+    pub r13: __uint64_t,
+    pub r14: __uint64_t,
+    pub r15: __uint64_t,
+    pub rdi: __uint64_t,
+    pub rsi: __uint64_t,
+    pub rbp: __uint64_t,
+    pub rbx: __uint64_t,
+    pub rdx: __uint64_t,
+    pub rax: __uint64_t,
+    pub rcx: __uint64_t,
+    pub rsp: __uint64_t,
+    pub rip: __uint64_t,
+    pub eflags: __uint64_t,
+    pub cs: ::std::os::raw::c_ushort,
+    pub gs: ::std::os::raw::c_ushort,
+    pub fs: ::std::os::raw::c_ushort,
+    pub __pad0: ::std::os::raw::c_ushort,
+    pub err: __uint64_t,
+    pub trapno: __uint64_t,
+    pub oldmask: __uint64_t,
+    pub cr2: __uint64_t,
+    pub __bindgen_anon_1: sigcontext__bindgen_ty_1,
+    pub __reserved1: [__uint64_t; 8usize],
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub union sigcontext__bindgen_ty_1 {
+    pub fpstate: *mut _fpstate,
+    pub __fpstate_word: __uint64_t,
+}
+impl Default for sigcontext__bindgen_ty_1 {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+impl Default for sigcontext {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct _xsave_hdr {
+    pub xstate_bv: __uint64_t,
+    pub __glibc_reserved1: [__uint64_t; 2usize],
+    pub __glibc_reserved2: [__uint64_t; 5usize],
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct _ymmh_state {
+    pub ymmh_space: [__uint32_t; 64usize],
+}
+impl Default for _ymmh_state {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct _xstate {
+    pub fpstate: _fpstate,
+    pub xstate_hdr: _xsave_hdr,
+    pub ymmh: _ymmh_state,
+}
+impl Default for _xstate {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub unsafe fn sigreturn(arg___scp: *mut sigcontext) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn sigreturn(arg___scp: *mut sigcontext) -> ::std::os::raw::c_int;
+        }
+        sigreturn(arg___scp)
+    })
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct stack_t {
+    pub ss_sp: *mut ::std::os::raw::c_void,
+    pub ss_flags: ::std::os::raw::c_int,
+    pub ss_size: usize,
+}
+impl Default for stack_t {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type greg_t = ::std::os::raw::c_longlong;
+pub type gregset_t = [greg_t; 23usize];
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct _libc_fpxreg {
+    pub significand: [::std::os::raw::c_ushort; 4usize],
+    pub exponent: ::std::os::raw::c_ushort,
+    pub __glibc_reserved1: [::std::os::raw::c_ushort; 3usize],
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct _libc_xmmreg {
+    pub element: [__uint32_t; 4usize],
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct _libc_fpstate {
+    pub cwd: __uint16_t,
+    pub swd: __uint16_t,
+    pub ftw: __uint16_t,
+    pub fop: __uint16_t,
+    pub rip: __uint64_t,
+    pub rdp: __uint64_t,
+    pub mxcsr: __uint32_t,
+    pub mxcr_mask: __uint32_t,
+    pub _st: [_libc_fpxreg; 8usize],
+    pub _xmm: [_libc_xmmreg; 16usize],
+    pub __glibc_reserved1: [__uint32_t; 24usize],
+}
+pub type fpregset_t = *mut _libc_fpstate;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct mcontext_t {
+    pub gregs: gregset_t,
+    pub fpregs: fpregset_t,
+    pub __reserved1: [::std::os::raw::c_ulonglong; 8usize],
+}
+impl Default for mcontext_t {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ucontext_t {
+    pub uc_flags: ::std::os::raw::c_ulong,
+    pub uc_link: *mut ucontext_t,
+    pub uc_stack: stack_t,
+    pub uc_mcontext: mcontext_t,
+    pub uc_sigmask: sigset_t,
+    pub __fpregs_mem: _libc_fpstate,
+    pub __ssp: [::std::os::raw::c_ulonglong; 4usize],
+}
+impl Default for ucontext_t {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub unsafe fn siginterrupt(
+    arg___sig: ::std::os::raw::c_int,
+    arg___interrupt: ::std::os::raw::c_int,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn siginterrupt(
+                arg___sig: ::std::os::raw::c_int,
+                arg___interrupt: ::std::os::raw::c_int,
+            ) -> ::std::os::raw::c_int;
+        }
+        siginterrupt(arg___sig, arg___interrupt)
+    })
+}
+pub const SS_ONSTACK: ::std::os::raw::c_uint = 1;
+pub const SS_DISABLE: ::std::os::raw::c_uint = 2;
+pub type _bindgen_ty_18 = ::std::os::raw::c_uint;
+pub unsafe fn sigaltstack(
+    arg___ss: *const stack_t,
+    arg___oss: *mut stack_t,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn sigaltstack(
+                arg___ss: *const stack_t,
+                arg___oss: *mut stack_t,
+            ) -> ::std::os::raw::c_int;
+        }
+        sigaltstack(arg___ss, arg___oss)
+    })
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct sigstack {
+    pub ss_sp: *mut ::std::os::raw::c_void,
+    pub ss_onstack: ::std::os::raw::c_int,
+}
+impl Default for sigstack {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub unsafe fn sigstack(arg___ss: *mut sigstack, arg___oss: *mut sigstack) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn sigstack(arg___ss: *mut sigstack, arg___oss: *mut sigstack)
+                -> ::std::os::raw::c_int;
+        }
+        sigstack(arg___ss, arg___oss)
+    })
+}
+pub unsafe fn pthread_sigmask(
+    arg___how: ::std::os::raw::c_int,
+    arg___newmask: *const __sigset_t,
+    arg___oldmask: *mut __sigset_t,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn pthread_sigmask(
+                arg___how: ::std::os::raw::c_int,
+                arg___newmask: *const __sigset_t,
+                arg___oldmask: *mut __sigset_t,
+            ) -> ::std::os::raw::c_int;
+        }
+        pthread_sigmask(arg___how, arg___newmask, arg___oldmask)
+    })
+}
+pub unsafe fn pthread_kill(
+    arg___threadid: pthread_t,
+    arg___signo: ::std::os::raw::c_int,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn pthread_kill(
+                arg___threadid: pthread_t,
+                arg___signo: ::std::os::raw::c_int,
+            ) -> ::std::os::raw::c_int;
+        }
+        pthread_kill(arg___threadid, arg___signo)
+    })
+}
+pub unsafe fn __libc_current_sigrtmin() -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __libc_current_sigrtmin() -> ::std::os::raw::c_int;
+        }
+        __libc_current_sigrtmin()
+    })
+}
+pub unsafe fn __libc_current_sigrtmax() -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn __libc_current_sigrtmax() -> ::std::os::raw::c_int;
+        }
+        __libc_current_sigrtmax()
     })
 }
 pub type pg_time_t = int64;
@@ -35081,9 +36486,8 @@ pub unsafe fn CancelBackup() {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct sockaddr_un {
-    pub sun_len: ::std::os::raw::c_uchar,
     pub sun_family: sa_family_t,
-    pub sun_path: [::std::os::raw::c_char; 104usize],
+    pub sun_path: [::std::os::raw::c_char; 108usize],
 }
 impl Default for sockaddr_un {
     fn default() -> Self {
@@ -35176,20 +36580,45 @@ pub const RmgrIds_RM_LOGICALMSG_ID: RmgrIds = 21;
 pub const RmgrIds_RM_NEXT_ID: RmgrIds = 22;
 pub type RmgrIds = ::std::os::raw::c_uint;
 pub type pg_crc32c = uint32;
-pub unsafe fn pg_comp_crc32c_armv8(
+pub unsafe fn pg_comp_crc32c_sb8(
     arg_crc: pg_crc32c,
     arg_data: *const ::std::os::raw::c_void,
     arg_len: usize,
 ) -> pg_crc32c {
     crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
         extern "C" {
-            fn pg_comp_crc32c_armv8(
+            fn pg_comp_crc32c_sb8(
                 arg_crc: pg_crc32c,
                 arg_data: *const ::std::os::raw::c_void,
                 arg_len: usize,
             ) -> pg_crc32c;
         }
-        pg_comp_crc32c_armv8(arg_crc, arg_data, arg_len)
+        pg_comp_crc32c_sb8(arg_crc, arg_data, arg_len)
+    })
+}
+extern "C" {
+    pub static mut pg_comp_crc32c: ::std::option::Option<
+        unsafe extern "C" fn(
+            crc: pg_crc32c,
+            data: *const ::std::os::raw::c_void,
+            len: usize,
+        ) -> pg_crc32c,
+    >;
+}
+pub unsafe fn pg_comp_crc32c_sse42(
+    arg_crc: pg_crc32c,
+    arg_data: *const ::std::os::raw::c_void,
+    arg_len: usize,
+) -> pg_crc32c {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn pg_comp_crc32c_sse42(
+                arg_crc: pg_crc32c,
+                arg_data: *const ::std::os::raw::c_void,
+                arg_len: usize,
+            ) -> pg_crc32c;
+        }
+        pg_comp_crc32c_sse42(arg_crc, arg_data, arg_len)
     })
 }
 pub const ForkNumber_InvalidForkNumber: ForkNumber = -1;
@@ -67672,6 +69101,269 @@ pub unsafe fn check_srf_call_placement(
         check_srf_call_placement(arg_pstate, arg_last_srf, arg_location)
     })
 }
+pub type Operator = HeapTuple;
+pub unsafe fn LookupOperName(
+    arg_pstate: *mut ParseState,
+    arg_opername: *mut List,
+    arg_oprleft: Oid,
+    arg_oprright: Oid,
+    arg_noError: bool,
+    arg_location: ::std::os::raw::c_int,
+) -> Oid {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn LookupOperName(
+                arg_pstate: *mut ParseState,
+                arg_opername: *mut List,
+                arg_oprleft: Oid,
+                arg_oprright: Oid,
+                arg_noError: bool,
+                arg_location: ::std::os::raw::c_int,
+            ) -> Oid;
+        }
+        LookupOperName(
+            arg_pstate,
+            arg_opername,
+            arg_oprleft,
+            arg_oprright,
+            arg_noError,
+            arg_location,
+        )
+    })
+}
+pub unsafe fn LookupOperWithArgs(arg_oper: *mut ObjectWithArgs, arg_noError: bool) -> Oid {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn LookupOperWithArgs(arg_oper: *mut ObjectWithArgs, arg_noError: bool) -> Oid;
+        }
+        LookupOperWithArgs(arg_oper, arg_noError)
+    })
+}
+pub unsafe fn oper(
+    arg_pstate: *mut ParseState,
+    arg_op: *mut List,
+    arg_arg1: Oid,
+    arg_arg2: Oid,
+    arg_noError: bool,
+    arg_location: ::std::os::raw::c_int,
+) -> Operator {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn oper(
+                arg_pstate: *mut ParseState,
+                arg_op: *mut List,
+                arg_arg1: Oid,
+                arg_arg2: Oid,
+                arg_noError: bool,
+                arg_location: ::std::os::raw::c_int,
+            ) -> Operator;
+        }
+        oper(
+            arg_pstate,
+            arg_op,
+            arg_arg1,
+            arg_arg2,
+            arg_noError,
+            arg_location,
+        )
+    })
+}
+pub unsafe fn right_oper(
+    arg_pstate: *mut ParseState,
+    arg_op: *mut List,
+    arg_arg: Oid,
+    arg_noError: bool,
+    arg_location: ::std::os::raw::c_int,
+) -> Operator {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn right_oper(
+                arg_pstate: *mut ParseState,
+                arg_op: *mut List,
+                arg_arg: Oid,
+                arg_noError: bool,
+                arg_location: ::std::os::raw::c_int,
+            ) -> Operator;
+        }
+        right_oper(arg_pstate, arg_op, arg_arg, arg_noError, arg_location)
+    })
+}
+pub unsafe fn left_oper(
+    arg_pstate: *mut ParseState,
+    arg_op: *mut List,
+    arg_arg: Oid,
+    arg_noError: bool,
+    arg_location: ::std::os::raw::c_int,
+) -> Operator {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn left_oper(
+                arg_pstate: *mut ParseState,
+                arg_op: *mut List,
+                arg_arg: Oid,
+                arg_noError: bool,
+                arg_location: ::std::os::raw::c_int,
+            ) -> Operator;
+        }
+        left_oper(arg_pstate, arg_op, arg_arg, arg_noError, arg_location)
+    })
+}
+pub unsafe fn compatible_oper(
+    arg_pstate: *mut ParseState,
+    arg_op: *mut List,
+    arg_arg1: Oid,
+    arg_arg2: Oid,
+    arg_noError: bool,
+    arg_location: ::std::os::raw::c_int,
+) -> Operator {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn compatible_oper(
+                arg_pstate: *mut ParseState,
+                arg_op: *mut List,
+                arg_arg1: Oid,
+                arg_arg2: Oid,
+                arg_noError: bool,
+                arg_location: ::std::os::raw::c_int,
+            ) -> Operator;
+        }
+        compatible_oper(
+            arg_pstate,
+            arg_op,
+            arg_arg1,
+            arg_arg2,
+            arg_noError,
+            arg_location,
+        )
+    })
+}
+pub unsafe fn get_sort_group_operators(
+    arg_argtype: Oid,
+    arg_needLT: bool,
+    arg_needEQ: bool,
+    arg_needGT: bool,
+    arg_ltOpr: *mut Oid,
+    arg_eqOpr: *mut Oid,
+    arg_gtOpr: *mut Oid,
+    arg_isHashable: *mut bool,
+) {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn get_sort_group_operators(
+                arg_argtype: Oid,
+                arg_needLT: bool,
+                arg_needEQ: bool,
+                arg_needGT: bool,
+                arg_ltOpr: *mut Oid,
+                arg_eqOpr: *mut Oid,
+                arg_gtOpr: *mut Oid,
+                arg_isHashable: *mut bool,
+            );
+        }
+        get_sort_group_operators(
+            arg_argtype,
+            arg_needLT,
+            arg_needEQ,
+            arg_needGT,
+            arg_ltOpr,
+            arg_eqOpr,
+            arg_gtOpr,
+            arg_isHashable,
+        )
+    })
+}
+pub unsafe fn compatible_oper_opid(
+    arg_op: *mut List,
+    arg_arg1: Oid,
+    arg_arg2: Oid,
+    arg_noError: bool,
+) -> Oid {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn compatible_oper_opid(
+                arg_op: *mut List,
+                arg_arg1: Oid,
+                arg_arg2: Oid,
+                arg_noError: bool,
+            ) -> Oid;
+        }
+        compatible_oper_opid(arg_op, arg_arg1, arg_arg2, arg_noError)
+    })
+}
+pub unsafe fn oprid(arg_op: Operator) -> Oid {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn oprid(arg_op: Operator) -> Oid;
+        }
+        oprid(arg_op)
+    })
+}
+pub unsafe fn oprfuncid(arg_op: Operator) -> Oid {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn oprfuncid(arg_op: Operator) -> Oid;
+        }
+        oprfuncid(arg_op)
+    })
+}
+pub unsafe fn make_op(
+    arg_pstate: *mut ParseState,
+    arg_opname: *mut List,
+    arg_ltree: *mut Node,
+    arg_rtree: *mut Node,
+    arg_last_srf: *mut Node,
+    arg_location: ::std::os::raw::c_int,
+) -> *mut Expr {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn make_op(
+                arg_pstate: *mut ParseState,
+                arg_opname: *mut List,
+                arg_ltree: *mut Node,
+                arg_rtree: *mut Node,
+                arg_last_srf: *mut Node,
+                arg_location: ::std::os::raw::c_int,
+            ) -> *mut Expr;
+        }
+        make_op(
+            arg_pstate,
+            arg_opname,
+            arg_ltree,
+            arg_rtree,
+            arg_last_srf,
+            arg_location,
+        )
+    })
+}
+pub unsafe fn make_scalar_array_op(
+    arg_pstate: *mut ParseState,
+    arg_opname: *mut List,
+    arg_useOr: bool,
+    arg_ltree: *mut Node,
+    arg_rtree: *mut Node,
+    arg_location: ::std::os::raw::c_int,
+) -> *mut Expr {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn make_scalar_array_op(
+                arg_pstate: *mut ParseState,
+                arg_opname: *mut List,
+                arg_useOr: bool,
+                arg_ltree: *mut Node,
+                arg_rtree: *mut Node,
+                arg_location: ::std::os::raw::c_int,
+            ) -> *mut Expr;
+        }
+        make_scalar_array_op(
+            arg_pstate,
+            arg_opname,
+            arg_useOr,
+            arg_ltree,
+            arg_rtree,
+            arg_location,
+        )
+    })
+}
 pub type Type = HeapTuple;
 pub unsafe fn LookupTypeName(
     arg_pstate: *mut ParseState,
@@ -93157,6 +94849,20 @@ pub unsafe fn xidComparator(
         xidComparator(arg_arg1, arg_arg2)
     })
 }
+pub unsafe fn xidLogicalComparator(
+    arg_arg1: *const ::std::os::raw::c_void,
+    arg_arg2: *const ::std::os::raw::c_void,
+) -> ::std::os::raw::c_int {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn xidLogicalComparator(
+                arg_arg1: *const ::std::os::raw::c_void,
+                arg_arg2: *const ::std::os::raw::c_void,
+            ) -> ::std::os::raw::c_int;
+        }
+        xidLogicalComparator(arg_arg1, arg_arg2)
+    })
+}
 pub unsafe fn inet_cidr_ntop(
     arg_af: ::std::os::raw::c_int,
     arg_src: *const ::std::os::raw::c_void,
@@ -96696,8 +98402,29 @@ pub unsafe fn SharedRecordTypmodRegistryAttach(arg_arg1: *mut SharedRecordTypmod
         SharedRecordTypmodRegistryAttach(arg_arg1)
     })
 }
-pub type __builtin_va_list = *mut ::std::os::raw::c_char;
-pub type __uint128_t = u128;
+pub type __builtin_va_list = [__va_list_tag; 1usize];
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct __va_list_tag {
+    pub gp_offset: ::std::os::raw::c_uint,
+    pub fp_offset: ::std::os::raw::c_uint,
+    pub overflow_arg_area: *mut ::std::os::raw::c_void,
+    pub reg_save_area: *mut ::std::os::raw::c_void,
+}
+impl Default for __va_list_tag {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct __locale_data {
+    pub _address: u8,
+}
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct AttrMissing {
