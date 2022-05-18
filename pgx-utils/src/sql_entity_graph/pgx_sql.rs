@@ -280,7 +280,7 @@ impl PgxSql {
             if let Some(syntax) = ps.find_syntax_by_extension("sql") {
                 let mut h = HighlightLines::new(syntax, &theme);
                 for line in LinesWithEndings::from(&generated) {
-                    let ranges: Vec<(Style, &str)> = h.highlight(line, &ps);
+                    let ranges: Vec<(Style, &str)> = h.highlight_line(line, &ps)?;
                     // Concept from https://github.com/sharkdp/bat/blob/1b030dc03b906aa345f44b8266bffeea77d763fe/src/terminal.rs#L6
                     for (style, content) in ranges {
                         if style.foreground.a == 0x01 {
