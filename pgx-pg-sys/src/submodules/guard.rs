@@ -13,6 +13,7 @@ use crate::FlushErrorState;
 use std::any::Any;
 use std::cell::Cell;
 use std::panic::catch_unwind;
+use std::mem;
 
 extern "C" {
     fn pg_re_throw();
@@ -70,39 +71,8 @@ fn take_panic_location() -> PanicLocation {
     })
 }
 
-// via pg_module_magic!() this gets set to Some(()) for the "main" thread, and remains at None
-// for all other threads.
-#[cfg(debug_assertions)]
-thread_local! { pub(crate) static IS_MAIN_THREAD: once_cell::sync::OnceCell<()> = once_cell::sync::OnceCell::new() }
-
 pub fn register_pg_guard_panic_handler() {
-    // first, lets ensure we're not calling ourselves twice
-    #[cfg(debug_assertions)]
-    {
-        if IS_MAIN_THREAD.with(|v| v.get().is_some()) {
-            panic!("IS_MAIN_THREAD has already been set")
-        }
-
-        // it's expected that this function will only ever be called by `pg_module_magic!()` by the main thread
-        IS_MAIN_THREAD.with(|v| v.set(()).expect("failed to set main thread sentinel"));
-    }
-
     std::panic::set_hook(Box::new(|info| {
-        #[cfg(debug_assertions)]
-        {
-            if IS_MAIN_THREAD.with(|v| v.get().is_none()) {
-                // a thread that isn't the main thread panic!()d
-                // we make a best effort to push a message to stderr, which hopefully
-                // Postgres is logging somewhere
-                eprintln!(
-                    "thread={:?}, id={:?}, {}",
-                    std::thread::current().name(),
-                    std::thread::current().id(),
-                    info
-                );
-            }
-        }
-
         PANIC_LOCATION.with(|p| {
             let existing = p.take();
 
@@ -261,7 +231,7 @@ where
         // the panic!()
         Ok(message) => {
             let location = take_panic_location();
-            let c_message = std::ffi::CString::new(message.clone()).unwrap();
+            let c_message = std::ffi::CString::new(message).unwrap();
             let c_file = std::ffi::CString::new(location.file).unwrap();
 
             unsafe {
@@ -274,7 +244,7 @@ where
                     location.col as i32,
                 );
             }
-            unreachable!("ereport() failed at depth==0 with message: {}", message);
+            unreachable!("ereport() failed at depth==0");
         }
 
         // the error is a JumpContext, so we need to longjmp back into Postgres
@@ -287,18 +257,22 @@ where
 
 /// convert types of `e` that we understand/expect into either a
 /// `Ok(String)` or a `Err<JumpContext>`
-fn downcast_err(e: Box<dyn Any + Send>) -> Result<String, JumpContext> {
+fn downcast_err(mut e: Box<dyn Any + Send>) -> Result<String, JumpContext> {
     if let Some(cxt) = e.downcast_ref::<JumpContext>() {
         Err(cxt.clone())
-    } else if let Some(s) = e.downcast_ref::<&str>() {
-        Ok((*s).to_string())
-    } else if let Some(s) = e.downcast_ref::<String>() {
-        Ok(s.to_string())
+    } else if let Some(&s) = e.downcast_ref::<&str>() {
+        Ok(s.to_owned())
+    } else if let Some(s) = e.downcast_mut::<String>() {
+        // Cloning is overhead, this box is owned, and ownership is theft.
+        Ok(mem::take(s))
     } else if let Some(s) = e.downcast_ref::<PgxPanic>() {
-        Ok(format!(
-            "{}: {}:{}:{}",
-            s.message, s.filename, s.lineno, s.colno
-        ))
+        let PgxPanic {
+            message,
+            filename,
+            lineno,
+            colno,
+        } = s;
+        Ok(format!("{message} at {filename}:{lineno}:{colno}"))
     } else {
         // not a type we understand, so use a generic string
         Ok("Box<Any>".to_string())

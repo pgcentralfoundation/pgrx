@@ -202,7 +202,7 @@ Generates:
 ```sql
 -- src/lib.rs:11
 -- aggregate::demo_sum_state
-CREATE OR REPLACE FUNCTION "demo_sum_state"(
+CREATE FUNCTION "demo_sum_state"(
     "this" DemoSum, /* aggregate::DemoSum */
     "arg_one" integer /* i32 */
 ) RETURNS DemoSum /* aggregate::DemoSum */
@@ -246,7 +246,7 @@ Creates:
 ```sql
 -- src/lib.rs:13
 -- aggregate::demo_sum_state
-CREATE OR REPLACE FUNCTION "demo_sum_state"(
+CREATE FUNCTION "demo_sum_state"(
     "this" DemoSumState, /* aggregate::DemoSumState */
     "arg_one" integer /* i32 */
 ) RETURNS DemoSumState /* aggregate::DemoSumState */

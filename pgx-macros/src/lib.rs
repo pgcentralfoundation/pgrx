@@ -1038,7 +1038,7 @@ Currently `sql` can be provided one of the following:
 
 * Disable SQL generation with `#[pgx(sql = false)]`
 * Call custom SQL generator function with `#[pgx(sql = path::to_function)]`
-* Render a specific fragment of SQL with a string `#[pgx(sql = "CREATE OR REPLACE FUNCTION ...")]`
+* Render a specific fragment of SQL with a string `#[pgx(sql = "CREATE FUNCTION ...")]`
 
 */
 #[proc_macro_attribute]

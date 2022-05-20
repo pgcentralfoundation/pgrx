@@ -11,7 +11,7 @@ use pgx::*;
 pg_module_magic!();
 
 /// ```sql
-/// CREATE OR REPLACE FUNCTION trigger_example()
+/// CREATE FUNCTION trigger_example()
 ///            RETURNS TRIGGER
 ///            LANGUAGE c
 ///            AS 'MODULE_PATHNAME', 'trigger_example_wrapper';
