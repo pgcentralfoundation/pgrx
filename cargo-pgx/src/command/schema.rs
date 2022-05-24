@@ -22,6 +22,7 @@ use pgx_utils::{
     sql_entity_graph::{PgxSql, RustSourceOnlySqlMapping, RustSqlMapping, SqlGraphEntity},
     PgxPgSysStub,
 };
+use once_cell::sync::OnceCell;
 use std::{
     collections::HashSet,
     hash::{Hash, Hasher},
@@ -31,6 +32,8 @@ use std::{
 // Since we support extensions with `#[no_std]`
 extern crate alloc;
 use alloc::vec::Vec;
+
+static POSTMASTER_LIBRARY: OnceCell<libloading::os::unix::Library> = OnceCell::new();
 
 /// Generate extension schema files
 #[derive(clap::Args, Debug)]
@@ -358,14 +361,15 @@ pub(crate) fn generate_schema(
     let source_only_sql_mapping;
 
     unsafe {
-        let _postmaster = libloading::os::unix::Library::open(
-            Some(&postmaster_stub_built),
-            libloading::os::unix::RTLD_NOW | libloading::os::unix::RTLD_GLOBAL,
-        )
-        .expect(&format!(
+        POSTMASTER_LIBRARY.get_or_try_init(|| {
+            libloading::os::unix::Library::open(
+                Some(&postmaster_stub_built),
+                libloading::os::unix::RTLD_NOW | libloading::os::unix::RTLD_GLOBAL,
+            )
+        }).wrap_err_with(|| format!(
             "Couldn't libload {}",
             postmaster_stub_built.display()
-        ));
+        ))?;
 
         let lib =
             libloading::os::unix::Library::open(Some(&lib_so), libloading::os::unix::RTLD_LAZY)
