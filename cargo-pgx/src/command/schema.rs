@@ -16,13 +16,13 @@ use crate::{
 use cargo_toml::Manifest;
 use eyre::{eyre, WrapErr};
 use object::Object;
+use once_cell::sync::OnceCell;
 use owo_colors::OwoColorize;
 use pgx_utils::{
     pg_config::{PgConfig, Pgx},
     sql_entity_graph::{PgxSql, RustSourceOnlySqlMapping, RustSqlMapping, SqlGraphEntity},
     PgxPgSysStub,
 };
-use once_cell::sync::OnceCell;
 use std::{
     collections::HashSet,
     hash::{Hash, Hasher},
