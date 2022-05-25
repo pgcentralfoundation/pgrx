@@ -9,6 +9,7 @@ repository = "https://github.com/zombodb/pgx"
 documentation = "https://docs.rs/pgx-utils"
 readme = "README.md"
 edition = "2021"
+rust-version = "1.58"
 
 [dependencies]
 atty = "0.2.14"

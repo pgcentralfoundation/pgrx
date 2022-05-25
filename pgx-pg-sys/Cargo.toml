@@ -9,6 +9,7 @@ repository = "https://github.com/zombodb/pgx"
 documentation = "https://docs.rs/pgx-pg-sys"
 readme = "README.md"
 edition = "2021"
+rust-version = "1.58"
 
 [features]
 default = [ ]

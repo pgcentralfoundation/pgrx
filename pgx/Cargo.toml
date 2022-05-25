@@ -11,6 +11,7 @@ categories = ["database"]
 keywords = ["database", "postgres", "postgresql", "extension"]
 readme = "../README.md"
 edition = "2021"
+rust-version = "1.58"
 
 [lib]
 crate-type = [ "rlib" ]
