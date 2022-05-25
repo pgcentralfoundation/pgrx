@@ -293,6 +293,7 @@ dependencies = [
  "libloading",
  "num_cpus",
  "object",
+ "once_cell",
  "owo-colors",
  "pgx-utils",
  "proc-macro2",
