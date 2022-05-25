@@ -1444,6 +1444,7 @@ dependencies = [
  "serde",
  "serde_cbor",
  "serde_json",
+ "thiserror",
  "time",
  "tracing",
  "tracing-error",
@@ -1500,6 +1501,7 @@ dependencies = [
  "serde",
  "serde_json",
  "shutdown_hooks",
+ "thiserror",
  "time",
 ]
 
@@ -2507,6 +2509,7 @@ version = "0.0.0"
 dependencies = [
  "pgx",
  "pgx-tests",
+ "thiserror",
 ]
 
 [[package]]

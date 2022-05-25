@@ -47,10 +47,6 @@ impl Display for TryFromDatumError {
 
 impl Error for TryFromDatumError {}
 
-/// A [Result] type that is used to indicate whether a conversion from a Datum to a Rust type
-/// succeeded or failed.
-pub type FromDatumResult<T> = std::result::Result<Option<T>, TryFromDatumError>;
-
 /// Convert a `(pg_sys::Datum, is_null:bool` pair into a Rust type
 ///
 /// Default implementations are provided for the common Rust types.
@@ -98,7 +94,7 @@ pub trait FromDatum {
     }
 
     /// `try_from_datum` is a convenience wrapper around `FromDatum::from_datum` that returns a
-    /// a [FromDatumResult] instead of an `Option`.  It's intended to be used in situations where
+    /// a `Result` instead of an `Option`.  It's intended to be used in situations where
     /// the caller needs to know whether the type conversion succeeded or failed.
     ///
     /// ## Safety
@@ -109,7 +105,7 @@ pub trait FromDatum {
         datum: pg_sys::Datum,
         is_null: bool,
         type_oid: pg_sys::Oid,
-    ) -> FromDatumResult<Self>
+    ) -> Result<Option<Self>, TryFromDatumError>
     where
         Self: Sized + IntoDatum + 'static,
     {
