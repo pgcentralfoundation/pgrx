@@ -119,7 +119,7 @@ custom types.
 
 ## System Requirements
 
-- `rustc` (minimum version 1.52) and `cargo` 
+- `rustc` (minimum version 1.58) and `cargo` 
 - `cargo install rustfmt`
  - `git`
  - `libclang.so`
