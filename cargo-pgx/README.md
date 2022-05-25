@@ -56,7 +56,7 @@ SUBCOMMANDS:
 - `PGX_BUILD_VERBOSE` - Set to true to enable verbose "build.rs" output -- useful for debugging build issues
 - `HTTPS_PROXY` - If set during `cargo pgx init`, it will download the Postgres sources using these proxy settings. For more details refer to the [env_proxy crate documentation](https://docs.rs/env_proxy/*/env_proxy/fn.for_url.html).
 
-## First Time Initialization
+## First Time Initialization {#cargo-pgx-init}
 
 ```shell script
 $ cargo pgx init
