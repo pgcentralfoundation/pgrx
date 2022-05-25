@@ -33,7 +33,7 @@
    + Seamlessly test against all versions
 - **Automatic Schema Generation**
    + Implement extensions entirely in Rust
-      - [Automatic mapping for many Rust types into PostgreSQL](#type-mappings)
+   + [Automatic mapping for many Rust types into PostgreSQL](#mapping-of-postgres-types-to-rust)
    + SQL schemas generated automatically (or manually via `cargo pgx schema`)
    + Include custom SQL with `extension_sql!` & `extension_sql_file!`
 - **Safety First**
@@ -97,7 +97,7 @@ cargo install cargo-pgx
 cargo pgx init
 ```
 
-The `init` command downloads PostgreSQL versions v10 through v14 compiles them to `~/.pgx/`, and runs `initdb`. It's also possible to use an existing (user-writable) PostgreSQL install, or install a subset of versions, see the [`README.md` of `cargo-pgx` for details](cargo-pgx/README.md#cargo-pgx-init).
+The `init` command downloads PostgreSQL versions v10 through v14 compiles them to `~/.pgx/`, and runs `initdb`. It's also possible to use an existing (user-writable) PostgreSQL install, or install a subset of versions, see the [`README.md` of `cargo-pgx` for details](cargo-pgx/README.md#first-time-initialization).
 
 ```bash
 cargo pgx new my_extension
@@ -156,7 +156,7 @@ As new Postgres versions are supported by `pgx`, you can re-run the `pgx init` p
 cargo pgx init
 ```
 
-### Mapping of Postgres types to Rust {#type-mappings}
+### Mapping of Postgres types to Rust
 
 Postgres Type | Rust Type (as `Option<T>`)
 --------------|-----------
