@@ -485,7 +485,7 @@ impl<'a> SpiClient<'a> {
 ///
 /// # Examples
 /// ## Simple cursor
-/// ```ignore // FIXME doctests compilation failing on m1
+/// ```rust,no_run
 /// use pgx::Spi;
 /// Spi::connect(|mut client| {
 ///     let mut cursor = client.open_cursor("SELECT * FROM generate_series(1, 5)", None);
@@ -498,7 +498,7 @@ impl<'a> SpiClient<'a> {
 /// ```
 ///
 /// ## Cursor by name
-/// ```ignore // FIXME doctests compilation failing on m1
+/// ```rust,no_run
 /// use pgx::Spi;
 /// let cursor_name = Spi::connect(|mut client| {
 ///     let mut cursor = client.open_cursor("SELECT * FROM generate_series(1, 5)", None);
