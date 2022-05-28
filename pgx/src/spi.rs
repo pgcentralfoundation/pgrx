@@ -399,7 +399,9 @@ impl<'a> SpiClient<'a> {
     }
 
     /// sets up a cursor that will execute the specified query.
-    /// Rows may be fetched then using [`SpiCursor::fetch`]
+    /// Rows may be then fetched using [`SpiCursor::fetch`]
+    ///
+    /// See [`SpiCursor`] docs for usage details.
     pub fn open_cursor(
         &mut self,
         query: &str,
@@ -446,7 +448,10 @@ impl<'a> SpiClient<'a> {
         SpiCursor { ptr }
     }
 
-    /// find a cursor in transaction by name. Name should usually be retrieved via [`SpiCursor::into_name`]
+    /// find a cursor in transaction by name.
+    /// Name should usually be retrieved via [`SpiCursor::into_name`]
+    ///
+    /// See [`SpiCursor`] docs for usage details.
     pub fn find_cursor(
         &mut self,
         name: String,
@@ -463,7 +468,51 @@ impl<'a> SpiClient<'a> {
     }
 }
 
-
+/// Represents a Postgres cursor (internally, a portal), allowing to retrieve result rows a few
+/// at a time. Moreover, a cursor can be left open within a transaction, and accessed in
+/// multiple independent Spi sessions within the transaction.
+///
+/// A cursor can be created via [`SpiClient::open_cursor()`] from a query; a cursor left open (i.e.
+/// not [`Self::close()`]d) can be turned into a cursor name via [`Self::into_name()`] and later
+/// retrieved by name (in the same transaction) via [`SpiClient::find_cursor()`].
+///
+/// # Important notes about memory usage
+/// Result sets returned by [`SpiCursor::fetch()`] will not be freed until the current
+/// Spi session is complete; this is a Pgx limitation that might get lifted in the future.
+///
+/// In the meantime, if you're using cursors to limit memory usage, make sure to use
+/// multiple separate Spi sessions, retrieving the cursor by name.
+///
+/// # Examples
+/// ## Simple cursor
+/// ```ignore // FIXME doctests compilation failing on m1
+/// use pgx::Spi;
+/// Spi::connect(|mut client| {
+///     let mut cursor = client.open_cursor("SELECT * FROM generate_series(1, 5)", None);
+///     assert_eq!(Some(1u32), cursor.fetch(1).get_one());
+///     assert_eq!(Some(2u32), cursor.fetch(2).get_one());
+///     assert_eq!(Some(3u32), cursor.fetch(3).get_one());
+///     Ok(None::<()>)
+///     // <--- all three result sets get freed only at this point
+/// });
+/// ```
+///
+/// ## Cursor by name
+/// ```ignore // FIXME doctests compilation failing on m1
+/// use pgx::Spi;
+/// let cursor_name = Spi::connect(|mut client| {
+///     let mut cursor = client.open_cursor("SELECT * FROM generate_series(1, 5)", None);
+///     assert_eq!(Some(1u32), cursor.fetch(1).get_one());
+///     Ok(Some(cursor.into_name()))
+///     // <--- first result set gets freed at this point
+/// }).unwrap();
+/// Spi::connect(|mut client| {
+///     let mut cursor = client.find_cursor(cursor_name);
+///     assert_eq!(Some(2u32), cursor.fetch(1).get_one());
+///     Ok(None::<()>)
+///     // <--- second result set gets freed at this point
+/// });
+/// ```
 pub struct SpiCursor {
     ptr: pg_sys::Portal,
 }
@@ -506,7 +555,9 @@ impl SpiCursor {
     }
 
     /// closes the cursor and releases its resources.
-    /// Not mandatory, as all open cursors are closed automatically at the end of a transaction.
+    /// All cursors are closed automatically at the end of a transaction anyway.
+    /// Avoid closing the cursor if planning to retrieve it in a later Spi session within the same
+    /// transaction using [`SpiClient::find_cursor()`].
     pub fn close(mut self) {
         let ptr = std::mem::replace(&mut self.ptr, std::ptr::null_mut());
         unsafe {
