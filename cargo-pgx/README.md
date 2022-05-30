@@ -414,7 +414,7 @@ By default, `cargo pgx install` builds your extension in debug mode. Specifying 
 
 ```shell script
 $ cargo pgx install --help
-cargo-pgx-install 0.4.2
+cargo-pgx-install 0.4.5
 ZomboDB, LLC <zombodb@gmail.com>
 Install the extension from the current crate to the Postgres specified by whatever `pg_config` is
 currently on your $PATH
@@ -431,6 +431,9 @@ OPTIONS:
 
         --features <FEATURES>
             Space-separated list of features to activate
+
+        --force-create-or-replace
+            Force generation of CREATE OR REPLACE statements instead of plain CREATE
 
     -h, --help
             Print help information
@@ -500,7 +503,7 @@ make to the database are not preserved.
 
 ```shell script
 $ cargo pgx test --help
-cargo-pgx-test 0.4.2
+cargo-pgx-test 0.4.5
 ZomboDB, LLC <zombodb@gmail.com>
 Run the test suite for this crate
 
@@ -518,6 +521,9 @@ OPTIONS:
 
         --features <FEATURES>
             Space-separated list of features to activate
+
+        --force-create-or-replace
+            Force generation of CREATE OR REPLACE statements instead of plain CREATE
 
     -h, --help
             Print help information
@@ -580,7 +586,7 @@ distobutions or MacOS Postgres installations.
 
 ```shell script
 $ cargo pgx package --help
-cargo-pgx-package 0.4.2
+cargo-pgx-package 0.4.5
 ZomboDB, LLC <zombodb@gmail.com>
 Create an installation package directory
 
@@ -599,6 +605,9 @@ OPTIONS:
 
         --features <FEATURES>
             Space-separated list of features to activate
+
+        --force-create-or-replace
+            Force generation of CREATE OR REPLACE statements instead of plain CREATE
 
     -h, --help
             Print help information
@@ -633,7 +642,7 @@ If you just want to look at the full extension schema that pgx will generate, us
 
 ```shell script
 $ cargo pgx schema --help
-cargo-pgx-schema 0.4.2
+cargo-pgx-schema 0.4.5
 ZomboDB, LLC <zombodb@gmail.com>
 Generate extension schema files
 
@@ -655,6 +664,9 @@ OPTIONS:
 
         --features <FEATURES>
             Space-separated list of features to activate
+
+        --force-create-or-replace
+            Force generation of CREATE OR REPLACE statements instead of plain CREATE
 
     -h, --help
             Print help information
@@ -710,7 +722,7 @@ point to the versioned shared library file. Without versioned shared-object supp
 would look as follows:
 
 ```SQL
-CREATE OR REPLACE FUNCTION "hello_extension"() RETURNS text /* &str */
+CREATE FUNCTION "hello_extension"() RETURNS text /* &str */
 STRICT
 LANGUAGE c /* Rust */
 AS 'MODULE_PATHNAME', 'hello_extension_wrapper';
@@ -722,7 +734,7 @@ this is  usually set to `$libdir/<extension-name>`.
 When using versioned shared-object support, the same SQL would look as follows:
 
 ```SQL
-CREATE OR REPLACE FUNCTION "hello_extension"() RETURNS text /* &str */
+CREATE FUNCTION "hello_extension"() RETURNS text /* &str */
 STRICT
 LANGUAGE c /* Rust */
 AS '$libdir/extension-0.0.0', 'hello_extension_wrapper';
@@ -733,8 +745,8 @@ Note that the versioned shared library is hard-coded in the function definition.
 
 It is important to note that the emitted SQL is version-dependent. This means that all previously-defined C functions
 must be redefined to point to the current versioned-so in the version upgrade script. As an example, when updating the
-extension version to 0.1.0, the shared object will be named `<extension-name>-0.1.0.so`, and `cargo pgx schema` will
-produce the following SQL for the above function:
+extension version to 0.1.0, the shared object will be named `<extension-name>-0.1.0.so`, and
+`cargo pgx schema --force-create-or-replace` will produce the following SQL for the above function:
 
 ```SQL
 CREATE OR REPLACE FUNCTION "hello_extension"() RETURNS text /* &str */
@@ -747,6 +759,12 @@ This SQL must be used in the upgrade script from `0.0.0` to `0.1.0` in order to 
 the new shared object. `pgx` _does not_ do any magic to determine in which version a function was introduced or modified
 and only place it in the corresponding versioned so file. By extension, you can always expect that the shared library
 will contain _all_ functions which are still defined in the extension's source code.
+
+Notice that `cargo pgx schema` was used with `--force-create-or-replace` argument, otherwise `pgx` produces
+plain `CREATE FUNCTION` statements. This default is potentially less destructive to pre-existing objects
+and more secure. Unfortunately, it complicates upgrade path when using versioned shared objects. In order
+to produce correct upgrade scripts one must pass `--force-create-or-replace` argument to `install`, `package`
+and `schema` sub-commands.
 
 This feature is not designed to assist in the backwards compatibility of data types.
 
@@ -777,3 +795,7 @@ Postgres, so loading two versions of the shared library will cause trouble.
 These scenarios are:
 - when using shared memory
 - when using query planner hooks
+
+Furthermore, `CREATE OR REPLACE FUNCTION` can present a security threat: 
+if you replace an object that belongs to a role controlled by a malicious actor,
+they can replace it again with arbitrary code.

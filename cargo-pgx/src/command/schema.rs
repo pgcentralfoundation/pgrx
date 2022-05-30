@@ -66,6 +66,9 @@ pub(crate) struct Schema {
     /// Skip building a fresh extension shared object.
     #[clap(long)]
     skip_build: bool,
+    /// Force generation of CREATE OR REPLACE statements instead of plain CREATE.
+    #[clap(long)]
+    force_create_or_replace: bool,
 }
 
 impl CommandExecute for Schema {
@@ -125,6 +128,7 @@ impl CommandExecute for Schema {
             self.dot,
             log_level,
             self.skip_build,
+            self.force_create_or_replace,
         )
     }
 }
@@ -149,6 +153,7 @@ pub(crate) fn generate_schema(
     dot: Option<impl AsRef<std::path::Path>>,
     log_level: Option<String>,
     skip_build: bool,
+    force_create_or_replace: bool,
 ) -> eyre::Result<()> {
     let manifest = Manifest::from_path(&package_manifest_path)?;
     let (control_file, _extname) = find_control_file(&package_manifest_path)?;
@@ -405,6 +410,7 @@ pub(crate) fn generate_schema(
         entities.into_iter(),
         package_name.to_string(),
         versioned_so,
+        force_create_or_replace,
     )
     .wrap_err("SQL generation error")?;
 

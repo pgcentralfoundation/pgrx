@@ -2,6 +2,25 @@ use pgx::*;
 
 pg_module_magic!();
 
+// This example works better in the test environment,
+// more relealistically though, when using versioned .so 
+// you'll end up with an older definition like:
+//
+// CREATE OR REPLACE FUNCTION hello_versioned_so() RETURNS text
+// IMMUTABLE PARALLEL SAFE STRICT
+// LANGUAGE C
+// AS '$libdir/versioned_so-0.0.1', 'hello_versioned_so_wrapper';
+extension_sql!(
+    "\n\
+    CREATE FUNCTION hello_versioned_so() RETURNS text \
+    AS 'old definition' \
+    LANGUAGE SQL \
+    IMMUTABLE; \
+    ",
+    name = "boostrap",
+    bootstrap,
+);
+
 #[pg_extern]
 fn hello_versioned_so() -> &'static str {
     "Hello, versioned_so"

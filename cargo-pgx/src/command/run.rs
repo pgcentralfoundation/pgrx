@@ -135,6 +135,7 @@ pub(crate) fn run(
         pg_config,
         is_release,
         false,
+        false,
         None,
         features,
     )?;

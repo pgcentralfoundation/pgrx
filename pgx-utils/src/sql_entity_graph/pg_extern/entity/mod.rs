@@ -107,8 +107,14 @@ impl ToSql for PgExternEntity {
 
         let module_pathname = &context.get_module_pathname();
 
+        let create = if context.force_create_or_replace {
+            "CREATE OR REPLACE"
+        } else {
+            "CREATE"
+        };
+
         let fn_sql = format!("\
-                                CREATE FUNCTION {schema}\"{name}\"({arguments}) {returns}\n\
+                                {create} FUNCTION {schema}\"{name}\"({arguments}) {returns}\n\
                                 {extern_attrs}\
                                 {search_path}\
                                 LANGUAGE c /* Rust */\n\

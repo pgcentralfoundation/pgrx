@@ -38,6 +38,9 @@ pub(crate) struct Test {
     /// compile for release mode (default is debug)
     #[clap(env = "PROFILE", long, short)]
     release: bool,
+    /// Force generation of CREATE OR REPLACE statements instead of plain CREATE.
+    #[clap(long)]
+    force_create_or_replace: bool,
     /// Don't regenerate the schema
     #[clap(long, short)]
     no_schema: bool,
@@ -98,6 +101,7 @@ impl CommandExecute for Test {
                 self.package.as_ref(),
                 self.release,
                 self.no_schema,
+                self.force_create_or_replace,
                 &features,
                 testname.clone(),
             )?
@@ -118,6 +122,7 @@ pub fn test_extension(
     user_package: Option<&String>,
     is_release: bool,
     no_schema: bool,
+    force_create_or_replace: bool,
     features: &clap_cargo::Features,
     testname: Option<impl AsRef<str>>,
 ) -> eyre::Result<()> {
@@ -160,7 +165,15 @@ pub fn test_extension(
             "PGX_BUILD_PROFILE",
             if is_release { "release" } else { "debug" },
         )
-        .env("PGX_NO_SCHEMA", if no_schema { "true" } else { "false" });
+        .env("PGX_NO_SCHEMA", if no_schema { "true" } else { "false" })
+        .env(
+            "PGX_FORCE_CREATE_OR_REPLACE",
+            if force_create_or_replace {
+                "true"
+            } else {
+                "false"
+            },
+        );
 
     if let Ok(rust_log) = std::env::var("RUST_LOG") {
         command.env("RUST_LOG", rust_log);

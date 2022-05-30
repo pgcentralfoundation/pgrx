@@ -32,6 +32,9 @@ pub(crate) struct Package {
     /// Build in test mode (for `cargo pgx test`)
     #[clap(long)]
     test: bool,
+    /// Force generation of CREATE OR REPLACE statements instead of plain CREATE.
+    #[clap(long)]
+    force_create_or_replace: bool,
     /// The `pg_config` path (default is first in $PATH)
     #[clap(long, short = 'c', parse(from_os_str))]
     pg_config: Option<PathBuf>,
@@ -78,6 +81,7 @@ impl CommandExecute for Package {
             out_dir,
             self.debug,
             self.test,
+            self.force_create_or_replace,
             &features,
         )
     }
@@ -96,6 +100,7 @@ pub(crate) fn package_extension(
     out_dir: PathBuf,
     is_debug: bool,
     is_test: bool,
+    force_create_or_replace: bool,
     features: &clap_cargo::Features,
 ) -> eyre::Result<()> {
     if !out_dir.exists() {
@@ -109,6 +114,7 @@ pub(crate) fn package_extension(
         pg_config,
         !is_debug,
         is_test,
+        force_create_or_replace,
         Some(out_dir),
         features,
     )

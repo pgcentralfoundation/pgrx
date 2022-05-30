@@ -67,6 +67,7 @@ pub struct PgxSql {
     pub aggregates: HashMap<PgAggregateEntity, NodeIndex>,
     pub extension_name: String,
     pub versioned_so: bool,
+    pub force_create_or_replace: bool,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Eq, Ord)]
@@ -84,6 +85,7 @@ impl PgxSql {
         entities: impl Iterator<Item = SqlGraphEntity>,
         extension_name: String,
         versioned_so: bool,
+        force_create_or_replace: bool,
     ) -> eyre::Result<Self> {
         let mut graph = StableGraph::new();
 
@@ -236,6 +238,7 @@ impl PgxSql {
             graph_finalize: finalize,
             extension_name: extension_name,
             versioned_so,
+            force_create_or_replace,
         };
         this.register_types();
         Ok(this)

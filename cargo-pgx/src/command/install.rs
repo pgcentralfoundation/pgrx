@@ -38,6 +38,9 @@ pub(crate) struct Install {
     /// Build in test mode (for `cargo pgx test`)
     #[clap(long)]
     test: bool,
+    /// Force generation of CREATE OR REPLACE statements instead of plain CREATE.
+    #[clap(long)]
+    force_create_or_replace: bool,
     /// The `pg_config` path (default is first in $PATH)
     #[clap(long, short = 'c')]
     pg_config: Option<String>,
@@ -75,6 +78,7 @@ impl CommandExecute for Install {
             &pg_config,
             self.release,
             self.test,
+            self.force_create_or_replace,
             None,
             &features,
         )
@@ -95,6 +99,7 @@ pub(crate) fn install_extension(
     pg_config: &PgConfig,
     is_release: bool,
     is_test: bool,
+    force_create_or_replace: bool,
     base_directory: Option<PathBuf>,
     features: &clap_cargo::Features,
 ) -> eyre::Result<()> {
@@ -192,6 +197,7 @@ pub(crate) fn install_extension(
         &extdir,
         &base_directory,
         true,
+        force_create_or_replace,
     )?;
 
     println!("{} installing {}", "    Finished".bold().green(), extname);
@@ -327,6 +333,7 @@ fn copy_sql_files(
     extdir: &PathBuf,
     base_directory: &PathBuf,
     skip_build: bool,
+    force_create_or_replace: bool,
 ) -> eyre::Result<()> {
     let dest = get_target_sql_file(&package_manifest_path, extdir, base_directory)?;
     let (_, extname) = find_control_file(&package_manifest_path)?;
@@ -343,6 +350,7 @@ fn copy_sql_files(
         Option::<String>::None,
         None,
         skip_build,
+        force_create_or_replace,
     )?;
 
     // now copy all the version upgrade files too
