@@ -1,4 +1,4 @@
-![Logo](logos/colors.svg)
+![Logo](logo-transparent.png)
 
 # `pgx`
 
@@ -71,20 +71,21 @@
 - `tar`
 - `bzip2`
 - GCC 7 or newer
-   <details>
-      <summary>GCC 7 on CentOS 7</summary>
-      
-   In order to use GCC 7, install [`scl`] and enter it's development environment:
-
-   ```bash
-   yum install centos-release-scl
-   yum install devtoolset-7
-   scl enable devtoolset-7 bash
-   ```
-   </details>
 - [Build dependencies for PostgreSQL](https://wiki.postgresql.org/wiki/Compile_and_Install_from_source_code)
 
-Note that a local Postgres installation is not required. `pgx` can download and compile Postgres itself.
+<details>
+   <summary>GCC 7 on CentOS 7</summary>
+   
+In order to use GCC 7, install [`scl`](https://wiki.centos.org/AdditionalResources/Repositories/SCL) and enter the GCC 7 development environment:
+
+```bash
+yum install centos-release-scl
+yum install devtoolset-7
+scl enable devtoolset-7 bash
+```
+</details>
+
+Note that a local PostgreSQL Server installation is not required. `pgx` typically downloads and compiles PostgreSQL versions itself.
 
 ## Getting Started
 
