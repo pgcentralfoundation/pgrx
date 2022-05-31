@@ -32,6 +32,7 @@ use crate::sql_entity_graph::{
     to_sql::ToSql,
     SqlGraphEntity, SqlGraphIdentifier,
 };
+use crate::versioned_so_name;
 
 /// A generator for SQL.
 ///
@@ -66,6 +67,8 @@ pub struct PgxSql {
     pub hashes: HashMap<PostgresHashEntity, NodeIndex>,
     pub aggregates: HashMap<PgAggregateEntity, NodeIndex>,
     pub triggers: HashMap<PgTriggerEntity, NodeIndex>,
+    pub extension_name: String,
+    pub versioned_so: bool,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Eq, Ord)]
@@ -81,6 +84,8 @@ impl PgxSql {
         type_mappings: impl Iterator<Item = RustSqlMapping>,
         source_mappings: impl Iterator<Item = RustSourceOnlySqlMapping>,
         entities: impl Iterator<Item = SqlGraphEntity>,
+        extension_name: String,
+        versioned_so: bool,
     ) -> eyre::Result<Self> {
         let mut graph = StableGraph::new();
 
@@ -240,6 +245,8 @@ impl PgxSql {
             graph_root: root,
             graph_bootstrap: bootstrap,
             graph_finalize: finalize,
+            extension_name: extension_name,
+            versioned_so,
         };
         this.register_types();
         Ok(this)
@@ -284,7 +291,7 @@ impl PgxSql {
             if let Some(syntax) = ps.find_syntax_by_extension("sql") {
                 let mut h = HighlightLines::new(syntax, &theme);
                 for line in LinesWithEndings::from(&generated) {
-                    let ranges: Vec<(Style, &str)> = h.highlight(line, &ps);
+                    let ranges: Vec<(Style, &str)> = h.highlight_line(line, &ps)?;
                     // Concept from https://github.com/sharkdp/bat/blob/1b030dc03b906aa345f44b8266bffeea77d763fe/src/terminal.rs#L6
                     for (style, content) in ranges {
                         if style.foreground.a == 0x01 {
@@ -509,6 +516,16 @@ impl PgxSql {
                 id: core::any::TypeId::of::<T>(),
             },
         );
+    }
+
+    pub fn get_module_pathname(&self) -> String {
+        return if self.versioned_so {
+            let extname = &self.extension_name;
+            let extver = &self.control.default_version;
+            format!("$libdir/{}", versioned_so_name(extname, extver))
+        } else {
+            String::from("MODULE_PATHNAME")
+        };
     }
 }
 

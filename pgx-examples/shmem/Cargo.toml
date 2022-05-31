@@ -2,6 +2,7 @@
 name = "shmem"
 version = "0.1.0"
 edition = "2021"
+rust-version = "1.58"
 
 [lib]
 crate-type = ["cdylib"]
@@ -16,9 +17,9 @@ pg14 = ["pgx/pg14", "pgx-tests/pg14" ]
 pg_test = []
 
 [dependencies]
-heapless = "0.7.10"
+heapless = "0.7.13"
 pgx = { path = "../../pgx", default-features = false }
-serde = { version = "1.0.136", features = [ "derive" ] }
+serde = { version = "1.0.137", features = [ "derive" ] }
 
 [dev-dependencies]
 pgx-tests = { path = "../../pgx-tests" }

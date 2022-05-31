@@ -20,6 +20,7 @@ use pgx_utils::{createdb, get_named_capture, get_target_dir};
 use postgres::error::DbError;
 use postgres::Client;
 use std::collections::HashMap;
+use std::fmt::Write as _;
 use std::io::{BufRead, BufReader, Write};
 use std::path::PathBuf;
 
@@ -70,7 +71,7 @@ pub fn run_test(
     let result = match client.transaction() {
         // run the test function in a transaction
         Ok(mut tx) => {
-            let result = tx.simple_query(&format!("SELECT \"{}\".\"{}\"();", schema, sql_funcname));
+            let result = tx.simple_query(&format!("SELECT \"{schema}\".\"{sql_funcname}\"();"));
 
             if result.is_ok() {
                 // and abort the transaction when complete
@@ -80,11 +81,11 @@ pub fn run_test(
             result
         }
 
-        Err(e) => panic!("{}", e),
+        Err(e) => panic!("attempt to run test tx failed:\n{e}"),
     };
 
     if let Err(e) = result {
-        let error_as_string = format!("{}", e);
+        let error_as_string = format!("error in test tx: {e}");
 
         let cause = e.into_source();
         if let Some(e) = cause {
@@ -98,50 +99,45 @@ pub fn run_test(
                     Ok(())
                 } else {
                     // we weren't expecting an error
-                    //
-                    // wait a second for Postgres to get log messages written to stdoerr
+                    // wait a second for Postgres to get log messages written to stderr
                     std::thread::sleep(std::time::Duration::from_millis(1000));
 
-                    let mut pg_location = String::new();
-                    pg_location.push_str("Postgres location: ");
-                    if dberror.file().is_some() {
-                        pg_location.push_str(&dberror.file().unwrap());
+                    let mut pg_location = String::from("Postgres location: ");
+                    pg_location.push_str(match dberror.file() {
+                        Some(file) => file,
+                        None => "<unknown>",
+                    });
+                    if let Some(ln) = dberror.line() {
+                        let _ = write!(pg_location, ":{ln}");
+                    };
 
-                        if dberror.line().is_some() {
-                            pg_location.push(':');
-                            pg_location.push_str(&dberror.line().unwrap().to_string());
-                        }
-                    } else {
-                        pg_location.push_str("<unknown>");
-                    }
-
-                    let mut rust_location = String::new();
-                    rust_location.push_str("Rust location: ");
-                    if dberror.where_().is_some() {
-                        rust_location.push_str(&dberror.where_().unwrap());
-                    } else {
-                        rust_location.push_str("<unknown>");
-                    }
-
+                    let mut rust_location = String::from("Rust location: ");
+                    rust_location.push_str(match dberror.where_() {
+                        Some(place) => place,
+                        None => "<unknown>",
+                    });
                     // then we can panic with those messages plus those that belong to the system
                     panic!(
-                        "\n{}...\n{}\n{}\n{}\n{}\n\n",
-                        format_loglines(&system_session_id, &loglines),
-                        format_loglines(&session_id, &loglines),
-                        received_error_message.bold().red(),
-                        pg_location.dimmed().white(),
-                        rust_location.yellow()
+                        "\n{sys}...\n{sess}\n{e}\n{pg}\n{rs}\n\n",
+                        sys = format_loglines(&system_session_id, &loglines),
+                        sess = format_loglines(&session_id, &loglines),
+                        e = received_error_message.bold().red(),
+                        pg = pg_location.dimmed().white(),
+                        rs = rust_location.yellow()
                     );
                 }
             } else {
-                panic!("{}", e)
+                panic!("Failed downcast to DbError:\n{e}")
             }
         } else {
-            panic!("{}", error_as_string.bold().red())
+            panic!(
+                "Error without deeper source cause:\n{e}\n",
+                e = error_as_string.bold().red()
+            )
         }
-    } else if let Some(expected_error_message) = expected_error {
+    } else if let Some(message) = expected_error {
         // we expected an ERROR, but didn't get one
-        return Err(eyre!("Expected error: {}", expected_error_message));
+        return Err(eyre!("Expected error: {message}"));
     } else {
         Ok(())
     }
@@ -339,7 +335,7 @@ fn modify_postgresql_conf(pgdata: PathBuf, postgresql_conf: Vec<&'static str>) -
 
     for setting in postgresql_conf {
         postgresql_conf_file
-            .write_all(format!("{}\n", setting).as_bytes())
+            .write_all(format!("{setting}\n").as_bytes())
             .wrap_err("couldn't append custom setting to postgresql.conf")?;
     }
 
@@ -377,7 +373,7 @@ fn start_pg(loglines: LogLines) -> eyre::Result<String> {
         .stdout(Stdio::inherit())
         .stderr(Stdio::piped());
 
-    let command_str = format!("{:?}", command);
+    let command_str = format!("{command:?}");
 
     // start Postgres and monitor its stderr in the background
     // also notify the main thread when it's ready to accept connections
@@ -403,9 +399,9 @@ fn monitor_pg(mut command: Command, cmd_string: String, loglines: LogLines) -> (
         let pid = child.id();
 
         eprintln!(
-            "{}\npid={}",
-            cmd_string.bold().blue(),
-            pid.to_string().yellow()
+            "{cmd}\npid={p}",
+            cmd = cmd_string.bold().blue(),
+            p = pid.to_string().yellow()
         );
         eprintln!("{}", pg_sys::get_pg_version_string().bold().purple());
 
@@ -419,44 +415,40 @@ fn monitor_pg(mut command: Command, cmd_string: String, loglines: LogLines) -> (
 
         let regex = regex::Regex::new(r#"\[.*?\] \[.*?\] \[(?P<session_id>.*?)\]"#).unwrap();
         let mut is_started_yet = false;
-        for line in reader.lines() {
-            match line {
-                Ok(line) => {
-                    let session_id = match get_named_capture(&regex, "session_id", &line) {
-                        Some(sid) => sid,
-                        None => "NONE".to_string(),
-                    };
+        let mut lines = reader.lines();
+        while let Some(Ok(line)) = lines.next() {
+            let session_id = match get_named_capture(&regex, "session_id", &line) {
+                Some(sid) => sid,
+                None => "NONE".to_string(),
+            };
 
-                    if line.contains("database system is ready to accept connections") {
-                        // Postgres says it's ready to go
-                        sender.send((pid, session_id.clone())).unwrap();
-                        is_started_yet = true;
-                    }
-
-                    if !is_started_yet || line.contains("TMSG: ") {
-                        eprintln!("{}", line.cyan());
-                    }
-
-                    //                    if line.contains("INFO: ") {
-                    //                        eprintln!("{}", line.cyan());
-                    //                    } else if line.contains("WARNING: ") {
-                    //                        eprintln!("{}", line.bold().yellow());
-                    //                    } else if line.contains("ERROR: ") {
-                    //                        eprintln!("{}", line.bold().red());
-                    //                    } else if line.contains("statement: ") || line.contains("duration: ") {
-                    //                        eprintln!("{}", line.bold().blue());
-                    //                    } else if line.contains("LOG: ") {
-                    //                        eprintln!("{}", line.dimmed().white());
-                    //                    } else {
-                    //                        eprintln!("{}", line.bold().purple());
-                    //                    }
-
-                    let mut loglines = loglines.lock().unwrap();
-                    let session_lines = loglines.entry(session_id).or_insert_with(Vec::new);
-                    session_lines.push(line);
-                }
-                Err(e) => panic!("{}", e),
+            if line.contains("database system is ready to accept connections") {
+                // Postgres says it's ready to go
+                sender.send((pid, session_id.clone())).unwrap();
+                is_started_yet = true;
             }
+
+            if !is_started_yet || line.contains("TMSG: ") {
+                eprintln!("{}", line.cyan());
+            }
+
+            // if line.contains("INFO: ") {
+            //     eprintln!("{}", line.cyan());
+            // } else if line.contains("WARNING: ") {
+            //     eprintln!("{}", line.bold().yellow());
+            // } else if line.contains("ERROR: ") {
+            //     eprintln!("{}", line.bold().red());
+            // } else if line.contains("statement: ") || line.contains("duration: ") {
+            //     eprintln!("{}", line.bold().blue());
+            // } else if line.contains("LOG: ") {
+            //     eprintln!("{}", line.dimmed().white());
+            // } else {
+            //     eprintln!("{}", line.bold().purple());
+            // }
+
+            let mut loglines = loglines.lock().unwrap();
+            let session_lines = loglines.entry(session_id).or_insert_with(Vec::new);
+            session_lines.push(line);
         }
 
         // wait for Postgres to really finish
@@ -466,7 +458,7 @@ fn monitor_pg(mut command: Command, cmd_string: String, loglines: LogLines) -> (
                     // we exited normally
                 }
             }
-            Err(e) => panic!("{}", e),
+            Err(e) => panic!("was going to let Postgres finish, but errored this time:\n{e}"),
         }
     });
 
@@ -508,8 +500,9 @@ fn dropdb() {
             get_pg_dbname()
         )) {
             // got some error we didn't expect
-            eprintln!("{}", String::from_utf8_lossy(output.stdout.as_slice()));
-            eprintln!("{}", stderr);
+            let stdout = String::from_utf8_lossy(output.stdout.as_slice());
+            eprintln!("unexpected error (stdout):\n{stdout}");
+            eprintln!("unexpected error (stderr):\n{stderr}");
             panic!("failed to drop test database");
         }
     }
@@ -528,7 +521,7 @@ fn create_extension() {
 
 fn get_extension_name() -> String {
     std::env::var("CARGO_PKG_NAME")
-        .unwrap_or_else(|_| panic!("CARGO_PKG_NAME is not an envvar"))
+        .unwrap_or_else(|_| panic!("CARGO_PKG_NAME environment var is unset or invalid UTF-8"))
         .replace("-", "_")
 }
 
@@ -546,5 +539,6 @@ fn get_pg_dbname() -> &'static str {
 }
 
 fn get_pg_user() -> String {
-    std::env::var("USER").unwrap_or_else(|_| panic!("USER is not an envvar"))
+    std::env::var("USER")
+        .unwrap_or_else(|_| panic!("USER environment var is unset or invalid UTF-8"))
 }

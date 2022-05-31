@@ -21,7 +21,7 @@ use crate::{pg_sys, void_mut_ptr, AllocatedByRust, FromDatum, PgBox, PgMemoryCon
 /// This example will create a SQL function like so:
 ///
 /// ```sql
-/// CREATE OR REPLACE FUNCTION fun_with_default_arg_value(a integer, b integer DEFAULT 99) RETURNS integer ...;
+/// CREATE FUNCTION fun_with_default_arg_value(a integer, b integer DEFAULT 99) RETURNS integer ...;
 /// ```
 ///
 /// ```rust
@@ -61,7 +61,7 @@ pub struct NULL;
 /// This example will create a SQL function like so:
 ///
 /// ```sql
-/// CREATE OR REPLACE FUNCTION get_a_set() RETURNS TABLE (id integer, title text) ...;
+/// CREATE FUNCTION get_a_set() RETURNS TABLE (id integer, title text) ...;
 /// ```
 ///
 /// ```rust

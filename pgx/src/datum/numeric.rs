@@ -17,6 +17,12 @@ use std::fmt;
 #[derive(Serialize, Debug)]
 pub struct Numeric(pub String);
 
+impl std::fmt::Display for Numeric {
+    fn fmt(&self, fmt: &mut std::fmt::Formatter<'_>) -> std::result::Result<(), std::fmt::Error> {
+        fmt.write_fmt(format_args!("{}", self.0))
+    }
+}
+
 impl<'de> Deserialize<'de> for Numeric {
     fn deserialize<D>(deserializer: D) -> Result<Self, <D as Deserializer<'de>>::Error>
     where

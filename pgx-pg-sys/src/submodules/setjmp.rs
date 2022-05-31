@@ -7,17 +7,13 @@
 ///
 /// Currently, this function is only used by pgx' generated Postgres bindings.  It is not (yet)
 /// intended (or even necessary) for normal user code.
+///
+/// Calling this function from anything but the main thread can result in unpredictable behavior.
 #[inline(always)]
 pub(crate) unsafe fn pg_guard_ffi_boundary<T, F: FnOnce() -> T>(f: F) -> T {
     use crate as pg_sys;
 
-    // as the panic message says, we can't call Postgres functions from threads
-    // the value of IS_MAIN_THREAD gets set through the pg_module_magic!() macro
-    #[cfg(debug_assertions)]
-    if crate::submodules::guard::IS_MAIN_THREAD.with(|v| v.get().is_none()) {
-        panic!("functions under #[pg_guard] cannot be called from threads");
-    };
-
+    // This should really, really not be done in a multithreaded context
     let prev_exception_stack = pg_sys::PG_exception_stack;
     let prev_error_context_stack = pg_sys::error_context_stack;
     let mut jump_buffer = std::mem::MaybeUninit::uninit();

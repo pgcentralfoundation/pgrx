@@ -1,6 +1,6 @@
 [package]
 name = "pgx-macros"
-version = "0.4.3"
+version = "0.4.5"
 authors = ["ZomboDB, LLC <zombodb@gmail.com>"]
 license = "MIT"
 description = "Proc Macros for 'pgx'"
@@ -9,6 +9,7 @@ repository = "https://github.com/zombodb/pgx"
 documentation = "https://docs.rs/pgx-macros"
 readme = "README.md"
 edition = "2021"
+rust-version = "1.58"
 
 [lib]
 proc-macro = true
@@ -18,11 +19,11 @@ proc-macro = true
 rustc-args = ["--cfg", "docsrs"]
 
 [dependencies]
-pgx-utils = { path = "../pgx-utils", version = "0.4.3" }
-proc-macro2 = "1.0.37"
+pgx-utils = { path = "../pgx-utils", version = "=0.4.5" }
+proc-macro2 = "1.0.39"
 quote = "1.0.18"
-syn = { version = "1.0.91", features = [ "extra-traits", "full", "fold", "parsing" ] }
+syn = { version = "1.0.95", features = [ "extra-traits", "full", "fold", "parsing" ] }
 unescape = "0.1.0"
 
 [dev-dependencies]
-serde = { version = "1.0.136", features = ["derive"] }
+serde = { version = "1.0.137", features = ["derive"] }

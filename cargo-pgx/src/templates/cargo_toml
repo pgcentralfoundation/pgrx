@@ -2,6 +2,7 @@
 name = "{name}"
 version = "0.0.0"
 edition = "2021"
+rust-version = "1.58"
 
 [lib]
 crate-type = ["cdylib"]
@@ -16,10 +17,10 @@ pg14 = ["pgx/pg14", "pgx-tests/pg14" ]
 pg_test = []
 
 [dependencies]
-pgx = "0.4.3"
+pgx = "=0.4.5"
 
 [dev-dependencies]
-pgx-tests = "0.4.3"
+pgx-tests = "=0.4.5"
 
 [profile.dev]
 panic = "unwind"

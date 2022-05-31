@@ -16,6 +16,7 @@ use crate::{
 use cargo_toml::Manifest;
 use eyre::{eyre, WrapErr};
 use object::Object;
+use once_cell::sync::OnceCell;
 use owo_colors::OwoColorize;
 use pgx_utils::{
     pg_config::{PgConfig, Pgx},
@@ -31,6 +32,14 @@ use std::{
 // Since we support extensions with `#[no_std]`
 extern crate alloc;
 use alloc::vec::Vec;
+
+// An apparent bug in `glibc` 2.17 prevents us from safely dropping this
+// otherwise users find issues such as https://github.com/tcdi/pgx/issues/572
+static POSTMASTER_LIBRARY: OnceCell<libloading::os::unix::Library> = OnceCell::new();
+
+// An apparent bug in `glibc` 2.17 prevents us from safely dropping this
+// otherwise users find issues such as https://github.com/tcdi/pgx/issues/572
+static EXTENSION_LIBRARY: OnceCell<libloading::os::unix::Library> = OnceCell::new();
 
 /// Generate extension schema files
 #[derive(clap::Args, Debug)]
@@ -164,6 +173,8 @@ pub(crate) fn generate_schema(
             control_file.display()
         ));
     }
+
+    let versioned_so = get_property(&package_manifest_path, "module_pathname")?.is_none();
 
     let flags = std::env::var("PGX_BUILD_FLAGS").unwrap_or_default();
 
@@ -360,18 +371,20 @@ pub(crate) fn generate_schema(
     let source_only_sql_mapping;
 
     unsafe {
-        let _postmaster = libloading::os::unix::Library::open(
-            Some(&postmaster_stub_built),
-            libloading::os::unix::RTLD_NOW | libloading::os::unix::RTLD_GLOBAL,
-        )
-        .expect(&format!(
+        POSTMASTER_LIBRARY.get_or_try_init(|| {
+            libloading::os::unix::Library::open(
+                Some(&postmaster_stub_built),
+                libloading::os::unix::RTLD_NOW | libloading::os::unix::RTLD_GLOBAL,
+            )
+        }).wrap_err_with(|| format!(
             "Couldn't libload {}",
             postmaster_stub_built.display()
-        ));
+        ))?;
 
-        let lib =
-            libloading::os::unix::Library::open(Some(&lib_so), libloading::os::unix::RTLD_LAZY)
-                .expect(&format!("Couldn't libload {}", lib_so.display()));
+        let lib = EXTENSION_LIBRARY.get_or_try_init(|| {
+            libloading::os::unix::Library::open(Some(&lib_so),
+                libloading::os::unix::RTLD_LAZY)
+        }).wrap_err_with(|| format!("Couldn't libload {}", lib_so.display()))?;
 
         let typeid_sql_mappings_symbol: libloading::os::unix::Symbol<
             unsafe extern "C" fn() -> &'static std::collections::HashSet<RustSqlMapping>,
@@ -405,6 +418,8 @@ pub(crate) fn generate_schema(
         typeid_sql_mapping.clone().into_iter(),
         source_only_sql_mapping.clone().into_iter(),
         entities.into_iter(),
+        package_name.to_string(),
+        versioned_so,
     )
     .wrap_err("SQL generation error")?;
 

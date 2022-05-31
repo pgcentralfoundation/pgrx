@@ -1,6 +1,6 @@
 [package]
-name = "pgx_demo"
-version = "0.0.1"
+name = "versioned_so"
+version = "0.0.0"
 edition = "2021"
 rust-version = "1.58"
 
@@ -17,22 +17,18 @@ pg14 = ["pgx/pg14", "pgx-tests/pg14" ]
 pg_test = []
 
 [dependencies]
-pgx = "=0.4.5"
-pgx-macros = "=0.4.5"
-pgx-utils = "=0.4.5"
-
+pgx = { path = "../../pgx/", default-features = false }
 
 [dev-dependencies]
-pgx-tests = "=0.4.5"
-tempfile = "3.2.0"
-once_cell = "1.7.2"
+pgx-tests = { path = "../../pgx-tests" }
 
-[profile.dev]
-panic = "unwind"
-lto = "thin"
+# uncomment these if compiling outside of 'pgx'
+#[profile.dev]
+#panic = "unwind"
+# lto = "thin"
 
-[profile.release]
-panic = "unwind"
-opt-level = 3
-lto = "fat"
-codegen-units = 1
+#[profile.release]
+#panic = "unwind"
+#opt-level = 3
+#lto = "fat"
+#codegen-units = 1

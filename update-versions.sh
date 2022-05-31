@@ -57,7 +57,7 @@ SEMVER_REGEX="(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*
 
 for cargo_toml in ${CARGO_TOMLS_TO_SED[@]}; do
     for dependency in ${DEPENDENCIES_TO_UPDATE[@]}; do
-        rg --passthru -N "(?P<prefix>^${dependency}.*\")${SEMVER_REGEX}(?P<postfix>\".*$)" -r "\${prefix}${VERSION}\${postfix}" ${cargo_toml} > ${cargo_toml}.tmp || true
+        rg --passthru -N "(?P<prefix>^${dependency}.*\")(?P<pin>=?)${SEMVER_REGEX}(?P<postfix>\".*$)" -r "\${prefix}=${VERSION}\${postfix}" ${cargo_toml} > ${cargo_toml}.tmp || true
         mv ${cargo_toml}.tmp ${cargo_toml}
     done
 done
