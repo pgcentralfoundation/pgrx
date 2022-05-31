@@ -357,21 +357,31 @@ impl PgMemoryContexts {
     }
 
     pub fn leak_and_drop_on_delete<T>(&mut self, v: T) -> *mut T {
-        unsafe extern "C" fn drop_on_delete<T>(ptr: void_mut_ptr) {
-            let boxed = Box::from_raw(ptr as *mut T);
-            drop(boxed);
+        #[cfg(feature = "postgrestd")]
+        {
+            self.switch_to(|_cx| {
+                use ::alloc::boxed::Box;
+                Box::leak(Box::new(v))
+            })
         }
+        #[cfg(not(feature = "postgrestd"))]
+        {
+            unsafe extern "C" fn drop_on_delete<T>(ptr: void_mut_ptr) {
+                let boxed = Box::from_raw(ptr as *mut T);
+                drop(boxed);
+            }
 
-        let leaked_ptr = Box::leak(Box::new(v));
-        // SAFETY:  we know the result of `self.palloc_struct()` is a valid pointer
-        let mut memcxt_callback =
-            unsafe { PgBox::from_pg(self.palloc_struct::<pg_sys::MemoryContextCallback>()) };
-        memcxt_callback.func = Some(drop_on_delete::<T>);
-        memcxt_callback.arg = leaked_ptr as *mut T as void_mut_ptr;
-        unsafe {
-            pg_sys::MemoryContextRegisterResetCallback(self.value(), memcxt_callback.into_pg());
+            let leaked_ptr = Box::leak(Box::new(v));
+            // SAFETY:  we know the result of `self.palloc_struct()` is a valid pointer
+            unsafe {
+                let mut memcxt_callback =
+                    PgBox::from_pg(self.palloc_struct::<pg_sys::MemoryContextCallback>());
+                memcxt_callback.func = Some(drop_on_delete::<T>);
+                memcxt_callback.arg = leaked_ptr as *mut T as void_mut_ptr;
+                pg_sys::MemoryContextRegisterResetCallback(self.value(), memcxt_callback.into_pg());
+            }
+            leaked_ptr
         }
-        leaked_ptr
     }
 
     /// helper function
