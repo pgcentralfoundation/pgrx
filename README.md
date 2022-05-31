@@ -74,7 +74,7 @@
 - [Build dependencies for PostgreSQL](https://wiki.postgresql.org/wiki/Compile_and_Install_from_source_code)
 
 <details>
-   <summary>GCC 7 on CentOS 7</summary>
+   <summary>How to: GCC 7 on CentOS 7</summary>
    
 In order to use GCC 7, install [`scl`](https://wiki.centos.org/AdditionalResources/Repositories/SCL) and enter the GCC 7 development environment:
 
