@@ -26,13 +26,11 @@ pub struct JsonString(pub String);
 /// for json
 impl FromDatum for Json {
     #[inline]
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<Json> {
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Json> {
         if is_null {
             None
-        } else if datum == 0 {
-            panic!("a json Datum was flagged as non-null but the datum is zero");
         } else {
-            let varlena = pg_sys::pg_detoast_datum(datum as *mut pg_sys::varlena);
+            let varlena = pg_sys::pg_detoast_datum(datum.ptr_cast());
             let len = varsize_any_exhdr(varlena);
             let data = vardata_any(varlena);
             let slice = std::slice::from_raw_parts(data as *const u8, len);
@@ -44,18 +42,16 @@ impl FromDatum for Json {
 
 /// for jsonb
 impl FromDatum for JsonB {
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<JsonB> {
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<JsonB> {
         if is_null {
             None
-        } else if datum == 0 {
-            panic!("a jsonb Datum was flagged as non-null but the datum is zero")
         } else {
-            let varlena = datum as *mut pg_sys::varlena;
+            let varlena = datum.ptr_cast();
             let detoasted = pg_sys::pg_detoast_datum_packed(varlena);
 
             let cstr = direct_function_call::<&std::ffi::CStr>(
                 pg_sys::jsonb_out,
-                vec![Some(detoasted as pg_sys::Datum)],
+                vec![Some(detoasted.into())],
             )
             .expect("failed to convert jsonb to a cstring");
 
@@ -84,17 +80,11 @@ impl FromDatum for JsonB {
 /// This returns a **copy**, allocated and managed by Rust, of the underlying `varlena` Datum
 impl FromDatum for JsonString {
     #[inline]
-    unsafe fn from_datum(
-        datum: pg_sys::Datum,
-        is_null: bool,
-        _: pg_sys::Oid,
-    ) -> Option<JsonString> {
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<JsonString> {
         if is_null {
             None
-        } else if datum == 0 {
-            panic!("a varlena Datum was flagged as non-null but the datum is zero");
         } else {
-            let varlena = datum as *mut pg_sys::varlena;
+            let varlena = datum.ptr_cast();
             let detoasted = pg_sys::pg_detoast_datum_packed(varlena);
             let len = varsize_any_exhdr(detoasted);
             let data = vardata_any(detoasted);
@@ -132,10 +122,7 @@ impl IntoDatum for JsonB {
             std::ffi::CString::new(string).expect("string version of jsonb is not valid UTF8");
 
         unsafe {
-            direct_function_call_as_datum(
-                pg_sys::jsonb_in,
-                vec![Some(cstring.as_ptr() as pg_sys::Datum)],
-            )
+            direct_function_call_as_datum(pg_sys::jsonb_in, vec![Some(cstring.as_ptr().into())])
         }
     }
 

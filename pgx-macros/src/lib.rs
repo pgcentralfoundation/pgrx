@@ -641,11 +641,12 @@ fn impl_postgres_enum(ast: DeriveInput) -> proc_macro2::TokenStream {
     stream.extend(quote! {
         impl pgx::FromDatum for #enum_ident {
             #[inline]
-            unsafe fn from_datum(datum: pgx::pg_sys::Datum, is_null: bool, typeoid: pgx::pg_sys::Oid) -> Option<#enum_ident> {
+            unsafe fn from_datum(datum: pgx::pg_sys::Datum, is_null: bool) -> Option<#enum_ident> {
                 if is_null {
                     None
                 } else {
-                    let (name, _, _) = pgx::lookup_enum_by_oid(datum as pgx::pg_sys::Oid);
+                    // GREPME: non-primitive cast u64 as Oid
+                    let (name, _, _) = pgx::lookup_enum_by_oid(datum.value() as pgx::pg_sys::Oid);
                     match name.as_str() {
                         #from_datum
                         _ => panic!("invalid enum value: {}", name)
@@ -1044,4 +1045,36 @@ Currently `sql` can be provided one of the following:
 #[proc_macro_attribute]
 pub fn pgx(_attr: TokenStream, item: TokenStream) -> TokenStream {
     item
+}
+
+/**
+Create a [PostgreSQL trigger function](https://www.postgresql.org/docs/current/plpgsql-trigger.html)
+
+Review the `pgx::trigger_support::PgTrigger` documentation for use.
+
+ */
+#[proc_macro_attribute]
+pub fn pg_trigger(attrs: TokenStream, input: TokenStream) -> TokenStream {
+    fn wrapped(attrs: TokenStream, input: TokenStream) -> Result<TokenStream, syn::Error> {
+        use pgx_utils::sql_entity_graph::{PgTrigger, PgTriggerAttribute};
+        use syn::{parse::Parser, punctuated::Punctuated, Token};
+
+        let attributes =
+            Punctuated::<PgTriggerAttribute, Token![,]>::parse_terminated.parse(attrs)?;
+        let item_fn: syn::ItemFn = syn::parse(input)?;
+        let trigger_item = PgTrigger::new(item_fn, attributes)?;
+        let trigger_tokens = trigger_item.to_token_stream();
+
+        Ok(trigger_tokens.into())
+    }
+
+    match wrapped(attrs, input) {
+        Ok(tokens) => tokens,
+        Err(e) => {
+            let msg = e.to_string();
+            TokenStream::from(quote! {
+              compile_error!(#msg);
+            })
+        }
+    }
 }

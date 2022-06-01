@@ -7,12 +7,18 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
+mod datum;
 pub mod guard;
 mod oids;
 pub mod setjmp;
 mod tupdesc;
 mod utils;
 
+pub use datum::Datum;
+// OnDrop(feature = "pg11"): remove this cfg if all supported versions of Postgres
+// now include NullableDatum.
+#[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14"))]
+pub use datum::NullableDatum;
 pub use guard::*;
 pub use oids::*;
 pub use tupdesc::*;

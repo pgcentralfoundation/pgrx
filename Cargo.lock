@@ -1435,6 +1435,7 @@ dependencies = [
  "serde",
  "serde_cbor",
  "serde_json",
+ "thiserror",
  "time",
  "tracing",
  "tracing-error",
@@ -1470,6 +1471,8 @@ dependencies = [
  "proc-macro2",
  "quote",
  "rayon",
+ "rustversion",
+ "sptr",
  "syn",
 ]
 
@@ -1489,6 +1492,7 @@ dependencies = [
  "serde",
  "serde_json",
  "shutdown_hooks",
+ "thiserror",
  "time",
 ]
 
@@ -1899,15 +1903,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "rustc_version"
-version = "0.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bfa0f585226d2e68097d4f95d113b15b83a82e819ab25717ec0590d9584ef366"
-dependencies = [
- "semver 1.0.9",
-]
-
-[[package]]
 name = "ryu"
 version = "1.0.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2174,6 +2169,12 @@ checksum = "c530c2b0d0bf8b69304b39fe2001993e267461948b890cd037d8ad4293fa1a0d"
 dependencies = [
  "lock_api",
 ]
+
+[[package]]
+name = "sptr"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1e0d4365121b91e8522958da77ce29c004333daeaf0711225c4727c8c5f49941"
 
 [[package]]
 name = "srf"
@@ -2495,6 +2496,7 @@ version = "0.0.0"
 dependencies = [
  "pgx",
  "pgx-tests",
+ "thiserror",
 ]
 
 [[package]]

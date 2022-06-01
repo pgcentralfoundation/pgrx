@@ -40,7 +40,7 @@ pub extern "C" fn _PG_init() {
 #[pg_guard]
 #[no_mangle]
 pub extern "C" fn background_worker_main(arg: pg_sys::Datum) {
-    let arg = unsafe { i32::from_datum(arg, false, pg_sys::INT4OID) };
+    let arg = unsafe { i32::from_datum(arg, false) };
 
     // these are the signals we want to receive.  If we don't attach the SIGTERM handler, then
     // we'll never be able to exit via an external notification

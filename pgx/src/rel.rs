@@ -308,13 +308,12 @@ impl Clone for PgRelation {
 }
 
 impl FromDatum for PgRelation {
-    const NEEDS_TYPID: bool = false;
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _typoid: u32) -> Option<PgRelation> {
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<PgRelation> {
         if is_null {
             None
         } else {
             Some(PgRelation::with_lock(
-                datum as pg_sys::Oid,
+                datum.value() as _,
                 pg_sys::AccessShareLock as pg_sys::LOCKMODE,
             ))
         }
@@ -323,7 +322,7 @@ impl FromDatum for PgRelation {
 
 impl IntoDatum for PgRelation {
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        Some(self.oid() as pg_sys::Datum)
+        Some(pg_sys::Datum::from(self.oid()))
     }
 
     fn type_oid() -> u32 {

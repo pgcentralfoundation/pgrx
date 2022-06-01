@@ -26,6 +26,11 @@ use syn::{ForeignItem, Item};
 #[derive(Debug)]
 struct IgnoredMacros(HashSet<String>);
 
+#[rustversion::nightly]
+const IS_NIGHTLY: bool = true;
+#[rustversion::not(nightly)]
+const IS_NIGHTLY: bool = false;
+
 impl IgnoredMacros {
     fn default() -> Self {
         // these cause duplicate definition problems on linux
@@ -70,6 +75,11 @@ fn main() -> color_eyre::Result<()> {
     let is_for_release =
         std::env::var("PGX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE").unwrap_or("0".to_string()) == "1";
     println!("cargo:rerun-if-env-changed=PGX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE");
+
+    // Do nightly detection to suppress silly warnings.
+    if IS_NIGHTLY {
+        println!("cargo:rustc-cfg=nightly")
+    };
 
     let manifest_dir = PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").unwrap());
     let out_dir = PathBuf::from(std::env::var("OUT_DIR").unwrap());
@@ -156,7 +166,9 @@ fn main() -> color_eyre::Result<()> {
                     &bindings_file,
                     quote! {
                         use crate as pg_sys;
-                        use crate::PgNode;
+                        #[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14"))]
+                        use crate::NullableDatum;
+                        use crate::{PgNode, Datum};
                     },
                 )
                 .wrap_err_with(|| {
@@ -508,6 +520,8 @@ fn run_bindgen(pg_config: &PgConfig, include_h: &PathBuf) -> eyre::Result<syn::F
         .header(include_h.display().to_string())
         .clang_arg(&format!("-I{}", includedir_server.display()))
         .parse_callbacks(Box::new(IgnoredMacros::default()))
+        .blocklist_type("Datum") // manually wrapping datum types for correctness
+        .blocklist_type("NullableDatum")
         .blocklist_function("varsize_any") // pgx converts the VARSIZE_ANY macro, so we don't want to also have this function, which is in heaptuple.c
         .blocklist_function("query_tree_walker")
         .blocklist_function("expression_tree_walker")

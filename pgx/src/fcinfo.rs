@@ -94,14 +94,7 @@ mod pg_10_11 {
     pub fn pg_getarg<T: FromDatum>(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> Option<T> {
         let datum = unsafe { fcinfo.as_ref() }.unwrap().arg[num];
         let isnull = pg_arg_is_null(fcinfo, num);
-        unsafe {
-            let typid = if T::NEEDS_TYPID {
-                crate::get_getarg_type(fcinfo, num)
-            } else {
-                pg_sys::InvalidOid
-            };
-            T::from_datum(datum, isnull, typid)
-        }
+        unsafe { T::from_datum(datum, isnull) }
     }
 
     #[inline]
@@ -126,7 +119,7 @@ mod pg_10_11 {
     #[inline]
     pub fn pg_return_null(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
         unsafe { fcinfo.as_mut() }.unwrap().isnull = true;
-        0 as pg_sys::Datum
+        pg_sys::Datum::from(0)
     }
 }
 
@@ -137,14 +130,7 @@ mod pg_12_13_14 {
     #[inline]
     pub fn pg_getarg<T: FromDatum>(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> Option<T> {
         let datum = get_nullable_datum(fcinfo, num);
-        unsafe {
-            let typid = if T::NEEDS_TYPID {
-                crate::get_getarg_type(fcinfo, num)
-            } else {
-                pg_sys::InvalidOid
-            };
-            T::from_datum(datum.value, datum.isnull, typid)
-        }
+        unsafe { T::from_datum(datum.value, datum.isnull) }
     }
 
     #[inline]
@@ -172,7 +158,7 @@ mod pg_12_13_14 {
         unsafe {
             let nargs = fcinfo.nargs;
             let len = std::mem::size_of::<pg_sys::NullableDatum>() * nargs as usize;
-            fcinfo.args.as_slice(len)[num]
+            fcinfo.args.as_slice(len)[num].clone()
         }
     }
 
@@ -180,7 +166,7 @@ mod pg_12_13_14 {
     pub fn pg_return_null(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
         let fcinfo = unsafe { fcinfo.as_mut() }.unwrap();
         fcinfo.isnull = true;
-        0 as pg_sys::Datum
+        pg_sys::Datum::from(0)
     }
 }
 
@@ -198,7 +184,7 @@ use std::ops::DerefMut;
 #[inline]
 pub fn pg_getarg_pointer<T>(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> Option<*mut T> {
     match pg_getarg_datum(fcinfo, num) {
-        Some(datum) => Some(datum as *mut T),
+        Some(datum) => Some(datum.ptr_cast::<T>()),
         None => None,
     }
 }
@@ -227,7 +213,7 @@ pub fn pg_getarg_cstr<'a>(
 
 #[inline]
 pub fn pg_return_void() -> pg_sys::Datum {
-    0 as pg_sys::Datum
+    pg_sys::Datum::from(0)
 }
 
 /// Retrieve the `.flinfo.fn_extra` pointer (as a PgBox'd type) from [`pg_sys::FunctionCallInfo`].
@@ -277,7 +263,7 @@ pub unsafe fn direct_function_call<R: FromDatum>(
 ) -> Option<R> {
     let datum = direct_function_call_as_datum(func, args);
     match datum {
-        Some(datum) => R::from_datum(datum, false, pg_sys::InvalidOid),
+        Some(datum) => R::from_datum(datum, false),
         None => None,
     }
 }
@@ -314,7 +300,7 @@ pub unsafe fn direct_pg_extern_function_call<R: FromDatum>(
 ) -> Option<R> {
     let datum = direct_pg_extern_function_call_as_datum(func, args);
     match datum {
-        Some(datum) => R::from_datum(datum, false, pg_sys::InvalidOid),
+        Some(datum) => R::from_datum(datum, false),
         None => None,
     }
 }
@@ -330,7 +316,7 @@ pub unsafe fn direct_function_call_as_datum(
     args: Vec<Option<pg_sys::Datum>>,
 ) -> Option<pg_sys::Datum> {
     let mut null_array = [false; 100usize];
-    let mut arg_array = [0 as pg_sys::Datum; 100usize];
+    let mut arg_array = [pg_sys::Datum::from(0); 100usize];
     let nargs = args.len();
 
     for (i, datum) in args.into_iter().enumerate() {
@@ -342,7 +328,7 @@ pub unsafe fn direct_function_call_as_datum(
 
             None => {
                 null_array[i] = true;
-                arg_array[i] = 0;
+                arg_array[i] = pg_sys::Datum::from(0);
             }
         }
     }
@@ -368,7 +354,7 @@ pub unsafe fn direct_pg_extern_function_call_as_datum(
     args: Vec<Option<pg_sys::Datum>>,
 ) -> Option<pg_sys::Datum> {
     let mut null_array = [false; 100usize];
-    let mut arg_array = [0 as pg_sys::Datum; 100usize];
+    let mut arg_array = [pg_sys::Datum::from(0); 100usize];
     let nargs = args.len();
 
     for (i, datum) in args.into_iter().enumerate() {
@@ -380,7 +366,7 @@ pub unsafe fn direct_pg_extern_function_call_as_datum(
 
             None => {
                 null_array[i] = true;
-                arg_array[i] = 0;
+                arg_array[i] = pg_sys::Datum::from(0);
             }
         }
     }
@@ -398,7 +384,7 @@ pub unsafe fn direct_pg_extern_function_call_as_datum(
 #[cfg(any(feature = "pg10", feature = "pg11"))]
 fn make_function_call_info(
     nargs: usize,
-    arg_array: [usize; 100],
+    arg_array: [pg_sys::Datum; 100],
     null_array: [bool; 100],
 ) -> PgBox<pg_sys::FunctionCallInfoData, AllocatedByRust> {
     let mut fcinfo_boxed = PgBox::<pg_sys::FunctionCallInfoData>::alloc0();
@@ -414,7 +400,7 @@ fn make_function_call_info(
 #[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14"))]
 fn make_function_call_info(
     nargs: usize,
-    arg_array: [usize; 100],
+    arg_array: [pg_sys::Datum; 100],
     null_array: [bool; 100],
 ) -> PgBox<pg_sys::FunctionCallInfoBaseData, AllocatedByRust> {
     let fcid: *mut pg_sys::FunctionCallInfoBaseData = unsafe {

@@ -17,15 +17,14 @@ pub struct Timestamp(time::PrimitiveDateTime);
 
 impl From<pg_sys::Timestamp> for Timestamp {
     fn from(item: pg_sys::Timestamp) -> Self {
-        unsafe { Timestamp::from_datum(item as usize, false, pg_sys::TIMESTAMPOID).unwrap() }
+        unsafe { Timestamp::from_datum(item.into(), false).unwrap() }
     }
 }
 
 impl FromDatum for Timestamp {
     #[inline]
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, typoid: u32) -> Option<Timestamp> {
-        let ts: Option<TimestampWithTimeZone> =
-            TimestampWithTimeZone::from_datum(datum, is_null, typoid);
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Timestamp> {
+        let ts: Option<TimestampWithTimeZone> = TimestampWithTimeZone::from_datum(datum, is_null);
         match ts {
             None => None,
             Some(ts) => {

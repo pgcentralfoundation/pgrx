@@ -315,6 +315,7 @@ pub(crate) fn generate_schema(
     }
     let mut seen_schemas = Vec::new();
     let mut num_funcs = 0_usize;
+    let mut num_triggers = 0_usize;
     let mut num_types = 0_usize;
     let mut num_enums = 0_usize;
     let mut num_sqls = 0_usize;
@@ -331,6 +332,8 @@ pub(crate) fn generate_schema(
             seen_schemas.push(schema);
         } else if func.starts_with("__pgx_internals_fn_") {
             num_funcs += 1;
+        } else if func.starts_with("__pgx_internals_trigger_") {
+            num_triggers += 1;
         } else if func.starts_with("__pgx_internals_type_") {
             num_types += 1;
         } else if func.starts_with("__pgx_internals_enum_") {
@@ -347,7 +350,7 @@ pub(crate) fn generate_schema(
     }
 
     eprintln!(
-        "{} {} SQL entities: {} schemas ({} unique), {} functions, {} types, {} enums, {} sqls, {} ords, {} hashes, {} aggregates",
+        "{} {} SQL entities: {} schemas ({} unique), {} functions, {} types, {} enums, {} sqls, {} ords, {} hashes, {} aggregates, {} triggers",
         "  Discovered".bold().green(),
         fns_to_call.len().to_string().bold().cyan(),
         seen_schemas.iter().count().to_string().bold().cyan(),
@@ -359,6 +362,7 @@ pub(crate) fn generate_schema(
         num_ords.to_string().bold().cyan(),
         num_hashes.to_string().bold().cyan(),
         num_aggregates.to_string().bold().cyan(),
+        num_triggers.to_string().bold().cyan(),
     );
 
     tracing::debug!("Collecting {} SQL entities", fns_to_call.len());
