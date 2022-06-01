@@ -1,5 +1,7 @@
 use crate as pg_sys;
-use crate::PgNode;
+#[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14"))]
+use crate::NullableDatum;
+use crate::{Datum, PgNode};
 #[repr(C)]
 #[derive(Copy, Clone, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct __BindgenBitfieldUnit<Storage> {
@@ -322,16 +324,16 @@ pub const MAXIMUM_ALIGNOF: u32 = 8;
 pub const MEMSET_LOOP_LIMIT: u32 = 1024;
 pub const PACKAGE_BUGREPORT: &[u8; 26usize] = b"pgsql-bugs@postgresql.org\0";
 pub const PACKAGE_NAME: &[u8; 11usize] = b"PostgreSQL\0";
-pub const PACKAGE_STRING: &[u8; 17usize] = b"PostgreSQL 10.20\0";
+pub const PACKAGE_STRING: &[u8; 17usize] = b"PostgreSQL 10.21\0";
 pub const PACKAGE_TARNAME: &[u8; 11usize] = b"postgresql\0";
 pub const PACKAGE_URL: &[u8; 1usize] = b"\0";
-pub const PACKAGE_VERSION: &[u8; 6usize] = b"10.20\0";
+pub const PACKAGE_VERSION: &[u8; 6usize] = b"10.21\0";
 pub const PG_KRB_SRVNAM: &[u8; 9usize] = b"postgres\0";
 pub const PG_MAJORVERSION: &[u8; 3usize] = b"10\0";
-pub const PG_VERSION: &[u8; 6usize] = b"10.20\0";
-pub const PG_VERSION_NUM: u32 = 100020;
+pub const PG_VERSION: &[u8; 6usize] = b"10.21\0";
+pub const PG_VERSION_NUM: u32 = 100021;
 pub const PG_VERSION_STR: &[u8; 78usize] =
-    b"PostgreSQL 10.20 on x86_64-pc-linux-gnu, compiled by gcc (GCC) 11.2.0, 64-bit\0";
+    b"PostgreSQL 10.21 on x86_64-pc-linux-gnu, compiled by gcc (GCC) 12.1.0, 64-bit\0";
 pub const RELSEG_SIZE: u32 = 131072;
 pub const SIZEOF_LONG: u32 = 8;
 pub const SIZEOF_OFF_T: u32 = 8;
@@ -898,6 +900,8 @@ pub const SOL_NFC: u32 = 280;
 pub const SOL_KCM: u32 = 281;
 pub const SOL_TLS: u32 = 282;
 pub const SOL_XDP: u32 = 283;
+pub const SOL_MPTCP: u32 = 284;
+pub const SOL_MCTP: u32 = 285;
 pub const SOMAXCONN: u32 = 4096;
 pub const _BITS_SOCKADDR_H: u32 = 1;
 pub const _SS_SIZE: u32 = 128;
@@ -1180,7 +1184,7 @@ pub const NI_DGRAM: u32 = 16;
 pub const _PWD_H: u32 = 1;
 pub const NSS_BUFLEN_PASSWD: u32 = 1024;
 pub const PGINVALID_SOCKET: i32 = -1;
-pub const PG_BACKEND_VERSIONSTR: &[u8; 29usize] = b"postgres (PostgreSQL) 10.20\n\0";
+pub const PG_BACKEND_VERSIONSTR: &[u8; 29usize] = b"postgres (PostgreSQL) 10.21\n\0";
 pub const EXE: &[u8; 1usize] = b"\0";
 pub const DEVNULL: &[u8; 10usize] = b"/dev/null\0";
 pub const PG_IOLBF: u32 = 1;
@@ -1996,6 +2000,8 @@ pub const PROC_RESERVED: u32 = 32;
 pub const PROC_VACUUM_STATE_MASK: u32 = 14;
 pub const FP_LOCK_SLOTS_PER_BACKEND: u32 = 16;
 pub const INVALID_PGPROCNO: u32 = 2147483647;
+pub const DELAY_CHKPT_START: u32 = 1;
+pub const DELAY_CHKPT_COMPLETE: u32 = 2;
 pub const NUM_AUXILIARY_PROCS: u32 = 4;
 pub const PGSTAT_STAT_PERMANENT_DIRECTORY: &[u8; 8usize] = b"pg_stat\0";
 pub const PGSTAT_STAT_PERMANENT_FILENAME: &[u8; 20usize] = b"pg_stat/global.stat\0";
@@ -11132,7 +11138,6 @@ pub struct varattrib_1b_e {
     pub va_tag: uint8,
     pub va_data: __IncompleteArrayField<::std::os::raw::c_char>,
 }
-pub type Datum = usize;
 pub type DatumPtr = *mut Datum;
 pub unsafe fn ExceptionalCondition(
     arg_conditionName: *const ::std::os::raw::c_char,
@@ -11187,7 +11192,6 @@ impl Default for FmgrInfo {
     }
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
 pub struct FunctionCallInfoData {
     pub flinfo: *mut FmgrInfo,
     pub context: fmNodePtr,
@@ -14389,7 +14393,6 @@ pub const ScanDirection_ForwardScanDirection: ScanDirection = 1;
 pub type ScanDirection = ::std::os::raw::c_int;
 pub type StrategyNumber = uint16;
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
 pub struct ScanKeyData {
     pub sk_flags: ::std::os::raw::c_int,
     pub sk_attno: AttrNumber,
@@ -16851,7 +16854,6 @@ impl Default for Var {
     }
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
 pub struct Const {
     pub xpr: Expr,
     pub consttype: Oid,
@@ -19455,12 +19457,20 @@ pub unsafe fn InstrAccumParallelQuery(arg_result: *mut BufferUsage) {
     })
 }
 #[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
 pub struct ParamExternData {
     pub value: Datum,
     pub isnull: bool,
     pub pflags: uint16,
     pub ptype: Oid,
+}
+impl Default for ParamExternData {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
 }
 pub type ParamListInfo = *mut ParamListInfoData;
 pub type ParamFetchHook = ::std::option::Option<
@@ -19470,7 +19480,6 @@ pub type ParserSetupHook = ::std::option::Option<
     unsafe extern "C" fn(pstate: *mut ParseState, arg: *mut ::std::os::raw::c_void),
 >;
 #[repr(C)]
-#[derive(Debug)]
 pub struct ParamListInfoData {
     pub paramFetch: ParamFetchHook,
     pub paramFetchArg: *mut ::std::os::raw::c_void,
@@ -19490,7 +19499,6 @@ impl Default for ParamListInfoData {
     }
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
 pub struct ParamExecData {
     pub execPlan: *mut ::std::os::raw::c_void,
     pub value: Datum,
@@ -21778,7 +21786,6 @@ pub type ExprStateEvalFunc = ::std::option::Option<
     ) -> Datum,
 >;
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
 pub struct ExprState {
     pub tag: Node,
     pub flags: uint8,
@@ -21838,7 +21845,6 @@ impl Default for IndexInfo {
 }
 pub type ExprContextCallbackFunction = ::std::option::Option<unsafe extern "C" fn(arg: Datum)>;
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
 pub struct ExprContext_CB {
     pub next: *mut ExprContext_CB,
     pub function: ExprContextCallbackFunction,
@@ -21854,7 +21860,6 @@ impl Default for ExprContext_CB {
     }
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
 pub struct ExprContext {
     pub type_: NodeTag,
     pub ecxt_scantuple: *mut TupleTableSlot,
@@ -21913,7 +21918,6 @@ impl Default for ReturnSetInfo {
     }
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
 pub struct ProjectionInfo {
     pub type_: NodeTag,
     pub pi_state: ExprState,
@@ -22309,7 +22313,6 @@ impl Default for WindowFuncExprState {
     }
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
 pub struct SetExprState {
     pub type_: NodeTag,
     pub expr: *mut Expr,
@@ -22335,7 +22338,6 @@ impl Default for SetExprState {
     }
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
 pub struct SubPlanState {
     pub type_: NodeTag,
     pub subplan: *mut SubPlan,
@@ -23310,7 +23312,6 @@ pub struct WindowStatePerAggData {
 }
 pub type WindowStatePerAgg = *mut WindowStatePerAggData;
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
 pub struct WindowAggState {
     pub ss: ScanState,
     pub funcs: *mut List,
@@ -38105,6 +38106,7 @@ pub struct PGPROC {
     pub heldLocks: LOCKMASK,
     pub waitLSN: XLogRecPtr,
     pub syncRepState: ::std::os::raw::c_int,
+    pub delayChkptEnd: bool,
     pub syncRepLinks: SHM_QUEUE,
     pub myProcLocks: [SHM_QUEUE; 16usize],
     pub subxids: XidCache,
@@ -40014,7 +40016,6 @@ pub struct GISTPageOpaqueData {
 }
 pub type GISTPageOpaque = *mut GISTPageOpaqueData;
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
 pub struct GIST_SPLITVEC {
     pub spl_left: *mut OffsetNumber,
     pub spl_nleft: ::std::os::raw::c_int,
@@ -40035,7 +40036,6 @@ impl Default for GIST_SPLITVEC {
     }
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
 pub struct GISTENTRY {
     pub key: Datum,
     pub rel: Relation,
@@ -40053,7 +40053,6 @@ impl Default for GISTENTRY {
     }
 }
 #[repr(C)]
-#[derive(Debug)]
 pub struct GistEntryVector {
     pub n: int32,
     pub vector: __IncompleteArrayField<GISTENTRY>,
@@ -49591,7 +49590,6 @@ pub const BgWorkerStartTime_BgWorkerStart_ConsistentState: BgWorkerStartTime = 1
 pub const BgWorkerStartTime_BgWorkerStart_RecoveryFinished: BgWorkerStartTime = 2;
 pub type BgWorkerStartTime = ::std::os::raw::c_uint;
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
 pub struct BackgroundWorker {
     pub bgw_name: [::std::os::raw::c_char; 64usize],
     pub bgw_flags: ::std::os::raw::c_int,
@@ -62604,6 +62602,18 @@ pub unsafe fn GetVirtualXIDsDelayingChkpt(
         GetVirtualXIDsDelayingChkpt(arg_nvxids)
     })
 }
+pub unsafe fn GetVirtualXIDsDelayingChkptEnd(
+    arg_nvxids: *mut ::std::os::raw::c_int,
+) -> *mut VirtualTransactionId {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn GetVirtualXIDsDelayingChkptEnd(
+                arg_nvxids: *mut ::std::os::raw::c_int,
+            ) -> *mut VirtualTransactionId;
+        }
+        GetVirtualXIDsDelayingChkptEnd(arg_nvxids)
+    })
+}
 pub unsafe fn HaveVirtualXIDsDelayingChkpt(
     arg_vxids: *mut VirtualTransactionId,
     arg_nvxids: ::std::os::raw::c_int,
@@ -62616,6 +62626,20 @@ pub unsafe fn HaveVirtualXIDsDelayingChkpt(
             ) -> bool;
         }
         HaveVirtualXIDsDelayingChkpt(arg_vxids, arg_nvxids)
+    })
+}
+pub unsafe fn HaveVirtualXIDsDelayingChkptEnd(
+    arg_vxids: *mut VirtualTransactionId,
+    arg_nvxids: ::std::os::raw::c_int,
+) -> bool {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn HaveVirtualXIDsDelayingChkptEnd(
+                arg_vxids: *mut VirtualTransactionId,
+                arg_nvxids: ::std::os::raw::c_int,
+            ) -> bool;
+        }
+        HaveVirtualXIDsDelayingChkptEnd(arg_vxids, arg_nvxids)
     })
 }
 pub unsafe fn BackendPidGetProc(arg_pid: ::std::os::raw::c_int) -> *mut PGPROC {

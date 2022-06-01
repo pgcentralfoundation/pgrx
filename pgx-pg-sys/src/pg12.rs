@@ -1,5 +1,7 @@
 use crate as pg_sys;
-use crate::PgNode;
+#[cfg(any(feature = "pg12", feature = "pg13", feature = "pg14"))]
+use crate::NullableDatum;
+use crate::{Datum, PgNode};
 #[repr(C)]
 #[derive(Copy, Clone, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct __BindgenBitfieldUnit<Storage> {
@@ -313,6 +315,7 @@ pub const HAVE__BUILTIN_BSWAP64: u32 = 1;
 pub const HAVE__BUILTIN_CLZ: u32 = 1;
 pub const HAVE__BUILTIN_CONSTANT_P: u32 = 1;
 pub const HAVE__BUILTIN_CTZ: u32 = 1;
+pub const HAVE__BUILTIN_FRAME_ADDRESS: u32 = 1;
 pub const HAVE__BUILTIN_OP_OVERFLOW: u32 = 1;
 pub const HAVE__BUILTIN_POPCOUNT: u32 = 1;
 pub const HAVE__BUILTIN_TYPES_COMPATIBLE_P: u32 = 1;
@@ -324,16 +327,16 @@ pub const MAXIMUM_ALIGNOF: u32 = 8;
 pub const MEMSET_LOOP_LIMIT: u32 = 1024;
 pub const PACKAGE_BUGREPORT: &[u8; 32usize] = b"pgsql-bugs@lists.postgresql.org\0";
 pub const PACKAGE_NAME: &[u8; 11usize] = b"PostgreSQL\0";
-pub const PACKAGE_STRING: &[u8; 17usize] = b"PostgreSQL 12.10\0";
+pub const PACKAGE_STRING: &[u8; 17usize] = b"PostgreSQL 12.11\0";
 pub const PACKAGE_TARNAME: &[u8; 11usize] = b"postgresql\0";
 pub const PACKAGE_URL: &[u8; 1usize] = b"\0";
-pub const PACKAGE_VERSION: &[u8; 6usize] = b"12.10\0";
+pub const PACKAGE_VERSION: &[u8; 6usize] = b"12.11\0";
 pub const PG_KRB_SRVNAM: &[u8; 9usize] = b"postgres\0";
 pub const PG_MAJORVERSION: &[u8; 3usize] = b"12\0";
-pub const PG_VERSION: &[u8; 6usize] = b"12.10\0";
-pub const PG_VERSION_NUM: u32 = 120010;
+pub const PG_VERSION: &[u8; 6usize] = b"12.11\0";
+pub const PG_VERSION_NUM: u32 = 120011;
 pub const PG_VERSION_STR: &[u8; 78usize] =
-    b"PostgreSQL 12.10 on x86_64-pc-linux-gnu, compiled by gcc (GCC) 11.2.0, 64-bit\0";
+    b"PostgreSQL 12.11 on x86_64-pc-linux-gnu, compiled by gcc (GCC) 12.1.0, 64-bit\0";
 pub const RELSEG_SIZE: u32 = 131072;
 pub const SIZEOF_BOOL: u32 = 1;
 pub const SIZEOF_LONG: u32 = 8;
@@ -903,6 +906,8 @@ pub const SOL_NFC: u32 = 280;
 pub const SOL_KCM: u32 = 281;
 pub const SOL_TLS: u32 = 282;
 pub const SOL_XDP: u32 = 283;
+pub const SOL_MPTCP: u32 = 284;
+pub const SOL_MCTP: u32 = 285;
 pub const SOMAXCONN: u32 = 4096;
 pub const _BITS_SOCKADDR_H: u32 = 1;
 pub const _SS_SIZE: u32 = 128;
@@ -1185,7 +1190,7 @@ pub const NI_DGRAM: u32 = 16;
 pub const _PWD_H: u32 = 1;
 pub const NSS_BUFLEN_PASSWD: u32 = 1024;
 pub const PGINVALID_SOCKET: i32 = -1;
-pub const PG_BACKEND_VERSIONSTR: &[u8; 29usize] = b"postgres (PostgreSQL) 12.10\n\0";
+pub const PG_BACKEND_VERSIONSTR: &[u8; 29usize] = b"postgres (PostgreSQL) 12.11\n\0";
 pub const EXE: &[u8; 1usize] = b"\0";
 pub const DEVNULL: &[u8; 10usize] = b"/dev/null\0";
 pub const USE_REPL_SNPRINTF: u32 = 1;
@@ -1990,6 +1995,8 @@ pub const PROC_RESERVED: u32 = 32;
 pub const PROC_VACUUM_STATE_MASK: u32 = 14;
 pub const FP_LOCK_SLOTS_PER_BACKEND: u32 = 16;
 pub const INVALID_PGPROCNO: u32 = 2147483647;
+pub const DELAY_CHKPT_START: u32 = 1;
+pub const DELAY_CHKPT_COMPLETE: u32 = 2;
 pub const NUM_AUXILIARY_PROCS: u32 = 4;
 pub const PGSTAT_STAT_PERMANENT_DIRECTORY: &[u8; 8usize] = b"pg_stat\0";
 pub const PGSTAT_STAT_PERMANENT_FILENAME: &[u8; 20usize] = b"pg_stat/global.stat\0";
@@ -15041,13 +15048,6 @@ pub struct varattrib_1b_e {
     pub va_tag: uint8,
     pub va_data: __IncompleteArrayField<::std::os::raw::c_char>,
 }
-pub type Datum = usize;
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct NullableDatum {
-    pub value: Datum,
-    pub isnull: bool,
-}
 pub type fmNodePtr = *mut Node;
 pub type fmAggrefPtr = *mut Aggref;
 pub type fmExprContextCallbackFunction = ::std::option::Option<unsafe extern "C" fn(arg: Datum)>;
@@ -15078,7 +15078,6 @@ impl Default for FmgrInfo {
     }
 }
 #[repr(C)]
-#[derive(Debug)]
 pub struct FunctionCallInfoBaseData {
     pub flinfo: *mut FmgrInfo,
     pub context: fmNodePtr,
@@ -20662,12 +20661,20 @@ pub unsafe fn pairingheap_remove(arg_heap: *mut pairingheap, arg_node: *mut pair
     })
 }
 #[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
 pub struct ParamExternData {
     pub value: Datum,
     pub isnull: bool,
     pub pflags: uint16,
     pub ptype: Oid,
+}
+impl Default for ParamExternData {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
 }
 pub type ParamListInfo = *mut ParamListInfoData;
 pub type ParamFetchHook = ::std::option::Option<
@@ -20691,7 +20698,6 @@ pub type ParserSetupHook = ::std::option::Option<
     unsafe extern "C" fn(pstate: *mut ParseState, arg: *mut ::std::os::raw::c_void),
 >;
 #[repr(C)]
-#[derive(Debug)]
 pub struct ParamListInfoData {
     pub paramFetch: ParamFetchHook,
     pub paramFetchArg: *mut ::std::os::raw::c_void,
@@ -20712,7 +20718,6 @@ impl Default for ParamListInfoData {
     }
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
 pub struct ParamExecData {
     pub execPlan: *mut ::std::os::raw::c_void,
     pub value: Datum,
@@ -20926,7 +20931,6 @@ impl Default for Var {
     }
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
 pub struct Const {
     pub xpr: Expr,
     pub consttype: Oid,
@@ -26472,7 +26476,6 @@ pub type ExprStateEvalFunc = ::std::option::Option<
     ) -> Datum,
 >;
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
 pub struct ExprState {
     pub tag: Node,
     pub flags: uint8,
@@ -26538,7 +26541,6 @@ impl Default for IndexInfo {
 }
 pub type ExprContextCallbackFunction = ::std::option::Option<unsafe extern "C" fn(arg: Datum)>;
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
 pub struct ExprContext_CB {
     pub next: *mut ExprContext_CB,
     pub function: ExprContextCallbackFunction,
@@ -26554,7 +26556,6 @@ impl Default for ExprContext_CB {
     }
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
 pub struct ExprContext {
     pub type_: NodeTag,
     pub ecxt_scantuple: *mut TupleTableSlot,
@@ -26613,7 +26614,6 @@ impl Default for ReturnSetInfo {
     }
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
 pub struct ProjectionInfo {
     pub type_: NodeTag,
     pub pi_state: ExprState,
@@ -27071,7 +27071,6 @@ impl Default for SetExprState {
     }
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
 pub struct SubPlanState {
     pub type_: NodeTag,
     pub subplan: *mut SubPlan,
@@ -28109,7 +28108,6 @@ pub struct WindowStatePerAggData {
 }
 pub type WindowStatePerAgg = *mut WindowStatePerAggData;
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
 pub struct WindowAggState {
     pub ss: ScanState,
     pub funcs: *mut List,
@@ -38808,6 +38806,7 @@ pub struct PGPROC {
     pub heldLocks: LOCKMASK,
     pub waitLSN: XLogRecPtr,
     pub syncRepState: ::std::os::raw::c_int,
+    pub delayChkptEnd: bool,
     pub syncRepLinks: SHM_QUEUE,
     pub myProcLocks: [SHM_QUEUE; 16usize],
     pub subxids: XidCache,
@@ -39791,6 +39790,7 @@ pub type WaitEventIPC = ::std::os::raw::c_uint;
 pub const WaitEventTimeout_WAIT_EVENT_BASE_BACKUP_THROTTLE: WaitEventTimeout = 150994944;
 pub const WaitEventTimeout_WAIT_EVENT_PG_SLEEP: WaitEventTimeout = 150994945;
 pub const WaitEventTimeout_WAIT_EVENT_RECOVERY_APPLY_DELAY: WaitEventTimeout = 150994946;
+pub const WaitEventTimeout_WAIT_EVENT_REGISTER_SYNC_REQUEST: WaitEventTimeout = 150994947;
 pub type WaitEventTimeout = ::std::os::raw::c_uint;
 pub const WaitEventIO_WAIT_EVENT_BUFFILE_READ: WaitEventIO = 167772160;
 pub const WaitEventIO_WAIT_EVENT_BUFFILE_WRITE: WaitEventIO = 167772161;
@@ -40606,7 +40606,6 @@ pub unsafe fn pgstat_fetch_global() -> *mut PgStat_GlobalStats {
     })
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
 pub struct ScanKeyData {
     pub sk_flags: ::std::os::raw::c_int,
     pub sk_attno: AttrNumber,
@@ -42467,7 +42466,6 @@ pub struct GISTPageOpaqueData {
 }
 pub type GISTPageOpaque = *mut GISTPageOpaqueData;
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
 pub struct GIST_SPLITVEC {
     pub spl_left: *mut OffsetNumber,
     pub spl_nleft: ::std::os::raw::c_int,
@@ -42488,7 +42486,6 @@ impl Default for GIST_SPLITVEC {
     }
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
 pub struct GISTENTRY {
     pub key: Datum,
     pub rel: Relation,
@@ -42511,7 +42508,6 @@ pub struct GISTDeletedPageContents {
     pub deleteXid: FullTransactionId,
 }
 #[repr(C)]
-#[derive(Debug)]
 pub struct GistEntryVector {
     pub n: int32,
     pub vector: __IncompleteArrayField<GISTENTRY>,
@@ -47714,6 +47710,32 @@ pub unsafe fn heap_fetch(
             ) -> bool;
         }
         heap_fetch(arg_relation, arg_snapshot, arg_tuple, arg_userbuf)
+    })
+}
+pub unsafe fn heap_fetch_extended(
+    arg_relation: Relation,
+    arg_snapshot: Snapshot,
+    arg_tuple: HeapTuple,
+    arg_userbuf: *mut Buffer,
+    arg_keep_buf: bool,
+) -> bool {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn heap_fetch_extended(
+                arg_relation: Relation,
+                arg_snapshot: Snapshot,
+                arg_tuple: HeapTuple,
+                arg_userbuf: *mut Buffer,
+                arg_keep_buf: bool,
+            ) -> bool;
+        }
+        heap_fetch_extended(
+            arg_relation,
+            arg_snapshot,
+            arg_tuple,
+            arg_userbuf,
+            arg_keep_buf,
+        )
     })
 }
 pub unsafe fn heap_hot_search_buffer(
@@ -58242,7 +58264,6 @@ pub const BgWorkerStartTime_BgWorkerStart_ConsistentState: BgWorkerStartTime = 1
 pub const BgWorkerStartTime_BgWorkerStart_RecoveryFinished: BgWorkerStartTime = 2;
 pub type BgWorkerStartTime = ::std::os::raw::c_uint;
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
 pub struct BackgroundWorker {
     pub bgw_name: [::std::os::raw::c_char; 96usize],
     pub bgw_type: [::std::os::raw::c_char; 96usize],
@@ -72378,6 +72399,18 @@ pub unsafe fn GetVirtualXIDsDelayingChkpt(
         GetVirtualXIDsDelayingChkpt(arg_nvxids)
     })
 }
+pub unsafe fn GetVirtualXIDsDelayingChkptEnd(
+    arg_nvxids: *mut ::std::os::raw::c_int,
+) -> *mut VirtualTransactionId {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn GetVirtualXIDsDelayingChkptEnd(
+                arg_nvxids: *mut ::std::os::raw::c_int,
+            ) -> *mut VirtualTransactionId;
+        }
+        GetVirtualXIDsDelayingChkptEnd(arg_nvxids)
+    })
+}
 pub unsafe fn HaveVirtualXIDsDelayingChkpt(
     arg_vxids: *mut VirtualTransactionId,
     arg_nvxids: ::std::os::raw::c_int,
@@ -72390,6 +72423,20 @@ pub unsafe fn HaveVirtualXIDsDelayingChkpt(
             ) -> bool;
         }
         HaveVirtualXIDsDelayingChkpt(arg_vxids, arg_nvxids)
+    })
+}
+pub unsafe fn HaveVirtualXIDsDelayingChkptEnd(
+    arg_vxids: *mut VirtualTransactionId,
+    arg_nvxids: ::std::os::raw::c_int,
+) -> bool {
+    crate::submodules::setjmp::pg_guard_ffi_boundary(move || {
+        extern "C" {
+            fn HaveVirtualXIDsDelayingChkptEnd(
+                arg_vxids: *mut VirtualTransactionId,
+                arg_nvxids: ::std::os::raw::c_int,
+            ) -> bool;
+        }
+        HaveVirtualXIDsDelayingChkptEnd(arg_vxids, arg_nvxids)
     })
 }
 pub unsafe fn BackendPidGetProc(arg_pid: ::std::os::raw::c_int) -> *mut PGPROC {
