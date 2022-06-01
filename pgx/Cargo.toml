@@ -18,6 +18,7 @@ crate-type = [ "rlib" ]
 
 [features]
 default = [ ]
+postgrestd = [ ]
 pg10 = [ "pgx-pg-sys/pg10" ]
 pg11 = [ "pgx-pg-sys/pg11" ]
 pg12 = [ "pgx-pg-sys/pg12" ]

@@ -17,6 +17,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 //!
 use crate::pg_sys::AsPgCStr;
 use crate::{guard, pg_sys, PgBox};
+use core::panic::{RefUnwindSafe, UnwindSafe};
 use std::fmt::Debug;
 
 /// A shorter type name for a `*const std::os::raw::c_void`
@@ -261,10 +262,7 @@ impl PgMemoryContexts {
     ///     })
     /// }
     /// ```
-    pub fn switch_to<
-        R,
-        F: FnOnce(&mut PgMemoryContexts) -> R + std::panic::UnwindSafe + std::panic::RefUnwindSafe,
-    >(
+    pub fn switch_to<R, F: FnOnce(&mut PgMemoryContexts) -> R + UnwindSafe + RefUnwindSafe>(
         &mut self,
         f: F,
     ) -> R {
@@ -374,11 +372,26 @@ impl PgMemoryContexts {
         leaked_ptr
     }
 
+    /// Allocates and then leaks a "trivially dropped" type in the appropriate memory context.
+    /// If `feature = "postgrestd"` is enabled, this "forgets" it entirely, assuming that it is fine
+    /// to let Postgres `pfree` it later. Otherwise it is equivalent to `fn leak_and_drop_on_delete`.
+    ///
+    /// Accordingly, this may prove unwise to use on something that actually needs to run its Drop.
+    /// But note it is not actually unsound to `mem::forget` something in this way, just annoying
+    /// if you were expecting it to actually execute its Drop.
+    pub fn leak_trivial_alloc<T: RefUnwindSafe + UnwindSafe>(&mut self, v: T) -> *mut T {
+        #[cfg(feature = "postgrestd")]
+        {
+            self.switch_to(|_cx| Box::leak(Box::new(v)))
+        }
+        #[cfg(not(feature = "postgrestd"))]
+        {
+            self.leak_and_drop_on_delete(v)
+        }
+    }
+
     /// helper function
-    fn exec_in_context<
-        R,
-        F: FnOnce(&mut PgMemoryContexts) -> R + std::panic::UnwindSafe + std::panic::RefUnwindSafe,
-    >(
+    fn exec_in_context<R, F: FnOnce(&mut PgMemoryContexts) -> R + UnwindSafe + RefUnwindSafe>(
         context: pg_sys::MemoryContext,
         f: F,
     ) -> R {
