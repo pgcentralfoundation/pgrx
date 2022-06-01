@@ -279,7 +279,7 @@ dependencies = [
 
 [[package]]
 name = "cargo-pgx"
-version = "0.5.0-rc.1"
+version = "0.5.0-beta.0"
 dependencies = [
  "atty",
  "cargo_metadata",
@@ -1415,7 +1415,7 @@ dependencies = [
 
 [[package]]
 name = "pgx"
-version = "0.5.0-rc.1"
+version = "0.5.0-beta.0"
 dependencies = [
  "atomic-traits",
  "bitflags",
@@ -1442,7 +1442,7 @@ dependencies = [
 
 [[package]]
 name = "pgx-macros"
-version = "0.5.0-rc.1"
+version = "0.5.0-beta.0"
 dependencies = [
  "pgx-utils",
  "proc-macro2",
@@ -1454,7 +1454,7 @@ dependencies = [
 
 [[package]]
 name = "pgx-pg-sys"
-version = "0.5.0-rc.1"
+version = "0.5.0-beta.0"
 dependencies = [
  "bindgen",
  "build-deps",
@@ -1476,7 +1476,7 @@ dependencies = [
 
 [[package]]
 name = "pgx-tests"
-version = "0.5.0-rc.1"
+version = "0.5.0-beta.0"
 dependencies = [
  "eyre",
  "libc",
@@ -1496,7 +1496,7 @@ dependencies = [
 
 [[package]]
 name = "pgx-utils"
-version = "0.5.0-rc.1"
+version = "0.5.0-beta.0"
 dependencies = [
  "atty",
  "convert_case",
@@ -2574,9 +2574,9 @@ dependencies = [
 
 [[package]]
 name = "uuid"
-version = "1.1.0"
+version = "1.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "93bbc61e655a4833cf400d0d15bf3649313422fa7572886ad6dab16d79886365"
+checksum = "c6d5d669b51467dcf7b2f1a796ce0f955f05f01cafda6c19d6e95f730df29238"
 dependencies = [
  "getrandom 0.2.6",
 ]
