@@ -308,7 +308,7 @@ impl PgGuardRewriter {
 
                     #result_handler
 
-                    iterator_holder.iter = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).leak_and_drop_on_delete(result);
+                    iterator_holder.iter = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).leak_trivial_alloc(result);
                 }
 
                 funcctx = pgx::srf_per_call_setup(fcinfo);
