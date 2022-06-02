@@ -398,8 +398,9 @@ impl<'a> SpiClient<'a> {
         }
     }
 
-    /// sets up a cursor that will execute the specified query.
-    /// Rows may be then fetched using [`SpiCursor::fetch`]
+    /// Set up a cursor that will execute the specified query
+    ///
+    /// Rows may be then fetched using [`SpiCursor::fetch`].
     ///
     /// See [`SpiCursor`] docs for usage details.
     pub fn open_cursor(
@@ -448,8 +449,10 @@ impl<'a> SpiClient<'a> {
         SpiCursor { ptr }
     }
 
-    /// find a cursor in transaction by name.
-    /// Name should usually be retrieved via [`SpiCursor::into_name`]
+    /// Find a cursor in transaction by name
+    ///
+    /// A cursor for a query can be opened using [`SpiClient::open_cursor`].
+    /// Cursor name can be retrieved via [`SpiCursor::into_name`].
     ///
     /// See [`SpiCursor`] docs for usage details.
     pub fn find_cursor(
@@ -468,6 +471,8 @@ impl<'a> SpiClient<'a> {
     }
 }
 
+/// An SPI Cursor from a query
+///
 /// Represents a Postgres cursor (internally, a portal), allowing to retrieve result rows a few
 /// at a time. Moreover, a cursor can be left open within a transaction, and accessed in
 /// multiple independent Spi sessions within the transaction.
@@ -477,8 +482,9 @@ impl<'a> SpiClient<'a> {
 /// retrieved by name (in the same transaction) via [`SpiClient::find_cursor()`].
 ///
 /// # Important notes about memory usage
-/// Result sets returned by [`SpiCursor::fetch()`] will not be freed until the current
-/// Spi session is complete; this is a Pgx limitation that might get lifted in the future.
+/// Result sets ([`SpiTupleTable`]s) returned by [`SpiCursor::fetch()`] will not be freed until
+/// the current Spi session is complete;
+/// this is a Pgx limitation that might get lifted in the future.
 ///
 /// In the meantime, if you're using cursors to limit memory usage, make sure to use
 /// multiple separate Spi sessions, retrieving the cursor by name.
@@ -493,7 +499,7 @@ impl<'a> SpiClient<'a> {
 ///     assert_eq!(Some(2u32), cursor.fetch(2).get_one());
 ///     assert_eq!(Some(3u32), cursor.fetch(3).get_one());
 ///     Ok(None::<()>)
-///     // <--- all three result sets get freed only at this point
+///     // <--- all three SpiTupleTable get freed by Spi::connect at this point
 /// });
 /// ```
 ///
@@ -503,14 +509,16 @@ impl<'a> SpiClient<'a> {
 /// let cursor_name = Spi::connect(|mut client| {
 ///     let mut cursor = client.open_cursor("SELECT * FROM generate_series(1, 5)", None);
 ///     assert_eq!(Some(1u32), cursor.fetch(1).get_one());
-///     Ok(Some(cursor.into_name()))
-///     // <--- first result set gets freed at this point
+///     Ok(Some(cursor.into_name())) // <-- cursor gets dropped here
+///     // <--- first SpiTupleTable gets freed by Spi::connect at this point
 /// }).unwrap();
 /// Spi::connect(|mut client| {
 ///     let mut cursor = client.find_cursor(cursor_name);
 ///     assert_eq!(Some(2u32), cursor.fetch(1).get_one());
+///     drop(cursor); // <-- cursor gets dropped here
+///     // ... more code ...
 ///     Ok(None::<()>)
-///     // <--- second result set gets freed at this point
+///     // <--- second SpiTupleTable gets freed by Spi::connect at this point
 /// });
 /// ```
 pub struct SpiCursor {
@@ -518,7 +526,9 @@ pub struct SpiCursor {
 }
 
 impl SpiCursor {
-    /// fetch some rows from a cursor
+    /// Fetch up to `count` rows from the cursor, moving forward
+    ///
+    /// If `fetch` runs off the end of the available rows, an empty [`SpiTupleTable`] is returned.
     pub fn fetch(
         &mut self,
         count: i64
@@ -546,7 +556,9 @@ impl SpiCursor {
         }
     }
 
-    /// consumes the cursor and returns its name.
+    /// Consume the cursor, returning its name
+    ///
+    /// The actual Postgres cursor is kept alive for the duration of the transaction.
     /// This allows to fetch it in a later SPI session within the same transaction
     /// using [`SpiClient::find_cursor()`]
     pub fn into_name(self) -> String {
@@ -554,8 +566,9 @@ impl SpiCursor {
             .to_str().expect("non-utf8 cursor name").to_string()
     }
 
-    /// closes the cursor and releases its resources.
-    /// All cursors are closed automatically at the end of a transaction anyway.
+    /// Close the cursor, releasing its resources
+    ///
+    /// All cursors are closed automatically at the end of a transaction.
     /// Avoid closing the cursor if planning to retrieve it in a later Spi session within the same
     /// transaction using [`SpiClient::find_cursor()`].
     pub fn close(mut self) {
