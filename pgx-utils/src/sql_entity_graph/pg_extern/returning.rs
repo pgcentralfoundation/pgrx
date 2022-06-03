@@ -17,11 +17,18 @@ use syn::{
 };
 
 #[derive(Debug, Clone)]
+pub struct ReturningIteratedItem {
+    ty: syn::Type,
+    name: Option<String>,
+    sql: Option<syn::Expr>
+}
+
+#[derive(Debug, Clone)]
 pub enum Returning {
     None,
-    Type(syn::Type),
-    SetOf(syn::TypePath),
-    Iterated(Vec<(syn::Type, Option<String>)>),
+    Type { ty: syn::Type, sql: Option<syn::Expr>, },
+    SetOf { ty: syn::TypePath, sql: Option<syn::Expr>, },
+    Iterated(Vec<ReturningIteratedItem>),
     /// `pgx_pg_sys::Datum`
     Trigger,
 }
@@ -35,11 +42,11 @@ impl Returning {
                     syn::GenericArgument::Binding(binding) => match &mut binding.ty {
                         syn::Type::Tuple(tuple_type) => Self::parse_type_tuple(tuple_type),
                         syn::Type::Path(path) => {
-                            Returning::SetOf(anonymonize_lifetimes_in_type_path(path.clone()))
+                            Returning::SetOf { ty: anonymonize_lifetimes_in_type_path(path.clone()), sql: None }
                         }
                         syn::Type::Reference(type_ref) => match &*type_ref.elem {
                             syn::Type::Path(path) => {
-                                Returning::SetOf(anonymonize_lifetimes_in_type_path(path.clone()))
+                                Returning::SetOf { ty: anonymonize_lifetimes_in_type_path(path.clone()), sql: None }
                             }
                             _ => unimplemented!("Expected path"),
                         },
@@ -54,7 +61,7 @@ impl Returning {
     }
 
     fn parse_type_tuple(type_tuple: &mut syn::TypeTuple) -> Returning {
-        let returns: Vec<(syn::Type, Option<_>)> = type_tuple
+        let returns: Vec<ReturningIteratedItem> = type_tuple
             .elems
             .iter_mut()
             .flat_map(|elem| {
@@ -63,6 +70,7 @@ impl Returning {
 
                 match elem {
                     syn::Type::Macro(macro_pat) => {
+                        // This is essentially a copy of `parse_type_macro` but it returns items instead of `Returning`
                         let mac = &macro_pat.mac;
                         let archetype = mac.path.segments.last().unwrap();
                         match archetype.ident.to_string().as_str() {
@@ -70,12 +78,20 @@ impl Returning {
                                 let out: NameMacro = mac
                                     .parse_body()
                                     .expect(&*format!("Failed to parse named!(): {:?}", mac));
-                                Some((out.ty, Some(out.ident)))
+                                Some(ReturningIteratedItem { ty: out.ty, name: Some(out.ident), sql: out.sql })
+                            },
+                            "composite_type" => {
+                                let sql: syn::Expr = mac.parse_body().expect(&*format!("Failed to parse composite_type!(): {:?}", mac));
+                                Some(ReturningIteratedItem {
+                                    ty: syn::parse_quote! { ::pgx::PgHeapTuple<'_, impl WhoAllocated<::pgx::pg_sys::HeapTupleData>> },
+                                    name: None,
+                                    sql: Some(sql),
+                                })
                             }
-                            _ => unimplemented!("Don't support anything other than name."),
+                            _ => unimplemented!("Don't support anything other than `name!()` and `composite_type!()`"),
                         }
-                    }
-                    ty => Some((ty.clone(), None)),
+                    },
+                    ty => Some(ReturningIteratedItem { ty: ty.clone(), name: None, sql: None }),
                 }
             })
             .collect();
@@ -86,6 +102,21 @@ impl Returning {
         match impl_trait.bounds.first_mut().unwrap() {
             syn::TypeParamBound::Trait(trait_bound) => Self::parse_trait_bound(trait_bound),
             _ => Returning::None,
+        }
+    }
+
+    fn parse_type_macro(type_macro: &mut syn::TypeMacro) -> Returning {
+        let mac = &type_macro.mac;
+        let archetype = mac.path.segments.last().unwrap();
+        match archetype.ident.to_string().as_str() {
+            "composite_type" => {
+                let sql: syn::Expr = mac.parse_body().expect(&*format!("Failed to parse composite_type!(): {:?}", mac));
+                Returning::Type {
+                    ty: syn::parse_quote! { ::pgx::PgHeapTuple<'_, impl WhoAllocated<::pgx::pg_sys::HeapTupleData>> },
+                    sql: Some(sql),
+                }
+            }
+            _ => unimplemented!("Don't support anything other than `composite_type!()`"),
         }
     }
 
@@ -110,10 +141,10 @@ impl TryFrom<&syn::ReturnType> for Returning {
                 match ty {
                     syn::Type::ImplTrait(mut impl_trait) => {
                         Returning::parse_impl_trait(&mut impl_trait)
-                    }
+                    },
                     syn::Type::TraitObject(mut dyn_trait) => {
                         Returning::parse_dyn_trait(&mut dyn_trait)
-                    }
+                    },
                     syn::Type::Path(mut typepath) => {
                         let path = &mut typepath.path;
                         let mut saw_pg_sys = false;
@@ -140,13 +171,13 @@ impl TryFrom<&syn::ReturnType> for Returning {
                                             )) => {
                                                 maybe_inner_impl_trait =
                                                     Some(Returning::parse_impl_trait(impl_trait));
-                                            }
+                                            },
                                             Some(syn::GenericArgument::Type(
                                                 syn::Type::TraitObject(dyn_trait),
                                             )) => {
                                                 maybe_inner_impl_trait =
                                                     Some(Returning::parse_dyn_trait(dyn_trait))
-                                            }
+                                            },
                                             _ => (),
                                         }
                                     }
@@ -175,26 +206,29 @@ impl TryFrom<&syn::ReturnType> for Returning {
                                                 _ => (),
                                             }
                                         }
-                                    }
+                                    },
                                     _ => (),
                                 }
                             }
-                            Returning::Type(syn::Type::Path(static_ty.clone()))
+                            Returning::Type { ty: syn::Type::Path(static_ty.clone()), sql: None }
                         }
-                    }
+                    },
                     syn::Type::Reference(mut ty_ref) => {
                         if let Some(ref mut lifetime) = &mut ty_ref.lifetime {
                             lifetime.ident = Ident::new("static", Span::call_site());
                         }
-                        Returning::Type(syn::Type::Reference(ty_ref))
-                    }
+                        Returning::Type { ty: syn::Type::Reference(ty_ref), sql: None } 
+                    },
                     syn::Type::Tuple(ref mut tup) => {
                         if tup.elems.is_empty() {
-                            Returning::Type(ty.clone())
+                            Returning::Type { ty: ty.clone(), sql: None }
                         } else {
                             Self::parse_type_tuple(tup)
                         }
-                    }
+                    },
+                    syn::Type::Macro(ref mut type_macro) => {
+                        Self::parse_type_macro(type_macro)
+                    },
                     _ => return Err(eyre!("Got unknown return type: {}", &ty.to_token_stream())),
                 }
             }
@@ -208,34 +242,61 @@ impl ToTokens for Returning {
             Returning::None => quote! {
                 ::pgx::utils::sql_entity_graph::PgExternReturnEntity::None
             },
-            Returning::Type(ty) => {
-                let ty_string = ty.to_token_stream().to_string().replace(" ", "");
-                quote! {
-                    ::pgx::utils::sql_entity_graph::PgExternReturnEntity::Type {
-                        id: TypeId::of::<#ty>(),
-                        source: #ty_string,
-                        full_path: core::any::type_name::<#ty>(),
-                        module_path: {
-                            let type_name = core::any::type_name::<#ty>();
-                            let mut path_items: Vec<_> = type_name.split("::").collect();
-                            let _ = path_items.pop(); // Drop the one we don't want.
-                            path_items.join("::")
-                        },
+            Returning::Type { ty, sql} => {
+                if let Some(sql) = sql {
+                    quote! {
+                        ::pgx::utils::sql_entity_graph::PgExternReturnEntity::Type {
+                            ty: ::pgx::utils::sql_entity_graph::TypeEntity::CompositeType {
+                                sql: #sql,
+                            }
+                        }
+                    }
+                } else {
+                    let ty_string = ty.to_token_stream().to_string().replace(" ", "");
+                    let sql_iter = sql.iter();
+                    quote! {
+                        ::pgx::utils::sql_entity_graph::PgExternReturnEntity::Type {
+                            ty: ::pgx::utils::sql_entity_graph::TypeEntity::Type {
+                                id: TypeId::of::<#ty>(),
+                                source: #ty_string,
+                                full_path: core::any::type_name::<#ty>(),
+                                module_path: {
+                                    let type_name = core::any::type_name::<#ty>();
+                                    let mut path_items: Vec<_> = type_name.split("::").collect();
+                                    let _ = path_items.pop(); // Drop the one we don't want.
+                                    path_items.join("::")
+                                },
+                            }
+                        }
                     }
                 }
+                
             }
-            Returning::SetOf(ty) => {
-                let ty_string = ty.to_token_stream().to_string().replace(" ", "");
-                quote! {
-                    ::pgx::utils::sql_entity_graph::PgExternReturnEntity::SetOf {
-                        id: TypeId::of::<#ty>(),
-                        source: #ty_string,
-                        full_path: core::any::type_name::<#ty>(),
-                        module_path: {
-                            let type_name = core::any::type_name::<#ty>();
-                            let mut path_items: Vec<_> = type_name.split("::").collect();
-                            let _ = path_items.pop(); // Drop the one we don't want.
-                            path_items.join("::")
+            Returning::SetOf { ty, sql } => {
+                if let Some(sql) = sql {
+                    quote! {
+                        ::pgx::utils::sql_entity_graph::PgExternReturnEntity::SetOf {
+                            ty: ::pgx::utils::sql_entity_graph::TypeEntity::CompositeType {
+                                sql: #sql,
+                            }
+                        }
+                    }
+                } else {
+                    let ty_string = ty.to_token_stream().to_string().replace(" ", "");
+                    let sql_iter = sql.iter();
+                    quote! {
+                        ::pgx::utils::sql_entity_graph::PgExternReturnEntity::SetOf {
+                            ty: ::pgx::utils::sql_entity_graph::TypeEntity::Type {
+                                id: TypeId::of::<#ty>(),
+                                source: #ty_string,
+                                full_path: core::any::type_name::<#ty>(),
+                                module_path: {
+                                    let type_name = core::any::type_name::<#ty>();
+                                    let mut path_items: Vec<_> = type_name.split("::").collect();
+                                    let _ = path_items.pop(); // Drop the one we don't want.
+                                    path_items.join("::")
+                                },
+                            },
                         }
                     }
                 }
@@ -243,21 +304,25 @@ impl ToTokens for Returning {
             Returning::Iterated(items) => {
                 let quoted_items = items
                     .iter()
-                    .map(|(ty, name)| {
+                    .map(|ReturningIteratedItem { ty, name, sql }| {
                         let ty_string = ty.to_token_stream().to_string().replace(" ", "");
                         let name_iter = name.iter();
+                        let sql_iter = sql.iter();
                         quote! {
                             (
-                                TypeId::of::<#ty>(),
-                                #ty_string,
-                                core::any::type_name::<#ty>(),
-                                {
-                                    let type_name = core::any::type_name::<#ty>();
-                                    let mut path_items: Vec<_> = type_name.split("::").collect();
-                                    let _ = path_items.pop(); // Drop the one we don't want.
-                                    path_items.join("::")
+                                ::pgx::utils::sql_entity_graph::TypeEntity::Type {
+                                    ty: TypeId::of::<#ty>(),
+                                    source: #ty_string,
+                                    full_path: core::any::type_name::<#ty>(),
+                                    module_path: {
+                                        let type_name = core::any::type_name::<#ty>();
+                                        let mut path_items: Vec<_> = type_name.split("::").collect();
+                                        let _ = path_items.pop(); // Drop the one we don't want.
+                                        path_items.join("::")
+                                    },
                                 },
                                 None #( .unwrap_or(Some(stringify!(#name_iter))) )*,
+                                None #( .unwrap_or(Some(#sql_iter)) )*,
                             )
                         }
                     })
@@ -280,6 +345,7 @@ impl ToTokens for Returning {
 pub struct NameMacro {
     pub(crate) ident: String,
     pub(crate) ty: syn::Type,
+    pub(crate) sql: Option<syn::Expr>,
 }
 
 impl Parse for NameMacro {
@@ -320,6 +386,23 @@ impl Parse for NameMacro {
             })?;
         let _comma: Token![,] = input.parse()?;
         let ty = input.parse()?;
-        Ok(Self { ident, ty })
+
+        
+        let sql = match &ty {
+            syn::Type::Macro(ref macro_pat) => {
+                // This is essentially a copy of `parse_type_macro` but it returns items instead of `Returning`
+                let mac = &macro_pat.mac;
+                let archetype = mac.path.segments.last().unwrap();
+                match archetype.ident.to_string().as_str() {
+                    "composite_type" => {
+                        Some(mac.parse_body().expect(&*format!("Failed to parse composite_type!(): {:?}", mac)))
+                    }
+                    _ => unimplemented!("Don't support anything other than `name!()` and `composite_type!()`"),
+                }
+            },
+            _ => None,
+        };
+
+        Ok(Self { ident, ty, sql })
     }
 }

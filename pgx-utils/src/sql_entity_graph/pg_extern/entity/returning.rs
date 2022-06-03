@@ -8,27 +8,20 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 use core::any::TypeId;
 
+use crate::sql_entity_graph::TypeEntity;
+
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub enum PgExternReturnEntity {
     None,
     Type {
-        id: TypeId,
-        source: &'static str,
-        full_path: &'static str,
-        module_path: String,
+        ty: TypeEntity,
     },
     SetOf {
-        id: TypeId,
-        source: &'static str,
-        full_path: &'static str,
-        module_path: String,
+        ty: TypeEntity,
     },
     Iterated(
         Vec<(
-            TypeId,
-            &'static str,         // Source
-            &'static str,         // Full path
-            String,               // Module path
+            TypeEntity,
             Option<&'static str>, // Name
         )>,
     ),

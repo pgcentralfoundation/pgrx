@@ -33,7 +33,7 @@ pub use extension_sql::{
 };
 pub use mapping::{RustSourceOnlySqlMapping, RustSqlMapping};
 pub use pg_extern::{
-    entity::{PgExternArgumentEntity, PgExternEntity, PgExternReturnEntity, PgOperatorEntity},
+    entity::{PgExternArgumentEntity, TypeEntity, PgExternEntity, PgExternReturnEntity, PgOperatorEntity},
     NameMacro, PgExtern, PgExternArgument, PgOperator,
 };
 pub use pg_trigger::{attribute::PgTriggerAttribute, entity::PgTriggerEntity, PgTrigger};

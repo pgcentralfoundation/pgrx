@@ -27,6 +27,17 @@ pub struct PgHeapTuple<'a, AllocatedBy: WhoAllocated<pg_sys::HeapTupleData>> {
     tupdesc: PgTupleDesc<'a>,
 }
 
+
+impl<'a> FromDatum for PgHeapTuple<'a, AllocatedByRust> {
+    unsafe fn from_datum(composite: pg_sys::Datum, is_null: bool) -> Option<Self> {
+        if is_null {
+            None
+        } else {
+            Some(PgHeapTuple::from_composite_datum(composite))
+        }
+    }
+}
+
 impl<'a> PgHeapTuple<'a, AllocatedByPostgres> {
     /// Creates a new [PgHeapTuple] from a [PgTupleDesc] and a [pg_sys::HeapTuple] pointer.  The
     /// returned [PgHeapTuple] will be considered by have been allocated by Postgres and is not mutable
@@ -351,4 +362,11 @@ impl<'a, AllocatedBy: WhoAllocated<pg_sys::HeapTupleData>> PgHeapTuple<'a, Alloc
             }
         }
     }
+}
+
+#[macro_export]
+macro_rules! composite_type {
+    ($composite_type:expr) => {
+        panic!("composite_rules!() macro didn't get rewritten, should have been rewritten by `#[pg_extern]`")
+    };
 }

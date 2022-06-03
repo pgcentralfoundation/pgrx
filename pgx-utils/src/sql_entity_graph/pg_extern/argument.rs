@@ -23,6 +23,9 @@ use syn::{
 pub struct PgExternArgument {
     pat: syn::Ident,
     ty: syn::Type,
+    /// Set via `composite_type!()`
+    sql: Option<syn::Expr>,
+    /// Set via `default!()`
     default: Option<String>,
 }
 
@@ -34,7 +37,7 @@ impl PgExternArgument {
         }
     }
 
-    pub fn build_from_pat_type(value: syn::PatType) -> Result<Option<Self>, syn::Error> {
+    pub fn build_from_pat_type(mut value: syn::PatType) -> Result<Option<Self>, syn::Error> {
         let mut true_ty = *value.ty.clone();
         anonymonize_lifetimes(&mut true_ty);
 
@@ -46,18 +49,33 @@ impl PgExternArgument {
             },
             _ => return Err(syn::Error::new(Span::call_site(), "Unable to parse FnArg")),
         };
-        let default = match value.ty.as_ref() {
-            syn::Type::Macro(macro_pat) => {
+
+        let mut default: Option<String> = None;
+        let mut sql: Option<syn::Expr> = None;
+        
+        match *value.ty {
+            syn::Type::Macro(ref macro_pat) => {
                 let mac = &macro_pat.mac;
                 let archetype = mac.path.segments.last().expect("No last segment");
-                let (maybe_new_true_ty, default_value) =
-                    handle_default(true_ty.clone(), archetype, mac)?;
-                true_ty = maybe_new_true_ty;
-                default_value
+                match archetype.ident.to_string().as_str() {
+                    "default" => {
+                        let (maybe_new_true_ty, default_value) =
+                            handle_default_macro(mac)?;
+                        true_ty = maybe_new_true_ty;
+                        default = default_value;
+                    },
+                    "composite_type" => {
+                        sql = Some(handle_composite_type_macro(mac)?);
+                        true_ty = syn::parse_quote! {
+                            ::pgx::PgHeapTuple<'_, ::pgx::AllocatedByPostgres<::pgx::pg_sys::HeapTupleData>>
+                        }
+                    },
+                    _ => (),
+                }
+                
             }
             syn::Type::Path(ref path) => {
                 let segments = &path.path;
-                let mut default = None;
                 for segment in &segments.segments {
                     if segment.ident.to_string().ends_with("Option") {
                         match &segment.arguments {
@@ -69,10 +87,21 @@ impl PgExternArgument {
                                         let mac = &macro_pat.mac;
                                         let archetype =
                                             mac.path.segments.last().expect("No last segment");
-                                        let (inner_type, default_value) =
-                                            handle_default(true_ty.clone(), archetype, mac)?;
-                                        true_ty = parse_quote! { Option<#inner_type> };
-                                        default = default_value;
+                                        match archetype.ident.to_string().as_str() {
+                                            "default" => {
+                                                let (maybe_new_true_ty, default_value) =
+                                                    handle_default_macro(mac)?;
+                                                true_ty = maybe_new_true_ty;
+                                                default = default_value;
+                                            },
+                                            "composite_type" => {
+                                                sql = Some(handle_composite_type_macro(mac)?);
+                                                true_ty = syn::parse_quote! {
+                                                    ::pgx::PgHeapTuple<'_, ::pgx::AllocatedByPostgres<::pgx::pg_sys::HeapTupleData>>
+                                                }
+                                            },
+                                            _ => (),
+                                        }
                                     }
                                     _ => (),
                                 }
@@ -81,9 +110,8 @@ impl PgExternArgument {
                         }
                     }
                 }
-                default
             }
-            _ => None,
+            _ => (),
         };
 
         // We special case ignore `*mut pg_sys::FunctionCallInfoData`
@@ -157,124 +185,125 @@ impl PgExternArgument {
         Ok(Some(PgExternArgument {
             pat: identifier,
             ty: true_ty,
+            sql,
             default,
         }))
     }
 }
 
-fn handle_default(
-    ty: syn::Type,
-    archetype: &syn::PathSegment,
+fn handle_composite_type_macro(
+    mac: &syn::Macro,
+) -> syn::Result<syn::Expr> {
+    let out: syn::Expr = mac.parse_body()?;
+    Ok(out)
+}
+
+fn handle_default_macro(
     mac: &syn::Macro,
 ) -> syn::Result<(syn::Type, Option<String>)> {
-    match archetype.ident.to_string().as_str() {
-        "default" => {
-            let out: DefaultMacro = mac.parse_body()?;
-            let true_ty = out.ty;
-            match out.expr {
-                syn::Expr::Lit(syn::ExprLit {
-                    lit: syn::Lit::Str(def),
-                    ..
-                }) => {
-                    let value = def.value();
-                    Ok((true_ty, Some(value)))
-                }
-                syn::Expr::Lit(syn::ExprLit {
-                    lit: syn::Lit::Float(def),
-                    ..
-                }) => {
-                    let value = def.base10_digits();
-                    Ok((true_ty, Some(value.to_string())))
-                }
-                syn::Expr::Lit(syn::ExprLit {
-                    lit: syn::Lit::Int(def),
-                    ..
-                }) => {
-                    let value = def.base10_digits();
-                    Ok((true_ty, Some(value.to_string())))
-                }
-                syn::Expr::Lit(syn::ExprLit {
-                    lit: syn::Lit::Bool(def),
-                    ..
-                }) => {
-                    let value = def.value();
-                    Ok((true_ty, Some(value.to_string())))
-                }
-                syn::Expr::Unary(syn::ExprUnary {
-                    op: syn::UnOp::Neg(_),
-                    ref expr,
-                    ..
-                }) => match &**expr {
-                    syn::Expr::Lit(syn::ExprLit {
-                        lit: syn::Lit::Int(def),
-                        ..
-                    }) => {
-                        let value = def.base10_digits();
-                        Ok((true_ty, Some("-".to_owned() + value)))
-                    }
-                    _ => {
-                        return Err(syn::Error::new(
-                            Span::call_site(),
-                            format!(
-                                "Unrecognized UnaryExpr in `default!()` macro, got: {:?}",
-                                out.expr
-                            ),
-                        ))
-                    }
-                },
-                syn::Expr::Type(syn::ExprType { ref ty, .. }) => match ty.deref() {
-                    syn::Type::Path(syn::TypePath {
-                        path: syn::Path { segments, .. },
-                        ..
-                    }) => {
-                        let last = segments.last().expect("No last segment");
-                        let last_string = last.ident.to_string();
-                        if last_string.as_str() == "NULL" {
-                            Ok((true_ty, Some(last_string)))
-                        } else {
-                            return Err(syn::Error::new(Span::call_site(), format!("Unable to parse default value of `default!()` macro, got: {:?}", out.expr)));
-                        }
-                    }
-                    _ => {
-                        return Err(syn::Error::new(
-                            Span::call_site(),
-                            format!(
-                                "Unable to parse default value of `default!()` macro, got: {:?}",
-                                out.expr
-                            ),
-                        ))
-                    }
-                },
-                syn::Expr::Path(syn::ExprPath {
-                    path: syn::Path { ref segments, .. },
-                    ..
-                }) => {
-                    let last = segments.last().expect("No last segment");
-                    let last_string = last.ident.to_string();
-                    if last_string.as_str() == "NULL" {
-                        Ok((true_ty, Some(last_string)))
-                    } else {
-                        return Err(syn::Error::new(
-                            Span::call_site(),
-                            format!(
-                                "Unable to parse default value of `default!()` macro, got: {:?}",
-                                out.expr
-                            ),
-                        ));
-                    }
-                }
-                _ => {
-                    return Err(syn::Error::new(
-                        Span::call_site(),
-                        format!(
-                            "Unable to parse default value of `default!()` macro, got: {:?}",
-                            out.expr
-                        ),
-                    ))
+    let out: DefaultMacro = mac.parse_body()?;
+    let true_ty = out.ty;
+    match out.expr {
+        syn::Expr::Lit(syn::ExprLit {
+            lit: syn::Lit::Str(def),
+            ..
+        }) => {
+            let value = def.value();
+            Ok((true_ty, Some(value)))
+        }
+        syn::Expr::Lit(syn::ExprLit {
+            lit: syn::Lit::Float(def),
+            ..
+        }) => {
+            let value = def.base10_digits();
+            Ok((true_ty, Some(value.to_string())))
+        }
+        syn::Expr::Lit(syn::ExprLit {
+            lit: syn::Lit::Int(def),
+            ..
+        }) => {
+            let value = def.base10_digits();
+            Ok((true_ty, Some(value.to_string())))
+        }
+        syn::Expr::Lit(syn::ExprLit {
+            lit: syn::Lit::Bool(def),
+            ..
+        }) => {
+            let value = def.value();
+            Ok((true_ty, Some(value.to_string())))
+        }
+        syn::Expr::Unary(syn::ExprUnary {
+            op: syn::UnOp::Neg(_),
+            ref expr,
+            ..
+        }) => match &**expr {
+            syn::Expr::Lit(syn::ExprLit {
+                lit: syn::Lit::Int(def),
+                ..
+            }) => {
+                let value = def.base10_digits();
+                Ok((true_ty, Some("-".to_owned() + value)))
+            }
+            _ => {
+                return Err(syn::Error::new(
+                    Span::call_site(),
+                    format!(
+                        "Unrecognized UnaryExpr in `default!()` macro, got: {:?}",
+                        out.expr
+                    ),
+                ))
+            }
+        },
+        syn::Expr::Type(syn::ExprType { ref ty, .. }) => match ty.deref() {
+            syn::Type::Path(syn::TypePath {
+                path: syn::Path { segments, .. },
+                ..
+            }) => {
+                let last = segments.last().expect("No last segment");
+                let last_string = last.ident.to_string();
+                if last_string.as_str() == "NULL" {
+                    Ok((true_ty, Some(last_string)))
+                } else {
+                    return Err(syn::Error::new(Span::call_site(), format!("Unable to parse default value of `default!()` macro, got: {:?}", out.expr)));
                 }
             }
+            _ => {
+                return Err(syn::Error::new(
+                    Span::call_site(),
+                    format!(
+                        "Unable to parse default value of `default!()` macro, got: {:?}",
+                        out.expr
+                    ),
+                ))
+            }
+        },
+        syn::Expr::Path(syn::ExprPath {
+            path: syn::Path { ref segments, .. },
+            ..
+        }) => {
+            let last = segments.last().expect("No last segment");
+            let last_string = last.ident.to_string();
+            if last_string.as_str() == "NULL" {
+                Ok((true_ty, Some(last_string)))
+            } else {
+                return Err(syn::Error::new(
+                    Span::call_site(),
+                    format!(
+                        "Unable to parse default value of `default!()` macro, got: {:?}",
+                        out.expr
+                    ),
+                ));
+            }
         }
-        _ => Ok((ty, None)),
+        _ => {
+            return Err(syn::Error::new(
+                Span::call_site(),
+                format!(
+                    "Unable to parse default value of `default!()` macro, got: {:?}",
+                    out.expr
+                ),
+            ))
+        }
     }
 }
 
@@ -314,18 +343,35 @@ impl ToTokens for PgExternArgument {
         };
         let ty_string = ty.to_token_stream().to_string().replace(" ", "");
 
+        let ty_entity = match &self.sql {
+            Some(sql) => {
+                quote! {
+                    ::pgx::utils::sql_entity_graph::TypeEntity::CompositeType {
+                        sql: #sql,
+                    }
+                }
+            },
+            None => {
+                quote! {
+                    ::pgx::utils::sql_entity_graph::TypeEntity::Type {
+                        ty_source: #ty_string,
+                        ty_id: TypeId::of::<#ty>(),
+                        full_path: core::any::type_name::<#ty>(),
+                        module_path: {
+                            let ty_name = core::any::type_name::<#ty>();
+                            let mut path_items: Vec<_> = ty_name.split("::").collect();
+                            let _ = path_items.pop(); // Drop the one we don't want.
+                            path_items.join("::")
+                        },
+                    }
+                }
+            }
+        };
+
         let quoted = quote! {
             ::pgx::utils::sql_entity_graph::PgExternArgumentEntity {
                 pattern: stringify!(#pat),
-                ty_source: #ty_string,
-                ty_id: TypeId::of::<#ty>(),
-                full_path: core::any::type_name::<#ty>(),
-                module_path: {
-                    let ty_name = core::any::type_name::<#ty>();
-                    let mut path_items: Vec<_> = ty_name.split("::").collect();
-                    let _ = path_items.pop(); // Drop the one we don't want.
-                    path_items.join("::")
-                },
+                ty: #ty_entity,
                 is_optional: #found_optional,
                 is_variadic: #found_variadic,
                 default: None #( .unwrap_or(Some(#default)) )*,

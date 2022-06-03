@@ -12,6 +12,7 @@ members = [
     "pgx-examples/bad_ideas",
     "pgx-examples/bgworker",
     "pgx-examples/bytea",
+    "pgx-examples/composite_type",
     "pgx-examples/custom_types",
     "pgx-examples/custom_sql",
     "pgx-examples/errors",
