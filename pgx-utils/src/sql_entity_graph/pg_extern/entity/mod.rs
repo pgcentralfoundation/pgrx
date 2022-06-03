@@ -150,7 +150,14 @@ impl ToSql for PgExternEntity {
                                             args.push(buf);
                                         },
                                         TypeEntity::CompositeType { sql } => {
-                                            args.push(sql.to_string());
+                                            let buf = format!("\
+                                                \t\"{pattern}\" {variadic}{sql}{maybe_comma} /* pgx::composite_type! */\
+                                            ",
+                                                pattern = arg.pattern,
+                                                variadic = if arg.is_variadic { "VARIADIC " } else { "" },
+                                                maybe_comma = if idx < (self.fn_args.len() - 1) { ", " } else { " " },
+                                            );
+                                            args.push(buf);
                                         },
                                     }
                                 };
@@ -184,7 +191,7 @@ impl ToSql for PgExternEntity {
                                                     full_path = full_path
                                             )
                                         },
-                                        TypeEntity::CompositeType { sql } => format!("RETURNS {sql} /* Composite type */"),
+                                        TypeEntity::CompositeType { sql } => format!("RETURNS {sql} /* pgx::composite_type! */"),
                                     }
                                      
                                  },
@@ -214,7 +221,7 @@ impl ToSql for PgExternEntity {
                                                     full_path = full_path
                                             )
                                         },
-                                        TypeEntity::CompositeType { sql } => format!("RETURNS {sql} /* Composite type */"),
+                                        TypeEntity::CompositeType { sql } => format!("RETURNS {sql} /* pgx::composite_type! */"),
                                     }
                                  },
                                  PgExternReturnEntity::Iterated(table_items) => {

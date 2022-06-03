@@ -367,6 +367,6 @@ impl<'a, AllocatedBy: WhoAllocated<pg_sys::HeapTupleData>> PgHeapTuple<'a, Alloc
 #[macro_export]
 macro_rules! composite_type {
     ($composite_type:expr) => {
-        panic!("composite_rules!() macro didn't get rewritten, should have been rewritten by `#[pg_extern]`")
+        ::pgx::PgHeapTuple<'_, ::pgx::AllocatedByRust>
     };
 }
