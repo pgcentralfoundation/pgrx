@@ -10,35 +10,32 @@ use pgx::{*, pg_sys::FunctionCallInfo};
 
 pg_module_magic!();
 
+extension_sql!(r#"
+CREATE TYPE Dog AS (
+    name TEXT,
+    scritches INT
+);
+"#, name = "create_dog", bootstrap);
+
 #[pg_extern]
 fn gets_name_field(
-    value: pgx::composite_type!("Bear"),
+    value: pgx::composite_type!("Dog"),
     fcinfo: pgx::pg_sys::FunctionCallInfo,
-) -> pgx::composite_type!("Buffalo") {
-    value
+) -> Option<&str> {
+    value.get_by_name("name").ok().unwrap_or_default()
 }
 
 #[cfg(any(test, feature = "pg_test"))]
 #[pg_schema]
 mod tests {
-    use crate::IntegerAvgState;
     use pgx::*;
 
     #[pg_test]
     fn test_gets_name_field() {
-        Spi::run(
-            r#"
-            CREATE TYPE composite AS (
-                name TEXT,
-                scritches INT
-            )
-        "#,
-        );
-
         let retval = Spi::get_one::<&str>("
-            SELECT gets_name_field(ROW('Nami', 0)::composite)
+            SELECT gets_name_field(ROW('Nami', 0)::Dog)
         ").expect("SQL select failed");
-        assert_eq!(retval, 0);
+        assert_eq!(retval, "Nami");
     }
 
 }

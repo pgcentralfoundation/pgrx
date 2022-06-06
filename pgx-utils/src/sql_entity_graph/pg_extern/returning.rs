@@ -257,8 +257,8 @@ impl ToTokens for Returning {
                     quote! {
                         ::pgx::utils::sql_entity_graph::PgExternReturnEntity::Type {
                             ty: ::pgx::utils::sql_entity_graph::TypeEntity::Type {
-                                id: TypeId::of::<#ty>(),
-                                source: #ty_string,
+                                ty_id: TypeId::of::<#ty>(),
+                                ty_source: #ty_string,
                                 full_path: core::any::type_name::<#ty>(),
                                 module_path: {
                                     let type_name = core::any::type_name::<#ty>();
@@ -283,12 +283,11 @@ impl ToTokens for Returning {
                     }
                 } else {
                     let ty_string = ty.to_token_stream().to_string().replace(" ", "");
-                    let sql_iter = sql.iter();
                     quote! {
                         ::pgx::utils::sql_entity_graph::PgExternReturnEntity::SetOf {
                             ty: ::pgx::utils::sql_entity_graph::TypeEntity::Type {
-                                id: TypeId::of::<#ty>(),
-                                source: #ty_string,
+                                ty_id: TypeId::of::<#ty>(),
+                                ty_source: #ty_string,
                                 full_path: core::any::type_name::<#ty>(),
                                 module_path: {
                                     let type_name = core::any::type_name::<#ty>();
@@ -307,12 +306,11 @@ impl ToTokens for Returning {
                     .map(|ReturningIteratedItem { ty, name, sql }| {
                         let ty_string = ty.to_token_stream().to_string().replace(" ", "");
                         let name_iter = name.iter();
-                        let sql_iter = sql.iter();
                         quote! {
                             (
                                 ::pgx::utils::sql_entity_graph::TypeEntity::Type {
-                                    ty: TypeId::of::<#ty>(),
-                                    source: #ty_string,
+                                    ty_id: TypeId::of::<#ty>(),
+                                    ty_source: #ty_string,
                                     full_path: core::any::type_name::<#ty>(),
                                     module_path: {
                                         let type_name = core::any::type_name::<#ty>();
@@ -322,7 +320,6 @@ impl ToTokens for Returning {
                                     },
                                 },
                                 None #( .unwrap_or(Some(stringify!(#name_iter))) )*,
-                                None #( .unwrap_or(Some(#sql_iter)) )*,
                             )
                         }
                     })
