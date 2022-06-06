@@ -89,9 +89,9 @@ impl PgExternArgument {
                                             mac.path.segments.last().expect("No last segment");
                                         match archetype.ident.to_string().as_str() {
                                             "default" => {
-                                                let (maybe_new_true_ty, default_value) =
+                                                let (inner_type, default_value) =
                                                     handle_default_macro(mac)?;
-                                                true_ty = maybe_new_true_ty;
+                                                    true_ty = parse_quote! { Option<#inner_type> };
                                                 default = default_value;
                                             },
                                             "composite_type" => {
