@@ -37,7 +37,7 @@ impl PgExternArgument {
         }
     }
 
-    pub fn build_from_pat_type(mut value: syn::PatType) -> Result<Option<Self>, syn::Error> {
+    pub fn build_from_pat_type(value: syn::PatType) -> Result<Option<Self>, syn::Error> {
         let mut true_ty = *value.ty.clone();
         anonymonize_lifetimes(&mut true_ty);
 

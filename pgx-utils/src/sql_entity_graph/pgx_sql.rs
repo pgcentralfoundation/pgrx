@@ -843,7 +843,7 @@ fn initialize_externs(
 
         for arg in &item.fn_args {
             match &arg.ty {
-                TypeEntity::Type { ty_source, ty_id, full_path, ref module_path } => {
+                TypeEntity::Type { ty_source: _, ty_id, full_path, module_path: _ } => {
                     let mut found = false;
                     for (ty_item, &_ty_index) in mapped_types {
                         if ty_item.id_matches(&ty_id) {
@@ -874,7 +874,7 @@ fn initialize_externs(
             PgExternReturnEntity::Type { ty, .. }
             | PgExternReturnEntity::SetOf { ty, .. } => {
                 match ty {
-                    TypeEntity::Type { ty_source, ty_id, full_path, module_path } => {
+                    TypeEntity::Type { ty_source: _, ty_id, full_path, module_path: _ } => {
                         let mut found = false;
                         for (ty_item, &_ty_index) in mapped_types {
                             if ty_item.id_matches(&ty_id) {
@@ -900,9 +900,9 @@ fn initialize_externs(
                 };
             }
             PgExternReturnEntity::Iterated(iterated_returns) => {
-                for (return_ty_entity, return_name) in iterated_returns {
+                for (return_ty_entity, _return_name) in iterated_returns {
                     match return_ty_entity {
-                        TypeEntity::Type { ty_source, ty_id, full_path, module_path } => {
+                        TypeEntity::Type { ty_source, ty_id, full_path: _, module_path: _ } => {
                             let mut found = false;
                             for (ty_item, &_ty_index) in mapped_types {
                                 if ty_item.id_matches(&ty_id) {
@@ -926,7 +926,7 @@ fn initialize_externs(
                                     });
                             }
                         },
-                        TypeEntity::CompositeType { sql } => (),
+                        TypeEntity::CompositeType { .. } => (),
                     }
 
                 }
@@ -983,7 +983,7 @@ fn connect_externs(
 
         for arg in &item.fn_args {
             match arg.ty {
-                TypeEntity::Type { ty_source, ty_id, full_path, ref module_path } => {
+                TypeEntity::Type { ty_source: _, ty_id, full_path, module_path: _ } => {
                     let mut found = false;
             
                     for (ty_item, &ty_index) in types {
@@ -1036,7 +1036,7 @@ fn connect_externs(
             PgExternReturnEntity::Type { ty }
             | PgExternReturnEntity::SetOf { ty } => {
                 match ty {
-                    TypeEntity::Type { ty_source, ty_id, full_path, ref module_path } => {
+                    TypeEntity::Type { ty_source: _, ty_id, full_path, module_path: _ } => {
                         let mut found = false;
                         for (ty_item, &ty_index) in types {
                             if ty_item.id_matches(&ty_id) {
@@ -1083,13 +1083,13 @@ fn connect_externs(
                             }
                         }
                     },
-                    TypeEntity::CompositeType { sql } => ()
+                    TypeEntity::CompositeType { .. } => ()
                 }
             }
             PgExternReturnEntity::Iterated(iterated_returns) => {
-                for (type_entity, name) in iterated_returns {
+                for (type_entity, _name) in iterated_returns {
                     match type_entity {
-                        TypeEntity::Type { ty_source, ty_id, full_path, ref module_path } => {
+                        TypeEntity::Type { ty_source, ty_id, full_path: _, module_path: _ } => {
                             let mut found = false;
                             for (ty_item, &ty_index) in types {
                                 if ty_item.id_matches(&ty_id) {
@@ -1151,7 +1151,7 @@ fn connect_externs(
                                 }
                             }
                         },
-                        TypeEntity::CompositeType { sql } => (),
+                        TypeEntity::CompositeType { .. } => (),
                     }
                 }
             }

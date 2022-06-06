@@ -6,7 +6,7 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
-use pgx::{*, pg_sys::FunctionCallInfo};
+use pgx::*;
 
 pg_module_magic!();
 
@@ -20,7 +20,6 @@ CREATE TYPE Dog AS (
 #[pg_extern]
 fn gets_name_field(
     value: pgx::composite_type!("Dog"),
-    fcinfo: pgx::pg_sys::FunctionCallInfo,
 ) -> Option<&str> {
     value.get_by_name("name").ok().unwrap_or_default()
 }

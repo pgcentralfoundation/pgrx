@@ -253,7 +253,6 @@ impl ToTokens for Returning {
                     }
                 } else {
                     let ty_string = ty.to_token_stream().to_string().replace(" ", "");
-                    let sql_iter = sql.iter();
                     quote! {
                         ::pgx::utils::sql_entity_graph::PgExternReturnEntity::Type {
                             ty: ::pgx::utils::sql_entity_graph::TypeEntity::Type {
@@ -304,23 +303,34 @@ impl ToTokens for Returning {
                 let quoted_items = items
                     .iter()
                     .map(|ReturningIteratedItem { ty, name, sql }| {
-                        let ty_string = ty.to_token_stream().to_string().replace(" ", "");
                         let name_iter = name.iter();
-                        quote! {
-                            (
-                                ::pgx::utils::sql_entity_graph::TypeEntity::Type {
-                                    ty_id: TypeId::of::<#ty>(),
-                                    ty_source: #ty_string,
-                                    full_path: core::any::type_name::<#ty>(),
-                                    module_path: {
-                                        let type_name = core::any::type_name::<#ty>();
-                                        let mut path_items: Vec<_> = type_name.split("::").collect();
-                                        let _ = path_items.pop(); // Drop the one we don't want.
-                                        path_items.join("::")
+                        if let Some(sql) = sql {
+                            quote! {
+                                (
+                                    ::pgx::utils::sql_entity_graph::TypeEntity::CompositeType {
+                                        sql: #sql,
                                     },
-                                },
-                                None #( .unwrap_or(Some(stringify!(#name_iter))) )*,
-                            )
+                                    None #( .unwrap_or(Some(stringify!(#name_iter))) )*,
+                                )
+                            }
+                        } else {
+                            let ty_string = ty.to_token_stream().to_string().replace(" ", "");
+                            quote! {
+                                (
+                                    ::pgx::utils::sql_entity_graph::TypeEntity::Type {
+                                        ty_id: TypeId::of::<#ty>(),
+                                        ty_source: #ty_string,
+                                        full_path: core::any::type_name::<#ty>(),
+                                        module_path: {
+                                            let type_name = core::any::type_name::<#ty>();
+                                            let mut path_items: Vec<_> = type_name.split("::").collect();
+                                            let _ = path_items.pop(); // Drop the one we don't want.
+                                            path_items.join("::")
+                                        },
+                                    },
+                                    None #( .unwrap_or(Some(stringify!(#name_iter))) )*,
+                                )
+                            }
                         }
                     })
                     .collect::<Vec<_>>();

@@ -122,7 +122,7 @@ impl ToSql for PgExternEntity {
                                 let mut args = Vec::new();
                                 for (idx, arg) in self.fn_args.iter().enumerate() {
                                     match &arg.ty {
-                                        TypeEntity::Type { ty_source, ty_id, full_path, module_path } => {
+                                        TypeEntity::Type { ty_source, ty_id, full_path, module_path: _ } => {
                                             let graph_index = context.graph.neighbors_undirected(self_index).find(|neighbor| match &context.graph[*neighbor] {
                                                 SqlGraphEntity::Type(ty) => ty.id_matches(&ty_id),
                                                 SqlGraphEntity::Enum(en) => en.id_matches(&ty_id),
@@ -167,7 +167,7 @@ impl ToSql for PgExternEntity {
                                  PgExternReturnEntity::None => String::from("RETURNS void"),
                                  PgExternReturnEntity::Type { ty } => {
                                      match ty {
-                                        TypeEntity::Type { ty_source, ty_id, full_path, module_path } => {
+                                        TypeEntity::Type { ty_source, ty_id, full_path, module_path: _ } => {
                                             let graph_index = context.graph.neighbors_undirected(self_index).find(|neighbor| match &context.graph[*neighbor] {
                                                 SqlGraphEntity::Type(ty) => ty.id_matches(&ty_id),
                                                 SqlGraphEntity::Enum(en) => en.id_matches(&ty_id),
@@ -197,7 +197,7 @@ impl ToSql for PgExternEntity {
                                  },
                                  PgExternReturnEntity::SetOf { ty } => {
                                     match ty {
-                                        TypeEntity::Type { ty_source, ty_id, full_path, module_path } => {
+                                        TypeEntity::Type { ty_source, ty_id, full_path, module_path: _ } => {
                                             let graph_index = context.graph.neighbors_undirected(self_index).find(|neighbor| match &context.graph[*neighbor] {
                                                 SqlGraphEntity::Type(ty) => ty.id_matches(&ty_id),
                                                 SqlGraphEntity::Enum(en) => en.id_matches(&ty_id),
@@ -228,7 +228,7 @@ impl ToSql for PgExternEntity {
                                      let mut items = String::new();
                                      for (idx, (ty, col_name)) in table_items.iter().enumerate() {
                                         match ty {
-                                            TypeEntity::Type { ty_source, ty_id, full_path, module_path } => {
+                                            TypeEntity::Type { ty_source, ty_id, full_path, module_path: _ } => {
                                                 let graph_index = context.graph.neighbors_undirected(self_index).find(|neighbor| match &context.graph[*neighbor] {
                                                     SqlGraphEntity::Type(ty) => ty.id_matches(&ty_id),
                                                     SqlGraphEntity::Enum(en) => en.id_matches(&ty_id),
