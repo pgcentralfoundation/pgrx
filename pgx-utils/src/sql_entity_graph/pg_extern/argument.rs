@@ -29,6 +29,9 @@ pub struct PgExternArgument {
     sql: Option<syn::Expr>,
     /// Set via `default!()`
     default: Option<String>,
+    /// Set via `variadic!()`
+    variadic: bool,
+    optional: bool,
 }
 
 impl PgExternArgument {
@@ -52,7 +55,7 @@ impl PgExternArgument {
             _ => return Err(syn::Error::new(Span::call_site(), "Unable to parse FnArg")),
         };
 
-        let (mut true_ty, variadic, default, sql) = resolve_arg_ty(*value.ty)?;
+        let (mut true_ty, optional, variadic, default, sql) = resolve_arg_ty(*value.ty)?;
 
         // We special case ignore `*mut pg_sys::FunctionCallInfoData`
         match true_ty {
@@ -127,6 +130,8 @@ impl PgExternArgument {
             ty: true_ty,
             sql,
             default,
+            variadic,
+            optional,
         }))
     }
 }
@@ -251,38 +256,13 @@ fn handle_default_macro(mac: &syn::Macro) -> syn::Result<(syn::Type, Option<Stri
 
 impl ToTokens for PgExternArgument {
     fn to_tokens(&self, tokens: &mut TokenStream2) {
-        let mut found_optional = false;
-        let mut found_variadic = false;
+        let mut is_optional = self.optional;
+        let mut is_variadic = self.variadic;
         let pat = &self.pat;
         let default = self.default.iter();
         let mut ty = self.ty.clone();
         anonymonize_lifetimes(&mut ty);
 
-        match ty {
-            syn::Type::Path(ref type_path) => {
-                let path = &type_path.path;
-                for segment in &path.segments {
-                    let ident_string = segment.ident.to_string();
-                    match ident_string.as_str() {
-                        "Option" => found_optional = true,
-                        "VariadicArray" => found_variadic = true,
-                        "Internal" => found_optional = true,
-                        _ => (),
-                    }
-                }
-            }
-            syn::Type::Macro(ref type_macro) => {
-                let path = &type_macro.mac.path;
-                for segment in &path.segments {
-                    let ident_string = segment.ident.to_string();
-                    match ident_string.as_str() {
-                        "variadic" => found_variadic = true,
-                        _ => (),
-                    }
-                }
-            }
-            _ => (),
-        };
         let ty_string = ty.to_token_stream().to_string().replace(" ", "");
 
         let ty_entity = match &self.sql {
@@ -314,8 +294,8 @@ impl ToTokens for PgExternArgument {
             ::pgx::utils::sql_entity_graph::PgExternArgumentEntity {
                 pattern: stringify!(#pat),
                 ty: #ty_entity,
-                is_optional: #found_optional,
-                is_variadic: #found_variadic,
+                is_optional: #is_optional,
+                is_variadic: #is_variadic,
                 default: None #( .unwrap_or(Some(#default)) )*,
             }
         };
@@ -340,7 +320,7 @@ impl Parse for DefaultMacro {
 
 /** Resolves a `pg_extern` argument `syn::Type` into metadata
 
-Returns `(resolved_ty, variadic, default, sql)`.
+Returns `(resolved_ty, optional, variadic, default, sql)`.
 
 Resolves the following:
 * Any plain Rust type
@@ -352,9 +332,10 @@ Resolves the following:
 */
 fn resolve_arg_ty(
     ty: syn::Type,
-) -> syn::Result<(syn::Type, bool, Option<String>, Option<syn::Expr>)> {
+) -> syn::Result<(syn::Type, bool, bool, Option<String>, Option<syn::Expr>)> {
     let mut resolved_ty = ty;
     let mut variadic = false;
+    let mut optional = false;
     let mut default = None;
     let mut sql = None;
 
@@ -411,5 +392,31 @@ fn resolve_arg_ty(
         _ => (),
     };
 
-    Ok((resolved_ty, variadic, default, sql))
+    match resolved_ty {
+        syn::Type::Path(ref type_path) => {
+            let path = &type_path.path;
+            for segment in &path.segments {
+                let ident_string = segment.ident.to_string();
+                match ident_string.as_str() {
+                    "Option" => optional = true,
+                    "VariadicArray" => variadic = true,
+                    "Internal" => optional = true,
+                    _ => (),
+                }
+            }
+        }
+        syn::Type::Macro(ref type_macro) => {
+            let path = &type_macro.mac.path;
+            for segment in &path.segments {
+                let ident_string = segment.ident.to_string();
+                match ident_string.as_str() {
+                    "variadic" => variadic = true,
+                    _ => (),
+                }
+            }
+        }
+        _ => (),
+    };
+
+    Ok((resolved_ty, optional, variadic, default, sql))
 }
