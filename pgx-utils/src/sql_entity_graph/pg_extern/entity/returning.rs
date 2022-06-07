@@ -12,17 +12,14 @@ use crate::sql_entity_graph::TypeEntity;
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub enum PgExternReturnEntity {
     None,
-    Type {
-        ty: TypeEntity,
-    },
-    SetOf {
-        ty: TypeEntity,
-    },
-    Iterated(
-        Vec<(
-            TypeEntity,
-            Option<&'static str>, // Name
-        )>,
-    ),
+    Type { ty: TypeEntity },
+    SetOf { ty: TypeEntity },
+    Iterated(Vec<PgExternReturnEntityIteratedItem>),
     Trigger,
+}
+
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+pub struct PgExternReturnEntityIteratedItem {
+    pub ty: TypeEntity,
+    pub name: Option<&'static str>,
 }

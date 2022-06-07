@@ -25,7 +25,7 @@ impl SqlGraphIdentifier for PgExternArgumentEntity {
     fn rust_identifier(&self) -> String {
         match self.ty {
             TypeEntity::Type { full_path, .. } => full_path.to_string(),
-            TypeEntity::CompositeType { sql } => sql.to_string(),
+            TypeEntity::CompositeType { sql, .. } => sql.to_string() + "[]",
         }
     }
 

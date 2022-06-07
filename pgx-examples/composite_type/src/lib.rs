@@ -30,7 +30,7 @@ fn gets_name_field(dog: Option<pgx::composite_type!("Dog")>) -> Option<&str> {
 }
 
 #[pg_extern]
-fn gets_name_field_variadic(dogs: pgx::variadic!(pgx::composite_type!("Dog"))) -> Vec<&str> {
+fn gets_name_field_variadic(dogs: VariadicArray<pgx::composite_type!("Dog")>) -> Vec<String> {
     // Gets resolved to:
     let dogs: pgx::VariadicArray<PgHeapTuple<AllocatedByRust>> = dogs;
 
@@ -56,10 +56,10 @@ fn gets_name_field_default(
 #[pg_extern]
 fn gets_name_field_default_variadic(
     dogs: default!(
-        variadic!(pgx::composite_type!("Dog")),
+        VariadicArray<pgx::composite_type!("Dog")>,
         "ARRAY[ROW('Nami', 0)]::Dog[]"
     ),
-) -> Vec<&str> {
+) -> Vec<String> {
     // Gets resolved to:
     let dogs: pgx::VariadicArray<PgHeapTuple<AllocatedByRust>> = dogs;
 
@@ -81,7 +81,9 @@ fn gets_name_field_strict(dog: pgx::composite_type!("Dog")) -> &str {
 }
 
 #[pg_extern]
-fn gets_name_field_strict_variadic(dogs: pgx::variadic!(pgx::composite_type!("Dog"))) -> Vec<&str> {
+fn gets_name_field_strict_variadic(
+    dogs: pgx::VariadicArray<pgx::composite_type!("Dog")>,
+) -> Vec<String> {
     // Gets resolved to:
     let dogs: pgx::VariadicArray<PgHeapTuple<AllocatedByRust>> = dogs;
 

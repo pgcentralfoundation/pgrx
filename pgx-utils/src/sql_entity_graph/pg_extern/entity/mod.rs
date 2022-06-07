@@ -12,7 +12,8 @@ mod returning;
 
 pub use argument::PgExternArgumentEntity;
 pub use operator::PgOperatorEntity;
-pub use returning::PgExternReturnEntity;
+use quote::{ToTokens, TokenStreamExt};
+pub use returning::{PgExternReturnEntity, PgExternReturnEntityIteratedItem};
 
 use crate::{
     sql_entity_graph::{
@@ -164,12 +165,31 @@ impl ToSql for PgExternEntity {
                                             );
                             args.push(buf);
                         }
-                        TypeEntity::CompositeType { sql } => {
+                        TypeEntity::CompositeType { sql, wrapper } => {
                             let buf = format!("\
-                                                \t\"{pattern}\" {variadic}{sql}{maybe_comma} /* pgx::composite_type! */\
+                                                \t\"{pattern}\" {variadic}{sql}{maybe_square_braces}{maybe_comma} /* {with_wrapper} */\
                                             ",
                                                 pattern = arg.pattern,
+                                                maybe_square_braces = if wrapper.square_brackets() {
+                                                    "[]"
+                                                } else { "" },
                                                 variadic = if arg.is_variadic { "VARIADIC " } else { "" },
+                                                with_wrapper = match wrapper {
+                                                    CompositeTypeWrapper::None => format!("::pgx::composite_type!(..)"),
+                                                    CompositeTypeWrapper::Option => format!("Option<::pgx::composite_type!(..)>"),
+                                                    CompositeTypeWrapper::OptionVec => format!("Option<Vec::pgx::composite_type!(..)>"),
+                                                    CompositeTypeWrapper::OptionVecOption => format!("Option<Vec<Option::pgx::composite_type!(..)>>"),
+                                                    CompositeTypeWrapper::OptionArray => format!("Option<Array::pgx::composite_type!(..)>"),
+                                                    CompositeTypeWrapper::OptionArrayOption => format!("Option<Array<Option::pgx::composite_type!(..)>>>"),
+                                                    CompositeTypeWrapper::OptionVariadicArray => format!("Option<VariadicArray::pgx::composite_type!(..)>>"),
+                                                    CompositeTypeWrapper::OptionVariadicArrayOption => format!("Option<VariadicArray<Option::pgx::composite_type!(..)>>>"),
+                                                    CompositeTypeWrapper::Vec => format!("Vec<c::pgx::omposite_type!(..)>"),
+                                                    CompositeTypeWrapper::VecOption => format!("Vec<Option<::pgx::composite_type!(..)>>"),
+                                                    CompositeTypeWrapper::Array => format!("::pgx::Array<composite_type!(..)>"),
+                                                    CompositeTypeWrapper::ArrayOption => format!("::pgx::Array<Option<::pgx::composite_type!(..)>>"),
+                                                    CompositeTypeWrapper::VariadicArray => format!("::pgx::VariadicArray<::pgx::composite_type!(..)>"),
+                                                    CompositeTypeWrapper::VariadicArrayOption => format!("::pgx::VariadicArray<Option<::pgx::composite_type!(..)>>"),
+                                                },
                                                 maybe_comma = if idx < (self.fn_args.len() - 1) { ", " } else { " " },
                                             );
                             args.push(buf);
@@ -217,8 +237,21 @@ impl ToSql for PgExternEntity {
                                                     full_path = full_path
                                             )
                         }
-                        TypeEntity::CompositeType { sql } => {
-                            format!("RETURNS {sql} /* pgx::composite_type! */")
+                        TypeEntity::CompositeType { sql, wrapper } => match wrapper {
+                            CompositeTypeWrapper::None => format!("RETURNS {sql} /* ::pgx::composite_type!(..) */"),
+                            CompositeTypeWrapper::Option => format!("RETURNS {sql}[] /* Option<::pgx::composite_type!(..)> */"),
+                            CompositeTypeWrapper::OptionVec => format!("RETURNS {sql}[] /* Option<Vec::pgx::composite_type!(..)> */"),
+                            CompositeTypeWrapper::OptionVecOption => format!("RETURNS {sql}[] /* Option<Vec<Option::pgx::composite_type!(..)>> */"),
+                            CompositeTypeWrapper::OptionArray => format!("RETURNS {sql}[] /* Option<Array::pgx::composite_type!(..)> */"),
+                            CompositeTypeWrapper::OptionArrayOption => format!("RETURNS {sql}[] /* Option<Array<Option::pgx::composite_type!(..)>>> */"),
+                            CompositeTypeWrapper::OptionVariadicArray => format!("RETURNS {sql}[] /* Option<VariadicArray::pgx::composite_type!(..)>> */"),
+                            CompositeTypeWrapper::OptionVariadicArrayOption => format!("RETURNS {sql}[] /* Option<VariadicArray<Option::pgx::composite_type!(..)>>> */"),
+                            CompositeTypeWrapper::Vec => format!("RETURNS {sql}[] /* Vec<::pgx::composite_type!(..)> */"),
+                            CompositeTypeWrapper::VecOption => format!("RETURNS {sql}[] /* Vec<Option<::pgx::composite_type!(..)>> */"),
+                            CompositeTypeWrapper::Array => format!("RETURNS {sql}[] /* ::pgx::Array<::pgx::composite_type!(..)> */"),
+                            CompositeTypeWrapper::ArrayOption => format!("RETURNS {sql}[] /* ::pgx::Array<Option<::pgx::composite_type!(..)>> */"),
+                            CompositeTypeWrapper::VariadicArray => format!("RETURNS {sql}[] /* ::pgx::VariadicArray<::pgx::composite_type!(..)> */"),
+                            CompositeTypeWrapper::VariadicArrayOption => format!("RETURNS {sql}[] /* ::pgx::VariadicArray<Option<::pgx::composite_type!(..)>> */"),
                         }
                     }
                 }
@@ -257,14 +290,29 @@ impl ToSql for PgExternEntity {
                                                     full_path = full_path
                                             )
                         }
-                        TypeEntity::CompositeType { sql } => {
-                            format!("RETURNS {sql} /* pgx::composite_type! */")
+                        TypeEntity::CompositeType { sql, wrapper } => match wrapper {
+                            CompositeTypeWrapper::None => format!("RETURNS SETOF {sql} /* ::pgx::composite_type!(..) */"),
+                            CompositeTypeWrapper::Option => format!("RETURNS SETOF {sql}[] /* Option<::pgx::composite_type!(..)> */"),
+                            CompositeTypeWrapper::OptionVec => format!("RETURNS SETOF {sql}[] /* Option<Vec::pgx::composite_type!(..)> */"),
+                            CompositeTypeWrapper::OptionVecOption => format!("RETURNS SETOF {sql}[] /* Option<Vec<Option::pgx::composite_type!(..)>> */"),
+                            CompositeTypeWrapper::OptionArray => format!("RETURNS SETOF {sql}[] /* Option<Array::pgx::composite_type!(..)> */"),
+                            CompositeTypeWrapper::OptionArrayOption => format!("RETURNS SETOF {sql}[] /* Option<Array<Option::pgx::composite_type!(..)>>> */"),
+                            CompositeTypeWrapper::OptionVariadicArray => format!("RETURNS SETOF {sql}[] /* Option<VariadicArray::pgx::composite_type!(..)>> */"),
+                            CompositeTypeWrapper::OptionVariadicArrayOption => format!("RETURNS SETOF {sql}[] /* Option<VariadicArray<Option::pgx::composite_type!(..)>>> */"),
+                            CompositeTypeWrapper::Vec => format!("RETURNS SETOF {sql}[] /* Vec<::pgx::composite_type!(..)> */"),
+                            CompositeTypeWrapper::VecOption => format!("RETURNS SETOF {sql}[] /* Vec<Option<::pgx::composite_type!(..)>> */"),
+                            CompositeTypeWrapper::Array => format!("RETURNS SETOF {sql}[] /* ::pgx::Array<composite_type!(..)> */"),
+                            CompositeTypeWrapper::ArrayOption => format!("RETURNS SETOF {sql}[] /* ::pgx::Array<Option<::pgx::composite_type!(..)>> */"),
+                            CompositeTypeWrapper::VariadicArray => format!("RETURNS SETOF {sql}[] /* ::pgx::VariadicArray<::pgx::composite_type!(..)> */"),
+                            CompositeTypeWrapper::VariadicArrayOption => format!("RETURNS SETOF {sql}[] /* ::pgx::VariadicArray<Option<::pgx::composite_type!(..)>> */"),
                         }
                     }
                 }
                 PgExternReturnEntity::Iterated(table_items) => {
                     let mut items = String::new();
-                    for (idx, (ty, col_name)) in table_items.iter().enumerate() {
+                    for (idx, returning::PgExternReturnEntityIteratedItem { ty, name: col_name }) in
+                        table_items.iter().enumerate()
+                    {
                         match ty {
                             TypeEntity::Type {
                                 ty_source,
@@ -308,7 +356,12 @@ impl ToSql for PgExternEntity {
                                                 );
                                 items.push_str(&item);
                             }
-                            TypeEntity::CompositeType { sql } => items.push_str(sql),
+                            TypeEntity::CompositeType { sql, wrapper } => {
+                                match wrapper.square_brackets() {
+                                    false => items.push_str(sql),
+                                    true => items.push_str(&format!("{sql}[]")),
+                                }
+                            }
                         }
                     }
                     format!("RETURNS TABLE ({}\n)", items)
@@ -496,5 +549,94 @@ pub enum TypeEntity {
     },
     CompositeType {
         sql: &'static str,
+        wrapper: CompositeTypeWrapper,
     },
+}
+
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+pub enum CompositeTypeWrapper {
+    None,
+    Option,
+    OptionVec,
+    OptionVecOption,
+    OptionArray,
+    OptionArrayOption,
+    OptionVariadicArray,
+    OptionVariadicArrayOption,
+    Vec,
+    VecOption,
+    Array,
+    ArrayOption,
+    VariadicArray,
+    VariadicArrayOption,
+}
+
+impl CompositeTypeWrapper {
+    fn square_brackets(&self) -> bool {
+        match self {
+            CompositeTypeWrapper::None | CompositeTypeWrapper::Option => false,
+            CompositeTypeWrapper::Vec
+            | CompositeTypeWrapper::VecOption
+            | CompositeTypeWrapper::Array
+            | CompositeTypeWrapper::ArrayOption
+            | CompositeTypeWrapper::VariadicArray
+            | CompositeTypeWrapper::OptionVec
+            | CompositeTypeWrapper::OptionVecOption
+            | CompositeTypeWrapper::OptionArray
+            | CompositeTypeWrapper::OptionArrayOption
+            | CompositeTypeWrapper::OptionVariadicArray
+            | CompositeTypeWrapper::OptionVariadicArrayOption
+            | CompositeTypeWrapper::VariadicArrayOption => true,
+        }
+    }
+}
+
+impl ToTokens for CompositeTypeWrapper {
+    fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
+        let self_tokens = match self {
+            CompositeTypeWrapper::None => {
+                quote::quote! { ::pgx::utils::sql_entity_graph::CompositeTypeWrapper::None }
+            }
+            CompositeTypeWrapper::Option => {
+                quote::quote! { ::pgx::utils::sql_entity_graph::CompositeTypeWrapper::Option }
+            }
+            CompositeTypeWrapper::OptionVec => {
+                quote::quote! { ::pgx::utils::sql_entity_graph::CompositeTypeWrapper::OptionVec }
+            }
+            CompositeTypeWrapper::OptionVecOption => {
+                quote::quote! { ::pgx::utils::sql_entity_graph::CompositeTypeWrapper::OptionVecOption }
+            }
+            CompositeTypeWrapper::OptionArray => {
+                quote::quote! { ::pgx::utils::sql_entity_graph::CompositeTypeWrapper::OptionArray }
+            }
+            CompositeTypeWrapper::OptionArrayOption => {
+                quote::quote! { ::pgx::utils::sql_entity_graph::CompositeTypeWrapper::OptionArrayOption }
+            }
+            CompositeTypeWrapper::OptionVariadicArray => {
+                quote::quote! { ::pgx::utils::sql_entity_graph::CompositeTypeWrapper::OptionVariadicArray }
+            }
+            CompositeTypeWrapper::OptionVariadicArrayOption => {
+                quote::quote! { ::pgx::utils::sql_entity_graph::CompositeTypeWrapper::OptionVariadicArrayOption }
+            }
+            CompositeTypeWrapper::Vec => {
+                quote::quote! { ::pgx::utils::sql_entity_graph::CompositeTypeWrapper::Vec }
+            }
+            CompositeTypeWrapper::VecOption => {
+                quote::quote! { ::pgx::utils::sql_entity_graph::CompositeTypeWrapper::VecOption }
+            }
+            CompositeTypeWrapper::Array => {
+                quote::quote! { ::pgx::utils::sql_entity_graph::CompositeTypeWrapper::Array }
+            }
+            CompositeTypeWrapper::ArrayOption => {
+                quote::quote! { ::pgx::utils::sql_entity_graph::CompositeTypeWrapper::ArrayOption }
+            }
+            CompositeTypeWrapper::VariadicArray => {
+                quote::quote! { ::pgx::utils::sql_entity_graph::CompositeTypeWrapper::VariadicArray }
+            }
+            CompositeTypeWrapper::VariadicArrayOption => {
+                quote::quote! { ::pgx::utils::sql_entity_graph::CompositeTypeWrapper::VariadicArrayOption }
+            }
+        };
+        tokens.append_all(self_tokens);
+    }
 }
