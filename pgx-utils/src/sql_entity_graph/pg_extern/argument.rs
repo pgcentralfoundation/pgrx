@@ -13,7 +13,9 @@ use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
 use syn::{
     parse::{Parse, ParseStream},
-    parse_quote, FnArg, Pat, Token,
+    parse_quote,
+    spanned::Spanned,
+    FnArg, Pat, Token,
 };
 
 /// A parsed `#[pg_extern]` argument.
@@ -50,69 +52,7 @@ impl PgExternArgument {
             _ => return Err(syn::Error::new(Span::call_site(), "Unable to parse FnArg")),
         };
 
-        let mut default: Option<String> = None;
-        let mut sql: Option<syn::Expr> = None;
-        
-        match *value.ty {
-            syn::Type::Macro(ref macro_pat) => {
-                let mac = &macro_pat.mac;
-                let archetype = mac.path.segments.last().expect("No last segment");
-                match archetype.ident.to_string().as_str() {
-                    "default" => {
-                        let (maybe_new_true_ty, default_value) =
-                            handle_default_macro(mac)?;
-                        true_ty = maybe_new_true_ty;
-                        default = default_value;
-                    },
-                    "composite_type" => {
-                        sql = Some(handle_composite_type_macro(mac)?);
-                        true_ty = syn::parse_quote! {
-                            ::pgx::PgHeapTuple<'_, ::pgx::AllocatedByPostgres<::pgx::pg_sys::HeapTupleData>>
-                        }
-                    },
-                    _ => (),
-                }
-                
-            }
-            syn::Type::Path(ref path) => {
-                let segments = &path.path;
-                for segment in &segments.segments {
-                    if segment.ident.to_string().ends_with("Option") {
-                        match &segment.arguments {
-                            syn::PathArguments::AngleBracketed(path_arg) => {
-                                match path_arg.args.first() {
-                                    Some(syn::GenericArgument::Type(syn::Type::Macro(
-                                        macro_pat,
-                                    ))) => {
-                                        let mac = &macro_pat.mac;
-                                        let archetype =
-                                            mac.path.segments.last().expect("No last segment");
-                                        match archetype.ident.to_string().as_str() {
-                                            "default" => {
-                                                let (inner_type, default_value) =
-                                                    handle_default_macro(mac)?;
-                                                    true_ty = parse_quote! { Option<#inner_type> };
-                                                default = default_value;
-                                            },
-                                            "composite_type" => {
-                                                sql = Some(handle_composite_type_macro(mac)?);
-                                                true_ty = syn::parse_quote! {
-                                                    ::pgx::PgHeapTuple<'_, ::pgx::AllocatedByPostgres<::pgx::pg_sys::HeapTupleData>>
-                                                }
-                                            },
-                                            _ => (),
-                                        }
-                                    }
-                                    _ => (),
-                                }
-                            }
-                            _ => continue,
-                        }
-                    }
-                }
-            }
-            _ => (),
-        };
+        let (mut true_ty, variadic, default, sql) = resolve_arg_ty(*value.ty)?;
 
         // We special case ignore `*mut pg_sys::FunctionCallInfoData`
         match true_ty {
@@ -191,16 +131,12 @@ impl PgExternArgument {
     }
 }
 
-fn handle_composite_type_macro(
-    mac: &syn::Macro,
-) -> syn::Result<syn::Expr> {
+fn handle_composite_type_macro(mac: &syn::Macro) -> syn::Result<syn::Expr> {
     let out: syn::Expr = mac.parse_body()?;
     Ok(out)
 }
 
-fn handle_default_macro(
-    mac: &syn::Macro,
-) -> syn::Result<(syn::Type, Option<String>)> {
+fn handle_default_macro(mac: &syn::Macro) -> syn::Result<(syn::Type, Option<String>)> {
     let out: DefaultMacro = mac.parse_body()?;
     let true_ty = out.ty;
     match out.expr {
@@ -264,7 +200,13 @@ fn handle_default_macro(
                 if last_string.as_str() == "NULL" {
                     Ok((true_ty, Some(last_string)))
                 } else {
-                    return Err(syn::Error::new(Span::call_site(), format!("Unable to parse default value of `default!()` macro, got: {:?}", out.expr)));
+                    return Err(syn::Error::new(
+                        Span::call_site(),
+                        format!(
+                            "Unable to parse default value of `default!()` macro, got: {:?}",
+                            out.expr
+                        ),
+                    ));
                 }
             }
             _ => {
@@ -350,7 +292,7 @@ impl ToTokens for PgExternArgument {
                         sql: #sql,
                     }
                 }
-            },
+            }
             None => {
                 quote! {
                     ::pgx::utils::sql_entity_graph::TypeEntity::Type {
@@ -394,4 +336,80 @@ impl Parse for DefaultMacro {
         let expr = input.parse()?;
         Ok(Self { ty, expr })
     }
+}
+
+/** Resolves a `pg_extern` argument `syn::Type` into metadata
+
+Returns `(resolved_ty, variadic, default, sql)`.
+
+Resolves the following:
+* Any plain Rust type
+* `pgx::default!(syn::Type, syn::Ident)`
+* `pgx::default!(syn::Type, syn::Ident)`
+* `::pgx::default!(syn::Type, syn::Ident)`
+* `pgx::default!(syn::Type, syn::Ident)`
+
+*/
+fn resolve_arg_ty(
+    ty: syn::Type,
+) -> syn::Result<(syn::Type, bool, Option<String>, Option<syn::Expr>)> {
+    let mut resolved_ty = ty;
+    let mut variadic = false;
+    let mut default = None;
+    let mut sql = None;
+
+    match &resolved_ty {
+        syn::Type::Macro(ref macro_pat) => {
+            let mac = &macro_pat.mac;
+            let archetype = mac.path.segments.last().expect("No last segment");
+            match archetype.ident.to_string().as_str() {
+                "default" => {
+                    (resolved_ty, default) = handle_default_macro(mac)?;
+                }
+                "composite_type" => {
+                    sql = Some(handle_composite_type_macro(mac)?);
+                    resolved_ty = syn::parse_quote! {
+                        ::pgx::PgHeapTuple<'_, ::pgx::AllocatedByPostgres<::pgx::pg_sys::HeapTupleData>>
+                    }
+                }
+                _ => (),
+            }
+        }
+        syn::Type::Path(ref path) => {
+            let segments = &path.path;
+            let last = segments.segments.last().ok_or(syn::Error::new(
+                path.span(),
+                "Could not read last segment of path",
+            ))?;
+            if last.ident.to_string().ends_with("Option") {
+                match &last.arguments {
+                    syn::PathArguments::AngleBracketed(path_arg) => match path_arg.args.first() {
+                        Some(syn::GenericArgument::Type(syn::Type::Macro(macro_pat))) => {
+                            let mac = &macro_pat.mac;
+                            let archetype = mac.path.segments.last().expect("No last segment");
+                            match archetype.ident.to_string().as_str() {
+                                "default" => {
+                                    let (inner_type, default_value) = handle_default_macro(mac)?;
+                                    resolved_ty = parse_quote! { Option<#inner_type> };
+                                    default = default_value;
+                                }
+                                "composite_type" => {
+                                    sql = Some(handle_composite_type_macro(mac)?);
+                                    resolved_ty = syn::parse_quote! {
+                                        ::pgx::PgHeapTuple<'_, ::pgx::AllocatedByPostgres<::pgx::pg_sys::HeapTupleData>>
+                                    }
+                                }
+                                _ => (),
+                            }
+                        }
+                        _ => (),
+                    },
+                    _ => (),
+                }
+            }
+        }
+        _ => (),
+    };
+
+    Ok((resolved_ty, variadic, default, sql))
 }

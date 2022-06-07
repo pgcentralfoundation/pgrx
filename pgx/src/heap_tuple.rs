@@ -27,7 +27,6 @@ pub struct PgHeapTuple<'a, AllocatedBy: WhoAllocated<pg_sys::HeapTupleData>> {
     tupdesc: PgTupleDesc<'a>,
 }
 
-
 impl<'a> FromDatum for PgHeapTuple<'a, AllocatedByRust> {
     unsafe fn from_datum(composite: pg_sys::Datum, is_null: bool) -> Option<Self> {
         if is_null {

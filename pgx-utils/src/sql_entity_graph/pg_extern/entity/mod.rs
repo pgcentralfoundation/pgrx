@@ -10,7 +10,7 @@ mod argument;
 mod operator;
 mod returning;
 
-pub use argument::{PgExternArgumentEntity};
+pub use argument::PgExternArgumentEntity;
 pub use operator::PgOperatorEntity;
 pub use returning::PgExternReturnEntity;
 
@@ -107,30 +107,45 @@ impl ToSql for PgExternEntity {
 
         let module_pathname = &context.get_module_pathname();
 
-        let fn_sql = format!("\
+        let fn_sql = format!(
+            "\
                                 CREATE FUNCTION {schema}\"{name}\"({arguments}) {returns}\n\
                                 {extern_attrs}\
                                 {search_path}\
                                 LANGUAGE c /* Rust */\n\
                                 AS '{module_pathname}', '{unaliased_name}_wrapper';\
                             ",
-                             schema = self.schema.map(|schema| format!("{}.", schema)).unwrap_or_else(|| context.schema_prefix_for(&self_index)),
-                             name = self.name,
-                             unaliased_name = self.unaliased_name,
-                             module_pathname = module_pathname,
-                             arguments = if !self.fn_args.is_empty() {
-                                let mut args = Vec::new();
-                                for (idx, arg) in self.fn_args.iter().enumerate() {
-                                    match &arg.ty {
-                                        TypeEntity::Type { ty_source, ty_id, full_path, module_path: _ } => {
-                                            let graph_index = context.graph.neighbors_undirected(self_index).find(|neighbor| match &context.graph[*neighbor] {
-                                                SqlGraphEntity::Type(ty) => ty.id_matches(&ty_id),
-                                                SqlGraphEntity::Enum(en) => en.id_matches(&ty_id),
-                                                SqlGraphEntity::BuiltinType(defined) => defined == full_path,
-                                                _ => false,
-                                            }).ok_or_else(|| eyre!("Could not find arg type in graph. Got: {:?}", arg))?;
-                                            let needs_comma = idx < (self.fn_args.len() - 1);
-                                            let buf = format!("\
+            schema = self
+                .schema
+                .map(|schema| format!("{}.", schema))
+                .unwrap_or_else(|| context.schema_prefix_for(&self_index)),
+            name = self.name,
+            unaliased_name = self.unaliased_name,
+            module_pathname = module_pathname,
+            arguments = if !self.fn_args.is_empty() {
+                let mut args = Vec::new();
+                for (idx, arg) in self.fn_args.iter().enumerate() {
+                    match &arg.ty {
+                        TypeEntity::Type {
+                            ty_source,
+                            ty_id,
+                            full_path,
+                            module_path: _,
+                        } => {
+                            let graph_index = context
+                                .graph
+                                .neighbors_undirected(self_index)
+                                .find(|neighbor| match &context.graph[*neighbor] {
+                                    SqlGraphEntity::Type(ty) => ty.id_matches(&ty_id),
+                                    SqlGraphEntity::Enum(en) => en.id_matches(&ty_id),
+                                    SqlGraphEntity::BuiltinType(defined) => defined == full_path,
+                                    _ => false,
+                                })
+                                .ok_or_else(|| {
+                                    eyre!("Could not find arg type in graph. Got: {:?}", arg)
+                                })?;
+                            let needs_comma = idx < (self.fn_args.len() - 1);
+                            let buf = format!("\
                                                     \t\"{pattern}\" {variadic}{schema_prefix}{sql_type}{default}{maybe_comma}/* {full_path} */\
                                                 ",
                                                     pattern = arg.pattern,
@@ -147,34 +162,45 @@ impl ToSql for PgExternEntity {
                                                     maybe_comma = if needs_comma { ", " } else { " " },
                                                     full_path = full_path,
                                             );
-                                            args.push(buf);
-                                        },
-                                        TypeEntity::CompositeType { sql } => {
-                                            let buf = format!("\
+                            args.push(buf);
+                        }
+                        TypeEntity::CompositeType { sql } => {
+                            let buf = format!("\
                                                 \t\"{pattern}\" {variadic}{sql}{maybe_comma} /* pgx::composite_type! */\
                                             ",
                                                 pattern = arg.pattern,
                                                 variadic = if arg.is_variadic { "VARIADIC " } else { "" },
                                                 maybe_comma = if idx < (self.fn_args.len() - 1) { ", " } else { " " },
                                             );
-                                            args.push(buf);
-                                        },
-                                    }
-                                };
-                                String::from("\n") + &args.join("\n") + "\n"
-                             } else { Default::default() },
-                             returns = match &self.fn_return {
-                                 PgExternReturnEntity::None => String::from("RETURNS void"),
-                                 PgExternReturnEntity::Type { ty } => {
-                                     match ty {
-                                        TypeEntity::Type { ty_source, ty_id, full_path, module_path: _ } => {
-                                            let graph_index = context.graph.neighbors_undirected(self_index).find(|neighbor| match &context.graph[*neighbor] {
-                                                SqlGraphEntity::Type(ty) => ty.id_matches(&ty_id),
-                                                SqlGraphEntity::Enum(en) => en.id_matches(&ty_id),
-                                                SqlGraphEntity::BuiltinType(defined) => &*defined == full_path,
-                                                _ => false,
-                                            }).ok_or_else(|| eyre!("Could not find return type in graph."))?;
-                                            format!("RETURNS {schema_prefix}{sql_type} /* {full_path} */",
+                            args.push(buf);
+                        }
+                    }
+                }
+                String::from("\n") + &args.join("\n") + "\n"
+            } else {
+                Default::default()
+            },
+            returns = match &self.fn_return {
+                PgExternReturnEntity::None => String::from("RETURNS void"),
+                PgExternReturnEntity::Type { ty } => {
+                    match ty {
+                        TypeEntity::Type {
+                            ty_source,
+                            ty_id,
+                            full_path,
+                            module_path: _,
+                        } => {
+                            let graph_index = context
+                                .graph
+                                .neighbors_undirected(self_index)
+                                .find(|neighbor| match &context.graph[*neighbor] {
+                                    SqlGraphEntity::Type(ty) => ty.id_matches(&ty_id),
+                                    SqlGraphEntity::Enum(en) => en.id_matches(&ty_id),
+                                    SqlGraphEntity::BuiltinType(defined) => &*defined == full_path,
+                                    _ => false,
+                                })
+                                .ok_or_else(|| eyre!("Could not find return type in graph."))?;
+                            format!("RETURNS {schema_prefix}{sql_type} /* {full_path} */",
                                                     sql_type = context.source_only_to_sql_type(ty_source).or_else(|| {
                                                         context.type_id_to_sql_type(*ty_id)
                                                     }).or_else(|| {
@@ -190,21 +216,31 @@ impl ToSql for PgExternEntity {
                                                     schema_prefix = context.schema_prefix_for(&graph_index),
                                                     full_path = full_path
                                             )
-                                        },
-                                        TypeEntity::CompositeType { sql } => format!("RETURNS {sql} /* pgx::composite_type! */"),
-                                    }
-                                     
-                                 },
-                                 PgExternReturnEntity::SetOf { ty } => {
-                                    match ty {
-                                        TypeEntity::Type { ty_source, ty_id, full_path, module_path: _ } => {
-                                            let graph_index = context.graph.neighbors_undirected(self_index).find(|neighbor| match &context.graph[*neighbor] {
-                                                SqlGraphEntity::Type(ty) => ty.id_matches(&ty_id),
-                                                SqlGraphEntity::Enum(en) => en.id_matches(&ty_id),
-                                                SqlGraphEntity::BuiltinType(defined) => defined == full_path,
-                                                _ => false,
-                                            }).ok_or_else(|| eyre!("Could not find return type in graph."))?;
-                                            format!("RETURNS SETOF {schema_prefix}{sql_type} /* {full_path} */",
+                        }
+                        TypeEntity::CompositeType { sql } => {
+                            format!("RETURNS {sql} /* pgx::composite_type! */")
+                        }
+                    }
+                }
+                PgExternReturnEntity::SetOf { ty } => {
+                    match ty {
+                        TypeEntity::Type {
+                            ty_source,
+                            ty_id,
+                            full_path,
+                            module_path: _,
+                        } => {
+                            let graph_index = context
+                                .graph
+                                .neighbors_undirected(self_index)
+                                .find(|neighbor| match &context.graph[*neighbor] {
+                                    SqlGraphEntity::Type(ty) => ty.id_matches(&ty_id),
+                                    SqlGraphEntity::Enum(en) => en.id_matches(&ty_id),
+                                    SqlGraphEntity::BuiltinType(defined) => defined == full_path,
+                                    _ => false,
+                                })
+                                .ok_or_else(|| eyre!("Could not find return type in graph."))?;
+                            format!("RETURNS SETOF {schema_prefix}{sql_type} /* {full_path} */",
                                                     sql_type = context.source_only_to_sql_type(ty_source).or_else(|| {
                                                         context.type_id_to_sql_type(*ty_id)
                                                     }).or_else(|| {
@@ -220,23 +256,35 @@ impl ToSql for PgExternEntity {
                                                     schema_prefix = context.schema_prefix_for(&graph_index),
                                                     full_path = full_path
                                             )
-                                        },
-                                        TypeEntity::CompositeType { sql } => format!("RETURNS {sql} /* pgx::composite_type! */"),
-                                    }
-                                 },
-                                 PgExternReturnEntity::Iterated(table_items) => {
-                                     let mut items = String::new();
-                                     for (idx, (ty, col_name)) in table_items.iter().enumerate() {
-                                        match ty {
-                                            TypeEntity::Type { ty_source, ty_id, full_path, module_path: _ } => {
-                                                let graph_index = context.graph.neighbors_undirected(self_index).find(|neighbor| match &context.graph[*neighbor] {
-                                                    SqlGraphEntity::Type(ty) => ty.id_matches(&ty_id),
-                                                    SqlGraphEntity::Enum(en) => en.id_matches(&ty_id),
-                                                    SqlGraphEntity::BuiltinType(defined) => defined == ty_source,
-                                                    _ => false,
-                                                });
-                                                let needs_comma = idx < (table_items.len() - 1);
-                                                let item = format!("\n\t{col_name} {schema_prefix}{ty_resolved}{needs_comma} /* {ty_name} */",
+                        }
+                        TypeEntity::CompositeType { sql } => {
+                            format!("RETURNS {sql} /* pgx::composite_type! */")
+                        }
+                    }
+                }
+                PgExternReturnEntity::Iterated(table_items) => {
+                    let mut items = String::new();
+                    for (idx, (ty, col_name)) in table_items.iter().enumerate() {
+                        match ty {
+                            TypeEntity::Type {
+                                ty_source,
+                                ty_id,
+                                full_path,
+                                module_path: _,
+                            } => {
+                                let graph_index = context
+                                    .graph
+                                    .neighbors_undirected(self_index)
+                                    .find(|neighbor| match &context.graph[*neighbor] {
+                                        SqlGraphEntity::Type(ty) => ty.id_matches(&ty_id),
+                                        SqlGraphEntity::Enum(en) => en.id_matches(&ty_id),
+                                        SqlGraphEntity::BuiltinType(defined) => {
+                                            defined == ty_source
+                                        }
+                                        _ => false,
+                                    });
+                                let needs_comma = idx < (table_items.len() - 1);
+                                let item = format!("\n\t{col_name} {schema_prefix}{ty_resolved}{needs_comma} /* {ty_name} */",
                                                                    col_name = col_name.expect("An iterator of tuples should have `named!()` macro declarations."),
                                                                    schema_prefix = if let Some(graph_index) = graph_index {
                                                                        context.schema_prefix_for(&graph_index)
@@ -258,26 +306,32 @@ impl ToSql for PgExternEntity {
                                                                    needs_comma = if needs_comma { ", " } else { " " },
                                                                    ty_name = full_path
                                                 );
-                                                items.push_str(&item);
-                                            },
-                                            TypeEntity::CompositeType { sql } => items.push_str(sql),
-                                        }
-                                     }
-                                     format!("RETURNS TABLE ({}\n)", items)
-                                 },
-                                 PgExternReturnEntity::Trigger => String::from("RETURNS trigger"),
-                             },
-                             search_path = if let Some(search_path) = &self.search_path {
-                                 let retval = format!("SET search_path TO {}", search_path.join(", "));
-                                 retval + "\n"
-                             } else { Default::default() },
-                             extern_attrs = if extern_attrs.is_empty() {
-                                 String::default()
-                             } else {
-                                 let mut retval = extern_attrs.iter().map(|attr| format!("{}", attr).to_uppercase()).collect::<Vec<_>>().join(" ");
-                                 retval.push('\n');
-                                 retval
-                             },
+                                items.push_str(&item);
+                            }
+                            TypeEntity::CompositeType { sql } => items.push_str(sql),
+                        }
+                    }
+                    format!("RETURNS TABLE ({}\n)", items)
+                }
+                PgExternReturnEntity::Trigger => String::from("RETURNS trigger"),
+            },
+            search_path = if let Some(search_path) = &self.search_path {
+                let retval = format!("SET search_path TO {}", search_path.join(", "));
+                retval + "\n"
+            } else {
+                Default::default()
+            },
+            extern_attrs = if extern_attrs.is_empty() {
+                String::default()
+            } else {
+                let mut retval = extern_attrs
+                    .iter()
+                    .map(|attr| format!("{}", attr).to_uppercase())
+                    .collect::<Vec<_>>()
+                    .join(" ");
+                retval.push('\n');
+                retval
+            },
         );
 
         let ext_sql = format!(
@@ -347,8 +401,12 @@ impl ToSql for PgExternEntity {
                 .get(0)
                 .ok_or_else(|| eyre!("Did not find `left_arg` for operator `{}`.", self.name))?;
             let (left_arg_ty_id, left_arg_full_path) = match left_arg.ty {
-                TypeEntity::Type { ty_id, full_path, .. } => (ty_id, full_path),
-                TypeEntity::CompositeType { .. } => Err(eyre!("Cannot create operators for composite types"))?,
+                TypeEntity::Type {
+                    ty_id, full_path, ..
+                } => (ty_id, full_path),
+                TypeEntity::CompositeType { .. } => {
+                    Err(eyre!("Cannot create operators for composite types"))?
+                }
             };
             let left_arg_graph_index = context
                 .graph
@@ -358,14 +416,18 @@ impl ToSql for PgExternEntity {
                     _ => false,
                 })
                 .ok_or_else(|| eyre!("Could not find left arg function in graph."))?;
-            
+
             let right_arg = self
                 .fn_args
                 .get(1)
                 .ok_or_else(|| eyre!("Did not find `left_arg` for operator `{}`.", self.name))?;
             let (right_arg_ty_id, right_arg_full_path) = match left_arg.ty {
-                TypeEntity::Type { ty_id, full_path, .. } => (ty_id, full_path),
-                TypeEntity::CompositeType { .. } => Err(eyre!("Cannot create operators for composite types"))?,
+                TypeEntity::Type {
+                    ty_id, full_path, ..
+                } => (ty_id, full_path),
+                TypeEntity::CompositeType { .. } => {
+                    Err(eyre!("Cannot create operators for composite types"))?
+                }
             };
             let right_arg_graph_index = context
                 .graph
@@ -434,5 +496,5 @@ pub enum TypeEntity {
     },
     CompositeType {
         sql: &'static str,
-    }
+    },
 }

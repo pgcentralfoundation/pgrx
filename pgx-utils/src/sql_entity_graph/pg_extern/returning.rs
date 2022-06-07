@@ -20,14 +20,20 @@ use syn::{
 pub struct ReturningIteratedItem {
     ty: syn::Type,
     name: Option<String>,
-    sql: Option<syn::Expr>
+    sql: Option<syn::Expr>,
 }
 
 #[derive(Debug, Clone)]
 pub enum Returning {
     None,
-    Type { ty: syn::Type, sql: Option<syn::Expr>, },
-    SetOf { ty: syn::TypePath, sql: Option<syn::Expr>, },
+    Type {
+        ty: syn::Type,
+        sql: Option<syn::Expr>,
+    },
+    SetOf {
+        ty: syn::TypePath,
+        sql: Option<syn::Expr>,
+    },
     Iterated(Vec<ReturningIteratedItem>),
     /// `pgx_pg_sys::Datum`
     Trigger,
@@ -41,13 +47,15 @@ impl Returning {
                 syn::PathArguments::AngleBracketed(args) => match args.args.first_mut().unwrap() {
                     syn::GenericArgument::Binding(binding) => match &mut binding.ty {
                         syn::Type::Tuple(tuple_type) => Self::parse_type_tuple(tuple_type),
-                        syn::Type::Path(path) => {
-                            Returning::SetOf { ty: anonymonize_lifetimes_in_type_path(path.clone()), sql: None }
-                        }
+                        syn::Type::Path(path) => Returning::SetOf {
+                            ty: anonymonize_lifetimes_in_type_path(path.clone()),
+                            sql: None,
+                        },
                         syn::Type::Reference(type_ref) => match &*type_ref.elem {
-                            syn::Type::Path(path) => {
-                                Returning::SetOf { ty: anonymonize_lifetimes_in_type_path(path.clone()), sql: None }
-                            }
+                            syn::Type::Path(path) => Returning::SetOf {
+                                ty: anonymonize_lifetimes_in_type_path(path.clone()),
+                                sql: None,
+                            },
                             _ => unimplemented!("Expected path"),
                         },
                         ty => unimplemented!("Only iters with tuples, got {:?}.", ty),
@@ -110,7 +118,9 @@ impl Returning {
         let archetype = mac.path.segments.last().unwrap();
         match archetype.ident.to_string().as_str() {
             "composite_type" => {
-                let sql: syn::Expr = mac.parse_body().expect(&*format!("Failed to parse composite_type!(): {:?}", mac));
+                let sql: syn::Expr = mac
+                    .parse_body()
+                    .expect(&*format!("Failed to parse composite_type!(): {:?}", mac));
                 Returning::Type {
                     ty: syn::parse_quote! { ::pgx::PgHeapTuple<'_, impl WhoAllocated<::pgx::pg_sys::HeapTupleData>> },
                     sql: Some(sql),
@@ -141,10 +151,10 @@ impl TryFrom<&syn::ReturnType> for Returning {
                 match ty {
                     syn::Type::ImplTrait(mut impl_trait) => {
                         Returning::parse_impl_trait(&mut impl_trait)
-                    },
+                    }
                     syn::Type::TraitObject(mut dyn_trait) => {
                         Returning::parse_dyn_trait(&mut dyn_trait)
-                    },
+                    }
                     syn::Type::Path(mut typepath) => {
                         let path = &mut typepath.path;
                         let mut saw_pg_sys = false;
@@ -171,13 +181,13 @@ impl TryFrom<&syn::ReturnType> for Returning {
                                             )) => {
                                                 maybe_inner_impl_trait =
                                                     Some(Returning::parse_impl_trait(impl_trait));
-                                            },
+                                            }
                                             Some(syn::GenericArgument::Type(
                                                 syn::Type::TraitObject(dyn_trait),
                                             )) => {
                                                 maybe_inner_impl_trait =
                                                     Some(Returning::parse_dyn_trait(dyn_trait))
-                                            },
+                                            }
                                             _ => (),
                                         }
                                     }
@@ -206,29 +216,36 @@ impl TryFrom<&syn::ReturnType> for Returning {
                                                 _ => (),
                                             }
                                         }
-                                    },
+                                    }
                                     _ => (),
                                 }
                             }
-                            Returning::Type { ty: syn::Type::Path(static_ty.clone()), sql: None }
+                            Returning::Type {
+                                ty: syn::Type::Path(static_ty.clone()),
+                                sql: None,
+                            }
                         }
-                    },
+                    }
                     syn::Type::Reference(mut ty_ref) => {
                         if let Some(ref mut lifetime) = &mut ty_ref.lifetime {
                             lifetime.ident = Ident::new("static", Span::call_site());
                         }
-                        Returning::Type { ty: syn::Type::Reference(ty_ref), sql: None } 
-                    },
+                        Returning::Type {
+                            ty: syn::Type::Reference(ty_ref),
+                            sql: None,
+                        }
+                    }
                     syn::Type::Tuple(ref mut tup) => {
                         if tup.elems.is_empty() {
-                            Returning::Type { ty: ty.clone(), sql: None }
+                            Returning::Type {
+                                ty: ty.clone(),
+                                sql: None,
+                            }
                         } else {
                             Self::parse_type_tuple(tup)
                         }
-                    },
-                    syn::Type::Macro(ref mut type_macro) => {
-                        Self::parse_type_macro(type_macro)
-                    },
+                    }
+                    syn::Type::Macro(ref mut type_macro) => Self::parse_type_macro(type_macro),
                     _ => return Err(eyre!("Got unknown return type: {}", &ty.to_token_stream())),
                 }
             }
@@ -242,7 +259,7 @@ impl ToTokens for Returning {
             Returning::None => quote! {
                 ::pgx::utils::sql_entity_graph::PgExternReturnEntity::None
             },
-            Returning::Type { ty, sql} => {
+            Returning::Type { ty, sql } => {
                 if let Some(sql) = sql {
                     quote! {
                         ::pgx::utils::sql_entity_graph::PgExternReturnEntity::Type {
@@ -269,7 +286,6 @@ impl ToTokens for Returning {
                         }
                     }
                 }
-                
             }
             Returning::SetOf { ty, sql } => {
                 if let Some(sql) = sql {
@@ -394,19 +410,21 @@ impl Parse for NameMacro {
         let _comma: Token![,] = input.parse()?;
         let ty = input.parse()?;
 
-        
         let sql = match &ty {
             syn::Type::Macro(ref macro_pat) => {
                 // This is essentially a copy of `parse_type_macro` but it returns items instead of `Returning`
                 let mac = &macro_pat.mac;
                 let archetype = mac.path.segments.last().unwrap();
                 match archetype.ident.to_string().as_str() {
-                    "composite_type" => {
-                        Some(mac.parse_body().expect(&*format!("Failed to parse composite_type!(): {:?}", mac)))
-                    }
-                    _ => unimplemented!("Don't support anything other than `name!()` and `composite_type!()`"),
+                    "composite_type" => Some(
+                        mac.parse_body()
+                            .expect(&*format!("Failed to parse composite_type!(): {:?}", mac)),
+                    ),
+                    _ => unimplemented!(
+                        "Don't support anything other than `name!()` and `composite_type!()`"
+                    ),
                 }
-            },
+            }
             _ => None,
         };
 

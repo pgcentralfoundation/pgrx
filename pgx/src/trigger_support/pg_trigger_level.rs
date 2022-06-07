@@ -1,7 +1,4 @@
-use crate::{
-    pg_sys,
-    trigger_support::TriggerEvent,
-};
+use crate::{pg_sys, trigger_support::TriggerEvent};
 
 /// The level of a trigger
 ///
