@@ -1,15 +1,18 @@
 //! Provides a safe interface to Postgres `HeapTuple` objects.
 use crate::{
     heap_getattr_raw, pg_sys, AllocatedByPostgres, AllocatedByRust, FromDatum, IntoDatum, PgBox,
-    PgTupleDesc, TriggerTuple, TryFromDatumError, WhoAllocated,
+    PgTupleDesc, Spi, TriggerTuple, TryFromDatumError, WhoAllocated,
 };
 use std::num::NonZeroUsize;
 
 /// Describes errors that can occur when trying to create a new [PgHeapTuple].
-#[derive(thiserror::Error, Debug, Clone, Copy)]
+#[derive(thiserror::Error, Debug, Clone)]
 pub enum PgHeapTupleError {
     #[error("Incorrect attribute count, found {0}, descriptor had {1}")]
     IncorrectAttributeCount(usize, usize),
+
+    #[error("The specified composite type, {0}, does not exist")]
+    NoSuchType(String),
 }
 
 /// A [PgHeapTuple] is a lightweight wrapper around Postgres' [pg_sys::HeapTuple] object and a [PgTupleDesc].
@@ -83,6 +86,27 @@ impl<'a> PgHeapTuple<'a, AllocatedByPostgres> {
 }
 
 impl<'a> PgHeapTuple<'a, AllocatedByRust> {
+    pub fn new_composite_type(
+        type_name: &str,
+    ) -> Result<PgHeapTuple<'a, AllocatedByRust>, PgHeapTupleError> {
+        let tuple_desc = PgTupleDesc::from_composite_type(type_name)
+            .ok_or_else(|| PgHeapTupleError::NoSuchType(type_name.to_string()))?;
+        let natts = tuple_desc.len();
+        unsafe {
+            let datums =
+                pg_sys::palloc0(natts * std::mem::size_of::<pg_sys::Datum>()) as *mut pg_sys::Datum;
+            let mut is_null = (0..natts).map(|_| true).collect::<Vec<_>>();
+
+            let heap_tuple =
+                pg_sys::heap_form_tuple(tuple_desc.as_ptr(), datums, is_null.as_mut_ptr());
+
+            Ok(PgHeapTuple {
+                tuple: PgBox::<pg_sys::HeapTupleData, AllocatedByRust>::from_rust(heap_tuple),
+                tupdesc: tuple_desc,
+            })
+        }
+    }
+
     /// Create a new [PgHeapTuple] from a [PgTupleDesc] from an iterator of Datums.
     ///
     /// ## Errors

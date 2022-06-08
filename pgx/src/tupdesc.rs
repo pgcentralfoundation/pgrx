@@ -10,6 +10,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 //! Provides a safe wrapper around Postgres' `pg_sys::TupleDescData` struct
 use crate::{pg_sys, void_mut_ptr, PgBox, PgRelation};
 
+use pgx_pg_sys::AsPgCStr;
 use std::ops::Deref;
 
 /// This struct is passed around within the backend to describe the structure
@@ -116,7 +117,7 @@ impl<'a> PgTupleDesc<'a> {
     /// use pgx::{pg_sys, PgTupleDesc};
     /// let typid = 42 as pg_sys::Oid;  // a valid pg_type "oid" value
     /// let typmod = 0; // it's corresponding typemod value
-    /// let tupdesc = unsafe { PgTupleDesc::from_pg_is_copy(pg_sys::lookup_rowtype_tupdesc_copy(typid, typmod)) };
+    /// let tupdesc = unsafe { PgTupleDesc::from_rust(pg_sys::lookup_rowtype_tupdesc_copy(typid, typmod)) };
     ///
     /// // assert the tuple descriptor has 12 attributes
     /// assert_eq!(tupdesc.len(), 12);
@@ -129,7 +130,7 @@ impl<'a> PgTupleDesc<'a> {
     ///
     /// This method is unsafe as we cannot validate that the provided `pg_sys::TupleDesc` is valid
     /// or is actually a copy that requires a `pfree()` on Drop.
-    pub unsafe fn from_pg_is_copy<'b>(ptr: pg_sys::TupleDesc) -> PgTupleDesc<'b> {
+    pub unsafe fn from_rust<'b>(ptr: pg_sys::TupleDesc) -> PgTupleDesc<'b> {
         PgTupleDesc {
             tupdesc: PgBox::from_pg(ptr),
             parent: None,
@@ -146,6 +147,21 @@ impl<'a> PgTupleDesc<'a> {
             parent: Some(parent),
             need_release: false,
             need_pfree: false,
+        }
+    }
+
+    pub fn from_composite_type(name: &str) -> Option<PgTupleDesc<'a>> {
+        unsafe {
+            let mut typoid = 0;
+            let mut typmod = 0;
+            pg_sys::parseTypeString(name.as_pg_cstr(), &mut typoid, &mut typmod, true);
+
+            if typoid == pg_sys::InvalidOid {
+                return None;
+            }
+
+            let tuple_desc = pg_sys::lookup_rowtype_tupdesc(typoid, typmod);
+            Some(PgTupleDesc::from_rust(tuple_desc))
         }
     }
 
