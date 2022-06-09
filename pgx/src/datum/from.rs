@@ -19,33 +19,20 @@ use std::fmt::{Display, Formatter};
 use std::num::NonZeroUsize;
 
 /// If converting a Datum to a Rust type fails, this is the set of possible reasons why.
-#[derive(Debug)]
+#[derive(thiserror::Error, Debug, Clone, PartialEq, Eq)]
 pub enum TryFromDatumError {
-    /// The specified type of the Datum is not compatible with the desired Rust type.
+    #[error("The specified type of the Datum is not compatible with the desired Rust type.")]
     IncompatibleTypes,
 
-    /// We were asked to convert a Datum that is NULL (but flagged as "not null")
+    #[error("We were asked to convert a Datum that is NULL (but flagged as \"not null\")")]
     NullDatumPointer,
 
-    /// The specified attribute number is invalid
+    #[error("The specified attribute number `{0}` is not present")]
     NoSuchAttributeNumber(NonZeroUsize),
 
-    /// The specified attribute name is invalid
+    #[error("The specified attribute name `{0}` is not present")]
     NoSuchAttributeName(String),
 }
-
-impl Display for TryFromDatumError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        match self {
-            TryFromDatumError::IncompatibleTypes => f.write_str("Incompatible types"),
-            TryFromDatumError::NullDatumPointer => f.write_str("Null Datum pointer"),
-            TryFromDatumError::NoSuchAttributeNumber(_) => f.write_str("No such attribute number"),
-            TryFromDatumError::NoSuchAttributeName(_) => f.write_str("No such attribute name"),
-        }
-    }
-}
-
-impl Error for TryFromDatumError {}
 
 /// Convert a `(pg_sys::Datum, is_null:bool` pair into a Rust type
 ///

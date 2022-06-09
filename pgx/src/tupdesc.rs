@@ -150,7 +150,24 @@ impl<'a> PgTupleDesc<'a> {
         }
     }
 
-    pub fn from_composite_type(name: &str) -> Option<PgTupleDesc<'a>> {
+    /** Retrieve the tuple description of the shape of a defined composite type
+    
+    ```rust,no_run
+    Spi::run("CREATE TYPE dog AS (name text, age int);");
+    let tuple_desc = PgTupleDesc::for_composite_type(type_name);
+    
+    let mut is_null = (0..natts).map(|_| true).collect::<Vec<_>>();
+
+    let heap_tuple =
+        pg_sys::heap_form_tuple(tuple_desc.as_ptr(), datums, is_null.as_mut_ptr());
+
+    PgHeapTuple {
+        tuple: PgBox::<pg_sys::HeapTupleData, AllocatedByRust>::from_rust(heap_tuple),
+        tupdesc: tuple_desc,
+    }
+    ```
+    */
+    pub fn for_composite_type(name: &str) -> Option<PgTupleDesc<'a>> {
         unsafe {
             let mut typoid = 0;
             let mut typmod = 0;

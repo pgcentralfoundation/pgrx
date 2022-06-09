@@ -1,12 +1,12 @@
 //! Provides a safe interface to Postgres `HeapTuple` objects.
 use crate::{
     heap_getattr_raw, pg_sys, AllocatedByPostgres, AllocatedByRust, FromDatum, IntoDatum, PgBox,
-    PgTupleDesc, Spi, TriggerTuple, TryFromDatumError, WhoAllocated,
+    PgTupleDesc, TriggerTuple, TryFromDatumError, WhoAllocated,
 };
 use std::num::NonZeroUsize;
 
 /// Describes errors that can occur when trying to create a new [PgHeapTuple].
-#[derive(thiserror::Error, Debug, Clone)]
+#[derive(thiserror::Error, Debug, Clone, PartialEq, Eq)]
 pub enum PgHeapTupleError {
     #[error("Incorrect attribute count, found {0}, descriptor had {1}")]
     IncorrectAttributeCount(usize, usize),
@@ -86,10 +86,31 @@ impl<'a> PgHeapTuple<'a, AllocatedByPostgres> {
 }
 
 impl<'a> PgHeapTuple<'a, AllocatedByRust> {
+    /** Create a new heap tuple in the shape of a defined composite type
+    
+    ```rust,no_run
+    Spi::run("CREATE TYPE dog AS (name text, age int);");
+    let mut heap_tuple = PgHeapTuple::new_composite_type("dog").unwrap();
+
+    assert_eq!(heap_tuple.get_by_name::<String>("name").unwrap(), None);
+    assert_eq!(heap_tuple.get_by_name::<i32>("age").unwrap(), None);
+
+    heap_tuple
+        .set_by_name("name", "Brandy".to_string())
+        .unwrap();
+    heap_tuple.set_by_name("age", 42).unwrap();
+
+    assert_eq!(
+        heap_tuple.get_by_name("name").unwrap(),
+        Some("Brandy".to_string())
+    );
+    assert_eq!(heap_tuple.get_by_name("age").unwrap(), Some(42i32));
+    ```
+    */
     pub fn new_composite_type(
         type_name: &str,
     ) -> Result<PgHeapTuple<'a, AllocatedByRust>, PgHeapTupleError> {
-        let tuple_desc = PgTupleDesc::from_composite_type(type_name)
+        let tuple_desc = PgTupleDesc::for_composite_type(type_name)
             .ok_or_else(|| PgHeapTupleError::NoSuchType(type_name.to_string()))?;
         let natts = tuple_desc.len();
         unsafe {
