@@ -265,6 +265,7 @@ impl ToTokens for Returning {
                         ::pgx::utils::sql_entity_graph::PgExternReturnEntity::Type {
                             ty: ::pgx::utils::sql_entity_graph::TypeEntity::CompositeType {
                                 sql: #sql,
+                                wrapper: ::pgx::utils::sql_entity_graph::CompositeTypeWrapper::None,
                             }
                         }
                     }
@@ -293,6 +294,7 @@ impl ToTokens for Returning {
                         ::pgx::utils::sql_entity_graph::PgExternReturnEntity::SetOf {
                             ty: ::pgx::utils::sql_entity_graph::TypeEntity::CompositeType {
                                 sql: #sql,
+                                wrapper: ::pgx::utils::sql_entity_graph::CompositeTypeWrapper::None,
                             }
                         }
                     }
@@ -322,18 +324,19 @@ impl ToTokens for Returning {
                         let name_iter = name.iter();
                         if let Some(sql) = sql {
                             quote! {
-                                (
-                                    ::pgx::utils::sql_entity_graph::TypeEntity::CompositeType {
+                                ::pgx::utils::sql_entity_graph::PgExternReturnEntityIteratedItem {
+                                    ty: ::pgx::utils::sql_entity_graph::TypeEntity::CompositeType {
                                         sql: #sql,
+                                        wrapper: ::pgx::utils::sql_entity_graph::CompositeTypeWrapper::None,
                                     },
-                                    None #( .unwrap_or(Some(stringify!(#name_iter))) )*,
-                                )
+                                    name: None #( .unwrap_or(Some(stringify!(#name_iter))) )*,
+                                }
                             }
                         } else {
                             let ty_string = ty.to_token_stream().to_string().replace(" ", "");
                             quote! {
-                                (
-                                    ::pgx::utils::sql_entity_graph::TypeEntity::Type {
+                                ::pgx::utils::sql_entity_graph::PgExternReturnEntityIteratedItem {
+                                    ty: ::pgx::utils::sql_entity_graph::TypeEntity::Type {
                                         ty_id: TypeId::of::<#ty>(),
                                         ty_source: #ty_string,
                                         full_path: core::any::type_name::<#ty>(),
@@ -344,8 +347,8 @@ impl ToTokens for Returning {
                                             path_items.join("::")
                                         },
                                     },
-                                    None #( .unwrap_or(Some(stringify!(#name_iter))) )*,
-                                )
+                                    name: None #( .unwrap_or(Some(stringify!(#name_iter))) )*,
+                                }
                             }
                         }
                     })

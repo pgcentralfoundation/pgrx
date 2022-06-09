@@ -21,200 +21,322 @@ CREATE TYPE Dog AS (
     bootstrap
 );
 
-#[pg_extern]
-fn gets_name_field(dog: Option<pgx::composite_type!("Dog")>) -> Option<&str> {
-    // Gets resolved to:
-    let dog: Option<PgHeapTuple<AllocatedByRust>> = dog;
+// As Arguments
+mod arguments {
+    use super::*;
 
-    dog?.get_by_name("name").ok()?
-}
-
-#[pg_extern]
-fn gets_name_field_variadic(dogs: VariadicArray<pgx::composite_type!("Dog")>) -> Vec<String> {
-    // Gets resolved to:
-    let dogs: pgx::VariadicArray<PgHeapTuple<AllocatedByRust>> = dogs;
-
-    let mut names = Vec::with_capacity(dogs.len());
-    for dog in dogs {
-        let dog = dog.unwrap();
-        let name = dog.get_by_name("name").unwrap().unwrap();
-        names.push(name);
+    mod singleton {
+        use super::*;
+    
+        #[pg_extern]
+        fn gets_name_field(dog: Option<pgx::composite_type!("Dog")>) -> Option<&str> {
+            // Gets resolved to:
+            let dog: Option<PgHeapTuple<AllocatedByRust>> = dog;
+        
+            dog?.get_by_name("name").ok()?
+        }
+        
+        #[pg_extern]
+        fn gets_name_field_default(
+            dog: default!(pgx::composite_type!("Dog"), "ROW('Nami', 0)::Dog"),
+        ) -> &str {
+            // Gets resolved to:
+            let dog: PgHeapTuple<AllocatedByRust> = dog;
+        
+            dog.get_by_name("name").unwrap().unwrap()
+        }
+        
+        #[pg_extern]
+        fn gets_name_field_strict(dog: pgx::composite_type!("Dog")) -> &str {
+            // Gets resolved to:
+            let dog: PgHeapTuple<AllocatedByRust> = dog;
+        
+            dog.get_by_name("name").unwrap().unwrap()
+        }
     }
-    names
-}
 
-#[pg_extern]
-fn gets_name_field_default(
-    dog: default!(pgx::composite_type!("Dog"), "ROW('Nami', 0)::Dog"),
-) -> &str {
-    // Gets resolved to:
-    let dog: PgHeapTuple<AllocatedByRust> = dog;
-
-    dog.get_by_name("name").unwrap().unwrap()
-}
-
-#[pg_extern]
-fn gets_name_field_default_variadic(
-    dogs: default!(
-        VariadicArray<pgx::composite_type!("Dog")>,
-        "ARRAY[ROW('Nami', 0)]::Dog[]"
-    ),
-) -> Vec<String> {
-    // Gets resolved to:
-    let dogs: pgx::VariadicArray<PgHeapTuple<AllocatedByRust>> = dogs;
-
-    let mut names = Vec::with_capacity(dogs.len());
-    for dog in dogs {
-        let dog = dog.unwrap();
-        let name = dog.get_by_name("name").unwrap().unwrap();
-        names.push(name);
+    mod variadic_array {
+        use super::*;
+    
+        #[pg_extern]
+        fn gets_name_field_variadic(dogs: VariadicArray<pgx::composite_type!("Dog")>) -> Vec<String> {
+            // Gets resolved to:
+            let dogs: pgx::VariadicArray<PgHeapTuple<AllocatedByRust>> = dogs;
+        
+            let mut names = Vec::with_capacity(dogs.len());
+            for dog in dogs {
+                let dog = dog.unwrap();
+                let name = dog.get_by_name("name").unwrap().unwrap();
+                names.push(name);
+            }
+            names
+        }
+        
+        #[pg_extern]
+        fn gets_name_field_default_variadic(
+            dogs: default!(
+                VariadicArray<pgx::composite_type!("Dog")>,
+                "ARRAY[ROW('Nami', 0)]::Dog[]"
+            ),
+        ) -> Vec<String> {
+            // Gets resolved to:
+            let dogs: pgx::VariadicArray<PgHeapTuple<AllocatedByRust>> = dogs;
+        
+            let mut names = Vec::with_capacity(dogs.len());
+            for dog in dogs {
+                let dog = dog.unwrap();
+                let name = dog.get_by_name("name").unwrap().unwrap();
+                names.push(name);
+            }
+            names
+        }
+        
+        #[pg_extern]
+        fn gets_name_field_strict_variadic(
+            dogs: pgx::VariadicArray<pgx::composite_type!("Dog")>,
+        ) -> Vec<String> {
+            // Gets resolved to:
+            let dogs: pgx::VariadicArray<PgHeapTuple<AllocatedByRust>> = dogs;
+        
+            let mut names = Vec::with_capacity(dogs.len());
+            for dog in dogs {
+                let dog = dog.unwrap();
+                let name = dog.get_by_name("name").unwrap().unwrap();
+                names.push(name);
+            }
+            names
+        }
     }
-    names
-}
 
-#[pg_extern]
-fn gets_name_field_strict(dog: pgx::composite_type!("Dog")) -> &str {
-    // Gets resolved to:
-    let dog: PgHeapTuple<AllocatedByRust> = dog;
-
-    dog.get_by_name("name").unwrap().unwrap()
-}
-
-#[pg_extern]
-fn gets_name_field_strict_variadic(
-    dogs: pgx::VariadicArray<pgx::composite_type!("Dog")>,
-) -> Vec<String> {
-    // Gets resolved to:
-    let dogs: pgx::VariadicArray<PgHeapTuple<AllocatedByRust>> = dogs;
-
-    let mut names = Vec::with_capacity(dogs.len());
-    for dog in dogs {
-        let dog = dog.unwrap();
-        let name = dog.get_by_name("name").unwrap().unwrap();
-        names.push(name);
+    mod vec {
+        use super::*;
+    
+        #[pg_extern]
+        fn sum_scritches_for_names(dogs: Option<Vec<pgx::composite_type!("Dog")>>) -> i32 {
+            // Gets resolved to:
+            let dogs: Option<Vec<PgHeapTuple<AllocatedByRust>>> = dogs;
+        
+            let dogs = dogs.unwrap();
+            let mut sum_scritches = 0;
+            for dog in dogs {
+                let scritches: i32 = dog
+                    .get_by_name("scritches")
+                    .ok()
+                    .unwrap_or_default()
+                    .unwrap_or_default();
+                sum_scritches += scritches;
+            }
+            sum_scritches
+        }
+        
+        
+        #[pg_extern]
+        fn sum_scritches_for_names_default(
+            dogs: pgx::default!(
+                Vec<pgx::composite_type!("Dog")>,
+                "ARRAY[ROW('Nami', 0)]::Dog[]"
+            ),
+        ) -> i32 {
+            // Gets resolved to:
+            let dogs: Vec<PgHeapTuple<AllocatedByRust>> = dogs;
+        
+            let mut sum_scritches = 0;
+            for dog in dogs {
+                let scritches: i32 = dog
+                    .get_by_name("scritches")
+                    .ok()
+                    .unwrap_or_default()
+                    .unwrap_or_default();
+                sum_scritches += scritches;
+            }
+            sum_scritches
+        }
+        
+        #[pg_extern]
+        fn sum_scritches_for_names_strict(dogs: Vec<pgx::composite_type!("Dog")>) -> i32 {
+            // Gets resolved to:
+            let dogs: Vec<PgHeapTuple<AllocatedByRust>> = dogs;
+        
+            let mut sum_scritches = 0;
+            for dog in dogs {
+                let scritches: i32 = dog
+                    .get_by_name("scritches")
+                    .ok()
+                    .unwrap_or_default()
+                    .unwrap_or_default();
+                sum_scritches += scritches;
+            }
+            sum_scritches
+        }
+        
+        #[pg_extern]
+        fn sum_scritches_for_names_strict_optional_items(
+            dogs: Vec<Option<pgx::composite_type!("Dog")>>,
+        ) -> i32 {
+            // Gets resolved to:
+            let dogs: Vec<Option<PgHeapTuple<AllocatedByRust>>> = dogs;
+        
+            let mut sum_scritches = 0;
+            for dog in dogs {
+                let dog = dog.unwrap();
+                let scritches: i32 = dog
+                    .get_by_name("scritches")
+                    .ok()
+                    .unwrap_or_default()
+                    .unwrap_or_default();
+                sum_scritches += scritches;
+            }
+            sum_scritches
+        }
+        
+        #[pg_extern]
+        fn sum_scritches_for_names_default_optional_items(
+            dogs: pgx::default!(
+                Vec<Option<pgx::composite_type!("Dog")>>,
+                "ARRAY[ROW('Nami', 0)]::Dog[]"
+            ),
+        ) -> i32 {
+            // Gets resolved to:
+            let dogs: Vec<Option<PgHeapTuple<AllocatedByRust>>> = dogs;
+        
+            let mut sum_scritches = 0;
+            for dog in dogs {
+                let dog = dog.unwrap();
+                let scritches: i32 = dog
+                    .get_by_name("scritches")
+                    .ok()
+                    .unwrap_or_default()
+                    .unwrap_or_default();
+                sum_scritches += scritches;
+            }
+            sum_scritches
+        }
+        
+        #[pg_extern]
+        fn sum_scritches_for_names_optional_items(
+            dogs: Option<Vec<Option<pgx::composite_type!("Dog")>>>,
+        ) -> i32 {
+            // Gets resolved to:
+            let dogs: Option<Vec<Option<PgHeapTuple<AllocatedByRust>>>> = dogs;
+        
+            let dogs = dogs.unwrap();
+            let mut sum_scritches = 0;
+            for dog in dogs {
+                let dog = dog.unwrap();
+                let scritches: i32 = dog
+                    .get_by_name("scritches")
+                    .ok()
+                    .unwrap_or_default()
+                    .unwrap_or_default();
+                sum_scritches += scritches;
+            }
+            sum_scritches
+        }
     }
-    names
+
+    mod array {
+        use super::*;
+    
+        #[pg_extern]
+        fn sum_scritches_for_names_array(dogs: Option<pgx::Array<pgx::composite_type!("Dog")>>) -> i32 {
+            // Gets resolved to:
+            let dogs: Option<pgx::Array<PgHeapTuple<AllocatedByRust>>> = dogs;
+        
+            let dogs = dogs.unwrap();
+            let mut sum_scritches = 0;
+            for dog in dogs {
+                let dog = dog.unwrap();
+                let scritches: i32 = dog
+                    .get_by_name("scritches")
+                    .ok()
+                    .unwrap_or_default()
+                    .unwrap_or_default();
+                sum_scritches += scritches;
+            }
+            sum_scritches
+        }
+        
+        
+        #[pg_extern]
+        fn sum_scritches_for_names_array_default(
+            dogs: pgx::default!(
+                pgx::Array<pgx::composite_type!("Dog")>,
+                "ARRAY[ROW('Nami', 0)]::Dog[]"
+            ),
+        ) -> i32 {
+            // Gets resolved to:
+            let dogs: pgx::Array<PgHeapTuple<AllocatedByRust>> = dogs;
+        
+            let mut sum_scritches = 0;
+            for dog in dogs {
+                let dog = dog.unwrap();
+                let scritches: i32 = dog
+                    .get_by_name("scritches")
+                    .ok()
+                    .unwrap_or_default()
+                    .unwrap_or_default();
+                sum_scritches += scritches;
+            }
+            sum_scritches
+        }
+        
+        #[pg_extern]
+        fn sum_scritches_for_names_array_strict(dogs: pgx::Array<pgx::composite_type!("Dog")>) -> i32 {
+            // Gets resolved to:
+            let dogs: pgx::Array<PgHeapTuple<AllocatedByRust>> = dogs;
+        
+            let mut sum_scritches = 0;
+            for dog in dogs {
+                let dog = dog.unwrap();
+                let scritches: i32 = dog
+                    .get_by_name("scritches")
+                    .ok()
+                    .unwrap_or_default()
+                    .unwrap_or_default();
+                sum_scritches += scritches;
+            }
+            sum_scritches
+        }
+    }
 }
 
-#[pg_extern]
-fn sum_scritches_for_names_strict(dogs: Vec<pgx::composite_type!("Dog")>) -> i32 {
-    // Gets resolved to:
-    let dogs: Vec<PgHeapTuple<AllocatedByRust>> = dogs;
-
-    let mut sum_scritches = 0;
-    for dog in dogs {
-        let scritches: i32 = dog
-            .get_by_name("scritches")
-            .ok()
-            .unwrap_or_default()
-            .unwrap_or_default();
-        sum_scritches += scritches;
+// As return types
+mod returning {
+    use super::*;
+    
+    // Create from components
+    #[pg_extern]
+    fn create_dog(name: String, scritches: i32) -> pgx::composite_type!("Dog") {
+        
+        todo!()
     }
-    sum_scritches
-}
 
-#[pg_extern]
-fn sum_scritches_for_names_strict_optional_items(
-    dogs: Vec<Option<pgx::composite_type!("Dog")>>,
-) -> i32 {
-    // Gets resolved to:
-    let dogs: Vec<Option<PgHeapTuple<AllocatedByRust>>> = dogs;
+    // Modify existing
+    #[pg_extern]
+    fn scritch(maybe_dog: Option<::pgx::composite_type!("Dog")>) -> Option<pgx::composite_type!("Dog")> {
+        // Gets resolved to:
+        let maybe_dog: Option<PgHeapTuple<AllocatedByRust>> = maybe_dog;
 
-    let mut sum_scritches = 0;
-    for dog in dogs {
-        let dog = dog.unwrap();
-        let scritches: i32 = dog
-            .get_by_name("scritches")
-            .ok()
-            .unwrap_or_default()
-            .unwrap_or_default();
-        sum_scritches += scritches;
+        let maybe_dog = if let Some(mut dog) = maybe_dog {
+            dog.set_by_name("scritches", dog.get_by_name::<i32>("scritches").unwrap()).unwrap();
+            Some(dog)
+        } else {
+            None
+        };z
+
+        maybe_dog
     }
-    sum_scritches
-}
 
-#[pg_extern]
-fn sum_scritches_for_names_strict_default(
-    dogs: pgx::default!(
-        Vec<pgx::composite_type!("Dog")>,
-        "ARRAY[ROW('Nami', 0)]::Dog[]"
-    ),
-) -> i32 {
-    // Gets resolved to:
-    let dogs: Vec<PgHeapTuple<AllocatedByRust>> = dogs;
+    #[pg_extern]
+    fn scritch_strict(dog: ::pgx::composite_type!("Dog")) -> pgx::composite_type!("Dog") {
+        // Gets resolved to:
+        let mut dog: PgHeapTuple<AllocatedByRust> = dog;
 
-    let mut sum_scritches = 0;
-    for dog in dogs {
-        let scritches: i32 = dog
-            .get_by_name("scritches")
-            .ok()
-            .unwrap_or_default()
-            .unwrap_or_default();
-        sum_scritches += scritches;
+        dog.set_by_name("scritches", dog.get_by_name::<i32>("scritches").unwrap()).unwrap();
+
+        dog
     }
-    sum_scritches
-}
-
-#[pg_extern]
-fn sum_scritches_for_names_strict_default_optional_items(
-    dogs: pgx::default!(
-        Vec<Option<pgx::composite_type!("Dog")>>,
-        "ARRAY[ROW('Nami', 0)]::Dog[]"
-    ),
-) -> i32 {
-    // Gets resolved to:
-    let dogs: Vec<Option<PgHeapTuple<AllocatedByRust>>> = dogs;
-
-    let mut sum_scritches = 0;
-    for dog in dogs {
-        let dog = dog.unwrap();
-        let scritches: i32 = dog
-            .get_by_name("scritches")
-            .ok()
-            .unwrap_or_default()
-            .unwrap_or_default();
-        sum_scritches += scritches;
-    }
-    sum_scritches
-}
-
-#[pg_extern]
-fn sum_scritches_for_names(dogs: Option<Vec<pgx::composite_type!("Dog")>>) -> i32 {
-    // Gets resolved to:
-    let dogs: Option<Vec<PgHeapTuple<AllocatedByRust>>> = dogs;
-
-    let dogs = dogs.unwrap();
-    let mut sum_scritches = 0;
-    for dog in dogs {
-        let scritches: i32 = dog
-            .get_by_name("scritches")
-            .ok()
-            .unwrap_or_default()
-            .unwrap_or_default();
-        sum_scritches += scritches;
-    }
-    sum_scritches
-}
-
-#[pg_extern]
-fn sum_scritches_for_names_optional_items(
-    dogs: Option<Vec<Option<pgx::composite_type!("Dog")>>>,
-) -> i32 {
-    // Gets resolved to:
-    let dogs: Option<Vec<Option<PgHeapTuple<AllocatedByRust>>>> = dogs;
-
-    let dogs = dogs.unwrap();
-    let mut sum_scritches = 0;
-    for dog in dogs {
-        let dog = dog.unwrap();
-        let scritches: i32 = dog
-            .get_by_name("scritches")
-            .ok()
-            .unwrap_or_default()
-            .unwrap_or_default();
-        sum_scritches += scritches;
-    }
-    sum_scritches
+     
 }
 
 #[cfg(any(test, feature = "pg_test"))]

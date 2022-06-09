@@ -167,7 +167,7 @@ impl ToSql for PgExternEntity {
                         }
                         TypeEntity::CompositeType { sql, wrapper } => {
                             let buf = format!("\
-                                                \t\"{pattern}\" {variadic}{sql}{maybe_square_braces}{maybe_comma} /* {with_wrapper} */\
+                                                \t\"{pattern}\" {variadic}{sql}{maybe_square_braces}{maybe_default}{maybe_comma} /* {with_wrapper} */\
                                             ",
                                                 pattern = arg.pattern,
                                                 maybe_square_braces = if wrapper.square_brackets() {
@@ -183,14 +183,17 @@ impl ToSql for PgExternEntity {
                                                     CompositeTypeWrapper::OptionArrayOption => format!("Option<Array<Option::pgx::composite_type!(..)>>>"),
                                                     CompositeTypeWrapper::OptionVariadicArray => format!("Option<VariadicArray::pgx::composite_type!(..)>>"),
                                                     CompositeTypeWrapper::OptionVariadicArrayOption => format!("Option<VariadicArray<Option::pgx::composite_type!(..)>>>"),
-                                                    CompositeTypeWrapper::Vec => format!("Vec<c::pgx::omposite_type!(..)>"),
+                                                    CompositeTypeWrapper::Vec => format!("Vec<::pgx::composite_type!(..)>"),
                                                     CompositeTypeWrapper::VecOption => format!("Vec<Option<::pgx::composite_type!(..)>>"),
                                                     CompositeTypeWrapper::Array => format!("::pgx::Array<composite_type!(..)>"),
                                                     CompositeTypeWrapper::ArrayOption => format!("::pgx::Array<Option<::pgx::composite_type!(..)>>"),
                                                     CompositeTypeWrapper::VariadicArray => format!("::pgx::VariadicArray<::pgx::composite_type!(..)>"),
                                                     CompositeTypeWrapper::VariadicArrayOption => format!("::pgx::VariadicArray<Option<::pgx::composite_type!(..)>>"),
                                                 },
-                                                maybe_comma = if idx < (self.fn_args.len() - 1) { ", " } else { " " },
+                                                maybe_default = if let Some(default) = arg.default {
+                                                    format!(" DEFAULT {default}")
+                                                } else { String::from("") },
+                                                maybe_comma = if idx < (self.fn_args.len() - 1) { ", " } else { "" },
                                             );
                             args.push(buf);
                         }

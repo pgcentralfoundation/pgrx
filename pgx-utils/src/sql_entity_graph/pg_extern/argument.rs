@@ -13,7 +13,6 @@ use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
 use syn::{
     parse::{Parse, ParseStream},
-    parse_quote,
     spanned::Spanned,
     FnArg, Pat, Token,
 };
@@ -419,6 +418,13 @@ fn resolve_arg_ty(
                     last.arguments.clone(),
                     CompositeTypeWrapper::VariadicArray,
                 )?,
+                // Array<composite_type!(..)>
+                // Array<Option<composite_type!(..)>>
+                "Array" => resolve_array_inner(
+                    path,
+                    last.arguments.clone(),
+                    CompositeTypeWrapper::Array,
+                )?,
                 _ => (syn::Type::Path(path), None),
             }
         }
@@ -554,7 +560,7 @@ fn resolve_variadic_array_inner(
                         "composite_type" => {
                             let sql = Some(handle_composite_type_macro(mac)?);
                             let ty = syn::parse_quote! {
-                                VariadicArray<::pgx::PgHeapTuple<'_, ::pgx::AllocatedByRust>>
+                                ::pgx::VariadicArray<::pgx::PgHeapTuple<'_, ::pgx::AllocatedByRust>>
                             };
                             Ok((ty, sql.map(|v| (v, wrapper_so_far))))
                         }
@@ -572,6 +578,56 @@ fn resolve_variadic_array_inner(
                                     CompositeTypeWrapper::OptionVariadicArray => CompositeTypeWrapper::OptionVariadicArrayOption,
                                     CompositeTypeWrapper::VariadicArray => CompositeTypeWrapper::VariadicArrayOption,
                                     _ => return Err(syn::Error::new(last.span(), "Only VariadicArray<..>, Option<VariadicArray<..>, and Option<VariadicArray<Option<..>> are valid"))?,
+                                };
+                            resolve_option_inner(original, last.arguments.clone(), wrapper)
+                        }
+                        _ => Ok((syn::Type::Path(original), None)),
+                    }
+                }
+                _ => Ok((syn::Type::Path(original), None)),
+            },
+            _ => Ok((syn::Type::Path(original), None)),
+        },
+        _ => Ok((syn::Type::Path(original), None)),
+    }
+}
+
+fn resolve_array_inner(
+    original: syn::TypePath,
+    arguments: syn::PathArguments,
+    wrapper_so_far: CompositeTypeWrapper,
+) -> syn::Result<(syn::Type, Option<(syn::Expr, CompositeTypeWrapper)>)> {
+    match arguments {
+        syn::PathArguments::AngleBracketed(path_arg) => match path_arg.args.first() {
+            Some(syn::GenericArgument::Type(ty)) => match ty.clone() {
+                syn::Type::Macro(macro_pat) => {
+                    let mac = &macro_pat.mac;
+                    let archetype = mac.path.segments.last().expect("No last segment");
+                    match archetype.ident.to_string().as_str() {
+                        "default" => {
+                            return Err(syn::Error::new(mac.span(), "`VariadicArray<default!(T, default)>` not supported, choose `default!(VariadicArray<T>, ident)` instead"))?;
+                        }
+                        "composite_type" => {
+                            let sql = Some(handle_composite_type_macro(mac)?);
+                            let ty = syn::parse_quote! {
+                                ::pgx::Array<::pgx::PgHeapTuple<'_, ::pgx::AllocatedByRust>>
+                            };
+                            Ok((ty, sql.map(|v| (v, wrapper_so_far))))
+                        }
+                        _ => Ok((syn::Type::Path(original), None)),
+                    }
+                }
+                syn::Type::Path(arg_type_path) => {
+                    let last = arg_type_path.path.segments.last().ok_or(syn::Error::new(
+                        arg_type_path.span(),
+                        "No last segment in type path",
+                    ))?;
+                    match last.ident.to_string().as_str() {
+                        "Option" => {
+                            let wrapper = match wrapper_so_far {
+                                    CompositeTypeWrapper::OptionArray => CompositeTypeWrapper::OptionArrayOption,
+                                    CompositeTypeWrapper::Array => CompositeTypeWrapper::ArrayOption,
+                                    _ => return Err(syn::Error::new(last.span(), "Only Array<..>, Option<Array<..>, and Option<Array<Option<..>> are valid"))?,
                                 };
                             resolve_option_inner(original, last.arguments.clone(), wrapper)
                         }
@@ -628,7 +684,7 @@ fn resolve_option_inner(
                                     _ => return Err(syn::Error::new(last.span(), "Only Option<..>, Option<Vec<..>>, Option<Vec<Option<..>> are valid"))?,
                                 };
                                 resolve_vec_inner(original, last.arguments.clone(), wrapper)
-                            }
+                            },
                             // Option<VariadicArray<composite_type!(..)>>
                             // Option<VariadicArray<Option<composite_type!(..)>>>
                             "VariadicArray" => {
@@ -643,7 +699,22 @@ fn resolve_option_inner(
                                     last.arguments.clone(),
                                     wrapper,
                                 )
-                            }
+                            },
+                            // Option<Array<composite_type!(..)>>
+                            // Option<Array<Option<composite_type!(..)>>>
+                            "Array" => {
+                                let wrapper = match wrapper_so_far {
+                                    CompositeTypeWrapper::None => CompositeTypeWrapper::Option,
+                                    CompositeTypeWrapper::Option => CompositeTypeWrapper::OptionArray,
+                                    CompositeTypeWrapper::OptionArray => CompositeTypeWrapper::OptionArrayOption,
+                                    _ => return Err(syn::Error::new(last.span(), "Only Option<..>, Option<Array<..>>, Option<Array<Option<..>> are valid"))?,
+                                };
+                                resolve_array_inner(
+                                    original,
+                                    last.arguments.clone(),
+                                    wrapper,
+                                )
+                            },
                             // Option<..>
                             _ => Ok((syn::Type::Path(original), None)),
                         }
