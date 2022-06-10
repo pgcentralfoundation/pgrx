@@ -12,6 +12,7 @@ pub mod entity;
 mod operator;
 mod returning;
 mod search_path;
+mod resolve_ty;
 
 pub use argument::PgExternArgument;
 pub use operator::PgOperator;
@@ -32,6 +33,7 @@ use syn::{
     punctuated::Punctuated,
     Meta, Token,
 };
+pub(crate) use resolve_ty::resolve_ty;
 
 /// A parsed `#[pg_extern]` item.
 ///
@@ -194,7 +196,7 @@ impl PgExtern {
         Ok(args)
     }
 
-    fn returns(&self) -> Result<Returning, eyre::Error> {
+    fn returns(&self) -> Result<Returning, syn::Error> {
         Returning::try_from(&self.func.sig.output)
     }
 

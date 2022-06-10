@@ -13,8 +13,10 @@ use quote::{quote, ToTokens, TokenStreamExt};
 use std::convert::TryFrom;
 use syn::{
     parse::{Parse, ParseStream},
-    Token,
+    Token, spanned::Spanned,
 };
+
+use super::resolve_ty;
 
 #[derive(Debug, Clone)]
 pub struct ReturningIteratedItem {
@@ -31,7 +33,7 @@ pub enum Returning {
         composite_type: Option<syn::Expr>,
     },
     SetOf {
-        ty: syn::TypePath,
+        ty: syn::Type,
         composite_type: Option<syn::Expr>,
     },
     Iterated(Vec<ReturningIteratedItem>),
@@ -40,21 +42,27 @@ pub enum Returning {
 }
 
 impl Returning {
-    fn parse_trait_bound(trait_bound: &mut syn::TraitBound) -> Returning {
+    fn parse_trait_bound(trait_bound: &mut syn::TraitBound) -> Result<Returning, syn::Error> {
         let last_path_segment = trait_bound.path.segments.last_mut().unwrap();
         match last_path_segment.ident.to_string().as_str() {
             "Iterator" => match &mut last_path_segment.arguments {
                 syn::PathArguments::AngleBracketed(args) => match args.args.first_mut().unwrap() {
                     syn::GenericArgument::Binding(binding) => match &mut binding.ty {
-                        syn::Type::Tuple(tuple_type) => Self::parse_type_tuple(tuple_type),
-                        syn::Type::Path(path) => Returning::SetOf {
-                            ty: anonymonize_lifetimes_in_type_path(path.clone()),
-                            composite_type: None,
+                        syn::Type::Tuple(tuple_type) => Ok(Self::parse_type_tuple(tuple_type)?),
+                        syn::Type::Path(path) => {
+                            let (ty, _, _, _, composite_type) = resolve_ty(syn::Type::Path(path.clone()))?;
+                            Ok(Returning::SetOf {
+                                ty: ty,
+                                composite_type: composite_type,
+                            })
                         },
                         syn::Type::Reference(type_ref) => match &*type_ref.elem {
-                            syn::Type::Path(path) => Returning::SetOf {
-                                ty: anonymonize_lifetimes_in_type_path(path.clone()),
-                                composite_type: None,
+                            syn::Type::Path(path) => {
+                                let (ty, _, _, _, composite_type) = resolve_ty(syn::Type::Path(path.clone()))?;
+                                Ok(Returning::SetOf {
+                                    ty,
+                                    composite_type,
+                                })
                             },
                             _ => unimplemented!("Expected path"),
                         },
@@ -68,16 +76,15 @@ impl Returning {
         }
     }
 
-    fn parse_type_tuple(type_tuple: &mut syn::TypeTuple) -> Returning {
+    fn parse_type_tuple(type_tuple: &mut syn::TypeTuple) -> Result<Returning, syn::Error> {
         let returns: Vec<ReturningIteratedItem> = type_tuple
             .elems
             .iter_mut()
             .flat_map(|elem| {
                 let mut elem = elem.clone();
-                anonymonize_lifetimes(&mut elem);
 
                 match elem {
-                    syn::Type::Macro(macro_pat) => {
+                    syn::Type::Macro(ref macro_pat) => {
                         // This is essentially a copy of `parse_type_macro` but it returns items instead of `Returning`
                         let mac = &macro_pat.mac;
                         let archetype = mac.path.segments.last().unwrap();
@@ -86,12 +93,12 @@ impl Returning {
                                 let out: NameMacro = mac
                                     .parse_body()
                                     .expect(&*format!("Failed to parse named!(): {:?}", mac));
-                                Some(ReturningIteratedItem { ty: out.ty, name: Some(out.ident), composite_type: out.composite_type })
+                                Some(ReturningIteratedItem { ty: elem, name: Some(out.ident), composite_type: out.composite_type })
                             },
                             "composite_type" => {
                                 let composite_type: syn::Expr = mac.parse_body().expect(&*format!("Failed to parse composite_type!(): {:?}", mac));
                                 Some(ReturningIteratedItem {
-                                    ty: syn::parse_quote! { ::pgx::PgHeapTuple<'static, ::pgx::AllocatedByRust> },
+                                    ty: elem,
                                     name: None,
                                     composite_type: Some(composite_type),
                                 })
@@ -103,17 +110,17 @@ impl Returning {
                 }
             })
             .collect();
-        Returning::Iterated(returns)
+        Ok(Returning::Iterated(returns))
     }
 
-    fn parse_impl_trait(impl_trait: &mut syn::TypeImplTrait) -> Returning {
+    fn parse_impl_trait(impl_trait: &mut syn::TypeImplTrait) -> Result<Returning, syn::Error> {
         match impl_trait.bounds.first_mut().unwrap() {
             syn::TypeParamBound::Trait(trait_bound) => Self::parse_trait_bound(trait_bound),
-            _ => Returning::None,
+            _ => Ok(Returning::None),
         }
     }
 
-    fn parse_type_macro(type_macro: &mut syn::TypeMacro) -> Returning {
+    fn parse_type_macro(type_macro: &mut syn::TypeMacro) -> Result<Returning, syn::Error> {
         let mac = &type_macro.mac;
         let archetype = mac.path.segments.last().unwrap();
         match archetype.ident.to_string().as_str() {
@@ -121,32 +128,31 @@ impl Returning {
                 let composite_type: syn::Expr = mac
                     .parse_body()
                     .expect(&*format!("Failed to parse composite_type!(): {:?}", mac));
-                Returning::Type {
+                Ok(Returning::Type {
                     ty: syn::parse_quote! { ::pgx::PgHeapTuple<'static, ::pgx::AllocatedByRust> },
                     composite_type: Some(composite_type),
-                }
+                })
             }
             _ => unimplemented!("Don't support anything other than `composite_type!()`"),
         }
     }
 
-    fn parse_dyn_trait(dyn_trait: &mut syn::TypeTraitObject) -> Returning {
+    fn parse_dyn_trait(dyn_trait: &mut syn::TypeTraitObject) -> Result<Returning, syn::Error> {
         match dyn_trait.bounds.first_mut().unwrap() {
             syn::TypeParamBound::Trait(trait_bound) => Self::parse_trait_bound(trait_bound),
-            _ => Returning::None,
+            _ => Ok(Returning::None),
         }
     }
 }
 
 impl TryFrom<&syn::ReturnType> for Returning {
-    type Error = eyre::Error;
+    type Error = syn::Error;
 
     fn try_from(value: &syn::ReturnType) -> Result<Self, Self::Error> {
-        Ok(match &value {
-            syn::ReturnType::Default => Returning::None,
+        match &value {
+            syn::ReturnType::Default => Ok(Returning::None),
             syn::ReturnType::Type(_, ty) => {
                 let mut ty = *ty.clone();
-                anonymonize_lifetimes(&mut ty);
 
                 match ty {
                     syn::Type::ImplTrait(mut impl_trait) => {
@@ -180,13 +186,13 @@ impl TryFrom<&syn::ReturnType> for Returning {
                                                 syn::Type::ImplTrait(impl_trait),
                                             )) => {
                                                 maybe_inner_impl_trait =
-                                                    Some(Returning::parse_impl_trait(impl_trait));
+                                                    Some(Returning::parse_impl_trait(impl_trait)?);
                                             }
                                             Some(syn::GenericArgument::Type(
                                                 syn::Type::TraitObject(dyn_trait),
                                             )) => {
                                                 maybe_inner_impl_trait =
-                                                    Some(Returning::parse_dyn_trait(dyn_trait))
+                                                    Some(Returning::parse_dyn_trait(dyn_trait)?)
                                             }
                                             _ => (),
                                         }
@@ -197,59 +203,32 @@ impl TryFrom<&syn::ReturnType> for Returning {
                             }
                         }
                         if (saw_datum && saw_pg_sys) || (saw_datum && path.segments.len() == 1) {
-                            Returning::Trigger
+                            Ok(Returning::Trigger)
                         } else if let Some(returning) = maybe_inner_impl_trait {
-                            returning
+                            Ok(returning)
                         } else {
-                            let mut static_ty = typepath.clone();
-                            for segment in &mut static_ty.path.segments {
-                                match &mut segment.arguments {
-                                    syn::PathArguments::AngleBracketed(ref mut inside_brackets) => {
-                                        for mut arg in &mut inside_brackets.args {
-                                            match &mut arg {
-                                                syn::GenericArgument::Lifetime(
-                                                    ref mut lifetime,
-                                                ) => {
-                                                    lifetime.ident =
-                                                        Ident::new("static", Span::call_site())
-                                                }
-                                                _ => (),
-                                            }
-                                        }
-                                    }
-                                    _ => (),
-                                }
-                            }
-                            Returning::Type {
-                                ty: syn::Type::Path(static_ty.clone()),
-                                composite_type: None,
-                            }
+                            let (ty, _, _, _, composite_type) = resolve_ty(syn::Type::Path(typepath.clone()))?;
+                            Ok(Returning::Type {
+                                ty,
+                                composite_type,
+                            })
                         }
                     }
                     syn::Type::Reference(mut ty_ref) => {
-                        if let Some(ref mut lifetime) = &mut ty_ref.lifetime {
-                            lifetime.ident = Ident::new("static", Span::call_site());
-                        }
-                        Returning::Type {
-                            ty: syn::Type::Reference(ty_ref),
-                            composite_type: None,
-                        }
+                        let (ty, _, _, _, composite_type) = resolve_ty(syn::Type::Reference(ty_ref.clone()))?;
+                        Ok(Returning::Type {
+                            ty,
+                            composite_type,
+                        })
                     }
                     syn::Type::Tuple(ref mut tup) => {
-                        if tup.elems.is_empty() {
-                            Returning::Type {
-                                ty: ty.clone(),
-                                composite_type: None,
-                            }
-                        } else {
-                            Self::parse_type_tuple(tup)
-                        }
+                        Self::parse_type_tuple(tup)
                     }
                     syn::Type::Macro(ref mut type_macro) => Self::parse_type_macro(type_macro),
-                    _ => return Err(eyre!("Got unknown return type: {}", &ty.to_token_stream())),
+                    other => return Err(syn::Error::new(other.span(), "Got unknown return type")),
                 }
             }
-        })
+        }
     }
 }
 

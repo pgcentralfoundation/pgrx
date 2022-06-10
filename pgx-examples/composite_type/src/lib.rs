@@ -306,26 +306,25 @@ mod returning {
     
     // Create from components
     #[pg_extern]
-    fn create_dog(name: String, scritches: i32) -> pgx::composite_type!("Dog") {
-        
+    fn create_dog(_name: String, _scritches: i32) -> pgx::composite_type!("Dog") {
         todo!()
     }
 
-    // // Modify existing
-    // #[pg_extern]
-    // fn scritch(maybe_dog: Option<::pgx::composite_type!("Dog")>) -> Option<pgx::composite_type!("Dog")> {
-    //     // Gets resolved to:
-    //     let maybe_dog: Option<PgHeapTuple<AllocatedByRust>> = maybe_dog;
+    // Modify existing
+    #[pg_extern]
+    fn scritch(maybe_dog: Option<::pgx::composite_type!("Dog")>) -> Option<pgx::composite_type!("Dog")> {
+        // Gets resolved to:
+        let maybe_dog: Option<PgHeapTuple<AllocatedByRust>> = maybe_dog;
 
-    //     let maybe_dog = if let Some(mut dog) = maybe_dog {
-    //         dog.set_by_name("scritches", dog.get_by_name::<i32>("scritches").unwrap()).unwrap();
-    //         Some(dog)
-    //     } else {
-    //         None
-    //     };
+        let maybe_dog = if let Some(mut dog) = maybe_dog {
+            dog.set_by_name("scritches", dog.get_by_name::<i32>("scritches").unwrap()).unwrap();
+            Some(dog)
+        } else {
+            None
+        };
 
-    //     maybe_dog
-    // }
+        maybe_dog
+    }
 
     #[pg_extern]
     fn scritch_strict(dog: ::pgx::composite_type!("Dog")) -> pgx::composite_type!("Dog") {
