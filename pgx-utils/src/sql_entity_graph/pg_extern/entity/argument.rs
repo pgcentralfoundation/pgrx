@@ -23,10 +23,7 @@ impl SqlGraphIdentifier for PgExternArgumentEntity {
         format!("arg {}", self.rust_identifier())
     }
     fn rust_identifier(&self) -> String {
-        match self.ty {
-            TypeEntity::Type { full_path, .. } => full_path.to_string(),
-            TypeEntity::CompositeType { sql, .. } => sql.to_string() + "[]",
-        }
+        self.ty.full_path.to_string()
     }
 
     fn file(&self) -> Option<&'static str> {

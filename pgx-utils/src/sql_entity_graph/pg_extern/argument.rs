@@ -17,8 +17,6 @@ use syn::{
     FnArg, Pat, Token,
 };
 
-use super::entity::CompositeTypeWrapper;
-
 /// A parsed `#[pg_extern]` argument.
 ///
 /// It is created during [`PgExtern`](crate::sql_entity_graph::PgExtern) parsing.
@@ -27,7 +25,7 @@ pub struct PgExternArgument {
     pat: syn::Ident,
     ty: syn::Type,
     /// Set via `composite_type!()`
-    sql: Option<(syn::Expr, CompositeTypeWrapper)>,
+    composite_type: Option<syn::Expr>,
     /// Set via `default!()`
     default: Option<String>,
     /// Set via `variadic!()`
@@ -129,7 +127,7 @@ impl PgExternArgument {
         Ok(Some(PgExternArgument {
             pat: identifier,
             ty: true_ty,
-            sql,
+            composite_type: sql,
             default,
             variadic,
             optional,
@@ -261,34 +259,24 @@ impl ToTokens for PgExternArgument {
         let is_variadic = self.variadic;
         let pat = &self.pat;
         let default = self.default.iter();
+        let composite_type = self.composite_type.iter();
         let mut ty = self.ty.clone();
         anonymonize_lifetimes(&mut ty);
 
         let ty_string = ty.to_token_stream().to_string().replace(" ", "");
 
-        let ty_entity = match &self.sql {
-            Some((sql, wrapper)) => {
-                quote! {
-                    ::pgx::utils::sql_entity_graph::TypeEntity::CompositeType {
-                        sql: #sql,
-                        wrapper: #wrapper,
-                    }
-                }
-            }
-            None => {
-                quote! {
-                    ::pgx::utils::sql_entity_graph::TypeEntity::Type {
-                        ty_source: #ty_string,
-                        ty_id: TypeId::of::<#ty>(),
-                        full_path: core::any::type_name::<#ty>(),
-                        module_path: {
-                            let ty_name = core::any::type_name::<#ty>();
-                            let mut path_items: Vec<_> = ty_name.split("::").collect();
-                            let _ = path_items.pop(); // Drop the one we don't want.
-                            path_items.join("::")
-                        },
-                    }
-                }
+        let ty_entity = quote! {
+            ::pgx::utils::sql_entity_graph::TypeEntity {
+                ty_source: #ty_string,
+                ty_id: TypeId::of::<#ty>(),
+                full_path: core::any::type_name::<#ty>(),
+                module_path: {
+                    let ty_name = core::any::type_name::<#ty>();
+                    let mut path_items: Vec<_> = ty_name.split("::").collect();
+                    let _ = path_items.pop(); // Drop the one we don't want.
+                    path_items.join("::")
+                },
+                composite_type: None #( .unwrap_or(Some(#composite_type)) )*,
             }
         };
 
@@ -336,7 +324,7 @@ fn resolve_arg_ty(
     bool,
     bool,
     Option<String>,
-    Option<(syn::Expr, CompositeTypeWrapper)>,
+    Option<syn::Expr>,
 )> {
     // There are three steps:
     // * Resolve the `default!()` macro
@@ -376,10 +364,9 @@ fn resolve_arg_ty(
                     ))?
                 }
                 "composite_type" => {
-                    let sql = Some((
+                    let sql = Some(
                         handle_composite_type_macro(&mac)?,
-                        CompositeTypeWrapper::None,
-                    ));
+                    );
                     let ty = syn::parse_quote! {
                         ::pgx::PgHeapTuple<'_, ::pgx::AllocatedByRust>
                     };
@@ -404,26 +391,23 @@ fn resolve_arg_ty(
                 "Option" => resolve_option_inner(
                     path,
                     last.arguments.clone(),
-                    CompositeTypeWrapper::Option,
                 )?,
                 // Vec<composite_type!(..)>
                 // Vec<Option<composite_type!(..)>>
                 "Vec" => {
-                    resolve_vec_inner(path, last.arguments.clone(), CompositeTypeWrapper::Vec)?
+                    resolve_vec_inner(path, last.arguments.clone())?
                 }
                 // VariadicArray<composite_type!(..)>
                 // VariadicArray<Option<composite_type!(..)>>
                 "VariadicArray" => resolve_variadic_array_inner(
                     path,
                     last.arguments.clone(),
-                    CompositeTypeWrapper::VariadicArray,
                 )?,
                 // Array<composite_type!(..)>
                 // Array<Option<composite_type!(..)>>
                 "Array" => resolve_array_inner(
                     path,
                     last.arguments.clone(),
-                    CompositeTypeWrapper::Array,
                 )?,
                 _ => (syn::Type::Path(path), None),
             }
@@ -495,8 +479,7 @@ fn resolve_arg_ty(
 fn resolve_vec_inner(
     original: syn::TypePath,
     arguments: syn::PathArguments,
-    wrapper_so_far: CompositeTypeWrapper,
-) -> syn::Result<(syn::Type, Option<(syn::Expr, CompositeTypeWrapper)>)> {
+) -> syn::Result<(syn::Type, Option<syn::Expr>)> {
     match arguments {
         syn::PathArguments::AngleBracketed(path_arg) => match path_arg.args.first() {
             Some(syn::GenericArgument::Type(ty)) => match ty.clone() {
@@ -512,7 +495,7 @@ fn resolve_vec_inner(
                             let ty = syn::parse_quote! {
                                 Vec<::pgx::PgHeapTuple<'_, ::pgx::AllocatedByRust>>
                             };
-                            Ok((ty, sql.map(|v| (v, wrapper_so_far))))
+                            Ok((ty, sql))
                         }
                         _ => Ok((syn::Type::Path(original), None)),
                     }
@@ -524,12 +507,7 @@ fn resolve_vec_inner(
                     ))?;
                     match last.ident.to_string().as_str() {
                         "Option" => {
-                            let wrapper = match wrapper_so_far {
-                                    CompositeTypeWrapper::Vec => CompositeTypeWrapper::VecOption,
-                                    CompositeTypeWrapper::OptionVec => CompositeTypeWrapper::OptionVecOption,
-                                    _ => return Err(syn::Error::new(last.span(), "Only Vec<..>, Option<Vec<..>>, Option<Vec<Option<..>> are valid"))?,
-                                };
-                            resolve_option_inner(original, last.arguments.clone(), wrapper)
+                            resolve_option_inner(original, last.arguments.clone())
                         }
                         _ => Ok((syn::Type::Path(original), None)),
                     }
@@ -545,8 +523,7 @@ fn resolve_vec_inner(
 fn resolve_variadic_array_inner(
     original: syn::TypePath,
     arguments: syn::PathArguments,
-    wrapper_so_far: CompositeTypeWrapper,
-) -> syn::Result<(syn::Type, Option<(syn::Expr, CompositeTypeWrapper)>)> {
+) -> syn::Result<(syn::Type, Option<syn::Expr>)> {
     match arguments {
         syn::PathArguments::AngleBracketed(path_arg) => match path_arg.args.first() {
             Some(syn::GenericArgument::Type(ty)) => match ty.clone() {
@@ -562,7 +539,7 @@ fn resolve_variadic_array_inner(
                             let ty = syn::parse_quote! {
                                 ::pgx::VariadicArray<::pgx::PgHeapTuple<'_, ::pgx::AllocatedByRust>>
                             };
-                            Ok((ty, sql.map(|v| (v, wrapper_so_far))))
+                            Ok((ty, sql))
                         }
                         _ => Ok((syn::Type::Path(original), None)),
                     }
@@ -574,12 +551,7 @@ fn resolve_variadic_array_inner(
                     ))?;
                     match last.ident.to_string().as_str() {
                         "Option" => {
-                            let wrapper = match wrapper_so_far {
-                                    CompositeTypeWrapper::OptionVariadicArray => CompositeTypeWrapper::OptionVariadicArrayOption,
-                                    CompositeTypeWrapper::VariadicArray => CompositeTypeWrapper::VariadicArrayOption,
-                                    _ => return Err(syn::Error::new(last.span(), "Only VariadicArray<..>, Option<VariadicArray<..>, and Option<VariadicArray<Option<..>> are valid"))?,
-                                };
-                            resolve_option_inner(original, last.arguments.clone(), wrapper)
+                            resolve_option_inner(original, last.arguments.clone())
                         }
                         _ => Ok((syn::Type::Path(original), None)),
                     }
@@ -595,8 +567,7 @@ fn resolve_variadic_array_inner(
 fn resolve_array_inner(
     original: syn::TypePath,
     arguments: syn::PathArguments,
-    wrapper_so_far: CompositeTypeWrapper,
-) -> syn::Result<(syn::Type, Option<(syn::Expr, CompositeTypeWrapper)>)> {
+) -> syn::Result<(syn::Type, Option<syn::Expr>)> {
     match arguments {
         syn::PathArguments::AngleBracketed(path_arg) => match path_arg.args.first() {
             Some(syn::GenericArgument::Type(ty)) => match ty.clone() {
@@ -612,7 +583,7 @@ fn resolve_array_inner(
                             let ty = syn::parse_quote! {
                                 ::pgx::Array<::pgx::PgHeapTuple<'_, ::pgx::AllocatedByRust>>
                             };
-                            Ok((ty, sql.map(|v| (v, wrapper_so_far))))
+                            Ok((ty, sql))
                         }
                         _ => Ok((syn::Type::Path(original), None)),
                     }
@@ -624,12 +595,7 @@ fn resolve_array_inner(
                     ))?;
                     match last.ident.to_string().as_str() {
                         "Option" => {
-                            let wrapper = match wrapper_so_far {
-                                    CompositeTypeWrapper::OptionArray => CompositeTypeWrapper::OptionArrayOption,
-                                    CompositeTypeWrapper::Array => CompositeTypeWrapper::ArrayOption,
-                                    _ => return Err(syn::Error::new(last.span(), "Only Array<..>, Option<Array<..>, and Option<Array<Option<..>> are valid"))?,
-                                };
-                            resolve_option_inner(original, last.arguments.clone(), wrapper)
+                            resolve_option_inner(original, last.arguments.clone())
                         }
                         _ => Ok((syn::Type::Path(original), None)),
                     }
@@ -645,8 +611,7 @@ fn resolve_array_inner(
 fn resolve_option_inner(
     original: syn::TypePath,
     arguments: syn::PathArguments,
-    wrapper_so_far: CompositeTypeWrapper,
-) -> syn::Result<(syn::Type, Option<(syn::Expr, CompositeTypeWrapper)>)> {
+) -> syn::Result<(syn::Type, Option<syn::Expr>)> {
     match arguments {
         syn::PathArguments::AngleBracketed(path_arg) => match path_arg.args.first() {
             Some(syn::GenericArgument::Type(ty)) => {
@@ -661,10 +626,10 @@ fn resolve_option_inner(
                                 let ty = syn::parse_quote! {
                                     Option<::pgx::PgHeapTuple<'_, ::pgx::AllocatedByRust>>
                                 };
-                                Ok((ty, sql.map(|v| (v, wrapper_so_far))))
+                                Ok((ty, sql))
                             },
                             // Option<default!(composite_type!(..))> isn't valid. If the user wanted the default to be `NULL` they just don't need a default.
-                            "default" => return Err(syn::Error::new(mac.span(), "`Option<default!(T, default)>` not supported, choose `Option<T>` for a default of `NULL`, or `default!(T, default)` for a non-NULL default"))?,
+                            "default" => return Err(syn::Error::new(mac.span(), "`Option<default!(T, \"my_default\")>` not supported, choose `Option<T>` for a default of `NULL`, or `default!(T, default)` for a non-NULL default"))?,
                             _ => Ok((syn::Type::Path(original), None)),
                         }
                     }
@@ -677,42 +642,22 @@ fn resolve_option_inner(
                             // Option<Vec<composite_type!(..)>>
                             // Option<Vec<Option<composite_type!(..)>>>
                             "Vec" => {
-                                let wrapper = match wrapper_so_far {
-                                    CompositeTypeWrapper::None => CompositeTypeWrapper::Option,
-                                    CompositeTypeWrapper::Option => CompositeTypeWrapper::OptionVec,
-                                    CompositeTypeWrapper::OptionVec => CompositeTypeWrapper::OptionVecOption,
-                                    _ => return Err(syn::Error::new(last.span(), "Only Option<..>, Option<Vec<..>>, Option<Vec<Option<..>> are valid"))?,
-                                };
-                                resolve_vec_inner(original, last.arguments.clone(), wrapper)
+                                resolve_vec_inner(original, last.arguments.clone())
                             },
                             // Option<VariadicArray<composite_type!(..)>>
                             // Option<VariadicArray<Option<composite_type!(..)>>>
                             "VariadicArray" => {
-                                let wrapper = match wrapper_so_far {
-                                    CompositeTypeWrapper::None => CompositeTypeWrapper::Option,
-                                    CompositeTypeWrapper::Option => CompositeTypeWrapper::OptionVariadicArray,
-                                    CompositeTypeWrapper::OptionVariadicArray => CompositeTypeWrapper::OptionVariadicArrayOption,
-                                    _ => return Err(syn::Error::new(last.span(), "Only Option<..>, Option<VariadicArray<..>>, Option<VariadicArray<Option<..>> are valid"))?,
-                                };
                                 resolve_variadic_array_inner(
                                     original,
                                     last.arguments.clone(),
-                                    wrapper,
                                 )
                             },
                             // Option<Array<composite_type!(..)>>
                             // Option<Array<Option<composite_type!(..)>>>
                             "Array" => {
-                                let wrapper = match wrapper_so_far {
-                                    CompositeTypeWrapper::None => CompositeTypeWrapper::Option,
-                                    CompositeTypeWrapper::Option => CompositeTypeWrapper::OptionArray,
-                                    CompositeTypeWrapper::OptionArray => CompositeTypeWrapper::OptionArrayOption,
-                                    _ => return Err(syn::Error::new(last.span(), "Only Option<..>, Option<Array<..>>, Option<Array<Option<..>> are valid"))?,
-                                };
                                 resolve_array_inner(
                                     original,
                                     last.arguments.clone(),
-                                    wrapper,
                                 )
                             },
                             // Option<..>

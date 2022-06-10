@@ -844,114 +844,83 @@ fn initialize_externs(
         build_base_edges(graph, index, root, bootstrap, finalize);
 
         for arg in &item.fn_args {
-            match &arg.ty {
-                TypeEntity::Type {
-                    ty_source: _,
-                    ty_id,
-                    full_path,
-                    module_path: _,
-                } => {
+                let mut found = false;
+                for (ty_item, &_ty_index) in mapped_types {
+                    if ty_item.id_matches(&arg.ty.ty_id) {
+                        found = true;
+                        break;
+                    }
+                }
+                for (ty_item, &_ty_index) in mapped_enums {
+                    if ty_item.id_matches(&arg.ty.ty_id) {
+                        found = true;
+                        break;
+                    }
+                }
+                if !found {
+                    mapped_builtin_types
+                        .entry(arg.ty.full_path.to_string())
+                        .or_insert_with(|| {
+                            graph.add_node(SqlGraphEntity::BuiltinType(arg.ty.full_path.to_string()))
+                        });
+                }
+        }
+
+        match &item.fn_return {
+            PgExternReturnEntity::None | PgExternReturnEntity::Trigger => (),
+            PgExternReturnEntity::Type { ty, .. } | PgExternReturnEntity::SetOf { ty, .. } => {
+                let mut found = false;
+                for (ty_item, &_ty_index) in mapped_types {
+                    if ty_item.id_matches(&ty.ty_id) {
+                        found = true;
+                        break;
+                    }
+                }
+                for (ty_item, &_ty_index) in mapped_enums {
+                    if ty_item.id_matches(&ty.ty_id) {
+                        found = true;
+                        break;
+                    }
+                }
+                if !found {
+                    mapped_builtin_types
+                        .entry(ty.full_path.to_string())
+                        .or_insert_with(|| {
+                            graph.add_node(SqlGraphEntity::BuiltinType(
+                                ty.full_path.to_string(),
+                            ))
+                        });
+                }
+            },
+            PgExternReturnEntity::Iterated(iterated_returns) => {
+                for PgExternReturnEntityIteratedItem {
+                    ty: return_ty_entity,
+                    ..
+                } in iterated_returns {
                     let mut found = false;
                     for (ty_item, &_ty_index) in mapped_types {
-                        if ty_item.id_matches(&ty_id) {
+                        if ty_item.id_matches(&return_ty_entity.ty_id) {
                             found = true;
                             break;
                         }
                     }
                     for (ty_item, &_ty_index) in mapped_enums {
-                        if ty_item.id_matches(&ty_id) {
+                        if ty_item.id_matches(&return_ty_entity.ty_id) {
                             found = true;
                             break;
                         }
                     }
                     if !found {
                         mapped_builtin_types
-                            .entry(full_path.to_string())
+                            .entry(return_ty_entity.ty_source.to_string())
                             .or_insert_with(|| {
-                                graph.add_node(SqlGraphEntity::BuiltinType(full_path.to_string()))
+                                graph.add_node(SqlGraphEntity::BuiltinType(
+                                    return_ty_entity.ty_source.to_string(),
+                                ))
                             });
                     }
                 }
-                TypeEntity::CompositeType { .. } => (),
-            }
-        }
-
-        match &item.fn_return {
-            PgExternReturnEntity::None | PgExternReturnEntity::Trigger => (),
-            PgExternReturnEntity::Type { ty, .. } | PgExternReturnEntity::SetOf { ty, .. } => {
-                match ty {
-                    TypeEntity::Type {
-                        ty_source: _,
-                        ty_id,
-                        full_path,
-                        module_path: _,
-                    } => {
-                        let mut found = false;
-                        for (ty_item, &_ty_index) in mapped_types {
-                            if ty_item.id_matches(&ty_id) {
-                                found = true;
-                                break;
-                            }
-                        }
-                        for (ty_item, &_ty_index) in mapped_enums {
-                            if ty_item.id_matches(&ty_id) {
-                                found = true;
-                                break;
-                            }
-                        }
-                        if !found {
-                            mapped_builtin_types
-                                .entry(full_path.to_string())
-                                .or_insert_with(|| {
-                                    graph.add_node(SqlGraphEntity::BuiltinType(
-                                        full_path.to_string(),
-                                    ))
-                                });
-                        }
-                    }
-                    TypeEntity::CompositeType { .. } => (),
-                };
-            }
-            PgExternReturnEntity::Iterated(iterated_returns) => {
-                for PgExternReturnEntityIteratedItem {
-                    ty: return_ty_entity,
-                    ..
-                } in iterated_returns
-                {
-                    match return_ty_entity {
-                        TypeEntity::Type {
-                            ty_source,
-                            ty_id,
-                            full_path: _,
-                            module_path: _,
-                        } => {
-                            let mut found = false;
-                            for (ty_item, &_ty_index) in mapped_types {
-                                if ty_item.id_matches(&ty_id) {
-                                    found = true;
-                                    break;
-                                }
-                            }
-                            for (ty_item, &_ty_index) in mapped_enums {
-                                if ty_item.id_matches(&ty_id) {
-                                    found = true;
-                                    break;
-                                }
-                            }
-                            if !found {
-                                mapped_builtin_types
-                                    .entry(ty_source.to_string())
-                                    .or_insert_with(|| {
-                                        graph.add_node(SqlGraphEntity::BuiltinType(
-                                            ty_source.to_string(),
-                                        ))
-                                    });
-                            }
-                        }
-                        TypeEntity::CompositeType { .. } => (),
-                    }
-                }
-            }
+            },
         }
     }
     Ok((mapped_externs, mapped_builtin_types))
@@ -1003,85 +972,148 @@ fn connect_externs(
         }
 
         for arg in &item.fn_args {
-            match arg.ty {
-                TypeEntity::Type {
-                    ty_source: _,
-                    ty_id,
-                    full_path,
-                    module_path: _,
-                } => {
-                    let mut found = false;
+            let mut found = false;
 
-                    for (ty_item, &ty_index) in types {
-                        if ty_item.id_matches(&ty_id) {
-                            tracing::debug!(from = %item.rust_identifier(), to = %ty_item.rust_identifier(), "Adding Extern after Type (due to argument) edge");
-                            graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredByArg);
-                            found = true;
-                            break;
-                        }
-                    }
-                    if !found {
-                        for (enum_item, &enum_index) in enums {
-                            if enum_item.id_matches(&ty_id) {
-                                tracing::debug!(from = %item.rust_identifier(), to = %enum_item.rust_identifier(), "Adding Extern after Enum (due to argument) edge");
-                                graph.add_edge(
-                                    enum_index,
-                                    index,
-                                    SqlGraphRelationship::RequiredByArg,
-                                );
-                                found = true;
-                                break;
-                            }
-                        }
-                    }
-                    if !found {
-                        let builtin_index = builtin_types
-                            .get(full_path)
-                            .expect(&format!("Could not fetch Builtin Type {}.", full_path));
-                        tracing::debug!(from = %item.rust_identifier(), to = %arg.rust_identifier(), "Adding Extern(arg) after BuiltIn Type (due to argument) edge");
-                        graph.add_edge(*builtin_index, index, SqlGraphRelationship::RequiredByArg);
-                    }
-                    if !found {
-                        for (ext_item, ext_index) in extension_sqls {
-                            if let Some(_) = ext_item
-                                .has_sql_declared_entity(&SqlDeclared::Type(full_path.to_string()))
-                            {
-                                tracing::debug!(from = %item.rust_identifier(), to = %arg.rust_identifier(), "Adding Extern(arg) after Extension SQL (due to argument) edge");
-                                graph.add_edge(
-                                    *ext_index,
-                                    index,
-                                    SqlGraphRelationship::RequiredByArg,
-                                );
-                            } else if let Some(_) = ext_item
-                                .has_sql_declared_entity(&SqlDeclared::Enum(full_path.to_string()))
-                            {
-                                tracing::debug!(from = %item.rust_identifier(), to = %arg.rust_identifier(), "Adding Extern(arg) after Extension SQL (due to argument) edge");
-                                graph.add_edge(
-                                    *ext_index,
-                                    index,
-                                    SqlGraphRelationship::RequiredByArg,
-                                );
-                            }
-                        }
+            for (ty_item, &ty_index) in types {
+                if ty_item.id_matches(&arg.ty.ty_id) {
+                    tracing::debug!(from = %item.rust_identifier(), to = %ty_item.rust_identifier(), "Adding Extern after Type (due to argument) edge");
+                    graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredByArg);
+                    found = true;
+                    break;
+                }
+            }
+            if !found {
+                for (enum_item, &enum_index) in enums {
+                    if enum_item.id_matches(&arg.ty.ty_id) {
+                        tracing::debug!(from = %item.rust_identifier(), to = %enum_item.rust_identifier(), "Adding Extern after Enum (due to argument) edge");
+                        graph.add_edge(
+                            enum_index,
+                            index,
+                            SqlGraphRelationship::RequiredByArg,
+                        );
+                        found = true;
+                        break;
                     }
                 }
-                TypeEntity::CompositeType { .. } => (),
+            }
+            if !found {
+                let builtin_index = builtin_types
+                    .get(arg.ty.full_path)
+                    .expect(&format!("Could not fetch Builtin Type {}.", arg.ty.full_path));
+                tracing::debug!(from = %item.rust_identifier(), to = %arg.rust_identifier(), "Adding Extern(arg) after BuiltIn Type (due to argument) edge");
+                graph.add_edge(*builtin_index, index, SqlGraphRelationship::RequiredByArg);
+            }
+            if !found {
+                for (ext_item, ext_index) in extension_sqls {
+                    if let Some(_) = ext_item
+                        .has_sql_declared_entity(&SqlDeclared::Type(arg.ty.full_path.to_string()))
+                    {
+                        tracing::debug!(from = %item.rust_identifier(), to = %arg.rust_identifier(), "Adding Extern(arg) after Extension SQL (due to argument) edge");
+                        graph.add_edge(
+                            *ext_index,
+                            index,
+                            SqlGraphRelationship::RequiredByArg,
+                        );
+                    } else if let Some(_) = ext_item
+                        .has_sql_declared_entity(&SqlDeclared::Enum(arg.ty.full_path.to_string()))
+                    {
+                        tracing::debug!(from = %item.rust_identifier(), to = %arg.rust_identifier(), "Adding Extern(arg) after Extension SQL (due to argument) edge");
+                        graph.add_edge(
+                            *ext_index,
+                            index,
+                            SqlGraphRelationship::RequiredByArg,
+                        );
+                    }
+                }
             }
         }
         match &item.fn_return {
             PgExternReturnEntity::None | PgExternReturnEntity::Trigger => (),
             PgExternReturnEntity::Type { ty, .. } | PgExternReturnEntity::SetOf { ty, .. } => {
-                match ty {
-                    TypeEntity::Type {
-                        ty_source: _,
-                        ty_id,
-                        full_path,
-                        module_path: _,
-                    } => {
-                        let mut found = false;
-                        for (ty_item, &ty_index) in types {
-                            if ty_item.id_matches(&ty_id) {
-                                tracing::debug!(from = %item.rust_identifier(), to = %ty_item.rust_identifier(), "Adding Extern after Type (due to return) edge");
+                let mut found = false;
+                for (ty_item, &ty_index) in types {
+                    if ty_item.id_matches(&ty.ty_id) {
+                        tracing::debug!(from = %item.rust_identifier(), to = %ty_item.rust_identifier(), "Adding Extern after Type (due to return) edge");
+                        graph.add_edge(
+                            ty_index,
+                            index,
+                            SqlGraphRelationship::RequiredByReturn,
+                        );
+                        found = true;
+                        break;
+                    }
+                }
+                if !found {
+                    for (ty_item, &ty_index) in enums {
+                        if ty_item.id_matches(&ty.ty_id) {
+                            tracing::debug!(from = %item.rust_identifier(), to = %ty_item.rust_identifier(), "Adding Extern after Enum (due to return) edge");
+                            graph.add_edge(
+                                ty_index,
+                                index,
+                                SqlGraphRelationship::RequiredByReturn,
+                            );
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+                if !found {
+                    let builtin_index = builtin_types
+                        .get(&ty.full_path.to_string())
+                        .expect(&format!("Could not fetch Builtin Type {}.", ty.full_path));
+                    tracing::debug!(from = ?item.full_path, to = %ty.full_path, "Adding Extern(return) after BuiltIn Type (due to return) edge");
+                    graph.add_edge(
+                        *builtin_index,
+                        index,
+                        SqlGraphRelationship::RequiredByReturn,
+                    );
+                }
+                if !found {
+                    for (ext_item, ext_index) in extension_sqls {
+                        if let Some(_) = ext_item.has_sql_declared_entity(
+                            &SqlDeclared::Type(ty.full_path.to_string()),
+                        ) {
+                            tracing::debug!(from = %item.rust_identifier(), to = ty.full_path, "Adding Extern(arg) after Extension SQL (due to argument) edge");
+                            graph.add_edge(
+                                *ext_index,
+                                index,
+                                SqlGraphRelationship::RequiredByArg,
+                            );
+                        } else if let Some(_) = ext_item.has_sql_declared_entity(
+                            &SqlDeclared::Enum(ty.full_path.to_string()),
+                        ) {
+                            tracing::debug!(from = %item.rust_identifier(), to = ty.full_path, "Adding Extern(arg) after Extension SQL (due to argument) edge");
+                            graph.add_edge(
+                                *ext_index,
+                                index,
+                                SqlGraphRelationship::RequiredByArg,
+                            );
+                        }
+                    }
+                }
+            }
+            PgExternReturnEntity::Iterated(iterated_returns) => {
+                for PgExternReturnEntityIteratedItem {
+                    ty: type_entity, ..
+                } in iterated_returns
+                {
+                    let mut found = false;
+                    for (ty_item, &ty_index) in types {
+                        if ty_item.id_matches(&type_entity.ty_id) {
+                            tracing::debug!(from = %item.rust_identifier(), to = %ty_item.rust_identifier(), "Adding Extern after Type (due to return) edge");
+                            graph.add_edge(
+                                ty_index,
+                                index,
+                                SqlGraphRelationship::RequiredByReturn,
+                            );
+                            found = true;
+                            break;
+                        }
+                    }
+                    if !found {
+                        for (ty_item, &ty_index) in enums {
+                            if ty_item.id_matches(&type_entity.ty_id) {
+                                tracing::debug!(from = %item.rust_identifier(), to = %ty_item.rust_identifier(), "Adding Extern after Enum (due to return) edge");
                                 graph.add_edge(
                                     ty_index,
                                     index,
@@ -1091,135 +1123,42 @@ fn connect_externs(
                                 break;
                             }
                         }
-                        if !found {
-                            for (ty_item, &ty_index) in enums {
-                                if ty_item.id_matches(&ty_id) {
-                                    tracing::debug!(from = %item.rust_identifier(), to = %ty_item.rust_identifier(), "Adding Extern after Enum (due to return) edge");
-                                    graph.add_edge(
-                                        ty_index,
-                                        index,
-                                        SqlGraphRelationship::RequiredByReturn,
-                                    );
-                                    found = true;
-                                    break;
-                                }
-                            }
-                        }
-                        if !found {
-                            let builtin_index = builtin_types
-                                .get(&full_path.to_string())
-                                .expect(&format!("Could not fetch Builtin Type {}.", full_path));
-                            tracing::debug!(from = ?item.full_path, to = %full_path, "Adding Extern(return) after BuiltIn Type (due to return) edge");
-                            graph.add_edge(
-                                *builtin_index,
-                                index,
-                                SqlGraphRelationship::RequiredByReturn,
-                            );
-                        }
-                        if !found {
-                            for (ext_item, ext_index) in extension_sqls {
-                                if let Some(_) = ext_item.has_sql_declared_entity(
-                                    &SqlDeclared::Type(full_path.to_string()),
-                                ) {
-                                    tracing::debug!(from = %item.rust_identifier(), to = full_path, "Adding Extern(arg) after Extension SQL (due to argument) edge");
-                                    graph.add_edge(
-                                        *ext_index,
-                                        index,
-                                        SqlGraphRelationship::RequiredByArg,
-                                    );
-                                } else if let Some(_) = ext_item.has_sql_declared_entity(
-                                    &SqlDeclared::Enum(full_path.to_string()),
-                                ) {
-                                    tracing::debug!(from = %item.rust_identifier(), to = full_path, "Adding Extern(arg) after Extension SQL (due to argument) edge");
-                                    graph.add_edge(
-                                        *ext_index,
-                                        index,
-                                        SqlGraphRelationship::RequiredByArg,
-                                    );
-                                }
-                            }
-                        }
                     }
-                    TypeEntity::CompositeType { .. } => (),
-                }
-            }
-            PgExternReturnEntity::Iterated(iterated_returns) => {
-                for PgExternReturnEntityIteratedItem {
-                    ty: type_entity, ..
-                } in iterated_returns
-                {
-                    match type_entity {
-                        TypeEntity::Type {
-                            ty_source,
-                            ty_id,
-                            full_path: _,
-                            module_path: _,
-                        } => {
-                            let mut found = false;
-                            for (ty_item, &ty_index) in types {
-                                if ty_item.id_matches(&ty_id) {
-                                    tracing::debug!(from = %item.rust_identifier(), to = %ty_item.rust_identifier(), "Adding Extern after Type (due to return) edge");
-                                    graph.add_edge(
-                                        ty_index,
-                                        index,
-                                        SqlGraphRelationship::RequiredByReturn,
-                                    );
-                                    found = true;
-                                    break;
-                                }
-                            }
-                            if !found {
-                                for (ty_item, &ty_index) in enums {
-                                    if ty_item.id_matches(&ty_id) {
-                                        tracing::debug!(from = %item.rust_identifier(), to = %ty_item.rust_identifier(), "Adding Extern after Enum (due to return) edge");
-                                        graph.add_edge(
-                                            ty_index,
-                                            index,
-                                            SqlGraphRelationship::RequiredByReturn,
-                                        );
-                                        found = true;
-                                        break;
-                                    }
-                                }
-                            }
-                            if !found {
-                                let builtin_index =
-                                    builtin_types.get(&ty_source.to_string()).expect(&format!(
-                                        "Could not fetch Builtin Type {}.",
-                                        ty_source,
-                                    ));
-                                tracing::debug!(from = %item.rust_identifier(), to = ty_source, "Adding Extern after BuiltIn Type (due to return) edge");
+                    if !found {
+                        let builtin_index =
+                            builtin_types.get(&type_entity.ty_source.to_string()).expect(&format!(
+                                "Could not fetch Builtin Type {}.",
+                                type_entity.ty_source,
+                            ));
+                        tracing::debug!(from = %item.rust_identifier(), to = type_entity.ty_source, "Adding Extern after BuiltIn Type (due to return) edge");
+                        graph.add_edge(
+                            *builtin_index,
+                            index,
+                            SqlGraphRelationship::RequiredByReturn,
+                        );
+                    }
+                    if !found {
+                        for (ext_item, ext_index) in extension_sqls {
+                            if let Some(_) = ext_item.has_sql_declared_entity(
+                                &SqlDeclared::Type(type_entity.ty_source.to_string()),
+                            ) {
+                                tracing::debug!(from = %item.rust_identifier(), to = %ext_item.rust_identifier(), "Adding Extern(arg) after Extension SQL (due to argument) edge");
                                 graph.add_edge(
-                                    *builtin_index,
+                                    *ext_index,
                                     index,
-                                    SqlGraphRelationship::RequiredByReturn,
+                                    SqlGraphRelationship::RequiredByArg,
+                                );
+                            } else if let Some(_) = ext_item.has_sql_declared_entity(
+                                &SqlDeclared::Enum(type_entity.ty_source.to_string()),
+                            ) {
+                                tracing::debug!(from = %item.rust_identifier(), to = %ext_item.rust_identifier(), "Adding Extern(arg) after Extension SQL (due to argument) edge");
+                                graph.add_edge(
+                                    *ext_index,
+                                    index,
+                                    SqlGraphRelationship::RequiredByArg,
                                 );
                             }
-                            if !found {
-                                for (ext_item, ext_index) in extension_sqls {
-                                    if let Some(_) = ext_item.has_sql_declared_entity(
-                                        &SqlDeclared::Type(ty_source.to_string()),
-                                    ) {
-                                        tracing::debug!(from = %item.rust_identifier(), to = %ext_item.rust_identifier(), "Adding Extern(arg) after Extension SQL (due to argument) edge");
-                                        graph.add_edge(
-                                            *ext_index,
-                                            index,
-                                            SqlGraphRelationship::RequiredByArg,
-                                        );
-                                    } else if let Some(_) = ext_item.has_sql_declared_entity(
-                                        &SqlDeclared::Enum(ty_source.to_string()),
-                                    ) {
-                                        tracing::debug!(from = %item.rust_identifier(), to = %ext_item.rust_identifier(), "Adding Extern(arg) after Extension SQL (due to argument) edge");
-                                        graph.add_edge(
-                                            *ext_index,
-                                            index,
-                                            SqlGraphRelationship::RequiredByArg,
-                                        );
-                                    }
-                                }
-                            }
                         }
-                        TypeEntity::CompositeType { .. } => (),
                     }
                 }
             }

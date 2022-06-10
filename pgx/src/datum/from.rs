@@ -408,3 +408,30 @@ impl<T> FromDatum for PgBox<T, AllocatedByPostgres> {
         })
     }
 }
+
+impl<T> FromDatum for Option<T>
+where
+    T: FromDatum,
+{
+    #[inline]
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Self> {
+        match is_null {
+            true => None,
+            false => Some(T::from_datum(datum, is_null)),
+        }
+    }
+
+    unsafe fn from_datum_in_memory_context(
+        mut memory_context: PgMemoryContexts,
+        datum: pg_sys::Datum,
+        is_null: bool,
+    ) -> Option<Self>
+    where
+        Self: Sized,
+    {
+        match is_null {
+            true => None,
+            false => Some(T::from_datum_in_memory_context(memory_context, datum, is_null)),
+        }
+    }
+}
