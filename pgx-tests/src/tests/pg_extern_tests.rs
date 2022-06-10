@@ -14,6 +14,13 @@ fn returns_tuple_with_attributes() -> (name!(arg, String), name!(arg2, String)) 
     ("hi".to_string(), "bye".to_string())
 }
 
+// Check we can map a `fdw_handler`
+#[pg_extern]
+fn fdw_handler_return() -> pgx::PgBox<pgx::pg_sys::FdwRoutine> {
+    unimplemented!("Not a functional test, just a signature test for SQL generation. Feel free to make a functional test!")
+}
+
+
 #[cfg(any(test, feature = "pg_test"))]
 #[pgx::pg_schema]
 mod tests {
