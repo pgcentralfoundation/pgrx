@@ -39,7 +39,7 @@ pub use pg_extern::{
     NameMacro, PgExtern, PgExternArgument, PgOperator,
 };
 pub use pg_trigger::{attribute::PgTriggerAttribute, entity::PgTriggerEntity, PgTrigger};
-pub use pgx_sql::PgxSql;
+pub use pgx_sql::{PgxSql, RustToSqlMapping};
 pub use positioning_ref::PositioningRef;
 pub use postgres_enum::{entity::PostgresEnumEntity, PostgresEnum};
 pub use postgres_hash::{entity::PostgresHashEntity, PostgresHash};

@@ -517,7 +517,7 @@ pub fn anonymonize_lifetimes(value: &mut syn::Type) {
                             match arg {
                                 // rename lifetimes to the anonymous lifetime
                                 syn::GenericArgument::Lifetime(lifetime) => {
-                                    lifetime.ident = syn::Ident::new("_", lifetime.ident.span());
+                                    lifetime.ident = syn::Ident::new("static", lifetime.ident.span());
                                 }
 
                                 // recurse
@@ -530,7 +530,7 @@ pub fn anonymonize_lifetimes(value: &mut syn::Type) {
                                         match bound {
                                             syn::TypeParamBound::Lifetime(lifetime) => {
                                                 lifetime.ident =
-                                                    syn::Ident::new("_", lifetime.ident.span())
+                                                    syn::Ident::new("static", lifetime.ident.span())
                                             }
                                             _ => {}
                                         }
@@ -549,7 +549,7 @@ pub fn anonymonize_lifetimes(value: &mut syn::Type) {
 
         syn::Type::Reference(type_ref) => {
             if let Some(lifetime) = type_ref.lifetime.as_mut() {
-                lifetime.ident = syn::Ident::new("_", lifetime.ident.span());
+                lifetime.ident = syn::Ident::new("static", lifetime.ident.span());
             }
         }
 

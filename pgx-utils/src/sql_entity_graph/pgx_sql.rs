@@ -36,6 +36,20 @@ use crate::versioned_so_name;
 
 use super::pg_extern::entity::PgExternReturnEntityIteratedItem;
 
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Eq, Ord)]
+pub enum SqlGraphRelationship {
+    RequiredBy,
+    RequiredByArg,
+    RequiredByReturn,
+}
+
+#[derive(Debug, Clone,)]
+pub struct RustToSqlMapping {
+    pub rust_type_id_to_sql: std::collections::HashSet<RustSqlMapping>,
+    pub rust_source_to_sql: std::collections::HashSet<RustSourceOnlySqlMapping>,
+    pub known_composite_type_collections: std::collections::HashMap<TypeId, bool>, // True if it requires `[]` after it when printed to SQL
+}
+
 /// A generator for SQL.
 ///
 /// Consumes a base mapping of types (typically `pgx::DEFAULT_TYPEID_SQL_MAPPING`), a
@@ -49,11 +63,9 @@ use super::pg_extern::entity::PgExternReturnEntityIteratedItem;
 /// out of entities collected during a `pgx::pg_module_magic!()` call in a library.
 #[derive(Debug, Clone)]
 pub struct PgxSql {
-    // This is actually the Debug format of a TypeId!
-    //
-    // This is not a good idea, but without a stable way to create or serialize TypeIds, we have to.
     pub type_mappings: HashMap<TypeId, RustSqlMapping>,
     pub source_mappings: HashMap<String, RustSourceOnlySqlMapping>,
+    pub known_composite_type_collections: std::collections::HashMap<TypeId, bool>,
     pub control: ControlFile,
     pub graph: StableGraph<SqlGraphEntity, SqlGraphRelationship>,
     pub graph_root: NodeIndex,
@@ -73,22 +85,20 @@ pub struct PgxSql {
     pub versioned_so: bool,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Eq, Ord)]
-pub enum SqlGraphRelationship {
-    RequiredBy,
-    RequiredByArg,
-    RequiredByReturn,
-}
-
 impl PgxSql {
-    #[instrument(level = "error", skip(type_mappings, source_mappings, entities,))]
+    #[instrument(level = "error", skip(sql_mappings, entities,))]
     pub fn build(
-        type_mappings: impl Iterator<Item = RustSqlMapping>,
-        source_mappings: impl Iterator<Item = RustSourceOnlySqlMapping>,
+        sql_mappings: RustToSqlMapping,
         entities: impl Iterator<Item = SqlGraphEntity>,
         extension_name: String,
         versioned_so: bool,
     ) -> eyre::Result<Self> {
+        let RustToSqlMapping {
+            rust_type_id_to_sql: type_mappings,
+            rust_source_to_sql: source_mappings,
+            known_composite_type_collections,
+        } = sql_mappings;
+
         let mut graph = StableGraph::new();
 
         let mut entities = entities.collect::<Vec<_>>();
@@ -230,8 +240,9 @@ impl PgxSql {
         connect_triggers(&mut graph, &mapped_triggers, &mapped_schemas);
 
         let mut this = Self {
-            type_mappings: type_mappings.map(|x| (x.id.clone(), x)).collect(),
-            source_mappings: source_mappings.map(|x| (x.rust.clone(), x)).collect(),
+            type_mappings: type_mappings.into_iter().map(|x| (x.id.clone(), x)).collect(),
+            source_mappings: source_mappings.into_iter().map(|x| (x.rust.clone(), x)).collect(),
+            known_composite_type_collections,
             control: control,
             schemas: mapped_schemas,
             extension_sqls: mapped_extension_sqls,
@@ -528,6 +539,10 @@ impl PgxSql {
         } else {
             String::from("MODULE_PATHNAME")
         };
+    }
+
+    pub fn composite_type_requires_square_brackets(&self, ty_id: &TypeId,) -> eyre::Result<bool> {
+        self.known_composite_type_collections.get(ty_id).cloned().ok_or(eyre!("Not a Composite Type"))
     }
 }
 

@@ -25,7 +25,7 @@ use crate::{
     ExternArgs,
 };
 
-use eyre::eyre;
+use eyre::{eyre, WrapErr};
 use std::cmp::Ordering;
 
 /// The output of a [`PgExtern`](crate::sql_entity_graph::pg_extern::PgExtern) from `quote::ToTokens::to_tokens`.
@@ -146,7 +146,7 @@ impl ToSql for PgExternEntity {
                                             schema_prefix = context.schema_prefix_for(&graph_index),
                                             // First try to match on [`TypeId`] since it's most reliable.
                                             sql_type = if let Some(composite_type) = arg.ty.composite_type {
-                                                composite_type.to_string()
+                                                composite_type.to_string() + if context.composite_type_requires_square_brackets(&arg.ty.ty_id).wrap_err_with(|| format!("Attempted on {}", arg.ty.ty_source))? { "[]" } else { "" }
                                             } else {
                                                 context.rust_to_sql(arg.ty.ty_id.clone(), arg.ty.ty_source, arg.ty.full_path).ok_or_else(|| eyre!(
                                                     "Failed to map argument `{}` type `{}` to SQL type while building function `{}`.",
@@ -181,7 +181,7 @@ impl ToSql for PgExternEntity {
                     .ok_or_else(|| eyre!("Could not find return type in graph."))?;
                 format!("RETURNS {schema_prefix}{sql_type} /* {full_path} */",
                                         sql_type = if let Some(composite_type) = ty.composite_type {
-                                            composite_type.to_string()
+                                            composite_type.to_string() + if context.composite_type_requires_square_brackets(&ty.ty_id).wrap_err_with(|| format!("Attempted on `{}`", ty.ty_source))? { "[]" } else { "" }
                                         } else {
                                             context.source_only_to_sql_type(ty.ty_source).or_else(|| {
                                                 context.type_id_to_sql_type(ty.ty_id)
@@ -213,7 +213,7 @@ impl ToSql for PgExternEntity {
                         .ok_or_else(|| eyre!("Could not find return type in graph."))?;
                     format!("RETURNS SETOF {schema_prefix}{sql_type} /* {full_path} */",
                                             sql_type = if let Some(composite_type) = ty.composite_type {
-                                                composite_type.to_string()
+                                                composite_type.to_string() + if context.composite_type_requires_square_brackets(&ty.ty_id).wrap_err_with(|| format!("Attempted on `{}`", ty.ty_source))? { "[]" } else { "" }
                                             } else {
                                                 context.source_only_to_sql_type(ty.ty_source).or_else(|| {
                                                     context.type_id_to_sql_type(ty.ty_id)
@@ -249,30 +249,31 @@ impl ToSql for PgExternEntity {
                                 _ => false,
                             });
                         let needs_comma = idx < (table_items.len() - 1);
-                        let item = format!("\n\t{col_name} {schema_prefix}{ty_resolved}{needs_comma} /* {ty_name} */",
-                                                        col_name = col_name.expect("An iterator of tuples should have `named!()` macro declarations."),
-                                                        schema_prefix = if let Some(graph_index) = graph_index {
-                                                            context.schema_prefix_for(&graph_index)
-                                                        } else { "".into() },
-                                                        ty_resolved = if let Some(composite_type) = ty.composite_type {
-                                                            composite_type.to_string()
-                                                        } else {
-                                                            context.source_only_to_sql_type(ty.ty_source).or_else(|| {
-                                                                context.type_id_to_sql_type(ty.ty_id)
-                                                            }).or_else(|| {
-                                                                let pat = ty.ty_source.to_string();
-                                                                if let Some(found) = context.has_sql_declared_entity(&SqlDeclared::Type(pat.clone())) {
-                                                                    Some(found.sql())
-                                                                }  else if let Some(found) = context.has_sql_declared_entity(&SqlDeclared::Enum(pat.clone())) {
-                                                                    Some(found.sql())
-                                                                } else {
-                                                                    None
-                                                                }
-                                                            }).ok_or_else(|| eyre!("Failed to map return type `{}` to SQL type while building function `{}`.", ty.full_path, self.name))?
-                                                        },
-                                                        needs_comma = if needs_comma { ", " } else { " " },
-                                                        ty_name = ty.full_path
-                                        );
+                        let item = format!(
+                                "\n\t{col_name} {schema_prefix}{ty_resolved}{needs_comma} /* {ty_name} */",
+                                col_name = col_name.expect("An iterator of tuples should have `named!()` macro declarations."),
+                                schema_prefix = if let Some(graph_index) = graph_index {
+                                    context.schema_prefix_for(&graph_index)
+                                } else { "".into() },
+                                ty_resolved = if let Some(composite_type) = ty.composite_type {
+                                    composite_type.to_string() + if context.composite_type_requires_square_brackets(&ty.ty_id).wrap_err_with(|| format!("Attempted on `{}`", ty.ty_source))? { "[]" } else { "" }
+                                } else {
+                                    context.source_only_to_sql_type(ty.ty_source).or_else(|| {
+                                        context.type_id_to_sql_type(ty.ty_id)
+                                    }).or_else(|| {
+                                        let pat = ty.ty_source.to_string();
+                                        if let Some(found) = context.has_sql_declared_entity(&SqlDeclared::Type(pat.clone())) {
+                                            Some(found.sql())
+                                        }  else if let Some(found) = context.has_sql_declared_entity(&SqlDeclared::Enum(pat.clone())) {
+                                            Some(found.sql())
+                                        } else {
+                                            None
+                                        }
+                                    }).ok_or_else(|| eyre!("Failed to map return type `{}` to SQL type while building function `{}`.", ty.full_path, self.name))?
+                                },
+                                needs_comma = if needs_comma { ", " } else { " " },
+                                ty_name = ty.full_path
+                        );
                         items.push_str(&item);
                     }
                     format!("RETURNS TABLE ({}\n)", items)

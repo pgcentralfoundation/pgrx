@@ -367,8 +367,7 @@ pub(crate) fn generate_schema(
 
     tracing::debug!("Collecting {} SQL entities", fns_to_call.len());
     let mut entities = Vec::default();
-    let typeid_sql_mapping;
-    let source_only_sql_mapping;
+    let sql_mapping;
 
     unsafe {
         POSTMASTER_LIBRARY
@@ -386,18 +385,12 @@ pub(crate) fn generate_schema(
             })
             .wrap_err_with(|| format!("Couldn't libload {}", lib_so.display()))?;
 
-        let typeid_sql_mappings_symbol: libloading::os::unix::Symbol<
-            unsafe extern "C" fn() -> &'static std::collections::HashSet<RustSqlMapping>,
+        let sql_mappings_symbol: libloading::os::unix::Symbol<
+            unsafe extern "C" fn() -> ::pgx_utils::sql_entity_graph::RustToSqlMapping,
         > = lib
-            .get("__pgx_typeid_sql_mappings".as_bytes())
-            .expect(&format!("Couldn't call __pgx_typeid_sql_mappings"));
-        typeid_sql_mapping = typeid_sql_mappings_symbol();
-        let source_only_sql_mapping_symbol: libloading::os::unix::Symbol<
-            unsafe extern "C" fn() -> &'static std::collections::HashSet<RustSourceOnlySqlMapping>,
-        > = lib
-            .get("__pgx_source_only_sql_mappings".as_bytes())
-            .expect(&format!("Couldn't call __pgx_source_only_sql_mappings"));
-        source_only_sql_mapping = source_only_sql_mapping_symbol();
+            .get("__pgx_sql_mappings".as_bytes())
+            .expect(&format!("Couldn't call __pgx_sql_mappings"));
+        sql_mapping = sql_mappings_symbol();
 
         let symbol: libloading::os::unix::Symbol<unsafe extern "C" fn() -> SqlGraphEntity> = lib
             .get("__pgx_marker".as_bytes())
@@ -415,8 +408,7 @@ pub(crate) fn generate_schema(
     };
 
     let pgx_sql = PgxSql::build(
-        typeid_sql_mapping.clone().into_iter(),
-        source_only_sql_mapping.clone().into_iter(),
+        sql_mapping,
         entities.into_iter(),
         package_name.to_string(),
         versioned_so,
