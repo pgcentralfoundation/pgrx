@@ -135,9 +135,7 @@ impl ToSql for PgExternEntity {
                             SqlGraphEntity::BuiltinType(defined) => defined == arg.ty.full_path,
                             _ => false,
                         })
-                        .ok_or_else(|| {
-                            eyre!("Could not find arg type in graph. Got: {:?}", arg)
-                        })?;
+                        .ok_or_else(|| eyre!("Could not find arg type in graph. Got: {:?}", arg))?;
                     let needs_comma = idx < (self.fn_args.len() - 1);
                     let buf = format!("\
                                             \t\"{pattern}\" {variadic}{schema_prefix}{sql_type}{default}{maybe_comma}/* {full_path} */\
@@ -170,20 +168,29 @@ impl ToSql for PgExternEntity {
                 PgExternReturnEntity::None => String::from("RETURNS void"),
                 PgExternReturnEntity::Type { ty } => {
                     let graph_index = context
-                    .graph
-                    .neighbors_undirected(self_index)
-                    .find(|neighbor| match &context.graph[*neighbor] {
-                        SqlGraphEntity::Type(neighbor_ty) => neighbor_ty.id_matches(&ty.ty_id),
-                        SqlGraphEntity::Enum(neighbor_en) => neighbor_en.id_matches(&ty.ty_id),
-                        SqlGraphEntity::BuiltinType(defined) => &*defined == ty.full_path,
-                        _ => false,
-                    })
-                    .ok_or_else(|| eyre!("Could not find return type in graph."))?;
-                format!("RETURNS {schema_prefix}{sql_type} /* {full_path} */",
-                                        sql_type = if let Some(composite_type) = ty.composite_type {
-                                            composite_type.to_string() + if context.composite_type_requires_square_brackets(&ty.ty_id).wrap_err_with(|| format!("Attempted on `{}`", ty.ty_source))? { "[]" } else { "" }
-                                        } else {
-                                            context.source_only_to_sql_type(ty.ty_source).or_else(|| {
+                        .graph
+                        .neighbors_undirected(self_index)
+                        .find(|neighbor| match &context.graph[*neighbor] {
+                            SqlGraphEntity::Type(neighbor_ty) => neighbor_ty.id_matches(&ty.ty_id),
+                            SqlGraphEntity::Enum(neighbor_en) => neighbor_en.id_matches(&ty.ty_id),
+                            SqlGraphEntity::BuiltinType(defined) => &*defined == ty.full_path,
+                            _ => false,
+                        })
+                        .ok_or_else(|| eyre!("Could not find return type in graph."))?;
+                    format!(
+                        "RETURNS {schema_prefix}{sql_type} /* {full_path} */",
+                        sql_type = if let Some(composite_type) = ty.composite_type {
+                            composite_type.to_string()
+                                + if context
+                                    .composite_type_requires_square_brackets(&ty.ty_id)
+                                    .wrap_err_with(|| format!("Attempted on `{}`", ty.ty_source))?
+                                {
+                                    "[]"
+                                } else {
+                                    ""
+                                }
+                        } else {
+                            context.source_only_to_sql_type(ty.ty_source).or_else(|| {
                                                 context.type_id_to_sql_type(ty.ty_id)
                                             }).or_else(|| {
                                                 let pat = ty.full_path.to_string();
@@ -195,10 +202,10 @@ impl ToSql for PgExternEntity {
                                                     None
                                                 }
                                             }).ok_or_else(|| eyre!("Failed to map return type `{}` to SQL type while building function `{}`.", ty.full_path, self.full_path))?
-                                        },
-                                        schema_prefix = context.schema_prefix_for(&graph_index),
-                                        full_path = ty.full_path
-                                )
+                        },
+                        schema_prefix = context.schema_prefix_for(&graph_index),
+                        full_path = ty.full_path
+                    )
                 }
                 PgExternReturnEntity::SetOf { ty } => {
                     let graph_index = context
@@ -211,11 +218,20 @@ impl ToSql for PgExternEntity {
                             _ => false,
                         })
                         .ok_or_else(|| eyre!("Could not find return type in graph."))?;
-                    format!("RETURNS SETOF {schema_prefix}{sql_type} /* {full_path} */",
-                                            sql_type = if let Some(composite_type) = ty.composite_type {
-                                                composite_type.to_string() + if context.composite_type_requires_square_brackets(&ty.ty_id).wrap_err_with(|| format!("Attempted on `{}`", ty.ty_source))? { "[]" } else { "" }
-                                            } else {
-                                                context.source_only_to_sql_type(ty.ty_source).or_else(|| {
+                    format!(
+                        "RETURNS SETOF {schema_prefix}{sql_type} /* {full_path} */",
+                        sql_type = if let Some(composite_type) = ty.composite_type {
+                            composite_type.to_string()
+                                + if context
+                                    .composite_type_requires_square_brackets(&ty.ty_id)
+                                    .wrap_err_with(|| format!("Attempted on `{}`", ty.ty_source))?
+                                {
+                                    "[]"
+                                } else {
+                                    ""
+                                }
+                        } else {
+                            context.source_only_to_sql_type(ty.ty_source).or_else(|| {
                                                     context.type_id_to_sql_type(ty.ty_id)
                                                 }).or_else(|| {
                                                     let pat = ty.full_path.to_string();
@@ -227,27 +243,30 @@ impl ToSql for PgExternEntity {
                                                         None
                                                     }
                                                 }).ok_or_else(|| eyre!("Failed to map return type `{}` to SQL type while building function `{}`.", ty.full_path, self.full_path))?
-                                            },
-                                            schema_prefix = context.schema_prefix_for(&graph_index),
-                                            full_path = ty.full_path
-                                    )
+                        },
+                        schema_prefix = context.schema_prefix_for(&graph_index),
+                        full_path = ty.full_path
+                    )
                 }
                 PgExternReturnEntity::Iterated(table_items) => {
                     let mut items = String::new();
                     for (idx, returning::PgExternReturnEntityIteratedItem { ty, name: col_name }) in
                         table_items.iter().enumerate()
                     {
-                        let graph_index = context
-                            .graph
-                            .neighbors_undirected(self_index)
-                            .find(|neighbor| match &context.graph[*neighbor] {
-                                SqlGraphEntity::Type(neightbor_ty) => neightbor_ty.id_matches(&ty.ty_id),
-                                SqlGraphEntity::Enum(neightbor_en) => neightbor_en.id_matches(&ty.ty_id),
-                                SqlGraphEntity::BuiltinType(defined) => {
-                                    defined == ty.ty_source
-                                }
-                                _ => false,
-                            });
+                        let graph_index =
+                            context
+                                .graph
+                                .neighbors_undirected(self_index)
+                                .find(|neighbor| match &context.graph[*neighbor] {
+                                    SqlGraphEntity::Type(neightbor_ty) => {
+                                        neightbor_ty.id_matches(&ty.ty_id)
+                                    }
+                                    SqlGraphEntity::Enum(neightbor_en) => {
+                                        neightbor_en.id_matches(&ty.ty_id)
+                                    }
+                                    SqlGraphEntity::BuiltinType(defined) => defined == ty.ty_source,
+                                    _ => false,
+                                });
                         let needs_comma = idx < (table_items.len() - 1);
                         let item = format!(
                                 "\n\t{col_name} {schema_prefix}{ty_resolved}{needs_comma} /* {ty_name} */",
@@ -379,7 +398,8 @@ impl ToSql for PgExternEntity {
                 .fn_args
                 .get(1)
                 .ok_or_else(|| eyre!("Did not find `left_arg` for operator `{}`.", self.name))?;
-            let (right_arg_ty_id, right_arg_full_path) = (right_arg.ty.ty_id, right_arg.ty.full_path);
+            let (right_arg_ty_id, right_arg_full_path) =
+                (right_arg.ty.ty_id, right_arg.ty.full_path);
             let right_arg_graph_index = context
                 .graph
                 .neighbors_undirected(self_index)

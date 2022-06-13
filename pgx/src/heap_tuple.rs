@@ -365,6 +365,9 @@ impl<'a, AllocatedBy: WhoAllocated<pg_sys::HeapTupleData>> PgHeapTuple<'a, Alloc
 
 #[macro_export]
 macro_rules! composite_type {
+    ($lt:lifetime, $composite_type:expr) => {
+        ::pgx::PgHeapTuple<$lt, ::pgx::AllocatedByRust>
+    };
     ($composite_type:expr) => {
         ::pgx::PgHeapTuple<'static, ::pgx::AllocatedByRust>
     };

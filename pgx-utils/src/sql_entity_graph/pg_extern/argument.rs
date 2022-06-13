@@ -9,9 +9,9 @@ Use of this source code is governed by the MIT license that can be found in the 
 use crate::{anonymonize_lifetimes, sql_entity_graph::pg_extern::resolve_ty};
 use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
-use syn::{
-    FnArg, Pat,
-};
+use syn::{FnArg, Pat};
+
+use super::resolve_ty::CompositeTypeMacro;
 
 /// A parsed `#[pg_extern]` argument.
 ///
@@ -21,7 +21,7 @@ pub struct PgExternArgument {
     pat: syn::Ident,
     ty: syn::Type,
     /// Set via `composite_type!()`
-    composite_type: Option<syn::Expr>,
+    composite_type: Option<CompositeTypeMacro>,
     /// Set via `default!()`
     default: Option<String>,
     /// Set via `variadic!()`
@@ -137,7 +137,8 @@ impl ToTokens for PgExternArgument {
         let is_variadic = self.variadic;
         let pat = &self.pat;
         let default = self.default.iter();
-        let composite_type = self.composite_type.iter();
+        let composite_type = self.composite_type.clone().map(|v| v.expr);
+        let composite_type_iter= composite_type.iter();
         let mut ty = self.ty.clone();
         anonymonize_lifetimes(&mut ty);
 
@@ -154,7 +155,7 @@ impl ToTokens for PgExternArgument {
                     let _ = path_items.pop(); // Drop the one we don't want.
                     path_items.join("::")
                 },
-                composite_type: None #( .unwrap_or(Some(#composite_type)) )*,
+                composite_type: None #( .unwrap_or(Some(#composite_type_iter)) )*,
             }
         };
 

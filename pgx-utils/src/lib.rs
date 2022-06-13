@@ -517,7 +517,8 @@ pub fn anonymonize_lifetimes(value: &mut syn::Type) {
                             match arg {
                                 // rename lifetimes to the anonymous lifetime
                                 syn::GenericArgument::Lifetime(lifetime) => {
-                                    lifetime.ident = syn::Ident::new("static", lifetime.ident.span());
+                                    lifetime.ident =
+                                        syn::Ident::new("static", lifetime.ident.span());
                                 }
 
                                 // recurse

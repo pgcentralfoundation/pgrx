@@ -431,7 +431,11 @@ where
     {
         match is_null {
             true => None,
-            false => Some(T::from_datum_in_memory_context(memory_context, datum, is_null)),
+            false => Some(T::from_datum_in_memory_context(
+                memory_context,
+                datum,
+                is_null,
+            )),
         }
     }
 }

@@ -10,9 +10,9 @@ mod argument;
 mod attribute;
 pub mod entity;
 mod operator;
+mod resolve_ty;
 mod returning;
 mod search_path;
-mod resolve_ty;
 
 pub use argument::PgExternArgument;
 pub use operator::PgOperator;
@@ -27,13 +27,13 @@ use search_path::SearchPathList;
 use eyre::WrapErr;
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
+pub(crate) use resolve_ty::resolve_ty;
 use std::convert::TryFrom;
 use syn::{
     parse::{Parse, ParseStream, Parser},
     punctuated::Punctuated,
     Meta, Token,
 };
-pub(crate) use resolve_ty::resolve_ty;
 
 /// A parsed `#[pg_extern]` item.
 ///

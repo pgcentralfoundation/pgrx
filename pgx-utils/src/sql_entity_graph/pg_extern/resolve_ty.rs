@@ -20,25 +20,12 @@ It resolves the following macros:
 */
 pub(crate) fn resolve_ty(
     ty: syn::Type,
-) -> syn::Result<(
-    syn::Type,
-    bool,
-    bool,
-    Option<String>,
-    Option<syn::Expr>,
-)> {
+) -> syn::Result<(syn::Type, bool, bool, Option<String>, Option<CompositeTypeMacro>)> {
     // There are four steps:
-    // * Anonymize any lifetimes
     // * Resolve the `default!()` macro
     // * Resolve `composite_type!()`
+    // * Anonymize any lifetimes
     // * Resolving any flags for that resolved type so we can not have to do this later.
-
-    // Anonymize lifetimes, so the SQL resolver isn't dealing with that.
-    let ty = {
-        let mut ty = ty;
-        anonymonize_lifetimes(&mut ty);
-        ty
-    };
 
     // Resolve any `default` macro
     // We do this first as it's **always** in the first position. It's not valid deeper in the type.
@@ -73,11 +60,9 @@ pub(crate) fn resolve_ty(
                     ))?
                 }
                 "composite_type" => {
-                    let sql = Some(
-                        handle_composite_type_macro(&mac)?,
-                    );
+                    let sql = Some(handle_composite_type_macro(&mac)?);
                     let ty = syn::parse_quote! {
-                        ::pgx::PgHeapTuple<'_, ::pgx::AllocatedByRust>
+                        ::pgx::PgHeapTuple<'static, ::pgx::AllocatedByRust>
                     };
                     (ty, sql)
                 }
@@ -85,7 +70,7 @@ pub(crate) fn resolve_ty(
             }
         }
         syn::Type::Path(path) => {
-            let segments = path.path.clone();
+            let segments = &path.path;
             let last = segments.segments.last().ok_or(syn::Error::new(
                 path.span(),
                 "Could not read last segment of path",
@@ -97,34 +82,30 @@ pub(crate) fn resolve_ty(
                 // Option<Vec<Option<composite_type!(..)>>>
                 // Option<VariadicArray<composite_type!(..)>>
                 // Option<VariadicArray<Option<composite_type!(..)>>>
-                "Option" => resolve_option_inner(
-                    path,
-                    last.arguments.clone(),
-                )?,
+                "Option" => resolve_option_inner(path)?,
                 // Vec<composite_type!(..)>
                 // Vec<Option<composite_type!(..)>>
-                "Vec" => {
-                    resolve_vec_inner(path, last.arguments.clone())?
-                }
+                "Vec" => resolve_vec_inner(path)?,
                 // VariadicArray<composite_type!(..)>
                 // VariadicArray<Option<composite_type!(..)>>
-                "VariadicArray" => resolve_variadic_array_inner(
-                    path,
-                    last.arguments.clone(),
-                )?,
+                "VariadicArray" => resolve_variadic_array_inner(path)?,
                 // Array<composite_type!(..)>
                 // Array<Option<composite_type!(..)>>
-                "Array" => resolve_array_inner(
-                    path,
-                    last.arguments.clone(),
-                )?,
+                "Array" => resolve_array_inner(path)?,
                 _ => (syn::Type::Path(path), None),
             }
         }
         original => (original, None),
     };
 
-    // In this second setp, we go look at the resolved type and determine if it is a variadic, optional, etc.
+    // Anonymize lifetimes, so the SQL resolver isn't dealing with that.
+    let ty = {
+        let mut ty = ty;
+        anonymonize_lifetimes(&mut ty);
+        ty
+    };
+
+    // In this  step, we go look at the resolved type and determine if it is a variadic, optional, etc.
     let (ty, variadic, optional) = match ty {
         syn::Type::Path(type_path) => {
             let path = &type_path.path;
@@ -142,8 +123,8 @@ pub(crate) fn resolve_ty(
                                 angle_bracketed.span(),
                                 "No inner arg for Option<T> found",
                             ))? {
-                                syn::GenericArgument::Type(ty) => {
-                                    match ty {
+                                syn::GenericArgument::Type(inner_ty) => {
+                                    match inner_ty {
                                         // Option<VariadicArray<T>>
                                         syn::Type::Path(ref inner_type_path) => {
                                             let path = &inner_type_path.path;
@@ -187,10 +168,15 @@ pub(crate) fn resolve_ty(
 
 fn resolve_vec_inner(
     original: syn::TypePath,
-    arguments: syn::PathArguments,
-) -> syn::Result<(syn::Type, Option<syn::Expr>)> {
-    match arguments {
-        syn::PathArguments::AngleBracketed(path_arg) => match path_arg.args.first() {
+) -> syn::Result<(syn::Type, Option<CompositeTypeMacro>)> {
+    let segments = &original.path;
+    let last = segments.segments.last().ok_or(syn::Error::new(
+        original.span(),
+        "Could not read last segment of path",
+    ))?;
+
+    match &last.arguments {
+        syn::PathArguments::AngleBracketed(path_arg) => match path_arg.args.last() {
             Some(syn::GenericArgument::Type(ty)) => match ty.clone() {
                 syn::Type::Macro(macro_pat) => {
                     let mac = &macro_pat.mac;
@@ -202,7 +188,7 @@ fn resolve_vec_inner(
                         "composite_type" => {
                             let sql = Some(handle_composite_type_macro(mac)?);
                             let ty = syn::parse_quote! {
-                                Vec<::pgx::PgHeapTuple<'_, ::pgx::AllocatedByRust>>
+                                Vec<::pgx::PgHeapTuple<'static, ::pgx::AllocatedByRust>>
                             };
                             Ok((ty, sql))
                         }
@@ -216,7 +202,11 @@ fn resolve_vec_inner(
                     ))?;
                     match last.ident.to_string().as_str() {
                         "Option" => {
-                            resolve_option_inner(original, last.arguments.clone())
+                            let (inner_ty, expr) = resolve_option_inner(arg_type_path)?;
+                            let wrapped_ty = syn::parse_quote! {
+                                Vec<#inner_ty>
+                            };
+                            Ok((wrapped_ty, expr))
                         }
                         _ => Ok((syn::Type::Path(original), None)),
                     }
@@ -231,10 +221,16 @@ fn resolve_vec_inner(
 
 fn resolve_variadic_array_inner(
     original: syn::TypePath,
-    arguments: syn::PathArguments,
-) -> syn::Result<(syn::Type, Option<syn::Expr>)> {
-    match arguments {
-        syn::PathArguments::AngleBracketed(path_arg) => match path_arg.args.first() {
+) -> syn::Result<(syn::Type, Option<CompositeTypeMacro>)> {
+    let segments = &original.path;
+    let last = segments.segments.last().ok_or(syn::Error::new(
+        original.span(),
+        "Could not read last segment of path",
+    ))?;
+
+    match &last.arguments {
+        syn::PathArguments::AngleBracketed(path_arg) => match path_arg.args.last() {
+            // TODO: Lifetime????
             Some(syn::GenericArgument::Type(ty)) => match ty.clone() {
                 syn::Type::Macro(macro_pat) => {
                     let mac = &macro_pat.mac;
@@ -246,7 +242,7 @@ fn resolve_variadic_array_inner(
                         "composite_type" => {
                             let sql = Some(handle_composite_type_macro(mac)?);
                             let ty = syn::parse_quote! {
-                                ::pgx::VariadicArray<::pgx::PgHeapTuple<'_, ::pgx::AllocatedByRust>>
+                                ::pgx::VariadicArray<::pgx::PgHeapTuple<'static, ::pgx::AllocatedByRust>>
                             };
                             Ok((ty, sql))
                         }
@@ -260,7 +256,11 @@ fn resolve_variadic_array_inner(
                     ))?;
                     match last.ident.to_string().as_str() {
                         "Option" => {
-                            resolve_option_inner(original, last.arguments.clone())
+                            let (inner_ty, expr) = resolve_option_inner(arg_type_path)?;
+                            let wrapped_ty = syn::parse_quote! {
+                                ::pgx::VariadicArray<#inner_ty>
+                            };
+                            Ok((wrapped_ty, expr))
                         }
                         _ => Ok((syn::Type::Path(original), None)),
                     }
@@ -275,10 +275,15 @@ fn resolve_variadic_array_inner(
 
 fn resolve_array_inner(
     original: syn::TypePath,
-    arguments: syn::PathArguments,
-) -> syn::Result<(syn::Type, Option<syn::Expr>)> {
-    match arguments {
-        syn::PathArguments::AngleBracketed(path_arg) => match path_arg.args.first() {
+) -> syn::Result<(syn::Type, Option<CompositeTypeMacro>)> {
+    let segments = &original.path;
+    let last = segments.segments.last().ok_or(syn::Error::new(
+        original.span(),
+        "Could not read last segment of path",
+    ))?;
+
+    match &last.arguments {
+        syn::PathArguments::AngleBracketed(path_arg) => match path_arg.args.last() {
             Some(syn::GenericArgument::Type(ty)) => match ty.clone() {
                 syn::Type::Macro(macro_pat) => {
                     let mac = &macro_pat.mac;
@@ -290,7 +295,7 @@ fn resolve_array_inner(
                         "composite_type" => {
                             let sql = Some(handle_composite_type_macro(mac)?);
                             let ty = syn::parse_quote! {
-                                ::pgx::Array<::pgx::PgHeapTuple<'_, ::pgx::AllocatedByRust>>
+                                ::pgx::Array<::pgx::PgHeapTuple<'static, ::pgx::AllocatedByRust>>
                             };
                             Ok((ty, sql))
                         }
@@ -304,7 +309,11 @@ fn resolve_array_inner(
                     ))?;
                     match last.ident.to_string().as_str() {
                         "Option" => {
-                            resolve_option_inner(original, last.arguments.clone())
+                            let (inner_ty, expr) = resolve_option_inner(arg_type_path)?;
+                            let wrapped_ty = syn::parse_quote! {
+                                ::pgx::Array<#inner_ty>
+                            };
+                            Ok((wrapped_ty, expr))
                         }
                         _ => Ok((syn::Type::Path(original), None)),
                     }
@@ -319,9 +328,14 @@ fn resolve_array_inner(
 
 fn resolve_option_inner(
     original: syn::TypePath,
-    arguments: syn::PathArguments,
-) -> syn::Result<(syn::Type, Option<syn::Expr>)> {
-    match arguments {
+) -> syn::Result<(syn::Type, Option<CompositeTypeMacro>)> {
+    let segments = &original.path;
+    let last = segments.segments.last().ok_or(syn::Error::new(
+        original.span(),
+        "Could not read last segment of path",
+    ))?;
+
+    match &last.arguments {
         syn::PathArguments::AngleBracketed(path_arg) => match path_arg.args.first() {
             Some(syn::GenericArgument::Type(ty)) => {
                 match ty.clone() {
@@ -333,7 +347,7 @@ fn resolve_option_inner(
                             "composite_type" => {
                                 let sql = Some(handle_composite_type_macro(mac)?);
                                 let ty = syn::parse_quote! {
-                                    Option<::pgx::PgHeapTuple<'_, ::pgx::AllocatedByRust>>
+                                    Option<::pgx::PgHeapTuple<'static, ::pgx::AllocatedByRust>>
                                 };
                                 Ok((ty, sql))
                             },
@@ -351,24 +365,30 @@ fn resolve_option_inner(
                             // Option<Vec<composite_type!(..)>>
                             // Option<Vec<Option<composite_type!(..)>>>
                             "Vec" => {
-                                resolve_vec_inner(original, last.arguments.clone())
-                            },
+                                let (inner_ty, expr) = resolve_vec_inner(arg_type_path)?;
+                                let wrapped_ty = syn::parse_quote! {
+                                    ::std::option::Option<#inner_ty>
+                                };
+                                Ok((wrapped_ty, expr))
+                            }
                             // Option<VariadicArray<composite_type!(..)>>
                             // Option<VariadicArray<Option<composite_type!(..)>>>
                             "VariadicArray" => {
-                                resolve_variadic_array_inner(
-                                    original,
-                                    last.arguments.clone(),
-                                )
-                            },
+                                let (inner_ty, expr) = resolve_variadic_array_inner(arg_type_path)?;
+                                let wrapped_ty = syn::parse_quote! {
+                                    ::std::option::Option<#inner_ty>
+                                };
+                                Ok((wrapped_ty, expr))
+                            }
                             // Option<Array<composite_type!(..)>>
                             // Option<Array<Option<composite_type!(..)>>>
                             "Array" => {
-                                resolve_array_inner(
-                                    original,
-                                    last.arguments.clone(),
-                                )
-                            },
+                                let (inner_ty, expr) = resolve_array_inner(arg_type_path)?;
+                                let wrapped_ty = syn::parse_quote! {
+                                    ::std::option::Option<#inner_ty>
+                                };
+                                Ok((wrapped_ty, expr))
+                            }
                             // Option<..>
                             _ => Ok((syn::Type::Path(original), None)),
                         }
@@ -382,9 +402,8 @@ fn resolve_option_inner(
     }
 }
 
-
-fn handle_composite_type_macro(mac: &syn::Macro) -> syn::Result<syn::Expr> {
-    let out: syn::Expr = mac.parse_body()?;
+fn handle_composite_type_macro(mac: &syn::Macro) -> syn::Result<CompositeTypeMacro> {
+    let out: CompositeTypeMacro = mac.parse_body()?;
     Ok(out)
 }
 
@@ -513,5 +532,20 @@ impl Parse for DefaultMacro {
         let _comma: Token![,] = input.parse()?;
         let expr = input.parse()?;
         Ok(Self { ty, expr })
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CompositeTypeMacro {
+    pub(crate) lifetime: Option<syn::Lifetime>,
+    pub(crate) expr: syn::Expr,
+}
+
+impl Parse for CompositeTypeMacro {
+    fn parse(input: ParseStream) -> Result<Self, syn::Error> {
+        let lifetime: Option<syn::Lifetime> = input.parse().ok();
+        let _comma: Option<Token![,]> = input.parse().ok();
+        let expr = input.parse()?;
+        Ok(Self { lifetime, expr })
     }
 }
