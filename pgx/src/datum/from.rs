@@ -422,7 +422,7 @@ where
     }
 
     unsafe fn from_datum_in_memory_context(
-        mut memory_context: PgMemoryContexts,
+        memory_context: PgMemoryContexts,
         datum: pg_sys::Datum,
         is_null: bool,
     ) -> Option<Self>

@@ -1,13 +1,12 @@
 use std::ops::Deref;
 
 use crate::anonymonize_lifetimes;
-use proc_macro2::{Span, TokenStream as TokenStream2};
-use quote::{quote, ToTokens, TokenStreamExt};
 use syn::{
     parse::{Parse, ParseStream},
     spanned::Spanned,
-    FnArg, Pat, Token,
+    Token,
 };
+use proc_macro2::Span;
 
 /** Resolves a `pg_extern` argument or return `syn::Type` into metadata
 
@@ -537,6 +536,7 @@ impl Parse for DefaultMacro {
 
 #[derive(Debug, Clone)]
 pub struct CompositeTypeMacro {
+    #[allow(dead_code)]
     pub(crate) lifetime: Option<syn::Lifetime>,
     pub(crate) expr: syn::Expr,
 }

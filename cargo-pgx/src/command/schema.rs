@@ -20,7 +20,7 @@ use once_cell::sync::OnceCell;
 use owo_colors::OwoColorize;
 use pgx_utils::{
     pg_config::{PgConfig, Pgx},
-    sql_entity_graph::{PgxSql, RustSourceOnlySqlMapping, RustSqlMapping, SqlGraphEntity},
+    sql_entity_graph::{PgxSql, SqlGraphEntity},
     PgxPgSysStub,
 };
 use std::{

@@ -21,7 +21,7 @@ use crate::sql_entity_graph::{
         SqlDeclared,
     },
     mapping::{RustSourceOnlySqlMapping, RustSqlMapping},
-    pg_extern::entity::{PgExternEntity, PgExternReturnEntity, TypeEntity},
+    pg_extern::entity::{PgExternEntity, PgExternReturnEntity},
     pg_trigger::entity::PgTriggerEntity,
     positioning_ref::PositioningRef,
     postgres_enum::entity::PostgresEnumEntity,

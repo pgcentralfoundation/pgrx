@@ -6,9 +6,7 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
-use crate::{anonymonize_lifetimes, anonymonize_lifetimes_in_type_path};
-use eyre::eyre;
-use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
+use proc_macro2::{TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
 use std::convert::TryFrom;
 use syn::{
@@ -81,7 +79,7 @@ impl Returning {
             .elems
             .iter_mut()
             .flat_map(|elem| {
-                let mut elem = elem.clone();
+                let elem = elem.clone();
 
                 match elem {
                     syn::Type::Macro(ref macro_pat) => {

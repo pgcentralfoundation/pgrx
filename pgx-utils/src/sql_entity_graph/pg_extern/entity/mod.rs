@@ -12,7 +12,6 @@ mod returning;
 
 pub use argument::PgExternArgumentEntity;
 pub use operator::PgOperatorEntity;
-use quote::{ToTokens, TokenStreamExt};
 pub use returning::{PgExternReturnEntity, PgExternReturnEntityIteratedItem};
 
 use crate::{
