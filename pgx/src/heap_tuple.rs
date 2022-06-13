@@ -114,12 +114,10 @@ impl<'a> PgHeapTuple<'a, AllocatedByRust> {
             .ok_or_else(|| PgHeapTupleError::NoSuchType(type_name.to_string()))?;
         let natts = tuple_desc.len();
         unsafe {
-            let datums =
-                pg_sys::palloc0(natts * std::mem::size_of::<pg_sys::Datum>()) as *mut pg_sys::Datum;
             let mut is_null = (0..natts).map(|_| true).collect::<Vec<_>>();
 
             let heap_tuple =
-                pg_sys::heap_form_tuple(tuple_desc.as_ptr(), datums, is_null.as_mut_ptr());
+                pg_sys::heap_form_tuple(tuple_desc.as_ptr(), std::ptr::null_mut(), is_null.as_mut_ptr());
 
             Ok(PgHeapTuple {
                 tuple: PgBox::<pg_sys::HeapTupleData, AllocatedByRust>::from_rust(heap_tuple),
