@@ -31,7 +31,11 @@ mod tests {
         const NON_EXISTING_ATTRIBUTE: &str = "DEFINITELY_NOT_EXISTING";
 
         match PgHeapTuple::new_composite_type(NON_EXISTING_ATTRIBUTE) {
-            Err(PgHeapTupleError::NoSuchType(not_found)) if not_found == NON_EXISTING_ATTRIBUTE.to_string() => (),
+            Err(PgHeapTupleError::NoSuchType(not_found))
+                if not_found == NON_EXISTING_ATTRIBUTE.to_string() =>
+            {
+                ()
+            }
             Err(err) => panic!("{}", err),
             Ok(_) => panic!("Able to find what should be a not existing composite type"),
         }
@@ -45,13 +49,16 @@ mod tests {
         const NON_EXISTING_ATTRIBUTE: &str = "DEFINITELY_NOT_EXISTING";
         assert_eq!(
             heap_tuple.get_by_name::<String>(NON_EXISTING_ATTRIBUTE),
-            Err(TryFromDatumError::NoSuchAttributeName(NON_EXISTING_ATTRIBUTE.into())),
+            Err(TryFromDatumError::NoSuchAttributeName(
+                NON_EXISTING_ATTRIBUTE.into()
+            )),
         );
 
         assert_eq!(
-            heap_tuple
-                .set_by_name(NON_EXISTING_ATTRIBUTE, "Brandy".to_string()),
-            Err(TryFromDatumError::NoSuchAttributeName(NON_EXISTING_ATTRIBUTE.into())),
+            heap_tuple.set_by_name(NON_EXISTING_ATTRIBUTE, "Brandy".to_string()),
+            Err(TryFromDatumError::NoSuchAttributeName(
+                NON_EXISTING_ATTRIBUTE.into()
+            )),
         );
     }
 
@@ -63,13 +70,16 @@ mod tests {
         const NON_EXISTING_ATTRIBUTE: NonZeroUsize = unsafe { NonZeroUsize::new_unchecked(9001) };
         assert_eq!(
             heap_tuple.get_by_index::<String>(NON_EXISTING_ATTRIBUTE),
-            Err(TryFromDatumError::NoSuchAttributeNumber(NON_EXISTING_ATTRIBUTE)),
+            Err(TryFromDatumError::NoSuchAttributeNumber(
+                NON_EXISTING_ATTRIBUTE
+            )),
         );
 
         assert_eq!(
-            heap_tuple
-                .set_by_index(NON_EXISTING_ATTRIBUTE, "Brandy".to_string()),
-            Err(TryFromDatumError::NoSuchAttributeNumber(NON_EXISTING_ATTRIBUTE)),
+            heap_tuple.set_by_index(NON_EXISTING_ATTRIBUTE, "Brandy".to_string()),
+            Err(TryFromDatumError::NoSuchAttributeNumber(
+                NON_EXISTING_ATTRIBUTE
+            )),
         );
     }
 
@@ -90,16 +100,13 @@ mod tests {
 
         // These are **deliberately** the wrong types.
         assert_eq!(
-            heap_tuple
-                .set_by_name("name", 1_i32),
+            heap_tuple.set_by_name("name", 1_i32),
             Err(TryFromDatumError::IncompatibleTypes),
         );
         assert_eq!(
-            heap_tuple
-                .set_by_name("age", "Brandy"),
+            heap_tuple.set_by_name("age", "Brandy"),
             Err(TryFromDatumError::IncompatibleTypes),
         );
-
 
         // Now set them properly, to test that we get errors when they're set...
         heap_tuple
