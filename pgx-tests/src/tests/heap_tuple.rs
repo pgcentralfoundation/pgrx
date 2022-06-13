@@ -29,7 +29,6 @@ mod tests {
     #[pg_test]
     fn test_missing_type() {
         const NON_EXISTING_ATTRIBUTE: &str = "DEFINITELY_NOT_EXISTING";
-        let attr_string = NON_EXISTING_ATTRIBUTE.to_string();
 
         match PgHeapTuple::new_composite_type(NON_EXISTING_ATTRIBUTE) {
             Err(PgHeapTupleError::NoSuchType(not_found)) if not_found == NON_EXISTING_ATTRIBUTE.to_string() => (),

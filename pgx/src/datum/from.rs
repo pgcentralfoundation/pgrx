@@ -13,9 +13,7 @@ use crate::{
     pg_sys, text_to_rust_str_unchecked, varlena_to_byte_slice, AllocatedByPostgres, IntoDatum,
     PgBox, PgMemoryContexts,
 };
-use std::error::Error;
 use std::ffi::CStr;
-use std::fmt::{Display, Formatter};
 use std::num::NonZeroUsize;
 
 /// If converting a Datum to a Rust type fails, this is the set of possible reasons why.
