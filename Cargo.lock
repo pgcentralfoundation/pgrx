@@ -1516,7 +1516,6 @@ dependencies = [
  "serde_json",
  "syn",
  "syntect",
- "thiserror",
  "toml",
  "tracing",
  "tracing-error",
