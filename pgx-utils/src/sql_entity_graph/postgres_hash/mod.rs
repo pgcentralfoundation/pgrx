@@ -67,17 +67,20 @@ pub struct PostgresHash {
 }
 
 impl PostgresHash {
-    pub fn new(name: Ident, to_sql_config: ToSqlConfig) -> Self {
-        Self {
+    pub fn new(name: Ident, to_sql_config: ToSqlConfig) -> Result<Self, syn::Error> {
+        if !to_sql_config.overrides_default() {
+            crate::ident_is_acceptable_to_postgres(&name)?;
+        }
+        Ok(Self {
             name,
             to_sql_config,
-        }
+        })
     }
 
     pub fn from_derive_input(derive_input: DeriveInput) -> Result<Self, syn::Error> {
         let to_sql_config =
             ToSqlConfig::from_attributes(derive_input.attrs.as_slice())?.unwrap_or_default();
-        Ok(Self::new(derive_input.ident, to_sql_config))
+        Self::new(derive_input.ident, to_sql_config)
     }
 }
 
@@ -91,8 +94,9 @@ impl Parse for PostgresHash {
             Item::Struct(item) => (item.ident.clone(), item.attrs.as_slice()),
             _ => return Err(syn::Error::new(input.span(), "expected enum or struct")),
         };
+
         let to_sql_config = ToSqlConfig::from_attributes(attrs)?.unwrap_or_default();
-        Ok(Self::new(ident, to_sql_config))
+        Self::new(ident, to_sql_config)
     }
 }
 

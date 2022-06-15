@@ -100,10 +100,13 @@ impl PgAggregate {
             ToSqlConfig::from_attributes(item_impl.attrs.as_slice())?.unwrap_or_default();
         let target_path = get_target_path(&item_impl)?;
         let target_ident = get_target_ident(&target_path)?;
+
         let snake_case_target_ident = Ident::new(
             &target_ident.to_string().to_case(Case::Snake),
             target_ident.span(),
         );
+        crate::ident_is_acceptable_to_postgres(&snake_case_target_ident)?;
+
         let mut pg_externs = Vec::default();
         // We want to avoid having multiple borrows, so we take a snapshot to scan from,
         // and mutate the actual one.

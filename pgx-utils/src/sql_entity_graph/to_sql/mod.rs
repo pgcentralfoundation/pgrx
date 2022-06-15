@@ -148,6 +148,19 @@ impl ToSqlConfig {
             Ok(None)
         }
     }
+
+    pub fn overrides_default(&self) -> bool {
+        if self.enabled == false {
+            return true
+        }
+        if self.callback.is_some() {
+            return true
+        }
+        if self.content.is_some() {
+            return true
+        }
+        false
+    }
 }
 
 impl ToTokens for ToSqlConfig {

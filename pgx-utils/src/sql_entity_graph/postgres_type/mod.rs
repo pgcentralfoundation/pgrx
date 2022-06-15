@@ -59,14 +59,17 @@ impl PostgresType {
         in_fn: Ident,
         out_fn: Ident,
         to_sql_config: ToSqlConfig,
-    ) -> Self {
-        Self {
+    ) -> Result<Self, syn::Error> {
+        if !to_sql_config.overrides_default() {
+            crate::ident_is_acceptable_to_postgres(&name)?;
+        }
+        Ok(Self {
             generics,
             name,
             in_fn,
             out_fn,
             to_sql_config,
-        }
+        })
     }
 
     pub fn from_derive_input(derive_input: DeriveInput) -> Result<Self, syn::Error> {
@@ -89,13 +92,13 @@ impl PostgresType {
             &format!("{}_out", derive_input.ident).to_lowercase(),
             derive_input.ident.span(),
         );
-        Ok(Self::new(
+        Self::new(
             derive_input.ident,
             derive_input.generics,
             funcname_in,
             funcname_out,
             to_sql_config,
-        ))
+        )
     }
 
     pub fn inventory_fn_name(&self) -> String {
@@ -126,13 +129,13 @@ impl Parse for PostgresType {
             &format!("{}_out", parsed.ident).to_lowercase(),
             parsed.ident.span(),
         );
-        Ok(Self::new(
+        Self::new(
             parsed.ident,
             parsed.generics,
             funcname_in,
             funcname_out,
             to_sql_config,
-        ))
+        )
     }
 }
 
