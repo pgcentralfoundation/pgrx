@@ -582,13 +582,14 @@ const POSTGRES_IDENTIFIER_MAX_LEN: usize = 64;
 /// 
 // This list is incomplete, you could expand it!
 pub fn ident_is_acceptable_to_postgres(ident: &syn::Ident) -> Result<(), syn::Error> {
-    if ident.to_string().len() >= POSTGRES_IDENTIFIER_MAX_LEN {
+    let ident_string = ident.to_string();
+    if ident_string.len() >= POSTGRES_IDENTIFIER_MAX_LEN {
         return Err(syn::Error::new(
             ident.span(),
             &format!(
                 "Identifier `{}` was {} characters long, PostgreSQL will truncate identifiers with less than {POSTGRES_IDENTIFIER_MAX_LEN} characters, opt for an identifier which Postgres won't truncate",
                 ident,
-                ident.to_string().len(),
+                ident_string.len(),
             )
         ));
     }
