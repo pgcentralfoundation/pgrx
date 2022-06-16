@@ -97,7 +97,7 @@ impl<'a> PgTupleDesc<'a> {
     ///
     /// This method is unsafe as we cannot validate that the provided `pg_sys::TupleDesc` is valid
     /// or requires reference counting.
-    pub unsafe fn from_pg_copy<'b>(ptr: pg_sys::TupleDesc) -> PgTupleDesc<'b> {
+    pub unsafe fn from_rust_copy<'b>(ptr: pg_sys::TupleDesc) -> PgTupleDesc<'b> {
         PgTupleDesc {
             // SAFETY:  pg_sys::CreateTupleDescCopyConstr will be returning a valid pointer
             tupdesc: PgBox::from_pg(pg_sys::CreateTupleDescCopyConstr(ptr)),
@@ -107,7 +107,7 @@ impl<'a> PgTupleDesc<'a> {
         }
     }
 
-    /// Similar to `::from_pg_copy()`, but assumes the provided `TupleDesc` is already a copy.
+    /// Similar to `::from_rust_copy()`, but assumes the provided `TupleDesc` is already a copy.
     ///
     /// When this instance is dropped, the TupleDesc is `pfree()`'d
     ///
@@ -178,7 +178,8 @@ impl<'a> PgTupleDesc<'a> {
             }
 
             let tuple_desc = pg_sys::lookup_rowtype_tupdesc(typoid, typmod);
-            Some(PgTupleDesc::from_rust(tuple_desc))
+            // It's important to make a copy of the tupledesc: https://www.postgresql.org/message-id/flat/24471.1136768659%40sss.pgh.pa.us
+            Some(PgTupleDesc::from_rust_copy(tuple_desc))
         }
     }
 
