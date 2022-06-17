@@ -100,7 +100,7 @@ impl PgTrigger {
                 let maybe_pg_trigger = unsafe { ::pgx::trigger_support::PgTrigger::from_fcinfo(fcinfo) };
                 let pg_trigger = maybe_pg_trigger.expect("PgTrigger::from_fcinfo failed");
                 let trigger_fn_result: Result<
-                    ::pgx::PgHeapTuple<'_, _>,
+                    ::pgx::heap_tuple::PgHeapTuple<'_, _>,
                     _,
                 > = #function_ident(&pg_trigger);
 

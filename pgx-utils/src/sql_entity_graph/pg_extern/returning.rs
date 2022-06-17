@@ -127,7 +127,7 @@ impl Returning {
                     .parse_body()
                     .expect(&*format!("Failed to parse composite_type!(): {:?}", mac));
                 Ok(Returning::Type {
-                    ty: syn::parse_quote! { ::pgx::PgHeapTuple<'static, ::pgx::AllocatedByRust> },
+                    ty: syn::parse_quote! { ::pgx::heap_tuple::PgHeapTuple<'static, ::pgx::AllocatedByRust> },
                     composite_type: Some(composite_type),
                 })
             }

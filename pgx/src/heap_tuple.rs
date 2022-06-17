@@ -1,4 +1,6 @@
 //! Provides a safe interface to Postgres `HeapTuple` objects.
+//! 
+//! [`PgHeapTuple`]s also describe composite types as defined by [`pgx::composite_type!()`][crate::composite_type].
 use crate::{
     heap_getattr_raw, pg_sys, AllocatedByPostgres, AllocatedByRust, FromDatum, IntoDatum, PgBox,
     PgTupleDesc, TriggerTuple, TryFromDatumError, WhoAllocated,
@@ -12,16 +14,18 @@ pub enum PgHeapTupleError {
     IncorrectAttributeCount(usize, usize),
 }
 
-/// A [PgHeapTuple] is a lightweight wrapper around Postgres' [pg_sys::HeapTuple] object and a [PgTupleDesc].
+/// A [`PgHeapTuple`] is a lightweight wrapper around Postgres' [`pg_sys::HeapTuple`] object and a [`PgTupleDesc`].
 ///
-/// In order to access the attributes within a [pg_sys::HeapTuple], the [PgTupleDesc] is required
+/// In order to access the attributes within a [`pg_sys::HeapTuple`], the [`PgTupleDesc`] is required
 /// to describe its structure.
 ///
-/// [PgHeapTuple]s can be created from existing (Postgres-provided) [pg_sys::HeapTuple] pointers, from
-/// [pg_sys::TriggerData] pointers, from a composite datum, or created from scratch using raw Datums.
+/// [`PgHeapTuple`]s can be created from existing (Postgres-provided) [`pg_sys::HeapTuple`] pointers, from
+/// [`pg_sys::TriggerData`] pointers, from a composite datum, or created from scratch using raw Datums.
 ///
-/// A [PgHeapTuple] can either be considered to be allocated by Postgres or by the Rust runtime. If
-/// allocated by Postgres, it is not mutable until [PgHeapTuple::into_owned] is called.
+/// A [`PgHeapTuple`] can either be considered to be allocated by Postgres or by the Rust runtime. If
+/// allocated by Postgres, it is not mutable until [`PgHeapTuple::into_owned`] is called.
+/// 
+/// [`PgHeapTuple`]s also describe composite types as defined by [`pgx::composite_type!()`][crate::composite_type].
 pub struct PgHeapTuple<'a, AllocatedBy: WhoAllocated<pg_sys::HeapTupleData>> {
     tuple: PgBox<pg_sys::HeapTupleData, AllocatedBy>,
     tupdesc: PgTupleDesc<'a>,
@@ -363,12 +367,133 @@ impl<'a, AllocatedBy: WhoAllocated<pg_sys::HeapTupleData>> PgHeapTuple<'a, Alloc
     }
 }
 
+/** Composite type support
+
+Support for working with types defined by SQL statements like:
+
+```sql
+CREATE TYPE Dog AS (
+    name TEXT,
+    scritches INT
+);
+```
+
+To PostgreSQL, these types are a [`pgx::pg_sys::HeapTuple`][crate::pg_sys::HeapTuple], which is a
+pointer to a [`pgx::pg_sys::HeapTupleData`][crate::pg_sys::HeapTupleData]. `pgx` provides more idiomatic
+wrapping of this type with [`pgx::heap_tuple::PgHeapTuple`][crate::heap_tuple::PgHeapTuple].
+
+This `composite_type!()` macro expands into a [`pgx::heap_tuple::PgHeapTuple`][crate::heap_tuple::PgHeapTuple].
+
+```rust
+assert_eq!(
+    core::any::TypeId::of::<pgx::composite_type!("Dog")>(),
+    core::any::TypeId::of::<pgx::heap_tuple::PgHeapTuple<'static, ::pgx::AllocatedByRust>>(),
+);
+assert_eq!(
+    core::any::TypeId::of::<pgx::composite_type!('static, "Dog")>(),
+    core::any::TypeId::of::<pgx::heap_tuple::PgHeapTuple<'static, ::pgx::AllocatedByRust>>(),
+);
+const DOG_COMPOSITE_TYPE_IDENT: &str = "Dog";
+assert_eq!(
+    core::any::TypeId::of::<pgx::composite_type!('static, DOG_COMPOSITE_TYPE_IDENT)>(),
+    core::any::TypeId::of::<pgx::heap_tuple::PgHeapTuple<'static, ::pgx::AllocatedByRust>>(),
+);
+```
+
+# Inside a `#[pg_extern]`
+
+Used inside of a [`#[pg_extern]`][crate::pg_extern] definition, this macro alters the generated SQL to use the given
+composite type name.
+
+Meaning that this function:
+
+```rust,no_run
+use pgx::*;
+
+#[pg_extern]
+fn scritch(
+    maybe_dog: Option<::pgx::composite_type!("Dog")>,
+) -> Option<pgx::composite_type!("Dog")> {
+    // Gets resolved to:
+    let maybe_dog: Option<PgHeapTuple<AllocatedByRust>> = maybe_dog;
+
+    let maybe_dog = if let Some(mut dog) = maybe_dog {
+        dog.set_by_name("scritches", dog.get_by_name::<i32>("scritches").unwrap())
+            .unwrap();
+        Some(dog)
+    } else {
+        None
+    };
+
+    maybe_dog
+}
+```
+
+Would generate SQL similar to this:
+
+```SQL
+-- a_bunch_of_dog_functions/src/lib.rs:3
+-- a_bunch_of_dog_functions::scritch
+CREATE FUNCTION "scritch"(
+        "maybe_dog" Dog /* core::option::Option<pgx::heap_tuple::PgHeapTuple<pgx::pgbox::AllocatedByRust>> */
+) RETURNS Dog /* core::option::Option<pgx::heap_tuple::PgHeapTuple<pgx::pgbox::AllocatedByRust>> */
+LANGUAGE c /* Rust */
+AS 'MODULE_PATHNAME', 'scritch_wrapper';
+```
+
+It's possibly to use `composite_type!()` inside a `default!()` macro:
+
+```rust
+use pgx::*;
+
+#[pg_extern]
+fn this_dog_name_or_your_favorite_dog_name(
+    dog: pgx::default!(pgx::composite_type!("Dog"), "ROW('Nami', 0)::Dog"),
+) -> &str {
+    // Gets resolved to:
+    let dog: PgHeapTuple<AllocatedByRust> = dog;
+
+    dog.get_by_name("name").unwrap().unwrap()
+}
+```
+
+Composite types are very **runtime failure** heavy, as opposed to using PostgreSQL types `pgx` has
+a builtin compatable type for, or a [`#[derive(pgx::PostgresType)`][crate::PostgresType] type. Those options
+ can have their shape and API reasoned about at build time.
+
+This runtime failure model is because the shape and layout, or even the name of the type could change during
+the runtime of the extension. 
+
+For example, a user of the extension could do something like:
+
+```sql
+CREATE TYPE Dog AS (
+    name TEXT,
+    scritches INT
+);
+
+CREATE EXTENSION a_bunch_of_dog_functions;
+
+SELECT scritch(ROW('Nami', 0)::Dog);
+
+ALTER TYPE Dog ADD ATTRIBUTE tail_wags INT;
+
+SELECT scritch(ROW('Nami', 0, 0)::Dog);
+```
+
+Because of this, all interaction with composite types requires runtime lookup and type checking.
+
+# Creating composite types
+
+It's possible to create composite types of a given identifier with [`pgx::heap_tuple::PgHeapTuple::new_composite_type`][crate::heap_tuple::PgHeapTuple::new_composite_type].
+
+ */
 #[macro_export]
 macro_rules! composite_type {
     ($lt:lifetime, $composite_type:expr) => {
-        ::pgx::PgHeapTuple<$lt, ::pgx::AllocatedByRust>
+        ::pgx::heap_tuple::PgHeapTuple<$lt, ::pgx::AllocatedByRust>
     };
     ($composite_type:expr) => {
-        ::pgx::PgHeapTuple<'static, ::pgx::AllocatedByRust>
+        ::pgx::heap_tuple::PgHeapTuple<'static, ::pgx::AllocatedByRust>
     };
 }

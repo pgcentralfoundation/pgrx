@@ -10,6 +10,9 @@ use pgx::*;
 
 pg_module_magic!();
 
+// This is used by some, but not all, examples below.
+const DOG_COMPOSITE_TYPE_IDENT: &str = "Dog";
+
 extension_sql!(
     r#"
 CREATE TYPE Dog AS (
@@ -75,7 +78,7 @@ mod arguments {
 
         #[pg_extern]
         fn gets_name_field_variadic(
-            dogs: VariadicArray<pgx::composite_type!("Dog")>,
+            dogs: VariadicArray<pgx::composite_type!(DOG_COMPOSITE_TYPE_IDENT)>,
         ) -> Vec<String> {
             // Gets resolved to:
             let dogs: pgx::VariadicArray<PgHeapTuple<AllocatedByRust>> = dogs;
@@ -129,7 +132,7 @@ mod arguments {
         use super::*;
 
         #[pg_extern]
-        fn sum_scritches_for_names(dogs: Option<Vec<pgx::composite_type!("Dog")>>) -> i32 {
+        fn sum_scritches_for_names(dogs: Option<Vec<pgx::composite_type!(DOG_COMPOSITE_TYPE_IDENT)>>) -> i32 {
             // Gets resolved to:
             let dogs: Option<Vec<PgHeapTuple<AllocatedByRust>>> = dogs;
 
