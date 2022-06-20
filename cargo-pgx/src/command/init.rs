@@ -178,7 +178,7 @@ pub(crate) fn init_pgx(pgx: &Pgx) -> eyre::Result<()> {
 
 #[tracing::instrument(level = "error", skip_all, fields(pg_version = %pg_config.version()?, pgx_home))]
 fn download_postgres(pg_config: &PgConfig, pgx_home: &PathBuf) -> eyre::Result<PgConfig> {
-    use ureq::{AgentBuilder, Proxy};
+    use ureq::{Agent, AgentBuilder, Proxy};
     use env_proxy::for_url_str;
 
     println!(
@@ -190,13 +190,14 @@ fn download_postgres(pg_config: &PgConfig, pgx_home: &PathBuf) -> eyre::Result<P
     );
     let url = pg_config.url().expect("no url for pg_config").as_str();
     tracing::debug!(url = %url, "Fetching");
-    let http_client = {
-        let (host, port) = for_url_str(pg_config.url().expect("no url for pg_config")).host_port().unwrap();
+    let http_client = if let Some((host, port)) = for_url_str(pg_config.url().expect("no url for pg_config")).host_port() {
         AgentBuilder::new().proxy(Proxy::new(format!("https://{host}:{port}"))?).build()
+    } else {
+        Agent::new()
     };
     let http_response = http_client.get(url).call()?;
-    // tracing::trace!(status_code = %http_response.code(), url = %url, "Fetched");
     let status = http_response.status();
+    tracing::trace!(status_code = %status, url = %url, "Fetched");
     if status != 200 {
         return Err(eyre!(
             "Problem downloading {}:\ncode={status}\n{}",
