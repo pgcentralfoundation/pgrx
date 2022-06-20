@@ -89,6 +89,8 @@ impl<'a> PgHeapTuple<'a, AllocatedByRust> {
     /** Create a new heap tuple in the shape of a defined composite type
 
     ```rust,no_run
+    use pgx::*;
+    
     Spi::run("CREATE TYPE dog AS (name text, age int);");
     let mut heap_tuple = PgHeapTuple::new_composite_type("dog").unwrap();
 

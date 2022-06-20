@@ -153,17 +153,22 @@ impl<'a> PgTupleDesc<'a> {
     /** Retrieve the tuple description of the shape of a defined composite type
     
     ```rust,no_run
-    Spi::run("CREATE TYPE dog AS (name text, age int);");
-    let tuple_desc = PgTupleDesc::for_composite_type(type_name);
-    
-    let mut is_null = (0..natts).map(|_| true).collect::<Vec<_>>();
+    use pgx::*;
 
-    let heap_tuple =
-        pg_sys::heap_form_tuple(tuple_desc.as_ptr(), datums, is_null.as_mut_ptr());
+    Spi::run("CREATE TYPE Dog AS (name text, age int);");
+    let tuple_desc = PgTupleDesc::for_composite_type("Dog").unwrap();
+    let natts = tuple_desc.len();
 
-    PgHeapTuple {
-        tuple: PgBox::<pg_sys::HeapTupleData, AllocatedByRust>::from_rust(heap_tuple),
-        tupdesc: tuple_desc,
+    unsafe {
+        let mut is_null = (0..natts).map(|_| true).collect::<Vec<_>>();
+
+        let heap_tuple_data =
+            pg_sys::heap_form_tuple(tuple_desc.as_ptr(), std::ptr::null_mut(), is_null.as_mut_ptr());
+        
+        let heap_tuple = PgHeapTuple::from_heap_tuple(
+            tuple_desc,
+            heap_tuple_data,
+        );
     }
     ```
     */
