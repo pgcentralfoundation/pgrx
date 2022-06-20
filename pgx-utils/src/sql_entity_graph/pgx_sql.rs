@@ -47,7 +47,10 @@ pub enum SqlGraphRelationship {
 pub struct RustToSqlMapping {
     pub rust_type_id_to_sql: std::collections::HashSet<RustSqlMapping>,
     pub rust_source_to_sql: std::collections::HashSet<RustSourceOnlySqlMapping>,
-    pub known_composite_type_collections: std::collections::HashMap<TypeId, bool>, // True if it requires `[]` after it when printed to SQL
+    /// True if it requires `[]` after it when printed to SQL
+    pub composite_type_collections: std::collections::HashMap<TypeId, bool>,
+    /// The internal type acts like the `Option` type, blocking strictness upgrades.
+    pub internal_type: core::any::TypeId,
 }
 
 /// A generator for SQL.
@@ -65,7 +68,8 @@ pub struct RustToSqlMapping {
 pub struct PgxSql {
     pub type_mappings: HashMap<TypeId, RustSqlMapping>,
     pub source_mappings: HashMap<String, RustSourceOnlySqlMapping>,
-    pub known_composite_type_collections: std::collections::HashMap<TypeId, bool>,
+    pub composite_type_collections: std::collections::HashMap<TypeId, bool>,
+    pub internal_type: core::any::TypeId,
     pub control: ControlFile,
     pub graph: StableGraph<SqlGraphEntity, SqlGraphRelationship>,
     pub graph_root: NodeIndex,
@@ -96,7 +100,8 @@ impl PgxSql {
         let RustToSqlMapping {
             rust_type_id_to_sql: type_mappings,
             rust_source_to_sql: source_mappings,
-            known_composite_type_collections,
+            composite_type_collections,
+            internal_type,
         } = sql_mappings;
 
         let mut graph = StableGraph::new();
@@ -248,7 +253,8 @@ impl PgxSql {
                 .into_iter()
                 .map(|x| (x.rust.clone(), x))
                 .collect(),
-            known_composite_type_collections,
+            composite_type_collections,
+            internal_type,
             control: control,
             schemas: mapped_schemas,
             extension_sqls: mapped_extension_sqls,
@@ -548,7 +554,7 @@ impl PgxSql {
     }
 
     pub fn composite_type_requires_square_brackets(&self, ty_id: &TypeId) -> eyre::Result<bool> {
-        self.known_composite_type_collections
+        self.composite_type_collections
             .get(ty_id)
             .cloned()
             .ok_or(eyre!("Not a Composite Type"))

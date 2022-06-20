@@ -25,7 +25,7 @@ use crate::{
 };
 
 use eyre::{eyre, WrapErr};
-use std::cmp::Ordering;
+use std::{cmp::Ordering, any::Any};
 
 /// The output of a [`PgExtern`](crate::sql_entity_graph::pg_extern::PgExtern) from `quote::ToTokens::to_tokens`.
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
@@ -91,16 +91,18 @@ impl ToSql for PgExternEntity {
     fn to_sql(&self, context: &PgxSql) -> eyre::Result<String> {
         let self_index = context.externs[self];
         let mut extern_attrs = self.extern_attrs.clone();
+        
         // if we already have a STRICT marker we do not need to add it
-        let mut strict_upgrade = !extern_attrs.iter().any(|i| i == &ExternArgs::Strict);
-        if strict_upgrade {
+        let mut strict_upgrade = extern_attrs.iter().any(|i| i == &ExternArgs::Strict);
+        if !strict_upgrade {
+            // It may be possible to infer a `STRICT` marker though.
+            // But we can only do that if the user hasn't used `Option<T>` or `pgx::Internal`
             for arg in &self.fn_args {
-                if arg.is_optional {
+                if arg.is_optional || arg.ty.type_id() == context.internal_type {
                     strict_upgrade = false;
                 }
             }
         }
-
         if strict_upgrade {
             extern_attrs.push(ExternArgs::Strict);
         }

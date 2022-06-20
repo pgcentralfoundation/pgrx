@@ -241,7 +241,7 @@ pub static DEFAULT_RUST_TYPE_ID_TO_SQL: Lazy<HashSet<RustSqlMapping>> = Lazy::ne
 /// The default lookup for if composite types are a collection or not
 ///
 /// This is primarily used to determine if they need `[]` in SQL generation.
-pub static DEFAULT_KNOWN_COMPOSITE_TYPE_COLLECTIONS: Lazy<std::collections::HashMap<TypeId, bool>> =
+pub static DEFAULT_COMPOSITE_TYPE_COLLECTIONS: Lazy<std::collections::HashMap<TypeId, bool>> =
     Lazy::new(|| {
         let mut m = std::collections::HashMap::new();
 
@@ -414,8 +414,9 @@ macro_rules! pg_sql_graph_magic {
             ::pgx::utils::sql_entity_graph::RustToSqlMapping {
                 rust_type_id_to_sql: ::pgx::DEFAULT_RUST_TYPE_ID_TO_SQL.clone(),
                 rust_source_to_sql: ::pgx::DEFAULT_RUST_SOURCE_TO_SQL.clone(),
-                known_composite_type_collections: ::pgx::DEFAULT_KNOWN_COMPOSITE_TYPE_COLLECTIONS
+                composite_type_collections: ::pgx::DEFAULT_COMPOSITE_TYPE_COLLECTIONS
                     .clone(),
+                internal_type: core::any::TypeId::of::<::pgx::Internal>(),
             }
         }
 
