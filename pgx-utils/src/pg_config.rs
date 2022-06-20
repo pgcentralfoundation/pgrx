@@ -414,7 +414,7 @@ mod rss {
     use crate::pg_config::PgVersion;
     use eyre::WrapErr;
     use owo_colors::OwoColorize;
-    use ureq::{AgentBuilder, Proxy};
+    use ureq::{Agent, AgentBuilder, Proxy};
     use serde_derive::Deserialize;
     use url::Url;
     use env_proxy::for_url_str;
