@@ -75,6 +75,9 @@ impl Returning {
     }
 
     fn parse_type_tuple(type_tuple: &mut syn::TypeTuple) -> Result<Returning, syn::Error> {
+        if type_tuple.elems.len() == 0 {
+            return Ok(Returning::None);
+        }
         let returns: Vec<ReturningIteratedItem> = type_tuple
             .elems
             .iter_mut()
