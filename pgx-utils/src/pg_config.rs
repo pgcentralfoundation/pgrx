@@ -412,12 +412,12 @@ impl Pgx {
 
 mod rss {
     use crate::pg_config::PgVersion;
+    use env_proxy::for_url_str;
     use eyre::WrapErr;
     use owo_colors::OwoColorize;
-    use ureq::{Agent, AgentBuilder, Proxy};
     use serde_derive::Deserialize;
+    use ureq::{Agent, AgentBuilder, Proxy};
     use url::Url;
-    use env_proxy::for_url_str;
 
     pub(super) struct PostgreSQLVersionRss;
 
@@ -425,14 +425,18 @@ mod rss {
         pub(super) fn new(supported_major_versions: &[u16]) -> eyre::Result<Vec<PgVersion>> {
             static VERSIONS_RSS_URL: &str = "https://www.postgresql.org/versions.rss";
 
-            let http_client = if let Some((host, port)) = for_url_str(VERSIONS_RSS_URL).host_port() {
-                AgentBuilder::new().proxy(Proxy::new(format!("https://{host}:{port}"))?).build()
+            let http_client = if let Some((host, port)) = for_url_str(VERSIONS_RSS_URL).host_port()
+            {
+                AgentBuilder::new()
+                    .proxy(Proxy::new(format!("https://{host}:{port}"))?)
+                    .build()
             } else {
                 Agent::new()
             };
 
             let response = http_client
-                .get(VERSIONS_RSS_URL).call()
+                .get(VERSIONS_RSS_URL)
+                .call()
                 .wrap_err_with(|| format!("unable to retrieve {}", VERSIONS_RSS_URL))?;
 
             let rss: Rss = match serde_xml_rs::from_str(&response.into_string()?) {
