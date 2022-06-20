@@ -20,7 +20,6 @@ env_proxy = "0.4.1"
 proc-macro2 = { version = "1.0.39", features = [ "span-locations" ] }
 quote = "1.0.18"
 regex = "1.5.5"
-rttp_client = "0.1.0"
 serde = { version = "1.0.137", features = [ "derive" ] }
 serde_derive = "1.0.137"
 serde-xml-rs = "0.5.1"
@@ -29,6 +28,7 @@ syn = { version = "1.0.95", features = [ "extra-traits", "full", "fold", "parsin
 syntect = { version = "5.0.0", default-features = false, features = ["default-fancy"] }
 toml = "0.5.9"
 unescape = "0.1.0"
+ureq = "2.4.0"
 url = "2.2.2"
 eyre = "0.6.8"
 tracing = "0.1.34"
