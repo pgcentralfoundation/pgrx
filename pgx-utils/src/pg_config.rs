@@ -414,7 +414,7 @@ mod rss {
     use crate::pg_config::PgVersion;
     use eyre::WrapErr;
     use owo_colors::OwoColorize;
-    use ureq::{AgentBuilder, Proxy};
+    use ureq::{Agent, AgentBuilder, Proxy};
     use serde_derive::Deserialize;
     use url::Url;
     use env_proxy::for_url_str;
@@ -425,9 +425,10 @@ mod rss {
         pub(super) fn new(supported_major_versions: &[u16]) -> eyre::Result<Vec<PgVersion>> {
             static VERSIONS_RSS_URL: &str = "https://www.postgresql.org/versions.rss";
 
-            let http_client = {
-                let (host, port) = for_url_str(VERSIONS_RSS_URL).host_port().unwrap();
+            let http_client = if let Some((host, port)) = for_url_str(pg_config.url().expect("no url for pg_config")).host_port() {
                 AgentBuilder::new().proxy(Proxy::new(format!("https://{host}:{port}"))?).build()
+            } else {
+                Agent::new()
             };
 
             let response = http_client
