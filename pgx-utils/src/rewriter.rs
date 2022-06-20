@@ -714,7 +714,8 @@ impl FunctionSignatureRewriter {
                 FnArg::Typed(ty) => match ty.pat.deref() {
                     Pat::Ident(ident) => {
                         let name = Ident::new(&format!("{}_", ident.ident), ident.span());
-                        let mut type_ = ty.ty.clone();
+                        let type_ = ty.ty.clone();
+                        let (mut type_, _, _, _, _) = crate::sql_entity_graph::pg_extern::resolve_ty(*type_).unwrap();
                         let is_option = type_matches(&type_, "Option");
 
                         let ts = if is_option {
@@ -730,6 +731,12 @@ impl FunctionSignatureRewriter {
                         {
                             quote_spanned! {ident.span()=>
                                 let #name = #fcinfo_ident;
+                            }
+                        } else if type_matches(&type_, "()")
+                        {
+                            quote_spanned! {ident.span()=>
+                                debug_assert!(pgx::pg_getarg::<()>(#fcinfo_ident, #i).is_none(), "A `()` argument should always recieve `NULL`");
+                                let #name: () = ();
                             }
                         } else if is_raw {
                             quote_spanned! {ident.span()=>
