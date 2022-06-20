@@ -178,8 +178,8 @@ pub(crate) fn init_pgx(pgx: &Pgx) -> eyre::Result<()> {
 
 #[tracing::instrument(level = "error", skip_all, fields(pg_version = %pg_config.version()?, pgx_home))]
 fn download_postgres(pg_config: &PgConfig, pgx_home: &PathBuf) -> eyre::Result<PgConfig> {
-    use ureq::{Agent, AgentBuilder, Proxy};
     use env_proxy::for_url_str;
+    use ureq::{Agent, AgentBuilder, Proxy};
 
     println!(
         "{} Postgres v{}.{} from {}",
@@ -190,8 +190,12 @@ fn download_postgres(pg_config: &PgConfig, pgx_home: &PathBuf) -> eyre::Result<P
     );
     let url = pg_config.url().expect("no url for pg_config").as_str();
     tracing::debug!(url = %url, "Fetching");
-    let http_client = if let Some((host, port)) = for_url_str(pg_config.url().expect("no url for pg_config")).host_port() {
-        AgentBuilder::new().proxy(Proxy::new(format!("https://{host}:{port}"))?).build()
+    let http_client = if let Some((host, port)) =
+        for_url_str(pg_config.url().expect("no url for pg_config")).host_port()
+    {
+        AgentBuilder::new()
+            .proxy(Proxy::new(format!("https://{host}:{port}"))?)
+            .build()
     } else {
         Agent::new()
     };

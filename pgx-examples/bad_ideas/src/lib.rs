@@ -55,7 +55,9 @@ fn http(url: &str) -> String {
         .call()
         .expect("invalid http response");
 
-    response.into_string().expect("invalid string from response")
+    response
+        .into_string()
+        .expect("invalid string from response")
 }
 
 #[pg_extern]
