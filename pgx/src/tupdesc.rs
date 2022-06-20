@@ -10,6 +10,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 //! Provides a safe wrapper around Postgres' `pg_sys::TupleDescData` struct
 use crate::{pg_sys, void_mut_ptr, PgBox, PgRelation};
 
+use pgx_pg_sys::AsPgCStr;
 use std::ops::Deref;
 
 /// This struct is passed around within the backend to describe the structure
@@ -96,7 +97,7 @@ impl<'a> PgTupleDesc<'a> {
     ///
     /// This method is unsafe as we cannot validate that the provided `pg_sys::TupleDesc` is valid
     /// or requires reference counting.
-    pub unsafe fn from_pg_copy<'b>(ptr: pg_sys::TupleDesc) -> PgTupleDesc<'b> {
+    pub unsafe fn from_rust_copy<'b>(ptr: pg_sys::TupleDesc) -> PgTupleDesc<'b> {
         PgTupleDesc {
             // SAFETY:  pg_sys::CreateTupleDescCopyConstr will be returning a valid pointer
             tupdesc: PgBox::from_pg(pg_sys::CreateTupleDescCopyConstr(ptr)),
@@ -106,7 +107,7 @@ impl<'a> PgTupleDesc<'a> {
         }
     }
 
-    /// Similar to `::from_pg_copy()`, but assumes the provided `TupleDesc` is already a copy.
+    /// Similar to `::from_rust_copy()`, but assumes the provided `TupleDesc` is already a copy.
     ///
     /// When this instance is dropped, the TupleDesc is `pfree()`'d
     ///
@@ -116,7 +117,7 @@ impl<'a> PgTupleDesc<'a> {
     /// use pgx::{pg_sys, PgTupleDesc};
     /// let typid = 42 as pg_sys::Oid;  // a valid pg_type "oid" value
     /// let typmod = 0; // it's corresponding typemod value
-    /// let tupdesc = unsafe { PgTupleDesc::from_pg_is_copy(pg_sys::lookup_rowtype_tupdesc_copy(typid, typmod)) };
+    /// let tupdesc = unsafe { PgTupleDesc::from_rust(pg_sys::lookup_rowtype_tupdesc_copy(typid, typmod)) };
     ///
     /// // assert the tuple descriptor has 12 attributes
     /// assert_eq!(tupdesc.len(), 12);
@@ -129,7 +130,7 @@ impl<'a> PgTupleDesc<'a> {
     ///
     /// This method is unsafe as we cannot validate that the provided `pg_sys::TupleDesc` is valid
     /// or is actually a copy that requires a `pfree()` on Drop.
-    pub unsafe fn from_pg_is_copy<'b>(ptr: pg_sys::TupleDesc) -> PgTupleDesc<'b> {
+    pub unsafe fn from_rust<'b>(ptr: pg_sys::TupleDesc) -> PgTupleDesc<'b> {
         PgTupleDesc {
             tupdesc: PgBox::from_pg(ptr),
             parent: None,
@@ -146,6 +147,44 @@ impl<'a> PgTupleDesc<'a> {
             parent: Some(parent),
             need_release: false,
             need_pfree: false,
+        }
+    }
+
+    /** Retrieve the tuple description of the shape of a defined composite type
+    
+    ```rust,no_run
+    use pgx::*;
+
+    Spi::run("CREATE TYPE Dog AS (name text, age int);");
+    let tuple_desc = PgTupleDesc::for_composite_type("Dog").unwrap();
+    let natts = tuple_desc.len();
+
+    unsafe {
+        let mut is_null = (0..natts).map(|_| true).collect::<Vec<_>>();
+
+        let heap_tuple_data =
+            pg_sys::heap_form_tuple(tuple_desc.as_ptr(), std::ptr::null_mut(), is_null.as_mut_ptr());
+        
+        let heap_tuple = PgHeapTuple::from_heap_tuple(
+            tuple_desc,
+            heap_tuple_data,
+        );
+    }
+    ```
+    */
+    pub fn for_composite_type(name: &str) -> Option<PgTupleDesc<'a>> {
+        unsafe {
+            let mut typoid = 0;
+            let mut typmod = 0;
+            pg_sys::parseTypeString(name.as_pg_cstr(), &mut typoid, &mut typmod, true);
+
+            if typoid == pg_sys::InvalidOid {
+                return None;
+            }
+
+            let tuple_desc = pg_sys::lookup_rowtype_tupdesc(typoid, typmod);
+            // It's important to make a copy of the tupledesc: https://www.postgresql.org/message-id/flat/24471.1136768659%40sss.pgh.pa.us
+            Some(PgTupleDesc::from_rust_copy(tuple_desc))
         }
     }
 
