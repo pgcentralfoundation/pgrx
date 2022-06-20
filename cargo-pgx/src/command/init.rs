@@ -16,11 +16,10 @@ use pgx_utils::{
     prefix_path, SUPPORTED_MAJOR_VERSIONS,
 };
 use rayon::prelude::*;
-use rttp_client::{types::Proxy, HttpClient};
 
 use std::collections::HashMap;
 use std::fs::File;
-use std::io::Write;
+use std::io::{Read, Write};
 use std::path::PathBuf;
 use std::process::Stdio;
 
@@ -179,6 +178,9 @@ pub(crate) fn init_pgx(pgx: &Pgx) -> eyre::Result<()> {
 
 #[tracing::instrument(level = "error", skip_all, fields(pg_version = %pg_config.version()?, pgx_home))]
 fn download_postgres(pg_config: &PgConfig, pgx_home: &PathBuf) -> eyre::Result<PgConfig> {
+    use ureq::{AgentBuilder, Proxy};
+    use env_proxy::for_url_str;
+
     println!(
         "{} Postgres v{}.{} from {}",
         "  Downloading".bold().green(),
@@ -188,24 +190,23 @@ fn download_postgres(pg_config: &PgConfig, pgx_home: &PathBuf) -> eyre::Result<P
     );
     let url = pg_config.url().expect("no url for pg_config").as_str();
     tracing::debug!(url = %url, "Fetching");
-    let mut http_client = HttpClient::new();
-    http_client.get().url(url);
-    if let Some((host, port)) =
-        env_proxy::for_url_str(pg_config.url().expect("no url for pg_config")).host_port()
-    {
-        http_client.proxy(Proxy::https(host, port as u32));
-    }
-    let http_response = http_client.emit()?;
-    tracing::trace!(status_code = %http_response.code(), url = %url, "Fetched");
-    if http_response.code() != 200 {
+    let http_client = {
+        let (host, port) = for_url_str(pg_config.url().expect("no url for pg_config")).host_port().unwrap();
+        AgentBuilder::new().proxy(Proxy::new(format!("https://{host}:{port}"))?).build()
+    };
+    let http_response = http_client.get(url).call()?;
+    // tracing::trace!(status_code = %http_response.code(), url = %url, "Fetched");
+    let status = http_response.status();
+    if status != 200 {
         return Err(eyre!(
-            "Problem downloading {}:\ncode={}\n{}",
+            "Problem downloading {}:\ncode={status}\n{}",
             pg_config.url().unwrap().to_string().yellow().bold(),
-            http_response.code(),
-            http_response.body().to_string()
+            http_response.into_string()?
         ));
     }
-    let pgdir = untar(http_response.body().binary(), pgx_home, pg_config)?;
+    let mut buf = Vec::new();
+    let _count = http_response.into_reader().read_to_end(&mut buf)?;
+    let pgdir = untar(&buf, pgx_home, pg_config)?;
     configure_postgres(pg_config, &pgdir)?;
     make_postgres(pg_config, &pgdir)?;
     make_install_postgres(pg_config, &pgdir) // returns a new PgConfig object

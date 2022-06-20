@@ -414,9 +414,7 @@ mod rss {
     use crate::pg_config::PgVersion;
     use eyre::WrapErr;
     use owo_colors::OwoColorize;
-    use ureq::Agent as HttpClient;
-    use ureq;
-    use ureq::Proxy;
+    use ureq::{AgentBuilder, Proxy};
     use serde_derive::Deserialize;
     use url::Url;
     use env_proxy::for_url_str;
@@ -429,7 +427,7 @@ mod rss {
 
             let http_client = {
                 let (host, port) = for_url_str(VERSIONS_RSS_URL).host_port().unwrap();
-                ureq::AgentBuilder::new().proxy(Proxy::new(format!("https://{host}:{port}"))?).build()
+                AgentBuilder::new().proxy(Proxy::new(format!("https://{host}:{port}"))?).build()
             };
 
             let response = http_client

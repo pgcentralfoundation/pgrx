@@ -50,13 +50,12 @@ fn write_file(filename: &str, bytes: &[u8]) -> i64 {
 
 #[pg_extern]
 fn http(url: &str) -> String {
-    let response = rttp_client::HttpClient::new()
-        .get()
-        .url(url)
-        .emit()
+    let response = ureq::Agent::new()
+        .get(url)
+        .call()
         .expect("invalid http response");
 
-    response.to_string()
+    response.into_string().expect("invalid string from response")
 }
 
 #[pg_extern]
