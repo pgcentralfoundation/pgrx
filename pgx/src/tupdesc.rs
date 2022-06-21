@@ -185,7 +185,7 @@ impl<'a> PgTupleDesc<'a> {
             // It's important to make a copy of the tupledesc: https://www.postgresql.org/message-id/flat/24471.1136768659%40sss.pgh.pa.us
             let tuple_desc = pg_sys::lookup_rowtype_tupdesc_copy(typoid, typmod);
             
-            Some(PgTupleDesc::from_rust(tuple_desc))
+            Some(PgTupleDesc::from_rust_copy(tuple_desc))
         }
     }
 

@@ -234,9 +234,8 @@ mod arguments {
                 let dog = dog.unwrap();
                 let scritches: i32 = dog
                     .get_by_name("scritches")
-                    .ok()
-                    .unwrap_or_default()
-                    .unwrap_or_default();
+                    .unwrap()
+                    .unwrap();
                 sum_scritches += scritches;
             }
             sum_scritches
@@ -530,7 +529,7 @@ mod tests {
         let retval = Spi::get_one::<i32>("
             SELECT sum_scritches_for_names_optional_items(ARRAY[ROW('Nami', 1), ROW('Brandy', 42)]::Dog[])
         ").expect("SQL select failed");
-        assert_eq!(retval, 0);
+        assert_eq!(retval, 43);
     }
 
     #[pg_test]
@@ -569,7 +568,7 @@ mod tests {
     #[pg_test]
     fn test_scritch() {
         let retval = Spi::get_one::<PgHeapTuple<'_, AllocatedByRust>>("
-            SELECT scritch(ROW('Nami', 1))
+            SELECT scritch(ROW('Nami', 1)::Dog)
         ").expect("SQL select failed");
         assert_eq!(retval.get_by_name("name").unwrap(), Some("Nami"));
         assert_eq!(retval.get_by_name("scritches").unwrap(), Some(2));
@@ -578,7 +577,7 @@ mod tests {
     #[pg_test]
     fn test_scritch_strict() {
         let retval = Spi::get_one::<PgHeapTuple<'_, AllocatedByRust>>("
-            SELECT scritch_strict(ROW('Nami', 1))
+            SELECT scritch_strict(ROW('Nami', 1)::Dog)
         ").expect("SQL select failed");
         assert_eq!(retval.get_by_name("name").unwrap(), Some("Nami"));
         assert_eq!(retval.get_by_name("scritches").unwrap(), Some(2));
@@ -587,7 +586,7 @@ mod tests {
     #[pg_test]
     fn test_new_composite_type() {
         Spi::run("CREATE TYPE DogWithAge AS (name text, age int);");
-        let mut heap_tuple = PgHeapTuple::new_composite_type("dog").unwrap();
+        let mut heap_tuple = PgHeapTuple::new_composite_type("DogWithAge").unwrap();
 
         assert_eq!(heap_tuple.get_by_name::<String>("name").unwrap(), None);
         assert_eq!(heap_tuple.get_by_name::<i32>("age").unwrap(), None);
