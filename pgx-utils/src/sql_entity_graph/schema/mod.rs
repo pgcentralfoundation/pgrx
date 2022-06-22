@@ -43,7 +43,7 @@ pub struct Schema {
 impl Parse for Schema {
     fn parse(input: ParseStream) -> Result<Self, syn::Error> {
         let module: ItemMod = input.parse()?;
-
+        crate::ident_is_acceptable_to_postgres(&module.ident)?;
         Ok(Self { module })
     }
 }
@@ -54,6 +54,7 @@ impl ToTokens for Schema {
         let vis = &self.module.vis;
         let mod_token = &self.module.mod_token;
         let ident = &self.module.ident;
+
         let (_content_brace, content_items) = &self
             .module
             .content

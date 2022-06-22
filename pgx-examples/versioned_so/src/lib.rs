@@ -16,7 +16,6 @@ mod tests {
     fn test_hello_versioned_so() {
         assert_eq!("Hello, versioned_so", crate::hello_versioned_so());
     }
-
 }
 
 #[cfg(test)]

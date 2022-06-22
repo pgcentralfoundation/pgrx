@@ -2,9 +2,7 @@ use crate::{
     heap_tuple::PgHeapTuple,
     pg_sys,
     pgbox::AllocatedByPostgres,
-    trigger_support::{
-        PgTriggerLevel, PgTriggerOperation, PgTriggerWhen, TriggerEvent,
-    },
+    trigger_support::{PgTriggerLevel, PgTriggerOperation, PgTriggerWhen, TriggerEvent},
 };
 
 pub struct PgTriggerSafe<'a> {

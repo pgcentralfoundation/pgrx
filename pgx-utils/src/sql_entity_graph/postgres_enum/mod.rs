@@ -53,13 +53,17 @@ impl PostgresEnum {
         generics: Generics,
         variants: Punctuated<syn::Variant, Token![,]>,
         to_sql_config: ToSqlConfig,
-    ) -> Self {
-        Self {
+    ) -> Result<Self, syn::Error> {
+        if !to_sql_config.overrides_default() {
+            crate::ident_is_acceptable_to_postgres(&name)?;
+        }
+
+        Ok(Self {
             name,
             generics,
             variants,
             to_sql_config,
-        }
+        })
     }
 
     pub fn from_derive_input(derive_input: DeriveInput) -> Result<Self, syn::Error> {
@@ -71,12 +75,12 @@ impl PostgresEnum {
                 return Err(syn::Error::new(derive_input.ident.span(), "expected enum"))
             }
         };
-        Ok(Self::new(
+        Self::new(
             derive_input.ident,
             derive_input.generics,
             data_enum.variants,
             to_sql_config,
-        ))
+        )
     }
 }
 
@@ -85,12 +89,12 @@ impl Parse for PostgresEnum {
         let parsed: ItemEnum = input.parse()?;
         let to_sql_config =
             ToSqlConfig::from_attributes(parsed.attrs.as_slice())?.unwrap_or_default();
-        Ok(Self::new(
+        Self::new(
             parsed.ident,
             parsed.generics,
             parsed.variants,
             to_sql_config,
-        ))
+        )
     }
 }
 
