@@ -69,7 +69,7 @@ impl Returning {
                             "name" => {
                                 let out: NameMacro = mac
                                     .parse_body()
-                                    .expect(&*format!("Failed to parse named!(): {:?}", mac));
+                                    .expect(&*format!("Failed to parse name!(): {:?}", mac));
                                 Some((out.ty, Some(out.ident)))
                             }
                             _ => unimplemented!("Don't support anything other than name."),

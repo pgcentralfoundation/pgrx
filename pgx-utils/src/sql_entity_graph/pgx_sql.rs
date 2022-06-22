@@ -932,15 +932,7 @@ fn connect_externs(
     triggers: &HashMap<PgTriggerEntity, NodeIndex>,
 ) -> eyre::Result<()> {
     for (item, &index) in externs {
-        make_schema_connection(
-            graph,
-            "Extern",
-            index,
-            &item.rust_identifier(),
-            item.module_path,
-            schemas,
-        );
-
+        let mut found_schema_declaration = false;
         for extern_attr in &item.extern_attrs {
             match extern_attr {
                 crate::ExternArgs::Requires(requirements) => {
@@ -960,9 +952,32 @@ fn connect_externs(
                             return Err(eyre!("Could not find `requires` target: {:?}", requires));
                         }
                     }
-                }
+                },
+                crate::ExternArgs::Schema(declared_schema_name) => {
+                    for (schema, schema_index) in schemas {
+                        if schema.name == declared_schema_name {
+                            tracing::debug!(from = ?item.rust_identifier(), to = schema.module_path, "Adding Extern after Schema edge.");
+                            graph.add_edge(*schema_index, index, SqlGraphRelationship::RequiredBy);
+                            found_schema_declaration = true;
+                        }
+                    }
+                    if !found_schema_declaration {
+                        return Err(eyre!("Got manual `schema = \"{declared_schema_name}\"` setting, but that schema did not exist."))
+                    }
+                },
                 _ => (),
             }
+        }
+
+        if !found_schema_declaration {
+            make_schema_connection(
+                graph,
+                "Extern",
+                index,
+                &item.rust_identifier(),
+                item.module_path,
+                schemas,
+            );
         }
 
         for arg in &item.fn_args {
