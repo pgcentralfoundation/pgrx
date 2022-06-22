@@ -24,7 +24,7 @@ pub use oids::*;
 pub use tupdesc::*;
 pub use utils::*;
 
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "postgres"))]
 extern "C" {
     #[link_name = "__sigsetjmp"]
     pub(crate) fn sigsetjmp(
