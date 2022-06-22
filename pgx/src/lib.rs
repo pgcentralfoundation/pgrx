@@ -234,6 +234,7 @@ pub static DEFAULT_RUST_TYPE_ID_TO_SQL: Lazy<HashSet<RustSqlMapping>> = Lazy::ne
     map_type!(m, datum::AnyArray, "anyarray");
     map_type!(m, datum::Inet, "inet");
     map_type!(m, datum::Uuid, "uuid");
+    map_type!(m, pgx_pg_sys::FdwRoutine, "fdw_handler");
 
     m
 });
