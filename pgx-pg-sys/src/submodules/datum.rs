@@ -44,6 +44,7 @@ impl Datum {
     /// Assume the datum is a value and extract the bits from
     /// the memory address, interpreting them as an integer.
     pub fn value(self) -> usize {
+        #[allow(unstable_name_collisions)]
         self.0.addr()
     }
 
@@ -59,18 +60,21 @@ impl Datum {
 
     /// Assume the datum is a pointer and cast it to point to T.
     pub fn ptr_cast<T>(self) -> *mut T {
+        #[allow(unstable_name_collisions)]
         self.0.cast()
     }
 }
 
 impl From<usize> for Datum {
     fn from(val: usize) -> Datum {
+        #[allow(unstable_name_collisions)]
         Datum(NonNull::<DatumBlob>::dangling().as_ptr().with_addr(val))
     }
 }
 
 impl From<Datum> for usize {
     fn from(val: Datum) -> usize {
+        #[allow(unstable_name_collisions)]
         val.0.addr()
     }
 }
