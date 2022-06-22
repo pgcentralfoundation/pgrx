@@ -19,28 +19,45 @@ impl PgTrigger {
         func: ItemFn,
         attributes: syn::punctuated::Punctuated<PgTriggerAttribute, Token![,]>,
     ) -> Result<Self, syn::Error> {
-        if attributes.len() > 1 {
-            return Err(syn::Error::new(
-                Span::call_site(),
-                "Multiple `sql` arguments found, it must be unique",
-            ))
-        };
-        let to_sql_config = attributes.first().cloned().map(|PgTriggerAttribute::Sql(mut config)| {
-                if let Some(ref mut content) = config.content {
+        let to_sql_config = {
+            let mut found = None;
+            for attribute in attributes.iter() {
+                match attribute {
+                    &PgTriggerAttribute::Sql(ref to_sql_config) if found.is_none() => {
+                        found = Some(to_sql_config.clone())
+                    }
+                    &PgTriggerAttribute::Sql(_) if found.is_some() => {
+                        return Err(syn::Error::new(
+                            Span::call_site(),
+                            "Multiple `sql` arguments found, it must be unique",
+                        ))
+                    }
+                    _ => (),
+                }
+            }
+
+            if let Some(ref mut found) = found {
+                if let Some(ref mut content) = found.content {
                     let value = content.value();
-                    let updated_value = value
-                        .replace("@FUNCTION_NAME@", &*(func.sig.ident.to_string() + "_wrapper"))
-                        + "\n";
+                    let updated_value = value.replace(
+                        "@FUNCTION_NAME@",
+                        &*(func.sig.ident.to_string() + "_wrapper"),
+                    ) + "\n";
                     *content = syn::LitStr::new(&updated_value, Span::call_site());
-                };
-                config
-            }).unwrap_or_default();
+                }
+            }
+
+            found.unwrap_or_default()
+        };
 
         if !to_sql_config.overrides_default() {
             crate::ident_is_acceptable_to_postgres(&func.sig.ident)?;
         }
 
-        Ok(Self { func, to_sql_config })
+        Ok(Self {
+            func,
+            to_sql_config,
+        })
     }
 
     pub fn entity_tokens(&self) -> Result<ItemFn, syn::Error> {

@@ -150,16 +150,7 @@ impl ToSqlConfig {
     }
 
     pub fn overrides_default(&self) -> bool {
-        if self.enabled == false {
-            return true
-        }
-        if self.callback.is_some() {
-            return true
-        }
-        if self.content.is_some() {
-            return true
-        }
-        false
+        self.enabled == false || self.callback.is_some() || self.content.is_some()
     }
 }
 

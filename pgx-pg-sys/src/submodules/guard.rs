@@ -12,8 +12,8 @@ Use of this source code is governed by the MIT license that can be found in the 
 use crate::FlushErrorState;
 use std::any::Any;
 use std::cell::Cell;
-use std::panic::catch_unwind;
 use std::mem;
+use std::panic::catch_unwind;
 
 extern "C" {
     fn pg_re_throw();

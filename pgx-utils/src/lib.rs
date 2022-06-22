@@ -568,18 +568,18 @@ pub fn versioned_so_name(extension_name: &str, extension_version: &str) -> Strin
 }
 
 /// Roughly `pgx::pg_sys::NAMEDATALEN`
-/// 
+///
 /// Technically it **should** be that exactly, however this is `pgx-utils` and a this data is used at macro time.
 const POSTGRES_IDENTIFIER_MAX_LEN: usize = 64;
 
 /// Validate that a given ident is acceptable to PostgreSQL
-/// 
+///
 /// PostgreSQL places some restrictions on identifiers for things like functions.
-/// 
+///
 /// Namely:
-/// 
+///
 /// * It must be less than 64 characters
-/// 
+///
 // This list is incomplete, you could expand it!
 pub fn ident_is_acceptable_to_postgres(ident: &syn::Ident) -> Result<(), syn::Error> {
     let ident_string = ident.to_string();
