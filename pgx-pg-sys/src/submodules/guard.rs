@@ -72,6 +72,36 @@ fn take_panic_location() -> PanicLocation {
 }
 
 pub fn register_pg_guard_panic_hook() {
+    panic_hook_impl()
+}
+
+#[cfg(not(feature = "postgrestd"))]
+#[inline(always)]
+fn panic_hook_impl() {
+    std::panic::set_hook(Box::new(|info| {
+        PANIC_LOCATION.with(|p| {
+            let existing = p.take();
+
+            p.replace(if existing.is_none() {
+                match info.location() {
+                    Some(location) => Some(PanicLocation {
+                        file: location.file().to_string(),
+                        line: location.line(),
+                        col: location.column(),
+                    }),
+                    None => None,
+                }
+            } else {
+                existing
+            })
+        });
+    }))
+}
+
+// Hook differentiation for integrating with the Postgres runtime.
+#[cfg(feature = "postgrestd")]
+#[inline(always)]
+fn panic_hook_impl() {
     std::panic::set_hook(Box::new(|info| {
         PANIC_LOCATION.with(|p| {
             let existing = p.take();
