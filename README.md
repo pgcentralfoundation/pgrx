@@ -8,7 +8,7 @@
 [![crates.io badge](https://img.shields.io/crates/v/pgx.svg)](https://crates.io/crates/pgx)
 [![docs.rs badge](https://docs.rs/pgx/badge.svg)](https://docs.rs/pgx)
 [![Twitter Follow](https://img.shields.io/twitter/follow/zombodb.svg?style=flat)](https://twitter.com/zombodb)
-[![Discord Chat](https://img.shields.io/discord/561648697805504526.svg)](https://discord.gg/hPb93Y9)
+[![Discord Chat](https://img.shields.io/discord/561648697805504526.svg)][Discord]
 
 
 `pgx` is a framework for developing PostgreSQL extensions in Rust and strives to be as idiomatic and safe as possible.
@@ -225,6 +225,26 @@ but it doesn't automatically generate any of the DDL for them.  This too likely 
 will be built into the `cargo-pgx` subcommand and make use of https://github.com/zombodb/postgres-parser.
  - More examples -- especially around memory management and the various derive macros `#[derive(PostgresType/Enum)]`
 
+## Experimental Features
+
+Adding `pgx = { version = "0.5.0-beta.0", features = ["postgrestd"] }` to your Cargo.toml
+will enable a **highly** experimental variant of `pgx` designed for integration with `postgrestd`,
+a modified Rust standard library that executes the Rust runtime atop the Postgres runtime,
+instead of using the operating system's ordinary C runtime.
+This reduces the programmatic and performance impedance between Rust and Postgres.
+This feature is neither complete, nor is it completely enabled just by enabling the feature,
+as it requires additional code not in this crate in the form of the modified sysroot.
+
+Because the `postgrestd` feature is designed around control over `std`,
+some of `pgx`'s insulating guard code around the C FFI with Postgres is disabled.
+Combined with its "pre-alpha" stage, you should assume this feature can enable undefined behavior,
+even if you know what you are doing. Especially if you know exactly what you're doing, in fact,
+as that almost certainly means you are developing this feature,
+and further extending both runtimes in ways neither initially had imagined.
+If you absolutely must enable this feature, you may wish to discuss it first on [Discord].
+
+As a reminder: "THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND..."
+
 ## Contributing
 
 We are most definitely open to contributions of any kind.  Bug Reports, Feature Requests, Documentation,
@@ -245,3 +265,5 @@ Portions Copyright 2021-2022 Technology Concepts & Design, Inc. <support@tcdi.co
 All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 ```
+
+[Discord]: https://discord.gg/hPb93Y9
