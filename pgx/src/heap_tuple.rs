@@ -327,8 +327,8 @@ impl<'a, AllocatedBy: WhoAllocated<pg_sys::HeapTupleData>> PgHeapTuple<'a, Alloc
     pub fn into_composite_datum(self) -> Option<pg_sys::Datum> {
         unsafe {
             Some(pg_sys::heap_copy_tuple_as_datum(
-                self.tuple.into_pg(),
-                self.tupdesc.into_pg(),
+                self.tuple.as_ptr(),
+                self.tupdesc.as_ptr(),
             ))
         }
     }
@@ -428,8 +428,10 @@ impl<'a, AllocatedBy: WhoAllocated<pg_sys::HeapTupleData>> PgHeapTuple<'a, Alloc
                     if datum.is_none() {
                         return Ok(None);
                     }
-
-                    T::try_from_datum(datum.unwrap(), false, att.type_oid().value())
+                    match T::type_oid() {
+                        record @ pg_sys::RECORDOID => T::try_from_datum(datum.unwrap(), false, record),
+                        _ => T::try_from_datum(datum.unwrap(), false, att.type_oid().value()),
+                    }
                 }
             }
         }
