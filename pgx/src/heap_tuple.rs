@@ -4,9 +4,9 @@
 use crate::{
     heap_getattr_raw, pg_sys, AllocatedByPostgres, AllocatedByRust, FromDatum, IntoDatum, PgBox,
     PgTupleDesc, TriggerTuple, TryFromDatumError, WhoAllocated, PgMemoryContexts,
-    pg_sys::Datum,
+    pg_sys::{Datum, Oid},
 };
-use std::num::NonZeroUsize;
+use std::{num::NonZeroUsize, any::Any};
 
 /// Describes errors that can occur when trying to create a new [PgHeapTuple].
 #[derive(thiserror::Error, Debug, Clone, PartialEq, Eq)]
@@ -265,7 +265,11 @@ impl<'a> PgHeapTuple<'a, AllocatedByRust> {
             match self.get_attribute_by_index(attno) {
                 None => return Err(TryFromDatumError::NoSuchAttributeNumber(attno)),
                 Some(att) => {
-                    if !T::is_compatible_with(att.atttypid) {
+                    let type_oid = T::type_oid();
+                    let composite_type_oid = value.composite_type_oid();
+                    let is_compatible_composite_types = type_oid == pg_sys::RECORDOID && composite_type_oid == Some(att.atttypid);
+                    if !is_compatible_composite_types && !T::is_compatible_with(att.atttypid)
+                    {
                         return Err(TryFromDatumError::IncompatibleTypes);
                     }
                 }
@@ -308,7 +312,11 @@ impl<'a, AllocatedBy: WhoAllocated<pg_sys::HeapTupleData>> IntoDatum
     }
 
     fn type_oid() -> pg_sys::Oid {
-        crate::pg_sys::BOXOID
+        crate::pg_sys::RECORDOID
+    }
+
+    fn composite_type_oid(&self) -> Option<Oid> {
+        Some(self.tupdesc.oid())
     }
 }
 
