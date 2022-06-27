@@ -389,7 +389,7 @@ macro_rules! pg_sql_graph_magic {
 
 /// Initialize the extension with Postgres
 ///
-/// Sets up panic handling with [`register_pg_guard_panic_handler()`] to ensure that a crash within
+/// Sets up panic handling with [`register_pg_guard_panic_hook()`] to ensure that a crash within
 /// the extension does not adversely affect the entire server process.
 ///
 /// ## Note
@@ -398,5 +398,5 @@ macro_rules! pg_sql_graph_magic {
 /// directly.
 #[allow(unused)]
 pub fn initialize() {
-    register_pg_guard_panic_handler();
+    register_pg_guard_panic_hook();
 }
