@@ -217,23 +217,27 @@ impl PgExtern {
             }
         }
 
+        let mut to_sql_config = to_sql_config.unwrap_or_default();
+
         let func = syn::parse2::<syn::ItemFn>(item)?;
 
-        if let Some(ref mut to_sql_config) = to_sql_config {
-            if let Some(ref mut content) = to_sql_config.content {
-                let value = content.value();
-                let updated_value = value.replace(
-                    "@FUNCTION_NAME@",
-                    &*(func.sig.ident.to_string() + "_wrapper"),
-                ) + "\n";
-                *content = syn::LitStr::new(&updated_value, Span::call_site());
-            }
+        if let Some(ref mut content) = to_sql_config.content {
+            let value = content.value();
+            let updated_value = value.replace(
+                "@FUNCTION_NAME@",
+                &*(func.sig.ident.to_string() + "_wrapper"),
+            ) + "\n";
+            *content = syn::LitStr::new(&updated_value, Span::call_site());
+        }
+
+        if !to_sql_config.overrides_default() {
+            crate::ident_is_acceptable_to_postgres(&func.sig.ident)?;
         }
 
         Ok(Self {
             attrs,
             func,
-            to_sql_config: to_sql_config.unwrap_or_default(),
+            to_sql_config,
         })
     }
 }
@@ -321,11 +325,18 @@ impl Parse for PgExtern {
             }
         }
 
+        let to_sql_config = to_sql_config.unwrap_or_default();
+
         let func: syn::ItemFn = input.parse()?;
+
+        if !to_sql_config.overrides_default() {
+            crate::ident_is_acceptable_to_postgres(&func.sig.ident)?;
+        }
+
         Ok(Self {
             attrs,
             func,
-            to_sql_config: to_sql_config.unwrap_or_default(),
+            to_sql_config,
         })
     }
 }
