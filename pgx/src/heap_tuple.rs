@@ -3,7 +3,8 @@
 //! [`PgHeapTuple`]s also describe composite types as defined by [`pgx::composite_type!()`][crate::composite_type].
 use crate::{
     heap_getattr_raw, pg_sys, AllocatedByPostgres, AllocatedByRust, FromDatum, IntoDatum, PgBox,
-    PgTupleDesc, TriggerTuple, TryFromDatumError, WhoAllocated,
+    PgTupleDesc, TriggerTuple, TryFromDatumError, WhoAllocated, PgMemoryContexts,
+    pg_sys::Datum,
 };
 use std::num::NonZeroUsize;
 
@@ -40,6 +41,26 @@ impl<'a> FromDatum for PgHeapTuple<'a, AllocatedByRust> {
             None
         } else {
             Some(PgHeapTuple::from_composite_datum(composite))
+        }
+    }
+
+    unsafe fn from_datum_in_memory_context(
+        mut memory_context: PgMemoryContexts,
+        composite: Datum,
+        is_null: bool,
+    ) -> Option<Self>
+    where
+        Self: Sized,
+    {
+        if is_null {
+            None
+        } else {
+            memory_context.switch_to(|_| {
+                // we're copying the composite datum into this memory context
+                let tuple = PgHeapTuple::from_composite_datum(composite);
+                let datum = tuple.into_composite_datum();
+                Some(PgHeapTuple::from_composite_datum(datum.unwrap()))
+            })
         }
     }
 }
