@@ -138,7 +138,7 @@ impl ToTokens for PgExternArgument {
         let pat = &self.pat;
         let default = self.default.iter();
         let composite_type = self.composite_type.clone().map(|v| v.expr);
-        let composite_type_iter= composite_type.iter();
+        let composite_type_iter = composite_type.iter();
         let mut ty = self.ty.clone();
         anonymonize_lifetimes(&mut ty);
 

@@ -1,12 +1,12 @@
 use std::ops::Deref;
 
 use crate::anonymonize_lifetimes;
+use proc_macro2::Span;
 use syn::{
     parse::{Parse, ParseStream},
     spanned::Spanned,
     Token,
 };
-use proc_macro2::Span;
 
 /** Resolves a `pg_extern` argument or return `syn::Type` into metadata
 
@@ -19,7 +19,13 @@ It resolves the following macros:
 */
 pub(crate) fn resolve_ty(
     ty: syn::Type,
-) -> syn::Result<(syn::Type, bool, bool, Option<String>, Option<CompositeTypeMacro>)> {
+) -> syn::Result<(
+    syn::Type,
+    bool,
+    bool,
+    Option<String>,
+    Option<CompositeTypeMacro>,
+)> {
     // There are four steps:
     // * Resolve the `default!()` macro
     // * Resolve `composite_type!()`

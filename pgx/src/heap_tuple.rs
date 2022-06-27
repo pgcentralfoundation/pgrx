@@ -1,12 +1,13 @@
 //! Provides a safe interface to Postgres `HeapTuple` objects.
-//! 
+//!
 //! [`PgHeapTuple`]s also describe composite types as defined by [`pgx::composite_type!()`][crate::composite_type].
 use crate::{
-    heap_getattr_raw, pg_sys, AllocatedByPostgres, AllocatedByRust, FromDatum, IntoDatum, PgBox,
-    PgTupleDesc, TriggerTuple, TryFromDatumError, WhoAllocated, PgMemoryContexts,
+    heap_getattr_raw, pg_sys,
     pg_sys::{Datum, Oid},
+    AllocatedByPostgres, AllocatedByRust, FromDatum, IntoDatum, PgBox, PgMemoryContexts,
+    PgTupleDesc, TriggerTuple, TryFromDatumError, WhoAllocated,
 };
-use std::{num::NonZeroUsize, any::Any};
+use std::num::NonZeroUsize;
 
 /// Describes errors that can occur when trying to create a new [PgHeapTuple].
 #[derive(thiserror::Error, Debug, Clone, PartialEq, Eq)]
@@ -28,7 +29,7 @@ pub enum PgHeapTupleError {
 ///
 /// A [`PgHeapTuple`] can either be considered to be allocated by Postgres or by the Rust runtime. If
 /// allocated by Postgres, it is not mutable until [`PgHeapTuple::into_owned`] is called.
-/// 
+///
 /// [`PgHeapTuple`]s also describe composite types as defined by [`pgx::composite_type!()`][crate::composite_type].
 pub struct PgHeapTuple<'a, AllocatedBy: WhoAllocated<pg_sys::HeapTupleData>> {
     tuple: PgBox<pg_sys::HeapTupleData, AllocatedBy>,
@@ -125,7 +126,7 @@ impl<'a> PgHeapTuple<'a, AllocatedByRust> {
 
     ```rust,no_run
     use pgx::*;
-    
+
     Spi::run("CREATE TYPE dog AS (name text, age int);");
     let mut heap_tuple = PgHeapTuple::new_composite_type("dog").unwrap();
 
@@ -151,7 +152,8 @@ impl<'a> PgHeapTuple<'a, AllocatedByRust> {
             .ok_or_else(|| PgHeapTupleError::NoSuchType(type_name.to_string()))?;
         let natts = tuple_desc.len();
         unsafe {
-            let datums = pg_sys::palloc0(natts * std::mem::size_of::<pg_sys::Datum>()) as *mut pg_sys::Datum;
+            let datums =
+                pg_sys::palloc0(natts * std::mem::size_of::<pg_sys::Datum>()) as *mut pg_sys::Datum;
             let mut is_null = (0..natts).map(|_| true).collect::<Vec<_>>();
 
             let heap_tuple =
@@ -267,9 +269,9 @@ impl<'a> PgHeapTuple<'a, AllocatedByRust> {
                 Some(att) => {
                     let type_oid = T::type_oid();
                     let composite_type_oid = value.composite_type_oid();
-                    let is_compatible_composite_types = type_oid == pg_sys::RECORDOID && composite_type_oid == Some(att.atttypid);
-                    if !is_compatible_composite_types && !T::is_compatible_with(att.atttypid)
-                    {
+                    let is_compatible_composite_types =
+                        type_oid == pg_sys::RECORDOID && composite_type_oid == Some(att.atttypid);
+                    if !is_compatible_composite_types && !T::is_compatible_with(att.atttypid) {
                         return Err(TryFromDatumError::IncompatibleTypes);
                     }
                 }
@@ -429,7 +431,9 @@ impl<'a, AllocatedBy: WhoAllocated<pg_sys::HeapTupleData>> PgHeapTuple<'a, Alloc
                         return Ok(None);
                     }
                     match T::type_oid() {
-                        record @ pg_sys::RECORDOID => T::try_from_datum(datum.unwrap(), false, record),
+                        record @ pg_sys::RECORDOID => {
+                            T::try_from_datum(datum.unwrap(), false, record)
+                        }
                         _ => T::try_from_datum(datum.unwrap(), false, att.type_oid().value()),
                     }
                 }
@@ -533,7 +537,7 @@ a builtin compatable type for, or a [`#[derive(pgx::PostgresType)`][crate::Postg
  can have their shape and API reasoned about at build time.
 
 This runtime failure model is because the shape and layout, or even the name of the type could change during
-the runtime of the extension. 
+the runtime of the extension.
 
 For example, a user of the extension could do something like:
 

@@ -20,7 +20,6 @@ A number of considerations are detailed in the [`pgx::composite_type`][pgx::comp
 [`PgHeapTuple`][pgx::PgHeapTuple] documentation which may assist in productionalizing extensions
 using composite types.
 */
-
 use pgx::*;
 
 // All `pgx` extensions will do this:
@@ -39,7 +38,8 @@ anything to define them. Just use them as if they exist.
 If your extension defines the composite types itself, it's recommended to do that in an
 `extension_sql!()` which is set to be a `bootstrap`, and is ordered first in the generated SQL:
 */
-extension_sql!("\
+extension_sql!(
+    "\
 CREATE TYPE Dog AS (
     name TEXT,
     scritches INT
@@ -58,14 +58,14 @@ If it's required for exotic reasons that the composite type not be part of the b
 it can also be defined in a non-bootstrap SQL block (**Note:** This could have just been
 included in the above bootstrap code):
 */
-extension_sql!("\
+extension_sql!(
+    "\
 CREATE TYPE CatAndDogFriendship AS (
     cat Cat,
     dog Dog
 );",
     name = "create_cat_and_dog_friendship",
 );
-
 
 // To assist with code reuse, consider setting your composite type names in constants:
 const DOG_COMPOSITE_TYPE: &str = "Dog";
@@ -81,7 +81,6 @@ This is not correct! The [`#[pgx::pg_extern]`][pgx::pg_extern] macro would not b
 up the required metadata for SQL generation. Instead, set the constant as a `&'static str` which
 the [`pgx::composite_type!()`][pgx::composite_type] macro can consume.
 */
-
 
 /*
 Create a dog inside Rust then return it, roughly the equivalent of this SQL:
@@ -110,7 +109,9 @@ CREATE FUNCTION scritch_dog(dog Dog) RETURNS Dog
 ```
 */
 #[pg_extern]
-fn scritch_dog(mut dog: pgx::composite_type!(DOG_COMPOSITE_TYPE)) -> pgx::composite_type!(DOG_COMPOSITE_TYPE) {
+fn scritch_dog(
+    mut dog: pgx::composite_type!(DOG_COMPOSITE_TYPE),
+) -> pgx::composite_type!(DOG_COMPOSITE_TYPE) {
     if let Ok(scritches) = dog.get_by_name::<i32>("scritches") {
         dog.set_by_name("scritches", scritches).unwrap();
     }
@@ -131,9 +132,10 @@ the function.
 #[pg_extern(requires = ["create_cat_and_dog_friendship"])]
 fn make_friendship(
     dog: pgx::composite_type!(DOG_COMPOSITE_TYPE),
-    cat: pgx::composite_type!(CAT_COMPOSITE_TYPE)
+    cat: pgx::composite_type!(CAT_COMPOSITE_TYPE),
 ) -> pgx::composite_type!(CAT_AND_DOG_FRIENDSHIP_COMPOSITE_TYPE) {
-    let mut friendship = PgHeapTuple::new_composite_type(CAT_AND_DOG_FRIENDSHIP_COMPOSITE_TYPE).unwrap();
+    let mut friendship =
+        PgHeapTuple::new_composite_type(CAT_AND_DOG_FRIENDSHIP_COMPOSITE_TYPE).unwrap();
     friendship.set_by_name("dog", dog).unwrap();
     friendship.set_by_name("cat", cat).unwrap();
     friendship
@@ -146,34 +148,42 @@ mod tests {
 
     #[pg_test]
     fn test_create_dog() {
-        let retval = Spi::get_one::<PgHeapTuple<AllocatedByRust>>("\
+        let retval = Spi::get_one::<PgHeapTuple<AllocatedByRust>>(
+            "\
             SELECT create_dog('Nami', 0)
-        ").expect("SQL select failed");
+        ",
+        )
+        .expect("SQL select failed");
         assert_eq!(retval.get_by_name::<&str>("name").unwrap().unwrap(), "Nami");
         assert_eq!(retval.get_by_name::<i32>("scritches").unwrap().unwrap(), 0);
     }
 
     #[pg_test]
     fn test_scritch_dog() {
-        let retval = Spi::get_one::<PgHeapTuple<AllocatedByRust>>("\
+        let retval = Spi::get_one::<PgHeapTuple<AllocatedByRust>>(
+            "\
             SELECT scritch_dog(ROW('Nami', 1)::Dog)
-        ").expect("SQL select failed");
+        ",
+        )
+        .expect("SQL select failed");
         assert_eq!(retval.get_by_name::<&str>("name").unwrap().unwrap(), "Nami");
         assert_eq!(retval.get_by_name::<i32>("scritches").unwrap().unwrap(), 1);
     }
 
     #[pg_test]
     fn test_make_friendship() {
-        let friendship = Spi::get_one::<PgHeapTuple<AllocatedByRust>>("\
+        let friendship = Spi::get_one::<PgHeapTuple<AllocatedByRust>>(
+            "\
             SELECT make_friendship(ROW('Nami', 0)::Dog, ROW('Sally', 0)::Cat)
-        ").expect("SQL select failed");
+        ",
+        )
+        .expect("SQL select failed");
         let dog: PgHeapTuple<AllocatedByRust> = friendship.get_by_name("dog").unwrap().unwrap();
         assert_eq!(dog.get_by_name::<&str>("name").unwrap().unwrap(), "Nami");
 
         let cat: PgHeapTuple<AllocatedByRust> = friendship.get_by_name("cat").unwrap().unwrap();
         assert_eq!(cat.get_by_name::<&str>("name").unwrap().unwrap(), "Sally");
     }
-
 }
 
 #[cfg(test)]

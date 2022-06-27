@@ -987,7 +987,7 @@ fn connect_externs(
                             return Err(eyre!("Could not find `requires` target: {:?}", requires));
                         }
                     }
-                },
+                }
                 crate::ExternArgs::Schema(declared_schema_name) => {
                     for (schema, schema_index) in schemas {
                         if schema.name == declared_schema_name {
@@ -997,9 +997,9 @@ fn connect_externs(
                         }
                     }
                     if !found_schema_declaration {
-                        return Err(eyre!("Got manual `schema = \"{declared_schema_name}\"` setting, but that schema did not exist."))
+                        return Err(eyre!("Got manual `schema = \"{declared_schema_name}\"` setting, but that schema did not exist."));
                     }
-                },
+                }
                 _ => (),
             }
         }

@@ -6,7 +6,7 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
-use proc_macro2::{TokenStream as TokenStream2};
+use proc_macro2::TokenStream as TokenStream2;
 use quote::{quote, ToTokens, TokenStreamExt};
 use std::convert::TryFrom;
 use syn::{
@@ -236,7 +236,7 @@ impl ToTokens for Returning {
             Returning::Type { ty, composite_type } => {
                 let ty_string = ty.to_token_stream().to_string().replace(" ", "");
                 let composite_type = composite_type.clone().map(|v| v.expr);
-                let composite_type_iter= composite_type.iter();
+                let composite_type_iter = composite_type.iter();
                 quote! {
                     ::pgx::utils::sql_entity_graph::PgExternReturnEntity::Type {
                         ty: ::pgx::utils::sql_entity_graph::TypeEntity {
@@ -257,7 +257,7 @@ impl ToTokens for Returning {
             Returning::SetOf { ty, composite_type } => {
                 let ty_string = ty.to_token_stream().to_string().replace(" ", "");
                 let composite_type = composite_type.clone().map(|v| v.expr);
-                let composite_type_iter= composite_type.iter();
+                let composite_type_iter = composite_type.iter();
                 quote! {
                     ::pgx::utils::sql_entity_graph::PgExternReturnEntity::SetOf {
                         ty: ::pgx::utils::sql_entity_graph::TypeEntity {
