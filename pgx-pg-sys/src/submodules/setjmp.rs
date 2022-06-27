@@ -10,6 +10,7 @@ Wrapping the FFI into Postgres enables
 - minimizing resource leaks
 
 But only the first of these is considered paramount.
+
 At all times PGX reserves the right to choose an implementation that achieves memory safety.
 Currently, this function is only used by PGX's generated Postgres bindings.
 It is not (yet) intended (or even necessary) for normal user code.
