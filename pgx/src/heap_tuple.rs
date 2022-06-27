@@ -283,7 +283,7 @@ impl<'a, AllocatedBy: WhoAllocated<pg_sys::HeapTupleData>> IntoDatum
     for PgHeapTuple<'a, AllocatedBy>
 {
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        self.into_datum()
+        self.into_composite_datum()
     }
 
     fn type_oid() -> pg_sys::Oid {
@@ -292,20 +292,14 @@ impl<'a, AllocatedBy: WhoAllocated<pg_sys::HeapTupleData>> IntoDatum
 }
 
 impl<'a, AllocatedBy: WhoAllocated<pg_sys::HeapTupleData>> PgHeapTuple<'a, AllocatedBy> {
-    /// Consume this [PgHeapTuple] and return a Datum representation, which is a pointer to the
-    /// underlying [pg_sys::HeapTupleData] struct.
-    pub fn into_datum(self) -> Option<pg_sys::Datum> {
-        self.tuple.into_datum()
-    }
-
     /// Consume this [PgHeapTuple] and return a Datum representation, which is a pointer to a
     /// [pg_sys::HeapTupleHeaderData] struct, containing the tuple data and the corresponding
     /// tuple descriptor information.
     pub fn into_composite_datum(self) -> Option<pg_sys::Datum> {
         unsafe {
             Some(pg_sys::heap_copy_tuple_as_datum(
-                self.tuple.as_ptr(),
-                self.tupdesc.as_ptr(),
+                self.tuple.into_pg(),
+                self.tupdesc.into_pg(),
             ))
         }
     }

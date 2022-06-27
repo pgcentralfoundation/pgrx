@@ -319,8 +319,15 @@ mod returning {
         use super::*;
 
         #[pg_extern]
-        fn create_dog(_name: String, _scritches: i32) -> pgx::composite_type!("Dog") {
-            PgHeapTuple::new_composite_type("Dog").unwrap()
+        fn create_dog(name: String, scritches: i32) -> pgx::composite_type!("Dog") {
+            let mut tuple = PgHeapTuple::new_composite_type("Dog").unwrap();
+
+            let cur_name = tuple.get_by_name::<String>("name").unwrap();
+            tuple.set_by_name("scritches", scritches).unwrap();
+            tuple.set_by_name("name", name).unwrap();
+            pgx::log!("{cur_name:?}, {:?}", tuple.get_by_name::<String>("name"));
+
+            tuple
         }
 
         #[pg_extern]
@@ -568,7 +575,7 @@ mod tests {
     #[pg_test]
     fn test_scritch() {
         let retval = Spi::get_one::<PgHeapTuple<'_, AllocatedByRust>>("
-            SELECT scritch(ROW('Nami', 1)::Dog)
+            SELECT scritch(ROW('Nami', 2)::Dog)
         ").expect("SQL select failed");
         assert_eq!(retval.get_by_name("name").unwrap(), Some("Nami"));
         assert_eq!(retval.get_by_name("scritches").unwrap(), Some(2));
@@ -577,7 +584,7 @@ mod tests {
     #[pg_test]
     fn test_scritch_strict() {
         let retval = Spi::get_one::<PgHeapTuple<'_, AllocatedByRust>>("
-            SELECT scritch_strict(ROW('Nami', 1)::Dog)
+            SELECT scritch_strict(ROW('Nami', 2)::Dog)
         ").expect("SQL select failed");
         assert_eq!(retval.get_by_name("name").unwrap(), Some("Nami"));
         assert_eq!(retval.get_by_name("scritches").unwrap(), Some(2));
