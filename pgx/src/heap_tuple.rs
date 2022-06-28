@@ -309,6 +309,8 @@ impl<'a> PgHeapTuple<'a, AllocatedByRust> {
 impl<'a, AllocatedBy: WhoAllocated<pg_sys::HeapTupleData>> IntoDatum
     for PgHeapTuple<'a, AllocatedBy>
 {
+    /// # Implementation Node
+    /// Delegates to `self.into_composite_datum()`
     fn into_datum(self) -> Option<pg_sys::Datum> {
         self.into_composite_datum()
     }
@@ -323,9 +325,8 @@ impl<'a, AllocatedBy: WhoAllocated<pg_sys::HeapTupleData>> IntoDatum
 }
 
 impl<'a, AllocatedBy: WhoAllocated<pg_sys::HeapTupleData>> PgHeapTuple<'a, AllocatedBy> {
-    /// Consume this [PgHeapTuple] and return a Datum representation, which is a pointer to a
-    /// [pg_sys::HeapTupleHeaderData] struct, containing the tuple data and the corresponding
-    /// tuple descriptor information.
+    /// Consume this [PgHeapTuple] and return a composite Datum representation, containing the tuple
+    /// data and the corresponding tuple descriptor information.
     pub fn into_composite_datum(self) -> Option<pg_sys::Datum> {
         unsafe {
             Some(pg_sys::heap_copy_tuple_as_datum(
@@ -333,6 +334,12 @@ impl<'a, AllocatedBy: WhoAllocated<pg_sys::HeapTupleData>> PgHeapTuple<'a, Alloc
                 self.tupdesc.as_ptr(),
             ))
         }
+    }
+
+    /// Consume this [PgHeapTuple] and return a Datum representation appropriate for returning from
+    /// a trigger function
+    pub fn into_trigger_datum(self) -> Option<pg_sys::Datum> {
+        self.tuple.into_datum()
     }
 
     /// Returns the number of attributes in this [PgHeapTuple].
