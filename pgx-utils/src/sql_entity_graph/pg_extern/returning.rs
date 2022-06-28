@@ -94,7 +94,7 @@ impl Returning {
                                 let out: NameMacro = mac
                                     .parse_body()
                                     .expect(&*format!("Failed to parse named!(): {:?}", mac));
-                                Some(ReturningIteratedItem { ty: elem, name: Some(out.ident), composite_type: out.composite_type })
+                                Some(ReturningIteratedItem { ty: out.ty, name: Some(out.ident), composite_type: out.composite_type })
                             },
                             "composite_type" => {
                                 let composite_type: CompositeTypeMacro = mac.parse_body().expect(&*format!("Failed to parse composite_type!(): {:?}", mac));
@@ -122,20 +122,8 @@ impl Returning {
     }
 
     fn parse_type_macro(type_macro: &mut syn::TypeMacro) -> Result<Returning, syn::Error> {
-        let mac = &type_macro.mac;
-        let archetype = mac.path.segments.last().unwrap();
-        match archetype.ident.to_string().as_str() {
-            "composite_type" => {
-                let composite_type: CompositeTypeMacro = mac
-                    .parse_body()
-                    .expect(&*format!("Failed to parse composite_type!(): {:?}", mac));
-                Ok(Returning::Type {
-                    ty: syn::parse_quote! { ::pgx::heap_tuple::PgHeapTuple<'static, ::pgx::AllocatedByRust> },
-                    composite_type: Some(composite_type),
-                })
-            }
-            _ => unimplemented!("Don't support anything other than `composite_type!()`"),
-        }
+        let (ty, _, _, _, composite_type) = resolve_ty(syn::Type::Macro(type_macro.clone()))?;
+        Ok(Returning::Type { ty, composite_type })
     }
 
     fn parse_dyn_trait(dyn_trait: &mut syn::TypeTraitObject) -> Result<Returning, syn::Error> {
@@ -362,23 +350,7 @@ impl Parse for NameMacro {
         let _comma: Token![,] = input.parse()?;
         let ty = input.parse()?;
 
-        let composite_type = match &ty {
-            syn::Type::Macro(ref macro_pat) => {
-                // This is essentially a copy of `parse_type_macro` but it returns items instead of `Returning`
-                let mac = &macro_pat.mac;
-                let archetype = mac.path.segments.last().unwrap();
-                match archetype.ident.to_string().as_str() {
-                    "composite_type" => Some(
-                        mac.parse_body()
-                            .expect(&*format!("Failed to parse composite_type!(): {:?}", mac)),
-                    ),
-                    _ => unimplemented!(
-                        "Don't support anything other than `name!()` and `composite_type!()`"
-                    ),
-                }
-            }
-            _ => None,
-        };
+        let (ty, _, _, _, composite_type) = resolve_ty(ty)?;
 
         Ok(Self {
             ident,

@@ -115,7 +115,6 @@ extension_sql!(
 
 CREATE TABLE foo ();
 
-
 "#,
     name = "create_foo_table"
 );

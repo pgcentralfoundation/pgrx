@@ -59,10 +59,12 @@ pub(crate) fn resolve_ty(
             let archetype = mac.path.segments.last().expect("No last segment");
             match archetype.ident.to_string().as_str() {
                 "default" => {
+                    // If we land here, after already expanding the `default!()` above, the user has written it twice.
+                    // This is definitely an issue and we should tell them.
                     return Err(syn::Error::new(
                         mac.span(),
                         "default!(default!()) not supported, use it only once",
-                    ))?
+                    ))?;
                 }
                 "composite_type" => {
                     let sql = Some(handle_composite_type_macro(&mac)?);
