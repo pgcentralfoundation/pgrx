@@ -46,6 +46,3 @@ shutdown_hooks = "0.1.0"
 time = "0.3.9"
 eyre = "0.6.8"
 thiserror = "1.0"
-
-[profile.dev]
-opt-level = 0

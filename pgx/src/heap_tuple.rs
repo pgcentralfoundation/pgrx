@@ -309,8 +309,8 @@ impl<'a> PgHeapTuple<'a, AllocatedByRust> {
 impl<'a, AllocatedBy: WhoAllocated<pg_sys::HeapTupleData>> IntoDatum
     for PgHeapTuple<'a, AllocatedBy>
 {
-    /// # Implementation Node
-    /// Delegates to `self.into_composite_datum()`
+    // Delegate to `into_composite_datum()` as this will normally be used with composite types.
+    // See `into_trigger_datum()` if using as a trigger.
     fn into_datum(self) -> Option<pg_sys::Datum> {
         self.into_composite_datum()
     }
@@ -325,7 +325,7 @@ impl<'a, AllocatedBy: WhoAllocated<pg_sys::HeapTupleData>> IntoDatum
 }
 
 impl<'a, AllocatedBy: WhoAllocated<pg_sys::HeapTupleData>> PgHeapTuple<'a, AllocatedBy> {
-    /// Consume this [PgHeapTuple] and return a composite Datum representation, containing the tuple
+    /// Consume this [`PgHeapTuple`] and return a composite Datum representation, containing the tuple
     /// data and the corresponding tuple descriptor information.
     pub fn into_composite_datum(self) -> Option<pg_sys::Datum> {
         unsafe {
@@ -336,19 +336,19 @@ impl<'a, AllocatedBy: WhoAllocated<pg_sys::HeapTupleData>> PgHeapTuple<'a, Alloc
         }
     }
 
-    /// Consume this [PgHeapTuple] and return a Datum representation appropriate for returning from
+    /// Consume this [`PgHeapTuple`] and return a Datum representation appropriate for returning from
     /// a trigger function
     pub fn into_trigger_datum(self) -> Option<pg_sys::Datum> {
         self.tuple.into_datum()
     }
 
-    /// Returns the number of attributes in this [PgHeapTuple].
+    /// Returns the number of attributes in this [`PgHeapTuple`].
     #[inline]
     pub fn len(&self) -> usize {
         self.tupdesc.len()
     }
 
-    /// Returns an iterator over the attributes in this [PgHeapTuple].
+    /// Returns an iterator over the attributes in this [`PgHeapTuple`].
     ///
     /// The return value is `(attribute_number: NonZeroUsize, attribute_info: &pg_sys::FormData_pg_attribute)`.
     pub fn attributes(
@@ -394,8 +394,8 @@ impl<'a, AllocatedBy: WhoAllocated<pg_sys::HeapTupleData>> PgHeapTuple<'a, Alloc
     /// Attribute names are case-insensitive.
     ///
     /// ## Errors
-    /// - return [TryFromDatumError::NoSuchAttributeName] if the attribute does not exist
-    /// - return [TryFromDatumError::IncompatibleTypes] if the Rust type of the `value` is not
+    /// - return [`TryFromDatumError::NoSuchAttributeName`] if the attribute does not exist
+    /// - return [`TryFromDatumError::IncompatibleTypes`] if the Rust type of the `value` is not
     /// compatible with the attribute's Postgres type
     pub fn get_by_name<T: FromDatum + IntoDatum + 'static>(
         &self,
@@ -418,8 +418,8 @@ impl<'a, AllocatedBy: WhoAllocated<pg_sys::HeapTupleData>> PgHeapTuple<'a, Alloc
     /// Attribute numbers start at 1, not 0.
     ///
     /// ## Errors
-    /// - return [TryFromDatumError::NoSuchAttributeNumber] if the attribute does not exist
-    /// - return [TryFromDatumError::IncompatibleTypes] if the Rust type of the `value` is not
+    /// - return [`TryFromDatumError::NoSuchAttributeNumber`] if the attribute does not exist
+    /// - return [`TryFromDatumError::IncompatibleTypes`] if the Rust type of the `value` is not
     /// compatible with the attribute's Postgres type
     pub fn get_by_index<T: FromDatum + IntoDatum + 'static>(
         &self,
