@@ -106,7 +106,8 @@ impl PgTrigger {
                 match trigger_retval {
                     None => {
                         // Yup, you return 0... https://www.postgresql.org/docs/current/trigger-example.html
-                        0.into_datum().unwrap()
+                        use pgx::IntoDatum;
+                        0_u32.into_datum().unwrap()
                     },
                     Some(val) => match val.into_trigger_datum() {
                         None => ::pgx::pg_return_null(fcinfo),

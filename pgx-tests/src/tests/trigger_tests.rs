@@ -624,7 +624,7 @@ mod tests {
 
     #[pg_trigger]
     fn nullified(
-        trigger: &pgx::PgTrigger,
+        _trigger: &pgx::PgTrigger,
     ) -> Result<Option<PgHeapTuple<'_, AllocatedByRust>>, TriggerError> {
         Ok(None)
     }
