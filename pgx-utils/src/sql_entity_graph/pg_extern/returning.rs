@@ -122,8 +122,33 @@ impl Returning {
     }
 
     fn parse_type_macro(type_macro: &mut syn::TypeMacro) -> Result<Returning, syn::Error> {
-        let (ty, _, _, _, composite_type) = resolve_ty(syn::Type::Macro(type_macro.clone()))?;
-        Ok(Returning::Type { ty, composite_type })
+        // This is essentially a copy of `parse_type_macro` but it returns items instead of `Returning`
+        let mac = &type_macro.mac;
+        let archetype = mac.path.segments.last().unwrap();
+        match archetype.ident.to_string().as_str() {
+            "name" => {
+                let out: NameMacro = mac
+                    .parse_body()
+                    .expect(&*format!("Failed to parse named!(): {:?}", mac));
+                Ok(Returning::Iterated(vec![ReturningIteratedItem {
+                    ty: out.ty,
+                    name: Some(out.ident),
+                    composite_type: out.composite_type,
+                }]))
+            }
+            "composite_type" => {
+                let composite_type: CompositeTypeMacro = mac
+                    .parse_body()
+                    .expect(&*format!("Failed to parse composite_type!(): {:?}", mac));
+                Ok(Returning::Type {
+                    ty: syn::Type::Macro(type_macro.clone()),
+                    composite_type: Some(composite_type),
+                })
+            }
+            _ => unimplemented!(
+                "Don't support anything other than `name!()` and `composite_type!()`"
+            ),
+        }
     }
 
     fn parse_dyn_trait(dyn_trait: &mut syn::TypeTraitObject) -> Result<Returning, syn::Error> {
@@ -208,7 +233,21 @@ impl TryFrom<&syn::ReturnType> for Returning {
                     }
                     syn::Type::Tuple(ref mut tup) => Self::parse_type_tuple(tup),
                     syn::Type::Macro(ref mut type_macro) => Self::parse_type_macro(type_macro),
-                    other => return Err(syn::Error::new(other.span(), "Got unknown return type")),
+                    syn::Type::Paren(ref mut type_paren) => match &mut *type_paren.elem {
+                        syn::Type::Macro(ref mut type_macro) => Self::parse_type_macro(type_macro),
+                        other => {
+                            return Err(syn::Error::new(
+                                other.span(),
+                                &format!("Got unknown return type: {type_paren:?}"),
+                            ))
+                        }
+                    },
+                    other => {
+                        return Err(syn::Error::new(
+                            other.span(),
+                            &format!("Got unknown return type: {other:?}"),
+                        ))
+                    }
                 }
             }
         }

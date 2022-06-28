@@ -321,10 +321,8 @@ mod returning {
         fn create_dog(name: String, scritches: i32) -> pgx::composite_type!("Dog") {
             let mut tuple = PgHeapTuple::new_composite_type("Dog").unwrap();
 
-            let cur_name = tuple.get_by_name::<String>("name").unwrap();
             tuple.set_by_name("scritches", scritches).unwrap();
             tuple.set_by_name("name", name).unwrap();
-            pgx::log!("{cur_name:?}, {:?}", tuple.get_by_name::<String>("name"));
 
             tuple
         }
@@ -423,22 +421,124 @@ mod returning {
 }
 
 // Just a compile test...
-#[pg_extern]
-fn exotic_signature(
-    _cats: pgx::default!(
-        Option<Vec<Option<::pgx::composite_type!("Cat")>>>,
-        "ARRAY[ROW('Sally', 0)]::Cat[]"
-    ),
-    _a_single_fish: pgx::default!(
-        Option<::pgx::composite_type!("Fish")>,
-        "ROW('Bob', 0)::Fish"
-    ),
-    _dogs: pgx::default!(
-        Option<::pgx::VariadicArray<::pgx::composite_type!("Dog")>>,
-        "ARRAY[ROW('Nami', 0), ROW('Brandy', 0)]::Dog[]"
-    ),
-) -> Option<Vec<::pgx::composite_type!("AnimalFriendshipEdge")>> {
-    unimplemented!()
+// We don't run these, but we ensure we can build SQL for them
+mod sql_generator_tests {
+    use super::*;
+
+    #[pg_extern]
+    fn exotic_signature(
+        _cats: pgx::default!(
+            Option<Vec<Option<::pgx::composite_type!("Cat")>>>,
+            "ARRAY[ROW('Sally', 0)]::Cat[]"
+        ),
+        _a_single_fish: pgx::default!(
+            Option<::pgx::composite_type!("Fish")>,
+            "ROW('Bob', 0)::Fish"
+        ),
+        _dogs: pgx::default!(
+            Option<::pgx::VariadicArray<::pgx::composite_type!("Dog")>>,
+            "ARRAY[ROW('Nami', 0), ROW('Brandy', 0)]::Dog[]"
+        ),
+    ) -> Option<Vec<::pgx::composite_type!("AnimalFriendshipEdge")>> {
+        unimplemented!()
+    }
+
+    #[pg_extern]
+    fn iterable_named_table() -> impl Iterator<
+        Item = (
+            name!(dog, ::pgx::composite_type!("Dog")),
+            name!(cat, ::pgx::composite_type!("Cat")),
+        ),
+    > {
+        Vec::new().into_iter()
+    }
+
+    #[pg_extern]
+    fn iterable_named_table_optional_elems() -> impl Iterator<
+        Item = (
+            name!(dog, Option<::pgx::composite_type!("Dog")>),
+            name!(cat, Option<::pgx::composite_type!("Cat")>),
+        ),
+    > {
+        Vec::new().into_iter()
+    }
+
+    #[pg_extern]
+    fn iterable_named_table_array_elems() -> impl Iterator<
+        Item = (
+            name!(dog, Vec<::pgx::composite_type!("Dog")>),
+            name!(cat, Vec<::pgx::composite_type!("Cat")>),
+        ),
+    > {
+        Vec::new().into_iter()
+    }
+
+    #[pg_extern]
+    fn iterable_named_table_optional_array_elems() -> impl Iterator<
+        Item = (
+            name!(dog, Option<Vec<::pgx::composite_type!("Dog")>>),
+            name!(cat, Option<Vec<::pgx::composite_type!("Cat")>>),
+        ),
+    > {
+        Vec::new().into_iter()
+    }
+
+    #[pg_extern]
+    fn iterable_named_table_optional_array_optional_elems() -> impl Iterator<
+        Item = (
+            name!(dog, Option<Vec<Option<::pgx::composite_type!("Dog")>>>),
+            name!(cat, Option<Vec<Option<::pgx::composite_type!("Cat")>>>),
+        ),
+    > {
+        Vec::new().into_iter()
+    }
+
+    #[allow(unused_parens)]
+    #[pg_extern]
+    fn return_table_single() -> (name!(dog, pgx::composite_type!("Dog"))) {
+        let mut tuple = PgHeapTuple::new_composite_type("Dog").unwrap();
+
+        tuple.set_by_name("scritches", 0).unwrap();
+        tuple.set_by_name("name", "Nami").unwrap();
+
+        (tuple)
+    }
+
+    #[pg_extern]
+    fn return_table_single_bare() -> name!(dog, pgx::composite_type!("Dog")) {
+        let mut tuple = PgHeapTuple::new_composite_type("Dog").unwrap();
+
+        tuple.set_by_name("scritches", 0).unwrap();
+        tuple.set_by_name("name", "Nami").unwrap();
+
+        tuple
+    }
+
+    #[pg_extern]
+    fn return_table_two() -> (
+        name!(dog, pgx::composite_type!("Dog")),
+        name!(cat, pgx::composite_type!("Cat")),
+    ) {
+        let mut dog_tuple = PgHeapTuple::new_composite_type("Dog").unwrap();
+
+        dog_tuple.set_by_name("scritches", 0).unwrap();
+        dog_tuple.set_by_name("name", "Brandy").unwrap();
+
+        let mut cat_tuple = PgHeapTuple::new_composite_type("Dog").unwrap();
+
+        cat_tuple.set_by_name("boops", 0).unwrap();
+        cat_tuple.set_by_name("name", "Sally").unwrap();
+
+        (dog_tuple, cat_tuple)
+    }
+
+    #[pg_extern]
+    fn return_table_two_optional() -> (
+        name!(dog, Option<pgx::composite_type!("Dog")>),
+        name!(cat, Option<pgx::composite_type!("Cat")>),
+    ) {
+        (None, None)
+    }
 }
 
 #[cfg(any(test, feature = "pg_test"))]
