@@ -9,22 +9,21 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 /*! Support for writing Rust trigger functions
 
-A "no-op" trigger that gets the current [`PgHeapTuple`][crate::PgHeapTuple],
-panicking (into a PostgreSQL error) if it doesn't exist:
+A "no-op" trigger that gets the current [`PgHeapTuple`][crate::PgHeapTuple]:
 
 ```rust,no_run
 use pgx::{pg_trigger, pg_sys, PgHeapTuple, WhoAllocated, PgHeapTupleError, PgTrigger};
 
 #[pg_trigger]
 fn trigger_example(trigger: &PgTrigger) -> Result<
-    PgHeapTuple<'_, impl WhoAllocated<pg_sys::HeapTupleData>>,
+    Option<PgHeapTuple<'_, impl WhoAllocated<pg_sys::HeapTupleData>>>,
     PgHeapTupleError,
 > {
-    Ok(unsafe { trigger.current() }.expect("No current HeapTuple"))
+    Ok(unsafe { trigger.current() })
 }
 ```
 
-Trigger functions only accept one argument, a [`PgTrigger`], and they return a [`Result`][std::result::Result] containing
+Trigger functions only accept one argument, a [`PgTrigger`], and they return a [`Result`][std::result::Result] of an [`Option`][std::option::Option] containing
 either a [`PgHeapTuple`][crate::PgHeapTuple] or any error that implements [`impl std::error::Error`][std::error::Error].
 
 # Use from SQL
@@ -66,10 +65,10 @@ This can also be done via the [`extension_sql`][crate::extension_sql] attribute:
 #
 # #[pg_trigger]
 # fn trigger_example(trigger: &PgTrigger) -> Result<
-#    PgHeapTuple<'_, impl WhoAllocated<pg_sys::HeapTupleData>>,
+#    Option<PgHeapTuple<'_, impl WhoAllocated<pg_sys::HeapTupleData>>>,
 #    PgHeapTupleError,
 # > {
-#     Ok(unsafe { trigger.current() }.expect("No current HeapTuple"))
+#     Ok(unsafe { trigger.current() })
 # }
 #
 pgx::extension_sql!(
@@ -102,19 +101,19 @@ use pgx::{pg_trigger, pg_sys, PgHeapTuple, AllocatedByRust, AllocatedByPostgres,
 
 #[pg_trigger]
 fn example_allocated_by_rust(trigger: &PgTrigger) -> Result<
-    PgHeapTuple<'_, AllocatedByRust>,
+    Option<PgHeapTuple<'_, AllocatedByRust>>,
     PgHeapTupleError,
 > {
-    let current = unsafe { trigger.current() }.expect("No current HeapTuple");
-    Ok(current.into_owned())
+    let current = unsafe { trigger.current() };
+    Ok(current.map(|v| v.into_owned()))
 }
 
 #[pg_trigger]
 fn example_allocated_by_postgres(trigger: &PgTrigger) -> Result<
-    PgHeapTuple<'_, AllocatedByPostgres>,
+    Option<PgHeapTuple<'_, AllocatedByPostgres>>,
     PgHeapTupleError,
 > {
-    let current = unsafe { trigger.current() }.expect("No current HeapTuple");
+    let current = unsafe { trigger.current() };
     Ok(current)
 }
 ```
@@ -138,10 +137,10 @@ enum CustomTriggerError {
 
 #[pg_trigger]
 fn example_custom_error(trigger: &PgTrigger) -> Result<
-    PgHeapTuple<'_, impl WhoAllocated<pg_sys::HeapTupleData>>,
+    Option<PgHeapTuple<'_, impl WhoAllocated<pg_sys::HeapTupleData>>>,
     CustomTriggerError,
 > {
-    unsafe { trigger.current() }.ok_or(CustomTriggerError::NoCurrentHeapTuple)
+    unsafe { Ok(trigger.current()) }
 }
 ```
 
@@ -164,7 +163,7 @@ enum CustomTriggerError<'a> {
 
 #[pg_trigger]
 fn example_lifetimes<'a, 'b>(trigger: &'a PgTrigger) -> Result<
-    PgHeapTuple<'a, AllocatedByRust>,
+    Option<PgHeapTuple<'a, AllocatedByRust>>,
     CustomTriggerError<'b>,
 > {
     return Err(CustomTriggerError::SomeStr("Oopsie"))
@@ -173,9 +172,9 @@ fn example_lifetimes<'a, 'b>(trigger: &'a PgTrigger) -> Result<
 
 # Escape hatches
 
-Unsafe [`pgx::pg_sys::FunctionCallInfo`][crate::pg_sys::FunctionCallInfo] and
-[`pgx::pg_sys::TriggerData`][crate::pg_sys::TriggerData] (include its contained
-[`pgx::pg_sys::Trigger`][crate::pg_sys::Trigger]) accessors are available..
+Unsafe [`pgx::pg_sys::FunctionCallInfo`][crate::pg_sys::FunctionCallInfo] ([`my_trigger.fcinfo()`][crate::trigger_support::PgTrigger::fcinfo]),
+[`pgx::pg_sys::TriggerData`][crate::pg_sys::TriggerData] ([`my_trigger.trigger_data()`][crate::trigger_support::PgTrigger::trigger_data]), and
+[`pgx::pg_sys::Trigger`][crate::pg_sys::Trigger] ([`my_trigger.trigger()`][crate::trigger_support::PgTrigger::trigger]) accessors are available.
 
 
 # Getting safe data all at once
@@ -191,11 +190,11 @@ use pgx::{pg_trigger, pg_sys, PgHeapTuple, WhoAllocated, PgHeapTupleError, PgTri
 
 #[pg_trigger]
 fn trigger_safe(trigger: &PgTrigger) -> Result<
-    PgHeapTuple<'_, impl WhoAllocated<pg_sys::HeapTupleData>>,
+    Option<PgHeapTuple<'_, impl WhoAllocated<pg_sys::HeapTupleData>>>,
     PgTriggerError,
 > {
     let trigger_safe = unsafe { trigger.to_safe() }?;
-    Ok(trigger_safe.current.expect("No current HeapTuple"))
+    Ok(trigger_safe.current)
 }
 ```
 

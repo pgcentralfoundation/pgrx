@@ -98,17 +98,22 @@ impl PgTrigger {
                 let maybe_pg_trigger = unsafe { ::pgx::trigger_support::PgTrigger::from_fcinfo(fcinfo) };
                 let pg_trigger = maybe_pg_trigger.expect("PgTrigger::from_fcinfo failed");
                 let trigger_fn_result: Result<
-                    ::pgx::heap_tuple::PgHeapTuple<'_, _>,
+                    Option<::pgx::heap_tuple::PgHeapTuple<'_, _>>,
                     _,
                 > = #function_ident(&pg_trigger);
 
                 let trigger_retval = trigger_fn_result.expect("Trigger function panic");
-                match trigger_retval.into_trigger_datum() {
-                    None => ::pgx::pg_return_null(fcinfo),
-                    Some(datum) => datum,
+                match trigger_retval {
+                    None => {
+                        // Yup, you return 0... https://www.postgresql.org/docs/current/trigger-example.html
+                        0.into_datum().unwrap()
+                    },
+                    Some(val) => match val.into_trigger_datum() {
+                        None => ::pgx::pg_return_null(fcinfo),
+                        Some(datum) => datum,
+                    },
                 }
             }
-
         };
         syn::parse2(tokens)
     }

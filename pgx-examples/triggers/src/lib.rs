@@ -25,7 +25,7 @@ enum TriggerError {
 #[pg_trigger]
 fn trigger_example(
     trigger: &pgx::PgTrigger,
-) -> Result<PgHeapTuple<'_, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>, TriggerError> {
+) -> Result<Option<PgHeapTuple<'_, impl WhoAllocated<pgx::pg_sys::HeapTupleData>>>, TriggerError> {
     let old = trigger.current().ok_or(TriggerError::NullOld)?;
 
     let mut current = old.into_owned();
@@ -35,7 +35,7 @@ fn trigger_example(
         current.set_by_name(col_name, "Bear")?;
     }
 
-    Ok(current)
+    Ok(Some(current))
 }
 
 extension_sql!(
