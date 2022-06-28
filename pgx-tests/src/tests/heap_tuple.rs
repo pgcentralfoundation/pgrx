@@ -439,8 +439,18 @@ mod sql_generator_tests {
             Option<::pgx::VariadicArray<::pgx::composite_type!("Dog")>>,
             "ARRAY[ROW('Nami', 0), ROW('Brandy', 0)]::Dog[]"
         ),
-    ) -> Option<Vec<::pgx::composite_type!("AnimalFriendshipEdge")>> {
-        unimplemented!()
+    ) -> impl Iterator<
+        Item = (
+            name!(dog, Option<::pgx::composite_type!("Dog")>),
+            name!(cat, Option<::pgx::composite_type!("Cat")>),
+            name!(fish, Option<::pgx::composite_type!("Fish")>),
+            name!(
+                related_edges,
+                Option<Vec<::pgx::composite_type!("AnimalFriendshipEdge")>>
+            ),
+        ),
+    > {
+        Vec::new().into_iter()
     }
 
     #[pg_extern]
@@ -524,7 +534,7 @@ mod sql_generator_tests {
         dog_tuple.set_by_name("scritches", 0).unwrap();
         dog_tuple.set_by_name("name", "Brandy").unwrap();
 
-        let mut cat_tuple = PgHeapTuple::new_composite_type("Dog").unwrap();
+        let mut cat_tuple = PgHeapTuple::new_composite_type("Cat").unwrap();
 
         cat_tuple.set_by_name("boops", 0).unwrap();
         cat_tuple.set_by_name("name", "Sally").unwrap();
