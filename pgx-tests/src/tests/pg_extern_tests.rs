@@ -20,7 +20,6 @@ fn fdw_handler_return() -> pgx::PgBox<pgx::pg_sys::FdwRoutine> {
     unimplemented!("Not a functional test, just a signature test for SQL generation. Feel free to make a functional test!")
 }
 
-
 #[cfg(any(test, feature = "pg_test"))]
 #[pgx::pg_schema]
 mod tests {

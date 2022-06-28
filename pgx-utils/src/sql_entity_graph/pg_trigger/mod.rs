@@ -23,24 +23,32 @@ impl PgTrigger {
             return Err(syn::Error::new(
                 Span::call_site(),
                 "Multiple `sql` arguments found, it must be unique",
-            ))
+            ));
         };
-        let to_sql_config = attributes.first().cloned().map(|PgTriggerAttribute::Sql(mut config)| {
+        let to_sql_config = attributes
+            .first()
+            .cloned()
+            .map(|PgTriggerAttribute::Sql(mut config)| {
                 if let Some(ref mut content) = config.content {
                     let value = content.value();
-                    let updated_value = value
-                        .replace("@FUNCTION_NAME@", &*(func.sig.ident.to_string() + "_wrapper"))
-                        + "\n";
+                    let updated_value = value.replace(
+                        "@FUNCTION_NAME@",
+                        &*(func.sig.ident.to_string() + "_wrapper"),
+                    ) + "\n";
                     *content = syn::LitStr::new(&updated_value, Span::call_site());
                 };
                 config
-            }).unwrap_or_default();
+            })
+            .unwrap_or_default();
 
         if !to_sql_config.overrides_default() {
             crate::ident_is_acceptable_to_postgres(&func.sig.ident)?;
         }
 
-        Ok(Self { func, to_sql_config })
+        Ok(Self {
+            func,
+            to_sql_config,
+        })
     }
 
     pub fn entity_tokens(&self) -> Result<ItemFn, syn::Error> {
