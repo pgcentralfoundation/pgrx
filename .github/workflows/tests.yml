@@ -292,6 +292,9 @@ jobs:
     - name: Print sccache stats (before)
       run: sccache --show-stats
 
+    - name: Run rustfmt
+      run: cargo fmt --all -- --check
+
     - name: Install cargo-pgx
       run: cargo install --path cargo-pgx/ --debug --force
 
