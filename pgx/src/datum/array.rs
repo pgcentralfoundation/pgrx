@@ -13,6 +13,39 @@ use std::marker::PhantomData;
 
 pub type VariadicArray<'a, T> = Array<'a, T>;
 
+/** An array of some type (eg. `TEXT[]`, `int[]`)
+
+While conceptually similar to a [`Vec<T>`][std::vec::Vec], arrays are lazy.
+
+Using a [`Vec<T>`][std::vec::Vec] here means each element of the passed array will be eagerly fetched and converted into a Rust type:
+
+```rust,no_run
+use pgx::*;
+
+#[pg_extern]
+fn with_vec(elems: Vec<String>) {
+    // Elements all already converted.
+    for elem in elems {
+        todo!()
+    }
+}
+```
+
+Using an array, elements are only fetched and converted into a Rust type on demand:
+
+```rust,no_run
+use pgx::*;
+
+#[pg_extern]
+fn with_vec(elems: Array<String>) {
+    // Elements converted one by one
+    for maybe_elem in elems {
+        let elem = maybe_elem.unwrap();
+        todo!()
+    }
+}
+```
+*/
 pub struct Array<'a, T: FromDatum> {
     ptr: *mut pg_sys::varlena,
     array_type: *mut pg_sys::ArrayType,

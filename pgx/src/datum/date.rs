@@ -11,8 +11,10 @@ use crate::{pg_sys, FromDatum, IntoDatum};
 use std::ops::{Deref, DerefMut};
 use time::format_description::FormatItem;
 
+/// A `date` type from PostgreSQL
 #[derive(Debug)]
 pub struct Date(time::Date);
+
 impl FromDatum for Date {
     #[inline]
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Date> {

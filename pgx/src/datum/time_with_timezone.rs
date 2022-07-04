@@ -12,6 +12,7 @@ use crate::{pg_sys, FromDatum, IntoDatum, PgBox};
 use std::ops::{Deref, DerefMut};
 use time::format_description::FormatItem;
 
+/// A `time with timezone` type from PostgreSQL
 #[derive(Debug)]
 pub struct TimeWithTimeZone(Time);
 impl FromDatum for TimeWithTimeZone {

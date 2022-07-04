@@ -18,7 +18,7 @@ use std::ffi::CStr;
 use std::fmt::{Display, Formatter};
 use std::num::NonZeroUsize;
 
-/// If converting a Datum to a Rust type fails, this is the set of possible reasons why.
+/// Reasons converting a Datum to a Rust type may fail
 #[derive(Debug)]
 pub enum TryFromDatumError {
     /// The specified type of the Datum is not compatible with the desired Rust type.

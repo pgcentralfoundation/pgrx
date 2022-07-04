@@ -9,6 +9,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 use crate::{pg_sys, FromDatum, IntoDatum};
 
+/// An `any` array (`Any[]`) from PostgreSQL
 #[derive(Debug, Clone, Copy)]
 pub struct AnyArray {
     datum: pg_sys::Datum,

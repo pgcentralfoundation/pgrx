@@ -12,6 +12,7 @@ use crate::{direct_function_call_as_datum, pg_sys, FromDatum, IntoDatum, Timesta
 use std::ops::{Deref, DerefMut};
 use time::{format_description::FormatItem, PrimitiveDateTime};
 
+/// A `timestamp` type from PostgreSQL
 #[derive(Debug, Copy, Clone)]
 pub struct Timestamp(time::PrimitiveDateTime);
 

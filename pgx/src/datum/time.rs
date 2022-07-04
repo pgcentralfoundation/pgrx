@@ -17,6 +17,7 @@ pub(crate) const USECS_PER_SEC: i64 = 1_000_000;
 pub(crate) const MINS_PER_HOUR: i64 = 60;
 pub(crate) const SEC_PER_MIN: i64 = 60;
 
+/// A `time` type from PostgreSQL
 #[derive(Debug)]
 pub struct Time(pub(crate) time::Time);
 impl FromDatum for Time {
