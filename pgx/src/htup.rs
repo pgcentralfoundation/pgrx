@@ -7,7 +7,7 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-//! Utility functions for working with `pg_sys::HeapTuple` and `pg_sys::HeapTupleHeader` structs
+//! Utility functions for working with [`pg_sys::HeapTuple`][crate::pg_sys::HeapTuple] and [`pg_sys::HeapTupleHeader`][crate::pg_sys::HeapTupleHeader] structs
 use crate::*;
 use std::num::NonZeroUsize;
 
