@@ -14,6 +14,7 @@ use serde::{de, Deserialize, Deserializer, Serialize};
 use serde_json::Number;
 use std::fmt;
 
+/// A `numeric` type from PostgreSQL
 #[derive(Serialize, Debug)]
 pub struct Numeric(pub String);
 
