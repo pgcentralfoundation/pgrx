@@ -15,7 +15,7 @@ use std::{
 };
 use time::{format_description::FormatItem, UtcOffset};
 
-/// A `timestamp with timezone` type from PostgreSQL
+/// A `timestamp with timezone` or `timestamptz` type from PostgreSQL
 #[derive(Debug, Copy, Clone)]
 pub struct TimestampWithTimeZone(time::OffsetDateTime);
 
