@@ -71,6 +71,7 @@ CREATE TYPE CatAndDogFriendship AS (
 const DOG_COMPOSITE_TYPE: &str = "Dog";
 const CAT_COMPOSITE_TYPE: &str = "Cat";
 const CAT_AND_DOG_FRIENDSHIP_COMPOSITE_TYPE: &str = "CatAndDogFriendship";
+
 /*
 While it may be tempting to do something like:
 

@@ -268,7 +268,7 @@ impl PgGuardRewriter {
     ) -> proc_macro2::TokenStream {
         let generic_type = proc_macro2::TokenStream::from_str(types.first().unwrap()).unwrap();
         let mut generic_type = syn::parse2::<syn::Type>(generic_type).unwrap();
-        crate::anonymonize_lifetimes(&mut generic_type);
+        crate::staticize_lifetimes(&mut generic_type);
 
         let result_handler = if optional {
             quote! {
@@ -376,7 +376,7 @@ impl PgGuardRewriter {
         let composite_type = format!("({})", types.join(","));
         let generic_type = proc_macro2::TokenStream::from_str(&composite_type).unwrap();
         let mut generic_type = syn::parse2::<syn::Type>(generic_type).unwrap();
-        crate::anonymonize_lifetimes(&mut generic_type);
+        crate::staticize_lifetimes(&mut generic_type);
 
         let result_handler = if optional {
             quote! {
@@ -722,7 +722,7 @@ impl FunctionSignatureRewriter {
                         let ts = if is_option {
                             let option_type = extract_option_type(&type_);
                             let mut option_type = syn::parse2::<syn::Type>(option_type).unwrap();
-                            crate::anonymonize_lifetimes(&mut option_type);
+                            crate::staticize_lifetimes(&mut option_type);
 
                             quote_spanned! {ident.span()=>
                                 let #name = pgx::pg_getarg::<#option_type>(#fcinfo_ident, #i);
@@ -743,7 +743,7 @@ impl FunctionSignatureRewriter {
                                 let #name = pgx::pg_getarg_datum_raw(#fcinfo_ident, #i) as #type_;
                             }
                         } else {
-                            crate::anonymonize_lifetimes(&mut type_);
+                            crate::staticize_lifetimes(&mut type_);
                             quote_spanned! {ident.span()=>
                                 let #name = pgx::pg_getarg::<#type_>(#fcinfo_ident, #i).unwrap_or_else(|| panic!("{} is null", stringify!{#ident}));
                             }

@@ -6,7 +6,7 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
-use crate::{anonymonize_lifetimes, sql_entity_graph::pg_extern::resolve_ty};
+use crate::{sql_entity_graph::pg_extern::resolve_ty, staticize_lifetimes};
 use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
 use syn::{FnArg, Pat};
@@ -39,7 +39,7 @@ impl PgExternArgument {
 
     pub fn build_from_pat_type(value: syn::PatType) -> Result<Option<Self>, syn::Error> {
         let mut true_ty = *value.ty.clone();
-        anonymonize_lifetimes(&mut true_ty);
+        staticize_lifetimes(&mut true_ty);
 
         let identifier = match *value.pat {
             Pat::Ident(ref p) => p.ident.clone(),
@@ -140,7 +140,7 @@ impl ToTokens for PgExternArgument {
         let composite_type = self.composite_type.clone().map(|v| v.expr);
         let composite_type_iter = composite_type.iter();
         let mut ty = self.ty.clone();
-        anonymonize_lifetimes(&mut ty);
+        staticize_lifetimes(&mut ty);
 
         let ty_string = ty.to_token_stream().to_string().replace(" ", "");
 

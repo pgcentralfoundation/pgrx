@@ -1,6 +1,6 @@
 use std::ops::Deref;
 
-use crate::anonymonize_lifetimes;
+use crate::staticize_lifetimes;
 use proc_macro2::Span;
 use syn::{
     parse::{Parse, ParseStream},
@@ -108,7 +108,7 @@ pub(crate) fn resolve_ty(
     // Anonymize lifetimes, so the SQL resolver isn't dealing with that.
     let ty = {
         let mut ty = ty;
-        anonymonize_lifetimes(&mut ty);
+        staticize_lifetimes(&mut ty);
         ty
     };
 
