@@ -1,5 +1,3 @@
-An example of how to create an Aggregate with `pgx`.
+An example of how to use composite types with `pgx`.
 
-Demonstrates how to create a `IntegerAvgState` aggregate.
-
-This example also demonstrates the use of `PgVarlena<T>` and how to use `#[pgvarlena_inoutfuncs]` with `#[derive(PostgresType)]`.
+Demonstrates how define composite types using `extension_sql!()` then later use them in functions.
