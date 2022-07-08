@@ -6,6 +6,7 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
+use crate::sql_entity_graph::UsedType;
 use proc_macro2::TokenStream as TokenStream2;
 use quote::{quote, ToTokens, TokenStreamExt};
 use std::convert::TryFrom;
@@ -15,26 +16,17 @@ use syn::{
     Token,
 };
 
-use super::resolve_ty::{resolve_ty, CompositeTypeMacro};
-
 #[derive(Debug, Clone)]
 pub struct ReturningIteratedItem {
-    ty: syn::Type,
+    used_ty: UsedType,
     name: Option<String>,
-    composite_type: Option<CompositeTypeMacro>,
 }
 
 #[derive(Debug, Clone)]
 pub enum Returning {
     None,
-    Type {
-        ty: syn::Type,
-        composite_type: Option<CompositeTypeMacro>,
-    },
-    SetOf {
-        ty: syn::Type,
-        composite_type: Option<CompositeTypeMacro>,
-    },
+    Type(UsedType),
+    SetOf(UsedType),
     Iterated(Vec<ReturningIteratedItem>),
     /// `pgx_pg_sys::Datum`
     Trigger,
@@ -49,18 +41,13 @@ impl Returning {
                     syn::GenericArgument::Binding(binding) => match &mut binding.ty {
                         syn::Type::Tuple(tuple_type) => Ok(Self::parse_type_tuple(tuple_type)?),
                         syn::Type::Path(path) => {
-                            let (ty, _, _, _, composite_type) =
-                                resolve_ty(syn::Type::Path(path.clone()))?;
-                            Ok(Returning::SetOf {
-                                ty: ty,
-                                composite_type,
-                            })
+                            let used_ty = UsedType::new(syn::Type::Path(path.clone()))?;
+                            Ok(Returning::SetOf(used_ty))
                         }
                         syn::Type::Reference(type_ref) => match &*type_ref.elem {
                             syn::Type::Path(path) => {
-                                let (ty, _, _, _, composite_type) =
-                                    resolve_ty(syn::Type::Path(path.clone()))?;
-                                Ok(Returning::SetOf { ty, composite_type })
+                                let used_ty = UsedType::new(syn::Type::Path(path.clone()))?;
+                                Ok(Returning::SetOf(used_ty))
                             }
                             _ => unimplemented!("Expected path"),
                         },
@@ -78,39 +65,44 @@ impl Returning {
         if type_tuple.elems.len() == 0 {
             return Ok(Returning::None);
         }
-        let returns: Vec<ReturningIteratedItem> = type_tuple
-            .elems
-            .iter_mut()
-            .flat_map(|elem| {
-                let elem = elem.clone();
+        let mut returns: Vec<ReturningIteratedItem> = vec![];
+        for elem in &type_tuple.elems {
+            let elem = elem.clone();
 
-                match elem {
-                    syn::Type::Macro(ref macro_pat) => {
-                        // This is essentially a copy of `parse_type_macro` but it returns items instead of `Returning`
-                        let mac = &macro_pat.mac;
-                        let archetype = mac.path.segments.last().unwrap();
-                        match archetype.ident.to_string().as_str() {
-                            "name" => {
-                                let out: NameMacro = mac
-                                    .parse_body()
-                                    .expect(&*format!("Failed to parse named!(): {:?}", mac));
-                                Some(ReturningIteratedItem { ty: out.ty, name: Some(out.ident), composite_type: out.composite_type })
-                            },
-                            "composite_type" => {
-                                let composite_type: CompositeTypeMacro = mac.parse_body().expect(&*format!("Failed to parse composite_type!(): {:?}", mac));
-                                Some(ReturningIteratedItem {
-                                    ty: elem,
-                                    name: None,
-                                    composite_type: Some(composite_type),
-                                })
-                            }
-                            _ => unimplemented!("Don't support anything other than `name!()` and `composite_type!()`"),
+            let return_ty = match elem {
+                syn::Type::Macro(ref macro_pat) => {
+                    // This is essentially a copy of `parse_type_macro` but it returns items instead of `Returning`
+                    let mac = &macro_pat.mac;
+                    let archetype = mac.path.segments.last().unwrap();
+                    match archetype.ident.to_string().as_str() {
+                        "name" => {
+                            let out: NameMacro = mac.parse_body()?;
+                            Some(ReturningIteratedItem {
+                                name: Some(out.ident),
+                                used_ty: out.used_ty,
+                            })
                         }
-                    },
-                    ty => Some(ReturningIteratedItem { ty: ty.clone(), name: None, composite_type: None }),
+                        "composite_type" => {
+                            let used_ty = UsedType::new(elem)?;
+                            Some(ReturningIteratedItem {
+                                used_ty,
+                                name: None,
+                            })
+                        }
+                        _ => unimplemented!(
+                            "Don't support anything other than `name!()` and `composite_type!()`"
+                        ),
+                    }
                 }
-            })
-            .collect();
+                ty => Some(ReturningIteratedItem {
+                    used_ty: UsedType::new(ty)?,
+                    name: None,
+                }),
+            };
+            if let Some(return_ty) = return_ty {
+                returns.push(return_ty);
+            }
+        }
         Ok(Returning::Iterated(returns))
     }
 
@@ -127,24 +119,15 @@ impl Returning {
         let archetype = mac.path.segments.last().unwrap();
         match archetype.ident.to_string().as_str() {
             "name" => {
-                let out: NameMacro = mac
-                    .parse_body()
-                    .expect(&*format!("Failed to parse named!(): {:?}", mac));
+                let out: NameMacro = mac.parse_body()?;
                 Ok(Returning::Iterated(vec![ReturningIteratedItem {
-                    ty: out.ty,
+                    used_ty: out.used_ty,
                     name: Some(out.ident),
-                    composite_type: out.composite_type,
                 }]))
             }
-            "composite_type" => {
-                let composite_type: CompositeTypeMacro = mac
-                    .parse_body()
-                    .expect(&*format!("Failed to parse composite_type!(): {:?}", mac));
-                Ok(Returning::Type {
-                    ty: syn::Type::Macro(type_macro.clone()),
-                    composite_type: Some(composite_type),
-                })
-            }
+            "composite_type" => Ok(Returning::Type(UsedType::new(syn::Type::Macro(
+                type_macro.clone(),
+            ))?)),
             _ => unimplemented!(
                 "Don't support anything other than `name!()` and `composite_type!()`"
             ),
@@ -221,15 +204,13 @@ impl TryFrom<&syn::ReturnType> for Returning {
                         } else if let Some(returning) = maybe_inner_impl_trait {
                             Ok(returning)
                         } else {
-                            let (ty, _, _, _, composite_type) =
-                                resolve_ty(syn::Type::Path(typepath.clone()))?;
-                            Ok(Returning::Type { ty, composite_type })
+                            let used_ty = UsedType::new(syn::Type::Path(typepath.clone()))?;
+                            Ok(Returning::Type(used_ty))
                         }
                     }
                     syn::Type::Reference(ty_ref) => {
-                        let (ty, _, _, _, composite_type) =
-                            resolve_ty(syn::Type::Reference(ty_ref.clone()))?;
-                        Ok(Returning::Type { ty, composite_type })
+                        let used_ty = UsedType::new(syn::Type::Reference(ty_ref.clone()))?;
+                        Ok(Returning::Type(used_ty))
                     }
                     syn::Type::Tuple(ref mut tup) => Self::parse_type_tuple(tup),
                     syn::Type::Macro(ref mut type_macro) => Self::parse_type_macro(type_macro),
@@ -260,70 +241,31 @@ impl ToTokens for Returning {
             Returning::None => quote! {
                 ::pgx::utils::sql_entity_graph::PgExternReturnEntity::None
             },
-            Returning::Type { ty, composite_type } => {
-                let ty_string = ty.to_token_stream().to_string().replace(" ", "");
-                let composite_type = composite_type.clone().map(|v| v.expr);
-                let composite_type_iter = composite_type.iter();
+            Returning::Type(used_ty) => {
+                let used_ty_entity_tokens = used_ty.entity_tokens();
                 quote! {
                     ::pgx::utils::sql_entity_graph::PgExternReturnEntity::Type {
-                        ty: ::pgx::utils::sql_entity_graph::TypeEntity {
-                            ty_id: TypeId::of::<#ty>(),
-                            ty_source: #ty_string,
-                            full_path: core::any::type_name::<#ty>(),
-                            module_path: {
-                                let type_name = core::any::type_name::<#ty>();
-                                let mut path_items: Vec<_> = type_name.split("::").collect();
-                                let _ = path_items.pop(); // Drop the one we don't want.
-                                path_items.join("::")
-                            },
-                            composite_type: None #( .unwrap_or(Some(#composite_type_iter)) )*,
-                        }
+                        ty: #used_ty_entity_tokens,
                     }
                 }
             }
-            Returning::SetOf { ty, composite_type } => {
-                let ty_string = ty.to_token_stream().to_string().replace(" ", "");
-                let composite_type = composite_type.clone().map(|v| v.expr);
-                let composite_type_iter = composite_type.iter();
+            Returning::SetOf(used_ty) => {
+                let used_ty_entity_tokens = used_ty.entity_tokens();
                 quote! {
                     ::pgx::utils::sql_entity_graph::PgExternReturnEntity::SetOf {
-                        ty: ::pgx::utils::sql_entity_graph::TypeEntity {
-                            ty_id: TypeId::of::<#ty>(),
-                            ty_source: #ty_string,
-                            full_path: core::any::type_name::<#ty>(),
-                            module_path: {
-                                let type_name = core::any::type_name::<#ty>();
-                                let mut path_items: Vec<_> = type_name.split("::").collect();
-                                let _ = path_items.pop(); // Drop the one we don't want.
-                                path_items.join("::")
-                            },
-                            composite_type: None #( .unwrap_or(Some(#composite_type_iter)) )*,
-                        },
+                        ty: #used_ty_entity_tokens,
                     }
                 }
             }
             Returning::Iterated(items) => {
                 let quoted_items = items
                     .iter()
-                    .map(|ReturningIteratedItem { ty, name, composite_type }| {
+                    .map(|ReturningIteratedItem { used_ty, name }| {
                         let name_iter = name.iter();
-                        let ty_string = ty.to_token_stream().to_string().replace(" ", "");
-                        let composite_type = composite_type.clone().map(|v| v.expr);
-                        let composite_type_iter= composite_type.iter();
+                        let used_ty_entity_tokens = used_ty.entity_tokens();
                         quote! {
                             ::pgx::utils::sql_entity_graph::PgExternReturnEntityIteratedItem {
-                                ty: ::pgx::utils::sql_entity_graph::TypeEntity {
-                                    ty_id: TypeId::of::<#ty>(),
-                                    ty_source: #ty_string,
-                                    full_path: core::any::type_name::<#ty>(),
-                                    module_path: {
-                                        let type_name = core::any::type_name::<#ty>();
-                                        let mut path_items: Vec<_> = type_name.split("::").collect();
-                                        let _ = path_items.pop(); // Drop the one we don't want.
-                                        path_items.join("::")
-                                    },
-                                    composite_type: None #( .unwrap_or(Some(#composite_type_iter)) )*,
-                                },
+                                ty: #used_ty_entity_tokens,
                                 name: None #( .unwrap_or(Some(stringify!(#name_iter))) )*,
                             }
                         }
@@ -346,8 +288,7 @@ impl ToTokens for Returning {
 #[derive(Debug, Clone)]
 pub struct NameMacro {
     pub(crate) ident: String,
-    pub(crate) ty: syn::Type,
-    pub(crate) composite_type: Option<CompositeTypeMacro>,
+    pub(crate) used_ty: UsedType,
 }
 
 impl Parse for NameMacro {
@@ -387,14 +328,10 @@ impl Parse for NameMacro {
                     .map(|_| String::from("use"))
             })?;
         let _comma: Token![,] = input.parse()?;
-        let ty = input.parse()?;
+        let ty: syn::Type = input.parse()?;
 
-        let (ty, _, _, _, composite_type) = resolve_ty(ty)?;
+        let used_ty = UsedType::new(ty)?;
 
-        Ok(Self {
-            ident,
-            ty,
-            composite_type,
-        })
+        Ok(Self { ident, used_ty })
     }
 }

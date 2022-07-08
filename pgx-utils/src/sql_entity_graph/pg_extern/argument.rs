@@ -6,12 +6,10 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
-use crate::{sql_entity_graph::pg_extern::resolve_ty, staticize_lifetimes};
+use crate::sql_entity_graph::UsedType;
 use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
 use syn::{FnArg, Pat};
-
-use super::resolve_ty::CompositeTypeMacro;
 
 /// A parsed `#[pg_extern]` argument.
 ///
@@ -19,14 +17,7 @@ use super::resolve_ty::CompositeTypeMacro;
 #[derive(Debug, Clone)]
 pub struct PgExternArgument {
     pat: syn::Ident,
-    ty: syn::Type,
-    /// Set via `composite_type!()`
-    composite_type: Option<CompositeTypeMacro>,
-    /// Set via `default!()`
-    default: Option<String>,
-    /// Set via `variadic!()`
-    variadic: bool,
-    optional: bool,
+    used_ty: UsedType,
 }
 
 impl PgExternArgument {
@@ -38,9 +29,6 @@ impl PgExternArgument {
     }
 
     pub fn build_from_pat_type(value: syn::PatType) -> Result<Option<Self>, syn::Error> {
-        let mut true_ty = *value.ty.clone();
-        staticize_lifetimes(&mut true_ty);
-
         let identifier = match *value.pat {
             Pat::Ident(ref p) => p.ident.clone(),
             Pat::Reference(ref p_ref) => match *p_ref.pat {
@@ -50,21 +38,16 @@ impl PgExternArgument {
             _ => return Err(syn::Error::new(Span::call_site(), "Unable to parse FnArg")),
         };
 
-        let (mut true_ty, optional, variadic, default, sql) = resolve_ty(*value.ty)?;
+        let used_ty = UsedType::new(*value.ty)?;
 
         // We special case ignore `*mut pg_sys::FunctionCallInfoData`
-        match true_ty {
-            syn::Type::Reference(ref mut ty_ref) => {
-                if let Some(ref mut lifetime) = &mut ty_ref.lifetime {
-                    lifetime.ident = syn::Ident::new("static", Span::call_site());
-                }
-            }
-            syn::Type::Path(ref mut path) => {
-                let segments = &mut path.path;
+        match used_ty.resolved_ty {
+            syn::Type::Path(ref path) => {
+                let segments = &path.path;
                 let mut saw_pg_sys = false;
                 let mut saw_functioncallinfobasedata = false;
 
-                for segment in &mut segments.segments {
+                for segment in &segments.segments {
                     let ident_string = segment.ident.to_string();
                     match ident_string.as_str() {
                         "pg_sys" => saw_pg_sys = true,
@@ -76,26 +59,9 @@ impl PgExternArgument {
                     || (saw_functioncallinfobasedata && segments.segments.len() == 1)
                 {
                     return Ok(None);
-                } else {
-                    for segment in &mut path.path.segments {
-                        match &mut segment.arguments {
-                            syn::PathArguments::AngleBracketed(ref mut inside_brackets) => {
-                                for mut arg in &mut inside_brackets.args {
-                                    match &mut arg {
-                                        syn::GenericArgument::Lifetime(ref mut lifetime) => {
-                                            lifetime.ident =
-                                                syn::Ident::new("static", Span::call_site())
-                                        }
-                                        _ => (),
-                                    }
-                                }
-                            }
-                            _ => (),
-                        }
-                    }
                 }
             }
-            syn::Type::Ptr(ref ptr) => match *ptr.elem {
+            syn::Type::Ptr(ref type_ptr) => match *type_ptr.elem {
                 syn::Type::Path(ref path) => {
                     let segments = &path.path;
                     let mut saw_pg_sys = false;
@@ -122,50 +88,20 @@ impl PgExternArgument {
 
         Ok(Some(PgExternArgument {
             pat: identifier,
-            ty: true_ty,
-            composite_type: sql,
-            default,
-            variadic,
-            optional,
+            used_ty,
         }))
     }
 }
 
 impl ToTokens for PgExternArgument {
     fn to_tokens(&self, tokens: &mut TokenStream2) {
-        let is_optional = self.optional;
-        let is_variadic = self.variadic;
         let pat = &self.pat;
-        let default = self.default.iter();
-        let composite_type = self.composite_type.clone().map(|v| v.expr);
-        let composite_type_iter = composite_type.iter();
-        let mut ty = self.ty.clone();
-        staticize_lifetimes(&mut ty);
-
-        let ty_string = ty.to_token_stream().to_string().replace(" ", "");
-
-        let ty_entity = quote! {
-            ::pgx::utils::sql_entity_graph::TypeEntity {
-                ty_source: #ty_string,
-                ty_id: TypeId::of::<#ty>(),
-                full_path: core::any::type_name::<#ty>(),
-                module_path: {
-                    let ty_name = core::any::type_name::<#ty>();
-                    let mut path_items: Vec<_> = ty_name.split("::").collect();
-                    let _ = path_items.pop(); // Drop the one we don't want.
-                    path_items.join("::")
-                },
-                composite_type: None #( .unwrap_or(Some(#composite_type_iter)) )*,
-            }
-        };
+        let used_ty_entity = self.used_ty.entity_tokens();
 
         let quoted = quote! {
             ::pgx::utils::sql_entity_graph::PgExternArgumentEntity {
                 pattern: stringify!(#pat),
-                ty: #ty_entity,
-                is_optional: #is_optional,
-                is_variadic: #is_variadic,
-                default: None #( .unwrap_or(Some(#default)) )*,
+                used_ty: #used_ty_entity,
             }
         };
         tokens.append_all(quoted);

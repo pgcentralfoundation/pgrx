@@ -8,11 +8,9 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 mod aggregate_type;
 pub(crate) mod entity;
-mod maybe_variadic_type;
 mod options;
 
 pub use aggregate_type::{AggregateType, AggregateTypeList};
-pub use maybe_variadic_type::{MaybeNamedVariadicType, MaybeNamedVariadicTypeList};
 pub use options::{FinalizeModify, ParallelOption};
 
 use convert_case::{Case, Casing};
@@ -26,6 +24,8 @@ use syn::{
 };
 
 use crate::sql_entity_graph::ToSqlConfig;
+
+use super::UsedType;
 
 // We support only 32 tuples...
 const ARG_NAMES: [&str; 32] = [
@@ -71,7 +71,7 @@ pub struct PgAggregate {
     name: Expr,
     pg_externs: Vec<ItemFn>,
     // Note these should not be considered *writable*, they're snapshots from construction.
-    type_args: MaybeNamedVariadicTypeList,
+    type_args: AggregateTypeList,
     type_ordered_set_args: Option<AggregateTypeList>,
     type_moving_state: Option<syn::Type>,
     type_stype: AggregateType,
@@ -162,7 +162,7 @@ impl PgAggregate {
             remapped
         };
         let type_stype = AggregateType {
-            ty: type_state_without_self.clone(),
+            used_ty: UsedType::new(type_state_without_self.clone())?,
             name: Some("state".into()),
         };
 
@@ -190,7 +190,7 @@ impl PgAggregate {
                 let direct_args = order_by_direct_args
                     .found
                     .iter()
-                    .map(|x| (x.name.clone(), x.ty.clone()))
+                    .map(|x| (x.name.clone(), x.used_ty.resolved_ty.clone()))
                     .collect::<Vec<_>>();
                 let direct_arg_names = ARG_NAMES[0..direct_args.len()]
                     .iter()
@@ -226,7 +226,7 @@ impl PgAggregate {
                 "`#[pg_aggregate]` requires the `Args` type defined.",
             )
         })?;
-        let type_args_value = MaybeNamedVariadicTypeList::new(type_args.ty.clone())?;
+        let type_args_value = AggregateTypeList::new(type_args.ty.clone())?;
 
         // `Finalize` is an optional value, we default to nothing.
         let type_finalize = get_impl_type_by_name(&item_impl_snapshot, "Finalize");
@@ -247,7 +247,7 @@ impl PgAggregate {
             let args = type_args_value
                 .found
                 .iter()
-                .map(|x| (x.name.clone(), x.ty.clone()))
+                .map(|x| (x.name.clone(), x.used_ty.original_ty.clone()))
                 .collect::<Vec<_>>();
             let arg_names = ARG_NAMES[0..args.len()]
                 .iter()
@@ -418,7 +418,7 @@ impl PgAggregate {
             let args = type_args_value
                 .found
                 .iter()
-                .map(|x| x.variadic_ty.clone().unwrap_or(x.ty.clone()))
+                .map(|x| x.used_ty.resolved_ty.clone())
                 .collect::<Vec<_>>();
             let args_with_names = args.iter().zip(ARG_NAMES.iter()).map(|(arg, name)| {
                 let name_ident = Ident::new(name, Span::call_site());
@@ -648,10 +648,13 @@ impl PgAggregate {
                     deserialfunc: None #( .unwrap_or(Some(stringify!(#fn_deserial_iter))) )*,
                     msfunc: None #( .unwrap_or(Some(stringify!(#fn_moving_state_iter))) )*,
                     minvfunc: None #( .unwrap_or(Some(stringify!(#fn_moving_state_inverse_iter))) )*,
-                    mstype: None #( .unwrap_or(Some(::pgx::utils::sql_entity_graph::AggregateTypeEntity {
-                        ty_source: #type_moving_state_string,
-                        ty_id: ::core::any::TypeId::of::<#type_moving_state_iter>(),
-                        full_path: ::core::any::type_name::<#type_moving_state_iter>(),
+                    mstype: None #( .unwrap_or(Some(::pgx::utils::sql_entity_graph::MaybeNamedTypeEntity {
+                        inner: ::pgx::utils::sql_entity_graph::TypeEntity {
+                            ty_source: #type_moving_state_string,
+                            ty_id: ::core::any::TypeId::of::<#type_moving_state_iter>(),
+                            full_path: ::core::any::type_name::<#type_moving_state_iter>(),
+                            composite_type: None,
+                        },
                         name: None
                     })) )*,
                     mfinalfunc: None #( .unwrap_or(Some(stringify!(#fn_moving_finalize_iter))) )*,

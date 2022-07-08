@@ -123,9 +123,11 @@ fn scritch_dog(
 Make a cat and a dog friends, returning that relationship, roughly the same as:
 
 ```sql
-CREATE FUNCTION make_friendship(dog Dog, cat Cat) RETURNS CatAndDogFriendship
+CREATE FUNCTION make_friendship(dog Dog, cat Cat)
+    RETURNS CatAndDogFriendship
     LANGUAGE SQL
-    STRICT RETURN ROW(dog, cat)::CatAndDogFriendship;
+    STRICT
+    RETURN ROW(cat, dog)::CatAndDogFriendship;
 ```
 This function primarily exists to demonstrate how to make some `extension_sql!()` "appear before"
 the function.
@@ -140,6 +142,66 @@ fn make_friendship(
     friendship.set_by_name("dog", dog).unwrap();
     friendship.set_by_name("cat", cat).unwrap();
     friendship
+}
+
+/*
+Create sum the scritches recieved by dogs, roughly the equivalent of:
+
+```sql
+CREATE FUNCTION sum_scritches_state(state integer, new Dog)
+    RETURNS integer
+    LANGUAGE SQL
+    STRICT
+    RETURN state + new.scritches;
+
+CREATE AGGREGATE sum_scritches ("value" Dog) (
+    SFUNC = "sum_scritches_state",
+    STYPE = integer,
+    INITCOND = '0'
+);
+```
+*/
+struct SumScritches;
+
+#[pg_aggregate]
+impl Aggregate for SumScritches {
+    type State = i32;
+    type Args = pgx::name!(value, pgx::composite_type!("Dog"));
+
+    fn state(
+        current: Self::State,
+        arg: Self::Args,
+        _fcinfo: pg_sys::FunctionCallInfo,
+    ) -> Self::State {
+        let arg_scritches: i32 = arg
+            .get_by_name("scritches")
+            .unwrap() // Unwrap the result of the conversion
+            .unwrap_or_default(); // The number of scritches, or 0 if there was none set
+        current + arg_scritches
+    }
+}
+
+struct ScritchCollector;
+
+#[pg_aggregate]
+impl Aggregate for ScritchCollector {
+    type State = pgx::composite_type!("Dog");
+    type Args = i32;
+
+    fn state(
+        mut current: Self::State,
+        arg: Self::Args,
+        _fcinfo: pg_sys::FunctionCallInfo,
+    ) -> Self::State {
+        let current_scritches: i32 = current
+            .get_by_name("scritches")
+            .unwrap()
+            .unwrap_or_default();
+        current
+            .set_by_name("scritches", current_scritches + arg)
+            .unwrap();
+        current
+    }
 }
 
 #[cfg(any(test, feature = "pg_test"))]

@@ -7,19 +7,19 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use crate::sql_entity_graph::TypeEntity;
+use crate::sql_entity_graph::UsedTypeEntity;
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub enum PgExternReturnEntity {
     None,
-    Type { ty: TypeEntity },
-    SetOf { ty: TypeEntity },
+    Type { ty: UsedTypeEntity },
+    SetOf { ty: UsedTypeEntity },
     Iterated(Vec<PgExternReturnEntityIteratedItem>),
     Trigger,
 }
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct PgExternReturnEntityIteratedItem {
-    pub ty: TypeEntity,
+    pub ty: UsedTypeEntity,
     pub name: Option<&'static str>,
 }

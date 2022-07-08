@@ -876,22 +876,24 @@ fn initialize_externs(
         for arg in &item.fn_args {
             let mut found = false;
             for (ty_item, &_ty_index) in mapped_types {
-                if ty_item.id_matches(&arg.ty.ty_id) {
+                if ty_item.id_matches(&arg.used_ty.ty_id) {
                     found = true;
                     break;
                 }
             }
             for (ty_item, &_ty_index) in mapped_enums {
-                if ty_item.id_matches(&arg.ty.ty_id) {
+                if ty_item.id_matches(&arg.used_ty.ty_id) {
                     found = true;
                     break;
                 }
             }
             if !found {
                 mapped_builtin_types
-                    .entry(arg.ty.full_path.to_string())
+                    .entry(arg.used_ty.full_path.to_string())
                     .or_insert_with(|| {
-                        graph.add_node(SqlGraphEntity::BuiltinType(arg.ty.full_path.to_string()))
+                        graph.add_node(SqlGraphEntity::BuiltinType(
+                            arg.used_ty.full_path.to_string(),
+                        ))
                     });
             }
         }
@@ -1019,7 +1021,7 @@ fn connect_externs(
             let mut found = false;
 
             for (ty_item, &ty_index) in types {
-                if ty_item.id_matches(&arg.ty.ty_id) {
+                if ty_item.id_matches(&arg.used_ty.ty_id) {
                     tracing::debug!(from = %item.rust_identifier(), to = %ty_item.rust_identifier(), "Adding Extern after Type (due to argument) edge");
                     graph.add_edge(ty_index, index, SqlGraphRelationship::RequiredByArg);
                     found = true;
@@ -1028,7 +1030,7 @@ fn connect_externs(
             }
             if !found {
                 for (enum_item, &enum_index) in enums {
-                    if enum_item.id_matches(&arg.ty.ty_id) {
+                    if enum_item.id_matches(&arg.used_ty.ty_id) {
                         tracing::debug!(from = %item.rust_identifier(), to = %enum_item.rust_identifier(), "Adding Extern after Enum (due to argument) edge");
                         graph.add_edge(enum_index, index, SqlGraphRelationship::RequiredByArg);
                         found = true;
@@ -1037,23 +1039,23 @@ fn connect_externs(
                 }
             }
             if !found {
-                let builtin_index = builtin_types.get(arg.ty.full_path).expect(&format!(
+                let builtin_index = builtin_types.get(arg.used_ty.full_path).expect(&format!(
                     "Could not fetch Builtin Type {}.",
-                    arg.ty.full_path
+                    arg.used_ty.full_path
                 ));
                 tracing::debug!(from = %item.rust_identifier(), to = %arg.rust_identifier(), "Adding Extern(arg) after BuiltIn Type (due to argument) edge");
                 graph.add_edge(*builtin_index, index, SqlGraphRelationship::RequiredByArg);
             }
             if !found {
                 for (ext_item, ext_index) in extension_sqls {
-                    if let Some(_) = ext_item
-                        .has_sql_declared_entity(&SqlDeclared::Type(arg.ty.full_path.to_string()))
-                    {
+                    if let Some(_) = ext_item.has_sql_declared_entity(&SqlDeclared::Type(
+                        arg.used_ty.full_path.to_string(),
+                    )) {
                         tracing::debug!(from = %item.rust_identifier(), to = %arg.rust_identifier(), "Adding Extern(arg) after Extension SQL (due to argument) edge");
                         graph.add_edge(*ext_index, index, SqlGraphRelationship::RequiredByArg);
-                    } else if let Some(_) = ext_item
-                        .has_sql_declared_entity(&SqlDeclared::Enum(arg.ty.full_path.to_string()))
-                    {
+                    } else if let Some(_) = ext_item.has_sql_declared_entity(&SqlDeclared::Enum(
+                        arg.used_ty.full_path.to_string(),
+                    )) {
                         tracing::debug!(from = %item.rust_identifier(), to = %arg.rust_identifier(), "Adding Extern(arg) after Extension SQL (due to argument) edge");
                         graph.add_edge(*ext_index, index, SqlGraphRelationship::RequiredByArg);
                     }
@@ -1331,23 +1333,23 @@ fn initialize_aggregates(
         for arg in &item.args {
             let mut found = false;
             for (ty_item, &_ty_index) in mapped_types {
-                if ty_item.id_matches(&arg.agg_ty.ty_id) {
+                if ty_item.id_matches(&arg.used_ty.ty_id) {
                     found = true;
                     break;
                 }
             }
             for (ty_item, &_ty_index) in mapped_enums {
-                if ty_item.id_matches(&arg.agg_ty.ty_id) {
+                if ty_item.id_matches(&arg.used_ty.ty_id) {
                     found = true;
                     break;
                 }
             }
             if !found {
                 mapped_builtin_types
-                    .entry(arg.agg_ty.full_path.to_string())
+                    .entry(arg.used_ty.full_path.to_string())
                     .or_insert_with(|| {
                         graph.add_node(SqlGraphEntity::BuiltinType(
-                            arg.agg_ty.full_path.to_string(),
+                            arg.used_ty.full_path.to_string(),
                         ))
                     });
             }
@@ -1394,16 +1396,16 @@ fn connect_aggregates(
                 "Aggregate",
                 index,
                 &item.rust_identifier(),
-                &arg.agg_ty.ty_id,
+                &arg.used_ty.ty_id,
                 types,
                 enums,
             );
             if !found {
-                let builtin_index = builtin_types.get(arg.agg_ty.full_path).expect(&format!(
+                let builtin_index = builtin_types.get(arg.used_ty.full_path).expect(&format!(
                     "Could not fetch Builtin Type {}.",
-                    arg.agg_ty.full_path
+                    arg.used_ty.full_path
                 ));
-                tracing::debug!(from = %item.rust_identifier(), to = %arg.agg_ty.full_path, "Adding Aggregate after BuiltIn Type edge");
+                tracing::debug!(from = %item.rust_identifier(), to = %arg.used_ty.full_path, "Adding Aggregate after BuiltIn Type edge");
                 graph.add_edge(*builtin_index, index, SqlGraphRelationship::RequiredByArg);
             }
         }
@@ -1414,15 +1416,16 @@ fn connect_aggregates(
                 "Aggregate",
                 index,
                 &item.rust_identifier(),
-                &arg.ty_id,
+                &arg.used_ty.ty_id,
                 types,
                 enums,
             );
             if !found {
-                let builtin_index = builtin_types
-                    .get(arg.full_path)
-                    .expect(&format!("Could not fetch Builtin Type {}.", arg.full_path));
-                tracing::debug!(from = %item.rust_identifier(), to = %arg.full_path, "Adding Aggregate after BuiltIn Type edge");
+                let builtin_index = builtin_types.get(arg.used_ty.full_path).expect(&format!(
+                    "Could not fetch Builtin Type {}.",
+                    arg.used_ty.full_path
+                ));
+                tracing::debug!(from = %item.rust_identifier(), to = %arg.used_ty.full_path, "Adding Aggregate after BuiltIn Type edge");
                 graph.add_edge(*builtin_index, index, SqlGraphRelationship::RequiredByArg);
             }
         }
@@ -1433,15 +1436,16 @@ fn connect_aggregates(
                 "Aggregate",
                 index,
                 &item.rust_identifier(),
-                &arg.ty_id,
+                &arg.used_ty.ty_id,
                 types,
                 enums,
             );
             if !found {
-                let builtin_index = builtin_types
-                    .get(arg.full_path)
-                    .expect(&format!("Could not fetch Builtin Type {}.", arg.full_path));
-                tracing::debug!(from = %item.rust_identifier(), to = %arg.full_path, "Adding Aggregate after BuiltIn Type edge");
+                let builtin_index = builtin_types.get(arg.used_ty.full_path).expect(&format!(
+                    "Could not fetch Builtin Type {}.",
+                    arg.used_ty.full_path
+                ));
+                tracing::debug!(from = %item.rust_identifier(), to = %arg.used_ty.full_path, "Adding Aggregate after BuiltIn Type edge");
                 graph.add_edge(*builtin_index, index, SqlGraphRelationship::RequiredByArg);
             }
         }

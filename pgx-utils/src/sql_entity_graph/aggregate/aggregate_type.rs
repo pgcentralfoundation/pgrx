@@ -7,7 +7,7 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 use super::get_pgx_attr_macro;
-use crate::sql_entity_graph::NameMacro;
+use crate::sql_entity_graph::{pg_extern::NameMacro, UsedType};
 
 use proc_macro2::TokenStream as TokenStream2;
 use quote::ToTokens;
@@ -65,35 +65,33 @@ impl ToTokens for AggregateTypeList {
 
 #[derive(Debug, Clone)]
 pub struct AggregateType {
-    pub ty: Type,
+    pub used_ty: UsedType,
     /// The name, if it exists.
     pub name: Option<String>,
 }
 
 impl AggregateType {
     pub fn new(ty: syn::Type) -> Result<Self, syn::Error> {
-        let name_tokens = get_pgx_attr_macro("name", &ty);
-        let name = match name_tokens {
-            Some(tokens) => {
-                let name_macro =
-                    syn::parse2::<NameMacro>(tokens).expect("Could not parse `name!()` macro");
-                Some(name_macro.ident)
-            }
-            None => None,
+        let (name_macro, name) = if let Some(name_macro) = get_pgx_attr_macro("name", &ty) {
+            let name_macro = syn::parse2::<NameMacro>(name_macro)?;
+            let name = Some(name_macro.ident.clone());
+            (Some(name_macro), name)
+        } else {
+            (None, None)
         };
-        let retval = Self { name, ty };
+
+        let used_ty = name_macro.map(|v| v.used_ty).unwrap_or(UsedType::new(ty)?);
+
+        let retval = Self { used_ty, name };
         Ok(retval)
     }
 
     pub fn entity_tokens(&self) -> Expr {
-        let ty = &self.ty;
-        let ty_string = ty.to_token_stream().to_string().replace(" ", "");
+        let used_ty_entity_tokens = self.used_ty.entity_tokens();
         let name = self.name.iter();
         parse_quote! {
             ::pgx::utils::sql_entity_graph::AggregateTypeEntity {
-                ty_source: #ty_string,
-                ty_id: core::any::TypeId::of::<#ty>(),
-                full_path: core::any::type_name::<#ty>(),
+                used_ty: #used_ty_entity_tokens,
                 name: None #( .unwrap_or(Some(#name)) )*,
             }
         }
@@ -102,12 +100,112 @@ impl AggregateType {
 
 impl ToTokens for AggregateType {
     fn to_tokens(&self, tokens: &mut TokenStream2) {
-        self.ty.to_tokens(tokens)
+        self.used_ty.resolved_ty.to_tokens(tokens)
     }
 }
 
 impl Parse for AggregateType {
     fn parse(input: ParseStream) -> Result<Self, syn::Error> {
         Self::new(input.parse()?)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::AggregateTypeList;
+    use eyre::{eyre as eyre_err, Result};
+    use syn::parse_quote;
+
+    #[test]
+    fn solo() -> Result<()> {
+        let tokens: syn::Type = parse_quote! {
+            i32
+        };
+        // It should not error, as it's valid.
+        let list = AggregateTypeList::new(tokens);
+        assert!(list.is_ok());
+        let list = list.unwrap();
+        let found = &list.found[0];
+        let found_string = match &found.used_ty.resolved_ty {
+            syn::Type::Path(ty_path) => ty_path.path.segments.last().unwrap().ident.to_string(),
+            _ => return Err(eyre_err!("Wrong found.used_ty.resolved_ty")),
+        };
+        assert_eq!(found_string, "i32");
+        Ok(())
+    }
+
+    #[test]
+    fn list() -> Result<()> {
+        let tokens: syn::Type = parse_quote! {
+            (i32, i8)
+        };
+        // It should not error, as it's valid.
+        let list = AggregateTypeList::new(tokens);
+        assert!(list.is_ok());
+        let list = list.unwrap();
+        let first = &list.found[0];
+        let first_string = match &first.used_ty.resolved_ty {
+            syn::Type::Path(ty_path) => ty_path.path.segments.last().unwrap().ident.to_string(),
+            _ => return Err(eyre_err!("Wrong first.used_ty.resolved_ty: {:?}", first)),
+        };
+        assert_eq!(first_string, "i32");
+
+        let second = &list.found[1];
+        let second_string = match &second.used_ty.resolved_ty {
+            syn::Type::Path(ty_path) => ty_path.path.segments.last().unwrap().ident.to_string(),
+            _ => return Err(eyre_err!("Wrong second.used_ty.resolved_ty: {:?}", second)),
+        };
+        assert_eq!(second_string, "i8");
+        Ok(())
+    }
+
+    #[test]
+    fn list_variadic_with_path() -> Result<()> {
+        let tokens: syn::Type = parse_quote! {
+            (i32, pgx::variadic!(i8))
+        };
+        // It should not error, as it's valid.
+        let list = AggregateTypeList::new(tokens);
+        assert!(list.is_ok());
+        let list = list.unwrap();
+        let first = &list.found[0];
+        let first_string = match &first.used_ty.resolved_ty {
+            syn::Type::Path(ty_path) => ty_path.path.segments.last().unwrap().ident.to_string(),
+            _ => return Err(eyre_err!("Wrong first.used_ty.resolved_ty: {:?}", first)),
+        };
+        assert_eq!(first_string, "i32");
+
+        let second = &list.found[1];
+        let second_string = match &second.used_ty.resolved_ty {
+            syn::Type::Path(ty_path) => ty_path.path.segments.last().unwrap().ident.to_string(),
+            _ => return Err(eyre_err!("Wrong second.used_ty.resolved_ty: {:?}", second)),
+        };
+        assert_eq!(second_string, "i8");
+        Ok(())
+    }
+
+    #[test]
+    fn list_variadic() -> Result<()> {
+        let tokens: syn::Type = parse_quote! {
+            (i32, variadic!(i8))
+        };
+        // It should not error, as it's valid.
+        let list = AggregateTypeList::new(tokens);
+        assert!(list.is_ok());
+        let list = list.unwrap();
+        let first = &list.found[0];
+        let first_string = match &first.used_ty.resolved_ty {
+            syn::Type::Path(ty_path) => ty_path.path.segments.last().unwrap().ident.to_string(),
+            _ => return Err(eyre_err!("Wrong first.ty: {:?}", first)),
+        };
+        assert_eq!(first_string, "i32");
+
+        let second = &list.found[1];
+        let second_string = match &second.used_ty.resolved_ty {
+            syn::Type::Path(ty_path) => ty_path.path.segments.last().unwrap().ident.to_string(),
+            _ => return Err(eyre_err!("Wrong second.used_ty.resolved_ty: {:?}", second)),
+        };
+        assert_eq!(second_string, "i8");
+        Ok(())
     }
 }

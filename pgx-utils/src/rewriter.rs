@@ -715,8 +715,9 @@ impl FunctionSignatureRewriter {
                     Pat::Ident(ident) => {
                         let name = Ident::new(&format!("{}_", ident.ident), ident.span());
                         let type_ = ty.ty.clone();
-                        let (mut type_, _, _, _, _) =
-                            crate::sql_entity_graph::pg_extern::resolve_ty(*type_).unwrap();
+                        let mut type_ = crate::sql_entity_graph::UsedType::new(*type_)
+                            .unwrap()
+                            .resolved_ty;
                         let is_option = type_matches(&type_, "Option");
 
                         let ts = if is_option {

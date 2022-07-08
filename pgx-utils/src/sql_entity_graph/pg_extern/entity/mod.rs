@@ -98,7 +98,7 @@ impl ToSql for PgExternEntity {
             // It may be possible to infer a `STRICT` marker though.
             // But we can only do that if the user hasn't used `Option<T>` or `pgx::Internal`
             for arg in &self.fn_args {
-                if arg.is_optional || arg.ty.type_id() == context.internal_type {
+                if arg.used_ty.optional || arg.used_ty.type_id() == context.internal_type {
                     strict_upgrade = false;
                 }
             }
@@ -131,9 +131,11 @@ impl ToSql for PgExternEntity {
                         .graph
                         .neighbors_undirected(self_index)
                         .find(|neighbor| match &context.graph[*neighbor] {
-                            SqlGraphEntity::Type(ty) => ty.id_matches(&arg.ty.ty_id),
-                            SqlGraphEntity::Enum(en) => en.id_matches(&arg.ty.ty_id),
-                            SqlGraphEntity::BuiltinType(defined) => defined == arg.ty.full_path,
+                            SqlGraphEntity::Type(ty) => ty.id_matches(&arg.used_ty.ty_id),
+                            SqlGraphEntity::Enum(en) => en.id_matches(&arg.used_ty.ty_id),
+                            SqlGraphEntity::BuiltinType(defined) => {
+                                defined == arg.used_ty.full_path
+                            }
                             _ => false,
                         })
                         .ok_or_else(|| eyre!("Could not find arg type in graph. Got: {:?}", arg))?;
@@ -144,20 +146,34 @@ impl ToSql for PgExternEntity {
                                             pattern = arg.pattern,
                                             schema_prefix = context.schema_prefix_for(&graph_index),
                                             // First try to match on [`TypeId`] since it's most reliable.
-                                            sql_type = if let Some(composite_type) = arg.ty.composite_type {
-                                                composite_type.to_string() + if context.composite_type_requires_square_brackets(&arg.ty.ty_id).wrap_err_with(|| format!("Attempted on {}", arg.ty.ty_source))? { "[]" } else { "" }
+                                            sql_type = if let Some(composite_type) = arg.used_ty.composite_type {
+                                                composite_type.to_string()
+                                                    + if context
+                                                        .composite_type_requires_square_brackets(&arg.used_ty.ty_id)
+                                                        .wrap_err_with(|| format!("Attempted on `{}`", arg.used_ty.ty_source))?
+                                                    {
+                                                        "[]"
+                                                    } else {
+                                                        ""
+                                                    }
                                             } else {
-                                                context.rust_to_sql(arg.ty.ty_id.clone(), arg.ty.ty_source, arg.ty.full_path).ok_or_else(|| eyre!(
-                                                    "Failed to map argument `{}` type `{}` to SQL type while building function `{}`.",
-                                                    arg.pattern,
-                                                    arg.ty.full_path,
-                                                    self.name
-                                                ))?
+                                                context.source_only_to_sql_type(arg.used_ty.ty_source).or_else(|| {
+                                                                    context.type_id_to_sql_type(arg.used_ty.ty_id)
+                                                                }).or_else(|| {
+                                                                    let pat = arg.used_ty.full_path.to_string();
+                                                                    if let Some(found) = context.has_sql_declared_entity(&SqlDeclared::Type(pat.clone())) {
+                                                                        Some(found.sql())
+                                                                    }  else if let Some(found) = context.has_sql_declared_entity(&SqlDeclared::Enum(pat.clone())) {
+                                                                        Some(found.sql())
+                                                                    } else {
+                                                                        None
+                                                                    }
+                                                                }).ok_or_else(|| eyre!("Failed to map return type `{}` to SQL type while building function `{}`.", arg.used_ty.full_path, self.full_path))?
                                             },
-                                            default = if let Some(def) = arg.default { format!(" DEFAULT {}", def) } else { String::from("") },
-                                            variadic = if arg.is_variadic { "VARIADIC " } else { "" },
+                                            default = if let Some(def) = arg.used_ty.default { format!(" DEFAULT {}", def) } else { String::from("") },
+                                            variadic = if arg.used_ty.variadic { "VARIADIC " } else { "" },
                                             maybe_comma = if needs_comma { ", " } else { " " },
-                                            full_path = arg.ty.full_path,
+                                            full_path = arg.used_ty.full_path,
                                     );
                     args.push(buf);
                 }
@@ -385,7 +401,8 @@ impl ToSql for PgExternEntity {
                 .fn_args
                 .get(0)
                 .ok_or_else(|| eyre!("Did not find `left_arg` for operator `{}`.", self.name))?;
-            let (left_arg_ty_id, left_arg_full_path) = (left_arg.ty.ty_id, left_arg.ty.full_path);
+            let (left_arg_ty_id, left_arg_full_path) =
+                (left_arg.used_ty.ty_id, left_arg.used_ty.full_path);
             let left_arg_graph_index = context
                 .graph
                 .neighbors_undirected(self_index)
@@ -400,7 +417,7 @@ impl ToSql for PgExternEntity {
                 .get(1)
                 .ok_or_else(|| eyre!("Did not find `left_arg` for operator `{}`.", self.name))?;
             let (right_arg_ty_id, right_arg_full_path) =
-                (right_arg.ty.ty_id, right_arg.ty.full_path);
+                (right_arg.used_ty.ty_id, right_arg.used_ty.full_path);
             let right_arg_graph_index = context
                 .graph
                 .neighbors_undirected(self_index)
@@ -456,13 +473,4 @@ impl ToSql for PgExternEntity {
         };
         Ok(rendered)
     }
-}
-
-#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub struct TypeEntity {
-    pub ty_source: &'static str,
-    pub ty_id: core::any::TypeId,
-    pub full_path: &'static str,
-    pub module_path: String,
-    pub composite_type: Option<&'static str>,
 }

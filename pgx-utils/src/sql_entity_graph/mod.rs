@@ -21,9 +21,10 @@ pub(crate) mod postgres_ord;
 pub(crate) mod postgres_type;
 pub(crate) mod schema;
 pub(crate) mod to_sql;
+pub(crate) mod used_type;
 
 pub use aggregate::{
-    entity::{AggregateTypeEntity, MaybeVariadicAggregateTypeEntity, PgAggregateEntity},
+    entity::{AggregateTypeEntity, PgAggregateEntity},
     AggregateType, AggregateTypeList, FinalizeModify, ParallelOption, PgAggregate,
 };
 pub use control_file::ControlFile;
@@ -35,7 +36,7 @@ pub use mapping::{RustSourceOnlySqlMapping, RustSqlMapping};
 pub use pg_extern::{
     entity::{
         PgExternArgumentEntity, PgExternEntity, PgExternReturnEntity,
-        PgExternReturnEntityIteratedItem, PgOperatorEntity, TypeEntity,
+        PgExternReturnEntityIteratedItem, PgOperatorEntity,
     },
     NameMacro, PgExtern, PgExternArgument, PgOperator,
 };
@@ -48,6 +49,7 @@ pub use postgres_ord::{entity::PostgresOrdEntity, PostgresOrd};
 pub use postgres_type::{entity::PostgresTypeEntity, PostgresType};
 pub use schema::{entity::SchemaEntity, Schema};
 pub use to_sql::{entity::ToSqlConfigEntity, ToSql, ToSqlConfig};
+pub use used_type::{UsedType, UsedTypeEntity};
 
 pub use crate::ExternArgs;
 

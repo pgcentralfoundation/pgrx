@@ -6,16 +6,13 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
-use crate::sql_entity_graph::{pg_extern::entity::TypeEntity, SqlGraphIdentifier};
+use crate::sql_entity_graph::{SqlGraphIdentifier, UsedTypeEntity};
 
 /// The output of a [`PgExternArgument`](crate::sql_entity_graph::PgExternArgument) from `quote::ToTokens::to_tokens`.
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct PgExternArgumentEntity {
     pub pattern: &'static str,
-    pub ty: TypeEntity,
-    pub is_optional: bool,
-    pub is_variadic: bool,
-    pub default: Option<&'static str>,
+    pub used_ty: UsedTypeEntity,
 }
 
 impl SqlGraphIdentifier for PgExternArgumentEntity {
@@ -23,7 +20,7 @@ impl SqlGraphIdentifier for PgExternArgumentEntity {
         format!("arg {}", self.rust_identifier())
     }
     fn rust_identifier(&self) -> String {
-        self.ty.full_path.to_string()
+        self.used_ty.full_path.to_string()
     }
 
     fn file(&self) -> Option<&'static str> {
