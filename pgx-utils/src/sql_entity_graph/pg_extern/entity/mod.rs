@@ -168,7 +168,7 @@ impl ToSql for PgExternEntity {
                                                                     } else {
                                                                         None
                                                                     }
-                                                                }).ok_or_else(|| eyre!("Failed to map return type `{}` to SQL type while building function `{}`.", arg.used_ty.full_path, self.full_path))?
+                                                                }).ok_or_else(|| eyre!("Failed to map arg type `{}` to SQL type while building function `{}`.", arg.used_ty.full_path, self.full_path))?
                                             },
                                             default = if let Some(def) = arg.used_ty.default { format!(" DEFAULT {}", def) } else { String::from("") },
                                             variadic = if arg.used_ty.variadic { "VARIADIC " } else { "" },

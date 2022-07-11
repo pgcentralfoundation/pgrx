@@ -1436,16 +1436,15 @@ fn connect_aggregates(
                 "Aggregate",
                 index,
                 &item.rust_identifier(),
-                &arg.used_ty.ty_id,
+                &arg.ty_id,
                 types,
                 enums,
             );
             if !found {
-                let builtin_index = builtin_types.get(arg.used_ty.full_path).expect(&format!(
-                    "Could not fetch Builtin Type {}.",
-                    arg.used_ty.full_path
-                ));
-                tracing::debug!(from = %item.rust_identifier(), to = %arg.used_ty.full_path, "Adding Aggregate after BuiltIn Type edge");
+                let builtin_index = builtin_types
+                    .get(arg.full_path)
+                    .expect(&format!("Could not fetch Builtin Type {}.", arg.full_path));
+                tracing::debug!(from = %item.rust_identifier(), to = %arg.full_path, "Adding Aggregate after BuiltIn Type edge");
                 graph.add_edge(*builtin_index, index, SqlGraphRelationship::RequiredByArg);
             }
         }

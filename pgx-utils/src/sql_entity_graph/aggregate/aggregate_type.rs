@@ -180,7 +180,7 @@ mod tests {
             syn::Type::Path(ty_path) => ty_path.path.segments.last().unwrap().ident.to_string(),
             _ => return Err(eyre_err!("Wrong second.used_ty.resolved_ty: {:?}", second)),
         };
-        assert_eq!(second_string, "i8");
+        assert_eq!(second_string, "VariadicArray");
         Ok(())
     }
 
@@ -205,7 +205,7 @@ mod tests {
             syn::Type::Path(ty_path) => ty_path.path.segments.last().unwrap().ident.to_string(),
             _ => return Err(eyre_err!("Wrong second.used_ty.resolved_ty: {:?}", second)),
         };
-        assert_eq!(second_string, "i8");
+        assert_eq!(second_string, "VariadicArray");
         Ok(())
     }
 }

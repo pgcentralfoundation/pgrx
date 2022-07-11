@@ -73,7 +73,7 @@ pub struct PgAggregate {
     // Note these should not be considered *writable*, they're snapshots from construction.
     type_args: AggregateTypeList,
     type_ordered_set_args: Option<AggregateTypeList>,
-    type_moving_state: Option<syn::Type>,
+    type_moving_state: Option<UsedType>,
     type_stype: AggregateType,
     const_ordered_set: bool,
     const_parallel: Option<syn::Expr>,
@@ -167,13 +167,18 @@ impl PgAggregate {
         };
 
         // `MovingState` is an optional value, we default to nothing.
-        let type_moving_state = get_impl_type_by_name(&item_impl_snapshot, "MovingState");
-        let type_moving_state_value = type_moving_state.map(|v| v.ty.clone());
-        if type_moving_state.is_none() {
+        let impl_type_moving_state = get_impl_type_by_name(&item_impl_snapshot, "MovingState");
+        let type_moving_state;
+        let type_moving_state_value = if let Some(impl_type_moving_state) = impl_type_moving_state {
+            type_moving_state = impl_type_moving_state.ty.clone();
+            Some(UsedType::new(type_moving_state.clone())?)
+        } else {
             item_impl.items.push(parse_quote! {
                 type MovingState = ();
-            })
-        }
+            });
+            type_moving_state = parse_quote! { () };
+            None
+        };
 
         // `OrderBy` is an optional value, we default to nothing.
         let type_ordered_set_args = get_impl_type_by_name(&item_impl_snapshot, "OrderedSetArgs");
@@ -190,12 +195,18 @@ impl PgAggregate {
                 let direct_args = order_by_direct_args
                     .found
                     .iter()
-                    .map(|x| (x.name.clone(), x.used_ty.resolved_ty.clone()))
+                    .map(|x| {
+                        (
+                            x.name.clone(),
+                            x.used_ty.resolved_ty.clone(),
+                            x.used_ty.original_ty.clone(),
+                        )
+                    })
                     .collect::<Vec<_>>();
                 let direct_arg_names = ARG_NAMES[0..direct_args.len()]
                     .iter()
                     .zip(direct_args.iter())
-                    .map(|(default_name, (custom_name, _ty))| {
+                    .map(|(default_name, (custom_name, _ty, _orig))| {
                         Ident::new(
                             &custom_name
                                 .clone()
@@ -208,7 +219,7 @@ impl PgAggregate {
                     .iter()
                     .zip(direct_arg_names.iter())
                     .map(|(arg, name)| {
-                        let arg_ty = &arg.1;
+                        let arg_ty = &arg.2; // original_type
                         parse_quote! {
                             #name: #arg_ty
                         }
@@ -227,14 +238,44 @@ impl PgAggregate {
             )
         })?;
         let type_args_value = AggregateTypeList::new(type_args.ty.clone())?;
+        let args = type_args_value
+            .found
+            .iter()
+            .map(|x| (x.name.clone(), x.used_ty.original_ty.clone()))
+            .collect::<Vec<_>>();
+        let arg_names = ARG_NAMES[0..args.len()]
+            .iter()
+            .zip(args.iter())
+            .map(|(default_name, (custom_name, ty))| {
+                Ident::new(
+                    &custom_name
+                        .clone()
+                        .unwrap_or_else(|| default_name.to_string()),
+                    ty.span(),
+                )
+            })
+            .collect::<Vec<_>>();
+        let args_with_names = args
+            .iter()
+            .zip(arg_names.iter())
+            .map(|(arg, name)| {
+                let arg_ty = &arg.1;
+                quote! {
+                    #name: #arg_ty
+                }
+            })
+            .collect::<Vec<_>>();
 
         // `Finalize` is an optional value, we default to nothing.
-        let type_finalize = get_impl_type_by_name(&item_impl_snapshot, "Finalize");
-        if type_finalize.is_none() {
+        let impl_type_finalize = get_impl_type_by_name(&item_impl_snapshot, "Finalize");
+        let type_finalize: syn::Type = if let Some(type_finalize) = impl_type_finalize {
+            type_finalize.ty.clone()
+        } else {
             item_impl.items.push(parse_quote! {
                 type Finalize = ();
-            })
-        }
+            });
+            parse_quote! { () }
+        };
 
         let fn_state = get_impl_func_by_name(&item_impl_snapshot, "state");
 
@@ -244,29 +285,6 @@ impl PgAggregate {
                 found.sig.ident.span(),
             );
             let pg_extern_attr = pg_extern_attr(found);
-            let args = type_args_value
-                .found
-                .iter()
-                .map(|x| (x.name.clone(), x.used_ty.original_ty.clone()))
-                .collect::<Vec<_>>();
-            let arg_names = ARG_NAMES[0..args.len()]
-                .iter()
-                .zip(args.iter())
-                .map(|(default_name, (custom_name, _ty))| {
-                    Ident::new(
-                        &custom_name
-                            .clone()
-                            .unwrap_or_else(|| default_name.to_string()),
-                        fn_state.span(),
-                    )
-                })
-                .collect::<Vec<_>>();
-            let args_with_names = args.iter().zip(arg_names.iter()).map(|(arg, name)| {
-                let arg_ty = &arg.1;
-                quote! {
-                    #name: #arg_ty
-                }
-            });
 
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case, clippy::too_many_arguments)]
@@ -325,7 +343,7 @@ impl PgAggregate {
                 pg_externs.push(parse_quote! {
                     #[allow(non_snake_case, clippy::too_many_arguments)]
                     #pg_extern_attr
-                    fn #fn_name(this: #type_state_without_self, #(#direct_args_with_names),*, fcinfo: pgx::pg_sys::FunctionCallInfo) -> <#target_path as pgx::Aggregate>::Finalize {
+                    fn #fn_name(this: #type_state_without_self, #(#direct_args_with_names),*, fcinfo: pgx::pg_sys::FunctionCallInfo) -> #type_finalize {
                         <#target_path as pgx::Aggregate>::in_memory_context(
                             fcinfo,
                             move |_context| <#target_path as pgx::Aggregate>::finalize(this, (#(#direct_arg_names),*), fcinfo)
@@ -336,7 +354,7 @@ impl PgAggregate {
                 pg_externs.push(parse_quote! {
                     #[allow(non_snake_case, clippy::too_many_arguments)]
                     #pg_extern_attr
-                    fn #fn_name(this: #type_state_without_self, fcinfo: pgx::pg_sys::FunctionCallInfo) -> <#target_path as pgx::Aggregate>::Finalize {
+                    fn #fn_name(this: #type_state_without_self, fcinfo: pgx::pg_sys::FunctionCallInfo) -> #type_finalize {
                         <#target_path as pgx::Aggregate>::in_memory_context(
                             fcinfo,
                             move |_context| <#target_path as pgx::Aggregate>::finalize(this, (), fcinfo)
@@ -347,7 +365,7 @@ impl PgAggregate {
             Some(fn_name)
         } else {
             item_impl.items.push(parse_quote! {
-                fn finalize(current: Self::State, direct_args: Self::OrderedSetArgs, _fcinfo: pgx::pg_sys::FunctionCallInfo) -> Self::Finalize {
+                fn finalize(current: Self::State, direct_args: Self::OrderedSetArgs, _fcinfo: pgx::pg_sys::FunctionCallInfo) -> #type_finalize {
                     unimplemented!("Call to finalize on an aggregate which does not support it.")
                 }
             });
@@ -415,28 +433,15 @@ impl PgAggregate {
                 found.sig.ident.span(),
             );
             let pg_extern_attr = pg_extern_attr(found);
-            let args = type_args_value
-                .found
-                .iter()
-                .map(|x| x.used_ty.resolved_ty.clone())
-                .collect::<Vec<_>>();
-            let args_with_names = args.iter().zip(ARG_NAMES.iter()).map(|(arg, name)| {
-                let name_ident = Ident::new(name, Span::call_site());
-                quote! {
-                    #name_ident: #arg
-                }
-            });
-            let arg_names = ARG_NAMES[0..args.len()]
-                .iter()
-                .map(|name| Ident::new(name, fn_state.span()));
+
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case, clippy::too_many_arguments)]
                 #pg_extern_attr
                 fn #fn_name(
-                    mstate: <#target_path as pgx::Aggregate>::MovingState,
+                    mstate: #type_moving_state,
                     #(#args_with_names),*,
                     fcinfo: pgx::pg_sys::FunctionCallInfo,
-                ) -> <#target_path as pgx::Aggregate>::MovingState {
+                ) -> #type_moving_state {
                     <#target_path as pgx::Aggregate>::in_memory_context(
                         fcinfo,
                         move |_context| <#target_path as pgx::Aggregate>::moving_state(mstate, (#(#arg_names),*), fcinfo)
@@ -469,13 +474,13 @@ impl PgAggregate {
                 #[allow(non_snake_case, clippy::too_many_arguments)]
                 #pg_extern_attr
                 fn #fn_name(
-                    mstate: <#target_path as pgx::Aggregate>::MovingState,
-                    v: <#target_path as pgx::Aggregate>::Args,
+                    mstate: #type_moving_state,
+                    #(#args_with_names),*,
                     fcinfo: pgx::pg_sys::FunctionCallInfo,
-                ) -> <#target_path as pgx::Aggregate>::MovingState {
+                ) -> #type_moving_state {
                     <#target_path as pgx::Aggregate>::in_memory_context(
                         fcinfo,
-                        move |_context| <#target_path as pgx::Aggregate>::moving_state_inverse(mstate, v, fcinfo)
+                        move |_context| <#target_path as pgx::Aggregate>::moving_state_inverse(mstate, (#(#arg_names),*), fcinfo)
                     )
                 }
             });
@@ -483,10 +488,10 @@ impl PgAggregate {
         } else {
             item_impl.items.push(parse_quote! {
                 fn moving_state_inverse(
-                    _mstate: <#target_path as pgx::Aggregate>::MovingState,
+                    _mstate: #type_moving_state,
                     _v: Self::Args,
                     _fcinfo: pgx::pg_sys::FunctionCallInfo,
-                ) -> <#target_path as pgx::Aggregate>::MovingState {
+                ) -> #type_moving_state {
                     unimplemented!("Call to moving_state on an aggregate which does not support it.")
                 }
             });
@@ -509,7 +514,7 @@ impl PgAggregate {
             pg_externs.push(parse_quote! {
                 #[allow(non_snake_case, clippy::too_many_arguments)]
                 #pg_extern_attr
-                fn #fn_name(mstate: <#target_path as pgx::Aggregate>::MovingState, #(#direct_args_with_names),* #maybe_comma fcinfo: pgx::pg_sys::FunctionCallInfo) -> <#target_path as pgx::Aggregate>::Finalize {
+                fn #fn_name(mstate: #type_moving_state, #(#direct_args_with_names),* #maybe_comma fcinfo: pgx::pg_sys::FunctionCallInfo) -> #type_finalize {
                     <#target_path as pgx::Aggregate>::in_memory_context(
                         fcinfo,
                         move |_context| <#target_path as pgx::Aggregate>::moving_finalize(mstate, (#(#direct_arg_names),*), fcinfo)
@@ -600,11 +605,10 @@ impl PgAggregate {
         let name = &self.name;
         let type_args_iter = &self.type_args.entity_tokens();
         let type_order_by_args_iter = self.type_ordered_set_args.iter().map(|x| x.entity_tokens());
-        let type_moving_state_iter = self.type_moving_state.iter();
-        let type_moving_state_string = self
-            .type_moving_state
-            .as_ref()
-            .map(|t| t.to_token_stream().to_string().replace(" ", ""));
+
+        let type_moving_state_entity_tokens =
+            self.type_moving_state.clone().map(|v| v.entity_tokens());
+        let type_moving_state_entity_tokens_iter = type_moving_state_entity_tokens.iter();
         let type_stype = self.type_stype.entity_tokens();
         let const_ordered_set = self.const_ordered_set;
         let const_parallel_iter = self.const_parallel.iter();
@@ -648,15 +652,7 @@ impl PgAggregate {
                     deserialfunc: None #( .unwrap_or(Some(stringify!(#fn_deserial_iter))) )*,
                     msfunc: None #( .unwrap_or(Some(stringify!(#fn_moving_state_iter))) )*,
                     minvfunc: None #( .unwrap_or(Some(stringify!(#fn_moving_state_inverse_iter))) )*,
-                    mstype: None #( .unwrap_or(Some(::pgx::utils::sql_entity_graph::MaybeNamedTypeEntity {
-                        inner: ::pgx::utils::sql_entity_graph::TypeEntity {
-                            ty_source: #type_moving_state_string,
-                            ty_id: ::core::any::TypeId::of::<#type_moving_state_iter>(),
-                            full_path: ::core::any::type_name::<#type_moving_state_iter>(),
-                            composite_type: None,
-                        },
-                        name: None
-                    })) )*,
+                    mstype: None #( .unwrap_or(Some(#type_moving_state_entity_tokens_iter)) )*,
                     mfinalfunc: None #( .unwrap_or(Some(stringify!(#fn_moving_finalize_iter))) )*,
                     mfinalfunc_modify: None #( .unwrap_or(#const_moving_finalize_modify_iter) )*,
                     minitcond: None #( .unwrap_or(Some(#const_moving_intial_condition_iter)) )*,

@@ -549,6 +549,76 @@ mod sql_generator_tests {
     ) {
         (None, None)
     }
+
+    #[derive(Copy, Clone, Default, Debug)]
+    pub struct AggregateWithOrderedSetArgs;
+
+    #[pg_aggregate]
+    impl Aggregate for AggregateWithOrderedSetArgs {
+        type Args = name!(input, pgx::composite_type!("Dog"));
+        type State = pgx::composite_type!("Dog");
+        type Finalize = pgx::composite_type!("Dog");
+        const ORDERED_SET: bool = true;
+        type OrderedSetArgs = name!(percentile, pgx::composite_type!("Dog"));
+
+        fn state(
+            mut _current: Self::State,
+            _arg: Self::Args,
+            _fcinfo: pg_sys::FunctionCallInfo,
+        ) -> Self::State {
+            unimplemented!("Just a SQL generation test")
+        }
+
+        fn finalize(
+            mut _current: Self::State,
+            _direct_arg: Self::OrderedSetArgs,
+            _fcinfo: pg_sys::FunctionCallInfo,
+        ) -> Self::Finalize {
+            unimplemented!("Just a SQL generation test")
+        }
+    }
+
+    #[derive(Copy, Clone, Default, Debug)]
+    pub struct AggregateWithMovingState;
+
+    #[pg_aggregate]
+    impl Aggregate for AggregateWithMovingState {
+        type Args = pgx::composite_type!("Dog");
+        type State = pgx::composite_type!("Dog");
+        type MovingState = pgx::composite_type!("Dog");
+
+        fn state(
+            mut _current: Self::State,
+            _arg: Self::Args,
+            _fcinfo: pg_sys::FunctionCallInfo,
+        ) -> Self::State {
+            unimplemented!("Just a SQL generation test")
+        }
+
+        fn moving_state(
+            _current: Self::State,
+            _arg: Self::Args,
+            _fcinfo: pg_sys::FunctionCallInfo,
+        ) -> Self::MovingState {
+            unimplemented!("Just a SQL generation test")
+        }
+
+        fn moving_state_inverse(
+            mut _current: Self::State,
+            _arg: Self::Args,
+            _fcinfo: pg_sys::FunctionCallInfo,
+        ) -> Self::MovingState {
+            unimplemented!("Just a SQL generation test")
+        }
+
+        fn combine(
+            mut _first: Self::State,
+            _second: Self::State,
+            _fcinfo: pg_sys::FunctionCallInfo,
+        ) -> Self::State {
+            unimplemented!("Just a SQL generation test")
+        }
+    }
 }
 
 #[cfg(any(test, feature = "pg_test"))]

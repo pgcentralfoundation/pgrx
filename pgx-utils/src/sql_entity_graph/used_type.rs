@@ -28,8 +28,9 @@ pub struct UsedType {
 impl UsedType {
     pub fn new(ty: syn::Type) -> syn::Result<Self> {
         let original_ty = ty.clone();
-        // There are four steps:
+        // There are several steps:
         // * Resolve the `default!()` macro
+        // * Resolve the `variadic!()` macro
         // * Resolve `composite_type!()`
         // * Anonymize any lifetimes
         // * Resolving any flags for that resolved type so we can not have to do this later.
@@ -50,6 +51,24 @@ impl UsedType {
                 }
             }
             original => (original, None),
+        };
+
+        // Resolve any `variadic` macro
+        // We do this first as it's **always** in the first position. It's not valid deeper in the type.
+        let resolved_ty = match resolved_ty {
+            // variadic!(..)
+            syn::Type::Macro(macro_pat) => {
+                let mac = &macro_pat.mac;
+                let archetype = mac.path.segments.last().expect("No last segment");
+                match archetype.ident.to_string().as_str() {
+                    "variadic" => {
+                        let ty: syn::Type = syn::parse2(mac.tokens.clone())?;
+                        syn::parse_quote! { ::pgx::VariadicArray<#ty>}
+                    }
+                    _ => syn::Type::Macro(macro_pat),
+                }
+            }
+            original => original,
         };
 
         // Now, resolve any `composite_type` macro
