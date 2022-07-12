@@ -8,8 +8,8 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use crate::command::stop::stop_postgres;
-use crate::CommandExecute;
 use crate::command::version::pgx_default;
+use crate::CommandExecute;
 use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
 use pgx_utils::{

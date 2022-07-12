@@ -1,19 +1,19 @@
-use pgx_utils::pg_config::{Pgx, PgConfig};
+use pgx_utils::pg_config::{PgConfig, Pgx};
 
 pub(crate) fn pgx_default(supported_major_versions: &[u16]) -> eyre::Result<Pgx> {
     let mut pgx = Pgx::new();
     rss::PostgreSQLVersionRss::new(supported_major_versions)?
-            .into_iter()
-            .for_each(|version| pgx.push(PgConfig::from(version)));
+        .into_iter()
+        .for_each(|version| pgx.push(PgConfig::from(version)));
 
     Ok(pgx)
 }
 
 mod rss {
-    use pgx_utils::pg_config::PgVersion;
     use env_proxy::for_url_str;
     use eyre::WrapErr;
     use owo_colors::OwoColorize;
+    use pgx_utils::pg_config::PgVersion;
     use serde_derive::Deserialize;
     use ureq::{Agent, AgentBuilder, Proxy};
     use url::Url;

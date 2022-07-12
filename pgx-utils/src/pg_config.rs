@@ -73,7 +73,10 @@ impl Default for PgConfig {
 
 impl From<PgVersion> for PgConfig {
     fn from(version: PgVersion) -> Self {
-        PgConfig { version: Some(version), pg_config: None, }
+        PgConfig {
+            version: Some(version),
+            pg_config: None,
+        }
     }
 }
 
