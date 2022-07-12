@@ -7,8 +7,11 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 //! Wrapper around Postgres' `pg_config` command-line tool
+use crate::{BASE_POSTGRES_PORT_NO, BASE_POSTGRES_TESTING_PORT_NO};
 use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
+use serde_derive::{Deserialize, Serialize};
+use std::fmt::{self, Display, Formatter};
 use std::{
     collections::HashMap,
     io::ErrorKind,
@@ -27,16 +30,12 @@ pub struct PgVersion {
 
 impl PgVersion {
     pub fn new(major: u16, minor: u16, url: Url) -> PgVersion {
-        PgVersion {
-            major,
-            minor,
-            url
-        }
+        PgVersion { major, minor, url }
     }
 }
 
 impl Display for PgVersion {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         write!(f, "{}.{}", self.major, self.minor)
     }
 }
@@ -48,7 +47,7 @@ pub struct PgConfig {
 }
 
 impl Display for PgConfig {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         let major = self
             .major_version()
             .expect("could not determine major version");
@@ -258,10 +257,6 @@ impl PgConfig {
 pub struct Pgx {
     pg_configs: Vec<PgConfig>,
 }
-
-use crate::{BASE_POSTGRES_PORT_NO, BASE_POSTGRES_TESTING_PORT_NO};
-use serde_derive::{Deserialize, Serialize};
-use std::fmt::{Display, Formatter};
 
 #[derive(Debug, Serialize, Deserialize)]
 struct ConfigToml {
