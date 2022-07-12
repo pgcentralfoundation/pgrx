@@ -91,7 +91,6 @@ impl ToSql for PgExternEntity {
     fn to_sql(&self, context: &PgxSql) -> eyre::Result<String> {
         let self_index = context.externs[self];
         let mut extern_attrs = self.extern_attrs.clone();
-
         // if we already have a STRICT marker we do not need to add it
         let mut strict_upgrade = extern_attrs.iter().any(|i| i == &ExternArgs::Strict);
         if !strict_upgrade {
@@ -103,6 +102,7 @@ impl ToSql for PgExternEntity {
                 }
             }
         }
+
         if strict_upgrade {
             extern_attrs.push(ExternArgs::Strict);
         }
@@ -408,6 +408,8 @@ impl ToSql for PgExternEntity {
                 .neighbors_undirected(self_index)
                 .find(|neighbor| match &context.graph[*neighbor] {
                     SqlGraphEntity::Type(ty) => ty.id_matches(&left_arg_ty_id),
+                    SqlGraphEntity::Enum(en) => en.id_matches(&left_arg_ty_id),
+                    SqlGraphEntity::BuiltinType(defined) => defined == left_arg_full_path,
                     _ => false,
                 })
                 .ok_or_else(|| eyre!("Could not find left arg function in graph."))?;
@@ -423,6 +425,8 @@ impl ToSql for PgExternEntity {
                 .neighbors_undirected(self_index)
                 .find(|neighbor| match &context.graph[*neighbor] {
                     SqlGraphEntity::Type(ty) => ty.id_matches(&right_arg_ty_id),
+                    SqlGraphEntity::Enum(en) => en.id_matches(&right_arg_ty_id),
+                    SqlGraphEntity::BuiltinType(defined) => defined == right_arg_full_path,
                     _ => false,
                 })
                 .ok_or_else(|| eyre!("Could not find right arg function in graph."))?;
@@ -446,23 +450,55 @@ impl ToSql for PgExternEntity {
                                         left_name = left_arg_full_path,
                                         right_name = right_arg_full_path,
                                         schema_prefix_left = context.schema_prefix_for(&left_arg_graph_index),
-                                        left_arg = context.type_id_to_sql_type(left_arg_ty_id).ok_or_else(||
-                                            eyre!(
-                                                "Failed to map argument `{}` type `{}` to SQL type while building operator `{}`.",
-                                                left_arg.pattern,
-                                                left_arg_full_path,
-                                                self.name
-                                            )
-                                        )?,
+                                        left_arg = if let Some(composite_type) = left_arg.used_ty.composite_type {
+                                            composite_type.to_string()
+                                                + if context
+                                                    .composite_type_requires_square_brackets(&left_arg.used_ty.ty_id)
+                                                    .wrap_err_with(|| format!("Attempted on `{}`", left_arg.used_ty.ty_source))?
+                                                {
+                                                    "[]"
+                                                } else {
+                                                    ""
+                                                }
+                                        } else {
+                                            context.source_only_to_sql_type(left_arg.used_ty.ty_source).or_else(|| {
+                                                                context.type_id_to_sql_type(left_arg.used_ty.ty_id)
+                                                            }).or_else(|| {
+                                                                let pat = left_arg.used_ty.full_path.to_string();
+                                                                if let Some(found) = context.has_sql_declared_entity(&SqlDeclared::Type(pat.clone())) {
+                                                                    Some(found.sql())
+                                                                }  else if let Some(found) = context.has_sql_declared_entity(&SqlDeclared::Enum(pat.clone())) {
+                                                                    Some(found.sql())
+                                                                } else {
+                                                                    None
+                                                                }
+                                                            }).ok_or_else(|| eyre!("Failed to map left arg type `{}` to SQL type while building function `{}`.", left_arg.used_ty.full_path, self.full_path))?
+                                        },
                                         schema_prefix_right = context.schema_prefix_for(&right_arg_graph_index),
-                                        right_arg = context.type_id_to_sql_type(right_arg_ty_id).ok_or_else(||
-                                            eyre!(
-                                                "Failed to map argument `{}` type `{}` to SQL type while building operator `{}`.",
-                                                right_arg.pattern,
-                                                right_arg_full_path,
-                                                self.name
-                                            )
-                                        )?,
+                                        right_arg = if let Some(composite_type) = right_arg.used_ty.composite_type {
+                                            composite_type.to_string()
+                                                + if context
+                                                    .composite_type_requires_square_brackets(&right_arg.used_ty.ty_id)
+                                                    .wrap_err_with(|| format!("Attempted on `{}`", right_arg.used_ty.ty_source))?
+                                                {
+                                                    "[]"
+                                                } else {
+                                                    ""
+                                                }
+                                        } else {
+                                            context.source_only_to_sql_type(right_arg.used_ty.ty_source).or_else(|| {
+                                                                context.type_id_to_sql_type(right_arg.used_ty.ty_id)
+                                                            }).or_else(|| {
+                                                                let pat = right_arg.used_ty.full_path.to_string();
+                                                                if let Some(found) = context.has_sql_declared_entity(&SqlDeclared::Type(pat.clone())) {
+                                                                    Some(found.sql())
+                                                                }  else if let Some(found) = context.has_sql_declared_entity(&SqlDeclared::Enum(pat.clone())) {
+                                                                    Some(found.sql())
+                                                                } else {
+                                                                    None
+                                                                }
+                                                            }).ok_or_else(|| eyre!("Failed to map right arg type `{}` to SQL type while building function `{}`.", right_arg.used_ty.full_path, self.full_path))?
+                                        },
                                         maybe_comma = if optionals.len() >= 1 { "," } else { "" },
                                         optionals = if !optionals.is_empty() { optionals.join(",\n") + "\n" } else { "".to_string() },
                                 );

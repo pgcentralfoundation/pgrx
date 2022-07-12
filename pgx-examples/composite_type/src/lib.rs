@@ -204,6 +204,18 @@ impl Aggregate for ScritchCollector {
     }
 }
 
+#[pg_operator]
+#[opname(+)]
+fn add_scritches_to_dog(
+    mut left: pgx::composite_type!("Dog"),
+    right: i32,
+) -> pgx::composite_type!("Dog") {
+    let left_scritches: i32 = left.get_by_name("scritches").unwrap().unwrap_or_default();
+    left.set_by_name("scritches", left_scritches + right)
+        .unwrap();
+    left
+}
+
 #[cfg(any(test, feature = "pg_test"))]
 #[pg_schema]
 mod tests {
