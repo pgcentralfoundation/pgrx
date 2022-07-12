@@ -300,12 +300,16 @@ dependencies = [
  "rayon",
  "regex",
  "semver 1.0.9",
+ "serde",
+ "serde-xml-rs",
+ "serde_derive",
  "syn",
  "tracing",
  "tracing-error",
  "tracing-subscriber",
  "unescape",
  "ureq",
+ "url",
 ]
 
 [[package]]
@@ -1491,7 +1495,6 @@ dependencies = [
  "quote",
  "regex",
  "serde",
- "serde-xml-rs",
  "serde_derive",
  "serde_json",
  "syn",
@@ -1501,7 +1504,6 @@ dependencies = [
  "tracing-error",
  "tracing-subscriber",
  "unescape",
- "ureq",
  "url",
 ]
 

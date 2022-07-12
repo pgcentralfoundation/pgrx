@@ -71,6 +71,12 @@ impl Default for PgConfig {
     }
 }
 
+impl From<PgVersion> for PgConfig {
+    fn from(version: PgVersion) -> Self {
+        PgConfig { version: Some(version), pg_config: None, }
+    }
+}
+
 impl PgConfig {
     pub fn new(pg_config: PathBuf) -> Self {
         PgConfig {
@@ -283,19 +289,6 @@ impl Pgx {
         Pgx { pg_configs: vec![] }
     }
 
-    pub fn default(supported_major_versions: &[u16]) -> eyre::Result<Self> {
-        let pgx = Self {
-            pg_configs: rss::PostgreSQLVersionRss::new(supported_major_versions)?
-                .into_iter()
-                .map(|version| PgConfig {
-                    version: Some(version),
-                    pg_config: None,
-                })
-                .collect(),
-        };
-        Ok(pgx)
-    }
-
     pub fn from_config() -> eyre::Result<Self> {
         match std::env::var("PGX_PG_CONFIG_PATH") {
             Ok(pg_config) => {
@@ -412,94 +405,5 @@ impl Pgx {
         let mut path = Pgx::home()?;
         path.push("config.toml");
         Ok(path)
-    }
-}
-
-mod rss {
-    use crate::pg_config::PgVersion;
-    use env_proxy::for_url_str;
-    use eyre::WrapErr;
-    use owo_colors::OwoColorize;
-    use serde_derive::Deserialize;
-    use ureq::{Agent, AgentBuilder, Proxy};
-    use url::Url;
-
-    pub(super) struct PostgreSQLVersionRss;
-
-    impl PostgreSQLVersionRss {
-        pub(super) fn new(supported_major_versions: &[u16]) -> eyre::Result<Vec<PgVersion>> {
-            static VERSIONS_RSS_URL: &str = "https://www.postgresql.org/versions.rss";
-
-            let http_client = if let Some((host, port)) = for_url_str(VERSIONS_RSS_URL).host_port()
-            {
-                AgentBuilder::new()
-                    .proxy(Proxy::new(format!("https://{host}:{port}"))?)
-                    .build()
-            } else {
-                Agent::new()
-            };
-
-            let response = http_client
-                .get(VERSIONS_RSS_URL)
-                .call()
-                .wrap_err_with(|| format!("unable to retrieve {}", VERSIONS_RSS_URL))?;
-
-            let rss: Rss = match serde_xml_rs::from_str(&response.into_string()?) {
-                Ok(rss) => rss,
-                Err(e) => return Err(e.into()),
-            };
-
-            let mut versions = Vec::new();
-            for item in rss.channel.item {
-                let title = item.title.trim();
-                let mut parts = title.split('.');
-                let major = parts.next();
-                let minor = parts.next();
-
-                // if we don't have major/minor versions or if they don't parse correctly
-                // we'll just assume zero for them and eventually skip them
-                let major = major.unwrap().parse::<u16>().unwrap_or_default();
-                let minor = minor.unwrap().parse::<u16>().unwrap_or_default();
-
-                if supported_major_versions.contains(&major) {
-                    versions.push(PgVersion {
-                        major,
-                        minor,
-                        url: Url::parse(
-                            &format!("https://ftp.postgresql.org/pub/source/v{major}.{minor}/postgresql-{major}.{minor}.tar.bz2",
-                                     major = major, minor = minor)
-                        )
-                            .expect("invalid url")
-                    })
-                }
-            }
-
-            println!(
-                "{} Postgres {}",
-                "  Discovered".white().bold(),
-                versions
-                    .iter()
-                    .map(|ver| format!("v{ver}"))
-                    .collect::<Vec<_>>()
-                    .join(", ")
-            );
-
-            Ok(versions)
-        }
-    }
-
-    #[derive(Deserialize)]
-    struct Rss {
-        channel: Channel,
-    }
-
-    #[derive(Deserialize)]
-    struct Channel {
-        item: Vec<Item>,
-    }
-
-    #[derive(Deserialize)]
-    struct Item {
-        title: String,
     }
 }

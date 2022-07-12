@@ -9,6 +9,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 use crate::command::stop::stop_postgres;
 use crate::CommandExecute;
+use crate::command::version::pgx_default;
 use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
 use pgx_utils::{
@@ -86,7 +87,7 @@ impl CommandExecute for Init {
 
         if versions.is_empty() {
             // no arguments specified, so we'll just install our defaults
-            init_pgx(&Pgx::default(SUPPORTED_MAJOR_VERSIONS)?)
+            init_pgx(&pgx_default(SUPPORTED_MAJOR_VERSIONS)?)
         } else {
             // user specified arguments, so we'll only install those versions of Postgres
             let mut default_pgx = None;
@@ -95,7 +96,7 @@ impl CommandExecute for Init {
             for (pgver, pg_config_path) in versions {
                 let config = if pg_config_path == "download" {
                     if default_pgx.is_none() {
-                        default_pgx = Some(Pgx::default(SUPPORTED_MAJOR_VERSIONS)?);
+                        default_pgx = Some(pgx_default(SUPPORTED_MAJOR_VERSIONS)?);
                     }
                     default_pgx
                         .as_ref()
