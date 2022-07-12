@@ -20,14 +20,24 @@ use url::Url;
 
 #[derive(Clone)]
 pub struct PgVersion {
-    major_version: u16,
-    minor_version: u16,
+    major: u16,
+    minor: u16,
     url: Url,
+}
+
+impl PgVersion {
+    pub fn new(major: u16, minor: u16, url: Url) -> PgVersion {
+        PgVersion {
+            major,
+            minor,
+            url
+        }
+    }
 }
 
 impl Display for PgVersion {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}.{}", self.major_version, self.minor_version)
+        write!(f, "{}.{}", self.major, self.minor)
     }
 }
 
@@ -92,7 +102,7 @@ impl PgConfig {
 
     pub fn major_version(&self) -> eyre::Result<u16> {
         match &self.version {
-            Some(version) => Ok(version.major_version),
+            Some(version) => Ok(version.major),
             None => {
                 let version_string = self.run("--version")?;
                 let version_parts = version_string.split_whitespace().collect::<Vec<&str>>();
@@ -115,7 +125,7 @@ impl PgConfig {
 
     pub fn minor_version(&self) -> eyre::Result<u16> {
         match &self.version {
-            Some(version) => Ok(version.minor_version),
+            Some(version) => Ok(version.minor),
             None => {
                 let version_string = self.run("--version")?;
                 let version_parts = version_string.split_whitespace().collect::<Vec<&str>>();
@@ -458,8 +468,8 @@ mod rss {
 
                 if supported_major_versions.contains(&major) {
                     versions.push(PgVersion {
-                        major_version: major,
-                        minor_version: minor,
+                        major,
+                        minor,
                         url: Url::parse(
                             &format!("https://ftp.postgresql.org/pub/source/v{major}.{minor}/postgresql-{major}.{minor}.tar.bz2",
                                      major = major, minor = minor)
@@ -474,7 +484,7 @@ mod rss {
                 "  Discovered".white().bold(),
                 versions
                     .iter()
-                    .map(|v| format!("v{}.{}", v.major_version, v.minor_version))
+                    .map(|ver| format!("v{ver}"))
                     .collect::<Vec<_>>()
                     .join(", ")
             );
