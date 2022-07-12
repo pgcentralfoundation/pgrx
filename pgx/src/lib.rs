@@ -410,8 +410,7 @@ macro_rules! pg_sql_graph_magic {
     () => {
         #[no_mangle]
         #[doc(hidden)]
-        pub extern "C" fn __pgx_sql_mappings() -> (::pgx::utils::sql_entity_graph::RustToSqlMapping)
-        {
+        pub extern "C" fn __pgx_sql_mappings() -> ::pgx::utils::sql_entity_graph::RustToSqlMapping {
             ::pgx::utils::sql_entity_graph::RustToSqlMapping {
                 rust_type_id_to_sql: ::pgx::DEFAULT_RUST_TYPE_ID_TO_SQL.clone(),
                 rust_source_to_sql: ::pgx::DEFAULT_RUST_SOURCE_TO_SQL.clone(),
