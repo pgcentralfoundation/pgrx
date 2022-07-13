@@ -7,8 +7,11 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 //! Wrapper around Postgres' `pg_config` command-line tool
+use crate::{BASE_POSTGRES_PORT_NO, BASE_POSTGRES_TESTING_PORT_NO};
 use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
+use serde_derive::{Deserialize, Serialize};
+use std::fmt::{self, Display, Formatter};
 use std::{
     collections::HashMap,
     io::ErrorKind,
@@ -20,14 +23,20 @@ use url::Url;
 
 #[derive(Clone)]
 pub struct PgVersion {
-    major_version: u16,
-    minor_version: u16,
+    major: u16,
+    minor: u16,
     url: Url,
 }
 
+impl PgVersion {
+    pub fn new(major: u16, minor: u16, url: Url) -> PgVersion {
+        PgVersion { major, minor, url }
+    }
+}
+
 impl Display for PgVersion {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}.{}", self.major_version, self.minor_version)
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(f, "{}.{}", self.major, self.minor)
     }
 }
 
@@ -38,7 +47,7 @@ pub struct PgConfig {
 }
 
 impl Display for PgConfig {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         let major = self
             .major_version()
             .expect("could not determine major version");
@@ -57,6 +66,15 @@ impl Default for PgConfig {
     fn default() -> Self {
         PgConfig {
             version: None,
+            pg_config: None,
+        }
+    }
+}
+
+impl From<PgVersion> for PgConfig {
+    fn from(version: PgVersion) -> Self {
+        PgConfig {
+            version: Some(version),
             pg_config: None,
         }
     }
@@ -92,7 +110,7 @@ impl PgConfig {
 
     pub fn major_version(&self) -> eyre::Result<u16> {
         match &self.version {
-            Some(version) => Ok(version.major_version),
+            Some(version) => Ok(version.major),
             None => {
                 let version_string = self.run("--version")?;
                 let version_parts = version_string.split_whitespace().collect::<Vec<&str>>();
@@ -115,7 +133,7 @@ impl PgConfig {
 
     pub fn minor_version(&self) -> eyre::Result<u16> {
         match &self.version {
-            Some(version) => Ok(version.minor_version),
+            Some(version) => Ok(version.minor),
             None => {
                 let version_string = self.run("--version")?;
                 let version_parts = version_string.split_whitespace().collect::<Vec<&str>>();
@@ -249,10 +267,6 @@ pub struct Pgx {
     pg_configs: Vec<PgConfig>,
 }
 
-use crate::{BASE_POSTGRES_PORT_NO, BASE_POSTGRES_TESTING_PORT_NO};
-use serde_derive::{Deserialize, Serialize};
-use std::fmt::{Display, Formatter};
-
 #[derive(Debug, Serialize, Deserialize)]
 struct ConfigToml {
     configs: HashMap<String, PathBuf>,
@@ -276,19 +290,6 @@ impl<'a> PgConfigSelector<'a> {
 impl Pgx {
     pub fn new() -> Self {
         Pgx { pg_configs: vec![] }
-    }
-
-    pub fn default(supported_major_versions: &[u16]) -> eyre::Result<Self> {
-        let pgx = Self {
-            pg_configs: rss::PostgreSQLVersionRss::new(supported_major_versions)?
-                .into_iter()
-                .map(|version| PgConfig {
-                    version: Some(version),
-                    pg_config: None,
-                })
-                .collect(),
-        };
-        Ok(pgx)
     }
 
     pub fn from_config() -> eyre::Result<Self> {
@@ -407,94 +408,5 @@ impl Pgx {
         let mut path = Pgx::home()?;
         path.push("config.toml");
         Ok(path)
-    }
-}
-
-mod rss {
-    use crate::pg_config::PgVersion;
-    use env_proxy::for_url_str;
-    use eyre::WrapErr;
-    use owo_colors::OwoColorize;
-    use serde_derive::Deserialize;
-    use ureq::{Agent, AgentBuilder, Proxy};
-    use url::Url;
-
-    pub(super) struct PostgreSQLVersionRss;
-
-    impl PostgreSQLVersionRss {
-        pub(super) fn new(supported_major_versions: &[u16]) -> eyre::Result<Vec<PgVersion>> {
-            static VERSIONS_RSS_URL: &str = "https://www.postgresql.org/versions.rss";
-
-            let http_client = if let Some((host, port)) = for_url_str(VERSIONS_RSS_URL).host_port()
-            {
-                AgentBuilder::new()
-                    .proxy(Proxy::new(format!("https://{host}:{port}"))?)
-                    .build()
-            } else {
-                Agent::new()
-            };
-
-            let response = http_client
-                .get(VERSIONS_RSS_URL)
-                .call()
-                .wrap_err_with(|| format!("unable to retrieve {}", VERSIONS_RSS_URL))?;
-
-            let rss: Rss = match serde_xml_rs::from_str(&response.into_string()?) {
-                Ok(rss) => rss,
-                Err(e) => return Err(e.into()),
-            };
-
-            let mut versions = Vec::new();
-            for item in rss.channel.item {
-                let title = item.title.trim();
-                let mut parts = title.split('.');
-                let major = parts.next();
-                let minor = parts.next();
-
-                // if we don't have major/minor versions or if they don't parse correctly
-                // we'll just assume zero for them and eventually skip them
-                let major = major.unwrap().parse::<u16>().unwrap_or_default();
-                let minor = minor.unwrap().parse::<u16>().unwrap_or_default();
-
-                if supported_major_versions.contains(&major) {
-                    versions.push(PgVersion {
-                        major_version: major,
-                        minor_version: minor,
-                        url: Url::parse(
-                            &format!("https://ftp.postgresql.org/pub/source/v{major}.{minor}/postgresql-{major}.{minor}.tar.bz2",
-                                     major = major, minor = minor)
-                        )
-                            .expect("invalid url")
-                    })
-                }
-            }
-
-            println!(
-                "{} Postgres {}",
-                "  Discovered".white().bold(),
-                versions
-                    .iter()
-                    .map(|v| format!("v{}.{}", v.major_version, v.minor_version))
-                    .collect::<Vec<_>>()
-                    .join(", ")
-            );
-
-            Ok(versions)
-        }
-    }
-
-    #[derive(Deserialize)]
-    struct Rss {
-        channel: Channel,
-    }
-
-    #[derive(Deserialize)]
-    struct Channel {
-        item: Vec<Item>,
-    }
-
-    #[derive(Deserialize)]
-    struct Item {
-        title: String,
     }
 }
