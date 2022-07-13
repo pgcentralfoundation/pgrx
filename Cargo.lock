@@ -1255,6 +1255,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "numeric"
+version = "0.0.0"
+dependencies = [
+ "pgx",
+ "pgx-tests",
+]
+
+[[package]]
 name = "object"
 version = "0.28.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"

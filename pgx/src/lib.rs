@@ -230,7 +230,9 @@ pub static DEFAULT_TYPEID_SQL_MAPPING: Lazy<HashSet<RustSqlMapping>> = Lazy::new
     map_type!(m, datum::Internal, "internal");
     map_type!(m, pgbox::PgBox<pgx_pg_sys::IndexAmRoutine>, "internal");
     map_type!(m, rel::PgRelation, "regclass");
-    map_type!(m, datum::Numeric, "numeric");
+    map_type!(m, datum::Numeric<-1, -1>, "numeric");
+    map_type!(m, datum::Numeric<1000, 0>, "numeric");
+    map_type!(m, datum::Numeric<1000, 10>, "numeric");
     map_type!(m, datum::AnyElement, "anyelement");
     map_type!(m, datum::AnyArray, "anyarray");
     map_type!(m, datum::Inet, "inet");

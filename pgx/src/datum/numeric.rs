@@ -7,48 +7,78 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use crate::{direct_function_call, direct_function_call_as_datum, pg_sys, FromDatum, IntoDatum};
-use pgx_pg_sys::pg_try;
+use crate::{direct_function_call, pg_sys, FromDatum, IntoDatum};
+use pgx_pg_sys::{pg_try, AsPgCStr, InvalidOid};
 use serde::de::{Error, Visitor};
-use serde::{de, Deserialize, Deserializer, Serialize};
+use serde::{de, Deserialize, Deserializer, Serialize, Serializer};
 use serde_json::Number;
+use std::ffi::CStr;
 use std::fmt;
 
-#[derive(Serialize, Debug)]
-pub struct Numeric(pub String);
+pub const NUMERIC_MAX_PRECISION: i32 = 1000;
+pub const NUMERIC_MAX_RESULT_SCALE: i32 = NUMERIC_MAX_PRECISION * 2;
 
-impl std::fmt::Display for Numeric {
+#[derive(Debug)]
+pub struct Numeric<const PRECISION: i32, const SCALE: i32>(pg_sys::Numeric);
+
+#[inline(always)]
+const fn make_typmod(precision: i32, scale: i32) -> i32 {
+    ((precision << 16) | scale) + pg_sys::VARHDRSZ as i32
+}
+
+impl<const PRECISION: i32, const SCALE: i32> std::fmt::Display for Numeric<PRECISION, SCALE> {
     fn fmt(&self, fmt: &mut std::fmt::Formatter<'_>) -> std::result::Result<(), std::fmt::Error> {
-        fmt.write_fmt(format_args!("{}", self.0))
+        let numeric_out = unsafe {
+            direct_function_call::<&CStr>(
+                pg_sys::numeric_out,
+                vec![Some(pg_sys::Datum::from(self.0))],
+            )
+            .unwrap()
+        };
+        let s = numeric_out
+            .to_str()
+            .expect("numeric_out is not a valid UTF8 string");
+        fmt.write_str(s)
     }
 }
 
-impl<'de> Deserialize<'de> for Numeric {
+impl<const PRECISION: i32, const SCALE: i32> Serialize for Numeric<PRECISION, SCALE> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        serializer.serialize_str(&format!("{}", self))
+    }
+}
+
+impl<'de, const PRECISION: i32, const SCALE: i32> Deserialize<'de> for Numeric<PRECISION, SCALE> {
     fn deserialize<D>(deserializer: D) -> Result<Self, <D as Deserializer<'de>>::Error>
     where
         D: Deserializer<'de>,
     {
-        struct NumericVisitor;
+        struct NumericVisitor<const PRECISION: i32, const SCALE: i32>;
 
-        impl<'de> Visitor<'de> for NumericVisitor {
-            type Value = Numeric;
+        impl<'de, const PRECISION: i32, const SCALE: i32> Visitor<'de>
+            for NumericVisitor<PRECISION, SCALE>
+        {
+            type Value = Numeric<PRECISION, SCALE>;
 
             fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
                 formatter.write_str("a JSON number or a \"quoted JSON number\"")
             }
 
             #[inline]
-            fn visit_i64<E>(self, value: i64) -> Result<Numeric, E> {
+            fn visit_i64<E>(self, value: i64) -> Result<Numeric<PRECISION, SCALE>, E> {
                 Ok(value.into())
             }
 
             #[inline]
-            fn visit_u64<E>(self, value: u64) -> Result<Numeric, E> {
+            fn visit_u64<E>(self, value: u64) -> Result<Numeric<PRECISION, SCALE>, E> {
                 Ok(value.into())
             }
 
             #[inline]
-            fn visit_f64<E>(self, value: f64) -> Result<Numeric, E>
+            fn visit_f64<E>(self, value: f64) -> Result<Numeric<PRECISION, SCALE>, E>
             where
                 E: de::Error,
             {
@@ -78,13 +108,10 @@ impl<'de> Deserialize<'de> for Numeric {
                 unsafe {
                     pg_try(|| {
                         // this might throw, but that's okay
-                        let datum = Numeric(v.clone()).into_datum().unwrap();
-
-                        // and don't leak the NumericData datum Postgres created
-                        pg_sys::pfree(datum.to_void());
+                        let numeric = v.clone().into();
 
                         // we have it as a valid String
-                        Ok(Numeric(v.clone()))
+                        Ok(numeric)
                     })
                     .unwrap_or(Err(Error::custom(format!("invalid Numeric value: {}", v))))
                 }
@@ -95,67 +122,128 @@ impl<'de> Deserialize<'de> for Numeric {
     }
 }
 
-impl Into<Numeric> for i8 {
-    fn into(self) -> Numeric {
-        Numeric(format!("{}", self))
+impl<const PRECISION: i32, const SCALE: i32> Into<Numeric<PRECISION, SCALE>> for i8 {
+    fn into(self) -> Numeric<PRECISION, SCALE> {
+        format!("{}", self).into()
     }
 }
 
-impl Into<Numeric> for i16 {
-    fn into(self) -> Numeric {
-        Numeric(format!("{}", self))
+impl<const PRECISION: i32, const SCALE: i32> Into<Numeric<PRECISION, SCALE>> for i16 {
+    #[inline]
+    fn into(self) -> Numeric<PRECISION, SCALE> {
+        unsafe {
+            direct_function_call::<Numeric<PRECISION, SCALE>>(
+                pg_sys::int2_numeric,
+                vec![self.into_datum()],
+            )
+        }
+        .unwrap()
     }
 }
 
-impl Into<Numeric> for i32 {
-    fn into(self) -> Numeric {
-        Numeric(format!("{}", self))
+impl<const PRECISION: i32, const SCALE: i32> Into<Numeric<PRECISION, SCALE>> for i32 {
+    #[inline]
+    fn into(self) -> Numeric<PRECISION, SCALE> {
+        unsafe {
+            direct_function_call::<Numeric<PRECISION, SCALE>>(
+                pg_sys::int4_numeric,
+                vec![self.into_datum()],
+            )
+        }
+        .unwrap()
     }
 }
 
-impl Into<Numeric> for i64 {
-    fn into(self) -> Numeric {
-        Numeric(format!("{}", self))
+impl<const PRECISION: i32, const SCALE: i32> Into<Numeric<PRECISION, SCALE>> for i64 {
+    #[inline]
+    fn into(self) -> Numeric<PRECISION, SCALE> {
+        unsafe {
+            direct_function_call::<Numeric<PRECISION, SCALE>>(
+                pg_sys::int8_numeric,
+                vec![self.into_datum()],
+            )
+        }
+        .unwrap()
     }
 }
 
-impl Into<Numeric> for u8 {
-    fn into(self) -> Numeric {
-        Numeric(format!("{}", self))
+impl<const PRECISION: i32, const SCALE: i32> Into<Numeric<PRECISION, SCALE>> for u8 {
+    #[inline]
+    fn into(self) -> Numeric<PRECISION, SCALE> {
+        format!("{}", self).into()
     }
 }
 
-impl Into<Numeric> for u16 {
-    fn into(self) -> Numeric {
-        Numeric(format!("{}", self))
+impl<const PRECISION: i32, const SCALE: i32> Into<Numeric<PRECISION, SCALE>> for u16 {
+    #[inline]
+    fn into(self) -> Numeric<PRECISION, SCALE> {
+        format!("{}", self).into()
     }
 }
 
-impl Into<Numeric> for u32 {
-    fn into(self) -> Numeric {
-        Numeric(format!("{}", self))
+impl<const PRECISION: i32, const SCALE: i32> Into<Numeric<PRECISION, SCALE>> for u32 {
+    #[inline]
+    fn into(self) -> Numeric<PRECISION, SCALE> {
+        format!("{}", self).into()
     }
 }
 
-impl Into<Numeric> for u64 {
-    fn into(self) -> Numeric {
-        Numeric(format!("{}", self))
+impl<const PRECISION: i32, const SCALE: i32> Into<Numeric<PRECISION, SCALE>> for u64 {
+    #[inline]
+    fn into(self) -> Numeric<PRECISION, SCALE> {
+        format!("{}", self).into()
     }
 }
 
-impl Into<Numeric> for f32 {
-    fn into(self) -> Numeric {
-        Numeric(format!("{}", self))
+impl<const PRECISION: i32, const SCALE: i32> Into<Numeric<PRECISION, SCALE>> for f32 {
+    #[inline]
+    fn into(self) -> Numeric<PRECISION, SCALE> {
+        unsafe {
+            direct_function_call::<Numeric<PRECISION, SCALE>>(
+                pg_sys::float4_numeric,
+                vec![self.into_datum()],
+            )
+        }
+        .unwrap()
     }
 }
 
-impl Into<Numeric> for f64 {
-    fn into(self) -> Numeric {
-        Numeric(format!("{}", self))
+impl<const PRECISION: i32, const SCALE: i32> Into<Numeric<PRECISION, SCALE>> for f64 {
+    #[inline]
+    fn into(self) -> Numeric<PRECISION, SCALE> {
+        unsafe {
+            direct_function_call::<Numeric<PRECISION, SCALE>>(
+                pg_sys::float8_numeric,
+                vec![self.into_datum()],
+            )
+        }
+        .unwrap()
     }
 }
 
-impl FromDatum for Numeric {
+impl<const PRECISION: i32, const SCALE: i32> Into<Numeric<PRECISION, SCALE>> for String {
+    #[inline]
+    fn into(self) -> Numeric<PRECISION, SCALE> {
+        unsafe {
+            let s = self.as_pg_cstr();
+            let numeric = direct_function_call::<Numeric<PRECISION, SCALE>>(
+                pg_sys::numeric_in,
+                vec![
+                    Some(pg_sys::Datum::from(s)),
+                    InvalidOid.into_datum(),
+                    make_typmod(PRECISION, SCALE).into_datum(),
+                ],
+            )
+            .unwrap();
+
+            pg_sys::pfree(s as _);
+            numeric
+        }
+    }
+}
+
+impl<const PRECISION: i32, const SCALE: i32> FromDatum for Numeric<PRECISION, SCALE> {
+    #[inline]
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Self>
     where
         Self: Sized,
@@ -163,30 +251,16 @@ impl FromDatum for Numeric {
         if is_null {
             None
         } else {
-            let cstr =
-                direct_function_call::<&std::ffi::CStr>(pg_sys::numeric_out, vec![Some(datum)])
-                    .expect("numeric_out returned null");
-            Some(Numeric(cstr.to_str().unwrap().into()))
+            let datum = pg_sys::pg_detoast_datum(datum.ptr_cast()) as pg_sys::Numeric;
+            Some(Numeric(datum))
         }
     }
 }
 
-impl IntoDatum for Numeric {
+impl<const PRECISION: i32, const SCALE: i32> IntoDatum for Numeric<PRECISION, SCALE> {
+    #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        let cstring =
-            std::ffi::CString::new(self.0).expect("failed to convert numeric string into CString");
-        let cstr = cstring.as_c_str();
-
-        unsafe {
-            direct_function_call_as_datum(
-                pg_sys::numeric_in,
-                vec![
-                    cstr.into_datum(),
-                    pg_sys::InvalidOid.into_datum(),
-                    0i32.into_datum(),
-                ],
-            )
-        }
+        Some(pg_sys::Datum::from(self.0))
     }
 
     fn type_oid() -> u32 {
