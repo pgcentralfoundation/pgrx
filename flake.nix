@@ -32,6 +32,12 @@
 
       # Inheritance helpers
       inherit (gitignore.lib) gitignoreSource;
+
+      # Not yet in use
+      releaseAndDebug = attr: call: args: {
+        "${attr}" = call args;
+        "${attr}_debug" = call (args // { release = false; });
+      };
     in flake-utils.lib.eachDefaultSystem (system:
       {
         packages = let
