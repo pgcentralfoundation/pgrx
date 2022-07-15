@@ -1,10 +1,12 @@
 { gitignoreSource
+, stdenv
 , lib
 , pkg-config
 , openssl
 , libiconv
 , llvmPackages
 , rustPlatform
+, darwin
 , release ? true
 }:
 
@@ -15,6 +17,10 @@ in rustPlatform.buildRustPackage {
   inherit (cargoToml.package) name version;
   cargoSha256 = "sha256-bxzBYrQGA3PmwGh5B2qUaOM9oif9hwk2OR5ZcfDkltY=";
   src = gitignoreSource ../.;
+  cargoLock.lockFile = ../Cargo.lock;
+
+  cargoBuildFlags = ["--package" "cargo-pgx"];
+  cargoTestFlags = ["--package" "cargo-pgx"];
 
   nativeBuildInputs = [
     pkg-config
@@ -22,7 +28,7 @@ in rustPlatform.buildRustPackage {
   buildInputs = [
     openssl
     libiconv
-  ];
+  ] ++ (lib.optional stdenv.isDarwin [ darwin.apple_sdk.frameworks.Security ]);
 
   LIBCLANG_PATH = "${llvmPackages.libclang}/lib";
 
