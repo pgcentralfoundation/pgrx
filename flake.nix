@@ -12,9 +12,13 @@
       url = "github:hercules-ci/gitignore.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    naersk = {
+      url = "github:nix-community/naersk";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, flake-utils, rust-overlay, gitignore, ... }:
+  outputs = { self, nixpkgs, flake-utils, rust-overlay, gitignore, naersk, ... }:
     let
       # Helper function for producing a package-specific nixpkgs
       nixpkgsWithOverlays = { nixpkgs, system, extraOverlays ? [ ] }: (import nixpkgs {
@@ -83,6 +87,22 @@
         };
       }
     ) // {
+      lib = let
+        supportedSystems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
+        forAllSystems = f: nixpkgs.lib.genAttrs supportedSystems (system: f system);
+      in {
+        inherit supportedSystems forAllSystems nixpkgsWithOverlays;
+        buildPgxExtension =
+          { pkgs
+          , source
+          , targetPostgres
+          , additionalFeatures ? [ ]
+          , release ? true
+          }: pkgs.callPackage ./nix/extension.nix {
+            inherit source targetPostgres release naersk additionalFeatures gitignoreSource;
+          };
+      };
+
       overlays.default = final: prev: {
         cargo-pgx = final.callPackage ./cargo-pgx {
           inherit gitignoreSource;
