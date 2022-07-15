@@ -1,5 +1,5 @@
-{ lib
-, naersk
+{ buildRustPackage
+, lib
 , hostPlatform
 , fetchFromGitHub
 , postgresql_10
@@ -8,29 +8,24 @@
 , postgresql_13
 , pkg-config
 , openssl
+, rustToolchain
 , rustfmt
 , libiconv
 , llvmPackages
 , gitignoreSource
 , release ? true
-,
 }:
 
 let
   cargoToml = (builtins.fromTOML (builtins.readFile ./Cargo.toml));
-in
-
-naersk.lib."${hostPlatform.system}".buildPackage rec {
-  name = cargoToml.package.name;
-  version = cargoToml.package.version;
-
-  src = gitignoreSource ../.;
+in buildRustPackage {
   inherit release;
-
-  cargoBuildOptions = final: final ++ [ "--package" "cargo-pgx" ];
-  cargoTestOptions = final: final ++ [ "--package" "cargo-pgx" ];
+  inherit (cargoToml.package) name version;
+  cargoSha256 = "sha256-bxzBYrQGA3PmwGh5B2qUaOM9oif9hwk2OR5ZcfDkltY=";
+  src = gitignoreSource ../.;
 
   nativeBuildInputs = [
+    rustToolchain
     pkg-config
   ];
   buildInputs = [

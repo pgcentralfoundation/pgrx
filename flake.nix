@@ -3,72 +3,48 @@
 
   inputs = {
     nixpkgs.url = "nixpkgs";
-    rust-overlay.url = "github:oxalica/rust-overlay";
-    rust-overlay.inputs.nixpkgs.follows = "nixpkgs";
-    naersk.url = "github:nix-community/naersk";
-    naersk.inputs.nixpkgs.follows = "nixpkgs";
-    gitignore.url = "github:hercules-ci/gitignore.nix";
-    gitignore.inputs.nixpkgs.follows = "nixpkgs";
+    flake-utils.url = "github:numtide/flake-utils";
+    rust-overlay = {
+      url = "github:oxalica/rust-overlay";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    gitignore = {
+      url = "github:hercules-ci/gitignore.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, rust-overlay, naersk, gitignore }:
-    let
-      supportedSystems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
-      forAllSystems = f: nixpkgs.lib.genAttrs supportedSystems (system: f system);
-      nixpkgsWithOverlays = { system, nixpkgs, extraOverlays ? [ ] }: (import nixpkgs {
-        inherit system;
+  outputs = { self, nixpkgs, flake-utils, rust-overlay, gitignore, ... }:
+    flake-utils.lib.eachDefaultSystem (system:
+      let
+        inherit (pkgs) callPackage;
+        inherit (pkgs.rustPlatform) buildRustPackage;
+        inherit (gitignore.lib) gitignoreSource;
+
         overlays = [
-          self.overlay
-          rust-overlay.overlay
-          (self: super: { inherit (self.rust-bin.stable.latest) rustc cargo rustdoc rust-std; })
-        ] ++ extraOverlays;
-      });
-      releaseAndDebug = attr: call: args: {
-        "${attr}" = call args;
-        "${attr}_debug" = call (args // { release = false; });
-      };
-    in
-    {
-      lib = {
-        inherit supportedSystems forAllSystems nixpkgsWithOverlays;
-        buildPgxExtension =
-          { pkgs
-          , source
-          , targetPostgres
-          , additionalFeatures ? [ ]
-          , release ? true
-          }: pkgs.callPackage ./nix/extension.nix {
-            inherit source targetPostgres release naersk additionalFeatures;
-            inherit (gitignore.lib) gitignoreSource;
-          };
-      };
-      defaultPackage = forAllSystems (system: (nixpkgsWithOverlays { inherit system nixpkgs; }).cargo-pgx);
+          (import rust-overlay)
+        ];
 
-      packages = forAllSystems (system:
-        let
-          pkgs = nixpkgsWithOverlays { inherit system nixpkgs; };
-        in
-        {
-          inherit (pkgs) cargo-pgx;
-        });
+        pkgs = import nixpkgs { inherit overlays system; };
+        
+        rustToolchain = pkgs.rust-bin.stable.latest.default;
 
-      overlay = final: prev: {
-        cargo-pgx = final.callPackage ./cargo-pgx {
-          inherit naersk;
-          gitignoreSource = gitignore.lib.gitignoreSource;
+        cargo-pgx = callPackage ./cargo-pgx {
+          inherit buildRustPackage gitignoreSource rustToolchain;
         };
-        cargo-pgx_debug = final.callPackage ./cargo-pgx {
-          inherit naersk;
+
+        cargo-pgx_debug = callPackage ./cargo-pgx {
           release = false;
-          gitignoreSource = gitignore.lib.gitignoreSource;
+          inherit buildRustPackage gitignoreSource rustToolchain;
         };
-      };
+      in {
+        packages = {
+          default = cargo-pgx;
 
-      devShell = forAllSystems (system:
-        let
-          pkgs = nixpkgsWithOverlays { inherit system nixpkgs; };
-        in
-        pkgs.mkShell {
+          inherit cargo-pgx cargo-pgx_debug;
+        };
+
+        devShells.default = pkgs.mkShell {
           inputsFrom = with pkgs; [
             postgresql_10
             postgresql_11
@@ -94,25 +70,21 @@
           ] ++ (if pkgs.stdenv.isLinux then [
             "-I ${pkgs.glibc.dev}/include"
           ] else [ ]);
-        });
+        };
 
-      checks = forAllSystems (system:
-        let
-          pkgs = nixpkgsWithOverlays { inherit system nixpkgs; };
-        in
-        {
+        checks = {
           format = pkgs.runCommand "check-format"
             {
-              buildInputs = with pkgs; [ rustfmt cargo ];
+              buildInputs = with pkgs; [ cargo rustfmt ];
             } ''
             ${pkgs.rustfmt}/bin/cargo-fmt fmt --manifest-path ${./.}/Cargo.toml -- --check
             ${pkgs.nixpkgs-fmt}/bin/nixpkgs-fmt --check ${./.}
             touch $out # it worked!
           '';
-          pkgs-cargo-pgx = pkgs.cargo-pgx_debug.out;
-        });
-
-      defaultTemplate = self.templates.default;
+          pkgs-cargo-pgx = cargo-pgx_debug.out;
+        };
+      }
+    ) // {
       templates = {
         default = {
           path = ./nix/templates/default;
