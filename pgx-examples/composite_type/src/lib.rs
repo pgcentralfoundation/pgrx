@@ -158,7 +158,7 @@ CREATE AGGREGATE sum_scritches ("value" Dog) (
     SFUNC = "sum_scritches_state",
     STYPE = integer,
     INITCOND = '0'
-);
+)
 ```
 */
 struct SumScritches;
@@ -181,18 +181,38 @@ impl Aggregate for SumScritches {
     }
 }
 
+/*
+Create sum the scritches recieved by dogs, roughly the equivalent of:
+
+```sql
+CREATE FUNCTION scritch_collector_state(state Dog, new integer)
+    RETURNS Dog
+    LANGUAGE SQL
+    STRICT
+    RETURN ROW(state.name, state.scritches + new)::Dog;
+
+CREATE AGGREGATE scritch_collector ("value" integer) (
+    SFUNC = "sum_scritches_state",
+    STYPE = Dog,
+)
+```
+*/
 struct ScritchCollector;
 
 #[pg_aggregate]
 impl Aggregate for ScritchCollector {
-    type State = pgx::composite_type!("Dog");
+    type State = Option<pgx::composite_type!("Dog")>;
     type Args = i32;
 
     fn state(
-        mut current: Self::State,
+        current: Self::State,
         arg: Self::Args,
         _fcinfo: pg_sys::FunctionCallInfo,
     ) -> Self::State {
+        let mut current = match current {
+            Some(v) => v,
+            None => PgHeapTuple::new_composite_type(DOG_COMPOSITE_TYPE).unwrap(),
+        };
         let current_scritches: i32 = current
             .get_by_name("scritches")
             .unwrap()
@@ -200,10 +220,29 @@ impl Aggregate for ScritchCollector {
         current
             .set_by_name("scritches", current_scritches + arg)
             .unwrap();
-        current
+        Some(current)
     }
 }
 
+/*
+Create an operator allowing dogs to accept scritches directly.
+
+```sql
+CREATE FUNCTION add_scritches_to_dog(
+    dog Dog,
+    number integer
+) RETURNS Dog
+LANGUAGE SQL
+STRICT
+RETURN ROW(dog.name, dog.scritches + number)::Dog;
+
+CREATE OPERATOR + (
+    PROCEDURE="add_scritches_to_dog",
+    LEFTARG=Dog,
+    RIGHTARG=integer
+);
+```
+*/
 #[pg_operator]
 #[opname(+)]
 fn add_scritches_to_dog(
@@ -258,6 +297,22 @@ mod tests {
 
         let cat: PgHeapTuple<AllocatedByRust> = friendship.get_by_name("cat").unwrap().unwrap();
         assert_eq!(cat.get_by_name::<&str>("name").unwrap().unwrap(), "Sally");
+    }
+
+    #[pg_test]
+    fn test_scritch_collector() {
+        let retval = Spi::get_one::<i32>(
+            "SELECT (scritchcollector(value)).scritches FROM UNNEST(ARRAY [1,2,3]) as value;",
+        )
+        .expect("SQL select failed");
+        assert_eq!(retval, 6);
+    }
+
+    #[pg_test]
+    fn test_dog_add_operator() {
+        let retval = Spi::get_one::<i32>("SELECT (ROW('Nami', 0)::Dog + 1).scritches;")
+            .expect("SQL select failed");
+        assert_eq!(retval, 1);
     }
 }
 
