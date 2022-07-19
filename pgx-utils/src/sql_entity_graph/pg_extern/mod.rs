@@ -26,7 +26,7 @@ use search_path::SearchPathList;
 use eyre::WrapErr;
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
-use std::convert::TryFrom;
+use std::{convert::TryFrom, ops::Deref};
 use syn::{
     parse::{Parse, ParseStream, Parser},
     punctuated::Punctuated,
@@ -182,20 +182,92 @@ impl PgExtern {
             .and_then(|attr| Some(attr.parse_args::<SearchPathList>().unwrap()))
     }
 
-    fn inputs(&self) -> eyre::Result<Vec<PgExternArgument>> {
-        let mut args = Vec::default();
+    fn arg_patterns(&self) -> syn::Result<Vec<Ident>> {
+        let mut patterns = Vec::default();
         for input in &self.func.sig.inputs {
-            let arg = PgExternArgument::build(input.clone())
-                .wrap_err_with(|| format!("Could not map {:?}", input))?;
-            if let Some(arg) = arg {
-                args.push(arg);
+            match input {
+                syn::FnArg::Typed(pat_type) => {
+                    let pattern = match *pat_type.pat {
+                        syn::Pat::Ident(ref p) => p.ident.clone(),
+                        syn::Pat::Reference(ref p_ref) => match *p_ref.pat {
+                            syn::Pat::Ident(ref inner_ident) => inner_ident.ident.clone(),
+                            _ => {
+                                return Err(syn::Error::new(
+                                    Span::call_site(),
+                                    "Unable to parse FnArg",
+                                ))
+                            }
+                        },
+                        _ => {
+                            return Err(syn::Error::new(Span::call_site(), "Unable to parse FnArg"))
+                        }
+                    };
+                    patterns.push(pattern);
+                }
+                _ => return Err(syn::Error::new(Span::call_site(), "Unable to parse FnArg")),
             }
         }
-        Ok(args)
+        Ok(patterns)
     }
 
-    fn returns(&self) -> Result<Returning, syn::Error> {
-        Returning::try_from(&self.func.sig.output)
+    fn arg_defaults(&self) -> syn::Result<Vec<Option<String>>> {
+        let mut defaults = Vec::default();
+        for input in &self.func.sig.inputs {
+            match input {
+                syn::FnArg::Typed(pat_type) => {
+                    let mut input_cloned = (*pat_type.ty).clone();
+                    let default = match pat_type.ty.as_ref() {
+                        syn::Type::Macro(macro_pat) => {
+                            let mac = &macro_pat.mac;
+                            let archetype = mac.path.segments.last().expect("No last segment");
+                            let (_, default_value) =
+                                handle_default(input_cloned.clone(), archetype, mac)?;
+                            default_value
+                        }
+                        syn::Type::Path(ref path) => {
+                            let segments = &path.path;
+                            let mut default = None;
+                            for segment in &segments.segments {
+                                if segment.ident.to_string().ends_with("Option") {
+                                    match &segment.arguments {
+                                        syn::PathArguments::AngleBracketed(path_arg) => {
+                                            match path_arg.args.first() {
+                                                Some(syn::GenericArgument::Type(
+                                                    syn::Type::Macro(macro_pat),
+                                                )) => {
+                                                    let mac = &macro_pat.mac;
+                                                    let archetype = mac
+                                                        .path
+                                                        .segments
+                                                        .last()
+                                                        .expect("No last segment");
+                                                    let (inner_type, default_value) =
+                                                        handle_default(
+                                                            input_cloned.clone(),
+                                                            archetype,
+                                                            mac,
+                                                        )?;
+                                                    input_cloned =
+                                                        syn::parse_quote! { Option<#inner_type> };
+                                                    default = default_value;
+                                                }
+                                                _ => (),
+                                            }
+                                        }
+                                        _ => (),
+                                    }
+                                }
+                            }
+                            default
+                        }
+                        _ => None,
+                    };
+                    defaults.push(default);
+                }
+                _ => return Err(syn::Error::new(Span::call_site(), "Unable to parse FnArg")),
+            }
+        }
+        Ok(defaults)
     }
 
     pub fn new(attr: TokenStream2, item: TokenStream2) -> Result<Self, syn::Error> {
@@ -243,7 +315,6 @@ impl PgExtern {
 impl ToTokens for PgExtern {
     fn to_tokens(&self, tokens: &mut TokenStream2) {
         let ident = &self.func.sig.ident;
-        let name = self.name();
         let schema = self.schema();
         let schema_iter = schema.iter();
         let extern_attrs = self
@@ -252,9 +323,24 @@ impl ToTokens for PgExtern {
             .map(|attr| attr.to_sql_entity_graph_tokens())
             .collect::<Punctuated<_, Token![,]>>();
         let search_path = self.search_path().into_iter();
-        let inputs = self.inputs().unwrap();
-        let returns = match self.returns() {
-            Ok(returns) => returns,
+        let arg_patterns = match self.arg_patterns() {
+            Ok(arg_patterns) => arg_patterns,
+            Err(e) => {
+                let msg = e.to_string();
+                tokens.append_all(quote! {
+                    std::compile_error!(#msg);
+                });
+                return;
+            }
+        };
+        let arg_defaults = match self.arg_defaults() {
+            Ok(arg_defaults) => arg_defaults
+                .iter()
+                .map(|v| match v {
+                    Some(v) => syn::parse_quote! { Some(#v) },
+                    None => syn::parse_quote! { None },
+                })
+                .collect::<Vec<syn::Expr>>(),
             Err(e) => {
                 let msg = e.to_string();
                 tokens.append_all(quote! {
@@ -284,17 +370,14 @@ impl ToTokens for PgExtern {
                 use alloc::vec::Vec;
                 use alloc::vec;
                 let submission = ::pgx::utils::sql_entity_graph::PgExternEntity {
-                    name: #name,
-                    unaliased_name: stringify!(#ident),
+                    metadata: pgx::utils::sql_entity_graph::metadata::FunctionMetadata::entity(&#ident),
+                    arg_patterns: vec![#(stringify!(#arg_patterns)),*],
+                    arg_defaults: vec![#(#arg_defaults),*],
                     schema: None #( .unwrap_or(Some(#schema_iter)) )*,
                     file: file!(),
                     line: line!(),
-                    module_path: core::module_path!(),
-                    full_path: concat!(core::module_path!(), "::", stringify!(#ident)),
                     extern_attrs: vec![#extern_attrs],
                     search_path: None #( .unwrap_or(Some(vec![#search_path])) )*,
-                    fn_args: vec![#(#inputs),*],
-                    fn_return: #returns,
                     operator: None #( .unwrap_or(Some(#operator)) )*,
                     to_sql_config: #to_sql_config,
                 };
@@ -336,5 +419,136 @@ impl Parse for PgExtern {
             func,
             to_sql_config,
         })
+    }
+}
+
+fn handle_default(
+    ty: syn::Type,
+    archetype: &syn::PathSegment,
+    mac: &syn::Macro,
+) -> syn::Result<(syn::Type, Option<String>)> {
+    match archetype.ident.to_string().as_str() {
+        "default" => {
+            let out: DefaultMacro = mac.parse_body()?;
+            let true_ty = out.ty;
+            match out.expr {
+                syn::Expr::Lit(syn::ExprLit {
+                    lit: syn::Lit::Str(def),
+                    ..
+                }) => {
+                    let value = def.value();
+                    Ok((true_ty, Some(value)))
+                }
+                syn::Expr::Lit(syn::ExprLit {
+                    lit: syn::Lit::Float(def),
+                    ..
+                }) => {
+                    let value = def.base10_digits();
+                    Ok((true_ty, Some(value.to_string())))
+                }
+                syn::Expr::Lit(syn::ExprLit {
+                    lit: syn::Lit::Int(def),
+                    ..
+                }) => {
+                    let value = def.base10_digits();
+                    Ok((true_ty, Some(value.to_string())))
+                }
+                syn::Expr::Lit(syn::ExprLit {
+                    lit: syn::Lit::Bool(def),
+                    ..
+                }) => {
+                    let value = def.value();
+                    Ok((true_ty, Some(value.to_string())))
+                }
+                syn::Expr::Unary(syn::ExprUnary {
+                    op: syn::UnOp::Neg(_),
+                    ref expr,
+                    ..
+                }) => match &**expr {
+                    syn::Expr::Lit(syn::ExprLit {
+                        lit: syn::Lit::Int(def),
+                        ..
+                    }) => {
+                        let value = def.base10_digits();
+                        Ok((true_ty, Some("-".to_owned() + value)))
+                    }
+                    _ => {
+                        return Err(syn::Error::new(
+                            Span::call_site(),
+                            format!(
+                                "Unrecognized UnaryExpr in `default!()` macro, got: {:?}",
+                                out.expr
+                            ),
+                        ))
+                    }
+                },
+                syn::Expr::Type(syn::ExprType { ref ty, .. }) => match ty.deref() {
+                    syn::Type::Path(syn::TypePath {
+                        path: syn::Path { segments, .. },
+                        ..
+                    }) => {
+                        let last = segments.last().expect("No last segment");
+                        let last_string = last.ident.to_string();
+                        if last_string.as_str() == "NULL" {
+                            Ok((true_ty, Some(last_string)))
+                        } else {
+                            return Err(syn::Error::new(Span::call_site(), format!("Unable to parse default value of `default!()` macro, got: {:?}", out.expr)));
+                        }
+                    }
+                    _ => {
+                        return Err(syn::Error::new(
+                            Span::call_site(),
+                            format!(
+                                "Unable to parse default value of `default!()` macro, got: {:?}",
+                                out.expr
+                            ),
+                        ))
+                    }
+                },
+                syn::Expr::Path(syn::ExprPath {
+                    path: syn::Path { ref segments, .. },
+                    ..
+                }) => {
+                    let last = segments.last().expect("No last segment");
+                    let last_string = last.ident.to_string();
+                    if last_string.as_str() == "NULL" {
+                        Ok((true_ty, Some(last_string)))
+                    } else {
+                        return Err(syn::Error::new(
+                            Span::call_site(),
+                            format!(
+                                "Unable to parse default value of `default!()` macro, got: {:?}",
+                                out.expr
+                            ),
+                        ));
+                    }
+                }
+                _ => {
+                    return Err(syn::Error::new(
+                        Span::call_site(),
+                        format!(
+                            "Unable to parse default value of `default!()` macro, got: {:?}",
+                            out.expr
+                        ),
+                    ))
+                }
+            }
+        }
+        _ => Ok((ty, None)),
+    }
+}
+
+#[derive(Debug, Clone)]
+pub(crate) struct DefaultMacro {
+    ty: syn::Type,
+    pub(crate) expr: syn::Expr,
+}
+
+impl Parse for DefaultMacro {
+    fn parse(input: ParseStream) -> Result<Self, syn::Error> {
+        let ty = input.parse()?;
+        let _comma: Token![,] = input.parse()?;
+        let expr = input.parse()?;
+        Ok(Self { ty, expr })
     }
 }

@@ -11,8 +11,6 @@ use crate::{pg_sys, void_mut_ptr, FromDatum, IntoDatum, PgMemoryContexts};
 use serde::Serializer;
 use std::marker::PhantomData;
 
-pub type VariadicArray<'a, T> = Array<'a, T>;
-
 pub struct Array<'a, T: FromDatum> {
     ptr: *mut pg_sys::varlena,
     array_type: *mut pg_sys::ArrayType,
@@ -151,6 +149,91 @@ impl<'a, T: FromDatum> Array<'a, T> {
         } else {
             Some(unsafe { T::from_datum(self.elem_slice[i], self.null_slice[i]) })
         }
+    }
+}
+
+pub struct VariadicArray<'a, T: FromDatum>(Array<'a, T>);
+
+impl<'a, T: FromDatum + serde::Serialize> serde::Serialize for VariadicArray<'a, T> {
+    fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error>
+    where
+        S: Serializer,
+    {
+        serializer.collect_seq(self.0.iter())
+    }
+}
+
+impl<'a, T: FromDatum> VariadicArray<'a, T> {
+    /// Create an [`Array`](crate::datum::Array) over an array of [`pg_sys::Datum`](pg_sys::Datum) values and a corresponding array
+    /// of "is_null" indicators
+    ///
+    /// `T` can be [`pg_sys::Datum`](pg_sys::Datum) if the elements are not all of the same type
+    ///
+    /// # Safety
+    ///
+    /// This function is unsafe as it can't validate the provided pointer are valid or that
+    ///
+    pub unsafe fn over(
+        elements: *mut pg_sys::Datum,
+        nulls: *mut bool,
+        nelems: usize,
+    ) -> VariadicArray<'a, T> {
+        Self(Array::<T> {
+            ptr: std::ptr::null_mut(),
+            array_type: std::ptr::null_mut(),
+            elements,
+            nulls,
+            nelems,
+            elem_slice: std::slice::from_raw_parts(elements, nelems),
+            null_slice: std::slice::from_raw_parts(nulls, nelems),
+            _marker: PhantomData,
+        })
+    }
+
+    unsafe fn from_pg(
+        ptr: *mut pg_sys::varlena,
+        array_type: *mut pg_sys::ArrayType,
+        elements: *mut pg_sys::Datum,
+        nulls: *mut bool,
+        nelems: usize,
+    ) -> Self {
+        Self(Array::from_pg(ptr, array_type, elements, nulls, nelems))
+    }
+
+    pub fn into_array_type(self) -> *const pg_sys::ArrayType {
+        self.0.into_array_type()
+    }
+
+    pub fn as_slice(&self) -> &[T] {
+        self.0.as_slice()
+    }
+
+    /// Return an Iterator of Option<T> over the contained Datums.
+    pub fn iter(&self) -> ArrayIterator<'_, T> {
+        self.0.iter()
+    }
+
+    /// Return an Iterator of the contained Datums (converted to Rust types).
+    ///
+    /// This function will panic when called if the array contains any SQL NULL values.
+    pub fn iter_deny_null(&self) -> ArrayTypedIterator<'_, T> {
+        self.0.iter_deny_null()
+    }
+
+    #[inline]
+    pub fn len(&self) -> usize {
+        self.0.len()
+    }
+
+    #[inline]
+    pub fn is_empty(&self) -> bool {
+        self.0.is_empty()
+    }
+
+    #[allow(clippy::option_option)]
+    #[inline]
+    pub fn get(&self, i: usize) -> Option<Option<T>> {
+        self.0.get(i)
     }
 }
 

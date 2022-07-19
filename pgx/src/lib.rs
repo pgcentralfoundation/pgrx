@@ -6,7 +6,6 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
-
 //! `pgx` is a framework for creating Postgres extensions in 100% Rust
 //!
 //! ## Example
@@ -87,12 +86,14 @@ pub use memcxt::*;
 pub use namespace::*;
 pub use nodes::*;
 pub use pgbox::*;
+use quote::__private::token_stream::IntoIter;
 pub use rel::*;
 pub use shmem::*;
 pub use spi::*;
 pub use stringinfo::*;
 pub use trigger_support::*;
 pub use tupdesc::*;
+use utils::sql_entity_graph::metadata::ReturnVariant;
 pub use varlena::*;
 pub use wrappers::*;
 pub use xid::*;
@@ -302,6 +303,185 @@ pub static DEFAULT_COMPOSITE_TYPE_COLLECTIONS: Lazy<std::collections::HashMap<Ty
 
         m
     });
+use pgx_utils::sql_entity_graph::metadata::{FunctionMetadata, SqlTranslatable};
+
+pub fn print_some_mappings_please_and_thank_you() {
+    crate::log!(
+        "`my_goofy_function`: {:#?}",
+        tester_functions::my_goofy_function.entity(),
+    );
+    crate::log!(
+        "`my_other_goofy_function`: {:#?}",
+        tester_functions::my_other_goofy_function.entity(),
+    );
+    crate::log!(
+        "`my_variadic_goofy_function`: {:#?}",
+        tester_functions::my_variadic_goofy_function.entity(),
+    );
+    crate::log!(
+        "`my_goofy_set_returning_function`: {:#?}",
+        tester_functions::my_goofy_set_returning_function.entity(),
+    );
+    crate::log!(
+        "`my_goofy_table_function`: {:#?}",
+        tester_functions::my_goofy_table_function.entity(),
+    );
+}
+
+mod tester_functions {
+    use crate::{SetReturningFunctionIterator, TableIterator, VariadicArray};
+
+    pub(crate) fn my_goofy_function<'a>(_a: &'a str) {
+        todo!()
+    }
+
+    pub(crate) fn my_other_goofy_function(_a: Option<String>, _b: String) -> Vec<String> {
+        todo!()
+    }
+
+    pub(crate) fn my_variadic_goofy_function(_a: VariadicArray<i32>, _b: String) -> String {
+        todo!()
+    }
+
+    pub(crate) fn my_goofy_set_returning_function(
+        _a: i32,
+        b: String,
+    ) -> SetReturningFunctionIterator<String> {
+        SetReturningFunctionIterator::new(vec![b].into_iter())
+    }
+
+    pub(crate) fn my_goofy_table_function(_a: i32, _b: String) -> TableIterator<String> {
+        todo!()
+    }
+}
+
+pub struct SetReturningFunctionIterator<T> {
+    iter: Box<dyn Iterator<Item = T>>,
+}
+
+impl<T> SetReturningFunctionIterator<T> {
+    pub fn new<I>(iter: I) -> Self
+    where
+        I: IntoIterator<Item = T>,
+        I::IntoIter: 'static,
+    {
+        Self {
+            iter: Box::new(iter.into_iter()),
+        }
+    }
+}
+
+impl<T> Iterator for SetReturningFunctionIterator<T> {
+    type Item = T;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.iter.next()
+    }
+}
+
+impl<T> IntoDatum for SetReturningFunctionIterator<T> {
+    fn into_datum(self) -> Option<pg_sys::Datum> {
+        todo!()
+    }
+
+    fn type_oid() -> pg_sys::Oid {
+        todo!()
+    }
+}
+
+impl<T> crate::utils::sql_entity_graph::metadata::SqlTranslatable
+    for SetReturningFunctionIterator<T>
+where
+    T: SqlTranslatable,
+{
+    fn sql_type() -> String {
+        T::sql_type()
+    }
+    fn return_variant() -> crate::utils::sql_entity_graph::metadata::ReturnVariant {
+        ReturnVariant::SetOf
+    }
+}
+
+pub struct TableIterator<T> {
+    iter: Box<dyn Iterator<Item = T>>,
+}
+
+impl<T> TableIterator<T> {
+    pub fn new<I>(iter: I) -> Self
+    where
+        I: IntoIterator<Item = T>,
+        I::IntoIter: 'static,
+    {
+        Self {
+            iter: Box::new(iter.into_iter()),
+        }
+    }
+}
+
+impl<'a, T> Iterator for TableIterator<T> {
+    type Item = T;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.iter.next()
+    }
+}
+
+impl<'a, T> IntoDatum for TableIterator<T> {
+    fn into_datum(self) -> Option<pg_sys::Datum> {
+        todo!()
+    }
+
+    fn type_oid() -> pg_sys::Oid {
+        todo!()
+    }
+}
+
+impl<T> crate::utils::sql_entity_graph::metadata::SqlTranslatable for TableIterator<T>
+where
+    T: SqlTranslatable,
+{
+    fn sql_type() -> String {
+        T::sql_type()
+    }
+    fn return_variant() -> crate::utils::sql_entity_graph::metadata::ReturnVariant {
+        ReturnVariant::Table
+    }
+}
+
+// impl<const PRECISION: i32, const SCALE: i32>
+//     crate::utils::sql_entity_graph::metadata::SqlTranslatable
+//     for crate::datum::Numeric<PRECISION, SCALE>
+// {
+//     fn sql_type() -> String {
+//         if PRECISION == 0 && SCALE == 0 {
+//             String::from("NUMERIC")
+//         } else {
+//             format!("NUMERIC({PRECISION}, {SCALE})")
+//         }
+//     }
+// }
+
+impl<T> crate::utils::sql_entity_graph::metadata::SqlTranslatable for Array<'static, T>
+where
+    T: crate::utils::sql_entity_graph::metadata::SqlTranslatable + FromDatum,
+{
+    fn sql_type() -> String {
+        format!("{}[]", T::sql_type())
+    }
+}
+
+impl<T> crate::utils::sql_entity_graph::metadata::SqlTranslatable for VariadicArray<'static, T>
+where
+    T: crate::utils::sql_entity_graph::metadata::SqlTranslatable + FromDatum,
+{
+    fn sql_type() -> String {
+        format!("{}[]", T::sql_type())
+    }
+
+    fn variadic() -> bool {
+        true
+    }
+}
 
 /// A macro for marking a library compatible with [`pgx`][crate].
 ///

@@ -42,8 +42,13 @@ fn split(input: &'static str, pattern: &str) -> Vec<&'static str> {
 fn split_set(
     input: &'static str,
     pattern: &'static str,
-) -> impl std::iter::Iterator<Item = &'static str> {
-    input.split_terminator(pattern).into_iter()
+) -> pgx::SetReturningFunctionIterator<&'static str> {
+    pgx::SetReturningFunctionIterator::new(input.split_terminator(pattern).into_iter().map(|v| v))
+}
+
+#[pg_extern]
+fn mappings() {
+    pgx::print_some_mappings_please_and_thank_you()
 }
 
 #[cfg(any(test, feature = "pg_test"))]
