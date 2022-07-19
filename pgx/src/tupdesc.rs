@@ -117,7 +117,7 @@ impl<'a> PgTupleDesc<'a> {
     /// use pgx::{pg_sys, PgTupleDesc};
     /// let typid = 42 as pg_sys::Oid;  // a valid pg_type "oid" value
     /// let typmod = 0; // it's corresponding typemod value
-    /// let tupdesc = unsafe { PgTupleDesc::from_rust(pg_sys::lookup_rowtype_tupdesc_copy(typid, typmod)) };
+    /// let tupdesc = unsafe { PgTupleDesc::from_pg_is_copy(pg_sys::lookup_rowtype_tupdesc_copy(typid, typmod)) };
     ///
     /// // assert the tuple descriptor has 12 attributes
     /// assert_eq!(tupdesc.len(), 12);
