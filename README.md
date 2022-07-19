@@ -44,11 +44,13 @@
 - **First-class UDF support**
    + Annotate functions with `#[pg_extern]` to expose them to Postgres
    + Return `impl std::iter::Iterator<Item = T> where T: IntoDatum` for `RETURNS SETOF` and `RETURNS TABLE (...)`
+   + Create trigger functions with `#[pg_trigger]`
 - **Easy Custom Types**
    + `#[derive(PostgresType)]` to use a Rust struct as a Postgres type
       - By default, represented as a CBOR-encoded object in-memory/on-disk, and JSON as human-readable
       - Provide custom in-memory/on-disk/human-readable representations
    + `#[derive(PostgresEnum)]` to use a Rust enum as a Postgres enum
+   + Composite types supported with the `pgx::composite_type!("Sample")` macro
 - **Server Programming Interface (SPI)**
    + Safe access into SPI
    + Transparently return owned Datums from an SPI context
@@ -219,8 +221,6 @@ There's probably more than are listed here, but a primary things of note are:
 
 There's a few things on our immediate TODO list
 
- - Better trigger function support.  `pgx` does support creating trigger functions in Rust (need examples!)
-but it doesn't automatically generate any of the DDL for them.  This too likely needs a procmaro like `#[pg_trigger]`
  - Automatic extension schema upgrade scripts, based on diffs from a previous git tag and HEAD.  Likely, this
 will be built into the `cargo-pgx` subcommand and make use of https://github.com/zombodb/postgres-parser.
  - More examples -- especially around memory management and the various derive macros `#[derive(PostgresType/Enum)]`

@@ -181,7 +181,7 @@ Unsafe [`pgx::pg_sys::FunctionCallInfo`][crate::pg_sys::FunctionCallInfo] and
 # Getting safe data all at once
 
 Many [`PgTrigger`][PgTrigger] functions are `unsafe` as they dereference pointers inside the
-[`TriggerData`][pgx::pg_sys::TriggerData] contained by the [`PgTrigger`][PgTrigger].
+[`TriggerData`][crate::pg_sys::TriggerData] contained by the [`PgTrigger`][PgTrigger].
 
 In cases where a safe API is desired, the [`PgTriggerSafe`] structure can be retrieved
 from [`PgTrigger::to_safe`].

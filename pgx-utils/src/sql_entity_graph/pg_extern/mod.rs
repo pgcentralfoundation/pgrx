@@ -194,7 +194,7 @@ impl PgExtern {
         Ok(args)
     }
 
-    fn returns(&self) -> Result<Returning, eyre::Error> {
+    fn returns(&self) -> Result<Returning, syn::Error> {
         Returning::try_from(&self.func.sig.output)
     }
 

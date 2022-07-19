@@ -461,6 +461,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "composite_type"
+version = "0.0.0"
+dependencies = [
+ "pgx",
+ "pgx-tests",
+ "serde",
+]
+
+[[package]]
 name = "convert_case"
 version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"

@@ -30,6 +30,10 @@ use pgx_pg_sys::Oid;
 pub trait IntoDatum {
     fn into_datum(self) -> Option<pg_sys::Datum>;
     fn type_oid() -> pg_sys::Oid;
+
+    fn composite_type_oid(&self) -> Option<Oid> {
+        None
+    }
     fn array_type_oid() -> pg_sys::Oid {
         unsafe { pg_sys::get_array_type(Self::type_oid()) }
     }

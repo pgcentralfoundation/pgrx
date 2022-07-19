@@ -70,7 +70,7 @@ fn iterate_array_with_deny_null(values: Array<i32>) {
 }
 
 #[pg_extern]
-fn optional_array_with_default(values: Option<default!(Array<i32>, NULL)>) -> i32 {
+fn optional_array_with_default(values: default!(Option<Array<i32>>, "NULL")) -> i32 {
     values.unwrap().iter().map(|v| v.unwrap_or(0)).sum()
 }
 

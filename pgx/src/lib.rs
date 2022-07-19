@@ -152,15 +152,14 @@ macro_rules! map_source_only {
     }};
 }
 
-pub static DEFAULT_SOURCE_ONLY_SQL_MAPPING: Lazy<HashSet<RustSourceOnlySqlMapping>> =
-    Lazy::new(|| {
-        let mut m = HashSet::new();
+pub static DEFAULT_RUST_SOURCE_TO_SQL: Lazy<HashSet<RustSourceOnlySqlMapping>> = Lazy::new(|| {
+    let mut m = HashSet::new();
 
-        map_source_only!(m, pg_sys::Oid, "Oid");
-        map_source_only!(m, pg_sys::TimestampTz, "timestamp with time zone");
+    map_source_only!(m, pg_sys::Oid, "Oid");
+    map_source_only!(m, pg_sys::TimestampTz, "timestamp with time zone");
 
-        m
-    });
+    m
+});
 
 macro_rules! map_type {
     ($map:ident, $rust:ty, $sql:expr) => {{
@@ -175,7 +174,7 @@ macro_rules! map_type {
 ///
 /// This only contains types known to [`pgx`](crate), so it will not include types defined by things
 /// like [`derive@PostgresType`] in the local extension.
-pub static DEFAULT_TYPEID_SQL_MAPPING: Lazy<HashSet<RustSqlMapping>> = Lazy::new(|| {
+pub static DEFAULT_RUST_TYPE_ID_TO_SQL: Lazy<HashSet<RustSqlMapping>> = Lazy::new(|| {
     let mut m = HashSet::new();
 
     // `str` isn't sized, so we can't lean on the macro.
@@ -239,6 +238,70 @@ pub static DEFAULT_TYPEID_SQL_MAPPING: Lazy<HashSet<RustSqlMapping>> = Lazy::new
 
     m
 });
+
+/// The default lookup for if composite types are a collection or not
+///
+/// This is primarily used to determine if they need `[]` in SQL generation.
+pub static DEFAULT_COMPOSITE_TYPE_COLLECTIONS: Lazy<std::collections::HashMap<TypeId, bool>> =
+    Lazy::new(|| {
+        let mut m = std::collections::HashMap::new();
+
+        m.insert(TypeId::of::<PgHeapTuple<'static, AllocatedByRust>>(), false);
+        m.insert(
+            TypeId::of::<Vec<PgHeapTuple<'static, AllocatedByRust>>>(),
+            true,
+        );
+        m.insert(
+            TypeId::of::<Vec<Option<PgHeapTuple<'static, AllocatedByRust>>>>(),
+            true,
+        );
+        m.insert(
+            TypeId::of::<Array<PgHeapTuple<'static, AllocatedByRust>>>(),
+            true,
+        );
+        m.insert(
+            TypeId::of::<Array<Option<PgHeapTuple<'static, AllocatedByRust>>>>(),
+            true,
+        );
+        m.insert(
+            TypeId::of::<VariadicArray<PgHeapTuple<'static, AllocatedByRust>>>(),
+            true,
+        );
+        m.insert(
+            TypeId::of::<VariadicArray<Option<PgHeapTuple<'static, AllocatedByRust>>>>(),
+            true,
+        );
+        m.insert(
+            TypeId::of::<Option<PgHeapTuple<'static, AllocatedByRust>>>(),
+            false,
+        );
+        m.insert(
+            TypeId::of::<Option<Vec<PgHeapTuple<'static, AllocatedByRust>>>>(),
+            true,
+        );
+        m.insert(
+            TypeId::of::<Option<Vec<Option<PgHeapTuple<'static, AllocatedByRust>>>>>(),
+            true,
+        );
+        m.insert(
+            TypeId::of::<Option<Array<PgHeapTuple<'static, AllocatedByRust>>>>(),
+            true,
+        );
+        m.insert(
+            TypeId::of::<Option<Array<Option<PgHeapTuple<'static, AllocatedByRust>>>>>(),
+            true,
+        );
+        m.insert(
+            TypeId::of::<Option<VariadicArray<PgHeapTuple<'static, AllocatedByRust>>>>(),
+            true,
+        );
+        m.insert(
+            TypeId::of::<Option<VariadicArray<Option<PgHeapTuple<'static, AllocatedByRust>>>>>(),
+            true,
+        );
+
+        m
+    });
 
 /// A macro for marking a library compatible with [`pgx`][crate].
 ///
@@ -347,20 +410,13 @@ macro_rules! pg_sql_graph_magic {
     () => {
         #[no_mangle]
         #[doc(hidden)]
-        pub extern "C" fn __pgx_typeid_sql_mappings(
-        ) -> &'static ::pgx::utils::__reexports::std::collections::HashSet<
-            ::pgx::utils::sql_entity_graph::RustSqlMapping,
-        > {
-            &::pgx::DEFAULT_TYPEID_SQL_MAPPING
-        }
-
-        #[no_mangle]
-        #[doc(hidden)]
-        pub extern "C" fn __pgx_source_only_sql_mappings(
-        ) -> &'static ::pgx::utils::__reexports::std::collections::HashSet<
-            ::pgx::utils::sql_entity_graph::RustSourceOnlySqlMapping,
-        > {
-            &::pgx::DEFAULT_SOURCE_ONLY_SQL_MAPPING
+        pub extern "C" fn __pgx_sql_mappings() -> ::pgx::utils::sql_entity_graph::RustToSqlMapping {
+            ::pgx::utils::sql_entity_graph::RustToSqlMapping {
+                rust_type_id_to_sql: ::pgx::DEFAULT_RUST_TYPE_ID_TO_SQL.clone(),
+                rust_source_to_sql: ::pgx::DEFAULT_RUST_SOURCE_TO_SQL.clone(),
+                composite_type_collections: ::pgx::DEFAULT_COMPOSITE_TYPE_COLLECTIONS.clone(),
+                internal_type: core::any::TypeId::of::<::pgx::Internal>(),
+            }
         }
 
         // A marker which must exist in the root of the extension.

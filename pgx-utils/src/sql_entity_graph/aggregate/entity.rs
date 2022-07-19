@@ -10,23 +10,15 @@ use crate::sql_entity_graph::{
     aggregate::options::{FinalizeModify, ParallelOption},
     pgx_sql::PgxSql,
     to_sql::{entity::ToSqlConfigEntity, ToSql},
-    SqlGraphEntity, SqlGraphIdentifier,
+    SqlDeclared, SqlGraphEntity, SqlGraphIdentifier, UsedTypeEntity,
 };
 use core::{any::TypeId, cmp::Ordering};
-use eyre::eyre as eyre_err;
+use eyre::{eyre, WrapErr};
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub struct AggregateTypeEntity {
-    pub ty_source: &'static str,
-    pub ty_id: TypeId,
-    pub full_path: &'static str,
+    pub used_ty: UsedTypeEntity,
     pub name: Option<&'static str>,
-}
-
-#[derive(Debug, Clone, Hash, PartialEq, Eq)]
-pub struct MaybeVariadicAggregateTypeEntity {
-    pub agg_ty: AggregateTypeEntity,
-    pub variadic: bool,
 }
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
@@ -47,7 +39,7 @@ pub struct PgAggregateEntity {
     /// The `arg_data_type` list.
     ///
     /// Corresponds to `Args` in [`pgx::aggregate::Aggregate`].
-    pub args: Vec<MaybeVariadicAggregateTypeEntity>,
+    pub args: Vec<AggregateTypeEntity>,
 
     /// The direct argument list, appearing before `ORDER BY` in ordered set aggregates.
     ///
@@ -107,7 +99,7 @@ pub struct PgAggregateEntity {
     /// The `MSTYPE` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     ///
     /// Corresponds to `MovingState` in [`pgx::aggregate::Aggregate`].
-    pub mstype: Option<AggregateTypeEntity>,
+    pub mstype: Option<UsedTypeEntity>,
 
     // The `MSSPACE` parameter for [`CREATE AGGREGATE`](https://www.postgresql.org/docs/current/sql-createaggregate.html)
     //
@@ -272,28 +264,51 @@ impl ToSql for PgAggregateEntity {
             ))
         }
 
-        let stype_sql = context
-            .rust_to_sql(self.stype.ty_id, self.stype.ty_source, self.stype.full_path)
-            .ok_or_else(|| {
-                eyre_err!(
-                    "Failed to map moving state type `{}` to SQL type while building aggregate `{}`.",
-                    self.stype.full_path,
-                    self.name
-                )
-            })?;
+        let map_ty = |used_ty: &UsedTypeEntity| -> eyre::Result<String> {
+            if let Some(composite_type) = used_ty.composite_type {
+                Ok(composite_type.to_string()
+                    + if context
+                        .composite_type_requires_square_brackets(&used_ty.ty_id)
+                        .wrap_err_with(|| format!("Attempted on `{}`", used_ty.ty_source))?
+                    {
+                        "[]"
+                    } else {
+                        ""
+                    })
+            } else {
+                context
+                    .source_only_to_sql_type(used_ty.ty_source)
+                    .or_else(|| context.type_id_to_sql_type(used_ty.ty_id))
+                    .or_else(|| {
+                        let pat = used_ty.full_path.to_string();
+                        if let Some(found) =
+                            context.has_sql_declared_entity(&SqlDeclared::Type(pat.clone()))
+                        {
+                            Some(found.sql())
+                        } else if let Some(found) =
+                            context.has_sql_declared_entity(&SqlDeclared::Enum(pat.clone()))
+                        {
+                            Some(found.sql())
+                        } else {
+                            None
+                        }
+                    })
+                    .ok_or_else(|| {
+                        eyre!(
+                            "Failed to map type `{}` to SQL type while building aggregate `{}`.",
+                            used_ty.full_path,
+                            self.full_path
+                        )
+                    })
+            }
+        };
+
+        let stype_sql = map_ty(&self.stype.used_ty).wrap_err("Mapping state type")?;
 
         if let Some(value) = &self.mstype {
-            let sql = context
-                .rust_to_sql(value.ty_id, value.ty_source, value.full_path)
-                .ok_or_else(|| {
-                    eyre_err!(
-                        "Failed to map moving state type `{}` to SQL type while building aggregate `{}`.",
-                        value.full_path,
-                        self.name
-                    )
-                })?;
+            let mstype_sql = map_ty(&value).wrap_err("Mapping moving state type")?;
             optional_attributes.push((
-                format!("\tMSTYPE = {}", sql),
+                format!("\tMSTYPE = {}", mstype_sql),
                 format!(
                     "/* {}::MovingState = {} */",
                     self.full_path, value.full_path
@@ -339,7 +354,7 @@ impl ToSql for PgAggregateEntity {
             line = self.line,
             sfunc = self.sfunc,
             stype = stype_sql,
-            stype_full_path = self.stype.full_path,
+            stype_full_path = self.stype.used_ty.full_path,
             maybe_comma_after_stype = if optional_attributes.len() == 0 {
                 ""
             } else {
@@ -352,15 +367,15 @@ impl ToSql for PgAggregateEntity {
                         .graph
                         .neighbors_undirected(self_index)
                         .find(|neighbor| match &context.graph[*neighbor] {
-                            SqlGraphEntity::Type(ty) => ty.id_matches(&arg.agg_ty.ty_id),
-                            SqlGraphEntity::Enum(en) => en.id_matches(&arg.agg_ty.ty_id),
+                            SqlGraphEntity::Type(ty) => ty.id_matches(&arg.used_ty.ty_id),
+                            SqlGraphEntity::Enum(en) => en.id_matches(&arg.used_ty.ty_id),
                             SqlGraphEntity::BuiltinType(defined) => {
-                                defined == &arg.agg_ty.full_path
+                                defined == &arg.used_ty.full_path
                             }
                             _ => false,
                         })
                         .ok_or_else(|| {
-                            eyre_err!("Could not find arg type in graph. Got: {:?}", arg.agg_ty)
+                            eyre!("Could not find arg type in graph. Got: {:?}", arg.used_ty)
                         })?;
                     let needs_comma = idx < (self.args.len() - 1);
                     let buf = format!("\
@@ -368,15 +383,34 @@ impl ToSql for PgAggregateEntity {
                        ",
                            schema_prefix = context.schema_prefix_for(&graph_index),
                            // First try to match on [`TypeId`] since it's most reliable.
-                           sql_type = context.rust_to_sql(arg.agg_ty.ty_id, arg.agg_ty.ty_source, arg.agg_ty.full_path).ok_or_else(|| eyre_err!(
-                               "Failed to map argument type `{}` to SQL type while building aggregate `{}`.",
-                               arg.agg_ty.full_path,
-                               self.name
-                           ))?,
-                           variadic = if arg.variadic { "VARIADIC " } else { "" },
+                           sql_type = if let Some(composite_type) = arg.used_ty.composite_type {
+                                composite_type.to_string()
+                                    + if context
+                                        .composite_type_requires_square_brackets(&arg.used_ty.ty_id)
+                                        .wrap_err_with(|| format!("Attempted on `{}`", arg.used_ty.ty_source))?
+                                    {
+                                        "[]"
+                                    } else {
+                                        ""
+                                    }
+                            } else {
+                                context.source_only_to_sql_type(arg.used_ty.ty_source).or_else(|| {
+                                                    context.type_id_to_sql_type(arg.used_ty.ty_id)
+                                                }).or_else(|| {
+                                                    let pat = arg.used_ty.full_path.to_string();
+                                                    if let Some(found) = context.has_sql_declared_entity(&SqlDeclared::Type(pat.clone())) {
+                                                        Some(found.sql())
+                                                    }  else if let Some(found) = context.has_sql_declared_entity(&SqlDeclared::Enum(pat.clone())) {
+                                                        Some(found.sql())
+                                                    } else {
+                                                        None
+                                                    }
+                                                }).ok_or_else(|| eyre!("Failed to map return type `{}` to SQL type while building function `{}`.", arg.used_ty.full_path, self.full_path))?
+                            },
+                           variadic = if arg.used_ty.variadic { "VARIADIC " } else { "" },
                            maybe_comma = if needs_comma { ", " } else { " " },
-                           full_path = arg.agg_ty.full_path,
-                           name = if let Some(name) = arg.agg_ty.name {
+                           full_path = arg.used_ty.full_path,
+                           name = if let Some(name) = arg.name {
                                format!(r#""{}" "#, name)
                            } else { "".to_string() },
                     );
@@ -391,30 +425,54 @@ impl ToSql for PgAggregateEntity {
                         .graph
                         .neighbors_undirected(self_index)
                         .find(|neighbor| match &context.graph[*neighbor] {
-                            SqlGraphEntity::Type(ty) => ty.id_matches(&arg.ty_id),
-                            SqlGraphEntity::Enum(en) => en.id_matches(&arg.ty_id),
-                            SqlGraphEntity::BuiltinType(defined) => defined == &arg.full_path,
+                            SqlGraphEntity::Type(ty) => ty.id_matches(&arg.used_ty.ty_id),
+                            SqlGraphEntity::Enum(en) => en.id_matches(&arg.used_ty.ty_id),
+                            SqlGraphEntity::BuiltinType(defined) => {
+                                defined == &arg.used_ty.full_path
+                            }
                             _ => false,
                         })
-                        .ok_or_else(|| {
-                            eyre_err!("Could not find arg type in graph. Got: {:?}", arg)
-                        })?;
+                        .ok_or_else(|| eyre!("Could not find arg type in graph. Got: {:?}", arg))?;
                     let needs_comma = idx < (direct_args.len() - 1);
-                    let buf = format!("\
+                    let buf = format!(
+                        "\
                         \t{maybe_name}{schema_prefix}{sql_type}{maybe_comma}/* {full_path} */\
                        ",
-                           schema_prefix = context.schema_prefix_for(&graph_index),
-                           // First try to match on [`TypeId`] since it's most reliable.
-                           sql_type = context.rust_to_sql(arg.ty_id, arg.ty_source, arg.full_path).ok_or_else(|| eyre_err!(
-                               "Failed to map argument type `{}` to SQL type while building aggregate `{}`.",
-                               arg.full_path,
-                               self.name
-                           ))?,
-                           maybe_name = if let Some(name) = arg.name {
-                                "\"".to_string() + name + "\" "
-                           } else { "".to_string() },
-                           maybe_comma = if needs_comma { ", " } else { " " },
-                           full_path = arg.full_path,
+                        schema_prefix = context.schema_prefix_for(&graph_index),
+                        // First try to match on [`TypeId`] since it's most reliable.
+                        sql_type = if let Some(composite_type) = arg.used_ty.composite_type {
+                            composite_type.to_string()
+                                + if context
+                                    .composite_type_requires_square_brackets(&arg.used_ty.ty_id)
+                                    .wrap_err_with(|| {
+                                        format!("Attempted on `{}`", arg.used_ty.ty_source)
+                                    })?
+                                {
+                                    "[]"
+                                } else {
+                                    ""
+                                }
+                        } else {
+                            context.source_only_to_sql_type(arg.used_ty.ty_source).or_else(|| {
+                                                context.type_id_to_sql_type(arg.used_ty.ty_id)
+                                            }).or_else(|| {
+                                                let pat = arg.used_ty.full_path.to_string();
+                                                if let Some(found) = context.has_sql_declared_entity(&SqlDeclared::Type(pat.clone())) {
+                                                    Some(found.sql())
+                                                }  else if let Some(found) = context.has_sql_declared_entity(&SqlDeclared::Enum(pat.clone())) {
+                                                    Some(found.sql())
+                                                } else {
+                                                    None
+                                                }
+                                            }).ok_or_else(|| eyre!("Failed to map return type `{}` to SQL type while building function `{}`.", arg.used_ty.full_path, self.full_path))?
+                        },
+                        maybe_name = if let Some(name) = arg.name {
+                            "\"".to_string() + name + "\" "
+                        } else {
+                            "".to_string()
+                        },
+                        maybe_comma = if needs_comma { ", " } else { " " },
+                        full_path = arg.used_ty.full_path,
                     );
                     args.push(buf);
                 }

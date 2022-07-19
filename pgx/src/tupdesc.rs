@@ -10,6 +10,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 //! Provides a safe wrapper around Postgres' `pg_sys::TupleDescData` struct
 use crate::{pg_sys, void_mut_ptr, PgBox, PgRelation};
 
+use pgx_pg_sys::AsPgCStr;
 use std::ops::Deref;
 
 /// This struct is passed around within the backend to describe the structure
@@ -44,7 +45,7 @@ use std::ops::Deref;
 ///
 /// PGX's safe wrapper takes care of properly freeing or decrementing reference counts
 pub struct PgTupleDesc<'a> {
-    tupdesc: PgBox<pg_sys::TupleDescData>,
+    tupdesc: Option<PgBox<pg_sys::TupleDescData>>,
     parent: Option<&'a PgRelation>,
     need_release: bool,
     need_pfree: bool,
@@ -63,7 +64,7 @@ impl<'a> PgTupleDesc<'a> {
     /// or requires reference counting.
     pub unsafe fn from_pg<'b>(ptr: pg_sys::TupleDesc) -> PgTupleDesc<'b> {
         PgTupleDesc {
-            tupdesc: PgBox::from_pg(ptr),
+            tupdesc: Some(PgBox::from_pg(ptr)),
             parent: None,
             need_release: true,
             need_pfree: false,
@@ -80,7 +81,7 @@ impl<'a> PgTupleDesc<'a> {
     /// This method is unsafe as we cannot validate that the provided `pg_sys::TupleDesc` is valid
     pub unsafe fn from_pg_unchecked<'b>(ptr: pg_sys::TupleDesc) -> PgTupleDesc<'b> {
         PgTupleDesc {
-            tupdesc: PgBox::from_pg(ptr),
+            tupdesc: Some(PgBox::from_pg(ptr)),
             parent: None,
             need_release: false,
             need_pfree: false,
@@ -99,14 +100,14 @@ impl<'a> PgTupleDesc<'a> {
     pub unsafe fn from_pg_copy<'b>(ptr: pg_sys::TupleDesc) -> PgTupleDesc<'b> {
         PgTupleDesc {
             // SAFETY:  pg_sys::CreateTupleDescCopyConstr will be returning a valid pointer
-            tupdesc: PgBox::from_pg(pg_sys::CreateTupleDescCopyConstr(ptr)),
+            tupdesc: Some(PgBox::from_pg(pg_sys::CreateTupleDescCopyConstr(ptr))),
             parent: None,
             need_release: false,
             need_pfree: true,
         }
     }
 
-    /// Similar to `::from_pg_copy()`, but assumes the provided `TupleDesc` is already a copy.
+    /// Similar to `::from_rust_copy()`, but assumes the provided `TupleDesc` is already a copy.
     ///
     /// When this instance is dropped, the TupleDesc is `pfree()`'d
     ///
@@ -131,7 +132,7 @@ impl<'a> PgTupleDesc<'a> {
     /// or is actually a copy that requires a `pfree()` on Drop.
     pub unsafe fn from_pg_is_copy<'b>(ptr: pg_sys::TupleDesc) -> PgTupleDesc<'b> {
         PgTupleDesc {
-            tupdesc: PgBox::from_pg(ptr),
+            tupdesc: Some(PgBox::from_pg(ptr)),
             parent: None,
             need_release: false,
             need_pfree: true,
@@ -142,10 +143,49 @@ impl<'a> PgTupleDesc<'a> {
     pub fn from_relation(parent: &PgRelation) -> PgTupleDesc {
         PgTupleDesc {
             // SAFETY:  `parent` is a Rust reference, and as such its rd_att attribute will be property initialized
-            tupdesc: unsafe { PgBox::from_pg(parent.rd_att) },
+            tupdesc: Some(unsafe { PgBox::from_pg(parent.rd_att) }),
             parent: Some(parent),
             need_release: false,
             need_pfree: false,
+        }
+    }
+
+    /** Retrieve the tuple description of the shape of a defined composite type
+
+    ```rust,no_run
+    use pgx::*;
+
+    Spi::run("CREATE TYPE Dog AS (name text, age int);");
+    let tuple_desc = PgTupleDesc::for_composite_type("Dog").unwrap();
+    let natts = tuple_desc.len();
+
+    unsafe {
+        let mut is_null = (0..natts).map(|_| true).collect::<Vec<_>>();
+
+        let heap_tuple_data =
+            pg_sys::heap_form_tuple(tuple_desc.as_ptr(), std::ptr::null_mut(), is_null.as_mut_ptr());
+
+        let heap_tuple = PgHeapTuple::from_heap_tuple(
+            tuple_desc,
+            heap_tuple_data,
+        );
+    }
+    ```
+    */
+    pub fn for_composite_type(name: &str) -> Option<PgTupleDesc<'a>> {
+        unsafe {
+            let mut typoid = 0;
+            let mut typmod = 0;
+            pg_sys::parseTypeString(name.as_pg_cstr(), &mut typoid, &mut typmod, true);
+
+            if typoid == pg_sys::InvalidOid {
+                return None;
+            }
+
+            // It's important to make a copy of the tupledesc: https://www.postgresql.org/message-id/flat/24471.1136768659%40sss.pgh.pa.us
+            let tuple_desc = pg_sys::lookup_rowtype_tupdesc_copy(typoid, typmod);
+
+            Some(PgTupleDesc::from_pg_copy(tuple_desc))
         }
     }
 
@@ -156,17 +196,17 @@ impl<'a> PgTupleDesc<'a> {
 
     /// What is the pg_type oid of this TupleDesc?
     pub fn oid(&self) -> pg_sys::Oid {
-        self.tupdesc.tdtypeid
+        self.tupdesc.as_ref().unwrap().tdtypeid
     }
 
     /// What is the typemod of this TupleDesc?
     pub fn typmod(&self) -> i32 {
-        self.tupdesc.tdtypmod
+        self.tupdesc.as_ref().unwrap().tdtypmod
     }
 
     /// How many attributes do we have?
     pub fn len(&self) -> usize {
-        self.tupdesc.natts as usize
+        self.tupdesc.as_ref().unwrap().natts as usize
     }
 
     /// Do we have attributes?
@@ -179,7 +219,7 @@ impl<'a> PgTupleDesc<'a> {
         if i >= self.len() {
             None
         } else {
-            Some(tupdesc_get_attr(&self.tupdesc, i))
+            Some(tupdesc_get_attr(self.tupdesc.as_ref().unwrap(), i))
         }
     }
 
@@ -190,22 +230,31 @@ impl<'a> PgTupleDesc<'a> {
             curr: 0,
         }
     }
+
+    /// Convert this [PgTupleDesc] into a pointer for passing into Postgres.  You are responsible
+    /// for releasing or freeing the returned [pg_sys::TupleDescData] pointer.
+    pub fn into_pg(mut self) -> *mut pg_sys::TupleDescData {
+        self.tupdesc.take().unwrap().into_pg()
+    }
 }
 
 impl<'a> Deref for PgTupleDesc<'a> {
     type Target = PgBox<pg_sys::TupleDescData>;
 
     fn deref(&self) -> &Self::Target {
-        &self.tupdesc
+        self.tupdesc.as_ref().unwrap()
     }
 }
 
 impl<'a> Drop for PgTupleDesc<'a> {
     fn drop(&mut self) {
-        if self.need_release {
-            unsafe { release_tupdesc(self.tupdesc.as_ptr()) }
-        } else if self.need_pfree {
-            unsafe { pg_sys::pfree(self.tupdesc.as_ptr() as void_mut_ptr) }
+        if self.tupdesc.is_some() {
+            let tupdesc = self.tupdesc.take().unwrap();
+            if self.need_release {
+                unsafe { release_tupdesc(tupdesc.as_ptr()) }
+            } else if self.need_pfree {
+                unsafe { pg_sys::pfree(tupdesc.as_ptr() as void_mut_ptr) }
+            }
         }
     }
 }

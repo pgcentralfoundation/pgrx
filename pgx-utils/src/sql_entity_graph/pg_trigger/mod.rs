@@ -98,13 +98,15 @@ impl PgTrigger {
                 let maybe_pg_trigger = unsafe { ::pgx::trigger_support::PgTrigger::from_fcinfo(fcinfo) };
                 let pg_trigger = maybe_pg_trigger.expect("PgTrigger::from_fcinfo failed");
                 let trigger_fn_result: Result<
-                    ::pgx::PgHeapTuple<'_, _>,
+                    ::pgx::heap_tuple::PgHeapTuple<'_, _>,
                     _,
                 > = #function_ident(&pg_trigger);
 
                 let trigger_retval = trigger_fn_result.expect("Trigger function panic");
-                let retval_datum = trigger_retval.into_datum();
-                retval_datum.expect("Failed to turn trigger function return value into Datum")
+                match trigger_retval.into_trigger_datum() {
+                    None => ::pgx::pg_return_null(fcinfo),
+                    Some(datum) => datum,
+                }
             }
 
         };

@@ -29,7 +29,7 @@ pub struct PgTrigger {
 impl PgTrigger {
     /// Construct a new [`PgTrigger`] from a [`FunctionCallInfo`][pg_sys::FunctionCallInfo]
     ///
-    /// Generally this would be automatically done for the user in a [`#[pg_trigger]`][pgx::pg_trigger].
+    /// Generally this would be automatically done for the user in a [`#[pg_trigger]`][crate::pg_trigger].
     ///
     /// # Safety
     ///
