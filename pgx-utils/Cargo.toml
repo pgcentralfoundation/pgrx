@@ -13,6 +13,7 @@ rust-version = "1.58"
 
 [dependencies]
 seq-macro = "0.3"
+cstr_core = "0.2"
 atty = "0.2.14"
 owo-colors = "3.4.0"
 convert_case = "0.5.0"

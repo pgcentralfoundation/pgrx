@@ -100,20 +100,6 @@ impl PostgresType {
             to_sql_config,
         )
     }
-
-    pub fn inventory_fn_name(&self) -> String {
-        "__inventory_type_".to_string() + &self.name.to_string()
-    }
-
-    pub fn inventory(&self, inventory_dir: String) {
-        create_dir_all(&inventory_dir).expect("Couldn't create inventory dir.");
-        let mut fd =
-            File::create(inventory_dir.to_string() + "/" + &self.inventory_fn_name() + ".json")
-                .expect("Couldn't create inventory file");
-        let sql_graph_entity_fn_json = serde_json::to_string(&self.inventory_fn_name())
-            .expect("Could not serialize inventory item.");
-        write!(fd, "{}", sql_graph_entity_fn_json).expect("Couldn't write to inventory file");
-    }
 }
 
 impl Parse for PostgresType {
@@ -159,6 +145,17 @@ impl ToTokens for PostgresType {
         let to_sql_config = &self.to_sql_config;
 
         let inv = quote! {
+            impl<#ty_generics> ::pgx::utils::sql_entity_graph::metadata::SqlTranslatable for #name #ty_generics {
+                fn argument_sql() -> Result<Option<String>, ::pgx::utils::sql_entity_graph::metadata::ArgumentError> {
+                    Ok(Some(String::from(stringify!(#name))))
+                }
+
+                fn return_sql() -> Result<::pgx::utils::sql_entity_graph::metadata::ReturnVariant, ::pgx::utils::sql_entity_graph::metadata::ReturnVariantError> {
+                    Ok(::pgx::utils::sql_entity_graph::metadata::ReturnVariant::Plain(String::from(stringify!(#name))))
+                }
+            }
+
+
             #[no_mangle]
             #[doc(hidden)]
             pub extern "C" fn  #sql_graph_entity_fn_name() -> ::pgx::utils::sql_entity_graph::SqlGraphEntity {

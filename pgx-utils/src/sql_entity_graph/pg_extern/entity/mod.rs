@@ -16,7 +16,6 @@ pub use returning::{PgExternReturnEntity, PgExternReturnEntityIteratedItem};
 
 use crate::{
     sql_entity_graph::{
-        extension_sql::SqlDeclared,
         pgx_sql::PgxSql,
         to_sql::{entity::ToSqlConfigEntity, ToSql},
         SqlGraphEntity, SqlGraphIdentifier,
@@ -25,7 +24,7 @@ use crate::{
 };
 
 use eyre::{eyre, WrapErr};
-use std::{any::Any, cmp::Ordering};
+use std::cmp::Ordering;
 
 /// The output of a [`PgExtern`](crate::sql_entity_graph::pg_extern::PgExtern) from `quote::ToTokens::to_tokens`.
 #[derive(Debug, Clone)]
@@ -33,6 +32,7 @@ pub struct PgExternEntity {
     pub metadata: crate::sql_entity_graph::metadata::FunctionMetadataEntity,
     pub arg_patterns: Vec<&'static str>,
     pub arg_defaults: Vec<Option<&'static str>>,
+    pub arg_composite_types: Vec<Option<&'static str>>,
     pub schema: Option<&'static str>,
     pub file: &'static str,
     pub line: u32,
@@ -133,40 +133,50 @@ impl ToSql for PgExternEntity {
             arguments = if !self.metadata.arguments.is_empty() {
                 let mut args = Vec::new();
                 for (idx, arg) in self.metadata.arguments.iter().enumerate() {
-                    let arg_pattern = self.arg_patterns[idx];
-                    let arg_default = self.arg_defaults[idx];
-                    let graph_index = context
-                        .graph
-                        .neighbors_undirected(self_index)
-                        .find(|neighbor| match &context.graph[*neighbor] {
-                            SqlGraphEntity::Type(ty) => ty.id_matches(&arg.type_id),
-                            SqlGraphEntity::Enum(en) => en.id_matches(&arg.type_id),
-                            SqlGraphEntity::BuiltinType(defined) => defined == &arg.type_name,
-                            _ => false,
-                        })
-                        .ok_or_else(|| eyre!("Could not find arg type in graph. Got: {:?}", arg))?;
-                    let needs_comma = idx < (self.metadata.arguments.len() - 1);
-                    let buf = format!("\
-                                            \t\"{pattern}\" {variadic}{schema_prefix}{sql_type}{default}{maybe_comma}/* {type_name} */\
-                                        ",
-                                            pattern = arg_pattern,
-                                            schema_prefix = context.schema_prefix_for(&graph_index),
-                                            // First try to match on [`TypeId`] since it's most reliable.
-                                            sql_type = self.metadata.arguments[0].sql_type,
-                                            default = if let Some(def) = arg_default { format!(" DEFAULT {}", def) } else { String::from("") },
-                                            variadic = if arg.variadic { "VARIADIC " } else { "" },
-                                            maybe_comma = if needs_comma { ", " } else { " " },
-                                            type_name = arg.type_name,
-                                     );
-                    args.push(buf);
+                    match arg.argument_sql {
+                        Ok(Some(ref argument_sql)) => {
+                            let arg_pattern = self.arg_patterns[idx];
+                            let arg_default = self.arg_defaults[idx];
+                            let graph_index = context
+                                .graph
+                                .neighbors_undirected(self_index)
+                                .find(|neighbor| match &context.graph[*neighbor] {
+                                    SqlGraphEntity::Type(ty) => ty.id_matches(&arg.type_id),
+                                    SqlGraphEntity::Enum(en) => en.id_matches(&arg.type_id),
+                                    SqlGraphEntity::BuiltinType(defined) => {
+                                        defined == &arg.type_name
+                                    }
+                                    _ => false,
+                                })
+                                .ok_or_else(|| {
+                                    eyre!("Could not find arg type in graph. Got: {:?}", arg)
+                                })?;
+                            let needs_comma = idx < (self.metadata.arguments.len() - 1);
+                            let buf = format!("\
+                                                \t\"{pattern}\" {variadic}{schema_prefix}{sql_type}{default}{maybe_comma}/* {type_name} */\
+                                            ",
+                                                pattern = arg_pattern,
+                                                schema_prefix = context.schema_prefix_for(&graph_index),
+                                                // First try to match on [`TypeId`] since it's most reliable.
+                                                sql_type = argument_sql,
+                                                default = if let Some(def) = arg_default { format!(" DEFAULT {}", def) } else { String::from("") },
+                                                variadic = if arg.variadic { "VARIADIC " } else { "" },
+                                                maybe_comma = if needs_comma { ", " } else { " " },
+                                                type_name = arg.type_name,
+                                        );
+                            args.push(buf);
+                        }
+                        Ok(None) => (),
+                        Err(err) => return Err(err).wrap_err("While mapping argument"),
+                    }
                 }
                 String::from("\n") + &args.join("\n") + "\n"
             } else {
                 Default::default()
             },
-            returns = match &self.metadata.retval {
+            returns = match self.metadata.retval {
                 None => String::from("RETURNS void"),
-                Some(retval) => {
+                Some(ref retval) => {
                     let graph_index = context
                         .graph
                         .neighbors_undirected(self_index)
@@ -177,9 +187,17 @@ impl ToSql for PgExternEntity {
                             _ => false,
                         })
                         .ok_or_else(|| eyre!("Could not find return type in graph."))?;
+                    use crate::sql_entity_graph::metadata::ReturnVariant;
+                    let (variant_prefix, sql_type) = match retval.return_sql {
+                        Ok(ReturnVariant::Plain(ref sql)) => ("", sql.clone()),
+                        Ok(ReturnVariant::SetOf(ref sql)) => ("SETOF ", sql.clone()),
+                        Ok(ReturnVariant::Table(ref vec_of_sql)) => ("TABLE ", "TODO".into()),
+                        Err(err) => return Err(err).wrap_err("Mapping return type"),
+                    };
                     format!(
-                        "RETURNS {schema_prefix}{sql_type} /* {type_name} */",
-                        sql_type = self.metadata.retval.as_ref().unwrap().sql_type,
+                        "RETURNS {variant_prefix}{schema_prefix}{sql_type} /* {type_name} */",
+                        variant_prefix = variant_prefix,
+                        sql_type = sql_type,
                         schema_prefix = context.schema_prefix_for(&graph_index),
                         type_name = retval.type_name
                     )

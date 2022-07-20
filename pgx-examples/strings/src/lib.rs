@@ -39,11 +39,8 @@ fn split(input: &'static str, pattern: &str) -> Vec<&'static str> {
 }
 
 #[pg_extern]
-fn split_set(
-    input: &'static str,
-    pattern: &'static str,
-) -> pgx::SetReturningFunctionIterator<&'static str> {
-    pgx::SetReturningFunctionIterator::new(input.split_terminator(pattern).into_iter().map(|v| v))
+fn split_set(input: &'static str, pattern: &'static str) -> pgx::SetOfIterator<&'static str> {
+    pgx::SetOfIterator::new(input.split_terminator(pattern).into_iter().map(|v| v))
 }
 
 #[pg_extern]

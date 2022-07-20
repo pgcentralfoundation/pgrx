@@ -70,13 +70,15 @@ fn static_names() -> Vec<Option<&'static str>> {
 }
 
 #[pg_extern]
-fn static_names_set() -> impl std::iter::Iterator<Item = Vec<Option<&'static str>>> {
-    vec![
-        vec![Some("Brandy"), Some("Sally"), None, Some("Anchovy")],
-        vec![Some("Eric"), Some("David")],
-        vec![Some("ZomboDB"), Some("PostgreSQL"), Some("Elasticsearch")],
-    ]
-    .into_iter()
+fn static_names_set() -> SetOfIterator<Vec<Option<&'static str>>> {
+    SetOfIterator::new(
+        vec![
+            vec![Some("Brandy"), Some("Sally"), None, Some("Anchovy")],
+            vec![Some("Eric"), Some("David")],
+            vec![Some("ZomboDB"), Some("PostgreSQL"), Some("Elasticsearch")],
+        ]
+        .into_iter(),
+    )
 }
 
 #[pg_extern]

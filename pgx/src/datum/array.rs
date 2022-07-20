@@ -190,16 +190,6 @@ impl<'a, T: FromDatum> VariadicArray<'a, T> {
         })
     }
 
-    unsafe fn from_pg(
-        ptr: *mut pg_sys::varlena,
-        array_type: *mut pg_sys::ArrayType,
-        elements: *mut pg_sys::Datum,
-        nulls: *mut bool,
-        nelems: usize,
-    ) -> Self {
-        Self(Array::from_pg(ptr, array_type, elements, nulls, nelems))
-    }
-
     pub fn into_array_type(self) -> *const pg_sys::ArrayType {
         self.0.into_array_type()
     }

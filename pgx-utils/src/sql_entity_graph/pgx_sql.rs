@@ -21,7 +21,7 @@ use crate::sql_entity_graph::{
         SqlDeclared,
     },
     mapping::{RustSourceOnlySqlMapping, RustSqlMapping},
-    pg_extern::entity::{PgExternEntity, PgExternReturnEntity},
+    pg_extern::entity::PgExternEntity,
     pg_trigger::entity::PgTriggerEntity,
     positioning_ref::PositioningRef,
     postgres_enum::entity::PostgresEnumEntity,
@@ -33,8 +33,6 @@ use crate::sql_entity_graph::{
     SqlGraphEntity, SqlGraphIdentifier,
 };
 use crate::versioned_so_name;
-
-use super::pg_extern::entity::PgExternReturnEntityIteratedItem;
 
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Eq, Ord)]
 pub enum SqlGraphRelationship {

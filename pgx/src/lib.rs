@@ -86,14 +86,13 @@ pub use memcxt::*;
 pub use namespace::*;
 pub use nodes::*;
 pub use pgbox::*;
-use quote::__private::token_stream::IntoIter;
 pub use rel::*;
 pub use shmem::*;
 pub use spi::*;
 pub use stringinfo::*;
 pub use trigger_support::*;
 pub use tupdesc::*;
-use utils::sql_entity_graph::metadata::ReturnVariant;
+use utils::sql_entity_graph::metadata::{ArgumentError, ReturnVariant, ReturnVariantError};
 pub use varlena::*;
 pub use wrappers::*;
 pub use xid::*;
@@ -329,7 +328,7 @@ pub fn print_some_mappings_please_and_thank_you() {
 }
 
 mod tester_functions {
-    use crate::{SetReturningFunctionIterator, TableIterator, VariadicArray};
+    use crate::{SetOfIterator, TableIterator, VariadicArray};
 
     pub(crate) fn my_goofy_function<'a>(_a: &'a str) {
         todo!()
@@ -343,23 +342,20 @@ mod tester_functions {
         todo!()
     }
 
-    pub(crate) fn my_goofy_set_returning_function(
-        _a: i32,
-        b: String,
-    ) -> SetReturningFunctionIterator<String> {
-        SetReturningFunctionIterator::new(vec![b].into_iter())
+    pub(crate) fn my_goofy_set_returning_function(_a: i32, b: String) -> SetOfIterator<String> {
+        SetOfIterator::new(vec![b].into_iter())
     }
 
-    pub(crate) fn my_goofy_table_function(_a: i32, _b: String) -> TableIterator<String> {
+    pub(crate) fn my_goofy_table_function(_a: i32, _b: String) -> TableIterator<(String,)> {
         todo!()
     }
 }
 
-pub struct SetReturningFunctionIterator<T> {
+pub struct SetOfIterator<T> {
     iter: Box<dyn Iterator<Item = T>>,
 }
 
-impl<T> SetReturningFunctionIterator<T> {
+impl<T> SetOfIterator<T> {
     pub fn new<I>(iter: I) -> Self
     where
         I: IntoIterator<Item = T>,
@@ -371,7 +367,7 @@ impl<T> SetReturningFunctionIterator<T> {
     }
 }
 
-impl<T> Iterator for SetReturningFunctionIterator<T> {
+impl<T> Iterator for SetOfIterator<T> {
     type Item = T;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -379,7 +375,7 @@ impl<T> Iterator for SetReturningFunctionIterator<T> {
     }
 }
 
-impl<T> IntoDatum for SetReturningFunctionIterator<T> {
+impl<T> IntoDatum for SetOfIterator<T> {
     fn into_datum(self) -> Option<pg_sys::Datum> {
         todo!()
     }
@@ -389,16 +385,20 @@ impl<T> IntoDatum for SetReturningFunctionIterator<T> {
     }
 }
 
-impl<T> crate::utils::sql_entity_graph::metadata::SqlTranslatable
-    for SetReturningFunctionIterator<T>
+impl<T> SqlTranslatable for SetOfIterator<T>
 where
     T: SqlTranslatable,
 {
-    fn sql_type() -> String {
-        T::sql_type()
+    fn argument_sql() -> Result<Option<String>, ArgumentError> {
+        T::argument_sql()
     }
-    fn return_variant() -> crate::utils::sql_entity_graph::metadata::ReturnVariant {
-        ReturnVariant::SetOf
+    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
+        match T::return_sql() {
+            Ok(ReturnVariant::Plain(sql)) => Ok(ReturnVariant::SetOf(sql)),
+            Ok(ReturnVariant::SetOf(_)) => Err(ReturnVariantError::NestedSetOf),
+            Ok(ReturnVariant::Table(_)) => Err(ReturnVariantError::SetOfContainingTable),
+            err @ Err(_) => err,
+        }
     }
 }
 
@@ -436,20 +436,45 @@ impl<'a, T> IntoDatum for TableIterator<T> {
     }
 }
 
-impl<T> crate::utils::sql_entity_graph::metadata::SqlTranslatable for TableIterator<T>
-where
-    T: SqlTranslatable,
-{
-    fn sql_type() -> String {
-        T::sql_type()
+seq_macro::seq!(I in 0..=32 {
+    #(
+        seq_macro::seq!(N in 0..=I {
+            impl<#(Input~N,)*> SqlTranslatable for TableIterator<(#(Input~N,)*)>
+            where
+                #(
+                    Input~N: SqlTranslatable + 'static,
+                )*
+            {
+                fn argument_sql() -> Result<Option<String>, ArgumentError> {
+                    Err(ArgumentError::Table)
+                }
+                fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
+                    let mut vec = Vec::new();
+                    #(
+                        vec.push(match Input~N::return_sql() {
+                            Ok(ReturnVariant::Plain(sql)) => sql,
+                            Ok(ReturnVariant::SetOf(_)) => return Err(ReturnVariantError::TableContainingSetOf),
+                            Ok(ReturnVariant::Table(_)) => return Err(ReturnVariantError::NestedTable),
+                            Err(err) => return Err(err),
+                        });
+                    )*
+                    Ok(ReturnVariant::Table(vec))
+                }
+            }
+        });
+    )*
+});
+
+impl SqlTranslatable for crate::datum::Numeric {
+    fn argument_sql() -> Result<Option<String>, ArgumentError> {
+        Ok(Some(String::from("NUMERIC")))
     }
-    fn return_variant() -> crate::utils::sql_entity_graph::metadata::ReturnVariant {
-        ReturnVariant::Table
+    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
+        Ok(ReturnVariant::Plain(String::from("NUMERIC")))
     }
 }
-
 // impl<const PRECISION: i32, const SCALE: i32>
-//     crate::utils::sql_entity_graph::metadata::SqlTranslatable
+//     SqlTranslatable
 //     for crate::datum::Numeric<PRECISION, SCALE>
 // {
 //     fn sql_type() -> String {
@@ -461,25 +486,60 @@ where
 //     }
 // }
 
-impl<T> crate::utils::sql_entity_graph::metadata::SqlTranslatable for Array<'static, T>
-where
-    T: crate::utils::sql_entity_graph::metadata::SqlTranslatable + FromDatum,
-{
-    fn sql_type() -> String {
-        format!("{}[]", T::sql_type())
+impl SqlTranslatable for crate::datum::Uuid {
+    fn argument_sql() -> Result<Option<String>, ArgumentError> {
+        Ok(Some(String::from("uuid")))
+    }
+    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
+        Ok(ReturnVariant::Plain(String::from("uuid")))
     }
 }
 
-impl<T> crate::utils::sql_entity_graph::metadata::SqlTranslatable for VariadicArray<'static, T>
+impl<T> SqlTranslatable for Array<'static, T>
 where
-    T: crate::utils::sql_entity_graph::metadata::SqlTranslatable + FromDatum,
+    T: SqlTranslatable + FromDatum,
 {
-    fn sql_type() -> String {
-        format!("{}[]", T::sql_type())
+    fn argument_sql() -> Result<Option<String>, ArgumentError> {
+        match T::argument_sql() {
+            Ok(Some(sql)) => Ok(Some(format!("{sql}[]"))),
+            Ok(None) => Ok(None),
+            err @ Err(_) => err,
+        }
+    }
+
+    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
+        match T::return_sql() {
+            Ok(ReturnVariant::Plain(sql)) => Ok(ReturnVariant::Plain(format!("{sql}[]"))),
+            Ok(ReturnVariant::SetOf(_)) => Err(ReturnVariantError::SetOfInArray),
+            Ok(ReturnVariant::Table(_)) => Err(ReturnVariantError::TableInArray),
+            err @ Err(_) => err,
+        }
+    }
+}
+
+impl<T> SqlTranslatable for VariadicArray<'static, T>
+where
+    T: SqlTranslatable + FromDatum,
+{
+    fn argument_sql() -> Result<Option<String>, ArgumentError> {
+        match T::argument_sql() {
+            Ok(Some(sql)) => Ok(Some(format!("{sql}[]"))),
+            Ok(None) => Ok(None),
+            err @ Err(_) => err,
+        }
     }
 
     fn variadic() -> bool {
         true
+    }
+
+    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
+        match T::return_sql() {
+            Ok(ReturnVariant::Plain(sql)) => Ok(ReturnVariant::Plain(format!("{sql}[]"))),
+            Ok(ReturnVariant::SetOf(_)) => Err(ReturnVariantError::SetOfInArray),
+            Ok(ReturnVariant::Table(_)) => Err(ReturnVariantError::TableInArray),
+            err @ Err(_) => err,
+        }
     }
 }
 

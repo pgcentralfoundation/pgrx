@@ -1,5 +1,5 @@
 use super::{FunctionMetadataEntity, PhantomDataExt, SqlTranslatable};
-use core::{any::TypeId, marker::PhantomData};
+use core::marker::PhantomData;
 
 pub trait FunctionMetadata<Inputs, Output> {
     fn arguments(&self) -> Vec<Box<dyn PhantomDataExt>>;

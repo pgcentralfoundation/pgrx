@@ -1,12 +1,15 @@
 use core::{any::TypeId, marker::PhantomData};
 
-use super::{FunctionMetadataTypeEntity, ReturnVariant, SqlTranslatable};
+use super::{
+    return_variant::ReturnVariantError, ArgumentError, FunctionMetadataTypeEntity, ReturnVariant,
+    SqlTranslatable,
+};
 
 pub trait PhantomDataExt {
     fn type_id(&self) -> TypeId;
     fn type_name(&self) -> &'static str;
-    fn sql_type(&self) -> String;
-    fn return_variant(&self) -> ReturnVariant;
+    fn argument_sql(&self) -> Result<Option<String>, ArgumentError>;
+    fn return_sql(&self) -> Result<ReturnVariant, ReturnVariantError>;
     fn variadic(&self) -> bool;
     fn optional(&self) -> bool;
     fn entity(&self) -> FunctionMetadataTypeEntity;
@@ -22,11 +25,11 @@ where
     fn type_name(&self) -> &'static str {
         T::type_name()
     }
-    fn sql_type(&self) -> String {
-        T::sql_type()
+    fn argument_sql(&self) -> Result<Option<String>, ArgumentError> {
+        T::argument_sql()
     }
-    fn return_variant(&self) -> ReturnVariant {
-        T::return_variant()
+    fn return_sql(&self) -> Result<ReturnVariant, ReturnVariantError> {
+        T::return_sql()
     }
     fn variadic(&self) -> bool {
         T::variadic()
@@ -38,8 +41,8 @@ where
         FunctionMetadataTypeEntity {
             type_id: self.type_id(),
             type_name: self.type_name(),
-            sql_type: self.sql_type(),
-            return_variant: self.return_variant(),
+            argument_sql: self.argument_sql(),
+            return_sql: self.return_sql(),
             variadic: self.variadic(),
             optional: self.optional(),
         }

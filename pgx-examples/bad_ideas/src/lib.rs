@@ -17,7 +17,7 @@ pg_module_magic!();
 fn exec(
     command: &str,
     args: default!(Vec<Option<&str>>, "ARRAY[]::text[]"),
-) -> (name!(status, Option<i32>), name!(stdout, String)) {
+) -> TableIterator<(name!(status, Option<i32>), name!(stdout, String))> {
     let mut command = &mut Command::new(command);
 
     for arg in args {
@@ -35,9 +35,12 @@ fn exec(
         )
     }
 
-    (
-        output.status.code(),
-        String::from_utf8(output.stdout).expect("stdout is not valid utf8"),
+    TableIterator::new(
+        [(
+            output.status.code(),
+            String::from_utf8(output.stdout).expect("stdout is not valid utf8"),
+        )]
+        .into_iter(),
     )
 }
 

@@ -20,13 +20,11 @@ pub use returning::NameMacro;
 use crate::sql_entity_graph::ToSqlConfig;
 use attribute::Attribute;
 use operator::{PgxOperatorAttributeWithIdent, PgxOperatorOpName};
-use returning::Returning;
 use search_path::SearchPathList;
 
-use eyre::WrapErr;
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
-use std::{convert::TryFrom, ops::Deref};
+use std::ops::Deref;
 use syn::{
     parse::{Parse, ParseStream, Parser},
     punctuated::Punctuated,
@@ -62,16 +60,6 @@ pub struct PgExtern {
 }
 
 impl PgExtern {
-    fn name(&self) -> String {
-        self.attrs
-            .iter()
-            .find_map(|a| match a {
-                Attribute::Name(name) => Some(name.value()),
-                _ => None,
-            })
-            .unwrap_or_else(|| self.func.sig.ident.to_string())
-    }
-
     fn schema(&self) -> Option<String> {
         self.attrs.iter().find_map(|a| match a {
             Attribute::Schema(name) => Some(name.value()),
