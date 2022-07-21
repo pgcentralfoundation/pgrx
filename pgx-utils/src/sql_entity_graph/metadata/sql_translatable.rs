@@ -71,6 +71,21 @@ where
     }
 }
 
+impl<T> SqlTranslatable for *mut T
+where
+    T: SqlTranslatable,
+{
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+        T::argument_sql()
+    }
+    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
+        T::return_sql()
+    }
+    fn optional() -> bool {
+        true
+    }
+}
+
 impl<T, E> SqlTranslatable for Result<T, E>
 where
     T: SqlTranslatable,

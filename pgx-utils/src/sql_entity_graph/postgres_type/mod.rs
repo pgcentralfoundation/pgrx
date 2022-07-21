@@ -146,12 +146,12 @@ impl ToTokens for PostgresType {
 
         let inv = quote! {
             impl<#ty_generics> ::pgx::utils::sql_entity_graph::metadata::SqlTranslatable for #name #ty_generics {
-                fn argument_sql() -> Result<Option<String>, ::pgx::utils::sql_entity_graph::metadata::ArgumentError> {
-                    Ok(Some(String::from(stringify!(#name))))
+                fn argument_sql() -> Result<::pgx::utils::sql_entity_graph::metadata::SqlVariant, ::pgx::utils::sql_entity_graph::metadata::ArgumentError> {
+                    Ok(::pgx::utils::sql_entity_graph::metadata::SqlVariant::Mapped(String::from(stringify!(#name))))
                 }
 
                 fn return_sql() -> Result<::pgx::utils::sql_entity_graph::metadata::ReturnVariant, ::pgx::utils::sql_entity_graph::metadata::ReturnVariantError> {
-                    Ok(::pgx::utils::sql_entity_graph::metadata::ReturnVariant::Plain(String::from(stringify!(#name))))
+                    Ok(::pgx::utils::sql_entity_graph::metadata::ReturnVariant::Plain(::pgx::utils::sql_entity_graph::metadata::SqlVariant::Mapped(String::from(stringify!(#name)))))
                 }
             }
 

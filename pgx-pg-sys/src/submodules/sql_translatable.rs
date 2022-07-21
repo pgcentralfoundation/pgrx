@@ -2,7 +2,7 @@ use pgx_utils::sql_entity_graph::metadata::{
     ArgumentError, ReturnVariant, ReturnVariantError, SqlTranslatable, SqlVariant,
 };
 
-impl SqlTranslatable for crate::FunctionCallInfo {
+impl SqlTranslatable for crate::FunctionCallInfoBaseData {
     fn argument_sql() -> Result<SqlVariant, ArgumentError> {
         Ok(SqlVariant::Mapped(String::from("uuid")))
     }
