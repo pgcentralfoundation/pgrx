@@ -2,13 +2,13 @@ use core::{any::TypeId, marker::PhantomData};
 
 use super::{
     return_variant::ReturnVariantError, ArgumentError, FunctionMetadataTypeEntity, ReturnVariant,
-    SqlTranslatable,
+    SqlTranslatable, SqlVariant,
 };
 
 pub trait PhantomDataExt {
     fn type_id(&self) -> TypeId;
     fn type_name(&self) -> &'static str;
-    fn argument_sql(&self) -> Result<Option<String>, ArgumentError>;
+    fn argument_sql(&self) -> Result<SqlVariant, ArgumentError>;
     fn return_sql(&self) -> Result<ReturnVariant, ReturnVariantError>;
     fn variadic(&self) -> bool;
     fn optional(&self) -> bool;
@@ -25,7 +25,7 @@ where
     fn type_name(&self) -> &'static str {
         T::type_name()
     }
-    fn argument_sql(&self) -> Result<Option<String>, ArgumentError> {
+    fn argument_sql(&self) -> Result<SqlVariant, ArgumentError> {
         T::argument_sql()
     }
     fn return_sql(&self) -> Result<ReturnVariant, ReturnVariantError> {

@@ -8,6 +8,7 @@ pub enum ArgumentError {
     SetOf,
     Table,
     BareU8,
+    SkipInArray,
 }
 
 impl std::fmt::Display for ArgumentError {
@@ -22,8 +23,18 @@ impl std::fmt::Display for ArgumentError {
             ArgumentError::BareU8 => {
                 write!(f, "Canot use bare u8")
             }
+            ArgumentError::SkipInArray => {
+                write!(f, "A SqlVariant::Skip inside Array is not valid")
+            }
         }
     }
+}
+
+#[derive(Clone, Debug, Hash, Eq, PartialEq, Ord, PartialOrd)]
+pub enum SqlVariant {
+    Mapped(String),
+    Composite { requires_array_brackets: bool },
+    Skip,
 }
 
 impl Error for ArgumentError {}
@@ -35,7 +46,7 @@ pub trait SqlTranslatable: 'static {
     fn type_name() -> &'static str {
         core::any::type_name::<Self>()
     }
-    fn argument_sql() -> Result<Option<String>, ArgumentError>;
+    fn argument_sql() -> Result<SqlVariant, ArgumentError>;
     fn return_sql() -> Result<ReturnVariant, ReturnVariantError>;
     fn variadic() -> bool {
         false
@@ -49,7 +60,7 @@ impl<T> SqlTranslatable for Option<T>
 where
     T: SqlTranslatable,
 {
-    fn argument_sql() -> Result<Option<String>, ArgumentError> {
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
         T::argument_sql()
     }
     fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
@@ -65,7 +76,7 @@ where
     T: SqlTranslatable,
     E: std::error::Error + 'static,
 {
-    fn argument_sql() -> Result<Option<String>, ArgumentError> {
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
         T::argument_sql()
     }
     fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
@@ -77,21 +88,38 @@ impl<T> SqlTranslatable for Vec<T>
 where
     T: SqlTranslatable,
 {
-    fn argument_sql() -> Result<Option<String>, ArgumentError> {
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
         match T::type_id() {
-            id if id == TypeId::of::<u8>() => Ok(Some(format!("bytea"))),
+            id if id == TypeId::of::<u8>() => Ok(SqlVariant::Mapped(format!("bytea"))),
             _ => match T::argument_sql() {
-                Ok(Some(val)) => Ok(Some(format!("{val}[]"))),
-                Ok(None) => Ok(None),
+                Ok(SqlVariant::Mapped(val)) => Ok(SqlVariant::Mapped(format!("{val}[]"))),
+                Ok(SqlVariant::Composite {
+                    requires_array_brackets: _,
+                }) => Ok(SqlVariant::Composite {
+                    requires_array_brackets: true,
+                }),
+                Ok(SqlVariant::Skip) => Ok(SqlVariant::Skip),
                 err @ Err(_) => err,
             },
         }
     }
     fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
         match T::type_id() {
-            id if id == TypeId::of::<u8>() => Ok(ReturnVariant::Plain(format!("bytea"))),
+            id if id == TypeId::of::<u8>() => {
+                Ok(ReturnVariant::Plain(SqlVariant::Mapped(format!("bytea"))))
+            }
             _ => match T::return_sql() {
-                Ok(ReturnVariant::Plain(val)) => Ok(ReturnVariant::Plain(format!("{val}[]"))),
+                Ok(ReturnVariant::Plain(SqlVariant::Mapped(val))) => {
+                    Ok(ReturnVariant::Plain(SqlVariant::Mapped(format!("{val}[]"))))
+                }
+                Ok(ReturnVariant::Plain(SqlVariant::Composite {
+                    requires_array_brackets: _,
+                })) => Ok(ReturnVariant::Plain(SqlVariant::Composite {
+                    requires_array_brackets: true,
+                })),
+                Ok(ReturnVariant::Plain(SqlVariant::Skip)) => {
+                    Ok(ReturnVariant::Plain(SqlVariant::Skip))
+                }
                 Ok(ReturnVariant::SetOf(_)) => Err(ReturnVariantError::SetOfInArray),
                 Ok(ReturnVariant::Table(_)) => Err(ReturnVariantError::TableInArray),
                 err @ Err(_) => err,
@@ -101,7 +129,7 @@ where
 }
 
 impl SqlTranslatable for u8 {
-    fn argument_sql() -> Result<Option<String>, ArgumentError> {
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
         Err(ArgumentError::BareU8)
     }
     fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
@@ -110,127 +138,155 @@ impl SqlTranslatable for u8 {
 }
 
 impl SqlTranslatable for i32 {
-    fn argument_sql() -> Result<Option<String>, ArgumentError> {
-        Ok(Some(String::from("INT")))
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+        Ok(SqlVariant::Mapped(String::from("INT")))
     }
     fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        Ok(ReturnVariant::Plain(String::from("INT")))
+        Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
+            "INT",
+        ))))
     }
 }
 
 impl SqlTranslatable for String {
-    fn argument_sql() -> Result<Option<String>, ArgumentError> {
-        Ok(Some(String::from("TEXT")))
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+        Ok(SqlVariant::Mapped(String::from("TEXT")))
     }
     fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        Ok(ReturnVariant::Plain(String::from("TEXT")))
+        Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
+            "TEXT",
+        ))))
     }
 }
 
 impl SqlTranslatable for &'static str {
-    fn argument_sql() -> Result<Option<String>, ArgumentError> {
-        Ok(Some(String::from("TEXT")))
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+        Ok(SqlVariant::Mapped(String::from("TEXT")))
     }
     fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        Ok(ReturnVariant::Plain(String::from("TEXT")))
+        Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
+            "TEXT",
+        ))))
     }
 }
 
 impl SqlTranslatable for &'static [u8] {
-    fn argument_sql() -> Result<Option<String>, ArgumentError> {
-        Ok(Some(String::from("bytea")))
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+        Ok(SqlVariant::Mapped(String::from("bytea")))
     }
     fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        Ok(ReturnVariant::Plain(String::from("bytea")))
+        Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
+            "bytea",
+        ))))
     }
 }
 
 impl SqlTranslatable for i8 {
-    fn argument_sql() -> Result<Option<String>, ArgumentError> {
-        Ok(Some(String::from("char")))
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+        Ok(SqlVariant::Mapped(String::from("char")))
     }
     fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        Ok(ReturnVariant::Plain(String::from("char")))
+        Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
+            "char",
+        ))))
     }
 }
 
 impl SqlTranslatable for i16 {
-    fn argument_sql() -> Result<Option<String>, ArgumentError> {
-        Ok(Some(String::from("smallint")))
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+        Ok(SqlVariant::Mapped(String::from("smallint")))
     }
     fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        Ok(ReturnVariant::Plain(String::from("smallint")))
+        Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
+            "smallint",
+        ))))
     }
 }
 
 impl SqlTranslatable for i64 {
-    fn argument_sql() -> Result<Option<String>, ArgumentError> {
-        Ok(Some(String::from("bigint")))
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+        Ok(SqlVariant::Mapped(String::from("bigint")))
     }
     fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        Ok(ReturnVariant::Plain(String::from("bigint")))
+        Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
+            "bigint",
+        ))))
     }
 }
 
 impl SqlTranslatable for bool {
-    fn argument_sql() -> Result<Option<String>, ArgumentError> {
-        Ok(Some(String::from("bool")))
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+        Ok(SqlVariant::Mapped(String::from("bool")))
     }
     fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        Ok(ReturnVariant::Plain(String::from("bool")))
+        Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
+            "bool",
+        ))))
     }
 }
 
 impl SqlTranslatable for char {
-    fn argument_sql() -> Result<Option<String>, ArgumentError> {
-        Ok(Some(String::from("varchar")))
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+        Ok(SqlVariant::Mapped(String::from("bool")))
     }
     fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        Ok(ReturnVariant::Plain(String::from("varchar")))
+        Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
+            "bool",
+        ))))
     }
 }
 
 impl SqlTranslatable for f32 {
-    fn argument_sql() -> Result<Option<String>, ArgumentError> {
-        Ok(Some(String::from("real")))
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+        Ok(SqlVariant::Mapped(String::from("real")))
     }
     fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        Ok(ReturnVariant::Plain(String::from("real")))
+        Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
+            "real",
+        ))))
     }
 }
 
 impl SqlTranslatable for f64 {
-    fn argument_sql() -> Result<Option<String>, ArgumentError> {
-        Ok(Some(String::from("double precision")))
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+        Ok(SqlVariant::Mapped(String::from("double precision")))
     }
     fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        Ok(ReturnVariant::Plain(String::from("double precision")))
+        Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
+            "double precision",
+        ))))
     }
 }
 
 impl SqlTranslatable for std::ffi::CStr {
-    fn argument_sql() -> Result<Option<String>, ArgumentError> {
-        Ok(Some(String::from("cstring")))
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+        Ok(SqlVariant::Mapped(String::from("cstring")))
     }
     fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        Ok(ReturnVariant::Plain(String::from("cstring")))
+        Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
+            "cstring",
+        ))))
     }
 }
 
 impl SqlTranslatable for &'static cstr_core::CStr {
-    fn argument_sql() -> Result<Option<String>, ArgumentError> {
-        Ok(Some(String::from("cstring")))
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+        Ok(SqlVariant::Mapped(String::from("cstring")))
     }
     fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        Ok(ReturnVariant::Plain(String::from("cstring")))
+        Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
+            "cstring",
+        ))))
     }
 }
 
 impl SqlTranslatable for cstr_core::CStr {
-    fn argument_sql() -> Result<Option<String>, ArgumentError> {
-        Ok(Some(String::from("cstring")))
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+        Ok(SqlVariant::Mapped(String::from("cstring")))
     }
     fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        Ok(ReturnVariant::Plain(String::from("cstring")))
+        Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
+            "cstring",
+        ))))
     }
 }

@@ -92,6 +92,7 @@ pub use spi::*;
 pub use stringinfo::*;
 pub use trigger_support::*;
 pub use tupdesc::*;
+use utils::sql_entity_graph::metadata::SqlVariant;
 use utils::sql_entity_graph::metadata::{ArgumentError, ReturnVariant, ReturnVariantError};
 pub use varlena::*;
 pub use wrappers::*;
@@ -389,7 +390,7 @@ impl<T> SqlTranslatable for SetOfIterator<T>
 where
     T: SqlTranslatable,
 {
-    fn argument_sql() -> Result<Option<String>, ArgumentError> {
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
         T::argument_sql()
     }
     fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
@@ -445,7 +446,7 @@ seq_macro::seq!(I in 0..=32 {
                     Input~N: SqlTranslatable + 'static,
                 )*
             {
-                fn argument_sql() -> Result<Option<String>, ArgumentError> {
+                fn argument_sql() -> Result<SqlVariant, ArgumentError> {
                     Err(ArgumentError::Table)
                 }
                 fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
@@ -466,13 +467,16 @@ seq_macro::seq!(I in 0..=32 {
 });
 
 impl SqlTranslatable for crate::datum::Numeric {
-    fn argument_sql() -> Result<Option<String>, ArgumentError> {
-        Ok(Some(String::from("NUMERIC")))
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+        Ok(SqlVariant::Mapped(String::from("NUMERIC")))
     }
     fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        Ok(ReturnVariant::Plain(String::from("NUMERIC")))
+        Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
+            "NUMERIC",
+        ))))
     }
 }
+
 // impl<const PRECISION: i32, const SCALE: i32>
 //     SqlTranslatable
 //     for crate::datum::Numeric<PRECISION, SCALE>
@@ -486,12 +490,40 @@ impl SqlTranslatable for crate::datum::Numeric {
 //     }
 // }
 
-impl SqlTranslatable for crate::datum::Uuid {
-    fn argument_sql() -> Result<Option<String>, ArgumentError> {
-        Ok(Some(String::from("uuid")))
+impl SqlTranslatable for crate::heap_tuple::PgHeapTuple<'static, AllocatedByPostgres> {
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+        Ok(SqlVariant::Composite {
+            requires_array_brackets: false,
+        })
     }
     fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        Ok(ReturnVariant::Plain(String::from("uuid")))
+        Ok(ReturnVariant::Plain(SqlVariant::Composite {
+            requires_array_brackets: false,
+        }))
+    }
+}
+
+impl SqlTranslatable for crate::heap_tuple::PgHeapTuple<'static, AllocatedByRust> {
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+        Ok(SqlVariant::Composite {
+            requires_array_brackets: false,
+        })
+    }
+    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
+        Ok(ReturnVariant::Plain(SqlVariant::Composite {
+            requires_array_brackets: false,
+        }))
+    }
+}
+
+impl SqlTranslatable for crate::datum::Uuid {
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+        Ok(SqlVariant::Mapped(String::from("uuid")))
+    }
+    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
+        Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
+            "uuid",
+        ))))
     }
 }
 
@@ -499,17 +531,28 @@ impl<T> SqlTranslatable for Array<'static, T>
 where
     T: SqlTranslatable + FromDatum,
 {
-    fn argument_sql() -> Result<Option<String>, ArgumentError> {
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
         match T::argument_sql() {
-            Ok(Some(sql)) => Ok(Some(format!("{sql}[]"))),
-            Ok(None) => Ok(None),
+            Ok(SqlVariant::Mapped(sql)) => Ok(SqlVariant::Mapped(format!("{sql}[]"))),
+            Ok(SqlVariant::Skip) => Err(ArgumentError::SkipInArray),
+            Ok(SqlVariant::Composite { .. }) => Ok(SqlVariant::Composite {
+                requires_array_brackets: true,
+            }),
             err @ Err(_) => err,
         }
     }
 
     fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
         match T::return_sql() {
-            Ok(ReturnVariant::Plain(sql)) => Ok(ReturnVariant::Plain(format!("{sql}[]"))),
+            Ok(ReturnVariant::Plain(SqlVariant::Mapped(sql))) => {
+                Ok(ReturnVariant::Plain(SqlVariant::Mapped(format!("{sql}[]"))))
+            }
+            Ok(ReturnVariant::Plain(SqlVariant::Composite {
+                requires_array_brackets: _,
+            })) => Ok(ReturnVariant::Plain(SqlVariant::Composite {
+                requires_array_brackets: true,
+            })),
+            Ok(ReturnVariant::Plain(SqlVariant::Skip)) => Err(ReturnVariantError::SkipInArray),
             Ok(ReturnVariant::SetOf(_)) => Err(ReturnVariantError::SetOfInArray),
             Ok(ReturnVariant::Table(_)) => Err(ReturnVariantError::TableInArray),
             err @ Err(_) => err,
@@ -521,25 +564,36 @@ impl<T> SqlTranslatable for VariadicArray<'static, T>
 where
     T: SqlTranslatable + FromDatum,
 {
-    fn argument_sql() -> Result<Option<String>, ArgumentError> {
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
         match T::argument_sql() {
-            Ok(Some(sql)) => Ok(Some(format!("{sql}[]"))),
-            Ok(None) => Ok(None),
+            Ok(SqlVariant::Mapped(sql)) => Ok(SqlVariant::Mapped(sql)),
+            Ok(SqlVariant::Skip) => Err(ArgumentError::SkipInArray),
+            Ok(SqlVariant::Composite { .. }) => Ok(SqlVariant::Composite {
+                requires_array_brackets: true,
+            }),
+            err @ Err(_) => err,
+        }
+    }
+
+    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
+        match T::return_sql() {
+            Ok(ReturnVariant::Plain(SqlVariant::Mapped(sql))) => {
+                Ok(ReturnVariant::Plain(SqlVariant::Mapped(sql)))
+            }
+            Ok(ReturnVariant::Plain(SqlVariant::Composite {
+                requires_array_brackets: _,
+            })) => Ok(ReturnVariant::Plain(SqlVariant::Composite {
+                requires_array_brackets: true,
+            })),
+            Ok(ReturnVariant::Plain(SqlVariant::Skip)) => Err(ReturnVariantError::SkipInArray),
+            Ok(ReturnVariant::SetOf(_)) => Err(ReturnVariantError::SetOfInArray),
+            Ok(ReturnVariant::Table(_)) => Err(ReturnVariantError::TableInArray),
             err @ Err(_) => err,
         }
     }
 
     fn variadic() -> bool {
         true
-    }
-
-    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        match T::return_sql() {
-            Ok(ReturnVariant::Plain(sql)) => Ok(ReturnVariant::Plain(format!("{sql}[]"))),
-            Ok(ReturnVariant::SetOf(_)) => Err(ReturnVariantError::SetOfInArray),
-            Ok(ReturnVariant::Table(_)) => Err(ReturnVariantError::TableInArray),
-            err @ Err(_) => err,
-        }
     }
 }
 

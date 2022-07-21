@@ -16,6 +16,7 @@ pub use returning::{PgExternReturnEntity, PgExternReturnEntityIteratedItem};
 
 use crate::{
     sql_entity_graph::{
+        metadata::SqlVariant,
         pgx_sql::PgxSql,
         to_sql::{entity::ToSqlConfigEntity, ToSql},
         SqlGraphEntity, SqlGraphIdentifier,
@@ -30,9 +31,8 @@ use std::cmp::Ordering;
 #[derive(Debug, Clone)]
 pub struct PgExternEntity {
     pub metadata: crate::sql_entity_graph::metadata::FunctionMetadataEntity,
-    pub arg_patterns: Vec<&'static str>,
-    pub arg_defaults: Vec<Option<&'static str>>,
-    pub arg_composite_types: Vec<Option<&'static str>>,
+    pub fn_args: Vec<PgExternArgumentEntity>,
+    pub fn_return: PgExternReturnEntity,
     pub schema: Option<&'static str>,
     pub file: &'static str,
     pub line: u32,
@@ -134,9 +134,9 @@ impl ToSql for PgExternEntity {
                 let mut args = Vec::new();
                 for (idx, arg) in self.metadata.arguments.iter().enumerate() {
                     match arg.argument_sql {
-                        Ok(Some(ref argument_sql)) => {
-                            let arg_pattern = self.arg_patterns[idx];
-                            let arg_default = self.arg_defaults[idx];
+                        Ok(SqlVariant::Mapped(ref argument_sql)) => {
+                            let arg_pattern = self.fn_args[idx].pattern;
+                            let arg_default = self.fn_args[idx].used_ty.default;
                             let graph_index = context
                                 .graph
                                 .neighbors_undirected(self_index)
@@ -166,7 +166,27 @@ impl ToSql for PgExternEntity {
                                         );
                             args.push(buf);
                         }
-                        Ok(None) => (),
+                        Ok(SqlVariant::Composite {
+                            requires_array_brackets,
+                        }) => {
+                            let buf = self.fn_args[idx]
+                                .used_ty
+                                .composite_type
+                                .map(|v| {
+                                    if requires_array_brackets {
+                                        format!("{v}[]")
+                                    } else {
+                                        format!("{v}")
+                                    }
+                                })
+                                .ok_or_else(|| {
+                                    eyre!(
+                                    "Macro expansion time suggested a composite_type!() in return"
+                                )
+                                })?;
+                            args.push(buf);
+                        }
+                        Ok(SqlVariant::Skip) => (),
                         Err(err) => return Err(err).wrap_err("While mapping argument"),
                     }
                 }
@@ -187,11 +207,32 @@ impl ToSql for PgExternEntity {
                             _ => false,
                         })
                         .ok_or_else(|| eyre!("Could not find return type in graph."))?;
-                    use crate::sql_entity_graph::metadata::ReturnVariant;
+                    use crate::sql_entity_graph::metadata::{ReturnVariant, SqlVariant};
+
                     let (variant_prefix, sql_type) = match retval.return_sql {
-                        Ok(ReturnVariant::Plain(ref sql)) => ("", sql.clone()),
-                        Ok(ReturnVariant::SetOf(ref sql)) => ("SETOF ", sql.clone()),
-                        Ok(ReturnVariant::Table(ref vec_of_sql)) => ("TABLE ", "TODO".into()),
+                        Ok(ReturnVariant::Plain(ref variant)) => ("", match variant {
+                            SqlVariant::Mapped(ref sql) => sql.clone(),
+                            SqlVariant::Composite { requires_array_brackets } => match &self.fn_return {
+                                PgExternReturnEntity::None => return Err(eyre!("Macro expansion time suggested no return value, but at runtime a return value was determined")),
+                                PgExternReturnEntity::Type { ty } => ty.composite_type.map(|v| if *requires_array_brackets { format!("{v}[]") } else { format!("{v}") }).ok_or_else(|| eyre!("Macro expansion time suggested a composite_type!() in return"))?,
+                                PgExternReturnEntity::SetOf { .. } => return Err(eyre!("Macro expansion time suggested a SetOfIterator return value, but at runtime a plain return value was determined")),
+                                PgExternReturnEntity::Iterated(_) => return Err(eyre!("Macro expansion time suggested a TableIterator return value, but at runtime a plain return value was determined")),
+                                PgExternReturnEntity::Trigger => return Err(eyre!("Macro expansion time suggested a Trigger return value, but at runtime a plain return value was determined")),
+                            },
+                            SqlVariant::Skip => return Err(eyre!("At runtime a skipped return value was determined, this is not valid")),
+                        }),
+                        Ok(ReturnVariant::SetOf(ref variant)) => ("SETOF ", match variant {
+                            SqlVariant::Mapped(ref sql) => sql.clone(),
+                            SqlVariant::Composite { requires_array_brackets } => match &self.fn_return {
+                                PgExternReturnEntity::None => return Err(eyre!("Macro expansion time suggested no return value, but at runtime a return value was determined")),
+                                PgExternReturnEntity::Type { .. } => return Err(eyre!("Macro expansion time suggested a plain return value, but at runtime a SetOf return value was determined")),
+                                PgExternReturnEntity::SetOf { ty } => ty.composite_type.map(|v| if *requires_array_brackets { format!("{v}[]") } else { format!("{v}") }).ok_or_else(|| eyre!("Macro expansion time suggested a composite_type!() in return"))?,
+                                PgExternReturnEntity::Iterated(_) => return Err(eyre!("Macro expansion time suggested a TableIterator return value, but at runtime a SetOf return value was determined")),
+                                PgExternReturnEntity::Trigger => return Err(eyre!("Macro expansion time suggested a Trigger return value, but at runtime a SetOf return value was determined")),
+                            },
+                            SqlVariant::Skip => todo!(),
+                        }),
+                        Ok(ReturnVariant::Table(ref vec_of_variant)) => ("TABLE ", "TODO".into()),
                         Err(err) => return Err(err).wrap_err("Mapping return type"),
                     };
                     format!(

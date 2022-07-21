@@ -30,6 +30,9 @@ use syn::{
     punctuated::Punctuated,
     Meta, Token,
 };
+use eyre::WrapErr;
+
+use self::returning::Returning;
 
 /// A parsed `#[pg_extern]` item.
 ///
@@ -170,92 +173,20 @@ impl PgExtern {
             .and_then(|attr| Some(attr.parse_args::<SearchPathList>().unwrap()))
     }
 
-    fn arg_patterns(&self) -> syn::Result<Vec<Ident>> {
-        let mut patterns = Vec::default();
+    fn inputs(&self) -> eyre::Result<Vec<PgExternArgument>> {
+        let mut args = Vec::default();
         for input in &self.func.sig.inputs {
-            match input {
-                syn::FnArg::Typed(pat_type) => {
-                    let pattern = match *pat_type.pat {
-                        syn::Pat::Ident(ref p) => p.ident.clone(),
-                        syn::Pat::Reference(ref p_ref) => match *p_ref.pat {
-                            syn::Pat::Ident(ref inner_ident) => inner_ident.ident.clone(),
-                            _ => {
-                                return Err(syn::Error::new(
-                                    Span::call_site(),
-                                    "Unable to parse FnArg",
-                                ))
-                            }
-                        },
-                        _ => {
-                            return Err(syn::Error::new(Span::call_site(), "Unable to parse FnArg"))
-                        }
-                    };
-                    patterns.push(pattern);
-                }
-                _ => return Err(syn::Error::new(Span::call_site(), "Unable to parse FnArg")),
+            let arg = PgExternArgument::build(input.clone())
+                .wrap_err_with(|| format!("Could not map {:?}", input))?;
+            if let Some(arg) = arg {
+                args.push(arg);
             }
         }
-        Ok(patterns)
+        Ok(args)
     }
 
-    fn arg_defaults(&self) -> syn::Result<Vec<Option<String>>> {
-        let mut defaults = Vec::default();
-        for input in &self.func.sig.inputs {
-            match input {
-                syn::FnArg::Typed(pat_type) => {
-                    let mut input_cloned = (*pat_type.ty).clone();
-                    let default = match pat_type.ty.as_ref() {
-                        syn::Type::Macro(macro_pat) => {
-                            let mac = &macro_pat.mac;
-                            let archetype = mac.path.segments.last().expect("No last segment");
-                            let (_, default_value) =
-                                handle_default(input_cloned.clone(), archetype, mac)?;
-                            default_value
-                        }
-                        syn::Type::Path(ref path) => {
-                            let segments = &path.path;
-                            let mut default = None;
-                            for segment in &segments.segments {
-                                if segment.ident.to_string().ends_with("Option") {
-                                    match &segment.arguments {
-                                        syn::PathArguments::AngleBracketed(path_arg) => {
-                                            match path_arg.args.first() {
-                                                Some(syn::GenericArgument::Type(
-                                                    syn::Type::Macro(macro_pat),
-                                                )) => {
-                                                    let mac = &macro_pat.mac;
-                                                    let archetype = mac
-                                                        .path
-                                                        .segments
-                                                        .last()
-                                                        .expect("No last segment");
-                                                    let (inner_type, default_value) =
-                                                        handle_default(
-                                                            input_cloned.clone(),
-                                                            archetype,
-                                                            mac,
-                                                        )?;
-                                                    input_cloned =
-                                                        syn::parse_quote! { Option<#inner_type> };
-                                                    default = default_value;
-                                                }
-                                                _ => (),
-                                            }
-                                        }
-                                        _ => (),
-                                    }
-                                }
-                            }
-                            default
-                        }
-                        _ => None,
-                    };
-                    defaults.push(default);
-                }
-                _ => return Err(syn::Error::new(Span::call_site(), "Unable to parse FnArg")),
-            }
-        }
-        Ok(defaults)
+    fn returns(&self) -> Result<Returning, syn::Error> {
+        Returning::try_from(&self.func.sig.output)
     }
 
     pub fn new(attr: TokenStream2, item: TokenStream2) -> Result<Self, syn::Error> {
@@ -311,24 +242,9 @@ impl ToTokens for PgExtern {
             .map(|attr| attr.to_sql_entity_graph_tokens())
             .collect::<Punctuated<_, Token![,]>>();
         let search_path = self.search_path().into_iter();
-        let arg_patterns = match self.arg_patterns() {
-            Ok(arg_patterns) => arg_patterns,
-            Err(e) => {
-                let msg = e.to_string();
-                tokens.append_all(quote! {
-                    std::compile_error!(#msg);
-                });
-                return;
-            }
-        };
-        let arg_defaults = match self.arg_defaults() {
-            Ok(arg_defaults) => arg_defaults
-                .iter()
-                .map(|v| match v {
-                    Some(v) => syn::parse_quote! { Some(#v) },
-                    None => syn::parse_quote! { None },
-                })
-                .collect::<Vec<syn::Expr>>(),
+        let inputs = self.inputs().unwrap();
+        let returns = match self.returns() {
+            Ok(returns) => returns,
             Err(e) => {
                 let msg = e.to_string();
                 tokens.append_all(quote! {
@@ -359,8 +275,8 @@ impl ToTokens for PgExtern {
                 use alloc::vec;
                 let submission = ::pgx::utils::sql_entity_graph::PgExternEntity {
                     metadata: pgx::utils::sql_entity_graph::metadata::FunctionMetadata::entity(&#ident),
-                    arg_patterns: vec![#(stringify!(#arg_patterns)),*],
-                    arg_defaults: vec![#(#arg_defaults),*],
+                    fn_args: vec![#(#inputs),*],
+                    fn_return: #returns,
                     schema: None #( .unwrap_or(Some(#schema_iter)) )*,
                     file: file!(),
                     line: line!(),
