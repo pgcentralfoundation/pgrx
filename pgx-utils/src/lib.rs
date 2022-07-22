@@ -548,11 +548,12 @@ pub fn staticize_lifetimes(value: &mut syn::Type) {
             }
         }
 
-        syn::Type::Reference(type_ref) => {
-            if let Some(lifetime) = type_ref.lifetime.as_mut() {
+        syn::Type::Reference(type_ref) => match &mut type_ref.lifetime {
+            Some(ref mut lifetime) => {
                 lifetime.ident = syn::Ident::new("static", lifetime.ident.span());
             }
-        }
+            this @ None => *this = Some(syn::parse_quote!('static)),
+        },
 
         syn::Type::Tuple(type_tuple) => {
             for elem in &mut type_tuple.elems {

@@ -288,6 +288,18 @@ impl<'a, T: FromDatum> IntoIterator for Array<'a, T> {
     }
 }
 
+impl<'a, T: FromDatum> IntoIterator for VariadicArray<'a, T> {
+    type Item = Option<T>;
+    type IntoIter = ArrayIntoIterator<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        ArrayIntoIterator {
+            array: self.0,
+            curr: 0,
+        }
+    }
+}
+
 impl<'a, T: FromDatum> Iterator for ArrayIntoIterator<'a, T> {
     type Item = Option<T>;
 

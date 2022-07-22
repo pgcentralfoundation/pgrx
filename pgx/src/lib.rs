@@ -303,31 +303,7 @@ pub static DEFAULT_COMPOSITE_TYPE_COLLECTIONS: Lazy<std::collections::HashMap<Ty
 
         m
     });
-use pgx_utils::sql_entity_graph::metadata::{FunctionMetadata, SqlTranslatable};
-
-mod tester_functions {
-    use crate::{SetOfIterator, TableIterator, VariadicArray};
-
-    pub(crate) fn my_goofy_function<'a>(_a: &'a str) {
-        todo!()
-    }
-
-    pub(crate) fn my_other_goofy_function(_a: Option<String>, _b: String) -> Vec<String> {
-        todo!()
-    }
-
-    pub(crate) fn my_variadic_goofy_function(_a: VariadicArray<i32>, _b: String) -> String {
-        todo!()
-    }
-
-    pub(crate) fn my_goofy_set_returning_function(_a: i32, b: String) -> SetOfIterator<String> {
-        SetOfIterator::new(vec![b].into_iter())
-    }
-
-    pub(crate) fn my_goofy_table_function(_a: i32, _b: String) -> TableIterator<(String,)> {
-        todo!()
-    }
-}
+use pgx_utils::sql_entity_graph::metadata::SqlTranslatable;
 
 pub struct SetOfIterator<T> {
     iter: Box<dyn Iterator<Item = T>>,
@@ -478,6 +454,72 @@ impl SqlTranslatable for crate::datum::Inet {
     }
 }
 
+impl SqlTranslatable for crate::datum::Date {
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+        Ok(SqlVariant::Mapped(String::from("date")))
+    }
+    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
+        Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
+            "date",
+        ))))
+    }
+}
+
+impl SqlTranslatable for crate::datum::Time {
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+        Ok(SqlVariant::Mapped(String::from("time")))
+    }
+    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
+        Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
+            "time",
+        ))))
+    }
+}
+
+impl SqlTranslatable for crate::datum::TimeWithTimeZone {
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+        Ok(SqlVariant::Mapped(String::from("time with time zone")))
+    }
+    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
+        Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
+            "time with time zone",
+        ))))
+    }
+}
+
+impl SqlTranslatable for crate::datum::Timestamp {
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+        Ok(SqlVariant::Mapped(String::from("timestamp")))
+    }
+    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
+        Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
+            "timestamp",
+        ))))
+    }
+}
+
+impl SqlTranslatable for crate::datum::TimestampWithTimeZone {
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+        Ok(SqlVariant::Mapped(String::from("timestamp with time zone")))
+    }
+    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
+        Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
+            "timestamp with time zone",
+        ))))
+    }
+}
+
+impl SqlTranslatable for crate::datum::Internal {
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+        Ok(SqlVariant::Mapped(String::from("internal")))
+    }
+    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
+        Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
+            "internal",
+        ))))
+    }
+}
+
 impl<T> SqlTranslatable for crate::datum::PgVarlena<T>
 where
     T: SqlTranslatable + Copy,
@@ -561,7 +603,7 @@ impl SqlTranslatable for crate::datum::Uuid {
     }
 }
 
-impl<T> SqlTranslatable for Array<'static, T>
+impl<'a, T> SqlTranslatable for Array<'a, T>
 where
     T: SqlTranslatable + FromDatum,
 {

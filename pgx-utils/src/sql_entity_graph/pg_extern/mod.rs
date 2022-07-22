@@ -17,7 +17,7 @@ pub use argument::PgExternArgument;
 pub use operator::PgOperator;
 pub use returning::NameMacro;
 
-use crate::sql_entity_graph::ToSqlConfig;
+use crate::{sql_entity_graph::ToSqlConfig, staticize_lifetimes};
 use attribute::Attribute;
 use operator::{PgxOperatorAttributeWithIdent, PgxOperatorOpName};
 use search_path::SearchPathList;
@@ -256,7 +256,11 @@ impl ToTokens for PgExtern {
 
         let input_types = self.func.sig.inputs.iter().filter_map(|v| match v {
             syn::FnArg::Receiver(_) => None,
-            syn::FnArg::Typed(pat_ty) => Some(pat_ty.ty.clone()),
+            syn::FnArg::Typed(pat_ty) => {
+                let mut static_ty = pat_ty.ty.clone();
+                Some(staticize_lifetimes(&mut static_ty));
+                Some(static_ty)
+            }
         });
 
         let returns = match self.returns() {
@@ -272,7 +276,11 @@ impl ToTokens for PgExtern {
 
         let return_type = match &self.func.sig.output {
             syn::ReturnType::Default => None,
-            retval @ syn::ReturnType::Type(_, _) => Some(retval.clone()),
+            syn::ReturnType::Type(arrow, ty) => {
+                let mut static_ty = ty.clone();
+                Some(staticize_lifetimes(&mut static_ty));
+                Some(syn::ReturnType::Type(*arrow, static_ty))
+            }
         };
 
         let operator = self.operator().into_iter();

@@ -12,3 +12,14 @@ impl SqlTranslatable for crate::FunctionCallInfoBaseData {
         ))))
     }
 }
+
+impl SqlTranslatable for crate::PlannerInfo {
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+        Ok(SqlVariant::Mapped(String::from("internal")))
+    }
+    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
+        Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
+            "internal",
+        ))))
+    }
+}

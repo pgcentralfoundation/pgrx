@@ -109,7 +109,7 @@ mod arguments {
             let dogs: pgx::VariadicArray<PgHeapTuple<AllocatedByRust>> = dogs;
 
             let mut names = Vec::with_capacity(dogs.len());
-            for dog in dogs {
+            for dog in dogs.iter() {
                 let dog = dog.unwrap();
                 let name = dog.get_by_name("name").unwrap().unwrap();
                 names.push(name);
@@ -493,23 +493,23 @@ mod sql_generator_tests {
 
     #[allow(unused_parens)]
     #[pg_extern]
-    fn return_table_single() -> TableIterator<(name!(dog, pgx::composite_type!("Dog")))> {
+    fn return_table_single() -> TableIterator<(name!(dog, pgx::composite_type!("Dog")),)> {
         let mut tuple = PgHeapTuple::new_composite_type("Dog").unwrap();
 
         tuple.set_by_name("scritches", 0).unwrap();
         tuple.set_by_name("name", "Nami").unwrap();
 
-        TableIterator::new(vec![(tuple)].into_iter())
+        TableIterator::new(vec![(tuple,)].into_iter())
     }
 
     #[pg_extern]
-    fn return_table_single_bare() -> TableIterator<(name!(dog, pgx::composite_type!("Dog")))> {
+    fn return_table_single_bare() -> TableIterator<(name!(dog, pgx::composite_type!("Dog")),)> {
         let mut tuple = PgHeapTuple::new_composite_type("Dog").unwrap();
 
         tuple.set_by_name("scritches", 0).unwrap();
         tuple.set_by_name("name", "Nami").unwrap();
 
-        TableIterator::new(vec![tuple].into_iter())
+        TableIterator::new(vec![(tuple,)].into_iter())
     }
 
     #[pg_extern]

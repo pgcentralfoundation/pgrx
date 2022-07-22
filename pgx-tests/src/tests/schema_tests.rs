@@ -49,7 +49,7 @@ mod test_schema {
                 LANGUAGE c /* Rust */\n\
                 AS 'MODULE_PATHNAME', '{unaliased_name}_wrapper';\
                 ",
-                unaliased_name = func.metadata.name,
+                unaliased_name = func.name,
             ))
         } else {
             panic!("expected extern function entity, got {:?}", entity);
