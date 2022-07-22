@@ -133,25 +133,21 @@ impl ToSql for PgExternEntity {
             arguments = if !self.metadata.arguments.is_empty() {
                 let mut args = Vec::new();
                 for (idx, arg) in self.metadata.arguments.iter().enumerate() {
+                    let arg_pattern = self.fn_args[idx].pattern;
+                    let arg_default = self.fn_args[idx].used_ty.default;
+                    let graph_index = context
+                        .graph
+                        .neighbors_undirected(self_index)
+                        .find(|neighbor| match &context.graph[*neighbor] {
+                            SqlGraphEntity::Type(ty) => ty.id_matches(&arg.type_id),
+                            SqlGraphEntity::Enum(en) => en.id_matches(&arg.type_id),
+                            SqlGraphEntity::BuiltinType(defined) => defined == &arg.type_name,
+                            _ => false,
+                        })
+                        .ok_or_else(|| eyre!("Could not find arg type in graph. Got: {:?}", arg))?;
+                    let needs_comma = idx < (self.metadata.arguments.len() - 1);
                     match arg.argument_sql {
                         Ok(SqlVariant::Mapped(ref argument_sql)) => {
-                            let arg_pattern = self.fn_args[idx].pattern;
-                            let arg_default = self.fn_args[idx].used_ty.default;
-                            let graph_index = context
-                                .graph
-                                .neighbors_undirected(self_index)
-                                .find(|neighbor| match &context.graph[*neighbor] {
-                                    SqlGraphEntity::Type(ty) => ty.id_matches(&arg.type_id),
-                                    SqlGraphEntity::Enum(en) => en.id_matches(&arg.type_id),
-                                    SqlGraphEntity::BuiltinType(defined) => {
-                                        defined == &arg.type_name
-                                    }
-                                    _ => false,
-                                })
-                                .ok_or_else(|| {
-                                    eyre!("Could not find arg type in graph. Got: {:?}", arg)
-                                })?;
-                            let needs_comma = idx < (self.metadata.arguments.len() - 1);
                             let buf = format!("\
                                                 \t\"{pattern}\" {variadic}{schema_prefix}{sql_type}{default}{maybe_comma}/* {type_name} */\
                                             ",
@@ -169,7 +165,7 @@ impl ToSql for PgExternEntity {
                         Ok(SqlVariant::Composite {
                             requires_array_brackets,
                         }) => {
-                            let buf = self.fn_args[idx]
+                            let sql = self.fn_args[idx]
                                 .used_ty
                                 .composite_type
                                 .map(|v| {
@@ -184,6 +180,18 @@ impl ToSql for PgExternEntity {
                                     "Macro expansion time suggested a composite_type!() in return"
                                 )
                                 })?;
+                            let buf = format!("\
+                                \t\"{pattern}\" {variadic}{schema_prefix}{sql_type}{default}{maybe_comma}/* {type_name} */\
+                            ",
+                                pattern = arg_pattern,
+                                schema_prefix = context.schema_prefix_for(&graph_index),
+                                // First try to match on [`TypeId`] since it's most reliable.
+                                sql_type = sql,
+                                default = if let Some(def) = arg_default { format!(" DEFAULT {}", def) } else { String::from("") },
+                                variadic = if arg.variadic { "VARIADIC " } else { "" },
+                                maybe_comma = if needs_comma { ", " } else { " " },
+                                type_name = arg.type_name,
+                        );
                             args.push(buf);
                         }
                         Ok(SqlVariant::Skip) => (),
@@ -336,9 +344,35 @@ impl ToSql for PgExternEntity {
                 .neighbors_undirected(self_index)
                 .find(|neighbor| match &context.graph[*neighbor] {
                     SqlGraphEntity::Type(ty) => ty.id_matches(&left_arg.type_id),
+                    SqlGraphEntity::Enum(en) => en.id_matches(&left_arg.type_id),
+                    SqlGraphEntity::BuiltinType(defined) => defined == &left_arg.type_name,
                     _ => false,
                 })
-                .ok_or_else(|| eyre!("Could not find left arg function in graph."))?;
+                .ok_or_else(|| {
+                    eyre!("Could not find left arg type in graph. Got: {:?}", left_arg)
+                })?;
+            let left_arg_sql = match left_arg.argument_sql {
+                Ok(SqlVariant::Mapped(ref sql)) => sql.clone(),
+                Ok(SqlVariant::Composite {
+                    requires_array_brackets,
+                }) => {
+                    if requires_array_brackets {
+                        let composite_type = self.fn_args[0].used_ty.composite_type
+                            .ok_or(eyre!("Found a composite type but macro expansion time did not reveal a name, use `pgx::composite_type!()`"))?;
+                        format!("{composite_type}[]")
+                    } else {
+                        self.fn_args[0].used_ty.composite_type
+                            .ok_or(eyre!("Found a composite type but macro expansion time did not reveal a name, use `pgx::composite_type!()`"))?.to_string()
+                    }
+                }
+                Ok(SqlVariant::Skip) => {
+                    return Err(eyre!(
+                        "Found an skipped SQL type in an operator, this is not valid"
+                    ))
+                }
+                Err(err) => return Err(err.into()),
+            };
+
             let right_arg = self.metadata.arguments.get(1).ok_or_else(|| {
                 eyre!(
                     "Did not find `left_arg` for operator `{}`.",
@@ -350,9 +384,37 @@ impl ToSql for PgExternEntity {
                 .neighbors_undirected(self_index)
                 .find(|neighbor| match &context.graph[*neighbor] {
                     SqlGraphEntity::Type(ty) => ty.id_matches(&right_arg.type_id),
+                    SqlGraphEntity::Enum(en) => en.id_matches(&right_arg.type_id),
+                    SqlGraphEntity::BuiltinType(defined) => defined == &right_arg.type_name,
                     _ => false,
                 })
-                .ok_or_else(|| eyre!("Could not find right arg function in graph."))?;
+                .ok_or_else(|| {
+                    eyre!(
+                        "Could not find right arg type in graph. Got: {:?}",
+                        right_arg
+                    )
+                })?;
+            let right_arg_sql = match right_arg.argument_sql {
+                Ok(SqlVariant::Mapped(ref sql)) => sql.clone(),
+                Ok(SqlVariant::Composite {
+                    requires_array_brackets,
+                }) => {
+                    if requires_array_brackets {
+                        let composite_type = self.fn_args[1].used_ty.composite_type
+                            .ok_or(eyre!("Found a composite type but macro expansion time did not reveal a name, use `pgx::composite_type!()`"))?;
+                        format!("{composite_type}[]")
+                    } else {
+                        self.fn_args[0].used_ty.composite_type
+                            .ok_or(eyre!("Found a composite type but macro expansion time did not reveal a name, use `pgx::composite_type!()`"))?.to_string()
+                    }
+                }
+                Ok(SqlVariant::Skip) => {
+                    return Err(eyre!(
+                        "Found an skipped SQL type in an operator, this is not valid"
+                    ))
+                }
+                Err(err) => return Err(err.into()),
+            };
 
             let operator_sql = format!("\n\n\
                                                     -- {file}:{line}\n\
@@ -372,11 +434,9 @@ impl ToSql for PgExternEntity {
                                                     left_name = left_arg.type_name,
                                                     right_name = right_arg.type_name,
                                                     schema_prefix_left = context.schema_prefix_for(&left_arg_graph_index),
-                                                    left_arg = context.type_id_to_sql_type(left_arg.type_id)
-                                                        .ok_or_else(|| eyre!("Failed to map left argument type `{}` to SQL type while building operator `{}`.", left_arg.type_name, self.metadata.function_name()))?,
+                                                    left_arg = left_arg_sql,
                                                     schema_prefix_right = context.schema_prefix_for(&right_arg_graph_index),
-                                                    right_arg = context.type_id_to_sql_type(right_arg.type_id)
-                                                        .ok_or_else(|| eyre!("Failed to map right argument type `{}` to SQL type while building operator `{}`.", right_arg.type_name, self.metadata.function_name()))?,
+                                                    right_arg = right_arg_sql,
                                                     maybe_comma = if optionals.len() >= 1 { "," } else { "" },
                                                     optionals = if !optionals.is_empty() { optionals.join(",\n") + "\n" } else { "".to_string() },
                                             );

@@ -22,6 +22,7 @@ use attribute::Attribute;
 use operator::{PgxOperatorAttributeWithIdent, PgxOperatorOpName};
 use search_path::SearchPathList;
 
+use eyre::WrapErr;
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
 use std::ops::Deref;
@@ -30,7 +31,6 @@ use syn::{
     punctuated::Punctuated,
     Meta, Token,
 };
-use eyre::WrapErr;
 
 use self::returning::Returning;
 
@@ -178,9 +178,7 @@ impl PgExtern {
         for input in &self.func.sig.inputs {
             let arg = PgExternArgument::build(input.clone())
                 .wrap_err_with(|| format!("Could not map {:?}", input))?;
-            if let Some(arg) = arg {
-                args.push(arg);
-            }
+            args.push(arg);
         }
         Ok(args)
     }
