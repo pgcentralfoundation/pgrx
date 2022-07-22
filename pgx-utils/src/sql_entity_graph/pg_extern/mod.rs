@@ -232,6 +232,7 @@ impl PgExtern {
 impl ToTokens for PgExtern {
     fn to_tokens(&self, tokens: &mut TokenStream2) {
         let ident = &self.func.sig.ident;
+        let unsafety = &self.func.sig.unsafety;
         let schema = self.schema();
         let schema_iter = schema.iter();
         let extern_attrs = self
@@ -241,6 +242,12 @@ impl ToTokens for PgExtern {
             .collect::<Punctuated<_, Token![,]>>();
         let search_path = self.search_path().into_iter();
         let inputs = self.inputs().unwrap();
+
+        let input_types = self.func.sig.inputs.iter().filter_map(|v| match v {
+            syn::FnArg::Receiver(_) => None,
+            syn::FnArg::Typed(pat_ty) => Some(pat_ty.ty.clone()),
+        });
+
         let returns = match self.returns() {
             Ok(returns) => returns,
             Err(e) => {
@@ -251,6 +258,12 @@ impl ToTokens for PgExtern {
                 return;
             }
         };
+
+        let return_type = match &self.func.sig.output {
+            syn::ReturnType::Default => None,
+            retval @ syn::ReturnType::Type(_, _) => Some(retval.clone()),
+        };
+
         let operator = self.operator().into_iter();
         let to_sql_config = match self.overridden() {
             None => self.to_sql_config.clone(),
@@ -271,8 +284,10 @@ impl ToTokens for PgExtern {
                 extern crate alloc;
                 use alloc::vec::Vec;
                 use alloc::vec;
+                type FunctionPointer = #unsafety fn(#( #input_types ),*) #return_type;
+                let metadata: FunctionPointer = #ident;
                 let submission = ::pgx::utils::sql_entity_graph::PgExternEntity {
-                    metadata: pgx::utils::sql_entity_graph::metadata::FunctionMetadata::entity(&#ident),
+                    metadata: pgx::utils::sql_entity_graph::metadata::FunctionMetadata::entity(&metadata),
                     fn_args: vec![#(#inputs),*],
                     fn_return: #returns,
                     schema: None #( .unwrap_or(Some(#schema_iter)) )*,

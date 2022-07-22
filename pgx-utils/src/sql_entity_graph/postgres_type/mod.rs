@@ -132,7 +132,7 @@ impl ToTokens for PostgresType {
         for lifetime in static_generics.lifetimes_mut() {
             lifetime.lifetime.ident = Ident::new("static", Span::call_site());
         }
-        let (_impl_generics, ty_generics, _where_clauses) = static_generics.split_for_impl();
+        let (impl_generics, ty_generics, where_clauses) = static_generics.split_for_impl();
 
         let in_fn = &self.in_fn;
         let out_fn = &self.out_fn;
@@ -145,7 +145,7 @@ impl ToTokens for PostgresType {
         let to_sql_config = &self.to_sql_config;
 
         let inv = quote! {
-            impl<#ty_generics> ::pgx::utils::sql_entity_graph::metadata::SqlTranslatable for #name #ty_generics {
+            impl #impl_generics ::pgx::utils::sql_entity_graph::metadata::SqlTranslatable for #name #ty_generics #where_clauses {
                 fn argument_sql() -> Result<::pgx::utils::sql_entity_graph::metadata::SqlVariant, ::pgx::utils::sql_entity_graph::metadata::ArgumentError> {
                     Ok(::pgx::utils::sql_entity_graph::metadata::SqlVariant::Mapped(String::from(stringify!(#name))))
                 }

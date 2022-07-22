@@ -10,12 +10,13 @@ Use of this source code is governed by the MIT license that can be found in the 
 use pgx::*;
 
 #[pg_extern]
-fn example_generate_series(
-    start: i32,
-    end: i32,
-    step: default!(i32, 1),
-) -> impl std::iter::Iterator<Item = i32> {
-    (start..=end).step_by(step as usize)
+fn example_generate_series(start: i32, end: i32, step: default!(i32, 1)) -> TableIterator<(i32,)> {
+    TableIterator::new(
+        (start..=end)
+            .step_by(step as usize)
+            .map(|v| (v,))
+            .into_iter(),
+    )
 }
 
 #[pg_extern]
@@ -55,16 +56,16 @@ fn return_none_iterator(
 }
 
 #[pg_extern]
-fn return_some_setof_iterator() -> Option<TableIterator<i32>> {
-    Some(TableIterator::new(vec![1, 2, 3].into_iter()))
+fn return_some_setof_iterator() -> Option<SetOfIterator<i32>> {
+    Some(SetOfIterator::new(vec![1, 2, 3].into_iter()))
 }
 
 #[pg_extern]
-fn return_none_setof_iterator() -> Option<TableIterator<i32>> {
+fn return_none_setof_iterator() -> Option<SetOfIterator<i32>> {
     if true {
         None
     } else {
-        Some(TableIterator::new(vec![1, 2, 3].into_iter()))
+        Some(SetOfIterator::new(vec![1, 2, 3].into_iter()))
     }
 }
 

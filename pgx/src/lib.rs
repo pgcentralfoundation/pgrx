@@ -305,29 +305,6 @@ pub static DEFAULT_COMPOSITE_TYPE_COLLECTIONS: Lazy<std::collections::HashMap<Ty
     });
 use pgx_utils::sql_entity_graph::metadata::{FunctionMetadata, SqlTranslatable};
 
-pub fn print_some_mappings_please_and_thank_you() {
-    crate::log!(
-        "`my_goofy_function`: {:#?}",
-        tester_functions::my_goofy_function.entity(),
-    );
-    crate::log!(
-        "`my_other_goofy_function`: {:#?}",
-        tester_functions::my_other_goofy_function.entity(),
-    );
-    crate::log!(
-        "`my_variadic_goofy_function`: {:#?}",
-        tester_functions::my_variadic_goofy_function.entity(),
-    );
-    crate::log!(
-        "`my_goofy_set_returning_function`: {:#?}",
-        tester_functions::my_goofy_set_returning_function.entity(),
-    );
-    crate::log!(
-        "`my_goofy_table_function`: {:#?}",
-        tester_functions::my_goofy_table_function.entity(),
-    );
-}
-
 mod tester_functions {
     use crate::{SetOfIterator, TableIterator, VariadicArray};
 
@@ -410,11 +387,10 @@ pub struct TableIterator<T> {
 impl<T> TableIterator<T> {
     pub fn new<I>(iter: I) -> Self
     where
-        I: IntoIterator<Item = T>,
-        I::IntoIter: 'static,
+        I: Iterator<Item = T> + 'static,
     {
         Self {
-            iter: Box::new(iter.into_iter()),
+            iter: Box::new(iter),
         }
     }
 }
@@ -466,6 +442,20 @@ seq_macro::seq!(I in 0..=32 {
     )*
 });
 
+impl<T> SqlTranslatable for crate::pgbox::PgBox<T>
+where
+    T: 'static,
+{
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+        Ok(SqlVariant::Mapped(String::from("box")))
+    }
+    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
+        Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
+            "box",
+        ))))
+    }
+}
+
 impl SqlTranslatable for crate::datum::Numeric {
     fn argument_sql() -> Result<SqlVariant, ArgumentError> {
         Ok(SqlVariant::Mapped(String::from("NUMERIC")))
@@ -474,6 +464,50 @@ impl SqlTranslatable for crate::datum::Numeric {
         Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
             "NUMERIC",
         ))))
+    }
+}
+
+impl SqlTranslatable for crate::datum::Inet {
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+        Ok(SqlVariant::Mapped(String::from("inet")))
+    }
+    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
+        Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
+            "inet",
+        ))))
+    }
+}
+
+impl<T> SqlTranslatable for crate::datum::PgVarlena<T>
+where
+    T: SqlTranslatable + Copy,
+{
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+        match T::argument_sql() {
+            Ok(SqlVariant::Mapped(sql)) => Ok(SqlVariant::Mapped(format!("{sql}[]"))),
+            Ok(SqlVariant::Skip) => Err(ArgumentError::SkipInArray),
+            Ok(SqlVariant::Composite { .. }) => Ok(SqlVariant::Composite {
+                requires_array_brackets: true,
+            }),
+            err @ Err(_) => err,
+        }
+    }
+
+    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
+        match T::return_sql() {
+            Ok(ReturnVariant::Plain(SqlVariant::Mapped(sql))) => {
+                Ok(ReturnVariant::Plain(SqlVariant::Mapped(format!("{sql}[]"))))
+            }
+            Ok(ReturnVariant::Plain(SqlVariant::Composite {
+                requires_array_brackets: _,
+            })) => Ok(ReturnVariant::Plain(SqlVariant::Composite {
+                requires_array_brackets: true,
+            })),
+            Ok(ReturnVariant::Plain(SqlVariant::Skip)) => Err(ReturnVariantError::SkipInArray),
+            Ok(ReturnVariant::SetOf(_)) => Err(ReturnVariantError::SetOfInArray),
+            Ok(ReturnVariant::Table(_)) => Err(ReturnVariantError::TableInArray),
+            err @ Err(_) => err,
+        }
     }
 }
 

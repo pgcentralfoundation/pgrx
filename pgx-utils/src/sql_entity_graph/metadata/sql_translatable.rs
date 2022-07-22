@@ -284,6 +284,17 @@ impl SqlTranslatable for std::ffi::CStr {
     }
 }
 
+impl SqlTranslatable for &'static std::ffi::CStr {
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+        Ok(SqlVariant::Mapped(String::from("cstring")))
+    }
+    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
+        Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
+            "cstring",
+        ))))
+    }
+}
+
 impl SqlTranslatable for &'static cstr_core::CStr {
     fn argument_sql() -> Result<SqlVariant, ArgumentError> {
         Ok(SqlVariant::Mapped(String::from("cstring")))

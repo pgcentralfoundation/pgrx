@@ -31,15 +31,6 @@ impl<'a, T: FromDatum + serde::Serialize> serde::Serialize for Array<'a, T> {
     }
 }
 
-impl<'a, T: FromDatum + serde::Serialize> serde::Serialize for ArrayTypedIterator<'a, T> {
-    fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error>
-    where
-        S: Serializer,
-    {
-        serializer.collect_seq(self.array.iter())
-    }
-}
-
 impl<'a, T: FromDatum> Array<'a, T> {
     /// Create an [`Array`](crate::datum::Array) over an array of [`pg_sys::Datum`](pg_sys::Datum) values and a corresponding array
     /// of "is_null" indicators
@@ -251,6 +242,15 @@ impl<'a, T: FromDatum> Iterator for ArrayTypedIterator<'a, T> {
     }
 }
 
+impl<'a, T: FromDatum + serde::Serialize> serde::Serialize for ArrayTypedIterator<'a, T> {
+    fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error>
+    where
+        S: Serializer,
+    {
+        serializer.collect_seq(self.array.iter())
+    }
+}
+
 pub struct ArrayIterator<'a, T: 'a + FromDatum> {
     array: &'a Array<'a, T>,
     curr: usize,
@@ -341,6 +341,13 @@ impl<'a, T: FromDatum> Drop for Array<'a, T> {
         // NB:  we don't pfree(self.ptr) because we don't know if it's actually
         // safe to do that.  It'll be freed whenever Postgres deletes/resets its parent
         // MemoryContext
+    }
+}
+
+impl<'a, T: FromDatum> FromDatum for VariadicArray<'a, T> {
+    #[inline]
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<VariadicArray<'a, T>> {
+        Array::from_datum(datum, is_null).map(Self)
     }
 }
 
