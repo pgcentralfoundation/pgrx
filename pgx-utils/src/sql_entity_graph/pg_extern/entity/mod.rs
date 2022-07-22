@@ -30,6 +30,10 @@ use std::cmp::Ordering;
 /// The output of a [`PgExtern`](crate::sql_entity_graph::pg_extern::PgExtern) from `quote::ToTokens::to_tokens`.
 #[derive(Debug, Clone)]
 pub struct PgExternEntity {
+    pub name: &'static str,
+    pub unaliased_name: &'static str,
+    pub module_path: &'static str,
+    pub full_path: &'static str,
     pub metadata: crate::sql_entity_graph::metadata::FunctionMetadataEntity,
     pub fn_args: Vec<PgExternArgumentEntity>,
     pub fn_return: PgExternReturnEntity,
@@ -76,7 +80,7 @@ impl Into<SqlGraphEntity> for PgExternEntity {
 
 impl SqlGraphIdentifier for PgExternEntity {
     fn dot_identifier(&self) -> String {
-        format!("fn {}", self.metadata.function_name())
+        format!("fn {}", self.name)
     }
     fn rust_identifier(&self) -> String {
         self.metadata.path.to_string()
@@ -128,7 +132,7 @@ impl ToSql for PgExternEntity {
                 .schema
                 .map(|schema| format!("{}.", schema))
                 .unwrap_or_else(|| context.schema_prefix_for(&self_index)),
-            name = self.metadata.function_name(),
+            name = self.name,
             module_pathname = module_pathname,
             arguments = if !self.metadata.arguments.is_empty() {
                 let mut args = Vec::new();
@@ -278,8 +282,8 @@ impl ToSql for PgExternEntity {
                                 {requires}\
                                 {fn_sql}\
                             ",
-            name = self.metadata.function_name(),
-            module_path = self.metadata.module_path(),
+            name = self.name,
+            module_path = self.module_path,
             file = self.file,
             line = self.line,
             fn_sql = fn_sql,
@@ -333,12 +337,10 @@ impl ToSql for PgExternEntity {
                 optionals.push(String::from("\tMERGES"));
             };
 
-            let left_arg = self.metadata.arguments.get(0).ok_or_else(|| {
-                eyre!(
-                    "Did not find `left_arg` for operator `{}`.",
-                    self.metadata.function_name()
-                )
-            })?;
+            let left_arg =
+                self.metadata.arguments.get(0).ok_or_else(|| {
+                    eyre!("Did not find `left_arg` for operator `{}`.", self.name)
+                })?;
             let left_arg_graph_index = context
                 .graph
                 .neighbors_undirected(self_index)
@@ -373,12 +375,10 @@ impl ToSql for PgExternEntity {
                 Err(err) => return Err(err.into()),
             };
 
-            let right_arg = self.metadata.arguments.get(1).ok_or_else(|| {
-                eyre!(
-                    "Did not find `left_arg` for operator `{}`.",
-                    self.metadata.function_name()
-                )
-            })?;
+            let right_arg =
+                self.metadata.arguments.get(1).ok_or_else(|| {
+                    eyre!("Did not find `left_arg` for operator `{}`.", self.name)
+                })?;
             let right_arg_graph_index = context
                 .graph
                 .neighbors_undirected(self_index)
@@ -429,8 +429,8 @@ impl ToSql for PgExternEntity {
                                                     opname = op.opname.unwrap(),
                                                     file = self.file,
                                                     line = self.line,
-                                                    name = self.metadata.function_name(),
-                                                    module_path = self.metadata.module_path(),
+                                                    name = self.name,
+                                                    module_path = self.module_path,
                                                     left_name = left_arg.type_name,
                                                     right_name = right_arg.type_name,
                                                     schema_prefix_left = context.schema_prefix_for(&left_arg_graph_index),

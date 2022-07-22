@@ -7,19 +7,3 @@ pub struct FunctionMetadataEntity {
     pub retval: Option<FunctionMetadataTypeEntity>,
     pub path: &'static str,
 }
-
-impl FunctionMetadataEntity {
-    pub fn function_name(&self) -> &'static str {
-        self.path
-            .split("::")
-            .last()
-            .expect("Expected path to contain at least one item")
-    }
-    pub fn module_path(&self) -> &'static str {
-        if let Some(end) = self.path.rfind("::") {
-            &self.path[..end]
-        } else {
-            self.path
-        }
-    }
-}

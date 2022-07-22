@@ -663,9 +663,7 @@ pub fn find_positioning_ref_target<'a>(
                 }
             }
             for (other, other_index) in externs {
-                if *last_segment == other.metadata.function_name()
-                    && other.metadata.module_path().ends_with(&module_path)
-                {
+                if *last_segment == other.name && other.module_path.ends_with(&module_path) {
                     return Some(&other_index);
                 }
             }
@@ -979,7 +977,7 @@ fn connect_externs(
                 "Extern",
                 index,
                 &item.rust_identifier(),
-                item.metadata.module_path(),
+                item.module_path,
                 schemas,
             );
         }
@@ -1135,8 +1133,7 @@ fn connect_ords(
 
         for (extern_item, &extern_index) in externs {
             let fn_matches = |fn_name| {
-                item.module_path == extern_item.metadata.path
-                    && extern_item.metadata.function_name() == fn_name
+                item.module_path == extern_item.metadata.path && extern_item.name == fn_name
             };
             let cmp_fn_matches = fn_matches(item.cmp_fn_name());
             let lt_fn_matches = fn_matches(item.lt_fn_name());
@@ -1207,8 +1204,8 @@ fn connect_hashes(
 
         for (extern_item, &extern_index) in externs {
             let hash_fn_name = item.fn_name();
-            let hash_fn_matches = item.module_path == extern_item.metadata.module_path()
-                && extern_item.metadata.function_name() == hash_fn_name;
+            let hash_fn_matches =
+                item.module_path == extern_item.module_path && extern_item.name == hash_fn_name;
 
             if hash_fn_matches {
                 tracing::debug!(from = ?item.full_path, to = extern_item.metadata.path, "Adding Hash after Extern edge");
@@ -1530,7 +1527,7 @@ fn make_extern_connection(
     let mut found = false;
     for (extern_item, &extern_index) in externs {
         if full_path == extern_item.metadata.path {
-            tracing::debug!(from = ?rust_identifier, to = extern_item.metadata.module_path(), "Adding {kind} after Extern edge.", kind = kind);
+            tracing::debug!(from = ?rust_identifier, to = extern_item.module_path, "Adding {kind} after Extern edge.", kind = kind);
             graph.add_edge(extern_index, index, SqlGraphRelationship::RequiredBy);
             found = true;
             break;

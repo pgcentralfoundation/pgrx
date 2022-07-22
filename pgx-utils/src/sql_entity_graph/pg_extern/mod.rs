@@ -63,6 +63,16 @@ pub struct PgExtern {
 }
 
 impl PgExtern {
+    fn name(&self) -> String {
+        self.attrs
+            .iter()
+            .find_map(|a| match a {
+                Attribute::Name(name) => Some(name.value()),
+                _ => None,
+            })
+            .unwrap_or_else(|| self.func.sig.ident.to_string())
+    }
+
     fn schema(&self) -> Option<String> {
         self.attrs.iter().find_map(|a| match a {
             Attribute::Schema(name) => Some(name.value()),
@@ -232,6 +242,7 @@ impl PgExtern {
 impl ToTokens for PgExtern {
     fn to_tokens(&self, tokens: &mut TokenStream2) {
         let ident = &self.func.sig.ident;
+        let name = self.name();
         let unsafety = &self.func.sig.unsafety;
         let schema = self.schema();
         let schema_iter = schema.iter();
@@ -287,6 +298,10 @@ impl ToTokens for PgExtern {
                 type FunctionPointer = #unsafety fn(#( #input_types ),*) #return_type;
                 let metadata: FunctionPointer = #ident;
                 let submission = ::pgx::utils::sql_entity_graph::PgExternEntity {
+                    name: #name,
+                    unaliased_name: stringify!(#ident),
+                    module_path: core::module_path!(),
+                    full_path: concat!(core::module_path!(), "::", stringify!(#ident)),
                     metadata: pgx::utils::sql_entity_graph::metadata::FunctionMetadata::entity(&metadata),
                     fn_args: vec![#(#inputs),*],
                     fn_return: #returns,
