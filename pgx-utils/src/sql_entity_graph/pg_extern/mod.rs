@@ -34,6 +34,8 @@ use syn::{
 
 use self::returning::Returning;
 
+use super::UsedType;
+
 /// A parsed `#[pg_extern]` item.
 ///
 /// It should be used with [`syn::parse::Parse`] functions.
@@ -257,8 +259,9 @@ impl ToTokens for PgExtern {
         let input_types = self.func.sig.inputs.iter().filter_map(|v| match v {
             syn::FnArg::Receiver(_) => None,
             syn::FnArg::Typed(pat_ty) => {
-                let mut static_ty = pat_ty.ty.clone();
-                Some(staticize_lifetimes(&mut static_ty));
+                let static_ty = pat_ty.ty.clone();
+                let mut static_ty = UsedType::new(*static_ty).unwrap().resolved_ty;
+                staticize_lifetimes(&mut static_ty);
                 Some(static_ty)
             }
         });

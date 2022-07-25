@@ -45,6 +45,6 @@ fn returns_tuple_with_lifetime(
 }
 
 #[pg_extern]
-fn returns_iterator_with_lifetime<'a>(value: &'a str) -> TableIterator<&'a str> {
-    TableIterator::new(value.split_whitespace().into_iter())
+fn returns_iterator_with_lifetime<'a>(value: &'a str) -> SetOfIterator<&'a str> {
+    SetOfIterator::new(value.split_whitespace().into_iter())
 }

@@ -39,10 +39,7 @@ pub enum SqlVariant {
 
 impl Error for ArgumentError {}
 
-pub trait SqlTranslatable: 'static {
-    fn type_id() -> TypeId {
-        TypeId::of::<Self>()
-    }
+pub trait SqlTranslatable {
     fn type_name() -> &'static str {
         core::any::type_name::<Self>()
     }
@@ -104,8 +101,8 @@ where
     T: SqlTranslatable,
 {
     fn argument_sql() -> Result<SqlVariant, ArgumentError> {
-        match T::type_id() {
-            id if id == TypeId::of::<u8>() => Ok(SqlVariant::Mapped(format!("bytea"))),
+        match T::type_name() {
+            id if id == u8::type_name() => Ok(SqlVariant::Mapped(format!("bytea"))),
             _ => match T::argument_sql() {
                 Ok(SqlVariant::Mapped(val)) => Ok(SqlVariant::Mapped(format!("{val}[]"))),
                 Ok(SqlVariant::Composite {
@@ -119,8 +116,8 @@ where
         }
     }
     fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        match T::type_id() {
-            id if id == TypeId::of::<u8>() => {
+        match T::type_name() {
+            id if id == u8::type_name() => {
                 Ok(ReturnVariant::Plain(SqlVariant::Mapped(format!("bytea"))))
             }
             _ => match T::return_sql() {
@@ -174,7 +171,7 @@ impl SqlTranslatable for String {
     }
 }
 
-impl SqlTranslatable for &'static str {
+impl<'a> SqlTranslatable for &'a str {
     fn argument_sql() -> Result<SqlVariant, ArgumentError> {
         Ok(SqlVariant::Mapped(String::from("TEXT")))
     }
@@ -185,7 +182,7 @@ impl SqlTranslatable for &'static str {
     }
 }
 
-impl SqlTranslatable for &'static [u8] {
+impl<'a> SqlTranslatable for &'a [u8] {
     fn argument_sql() -> Result<SqlVariant, ArgumentError> {
         Ok(SqlVariant::Mapped(String::from("bytea")))
     }

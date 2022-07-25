@@ -83,17 +83,12 @@ fn returns_none() -> Option<i32> {
 }
 
 #[pg_extern]
-fn takes_void(_void: ()) {
-    // noop
-}
-
-#[pg_extern]
 fn returns_void() -> () {
     // noop
 }
 
 #[pg_extern]
-fn returns_tuple() -> TableIterator<(name!(id, i32), name!(title, String))> {
+fn returns_tuple() -> TableIterator<'static, (name!(id, i32), name!(title, String))> {
     TableIterator::new(vec![(42, "pgx".into())].into_iter())
 }
 

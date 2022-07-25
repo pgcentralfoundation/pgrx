@@ -6,7 +6,6 @@ use super::{
 };
 
 pub trait PhantomDataExt {
-    fn type_id(&self) -> TypeId;
     fn type_name(&self) -> &'static str;
     fn argument_sql(&self) -> Result<SqlVariant, ArgumentError>;
     fn return_sql(&self) -> Result<ReturnVariant, ReturnVariantError>;
@@ -17,11 +16,8 @@ pub trait PhantomDataExt {
 
 impl<T> PhantomDataExt for PhantomData<T>
 where
-    T: SqlTranslatable + 'static,
+    T: SqlTranslatable,
 {
-    fn type_id(&self) -> TypeId {
-        T::type_id()
-    }
     fn type_name(&self) -> &'static str {
         T::type_name()
     }
@@ -39,7 +35,6 @@ where
     }
     fn entity(&self) -> FunctionMetadataTypeEntity {
         FunctionMetadataTypeEntity {
-            type_id: self.type_id(),
             type_name: self.type_name(),
             argument_sql: self.argument_sql(),
             return_sql: self.return_sql(),

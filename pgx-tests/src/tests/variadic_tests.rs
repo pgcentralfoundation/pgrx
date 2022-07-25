@@ -12,7 +12,10 @@ mod test {
     use pgx::*;
 
     #[pg_extern]
-    fn func_with_variadic_array_args(_field: &str, values: VariadicArray<&str>) -> String {
+    fn func_with_variadic_array_args<'a>(
+        _field: &'a str,
+        values: VariadicArray<&'a str>,
+    ) -> String {
         values.get(0).unwrap().unwrap().to_string()
     }
 }

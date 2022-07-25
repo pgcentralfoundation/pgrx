@@ -1,9 +1,7 @@
 /*
 Portions Copyright 2019-2021 ZomboDB, LLC.
 Portions Copyright 2021-2022 Technology Concepts & Design, Inc. <support@tcdi.com>
-
 All rights reserved.
-
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
@@ -39,13 +37,8 @@ fn split(input: &'static str, pattern: &str) -> Vec<&'static str> {
 }
 
 #[pg_extern]
-fn split_set(input: &'static str, pattern: &'static str) -> pgx::SetOfIterator<&'static str> {
-    pgx::SetOfIterator::new(input.split_terminator(pattern).into_iter().map(|v| v))
-}
-
-#[pg_extern]
-fn mappings() {
-    pgx::print_some_mappings_please_and_thank_you()
+fn split_set<'a>(input: &'a str, pattern: &'a str) -> TableIterator<'a, (&'a str,)> {
+    TableIterator::new(input.split_terminator(pattern).map(|v| (v,)).into_iter())
 }
 
 #[cfg(any(test, feature = "pg_test"))]

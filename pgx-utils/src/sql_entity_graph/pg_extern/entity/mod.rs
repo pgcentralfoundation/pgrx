@@ -19,7 +19,7 @@ use crate::{
         metadata::SqlVariant,
         pgx_sql::PgxSql,
         to_sql::{entity::ToSqlConfigEntity, ToSql},
-        SqlGraphEntity, SqlGraphIdentifier,
+        SqlDeclared, SqlGraphEntity, SqlGraphIdentifier,
     },
     ExternArgs,
 };
@@ -106,9 +106,11 @@ impl ToSql for PgExternEntity {
         let mut extern_attrs = self.extern_attrs.clone();
         // if we already have a STRICT marker we do not need to add it
         let mut strict_upgrade = !extern_attrs.iter().any(|i| i == &ExternArgs::Strict);
-        if strict_upgrade {
-            for arg in &self.metadata.arguments {
-                if arg.optional || arg.type_id == context.internal_type {
+        if !strict_upgrade {
+            // It may be possible to infer a `STRICT` marker though.
+            // But we can only do that if the user hasn't used `Option<T>` or `pgx::Internal`
+            for arg in &self.fn_args {
+                if arg.used_ty.optional || arg.used_ty.ty_id == context.internal_type {
                     strict_upgrade = false;
                 }
             }
@@ -134,127 +136,197 @@ impl ToSql for PgExternEntity {
                 .unwrap_or_else(|| context.schema_prefix_for(&self_index)),
             name = self.name,
             module_pathname = module_pathname,
-            arguments = if !self.metadata.arguments.is_empty() {
+            arguments = if !self.fn_args.is_empty() {
                 let mut args = Vec::new();
-                for (idx, arg) in self.metadata.arguments.iter().enumerate() {
-                    let arg_pattern = self.fn_args[idx].pattern;
-                    let arg_default = self.fn_args[idx].used_ty.default;
+                for (idx, arg) in self.fn_args.iter().enumerate() {
                     let graph_index = context
                         .graph
                         .neighbors_undirected(self_index)
                         .find(|neighbor| match &context.graph[*neighbor] {
-                            SqlGraphEntity::Type(ty) => ty.id_matches(&arg.type_id),
-                            SqlGraphEntity::Enum(en) => en.id_matches(&arg.type_id),
-                            SqlGraphEntity::BuiltinType(defined) => defined == &arg.type_name,
+                            SqlGraphEntity::Type(ty) => ty.id_matches(&arg.used_ty.ty_id),
+                            SqlGraphEntity::Enum(en) => en.id_matches(&arg.used_ty.ty_id),
+                            SqlGraphEntity::BuiltinType(defined) => {
+                                defined == arg.used_ty.full_path
+                            }
                             _ => false,
                         })
                         .ok_or_else(|| eyre!("Could not find arg type in graph. Got: {:?}", arg))?;
-                    let needs_comma = idx < (self.metadata.arguments.len() - 1);
-                    match arg.argument_sql {
-                        Ok(SqlVariant::Mapped(ref argument_sql)) => {
-                            let buf = format!("\
-                                                \t\"{pattern}\" {variadic}{schema_prefix}{sql_type}{default}{maybe_comma}/* {type_name} */\
-                                            ",
-                                                pattern = arg_pattern,
-                                                schema_prefix = context.schema_prefix_for(&graph_index),
-                                                // First try to match on [`TypeId`] since it's most reliable.
-                                                sql_type = argument_sql,
-                                                default = if let Some(def) = arg_default { format!(" DEFAULT {}", def) } else { String::from("") },
-                                                variadic = if arg.variadic { "VARIADIC " } else { "" },
-                                                maybe_comma = if needs_comma { ", " } else { " " },
-                                                type_name = arg.type_name,
-                                        );
-                            args.push(buf);
-                        }
-                        Ok(SqlVariant::Composite {
-                            requires_array_brackets,
-                        }) => {
-                            let sql = self.fn_args[idx]
-                                .used_ty
-                                .composite_type
-                                .map(|v| {
-                                    if requires_array_brackets {
-                                        format!("{v}[]")
-                                    } else {
-                                        format!("{v}")
-                                    }
-                                })
-                                .ok_or_else(|| {
-                                    eyre!(
-                                    "Macro expansion time suggested a composite_type!() in return"
-                                )
-                                })?;
-                            let buf = format!("\
-                                \t\"{pattern}\" {variadic}{schema_prefix}{sql_type}{default}{maybe_comma}/* {type_name} */\
-                            ",
-                                pattern = arg_pattern,
-                                schema_prefix = context.schema_prefix_for(&graph_index),
-                                // First try to match on [`TypeId`] since it's most reliable.
-                                sql_type = sql,
-                                default = if let Some(def) = arg_default { format!(" DEFAULT {}", def) } else { String::from("") },
-                                variadic = if arg.variadic { "VARIADIC " } else { "" },
-                                maybe_comma = if needs_comma { ", " } else { " " },
-                                type_name = arg.type_name,
-                        );
-                            args.push(buf);
-                        }
-                        Ok(SqlVariant::Skip) => (),
-                        Err(err) => return Err(err).wrap_err("While mapping argument"),
-                    }
+                    let needs_comma = idx < (self.fn_args.len() - 1);
+                    let buf = format!("\
+                                            \t\"{pattern}\" {variadic}{schema_prefix}{sql_type}{default}{maybe_comma}/* {full_path} */\
+                                        ",
+                                            pattern = arg.pattern,
+                                            schema_prefix = context.schema_prefix_for(&graph_index),
+                                            // First try to match on [`TypeId`] since it's most reliable.
+                                            sql_type = if let Some(composite_type) = arg.used_ty.composite_type {
+                                                composite_type.to_string()
+                                                    + if context
+                                                        .composite_type_requires_square_brackets(&arg.used_ty.ty_id)
+                                                        .wrap_err_with(|| format!("Attempted on `{}`", arg.used_ty.ty_source))?
+                                                    {
+                                                        "[]"
+                                                    } else {
+                                                        ""
+                                                    }
+                                            } else {
+                                                context.source_only_to_sql_type(arg.used_ty.ty_source).or_else(|| {
+                                                                    context.type_id_to_sql_type(arg.used_ty.ty_id)
+                                                                }).or_else(|| {
+                                                                    let pat = arg.used_ty.full_path.to_string();
+                                                                    if let Some(found) = context.has_sql_declared_entity(&SqlDeclared::Type(pat.clone())) {
+                                                                        Some(found.sql())
+                                                                    }  else if let Some(found) = context.has_sql_declared_entity(&SqlDeclared::Enum(pat.clone())) {
+                                                                        Some(found.sql())
+                                                                    } else {
+                                                                        None
+                                                                    }
+                                                                }).ok_or_else(|| eyre!("Failed to map arg type `{}` to SQL type while building function `{}`.", arg.used_ty.full_path, self.full_path))?
+                                            },
+                                            default = if let Some(def) = arg.used_ty.default { format!(" DEFAULT {}", def) } else { String::from("") },
+                                            variadic = if arg.used_ty.variadic { "VARIADIC " } else { "" },
+                                            maybe_comma = if needs_comma { ", " } else { " " },
+                                            full_path = arg.used_ty.full_path,
+                                    );
+                    args.push(buf);
                 }
                 String::from("\n") + &args.join("\n") + "\n"
             } else {
                 Default::default()
             },
-            returns = match self.metadata.retval {
-                None => String::from("RETURNS void"),
-                Some(ref retval) => {
+            returns = match &self.fn_return {
+                PgExternReturnEntity::None => String::from("RETURNS void"),
+                PgExternReturnEntity::Type { ty } => {
                     let graph_index = context
                         .graph
                         .neighbors_undirected(self_index)
                         .find(|neighbor| match &context.graph[*neighbor] {
-                            SqlGraphEntity::Type(ty) => ty.id_matches(&retval.type_id),
-                            SqlGraphEntity::Enum(en) => en.id_matches(&retval.type_id),
-                            SqlGraphEntity::BuiltinType(defined) => &*defined == retval.type_name,
+                            SqlGraphEntity::Type(neighbor_ty) => neighbor_ty.id_matches(&ty.ty_id),
+                            SqlGraphEntity::Enum(neighbor_en) => neighbor_en.id_matches(&ty.ty_id),
+                            SqlGraphEntity::BuiltinType(defined) => &*defined == ty.full_path,
                             _ => false,
                         })
                         .ok_or_else(|| eyre!("Could not find return type in graph."))?;
-                    use crate::sql_entity_graph::metadata::{ReturnVariant, SqlVariant};
-
-                    let (variant_prefix, sql_type) = match retval.return_sql {
-                        Ok(ReturnVariant::Plain(ref variant)) => ("", match variant {
-                            SqlVariant::Mapped(ref sql) => sql.clone(),
-                            SqlVariant::Composite { requires_array_brackets } => match &self.fn_return {
-                                PgExternReturnEntity::None => return Err(eyre!("Macro expansion time suggested no return value, but at runtime a return value was determined")),
-                                PgExternReturnEntity::Type { ty } => ty.composite_type.map(|v| if *requires_array_brackets { format!("{v}[]") } else { format!("{v}") }).ok_or_else(|| eyre!("Macro expansion time suggested a composite_type!() in return"))?,
-                                PgExternReturnEntity::SetOf { .. } => return Err(eyre!("Macro expansion time suggested a SetOfIterator return value, but at runtime a plain return value was determined")),
-                                PgExternReturnEntity::Iterated(_) => return Err(eyre!("Macro expansion time suggested a TableIterator return value, but at runtime a plain return value was determined")),
-                                PgExternReturnEntity::Trigger => return Err(eyre!("Macro expansion time suggested a Trigger return value, but at runtime a plain return value was determined")),
-                            },
-                            SqlVariant::Skip => return Err(eyre!("At runtime a skipped return value was determined, this is not valid")),
-                        }),
-                        Ok(ReturnVariant::SetOf(ref variant)) => ("SETOF ", match variant {
-                            SqlVariant::Mapped(ref sql) => sql.clone(),
-                            SqlVariant::Composite { requires_array_brackets } => match &self.fn_return {
-                                PgExternReturnEntity::None => return Err(eyre!("Macro expansion time suggested no return value, but at runtime a return value was determined")),
-                                PgExternReturnEntity::Type { .. } => return Err(eyre!("Macro expansion time suggested a plain return value, but at runtime a SetOf return value was determined")),
-                                PgExternReturnEntity::SetOf { ty } => ty.composite_type.map(|v| if *requires_array_brackets { format!("{v}[]") } else { format!("{v}") }).ok_or_else(|| eyre!("Macro expansion time suggested a composite_type!() in return"))?,
-                                PgExternReturnEntity::Iterated(_) => return Err(eyre!("Macro expansion time suggested a TableIterator return value, but at runtime a SetOf return value was determined")),
-                                PgExternReturnEntity::Trigger => return Err(eyre!("Macro expansion time suggested a Trigger return value, but at runtime a SetOf return value was determined")),
-                            },
-                            SqlVariant::Skip => todo!(),
-                        }),
-                        Ok(ReturnVariant::Table(ref vec_of_variant)) => ("TABLE ", "TODO".into()),
-                        Err(err) => return Err(err).wrap_err("Mapping return type"),
-                    };
                     format!(
-                        "RETURNS {variant_prefix}{schema_prefix}{sql_type} /* {type_name} */",
-                        variant_prefix = variant_prefix,
-                        sql_type = sql_type,
+                        "RETURNS {schema_prefix}{sql_type} /* {full_path} */",
+                        sql_type = if let Some(composite_type) = ty.composite_type {
+                            composite_type.to_string()
+                                + if context
+                                    .composite_type_requires_square_brackets(&ty.ty_id)
+                                    .wrap_err_with(|| format!("Attempted on `{}`", ty.ty_source))?
+                                {
+                                    "[]"
+                                } else {
+                                    ""
+                                }
+                        } else {
+                            context.source_only_to_sql_type(ty.ty_source).or_else(|| {
+                                                context.type_id_to_sql_type(ty.ty_id)
+                                            }).or_else(|| {
+                                                let pat = ty.full_path.to_string();
+                                                if let Some(found) = context.has_sql_declared_entity(&SqlDeclared::Type(pat.clone())) {
+                                                    Some(found.sql())
+                                                }  else if let Some(found) = context.has_sql_declared_entity(&SqlDeclared::Enum(pat.clone())) {
+                                                    Some(found.sql())
+                                                } else {
+                                                    None
+                                                }
+                                            }).ok_or_else(|| eyre!("Failed to map return type `{}` to SQL type while building function `{}`.", ty.full_path, self.full_path))?
+                        },
                         schema_prefix = context.schema_prefix_for(&graph_index),
-                        type_name = retval.type_name
+                        full_path = ty.full_path
                     )
                 }
+                PgExternReturnEntity::SetOf { ty } => {
+                    let graph_index = context
+                        .graph
+                        .neighbors_undirected(self_index)
+                        .find(|neighbor| match &context.graph[*neighbor] {
+                            SqlGraphEntity::Type(neighbor_ty) => neighbor_ty.id_matches(&ty.ty_id),
+                            SqlGraphEntity::Enum(neighbor_en) => neighbor_en.id_matches(&ty.ty_id),
+                            SqlGraphEntity::BuiltinType(defined) => defined == ty.full_path,
+                            _ => false,
+                        })
+                        .ok_or_else(|| eyre!("Could not find return type in graph."))?;
+                    format!(
+                        "RETURNS SETOF {schema_prefix}{sql_type} /* {full_path} */",
+                        sql_type = if let Some(composite_type) = ty.composite_type {
+                            composite_type.to_string()
+                                + if context
+                                    .composite_type_requires_square_brackets(&ty.ty_id)
+                                    .wrap_err_with(|| format!("Attempted on `{}`", ty.ty_source))?
+                                {
+                                    "[]"
+                                } else {
+                                    ""
+                                }
+                        } else {
+                            context.source_only_to_sql_type(ty.ty_source).or_else(|| {
+                                                    context.type_id_to_sql_type(ty.ty_id)
+                                                }).or_else(|| {
+                                                    let pat = ty.full_path.to_string();
+                                                    if let Some(found) = context.has_sql_declared_entity(&SqlDeclared::Type(pat.clone())) {
+                                                        Some(found.sql())
+                                                    }  else if let Some(found) = context.has_sql_declared_entity(&SqlDeclared::Enum(pat.clone())) {
+                                                        Some(found.sql())
+                                                    } else {
+                                                        None
+                                                    }
+                                                }).ok_or_else(|| eyre!("Failed to map return type `{}` to SQL type while building function `{}`.", ty.full_path, self.full_path))?
+                        },
+                        schema_prefix = context.schema_prefix_for(&graph_index),
+                        full_path = ty.full_path
+                    )
+                }
+                PgExternReturnEntity::Iterated(table_items) => {
+                    let mut items = String::new();
+                    for (idx, returning::PgExternReturnEntityIteratedItem { ty, name: col_name }) in
+                        table_items.iter().enumerate()
+                    {
+                        let graph_index =
+                            context
+                                .graph
+                                .neighbors_undirected(self_index)
+                                .find(|neighbor| match &context.graph[*neighbor] {
+                                    SqlGraphEntity::Type(neightbor_ty) => {
+                                        neightbor_ty.id_matches(&ty.ty_id)
+                                    }
+                                    SqlGraphEntity::Enum(neightbor_en) => {
+                                        neightbor_en.id_matches(&ty.ty_id)
+                                    }
+                                    SqlGraphEntity::BuiltinType(defined) => defined == ty.ty_source,
+                                    _ => false,
+                                });
+                        let needs_comma = idx < (table_items.len() - 1);
+                        let item = format!(
+                                "\n\t{col_name} {schema_prefix}{ty_resolved}{needs_comma} /* {ty_name} */",
+                                col_name = col_name.expect("An iterator of tuples should have `named!()` macro declarations."),
+                                schema_prefix = if let Some(graph_index) = graph_index {
+                                    context.schema_prefix_for(&graph_index)
+                                } else { "".into() },
+                                ty_resolved = if let Some(composite_type) = ty.composite_type {
+                                    composite_type.to_string() + if context.composite_type_requires_square_brackets(&ty.ty_id).wrap_err_with(|| format!("Attempted on `{}`", ty.ty_source))? { "[]" } else { "" }
+                                } else {
+                                    context.source_only_to_sql_type(ty.ty_source).or_else(|| {
+                                        context.type_id_to_sql_type(ty.ty_id)
+                                    }).or_else(|| {
+                                        let pat = ty.ty_source.to_string();
+                                        if let Some(found) = context.has_sql_declared_entity(&SqlDeclared::Type(pat.clone())) {
+                                            Some(found.sql())
+                                        }  else if let Some(found) = context.has_sql_declared_entity(&SqlDeclared::Enum(pat.clone())) {
+                                            Some(found.sql())
+                                        } else {
+                                            None
+                                        }
+                                    }).ok_or_else(|| eyre!("Failed to map return type `{}` to SQL type while building function `{}`.", ty.full_path, self.name))?
+                                },
+                                needs_comma = if needs_comma { ", " } else { " " },
+                                ty_name = ty.full_path
+                        );
+                        items.push_str(&item);
+                    }
+                    format!("RETURNS TABLE ({}\n)", items)
+                }
+                PgExternReturnEntity::Trigger => String::from("RETURNS trigger"),
             },
             search_path = if let Some(search_path) = &self.search_path {
                 let retval = format!("SET search_path TO {}", search_path.join(", "));
@@ -341,12 +413,16 @@ impl ToSql for PgExternEntity {
                 self.metadata.arguments.get(0).ok_or_else(|| {
                     eyre!("Did not find `left_arg` for operator `{}`.", self.name)
                 })?;
+            let left_fn_arg = self
+                .fn_args
+                .get(0)
+                .ok_or_else(|| eyre!("Did not find `left_arg` for operator `{}`.", self.name))?;
             let left_arg_graph_index = context
                 .graph
                 .neighbors_undirected(self_index)
                 .find(|neighbor| match &context.graph[*neighbor] {
-                    SqlGraphEntity::Type(ty) => ty.id_matches(&left_arg.type_id),
-                    SqlGraphEntity::Enum(en) => en.id_matches(&left_arg.type_id),
+                    SqlGraphEntity::Type(ty) => ty.id_matches(&left_fn_arg.used_ty.ty_id),
+                    SqlGraphEntity::Enum(en) => en.id_matches(&left_fn_arg.used_ty.ty_id),
                     SqlGraphEntity::BuiltinType(defined) => defined == &left_arg.type_name,
                     _ => false,
                 })
@@ -379,12 +455,16 @@ impl ToSql for PgExternEntity {
                 self.metadata.arguments.get(1).ok_or_else(|| {
                     eyre!("Did not find `left_arg` for operator `{}`.", self.name)
                 })?;
+            let right_fn_arg = self
+                .fn_args
+                .get(1)
+                .ok_or_else(|| eyre!("Did not find `left_arg` for operator `{}`.", self.name))?;
             let right_arg_graph_index = context
                 .graph
                 .neighbors_undirected(self_index)
                 .find(|neighbor| match &context.graph[*neighbor] {
-                    SqlGraphEntity::Type(ty) => ty.id_matches(&right_arg.type_id),
-                    SqlGraphEntity::Enum(en) => en.id_matches(&right_arg.type_id),
+                    SqlGraphEntity::Type(ty) => ty.id_matches(&right_fn_arg.used_ty.ty_id),
+                    SqlGraphEntity::Enum(en) => en.id_matches(&right_fn_arg.used_ty.ty_id),
                     SqlGraphEntity::BuiltinType(defined) => defined == &right_arg.type_name,
                     _ => false,
                 })

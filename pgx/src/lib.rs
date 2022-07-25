@@ -305,15 +305,14 @@ pub static DEFAULT_COMPOSITE_TYPE_COLLECTIONS: Lazy<std::collections::HashMap<Ty
     });
 use pgx_utils::sql_entity_graph::metadata::SqlTranslatable;
 
-pub struct SetOfIterator<T> {
-    iter: Box<dyn Iterator<Item = T>>,
+pub struct SetOfIterator<'a, T> {
+    iter: Box<dyn Iterator<Item = T> + 'a>,
 }
 
-impl<T> SetOfIterator<T> {
+impl<'a, T> SetOfIterator<'a, T> {
     pub fn new<I>(iter: I) -> Self
     where
-        I: IntoIterator<Item = T>,
-        I::IntoIter: 'static,
+        I: IntoIterator<Item = T> + 'a,
     {
         Self {
             iter: Box::new(iter.into_iter()),
@@ -321,7 +320,7 @@ impl<T> SetOfIterator<T> {
     }
 }
 
-impl<T> Iterator for SetOfIterator<T> {
+impl<'a, T> Iterator for SetOfIterator<'a, T> {
     type Item = T;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -329,7 +328,7 @@ impl<T> Iterator for SetOfIterator<T> {
     }
 }
 
-impl<T> IntoDatum for SetOfIterator<T> {
+impl<'a, T> IntoDatum for SetOfIterator<'a, T> {
     fn into_datum(self) -> Option<pg_sys::Datum> {
         todo!()
     }
@@ -339,7 +338,7 @@ impl<T> IntoDatum for SetOfIterator<T> {
     }
 }
 
-impl<T> SqlTranslatable for SetOfIterator<T>
+impl<'a, T> SqlTranslatable for SetOfIterator<'a, T>
 where
     T: SqlTranslatable,
 {
@@ -356,14 +355,14 @@ where
     }
 }
 
-pub struct TableIterator<T> {
-    iter: Box<dyn Iterator<Item = T>>,
+pub struct TableIterator<'a, T> {
+    iter: Box<dyn Iterator<Item = T> + 'a>,
 }
 
-impl<T> TableIterator<T> {
+impl<'a, T> TableIterator<'a, T> {
     pub fn new<I>(iter: I) -> Self
     where
-        I: Iterator<Item = T> + 'static,
+        I: Iterator<Item = T> + 'a,
     {
         Self {
             iter: Box::new(iter),
@@ -371,7 +370,7 @@ impl<T> TableIterator<T> {
     }
 }
 
-impl<'a, T> Iterator for TableIterator<T> {
+impl<'a, T> Iterator for TableIterator<'a, T> {
     type Item = T;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -379,7 +378,7 @@ impl<'a, T> Iterator for TableIterator<T> {
     }
 }
 
-impl<'a, T> IntoDatum for TableIterator<T> {
+impl<'a, T> IntoDatum for TableIterator<'a, T> {
     fn into_datum(self) -> Option<pg_sys::Datum> {
         todo!()
     }
@@ -392,7 +391,7 @@ impl<'a, T> IntoDatum for TableIterator<T> {
 seq_macro::seq!(I in 0..=32 {
     #(
         seq_macro::seq!(N in 0..=I {
-            impl<#(Input~N,)*> SqlTranslatable for TableIterator<(#(Input~N,)*)>
+            impl<'a, #(Input~N,)*> SqlTranslatable for TableIterator<'a, (#(Input~N,)*)>
             where
                 #(
                     Input~N: SqlTranslatable + 'static,
@@ -450,6 +449,39 @@ impl SqlTranslatable for crate::datum::Inet {
     fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
         Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
             "inet",
+        ))))
+    }
+}
+
+impl SqlTranslatable for crate::datum::Json {
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+        Ok(SqlVariant::Mapped(String::from("json")))
+    }
+    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
+        Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
+            "json",
+        ))))
+    }
+}
+
+impl SqlTranslatable for crate::datum::JsonB {
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+        Ok(SqlVariant::Mapped(String::from("jsonb")))
+    }
+    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
+        Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
+            "jsonb",
+        ))))
+    }
+}
+
+impl SqlTranslatable for crate::datum::AnyArray {
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+        Ok(SqlVariant::Mapped(String::from("anyarray")))
+    }
+    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
+        Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
+            "anyarray",
         ))))
     }
 }
@@ -636,7 +668,7 @@ where
     }
 }
 
-impl<T> SqlTranslatable for VariadicArray<'static, T>
+impl<'a, T> SqlTranslatable for VariadicArray<'a, T>
 where
     T: SqlTranslatable + FromDatum,
 {
