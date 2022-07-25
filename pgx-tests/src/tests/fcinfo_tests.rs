@@ -83,7 +83,7 @@ fn returns_none() -> Option<i32> {
 }
 
 #[pg_extern]
-fn returns_void() -> () {
+fn returns_void() {
     // noop
 }
 

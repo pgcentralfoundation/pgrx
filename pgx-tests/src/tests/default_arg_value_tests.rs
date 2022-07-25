@@ -20,7 +20,7 @@ fn default_argument(a: default!(i32, 99)) -> i32 {
 }
 
 #[pg_extern]
-fn option_default_argument<'a>(a: default!(Option<&'a str>, "NULL")) -> &'a str {
+fn option_default_argument(a: default!(Option<&str>, "NULL")) -> &str {
     match a {
         Some(a) => a,
         None => "got default of null",

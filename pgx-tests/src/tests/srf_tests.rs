@@ -14,13 +14,8 @@ fn example_generate_series(
     start: i32,
     end: i32,
     step: default!(i32, 1),
-) -> TableIterator<'static, (i32,)> {
-    TableIterator::new(
-        (start..=end)
-            .step_by(step as usize)
-            .map(|v| (v,))
-            .into_iter(),
-    )
+) -> SetOfIterator<'static, i32> {
+    SetOfIterator::new((start..=end).step_by(step as usize).into_iter())
 }
 
 #[pg_extern]
