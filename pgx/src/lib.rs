@@ -417,10 +417,18 @@ seq_macro::seq!(I in 0..=32 {
     )*
 });
 
-impl<T> SqlTranslatable for crate::pgbox::PgBox<T>
-where
-    T: 'static,
-{
+impl<T> SqlTranslatable for crate::pgbox::PgBox<T, AllocatedByPostgres> {
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+        Ok(SqlVariant::Mapped(String::from("box")))
+    }
+    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
+        Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
+            "box",
+        ))))
+    }
+}
+
+impl<T> SqlTranslatable for crate::pgbox::PgBox<T, AllocatedByRust> {
     fn argument_sql() -> Result<SqlVariant, ArgumentError> {
         Ok(SqlVariant::Mapped(String::from("box")))
     }
