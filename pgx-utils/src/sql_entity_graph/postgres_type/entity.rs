@@ -118,13 +118,13 @@ impl ToSql for PostgresTypeEntity {
         let (_, _index) = context
             .externs
             .iter()
-            .find(|(k, _v)| (**k).metadata.path == in_fn_path.as_str())
+            .find(|(k, _v)| (**k).full_path == in_fn_path.as_str())
             .ok_or_else(|| eyre::eyre!("Did not find `in_fn: {}`.", in_fn_path))?;
         let (in_fn_graph_index, in_fn) = context
             .graph
             .neighbors_undirected(self_index)
             .find_map(|neighbor| match &context.graph[neighbor] {
-                SqlGraphEntity::Function(func) if func.metadata.path == in_fn_path => {
+                SqlGraphEntity::Function(func) if func.full_path == in_fn_path => {
                     Some((neighbor, func))
                 }
                 _ => None,
@@ -152,13 +152,13 @@ impl ToSql for PostgresTypeEntity {
         let (_, _index) = context
             .externs
             .iter()
-            .find(|(k, _v)| (**k).metadata.path == out_fn_path.as_str())
+            .find(|(k, _v)| (**k).full_path == out_fn_path.as_str())
             .ok_or_else(|| eyre::eyre!("Did not find `out_fn: {}`.", out_fn_path))?;
         let (out_fn_graph_index, out_fn) = context
             .graph
             .neighbors_undirected(self_index)
             .find_map(|neighbor| match &context.graph[neighbor] {
-                SqlGraphEntity::Function(func) if func.metadata.path == out_fn_path => {
+                SqlGraphEntity::Function(func) if func.full_path == out_fn_path => {
                     Some((neighbor, func))
                 }
                 _ => None,

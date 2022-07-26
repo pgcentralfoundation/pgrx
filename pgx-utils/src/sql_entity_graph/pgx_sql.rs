@@ -1229,9 +1229,8 @@ fn connect_ords(
         );
 
         for (extern_item, &extern_index) in externs {
-            let fn_matches = |fn_name| {
-                item.module_path == extern_item.metadata.path && extern_item.name == fn_name
-            };
+            let fn_matches =
+                |fn_name| item.module_path == extern_item.full_path && extern_item.name == fn_name;
             let cmp_fn_matches = fn_matches(item.cmp_fn_name());
             let lt_fn_matches = fn_matches(item.lt_fn_name());
             let lte_fn_matches = fn_matches(item.le_fn_name());
@@ -1245,7 +1244,7 @@ fn connect_ords(
                 || gt_fn_matches
                 || gte_fn_matches
             {
-                tracing::debug!(from = ?item.full_path, to = extern_item.metadata.path, "Adding Ord after Extern edge");
+                tracing::debug!(from = ?item.full_path, to = extern_item.full_path, "Adding Ord after Extern edge");
                 graph.add_edge(extern_index, index, SqlGraphRelationship::RequiredBy);
             }
         }
@@ -1305,7 +1304,7 @@ fn connect_hashes(
                 item.module_path == extern_item.module_path && extern_item.name == hash_fn_name;
 
             if hash_fn_matches {
-                tracing::debug!(from = ?item.full_path, to = extern_item.metadata.path, "Adding Hash after Extern edge");
+                tracing::debug!(from = ?item.full_path, to = extern_item.full_path, "Adding Hash after Extern edge");
                 graph.add_edge(extern_index, index, SqlGraphRelationship::RequiredBy);
                 break;
             }
@@ -1623,8 +1622,8 @@ fn make_extern_connection(
 ) -> bool {
     let mut found = false;
     for (extern_item, &extern_index) in externs {
-        if full_path == extern_item.metadata.path {
-            tracing::debug!(from = ?rust_identifier, to = extern_item.module_path, "Adding {kind} after Extern edge.", kind = kind);
+        if full_path == extern_item.full_path {
+            tracing::debug!(from = ?rust_identifier, to = extern_item.full_path, "Adding {kind} after Extern edge.", kind = kind);
             graph.add_edge(extern_index, index, SqlGraphRelationship::RequiredBy);
             found = true;
             break;

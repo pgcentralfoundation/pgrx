@@ -226,10 +226,7 @@ impl ToSql for PgExternEntity {
                     let metadata_retval_sql = match metadata_retval.return_sql {
                         Ok(ReturnVariant::Plain(SqlVariant::Mapped(ref sql))) => sql.clone(),
                         Ok(ReturnVariant::Plain(SqlVariant::Composite { requires_array_brackets })) => ty.composite_type.unwrap().to_string()
-                        + if context
-                            .composite_type_requires_square_brackets(&ty.ty_id)
-                            .wrap_err_with(|| format!("Attempted on `{}`", ty.ty_source))?
-                        {
+                        + if requires_array_brackets {
                             "[]"
                         } else {
                             ""
