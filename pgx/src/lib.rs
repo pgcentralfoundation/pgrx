@@ -417,25 +417,21 @@ seq_macro::seq!(I in 0..=32 {
     )*
 });
 
-impl<T> SqlTranslatable for crate::pgbox::PgBox<T, AllocatedByPostgres> {
+impl<T: SqlTranslatable> SqlTranslatable for crate::pgbox::PgBox<T, AllocatedByPostgres> {
     fn argument_sql() -> Result<SqlVariant, ArgumentError> {
-        Ok(SqlVariant::Mapped(String::from("box")))
+        T::argument_sql()
     }
     fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
-            "box",
-        ))))
+        T::return_sql()
     }
 }
 
-impl<T> SqlTranslatable for crate::pgbox::PgBox<T, AllocatedByRust> {
+impl<T: SqlTranslatable> SqlTranslatable for crate::pgbox::PgBox<T, AllocatedByRust> {
     fn argument_sql() -> Result<SqlVariant, ArgumentError> {
-        Ok(SqlVariant::Mapped(String::from("box")))
+        T::argument_sql()
     }
     fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
-            "box",
-        ))))
+        T::return_sql()
     }
 }
 
@@ -569,31 +565,11 @@ where
     T: SqlTranslatable + Copy,
 {
     fn argument_sql() -> Result<SqlVariant, ArgumentError> {
-        match T::argument_sql() {
-            Ok(SqlVariant::Mapped(sql)) => Ok(SqlVariant::Mapped(format!("{sql}[]"))),
-            Ok(SqlVariant::Skip) => Err(ArgumentError::SkipInArray),
-            Ok(SqlVariant::Composite { .. }) => Ok(SqlVariant::Composite {
-                requires_array_brackets: true,
-            }),
-            err @ Err(_) => err,
-        }
+        T::argument_sql()
     }
 
     fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        match T::return_sql() {
-            Ok(ReturnVariant::Plain(SqlVariant::Mapped(sql))) => {
-                Ok(ReturnVariant::Plain(SqlVariant::Mapped(format!("{sql}[]"))))
-            }
-            Ok(ReturnVariant::Plain(SqlVariant::Composite {
-                requires_array_brackets: _,
-            })) => Ok(ReturnVariant::Plain(SqlVariant::Composite {
-                requires_array_brackets: true,
-            })),
-            Ok(ReturnVariant::Plain(SqlVariant::Skip)) => Err(ReturnVariantError::SkipInArray),
-            Ok(ReturnVariant::SetOf(_)) => Err(ReturnVariantError::SetOfInArray),
-            Ok(ReturnVariant::Table(_)) => Err(ReturnVariantError::TableInArray),
-            err @ Err(_) => err,
-        }
+        T::return_sql()
     }
 }
 
@@ -686,7 +662,7 @@ where
 {
     fn argument_sql() -> Result<SqlVariant, ArgumentError> {
         match T::argument_sql() {
-            Ok(SqlVariant::Mapped(sql)) => Ok(SqlVariant::Mapped(sql)),
+            Ok(SqlVariant::Mapped(sql)) => Ok(SqlVariant::Mapped(format!("{sql}[]"))),
             Ok(SqlVariant::Skip) => Err(ArgumentError::SkipInArray),
             Ok(SqlVariant::Composite { .. }) => Ok(SqlVariant::Composite {
                 requires_array_brackets: true,
@@ -698,7 +674,7 @@ where
     fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
         match T::return_sql() {
             Ok(ReturnVariant::Plain(SqlVariant::Mapped(sql))) => {
-                Ok(ReturnVariant::Plain(SqlVariant::Mapped(sql)))
+                Ok(ReturnVariant::Plain(SqlVariant::Mapped(format!("{sql}[]"))))
             }
             Ok(ReturnVariant::Plain(SqlVariant::Composite {
                 requires_array_brackets: _,

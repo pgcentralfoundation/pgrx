@@ -51,7 +51,14 @@ fn return_3pm_mountain_time() -> TimestampWithTimeZone {
     three_pm
 }
 
-#[pg_extern]
+#[pg_extern(sql = r#"
+CREATE FUNCTION "timestamptz_to_i64"(
+	"tstz" timestamptz
+) RETURNS bigint
+STRICT
+LANGUAGE c /* Rust */
+AS 'MODULE_PATHNAME', '@FUNCTION_NAME@';
+"#)]
 fn timestamptz_to_i64(tstz: pg_sys::TimestampTz) -> i64 {
     tstz
 }

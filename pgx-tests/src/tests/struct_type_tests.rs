@@ -8,6 +8,9 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use pgx::stringinfo::StringInfo;
+use pgx::utils::sql_entity_graph::metadata::{
+    ArgumentError, ReturnVariant, ReturnVariantError, SqlTranslatable, SqlVariant,
+};
 use pgx::*;
 use pgx_utils::get_named_capture;
 
@@ -23,6 +26,18 @@ extension_sql!(
     name = "create_complex_shell_type",
     creates = [Type(Complex)]
 );
+
+impl SqlTranslatable for Complex {
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+        Ok(SqlVariant::Mapped(String::from("Complex")))
+    }
+
+    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
+        Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
+            "Complex",
+        ))))
+    }
+}
 
 #[pg_extern(immutable)]
 fn complex_in(input: &std::ffi::CStr) -> PgBox<Complex, AllocatedByRust> {

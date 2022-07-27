@@ -201,11 +201,11 @@ impl<'a> SqlTranslatable for &'a [u8] {
 
 impl SqlTranslatable for i8 {
     fn argument_sql() -> Result<SqlVariant, ArgumentError> {
-        Ok(SqlVariant::Mapped(String::from("char")))
+        Ok(SqlVariant::Mapped(String::from("\"char\"")))
     }
     fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
         Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
-            "char",
+            "\"char\"",
         ))))
     }
 }
@@ -245,11 +245,11 @@ impl SqlTranslatable for bool {
 
 impl SqlTranslatable for char {
     fn argument_sql() -> Result<SqlVariant, ArgumentError> {
-        Ok(SqlVariant::Mapped(String::from("bool")))
+        Ok(SqlVariant::Mapped(String::from("varchar")))
     }
     fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
         Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
-            "bool",
+            "varchar",
         ))))
     }
 }

@@ -129,7 +129,7 @@ impl ToSql for PgExternEntity {
                                 {extern_attrs}\
                                 {search_path}\
                                 LANGUAGE c /* Rust */\n\
-                                AS '{module_pathname}', '{name}_wrapper';\
+                                AS '{module_pathname}', '{unaliased_name}_wrapper';\
                             ",
             schema = self
                 .schema
@@ -357,6 +357,7 @@ impl ToSql for PgExternEntity {
                 retval.push('\n');
                 retval
             },
+            unaliased_name = self.unaliased_name,
         );
 
         let ext_sql = format!(

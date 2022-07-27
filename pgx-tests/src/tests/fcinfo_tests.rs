@@ -275,12 +275,6 @@ mod tests {
     }
 
     #[pg_test]
-    fn test_takes_void() {
-        let result = Spi::get_one::<()>("SELECT takes_void(NULL::void);");
-        assert_eq!(result, None)
-    }
-
-    #[pg_test]
     fn test_returns_void() {
         let result = Spi::get_one::<()>("SELECT returns_void();");
         assert_eq!(result, None)
