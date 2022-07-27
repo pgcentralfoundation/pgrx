@@ -16,7 +16,7 @@ pub use returning::{PgExternReturnEntity, PgExternReturnEntityIteratedItem};
 
 use crate::{
     sql_entity_graph::{
-        metadata::{ReturnVariant, SqlVariant},
+        metadata::{ReturnVariant, SqlTranslatable, SqlVariant},
         pgx_sql::PgxSql,
         to_sql::{entity::ToSqlConfigEntity, ToSql},
         SqlDeclared, SqlGraphEntity, SqlGraphIdentifier,
@@ -105,12 +105,13 @@ impl ToSql for PgExternEntity {
         let self_index = context.externs[self];
         let mut extern_attrs = self.extern_attrs.clone();
         // if we already have a STRICT marker we do not need to add it
+        // presume we can upgrade, then disprove it
         let mut strict_upgrade = !extern_attrs.iter().any(|i| i == &ExternArgs::Strict);
-        if !strict_upgrade {
+        if strict_upgrade {
             // It may be possible to infer a `STRICT` marker though.
             // But we can only do that if the user hasn't used `Option<T>` or `pgx::Internal`
-            for arg in &self.fn_args {
-                if arg.used_ty.optional || arg.used_ty.ty_id == context.internal_type {
+            for arg in &self.metadata.arguments {
+                if arg.optional {
                     strict_upgrade = false;
                 }
             }
@@ -157,7 +158,7 @@ impl ToSql for PgExternEntity {
                             _ => false,
                         })
                         .ok_or_else(|| eyre!("Could not find arg type in graph. Got: {:?}", arg))?;
-                    let needs_comma = idx < (metadata_without_arg_skips.len() - 1);
+                    let needs_comma = idx < (metadata_without_arg_skips.len().saturating_sub(1));
                     let metadata_argument = &self.metadata.arguments[idx];
                     match metadata_argument.argument_sql {
                         Ok(SqlVariant::Mapped(ref argument_sql)) => {

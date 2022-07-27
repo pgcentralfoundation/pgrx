@@ -558,6 +558,10 @@ impl SqlTranslatable for crate::datum::Internal {
             "internal",
         ))))
     }
+    // We don't want to strict upgrade if internal is present.
+    fn optional() -> bool {
+        true
+    }
 }
 
 impl<T> SqlTranslatable for crate::datum::PgVarlena<T>

@@ -79,7 +79,7 @@ where
         T::return_sql()
     }
     fn optional() -> bool {
-        true
+        T::optional()
     }
 }
 
@@ -93,6 +93,9 @@ where
     }
     fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
         T::return_sql()
+    }
+    fn optional() -> bool {
+        true
     }
 }
 
@@ -137,6 +140,9 @@ where
                 err @ Err(_) => err,
             },
         }
+    }
+    fn optional() -> bool {
+        T::optional()
     }
 }
 
