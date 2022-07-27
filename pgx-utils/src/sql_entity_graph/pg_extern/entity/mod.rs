@@ -48,13 +48,13 @@ pub struct PgExternEntity {
 
 impl std::hash::Hash for PgExternEntity {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        self.metadata.hash(state);
+        self.full_path.hash(state);
     }
 }
 
 impl PartialEq for PgExternEntity {
     fn eq(&self, other: &Self) -> bool {
-        self.metadata.eq(&other.metadata)
+        self.full_path.eq(other.full_path)
     }
 }
 
@@ -62,7 +62,7 @@ impl Eq for PgExternEntity {}
 
 impl Ord for PgExternEntity {
     fn cmp(&self, other: &Self) -> Ordering {
-        self.metadata.cmp(&other.metadata)
+        self.full_path.cmp(&other.full_path)
     }
 }
 
