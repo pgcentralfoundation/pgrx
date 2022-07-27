@@ -138,6 +138,12 @@ impl ToSql for PgExternEntity {
             module_pathname = module_pathname,
             arguments = if !self.fn_args.is_empty() {
                 let mut args = Vec::new();
+                let metadata_without_arg_skips = &self
+                    .metadata
+                    .arguments
+                    .iter()
+                    .filter(|v| v.argument_sql != Ok(SqlVariant::Skip))
+                    .collect::<Vec<_>>();
                 for (idx, arg) in self.fn_args.iter().enumerate() {
                     let graph_index = context
                         .graph
@@ -151,7 +157,7 @@ impl ToSql for PgExternEntity {
                             _ => false,
                         })
                         .ok_or_else(|| eyre!("Could not find arg type in graph. Got: {:?}", arg))?;
-                    let needs_comma = idx < (self.fn_args.len() - 1);
+                    let needs_comma = idx < (metadata_without_arg_skips.len() - 1);
                     let metadata_argument = &self.metadata.arguments[idx];
                     match metadata_argument.argument_sql {
                         Ok(SqlVariant::Mapped(ref argument_sql)) => {
@@ -255,7 +261,7 @@ impl ToSql for PgExternEntity {
                     let metadata_retval = self.metadata.retval.clone().ok_or_else(|| eyre!("Macro expansion time and SQL resolution time had differing opinions about the return value existing"))?;
                     let metadata_retval_sql = match metadata_retval.return_sql {
                             Ok(ReturnVariant::SetOf(SqlVariant::Mapped(ref sql))) => sql.clone(),
-                            Ok(ReturnVariant::SetOf(SqlVariant::Composite { requires_array_brackets })) => 
+                            Ok(ReturnVariant::SetOf(SqlVariant::Composite { requires_array_brackets })) =>
                                 ty.composite_type.unwrap().to_string() + if requires_array_brackets {
                                     "[]"
                                 } else {

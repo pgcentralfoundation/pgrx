@@ -4,12 +4,10 @@ use pgx_utils::sql_entity_graph::metadata::{
 
 impl SqlTranslatable for crate::FunctionCallInfoBaseData {
     fn argument_sql() -> Result<SqlVariant, ArgumentError> {
-        Ok(SqlVariant::Mapped(String::from("uuid")))
+        Ok(SqlVariant::Skip)
     }
     fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
-            "uuid",
-        ))))
+        Ok(ReturnVariant::Plain(SqlVariant::Skip))
     }
 }
 
