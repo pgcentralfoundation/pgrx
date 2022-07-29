@@ -534,14 +534,19 @@ fn example_return() -> pg_sys::Oid {
 */
 #[proc_macro_attribute]
 pub fn pg_extern(attr: TokenStream, item: TokenStream) -> TokenStream {
-    let args = parse_extern_attributes(proc_macro2::TokenStream::from(attr.clone()));
+    fn wrapped(attr: TokenStream, item: TokenStream) -> Result<TokenStream, syn::Error> {
+        let pg_extern_item = PgExtern::new(attr.clone().into(), item.clone().into())?;
+        Ok(pg_extern_item.to_token_stream().into())
+    }
 
-    let sql_graph_entity_item = PgExtern::new(attr.clone().into(), item.clone().into()).unwrap();
-
-    let ast = parse_macro_input!(item as syn::Item);
-    match ast {
-        Item::Fn(func) => rewrite_item_fn(func, args, &sql_graph_entity_item).into(),
-        _ => panic!("#[pg_extern] can only be applied to top-level functions"),
+    match wrapped(attr, item) {
+        Ok(tokens) => tokens,
+        Err(e) => {
+            let msg = e.to_string();
+            TokenStream::from(quote! {
+              compile_error!(#msg);
+            })
+        }
     }
 }
 

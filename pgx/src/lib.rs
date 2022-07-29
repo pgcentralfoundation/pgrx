@@ -108,6 +108,7 @@ pub use pgx_utils as utils;
 use core::any::TypeId;
 use once_cell::sync::Lazy;
 use std::collections::HashSet;
+use std::panic::UnwindSafe;
 
 use pgx_utils::sql_entity_graph::{RustSourceOnlySqlMapping, RustSqlMapping};
 
@@ -305,14 +306,21 @@ pub static DEFAULT_COMPOSITE_TYPE_COLLECTIONS: Lazy<std::collections::HashMap<Ty
     });
 use pgx_utils::sql_entity_graph::metadata::SqlTranslatable;
 
-pub struct SetOfIterator<'a, T> {
-    iter: Box<dyn Iterator<Item = T> + 'a>,
+pub struct SetOfIterator<'a, T>
+where
+    T: std::panic::UnwindSafe + std::panic::RefUnwindSafe,
+{
+    iter: Box<dyn Iterator<Item = T> + std::panic::UnwindSafe + std::panic::RefUnwindSafe + 'a>,
 }
 
-impl<'a, T> SetOfIterator<'a, T> {
+impl<'a, T> SetOfIterator<'a, T>
+where
+    T: std::panic::UnwindSafe + std::panic::RefUnwindSafe,
+{
     pub fn new<I>(iter: I) -> Self
     where
-        I: IntoIterator<Item = T> + 'a,
+        I: IntoIterator<Item = T> + std::panic::UnwindSafe + 'a,
+        <I as IntoIterator>::IntoIter: std::panic::UnwindSafe + std::panic::RefUnwindSafe,
     {
         Self {
             iter: Box::new(iter.into_iter()),
@@ -320,7 +328,10 @@ impl<'a, T> SetOfIterator<'a, T> {
     }
 }
 
-impl<'a, T> Iterator for SetOfIterator<'a, T> {
+impl<'a, T> Iterator for SetOfIterator<'a, T>
+where
+    T: std::panic::UnwindSafe + std::panic::RefUnwindSafe,
+{
     type Item = T;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -328,7 +339,10 @@ impl<'a, T> Iterator for SetOfIterator<'a, T> {
     }
 }
 
-impl<'a, T> IntoDatum for SetOfIterator<'a, T> {
+impl<'a, T> IntoDatum for SetOfIterator<'a, T>
+where
+    T: std::panic::UnwindSafe + std::panic::RefUnwindSafe,
+{
     fn into_datum(self) -> Option<pg_sys::Datum> {
         todo!()
     }
@@ -340,7 +354,7 @@ impl<'a, T> IntoDatum for SetOfIterator<'a, T> {
 
 impl<'a, T> SqlTranslatable for SetOfIterator<'a, T>
 where
-    T: SqlTranslatable,
+    T: SqlTranslatable + std::panic::UnwindSafe + std::panic::RefUnwindSafe,
 {
     fn argument_sql() -> Result<SqlVariant, ArgumentError> {
         T::argument_sql()
@@ -355,14 +369,20 @@ where
     }
 }
 
-pub struct TableIterator<'a, T> {
-    iter: Box<dyn Iterator<Item = T> + 'a>,
+pub struct TableIterator<'a, T>
+where
+    T: std::panic::UnwindSafe + std::panic::RefUnwindSafe,
+{
+    iter: Box<dyn Iterator<Item = T> + std::panic::UnwindSafe + std::panic::RefUnwindSafe + 'a>,
 }
 
-impl<'a, T> TableIterator<'a, T> {
+impl<'a, T> TableIterator<'a, T>
+where
+    T: std::panic::UnwindSafe + std::panic::RefUnwindSafe,
+{
     pub fn new<I>(iter: I) -> Self
     where
-        I: Iterator<Item = T> + 'a,
+        I: Iterator<Item = T> + std::panic::UnwindSafe + std::panic::RefUnwindSafe + 'a,
     {
         Self {
             iter: Box::new(iter),
@@ -370,7 +390,10 @@ impl<'a, T> TableIterator<'a, T> {
     }
 }
 
-impl<'a, T> Iterator for TableIterator<'a, T> {
+impl<'a, T> Iterator for TableIterator<'a, T>
+where
+    T: std::panic::UnwindSafe + std::panic::RefUnwindSafe,
+{
     type Item = T;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -378,7 +401,10 @@ impl<'a, T> Iterator for TableIterator<'a, T> {
     }
 }
 
-impl<'a, T> IntoDatum for TableIterator<'a, T> {
+impl<'a, T> IntoDatum for TableIterator<'a, T>
+where
+    T: SqlTranslatable + std::panic::UnwindSafe + std::panic::RefUnwindSafe,
+{
     fn into_datum(self) -> Option<pg_sys::Datum> {
         todo!()
     }
@@ -394,7 +420,7 @@ seq_macro::seq!(I in 0..=32 {
             impl<'a, #(Input~N,)*> SqlTranslatable for TableIterator<'a, (#(Input~N,)*)>
             where
                 #(
-                    Input~N: SqlTranslatable + 'static,
+                    Input~N: SqlTranslatable + std::panic::UnwindSafe + std::panic::RefUnwindSafe + 'static,
                 )*
             {
                 fn argument_sql() -> Result<SqlVariant, ArgumentError> {

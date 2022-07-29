@@ -18,8 +18,8 @@ use syn::{
 
 #[derive(Debug, Clone)]
 pub struct ReturningIteratedItem {
-    used_ty: UsedType,
-    name: Option<String>,
+    pub used_ty: UsedType,
+    pub name: Option<String>,
 }
 
 #[derive(Debug, Clone)]
@@ -134,14 +134,9 @@ impl TryFrom<&syn::ReturnType> for Returning {
                                                 syn::Type::Macro(type_macro) => UsedType::new(
                                                     syn::Type::Macro(type_macro.clone()),
                                                 )?,
-                                                syn::Type::Reference(type_ref) => {
-                                                    match &*type_ref.elem {
-                                                        syn::Type::Path(path) => UsedType::new(
-                                                            syn::Type::Path(path.clone()),
-                                                        )?,
-                                                        _ => unimplemented!("Expected path"),
-                                                    }
-                                                }
+                                                reference @ syn::Type::Reference(_) => UsedType::new(
+                                                    (*reference).clone(),
+                                                )?,
                                                 ty => {
                                                     unimplemented!("SetOf Iterator must have an item, got: {ty:?}")
                                                 }
@@ -255,25 +250,15 @@ impl TryFrom<&syn::ReturnType> for Returning {
                                                                 }
                                                             }
                                                         }
-                                                        syn::Type::Reference(type_ref) => {
-                                                            match &*type_ref.elem {
-                                                                syn::Type::Path(path) => {
-                                                                    let iterated_item =
-                                                                        ReturningIteratedItem {
-                                                                            name: None,
-                                                                            used_ty: UsedType::new(
-                                                                                syn::Type::Reference(
-                                                                                    type_ref.clone(),
-                                                                                ),
-                                                                            )?,
-                                                                        };
-                                                                    iterated_items
-                                                                        .push(iterated_item);
-                                                                }
-                                                                _ => {
-                                                                    unimplemented!("Expected path")
-                                                                }
-                                                            }
+                                                        reference @ syn::Type::Reference(_) => {
+                                                            let iterated_item =
+                                                                ReturningIteratedItem {
+                                                                    name: None,
+                                                                    used_ty: UsedType::new(
+                                                                        (*reference).clone(),
+                                                                    )?,
+                                                                };
+                                                            iterated_items.push(iterated_item);
                                                         }
                                                         ty => {
                                                             unimplemented!("Table Iterator must have an item, got: {ty:?}")

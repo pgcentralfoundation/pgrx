@@ -62,32 +62,6 @@ impl FunctionMetadata<(), ()> for unsafe fn() {
 seq_macro::seq!(I in 0..=32 {
     #(
         seq_macro::seq!(N in 0..=I {
-            // impl<#(Input~N,)* Output> FunctionMetadata<(#(Input~N,)*), Output> for fn(#(Input~N,)*) -> Output
-            // where
-            //     #(
-            //         Input~N: SqlTranslatable,
-            //     )*
-            //     Output: SqlTranslatable,
-            // {
-            //     fn entity(&self) -> FunctionMetadataEntity {
-            //         let mut arguments = Vec::new();
-            //         #(
-            //             arguments.push({
-            //                 let marker: PhantomData<Input~N> = PhantomData;
-            //                 marker.entity()
-            //             });
-            //         )*
-            //         FunctionMetadataEntity {
-            //             arguments,
-            //             retval: {
-            //                 let marker: PhantomData<Output> = PhantomData;
-            //                 Some(marker.entity())
-            //             },
-            //             path: self.path(),
-            //         }
-            //     }
-            // }
-
             impl<'output, #('input~N: 'output,)* #(Input~N,)* Output> FunctionMetadata<(#(Input~N,)*), Output> for fn(#(Input~N,)*) -> Output
             where
                 #(

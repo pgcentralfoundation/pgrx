@@ -24,11 +24,12 @@ use search_path::SearchPathList;
 
 use eyre::WrapErr;
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
-use quote::{quote, ToTokens, TokenStreamExt};
+use quote::{quote, quote_spanned, ToTokens, TokenStreamExt};
 use std::ops::Deref;
 use syn::{
     parse::{Parse, ParseStream, Parser},
     punctuated::Punctuated,
+    spanned::Spanned,
     Meta, Token,
 };
 
@@ -65,6 +66,47 @@ pub struct PgExtern {
 }
 
 impl PgExtern {
+    pub fn new(attr: TokenStream2, item: TokenStream2) -> Result<Self, syn::Error> {
+        let mut attrs = Vec::new();
+        let mut to_sql_config: Option<ToSqlConfig> = None;
+
+        let parser = Punctuated::<Attribute, Token![,]>::parse_terminated;
+        let punctuated_attrs = parser.parse2(attr)?;
+        for pair in punctuated_attrs.into_pairs() {
+            match pair.into_value() {
+                Attribute::Sql(config) => {
+                    to_sql_config.get_or_insert(config);
+                }
+                attr => {
+                    attrs.push(attr);
+                }
+            }
+        }
+
+        let mut to_sql_config = to_sql_config.unwrap_or_default();
+
+        let func = syn::parse2::<syn::ItemFn>(item)?;
+
+        if let Some(ref mut content) = to_sql_config.content {
+            let value = content.value();
+            let updated_value = value.replace(
+                "@FUNCTION_NAME@",
+                &*(func.sig.ident.to_string() + "_wrapper"),
+            ) + "\n";
+            *content = syn::LitStr::new(&updated_value, Span::call_site());
+        }
+
+        if !to_sql_config.overrides_default() {
+            crate::ident_is_acceptable_to_postgres(&func.sig.ident)?;
+        }
+
+        Ok(Self {
+            attrs,
+            func,
+            to_sql_config,
+        })
+    }
+
     fn name(&self) -> String {
         self.attrs
             .iter()
@@ -199,50 +241,7 @@ impl PgExtern {
         Returning::try_from(&self.func.sig.output)
     }
 
-    pub fn new(attr: TokenStream2, item: TokenStream2) -> Result<Self, syn::Error> {
-        let mut attrs = Vec::new();
-        let mut to_sql_config: Option<ToSqlConfig> = None;
-
-        let parser = Punctuated::<Attribute, Token![,]>::parse_terminated;
-        let punctuated_attrs = parser.parse2(attr)?;
-        for pair in punctuated_attrs.into_pairs() {
-            match pair.into_value() {
-                Attribute::Sql(config) => {
-                    to_sql_config.get_or_insert(config);
-                }
-                attr => {
-                    attrs.push(attr);
-                }
-            }
-        }
-
-        let mut to_sql_config = to_sql_config.unwrap_or_default();
-
-        let func = syn::parse2::<syn::ItemFn>(item)?;
-
-        if let Some(ref mut content) = to_sql_config.content {
-            let value = content.value();
-            let updated_value = value.replace(
-                "@FUNCTION_NAME@",
-                &*(func.sig.ident.to_string() + "_wrapper"),
-            ) + "\n";
-            *content = syn::LitStr::new(&updated_value, Span::call_site());
-        }
-
-        if !to_sql_config.overrides_default() {
-            crate::ident_is_acceptable_to_postgres(&func.sig.ident)?;
-        }
-
-        Ok(Self {
-            attrs,
-            func,
-            to_sql_config,
-        })
-    }
-}
-
-impl ToTokens for PgExtern {
-    fn to_tokens(&self, tokens: &mut TokenStream2) {
+    fn entity_tokens(&self) -> TokenStream2 {
         let ident = &self.func.sig.ident;
         let name = self.name();
         let unsafety = &self.func.sig.unsafety;
@@ -255,6 +254,7 @@ impl ToTokens for PgExtern {
             .collect::<Punctuated<_, Token![,]>>();
         let search_path = self.search_path().into_iter();
         let inputs = self.inputs().unwrap();
+        let inputs_iter = inputs.iter().map(|v| v.entity_tokens());
 
         let input_types = self.func.sig.inputs.iter().filter_map(|v| match v {
             syn::FnArg::Receiver(_) => None,
@@ -270,10 +270,9 @@ impl ToTokens for PgExtern {
             Ok(returns) => returns,
             Err(e) => {
                 let msg = e.to_string();
-                tokens.append_all(quote! {
+                return quote! {
                     std::compile_error!(#msg);
-                });
-                return;
+                };
             }
         };
 
@@ -298,7 +297,7 @@ impl ToTokens for PgExtern {
 
         let sql_graph_entity_fn_name =
             syn::Ident::new(&format!("__pgx_internals_fn_{}", ident), Span::call_site());
-        let inv = quote! {
+        quote_spanned! { self.func.sig.span() =>
             #[no_mangle]
             #[doc(hidden)]
             pub extern "C" fn  #sql_graph_entity_fn_name() -> ::pgx::utils::sql_entity_graph::SqlGraphEntity {
@@ -314,7 +313,7 @@ impl ToTokens for PgExtern {
                     module_path: core::module_path!(),
                     full_path: concat!(core::module_path!(), "::", stringify!(#ident)),
                     metadata: pgx::utils::sql_entity_graph::metadata::FunctionMetadata::entity(&metadata),
-                    fn_args: vec![#(#inputs),*],
+                    fn_args: vec![#(#inputs_iter),*],
                     fn_return: #returns,
                     schema: None #( .unwrap_or(Some(#schema_iter)) )*,
                     file: file!(),
@@ -326,8 +325,289 @@ impl ToTokens for PgExtern {
                 };
                 ::pgx::utils::sql_entity_graph::SqlGraphEntity::Function(submission)
             }
+        }
+    }
+
+    fn finfo_tokens(&self) -> TokenStream2 {
+        let finfo_name = syn::Ident::new(
+            &format!("pg_finfo_{}_wrapper", self.func.sig.ident),
+            Span::call_site(),
+        );
+        quote_spanned! { self.func.sig.span() =>
+            #[no_mangle]
+            #[doc(hidden)]
+            pub extern "C" fn #finfo_name() -> &'static pg_sys::Pg_finfo_record {
+                const V1_API: pg_sys::Pg_finfo_record = pg_sys::Pg_finfo_record { api_version: 1 };
+                &V1_API
+            }
+        }
+    }
+
+    pub fn wrapper_func(&self) -> TokenStream2 {
+        let func_name = &self.func.sig.ident;
+        let func_name_wrapper = Ident::new(
+            &format!("{}_wrapper", &self.func.sig.ident.to_string()),
+            self.func.sig.ident.span(),
+        );
+        let func_generics = &self.func.sig.generics;
+        let is_raw = self.extern_attrs().contains(&Attribute::Raw);
+        let fcinfo_ident = syn::Ident::new("fcinfo", self.func.sig.ident.span());
+
+        let args = self.inputs().unwrap();
+        let arg_pats = args
+            .iter()
+            .map(|v| syn::Ident::new(&format!("{}_", &v.pat), self.func.sig.span()))
+            .collect::<Vec<_>>();
+        let arg_fetches = args.iter().enumerate().map(|(idx, arg)| {
+            let pat = &arg_pats[idx];
+            let resolved_ty = &arg.used_ty.resolved_ty;
+            if arg.used_ty.resolved_ty.to_token_stream().to_string() == quote!(pgx::pg_sys::FunctionCallInfo).to_token_stream().to_string()
+            || arg.used_ty.resolved_ty.to_token_stream().to_string() == quote!(pg_sys::FunctionCallInfo).to_token_stream().to_string() {
+                quote_spanned! {pat.span()=>
+                    let #pat = #fcinfo_ident;
+                }
+            } else if arg.used_ty.resolved_ty.to_token_stream().to_string() == quote!(()).to_token_stream().to_string() {
+                quote_spanned! {pat.span()=>
+                    debug_assert!(pgx::pg_getarg::<()>(#fcinfo_ident, #idx).is_none(), "A `()` argument should always recieve `NULL`");
+                    let #pat = ();
+                }
+            } else {
+                match (is_raw, &arg.used_ty.optional) {
+                    (true, None) | (true, Some(_)) => quote_spanned! { pat.span() =>
+                        let #pat = pgx::pg_getarg_datum_raw(#fcinfo_ident, #idx) as #resolved_ty;
+                    },
+                    (false, None) => quote_spanned! { pat.span() =>
+                        let #pat = pgx::pg_getarg::<#resolved_ty>(#fcinfo_ident, #idx).unwrap_or_else(|| panic!("{} is null", stringify!{#pat}));
+                    },
+                    (false, Some(inner)) => quote_spanned! { pat.span() =>
+                        let #pat = pgx::pg_getarg::<#inner>(#fcinfo_ident, #idx);
+                    },
+                }
+            }
+        });
+
+        match self.returns().unwrap() {
+            Returning::None => quote_spanned! { self.func.sig.span() =>
+                    #[no_mangle]
+                    #[doc(hidden)]
+                    pub unsafe extern "C" fn #func_name_wrapper #func_generics(#fcinfo_ident: ::pgx::pg_sys::FunctionCallInfo) {
+                        #(
+                            #arg_fetches
+                        )*
+
+                        #func_name(#(#arg_pats),*)
+                    }
+            },
+            Returning::Type(retval_ty) => {
+                let result_ident = syn::Ident::new("result", self.func.sig.span());
+                let retval_transform = if retval_ty.resolved_ty == syn::parse_quote!(()) {
+                    quote_spanned! { self.func.sig.output.span() =>
+                       pgx::pg_return_void()
+                    }
+                } else if retval_ty.resolved_ty == syn::parse_quote!(pg_sys::Datum)
+                    || retval_ty.resolved_ty == syn::parse_quote!(pgx::pg_sys::Datum)
+                {
+                    quote_spanned! { self.func.sig.output.span() =>
+                       #result_ident
+                    }
+                } else if retval_ty.optional.is_some() {
+                    quote_spanned! { self.func.sig.output.span() =>
+                        match #result_ident {
+                            Some(result) => {
+                                result.into_datum().unwrap_or_else(|| panic!("returned Option<T> was NULL"))
+                            },
+                            None => pgx::pg_return_null(fcinfo)
+                        }
+                    }
+                } else {
+                    quote_spanned! { self.func.sig.output.span() =>
+                        #result_ident.into_datum().unwrap_or_else(|| panic!("returned Datum was NULL"))
+                    }
+                };
+
+                quote_spanned! { self.func.sig.span() =>
+                    #[no_mangle]
+                    #[doc(hidden)]
+                    #[pg_guard]
+                    pub unsafe extern "C" fn #func_name_wrapper #func_generics(#fcinfo_ident: ::pgx::pg_sys::FunctionCallInfo) -> ::pgx::pg_sys::Datum {
+                        #(
+                            #arg_fetches
+                        )*
+
+                        let #result_ident = #func_name(#(#arg_pats),*);
+
+                        #retval_transform
+                    }
+                }
+            }
+            Returning::SetOf(retval_ty) => {
+                let result_ident = syn::Ident::new("result", self.func.sig.span());
+                let funcctx_ident = syn::Ident::new("funcctx", self.func.sig.span());
+                let retval_ty_resolved = retval_ty.original_ty;
+                let result_handler = if retval_ty.optional.is_some() {
+                    quote_spanned! { self.func.sig.span() =>
+                        let #result_ident = match pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).switch_to(|_| { #func_name(#(#arg_pats),*) }) {
+                            Some(result) => result,
+                            None => {
+                                pgx::srf_return_done(fcinfo, &mut funcctx);
+                                return pgx::pg_return_null(fcinfo)
+                            }
+                        };
+                    }
+                } else {
+                    quote_spanned! { self.func.sig.span() =>
+                        let #result_ident = pgx::PgMemoryContexts::For(#funcctx_ident.multi_call_memory_ctx).switch_to(|_| { #func_name(#(#arg_pats),*) });
+                    }
+                };
+
+                quote_spanned! { self.func.sig.span() =>
+                    #[no_mangle]
+                    #[doc(hidden)]
+                    #[pg_guard]
+                    pub unsafe extern "C" fn #func_name_wrapper #func_generics(#fcinfo_ident: ::pgx::pg_sys::FunctionCallInfo) -> ::pgx::pg_sys::Datum {
+                        let mut #funcctx_ident: pgx::PgBox<pg_sys::FuncCallContext> = if srf_is_first_call(fcinfo) {
+                            let mut #funcctx_ident = pgx::srf_first_call_init(fcinfo);
+                            #funcctx_ident.user_fctx = pgx::PgMemoryContexts::For(#funcctx_ident.multi_call_memory_ctx)
+                                .palloc_struct::<SetOfIterator<#retval_ty_resolved>>() as pgx::memcxt::void_mut_ptr;
+
+                            #(
+                                #arg_fetches
+                            )*
+
+                            let mut iterator_holder = pgx::PgBox::from_pg(#funcctx_ident.user_fctx as *mut SetOfIterator<#retval_ty_resolved>);
+
+                            #result_handler
+
+                            let iterator_holder = pgx::PgMemoryContexts::For(#funcctx_ident.multi_call_memory_ctx).leak_trivial_alloc(#result_ident);
+                            #funcctx_ident
+                        } else {
+                            let mut #funcctx_ident = pgx::srf_per_call_setup(fcinfo);
+
+                            #funcctx_ident
+                        };
+
+                        let mut iterator_holder = pgx::PgBox::from_pg(funcctx.user_fctx as *mut pgx::SetOfIterator<#retval_ty_resolved>);
+                        match iterator_holder.next() {
+                            Some(result) => {
+
+                                pgx::srf_return_next(fcinfo, &mut #funcctx_ident);
+                                match result.into_datum() {
+                                    Some(datum) => datum,
+                                    None => pgx::pg_return_null(fcinfo),
+                                }
+                            },
+                            None => {
+                                pgx::srf_return_done(fcinfo, &mut #funcctx_ident);
+                                pgx::pg_return_null(fcinfo)
+                            },
+                        }
+                    }
+                }
+            }
+            Returning::Iterated(retval_tys) => {
+                let result_ident = syn::Ident::new("result", self.func.sig.span());
+                let funcctx_ident = syn::Ident::new("funcctx", self.func.sig.span());
+                let retval_tys_resolved = retval_tys.iter().map(|v| &v.used_ty.resolved_ty);
+                let retval_tys_tuple = quote! { (#(#retval_tys_resolved,)*) };
+
+                let retval_tuple_indexes = (0..retval_tys.len()).map(syn::Index::from);
+                let retval_tuple_len = retval_tuple_indexes.len();
+                let create_heap_tuple = quote! {
+                    let mut datums: [Datum; #retval_tuple_len] = [Datum::from(0); #retval_tuple_len];
+                    let mut nulls: [bool; #retval_tuple_len] = [false; #retval_tuple_len];
+
+                    #(
+                        let datum = result.#retval_tuple_indexes.into_datum();
+                        match datum {
+                            Some(datum) => { datums[#retval_tuple_indexes] = datum.into(); },
+                            None => { nulls[#retval_tuple_indexes] = true; }
+                        }
+                    )*
+
+                    let heap_tuple = pgx::pg_sys::heap_form_tuple(#funcctx_ident.tuple_desc, datums.as_mut_ptr(), nulls.as_mut_ptr());
+                };
+
+                let result_handler = quote_spanned! { self.func.sig.span() =>
+                    let #result_ident = pgx::PgMemoryContexts::For(#funcctx_ident.multi_call_memory_ctx).switch_to(|_| { #func_name(#(#arg_pats),*) });
+                };
+
+                quote_spanned! { self.func.sig.span() =>
+                    #[no_mangle]
+                    #[doc(hidden)]
+                    #[pg_guard]
+                    pub unsafe extern "C" fn #func_name_wrapper #func_generics(#fcinfo_ident: ::pgx::pg_sys::FunctionCallInfo) -> ::pgx::pg_sys::Datum {
+                        let mut #funcctx_ident: pgx::PgBox<pg_sys::FuncCallContext> = if srf_is_first_call(fcinfo) {
+                            let mut #funcctx_ident = pgx::srf_first_call_init(fcinfo);
+                            #funcctx_ident.user_fctx = pgx::PgMemoryContexts::For(#funcctx_ident.multi_call_memory_ctx)
+                                .palloc_struct::<TableIterator<#retval_tys_tuple>>() as pgx::memcxt::void_mut_ptr;
+
+                            #(
+                                #arg_fetches
+                            )*
+
+
+                            let mut iterator_holder = pgx::PgBox::from_pg(#funcctx_ident.user_fctx as *mut TableIterator<#retval_tys_tuple>);
+
+                            #result_handler
+
+                            let iterator_holder = pgx::PgMemoryContexts::For(#funcctx_ident.multi_call_memory_ctx).leak_trivial_alloc(#result_ident);
+
+                            #funcctx_ident
+                        } else {
+                            let mut #funcctx_ident = pgx::srf_per_call_setup(fcinfo);
+
+                            #funcctx_ident
+                        };
+
+
+                        let mut iter = Box::from_raw(funcctx.user_fctx as *mut pgx::TableIterator<#retval_tys_tuple>);
+
+                        match iter.next() {
+                            Some(result) => {
+                                // we need to leak the boxed iterator so that it's not freed by rust and we can
+                                // continue to use it
+                                Box::leak(iter);
+
+                                #create_heap_tuple
+
+                                let datum = pgx::heap_tuple_get_datum(heap_tuple);
+                                pgx::srf_return_next(fcinfo, &mut #funcctx_ident);
+                                pgx::pg_sys::Datum::from(datum)
+                            },
+                            None => {
+                                // leak the iterator here too, even tho we're done, b/c our MemoryContextCallback
+                                // function is going to properly drop it for us
+                                Box::leak(iter);
+
+                                pgx::srf_return_done(fcinfo, &mut #funcctx_ident);
+                                pgx::pg_return_null(fcinfo)
+                            },
+                        }
+                    }
+                }
+            }
+            Returning::Trigger => todo!(),
+        }
+    }
+}
+
+impl ToTokens for PgExtern {
+    fn to_tokens(&self, tokens: &mut TokenStream2) {
+        let original_func = &self.func;
+        let wrapper_func = self.wrapper_func();
+        let entity_func = self.entity_tokens();
+        let finfo_tokens = self.finfo_tokens();
+
+        let expansion = quote_spanned! { self.func.sig.span() =>
+            #original_func
+
+            #wrapper_func
+
+            #entity_func
+
+            #finfo_tokens
         };
-        tokens.append_all(inv);
+        tokens.append_all(expansion);
     }
 }
 

@@ -22,7 +22,7 @@ pub struct UsedType {
     pub(crate) variadic: bool,
     pub(crate) default: Option<String>,
     /// Set via the type being an `Option`.
-    pub(crate) optional: bool,
+    pub(crate) optional: Option<syn::Type>,
 }
 
 impl UsedType {
@@ -163,31 +163,37 @@ impl UsedType {
                                                 let ident_string = last_segment.ident.to_string();
                                                 match ident_string.as_str() {
                                                     // Option<VariadicArray<T>>
-                                                    "VariadicArray" => {
-                                                        (syn::Type::Path(type_path), true, true)
-                                                    }
-                                                    _ => (syn::Type::Path(type_path), false, true),
+                                                    "VariadicArray" => (
+                                                        syn::Type::Path(type_path.clone()),
+                                                        true,
+                                                        Some(inner_ty.clone()),
+                                                    ),
+                                                    _ => (
+                                                        syn::Type::Path(type_path.clone()),
+                                                        false,
+                                                        Some(inner_ty.clone()),
+                                                    ),
                                                 }
                                             }
                                             // Option<T>
-                                            _ => (syn::Type::Path(type_path), false, true),
+                                            _ => (syn::Type::Path(type_path), false, None),
                                         }
                                     }
                                     // Option<T>
-                                    _ => (syn::Type::Path(type_path), false, true),
+                                    _ => (syn::Type::Path(type_path), false, None),
                                 }
                             }
                             // Option<T>
-                            _ => (syn::Type::Path(type_path), false, true),
+                            _ => (syn::Type::Path(type_path), false, None),
                         }
                     }
                     // VariadicArray<T>
-                    "VariadicArray" => (syn::Type::Path(type_path), true, false),
+                    "VariadicArray" => (syn::Type::Path(type_path), true, None),
                     // T
-                    _ => (syn::Type::Path(type_path), false, false),
+                    _ => (syn::Type::Path(type_path), false, None),
                 }
             }
-            original => (original, false, false),
+            original => (original, false, None),
         };
 
         Ok(Self {
@@ -206,7 +212,7 @@ impl UsedType {
         let composite_type = self.composite_type.clone().map(|v| v.expr);
         let composite_type_iter = composite_type.iter();
         let variadic = &self.variadic;
-        let optional = &self.optional;
+        let optional = &self.optional.is_some();
         let default = (&self.default).iter();
 
         syn::parse_quote! {
