@@ -10,6 +10,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 mod aggregate_tests;
 mod anyarray_tests;
 mod array_tests;
+mod attributes_tests;
 mod bytea_tests;
 mod cfg_tests;
 mod datetime_tests;
