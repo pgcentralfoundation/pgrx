@@ -91,6 +91,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 #include "tcop/tcopprot.h"
 #include "tcop/utility.h"
 #include "utils/builtins.h"
+#include "utils/catcache.h"
 #include "utils/date.h"
 #include "utils/datetime.h"
 #include "utils/float.h"

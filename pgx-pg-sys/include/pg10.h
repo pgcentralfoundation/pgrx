@@ -93,6 +93,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 #include "tsearch/ts_public.h"
 #include "tsearch/ts_utils.h"
 #include "utils/builtins.h"
+#include "utils/catcache.h"
 #include "utils/date.h"
 #include "utils/datetime.h"
 
