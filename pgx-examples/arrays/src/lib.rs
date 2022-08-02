@@ -70,7 +70,7 @@ fn static_names() -> Vec<Option<&'static str>> {
 }
 
 #[pg_extern]
-fn static_names_set() -> SetOfIterator<Vec<Option<&'static str>>> {
+fn static_names_set() -> SetOfIterator<'static, Vec<Option<&'static str>>> {
     SetOfIterator::new(
         vec![
             vec![Some("Brandy"), Some("Sally"), None, Some("Anchovy")],

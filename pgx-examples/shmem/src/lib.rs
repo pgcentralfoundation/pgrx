@@ -47,7 +47,7 @@ pub extern "C" fn _PG_init() {
 }
 
 #[pg_extern]
-fn vec_select() -> SetOfIterator<Pgtest> {
+fn vec_select() -> SetOfIterator<'static, Pgtest> {
     SetOfIterator::new(
         VEC.share()
             .iter()
@@ -63,7 +63,7 @@ fn vec_count() -> i32 {
 }
 
 #[pg_extern]
-fn vec_drain() -> SetOfIterator<Pgtest> {
+fn vec_drain() -> SetOfIterator<'static, Pgtest> {
     let mut vec = VEC.exclusive();
     let r = vec.iter().map(|i| *i).collect::<Vec<Pgtest>>();
     vec.clear();

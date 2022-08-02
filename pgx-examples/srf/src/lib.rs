@@ -12,23 +12,23 @@ use pgx::*;
 pg_module_magic!();
 
 #[pg_extern]
-fn generate_series(start: i64, finish: i64, step: default!(i64, 1)) -> SetOfIterator<i64> {
+fn generate_series(start: i64, finish: i64, step: default!(i64, 1)) -> SetOfIterator<'static, i64> {
     SetOfIterator::new((start..=finish).step_by(step as usize))
 }
 
 #[pg_extern]
-fn random_values(num_rows: i32) -> TableIterator<(name!(index, i32), name!(value, f64))> {
+fn random_values(num_rows: i32) -> TableIterator<'static, (name!(index, i32), name!(value, f64))> {
     TableIterator::new((1..=num_rows).map(|i| (i, rand::random::<f64>())))
 }
 
 #[pg_extern]
-fn vector_of_static_values() -> SetOfIterator<&'static str> {
+fn vector_of_static_values() -> SetOfIterator<'static, &'static str> {
     let values = vec!["Brandy", "Sally", "Anchovy"];
     SetOfIterator::new(values.into_iter())
 }
 
 #[pg_extern]
-fn return_tuple() -> TableIterator<(name!(id, i32), name!(name, &'static str), name!(age, f64))> {
+fn return_tuple() -> TableIterator<'static, (name!(id, i32), name!(name, &'static str), name!(age, f64))> {
     TableIterator::new([(1, "Brandy", 4.5)].into_iter())
 }
 

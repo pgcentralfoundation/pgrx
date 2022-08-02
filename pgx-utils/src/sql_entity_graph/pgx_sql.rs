@@ -919,7 +919,7 @@ fn initialize_externs(
                         });
                 }
             }
-            PgExternReturnEntity::Iterated { tys: iterated_returns, optional } => {
+            PgExternReturnEntity::Iterated { tys: iterated_returns, optional: _ } => {
                 for PgExternReturnEntityIteratedItem {
                     ty: return_ty_entity,
                     ..

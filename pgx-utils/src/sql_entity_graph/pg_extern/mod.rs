@@ -25,7 +25,6 @@ use search_path::SearchPathList;
 use eyre::WrapErr;
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::{quote, quote_spanned, ToTokens, TokenStreamExt};
-use std::ops::Deref;
 use syn::{
     parse::{Parse, ParseStream, Parser},
     punctuated::Punctuated,
@@ -302,6 +301,8 @@ impl PgExtern {
             #[doc(hidden)]
             pub extern "Rust" fn  #sql_graph_entity_fn_name() -> ::pgx::utils::sql_entity_graph::SqlGraphEntity {
                 extern crate alloc;
+                #[allow(unused_imports)]
+                use alloc::{vec, vec::Vec};
                 type FunctionPointer = #unsafety fn(#( #input_types ),*) #return_type;
                 let metadata: FunctionPointer = #ident;
                 let submission = ::pgx::utils::sql_entity_graph::PgExternEntity {
@@ -666,136 +667,5 @@ impl Parse for PgExtern {
             func,
             to_sql_config,
         })
-    }
-}
-
-fn handle_default(
-    ty: syn::Type,
-    archetype: &syn::PathSegment,
-    mac: &syn::Macro,
-) -> syn::Result<(syn::Type, Option<String>)> {
-    match archetype.ident.to_string().as_str() {
-        "default" => {
-            let out: DefaultMacro = mac.parse_body()?;
-            let true_ty = out.ty;
-            match out.expr {
-                syn::Expr::Lit(syn::ExprLit {
-                    lit: syn::Lit::Str(def),
-                    ..
-                }) => {
-                    let value = def.value();
-                    Ok((true_ty, Some(value)))
-                }
-                syn::Expr::Lit(syn::ExprLit {
-                    lit: syn::Lit::Float(def),
-                    ..
-                }) => {
-                    let value = def.base10_digits();
-                    Ok((true_ty, Some(value.to_string())))
-                }
-                syn::Expr::Lit(syn::ExprLit {
-                    lit: syn::Lit::Int(def),
-                    ..
-                }) => {
-                    let value = def.base10_digits();
-                    Ok((true_ty, Some(value.to_string())))
-                }
-                syn::Expr::Lit(syn::ExprLit {
-                    lit: syn::Lit::Bool(def),
-                    ..
-                }) => {
-                    let value = def.value();
-                    Ok((true_ty, Some(value.to_string())))
-                }
-                syn::Expr::Unary(syn::ExprUnary {
-                    op: syn::UnOp::Neg(_),
-                    ref expr,
-                    ..
-                }) => match &**expr {
-                    syn::Expr::Lit(syn::ExprLit {
-                        lit: syn::Lit::Int(def),
-                        ..
-                    }) => {
-                        let value = def.base10_digits();
-                        Ok((true_ty, Some("-".to_owned() + value)))
-                    }
-                    _ => {
-                        return Err(syn::Error::new(
-                            Span::call_site(),
-                            format!(
-                                "Unrecognized UnaryExpr in `default!()` macro, got: {:?}",
-                                out.expr
-                            ),
-                        ))
-                    }
-                },
-                syn::Expr::Type(syn::ExprType { ref ty, .. }) => match ty.deref() {
-                    syn::Type::Path(syn::TypePath {
-                        path: syn::Path { segments, .. },
-                        ..
-                    }) => {
-                        let last = segments.last().expect("No last segment");
-                        let last_string = last.ident.to_string();
-                        if last_string.as_str() == "NULL" {
-                            Ok((true_ty, Some(last_string)))
-                        } else {
-                            return Err(syn::Error::new(Span::call_site(), format!("Unable to parse default value of `default!()` macro, got: {:?}", out.expr)));
-                        }
-                    }
-                    _ => {
-                        return Err(syn::Error::new(
-                            Span::call_site(),
-                            format!(
-                                "Unable to parse default value of `default!()` macro, got: {:?}",
-                                out.expr
-                            ),
-                        ))
-                    }
-                },
-                syn::Expr::Path(syn::ExprPath {
-                    path: syn::Path { ref segments, .. },
-                    ..
-                }) => {
-                    let last = segments.last().expect("No last segment");
-                    let last_string = last.ident.to_string();
-                    if last_string.as_str() == "NULL" {
-                        Ok((true_ty, Some(last_string)))
-                    } else {
-                        return Err(syn::Error::new(
-                            Span::call_site(),
-                            format!(
-                                "Unable to parse default value of `default!()` macro, got: {:?}",
-                                out.expr
-                            ),
-                        ));
-                    }
-                }
-                _ => {
-                    return Err(syn::Error::new(
-                        Span::call_site(),
-                        format!(
-                            "Unable to parse default value of `default!()` macro, got: {:?}",
-                            out.expr
-                        ),
-                    ))
-                }
-            }
-        }
-        _ => Ok((ty, None)),
-    }
-}
-
-#[derive(Debug, Clone)]
-pub(crate) struct DefaultMacro {
-    ty: syn::Type,
-    pub(crate) expr: syn::Expr,
-}
-
-impl Parse for DefaultMacro {
-    fn parse(input: ParseStream) -> Result<Self, syn::Error> {
-        let ty = input.parse()?;
-        let _comma: Token![,] = input.parse()?;
-        let expr = input.parse()?;
-        Ok(Self { ty, expr })
     }
 }

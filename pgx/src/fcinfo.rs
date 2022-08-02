@@ -68,8 +68,8 @@ pub struct NULL;
 /// use pgx::*;
 ///
 /// #[pg_extern]
-/// fn get_a_set() -> impl std::iter::Iterator<Item=(name!(id, i32), name!(title, &'static str))> {
-///     vec![1, 2, 3].into_iter().zip(vec!["A", "B", "C"].into_iter())
+/// fn get_a_set() -> TableIterator<'static, (name!(id, i32), name!(title, &'static str))> {
+///     TableIterator::new(vec![1, 2, 3].into_iter().zip(vec!["A", "B", "C"].into_iter()))
 /// }
 /// ```
 #[macro_export]

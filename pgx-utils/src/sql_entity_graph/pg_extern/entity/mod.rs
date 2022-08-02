@@ -208,8 +208,56 @@ impl ToSql for PgExternEntity {
                         );
                             args.push(buf);
                         }
+                        Ok(SqlVariant::SourceOnly {
+                            requires_array_brackets,
+                        }) => {
+                            let sql = context.source_only_to_sql_type(arg.used_ty.ty_source).map(|v| {
+                                    if requires_array_brackets {
+                                        format!("{v}[]")
+                                    } else {
+                                        format!("{v}")
+                                    }
+                                })
+                                .ok_or_else(|| {
+                                    eyre!(
+                                    "Macro expansion time suggested a source only mapping in return"
+                                )
+                                })?;
+                            let buf = format!("\
+                                \t\"{pattern}\" {variadic}{schema_prefix}{sql_type}{default}{maybe_comma}/* {type_name} */\
+                            ",
+                                pattern = arg.pattern,
+                                schema_prefix = context.schema_prefix_for(&graph_index),
+                                // First try to match on [`TypeId`] since it's most reliable.
+                                sql_type = sql,
+                                default = if let Some(def) = arg.used_ty.default { format!(" DEFAULT {}", def) } else { String::from("") },
+                                variadic = if metadata_argument.variadic { "VARIADIC " } else { "" },
+                                maybe_comma = if needs_comma { ", " } else { " " },
+                                type_name = metadata_argument.type_name,
+                        );
+                            args.push(buf);
+                        }
                         Ok(SqlVariant::Skip) => (),
-                        Err(err) => return Err(err).wrap_err("While mapping argument"),
+                        Err(err) => {
+                            match context.source_only_to_sql_type(arg.used_ty.ty_source) {
+                                Some(source_only_mapping) => {
+                                            let buf = format!("\
+                                            \t\"{pattern}\" {variadic}{schema_prefix}{sql_type}{default}{maybe_comma}/* {type_name} */\
+                                        ",
+                                            pattern = arg.pattern,
+                                            schema_prefix = context.schema_prefix_for(&graph_index),
+                                            // First try to match on [`TypeId`] since it's most reliable.
+                                            sql_type = source_only_mapping,
+                                            default = if let Some(def) = arg.used_ty.default { format!(" DEFAULT {}", def) } else { String::from("") },
+                                            variadic = if metadata_argument.variadic { "VARIADIC " } else { "" },
+                                            maybe_comma = if needs_comma { ", " } else { " " },
+                                            type_name = metadata_argument.type_name,
+                                    );
+                                    args.push(buf);
+                                },
+                                None => return Err(err).wrap_err("While mapping argument")
+                            }
+                        },
                     }
                 }
                 String::from("\n") + &args.join("\n") + "\n"
@@ -238,8 +286,19 @@ impl ToSql for PgExternEntity {
                         } else {
                             ""
                         },
+                        Ok(ReturnVariant::SetOf(SqlVariant::SourceOnly { requires_array_brackets })) =>
+                            context.source_only_to_sql_type(ty.ty_source).unwrap().to_string() + if requires_array_brackets {
+                                "[]"
+                            } else {
+                                ""
+                            },
                         Ok(other) => return Err(eyre!("Got non-plain mapped/composite return variant SQL in what macro-expansion thought was a type, got: {other:?}")),
-                        Err(err) => return Err(err).wrap_err("Error mapping return SQL"),
+                        Err(err) => {
+                            match context.source_only_to_sql_type(ty.ty_source) {
+                                Some(source_only_mapping) => source_only_mapping,
+                                None => return Err(err).wrap_err("Error mapping return SQL")
+                            }
+                        },
                     };
                     format!(
                         "RETURNS {schema_prefix}{sql_type} /* {full_path} */",
@@ -264,6 +323,12 @@ impl ToSql for PgExternEntity {
                             Ok(ReturnVariant::SetOf(SqlVariant::Mapped(ref sql))) => sql.clone(),
                             Ok(ReturnVariant::SetOf(SqlVariant::Composite { requires_array_brackets })) =>
                                 ty.composite_type.unwrap().to_string() + if requires_array_brackets {
+                                    "[]"
+                                } else {
+                                    ""
+                                },
+                            Ok(ReturnVariant::SetOf(SqlVariant::SourceOnly { requires_array_brackets })) =>
+                                context.source_only_to_sql_type(ty.ty_source).unwrap().to_string() + if requires_array_brackets {
                                     "[]"
                                 } else {
                                     ""
@@ -295,6 +360,12 @@ impl ToSql for PgExternEntity {
                                                 ""
                                             }
                                         },
+                                        SqlVariant::SourceOnly { requires_array_brackets } =>
+                                            context.source_only_to_sql_type(table_items[idx].ty.ty_source).unwrap() + if *requires_array_brackets {
+                                                "[]"
+                                            } else {
+                                                ""
+                                            },
                                         SqlVariant::Skip => todo!(),
                                     };
                                     retval_sqls.push(sql)
@@ -456,6 +527,18 @@ impl ToSql for PgExternEntity {
                             .ok_or(eyre!("Found a composite type but macro expansion time did not reveal a name, use `pgx::composite_type!()`"))?.to_string()
                     }
                 }
+                Ok(SqlVariant::SourceOnly {
+                    requires_array_brackets,
+                }) => {
+                    if requires_array_brackets {
+                        let composite_type = context.source_only_to_sql_type(self.fn_args[0].used_ty.ty_source)
+                            .ok_or(eyre!("Found a source only mapping but no source mapping exists for this"))?;
+                        format!("{composite_type}[]")
+                    } else {
+                        context.source_only_to_sql_type(self.fn_args[0].used_ty.ty_source)
+                        .ok_or(eyre!("Found a composite type but macro expansion time did not reveal a name, use `pgx::composite_type!()`"))?.to_string()
+                    }
+                }
                 Ok(SqlVariant::Skip) => {
                     return Err(eyre!(
                         "Found an skipped SQL type in an operator, this is not valid"
@@ -499,6 +582,18 @@ impl ToSql for PgExternEntity {
                     } else {
                         self.fn_args[0].used_ty.composite_type
                             .ok_or(eyre!("Found a composite type but macro expansion time did not reveal a name, use `pgx::composite_type!()`"))?.to_string()
+                    }
+                }
+                Ok(SqlVariant::SourceOnly {
+                    requires_array_brackets,
+                }) => {
+                    if requires_array_brackets {
+                        let composite_type = context.source_only_to_sql_type(self.fn_args[1].used_ty.ty_source)
+                            .ok_or(eyre!("Found a source only mapping but no source mapping exists for this"))?;
+                        format!("{composite_type}[]")
+                    } else {
+                        context.source_only_to_sql_type(self.fn_args[1].used_ty.ty_source)
+                        .ok_or(eyre!("Found a composite type but macro expansion time did not reveal a name, use `pgx::composite_type!()`"))?.to_string()
                     }
                 }
                 Ok(SqlVariant::Skip) => {

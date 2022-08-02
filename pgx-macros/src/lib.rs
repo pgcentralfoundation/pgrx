@@ -20,11 +20,11 @@ use pgx_utils::{
     *,
 };
 use proc_macro::TokenStream;
-use proc_macro2::{Ident, Span};
-use quote::{quote, quote_spanned, ToTokens};
+use proc_macro2::{Ident};
+use quote::{quote, ToTokens};
 use std::collections::HashSet;
 use syn::spanned::Spanned;
-use syn::{parse_macro_input, Attribute, Data, DeriveInput, Item, ItemFn, ItemImpl};
+use syn::{parse_macro_input, Attribute, Data, DeriveInput, Item, ItemImpl};
 
 /// Declare a function as `#[pg_guard]` to indicate that it is called from a Postgres `extern "C"`
 /// function so that Rust `panic!()`s (and Postgres `elog(ERROR)`s) will be properly handled by `pgx`
@@ -546,54 +546,6 @@ pub fn pg_extern(attr: TokenStream, item: TokenStream) -> TokenStream {
             TokenStream::from(quote! {
               compile_error!(#msg);
             })
-        }
-    }
-}
-
-fn rewrite_item_fn(
-    mut func: ItemFn,
-    extern_args: HashSet<ExternArgs>,
-    sql_graph_entity_submission: &PgExtern,
-) -> proc_macro2::TokenStream {
-    let is_raw = extern_args.contains(&ExternArgs::Raw);
-    let no_guard = extern_args.contains(&ExternArgs::NoGuard);
-
-    let finfo_name = syn::Ident::new(
-        &format!("pg_finfo_{}_wrapper", func.sig.ident),
-        Span::call_site(),
-    );
-
-    // use the PgGuardRewriter to go ahead and wrap the function here, rather than applying
-    // a #[pg_guard] macro to the original function.  This is necessary so that compiler
-    // errors/warnings indicate the proper line numbers
-    let rewriter = PgGuardRewriter::new();
-
-    // make the function 'extern "C"' because this is for the #[pg_extern[ macro
-    func.sig.abi = Some(syn::parse_str("extern \"C\"").unwrap());
-    let func_span = func.span();
-    let (rewritten_func, need_wrapper) = rewriter.item_fn(
-        func,
-        Some(sql_graph_entity_submission),
-        true,
-        is_raw,
-        no_guard,
-    );
-
-    if need_wrapper {
-        quote_spanned! {func_span=>
-            #[no_mangle]
-            #[doc(hidden)]
-            pub extern "C" fn #finfo_name() -> &'static pg_sys::Pg_finfo_record {
-                const V1_API: pg_sys::Pg_finfo_record = pg_sys::Pg_finfo_record { api_version: 1 };
-                &V1_API
-            }
-
-            #rewritten_func
-        }
-    } else {
-        quote_spanned! {func_span=>
-
-            #rewritten_func
         }
     }
 }

@@ -33,6 +33,7 @@ impl std::fmt::Display for ArgumentError {
 pub enum SqlVariant {
     Mapped(String),
     Composite { requires_array_brackets: bool },
+    SourceOnly { requires_array_brackets: bool },
     Skip,
 }
 
@@ -112,6 +113,11 @@ where
                 }) => Ok(SqlVariant::Composite {
                     requires_array_brackets: true,
                 }),
+                Ok(SqlVariant::SourceOnly {
+                    requires_array_brackets: _,
+                }) => Ok(SqlVariant::SourceOnly {
+                    requires_array_brackets: true,
+                }),
                 Ok(SqlVariant::Skip) => Ok(SqlVariant::Skip),
                 err @ Err(_) => err,
             },
@@ -129,6 +135,11 @@ where
                 Ok(ReturnVariant::Plain(SqlVariant::Composite {
                     requires_array_brackets: _,
                 })) => Ok(ReturnVariant::Plain(SqlVariant::Composite {
+                    requires_array_brackets: true,
+                })),
+                Ok(ReturnVariant::Plain(SqlVariant::SourceOnly {
+                    requires_array_brackets: _,
+                })) => Ok(ReturnVariant::Plain(SqlVariant::SourceOnly {
                     requires_array_brackets: true,
                 })),
                 Ok(ReturnVariant::Plain(SqlVariant::Skip)) => {
@@ -164,6 +175,16 @@ impl SqlTranslatable for i32 {
         ))))
     }
 }
+
+impl SqlTranslatable for u32 {
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+        Ok(SqlVariant::SourceOnly { requires_array_brackets: false })
+    }
+    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
+        Ok(ReturnVariant::Plain(SqlVariant::SourceOnly { requires_array_brackets: false }))
+    }
+}
+
 
 impl SqlTranslatable for String {
     fn argument_sql() -> Result<SqlVariant, ArgumentError> {
