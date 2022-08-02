@@ -301,10 +301,7 @@ impl PgExtern {
             #[no_mangle]
             #[doc(hidden)]
             pub extern "C" fn  #sql_graph_entity_fn_name() -> ::pgx::utils::sql_entity_graph::SqlGraphEntity {
-                use core::any::TypeId;
                 extern crate alloc;
-                use alloc::vec::Vec;
-                use alloc::vec;
                 type FunctionPointer = #unsafety fn(#( #input_types ),*) #return_type;
                 let metadata: FunctionPointer = #ident;
                 let submission = ::pgx::utils::sql_entity_graph::PgExternEntity {
@@ -390,6 +387,7 @@ impl PgExtern {
             Returning::None => quote_spanned! { self.func.sig.span() =>
                     #[no_mangle]
                     #[doc(hidden)]
+                    #[pg_guard]
                     pub unsafe extern "C" fn #func_name_wrapper #func_generics(#fcinfo_ident: ::pgx::pg_sys::FunctionCallInfo) {
                         #(
                             #arg_fetches
@@ -440,11 +438,11 @@ impl PgExtern {
                     }
                 }
             }
-            Returning::SetOf(retval_ty) => {
+            Returning::SetOf { ty: retval_ty, optional } => {
                 let result_ident = syn::Ident::new("result", self.func.sig.span());
                 let funcctx_ident = syn::Ident::new("funcctx", self.func.sig.span());
                 let retval_ty_resolved = retval_ty.original_ty;
-                let result_handler = if retval_ty.optional.is_some() {
+                let result_handler = if optional {
                     quote_spanned! { self.func.sig.span() =>
                         let #result_ident = match pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).switch_to(|_| { #func_name(#(#arg_pats),*) }) {
                             Some(result) => result,
@@ -465,46 +463,54 @@ impl PgExtern {
                     #[doc(hidden)]
                     #[pg_guard]
                     pub unsafe extern "C" fn #func_name_wrapper #func_generics(#fcinfo_ident: ::pgx::pg_sys::FunctionCallInfo) -> ::pgx::pg_sys::Datum {
-                        let mut #funcctx_ident: pgx::PgBox<pg_sys::FuncCallContext> = if srf_is_first_call(fcinfo) {
-                            let mut #funcctx_ident = pgx::srf_first_call_init(fcinfo);
-                            #funcctx_ident.user_fctx = pgx::PgMemoryContexts::For(#funcctx_ident.multi_call_memory_ctx)
-                                .palloc_struct::<SetOfIterator<#retval_ty_resolved>>() as pgx::memcxt::void_mut_ptr;
-
-                            #(
-                                #arg_fetches
-                            )*
-
-                            let mut iterator_holder = pgx::PgBox::from_pg(#funcctx_ident.user_fctx as *mut SetOfIterator<#retval_ty_resolved>);
-
+                        struct IteratorHolder<'__pgx_internal_lifetime, T: std::panic::UnwindSafe + std::panic::RefUnwindSafe> {
+                            iter: *mut SetOfIterator<'__pgx_internal_lifetime, T>,
+                        }
+        
+                        let mut funcctx: ::pgx::PgBox<pg_sys::FuncCallContext>;
+                        let mut iterator_holder: ::pgx::PgBox<IteratorHolder<#retval_ty_resolved>>;
+        
+                        if srf_is_first_call(fcinfo) {
+                            funcctx = pgx::srf_first_call_init(fcinfo);
+                            funcctx.user_fctx = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).palloc_struct::<IteratorHolder<#retval_ty_resolved>>() as void_mut_ptr;
+        
+                            iterator_holder = pgx::PgBox::from_pg(funcctx.user_fctx as *mut IteratorHolder<#retval_ty_resolved>);
+        
+                            #( #arg_fetches )*
                             #result_handler
-
-                            let iterator_holder = pgx::PgMemoryContexts::For(#funcctx_ident.multi_call_memory_ctx).leak_trivial_alloc(#result_ident);
-                            #funcctx_ident
-                        } else {
-                            let mut #funcctx_ident = pgx::srf_per_call_setup(fcinfo);
-
-                            #funcctx_ident
-                        };
-
-                        let mut iterator_holder = pgx::PgBox::from_pg(funcctx.user_fctx as *mut pgx::SetOfIterator<#retval_ty_resolved>);
-                        match iterator_holder.next() {
+        
+                            iterator_holder.iter = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).leak_trivial_alloc(result);
+                        }
+        
+                        funcctx = pgx::srf_per_call_setup(fcinfo);
+                        iterator_holder = pgx::PgBox::from_pg(funcctx.user_fctx as *mut IteratorHolder<#retval_ty_resolved>);
+        
+                        let mut iter = Box::from_raw(iterator_holder.iter);
+                        match iter.next() {
                             Some(result) => {
-
-                                pgx::srf_return_next(fcinfo, &mut #funcctx_ident);
+                                // we need to leak the boxed iterator so that it's not freed by rust and we can
+                                // continue to use it
+                                Box::leak(iter);
+        
+                                pgx::srf_return_next(fcinfo, &mut funcctx);
                                 match result.into_datum() {
                                     Some(datum) => datum,
                                     None => pgx::pg_return_null(fcinfo),
                                 }
                             },
                             None => {
-                                pgx::srf_return_done(fcinfo, &mut #funcctx_ident);
+                                // leak the iterator here too, even tho we're done, b/c our MemoryContextCallback
+                                // function is going to properly drop it for us
+                                Box::leak(iter);
+        
+                                pgx::srf_return_done(fcinfo, &mut funcctx);
                                 pgx::pg_return_null(fcinfo)
                             },
                         }
                     }
                 }
             }
-            Returning::Iterated(retval_tys) => {
+            Returning::Iterated { tys: retval_tys, optional} => {
                 let result_ident = syn::Ident::new("result", self.func.sig.span());
                 let funcctx_ident = syn::Ident::new("funcctx", self.func.sig.span());
                 let retval_tys_resolved = retval_tys.iter().map(|v| &v.used_ty.resolved_ty);
@@ -527,63 +533,81 @@ impl PgExtern {
                     let heap_tuple = pgx::pg_sys::heap_form_tuple(#funcctx_ident.tuple_desc, datums.as_mut_ptr(), nulls.as_mut_ptr());
                 };
 
-                let result_handler = quote_spanned! { self.func.sig.span() =>
-                    let #result_ident = pgx::PgMemoryContexts::For(#funcctx_ident.multi_call_memory_ctx).switch_to(|_| { #func_name(#(#arg_pats),*) });
+                let result_handler = if optional {
+                    quote_spanned! { self.func.sig.span() =>
+                        let #result_ident = match pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).switch_to(|_| { #func_name(#(#arg_pats),*) }) {
+                            Some(result) => result,
+                            None => {
+                                pgx::srf_return_done(fcinfo, &mut funcctx);
+                                return pgx::pg_return_null(fcinfo)
+                            }
+                        };
+                    }
+                } else {
+                    quote_spanned! { self.func.sig.span() =>
+                        let #result_ident = pgx::PgMemoryContexts::For(#funcctx_ident.multi_call_memory_ctx).switch_to(|_| { #func_name(#(#arg_pats),*) });
+                    }
                 };
 
                 quote_spanned! { self.func.sig.span() =>
                     #[no_mangle]
                     #[doc(hidden)]
                     #[pg_guard]
-                    pub unsafe extern "C" fn #func_name_wrapper #func_generics(#fcinfo_ident: ::pgx::pg_sys::FunctionCallInfo) -> ::pgx::pg_sys::Datum {
-                        let mut #funcctx_ident: pgx::PgBox<pg_sys::FuncCallContext> = if srf_is_first_call(fcinfo) {
-                            let mut #funcctx_ident = pgx::srf_first_call_init(fcinfo);
-                            #funcctx_ident.user_fctx = pgx::PgMemoryContexts::For(#funcctx_ident.multi_call_memory_ctx)
-                                .palloc_struct::<TableIterator<#retval_tys_tuple>>() as pgx::memcxt::void_mut_ptr;
-
-                            #(
-                                #arg_fetches
-                            )*
-
-
-                            let mut iterator_holder = pgx::PgBox::from_pg(#funcctx_ident.user_fctx as *mut TableIterator<#retval_tys_tuple>);
-
+                    pub unsafe extern "C" fn #func_name_wrapper #func_generics(fcinfo: pg_sys::FunctionCallInfo) -> pg_sys::Datum {
+                        struct IteratorHolder<'__pgx_internal_lifetime, T: std::panic::UnwindSafe + std::panic::RefUnwindSafe> {
+                            iter: *mut TableIterator<'__pgx_internal_lifetime, T>,
+                        }
+        
+                        let mut funcctx: pgx::PgBox<pg_sys::FuncCallContext>;
+                        let mut iterator_holder: pgx::PgBox<IteratorHolder<#retval_tys_tuple>>;
+        
+                        if srf_is_first_call(fcinfo) {
+                            funcctx = pgx::srf_first_call_init(fcinfo);
+                            funcctx.user_fctx = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).palloc_struct::<IteratorHolder<#retval_tys_tuple>>() as void_mut_ptr;
+                            funcctx.tuple_desc = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).switch_to(|_| {
+                                let mut tupdesc: *mut pgx::pg_sys::TupleDescData = std::ptr::null_mut();
+        
+                                /* Build a tuple descriptor for our result type */
+                                if pgx::pg_sys::get_call_result_type(fcinfo, std::ptr::null_mut(), &mut tupdesc) != pgx::pg_sys::TypeFuncClass_TYPEFUNC_COMPOSITE {
+                                    pgx::error!("return type must be a row type");
+                                }
+        
+                                pgx::pg_sys::BlessTupleDesc(tupdesc)
+                            });
+                            iterator_holder = pgx::PgBox::from_pg(funcctx.user_fctx as *mut IteratorHolder<#retval_tys_tuple>);
+        
+                            #( #arg_fetches )*
                             #result_handler
-
-                            let iterator_holder = pgx::PgMemoryContexts::For(#funcctx_ident.multi_call_memory_ctx).leak_trivial_alloc(#result_ident);
-
-                            #funcctx_ident
-                        } else {
-                            let mut #funcctx_ident = pgx::srf_per_call_setup(fcinfo);
-
-                            #funcctx_ident
-                        };
-
-
-                        let mut iter = Box::from_raw(funcctx.user_fctx as *mut pgx::TableIterator<#retval_tys_tuple>);
-
+        
+                            iterator_holder.iter = pgx::PgMemoryContexts::For(funcctx.multi_call_memory_ctx).leak_and_drop_on_delete(result);
+                        }
+        
+                        funcctx = pgx::srf_per_call_setup(fcinfo);
+                        iterator_holder = pgx::PgBox::from_pg(funcctx.user_fctx as *mut IteratorHolder<#retval_tys_tuple>);
+        
+                        let mut iter = Box::from_raw(iterator_holder.iter);
                         match iter.next() {
                             Some(result) => {
                                 // we need to leak the boxed iterator so that it's not freed by rust and we can
                                 // continue to use it
                                 Box::leak(iter);
-
+        
                                 #create_heap_tuple
-
+        
                                 let datum = pgx::heap_tuple_get_datum(heap_tuple);
-                                pgx::srf_return_next(fcinfo, &mut #funcctx_ident);
+                                pgx::srf_return_next(fcinfo, &mut funcctx);
                                 pgx::pg_sys::Datum::from(datum)
                             },
                             None => {
                                 // leak the iterator here too, even tho we're done, b/c our MemoryContextCallback
                                 // function is going to properly drop it for us
                                 Box::leak(iter);
-
-                                pgx::srf_return_done(fcinfo, &mut #funcctx_ident);
+        
+                                pgx::srf_return_done(fcinfo, &mut funcctx);
                                 pgx::pg_return_null(fcinfo)
                             },
                         }
-                    }
+                    }        
                 }
             }
             Returning::Trigger => todo!(),

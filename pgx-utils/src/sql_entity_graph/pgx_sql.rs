@@ -8,8 +8,6 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 use eyre::{eyre, WrapErr};
 use std::{any::TypeId, collections::HashMap, fmt::Debug, path::Path};
-use syn::Item;
-
 use owo_colors::{OwoColorize, XtermColors};
 use petgraph::{dot::Dot, graph::NodeIndex, stable_graph::StableGraph};
 use tracing::instrument;
@@ -921,7 +919,7 @@ fn initialize_externs(
                         });
                 }
             }
-            PgExternReturnEntity::Iterated(iterated_returns) => {
+            PgExternReturnEntity::Iterated { tys: iterated_returns, optional } => {
                 for PgExternReturnEntityIteratedItem {
                     ty: return_ty_entity,
                     ..
@@ -1110,7 +1108,7 @@ fn connect_externs(
                     }
                 }
             }
-            PgExternReturnEntity::Iterated(iterated_returns) => {
+            PgExternReturnEntity::Iterated { tys: iterated_returns, optional: _ } => {
                 for PgExternReturnEntityIteratedItem {
                     ty: type_entity, ..
                 } in iterated_returns

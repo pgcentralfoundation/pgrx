@@ -13,7 +13,7 @@ use std::convert::TryFrom;
 use syn::{
     parse::{Parse, ParseStream},
     spanned::Spanned,
-    Token, TypePath,
+    Token,
 };
 
 #[derive(Debug, Clone)]
@@ -26,8 +26,8 @@ pub struct ReturningIteratedItem {
 pub enum Returning {
     None,
     Type(UsedType),
-    SetOf(UsedType),
-    Iterated(Vec<ReturningIteratedItem>),
+    SetOf { ty: UsedType, optional: bool },
+    Iterated { tys: Vec<ReturningIteratedItem>, optional: bool },
     /// `pgx_pg_sys::Datum`
     Trigger,
 }
@@ -60,7 +60,6 @@ impl TryFrom<&syn::ReturnType> for Returning {
                         let mut saw_pg_sys = false;
                         let mut saw_datum_ident = false;
                         let mut saw_option_ident = false;
-                        let mut saw_box_ident = false;
                         let mut saw_setof_iterator = false;
                         let mut saw_table_iterator = false;
 
@@ -70,7 +69,6 @@ impl TryFrom<&syn::ReturnType> for Returning {
                                 "pg_sys" => saw_pg_sys = true,
                                 "Datum" => saw_datum_ident = true,
                                 "Option" => saw_option_ident = true,
-                                "Box" => saw_box_ident = true,
                                 "SetOfIterator" => saw_setof_iterator = true,
                                 "TableIterator" => saw_table_iterator = true,
                                 _ => (),
@@ -123,20 +121,20 @@ impl TryFrom<&syn::ReturnType> for Returning {
                             }
                             if saw_setof_iterator {
                                 let last_path_segment = option_inner_path.segments.last().unwrap();
-                                let used_ty = match &last_path_segment.arguments {
+                                let (used_ty, optional) = match &last_path_segment.arguments {
                                     syn::PathArguments::AngleBracketed(args) => {
                                         match args.args.last().unwrap() {
                                         syn::GenericArgument::Type(ty) => {
                                             match &ty {
                                                 syn::Type::Path(path) => {
-                                                    UsedType::new(syn::Type::Path(path.clone()))?
+                                                    (UsedType::new(syn::Type::Path(path.clone()))?, saw_option_ident)
                                                 }
-                                                syn::Type::Macro(type_macro) => UsedType::new(
-                                                    syn::Type::Macro(type_macro.clone()),
-                                                )?,
-                                                reference @ syn::Type::Reference(_) => UsedType::new(
-                                                    (*reference).clone(),
-                                                )?,
+                                                syn::Type::Macro(type_macro) => {
+                                                    (UsedType::new(syn::Type::Macro(type_macro.clone()),)?, saw_option_ident)
+                                                },
+                                                reference @ syn::Type::Reference(_) => {
+                                                    (UsedType::new((*reference).clone(),)?, saw_option_ident)
+                                                },
                                                 ty => {
                                                     unimplemented!("SetOf Iterator must have an item, got: {ty:?}")
                                                 }
@@ -161,7 +159,7 @@ impl TryFrom<&syn::ReturnType> for Returning {
                                         ))
                                     }
                                 };
-                                Ok(Returning::SetOf(used_ty))
+                                Ok(Returning::SetOf { ty: used_ty, optional })
                             } else if saw_table_iterator {
                                 let iterator_path = if saw_option_ident {
                                     let inner_path =
@@ -284,7 +282,7 @@ impl TryFrom<&syn::ReturnType> for Returning {
                                         ))
                                     }
                                 };
-                                Ok(Returning::Iterated(iterated_items))
+                                Ok(Returning::Iterated { tys: iterated_items, optional: saw_option_ident })
                             } else {
                                 let used_ty = UsedType::new(syn::Type::Path(typepath.clone()))?;
                                 Ok(Returning::Type(used_ty))
@@ -334,15 +332,16 @@ impl ToTokens for Returning {
                     }
                 }
             }
-            Returning::SetOf(used_ty) => {
+            Returning::SetOf{ ty: used_ty, optional } => {
                 let used_ty_entity_tokens = used_ty.entity_tokens();
                 quote! {
                     ::pgx::utils::sql_entity_graph::PgExternReturnEntity::SetOf {
                         ty: #used_ty_entity_tokens,
+                        optional: #optional,
                     }
                 }
             }
-            Returning::Iterated(items) => {
+            Returning::Iterated{ tys: items, optional } => {
                 let quoted_items = items
                     .iter()
                     .map(|ReturningIteratedItem { used_ty, name }| {
@@ -357,9 +356,12 @@ impl ToTokens for Returning {
                     })
                     .collect::<Vec<_>>();
                 quote! {
-                    ::pgx::utils::sql_entity_graph::PgExternReturnEntity::Iterated(vec![
-                        #(#quoted_items),*
-                    ])
+                    ::pgx::utils::sql_entity_graph::PgExternReturnEntity::Iterated {
+                        tys: vec![
+                            #(#quoted_items),*
+                        ],
+                        optional: #optional,
+                    }
                 }
             }
             Returning::Trigger => quote! {

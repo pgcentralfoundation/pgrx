@@ -129,9 +129,9 @@ impl ToTokens for PostgresEnum {
                 syn::GenericParam::Lifetime(_) => None,
             })
             .collect();
-        let (staticless_impl_generics, staticless_ty_generics, staticless_where_clauses) =
+        let (staticless_impl_generics, _staticless_ty_generics, _staticless_where_clauses) =
             staticless_generics.split_for_impl();
-        let (static_impl_generics, static_ty_generics, static_where_clauses) =
+        let (_static_impl_generics, static_ty_generics, static_where_clauses) =
             static_generics.split_for_impl();
 
         let variants = self.variants.iter();

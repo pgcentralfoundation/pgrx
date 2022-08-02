@@ -10,10 +10,6 @@ pub mod entity;
 
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
-use std::{
-    fs::{create_dir_all, File},
-    io::Write,
-};
 use syn::{
     parse::{Parse, ParseStream},
     DeriveInput, Generics, ItemStruct,
@@ -155,9 +151,9 @@ impl ToTokens for PostgresType {
                 syn::GenericParam::Lifetime(_) => None,
             })
             .collect();
-        let (staticless_impl_generics, staticless_ty_generics, staticless_where_clauses) =
+        let (staticless_impl_generics, _staticless_ty_generics, _staticless_where_clauses) =
             staticless_generics.split_for_impl();
-        let (static_impl_generics, static_ty_generics, static_where_clauses) =
+        let (_static_impl_generics, static_ty_generics, static_where_clauses) =
             static_generics.split_for_impl();
 
         let in_fn = &self.in_fn;

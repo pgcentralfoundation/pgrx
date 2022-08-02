@@ -16,10 +16,10 @@ pub use returning::{PgExternReturnEntity, PgExternReturnEntityIteratedItem};
 
 use crate::{
     sql_entity_graph::{
-        metadata::{ReturnVariant, SqlTranslatable, SqlVariant},
+        metadata::{ReturnVariant, SqlVariant},
         pgx_sql::PgxSql,
         to_sql::{entity::ToSqlConfigEntity, ToSql},
-        SqlDeclared, SqlGraphEntity, SqlGraphIdentifier,
+        SqlGraphEntity, SqlGraphIdentifier,
     },
     ExternArgs,
 };
@@ -248,7 +248,7 @@ impl ToSql for PgExternEntity {
                         full_path = ty.full_path
                     )
                 }
-                PgExternReturnEntity::SetOf { ty } => {
+                PgExternReturnEntity::SetOf { ty, optional: _ } => {
                     let graph_index = context
                         .graph
                         .neighbors_undirected(self_index)
@@ -268,7 +268,7 @@ impl ToSql for PgExternEntity {
                                 } else {
                                     ""
                                 },
-                            Ok(other) => return Err(eyre!("Got non-setof mapped/composite return variant SQL in what macro-expansion thought was a setof")),
+                            Ok(_other) => return Err(eyre!("Got non-setof mapped/composite return variant SQL in what macro-expansion thought was a setof")),
                             Err(err) => return Err(err).wrap_err("Error mapping return SQL"),
                         };
                     format!(
@@ -278,7 +278,7 @@ impl ToSql for PgExternEntity {
                         full_path = ty.full_path
                     )
                 }
-                PgExternReturnEntity::Iterated(table_items) => {
+                PgExternReturnEntity::Iterated { tys: table_items, optional: _ } => {
                     let mut items = String::new();
                     let metadata_retval = self.metadata.retval.clone().ok_or_else(|| eyre!("Macro expansion time and SQL resolution time had differing opinions about the return value existing"))?;
                     let metadata_retval_sqls = match metadata_retval.return_sql {
@@ -301,7 +301,7 @@ impl ToSql for PgExternEntity {
                                 }
                                 retval_sqls
                             },
-                            Ok(other) => return Err(eyre!("Got non-table return variant SQL in what macro-expansion thought was a table")),
+                            Ok(_other) => return Err(eyre!("Got non-table return variant SQL in what macro-expansion thought was a table")),
                             Err(err) => return Err(err).wrap_err("Error mapping return SQL"),
                         };
 

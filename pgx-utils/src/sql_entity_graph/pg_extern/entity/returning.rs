@@ -13,8 +13,8 @@ use crate::sql_entity_graph::UsedTypeEntity;
 pub enum PgExternReturnEntity {
     None,
     Type { ty: UsedTypeEntity },
-    SetOf { ty: UsedTypeEntity },
-    Iterated(Vec<PgExternReturnEntityIteratedItem>),
+    SetOf { ty: UsedTypeEntity, optional: bool /* Eg `Option<SetOfIterator<T>>` */ },
+    Iterated { tys: Vec<PgExternReturnEntityIteratedItem>, optional: bool  /* Eg `Option<TableIterator<T>>` */ },
     Trigger,
 }
 

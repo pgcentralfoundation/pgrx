@@ -1,4 +1,3 @@
-use core::any::TypeId;
 use std::error::Error;
 
 use super::{return_variant::ReturnVariantError, ReturnVariant};

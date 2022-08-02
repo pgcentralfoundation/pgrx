@@ -1,5 +1,3 @@
-use core::any::TypeId;
-
 use crate::sql_entity_graph::metadata::{
     return_variant::ReturnVariantError, ArgumentError, ReturnVariant, SqlVariant,
 };

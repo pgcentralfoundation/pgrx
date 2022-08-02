@@ -1,4 +1,4 @@
-use core::{any::TypeId, marker::PhantomData};
+use core::marker::PhantomData;
 
 use super::{
     return_variant::ReturnVariantError, ArgumentError, FunctionMetadataTypeEntity, ReturnVariant,
