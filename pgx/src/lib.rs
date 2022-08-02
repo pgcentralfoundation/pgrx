@@ -108,7 +108,6 @@ pub use pgx_utils as utils;
 use core::any::TypeId;
 use once_cell::sync::Lazy;
 use std::collections::HashSet;
-use std::panic::UnwindSafe;
 
 use pgx_utils::sql_entity_graph::{RustSourceOnlySqlMapping, RustSqlMapping};
 
@@ -660,6 +659,9 @@ where
             Ok(SqlVariant::Composite { .. }) => Ok(SqlVariant::Composite {
                 requires_array_brackets: true,
             }),
+            Ok(SqlVariant::SourceOnly { .. }) => Ok(SqlVariant::SourceOnly {
+                requires_array_brackets: true,
+            }),
             err @ Err(_) => err,
         }
     }
@@ -672,6 +674,11 @@ where
             Ok(ReturnVariant::Plain(SqlVariant::Composite {
                 requires_array_brackets: _,
             })) => Ok(ReturnVariant::Plain(SqlVariant::Composite {
+                requires_array_brackets: true,
+            })),
+            Ok(ReturnVariant::Plain(SqlVariant::SourceOnly {
+                requires_array_brackets: _,
+            })) => Ok(ReturnVariant::Plain(SqlVariant::SourceOnly {
                 requires_array_brackets: true,
             })),
             Ok(ReturnVariant::Plain(SqlVariant::Skip)) => Err(ReturnVariantError::SkipInArray),
@@ -693,6 +700,9 @@ where
             Ok(SqlVariant::Composite { .. }) => Ok(SqlVariant::Composite {
                 requires_array_brackets: true,
             }),
+            Ok(SqlVariant::SourceOnly { .. }) => Ok(SqlVariant::SourceOnly {
+                requires_array_brackets: true,
+            }),
             err @ Err(_) => err,
         }
     }
@@ -705,6 +715,11 @@ where
             Ok(ReturnVariant::Plain(SqlVariant::Composite {
                 requires_array_brackets: _,
             })) => Ok(ReturnVariant::Plain(SqlVariant::Composite {
+                requires_array_brackets: true,
+            })),
+            Ok(ReturnVariant::Plain(SqlVariant::SourceOnly {
+                requires_array_brackets: _,
+            })) => Ok(ReturnVariant::Plain(SqlVariant::SourceOnly {
                 requires_array_brackets: true,
             })),
             Ok(ReturnVariant::Plain(SqlVariant::Skip)) => Err(ReturnVariantError::SkipInArray),
