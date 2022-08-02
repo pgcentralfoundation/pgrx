@@ -211,7 +211,9 @@ impl ToSql for PgExternEntity {
                         Ok(SqlVariant::SourceOnly {
                             requires_array_brackets,
                         }) => {
-                            let sql = context.source_only_to_sql_type(arg.used_ty.ty_source).map(|v| {
+                            let sql = context
+                                .source_only_to_sql_type(arg.used_ty.ty_source)
+                                .map(|v| {
                                     if requires_array_brackets {
                                         format!("{v}[]")
                                     } else {
@@ -241,7 +243,7 @@ impl ToSql for PgExternEntity {
                         Err(err) => {
                             match context.source_only_to_sql_type(arg.used_ty.ty_source) {
                                 Some(source_only_mapping) => {
-                                            let buf = format!("\
+                                    let buf = format!("\
                                             \t\"{pattern}\" {variadic}{schema_prefix}{sql_type}{default}{maybe_comma}/* {type_name} */\
                                         ",
                                             pattern = arg.pattern,
@@ -254,10 +256,10 @@ impl ToSql for PgExternEntity {
                                             type_name = metadata_argument.type_name,
                                     );
                                     args.push(buf);
-                                },
-                                None => return Err(err).wrap_err("While mapping argument")
+                                }
+                                None => return Err(err).wrap_err("While mapping argument"),
                             }
-                        },
+                        }
                     }
                 }
                 String::from("\n") + &args.join("\n") + "\n"
@@ -343,7 +345,10 @@ impl ToSql for PgExternEntity {
                         full_path = ty.full_path
                     )
                 }
-                PgExternReturnEntity::Iterated { tys: table_items, optional: _ } => {
+                PgExternReturnEntity::Iterated {
+                    tys: table_items,
+                    optional: _,
+                } => {
                     let mut items = String::new();
                     let metadata_retval = self.metadata.retval.clone().ok_or_else(|| eyre!("Macro expansion time and SQL resolution time had differing opinions about the return value existing"))?;
                     let metadata_retval_sqls = match metadata_retval.return_sql {
@@ -531,8 +536,11 @@ impl ToSql for PgExternEntity {
                     requires_array_brackets,
                 }) => {
                     if requires_array_brackets {
-                        let composite_type = context.source_only_to_sql_type(self.fn_args[0].used_ty.ty_source)
-                            .ok_or(eyre!("Found a source only mapping but no source mapping exists for this"))?;
+                        let composite_type = context
+                            .source_only_to_sql_type(self.fn_args[0].used_ty.ty_source)
+                            .ok_or(eyre!(
+                                "Found a source only mapping but no source mapping exists for this"
+                            ))?;
                         format!("{composite_type}[]")
                     } else {
                         context.source_only_to_sql_type(self.fn_args[0].used_ty.ty_source)
@@ -588,8 +596,11 @@ impl ToSql for PgExternEntity {
                     requires_array_brackets,
                 }) => {
                     if requires_array_brackets {
-                        let composite_type = context.source_only_to_sql_type(self.fn_args[1].used_ty.ty_source)
-                            .ok_or(eyre!("Found a source only mapping but no source mapping exists for this"))?;
+                        let composite_type = context
+                            .source_only_to_sql_type(self.fn_args[1].used_ty.ty_source)
+                            .ok_or(eyre!(
+                                "Found a source only mapping but no source mapping exists for this"
+                            ))?;
                         format!("{composite_type}[]")
                     } else {
                         context.source_only_to_sql_type(self.fn_args[1].used_ty.ty_source)

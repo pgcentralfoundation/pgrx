@@ -26,8 +26,14 @@ pub struct ReturningIteratedItem {
 pub enum Returning {
     None,
     Type(UsedType),
-    SetOf { ty: UsedType, optional: bool },
-    Iterated { tys: Vec<ReturningIteratedItem>, optional: bool },
+    SetOf {
+        ty: UsedType,
+        optional: bool,
+    },
+    Iterated {
+        tys: Vec<ReturningIteratedItem>,
+        optional: bool,
+    },
     /// `pgx_pg_sys::Datum`
     Trigger,
 }
@@ -159,7 +165,10 @@ impl TryFrom<&syn::ReturnType> for Returning {
                                         ))
                                     }
                                 };
-                                Ok(Returning::SetOf { ty: used_ty, optional })
+                                Ok(Returning::SetOf {
+                                    ty: used_ty,
+                                    optional,
+                                })
                             } else if saw_table_iterator {
                                 let iterator_path = if saw_option_ident {
                                     let inner_path =
@@ -282,7 +291,10 @@ impl TryFrom<&syn::ReturnType> for Returning {
                                         ))
                                     }
                                 };
-                                Ok(Returning::Iterated { tys: iterated_items, optional: saw_option_ident })
+                                Ok(Returning::Iterated {
+                                    tys: iterated_items,
+                                    optional: saw_option_ident,
+                                })
                             } else {
                                 let used_ty = UsedType::new(syn::Type::Path(typepath.clone()))?;
                                 Ok(Returning::Type(used_ty))
@@ -332,7 +344,10 @@ impl ToTokens for Returning {
                     }
                 }
             }
-            Returning::SetOf{ ty: used_ty, optional } => {
+            Returning::SetOf {
+                ty: used_ty,
+                optional,
+            } => {
                 let used_ty_entity_tokens = used_ty.entity_tokens();
                 quote! {
                     ::pgx::utils::sql_entity_graph::PgExternReturnEntity::SetOf {
@@ -341,7 +356,10 @@ impl ToTokens for Returning {
                     }
                 }
             }
-            Returning::Iterated{ tys: items, optional } => {
+            Returning::Iterated {
+                tys: items,
+                optional,
+            } => {
                 let quoted_items = items
                     .iter()
                     .map(|ReturningIteratedItem { used_ty, name }| {

@@ -29,8 +29,7 @@ INSERT INTO spi_example (title) VALUES ('I like pudding');
 
 #[pg_extern]
 fn spi_return_query(
-) -> TableIterator<'static, (name!(oid, Option<pg_sys::Oid>), name!(name, Option<String>))>
-{
+) -> TableIterator<'static, (name!(oid, Option<pg_sys::Oid>), name!(name, Option<String>))> {
     #[cfg(feature = "pg10")]
     let query = "SELECT oid, relname::text || '-pg10' FROM pg_class";
     #[cfg(feature = "pg11")]

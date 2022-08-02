@@ -178,13 +178,16 @@ impl SqlTranslatable for i32 {
 
 impl SqlTranslatable for u32 {
     fn argument_sql() -> Result<SqlVariant, ArgumentError> {
-        Ok(SqlVariant::SourceOnly { requires_array_brackets: false })
+        Ok(SqlVariant::SourceOnly {
+            requires_array_brackets: false,
+        })
     }
     fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        Ok(ReturnVariant::Plain(SqlVariant::SourceOnly { requires_array_brackets: false }))
+        Ok(ReturnVariant::Plain(SqlVariant::SourceOnly {
+            requires_array_brackets: false,
+        }))
     }
 }
-
 
 impl SqlTranslatable for String {
     fn argument_sql() -> Result<SqlVariant, ArgumentError> {

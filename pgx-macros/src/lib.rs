@@ -20,7 +20,7 @@ use pgx_utils::{
     *,
 };
 use proc_macro::TokenStream;
-use proc_macro2::{Ident};
+use proc_macro2::Ident;
 use quote::{quote, ToTokens};
 use std::collections::HashSet;
 use syn::spanned::Spanned;

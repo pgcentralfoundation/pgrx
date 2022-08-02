@@ -7,9 +7,9 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 use eyre::{eyre, WrapErr};
-use std::{any::TypeId, collections::HashMap, fmt::Debug, path::Path};
 use owo_colors::{OwoColorize, XtermColors};
 use petgraph::{dot::Dot, graph::NodeIndex, stable_graph::StableGraph};
+use std::{any::TypeId, collections::HashMap, fmt::Debug, path::Path};
 use tracing::instrument;
 
 use crate::sql_entity_graph::{
@@ -919,7 +919,10 @@ fn initialize_externs(
                         });
                 }
             }
-            PgExternReturnEntity::Iterated { tys: iterated_returns, optional: _ } => {
+            PgExternReturnEntity::Iterated {
+                tys: iterated_returns,
+                optional: _,
+            } => {
                 for PgExternReturnEntityIteratedItem {
                     ty: return_ty_entity,
                     ..
@@ -1108,7 +1111,10 @@ fn connect_externs(
                     }
                 }
             }
-            PgExternReturnEntity::Iterated { tys: iterated_returns, optional: _ } => {
+            PgExternReturnEntity::Iterated {
+                tys: iterated_returns,
+                optional: _,
+            } => {
                 for PgExternReturnEntityIteratedItem {
                     ty: type_entity, ..
                 } in iterated_returns

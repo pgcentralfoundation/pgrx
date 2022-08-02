@@ -184,11 +184,19 @@ impl UsedType {
                                         }
                                     }
                                     // Option<T>
-                                    _ => return Err(syn::Error::new(type_path.span().clone(), "Unexpected Item found inside `Option` (expected Type)")),
+                                    _ => {
+                                        return Err(syn::Error::new(
+                                            type_path.span().clone(),
+                                            "Unexpected Item found inside `Option` (expected Type)",
+                                        ))
+                                    }
                                 }
                             }
                             // Option<T>
-                            _ => return Err(syn::Error::new(type_path.span().clone(), "Unexpected Item found inside `Option` (expected Angle Brackets)")),
+                            _ => return Err(syn::Error::new(
+                                type_path.span().clone(),
+                                "Unexpected Item found inside `Option` (expected Angle Brackets)",
+                            )),
                         }
                     }
                     // VariadicArray<T>
