@@ -176,15 +176,19 @@ impl UsedType {
                                                 }
                                             }
                                             // Option<T>
-                                            _ => (syn::Type::Path(type_path), false, None),
+                                            _ => (
+                                                syn::Type::Path(type_path.clone()),
+                                                false,
+                                                Some(inner_ty.clone()),
+                                            ),
                                         }
                                     }
                                     // Option<T>
-                                    _ => (syn::Type::Path(type_path), false, None),
+                                    _ => return Err(syn::Error::new(type_path.span().clone(), "Unexpected Item found inside `Option` (expected Type)")),
                                 }
                             }
                             // Option<T>
-                            _ => (syn::Type::Path(type_path), false, None),
+                            _ => return Err(syn::Error::new(type_path.span().clone(), "Unexpected Item found inside `Option` (expected Angle Brackets)")),
                         }
                     }
                     // VariadicArray<T>

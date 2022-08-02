@@ -62,9 +62,9 @@ fn rstore_size(rstore: Option<RustStore>) -> i64 {
 #[pg_extern]
 fn rstore_table(
     rstore: Option<RustStore>,
-) -> impl std::iter::Iterator<Item = (name!(key, String), name!(value, String))> {
+) -> TableIterator<'static, (name!(key, String), name!(value, String))> {
     match rstore {
-        Some(rstore) => rstore.0.into_iter(),
-        None => HashMap::<String, String>::default().into_iter(),
+        Some(rstore) => TableIterator::new(rstore.0.into_iter()),
+        None => TableIterator::new(HashMap::<String, String>::default().into_iter()),
     }
 }

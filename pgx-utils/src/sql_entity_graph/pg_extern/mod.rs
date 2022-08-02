@@ -300,7 +300,7 @@ impl PgExtern {
         quote_spanned! { self.func.sig.span() =>
             #[no_mangle]
             #[doc(hidden)]
-            pub extern "C" fn  #sql_graph_entity_fn_name() -> ::pgx::utils::sql_entity_graph::SqlGraphEntity {
+            pub extern "Rust" fn  #sql_graph_entity_fn_name() -> ::pgx::utils::sql_entity_graph::SqlGraphEntity {
                 extern crate alloc;
                 type FunctionPointer = #unsafety fn(#( #input_types ),*) #return_type;
                 let metadata: FunctionPointer = #ident;
