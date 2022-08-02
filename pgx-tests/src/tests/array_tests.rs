@@ -156,6 +156,29 @@ fn over_implicit_drop() -> Vec<i64> {
     // Implicit drop of _arr
 }
 
+// This deliberately iterates the Array.
+// Because Array::iter currently iterates the Array as Datums, this is guaranteed to be "bug-free" regarding size.
+#[pg_extern]
+fn arr_mapped_vec(arr: Array<i32>) -> Vec<i32> {
+    arr.iter().filter_map(|x| x).collect()
+}
+
+/// Naive conversion. This causes errors if Array::as_slice doesn't handle differently sized slices well.
+#[pg_extern]
+#[allow(deprecated)]
+fn arr_into_vec(arr: Array<i32>) -> Vec<i32> {
+    arr.as_slice().to_vec()
+}
+
+#[pg_extern]
+#[allow(deprecated)]
+fn arr_sort_uniq(arr: Array<i32>) -> Vec<i32> {
+    let mut v: Vec<i32> = arr.as_slice().into();
+    v.sort();
+    v.dedup();
+    v
+}
+
 #[cfg(any(test, feature = "pg_test"))]
 #[pgx::pg_schema]
 mod tests {
@@ -354,5 +377,21 @@ mod tests {
         let vals: Vec<i64> =
             Spi::get_one("SELECT over_implicit_drop();").expect("over machine broke");
         assert_eq!(vals, &[1, 2, 3, 4, 5]);
+    }
+
+    #[pg_test]
+    fn test_arr_to_vec() {
+        let result = Spi::get_one::<Vec<i32>>("SELECT arr_mapped_vec(ARRAY[3,2,2,1]::integer[])");
+        let other = Spi::get_one::<Vec<i32>>("SELECT arr_into_vec(ARRAY[3,2,2,1]::integer[])");
+        // One should be equivalent to the canonical form.
+        assert_eq!(result, Some(vec![3, 2, 2, 1]));
+        // And they should be equal to each other.
+        assert_eq!(result, other);
+    }
+
+    #[pg_test]
+    fn test_arr_sort_uniq() {
+        let result = Spi::get_one::<Vec<i32>>("SELECT arr_sort_uniq(ARRAY[3,2,2,1]::integer[])");
+        assert_eq!(result, Some(vec![1, 2, 3]));
     }
 }
