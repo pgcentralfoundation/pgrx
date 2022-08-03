@@ -2,7 +2,18 @@ use pgx_utils::sql_entity_graph::metadata::{
     ArgumentError, ReturnVariant, ReturnVariantError, SqlTranslatable, SqlVariant,
 };
 
+#[cfg(any(feature = "pg14", feature = "pg13", feature = "pg12"))]
 impl SqlTranslatable for crate::FunctionCallInfoBaseData {
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+        Ok(SqlVariant::Skip)
+    }
+    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
+        Ok(ReturnVariant::Plain(SqlVariant::Skip))
+    }
+}
+
+#[cfg(any(feature = "pg10", feature = "pg11"))]
+impl SqlTranslatable for crate::FunctionCallInfoData {
     fn argument_sql() -> Result<SqlVariant, ArgumentError> {
         Ok(SqlVariant::Skip)
     }
