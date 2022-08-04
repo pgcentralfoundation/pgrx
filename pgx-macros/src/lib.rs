@@ -64,19 +64,41 @@ pub fn pg_test(attr: TokenStream, item: TokenStream) -> TokenStream {
         }
     });
 
-    stream.extend(proc_macro2::TokenStream::from(pg_extern(
-        attr,
-        item.clone(),
-    )));
-
-    let expected_error = match expected_error {
-        Some(msg) => quote! {Some(#msg)},
-        None => quote! {None},
-    };
-
     let ast = parse_macro_input!(item as syn::Item);
+
     match ast {
-        Item::Fn(func) => {
+        Item::Fn(mut func) => {
+            // Here we need to break out attributes into test and non-test attributes,
+            // so the generated #[test] attributes are in the appropriate place.
+            let mut test_attributes = Vec::new();
+            let mut non_test_attributes = Vec::new();
+
+            for attribute in func.attrs.iter() {
+                if let Some(ident) = attribute.path.get_ident() {
+                    let ident_str = ident.to_string();
+
+                    if ident_str == "ignore" || ident_str == "should_panic" {
+                        test_attributes.push(attribute.clone());
+                    } else {
+                        non_test_attributes.push(attribute.clone());
+                    }
+                } else {
+                    non_test_attributes.push(attribute.clone());
+                }
+            }
+
+            func.attrs = non_test_attributes;
+
+            stream.extend(proc_macro2::TokenStream::from(pg_extern(
+                attr,
+                Item::Fn(func.clone()).to_token_stream().into(),
+            )));
+
+            let expected_error = match expected_error {
+                Some(msg) => quote! {Some(#msg)},
+                None => quote! {None},
+            };
+
             let sql_funcname = func.sig.ident.to_string();
             let test_func_name =
                 Ident::new(&format!("pg_{}", func.sig.ident.to_string()), func.span());
@@ -93,6 +115,7 @@ pub fn pg_test(attr: TokenStream, item: TokenStream) -> TokenStream {
 
             stream.extend(quote! {
                 #[test]
+                #(#test_attributes)*
                 fn #test_func_name() {
                     let mut options = Vec::new();
                     #att_stream
