@@ -35,21 +35,21 @@ impl SqlTranslatable for crate::PlannerInfo {
 
 impl SqlTranslatable for crate::IndexAmRoutine {
     fn argument_sql() -> Result<SqlVariant, ArgumentError> {
-        Ok(SqlVariant::Mapped(String::from("box")))
+        Ok(SqlVariant::Mapped(String::from("internal")))
     }
     fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
         Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
-            "box",
+            "internal",
         ))))
     }
 }
 impl SqlTranslatable for crate::FdwRoutine {
     fn argument_sql() -> Result<SqlVariant, ArgumentError> {
-        Ok(SqlVariant::Mapped(String::from("box")))
+        Ok(SqlVariant::Mapped(String::from("fdw_handler")))
     }
     fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
         Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
-            "box",
+            "fdw_handler",
         ))))
     }
 }

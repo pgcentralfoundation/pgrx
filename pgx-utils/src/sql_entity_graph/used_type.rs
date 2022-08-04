@@ -9,6 +9,8 @@ use syn::{
     Token,
 };
 
+use super::metadata::FunctionMetadataTypeEntity;
+
 /// A type, optionally with an overriding composite type name
 ///
 /// Can be transformed into a [`TypeEntity`]
@@ -243,6 +245,11 @@ impl UsedType {
                 default:  None #( .unwrap_or(Some(#default)) )*,
                 /// Set via the type being an `Option`.
                 optional: #optional,
+                metadata: {
+                    use pgx::utils::sql_entity_graph::metadata::PhantomDataExt;
+                    let marker: core::marker::PhantomData<#resolved_ty> = core::marker::PhantomData;
+                    marker.entity()
+                },
             }
         }
     }
@@ -259,6 +266,7 @@ pub struct UsedTypeEntity {
     pub default: Option<&'static str>,
     /// Set via the type being an `Option`.
     pub optional: bool,
+    pub metadata: FunctionMetadataTypeEntity,
 }
 
 fn resolve_vec_inner(

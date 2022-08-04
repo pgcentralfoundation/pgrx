@@ -162,147 +162,6 @@ pub static DEFAULT_RUST_SOURCE_TO_SQL: Lazy<HashSet<RustSourceOnlySqlMapping>> =
     m
 });
 
-macro_rules! map_type {
-    ($map:ident, $rust:ty, $sql:expr) => {{
-        <$rust as WithTypeIds>::register_with_refs(&mut $map, $sql.to_string());
-        WithSizedTypeIds::<$rust>::register_sized_with_refs(&mut $map, $sql.to_string());
-        WithArrayTypeIds::<$rust>::register_array_with_refs(&mut $map, $sql.to_string());
-        WithVarlenaTypeIds::<$rust>::register_varlena_with_refs(&mut $map, $sql.to_string());
-    }};
-}
-
-/// The default lookup for [`TypeId`]s to both Rust and SQL types via a [`RustSqlMapping`].
-///
-/// This only contains types known to [`pgx`](crate), so it will not include types defined by things
-/// like [`derive@PostgresType`] in the local extension.
-pub static DEFAULT_RUST_TYPE_ID_TO_SQL: Lazy<HashSet<RustSqlMapping>> = Lazy::new(|| {
-    let mut m = HashSet::new();
-
-    // `str` isn't sized, so we can't lean on the macro.
-    <str as WithTypeIds>::register(&mut m, "text".to_string());
-    map_type!(m, &str, "text");
-
-    // Bytea is a special case, notice how it has no `bytea[]`.
-    m.insert(RustSqlMapping {
-        sql: String::from("bytea"),
-        id: TypeId::of::<&[u8]>(),
-        rust: core::any::type_name::<&[u8]>().to_string(),
-    });
-    m.insert(RustSqlMapping {
-        sql: String::from("bytea"),
-        id: TypeId::of::<Option<&[u8]>>(),
-        rust: core::any::type_name::<Option<&[u8]>>().to_string(),
-    });
-    m.insert(RustSqlMapping {
-        sql: String::from("bytea"),
-        id: TypeId::of::<Vec<u8>>(),
-        rust: core::any::type_name::<Vec<u8>>().to_string(),
-    });
-    m.insert(RustSqlMapping {
-        sql: String::from("bytea"),
-        id: TypeId::of::<Option<Vec<u8>>>(),
-        rust: core::any::type_name::<Option<Vec<u8>>>().to_string(),
-    });
-
-    map_type!(m, String, "text");
-    map_type!(m, &std::ffi::CStr, "cstring");
-    map_type!(m, &crate::cstr_core::CStr, "cstring");
-    map_type!(m, (), "void");
-    map_type!(m, i8, "\"char\"");
-    map_type!(m, i16, "smallint");
-    map_type!(m, i32, "integer");
-    map_type!(m, i64, "bigint");
-    map_type!(m, bool, "bool");
-    map_type!(m, char, "varchar");
-    map_type!(m, f32, "real");
-    map_type!(m, f64, "double precision");
-    map_type!(m, datum::JsonB, "jsonb");
-    map_type!(m, datum::Json, "json");
-    map_type!(m, pgx_pg_sys::ItemPointerData, "tid");
-    map_type!(m, pgx_pg_sys::Point, "point");
-    map_type!(m, pgx_pg_sys::BOX, "box");
-    map_type!(m, Date, "date");
-    map_type!(m, Time, "time");
-    map_type!(m, TimeWithTimeZone, "time with time zone");
-    map_type!(m, Timestamp, "timestamp");
-    map_type!(m, TimestampWithTimeZone, "timestamp with time zone");
-    map_type!(m, pgx_pg_sys::PlannerInfo, "internal");
-    map_type!(m, datum::Internal, "internal");
-    map_type!(m, pgbox::PgBox<pgx_pg_sys::IndexAmRoutine>, "internal");
-    map_type!(m, rel::PgRelation, "regclass");
-    map_type!(m, datum::Numeric, "numeric");
-    map_type!(m, datum::AnyElement, "anyelement");
-    map_type!(m, datum::AnyArray, "anyarray");
-    map_type!(m, datum::Inet, "inet");
-    map_type!(m, datum::Uuid, "uuid");
-    map_type!(m, pgx_pg_sys::FdwRoutine, "fdw_handler");
-
-    m
-});
-
-/// The default lookup for if composite types are a collection or not
-///
-/// This is primarily used to determine if they need `[]` in SQL generation.
-pub static DEFAULT_COMPOSITE_TYPE_COLLECTIONS: Lazy<std::collections::HashMap<TypeId, bool>> =
-    Lazy::new(|| {
-        let mut m = std::collections::HashMap::new();
-
-        m.insert(TypeId::of::<PgHeapTuple<'static, AllocatedByRust>>(), false);
-        m.insert(
-            TypeId::of::<Vec<PgHeapTuple<'static, AllocatedByRust>>>(),
-            true,
-        );
-        m.insert(
-            TypeId::of::<Vec<Option<PgHeapTuple<'static, AllocatedByRust>>>>(),
-            true,
-        );
-        m.insert(
-            TypeId::of::<Array<PgHeapTuple<'static, AllocatedByRust>>>(),
-            true,
-        );
-        m.insert(
-            TypeId::of::<Array<Option<PgHeapTuple<'static, AllocatedByRust>>>>(),
-            true,
-        );
-        m.insert(
-            TypeId::of::<VariadicArray<PgHeapTuple<'static, AllocatedByRust>>>(),
-            true,
-        );
-        m.insert(
-            TypeId::of::<VariadicArray<Option<PgHeapTuple<'static, AllocatedByRust>>>>(),
-            true,
-        );
-        m.insert(
-            TypeId::of::<Option<PgHeapTuple<'static, AllocatedByRust>>>(),
-            false,
-        );
-        m.insert(
-            TypeId::of::<Option<Vec<PgHeapTuple<'static, AllocatedByRust>>>>(),
-            true,
-        );
-        m.insert(
-            TypeId::of::<Option<Vec<Option<PgHeapTuple<'static, AllocatedByRust>>>>>(),
-            true,
-        );
-        m.insert(
-            TypeId::of::<Option<Array<PgHeapTuple<'static, AllocatedByRust>>>>(),
-            true,
-        );
-        m.insert(
-            TypeId::of::<Option<Array<Option<PgHeapTuple<'static, AllocatedByRust>>>>>(),
-            true,
-        );
-        m.insert(
-            TypeId::of::<Option<VariadicArray<PgHeapTuple<'static, AllocatedByRust>>>>(),
-            true,
-        );
-        m.insert(
-            TypeId::of::<Option<VariadicArray<Option<PgHeapTuple<'static, AllocatedByRust>>>>>(),
-            true,
-        );
-
-        m
-    });
 use pgx_utils::sql_entity_graph::metadata::SqlTranslatable;
 
 pub struct SetOfIterator<'a, T>
@@ -585,6 +444,18 @@ impl SqlTranslatable for crate::datum::Internal {
     }
 }
 
+impl SqlTranslatable for crate::rel::PgRelation {
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+        Ok(SqlVariant::Mapped(String::from("regclass")))
+    }
+    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
+        Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
+            "regclass",
+        ))))
+    }
+}
+
+
 impl<T> SqlTranslatable for crate::datum::PgVarlena<T>
 where
     T: SqlTranslatable + Copy,
@@ -843,10 +714,7 @@ macro_rules! pg_sql_graph_magic {
         #[doc(hidden)]
         pub fn __pgx_sql_mappings(_: ()) -> ::pgx::utils::sql_entity_graph::RustToSqlMapping {
             ::pgx::utils::sql_entity_graph::RustToSqlMapping {
-                rust_type_id_to_sql: ::pgx::DEFAULT_RUST_TYPE_ID_TO_SQL.clone(),
                 rust_source_to_sql: ::pgx::DEFAULT_RUST_SOURCE_TO_SQL.clone(),
-                composite_type_collections: ::pgx::DEFAULT_COMPOSITE_TYPE_COLLECTIONS.clone(),
-                internal_type: core::any::TypeId::of::<::pgx::Internal>(),
             }
         }
 

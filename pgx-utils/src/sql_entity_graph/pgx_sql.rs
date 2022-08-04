@@ -44,12 +44,7 @@ pub enum SqlGraphRelationship {
 
 #[derive(Debug, Clone)]
 pub struct RustToSqlMapping {
-    pub rust_type_id_to_sql: std::collections::HashSet<RustSqlMapping>,
     pub rust_source_to_sql: std::collections::HashSet<RustSourceOnlySqlMapping>,
-    /// True if it requires `[]` after it when printed to SQL
-    pub composite_type_collections: std::collections::HashMap<TypeId, bool>,
-    /// The internal type acts like the `Option` type, blocking strictness upgrades.
-    pub internal_type: core::any::TypeId,
 }
 
 /// A generator for SQL.
@@ -65,10 +60,7 @@ pub struct RustToSqlMapping {
 /// out of entities collected during a `pgx::pg_module_magic!()` call in a library.
 #[derive(Debug, Clone)]
 pub struct PgxSql {
-    pub type_mappings: HashMap<TypeId, RustSqlMapping>,
     pub source_mappings: HashMap<String, RustSourceOnlySqlMapping>,
-    pub composite_type_collections: std::collections::HashMap<TypeId, bool>,
-    pub internal_type: core::any::TypeId,
     pub control: ControlFile,
     pub graph: StableGraph<SqlGraphEntity, SqlGraphRelationship>,
     pub graph_root: NodeIndex,
@@ -97,10 +89,7 @@ impl PgxSql {
         versioned_so: bool,
     ) -> eyre::Result<Self> {
         let RustToSqlMapping {
-            rust_type_id_to_sql: type_mappings,
             rust_source_to_sql: source_mappings,
-            composite_type_collections,
-            internal_type,
         } = sql_mappings;
 
         let mut graph = StableGraph::new();
@@ -244,16 +233,10 @@ impl PgxSql {
         connect_triggers(&mut graph, &mapped_triggers, &mapped_schemas);
 
         let mut this = Self {
-            type_mappings: type_mappings
-                .into_iter()
-                .map(|x| (x.id.clone(), x))
-                .collect(),
             source_mappings: source_mappings
                 .into_iter()
                 .map(|x| (x.rust.clone(), x))
                 .collect(),
-            composite_type_collections,
-            internal_type,
             control: control,
             schemas: mapped_schemas,
             extension_sqls: mapped_extension_sqls,
@@ -272,7 +255,6 @@ impl PgxSql {
             extension_name: extension_name,
             versioned_so,
         };
-        this.register_types();
         Ok(this)
     }
 
@@ -465,32 +447,6 @@ impl PgxSql {
         Ok(full_sql)
     }
 
-    #[instrument(level = "error", skip(self))]
-    pub fn register_types(&mut self) {
-        for (item, _index) in self.enums.clone() {
-            for mapping in &item.mappings {
-                assert_eq!(
-                    self.type_mappings
-                        .insert(mapping.id.clone(), mapping.clone()),
-                    None,
-                    "Cannot map `{}` twice.",
-                    item.full_path,
-                );
-            }
-        }
-        for (item, _index) in self.types.clone() {
-            for mapping in &item.mappings {
-                assert_eq!(
-                    self.type_mappings
-                        .insert(mapping.id.clone(), mapping.clone()),
-                    None,
-                    "Cannot map `{}` twice.",
-                    item.full_path,
-                );
-            }
-        }
-    }
-
     pub fn has_sql_declared_entity(&self, identifier: &SqlDeclared) -> Option<&SqlDeclaredEntity> {
         self.extension_sqls.iter().find_map(|(item, _index)| {
             let retval = item.creates.iter().find_map(|create_entity| {
@@ -504,42 +460,8 @@ impl PgxSql {
         })
     }
 
-    pub fn rust_to_sql(&self, ty_id: TypeId, ty_source: &str, full_path: &str) -> Option<String> {
-        self.source_only_to_sql_type(ty_source)
-            .or_else(|| self.type_id_to_sql_type(ty_id))
-            .or_else(|| {
-                if let Some(found) =
-                    self.has_sql_declared_entity(&SqlDeclared::Type(full_path.to_string()))
-                {
-                    Some(found.sql())
-                } else if let Some(found) =
-                    self.has_sql_declared_entity(&SqlDeclared::Enum(full_path.to_string()))
-                {
-                    Some(found.sql())
-                } else {
-                    None
-                }
-            })
-    }
-
-    pub fn type_id_to_sql_type(&self, id: TypeId) -> Option<String> {
-        self.type_mappings.get(&id).map(|f| f.sql.clone())
-    }
-
     pub fn source_only_to_sql_type(&self, ty_source: &str) -> Option<String> {
         self.source_mappings.get(ty_source).map(|f| f.sql.clone())
-    }
-
-    pub fn map_type_to_sql_type<T: 'static>(&mut self, sql: impl AsRef<str> + Debug) {
-        let sql = sql.as_ref().to_string();
-        self.type_mappings.insert(
-            TypeId::of::<T>(),
-            RustSqlMapping {
-                rust: core::any::type_name::<T>().to_string(),
-                sql: sql.clone(),
-                id: core::any::TypeId::of::<T>(),
-            },
-        );
     }
 
     pub fn get_module_pathname(&self) -> String {
@@ -550,13 +472,6 @@ impl PgxSql {
         } else {
             String::from("MODULE_PATHNAME")
         };
-    }
-
-    pub fn composite_type_requires_square_brackets(&self, ty_id: &TypeId) -> eyre::Result<bool> {
-        self.composite_type_collections
-            .get(ty_id)
-            .cloned()
-            .ok_or(eyre!("Not a Composite Type"))
     }
 }
 

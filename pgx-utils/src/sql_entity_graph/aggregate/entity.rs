@@ -10,7 +10,7 @@ use crate::sql_entity_graph::{
     aggregate::options::{FinalizeModify, ParallelOption},
     pgx_sql::PgxSql,
     to_sql::{entity::ToSqlConfigEntity, ToSql},
-    SqlDeclared, SqlGraphEntity, SqlGraphIdentifier, UsedTypeEntity,
+    SqlDeclared, SqlGraphEntity, SqlGraphIdentifier, UsedTypeEntity, metadata::FunctionMetadataTypeEntity,
 };
 use core::{any::TypeId, cmp::Ordering};
 use eyre::{eyre, WrapErr};
@@ -265,42 +265,7 @@ impl ToSql for PgAggregateEntity {
         }
 
         let map_ty = |used_ty: &UsedTypeEntity| -> eyre::Result<String> {
-            if let Some(composite_type) = used_ty.composite_type {
-                Ok(composite_type.to_string()
-                    + if context
-                        .composite_type_requires_square_brackets(&used_ty.ty_id)
-                        .wrap_err_with(|| format!("Attempted on `{}`", used_ty.ty_source))?
-                    {
-                        "[]"
-                    } else {
-                        ""
-                    })
-            } else {
-                context
-                    .source_only_to_sql_type(used_ty.ty_source)
-                    .or_else(|| context.type_id_to_sql_type(used_ty.ty_id))
-                    .or_else(|| {
-                        let pat = used_ty.full_path.to_string();
-                        if let Some(found) =
-                            context.has_sql_declared_entity(&SqlDeclared::Type(pat.clone()))
-                        {
-                            Some(found.sql())
-                        } else if let Some(found) =
-                            context.has_sql_declared_entity(&SqlDeclared::Enum(pat.clone()))
-                        {
-                            Some(found.sql())
-                        } else {
-                            None
-                        }
-                    })
-                    .ok_or_else(|| {
-                        eyre!(
-                            "Failed to map type `{}` to SQL type while building aggregate `{}`.",
-                            used_ty.full_path,
-                            self.full_path
-                        )
-                    })
-            }
+            todo!()
         };
 
         let stype_sql = map_ty(&self.stype.used_ty).wrap_err("Mapping state type")?;
@@ -383,30 +348,7 @@ impl ToSql for PgAggregateEntity {
                        ",
                            schema_prefix = context.schema_prefix_for(&graph_index),
                            // First try to match on [`TypeId`] since it's most reliable.
-                           sql_type = if let Some(composite_type) = arg.used_ty.composite_type {
-                                composite_type.to_string()
-                                    + if context
-                                        .composite_type_requires_square_brackets(&arg.used_ty.ty_id)
-                                        .wrap_err_with(|| format!("Attempted on `{}`", arg.used_ty.ty_source))?
-                                    {
-                                        "[]"
-                                    } else {
-                                        ""
-                                    }
-                            } else {
-                                context.source_only_to_sql_type(arg.used_ty.ty_source).or_else(|| {
-                                                    context.type_id_to_sql_type(arg.used_ty.ty_id)
-                                                }).or_else(|| {
-                                                    let pat = arg.used_ty.full_path.to_string();
-                                                    if let Some(found) = context.has_sql_declared_entity(&SqlDeclared::Type(pat.clone())) {
-                                                        Some(found.sql())
-                                                    }  else if let Some(found) = context.has_sql_declared_entity(&SqlDeclared::Enum(pat.clone())) {
-                                                        Some(found.sql())
-                                                    } else {
-                                                        None
-                                                    }
-                                                }).ok_or_else(|| eyre!("Failed to map return type `{}` to SQL type while building function `{}`.", arg.used_ty.full_path, self.full_path))?
-                            },
+                           sql_type = todo!(),
                            variadic = if arg.used_ty.variadic { "VARIADIC " } else { "" },
                            maybe_comma = if needs_comma { ", " } else { " " },
                            full_path = arg.used_ty.full_path,
@@ -440,32 +382,7 @@ impl ToSql for PgAggregateEntity {
                        ",
                         schema_prefix = context.schema_prefix_for(&graph_index),
                         // First try to match on [`TypeId`] since it's most reliable.
-                        sql_type = if let Some(composite_type) = arg.used_ty.composite_type {
-                            composite_type.to_string()
-                                + if context
-                                    .composite_type_requires_square_brackets(&arg.used_ty.ty_id)
-                                    .wrap_err_with(|| {
-                                        format!("Attempted on `{}`", arg.used_ty.ty_source)
-                                    })?
-                                {
-                                    "[]"
-                                } else {
-                                    ""
-                                }
-                        } else {
-                            context.source_only_to_sql_type(arg.used_ty.ty_source).or_else(|| {
-                                                context.type_id_to_sql_type(arg.used_ty.ty_id)
-                                            }).or_else(|| {
-                                                let pat = arg.used_ty.full_path.to_string();
-                                                if let Some(found) = context.has_sql_declared_entity(&SqlDeclared::Type(pat.clone())) {
-                                                    Some(found.sql())
-                                                }  else if let Some(found) = context.has_sql_declared_entity(&SqlDeclared::Enum(pat.clone())) {
-                                                    Some(found.sql())
-                                                } else {
-                                                    None
-                                                }
-                                            }).ok_or_else(|| eyre!("Failed to map return type `{}` to SQL type while building function `{}`.", arg.used_ty.full_path, self.full_path))?
-                        },
+                        sql_type = todo!(),
                         maybe_name = if let Some(name) = arg.name {
                             "\"".to_string() + name + "\" "
                         } else {

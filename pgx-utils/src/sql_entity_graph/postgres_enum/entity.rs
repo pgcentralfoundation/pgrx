@@ -10,7 +10,7 @@ use crate::sql_entity_graph::{
     mapping::RustSqlMapping,
     pgx_sql::PgxSql,
     to_sql::{entity::ToSqlConfigEntity, ToSql},
-    SqlGraphEntity, SqlGraphIdentifier,
+    SqlGraphEntity, SqlGraphIdentifier, metadata::FunctionMetadataTypeEntity,
 };
 
 use std::{

@@ -19,7 +19,6 @@ pub enum ReturnVariantError {
     TableInArray,
     BareU8,
     SkipInArray,
-    LikelySourceOnlyMapping,
 }
 
 impl std::fmt::Display for ReturnVariantError {
@@ -48,9 +47,6 @@ impl std::fmt::Display for ReturnVariantError {
             }
             ReturnVariantError::BareU8 => {
                 write!(f, "Canot use bare u8")
-            }
-            ReturnVariantError::LikelySourceOnlyMapping => {
-                write!(f, "Recieved a u32, you likely used a `pg_sys` C type, try using `pg_sys::$TYPE` for a source-only mapping if one exists")
             }
         }
     }

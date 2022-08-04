@@ -34,12 +34,6 @@ where
         T::optional()
     }
     fn entity(&self) -> FunctionMetadataTypeEntity {
-        FunctionMetadataTypeEntity {
-            type_name: self.type_name(),
-            argument_sql: self.argument_sql(),
-            return_sql: self.return_sql(),
-            variadic: self.variadic(),
-            optional: self.optional(),
-        }
+        T::entity()
     }
 }

@@ -1,6 +1,6 @@
 use std::error::Error;
 
-use super::{return_variant::ReturnVariantError, ReturnVariant};
+use super::{return_variant::ReturnVariantError, ReturnVariant, FunctionMetadataTypeEntity};
 
 #[derive(Clone, Copy, Debug, Hash, Ord, PartialOrd, PartialEq, Eq)]
 pub enum ArgumentError {
@@ -50,6 +50,15 @@ pub trait SqlTranslatable {
     }
     fn optional() -> bool {
         false
+    }
+    fn entity() -> FunctionMetadataTypeEntity {
+        FunctionMetadataTypeEntity {
+            type_name: Self::type_name(),
+            argument_sql: Self::argument_sql(),
+            return_sql: Self::return_sql(),
+            variadic: Self::variadic(),
+            optional: Self::optional(),
+        }
     }
 }
 
