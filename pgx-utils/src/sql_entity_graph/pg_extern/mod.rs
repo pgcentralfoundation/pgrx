@@ -288,7 +288,7 @@ impl PgExtern {
             syn::ReturnType::Default => None,
             syn::ReturnType::Type(arrow, ty) => {
                 let mut static_ty = ty.clone();
-                Some(staticize_lifetimes(&mut static_ty));
+                staticize_lifetimes(&mut static_ty);
                 Some(syn::ReturnType::Type(*arrow, static_ty))
             }
         };

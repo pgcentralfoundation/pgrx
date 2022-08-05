@@ -133,13 +133,6 @@ impl UsedType {
             original => (original, None),
         };
 
-        // Anonymize lifetimes, so the SQL resolver isn't dealing with that.
-        let resolved_ty = {
-            let mut resolved_ty = resolved_ty;
-            staticize_lifetimes(&mut resolved_ty);
-            resolved_ty
-        };
-
         // In this  step, we go look at the resolved type and determine if it is a variadic, optional, etc.
         let (resolved_ty, variadic, optional) = match resolved_ty {
             syn::Type::Path(type_path) => {
@@ -227,7 +220,8 @@ impl UsedType {
     }
 
     pub fn entity_tokens(&self) -> syn::Expr {
-        let resolved_ty = self.resolved_ty.clone();
+        let mut resolved_ty = self.resolved_ty.clone();
+        staticize_lifetimes(&mut resolved_ty);
         let resolved_ty_string = resolved_ty.to_token_stream().to_string().replace(" ", "");
         let composite_type = self.composite_type.clone().map(|v| v.expr);
         let composite_type_iter = composite_type.iter();
