@@ -6,11 +6,21 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
+/*!
+
+`#[pg_aggregate]` related entities for Rust to SQL translation
+
+> Like all of the [`sql_entity_graph`][crate::sql_entity_graph] APIs, this is considered **internal**
+to the `pgx` framework and very subject to change between versions. While you may use this, please do it with caution.
+
+
+*/
 use crate::sql_entity_graph::{
     aggregate::options::{FinalizeModify, ParallelOption},
+    metadata::SqlVariant,
     pgx_sql::PgxSql,
     to_sql::{entity::ToSqlConfigEntity, ToSql},
-    SqlGraphEntity, SqlGraphIdentifier, UsedTypeEntity, metadata::{SqlVariant},
+    SqlGraphEntity, SqlGraphIdentifier, UsedTypeEntity,
 };
 use core::{any::TypeId, cmp::Ordering};
 use eyre::{eyre, WrapErr};
@@ -266,27 +276,21 @@ impl ToSql for PgAggregateEntity {
 
         let map_ty = |used_ty: &UsedTypeEntity| -> eyre::Result<String> {
             match used_ty.metadata.argument_sql {
-                Ok(SqlVariant::Mapped(ref argument_sql)) => {
-                    Ok(argument_sql.to_string())
-                }
+                Ok(SqlVariant::Mapped(ref argument_sql)) => Ok(argument_sql.to_string()),
                 Ok(SqlVariant::Composite {
                     requires_array_brackets,
-                }) => {
-                    used_ty
-                        .composite_type
-                        .map(|v| {
-                            if requires_array_brackets {
-                                format!("{v}[]")
-                            } else {
-                                format!("{v}")
-                            }
-                        })
-                        .ok_or_else(|| {
-                            eyre!(
-                            "Macro expansion time suggested a composite_type!() in return"
-                        )
-                        })
-                }
+                }) => used_ty
+                    .composite_type
+                    .map(|v| {
+                        if requires_array_brackets {
+                            format!("{v}[]")
+                        } else {
+                            format!("{v}")
+                        }
+                    })
+                    .ok_or_else(|| {
+                        eyre!("Macro expansion time suggested a composite_type!() in return")
+                    }),
                 Ok(SqlVariant::SourceOnly {
                     requires_array_brackets,
                 }) => {
@@ -300,21 +304,17 @@ impl ToSql for PgAggregateEntity {
                             }
                         })
                         .ok_or_else(|| {
-                            eyre!(
-                            "Macro expansion time suggested a source only mapping in return"
-                        )
+                            eyre!("Macro expansion time suggested a source only mapping in return")
                         })?;
                     Ok(sql)
                 }
-                Ok(SqlVariant::Skip) => Err(eyre!("Cannot use skipped SQL translatable type as aggregate const type")),
-                Err(err) => {
-                    match context.source_only_to_sql_type(used_ty.ty_source) {
-                        Some(source_only_mapping) => {
-                            Ok(source_only_mapping.to_string())
-                        }
-                        None => return Err(err).wrap_err("While mapping argument"),
-                    }
-                }
+                Ok(SqlVariant::Skip) => Err(eyre!(
+                    "Cannot use skipped SQL translatable type as aggregate const type"
+                )),
+                Err(err) => match context.source_only_to_sql_type(used_ty.ty_source) {
+                    Some(source_only_mapping) => Ok(source_only_mapping.to_string()),
+                    None => return Err(err).wrap_err("While mapping argument"),
+                },
             }
         };
 

@@ -454,7 +454,6 @@ impl SqlTranslatable for crate::rel::PgRelation {
     }
 }
 
-
 impl<T> SqlTranslatable for crate::datum::PgVarlena<T>
 where
     T: SqlTranslatable + Copy,

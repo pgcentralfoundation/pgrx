@@ -1,3 +1,11 @@
+/*!
+
+Type level metadata for Rust to SQL generation.
+
+> Like all of the [`sql_entity_graph`][crate::sql_entity_graph] APIs, this is considered **internal**
+to the `pgx` framework and very subject to change between versions. While you may use this, please do it with caution.
+
+*/
 use std::ops::Deref;
 
 use crate::staticize_lifetimes;
@@ -12,8 +20,6 @@ use syn::{
 use super::metadata::FunctionMetadataTypeEntity;
 
 /// A type, optionally with an overriding composite type name
-///
-/// Can be transformed into a [`TypeEntity`]
 #[derive(Debug, Clone)]
 pub struct UsedType {
     pub(crate) original_ty: syn::Type,

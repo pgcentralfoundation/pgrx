@@ -1,3 +1,12 @@
+/*!
+
+Function level metadata for Rust to SQL translation
+
+> Like all of the [`sql_entity_graph`][crate::sql_entity_graph] APIs, this is considered **internal**
+to the `pgx` framework and very subject to change between versions. While you may use this, please do it with caution.
+
+
+*/
 use super::{FunctionMetadataEntity, PhantomDataExt, SqlTranslatable};
 use core::marker::PhantomData;
 

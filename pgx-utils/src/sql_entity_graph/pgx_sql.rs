@@ -6,6 +6,15 @@ All rights reserved.
 
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
+/*!
+
+Rust to SQL mapping support.
+
+> Like all of the [`sql_entity_graph`][crate::sql_entity_graph] APIs, this is considered **internal**
+to the `pgx` framework and very subject to change between versions. While you may use this, please do it with caution.
+
+*/
+
 use eyre::{eyre, WrapErr};
 use owo_colors::{OwoColorize, XtermColors};
 use petgraph::{dot::Dot, graph::NodeIndex, stable_graph::StableGraph};
@@ -19,7 +28,7 @@ use crate::sql_entity_graph::{
         entity::{ExtensionSqlEntity, SqlDeclaredEntity},
         SqlDeclared,
     },
-    mapping::{RustSourceOnlySqlMapping},
+    mapping::RustSourceOnlySqlMapping,
     pg_extern::entity::PgExternEntity,
     pg_trigger::entity::PgTriggerEntity,
     positioning_ref::PositioningRef,
