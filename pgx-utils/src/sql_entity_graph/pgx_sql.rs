@@ -19,7 +19,7 @@ use crate::sql_entity_graph::{
         entity::{ExtensionSqlEntity, SqlDeclaredEntity},
         SqlDeclared,
     },
-    mapping::{RustSourceOnlySqlMapping, RustSqlMapping},
+    mapping::{RustSourceOnlySqlMapping},
     pg_extern::entity::PgExternEntity,
     pg_trigger::entity::PgTriggerEntity,
     positioning_ref::PositioningRef,
@@ -232,7 +232,7 @@ impl PgxSql {
         )?;
         connect_triggers(&mut graph, &mapped_triggers, &mapped_schemas);
 
-        let mut this = Self {
+        let this = Self {
             source_mappings: source_mappings
                 .into_iter()
                 .map(|x| (x.rust.clone(), x))

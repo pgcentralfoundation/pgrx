@@ -10,7 +10,7 @@ use crate::sql_entity_graph::{
     aggregate::options::{FinalizeModify, ParallelOption},
     pgx_sql::PgxSql,
     to_sql::{entity::ToSqlConfigEntity, ToSql},
-    SqlDeclared, SqlGraphEntity, SqlGraphIdentifier, UsedTypeEntity, metadata::FunctionMetadataTypeEntity,
+    SqlGraphEntity, SqlGraphIdentifier, UsedTypeEntity, metadata::{SqlVariant},
 };
 use core::{any::TypeId, cmp::Ordering};
 use eyre::{eyre, WrapErr};
@@ -265,7 +265,57 @@ impl ToSql for PgAggregateEntity {
         }
 
         let map_ty = |used_ty: &UsedTypeEntity| -> eyre::Result<String> {
-            todo!()
+            match used_ty.metadata.argument_sql {
+                Ok(SqlVariant::Mapped(ref argument_sql)) => {
+                    Ok(argument_sql.to_string())
+                }
+                Ok(SqlVariant::Composite {
+                    requires_array_brackets,
+                }) => {
+                    used_ty
+                        .composite_type
+                        .map(|v| {
+                            if requires_array_brackets {
+                                format!("{v}[]")
+                            } else {
+                                format!("{v}")
+                            }
+                        })
+                        .ok_or_else(|| {
+                            eyre!(
+                            "Macro expansion time suggested a composite_type!() in return"
+                        )
+                        })
+                }
+                Ok(SqlVariant::SourceOnly {
+                    requires_array_brackets,
+                }) => {
+                    let sql = context
+                        .source_only_to_sql_type(used_ty.ty_source)
+                        .map(|v| {
+                            if requires_array_brackets {
+                                format!("{v}[]")
+                            } else {
+                                format!("{v}")
+                            }
+                        })
+                        .ok_or_else(|| {
+                            eyre!(
+                            "Macro expansion time suggested a source only mapping in return"
+                        )
+                        })?;
+                    Ok(sql)
+                }
+                Ok(SqlVariant::Skip) => Err(eyre!("Cannot use skipped SQL translatable type as aggregate const type")),
+                Err(err) => {
+                    match context.source_only_to_sql_type(used_ty.ty_source) {
+                        Some(source_only_mapping) => {
+                            Ok(source_only_mapping.to_string())
+                        }
+                        None => return Err(err).wrap_err("While mapping argument"),
+                    }
+                }
+            }
         };
 
         let stype_sql = map_ty(&self.stype.used_ty).wrap_err("Mapping state type")?;
@@ -348,7 +398,57 @@ impl ToSql for PgAggregateEntity {
                        ",
                            schema_prefix = context.schema_prefix_for(&graph_index),
                            // First try to match on [`TypeId`] since it's most reliable.
-                           sql_type = todo!(),
+                           sql_type = match arg.used_ty.metadata.argument_sql {
+                                Ok(SqlVariant::Mapped(ref argument_sql)) => {
+                                    argument_sql.to_string()
+                                }
+                                Ok(SqlVariant::Composite {
+                                    requires_array_brackets,
+                                }) => {
+                                    arg.used_ty
+                                        .composite_type
+                                        .map(|v| {
+                                            if requires_array_brackets {
+                                                format!("{v}[]")
+                                            } else {
+                                                format!("{v}")
+                                            }
+                                        })
+                                        .ok_or_else(|| {
+                                            eyre!(
+                                            "Macro expansion time suggested a composite_type!() in return"
+                                        )
+                                        })?
+                                }
+                                Ok(SqlVariant::SourceOnly {
+                                    requires_array_brackets,
+                                }) => {
+                                    let sql = context
+                                        .source_only_to_sql_type(arg.used_ty.ty_source)
+                                        .map(|v| {
+                                            if requires_array_brackets {
+                                                format!("{v}[]")
+                                            } else {
+                                                format!("{v}")
+                                            }
+                                        })
+                                        .ok_or_else(|| {
+                                            eyre!(
+                                            "Macro expansion time suggested a source only mapping in return"
+                                        )
+                                        })?;
+                                    sql
+                                }
+                                Ok(SqlVariant::Skip) => return Err(eyre!("Got a skipped SQL translatable type in aggregate args, this is not permitted")),
+                                Err(err) => {
+                                    match context.source_only_to_sql_type(arg.used_ty.ty_source) {
+                                        Some(source_only_mapping) => {
+                                            source_only_mapping.to_string()
+                                        }
+                                        None => return Err(err).wrap_err("While mapping argument"),
+                                    }
+                                }
+                            },
                            variadic = if arg.used_ty.variadic { "VARIADIC " } else { "" },
                            maybe_comma = if needs_comma { ", " } else { " " },
                            full_path = arg.used_ty.full_path,
@@ -382,7 +482,7 @@ impl ToSql for PgAggregateEntity {
                        ",
                         schema_prefix = context.schema_prefix_for(&graph_index),
                         // First try to match on [`TypeId`] since it's most reliable.
-                        sql_type = todo!(),
+                        sql_type = map_ty(&arg.used_ty).wrap_err("Mapping direct arg type")?,
                         maybe_name = if let Some(name) = arg.name {
                             "\"".to_string() + name + "\" "
                         } else {

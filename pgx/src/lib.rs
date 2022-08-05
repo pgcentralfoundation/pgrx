@@ -105,11 +105,10 @@ pub use pgx_pg_sys::PgBuiltInOids; // reexport this so it looks like it comes fr
 pub use cstr_core;
 pub use pgx_utils as utils;
 
-use core::any::TypeId;
 use once_cell::sync::Lazy;
 use std::collections::HashSet;
 
-use pgx_utils::sql_entity_graph::{RustSourceOnlySqlMapping, RustSqlMapping};
+use pgx_utils::sql_entity_graph::RustSourceOnlySqlMapping;
 
 macro_rules! map_source_only {
     ($map:ident, $rust:ty, $sql:expr) => {{
