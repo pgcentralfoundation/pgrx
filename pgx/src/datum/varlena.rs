@@ -14,6 +14,9 @@ use crate::{
     StringInfo,
 };
 use pgx_pg_sys::varlena;
+use pgx_utils::sql_entity_graph::metadata::{
+    ArgumentError, ReturnVariant, ReturnVariantError, SqlTranslatable, SqlVariant,
+};
 use serde::{Deserialize, Serialize};
 use std::borrow::Cow;
 use std::marker::PhantomData;
@@ -438,4 +441,17 @@ where
     let data = vardata_any(varlena);
     let slice = std::slice::from_raw_parts(data as *const u8, len);
     serde_json::from_slice(slice).expect("failed to decode JSON")
+}
+
+impl<T> SqlTranslatable for PgVarlena<T>
+where
+    T: SqlTranslatable + Copy,
+{
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+        T::argument_sql()
+    }
+
+    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
+        T::return_sql()
+    }
 }

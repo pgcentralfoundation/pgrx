@@ -11,6 +11,9 @@ use crate::{
     direct_function_call, direct_function_call_as_datum, pg_sys, vardata_any, varsize_any_exhdr,
     void_mut_ptr, FromDatum, IntoDatum,
 };
+use pgx_utils::sql_entity_graph::metadata::{
+    ArgumentError, ReturnVariant, ReturnVariantError, SqlTranslatable, SqlVariant,
+};
 use serde::{Serialize, Serializer};
 use serde_json::Value;
 
@@ -168,5 +171,27 @@ impl Serialize for JsonString {
         serde_json::to_value(self.0.as_str())
             .expect("JsonString is not valid JSON")
             .serialize(serializer)
+    }
+}
+
+impl SqlTranslatable for Json {
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+        Ok(SqlVariant::Mapped(String::from("json")))
+    }
+    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
+        Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
+            "json",
+        ))))
+    }
+}
+
+impl SqlTranslatable for crate::datum::JsonB {
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+        Ok(SqlVariant::Mapped(String::from("jsonb")))
+    }
+    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
+        Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
+            "jsonb",
+        ))))
     }
 }

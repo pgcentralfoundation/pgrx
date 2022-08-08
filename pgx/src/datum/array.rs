@@ -8,6 +8,9 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use crate::{pg_sys, void_mut_ptr, FromDatum, IntoDatum, PgMemoryContexts};
+use pgx_utils::sql_entity_graph::metadata::{
+    ArgumentError, ReturnVariant, ReturnVariantError, SqlTranslatable, SqlVariant,
+};
 use serde::Serializer;
 use std::marker::PhantomData;
 
@@ -514,5 +517,91 @@ where
     #[inline]
     fn is_compatible_with(other: pg_sys::Oid) -> bool {
         Self::type_oid() == other || other == unsafe { pg_sys::get_array_type(T::type_oid()) }
+    }
+}
+
+impl<'a, T> SqlTranslatable for Array<'a, T>
+where
+    T: SqlTranslatable + FromDatum,
+{
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+        match T::argument_sql() {
+            Ok(SqlVariant::Mapped(sql)) => Ok(SqlVariant::Mapped(format!("{sql}[]"))),
+            Ok(SqlVariant::Skip) => Err(ArgumentError::SkipInArray),
+            Ok(SqlVariant::Composite { .. }) => Ok(SqlVariant::Composite {
+                requires_array_brackets: true,
+            }),
+            Ok(SqlVariant::SourceOnly { .. }) => Ok(SqlVariant::SourceOnly {
+                requires_array_brackets: true,
+            }),
+            err @ Err(_) => err,
+        }
+    }
+
+    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
+        match T::return_sql() {
+            Ok(ReturnVariant::Plain(SqlVariant::Mapped(sql))) => {
+                Ok(ReturnVariant::Plain(SqlVariant::Mapped(format!("{sql}[]"))))
+            }
+            Ok(ReturnVariant::Plain(SqlVariant::Composite {
+                requires_array_brackets: _,
+            })) => Ok(ReturnVariant::Plain(SqlVariant::Composite {
+                requires_array_brackets: true,
+            })),
+            Ok(ReturnVariant::Plain(SqlVariant::SourceOnly {
+                requires_array_brackets: _,
+            })) => Ok(ReturnVariant::Plain(SqlVariant::SourceOnly {
+                requires_array_brackets: true,
+            })),
+            Ok(ReturnVariant::Plain(SqlVariant::Skip)) => Err(ReturnVariantError::SkipInArray),
+            Ok(ReturnVariant::SetOf(_)) => Err(ReturnVariantError::SetOfInArray),
+            Ok(ReturnVariant::Table(_)) => Err(ReturnVariantError::TableInArray),
+            err @ Err(_) => err,
+        }
+    }
+}
+
+impl<'a, T> SqlTranslatable for VariadicArray<'a, T>
+where
+    T: SqlTranslatable + FromDatum,
+{
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+        match T::argument_sql() {
+            Ok(SqlVariant::Mapped(sql)) => Ok(SqlVariant::Mapped(format!("{sql}[]"))),
+            Ok(SqlVariant::Skip) => Err(ArgumentError::SkipInArray),
+            Ok(SqlVariant::Composite { .. }) => Ok(SqlVariant::Composite {
+                requires_array_brackets: true,
+            }),
+            Ok(SqlVariant::SourceOnly { .. }) => Ok(SqlVariant::SourceOnly {
+                requires_array_brackets: true,
+            }),
+            err @ Err(_) => err,
+        }
+    }
+
+    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
+        match T::return_sql() {
+            Ok(ReturnVariant::Plain(SqlVariant::Mapped(sql))) => {
+                Ok(ReturnVariant::Plain(SqlVariant::Mapped(format!("{sql}[]"))))
+            }
+            Ok(ReturnVariant::Plain(SqlVariant::Composite {
+                requires_array_brackets: _,
+            })) => Ok(ReturnVariant::Plain(SqlVariant::Composite {
+                requires_array_brackets: true,
+            })),
+            Ok(ReturnVariant::Plain(SqlVariant::SourceOnly {
+                requires_array_brackets: _,
+            })) => Ok(ReturnVariant::Plain(SqlVariant::SourceOnly {
+                requires_array_brackets: true,
+            })),
+            Ok(ReturnVariant::Plain(SqlVariant::Skip)) => Err(ReturnVariantError::SkipInArray),
+            Ok(ReturnVariant::SetOf(_)) => Err(ReturnVariantError::SetOfInArray),
+            Ok(ReturnVariant::Table(_)) => Err(ReturnVariantError::TableInArray),
+            err @ Err(_) => err,
+        }
+    }
+
+    fn variadic() -> bool {
+        true
     }
 }

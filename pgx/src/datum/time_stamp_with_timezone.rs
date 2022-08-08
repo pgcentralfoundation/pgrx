@@ -9,6 +9,9 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 use crate::datum::time::USECS_PER_SEC;
 use crate::{direct_function_call_as_datum, pg_sys, FromDatum, IntoDatum};
+use pgx_utils::sql_entity_graph::metadata::{
+    ArgumentError, ReturnVariant, ReturnVariantError, SqlTranslatable, SqlVariant,
+};
 use std::{
     convert::TryFrom,
     ops::{Deref, DerefMut},
@@ -192,3 +195,14 @@ impl serde::Serialize for TimestampWithTimeZone {
 
 static DEFAULT_TIMESTAMP_WITH_TIMEZONE_FORMAT: &[FormatItem<'static>] =
     time::macros::format_description!("[year]-[month]-[day]T[hour]:[minute]:[second]-00");
+
+impl SqlTranslatable for TimestampWithTimeZone {
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+        Ok(SqlVariant::Mapped(String::from("timestamp with time zone")))
+    }
+    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
+        Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
+            "timestamp with time zone",
+        ))))
+    }
+}

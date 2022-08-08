@@ -7,6 +7,9 @@ use crate::{
     AllocatedByPostgres, AllocatedByRust, FromDatum, IntoDatum, PgBox, PgMemoryContexts,
     PgTupleDesc, TriggerTuple, TryFromDatumError, WhoAllocated,
 };
+use pgx_utils::sql_entity_graph::metadata::{
+    ArgumentError, ReturnVariant, ReturnVariantError, SqlTranslatable, SqlVariant,
+};
 use std::num::NonZeroUsize;
 
 /// Describes errors that can occur when trying to create a new [PgHeapTuple].
@@ -578,4 +581,30 @@ macro_rules! composite_type {
     ($composite_type:expr) => {
         ::pgx::heap_tuple::PgHeapTuple<'static, ::pgx::AllocatedByRust>
     };
+}
+
+impl SqlTranslatable for crate::heap_tuple::PgHeapTuple<'static, AllocatedByPostgres> {
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+        Ok(SqlVariant::Composite {
+            requires_array_brackets: false,
+        })
+    }
+    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
+        Ok(ReturnVariant::Plain(SqlVariant::Composite {
+            requires_array_brackets: false,
+        }))
+    }
+}
+
+impl SqlTranslatable for crate::heap_tuple::PgHeapTuple<'static, AllocatedByRust> {
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+        Ok(SqlVariant::Composite {
+            requires_array_brackets: false,
+        })
+    }
+    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
+        Ok(ReturnVariant::Plain(SqlVariant::Composite {
+            requires_array_brackets: false,
+        }))
+    }
 }

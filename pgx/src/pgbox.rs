@@ -10,6 +10,9 @@ Use of this source code is governed by the MIT license that can be found in the 
 /// Similar to Rust's `Box<T>` type, `PgBox<T>` also represents heap-allocated memory.
 use crate::{pg_sys, PgMemoryContexts};
 //use std::fmt::{Debug, Error, Formatter};
+use pgx_utils::sql_entity_graph::metadata::{
+    ArgumentError, ReturnVariant, ReturnVariantError, SqlTranslatable, SqlVariant,
+};
 use std::marker::PhantomData;
 use std::ops::{Deref, DerefMut};
 use std::ptr::NonNull;
@@ -404,5 +407,23 @@ impl<T, AllocatedBy: WhoAllocated<T>> Drop for PgBox<T, AllocatedBy> {
         if let Some(ptr) = self.ptr {
             AllocatedBy::free(ptr.as_ptr());
         }
+    }
+}
+
+impl<T: SqlTranslatable> SqlTranslatable for PgBox<T, AllocatedByPostgres> {
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+        T::argument_sql()
+    }
+    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
+        T::return_sql()
+    }
+}
+
+impl<T: SqlTranslatable> SqlTranslatable for PgBox<T, AllocatedByRust> {
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+        T::argument_sql()
+    }
+    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
+        T::return_sql()
     }
 }

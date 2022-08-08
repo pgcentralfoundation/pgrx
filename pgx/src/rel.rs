@@ -12,6 +12,9 @@ use crate::{
     direct_function_call, name_data_to_str, pg_sys, FromDatum, IntoDatum, PgBox, PgList,
     PgTupleDesc,
 };
+use pgx_utils::sql_entity_graph::metadata::{
+    ArgumentError, ReturnVariant, ReturnVariantError, SqlTranslatable, SqlVariant,
+};
 use std::ops::Deref;
 use std::os::raw::c_char;
 
@@ -350,5 +353,16 @@ impl Drop for PgRelation {
                 }
             }
         }
+    }
+}
+
+impl SqlTranslatable for PgRelation {
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+        Ok(SqlVariant::Mapped(String::from("regclass")))
+    }
+    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
+        Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
+            "regclass",
+        ))))
     }
 }

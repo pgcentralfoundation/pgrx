@@ -8,6 +8,9 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use crate::{pg_sys, FromDatum, IntoDatum};
+use pgx_utils::sql_entity_graph::metadata::{
+    ArgumentError, ReturnVariant, ReturnVariantError, SqlTranslatable, SqlVariant,
+};
 
 #[derive(Debug, Clone, Copy)]
 pub struct AnyElement {
@@ -44,5 +47,16 @@ impl IntoDatum for AnyElement {
 
     fn type_oid() -> u32 {
         pg_sys::ANYELEMENTOID
+    }
+}
+
+impl SqlTranslatable for AnyElement {
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+        Ok(SqlVariant::Mapped(String::from("any")))
+    }
+    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
+        Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
+            "any",
+        ))))
     }
 }

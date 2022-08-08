@@ -8,6 +8,9 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use crate::{pg_sys, FromDatum, IntoDatum};
+use pgx_utils::sql_entity_graph::metadata::{
+    ArgumentError, ReturnVariant, ReturnVariantError, SqlTranslatable, SqlVariant,
+};
 use std::ops::{Deref, DerefMut};
 use time::format_description::FormatItem;
 
@@ -119,3 +122,14 @@ impl serde::Serialize for Time {
 
 static DEFAULT_TIME_FORMAT: &[FormatItem<'static>] =
     time::macros::format_description!("[hour]:[minute]:[second]");
+
+impl SqlTranslatable for Time {
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+        Ok(SqlVariant::Mapped(String::from("time")))
+    }
+    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
+        Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
+            "time",
+        ))))
+    }
+}

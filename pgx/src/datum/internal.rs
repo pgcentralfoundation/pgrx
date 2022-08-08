@@ -8,6 +8,9 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use crate::{pg_sys, FromDatum, IntoDatum, PgMemoryContexts};
+use pgx_utils::sql_entity_graph::metadata::{
+    ArgumentError, ReturnVariant, ReturnVariantError, SqlTranslatable, SqlVariant,
+};
 
 /// Represents Postgres' `internal` data type, which is documented as:
 ///
@@ -174,5 +177,20 @@ impl IntoDatum for Internal {
     #[inline]
     fn type_oid() -> pg_sys::Oid {
         pg_sys::INTERNALOID
+    }
+}
+
+impl SqlTranslatable for crate::datum::Internal {
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+        Ok(SqlVariant::Mapped(String::from("internal")))
+    }
+    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
+        Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
+            "internal",
+        ))))
+    }
+    // We don't want to strict upgrade if internal is present.
+    fn optional() -> bool {
+        true
     }
 }
