@@ -10,6 +10,22 @@ to the `pgx` framework and very subject to change between versions. While you ma
 use super::{FunctionMetadataEntity, PhantomDataExt, SqlTranslatable};
 use core::marker::PhantomData;
 
+/**
+Provide SQL generation related information on functions
+
+```rust
+use pgx_utils::sql_entity_graph::metadata::{FunctionMetadata, ReturnVariant, SqlVariant};
+fn floof(i: i32) -> String { todo!() }
+
+type FunctionPointer = fn(i32) -> String;
+let marker: FunctionPointer = floof;
+let metadata = pgx_utils::sql_entity_graph::metadata::FunctionMetadata::entity(&marker);
+assert_eq!(
+    metadata.retval.unwrap().return_sql,
+    Ok(ReturnVariant::Plain(SqlVariant::Mapped("TEXT".to_string()))),
+);
+```
+ */
 pub trait FunctionMetadata<Inputs, Output> {
     fn path(&self) -> &'static str {
         core::any::type_name::<Self>()

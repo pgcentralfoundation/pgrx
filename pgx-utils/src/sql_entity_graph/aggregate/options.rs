@@ -13,7 +13,6 @@ Use of this source code is governed by the MIT license that can be found in the 
 > Like all of the [`sql_entity_graph`][crate::sql_entity_graph] APIs, this is considered **internal**
 to the `pgx` framework and very subject to change between versions. While you may use this, please do it with caution.
 
-
 */
 use crate::sql_entity_graph::{PgxSql, ToSql};
 

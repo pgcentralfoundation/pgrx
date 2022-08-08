@@ -47,6 +47,9 @@ pub enum SqlVariant {
 
 impl Error for ArgumentError {}
 
+/**
+A value which can be represented in SQL
+ */
 pub trait SqlTranslatable {
     fn type_name() -> &'static str {
         core::any::type_name::<Self>()

@@ -13,6 +13,11 @@ use super::{
     SqlTranslatable, SqlVariant,
 };
 
+/**
+An extension trait for [`PhantomData`][core::marker::PhantomData] offering SQL generation related info
+
+Since we don't actually want to construct values during SQL generation, we use a [`PhantomData`][core::marker::PhantomData].
+ */
 pub trait PhantomDataExt {
     fn type_name(&self) -> &'static str;
     fn argument_sql(&self) -> Result<SqlVariant, ArgumentError>;
