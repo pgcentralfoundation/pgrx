@@ -175,6 +175,22 @@ mod tests {
     }
 
     #[pg_test]
+    fn test_accept_date_infinity() {
+        let result =
+            Spi::get_one::<bool>("SELECT accept_date('infinity'::date) = 'infinity'::date;")
+                .expect("failed to get SPI result");
+        assert!(result)
+    }
+
+    #[pg_test]
+    fn test_accept_date_neg_infinity() {
+        let result =
+            Spi::get_one::<bool>("SELECT accept_date('-infinity'::date) = '-infinity'::date;")
+                .expect("failed to get SPI result");
+        assert!(result)
+    }
+
+    #[pg_test]
     fn test_accept_time_now() {
         let result = Spi::get_one::<bool>("SELECT accept_time(now()::time) = now()::time;")
             .expect("failed to get SPI result");
@@ -226,6 +242,22 @@ mod tests {
     }
 
     #[pg_test]
+    fn test_accept_timestamp_infinity() {
+        let result =
+            Spi::get_one::<bool>("SELECT accept_timestamp('infinity'::timestamp) = 'infinity'::timestamp;")
+                .expect("failed to get SPI result");
+        assert!(result)
+    }
+
+    #[pg_test]
+    fn test_accept_timestamp_neg_infinity() {
+        let result =
+            Spi::get_one::<bool>("SELECT accept_timestamp('-infinity'::timestamp) = '-infinity'::timestamp;")
+                .expect("failed to get SPI result");
+        assert!(result)
+    }
+
+    #[pg_test]
     fn test_accept_timestamp_with_time_zone() {
         let result = Spi::get_one::<bool>("SELECT accept_timestamp_with_time_zone(now()) = now();")
             .expect("failed to get SPI result");
@@ -235,6 +267,20 @@ mod tests {
     #[pg_test]
     fn test_accept_timestamp_with_time_zone_not_utc() {
         let result = Spi::get_one::<bool>("SELECT accept_timestamp_with_time_zone('1990-01-23 03:45:00-07') = '1990-01-23 03:45:00-07'::timestamp with time zone;")
+            .expect("failed to get SPI result");
+        assert!(result)
+    }
+
+    #[pg_test]
+    fn test_accept_timestamp_with_time_zone_infinity() {
+        let result = Spi::get_one::<bool>("SELECT accept_timestamp_with_time_zone('infinity') = 'infinity'::timestamp with time zone;")
+            .expect("failed to get SPI result");
+        assert!(result)
+    }
+
+    #[pg_test]
+    fn test_accept_timestamp_with_time_zone_neg_infinity() {
+        let result = Spi::get_one::<bool>("SELECT accept_timestamp_with_time_zone('-infinity') = '-infinity'::timestamp with time zone;")
             .expect("failed to get SPI result");
         assert!(result)
     }

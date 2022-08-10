@@ -8,7 +8,10 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use crate::{pg_sys, FromDatum, IntoDatum};
-use std::ops::{Deref, DerefMut};
+use std::{
+    fmt::Display,
+    ops::{Deref, DerefMut},
+};
 use time::format_description::FormatItem;
 
 #[derive(Debug)]
@@ -19,19 +22,28 @@ impl FromDatum for Date {
         if is_null {
             None
         } else {
-            Some(Date(
-                time::Date::from_julian_day(
-                    datum.value() as i32 + pg_sys::POSTGRES_EPOCH_JDATE as i32,
-                )
-                .expect("Unexpected error getting the Julian day in Date::from_datum"),
-            ))
+            let pg_epoch_days = datum.value() as i32;
+            let date = match pg_epoch_days {
+                i32::MIN => time::Date::MIN,
+                i32::MAX => time::Date::MAX,
+                _ => {
+                    time::Date::from_julian_day(pg_epoch_days + pg_sys::POSTGRES_EPOCH_JDATE as i32)
+                        .expect("Unexpected error getting the Julian day in Date::from_datum")
+                }
+            };
+            Some(Date(date))
         }
     }
 }
 impl IntoDatum for Date {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        Some((self.to_julian_day() as i32 - pg_sys::POSTGRES_EPOCH_JDATE as i32).into())
+        let pg_epoch_days = match self.0 {
+            time::Date::MIN => i32::MIN,
+            time::Date::MAX => i32::MAX,
+            _ => self.to_julian_day() as i32 - pg_sys::POSTGRES_EPOCH_JDATE as i32,
+        };
+        Some(pg_epoch_days.into())
     }
 
     fn type_oid() -> u32 {
@@ -42,6 +54,24 @@ impl IntoDatum for Date {
 impl Date {
     pub fn new(date: time::Date) -> Self {
         Date(date)
+    }
+
+    pub fn infinity() -> Self {
+        Date(time::Date::MAX)
+    }
+
+    pub fn neg_infinity() -> Self {
+        Date(time::Date::MIN)
+    }
+
+    #[inline]
+    pub fn is_infinity(self) -> bool {
+        self.0 == time::Date::MAX
+    }
+
+    #[inline]
+    pub fn is_neg_infinity(self) -> bool {
+        self.0 == time::Date::MIN
     }
 }
 
@@ -77,3 +107,13 @@ impl serde::Serialize for Date {
 
 static DATE_FORMAT: &[FormatItem<'static>] =
     time::macros::format_description!("[year]-[month]-[day]");
+
+impl Display for Date {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            &self.format(&DATE_FORMAT).expect("Date formatting problem")
+        )
+    }
+}
