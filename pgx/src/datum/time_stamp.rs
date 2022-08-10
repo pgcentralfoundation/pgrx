@@ -9,6 +9,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 use crate::datum::time::USECS_PER_SEC;
 use crate::{direct_function_call_as_datum, pg_sys, FromDatum, IntoDatum, TimestampWithTimeZone};
+use std::fmt::Display;
 use std::ops::{Deref, DerefMut};
 use time::{format_description::FormatItem, PrimitiveDateTime};
 
@@ -39,25 +40,32 @@ impl FromDatum for Timestamp {
 impl IntoDatum for Timestamp {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        let year = self.year();
-        let month = self.month() as i32;
-        let mday = self.day() as i32;
-        let hour = self.hour() as i32;
-        let minute = self.minute() as i32;
-        let second = self.second() as f64 + (self.microsecond() as f64 / USECS_PER_SEC as f64);
+        match self.0.date() {
+            time::Date::MIN => i64::MIN.into_datum(),
+            time::Date::MAX => i64::MAX.into_datum(),
+            _ => {
+                let year = self.year();
+                let month = self.month() as i32;
+                let mday = self.day() as i32;
+                let hour = self.hour() as i32;
+                let minute = self.minute() as i32;
+                let second =
+                    self.second() as f64 + (self.microsecond() as f64 / USECS_PER_SEC as f64);
 
-        unsafe {
-            direct_function_call_as_datum(
-                pg_sys::make_timestamp,
-                vec![
-                    year.into_datum(),
-                    month.into_datum(),
-                    mday.into_datum(),
-                    hour.into_datum(),
-                    minute.into_datum(),
-                    second.into_datum(),
-                ],
-            )
+                unsafe {
+                    direct_function_call_as_datum(
+                        pg_sys::make_timestamp,
+                        vec![
+                            year.into_datum(),
+                            month.into_datum(),
+                            mday.into_datum(),
+                            hour.into_datum(),
+                            minute.into_datum(),
+                            second.into_datum(),
+                        ],
+                    )
+                }
+            }
         }
     }
 
@@ -68,6 +76,24 @@ impl IntoDatum for Timestamp {
 impl Timestamp {
     pub fn new(timestamp: time::PrimitiveDateTime) -> Self {
         Timestamp(timestamp)
+    }
+
+    pub fn infinity() -> Self {
+        unsafe { Self::from_datum(i64::MAX.into_datum().unwrap(), false).unwrap() }
+    }
+
+    pub fn neg_infinity() -> Self {
+        unsafe { Self::from_datum(i64::MIN.into_datum().unwrap(), false).unwrap() }
+    }
+
+    #[inline]
+    pub fn is_infinity(self) -> bool {
+        self.0.date() == time::Date::MAX
+    }
+
+    #[inline]
+    pub fn is_neg_infinity(self) -> bool {
+        self.0.date() == time::Date::MIN
     }
 }
 
@@ -121,3 +147,15 @@ impl serde::Serialize for Timestamp {
 
 static DEFAULT_TIMESTAMP_FORMAT: &[FormatItem<'static>] =
     time::macros::format_description!("[year]-[month]-[day]T[hour]:[minute]:[second]-00");
+
+impl Display for Timestamp {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            &self
+                .format(&DEFAULT_TIMESTAMP_FORMAT)
+                .expect("Date formatting problem")
+        )
+    }
+}
