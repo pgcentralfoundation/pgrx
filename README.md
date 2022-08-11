@@ -190,6 +190,12 @@ Postgres Type | Rust Type (as `Option<T>`)
 `numeric` | `pgx::Numeric(String)` -- TODO: needs better support
 `void` | `()`
 `ARRAY[]::<type>` | `Vec<Option<T>>` or `pgx::Array<T>` (zero-copy)
+`int4range` | `PgRange<i32>` (zero-copy)
+`int8range` | `PgRange<i64>` (zero-copy)
+`daterange` | `PgRange<pgx::Date>` (zero-copy)
+`numrange` | `PgRange<pgx::Numeric>` (zero-copy)
+`tsrange` | `PgRange<pgx::Timestamp>` (zero-copy)
+`tstzrange` | `PgRange<pgx::TimestampWithTimeZone>` (zero-copy)
 `NULL` | `Option::None`
 `internal` | `pgx::PgBox<T>` where `T` is any Rust/Postgres struct
 `uuid` | `pgx::Uuid([u8; 16])`

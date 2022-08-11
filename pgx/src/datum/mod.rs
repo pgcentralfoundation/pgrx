@@ -12,6 +12,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 mod anyarray;
 mod anyelement;
 mod array;
+mod range;
 mod date;
 mod from;
 mod geo;
@@ -34,6 +35,7 @@ pub use self::uuid::*;
 pub use anyarray::*;
 pub use anyelement::*;
 pub use array::*;
+pub use range::*;
 pub use date::*;
 pub use from::*;
 pub use geo::*;

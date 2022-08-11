@@ -235,6 +235,15 @@ pub static DEFAULT_RUST_TYPE_ID_TO_SQL: Lazy<HashSet<RustSqlMapping>> = Lazy::ne
     map_type!(m, datum::Inet, "inet");
     map_type!(m, datum::Uuid, "uuid");
     map_type!(m, pgx_pg_sys::FdwRoutine, "fdw_handler");
+    map_type!(m, datum::PgRange<i32>, "int4range");
+    map_type!(m, datum::PgRange<i64>, "int8range");
+    map_type!(m, datum::PgRange<datum::Numeric>, "numrange");
+    map_type!(m, datum::PgRange<datum::Date>, "daterange");
+    map_type!(m, datum::PgRange<datum::Timestamp>, "tsrange");
+    map_type!(m, datum::PgRange<datum::TimestampWithTimeZone>, "tstzrange");
+    // map_type!(m, std::ops::Range<i32>, "int4range");  // discrete pg_types only
+    // map_type!(m, std::ops::Range<i64>, "int8range");  // discrete pg_types only
+    // map_type!(m, std::ops::Range<datum::Date>, "daterange");  // discrete pg_types only
 
     m
 });
