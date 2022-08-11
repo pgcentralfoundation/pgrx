@@ -14,7 +14,10 @@ use std::{
     convert::TryFrom,
     ops::{Deref, DerefMut},
 };
+use time::macros::time;
 use time::{format_description::FormatItem, UtcOffset};
+
+pub(crate) const MAX_TIME: time::Time = time!(23:59:59.999_999);
 
 #[derive(Debug, Copy, Clone)]
 pub struct TimestampWithTimeZone(time::OffsetDateTime);
@@ -40,7 +43,7 @@ impl FromDatum for TimestampWithTimeZone {
             let datum_val = datum.value() as i64;
             let (date, time, tz) = match datum_val {
                 i64::MIN => (time::Date::MIN, time::Time::MIDNIGHT, 0i32),
-                i64::MAX => (time::Date::MAX, time::Time::MIDNIGHT, 0i32),
+                i64::MAX => (time::Date::MAX, MAX_TIME, 0i32),
                 _ => {
                     let mut tm = pg_sys::pg_tm {
                         tm_sec: 0,
@@ -101,9 +104,9 @@ impl FromDatum for TimestampWithTimeZone {
 impl IntoDatum for TimestampWithTimeZone {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        match self.0.date() {
-            time::Date::MIN => i64::MIN.into_datum(),
-            time::Date::MAX => i64::MAX.into_datum(),
+        match (self.0.date(), self.0.time()) {
+            (time::Date::MIN, time::Time::MIDNIGHT) => i64::MIN.into_datum(),
+            (time::Date::MAX, MAX_TIME) => i64::MAX.into_datum(),
             _ => {
                 let year = self.year();
                 let month = self.month() as i32;
@@ -158,12 +161,12 @@ impl TimestampWithTimeZone {
 
     #[inline]
     pub fn is_infinity(self) -> bool {
-        self.0.date() == time::Date::MAX
+        self.0.date() == time::Date::MAX && self.0.time() == MAX_TIME
     }
 
     #[inline]
     pub fn is_neg_infinity(self) -> bool {
-        self.0.date() == time::Date::MIN
+        self.0.date() == time::Date::MIN && self.0.time() == time::Time::MIDNIGHT
     }
 }
 

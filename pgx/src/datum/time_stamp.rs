@@ -8,7 +8,9 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use crate::datum::time::USECS_PER_SEC;
-use crate::{direct_function_call_as_datum, pg_sys, FromDatum, IntoDatum, TimestampWithTimeZone};
+use crate::{
+    direct_function_call_as_datum, pg_sys, FromDatum, IntoDatum, TimestampWithTimeZone, MAX_TIME,
+};
 use std::fmt::Display;
 use std::ops::{Deref, DerefMut};
 use time::{format_description::FormatItem, PrimitiveDateTime};
@@ -40,9 +42,9 @@ impl FromDatum for Timestamp {
 impl IntoDatum for Timestamp {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        match self.0.date() {
-            time::Date::MIN => i64::MIN.into_datum(),
-            time::Date::MAX => i64::MAX.into_datum(),
+        match (self.0.date(), self.0.time()) {
+            (time::Date::MIN, time::Time::MIDNIGHT) => i64::MIN.into_datum(),
+            (time::Date::MAX, MAX_TIME) => i64::MAX.into_datum(),
             _ => {
                 let year = self.year();
                 let month = self.month() as i32;
@@ -88,12 +90,12 @@ impl Timestamp {
 
     #[inline]
     pub fn is_infinity(self) -> bool {
-        self.0.date() == time::Date::MAX
+        self.0.date() == time::Date::MAX && self.0.time() == MAX_TIME
     }
 
     #[inline]
     pub fn is_neg_infinity(self) -> bool {
-        self.0.date() == time::Date::MIN
+        self.0.date() == time::Date::MIN && self.0.time() == time::Time::MIDNIGHT
     }
 }
 
