@@ -108,3 +108,4 @@ Use of this source code is governed by the MIT license that can be found in the 
 #include "utils/snapmgr.h"
 #include "utils/syscache.h"
 #include "utils/typcache.h"
+#include "utils/rangetypes.h"
