@@ -205,21 +205,23 @@ mod tests {
             Spi::get_one::<bool>("SELECT accept_date('1823-03-28'::date) = '1823-03-28'::date;")
                 .expect("failed to get SPI result");
         assert!(result)
-    } 
-    
+    }
+
     #[pg_test]
     fn test_accept_date_round_trip_large_date() {
-        let result =
-            Spi::get_one::<bool>("SELECT accept_date_round_trip('10001-01-01'::date) = '10001-01-01'::date;")
-                .expect("failed to get SPI result");
+        let result = Spi::get_one::<bool>(
+            "SELECT accept_date_round_trip('10001-01-01'::date) = '10001-01-01'::date;",
+        )
+        .expect("failed to get SPI result");
         assert!(result)
     }
 
     #[pg_test]
     fn test_accept_date_round_trip_random() {
-        let result =
-            Spi::get_one::<bool>("SELECT accept_date_round_trip('1823-03-28'::date) = '1823-03-28'::date;")
-                .expect("failed to get SPI result");
+        let result = Spi::get_one::<bool>(
+            "SELECT accept_date_round_trip('1823-03-28'::date) = '1823-03-28'::date;",
+        )
+        .expect("failed to get SPI result");
         assert!(result)
     }
 
