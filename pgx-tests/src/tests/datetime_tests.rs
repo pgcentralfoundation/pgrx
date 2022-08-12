@@ -17,6 +17,14 @@ fn accept_date(d: Date) -> Date {
 }
 
 #[pg_extern]
+fn accept_date_round_trip(d: Date) -> Date {
+    match d.try_get_date() {
+        Ok(date) => Date::from_date(date),
+        Err(pg_epoch_days) => Date::from_pg_epoch_days(pg_epoch_days),
+    }
+}
+
+#[pg_extern]
 fn accept_time(t: Time) -> Time {
     t
 }
@@ -64,23 +72,6 @@ mod serialization_tests {
     use std::convert::TryFrom;
     use time::{PrimitiveDateTime, UtcOffset};
 
-    #[test]
-    fn test_date_serialization() {
-        let date = Date::new(
-            time::Date::from_calendar_date(2020, time::Month::try_from(4).unwrap(), 07).unwrap(),
-        );
-        let json = json!({ "date test": date });
-
-        assert_eq!(json!({"date test":"2020-04-07"}), json);
-    }
-
-    #[test]
-    fn test_time_serialization() {
-        let time = Time::new(time::Time::from_hms(0, 0, 0).unwrap());
-        let json = json!({ "time test": time });
-
-        assert_eq!(json!({"time test":"00:00:00"}), json);
-    }
     #[test]
     fn test_time_with_timezone_serialization() {
         let time_with_timezone = TimeWithTimeZone::new(
@@ -140,8 +131,26 @@ mod tests {
     use crate as pgx_tests;
 
     use pgx::*;
-
+    use serde_json::*;
     use std::time::Duration;
+
+    #[pg_test]
+    fn test_date_serialization() {
+        let date = Date::from_date(
+            time::Date::from_calendar_date(2020, time::Month::try_from(4).unwrap(), 07).unwrap(),
+        );
+        let json = json!({ "date test": date });
+
+        assert_eq!(json!({"date test":"2020-04-07"}), json);
+    }
+
+    #[pg_test]
+    fn test_time_serialization() {
+        let time = Time::new(time::Time::from_hms(0, 0, 0).unwrap());
+        let json = json!({ "time test": time });
+
+        assert_eq!(json!({"time test":"00:00:00"}), json);
+    }
 
     #[pg_test]
     fn test_accept_date_now() {
@@ -167,9 +176,49 @@ mod tests {
     }
 
     #[pg_test]
+    fn test_accept_date_neg_infinity() {
+        let result =
+            Spi::get_one::<bool>("SELECT accept_date('-infinity'::date) = '-infinity'::date;")
+                .expect("failed to get SPI result");
+        assert!(result)
+    }
+
+    #[pg_test]
+    fn test_accept_date_infinity() {
+        let result =
+            Spi::get_one::<bool>("SELECT accept_date('infinity'::date) = 'infinity'::date;")
+                .expect("failed to get SPI result");
+        assert!(result)
+    }
+
+    #[pg_test]
+    fn test_accept_date_large_date() {
+        let result =
+            Spi::get_one::<bool>("SELECT accept_date('10001-01-01'::date) = '10001-01-01'::date;")
+                .expect("failed to get SPI result");
+        assert!(result)
+    }
+
+    #[pg_test]
     fn test_accept_date_random() {
         let result =
             Spi::get_one::<bool>("SELECT accept_date('1823-03-28'::date) = '1823-03-28'::date;")
+                .expect("failed to get SPI result");
+        assert!(result)
+    } 
+    
+    #[pg_test]
+    fn test_accept_date_round_trip_large_date() {
+        let result =
+            Spi::get_one::<bool>("SELECT accept_date_round_trip('10001-01-01'::date) = '10001-01-01'::date;")
+                .expect("failed to get SPI result");
+        assert!(result)
+    }
+
+    #[pg_test]
+    fn test_accept_date_round_trip_random() {
+        let result =
+            Spi::get_one::<bool>("SELECT accept_date_round_trip('1823-03-28'::date) = '1823-03-28'::date;")
                 .expect("failed to get SPI result");
         assert!(result)
     }
