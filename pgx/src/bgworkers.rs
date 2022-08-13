@@ -98,14 +98,18 @@ impl BackgroundWorker {
 
     /// Have we received a SIGUP?
     pub fn sighup_received() -> bool {
-        unsafe { assert!(!pg_sys::MyBgworkerEntry.is_null(), "BackgroundWorker associated functions can only be called from a registered background worker"); }
+        unsafe {
+            assert!(!pg_sys::MyBgworkerEntry.is_null(), "BackgroundWorker associated functions can only be called from a registered background worker");
+        }
         // toggle the bool to false, returning whatever it was
         GOT_SIGHUP.swap(false, Ordering::SeqCst)
     }
 
     /// Have we received a SIGTERM?
     pub fn sigterm_received() -> bool {
-        unsafe { assert!(!pg_sys::MyBgworkerEntry.is_null(), "BackgroundWorker associated functions can only be called from a registered background worker"); }
+        unsafe {
+            assert!(!pg_sys::MyBgworkerEntry.is_null(), "BackgroundWorker associated functions can only be called from a registered background worker");
+        }
         // toggle the bool to false, returning whatever it was
         GOT_SIGTERM.swap(false, Ordering::SeqCst)
     }
@@ -114,7 +118,9 @@ impl BackgroundWorker {
     ///
     /// Returns true if we're still supposed to be alive and haven't received a SIGTERM
     pub fn wait_latch(timeout: Option<Duration>) -> bool {
-        unsafe { assert!(!pg_sys::MyBgworkerEntry.is_null(), "BackgroundWorker associated functions can only be called from a registered background worker"); }
+        unsafe {
+            assert!(!pg_sys::MyBgworkerEntry.is_null(), "BackgroundWorker associated functions can only be called from a registered background worker");
+        }
         match timeout {
             Some(t) => wait_latch(
                 t.as_millis().try_into().unwrap(),
@@ -127,14 +133,18 @@ impl BackgroundWorker {
 
     /// Is this `BackgroundWorker` allowed to continue?
     pub fn worker_continue() -> bool {
-        unsafe { assert!(!pg_sys::MyBgworkerEntry.is_null(), "BackgroundWorker associated functions can only be called from a registered background worker"); }
+        unsafe {
+            assert!(!pg_sys::MyBgworkerEntry.is_null(), "BackgroundWorker associated functions can only be called from a registered background worker");
+        }
         pg_sys::WL_POSTMASTER_DEATH as i32 != 0
     }
 
     /// Intended to be called once to indicate the database and user to use to
     /// connect to via SPI
     pub fn connect_worker_to_spi(dbname: Option<&str>, username: Option<&str>) {
-        unsafe { assert!(!pg_sys::MyBgworkerEntry.is_null(), "BackgroundWorker associated functions can only be called from a registered background worker"); }
+        unsafe {
+            assert!(!pg_sys::MyBgworkerEntry.is_null(), "BackgroundWorker associated functions can only be called from a registered background worker");
+        }
         let db = dbname.and_then(|rs| CString::new(rs).ok());
         let db: *const c_char = db.as_ref().map_or(std::ptr::null(), |i| i.as_ptr());
 
