@@ -10,7 +10,8 @@ Use of this source code is governed by the MIT license that can be found in the 
 use crate::{pg_sys, FromDatum, IntoDatum};
 use std::ffi::CStr;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
+#[repr(transparent)]
 pub struct Date(i32);
 
 impl TryFrom<pg_sys::Datum> for Date {
@@ -43,8 +44,8 @@ impl FromDatum for Date {
 }
 
 impl Date {
-    pub const NEG_INFINITY: i32 = i32::MIN;
-    pub const INFINITY: i32 = i32::MAX;
+    pub const NEG_INFINITY: Self = Date(i32::MIN);
+    pub const INFINITY: Self = Date(i32::MAX);
 
     #[inline]
     pub fn from_date(date: time::Date) -> Date {
@@ -58,12 +59,12 @@ impl Date {
 
     #[inline]
     pub fn is_infinity(&self) -> bool {
-        self.0 == Self::INFINITY
+        self == &Self::INFINITY
     }
 
     #[inline]
     pub fn is_neg_infinity(&self) -> bool {
-        self.0 == Self::NEG_INFINITY
+        self == &Self::NEG_INFINITY
     }
 
     #[inline]
@@ -93,9 +94,14 @@ impl serde::Serialize for Date {
         S: serde::Serializer,
     {
         let cstr;
+        assert!(pg_sys::MAXDATELEN > 0); // free at runtime
+        const BUF_LEN: usize = pg_sys::MAXDATELEN as usize * 2;
+        let mut buffer = [0u8; BUF_LEN];
+        let buf = buffer.as_mut_slice().as_mut_ptr().cast::<libc::c_char>();
+        // SAFETY: This provides a quite-generous writing pad to Postgres
+        // and Postgres has promised to use far less than this.
         unsafe {
-            let buf = [0u8; pg_sys::MAXDATELEN as usize + 1].as_mut_ptr() as *mut i8;
-            match &self.0 {
+            match self {
                 &Self::NEG_INFINITY | &Self::INFINITY => {
                     pg_sys::EncodeSpecialDate(self.0, buf);
                 }
@@ -110,9 +116,16 @@ impl serde::Serialize for Date {
                     pg_sys::EncodeDateOnly(&mut pg_tm, pg_sys::USE_XSD_DATES as i32, buf)
                 }
             }
-            cstr = CStr::from_ptr(pg_sys::pstrdup(buf));
+            assert!(buffer[BUF_LEN - 1] == 0);
+            cstr = CStr::from_ptr(buf);
         }
 
+        /* This unwrap is fine as Postgres won't ever write invalid UTF-8,
+           because Postgres only writes ASCII
+           (or uses locale-ignorant functions to write,
+            or uses a fully compliant UTF-8 suite,
+            whatever's actually true).
+        */
         serializer
             .serialize_str(cstr.to_str().unwrap())
             .map_err(|e| serde::ser::Error::custom(format!("Date formatting problem: {:?}", e)))
