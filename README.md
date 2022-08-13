@@ -77,7 +77,7 @@
  
  † PGX has no MSRV policy, thus may require the latest stable version of Rust, available via Rustup
  
- ‡ A local Postgres installation is not required. `cargo pgx` can download and compile PostgreSQL versions on its own.
+ ‡ A local PostgreSQL server installation is not required. `cargo pgx` can download and compile PostgreSQL versions on its own.
 
 <details>
    <summary>How to: GCC 7 on CentOS 7</summary>
