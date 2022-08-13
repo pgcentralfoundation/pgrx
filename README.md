@@ -65,15 +65,19 @@
 
 ## System Requirements
 
-- A `rustup` managed toolchain (>=1.58) (or `rustc`, `cargo`, and `rustfmt`)
+- A Rust toolchain: `rustc`, `cargo`, and `rustfmt`. The recommended way to get these is from https://rustup.rs †
 - `git`
 - `libclang`
-   - Ubuntu: `libclang-dev` or `clang`
-   - RHEL: `clang`
+   - Ubuntu: `apt install libclang-dev` or `apt install clang`
+   - RHEL: `yum install clang`
 - `tar`
 - `bzip2`
 - GCC 7 or newer
-- [Build dependencies for PostgreSQL](https://wiki.postgresql.org/wiki/Compile_and_Install_from_source_code)
+- [PostgreSQL's build dependencies](https://wiki.postgresql.org/wiki/Compile_and_Install_from_source_code) ‡
+ 
+ † PGX has no MSRV policy, thus may require the latest stable version of Rust, available via Rustup
+ 
+ ‡ A local PostgreSQL server installation is not required. `cargo pgx` can download and compile PostgreSQL versions on its own.
 
 <details>
    <summary>How to: GCC 7 on CentOS 7</summary>
@@ -86,8 +90,6 @@ yum install devtoolset-7
 scl enable devtoolset-7 bash
 ```
 </details>
-
-Note that a local PostgreSQL Server installation is not required. `pgx` typically downloads and compiles PostgreSQL versions itself.
 
 ## Getting Started
 
