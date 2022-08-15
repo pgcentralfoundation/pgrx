@@ -15,9 +15,9 @@ use time::Duration;
 
 #[derive(Debug)]
 #[repr(transparent)]
-pub struct PgInterval(pg_sys::Interval);
+pub struct Interval(pg_sys::Interval);
 
-impl PgInterval {
+impl Interval {
     const MONTH_DURATION: Duration = Duration::days(DAYS_PER_MONTH as i64);
 
     pub fn get_duration(&self) -> Duration {
@@ -40,7 +40,7 @@ impl PgInterval {
     }
 
     pub fn from_months_days_usecs(months: i32, days: i32, usecs: i64) -> Self {
-        PgInterval(pg_sys::Interval {
+        Interval(pg_sys::Interval {
             day: days,
             month: months,
             time: usecs,
@@ -66,7 +66,7 @@ impl PgInterval {
             }
             let time = d.whole_microseconds() as i64;
 
-            Ok(PgInterval(pg_sys::Interval { day, month, time }))
+            Ok(Interval(pg_sys::Interval { day, month, time }))
         } else {
             Err("duration outside of -178,000,000 year to 178,000,000 year bound")
         }
@@ -85,15 +85,15 @@ impl PgInterval {
     }
 }
 
-impl TryFrom<pg_sys::Datum> for PgInterval {
+impl TryFrom<pg_sys::Datum> for Interval {
     type Error = &'static str;
 
     fn try_from(d: pg_sys::Datum) -> Result<Self, Self::Error> {
-        Ok(PgInterval(unsafe { *d.ptr_cast() }))
+        Ok(Interval(unsafe { *d.ptr_cast() }))
     }
 }
 
-impl IntoDatum for PgInterval {
+impl IntoDatum for Interval {
     fn into_datum(mut self) -> Option<pg_sys::Datum> {
         let interval = &mut self.0;
         Some(pg_sys::Datum::from(interval as *mut _))
@@ -103,7 +103,7 @@ impl IntoDatum for PgInterval {
     }
 }
 
-impl FromDatum for PgInterval {
+impl FromDatum for Interval {
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Self>
     where
         Self: Sized,
@@ -116,7 +116,7 @@ impl FromDatum for PgInterval {
     }
 }
 
-impl serde::Serialize for PgInterval {
+impl serde::Serialize for Interval {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: serde::Serializer,

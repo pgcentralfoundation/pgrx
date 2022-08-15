@@ -101,14 +101,14 @@ fn timestamptz_to_i64(tstz: pg_sys::TimestampTz) -> i64 {
 }
 
 #[pg_extern]
-fn accept_interval(interval: PgInterval) -> PgInterval {
+fn accept_interval(interval: Interval) -> Interval {
     interval
 }
 
 #[pg_extern]
-fn accept_interval_round_trip(interval: PgInterval) -> PgInterval {
+fn accept_interval_round_trip(interval: Interval) -> Interval {
     let duration = interval.get_duration();
-    PgInterval::try_from_duration(duration).expect("Error converting Duration to PgInterval")
+    Interval::try_from_duration(duration).expect("Error converting Duration to PgInterval")
 }
 
 #[cfg(test)]
@@ -517,7 +517,7 @@ mod tests {
 
     #[pg_test]
     fn test_interval_serialization() {
-        let interval = PgInterval::from_months_days_usecs(3, 4, 5_000_000);
+        let interval = Interval::from_months_days_usecs(3, 4, 5_000_000);
         let json = json!({ "interval test": interval });
 
         assert_eq!(json!({"interval test":"3 mons 4 days 00:00:05"}), json);
