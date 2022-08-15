@@ -100,6 +100,17 @@ fn timestamptz_to_i64(tstz: pg_sys::TimestampTz) -> i64 {
     tstz
 }
 
+#[pg_extern]
+fn accept_interval(interval: PgInterval) -> PgInterval {
+    interval
+}
+
+#[pg_extern]
+fn accept_interval_round_trip(interval: PgInterval) -> PgInterval {
+    let duration = interval.get_duration();
+    PgInterval::try_from_duration(duration).expect("Error converting Duration to PgInterval")
+}
+
 #[cfg(test)]
 #[pgx::pg_schema]
 mod date_epoch_tests {
@@ -474,5 +485,41 @@ mod tests {
         let ts = Spi::get_one::<Timestamp>("SELECT '-infinity'::timestamp")
             .expect("failed to get SPI result");
         assert!(ts.is_neg_infinity());
+    }
+
+    #[pg_test]
+    fn test_accept_interval_random() {
+        let result = Spi::get_one::<bool>("SELECT accept_interval(interval'1 year 2 months 3 days 4 hours 5 minutes 6 seconds') = interval'1 year 2 months 3 days 4 hours 5 minutes 6 seconds';")
+            .expect("failed to get SPI result");
+        assert!(result)
+    }
+
+    #[pg_test]
+    fn test_accept_interval_neg_random() {
+        let result = Spi::get_one::<bool>("SELECT accept_interval(interval'1 year 2 months 3 days 4 hours 5 minutes 6 seconds ago') = interval'1 year 2 months 3 days 4 hours 5 minutes 6 seconds ago';")
+            .expect("failed to get SPI result");
+        assert!(result)
+    }
+
+    #[pg_test]
+    fn test_accept_interval_round_trip_random() {
+        let result = Spi::get_one::<bool>("SELECT accept_interval_round_trip(interval'1 year 2 months 3 days 4 hours 5 minutes 6 seconds') = interval'1 year 2 months 3 days 4 hours 5 minutes 6 seconds';")
+            .expect("failed to get SPI result");
+        assert!(result)
+    }
+
+    #[pg_test]
+    fn test_accept_interval_round_trip_neg_random() {
+        let result = Spi::get_one::<bool>("SELECT accept_interval_round_trip(interval'1 year 2 months 3 days 4 hours 5 minutes 6 seconds ago') = interval'1 year 2 months 3 days 4 hours 5 minutes 6 seconds ago';")
+            .expect("failed to get SPI result");
+        assert!(result)
+    }
+
+    #[pg_test]
+    fn test_interval_serialization() {
+        let interval = PgInterval::from_months_days_usecs(3, 4, 5_000_000);
+        let json = json!({ "interval test": interval });
+
+        assert_eq!(json!({"interval test":"3 mons 4 days 00:00:05"}), json);
     }
 }
