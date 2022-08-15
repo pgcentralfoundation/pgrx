@@ -48,6 +48,16 @@ impl Date {
     pub const INFINITY: Self = Date(i32::MAX);
 
     #[inline]
+    #[deprecated(
+        since = "0.5.0",
+        note = "the repr of pgx::Date is no longer time::Date \
+    and this fn will be removed in a future version"
+    )]
+    pub fn new(date: time::Date) -> Date {
+        Self::from_date(date)
+    }
+
+    #[inline]
     pub fn from_date(date: time::Date) -> Date {
         Self::from_pg_epoch_days(date.to_julian_day() - pg_sys::POSTGRES_EPOCH_JDATE as i32)
     }
@@ -122,9 +132,6 @@ impl serde::Serialize for Date {
 
         /* This unwrap is fine as Postgres won't ever write invalid UTF-8,
            because Postgres only writes ASCII
-           (or uses locale-ignorant functions to write,
-            or uses a fully compliant UTF-8 suite,
-            whatever's actually true).
         */
         serializer
             .serialize_str(cstr.to_str().unwrap())
