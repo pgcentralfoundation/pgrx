@@ -10,7 +10,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 use std::ops::{Mul, Sub};
 
 use crate::{direct_function_call, pg_sys, FromDatum, IntoDatum, USECS_PER_SEC};
-use pg_sys::{DAYS_PER_MONTH, DAYS_PER_YEAR, SECS_PER_DAY};
+use pg_sys::{DAYS_PER_MONTH, SECS_PER_DAY};
 use time::Duration;
 
 #[derive(Debug)]
@@ -48,23 +48,19 @@ impl PgInterval {
     }
 
     pub fn try_from_duration(duration: Duration) -> Result<Self, &'static str> {
-        const MIN_DURATION: Duration = Duration::new(
-            -178_000_000i64 * SECS_PER_DAY as i64 * DAYS_PER_YEAR as i64,
-            0,
-        );
-        const MAX_DURATION: Duration = Duration::new(
-            178_000_000i64 * SECS_PER_DAY as i64 * DAYS_PER_YEAR as i64,
-            0,
-        );
-        if duration >= MIN_DURATION && duration <= MAX_DURATION {
+        const INNER_RANGE_BEGIN: Duration =
+            Duration::new(-178_000_000i64 * pg_sys::SECS_PER_YEAR as i64, 0);
+        const INNER_RANGE_END: Duration =
+            Duration::new(178_000_000i64 * pg_sys::SECS_PER_YEAR as i64, 0);
+        if duration >= INNER_RANGE_BEGIN && duration <= INNER_RANGE_END {
             let mut month = 0;
             let mut day = 0;
             let mut d = duration;
-            if Duration::abs(d) > Self::MONTH_DURATION {
+            if Duration::abs(d) >= Self::MONTH_DURATION {
                 month = d.whole_days() as i32 / (DAYS_PER_MONTH as i32);
                 d = d.sub(Self::MONTH_DURATION.mul(month));
             }
-            if d > Duration::DAY {
+            if Duration::abs(d) >= Duration::DAY {
                 day = d.whole_days() as i32;
                 d = d.sub(Duration::DAY.mul(day));
             }
