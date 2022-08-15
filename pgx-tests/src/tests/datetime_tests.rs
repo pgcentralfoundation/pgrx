@@ -66,6 +66,37 @@ fn timestamptz_to_i64(tstz: pg_sys::TimestampTz) -> i64 {
 
 #[cfg(test)]
 #[pgx::pg_schema]
+mod date_epoch_tests {
+    use pg_sys;
+    use pgx::*;
+
+    #[test]
+    fn test_to_pg_epoch_days() {
+        let d = time::Date::from_calendar_date(2000, time::Month::January, 2).unwrap();
+        let date = Date::from_date(d);
+
+        assert_eq!(date.to_pg_epoch_days(), 1);
+    }
+
+    #[test]
+    fn test_to_posix_time() {
+        let d = time::Date::from_calendar_date(1970, time::Month::January, 2).unwrap();
+        let date = Date::from_date(d);
+
+        assert_eq!(date.to_posix_time(), 86400);
+    }
+
+    #[test]
+    fn test_to_julian_days() {
+        let d = time::Date::from_calendar_date(2000, time::Month::January, 1).unwrap();
+        let date = Date::from_date(d);
+
+        assert_eq!(date.to_julian_days(), pg_sys::POSTGRES_EPOCH_JDATE as i32);
+    }
+}
+
+#[cfg(test)]
+#[pgx::pg_schema]
 mod serialization_tests {
     use pgx::*;
     use serde_json::*;

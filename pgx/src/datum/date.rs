@@ -10,6 +10,9 @@ Use of this source code is governed by the MIT license that can be found in the 
 use crate::{pg_sys, FromDatum, IntoDatum};
 use std::ffi::CStr;
 
+pub const POSTGRES_EPOCH_JDATE: i32 = pg_sys::POSTGRES_EPOCH_JDATE as i32;
+pub const UNIX_EPOCH_JDATE: i32 = pg_sys::UNIX_EPOCH_JDATE as i32;
+
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 #[repr(transparent)]
 pub struct Date(i32);
@@ -59,7 +62,7 @@ impl Date {
 
     #[inline]
     pub fn from_date(date: time::Date) -> Date {
-        Self::from_pg_epoch_days(date.to_julian_day() - pg_sys::POSTGRES_EPOCH_JDATE as i32)
+        Self::from_pg_epoch_days(date.to_julian_day() - POSTGRES_EPOCH_JDATE)
     }
 
     #[inline]
@@ -78,8 +81,23 @@ impl Date {
     }
 
     #[inline]
-    pub fn to_julian_day(&self) -> i32 {
+    pub fn to_julian_days(&self) -> i32 {
+        self.0 + POSTGRES_EPOCH_JDATE
+    }
+
+    #[inline]
+    pub fn to_pg_epoch_days(&self) -> i32 {
         self.0
+    }
+
+    #[inline]
+    fn to_unix_epoch_days(&self) -> i32 {
+        self.0 + POSTGRES_EPOCH_JDATE - UNIX_EPOCH_JDATE
+    }
+
+    #[inline]
+    pub fn to_posix_time(&self) -> libc::time_t {
+        libc::time_t::from(self.to_unix_epoch_days()) * libc::time_t::from(pg_sys::SECS_PER_DAY)
     }
 
     pub fn try_get_date(&self) -> Result<time::Date, i32> {
@@ -87,8 +105,7 @@ impl Date {
         const INNER_RANGE_END: i32 = time::Date::MAX.to_julian_day();
         match self.0 {
             INNER_RANGE_BEGIN..=INNER_RANGE_END => {
-                time::Date::from_julian_day(self.0 + pg_sys::POSTGRES_EPOCH_JDATE as i32)
-                    .or_else(|_e| Err(self.0))
+                time::Date::from_julian_day(self.0 + POSTGRES_EPOCH_JDATE).or_else(|_e| Err(self.0))
             }
             v => Err(v),
         }
@@ -118,7 +135,7 @@ impl serde::Serialize for Date {
                 _ => {
                     let mut pg_tm: pg_sys::pg_tm = Default::default();
                     pg_sys::j2date(
-                        &self.0 + pg_sys::POSTGRES_EPOCH_JDATE as i32,
+                        &self.0 + POSTGRES_EPOCH_JDATE,
                         &mut pg_tm.tm_year,
                         &mut pg_tm.tm_mon,
                         &mut pg_tm.tm_mday,
