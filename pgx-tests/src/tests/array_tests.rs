@@ -99,6 +99,21 @@ fn return_zero_length_vec() -> Vec<i32> {
     Vec::new()
 }
 
+#[pg_extern]
+fn over_implicit_drop() -> Vec<i64> {
+    // Create an array of exactly Datum-sized numbers.
+    let mut vec: Vec<i64> = vec![1, 2, 3, 4, 5];
+    let mut nulls = vec![false, false, true, false, false];
+    // Verify we uphold the length contract.
+    assert_eq!(vec.len(), nulls.len());
+    let len = vec.len();
+    // Create an Array...
+    let _arr = unsafe { Array::<'_, i64>::over(vec.as_mut_ptr().cast(), nulls.as_mut_ptr(), len) };
+    // core::mem::forget(_arr); // Uncomment me to make the tests pass.
+    vec
+    // Implicit drop of _arr
+}
+
 #[cfg(any(test, feature = "pg_test"))]
 #[pgx::pg_schema]
 mod tests {
@@ -239,5 +254,18 @@ mod tests {
         })
         .expect("Failed to return json even though it's right there ^^");
         assert_eq!(json.0, json! {{"values": [1, 2, 3, null, 4]}});
+    }
+
+    #[pg_test]
+    fn test_array_over_direct() {
+        let vals = crate::tests::array_tests::over_implicit_drop();
+        assert_eq!(vals, &[1, 2, 3, 4, 5]);
+    }
+
+    #[pg_test]
+    fn test_array_over_spi() {
+        let vals: Vec<i64> =
+            Spi::get_one("SELECT over_implicit_drop();").expect("over machine broke");
+        assert_eq!(vals, &[1, 2, 3, 4, 5]);
     }
 }
