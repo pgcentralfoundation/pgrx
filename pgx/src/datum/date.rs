@@ -57,12 +57,7 @@ impl Date {
     and this fn will be removed in a future version"
     )]
     pub fn new(date: time::Date) -> Date {
-        Self::from_date(date)
-    }
-
-    #[inline]
-    pub fn from_date(date: time::Date) -> Date {
-        Self::from_pg_epoch_days(date.to_julian_day() - POSTGRES_EPOCH_JDATE)
+        date.into()
     }
 
     #[inline]
@@ -99,13 +94,23 @@ impl Date {
     pub fn to_posix_time(&self) -> libc::time_t {
         libc::time_t::from(self.to_unix_epoch_days()) * libc::time_t::from(pg_sys::SECS_PER_DAY)
     }
+}
 
-    pub fn try_get_date(&self) -> Result<time::Date, i32> {
+impl From<time::Date> for Date {
+    #[inline]
+    fn from(date: time::Date) -> Self {
+        Date::from_pg_epoch_days(date.to_julian_day() - POSTGRES_EPOCH_JDATE)
+    }
+}
+
+impl TryFrom<Date> for time::Date {
+    type Error = i32;
+    fn try_from(date: Date) -> Result<time::Date, Self::Error> {
         const INNER_RANGE_BEGIN: i32 = time::Date::MIN.to_julian_day();
         const INNER_RANGE_END: i32 = time::Date::MAX.to_julian_day();
-        match self.0 {
+        match date.0 {
             INNER_RANGE_BEGIN..=INNER_RANGE_END => {
-                time::Date::from_julian_day(self.0 + POSTGRES_EPOCH_JDATE).or_else(|_e| Err(self.0))
+                time::Date::from_julian_day(date.0 + POSTGRES_EPOCH_JDATE).or_else(|_e| Err(date.0))
             }
             v => Err(v),
         }

@@ -18,8 +18,8 @@ fn accept_date(d: Date) -> Date {
 
 #[pg_extern]
 fn accept_date_round_trip(d: Date) -> Date {
-    match d.try_get_date() {
-        Ok(date) => Date::from_date(date),
+    match TryInto::<time::Date>::try_into(d) {
+        Ok(date) => date.into(),
         Err(pg_epoch_days) => Date::from_pg_epoch_days(pg_epoch_days),
     }
 }
@@ -73,7 +73,7 @@ mod date_epoch_tests {
     #[test]
     fn test_to_pg_epoch_days() {
         let d = time::Date::from_calendar_date(2000, time::Month::January, 2).unwrap();
-        let date = Date::from_date(d);
+        let date: Date = d.into();
 
         assert_eq!(date.to_pg_epoch_days(), 1);
     }
@@ -81,7 +81,7 @@ mod date_epoch_tests {
     #[test]
     fn test_to_posix_time() {
         let d = time::Date::from_calendar_date(1970, time::Month::January, 2).unwrap();
-        let date = Date::from_date(d);
+        let date: Date = d.into();
 
         assert_eq!(date.to_posix_time(), 86400);
     }
@@ -89,7 +89,7 @@ mod date_epoch_tests {
     #[test]
     fn test_to_julian_days() {
         let d = time::Date::from_calendar_date(2000, time::Month::January, 1).unwrap();
-        let date = Date::from_date(d);
+        let date: Date = d.into();
 
         assert_eq!(date.to_julian_days(), pg_sys::POSTGRES_EPOCH_JDATE as i32);
     }
@@ -167,9 +167,11 @@ mod tests {
 
     #[pg_test]
     fn test_date_serialization() {
-        let date = Date::from_date(
-            time::Date::from_calendar_date(2020, time::Month::try_from(4).unwrap(), 07).unwrap(),
-        );
+        let date: Date =
+            time::Date::from_calendar_date(2020, time::Month::try_from(4).unwrap(), 07)
+                .unwrap()
+                .into();
+
         let json = json!({ "date test": date });
 
         assert_eq!(json!({"date test":"2020-04-07"}), json);
