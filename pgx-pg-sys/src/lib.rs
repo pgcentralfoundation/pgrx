@@ -240,6 +240,11 @@ mod all_versions {
         pub fn pgx_list_nth_oid(list: *mut super::List, nth: i32) -> super::Oid;
         pub fn pgx_list_nth_cell(list: *mut super::List, nth: i32) -> *mut super::ListCell;
         pub fn pgx_GETSTRUCT(tuple: pg_sys::HeapTuple) -> *mut std::os::raw::c_char;
+        pub fn pgx_ARR_DATA_PTR(arrayType: *mut pg_sys::ArrayType) -> *mut u8;
+        pub fn pgx_ARR_NELEMS(arrayType: *mut pg_sys::ArrayType) -> i32;
+        pub fn pgx_ARR_NDIM(arrayType: *mut pg_sys::ArrayType) -> i32;
+        pub fn pgx_ARR_NULLBITMAP(arrayType: *mut pg_sys::ArrayType) -> *mut pg_sys::bits8;
+        pub fn pgx_ARR_HASNULL(arrayType: *mut pg_sys::ArrayType) -> bool;
     }
 
     #[inline]
@@ -444,6 +449,42 @@ mod all_versions {
             >,
             context: *mut ::std::os::raw::c_void,
         ) -> bool;
+    }
+
+    #[inline]
+    pub fn get_arr_data_ptr<T>(arr: *mut super::ArrayType) -> *mut T {
+        unsafe { pgx_ARR_DATA_PTR(arr) as *mut T }
+    }
+
+    #[inline]
+    pub fn get_arr_nelems(arr: *mut super::ArrayType) -> i32 {
+        unsafe { pgx_ARR_NELEMS(arr) }
+    }
+
+    #[inline]
+    pub fn get_arr_ndim(arr: *mut super::ArrayType) -> i32 {
+        unsafe { pgx_ARR_NDIM(arr) }
+    }
+
+    #[inline]
+    pub fn get_arr_nullbitmap<'a>(arr: *mut super::ArrayType) -> &'a [pg_sys::bits8] {
+        unsafe {
+            let len = (pgx_ARR_NELEMS(arr) + 7) / 8;
+            std::slice::from_raw_parts(pgx_ARR_NULLBITMAP(arr), len as usize)
+        }
+    }
+
+    #[inline]
+    pub fn get_arr_nullbitmap_mut<'a>(arr: *mut super::ArrayType) -> &'a mut [u8] {
+        unsafe {
+            let len = (pgx_ARR_NELEMS(arr) + 7) / 8;
+            std::slice::from_raw_parts_mut(pgx_ARR_NULLBITMAP(arr), len as usize)
+        }
+    }
+
+    #[inline]
+    pub fn get_arr_hasnull(arr: *mut super::ArrayType) -> bool {
+        unsafe { pgx_ARR_HASNULL(arr) }
     }
 }
 

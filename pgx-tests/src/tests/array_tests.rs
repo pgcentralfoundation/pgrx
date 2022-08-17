@@ -7,7 +7,7 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use pgx::*;
+use pgx::{pg_sys::ArrayType, *};
 use serde_json::*;
 
 #[pg_extern(name = "sum_array")]
@@ -97,6 +97,53 @@ fn return_text_array() -> Vec<&'static str> {
 #[pg_extern]
 fn return_zero_length_vec() -> Vec<i32> {
     Vec::new()
+}
+
+#[pg_extern]
+fn get_arr_nelems(arr: Array<i32>) -> i32 {
+    let arr_type = arr.into_array_type();
+    pg_sys::get_arr_nelems(arr_type as *mut ArrayType)
+}
+
+#[pg_extern]
+fn get_arr_data_ptr_nth_elem(arr: Array<i32>, elem: i32) -> Option<i32> {
+    let len = arr.len();
+    let arr_type = arr.into_array_type();
+    let ptr = pg_sys::get_arr_data_ptr::<i32>(arr_type as *mut ArrayType);
+
+    unsafe {
+        let elem = elem as usize;
+        let data = std::slice::from_raw_parts(ptr, len);
+        if elem < len {
+            Some(data[elem])
+        } else {
+            None
+        }
+    }
+}
+
+#[pg_extern]
+fn display_get_arr_nullbitmap(arr: Array<i32>) -> String {
+    let arr_type = arr.into_array_type();
+
+    if pg_sys::get_arr_hasnull(arr_type as *mut ArrayType) {
+        let bitmap_slice = pg_sys::get_arr_nullbitmap(arr_type as *mut ArrayType);
+        format!("{:#010b}", bitmap_slice[0])
+    } else {
+        String::from("")
+    }
+}
+
+#[pg_extern]
+fn get_arr_ndim(arr: Array<i32>) -> i32 {
+    let arr_type = arr.into_array_type();
+    pg_sys::get_arr_ndim(arr_type as *mut ArrayType)
+}
+
+#[pg_extern]
+fn get_arr_hasnull(arr: Array<i32>) -> bool {
+    let arr_type = arr.into_array_type();
+    pg_sys::get_arr_hasnull(arr_type as *mut ArrayType)
 }
 
 #[cfg(any(test, feature = "pg_test"))]
@@ -239,5 +286,50 @@ mod tests {
         })
         .expect("Failed to return json even though it's right there ^^");
         assert_eq!(json.0, json! {{"values": [1, 2, 3, null, 4]}});
+    }
+
+    #[pg_test]
+    fn test_arr_data_ptr() {
+        let len = Spi::get_one::<i32>("SELECT get_arr_nelems('{1,2,3,4,5}'::int[])")
+            .expect("failed to get SPI result");
+
+        assert_eq!(len, 5);
+    }
+
+    #[pg_test]
+    fn test_get_arr_data_ptr_nth_elem() {
+        let nth = Spi::get_one::<i32>("SELECT get_arr_data_ptr_nth_elem('{1,2,3,4,5}'::int[], 2)")
+            .expect("failed to get SPI result");
+
+        assert_eq!(nth, 3);
+    }
+
+    #[pg_test]
+    fn test_display_get_arr_nullbitmap() {
+        let bitmap_str = Spi::get_one::<String>(
+            "SELECT display_get_arr_nullbitmap(ARRAY[1,NULL,3,NULL,5]::int[])",
+        )
+        .expect("failed to get SPI result");
+
+        assert_eq!(bitmap_str, "0b00010101");
+
+        let bitmap_str =
+            Spi::get_one::<String>("SELECT display_get_arr_nullbitmap(ARRAY[1,2,3,4,5]::int[])")
+                .expect("failed to get SPI result");
+
+        assert_eq!(bitmap_str, "");
+    }
+
+    #[pg_test]
+    fn test_get_arr_ndim() {
+        let ndim = Spi::get_one::<i32>("SELECT get_arr_ndim(ARRAY[1,2,3,4,5]::int[])")
+            .expect("failed to get SPI result");
+
+        assert_eq!(ndim, 1);
+
+        let ndim = Spi::get_one::<i32>("SELECT get_arr_ndim('{{1,2,3},{4,5,6}}'::int[])")
+            .expect("failed to get SPI result");
+
+        assert_eq!(ndim, 2);
     }
 }
