@@ -14,7 +14,7 @@ use std::marker::PhantomData;
 pub type VariadicArray<'a, T> = Array<'a, T>;
 
 pub struct Array<'a, T: FromDatum> {
-    ptr: *mut pg_sys::varlena,
+    _ptr: *mut pg_sys::varlena,
     array_type: *mut pg_sys::ArrayType,
     nelems: usize,
     elem_slice: &'a [pg_sys::Datum],
@@ -56,7 +56,7 @@ impl<'a, T: FromDatum> Array<'a, T> {
         nelems: usize,
     ) -> Array<'a, T> {
         Array::<T> {
-            ptr: std::ptr::null_mut(),
+            _ptr: std::ptr::null_mut(),
             array_type: std::ptr::null_mut(),
             nelems,
             elem_slice: std::slice::from_raw_parts(elements, nelems),
@@ -66,14 +66,14 @@ impl<'a, T: FromDatum> Array<'a, T> {
     }
 
     unsafe fn from_pg(
-        ptr: *mut pg_sys::varlena,
+        _ptr: *mut pg_sys::varlena,
         array_type: *mut pg_sys::ArrayType,
         elements: *mut pg_sys::Datum,
         nulls: *mut bool,
         nelems: usize,
     ) -> Self {
         Array::<T> {
-            ptr,
+            _ptr,
             array_type,
             nelems,
             elem_slice: std::slice::from_raw_parts(elements, nelems),
