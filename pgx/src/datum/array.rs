@@ -245,32 +245,6 @@ impl<'a, T: FromDatum> Iterator for ArrayIntoIterator<'a, T> {
     }
 }
 
-impl<'a, T: FromDatum> Drop for Array<'a, T> {
-    fn drop(&mut self) {
-        if !self.elements.is_null() {
-            unsafe {
-                pg_sys::pfree(self.elements as void_mut_ptr);
-            }
-        }
-
-        if !self.nulls.is_null() {
-            unsafe {
-                pg_sys::pfree(self.nulls as void_mut_ptr);
-            }
-        }
-
-        if !self.array_type.is_null() && self.array_type as *mut pg_sys::varlena != self.ptr {
-            unsafe {
-                pg_sys::pfree(self.array_type as void_mut_ptr);
-            }
-        }
-
-        // NB:  we don't pfree(self.ptr) because we don't know if it's actually
-        // safe to do that.  It'll be freed whenever Postgres deletes/resets its parent
-        // MemoryContext
-    }
-}
-
 impl<'a, T: FromDatum> FromDatum for Array<'a, T> {
     #[inline]
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Array<'a, T>> {
