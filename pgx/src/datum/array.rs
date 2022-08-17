@@ -266,6 +266,11 @@ impl<'a, T: FromDatum> FromDatum for Array<'a, T> {
             let mut nulls = std::ptr::null_mut();
             let mut nelems = 0;
 
+            // FIXME: This way of getting array buffers causes problems for any Drop impl,
+            // and clashes with assumptions of Array being a "zero-copy", lifetime-bound array,
+            // some of which are implicitly embedded in other methods (e.g. Array::over).
+            // It also risks leaking memory, as deconstruct_array calls palloc.
+            // So either we don't use this, we use it more conditionally, or something.
             pg_sys::deconstruct_array(
                 array,
                 array_ref.elemtype,
