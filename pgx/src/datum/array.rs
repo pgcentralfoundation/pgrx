@@ -7,7 +7,7 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use crate::{pg_sys, void_mut_ptr, FromDatum, IntoDatum, PgMemoryContexts};
+use crate::{pg_sys, FromDatum, IntoDatum, PgMemoryContexts};
 use serde::Serializer;
 use std::marker::PhantomData;
 
@@ -16,8 +16,6 @@ pub type VariadicArray<'a, T> = Array<'a, T>;
 pub struct Array<'a, T: FromDatum> {
     ptr: *mut pg_sys::varlena,
     array_type: *mut pg_sys::ArrayType,
-    elements: *mut pg_sys::Datum,
-    nulls: *mut bool,
     nelems: usize,
     elem_slice: &'a [pg_sys::Datum],
     null_slice: &'a [bool],
@@ -60,8 +58,6 @@ impl<'a, T: FromDatum> Array<'a, T> {
         Array::<T> {
             ptr: std::ptr::null_mut(),
             array_type: std::ptr::null_mut(),
-            elements,
-            nulls,
             nelems,
             elem_slice: std::slice::from_raw_parts(elements, nelems),
             null_slice: std::slice::from_raw_parts(nulls, nelems),
@@ -79,8 +75,6 @@ impl<'a, T: FromDatum> Array<'a, T> {
         Array::<T> {
             ptr,
             array_type,
-            elements,
-            nulls,
             nelems,
             elem_slice: std::slice::from_raw_parts(elements, nelems),
             null_slice: std::slice::from_raw_parts(nulls, nelems),
