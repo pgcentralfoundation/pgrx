@@ -17,11 +17,11 @@ fn sum_array_i32(values: Array<i32>) -> i32 {
     let mut sum = 0_i32;
     for v in values {
         let v = v.unwrap_or(0);
-        let tmp = sum.overflowing_add(v);
-        if tmp.1 {
+        let (val, overflow) = sum.overflowing_add(v);
+        if overflow {
             panic!("attempt to add with overflow");
         } else {
-            sum = tmp.0;
+            sum = val;
         }
     }
     sum
@@ -109,7 +109,6 @@ fn over_implicit_drop() -> Vec<i64> {
     let len = vec.len();
     // Create an Array...
     let _arr = unsafe { Array::<'_, i64>::over(vec.as_mut_ptr().cast(), nulls.as_mut_ptr(), len) };
-    // core::mem::forget(_arr); // Uncomment me to make the tests pass.
     vec
     // Implicit drop of _arr
 }
