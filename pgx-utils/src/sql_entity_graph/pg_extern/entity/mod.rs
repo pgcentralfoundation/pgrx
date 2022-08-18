@@ -106,6 +106,8 @@ impl ToSql for PgExternEntity {
         if strict_upgrade {
             extern_attrs.push(ExternArgs::Strict);
         }
+        extern_attrs.sort();
+        extern_attrs.dedup();
 
         let module_pathname = &context.get_module_pathname();
 
