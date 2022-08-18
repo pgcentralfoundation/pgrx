@@ -772,13 +772,13 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
             impl #generics JsonInOutFuncs #inout_generics for #name #generics {}
 
             #[doc(hidden)]
-            #[pg_extern(immutable,parallel_safe)]
+            #[pg_extern(immutable,parallel_safe,strict)]
             pub fn #funcname_in #generics(input: &#lifetime pgx::cstr_core::CStr) -> #name #generics {
                 #name::input(input)
             }
 
             #[doc(hidden)]
-            #[pg_extern(immutable,parallel_safe)]
+            #[pg_extern(immutable,parallel_safe,strict)]
             pub fn #funcname_out #generics(input: #name #generics) -> &#lifetime pgx::cstr_core::CStr {
                 let mut buffer = StringInfo::new();
                 input.output(&mut buffer);
@@ -790,13 +790,13 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
         // otherwise if it's InOutFuncs our _in/_out functions use an owned type instance
         stream.extend(quote! {
             #[doc(hidden)]
-            #[pg_extern(immutable,parallel_safe)]
+            #[pg_extern(immutable,parallel_safe,strict)]
             pub fn #funcname_in #generics(input: &#lifetime pgx::cstr_core::CStr) -> #name #generics {
                 #name::input(input)
             }
 
             #[doc(hidden)]
-            #[pg_extern(immutable,parallel_safe)]
+            #[pg_extern(immutable,parallel_safe,strict)]
             pub fn #funcname_out #generics(input: #name #generics) -> &#lifetime pgx::cstr_core::CStr {
                 let mut buffer = StringInfo::new();
                 input.output(&mut buffer);
@@ -807,13 +807,13 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
         // otherwise if it's PgVarlenaInOutFuncs our _in/_out functions use a PgVarlena
         stream.extend(quote! {
             #[doc(hidden)]
-            #[pg_extern(immutable,parallel_safe)]
+            #[pg_extern(immutable,parallel_safe,strict)]
             pub fn #funcname_in #generics(input: &#lifetime pgx::cstr_core::CStr) -> pgx::PgVarlena<#name #generics> {
                 #name::input(input)
             }
 
             #[doc(hidden)]
-            #[pg_extern(immutable,parallel_safe)]
+            #[pg_extern(immutable,parallel_safe,strict)]
             pub fn #funcname_out #generics(input: pgx::PgVarlena<#name #generics>) -> &#lifetime pgx::cstr_core::CStr {
                 let mut buffer = StringInfo::new();
                 input.output(&mut buffer);
