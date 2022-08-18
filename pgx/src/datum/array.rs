@@ -10,6 +10,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 use crate::{pg_sys, FromDatum, IntoDatum, PgMemoryContexts};
 use serde::Serializer;
 use std::marker::PhantomData;
+use std::{mem, ptr, slice};
 
 pub type VariadicArray<'a, T> = Array<'a, T>;
 
@@ -56,11 +57,11 @@ impl<'a, T: FromDatum> Array<'a, T> {
         nelems: usize,
     ) -> Array<'a, T> {
         Array::<T> {
-            _ptr: std::ptr::null_mut(),
-            array_type: std::ptr::null_mut(),
+            _ptr: ptr::null_mut(),
+            array_type: ptr::null_mut(),
             nelems,
-            elem_slice: std::slice::from_raw_parts(elements, nelems),
-            null_slice: std::slice::from_raw_parts(nulls, nelems),
+            elem_slice: slice::from_raw_parts(elements, nelems),
+            null_slice: slice::from_raw_parts(nulls, nelems),
             _marker: PhantomData,
         }
     }
@@ -76,8 +77,8 @@ impl<'a, T: FromDatum> Array<'a, T> {
             _ptr,
             array_type,
             nelems,
-            elem_slice: std::slice::from_raw_parts(elements, nelems),
-            null_slice: std::slice::from_raw_parts(nulls, nelems),
+            elem_slice: slice::from_raw_parts(elements, nelems),
+            null_slice: slice::from_raw_parts(nulls, nelems),
             _marker: PhantomData,
         }
     }
@@ -88,15 +89,15 @@ impl<'a, T: FromDatum> Array<'a, T> {
         }
 
         let ptr = self.array_type;
-        std::mem::forget(self);
+        mem::forget(self);
         ptr
     }
 
     pub fn as_slice(&self) -> &[T] {
-        let sizeof_type = std::mem::size_of::<T>();
-        let sizeof_datums = std::mem::size_of_val(self.elem_slice);
+        let sizeof_type = mem::size_of::<T>();
+        let sizeof_datums = mem::size_of_val(self.elem_slice);
         unsafe {
-            std::slice::from_raw_parts(
+            slice::from_raw_parts(
                 self.elem_slice.as_ptr() as *const T,
                 sizeof_datums / sizeof_type,
             )
@@ -262,8 +263,8 @@ impl<'a, T: FromDatum> FromDatum for Array<'a, T> {
             );
 
             // outvals for deconstruct_array()
-            let mut elements = std::ptr::null_mut();
-            let mut nulls = std::ptr::null_mut();
+            let mut elements = ptr::null_mut();
+            let mut nulls = ptr::null_mut();
             let mut nelems = 0;
 
             // FIXME: This way of getting array buffers causes problems for any Drop impl,
