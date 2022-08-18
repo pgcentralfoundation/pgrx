@@ -49,8 +49,10 @@ impl<'a, T: FromDatum> Array<'a, T> {
     ///
     /// # Safety
     ///
-    /// This function is unsafe as it can't validate the provided pointer are valid or that
-    ///
+    /// This function requires that:
+    /// - `elements` is non-null
+    /// - `nulls` is non-null
+    /// - both `elements` and `nulls` point to a slice of equal-or-greater length than `nelems`
     pub unsafe fn over(
         elements: *mut pg_sys::Datum,
         nulls: *mut bool,
