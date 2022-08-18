@@ -66,6 +66,12 @@ impl<'a, T: FromDatum> Array<'a, T> {
         }
     }
 
+    /// # Safety
+    ///
+    /// This function requires that:
+    /// - `elements` is non-null
+    /// - `nulls` is non-null
+    /// - both `elements` and `nulls` point to a slice of equal-or-greater length than `nelems`
     unsafe fn from_pg(
         _ptr: *mut pg_sys::varlena,
         array_type: *mut pg_sys::ArrayType,
