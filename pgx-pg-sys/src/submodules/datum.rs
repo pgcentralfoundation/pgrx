@@ -166,3 +166,22 @@ pub struct NullableDatum {
     pub value: Datum,
     pub isnull: bool,
 }
+
+impl TryFrom<NullableDatum> for Datum {
+    type Error = ();
+
+    fn try_from(nd: NullableDatum) -> Result<Datum, ()> {
+        let NullableDatum { value, isnull } = nd;
+        if isnull {
+            Err(())
+        } else {
+            Ok(value)
+        }
+    }
+}
+
+impl From<NullableDatum> for Option<Datum> {
+    fn from(nd: NullableDatum) -> Option<Datum> {
+        Some(Datum::try_from(nd).ok()?)
+    }
+}
