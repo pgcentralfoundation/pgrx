@@ -102,16 +102,16 @@ fn return_zero_length_vec() -> Vec<i32> {
 #[pg_extern]
 fn get_arr_nelems(arr: Array<i32>) -> i32 {
     let arr_type = arr.into_array_type();
-    pg_sys::get_arr_nelems(arr_type as *mut ArrayType)
+    array::get_arr_nelems(arr_type as *mut ArrayType)
 }
 
 #[pg_extern]
 fn get_arr_data_ptr_nth_elem(arr: Array<i32>, elem: i32) -> Option<i32> {
     let len = arr.len();
     let arr_type = arr.into_array_type();
-    let ptr = pg_sys::get_arr_data_ptr::<i32>(arr_type as *mut ArrayType);
 
     unsafe {
+        let ptr = array::get_arr_data_ptr::<i32>(arr_type as *mut ArrayType);
         let elem = elem as usize;
         let data = std::slice::from_raw_parts(ptr, len);
         if elem < len {
@@ -126,8 +126,8 @@ fn get_arr_data_ptr_nth_elem(arr: Array<i32>, elem: i32) -> Option<i32> {
 fn display_get_arr_nullbitmap(arr: Array<i32>) -> String {
     let arr_type = arr.into_array_type();
 
-    if pg_sys::get_arr_hasnull(arr_type as *mut ArrayType) {
-        let bitmap_slice = pg_sys::get_arr_nullbitmap(arr_type as *mut ArrayType);
+    if array::get_arr_hasnull(arr_type as *mut ArrayType) {
+        let bitmap_slice = array::get_arr_nullbitmap(arr_type as *mut ArrayType);
         format!("{:#010b}", bitmap_slice[0])
     } else {
         String::from("")
@@ -137,13 +137,13 @@ fn display_get_arr_nullbitmap(arr: Array<i32>) -> String {
 #[pg_extern]
 fn get_arr_ndim(arr: Array<i32>) -> i32 {
     let arr_type = arr.into_array_type();
-    pg_sys::get_arr_ndim(arr_type as *mut ArrayType)
+    array::get_arr_ndim(arr_type as *mut ArrayType)
 }
 
 #[pg_extern]
 fn get_arr_hasnull(arr: Array<i32>) -> bool {
     let arr_type = arr.into_array_type();
-    pg_sys::get_arr_hasnull(arr_type as *mut ArrayType)
+    array::get_arr_hasnull(arr_type as *mut ArrayType)
 }
 
 #[cfg(any(test, feature = "pg_test"))]

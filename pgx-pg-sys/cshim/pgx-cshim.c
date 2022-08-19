@@ -117,9 +117,9 @@ char *pgx_ARR_DATA_PTR(ArrayType *arr) {
     return ARR_DATA_PTR(arr);
 }
 
-PGDLLEXPORT int pgx_ARR_NELEMS(ArrayType *arr);
-int pgx_ARR_NELEMS(ArrayType *arr) {
-    return ArrayGetNItems(ARR_NDIM(arr), ARR_DIMS(arr));
+PGDLLEXPORT int pgx_ARRNELEMS(ArrayType *arr);
+int ARRNELEMS(ArrayType *arr) {
+    return ArrayGetNItems(arr->ndim, ARR_DIMS(arr));
 }
 
 PGDLLEXPORT bits8 *pgx_ARR_NULLBITMAP(ArrayType *arr);
@@ -135,4 +135,9 @@ int pgx_ARR_NDIM(ArrayType *arr) {
 PGDLLEXPORT bool pgx_ARR_HASNULL(ArrayType *arr);
 bool pgx_ARR_HASNULL(ArrayType *arr) {
     return ARR_HASNULL(arr);
+}
+
+PGDLLEXPORT int *pgx_ARR_HASNULL(ArrayType *arr);
+int *pgx_ARR_DIMS(ArrayType *arr){
+    return ARR_DIMS(arr);
 }
