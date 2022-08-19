@@ -7,9 +7,10 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use crate::{pg_config::PgConfig, sql_entity_graph::PositioningRef};
+use crate::sql_entity_graph::PositioningRef;
 use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
+use pgx_pg_config::PgConfig;
 use proc_macro2::{TokenStream, TokenTree};
 use quote::{format_ident, quote, ToTokens, TokenStreamExt};
 use serde_json::value::Value as JsonValue;
@@ -24,7 +25,6 @@ use syn::{GenericArgument, ItemFn, PathArguments, ReturnType, Type, TypeParamBou
 mod pgx_pg_sys_stub;
 
 pub mod operator_common;
-pub mod pg_config;
 pub mod rewriter;
 pub mod sql_entity_graph;
 
@@ -42,8 +42,6 @@ pub mod __reexports {
 }
 
 pub const SUPPORTED_MAJOR_VERSIONS: &[u16] = &[10, 11, 12, 13, 14];
-pub static BASE_POSTGRES_PORT_NO: u16 = 28800;
-pub static BASE_POSTGRES_TESTING_PORT_NO: u16 = 32200;
 
 pub fn get_target_dir() -> eyre::Result<PathBuf> {
     let mut command = Command::new("cargo");

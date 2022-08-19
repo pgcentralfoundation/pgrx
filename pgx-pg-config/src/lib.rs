@@ -7,7 +7,6 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 //! Wrapper around Postgres' `pg_config` command-line tool
-use crate::{BASE_POSTGRES_PORT_NO, BASE_POSTGRES_TESTING_PORT_NO};
 use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
 use serde_derive::{Deserialize, Serialize};
@@ -20,6 +19,9 @@ use std::{
     str::FromStr,
 };
 use url::Url;
+
+pub static BASE_POSTGRES_PORT_NO: u16 = 28800;
+pub static BASE_POSTGRES_TESTING_PORT_NO: u16 = 32200;
 
 #[derive(Clone)]
 pub struct PgVersion {

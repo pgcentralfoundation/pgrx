@@ -294,6 +294,7 @@ dependencies = [
  "object",
  "once_cell",
  "owo-colors",
+ "pgx-pg-config",
  "pgx-utils",
  "proc-macro2",
  "quote",
@@ -1448,6 +1449,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "pgx-pg-config"
+version = "0.5.0-beta.0"
+dependencies = [
+ "dirs",
+ "eyre",
+ "owo-colors",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "toml",
+ "tracing",
+ "tracing-error",
+ "url",
+]
+
+[[package]]
 name = "pgx-pg-sys"
 version = "0.5.0-beta.0"
 dependencies = [
@@ -1460,6 +1477,7 @@ dependencies = [
  "once_cell",
  "owo-colors",
  "pgx-macros",
+ "pgx-pg-config",
  "pgx-utils",
  "proc-macro2",
  "quote",
@@ -1479,6 +1497,7 @@ dependencies = [
  "owo-colors",
  "pgx",
  "pgx-macros",
+ "pgx-pg-config",
  "pgx-utils",
  "postgres",
  "regex",
@@ -1500,6 +1519,7 @@ dependencies = [
  "eyre",
  "owo-colors",
  "petgraph",
+ "pgx-pg-config",
  "prettyplease",
  "proc-macro2",
  "quote",

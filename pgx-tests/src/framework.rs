@@ -10,12 +10,12 @@ Use of this source code is governed by the MIT license that can be found in the 
 use std::process::{Command, Stdio};
 
 use once_cell::sync::Lazy;
+use pgx_pg_config::{PgConfig, Pgx};
 use std::sync::{Arc, Mutex};
 
 use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
 use pgx::*;
-use pgx_utils::pg_config::{PgConfig, Pgx};
 use pgx_utils::{createdb, get_named_capture, get_target_dir};
 use postgres::error::DbError;
 use postgres::Client;

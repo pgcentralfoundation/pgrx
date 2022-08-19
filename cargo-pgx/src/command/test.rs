@@ -9,10 +9,8 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 use cargo_toml::Manifest;
 use eyre::{eyre, WrapErr};
-use pgx_utils::{
-    get_target_dir,
-    pg_config::{PgConfig, PgConfigSelector, Pgx},
-};
+use pgx_pg_config::{PgConfig, PgConfigSelector, Pgx};
+use pgx_utils::get_target_dir;
 use std::{
     path::{Path, PathBuf},
     process::{Command, Stdio},

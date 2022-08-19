@@ -13,7 +13,7 @@ use crate::CommandExecute;
 use cargo_toml::Manifest;
 use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
-use pgx_utils::pg_config::{PgConfig, PgConfigSelector, Pgx};
+use pgx_pg_config::{PgConfig, PgConfigSelector, Pgx};
 use std::{os::unix::process::CommandExt, path::PathBuf, process::Stdio};
 
 /// Start a pgx-managed Postgres instance

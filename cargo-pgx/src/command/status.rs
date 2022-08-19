@@ -9,7 +9,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 use eyre::eyre;
 use owo_colors::OwoColorize;
-use pgx_utils::pg_config::{PgConfig, PgConfigSelector, Pgx};
+use pgx_pg_config::{PgConfig, PgConfigSelector, Pgx};
 use std::{path::PathBuf, process::Stdio};
 
 use crate::CommandExecute;

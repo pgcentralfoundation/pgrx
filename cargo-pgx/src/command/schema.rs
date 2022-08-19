@@ -18,8 +18,8 @@ use eyre::{eyre, WrapErr};
 use object::Object;
 use once_cell::sync::OnceCell;
 use owo_colors::OwoColorize;
+use pgx_pg_config::{PgConfig, Pgx};
 use pgx_utils::{
-    pg_config::{PgConfig, Pgx},
     sql_entity_graph::{PgxSql, SqlGraphEntity},
     PgxPgSysStub,
 };
