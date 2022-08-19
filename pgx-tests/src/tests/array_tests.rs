@@ -17,11 +17,11 @@ fn sum_array_i32(values: Array<i32>) -> i32 {
     let mut sum = 0_i32;
     for v in values {
         let v = v.unwrap_or(0);
-        let tmp = sum.overflowing_add(v);
-        if tmp.1 {
+        let (val, overflow) = sum.overflowing_add(v);
+        if overflow {
             panic!("attempt to add with overflow");
         } else {
-            sum = tmp.0;
+            sum = val;
         }
     }
     sum
@@ -97,6 +97,20 @@ fn return_text_array() -> Vec<&'static str> {
 #[pg_extern]
 fn return_zero_length_vec() -> Vec<i32> {
     Vec::new()
+}
+
+#[pg_extern]
+fn over_implicit_drop() -> Vec<i64> {
+    // Create an array of exactly Datum-sized numbers.
+    let mut vec: Vec<i64> = vec![1, 2, 3, 4, 5];
+    let mut nulls = vec![false, false, true, false, false];
+    // Verify we uphold the length contract.
+    assert_eq!(vec.len(), nulls.len());
+    let len = vec.len();
+    // Create an Array...
+    let _arr = unsafe { Array::<'_, i64>::over(vec.as_mut_ptr().cast(), nulls.as_mut_ptr(), len) };
+    vec
+    // Implicit drop of _arr
 }
 
 #[cfg(any(test, feature = "pg_test"))]
@@ -239,5 +253,18 @@ mod tests {
         })
         .expect("Failed to return json even though it's right there ^^");
         assert_eq!(json.0, json! {{"values": [1, 2, 3, null, 4]}});
+    }
+
+    #[pg_test]
+    fn test_array_over_direct() {
+        let vals = crate::tests::array_tests::over_implicit_drop();
+        assert_eq!(vals, &[1, 2, 3, 4, 5]);
+    }
+
+    #[pg_test]
+    fn test_array_over_spi() {
+        let vals: Vec<i64> =
+            Spi::get_one("SELECT over_implicit_drop();").expect("over machine broke");
+        assert_eq!(vals, &[1, 2, 3, 4, 5]);
     }
 }
