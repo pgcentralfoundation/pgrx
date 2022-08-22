@@ -296,6 +296,7 @@ dependencies = [
  "owo-colors",
  "pgx-paths",
  "pgx-pg-config",
+ "pgx-pg-sys-stub",
  "pgx-utils",
  "proc-macro2",
  "quote",
@@ -1497,6 +1498,16 @@ dependencies = [
  "rustversion",
  "sptr",
  "syn",
+]
+
+[[package]]
+name = "pgx-pg-sys-stub"
+version = "0.5.0-beta.0"
+dependencies = [
+ "eyre",
+ "prettyplease",
+ "syn",
+ "tracing",
 ]
 
 [[package]]

@@ -20,10 +20,8 @@ use once_cell::sync::OnceCell;
 use owo_colors::OwoColorize;
 use pgx_paths::get_target_dir;
 use pgx_pg_config::{PgConfig, Pgx};
-use pgx_utils::{
-    sql_entity_graph::{PgxSql, SqlGraphEntity},
-    PgxPgSysStub,
-};
+use pgx_pg_sys_stub::PgxPgSysStub;
+use pgx_utils::sql_entity_graph::{PgxSql, SqlGraphEntity};
 use std::{
     collections::HashSet,
     hash::{Hash, Hasher},
