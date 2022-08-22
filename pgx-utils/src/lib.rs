@@ -24,7 +24,6 @@ use syn::{GenericArgument, ItemFn, PathArguments, ReturnType, Type, TypeParamBou
 
 mod pgx_pg_sys_stub;
 
-pub mod operator_common;
 pub mod rewriter;
 pub mod sql_entity_graph;
 
