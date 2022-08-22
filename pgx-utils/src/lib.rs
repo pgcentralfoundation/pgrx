@@ -31,17 +31,6 @@ pub mod __reexports {
     }
 }
 
-pub fn get_named_capture(
-    regex: &regex::Regex,
-    name: &'static str,
-    against: &str,
-) -> Option<String> {
-    match regex.captures(against) {
-        Some(cap) => Some(cap[name].to_string()),
-        None => None,
-    }
-}
-
 #[derive(Debug, Hash, Eq, PartialEq, Clone, PartialOrd, Ord)]
 pub enum ExternArgs {
     Immutable,

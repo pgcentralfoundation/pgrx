@@ -9,21 +9,19 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 use std::process::{Command, Stdio};
 
-use once_cell::sync::Lazy;
-use pgx_paths::get_target_dir;
-use pgx_pg_config::{createdb, PgConfig, Pgx};
-use std::sync::{Arc, Mutex};
-
 use eyre::{eyre, WrapErr};
+use once_cell::sync::Lazy;
 use owo_colors::OwoColorize;
 use pgx::*;
-use pgx_utils::get_named_capture;
+use pgx_paths::get_target_dir;
+use pgx_pg_config::{createdb, PgConfig, Pgx};
 use postgres::error::DbError;
 use postgres::Client;
 use std::collections::HashMap;
 use std::fmt::Write as _;
 use std::io::{BufRead, BufReader, Write};
 use std::path::PathBuf;
+use std::sync::{Arc, Mutex};
 
 type LogLines = Arc<Mutex<HashMap<String, Vec<String>>>>;
 
@@ -542,4 +540,15 @@ fn get_pg_dbname() -> &'static str {
 fn get_pg_user() -> String {
     std::env::var("USER")
         .unwrap_or_else(|_| panic!("USER environment var is unset or invalid UTF-8"))
+}
+
+pub fn get_named_capture(
+    regex: &regex::Regex,
+    name: &'static str,
+    against: &str,
+) -> Option<String> {
+    match regex.captures(against) {
+        Some(cap) => Some(cap[name].to_string()),
+        None => None,
+    }
 }

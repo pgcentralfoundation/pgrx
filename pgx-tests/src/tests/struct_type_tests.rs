@@ -9,7 +9,8 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 use pgx::stringinfo::StringInfo;
 use pgx::*;
-use pgx_utils::get_named_capture;
+
+use crate::get_named_capture;
 
 #[derive(Debug)]
 #[repr(C)]
