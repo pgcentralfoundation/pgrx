@@ -294,6 +294,7 @@ dependencies = [
  "object",
  "once_cell",
  "owo-colors",
+ "pgx-paths",
  "pgx-pg-config",
  "pgx-utils",
  "proc-macro2",
@@ -1449,6 +1450,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "pgx-paths"
+version = "0.5.0-beta.0"
+dependencies = [
+ "eyre",
+ "serde",
+ "serde_derive",
+ "serde_json",
+]
+
+[[package]]
 name = "pgx-pg-config"
 version = "0.5.0-beta.0"
 dependencies = [
@@ -1477,6 +1488,7 @@ dependencies = [
  "once_cell",
  "owo-colors",
  "pgx-macros",
+ "pgx-paths",
  "pgx-pg-config",
  "pgx-utils",
  "proc-macro2",
@@ -1497,6 +1509,7 @@ dependencies = [
  "owo-colors",
  "pgx",
  "pgx-macros",
+ "pgx-paths",
  "pgx-pg-config",
  "pgx-utils",
  "postgres",

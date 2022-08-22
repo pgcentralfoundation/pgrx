@@ -18,6 +18,7 @@ use eyre::{eyre, WrapErr};
 use object::Object;
 use once_cell::sync::OnceCell;
 use owo_colors::OwoColorize;
+use pgx_paths::get_target_dir;
 use pgx_pg_config::{PgConfig, Pgx};
 use pgx_utils::{
     sql_entity_graph::{PgxSql, SqlGraphEntity},
@@ -178,7 +179,7 @@ pub(crate) fn generate_schema(
 
     let flags = std::env::var("PGX_BUILD_FLAGS").unwrap_or_default();
 
-    let mut target_dir_with_profile = pgx_utils::get_target_dir()?;
+    let mut target_dir_with_profile = get_target_dir()?;
     target_dir_with_profile.push(if is_release { "release" } else { "debug" });
 
     // First, build the SQL generator so we can get a look at the symbol table

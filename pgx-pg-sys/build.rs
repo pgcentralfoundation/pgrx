@@ -11,8 +11,8 @@ extern crate build_deps;
 
 use bindgen::callbacks::MacroParsingBehavior;
 use eyre::{eyre, WrapErr};
+use pgx_paths::prefix_path;
 use pgx_pg_config::{PgConfig, PgConfigSelector, Pgx};
-use pgx_utils::prefix_path;
 use pgx_utils::rewriter::PgGuardRewriter;
 use quote::{quote, ToTokens};
 use rayon::prelude::*;

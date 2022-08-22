@@ -14,8 +14,9 @@ use crate::{
 use cargo_toml::Manifest;
 use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
+use pgx_paths::get_target_dir;
 use pgx_pg_config::PgConfig;
-use pgx_utils::{get_target_dir, versioned_so_name};
+use pgx_utils::versioned_so_name;
 use std::{
     io::BufReader,
     path::{Path, PathBuf},

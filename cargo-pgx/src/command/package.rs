@@ -13,8 +13,8 @@ use crate::{
 };
 use cargo_toml::Manifest;
 use eyre::{eyre, WrapErr};
+use pgx_paths::get_target_dir;
 use pgx_pg_config::PgConfig;
-use pgx_utils::get_target_dir;
 use std::path::{Path, PathBuf};
 
 /// Create an installation package directory.
