@@ -13,12 +13,11 @@ rust-version = "1.58"
 
 [dependencies]
 atty = "0.2.14"
-owo-colors = "3.4.0"
 convert_case = "0.5.0"
-dirs = "4.0.0"
-env_proxy = "0.4.1"
+eyre = "0.6.8"
+owo-colors = "3.4.0"
+petgraph = "0.6.0"
 pgx-paths = { path = "../pgx-paths", version = "=0.5.0-beta.0" }
-pgx-pg-config = { path = "../pgx-pg-config", version = "=0.5.0-beta.0" }
 proc-macro2 = { version = "1.0.39", features = [ "span-locations" ] }
 quote = "1.0.18"
 regex = "1.5.5"
@@ -27,12 +26,7 @@ serde_derive = "1.0.137"
 serde_json = "1.0.81"
 syn = { version = "1.0.95", features = [ "extra-traits", "full", "fold", "parsing" ] }
 syntect = { version = "5.0.0", default-features = false, features = ["default-fancy"] }
-toml = "0.5.9"
 unescape = "0.1.0"
-url = "2.2.2"
-eyre = "0.6.8"
 tracing = "0.1.34"
 tracing-error = "0.2.0"
 tracing-subscriber = { version = "0.3.11", features = [ "env-filter" ] }
-petgraph = "0.6.0"
-prettyplease = "0.1.10"
