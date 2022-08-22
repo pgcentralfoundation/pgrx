@@ -16,8 +16,7 @@ use crate::{
 use cargo_toml::Manifest;
 use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
-use pgx_pg_config::{PgConfig, Pgx};
-use pgx_utils::createdb;
+use pgx_pg_config::{createdb, PgConfig, Pgx};
 use std::{os::unix::process::CommandExt, path::Path, process::Command};
 /// Compile/install extension to a pgx-managed Postgres instance and start psql
 #[derive(clap::Args, Debug)]

@@ -11,13 +11,13 @@ use std::process::{Command, Stdio};
 
 use once_cell::sync::Lazy;
 use pgx_paths::get_target_dir;
-use pgx_pg_config::{PgConfig, Pgx};
+use pgx_pg_config::{createdb, PgConfig, Pgx};
 use std::sync::{Arc, Mutex};
 
 use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
 use pgx::*;
-use pgx_utils::{createdb, get_named_capture};
+use pgx_utils::get_named_capture;
 use postgres::error::DbError;
 use postgres::Client;
 use std::collections::HashMap;

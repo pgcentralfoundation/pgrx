@@ -14,8 +14,7 @@ use crate::{
 use cargo_toml::Manifest;
 use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
-use pgx_pg_config::{PgConfig, Pgx};
-use pgx_utils::createdb;
+use pgx_pg_config::{createdb, PgConfig, Pgx};
 use std::path::PathBuf;
 
 /// Connect, via psql, to a Postgres instance

@@ -11,6 +11,7 @@ use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
 use serde_derive::{Deserialize, Serialize};
 use std::fmt::{self, Display, Formatter};
+use std::process::Stdio;
 use std::{
     collections::HashMap,
     io::ErrorKind,
@@ -410,5 +411,87 @@ impl Pgx {
         let mut path = Pgx::home()?;
         path.push("config.toml");
         Ok(path)
+    }
+}
+
+pub const SUPPORTED_MAJOR_VERSIONS: &[u16] = &[10, 11, 12, 13, 14];
+
+pub fn createdb(
+    pg_config: &PgConfig,
+    dbname: &str,
+    is_test: bool,
+    if_not_exists: bool,
+) -> eyre::Result<bool> {
+    if if_not_exists && does_db_exist(pg_config, dbname)? {
+        return Ok(false);
+    }
+
+    println!("{} database {}", "     Creating".bold().green(), dbname);
+    let mut command = Command::new(pg_config.createdb_path()?);
+    command
+        .env_remove("PGDATABASE")
+        .env_remove("PGHOST")
+        .env_remove("PGPORT")
+        .env_remove("PGUSER")
+        .arg("-h")
+        .arg(pg_config.host())
+        .arg("-p")
+        .arg(if is_test {
+            pg_config.test_port()?.to_string()
+        } else {
+            pg_config.port()?.to_string()
+        })
+        .arg(dbname)
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped());
+    let command_str = format!("{:?}", command);
+
+    let output = command.output()?;
+
+    if !output.status.success() {
+        return Err(eyre!(
+            "problem running createdb: {}\n\n{}{}",
+            command_str,
+            String::from_utf8(output.stdout).unwrap(),
+            String::from_utf8(output.stderr).unwrap()
+        ));
+    }
+
+    Ok(true)
+}
+
+fn does_db_exist(pg_config: &PgConfig, dbname: &str) -> eyre::Result<bool> {
+    let mut command = Command::new(pg_config.psql_path()?);
+    command
+        .arg("-XqAt")
+        .env_remove("PGUSER")
+        .arg("-h")
+        .arg(pg_config.host())
+        .arg("-p")
+        .arg(pg_config.port()?.to_string())
+        .arg("template1")
+        .arg("-c")
+        .arg(&format!(
+            "select count(*) from pg_database where datname = '{}';",
+            dbname.replace("'", "''")
+        ))
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped());
+
+    let command_str = format!("{:?}", command);
+    let output = command.output()?;
+
+    if !output.status.success() {
+        return Err(eyre!(
+            "problem checking if database '{}' exists: {}\n\n{}{}",
+            dbname,
+            command_str,
+            String::from_utf8(output.stdout).unwrap(),
+            String::from_utf8(output.stderr).unwrap()
+        ));
+    } else {
+        let count = i32::from_str(&String::from_utf8(output.stdout).unwrap().trim())
+            .wrap_err("result is not a number")?;
+        Ok(count > 0)
     }
 }

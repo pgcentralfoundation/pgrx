@@ -12,7 +12,7 @@ extern crate build_deps;
 use bindgen::callbacks::MacroParsingBehavior;
 use eyre::{eyre, WrapErr};
 use pgx_paths::prefix_path;
-use pgx_pg_config::{PgConfig, PgConfigSelector, Pgx};
+use pgx_pg_config::{PgConfig, PgConfigSelector, Pgx, SUPPORTED_MAJOR_VERSIONS};
 use pgx_utils::rewriter::PgGuardRewriter;
 use quote::{quote, ToTokens};
 use rayon::prelude::*;
@@ -110,7 +110,7 @@ fn main() -> color_eyre::Result<()> {
             .collect::<eyre::Result<Vec<_>>>()?
     } else {
         let mut found = None;
-        for version in pgx_utils::SUPPORTED_MAJOR_VERSIONS {
+        for version in SUPPORTED_MAJOR_VERSIONS {
             if let Err(_) = std::env::var(&format!("CARGO_FEATURE_PG{}", version)) {
                 continue;
             }
@@ -122,7 +122,7 @@ fn main() -> color_eyre::Result<()> {
         let found = found.ok_or_else(|| {
             eyre!(
                 "Did not find `pg$VERSION` feature. `pgx-pg-sys` requires one of {} to be set",
-                pgx_utils::SUPPORTED_MAJOR_VERSIONS
+                SUPPORTED_MAJOR_VERSIONS
                     .iter()
                     .map(|x| format!("`pg{}`", x))
                     .collect::<Vec<_>>()
