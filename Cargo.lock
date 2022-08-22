@@ -1532,6 +1532,7 @@ dependencies = [
  "eyre",
  "owo-colors",
  "petgraph",
+ "pgx-paths",
  "pgx-pg-config",
  "prettyplease",
  "proc-macro2",

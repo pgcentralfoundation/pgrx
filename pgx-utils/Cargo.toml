@@ -17,6 +17,7 @@ owo-colors = "3.4.0"
 convert_case = "0.5.0"
 dirs = "4.0.0"
 env_proxy = "0.4.1"
+pgx-paths = { path = "../pgx-paths", version = "=0.5.0-beta.0" }
 pgx-pg-config = { path = "../pgx-pg-config", version = "=0.5.0-beta.0" }
 proc-macro2 = { version = "1.0.39", features = [ "span-locations" ] }
 quote = "1.0.18"

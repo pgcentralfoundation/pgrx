@@ -49,3 +49,7 @@ pub fn prefix_path<P: Into<PathBuf>>(dir: P) -> String {
         .into_string()
         .expect("failed to construct path")
 }
+
+pub fn versioned_so_name(extension_name: &str, extension_version: &str) -> String {
+    format!("{}-{}", extension_name, extension_version)
+}

@@ -420,10 +420,6 @@ pub fn staticize_lifetimes(value: &mut syn::Type) {
     }
 }
 
-pub fn versioned_so_name(extension_name: &str, extension_version: &str) -> String {
-    format!("{}-{}", extension_name, extension_version)
-}
-
 /// Roughly `pgx::pg_sys::NAMEDATALEN`
 ///
 /// Technically it **should** be that exactly, however this is `pgx-utils` and a this data is used at macro time.

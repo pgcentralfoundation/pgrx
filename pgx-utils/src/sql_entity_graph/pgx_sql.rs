@@ -7,6 +7,7 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 use eyre::{eyre, WrapErr};
+use pgx_paths::versioned_so_name;
 use std::{any::TypeId, collections::HashMap, fmt::Debug, path::Path};
 
 use owo_colors::{OwoColorize, XtermColors};
@@ -32,7 +33,6 @@ use crate::sql_entity_graph::{
     to_sql::ToSql,
     SqlGraphEntity, SqlGraphIdentifier,
 };
-use crate::versioned_so_name;
 
 use super::pg_extern::entity::PgExternReturnEntityIteratedItem;
 
