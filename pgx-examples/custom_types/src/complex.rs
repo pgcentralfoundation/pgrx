@@ -72,4 +72,12 @@ mod tests {
             })
         )
     }
+
+    #[pg_test]
+    fn test_null_as_animals() {
+        eprintln!("!");
+        let animals: Option<Animals> = Spi::get_one::<Animals>("SELECT NULL::animals;");
+
+        assert_eq!(animals, None);
+    }
 }
