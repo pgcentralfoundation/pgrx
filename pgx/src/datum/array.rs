@@ -7,17 +7,16 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use crate::{pg_sys, void_mut_ptr, FromDatum, IntoDatum, PgMemoryContexts};
+use crate::{pg_sys, FromDatum, IntoDatum, PgMemoryContexts};
 use serde::Serializer;
 use std::marker::PhantomData;
+use std::{mem, ptr, slice};
 
 pub type VariadicArray<'a, T> = Array<'a, T>;
 
 pub struct Array<'a, T: FromDatum> {
-    ptr: *mut pg_sys::varlena,
+    _ptr: *mut pg_sys::varlena,
     array_type: *mut pg_sys::ArrayType,
-    elements: *mut pg_sys::Datum,
-    nulls: *mut bool,
     nelems: usize,
     elem_slice: &'a [pg_sys::Datum],
     null_slice: &'a [bool],
@@ -50,40 +49,44 @@ impl<'a, T: FromDatum> Array<'a, T> {
     ///
     /// # Safety
     ///
-    /// This function is unsafe as it can't validate the provided pointer are valid or that
-    ///
+    /// This function requires that:
+    /// - `elements` is non-null
+    /// - `nulls` is non-null
+    /// - both `elements` and `nulls` point to a slice of equal-or-greater length than `nelems`
     pub unsafe fn over(
         elements: *mut pg_sys::Datum,
         nulls: *mut bool,
         nelems: usize,
     ) -> Array<'a, T> {
         Array::<T> {
-            ptr: std::ptr::null_mut(),
-            array_type: std::ptr::null_mut(),
-            elements,
-            nulls,
+            _ptr: ptr::null_mut(),
+            array_type: ptr::null_mut(),
             nelems,
-            elem_slice: std::slice::from_raw_parts(elements, nelems),
-            null_slice: std::slice::from_raw_parts(nulls, nelems),
+            elem_slice: slice::from_raw_parts(elements, nelems),
+            null_slice: slice::from_raw_parts(nulls, nelems),
             _marker: PhantomData,
         }
     }
 
+    /// # Safety
+    ///
+    /// This function requires that:
+    /// - `elements` is non-null
+    /// - `nulls` is non-null
+    /// - both `elements` and `nulls` point to a slice of equal-or-greater length than `nelems`
     unsafe fn from_pg(
-        ptr: *mut pg_sys::varlena,
+        _ptr: *mut pg_sys::varlena,
         array_type: *mut pg_sys::ArrayType,
         elements: *mut pg_sys::Datum,
         nulls: *mut bool,
         nelems: usize,
     ) -> Self {
         Array::<T> {
-            ptr,
+            _ptr,
             array_type,
-            elements,
-            nulls,
             nelems,
-            elem_slice: std::slice::from_raw_parts(elements, nelems),
-            null_slice: std::slice::from_raw_parts(nulls, nelems),
+            elem_slice: slice::from_raw_parts(elements, nelems),
+            null_slice: slice::from_raw_parts(nulls, nelems),
             _marker: PhantomData,
         }
     }
@@ -94,15 +97,15 @@ impl<'a, T: FromDatum> Array<'a, T> {
         }
 
         let ptr = self.array_type;
-        std::mem::forget(self);
+        mem::forget(self);
         ptr
     }
 
     pub fn as_slice(&self) -> &[T] {
-        let sizeof_type = std::mem::size_of::<T>();
-        let sizeof_datums = std::mem::size_of_val(self.elem_slice);
+        let sizeof_type = mem::size_of::<T>();
+        let sizeof_datums = mem::size_of_val(self.elem_slice);
         unsafe {
-            std::slice::from_raw_parts(
+            slice::from_raw_parts(
                 self.elem_slice.as_ptr() as *const T,
                 sizeof_datums / sizeof_type,
             )
@@ -245,32 +248,6 @@ impl<'a, T: FromDatum> Iterator for ArrayIntoIterator<'a, T> {
     }
 }
 
-impl<'a, T: FromDatum> Drop for Array<'a, T> {
-    fn drop(&mut self) {
-        if !self.elements.is_null() {
-            unsafe {
-                pg_sys::pfree(self.elements as void_mut_ptr);
-            }
-        }
-
-        if !self.nulls.is_null() {
-            unsafe {
-                pg_sys::pfree(self.nulls as void_mut_ptr);
-            }
-        }
-
-        if !self.array_type.is_null() && self.array_type as *mut pg_sys::varlena != self.ptr {
-            unsafe {
-                pg_sys::pfree(self.array_type as void_mut_ptr);
-            }
-        }
-
-        // NB:  we don't pfree(self.ptr) because we don't know if it's actually
-        // safe to do that.  It'll be freed whenever Postgres deletes/resets its parent
-        // MemoryContext
-    }
-}
-
 impl<'a, T: FromDatum> FromDatum for Array<'a, T> {
     #[inline]
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Array<'a, T>> {
@@ -294,10 +271,15 @@ impl<'a, T: FromDatum> FromDatum for Array<'a, T> {
             );
 
             // outvals for deconstruct_array()
-            let mut elements = std::ptr::null_mut();
-            let mut nulls = std::ptr::null_mut();
+            let mut elements = ptr::null_mut();
+            let mut nulls = ptr::null_mut();
             let mut nelems = 0;
 
+            // FIXME: This way of getting array buffers causes problems for any Drop impl,
+            // and clashes with assumptions of Array being a "zero-copy", lifetime-bound array,
+            // some of which are implicitly embedded in other methods (e.g. Array::over).
+            // It also risks leaking memory, as deconstruct_array calls palloc.
+            // So either we don't use this, we use it more conditionally, or something.
             pg_sys::deconstruct_array(
                 array,
                 array_ref.elemtype,

@@ -210,6 +210,7 @@ impl PgxSql {
         connect_externs(
             &mut graph,
             &mapped_externs,
+            &mapped_hashes,
             &mapped_schemas,
             &mapped_types,
             &mapped_enums,
@@ -961,6 +962,7 @@ fn initialize_externs(
 fn connect_externs(
     graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
     externs: &HashMap<PgExternEntity, NodeIndex>,
+    hashes: &HashMap<PostgresHashEntity, NodeIndex>,
     schemas: &HashMap<SchemaEntity, NodeIndex>,
     types: &HashMap<PostgresTypeEntity, NodeIndex>,
     enums: &HashMap<PostgresEnumEntity, NodeIndex>,
@@ -1015,6 +1017,16 @@ fn connect_externs(
                 item.module_path,
                 schemas,
             );
+        }
+
+        // The hash function must be defined after the {typename}_eq function.
+        for (hash_item, &hash_index) in hashes {
+            if item.module_path == hash_item.module_path
+                && item.name == hash_item.name.to_lowercase() + "_eq"
+            {
+                tracing::debug!(from = hash_item.full_path, to = ?item.full_path, "Adding Hash after Extern edge");
+                graph.add_edge(index, hash_index, SqlGraphRelationship::RequiredBy);
+            }
         }
 
         for arg in &item.fn_args {
