@@ -292,7 +292,7 @@ impl<'a> FromDatum for &'a crate::cstr_core::CStr {
         datum: pg_sys::Datum,
         is_null: bool,
     ) -> Option<&'a crate::cstr_core::CStr> {
-        if is_null {
+        if is_null || datum.is_null() {
             None
         } else {
             Some(crate::cstr_core::CStr::from_ptr(datum.ptr_cast()))
