@@ -91,6 +91,7 @@ pub trait WithTypeIds {
     const ARRAY_ID: Lazy<Option<TypeId>>;
     const OPTION_ARRAY_ID: Lazy<Option<TypeId>>;
     const VARLENA_ID: Lazy<Option<TypeId>>;
+    const OPTION_VARLENA_ID: Lazy<Option<TypeId>>;
 
     fn register_with_refs(map: &mut std::collections::HashSet<RustSqlMapping>, single_sql: String)
     where
@@ -178,6 +179,7 @@ impl<T: 'static + ?Sized> WithTypeIds for T {
     const ARRAY_ID: Lazy<Option<TypeId>> = Lazy::new(|| None);
     const OPTION_ARRAY_ID: Lazy<Option<TypeId>> = Lazy::new(|| None);
     const VARLENA_ID: Lazy<Option<TypeId>> = Lazy::new(|| None);
+    const OPTION_VARLENA_ID: Lazy<Option<TypeId>> = Lazy::new(|| None);
 }
 
 /// A type which can have it's [`core::any::TypeId`]s registered for Rust to SQL mapping.
@@ -459,6 +461,8 @@ impl<T: Copy + 'static> WithVarlenaTypeIds<T> {
     pub const VARLENA_ID: Lazy<Option<TypeId>> = Lazy::new(|| Some(TypeId::of::<PgVarlena<T>>()));
     pub const PG_BOX_VARLENA_ID: Lazy<Option<TypeId>> =
         Lazy::new(|| Some(TypeId::of::<PgBox<PgVarlena<T>>>()));
+    pub const OPTION_VARLENA_ID: Lazy<Option<TypeId>> =
+        Lazy::new(|| Some(TypeId::of::<Option<PgVarlena<T>>>()));
 
     pub fn register_varlena_with_refs(
         map: &mut std::collections::HashSet<RustSqlMapping>,
@@ -491,6 +495,19 @@ impl<T: Copy + 'static> WithVarlenaTypeIds<T> {
 
         if let Some(id) = *WithVarlenaTypeIds::<T>::PG_BOX_VARLENA_ID {
             let rust = core::any::type_name::<PgBox<PgVarlena<T>>>().to_string();
+            assert_eq!(
+                map.insert(RustSqlMapping {
+                    sql: single_sql.clone(),
+                    rust: rust.to_string(),
+                    id: id,
+                }),
+                true,
+                "Cannot map `{}` twice.",
+                rust,
+            );
+        }
+        if let Some(id) = *WithVarlenaTypeIds::<T>::OPTION_VARLENA_ID {
+            let rust = core::any::type_name::<Option<PgVarlena<T>>>().to_string();
             assert_eq!(
                 map.insert(RustSqlMapping {
                     sql: single_sql.clone(),

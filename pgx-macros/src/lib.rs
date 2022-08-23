@@ -773,8 +773,13 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
 
             #[doc(hidden)]
             #[pg_extern(immutable,parallel_safe)]
-            pub fn #funcname_in #generics(input: &#lifetime pgx::cstr_core::CStr) -> #name #generics {
-                #name::input(input)
+            pub fn #funcname_in #generics(input: Option<&#lifetime pgx::cstr_core::CStr>) -> Option<#name #generics> {
+                input.map_or_else(|| {
+                    for m in #name::NULL_ERROR_MESSAGE {
+                        pgx::error!("{}", m);
+                    }
+                    None
+                }, |i| Some(#name::input(i)))
             }
 
             #[doc(hidden)]
@@ -791,8 +796,13 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
         stream.extend(quote! {
             #[doc(hidden)]
             #[pg_extern(immutable,parallel_safe)]
-            pub fn #funcname_in #generics(input: &#lifetime pgx::cstr_core::CStr) -> #name #generics {
-                #name::input(input)
+            pub fn #funcname_in #generics(input: Option<&#lifetime pgx::cstr_core::CStr>) -> Option<#name #generics> {
+                input.map_or_else(|| {
+                    for m in #name::NULL_ERROR_MESSAGE {
+                        pgx::error!("{}", m);
+                    }
+                    None
+                }, |i| Some(#name::input(i)))
             }
 
             #[doc(hidden)]
@@ -808,8 +818,13 @@ fn impl_postgres_type(ast: DeriveInput) -> proc_macro2::TokenStream {
         stream.extend(quote! {
             #[doc(hidden)]
             #[pg_extern(immutable,parallel_safe)]
-            pub fn #funcname_in #generics(input: &#lifetime pgx::cstr_core::CStr) -> pgx::PgVarlena<#name #generics> {
-                #name::input(input)
+            pub fn #funcname_in #generics(input: Option<&#lifetime pgx::cstr_core::CStr>) -> Option<pgx::PgVarlena<#name #generics>> {
+                input.map_or_else(|| {
+                    for m in #name::NULL_ERROR_MESSAGE {
+                        pgx::error!("{}", m);
+                    }
+                    None
+                }, |i| Some(#name::input(i)))
             }
 
             #[doc(hidden)]
