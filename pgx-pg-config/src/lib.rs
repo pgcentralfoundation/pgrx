@@ -24,6 +24,13 @@ use url::Url;
 pub static BASE_POSTGRES_PORT_NO: u16 = 28800;
 pub static BASE_POSTGRES_TESTING_PORT_NO: u16 = 32200;
 
+// These methods were originally in `pgx-utils`, but in an effort to consolidate
+// dependencies, the decision was made to package them into wherever made the
+// most sense. In this case, it made the most sense to put them into this
+// pgx-pg-config crate. That doesnt mean they can't be moved at a later date.
+mod path_methods;
+pub use path_methods::{get_target_dir, prefix_path};
+
 #[derive(Clone)]
 pub struct PgVersion {
     major: u16,

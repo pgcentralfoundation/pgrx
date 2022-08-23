@@ -1,16 +1,20 @@
-/*
-Portions Copyright 2019-2021 ZomboDB, LLC.
-Portions Copyright 2021-2022 Technology Concepts & Design, Inc. <support@tcdi.com>
-
-All rights reserved.
-
-Use of this source code is governed by the MIT license that can be found in the LICENSE file.
-*/
-
 use eyre::{eyre, WrapErr};
 use serde_json::value::Value as JsonValue;
 use std::{path::PathBuf, process::Command};
 
+// Originally part of `pgx-utils`
+pub fn prefix_path<P: Into<PathBuf>>(dir: P) -> String {
+    let mut path = std::env::split_paths(&std::env::var_os("PATH").expect("failed to get $PATH"))
+        .collect::<Vec<_>>();
+
+    path.insert(0, dir.into());
+    std::env::join_paths(path)
+        .expect("failed to join paths")
+        .into_string()
+        .expect("failed to construct path")
+}
+
+// Originally part of `pgx-utils`
 pub fn get_target_dir() -> eyre::Result<PathBuf> {
     let mut command = Command::new("cargo");
     command
@@ -37,19 +41,4 @@ pub fn get_target_dir() -> eyre::Result<PathBuf> {
             v,
         )),
     }
-}
-
-pub fn prefix_path<P: Into<PathBuf>>(dir: P) -> String {
-    let mut path = std::env::split_paths(&std::env::var_os("PATH").expect("failed to get $PATH"))
-        .collect::<Vec<_>>();
-
-    path.insert(0, dir.into());
-    std::env::join_paths(path)
-        .expect("failed to join paths")
-        .into_string()
-        .expect("failed to construct path")
-}
-
-pub fn versioned_so_name(extension_name: &str, extension_version: &str) -> String {
-    format!("{}-{}", extension_name, extension_version)
 }

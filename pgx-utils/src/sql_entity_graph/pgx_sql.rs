@@ -7,7 +7,6 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 use eyre::{eyre, WrapErr};
-use pgx_paths::versioned_so_name;
 use std::{any::TypeId, collections::HashMap, fmt::Debug, path::Path};
 
 use owo_colors::{OwoColorize, XtermColors};
@@ -548,7 +547,10 @@ impl PgxSql {
         return if self.versioned_so {
             let extname = &self.extension_name;
             let extver = &self.control.default_version;
-            format!("$libdir/{}", versioned_so_name(extname, extver))
+            // Note: This originally was a call into versioned_so_name, but in an effort to eliminate crate dependencies,
+            // and because it was a single format! line, it was decided that inlining the single format! line was best in
+            // order to reduce a dependency.
+            format!("$libdir/{}-{}", extname, extver)
         } else {
             String::from("MODULE_PATHNAME")
         };

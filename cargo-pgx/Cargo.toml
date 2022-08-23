@@ -24,7 +24,6 @@ semver = "1.0.9"
 owo-colors = { version = "3.4.0", features = [ "supports-colors" ] }
 env_proxy = "0.4.1"
 num_cpus = "1.13.1"
-pgx-paths = { path = "../pgx-paths", version = "=0.5.0-beta.0" }
 pgx-pg-config = { path = "../pgx-pg-config", version = "=0.5.0-beta.0" }
 pgx-pg-sys-stub = { path = "../pgx-pg-sys-stub", version = "=0.5.0-beta.0" }
 pgx-utils = { path = "../pgx-utils", version = "=0.5.0-beta.0" }

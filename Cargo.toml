@@ -3,7 +3,6 @@ resolver = "2"
 members = [
     "cargo-pgx",
     "pgx",
-    "pgx-paths",
     "pgx-macros",
     "pgx-pg-config",
     "pgx-pg-sys",

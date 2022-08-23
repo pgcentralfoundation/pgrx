@@ -17,7 +17,6 @@ convert_case = "0.5.0"
 eyre = "0.6.8"
 owo-colors = "3.4.0"
 petgraph = "0.6.0"
-pgx-paths = { path = "../pgx-paths", version = "=0.5.0-beta.0" }
 proc-macro2 = { version = "1.0.39", features = [ "span-locations" ] }
 quote = "1.0.18"
 regex = "1.5.5"

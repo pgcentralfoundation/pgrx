@@ -12,8 +12,7 @@ use crate::command::version::pgx_default;
 use crate::CommandExecute;
 use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
-use pgx_paths::prefix_path;
-use pgx_pg_config::{PgConfig, PgConfigSelector, Pgx, SUPPORTED_MAJOR_VERSIONS};
+use pgx_pg_config::{prefix_path, PgConfig, PgConfigSelector, Pgx, SUPPORTED_MAJOR_VERSIONS};
 use rayon::prelude::*;
 
 use std::collections::HashMap;

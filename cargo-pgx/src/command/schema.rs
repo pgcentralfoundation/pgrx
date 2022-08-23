@@ -18,8 +18,7 @@ use eyre::{eyre, WrapErr};
 use object::Object;
 use once_cell::sync::OnceCell;
 use owo_colors::OwoColorize;
-use pgx_paths::get_target_dir;
-use pgx_pg_config::{PgConfig, Pgx};
+use pgx_pg_config::{get_target_dir, PgConfig, Pgx};
 use pgx_pg_sys_stub::PgxPgSysStub;
 use pgx_utils::sql_entity_graph::{PgxSql, SqlGraphEntity};
 use std::{
