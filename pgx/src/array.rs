@@ -112,13 +112,15 @@ impl RawArray {
 
         // SAFETY: Welcome to the infernal bowels of FFI.
         // Because the initial ptr was NonNull, we can assume this is also NonNull.
-        // As validity of the initial ptr was asserted on construction,
+        // As validity of the initial ptr was asserted on construction of RawArray,
         // this can assume the dims ptr is also valid, allowing making the slice.
-        // We don't assert validity yet, but in practice,
+        // This code doesn't assert validity per se, but in practice,
         // the caller will probably immediately turn this into a borrowed slice,
         // opening up the methods that are available on borrowed slices.
+        //
         // So, to be clear, yes, everything done so far allows the caller to do so,
         // though it is possible the caller can misuse this in various ways.
+        // Only the "naive" case is well-guarded.
         unsafe {
             let len = self.ndims() as usize;
             NonNull::new_unchecked(slice_from_raw_parts_mut(
@@ -162,16 +164,35 @@ impl RawArray {
         self.data_offset() != 0
     }
 
+    /// The slice of the data.
+    /// Oxidized form of ARR_DATA_PTR(ArrayType*)
+    ///
     /// # Safety
     ///
     /// This is not inherently typesafe!
     /// Thus you must know the implied type of the underlying ArrayType when calling this.
     /// In addition, the raw slice is not guaranteed to be legible at any given index,
     /// e.g. it may be an "SQL null" if so indicated in the null bitmap.
-    /// But even if the null bitmap does not indicate null, the value itself may still be null,
+    /// But even if the index is not marked as null, the value may be equal to nullptr,
     /// thus leaving it correct to read the value but incorrect to then dereference.
-    pub unsafe fn data_slice<T>(&mut self) -> NonNull<[T]> {
+    ///
+    /// That is why this returns `NonNull<[T]>`: if it returned `&mut [T]`,
+    /// then for many possible types, that would actually be UB, as it would assert
+    /// that each particular index was a valid `T`.
+    pub unsafe fn data<T>(&mut self) -> NonNull<[T]> {
         let len = self.len() as usize;
+
+        // SAFETY: Welcome to the infernal bowels of FFI.
+        // Because the initial ptr was NonNull, we can assume this is also NonNull.
+        // As validity of the initial ptr was asserted on construction of RawArray,
+        // this can assume the data ptr is also valid, allowing making the slice.
+        // This code doesn't assert validity per se, but in practice,
+        // the caller will probably immediately turn this into a borrowed slice,
+        // opening up the methods that are available on borrowed slices.
+        //
+        // Most importantly, the caller has asserted this is in fact a valid [T],
+        // by calling this function, so both this code and the caller can rely
+        // on that assertion, only requiring that it is correct.
         unsafe {
             NonNull::new_unchecked(slice_from_raw_parts_mut(
                 pgx_ARR_DATA_PTR(self.at.as_ptr()).cast(),
