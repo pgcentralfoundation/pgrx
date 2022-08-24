@@ -74,12 +74,9 @@ impl FromDatum for Interval {
 impl TryFrom<Duration> for Interval {
     type Error = &'static str;
     fn try_from(duration: Duration) -> Result<Interval, Self::Error> {
-        const INNER_RANGE_BEGIN: Duration =
-            Duration::new(-178_000_000i64 * pg_sys::SECS_PER_YEAR as i64, 0);
-        const INNER_RANGE_END: Duration =
-            Duration::new(178_000_000i64 * pg_sys::SECS_PER_YEAR as i64, 0);
+        let total_months = duration.whole_days() / (pg_sys::DAYS_PER_MONTH as i64);
 
-        if duration >= INNER_RANGE_BEGIN && duration <= INNER_RANGE_END {
+        if total_months >= (i32::MIN as i64) && total_months <= (i32::MAX as i64) {
             let mut month = 0;
             let mut day = 0;
             let mut d = duration;
@@ -98,7 +95,7 @@ impl TryFrom<Duration> for Interval {
 
             Ok(Interval(pg_sys::Interval { day, month, time }))
         } else {
-            Err("duration outside of -178,000,000 year to 178,000,000 year bound")
+            Err("duration's total month count outside of valid i32::MIN..=i32::MAX range")
         }
     }
 }

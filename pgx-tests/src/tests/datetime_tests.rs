@@ -524,4 +524,26 @@ mod tests {
 
         assert_eq!(json!({"interval test":"3 mons 4 days 00:00:05"}), json);
     }
+
+    #[pg_test]
+    fn test_duration_to_interval_err() {
+        // normal limit of i32::MAX months
+        let duration = time::Duration::days(pg_sys::DAYS_PER_MONTH as i64 * i32::MAX as i64);
+
+        let result = TryInto::<Interval>::try_into(duration);
+        match result {
+            Ok(_) => (),
+            Err(_) => panic!("failed duration -> interval conversion"),
+        };
+
+        // one month too many, expect error
+        let duration =
+            time::Duration::days(pg_sys::DAYS_PER_MONTH as i64 * (i32::MAX as i64 + 1i64));
+
+        let result = TryInto::<Interval>::try_into(duration);
+        match result {
+            Ok(_) => panic!("invalid duration -> interval conversion succeeded"),
+            Err(_) => (),
+        };
+    }
 }
