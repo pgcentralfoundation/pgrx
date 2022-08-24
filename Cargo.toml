@@ -6,7 +6,6 @@ members = [
     "pgx-macros",
     "pgx-pg-config",
     "pgx-pg-sys",
-    "pgx-pg-sys-stub",
     "pgx-tests",
     "pgx-utils",
     "pgx-examples/aggregate",

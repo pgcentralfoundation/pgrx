@@ -295,8 +295,8 @@ dependencies = [
  "once_cell",
  "owo-colors",
  "pgx-pg-config",
- "pgx-pg-sys-stub",
  "pgx-utils",
+ "prettyplease",
  "proc-macro2",
  "quote",
  "rayon",
@@ -1488,16 +1488,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "pgx-pg-sys-stub"
-version = "0.5.0-beta.0"
-dependencies = [
- "eyre",
- "prettyplease",
- "syn",
- "tracing",
-]
-
-[[package]]
 name = "pgx-tests"
 version = "0.5.0-beta.0"
 dependencies = [
@@ -1642,9 +1632,9 @@ checksum = "eb9f9e6e233e5c4a35559a617bf40a4ec447db2e84c20b55a6f83167b7e57872"
 
 [[package]]
 name = "prettyplease"
-version = "0.1.11"
+version = "0.1.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f28f53e8b192565862cf99343194579a022eb9c7dd3a8d03134734803c7b3125"
+checksum = "697ae720ee02011f439e0701db107ffe2916d83f718342d65d7f8bf7b8a5fee9"
 dependencies = [
  "proc-macro2",
  "syn",
