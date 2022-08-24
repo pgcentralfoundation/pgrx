@@ -53,7 +53,9 @@ impl RawArray {
     /// * The pointer must be properly aligned.
     /// * It must be "dereferenceable" in the sense defined in [the std documentation].
     /// * The pointer must point to an initialized instance of `ArrayType`.
-    /// * You aren't going to alias the data like mad.
+    /// * This can be considered a unique, "owning pointer",
+    ///   so it won't be aliased while RawArray is held,
+    ///   and it points to data in the Postgres ArrayType format.
     ///
     /// It should be noted as RawArray is not inherently lifetime-bound, it can be racy and unsafe!
     ///
@@ -98,11 +100,25 @@ impl RawArray {
     ///
     /// # Safety
     ///
-    /// Be aware that if you get clever and use this pointer beyond owning RawArray, it's wrong!
+    /// This requires &mut to collect the slice, but be aware: this is a raw pointer!
+    /// If you find ways to store it, you are probably violating ownership.
     /// Raw pointer validity is **asserted on dereference, not construction**,
-    /// and this slice is no longer valid if you do not also hold RawArray.
+    /// so remember, this slice is only guaranteed to be valid almost immediately
+    /// after obtaining it, or if you continue to hold the RawArray.
     pub fn dims(&mut self) -> NonNull<[libc::c_int]> {
-        // must match or use postgres/src/include/utils/array.h #define ARR_DIMS
+        // for expected behavior, see:
+        // postgres/src/include/utils/array.h
+        // #define ARR_DIMS
+
+        // SAFETY: Welcome to the infernal bowels of FFI.
+        // Because the initial ptr was NonNull, we can assume this is also NonNull.
+        // As validity of the initial ptr was asserted on construction,
+        // this can assume the dims ptr is also valid, allowing making the slice.
+        // We don't assert validity yet, but in practice,
+        // the caller will probably immediately turn this into a borrowed slice,
+        // opening up the methods that are available on borrowed slices.
+        // So, to be clear, yes, everything done so far allows the caller to do so,
+        // though it is possible the caller can misuse this in various ways.
         unsafe {
             let len = self.ndims() as usize;
             NonNull::new_unchecked(slice_from_raw_parts_mut(
