@@ -7,6 +7,7 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
+use core::ptr::NonNull;
 use pgx::array::RawArray;
 use pgx::{pg_sys::ArrayType, *};
 use serde_json::*;
@@ -127,7 +128,8 @@ fn get_arr_data_ptr_nth_elem(arr: Array<i32>, elem: i32) -> Option<i32> {
 fn display_get_arr_nullbitmap(arr: Array<i32>) -> String {
     let arr_type = arr.into_array_type();
 
-    if array::get_arr_hasnull(arr_type as *mut ArrayType) {
+    if unsafe { RawArray::from_raw(NonNull::new_unchecked(arr_type.clone() as *mut _)).nullable() }
+    {
         let bitmap_slice = array::get_arr_nullbitmap(arr_type as *mut ArrayType);
         format!("{:#010b}", bitmap_slice[0])
     } else {
@@ -142,8 +144,7 @@ fn get_arr_ndim(arr: Array<i32>) -> libc::c_int {
 
 #[pg_extern]
 fn get_arr_hasnull(arr: Array<i32>) -> bool {
-    let arr_type = arr.into_array_type();
-    array::get_arr_hasnull(arr_type as *mut ArrayType)
+    unsafe { RawArray::from_array(arr).unwrap().nullable() }
 }
 
 #[pg_extern]

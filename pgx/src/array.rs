@@ -38,12 +38,6 @@ pub fn get_arr_nullbitmap_mut<'a>(arr: *mut ArrayType) -> &'a mut [u8] {
 }
 
 #[inline]
-pub fn get_arr_hasnull(arr: *mut ArrayType) -> bool {
-    // copied from array.h
-    unsafe { (*arr).dataoffset != 0 }
-}
-
-#[inline]
 pub fn get_arr_dims<'a>(arr: *mut ArrayType) -> &'a [i32] {
     extern "C" {
         pub fn pgx_ARR_DIMS(arrayType: *mut ArrayType) -> *mut i32;
@@ -127,5 +121,12 @@ impl RawArray {
     pub fn data_offset(&self) -> libc::c_int {
         // SAFETY: Validity asserted on construction.
         unsafe { (*self.at.as_ptr()).dataoffset }
+    }
+
+    /// Equivalent to ARR_HASNULL(ArrayType*)
+    /// Note this means that it only asserts that there MIGHT be a null
+    pub fn nullable(&self) -> bool {
+        // copied from postgres/src/include/utils/array.h
+        self.data_offset() != 0
     }
 }
