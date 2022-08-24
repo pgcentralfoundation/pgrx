@@ -150,9 +150,10 @@ impl RawArray {
 
     /// Gets the offset to the ArrayType's data.
     /// Note that this should not be "taken literally".
-    pub fn data_offset(&self) -> libc::c_int {
+    fn data_offset(&self) -> i32 {
         // SAFETY: Validity asserted on construction.
         unsafe { (*self.at.as_ptr()).dataoffset }
+        // This field is an "int32" in Postgres
     }
 
     /// Equivalent to ARR_HASNULL(ArrayType*)
