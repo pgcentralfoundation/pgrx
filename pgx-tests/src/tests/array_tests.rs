@@ -108,18 +108,10 @@ fn get_arr_nelems(arr: Array<i32>) -> libc::c_int {
 
 #[pg_extern]
 fn get_arr_data_ptr_nth_elem(arr: Array<i32>, elem: i32) -> Option<i32> {
-    let len = arr.len();
-    let arr_type = arr.into_array_type();
-
     unsafe {
-        let ptr = array::get_arr_data_ptr::<i32>(arr_type as *mut ArrayType);
-        let elem = elem as usize;
-        let data = std::slice::from_raw_parts(ptr, len);
-        if elem < len {
-            Some(data[elem])
-        } else {
-            None
-        }
+        let raw = RawArray::from_array(arr).unwrap().data_slice::<i32>();
+        let slice = &(*raw.as_ptr());
+        slice.get(elem as usize).copied()
     }
 }
 

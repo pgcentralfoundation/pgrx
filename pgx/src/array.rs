@@ -6,15 +6,8 @@ use pgx_pg_sys::*;
 extern "C" {
     pub fn pgx_ARR_NELEMS(arrayType: *mut ArrayType) -> i32;
     pub fn pgx_ARR_NULLBITMAP(arrayType: *mut ArrayType) -> *mut bits8;
+    pub fn pgx_ARR_DATA_PTR(arrayType: *mut ArrayType) -> *mut u8;
     pub fn pgx_ARR_DIMS(arrayType: *mut ArrayType) -> *mut libc::c_int;
-}
-
-#[inline]
-pub unsafe fn get_arr_data_ptr<T>(arr: *mut ArrayType) -> *mut T {
-    extern "C" {
-        pub fn pgx_ARR_DATA_PTR(arrayType: *mut ArrayType) -> *mut u8;
-    }
-    pgx_ARR_DATA_PTR(arr) as *mut T
 }
 
 #[inline]
@@ -151,5 +144,23 @@ impl RawArray {
     pub fn nullable(&self) -> bool {
         // must match postgres/src/include/utils/array.h #define ARR_HASNULL
         self.data_offset() != 0
+    }
+
+    /// # Safety
+    ///
+    /// This is not inherently typesafe!
+    /// Thus you must know the implied type of the underlying ArrayType when calling this.
+    /// In addition, the raw slice is not guaranteed to be legible at any given index,
+    /// e.g. it may be an "SQL null" if so indicated in the null bitmap.
+    /// But even if the null bitmap does not indicate null, the value itself may still be null,
+    /// thus leaving it correct to read the value but incorrect to then dereference.
+    pub unsafe fn data_slice<T>(&mut self) -> NonNull<[T]> {
+        let len = self.len() as usize;
+        unsafe {
+            NonNull::new_unchecked(slice_from_raw_parts_mut(
+                pgx_ARR_DATA_PTR(self.at.as_ptr()).cast(),
+                len,
+            ))
+        }
     }
 }
