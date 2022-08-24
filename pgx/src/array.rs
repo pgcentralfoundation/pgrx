@@ -4,10 +4,18 @@ use core::ptr::{slice_from_raw_parts_mut, NonNull};
 use pgx_pg_sys::*;
 
 extern "C" {
-    pub fn pgx_ARR_NELEMS(arrayType: *mut ArrayType) -> i32;
-    pub fn pgx_ARR_NULLBITMAP(arrayType: *mut ArrayType) -> *mut bits8;
-    pub fn pgx_ARR_DATA_PTR(arrayType: *mut ArrayType) -> *mut u8;
-    pub fn pgx_ARR_DIMS(arrayType: *mut ArrayType) -> *mut libc::c_int;
+    /// # Safety
+    /// Does a field access, but doesn't deref out of bounds of ArrayType
+    fn pgx_ARR_DATA_PTR(arrayType: *mut ArrayType) -> *mut u8;
+    /// # Safety
+    /// Does a field access, but doesn't deref out of bounds of ArrayType
+    fn pgx_ARR_DIMS(arrayType: *mut ArrayType) -> *mut libc::c_int;
+    /// # Safety
+    /// Must only be used on a "valid" (Postgres-constructed) ArrayType
+    fn pgx_ARR_NELEMS(arrayType: *mut ArrayType) -> i32;
+    /// # Safety
+    /// Does a field access, but doesn't deref out of bounds of ArrayType
+    fn pgx_ARR_NULLBITMAP(arrayType: *mut ArrayType) -> *mut bits8;
 }
 
 /// Handle describing a bare, "untyped" pointer to an array,
