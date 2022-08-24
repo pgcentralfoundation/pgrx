@@ -155,9 +155,7 @@ pub(crate) fn install_extension(
         dest.push(&pkgdir);
         let so_name = if versioned_so {
             let extver = get_version(&package_manifest_path)?;
-            // Note: This originally was a call into versioned_so_name, but in an effort to eliminate crate dependencies,
-            // and because it was a single format! line, it was decided that inlining the single format! line was best in
-            // order to reduce a dependency.
+            // note: versioned so-name format must agree with pgx-utils
             format!("{}-{}", &extname, &extver)
         } else {
             extname.clone()
