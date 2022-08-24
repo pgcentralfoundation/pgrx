@@ -1,11 +1,12 @@
 use crate::datum::{Array, FromDatum};
 use crate::pg_sys;
-use core::ptr::NonNull;
+use core::ptr::{slice_from_raw_parts_mut, NonNull};
 use pgx_pg_sys::*;
 
 extern "C" {
     pub fn pgx_ARR_NELEMS(arrayType: *mut ArrayType) -> i32;
     pub fn pgx_ARR_NULLBITMAP(arrayType: *mut ArrayType) -> *mut bits8;
+    pub fn pgx_ARR_DIMS(arrayType: *mut ArrayType) -> *mut libc::c_int;
 }
 
 #[inline]
@@ -14,11 +15,6 @@ pub unsafe fn get_arr_data_ptr<T>(arr: *mut ArrayType) -> *mut T {
         pub fn pgx_ARR_DATA_PTR(arrayType: *mut ArrayType) -> *mut u8;
     }
     pgx_ARR_DATA_PTR(arr) as *mut T
-}
-
-#[inline]
-pub fn get_arr_nelems(arr: *mut ArrayType) -> i32 {
-    unsafe { pgx_ARR_NELEMS(arr) }
 }
 
 #[inline]
@@ -37,17 +33,6 @@ pub fn get_arr_nullbitmap_mut<'a>(arr: *mut ArrayType) -> &'a mut [u8] {
     }
 }
 
-#[inline]
-pub fn get_arr_dims<'a>(arr: *mut ArrayType) -> &'a [i32] {
-    extern "C" {
-        pub fn pgx_ARR_DIMS(arrayType: *mut ArrayType) -> *mut i32;
-    }
-    unsafe {
-        let len = (*arr).ndim;
-        std::slice::from_raw_parts(pgx_ARR_DIMS(arr), len as usize)
-    }
-}
-
 /// Handle describing a bare, "untyped" pointer to an array,
 /// offering safe accessors to the various fields of one.
 #[repr(transparent)]
@@ -62,6 +47,10 @@ impl RawArray {
     // RawArray is not Copy or Clone, making it harder to misuse versus *mut ArrayType.
     // But this also offers safe accessors to the fields, like &ArrayType,
     // so it requires validity assertions in order to be constructed.
+    // The main reason it uses NonNull and denies Clone, however, is access soundness:
+    // It is not sound to go from &mut Type to *mut T if *mut T is not a field of Type.
+    // This creates an obvious complication for handing out pointers into varlenas.
+    // Thus also why this does not use lifetime-bounded borrows.
 
     /// Returns a handle to the raw array header.
     ///
@@ -107,6 +96,40 @@ impl RawArray {
             // that it is going to actually challenge even 16-bit pointer widths.
             // It would be preferable to return a usize instead,
             // however, PGX has trouble with that, unfortunately.
+            as _
+        }
+    }
+
+    /// A raw slice of the dimensions.
+    /// Oxidized form of ARR_DIMS(ArrayType*)
+    ///
+    /// # Safety
+    ///
+    /// Be aware that if you get clever and use this pointer beyond owning RawArray, it's wrong!
+    /// Raw pointer validity is **asserted on dereference, not construction**,
+    /// and this slice is no longer valid if you do not also hold RawArray.
+    pub fn dims(&mut self) -> NonNull<[libc::c_int]> {
+        // must match or use postgres/src/include/utils/array.h #define ARR_DIMS
+        unsafe {
+            let len = self.ndims() as usize;
+            NonNull::new_unchecked(slice_from_raw_parts_mut(
+                pgx_ARR_DIMS(self.at.as_ptr()),
+                len,
+            ))
+        }
+    }
+
+    /// The flattened length of the array.
+    pub fn len(&self) -> libc::c_int {
+        // SAFETY: Validity asserted on construction, and...
+        // ...well, hopefully Postgres knows what it's doing.
+        unsafe {
+            pgx_ARR_NELEMS(self.at.as_ptr())
+            // FIXME: While this was indeed a function that returns a c_int,
+            // using a usize is more idiomatic in Rust, to say the least.
+            // In addition, the actual sizes are under various restrictions,
+            // so we probably can further constrain the value, honestly.
+            // However, PGX has trouble with returning usizes
             as _
         }
     }

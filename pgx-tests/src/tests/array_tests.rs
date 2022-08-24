@@ -102,9 +102,8 @@ fn return_zero_length_vec() -> Vec<i32> {
 }
 
 #[pg_extern]
-fn get_arr_nelems(arr: Array<i32>) -> i32 {
-    let arr_type = arr.into_array_type();
-    array::get_arr_nelems(arr_type as *mut ArrayType)
+fn get_arr_nelems(arr: Array<i32>) -> libc::c_int {
+    unsafe { RawArray::from_array(arr).unwrap().len() }
 }
 
 #[pg_extern]
