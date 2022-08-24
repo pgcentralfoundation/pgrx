@@ -10,22 +10,6 @@ extern "C" {
     pub fn pgx_ARR_DIMS(arrayType: *mut ArrayType) -> *mut libc::c_int;
 }
 
-#[inline]
-pub fn get_arr_nullbitmap<'a>(arr: *mut ArrayType) -> &'a [bits8] {
-    unsafe {
-        let len = (pgx_ARR_NELEMS(arr) + 7) / 8;
-        std::slice::from_raw_parts(pgx_ARR_NULLBITMAP(arr), len as usize)
-    }
-}
-
-#[inline]
-pub fn get_arr_nullbitmap_mut<'a>(arr: *mut ArrayType) -> &'a mut [u8] {
-    unsafe {
-        let len = (pgx_ARR_NELEMS(arr) + 7) / 8;
-        std::slice::from_raw_parts_mut(pgx_ARR_NULLBITMAP(arr), len as usize)
-    }
-}
-
 /// Handle describing a bare, "untyped" pointer to an array,
 /// offering safe accessors to the various fields of one.
 #[repr(transparent)]
@@ -163,6 +147,25 @@ impl RawArray {
         // postgres/src/include/utils/array.h
         // #define ARR_HASNULL
         self.data_offset() != 0
+    }
+
+    /// Oxidized form of ARR_NULLBITMAP(ArrayType*)
+    pub fn nulls(&self) -> Option<NonNull<[u8]>> {
+        // for expected behavior, see:
+        // postgres/src/include/utils/array.h
+        // #define ARR_NULLBITMAP
+        let len = (self.len() as usize + 7) >> 3; // Obtains 0 if len was 0.
+
+        // SAFETY: This obtains the nulls pointer, which is valid to obtain because
+        // the validity was asserted on construction. However, unlike the other cases,
+        // it isn't correct to trust it. Instead, this gets null-checked.
+        // This is because, while the initial pointer is NonNull,
+        // ARR_NULLBITMAP can return a nullptr!
+        let nulls = unsafe { slice_from_raw_parts_mut(pgx_ARR_NULLBITMAP(self.at.as_ptr()), len) };
+        // This code doesn't assert validity per se, but in practice,
+        // the caller will probably immediately turn this into a borrowed slice,
+        // opening up the methods that are available on borrowed slices.
+        Some(NonNull::new(nulls)?)
     }
 
     /// The slice of the data.

@@ -7,9 +7,8 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use core::ptr::NonNull;
 use pgx::array::RawArray;
-use pgx::{pg_sys::ArrayType, *};
+use pgx::*;
 use serde_json::*;
 
 #[pg_extern(name = "sum_array")]
@@ -117,12 +116,11 @@ fn get_arr_data_ptr_nth_elem(arr: Array<i32>, elem: i32) -> Option<i32> {
 
 #[pg_extern]
 fn display_get_arr_nullbitmap(arr: Array<i32>) -> String {
-    let arr_type = arr.into_array_type();
+    let raw = unsafe { RawArray::from_array(arr) }.unwrap();
 
-    if unsafe { RawArray::from_raw(NonNull::new_unchecked(arr_type.clone() as *mut _)).nullable() }
-    {
-        let bitmap_slice = array::get_arr_nullbitmap(arr_type as *mut ArrayType);
-        format!("{:#010b}", bitmap_slice[0])
+    if let Some(slice) = raw.nulls() {
+        let slice = unsafe { &*slice.as_ptr() };
+        format!("{:#010b}", slice[0])
     } else {
         String::from("")
     }
