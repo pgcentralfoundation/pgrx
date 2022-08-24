@@ -102,11 +102,17 @@ fn return_zero_length_vec() -> Vec<i32> {
 
 #[pg_extern]
 fn get_arr_nelems(arr: Array<i32>) -> libc::c_int {
+    // SAFETY: Eh it's fine, it's just a len check.
     unsafe { RawArray::from_array(arr).unwrap().len() }
 }
 
+/// # Safety
+/// Don't call with an actually-null index, or you might see an invalid value.
 #[pg_extern]
-fn get_arr_data_ptr_nth_elem(arr: Array<i32>, elem: i32) -> Option<i32> {
+#[deny(unsafe_op_in_unsafe_fn)]
+unsafe fn get_arr_data_ptr_nth_elem(arr: Array<i32>, elem: i32) -> Option<i32> {
+    // SAFETY: this is Known to be an Array from ArrayType,
+    // and the index has to be a valid one.
     unsafe {
         let raw = RawArray::from_array(arr).unwrap().data::<i32>();
         let slice = &(*raw.as_ptr());
@@ -119,7 +125,9 @@ fn display_get_arr_nullbitmap(arr: Array<i32>) -> String {
     let raw = unsafe { RawArray::from_array(arr) }.unwrap();
 
     if let Some(slice) = raw.nulls() {
+        // SAFETY: If the test has gotten this far, the ptr is good for 0+ bytes.
         let slice = unsafe { &*slice.as_ptr() };
+        // might panic if the array is len 0
         format!("{:#010b}", slice[0])
     } else {
         String::from("")
@@ -128,11 +136,13 @@ fn display_get_arr_nullbitmap(arr: Array<i32>) -> String {
 
 #[pg_extern]
 fn get_arr_ndim(arr: Array<i32>) -> libc::c_int {
+    // SAFETY: This is a valid ArrayType and it's just a field access.
     unsafe { RawArray::from_array(arr).unwrap().ndims() }
 }
 
 #[pg_extern]
 fn get_arr_hasnull(arr: Array<i32>) -> bool {
+    // SAFETY: This is a valid ArrayType and it's just a field access.
     unsafe { RawArray::from_array(arr).unwrap().nullable() }
 }
 
