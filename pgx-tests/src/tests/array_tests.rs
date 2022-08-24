@@ -7,6 +7,7 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
+use pgx::array::RawArray;
 use pgx::{pg_sys::ArrayType, *};
 use serde_json::*;
 
@@ -135,9 +136,8 @@ fn display_get_arr_nullbitmap(arr: Array<i32>) -> String {
 }
 
 #[pg_extern]
-fn get_arr_ndim(arr: Array<i32>) -> i32 {
-    let arr_type = arr.into_array_type();
-    array::get_arr_ndim(arr_type as *mut ArrayType)
+fn get_arr_ndim(arr: Array<i32>) -> libc::c_int {
+    unsafe { RawArray::from_array(arr).unwrap().ndims() }
 }
 
 #[pg_extern]
