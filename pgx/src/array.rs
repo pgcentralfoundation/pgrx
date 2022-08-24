@@ -126,7 +126,7 @@ impl RawArray {
     /// Equivalent to ARR_HASNULL(ArrayType*)
     /// Note this means that it only asserts that there MIGHT be a null
     pub fn nullable(&self) -> bool {
-        // copied from postgres/src/include/utils/array.h
+        // must match postgres/src/include/utils/array.h #define ARR_HASNULL
         self.data_offset() != 0
     }
 }
