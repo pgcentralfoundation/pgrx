@@ -109,7 +109,7 @@ fn get_arr_nelems(arr: Array<i32>) -> libc::c_int {
 #[pg_extern]
 fn get_arr_data_ptr_nth_elem(arr: Array<i32>, elem: i32) -> Option<i32> {
     unsafe {
-        let raw = RawArray::from_array(arr).unwrap().data_slice::<i32>();
+        let raw = RawArray::from_array(arr).unwrap().data::<i32>();
         let slice = &(*raw.as_ptr());
         slice.get(elem as usize).copied()
     }
