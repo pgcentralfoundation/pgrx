@@ -61,8 +61,6 @@ impl RawArray {
     ///
     /// [the std documentation]: core::ptr#safety
     pub unsafe fn from_raw(at: NonNull<ArrayType>) -> RawArray {
-        // SAFETY: the caller must guarantee that `self` meets all the
-        // requirements for a mutable reference, as we're going to treat this like one.
         RawArray { at }
     }
 
@@ -160,7 +158,9 @@ impl RawArray {
     /// Equivalent to ARR_HASNULL(ArrayType*)
     /// Note this means that it only asserts that there MIGHT be a null
     pub fn nullable(&self) -> bool {
-        // must match postgres/src/include/utils/array.h #define ARR_HASNULL
+        // for expected behavior, see:
+        // postgres/src/include/utils/array.h
+        // #define ARR_HASNULL
         self.data_offset() != 0
     }
 
