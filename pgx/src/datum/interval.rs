@@ -9,7 +9,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 use std::ops::{Mul, Sub};
 
-use crate::{direct_function_call, pg_sys, FromDatum, IntoDatum, USECS_PER_SEC};
+use crate::{direct_function_call, pg_sys, FromDatum, IntoDatum, USECS_PER_DAY, USECS_PER_SEC};
 use pg_sys::{DAYS_PER_MONTH, SECS_PER_DAY};
 use time::Duration;
 
@@ -20,12 +20,22 @@ const MONTH_DURATION: Duration = Duration::days(DAYS_PER_MONTH as i64);
 pub struct Interval(pg_sys::Interval);
 
 impl Interval {
-    pub fn from_months_days_usecs(months: i32, days: i32, usecs: i64) -> Self {
-        Interval(pg_sys::Interval {
+    pub fn try_from_months_days_usecs(
+        months: i32,
+        days: i32,
+        usecs: i64,
+    ) -> Result<Self, IntervalConversionError> {
+        if days.abs() >= pg_sys::DAYS_PER_MONTH as i32 {
+            return Err(IntervalConversionError::FromDaysOutOfBounds);
+        }
+        if usecs.abs() >= USECS_PER_DAY {
+            return Err(IntervalConversionError::FromUSecOutOfBounds);
+        }
+        Ok(Interval(pg_sys::Interval {
             day: days,
             month: months,
             time: usecs,
-        })
+        }))
     }
 
     pub fn months(&self) -> i32 {
@@ -72,7 +82,7 @@ impl FromDatum for Interval {
 }
 
 impl TryFrom<Duration> for Interval {
-    type Error = &'static str;
+    type Error = IntervalConversionError;
     fn try_from(duration: Duration) -> Result<Interval, Self::Error> {
         let total_months = duration.whole_days() / (pg_sys::DAYS_PER_MONTH as i64);
 
@@ -95,7 +105,7 @@ impl TryFrom<Duration> for Interval {
 
             Ok(Interval(pg_sys::Interval { day, month, time }))
         } else {
-            Err("duration's total month count outside of valid i32::MIN..=i32::MAX range")
+            Err(IntervalConversionError::DurationMonthsOutOfBounds)
         }
     }
 }
@@ -139,4 +149,14 @@ impl serde::Serialize for Interval {
             serializer.serialize_str(cstr.to_str().unwrap())
         }
     }
+}
+
+#[derive(thiserror::Error, Debug, Clone, Copy)]
+pub enum IntervalConversionError {
+    #[error("duration's total month count outside of valid i32::MIN..=i32::MAX range")]
+    DurationMonthsOutOfBounds,
+    #[error("try_from_months_days_usecs's days abs count must be < DAYS_PER_MONTH (30)")]
+    FromDaysOutOfBounds,
+    #[error("try_from_months_days_usecs's usec abs count must be < USECS_PER_DAY")]
+    FromUSecOutOfBounds,
 }

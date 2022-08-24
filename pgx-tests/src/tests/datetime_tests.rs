@@ -519,10 +519,26 @@ mod tests {
 
     #[pg_test]
     fn test_interval_serialization() {
-        let interval = Interval::from_months_days_usecs(3, 4, 5_000_000);
+        let interval = Interval::try_from_months_days_usecs(3, 4, 5_000_000).unwrap();
         let json = json!({ "interval test": interval });
 
         assert_eq!(json!({"interval test":"3 mons 4 days 00:00:05"}), json);
+    }
+
+    #[pg_test]
+    fn test_try_from_months_days_usecs_err() {
+        let result = Interval::try_from_months_days_usecs(3, 30, 5_000_000);
+        match result {
+            Err(IntervalConversionError::FromDaysOutOfBounds) => (),
+            _ => panic!("invalid try_from_months_days_usecs conversion succeeded"),
+        };
+
+        let result =
+            Interval::try_from_months_days_usecs(3, 4, pg_sys::SECS_PER_DAY as i64 * 1_000_000i64);
+        match result {
+            Err(IntervalConversionError::FromUSecOutOfBounds) => (),
+            _ => panic!("invalid try_from_months_days_usecs conversion succeeded"),
+        };
     }
 
     #[pg_test]
@@ -533,7 +549,7 @@ mod tests {
         let result = TryInto::<Interval>::try_into(duration);
         match result {
             Ok(_) => (),
-            Err(_) => panic!("failed duration -> interval conversion"),
+            _ => panic!("failed duration -> interval conversion"),
         };
 
         // one month too many, expect error
@@ -542,8 +558,8 @@ mod tests {
 
         let result = TryInto::<Interval>::try_into(duration);
         match result {
-            Ok(_) => panic!("invalid duration -> interval conversion succeeded"),
-            Err(_) => (),
+            Err(IntervalConversionError::DurationMonthsOutOfBounds) => (),
+            _ => panic!("invalid duration -> interval conversion succeeded"),
         };
     }
 }
