@@ -18,8 +18,19 @@ extern "C" {
     fn pgx_ARR_NULLBITMAP(arrayType: *mut ArrayType) -> *mut bits8;
 }
 
-/// Handle describing a bare, "untyped" pointer to an array,
-/// offering safe accessors to the various fields of one.
+/// Handle describing a bare, "untyped" pointer to a Postgres varlena array,
+/// offering safe accessors to the various fields of the ArrayType,
+/// and access to the various slices that are implicitly present in the varlena.
+///
+/// # On sizes and subscripts
+///
+/// Postgres uses C's `int` (`c_int` in Rust) for sizes, and Rust uses `usize`.
+/// Thus various functions of RawArray return `c_int` values, but you must convert to usize.
+/// On 32-bit or 64-bit machines with 32-bit `c_int`s, you can losslessly upgrade to `as usize`,
+/// except with negative indices, which Postgres asserts against creating.
+/// PGX currently only intentionally supports 64-bit machines,
+/// and while support for ILP32 or I64LP128 C data models may become possible,
+/// PGX will **not** support 16-bit machines in any practical case, even though Rust does.
 #[repr(transparent)]
 #[derive(Debug)]
 pub struct RawArray {
