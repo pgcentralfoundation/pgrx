@@ -19,8 +19,8 @@ use pgx_utils::{
 use rayon::prelude::*;
 
 use std::collections::HashMap;
-use std::fs::File;
 use std::env;
+use std::fs::File;
 use std::io::{Read, Write};
 use std::path::PathBuf;
 use std::process::Stdio;
