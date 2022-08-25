@@ -20,6 +20,7 @@ use rayon::prelude::*;
 
 use std::collections::HashMap;
 use std::fs::File;
+use std::env;
 use std::io::{Read, Write};
 use std::path::PathBuf;
 use std::process::Stdio;
@@ -60,9 +61,6 @@ pub(crate) struct Init {
     /// If installed locally, the path to PG14's `pgconfig` tool, or `download` to have pgx download/compile/install it
     #[clap(env = "PG14_PG_CONFIG", long)]
     pg14: Option<String>,
-    /// Skip performing initdb for postgres
-    #[clap(long)]
-    no_init_db: bool,
     #[clap(from_global, parse(from_occurrences))]
     verbose: usize,
 }
@@ -90,7 +88,7 @@ impl CommandExecute for Init {
 
         if versions.is_empty() {
             // no arguments specified, so we'll just install our defaults
-            init_pgx(&pgx_default(SUPPORTED_MAJOR_VERSIONS)?, self.no_init_db)
+            init_pgx(&pgx_default(SUPPORTED_MAJOR_VERSIONS)?)
         } else {
             // user specified arguments, so we'll only install those versions of Postgres
             let mut default_pgx = None;
@@ -113,13 +111,13 @@ impl CommandExecute for Init {
                 pgx.push(config);
             }
 
-            init_pgx(&pgx, self.no_init_db)
+            init_pgx(&pgx)
         }
     }
 }
 
 #[tracing::instrument(skip_all, fields(pgx_home = %Pgx::home()?.display()))]
-pub(crate) fn init_pgx(pgx: &Pgx, no_init_db: bool) -> eyre::Result<()> {
+pub(crate) fn init_pgx(pgx: &Pgx) -> eyre::Result<()> {
     let dir = Pgx::home()?;
 
     let output_configs = Arc::new(Mutex::new(Vec::new()));
@@ -169,11 +167,10 @@ pub(crate) fn init_pgx(pgx: &Pgx, no_init_db: bool) -> eyre::Result<()> {
     for pg_config in output_configs.iter() {
         validate_pg_config(pg_config)?;
 
-        if no_init_db {
+        if is_root_user() {
             println!(
-                "{} initdb as --no-init-db is specified {}",
-                "   Skipping ".bold().green(),
-                no_init_db.bold().green(),
+                "{} initdb as current user is root user",
+                "   Skipping".bold().green(),
             );
         } else {
             let datadir = pg_config.data_dir()?;
@@ -441,6 +438,13 @@ fn get_pg_installdir(pgdir: &PathBuf) -> PathBuf {
     let mut dir = PathBuf::from(pgdir);
     dir.push("pgx-install");
     dir
+}
+
+fn is_root_user() -> bool {
+    match env::var("USER") {
+        Ok(val) => val == "root",
+        Err(_) => false,
+    }
 }
 
 pub(crate) fn initdb(bindir: &PathBuf, datadir: &PathBuf) -> eyre::Result<()> {
