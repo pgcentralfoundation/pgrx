@@ -188,9 +188,18 @@ impl RawArray {
     /// But even if the index is not marked as null, the value may be equal to nullptr,
     /// thus leaving it correct to read the value but incorrect to then dereference.
     ///
-    /// That is why this returns `NonNull<[T]>`: if it returned `&mut [T]`,
-    /// then for many possible types, that would actually be UB, as it would assert
-    /// that each particular index was a valid `T`.
+    /// That is why this returns [`NonNull<[T]>`]: if it returned `&mut [T]`,
+    /// then for many possible types that can be **undefined behavior**,
+    /// as it would assert that each particular index was a valid `T`.
+    /// A Rust borrow, including of a slice, will always be
+    /// - non-null
+    /// - aligned
+    /// - **validly initialized**, except in the case of [MaybeUninit] types
+    /// It can be incorrect to assume that data that Postgres has marked "null"
+    /// follows Rust-level initialization requirements.
+    ///
+    /// [MaybeUninit]: core::mem::MaybeUninit
+    /// [`NonNull<[T]>`]: core::ptr::NonNull
     pub unsafe fn data<T>(&mut self) -> NonNull<[T]> {
         let len = self.len() as usize;
 
