@@ -16,6 +16,7 @@ pub enum ArgumentError {
     Table,
     BareU8,
     SkipInArray,
+    Datum,
 }
 
 impl std::fmt::Display for ArgumentError {
@@ -32,6 +33,9 @@ impl std::fmt::Display for ArgumentError {
             }
             ArgumentError::SkipInArray => {
                 write!(f, "A SqlVariant::Skip inside Array is not valid")
+            }
+            ArgumentError::Datum => {
+                write!(f, "A Datum as an argument means that `sql = \"...\"` must be set in the declaration")
             }
         }
     }
@@ -217,6 +221,15 @@ impl SqlTranslatable for String {
         Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
             "TEXT",
         ))))
+    }
+}
+
+impl<T> SqlTranslatable for &T where T: SqlTranslatable {
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+        T::argument_sql()
+    }
+    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
+        T::return_sql()
     }
 }
 

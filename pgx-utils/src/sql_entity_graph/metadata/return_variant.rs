@@ -27,6 +27,7 @@ pub enum ReturnVariantError {
     TableInArray,
     BareU8,
     SkipInArray,
+    Datum,
 }
 
 impl std::fmt::Display for ReturnVariantError {
@@ -55,6 +56,9 @@ impl std::fmt::Display for ReturnVariantError {
             }
             ReturnVariantError::BareU8 => {
                 write!(f, "Canot use bare u8")
+            }
+            ReturnVariantError::Datum => {
+                write!(f, "A Datum as a return means that `sql = \"...\"` must be set in the declaration")
             }
         }
     }

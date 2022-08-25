@@ -627,27 +627,28 @@ impl PgExtern {
                     }
                 }
             }
-            Returning::Trigger => {
-                quote_spanned! { self.func.sig.span() =>
-                    #[no_mangle]
-                    #[doc(hidden)]
-                    #[pg_guard]
-                    pub unsafe extern "C" fn #func_name_wrapper #func_generics(#fcinfo_ident: ::pgx::pg_sys::FunctionCallInfo) -> ::pgx::pg_sys::Datum {
-                        let maybe_pg_trigger = unsafe { ::pgx::trigger_support::PgTrigger::from_fcinfo(#fcinfo_ident) };
-                        let pg_trigger = maybe_pg_trigger.expect("PgTrigger::from_fcinfo failed");
-                        let trigger_fn_result: Result<
-                            ::pgx::heap_tuple::PgHeapTuple<'_, _>,
-                            _,
-                        > = #func_name(&pg_trigger);
+            // /// We don't actually do this since triggers have their own cool kids zone
+            // Returning::Trigger => {
+            //     quote_spanned! { self.func.sig.span() =>
+            //         #[no_mangle]
+            //         #[doc(hidden)]
+            //         #[pg_guard]
+            //         pub unsafe extern "C" fn #func_name_wrapper #func_generics(#fcinfo_ident: ::pgx::pg_sys::FunctionCallInfo) -> ::pgx::pg_sys::Datum {
+            //             let maybe_pg_trigger = unsafe { ::pgx::trigger_support::PgTrigger::from_fcinfo(#fcinfo_ident) };
+            //             let pg_trigger = maybe_pg_trigger.expect("PgTrigger::from_fcinfo failed");
+            //             let trigger_fn_result: Result<
+            //                 ::pgx::heap_tuple::PgHeapTuple<'_, _>,
+            //                 _,
+            //             > = #func_name(&pg_trigger);
         
-                        let trigger_retval = trigger_fn_result.expect("Trigger function panic");
-                        match trigger_retval.into_trigger_datum() {
-                            None => ::pgx::pg_return_null(fcinfo),
-                            Some(datum) => datum,
-                        }
-                    }
-                }
-            },
+            //             let trigger_retval = trigger_fn_result.expect("Trigger function panic");
+            //             match trigger_retval.into_trigger_datum() {
+            //                 None => ::pgx::pg_return_null(fcinfo),
+            //                 Some(datum) => datum,
+            //             }
+            //         }
+            //     }
+            // },
         }
     }
 }

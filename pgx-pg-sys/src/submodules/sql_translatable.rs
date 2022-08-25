@@ -53,3 +53,45 @@ impl SqlTranslatable for crate::FdwRoutine {
         ))))
     }
 }
+
+impl SqlTranslatable for crate::BOX {
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+        Ok(SqlVariant::Mapped(String::from("box")))
+    }
+    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
+        Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
+            "box",
+        ))))
+    }
+}
+
+impl SqlTranslatable for crate::Point {
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+        Ok(SqlVariant::Mapped(String::from("box")))
+    }
+    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
+        Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
+            "box",
+        ))))
+    }
+}
+
+impl SqlTranslatable for crate::ItemPointerData {
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+        Ok(SqlVariant::Mapped(String::from("tid")))
+    }
+    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
+        Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
+            "tid",
+        ))))
+    }
+}
+
+impl SqlTranslatable for crate::Datum {
+    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+        Err(ArgumentError::Datum)
+    }
+    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
+        Err(ReturnVariantError::Datum)
+    }
+}

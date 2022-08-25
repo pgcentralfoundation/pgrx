@@ -42,8 +42,8 @@ pub enum Returning {
         tys: Vec<ReturningIteratedItem>,
         optional: bool,
     },
-    /// `pgx_pg_sys::Datum`
-    Trigger,
+    // /// Technically we don't ever create this, singe triggers have their own macro.
+    // Trigger,
 }
 
 impl Returning {
@@ -71,8 +71,6 @@ impl TryFrom<&syn::ReturnType> for Returning {
                 match ty {
                     syn::Type::Path(mut typepath) => {
                         let path = &mut typepath.path;
-                        let mut saw_pg_sys = false;
-                        let mut saw_datum_ident = false;
                         let mut saw_option_ident = false;
                         let mut saw_setof_iterator = false;
                         let mut saw_table_iterator = false;
@@ -80,19 +78,13 @@ impl TryFrom<&syn::ReturnType> for Returning {
                         for segment in &mut path.segments {
                             let ident_string = segment.ident.to_string();
                             match ident_string.as_str() {
-                                "pg_sys" => saw_pg_sys = true,
-                                "Datum" => saw_datum_ident = true,
                                 "Option" => saw_option_ident = true,
                                 "SetOfIterator" => saw_setof_iterator = true,
                                 "TableIterator" => saw_table_iterator = true,
                                 _ => (),
                             };
                         }
-                        if (saw_datum_ident && saw_pg_sys)
-                            || (saw_datum_ident && path.segments.len() == 1)
-                        {
-                            Ok(Returning::Trigger)
-                        } else if saw_option_ident || saw_setof_iterator || saw_table_iterator {
+                        if saw_option_ident || saw_setof_iterator || saw_table_iterator {
                             let option_inner_path = if saw_option_ident {
                                 match &mut path.segments.last_mut().unwrap().arguments {
                                     syn::PathArguments::AngleBracketed(args) => {
@@ -390,9 +382,10 @@ impl ToTokens for Returning {
                     }
                 }
             }
-            Returning::Trigger => quote! {
-                ::pgx::utils::sql_entity_graph::PgExternReturnEntity::Trigger
-            },
+            // // Triggers have their own cool kids zone
+            // Returning::Trigger => quote! {
+            //     ::pgx::utils::sql_entity_graph::PgExternReturnEntity::Trigger
+            // },
         };
         tokens.append_all(quoted);
     }
