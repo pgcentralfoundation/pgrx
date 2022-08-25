@@ -125,7 +125,8 @@ fn display_get_arr_nullbitmap(arr: Array<i32>) -> String {
     let raw = unsafe { RawArray::from_array(arr) }.unwrap();
 
     if let Some(slice) = raw.nulls() {
-        // SAFETY: If the test has gotten this far, the ptr is good for 0+ bytes.
+        // SAFETY: If the test has gotten this far, the ptr is good for 0+ bytes,
+        // so reborrow NonNull<[u8]> as &[u8] for the hot second we're looking at it.
         let slice = unsafe { &*slice.as_ptr() };
         // might panic if the array is len 0
         format!("{:#010b}", slice[0])
