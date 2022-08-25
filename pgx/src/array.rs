@@ -181,9 +181,6 @@ impl RawArray {
         // This is because, while the initial pointer is NonNull,
         // ARR_NULLBITMAP can return a nullptr!
         let nulls = unsafe { slice_from_raw_parts_mut(pgx_ARR_NULLBITMAP(self.at.as_ptr()), len) };
-        // This code doesn't assert validity per se, but in practice,
-        // the caller will probably immediately turn this into a borrowed slice,
-        // opening up the methods that are available on borrowed slices.
         Some(NonNull::new(nulls)?)
     }
 
