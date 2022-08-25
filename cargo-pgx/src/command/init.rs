@@ -60,6 +60,9 @@ pub(crate) struct Init {
     /// If installed locally, the path to PG14's `pgconfig` tool, or `download` to have pgx download/compile/install it
     #[clap(env = "PG14_PG_CONFIG", long)]
     pg14: Option<String>,
+    /// Skip performing initdb for postgres
+    #[clap(long)]
+    no_init_db: bool,
     #[clap(from_global, parse(from_occurrences))]
     verbose: usize,
 }
@@ -87,7 +90,7 @@ impl CommandExecute for Init {
 
         if versions.is_empty() {
             // no arguments specified, so we'll just install our defaults
-            init_pgx(&pgx_default(SUPPORTED_MAJOR_VERSIONS)?)
+            init_pgx(&pgx_default(SUPPORTED_MAJOR_VERSIONS)?, self.no_init_db)
         } else {
             // user specified arguments, so we'll only install those versions of Postgres
             let mut default_pgx = None;
@@ -110,13 +113,13 @@ impl CommandExecute for Init {
                 pgx.push(config);
             }
 
-            init_pgx(&pgx)
+            init_pgx(&pgx, self.no_init_db)
         }
     }
 }
 
 #[tracing::instrument(skip_all, fields(pgx_home = %Pgx::home()?.display()))]
-pub(crate) fn init_pgx(pgx: &Pgx) -> eyre::Result<()> {
+pub(crate) fn init_pgx(pgx: &Pgx, no_init_db: bool) -> eyre::Result<()> {
     let dir = Pgx::home()?;
 
     let output_configs = Arc::new(Mutex::new(Vec::new()));
@@ -166,10 +169,18 @@ pub(crate) fn init_pgx(pgx: &Pgx) -> eyre::Result<()> {
     for pg_config in output_configs.iter() {
         validate_pg_config(pg_config)?;
 
-        let datadir = pg_config.data_dir()?;
-        let bindir = pg_config.bin_dir()?;
-        if !datadir.exists() {
-            initdb(&bindir, &datadir)?;
+        if no_init_db {
+            println!(
+                "{} initdb as --no-init-db is specified {}",
+                "   Skipping ".bold().green(),
+                no_init_db.bold().green(),
+            );
+        } else {
+            let datadir = pg_config.data_dir()?;
+            let bindir = pg_config.bin_dir()?;
+            if !datadir.exists() {
+                initdb(&bindir, &datadir)?;
+            }
         }
     }
 
