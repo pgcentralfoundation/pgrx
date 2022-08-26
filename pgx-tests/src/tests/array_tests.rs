@@ -7,7 +7,7 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use pgx::array::ArrayPtr;
+use pgx::array::{ArrayPtr, RawArray};
 use pgx::*;
 use serde_json::*;
 
@@ -114,7 +114,7 @@ unsafe fn get_arr_data_ptr_nth_elem(arr: Array<i32>, elem: i32) -> Option<i32> {
     // SAFETY: this is Known to be an Array from ArrayType,
     // and the index has to be a valid one.
     unsafe {
-        let raw = ArrayPtr::from_array(arr).unwrap().data::<i32>();
+        let raw = RawArray::from_valid(ArrayPtr::from_array(arr).unwrap()).data::<i32>();
         let slice = &(*raw.as_ptr());
         slice.get(elem as usize).copied()
     }
@@ -122,7 +122,7 @@ unsafe fn get_arr_data_ptr_nth_elem(arr: Array<i32>, elem: i32) -> Option<i32> {
 
 #[pg_extern]
 fn display_get_arr_nullbitmap(arr: Array<i32>) -> String {
-    let raw = unsafe { ArrayPtr::from_array(arr) }.unwrap();
+    let raw = unsafe { RawArray::from_valid(ArrayPtr::from_array(arr).unwrap()) };
 
     if let Some(slice) = raw.nulls() {
         // SAFETY: If the test has gotten this far, the ptr is good for 0+ bytes,

@@ -2,6 +2,7 @@ use crate::datum::{Array, FromDatum};
 use crate::pg_sys;
 use core::marker::PhantomData;
 use core::ptr::{slice_from_raw_parts_mut, NonNull};
+use core::slice;
 use pgx_pg_sys::*;
 
 extern "C" {
@@ -90,6 +91,7 @@ impl ArrayPtr {
     }
 
     /// Get the number of dimensions.
+    /// Will be in 0..=[pg_sys::MAXDIM].
     pub fn ndims(&self) -> libc::c_int {
         // SAFETY: Validity asserted on construction.
         unsafe {
@@ -105,7 +107,9 @@ impl ArrayPtr {
 
     /**
     A raw slice of the dimensions.
-    Oxidized form of ARR_DIMS(ArrayType*)
+
+    Oxidized form of ARR_DIMS(ArrayType*).
+    The length will be within 0..=[pg_sys::MAXDIM].
 
     # Safety
 
@@ -161,14 +165,15 @@ impl ArrayPtr {
     }
 
     /// Gets the offset to the ArrayType's data.
-    /// Note that this should not be "taken literally".
+    /// Should not be "taken literally".
     fn data_offset(&self) -> i32 {
         // SAFETY: Validity asserted on construction.
         unsafe { (*self.at.as_ptr()).dataoffset }
         // This field is an "int32" in Postgres
     }
 
-    /// Equivalent to ARR_HASNULL(ArrayType*)
+    /// Equivalent to ARR_HASNULL(ArrayType*).
+    ///
     /// Note this means that it only asserts that there MIGHT be a null
     pub fn nullable(&self) -> bool {
         // for expected behavior, see:
@@ -178,18 +183,17 @@ impl ArrayPtr {
     }
 
     /// Oxidized form of ARR_NULLBITMAP(ArrayType*)
-    pub fn nulls(&self) -> Option<NonNull<[u8]>> {
+    pub fn nulls(&self) -> Option<NonNull<u8>> {
         // for expected behavior, see:
         // postgres/src/include/utils/array.h
         // #define ARR_NULLBITMAP
-        let len = (self.len() as usize + 7) >> 3; // Obtains 0 if len was 0.
 
         // SAFETY: This obtains the nulls pointer, which is valid to obtain because
         // the validity was asserted on construction. However, unlike the other cases,
         // it isn't correct to trust it. Instead, this gets null-checked.
         // This is because, while the initial pointer is NonNull,
         // ARR_NULLBITMAP can return a nullptr!
-        let nulls = unsafe { slice_from_raw_parts_mut(pgx_ARR_NULLBITMAP(self.at.as_ptr()), len) };
+        let nulls = unsafe { pgx_ARR_NULLBITMAP(self.at.as_ptr()) };
         Some(NonNull::new(nulls)?)
     }
 
@@ -205,22 +209,21 @@ impl ArrayPtr {
     But even if the index is not marked as null, the value may be equal to nullptr,
     thus leaving it correct to read the value but incorrect to then dereference.
 
-    That is why this returns [`NonNull<[T]>`]: if it returned `&mut [T]`,
+    That is the primary reason this returns [`NonNull<T>`]. If it returned `&mut [T]`,
     then for many possible types that can be **undefined behavior**,
-    as it would assert that each particular index was a valid `T`.
+    as it would assert each particular index was a valid `T`.
     A Rust borrow, including of a slice, will always be
     * non-null
     * aligned
     * **validly initialized**, except in the case of [MaybeUninit] types
-    It can be incorrect to assume that data that Postgres has marked "null"
-    follows Rust-level initialization requirements.
+    It is reasonable to assume data Postgres exposes logically to SQL is initialized,
+    but it may be incorrect to assume data Postgres has marked "null"
+    otherwise follows Rust-level initialization requirements.
 
     [MaybeUninit]: core::mem::MaybeUninit
-    [`NonNull<[T]>`]: core::ptr::NonNull
+    [`NonNull<T>`]: core::ptr::NonNull
     */
-    pub unsafe fn data<T>(&mut self) -> NonNull<[T]> {
-        let len = self.len() as usize;
-
+    pub fn data<T>(&mut self) -> NonNull<T> {
         // SAFETY: Welcome to the infernal bowels of FFI.
         // Because the initial ptr was NonNull, we can assume this is also NonNull.
         // As validity of the initial ptr was asserted on construction of ArrayPtr,
@@ -232,20 +235,68 @@ impl ArrayPtr {
         // Most importantly, the caller has asserted this is in fact a valid [T],
         // by calling this function, so both this code and the caller can rely
         // on that assertion, only requiring that it is correct.
-        unsafe {
-            NonNull::new_unchecked(slice_from_raw_parts_mut(
-                pgx_ARR_DATA_PTR(self.at.as_ptr()).cast(),
-                len,
-            ))
-        }
+        unsafe { NonNull::new_unchecked(pgx_ARR_DATA_PTR(self.at.as_ptr()).cast()) }
     }
 }
 
 /**
 A pointer into a Postgres varlena.
 */
-pub struct RawArray<T> {
-    _ptr: ArrayPtr,
-    _len: usize,
-    ty: PhantomData<T>,
+pub struct RawArray {
+    ptr: ArrayPtr,
+    len: usize,
+}
+
+#[deny(unsafe_op_in_unsafe_fn)]
+impl RawArray {
+    /**
+    # Safety
+
+    Requires a pointer that really is from a properly constructed varlena,
+    using the format used internally by Postgres.
+    */
+    pub unsafe fn from_valid(ptr: ArrayPtr) -> RawArray {
+        let len = unsafe { ptr.len() } as usize;
+        RawArray { ptr, len }
+    }
+
+    fn len(&self) -> usize {
+        self.len
+    }
+
+    fn into_ptr(self) -> ArrayPtr {
+        self.ptr
+    }
+    
+    /// Oxidized form of ARR_NULLBITMAP(ArrayType*)
+    pub fn nulls(&self) -> Option<NonNull<[u8]>> {
+        // for expected behavior, see:
+        // postgres/src/include/utils/array.h
+        // #define ARR_NULLBITMAP
+        let len = self.len + 7 >> 3; // Obtains 0 if len was 0.
+
+        // SAFETY: This obtains the nulls pointer, which is valid to obtain because
+        // the validity was asserted on construction. However, unlike the other cases,
+        // it isn't correct to trust it. Instead, this gets null-checked.
+        // This is because, while the initial pointer is NonNull,
+        // ARR_NULLBITMAP can return a nullptr!
+        Some(unsafe { NonNull::new_unchecked(slice_from_raw_parts_mut(self.ptr.nulls()?.as_ptr(), len)) } )
+    }
+
+    /// # Safety
+    /// Asserts the data is mutable, properly aligned, all that jazz.
+    pub unsafe fn data<T>(&mut self) -> NonNull<[T]> {
+        // SAFETY: Welcome to the infernal bowels of FFI.
+        // Because the initial ptr was NonNull, we can assume this is also NonNull.
+        // As validity of the initial ptr was asserted on construction of ArrayPtr,
+        // this can assume the data ptr is also valid, allowing making the slice.
+        // This code doesn't assert validity per se, but in practice,
+        // the caller will probably immediately turn this into a borrowed slice,
+        // opening up the methods that are available on borrowed slices.
+        //
+        // Most importantly, the caller has asserted this is in fact a valid [T],
+        // by calling this function, so both this code and the caller can rely
+        // on that assertion, only requiring that it is correct.
+        unsafe { NonNull::new_unchecked(slice_from_raw_parts_mut(self.ptr.data::<T>().as_ptr(), self.len)) }
+    }
 }
