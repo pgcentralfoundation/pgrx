@@ -140,11 +140,12 @@ impl RawArray {
     /**
     The ability to rewrite the dimensions slice.
 
-    You almost certainly do not actually want to call this.
+    You almost certainly do not actually want to call this,
+    unless you intentionally stored the actually intended ndim and wrote 0 instead.
     Returns a triple tuple of
-    * a mutable reference to ndim,
-    * a pointer to the first c_int
-    * a mutable reference to RawArray's len field.
+    * a mutable reference to the underlying ArrayType's ndim field
+    * a pointer to the first c_int of the dimensions slice
+    * a mutable reference to RawArray's len field
 
     Write to them in order.
     */
@@ -184,7 +185,15 @@ impl RawArray {
         self.data_offset() != 0
     }
 
-    /// Oxidized form of ARR_NULLBITMAP(ArrayType*)
+    /**
+    Oxidized form of ARR_NULLBITMAP(ArrayType*)
+
+    If this returns None, the array cannot have nulls.
+    If this returns Some, it points to the bitslice that marks nulls in this array.
+
+    Note that unlike the `is_null: bool` that appears elsewhere, here a 0 bit is null,
+    or possibly out of bounds for the final byte of the bitslice.
+    */
     pub fn nulls(&self) -> Option<NonNull<[u8]>> {
         // for expected behavior, see:
         // postgres/src/include/utils/array.h
