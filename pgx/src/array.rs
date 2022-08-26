@@ -63,7 +63,8 @@ impl RawArray {
     * The pointer must be properly aligned.
     * It must be "dereferenceable" in the sense defined in [the std documentation].
     * The pointer must point to an initialized instance of [pg_sys::ArrayType].
-    * The `ndim` field must be a correct value, so the `dims` slice is aligned and readable.
+    * The `ndim` field must be a correct value, or **0**, so `dims` is aligned and readable,
+      or no data is actually read at all.
     * This is a unique, "owning pointer" for the varlena, so it won't be aliased while held,
       and it points to data in the Postgres ArrayType format.
 
@@ -121,17 +122,12 @@ impl RawArray {
         // postgres/src/include/utils/array.h
         // #define ARR_DIMS
 
-        // SAFETY: Welcome to the infernal bowels of FFI.
-        // Because the initial ptr was NonNull, we can assume this is also NonNull.
-        // As validity of the initial ptr was asserted on construction of RawArray,
-        // this can assume the dims ptr is also valid, allowing making the slice.
-        // This code doesn't assert validity per se, but in practice,
-        // the caller will probably immediately turn this into a borrowed slice,
-        // opening up the methods that are available on borrowed slices.
-        //
-        // So, to be clear, yes, everything done so far allows the caller to do so,
-        // though it is possible the caller can misuse this in various ways.
-        // Only the "naive" case is well-guarded.
+        /*
+        SAFETY: Welcome to the infernal bowels of FFI.
+        Because the initial ptr was NonNull, we can assume this is also NonNull.
+        Validity of the ptr and ndim field was asserted on construction of RawArray,
+        so can assume the dims ptr is also valid, allowing making the slice.
+        */
         unsafe {
             let ndim = self.ndim() as usize;
             slice::from_raw_parts(
@@ -178,21 +174,24 @@ impl RawArray {
 
         let len = self.len + 7 >> 3; // Obtains 0 if len was 0.
 
-        // SAFETY: This obtains the nulls pointer, which is valid to obtain because
-        // the validity was asserted on construction. However, unlike the other cases,
-        // it isn't correct to trust it. Instead, this gets null-checked.
-        // This is because, while the initial pointer is NonNull,
-        // ARR_NULLBITMAP can return a nullptr!
+        /* 
+        SAFETY: This obtains the nulls pointer, which is valid to obtain because
+        the len was asserted on construction. However, unlike the other cases,
+        it isn't correct to trust it. Instead, this gets null-checked.
+        This is because, while the initial pointer is NonNull,
+        ARR_NULLBITMAP can return a nullptr!
+        */
         NonNull::new(unsafe {
             slice_from_raw_parts_mut(pgx_ARR_NULLBITMAP(self.ptr.as_ptr()), len)
         })
     }
 
     /**
-    Shim to ARR_DATA_PTR(ArrayType*)
+    Oxidized form of ARR_DATA_PTR(ArrayType*)
 
     # Safety
 
+    While this function is safe to call, using the slice may risk undefined behavior.
     The raw slice is not guaranteed to be legible at any given index as T,
     e.g. it may be an "SQL null" if so indicated in the null bitmap.
     As a result, it is dangerous to reborrow this as `&[T]` or `&mut [T]`
@@ -209,21 +208,31 @@ impl RawArray {
     but it may be incorrect to assume data Postgres has marked "null"
     otherwise follows Rust-level initialization requirements.
 
+    As Postgres handles alignment requirements in its own particular ways,
+    it is up to you to validate that each index is aligned correctly.
+    The first element should be correctly aligned to the type, but that is not certain.
+    Successive indices are even less likely to match the data type you want
+    unless Postgres also uses an identical layout.
+
     [MaybeUninit]: core::mem::MaybeUninit
     [nonnull]: core::ptr::NonNull
     */
     pub fn data<T>(&mut self) -> NonNull<[T]> {
-        // SAFETY: Welcome to the infernal bowels of FFI.
-        // Because the initial ptr was NonNull, we can assume this is also NonNull.
-        // As validity of the initial ptr was asserted on construction of RawArray,
-        // this can assume the data ptr is also valid, allowing making the slice.
-        // This code doesn't assert validity per se, but in practice,
-        // the caller will probably immediately turn this into a borrowed slice,
-        // opening up the methods that are available on borrowed slices.
-        //
-        // Most importantly, the caller has asserted this is in fact a valid [T],
-        // by calling this function, so both this code and the caller can rely
-        // on that assertion, only requiring that it is correct.
+        /*
+        SAFETY: Welcome to the infernal bowels of FFI.
+        Because the initial ptr was NonNull, we can assume this is also NonNull.
+        As validity of the initial ptr was asserted on construction of RawArray,
+        this can assume the data ptr is also valid, or harmlessly incorrect.
+
+        This code doesn't assert validity per se, but in practice,
+        the caller may immediately turn this into a borrowed slice,
+        opening up the methods that are available on borrowed slices.
+        This is fine as long as the caller heeds the caveats already given.
+        In particular, for simply sized and aligned data, where alignment is the size
+        (e.g. u8, i16, f32, u64), and there are no invalid bitpatterns to worry about,
+        the caller can almost certainly go to town with it,
+        needing only their initial assertion regarding the type being correct.
+        */
         unsafe {
             NonNull::new_unchecked(slice_from_raw_parts_mut(
                 pgx_ARR_DATA_PTR(self.ptr.as_ptr()).cast(),
