@@ -7,6 +7,7 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
+use pgx::array::RawArray;
 use pgx::*;
 use serde_json::*;
 
@@ -97,6 +98,44 @@ fn return_text_array() -> Vec<&'static str> {
 #[pg_extern]
 fn return_zero_length_vec() -> Vec<i32> {
     Vec::new()
+}
+
+#[pg_extern]
+fn get_arr_nelems(arr: Array<i32>) -> libc::c_int {
+    // SAFETY: Eh it's fine, it's just a len check.
+    unsafe { RawArray::from_array(arr) }.unwrap().len() as _
+}
+
+#[pg_extern]
+fn get_arr_data_ptr_nth_elem(arr: Array<i32>, elem: i32) -> Option<i32> {
+    // SAFETY: this is Known to be an Array from ArrayType,
+    // and it's valid-ish to see any bitpattern of an i32 inbounds of a slice.
+    unsafe {
+        let raw = RawArray::from_array(arr).unwrap().data::<i32>();
+        let slice = &(*raw.as_ptr());
+        slice.get(elem as usize).copied()
+    }
+}
+
+#[pg_extern]
+fn display_get_arr_nullbitmap(arr: Array<i32>) -> String {
+    let raw = unsafe { RawArray::from_array(arr) }.unwrap();
+
+    if let Some(slice) = raw.nulls() {
+        // SAFETY: If the test has gotten this far, the ptr is good for 0+ bytes,
+        // so reborrow NonNull<[u8]> as &[u8] for the hot second we're looking at it.
+        let slice = unsafe { &*slice.as_ptr() };
+        // might panic if the array is len 0
+        format!("{:#010b}", slice[0])
+    } else {
+        String::from("")
+    }
+}
+
+#[pg_extern]
+fn get_arr_ndim(arr: Array<i32>) -> libc::c_int {
+    // SAFETY: This is a valid ArrayType and it's just a field access.
+    unsafe { RawArray::from_array(arr) }.unwrap().dims().len() as _
 }
 
 #[pg_extern]
@@ -253,6 +292,51 @@ mod tests {
         })
         .expect("Failed to return json even though it's right there ^^");
         assert_eq!(json.0, json! {{"values": [1, 2, 3, null, 4]}});
+    }
+
+    #[pg_test]
+    fn test_arr_data_ptr() {
+        let len = Spi::get_one::<i32>("SELECT get_arr_nelems('{1,2,3,4,5}'::int[])")
+            .expect("failed to get SPI result");
+
+        assert_eq!(len, 5);
+    }
+
+    #[pg_test]
+    fn test_get_arr_data_ptr_nth_elem() {
+        let nth = Spi::get_one::<i32>("SELECT get_arr_data_ptr_nth_elem('{1,2,3,4,5}'::int[], 2)")
+            .expect("failed to get SPI result");
+
+        assert_eq!(nth, 3);
+    }
+
+    #[pg_test]
+    fn test_display_get_arr_nullbitmap() {
+        let bitmap_str = Spi::get_one::<String>(
+            "SELECT display_get_arr_nullbitmap(ARRAY[1,NULL,3,NULL,5]::int[])",
+        )
+        .expect("failed to get SPI result");
+
+        assert_eq!(bitmap_str, "0b00010101");
+
+        let bitmap_str =
+            Spi::get_one::<String>("SELECT display_get_arr_nullbitmap(ARRAY[1,2,3,4,5]::int[])")
+                .expect("failed to get SPI result");
+
+        assert_eq!(bitmap_str, "");
+    }
+
+    #[pg_test]
+    fn test_get_arr_ndim() {
+        let ndim = Spi::get_one::<i32>("SELECT get_arr_ndim(ARRAY[1,2,3,4,5]::int[])")
+            .expect("failed to get SPI result");
+
+        assert_eq!(ndim, 1);
+
+        let ndim = Spi::get_one::<i32>("SELECT get_arr_ndim('{{1,2,3},{4,5,6}}'::int[])")
+            .expect("failed to get SPI result");
+
+        assert_eq!(ndim, 2);
     }
 
     #[pg_test]

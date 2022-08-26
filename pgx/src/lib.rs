@@ -46,6 +46,7 @@ pub mod itemptr;
 pub mod list;
 #[macro_use]
 pub mod log;
+pub mod array;
 pub mod atomics;
 pub mod bgworkers;
 pub mod heap_tuple;
