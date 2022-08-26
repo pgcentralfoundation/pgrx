@@ -106,13 +106,10 @@ fn get_arr_nelems(arr: Array<i32>) -> libc::c_int {
     unsafe { RawArray::from_array(arr) }.unwrap().len() as _
 }
 
-/// # Safety
-/// Don't call with an actually-null index, or you might see an invalid value.
 #[pg_extern]
-#[deny(unsafe_op_in_unsafe_fn)]
-unsafe fn get_arr_data_ptr_nth_elem(arr: Array<i32>, elem: i32) -> Option<i32> {
+fn get_arr_data_ptr_nth_elem(arr: Array<i32>, elem: i32) -> Option<i32> {
     // SAFETY: this is Known to be an Array from ArrayType,
-    // and the index has to be a valid one.
+    // and it's valid-ish to see any bitpattern of an i32 inbounds of a slice.
     unsafe {
         let raw = RawArray::from_array(arr).unwrap().data::<i32>();
         let slice = &(*raw.as_ptr());
