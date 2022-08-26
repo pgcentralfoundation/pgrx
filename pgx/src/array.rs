@@ -1,6 +1,7 @@
 use crate::datum::{Array, FromDatum};
 use crate::pg_sys;
 use core::ptr::{slice_from_raw_parts_mut, NonNull};
+use core::marker::PhantomData;
 use pgx_pg_sys::*;
 
 extern "C" {
@@ -18,29 +19,34 @@ extern "C" {
     fn pgx_ARR_NULLBITMAP(arrayType: *mut ArrayType) -> *mut bits8;
 }
 
-/// Handle describing a bare, "untyped" pointer to a Postgres varlena array,
-/// offering safe accessors to the various fields of the ArrayType,
-/// and access to the various slices that are implicitly present in the varlena.
-///
-/// # On sizes and subscripts
-///
-/// Postgres uses C's `int` (`c_int` in Rust) for sizes, and Rust uses `usize`.
-/// Thus various functions of RawArray return `c_int` values, but you must convert to usize.
-/// On 32-bit or 64-bit machines with 32-bit `c_int`s, you can losslessly upgrade to `as usize`,
-/// except with negative indices, which Postgres asserts against creating.
-/// PGX currently only intentionally supports 64-bit machines,
-/// and while support for ILP32 or I64LP128 C data models may become possible,
-/// PGX will **not** support 16-bit machines in any practical case, even though Rust does.
+/**
+An aligned, dereferenceable `NonNull<ArrayType>` with low-level accessors.
+
+It offers technically-safe accessors to the "dynamic" fields of a Postgres varlena array,
+as well as any fields not covered by such, but does not require any more validity.
+This also means that the [NonNull] pointers that are returned may not be valid to read.
+Validating the correctness of the entire array requires a bit more effort.
+
+# On sizes and subscripts
+
+Postgres uses C's `int` (`c_int` in Rust) for sizes, and Rust uses [usize].
+Thus various functions of ArrayPtr return `c_int` values, but you must convert to usize.
+On 32-bit or 64-bit machines with 32-bit `c_int`s, you may losslessly upgrade `as usize`,
+except with negative indices, which Postgres asserts against creating.
+PGX currently only intentionally supports 64-bit machines,
+and while support for ILP32 or I64LP128 C data models may become possible,
+PGX will **not** support 16-bit machines in any practical case, even though Rust does.
+*/
 #[repr(transparent)]
 #[derive(Debug)]
-pub struct RawArray {
+pub struct ArrayPtr {
     at: NonNull<ArrayType>,
 }
 
 #[deny(unsafe_op_in_unsafe_fn)]
-impl RawArray {
+impl ArrayPtr {
     // General implementation notes:
-    // RawArray is not Copy or Clone, making it harder to misuse versus *mut ArrayType.
+    // ArrayPtr is not Copy or Clone, making it harder to misuse versus *mut ArrayType.
     // But this also offers safe accessors to the fields, like &ArrayType,
     // so it requires validity assertions in order to be constructed.
     // The main reason it uses NonNull and denies Clone, however, is access soundness:
@@ -57,22 +63,22 @@ impl RawArray {
     /// * It must be "dereferenceable" in the sense defined in [the std documentation].
     /// * The pointer must point to an initialized instance of `ArrayType`.
     /// * This can be considered a unique, "owning pointer",
-    ///   so it won't be aliased while RawArray is held,
+    ///   so it won't be aliased while ArrayPtr is held,
     ///   and it points to data in the Postgres ArrayType format.
     ///
-    /// It should be noted as RawArray is not inherently lifetime-bound, it can be racy and unsafe!
+    /// It should be noted as ArrayPtr is not inherently lifetime-bound, it can be racy and unsafe!
     ///
     /// [the std documentation]: core::ptr#safety
-    pub unsafe fn from_raw(at: NonNull<ArrayType>) -> RawArray {
-        RawArray { at }
+    pub unsafe fn from_ptr(at: NonNull<ArrayType>) -> ArrayPtr {
+        ArrayPtr { at }
     }
 
     /// # Safety
     ///
     /// Array must have been constructed from an ArrayType pointer.
-    pub unsafe fn from_array<T: FromDatum>(arr: Array<T>) -> Option<RawArray> {
+    pub unsafe fn from_array<T: FromDatum>(arr: Array<T>) -> Option<ArrayPtr> {
         let array_type = arr.into_array_type() as *mut _;
-        Some(RawArray {
+        Some(ArrayPtr {
             at: NonNull::new(array_type)?,
         })
     }
@@ -105,7 +111,7 @@ impl RawArray {
     /// If you find ways to store it, you are probably violating ownership.
     /// Raw pointer validity is **asserted on dereference, not construction**,
     /// so remember, this slice is only guaranteed to be valid almost immediately
-    /// after obtaining it, or if you continue to hold the RawArray.
+    /// after obtaining it, or if you continue to hold the ArrayPtr.
     pub fn dims(&mut self) -> NonNull<[libc::c_int]> {
         // for expected behavior, see:
         // postgres/src/include/utils/array.h
@@ -113,7 +119,7 @@ impl RawArray {
 
         // SAFETY: Welcome to the infernal bowels of FFI.
         // Because the initial ptr was NonNull, we can assume this is also NonNull.
-        // As validity of the initial ptr was asserted on construction of RawArray,
+        // As validity of the initial ptr was asserted on construction of ArrayPtr,
         // this can assume the dims ptr is also valid, allowing making the slice.
         // This code doesn't assert validity per se, but in practice,
         // the caller will probably immediately turn this into a borrowed slice,
@@ -213,7 +219,7 @@ impl RawArray {
 
         // SAFETY: Welcome to the infernal bowels of FFI.
         // Because the initial ptr was NonNull, we can assume this is also NonNull.
-        // As validity of the initial ptr was asserted on construction of RawArray,
+        // As validity of the initial ptr was asserted on construction of ArrayPtr,
         // this can assume the data ptr is also valid, allowing making the slice.
         // This code doesn't assert validity per se, but in practice,
         // the caller will probably immediately turn this into a borrowed slice,
@@ -229,4 +235,13 @@ impl RawArray {
             ))
         }
     }
+}
+
+/**
+A pointer into a Postgres varlena.
+*/
+pub struct RawArray<T> {
+    _ptr: ArrayPtr,
+    _len: usize,
+    ty: PhantomData<T>,
 }
