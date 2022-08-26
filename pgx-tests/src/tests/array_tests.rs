@@ -139,6 +139,7 @@ fn get_arr_ndim(arr: Array<i32>) -> libc::c_int {
 }
 
 #[pg_extern]
+#[allow(deprecated)]
 fn over_implicit_drop() -> Vec<i64> {
     // Create an array of exactly Datum-sized numbers.
     let mut vec: Vec<i64> = vec![1, 2, 3, 4, 5];

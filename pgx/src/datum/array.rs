@@ -8,6 +8,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use crate::{pg_sys, FromDatum, IntoDatum, PgMemoryContexts};
+use core::ptr::NonNull;
 use serde::Serializer;
 use std::marker::PhantomData;
 use std::{mem, ptr, slice};
@@ -15,8 +16,8 @@ use std::{mem, ptr, slice};
 pub type VariadicArray<'a, T> = Array<'a, T>;
 
 pub struct Array<'a, T: FromDatum> {
-    _ptr: *mut pg_sys::varlena,
-    array_type: *mut pg_sys::ArrayType,
+    _ptr: Option<NonNull<pg_sys::varlena>>,
+    array_type: Option<NonNull<pg_sys::ArrayType>>,
     nelems: usize,
     elem_slice: &'a [pg_sys::Datum],
     null_slice: &'a [bool],
@@ -53,14 +54,29 @@ impl<'a, T: FromDatum> Array<'a, T> {
     /// - `elements` is non-null
     /// - `nulls` is non-null
     /// - both `elements` and `nulls` point to a slice of equal-or-greater length than `nelems`
+    #[deprecated(
+        since = "0.5.0",
+        note = "creating arbitrary Arrays from raw pointers has unsound interactions!
+    please open an issue in tcdi/pgx if you need this, with your stated use-case"
+    )]
     pub unsafe fn over(
         elements: *mut pg_sys::Datum,
         nulls: *mut bool,
         nelems: usize,
     ) -> Array<'a, T> {
+        // FIXME: This function existing prevents simply using NonNull<varlena>
+        // or NonNull<ArrayType>. It has also caused issues like tcdi/pgx#633
+        // Ideally it would cease being used soon.
+        // It can be replaced with ways to make Postgres varlena arrays in Rust,
+        // if there are any users who desire such a thing.
+        //
+        // Remember to remove the Array::over tests in pgx-tests/src/tests/array_tests.rs
+        // when you finally kill this off.
+        let _ptr: Option<NonNull<pg_sys::varlena>> = None;
+        let array_type: Option<NonNull<pg_sys::ArrayType>> = None;
         Array::<T> {
-            _ptr: ptr::null_mut(),
-            array_type: ptr::null_mut(),
+            _ptr,
+            array_type,
             nelems,
             elem_slice: slice::from_raw_parts(elements, nelems),
             null_slice: slice::from_raw_parts(nulls, nelems),
@@ -75,8 +91,8 @@ impl<'a, T: FromDatum> Array<'a, T> {
     /// - `nulls` is non-null
     /// - both `elements` and `nulls` point to a slice of equal-or-greater length than `nelems`
     unsafe fn from_pg(
-        _ptr: *mut pg_sys::varlena,
-        array_type: *mut pg_sys::ArrayType,
+        _ptr: Option<NonNull<pg_sys::varlena>>,
+        array_type: Option<NonNull<pg_sys::ArrayType>>,
         elements: *mut pg_sys::Datum,
         nulls: *mut bool,
         nelems: usize,
@@ -92,11 +108,11 @@ impl<'a, T: FromDatum> Array<'a, T> {
     }
 
     pub fn into_array_type(self) -> *const pg_sys::ArrayType {
-        if self.array_type.is_null() {
-            panic!("attempt to dereference a NULL array");
-        }
-
-        let ptr = self.array_type;
+        let ptr = if let Some(at) = self.array_type {
+            at.as_ptr()
+        } else {
+            ptr::null()
+        };
         mem::forget(self);
         ptr
     }
@@ -124,11 +140,13 @@ impl<'a, T: FromDatum> Array<'a, T> {
     ///
     /// This function will panic when called if the array contains any SQL NULL values.
     pub fn iter_deny_null(&self) -> ArrayTypedIterator<'_, T> {
-        if self.array_type.is_null() {
+        if let Some(at) = self.array_type {
+            if unsafe { pg_sys::array_contains_nulls(at.as_ptr()) } {
+                panic!("array contains NULL");
+            }
+        } else {
             panic!("array is NULL");
-        } else if unsafe { pg_sys::array_contains_nulls(self.array_type) } {
-            panic!("array contains NULL");
-        }
+        };
 
         ArrayTypedIterator {
             array: self,
@@ -251,7 +269,7 @@ impl<'a, T: FromDatum> Iterator for ArrayIntoIterator<'a, T> {
 impl<'a, T: FromDatum> FromDatum for Array<'a, T> {
     #[inline]
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Array<'a, T>> {
-        if is_null {
+        if is_null || datum.is_null() {
             None
         } else {
             let ptr = datum.ptr_cast();
@@ -291,7 +309,13 @@ impl<'a, T: FromDatum> FromDatum for Array<'a, T> {
                 &mut nelems,
             );
 
-            Some(Array::from_pg(ptr, array, elements, nulls, nelems as usize))
+            Some(Array::from_pg(
+                NonNull::new(ptr),
+                NonNull::new(array),
+                elements,
+                nulls,
+                nelems as usize,
+            ))
         }
     }
 }
