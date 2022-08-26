@@ -137,6 +137,24 @@ impl RawArray {
         }
     }
 
+    /**
+    The ability to rewrite the dimensions slice.
+
+    You almost certainly do not actually want to call this.
+    Returns a triple tuple of
+    * a mutable reference to ndim,
+    * a pointer to the first c_int
+    * a mutable reference to RawArray's len field.
+
+    Write to them in order.
+    */
+    pub unsafe fn dims_mut(&mut self) -> (&mut libc::c_int, NonNull<libc::c_int>, &mut usize) {
+        let dims_ptr = unsafe { NonNull::new_unchecked(pgx_ARR_DIMS(self.ptr.as_ptr())) };
+        let len = &mut self.len;
+
+        (unsafe { &mut self.ptr.as_mut().ndim }, dims_ptr, len)
+    }
+
     /// The flattened length of the array.
     pub fn len(&self) -> usize {
         self.len
