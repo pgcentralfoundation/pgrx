@@ -205,7 +205,7 @@ impl RawArray {
 
     Note that if this is None, that does not mean it's always okay to read!
     If len is 0, then this slice will be valid for 0 bytes.
-    
+
     [ARR_NULLBITMAP]: <https://git.postgresql.org/gitweb/?p=postgresql.git;a=blob;f=src/include/utils/array.h;h=4ae6c3be2f8b57afa38c19af2779f67c782e4efc;hb=278273ccbad27a8834dfdf11895da9cd91de4114#l293>
     */
     pub fn nulls(&self) -> Option<NonNull<[u8]>> {
