@@ -22,17 +22,17 @@ pub struct Interval(pg_sys::Interval);
 impl Interval {
     pub fn try_from_months_days_usecs(
         months: i32,
-        days: i32,
+        days: i8,
         usecs: i64,
     ) -> Result<Self, IntervalConversionError> {
-        if days.abs() >= pg_sys::DAYS_PER_MONTH as i32 {
+        if days.abs() >= pg_sys::DAYS_PER_MONTH as i8 {
             return Err(IntervalConversionError::FromDaysOutOfBounds);
         }
         if usecs.abs() >= USECS_PER_DAY {
             return Err(IntervalConversionError::FromUSecOutOfBounds);
         }
         Ok(Interval(pg_sys::Interval {
-            day: days,
+            day: days as i32,
             month: months,
             time: usecs,
         }))
