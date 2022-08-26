@@ -138,7 +138,7 @@ fn display_get_arr_nullbitmap(arr: Array<i32>) -> String {
 #[pg_extern]
 fn get_arr_ndim(arr: Array<i32>) -> libc::c_int {
     // SAFETY: This is a valid ArrayType and it's just a field access.
-    unsafe { ArrayPtr::from_array(arr) .unwrap().ndims() }
+    unsafe { ArrayPtr::from_array(arr).unwrap().ndims() }
 }
 
 #[pg_extern]

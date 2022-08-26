@@ -1,7 +1,7 @@
 use crate::datum::{Array, FromDatum};
 use crate::pg_sys;
-use core::ptr::{slice_from_raw_parts_mut, NonNull};
 use core::marker::PhantomData;
+use core::ptr::{slice_from_raw_parts_mut, NonNull};
 use pgx_pg_sys::*;
 
 extern "C" {
@@ -54,27 +54,28 @@ impl ArrayPtr {
     // This creates an obvious complication for handing out pointers into varlenas.
     // Thus also why this does not use lifetime-bounded borrows.
 
-    /// Returns a handle to the raw array header.
-    ///
-    /// # Safety
-    ///
-    /// When calling this method, you have to ensure that all of the following is true:
-    /// * The pointer must be properly aligned.
-    /// * It must be "dereferenceable" in the sense defined in [the std documentation].
-    /// * The pointer must point to an initialized instance of `ArrayType`.
-    /// * This can be considered a unique, "owning pointer",
-    ///   so it won't be aliased while ArrayPtr is held,
-    ///   and it points to data in the Postgres ArrayType format.
-    ///
-    /// It should be noted as ArrayPtr is not inherently lifetime-bound, it can be racy and unsafe!
-    ///
-    /// [the std documentation]: core::ptr#safety
+    /**
+    Returns a handle to the raw array header.
+
+    # Safety
+
+    When calling this method, you have to ensure that all of the following is true:
+    * The pointer must be properly aligned.
+    * It must be "dereferenceable" in the sense defined in [the std documentation].
+    * The pointer must point to an initialized instance of `ArrayType`.
+    * This can be considered a unique, "owning pointer",
+      so it won't be aliased while ArrayPtr is held,
+      and it points to data in the Postgres ArrayType format.
+
+    It should be noted as ArrayPtr is not inherently lifetime-bound, it can be racy and unsafe!
+
+    [the std documentation]: core::ptr#safety
+    */
     pub unsafe fn from_ptr(at: NonNull<ArrayType>) -> ArrayPtr {
         ArrayPtr { at }
     }
 
     /// # Safety
-    ///
     /// Array must have been constructed from an ArrayType pointer.
     pub unsafe fn from_array<T: FromDatum>(arr: Array<T>) -> Option<ArrayPtr> {
         let array_type = arr.into_array_type() as *mut _;
@@ -102,16 +103,18 @@ impl ArrayPtr {
         }
     }
 
-    /// A raw slice of the dimensions.
-    /// Oxidized form of ARR_DIMS(ArrayType*)
-    ///
-    /// # Safety
-    ///
-    /// This requires &mut to collect the slice, but be aware: this is a raw pointer!
-    /// If you find ways to store it, you are probably violating ownership.
-    /// Raw pointer validity is **asserted on dereference, not construction**,
-    /// so remember, this slice is only guaranteed to be valid almost immediately
-    /// after obtaining it, or if you continue to hold the ArrayPtr.
+    /**
+    A raw slice of the dimensions.
+    Oxidized form of ARR_DIMS(ArrayType*)
+
+    # Safety
+
+    This requires &mut to collect the slice, but be aware: this is a raw pointer!
+    If you find ways to store it, you are probably violating ownership.
+    Raw pointer validity is **asserted on dereference, not construction**,
+    so remember, this slice is only guaranteed to be valid almost immediately
+    after obtaining it, or if you continue to hold the ArrayPtr.
+    */
     pub fn dims(&mut self) -> NonNull<[libc::c_int]> {
         // for expected behavior, see:
         // postgres/src/include/utils/array.h
@@ -190,30 +193,31 @@ impl ArrayPtr {
         Some(NonNull::new(nulls)?)
     }
 
-    /// The slice of the data.
-    /// Oxidized form of ARR_DATA_PTR(ArrayType*)
-    ///
-    /// # Safety
-    ///
-    /// This is not inherently typesafe!
-    /// Thus you must know the implied type of the underlying ArrayType when calling this.
-    /// In addition, the raw slice is not guaranteed to be legible at any given index,
-    /// e.g. it may be an "SQL null" if so indicated in the null bitmap.
-    /// But even if the index is not marked as null, the value may be equal to nullptr,
-    /// thus leaving it correct to read the value but incorrect to then dereference.
-    ///
-    /// That is why this returns [`NonNull<[T]>`]: if it returned `&mut [T]`,
-    /// then for many possible types that can be **undefined behavior**,
-    /// as it would assert that each particular index was a valid `T`.
-    /// A Rust borrow, including of a slice, will always be
-    /// - non-null
-    /// - aligned
-    /// - **validly initialized**, except in the case of [MaybeUninit] types
-    /// It can be incorrect to assume that data that Postgres has marked "null"
-    /// follows Rust-level initialization requirements.
-    ///
-    /// [MaybeUninit]: core::mem::MaybeUninit
-    /// [`NonNull<[T]>`]: core::ptr::NonNull
+    /**
+    Shim to ARR_DATA_PTR(ArrayType*)
+
+    # Safety
+
+    This is not inherently typesafe!
+    Thus you must know the implied type of the underlying ArrayType when calling this.
+    In addition, the raw slice is not guaranteed to be legible at any given index,
+    e.g. it may be an "SQL null" if so indicated in the null bitmap.
+    But even if the index is not marked as null, the value may be equal to nullptr,
+    thus leaving it correct to read the value but incorrect to then dereference.
+
+    That is why this returns [`NonNull<[T]>`]: if it returned `&mut [T]`,
+    then for many possible types that can be **undefined behavior**,
+    as it would assert that each particular index was a valid `T`.
+    A Rust borrow, including of a slice, will always be
+    * non-null
+    * aligned
+    * **validly initialized**, except in the case of [MaybeUninit] types
+    It can be incorrect to assume that data that Postgres has marked "null"
+    follows Rust-level initialization requirements.
+
+    [MaybeUninit]: core::mem::MaybeUninit
+    [`NonNull<[T]>`]: core::ptr::NonNull
+    */
     pub unsafe fn data<T>(&mut self) -> NonNull<[T]> {
         let len = self.len() as usize;
 
