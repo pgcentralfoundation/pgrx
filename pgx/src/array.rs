@@ -143,27 +143,6 @@ impl RawArray {
         }
     }
 
-    /**
-    The ability to rewrite the dimensions slice.
-
-    You almost certainly do not actually want to call this,
-    unless you intentionally stored the actually intended ndim and wrote 0 instead.
-    Returns a triple tuple of
-    * a mutable reference to the underlying ArrayType's ndim field
-    * a pointer to the first c_int of the dimensions slice
-    * a mutable reference to RawArray's len field
-
-    Write to them in order.
-    */
-    pub unsafe fn dims_mut(&mut self) -> (&mut libc::c_int, NonNull<libc::c_int>, &mut usize) {
-        // SAFETY: Validity asserted on construction, origin ptr is non-null.
-        let dims_ptr = unsafe { NonNull::new_unchecked(pgx_ARR_DIMS(self.ptr.as_ptr())) };
-        let len = &mut self.len;
-
-        // SAFETY: Validity asserted on construction. Just reborrowing a subfield.
-        (unsafe { &mut self.ptr.as_mut().ndim }, dims_ptr, len)
-    }
-
     /// The flattened length of the array over every single element.
     /// Includes all items, even the ones that might be null.
     pub fn len(&self) -> usize {
