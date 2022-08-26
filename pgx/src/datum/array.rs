@@ -16,7 +16,7 @@ use std::{mem, ptr, slice};
 pub type VariadicArray<'a, T> = Array<'a, T>;
 
 pub struct Array<'a, T: FromDatum> {
-    _ptr: *mut pg_sys::varlena,
+    _ptr: Option<NonNull<pg_sys::varlena>>,
     array_type: Option<NonNull<pg_sys::ArrayType>>,
     nelems: usize,
     elem_slice: &'a [pg_sys::Datum],
@@ -59,9 +59,10 @@ impl<'a, T: FromDatum> Array<'a, T> {
         nulls: *mut bool,
         nelems: usize,
     ) -> Array<'a, T> {
+        let _ptr: Option<NonNull<pg_sys::varlena>> = None;
         let array_type: Option<NonNull<pg_sys::ArrayType>> = None;
         Array::<T> {
-            _ptr: ptr::null_mut(),
+            _ptr,
             array_type,
             nelems,
             elem_slice: slice::from_raw_parts(elements, nelems),
@@ -77,15 +78,15 @@ impl<'a, T: FromDatum> Array<'a, T> {
     /// - `nulls` is non-null
     /// - both `elements` and `nulls` point to a slice of equal-or-greater length than `nelems`
     unsafe fn from_pg(
-        _ptr: *mut pg_sys::varlena,
-        array_type: *mut pg_sys::ArrayType,
+        _ptr: Option<NonNull<pg_sys::varlena>>,
+        array_type: Option<NonNull<pg_sys::ArrayType>>,
         elements: *mut pg_sys::Datum,
         nulls: *mut bool,
         nelems: usize,
     ) -> Self {
         Array::<T> {
             _ptr,
-            array_type: NonNull::new(array_type),
+            array_type,
             nelems,
             elem_slice: slice::from_raw_parts(elements, nelems),
             null_slice: slice::from_raw_parts(nulls, nelems),
@@ -255,7 +256,7 @@ impl<'a, T: FromDatum> Iterator for ArrayIntoIterator<'a, T> {
 impl<'a, T: FromDatum> FromDatum for Array<'a, T> {
     #[inline]
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Array<'a, T>> {
-        if is_null {
+        if is_null || datum.is_null() {
             None
         } else {
             let ptr = datum.ptr_cast();
@@ -295,7 +296,13 @@ impl<'a, T: FromDatum> FromDatum for Array<'a, T> {
                 &mut nelems,
             );
 
-            Some(Array::from_pg(ptr, array, elements, nulls, nelems as usize))
+            Some(Array::from_pg(
+                NonNull::new(ptr),
+                NonNull::new(array),
+                elements,
+                nulls,
+                nelems as usize,
+            ))
         }
     }
 }
