@@ -22,10 +22,23 @@ extern "C" {
 /**
 An aligned, dereferenceable `NonNull<ArrayType>` with low-level accessors.
 
-It offers technically-safe accessors to the "dynamic" fields of a Postgres varlena array
-but only requires validity of ArrayType itself as well as the dimensions slice.
-This also means that the [NonNull] pointers that are returned may not be valid to read.
+It offers safe accessors to the fields of [pg_sys::ArrayType] and mostly-safe accessors
+to the "dynamic fields" of the defined Postgres varlena array, but only requires validity
+of ArrayType itself and the dimensions slice (always valid if `ndim == 0`).
+This means the [NonNull] pointers that are returned may not be valid to read.
 Validating the correctness of the entire array requires a bit more effort.
+
+It is not Copy or Clone to make it slightly harder to misuse versus *mut ArrayType.
+However, `&mut self` accessors do not give lifetimes to returned [`NonNull<[T]>`][nonnull]!
+Instead, these are raw pointers, and `&mut RawArray` only makes `&RawArray` safer.
+
+The reason RawArray works almost entirely with raw pointers is that
+it is not currently valid to go from `&mut ArrayType` to `*mut ArrayType`,
+take an offset beyond ArrayType's fields, and then create a new slice there
+and read from that. The result is currently undefined behavior,
+though with emphasis on "undefined": it may become defined in the future of Rust.
+
+At the current moment, however, it is best to exercise an abundance of caution.
 
 # On sizes and subscripts
 
@@ -36,6 +49,8 @@ except with negative indices, which Postgres asserts against creating.
 PGX currently only intentionally supports 64-bit machines,
 and while support for ILP32 or I64LP128 C data models may become possible,
 PGX will **not** support 16-bit machines in any practical case, even though Rust does.
+
+[nonnull]: core::ptr::NonNull
 */
 #[derive(Debug)]
 pub struct RawArray {
@@ -45,15 +60,6 @@ pub struct RawArray {
 
 #[deny(unsafe_op_in_unsafe_fn)]
 impl RawArray {
-    // General implementation notes:
-    // RawArray is not Copy or Clone, making it harder to misuse versus *mut ArrayType.
-    // But this also offers safe accessors to the fields, like &ArrayType,
-    // so it requires validity assertions in order to be constructed.
-    // The main reason it uses NonNull and denies Clone, however, is access soundness:
-    // It is not sound to go from &mut Type to *mut T if *mut T is not a field of Type.
-    // This creates an obvious complication for handing out pointers into varlenas.
-    // Thus also why this does not use lifetime-bounded borrows.
-
     /**
     Returns a handle to the raw array header.
 
@@ -74,14 +80,17 @@ impl RawArray {
     [the std documentation]: core::ptr#safety
     */
     pub unsafe fn from_ptr(ptr: NonNull<ArrayType>) -> RawArray {
+        // SAFETY: Validity asserted by the caller.
         let len = unsafe { pgx_ARR_NELEMS(ptr.as_ptr()) } as usize;
         RawArray { ptr, len }
     }
 
     /// # Safety
-    /// Array must have been constructed from an ArrayType pointer.
+    /// Array must have been made from an ArrayType pointer,
+    /// or a null value, as-if [RawArray::from_ptr].
     pub unsafe fn from_array<T: FromDatum>(arr: Array<T>) -> Option<RawArray> {
         let array_type = arr.into_array_type() as *mut _;
+        // SAFETY: Validity asserted by the caller.
         let len = unsafe { pgx_ARR_NELEMS(array_type) } as usize;
         Some(RawArray {
             ptr: NonNull::new(array_type)?,
@@ -112,16 +121,14 @@ impl RawArray {
     /**
     A slice of the dimensions.
 
-    Oxidized form of ARR_DIMS(ArrayType*).
+    Oxidized form of [ARR_DIMS(ArrayType*)][ARR_DIMS].
     The length will be within 0..=[pg_sys::MAXDIM].
 
     Safe to use because validity of this slice was asserted on construction.
+
+    [ARR_DIMS]: <https://git.postgresql.org/gitweb/?p=postgresql.git;a=blob;f=src/include/utils/array.h;h=4ae6c3be2f8b57afa38c19af2779f67c782e4efc;hb=278273ccbad27a8834dfdf11895da9cd91de4114#l287>
     */
     pub fn dims(&self) -> &[libc::c_int] {
-        // for expected behavior, see:
-        // postgres/src/include/utils/array.h
-        // #define ARR_DIMS
-
         /*
         SAFETY: Welcome to the infernal bowels of FFI.
         Because the initial ptr was NonNull, we can assume this is also NonNull.
@@ -147,17 +154,21 @@ impl RawArray {
     Write to them in order.
     */
     pub unsafe fn dims_mut(&mut self) -> (&mut libc::c_int, NonNull<libc::c_int>, &mut usize) {
+        // SAFETY: Validity asserted on construction, origin ptr is non-null.
         let dims_ptr = unsafe { NonNull::new_unchecked(pgx_ARR_DIMS(self.ptr.as_ptr())) };
         let len = &mut self.len;
 
+        // SAFETY: Validity asserted on construction. Just reborrowing a subfield.
         (unsafe { &mut self.ptr.as_mut().ndim }, dims_ptr, len)
     }
 
-    /// The flattened length of the array.
+    /// The flattened length of the array over every single element.
+    /// Includes all items, even the ones that might be null.
     pub fn len(&self) -> usize {
         self.len
     }
 
+    /// Accessor for ArrayType's elemtype.
     pub fn oid(&self) -> pg_sys::Oid {
         // SAFETY: Validity asserted on construction.
         unsafe { (*self.ptr.as_ptr()).elemtype }
@@ -171,19 +182,20 @@ impl RawArray {
         // This field is an "int32" in Postgres
     }
 
-    /// Equivalent to ARR_HASNULL(ArrayType*).
-    ///
-    /// Note this means that it only asserts that there MIGHT be a null
+    /**
+    Equivalent to [ARR_HASNULL(ArrayType*)][ARR_HASNULL].
+
+    Note this means that it only asserts that there MIGHT be a null
+
+    [ARR_HASNULL]: <https://git.postgresql.org/gitweb/?p=postgresql.git;a=blob;f=src/include/utils/array.h;h=4ae6c3be2f8b57afa38c19af2779f67c782e4efc;hb=278273ccbad27a8834dfdf11895da9cd91de4114#l284>
+    */
     #[allow(unused)]
     fn nullable(&self) -> bool {
-        // for expected behavior, see:
-        // postgres/src/include/utils/array.h
-        // #define ARR_HASNULL
         self.data_offset() != 0
     }
 
     /**
-    Oxidized form of ARR_NULLBITMAP(ArrayType*)
+    Oxidized form of [ARR_NULLBITMAP(ArrayType*)][ARR_NULLBITMAP]
 
     If this returns None, the array cannot have nulls.
     If this returns Some, it points to the bitslice that marks nulls in this array.
@@ -193,6 +205,8 @@ impl RawArray {
 
     Note that if this is None, that does not mean it's always okay to read!
     If len is 0, then this slice will be valid for 0 bytes.
+    
+    [ARR_NULLBITMAP]: <https://git.postgresql.org/gitweb/?p=postgresql.git;a=blob;f=src/include/utils/array.h;h=4ae6c3be2f8b57afa38c19af2779f67c782e4efc;hb=278273ccbad27a8834dfdf11895da9cd91de4114#l293>
     */
     pub fn nulls(&self) -> Option<NonNull<[u8]>> {
         // for expected behavior, see:
@@ -214,7 +228,7 @@ impl RawArray {
     }
 
     /**
-    Oxidized form of ARR_DATA_PTR(ArrayType*)
+    Oxidized form of [ARR_DATA_PTR(ArrayType*)][ARR_DATA_PTR]
 
     # Safety
 
@@ -246,6 +260,7 @@ impl RawArray {
 
     [MaybeUninit]: core::mem::MaybeUninit
     [nonnull]: core::ptr::NonNull
+    [ARR_DATA_PTR]: <https://git.postgresql.org/gitweb/?p=postgresql.git;a=blob;f=src/include/utils/array.h;h=4ae6c3be2f8b57afa38c19af2779f67c782e4efc;hb=278273ccbad27a8834dfdf11895da9cd91de4114#l315>
     */
     pub fn data<T>(&mut self) -> NonNull<[T]> {
         /*
