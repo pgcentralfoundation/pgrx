@@ -11,7 +11,7 @@ use crate::{command::status::status_postgres, CommandExecute};
 use cargo_toml::Manifest;
 use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
-use pgx_utils::pg_config::{PgConfig, PgConfigSelector, Pgx};
+use pgx_pg_config::{PgConfig, PgConfigSelector, Pgx};
 use std::{path::PathBuf, process::Stdio};
 
 /// Stop a pgx-managed Postgres instance

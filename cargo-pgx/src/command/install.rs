@@ -14,8 +14,7 @@ use crate::{
 use cargo_toml::Manifest;
 use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
-use pgx_utils::pg_config::PgConfig;
-use pgx_utils::{get_target_dir, versioned_so_name};
+use pgx_pg_config::{get_target_dir, PgConfig};
 use std::{
     io::BufReader,
     path::{Path, PathBuf},
@@ -156,7 +155,8 @@ pub(crate) fn install_extension(
         dest.push(&pkgdir);
         let so_name = if versioned_so {
             let extver = get_version(&package_manifest_path)?;
-            versioned_so_name(&extname, &extver)
+            // note: versioned so-name format must agree with pgx-utils
+            format!("{}-{}", &extname, &extver)
         } else {
             extname.clone()
         };

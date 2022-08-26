@@ -11,6 +11,7 @@ use crate::{
         get::{find_control_file, get_property},
         install::format_display_path,
     },
+    pgx_pg_sys_stub::PgxPgSysStub,
     CommandExecute,
 };
 use cargo_toml::Manifest;
@@ -18,11 +19,8 @@ use eyre::{eyre, WrapErr};
 use object::Object;
 use once_cell::sync::OnceCell;
 use owo_colors::OwoColorize;
-use pgx_utils::{
-    pg_config::{PgConfig, Pgx},
-    sql_entity_graph::{PgxSql, SqlGraphEntity},
-    PgxPgSysStub,
-};
+use pgx_pg_config::{get_target_dir, PgConfig, Pgx};
+use pgx_utils::sql_entity_graph::{PgxSql, SqlGraphEntity};
 use std::{
     collections::HashSet,
     hash::{Hash, Hasher},
@@ -178,7 +176,7 @@ pub(crate) fn generate_schema(
 
     let flags = std::env::var("PGX_BUILD_FLAGS").unwrap_or_default();
 
-    let mut target_dir_with_profile = pgx_utils::get_target_dir()?;
+    let mut target_dir_with_profile = get_target_dir()?;
     target_dir_with_profile.push(if is_release { "release" } else { "debug" });
 
     // First, build the SQL generator so we can get a look at the symbol table

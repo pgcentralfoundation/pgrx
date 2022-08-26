@@ -32,7 +32,6 @@ use crate::sql_entity_graph::{
     to_sql::ToSql,
     SqlGraphEntity, SqlGraphIdentifier,
 };
-use crate::versioned_so_name;
 
 use super::pg_extern::entity::PgExternReturnEntityIteratedItem;
 
@@ -548,7 +547,8 @@ impl PgxSql {
         return if self.versioned_so {
             let extname = &self.extension_name;
             let extver = &self.control.default_version;
-            format!("$libdir/{}", versioned_so_name(extname, extver))
+            // Note: versioned so-name format must agree with cargo pgx
+            format!("$libdir/{}-{}", extname, extver)
         } else {
             String::from("MODULE_PATHNAME")
         };

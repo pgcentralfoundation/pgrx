@@ -4,6 +4,7 @@ members = [
     "cargo-pgx",
     "pgx",
     "pgx-macros",
+    "pgx-pg-config",
     "pgx-pg-sys",
     "pgx-tests",
     "pgx-utils",

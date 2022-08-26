@@ -10,6 +10,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 mod command;
 mod manifest;
 mod metadata;
+mod pgx_pg_sys_stub;
 
 use atty::Stream;
 use clap::Parser;
