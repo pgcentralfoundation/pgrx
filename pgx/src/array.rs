@@ -267,7 +267,7 @@ impl RawArray {
     fn into_ptr(self) -> ArrayPtr {
         self.ptr
     }
-    
+
     /// Oxidized form of ARR_NULLBITMAP(ArrayType*)
     pub fn nulls(&self) -> Option<NonNull<[u8]>> {
         // for expected behavior, see:
@@ -280,7 +280,9 @@ impl RawArray {
         // it isn't correct to trust it. Instead, this gets null-checked.
         // This is because, while the initial pointer is NonNull,
         // ARR_NULLBITMAP can return a nullptr!
-        Some(unsafe { NonNull::new_unchecked(slice_from_raw_parts_mut(self.ptr.nulls()?.as_ptr(), len)) } )
+        Some(unsafe {
+            NonNull::new_unchecked(slice_from_raw_parts_mut(self.ptr.nulls()?.as_ptr(), len))
+        })
     }
 
     /// # Safety
@@ -297,6 +299,11 @@ impl RawArray {
         // Most importantly, the caller has asserted this is in fact a valid [T],
         // by calling this function, so both this code and the caller can rely
         // on that assertion, only requiring that it is correct.
-        unsafe { NonNull::new_unchecked(slice_from_raw_parts_mut(self.ptr.data::<T>().as_ptr(), self.len)) }
+        unsafe {
+            NonNull::new_unchecked(slice_from_raw_parts_mut(
+                self.ptr.data::<T>().as_ptr(),
+                self.len,
+            ))
+        }
     }
 }
