@@ -190,6 +190,9 @@ impl RawArray {
 
     Note that unlike the `is_null: bool` that appears elsewhere, here a 0 bit is null,
     or possibly out of bounds for the final byte of the bitslice.
+
+    Note that if this is None, that does not mean it's always okay to read!
+    If len is 0, then this slice will be valid for 0 bytes.
     */
     pub fn nulls(&self) -> Option<NonNull<[u8]>> {
         // for expected behavior, see:
@@ -237,6 +240,9 @@ impl RawArray {
     The first element should be correctly aligned to the type, but that is not certain.
     Successive indices are even less likely to match the data type you want
     unless Postgres also uses an identical layout.
+
+    This returns a slice to make it somewhat harder to fail to read it correctly.
+    However, it should be noted that a len 0 slice may not be read via raw pointers.
 
     [MaybeUninit]: core::mem::MaybeUninit
     [nonnull]: core::ptr::NonNull
