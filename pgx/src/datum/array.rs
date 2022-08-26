@@ -54,11 +54,24 @@ impl<'a, T: FromDatum> Array<'a, T> {
     /// - `elements` is non-null
     /// - `nulls` is non-null
     /// - both `elements` and `nulls` point to a slice of equal-or-greater length than `nelems`
+    #[deprecated(
+        since = "0.5.0",
+        note = "creating arbitrary Arrays from raw pointers has unsound interactions!
+    please open an issue in tcdi/pgx if you need this, with your stated use-case"
+    )]
     pub unsafe fn over(
         elements: *mut pg_sys::Datum,
         nulls: *mut bool,
         nelems: usize,
     ) -> Array<'a, T> {
+        // FIXME: This function existing prevents simply using NonNull<varlena>
+        // or NonNull<ArrayType>. It has also caused issues like tcdi/pgx#633
+        // Ideally it would cease being used soon.
+        // It can be replaced with ways to make Postgres varlena arrays in Rust,
+        // if there are any users who desire such a thing.
+        //
+        // Remember to remove the Array::over tests in pgx-tests/src/tests/array_tests.rs
+        // when you finally kill this off.
         let _ptr: Option<NonNull<pg_sys::varlena>> = None;
         let array_type: Option<NonNull<pg_sys::ArrayType>> = None;
         Array::<T> {
