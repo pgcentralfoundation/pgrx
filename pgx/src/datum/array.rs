@@ -8,6 +8,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use crate::{pg_sys, FromDatum, IntoDatum, PgMemoryContexts};
+use core::ptr::NonNull;
 use serde::Serializer;
 use std::marker::PhantomData;
 use std::{mem, ptr, slice};
@@ -16,7 +17,7 @@ pub type VariadicArray<'a, T> = Array<'a, T>;
 
 pub struct Array<'a, T: FromDatum> {
     _ptr: *mut pg_sys::varlena,
-    array_type: *mut pg_sys::ArrayType,
+    array_type: Option<NonNull<pg_sys::ArrayType>>,
     nelems: usize,
     elem_slice: &'a [pg_sys::Datum],
     null_slice: &'a [bool],
@@ -58,9 +59,10 @@ impl<'a, T: FromDatum> Array<'a, T> {
         nulls: *mut bool,
         nelems: usize,
     ) -> Array<'a, T> {
+        let array_type: Option<NonNull<pg_sys::ArrayType>> = None;
         Array::<T> {
             _ptr: ptr::null_mut(),
-            array_type: ptr::null_mut(),
+            array_type,
             nelems,
             elem_slice: slice::from_raw_parts(elements, nelems),
             null_slice: slice::from_raw_parts(nulls, nelems),
@@ -83,7 +85,7 @@ impl<'a, T: FromDatum> Array<'a, T> {
     ) -> Self {
         Array::<T> {
             _ptr,
-            array_type,
+            array_type: NonNull::new(array_type),
             nelems,
             elem_slice: slice::from_raw_parts(elements, nelems),
             null_slice: slice::from_raw_parts(nulls, nelems),
@@ -92,11 +94,11 @@ impl<'a, T: FromDatum> Array<'a, T> {
     }
 
     pub fn into_array_type(self) -> *const pg_sys::ArrayType {
-        if self.array_type.is_null() {
-            panic!("attempt to dereference a NULL array");
-        }
-
-        let ptr = self.array_type;
+        let ptr = if let Some(at) = self.array_type {
+            at.as_ptr()
+        } else {
+            ptr::null()
+        };
         mem::forget(self);
         ptr
     }
@@ -124,11 +126,13 @@ impl<'a, T: FromDatum> Array<'a, T> {
     ///
     /// This function will panic when called if the array contains any SQL NULL values.
     pub fn iter_deny_null(&self) -> ArrayTypedIterator<'_, T> {
-        if self.array_type.is_null() {
+        if let Some(at) = self.array_type {
+            if unsafe { pg_sys::array_contains_nulls(at.as_ptr()) } {
+                panic!("array contains NULL");
+            }
+        } else {
             panic!("array is NULL");
-        } else if unsafe { pg_sys::array_contains_nulls(self.array_type) } {
-            panic!("array contains NULL");
-        }
+        };
 
         ArrayTypedIterator {
             array: self,
