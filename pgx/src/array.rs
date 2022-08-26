@@ -109,11 +109,13 @@ impl RawArray {
         // SAFETY: Validity asserted on construction.
         unsafe {
             (*self.ptr.as_ptr()).ndim
-            // FIXME: While this is a c_int, the max ndim is normally 6
-            // While the value can be set higher, it is... unlikely
-            // that it is going to actually challenge even 16-bit pointer widths.
-            // It would be preferable to return a usize instead,
-            // however, PGX has trouble with that, unfortunately.
+            /*
+            FIXME: While this is a c_int, the max ndim is normally 6
+            While the value can be set higher, it is... unlikely
+            that it is going to actually challenge even 16-bit pointer widths.
+            It would be preferable to return a usize instead,
+            however, PGX has trouble with that, unfortunately.
+            */
             as _
         }
     }
@@ -209,10 +211,6 @@ impl RawArray {
     [ARR_NULLBITMAP]: <https://git.postgresql.org/gitweb/?p=postgresql.git;a=blob;f=src/include/utils/array.h;h=4ae6c3be2f8b57afa38c19af2779f67c782e4efc;hb=278273ccbad27a8834dfdf11895da9cd91de4114#l293>
     */
     pub fn nulls(&self) -> Option<NonNull<[u8]>> {
-        // for expected behavior, see:
-        // postgres/src/include/utils/array.h
-        // #define ARR_NULLBITMAP
-
         let len = self.len + 7 >> 3; // Obtains 0 if len was 0.
 
         /*
