@@ -1,8 +1,8 @@
 use crate::datum::{Array, FromDatum};
 use crate::pg_sys;
 use core::ptr::{slice_from_raw_parts_mut, NonNull};
-use pgx_pg_sys::*;
 use core::slice;
+use pgx_pg_sys::*;
 
 extern "C" {
     /// # Safety
@@ -130,10 +130,7 @@ impl RawArray {
         */
         unsafe {
             let ndim = self.ndim() as usize;
-            slice::from_raw_parts(
-                pgx_ARR_DIMS(self.ptr.as_ptr()),
-                ndim,
-            )
+            slice::from_raw_parts(pgx_ARR_DIMS(self.ptr.as_ptr()), ndim)
         }
     }
 
@@ -201,7 +198,7 @@ impl RawArray {
 
         let len = self.len + 7 >> 3; // Obtains 0 if len was 0.
 
-        /* 
+        /*
         SAFETY: This obtains the nulls pointer, which is valid to obtain because
         the len was asserted on construction. However, unlike the other cases,
         it isn't correct to trust it. Instead, this gets null-checked.
