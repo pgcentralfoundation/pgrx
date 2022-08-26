@@ -2,6 +2,7 @@ use crate::datum::{Array, FromDatum};
 use crate::pg_sys;
 use core::ptr::{slice_from_raw_parts_mut, NonNull};
 use pgx_pg_sys::*;
+use core::slice;
 
 extern "C" {
     /// # Safety
@@ -21,8 +22,8 @@ extern "C" {
 /**
 An aligned, dereferenceable `NonNull<ArrayType>` with low-level accessors.
 
-It offers technically-safe accessors to the "dynamic" fields of a Postgres varlena array,
-as well as any fields not covered by such, but does not require any more validity.
+It offers technically-safe accessors to the "dynamic" fields of a Postgres varlena array
+but only requires validity of ArrayType itself as well as the dimensions slice.
 This also means that the [NonNull] pointers that are returned may not be valid to read.
 Validating the correctness of the entire array requires a bit more effort.
 
@@ -94,7 +95,7 @@ impl RawArray {
 
     /// Get the number of dimensions.
     /// Will be in 0..=[pg_sys::MAXDIM].
-    pub fn ndims(&self) -> libc::c_int {
+    fn ndim(&self) -> libc::c_int {
         // SAFETY: Validity asserted on construction.
         unsafe {
             (*self.ptr.as_ptr()).ndim
@@ -108,20 +109,14 @@ impl RawArray {
     }
 
     /**
-    A raw slice of the dimensions.
+    A slice of the dimensions.
 
     Oxidized form of ARR_DIMS(ArrayType*).
     The length will be within 0..=[pg_sys::MAXDIM].
 
-    # Safety
-
-    This requires &mut to collect the slice, but be aware: this is a raw pointer!
-    If you find ways to store it, you are probably violating ownership.
-    Raw pointer validity is **asserted on dereference, not construction**,
-    so remember, this slice is only guaranteed to be valid almost immediately
-    after obtaining it, or if you continue to hold the RawArray.
+    Safe to use because validity of this slice was asserted on construction.
     */
-    pub fn dims(&mut self) -> NonNull<[libc::c_int]> {
+    pub fn dims(&self) -> &[libc::c_int] {
         // for expected behavior, see:
         // postgres/src/include/utils/array.h
         // #define ARR_DIMS
@@ -138,27 +133,17 @@ impl RawArray {
         // though it is possible the caller can misuse this in various ways.
         // Only the "naive" case is well-guarded.
         unsafe {
-            let ndim = self.ndims() as usize;
-            NonNull::new_unchecked(slice_from_raw_parts_mut(
+            let ndim = self.ndim() as usize;
+            slice::from_raw_parts(
                 pgx_ARR_DIMS(self.ptr.as_ptr()),
                 ndim,
-            ))
+            )
         }
     }
 
     /// The flattened length of the array.
     pub fn len(&self) -> usize {
-        // SAFETY: Validity asserted on construction, and...
-        // ...well, hopefully Postgres knows what it's doing.
-        unsafe {
-            pgx_ARR_NELEMS(self.ptr.as_ptr())
-            // FIXME: While this was indeed a function that returns a c_int,
-            // using a usize is more idiomatic in Rust, to say the least.
-            // In addition, the actual sizes are under various restrictions,
-            // so we probably can further constrain the value, honestly.
-            // However, PGX has trouble with returning usizes
-            as _
-        }
+        self.len
     }
 
     pub fn oid(&self) -> pg_sys::Oid {
@@ -177,7 +162,8 @@ impl RawArray {
     /// Equivalent to ARR_HASNULL(ArrayType*).
     ///
     /// Note this means that it only asserts that there MIGHT be a null
-    pub fn nullable(&self) -> bool {
+    #[allow(unused)]
+    fn nullable(&self) -> bool {
         // for expected behavior, see:
         // postgres/src/include/utils/array.h
         // #define ARR_HASNULL
@@ -190,11 +176,6 @@ impl RawArray {
         // postgres/src/include/utils/array.h
         // #define ARR_NULLBITMAP
 
-        // SAFETY: This obtains the nulls pointer, which is valid to obtain because
-        // the validity was asserted on construction. However, unlike the other cases,
-        // it isn't correct to trust it. Instead, this gets null-checked.
-        // This is because, while the initial pointer is NonNull,
-        // ARR_NULLBITMAP can return a nullptr!
         let len = self.len + 7 >> 3; // Obtains 0 if len was 0.
 
         // SAFETY: This obtains the nulls pointer, which is valid to obtain because
@@ -212,14 +193,12 @@ impl RawArray {
 
     # Safety
 
-    This is not inherently typesafe!
-    Thus you must know the implied type of the underlying ArrayType when calling this.
-    In addition, the raw slice is not guaranteed to be legible at any given index,
+    The raw slice is not guaranteed to be legible at any given index as T,
     e.g. it may be an "SQL null" if so indicated in the null bitmap.
-    But even if the index is not marked as null, the value may be equal to nullptr,
-    thus leaving it correct to read the value but incorrect to then dereference.
+    As a result, it is dangerous to reborrow this as `&[T]` or `&mut [T]`
+    unless the type considers all bitpatterns to be valid values.
 
-    That is the primary reason this returns [`NonNull<T>`]. If it returned `&mut [T]`,
+    That is the primary reason this returns [`NonNull<[T]>`][nonnull]. If it returned `&mut [T]`,
     then for many possible types that can be **undefined behavior**,
     as it would assert each particular index was a valid `T`.
     A Rust borrow, including of a slice, will always be
@@ -231,7 +210,7 @@ impl RawArray {
     otherwise follows Rust-level initialization requirements.
 
     [MaybeUninit]: core::mem::MaybeUninit
-    [`NonNull<T>`]: core::ptr::NonNull
+    [nonnull]: core::ptr::NonNull
     */
     pub fn data<T>(&mut self) -> NonNull<[T]> {
         // SAFETY: Welcome to the infernal bowels of FFI.
