@@ -86,20 +86,49 @@ impl<'a, T: FromDatum> Array<'a, T> {
 
     /// # Safety
     ///
-    /// This function requires that:
-    /// - `elements` is non-null
-    /// - `nulls` is non-null
-    /// - both `elements` and `nulls` point to a slice of equal-or-greater length than `nelems`
-    unsafe fn from_pg(
+    /// This function requires that the RawArray was obtained in a properly-constructed form
+    /// (probably from Postgres).
+    unsafe fn deconstruct_from(
         _ptr: Option<NonNull<pg_sys::varlena>>,
-        raw: Option<RawArray>,
-        elements: *mut pg_sys::Datum,
-        nulls: *mut bool,
-        nelems: usize,
-    ) -> Self {
-        Array::<T> {
+        raw: RawArray,
+        typlen: libc::c_int,
+        typbyval: bool,
+        typalign: libc::c_char,
+    ) -> Array<'a, T> {
+        let oid = raw.oid();
+        let len = raw.len();
+        let array = raw.into_raw().as_ptr();
+
+        // outvals for deconstruct_array
+        let mut elements = ptr::null_mut();
+        let mut nulls = ptr::null_mut();
+        let mut nelems = 0;
+
+        // FIXME: This way of getting array buffers causes problems for any Drop impl,
+        // and clashes with assumptions of Array being a "zero-copy", lifetime-bound array,
+        // some of which are implicitly embedded in other methods (e.g. Array::over).
+        // It also risks leaking memory, as deconstruct_array calls palloc.
+        // So either we don't use this, we use it more conditionally, or something.
+        pg_sys::deconstruct_array(
+            array,
+            oid,
+            typlen as i32,
+            typbyval,
+            typalign,
+            &mut elements,
+            &mut nulls,
+            &mut nelems,
+        );
+
+        let nelems = nelems as usize;
+
+        // Check our RawArray len impl for correctness.
+        assert_eq!(nelems, len);
+        let raw = RawArray::from_ptr(NonNull::new_unchecked(array));
+
+        Array {
             _ptr,
-            raw,
+            raw: Some(raw),
             nelems,
             elem_slice: slice::from_raw_parts(elements, nelems),
             null_slice: slice::from_raw_parts(nulls, nelems),
@@ -278,6 +307,7 @@ impl<'a, T: FromDatum> FromDatum for Array<'a, T> {
             let array = pg_sys::pg_detoast_datum(datum.ptr_cast()) as *mut pg_sys::ArrayType;
             let raw =
                 RawArray::from_ptr(NonNull::new(array).expect("detoast returned null ArrayType*"));
+            let ptr = NonNull::new(ptr);
 
             // outvals for get_typlenbyvalalign()
             let mut typlen = 0;
@@ -286,34 +316,10 @@ impl<'a, T: FromDatum> FromDatum for Array<'a, T> {
             let oid = raw.oid();
 
             pg_sys::get_typlenbyvalalign(oid, &mut typlen, &mut typbyval, &mut typalign);
+            let typlen = typlen as _;
 
-            // outvals for deconstruct_array()
-            let mut elements = ptr::null_mut();
-            let mut nulls = ptr::null_mut();
-            let mut nelems = 0;
-
-            // FIXME: This way of getting array buffers causes problems for any Drop impl,
-            // and clashes with assumptions of Array being a "zero-copy", lifetime-bound array,
-            // some of which are implicitly embedded in other methods (e.g. Array::over).
-            // It also risks leaking memory, as deconstruct_array calls palloc.
-            // So either we don't use this, we use it more conditionally, or something.
-            pg_sys::deconstruct_array(
-                array,
-                oid,
-                typlen as i32,
-                typbyval,
-                typalign,
-                &mut elements,
-                &mut nulls,
-                &mut nelems,
-            );
-
-            Some(Array::from_pg(
-                NonNull::new(ptr),
-                Some(raw),
-                elements,
-                nulls,
-                nelems as usize,
+            Some(Array::deconstruct_from(
+                ptr, raw, typlen, typbyval, typalign,
             ))
         }
     }
