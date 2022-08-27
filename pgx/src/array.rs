@@ -205,6 +205,18 @@ impl RawArray {
     }
 
     /**
+    Checks the array for any NULL values by assuming it is a proper varlena array,
+
+    # Safety
+
+    * This requires every index is valid to read or correctly marked as null.
+    */
+    pub unsafe fn any_nulls(&self) -> bool {
+        // SAFETY: Caller asserted safety conditions.
+        unsafe { pg_sys::array_contains_nulls(self.ptr.as_ptr()) }
+    }
+
+    /**
     Oxidized form of [ARR_DATA_PTR(ArrayType*)][ARR_DATA_PTR]
 
     # Safety
