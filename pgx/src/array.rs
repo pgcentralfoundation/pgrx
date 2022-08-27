@@ -1,8 +1,9 @@
 use crate::datum::{Array, FromDatum};
-use crate::pg_sys;
+use bitvec::{prelude::*, ptr::{bitslice_from_raw_parts_mut,BitPtrError, BitPtr}};
+use wyz::comu::NullPtrError;
+use crate::pg_sys::{self, ArrayType, bits8};
 use core::ptr::{slice_from_raw_parts_mut, NonNull};
 use core::slice;
-use pgx_pg_sys::*;
 
 extern "C" {
     /// # Safety
@@ -175,6 +176,11 @@ impl RawArray {
         self.data_offset() != 0
     }
 
+    /// May return null.
+    fn nulls_mut_ptr(&mut self) -> *mut u8 {
+        unsafe { pgx_ARR_NULLBITMAP(self.ptr.as_ptr()) }
+    }
+
     /**
     Oxidized form of [ARR_NULLBITMAP(ArrayType*)][ARR_NULLBITMAP]
 
@@ -189,7 +195,7 @@ impl RawArray {
 
     [ARR_NULLBITMAP]: <https://git.postgresql.org/gitweb/?p=postgresql.git;a=blob;f=src/include/utils/array.h;h=4ae6c3be2f8b57afa38c19af2779f67c782e4efc;hb=278273ccbad27a8834dfdf11895da9cd91de4114#l293>
     */
-    pub fn nulls(&self) -> Option<NonNull<[u8]>> {
+    pub fn nulls(&mut self) -> Option<NonNull<[u8]>> {
         let len = self.len + 7 >> 3; // Obtains 0 if len was 0.
 
         /*
@@ -200,8 +206,20 @@ impl RawArray {
         ARR_NULLBITMAP can return a nullptr!
         */
         NonNull::new(unsafe {
-            slice_from_raw_parts_mut(pgx_ARR_NULLBITMAP(self.ptr.as_ptr()), len)
+            slice_from_raw_parts_mut(self.nulls_mut_ptr(), len)
         })
+    }
+
+    pub fn null_bits(&mut self) -> Result<NonNull<BitSlice<u8>>, BitPtrError<u8>> {
+        /*
+        SAFETY: This obtains the nulls pointer, which is valid to obtain because
+        the len was asserted on construction. However, unlike the other cases,
+        it isn't correct to trust it. Instead, this gets null-checked.
+        This is because, while the initial pointer is NonNull,
+        ARR_NULLBITMAP can return a nullptr!
+        */
+        let ptr = BitPtr::try_from(self.nulls_mut_ptr())?;//, BitIdx::new(0).ok()?).ok()?;
+        NonNull::new(bitslice_from_raw_parts_mut(ptr, self.len)).ok_or(BitPtrError::Null(NullPtrError))
     }
 
     /**
