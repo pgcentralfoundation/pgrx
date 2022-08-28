@@ -19,7 +19,7 @@ const PG_EPOCH_DATETIME: time::PrimitiveDateTime = date!(2000 - 01 - 01).midnigh
 
 // taken from /include/datatype/timestamp.h
 const MIN_TIMESTAMP_USEC: i64 = -211_813_488_000_000_000;
-const END_TIMESTAMP_USEC: i64 = 9_223_371_331_200_000_000;
+const END_TIMESTAMP_USEC: i64 = 9_223_371_331_200_000_000 - 1; // dec by 1 to accommodate exclusive range match pattern
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 #[repr(transparent)]
@@ -71,10 +71,7 @@ impl TryFrom<pg_sys::TimestampTz> for TimestampWithTimeZone {
         match usec {
             i64::MIN => Ok(Self::NEG_INFINITY),
             i64::MAX => Ok(Self::INFINITY),
-            // https://github.com/rust-lang/rust/issues/37854 for funny exlusive range guard
-            MIN_TIMESTAMP_USEC..=END_TIMESTAMP_USEC if usec < END_TIMESTAMP_USEC => {
-                Ok(TimestampWithTimeZone(usec))
-            }
+            MIN_TIMESTAMP_USEC..=END_TIMESTAMP_USEC => Ok(TimestampWithTimeZone(usec)),
             _ => Err(TimestampConversionError::OutOfRangeMicroseconds),
         }
     }
@@ -99,17 +96,15 @@ impl TryFrom<TimestampWithTimeZone> for time::PrimitiveDateTime {
     type Error = TimestampConversionError;
     fn try_from(tstz: TimestampWithTimeZone) -> Result<Self, Self::Error> {
         match tstz {
-            TimestampWithTimeZone::NEG_INFINITY => {
-                Err(TimestampConversionError::TimestampNegativeInfinity)
-            }
-            TimestampWithTimeZone::INFINITY => Err(TimestampConversionError::TimestampInfinity),
+            TimestampWithTimeZone::NEG_INFINITY => Err(TimestampConversionError::NegInfinity),
+            TimestampWithTimeZone::INFINITY => Err(TimestampConversionError::Infinity),
             _ => {
                 let sec = tstz.0 / USECS_PER_SEC;
                 let usec = tstz.0 - (sec * USECS_PER_SEC);
                 let duration = time::Duration::new(sec, (usec as i32) * 1000);
                 match PG_EPOCH_DATETIME.checked_add(duration) {
                     Some(datetime) => Ok(datetime),
-                    None => Err(TimestampConversionError::TimeCrateConversionError),
+                    None => Err(TimestampConversionError::TimeCrate),
                 }
             }
         }
@@ -162,11 +157,11 @@ impl FromDatum for TimestampWithTimeZone {
 #[derive(thiserror::Error, Debug, Clone, Copy)]
 pub enum TimestampConversionError {
     #[error("timestamp value is negative infinity and shouldn't map to time::PrimitiveDateTime")]
-    TimestampNegativeInfinity,
+    NegInfinity,
     #[error("timestamp value is negative infinity and shouldn't map to time::PrimitiveDateTime")]
-    TimestampInfinity,
+    Infinity,
     #[error("time::PrimitiveDateTime was unable to convert this timestamp")]
-    TimeCrateConversionError,
+    TimeCrate,
     #[error("usec outside of PG's defined Timestamp range")]
     OutOfRangeMicroseconds,
 }
