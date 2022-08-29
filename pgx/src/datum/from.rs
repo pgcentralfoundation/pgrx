@@ -108,7 +108,7 @@ pub trait FromDatum {
 impl FromDatum for pg_sys::Datum {
     #[inline]
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<pg_sys::Datum> {
-        if is_null {
+        if is_null || datum.is_null() {
             None
         } else {
             Some(datum)
@@ -216,7 +216,7 @@ impl FromDatum for f64 {
 impl<'a> FromDatum for &'a str {
     #[inline]
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<&'a str> {
-        if is_null {
+        if is_null || datum.is_null() {
             None
         } else {
             let varlena = pg_sys::pg_detoast_datum_packed(datum.ptr_cast());
@@ -232,7 +232,7 @@ impl<'a> FromDatum for &'a str {
     where
         Self: Sized,
     {
-        if is_null {
+        if is_null || datum.is_null() {
             None
         } else {
             memory_context.switch_to(|_| {
@@ -255,22 +255,14 @@ impl<'a> FromDatum for &'a str {
 impl FromDatum for String {
     #[inline]
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<String> {
-        let refstr: Option<&str> = FromDatum::from_datum(datum, is_null);
-        match refstr {
-            Some(refstr) => Some(refstr.to_owned()),
-            None => None,
-        }
+        FromDatum::from_datum(datum, is_null).map(|s: &str| s.to_owned())
     }
 }
 
 impl FromDatum for char {
     #[inline]
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<char> {
-        let refstr: Option<&str> = FromDatum::from_datum(datum, is_null);
-        match refstr {
-            Some(refstr) => refstr.chars().next(),
-            None => None,
-        }
+        FromDatum::from_datum(datum, is_null).and_then(|s: &str| s.chars().next())
     }
 }
 
@@ -278,7 +270,7 @@ impl FromDatum for char {
 impl<'a> FromDatum for &'a std::ffi::CStr {
     #[inline]
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<&'a CStr> {
-        if is_null {
+        if is_null || datum.is_null() {
             None
         } else {
             Some(std::ffi::CStr::from_ptr(datum.ptr_cast()))
@@ -292,7 +284,7 @@ impl<'a> FromDatum for &'a crate::cstr_core::CStr {
         datum: pg_sys::Datum,
         is_null: bool,
     ) -> Option<&'a crate::cstr_core::CStr> {
-        if is_null {
+        if is_null || datum.is_null() {
             None
         } else {
             Some(crate::cstr_core::CStr::from_ptr(datum.ptr_cast()))
@@ -304,7 +296,7 @@ impl<'a> FromDatum for &'a crate::cstr_core::CStr {
 impl<'a> FromDatum for &'a [u8] {
     #[inline]
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<&'a [u8]> {
-        if is_null {
+        if is_null || datum.is_null() {
             None
         } else {
             let varlena = pg_sys::pg_detoast_datum_packed(datum.ptr_cast());
@@ -320,7 +312,7 @@ impl<'a> FromDatum for &'a [u8] {
     where
         Self: Sized,
     {
-        if is_null {
+        if is_null || datum.is_null() {
             None
         } else {
             memory_context.switch_to(|_| {
@@ -340,7 +332,7 @@ impl<'a> FromDatum for &'a [u8] {
 impl FromDatum for Vec<u8> {
     #[inline]
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Vec<u8>> {
-        if is_null {
+        if is_null || datum.is_null() {
             None
         } else {
             // Vec<u8> conversion is initially the same as for &[u8]
@@ -368,7 +360,7 @@ impl FromDatum for () {
 impl<T> FromDatum for PgBox<T, AllocatedByPostgres> {
     #[inline]
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Self> {
-        if is_null {
+        if is_null || datum.is_null() {
             None
         } else {
             Some(PgBox::<T>::from_pg(datum.ptr_cast()))
@@ -384,7 +376,7 @@ impl<T> FromDatum for PgBox<T, AllocatedByPostgres> {
         Self: Sized,
     {
         memory_context.switch_to(|context| {
-            if is_null {
+            if is_null || datum.is_null() {
                 None
             } else {
                 let copied = context.copy_ptr_into(datum.ptr_cast(), std::mem::size_of::<T>());
