@@ -69,6 +69,7 @@ impl<'a, T: FromDatum + serde::Serialize> serde::Serialize for ArrayTypedIterato
     }
 }
 
+#[deny(unsafe_op_in_unsafe_fn)]
 impl<'a, T: FromDatum> Array<'a, T> {
     /// Create an [`Array`](crate::datum::Array) over an array of [`pg_sys::Datum`](pg_sys::Datum) values and a corresponding array
     /// of "is_null" indicators
@@ -105,8 +106,8 @@ impl<'a, T: FromDatum> Array<'a, T> {
             _ptr,
             raw,
             nelems,
-            elem_slice: slice::from_raw_parts(elements, nelems),
-            null_slice: slice::from_raw_parts(nulls, nelems).into(),
+            elem_slice: unsafe { slice::from_raw_parts(elements, nelems) },
+            null_slice: unsafe { slice::from_raw_parts(nulls, nelems) }.into(),
             _marker: PhantomData,
         }
     }
@@ -124,7 +125,7 @@ impl<'a, T: FromDatum> Array<'a, T> {
     ) -> Array<'a, T> {
         let oid = raw.oid();
         let len = raw.len();
-        let array = raw.into_raw().as_ptr();
+        let array = raw.into_ptr().as_ptr();
 
         // outvals for deconstruct_array
         let mut elements = ptr::null_mut();
@@ -136,22 +137,26 @@ impl<'a, T: FromDatum> Array<'a, T> {
         // some of which are implicitly embedded in other methods (e.g. Array::over).
         // It also risks leaking memory, as deconstruct_array calls palloc.
         // So either we don't use this, we use it more conditionally, or something.
-        pg_sys::deconstruct_array(
-            array,
-            oid,
-            typlen as i32,
-            typbyval,
-            typalign,
-            &mut elements,
-            &mut nulls,
-            &mut nelems,
-        );
+        // SAFETY: We have already asserted the validity of the RawArray, so
+        // this only makes mistakes if we mix things up and pass Postgres the wrong data.
+        unsafe {
+            pg_sys::deconstruct_array(
+                array,
+                oid,
+                typlen,
+                typbyval,
+                typalign,
+                &mut elements,
+                &mut nulls,
+                &mut nelems,
+            )
+        };
 
         let nelems = nelems as usize;
 
         // Check our RawArray len impl for correctness.
         assert_eq!(nelems, len);
-        let mut raw = RawArray::from_ptr(NonNull::new_unchecked(array));
+        let mut raw = unsafe { RawArray::from_ptr(NonNull::new_unchecked(array)) };
 
         let null_slice = raw
             .null_bits()
@@ -162,21 +167,16 @@ impl<'a, T: FromDatum> Array<'a, T> {
             _ptr,
             raw: Some(raw),
             nelems,
-            elem_slice: slice::from_raw_parts(elements, nelems),
+            elem_slice: unsafe { slice::from_raw_parts(elements, nelems) },
             null_slice,
             _marker: PhantomData,
         }
     }
 
     pub fn into_array_type(mut self) -> *const pg_sys::ArrayType {
-        let at = mem::take(&mut self.raw);
-        let ptr = if let Some(at) = at {
-            at.into_raw().as_ptr()
-        } else {
-            ptr::null()
-        };
+        let ptr = mem::take(&mut self.raw).map(|raw| raw.into_ptr().as_ptr() as _);
         mem::forget(self);
-        ptr
+        ptr.unwrap_or(ptr::null())
     }
 
     pub fn as_slice(&self) -> &[T] {

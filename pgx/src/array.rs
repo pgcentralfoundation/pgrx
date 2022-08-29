@@ -103,7 +103,7 @@ impl RawArray {
     }
 
     /// Returns the inner raw pointer to the ArrayType.
-    pub fn into_raw(self) -> NonNull<ArrayType> {
+    pub fn into_ptr(self) -> NonNull<ArrayType> {
         self.ptr
     }
 
@@ -208,9 +208,21 @@ impl RawArray {
         This is because, while the initial pointer is NonNull,
         ARR_NULLBITMAP can return a nullptr!
         */
-        NonNull::new(unsafe { slice_from_raw_parts_mut(self.nulls_mut_ptr(), len) })
+        NonNull::new(slice_from_raw_parts_mut(self.nulls_mut_ptr(), len))
     }
 
+    /**
+    The [bitvec] equivalent of [RawArray::nulls].
+    If this returns `Ok`, it points to the bitslice that marks nulls in this array.
+    If this returns `Err`, it most likely returns [BitPtrError::Null] and in that case the array cannot have nulls.
+
+    Note that unlike the `is_null: bool` that appears elsewhere, here a 0 bit is null.
+    Unlike [RawArray::nulls], this slice is bit-exact in length, so there are no caveats for safely-used BitSlices.
+
+    [bitvec]: https://docs.rs/bitvec/latest
+    [BitPtrError::Null]: <https://docs.rs/bitvec/latest/bitvec/ptr/enum.BitPtrError.html>
+    [ARR_NULLBITMAP]: <https://git.postgresql.org/gitweb/?p=postgresql.git;a=blob;f=src/include/utils/array.h;h=4ae6c3be2f8b57afa38c19af2779f67c782e4efc;hb=278273ccbad27a8834dfdf11895da9cd91de4114#l293>
+    */
     pub fn null_bits(&mut self) -> Result<NonNull<BitSlice<u8>>, BitPtrError<u8>> {
         /*
         SAFETY: This obtains the nulls pointer, which is valid to obtain because
