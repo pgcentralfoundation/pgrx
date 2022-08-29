@@ -1,9 +1,12 @@
 use crate::datum::{Array, FromDatum};
-use bitvec::{prelude::*, ptr::{bitslice_from_raw_parts_mut,BitPtrError, BitPtr}};
-use wyz::comu::NullPtrError;
-use crate::pg_sys::{self, ArrayType, bits8};
+use crate::pg_sys::{self, bits8, ArrayType};
+use bitvec::{
+    prelude::*,
+    ptr::{bitslice_from_raw_parts_mut, BitPtr, BitPtrError},
+};
 use core::ptr::{slice_from_raw_parts_mut, NonNull};
 use core::slice;
+use wyz::comu::NullPtrError;
 
 extern "C" {
     /// # Safety
@@ -205,9 +208,7 @@ impl RawArray {
         This is because, while the initial pointer is NonNull,
         ARR_NULLBITMAP can return a nullptr!
         */
-        NonNull::new(unsafe {
-            slice_from_raw_parts_mut(self.nulls_mut_ptr(), len)
-        })
+        NonNull::new(unsafe { slice_from_raw_parts_mut(self.nulls_mut_ptr(), len) })
     }
 
     pub fn null_bits(&mut self) -> Result<NonNull<BitSlice<u8>>, BitPtrError<u8>> {
@@ -218,8 +219,9 @@ impl RawArray {
         This is because, while the initial pointer is NonNull,
         ARR_NULLBITMAP can return a nullptr!
         */
-        let ptr = BitPtr::try_from(self.nulls_mut_ptr())?;//, BitIdx::new(0).ok()?).ok()?;
-        NonNull::new(bitslice_from_raw_parts_mut(ptr, self.len)).ok_or(BitPtrError::Null(NullPtrError))
+        let ptr = BitPtr::try_from(self.nulls_mut_ptr())?;
+        NonNull::new(bitslice_from_raw_parts_mut(ptr, self.len))
+            .ok_or(BitPtrError::Null(NullPtrError))
     }
 
     /**

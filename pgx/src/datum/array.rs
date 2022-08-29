@@ -26,8 +26,9 @@ pub struct Array<'a, T: FromDatum> {
     _marker: PhantomData<T>,
 }
 
-// FIXME: When Array::over gets removed, this enum can be dropped,
+// FIXME: When Array::over gets removed, this enum can probably be dropped
 // since we won't be entertaining ArrayTypes which don't use bitslices anymore.
+// However, we could also use a static resolution? Hard to say what's best.
 enum NullKind<'a> {
     Bits(&'a BitSlice<u8>),
     Bytes(&'a [bool]),
@@ -43,9 +44,9 @@ impl<'a> From<&'a [bool]> for NullKind<'a> {
 impl NullKind<'_> {
     fn get(&self, index: usize) -> Option<bool> {
         match self {
-            Self::Bits(b1) => b1.get(index).map(|b| *b),
-            Self::Bytes(b8) => b8.get(index).map(|b| !b),
-            Self::Strict(len) => index.le(len).then(|| true)
+            Self::Bits(b1) => b1.get(index).map(|b| !b),
+            Self::Bytes(b8) => b8.get(index).map(|b| *b),
+            Self::Strict(len) => index.le(len).then(|| false),
         }
     }
 }
@@ -150,60 +151,18 @@ impl<'a, T: FromDatum> Array<'a, T> {
 
         // Check our RawArray len impl for correctness.
         assert_eq!(nelems, len);
-        let raw = RawArray::from_ptr(NonNull::new_unchecked(array));
+        let mut raw = RawArray::from_ptr(NonNull::new_unchecked(array));
+
+        let null_slice = raw
+            .null_bits()
+            .map(|nn| NullKind::Bits(unsafe { &*nn.as_ptr() }))
+            .unwrap_or(NullKind::Strict(nelems));
 
         Array {
             _ptr,
             raw: Some(raw),
             nelems,
             elem_slice: slice::from_raw_parts(elements, nelems),
-            null_slice: slice::from_raw_parts(nulls, nelems).into(),
-            _marker: PhantomData,
-        }
-    }
-
-    unsafe fn direct_from(
-        _ptr: Option<NonNull<pg_sys::varlena>>,
-        mut raw: RawArray,
-        typlen: libc::c_int,
-        typbyval: bool,
-        typalign: libc::c_char,
-    ) -> Array<'a, T> {
-        let oid = raw.oid();
-        let len = raw.len();
-        // Attempt to handle the array directly.
-        // First, assert on alignment
-        let eval_align = match typalign as u8 {
-            b'c' => 1,
-            b's' => mem::align_of::<libc::c_short>(),
-            b'i' => mem::align_of::<libc::c_int>(),
-            b'd' => mem::align_of::<f64>(),
-            _ => panic!("PGX encountered unfamiliar typalign?"),
-        };
-        let mem_align = mem::align_of::<T>();
-        assert_eq!(
-            eval_align,
-            mem_align,
-            "by-value align mismatch. Postgres said {ch},
-            type was Rust: {rs_ty}, OID#{oid}, Len: {typlen}",
-            ch = char::from(typalign as u8),
-            rs_ty = std::any::type_name::<T>()
-        );
-
-        let elems_raw = raw.data();
-        let nulls_raw = raw.null_bits();
-        let elem_slice = unsafe { &*elems_raw.as_ptr() };
-        let null_slice = match nulls_raw {
-            Ok(raw) => NullKind::Bits(unsafe { &*raw.as_ptr() }),
-            Err(_) => NullKind::Strict(len),
-        };
-
-
-        Array {
-            _ptr,
-            raw: Some(raw),
-            nelems: len,
-            elem_slice,
             null_slice,
             _marker: PhantomData,
         }
@@ -391,13 +350,9 @@ impl<'a, T: FromDatum> FromDatum for Array<'a, T> {
             pg_sys::get_typlenbyvalalign(oid, &mut typlen, &mut typbyval, &mut typalign);
             let typlen = typlen as _;
 
-            if typbyval {
-                Some(Array::direct_from(ptr, raw, typlen, typbyval, typalign))
-            } else {
-                Some(Array::deconstruct_from(
-                    ptr, raw, typlen, typbyval, typalign,
-                ))
-            }
+            Some(Array::deconstruct_from(
+                ptr, raw, typlen, typbyval, typalign,
+            ))
         }
     }
 }
