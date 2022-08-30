@@ -15,11 +15,22 @@ use time::Duration;
 
 const MONTH_DURATION: Duration = Duration::days(DAYS_PER_MONTH as i64);
 
+/// From the PG docs  https://www.postgresql.org/docs/current/datatype-datetime.html#DATATYPE-INTERVAL-INPUT
+/// Internally interval values are stored as months, days, and microseconds. This is done because the number of days in a month varies,
+/// and a day can have 23 or 25 hours if a daylight savings time adjustment is involved. The months and days fields are integers while
+/// the microseconds field can store fractional seconds. Because intervals are usually created from constant strings or timestamp
+/// subtraction, this storage method works well in most cases...
 #[derive(Debug)]
 #[repr(transparent)]
 pub struct Interval(pg_sys::Interval);
 
 impl Interval {
+    /// This function takes `months`/`days`/`usecs` as input to convert directly to the internal PG storage struct `pg_sys::Interval`
+    /// Normally in PG time representations would have made their way through `timestamp2tm(..)` which would normalize the units
+    /// to avoid rollovers of the smaller units.  Since this bypasses `timestamp2tm(..)` we must enforce that:
+    /// - `days` should not exceed one month (30 days)
+    /// - `usec` should not exceed 1 day
+    /// - the sign of all units must be all matching in the positive or all matching in the negative direction
     pub fn try_from_months_days_usecs(
         months: i32,
         days: i8,
@@ -38,14 +49,17 @@ impl Interval {
         }))
     }
 
+    /// Total number of months before/after 2000-01-01
     pub fn months(&self) -> i32 {
         self.0.month
     }
 
+    /// Total number of days before/after the `months` offset, not to exceed 1 month. (sign must match `months`)
     pub fn days(&self) -> i32 {
         self.0.day
     }
 
+    /// Total number of usecs before/after the `days` offset, not to exceed 1 day. (sign must match `months`/`days`)
     pub fn usecs(&self) -> i64 {
         self.0.time
     }
