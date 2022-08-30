@@ -3,6 +3,7 @@ use std::marker::PhantomData;
 use crate::{
     pg_sys, void_mut_ptr, Date, FromDatum, IntoDatum, Numeric, Timestamp, TimestampWithTimeZone,
 };
+
 use pgx_pg_sys::{Oid, RangeBound};
 
 pub struct Range<T: FromDatum + IntoDatum + RangeSubType> {
@@ -86,7 +87,8 @@ where
         }
     }
 }
-// lower, upper, is_empty
+
+// A deserialized state of the RangeType's data
 pub struct RangeData<T> {
     pub lower: RangeBound,
     pub upper: RangeBound,
@@ -102,7 +104,7 @@ where
         if self.is_empty || self.lower.infinite {
             None
         } else {
-            unsafe { T::from_datum(self.lower.val, self.lower.val.is_null()) }
+            unsafe { T::from_datum(self.lower.val, false) }
         }
     }
 
@@ -110,28 +112,34 @@ where
         if self.is_empty || self.upper.infinite {
             None
         } else {
-            unsafe { T::from_datum(self.upper.val, self.upper.val.is_null()) }
+            unsafe { T::from_datum(self.upper.val, false) }
         }
     }
 
     pub fn empty_range_data() -> Self {
-        let lower = RangeBound::default();
-        let upper = RangeBound::default();
-        Self::from_range_bounds_internal(lower, upper, true)
+        let lower_bound = RangeBound {
+            lower: true,
+            ..RangeBound::default()
+        };
+        let upper_bound = RangeBound {
+            lower: false,
+            ..RangeBound::default()
+        };
+        Self::from_range_bounds_internal(lower_bound, upper_bound, true)
     }
 
-    pub fn from_range_bounds(lower: RangeBound, upper: RangeBound) -> Self {
-        Self::from_range_bounds_internal(lower, upper, false)
+    pub fn from_range_bounds(lower_bound: RangeBound, upper_bound: RangeBound) -> Self {
+        Self::from_range_bounds_internal(lower_bound, upper_bound, false)
     }
 
     pub(crate) fn from_range_bounds_internal(
-        lower: RangeBound,
-        upper: RangeBound,
+        lower_bound: RangeBound,
+        upper_bound: RangeBound,
         is_empty: bool,
     ) -> Self {
         RangeData {
-            lower,
-            upper,
+            lower: lower_bound,
+            upper: upper_bound,
             is_empty,
             __marker: PhantomData,
         }
@@ -143,46 +151,53 @@ where
         lower_inc: bool,
         upper_inc: bool,
     ) -> Self {
-        let mut lower = RangeBound {
+        let mut lower_bound = RangeBound {
             lower: true,
             inclusive: lower_inc,
             ..Default::default()
         };
-        let mut upper = RangeBound {
+
+        let mut upper_bound = RangeBound {
             lower: false,
             inclusive: upper_inc,
             ..Default::default()
         };
 
-        if let Some(lower_val) = lower_val {
-            lower.val = lower_val
-                .into_datum()
-                .expect("Couldn't convert lower_val to Datum");
-        } else {
-            lower.infinite = true;
+        match lower_val {
+            Some(lower_val) => {
+                lower_bound.val = lower_val
+                    .into_datum()
+                    .expect("Couldn't convert lower_val to Datum");
+            }
+            None => {
+                lower_bound.infinite = true;
+            }
         }
 
-        if let Some(upper_val) = upper_val {
-            upper.val = upper_val
-                .into_datum()
-                .expect("Couldn't convert upper_val to Datum");
-        } else {
-            upper.infinite = true;
+        match upper_val {
+            Some(upper_val) => {
+                upper_bound.val = upper_val
+                    .into_datum()
+                    .expect("Couldn't convert upper_val to Datum");
+            }
+            None => {
+                upper_bound.infinite = true;
+            }
         }
-        RangeData::from_range_bounds(lower, upper)
+
+        RangeData::from_range_bounds(lower_bound, upper_bound)
     }
 }
 
-impl<T> TryFrom<Range<T>> for RangeData<T>
+impl<T> From<Range<T>> for RangeData<T>
 where
     T: FromDatum + IntoDatum + RangeSubType,
 {
-    type Error = RangeConversionError;
-
-    fn try_from(range: Range<T>) -> Result<Self, Self::Error> {
+    fn from(range: Range<T>) -> Self {
         let mut lower_bound: RangeBound = Default::default();
         let mut upper_bound: RangeBound = Default::default();
         let mut is_empty = false;
+
         unsafe {
             let typecache = pg_sys::lookup_type_cache(
                 (*(range.range_type)).rangetypid,
@@ -197,35 +212,31 @@ where
                 &mut is_empty,
             );
         }
-        Ok(RangeData::from_range_bounds_internal(
-            lower_bound,
-            upper_bound,
-            is_empty,
-        ))
+
+        RangeData::from_range_bounds_internal(lower_bound, upper_bound, is_empty)
     }
 }
 
-impl<T> TryFrom<RangeData<T>> for Range<T>
+impl<T> From<RangeData<T>> for Range<T>
 where
     T: FromDatum + IntoDatum + RangeSubType,
 {
-    type Error = RangeConversionError;
-
-    fn try_from(range_data: RangeData<T>) -> Result<Self, Self::Error> {
+    fn from(range_data: RangeData<T>) -> Self {
         unsafe {
             let typecache =
                 pg_sys::lookup_type_cache(T::range_type_oid(), pg_sys::TYPECACHE_RANGE_INFO as i32);
 
-            let mut lower = range_data.lower;
-            let mut upper = range_data.upper;
+            let mut lower_bound = range_data.lower;
+            let mut upper_bound = range_data.upper;
 
-            let range_type =
-                pg_sys::make_range(typecache, &mut lower, &mut upper, range_data.is_empty);
+            let range_type = pg_sys::make_range(
+                typecache,
+                &mut lower_bound,
+                &mut upper_bound,
+                range_data.is_empty,
+            );
 
-            Ok(Range::<T>::from_pg(
-                range_type as *mut pg_sys::varlena,
-                range_type,
-            ))
+            Range::<T>::from_pg(range_type as *mut pg_sys::varlena, range_type)
         }
     }
 }
