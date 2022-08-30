@@ -1,26 +1,40 @@
-use std::marker::PhantomData;
+/*
+Portions Copyright 2019-2021 ZomboDB, LLC.
+Portions Copyright 2021-2022 Technology Concepts & Design, Inc. <support@tcdi.com>
 
+All rights reserved.
+
+Use of this source code is governed by the MIT license that can be found in the LICENSE file.
+*/
+
+//! Utility functions for working with `pg_sys::RangeType` structs
 use crate::{
     pg_sys, void_mut_ptr, Date, FromDatum, IntoDatum, Numeric, Timestamp, TimestampWithTimeZone,
 };
-
 use pgx_pg_sys::{Oid, RangeBound};
+use std::marker::PhantomData;
 
+/// Represents Datum to serialized RangeType PG struct
 pub struct Range<T: FromDatum + IntoDatum + RangeSubType> {
     ptr: *mut pg_sys::varlena,
     range_type: *mut pg_sys::RangeType,
-    __marker: PhantomData<T>,
+    _marker: PhantomData<T>,
 }
 
 impl<T> Range<T>
 where
     T: FromDatum + IntoDatum + RangeSubType,
 {
+    /// ## Safety
+    /// function requires that
+    /// - datum is null OR
+    /// - datum represents a RangeType datum
+    #[inline]
     unsafe fn from_pg(ptr: *mut pg_sys::varlena, range_type: *mut pg_sys::RangeType) -> Self {
         Range {
             ptr,
             range_type,
-            __marker: PhantomData,
+            _marker: PhantomData,
         }
     }
 }
@@ -30,6 +44,11 @@ where
     T: FromDatum + IntoDatum + RangeSubType,
 {
     type Error = RangeConversionError;
+
+    /// ## Safety
+    /// function requires that
+    /// - datum is null OR
+    /// - datum represents a RangeType datum
     fn try_from(datum: pg_sys::Datum) -> Result<Self, Self::Error> {
         if datum.is_null() {
             Err(RangeConversionError::NullDatum)
@@ -50,6 +69,7 @@ impl<T> FromDatum for Range<T>
 where
     T: FromDatum + IntoDatum + RangeSubType,
 {
+    #[inline]
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Self>
     where
         Self: Sized,
@@ -66,10 +86,12 @@ impl<T> IntoDatum for Range<T>
 where
     T: FromDatum + IntoDatum + RangeSubType,
 {
+    #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
         Some(self.range_type.into())
     }
 
+    #[inline]
     fn type_oid() -> pg_sys::Oid {
         T::range_type_oid()
     }
@@ -88,7 +110,8 @@ where
     }
 }
 
-// A deserialized state of the RangeType's data
+/// Represents a deserialized state of the RangeType's data
+/// <T> indicates the subtype of the lower/upper bounds' datum
 pub struct RangeData<T> {
     pub lower: RangeBound,
     pub upper: RangeBound,
@@ -100,6 +123,9 @@ impl<T> RangeData<T>
 where
     T: FromDatum + IntoDatum + RangeSubType,
 {
+    /// The lower bound's datum as Option<T>
+    /// Empty ranges or lower infinite bounds will be None
+    #[inline]
     pub fn lower_val(&self) -> Option<T> {
         if self.is_empty || self.lower.infinite {
             None
@@ -108,6 +134,9 @@ where
         }
     }
 
+    /// The upper bound's datum as Option<T>
+    /// Empty ranges or upper infinite bounds will be None
+    #[inline]
     pub fn upper_val(&self) -> Option<T> {
         if self.is_empty || self.upper.infinite {
             None
@@ -116,6 +145,7 @@ where
         }
     }
 
+    /// Builds an "empty" range
     pub fn empty_range_data() -> Self {
         let lower_bound = RangeBound {
             lower: true,
@@ -128,6 +158,8 @@ where
         Self::from_range_bounds_internal(lower_bound, upper_bound, true)
     }
 
+    /// Generate a RangeData<T> from the lower/upper RangeBounds, implies non-empty
+    #[inline]
     pub fn from_range_bounds(lower_bound: RangeBound, upper_bound: RangeBound) -> Self {
         Self::from_range_bounds_internal(lower_bound, upper_bound, false)
     }
@@ -145,6 +177,8 @@ where
         }
     }
 
+    /// Generate a RangeData<T> from the T values for lower/upper bounds, lower/upper inclusive
+    /// None for lower_val or upper_val will represent lower_inf/upper_inf bounds
     pub fn from_range_values(
         lower_val: Option<T>,
         upper_val: Option<T>,
@@ -193,6 +227,9 @@ impl<T> From<Range<T>> for RangeData<T>
 where
     T: FromDatum + IntoDatum + RangeSubType,
 {
+    /// ## Safety
+    /// Requires that:
+    /// - range.range_type is valid pointer to RangeType PG struct
     fn from(range: Range<T>) -> Self {
         let mut lower_bound: RangeBound = Default::default();
         let mut upper_bound: RangeBound = Default::default();
@@ -241,40 +278,47 @@ where
     }
 }
 
+/// This trait allows a struct to be a valid subtype for a RangeType
 pub trait RangeSubType {
     fn range_type_oid() -> Oid;
 }
 
+/// for int/int4range
 impl RangeSubType for i32 {
     fn range_type_oid() -> Oid {
         pg_sys::INT4RANGEOID
     }
 }
 
+/// for bigint/int8range
 impl RangeSubType for i64 {
     fn range_type_oid() -> Oid {
         pg_sys::INT8RANGEOID
     }
 }
 
+/// for numeric/numrange
 impl RangeSubType for Numeric {
     fn range_type_oid() -> Oid {
         pg_sys::NUMRANGEOID
     }
 }
 
+/// for date/daterange
 impl RangeSubType for Date {
     fn range_type_oid() -> Oid {
         pg_sys::DATERANGEOID
     }
 }
 
+/// for Timestamp/tsrange
 impl RangeSubType for Timestamp {
     fn range_type_oid() -> Oid {
         pg_sys::TSRANGEOID
     }
 }
 
+/// for Timestamp With Time Zone/tstzrange
 impl RangeSubType for TimestampWithTimeZone {
     fn range_type_oid() -> Oid {
         pg_sys::TSTZRANGEOID
