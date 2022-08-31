@@ -1454,7 +1454,6 @@ dependencies = [
  "tracing",
  "tracing-error",
  "uuid",
- "wyz",
 ]
 
 [[package]]

@@ -9,7 +9,6 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 use crate::{array::RawArray, pg_sys, FromDatum, IntoDatum, PgMemoryContexts};
 use bitvec::slice::BitSlice;
-use core::ops::Index;
 use core::ptr::NonNull;
 use serde::Serializer;
 use std::marker::PhantomData;
@@ -160,7 +159,7 @@ impl<'a, T: FromDatum> Array<'a, T> {
 
         let null_slice = raw
             .null_bits()
-            .map(|nn| NullKind::Bits(unsafe { &*nn.as_ptr() }))
+            .map(|nonnull| NullKind::Bits(unsafe { &*nonnull.as_ptr() }))
             .unwrap_or(NullKind::Strict(nelems));
 
         Array {
