@@ -230,10 +230,14 @@ impl RawArray {
         This is because, while the initial pointer is NonNull,
         ARR_NULLBITMAP can return a nullptr!
         */
-        let ptr = BitPtr::try_from(self.nulls_mut_ptr()).map_err(|e| match e {
-            BitPtrError::Misaligned(_) => unreachable!("it should be impossible to misalign this"),
-            v => v,
-        }).ok()?;
+        let ptr = BitPtr::try_from(self.nulls_mut_ptr())
+            .map_err(|e| match e {
+                BitPtrError::Misaligned(_) => {
+                    unreachable!("it should be impossible to misalign this")
+                }
+                v => v,
+            })
+            .ok()?;
         NonNull::new(bitslice_from_raw_parts_mut(ptr, self.len))
     }
 
