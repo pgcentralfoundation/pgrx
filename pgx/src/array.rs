@@ -232,10 +232,8 @@ impl RawArray {
         */
         let ptr = BitPtr::try_from(self.nulls_mut_ptr())
             .map_err(|e| match e {
-                BitPtrError::Misaligned(_) => {
-                    unreachable!("it should be impossible to misalign this")
-                }
-                v => v,
+                BitPtrError::Null(v) => BitPtrError::<u8>::Null(v),
+                BitPtrError::Misaligned(_) => unreachable!("impossible to misalign *mut u8"),
             })
             .ok()?;
         NonNull::new(bitslice_from_raw_parts_mut(ptr, self.len))
