@@ -158,7 +158,7 @@ impl<'a, T: FromDatum> Array<'a, T> {
         let mut raw = unsafe { RawArray::from_ptr(NonNull::new_unchecked(array)) };
 
         let null_slice = raw
-            .null_bits()
+            .nulls_bitslice()
             .map(|nonnull| NullKind::Bits(unsafe { &*nonnull.as_ptr() }))
             .unwrap_or(NullKind::Strict(nelems));
 

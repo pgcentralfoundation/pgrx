@@ -2,7 +2,7 @@ use crate::datum::{Array, FromDatum};
 use crate::pg_sys::{self, bits8, ArrayType};
 use bitvec::{
     prelude::*,
-    ptr::{bitslice_from_raw_parts_mut, BitPtr, BitPtrError},
+    ptr::{bitslice_from_raw_parts_mut, BitPtr, BitPtrError, Mut},
 };
 use core::ptr::{slice_from_raw_parts_mut, NonNull};
 use core::slice;
@@ -102,12 +102,14 @@ impl RawArray {
     }
 
     /// Returns the inner raw pointer to the ArrayType.
+    #[inline]
     pub fn into_ptr(self) -> NonNull<ArrayType> {
         self.ptr
     }
 
     /// Get the number of dimensions.
     /// Will be in 0..=[pg_sys::MAXDIM].
+    #[inline]
     fn ndim(&self) -> libc::c_int {
         // SAFETY: Validity asserted on construction.
         unsafe {
@@ -148,6 +150,7 @@ impl RawArray {
 
     /// The flattened length of the array over every single element.
     /// Includes all items, even the ones that might be null.
+    #[inline]
     pub fn len(&self) -> usize {
         self.len
     }
@@ -160,6 +163,7 @@ impl RawArray {
 
     /// Gets the offset to the ArrayType's data.
     /// Should not be "taken literally".
+    #[inline]
     fn data_offset(&self) -> i32 {
         // SAFETY: Validity asserted on construction.
         unsafe { (*self.ptr.as_ptr()).dataoffset }
@@ -179,8 +183,18 @@ impl RawArray {
     }
 
     /// May return null.
+    #[inline]
     fn nulls_mut_ptr(&mut self) -> *mut u8 {
         unsafe { pgx_ARR_NULLBITMAP(self.ptr.as_ptr()) }
+    }
+
+    #[inline]
+    fn nulls_bitptr(&mut self) -> Option<BitPtr<Mut, u8>> {
+        match BitPtr::try_from(self.nulls_mut_ptr()) {
+            Ok(ptr) => Some(ptr),
+            Err(BitPtrError::Null(_)) => None,
+            Err(BitPtrError::Misaligned(_)) => unreachable!("impossible to misalign *mut u8"),
+        }
     }
 
     /**
@@ -222,7 +236,7 @@ impl RawArray {
     [BitPtrError::Null]: <https://docs.rs/bitvec/latest/bitvec/ptr/enum.BitPtrError.html>
     [ARR_NULLBITMAP]: <https://git.postgresql.org/gitweb/?p=postgresql.git;a=blob;f=src/include/utils/array.h;h=4ae6c3be2f8b57afa38c19af2779f67c782e4efc;hb=278273ccbad27a8834dfdf11895da9cd91de4114#l293>
     */
-    pub fn null_bits(&mut self) -> Option<NonNull<BitSlice<u8>>> {
+    pub fn nulls_bitslice(&mut self) -> Option<NonNull<BitSlice<u8>>> {
         /*
         SAFETY: This obtains the nulls pointer, which is valid to obtain because
         the len was asserted on construction. However, unlike the other cases,
@@ -230,13 +244,8 @@ impl RawArray {
         This is because, while the initial pointer is NonNull,
         ARR_NULLBITMAP can return a nullptr!
         */
-        let ptr = BitPtr::try_from(self.nulls_mut_ptr())
-            .map_err(|e| match e {
-                BitPtrError::Null(v) => BitPtrError::<u8>::Null(v),
-                BitPtrError::Misaligned(_) => unreachable!("impossible to misalign *mut u8"),
-            })
-            .ok()?;
-        NonNull::new(bitslice_from_raw_parts_mut(ptr, self.len))
+
+        NonNull::new(bitslice_from_raw_parts_mut(self.nulls_bitptr()?, self.len))
     }
 
     /**
