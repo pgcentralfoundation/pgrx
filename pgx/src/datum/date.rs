@@ -58,7 +58,7 @@ impl Date {
     )]
     pub fn new(date: time::Date) -> Date {
         // TODO(0.6.0): remove this
-        cratetime_date_to_pg_date(date)
+        timecrate_date_to_pg_date(date)
     }
 
     #[inline]
@@ -101,7 +101,7 @@ impl Date {
 impl From<time::Date> for Date {
     #[inline]
     fn from(date: time::Date) -> Self {
-        cratetime_date_to_pg_date(date)
+        timecrate_date_to_pg_date(date)
     }
 }
 
