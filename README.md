@@ -227,7 +227,19 @@ There's a few things on our immediate TODO list
 will be built into the `cargo-pgx` subcommand and make use of https://github.com/zombodb/postgres-parser.
  - More examples -- especially around memory management and the various derive macros `#[derive(PostgresType/Enum)]`
 
-## Experimental Features
+
+## Feature Flags
+PGX has optional feature flags for Rust code that do not involve configuring the version of Postgres used,
+but rather extend additional support for other kinds of Rust code. These are not included by default.
+
+### "time-crate": interop with the `time` crate
+This crate once used direct interop with the excellent [time crate][timecrate].
+However, due to complications involving performance and accurate interop with Postgres,
+this feature is now considered deprecated in favor of a lower-overhead interop.
+You may still request implementations of `TryFrom<time::Type> for pgx::MatchingType`
+and `From<time::Type> for pgx::MatchingType` by enabling the `"time-crate"` feature.
+
+### Experimental Features
 
 Adding `pgx = { version = "0.5.0-beta.0", features = ["postgrestd"] }` to your Cargo.toml
 will enable a **highly** experimental variant of `pgx` designed for integration with `postgrestd`,
@@ -269,3 +281,4 @@ Use of this source code is governed by the MIT license that can be found in the 
 ```
 
 [Discord]: https://discord.gg/hPb93Y9
+[timecrate]: https://crates.io/crates/time
