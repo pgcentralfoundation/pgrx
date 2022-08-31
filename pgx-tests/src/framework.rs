@@ -55,6 +55,10 @@ where
     SHUTDOWN_HOOKS.lock().unwrap().push(Box::new(func));
 }
 
+// The goal of this closure is to allow "wrapping" of anything that might issue
+// an SQL simple_quuery or query using either a postgres::Client or
+// postgres::Transction and capture the output. The use of this wrapper is
+// completely optional, but it might help narrow down some errors later on.
 fn query_wrapper<F, T>(
     query: Option<String>,
     query_params: Option<&[&(dyn postgres::types::ToSql + Sync)]>,
@@ -250,34 +254,6 @@ fn get_pg_config() -> eyre::Result<PgConfig> {
 }
 
 pub fn client() -> eyre::Result<(postgres::Client, String)> {
-    // fn determine_session_id(client: &mut Client) -> String {
-    //     let result = client.query("SELECT to_hex(trunc(EXTRACT(EPOCH FROM backend_start))::integer) || '.' || to_hex(pid) AS sid FROM pg_stat_activity WHERE pid = pg_backend_pid();", &[]).expect("failed to determine session id");
-
-    //     match result.get(0) {
-    //         Some(row) => row.get::<&str, &str>("sid").to_string(),
-    //         None => panic!("No session id returned from query"),
-    //     }
-    // }
-
-    // fn determine_session_id(client: &mut Client) -> String {
-    //     let result = client.query("SELECT to_hex(trunc(EXTRACT(EPOCH FROM backend_start))::integer) || '.' || to_hex(pid) AS sid FROM pg_stat_activity WHERE pid = pg_backend_pid();", &[]).expect("failed to determine session id");
-
-    //     match result.get(0) {
-    //         Some(row) => row.get::<&str, &str>("sid").to_string(),
-    //         None => panic!("No session id returned from query"),
-    //     }
-    // }
-
-    // query_wrapper_mut(
-    //     Some(format!("CREATE EXTENSION {} CASCADE;", &extension_name)),
-    //     None,
-    //     |query, _| client.simple_query(query.unwrap().as_str()),
-    // )
-    // .wrap_err(format!(
-    //     "There was an issue creating the extension '{}' in Postgres: ",
-    //     &extension_name
-    // ))?;
-
     let pg_config = get_pg_config()?;
     let mut client = postgres::Config::new()
         .host(pg_config.host())
@@ -303,9 +279,6 @@ pub fn client() -> eyre::Result<(postgres::Client, String)> {
         None => Err(eyre!("Failed to obtain a client Session ID from Postgres"))?,
     };
 
-    // client
-    //     .simple_query("SET log_min_messages TO 'INFO';")
-    //     .expect("FAILED: SET log_min_messages TO 'INFO'");
     query_wrapper(
         Some("SET log_min_messages TO 'INFO';".to_string()),
         None,
@@ -313,9 +286,6 @@ pub fn client() -> eyre::Result<(postgres::Client, String)> {
     )
     .wrap_err("Postgres Client setup failed to SET log_min_messages TO 'INFO'")?;
 
-    // client
-    //     .simple_query("SET log_min_duration_statement TO 1000;")
-    //     .expect("FAILED: SET log_min_duration_statement TO 1000");
     query_wrapper(
         Some("SET log_min_duration_statement TO 1000;".to_string()),
         None,
@@ -323,9 +293,6 @@ pub fn client() -> eyre::Result<(postgres::Client, String)> {
     )
     .wrap_err("Postgres Client setup failed to SET log_min_duration_statement TO 1000;")?;
 
-    // client
-    //     .simple_query("SET log_statement TO 'all';")
-    //     .expect("FAILED: SET log_statement TO 'all'");
     query_wrapper(
         Some("SET log_statement TO 'all';".to_string()),
         None,
