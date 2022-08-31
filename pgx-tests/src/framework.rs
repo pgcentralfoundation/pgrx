@@ -15,7 +15,6 @@ use owo_colors::OwoColorize;
 use pgx::*;
 use pgx_pg_config::{createdb, get_target_dir, PgConfig, Pgx};
 use postgres::error::DbError;
-use postgres::Client;
 use std::collections::HashMap;
 use std::fmt::Write as _;
 use std::io::{BufRead, BufReader, Write};
@@ -56,6 +55,49 @@ where
     SHUTDOWN_HOOKS.lock().unwrap().push(Box::new(func));
 }
 
+fn query_wrapper<F, T>(
+    query: Option<String>,
+    query_params: Option<&[&(dyn postgres::types::ToSql + Sync)]>,
+    mut f: F,
+) -> eyre::Result<T>
+where
+    T: IntoIterator,
+    F: FnMut(
+        Option<String>,
+        Option<&[&(dyn postgres::types::ToSql + Sync)]>,
+    ) -> Result<T, postgres::Error>,
+{
+    let result = f(query.clone(), query_params.clone());
+
+    match result {
+        Ok(result) => Ok(result),
+        Err(e) => {
+            let e = e.as_db_error().unwrap();
+            Err(eyre!(
+                "Postgres query failed:
+Query: {},
+Query Params: {:?},
+Error Message: {}
+Code: {:?}
+Severity: {}
+Detail: {}
+Hint: {}
+Schema: {}
+Table: {}",
+                query.unwrap(),
+                query_params,
+                e.message(),
+                e.code(),
+                e.severity(),
+                e.detail().unwrap_or("None"),
+                e.hint().unwrap_or("None"),
+                e.schema().unwrap_or("None"),
+                e.table().unwrap_or("None"),
+            ))
+        }
+    }
+}
+
 pub fn run_test(
     sql_funcname: &str,
     expected_error: Option<&str>,
@@ -63,7 +105,7 @@ pub fn run_test(
 ) -> eyre::Result<()> {
     let (loglines, system_session_id) = initialize_test_framework(postgresql_conf)?;
 
-    let (mut client, session_id) = client();
+    let (mut client, session_id) = client()?;
 
     let schema = "tests"; // get_extension_schema();
     let result = match client.transaction() {
@@ -162,9 +204,12 @@ fn initialize_test_framework(
     postgresql_conf: Vec<&'static str>,
 ) -> eyre::Result<(LogLines, String)> {
     let mut state = TEST_MUTEX.lock().unwrap_or_else(|_| {
-        // if we can't get the lock, that means it was poisoned,
-        // so we just abruptly exit, which cuts down on test failure spam
-        std::process::exit(1);
+        // This used to immediately throw an std::process::exit(1), but it
+        // would consume both stdout and stderr, resulting in error messages
+        // not being displayed unless you were running tests with --nocapture.
+        panic!(
+            "Could not obtain test mutex. Please check for errors in pervious tests to find the root cause."
+        );
     });
 
     if !state.installed {
@@ -174,11 +219,10 @@ fn initialize_test_framework(
         initdb(postgresql_conf)?;
 
         let system_session_id = start_pg(state.loglines.clone())?;
-        let pg_config = get_pg_config();
-        dropdb();
-        createdb(&pg_config, get_pg_dbname(), true, false).expect("failed to create test database");
-        create_extension();
-
+        let pg_config = get_pg_config()?;
+        dropdb()?;
+        createdb(&pg_config, get_pg_dbname(), true, false)?;
+        create_extension()?;
         state.installed = true;
         state.system_session_id = system_session_id;
     }
@@ -186,24 +230,55 @@ fn initialize_test_framework(
     Ok((state.loglines.clone(), state.system_session_id.clone()))
 }
 
-fn get_pg_config() -> PgConfig {
-    let pgx = Pgx::from_config().expect("Unable to load pgx config");
-    pgx.get(&format!("pg{}", pg_sys::get_pg_major_version_num()))
-        .expect("not a valid postgres version")
-        .clone()
+fn get_pg_config() -> eyre::Result<PgConfig> {
+    let pgx = Pgx::from_config().wrap_err("Unable to get PGX from config")?;
+
+    let pg_version = pg_sys::get_pg_major_version_num();
+
+    let pg_config = pgx
+        .get(&format!("pg{}", pg_version))
+        .wrap_err_with(|| {
+            format!(
+                "Error getting pg_config: {} is not a valid postgres version",
+                pg_version
+            )
+        })
+        .unwrap()
+        .clone();
+
+    Ok(pg_config)
 }
 
-pub fn client() -> (postgres::Client, String) {
-    fn determine_session_id(client: &mut Client) -> String {
-        let result = client.query("SELECT to_hex(trunc(EXTRACT(EPOCH FROM backend_start))::integer) || '.' || to_hex(pid) AS sid FROM pg_stat_activity WHERE pid = pg_backend_pid();", &[]).expect("failed to determine session id");
+pub fn client() -> eyre::Result<(postgres::Client, String)> {
+    // fn determine_session_id(client: &mut Client) -> String {
+    //     let result = client.query("SELECT to_hex(trunc(EXTRACT(EPOCH FROM backend_start))::integer) || '.' || to_hex(pid) AS sid FROM pg_stat_activity WHERE pid = pg_backend_pid();", &[]).expect("failed to determine session id");
 
-        match result.get(0) {
-            Some(row) => row.get::<&str, &str>("sid").to_string(),
-            None => panic!("No session id returned from query"),
-        }
-    }
+    //     match result.get(0) {
+    //         Some(row) => row.get::<&str, &str>("sid").to_string(),
+    //         None => panic!("No session id returned from query"),
+    //     }
+    // }
 
-    let pg_config = get_pg_config();
+    // fn determine_session_id(client: &mut Client) -> String {
+    //     let result = client.query("SELECT to_hex(trunc(EXTRACT(EPOCH FROM backend_start))::integer) || '.' || to_hex(pid) AS sid FROM pg_stat_activity WHERE pid = pg_backend_pid();", &[]).expect("failed to determine session id");
+
+    //     match result.get(0) {
+    //         Some(row) => row.get::<&str, &str>("sid").to_string(),
+    //         None => panic!("No session id returned from query"),
+    //     }
+    // }
+
+    // query_wrapper_mut(
+    //     Some(format!("CREATE EXTENSION {} CASCADE;", &extension_name)),
+    //     None,
+    //     |query, _| client.simple_query(query.unwrap().as_str()),
+    // )
+    // .wrap_err(format!(
+    //     "There was an issue creating the extension '{}' in Postgres: ",
+    //     &extension_name
+    // ))?;
+
+    let pg_config = get_pg_config()?;
     let mut client = postgres::Config::new()
         .host(pg_config.host())
         .port(
@@ -216,20 +291,49 @@ pub fn client() -> (postgres::Client, String) {
         .connect(postgres::NoTls)
         .unwrap();
 
-    let session_id = determine_session_id(&mut client);
-    client
-        .simple_query("SET log_min_messages TO 'INFO';")
-        .expect("FAILED: SET log_min_messages TO 'INFO'");
+    let sid_query_result = query_wrapper(
+        Some("SELECT to_hex(trunc(EXTRACT(EPOCH FROM backend_start))::integer) || '.' || to_hex(pid) AS sid FROM pg_stat_activity WHERE pid = pg_backend_pid();".to_string()),
+        Some(&[]),
+        |query, query_params| client.query(&query.unwrap(), query_params.unwrap()),
+    )
+    .wrap_err("There was an issue attempting to get the session ID from Postgres")?;
 
-    client
-        .simple_query("SET log_min_duration_statement TO 1000;")
-        .expect("FAILED: SET log_min_duration_statement TO 1000");
+    let session_id = match sid_query_result.get(0) {
+        Some(row) => row.get::<&str, &str>("sid").to_string(),
+        None => Err(eyre!("Failed to obtain a client Session ID from Postgres"))?,
+    };
 
-    client
-        .simple_query("SET log_statement TO 'all';")
-        .expect("FAILED: SET log_statement TO 'all'");
+    // client
+    //     .simple_query("SET log_min_messages TO 'INFO';")
+    //     .expect("FAILED: SET log_min_messages TO 'INFO'");
+    query_wrapper(
+        Some("SET log_min_messages TO 'INFO';".to_string()),
+        None,
+        |query, _| client.simple_query(query.unwrap().as_str()),
+    )
+    .wrap_err("Postgres Client setup failed to SET log_min_messages TO 'INFO'")?;
 
-    (client, session_id)
+    // client
+    //     .simple_query("SET log_min_duration_statement TO 1000;")
+    //     .expect("FAILED: SET log_min_duration_statement TO 1000");
+    query_wrapper(
+        Some("SET log_min_duration_statement TO 1000;".to_string()),
+        None,
+        |query, _| client.simple_query(query.unwrap().as_str()),
+    )
+    .wrap_err("Postgres Client setup failed to SET log_min_duration_statement TO 1000;")?;
+
+    // client
+    //     .simple_query("SET log_statement TO 'all';")
+    //     .expect("FAILED: SET log_statement TO 'all'");
+    query_wrapper(
+        Some("SET log_statement TO 'all';".to_string()),
+        None,
+        |query, _| client.simple_query(query.unwrap().as_str()),
+    )
+    .wrap_err("Postgres Client setup failed to SET log_statement TO 'all';")?;
+
+    Ok((client, session_id))
 }
 
 fn install_extension() -> eyre::Result<()> {
@@ -256,7 +360,7 @@ fn install_extension() -> eyre::Result<()> {
         .arg("--pg-config")
         .arg(pg_config.path().ok_or(eyre!("No pg_config found"))?)
         .stdout(Stdio::inherit())
-        .stderr(Stdio::inherit())
+        .stderr(Stdio::piped())
         .env("CARGO_TARGET_DIR", get_target_dir()?);
 
     if let Ok(manifest_path) = std::env::var("PGX_MANIFEST_PATH") {
@@ -284,37 +388,79 @@ fn install_extension() -> eyre::Result<()> {
     if is_release {
         command.arg("--release");
     }
+
     if no_schema {
         command.arg("--no-schema");
     }
 
-    let mut child = command.spawn().unwrap();
-    let status = child.wait().unwrap();
-    if !status.success() {
-        return Err(eyre!("failed to install extension"));
+    let command_str = format!("{:?}", command);
+
+    let child = command.spawn().wrap_err_with(|| {
+        format!(
+            "Failed to spawn process for installing extension using command: '{}': ",
+            command_str
+        )
+    })?;
+
+    let output = child.wait_with_output().wrap_err_with(|| {
+        format!(
+            "Failed waiting for spawned process attempting to install extension using command: '{}': ",
+            command_str
+        )
+    })?;
+
+    if !output.status.success() {
+        return Err(eyre!(
+            "Failure installing extension using command: {}\n\n{}{}",
+            command_str,
+            String::from_utf8(output.stdout).unwrap(),
+            String::from_utf8(output.stderr).unwrap()
+        ));
     }
+
     Ok(())
 }
 
 fn initdb(postgresql_conf: Vec<&'static str>) -> eyre::Result<()> {
-    let pg_config = get_pg_config();
     let pgdata = get_pgdata_path()?;
 
     if !pgdata.is_dir() {
-        let status = Command::new(
+        let pg_config = get_pg_config()?;
+        let mut command = Command::new(
             pg_config
                 .initdb_path()
                 .wrap_err("unable to determine initdb path")?,
-        )
-        .arg("-D")
-        .arg(pgdata.to_str().unwrap())
-        .stdout(Stdio::inherit())
-        .stderr(Stdio::inherit())
-        .status()
-        .unwrap();
+        );
 
-        if !status.success() {
-            return Err(eyre!("initdb failed"));
+        command
+            .arg("-D")
+            .arg(pgdata.to_str().unwrap())
+            .stdout(Stdio::inherit())
+            .stderr(Stdio::inherit());
+
+        let command_str = format!("{:?}", command);
+
+        let child = command.spawn().wrap_err_with(|| {
+            format!(
+                "Failed to spawn process for initializing database using command: '{}': ",
+                command_str
+            )
+        })?;
+
+        let output = child.wait_with_output().wrap_err_with(|| {
+            format!(
+                "Failed waiting for spawned process attempting to initialize database using command: '{}': ",
+                command_str
+            )
+        })?;
+
+        if !output.status.success() {
+            return Err(eyre!(
+                "Failed to initialize database using command: {}\n\n{}{}",
+                command_str,
+                String::from_utf8(output.stdout).unwrap(),
+                String::from_utf8(output.stderr).unwrap()
+            ));
         }
     }
 
@@ -350,7 +496,7 @@ fn modify_postgresql_conf(pgdata: PathBuf, postgresql_conf: Vec<&'static str>) -
 }
 
 fn start_pg(loglines: LogLines) -> eyre::Result<String> {
-    let pg_config = get_pg_config();
+    let pg_config = get_pg_config()?;
     let mut command = Command::new(
         pg_config
             .postmaster_path()
@@ -379,8 +525,13 @@ fn start_pg(loglines: LogLines) -> eyre::Result<String> {
 
     // add a shutdown hook so we can terminate it when the test framework exits
     add_shutdown_hook(move || unsafe {
-        let message_string =
-            std::ffi::CString::new("Stopping Postgres\n\n".bold().blue().to_string()).unwrap();
+        let message_string = std::ffi::CString::new(
+            format!("Stopping Postgres PID {}\n\n", pgpid)
+                .bold()
+                .blue()
+                .to_string(),
+        )
+        .unwrap();
         libc::printf(message_string.as_ptr());
         libc::kill(pgpid as libc::pid_t, libc::SIGTERM);
     });
@@ -465,8 +616,8 @@ fn monitor_pg(mut command: Command, cmd_string: String, loglines: LogLines) -> (
     receiver.recv().expect("Postgres failed to start")
 }
 
-fn dropdb() {
-    let pg_config = get_pg_config();
+fn dropdb() -> eyre::Result<()> {
+    let pg_config = get_pg_config()?;
     let output = Command::new(
         pg_config
             .dropdb_path()
@@ -504,17 +655,25 @@ fn dropdb() {
             panic!("failed to drop test database");
         }
     }
+
+    Ok(())
 }
 
-fn create_extension() {
-    let (mut client, _) = client();
+fn create_extension() -> eyre::Result<()> {
+    let (mut client, _) = client()?;
+    let extension_name = get_extension_name();
 
-    client
-        .simple_query(&format!(
-            "CREATE EXTENSION {} CASCADE;",
-            get_extension_name()
-        ))
-        .unwrap();
+    query_wrapper(
+        Some(format!("CREATE EXTENSION {} CASCADE;", &extension_name)),
+        None,
+        |query, _| client.simple_query(query.unwrap().as_str()),
+    )
+    .wrap_err(format!(
+        "There was an issue creating the extension '{}' in Postgres: ",
+        &extension_name
+    ))?;
+
+    Ok(())
 }
 
 fn get_extension_name() -> String {
