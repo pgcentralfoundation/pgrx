@@ -41,7 +41,6 @@ pgx-pg-sys = { path = "../pgx-pg-sys", version = "=0.5.0-beta.0" }
 pgx-utils = { path = "../pgx-utils/", version = "=0.5.0-beta.0" }
 
 # used to internally impl things
-libc = "0.2.126" # FFI compat
 once_cell = "1.10.0" # polyfill until std::lazy::OnceCell stabilizes
 quote = "1.0.18" # necessary for pgx's SQL generation
 uuid = { version = "1.0.0", features = [ "v4" ] } # PgLwLock and shmem
@@ -58,6 +57,7 @@ bitflags = "1.3.2" # BackgroundWorker
 bitvec = "1.0" # processing array nullbitmaps
 cstr_core = "0.2.5" # no std compat
 heapless = "0.7.13" # shmem and PgLwLock
+libc = "0.2.126" # FFI type compat
 seahash = "4.1.0" # derive(PostgresHash)
 serde = { version = "1.0.137", features = [ "derive" ] } # impls on pub types
 serde_cbor = "0.11.2" # derive(PostgresType)
