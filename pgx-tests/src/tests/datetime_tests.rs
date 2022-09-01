@@ -526,22 +526,6 @@ mod tests {
     }
 
     #[pg_test]
-    fn test_try_from_months_days_usecs_err() {
-        let result = Interval::try_from_months_days_usecs(3, 30, 5_000_000);
-        match result {
-            Err(IntervalConversionError::FromDaysOutOfBounds) => (),
-            _ => panic!("invalid try_from_months_days_usecs conversion succeeded"),
-        };
-
-        let result =
-            Interval::try_from_months_days_usecs(3, 4, pg_sys::SECS_PER_DAY as i64 * 1_000_000i64);
-        match result {
-            Err(IntervalConversionError::FromUSecOutOfBounds) => (),
-            _ => panic!("invalid try_from_months_days_usecs conversion succeeded"),
-        };
-    }
-
-    #[pg_test]
     fn test_duration_to_interval_err() {
         // normal limit of i32::MAX months
         let duration = time::Duration::days(pg_sys::DAYS_PER_MONTH as i64 * i32::MAX as i64);

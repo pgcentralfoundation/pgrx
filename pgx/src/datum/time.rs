@@ -16,6 +16,7 @@ use time::format_description::FormatItem;
 pub(crate) const USECS_PER_HOUR: i64 = 3_600_000_000;
 pub(crate) const USECS_PER_MINUTE: i64 = 60_000_000;
 pub(crate) const USECS_PER_SEC: i64 = 1_000_000;
+#[allow(dead_code)]
 pub(crate) const USECS_PER_DAY: i64 = pg_sys::SECS_PER_DAY as i64 * USECS_PER_SEC;
 pub(crate) const MINS_PER_HOUR: i64 = 60;
 pub(crate) const SEC_PER_MIN: i64 = 60;

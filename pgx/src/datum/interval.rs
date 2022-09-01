@@ -9,7 +9,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 use std::ops::{Mul, Sub};
 
-use crate::{direct_function_call, pg_sys, FromDatum, IntoDatum, USECS_PER_DAY, USECS_PER_SEC};
+use crate::{direct_function_call, pg_sys, FromDatum, IntoDatum, USECS_PER_SEC};
 use pg_sys::{DAYS_PER_MONTH, SECS_PER_DAY};
 use time::Duration;
 
@@ -26,24 +26,14 @@ pub struct Interval(pg_sys::Interval);
 
 impl Interval {
     /// This function takes `months`/`days`/`usecs` as input to convert directly to the internal PG storage struct `pg_sys::Interval`
-    /// Normally in PG time representations would have made their way through `timestamp2tm(..)` which would normalize the units
-    /// to avoid rollovers of the smaller units.  Since this bypasses `timestamp2tm(..)` we must enforce that:
-    /// - `days` should not exceed one month (30 days)
-    /// - `usec` should not exceed 1 day
     /// - the sign of all units must be all matching in the positive or all matching in the negative direction
     pub fn try_from_months_days_usecs(
         months: i32,
-        days: i8,
+        days: i32,
         usecs: i64,
     ) -> Result<Self, IntervalConversionError> {
-        if days.abs() >= pg_sys::DAYS_PER_MONTH as i8 {
-            return Err(IntervalConversionError::FromDaysOutOfBounds);
-        }
-        if usecs.abs() >= USECS_PER_DAY {
-            return Err(IntervalConversionError::FromUSecOutOfBounds);
-        }
         Ok(Interval(pg_sys::Interval {
-            day: days as i32,
+            day: days,
             month: months,
             time: usecs,
         }))
@@ -54,12 +44,12 @@ impl Interval {
         self.0.month
     }
 
-    /// Total number of days before/after the `months` offset, not to exceed 1 month. (sign must match `months`)
+    /// Total number of days before/after the `months()` offset (sign must match `months`)
     pub fn days(&self) -> i32 {
         self.0.day
     }
 
-    /// Total number of usecs before/after the `days` offset, not to exceed 1 day. (sign must match `months`/`days`)
+    /// Total number of usecs before/after the `days()` offset (sign must match `months`/`days`)
     pub fn usecs(&self) -> i64 {
         self.0.time
     }
@@ -102,22 +92,20 @@ impl TryFrom<Duration> for Interval {
 
         if total_months >= (i32::MIN as i64) && total_months <= (i32::MAX as i64) {
             let mut month = 0;
-            let mut day = 0;
             let mut d = duration;
 
             if Duration::abs(d) >= MONTH_DURATION {
-                month = d.whole_days() as i32 / (DAYS_PER_MONTH as i32);
+                month = total_months as i32;
                 d = d.sub(MONTH_DURATION.mul(month));
-            }
-
-            if Duration::abs(d) >= Duration::DAY {
-                day = d.whole_days() as i32;
-                d = d.sub(Duration::DAY.mul(day));
             }
 
             let time = d.whole_microseconds() as i64;
 
-            Ok(Interval(pg_sys::Interval { day, month, time }))
+            Ok(Interval(pg_sys::Interval {
+                day: 0,
+                month,
+                time,
+            }))
         } else {
             Err(IntervalConversionError::DurationMonthsOutOfBounds)
         }
@@ -169,8 +157,4 @@ impl serde::Serialize for Interval {
 pub enum IntervalConversionError {
     #[error("duration's total month count outside of valid i32::MIN..=i32::MAX range")]
     DurationMonthsOutOfBounds,
-    #[error("try_from_months_days_usecs's days abs count must be < DAYS_PER_MONTH (30)")]
-    FromDaysOutOfBounds,
-    #[error("try_from_months_days_usecs's usec abs count must be < USECS_PER_DAY")]
-    FromUSecOutOfBounds,
 }
