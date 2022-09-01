@@ -36,6 +36,8 @@ pub enum SpiOk {
     RelRegister = 15,
     RelUnregister = 16,
     TdRegister = 17,
+    #[cfg(feature = "pg15")]
+    Merge = 18,
 }
 
 /// These match the Postgres `#define`d constants prefixed `SPI_ERROR_*` that you can find in `pg_sys`.
