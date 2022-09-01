@@ -25,8 +25,6 @@ Use of this source code is governed by the MIT license that can be found in the 
 #![allow(clippy::cast_ptr_alignment)]
 extern crate pgx_macros;
 
-extern crate num_traits;
-
 #[macro_use]
 extern crate bitflags;
 
