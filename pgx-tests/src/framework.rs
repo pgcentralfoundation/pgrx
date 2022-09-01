@@ -211,9 +211,7 @@ fn initialize_test_framework(
         // This used to immediately throw an std::process::exit(1), but it
         // would consume both stdout and stderr, resulting in error messages
         // not being displayed unless you were running tests with --nocapture.
-        panic!(
-            "Could not obtain test mutex. Please check for errors in pervious tests to find the root cause."
-        );
+        panic!("Could not obtain test mutex. A previous test may have hard-aborted while holding it.");
     });
 
     if !state.installed {
