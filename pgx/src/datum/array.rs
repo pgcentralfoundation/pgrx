@@ -131,13 +131,18 @@ impl<'a, T: FromDatum> Array<'a, T> {
         let mut nulls = ptr::null_mut();
         let mut nelems = 0;
 
-        // FIXME: This way of getting array buffers causes problems for any Drop impl,
-        // and clashes with assumptions of Array being a "zero-copy", lifetime-bound array,
-        // some of which are implicitly embedded in other methods (e.g. Array::over).
-        // It also risks leaking memory, as deconstruct_array calls palloc.
-        // So either we don't use this, we use it more conditionally, or something.
-        // SAFETY: We have already asserted the validity of the RawArray, so
-        // this only makes mistakes if we mix things up and pass Postgres the wrong data.
+        /*
+        FIXME(jubilee): This way of getting array buffers causes problems for any Drop impl,
+        and clashes with assumptions of Array being a "zero-copy", lifetime-bound array,
+        some of which are implicitly embedded in other methods (e.g. Array::over).
+        It also risks leaking memory, as deconstruct_array calls palloc.
+
+        TODO(0.6.0): Start implementing Drop again when we no longer have Array::over.
+        See tcdi/pgx#627 and #633 for why this is the preferred resolution to this.
+
+        SAFETY: We have already asserted the validity of the RawArray, so
+        this only makes mistakes if we mix things up and pass Postgres the wrong data.
+        */
         unsafe {
             pg_sys::deconstruct_array(
                 array,
@@ -166,7 +171,7 @@ impl<'a, T: FromDatum> Array<'a, T> {
             _ptr,
             raw: Some(raw),
             nelems,
-            elem_slice: unsafe { slice::from_raw_parts(elements, nelems) },
+            elem_slice: /* SAFETY: &[Datum] from palloc'd [Datum] */ unsafe { slice::from_raw_parts(elements, nelems) },
             null_slice,
             _marker: PhantomData,
         }

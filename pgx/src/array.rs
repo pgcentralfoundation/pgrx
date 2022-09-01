@@ -185,6 +185,8 @@ impl RawArray {
     /// May return null.
     #[inline]
     fn nulls_mut_ptr(&mut self) -> *mut u8 {
+        // SAFETY: This isn't public for a reason: it's a maybe-null *mut BitSlice, which is easy to misuse.
+        // Obtaining it, however, is perfectly safe.
         unsafe { pgx_ARR_NULLBITMAP(self.ptr.as_ptr()) }
     }
 
