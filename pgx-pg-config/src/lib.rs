@@ -455,9 +455,7 @@ pub fn createdb(
     let command_str = format!("{:?}", command);
 
     let child = command.spawn().wrap_err_with(|| {
-        format!(
-            "Failed to spawn process for creating database using command: '{command_str}': "
-        )
+        format!("Failed to spawn process for creating database using command: '{command_str}': ")
     })?;
 
     let output = child.wait_with_output().wrap_err_with(|| {
