@@ -76,28 +76,32 @@ where
     match result {
         Ok(result) => Ok(result),
         Err(e) => {
-            let e = e.as_db_error().unwrap();
-            Err(eyre!(
-                "Postgres query failed:
-Query: {},
-Query Params: {:?},
-Error Message: {}
-Code: {:?}
-Severity: {}
-Detail: {}
-Hint: {}
-Schema: {}
-Table: {}",
-                query.unwrap(),
-                query_params,
-                e.message(),
-                e.code(),
-                e.severity(),
-                e.detail().unwrap_or("None"),
-                e.hint().unwrap_or("None"),
-                e.schema().unwrap_or("None"),
-                e.table().unwrap_or("None"),
-            ))
+            let dberror = e.as_db_error().unwrap();
+            let query = query.unwrap();
+            let query_params = query_params.unwrap_or(&[]);
+            let query_message = dberror.message();
+
+            let mut message = format!(
+                "postgres query failed:\nquery: {query}\nquery params: {:?}\nmessage: {query_message}",
+                query_params
+            );
+
+            if let Ok(var) = std::env::var("RUST_BACKTRACE") {
+                if var.eq("1") {
+                    let code = dberror.code().code();
+                    let severity = dberror.severity();
+                    let detail = dberror.detail().unwrap_or("None");
+                    let hint = dberror.hint().unwrap_or("None");
+                    let schema = dberror.hint().unwrap_or("None");
+                    let table = dberror.table().unwrap_or("None");
+                    let more_info = format!(
+                        "\ncode: {code}\nseverity: {severity}\ndetail: {detail}\nhint: {hint}\nschema: {schema}\ntable: {table}"
+                    );
+                    message.push_str(more_info.as_str());
+                }
+            }
+
+            Err(eyre!(message))
         }
     }
 }
@@ -211,7 +215,9 @@ fn initialize_test_framework(
         // This used to immediately throw an std::process::exit(1), but it
         // would consume both stdout and stderr, resulting in error messages
         // not being displayed unless you were running tests with --nocapture.
-        panic!("Could not obtain test mutex. A previous test may have hard-aborted while holding it.");
+        panic!(
+            "Could not obtain test mutex. A previous test may have hard-aborted while holding it."
+        );
     });
 
     if !state.installed {
