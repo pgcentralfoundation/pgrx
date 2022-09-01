@@ -491,7 +491,7 @@ fn start_pg(loglines: LogLines) -> eyre::Result<String> {
     // add a shutdown hook so we can terminate it when the test framework exits
     add_shutdown_hook(move || unsafe {
         let message_string = std::ffi::CString::new(
-            format!("Stopping Postgres PID {}\n\n", pgpid)
+            format!("stopping postgres (pid={pgpid})\n")
                 .bold()
                 .blue()
                 .to_string(),
