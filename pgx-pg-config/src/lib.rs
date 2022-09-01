@@ -456,15 +456,13 @@ pub fn createdb(
 
     let child = command.spawn().wrap_err_with(|| {
         format!(
-            "Failed to spawn process for creating database using command: '{}': ",
-            command_str
+            "Failed to spawn process for creating database using command: '{command_str}': "
         )
     })?;
 
     let output = child.wait_with_output().wrap_err_with(|| {
         format!(
-            "Failed waiting for spawned process attempting to create database using command: '{}': ",
-            command_str
+            "failed waiting for spawned process to create database using command: '{command_str}': "
         )
     })?;
 
