@@ -8,6 +8,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use pgx::*;
+use serde::{Deserialize, Serialize};
 
 #[pg_extern]
 fn add_two_numbers(a: i32, b: i32) -> i32 {
@@ -131,6 +132,39 @@ fn fcinfo_not_named_no_arg(fcinfo: pg_sys::FunctionCallInfo) -> i32 {
     todo!()
 }
 
+#[derive(PostgresType, Serialize, Deserialize, Debug, PartialEq)]
+#[inoutfuncs]
+pub struct NullStrict {}
+
+impl InOutFuncs for NullStrict {
+    fn input(_input: &pgx::cstr_core::CStr) -> Self
+    where
+        Self: Sized,
+    {
+        NullStrict {}
+    }
+
+    fn output(&self, _buffer: &mut StringInfo) {}
+    // doesn't define a NULL_ERROR_MESSAGE
+}
+
+#[derive(PostgresType, Serialize, Deserialize, Debug, PartialEq)]
+#[inoutfuncs]
+pub struct NullError {}
+
+impl InOutFuncs for NullError {
+    fn input(_input: &pgx::cstr_core::CStr) -> Self
+    where
+        Self: Sized,
+    {
+        NullError {}
+    }
+
+    fn output(&self, _buffer: &mut StringInfo) {}
+
+    const NULL_ERROR_MESSAGE: Option<&'static str> = Some("An error message");
+}
+
 #[cfg(any(test, feature = "pg_test"))]
 #[pgx::pg_schema]
 mod tests {
@@ -138,6 +172,8 @@ mod tests {
     use crate as pgx_tests;
 
     use crate::tests::fcinfo_tests::same_name;
+    use crate::tests::fcinfo_tests::NullError;
+    use crate::tests::fcinfo_tests::NullStrict;
     use pgx::*;
 
     #[test]
@@ -302,5 +338,14 @@ mod tests {
     #[pg_test]
     fn test_same_name() {
         assert_eq!("test", same_name("test"));
+    }
+    #[pg_test]
+    fn test_null_strict_type() {
+        assert_eq!(None, Spi::get_one::<NullStrict>("SELECT null::NullStrict"));
+    }
+    #[pg_test]
+    #[should_panic(expected = "An error message")]
+    fn test_null_error_type() {
+        assert_eq!(None, Spi::get_one::<NullError>("SELECT null::NullError"));
     }
 }
