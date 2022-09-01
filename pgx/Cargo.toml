@@ -33,6 +33,8 @@ no-default-features = true
 rustc-args = ["--cfg", "docsrs"]
 
 [dependencies]
+bitflags = "1.3.2"
+bitvec = "1.0" # processing array nullbitmaps
 cstr_core = "0.2.5"
 enum-primitive-derive = "0.2.2"
 num-traits = "0.2.15"
@@ -49,7 +51,6 @@ atomic-traits = "0.3.0"
 heapless = "0.7.13"
 uuid = { version = "1.0.0", features = [ "v4" ] }
 once_cell = "1.10.0"
-bitflags = "1.3.2"
 eyre = "0.6.8"
 tracing = "0.1.34"
 tracing-error = "0.2.0"
