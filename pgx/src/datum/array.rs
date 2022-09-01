@@ -183,6 +183,15 @@ impl<'a, T: FromDatum> Array<'a, T> {
         ptr.unwrap_or(ptr::null())
     }
 
+    // # Panics
+    //
+    // Panics if it detects the slightest misalignment between types.
+    #[deprecated(
+        since = "0.5.0",
+        note = "it is virtually impossible to offer this function safely due to mismatches between Postgres and Rust\n\
+        even `unsafe fn as_slice(&self) -> &[T]` would not be sound for all `&[T]`\n
+        if you are sure your usage is sound, consider RawArray's functions"
+    )]
     pub fn as_slice(&self) -> &[T] {
         let sizeof_type = mem::size_of::<T>();
         let sizeof_datums = mem::size_of_val(self.elem_slice);
