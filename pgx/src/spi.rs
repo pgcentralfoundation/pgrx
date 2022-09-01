@@ -15,6 +15,7 @@ use std::fmt::Debug;
 use std::mem;
 use std::ops::{Index, IndexMut};
 
+/// These match the Postgres `#define`d constants prefixed `SPI_OK_*` that you can find in `pg_sys`.
 #[derive(Debug, PartialEq)]
 #[repr(i32)]
 pub enum SpiOk {
@@ -37,10 +38,12 @@ pub enum SpiOk {
     TdRegister = 17,
 }
 
+/// These match the Postgres `#define`d constants prefixed `SPI_ERROR_*` that you can find in `pg_sys`.
+/// It is hypothetically possible for a Postgres-defined status code to be `0`, AKA `NULL`, however,
+/// this should not usually occur in Rust code paths. If it does happen, please report such bugs to the pgx repo.
 #[derive(Debug, PartialEq)]
 #[repr(i32)]
 pub enum SpiError {
-    Null = 0,
     Connect = -1,
     Copy = -2,
     OpUnknown = -3,
@@ -68,7 +71,7 @@ impl TryFrom<libc::c_int> for SpiOk {
         // Cast to assure that we're obeying repr rules even on platforms where c_ints are not 4 bytes wide,
         // as we don't support any but we may wish to in the future.
         match code as i32 {
-            err @ -13..=0 => Err(Ok(
+            err @ -13..=-1 => Err(Ok(
                 // SAFETY: These values are described in SpiError, thus they are inbounds for transmute
                 unsafe { mem::transmute::<i32, SpiError>(err) },
             )),
