@@ -78,7 +78,7 @@ impl TryFrom<libc::c_int> for SpiOk {
                 // SAFETY: These values are described in SpiError, thus they are inbounds for transmute
                 unsafe { mem::transmute::<i32, SpiError>(err) },
             )),
-            ok @ 1..=17 => Ok(
+            ok @ 1..=18 => Ok(
                 //SAFETY: These values are described in SpiOk, thus they are inbounds for transmute
                 unsafe { mem::transmute::<i32, SpiOk>(ok) },
             ),
