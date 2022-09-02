@@ -7,7 +7,8 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use crate::{pg_sys, FromDatum, IntoDatum, PgMemoryContexts};
+use crate::{array::RawArray, pg_sys, FromDatum, IntoDatum, PgMemoryContexts};
+use bitvec::slice::BitSlice;
 use core::ptr::NonNull;
 use serde::Serializer;
 use std::marker::PhantomData;
@@ -17,11 +18,36 @@ pub type VariadicArray<'a, T> = Array<'a, T>;
 
 pub struct Array<'a, T: FromDatum> {
     _ptr: Option<NonNull<pg_sys::varlena>>,
-    array_type: Option<NonNull<pg_sys::ArrayType>>,
+    raw: Option<RawArray>,
     nelems: usize,
     elem_slice: &'a [pg_sys::Datum],
-    null_slice: &'a [bool],
+    null_slice: NullKind<'a>,
     _marker: PhantomData<T>,
+}
+
+// FIXME: When Array::over gets removed, this enum can probably be dropped
+// since we won't be entertaining ArrayTypes which don't use bitslices anymore.
+// However, we could also use a static resolution? Hard to say what's best.
+enum NullKind<'a> {
+    Bits(&'a BitSlice<u8>),
+    Bytes(&'a [bool]),
+    Strict(usize),
+}
+
+impl<'a> From<&'a [bool]> for NullKind<'a> {
+    fn from(b8: &'a [bool]) -> NullKind<'a> {
+        NullKind::Bytes(b8)
+    }
+}
+
+impl NullKind<'_> {
+    fn get(&self, index: usize) -> Option<bool> {
+        match self {
+            Self::Bits(b1) => b1.get(index).map(|b| !b),
+            Self::Bytes(b8) => b8.get(index).map(|b| *b),
+            Self::Strict(len) => index.le(len).then(|| false),
+        }
+    }
 }
 
 impl<'a, T: FromDatum + serde::Serialize> serde::Serialize for Array<'a, T> {
@@ -42,6 +68,7 @@ impl<'a, T: FromDatum + serde::Serialize> serde::Serialize for ArrayTypedIterato
     }
 }
 
+#[deny(unsafe_op_in_unsafe_fn)]
 impl<'a, T: FromDatum> Array<'a, T> {
     /// Create an [`Array`](crate::datum::Array) over an array of [`pg_sys::Datum`](pg_sys::Datum) values and a corresponding array
     /// of "is_null" indicators
@@ -73,48 +100,87 @@ impl<'a, T: FromDatum> Array<'a, T> {
         // Remember to remove the Array::over tests in pgx-tests/src/tests/array_tests.rs
         // when you finally kill this off.
         let _ptr: Option<NonNull<pg_sys::varlena>> = None;
-        let array_type: Option<NonNull<pg_sys::ArrayType>> = None;
+        let raw: Option<RawArray> = None;
         Array::<T> {
             _ptr,
-            array_type,
+            raw,
             nelems,
-            elem_slice: slice::from_raw_parts(elements, nelems),
-            null_slice: slice::from_raw_parts(nulls, nelems),
+            elem_slice: unsafe { slice::from_raw_parts(elements, nelems) },
+            null_slice: unsafe { slice::from_raw_parts(nulls, nelems) }.into(),
             _marker: PhantomData,
         }
     }
 
     /// # Safety
     ///
-    /// This function requires that:
-    /// - `elements` is non-null
-    /// - `nulls` is non-null
-    /// - both `elements` and `nulls` point to a slice of equal-or-greater length than `nelems`
-    unsafe fn from_pg(
+    /// This function requires that the RawArray was obtained in a properly-constructed form
+    /// (probably from Postgres).
+    unsafe fn deconstruct_from(
         _ptr: Option<NonNull<pg_sys::varlena>>,
-        array_type: Option<NonNull<pg_sys::ArrayType>>,
-        elements: *mut pg_sys::Datum,
-        nulls: *mut bool,
-        nelems: usize,
-    ) -> Self {
-        Array::<T> {
+        raw: RawArray,
+        typlen: libc::c_int,
+        typbyval: bool,
+        typalign: libc::c_char,
+    ) -> Array<'a, T> {
+        let oid = raw.oid();
+        let len = raw.len();
+        let array = raw.into_ptr().as_ptr();
+
+        // outvals for deconstruct_array
+        let mut elements = ptr::null_mut();
+        let mut nulls = ptr::null_mut();
+        let mut nelems = 0;
+
+        /*
+        FIXME(jubilee): This way of getting array buffers causes problems for any Drop impl,
+        and clashes with assumptions of Array being a "zero-copy", lifetime-bound array,
+        some of which are implicitly embedded in other methods (e.g. Array::over).
+        It also risks leaking memory, as deconstruct_array calls palloc.
+
+        TODO(0.6.0): Start implementing Drop again when we no longer have Array::over.
+        See tcdi/pgx#627 and #633 for why this is the preferred resolution to this.
+
+        SAFETY: We have already asserted the validity of the RawArray, so
+        this only makes mistakes if we mix things up and pass Postgres the wrong data.
+        */
+        unsafe {
+            pg_sys::deconstruct_array(
+                array,
+                oid,
+                typlen,
+                typbyval,
+                typalign,
+                &mut elements,
+                &mut nulls,
+                &mut nelems,
+            )
+        };
+
+        let nelems = nelems as usize;
+
+        // Check our RawArray len impl for correctness.
+        assert_eq!(nelems, len);
+        let mut raw = unsafe { RawArray::from_ptr(NonNull::new_unchecked(array)) };
+
+        let null_slice = raw
+            .nulls_bitslice()
+            .map(|nonnull| NullKind::Bits(unsafe { &*nonnull.as_ptr() }))
+            .unwrap_or(NullKind::Strict(nelems));
+
+        Array {
             _ptr,
-            array_type,
+            raw: Some(raw),
             nelems,
-            elem_slice: slice::from_raw_parts(elements, nelems),
-            null_slice: slice::from_raw_parts(nulls, nelems),
+            elem_slice: /* SAFETY: &[Datum] from palloc'd [Datum] */ unsafe { slice::from_raw_parts(elements, nelems) },
+            null_slice,
             _marker: PhantomData,
         }
     }
 
-    pub fn into_array_type(self) -> *const pg_sys::ArrayType {
-        let ptr = if let Some(at) = self.array_type {
-            at.as_ptr()
-        } else {
-            ptr::null()
-        };
+    pub fn into_array_type(mut self) -> *const pg_sys::ArrayType {
+        let ptr = mem::take(&mut self.raw).map(|raw| raw.into_ptr().as_ptr() as _);
         mem::forget(self);
-        ptr
+        ptr.unwrap_or(ptr::null())
     }
 
     pub fn as_slice(&self) -> &[T] {
@@ -140,8 +206,9 @@ impl<'a, T: FromDatum> Array<'a, T> {
     ///
     /// This function will panic when called if the array contains any SQL NULL values.
     pub fn iter_deny_null(&self) -> ArrayTypedIterator<'_, T> {
-        if let Some(at) = self.array_type {
-            if unsafe { pg_sys::array_contains_nulls(at.as_ptr()) } {
+        if let Some(at) = &self.raw {
+            // SAFETY: if Some, then the ArrayType is from Postgres
+            if unsafe { at.any_nulls() } {
                 panic!("array contains NULL");
             }
         } else {
@@ -170,7 +237,7 @@ impl<'a, T: FromDatum> Array<'a, T> {
         if i >= self.nelems {
             None
         } else {
-            Some(unsafe { T::from_datum(self.elem_slice[i], self.null_slice[i]) })
+            Some(unsafe { T::from_datum(self.elem_slice[i], self.null_slice.get(i)?) })
         }
     }
 }
@@ -274,47 +341,21 @@ impl<'a, T: FromDatum> FromDatum for Array<'a, T> {
         } else {
             let ptr = datum.ptr_cast();
             let array = pg_sys::pg_detoast_datum(datum.ptr_cast()) as *mut pg_sys::ArrayType;
-            let array_ref = array.as_ref().expect("ArrayType * was NULL");
+            let raw =
+                RawArray::from_ptr(NonNull::new(array).expect("detoast returned null ArrayType*"));
+            let ptr = NonNull::new(ptr);
 
             // outvals for get_typlenbyvalalign()
             let mut typlen = 0;
             let mut typbyval = false;
             let mut typalign = 0;
+            let oid = raw.oid();
 
-            pg_sys::get_typlenbyvalalign(
-                array_ref.elemtype,
-                &mut typlen,
-                &mut typbyval,
-                &mut typalign,
-            );
+            pg_sys::get_typlenbyvalalign(oid, &mut typlen, &mut typbyval, &mut typalign);
+            let typlen = typlen as _;
 
-            // outvals for deconstruct_array()
-            let mut elements = ptr::null_mut();
-            let mut nulls = ptr::null_mut();
-            let mut nelems = 0;
-
-            // FIXME: This way of getting array buffers causes problems for any Drop impl,
-            // and clashes with assumptions of Array being a "zero-copy", lifetime-bound array,
-            // some of which are implicitly embedded in other methods (e.g. Array::over).
-            // It also risks leaking memory, as deconstruct_array calls palloc.
-            // So either we don't use this, we use it more conditionally, or something.
-            pg_sys::deconstruct_array(
-                array,
-                array_ref.elemtype,
-                typlen as i32,
-                typbyval,
-                typalign,
-                &mut elements,
-                &mut nulls,
-                &mut nelems,
-            );
-
-            Some(Array::from_pg(
-                NonNull::new(ptr),
-                NonNull::new(array),
-                elements,
-                nulls,
-                nelems as usize,
+            Some(Array::deconstruct_from(
+                ptr, raw, typlen, typbyval, typalign,
             ))
         }
     }

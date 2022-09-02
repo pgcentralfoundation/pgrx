@@ -1,8 +1,11 @@
 use crate::datum::{Array, FromDatum};
-use crate::pg_sys;
+use crate::pg_sys::{self, bits8, ArrayType};
+use bitvec::{
+    prelude::*,
+    ptr::{bitslice_from_raw_parts_mut, BitPtr, BitPtrError, Mut},
+};
 use core::ptr::{slice_from_raw_parts_mut, NonNull};
 use core::slice;
-use pgx_pg_sys::*;
 
 extern "C" {
     /// # Safety
@@ -99,12 +102,14 @@ impl RawArray {
     }
 
     /// Returns the inner raw pointer to the ArrayType.
-    pub fn into_raw(self) -> NonNull<ArrayType> {
+    #[inline]
+    pub fn into_ptr(self) -> NonNull<ArrayType> {
         self.ptr
     }
 
     /// Get the number of dimensions.
     /// Will be in 0..=[pg_sys::MAXDIM].
+    #[inline]
     fn ndim(&self) -> libc::c_int {
         // SAFETY: Validity asserted on construction.
         unsafe {
@@ -145,6 +150,7 @@ impl RawArray {
 
     /// The flattened length of the array over every single element.
     /// Includes all items, even the ones that might be null.
+    #[inline]
     pub fn len(&self) -> usize {
         self.len
     }
@@ -157,6 +163,7 @@ impl RawArray {
 
     /// Gets the offset to the ArrayType's data.
     /// Should not be "taken literally".
+    #[inline]
     fn data_offset(&self) -> i32 {
         // SAFETY: Validity asserted on construction.
         unsafe { (*self.ptr.as_ptr()).dataoffset }
@@ -175,6 +182,23 @@ impl RawArray {
         self.data_offset() != 0
     }
 
+    /// May return null.
+    #[inline]
+    fn nulls_mut_ptr(&mut self) -> *mut u8 {
+        // SAFETY: This isn't public for a reason: it's a maybe-null *mut BitSlice, which is easy to misuse.
+        // Obtaining it, however, is perfectly safe.
+        unsafe { pgx_ARR_NULLBITMAP(self.ptr.as_ptr()) }
+    }
+
+    #[inline]
+    fn nulls_bitptr(&mut self) -> Option<BitPtr<Mut, u8>> {
+        match BitPtr::try_from(self.nulls_mut_ptr()) {
+            Ok(ptr) => Some(ptr),
+            Err(BitPtrError::Null(_)) => None,
+            Err(BitPtrError::Misaligned(_)) => unreachable!("impossible to misalign *mut u8"),
+        }
+    }
+
     /**
     Oxidized form of [ARR_NULLBITMAP(ArrayType*)][ARR_NULLBITMAP]
 
@@ -189,7 +213,7 @@ impl RawArray {
 
     [ARR_NULLBITMAP]: <https://git.postgresql.org/gitweb/?p=postgresql.git;a=blob;f=src/include/utils/array.h;h=4ae6c3be2f8b57afa38c19af2779f67c782e4efc;hb=278273ccbad27a8834dfdf11895da9cd91de4114#l293>
     */
-    pub fn nulls(&self) -> Option<NonNull<[u8]>> {
+    pub fn nulls(&mut self) -> Option<NonNull<[u8]>> {
         let len = self.len + 7 >> 3; // Obtains 0 if len was 0.
 
         /*
@@ -199,9 +223,43 @@ impl RawArray {
         This is because, while the initial pointer is NonNull,
         ARR_NULLBITMAP can return a nullptr!
         */
-        NonNull::new(unsafe {
-            slice_from_raw_parts_mut(pgx_ARR_NULLBITMAP(self.ptr.as_ptr()), len)
-        })
+        NonNull::new(slice_from_raw_parts_mut(self.nulls_mut_ptr(), len))
+    }
+
+    /**
+    The [bitvec] equivalent of [RawArray::nulls].
+    If this returns `None`, the array cannot have nulls.
+    If this returns `Some`, it points to the bitslice that marks nulls in this array.
+
+    Note that unlike the `is_null: bool` that appears elsewhere, here a 0 bit is null.
+    Unlike [RawArray::nulls], this slice is bit-exact in length, so there are no caveats for safely-used BitSlices.
+
+    [bitvec]: https://docs.rs/bitvec/latest
+    [BitPtrError::Null]: <https://docs.rs/bitvec/latest/bitvec/ptr/enum.BitPtrError.html>
+    [ARR_NULLBITMAP]: <https://git.postgresql.org/gitweb/?p=postgresql.git;a=blob;f=src/include/utils/array.h;h=4ae6c3be2f8b57afa38c19af2779f67c782e4efc;hb=278273ccbad27a8834dfdf11895da9cd91de4114#l293>
+    */
+    pub fn nulls_bitslice(&mut self) -> Option<NonNull<BitSlice<u8>>> {
+        /*
+        SAFETY: This obtains the nulls pointer, which is valid to obtain because
+        the len was asserted on construction. However, unlike the other cases,
+        it isn't correct to trust it. Instead, this gets null-checked.
+        This is because, while the initial pointer is NonNull,
+        ARR_NULLBITMAP can return a nullptr!
+        */
+
+        NonNull::new(bitslice_from_raw_parts_mut(self.nulls_bitptr()?, self.len))
+    }
+
+    /**
+    Checks the array for any NULL values by assuming it is a proper varlena array,
+
+    # Safety
+
+    * This requires every index is valid to read or correctly marked as null.
+    */
+    pub unsafe fn any_nulls(&self) -> bool {
+        // SAFETY: Caller asserted safety conditions.
+        unsafe { pg_sys::array_contains_nulls(self.ptr.as_ptr()) }
     }
 
     /**

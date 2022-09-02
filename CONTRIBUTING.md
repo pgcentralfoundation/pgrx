@@ -29,6 +29,34 @@ cargo pgx init # This might take a while. Consider getting a drink.
 - Diffs in Cargo.lock should be checked in
 - HOWEVER, diffs in the bindgen in `pgx-pg-sys/src/pg*.rs` should **not** be checked in (this is a release task)
 
+### Adding Dependencies
+
+If a new crate dependency is required for a pull request, and it can't or should not be marked optional and behind some kind of feature flag, then it should have its reason for being used stated in the Cargo.toml it is added to. This can be "as a member of a category", in the case of e.g. error handling:
+
+```toml
+# error handling and logging
+eyre = "0.6.8"
+thiserror = "1.0"
+tracing = "0.1.34"
+tracing-error = "0.2.0"
+```
+
+It can be as notes for the individual dependencies:
+```toml
+once_cell = "1.10.0" # polyfill until std::lazy::OnceCell stabilizes
+```
+
+Or it can be both:
+
+```toml
+# exposed in public API
+atomic-traits = "0.3.0" # PgAtomic and shmem init
+bitflags = "1.3.2" # BackgroundWorker
+bitvec = "1.0" # processing array nullbitmaps
+```
+
+You do not need exceptional justification notes in your PR to justify a new dependency as your code will, in most cases, self-evidently justify the use of the dependency. PGX uses the normal Rust approach of using dependencies based on their ability to improve correctness and make features possible. It does not reimplement things already available in the Rust ecosystem unless the addition is trivial (do not add custom derives to save 5~10 lines of code in one site) or the ecosystem crates are not compatible with Postgres (unfortunately common for Postgres data types).
+
 ## Releases
 
 On a new PGX release, *develop* will be merged to *master* via merge commit.
