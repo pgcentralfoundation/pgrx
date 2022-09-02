@@ -18,6 +18,7 @@ use std::ops::{Index, IndexMut};
 /// These match the Postgres `#define`d constants prefixed `SPI_OK_*` that you can find in `pg_sys`.
 #[derive(Debug, PartialEq)]
 #[repr(i32)]
+#[non_exhaustive]
 pub enum SpiOk {
     Connect = 1,
     Finish = 2,
@@ -36,7 +37,7 @@ pub enum SpiOk {
     RelRegister = 15,
     RelUnregister = 16,
     TdRegister = 17,
-    #[cfg(feature = "pg15")]
+    /// Added in Postgres 15
     Merge = 18,
 }
 
