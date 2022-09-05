@@ -7,7 +7,7 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use crate::{array::RawArray, pg_sys, FromDatum, IntoDatum, PgMemoryContexts};
+use crate::{array::RawArray, layout::*, pg_sys, FromDatum, IntoDatum, PgMemoryContexts};
 use bitvec::slice::BitSlice;
 use core::ptr::NonNull;
 use serde::Serializer;
@@ -22,6 +22,7 @@ pub struct Array<'a, T: FromDatum> {
     nelems: usize,
     elem_slice: &'a [pg_sys::Datum],
     null_slice: NullKind<'a>,
+    elem_layout: Option<Layout>,
     _marker: PhantomData<T>,
 }
 
@@ -101,12 +102,14 @@ impl<'a, T: FromDatum> Array<'a, T> {
         // when you finally kill this off.
         let _ptr: Option<NonNull<pg_sys::varlena>> = None;
         let raw: Option<RawArray> = None;
+        let elem_layout: Option<Layout> = None;
         Array::<T> {
             _ptr,
             raw,
             nelems,
             elem_slice: unsafe { slice::from_raw_parts(elements, nelems) },
             null_slice: unsafe { slice::from_raw_parts(nulls, nelems) }.into(),
+            elem_layout,
             _marker: PhantomData,
         }
     }
@@ -118,9 +121,7 @@ impl<'a, T: FromDatum> Array<'a, T> {
     unsafe fn deconstruct_from(
         _ptr: Option<NonNull<pg_sys::varlena>>,
         raw: RawArray,
-        typlen: libc::c_int,
-        typbyval: bool,
-        typalign: libc::c_char,
+        layout: Layout,
     ) -> Array<'a, T> {
         let oid = raw.oid();
         let len = raw.len();
@@ -147,9 +148,9 @@ impl<'a, T: FromDatum> Array<'a, T> {
             pg_sys::deconstruct_array(
                 array,
                 oid,
-                typlen,
-                typbyval,
-                typalign,
+                layout.size.as_typlen().into(),
+                layout.passbyval,
+                layout.align.as_typalign(),
                 &mut elements,
                 &mut nulls,
                 &mut nelems,
@@ -173,6 +174,7 @@ impl<'a, T: FromDatum> Array<'a, T> {
             nelems,
             elem_slice: /* SAFETY: &[Datum] from palloc'd [Datum] */ unsafe { slice::from_raw_parts(elements, nelems) },
             null_slice,
+            elem_layout: Some(layout),
             _marker: PhantomData,
         }
     }
@@ -353,19 +355,10 @@ impl<'a, T: FromDatum> FromDatum for Array<'a, T> {
             let raw =
                 RawArray::from_ptr(NonNull::new(array).expect("detoast returned null ArrayType*"));
             let ptr = NonNull::new(ptr);
-
-            // outvals for get_typlenbyvalalign()
-            let mut typlen = 0;
-            let mut typbyval = false;
-            let mut typalign = 0;
             let oid = raw.oid();
+            let layout = Layout::lookup_oid(oid);
 
-            pg_sys::get_typlenbyvalalign(oid, &mut typlen, &mut typbyval, &mut typalign);
-            let typlen = typlen as _;
-
-            Some(Array::deconstruct_from(
-                ptr, raw, typlen, typbyval, typalign,
-            ))
+            Some(Array::deconstruct_from(ptr, raw, layout))
         }
     }
 }
