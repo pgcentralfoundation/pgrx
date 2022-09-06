@@ -190,18 +190,31 @@ impl<'a, T: FromDatum> Array<'a, T> {
     // Panics if it detects the slightest misalignment between types.
     #[deprecated(
         since = "0.5.0",
-        note = "it is virtually impossible to offer this function safely due to mismatches between Postgres and Rust\n\
-        even `unsafe fn as_slice(&self) -> &[T]` would not be sound for all `&[T]`\n
-        if you are sure your usage is sound, consider RawArray's functions"
+        note = "this function cannot be safe and is not generically sound\n\
+        even `unsafe fn as_slice(&self) -> &[T]` is not sound for all `&[T]`\n\
+        if you are sure your usage is sound, consider RawArray"
     )]
     pub fn as_slice(&self) -> &[T] {
-        let sizeof_type = mem::size_of::<T>();
-        let sizeof_datums = mem::size_of_val(self.elem_slice);
-        unsafe {
-            slice::from_raw_parts(
-                self.elem_slice.as_ptr() as *const T,
-                sizeof_datums / sizeof_type,
-            )
+        if let Some(Layout {
+            size, passbyval, ..
+        }) = &self.elem_layout
+        {
+            const DATUM_SIZE: usize = mem::size_of::<pg_sys::Datum>();
+            let sizeof_type = match (passbyval, mem::size_of::<T>(), size.try_as_usize()) {
+                (true, rs @ (1 | 2 | 4 | 8), Some(pg @ (1 | 2 | 4 | 8))) if rs == pg => rs,
+                (true, _, _) => panic!("invalid sizes for pass-by-value datum"),
+                (false, DATUM_SIZE, _) => DATUM_SIZE,
+                (false, _, _) => panic!("invalid sizes for pass-by-reference datum"),
+            };
+            let sizeof_datums = mem::size_of_val(self.elem_slice);
+            unsafe {
+                slice::from_raw_parts(
+                    self.elem_slice.as_ptr() as *const T,
+                    sizeof_datums / sizeof_type,
+                )
+            }
+        } else {
+            panic!("not enough type information to slice correctly")
         }
     }
 
