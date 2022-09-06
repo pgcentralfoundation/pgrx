@@ -33,9 +33,6 @@ no-default-features = true
 rustc-args = ["--cfg", "docsrs"]
 
 [dependencies]
-enum-primitive-derive = "0.2.2"
-num-traits = "0.2.15"
-
 pgx-macros = { path = "../pgx-macros/", version = "=0.5.0-beta.0" }
 pgx-pg-sys = { path = "../pgx-pg-sys", version = "=0.5.0-beta.0" }
 pgx-utils = { path = "../pgx-utils/", version = "=0.5.0-beta.0" }
