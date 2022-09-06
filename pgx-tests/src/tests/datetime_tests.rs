@@ -9,7 +9,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 use pgx::*;
 use std::convert::TryFrom;
-use time::UtcOffset;
+use time::{OffsetDateTime, PrimitiveDateTime, UtcOffset};
 
 #[pg_extern]
 fn accept_date(d: Date) -> Date {
@@ -45,18 +45,42 @@ fn accept_timestamp_with_time_zone(t: TimestampWithTimeZone) -> TimestampWithTim
 }
 
 #[pg_extern]
+fn accept_timestamp_with_time_zone_offset_round_trip(
+    t: TimestampWithTimeZone,
+) -> Option<TimestampWithTimeZone> {
+    match TryInto::<OffsetDateTime>::try_into(t) {
+        Ok(offset) => Some(offset.try_into().unwrap()),
+        Err(_) => None,
+    }
+}
+
+#[pg_extern]
+fn accept_timestamp_with_time_zone_datetime_round_trip(
+    t: TimestampWithTimeZone,
+) -> Option<TimestampWithTimeZone> {
+    match TryInto::<PrimitiveDateTime>::try_into(t) {
+        Ok(datetime) => Some(datetime.try_into().unwrap()),
+        Err(_) => None,
+    }
+}
+
+#[pg_extern]
 fn return_3pm_mountain_time() -> TimestampWithTimeZone {
-    let three_pm = TimestampWithTimeZone::new(
-        time::PrimitiveDateTime::new(
-            time::Date::from_calendar_date(2020, time::Month::try_from(2).unwrap(), 19).unwrap(),
-            time::Time::from_hms(15, 0, 0).unwrap(),
-        ),
-        UtcOffset::from_hms(-7, 0, 0).unwrap(),
-    );
+    let datetime = PrimitiveDateTime::new(
+        time::Date::from_calendar_date(2020, time::Month::try_from(2).unwrap(), 19).unwrap(),
+        time::Time::from_hms(15, 0, 0).unwrap(),
+    )
+    .assume_offset(UtcOffset::from_hms(-7, 0, 0).unwrap());
 
-    assert_eq!(7, three_pm.offset().whole_hours());
+    let three_pm: TimestampWithTimeZone = datetime.try_into().unwrap();
 
-    three_pm
+    // this conversion will revert to UTC
+    let offset: time::OffsetDateTime = three_pm.try_into().unwrap();
+
+    // 3PM mountain time is 10PM UTC
+    assert_eq!(22, offset.hour());
+
+    datetime.try_into().unwrap()
 }
 
 #[pg_extern]
@@ -100,8 +124,6 @@ mod date_epoch_tests {
 mod serialization_tests {
     use pgx::*;
     use serde_json::*;
-    use std::convert::TryFrom;
-    use time::{PrimitiveDateTime, UtcOffset};
 
     #[test]
     fn test_time_with_timezone_serialization() {
@@ -117,42 +139,6 @@ mod serialization_tests {
         // b/c we always want our times output in UTC
         assert_eq!(json!({"time W/ Zone test":"10:23:34-00"}), json);
     }
-
-    #[test]
-    fn test_timestamp_serialization() {
-        let time_stamp = Timestamp::new(PrimitiveDateTime::new(
-            time::Date::from_calendar_date(2020, time::Month::try_from(1).unwrap(), 1).unwrap(),
-            time::Time::from_hms(12, 34, 54).unwrap(),
-        ));
-        let json = json!({ "time stamp test": time_stamp });
-
-        assert_eq!(json!({"time stamp test":"2020-01-01T12:34:54-00"}), json);
-    }
-    #[test]
-    fn test_timestamp_with_timezone_serialization() {
-        let time_stamp_with_timezone = TimestampWithTimeZone::new(
-            PrimitiveDateTime::new(
-                time::Date::from_calendar_date(2022, time::Month::try_from(2).unwrap(), 2).unwrap(),
-                time::Time::from_hms(16, 57, 11).unwrap(),
-            ),
-            UtcOffset::parse(
-                "+0200",
-                &time::format_description::parse("[offset_hour][offset_minute]").unwrap(),
-            )
-            .unwrap(),
-        );
-
-        let json = json!({ "time stamp with timezone test": time_stamp_with_timezone });
-
-        // b/c we shift back to UTC during construction in ::new()
-        assert_eq!(14, time_stamp_with_timezone.hour());
-
-        // but we serialize timestamps at UTC
-        assert_eq!(
-            json!({"time stamp with timezone test":"2022-02-02T14:57:11-00"}),
-            json
-        );
-    }
 }
 
 #[cfg(any(test, feature = "pg_test"))]
@@ -164,6 +150,8 @@ mod tests {
     use pgx::*;
     use serde_json::*;
     use std::time::Duration;
+    use time;
+    use time::PrimitiveDateTime;
 
     #[pg_test]
     fn test_date_serialization() {
@@ -328,7 +316,9 @@ mod tests {
         let result = Spi::get_one::<TimestampWithTimeZone>("SELECT return_3pm_mountain_time();")
             .expect("failed to get SPI result");
 
-        assert_eq!(22, result.hour());
+        let offset: time::OffsetDateTime = result.try_into().unwrap();
+
+        assert_eq!(22, offset.hour());
     }
 
     #[pg_test]
@@ -338,15 +328,17 @@ mod tests {
         )
         .expect("failed to get SPI result");
 
-        assert_eq!(ts.hour(), 21);
+        let datetime: time::PrimitiveDateTime = ts.try_into().unwrap();
+
+        assert_eq!(datetime.hour(), 21);
     }
 
     #[pg_test]
     fn test_is_timestamp_utc() {
         let ts = Spi::get_one::<Timestamp>("SELECT '2020-02-18 14:08'::timestamp")
             .expect("failed to get SPI result");
-
-        assert_eq!(ts.hour(), 14);
+        let datetime: time::PrimitiveDateTime = ts.try_into().unwrap();
+        assert_eq!(datetime.hour(), 14);
     }
 
     #[pg_test]
@@ -357,5 +349,111 @@ mod tests {
         .expect("failed to get SPI result");
 
         assert_eq!(result, Duration::from_secs(60).as_micros() as i64);
+    }
+
+    #[pg_test]
+    fn test_accept_timestamp_with_time_zone_offset_round_trip() {
+        let result = Spi::get_one::<bool>(
+            "SELECT accept_timestamp_with_time_zone_offset_round_trip(now()) = now()",
+        )
+        .expect("failed to get SPI result");
+
+        assert!(result);
+    }
+
+    #[pg_test]
+    fn test_accept_timestamp_with_time_zone_datetime_round_trip() {
+        let result = Spi::get_one::<bool>(
+            "SELECT accept_timestamp_with_time_zone_datetime_round_trip(now()) = now()",
+        )
+        .expect("failed to get SPI result");
+
+        assert!(result);
+    }
+
+    #[pg_test]
+    fn test_timestamp_with_timezone_serialization() {
+        let time_stamp_with_timezone: TimestampWithTimeZone = PrimitiveDateTime::new(
+            time::Date::from_calendar_date(2022, time::Month::try_from(2).unwrap(), 2).unwrap(),
+            time::Time::from_hms(16, 57, 11).unwrap(),
+        )
+        .assume_offset(
+            time::UtcOffset::parse(
+                "+0200",
+                &time::format_description::parse("[offset_hour][offset_minute]").unwrap(),
+            )
+            .unwrap(),
+        )
+        .try_into()
+        .unwrap();
+
+        // prevents PG's timestamp serialization from imposing the local servers time zone
+        Spi::run("SET TIME ZONE 'UTC'");
+        let json = json!({ "time stamp with timezone test": time_stamp_with_timezone });
+
+        // but we serialize timestamps at UTC
+        assert_eq!(
+            json!({"time stamp with timezone test":"2022-02-02T14:57:11+00:00"}),
+            json
+        );
+    }
+
+    #[pg_test]
+    fn test_timestamp_serialization() {
+        // prevents PG's timestamp serialization from imposing the local servers time zone
+        Spi::run("SET TIME ZONE 'UTC'");
+
+        let datetime = PrimitiveDateTime::new(
+            time::Date::from_calendar_date(2020, time::Month::try_from(1).unwrap(), 1).unwrap(),
+            time::Time::from_hms(12, 34, 54).unwrap(),
+        );
+        let ts: Timestamp = datetime.try_into().unwrap();
+        let json = json!({ "time stamp test": ts });
+
+        assert_eq!(json!({"time stamp test":"2020-01-01T12:34:54"}), json);
+    }
+
+    #[pg_test]
+    fn test_timestamp_with_timezone_infinity() {
+        let result =
+            Spi::get_one::<bool>("SELECT accept_timestamp_with_time_zone('-infinity') = TIMESTAMP WITH TIME ZONE '-infinity';")
+                .expect("failed to get SPI result");
+        assert!(result);
+
+        let result =
+            Spi::get_one::<bool>("SELECT accept_timestamp_with_time_zone('infinity') = TIMESTAMP WITH TIME ZONE 'infinity';")
+                .expect("failed to get SPI result");
+        assert!(result);
+
+        let tstz =
+            Spi::get_one::<TimestampWithTimeZone>("SELECT TIMESTAMP WITH TIME ZONE'infinity'")
+                .expect("failed to get SPI result");
+        assert!(tstz.is_infinity());
+
+        let tstz =
+            Spi::get_one::<TimestampWithTimeZone>("SELECT TIMESTAMP WITH TIME ZONE'-infinity'")
+                .expect("failed to get SPI result");
+        assert!(tstz.is_neg_infinity());
+    }
+
+    #[pg_test]
+    fn test_timestamp_infinity() {
+        let result =
+            Spi::get_one::<bool>("SELECT accept_timestamp('-infinity') = '-infinity'::timestamp;")
+                .expect("failed to get SPI result");
+        assert!(result);
+
+        let result =
+            Spi::get_one::<bool>("SELECT accept_timestamp('infinity') = 'infinity'::timestamp;")
+                .expect("failed to get SPI result");
+        assert!(result);
+
+        let ts = Spi::get_one::<Timestamp>("SELECT 'infinity'::timestamp")
+            .expect("failed to get SPI result");
+        assert!(ts.is_infinity());
+
+        let ts = Spi::get_one::<Timestamp>("SELECT '-infinity'::timestamp")
+            .expect("failed to get SPI result");
+        assert!(ts.is_neg_infinity());
     }
 }

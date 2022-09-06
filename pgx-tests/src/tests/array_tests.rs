@@ -119,7 +119,7 @@ fn get_arr_data_ptr_nth_elem(arr: Array<i32>, elem: i32) -> Option<i32> {
 
 #[pg_extern]
 fn display_get_arr_nullbitmap(arr: Array<i32>) -> String {
-    let raw = unsafe { RawArray::from_array(arr) }.unwrap();
+    let mut raw = unsafe { RawArray::from_array(arr) }.unwrap();
 
     if let Some(slice) = raw.nulls() {
         // SAFETY: If the test has gotten this far, the ptr is good for 0+ bytes,
