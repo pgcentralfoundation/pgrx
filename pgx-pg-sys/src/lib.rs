@@ -87,13 +87,6 @@ pub use pg14::*;
 // feature gate each pg-specific oid module
 #[cfg(all(feature = "pg10", not(docsrs)))]
 mod pg10_oids {
-    // make up for pg10's range definitions not being a bindgen parsable format
-    // as it lacks (install dir)/include/postgresql/server/catalog/pg_type_d.h
-    pub const INT8RANGEOID: u32 = 3926;
-    pub const NUMRANGEOID: u32 = 3906;
-    pub const DATERANGEOID: u32 = 3912;
-    pub const TSRANGEOID: u32 = 3908;
-    pub const TSTZRANGEOID: u32 = 3910;
     include!(concat!(env!("OUT_DIR"), "/pg10_oids.rs"));
 }
 #[cfg(all(feature = "pg10", docsrs))]
