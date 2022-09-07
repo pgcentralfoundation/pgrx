@@ -7,12 +7,13 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use crate::datum::time::USECS_PER_SEC;
 use crate::{pg_sys, FromDatum, IntoDatum};
 use std::convert::TryFrom;
 use std::ffi::CStr;
 use std::ops::Sub;
 use time::{macros::date, UtcOffset};
+
+pub(crate) const USECS_PER_SEC: i64 = 1_000_000;
 
 const PG_EPOCH_OFFSET: time::OffsetDateTime = date!(2000 - 01 - 01).midnight().assume_utc();
 const PG_EPOCH_DATETIME: time::PrimitiveDateTime = date!(2000 - 01 - 01).midnight();
@@ -162,8 +163,14 @@ pub enum TimestampConversionError {
     Infinity,
     #[error("time::PrimitiveDateTime was unable to convert this timestamp")]
     TimeCrate,
-    #[error("usec outside of PG's defined Timestamp range")]
+    #[error("microseconds outside of target microsecond range")]
     OutOfRangeMicroseconds,
+    #[error("hours outside of target range")]
+    HourOverflow,
+    #[error("minutes outside of target range")]
+    MinuteOverflow,
+    #[error("seconds outside of target range")]
+    SecondOverflow,
 }
 
 impl serde::Serialize for TimestampWithTimeZone {
