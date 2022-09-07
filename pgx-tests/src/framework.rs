@@ -78,24 +78,37 @@ where
         Err(e) => {
             let dberror = e.as_db_error().unwrap();
             let query = query.unwrap();
-            let query_params = query_params.unwrap_or(&[]);
             let query_message = dberror.message();
 
-            let mut message = format!(
-                "postgres query failed:\nquery: {query}\nquery params: {:?}\nmessage: {query_message}",
-                query_params
+            let code = dberror.code().code();
+            let severity = dberror.severity();
+
+            let mut message = format!("{} SQLSTATE[{}]", severity, code)
+                .bold()
+                .red()
+                .to_string();
+
+            message.push_str(format!(": {}", query_message.bold().white()).as_str());
+            message.push_str(format!("\nquery: {}", query.bold().white()).as_str());
+            message.push_str(
+                format!(
+                    "\nparams: {}",
+                    match query_params {
+                        Some(params) => format!("{:?}", params),
+                        None => "None".to_string(),
+                    }
+                )
+                .as_str(),
             );
 
             if let Ok(var) = std::env::var("RUST_BACKTRACE") {
                 if var.eq("1") {
-                    let code = dberror.code().code();
-                    let severity = dberror.severity();
                     let detail = dberror.detail().unwrap_or("None");
                     let hint = dberror.hint().unwrap_or("None");
                     let schema = dberror.hint().unwrap_or("None");
                     let table = dberror.table().unwrap_or("None");
                     let more_info = format!(
-                        "\ncode: {code}\nseverity: {severity}\ndetail: {detail}\nhint: {hint}\nschema: {schema}\ntable: {table}"
+                        "\ndetail: {detail}\nhint: {hint}\nschema: {schema}\ntable: {table}"
                     );
                     message.push_str(more_info.as_str());
                 }
