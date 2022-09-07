@@ -9,7 +9,6 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 use crate::datum::time::Time;
 use crate::{pg_sys, FromDatum, IntoDatum, PgBox};
-use std::ops::{Deref, DerefMut};
 use time::format_description::FormatItem;
 
 #[derive(Debug)]
@@ -55,19 +54,6 @@ impl TimeWithTimeZone {
     pub fn new(mut time: time::Time, at_tz_offset: time::UtcOffset) -> Self {
         time -= time::Duration::seconds(at_tz_offset.whole_seconds() as i64);
         TimeWithTimeZone(Time(time))
-    }
-}
-
-impl Deref for TimeWithTimeZone {
-    type Target = time::Time;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-impl DerefMut for TimeWithTimeZone {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
     }
 }
 

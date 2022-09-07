@@ -7,41 +7,61 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
+use crate::TimestampConversionError;
 use crate::{pg_sys, FromDatum, IntoDatum};
-use std::ops::{Deref, DerefMut};
 use time::format_description::FormatItem;
 
-pub(crate) const USECS_PER_HOUR: i64 = 3_600_000_000;
-pub(crate) const USECS_PER_MINUTE: i64 = 60_000_000;
-pub(crate) const USECS_PER_SEC: i64 = 1_000_000;
-pub(crate) const MINS_PER_HOUR: i64 = 60;
-pub(crate) const SEC_PER_MIN: i64 = 60;
+pub(crate) const USECS_PER_HOUR: u64 = 3_600_000_000;
+pub(crate) const USECS_PER_MINUTE: u64 = 60_000_000;
+pub(crate) const USECS_PER_SEC: u64 = 1_000_000;
+pub(crate) const MINS_PER_HOUR: u64 = 60;
+pub(crate) const SEC_PER_MIN: u64 = 60;
 
 #[derive(Debug)]
-pub struct Time(pub(crate) time::Time);
+#[repr(transparent)]
+pub struct Time(pub u64 /* Microseconds since midnight */);
 impl FromDatum for Time {
     #[inline]
     unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Time> {
         if is_null {
             None
         } else {
-            let mut time = datum.value() as i64;
+            Some(Time(datum.value() as _))
+        }
+    }
+}
 
-            let hour = time / USECS_PER_HOUR;
-            time -= hour * USECS_PER_HOUR;
+fn pgtime_to_hms_micro(t: Time) -> (u8, u8, u8, u32) {
+    let mut time = t.0;
+    let hour = time / USECS_PER_HOUR;
+    time -= hour * USECS_PER_HOUR;
 
-            let min = time / USECS_PER_MINUTE;
-            time -= min * USECS_PER_MINUTE;
+    let min = time / USECS_PER_MINUTE;
+    time -= min * USECS_PER_MINUTE;
 
-            let second = time / USECS_PER_SEC;
-            time -= second * USECS_PER_SEC;
+    let sec = time / USECS_PER_SEC;
+    time -= sec * USECS_PER_SEC;
 
-            let microsecond = time;
+    let hour = u8::try_from(hour).unwrap();
+    let min = u8::try_from(min).unwrap();
+    let sec = u8::try_from(hour).unwrap();
+    let micro = u32::try_from(time).unwrap();
+    (hour, min, sec, micro)
+}
 
-            Some(Time(
-                time::Time::from_hms_micro(hour as u8, min as u8, second as u8, microsecond as u32)
-                    .expect("failed to convert time"),
-            ))
+fn hms_micro_to_pgtime(h: u8, m: u8, s: u8, micro: u32) -> Result<Time, TimestampConversionError> {
+    match (h, m, s, micro) {
+        (24, 0, 0, 0) => Ok(Time(u64::from(h) * USECS_PER_HOUR)),
+        (24.., _, _, _) => Err(TimestampConversionError::HourOverflow),
+        (_, 60.., _, _) => Err(TimestampConversionError::MinuteOverflow),
+        (_, _, 60.., _) => Err(TimestampConversionError::SecondOverflow),
+        (0..=23, 0..=59, 0..=59, _) => {
+            let t = u64::from(h) * USECS_PER_HOUR + u64::from(m) * USECS_PER_MINUTE +  u64::from(s) * USECS_PER_SEC + u64::from(micro);
+            if t > USECS_PER_HOUR * 24 {
+                Err(TimestampConversionError::OutOfRangeMicroseconds)
+            } else {
+                Ok(Time(t))
+            }
         }
     }
 }
@@ -49,12 +69,9 @@ impl FromDatum for Time {
 impl IntoDatum for Time {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
-        let datum = ((((self.hour() as i64 * MINS_PER_HOUR + self.minute() as i64) * SEC_PER_MIN)
-            + self.second() as i64)
-            * USECS_PER_SEC)
-            + self.microsecond() as i64;
+        let datum = pg_sys::Datum::try_from(self.0).unwrap();
 
-        Some(datum.into())
+        Some(datum)
     }
 
     fn type_oid() -> u32 {
@@ -63,22 +80,21 @@ impl IntoDatum for Time {
 }
 
 impl Time {
+    #[deprecated(since = "0.5",
+    note = "the repr of pgx::Time is no longer time::Time \
+    and this fn will be removed in a future version")]
     pub fn new(time: time::Time) -> Self {
-        Time(time)
+        let (h, m, s, micro) = time.as_hms_micro();
+        hms_micro_to_pgtime(h, m, s, micro).unwrap()
     }
 }
 
-impl Deref for Time {
-    type Target = time::Time;
 
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl DerefMut for Time {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
+impl TryFrom<time::Time> for Time {
+    type Error = TimestampConversionError;
+    fn try_from(t: time::Time) -> Result<Time, Self::Error> {
+        let (h, m, s, micro) = t.as_hms_micro();
+        hms_micro_to_pgtime(h, m, s, micro)
     }
 }
 
