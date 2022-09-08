@@ -17,7 +17,7 @@ pub(crate) const USECS_PER_SEC: u64 = 1_000_000;
 pub(crate) const MINS_PER_HOUR: u64 = 60;
 pub(crate) const SEC_PER_MIN: u64 = 60;
 
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq)]
 #[repr(transparent)]
 pub struct Time(pub u64 /* Microseconds since midnight */);
 impl FromDatum for Time {
@@ -31,7 +31,7 @@ impl FromDatum for Time {
     }
 }
 
-fn pgtime_to_hms_micro(t: Time) -> (u8, u8, u8, u32) {
+pub(crate) fn pgtime_to_hms_micro(t: Time) -> (u8, u8, u8, u32) {
     let mut time = t.0;
     let hour = time / USECS_PER_HOUR;
     time -= hour * USECS_PER_HOUR;
@@ -49,7 +49,7 @@ fn pgtime_to_hms_micro(t: Time) -> (u8, u8, u8, u32) {
     (hour, min, sec, micro)
 }
 
-fn hms_micro_to_pgtime(h: u8, m: u8, s: u8, micro: u32) -> Result<Time, TimestampConversionError> {
+pub(crate) fn hms_micro_to_pgtime(h: u8, m: u8, s: u8, micro: u32) -> Result<Time, TimestampConversionError> {
     match (h, m, s, micro) {
         (24, 0, 0, 0) => Ok(Time(u64::from(h) * USECS_PER_HOUR)),
         (24.., _, _, _) => Err(TimestampConversionError::HourOverflow),
@@ -106,13 +106,15 @@ impl serde::Serialize for Time {
     where
         S: serde::Serializer,
     {
-        if self.millisecond() > 0 {
+        let (h, m, s, micro) = pgtime_to_hms_micro(self.clone());
+        let t = time::Time::from_hms_micro(h, m, s, micro).unwrap();
+        if t.millisecond() > 0 {
             serializer.serialize_str(
-                &self
+                &t
                     .format(
                         &time::format_description::parse(&format!(
                             "[hour]:[minute]:[second].{}",
-                            self.millisecond()
+                            t.millisecond()
                         ))
                         .map_err(|e| {
                             serde::ser::Error::custom(format!(
@@ -126,7 +128,7 @@ impl serde::Serialize for Time {
                     })?,
             )
         } else {
-            serializer.serialize_str(&self.format(&DEFAULT_TIME_FORMAT).map_err(|e| {
+            serializer.serialize_str(&t.format(&DEFAULT_TIME_FORMAT).map_err(|e| {
                 serde::ser::Error::custom(format!("Time formatting problem: {:?}", e))
             })?)
         }
