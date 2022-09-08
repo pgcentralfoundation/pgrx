@@ -7,14 +7,17 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use crate::datum::time::{hms_micro_to_pgtime, pgtime_to_hms_micro, Time};
+use crate::datum::time::{hms_micro_to_pgtime, Time, USECS_PER_DAY};
 use crate::{pg_sys, FromDatum, IntoDatum, PgBox};
 use time::format_description::FormatItem;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 #[repr(C)]
 pub struct TimeWithTimeZone {
     t: Time,
+    /// America/Denver time in ISO:      -06:00
+    /// America/Denver time in Postgres: +21600
+    /// Yes, the sign is flipped, following POSIX instead of ISO. Don't overthink it.
     tz_secs: i32,
 }
 
@@ -60,8 +63,23 @@ impl TimeWithTimeZone {
     pub fn new(time: time::Time, at_tz_offset: time::UtcOffset) -> Self {
         let (h, m, s, micro) = time.as_hms_micro();
         let t = hms_micro_to_pgtime(h, m, s, micro).unwrap();
-        let tz_secs = at_tz_offset.whole_seconds();
+        // Flip the sign, because time::Time uses the ISO sign convention
+        let tz_secs = -at_tz_offset.whole_seconds();
         TimeWithTimeZone { t, tz_secs }
+    }
+
+    pub fn to_utc(self) -> Time {
+        let TimeWithTimeZone { t, tz_secs } = self;
+        let tz_micros = tz_secs as i64 * 1_000_000;
+        // tz_secs uses a flipped sign from the ISO tz string, so just add to get UTC
+        let t_unwrapped = t.0 as i64 + tz_micros;
+        Time(t_unwrapped.rem_euclid(USECS_PER_DAY as i64) as u64)
+    }
+}
+
+impl From<Time> for TimeWithTimeZone {
+    fn from(t: Time) -> TimeWithTimeZone {
+        TimeWithTimeZone { t, tz_secs: 0 }
     }
 }
 
@@ -73,9 +91,8 @@ impl serde::Serialize for TimeWithTimeZone {
     where
         S: serde::Serializer,
     {
-        let (h, m, s, micro) = pgtime_to_hms_micro(self.t.clone());
-        let mut time = time::Time::from_hms_micro(h, m, s, micro).unwrap();
-        time -= time::Duration::seconds(self.tz_secs as _);
+        let (h, m, s, micro) = self.clone().to_utc().to_hms_micro();
+        let time = time::Time::from_hms_micro(h, m, s, micro).unwrap();
         if time.millisecond() > 0 {
             serializer.serialize_str(
                 &time

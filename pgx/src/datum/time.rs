@@ -16,6 +16,7 @@ const SEC_PER_MIN: u64 = 60;
 pub(crate) const USECS_PER_SEC: u64 = 1_000_000;
 pub(crate) const USECS_PER_MINUTE: u64 = USECS_PER_SEC * SEC_PER_MIN;
 pub(crate) const USECS_PER_HOUR: u64 = USECS_PER_MINUTE * MINS_PER_HOUR;
+pub(crate) const USECS_PER_DAY: u64 = USECS_PER_HOUR * 24;
 
 #[derive(Debug, Clone, PartialEq)]
 #[repr(transparent)]
@@ -29,24 +30,6 @@ impl FromDatum for Time {
             Some(Time(datum.value() as _))
         }
     }
-}
-
-pub(crate) fn pgtime_to_hms_micro(t: Time) -> (u8, u8, u8, u32) {
-    let mut time = t.0;
-    let hour = time / USECS_PER_HOUR;
-    time -= hour * USECS_PER_HOUR;
-
-    let min = time / USECS_PER_MINUTE;
-    time -= min * USECS_PER_MINUTE;
-
-    let sec = time / USECS_PER_SEC;
-    time -= sec * USECS_PER_SEC;
-
-    let hour = u8::try_from(hour).unwrap();
-    let min = u8::try_from(min).unwrap();
-    let sec = u8::try_from(hour).unwrap();
-    let micro = u32::try_from(time).unwrap();
-    (hour, min, sec, micro)
 }
 
 pub(crate) fn hms_micro_to_pgtime(
@@ -65,7 +48,7 @@ pub(crate) fn hms_micro_to_pgtime(
                 + u64::from(m) * USECS_PER_MINUTE
                 + u64::from(s) * USECS_PER_SEC
                 + u64::from(micro);
-            if t > USECS_PER_HOUR * 24 {
+            if t > USECS_PER_DAY {
                 Err(TimestampConversionError::OutOfRangeMicroseconds)
             } else {
                 Ok(Time(t))
@@ -88,6 +71,8 @@ impl IntoDatum for Time {
 }
 
 impl Time {
+    pub const ALLBALLS: Self = Time(0);
+
     #[deprecated(
         since = "0.5",
         note = "the repr of pgx::Time is no longer time::Time \
@@ -96,6 +81,25 @@ impl Time {
     pub fn new(time: time::Time) -> Self {
         let (h, m, s, micro) = time.as_hms_micro();
         hms_micro_to_pgtime(h, m, s, micro).unwrap()
+    }
+
+    /// To hours, minutes, seconds, and microseconds.
+    pub fn to_hms_micro(self) -> (u8, u8, u8, u32) {
+        let mut time = self.0;
+        let hour = time / USECS_PER_HOUR;
+        time -= hour * USECS_PER_HOUR;
+
+        let min = time / USECS_PER_MINUTE;
+        time -= min * USECS_PER_MINUTE;
+
+        let sec = time / USECS_PER_SEC;
+        time -= sec * USECS_PER_SEC;
+
+        let hour = u8::try_from(hour).unwrap();
+        let min = u8::try_from(min).unwrap();
+        let sec = u8::try_from(sec).unwrap();
+        let micro = u32::try_from(time).unwrap();
+        (hour, min, sec, micro)
     }
 }
 
@@ -115,7 +119,7 @@ impl serde::Serialize for Time {
     where
         S: serde::Serializer,
     {
-        let (h, m, s, micro) = pgtime_to_hms_micro(self.clone());
+        let (h, m, s, micro) = self.clone().to_hms_micro();
         let t = time::Time::from_hms_micro(h, m, s, micro).unwrap();
         if t.millisecond() > 0 {
             serializer.serialize_str(
