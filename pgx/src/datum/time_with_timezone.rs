@@ -7,15 +7,15 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use crate::datum::time::{Time, hms_micro_to_pgtime, pgtime_to_hms_micro};
+use crate::datum::time::{hms_micro_to_pgtime, pgtime_to_hms_micro, Time};
 use crate::{pg_sys, FromDatum, IntoDatum, PgBox};
 use time::format_description::FormatItem;
 
 #[derive(Debug)]
 #[repr(C)]
-pub struct TimeWithTimeZone{
+pub struct TimeWithTimeZone {
     t: Time,
-    tz: i32,
+    tz_secs: i32,
 }
 
 impl FromDatum for TimeWithTimeZone {
@@ -28,9 +28,9 @@ impl FromDatum for TimeWithTimeZone {
 
             let t = Time::from_datum(pg_sys::Datum::from(timetz.time), false)
                 .expect("failed to convert TimeWithTimeZone");
-            let tz = timetz.zone;
+            let tz_secs = timetz.zone;
 
-            Some(TimeWithTimeZone{ t, tz })
+            Some(TimeWithTimeZone { t, tz_secs })
         }
     }
 }
@@ -39,7 +39,7 @@ impl IntoDatum for TimeWithTimeZone {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
         let mut timetz = PgBox::<pg_sys::TimeTzADT>::alloc();
-        timetz.zone = self.tz;
+        timetz.zone = self.tz_secs;
         timetz.time = self.t.0 as i64;
 
         Some(timetz.into_pg().into())
@@ -52,14 +52,16 @@ impl IntoDatum for TimeWithTimeZone {
 
 impl TimeWithTimeZone {
     /// Constructs a TimeWithTimeZone from `time` crate components.
-    #[deprecated(since = "0.5.0",
-    note = "the repr of pgx::TimeWithTimeZone is no longer time::Time \
-    and this fn will be removed in a future version")]
+    #[deprecated(
+        since = "0.5.0",
+        note = "the repr of pgx::TimeWithTimeZone is no longer time::Time \
+    and this fn will be removed in a future version"
+    )]
     pub fn new(time: time::Time, at_tz_offset: time::UtcOffset) -> Self {
         let (h, m, s, micro) = time.as_hms_micro();
         let t = hms_micro_to_pgtime(h, m, s, micro).unwrap();
-        let tz = at_tz_offset.whole_seconds();
-        TimeWithTimeZone{ t, tz }
+        let tz_secs = at_tz_offset.whole_seconds();
+        TimeWithTimeZone { t, tz_secs }
     }
 }
 
@@ -73,7 +75,7 @@ impl serde::Serialize for TimeWithTimeZone {
     {
         let (h, m, s, micro) = pgtime_to_hms_micro(self.t.clone());
         let mut time = time::Time::from_hms_micro(h, m, s, micro).unwrap();
-        time -= time::Duration::seconds(self.tz as _);
+        time -= time::Duration::seconds(self.tz_secs as _);
         if time.millisecond() > 0 {
             serializer.serialize_str(
                 &time

@@ -11,11 +11,11 @@ use crate::TimestampConversionError;
 use crate::{pg_sys, FromDatum, IntoDatum};
 use time::format_description::FormatItem;
 
-pub(crate) const USECS_PER_HOUR: u64 = 3_600_000_000;
-pub(crate) const USECS_PER_MINUTE: u64 = 60_000_000;
+const MINS_PER_HOUR: u64 = 60;
+const SEC_PER_MIN: u64 = 60;
 pub(crate) const USECS_PER_SEC: u64 = 1_000_000;
-pub(crate) const MINS_PER_HOUR: u64 = 60;
-pub(crate) const SEC_PER_MIN: u64 = 60;
+pub(crate) const USECS_PER_MINUTE: u64 = USECS_PER_SEC * SEC_PER_MIN;
+pub(crate) const USECS_PER_HOUR: u64 = USECS_PER_MINUTE * MINS_PER_HOUR;
 
 #[derive(Debug, Clone, PartialEq)]
 #[repr(transparent)]
@@ -49,14 +49,22 @@ pub(crate) fn pgtime_to_hms_micro(t: Time) -> (u8, u8, u8, u32) {
     (hour, min, sec, micro)
 }
 
-pub(crate) fn hms_micro_to_pgtime(h: u8, m: u8, s: u8, micro: u32) -> Result<Time, TimestampConversionError> {
+pub(crate) fn hms_micro_to_pgtime(
+    h: u8,
+    m: u8,
+    s: u8,
+    micro: u32,
+) -> Result<Time, TimestampConversionError> {
     match (h, m, s, micro) {
         (24, 0, 0, 0) => Ok(Time(u64::from(h) * USECS_PER_HOUR)),
         (24.., _, _, _) => Err(TimestampConversionError::HourOverflow),
         (_, 60.., _, _) => Err(TimestampConversionError::MinuteOverflow),
         (_, _, 60.., _) => Err(TimestampConversionError::SecondOverflow),
         (0..=23, 0..=59, 0..=59, _) => {
-            let t = u64::from(h) * USECS_PER_HOUR + u64::from(m) * USECS_PER_MINUTE +  u64::from(s) * USECS_PER_SEC + u64::from(micro);
+            let t = u64::from(h) * USECS_PER_HOUR
+                + u64::from(m) * USECS_PER_MINUTE
+                + u64::from(s) * USECS_PER_SEC
+                + u64::from(micro);
             if t > USECS_PER_HOUR * 24 {
                 Err(TimestampConversionError::OutOfRangeMicroseconds)
             } else {
@@ -80,15 +88,16 @@ impl IntoDatum for Time {
 }
 
 impl Time {
-    #[deprecated(since = "0.5",
-    note = "the repr of pgx::Time is no longer time::Time \
-    and this fn will be removed in a future version")]
+    #[deprecated(
+        since = "0.5",
+        note = "the repr of pgx::Time is no longer time::Time \
+    and this fn will be removed in a future version"
+    )]
     pub fn new(time: time::Time) -> Self {
         let (h, m, s, micro) = time.as_hms_micro();
         hms_micro_to_pgtime(h, m, s, micro).unwrap()
     }
 }
-
 
 impl TryFrom<time::Time> for Time {
     type Error = TimestampConversionError;
@@ -110,22 +119,18 @@ impl serde::Serialize for Time {
         let t = time::Time::from_hms_micro(h, m, s, micro).unwrap();
         if t.millisecond() > 0 {
             serializer.serialize_str(
-                &t
-                    .format(
-                        &time::format_description::parse(&format!(
-                            "[hour]:[minute]:[second].{}",
-                            t.millisecond()
-                        ))
-                        .map_err(|e| {
-                            serde::ser::Error::custom(format!(
-                                "Time invalid format problem: {:?}",
-                                e
-                            ))
-                        })?,
-                    )
+                &t.format(
+                    &time::format_description::parse(&format!(
+                        "[hour]:[minute]:[second].{}",
+                        t.millisecond()
+                    ))
                     .map_err(|e| {
-                        serde::ser::Error::custom(format!("Time formatting problem: {:?}", e))
+                        serde::ser::Error::custom(format!("Time invalid format problem: {:?}", e))
                     })?,
+                )
+                .map_err(|e| {
+                    serde::ser::Error::custom(format!("Time formatting problem: {:?}", e))
+                })?,
             )
         } else {
             serializer.serialize_str(&t.format(&DEFAULT_TIME_FORMAT).map_err(|e| {
