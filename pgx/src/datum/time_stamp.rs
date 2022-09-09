@@ -7,7 +7,7 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use crate::{pg_sys, FromDatum, IntoDatum, TimestampConversionError, TimestampWithTimeZone};
+use crate::{pg_sys, FromDatum, IntoDatum, FromTimeError, TimestampWithTimeZone};
 use std::ffi::CStr;
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
@@ -61,7 +61,7 @@ impl From<Timestamp> for i64 {
 }
 
 impl TryFrom<pg_sys::Timestamp> for Timestamp {
-    type Error = TimestampConversionError;
+    type Error = FromTimeError;
 
     fn try_from(value: pg_sys::Timestamp) -> Result<Self, Self::Error> {
         TryInto::<TimestampWithTimeZone>::try_into(value).map(|tstz| tstz.into())
@@ -69,7 +69,7 @@ impl TryFrom<pg_sys::Timestamp> for Timestamp {
 }
 
 impl TryFrom<pg_sys::Datum> for Timestamp {
-    type Error = TimestampConversionError;
+    type Error = FromTimeError;
 
     fn try_from(datum: pg_sys::Datum) -> Result<Self, Self::Error> {
         (datum.value() as pg_sys::Timestamp).try_into()
@@ -77,7 +77,7 @@ impl TryFrom<pg_sys::Datum> for Timestamp {
 }
 
 impl TryFrom<time::OffsetDateTime> for Timestamp {
-    type Error = TimestampConversionError;
+    type Error = FromTimeError;
 
     fn try_from(offset: time::OffsetDateTime) -> Result<Self, Self::Error> {
         TryInto::<TimestampWithTimeZone>::try_into(offset).map(|tstz| tstz.into())
@@ -85,7 +85,7 @@ impl TryFrom<time::OffsetDateTime> for Timestamp {
 }
 
 impl TryFrom<Timestamp> for time::PrimitiveDateTime {
-    type Error = TimestampConversionError;
+    type Error = FromTimeError;
 
     fn try_from(ts: Timestamp) -> Result<Self, Self::Error> {
         let tstz: TimestampWithTimeZone = ts.into();
@@ -94,7 +94,7 @@ impl TryFrom<Timestamp> for time::PrimitiveDateTime {
 }
 
 impl TryFrom<time::PrimitiveDateTime> for Timestamp {
-    type Error = TimestampConversionError;
+    type Error = FromTimeError;
 
     fn try_from(datetime: time::PrimitiveDateTime) -> Result<Self, Self::Error> {
         TryInto::<TimestampWithTimeZone>::try_into(datetime).map(|tstz| tstz.into())
@@ -102,7 +102,7 @@ impl TryFrom<time::PrimitiveDateTime> for Timestamp {
 }
 
 impl TryFrom<Timestamp> for time::OffsetDateTime {
-    type Error = TimestampConversionError;
+    type Error = FromTimeError;
     fn try_from(ts: Timestamp) -> Result<Self, Self::Error> {
         let tstz: TimestampWithTimeZone = ts.into();
         tstz.try_into()

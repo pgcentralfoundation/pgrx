@@ -65,7 +65,7 @@ impl From<TimestampWithTimeZone> for i64 {
 }
 
 impl TryFrom<pg_sys::TimestampTz> for TimestampWithTimeZone {
-    type Error = TimestampConversionError;
+    type Error = FromTimeError;
 
     fn try_from(value: pg_sys::TimestampTz) -> Result<Self, Self::Error> {
         let usec = value as i64;
@@ -73,20 +73,20 @@ impl TryFrom<pg_sys::TimestampTz> for TimestampWithTimeZone {
             i64::MIN => Ok(Self::NEG_INFINITY),
             i64::MAX => Ok(Self::INFINITY),
             MIN_TIMESTAMP_USEC..=END_TIMESTAMP_USEC => Ok(TimestampWithTimeZone(usec)),
-            _ => Err(TimestampConversionError::OutOfRangeMicroseconds),
+            _ => Err(FromTimeError::MicrosOutOfBounds),
         }
     }
 }
 
 impl TryFrom<pg_sys::Datum> for TimestampWithTimeZone {
-    type Error = TimestampConversionError;
+    type Error = FromTimeError;
     fn try_from(datum: pg_sys::Datum) -> Result<Self, Self::Error> {
         (datum.value() as pg_sys::TimestampTz).try_into()
     }
 }
 
 impl TryFrom<time::OffsetDateTime> for TimestampWithTimeZone {
-    type Error = TimestampConversionError;
+    type Error = FromTimeError;
     fn try_from(offset: time::OffsetDateTime) -> Result<Self, Self::Error> {
         let usecs = offset.sub(PG_EPOCH_OFFSET).whole_microseconds() as i64;
         usecs.try_into()
@@ -94,18 +94,18 @@ impl TryFrom<time::OffsetDateTime> for TimestampWithTimeZone {
 }
 
 impl TryFrom<TimestampWithTimeZone> for time::PrimitiveDateTime {
-    type Error = TimestampConversionError;
+    type Error = FromTimeError;
     fn try_from(tstz: TimestampWithTimeZone) -> Result<Self, Self::Error> {
         match tstz {
-            TimestampWithTimeZone::NEG_INFINITY => Err(TimestampConversionError::NegInfinity),
-            TimestampWithTimeZone::INFINITY => Err(TimestampConversionError::Infinity),
+            TimestampWithTimeZone::NEG_INFINITY => Err(FromTimeError::NegInfinity),
+            TimestampWithTimeZone::INFINITY => Err(FromTimeError::Infinity),
             _ => {
                 let sec = tstz.0 / USECS_PER_SEC;
                 let usec = tstz.0 - (sec * USECS_PER_SEC);
                 let duration = time::Duration::new(sec, (usec as i32) * 1000);
                 match PG_EPOCH_DATETIME.checked_add(duration) {
                     Some(datetime) => Ok(datetime),
-                    None => Err(TimestampConversionError::TimeCrate),
+                    None => Err(FromTimeError::TimeCrate),
                 }
             }
         }
@@ -113,7 +113,7 @@ impl TryFrom<TimestampWithTimeZone> for time::PrimitiveDateTime {
 }
 
 impl TryFrom<time::PrimitiveDateTime> for TimestampWithTimeZone {
-    type Error = TimestampConversionError;
+    type Error = FromTimeError;
 
     fn try_from(datetime: time::PrimitiveDateTime) -> Result<Self, Self::Error> {
         let offset = datetime.assume_utc();
@@ -122,7 +122,7 @@ impl TryFrom<time::PrimitiveDateTime> for TimestampWithTimeZone {
 }
 
 impl TryFrom<TimestampWithTimeZone> for time::OffsetDateTime {
-    type Error = TimestampConversionError;
+    type Error = FromTimeError;
     fn try_from(tstz: TimestampWithTimeZone) -> Result<Self, Self::Error> {
         let datetime: time::PrimitiveDateTime = tstz.try_into()?;
         Ok(datetime.assume_utc())
@@ -156,7 +156,7 @@ impl FromDatum for TimestampWithTimeZone {
 }
 
 #[derive(thiserror::Error, Debug, Clone, Copy)]
-pub enum TimestampConversionError {
+pub enum FromTimeError {
     #[error("timestamp value is negative infinity and shouldn't map to time::PrimitiveDateTime")]
     NegInfinity,
     #[error("timestamp value is negative infinity and shouldn't map to time::PrimitiveDateTime")]
@@ -164,13 +164,13 @@ pub enum TimestampConversionError {
     #[error("time::PrimitiveDateTime was unable to convert this timestamp")]
     TimeCrate,
     #[error("microseconds outside of target microsecond range")]
-    OutOfRangeMicroseconds,
+    MicrosOutOfBounds,
     #[error("hours outside of target range")]
-    HourOverflow,
+    HoursOutOfBounds,
     #[error("minutes outside of target range")]
-    MinuteOverflow,
+    MinutesOutOfBounds,
     #[error("seconds outside of target range")]
-    SecondOverflow,
+    SecondsOutOfBounds,
 }
 
 impl serde::Serialize for TimestampWithTimeZone {

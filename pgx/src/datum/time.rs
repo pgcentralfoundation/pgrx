@@ -7,7 +7,7 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use crate::TimestampConversionError;
+use crate::FromTimeError;
 use crate::{pg_sys, FromDatum, IntoDatum};
 use time::format_description::FormatItem;
 
@@ -37,19 +37,19 @@ pub(crate) fn hms_micro_to_pgtime(
     m: u8,
     s: u8,
     micro: u32,
-) -> Result<Time, TimestampConversionError> {
+) -> Result<Time, FromTimeError> {
     match (h, m, s, micro) {
         (24, 0, 0, 0) => Ok(Time(u64::from(h) * USECS_PER_HOUR)),
-        (24.., _, _, _) => Err(TimestampConversionError::HourOverflow),
-        (_, 60.., _, _) => Err(TimestampConversionError::MinuteOverflow),
-        (_, _, 60.., _) => Err(TimestampConversionError::SecondOverflow),
+        (24.., _, _, _) => Err(FromTimeError::HoursOutOfBounds),
+        (_, 60.., _, _) => Err(FromTimeError::MinutesOutOfBounds),
+        (_, _, 60.., _) => Err(FromTimeError::SecondsOutOfBounds),
         (0..=23, 0..=59, 0..=59, _) => {
             let t = u64::from(h) * USECS_PER_HOUR
                 + u64::from(m) * USECS_PER_MINUTE
                 + u64::from(s) * USECS_PER_SEC
                 + u64::from(micro);
             if t > USECS_PER_DAY {
-                Err(TimestampConversionError::OutOfRangeMicroseconds)
+                Err(FromTimeError::MicrosOutOfBounds)
             } else {
                 Ok(Time(t))
             }
@@ -104,7 +104,7 @@ impl Time {
 }
 
 impl TryFrom<time::Time> for Time {
-    type Error = TimestampConversionError;
+    type Error = FromTimeError;
     fn try_from(t: time::Time) -> Result<Time, Self::Error> {
         let (h, m, s, micro) = t.as_hms_micro();
         hms_micro_to_pgtime(h, m, s, micro)
