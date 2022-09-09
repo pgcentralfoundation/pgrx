@@ -42,7 +42,11 @@ impl FromDatum for Date {
         if is_null {
             None
         } else {
-            Some(datum.try_into().expect("Error converting date datum"))
+            if cfg!(feature = "pg10") {
+                Some(Date(datum.value() as i32))
+            } else {
+                Some(datum.try_into().expect("Error converting date datum"))
+            }
         }
     }
 }
