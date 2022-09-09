@@ -98,6 +98,7 @@ impl Time {
     }
 }
 
+#[cfg(feature = "time-crate")]
 impl TryFrom<time::Time> for Time {
     type Error = FromTimeError;
     fn try_from(t: time::Time) -> Result<Time, Self::Error> {
