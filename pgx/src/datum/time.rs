@@ -32,31 +32,6 @@ impl FromDatum for Time {
     }
 }
 
-pub(crate) fn hms_micro_to_pgtime(
-    h: u8,
-    m: u8,
-    s: u8,
-    micro: u32,
-) -> Result<Time, FromTimeError> {
-    match (h, m, s, micro) {
-        (24, 0, 0, 0) => Ok(Time(u64::from(h) * USECS_PER_HOUR)),
-        (24.., _, _, _) => Err(FromTimeError::HoursOutOfBounds),
-        (_, 60.., _, _) => Err(FromTimeError::MinutesOutOfBounds),
-        (_, _, 60.., _) => Err(FromTimeError::SecondsOutOfBounds),
-        (0..=23, 0..=59, 0..=59, _) => {
-            let t = u64::from(h) * USECS_PER_HOUR
-                + u64::from(m) * USECS_PER_MINUTE
-                + u64::from(s) * USECS_PER_SEC
-                + u64::from(micro);
-            if t > USECS_PER_DAY {
-                Err(FromTimeError::MicrosOutOfBounds)
-            } else {
-                Ok(Time(t))
-            }
-        }
-    }
-}
-
 impl IntoDatum for Time {
     #[inline]
     fn into_datum(self) -> Option<pg_sys::Datum> {
@@ -80,7 +55,27 @@ impl Time {
     )]
     pub fn new(time: time::Time) -> Self {
         let (h, m, s, micro) = time.as_hms_micro();
-        hms_micro_to_pgtime(h, m, s, micro).unwrap()
+        Self::from_hms_micro(h, m, s, micro).unwrap()
+    }
+
+    pub fn from_hms_micro(h: u8, m: u8, s: u8, micro: u32) -> Result<Time, FromTimeError> {
+        match (h, m, s, micro) {
+            (24, 0, 0, 0) => Ok(Time(u64::from(h) * USECS_PER_HOUR)),
+            (24.., _, _, _) => Err(FromTimeError::HoursOutOfBounds),
+            (_, 60.., _, _) => Err(FromTimeError::MinutesOutOfBounds),
+            (_, _, 60.., _) => Err(FromTimeError::SecondsOutOfBounds),
+            (0..=23, 0..=59, 0..=59, _) => {
+                let t = u64::from(h) * USECS_PER_HOUR
+                    + u64::from(m) * USECS_PER_MINUTE
+                    + u64::from(s) * USECS_PER_SEC
+                    + u64::from(micro);
+                if t > USECS_PER_DAY {
+                    Err(FromTimeError::MicrosOutOfBounds)
+                } else {
+                    Ok(Time(t))
+                }
+            }
+        }
     }
 
     /// To hours, minutes, seconds, and microseconds.
@@ -107,7 +102,7 @@ impl TryFrom<time::Time> for Time {
     type Error = FromTimeError;
     fn try_from(t: time::Time) -> Result<Time, Self::Error> {
         let (h, m, s, micro) = t.as_hms_micro();
-        hms_micro_to_pgtime(h, m, s, micro)
+        Self::from_hms_micro(h, m, s, micro)
     }
 }
 

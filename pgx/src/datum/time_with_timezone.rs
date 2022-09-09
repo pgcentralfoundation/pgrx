@@ -7,7 +7,7 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use crate::datum::time::{hms_micro_to_pgtime, Time, USECS_PER_DAY};
+use crate::datum::time::{Time, USECS_PER_DAY};
 use crate::{pg_sys, FromDatum, IntoDatum, PgBox};
 use time::format_description::FormatItem;
 
@@ -62,7 +62,7 @@ impl TimeWithTimeZone {
     )]
     pub fn new(time: time::Time, at_tz_offset: time::UtcOffset) -> Self {
         let (h, m, s, micro) = time.as_hms_micro();
-        let t = hms_micro_to_pgtime(h, m, s, micro).unwrap();
+        let t = Time::from_hms_micro(h, m, s, micro).unwrap();
         // Flip the sign, because time::Time uses the ISO sign convention
         let tz_secs = -at_tz_offset.whole_seconds();
         TimeWithTimeZone { t, tz_secs }
