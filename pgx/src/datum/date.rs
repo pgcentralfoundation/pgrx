@@ -8,6 +8,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use crate::{pg_sys, FromDatum, IntoDatum};
+use core::num::TryFromIntError;
 use std::ffi::CStr;
 
 pub const POSTGRES_EPOCH_JDATE: i32 = pg_sys::POSTGRES_EPOCH_JDATE as i32;
@@ -18,9 +19,9 @@ pub const UNIX_EPOCH_JDATE: i32 = pg_sys::UNIX_EPOCH_JDATE as i32;
 pub struct Date(i32);
 
 impl TryFrom<pg_sys::Datum> for Date {
-    type Error = i32;
+    type Error = TryFromIntError;
     fn try_from(d: pg_sys::Datum) -> Result<Self, Self::Error> {
-        Ok(Date(d.value() as i32))
+        i32::try_from(d.value() as isize).map(|d| Date(d))
     }
 }
 
