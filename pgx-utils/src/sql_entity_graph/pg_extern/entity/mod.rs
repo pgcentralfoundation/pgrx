@@ -113,12 +113,13 @@ impl ToSql for PgExternEntity {
 
         let fn_sql = format!(
             "\
-                                CREATE FUNCTION {schema}\"{name}\"({arguments}) {returns}\n\
+                                CREATE {or_replace} FUNCTION {schema}\"{name}\"({arguments}) {returns}\n\
                                 {extern_attrs}\
                                 {search_path}\
                                 LANGUAGE c /* Rust */\n\
                                 AS '{module_pathname}', '{unaliased_name}_wrapper';\
                             ",
+            or_replace = "",
             schema = self
                 .schema
                 .map(|schema| format!("{}.", schema))
