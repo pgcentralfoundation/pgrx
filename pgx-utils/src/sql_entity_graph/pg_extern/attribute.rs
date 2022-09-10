@@ -23,6 +23,8 @@ pub enum Attribute {
     Volatile,
     Raw,
     NoGuard,
+    /// CREATE OR REPLACE FUNCTION
+    OrReplace,
     ParallelSafe,
     ParallelUnsafe,
     ParallelRestricted,
@@ -43,6 +45,7 @@ impl Attribute {
             Attribute::Volatile => quote! { ::pgx::utils::ExternArgs::Volatile },
             Attribute::Raw => quote! { ::pgx::utils::ExternArgs::Raw },
             Attribute::NoGuard => quote! { ::pgx::utils::ExternArgs::NoGuard },
+            Attribute::OrReplace => quote! { ::pgx::utils::ExternArgs::OrReplace },
             Attribute::ParallelSafe => {
                 quote! { ::pgx::utils::ExternArgs::ParallelSafe }
             }
@@ -88,6 +91,7 @@ impl ToTokens for Attribute {
             Attribute::Volatile => quote! { volatile },
             Attribute::Raw => quote! { raw },
             Attribute::NoGuard => quote! { no_guard },
+            Attribute::OrReplace => quote! { or_replace },
             Attribute::ParallelSafe => {
                 quote! { parallel_safe }
             }
@@ -135,6 +139,7 @@ impl Parse for Attribute {
             "volatile" => Self::Volatile,
             "raw" => Self::Raw,
             "no_guard" => Self::NoGuard,
+            "or_replace" => Self::OrReplace,
             "parallel_safe" => Self::ParallelSafe,
             "parallel_unsafe" => Self::ParallelUnsafe,
             "parallel_restricted" => Self::ParallelRestricted,
