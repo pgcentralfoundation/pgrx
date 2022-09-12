@@ -171,6 +171,12 @@ impl Spi {
             client.update(query, None, None);
         })
     }
+    
+    fn run_with_args(query: &str, args: Vec<(PgOid, Option<pg_sys::Datum>)>) {
+        Spi::execute(|mut client| {
+            client.update(query, None, Some(args));
+        })
+    }
 
     /// explain a query, returning its result in json form
     pub fn explain(query: &str) -> Json {
