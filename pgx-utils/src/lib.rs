@@ -29,6 +29,7 @@ pub mod __reexports {
 
 #[derive(Debug, Hash, Eq, PartialEq, Clone, PartialOrd, Ord)]
 pub enum ExternArgs {
+    CreateOrReplace,
     Immutable,
     Strict,
     Stable,
@@ -48,6 +49,7 @@ pub enum ExternArgs {
 impl core::fmt::Display for ExternArgs {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
+            ExternArgs::CreateOrReplace => write!(f, "CREATE OR REPLACE"),
             ExternArgs::Immutable => write!(f, "IMMUTABLE"),
             ExternArgs::Strict => write!(f, "STRICT"),
             ExternArgs::Stable => write!(f, "STABLE"),
@@ -69,6 +71,7 @@ impl core::fmt::Display for ExternArgs {
 impl ToTokens for ExternArgs {
     fn to_tokens(&self, tokens: &mut TokenStream) {
         match self {
+            ExternArgs::CreateOrReplace => tokens.append(format_ident!("CreateOrReplace")),
             ExternArgs::Immutable => tokens.append(format_ident!("Immutable")),
             ExternArgs::Strict => tokens.append(format_ident!("Strict")),
             ExternArgs::Stable => tokens.append(format_ident!("Stable")),
@@ -148,6 +151,7 @@ pub fn parse_extern_attributes(attr: TokenStream) -> HashSet<ExternArgs> {
             TokenTree::Ident(i) => {
                 let name = i.to_string();
                 match name.as_str() {
+                    "create_or_replace" => args.insert(ExternArgs::CreateOrReplace),
                     "immutable" => args.insert(ExternArgs::Immutable),
                     "strict" => args.insert(ExternArgs::Strict),
                     "stable" => args.insert(ExternArgs::Stable),
