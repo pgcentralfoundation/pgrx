@@ -16,7 +16,9 @@ After cloning the repository, mostly you can use similar flows as in the README.
 However, if there are any differences in `cargo pgx` since the last release, then
 the first and most drastic difference in the developer environment vs. the user environment is that you will have to run
 ```bash
-cargo install cargo-pgx --path ./cargo-pgx --force
+cargo install cargo-pgx --path ./cargo-pgx \
+    --force \
+    --locked # This forces usage of the repo's lockfile
 cargo pgx init # This might take a while. Consider getting a drink.
 ```
 
