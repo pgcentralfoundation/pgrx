@@ -119,7 +119,7 @@ impl ToSql for PgExternEntity {
                                 LANGUAGE c /* Rust */\n\
                                 AS '{module_pathname}', '{unaliased_name}_wrapper';\
                             ",
-            or_replace = if extern_attrs.contains(&ExternArgs::OrReplace) { "OR REPLACE" } else { "" },
+            or_replace = if extern_attrs.contains(&ExternArgs::CreateOrReplace) { "OR REPLACE" } else { "" },
             schema = self
                 .schema
                 .map(|schema| format!("{}.", schema))
