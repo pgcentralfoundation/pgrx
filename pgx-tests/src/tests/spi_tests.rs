@@ -162,7 +162,7 @@ mod tests {
             vec![
                 (PgBuiltInOids::INT4OID.oid(), i.into_datum()),
                 (PgBuiltInOids::INT8OID.oid(), j.into_datum()),
-            ]
+            ],
         )
     }
 
