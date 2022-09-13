@@ -49,6 +49,14 @@ impl NullKind<'_> {
             Self::Strict(len) => index.le(len).then(|| false),
         }
     }
+
+    fn any(&self) -> bool {
+        match self {
+            Self::Bits(b1) => !b1.all(),
+            Self::Bytes(b8) => b8.into_iter().any(|b| *b),
+            Self::Strict(_) => false,
+        }
+    }
 }
 
 impl<'a, T: FromDatum + serde::Serialize> serde::Serialize for Array<'a, T> {
@@ -187,7 +195,8 @@ impl<'a, T: FromDatum> Array<'a, T> {
 
     // # Panics
     //
-    // Panics if it detects the slightest misalignment between types.
+    // Panics if it detects the slightest misalignment between types,
+    // or if a valid slice contains nulls, which may be uninit data.
     #[deprecated(
         since = "0.5.0",
         note = "this function cannot be safe and is not generically sound\n\
@@ -199,6 +208,9 @@ impl<'a, T: FromDatum> Array<'a, T> {
             size, passbyval, ..
         }) = &self.elem_layout
         {
+            if self.null_slice.any() {
+                panic!("null detected: can't expose potentially uninit data as a slice!")
+            }
             const DATUM_SIZE: usize = mem::size_of::<pg_sys::Datum>();
             let sizeof_type = match (passbyval, mem::size_of::<T>(), size.try_as_usize()) {
                 (true, rs @ (1 | 2 | 4 | 8), Some(pg @ (1 | 2 | 4 | 8))) if rs == pg => rs,
@@ -208,7 +220,7 @@ impl<'a, T: FromDatum> Array<'a, T> {
             };
             match (sizeof_type, self.raw.as_ref()) {
                 // SAFETY: Rust slice layout matches Postgres data layout and this array is "owned"
-                (1 | 2 | 4, Some(ref mut raw)) => unsafe { raw.assume_init_data_slice::<T>() },
+                (1 | 2 | 4, Some(raw)) => unsafe { raw.assume_init_data_slice::<T>() },
                 (DATUM_SIZE, _) => {
                     let sizeof_datums = mem::size_of_val(self.elem_slice);
                     unsafe {
