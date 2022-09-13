@@ -206,12 +206,19 @@ impl<'a, T: FromDatum> Array<'a, T> {
                 (false, DATUM_SIZE, _) => DATUM_SIZE,
                 (false, _, _) => panic!("invalid sizes for pass-by-reference datum"),
             };
-            let sizeof_datums = mem::size_of_val(self.elem_slice);
-            unsafe {
-                slice::from_raw_parts(
-                    self.elem_slice.as_ptr() as *const T,
-                    sizeof_datums / sizeof_type,
-                )
+            match (sizeof_type, self.raw.as_ref()) {
+                // SAFETY: Rust slice layout matches Postgres data layout and this array is "owned"
+                (1 | 2 | 4, Some(ref mut raw)) => unsafe { raw.assume_init_data_slice::<T>() },
+                (DATUM_SIZE, _) => {
+                    let sizeof_datums = mem::size_of_val(self.elem_slice);
+                    unsafe {
+                        slice::from_raw_parts(
+                            self.elem_slice.as_ptr() as *const T,
+                            sizeof_datums / sizeof_type,
+                        )
+                    }
+                }
+                (_, _) => panic!("no correctly-sized slice exists"),
             }
         } else {
             panic!("not enough type information to slice correctly")
