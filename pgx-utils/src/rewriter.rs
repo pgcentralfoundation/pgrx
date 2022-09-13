@@ -92,12 +92,26 @@ impl PgGuardRewriter {
             Ident::new("result", Span::call_site())
         };
 
-        let func_call = quote! {
-            let #result_var_name = {
-                #rewritten_args
+        let return_type_kind = categorize_return_type(&func);
 
-                #func_name(#arg_list)
-            };
+        // When returning a single tuple, rewrite the function to actually return a single-item iterator, so that
+        // the general-purpose "return a table" function can be used.
+        let func_call = if let CategorizedType::Tuple(ref _types) = return_type_kind {
+            quote! {
+                let #result_var_name = {
+                    #rewritten_args
+
+                    Some(#func_name(#arg_list)).into_iter()
+                };
+            }
+        } else {
+            quote! {
+                let #result_var_name = {
+                    #rewritten_args
+
+                    #func_name(#arg_list)
+                };
+            }
         };
 
         let prolog = quote! {
@@ -106,7 +120,7 @@ impl PgGuardRewriter {
             #[doc(hidden)]
             #[allow(unused_variables)]
         };
-        match categorize_return_type(&func) {
+        match return_type_kind {
             CategorizedType::Default => (
                 PgGuardRewriter::impl_standard_udf(
                     func_span,
@@ -120,11 +134,6 @@ impl PgGuardRewriter {
                     no_guard,
                 ),
                 true,
-            ),
-
-            CategorizedType::Tuple(_types) => (
-                PgGuardRewriter::impl_tuple_udf(func, entity_submission.clone()),
-                false,
             ),
 
             CategorizedType::Iterator(types) if types.len() == 1 => (
@@ -157,7 +166,7 @@ impl PgGuardRewriter {
                 true,
             ),
 
-            CategorizedType::Iterator(types) => (
+            CategorizedType::Tuple(types) | CategorizedType::Iterator(types) => (
                 PgGuardRewriter::impl_table_srf(
                     types,
                     func_span,
