@@ -46,14 +46,11 @@ impl PgGuardRewriter {
         rewrite_args: bool,
         is_raw: bool,
         no_guard: bool,
-    ) -> (proc_macro2::TokenStream, bool) {
+    ) -> proc_macro2::TokenStream {
         if rewrite_args {
             self.item_fn_with_rewrite(func, entity_submission, is_raw, no_guard)
         } else {
-            (
-                self.item_fn_without_rewrite(func, entity_submission, no_guard),
-                true,
-            )
+            self.item_fn_without_rewrite(func, entity_submission, no_guard)
         }
     }
 
@@ -63,7 +60,7 @@ impl PgGuardRewriter {
         entity_submission: Option<&PgExtern>,
         is_raw: bool,
         no_guard: bool,
-    ) -> (proc_macro2::TokenStream, bool) {
+    ) -> proc_macro2::TokenStream {
         // remember the original visibility and signature classifications as we want
         // to use those for the outer function
         let vis = func.vis.clone();
@@ -121,22 +118,19 @@ impl PgGuardRewriter {
             #[allow(unused_variables)]
         };
         match return_type_kind {
-            CategorizedType::Default => (
-                PgGuardRewriter::impl_standard_udf(
-                    func_span,
-                    prolog,
-                    vis,
-                    func_name_wrapper,
-                    generics,
-                    func_call,
-                    rewritten_return_type,
-                    entity_submission,
-                    no_guard,
-                ),
-                true,
+            CategorizedType::Default => PgGuardRewriter::impl_standard_udf(
+                func_span,
+                prolog,
+                vis,
+                func_name_wrapper,
+                generics,
+                func_call,
+                rewritten_return_type,
+                entity_submission,
+                no_guard,
             ),
 
-            CategorizedType::Iterator(types) if types.len() == 1 => (
+            CategorizedType::Iterator(types) if types.len() == 1 => {
                 PgGuardRewriter::impl_setof_srf(
                     types,
                     func_span,
@@ -147,11 +141,10 @@ impl PgGuardRewriter {
                     func_call,
                     entity_submission,
                     false,
-                ),
-                true,
-            ),
+                )
+            }
 
-            CategorizedType::OptionalIterator(types) if types.len() == 1 => (
+            CategorizedType::OptionalIterator(types) if types.len() == 1 => {
                 PgGuardRewriter::impl_setof_srf(
                     types,
                     func_span,
@@ -162,11 +155,10 @@ impl PgGuardRewriter {
                     func_call,
                     entity_submission,
                     true,
-                ),
-                true,
-            ),
+                )
+            }
 
-            CategorizedType::Tuple(types) | CategorizedType::Iterator(types) => (
+            CategorizedType::Tuple(types) | CategorizedType::Iterator(types) => {
                 PgGuardRewriter::impl_table_srf(
                     types,
                     func_span,
@@ -177,22 +169,18 @@ impl PgGuardRewriter {
                     func_call,
                     entity_submission,
                     false,
-                ),
-                true,
-            ),
+                )
+            }
 
-            CategorizedType::OptionalIterator(types) => (
-                PgGuardRewriter::impl_table_srf(
-                    types,
-                    func_span,
-                    prolog,
-                    vis,
-                    func_name_wrapper,
-                    generics,
-                    func_call,
-                    entity_submission,
-                    true,
-                ),
+            CategorizedType::OptionalIterator(types) => PgGuardRewriter::impl_table_srf(
+                types,
+                func_span,
+                prolog,
+                vis,
+                func_name_wrapper,
+                generics,
+                func_call,
+                entity_submission,
                 true,
             ),
         }

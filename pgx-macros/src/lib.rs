@@ -43,7 +43,7 @@ pub fn pg_guard(_attr: TokenStream, item: TokenStream) -> TokenStream {
         // process top-level functions
         // these functions get wrapped as public extern "C" functions with #[no_mangle] so they
         // can also be called from C code
-        Item::Fn(func) => rewriter.item_fn(func, None, false, false, false).0.into(),
+        Item::Fn(func) => rewriter.item_fn(func, None, false, false, false).into(),
         _ => {
             panic!("#[pg_guard] can only be applied to extern \"C\" blocks and top-level functions")
         }
@@ -589,7 +589,7 @@ fn rewrite_item_fn(
     // make the function 'extern "C"' because this is for the #[pg_extern[ macro
     func.sig.abi = Some(syn::parse_str("extern \"C\"").unwrap());
     let func_span = func.span();
-    let (rewritten_func, need_wrapper) = rewriter.item_fn(
+    let rewritten_func = rewriter.item_fn(
         func,
         Some(sql_graph_entity_submission),
         true,
@@ -597,22 +597,15 @@ fn rewrite_item_fn(
         no_guard,
     );
 
-    if need_wrapper {
-        quote_spanned! {func_span=>
-            #[no_mangle]
-            #[doc(hidden)]
-            pub extern "C" fn #finfo_name() -> &'static pg_sys::Pg_finfo_record {
-                const V1_API: pg_sys::Pg_finfo_record = pg_sys::Pg_finfo_record { api_version: 1 };
-                &V1_API
-            }
-
-            #rewritten_func
+    quote_spanned! {func_span=>
+        #[no_mangle]
+        #[doc(hidden)]
+        pub extern "C" fn #finfo_name() -> &'static pg_sys::Pg_finfo_record {
+            const V1_API: pg_sys::Pg_finfo_record = pg_sys::Pg_finfo_record { api_version: 1 };
+            &V1_API
         }
-    } else {
-        quote_spanned! {func_span=>
 
-            #rewritten_func
-        }
+        #rewritten_func
     }
 }
 
