@@ -20,7 +20,7 @@ use object::Object;
 use once_cell::sync::OnceCell;
 use owo_colors::OwoColorize;
 use pgx_pg_config::{get_target_dir, PgConfig, Pgx};
-use pgx_utils::sql_entity_graph::{PgxSql, SqlGraphEntity};
+use pgx_utils::sql_entity_graph::{ControlFile, PgxSql, SqlGraphEntity};
 use std::{
     collections::HashSet,
     hash::{Hash, Hasher},
@@ -390,10 +390,14 @@ pub(crate) fn generate_schema(
             .expect(&format!("Couldn't call __pgx_sql_mappings"));
         sql_mapping = sql_mappings_symbol();
 
-        let symbol: libloading::os::unix::Symbol<unsafe extern "C" fn() -> SqlGraphEntity> = lib
+        let symbol: libloading::os::unix::Symbol<
+            unsafe extern "C" fn() -> eyre::Result<ControlFile>,
+        > = lib
             .get("__pgx_marker".as_bytes())
             .expect(&format!("Couldn't call __pgx_marker"));
-        let control_file_entity = symbol();
+        let control_file_entity = SqlGraphEntity::ExtensionRoot(
+            symbol().expect("Failed to get control file information"),
+        );
         entities.push(control_file_entity);
 
         for symbol_to_call in fns_to_call {
