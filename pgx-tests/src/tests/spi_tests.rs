@@ -147,6 +147,25 @@ mod tests {
         assert!(Spi::get_one::<i32>("SELECT 1 LIMIT 0").is_none());
     }
 
+    #[pg_test]
+    fn test_spi_run() {
+        Spi::run("SELECT 1")
+    }
+
+    #[pg_test]
+    fn test_spi_run_with_args() {
+        let i = 1 as i32;
+        let j = 2 as i64;
+
+        Spi::run_with_args(
+            "SELECT $1 + $2 = 3",
+            vec![
+                (PgBuiltInOids::INT4OID.oid(), i.into_datum()),
+                (PgBuiltInOids::INT8OID.oid(), j.into_datum()),
+            ]
+        )
+    }
+
     #[pg_extern]
     fn do_panic() {
         panic!("did a panic");

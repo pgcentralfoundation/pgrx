@@ -171,7 +171,12 @@ impl Spi {
             client.update(query, None, None);
         })
     }
-    
+
+    /// run an arbitrary SQL statement with args.
+    ///
+    /// ## Safety
+    ///
+    /// The statement runs in read/write mode
     pub fn run_with_args(query: &str, args: Vec<(PgOid, Option<pg_sys::Datum>)>) {
         Spi::execute(|mut client| {
             client.update(query, None, Some(args));
