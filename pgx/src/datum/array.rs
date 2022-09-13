@@ -7,7 +7,7 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use crate::{array::RawArray, pg_sys, FromDatum, IntoDatum, PgMemoryContexts};
+use crate::{array::RawArray, layout::*, pg_sys, FromDatum, IntoDatum, PgMemoryContexts};
 use bitvec::slice::BitSlice;
 use core::ptr::NonNull;
 use serde::Serializer;
@@ -22,6 +22,7 @@ pub struct Array<'a, T: FromDatum> {
     nelems: usize,
     elem_slice: &'a [pg_sys::Datum],
     null_slice: NullKind<'a>,
+    elem_layout: Option<Layout>,
     _marker: PhantomData<T>,
 }
 
@@ -46,6 +47,14 @@ impl NullKind<'_> {
             Self::Bits(b1) => b1.get(index).map(|b| !b),
             Self::Bytes(b8) => b8.get(index).map(|b| *b),
             Self::Strict(len) => index.le(len).then(|| false),
+        }
+    }
+
+    fn any(&self) -> bool {
+        match self {
+            Self::Bits(b1) => !b1.all(),
+            Self::Bytes(b8) => b8.into_iter().any(|b| *b),
+            Self::Strict(_) => false,
         }
     }
 }
@@ -101,12 +110,14 @@ impl<'a, T: FromDatum> Array<'a, T> {
         // when you finally kill this off.
         let _ptr: Option<NonNull<pg_sys::varlena>> = None;
         let raw: Option<RawArray> = None;
+        let elem_layout: Option<Layout> = None;
         Array::<T> {
             _ptr,
             raw,
             nelems,
             elem_slice: unsafe { slice::from_raw_parts(elements, nelems) },
             null_slice: unsafe { slice::from_raw_parts(nulls, nelems) }.into(),
+            elem_layout,
             _marker: PhantomData,
         }
     }
@@ -118,9 +129,7 @@ impl<'a, T: FromDatum> Array<'a, T> {
     unsafe fn deconstruct_from(
         _ptr: Option<NonNull<pg_sys::varlena>>,
         raw: RawArray,
-        typlen: libc::c_int,
-        typbyval: bool,
-        typalign: libc::c_char,
+        layout: Layout,
     ) -> Array<'a, T> {
         let oid = raw.oid();
         let len = raw.len();
@@ -147,9 +156,9 @@ impl<'a, T: FromDatum> Array<'a, T> {
             pg_sys::deconstruct_array(
                 array,
                 oid,
-                typlen,
-                typbyval,
-                typalign,
+                layout.size.as_typlen().into(),
+                layout.passbyval,
+                layout.align.as_typalign(),
                 &mut elements,
                 &mut nulls,
                 &mut nelems,
@@ -173,6 +182,7 @@ impl<'a, T: FromDatum> Array<'a, T> {
             nelems,
             elem_slice: /* SAFETY: &[Datum] from palloc'd [Datum] */ unsafe { slice::from_raw_parts(elements, nelems) },
             null_slice,
+            elem_layout: Some(layout),
             _marker: PhantomData,
         }
     }
@@ -183,14 +193,47 @@ impl<'a, T: FromDatum> Array<'a, T> {
         ptr.unwrap_or(ptr::null())
     }
 
+    // # Panics
+    //
+    // Panics if it detects the slightest misalignment between types,
+    // or if a valid slice contains nulls, which may be uninit data.
+    #[deprecated(
+        since = "0.5.0",
+        note = "this function cannot be safe and is not generically sound\n\
+        even `unsafe fn as_slice(&self) -> &[T]` is not sound for all `&[T]`\n\
+        if you are sure your usage is sound, consider RawArray"
+    )]
     pub fn as_slice(&self) -> &[T] {
-        let sizeof_type = mem::size_of::<T>();
-        let sizeof_datums = mem::size_of_val(self.elem_slice);
-        unsafe {
-            slice::from_raw_parts(
-                self.elem_slice.as_ptr() as *const T,
-                sizeof_datums / sizeof_type,
-            )
+        if let Some(Layout {
+            size, passbyval, ..
+        }) = &self.elem_layout
+        {
+            if self.null_slice.any() {
+                panic!("null detected: can't expose potentially uninit data as a slice!")
+            }
+            const DATUM_SIZE: usize = mem::size_of::<pg_sys::Datum>();
+            let sizeof_type = match (passbyval, mem::size_of::<T>(), size.try_as_usize()) {
+                (true, rs @ (1 | 2 | 4 | 8), Some(pg @ (1 | 2 | 4 | 8))) if rs == pg => rs,
+                (true, _, _) => panic!("invalid sizes for pass-by-value datum"),
+                (false, DATUM_SIZE, _) => DATUM_SIZE,
+                (false, _, _) => panic!("invalid sizes for pass-by-reference datum"),
+            };
+            match (sizeof_type, self.raw.as_ref()) {
+                // SAFETY: Rust slice layout matches Postgres data layout and this array is "owned"
+                (1 | 2 | 4, Some(raw)) => unsafe { raw.assume_init_data_slice::<T>() },
+                (DATUM_SIZE, _) => {
+                    let sizeof_datums = mem::size_of_val(self.elem_slice);
+                    unsafe {
+                        slice::from_raw_parts(
+                            self.elem_slice.as_ptr() as *const T,
+                            sizeof_datums / sizeof_type,
+                        )
+                    }
+                }
+                (_, _) => panic!("no correctly-sized slice exists"),
+            }
+        } else {
+            panic!("not enough type information to slice correctly")
         }
     }
 
@@ -344,19 +387,10 @@ impl<'a, T: FromDatum> FromDatum for Array<'a, T> {
             let raw =
                 RawArray::from_ptr(NonNull::new(array).expect("detoast returned null ArrayType*"));
             let ptr = NonNull::new(ptr);
-
-            // outvals for get_typlenbyvalalign()
-            let mut typlen = 0;
-            let mut typbyval = false;
-            let mut typalign = 0;
             let oid = raw.oid();
+            let layout = Layout::lookup_oid(oid);
 
-            pg_sys::get_typlenbyvalalign(oid, &mut typlen, &mut typbyval, &mut typalign);
-            let typlen = typlen as _;
-
-            Some(Array::deconstruct_from(
-                ptr, raw, typlen, typbyval, typalign,
-            ))
+            Some(Array::deconstruct_from(ptr, raw, layout))
         }
     }
 }

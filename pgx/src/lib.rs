@@ -67,6 +67,8 @@ pub mod xid;
 #[doc(hidden)]
 pub use once_cell;
 
+mod layout;
+
 pub use aggregate::*;
 pub use atomics::*;
 pub use callbacks::*;

@@ -10,6 +10,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 mod datum;
 pub mod guard;
 mod oids;
+mod polyfill;
 pub mod setjmp;
 mod tupdesc;
 mod utils;
@@ -21,6 +22,7 @@ pub use datum::Datum;
 pub use datum::NullableDatum;
 pub use guard::*;
 pub use oids::*;
+pub use polyfill::*;
 pub use tupdesc::*;
 pub use utils::*;
 
