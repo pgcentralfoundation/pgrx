@@ -398,7 +398,8 @@ mod tests {
     #[pg_test]
     #[should_panic]
     fn test_arr_sort_uniq_with_null() {
-        let _result = Spi::get_one::<Vec<i32>>("SELECT arr_sort_uniq(ARRAY[3,2,NULL,2,1]::integer[])");
+        let _result =
+            Spi::get_one::<Vec<i32>>("SELECT arr_sort_uniq(ARRAY[3,2,NULL,2,1]::integer[])");
         // No assert because we're testing for the panic.
     }
 }
