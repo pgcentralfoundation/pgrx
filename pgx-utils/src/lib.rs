@@ -11,7 +11,7 @@ use crate::sql_entity_graph::PositioningRef;
 use proc_macro2::{TokenStream, TokenTree};
 use quote::{format_ident, quote, ToTokens, TokenStreamExt};
 use std::collections::HashSet;
-use syn::{GenericArgument, ItemFn, PathArguments, ReturnType, Type, TypeParamBound};
+use syn::{GenericArgument, PathArguments, Type, TypeParamBound};
 
 pub mod rewriter;
 pub mod sql_entity_graph;
@@ -205,15 +205,6 @@ pub fn parse_extern_attributes(attr: TokenStream) -> HashSet<ExternArgs> {
         }
     }
     args
-}
-
-pub fn categorize_return_type(func: &ItemFn) -> CategorizedType {
-    let rt = &func.sig.output;
-
-    match rt {
-        ReturnType::Default => CategorizedType::Default,
-        ReturnType::Type(_, ty) => categorize_type(ty),
-    }
 }
 
 pub fn categorize_type(ty: &Type) -> CategorizedType {
