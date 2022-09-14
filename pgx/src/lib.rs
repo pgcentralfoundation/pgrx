@@ -411,7 +411,8 @@ macro_rules! pg_sql_graph_magic {
     () => {
         #[no_mangle]
         #[doc(hidden)]
-        pub extern "C" fn __pgx_sql_mappings() -> ::pgx::utils::sql_entity_graph::RustToSqlMapping {
+        #[rustfmt::skip] // explict extern "Rust" is more clear here
+        pub extern "Rust" fn __pgx_sql_mappings() -> ::pgx::utils::sql_entity_graph::RustToSqlMapping {
             ::pgx::utils::sql_entity_graph::RustToSqlMapping {
                 rust_type_id_to_sql: ::pgx::DEFAULT_RUST_TYPE_ID_TO_SQL.clone(),
                 rust_source_to_sql: ::pgx::DEFAULT_RUST_SOURCE_TO_SQL.clone(),
@@ -423,7 +424,8 @@ macro_rules! pg_sql_graph_magic {
         // A marker which must exist in the root of the extension.
         #[no_mangle]
         #[doc(hidden)]
-        pub extern "C" fn __pgx_marker(
+        #[rustfmt::skip] // explict extern "Rust" is more clear here
+        pub extern "Rust" fn __pgx_marker(
         ) -> ::pgx::utils::__reexports::eyre::Result<::pgx::utils::sql_entity_graph::ControlFile> {
             use ::core::convert::TryFrom;
             use ::pgx::utils::__reexports::eyre::WrapErr;

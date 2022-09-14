@@ -631,7 +631,7 @@ impl PgAggregate {
         let entity_item_fn: ItemFn = parse_quote! {
             #[no_mangle]
             #[doc(hidden)]
-            pub extern "C" fn #sql_graph_entity_fn_name() -> ::pgx::utils::sql_entity_graph::SqlGraphEntity {
+            pub extern "Rust" fn #sql_graph_entity_fn_name() -> ::pgx::utils::sql_entity_graph::SqlGraphEntity {
                 let submission = ::pgx::utils::sql_entity_graph::PgAggregateEntity {
                     full_path: ::core::any::type_name::<#target_ident>(),
                     module_path: module_path!(),
