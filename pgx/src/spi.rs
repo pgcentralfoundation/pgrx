@@ -75,7 +75,7 @@ pub struct SpiTupleTable {
 /// Represents a single `pg_sys::Datum` inside a `SpiHeapTupleData`
 pub struct SpiHeapTupleDataEntry {
     datum: Option<pg_sys::Datum>,
-    type_oid: pg_sys::Oid,
+    pub type_oid: pg_sys::Oid,
 }
 
 /// Represents the set of `pg_sys::Datum`s in a `pg_sys::HeapTuple`
