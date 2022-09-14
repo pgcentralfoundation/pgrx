@@ -159,11 +159,39 @@ mod tests {
 
         Spi::run_with_args(
             "SELECT $1 + $2 = 3",
-            vec![
+            Some(vec![
                 (PgBuiltInOids::INT4OID.oid(), i.into_datum()),
                 (PgBuiltInOids::INT8OID.oid(), j.into_datum()),
-            ],
+            ]),
         )
+    }
+
+    #[pg_test]
+    fn test_spi_explain() {
+        let result = Spi::explain("SELECT 1");
+        let expected: serde_json::Value = serde_json::from_str(r#"
+        [{"Plan": {"Node Type": "Result", "Parallel Aware": false, "Plan Rows": 1, "Plan Width": 4, "Startup Cost": 0.0, "Total Cost": 0.01}}]
+        "#).unwrap();
+        assert_eq!(result.0, expected);
+    }
+
+    #[pg_test]
+    fn test_spi_explain_with_args() {
+        let i = 1 as i32;
+        let j = 2 as i64;
+
+        let result = Spi::explain_with_args(
+            "SELECT $1 + $2 = 3",
+            Some(vec![
+                (PgBuiltInOids::INT4OID.oid(), i.into_datum()),
+                (PgBuiltInOids::INT8OID.oid(), j.into_datum()),
+            ]),
+        );
+
+        let expected: serde_json::Value = serde_json::from_str(r#"
+        [{"Plan": {"Node Type": "Result", "Parallel Aware": false, "Plan Rows": 1, "Plan Width": 1, "Startup Cost": 0.0, "Total Cost": 0.01}}]
+        "#).unwrap();
+        assert_eq!(result.0, expected);
     }
 
     #[pg_extern]
