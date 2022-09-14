@@ -367,7 +367,13 @@ pub(crate) fn generate_schema(
     let mut entities = Vec::default();
     let sql_mapping;
 
+    #[rustfmt::skip] // explict extern "Rust" is more clear here
     unsafe {
+        // SAFETY: Calls foreign functions with the correct type signatures.
+        // Assumes that repr(Rust) enums are represented the same in this crate as in the external
+        // binary, which is the case in practice when the same compiler is used to compile the
+        // external crate.
+
         POSTMASTER_LIBRARY
             .get_or_try_init(|| {
                 libloading::os::unix::Library::open(
@@ -384,14 +390,14 @@ pub(crate) fn generate_schema(
             .wrap_err_with(|| format!("Couldn't libload {}", lib_so.display()))?;
 
         let sql_mappings_symbol: libloading::os::unix::Symbol<
-            unsafe extern "C" fn() -> ::pgx_utils::sql_entity_graph::RustToSqlMapping,
+            unsafe extern "Rust" fn() -> ::pgx_utils::sql_entity_graph::RustToSqlMapping,
         > = lib
             .get("__pgx_sql_mappings".as_bytes())
             .expect(&format!("Couldn't call __pgx_sql_mappings"));
         sql_mapping = sql_mappings_symbol();
 
         let symbol: libloading::os::unix::Symbol<
-            unsafe extern "C" fn() -> eyre::Result<ControlFile>,
+            unsafe extern "Rust" fn() -> eyre::Result<ControlFile>,
         > = lib
             .get("__pgx_marker".as_bytes())
             .expect(&format!("Couldn't call __pgx_marker"));
@@ -401,7 +407,7 @@ pub(crate) fn generate_schema(
         entities.push(control_file_entity);
 
         for symbol_to_call in fns_to_call {
-            let symbol: libloading::os::unix::Symbol<unsafe extern "C" fn() -> SqlGraphEntity> =
+            let symbol: libloading::os::unix::Symbol<unsafe extern "Rust" fn() -> SqlGraphEntity> =
                 lib.get(symbol_to_call.as_bytes())
                     .expect(&format!("Couldn't call {:#?}", symbol_to_call));
             let entity = symbol();
