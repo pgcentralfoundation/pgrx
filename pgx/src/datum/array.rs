@@ -318,6 +318,17 @@ impl<'a, T: FromDatum> VariadicArray<'a, T> {
         self.0.into_array_type()
     }
 
+    // # Panics
+    //
+    // Panics if it detects the slightest misalignment between types,
+    // or if a valid slice contains nulls, which may be uninit data.
+    #[deprecated(
+        since = "0.5.0",
+        note = "this function cannot be safe and is not generically sound\n\
+        even `unsafe fn as_slice(&self) -> &[T]` is not sound for all `&[T]`\n\
+        if you are sure your usage is sound, consider RawArray"
+    )]
+    #[allow(deprecated)]
     pub fn as_slice(&self) -> &[T] {
         self.0.as_slice()
     }
