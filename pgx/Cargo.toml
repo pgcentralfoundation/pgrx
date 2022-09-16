@@ -33,8 +33,6 @@ no-default-features = true
 rustc-args = ["--cfg", "docsrs"]
 
 [dependencies]
-seq-macro = "0.3"
-
 pgx-macros = { path = "../pgx-macros/", version = "=0.5.0-beta.0" }
 pgx-pg-sys = { path = "../pgx-pg-sys", version = "=0.5.0-beta.0" }
 pgx-utils = { path = "../pgx-utils/", version = "=0.5.0-beta.0" }
@@ -42,6 +40,7 @@ pgx-utils = { path = "../pgx-utils/", version = "=0.5.0-beta.0" }
 # used to internally impl things
 once_cell = "1.10.0" # polyfill until std::lazy::OnceCell stabilizes
 quote = "1.0.18" # necessary for pgx's SQL generation
+seq-macro = "0.3" # impls loops in macros
 uuid = { version = "1.0.0", features = [ "v4" ] } # PgLwLock and shmem
 
 # error handling and logging

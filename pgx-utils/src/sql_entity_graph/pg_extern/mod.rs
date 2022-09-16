@@ -640,7 +640,7 @@ impl PgExtern {
             //                 ::pgx::heap_tuple::PgHeapTuple<'_, _>,
             //                 _,
             //             > = #func_name(&pg_trigger);
-        
+
             //             let trigger_retval = trigger_fn_result.expect("Trigger function panic");
             //             match trigger_retval.into_trigger_datum() {
             //                 None => ::pgx::pg_return_null(fcinfo),
