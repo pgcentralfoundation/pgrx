@@ -65,15 +65,19 @@
 
 ## System Requirements
 
-- A `rustup` managed toolchain (>=1.58) (or `rustc`, `cargo`, and `rustfmt`)
+- A Rust toolchain: `rustc`, `cargo`, and `rustfmt`. The recommended way to get these is from https://rustup.rs †
 - `git`
 - `libclang`
-   - Ubuntu: `libclang-dev` or `clang`
-   - RHEL: `clang`
+   - Ubuntu: `apt install libclang-dev` or `apt install clang`
+   - RHEL: `yum install clang`
 - `tar`
 - `bzip2`
 - GCC 7 or newer
-- [Build dependencies for PostgreSQL](https://wiki.postgresql.org/wiki/Compile_and_Install_from_source_code)
+- [PostgreSQL's build dependencies](https://wiki.postgresql.org/wiki/Compile_and_Install_from_source_code) ‡
+ 
+ † PGX has no MSRV policy, thus may require the latest stable version of Rust, available via Rustup
+ 
+ ‡ A local PostgreSQL server installation is not required. `cargo pgx` can download and compile PostgreSQL versions on its own.
 
 <details>
    <summary>How to: GCC 7 on CentOS 7</summary>
@@ -87,15 +91,13 @@ scl enable devtoolset-7 bash
 ```
 </details>
 
-Note that a local PostgreSQL Server installation is not required. `pgx` typically downloads and compiles PostgreSQL versions itself.
-
 ## Getting Started
 
 
 First install the `cargo-pgx` sub-command and initialize the development environment:
 
 ```bash
-cargo install cargo-pgx
+cargo install --locked cargo-pgx
 cargo pgx init
 ```
 
@@ -149,7 +151,7 @@ You can upgrade your current `cargo-pgx` installation by passing the `--force` f
 to `cargo install`:
 
 ```bash
-cargo install --force cargo-pgx
+cargo install --force --locked cargo-pgx
 ```
 
 As new Postgres versions are supported by `pgx`, you can re-run the `pgx init` process to download and compile them:
@@ -225,7 +227,19 @@ There's a few things on our immediate TODO list
 will be built into the `cargo-pgx` subcommand and make use of https://github.com/zombodb/postgres-parser.
  - More examples -- especially around memory management and the various derive macros `#[derive(PostgresType/Enum)]`
 
-## Experimental Features
+
+## Feature Flags
+PGX has optional feature flags for Rust code that do not involve configuring the version of Postgres used,
+but rather extend additional support for other kinds of Rust code. These are not included by default.
+
+### "time-crate": interop with the `time` crate
+This crate once used direct interop with the excellent [time crate][timecrate].
+However, due to complications involving performance and accurate interop with Postgres,
+this feature is now considered deprecated in favor of a lower-overhead interop.
+You may still request implementations of `TryFrom<time::Type> for pgx::MatchingType`
+and `From<time::Type> for pgx::MatchingType` by enabling the `"time-crate"` feature.
+
+### Experimental Features
 
 Adding `pgx = { version = "0.5.0-beta.0", features = ["postgrestd"] }` to your Cargo.toml
 will enable a **highly** experimental variant of `pgx` designed for integration with `postgrestd`,
@@ -267,3 +281,4 @@ Use of this source code is governed by the MIT license that can be found in the 
 ```
 
 [Discord]: https://discord.gg/hPb93Y9
+[timecrate]: https://crates.io/crates/time

@@ -72,9 +72,9 @@ dependencies = [
 
 [[package]]
 name = "atomic-polyfill"
-version = "0.1.8"
+version = "0.1.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e14bf7b4f565e5e717d7a7a65b2a05c0b8c96e4db636d6f780f03b15108cdd1b"
+checksum = "9c041a8d9751a520ee19656232a18971f18946a7900f1520ee4400002244dd89"
 dependencies = [
  "critical-section",
 ]
@@ -223,6 +223,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bef38d45163c2f1dde094a7dfd33ccf595c92905c8f8f4fdc18d06fb1037718a"
 
 [[package]]
+name = "bitvec"
+version = "1.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1bc2832c24239b0141d5674bb9174f9d68a8b5b3f2753311927c172ca46f7e9c"
+dependencies = [
+ "funty",
+ "radium",
+ "tap",
+ "wyz",
+]
+
+[[package]]
 name = "block-buffer"
 version = "0.10.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -294,7 +306,9 @@ dependencies = [
  "object",
  "once_cell",
  "owo-colors",
+ "pgx-pg-config",
  "pgx-utils",
+ "prettyplease",
  "proc-macro2",
  "quote",
  "rayon",
@@ -505,9 +519,9 @@ dependencies = [
 
 [[package]]
 name = "cpufeatures"
-version = "0.2.2"
+version = "0.2.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "59a6001667ab124aebae2a495118e11d30984c3a653e99d86d58971708cf5e4b"
+checksum = "28d997bd5e24a5928dd43e46dc529867e207907fe0b239c3477d924f7f2ca320"
 dependencies = [
  "libc",
 ]
@@ -677,17 +691,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "enum-primitive-derive"
-version = "0.2.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c375b9c5eadb68d0a6efee2999fef292f45854c3444c86f09d8ab086ba942b0e"
-dependencies = [
- "num-traits",
- "quote",
- "syn",
-]
-
-[[package]]
 name = "env_proxy"
 version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -795,6 +798,12 @@ dependencies = [
  "matches",
  "percent-encoding",
 ]
+
+[[package]]
+name = "funty"
+version = "2.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e6d5a32815ae3f33302d95fdcb2ce17862f8c65363dcfd29360480ba1001fc9c"
 
 [[package]]
 name = "futures"
@@ -1240,15 +1249,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "num-traits"
-version = "0.2.15"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "578ede34cf02f8924ab9447f50c28075b4d3e5b269972345e7e0372b38c6cdcd"
-dependencies = [
- "autocfg",
-]
-
-[[package]]
 name = "num_cpus"
 version = "1.13.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1413,11 +1413,11 @@ version = "0.5.0-beta.0"
 dependencies = [
  "atomic-traits",
  "bitflags",
+ "bitvec",
  "cstr_core",
- "enum-primitive-derive",
  "eyre",
  "heapless",
- "num-traits",
+ "libc",
  "once_cell",
  "pgx-macros",
  "pgx-pg-sys",
@@ -1448,6 +1448,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "pgx-pg-config"
+version = "0.5.0-beta.0"
+dependencies = [
+ "dirs",
+ "eyre",
+ "owo-colors",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "toml",
+ "tracing",
+ "url",
+]
+
+[[package]]
 name = "pgx-pg-sys"
 version = "0.5.0-beta.0"
 dependencies = [
@@ -1460,6 +1475,7 @@ dependencies = [
  "once_cell",
  "owo-colors",
  "pgx-macros",
+ "pgx-pg-config",
  "pgx-utils",
  "proc-macro2",
  "quote",
@@ -1479,6 +1495,7 @@ dependencies = [
  "owo-colors",
  "pgx",
  "pgx-macros",
+ "pgx-pg-config",
  "pgx-utils",
  "postgres",
  "regex",
@@ -1496,12 +1513,9 @@ dependencies = [
  "atty",
  "convert_case",
  "cstr_core",
- "dirs",
- "env_proxy",
  "eyre",
  "owo-colors",
  "petgraph",
- "prettyplease",
  "proc-macro2",
  "quote",
  "regex",
@@ -1511,12 +1525,10 @@ dependencies = [
  "serde_json",
  "syn",
  "syntect",
- "toml",
  "tracing",
  "tracing-error",
  "tracing-subscriber",
  "unescape",
- "url",
 ]
 
 [[package]]
@@ -1620,9 +1632,9 @@ checksum = "eb9f9e6e233e5c4a35559a617bf40a4ec447db2e84c20b55a6f83167b7e57872"
 
 [[package]]
 name = "prettyplease"
-version = "0.1.11"
+version = "0.1.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f28f53e8b192565862cf99343194579a022eb9c7dd3a8d03134734803c7b3125"
+checksum = "697ae720ee02011f439e0701db107ffe2916d83f718342d65d7f8bf7b8a5fee9"
 dependencies = [
  "proc-macro2",
  "syn",
@@ -1669,6 +1681,12 @@ checksum = "a1feb54ed693b93a84e14094943b84b7c4eae204c512b7ccb95ab0c66d278ad1"
 dependencies = [
  "proc-macro2",
 ]
+
+[[package]]
+name = "radium"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dc33ff2d4973d518d823d61aa239014831e521c75da58e3df4840d3f47749d09"
 
 [[package]]
 name = "rand"
@@ -2253,6 +2271,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "tap"
+version = "1.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "55937e1799185b12863d447f42597ed69d9928686b8d88a1df17376a097d8369"
+
+[[package]]
 name = "tempfile"
 version = "3.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2790,6 +2814,15 @@ name = "windows_x86_64_msvc"
 version = "0.36.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c811ca4a8c853ef420abd8592ba53ddbbac90410fab6903b3e79972a631f7680"
+
+[[package]]
+name = "wyz"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "30b31594f29d27036c383b53b59ed3476874d518f0efb151b27a4c275141390e"
+dependencies = [
+ "tap",
+]
 
 [[package]]
 name = "xml-rs"

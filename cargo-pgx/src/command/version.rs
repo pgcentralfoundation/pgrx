@@ -1,4 +1,4 @@
-use pgx_utils::pg_config::{PgConfig, Pgx};
+use pgx_pg_config::{PgConfig, Pgx};
 
 pub(crate) fn pgx_default(supported_major_versions: &[u16]) -> eyre::Result<Pgx> {
     let mut pgx = Pgx::new();
@@ -13,7 +13,7 @@ mod rss {
     use env_proxy::for_url_str;
     use eyre::WrapErr;
     use owo_colors::OwoColorize;
-    use pgx_utils::pg_config::PgVersion;
+    use pgx_pg_config::PgVersion;
     use serde_derive::Deserialize;
     use ureq::{Agent, AgentBuilder, Proxy};
     use url::Url;

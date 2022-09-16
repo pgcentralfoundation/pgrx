@@ -24,6 +24,7 @@ pg11 = [ "pgx-pg-sys/pg11" ]
 pg12 = [ "pgx-pg-sys/pg12" ]
 pg13 = [ "pgx-pg-sys/pg13" ]
 pg14 = [ "pgx-pg-sys/pg14" ]
+time-crate = [ ] # TODO(0.6.0): add "dep:time"
 
 [package.metadata.docs.rs]
 features = ["pg14"]
@@ -34,25 +35,30 @@ rustc-args = ["--cfg", "docsrs"]
 [dependencies]
 seq-macro = "0.3"
 
-
-cstr_core = "0.2.5"
-enum-primitive-derive = "0.2.2"
-num-traits = "0.2.15"
-seahash = "4.1.0"
 pgx-macros = { path = "../pgx-macros/", version = "=0.5.0-beta.0" }
 pgx-pg-sys = { path = "../pgx-pg-sys", version = "=0.5.0-beta.0" }
 pgx-utils = { path = "../pgx-utils/", version = "=0.5.0-beta.0" }
-serde = { version = "1.0.137", features = [ "derive" ] }
-serde_cbor = "0.11.2"
-serde_json = "1.0.81"
-time = { version = "0.3.9", features = ["formatting", "parsing", "alloc", "macros"] }
-atomic-traits = "0.3.0"
-heapless = "0.7.13"
-uuid = { version = "1.0.0", features = [ "v4" ] }
-once_cell = "1.10.0"
-bitflags = "1.3.2"
+
+# used to internally impl things
+once_cell = "1.10.0" # polyfill until std::lazy::OnceCell stabilizes
+quote = "1.0.18" # necessary for pgx's SQL generation
+uuid = { version = "1.0.0", features = [ "v4" ] } # PgLwLock and shmem
+
+# error handling and logging
 eyre = "0.6.8"
+thiserror = "1.0"
 tracing = "0.1.34"
 tracing-error = "0.2.0"
-quote = "1.0.18"
-thiserror = "1.0"
+
+# exposed in public API
+atomic-traits = "0.3.0" # PgAtomic and shmem init
+bitflags = "1.3.2" # BackgroundWorker
+bitvec = "1.0" # processing array nullbitmaps
+cstr_core = "0.2.5" # no std compat
+heapless = "0.7.13" # shmem and PgLwLock
+libc = "0.2.126" # FFI type compat
+seahash = "4.1.0" # derive(PostgresHash)
+serde = { version = "1.0.137", features = [ "derive" ] } # impls on pub types
+serde_cbor = "0.11.2" # derive(PostgresType)
+serde_json = "1.0.81" # everything JSON
+time = { version = "0.3.9", features = ["formatting", "parsing", "alloc", "macros"] } # TODO(0.6.0): add `optional = true`

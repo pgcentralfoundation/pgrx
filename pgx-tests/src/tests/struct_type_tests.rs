@@ -12,7 +12,8 @@ use pgx::utils::sql_entity_graph::metadata::{
     ArgumentError, ReturnVariant, ReturnVariantError, SqlTranslatable, SqlVariant,
 };
 use pgx::*;
-use pgx_utils::get_named_capture;
+
+use crate::get_named_capture;
 
 #[derive(Debug)]
 #[repr(C)]

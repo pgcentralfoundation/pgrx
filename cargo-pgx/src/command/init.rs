@@ -12,13 +12,11 @@ use crate::command::version::pgx_default;
 use crate::CommandExecute;
 use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
-use pgx_utils::{
-    pg_config::{PgConfig, PgConfigSelector, Pgx},
-    prefix_path, SUPPORTED_MAJOR_VERSIONS,
-};
+use pgx_pg_config::{prefix_path, PgConfig, PgConfigSelector, Pgx, SUPPORTED_MAJOR_VERSIONS};
 use rayon::prelude::*;
 
 use std::collections::HashMap;
+use std::env;
 use std::fs::File;
 use std::io::{Read, Write};
 use std::path::PathBuf;
@@ -166,10 +164,17 @@ pub(crate) fn init_pgx(pgx: &Pgx) -> eyre::Result<()> {
     for pg_config in output_configs.iter() {
         validate_pg_config(pg_config)?;
 
-        let datadir = pg_config.data_dir()?;
-        let bindir = pg_config.bin_dir()?;
-        if !datadir.exists() {
-            initdb(&bindir, &datadir)?;
+        if is_root_user() {
+            println!(
+                "{} initdb as current user is root user",
+                "   Skipping".bold().green(),
+            );
+        } else {
+            let datadir = pg_config.data_dir()?;
+            let bindir = pg_config.bin_dir()?;
+            if !datadir.exists() {
+                initdb(&bindir, &datadir)?;
+            }
         }
     }
 
@@ -430,6 +435,13 @@ fn get_pg_installdir(pgdir: &PathBuf) -> PathBuf {
     let mut dir = PathBuf::from(pgdir);
     dir.push("pgx-install");
     dir
+}
+
+fn is_root_user() -> bool {
+    match env::var("USER") {
+        Ok(val) => val == "root",
+        Err(_) => false,
+    }
 }
 
 pub(crate) fn initdb(bindir: &PathBuf, datadir: &PathBuf) -> eyre::Result<()> {

@@ -7,28 +7,14 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use crate::{pg_config::PgConfig, sql_entity_graph::PositioningRef};
-use eyre::{eyre, WrapErr};
-use owo_colors::OwoColorize;
+use crate::sql_entity_graph::PositioningRef;
 use proc_macro2::{TokenStream, TokenTree};
 use quote::{format_ident, quote, ToTokens, TokenStreamExt};
-use serde_json::value::Value as JsonValue;
-use std::{
-    collections::HashSet,
-    path::PathBuf,
-    process::{Command, Stdio},
-    str::FromStr,
-};
+use std::collections::HashSet;
 use syn::{GenericArgument, ItemFn, PathArguments, ReturnType, Type, TypeParamBound};
 
-mod pgx_pg_sys_stub;
-
-pub mod operator_common;
-pub mod pg_config;
 pub mod rewriter;
 pub mod sql_entity_graph;
-
-pub use pgx_pg_sys_stub::PgxPgSysStub;
 
 #[doc(hidden)]
 pub mod __reexports {
@@ -41,142 +27,9 @@ pub mod __reexports {
     }
 }
 
-pub const SUPPORTED_MAJOR_VERSIONS: &[u16] = &[10, 11, 12, 13, 14];
-pub static BASE_POSTGRES_PORT_NO: u16 = 28800;
-pub static BASE_POSTGRES_TESTING_PORT_NO: u16 = 32200;
-
-pub fn get_target_dir() -> eyre::Result<PathBuf> {
-    let mut command = Command::new("cargo");
-    command
-        .arg("metadata")
-        .arg("--format-version=1")
-        .arg("--no-deps");
-    let output = command
-        .output()
-        .wrap_err("Unable to get target directory from `cargo metadata`")?;
-    if !output.status.success() {
-        return Err(eyre!(
-            "'cargo metadata' failed with exit code: {}",
-            output.status
-        ));
-    }
-
-    let json: JsonValue =
-        serde_json::from_slice(&output.stdout).wrap_err("Invalid `cargo metada` response")?;
-    let target_dir = json.get("target_directory");
-    match target_dir {
-        Some(JsonValue::String(target_dir)) => Ok(target_dir.into()),
-        v => Err(eyre!(
-            "could not read target dir from `cargo metadata` got: {:?}",
-            v,
-        )),
-    }
-}
-
-pub fn prefix_path<P: Into<PathBuf>>(dir: P) -> String {
-    let mut path = std::env::split_paths(&std::env::var_os("PATH").expect("failed to get $PATH"))
-        .collect::<Vec<_>>();
-
-    path.insert(0, dir.into());
-    std::env::join_paths(path)
-        .expect("failed to join paths")
-        .into_string()
-        .expect("failed to construct path")
-}
-
-pub fn createdb(
-    pg_config: &PgConfig,
-    dbname: &str,
-    is_test: bool,
-    if_not_exists: bool,
-) -> eyre::Result<bool> {
-    if if_not_exists && does_db_exist(pg_config, dbname)? {
-        return Ok(false);
-    }
-
-    println!("{} database {}", "     Creating".bold().green(), dbname);
-    let mut command = Command::new(pg_config.createdb_path()?);
-    command
-        .env_remove("PGDATABASE")
-        .env_remove("PGHOST")
-        .env_remove("PGPORT")
-        .env_remove("PGUSER")
-        .arg("-h")
-        .arg(pg_config.host())
-        .arg("-p")
-        .arg(if is_test {
-            pg_config.test_port()?.to_string()
-        } else {
-            pg_config.port()?.to_string()
-        })
-        .arg(dbname)
-        .stdout(Stdio::piped())
-        .stderr(Stdio::piped());
-    let command_str = format!("{:?}", command);
-
-    let output = command.output()?;
-
-    if !output.status.success() {
-        return Err(eyre!(
-            "problem running createdb: {}\n\n{}{}",
-            command_str,
-            String::from_utf8(output.stdout).unwrap(),
-            String::from_utf8(output.stderr).unwrap()
-        ));
-    }
-
-    Ok(true)
-}
-
-fn does_db_exist(pg_config: &PgConfig, dbname: &str) -> eyre::Result<bool> {
-    let mut command = Command::new(pg_config.psql_path()?);
-    command
-        .arg("-XqAt")
-        .env_remove("PGUSER")
-        .arg("-h")
-        .arg(pg_config.host())
-        .arg("-p")
-        .arg(pg_config.port()?.to_string())
-        .arg("template1")
-        .arg("-c")
-        .arg(&format!(
-            "select count(*) from pg_database where datname = '{}';",
-            dbname.replace("'", "''")
-        ))
-        .stdout(Stdio::piped())
-        .stderr(Stdio::piped());
-
-    let command_str = format!("{:?}", command);
-    let output = command.output()?;
-
-    if !output.status.success() {
-        return Err(eyre!(
-            "problem checking if database '{}' exists: {}\n\n{}{}",
-            dbname,
-            command_str,
-            String::from_utf8(output.stdout).unwrap(),
-            String::from_utf8(output.stderr).unwrap()
-        ));
-    } else {
-        let count = i32::from_str(&String::from_utf8(output.stdout).unwrap().trim())
-            .wrap_err("result is not a number")?;
-        Ok(count > 0)
-    }
-}
-
-pub fn get_named_capture(
-    regex: &regex::Regex,
-    name: &'static str,
-    against: &str,
-) -> Option<String> {
-    match regex.captures(against) {
-        Some(cap) => Some(cap[name].to_string()),
-        None => None,
-    }
-}
-
 #[derive(Debug, Hash, Eq, PartialEq, Clone, PartialOrd, Ord)]
 pub enum ExternArgs {
+    CreateOrReplace,
     Immutable,
     Strict,
     Stable,
@@ -196,6 +49,7 @@ pub enum ExternArgs {
 impl core::fmt::Display for ExternArgs {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
+            ExternArgs::CreateOrReplace => write!(f, "CREATE OR REPLACE"),
             ExternArgs::Immutable => write!(f, "IMMUTABLE"),
             ExternArgs::Strict => write!(f, "STRICT"),
             ExternArgs::Stable => write!(f, "STABLE"),
@@ -217,6 +71,7 @@ impl core::fmt::Display for ExternArgs {
 impl ToTokens for ExternArgs {
     fn to_tokens(&self, tokens: &mut TokenStream) {
         match self {
+            ExternArgs::CreateOrReplace => tokens.append(format_ident!("CreateOrReplace")),
             ExternArgs::Immutable => tokens.append(format_ident!("Immutable")),
             ExternArgs::Strict => tokens.append(format_ident!("Strict")),
             ExternArgs::Stable => tokens.append(format_ident!("Stable")),
@@ -296,6 +151,7 @@ pub fn parse_extern_attributes(attr: TokenStream) -> HashSet<ExternArgs> {
             TokenTree::Ident(i) => {
                 let name = i.to_string();
                 match name.as_str() {
+                    "create_or_replace" => args.insert(ExternArgs::CreateOrReplace),
                     "immutable" => args.insert(ExternArgs::Immutable),
                     "strict" => args.insert(ExternArgs::Strict),
                     "stable" => args.insert(ExternArgs::Stable),
@@ -630,10 +486,6 @@ pub fn anonymonize_lifetimes(value: &mut syn::Type) {
 
         _ => {}
     }
-}
-
-pub fn versioned_so_name(extension_name: &str, extension_version: &str) -> String {
-    format!("{}-{}", extension_name, extension_version)
 }
 
 /// Roughly `pgx::pg_sys::NAMEDATALEN`

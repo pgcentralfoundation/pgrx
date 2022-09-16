@@ -128,17 +128,20 @@ impl ToSql for PgExternEntity {
         if strict_upgrade {
             extern_attrs.push(ExternArgs::Strict);
         }
+        extern_attrs.sort();
+        extern_attrs.dedup();
 
         let module_pathname = &context.get_module_pathname();
 
         let fn_sql = format!(
             "\
-                                CREATE FUNCTION {schema}\"{name}\"({arguments}) {returns}\n\
+                                CREATE {or_replace} FUNCTION {schema}\"{name}\"({arguments}) {returns}\n\
                                 {extern_attrs}\
                                 {search_path}\
                                 LANGUAGE c /* Rust */\n\
                                 AS '{module_pathname}', '{unaliased_name}_wrapper';\
                             ",
+            or_replace = if extern_attrs.contains(&ExternArgs::CreateOrReplace) { "OR REPLACE" } else { "" },
             schema = self
                 .schema
                 .map(|schema| format!("{}.", schema))

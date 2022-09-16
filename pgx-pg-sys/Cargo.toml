@@ -41,6 +41,7 @@ bindgen = { version = "0.59.2", default-features = false, features = ["runtime"]
 build-deps = "0.1.4"
 owo-colors = "3.4.0"
 num_cpus = "1.13.1"
+pgx-pg-config= { path = "../pgx-pg-config/", version = "=0.5.0-beta.0" }
 pgx-utils = { path = "../pgx-utils/", version = "=0.5.0-beta.0" }
 proc-macro2 = "1.0.39"
 quote = "1.0.18"

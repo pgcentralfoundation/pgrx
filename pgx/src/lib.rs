@@ -24,8 +24,6 @@ Use of this source code is governed by the MIT license that can be found in the 
 #![allow(clippy::cast_ptr_alignment)]
 extern crate pgx_macros;
 
-extern crate num_traits;
-
 #[macro_use]
 extern crate bitflags;
 
@@ -46,6 +44,7 @@ pub mod iterators;
 pub mod list;
 #[macro_use]
 pub mod log;
+pub mod array;
 pub mod atomics;
 pub mod bgworkers;
 pub mod heap_tuple;
@@ -67,6 +66,8 @@ pub mod xid;
 
 #[doc(hidden)]
 pub use once_cell;
+
+mod layout;
 
 pub use aggregate::*;
 pub use atomics::*;
@@ -268,7 +269,8 @@ macro_rules! pg_sql_graph_magic {
     () => {
         #[no_mangle]
         #[doc(hidden)]
-        pub fn __pgx_sql_mappings(_: ()) -> ::pgx::utils::sql_entity_graph::RustToSqlMapping {
+        #[rustfmt::skip] // explict extern "Rust" is more clear here
+        pub extern "Rust" fn __pgx_sql_mappings() -> ::pgx::utils::sql_entity_graph::RustToSqlMapping {
             ::pgx::utils::sql_entity_graph::RustToSqlMapping {
                 rust_source_to_sql: ::pgx::DEFAULT_RUST_SOURCE_TO_SQL.clone(),
             }
@@ -277,7 +279,8 @@ macro_rules! pg_sql_graph_magic {
         // A marker which must exist in the root of the extension.
         #[no_mangle]
         #[doc(hidden)]
-        pub fn __pgx_marker(
+        #[rustfmt::skip] // explict extern "Rust" is more clear here
+        pub extern "Rust" fn __pgx_marker(
             _: (),
         ) -> ::pgx::utils::__reexports::eyre::Result<::pgx::utils::sql_entity_graph::ControlFile> {
             use ::core::convert::TryFrom;

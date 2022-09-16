@@ -14,8 +14,7 @@ use crate::{
 use cargo_toml::Manifest;
 use eyre::{eyre, WrapErr};
 use owo_colors::OwoColorize;
-use pgx_utils::pg_config::PgConfig;
-use pgx_utils::{get_target_dir, versioned_so_name};
+use pgx_pg_config::{get_target_dir, PgConfig};
 use std::{
     io::BufReader,
     path::{Path, PathBuf},
@@ -128,8 +127,7 @@ pub(crate) fn install_extension(
     let build_command_messages =
         build_command_stream.collect::<Result<Vec<_>, std::io::Error>>()?;
 
-    println!();
-    println!("installing extension");
+    println!("{} extension", "  Installing".bold().green(),);
     let pkgdir = make_relative(pg_config.pkglibdir()?);
     let extdir = make_relative(pg_config.extension_dir()?);
     let shlibpath = find_library_file(&manifest, &build_command_messages)?;
@@ -156,7 +154,8 @@ pub(crate) fn install_extension(
         dest.push(&pkgdir);
         let so_name = if versioned_so {
             let extver = get_version(&package_manifest_path)?;
-            versioned_so_name(&extname, &extver)
+            // note: versioned so-name format must agree with pgx-utils
+            format!("{}-{}", &extname, &extver)
         } else {
             extname.clone()
         };
@@ -287,8 +286,14 @@ pub(crate) fn build_extension(
     let command = command.stderr(Stdio::inherit());
     let command_str = format!("{:?}", command);
     println!(
-        "building extension with features `{}`\n{}",
-        features_arg, command_str
+        "{} extension with features {}",
+        "    Building".bold().green(),
+        features_arg.cyan()
+    );
+    println!(
+        "{} command {}",
+        "     Running".bold().green(),
+        command_str.cyan()
     );
     let cargo_output = command
         .output()

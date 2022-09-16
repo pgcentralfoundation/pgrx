@@ -40,7 +40,6 @@ use crate::sql_entity_graph::{
     to_sql::ToSql,
     SqlGraphEntity, SqlGraphIdentifier,
 };
-use crate::versioned_so_name;
 
 use super::{PgExternReturnEntity, PgExternReturnEntityIteratedItem};
 
@@ -207,6 +206,7 @@ impl PgxSql {
         connect_externs(
             &mut graph,
             &mapped_externs,
+            &mapped_hashes,
             &mapped_schemas,
             &mapped_types,
             &mapped_enums,
@@ -477,7 +477,8 @@ impl PgxSql {
         return if self.versioned_so {
             let extname = &self.extension_name;
             let extver = &self.control.default_version;
-            format!("$libdir/{}", versioned_so_name(extname, extver))
+            // Note: versioned so-name format must agree with cargo pgx
+            format!("$libdir/{}-{}", extname, extver)
         } else {
             String::from("MODULE_PATHNAME")
         };
@@ -885,6 +886,7 @@ fn initialize_externs(
 fn connect_externs(
     graph: &mut StableGraph<SqlGraphEntity, SqlGraphRelationship>,
     externs: &HashMap<PgExternEntity, NodeIndex>,
+    hashes: &HashMap<PostgresHashEntity, NodeIndex>,
     schemas: &HashMap<SchemaEntity, NodeIndex>,
     types: &HashMap<PostgresTypeEntity, NodeIndex>,
     enums: &HashMap<PostgresEnumEntity, NodeIndex>,
@@ -939,6 +941,16 @@ fn connect_externs(
                 item.module_path,
                 schemas,
             );
+        }
+
+        // The hash function must be defined after the {typename}_eq function.
+        for (hash_item, &hash_index) in hashes {
+            if item.module_path == hash_item.module_path
+                && item.name == hash_item.name.to_lowercase() + "_eq"
+            {
+                tracing::debug!(from = hash_item.full_path, to = ?item.full_path, "Adding Hash after Extern edge");
+                graph.add_edge(index, hash_index, SqlGraphRelationship::RequiredBy);
+            }
         }
 
         for arg in &item.fn_args {
