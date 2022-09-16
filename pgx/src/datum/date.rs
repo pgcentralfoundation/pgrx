@@ -11,8 +11,6 @@ use crate::{pg_sys, FromDatum, IntoDatum};
 use pgx_utils::sql_entity_graph::metadata::{
     ArgumentError, ReturnVariant, ReturnVariantError, SqlTranslatable, SqlVariant,
 };
-use std::ops::{Deref, DerefMut};
-use time::format_description::FormatItem;
 use core::num::TryFromIntError;
 use std::ffi::CStr;
 
@@ -179,9 +177,6 @@ impl serde::Serialize for Date {
             .map_err(|e| serde::ser::Error::custom(format!("Date formatting problem: {:?}", e)))
     }
 }
-
-static DATE_FORMAT: &[FormatItem<'static>] =
-    time::macros::format_description!("[year]-[month]-[day]");
 
 impl SqlTranslatable for Date {
     fn argument_sql() -> Result<SqlVariant, ArgumentError> {
