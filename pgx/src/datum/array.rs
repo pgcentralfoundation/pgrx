@@ -7,12 +7,12 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
-use pgx_utils::sql_entity_graph::metadata::{
-    ArgumentError, ReturnVariant, ReturnVariantError, SqlTranslatable, SqlVariant,
-};
 use crate::{array::RawArray, layout::*, pg_sys, FromDatum, IntoDatum, PgMemoryContexts};
 use bitvec::slice::BitSlice;
 use core::ptr::NonNull;
+use pgx_utils::sql_entity_graph::metadata::{
+    ArgumentError, ReturnVariant, ReturnVariantError, SqlTranslatable, SqlVariant,
+};
 use serde::Serializer;
 use std::marker::PhantomData;
 use std::{mem, ptr, slice};

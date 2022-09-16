@@ -224,7 +224,10 @@ impl SqlTranslatable for String {
     }
 }
 
-impl<T> SqlTranslatable for &T where T: SqlTranslatable {
+impl<T> SqlTranslatable for &T
+where
+    T: SqlTranslatable,
+{
     fn argument_sql() -> Result<SqlVariant, ArgumentError> {
         T::argument_sql()
     }

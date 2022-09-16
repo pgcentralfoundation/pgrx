@@ -8,10 +8,10 @@ Use of this source code is governed by the MIT license that can be found in the 
 */
 
 use crate::datum::time::USECS_PER_SEC;
+use crate::{pg_sys, FromDatum, IntoDatum};
 use pgx_utils::sql_entity_graph::metadata::{
     ArgumentError, ReturnVariant, ReturnVariantError, SqlTranslatable, SqlVariant,
 };
-use crate::{pg_sys, FromDatum, IntoDatum};
 use std::convert::TryFrom;
 use std::ffi::CStr;
 use std::ops::Sub;

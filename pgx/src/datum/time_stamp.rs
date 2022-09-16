@@ -7,10 +7,10 @@ All rights reserved.
 Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 */
 
+use crate::{pg_sys, FromDatum, IntoDatum, TimestampConversionError, TimestampWithTimeZone};
 use pgx_utils::sql_entity_graph::metadata::{
     ArgumentError, ReturnVariant, ReturnVariantError, SqlTranslatable, SqlVariant,
 };
-use crate::{pg_sys, FromDatum, IntoDatum, TimestampConversionError, TimestampWithTimeZone};
 use std::ffi::CStr;
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
