@@ -33,7 +33,8 @@ rustc-args = ["--cfg", "docsrs"]
 
 [dependencies]
 seq-macro = "0.3"
-anymap = "0.12.1"
+
+
 cstr_core = "0.2.5"
 enum-primitive-derive = "0.2.2"
 num-traits = "0.2.15"

@@ -51,12 +51,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "anymap"
-version = "0.12.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "33954243bd79057c2de7338850b85983a44588021f8a5fee574a8888c6de4344"
-
-[[package]]
 name = "arrays"
 version = "0.1.0"
 dependencies = [
@@ -1417,7 +1411,6 @@ dependencies = [
 name = "pgx"
 version = "0.5.0-beta.0"
 dependencies = [
- "anymap",
  "atomic-traits",
  "bitflags",
  "cstr_core",
