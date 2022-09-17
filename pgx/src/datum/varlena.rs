@@ -15,7 +15,7 @@ use crate::{
 };
 use pgx_pg_sys::varlena;
 use pgx_utils::sql_entity_graph::metadata::{
-    ArgumentError, ReturnVariant, ReturnVariantError, SqlMapping, SqlTranslatable,
+    ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
 use serde::{Deserialize, Serialize};
 use std::borrow::Cow;
@@ -451,7 +451,7 @@ where
         T::argument_sql()
     }
 
-    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
+    fn return_sql() -> Result<Returns, ReturnsError> {
         T::return_sql()
     }
 }

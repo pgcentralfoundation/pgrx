@@ -154,8 +154,8 @@ impl ToTokens for PostgresEnum {
                     Ok(::pgx::utils::sql_entity_graph::metadata::SqlMapping::As(String::from(stringify!(#name))))
                 }
 
-                fn return_sql() -> core::result::Result<::pgx::utils::sql_entity_graph::metadata::ReturnVariant, ::pgx::utils::sql_entity_graph::metadata::ReturnVariantError> {
-                    Ok(::pgx::utils::sql_entity_graph::metadata::ReturnVariant::Plain(::pgx::utils::sql_entity_graph::metadata::SqlMapping::As(String::from(stringify!(#name)))))
+                fn return_sql() -> core::result::Result<::pgx::utils::sql_entity_graph::metadata::Returns, ::pgx::utils::sql_entity_graph::metadata::ReturnsError> {
+                    Ok(::pgx::utils::sql_entity_graph::metadata::Returns::One(::pgx::utils::sql_entity_graph::metadata::SqlMapping::As(String::from(stringify!(#name)))))
                 }
             }
 

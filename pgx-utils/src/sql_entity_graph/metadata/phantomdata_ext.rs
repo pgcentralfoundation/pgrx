@@ -9,8 +9,8 @@ to the `pgx` framework and very subject to change between versions. While you ma
 use core::marker::PhantomData;
 
 use super::{
-    return_variant::ReturnVariantError, ArgumentError, FunctionMetadataTypeEntity, ReturnVariant,
-    SqlMapping, SqlTranslatable,
+    return_variant::ReturnsError, ArgumentError, FunctionMetadataTypeEntity, Returns, SqlMapping,
+    SqlTranslatable,
 };
 
 /**
@@ -21,7 +21,7 @@ Since we don't actually want to construct values during SQL generation, we use a
 pub trait PhantomDataExt {
     fn type_name(&self) -> &'static str;
     fn argument_sql(&self) -> Result<SqlMapping, ArgumentError>;
-    fn return_sql(&self) -> Result<ReturnVariant, ReturnVariantError>;
+    fn return_sql(&self) -> Result<Returns, ReturnsError>;
     fn variadic(&self) -> bool;
     fn optional(&self) -> bool;
     fn entity(&self) -> FunctionMetadataTypeEntity;
@@ -37,7 +37,7 @@ where
     fn argument_sql(&self) -> Result<SqlMapping, ArgumentError> {
         T::argument_sql()
     }
-    fn return_sql(&self) -> Result<ReturnVariant, ReturnVariantError> {
+    fn return_sql(&self) -> Result<Returns, ReturnsError> {
         T::return_sql()
     }
     fn variadic(&self) -> bool {

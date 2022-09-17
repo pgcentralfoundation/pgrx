@@ -12,7 +12,7 @@ use crate::{
     void_mut_ptr, FromDatum, IntoDatum,
 };
 use pgx_utils::sql_entity_graph::metadata::{
-    ArgumentError, ReturnVariant, ReturnVariantError, SqlMapping, SqlTranslatable,
+    ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
 use serde::{Serialize, Serializer};
 use serde_json::Value;
@@ -178,8 +178,8 @@ impl SqlTranslatable for Json {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("json"))
     }
-    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        Ok(ReturnVariant::Plain(SqlMapping::literal("json")))
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::literal("json")))
     }
 }
 
@@ -187,7 +187,7 @@ impl SqlTranslatable for crate::datum::JsonB {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("jsonb"))
     }
-    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        Ok(ReturnVariant::Plain(SqlMapping::literal("jsonb")))
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::literal("jsonb")))
     }
 }

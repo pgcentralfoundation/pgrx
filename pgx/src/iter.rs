@@ -1,5 +1,5 @@
 use pgx_utils::sql_entity_graph::metadata::{
-    ArgumentError, ReturnVariant, ReturnVariantError, SqlMapping, SqlTranslatable,
+    ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
 use std::panic::{RefUnwindSafe, UnwindSafe};
 
@@ -45,11 +45,11 @@ where
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         T::argument_sql()
     }
-    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
+    fn return_sql() -> Result<Returns, ReturnsError> {
         match T::return_sql() {
-            Ok(ReturnVariant::Plain(sql)) => Ok(ReturnVariant::SetOf(sql)),
-            Ok(ReturnVariant::SetOf(_)) => Err(ReturnVariantError::NestedSetOf),
-            Ok(ReturnVariant::Table(_)) => Err(ReturnVariantError::SetOfContainingTable),
+            Ok(Returns::One(sql)) => Ok(Returns::SetOf(sql)),
+            Ok(Returns::SetOf(_)) => Err(ReturnsError::NestedSetOf),
+            Ok(Returns::Table(_)) => Err(ReturnsError::SetOfContainingTable),
             err @ Err(_) => err,
         }
     }
@@ -112,17 +112,17 @@ seq_macro::seq!(I in 0..=32 {
                 fn argument_sql() -> Result<SqlMapping, ArgumentError> {
                     Err(ArgumentError::Table)
                 }
-                fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
+                fn return_sql() -> Result<Returns, ReturnsError> {
                     let mut vec = Vec::new();
                     #(
                         vec.push(match Input~N::return_sql() {
-                            Ok(ReturnVariant::Plain(sql)) => sql,
-                            Ok(ReturnVariant::SetOf(_)) => return Err(ReturnVariantError::TableContainingSetOf),
-                            Ok(ReturnVariant::Table(_)) => return Err(ReturnVariantError::NestedTable),
+                            Ok(Returns::One(sql)) => sql,
+                            Ok(Returns::SetOf(_)) => return Err(ReturnsError::TableContainingSetOf),
+                            Ok(Returns::Table(_)) => return Err(ReturnsError::NestedTable),
                             Err(err) => return Err(err),
                         });
                     )*
-                    Ok(ReturnVariant::Table(vec))
+                    Ok(Returns::Table(vec))
                 }
             }
         });

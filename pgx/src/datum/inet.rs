@@ -11,7 +11,7 @@ use crate::{
     direct_function_call, direct_function_call_as_datum, pg_sys, pg_try, FromDatum, IntoDatum,
 };
 use pgx_utils::sql_entity_graph::metadata::{
-    ArgumentError, ReturnVariant, ReturnVariantError, SqlMapping, SqlTranslatable,
+    ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
 use serde::de::{Error, Visitor};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
@@ -124,7 +124,7 @@ impl SqlTranslatable for Inet {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("inet"))
     }
-    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        Ok(ReturnVariant::Plain(SqlMapping::literal("inet")))
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::literal("inet")))
     }
 }

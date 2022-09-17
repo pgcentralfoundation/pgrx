@@ -14,7 +14,7 @@ use core::marker::PhantomData;
 Provide SQL generation related information on functions
 
 ```rust
-use pgx_utils::sql_entity_graph::metadata::{FunctionMetadata, ReturnVariant, SqlMapping};
+use pgx_utils::sql_entity_graph::metadata::{FunctionMetadata, Returns, SqlMapping};
 fn floof(i: i32) -> String { todo!() }
 
 type FunctionPointer = fn(i32) -> String;
@@ -22,7 +22,7 @@ let marker: FunctionPointer = floof;
 let metadata = pgx_utils::sql_entity_graph::metadata::FunctionMetadata::entity(&marker);
 assert_eq!(
     metadata.retval.unwrap().return_sql,
-    Ok(ReturnVariant::Plain(SqlMapping::As("TEXT".to_string()))),
+    Ok(Returns::One(SqlMapping::As("TEXT".to_string()))),
 );
 ```
  */

@@ -10,7 +10,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 use crate::datum::time::Time;
 use crate::{pg_sys, FromDatum, IntoDatum, PgBox};
 use pgx_utils::sql_entity_graph::metadata::{
-    ArgumentError, ReturnVariant, ReturnVariantError, SqlMapping, SqlTranslatable,
+    ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
 use std::ops::{Deref, DerefMut};
 use time::format_description::FormatItem;
@@ -126,9 +126,7 @@ impl SqlTranslatable for TimeWithTimeZone {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("time with time zone"))
     }
-    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        Ok(ReturnVariant::Plain(SqlMapping::literal(
-            "time with time zone",
-        )))
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::literal("time with time zone")))
     }
 }

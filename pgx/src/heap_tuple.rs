@@ -8,7 +8,7 @@ use crate::{
     PgTupleDesc, TriggerTuple, TryFromDatumError, WhoAllocated,
 };
 use pgx_utils::sql_entity_graph::metadata::{
-    ArgumentError, ReturnVariant, ReturnVariantError, SqlMapping, SqlTranslatable,
+    ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
 use std::num::NonZeroUsize;
 
@@ -589,8 +589,8 @@ impl SqlTranslatable for crate::heap_tuple::PgHeapTuple<'static, AllocatedByPost
             array_brackets: false,
         })
     }
-    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        Ok(ReturnVariant::Plain(SqlMapping::Composite {
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::Composite {
             array_brackets: false,
         }))
     }
@@ -602,8 +602,8 @@ impl SqlTranslatable for crate::heap_tuple::PgHeapTuple<'static, AllocatedByRust
             array_brackets: false,
         })
     }
-    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        Ok(ReturnVariant::Plain(SqlMapping::Composite {
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::Composite {
             array_brackets: false,
         }))
     }

@@ -10,15 +10,18 @@ use std::error::Error;
 
 use super::sql_translatable::SqlMapping;
 
+/// Describes the RETURNS of CREATE FUNCTION ... RETURNS ...
+/// See the PostgreSQL documentation for [CREATE FUNCTION]
+/// [CREATE FUNCTION]: https://www.postgresql.org/docs/current/sql-createfunction.html
 #[derive(Clone, Debug, Hash, Eq, PartialEq, Ord, PartialOrd)]
-pub enum ReturnVariant {
-    Plain(SqlMapping),
+pub enum Returns {
+    One(SqlMapping),
     SetOf(SqlMapping),
     Table(Vec<SqlMapping>),
 }
 
 #[derive(Clone, Copy, Debug, Hash, Ord, PartialOrd, PartialEq, Eq)]
-pub enum ReturnVariantError {
+pub enum ReturnsError {
     NestedSetOf,
     NestedTable,
     SetOfContainingTable,
@@ -30,34 +33,34 @@ pub enum ReturnVariantError {
     Datum,
 }
 
-impl std::fmt::Display for ReturnVariantError {
+impl std::fmt::Display for ReturnsError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            ReturnVariantError::NestedSetOf => {
+            ReturnsError::NestedSetOf => {
                 write!(f, "Nested SetofIterator in return type")
             }
-            ReturnVariantError::NestedTable => {
+            ReturnsError::NestedTable => {
                 write!(f, "Nested TableIterator in return type")
             }
-            ReturnVariantError::SetOfContainingTable => {
+            ReturnsError::SetOfContainingTable => {
                 write!(f, "SetofIterator containing TableIterator in return type")
             }
-            ReturnVariantError::TableContainingSetOf => {
+            ReturnsError::TableContainingSetOf => {
                 write!(f, "TableIterator containing SetofIterator in return type")
             }
-            ReturnVariantError::SetOfInArray => {
+            ReturnsError::SetOfInArray => {
                 write!(f, "SetofIterator inside Array is not valid")
             }
-            ReturnVariantError::TableInArray => {
+            ReturnsError::TableInArray => {
                 write!(f, "TableIterator inside Array is not valid")
             }
-            ReturnVariantError::SkipInArray => {
+            ReturnsError::SkipInArray => {
                 write!(f, "A SqlMapping::Skip inside Array is not valid")
             }
-            ReturnVariantError::BareU8 => {
+            ReturnsError::BareU8 => {
                 write!(f, "Canot use bare u8")
             }
-            ReturnVariantError::Datum => {
+            ReturnsError::Datum => {
                 write!(
                     f,
                     "A Datum as a return means that `sql = \"...\"` must be set in the declaration"
@@ -67,4 +70,4 @@ impl std::fmt::Display for ReturnVariantError {
     }
 }
 
-impl Error for ReturnVariantError {}
+impl Error for ReturnsError {}

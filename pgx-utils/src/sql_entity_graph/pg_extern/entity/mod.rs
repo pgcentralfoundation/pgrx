@@ -24,7 +24,7 @@ pub use returning::{PgExternReturnEntity, PgExternReturnEntityIteratedItem};
 
 use crate::{
     sql_entity_graph::{
-        metadata::{ReturnVariant, SqlMapping},
+        metadata::{Returns, SqlMapping},
         pgx_sql::PgxSql,
         to_sql::{entity::ToSqlConfigEntity, ToSql},
         SqlGraphEntity, SqlGraphIdentifier,
@@ -292,14 +292,14 @@ impl ToSql for PgExternEntity {
                         .ok_or_else(|| eyre!("Could not find return type in graph."))?;
                     let metadata_retval = self.metadata.retval.clone().ok_or_else(|| eyre!("Macro expansion time and SQL resolution time had differing opinions about the return value existing"))?;
                     let metadata_retval_sql = match metadata_retval.return_sql {
-                        Ok(ReturnVariant::Plain(SqlMapping::As(ref sql))) => sql.clone(),
-                        Ok(ReturnVariant::Plain(SqlMapping::Composite { array_brackets })) => ty.composite_type.unwrap().to_string()
+                        Ok(Returns::One(SqlMapping::As(ref sql))) => sql.clone(),
+                        Ok(Returns::One(SqlMapping::Composite { array_brackets })) => ty.composite_type.unwrap().to_string()
                         + if array_brackets {
                             "[]"
                         } else {
                             ""
                         },
-                        Ok(ReturnVariant::SetOf(SqlMapping::Source { array_brackets })) =>
+                        Ok(Returns::SetOf(SqlMapping::Source { array_brackets })) =>
                             context.source_only_to_sql_type(ty.ty_source).unwrap().to_string() + if array_brackets {
                                 "[]"
                             } else {
@@ -333,14 +333,14 @@ impl ToSql for PgExternEntity {
                         .ok_or_else(|| eyre!("Could not find return type in graph."))?;
                     let metadata_retval = self.metadata.retval.clone().ok_or_else(|| eyre!("Macro expansion time and SQL resolution time had differing opinions about the return value existing"))?;
                     let metadata_retval_sql = match metadata_retval.return_sql {
-                            Ok(ReturnVariant::SetOf(SqlMapping::As(ref sql))) => sql.clone(),
-                            Ok(ReturnVariant::SetOf(SqlMapping::Composite { array_brackets })) =>
+                            Ok(Returns::SetOf(SqlMapping::As(ref sql))) => sql.clone(),
+                            Ok(Returns::SetOf(SqlMapping::Composite { array_brackets })) =>
                                 ty.composite_type.unwrap().to_string() + if array_brackets {
                                     "[]"
                                 } else {
                                     ""
                                 },
-                            Ok(ReturnVariant::SetOf(SqlMapping::Source { array_brackets })) =>
+                            Ok(Returns::SetOf(SqlMapping::Source { array_brackets })) =>
                                 context.source_only_to_sql_type(ty.ty_source).unwrap().to_string() + if array_brackets {
                                     "[]"
                                 } else {
@@ -363,7 +363,7 @@ impl ToSql for PgExternEntity {
                     let mut items = String::new();
                     let metadata_retval = self.metadata.retval.clone().ok_or_else(|| eyre!("Macro expansion time and SQL resolution time had differing opinions about the return value existing"))?;
                     let metadata_retval_sqls = match metadata_retval.return_sql {
-                            Ok(ReturnVariant::Table(variants)) => {
+                            Ok(Returns::Table(variants)) => {
                                 let mut retval_sqls = vec![];
                                 for (idx, variant) in variants.iter().enumerate() {
                                     let sql = match variant {

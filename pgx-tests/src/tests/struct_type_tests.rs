@@ -9,7 +9,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 use pgx::stringinfo::StringInfo;
 use pgx::utils::sql_entity_graph::metadata::{
-    ArgumentError, ReturnVariant, ReturnVariantError, SqlMapping, SqlTranslatable,
+    ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
 use pgx::*;
 
@@ -33,8 +33,8 @@ impl SqlTranslatable for Complex {
         Ok(SqlMapping::literal("Complex"))
     }
 
-    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        Ok(ReturnVariant::Plain(SqlMapping::literal("Complex")))
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::literal("Complex")))
     }
 }
 

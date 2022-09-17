@@ -8,7 +8,7 @@ to the `pgx` framework and very subject to change between versions. While you ma
 */
 use std::error::Error;
 
-use super::{return_variant::ReturnVariantError, FunctionMetadataTypeEntity, ReturnVariant};
+use super::{return_variant::ReturnsError, FunctionMetadataTypeEntity, Returns};
 
 #[derive(Clone, Copy, Debug, Hash, Ord, PartialOrd, PartialEq, Eq)]
 pub enum ArgumentError {
@@ -73,7 +73,7 @@ pub trait SqlTranslatable {
         core::any::type_name::<Self>()
     }
     fn argument_sql() -> Result<SqlMapping, ArgumentError>;
-    fn return_sql() -> Result<ReturnVariant, ReturnVariantError>;
+    fn return_sql() -> Result<Returns, ReturnsError>;
     fn variadic() -> bool {
         false
     }
@@ -98,7 +98,7 @@ where
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         T::argument_sql()
     }
-    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
+    fn return_sql() -> Result<Returns, ReturnsError> {
         T::return_sql()
     }
     fn optional() -> bool {
@@ -113,7 +113,7 @@ where
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         T::argument_sql()
     }
-    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
+    fn return_sql() -> Result<Returns, ReturnsError> {
         T::return_sql()
     }
     fn optional() -> bool {
@@ -129,7 +129,7 @@ where
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         T::argument_sql()
     }
-    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
+    fn return_sql() -> Result<Returns, ReturnsError> {
         T::return_sql()
     }
     fn optional() -> bool {
@@ -157,30 +157,26 @@ where
             },
         }
     }
-    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
+    fn return_sql() -> Result<Returns, ReturnsError> {
         match T::type_name() {
-            id if id == u8::type_name() => {
-                Ok(ReturnVariant::Plain(SqlMapping::As(format!("bytea"))))
-            }
+            id if id == u8::type_name() => Ok(Returns::One(SqlMapping::As(format!("bytea")))),
             _ => match T::return_sql() {
-                Ok(ReturnVariant::Plain(SqlMapping::As(val))) => {
-                    Ok(ReturnVariant::Plain(SqlMapping::As(format!("{val}[]"))))
+                Ok(Returns::One(SqlMapping::As(val))) => {
+                    Ok(Returns::One(SqlMapping::As(format!("{val}[]"))))
                 }
-                Ok(ReturnVariant::Plain(SqlMapping::Composite { array_brackets: _ })) => {
-                    Ok(ReturnVariant::Plain(SqlMapping::Composite {
+                Ok(Returns::One(SqlMapping::Composite { array_brackets: _ })) => {
+                    Ok(Returns::One(SqlMapping::Composite {
                         array_brackets: true,
                     }))
                 }
-                Ok(ReturnVariant::Plain(SqlMapping::Source { array_brackets: _ })) => {
-                    Ok(ReturnVariant::Plain(SqlMapping::Source {
+                Ok(Returns::One(SqlMapping::Source { array_brackets: _ })) => {
+                    Ok(Returns::One(SqlMapping::Source {
                         array_brackets: true,
                     }))
                 }
-                Ok(ReturnVariant::Plain(SqlMapping::Skip)) => {
-                    Ok(ReturnVariant::Plain(SqlMapping::Skip))
-                }
-                Ok(ReturnVariant::SetOf(_)) => Err(ReturnVariantError::SetOfInArray),
-                Ok(ReturnVariant::Table(_)) => Err(ReturnVariantError::TableInArray),
+                Ok(Returns::One(SqlMapping::Skip)) => Ok(Returns::One(SqlMapping::Skip)),
+                Ok(Returns::SetOf(_)) => Err(ReturnsError::SetOfInArray),
+                Ok(Returns::Table(_)) => Err(ReturnsError::TableInArray),
                 err @ Err(_) => err,
             },
         }
@@ -194,8 +190,8 @@ impl SqlTranslatable for u8 {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Err(ArgumentError::BareU8)
     }
-    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        Err(ReturnVariantError::BareU8)
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Err(ReturnsError::BareU8)
     }
 }
 
@@ -203,8 +199,8 @@ impl SqlTranslatable for i32 {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("INT"))
     }
-    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        Ok(ReturnVariant::Plain(SqlMapping::literal("INT")))
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::literal("INT")))
     }
 }
 
@@ -214,8 +210,8 @@ impl SqlTranslatable for u32 {
             array_brackets: false,
         })
     }
-    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        Ok(ReturnVariant::Plain(SqlMapping::Source {
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::Source {
             array_brackets: false,
         }))
     }
@@ -225,8 +221,8 @@ impl SqlTranslatable for String {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("TEXT"))
     }
-    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        Ok(ReturnVariant::Plain(SqlMapping::literal("TEXT")))
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::literal("TEXT")))
     }
 }
 
@@ -237,7 +233,7 @@ where
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         T::argument_sql()
     }
-    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
+    fn return_sql() -> Result<Returns, ReturnsError> {
         T::return_sql()
     }
 }
@@ -246,8 +242,8 @@ impl<'a> SqlTranslatable for &'a str {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("TEXT"))
     }
-    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        Ok(ReturnVariant::Plain(SqlMapping::literal("TEXT")))
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::literal("TEXT")))
     }
 }
 
@@ -255,8 +251,8 @@ impl<'a> SqlTranslatable for &'a [u8] {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("bytea"))
     }
-    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        Ok(ReturnVariant::Plain(SqlMapping::literal("bytea")))
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::literal("bytea")))
     }
 }
 
@@ -264,10 +260,8 @@ impl SqlTranslatable for i8 {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::As(String::from("\"char\"")))
     }
-    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        Ok(ReturnVariant::Plain(SqlMapping::As(String::from(
-            "\"char\"",
-        ))))
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::As(String::from("\"char\""))))
     }
 }
 
@@ -275,8 +269,8 @@ impl SqlTranslatable for i16 {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("smallint"))
     }
-    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        Ok(ReturnVariant::Plain(SqlMapping::literal("smallint")))
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::literal("smallint")))
     }
 }
 
@@ -284,8 +278,8 @@ impl SqlTranslatable for i64 {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("bigint"))
     }
-    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        Ok(ReturnVariant::Plain(SqlMapping::literal("bigint")))
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::literal("bigint")))
     }
 }
 
@@ -293,8 +287,8 @@ impl SqlTranslatable for bool {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("bool"))
     }
-    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        Ok(ReturnVariant::Plain(SqlMapping::literal("bool")))
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::literal("bool")))
     }
 }
 
@@ -302,8 +296,8 @@ impl SqlTranslatable for char {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("varchar"))
     }
-    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        Ok(ReturnVariant::Plain(SqlMapping::literal("varchar")))
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::literal("varchar")))
     }
 }
 
@@ -311,8 +305,8 @@ impl SqlTranslatable for f32 {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("real"))
     }
-    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        Ok(ReturnVariant::Plain(SqlMapping::literal("real")))
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::literal("real")))
     }
 }
 
@@ -320,10 +314,8 @@ impl SqlTranslatable for f64 {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("double precision"))
     }
-    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        Ok(ReturnVariant::Plain(SqlMapping::literal(
-            "double precision",
-        )))
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::literal("double precision")))
     }
 }
 
@@ -331,8 +323,8 @@ impl SqlTranslatable for std::ffi::CStr {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("cstring"))
     }
-    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        Ok(ReturnVariant::Plain(SqlMapping::literal("cstring")))
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::literal("cstring")))
     }
 }
 
@@ -340,8 +332,8 @@ impl SqlTranslatable for &'static std::ffi::CStr {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("cstring"))
     }
-    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        Ok(ReturnVariant::Plain(SqlMapping::literal("cstring")))
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::literal("cstring")))
     }
 }
 
@@ -349,8 +341,8 @@ impl SqlTranslatable for &'static cstr_core::CStr {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("cstring"))
     }
-    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        Ok(ReturnVariant::Plain(SqlMapping::literal("cstring")))
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::literal("cstring")))
     }
 }
 
@@ -358,7 +350,7 @@ impl SqlTranslatable for cstr_core::CStr {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("cstring"))
     }
-    fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        Ok(ReturnVariant::Plain(SqlMapping::literal("cstring")))
+    fn return_sql() -> Result<Returns, ReturnsError> {
+        Ok(Returns::One(SqlMapping::literal("cstring")))
     }
 }

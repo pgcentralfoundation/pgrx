@@ -17,5 +17,5 @@ mod sql_translatable;
 pub use entity::{FunctionMetadataEntity, FunctionMetadataTypeEntity};
 pub use function_metadata::FunctionMetadata;
 pub use phantomdata_ext::PhantomDataExt;
-pub use return_variant::{ReturnVariant, ReturnVariantError};
+pub use return_variant::{Returns, ReturnsError};
 pub use sql_translatable::{ArgumentError, SqlMapping, SqlTranslatable};
