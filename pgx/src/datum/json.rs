@@ -174,7 +174,7 @@ impl Serialize for JsonString {
     }
 }
 
-impl SqlTranslatable for Json {
+unsafe impl SqlTranslatable for Json {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("json"))
     }
@@ -183,7 +183,7 @@ impl SqlTranslatable for Json {
     }
 }
 
-impl SqlTranslatable for crate::datum::JsonB {
+unsafe impl SqlTranslatable for crate::datum::JsonB {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("jsonb"))
     }

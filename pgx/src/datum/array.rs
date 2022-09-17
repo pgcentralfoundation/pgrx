@@ -586,7 +586,7 @@ where
     }
 }
 
-impl<'a, T> SqlTranslatable for Array<'a, T>
+unsafe impl<'a, T> SqlTranslatable for Array<'a, T>
 where
     T: SqlTranslatable + FromDatum,
 {
@@ -625,7 +625,7 @@ where
     }
 }
 
-impl<'a, T> SqlTranslatable for VariadicArray<'a, T>
+unsafe impl<'a, T> SqlTranslatable for VariadicArray<'a, T>
 where
     T: SqlTranslatable + FromDatum,
 {

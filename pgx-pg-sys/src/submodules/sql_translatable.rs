@@ -3,7 +3,7 @@ use pgx_utils::sql_entity_graph::metadata::{
 };
 
 #[cfg(any(feature = "pg14", feature = "pg13", feature = "pg12"))]
-impl SqlTranslatable for crate::FunctionCallInfoBaseData {
+unsafe impl SqlTranslatable for crate::FunctionCallInfoBaseData {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::Skip)
     }
@@ -13,7 +13,7 @@ impl SqlTranslatable for crate::FunctionCallInfoBaseData {
 }
 
 #[cfg(any(feature = "pg10", feature = "pg11"))]
-impl SqlTranslatable for crate::FunctionCallInfoData {
+unsafe impl SqlTranslatable for crate::FunctionCallInfoData {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::Skip)
     }
@@ -22,7 +22,7 @@ impl SqlTranslatable for crate::FunctionCallInfoData {
     }
 }
 
-impl SqlTranslatable for crate::PlannerInfo {
+unsafe impl SqlTranslatable for crate::PlannerInfo {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("internal"))
     }
@@ -31,7 +31,7 @@ impl SqlTranslatable for crate::PlannerInfo {
     }
 }
 
-impl SqlTranslatable for crate::IndexAmRoutine {
+unsafe impl SqlTranslatable for crate::IndexAmRoutine {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("internal"))
     }
@@ -39,7 +39,7 @@ impl SqlTranslatable for crate::IndexAmRoutine {
         Ok(Returns::One(SqlMapping::literal("internal")))
     }
 }
-impl SqlTranslatable for crate::FdwRoutine {
+unsafe impl SqlTranslatable for crate::FdwRoutine {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("fdw_handler"))
     }
@@ -48,7 +48,7 @@ impl SqlTranslatable for crate::FdwRoutine {
     }
 }
 
-impl SqlTranslatable for crate::BOX {
+unsafe impl SqlTranslatable for crate::BOX {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("box"))
     }
@@ -57,7 +57,7 @@ impl SqlTranslatable for crate::BOX {
     }
 }
 
-impl SqlTranslatable for crate::Point {
+unsafe impl SqlTranslatable for crate::Point {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("box"))
     }
@@ -66,7 +66,7 @@ impl SqlTranslatable for crate::Point {
     }
 }
 
-impl SqlTranslatable for crate::ItemPointerData {
+unsafe impl SqlTranslatable for crate::ItemPointerData {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("tid"))
     }
@@ -75,7 +75,7 @@ impl SqlTranslatable for crate::ItemPointerData {
     }
 }
 
-impl SqlTranslatable for crate::Datum {
+unsafe impl SqlTranslatable for crate::Datum {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Err(ArgumentError::Datum)
     }

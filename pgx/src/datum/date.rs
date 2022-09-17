@@ -178,7 +178,7 @@ impl serde::Serialize for Date {
     }
 }
 
-impl SqlTranslatable for Date {
+unsafe impl SqlTranslatable for Date {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("date"))
     }

@@ -122,7 +122,7 @@ impl serde::Serialize for TimeWithTimeZone {
 static DEFAULT_TIMESTAMP_WITH_TIMEZONE_FORMAT: &[FormatItem<'static>] =
     time::macros::format_description!("[hour]:[minute]:[second]-00");
 
-impl SqlTranslatable for TimeWithTimeZone {
+unsafe impl SqlTranslatable for TimeWithTimeZone {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("time with time zone"))
     }

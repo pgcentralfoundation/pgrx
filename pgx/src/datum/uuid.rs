@@ -128,7 +128,7 @@ impl<'a> std::fmt::UpperHex for Uuid {
     }
 }
 
-impl SqlTranslatable for crate::datum::Uuid {
+unsafe impl SqlTranslatable for crate::datum::Uuid {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("uuid"))
     }

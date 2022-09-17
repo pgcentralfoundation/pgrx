@@ -410,7 +410,7 @@ impl<T, AllocatedBy: WhoAllocated<T>> Drop for PgBox<T, AllocatedBy> {
     }
 }
 
-impl<T: SqlTranslatable> SqlTranslatable for PgBox<T, AllocatedByPostgres> {
+unsafe impl<T: SqlTranslatable> SqlTranslatable for PgBox<T, AllocatedByPostgres> {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         T::argument_sql()
     }
@@ -419,7 +419,7 @@ impl<T: SqlTranslatable> SqlTranslatable for PgBox<T, AllocatedByPostgres> {
     }
 }
 
-impl<T: SqlTranslatable> SqlTranslatable for PgBox<T, AllocatedByRust> {
+unsafe impl<T: SqlTranslatable> SqlTranslatable for PgBox<T, AllocatedByRust> {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         T::argument_sql()
     }

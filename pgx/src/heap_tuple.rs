@@ -583,7 +583,7 @@ macro_rules! composite_type {
     };
 }
 
-impl SqlTranslatable for crate::heap_tuple::PgHeapTuple<'static, AllocatedByPostgres> {
+unsafe impl SqlTranslatable for crate::heap_tuple::PgHeapTuple<'static, AllocatedByPostgres> {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::Composite {
             array_brackets: false,
@@ -596,7 +596,7 @@ impl SqlTranslatable for crate::heap_tuple::PgHeapTuple<'static, AllocatedByPost
     }
 }
 
-impl SqlTranslatable for crate::heap_tuple::PgHeapTuple<'static, AllocatedByRust> {
+unsafe impl SqlTranslatable for crate::heap_tuple::PgHeapTuple<'static, AllocatedByRust> {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::Composite {
             array_brackets: false,

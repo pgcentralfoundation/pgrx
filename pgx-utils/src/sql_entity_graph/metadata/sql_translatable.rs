@@ -67,8 +67,18 @@ impl Error for ArgumentError {}
 
 /**
 A value which can be represented in SQL
- */
-pub trait SqlTranslatable {
+
+# Safety
+
+By implementing this, you assert you are not lying to either Postgres or Rust in doing so.
+This trait asserts a safe translation exists between values of this type from Rust to SQL,
+or from SQL into Rust. If you are mistaken about how this works, either the Postgres C API
+or the Rust handling in PGX may emit undefined behavior.
+
+It cannot be made private or sealed due to details of the structure of the PGX framework.
+Nonetheless, if you are not confident the translation is valid: do not implement this trait.
+*/
+pub unsafe trait SqlTranslatable {
     fn type_name() -> &'static str {
         core::any::type_name::<Self>()
     }
@@ -91,7 +101,7 @@ pub trait SqlTranslatable {
     }
 }
 
-impl<T> SqlTranslatable for Option<T>
+unsafe impl<T> SqlTranslatable for Option<T>
 where
     T: SqlTranslatable,
 {
@@ -106,7 +116,7 @@ where
     }
 }
 
-impl<T> SqlTranslatable for *mut T
+unsafe impl<T> SqlTranslatable for *mut T
 where
     T: SqlTranslatable,
 {
@@ -121,7 +131,7 @@ where
     }
 }
 
-impl<T, E> SqlTranslatable for Result<T, E>
+unsafe impl<T, E> SqlTranslatable for Result<T, E>
 where
     T: SqlTranslatable,
     E: std::error::Error + 'static,
@@ -137,7 +147,7 @@ where
     }
 }
 
-impl<T> SqlTranslatable for Vec<T>
+unsafe impl<T> SqlTranslatable for Vec<T>
 where
     T: SqlTranslatable,
 {
@@ -186,7 +196,7 @@ where
     }
 }
 
-impl SqlTranslatable for u8 {
+unsafe impl SqlTranslatable for u8 {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Err(ArgumentError::BareU8)
     }
@@ -195,7 +205,7 @@ impl SqlTranslatable for u8 {
     }
 }
 
-impl SqlTranslatable for i32 {
+unsafe impl SqlTranslatable for i32 {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("INT"))
     }
@@ -204,7 +214,7 @@ impl SqlTranslatable for i32 {
     }
 }
 
-impl SqlTranslatable for u32 {
+unsafe impl SqlTranslatable for u32 {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::Source {
             array_brackets: false,
@@ -217,7 +227,7 @@ impl SqlTranslatable for u32 {
     }
 }
 
-impl SqlTranslatable for String {
+unsafe impl SqlTranslatable for String {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("TEXT"))
     }
@@ -226,7 +236,7 @@ impl SqlTranslatable for String {
     }
 }
 
-impl<T> SqlTranslatable for &T
+unsafe impl<T> SqlTranslatable for &T
 where
     T: SqlTranslatable,
 {
@@ -238,7 +248,7 @@ where
     }
 }
 
-impl<'a> SqlTranslatable for &'a str {
+unsafe impl<'a> SqlTranslatable for &'a str {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("TEXT"))
     }
@@ -247,7 +257,7 @@ impl<'a> SqlTranslatable for &'a str {
     }
 }
 
-impl<'a> SqlTranslatable for &'a [u8] {
+unsafe impl<'a> SqlTranslatable for &'a [u8] {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("bytea"))
     }
@@ -256,7 +266,7 @@ impl<'a> SqlTranslatable for &'a [u8] {
     }
 }
 
-impl SqlTranslatable for i8 {
+unsafe impl SqlTranslatable for i8 {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::As(String::from("\"char\"")))
     }
@@ -265,7 +275,7 @@ impl SqlTranslatable for i8 {
     }
 }
 
-impl SqlTranslatable for i16 {
+unsafe impl SqlTranslatable for i16 {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("smallint"))
     }
@@ -274,7 +284,7 @@ impl SqlTranslatable for i16 {
     }
 }
 
-impl SqlTranslatable for i64 {
+unsafe impl SqlTranslatable for i64 {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("bigint"))
     }
@@ -283,7 +293,7 @@ impl SqlTranslatable for i64 {
     }
 }
 
-impl SqlTranslatable for bool {
+unsafe impl SqlTranslatable for bool {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("bool"))
     }
@@ -292,7 +302,7 @@ impl SqlTranslatable for bool {
     }
 }
 
-impl SqlTranslatable for char {
+unsafe impl SqlTranslatable for char {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("varchar"))
     }
@@ -301,7 +311,7 @@ impl SqlTranslatable for char {
     }
 }
 
-impl SqlTranslatable for f32 {
+unsafe impl SqlTranslatable for f32 {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("real"))
     }
@@ -310,7 +320,7 @@ impl SqlTranslatable for f32 {
     }
 }
 
-impl SqlTranslatable for f64 {
+unsafe impl SqlTranslatable for f64 {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("double precision"))
     }
@@ -319,7 +329,7 @@ impl SqlTranslatable for f64 {
     }
 }
 
-impl SqlTranslatable for std::ffi::CStr {
+unsafe impl SqlTranslatable for std::ffi::CStr {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("cstring"))
     }
@@ -328,7 +338,7 @@ impl SqlTranslatable for std::ffi::CStr {
     }
 }
 
-impl SqlTranslatable for &'static std::ffi::CStr {
+unsafe impl SqlTranslatable for &'static std::ffi::CStr {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("cstring"))
     }
@@ -337,7 +347,7 @@ impl SqlTranslatable for &'static std::ffi::CStr {
     }
 }
 
-impl SqlTranslatable for &'static cstr_core::CStr {
+unsafe impl SqlTranslatable for &'static cstr_core::CStr {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("cstring"))
     }
@@ -346,7 +356,7 @@ impl SqlTranslatable for &'static cstr_core::CStr {
     }
 }
 
-impl SqlTranslatable for cstr_core::CStr {
+unsafe impl SqlTranslatable for cstr_core::CStr {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("cstring"))
     }

@@ -198,7 +198,7 @@ impl serde::Serialize for Timestamp {
     }
 }
 
-impl SqlTranslatable for crate::datum::Timestamp {
+unsafe impl SqlTranslatable for crate::datum::Timestamp {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("timestamp"))
     }

@@ -229,7 +229,7 @@ impl serde::Serialize for TimestampWithTimeZone {
     }
 }
 
-impl SqlTranslatable for TimestampWithTimeZone {
+unsafe impl SqlTranslatable for TimestampWithTimeZone {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("timestamp with time zone"))
     }

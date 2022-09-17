@@ -356,7 +356,7 @@ impl Drop for PgRelation {
     }
 }
 
-impl SqlTranslatable for PgRelation {
+unsafe impl SqlTranslatable for PgRelation {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("regclass"))
     }

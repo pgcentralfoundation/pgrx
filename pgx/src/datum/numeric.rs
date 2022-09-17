@@ -197,7 +197,7 @@ impl IntoDatum for Numeric {
     }
 }
 
-impl SqlTranslatable for Numeric {
+unsafe impl SqlTranslatable for Numeric {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("NUMERIC"))
     }

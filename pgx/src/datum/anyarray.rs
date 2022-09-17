@@ -50,7 +50,7 @@ impl IntoDatum for AnyArray {
     }
 }
 
-impl SqlTranslatable for AnyArray {
+unsafe impl SqlTranslatable for AnyArray {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("anyarray"))
     }

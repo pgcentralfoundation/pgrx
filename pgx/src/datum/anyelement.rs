@@ -50,7 +50,7 @@ impl IntoDatum for AnyElement {
     }
 }
 
-impl SqlTranslatable for AnyElement {
+unsafe impl SqlTranslatable for AnyElement {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("any"))
     }

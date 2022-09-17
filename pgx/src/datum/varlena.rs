@@ -443,7 +443,7 @@ where
     serde_json::from_slice(slice).expect("failed to decode JSON")
 }
 
-impl<T> SqlTranslatable for PgVarlena<T>
+unsafe impl<T> SqlTranslatable for PgVarlena<T>
 where
     T: SqlTranslatable + Copy,
 {

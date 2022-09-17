@@ -120,7 +120,7 @@ impl Into<Inet> for String {
     }
 }
 
-impl SqlTranslatable for Inet {
+unsafe impl SqlTranslatable for Inet {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("inet"))
     }

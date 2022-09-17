@@ -180,7 +180,7 @@ impl IntoDatum for Internal {
     }
 }
 
-impl SqlTranslatable for crate::datum::Internal {
+unsafe impl SqlTranslatable for crate::datum::Internal {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("internal"))
     }

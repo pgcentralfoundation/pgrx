@@ -123,7 +123,7 @@ impl serde::Serialize for Time {
 static DEFAULT_TIME_FORMAT: &[FormatItem<'static>] =
     time::macros::format_description!("[hour]:[minute]:[second]");
 
-impl SqlTranslatable for Time {
+unsafe impl SqlTranslatable for Time {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("time"))
     }

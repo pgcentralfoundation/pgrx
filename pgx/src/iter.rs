@@ -39,7 +39,7 @@ where
     }
 }
 
-impl<'a, T> SqlTranslatable for SetOfIterator<'a, T>
+unsafe impl<'a, T> SqlTranslatable for SetOfIterator<'a, T>
 where
     T: SqlTranslatable + UnwindSafe + RefUnwindSafe,
 {
@@ -113,7 +113,7 @@ where
 seq_macro::seq!(I in 0..=32 {
     #(
         seq_macro::seq!(N in 0..=I {
-            impl<'a, #(Input~N,)*> SqlTranslatable for TableIterator<'a, (#(Input~N,)*)>
+            unsafe impl<'a, #(Input~N,)*> SqlTranslatable for TableIterator<'a, (#(Input~N,)*)>
             where
                 #(
                     Input~N: SqlTranslatable + UnwindSafe + RefUnwindSafe + 'static,

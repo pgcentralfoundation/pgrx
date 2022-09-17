@@ -175,7 +175,7 @@ impl ToTokens for PostgresType {
         let to_sql_config = &self.to_sql_config;
 
         let inv = quote! {
-            impl #staticless_impl_generics ::pgx::utils::sql_entity_graph::metadata::SqlTranslatable for #name #static_ty_generics #static_where_clauses {
+            unsafe impl #staticless_impl_generics ::pgx::utils::sql_entity_graph::metadata::SqlTranslatable for #name #static_ty_generics #static_where_clauses {
                 fn argument_sql() -> core::result::Result<::pgx::utils::sql_entity_graph::metadata::SqlMapping, ::pgx::utils::sql_entity_graph::metadata::ArgumentError> {
                     Ok(::pgx::utils::sql_entity_graph::metadata::SqlMapping::As(String::from(stringify!(#name))))
                 }

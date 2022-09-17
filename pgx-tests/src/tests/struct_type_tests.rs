@@ -28,7 +28,7 @@ extension_sql!(
     creates = [Type(Complex)]
 );
 
-impl SqlTranslatable for Complex {
+unsafe impl SqlTranslatable for Complex {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         Ok(SqlMapping::literal("Complex"))
     }
