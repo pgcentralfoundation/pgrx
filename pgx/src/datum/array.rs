@@ -289,7 +289,6 @@ impl<'a, T: FromDatum + serde::Serialize> serde::Serialize for VariadicArray<'a,
 }
 
 impl<'a, T: FromDatum> VariadicArray<'a, T> {
-
     pub fn into_array_type(self) -> *const pg_sys::ArrayType {
         self.0.into_array_type()
     }
