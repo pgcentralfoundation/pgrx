@@ -12,7 +12,7 @@ use pgx::*;
 #[pg_extern(immutable)]
 fn returns_tuple_with_attributes(
 ) -> TableIterator<'static, (name!(arg, String), name!(arg2, String))> {
-    TableIterator::new(vec![("hi".to_string(), "bye".to_string())].into_iter())
+    TableIterator::once(("hi".to_string(), "bye".to_string()))
 }
 
 // Check we can map a `fdw_handler`

@@ -89,7 +89,7 @@ fn returns_void() {
 
 #[pg_extern]
 fn returns_tuple() -> TableIterator<'static, (name!(id, i32), name!(title, String))> {
-    TableIterator::new(vec![(42, "pgx".into())].into_iter())
+    TableIterator::once((42, "pgx".into()))
 }
 
 #[pg_extern]

@@ -35,13 +35,10 @@ fn exec<'a>(
         )
     }
 
-    TableIterator::new(
-        [(
-            output.status.code(),
-            String::from_utf8(output.stdout).expect("stdout is not valid utf8"),
-        )]
-        .into_iter(),
-    )
+    TableIterator::once((
+        output.status.code(),
+        String::from_utf8(output.stdout).expect("stdout is not valid utf8"),
+    ))
 }
 
 #[pg_extern]

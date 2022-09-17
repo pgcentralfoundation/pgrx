@@ -65,6 +65,6 @@ fn rstore_table(
 ) -> TableIterator<'static, (name!(key, String), name!(value, String))> {
     match rstore {
         Some(rstore) => TableIterator::new(rstore.0.into_iter()),
-        None => TableIterator::new(HashMap::<String, String>::default().into_iter()),
+        None => TableIterator::once((String::new(), String::new())),
     }
 }

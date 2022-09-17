@@ -489,7 +489,7 @@ mod sql_generator_tests {
             name!(cat, Option<::pgx::composite_type!("Cat")>),
         ),
     > {
-        TableIterator::new(Vec::new().into_iter())
+        TableIterator::once(Default::default())
     }
 
     #[pg_extern]
@@ -500,7 +500,7 @@ mod sql_generator_tests {
             name!(cat, Vec<::pgx::composite_type!("Cat")>),
         ),
     > {
-        TableIterator::new(Vec::new().into_iter())
+        TableIterator::once(Default::default())
     }
 
     #[pg_extern]
@@ -511,7 +511,7 @@ mod sql_generator_tests {
             name!(cat, Option<Vec<::pgx::composite_type!("Cat")>>),
         ),
     > {
-        TableIterator::new(Vec::new().into_iter())
+        TableIterator::once(Default::default())
     }
 
     #[pg_extern]
@@ -522,7 +522,7 @@ mod sql_generator_tests {
             name!(cat, Option<Vec<Option<::pgx::composite_type!("Cat")>>>),
         ),
     > {
-        TableIterator::new(Vec::new().into_iter())
+        TableIterator::once(Default::default())
     }
 
     #[allow(unused_parens)]
@@ -533,7 +533,7 @@ mod sql_generator_tests {
         tuple.set_by_name("scritches", 0).unwrap();
         tuple.set_by_name("name", "Nami").unwrap();
 
-        TableIterator::new(vec![(tuple,)].into_iter())
+        TableIterator::once((tuple,))
     }
 
     #[pg_extern]
@@ -544,7 +544,7 @@ mod sql_generator_tests {
         tuple.set_by_name("scritches", 0).unwrap();
         tuple.set_by_name("name", "Nami").unwrap();
 
-        TableIterator::new(vec![(tuple,)].into_iter())
+        TableIterator::once((tuple,))
     }
 
     #[pg_extern]
@@ -565,7 +565,7 @@ mod sql_generator_tests {
         cat_tuple.set_by_name("boops", 0).unwrap();
         cat_tuple.set_by_name("name", "Sally").unwrap();
 
-        TableIterator::new(vec![(dog_tuple, cat_tuple)].into_iter())
+        TableIterator::once((dog_tuple, cat_tuple))
     }
 
     #[pg_extern]
@@ -576,7 +576,7 @@ mod sql_generator_tests {
             name!(cat, Option<pgx::composite_type!("Cat")>),
         ),
     > {
-        TableIterator::new(vec![(None, None)].into_iter())
+        TableIterator::once((None, None))
     }
 
     #[derive(Copy, Clone, Default, Debug)]

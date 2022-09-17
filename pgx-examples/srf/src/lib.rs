@@ -30,7 +30,7 @@ fn vector_of_static_values() -> SetOfIterator<'static, &'static str> {
 #[pg_extern]
 fn return_tuple(
 ) -> TableIterator<'static, (name!(id, i32), name!(name, &'static str), name!(age, f64))> {
-    TableIterator::new([(1, "Brandy", 4.5)].into_iter())
+    TableIterator::once((1, "Brandy", 4.5))
 }
 
 #[cfg(any(test, feature = "pg_test"))]

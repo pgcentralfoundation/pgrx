@@ -1,6 +1,7 @@
 use pgx_utils::sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
+use std::iter::once;
 use std::panic::{RefUnwindSafe, UnwindSafe};
 
 use crate::{pg_sys, IntoDatum};
@@ -72,6 +73,15 @@ where
     {
         Self {
             iter: Box::new(iter),
+        }
+    }
+
+    pub fn once(value: T) -> TableIterator<'a, T>
+    where
+        T: 'a,
+    {
+        Self {
+            iter: Box::new(once(value)),
         }
     }
 }

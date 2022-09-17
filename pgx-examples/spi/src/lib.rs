@@ -106,7 +106,7 @@ fn spi_insert_title2(
         vec![(PgBuiltInOids::TEXTOID.oid(), title.into_datum())],
     );
 
-    TableIterator::new(vec![tuple].into_iter())
+    TableIterator::once(tuple)
 }
 
 extension_sql!(

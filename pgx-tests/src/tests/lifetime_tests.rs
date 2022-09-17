@@ -41,7 +41,7 @@ fn returns_option_ref_with_lifetime<'a>() -> Option<&'a str> {
 fn returns_tuple_with_lifetime(
     value: &'static str,
 ) -> TableIterator<(name!(a, &'static str), name!(b, Option<&'static str>))> {
-    TableIterator::new(vec![(value, Some(value))].into_iter())
+    TableIterator::once((value, Some(value)))
 }
 
 #[pg_extern]
