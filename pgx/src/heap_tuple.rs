@@ -586,12 +586,12 @@ macro_rules! composite_type {
 impl SqlTranslatable for crate::heap_tuple::PgHeapTuple<'static, AllocatedByPostgres> {
     fn argument_sql() -> Result<SqlVariant, ArgumentError> {
         Ok(SqlVariant::Composite {
-            requires_array_brackets: false,
+            array_brackets: false,
         })
     }
     fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
         Ok(ReturnVariant::Plain(SqlVariant::Composite {
-            requires_array_brackets: false,
+            array_brackets: false,
         }))
     }
 }
@@ -599,12 +599,12 @@ impl SqlTranslatable for crate::heap_tuple::PgHeapTuple<'static, AllocatedByPost
 impl SqlTranslatable for crate::heap_tuple::PgHeapTuple<'static, AllocatedByRust> {
     fn argument_sql() -> Result<SqlVariant, ArgumentError> {
         Ok(SqlVariant::Composite {
-            requires_array_brackets: false,
+            array_brackets: false,
         })
     }
     fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
         Ok(ReturnVariant::Plain(SqlVariant::Composite {
-            requires_array_brackets: false,
+            array_brackets: false,
         }))
     }
 }

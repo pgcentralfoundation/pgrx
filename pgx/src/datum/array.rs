@@ -595,10 +595,10 @@ where
             SqlVariant::Mapped(sql) => Ok(SqlVariant::Mapped(format!("{sql}[]"))),
             SqlVariant::Skip => Err(ArgumentError::SkipInArray),
             SqlVariant::Composite { .. } => Ok(SqlVariant::Composite {
-                requires_array_brackets: true,
+                array_brackets: true,
             }),
             SqlVariant::SourceOnly { .. } => Ok(SqlVariant::SourceOnly {
-                requires_array_brackets: true,
+                array_brackets: true,
             }),
         }
     }
@@ -608,16 +608,16 @@ where
             ReturnVariant::Plain(SqlVariant::Mapped(sql)) => {
                 Ok(ReturnVariant::Plain(SqlVariant::Mapped(format!("{sql}[]"))))
             }
-            ReturnVariant::Plain(SqlVariant::Composite {
-                requires_array_brackets: _,
-            }) => Ok(ReturnVariant::Plain(SqlVariant::Composite {
-                requires_array_brackets: true,
-            })),
-            ReturnVariant::Plain(SqlVariant::SourceOnly {
-                requires_array_brackets: _,
-            }) => Ok(ReturnVariant::Plain(SqlVariant::SourceOnly {
-                requires_array_brackets: true,
-            })),
+            ReturnVariant::Plain(SqlVariant::Composite { array_brackets: _ }) => {
+                Ok(ReturnVariant::Plain(SqlVariant::Composite {
+                    array_brackets: true,
+                }))
+            }
+            ReturnVariant::Plain(SqlVariant::SourceOnly { array_brackets: _ }) => {
+                Ok(ReturnVariant::Plain(SqlVariant::SourceOnly {
+                    array_brackets: true,
+                }))
+            }
             ReturnVariant::Plain(SqlVariant::Skip) => Err(ReturnVariantError::SkipInArray),
             ReturnVariant::SetOf(_) => Err(ReturnVariantError::SetOfInArray),
             ReturnVariant::Table(_) => Err(ReturnVariantError::TableInArray),
@@ -634,10 +634,10 @@ where
             SqlVariant::Mapped(sql) => Ok(SqlVariant::Mapped(format!("{sql}[]"))),
             SqlVariant::Skip => Err(ArgumentError::SkipInArray),
             SqlVariant::Composite { .. } => Ok(SqlVariant::Composite {
-                requires_array_brackets: true,
+                array_brackets: true,
             }),
             SqlVariant::SourceOnly { .. } => Ok(SqlVariant::SourceOnly {
-                requires_array_brackets: true,
+                array_brackets: true,
             }),
         }
     }
@@ -647,16 +647,16 @@ where
             ReturnVariant::Plain(SqlVariant::Mapped(sql)) => {
                 Ok(ReturnVariant::Plain(SqlVariant::Mapped(format!("{sql}[]"))))
             }
-            ReturnVariant::Plain(SqlVariant::Composite {
-                requires_array_brackets: _,
-            }) => Ok(ReturnVariant::Plain(SqlVariant::Composite {
-                requires_array_brackets: true,
-            })),
-            ReturnVariant::Plain(SqlVariant::SourceOnly {
-                requires_array_brackets: _,
-            }) => Ok(ReturnVariant::Plain(SqlVariant::SourceOnly {
-                requires_array_brackets: true,
-            })),
+            ReturnVariant::Plain(SqlVariant::Composite { array_brackets: _ }) => {
+                Ok(ReturnVariant::Plain(SqlVariant::Composite {
+                    array_brackets: true,
+                }))
+            }
+            ReturnVariant::Plain(SqlVariant::SourceOnly { array_brackets: _ }) => {
+                Ok(ReturnVariant::Plain(SqlVariant::SourceOnly {
+                    array_brackets: true,
+                }))
+            }
             ReturnVariant::Plain(SqlVariant::Skip) => Err(ReturnVariantError::SkipInArray),
             ReturnVariant::SetOf(_) => Err(ReturnVariantError::SetOfInArray),
             ReturnVariant::Table(_) => Err(ReturnVariantError::TableInArray),

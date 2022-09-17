@@ -44,8 +44,8 @@ impl std::fmt::Display for ArgumentError {
 #[derive(Clone, Debug, Hash, Eq, PartialEq, Ord, PartialOrd)]
 pub enum SqlVariant {
     Mapped(String),
-    Composite { requires_array_brackets: bool },
-    SourceOnly { requires_array_brackets: bool },
+    Composite { array_brackets: bool },
+    SourceOnly { array_brackets: bool },
     Skip,
 }
 
@@ -132,15 +132,11 @@ where
             id if id == u8::type_name() => Ok(SqlVariant::Mapped(format!("bytea"))),
             _ => match T::argument_sql() {
                 Ok(SqlVariant::Mapped(val)) => Ok(SqlVariant::Mapped(format!("{val}[]"))),
-                Ok(SqlVariant::Composite {
-                    requires_array_brackets: _,
-                }) => Ok(SqlVariant::Composite {
-                    requires_array_brackets: true,
+                Ok(SqlVariant::Composite { array_brackets: _ }) => Ok(SqlVariant::Composite {
+                    array_brackets: true,
                 }),
-                Ok(SqlVariant::SourceOnly {
-                    requires_array_brackets: _,
-                }) => Ok(SqlVariant::SourceOnly {
-                    requires_array_brackets: true,
+                Ok(SqlVariant::SourceOnly { array_brackets: _ }) => Ok(SqlVariant::SourceOnly {
+                    array_brackets: true,
                 }),
                 Ok(SqlVariant::Skip) => Ok(SqlVariant::Skip),
                 err @ Err(_) => err,
@@ -156,16 +152,16 @@ where
                 Ok(ReturnVariant::Plain(SqlVariant::Mapped(val))) => {
                     Ok(ReturnVariant::Plain(SqlVariant::Mapped(format!("{val}[]"))))
                 }
-                Ok(ReturnVariant::Plain(SqlVariant::Composite {
-                    requires_array_brackets: _,
-                })) => Ok(ReturnVariant::Plain(SqlVariant::Composite {
-                    requires_array_brackets: true,
-                })),
-                Ok(ReturnVariant::Plain(SqlVariant::SourceOnly {
-                    requires_array_brackets: _,
-                })) => Ok(ReturnVariant::Plain(SqlVariant::SourceOnly {
-                    requires_array_brackets: true,
-                })),
+                Ok(ReturnVariant::Plain(SqlVariant::Composite { array_brackets: _ })) => {
+                    Ok(ReturnVariant::Plain(SqlVariant::Composite {
+                        array_brackets: true,
+                    }))
+                }
+                Ok(ReturnVariant::Plain(SqlVariant::SourceOnly { array_brackets: _ })) => {
+                    Ok(ReturnVariant::Plain(SqlVariant::SourceOnly {
+                        array_brackets: true,
+                    }))
+                }
                 Ok(ReturnVariant::Plain(SqlVariant::Skip)) => {
                     Ok(ReturnVariant::Plain(SqlVariant::Skip))
                 }
@@ -203,12 +199,12 @@ impl SqlTranslatable for i32 {
 impl SqlTranslatable for u32 {
     fn argument_sql() -> Result<SqlVariant, ArgumentError> {
         Ok(SqlVariant::SourceOnly {
-            requires_array_brackets: false,
+            array_brackets: false,
         })
     }
     fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
         Ok(ReturnVariant::Plain(SqlVariant::SourceOnly {
-            requires_array_brackets: false,
+            array_brackets: false,
         }))
     }
 }

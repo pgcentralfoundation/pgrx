@@ -188,13 +188,13 @@ impl ToSql for PgExternEntity {
                             args.push(buf);
                         }
                         Ok(SqlVariant::Composite {
-                            requires_array_brackets,
+                            array_brackets,
                         }) => {
                             let sql = self.fn_args[idx]
                                 .used_ty
                                 .composite_type
                                 .map(|v| {
-                                    if requires_array_brackets {
+                                    if array_brackets {
                                         format!("{v}[]")
                                     } else {
                                         format!("{v}")
@@ -220,12 +220,12 @@ impl ToSql for PgExternEntity {
                             args.push(buf);
                         }
                         Ok(SqlVariant::SourceOnly {
-                            requires_array_brackets,
+                            array_brackets,
                         }) => {
                             let sql = context
                                 .source_only_to_sql_type(arg.used_ty.ty_source)
                                 .map(|v| {
-                                    if requires_array_brackets {
+                                    if array_brackets {
                                         format!("{v}[]")
                                     } else {
                                         format!("{v}")
@@ -293,14 +293,14 @@ impl ToSql for PgExternEntity {
                     let metadata_retval = self.metadata.retval.clone().ok_or_else(|| eyre!("Macro expansion time and SQL resolution time had differing opinions about the return value existing"))?;
                     let metadata_retval_sql = match metadata_retval.return_sql {
                         Ok(ReturnVariant::Plain(SqlVariant::Mapped(ref sql))) => sql.clone(),
-                        Ok(ReturnVariant::Plain(SqlVariant::Composite { requires_array_brackets })) => ty.composite_type.unwrap().to_string()
-                        + if requires_array_brackets {
+                        Ok(ReturnVariant::Plain(SqlVariant::Composite { array_brackets })) => ty.composite_type.unwrap().to_string()
+                        + if array_brackets {
                             "[]"
                         } else {
                             ""
                         },
-                        Ok(ReturnVariant::SetOf(SqlVariant::SourceOnly { requires_array_brackets })) =>
-                            context.source_only_to_sql_type(ty.ty_source).unwrap().to_string() + if requires_array_brackets {
+                        Ok(ReturnVariant::SetOf(SqlVariant::SourceOnly { array_brackets })) =>
+                            context.source_only_to_sql_type(ty.ty_source).unwrap().to_string() + if array_brackets {
                                 "[]"
                             } else {
                                 ""
@@ -334,14 +334,14 @@ impl ToSql for PgExternEntity {
                     let metadata_retval = self.metadata.retval.clone().ok_or_else(|| eyre!("Macro expansion time and SQL resolution time had differing opinions about the return value existing"))?;
                     let metadata_retval_sql = match metadata_retval.return_sql {
                             Ok(ReturnVariant::SetOf(SqlVariant::Mapped(ref sql))) => sql.clone(),
-                            Ok(ReturnVariant::SetOf(SqlVariant::Composite { requires_array_brackets })) =>
-                                ty.composite_type.unwrap().to_string() + if requires_array_brackets {
+                            Ok(ReturnVariant::SetOf(SqlVariant::Composite { array_brackets })) =>
+                                ty.composite_type.unwrap().to_string() + if array_brackets {
                                     "[]"
                                 } else {
                                     ""
                                 },
-                            Ok(ReturnVariant::SetOf(SqlVariant::SourceOnly { requires_array_brackets })) =>
-                                context.source_only_to_sql_type(ty.ty_source).unwrap().to_string() + if requires_array_brackets {
+                            Ok(ReturnVariant::SetOf(SqlVariant::SourceOnly { array_brackets })) =>
+                                context.source_only_to_sql_type(ty.ty_source).unwrap().to_string() + if array_brackets {
                                     "[]"
                                 } else {
                                     ""
@@ -368,16 +368,16 @@ impl ToSql for PgExternEntity {
                                 for (idx, variant) in variants.iter().enumerate() {
                                     let sql = match variant {
                                         SqlVariant::Mapped(sql) => sql.clone(),
-                                        SqlVariant::Composite { requires_array_brackets } => {
+                                        SqlVariant::Composite { array_brackets } => {
                                             let composite = table_items[idx].ty.composite_type.unwrap().to_string();
-                                            composite  + if *requires_array_brackets {
+                                            composite  + if *array_brackets {
                                                 "[]"
                                             } else {
                                                 ""
                                             }
                                         },
-                                        SqlVariant::SourceOnly { requires_array_brackets } =>
-                                            context.source_only_to_sql_type(table_items[idx].ty.ty_source).unwrap() + if *requires_array_brackets {
+                                        SqlVariant::SourceOnly { array_brackets } =>
+                                            context.source_only_to_sql_type(table_items[idx].ty.ty_source).unwrap() + if *array_brackets {
                                                 "[]"
                                             } else {
                                                 ""
@@ -531,10 +531,8 @@ impl ToSql for PgExternEntity {
                 })?;
             let left_arg_sql = match left_arg.argument_sql {
                 Ok(SqlVariant::Mapped(ref sql)) => sql.clone(),
-                Ok(SqlVariant::Composite {
-                    requires_array_brackets,
-                }) => {
-                    if requires_array_brackets {
+                Ok(SqlVariant::Composite { array_brackets }) => {
+                    if array_brackets {
                         let composite_type = self.fn_args[0].used_ty.composite_type
                             .ok_or(eyre!("Found a composite type but macro expansion time did not reveal a name, use `pgx::composite_type!()`"))?;
                         format!("{composite_type}[]")
@@ -543,10 +541,8 @@ impl ToSql for PgExternEntity {
                             .ok_or(eyre!("Found a composite type but macro expansion time did not reveal a name, use `pgx::composite_type!()`"))?.to_string()
                     }
                 }
-                Ok(SqlVariant::SourceOnly {
-                    requires_array_brackets,
-                }) => {
-                    if requires_array_brackets {
+                Ok(SqlVariant::SourceOnly { array_brackets }) => {
+                    if array_brackets {
                         let composite_type = context
                             .source_only_to_sql_type(self.fn_args[0].used_ty.ty_source)
                             .ok_or(eyre!(
@@ -591,10 +587,8 @@ impl ToSql for PgExternEntity {
                 })?;
             let right_arg_sql = match right_arg.argument_sql {
                 Ok(SqlVariant::Mapped(ref sql)) => sql.clone(),
-                Ok(SqlVariant::Composite {
-                    requires_array_brackets,
-                }) => {
-                    if requires_array_brackets {
+                Ok(SqlVariant::Composite { array_brackets }) => {
+                    if array_brackets {
                         let composite_type = self.fn_args[1].used_ty.composite_type
                             .ok_or(eyre!("Found a composite type but macro expansion time did not reveal a name, use `pgx::composite_type!()`"))?;
                         format!("{composite_type}[]")
@@ -603,10 +597,8 @@ impl ToSql for PgExternEntity {
                             .ok_or(eyre!("Found a composite type but macro expansion time did not reveal a name, use `pgx::composite_type!()`"))?.to_string()
                     }
                 }
-                Ok(SqlVariant::SourceOnly {
-                    requires_array_brackets,
-                }) => {
-                    if requires_array_brackets {
+                Ok(SqlVariant::SourceOnly { array_brackets }) => {
+                    if array_brackets {
                         let composite_type = context
                             .source_only_to_sql_type(self.fn_args[1].used_ty.ty_source)
                             .ok_or(eyre!(
