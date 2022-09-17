@@ -591,38 +591,36 @@ where
     T: SqlTranslatable + FromDatum,
 {
     fn argument_sql() -> Result<SqlVariant, ArgumentError> {
-        match T::argument_sql() {
-            Ok(SqlVariant::Mapped(sql)) => Ok(SqlVariant::Mapped(format!("{sql}[]"))),
-            Ok(SqlVariant::Skip) => Err(ArgumentError::SkipInArray),
-            Ok(SqlVariant::Composite { .. }) => Ok(SqlVariant::Composite {
+        match T::argument_sql()? {
+            SqlVariant::Mapped(sql) => Ok(SqlVariant::Mapped(format!("{sql}[]"))),
+            SqlVariant::Skip => Err(ArgumentError::SkipInArray),
+            SqlVariant::Composite { .. } => Ok(SqlVariant::Composite {
                 requires_array_brackets: true,
             }),
-            Ok(SqlVariant::SourceOnly { .. }) => Ok(SqlVariant::SourceOnly {
+            SqlVariant::SourceOnly { .. } => Ok(SqlVariant::SourceOnly {
                 requires_array_brackets: true,
             }),
-            err @ Err(_) => err,
         }
     }
 
     fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        match T::return_sql() {
-            Ok(ReturnVariant::Plain(SqlVariant::Mapped(sql))) => {
+        match T::return_sql()? {
+            ReturnVariant::Plain(SqlVariant::Mapped(sql)) => {
                 Ok(ReturnVariant::Plain(SqlVariant::Mapped(format!("{sql}[]"))))
             }
-            Ok(ReturnVariant::Plain(SqlVariant::Composite {
+            ReturnVariant::Plain(SqlVariant::Composite {
                 requires_array_brackets: _,
-            })) => Ok(ReturnVariant::Plain(SqlVariant::Composite {
+            }) => Ok(ReturnVariant::Plain(SqlVariant::Composite {
                 requires_array_brackets: true,
             })),
-            Ok(ReturnVariant::Plain(SqlVariant::SourceOnly {
+            ReturnVariant::Plain(SqlVariant::SourceOnly {
                 requires_array_brackets: _,
-            })) => Ok(ReturnVariant::Plain(SqlVariant::SourceOnly {
+            }) => Ok(ReturnVariant::Plain(SqlVariant::SourceOnly {
                 requires_array_brackets: true,
             })),
-            Ok(ReturnVariant::Plain(SqlVariant::Skip)) => Err(ReturnVariantError::SkipInArray),
-            Ok(ReturnVariant::SetOf(_)) => Err(ReturnVariantError::SetOfInArray),
-            Ok(ReturnVariant::Table(_)) => Err(ReturnVariantError::TableInArray),
-            err @ Err(_) => err,
+            ReturnVariant::Plain(SqlVariant::Skip) => Err(ReturnVariantError::SkipInArray),
+            ReturnVariant::SetOf(_) => Err(ReturnVariantError::SetOfInArray),
+            ReturnVariant::Table(_) => Err(ReturnVariantError::TableInArray),
         }
     }
 }
@@ -632,38 +630,36 @@ where
     T: SqlTranslatable + FromDatum,
 {
     fn argument_sql() -> Result<SqlVariant, ArgumentError> {
-        match T::argument_sql() {
-            Ok(SqlVariant::Mapped(sql)) => Ok(SqlVariant::Mapped(format!("{sql}[]"))),
-            Ok(SqlVariant::Skip) => Err(ArgumentError::SkipInArray),
-            Ok(SqlVariant::Composite { .. }) => Ok(SqlVariant::Composite {
+        match T::argument_sql()? {
+            SqlVariant::Mapped(sql) => Ok(SqlVariant::Mapped(format!("{sql}[]"))),
+            SqlVariant::Skip => Err(ArgumentError::SkipInArray),
+            SqlVariant::Composite { .. } => Ok(SqlVariant::Composite {
                 requires_array_brackets: true,
             }),
-            Ok(SqlVariant::SourceOnly { .. }) => Ok(SqlVariant::SourceOnly {
+            SqlVariant::SourceOnly { .. } => Ok(SqlVariant::SourceOnly {
                 requires_array_brackets: true,
             }),
-            err @ Err(_) => err,
         }
     }
 
     fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        match T::return_sql() {
-            Ok(ReturnVariant::Plain(SqlVariant::Mapped(sql))) => {
+        match T::return_sql()? {
+            ReturnVariant::Plain(SqlVariant::Mapped(sql)) => {
                 Ok(ReturnVariant::Plain(SqlVariant::Mapped(format!("{sql}[]"))))
             }
-            Ok(ReturnVariant::Plain(SqlVariant::Composite {
+            ReturnVariant::Plain(SqlVariant::Composite {
                 requires_array_brackets: _,
-            })) => Ok(ReturnVariant::Plain(SqlVariant::Composite {
+            }) => Ok(ReturnVariant::Plain(SqlVariant::Composite {
                 requires_array_brackets: true,
             })),
-            Ok(ReturnVariant::Plain(SqlVariant::SourceOnly {
+            ReturnVariant::Plain(SqlVariant::SourceOnly {
                 requires_array_brackets: _,
-            })) => Ok(ReturnVariant::Plain(SqlVariant::SourceOnly {
+            }) => Ok(ReturnVariant::Plain(SqlVariant::SourceOnly {
                 requires_array_brackets: true,
             })),
-            Ok(ReturnVariant::Plain(SqlVariant::Skip)) => Err(ReturnVariantError::SkipInArray),
-            Ok(ReturnVariant::SetOf(_)) => Err(ReturnVariantError::SetOfInArray),
-            Ok(ReturnVariant::Table(_)) => Err(ReturnVariantError::TableInArray),
-            err @ Err(_) => err,
+            ReturnVariant::Plain(SqlVariant::Skip) => Err(ReturnVariantError::SkipInArray),
+            ReturnVariant::SetOf(_) => Err(ReturnVariantError::SetOfInArray),
+            ReturnVariant::Table(_) => Err(ReturnVariantError::TableInArray),
         }
     }
 
