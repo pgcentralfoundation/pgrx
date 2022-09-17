@@ -289,30 +289,6 @@ impl<'a, T: FromDatum + serde::Serialize> serde::Serialize for VariadicArray<'a,
 }
 
 impl<'a, T: FromDatum> VariadicArray<'a, T> {
-    /// Create an [`Array`](crate::datum::Array) over an array of [`pg_sys::Datum`](pg_sys::Datum) values and a corresponding array
-    /// of "is_null" indicators
-    ///
-    /// `T` can be [`pg_sys::Datum`](pg_sys::Datum) if the elements are not all of the same type
-    ///
-    /// # Safety
-    ///
-    /// This function is unsafe as it can't validate the provided pointer are valid or that
-    ///
-    pub unsafe fn over(
-        elements: *mut pg_sys::Datum,
-        nulls: *mut bool,
-        nelems: usize,
-    ) -> VariadicArray<'a, T> {
-        Self(Array::<T> {
-            _ptr: NonNull::new(std::ptr::null_mut()),
-            raw: None,
-            elem_layout: None,
-            nelems,
-            elem_slice: slice::from_raw_parts(elements, nelems).into(),
-            null_slice: slice::from_raw_parts(nulls, nelems).into(),
-            _marker: PhantomData,
-        })
-    }
 
     pub fn into_array_type(self) -> *const pg_sys::ArrayType {
         self.0.into_array_type()
