@@ -17,7 +17,7 @@ to the `pgx` framework and very subject to change between versions. While you ma
 */
 use crate::sql_entity_graph::{
     aggregate::options::{FinalizeModify, ParallelOption},
-    metadata::SqlVariant,
+    metadata::SqlMapping,
     pgx_sql::PgxSql,
     to_sql::{entity::ToSqlConfigEntity, ToSql},
     SqlGraphEntity, SqlGraphIdentifier, UsedTypeEntity,
@@ -276,8 +276,8 @@ impl ToSql for PgAggregateEntity {
 
         let map_ty = |used_ty: &UsedTypeEntity| -> eyre::Result<String> {
             match used_ty.metadata.argument_sql {
-                Ok(SqlVariant::Mapped(ref argument_sql)) => Ok(argument_sql.to_string()),
-                Ok(SqlVariant::Composite { array_brackets }) => used_ty
+                Ok(SqlMapping::As(ref argument_sql)) => Ok(argument_sql.to_string()),
+                Ok(SqlMapping::Composite { array_brackets }) => used_ty
                     .composite_type
                     .map(|v| {
                         if array_brackets {
@@ -289,7 +289,7 @@ impl ToSql for PgAggregateEntity {
                     .ok_or_else(|| {
                         eyre!("Macro expansion time suggested a composite_type!() in return")
                     }),
-                Ok(SqlVariant::SourceOnly { array_brackets }) => {
+                Ok(SqlMapping::Source { array_brackets }) => {
                     let sql = context
                         .source_only_to_sql_type(used_ty.ty_source)
                         .map(|v| {
@@ -304,7 +304,7 @@ impl ToSql for PgAggregateEntity {
                         })?;
                     Ok(sql)
                 }
-                Ok(SqlVariant::Skip) => Err(eyre!(
+                Ok(SqlMapping::Skip) => Err(eyre!(
                     "Cannot use skipped SQL translatable type as aggregate const type"
                 )),
                 Err(err) => match context.source_only_to_sql_type(used_ty.ty_source) {
@@ -395,10 +395,10 @@ impl ToSql for PgAggregateEntity {
                            schema_prefix = context.schema_prefix_for(&graph_index),
                            // First try to match on [`TypeId`] since it's most reliable.
                            sql_type = match arg.used_ty.metadata.argument_sql {
-                                Ok(SqlVariant::Mapped(ref argument_sql)) => {
+                                Ok(SqlMapping::As(ref argument_sql)) => {
                                     argument_sql.to_string()
                                 }
-                                Ok(SqlVariant::Composite {
+                                Ok(SqlMapping::Composite {
                                     array_brackets,
                                 }) => {
                                     arg.used_ty
@@ -416,7 +416,7 @@ impl ToSql for PgAggregateEntity {
                                         )
                                         })?
                                 }
-                                Ok(SqlVariant::SourceOnly {
+                                Ok(SqlMapping::Source {
                                     array_brackets,
                                 }) => {
                                     let sql = context
@@ -435,7 +435,7 @@ impl ToSql for PgAggregateEntity {
                                         })?;
                                     sql
                                 }
-                                Ok(SqlVariant::Skip) => return Err(eyre!("Got a skipped SQL translatable type in aggregate args, this is not permitted")),
+                                Ok(SqlMapping::Skip) => return Err(eyre!("Got a skipped SQL translatable type in aggregate args, this is not permitted")),
                                 Err(err) => {
                                     match context.source_only_to_sql_type(arg.used_ty.ty_source) {
                                         Some(source_only_mapping) => {

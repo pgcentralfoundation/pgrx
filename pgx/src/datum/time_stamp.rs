@@ -9,7 +9,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 use crate::{pg_sys, FromDatum, IntoDatum, TimestampConversionError, TimestampWithTimeZone};
 use pgx_utils::sql_entity_graph::metadata::{
-    ArgumentError, ReturnVariant, ReturnVariantError, SqlTranslatable, SqlVariant,
+    ArgumentError, ReturnVariant, ReturnVariantError, SqlMapping, SqlTranslatable,
 };
 use std::ffi::CStr;
 
@@ -199,12 +199,10 @@ impl serde::Serialize for Timestamp {
 }
 
 impl SqlTranslatable for crate::datum::Timestamp {
-    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
-        Ok(SqlVariant::Mapped(String::from("timestamp")))
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        Ok(SqlMapping::literal("timestamp"))
     }
     fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
-            "timestamp",
-        ))))
+        Ok(ReturnVariant::Plain(SqlMapping::literal("timestamp")))
     }
 }

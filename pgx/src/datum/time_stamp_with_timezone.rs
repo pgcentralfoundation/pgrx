@@ -10,7 +10,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 use crate::datum::time::USECS_PER_SEC;
 use crate::{pg_sys, FromDatum, IntoDatum};
 use pgx_utils::sql_entity_graph::metadata::{
-    ArgumentError, ReturnVariant, ReturnVariantError, SqlTranslatable, SqlVariant,
+    ArgumentError, ReturnVariant, ReturnVariantError, SqlMapping, SqlTranslatable,
 };
 use std::convert::TryFrom;
 use std::ffi::CStr;
@@ -230,12 +230,12 @@ impl serde::Serialize for TimestampWithTimeZone {
 }
 
 impl SqlTranslatable for TimestampWithTimeZone {
-    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
-        Ok(SqlVariant::Mapped(String::from("timestamp with time zone")))
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        Ok(SqlMapping::literal("timestamp with time zone"))
     }
     fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
+        Ok(ReturnVariant::Plain(SqlMapping::literal(
             "timestamp with time zone",
-        ))))
+        )))
     }
 }

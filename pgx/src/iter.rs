@@ -1,5 +1,5 @@
 use pgx_utils::sql_entity_graph::metadata::{
-    ArgumentError, ReturnVariant, ReturnVariantError, SqlTranslatable, SqlVariant,
+    ArgumentError, ReturnVariant, ReturnVariantError, SqlMapping, SqlTranslatable,
 };
 use std::panic::{RefUnwindSafe, UnwindSafe};
 
@@ -42,7 +42,7 @@ impl<'a, T> SqlTranslatable for SetOfIterator<'a, T>
 where
     T: SqlTranslatable + UnwindSafe + RefUnwindSafe,
 {
-    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         T::argument_sql()
     }
     fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
@@ -109,7 +109,7 @@ seq_macro::seq!(I in 0..=32 {
                     Input~N: SqlTranslatable + UnwindSafe + RefUnwindSafe + 'static,
                 )*
             {
-                fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+                fn argument_sql() -> Result<SqlMapping, ArgumentError> {
                     Err(ArgumentError::Table)
                 }
                 fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {

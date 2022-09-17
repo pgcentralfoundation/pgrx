@@ -7,7 +7,7 @@ to the `pgx` framework and very subject to change between versions. While you ma
 
 
 */
-use super::{ArgumentError, ReturnVariant, ReturnVariantError, SqlVariant};
+use super::{ArgumentError, ReturnVariant, ReturnVariantError, SqlMapping};
 
 #[derive(Clone, Debug, Hash, Eq, PartialEq, Ord, PartialOrd)]
 pub struct FunctionMetadataEntity {
@@ -19,7 +19,7 @@ pub struct FunctionMetadataEntity {
 #[derive(Clone, Debug, Hash, Eq, PartialEq, Ord, PartialOrd)]
 pub struct FunctionMetadataTypeEntity {
     pub type_name: &'static str,
-    pub argument_sql: Result<SqlVariant, ArgumentError>,
+    pub argument_sql: Result<SqlMapping, ArgumentError>,
     pub return_sql: Result<ReturnVariant, ReturnVariantError>,
     pub variadic: bool,
     pub optional: bool,

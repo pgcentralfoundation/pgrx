@@ -15,7 +15,7 @@ use crate::{
 };
 use pgx_pg_sys::varlena;
 use pgx_utils::sql_entity_graph::metadata::{
-    ArgumentError, ReturnVariant, ReturnVariantError, SqlTranslatable, SqlVariant,
+    ArgumentError, ReturnVariant, ReturnVariantError, SqlMapping, SqlTranslatable,
 };
 use serde::{Deserialize, Serialize};
 use std::borrow::Cow;
@@ -447,7 +447,7 @@ impl<T> SqlTranslatable for PgVarlena<T>
 where
     T: SqlTranslatable + Copy,
 {
-    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         T::argument_sql()
     }
 

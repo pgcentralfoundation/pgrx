@@ -13,7 +13,7 @@ use crate::{
     PgTupleDesc,
 };
 use pgx_utils::sql_entity_graph::metadata::{
-    ArgumentError, ReturnVariant, ReturnVariantError, SqlTranslatable, SqlVariant,
+    ArgumentError, ReturnVariant, ReturnVariantError, SqlMapping, SqlTranslatable,
 };
 use std::ops::Deref;
 use std::os::raw::c_char;
@@ -357,12 +357,10 @@ impl Drop for PgRelation {
 }
 
 impl SqlTranslatable for PgRelation {
-    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
-        Ok(SqlVariant::Mapped(String::from("regclass")))
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        Ok(SqlMapping::literal("regclass"))
     }
     fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
-            "regclass",
-        ))))
+        Ok(ReturnVariant::Plain(SqlMapping::literal("regclass")))
     }
 }

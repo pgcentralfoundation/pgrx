@@ -8,13 +8,13 @@ to the `pgx` framework and very subject to change between versions. While you ma
 */
 use std::error::Error;
 
-use super::sql_translatable::SqlVariant;
+use super::sql_translatable::SqlMapping;
 
 #[derive(Clone, Debug, Hash, Eq, PartialEq, Ord, PartialOrd)]
 pub enum ReturnVariant {
-    Plain(SqlVariant),
-    SetOf(SqlVariant),
-    Table(Vec<SqlVariant>),
+    Plain(SqlMapping),
+    SetOf(SqlMapping),
+    Table(Vec<SqlMapping>),
 }
 
 #[derive(Clone, Copy, Debug, Hash, Ord, PartialOrd, PartialEq, Eq)]
@@ -52,7 +52,7 @@ impl std::fmt::Display for ReturnVariantError {
                 write!(f, "TableIterator inside Array is not valid")
             }
             ReturnVariantError::SkipInArray => {
-                write!(f, "A SqlVariant::Skip inside Array is not valid")
+                write!(f, "A SqlMapping::Skip inside Array is not valid")
             }
             ReturnVariantError::BareU8 => {
                 write!(f, "Canot use bare u8")

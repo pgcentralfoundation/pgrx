@@ -10,7 +10,7 @@ use core::marker::PhantomData;
 
 use super::{
     return_variant::ReturnVariantError, ArgumentError, FunctionMetadataTypeEntity, ReturnVariant,
-    SqlTranslatable, SqlVariant,
+    SqlMapping, SqlTranslatable,
 };
 
 /**
@@ -20,7 +20,7 @@ Since we don't actually want to construct values during SQL generation, we use a
  */
 pub trait PhantomDataExt {
     fn type_name(&self) -> &'static str;
-    fn argument_sql(&self) -> Result<SqlVariant, ArgumentError>;
+    fn argument_sql(&self) -> Result<SqlMapping, ArgumentError>;
     fn return_sql(&self) -> Result<ReturnVariant, ReturnVariantError>;
     fn variadic(&self) -> bool;
     fn optional(&self) -> bool;
@@ -34,7 +34,7 @@ where
     fn type_name(&self) -> &'static str {
         T::type_name()
     }
-    fn argument_sql(&self) -> Result<SqlVariant, ArgumentError> {
+    fn argument_sql(&self) -> Result<SqlMapping, ArgumentError> {
         T::argument_sql()
     }
     fn return_sql(&self) -> Result<ReturnVariant, ReturnVariantError> {

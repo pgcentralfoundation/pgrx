@@ -9,7 +9,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 use crate::{pg_sys, FromDatum, IntoDatum, PgMemoryContexts};
 use core::fmt::Write;
 use pgx_utils::sql_entity_graph::metadata::{
-    ArgumentError, ReturnVariant, ReturnVariantError, SqlTranslatable, SqlVariant,
+    ArgumentError, ReturnVariant, ReturnVariantError, SqlMapping, SqlTranslatable,
 };
 use std::ops::{Deref, DerefMut};
 
@@ -129,12 +129,10 @@ impl<'a> std::fmt::UpperHex for Uuid {
 }
 
 impl SqlTranslatable for crate::datum::Uuid {
-    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
-        Ok(SqlVariant::Mapped(String::from("uuid")))
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        Ok(SqlMapping::literal("uuid"))
     }
     fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
-            "uuid",
-        ))))
+        Ok(ReturnVariant::Plain(SqlMapping::literal("uuid")))
     }
 }

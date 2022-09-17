@@ -11,7 +11,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 use crate::{pg_sys, PgMemoryContexts};
 //use std::fmt::{Debug, Error, Formatter};
 use pgx_utils::sql_entity_graph::metadata::{
-    ArgumentError, ReturnVariant, ReturnVariantError, SqlTranslatable, SqlVariant,
+    ArgumentError, ReturnVariant, ReturnVariantError, SqlMapping, SqlTranslatable,
 };
 use std::marker::PhantomData;
 use std::ops::{Deref, DerefMut};
@@ -411,7 +411,7 @@ impl<T, AllocatedBy: WhoAllocated<T>> Drop for PgBox<T, AllocatedBy> {
 }
 
 impl<T: SqlTranslatable> SqlTranslatable for PgBox<T, AllocatedByPostgres> {
-    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         T::argument_sql()
     }
     fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
@@ -420,7 +420,7 @@ impl<T: SqlTranslatable> SqlTranslatable for PgBox<T, AllocatedByPostgres> {
 }
 
 impl<T: SqlTranslatable> SqlTranslatable for PgBox<T, AllocatedByRust> {
-    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         T::argument_sql()
     }
     fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {

@@ -11,7 +11,7 @@ use crate::{array::RawArray, layout::*, pg_sys, FromDatum, IntoDatum, PgMemoryCo
 use bitvec::slice::BitSlice;
 use core::ptr::NonNull;
 use pgx_utils::sql_entity_graph::metadata::{
-    ArgumentError, ReturnVariant, ReturnVariantError, SqlTranslatable, SqlVariant,
+    ArgumentError, ReturnVariant, ReturnVariantError, SqlMapping, SqlTranslatable,
 };
 use serde::Serializer;
 use std::marker::PhantomData;
@@ -590,14 +590,14 @@ impl<'a, T> SqlTranslatable for Array<'a, T>
 where
     T: SqlTranslatable + FromDatum,
 {
-    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         match T::argument_sql()? {
-            SqlVariant::Mapped(sql) => Ok(SqlVariant::Mapped(format!("{sql}[]"))),
-            SqlVariant::Skip => Err(ArgumentError::SkipInArray),
-            SqlVariant::Composite { .. } => Ok(SqlVariant::Composite {
+            SqlMapping::As(sql) => Ok(SqlMapping::As(format!("{sql}[]"))),
+            SqlMapping::Skip => Err(ArgumentError::SkipInArray),
+            SqlMapping::Composite { .. } => Ok(SqlMapping::Composite {
                 array_brackets: true,
             }),
-            SqlVariant::SourceOnly { .. } => Ok(SqlVariant::SourceOnly {
+            SqlMapping::Source { .. } => Ok(SqlMapping::Source {
                 array_brackets: true,
             }),
         }
@@ -605,20 +605,20 @@ where
 
     fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
         match T::return_sql()? {
-            ReturnVariant::Plain(SqlVariant::Mapped(sql)) => {
-                Ok(ReturnVariant::Plain(SqlVariant::Mapped(format!("{sql}[]"))))
+            ReturnVariant::Plain(SqlMapping::As(sql)) => {
+                Ok(ReturnVariant::Plain(SqlMapping::As(format!("{sql}[]"))))
             }
-            ReturnVariant::Plain(SqlVariant::Composite { array_brackets: _ }) => {
-                Ok(ReturnVariant::Plain(SqlVariant::Composite {
+            ReturnVariant::Plain(SqlMapping::Composite { array_brackets: _ }) => {
+                Ok(ReturnVariant::Plain(SqlMapping::Composite {
                     array_brackets: true,
                 }))
             }
-            ReturnVariant::Plain(SqlVariant::SourceOnly { array_brackets: _ }) => {
-                Ok(ReturnVariant::Plain(SqlVariant::SourceOnly {
+            ReturnVariant::Plain(SqlMapping::Source { array_brackets: _ }) => {
+                Ok(ReturnVariant::Plain(SqlMapping::Source {
                     array_brackets: true,
                 }))
             }
-            ReturnVariant::Plain(SqlVariant::Skip) => Err(ReturnVariantError::SkipInArray),
+            ReturnVariant::Plain(SqlMapping::Skip) => Err(ReturnVariantError::SkipInArray),
             ReturnVariant::SetOf(_) => Err(ReturnVariantError::SetOfInArray),
             ReturnVariant::Table(_) => Err(ReturnVariantError::TableInArray),
         }
@@ -629,14 +629,14 @@ impl<'a, T> SqlTranslatable for VariadicArray<'a, T>
 where
     T: SqlTranslatable + FromDatum,
 {
-    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         match T::argument_sql()? {
-            SqlVariant::Mapped(sql) => Ok(SqlVariant::Mapped(format!("{sql}[]"))),
-            SqlVariant::Skip => Err(ArgumentError::SkipInArray),
-            SqlVariant::Composite { .. } => Ok(SqlVariant::Composite {
+            SqlMapping::As(sql) => Ok(SqlMapping::As(format!("{sql}[]"))),
+            SqlMapping::Skip => Err(ArgumentError::SkipInArray),
+            SqlMapping::Composite { .. } => Ok(SqlMapping::Composite {
                 array_brackets: true,
             }),
-            SqlVariant::SourceOnly { .. } => Ok(SqlVariant::SourceOnly {
+            SqlMapping::Source { .. } => Ok(SqlMapping::Source {
                 array_brackets: true,
             }),
         }
@@ -644,20 +644,20 @@ where
 
     fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
         match T::return_sql()? {
-            ReturnVariant::Plain(SqlVariant::Mapped(sql)) => {
-                Ok(ReturnVariant::Plain(SqlVariant::Mapped(format!("{sql}[]"))))
+            ReturnVariant::Plain(SqlMapping::As(sql)) => {
+                Ok(ReturnVariant::Plain(SqlMapping::As(format!("{sql}[]"))))
             }
-            ReturnVariant::Plain(SqlVariant::Composite { array_brackets: _ }) => {
-                Ok(ReturnVariant::Plain(SqlVariant::Composite {
+            ReturnVariant::Plain(SqlMapping::Composite { array_brackets: _ }) => {
+                Ok(ReturnVariant::Plain(SqlMapping::Composite {
                     array_brackets: true,
                 }))
             }
-            ReturnVariant::Plain(SqlVariant::SourceOnly { array_brackets: _ }) => {
-                Ok(ReturnVariant::Plain(SqlVariant::SourceOnly {
+            ReturnVariant::Plain(SqlMapping::Source { array_brackets: _ }) => {
+                Ok(ReturnVariant::Plain(SqlMapping::Source {
                     array_brackets: true,
                 }))
             }
-            ReturnVariant::Plain(SqlVariant::Skip) => Err(ReturnVariantError::SkipInArray),
+            ReturnVariant::Plain(SqlMapping::Skip) => Err(ReturnVariantError::SkipInArray),
             ReturnVariant::SetOf(_) => Err(ReturnVariantError::SetOfInArray),
             ReturnVariant::Table(_) => Err(ReturnVariantError::TableInArray),
         }

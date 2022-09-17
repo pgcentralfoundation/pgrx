@@ -10,7 +10,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 use crate::{pg_sys, FromDatum, IntoDatum};
 use core::num::TryFromIntError;
 use pgx_utils::sql_entity_graph::metadata::{
-    ArgumentError, ReturnVariant, ReturnVariantError, SqlTranslatable, SqlVariant,
+    ArgumentError, ReturnVariant, ReturnVariantError, SqlMapping, SqlTranslatable,
 };
 use std::ffi::CStr;
 
@@ -179,12 +179,10 @@ impl serde::Serialize for Date {
 }
 
 impl SqlTranslatable for Date {
-    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
-        Ok(SqlVariant::Mapped(String::from("date")))
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        Ok(SqlMapping::literal("date"))
     }
     fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
-            "date",
-        ))))
+        Ok(ReturnVariant::Plain(SqlMapping::literal("date")))
     }
 }

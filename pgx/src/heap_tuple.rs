@@ -8,7 +8,7 @@ use crate::{
     PgTupleDesc, TriggerTuple, TryFromDatumError, WhoAllocated,
 };
 use pgx_utils::sql_entity_graph::metadata::{
-    ArgumentError, ReturnVariant, ReturnVariantError, SqlTranslatable, SqlVariant,
+    ArgumentError, ReturnVariant, ReturnVariantError, SqlMapping, SqlTranslatable,
 };
 use std::num::NonZeroUsize;
 
@@ -584,26 +584,26 @@ macro_rules! composite_type {
 }
 
 impl SqlTranslatable for crate::heap_tuple::PgHeapTuple<'static, AllocatedByPostgres> {
-    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
-        Ok(SqlVariant::Composite {
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        Ok(SqlMapping::Composite {
             array_brackets: false,
         })
     }
     fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        Ok(ReturnVariant::Plain(SqlVariant::Composite {
+        Ok(ReturnVariant::Plain(SqlMapping::Composite {
             array_brackets: false,
         }))
     }
 }
 
 impl SqlTranslatable for crate::heap_tuple::PgHeapTuple<'static, AllocatedByRust> {
-    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
-        Ok(SqlVariant::Composite {
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        Ok(SqlMapping::Composite {
             array_brackets: false,
         })
     }
     fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        Ok(ReturnVariant::Plain(SqlVariant::Composite {
+        Ok(ReturnVariant::Plain(SqlMapping::Composite {
             array_brackets: false,
         }))
     }

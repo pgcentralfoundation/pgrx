@@ -9,7 +9,7 @@ Use of this source code is governed by the MIT license that can be found in the 
 
 use crate::{pg_sys, FromDatum, IntoDatum};
 use pgx_utils::sql_entity_graph::metadata::{
-    ArgumentError, ReturnVariant, ReturnVariantError, SqlTranslatable, SqlVariant,
+    ArgumentError, ReturnVariant, ReturnVariantError, SqlMapping, SqlTranslatable,
 };
 
 #[derive(Debug, Clone, Copy)]
@@ -51,12 +51,10 @@ impl IntoDatum for AnyElement {
 }
 
 impl SqlTranslatable for AnyElement {
-    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
-        Ok(SqlVariant::Mapped(String::from("any")))
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        Ok(SqlMapping::literal("any"))
     }
     fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
-            "any",
-        ))))
+        Ok(ReturnVariant::Plain(SqlMapping::literal("any")))
     }
 }

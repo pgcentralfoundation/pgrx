@@ -176,12 +176,12 @@ impl ToTokens for PostgresType {
 
         let inv = quote! {
             impl #staticless_impl_generics ::pgx::utils::sql_entity_graph::metadata::SqlTranslatable for #name #static_ty_generics #static_where_clauses {
-                fn argument_sql() -> core::result::Result<::pgx::utils::sql_entity_graph::metadata::SqlVariant, ::pgx::utils::sql_entity_graph::metadata::ArgumentError> {
-                    Ok(::pgx::utils::sql_entity_graph::metadata::SqlVariant::Mapped(String::from(stringify!(#name))))
+                fn argument_sql() -> core::result::Result<::pgx::utils::sql_entity_graph::metadata::SqlMapping, ::pgx::utils::sql_entity_graph::metadata::ArgumentError> {
+                    Ok(::pgx::utils::sql_entity_graph::metadata::SqlMapping::As(String::from(stringify!(#name))))
                 }
 
                 fn return_sql() -> core::result::Result<::pgx::utils::sql_entity_graph::metadata::ReturnVariant, ::pgx::utils::sql_entity_graph::metadata::ReturnVariantError> {
-                    Ok(::pgx::utils::sql_entity_graph::metadata::ReturnVariant::Plain(::pgx::utils::sql_entity_graph::metadata::SqlVariant::Mapped(String::from(stringify!(#name)))))
+                    Ok(::pgx::utils::sql_entity_graph::metadata::ReturnVariant::Plain(::pgx::utils::sql_entity_graph::metadata::SqlMapping::As(String::from(stringify!(#name)))))
                 }
             }
 

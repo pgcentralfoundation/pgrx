@@ -12,7 +12,7 @@ use crate::{
     void_mut_ptr, FromDatum, IntoDatum,
 };
 use pgx_utils::sql_entity_graph::metadata::{
-    ArgumentError, ReturnVariant, ReturnVariantError, SqlTranslatable, SqlVariant,
+    ArgumentError, ReturnVariant, ReturnVariantError, SqlMapping, SqlTranslatable,
 };
 use serde::{Serialize, Serializer};
 use serde_json::Value;
@@ -175,23 +175,19 @@ impl Serialize for JsonString {
 }
 
 impl SqlTranslatable for Json {
-    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
-        Ok(SqlVariant::Mapped(String::from("json")))
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        Ok(SqlMapping::literal("json"))
     }
     fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
-            "json",
-        ))))
+        Ok(ReturnVariant::Plain(SqlMapping::literal("json")))
     }
 }
 
 impl SqlTranslatable for crate::datum::JsonB {
-    fn argument_sql() -> Result<SqlVariant, ArgumentError> {
-        Ok(SqlVariant::Mapped(String::from("jsonb")))
+    fn argument_sql() -> Result<SqlMapping, ArgumentError> {
+        Ok(SqlMapping::literal("jsonb"))
     }
     fn return_sql() -> Result<ReturnVariant, ReturnVariantError> {
-        Ok(ReturnVariant::Plain(SqlVariant::Mapped(String::from(
-            "jsonb",
-        ))))
+        Ok(ReturnVariant::Plain(SqlMapping::literal("jsonb")))
     }
 }
