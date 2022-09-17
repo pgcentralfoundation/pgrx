@@ -37,16 +37,16 @@ impl std::fmt::Display for ReturnsError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             ReturnsError::NestedSetOf => {
-                write!(f, "Nested SetofIterator in return type")
+                write!(f, "Nested SetOfIterator in return type")
             }
             ReturnsError::NestedTable => {
                 write!(f, "Nested TableIterator in return type")
             }
             ReturnsError::SetOfContainingTable => {
-                write!(f, "SetofIterator containing TableIterator in return type")
+                write!(f, "SetOfIterator containing TableIterator in return type")
             }
             ReturnsError::TableContainingSetOf => {
-                write!(f, "TableIterator containing SetofIterator in return type")
+                write!(f, "TableIterator containing SetOfIterator in return type")
             }
             ReturnsError::SetOfInArray => {
                 write!(f, "SetofIterator inside Array is not valid")
@@ -55,10 +55,10 @@ impl std::fmt::Display for ReturnsError {
                 write!(f, "TableIterator inside Array is not valid")
             }
             ReturnsError::SkipInArray => {
-                write!(f, "A SqlMapping::Skip inside Array is not valid")
+                write!(f, "SqlMapping::Skip inside Array is not valid")
             }
             ReturnsError::BareU8 => {
-                write!(f, "Canot use bare u8")
+                write!(f, "Cannot use bare u8")
             }
             ReturnsError::Datum => {
                 write!(

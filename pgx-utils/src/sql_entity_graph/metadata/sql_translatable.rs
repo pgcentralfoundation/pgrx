@@ -26,13 +26,13 @@ impl std::fmt::Display for ArgumentError {
                 write!(f, "Cannot use SetOfIterator as an argument")
             }
             ArgumentError::Table => {
-                write!(f, "Canot use TableIterator as an argument")
+                write!(f, "Cannot use TableIterator as an argument")
             }
             ArgumentError::BareU8 => {
-                write!(f, "Canot use bare u8")
+                write!(f, "Cannot use bare u8")
             }
             ArgumentError::SkipInArray => {
-                write!(f, "A SqlMapping::Skip inside Array is not valid")
+                write!(f, "SqlMapping::Skip inside Array is not valid")
             }
             ArgumentError::Datum => {
                 write!(f, "A Datum as an argument means that `sql = \"...\"` must be set in the declaration")
