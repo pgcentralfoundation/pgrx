@@ -421,9 +421,9 @@ pub fn staticize_lifetimes(value: &mut syn::Type) {
     }
 }
 
-pub fn anonymonize_lifetimes_in_type_path(value: syn::TypePath) -> syn::TypePath {
+pub fn anonymize_lifetimes_in_type_path(value: syn::TypePath) -> syn::TypePath {
     let mut ty = syn::Type::Path(value);
-    anonymonize_lifetimes(&mut ty);
+    anonymize_lifetimes(&mut ty);
     match ty {
         syn::Type::Path(type_path) => type_path,
 
@@ -432,7 +432,7 @@ pub fn anonymonize_lifetimes_in_type_path(value: syn::TypePath) -> syn::TypePath
     }
 }
 
-pub fn anonymonize_lifetimes(value: &mut syn::Type) {
+pub fn anonymize_lifetimes(value: &mut syn::Type) {
     match value {
         syn::Type::Path(type_path) => {
             for segment in &mut type_path.path.segments {
@@ -446,9 +446,9 @@ pub fn anonymonize_lifetimes(value: &mut syn::Type) {
                                 }
 
                                 // recurse
-                                syn::GenericArgument::Type(ty) => anonymonize_lifetimes(ty),
+                                syn::GenericArgument::Type(ty) => anonymize_lifetimes(ty),
                                 syn::GenericArgument::Binding(binding) => {
-                                    anonymonize_lifetimes(&mut binding.ty)
+                                    anonymize_lifetimes(&mut binding.ty)
                                 }
                                 syn::GenericArgument::Constraint(constraint) => {
                                     for bound in constraint.bounds.iter_mut() {
@@ -480,7 +480,7 @@ pub fn anonymonize_lifetimes(value: &mut syn::Type) {
 
         syn::Type::Tuple(type_tuple) => {
             for elem in &mut type_tuple.elems {
-                anonymonize_lifetimes(elem);
+                anonymize_lifetimes(elem);
             }
         }
 
