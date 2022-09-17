@@ -40,7 +40,7 @@ pub mod hooks;
 pub mod htup;
 pub mod inoutfuncs;
 pub mod itemptr;
-pub mod iterators;
+pub mod iter;
 pub mod list;
 #[macro_use]
 pub mod log;
@@ -81,7 +81,7 @@ pub use hooks::*;
 pub use htup::*;
 pub use inoutfuncs::*;
 pub use itemptr::*;
-pub use iterators::*;
+pub use iter::*;
 pub use list::*;
 pub use log::*;
 pub use lwlock::*;
