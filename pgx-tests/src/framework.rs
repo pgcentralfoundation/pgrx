@@ -498,6 +498,10 @@ fn start_pg(loglines: LogLines) -> eyre::Result<String> {
                 .expect("unable to determine test port")
                 .to_string(),
         )
+        .arg("-c")
+        .arg("log_destination=stderr")
+        .arg("-c")
+        .arg("logging_collector=off")
         .stdout(Stdio::inherit())
         .stderr(Stdio::piped());
 
