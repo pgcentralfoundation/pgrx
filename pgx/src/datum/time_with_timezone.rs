@@ -19,7 +19,11 @@ use time::format_description::FormatItem;
 pub struct TimeWithTimeZone(Time);
 impl FromDatum for TimeWithTimeZone {
     #[inline]
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, typoid: u32) -> Option<TimeWithTimeZone> {
+    unsafe fn from_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        typoid: u32,
+    ) -> Option<TimeWithTimeZone> {
         if is_null {
             None
         } else {

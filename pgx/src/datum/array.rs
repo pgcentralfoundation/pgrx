@@ -272,7 +272,13 @@ impl<'a, T: FromDatum> Array<'a, T> {
         if i >= self.nelems {
             None
         } else {
-            Some(unsafe { T::from_datum(self.elem_slice[i], self.null_slice.get(i)?, self.typoid) })
+            Some(unsafe {
+                T::from_datum(
+                    self.elem_slice[i],
+                    self.null_slice.get(i)?,
+                    self.raw.as_ref().map(|r| r.oid()).unwrap_or_default(),
+                )
+            })
         }
     }
 }
@@ -451,14 +457,22 @@ impl<'a, T: FromDatum> Iterator for ArrayIntoIterator<'a, T> {
 
 impl<'a, T: FromDatum> FromDatum for VariadicArray<'a, T> {
     #[inline]
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<VariadicArray<'a, T>> {
-        Array::from_datum(datum, is_null).map(Self)
+    unsafe fn from_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        oid: pg_sys::Oid,
+    ) -> Option<VariadicArray<'a, T>> {
+        Array::from_datum(datum, is_null, oid).map(Self)
     }
 }
 
 impl<'a, T: FromDatum> FromDatum for Array<'a, T> {
     #[inline]
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, typoid: u32) -> Option<Array<'a, T>> {
+    unsafe fn from_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _typoid: u32,
+    ) -> Option<Array<'a, T>> {
         if is_null || datum.is_null() {
             None
         } else {

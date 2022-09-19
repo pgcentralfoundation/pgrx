@@ -100,7 +100,7 @@ pub trait FromDatum {
         } else if !is_null && datum.is_null() && !Self::is_pass_by_value() {
             Err(TryFromDatumError::NullDatumPointer)
         } else {
-            Ok(FromDatum::from_datum(datum, is_null))
+            Ok(FromDatum::from_datum(datum, is_null, type_oid))
         }
     }
 }
@@ -404,10 +404,10 @@ where
     T: FromDatum,
 {
     #[inline]
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Self> {
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, oid: pg_sys::Oid) -> Option<Self> {
         match is_null {
             true => None,
-            false => Some(T::from_datum(datum, is_null)),
+            false => Some(T::from_datum(datum, is_null, oid)),
         }
     }
 }

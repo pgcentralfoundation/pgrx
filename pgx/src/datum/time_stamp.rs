@@ -122,7 +122,7 @@ impl IntoDatum for Timestamp {
 }
 
 impl FromDatum for Timestamp {
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Self>
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<Self>
     where
         Self: Sized,
     {

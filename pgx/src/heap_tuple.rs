@@ -40,7 +40,11 @@ pub struct PgHeapTuple<'a, AllocatedBy: WhoAllocated<pg_sys::HeapTupleData>> {
 }
 
 impl<'a> FromDatum for PgHeapTuple<'a, AllocatedByRust> {
-    unsafe fn from_datum(composite: pg_sys::Datum, is_null: bool) -> Option<Self> {
+    unsafe fn from_datum(
+        composite: pg_sys::Datum,
+        is_null: bool,
+        _oid: pg_sys::Oid,
+    ) -> Option<Self> {
         if is_null {
             None
         } else {
@@ -52,6 +56,7 @@ impl<'a> FromDatum for PgHeapTuple<'a, AllocatedByRust> {
         mut memory_context: PgMemoryContexts,
         composite: Datum,
         is_null: bool,
+        _oid: pg_sys::Oid,
     ) -> Option<Self>
     where
         Self: Sized,

@@ -38,7 +38,11 @@ impl IntoDatum for Uuid {
 
 impl FromDatum for Uuid {
     #[inline]
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _typoid: pg_sys::Oid) -> Option<Uuid> {
+    unsafe fn from_datum(
+        datum: pg_sys::Datum,
+        is_null: bool,
+        _typoid: pg_sys::Oid,
+    ) -> Option<Uuid> {
         if is_null {
             None
         } else {
