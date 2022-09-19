@@ -498,6 +498,13 @@ fn start_pg(loglines: LogLines) -> eyre::Result<String> {
                 .expect("unable to determine test port")
                 .to_string(),
         )
+        // Redirecting logs to files can hang the test framework, override it
+        .args([
+            "-c",
+            "log_destination=stderr",
+            "-c",
+            "logging_collector=off",
+        ])
         .stdout(Stdio::inherit())
         .stderr(Stdio::piped());
 
