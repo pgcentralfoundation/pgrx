@@ -379,7 +379,7 @@ impl PgMemoryContexts {
     /// Accordingly, this may prove unwise to use on something that actually needs to run its Drop.
     /// But note it is not actually unsound to `mem::forget` something in this way, just annoying
     /// if you were expecting it to actually execute its Drop.
-    pub fn leak_trivial_alloc<T: RefUnwindSafe + UnwindSafe>(&mut self, v: T) -> *mut T {
+    pub fn leak_trivial_alloc<T>(&mut self, v: T) -> *mut T {
         #[cfg(feature = "postgrestd")]
         {
             self.switch_to(|_cx| Box::leak(Box::new(v)))
@@ -411,6 +411,60 @@ impl PgMemoryContexts {
         }
 
         result
+    }
+
+    pub fn unguarded_switch_to<R, F: FnOnce(&mut PgMemoryContexts) -> R>(&mut self, f: F) -> R {
+        fn unguarded_exec_in_context<R, F: FnOnce(&mut PgMemoryContexts) -> R>(
+            context: pg_sys::MemoryContext,
+            f: F,
+        ) -> R {
+            let prev_context;
+
+            // mimic what palloc.h does for switching memory contexts
+            unsafe {
+                prev_context = pg_sys::CurrentMemoryContext;
+                pg_sys::CurrentMemoryContext = context;
+            }
+
+            let result = f(&mut PgMemoryContexts::For(context));
+
+            // restore our understanding of the current memory context
+            unsafe {
+                pg_sys::CurrentMemoryContext = prev_context;
+            }
+
+            result
+        }
+
+        match self {
+            PgMemoryContexts::Transient {
+                parent,
+                name,
+                min_context_size,
+                initial_block_size,
+                max_block_size,
+            } => {
+                let context: pg_sys::MemoryContext = unsafe {
+                    let name = std::ffi::CString::new(*name).unwrap();
+                    pg_sys::AllocSetContextCreateExtended(
+                        *parent,
+                        name.into_raw(),
+                        *min_context_size as usize,
+                        *initial_block_size as usize,
+                        *max_block_size as usize,
+                    )
+                };
+
+                let result = unguarded_exec_in_context(context, f);
+
+                unsafe {
+                    pg_sys::MemoryContextDelete(context);
+                }
+
+                result
+            }
+            _ => unguarded_exec_in_context(self.value(), f),
+        }
     }
 
     ///

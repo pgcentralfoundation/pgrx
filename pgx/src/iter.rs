@@ -2,25 +2,17 @@ use pgx_utils::sql_entity_graph::metadata::{
     ArgumentError, Returns, ReturnsError, SqlMapping, SqlTranslatable,
 };
 use std::iter::once;
-use std::panic::{RefUnwindSafe, UnwindSafe};
 
 use crate::{pg_sys, IntoDatum};
 
-pub struct SetOfIterator<'a, T>
-where
-    T: UnwindSafe + RefUnwindSafe,
-{
-    iter: Box<dyn Iterator<Item = T> + UnwindSafe + RefUnwindSafe + 'a>,
+pub struct SetOfIterator<'a, T> {
+    iter: Box<dyn Iterator<Item = T> + 'a>,
 }
 
-impl<'a, T> SetOfIterator<'a, T>
-where
-    T: UnwindSafe + RefUnwindSafe,
-{
+impl<'a, T> SetOfIterator<'a, T> {
     pub fn new<I>(iter: I) -> Self
     where
-        I: IntoIterator<Item = T> + UnwindSafe + 'a,
-        <I as IntoIterator>::IntoIter: UnwindSafe + RefUnwindSafe,
+        I: IntoIterator<Item = T> + 'a,
     {
         Self {
             iter: Box::new(iter.into_iter()),
@@ -28,10 +20,7 @@ where
     }
 }
 
-impl<'a, T> Iterator for SetOfIterator<'a, T>
-where
-    T: UnwindSafe + RefUnwindSafe,
-{
+impl<'a, T> Iterator for SetOfIterator<'a, T> {
     type Item = T;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -41,7 +30,7 @@ where
 
 unsafe impl<'a, T> SqlTranslatable for SetOfIterator<'a, T>
 where
-    T: SqlTranslatable + UnwindSafe + RefUnwindSafe,
+    T: SqlTranslatable,
 {
     fn argument_sql() -> Result<SqlMapping, ArgumentError> {
         T::argument_sql()
@@ -56,20 +45,14 @@ where
     }
 }
 
-pub struct TableIterator<'a, T>
-where
-    T: UnwindSafe + RefUnwindSafe,
-{
-    iter: Box<dyn Iterator<Item = T> + UnwindSafe + RefUnwindSafe + 'a>,
+pub struct TableIterator<'a, T> {
+    iter: Box<dyn Iterator<Item = T> + 'a>,
 }
 
-impl<'a, T> TableIterator<'a, T>
-where
-    T: UnwindSafe + RefUnwindSafe,
-{
+impl<'a, T> TableIterator<'a, T> {
     pub fn new<I>(iter: I) -> Self
     where
-        I: Iterator<Item = T> + UnwindSafe + RefUnwindSafe + 'a,
+        I: Iterator<Item = T> + 'a,
     {
         Self {
             iter: Box::new(iter),
@@ -86,10 +69,7 @@ where
     }
 }
 
-impl<'a, T> Iterator for TableIterator<'a, T>
-where
-    T: UnwindSafe + RefUnwindSafe,
-{
+impl<'a, T> Iterator for TableIterator<'a, T> {
     type Item = T;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -99,7 +79,7 @@ where
 
 impl<'a, T> IntoDatum for TableIterator<'a, T>
 where
-    T: SqlTranslatable + UnwindSafe + RefUnwindSafe,
+    T: SqlTranslatable,
 {
     fn into_datum(self) -> Option<pg_sys::Datum> {
         todo!()
@@ -116,7 +96,7 @@ seq_macro::seq!(I in 0..=32 {
             unsafe impl<'a, #(Input~N,)*> SqlTranslatable for TableIterator<'a, (#(Input~N,)*)>
             where
                 #(
-                    Input~N: SqlTranslatable + UnwindSafe + RefUnwindSafe + 'static,
+                    Input~N: SqlTranslatable + 'static,
                 )*
             {
                 fn argument_sql() -> Result<SqlMapping, ArgumentError> {
