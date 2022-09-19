@@ -94,7 +94,10 @@ mod pg_10_11 {
     pub fn pg_getarg<T: FromDatum>(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> Option<T> {
         let datum = unsafe { fcinfo.as_ref() }.unwrap().arg[num];
         let isnull = pg_arg_is_null(fcinfo, num);
-        unsafe { T::from_datum(datum, isnull) }
+        unsafe {
+            let typid = pg_sys::InvalidOid;
+            T::from_datum(datum, isnull, typid)
+        }
     }
 
     #[inline]
@@ -130,7 +133,10 @@ mod pg_12_13_14 {
     #[inline]
     pub fn pg_getarg<T: FromDatum>(fcinfo: pg_sys::FunctionCallInfo, num: usize) -> Option<T> {
         let datum = get_nullable_datum(fcinfo, num);
-        unsafe { T::from_datum(datum.value, datum.isnull) }
+        unsafe {
+            let typid = pg_sys::InvalidOid;
+            T::from_datum(datum.value, datum.isnull, typid)
+        }
     }
 
     #[inline]
@@ -263,7 +269,7 @@ pub unsafe fn direct_function_call<R: FromDatum>(
 ) -> Option<R> {
     let datum = direct_function_call_as_datum(func, args);
     match datum {
-        Some(datum) => R::from_datum(datum, false),
+        Some(datum) => R::from_datum(datum, false, pg_sys::InvalidOid),
         None => None,
     }
 }
@@ -300,7 +306,7 @@ pub unsafe fn direct_pg_extern_function_call<R: FromDatum>(
 ) -> Option<R> {
     let datum = direct_pg_extern_function_call_as_datum(func, args);
     match datum {
-        Some(datum) => R::from_datum(datum, false),
+        Some(datum) => R::from_datum(datum, false, pg_sys::InvalidOid),
         None => None,
     }
 }

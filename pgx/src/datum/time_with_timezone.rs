@@ -19,13 +19,13 @@ use time::format_description::FormatItem;
 pub struct TimeWithTimeZone(Time);
 impl FromDatum for TimeWithTimeZone {
     #[inline]
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<TimeWithTimeZone> {
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, typoid: u32) -> Option<TimeWithTimeZone> {
         if is_null {
             None
         } else {
             let timetz = PgBox::from_pg(datum.ptr_cast::<pg_sys::TimeTzADT>());
 
-            let mut time = Time::from_datum(pg_sys::Datum::from(timetz.time), false)
+            let mut time = Time::from_datum(timetz.time.into(), false, typoid)
                 .expect("failed to convert TimeWithTimeZone");
             time.0 += time::Duration::seconds(timetz.zone as i64);
 

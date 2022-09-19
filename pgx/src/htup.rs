@@ -110,8 +110,13 @@ pub fn heap_getattr<
             tupdesc.as_ptr(),
             &mut is_null,
         );
+        let typoid = tupdesc.get(attno - 1).expect("no attribute").type_oid();
 
-        T::from_datum(datum, is_null)
+    if is_null {
+        None
+    } else {
+        unsafe { T::from_datum(datum, false, typoid.value()) }
+    }
     }
 }
 
@@ -158,7 +163,7 @@ pub struct DatumWithTypeInfo {
 impl DatumWithTypeInfo {
     #[inline]
     pub fn into_value<T: FromDatum>(self) -> T {
-        unsafe { T::from_datum(self.datum, self.is_null).unwrap() }
+        unsafe { T::from_datum(self.datum, self.is_null, self.typoid.value()).unwrap() }
     }
 }
 

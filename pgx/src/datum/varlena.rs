@@ -301,7 +301,7 @@ impl<T> FromDatum for PgVarlena<T>
 where
     T: Copy + Sized,
 {
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Self> {
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _typoid: u32) -> Option<Self> {
         if is_null {
             None
         } else {
@@ -313,6 +313,7 @@ where
         mut memory_context: PgMemoryContexts,
         datum: pg_sys::Datum,
         is_null: bool,
+        _typoid: u32,
     ) -> Option<Self> {
         if is_null {
             None
@@ -348,7 +349,7 @@ impl<'de, T> FromDatum for T
 where
     T: PostgresType + Deserialize<'de>,
 {
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Self> {
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _typoid: u32) -> Option<Self> {
         if is_null {
             None
         } else {
@@ -360,6 +361,7 @@ where
         memory_context: PgMemoryContexts,
         datum: pg_sys::Datum,
         is_null: bool,
+        _typoid: u32,
     ) -> Option<Self> {
         if is_null {
             None

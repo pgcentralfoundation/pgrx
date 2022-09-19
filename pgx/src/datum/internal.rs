@@ -163,7 +163,7 @@ impl From<Option<pg_sys::Datum>> for Internal {
 
 impl FromDatum for Internal {
     #[inline]
-    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool) -> Option<Internal> {
+    unsafe fn from_datum(datum: pg_sys::Datum, is_null: bool, _: pg_sys::Oid) -> Option<Internal> {
         Some(Internal(if is_null { None } else { Some(datum) }))
     }
 }
